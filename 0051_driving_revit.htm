@@ -1,0 +1,161 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<!-- 1238742 [execute commands] -->
+
+<h3>Driving Revit from Outside</h3>
+
+<p>We are winding up here at Autodesk University, with a final panel session to
+
+<a href="http://au.autodesk.com/sessions/?speaker=Jeremy+Tammik&year=2008">
+meet the AEC API experts</a>
+
+yesterday afternoon, and one on
+
+<a href="http://au.autodesk.com/sessions/detail/2866">
+advanced use of the Revit API</a>
+
+this morning.</p>
+
+<p>One topic that keeps cropping up in infinite variations and was mentioned several times in my sessions here at AU is how to drive Revit reliably from an application.
+The Revit API assumes that all interaction with the API functionality happens from within an external command.
+In general, this requires user interaction to select a menu entry or click a toolbar button to trigger the external command execution.
+In many cases, an application would like to make use of the API without requiring this explicit manual user interaction to initiate it.
+One example of such a situation is a modeless dialogue displayed side by side with the Revit user interface.</p>
+
+<p>It is actually possible to at least query the model from a modeless dialogue without explicitly starting a command.
+It does help if you open a transaction before accessing the document.
+Making modifications to a document definitely does not work, however, without being within in the context of an external command execution.
+The good news is that it is possible to trigger the execution of an external command programmatically using Win32 API functions to simulate the required user input, such as a menu entry selection.
+Here are some of the topics that are of interest in this context, related topics for me to remember and you to optionally ponder until we get around to discussing them in depth:</p>
+
+<ul>
+<li>Determining the Revit window handle.</li>
+<li>Initiating a Revit external command from an external application.</li>
+<li>Driving Revit from a modeless dialogue.</li>
+<li>Synchronisation issues, such as determining when a command has begun and terminated.</li>
+<li>Executing a command that creates new elements and determining which ones they are.</li>
+<li>Opening and activating a document in Revit.</li>
+</ul>
+
+<p>Simply opening a new document in the background is not an issue, since the API provides the Application OpenDocumentFile method, but there is no Revit API call to activate it. There is, however, a known workaround. What do you think it is? Don't worry; we will get to it one of these days.</p>
+
+<p>This post starts off the exploration of these issues by addressing the first two points, determining the Revit window handle and triggering some Revit menu picks from an external command line application. It is so simple that I can list the code right here and now:</p>
+
+<pre class="code">
+[<span class="teal">DllImport</span>( <span class="maroon">"USER32.DLL"</span> )]
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">extern</span> <span class="teal">IntPtr</span> FindWindow(
+&nbsp; <span class="blue">string</span> lpClassName, <span class="blue">string</span> lpWindowName );
+
+[<span class="teal">DllImport</span>( <span class="maroon">"USER32.DLL"</span> )]
+<span class="blue">public</span> <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">bool</span> SetForegroundWindow(
+&nbsp; <span class="teal">IntPtr</span> hWnd );
+&nbsp;
+<span class="blue">const</span> <span class="blue">string</span> _window_class_name_zero
+&nbsp; = <span class="maroon">"Afx:00400000:8:00010011:00000000:007B05A1"</span>;
+
+<span class="blue">const</span> <span class="blue">string</span> _window_class_name_project_open
+&nbsp; = <span class="maroon">"Afx:00400000:8:00010011:00000000:007B05A1"</span>;
+&nbsp;
+<span class="blue">static</span> <span class="blue">int</span> Main( <span class="blue">string</span>[] args )
+{
+&nbsp; <span class="teal">IntPtr</span> revitHandle 
+&nbsp; &nbsp; = FindWindow( _window_class_name_project_open, <span class="blue">null</span> );
+
+&nbsp; <span class="blue">if</span>( <span class="teal">IntPtr</span>.Zero == revitHandle )
+&nbsp; {
+&nbsp; &nbsp; revitHandle = FindWindow( _window_class_name_zero, <span class="blue">null</span> );
+&nbsp; }
+
+&nbsp; <span class="blue">if</span>( <span class="teal">IntPtr</span>.Zero == revitHandle )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Console</span>.WriteLine( <span class="maroon">"Unable to find Revit window."
+&nbsp; &nbsp; &nbsp; + " Is Revit Architecture up and running yet?"</span> );
+&nbsp; &nbsp; <span class="blue">return</span> 1;
+&nbsp; }
+
+&nbsp; SetForegroundWindow( revitHandle );
+&nbsp; <span class="teal">SendKeys</span>.SendWait( <span class="maroon">"{F1}"</span> );
+
+&nbsp; SetForegroundWindow( revitHandle );
+&nbsp; <span class="teal">SendKeys</span>.SendWait( <span class="maroon">"^{F10}{LEFT}{LEFT}{DOWN}{UP}{ENTER}"</span> );
+
+&nbsp; <span class="blue">return</span> 0;
+}
+</pre>
+
+<p>I am providing the complete Visual Studio solution implementing this 
+
+<a href="zip/SendCmd_1000.zip">
+console application named SendCmd</a> here.</p>
+
+<p>We use the two Win32 API functions FindWindow() to get a handle to an application window and SetForegroundWindow() to activate it.
+In the call to the former, we need to specify either a window caption or a window class name. 
+Both of these can be obtained using the Visual Studio Spy++ tool, which is available under Start > Programs > Microsoft Visual Studio 2005 > Visual Studio Tools > Spy++.
+The window class name varies from one Revit version to the next, and also between different flavours of Revit.
+In addition, the class name is different depending on whether Revit has a project document open or not. 
+We would call the latter a zero document state.
+Another difference between these two states is that no external tools can be activated in zero document state, which is another reason why it is useful to be able to differentiate between the two states.
+The two class names for the open project and zero documents states specified in the code are valid for Revit Architecture 2009 Build 20080915_2100.</p>
+
+<p>The code in the Main() function searches for a window belonging to a running instance of Revit, first with an open project, then, if that fails, with no project open.
+If that fails as well, a message is printed, and the program terminates.
+Otherwise, it ensures that the Revit window is brought to the foreground and sends two keystroke sequences to it:</p>
+
+<ul>
+<li><code>"{F1}" </code> to open the help file.</li>
+<li><code>"^{F10}{LEFT}{LEFT}{DOWN}{UP}{ENTER}"</code> to enter the menu system, navigate to a particular menu entry, and activate it.</li>
+</ul>
+
+<p>The first sequence is a simple hit of the F1 function key to open the Revit help file.
+The second sequence represents "Ctrl + F10, Left Arrow, Left Arrow, Down Arrow, Up Arrow, Enter". 
+This activates the Revit menu and then navigates to and selects the menu entry Help > About... to display the about box.
+Thus, running this program with an open instance of Revit will pop up the Revit help file and about dialogue.</p>
+
+<p>We will probably revisit this question in more depth and from other points of view in future discussions.
+To start it off, we have looked at the simple scenario of running a standalone command line executable and triggering a menu selection in a running instance of Revit.
+A related possibility would be to send language dependent strings to activate menu items.
+For instance, to execute the line command on a Spanish version of Revit Architecture, one could use the string "(%M)í":</p>
+
+<ul>
+<li><strong>(%M)</strong> opens the "Modelling Menu".</li>
+<li><strong>í</strong> is the Spanish menu shortcut for the Line command.</li>
+</ul>
+
+<p>In Revit 2008, it was also possible to send the simple keystroke sequence "LI" for the shortcut that appears in the keyboardShortcuts.txt file, but that no longer seems to work in Revit 2009.</p>
+
+<p>An issue in this scenario is that the SendWait() method does not wait for the user to finalise the command.
+It is asynchronous. Once you have sent the keystroke sequence, you need to wait until the command has actually been activated by Revit before you can start interacting with it.
+How can we determine when the command is active, and also when it has ended?</p>
+
+<p>For more information on the use of SendKeys and the preparation in setting the active foreground window, you can look at the MSDN documentation on how to 	
+
+<a href="http://msdn2.microsoft.com/en-us/library/ms171548.aspx">
+simulate mouse and keyboard events</a> in code.
+
+The escape codes used with SendWait() are explained in the section on 
+
+<a href="http://msdn2.microsoft.com/en-us/library/system.windows.forms.sendkeys.send.aspx">
+SendKeys.Send()</a>.
+
+Using Ctrl + F10 to activate the menu bar, followed by arrow keys to navigate to the proper menu entry, make the key sequence language independent, 
+so it does not need to be modified to handle different language dependencies, e.g. for the English or Spanish menu shortcuts.
+
+<p>There are 
+
+<a href="http://forums.augi.com/showpost.php?p=765178&postcount=6">
+other ways</a>
+
+of doing this as well. One developer mentioned that using SendMessage() requires more work to implement, but is considerably more reliable.
+Also, in the minimal sample above, we are using a simple call to FindWindow() to determine the Revit handle. 
+This will not deal reliably with multiple sessions. In such a case, EnumWindow is sometimes a better way to go, or you can make use of the 
+
+<a href="http://www.mycsharpcorner.com/Post.aspx?postID=32">
+process name</a>
+
+to identify the required instance and retrieve its window handle.</p>
+

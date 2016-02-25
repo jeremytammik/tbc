@@ -1,0 +1,189 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>3D Polygon Areas</h3>
+
+<p>We continue the discussion initiated in the recent post on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html">
+two-dimensional polygon area calculation</a>.
+
+We can use these areas to determine which of the edge loops is the outer loop versus inner loops defining holes.
+The polygon with the largest area is the outer loop, all others are inner holes.
+This is a continuation of the analysis for determining the profile boundary loop polygons for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/slab-boundary.html">
+floor slabs</a>
+
+and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/wall-elevation-profile.html">
+walls</a>.
+
+In this instalment, we expand our analysis to include three-dimensional polygons, i.e. planar polygons oriented arbitrarily in 3D space.</p>
+
+<p>To determine the area of a two-dimensional polygon in the previous post, we used a simple formula which basically works by calculating the area of the triangles spanned by an arbitrary point in the plane and any two consecutive polygon vertices, and summing up all of those triangle areas.
+The polygons returned for the floor and wall boundary loops are three dimensional.
+We have two choices for calculating the area of a three-dimensional planar polygon in space.
+One approach is to transform the polygon appropriately onto the XY plane and make use of the formula we already have.
+Another approach makes use of the same algorithm adapted for use on the three-dimensional vertices directly.
+It calculates each polygon's plane data in space, i.e. its distance from the origin and normal vector.
+The polygon area is by-product of these calculations, because it is equal to half of the length of the non-normalized normal vector.
+I would like to demonstrate both approaches, so we can compare them and ensure that both return the same results.
+We will begin with the implementation of the three-dimensional algorithm, including optimised implementations for the special cases of triangles and four-sided polygons:</p>
+
+<pre class="code">
+<span class="blue">bool</span> GetPolygonPlane(
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; polygon,
+&nbsp; <span class="blue">out</span> <span class="teal">XYZ</span> normal,
+&nbsp; <span class="blue">out</span> <span class="blue">double</span> dist,
+&nbsp; <span class="blue">out</span> <span class="blue">double</span> area )
+{
+&nbsp; normal = <span class="teal">XYZ</span>.Zero;
+&nbsp; dist = area = 0.0;
+&nbsp; <span class="blue">int</span> n = ( <span class="blue">null</span> == polygon ) ? 0 : polygon.Count;
+&nbsp; <span class="blue">bool</span> rc = ( 2 &lt; n );
+&nbsp; <span class="blue">if</span>( 3 == n )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> a = polygon[0];
+&nbsp; &nbsp; <span class="teal">XYZ</span> b = polygon[1];
+&nbsp; &nbsp; <span class="teal">XYZ</span> c = polygon[2];
+&nbsp; &nbsp; <span class="teal">XYZ</span> v = b - a;
+&nbsp; &nbsp; normal = v.Cross( c - a );
+&nbsp; &nbsp; dist = normal.Dot( a );
+&nbsp; }
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( 4 == n )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> a = polygon[0];
+&nbsp; &nbsp; <span class="teal">XYZ</span> b = polygon[1];
+&nbsp; &nbsp; <span class="teal">XYZ</span> c = polygon[2];
+&nbsp; &nbsp; <span class="teal">XYZ</span> d = polygon[3];
+&nbsp;
+&nbsp; &nbsp; normal.X = ( c.Y - a.Y ) * ( d.Z - b.Z )
+&nbsp; &nbsp; &nbsp; + ( c.Z - a.Z ) * ( b.Y - d.Y );
+&nbsp; &nbsp; normal.Y = ( c.Z - a.Z ) * ( d.X - b.X )
+&nbsp; &nbsp; &nbsp; + ( c.X - a.X ) * ( b.Z - d.Z );
+&nbsp; &nbsp; normal.Z = ( c.X - a.X ) * ( d.Y - b.Y )
+&nbsp; &nbsp; &nbsp; + ( c.Y - a.Y ) * ( b.X - d.X );
+&nbsp;
+&nbsp; &nbsp; dist = 0.25 *
+&nbsp; &nbsp; &nbsp; ( normal.X * ( a.X + b.X + c.X + d.X )
+&nbsp; &nbsp; &nbsp; + normal.Y * ( a.Y + b.Y + c.Y + d.Y )
+&nbsp; &nbsp; &nbsp; + normal.Z * ( a.Z + b.Z + c.Z + d.Z ) );
+&nbsp; }
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( 4 &lt; n )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> a;
+&nbsp; &nbsp; <span class="teal">XYZ</span> b = polygon[n - 2];
+&nbsp; &nbsp; <span class="teal">XYZ</span> c = polygon[n - 1];
+&nbsp; &nbsp; <span class="teal">XYZ</span> s = <span class="teal">XYZ</span>.Zero;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; n; ++i ) {
+&nbsp; &nbsp; &nbsp; a = b;
+&nbsp; &nbsp; &nbsp; b = c;
+&nbsp; &nbsp; &nbsp; c = polygon[i];
+&nbsp;
+&nbsp; &nbsp; &nbsp; normal.X += b.Y * ( c.Z - a.Z );
+&nbsp; &nbsp; &nbsp; normal.Y += b.Z * ( c.X - a.X );
+&nbsp; &nbsp; &nbsp; normal.Z += b.X * ( c.Y - a.Y );
+&nbsp;
+&nbsp; &nbsp; &nbsp; s += c;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; dist = s.Dot( normal ) / n;
+&nbsp; }
+&nbsp; <span class="blue">if</span>( rc )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">double</span> length = normal.Length;
+&nbsp; &nbsp; rc = !<span class="teal">Util</span>.IsZero( length );
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( rc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( rc )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; normal /= length;
+&nbsp; &nbsp; &nbsp; dist /= length;
+&nbsp; &nbsp; &nbsp; area = 0.5 * length;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> rc;
+}
+</pre>
+
+<p>We define a variable n for the number of polygon vertices.
+We have implemented specific code for triangles, i.e. the case n = 3, and 4-sided polygons.
+The polygon area is half of the length of the non-normalized normal vector of the plane.</p>
+
+<p>Here is the main section of the external command making use of this function.
+It lists the areas of the various loops of the selected walls, or all walls in the model, if none were explicitly selected, and highlights the largest area.
+Just like in the floor area calculation, the code assumes that only one wall is picked.
+If more than one is processed, then the determination of the outer loop will only work for the wall with the largest surface area, since all loops of all walls are included in one single list.
+We repackaged the functionality for determining the wall profile polygons into a separate utility method GetWallProfilePolygons() in the CmdWallProfile class, so that we can reuse that functionality from the new command as well:</p>
+
+<pre class="code">
+<span class="teal">List</span>&lt;<span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;&gt; polygons
+&nbsp; = <span class="teal">CmdWallProfile</span>.GetWallProfilePolygons(
+&nbsp; &nbsp; app, walls );
+&nbsp;
+<span class="blue">int</span> i = 0, n = polygons.Count;
+<span class="blue">double</span>[] areas = <span class="blue">new</span> <span class="blue">double</span>[n];
+<span class="blue">double</span> d, a, maxArea = 0.0;
+<span class="teal">XYZ</span> normal;
+<span class="blue">foreach</span>( <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; polygon <span class="blue">in</span> polygons )
+{
+&nbsp; GetPolygonPlane( polygon,
+&nbsp; &nbsp; <span class="blue">out</span> normal, <span class="blue">out</span> d, <span class="blue">out</span> a );
+&nbsp; <span class="blue">if</span>( <span class="teal">Math</span>.Abs( maxArea ) &lt; <span class="teal">Math</span>.Abs( a ) )
+&nbsp; {
+&nbsp; &nbsp; maxArea = a;
+&nbsp; }
+&nbsp; areas[i++] = a;
+}
+&nbsp;
+<span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; <span class="maroon">"{0} boundary loop{1} found."</span>,
+&nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ) ) );
+&nbsp;
+<span class="blue">for</span>( i = 0; i &lt; n; ++i )
+{
+&nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">"&nbsp; Loop {0} area is {1} square feet{2}"</span>,
+&nbsp; &nbsp; i,
+&nbsp; &nbsp; <span class="teal">Util</span>.RealString( areas[i] ),
+&nbsp; &nbsp; ( areas[i].Equals( maxArea )
+&nbsp; &nbsp; &nbsp; ? <span class="maroon">", outer loop of largest wall"</span>
+&nbsp; &nbsp; &nbsp; : <span class="maroon">""</span> ) ) );
+}
+</pre>
+
+<p>Here is a small example model with two walls selected and highlighted in red. Their boundary loops are represented by model lines in green, offset outward from the outer wall face by one foot:</p>
+
+<img src="img/wall_boundary_loops.png" alt="Wall boundary loops"/>
+
+<p>This is the list of the boundary loop areas of the two selected walls.
+The first wall has an outer loop and two inner ones for the two windows.
+The second wall has only one single simple rectangular outer loop:</p>
+
+<pre>
+4 boundary loops found.
+  Loop 0 area is 288.98 square feet, outer loop of largest wall
+  Loop 1 area is 2.67 square feet
+  Loop 2 area is 2.67 square feet
+  Loop 3 area is 172.22 square feet
+</pre>
+
+<p>There are still some aspects of this topic left that we would like to address in future posts.
+As mentioned above, we would like to transform the 3D polygons into the 2D XY plane
+so we can use the two-dimensional GetSignedPolygonArea() on those as well, instead of performing the area calculation in 3D.
+Then we can compare the 2D and 3D results to ensure that they are equal.
+It would also be interesting to compare the relative speed of transforming the 3D situation to 2D and using 2D area calculation versus direct 3D area calculation.</p>
+
+<p>Here is an updated
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/bc10015.zip">
+version 1.0.0.15</a>
+
+of the complete Visual Studio solution,
+including the two new commands CmdSlabBoundaryArea and CmdWallProfileArea as well as all other commands discussed so far.</p>

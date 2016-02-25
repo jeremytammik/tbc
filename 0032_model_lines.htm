@@ -1,0 +1,114 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Model Line Creation</h3>
+
+<p>In the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/slab-boundary.html">
+previous post</a>,
+
+we determined the slab boundary polygons and displayed the resulting polygon data graphically for debugging and better understanding by creating model line segments for them in the Revit database. We did not go into any detail about the code to create those model lines, which is an interesting little topic all in itself. It is packaged in a utility class named Creator, since it encapsulates a small subset of the functionality provided by the Autodesk.Revit.Creation namespace. This post presents and discusses this model line creator. Here is the code for it:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">Creator</span>
+{
+&nbsp; <span class="green">// these are </span>
+&nbsp; <span class="green">// Autodesk.Revit.Creation</span>
+&nbsp; <span class="green">// objects!</span>
+&nbsp; <span class="teal">Application</span> _app;
+&nbsp; <span class="teal">Document</span> _doc;
+&nbsp;
+&nbsp; <span class="blue">public</span> Creator(
+&nbsp; &nbsp; Autodesk.Revit.<span class="teal">Application</span> app )
+&nbsp; {
+&nbsp; &nbsp; _app = app.Create;
+&nbsp; &nbsp; _doc = app.ActiveDocument.Create;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">SketchPlane</span> NewSketchPlanePassLine(
+&nbsp; &nbsp; <span class="teal">Line</span> line )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> p = line.get_EndPoint( 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> q = line.get_EndPoint( 1 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> norm;
+&nbsp; &nbsp; <span class="blue">if</span>( p.X == q.X )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; norm = <span class="teal">XYZ</span>.BasisX;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( p.Y == q.Y )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; norm = <span class="teal">XYZ</span>.BasisY;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; norm = <span class="teal">XYZ</span>.BasisZ;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="teal">Plane</span> plane = _app.NewPlane(
+&nbsp; &nbsp; &nbsp; norm, p );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> _doc.NewSketchPlane( plane );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> CreateModelLine( <span class="teal">XYZ</span> p, <span class="teal">XYZ</span> q )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( p.AlmostEqual( q ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">ArgumentException</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"Expected two different points."</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="teal">Line</span> line = _app.NewLine( p, q, <span class="blue">true</span> );
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == line )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span> <span class="blue">new</span> <span class="teal">Exception</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"Geometry line creation failed."</span> );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; _doc.NewModelCurve( line,
+&nbsp; &nbsp; &nbsp; NewSketchPlanePassLine( line ) );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> DrawPolygons(
+&nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;&gt; loops )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> p1 = <span class="teal">XYZ</span>.Zero;
+&nbsp; &nbsp; <span class="teal">XYZ</span> q = <span class="teal">XYZ</span>.Zero;
+&nbsp; &nbsp; <span class="blue">bool</span> first;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; loop <span class="blue">in</span> loops )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; first = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">XYZ</span> p <span class="blue">in</span> loop )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( first )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; p1 = p;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; first = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; CreateModelLine( p, q );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; q = p;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; CreateModelLine( q, p1 );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>This code and the idea to create these kind of model lines for debugging purposes is actually demonstrated by the Revit SDK sample Openings, in its module BoundingBox.cs, which implements the two methods NewSketchPlanePassLine() and NewModelLine(), upon which the methods defined above are based.</p>
+
+<p>Some things to note about this code:</p>
+
+<p>The creation of new instances of many Revit API classes is not performed by the standard constructur, but by special Revit API classes and their methods in the Autodesk.Revit.Creation namespace. The two most important classes defined in the namespace are Application and Document. Note that these are completely different classes than the ones with the same names in the Autodesk.Revit namespace. The latter refer to the normal Revit application and document, whereas the former are used exclusively to instantiate new Revit API object instances. As the help file puts it, the Application creation object is used to create new instances of utility objects, and the Document creation object is used to create new instances of elements within the Autodesk Revit project.</p>
+
+<p>The creation of a Revit database element is often a two-step process: first a geometry object is created to define its geometrical properties, and then a database object is created from that. The geometrical object is memory resident and independent of the database, so it is instantiated by the application creation object. The database object needs to be properly hooked up with the rest of the database, so obviously requires the document creation object. These two objects are stored in the private member variables _app and _doc, and set up by the constructor. Repeat: these are not instances of the Application and Document objects from the Autodesk.Revit namespace, but from the Autodesk.Revit.Creation one.</p>
+
+<p>Revit elements are often linked to other database objects. In this case, the creation of a model line requires a sketch plane to reside on. The sketch plane must contain the line, otherwise unexpected behaviour might occur. To keep it simple, we create a separate sketch plane for every single model line, to ensure that this requirement is fulfilled, using NewSketchPlanePassLine().</p>
+
+<p>Finally, we have the method DrawPolygons(), which is actually custom designed to handle the polygonal slab boundary loop data that we assembled in CmdSlabBoundary, but we have still kept it as generic as possible.</p>
+
+<p>I find the creation of model lines for debugging purposes an efficient way to better understand what my code is actually doing. It is much more reliable to look at these graphical helper objects than try to read and analyse raw coordinate data.</p>

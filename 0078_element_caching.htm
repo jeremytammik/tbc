@@ -1,0 +1,34 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Element Caching</h3>
+
+<p>Here is a question from Julien Duprat of 
+
+<a href="http://www.vertice.fr">
+Vertice</a>:<p>
+
+<p><strong>Question:</strong>
+I would like to know the best practises for data caching.
+This topic is mentioned in your tutorial on "Ten Steps for enhancing your Revit add-in".
+Specifically, I wonder:</p>
+
+<ul>
+<li>How to put the elements in a static List&lt;Element&gt; of cached elements?</li>
+<li>How to refresh this list?</li>
+</ul>
+
+<p><strong>Answer:</strong>
+We do not have any official recommendations from the API or development team, so it is more a question of finding out what works best.</p>
+
+<p>The one thing to be aware of is that it is currently not possible to keep track of the exact state of the Revit database, because we are still lacking any element level events. We can request notification when certain events occur at an application or document level, such as application start-up or shutdown and document creation, open, save, and close. There is no notification about adding, deleting or modifying individual elements, though.</p>
+
+<p>Another point is that this issue is much less important in Revit 2009 than it was in 2008. In 2008, we did not yet have the element filtering API. That meant that it was extremely expensive to retrieve a specific set of elements from the database, because the application basically had to iterate over the entire database and filter out the elements it needed itself. To avoid repeating this lengthy iteration several times, it was important to identify all required elements up front and perform the entire iteration for all required elements only once and in one single go. In 2009, with element filtering, this is not longer the case. We now have full support from the Revit API for a highly efficient and optimised selective access, and an application can repeatedly query the database for different sets of specific elements with hardly any overhead. Therefore, the need for caching elements is drastically reduced.</p>
+
+<p>The first part of your question is very easy: to add an element to a generic list, simply call the Add method.</p>
+
+<p>As explained, the second part is more difficult. I would suggest that you update the list every time you need to make use of it.</p>

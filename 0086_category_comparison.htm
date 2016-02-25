@@ -1,0 +1,85 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Category Comparison</h3>
+
+<p>Still giving Revit Structure API training in Verona, Italy, we ran into a problem in one of the Revit SDK samples today.
+The FrameBuilder sample works with structural beams and framing elements.
+It implements a FrameData class which defines an Initialize() method to set up internal lists of column, beam and brace symbols.
+These are sorted into different lists depending on their type, which is determined by comparing the category names.
+Unfortunately, the original SDK sample compares the category names with the language dependent strings "Structural Framing" and "Structural Columns".
+In the Italian version of Revit, these strings change to "Pilastri strutturali" and "Telaio strutturale" and the comparison will never succeed.</p>
+
+<p>Here is the original, language dependent comparison code that we would like to replace by language independent code:</p>
+
+<pre class="code">
+<span class="green">// add symbols to lists according to category name</span>
+<span class="blue">string</span> categoryName = symbol.Category.Name;
+<span class="blue">if</span> (<span class="maroon">"Structural Framing"</span> == categoryName)
+{
+&nbsp; m_beambracesSymbolsMgr.AddSymbol(symbol);
+}
+<span class="blue">else</span> <span class="blue">if</span> (<span class="maroon">"Structural Columns"</span> == categoryName)
+{
+&nbsp; m_columnSymbolsMgr.AddSymbol(symbol);
+}
+</pre>
+
+<p>To replace this by language independent code, we make use of the built-in category enumeration.
+We use the enumeration values OST_StructuralColumns and OST_StructuralFraming to obtain the corresponding document categories from the document settings and its categories collections, and store their element ids:</p>
+
+<pre class="code">
+<span class="teal">Document</span> doc =
+&nbsp; m_commandData.Application.ActiveDocument;
+&nbsp;
+<span class="teal">Categories</span> categories
+&nbsp; = doc.Settings.Categories;
+&nbsp;
+<span class="teal">BuiltInCategory</span> bipColumn
+&nbsp; = <span class="teal">BuiltInCategory</span>.OST_StructuralColumns;
+&nbsp;
+<span class="teal">BuiltInCategory</span> bipFraming
+&nbsp; = <span class="teal">BuiltInCategory</span>.OST_StructuralFraming;
+&nbsp;
+<span class="teal">ElementId</span> idColumn
+&nbsp; = categories.get_Item( bipColumn ).Id;
+&nbsp;
+<span class="teal">ElementId</span> idFraming
+&nbsp; = categories.get_Item( bipFraming ).Id;
+</pre>
+
+<p>This can be done right at the beginning of the Intialize() method.
+Then we can replace the language dependent code listed above by:</p>
+
+<pre class="code">
+<span class="green">// add symbols to lists according to category</span>
+<span class="teal">ElementId</span> categoryId = symbol.Category.Id;
+<span class="blue">if</span>( idFraming.Equals( categoryId ) )
+{
+&nbsp; m_beambracesSymbolsMgr.AddSymbol( symbol );
+}
+<span class="blue">else</span> <span class="blue">if</span>( idColumn.Equals( categoryId ) )
+{
+&nbsp; m_columnSymbolsMgr.AddSymbol( symbol );
+}
+</pre>
+
+<p>Note that in previous versions of Revit, 2008 and earlier, it was possible to compare the categories directly, i.e. use something like this:</p>
+
+<pre class="code">
+<span class="teal">Category</span> cat = symbol.Category;
+<span class="blue">if</span>( catFraming.Equals( cat ) )
+{
+&nbsp; m_beambracesSymbolsMgr.AddSymbol( symbol );
+}
+<span class="blue">else</span> <span class="blue">if</span>( catColumn.Equals( cat ) )
+{
+&nbsp; m_columnSymbolsMgr.AddSymbol( symbol );
+}
+</pre>
+
+<p>This stopped working reliably in Revit 2009, so nowadays you need to compare the category element ids instead of directly comparing the categories.</p>

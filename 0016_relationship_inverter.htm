@@ -1,0 +1,202 @@
+<h3>Relationship Inverter</h3>
+
+<style type="text/css">
+.blue { color: blue; }
+.green { color: green; }
+.teal { color: teal; }
+.gray { color: gray; }
+.maroon { color: maroon; }
+</style>
+
+<p>Moving away from the topic of geometry, I have another sample that I would like to share from the Revit API introductory workshop that I recently held. In this sample, we address the following topics:</p>
+
+<ul>
+<li>Using a Boolean combination of Revit API filters to find certain elements.</li>
+<li>Retrieving the hosted to host relationship between doors, windows, and walls.</li>
+<li>Inverting the relationship, i.e. determining the host to hosted one.</li>
+</ul>
+
+<p>This sample also introduces some new little utility functions, such as ElementDescription() to return a string describing a given Revit element.</p>
+
+<p>As said, we are interested in the relationship between door and window openings and the walls hosting them. The Revit API provides a one-way relationship from hosted element to its host in the form of the FamilyInstance.Host property, which returns the containing element if the family instance is contained within another element. In our case, the doors and windows are family instances, and the containing element is a wall.</p>
+
+<p>In a first step, we create a Boolean combination of filters to select the elements we are interested in from the building model database. We do not need to retrieve the walls, because they do not provide any relationship information about their hosted elements. All we need is to access the doors and windows. These can be identified by having the class FamilyInstance and either door or window category. We can use a TypeFilter to match the class, and CategoryFilter instances for the categories. The category filters can be combined using a Boolean OR to match either door or window. The resulting filter can in turn be combined with the class filter using a Boolean AND. The result is described in the code below as</p>
+
+<pre>
+f5 = f1 && f4
+   = f1 && (f2 || f3)
+   = family instance and (door or window)
+</pre>
+
+<p>Once all doors and windows in the model have been retrieved, we can simply loop through them and query the host of each. For each host element id, we create a new entry into a dictionary using the host element id as a key and a list of all hosted element ids as its value. The elements being processed are also logged to the Visual Studio debug output window using the Debug.WriteLine() method provided by the very useful System.Diagnostics namespace.</p>
+
+<p>At this point, we are actually already done. The resulting dictionary now implements the inverted relationship. We started out with each hosted element knowing its host, and now we have the dictionary with the host element id as key, and a list of ids of all  its hosted elements as a value. All that remains to do is list this information in the debug output window, or use it in some other way.</p>
+
+<p>Here is the code for this little command:</p>
+
+<pre class="code">
+<span class="blue">#region</span> Namespaces
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Diagnostics;
+<span class="blue">using</span> Autodesk.Revit;
+<span class="blue">using</span> Autodesk.Revit.Elements;
+<span class="blue">using</span> Autodesk.Revit.Parameters;
+<span class="blue">using</span> <span class="teal">CmdResult</span>
+&nbsp; = Autodesk.Revit.<span class="teal">IExternalCommand</span>.<span class="teal">Result</span>;
+<span class="blue">#endregion</span> <span class="green">// Namespaces</span>
+&nbsp;
+<span class="blue">namespace</span> BuildingCoder
+{
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">CmdRelationshipInverter</span>
+&nbsp; &nbsp; : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">private</span> <span class="teal">Document</span> m_doc;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">string</span> PluralSuffix( <span class="blue">int</span> n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> 1 == n ? <span class="maroon">""</span> : <span class="maroon">"s"</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">string</span> DotOrColon( <span class="blue">int</span> n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> 1 &lt; n ? <span class="maroon">":"</span> : <span class="maroon">"."</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> ElementDescription( <span class="teal">Element</span> e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// for a wall, the element name equals the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// wall type name, which is equivalent to the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// family name ...</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi = e <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> fn = <span class="blue">string</span>.Empty;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != fi )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; fn = fi.Symbol.Family.Name + <span class="maroon">" "</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">string</span>.Format( <span class="maroon">"{0} {1}&lt;{2} {3}&gt;"</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; e.Category.Name, fn,
+&nbsp; &nbsp; &nbsp; &nbsp; e.Id.Value.ToString(), e.Name );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> ElementDescription( <span class="teal">ElementId</span> id )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> e = m_doc.get_Element( <span class="blue">ref</span> id );
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> ElementDescription( e );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="teal">Dictionary</span>&lt;<span class="teal">ElementId</span>, <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;&gt;
+&nbsp; &nbsp; &nbsp; getElementIds( <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">ElementId</span>, <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;&gt; dict =
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="teal">ElementId</span>, <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;&gt;();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> fmt = <span class="maroon">"{0} is hosted by {1}"</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">FamilyInstance</span> fi <span class="blue">in</span> elements )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> id = fi.Id;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> idHost = fi.Host.Id;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format( fmt,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ElementDescription( fi ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ElementDescription( idHost ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !dict.ContainsKey( idHost ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; dict.Add( idHost, <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;() );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; dict[idHost].Add( id );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> dict;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">void</span> dumpHostedElements(
+&nbsp; &nbsp; &nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">ElementId</span>, <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;&gt; ids )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> idHost <span class="blue">in</span> ids.Keys )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> s = <span class="blue">string</span>.Empty;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> id <span class="blue">in</span> ids[idHost] )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; s.Length )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s += <span class="maroon">", "</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s += ElementDescription( id );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = ids[idHost].Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine(<span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"{0} hosts {1} opening{2}: {3}"</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ElementDescription( idHost ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; n, PluralSuffix( n ), s ) );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; &nbsp; &nbsp; m_doc = app.ActiveDocument;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// f5 = f1 &amp;&amp; f4 </span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; = f1 &amp;&amp; (f2 || f3) </span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; = family instance and (door or window)</span>
+&nbsp; &nbsp; &nbsp; Autodesk.Revit.Creation.<span class="teal">Filter</span> cf
+&nbsp; &nbsp; &nbsp; &nbsp; = app.Create.Filter;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Filter</span> f1 = cf.NewTypeFilter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Filter</span> f2 = cf.NewCategoryFilter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Doors );
+&nbsp; &nbsp; &nbsp; <span class="teal">Filter</span> f3 = cf.NewCategoryFilter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Windows );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Filter</span> f4 = cf.NewLogicOrFilter( f2, f3 );
+&nbsp; &nbsp; &nbsp; <span class="teal">Filter</span> f5 = cf.NewLogicAndFilter( f1, f4 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; openings = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = m_doc.get_Elements( f5, openings );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// map with key = host element id and</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// value = list of hosted element ids:</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">ElementId</span>, <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;&gt; ids =
+&nbsp; &nbsp; &nbsp; &nbsp; getElementIds( openings );
+&nbsp;
+&nbsp; &nbsp; &nbsp; dumpHostedElements( ids );
+&nbsp; &nbsp; &nbsp; m_doc = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Here is a log file from a sample run. As you can see, we first traverse all the hosted elements and determine the hosting wall of each. These are inserted into the dictionary representing the inverse relationship, which dumps its contents using dumpHostedElements() before the command ends. Please excuse the long overflowing lines:</p>
+
+<pre>
+Doors M_Single-Flush &lt;127252 0915 x 2134mm&gt; is hosted by Walls &lt;127248 Generic - 200mm&gt;
+Windows M_Fixed &lt;127255 0406 x 0610mm&gt; is hosted by Walls &lt;127248 Generic - 200mm&gt;
+Windows M_Fixed &lt;127258 0406 x 0610mm&gt; is hosted by Walls &lt;127248 Generic - 200mm&gt;
+Doors M_Single-Flush &lt;127295 0915 x 2134mm&gt; is hosted by Walls &lt;127167 Generic - 200mm&gt;
+Doors M_Single-Flush &lt;127331 0915 x 2134mm&gt; is hosted by Walls &lt;127167 Generic - 200mm&gt;
+Windows M_Fixed &lt;127356 0406 x 0610mm&gt; is hosted by Walls &lt;127240 Generic - 200mm&gt;
+Windows M_Fixed &lt;127411 0406 x 0610mm&gt; is hosted by Walls &lt;127240 Generic - 200mm&gt;
+Windows M_Fixed &lt;127436 0406 x 0610mm&gt; is hosted by Walls &lt;127240 Generic - 200mm&gt;
+Windows M_Fixed &lt;127462 0406 x 0610mm&gt; is hosted by Walls &lt;127215 Generic - 200mm&gt;
+Windows M_Fixed &lt;127484 0406 x 0610mm&gt; is hosted by Walls &lt;127215 Generic - 200mm&gt;
+Windows M_Fixed &lt;127502 0406 x 0610mm&gt; is hosted by Walls &lt;127215 Generic - 200mm&gt;
+Windows M_Fixed &lt;127526 0406 x 0610mm&gt; is hosted by Walls &lt;127215 Generic - 200mm&gt;
+Walls &lt;127248 Generic - 200mm&gt; hosts 3 openings: Doors M_Single-Flush &lt;127252 0915 x 2134mm&gt;, Windows M_Fixed &lt;127255 0406 x 0610mm&gt;, Windows M_Fixed &lt;127258 0406 x 0610mm&gt;
+Walls &lt;127167 Generic - 200mm&gt; hosts 2 openings: Doors M_Single-Flush &lt;127295 0915 x 2134mm&gt;, Doors M_Single-Flush &lt;127331 0915 x 2134mm&gt;
+Walls &lt;127240 Generic - 200mm&gt; hosts 3 openings: Windows M_Fixed &lt;127356 0406 x 0610mm&gt;, Windows M_Fixed &lt;127411 0406 x 0610mm&gt;, Windows M_Fixed &lt;127436 0406 x 0610mm&gt;
+Walls &lt;127215 Generic - 200mm&gt; hosts 4 openings: Windows M_Fixed &lt;127462 0406 x 0610mm&gt;, Windows M_Fixed &lt;127484 0406 x 0610mm&gt;, Windows M_Fixed &lt;127502 0406 x 0610mm&gt;, Windows M_Fixed &lt;127526 0406 x 0610mm&gt;
+</pre>
+
+<p>For your convenience, I am adding the complete Visual Studio solution here. This version 1.0.0.3 includes the three commands we discussed so far: CmdListWalls, CmdRelationshipInverter and CmdWallDimensions.</p>

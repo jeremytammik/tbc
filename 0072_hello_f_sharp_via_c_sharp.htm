@@ -1,0 +1,98 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Hello F# via C#</h3>
+
+<p>Still in Barcelona, after a very interesting day spent with Alex Vila Ortega, who gave us on a tour of the
+
+<a href="http://en.wikipedia.org/wiki/Sagrada_Fam%C3%ADlia">
+Sagrada Familia</a>
+
+cathedral by the famous Catalan architect
+
+<a href="http://en.wikipedia.org/wiki/Antoni_Gaud%C3%AD">
+Antoni Gaudi</a>
+
+to discuss the interesting mathematical and geometrical aspects of his architecture, and what we can do together to implement some effective support for them in Revit.
+I plan to write more on that as soon as possible, but I have something more urgent to discuss first.</p>
+
+<p>Kean's F# programming contest has a deadline set for the end of February, so the sooner we have access to an F# implementation of a Revit external command, the better.
+I will discuss my first steps in that direction, even though the result I have to show for it is not yet perfect. At least it does provide access to the Revit API within an application written in F#.</p>
+
+<p>Since I have not yet been able to execute an external command written in F# directly from Revit, I opted for an intermediate solution with an external command written in C# instead, which calls into the F# implementation.</p>
+
+<p>This is what it looks like so far; the C# external command implementation is completely standard and simply passes its arguments on the F# method:</p>
+
+<pre class="code">
+<span class="blue">namespace</span> CallFs
+{
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">Command</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Module1</span>.<span class="teal">BuildingCoder</span>.<span class="teal">Command6</span>
+&nbsp; &nbsp; &nbsp; &nbsp; c = <span class="blue">new</span> <span class="teal">Module1</span>.<span class="teal">BuildingCoder</span>.<span class="teal">Command6</span>();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> c.Execute(
+&nbsp; &nbsp; &nbsp; &nbsp; commandData, <span class="blue">ref</span> message, elements );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>The current F# class implementation looks like this:</p>
+
+<pre class="code">
+<span class="blue">#light</span>
+
+<span class="blue">open</span> System.Windows.Forms
+<span class="blue">open</span> Autodesk.Revit
+
+<span class="blue">module</span> BuildingCoder =
+
+  <span class="blue">let</span> show_message( msg : string ) =
+    MessageBox.Show( msg, "Building Coder F# Test" ) |> ignore
+
+  <span class="blue">type</span> public Command6() =
+    <span class="blue">interface</span> IExternalCommand <span class="blue">with</span>
+      <span class="blue">member</span> x.Execute( commandData, message, elements ) =
+        show_message "Kilroy was here"
+        IExternalCommand.Result.Succeeded
+    <span class="blue">member public</span> x.Execute( commandData, message : string byref, elements ) =
+      (x :> IExternalCommand).Execute( commandData, ref message, elements )
+</pre>
+
+<p>The reason for the slightly convoluted syntax is that the direct method implementation causes F# to decorate the Execute method name with an explicit interface prefix, so the result is named 'Autodesk-Revit-IExternalCommand-Execute' and thus will not match the expected method name called by the Revit API. This is explained in more detail in a discussion on
+
+<a href="http://bugsquash.blogspot.com/2009/01/implementing-interfaces-in-f.html">
+implementing interfaces in F#</a>
+
+which Kean was kind enough to hunt down and point out to me.</p>
+
+<p>Another confusing detail is that
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/converting-between-vb-and-c-and-net-decompilation.html">
+Reflector</a>
+
+is reporting the fully qualified method name as 'Module1+BuildingCoder+Command6', whereas the Visual Studio object browser displays it as 'Module1.BuildingCoder.Command6'.
+I can well imagine that the former might be confusing for the Revit API loader. 
+Unfortunately, it does not report any errors if something is wrong, but just quits.</p>
+
+<h4>Facade and Art</h4>
+
+<p>Anyway, I seem to have adapted well to the Spanish eating habits, did not even set foot in the restaurant tonight until about half past nine. 
+The food is slightly too haute cuisine for my taste, I prefer it simple and natural and tasty with no frills, no facade.
+Funny thing, how so much of Gaudi's work deals with the facade, but is so true and deep it moves me.
+Normally, I am rather anti-facade, no haute cuisine, no make-up, no frills, just the real thing, but for me, Gaudi created art, real thing, not just facade.
+Maybe art is the point where facade becomes the real thing, somehow.
+I really liked Alex' very apt categorisation of the various aspects of Gaudi's architecture into bones, muscles and skin.
+The bones are like the stick elements in the structural analytical model, the muscles are their profiles, providing strength, and the skin is the facade, which uses some impressively effective yet simple combination of geometry and mathematics to create natural and organic looking and yet relatively easily constructible surfaces, almost none of which are ever planar.</p>
+
+<p>I am still working at getting the direct and full-fledged F# connection up and running and will post a complete solution as soon as that works.</p>

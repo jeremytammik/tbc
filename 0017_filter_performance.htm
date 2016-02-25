@@ -1,0 +1,105 @@
+<style type="text/css">
+.blue { color: blue; }
+.teal { color: teal; }
+.green { color: green; }
+.maroon { color: maroon; }
+</style>
+
+<h3>Filter Performance</h3>
+
+<p>This post is entirely thanks to Guy Robinson, who has always been the quickest to test and comment on performance issues in the Revit API, in response to the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/relationship-in.html">previous post</a>. 
+
+He says:</p>
+
+<p>Like you, I initially thought the TypeFilter was a more elegant filter for FamilyInstances etc., but having done a lot of testing I now have my suspicions regarding how filters work internally and why it's not necessarily a good filter option for certain element types.</p>
+
+<p>In the relationship code for this situation, it is significantly faster to just use the category filter as demonstrated in the command below. On a 100 MB project, I compared the times required to retrieve 571 elements using the type filter as shown in the previous post versus using an anonymous method to filter away objects of the wrong type after receiving them from Revit. These are the execution times for running the two commands a repeated number of times:</p>
+
+<pre>
+using TypeFilter:
+Time to get 571 elements 37226
+Time to get 571 elements  6042
+Time to get 571 elements  6024
+Time to get 571 elements  6172
+
+using anonymous method:
+Time to get 571 elements 33769
+Time to get 571 elements  2052
+Time to get 571 elements  2050
+Time to get 571 elements  2048
+Time to get 571 elements  2034
+Time to get 571 elements  2037
+</pre>
+
+<p>As you can see, using the anonymous method is three times as fast. So while filters are fantastic, they're not always the best solution ;-)</p>
+
+<p>So much for the comment from Guy, whom I would like to thank very much for this invaluable input. Here is the alternative code he is describing, using an anonymous method instead of the TypeFilter:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">CmdFilterPerformance</span>
+{
+&nbsp; <span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Stopwatch</span> sw = <span class="teal">Stopwatch</span>.StartNew();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// f5 = f1 &amp;&amp; f4 </span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; = f1 &amp;&amp; (f2 || f3) </span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; &nbsp; = family instance and (door or window)</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; Autodesk.Revit.Creation.<span class="teal">Filter</span> cf
+&nbsp; &nbsp; &nbsp; &nbsp; = app.Create.Filter;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//Filter f1 = cf.NewTypeFilter( </span>
+&nbsp; &nbsp; &nbsp; <span class="green">//&nbsp; typeof( FamilyInstance ) );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Filter</span> f2 = cf.NewCategoryFilter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Doors );
+&nbsp; &nbsp; &nbsp; <span class="teal">Filter</span> f3 = cf.NewCategoryFilter(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Windows );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Filter</span> f4 = cf.NewLogicOrFilter( f2, f3 );
+&nbsp; &nbsp; &nbsp; <span class="green">//Filter f5 = cf.NewLogicAndFilter( f1, f4 );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">//int n = doc.get_Elements( f5, openings );</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; openings = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp; &nbsp; &nbsp; doc.get_Elements( f4, openings );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; openingInstances
+&nbsp; &nbsp; &nbsp; &nbsp; = openings.FindAll( <span class="blue">delegate</span>( <span class="teal">Element</span> element )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> !( element <span class="blue">is</span> <span class="teal">Symbol</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; } );
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = openingInstances.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; sw.Stop();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"Time to get {0} elements {1}"</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; n, sw.ElapsedMilliseconds ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = ex.Message + ex.StackTrace;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>It really goes to show how extremely important testing on real life projects and scrupulous profiling and benchmarking is to ensure that you as a professional developer really deliver optimal quality to your clients. It also shows how easy it is for me to play around in an ivory tower and that my messages should always be taken with large grains of salt. And everybody else's too, of course. Guy has already pointed out some performance traps when blindly trusting Revit API filters to be fast in the past ... this one really brings the message across!</p>
+
+<p>I am adding the complete Visual Studio solution <a href="">here</a>. This version 1.0.0.4 includes the four commands we discussed so far: CmdListWalls, CmdRelationshipInverter and CmdWallDimensions and the new CmdFilterPerformance.</p>
+

@@ -1,0 +1,173 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Slab Side Faces</h3>
+
+<p>In the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/model-line-creation.html">
+preceding post</a>,
+
+we discussed the creation of model lines to graphically display certain polygons in space for debugging purposes.
+
+The polygons we display are
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/slab-boundary.html">
+slab boundaries</a>
+
+calculated by iterating over all the horizontal faces of the slab and choosing the lowest one to extract its edge loops from, which represent the polygonal slab boundary loops.
+
+In this post, we demonstrate another use of this model line creator.
+We expand it to calculate and display the normal vectors of all the triangles of  a face mesh triangulation.
+This enables us to better understand the faces that we are intersted in.
+
+We make use of it to explore a slightly different approach for determining the slab boundary. This time around, we identify all vertical faces of the slab solid instead of the horizontal ones. They represent the two-dimensional 'side' faces. We highlight them by triangulating each one and adding little model lines representing the face normals of each triangle. This is accomplished by a new method DrawFaceTriangleNormals() added the Creator class.</p>
+
+<p>I have implemented an external command CmdSlabSides realising this algorithm. It analyses the solid of a floor slab, just like CmdSlabBoundary, and extracts a list of all vertical faces, i.e. all side faces of the horizontal slab. CmdSlabBoundary only analyses planar faces. If we did so here as well, the face of the cylindrical opening would be ignored, since its face not planar. Therefore, we implemented a new overloaded version of IsVertical() in the Util class for cylindrical faces. Whereas the version for planar faces checks the normal vector of the face, the test for cylindrical faces makes use of the cylinder axis instead. If you need support for other types, you will have to add that yourself.</p>
+
+<p>After the vertical side faces have been determined, we go through them all, triangulate each one, and draw a normal vector in the centre of each triangle. The normal vectors are calculated and added to the Revit model as model lines by the new method DrawFaceTriangleNormals( Face f ) added to the Creator class.</p>
+
+<p>Here is the code for the mainline of the command.
+The user can either select a set of specific floors to process, or all floors found in the database are used.
+The code to create this set of floors, originally presented in CmdSlabBoundary, is now packaged in the GetSelectedElementsOrAll() utility method.
+For each floor, the geometry is extracted and the solid is passed into the GetSideFaces() method for analysis:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt; floors = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt;();
+&nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.GetSelectedElementsOrAll(
+&nbsp; &nbsp; floors, doc, <span class="blue">typeof</span>( <span class="teal">Floor</span> ) ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = doc.Selection;
+&nbsp; &nbsp; message = ( 0 &lt; sel.Elements.Size )
+&nbsp; &nbsp; &nbsp; ? <span class="maroon">"Please select some floor elements."</span>
+&nbsp; &nbsp; &nbsp; : <span class="maroon">"No floor elements found."</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Face</span>&gt; faces = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Face</span>&gt;();
+&nbsp; <span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Floor</span> floor <span class="blue">in</span> floors )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">GeoElement</span> geo = floor.get_Geometry( opt );
+&nbsp; &nbsp; <span class="teal">GeometryObjectArray</span> objects = geo.Objects;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> objects )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( solid != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; GetSideFaces( faces, solid );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">int</span> n = faces.Count;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">"{0} side face{1} found."</span>,
+&nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ) ) );
+&nbsp;
+&nbsp; <span class="teal">Creator</span> creator = <span class="blue">new</span> <span class="teal">Creator</span>( app );
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> faces )
+&nbsp; {
+&nbsp; &nbsp; creator.DrawFaceTriangleNormals( f );
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+}
+</pre>
+
+<p>Here is the straight-forward implementation of GetSideFaces(); please note that it currently only supports planar and cylindrical faces:</p>
+
+<pre class="code">
+<span class="blue">void</span> GetSideFaces(
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Face</span>&gt; verticalFaces,
+&nbsp; <span class="teal">Solid</span> solid )
+{
+&nbsp; <span class="teal">FaceArray</span> faces = solid.Faces;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> faces )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( f <span class="blue">is</span> <span class="teal">PlanarFace</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">Util</span>.IsVertical( f <span class="blue">as</span> <span class="teal">PlanarFace</span> ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; verticalFaces.Add( f );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( f <span class="blue">is</span> <span class="teal">CylindricalFace</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">Util</span>.IsVertical( f <span class="blue">as</span> <span class="teal">CylindricalFace</span> ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; verticalFaces.Add( f );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>And finally, here is the new method added of the Creator class:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">void</span> DrawFaceTriangleNormals( <span class="teal">Face</span> f )
+{
+&nbsp; <span class="teal">Mesh</span> mesh = f.Triangulate();
+&nbsp; <span class="blue">int</span> n = mesh.NumTriangles;
+&nbsp;
+&nbsp; <span class="blue">string</span> s = <span class="maroon">"{0} face triangulation returns "</span>
+&nbsp; &nbsp; + <span class="maroon">"mesh triangle{1} and normal vector{1}:"</span>;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; s, n, <span class="teal">Util</span>.PluralSuffix( n ) ) );
+&nbsp;
+&nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; n; ++i )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">MeshTriangle</span> t = mesh.get_Triangle( i );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p = ( t.get_Vertex( 0 )
+&nbsp; &nbsp; &nbsp; + t.get_Vertex( 1 )
+&nbsp; &nbsp; &nbsp; + t.get_Vertex( 2 ) ) / 3;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> v = t.get_Vertex( 1 )
+&nbsp; &nbsp; &nbsp; - t.get_Vertex( 0 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> w = t.get_Vertex( 2 )
+&nbsp; &nbsp; &nbsp; - t.get_Vertex( 0 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> normal = v.Cross( w ).Normalized;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">"{0} {1} --&gt; {2}"</span>, i,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( p ),
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( normal ) ) );
+&nbsp;
+&nbsp; &nbsp; CreateModelLine( p, p + normal );
+&nbsp; }
+}
+</pre>
+
+<p>A given face is triangulated to obtain a mesh. For each triangle in the mesh, the centre point p and two edge vectors v and w are determined. From these, the normal vector can be calculated, and a model line pointing out of the face in the middle of the triangle is generated.</p>
+
+<p>Here is an example floor before processing:</p>
+
+<img src="img/slab_boundary_4.png" alt="Original Slab"/>
+
+<p>And here it is with the resulting model lines added after processing:</p>
+
+<img src="img/slab_boundary_sides.png" alt="Slab side face normals"/>
+
+<p>The little green lines are the face normals. Each rectangular face has two of them, since its triangulation returns two mesh triangles. Note that the circular hole is also handled successfully by this algorithm, although its face is not planar. Its mesh approximation obviously has many triangles. Also note that the triangle vertices are consistently oriented, so that the normal vector is always pointing out of the face, i.e. out of the solid that the face belongs to.</p>
+
+<p>I am adding a new version 1.0.0.10 of the complete Visual Studio solution
+<a href="http://thebuildingcoder.typepad.com/blog/files/bc10010.zip">here</a>,
+including the new CmdSlabSides and updated Creator classes, as well as all other commands discussed so far.</p>

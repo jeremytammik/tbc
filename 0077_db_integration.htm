@@ -1,0 +1,149 @@
+<h3>Database Integration</h3>
+
+<p>Here is an in-depth analysis of integrating Revit with external databases or other data sources performed end of last year by Miroslav Schonauer of Autodesk Consulting.
+Miro is a Senior Solution Architect in the AEC Solutions Division of Autodesk Consulting and has a lot of experience in this area. In previous years, he also presented on this topic at Autodesk University.</p>
+
+<p>We use the term DB to refer to a generic external source. 
+The main issue with 'integrate Revit with external DB' is that such phrase can mean so many completely different requirements and workflows, and there is definitely no silver bullet or a single approach to determine feasibility, estimate or design such an 'integration'.
+There is no single way to completely 'integrate' data between disparate manufacturing, GIS and AEC products.
+Different applications  and even specific users of the same applications see the same data in different manners.
+Hence, the conclusion is that the only thing that can be supported is specific workflows rather than any one-fits-all approach.
+Here are two workflows that we are likely to see support for in out-of-the-box Autodesk products in the near future:</p>
+
+<ul>
+<li>Manufacturing to architecture, for instance for importing manufacturing data for specific consumption in Revit, shrunk in size yet content-rich and tailored appropriately for the needs within BIM.
+For example, a 100 MB mechanical pump model might have only the 'envelope' solid representation in RVT/RFA, but still include 2D plans, part specifications, logical MEP connection points and similar metadata.</li>
+
+<li>Architecture to civil engineering: a useful workflow would be exporting from the architectural to the civil engineering environment.
+This might communicate the envelope of the building with only major elements, including any MEP 'connections' relevant to the infrastructure aspects of civil engineering.</li>
+</ul>
+
+<p>Returning to the specific 'Revit integration with external DB' issue which basically follows the same high-level conclusions,
+there are a few main aspects of requirements, combinations of which necessitate completely different approaches and have significantly varied levels of risk and feasibility. 
+Here is a categorisation and summary of options in each category:</p>
+
+<p><strong>1. 'Master' source of data.</strong> 
+There can be only one side, either Revit or the DB, that contains the master, primary or main source for a particular aspect of data at any time, i.e.:</p>
+
+<ol type="a">
+<li>Revit-owned, synchronized to DB.</li>
+<li>DB-owned, synchronized to Revit.</li>
+<li>Either application can own the data and update the other side. 
+This is rare but possible for <strong>some</strong> pieces of data. 
+It could be said that whichever was last used to update the other is a 'provisional master'.</li>
+</ol>
+
+<p>The ownership issue can get more complex but it is perfectly feasible if a mixture is required for different data aspects:</p>
+
+<ul>
+<li>Some parts can be Revit-owned, e.g. 3D family parametric models or the final instance count.</li>
+<li>Others can be DB-owned, e.g. cost, specific sets or ranges of parameters for families.</li>
+<li>Some might even allowed to be owned by either app, e.g. a part number or mark.</li>
+</ul>
+
+<p>The master rules being clear for each piece of data is a must to start from.</p>
+
+<p><strong>2. Type of synchronization.</strong> 
+What is the required frequency and workflow for synchronizing the data from master to the other side?</p>
+
+<p>a. Immediate synchronization – by virtue of adding, deleting or modifying a specific aspect of integrated data in the master app, the other gets automatically synchronized without any need for further user intervention. 
+From the Revit perspective, this option is currently not feasible from either master source: 
+(i) If Revit is the master, currently available API events in Revit do <strong>not</strong> include the element level events required to automatically trigger this in any custom add-in. This would however be possible from the AutoCAD API, which does support such events. 
+(ii) If DB is the master, it would be feasible to trigger events from the DB update side, but it is not possible to 'drive' Revit from an outside application. There are no out-of-process APIs or possibilities to manipulate RVT or RFA files from outside the Revit executable – both are possible in AutoCAD, for example, the former via the ActiveX out-of-process API and the latter via OEM or RealDWG applications.</p>
+
+<p>b. On-demand periodic synchronization – the same is achieved at discrete time points on user demand. This is feasible from Revit, either directly into the external source, providing that such source provides its own APIs or connections, which all DBs do in one way or another, or as a two-step process via an intermediate file or data-container, which requires an additional import action on the other side. If DB is the master, a two-step approach is required for the same reasons as in a.</p>
+
+<p>c. End-points only synchronization – this means that synchronization is required only at a single point in the workflow, typically at one of the 'end-points', such as the start or end of a Revit modelling session. 
+For example, some external master data is required only to start a Revit model, e.g. a list of views, title blocks etc., that should be generated automatically without a need for an RFT template. 
+On the other side, some kind of quantity takeoff may be required to be exported from master Revit data, at the end of Revit modelling, such as an instance count or properties ranging from geometrical location to other parameters like price, finish, etc.</p>
+
+<p><strong>3. Workflow and features compatibility with Revit.</strong> 
+This is a rather broad but probably the most important category. 
+It should answer the critical questions like:</p>
+
+<ul>
+<li>Does the Revit workflow support the usage as required by customer? 
+If this is not true, there is not much one could do via API – the API <strong>cannot</strong> change the fundamental Revit principles, workflow or assumptions, but only expose some of their aspects.</li>
+<li>Are Revit out-of-the-box features sufficient to satisfy the requirements? 
+If this is not met, the only possibility is to log change requests for the very Revit features, and typically also ask for these new features to be exposed via API.</li>
+<li>Are available Revit features required to be customized for the solution exposed via API?  
+If not, the only remedy is to log change request to expose relevant features to API.</li>
+<li>Is available user interface customization enough to achieve the goals, typically only via API extensions? 
+This is sometimes a show stopper from the API capabilities standpoint, which are limited in this respect (no modeless dialogs, no pick point functionality, limited elements selection, no custom grips or osnaps, no custom element tooltips/events, etc. – all available in e.g. the AutoCAD API). However, I have to say that (a) this is partially understandable since it is much easier to expose such behaviour for a 'dumb CAD' engine rather than for an 'intelligent BIM' engine (more about this later) and (b) Revit API team is making very good but balanced progress each release and taking on board the enhancement requests.</li>
+</ul>
+
+<p>When analyzing these questions, (this is to a smaller degree indeed valid for point 2. above), it is very important to understand user <strong>needs</strong>, not user <strong>wants</strong>, which are typically ideas of <strong>how</strong> to implement the needs. 
+Sometimes the wants do not pass the feasibility tests, but there may be alternative and possibly better implementations that perfectly satisfy the needs; requirements in consulting terms, though these 'requirements' sometimes come wrongly in the form of 'wants' – this is altogether another discussion topic for consulting projects.</p>
+
+<p><strong>Feasibility Check for Aspects 1-3.</strong>
+The crucial thing when estimating feasibility is whether a specifically required combination of the preceding three points can be implemented using the combination of Revit features and API extensions, i.e. plug-ins and custom features that need to be programmed. 
+Some show stoppers and possible implementations may be immediately identifiable, but this typically requires some research and prototyping. 
+In more complex cases, a lot of creativity and joint efforts between the product and API experts are needed.</p>
+
+<p><strong>4. Non-Autodesk Technologies (NATs)</strong>
+To extend the analysis beyond just DBs, another completely different issue is what form the 'external source' is, for instance any DB, Excel file, XML file, another BIM/CIM/CAD/Modelling standalone application, or other, and which programming and software technology is used to communicate with such a source, which external APIs, .NET/COM/C++/whatever, two- or multitier architecture, web services or more direct DB connections, etc. 
+All these aspects which can be further sub categorised really fall under something I would generally refer to as 'Non-Autodesk Technologies'. 
+The demarcation line is not 100% clear, but these are really 'HOWs' which carry much lower (if any) risk than client-specific and ADSK-technologies specific 'IF POSSIBLEs' above. 
+Nevertheless, these aspects, especially if databases, client IT infrastructure and internet or intranets are involved, typically require substantial design and implementation schedule time and very specific resource skills.</p>
+
+<p>IMO, all these NAT aspects are secondary to items 1-3 when analyzing the feasibility. 
+There is no point going into research about e.g. web services versus client-server architecture if Revit itself is not compatible with the requirements.</p>
+
+<h4>Rough guidelines</h4>
+
+<p>The <u>most feasible</u> and appropriate Revit-DB integration workflows would be those where the 'logic' is driven by Revit while specific parameters can be obtained from and exported to external DBs, or generally external sources. 
+The more detached from the core Revit and BIM logic these parameters are, the better, e.g. it is much easier to control something like a 'Cost' attribute than e.g. a 'Floor Type' substructure composition which automatically bears consequences on cleanups, joints with walls and similar.</p>
+
+<p>On the other extreme, the <u>least feasible</u> (or practically unfeasible) workflows are those which assume that the logic is driven externally, i.e. that Revit should behave as a 'dumb' client in whichever direction the client wants. 
+This defies the very nature and commercial advantage of Revit.
+Actually, the facts are completely opposite: It is exactly the same reasons that make Revit more natural, easier and clearly superior a product, both the generic BIM concept and the specific BIM-implementation within Revit, to work with for end user architects and engineers, that make it harder and less feasible to integrate in those workflows which require Revit to behave in 'non-intelligent' or 'non-Revit-compatible' modes.</p>
+
+<p>Ideally, the kind of questions to ask should not be 'Can Revit talk to XYZ application?', 'Can Revit utilize ABC external technology?', but rather 'Can Revit drive XYZ application concerning such-and-such data aspects', 'Can such-and-such data available in XLS files on a central server be utilized via web services to drive Revit’s so-and-so features?' and similar.</p>
+
+<p>In a nutshell, one has to analyze every opportunity on a case-by-case basis and gradually determine some kind of guidelines, for which I hope this  is a good start, which would enable a developer to identify the opportunities with a reasonable level of confidence, on the range between show-stoppers and turkey-shots. Such integration projects would then provide more of a repeatable (but not copy-able) experience (rather than a repeatable 'application') that should still significantly increase productivity.</p>
+
+<h4>Examples</h4>
+
+<p>Here is a very brief summary of some implementations from the above standpoint:</p>
+
+<p>E1. Revit-MSProject Link</p>
+
+<p>This is a bi-directional link utility that I developed in early Revit API days. 
+It can be categorized as:</p>
+
+<p>1 a/b/c – Elements to be scheduled and some of their parameters are (a), i.e. Revit-owned. 
+When exported to MSProject, each element becomes a line (i.e. task) in MSProject. 
+Start and end dates are practically (b), i.e. MSProject-owned. 
+Once they are added to tasks in MSProject, they can be imported back into Revit’s shared parameters since MSProject tasks also contain the original Revit element id used for subsequent cross-identifications. 
+In theory, start and end dates are really (c), since if any pre-scheduling is done in Revit shared parameters, these will be exported to MSProject as 'initial dates'.</p>
+
+<p>2 b – user initiates import or export custom dialogs at any time.</p>
+
+<p>NAT: The process is fully Revit-driven. 
+Connection to MSProject is via the out-of-process MSProject COM server which needs to reside on the same machine (no remoting). MSProject API used to manipulate MSP files.</p>
+
+<p>E2. External DB representation</p>
+
+<p>Without going into details, I can summarize at a high level:</p>
+
+<p>1 a – certain aspects of the Revit BIM model such as curtain cell geometry is used as a master to update the DB which contains all aspects of the relevant data, not only building-related. 
+Some standard BIM-related parameters such as floor and grid and some shared, i.e. custom ones such as building name and region are automatically extracted from the BIM model and pushed into DB as attributes (i.e. columns) for the corresponding elements.</p>
+
+<p>2 b – user initiates the DB synchronization dialog at any time in order to add, delete or modify DB elements whose counterparts have been altered within Revit since the last synchronisation.</p>
+
+<p>NAT: The process is fully Revit-driven. Dedicated web services are used to communicate with the underlying SQL Server DBs. Dedicated team members work exclusively on the DB data model and web services for all clients: Revit, Inventor, web pages, etc…</p>
+
+<p>E3. Generic parameters extraction</p>
+
+<p>Here are some possible aspects of a potential flexible and customizable generic extractor for Revit parameters:</p>
+
+<p>1 a </p>
+
+<p>2 b/c </p>
+
+<p>NAT: The process is fully Revit-driven. Export to Excel and possibly other DBs using their APIs.</p>
+
+<p>Hope this all makes sense.</p>
+
+<p>This is all to a great extent also valid for civil engineering integration with external sources and what I would call 'CIM', or a Civil Information Model.</p>
+

@@ -1,0 +1,85 @@
+<h3>More Filter Performance</h3>
+
+<p>This post is a response to Guy Robinson's contribution on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/filter-performa.html">Filter Performance</a>, 
+
+and is also by a reader, Ralf Huvendiek. Ralf only recently started working on the Revit API, but brings such a wealth of prior programming experience and enthusiasm that I am very grateful for his invaluable input. He says:</p>
+
+<p>Guy raises an interesting question regarding the performance of the Revit filters. I think he comes to the right conclusion, but not the best solution or explanation.</p>
+
+</p>First we need to agree about a few things. Let us assume the following:</p>
+
+<ol type="a">
+<li>Our drawing contains x elements.</li>
+<li>x is very high.</li>
+<li>Our drawing contains d doors and w windows.</li>
+<li>d+w is a lot smaller than x.</li>
+<li>The Revit TypeFilter has to use some kind of RTTI and is thus much slower than a plain CategoryFilter.</li>
+</ol>
+
+<p>Now let us return to the original filter, which was</p>
+
+<pre>
+  (TypeFilter && (CategoryFilter || CategoryFilter))
+</pre>
+
+<p>To evaluate that filter, Revit has to invoke the TypeFilter x times, because it is the first filter in our Boolean expression.</p>
+
+<p>If we look at the points 'b' and 'e' above, we see that this is not very desirable. With a look at our Boolean expression, and the fact that '&&' is commutative, we can reorder the filter like this:</p>
+
+<pre>
+   ((CategoryFilter || CategoryFilter) && TypeFilter)
+</pre>
+
+<p>Now our cheap CategoryFilter will be called ~x times and the expensive TypeFilter will only be called (w+d) times.</p>
+
+<p>With this knowledge, we can reorder Jeremy's original code from:</p>
+
+<pre>
+  Filter f5 = cf.NewLogicAndFilter( f1, f4 );
+</pre>
+
+<p>To:</p>
+
+<pre>
+  Filter f5 = cf.NewLogicAndFilter( f4, f1 );
+</pre>
+
+<p>The CmdRelationshipInverter modified as described is just as fast as the Guy's solution. This is not surprising, because his code does the same thing in a different way: prefilter everything with f4, and then use the expensive RTTI to filter out the rest afterwards.
+But I think Jeremy's solution from with a modified filter f5 is much cleaner than filtering using an anonymous method.</p>
+
+<p>What can we conclude from this:</p>
+
+<ol type="1">
+<li>If we're writing a performance critical filter, we should be aware how to organize it best: put the expensive filters as far to the right as possible.</li>
+<li>We can't blame the Revit API for being slow here. It's just the filter that is not optimal.</li>
+</ol>
+
+<p>Ralf measured the times running the various variants of the command that we discussed so far on one of the standard Revit sample files, using the following setup parameters:</p>
+
+<ul>
+<li>Revit version: Revit Architecture Build 20080508_1900 (German)</li>
+<li>Project: m_Conference.rvt from Revit Samples</li>
+<li>Number of elements in model: 14153</li>
+<li>Number of windows and doors: 50</li>
+<li>Machine used for testing: Windows XP SP3 German /  CPU: Core 2 Duo E6850 / 2GB RAM</li>
+<li>Compiler: Visual Studio 2005 Team Edition (SP1)</li>
+</ul>
+
+<p>Here are the resulting times:</p>
+
+<table border="1">
+<tr><th>Test run</th><th>Original filter</th><th>Guy's code</th><th>Optimised filter</th></tr>
+<tr><td align="right">1</td><td align="right">170</td><td align="right">58</td><td align="right">58</td></tr>
+<tr><td align="right">2</td><td align="right">170</td><td align="right">57</td><td align="right">58</td></tr>
+<tr><td align="right">3</td><td align="right">171</td><td align="right">57</td><td align="right">58</td></tr>
+<tr><td align="right">4</td><td align="right">191</td><td align="right">57</td><td align="right">58</td></tr>
+<tr><td align="right">5</td><td align="right">171</td><td align="right">57</td><td align="right">58</td></tr>
+<tr><td align="right">6</td><td align="right">171</td><td align="right">57</td><td align="right">58</td></tr>
+<tr><td align="right">7</td><td align="right">170</td><td align="right">57</td><td align="right">58</td></tr>
+<tr><td align="right">8</td><td align="right">170</td><td align="right">57</td><td align="right">58</td></tr>
+<tr><td align="right">9</td><td align="right">197</td><td align="right">57</td><td align="right">58</td></tr>
+<tr><td align="right">10</td><td align="right">172</td><td align="right">57</td><td align="right">58</td></tr>
+</table>
+

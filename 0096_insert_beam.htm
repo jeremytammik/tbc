@@ -1,0 +1,173 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Inserting a Beam</h3>
+
+<p>This is the final Verona installment, discussing the last remaining topic raised in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/verona-revit-api-training.html">
+Revit API training in Verona</a>
+
+the week before last, on creating new beam types and inserting beam instances through the API.</p>
+
+<p>Similar to the exploration concerning
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/inserting-a-column.html">
+columns</a>,
+
+we explored the following topics:</p>
+
+<ul>
+<li>Retrieving all matching family elements in current document in order to check whether the family we are interested in is loaded.</li>
+<li>Exploring the results of using a FamilyFilter.</li>
+<li>Loading a new family, if not already present.</li>
+<li>Creating a new family symbol, i.e. duplicating a beam type and setting its name and dimensions.</li>
+<li>Inserting a new beam instance into the model.</li>
+</ul>
+
+<p>The interesting new aspects addressed with beams compared to columns are:</p>
+
+<ul>
+<li>The family type parameters and the naming convention used are completely different.</li>
+<li>Inserting a beam instance requires using a different version of NewFamilyInstance.</li>
+</ul>
+
+<p>We implemented a new external command CmdNewBeamTypeInstance to demonstrate the steps listed above.
+It is very similar to the command CmdNewColumnTypeInstance for the columns.
+First, we set up some constants to define the family we are interested in, its library path, the structural type and a unit conversion:</p>
+
+<pre class="code">
+<span class="blue">const</span> <span class="blue">string</span> family_name
+&nbsp; = <span class="maroon">"M_Concrete-Rectangular Beam"</span>;
+&nbsp;
+<span class="blue">const</span> <span class="blue">string</span> extension
+&nbsp; = <span class="maroon">".rfa"</span>;
+&nbsp;
+<span class="blue">const</span> <span class="blue">string</span> directory
+&nbsp; = <span class="maroon">"C:/Documents and Settings/All Users"</span>
+&nbsp; + <span class="maroon">"/Application Data/Autodesk/RAC 2009"</span>
+&nbsp; + <span class="maroon">"/Metric Library/Structural/Framing"</span>
+&nbsp; + <span class="maroon">"/Concrete/"</span>;
+&nbsp;
+<span class="blue">const</span> <span class="blue">string</span> path
+&nbsp; = directory + family_name + extension;
+&nbsp;
+<span class="teal">StructuralType</span> stBeam
+&nbsp; = <span class="teal">StructuralType</span>.Beam;
+</pre>
+
+<h4>Creating a new Beam Type</h4>
+
+<p>Most of the implementation of the Execute method is the same as for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/inserting-a-column.html">
+CmdNewColumnTypeInstance</a>.
+
+We check whether the family we are interested in is already loaded, making use of a family filter to get all family elements in the current document. We again note that the family filter returns both the symbols contained within the family and the family itself. The family element itself is stored in the variable 'f', and its symbols are simply listed. In real life, we would probably eliminate the symbols by creating a Boolean 'and' filter and filtering for the Family class as well as the family name.
+If the family was not already loaded, then 'f' remains null, and we load it with the LoadFamily method. It would also be sufficient to load one single symbol from the family, since we just need one single symbol 's' in order to call its Duplicate method. Any one will do, so we simply select the first one.
+When duplicating it, we simultaneously define the new symbol name. We list all its parameters, set the new type's dimensions, and demonstrate that we can change its name at a later stage as well if desired:</p>
+
+<pre class="code">
+s.get_Parameter( <span class="maroon">"b"</span> ).Set(
+&nbsp; <span class="teal">Util</span>.MmToFoot( 500 ) );
+&nbsp;
+s.get_Parameter( <span class="maroon">"h"</span> ).Set(
+&nbsp; <span class="teal">Util</span>.MmToFoot( 1000 ) );
+
+s.Name = <span class="maroon">"Nuovo simbolo due"</span>;
+</pre>
+
+<p>The names of the dimension parameters we are interested in for the beam are named 'b' and 'h'.
+The column class that we examined used a completely different naming convention, with full names and upper-case initial letters, e.g. 'Width' and 'Depth'.
+This just goes to show that families are user defined and every family can use different conventions.</p>
+
+<p>The new beam and column types appear like this in the Revit project browser:</p>
+
+<img src="img/new_beam_type.png" alt="New column and beam types"/>
+
+<p>To follow the standard Revit type naming conventions, we would normally include the new type dimensions in its name, like the existing types do.</p>
+
+<h4>Creating FamilyInstance Objects</h4>
+
+<p>We did some experiments in order to place an instance of our new symbol in the model.
+First we verified that it is possible to insert a beam, which normally uses a location line, by specifying only a location point:</p>
+
+<pre class="code">
+<span class="teal">XYZ</span> p = <span class="teal">XYZ</span>.Zero;
+doc.Create.NewFamilyInstance( p, s, nonStructural );
+</pre>
+
+<p>We can also place it with just a point and a direction:</p>
+
+<pre class="code">
+<span class="teal">XYZ</span> p = <span class="teal">XYZ</span>.Zero;
+<span class="teal">XYZ</span> q = app.Create.NewXYZ( 30, 20, 20 ); <span class="green">// feet</span>
+
+<span class="teal">FamilyInstance</span> fi = doc.Create.NewFamilyInstance(
+&nbsp; p, s, q, <span class="blue">null</span>, nonStructural );
+</pre>
+
+<p>In both of these cases, the instance has no location line defined for it, causing it to behave rather strangely and basically be unusable, e.g. it cannot be selected.</p>
+
+<p>It is also possible to place it on a level, but lacking a location line, this version is also not really useful:</p>
+
+<pre class="code">
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; levels = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+doc.get_Elements( <span class="blue">typeof</span>( <span class="teal">Level</span> ), levels );
+<span class="teal">Debug</span>.Assert( 0 &lt; levels.Count,
+&nbsp; <span class="maroon">"expected at least one level in model"</span> );
+&nbsp;
+<span class="teal">Level</span> level = levels[0] <span class="blue">as</span> <span class="teal">Level</span>;
+&nbsp;
+fi = doc.Create.NewFamilyInstance(
+&nbsp; line, s, level, nonStructural );
+</pre>
+
+<p>These various attempts led us to realise that we really do need to define a location line for the beam.
+We also verified that we must specify a structural type. Specifying a non-structural type means that no beam is created, and results in a null family instance. So this is the final working version for inserting a valid instance of a beam with sloped location line:</p>
+
+<pre class="code">
+<span class="teal">XYZ</span> p = <span class="teal">XYZ</span>.Zero;
+<span class="teal">XYZ</span> q = app.Create.NewXYZ( 30, 20, 20 ); <span class="green">// feet</span>
+
+<span class="teal">Line</span> line = app.Create.NewLineBound( p, q );
+
+<span class="teal">FamilyInstance</span> fi = doc.Create.NewFamilyInstance(
+&nbsp; line, s, <span class="blue">null</span>, stBeam );
+</pre>
+
+<p>Here is an image showing the result of running the two new commands CmdNewBeamTypeInstance and CmdNewColumnTypeInstance, which insert one instance each of the of the new beam and column types:</p>
+
+<img src="img/new_beam.png" alt="New column and beam instances"/>
+
+<p>By the way, if you have any questions regarding the use of NewFamilyInstance and especially the choice of the correct overload to use for specific situations,
+the first place to look is in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/Revit_2009_API_Developer_Guide.zip">
+Revit 2009 API Developer Guide</a>
+
+section 11.3.4 on Creating FamilyInstance Objects.
+That document contains the most complete and up-to-date description of the topic.
+That section was also provided temporarily as a stand-alone SDK document named
+
+<a href="C:/a/lib/revit/2009/SDK/Guide to placing Family Instances with the API.doc">
+Guide to placing Family Instances with the API.doc</a>.
+
+This document provides a roadmap on how to create different categories of family instances using the API.
+Typically these instances are created using one of the eight overloads of the Autodesk.Revit.Creation.Document method NewFamilyInstance.
+The choice of which overload to use depends not only on the category of the instance, but also other characteristics of the placement, such as whether it should be hosted, placed relative to a reference level, or placed directly on a particular face.
+The details are included in a table.
+Instances of some family types are better created through methods other than NewFamilyInstance and are listed in a second table.</p>
+
+<p>Here is
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/bc10024.zip">
+version 1.0.0.24</a>
+
+of the complete Visual Studio solution with the new CmdNewBeamTypeInstance command implementation.</p>
+
+

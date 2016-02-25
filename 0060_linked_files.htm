@@ -1,0 +1,226 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Linked Files</h3>
+
+<p>Here is pretty thorough exploration by Joe Ye on how to retrieve linked Revit files in a project.</p>
+
+<p>The built-in category of a linked Revit file is BuiltInCategory.OST_RvtLinks, and the class storing it in the Revit database is Instance.
+Therefore, we can retrieve all linked Revit files in a document like this:</p>
+
+<pre class="code">
+Autodesk.Revit.Creation.<span class="teal">Filter</span> cf
+&nbsp; = app.Create.Filter;
+&nbsp;
+<span class="teal">BuiltInCategory</span> bic
+&nbsp; = <span class="teal">BuiltInCategory</span>.OST_RvtLinks;
+&nbsp;
+<span class="teal">Filter</span> f1
+&nbsp; = cf.NewCategoryFilter( bic );
+&nbsp;
+<span class="teal">Filter</span> f2
+&nbsp; = cf.NewTypeFilter( <span class="blue">typeof</span>( <span class="teal">Instance</span> ) );
+&nbsp;
+<span class="teal">Filter</span> f3
+&nbsp; = cf.NewLogicAndFilter( f1, f2 );
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; links = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+doc.get_Elements( f3, links );
+</pre>
+
+<p>We simply set up filters for the category and class, which is also the System.Type, combine them in a Boolean expression, and ask the document for the elements matching this filter.</p>
+
+<p>Revit 2008 did not provide a valid category property for the linked model, and at that time the API did not support filtering for specific elements, so one had to use a slower and more complex approach such as this:</p>
+
+<pre class="code">
+<span class="teal">BuiltInParameter</span> bip
+&nbsp; = <span class="teal">BuiltInParameter</span>.ELEM_TYPE_PARAM;
+&nbsp;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+<span class="teal">ElementIterator</span> it = doc.Elements;
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; links = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+<span class="blue">while</span>( it.MoveNext() )
+{
+&nbsp; <span class="teal">Instance</span> inst = it.Current <span class="blue">as</span> <span class="teal">Instance</span>;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != inst )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Parameter</span> p = inst.get_Parameter( bip );
+&nbsp; &nbsp; <span class="teal">ElementId</span> id = p.AsElementId();
+&nbsp; &nbsp; <span class="teal">Element</span> e = doc.get_Element( <span class="blue">ref</span> id );
+&nbsp; &nbsp; <span class="blue">string</span> n = e.Name;
+&nbsp; &nbsp; <span class="blue">string</span> s = n.Substring( n.Length - 4 );
+&nbsp; &nbsp; <span class="blue">if</span>( s.ToLower().Equals( <span class="maroon">".rvt"</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; links.Add( inst );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>In this loop we check all elements whose class is Instance.
+On those, we check for the built-in parameter ELEM_TYPE_PARAM, which gives us the family.
+The parameter is an element id.
+With the id, we can ask the document to retrieve the element 'e' and ask it for its name 'n'.
+The linked file's element name is the file name, which ends in ".rvt".</p>
+
+<h4>Linked File Path</h4>
+
+<p>This quickly leads to a new question: Having the file name, is it possible to also get the file path for a given Revit link?</p>
+
+<p>For that, we can make use of the fact that Application.Documents manages all imported Revit files.
+The linked Revit files' full path can be retrieved from the Document.PathName property.
+Here is some code to set up a dictionary mapping each Revit link's file name to its full path:</p>
+
+<pre class="code">
+<span class="teal">DocumentSet</span> docs = app.Documents;
+<span class="blue">int</span> n = docs.Size;
+&nbsp;
+<span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="blue">string</span>&gt; dict
+&nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="blue">string</span>&gt;( n );
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">Document</span> doc <span class="blue">in</span> docs )
+{
+&nbsp; <span class="blue">string</span> path = doc.PathName;
+&nbsp; <span class="blue">int</span> i = path.LastIndexOf( <span class="maroon">"\\"</span> ) + 1;
+&nbsp; <span class="blue">string</span> name = path.Substring( i );
+&nbsp; dict.Add( name, path );
+}
+</pre>
+
+<p>Unfortunately, the question still has some thorny bits in it, because it remains unclear how to get the linked files in a Revit project when there are two open projects, both referencing a files with the
+same name are but at different paths. For example:</p>
+
+<ul>
+<li>Open a Revit project: C:\tmp\a\link.rvt with a link to C:\tmp\a\x.rvt.</li>
+<li>Open another Revit project in the same Revit session: C:\tmp\b\x.rvt.</li>
+</ul>
+
+<p>Now we want the Revit links for the project "link.rvt".
+From the elements collection we can find the name of the linked file "x.rvt".
+But there are two files with the same name in the documents collection and we don't know which one of them to choose.
+The files in the documents collection are:</p>
+
+<ul>
+<li>C:\tmp\a\link.rvt</li>
+<li>C:\tmp\a\x.rvt</li>
+<li>C:\tmp\b\x.rvt</li>
+</ul>
+
+<p>For this situation, you can distinguish between the opened Revit document and the imported one.
+When you retrieve a document from Application.Documents and it is currently open in Revit, its property Document.ActiveView is not null.
+If the document is imported, its Document.ActiveView is null.
+This can be used to tell which one is imported.</p>
+
+<p>Unfortunately, this still does not solve the problem if two opened documents import two Revit files with the same file name in different folders.<p>
+
+<p>Here is the mainline of an external command making use of these methods:</p>
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+&nbsp;
+<span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="blue">string</span>&gt; dict
+&nbsp; = GetFilePaths( app );
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; links
+&nbsp; = GetLinkedFiles( app );
+&nbsp;
+<span class="blue">int</span> n = links.Count;
+<span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; <span class="maroon">"There {0} {1} linked Revit model{2}."</span>,
+&nbsp; (1 == n ? <span class="maroon">"is"</span> : <span class="maroon">"are"</span>), n,
+&nbsp; <span class="teal">Util</span>.PluralSuffix( n ) ) );
+&nbsp;
+<span class="blue">string</span> name;
+<span class="blue">char</span>[] sep = <span class="blue">new</span> <span class="blue">char</span>[] { <span class="maroon">':'</span> };
+<span class="blue">string</span>[] a;
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">Element</span> link <span class="blue">in</span> links )
+{
+&nbsp; name = link.Name;
+&nbsp; a = name.Split( sep );
+&nbsp; name = a[0].Trim();
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">"Link '{0}' full path is '{1}'."</span>,
+&nbsp; &nbsp; name, dict[name] ) );
+}
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+</pre>
+
+<p>It makes use of the fact that the link instance element names use " : " to delimit the file name, as in:</p>
+
+<pre>
+"two_rooms.rvt : 2 : location <Not Shared>"
+</pre>
+
+<p>Here is the output from running this command in a simple sample file:</p>
+
+<pre>
+There are 2 linked Revit models.
+Link 'roof.rvt' full path is 'C:\tmp\roof.rvt'.
+Link 'two_rooms.rvt' full path is 'C:\tmp\two_rooms.rvt'.
+</pre>
+
+<p>Joe suggests that yet another situation also needs to be considered. Assuming the following situation:</p>
+
+<ul>
+<li>C:\temp\a\file1.rvt is opened.</li>
+<li>C:\temp\a\main.rvt is also opened.</li>
+<li>C:\temp\b\file1.rvt is imported into main.rvt.</li>
+</ul>
+
+<p>In this case, the GetFilePaths method retrieves two file paths:</p>
+
+<ol>
+<li>C:\temp\a\file1.rvt</li>
+<li>C:\temp\b\file1.rvt</li>
+</ol>
+
+<p>From the link name file1.rvt alone, we cannot tell which path is the imported one.
+To do so, we need to remove the non-imported files from the mapping.
+In this case, GetFilePaths should remove the opened Revit file and only contain non-opened ones, which represent the imported files.
+This can be achieved by using the ActiveView property, for instance by enhancing GetFilePaths like this:</p>
+
+<pre class="code">
+<span class="teal">Dictionary</span>&lt;<span class="blue">string</span>,<span class="blue">string</span>&gt; GetFilePaths(
+&nbsp; <span class="teal">Application</span> app,
+&nbsp; <span class="blue">bool</span> onlyImportedFiles )
+{
+&nbsp; <span class="teal">DocumentSet</span> docs = app.Documents;
+&nbsp; <span class="blue">int</span> n = docs.Size;
+&nbsp;
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="blue">string</span>&gt; dict
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="blue">string</span>&gt;( n );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Document</span> doc <span class="blue">in</span> docs )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( !onlyImportedFiles
+&nbsp; &nbsp; &nbsp; || ( <span class="blue">null</span> == doc.ActiveView ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> path = doc.PathName;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> i = path.LastIndexOf( <span class="maroon">"\\"</span> ) + 1;
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> name = path.Substring( i );
+&nbsp; &nbsp; &nbsp; dict.Add( name, path );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> dict;
+}
+</pre>
+
+<p>I hope that this discussion is useful for exploring situations requiring handling of linked files in Revit.
+Many thanks to Joe for his thorough exploration!</p>
+
+<p>Here is
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/bc10017.zip">
+version 1.0.0.17</a>
+
+of the complete Visual Studio solution with the new command CmdLinkedFiles discussed here.</p>

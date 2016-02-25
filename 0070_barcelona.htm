@@ -1,0 +1,148 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Barcelona Questions</h3>
+
+<p>Thanks to Alex Vila Ortega of Autodesk Spain, I spent the last couple of days here in Barcelona giving a training class on the Revit API, with lots of professional and enthusiastic participants.
+Here are some of the questions that we explored.</p>
+
+<a name="retrieve_windows_hosted_by_a_wall"></a>
+
+<p><strong>Question:</strong>
+How can I retrieve all the windows hosted by a specific given wall?
+</p>
+
+<p><strong>Answer:</strong>
+Well, one possibility is to make use of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/relationship-in.html">
+relationship inverter</a>
+
+that we already discussed.
+This will provide a global dictionary mapping each wall in the entire model to a list of all the windows it hosts.
+Here is an idea for a more direct and localised approach using API filtering:</p>
+
+<p>We can make use of the fact that each window's host id is available not only from the FamilyInstance Host property, but also through the built-in parameter HOST_ID_PARAM.
+This means that we can build a filter checking for the following combination of properties:</p>
+
+<ul>
+<li>Category Windows.</li>
+<li>Type FamilyInstance.</li>
+<li>Built-in parameter value for HOST_ID_PARAM equal to the given wall element id.</li>
+</ul>
+
+<p>The resulting Boolean 'and' combination should return all the windows hosted by a specific wall.</p>
+
+<p><strong>Question:</strong>
+I create new levels through the API and that works fine.
+However, no views are generated for these levels.
+How can I generate views for the new levels?</p>
+
+<p><strong>Answer:</strong>
+You might get some ideas by searching globally in the SDKSamples2009 solution for the NewLevel method, which is used to create a new level.
+One of the places it is used is the FrameBuilder SDK sample, in FrameData.cs:</p>
+
+<pre class="code">
+  <span class="teal">Level</span> newLevel
+    = createDoc.NewLevel( elevation );
+
+  createDoc.NewViewPlan( newLevel.Name,
+    newLevel, <span class="teal">ViewType</span>.FloorPlan );
+</pre>
+
+<p>This appears to be creating a level and immediately creating a new plan view for it as well, which seems to be just what you are looking for.</p>
+
+<a name="open_transaction_in_event_handler"></a>
+
+<p><strong>Question:</strong>
+We need to update some parameter values on certain elements from the document closed and saved events on the application object.
+To do so, we implemented an external application class App in order to hook up automatic synchronisation to document save and close events.
+We created a method SynchroniseAreaParameters to update the appropriate element parameters, which is registered as an event handler for the OnDocumentClosed, OnDocumentSaved and OnDocumentSavedAs events:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">App</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="blue">void</span> SynchroniseAreaParameters(
+&nbsp; &nbsp; <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ElementIterator</span> i = doc.get_Elements(
+&nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">Room</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">while</span>( i.MoveNext() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Command</span>.UpdateAreaParameter(
+&nbsp; &nbsp; &nbsp; &nbsp; i.Current <span class="blue">as</span> <span class="teal">Room</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">IExternalApplication</span>.<span class="teal">Result</span> OnStartup(
+&nbsp; &nbsp; <span class="teal">ControlledApplication</span> app )
+&nbsp; {
+&nbsp; &nbsp; app.OnDocumentClosed
+&nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">DocumentClosedEventHandler</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; SynchroniseAreaParameters );
+&nbsp;
+&nbsp; &nbsp; app.OnDocumentSaved
+&nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">DocumentSavedEventHandler</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; SynchroniseAreaParameters );
+&nbsp;
+&nbsp; &nbsp; app.OnDocumentSavedAs
+&nbsp; &nbsp; &nbsp; += <span class="blue">new</span> <span class="teal">DocumentSavedAsEventHandler</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; SynchroniseAreaParameters );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">IExternalApplication</span>.<span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">IExternalApplication</span>.<span class="teal">Result</span> OnShutdown( <span class="teal">ControlledApplication</span> app )
+&nbsp; {
+&nbsp; &nbsp; app.OnDocumentClosed
+&nbsp; &nbsp; &nbsp; -= <span class="blue">new</span> <span class="teal">DocumentClosedEventHandler</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; SynchroniseAreaParameters );
+&nbsp;
+&nbsp; &nbsp; app.OnDocumentSaved
+&nbsp; &nbsp; &nbsp; -= <span class="blue">new</span> <span class="teal">DocumentSavedEventHandler</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; SynchroniseAreaParameters );
+&nbsp;
+&nbsp; &nbsp; app.OnDocumentSavedAs
+&nbsp; &nbsp; &nbsp; -= <span class="blue">new</span> <span class="teal">DocumentSavedAsEventHandler</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; SynchroniseAreaParameters );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">IExternalApplication</span>.<span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Unfortunately, this does not work, although we can see in the debugger that the notifications are dispatched as expected and each step executes correctly with no error.
+Why are the parameters not updated accordingly?</p>
+
+<p><strong>Answer:</strong>
+The reason why no changes are applied to the document is that you need to encapsulate the modification in a transaction.
+In the context of an external command, the Revit API will automatically begin a transaction for you.
+Depending on the IExternalCommand.Result value returned from the external command's Execute method, the transaction will be either closed or aborted.
+Within the context of an event handler, however, no such transaction will be automatically opened for you, so you are responsible for doing so yourself.
+Adding two lines to SynchroniseAreaParameters to begin and end a transaction solved the problem:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">void</span> SynchroniseAreaParameters(
+&nbsp; &nbsp; <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( doc.BeginTransaction() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementIterator</span> i = doc.get_Elements(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">Room</span> ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">while</span>( i.MoveNext() )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Command</span>.UpdateAreaParameter(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; i.Current <span class="blue">as</span> <span class="teal">Room</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; doc.EndTransaction();
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>I am looking forward to more exciting topics to explore and things to learn in our remaining day together.</p>

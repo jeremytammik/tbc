@@ -1,0 +1,192 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Boolean Operations for 2D Polygons</h3>
+
+<p>Friday the thirteenth! What has gone wrong so far today? Keeping my fingers crossed ...</p>
+
+<p>We recently discussed the issue of determining the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/room-and-wall-adjacent-area.html">
+wall area adjacent to a room</a>
+
+and mentioned the fact that the simplest way to calculate such an overlapping area might be the use of a free-standing library for performing Boolean set operations on two-dimensional polygons.
+As said, there are many such libraries available, as you can see by googling for "polygon boolean" or by looking at the Wikipedia article on
+
+<a href="http://en.wikipedia.org/wiki/Boolean_operations_on_polygons">
+Boolean operations on polygons</a>.
+
+I suggested possibly using the
+
+<a href="http://www.cs.man.ac.uk/~toby/alan/software">
+Generic Polygon Clipper (gpc)</a>
+
+and its C# wrapper GpcWrapper.
+Now my colleague Adam Nagy
+&ndash; the
+
+<a href="http://www.geocities.com/nagy_name/nagy-name-pronunciations.html">
+pronunciation</a>
+
+is 'nadj', according to Adam, and an interesting topic in itself &ndash;
+
+went ahead and wrote a sample application demonstrating the use of this tool in a Revit add-in.
+
+<p>Adam's sample application is named GpcNET.
+It defines an external command within the namespace GpcNET.
+It also includes the GpcWrapper code in the same namespace, so that all its classes are immediately available to the command class.</p>
+
+<p>You need to select two floors before running the command.
+If not, it will prompt you to do so and abort.
+The two floors are used to define a two-dimensional polygon each.
+The intersection of the two polygons is computed.
+If the result is a valid polygon, a new third floor is created.
+It uses the intersection result to define its profile CurveArray, and the same floor type and level as the first selected floor.</p>
+
+<p>Here is the code that extracts the profile from a selected floor and creates a GPC polygon object from it:</p>
+
+<pre class="code">
+<span class="teal">Polygon</span> getPolygon( <span class="teal">Floor</span> floor )
+{
+&nbsp; <span class="teal">Options</span> geomOptions
+&nbsp; &nbsp; = app.Create.NewGeometryOptions();
+&nbsp;
+&nbsp; <span class="teal">GeoElement</span> elem
+&nbsp; &nbsp; = floor.get_Geometry( geomOptions );
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Vertex</span>&gt; vertices = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Vertex</span>&gt;();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="blue">object</span> obj <span class="blue">in</span> elem.Objects )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Face</span> face = solid.Faces.get_Item( 0 );
+&nbsp; &nbsp; &nbsp; <span class="teal">EdgeArray</span> loop = face.EdgeLoops.get_Item( 0 );
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> edge <span class="blue">in</span> loop )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZArray</span> edgePts = edge.Tessellate();
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> n = edgePts.Size;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; n - 1; ++i )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = edgePts.get_Item( i );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; vertices.Add( <span class="blue">new</span> <span class="teal">Vertex</span>( p.X, p.Y ) );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="teal">VertexList</span> vertexList = <span class="blue">new</span> <span class="teal">VertexList</span>();
+&nbsp; vertexList.NofVertices = vertices.Count;
+&nbsp; vertexList.Vertex = vertices.ToArray();
+&nbsp; <span class="teal">Polygon</span> poly = <span class="blue">new</span> <span class="teal">Polygon</span>();
+&nbsp; poly.AddContour( vertexList, <span class="blue">false</span> );
+&nbsp; <span class="blue">return</span> poly;
+}
+</pre>
+
+<p>Here is the code for the Execute method of the command, i.e. the command mainline:</p>
+
+<pre class="code">
+<span class="teal">CmdResult</span> rc = <span class="teal">CmdResult</span>.Failed;
+app = commandData.Application;
+doc = app.ActiveDocument;
+&nbsp;
+<span class="teal">Floor</span>[] floors = <span class="blue">new</span> <span class="teal">Floor</span>[2] { <span class="blue">null</span>, <span class="blue">null</span> };
+&nbsp;
+<span class="green">// get the first 2 floors of the selection</span>
+<span class="blue">foreach</span>( <span class="teal">RvtElement</span> e <span class="blue">in</span> doc.Selection.Elements )
+{
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == floors[0] )
+&nbsp; {
+&nbsp; &nbsp; floors[0] = e <span class="blue">as</span> <span class="teal">Floor</span>;
+&nbsp; }
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( <span class="blue">null</span> == floors[1] )
+&nbsp; {
+&nbsp; &nbsp; floors[1] = e <span class="blue">as</span> <span class="teal">Floor</span>;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+}
+&nbsp;
+<span class="green">// if the selction did not contain two floors, return</span>
+<span class="blue">if</span>( <span class="blue">null</span> == floors[0] || <span class="blue">null</span> == floors[1] )
+{
+&nbsp; <span class="teal">MessageBox</span>.Show(
+&nbsp; &nbsp; <span class="maroon">"Please select two floors before"</span>
+&nbsp; &nbsp; + <span class="maroon">" running this command."</span>,
+&nbsp; &nbsp; <span class="maroon">"GpcNET"</span> );
+}
+<span class="blue">else</span>
+{
+&nbsp; <span class="green">// get the intersection</span>
+&nbsp; <span class="teal">Polygon</span> poly1 = getPolygon( floors[0] );
+&nbsp;
+&nbsp; <span class="teal">Polygon</span> poly2 = getPolygon( floors[1] );
+&nbsp;
+&nbsp; <span class="teal">Polygon</span> poly3 = poly1.Clip(
+&nbsp; &nbsp; <span class="teal">GpcOperation</span>.Intersection,
+&nbsp; &nbsp; poly2 );
+&nbsp;
+&nbsp; <span class="green">// if it looks like a valid polygon, create a new floor</span>
+&nbsp; <span class="blue">if</span>( 0 &lt; poly3.NofContours )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">CurveArray</span> curves = app.Create.NewCurveArray();
+&nbsp; &nbsp; <span class="teal">VertexList</span> v = poly3.Contour[0];
+&nbsp; &nbsp; <span class="blue">int</span> i, j, n = v.NofVertices;
+&nbsp; &nbsp; <span class="blue">for</span>( i = 0; i &lt; n; ++i )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; j = ( i + 1 ) % n;
+&nbsp; &nbsp; &nbsp; <span class="teal">Vertex</span> p = v.Vertex[i];
+&nbsp; &nbsp; &nbsp; <span class="teal">Vertex</span> q = v.Vertex[j];
+&nbsp;
+&nbsp; &nbsp; &nbsp; curves.Append( app.Create.NewLineBound(
+&nbsp; &nbsp; &nbsp; &nbsp; app.Create.NewXYZ( p.X, p.Y, 0 ),
+&nbsp; &nbsp; &nbsp; &nbsp; app.Create.NewXYZ( q.X, q.Y, 0 ) ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; doc.Create.NewFloor( curves,
+&nbsp; &nbsp; &nbsp; floors[0].FloorType,
+&nbsp; &nbsp; &nbsp; floors[0].Level, <span class="blue">false</span> );
+&nbsp;
+&nbsp; &nbsp; rc = <span class="teal">CmdResult</span>.Succeeded;
+&nbsp; }
+}
+<span class="blue">return</span> rc;
+</pre>
+
+<p>A short readme file and sample Revit.ini snippet are included with the project.
+Here are the steps to rebuild and install it:</p>
+
+<ol>
+<li>In the Visual Studio project, adjust the Properties > Build > Output Path to point to the Revit.exe folder, e.g. "C:\Program Files\Revit Architecture 2009\Program".</li>
+<li>Compile the project.</li>
+<li>Copy the gpc.dll file from the project folder to the Revit.exe folder.</li>
+<li>Adjust your Revit.ini file, for instance using the text in the sample Revit.ini file provided.</li>
+</ol>
+
+<p>Please note that the GPC library is only free to use for non-commercial use. Please contact the vendor if you are thinking of using it in a commercial product.</p>
+
+<p>The zip file includes a sample project named floors.rvt containing two floors.
+Here is what they look like before running the command:</p>
+
+<img src="img/floors_intersect_before.png" alt="Two floors before calculating intersection"/>
+
+<p>Here is the third floor created using the profile resulting from the intersection of the two, which have been temporarily half-toned:</p>
+
+<img src="img/floors_intersect_after.png" alt="New floor created using intersection result"/>
+
+<p>To apply these results to the problem we started the discussion with, the wall area adjacent to a given room, we would need to transform the vertical wall and room faces into 2D, as described in the discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/polygon-transformation.html">
+polygon transformation</a>.
+
+<p>Here is the complete Visual Studio
+
+<a href="zip/gpcnet.zip">
+GpcNET solution</a>.</p>

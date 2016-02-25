@@ -1,0 +1,90 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Transactions</h3>
+
+<p>We recently mentioned the need to
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/barcelona-questions.html#open_transaction_in_event_handler">
+open a transaction in an event handler</a>.
+
+In that case, the transaction was required in a handler for the document closed and saved events on the application object.
+
+Here is another similar case involving the application OnDocumentNewed event.
+
+<p><strong>Question:</strong>
+I am trying to set up some shared parameters on OST_Rooms in a ControlledApplication.
+I can read and bind values from a shared parameter file, and have checked that the binding is set up correctly for the document. However, when I open the properties of a room, I don't see my parameter there.
+As a little background, we are creating an application to link to a database which will get and set values in the shared parameters for each room.</p>
+
+<p><strong>Answer:</strong>
+If you create a new document explicitly, you need to start a transaction on it.
+Although in this case you are not creating the new document yourself, starting a transaction solves the problem here as well:</p>
+
+<pre class="code">
+<span class="blue">void</span> application_OnDocumentNewed( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="blue">bool</span> rc = doc.BeginTransaction();
+&nbsp; <span class="teal">Debug</span>.Assert( rc, <span class="maroon">"begin transaction failed"</span> );
+&nbsp; <span class="blue">if</span>( rc )
+&nbsp; {
+&nbsp; &nbsp; CreateUserDefinedParameters( doc );
+&nbsp; &nbsp; rc = doc.EndTransaction();
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( rc, <span class="maroon">"end transaction failed"</span> );
+&nbsp; }
+}
+</pre>
+
+<p>So, once again, you need to encapsulate the modification in a transaction.
+In the context of an external command, the Revit API will 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/document-ismodified-property.html">
+automatically begin a transaction</a>
+
+for you.
+Depending on the IExternalCommand result value returned from the external command's Execute method, the transaction will be either closed or aborted.
+In all other contexts, however, including all event handlers, no such transaction will be automatically opened for you, so you are responsible for doing so yourself.</p>
+
+</p>Many thanks Lindsay Rader at
+
+<a href="http://www.atginc.com">
+Advanced Technologies Group, Inc.</a>
+
+for raising this question and to Adam Nagy of Autodesk for the answer!</p>
+
+<h4>Rome and Cantalupo</h4>
+
+<p>I wrote the text above after getting hooked in a small coffee shop in Barcelona providing a wifi connection, on my way to the airport.
+At least I should have been on my way, instead of sitting there blogging.
+I very narrowly avoided missing my flight to Rome.
+I did make it though, checking in as the last passenger before the flight was closed, and am now on a completely uninformed and purely intuitive few-hour tour of some parts of the city.
+My first station here has turned out to be Viale Nino Manfredi with a fine view over the entire city. 
+From there I took a long walk:</p>
+
+<ul>
+<li>through the Palatino, almost getting lost in some fenced off areas,</li>
+<li>around the Arco di Constantino and Colloseum,</li>
+<li>through a huge protest march against the Israeli warfare on Gaza,</li>
+<li>around the unbelievably huge and impressive Monumento di Vittorio Emmanuele II,</li>
+<li>through the ruins of the Teatro Marcello,</li>
+<li>across Isola and Fiume Tevere,</li>
+<li>through Trastevere, looking for a hotel and some good food,</li>
+<li>before spontaneously and abruptly deciding to leave Rome immediately after all.</li>
+</ul>
+
+<p>After driving off into the unknown I ended up in a quiet and hidden little place called Cantalupo, which may or may not mean song of wolf, next to Casperia, with no idea of where I actually am, which is a very enjoyable state to be in.
+There is no hotel in this little town, so I am in a guest house where I first had to spend ten minutes trying to get any one electric light in the room to work.
+My landlady is an old lady with no teeth.
+She made me late supper, a delicious three-course meal from nothing, toasting some bruscetta over an open fire in the fireplace, spaghetti al'arrabiata, and cheese with some green vegetable fried in oil that she named for me but I was unable to identify or remember.</p>
+
+<p>I am awakened Sunday morning at half past seven by the firing of cannons.
+To celebrate the fiesta of the benediction of the animals, I am told.
+This place is so fantastic ... in case you are interested, the address is Villa delle Rose, Viale Verdi 42, Cantalupo, Rieti, Italy, tel. 0765/514035.
+From here I will visit Casperia, just a few kilometres away, and then maybe continue towards Perugia, Firenze, Bologna, Verona.
+In case you are wondering what I am actually up to on this haphazard trip, my purpose is to teach Revit programming in Verona and learn some Italian first, with the ultimate goal of holding the training in Italian.</p>
+
+<p>Well, no internet connection in Casperia, so now I am in the city of Terni, posting from the bonnet of somebody's car, hooked up to somebody's unprotected wifi.</p>

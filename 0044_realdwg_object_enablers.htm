@@ -1,0 +1,74 @@
+<h3>RealDWG and Object Enablers</h3>
+
+<p>Revit uses the RealDWG toolkit to implement the DWG file export and import functionality.
+A frequent question is whether there is any way to hook into this functionality, and how this relates to custom objects and DBX object enablers, like for instance:
+Is there a way to load a DBX application into Revit as a RealDWG extension? 
+It would be handy to be able to reuse the functionality of some custom ObjectDBX classes.</p>
+
+<p>First of all, let us clarify some terms required in this context:</p>
+
+<ul>
+<li><strong>ObjectARX:</strong> The AutoCAD Runtime Extension, originally just ARX.</li>
+<li><strong>ObjectDBX:</strong> The AutoCAD-independent subset of ObjectARX that deals only with the AutoCAD database, the DWG file.</li>
+<li><strong>RealDWG:</strong> An AutoCAD-independent library for reading and writing DWG files using ObjectDBX in a stand-alone application. Requires a separate license.</li>
+<li><strong>Custom object:</strong> An instance of a C++ class that can be stored in an AutoCAD database, implemented by an ObjectARX or ObjectDBX plug-in.</li>
+<li><strong>Custom entity:</strong> An custom object that defines graphics and can reside in the block table of an AutoCAD database.</li>
+<li><strong>Object enabler:</strong> An AutoCAD-independent plug-in module, i.e. an ObjectDBX plug-in, that defines the properties and behaviour of a custom object or entity.</li>
+<li><strong>Proxy graphics:</strong> Hard-coded graphics data stored in a DWG file and used to render a custom object in the absence of its object enabler.</li>
+</ul>
+
+<p>ObjectARX supports extending AutoCAD during runtime with plug-in modules implemented in C++.
+An ObjectDBX plug-in makes use of only an AutoCAD independent subset of ObjectARX. 
+It can therefore be loaded both inside of AutoCAD, and outside into other non-AutoCAD host applications such as TrueView.</p>
+
+<p>More details about RealDWG are provided in the 
+
+<a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=770257">
+RealDWG Developer Center</a>.
+
+Thanks to Adam Nagy from our DevTech team in Europe,
+we also have a DevTV recording explaining how to make use of this API, 
+available for 
+
+<a href="http://download.autodesk.com/media/adn/DevTV-Introduction-to-RealDWG-Programming.zip">
+download</a>
+
+(97.5 MB) or for 
+
+<a href="http://download.autodesk.com/media/adn/DevTV-Introduction-to-RealDWG-Programming">
+online viewing</a>. Kean Walmsley provides a list of 
+
+<a href="http://through-the-interface.typepad.com/through_the_interface/devtv/index.html">
+more DevTV recordings</a>
+
+on various Autodesk APIs.
+
+<p>RealDWG itself does include a full ObjectARX runtime kernel which provides the ability to load an object enabler. 
+It needs it to manage the ARX class relationships, and it includes the acrxLoadModule API call to load a DBX module.
+It obviously cannot load an ARX module, i.e. a module that depends on AutoCAD, because it is not AutoCAD.</p>
+
+<p>On the other hand, RealDWG within Revit is a different story. In that context, no object enablers are loaded.
+Revit only uses RealDWG to display the graphics of the primitive entities within the DWG file, without bothering to load object enablers for custom classes.
+It does not load object enablers, even though RealDWG itself is theoretically capable of doing so.</p>
+
+<p>For export, Revit uses RealDWG to generate DWG files with primitive built-in ObjectARX entities. 
+For importing DWG files, it uses it to read and display entities and other data from the DWG file.
+It does not use any additional classes or do anything to manage the object hierarchy, so it does not load object enablers. All it uses is primitives already available in the RealDWG system.
+All custom objects just render their proxy graphics.</p>
+
+<p>When you call an ObjectARX entity's worldDraw function and its object enabler is not loaded, it just returns its proxy graphics.
+If the enabler is loaded, the real entity calculates and returns its proper live graphics. 
+This functionality is automatically handled by worldDraw.</p>
+
+<p>Revit does not register itself as a RealDWG application, and so the object enabler installers do not see it and do not set up any object enabler autoloading.</p>
+
+<p>The result is that you cannot use the RealDWG functionality built in to Revit to load an object enabler or make use of ObjectDBX functionality.</p>
+
+<p>You may be able to implement your own .NET based RealDWG application inside a Revit plug-in. This combination has not been tested, however, and is not explicitly supported. You may run into problems where the RealDWG licensing mechanism interferes with the Revit plug-in security features.</p>
+
+<p>If this combination works, it would enable you to make use of the AcGe library within your Revit application. 
+It would also give you access to the acrxLoadModule, thus providing the complete required kernel functionality in able to load a DBX object enabler or handle custom objects in DWG files. 
+If anybody has succesfully made use of this combination, it would be interesting to hear from you and discuss further details. 
+However, there is another easy way to achieve the same result ...</p>
+
+<p>A related topic is the possibility to run AutoCAD as a hidden process and make full use of all its API functionality from within Revit, which we will look at next.</p>

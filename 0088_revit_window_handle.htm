@@ -1,0 +1,254 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Revit Window Handle and Modeless Dialogues</h3>
+
+<p>Even though we cannot make use of the Revit API unless we are inside a Revit external command context, which is a modal state, there is still a lot of very useful functionality that can be provided with the help of modeless dialogue boxes.
+Modeless dialogues require knowledge of the Revit main window handle.</p>
+
+<p>As an example of a modeless dialogue, we will implement a form which is displayed in parallel with the Revit user interaction for selecting elements on the graphic screen.
+Our implementation of this dialogue simply reports the current contents of the Revit selection set.
+Obviously, it could be adapted to prompt the user to select only specific elements, or a very specific combination of them.</p>
+
+<p>In order to host a modeless dialogue box, one needs to supply a parent window handle.
+This ensures that the modeless form is displayed on top of the parent window.</p>
+
+<p>In .NET, a modeless dialogue is displayed to the user through the Form.Show method.
+It has two overloads.
+One of them takes an IWin32Window argument, which is defined by the System.Windows.Forms namespace to encapsulate a windows handle.
+In that case, the specified window becomes the top-level owner of the form being displayed.
+The other overload takes no arguments, in which case the owner is unspecified.
+If so, Windows has no knowledge that the modeless dialogue belongs to Revit, thus there is no guarantee that it will appear on top of the Revit window.
+In fact, to the contrary, as soon as the Revit window is activated, it will hide the modeless form.
+This will sabotage our intention of using the modeless form to display information to the Revit user.</p>
+
+The Revit API does not provide the main application window handle directly.
+The Windows API offers several possibilities for determining a window handle using various criteria.
+Two of the most common approaches are based on the Win32 FindWindow and EnumWindows calls.</p>
+
+<p>Our first discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/driving-revit-from-outside.html">
+driving Revit from outside</a>
+
+discussed and demonstrated the use of FindWindow.
+It requires either the window class name or the full window caption.
+The window class name depends on the exact version of Revit, and also changes depending on the state of the application.
+For instance, the Revit window class name is different depending on whether a document is currently opened or not.
+The window caption is also variable, again depending on the flavour and state of Revit and the name of the current document.</p>
+
+<p>Another way to obtain a window handle makes use of the .NET framework Process class.
+This has two advantages:</p>
+
+<ul>
+<li>This is pure .NET, no need make use of Win32 API calls.</li>
+<li>The process name is invariant, always "Revit".</li>
+</ul>
+
+<p>This means we do not need to understand or import any methods from Win32 DLLs, and the code will work regardless of the Revit version number or flavour, i.e. Architecture, MEP, or Structure.</p>
+
+<p>To retrieve all processes named "Revit", we can simply call Process.GetProcessesByName( "Revit" ).
+That returns a list with zero or more entries of instances of the Process class.
+The Process class provides a property MainWindowHandle to return its top level window handle.</p>
+
+<p>As explained above, the Form.Show method takes an IWin32Window argument.
+The value returned by the MainWindowHandle is an IntPtr, so we have to somehow convert it.
+One way of doing so is to implement our own class implementing the IWin32Window interface.
+The only required method is Handle, so our minimal window handle wrapper class implementation can look like this:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">WindowHandle</span> : <span class="teal">IWin32Window</span>
+{
+&nbsp; <span class="teal">IntPtr</span> _hwnd;
+&nbsp;
+&nbsp; <span class="blue">public</span> WindowHandle( <span class="teal">IntPtr</span> h )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert( <span class="teal">IntPtr</span>.Zero != h,
+&nbsp; &nbsp; &nbsp; <span class="maroon">"expected non-null window handle"</span> );
+&nbsp;
+&nbsp; &nbsp; _hwnd = h;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">IntPtr</span> Handle
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _hwnd;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>The rest is quite easy and straightforward, actually.
+We have implemented an external command CmdWindowHandle which encapsulates the following steps:</p>
+
+<ul>
+<li>Determine the Revit top level window handle.</li>
+<li>Display a modeless form listing the current contents of the Revit selection set and prompting the user to continue the selection process.</li>
+<li>Drive the continued selection using the Revit API PickOne method.</li>
+</ul>
+
+<p>Since we do not expect the Revit main window handle to change from one call of our external command to the next, we can determine it once and for all and store it in a static class variable _hWndRevit.
+We initialise _hWndRevit to null, and set it on the first call to the command using the .NET GetProcessesByName and MainWindowHandle methods.</p>
+
+<p>The form CmdWindowHandleForm is used to display the current contents of the Revit selection set.
+It is simply a resizable form hosting one single label element, whose text can be set through a property LabelText:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">partial</span> <span class="blue">class</span> <span class="teal">CmdWindowHandleForm</span> : <span class="teal">Form</span>
+{
+&nbsp; <span class="blue">public</span> CmdWindowHandleForm()
+&nbsp; {
+&nbsp; &nbsp; InitializeComponent();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="blue">string</span> LabelText
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> label1.Text;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">set</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; label1.Text = <span class="blue">value</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>We define two class variables for the default prompt and the Revit window handle:</p>
+
+<pre class="code">
+<span class="blue">const</span> <span class="blue">string</span> _prompt
+&nbsp; = <span class="maroon">"Please select some elements."</span>;
+&nbsp;
+<span class="blue">static</span> <span class="teal">WindowHandle</span> _hWndRevit = <span class="blue">null</span>;
+</pre>
+
+<p>The rest is the implementation of the main command line, which realises the three steps listed above:</p>
+
+<pre class="code">
+<span class="blue">if</span>( <span class="blue">null</span> == _hWndRevit )
+{
+&nbsp; <span class="teal">Process</span>[] processes
+&nbsp; &nbsp; = <span class="teal">Process</span>.GetProcessesByName( <span class="maroon">"Revit"</span> );
+&nbsp;
+&nbsp; <span class="blue">if</span>( 0 &lt; processes.Length )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IntPtr</span> h = processes[0].MainWindowHandle;
+&nbsp; &nbsp; _hWndRevit = <span class="blue">new</span> <span class="teal">WindowHandle</span>( h );
+&nbsp; }
+}
+&nbsp;
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+<span class="teal">Selection</span> sel = doc.Selection;
+&nbsp;
+<span class="blue">using</span>( <span class="teal">CmdWindowHandleForm</span> f
+&nbsp; = <span class="blue">new</span> <span class="teal">CmdWindowHandleForm</span>() )
+{
+&nbsp; f.Show( _hWndRevit );
+&nbsp; <span class="blue">bool</span> go = <span class="blue">true</span>;
+&nbsp; <span class="blue">while</span>( go )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">SelElementSet</span> ss = sel.Elements;
+&nbsp; &nbsp; <span class="blue">int</span> n = ss.Size;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">string</span> s = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">"{0} element{1} selected{2}"</span>,
+&nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ),
+&nbsp; &nbsp; &nbsp; ((0 == n)
+&nbsp; &nbsp; &nbsp; &nbsp; ? <span class="maroon">";\n"</span> + _prompt
+&nbsp; &nbsp; &nbsp; &nbsp; : <span class="maroon">":"</span> ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> ss )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; s += <span class="maroon">"\n"</span>;
+&nbsp; &nbsp; &nbsp; s += <span class="teal">Util</span>.ElementDescription( e );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; f.LabelText = s;
+&nbsp; &nbsp; sel.StatusbarTip = _prompt;
+&nbsp; &nbsp; go = sel.PickOne();
+&nbsp; }
+}
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+</pre>
+
+<p>Note that we can initialise the variable 'sel' for the document selection outside the loop.
+However, we cannot do the same for the currently selected elements stored in 'ss', because the sel.Elements property just returns a snapshot of the current state.
+Therefore, we need to reinitialise that variable on each loop iteration.</p>
+
+<p>In real life, the application looks like this; if the Revit selection set is initially empty, it prompts us to select some elements:</p>
+
+<img src="img/window_handle_none.png" alt="Modeless form displaying prompt and empty selection set" />
+
+<p>Every time a new pick is made, the contents of the dialogue update to reflect the new state:</p>
+
+<img src="img/window_handle_some.png" alt="Modeless form displaying some selected elements" />
+
+<p>At any point, the application can determine that a valid selection has been made and terminate the interaction to process the elements, or the user can make an empty pick to cause PickOne to return false and terminate the loop.</p>
+
+<p>Here is
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/bc10021.zip">
+version 1.0.0.21</a>
+
+of the complete Visual Studio solution with the new command CmdWindowHandle discussed here, as well as the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/room-and-wall-adjacency.html">
+room and wall adjacency</a>
+
+command that we presented a few days ago, and an additional secret command that we have not presented in detail yet.
+By the way, we are still working on the room and wall adjacency and will have something more to say about that and the Boolean operations for 2D polygons sometime soon.</p>
+
+<p>As suggested below by Guy, I have updated the code to use GetCurrentProcess instead of GetProcessesByName.
+This has several advantages:</p>
+
+<ul>
+<li>It completely removes any dependency whatsoever on the Revit executable name.</li>
+<li>When running multiple Revit sessions, it ensures you get the one with no additional logic.</li>
+<li>It siplifies the code above, and removes the need for an array of processes.</li>
+</ul>
+
+<p>Here is the simplified code snippet for the first step using GetCurrentProcess:</p>
+
+<pre class="code">
+<span class="blue">if</span>( <span class="blue">null</span> == _hWndRevit )
+{
+&nbsp; <span class="teal">Process</span> process
+&nbsp; &nbsp; = <span class="teal">Process</span>.GetCurrentProcess();
+&nbsp;
+&nbsp; <span class="teal">IntPtr</span> h = process.MainWindowHandle;
+&nbsp; _hWndRevit = <span class="blue">new</span> <span class="teal">WindowHandle</span>( h );
+}
+</pre>
+
+<h4>Various Places</h4>
+
+<p>I originally started working on this topic during the Revit API training in Barcelona, then started writing this specific post in Terni in Italy.
+Asking for the single most important local sight of Terni, I was told there are none, this is an industrial town.
+On second thoughts, the waterfall of Marmore was mentioned,
+
+<a href="http://www.marmore.it">
+Cascata delle Marmore</a>,
+
+which unfortunately closed before I got there.
+Apparently, it is the highest waterfall in Europe.
+Hard to believe, coming from Switzerland.
+From Terni I continued to the beautiful towns and cities of Perugia, Firenze, and Bologna.
+In Perugia, I met Gaetano, with whom I spent a wonderful evening together practicing amateur philosophy and very basic Italian.
+In Firenze and Bologna, I was impressed with the size of the cathedrals.
+I had originally thought of staying longer in Firenze, but my tourist allergy forced me to leave quickly.
+Massive tourism polarises the entire population to a degree that I simply cannot stand.
+I arrived in Verona in the north of Italy, which is much colder and where it has been raining incessantly.
+I learned the word settiornio, for the north part of somthing, etymologically derived from seven, for the seven stars of the Ursa minor or major or something.</p>
+
+<p>By the time I finally get to post this, much more has happened.
+The world's first Revit API training in Italian in Verona is complete.
+I met several extremely nice people and discovered that I like Italy very much indeed.
+I performed some research on tiramisu and discovered a simple dessert of mascarpone con caffee which I liked even better.
+I had two nice dinners with Stefano and Giovanna, and in the last one we had some pizza by the meter.</p>

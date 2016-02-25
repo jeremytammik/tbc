@@ -1,0 +1,50 @@
+<h3>Mechanical Duct Types</h3>
+
+<p><strong>Question:</strong>
+When selecting duct type properties, under the mechanical heading, various fitting property values are specified.
+How can I find out what property a given fitting belongs to, i.e. is it an elbow, a transition or cross etc.?
+Obviously, the type of fitting is described in the family name, but is there a more definite way of knowing what kind of fitting it is through the API?</p>
+
+<p><strong>Answer:</strong>
+In Revit 2009, you can use the built-in parameter FAMILY_CONTENT_PART_TYPE.
+You can access it through the following series of properties:</p>
+
+<p>FamilyInstance > Symbol > Family > Parameter > BuiltInParameter.FAMILY_CONTENT_PART_TYPE.</p>
+
+<p>This parameter stores an integer value. The values for the different types are:</p>
+
+<pre>
+kUndefinedPartType = -1,
+kNormal            = 0,
+kDuctMounted       = 1,
+kJunctionBox       = 2,
+kAttachesTo        = 3,
+kBreaksInto        = 4,
+kElbow             = 5,
+kTee               = 6,
+kTransition        = 7,
+kCross             = 8,
+kCap               = 9,
+kTapPerpendicular  = 10,
+kTapAdjustable     = 11,
+kOffset            = 12,
+kUnion             = 13,
+kPanelBoard        = 14,
+kTransformer       = 15,
+kSwitchBoard       = 16,
+kOtherPanel        = 17,
+kEquipmentSwitch   = 18,
+kSwitch            = 19,
+kValveBreaksInto   = 20,
+kSpudPerpendicular = 21,
+kSpudAdjustable    = 22,
+kDamper            = 23,
+kWye               = 24,
+kLateralTee        = 25,
+kLateralCross      = 26,
+kPants             = 27,
+kMultiPort         = 28,
+kValveNormal       = 29,
+</pre>
+
+<p>Many thanks to Adam Nagy and Harry Mattison for providing this information.</p>

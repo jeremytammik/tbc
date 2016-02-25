@@ -1,0 +1,217 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Wall Compound Layers</h3>
+
+<p>We have examined floor and slab geometry in some detail now, and would like to have a look at walls as well.
+One important aspect of walls is their internal layering, defined by the compound layer structure.
+In this post, we examine the layer geometry, i.e. how to determine the exact location of the different layers within the wall structure.
+Many thanks to Harry Mattison for providing lots of support developing this code and explaining both the API and the user interface issues involved.</p>
+
+<p>We have the following sources of input:</p>
+
+<ul>
+<li>Wall location curve and total wall thickness:
+<pre>
+LocationCurve curve = wall.Location as LocationCurve;
+double thickness = wall.WallType.Width;
+</pre>
+</li>
+<li>Compound structure layers and their individual thicknesses:
+<pre>
+CompoundStructure structure = wall.WallType.CompoundStructure;
+CompoundStructureLayerArray layers = structure.Layers;
+</pre>
+</li>
+</ul>
+
+<p>How can these be used to determine the exact positions of the individual wall layers and the wall itself?</p>
+
+<p>The most important bit of information in this context is that the wall centre line is always given by the wall location curve, and that is not affected by any other settings.</p>
+
+<p>There are some additional wall parameters that we first thought might influence these positions:</p>
+
+<ul>
+<li>Location Line WALL_KEY_REF_PARAM</li>
+<li>Location Line Offset WALL_LOCATION_LINE_OFFSET_PARAM</li>
+</ul>
+
+<p>WALL_KEY_REF_PARAM describes the setting of the wall's Location Line property. However, wall.Location is always the centre of the wall, not the position of the 'Location Line' visible in the user interface:</p>
+
+<img src="img/wall_location_line_ui.png" alt="Wall location line in user interface"/>
+
+<p>So this property will not affect the computation of the wall layer locations.</p>
+
+<p>WALL_LOCATION_LINE_OFFSET_PARAM only affects walls that are used as panels in a curtain wall. It offsets the wall panel from the face of the curtain wall. Again, this parameter will not affect the wall layer analysis, because wall.Location will be the centre of the wall panel, regardless of any offset.</p>
+
+<p>So now we have clarified the different inputs available, how can these be combined to determine the exact location of each layer?</p>
+
+<p>From the wall and its location line, we can obtain the wall thickness and the wall centre line start and end point.
+Assuming a horizontal wall base line and vertical sides, we can calculate the vectors v, pointing along the location line from its start to its end point, and w, pointing perpendicularly to the location line and the Z axis towards the exterior edge of the wall.
+Both of these are normalised, i.e. one foot long, since the Revit database always uses feet as units for length measurements.
+If we multiply them by the wall length and half the wall thickness and draw them starting from the location line start point, they look like this:</p>
+
+<img src="img/wall_v_and_w.png" alt="Wall length and width vectors"/>
+
+<p>We use the location line start and end points, the wall thickness, and these two vectors to construct various model lines:
+the first simply displays the wall location line, extended by two feet in both directions beyond the end of the wall.
+We draw a second model line representing w multiplied by half the wall thickness at the starting point of the first, perpendicular to it.
+Then, we draw model lines deliminating the different wall layers.
+We lengthen the layer delimination lines by one foot in both directions beyond the end of the wall.</p>
+
+<p>Here is an example of a set of compound walls at various angles:</p>
+
+<img src="img/walls_compound.png" alt="Original compound walls"/>
+
+<p>Here is the result of running the wall layers command on that set, adding the model lines representing the wall location line, extending two feet beyond the end of each wall, its half thickness and exterior side, and the wall layer delimination lines extending one foot beyond the wall end:</p>
+
+<img src="img/walls_compound_after.png" alt="Compound walls with layer lines added"/>
+
+<p>We do need to pay attention to the wall Flipped property. If Flipped is true, the interior and exterior sides of the wall are swapped, so the layering is reversed. We can account for this reversal by negating w if Flipped is true.</p>
+
+<p>Here is a more detailed view of one of the compound walls in its original state:</p>
+
+<img src="img/wall_compound.png" alt="Original compound wall"/>
+
+<p>Running the wall layers command adds the model lines described above:</p>
+
+<img src="img/wall_compound_after.png" alt="Compound wall with layer lines added"/>
+
+<p>Flipping the wall swaps it interior and exterior faces and reverses the layering:</p>
+
+<img src="img/wall_compound_flipped.png" alt="Flipped compound wall"/>
+
+<p>Checking the Flipped property and negating the vector w pointing to the exterior face reverses the order of the layer delimitation lines as well:</p>
+
+<img src="img/wall_compound_flipped_after.png" alt="Flipped compound wall with layer lines added"/>
+
+<p>While iterating over the wall layers, the command prints some data to the Visual Studio debug output window, listing the wall description, thickness, number of layers, and the function and thickness of each layer:</p>
+
+<pre>
+Walls <128581 Jeremy Compound> with thickness 300 mm has 4 layers:
+  Layer 1: function Finish1, thickness 25 mm
+  Layer 2: function ThermalOrAir, thickness 50 mm
+  Layer 3: function Structure, thickness 200 mm
+  Layer 4: function Finish2, thickness 25 mm
+</pre>
+
+<p>While preparing the snapshots above, I also had to deal with a completely different question, a simple user interface issue not related to the API: how can I display the detailed wall compound structure on the graphics screen and ensure that hatch patterns for the different layers are displayed? There are a few steps required: first, change the view property from Coarse to Fine. At that point, I see the lines dividing the layers, but no hatches. For the hatching, make sure the wall layers are defined to use materials that have a cut pattern. Also ensure that you are zoomed in enough in the view so the pattern does not overscale, i.e. turn to gray fill, because the lines are too close to each other.</p>
+
+<p>Here is the CmdWallLayers source code:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt; walls = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt;();
+&nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.GetSelectedElementsOrAll(
+&nbsp; &nbsp; walls, doc, <span class="blue">typeof</span>( <span class="teal">Wall</span> ) ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = doc.Selection;
+&nbsp; &nbsp; message = ( 0 &lt; sel.Elements.Size )
+&nbsp; &nbsp; &nbsp; ? <span class="maroon">"Please select some wall elements."</span>
+&nbsp; &nbsp; &nbsp; : <span class="maroon">"No wall elements found."</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">int</span> i, n;
+&nbsp; <span class="blue">double</span> halfThickness, layerOffset;
+&nbsp; <span class="teal">Creator</span> creator = <span class="blue">new</span> <span class="teal">Creator</span>( app );
+&nbsp; <span class="teal">XYZ</span> lcstart, lcend, v, w, p, q;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Wall</span> wall <span class="blue">in</span> walls )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> desc = <span class="teal">Util</span>.ElementDescription( wall );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">LocationCurve</span> curve
+&nbsp; &nbsp; &nbsp; = wall.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == curve )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = desc + <span class="maroon">": No wall curve found."</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+&nbsp; &nbsp; }
+
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; <span class="green">// wall centre line and thickness:</span>
+&nbsp; &nbsp; <span class="green">//</span>
+&nbsp; &nbsp; lcstart = curve.Curve.get_EndPoint( 0 );
+&nbsp; &nbsp; lcend = curve.Curve.get_EndPoint( 1 );
+&nbsp; &nbsp; halfThickness = 0.5 * wall.WallType.Width;
+&nbsp; &nbsp; v = lcend - lcstart;
+&nbsp; &nbsp; v = v.Normalized; <span class="green">// one foot long</span>
+&nbsp; &nbsp; w = <span class="teal">XYZ</span>.BasisZ.Cross( v ).Normalized;
+&nbsp; &nbsp; <span class="blue">if</span>( wall.Flipped ) { w = -w; }
+&nbsp;
+&nbsp; &nbsp; p = lcstart - 2 * v;
+&nbsp; &nbsp; q = lcend + 2 * v;
+&nbsp; &nbsp; creator.CreateModelLine( p, q );
+&nbsp;
+&nbsp; &nbsp; q = p + halfThickness * w;
+&nbsp; &nbsp; creator.CreateModelLine( p, q );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// exterior edge</span>
+&nbsp; &nbsp; p = lcstart - v + halfThickness * w;
+&nbsp; &nbsp; q = lcend + v + halfThickness * w;
+&nbsp; &nbsp; creator.CreateModelLine( p, q );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CompoundStructure</span> structure
+&nbsp; &nbsp; &nbsp; = wall.WallType.CompoundStructure;
+&nbsp;
+&nbsp; &nbsp; <span class="teal">CompoundStructureLayerArray</span> layers
+&nbsp; &nbsp; &nbsp; = structure.Layers;
+&nbsp;
+&nbsp; &nbsp; i = 0;
+&nbsp; &nbsp; n = layers.Size;
+&nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; <span class="maroon">"{0} with thickness {1} mm"</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">" has {2} layer{3}{4}"</span>,
+&nbsp; &nbsp; &nbsp; desc,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.FootToMm( 2 * halfThickness ),
+&nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ),
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.DotOrColon( n ) ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == n )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// interior edge</span>
+&nbsp; &nbsp; &nbsp; p = lcstart - v - halfThickness * w;
+&nbsp; &nbsp; &nbsp; q = lcend + v - halfThickness * w;
+&nbsp; &nbsp; &nbsp; creator.CreateModelLine( p, q );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; layerOffset = halfThickness;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">CompoundStructureLayer</span> layer
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> layers )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"&nbsp; Layer {0}: function {1}, "</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">"thickness {2} mm"</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++i, layer.Function,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.FootToMm( layer.Thickness ) ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; layerOffset -= layer.Thickness;
+&nbsp; &nbsp; &nbsp; &nbsp; p = lcstart - v + layerOffset * w;
+&nbsp; &nbsp; &nbsp; &nbsp; q = lcend + v + layerOffset * w;
+&nbsp; &nbsp; &nbsp; &nbsp; creator.CreateModelLine( p, q );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+}
+</pre>
+
+<p>I am adding version 1.0.0.13 of the complete Visual Studio solution
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/bc10013.zip">here</a>,
+
+including the new CmdWallLayers and all other commands discussed so far. In fact, it even includes another command that we have not discussed yet, and will address in the next post.</p>

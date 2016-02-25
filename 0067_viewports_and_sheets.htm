@@ -1,0 +1,96 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Viewports and Sheets</h3>
+
+<p>Jochen Reichert of the University of Stuttgart asks: How can I determine all the view ports of a drawing sheet and vice versa?</p>
+
+<p>To determine the view ports of a drawing sheet, you can simply use the ViewSheet Views property.
+It returns the set of all views on the sheet.
+For the inverse relationship, you can create a mapping of your own as described in the discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/relationship-in.html">
+inverting the relationship</a>
+
+between hosted und hosting elements such as doors, windows and walls.
+Here is some code demonstrating this for the viewport and view sheet relationships.
+It sets up two mappings, one from each view sheet to all its contained viewports, the other from each viewport to the view sheet containing it, which we expect to be unique:</p>
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; sheets = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+doc.get_Elements( <span class="blue">typeof</span>( <span class="teal">ViewSheet</span> ), sheets );
+&nbsp;
+<span class="green">// map with key = sheet element id and</span>
+<span class="green">// value = list of viewport element ids:</span>
+&nbsp;
+<span class="teal">Dictionary</span>&lt;<span class="teal">ElementId</span>, <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;&gt;
+&nbsp; mapSheetToViewport =
+&nbsp; <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="teal">ElementId</span>, <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;&gt;();
+&nbsp;
+<span class="green">// map with key = viewport element id and</span>
+<span class="green">// value = sheet element id:</span>
+&nbsp;
+<span class="teal">Dictionary</span>&lt;<span class="teal">ElementId</span>, <span class="teal">ElementId</span>&gt;
+&nbsp; mapViewportToSheet =
+&nbsp; <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="teal">ElementId</span>, <span class="teal">ElementId</span>&gt;();
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">ViewSheet</span> sheet <span class="blue">in</span> sheets )
+{
+&nbsp; <span class="blue">int</span> n = sheet.Views.Size;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">"Sheet {0} contains {1} view{2}: "</span>,
+&nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( sheet ),
+&nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ) ) );
+&nbsp;
+&nbsp; <span class="teal">ElementId</span> idSheet = sheet.Id;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">View</span> v <span class="blue">in</span> sheet.Views )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( <span class="maroon">"&nbsp; Viewport "</span>
+&nbsp; &nbsp; &nbsp; + <span class="teal">Util</span>.ElementDescription( v ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !mapSheetToViewport.ContainsKey( idSheet ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; mapSheetToViewport.Add( idSheet,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;() );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; mapSheetToViewport[idSheet].Add( v.Id );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
+&nbsp; &nbsp; &nbsp; !mapViewportToSheet.ContainsKey( v.Id ),
+&nbsp; &nbsp; &nbsp; <span class="maroon">"expected viewport to be caontained"</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">" in only one single sheet"</span> );
+&nbsp;
+&nbsp; &nbsp; mapViewportToSheet.Add( v.Id, idSheet );
+&nbsp; }
+}
+</pre>
+
+<p>Here is the output generated for a simple model with three sheets:</p>
+
+<pre>
+Sheet Drawing Sheets <127148 Unnamed> contains 3 views:
+  Viewport Views <29193 East>
+  Viewport Views <29233 South>
+  Viewport Views <29273 Site>
+Sheet Drawing Sheets <127162 Unnamed> contains 1 view:
+  Viewport Views <13073 Level 1>
+Sheet Drawing Sheets <127176 Unnamed> contains 1 view:
+  Viewport Views <15915 Level 2>
+</pre>
+
+<p>Here is
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/bc10018.zip">
+version 1.0.0.18</a>
+
+of the complete Visual Studio solution with the new command CmdListViews discussed here.</p>

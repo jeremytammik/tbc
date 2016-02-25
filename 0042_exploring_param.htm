@@ -1,0 +1,103 @@
+<h3>Exploring Element Parameters</h3>
+
+<p>Most non-geometrical element data in Revit is stored in element parameters, so this is obviously an important topic, and one that we have not explored much yet. We did touch on it when discussing 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/adding-a-shared-parameter-to-a-dwg-file.html">
+adding a shared parameter to a DWG file</a>, 
+
+and now we will recapitulate some basics and discuss the built-in parameter checker, 
+which is a useful tool for exploring element parameters.</p>
+
+<p>First some brief basic facts of life on parameters. They are discussed in more detail by the 
+
+<a href="http://www.autodesk.com/developrevit">
+DevTV recording</a>
+
+available for 
+
+<a href="http://download.autodesk.com/media/adn/DevTV_Introduction_to_Revit_Programming">
+online viewing</a>
+
+or 
+
+<a href="http://download.autodesk.com/media/adn/DevTV_Introduction_to_Revit_Programming.zip">
+download</a>
+
+and the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/rac_labs_20081117.zip">
+Revit API introduction labs</a>,
+
+especially the sample commands in Labs4.cs.</p>
+
+<p>Every Revit element has parameters attached to it, and the 'official' collection of parameters can be accessed through the Element Parameters property.
+If you are looking for a specific parameter, you can also use one of the direct access methods to retrieve a parameter from an element:</p>
+
+<ul>
+<li>Parameter( BuiltInParameter ): given a built-in parameter enumeration id.</li>
+<li>Parameter( Definition ): given a parameter definition.</li>
+<li>Parameter( Guid ): given a GUID for a shared parameter.</li>
+<li>Parameter( String ): given a localised parameter name.</li>
+</ul>
+
+<p>A parameter has a value and a definition associated with it. The definition manages data such as the user visible parameter name and the interpretation of the parameter data. Shared parameters also have a GUID associated with them. All four methods above can be used to retrieve an individual parameter. Using the localised parameter name should be avoided, though, since it will cause the application to be language dependent. The build-in parameter enumeration is a hard-coded list of several hundred different parameters and provides a language independent method to identify most parameters.</p>
+
+<p>Sometimes an element will have other parameters attached to it as well, which are not listed in the 'official' collection returned by the Parameters property. To explore all parameters attached to an element, one can make use of the built-in parameter checker.</p>
+
+<p>This useful tool is included with the labs. It iterates over all the built-in parameter enumeration values and attempts to read a parameter for each one. Each one successfully retrieved is listed with all of its data, including the enumeration value, the localised name, the value, the string representation, and its read-write status. If the value is an element id, the id is evaluated and the type and name of referenced element is listed.</p>
+
+<p>This tool can be used in conjunction with another tool also provided by the labs, the element lister implemented in Lab2_1_Elements, to discover information about elements that are not easy to access otherwise.
+As an example, let us analyse the data associated with Revit filters in the database, starting with the following question:</p>
+
+<h4>How can I access the names and types of filters in a Revit document?</h4>
+
+<p>We can explore this issue in the following manner: First, create an empty Revit model. In that, list all the elements in the document into a text file RevitElementsBeforeFilter.txt. Then, create a filter and list the elements again in RevitElementsAfterFilter.txt. Now we can determine the properties of the filter element that was added:</p>
+
+<pre>
+C:\tmp\ > diff RevitElementsBeforeFilter.txt RevitElementsAfterFilter.txt
+2159a2160
+> Id=127147; Class=Symbol; Category=?; Name=Filter 1
+</pre>
+
+<p>As you can see, one single element was added to the database, the filter element. 
+Its System.Type is Symbol.
+It does not have a category associated with it, so we cannot use that to identify it. 
+Its element name is "Filter 1".
+Next, we can explore its parameters and see whether they might be used to help identify filter elements.
+Entering the element id in the Revit menu entry Tools > Element Ids > Select by ID, select the filter into the current Revit selection set and list its parameters using the built-in parameter checker:</p>
+
+<pre>
+Symbol 'Filter 1' 127147 Instance Built-in Parameters
+
+ELEM_CATEGORY_PARAM_MT              Category              ElementId  read-only   -1
+ELEM_CATEGORY_PARAM                 Category              ElementId  read-only   -1
+DESIGN_OPTION_ID                    Design Option         ElementId  read-only   -1
+PHASE_DEMOLISHED                    Phase Demolished      ElementId  read-write  -1
+PHASE_CREATED                       Phase Created         ElementId  read-write  -1
+ELEMENT_LOCKED_PARAM                Locked                Integer    read-write  0
+ELEM_DELETABLE_IN_FAMILY            Deletable             Integer    read-write  1
+UNIFORMAT_DESCRIPTION               Assembly Description  String     read-only
+UNIFORMAT_CODE                      Assembly Code         String     read-write
+ID_PARAM                            Id                    ElementId  read-only   Symbol 'Filter 1' 127147
+EDITED_BY                           Edited by             String     read-only
+ELEM_PARTITION_PARAM                Workset               Integer    read-write  0
+ELEM_FAMILY_AND_TYPE_PARAM          Family and Type       ElementId  read-only   -1
+ELEM_FAMILY_PARAM                   Family                ElementId  read-only   -1
+ELEM_TYPE_PARAM                     Type                  ElementId  read-only   -1
+SYMBOL_FAMILY_AND_TYPE_NAMES_PARAM  Family and Type       String     read-only   Filters: Filter 1
+SYMBOL_FAMILY_NAME_PARAM            Family Name           String     read-only   Filters
+SYMBOL_FAMILY_NAME_PARAM            Family Name           String     read-only   Filters
+SYMBOL_NAME_PARAM                   Type Name             String     read-only   Filter 1
+SYMBOL_NAME_PARAM                   Type Name             String     read-only   Filter 1
+SYMBOL_ID_PARAM                     Type Id               ElementId  read-only   -1
+</pre>
+
+<p>Please excuse the overly long lines ... you can see them in full by copying them to a text file. 
+This shows all the information accessible through the API for the filter element. 
+This information may be enough to identify the filters in the document. 
+For instance, it might be possible to use combinations of these built-in parameters to construct a Revit API filter to extract all database elements of interest.
+
+<p><strong>Addendum:</strong> For an improved version of the built-in parameter checker for Revit 2012, please refer to the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2011/09/unofficial-parameters-and-bipchecker.html">
+BipChecker</a>.

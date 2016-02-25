@@ -1,0 +1,88 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Document IsModified Property</h3>
+
+<p>Looking at the Document.IsModified property, one quickly notices that it is frequently set, even if no real modifications have been applied to a document. One reason for this is that every execution of an external command returning IExternalCommand.Result.Succeeded will cause this property to return True. To explore this in detail, we can use the following minimal command implementation:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">"Document.IsModified {0}"</span>, doc.IsModified ) );
+&nbsp; <span class="blue">return</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Succeeded;
+}
+</pre>
+
+<p>The result of running this command twice in a newly opened document is:</p>
+
+<pre>
+Document.IsModified False
+Document.IsModified True
+</pre>
+
+<p>According to the Revit API help, the Document.IsModified property reports whether the document has been modified since it was last saved.
+Since the command returned Succeeded, Revit assumes that the execution did modify it, and the result is as expected.
+If you do not want this property to be modified, for instance by a simple external command displaying a Help > About... dialogue which has no interaction at all with the Revit model, it should return Cancelled or Failed.
+To test this, I modified my little test command as follows:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">"Document.IsModified {0}"</span>, doc.IsModified ) );
+&nbsp;
+&nbsp; <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> rc;
+&nbsp; rc = <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Failed;
+&nbsp; <span class="blue">return</span> rc;
+}
+</pre>
+
+<p>The result of running the modified code twice in a newly opened document is:</p>
+
+<pre>
+Document.IsModified False
+Document.IsModified False
+</pre>
+
+<p>Many thanks to
+
+<a href="http://cadappdev.blogspot.com">
+Matt Mason</a>
+
+of 
+
+<a href="http://www.avatech.com">
+Avatech Solutions</a>
+
+for raising this issue!</p>
+
+<p>Matt performed some additional analysis and suggests noting the following implications of the results above:</p>
+
+<ul>
+<li>Returning Succeeded commits a transaction to the Revit model, even if that transaction is empty.</li>
+<li>If it is important to the add-in to not "modify" the model inadvertently, you need to keep track of whether you have made modifications, return Succeeded if you did, and Cancelled or Failed if you did not.</li>
+</ul>
+
+<p>Most sample applications always return Succeeded. 
+Matt also discovered that simply opening a transaction will immediately set this flag.
+Because 
+
+<a href="http://download.autodesk.com/media/adn/RvtMgdDbg2009_0429_2008.zip">
+RvtMgdDbg</a>
+
+immediately opens a transaction, the flag is always set when debugging into its code.</p>

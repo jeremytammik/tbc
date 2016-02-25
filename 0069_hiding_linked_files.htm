@@ -1,0 +1,106 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Hiding Linked Files</h3>
+
+<p>
+
+<a href="http://roddotnet.blogspot.com">Rod Howarth</a>
+
+raised a question in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/linked-files.html">
+discussion on linked files</a>:
+
+</p>
+
+<p><strong>Question:</strong> I'm trying to make a command to turn off the visibility of linked Revit and DWG models in the current view.</p>
+
+<p>The intent is to turn off the visibility for all imported categories in the drawing, i.e. all imported CAD files. This would be like going to Visibility/Graphics > Imported Categories > Show imported categories in this view.</p>
+
+<p>Is there an easy way to do this, or am I going to have to loop over each element, checking if its symbol's name ends in '.dwg' or '.rvt' or is there a certain thing I can look for, i.e. something that tells me it is an imported category, instead of just going by the name?</p>
+
+<p>For DWG, I simply loop through the document settings categories and make each category whose name ends with ".dwg" invisible in the current view.</p>
+
+<p>However, this does not work for RVT, so I had a look with 
+
+<a href="http://download.autodesk.com/media/adn/RvtMgdDbg2009_0429_2008.zip">
+RvtMgdDbg</a>, 
+
+and it says that my linked file on the plan is part of the OST_RvtLinks built-in category.</p>
+
+<p>So I changed my code to do:</p>
+
+<pre class="code">
+<span class="teal">Document</span> doc = app.ActiveDocument;
+<span class="teal">Categories</span> categories = doc.Settings.Categories;
+&nbsp;
+<span class="green">// get category for linked files</span>
+<span class="teal">Category</span> linkedRevitCat
+&nbsp; = categories.get_Item(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_RvtLinks );
+&nbsp;
+<span class="green">// loop through all categories in document</span>
+<span class="blue">foreach</span>( <span class="teal">Category</span> c <span class="blue">in</span> categories )
+{
+&nbsp; <span class="green">// if they end with dwg or rvt toggle</span>
+&nbsp; <span class="green">// their current visibility in current view</span>
+&nbsp; <span class="blue">if</span>( c.Name.ToLower().EndsWith( <span class="maroon">".dwg"</span> )
+&nbsp; &nbsp; || c.Name.ToLower().Contains( <span class="maroon">".rvt"</span> )
+&nbsp; &nbsp; || c.Name.ToLower().EndsWith( <span class="maroon">".dwf"</span> )
+&nbsp; &nbsp; || c.Name.ToLower().EndsWith( <span class="maroon">".dxf"</span> )
+&nbsp; &nbsp; || c.Name.ToLower().EndsWith( <span class="maroon">".dwfx"</span> )
+&nbsp; &nbsp; || ( linkedRevitCat != <span class="blue">null</span>
+&nbsp; &nbsp; &nbsp; &amp;&amp; c.Id.Equals( linkedRevitCat.Id ) ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// toggle visibility </span>
+&nbsp; &nbsp; doc.ActiveView.setVisibility( c,
+&nbsp; &nbsp; &nbsp; !c.get_Visible( doc.ActiveView ) );
+&nbsp; }
+}
+</pre>
+
+<p>Unfortunately, linkedRevitCat always is null, and when I run the elements filter API sample, OST_RvtLinks doesn't come up as a category list?</p>
+
+<p><strong>Answer:</strong>
+First of all, thank you Rod for raising this interesting question and for pointing out the positive information on how simple it is to hide the linked DWG files.</p>
+
+<p>Joe Ye discovered the following built-in category behaviour:
+There is no easy way to filter out those imported categories quickly.
+I found one hint that can make your add-in quicker, though:</p>
+
+<ul>
+<li>For the built-in categories, the element id is always negative.</li>
+<li>For imported ones, which are created after the DWG is imported, the element id is positive.</li>
+</ul>
+
+<p>Using this rule, it is no longer necessary to extract the substring and perform a string comparison for built-in categories.</p>
+
+<p>Phil Xia responded to the question on the OST_RvtLinks built-in category:
+indeed we cannot retrieve the OST_RvtLinks built-in category from the document settings categories.
+We can get it from the element category property, however:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">BuiltInCategory</span> bic = <span class="teal">BuiltInCategory</span>.OST_RvtLinks;
+&nbsp; <span class="teal">ElementIterator</span> i = doc.Elements;
+&nbsp; <span class="teal">Element</span> e;
+&nbsp; <span class="blue">while</span>( i.MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; e = i.Current <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( e.Name.Contains( <span class="maroon">".rvt"</span> )
+&nbsp; &nbsp; &nbsp; &amp;&amp; e.Category != <span class="blue">null</span>
+&nbsp; &nbsp; &nbsp; &amp;&amp; e.Category.Id.Value.Equals( (<span class="blue">int</span>) bic ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Unfortunately, since we cannot obtain the document category for the RVT link element, it is not possible to hide this category via the View.SetVisibility method like we do for the DWG link element.
+Also, unlike the DWG link elements, all the RVT ones return the same category OST_RvtLinks, so we cannot control the visibility for them individually using this method, even if we were able to obtain the appropriate document category.</p>
+
+<p>I hope these various hints are of some use and will be interested in hearing whether they help resolve your issue, Rod.</p>

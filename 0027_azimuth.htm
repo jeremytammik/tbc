@@ -1,0 +1,145 @@
+<style type="text/css">
+.blue { color: blue; }
+.green { color: green; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+</style>
+
+<h3>Azimuth</h3>
+
+<p>Several developers have asked how to determine the
+
+<a href="http://en.wikipedia.org/wiki/Azimuth">
+azimuth</a>
+
+of an element, i.e. the angle between the element and true north.
+This calculation is obviously strongly affected by the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2010/01/project-location.html">
+project location</a>.
+
+
+<p>Determining the angle of an element is pretty simple.
+All Revit elements have a Location property.
+For some, the location is a point, while others can be line or curve based, in which case their location is an instance of the LocationCurve class.
+One of the properties of the LocationCurve is Curve, which returns the actual geometry curve, which may be one of the derived classes Arc, Line, Ellipse or NurbSpline.
+In addition to providing access to the underlying geometry curve, the location curve class also provides methods to move and rotate the element whose location it defines, and to determine or modify the order of the neighbouring elements joining to the end of the element's location curve.</p>
+
+<p>In order to determine the angle of an element, you can convert the two endpoints of its location curve to a vector and then measure the angle of that vector relative to some other vector, for instance the X axis or the north direction.</p>
+
+<p>Revit stores true north in the ProjectPosition object stored in the ProjectLocation, accessible through the ProjectLocations property on the document object. You can query the ProjectPosition.Angle property, which returns the angle difference between the project north and true north measured in radians. It can have a value from -&pi; to +&pi;.</p>
+
+To determine the element azimuth, you can determine the element angle and the angle between project north and true north, and then simply add the two.</p>
+
+<p>Some notes on the Revit geometry angle methods:
+The Angle() method of the XYZ class treats its XYZ instances as vectors, not points.
+This is what the Revit API help has to say about this:</p>
+
+<blockquote>
+<p>The XYZ.Angle() method returns the angle between this vector and the specified vector.
+<br/>Return Value: The real number between 0 and &pi; equal to the angle between the two vectors.
+<br/>Remarks: The angle between the two vectors is measured in the plane spanned by them.</p>
+</blockquote>
+
+<p>If you are interested in angles around the full circle, i.e. in the interval [0, 2&pi;], you should use AngleTo() instead of Angle(), which returns a value in the interval [0, &pi;].</p>
+
+<p>Here is a code example measuring various kinds of element angles and printing the project north deviation:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">CmdAzimuth</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="teal">Element</span> SelectSingleElement( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = doc.Selection;
+&nbsp; &nbsp; <span class="teal">Element</span> e = <span class="blue">null</span>;
+&nbsp; &nbsp; sel.Elements.Clear();
+&nbsp; &nbsp; sel.StatusbarTip = <span class="maroon">"Please select a line"</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( sel.PickOne() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSetIterator</span> elemSetItr
+&nbsp; &nbsp; &nbsp; &nbsp; = sel.Elements.ForwardIterator();
+&nbsp; &nbsp; &nbsp; elemSetItr.MoveNext();
+&nbsp; &nbsp; &nbsp; e = elemSetItr.Current <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> e;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="teal">String</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp; &nbsp; <span class="teal">Element</span> e = SelectSingleElement( doc );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">"No element selected"</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">LocationCurve</span> curve
+&nbsp; &nbsp; &nbsp; = e.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == curve )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">"No curve available"</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p = curve.Curve.get_EndPoint( 0 );
+&nbsp; &nbsp; <span class="teal">XYZ</span> q = curve.Curve.get_EndPoint( 1 );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( <span class="maroon">"Start point "</span>
+&nbsp; &nbsp; &nbsp; + <span class="teal">Util</span>.PointString( p ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( <span class="maroon">"End point "</span>
+&nbsp; &nbsp; &nbsp; + <span class="teal">Util</span>.PointString( q ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">double</span> a = p.Angle( q );
+&nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine(
+&nbsp; &nbsp; &nbsp; <span class="maroon">"Angle between start and end points = "</span>
+&nbsp; &nbsp; &nbsp; + <span class="teal">Util</span>.AngleString( a ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> v = q - p;
+&nbsp; &nbsp; a = <span class="teal">XYZ</span>.BasisX.Angle( v );
+&nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine(
+&nbsp; &nbsp; &nbsp; <span class="maroon">"Angle between points measured from X axis = "</span>
+&nbsp; &nbsp; &nbsp; + <span class="teal">Util</span>.AngleString( a ) );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">XYZ</span> z = <span class="teal">XYZ</span>.BasisZ;
+&nbsp; &nbsp; a = <span class="teal">XYZ</span>.BasisX.AngleAround( v, z );
+&nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine(
+&nbsp; &nbsp; &nbsp; <span class="maroon">"Angle around measured from X axis = "</span>
+&nbsp; &nbsp; &nbsp; + <span class="teal">Util</span>.AngleString( a ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ProjectLocation</span> location
+&nbsp; &nbsp; &nbsp; <span class="blue">in</span> doc.ProjectLocations )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">ProjectPosition</span> projectPosition
+&nbsp; &nbsp; &nbsp; &nbsp; = location.get_ProjectPosition( <span class="teal">XYZ</span>.Zero );
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> pna = projectPosition.Angle;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"Angle between project north and true north "</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="teal">Util</span>.AngleString( pna ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<p>Running this command in a project and selecting a model line with an angle of 35 degrees to the X axis generates the following result in the Visual Studio debug output window:</p>
+
+<pre>
+Start point (-43.84,31.27,0)
+End point (-28.79,41.81,0)
+Angle between start and end points = 19.95 degrees
+Angle between points measured from X axis = 35 degrees
+Angle around measured from X axis = 35 degrees
+Angle between project north and true north 0 degrees
+</pre>
+
+<p>You might also have a look at the Revit SDK SharedCoordinateSystem sample to see another example of using the ProjectPosition object.</p>
+
+<p>I am adding the complete Visual Studio solution <a href="http://thebuildingcoder.typepad.com/blog/files/bc1007.zip">here</a>. This version 1.0.0.7 includes all commands discussed so far: CmdListWalls, CmdRelationshipInverter, CmdWallDimensions, CmdFilterPerformance, CmdGetMaterials and the new CmdAzimuth.</p>

@@ -1,0 +1,164 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Slab Boundary</h3>
+
+<p>Developers have frequently asked how to determine the boundary polygons of a horizontal slab, e.g. the loops formed by the bottom edges of all the vertical or 'side' faces in this floor:</p>
+
+<img src="img/slab_boundary_4.png" alt="Floor Slab with Holes"/>
+
+<p>In this case, there is one outer and three inner loops, one of which is circular.</p>
+
+<p>There are several different possible approaches to obtain this information, and you will need to decide which is simplest or most effective or optimally suited to provide the data you require in each individual case. Here is a suggestion for a very straightforward algorithm: determine the slab solid, iterate over its faces, ignore all non-horizontal faces, and determine which of the horizontal ones has the lowest Z coordinate. Query the lowest face for its edge loops, and collect all its vertices into a structure for handling the polygon data.</p>
+
+<p>I have implemented an external command CmdSlabBoundary realising this algorithm. For the polygon data, I use a list of lists of points. Each list of points represents one closed polygonal loop. This means that non-linear polygon edges will have to be approximated by straight segments. If you need to handle other curve types such as circular arcs or ellipses exactly, you would have to enhance this definition.
+It currently only handles planar faces on horizontal slabs. It uses the Edge Tesselate method, which returns a polyline approximation to the edge, to extract the points to be added to the boundary polygon.</p>
+
+<p>Here is the code for the mainline of the command. It implements some useful code to determine which floor elements to process. It first checks whether anything at all has been selected. If so, it extracts the floor elements from the selection and returns with an error message if none are found. If nothing has been preselected by the user before starting the command, it selects all floor elements from the model, and again returns with an error message if none are found. Then, for each floor, the geometry is extracted and the solid is passed into the GetBoundary() method for analysis:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt; floors = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt;();
+&nbsp; <span class="teal">Selection</span> sel = doc.Selection;
+&nbsp; <span class="blue">if</span>( 0 &lt; sel.Elements.Size )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">RvtElement</span> e <span class="blue">in</span> sel.Elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">Floor</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; floors.Add( e );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == floors.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">"Please select some floor elements."</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; doc.get_Elements( <span class="blue">typeof</span>( <span class="teal">Floor</span> ), floors );
+&nbsp; &nbsp; <span class="blue">if</span>( 0 == floors.Count )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = <span class="maroon">"No floor elements found."</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;&gt; polygons = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;&gt;();
+&nbsp; <span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Floor</span> floor <span class="blue">in</span> floors )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">GeoElement</span> geo = floor.get_Geometry( opt );
+&nbsp; &nbsp; <span class="teal">GeometryObjectArray</span> objects = geo.Objects;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> objects )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( solid != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; GetBoundary( polygons, solid );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">int</span> n = polygons.Count;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">"{0} boundary loop{1} found."</span>,
+&nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ) ) );
+&nbsp;
+&nbsp; <span class="teal">Creator</span> creator = <span class="blue">new</span> <span class="teal">Creator</span>( app );
+&nbsp; creator.DrawPolygons( polygons );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+}
+</pre>
+
+<p>Here is the implementation of GetBoundary(); I added a constant value to offset the boundary polygons downward a bit, away from the slab edge, so that they are more clearly visible:</p>
+
+<pre class="code">
+<span class="blue">const</span> <span class="blue">double</span> _offset = 0.1;
+&nbsp;
+<span class="blue">bool</span> GetBoundary(
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;&gt; polygons,
+&nbsp; <span class="teal">Solid</span> solid )
+{
+&nbsp; <span class="teal">PlanarFace</span> lowest = <span class="blue">null</span>;
+&nbsp; <span class="teal">FaceArray</span> faces = solid.Faces;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> faces )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">PlanarFace</span> pf = f <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != pf &amp;&amp; IsHorizontal( pf ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ( <span class="blue">null</span> == lowest )
+&nbsp; &nbsp; &nbsp; &nbsp; || ( pf.Origin.Z &lt; lowest.Origin.Z ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; lowest = pf;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != lowest )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> p, q = <span class="teal">XYZ</span>.Zero;
+&nbsp; &nbsp; <span class="blue">bool</span> first;
+&nbsp; &nbsp; <span class="blue">int</span> i, n;
+&nbsp; &nbsp; <span class="teal">EdgeArrayArray</span> loops = lowest.EdgeLoops;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">EdgeArray</span> loop <span class="blue">in</span> loops )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; vertices = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;();
+&nbsp; &nbsp; &nbsp; first = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> e <span class="blue">in</span> loop )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZArray</span> points = e.Tessellate();
+&nbsp; &nbsp; &nbsp; &nbsp; p = points.get_Item( 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !first )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( p.AlmostEqual( q ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"expected subsequent start point"</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">" to equal previous end point"</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; n = points.Size;
+&nbsp; &nbsp; &nbsp; &nbsp; q = points.get_Item( n - 1 );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( i = 0; i &lt; n - 1; ++i )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> v = points.get_Item( i );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; v.Z -= _offset;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; vertices.Add( v );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; q.Z -= _offset;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( q.AlmostEqual( vertices[0] ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"expected last end point to equal"</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">" first start point"</span> );
+&nbsp; &nbsp; &nbsp; polygons.Add( vertices );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="blue">null</span> != lowest;
+}
+</pre>
+
+<p>Here is the result displaying the model lines added after processing, with all lines offset downwards from the slab edge by 0.1 feet, and one of the edges approximating the bottom of the circular opening highlighted:</p>
+
+<img src="img/slab_boundary_5.png" alt="Slab polygonal boundary loops"/>
+
+<p>Finally, here are the model lines isolated to distinguish them better from the slab:</p>
+
+<img src="img/slab_boundary_6.png" alt="Boundary loops isolated"/>
+
+<p>I hope this provides a good geometrical analysis example and a starting point for further exploration. Obviously, I am interested in any improvements you may have or bugs that you find.</p>
+
+<p>I am adding a new version 1.0.0.9 of the complete Visual Studio solution
+<a href="http://thebuildingcoder.typepad.com/blog/files/bc1009.zip">here</a>,
+including the new CmdSlabBoundary class as well as all other commands discussed so far.</p>

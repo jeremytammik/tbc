@@ -1,0 +1,157 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Editing a Floor Profile</h3>
+
+<p>A question that recently came up was how to edit an existing floor profile. This also leads to the question of whether one can access the existing sketch lines through the API and modify them.</p>
+
+<p>In the user interface, one can enter the Floor Edit mode and modify the sketch lines of a floor. In the API, this is not possible. However, it is possible to simply recreate the floor with a new curve array.</p>
+
+<p>The next question that pops up is how to determine the sketch lines of the existing floor, as a starting point for recreating a new floor with a slightly modified set of sketch lines.</p>
+
+<p>To recreate a floor from the existing one, one can determine the topmost horizontal face of the floor solid, using an algorithm very similar to the one we looked at for determining the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/slab-boundary.html">
+slab boundary</a>.
+
+We can extract the top face edges, create line elements from them to assemble the floor profile, and generate the new floor from that. In case the existing floor has holes in it, the face will have several loops. The largest loop is the outer perimeter. In my tests so far, this was also the first loop in the EdgeArrayArray, but that may not always be true.</p>
+
+<p>Here is a helper method to extract the topmost face from the solid:</p>
+
+<pre class="code">
+<span class="teal">PlanarFace</span> GetTopFace( <span class="teal">Solid</span> solid )
+{
+&nbsp; <span class="teal">PlanarFace</span> topFace = <span class="blue">null</span>;
+&nbsp; <span class="teal">FaceArray</span> faces = solid.Faces;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> faces )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">PlanarFace</span> pf = f <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != pf
+&nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">Util</span>.IsHorizontal( pf ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( (<span class="blue">null</span> == topFace)
+&nbsp; &nbsp; &nbsp; &nbsp; || (topFace.Origin.Z &lt; pf.Origin.Z) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; topFace = pf;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> topFace;
+}
+</pre>
+
+<p>Here is the code for the rest of the command:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt; floors = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt;();
+&nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.GetSelectedElementsOrAll(
+&nbsp; &nbsp; floors, doc, <span class="blue">typeof</span>( <span class="teal">Floor</span> ) ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = doc.Selection;
+&nbsp; &nbsp; message = ( 0 &lt; sel.Elements.Size )
+&nbsp; &nbsp; &nbsp; ? <span class="maroon">"Please select some floor elements."</span>
+&nbsp; &nbsp; &nbsp; : <span class="maroon">"No floor elements found."</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+&nbsp; }
+
+&nbsp; <span class="blue">int</span> nNullFaces = 0;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Face</span>&gt; topFaces = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Face</span>&gt;();
+&nbsp; <span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Floor</span> floor <span class="blue">in</span> floors )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">GeoElement</span> geo = floor.get_Geometry( opt );
+&nbsp; &nbsp; <span class="teal">GeometryObjectArray</span> objects = geo.Objects;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> objects )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( solid != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PlanarFace</span> f = GetTopFace( solid );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == f )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( floor )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">" has no top face."</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++nNullFaces;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; topFaces.Add( f );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Application</span> creApp = app.Create;
+&nbsp; Autodesk.Revit.Creation.<span class="teal">Document</span> creDoc = doc.Create;
+&nbsp;
+&nbsp; <span class="blue">int</span> i = 0;
+&nbsp; <span class="blue">int</span> n = topFaces.Count - nNullFaces;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">"{0} top face{1} found."</span>,
+&nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ) ) );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> topFaces )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != f )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">CurveArray</span> profile = <span class="blue">new</span> <span class="teal">CurveArray</span>();
+&nbsp; &nbsp; &nbsp; <span class="teal">EdgeArrayArray</span> eaa = f.EdgeLoops;
+
+&nbsp; &nbsp; &nbsp; <span class="teal">EdgeArray</span> ea = eaa.get_Item( 0 );
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> e <span class="blue">in</span> ea )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZArray</span> pts = e.Tessellate();
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> m = pts.Size;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> p = pts.get_Item( 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> q = pts.get_Item( m - 1 );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Line</span> line = creApp.NewLineBound( p, q );
+&nbsp; &nbsp; &nbsp; &nbsp; profile.Append( line );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="teal">Floor</span> floor = floors[i++] <span class="blue">as</span> <span class="teal">Floor</span>;
+&nbsp; &nbsp; &nbsp; floor = creDoc.NewFloor( profile, floor.FloorType, floor.Level, <span class="blue">true</span> );
+&nbsp; &nbsp; &nbsp; doc.Move( floor, <span class="blue">new</span> <span class="teal">XYZ</span>( 5, 5, 0 ) );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+}
+</pre>
+
+<p>The first section retrieves selected floors from the current selection set, or all floors from the database, if nothing has been preselected.
+Then the top face of each selected floor is determined by retrieving each floor's solid and calling GetTopFace on it.
+Even if no top face was found, we still store the null result, so that the list of floors and faces match up.
+Finally we go through the array of top faces and create new floors from them.
+Before creating the new floor, we would obviously apply whatever modifications are required to the new floor profile.
+In this case, we have no modifications to apply, so the new floor will be identical to the existing one.
+To differentiate it, we move it away from the original location, five feet up and to the right.
+In case the original floor had some non-linear edges, these will be replaced by straight ones.
+All holes will also be lost.
+From the EdgeArrayArray instance returned by the face EdgeLoops property, we only make use of the first element, which seems to be the outer perimeter, i.e. boundary.
+Holes seem to be listed later in this array.
+If this assumption is not true, we would have to iterate over the array and analyse each loop to find the maximum size, which would ensure that is the outer boundary and not an inner hole loop.
+</p>
+
+<p>Here is a sample floor element before running the command:</p>
+
+<img src="img/floor_original.png" alt="Floor original"/>
+
+<p>Here is the original floor and the newly created copy offset from it and lacking holes after running the command:</p>
+
+<img src="img/floor_duplicated.png" alt="Floor duplicated"/>
+
+<p>I am adding a new version 1.0.0.11 of the complete Visual Studio solution
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/bc10011.zip">here</a>,
+
+including the new CmdEditFloor and all other commands discussed so far.</p>

@@ -1,0 +1,66 @@
+<h3>Geometry Library</h3>
+
+<p>In a comment on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/what-next.html">What Next</a>,
+
+<a href="http://roddotnet.blogspot.com">Rod Howarth</a> 
+
+suggested looking a bit at functionality that involves using geometry, 
+location points and other modelling based stuff. 
+I think this is a brilliant idea; it fits in well 
+with the introductory material that we have discussed so far,
+and constitutes a logical and interesting next step in exploring the Revit API.
+Before diving into any own example code dealing with geometry, 
+let us look a bit first at the Revit geometry library itself,
+and then the samples already at our disposal, provided in the SDK.
+I will also be covering this material in my session 
+
+<a href="http://au.autodesk.com/sessions/?speaker=Jeremy+Tammik&year=2008">
+DE205-3 Enhancing Your Revit Add-In</a>
+
+on Wednesday December 3. 2008 at 
+
+<a href="http://au.autodesk.com">Autodesk University</a>
+
+from 10:15 - 11:45 am.
+</p>
+
+<p>The Geometry library in Revit API includes a set of classes representing commonly used geometry, such as points, lines, curves, and surfaces. It also includes classes representing solids, whose boundary information can be queried, such as edges and faces. It includes point, vector, and matrix calculations, special functions to find intersection of two geometric objects, and much more.</p>
+
+<p>The Revit API includes a Geometry namespace encapsulating a geometry library providing geometrical calculation functionality. It is similar to ObjectARX AcGe library. The library works with temporary objects in memory, i.e. non database resident objects. Some of the objects can be created through the API using methods on the Application class in the Autodesk.Revit.Creation namespace. Others cannot yet be created through the API and are only provided when existing database elements are queried for their geometry generated internally by the Revit kernel.</p>
+
+<p>All geometrical classes are now reference types derived from APIObject, object, or enumeration interfaces. The XYZ, UV, and BoundingBoxUV classes were value types in 2008 and earlier versions, but are so no longer.</p>
+
+<p>The figure provided in "Revit API Diagram.dwf" in the Revit SDK illustrates the classes defined in the Revit API Geometry namespace. The geometry library provides both simple and complex geometry classes. UV and XYZ represent a point and a vector in 2D and 3D, respectively. Transform offers basic matrix operations, such as translation, rotation and scaling. The Curve class provides a base class and common functionality for Line, Arc, Ellipse and the more complex subclass NurbSpline. The Revit API Geometry namespace also includes solid representations including Solid, Face, and Edge. These are used to retrieve geometry information for architectural elements in Revit.</p>
+
+<p><strong>Non APIObject classes:</strong> In Revit, UV and XYZ are used to represent points and vectors, 2D and 3D respectively. Unlike the more complex geometry classes, they are not derived from APIObject. Unlike ObjectARX's AcGe library, there is no strict distinction between point and vector. You can use them interchangeably depending on the context of the actual usage. UV could be a parameter on a surface. You will find many usages of these classes in the Revit SDK samples. Some classes provide static properties that define convenient predefined data. XYZ, for example, defines XYZ.BasisX as a typical vector representing the X axis, i.e., (1,0,0). Similarly, BasisY and BasisZ define the Y and Z axes, and XYZ.Zero defines the origin (0,0,0). You can find the corresponding 2D properties on UV as well.</p>
+
+<p><strong>APIObject classes:</strong> Some of the classes derived from APIObject are BoundingBoxXYZ, IntersectionResult, MeshTriangle, Options, Plane, Reference and Transform. Transformations are represented by the Transform class, which can be compared to a transformation matrix. You can set up a transformation for translation, rotation, and reflection, and perform such operations on points and vectors. Transform defines an Identity property.
+
+<p><strong>GeometryObject classes:</strong> Some of the classes derived from GeometryObject are Element, which is a sort of geometry container class, Instance, which represents repeatable instances of symbol geometry, and the "real" geometry classes Curve, Edge, Face, Mesh, Profile, and Solid. The Autodesk.Revit.Geometry.Element class is not to be confused with the Autodesk.Revit.Element one. The latter represents a Revit database element, the former a geometrical one, and they are completely different.</p>
+
+<p>So, the geometry Element class is a container for geometric primitives. It is generated from a database element when its geometry is queried. The database element uses a parametric description to define its geometry. The main property of the Element class is Objects, which provides access to the geometric primitives contained in the element. In other words, the geometry element is a container for the database element geometry, and provides the interface and temporary repository to query a building element for its geometry.</p>
+
+<p>The Instance class represents an instance of symbol geometry, which is positioned by this database element. Some of its important properties and methods are:</p>
+
+<ul>
+<li>Symbol, returning the symbol element that this object is referring to</li>
+<li>SymbolGeometry, the geometric representation of the symbol</li>
+<li>Transform, an affine transformation from the local coordinate space</li>
+<li>Transformed, which transforms this instance and returns the result</li>
+</ul>
+
+<p>The Curve class represents a parametric curve and is the base class for arc, ellipse, line, and nurb spline. It has the typical properties and methods of a geometric curve class such as ApproximateLength, Length, ComputeDerivatives, Distance, Evaluate, Intersect, IsInside, etc. One commonly used method is Tessellate, which returns a set of line segments approximating the curve. This is used by the simple geometry viewers included in the Revit SDK, which reduce all geometry to line segments and display the result in a .NET form.</p>
+
+<p>Similarly, the Face class represents a parametric face. It is a base class for more specialised derived classes such as ConicalFace, CylindricalFace, HermiteFace, PlanarFace, RevolvedFace and RuledFace. It provides a Triangulate method to simplify complex curved geometry into a collection of simple planar triangles approximating it.</p>
+
+<p>The Solid is a top level representation of a database element solid geometry. From the solid, we can traverse the solid's boundary representation by querying it for its faces and edges. We can also simplify the solid by calling the Tesselate method to obtain simple triangles approximating the geometry, which may initially include much more complex non-planar surfaces.</p>
+
+<p>The Revit API does not provide full coverage of geometry creation. For instance, there is currently no way to create face from scratch in the Revit API. Generally, making a face is a lengthy process: you need to define the surface and all the edges and how it relates to all the other faces in the solid and the model at large. In fact, inside Revit, faces are very rarely created by hand, instead internal geometry kernel routines are used. At the moment, there is no external API to these routines, and designing one is hard too. So, for now you can only obtain a face from an existing model element. For instance, this satisfies the need for calculating the closest point to an existing object. The Revit geometry API is not suited for generic geometry calculations with no relation to the building model. One would expect that developers requiring this kind of computation have their own in-house math library anyway.</p>
+
+<p>To retrieve Revit element geometry, you use the Element.Geometry property, which is accessed through the get_Geometry() method in C#. The various viewers such as the VB ElementViewer and C# ObjectViewer in the Revit SDK samples demonstrate this. They traverse all the geometry and simplify it down to simple line segments, which are then displayed in a graphics window in a .NET form. The geometry traversal may become recursive, because some geometrical elements represent instances of other geometry, with a transformation applied to it.</p>
+
+<p>Generally, the geometry traversal will start at the top level solid and then iterate down through its faces and edges. The best way to understand this properly is to run the ElementViewer or ObjectViewer in the debugger and track the traversal through the geometry of some simple element.</p>
+
+<p>In the next post, I plan to briefly describe the different geometry viewers included in the Revit SDK samples, and then move on to some own example code dealing with geometry.</p>

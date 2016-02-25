@@ -1,0 +1,197 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Wall Elevation Profile</h3>
+
+<p>In this post, we explore how to determine the wall elevation boundary polygons, similarly to the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/slab-boundary.html">
+floor boundary polygon</a> 
+
+algorithm.
+
+This functionality is frequently requested, last but not least in a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/slab-boundary.html#comments">
+comment by Art</a>.
+
+<p>The approach is similar to the one for the floor boundary polygons, with some small additional twists.
+To determine the floor boundary, we simply searched for one of its two horizontal faces and queried it for its edge loops.
+For a wall, it is slightly more complicated to decide which face we want to query, since we cannot expect it to be aligned with any of the cardinal coordinate axes.
+What we can expect, however, for simple walls, is that the normal vector of the face we are interested in is perpendicular to both the wall location line and the Z axis.
+Then, we just have to decide whether we are interested in the face on the interior or exterior wall side.
+The preceding post on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/wall-compound-layers.html">
+wall layers</a>
+
+discussed some analysis concerning the wall location line and its Flipped property to help determine which face is interior and exterior.</p>
+
+<p>The implementation is similar to the floor boundary one and has the following main steps:</p>
+
+<ul>
+<li>Select wall elements to process.</li>
+<li>Query each wall for its location curve and solid.</li>
+<li>From these, determine its exterior face.</li>
+<li>Query the face for its edge loops and collect the polygon data from them.</li>
+<li>Draw model lines representing the boundary loops, offset from the wall by one foot.</li>
+</ul>
+
+<p>Here is an example of running this algorithm on a couple of walls, showing the original walls and the resulting model lines representing the boundary loops, offset by one foot outwards from their exterior faces, and including the interior hole loops:</p>
+
+<img src="img/wall_profiles.png" alt="Wall elevation profile boundary loops"/>
+
+<p>Determining the exterior face from the solid and assembling the polygon data from its edge loops is performed by the GetProfile helper method. It also includes some debugging sanity checks to ensure that the loops obtained are in fact closed loops, i.e. that subsequent edges join and the last vertex equals the first:</p>
+
+<pre class="code">
+<span class="blue">const</span> <span class="blue">double</span> _offset = 1.0;
+
+<span class="blue">bool</span> GetProfile(
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;&gt; polygons,
+&nbsp; <span class="teal">Solid</span> solid,
+&nbsp; <span class="teal">XYZ</span> v,
+&nbsp; <span class="teal">XYZ</span> w )
+{
+&nbsp; <span class="blue">double</span> d, dmax = 0;
+&nbsp; <span class="teal">PlanarFace</span> outermost = <span class="blue">null</span>;
+&nbsp; <span class="teal">FaceArray</span> faces = solid.Faces;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> f <span class="blue">in</span> faces )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">PlanarFace</span> pf = f <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != pf
+&nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">Util</span>.IsVertical( pf )
+&nbsp; &nbsp; &nbsp; &amp;&amp; <span class="teal">Util</span>.IsZero( v.Dot( pf.Normal ) ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; d = pf.Origin.Dot( w );
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( ( <span class="blue">null</span> == outermost )
+&nbsp; &nbsp; &nbsp; &nbsp; || ( dmax &lt; d ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; outermost = pf;
+&nbsp; &nbsp; &nbsp; &nbsp; dmax = d;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != outermost )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> voffset = _offset * w;
+&nbsp; &nbsp; <span class="teal">XYZ</span> p, q = <span class="teal">XYZ</span>.Zero;
+&nbsp; &nbsp; <span class="blue">bool</span> first;
+&nbsp; &nbsp; <span class="blue">int</span> i, n;
+&nbsp; &nbsp; <span class="teal">EdgeArrayArray</span> loops = outermost.EdgeLoops;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">EdgeArray</span> loop <span class="blue">in</span> loops )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; vertices = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;();
+&nbsp; &nbsp; &nbsp; first = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Edge</span> e <span class="blue">in</span> loop )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZArray</span> points = e.Tessellate();
+&nbsp; &nbsp; &nbsp; &nbsp; p = points.get_Item( 0 );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !first )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( p.AlmostEqual( q ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"expected subsequent start point"</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">" to equal previous end point"</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; n = points.Size;
+&nbsp; &nbsp; &nbsp; &nbsp; q = points.get_Item( n - 1 );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( i = 0; i &lt; n - 1; ++i )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> a = points.get_Item( i );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; a += voffset;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; vertices.Add( a );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; q += voffset;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( q.AlmostEqual( vertices[0] ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"expected last end point to equal"</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">" first start point"</span> );
+&nbsp; &nbsp; &nbsp; polygons.Add( vertices );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="blue">null</span> != outermost;
+}
+</pre>
+
+<p>Here is the CmdWallProfile mainline source code, making the call to GetProfile:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt; walls = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt;();
+&nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.GetSelectedElementsOrAll(
+&nbsp; &nbsp; walls, doc, <span class="blue">typeof</span>( <span class="teal">Wall</span> ) ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = doc.Selection;
+&nbsp; &nbsp; message = ( 0 &lt; sel.Elements.Size )
+&nbsp; &nbsp; &nbsp; ? <span class="maroon">"Please select some wall elements."</span>
+&nbsp; &nbsp; &nbsp; : <span class="maroon">"No wall elements found."</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">XYZ</span> p, q, v, w;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;&gt; polygons = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;&gt;();
+&nbsp; <span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Wall</span> wall <span class="blue">in</span> walls )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> desc = <span class="teal">Util</span>.ElementDescription( wall );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">LocationCurve</span> curve
+&nbsp; &nbsp; &nbsp; = wall.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == curve )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; message = desc + <span class="maroon">": No wall curve found."</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; p = curve.Curve.get_EndPoint( 0 );
+&nbsp; &nbsp; q = curve.Curve.get_EndPoint( 1 );
+&nbsp; &nbsp; v = q - p;
+&nbsp; &nbsp; v = v.Normalized;
+&nbsp; &nbsp; w = <span class="teal">XYZ</span>.BasisZ.Cross( v ).Normalized;
+&nbsp; &nbsp; <span class="blue">if</span>( wall.Flipped ) { w = -w; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">GeoElement</span> geo = wall.get_Geometry( opt );
+&nbsp; &nbsp; <span class="teal">GeometryObjectArray</span> objects = geo.Objects;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> objects )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( solid != <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; GetProfile( polygons, solid, v, w );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">int</span> n = polygons.Count;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">"{0} boundary loop{1} found."</span>,
+&nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ) ) );
+&nbsp;
+&nbsp; <span class="teal">Creator</span> creator = <span class="blue">new</span> <span class="teal">Creator</span>( app );
+&nbsp; creator.DrawPolygons( polygons );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+}
+</pre>
+
+<p>Here is an updated 
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/bc10013.zip">
+version 1.0.0.13</a>
+
+of the complete Visual Studio solution,
+
+including the new CmdWallProfile and all other commands discussed so far.</p>

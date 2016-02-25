@@ -1,0 +1,132 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Verona Revit API Training</h3>
+
+<p>Yesterday was the last day of the advanced Revit Structure API training at
+
+<a href="http://www.steel-graphics.com">
+Steel & Graphics srl</a>
+
+in Verona, Italy, with Gianni, Stefano, Michele, Paolo, and we started diving into deeper topics.</p>
+
+<img src="img/verona_2_380.jpg" alt="Gianni, Michele, Jeremy and Stefano"/>
+
+<p>But first, here are some of the initial things we discussed in the previous days:</p>
+
+<ul>
+<li>Making use of FamilyInstance.AddCoping to implement a Boolean operation between solids, for instance to cut a hole in a steel beam.</li>
+<li>Computing the volumes of all compound wall layers.</li>
+<li>Creating new column and beam types and inserting column and beam instances through the API.</li>
+<li>Improving the Revit SDK FrameBuilder sample to use language independent category comparison and make use of the Revit 2009 API filtering mechanism.</li>
+</ul>
+
+<p>I already posted a description of the changes made to FrameBuilder to make the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/category-comparison.html">
+category comparison</a>
+
+language independent.
+Notes on adding filtering may follow later.
+Here are some notes on the first of these issues:</p>
+
+<h4>AddCoping</h4>
+
+<p>Making use of AddCoping is pretty trivial.
+All we need to do is select two suitable beams, for instance a wide steel flange beam to cut a hole into, and a steel bar to define the hole, then feed these two instances into the AddCoping method.
+First of all, we implemented the following method to either extract a preselected element from the document selection set, or prompt the user to select a new one:</p>
+
+<pre class="code">
+<span class="teal">Element</span> GetSelectedElement(
+&nbsp; <span class="teal">Document</span> doc,
+&nbsp; <span class="blue">string</span> description )
+{
+&nbsp; <span class="teal">Selection</span> sel = doc.Selection;
+&nbsp; <span class="teal">Element</span> e = <span class="blue">null</span>;
+&nbsp; <span class="blue">while</span>( <span class="blue">null</span> == e )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">ElementSetIterator</span> i
+&nbsp; &nbsp; &nbsp; = sel.Elements.ForwardIterator();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( i.MoveNext() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; e = i.Current <span class="blue">as</span> <span class="teal">Element</span>;
+&nbsp; &nbsp; &nbsp; sel.Elements.Remove( e );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == e )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; sel.Elements.Clear();
+&nbsp;
+&nbsp; &nbsp; &nbsp; sel.StatusbarTip = <span class="maroon">"Please select "</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + description;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !sel.PickOne() )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> e;
+}
+</pre>
+
+<p>Then we can make use of that to select the two elements in the correct order and call the AddCoping method on the larger beam:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="blue">string</span> s
+&nbsp; &nbsp; = <span class="maroon">"Please select a family instance for the "</span>;
+&nbsp;
+&nbsp; <span class="teal">IExternalCommand</span>.<span class="teal">Result</span> rc
+&nbsp; &nbsp; = <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Failed;
+&nbsp;
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; <span class="teal">Element</span> e1 = GetSelectedElement( doc,
+&nbsp; &nbsp; <span class="maroon">"beam to cut"</span> );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> != e1 )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Element</span> e2 = GetSelectedElement( doc,
+&nbsp; &nbsp; &nbsp; <span class="maroon">"bar to drill hole"</span> );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != e2 )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> beam = e1 <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> bar = e2 <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == beam )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = s + <span class="maroon">"beam"</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( <span class="blue">null</span> == bar )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; message = s + <span class="maroon">"bar"</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; beam.AddCoping( bar );
+&nbsp; &nbsp; &nbsp; &nbsp; rc = <span class="teal">IExternalCommand</span>.<span class="teal">Result</span>.Succeeded;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> rc;
+}
+</pre>
+
+<p>The result of executing this is the flange beam with a nice little hole in it:</p>
+
+<img src="img/AddCoping.png" alt="Beam with a hole cut by AddCoping"/>
+
+<p>Unfortunately, this cannot be used as a generic Boolean operation, because if the bar is erased from the project, the hole immediately and automatically seals up again.</p>
+
+<p>I hope to be able to jot down some notes on the other topics listed above on the way back home.</p>

@@ -1,0 +1,151 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Walls and Doors on Two Levels</h3>
+
+<p>Here is a little note to answer a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/relationship-in.html#comments">
+question from Berria</a> on creating walls and doors on two separate levels.
+This is a slightly edited version of the original query:</p>
+
+<p><strong>Question:</strong>
+I need to create a house with two floors.
+I create a level and then a new wall and a door.
+It draws the two objects on different levels.
+When I built the first level, all is OK.
+An error occurs when I build the second, because the level to define the component position is always zero.</p>
+
+<p><strong>Answer:</strong>
+I cannot tell you off-hand what the problem is in your situation, but I can provide you with a code example that achieves your goal.
+Look at the external command Lab2_0_CreateLittleHouse in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/rac_labs_20081117.zip">
+Revit API introduction labs</a>.
+
+To demonstrate that the code can be easily adapted to work on several levels, here is a modified version which creates only the walls and doors, omitting the other elements, and repeats the process on two levels.
+In order to place the second door, I do indeed modify the Z coordinate of its insertion point by setting 'midpoint.Z = levelMiddle.Elevation'.
+Before running this command, ensure that you have three levels in your model, and that the brain-dead code snippet which extracts them into the three variables really gets them in the right order:</p>
+
+<pre class="code">
+<span class="teal">WaitCursor</span> waitCursor = <span class="blue">new</span> <span class="teal">WaitCursor</span>();
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+_createApp = app.Create;
+_createDoc = doc.Create;
+<span class="green">//</span>
+<span class="green">// determine the four corners of the rectangular house:</span>
+<span class="green">//</span>
+<span class="blue">double</span> width = 7 * <span class="teal">LabConstants</span>.MeterToFeet;
+<span class="blue">double</span> depth = 4 * <span class="teal">LabConstants</span>.MeterToFeet;
+<span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; corners = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;( 4 );
+corners.Add( <span class="blue">new</span> <span class="teal">XYZ</span>( 0, 0, 0 ) );
+corners.Add( <span class="blue">new</span> <span class="teal">XYZ</span>( width, 0, 0 ) );
+corners.Add( <span class="blue">new</span> <span class="teal">XYZ</span>( width, depth, 0 ) );
+corners.Add( <span class="blue">new</span> <span class="teal">XYZ</span>( 0, depth, 0 ) );
+&nbsp;
+<span class="teal">Level</span> levelBottom = <span class="blue">null</span>;
+<span class="teal">Level</span> levelMiddle = <span class="blue">null</span>;
+<span class="teal">Level</span> levelTop = <span class="blue">null</span>;
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; levels = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+<span class="teal">Filter</span> filterType
+&nbsp; = _createApp.Filter.NewTypeFilter(
+&nbsp; &nbsp; <span class="blue">typeof</span>( <span class="teal">Level</span> ) );
+&nbsp;
+doc.get_Elements( filterType, levels );
+<span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> levels )
+{
+&nbsp; <span class="blue">if</span>( <span class="blue">null</span> == levelBottom )
+&nbsp; {
+&nbsp; &nbsp; levelBottom = e <span class="blue">as</span> <span class="teal">Level</span>;
+&nbsp; }
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( <span class="blue">null</span> == levelMiddle )
+&nbsp; {
+&nbsp; &nbsp; levelMiddle = e <span class="blue">as</span> <span class="teal">Level</span>;
+&nbsp; }
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( <span class="blue">null</span> == levelTop )
+&nbsp; {
+&nbsp; &nbsp; levelTop = e <span class="blue">as</span> <span class="teal">Level</span>;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+}
+&nbsp;
+<span class="teal">BuiltInParameter</span> topLevelParam
+&nbsp; = <span class="teal">BuiltInParameter</span>.WALL_HEIGHT_TYPE;
+&nbsp;
+<span class="teal">Line</span> line;
+<span class="teal">Wall</span> wall;
+<span class="teal">Parameter</span> param;
+&nbsp;
+<span class="teal">ElementId</span> topId = levelMiddle.Id;
+<span class="teal">List</span>&lt;<span class="teal">Wall</span>&gt; walls = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Wall</span>&gt;( 8 );
+<span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; 4; ++i )
+{
+&nbsp; line = _createApp.NewLineBound(
+&nbsp; &nbsp; corners[i], corners[3 == i ? 0 : i + 1] );
+&nbsp;
+&nbsp; wall = _createDoc.NewWall(
+&nbsp; &nbsp; line, levelBottom, <span class="blue">false</span> );
+&nbsp;
+&nbsp; param = wall.get_Parameter( topLevelParam );
+&nbsp; param.Set( <span class="blue">ref</span> topId );
+&nbsp; walls.Add( wall );
+}
+&nbsp;
+topId = levelTop.Id;
+<span class="blue">for</span>( <span class="blue">int</span> i = 0; i &lt; 4; ++i )
+{
+&nbsp; line = _createApp.NewLineBound(
+&nbsp; &nbsp; corners[i], corners[3 == i ? 0 : i + 1] );
+&nbsp;
+&nbsp; wall = _createDoc.NewWall(
+&nbsp; &nbsp; line, levelMiddle, <span class="blue">false</span> );
+&nbsp;
+&nbsp; param = wall.get_Parameter( topLevelParam );
+&nbsp; param.Set( <span class="blue">ref</span> topId );
+&nbsp; walls.Add( wall );
+}
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; doorSymbols
+&nbsp; = <span class="teal">LabUtils</span>.GetAllFamilySymbols(
+&nbsp; &nbsp; app, <span class="teal">BuiltInCategory</span>.OST_Doors );
+&nbsp;
+<span class="teal">Debug</span>.Assert(
+&nbsp; 0 &lt; doorSymbols.Count,
+&nbsp; <span class="maroon">"expected at least one door symbol"</span>
+&nbsp; + <span class="maroon">" to be loaded into project"</span> );
+&nbsp;
+<span class="teal">FamilySymbol</span> door
+&nbsp; = doorSymbols[0] <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+<span class="teal">XYZ</span> midpoint = <span class="teal">LabUtils</span>.Midpoint(
+&nbsp; corners[0], corners[1] );
+&nbsp;
+<span class="teal">FamilyInstance</span> inst0
+&nbsp; = _createDoc.NewFamilyInstance(
+&nbsp; &nbsp; midpoint, door, walls[0], levelBottom,
+&nbsp; &nbsp; <span class="teal">StructuralType</span>.NonStructural );
+&nbsp;
+midpoint.Z = levelMiddle.Elevation;
+&nbsp;
+<span class="teal">FamilyInstance</span> inst1
+&nbsp; = _createDoc.NewFamilyInstance(
+&nbsp; &nbsp; midpoint, door, walls[4], levelMiddle,
+&nbsp; &nbsp; <span class="teal">StructuralType</span>.NonStructural );
+
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+</pre>
+
+<p>Here is the result of running the command:</p>
+
+<img src="img/two_level_house.png" alt="Two level house"/>
+
+<p>I hope this helps resolve your problem.</p>

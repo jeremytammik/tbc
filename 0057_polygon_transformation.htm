@@ -1,0 +1,135 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Polygon Transformation</h3>
+
+<p>As promised in the discussion on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/3d-polygon-areas.html">
+three-dimensional polygon area calculation</a>,
+
+I have now implemented some test code to transform the 3D polygon into a horizontal position.
+I can then ignore its Z coordinate and apply the 2D polygon area calculation algorithm to it as well and then compare the results.
+To my surprise, the results of the 2D and 3D algorithms do indeed exactly match.
+
+This is a continuation of the analysis for determining the profile boundary loop polygons for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/slab-boundary.html">
+floor slabs</a>
+
+and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/wall-elevation-profile.html">
+walls</a>,
+
+and on the calculation of areas for
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html">
+2D</a>
+
+and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/3d-polygon-areas.html">
+3D</a>
+
+polygons.</p>
+
+<p>First let us discuss the top level code for transforming the polygon, so that we can understand and discuss the required lower level functions afterwards.
+Since this is only for testing purposes, I have enclosed it in a debug pragma.
+We start out with the 3D planar polygon obtained from a wall face and located somewhere arbitrarily in space.
+We have also determined the normal vector of the plane it is lying in.
+The goal is to transform it into the XY plane so we can apply the 2D polygon area calculation algorithm to it.
+This can be achieved through the following steps:</p>
+
+<ul>
+<li>Determine the transform to rotate the polygon so it is parallel to the XY plane.</li>
+<li>Apply this transform to the polygon.</li>
+<li>Flatten the polygon by dropping the Z coordinate.</li>
+<li>Calculate the 2D polygon area.</li>
+</ul>
+
+<p>Here is the code implementing these steps:</p>
+
+<pre class="code">
+<span class="blue">#if</span> DEBUG
+&nbsp; <span class="teal">Transform</span> t = GetTransformToZ( normal );
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; polygonHorizontal
+&nbsp; &nbsp; = ApplyTransform( polygon, t );
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">UV</span>&gt; polygon2d
+&nbsp; &nbsp; = <span class="teal">CmdSlabBoundaryArea</span>.Flatten(
+&nbsp; &nbsp; &nbsp; polygonHorizontal );
+&nbsp;
+&nbsp; <span class="blue">double</span> a2
+&nbsp; &nbsp; = <span class="teal">CmdSlabBoundaryArea</span>.GetSignedPolygonArea(
+&nbsp; &nbsp; &nbsp; polygon2d );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert( <span class="teal">Util</span>.IsEqual( a, a2 ),
+&nbsp; &nbsp; <span class="maroon">"expected same area from 2D and 3D calculations"</span> );
+<span class="blue">#endif</span>
+</pre>
+
+<p>This code transforms the 3D polygon into a horizontal plane so we can use the 2D GetSignedPolygonArea() and compare its results with the 3D calculation.
+Next, let us look at the detailed implementation of the required low level functions.</p>
+
+<p>To determine the transform for rotating the polygon parallel to the XY plane, we first calculate the angle &alpha; between the normal vector and the Z axis.
+We have the following cases to consider:</p>
+
+<ul>
+<li>&alpha; is zero, so the normal vector is identical to the Z axis; in this case, the required transform is the identity.</li>
+<li>&alpha; equals &pi;, so the normal vector is equal to the negative Z axis; in this case, we have to rotate the polygon by 180 degrees around an arbitrary axis perpendicular to the Z axis, for instance the X axis.</li>
+<li>In all other cases, we can determine a rotation axis that is perpendicular to both the normal vector and the Z axis, and rotate around that by the angle &alpha;.</li>
+</ul>
+
+<p>Here is the code returning such a transformation:</p>
+
+<pre class="code">
+<span class="teal">Transform</span> GetTransformToZ( <span class="teal">XYZ</span> v )
+{
+&nbsp; <span class="teal">Transform</span> t;
+&nbsp;
+&nbsp; <span class="blue">double</span> a = <span class="teal">XYZ</span>.BasisZ.Angle( v );
+&nbsp;
+&nbsp; <span class="blue">if</span>( <span class="teal">Util</span>.IsZero( a ) )
+&nbsp; {
+&nbsp; &nbsp; t = <span class="teal">Transform</span>.Identity;
+&nbsp; }
+&nbsp; <span class="blue">else</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">XYZ</span> axis = <span class="teal">Util</span>.IsEqual( a, <span class="teal">Math</span>.PI )
+&nbsp; &nbsp; &nbsp; ? <span class="teal">XYZ</span>.BasisX
+&nbsp; &nbsp; &nbsp; : v.Cross( <span class="teal">XYZ</span>.BasisZ );
+&nbsp;
+&nbsp; &nbsp; t = <span class="teal">Transform</span>.get_Rotation( <span class="teal">XYZ</span>.Zero, axis, a );
+&nbsp; }
+&nbsp; <span class="blue">return</span> t;
+}
+</pre>
+
+<p>The other three steps are trivial or have already been discussed.
+Applying the transform to the polygon is achieved by applying it individually to each vertex.
+Flattening is done by simply dropping the Z coordinate and implemented in
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html">
+CmdSlabBoundaryArea</a>,
+
+as is the 2D polygon area calculation.</p>
+
+<p>As previously mentioned, it would also be interesting to compare the relative speed of transforming the 3D situation to 2D and using 2D area calculation versus direct 3D area calculation.
+Unfortunately, I still have not installed Visual Studio 2008, and my 2005 version is just a so-called professional edition.
+Apparently, I should have installed the team edition to have access to the profiling functionality.
+I hope to be able to do so with the 2008 version which I will soon be switching to.</p>
+
+<p>I am also looking forward to making use of the enhanced generic functionality and libraries provided by the new versions of .NET and C# to improve the implementation of some of the polygon transformation methods which work by applying some transformation to each vertex.</p>
+
+<p>Here is
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/bc10016.zip">
+version 1.0.0.16</a>
+
+of the complete Visual Studio solution with the updated code discussed here, still using the VS 2005 platform.</p>

@@ -1,0 +1,103 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Family Category and Filtering</h3>
+
+<p>So here we are in a brand new year, 2009. 
+Welcome back! 
+Here is an interesting question regarding families, their categories, and filtering, raised last year by Martin Schmid of Autodesk.</p>
+
+<p><strong>Question:</strong> In the following code, I attempt to use Revit API filtering to select all families with a built-in category value of BuiltInCategory.OST_MechanicalEquipment:</p>
+
+<pre class="code">
+<span class="teal">Document</span> doc = app.ActiveDocument;
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; famsInCat = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+Autodesk.Revit.Creation.<span class="teal">Filter</span> cf
+&nbsp; = app.Create.Filter;
+&nbsp;
+<span class="teal">TypeFilter</span> typeFilter
+&nbsp; = cf.NewTypeFilter( <span class="blue">typeof</span>( <span class="teal">Family</span> ) );
+&nbsp;
+<span class="teal">CategoryFilter</span> catFilter
+&nbsp; = cf.NewCategoryFilter( bic );
+&nbsp;
+<span class="teal">LogicAndFilter</span> andFilter
+&nbsp; = cf.NewLogicAndFilter( typeFilter, catFilter );
+&nbsp;
+doc.get_Elements( andFilter, famsInCat );
+<span class="blue">return</span> famsInCat;
+</pre>
+
+<p>Unfortunately, this does not work as expected, even when some mechanical equipment families have been loaded into the model.</p>
+
+<p>Instead, this more cumbersome iterative approach can be used successfully:</p>
+
+<pre class="code">
+<span class="teal">Category</span> categoryMechanicalEquipment
+&nbsp; = doc.Settings.Categories.get_Item( bic );
+&nbsp;
+<span class="teal">ElementId</span> categoryId
+&nbsp; = categoryMechanicalEquipment.Id;
+&nbsp;
+<span class="teal">ElementIterator</span> it
+&nbsp; = doc.get_Elements( <span class="blue">typeof</span>( <span class="teal">Family</span> ) );
+&nbsp;
+<span class="blue">while</span>( it.MoveNext() )
+{
+&nbsp; <span class="teal">Family</span> family = it.Current <span class="blue">as</span> <span class="teal">Family</span>;
+&nbsp; <span class="blue">bool</span> categoryMatches
+&nbsp; &nbsp; = family.FamilyCategory.Id.Equals( categoryId );
+&nbsp;
+&nbsp; <span class="blue">if</span>( categoryMatches )
+&nbsp; {
+&nbsp; &nbsp; famsInCat.Add( family );
+&nbsp; }
+}
+<span class="blue">return</span> famsInCat;
+</pre>
+
+<p>Do you see any errors in my logic?</p>
+
+<p><strong>Answer:</strong> The reason it does not work is because the Family class does not implement the Category property for all family files.
+Although the property is provided by the Family class, it sometimes returns null.
+The filter is probably using this property internally, but to no avail.</p>
+
+<p>Therefore, you have to use some other method to check the category of a family.
+On some family instances, you can use FamilyCategory instead of Category, like you are doing in your working code snippet.
+Unfortunately, even this work-around is not reliable for all families.
+On some families, the FamilyCategory property is not implemented either.
+The most reliable method is to check the Category property on any one symbol contained in the family.
+Mostly, it is practical to just use the first symbol defined in the family.
+Here is some updated code demonstrating this approach:</p>
+
+<pre class="code">
+<span class="teal">Category</span> categoryMechanicalEquipment
+&nbsp; = doc.Settings.Categories.get_Item( bic );
+&nbsp;
+<span class="teal">ElementId</span> categoryId
+&nbsp; = categoryMechanicalEquipment.Id;
+&nbsp;
+<span class="teal">ElementIterator</span> it
+&nbsp; = doc.get_Elements( <span class="blue">typeof</span>( <span class="teal">Family</span> ) );
+&nbsp;
+<span class="blue">while</span>( it.MoveNext() )
+{
+&nbsp; <span class="teal">Family</span> family = it.Current <span class="blue">as</span> <span class="teal">Family</span>;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Symbol</span> s <span class="blue">in</span> family.Symbols )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( s.Category.Id.Equals( categoryId ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; famsInCat.Add( family );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">break</span>; <span class="green">// only need to look at first symbol</span>
+&nbsp; }
+}
+<span class="blue">return</span> famsInCat;
+</pre>
+
+<p>Unfortunately, as Martin points out above, this does indeed mean that you have to add some own slightly cumbersome code after the filtered element retrieval to check for the desired category.</p>

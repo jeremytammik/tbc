@@ -1,0 +1,144 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Loading The Building Coder Samples</h3>
+
+<p>As I write these blog entries, I continuously add new commands to The Building Coder sample project.
+While doing so, I wish keep my list of external commands up to date with a minimum of effort.
+I have several important requirements:</p>
+
+<ul>
+<li>Maintain one single file listing the command information.</li>
+<li>Automatically create an entry point in Revit for each command.</li>
+<li>Reuse the same file in all flavours of Revit, with no additional effort.</li>
+<li>Integrate the command data with other ADN samples that I maintain.</li>
+</ul>
+
+<p>The easiest way to achieve these goals is to make use of the Revit SDK sample external application RvtSamples, which I described in more detail in the post on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/loading-sdk-sam.html">
+Loading SDK Samples</a>.</p>
+
+<p>So far, however, I have actually been duplicating the information, because on one hand, I wanted to keep it in a separate file. On the other hand, I had to copy it into the RvtSamples input file, RvtSamples.txt.</p>
+
+<p>For quite a while, I have been thinking that a simple solution to this problem would be for RvtSamples to support an #include mechanism, like the C and C++ pre-processors do. The C #include pragma allows one file to reference another one, and the reference behaves just as if the content of the referenced file were inserted into the referencing one at the #include pragma location.</p>
+
+<p>Once I started looking at the implementation, it turned out to be very simple. The original RvtSamples module Application.cs reads in the contents of RvtSamples.txt in the line:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">string</span>[] lines = <span class="teal">File</span>.ReadAllLines(filename);
+</pre>
+
+<p>I defined a new helper method ReadAllLinesWithInclude and replaced that call by:</p>
+
+<pre class="code">
+&nbsp; <span class="blue">string</span>[] lines = ReadAllLinesWithInclude( filename );
+</pre>
+
+<p>Here is the implementation of ReadAllLinesWithInclude:</p>
+
+<pre class="code">
+<span class="blue">char</span>[] _trimChars = <span class="blue">new</span> <span class="blue">char</span>[] {
+&nbsp; <span class="maroon">' '</span>, <span class="maroon">'"'</span>, <span class="maroon">'\''</span>, <span class="maroon">'&lt;'</span>, <span class="maroon">'&gt;'</span> };
+&nbsp;
+<span class="blue">string</span>[] ReadAllLinesWithInclude(
+&nbsp; <span class="blue">string</span> filename )
+{
+&nbsp; <span class="blue">if</span>( !<span class="teal">File</span>.Exists( filename ) )
+&nbsp; {
+&nbsp; &nbsp; ErrorMsg( filename + <span class="maroon">" not found."</span> );
+&nbsp; &nbsp; <span class="blue">return</span> <span class="blue">new</span> <span class="blue">string</span>[] { };
+&nbsp; }
+&nbsp; <span class="blue">string</span>[] lines = <span class="teal">File</span>.ReadAllLines(
+&nbsp; &nbsp; filename );
+&nbsp;
+&nbsp; <span class="blue">int</span> n = lines.GetLength(0);
+&nbsp; <span class="teal">ArrayList</span> all_lines = <span class="blue">new</span> <span class="teal">ArrayList</span>( n );
+&nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> line <span class="blue">in</span> lines )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">string</span> s = line.TrimStart();
+&nbsp; &nbsp; <span class="blue">if</span>( s.ToLower().StartsWith( <span class="maroon">"#include"</span> ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> filename2 = s.Substring( 8 );
+&nbsp; &nbsp; &nbsp; filename2 = filename2.Trim( _trimChars );
+&nbsp; &nbsp; &nbsp; all_lines.AddRange( ReadAllLinesWithInclude(
+&nbsp; &nbsp; &nbsp; &nbsp; filename2 ) );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; all_lines.Add( line );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> all_lines.ToArray( <span class="blue">typeof</span>( <span class="blue">string</span> ) )
+&nbsp; &nbsp; <span class="blue">as</span> <span class="blue">string</span>[];
+}
+</pre>
+
+<p>Now, I have added only two lines to the end of RvtSamples.txt, one each for the ADN and The Building Coder samples, and these two lines will never need to be edited again:</p>
+
+<pre>
+  #include C:/a/j/adn/train/revit/2009/src/AdnSamples.txt
+  #include C:/a/j/adn/train/revit/2009/src/bc/BcSamples.txt
+</pre>
+
+<p>Here are the entire contents of BcSamples.txt, with the header informational comments removed, and the binary path somewhat shortened for the sake of clarity:</p>
+
+<pre>
+  /&amp;ADN/&amp;Bc/List Walls
+  List wall lengths and areas
+  C:/bin/BuildingCoder.dll
+  BuildingCoder.CmdListWalls
+
+  /&amp;ADN/&amp;Bc/Wall Dimensions
+  Extract wall solid and list all its dimensions
+  C:/bin/BuildingCoder.dll
+  BuildingCoder.CmdWallDimensions
+
+  /&amp;ADN/&amp;Bc/Relationship Inverter
+  Determine opening > wall host relationships and invert them to wall > opening
+  C:/bin/BuildingCoder.dll
+  BuildingCoder.CmdRelationshipInverter
+
+  /&amp;ADN/&amp;Bc/Filter Performance
+  Compare Type Filter versus using an anonymous method to filter elements
+  C:/bin/BuildingCoder.dll
+  BuildingCoder.CmdFilterPerformance
+
+  /&amp;ADN/&amp;Bc/Element Materials
+  Retrieve building element materials
+  C:/bin/BuildingCoder.dll
+  BuildingCoder.CmdGetMaterials
+
+  /&amp;ADN/&amp;Bc/Azimuth
+  Calculate azimuth
+  C:/bin/BuildingCoder.dll
+  BuildingCoder.CmdAzimuth
+
+  /&amp;ADN/&amp;Bc/Bounding Box
+  Retrieve Element Bounding Box
+  C:/bin/BuildingCoder.dll
+  BuildingCoder.CmdBoundingBox
+
+  /&amp;ADN/&amp;Bc/Slab Boundaries
+  Determine polygonal floor slab boundary loops
+  C:/bin/BuildingCoder.dll
+  BuildingCoder.CmdSlabBoundary
+
+  /&amp;ADN/&amp;Bc/Slab Sides
+  Determine floor slab side faces
+  C:/bin/BuildingCoder.dll
+  BuildingCoder.CmdSlabSides
+</pre>
+
+<p>By the way, note that you can use an ampersand sign '&amp;' to define keyboard mnemonics to provide shortcut access to the menu items when defining them through an external application. I find this especially handy when I need to start a command repeatedly to debug an application.</p>
+
+<p>Here is my updated version of
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/RvtSamples1010.zip">
+RvtSamples 1.0.1.0 supporting #include</a>.
+
+I incremented the version number from 1.0.0.0 to 1.0.1.0.</p>

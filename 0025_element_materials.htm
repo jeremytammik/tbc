@@ -1,0 +1,151 @@
+<style type="text/css">
+.blue { color: blue; }
+.green { color: green; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+</style>
+
+<h3>Element Materials</h3>
+
+<p>I recently heard several queries on how to access the surface material of a wall or other building element. There are several different ways to access materials defined on building elements. One method is discussed in the section 16.3 Element Material in the 
+
+<a href="">Revit 2009 API Developer Guide</a>. 
+
+Another method goes through the geometry and retrieves the material associated with each face. We will discuss the latter approach in this and the next post.</p>
+
+<p>Retrieving the material associated with element geometry is actually very simple, similar to and simpler than the geometrical traversal that we looked at in the post on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/wall-dimensions.html">
+Wall Dimensions</a>.
+
+The geometry displayed in Revit generally has a solid associated with it, each solid has a set of faces, and each face has a material, which can be queried using its MaterialElement property.
+Therefore, we can simply query the building element for its geometry, traverse that, pick out all solids, ask each one for its faces, and list their materials. Here is the code to do so:</p>
+
+<pre class="code">
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Diagnostics;
+<span class="blue">using</span> Autodesk.Revit;
+<span class="blue">using</span> Autodesk.Revit.Elements;
+<span class="blue">using</span> Autodesk.Revit.Geometry;
+<span class="blue">using</span> <span class="teal">CmdResult</span> = Autodesk.Revit.<span class="teal">IExternalCommand</span>.<span class="teal">Result</span>;
+<span class="blue">using</span> <span class="teal">RvtElement</span> = Autodesk.Revit.<span class="teal">Element</span>;
+<span class="blue">using</span> <span class="teal">GeoElement</span> = Autodesk.Revit.Geometry.<span class="teal">Element</span>;
+&nbsp;
+<span class="blue">namespace</span> BuildingCoder
+{
+&nbsp; <span class="blue">class</span> <span class="teal">CmdGetMaterials</span> : <span class="teal">IExternalCommand</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; GetMaterials( <span class="teal">GeoElement</span> geo )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; materials = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;();
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> o <span class="blue">in</span> geo.Objects )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( o <span class="blue">is</span> <span class="teal">Solid</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = o <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> solid.Faces )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">string</span> s = face.MaterialElement.Name;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; materials.Add( s );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> materials;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Selection</span> sel = doc.Selection;
+&nbsp; &nbsp; &nbsp; <span class="teal">Options</span> opt = app.Create.NewGeometryOptions();
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> msg = <span class="blue">string</span>.Empty;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> i, n;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">RvtElement</span> e <span class="blue">in</span> sel.Elements )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeoElement</span> geo = e.get_Geometry( opt );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="blue">string</span>&gt; materials = GetMaterials( geo );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; msg += <span class="maroon">"\n"</span> + <span class="teal">Util</span>.ElementDescription( e );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; n = materials.Count;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 == n )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; msg += <span class="maroon">" has no materials."</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; i = 0;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; msg += <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">" has {0} material{1}:"</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">string</span> s <span class="blue">in</span> materials )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; msg += <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"\n&nbsp; {0} {1}"</span>, i++, s );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 == msg.Length )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; msg = <span class="maroon">"Please select some elements."</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg( msg );
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Here is the little house sample, consisting of four walls, a floor, a roof, a door and two windows, which we can run this code on:</p>
+
+<img src="img/little_house_3d_view.png" alt="Little House"/>
+
+<p>Here is the result of selecting all elements of the little house and running the command:</p>
+
+<pre>
+Walls <127248 Generic - 200mm> has 17 materials:
+  0 Default Wall
+  1 Default Wall
+  2 Default Wall
+  3 Default Wall
+  . . .
+  16 Default Wall
+Walls <127249 Generic - 200mm> has 6 materials:
+  0 Default Wall
+  1 Default Wall
+  . . .
+  5 Default Wall
+Walls <127250 Generic - 200mm> has 6 materials:
+  0 Default Wall
+  1 Default Wall
+  . . .
+  5 Default Wall
+Walls <127251 Generic - 200mm> has 6 materials:
+  0 Default Wall
+  . . .
+  5 Default Wall
+Doors M_Single-Flush <127252 0915 x 2134mm> has no materials.
+Windows M_Fixed <127255 0406 x 0610mm> has no materials.
+Windows M_Fixed <127258 0406 x 0610mm> has no materials.
+Floors <127266 Generic Floor - 400mm> has 6 materials:
+  0 Default Roof
+  1 Default Roof
+  . . .
+  5 Default Roof
+Roofs <127269 Generic Roof - 300mm> has 12 materials:
+  0 Default Roof
+  1 Default Roof
+  . . .
+  11 Default Roof
+</pre>
+
+<p>Notice that the sample in its current state does not report any materials for the door or windows. This is because these elements are family instances, and their geometry is nested in a geometry instance, which the current code does not traverse into. In a future instalment, we will rectify that to list the materials nested in family instances as well.</p>
+
+<p>I am adding the complete Visual Studio solution <a href="http://thebuildingcoder.typepad.com/blog/files/bc1005.zip">here</a>. This version 1.0.0.5 includes all commands we discussed so far: CmdListWalls, CmdRelationshipInverter, CmdWallDimensions, CmdFilterPerformance and the new CmdGetMaterials.</p>

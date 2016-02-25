@@ -1,0 +1,86 @@
+<h3>Unit Types and Format Options</h3>
+
+<p>Here is a question from
+
+<a href="http://cadappdev.blogspot.com">
+Matt Mason</a>
+
+and some exhaustive research results by Saikat Bhattacharya of Autodesk on unit types and their format options.</p>
+
+<p>To provide some context, UnitType is an enumeration listing all the unit types supported by Revit. The FormatOptions class is used to manage information for the ProjectUnit.FormatOptions property, which returns a FormatOptions instance containing the user's current project unit settings for each UnitType queried. Through the project units and the format options management, each unit type is associated with one FormatOptions instance, which provides the following properties and values:</p>
+
+<ul>
+<li>Group, a UnitGroup enumeration value,</li>
+<li>Name, a string,</li>
+<li>Units, a display unit type, represented by a DisplayUnitType enumeration value,</li>
+<li>Symbol, a UnitSymbolType enumeration value,</li>
+<li>Rounding, a double value.</li>
+</ul>
+
+<p>In this context, Matt asks:</p>
+
+<p><strong>Question:</strong>
+When attempting to get the FormatOptions for a given UnitType, I am getting exceptions for certain UnitTypes:</p>
+
+<ul>
+<li>AreaForceScale </li>
+<li>DecSheetLength </li>
+<li>Electrical Apparent Power </li>
+<li>Electrical Current </li>
+<li>Electrical Frequency </li>
+<li>Electrical Luminance </li>
+<li>Electrical Potential </li>
+<li>Electrical Power </li>
+<li>Electrical Power Density </li>
+<li>ForceScale </li>
+<li>HVAC * </li>
+<li>Linear Force Scale </li>
+<li>Moment Scale </li>
+<li>Number </li>
+<li>Pipe Size </li>
+<li>Piping * </li>
+<li>SheetLength </li>
+<li>SiteAngle </li>
+<li>WireSize </li>
+</ul>
+
+<p>Some of these might be related to the fact that I am running the Revit Architecture flavour, but it is not clear to me that all of these are based on Revit flavour issues.
+Are some of these legacy or otherwise invalid types? </p>
+
+<p><strong>Answer:</strong>
+Saikat created the following mapping of the list of unit types provided with the disciplines in RAC as well as RME.
+Most of the unit types listed below belong to the MEP flavour of Revit and thus do not throw an exception in RME:</p>
+
+<ul>
+<li>AreaForceScale - Structural</li>
+<li>DecSheetLength - </li>
+<li>Electrical Apparent Power - Electrical</li>
+<li>Electrical Current - Electrical</li>
+<li>Electrical Frequency - Electrical</li>
+<li>Electrical Luminance - Electrical</li>
+<li>Electrical Potential - Electrical</li>
+<li>Electrical Power - Electrical</li>
+<li>Electrical Power Density - Electrical</li>
+<li>ForceScale - Structural</li>
+<li>HVAC * - HVAC</li>
+<li>Linear Force Scale - Structural</li>
+<li>Moment Scale - Structural</li>
+<li>Number - </li>
+<li>Pipe Size - Piping</li>
+<li>Piping * - Piping</li>
+<li>SheetLength - </li>
+<li>SiteAngle - </li>
+<li>WireSize - Electrical</li>
+</ul>
+
+<p>After contacting the engineering team for more details, he compiled a more comprehensive list including 80 unit types with their format option groups and names, and additional notes on some of them.
+Here is a spreadsheet
+
+<a href="zip/ProjectUnit.csv">
+ProjectUnit.csv</a>
+
+with the complete mapping in a neutral comma delimited CSV format. </p>
+
+<p>After reviewing these results, Matt adds a note that the four 'special' unit types DecSheetLength, SheetLength, Number, and SiteAngle are 'fixed' and will throw an exception if you attempt to access them in any Revit Flavour.
+Saikat adds: As mentioned in the CSV file, there are more than the four special cases that Matt refers to as 'special'.
+The CSV file contains others which apply to all disciplines and also cannot be edited, which Matt refers to as 'fixed', and includes some notes on each of them.</p>

@@ -1,0 +1,115 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Creating a new Family Symbol</h3>
+
+<p>This post is due to Joe Ye in our Beijing office. Many thanks, Joe! While proof reading my handouts for the Revit API tips and tricks session at AU,
+
+<a href="http://au.autodesk.com/sessions/?speaker=Jeremy+Tammik&year=2008">
+DE205-3 Enhancing Your Revit Add-In</a>,
+
+Joe pointed out that creating a new type or family symbol is a hot topic often asked by developers.
+It is not obvious from the Revit API help documentation or samples how to achieve this.
+It is simple to solve, though: one can use the Duplicate() method to create a new type, and then modify the parameters or properties required.</p>
+
+<p>Here is an example in VB duplicating a wall type by doubling the thickness of each layer in its compound layer structure:</p>
+
+<pre class="code">
+<span class="blue">Public</span> <span class="blue">Function</span> Execute( _
+&nbsp; <span class="blue">ByVal</span> commandData <span class="blue">As</span> ExternalCommandData, _
+&nbsp; <span class="blue">ByRef</span> message <span class="blue">As</span> <span class="blue">String</span>, _
+&nbsp; <span class="blue">ByVal</span> elements <span class="blue">As</span> ElementSet) _
+<span class="blue">As</span> IExternalCommand.Result _
+<span class="blue">Implements</span> IExternalCommand.Execute
+&nbsp;
+&nbsp; <span class="blue">Try</span>
+&nbsp; &nbsp; <span class="blue">Dim</span> app <span class="blue">As</span> Application = commandData.Application
+&nbsp; &nbsp; <span class="blue">Dim</span> doc <span class="blue">As</span> Document = app.ActiveDocument
+&nbsp; &nbsp; <span class="blue">Dim</span> els <span class="blue">As</span> ElementSet = doc.Selection.Elements
+&nbsp; &nbsp; <span class="blue">Dim</span> e <span class="blue">As</span> Element
+&nbsp; &nbsp; <span class="blue">Dim</span> newWallTypeName <span class="blue">As</span> <span class="blue">String</span> _
+&nbsp; &nbsp; &nbsp; = <span class="maroon">"NewWallType_with_Width_doubled"</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> e <span class="blue">In</span> els
+&nbsp; &nbsp; &nbsp; <span class="blue">If</span> <span class="blue">TypeOf</span> e <span class="blue">Is</span> Wall <span class="blue">Then</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> wall <span class="blue">As</span> Wall = e
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> wallType <span class="blue">As</span> WallType
+&nbsp; &nbsp; &nbsp; &nbsp; wallType = wall.WallType
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> newWallType <span class="blue">As</span> WallType
+&nbsp; &nbsp; &nbsp; &nbsp; newWallType = wallType.Duplicate(newWallTypeName)
+
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> layers <span class="blue">As</span> CompoundStructureLayerArray
+&nbsp; &nbsp; &nbsp; &nbsp; layers = newWallType.CompoundStructure.Layers
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Dim</span> layer <span class="blue">As</span> CompoundStructureLayer
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">For</span> <span class="blue">Each</span> layer <span class="blue">In</span> layers
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; layer.Thickness *= 2
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; wall.WallType = newWallType
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">Exit</span> <span class="blue">For</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">End</span> <span class="blue">If</span>
+&nbsp; &nbsp; <span class="blue">Next</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">Return</span> IExternalCommand.Result.Succeeded
+
+&nbsp; <span class="blue">Catch</span> ex <span class="blue">As</span> Exception
+&nbsp; &nbsp; message = ex.ToString()
+&nbsp; &nbsp; <span class="blue">Return</span> IExternalCommand.Result.Failed
+&nbsp; <span class="blue">End</span> <span class="blue">Try</span>
+
+<span class="blue">End</span> <span class="blue">Function</span>
+</pre>
+
+<p>This command iterates over the currently selected elements. If a wall has been selected, its wall type is retrieved and duplicated to create a new wall type. In its compound layer structure, the thickness of every layer is doubled, and the new wall type is assigned to the selected wall. The command terminates as soon as the first selected wall has been processed.</p>
+
+
+<p>Here is a different example in C# duplicating a column type, setting a new fixed value for its radius:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; <span class="blue">string</span> familyName = <span class="maroon">"Concrete-Round-Column"</span>;
+&nbsp; <span class="teal">Filter</span> f = app.Create.Filter.NewFamilyFilter(
+&nbsp; &nbsp; familyName );
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt; families = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">RvtElement</span>&gt;();
+&nbsp; doc.get_Elements( f, families );
+&nbsp; <span class="blue">if</span>( 1 &gt; families.Count )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">"No suitable family found."</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="teal">Family</span> fam = families[0] <span class="blue">as</span> <span class="teal">Family</span>;
+&nbsp; <span class="teal">FamilySymbol</span> famSym = <span class="blue">null</span>;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> fs <span class="blue">in</span> fam.Symbols )
+&nbsp; {
+&nbsp; &nbsp; famSym = fs;
+&nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// create a new family symbol using Duplicate:</span>
+&nbsp; <span class="blue">string</span> newFamilyName = <span class="maroon">"NewRoundColumn 3"</span>;
+&nbsp; <span class="teal">FamilySymbol</span> newFamSym = famSym.Duplicate(
+&nbsp; &nbsp; newFamilyName ) <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; <span class="green">// set the radius to a new value:</span>
+&nbsp; <span class="teal">Parameter</span> par = newFamSym.get_Parameter( <span class="maroon">"b"</span> );
+&nbsp; par.Set( 3 );
+&nbsp;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+}
+</pre>

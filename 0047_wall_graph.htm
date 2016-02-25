@@ -1,0 +1,163 @@
+<style type="text/css">
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+</style>
+
+<h3>Wall Graph</h3>
+
+<p>How can I retrieve the wall graph from the Revit API?</p>
+
+<p>I am trying to retrieve the wall connections or wall graph from a Revit drawing using the API.
+In AutoCAD Architecture, this is exposed through the wall graph class.
+Is there any corresponding object that I can use in Revit to give me this information?</p>
+
+<p>The LocationCurve ElementsAtJoin property returns all the connected walls that join a wall at its two end points. 
+You can retrieve the wall's location curve though its Location property. 
+Here is some sample code implementing a new external command class CmdWallNeighbours that demonstrates this:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; <span class="teal">ElementSet</span> elements )
+{
+&nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; walls = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.GetSelectedElementsOrAll(
+&nbsp; &nbsp; walls, doc, <span class="blue">typeof</span>( <span class="teal">Wall</span> ) ) )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Selection</span> sel = doc.Selection;
+&nbsp; &nbsp; message = ( 0 &lt; sel.Elements.Size )
+&nbsp; &nbsp; &nbsp; ? <span class="maroon">"Please select some wall elements."</span>
+&nbsp; &nbsp; &nbsp; : <span class="maroon">"No wall elements found."</span>;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">int</span> i, n;
+&nbsp; <span class="blue">string</span> desc, s = <span class="blue">null</span>;
+&nbsp; <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; neighbours;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Wall</span> wall <span class="blue">in</span> walls )
+&nbsp; {
+&nbsp; &nbsp; desc = <span class="teal">Util</span>.ElementDescription( wall );
+&nbsp;
+&nbsp; &nbsp; <span class="teal">LocationCurve</span> c
+&nbsp; &nbsp; &nbsp; = wall.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == c )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; s = desc + <span class="maroon">": No wall curve found."</span>;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; s = <span class="blue">string</span>.Empty;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">for</span>( i = 0; i &lt; 2; ++i )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; neighbours = c.get_ElementsAtJoin( i );
+&nbsp; &nbsp; &nbsp; &nbsp; n = neighbours.Count;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; s += <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"\n\n{0} {1} point has {2} neighbour{3}{4}"</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; desc,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (0 == i ? <span class="maroon">"start"</span> : <span class="maroon">"end"</span>),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; n,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PluralSuffix( n ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.DotOrColon( n ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Wall</span> nb <span class="blue">in</span> neighbours )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s += <span class="maroon">"\n&nbsp; "</span> +
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ElementDescription( nb );
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg( s );
+&nbsp; }
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+}
+</pre>
+
+<p>Unfortunately, if two walls intersect in the middle of one of them, there is no API call to retrieve the connected wall.</p>
+
+<p>Thanks to Chris Arps of 
+
+<a href="http://www.americad.com">
+Ameri-CAD Inc.</a>
+
+for raising this issue, and Joe Ye of Autodesk for providing the answer.</p>
+
+<p>Note that if a wall has at least one neighbour at one end, then the list of joined elements will include the wall itself as well, so that you get either zero neighbours or two or more, and one of them is the wall itself, which obviously can be filtered away from the list.</p>
+
+<p>Here is the result of running this command on a small rectangular house with four walls:</p>
+
+<pre>
+Walls <127248 Jt> start point has 2 neighbours:
+  Walls <127248 Jt>
+  Walls <127251 Jt>
+
+Walls <127248 Jt> end point has 2 neighbours:
+  Walls <127248 Jt>
+  Walls <127249 Jt>
+
+
+Walls <127249 Jt> start point has 2 neighbours:
+  Walls <127248 Jt>
+  Walls <127249 Jt>
+
+Walls <127249 Jt> end point has 2 neighbours:
+  Walls <127249 Jt>
+  Walls <127250 Jt>
+
+
+Walls <127250 Jt> start point has 2 neighbours:
+  Walls <127249 Jt>
+  Walls <127250 Jt>
+
+Walls <127250 Jt> end point has 2 neighbours:
+  Walls <127250 Jt>
+  Walls <127251 Jt>
+
+
+Walls <127251 Jt> start point has 2 neighbours:
+  Walls <127250 Jt>
+  Walls <127251 Jt>
+
+Walls <127251 Jt> end point has 2 neighbours:
+  Walls <127248 Jt>
+  Walls <127251 Jt>
+</pre>
+
+<p>Here is the result of running it on a set of only two walls joined at their common end point:</p>
+
+<pre>
+Walls <127876 Jt> start point has 0 neighbours.
+
+Walls <127876 Jt> end point has 2 neighbours:
+  Walls <127876 Jt>
+  Walls <127933 Jt>
+
+Walls <127933 Jt> start point has 2 neighbours:
+  Walls <127876 Jt>
+  Walls <127933 Jt>
+
+Walls <127933 Jt> end point has 0 neighbours.
+</pre>
+
+<p>Here is an updated
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/bc10014.zip">
+version 1.0.0.14</a>
+
+of the complete Visual Studio solution,
+including the new CmdWallNeighbours and all other commands discussed so far.</p>
+
+<p>Note that this algorithm only reports the wall endpoint connections. If midpoint connections are required as well, some other algorithm will have to be used. The first idea that comes to mind is to retrieve all the wall center lines and treat is as a segment intersection problem in the plane: given a set S of n closed segments in the plane, report all intersection points among the segments in S. This doesn't seem like a challenging problem: one can take each pair of segments, compute whether they intersect, and, if so, report their intersection point. This brute force algorithm requires O(n^2) time. This is not a practical algorithm in real life. Wei Qian describes a more efficient 
+
+<a href="http://www.lems.brown.edu/~wq/projects/cs252.html">
+sweep line algorithm for segment intersection</a>
+
+which is O((n + i) log n), where i is the number of intersection points of segments in S. Obviously, one would have to sort the various wall center lines into different buckets for separate buildings and levels and possibly other relevant groupings before feeding them into such a algorithm.</p>

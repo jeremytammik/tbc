@@ -1,0 +1,266 @@
+<h3>Wall Dimensions</h3>
+
+<style type="text/css">
+.blue { color: blue; }
+.green { color: green; }
+.teal { color: teal; }
+.gray { color: gray; }
+.maroon { color: maroon; }
+</style>
+
+<p>After the diversion exploring the geometry related information and samples provided with the basic Revit SDK, let us finally get into an example of some own geometry related code. We present an algorithm to dimension an arbitrary Revit element containing a solid in its geometry. The implementation is tailored to handle wall elements, but the functionality can be applied to any other element containing geometry as well.</p>
+
+<p>The idea is pretty simple, and possibly not awfully useful for real life, but geometrically elegant and interesting. We analyse the wall geometry and determine the maximum distance between all planar wall faces with parallel normal vectors. The maximum distance for any given normal vector is assumed to be the wall dimension in that direction. Non-planar faces are ignored. For each planar face, we determine its normal vector and origin. For all faces sharing the same normal vector, we collect all the origin points. After completing this collection process, we determine the maximal distance along the normal vector between all the faces sharing this normal. For a quadrilateral wall, the result will be the three dimensions one expects. For irregular walls with planar faces, additional dimensions will be detected in all directions perpendicular to two or more planar faces.</p>
+
+<p>Here is the code for the external command and its support routines:</p>
+
+<pre class="code">
+<span class="blue">#region</span> Header
+<span class="green">//</span>
+<span class="green">// CmdWallDimensions.cs - determine wall dimensions </span>
+<span class="green">// by iterating over wall geometry faces</span>
+<span class="green">//</span>
+<span class="green">// Copyright (C) 2008 by Jeremy Tammik, </span>
+<span class="green">// Autodesk Inc. All rights reserved.</span>
+<span class="green">//</span>
+<span class="blue">#endregion</span> <span class="green">// Header</span>
+&nbsp;
+<span class="blue">#region</span> Namespaces
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Diagnostics;
+<span class="blue">using</span> Autodesk.Revit;
+<span class="blue">using</span> Autodesk.Revit.Elements;
+<span class="blue">using</span> Autodesk.Revit.Geometry;
+<span class="blue">using</span> <span class="teal">CmdResult</span> = Autodesk.Revit.<span class="teal">IExternalCommand</span>.<span class="teal">Result</span>;
+<span class="blue">using</span> <span class="teal">RvtElement</span> = Autodesk.Revit.<span class="teal">Element</span>;
+<span class="blue">using</span> <span class="teal">GeoElement</span> = Autodesk.Revit.Geometry.<span class="teal">Element</span>;
+<span class="blue">using</span> <span class="teal">NormalAndOrigins</span>
+&nbsp; = System.Collections.Generic.<span class="teal">KeyValuePair</span>
+&nbsp; &nbsp; &lt; Autodesk.Revit.Geometry.<span class="teal">XYZ</span>
+&nbsp; &nbsp; , System.Collections.Generic.<span class="teal">List</span>
+&nbsp; &nbsp; &nbsp; &lt;Autodesk.Revit.Geometry.<span class="teal">XYZ</span>&gt;&gt;;
+<span class="blue">#endregion</span> <span class="green">// Namespaces</span>
+&nbsp;
+<span class="blue">namespace</span> BuildingCoder
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> List dimensions for a quadrilateral wall with </span>
+&nbsp; <span class="gray">///</span><span class="green"> openings. In this algorithm, we collect all </span>
+&nbsp; <span class="gray">///</span><span class="green"> the faces with parallel normal vectors and </span>
+&nbsp; <span class="gray">///</span><span class="green"> calculate the maximal distance between any </span>
+&nbsp; <span class="gray">///</span><span class="green"> two pairs of them. This is the wall dimension </span>
+&nbsp; <span class="gray">///</span><span class="green"> in that direction.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">class</span> <span class="teal">CmdWallDimensions</span>
+&nbsp; {
+<span class="blue">&nbsp; &nbsp; #region</span> Geometry
+&nbsp; &nbsp; <span class="blue">const</span> <span class="blue">double</span> _eps = 1.0e-9;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Check whether two real numbers are equal</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">bool</span> DoubleEqual( <span class="blue">double</span> a, <span class="blue">double</span> b )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Math</span>.Abs( a - b ) &lt; _eps;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Check whether two vectors are parallel</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">static</span> <span class="blue">bool</span> XyzParallel( <span class="teal">XYZ</span> a, <span class="teal">XYZ</span> b )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> angle = a.Angle( b );
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> _eps &gt; angle
+&nbsp; &nbsp; &nbsp; &nbsp; || DoubleEqual( angle, <span class="teal">Math</span>.PI );
+&nbsp; &nbsp; }
+<span class="blue">&nbsp; &nbsp; #endregion</span> <span class="green">// Geometry</span>
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Retrieve the planar face normal and origin </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> from all of the solid's planar faces and </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> insert them into the map mapping face normals</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> to a list of all origins of different faces</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> sharing this normal.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name="m"&gt;</span><span class="green">Map mapping each normal vector </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> to a list of the origins of all planar faces </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> sharing this normal direction</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name="solid"&gt;</span><span class="green">Input solid</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; &nbsp; <span class="blue">void</span> getFaceData(
+&nbsp; &nbsp; &nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">XYZ</span>, <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;&gt; m,
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> i;
+&nbsp; &nbsp; &nbsp; <span class="teal">FaceArray</span> faces = solid.Faces;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Face</span> face <span class="blue">in</span> solid.Faces )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">PlanarFace</span> planarFace = face <span class="blue">as</span> <span class="teal">PlanarFace</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != planarFace )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> normal = planarFace.Normal;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> origin = planarFace.Origin;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; normals = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;( m.Keys );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; i = normals.FindIndex(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">delegate</span>( <span class="teal">XYZ</span> v )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> XyzParallel( v, normal );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; } );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( -1 == i )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"Face at {0} has new normal {1}"</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( origin ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( normal ) ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; m.Add( normal, <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;() );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; m[normal].Add( origin );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"Face at {0} normal {1} matches {2}"</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( origin ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( normal ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( normals[i] ) ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; m[normals[i]].Add( origin );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">public</span> <span class="teal">CmdResult</span> Execute(
+&nbsp; &nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Application</span> app = commandData.Application;
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp; &nbsp; &nbsp; <span class="teal">Selection</span> sel = doc.Selection;
+&nbsp; &nbsp; &nbsp; <span class="teal">Options</span> o = app.Create.NewGeometryOptions();
+&nbsp; &nbsp; &nbsp; <span class="green">// map planar face normals to face origins:</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">XYZ</span>, <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;&gt; m
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="teal">XYZ</span>, <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt;&gt;();
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> s, msg = <span class="blue">string</span>.Empty;
+&nbsp; &nbsp; &nbsp; <span class="blue">int</span> i;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">RvtElement</span> e <span class="blue">in</span> sel.Elements )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Wall</span> wall = e <span class="blue">as</span> <span class="teal">Wall</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != wall )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s = <span class="blue">string</span>.Format( <span class="maroon">"Wall &lt;{0} {1}&gt;:"</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; wall.Name, wall.Id.Value );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( s );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 &lt; msg.Length ) { msg += <span class="maroon">"\n\n"</span>; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; msg += s;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeoElement</span> ge = wall.get_Geometry( o );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">GeometryObjectArray</span> objs = ge.Objects;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">GeometryObject</span> obj <span class="blue">in</span> objs )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solid = obj <span class="blue">as</span> <span class="teal">Solid</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != solid )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; getFaceData( m, solid );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">int</span> j, n;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> d, dmax;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">NormalAndOrigins</span> pair <span class="blue">in</span> m )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; dmax = 0;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> normal = pair.Key.Normalized;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">XYZ</span>&gt; pts = pair.Value;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; n = pts.Count;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 1 == n )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"Only one wall face in "</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">"direction {0} found."</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( normal ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( i = 0; i &lt; n - 1; ++i )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">for</span>( j = i + 1; j &lt; n; ++j )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> v = pts[i].Subtract( pts[j] );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; d = v.Dot( normal );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( d &gt; dmax )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; dmax = d;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; s = <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"Max wall dimension in "</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">"direction {0} is {1} feet."</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.PointString( normal ),
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.RealString( dmax ) );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( s );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; msg += <span class="maroon">"\n"</span> + s;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; m.Clear();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( 0 == msg.Length )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; msg = <span class="maroon">"Please select some walls."</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.InfoMsg( msg );
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Succeeded;
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>We use regions to structure the code. It allows us to collapse bits of code that we are currently not interested in to reduce screen clutter and improve the overview. The main geometrical analysis is implemented in getFaceData(). It traverses the solid passed in and collects all the planar face normal vectors and origins, using the normals as dictionary keys, and creating lists of origin points as dictionary values. Once this information has been assembled, we traverse it to format it into a string to be presented in a message box, as well as listing it in the Visual Studio debug output window.</p>
+
+<p>The namespace is BuildingCoder, and the command name CmdWallDimensions, so the information to add to Revit.ini is something like this:</p>
+
+<pre>
+[ExternalCommands]
+ECCount=1
+ECName1=Wall Dimensions
+ECDescription1=Extract wall solid and list all its dimensions
+ECAssembly1=C:\bin\BuildingCoder.dll
+ECClassName1=BuildingCoder.CmdWallDimensions
+</pre>
+
+<p>Here is a sample wall to run it on, created by the external command defined by Lab2_0_CreateLittleHouse in the Revit API introduction labs:</p>
+
+<img src="img/little_house_3d_wall.png" alt="Little House Wall Selected">
+
+<p>Here is the result of selecting the wall and running the command:</p>
+
+<img src="img/wall_dimensions.png" alt="Wall Dimensions">
+
+<p>This is the log data printed to the Visual Studio debug output window generated during the process, to help understand how the faces are analysed one by one to determine whether their normal either matches an existing or defines a new  one:</p>
+
+<pre>
+Wall &lt;Generic - 200mm 127248&gt;:
+Face at (0,-0.33,0) has new normal (0,-1,0)
+Face at (12.98,0.33,0) has new normal (-1,0,0)
+Face at (0,-0.33,0) has new normal (0,0,-1)
+Face at (23.29,0,0) normal (1,0,0) matches (-1,0,0)
+Face at (22.97,-0.33,13.12) normal (0,0,1) matches (0,0,-1)
+Face at (-0.33,13.12,0) normal (-1,0,0) matches (-1,0,0)
+Face at (9.98,0.33,7) normal (1,0,0) matches (-1,0,0)
+Face at (12.98,0.33,7) normal (0,0,-1) matches (0,0,-1)
+Face at (5.08,-0.33,3.94) normal (1,0,0) matches (-1,0,0)
+Face at (5.08,-0.33,5.94) normal (0,0,-1) matches (0,0,-1)
+Face at (6.41,-0.33,5.94) normal (-1,0,0) matches (-1,0,0)
+Face at (6.41,-0.33,3.94) normal (0,0,1) matches (0,0,-1)
+Face at (16.56,-0.33,3.94) normal (1,0,0) matches (-1,0,0)
+Face at (16.56,-0.33,5.94) normal (0,0,-1) matches (0,0,-1)
+Face at (17.89,-0.33,5.94) normal (-1,0,0) matches (-1,0,0)
+Face at (17.89,-0.33,3.94) normal (0,0,1) matches (0,0,-1)
+Face at (0,0.33,0) normal (0,1,0) matches (0,-1,0)
+Max wall dimension in direction (0,-1,0) is 0.66 feet.
+Max wall dimension in direction (-1,0,0) is 18.22 feet.
+Max wall dimension in direction (0,0,-1) is 13.12 feet.
+Wall &lt;Generic - 200mm 127248&gt;:
+Max wall dimension in direction (0,-1,0) is 0.66 feet.
+Max wall dimension in direction (-1,0,0) is 18.22 feet.
+Max wall dimension in direction (0,0,-1) is 13.12 feet.
+</pre>

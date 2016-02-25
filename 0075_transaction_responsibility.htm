@@ -1,0 +1,58 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Transaction Responsibility</h3>
+
+<p>The last post on
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/transactions.html">
+transactions</a>
+
+explained the need to open a transaction of our own before trying to modify a document during an event.
+That is actually not all.
+We also need to remember that starting a transaction is not permitted at all times, and also that starting a new transaction or ending one may fail.
+This leaves us with a certain amount of responsibility.
+Therefore, we should add some error handling to ensure that failures are handled gracefully.
+The sample should be amended like this:</p>
+
+<pre class="code">
+<span class="blue">void</span> application_OnDocumentNewed( <span class="teal">Document</span> doc )
+{
+&nbsp; <span class="green">// we cannot modify the document </span>
+&nbsp; <span class="green">// unless a transaction is started</span>
+&nbsp;
+&nbsp; <span class="blue">if</span>( doc.BeginTransaction() )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// once a new transaction is started</span>
+&nbsp; &nbsp; <span class="green">// we are responsible for ending or </span>
+&nbsp; &nbsp; <span class="green">// aborting it, so we have to put </span>
+&nbsp; &nbsp; <span class="green">// everything in a try-catch block</span>
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; CreateUserDefinedParameters( doc );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// we are responsible for ending </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// the transaction we started</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; doc.EndTransaction();
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// if we cannot finish what we wanted</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// we should probably abort the whole thing</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; doc.AbortTransaction();
+&nbsp; &nbsp; &nbsp; <span class="blue">throw</span>; <span class="green">// re-throw the exception</span>
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>Thank you to Arnost Lobel and Harry Mattison for providing this feedback!</p>
+
+<p>I have arrived in Perugia by now ... rather slow progress, but getting there.</p>

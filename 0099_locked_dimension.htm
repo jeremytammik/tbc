@@ -1,0 +1,201 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+.gray { color: gray; }
+</style>
+
+<h3>Locked Dimensioning</h3>
+
+<p>Here is a little exploration I embarked upon prompted by a
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/bolt-out-of-the-red.html#comments">
+question</a>
+
+from
+
+<a href="http://forums.augi.com/showthread.php?t=84766">
+Pierre-Nelson Navarra</a>.
+It starts off as a rather esoteric search for connections between objects that have no API-accessible data, but ends up with a surprising twist, the ability to unlock all dimensions through the API.</p>
+
+<p><strong>Question:</strong>
+Is there a way to determine if a dimension element is locked or not, and is it possible to unlock it through the API?</p>
+
+<p><strong>Answer:</strong>
+To make a short answer long, here is a description of the exploration this prompted me to undertake.</p>
+
+<p>I had a quick look at a dimension element. 
+I made heavy use of 
+
+<a href="http://download.autodesk.com/media/adn/RvtMgdDbg2009_0429_2008.zip">
+RvtMgdDbg</a>,
+
+the most important tool for examining the Revit database, its elements, their properties and parameters, and the relationships between elements.
+Another important tool that I use a lot is the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/rac_labs_20081117.zip">
+Revit API introduction labs</a>
+
+built-in parameter checker.
+One thing I noted when examining the dimension element using the latter is the built-in parameter ELEMENT_LOCKED_PARAM, which is a read-write Boolean value and initially set to false. 
+Unfortunately, when I lock the dimension, it still remains false, so this does not give us the information we are looking for. 
+The 'Revit 2009 API Developer Guide' has nothing to say about this parameter either.</p>
+
+<p>I then examined in detail what elements are added to the database by inserting a dimensioning element and locking it. Adding a dimension introduces one new element into the database:</p>
+
+<pre>
+diff RevitElementsBeforeDimension.txt RevitElementsAfterDimension.txt
+2259a2260
+> Id=130751; Class=Dimension; Category=Dimensions; Name=Linear - 3mm Arial
+</pre>
+
+<p>I use the Revit API intro Lab2_1_Elements to examine what elements are added, as described in 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/exploring-element-parameters.html">
+exploring element parameters</a>.</p>
+
+<p>Locking the dimension adds another element:</p>
+
+<pre>
+diff RevitElementsAfterDimension.txt RevitElements.txt
+2260a2261
+> Id=130770; Class=Dimension; Category=Constraints; Name=Linear Dimension Style
+</pre>
+
+<p>So the locking information is stored in a separate element.
+I thought it might be might be possible to find the connection between these two elements and use that to determine the locked status of the dimension element.
+I also hoped that an analysis of the underlying geometry of the two elements would discover that one of them is a lock constraint for the other.</p>
+
+<p>If I remove the lock again, the constraint element id remains in the file but is invalid.
+Putting the lock back in again removes the invalid constraint element and adds a new one with a new element id:</p>
+
+<pre>
+diff RevitElementsAfterDimension.txt RevitElements.txt
+2260a2261
+> Id=130813; Class=Dimension; Category=Constraints; Name=Linear Dimension Style
+</pre>
+
+<p>The constraint element has almost no accessible data, but it does have a valid class, category and name.
+It has a Location property, but we cannot access its internal data either.
+As a Dimension instance, it also has a Curve property and a ReferenceArray.
+I tried to use these to determine that this constraint matches the existing dimension and is locking it.</p>
+
+<p>Here is the code for the Execute method of an external command that I used to explore this in a model with exactly one locked dimension in it, so that the dimension element 'd' and the constraint 'c' are both well defined:</p>
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">CreationFilter</span> cf = app.Create.Filter;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+&nbsp;
+<span class="teal">Filter</span> f1 = cf.NewCategoryFilter(
+&nbsp; <span class="teal">BuiltInCategory</span>.OST_Dimensions );
+&nbsp;
+<span class="teal">Filter</span> f2 = cf.NewTypeFilter(
+&nbsp; <span class="blue">typeof</span>( <span class="teal">Dimension</span> ) );
+&nbsp;
+<span class="teal">Filter</span> f = cf.NewLogicAndFilter( f1, f2 );
+&nbsp;
+<span class="teal">ElementIterator</span> iter = doc.get_Elements( f );
+&nbsp;
+<span class="teal">Dimension</span> d = <span class="blue">null</span>;
+&nbsp;
+<span class="blue">while</span>( iter.MoveNext() )
+{
+&nbsp; d = iter.Current <span class="blue">as</span> <span class="teal">Dimension</span>;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != d,
+&nbsp; &nbsp; <span class="maroon">"expected to find a dimension element"</span> );
+&nbsp;
+&nbsp; <span class="blue">break</span>;
+}
+&nbsp;
+f1 = cf.NewCategoryFilter(
+&nbsp; <span class="teal">BuiltInCategory</span>.OST_Constraints );
+&nbsp;
+f = cf.NewLogicAndFilter( f1, f2 );
+&nbsp;
+iter = doc.get_Elements( f );
+&nbsp;
+<span class="teal">Dimension</span> c = <span class="blue">null</span>;
+&nbsp;
+<span class="blue">while</span>( iter.MoveNext() )
+{
+&nbsp; c = iter.Current <span class="blue">as</span> <span class="teal">Dimension</span>;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != c,
+&nbsp; &nbsp; <span class="maroon">"expected to find a constraint element"</span> );
+&nbsp;
+&nbsp; <span class="blue">break</span>;
+}
+&nbsp;
+<span class="green">// both locations have no valid information:</span>
+<span class="teal">Location</span> locc = c.Location;
+<span class="teal">Location</span> locd = d.Location;
+&nbsp;
+<span class="green">// both lines have no valid information:</span>
+<span class="teal">Line</span> linc = c.Curve <span class="blue">as</span> <span class="teal">Line</span>;
+<span class="teal">Line</span> lind = d.Curve <span class="blue">as</span> <span class="teal">Line</span>;
+&nbsp;
+<span class="green">// this throws an exception:</span>
+<span class="green">//XYZ pc = linc.get_EndPoint( 0 ); </span>
+<span class="green">//XYZ qc = linc.get_EndPoint( 1 );</span>
+<span class="green">//XYZ pd = lind.get_EndPoint( 0 );</span>
+<span class="green">//XYZ qd = lind.get_EndPoint( 1 );</span>
+&nbsp;
+<span class="green">// this cast returns null:</span>
+<span class="teal">LocationCurve</span> locc2 = c.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+<span class="teal">LocationCurve</span> locd2 = d.Location <span class="blue">as</span> <span class="teal">LocationCurve</span>;
+&nbsp;
+<span class="teal">ReferenceArray</span> rc = c.References;
+<span class="teal">ReferenceArray</span> rd = d.References;
+&nbsp;
+<span class="blue">if</span>( rc.Size == rd.Size )
+{
+&nbsp; <span class="teal">ReferenceArrayIterator</span> ic = rc.ForwardIterator();
+&nbsp; <span class="teal">ReferenceArrayIterator</span> id = rd.ForwardIterator();
+&nbsp; <span class="blue">while</span>( ic.MoveNext() &amp;&amp; id.MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Reference</span> r1 = ic.Current <span class="blue">as</span> <span class="teal">Reference</span>;
+&nbsp; &nbsp; <span class="teal">Reference</span> r2 = id.Current <span class="blue">as</span> <span class="teal">Reference</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( r1.Equals( r2 ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// this never happens:</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">"Equal"</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+</pre>
+
+<p>Unfortunately, none of the attempts to read some valid geometrical information return anything useful.
+I also explored the parameters of both elements, and found no link there either.
+The constraint has no official parameters at all, and the hidden ones provide no clue.</p>
+
+<p>They both have a reference array with two elements each.
+The elements in the reference arrays do not compare equal, and trying to explore their innards leads us to an undocumented Pick object which we cannot explore further.</p>
+
+<p>Even if this exploration in Revit 2009 did not lead us anywhere useful, we still discovered some interesting background information on dimensioning and locking in Revit.</p>
+
+<p>And here come two pieces of good news at the end:</p>
+
+<p>First, in the Revit 2010 API, you can simply use the new properties Dimension.IsLocked and DimensionSegment.IsLocked.</p>
+
+<h4>How to Unlock all Dimensions</h4>
+
+<p>Later, Pierre followed up with a useful new result and an additional question:</p>
+
+<blockquote>
+<p>I've got the code now to get all constraints.
+When I delete them, the effect is that the dimensions are unlocked.
+That's good.</p>
+
+<p>I'd like to store the original constraints before deleting them in order to relock the dimensions afterwards;
+do you think that is possible?</p>
+</blockquote>
+
+<p>I am glad that we at least discovered a possibility to unlock the locked dimensions.
+Unfortunately, I cannot think of any way to store the constraints prior to deleting them, since we have no access to their internal data.
+Maybe they could be copied into a different database beforehand?
+But then it might be necessary to copy additional objects as well to preserve the associativity, and I cannot see a way to achieve this.
+Or just move them away somewhere where they do no harm instead of deleting them to unlock, and then move them back again to the original position to lock again?</p>

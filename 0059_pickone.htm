@@ -1,0 +1,78 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>PickOne</h3>
+
+<p>Here is a small note on how to make use of the PickOne Revit element selection method.</p>
+
+<p>For any source code example of how to use any Revit API method, one obvious to start looking is always the global solution SDKSamples2009.sln in the SDK Samples folder.</p>
+
+<p>PickOne is used in the Revit SDK samples VisibilityControl and PowerCircuit. You can see this by opening SDKSamples2009.sln and searching globally for PickOne(). This returns a list of hits, e.g.:</p>
+
+<pre>
+C:\SDK\Samples\VisibilityControl\CS\VisibilityCtrl.cs(138):
+m_document.Selection.PickOne();
+
+C:\SDK\Samples\PowerCircuit\CS\CircuitOperationData.cs(518):
+if (!m_revitDoc.Selection.PickOne())
+</pre>
+
+<p>Here is an excerpt from the VisibilityControl sample, slightly cleaned up and reformatted for readability, and with some numbered comments added in bold:</p>
+
+<pre class="code">
+<span class="blue">public</span> <span class="blue">void</span> Isolate()
+{
+&nbsp; <span class="green"><b>// 1. clear selection:</b></span>
+&nbsp; m_document.Selection.Elements.Clear();
+&nbsp; <span class="blue">switch</span> (m_isolateMode)
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">IsolateMode</span>.PickOne:
+&nbsp; &nbsp; &nbsp; <span class="green"><b>// 2. pick one element:</b></span>
+&nbsp; &nbsp; &nbsp; m_document.Selection.PickOne();
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">case</span> <span class="teal">IsolateMode</span>.WindowSelect:
+&nbsp; &nbsp; &nbsp; m_document.Selection.WindowSelect();
+&nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green"><b>// 3. retrieve selected elements:</b></span>
+&nbsp; Autodesk.Revit.<span class="teal">ElementSet</span> elements
+&nbsp; &nbsp; = m_document.Selection.Elements;
+&nbsp;
+&nbsp; <span class="green">// hide all categories elements</span>
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Category</span> cat <span class="blue">in</span>
+&nbsp; &nbsp; m_document.Settings.Categories )
+&nbsp; {
+&nbsp; &nbsp; SetVisibility(<span class="blue">false</span>, cat.Name);
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green"><b>// 4. make use of selected elements:</b></span>
+&nbsp; <span class="green">// set the selection elements visibility</span>
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Element</span> element <span class="blue">in</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Category</span> cat = element.Category;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != cat
+&nbsp; &nbsp; &nbsp; &amp;&amp; !<span class="blue">string</span>.IsNullOrEmpty( cat.Name ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; SetVisibility( <span class="blue">true</span>, cat.Name );
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>The PickOne method manipulates the document's current selection set, accessible through the document Selection property.
+The bold numbered comments correspond to the critical steps:</p>
+
+<ol>
+<li>Clear the current selection.</li>
+<li>Execute the PickOne method.</li>
+<li>Access the updated selection set.</li>
+<li>Do something with the selected elements.</li>
+</ol>
+
+<p>Hopefully this clarifies the use of the PickOne method.</p>

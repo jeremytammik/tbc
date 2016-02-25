@@ -1,0 +1,447 @@
+<style type="text/css">
+.green { color: green; }
+.blue { color: blue; }
+.gray { color: gray; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+</style>
+
+<h3>Units</h3>
+
+<p>In the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/09/selecting-all-w.html">previous post</a>,
+
+we noted that the area parameter for a wall had a numerical value of 283.65 on one hand, but a string representation of '26.352 m²' on the other. The reason for these two different values is that Revit internally works with a fixed set of database units for different measurement types. These internal database units cannot be changed. All raw database values obtained from attributes will always be returned and expected in database units. Some of the internal database length units are imperial. The database unit for length is feet, and areas are stored in square feet.
+The units used are not the standardised
+
+<a href="http://nostalgia.wikipedia.org/wiki/SI_unit">SI units</a>
+
+according to the International System of Units SI.</p>
+
+<p>Similarly, if we examine the thickness of a 200 mm wall, e.g. one using the system family 'Basic Wall' and the type 'Generic - 200.0 mm', its thickness is available in the type parameter 'width'. It appears to have the value 200 mm in the user interface, if set up to display metric length units. Looking at the actual value of the underlying parameter, however, returns a completely different number, something like 0.6561. 0.6561 feet is 0.6561 * 12 = 7.8732 inches, which corresponds to 7.8732 * 25.4 = 199.97928 millimetres.</p>
+
+<p>The user interface settings affecting the display of units in Revit can be queried through the API. The ProjectUnit SDK sample demonstrates how to do this.
+The units displayed in the user interface can be queried through the read-only Document.DisplayUnitSystem property. The Parameter.DisplayUnitType property determines how any individual parameter is displayed in the user interface. The DisplayUnitType enumeration lists all the supported display unit types.</p>
+
+<p>It can sometimes be tricky to figure out exactly what units Revit is using internally, for instance when analysing things like point, line and area loads in Revit Structure.
+For these loads, the units used are in terms of N and m, unlike other parameters and co-ordinates which use feet for all lengths.</p>
+
+<p>The good news, and the main message of this post, is that you do not really have to care what units Revit is using internally. All you need to do is some little research to determine a valid conversion factor. You can enter the unit value for whatever you are interested in in the user interface, and then check what the API reports. It will always be in the same internal units. This can then be used as a conversion factor for that specific unit. It works consistently. Possibly you may refine this depending on the metric or imperial Revit setting, but the factors are the same and consistent.</p>
+
+<p>So the simplest thing to do to determine the conversion factor to use is to set the parameter to 1 in the user interface and then observe the value returned by the API, which gives the conversion factor between the two.</p>
+
+<p>I am appending a small utility class UnitConversion.cs which may be of use in this context, even if just to give you a first impression of how these issues may be handled. I am not saying that this is the optimal solution. It includes some useful constants and stems from the Midas Link Revit Structure sample application which is available including source code on the ADN web site. By the way, the updated MidasLink version for Revit 2009 has just been posted to ADN, in case you are interested. Please excuse the fact that the source code lines exceed the blog display width. To obtain and review the full source code, please simply copy and paste it to notepad or some other editor.</p>
+
+<pre class="code"><span class="green">// (C) Copyright 2003-2007 by Autodesk, Inc.</span>
+<span class="green">//</span>
+<span class="green">// Permission to use, copy, modify, and distribute this software in</span>
+<span class="green">// object code form for any purpose and without fee is hereby granted,</span>
+<span class="green">// provided that the above copyright notice appears in all copies and</span>
+<span class="green">// that both that copyright notice and the limited warranty and</span>
+<span class="green">// restricted rights notice below appear in all supporting</span>
+<span class="green">// documentation.</span>
+<span class="green">//</span>
+<span class="green">// AUTODESK PROVIDES THIS PROGRAM "AS IS" AND WITH ALL FAULTS.</span>
+<span class="green">// AUTODESK SPECIFICALLY DISCLAIMS ANY IMPLIED WARRANTY OF</span>
+<span class="green">// MERCHANTABILITY OR FITNESS FOR A PARTICULAR USE. AUTODESK, INC.</span>
+<span class="green">// DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE</span>
+<span class="green">// UNINTERRUPTED OR ERROR FREE.</span>
+<span class="green">//</span>
+<span class="green">// Use, duplication, or disclosure by the U.S. Government is subject to</span>
+<span class="green">// restrictions set forth in FAR 52.227-19 (Commercial Computer</span>
+<span class="green">// Software - Restricted Rights) and DFAR 252.227-7013(c)(1)(ii)</span>
+<span class="green">// (Rights in Technical Data and Computer Software), as applicable.</span>
+<span class="green">//</span>
+&nbsp;
+<span class="blue">using</span> System;
+<span class="blue">using</span> System.Collections.Generic;
+<span class="blue">using</span> System.Text;
+<span class="blue">using</span> System.Collections;
+<span class="blue">using</span> System.Windows.Forms;
+<span class="blue">using</span> System.Diagnostics;
+&nbsp;
+<span class="blue">using</span> Autodesk.Revit;
+<span class="blue">using</span> Autodesk.Revit.Elements;
+<span class="blue">using</span> Autodesk.Revit.Enums;
+<span class="blue">using</span> Autodesk.Revit.Parameters;
+&nbsp;
+<span class="blue">namespace</span> Revit.MGT
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Unit conversion - convert values from standard units to given units.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">class</span> <span class="teal">UnitConversionFactors</span>
+&nbsp; {
+<span class="blue">&nbsp; &nbsp; #region</span> Class Member Variables
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Standard units</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">string</span> m_FromUnits;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Given units</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">string</span> m_ToUnits;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> true: conversion available for given units</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">bool</span> m_RatioSetUpSucceeded;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> To store length ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">double</span> m_LengthRatio;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> To store point load ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">double</span> m_PointLoadRatio;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> To store point load moment ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">double</span> m_PointLoadMomentRatio;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> To store line load ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">double</span> m_LineLoadRatio;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> To store line moment ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">double</span> m_LineMomentRatio;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> To store area load ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">double</span> m_AreaLoadRatio;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> To store stress ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">double</span> m_StressRatio;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> To store unit weight ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">double</span> m_UnitWeightRatio;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> To store point spring ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">double</span> m_PointSpringRatio;
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> To store rotational point spring ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">double</span> m_RotationalPointSpringRatio;
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #endregion</span>
+&nbsp;
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #region</span> Class Public Properties
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Get FromUnits</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> FromUnits
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_FromUnits;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Get ToUnits</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> ToUnits
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_ToUnits;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Get RatioSetUpSucceeded</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">bool</span> RatioSetUpSucceeded
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_RatioSetUpSucceeded;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Get length ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">double</span> LengthRatio
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_LengthRatio;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Get point load ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">double</span> PointLoadRatio
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_PointLoadRatio;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Get point load moment ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">double</span> PointLoadMomentRatio
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_PointLoadMomentRatio;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Get line load force ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">double</span> LineLoadForceRatio
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_LineLoadRatio;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Get line load moment ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">double</span> LineLoadMomentRatio
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_LineMomentRatio;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Get area load ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">double</span> AreaLoadRatio
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_AreaLoadRatio;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Get stress ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">double</span> StressRatio
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_StressRatio;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Get unit weight ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">double</span> UnitWeightRatio
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_UnitWeightRatio;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Get point sprint ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">double</span> PointSpringRatio
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_PointSpringRatio;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Get rotational point spring ratio</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">double</span> RotationalPointSpringRatio
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">get</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> m_RotationalPointSpringRatio;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+<span class="blue">&nbsp; &nbsp; #endregion</span>
+&nbsp;
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #region</span> Class Constructor
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Constructor</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name="lengthUnit"&gt;</span><span class="green">length unit</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name="forceUnit"&gt;</span><span class="green">forth unit</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> UnitConversionFactors(
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> lengthUnit,
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> forceUnit )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Initialize standard factors</span>
+&nbsp; &nbsp; &nbsp; InitializeConversionFactors();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Get length conversion factor</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> lenFactor = GetLengthConversionFactor(lengthUnit);
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span> (!m_RatioSetUpSucceeded)
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Get Force conversion factor</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> forceFactor = GetForceConversionFactor(forceUnit);
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span> (!m_RatioSetUpSucceeded)
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Set up all the conversion factors</span>
+&nbsp; &nbsp; &nbsp; m_ToUnits = lengthUnit + <span class="maroon">'-'</span> + forceUnit;
+&nbsp; &nbsp; &nbsp; SetUnitConversionFactors(lenFactor, forceFactor);
+&nbsp; &nbsp; }
+<span class="blue">&nbsp; &nbsp; #endregion</span>
+&nbsp;
+&nbsp;
+<span class="blue">&nbsp; &nbsp; #region</span> Class Implementation
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Initialize factor to convert internal units to standard ft, kips.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">void</span> InitializeConversionFactors()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Internally Revit stores length in feet and other quantities in metric units.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Thus the derived unit for force is stored in a non-standard unit: kg-ft/s**2.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// For example, m_PointLoadRatio below equals 1 (kip) / 14593.90 (kg-ft/s**2)</span>
+&nbsp; &nbsp; &nbsp; m_FromUnits = <span class="maroon">"ft-kips"</span>;
+&nbsp; &nbsp; &nbsp; m_ToUnits = <span class="maroon">""</span>;
+&nbsp; &nbsp; &nbsp; m_LengthRatio = 1;
+&nbsp; &nbsp; &nbsp; m_PointLoadRatio = 0.00006852176585679176;
+&nbsp; &nbsp; &nbsp; m_PointLoadMomentRatio = 0.00006852176585679176;
+&nbsp; &nbsp; &nbsp; m_LineLoadRatio = 0.00006852176585679176;
+&nbsp; &nbsp; &nbsp; m_LineMomentRatio = 0.00006852176585679176;
+&nbsp; &nbsp; &nbsp; m_AreaLoadRatio = 0.00006852176585679176;
+&nbsp; &nbsp; &nbsp; m_StressRatio = 0.00006852176585679176;
+&nbsp; &nbsp; &nbsp; m_UnitWeightRatio = 0.00006852176585679176;
+&nbsp; &nbsp; &nbsp; m_PointSpringRatio = 0.00006852176585679176;
+&nbsp; &nbsp; &nbsp; m_RotationalPointSpringRatio = 0.00006852176585679176 * 180 / <span class="teal">Math</span>.PI;&nbsp;  <span class="green">// Revit uses degrees, Midas uses radians</span>
+&nbsp; &nbsp; &nbsp; m_RatioSetUpSucceeded = <span class="blue">false</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Get length conversation factor</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name="lengthUnit"&gt;</span><span class="green">length unit type</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;</span><span class="green">length conversation factor</span><span class="gray">&lt;/returns&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">double</span> GetLengthConversionFactor(
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> lengthUnit )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> unitAvailable = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> lenFac = 0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">switch</span> (lengthUnit)
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="maroon">"ft"</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lenFac = 1;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="maroon">"in"</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lenFac = 12;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="maroon">"m"</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lenFac = 0.3048;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="maroon">"cm"</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lenFac = 30.48;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="maroon">"mm"</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lenFac = 304.8;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">default</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; unitAvailable = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; m_RatioSetUpSucceeded = unitAvailable;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> lenFac;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Get force conversation factor</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name="forceUnit"&gt;</span><span class="green">force unit</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;returns&gt;</span><span class="green">force conversation factor</span><span class="gray">&lt;/returns&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">double</span> GetForceConversionFactor(
+&nbsp; &nbsp; &nbsp; <span class="blue">string</span> forceUnit )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">bool</span> unitAvailable = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> forceFac = 0;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">switch</span> (forceUnit)
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="maroon">"kips"</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; forceFac = 1;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="maroon">"lbf"</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; forceFac = 1000;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="maroon">"kN"</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; forceFac = 4.4482216152605;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="maroon">"N"</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; forceFac = 4448.2216152605;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="maroon">"tonf"</span>: <span class="green">// metric tonne</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; forceFac = 4.4482216152605 * 0.101971999794;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">case</span> <span class="maroon">"kgf"</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; forceFac = 4448.2216152605 * 0.101971999794;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">default</span>:
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; unitAvailable = <span class="blue">false</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; m_RatioSetUpSucceeded = unitAvailable;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> forceFac;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Set length and force unit conversation factor</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name="lenFac"&gt;</span><span class="green">length unit factor</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;param name="forceFac"&gt;</span><span class="green">force unit factor</span><span class="gray">&lt;/param&gt;</span>
+&nbsp; &nbsp; <span class="blue">private</span> <span class="blue">void</span> SetUnitConversionFactors(
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> lenFac,
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> forceFac )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; m_LengthRatio *= (lenFac);
+&nbsp; &nbsp; &nbsp; m_PointLoadRatio *= (forceFac);
+&nbsp; &nbsp; &nbsp; m_PointLoadMomentRatio *= (forceFac * lenFac);
+&nbsp; &nbsp; &nbsp; m_LineLoadRatio *= (forceFac / lenFac);
+&nbsp; &nbsp; &nbsp; m_LineMomentRatio *= (forceFac);
+&nbsp; &nbsp; &nbsp; m_AreaLoadRatio *= (forceFac / lenFac / lenFac);
+&nbsp; &nbsp; &nbsp; m_StressRatio *= (forceFac / lenFac / lenFac);
+&nbsp; &nbsp; &nbsp; m_UnitWeightRatio *= (forceFac / lenFac / lenFac / lenFac);
+&nbsp; &nbsp; &nbsp; m_PointSpringRatio *= (forceFac / lenFac);
+&nbsp; &nbsp; &nbsp; m_RotationalPointSpringRatio *= (forceFac * lenFac);
+&nbsp; &nbsp; }
+<span class="blue">&nbsp; &nbsp; #endregion</span>
+&nbsp; }
+}</pre>

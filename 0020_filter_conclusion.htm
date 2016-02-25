@@ -1,0 +1,86 @@
+<style type="text/css">
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+</style>
+
+<h3>Filter Performance Conclusion</h3>
+
+<p>Continuing the topic of the 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/10/more-filter-per.html">
+Revit API filter performance</a>, 
+
+Guy responds to Ralf:</p>
+
+<p>Ralf raises some good points.</p>
+
+<p>A good point on the order in filters, I did not think about that and I did think the speed improvement was larger than normal. I've found in past testing using the TypeFilter in most cases 2-10% slower than using some form of .NET filtering for real world projects and where other filters are not appropriate.</p>
+
+<p>I agree that an anonymous method is not as elegant; I haven't used this method in any production code. It just gave you a list as per your original code. Almost without exception, all my commands use the ElementIterator getElements() rather than populating a list. And for that reason the point I should have made in the previous post was that IMO I still think the TypeFilter is redundant. This is how I would have processed the elements in the command:</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Filter</span> f1 = cf.NewCategoryFilter(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Doors );
+
+&nbsp; <span class="teal">Filter</span> f2 = cf.NewCategoryFilter(
+&nbsp; &nbsp; <span class="teal">BuiltInCategory</span>.OST_Windows );
+
+&nbsp; <span class="teal">Filter</span> f3 = cf.NewLogicOrFilter( f1, f2 );
+
+&nbsp; <span class="teal">ElementIterator</span> itor = doc.get_Elements( f3 );
+&nbsp; <span class="blue">int</span> n = 0;
+&nbsp; <span class="blue">while</span>( itor.MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( itor.Current <span class="blue">is</span> <span class="teal">FamilyInstance</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; n++;
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> elem = itor.Current
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Against the 100 MB project this is still 1-3% faster than including the type filter, even including the casting to a FamilyInstance.</p>
+
+<p>The other point Ralf raises is that x >> y where x is the total element number and y is the number of elements of interest, e.g. of the desired category. I would go a step further and say for most commands x >> y >> z, where z is the number of particular instances of a family you are interested in processing. For that reason a vast majority of production commands I've written use parameter filtering, yet I have none with type filtering.</p>
+
+<p>I've also found in testing that type filter performance is very dependent on whether a project has been recently purged of unused objects. As users will know, purging on a regular basis helps project performance. The difference in performance between a purged versus a non purged project for API commands can be very dramatic, as the total object count often drops significantly.</p>
+
+<p>As you can tell, I'm not a big fan of the type filter but every project is different ;-)</p>
+
+<p>For completeness sake, here is how I would use the ElementIterator in the original code:</p>
+
+<pre class="code">
+<span class="blue">private</span> <span class="teal">Dictionary</span>&lt;<span class="teal">ElementId</span>, <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;&gt;
+&nbsp; getElementIds( <span class="teal">ElementIterator</span> itor)
+{
+&nbsp; <span class="teal">Dictionary</span>&lt;<span class="teal">ElementId</span>, <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;&gt; dict
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">Dictionary</span>&lt;<span class="teal">ElementId</span>, <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;&gt;();
+
+&nbsp; <span class="blue">string</span> fmt = <span class="maroon">"{0} is hosted by {1}"</span>;
+
+&nbsp; <span class="blue">while</span>( itor.MoveNext() )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">object</span> elem = itor.Current;
+&nbsp; &nbsp; <span class="blue">if</span>( elem <span class="blue">is</span> <span class="teal">FamilyInstance</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi = elem <span class="blue">as</span> <span class="teal">FamilyInstance</span>;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> id = fi.Id;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">ElementId</span> idHost = fi.Host.Id;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format( fmt,
+&nbsp; &nbsp; &nbsp; &nbsp; ElementDescription( fi ),
+&nbsp; &nbsp; &nbsp; &nbsp; ElementDescription( idHost ) ) );
+
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( !dict.ContainsKey( idHost ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; dict.Add( idHost, <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">ElementId</span>&gt;() );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; dict[idHost].Add( id );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp; <span class="blue">return</span> dict;
+}
+</pre>

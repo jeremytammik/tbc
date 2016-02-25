@@ -1,0 +1,150 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Converting to Filters</h3>
+
+<p>This is a follow-up on the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/category-comparison.html">
+category comparison</a>
+
+topic we brought up during the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/verona-revit-api-training.html">
+Revit Structure API training in Verona</a>,
+
+Italy.
+We first ran into a language problem in the Revit SDK FrameBuilder sample and fixed that by converting the language dependent category comparison code to a language independent version.
+Stefano Carradore did not let it rest at that but went one step further and converted the old-fashioned and ineffective 2008-style iteration to a more effective style making use of the 2009-style API filtering functionality.</p>
+
+<p>As noted in the discussion of the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/category-comparison.html">
+category comparison</a>,
+
+the FrameBuilder sample works with structural beams and framing elements.
+It implements a FrameData class which defines an Initialize() method to set up internal collections of column, beam and brace symbols.
+They are sorted into different lists depending on their type, which is determined by comparing the category names.
+In the original SDK sample, the iteration is performed over all Revit elements.
+It picks out all the Level elements on one hand, and the structural framing and columns on the other.
+The levels are identified by their class, i.e. System.Type, and the structural elements by their category name.
+We already showed how to convert the category name comparison to a comparison of the category element id to remove the language dependence, which was preventing the code from running on the Italian version of Revit.
+Still, the 2008-style iteration over the entire collection of all Revit elements remains extremely inefficient.</p>
+
+<p>In Stefano's new implementation, we make use of two separate API filters to extract the levels and the structural elements. This has the additional advantage of being intrinsically language independent.</p>
+
+<p>Here is the original code:</p>
+
+<pre class="code">
+<span class="teal">ElementIterator</span> itor
+  = m_commandData.Application.ActiveDocument.Elements;
+
+itor.Reset();
+<span class="blue">while</span> (itor.MoveNext())
+{
+&nbsp; <span class="blue">object</span> obj = itor.Current;
+&nbsp;
+&nbsp; <span class="green">// add level to list</span>
+&nbsp; <span class="teal">Level</span> aLevel = obj <span class="blue">as</span> <span class="teal">Level</span>;
+&nbsp; <span class="blue">if</span> (<span class="blue">null</span> != aLevel)
+&nbsp; {
+&nbsp; &nbsp; m_levels.Add(aLevel.Elevation, aLevel);
+&nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="green">// get Family to get FamilySymbols</span>
+&nbsp; <span class="teal">Family</span> aFamily = obj <span class="blue">as</span> <span class="teal">Family</span>;
+&nbsp; <span class="blue">if</span> (<span class="blue">null</span> == aFamily)
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">foreach</span> (<span class="teal">FamilySymbol</span> symbol <span class="blue">in</span> aFamily.Symbols)
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span> (<span class="blue">null</span> == symbol.Category)
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">continue</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="green">// add symbols to lists according to category name</span>
+&nbsp; &nbsp; <span class="blue">string</span> categoryName = symbol.Category.Name;
+&nbsp; &nbsp; <span class="blue">if</span> (<span class="maroon">"Structural Framing"</span> == categoryName)
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; m_beambracesSymbolsMgr.AddSymbol(symbol);
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span> (<span class="maroon">"Structural Columns"</span> == categoryName)
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; m_columnSymbolsMgr.AddSymbol(symbol);
+&nbsp; &nbsp; }
+&nbsp; }
+}
+</pre>
+
+<p>We replace this code by two separate API filters.
+We could also use three filters, replacing the loop sorting the structural elements into the two separate collections by two separate dedicated filters, one each for columns and framing elements:</p>
+
+<pre class="code">
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; a = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+
+doc.get_Elements( <span class="blue">typeof</span>( <span class="teal">Level</span> ), a );
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">Level</span> lev <span class="blue">in</span> a )
+{
+&nbsp; m_levels.Add( lev.Elevation, lev );
+}
+&nbsp;
+a.Clear();
+
+Autodesk.Revit.Creation.<span class="teal">Filter</span> cf
+&nbsp; = app.Create.Filter;
+&nbsp;
+<span class="teal">Filter</span> filterSymbols
+&nbsp; = cf.NewTypeFilter( <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ) );
+
+<span class="teal">Filter</span> filterCols
+&nbsp; = cf.NewCategoryFilter( bipColumn );
+
+<span class="teal">Filter</span> filterFram
+&nbsp; = cf.NewCategoryFilter( bipFraming );
+
+<span class="teal">Filter</span> filterStruct
+&nbsp; = cf.NewLogicOrFilter( filterCols, filterFram );
+
+<span class="teal">Filter</span> filter
+&nbsp; = cf.NewLogicAndFilter( filterSymbols, filterStruct );
+&nbsp;
+doc.get_Elements( filter, a );
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> symbol <span class="blue">in</span> a )
+{
+&nbsp; <span class="teal">ElementId</span> categoryId = symbol.Category.Id;
+&nbsp;
+&nbsp; <span class="blue">if</span>( idFraming.Equals( categoryId ) )
+&nbsp; {
+&nbsp; &nbsp; m_beambracesSymbolsMgr.AddSymbol( symbol );
+&nbsp; }
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( idColumn.Equals( categoryId ) )
+&nbsp; {
+&nbsp; &nbsp; m_columnSymbolsMgr.AddSymbol( symbol );
+&nbsp; }
+}
+</pre>
+
+<p>When filtering only for the System.Type FamilySymbol without the additional check for the structural categories, our sample project was returning over 500 family symbols.
+Adding the category filters reduced this number to 40.</p>
+
+<p>
+
+<a href="C:/a/lib/revit/2009/SDK/Samples/FrameBuilder/CS/FrameData.cs">
+Here</a>
+
+is the updated source code for
+
+<a href="C:/a/lib/revit/2009/SDK/Samples/FrameBuilder/CS/FrameData.cs">
+FrameData.cs</a>
+
+with the three different variants enclosed in conditional compilation pragmas.</p>

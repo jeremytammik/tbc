@@ -1,0 +1,290 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Compound Wall Layer Volumes</h3>
+
+<p>Here I continue the discussion of one of the topics that were raised in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/verona-revit-api-training.html">
+Revit API training in Verona</a>
+
+last week.
+
+<p>We can combine the two discussion strands analysing
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/12/3d-polygon-areas.html">
+wall areas</a>
+
+and
+
+<a href="http://thebuildingcoder.typepad.com/blog/2008/11/wall-compound-layers.html">
+compound wall layers</a>
+
+to calculate the volumes of each individual layer in a compound wall.</p>
+
+<p>In our initial idea for implementing this, we thought of making use of the wall area that we calculated ourselves from the appropriate face of the wall's solid geometry.
+Whatever method we use to determine the area, there will be some imprecision in the calculation, since the wall profile area will be calculated either for the inner or outer face of the wall, which will not exactly match the area of some of the interior layers, depending on how the wall layers connect in the corners and wall intersections.</p>
+
+<p>Later, we discovered that a simpler and sometimes exact approach is given by using the value of the built-in parameter HOST_AREA_COMPUTED instead.
+In a compound wall with multiple layers, we can simply multiply this value with the thickness of each of the component layers to obtain the volume of each layer.
+We implemented a test to compare the sum of all the component layer volumes with the total wall volume obtained from the HOST_VOLUME_COMPUTED parameter.
+Depending on the type of wall connection, the two results are sometimes exactly equal.<p>
+
+<p>Since the Revit database unit for length is feet, all our raw values will be in feet for length, square feet for area, and cubic feet for volume. We convert the data to metric before displaying it.</p>
+
+<p>To store the cumulated volumes for each wall layer as well as the wall total, we make use of a dictionary mapping a key to a double number representing the volume. The key is defined by concatenating the wall type name and the layer function, using the string " : " as a separator.</p>
+
+<p>Since we want to cumulate the volumes for all selected walls, we implemented a derived class MapLayerToVolume with a Cumulate method. If we used the generic Dictionary class directly, we would have to use the ContainsKey as well as the Add method to check whether the key is present before adding to its volume:</p>
+
+<pre class="code">
+<span class="blue">class</span> <span class="teal">MapLayerToVolume</span>
+&nbsp; : <span class="teal">Dictionary</span>&lt;<span class="blue">string</span>, <span class="blue">double</span>&gt;
+{
+&nbsp; <span class="blue">public</span> <span class="blue">void</span> Cumulate(
+&nbsp; &nbsp; <span class="blue">string</span> key,
+&nbsp; &nbsp; <span class="blue">double</span> value )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">if</span>( !ContainsKey( key ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">this</span>[key] = 0.0;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">this</span>[key] += value;
+&nbsp; }
+}
+</pre>
+
+<p>We define constants for the two parameters we are interested in and a little helper method to retrieve their values from a given wall:</p>
+
+<pre class="code">
+<span class="blue">const</span> <span class="teal">BuiltInParameter</span> _bipArea
+&nbsp; = <span class="teal">BuiltInParameter</span>.HOST_AREA_COMPUTED;
+&nbsp;
+<span class="blue">const</span> <span class="teal">BuiltInParameter</span> _bipVolume
+&nbsp; = <span class="teal">BuiltInParameter</span>.HOST_VOLUME_COMPUTED;
+&nbsp;
+<span class="blue">double</span> GetWallParameter(
+&nbsp; <span class="teal">Wall</span> wall,
+&nbsp; <span class="teal">BuiltInParameter</span> bip )
+{
+&nbsp; <span class="teal">Parameter</span> p = wall.get_Parameter( bip );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != p,
+&nbsp; &nbsp; <span class="maroon">"expected wall to have "</span>
+&nbsp; &nbsp; + <span class="maroon">"HOST_AREA_COMPUTED and "</span>
+&nbsp; &nbsp; + <span class="maroon">"HOST_VOLUME_COMPUTED parameters"</span> );
+&nbsp;
+&nbsp; <span class="blue">return</span> p.AsDouble();
+}
+</pre>
+
+<p>The method GetWallLayerVolumes uses this helper method to determine and cumulate the compound wall layer volumes for a given wall:</p>
+
+<pre class="code">
+<span class="blue">void</span> GetWallLayerVolumes(
+&nbsp; <span class="teal">Wall</span> wall,
+&nbsp; <span class="blue">ref</span> <span class="teal">MapLayerToVolume</span> totalVolumes )
+{
+&nbsp; <span class="teal">WallType</span> wt = wall.WallType;
+&nbsp;
+&nbsp; <span class="teal">CompoundStructure</span> structure
+&nbsp; &nbsp; = wt.CompoundStructure;
+&nbsp;
+&nbsp; <span class="teal">CompoundStructureLayerArray</span> layers
+&nbsp; &nbsp; = structure.Layers;
+&nbsp;
+&nbsp; <span class="blue">int</span> i, n = layers.Size;
+&nbsp; <span class="blue">double</span> area = GetWallParameter( wall, _bipArea );
+&nbsp; <span class="blue">double</span> volume = GetWallParameter( wall, _bipVolume );
+&nbsp; <span class="blue">double</span> thickness = wt.Width;
+&nbsp;
+&nbsp; <span class="blue">string</span> desc = <span class="teal">Util</span>.ElementDescription( wall );
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; <span class="maroon">"{0} with thickness {1}"</span>
+&nbsp; &nbsp; + <span class="maroon">" and volume {2}"</span>
+&nbsp; &nbsp; + <span class="maroon">" has {3} layer{4}{5}"</span>,
+&nbsp; &nbsp; desc,
+&nbsp; &nbsp; <span class="teal">Util</span>.MmString( thickness ),
+&nbsp; &nbsp; <span class="teal">Util</span>.RealString( volume ),
+&nbsp; &nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ),
+&nbsp; &nbsp; <span class="teal">Util</span>.DotOrColon( n ) ) );
+&nbsp;
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// volume for entire wall:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="blue">string</span> key = wall.WallType.Name;
+&nbsp; totalVolumes.Cumulate( key, volume );
+&nbsp;
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="green">// volume for compound wall layers:</span>
+&nbsp; <span class="green">//</span>
+&nbsp; <span class="blue">if</span>( 0 &lt; n )
+&nbsp; {
+&nbsp; &nbsp; i = 0;
+&nbsp; &nbsp; <span class="blue">double</span> total = 0.0;
+&nbsp; &nbsp; <span class="blue">double</span> layerVolume;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">CompoundStructureLayer</span>
+&nbsp; &nbsp; &nbsp; layer <span class="blue">in</span> layers )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; key = wall.WallType.Name + <span class="maroon">" : "</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + layer.Function;
+&nbsp;
+&nbsp; &nbsp; &nbsp; layerVolume = area * layer.Thickness;
+&nbsp;
+&nbsp; &nbsp; &nbsp; totalVolumes.Cumulate( key, layerVolume );
+&nbsp; &nbsp; &nbsp; total += layerVolume;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.WriteLine( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">"&nbsp; Layer {0}: function {1}, "</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">"thickness {2}, volume {3}"</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; ++i, layer.Function,
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.MmString( layer.Thickness ),
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.RealString( layerVolume ) ) );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">"Wall volume = {0},"</span>
+&nbsp; &nbsp; &nbsp; + <span class="maroon">" total layer volume = {1}"</span>,
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.RealString( volume ),
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.RealString( total ) );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !<span class="teal">Util</span>.IsEqual( volume, total ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">"Wall host volume parameter"</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">" value differs from sum of all layer"</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">" volumes: {0}"</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; volume - total );
+&nbsp; &nbsp; }
+}
+</pre>
+
+<p>It iterates over each layer in the compound structure of the wall and determines its volume by multiplying the wall area with the layer thickness.
+It checks whether the total wall volume obtained from the HOST_VOLUME_COMPUTED parameter is equal to the sum of all the individual layer volumes and reports the difference if this is not the case.</p>
+
+<p>The mainline of the command selects the walls to process, applies GetWallLayerVolumes to each one in turn, and presents the results.
+The user can preselect some specific walls, otherwise all walls in the project will be processed:</p>
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; walls = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+<span class="blue">if</span>( !<span class="teal">Util</span>.GetSelectedElementsOrAll(
+&nbsp; walls, doc, <span class="blue">typeof</span>( <span class="teal">Wall</span> ) ) )
+{
+&nbsp; <span class="teal">Selection</span> sel = doc.Selection;
+&nbsp; message = ( 0 &lt; sel.Elements.Size )
+&nbsp; &nbsp; ? <span class="maroon">"Please select some wall elements."</span>
+&nbsp; &nbsp; : <span class="maroon">"No wall elements found."</span>;
+&nbsp; <span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+}
+&nbsp;
+<span class="teal">MapLayerToVolume</span> totalVolumes
+&nbsp; = <span class="blue">new</span> <span class="teal">MapLayerToVolume</span>();
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">Wall</span> wall <span class="blue">in</span> walls )
+{
+&nbsp; GetWallLayerVolumes( wall, <span class="blue">ref</span> totalVolumes );
+}
+&nbsp;
+<span class="blue">string</span> msg
+&nbsp; = <span class="maroon">"Compound wall layer volumes formatted as '"</span>
+&nbsp; + <span class="maroon">"wall type : layer function :"</span>;
+&nbsp; + <span class="maroon">" volume in cubic meters':\n"</span>;
+&nbsp;
+<span class="teal">List</span>&lt;<span class="blue">string</span>&gt; keys = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="blue">string</span>&gt;(
+&nbsp; totalVolumes.Keys );
+&nbsp;
+keys.Sort();
+&nbsp;
+<span class="blue">foreach</span>( <span class="blue">string</span> key <span class="blue">in</span> keys )
+{
+&nbsp; msg += <span class="maroon">"\n"</span> + key + <span class="maroon">" : "</span>
+&nbsp; &nbsp; + <span class="teal">Util</span>.RealString(
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.CubicFootToCubicMeter(
+&nbsp; &nbsp; &nbsp; totalVolumes[key] ) );
+}
+&nbsp;
+<span class="teal">Util</span>.InfoMsg( msg );
+&nbsp;
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Cancelled;
+</pre>
+
+<p>The command returns CmdResult.Cancelled, because no changes have been made to the Revit database.
+If we return Succeeded, the document is unnecessarily marked as dirty.</p>
+
+<p>Before displaying the volumes, they are converted from the raw internal cubic feet units to cubic meters using a new utility function CubicFootToCubicMeter:</p>
+
+<pre class="code">
+<span class="blue">const</span> <span class="blue">double</span> _convertFootToMm = 12 * 25.4;
+&nbsp;
+<span class="blue">const</span> <span class="blue">double</span> _convertFootToMeter
+&nbsp; = _convertFootToMm * 0.001;
+&nbsp;
+<span class="blue">const</span> <span class="blue">double</span> _convertCubicFootToCubicMeter
+&nbsp; = _convertFootToMeter
+&nbsp; * _convertFootToMeter
+&nbsp; * _convertFootToMeter;
+&nbsp;
+<span class="blue">static</span> <span class="blue">public</span> <span class="blue">double</span> CubicFootToCubicMeter(
+  <span class="blue">double</span> volume )
+{
+&nbsp; <span class="blue">return</span> volume * _convertCubicFootToCubicMeter;
+}
+</pre>
+
+<p>Here is the debug output produced by running this analysis in a simple project with just a few walls:</p>
+
+<pre>
+Walls <130328 Exterior - Block on Mtl. Stud> with thickness 460 mm and volume 679.68 has 7 layers:
+  Layer 1: function Finish1, thickness 200 mm, volume 295.51
+  Layer 2: function ThermalOrAir, thickness 76 mm, volume 112.29
+  Layer 3: function MembraneLayer, thickness 0 mm, volume 0
+  Layer 4: function Substrate, thickness 19 mm, volume 28.07
+  Layer 5: function Structure, thickness 152 mm, volume 224.59
+  Layer 6: function MembraneLayer, thickness 0 mm, volume 0
+  Layer 7: function Finish2, thickness 13 mm, volume 19.21
+Wall volume = 679.68, total layer volume = 679.68
+
+Walls <130357 Exterior - Block on Mtl. Stud> with thickness 460 mm and volume 489.94 has 7 layers:
+  Layer 1: function Finish1, thickness 200 mm, volume 213.02
+  Layer 2: function ThermalOrAir, thickness 76 mm, volume 80.95
+  Layer 3: function MembraneLayer, thickness 0 mm, volume 0
+  Layer 4: function Substrate, thickness 19 mm, volume 20.24
+  Layer 5: function Structure, thickness 152 mm, volume 161.89
+  Layer 6: function MembraneLayer, thickness 0 mm, volume 0
+  Layer 7: function Finish2, thickness 13 mm, volume 13.85
+Wall volume = 489.94, total layer volume = 489.94
+
+Walls <130424 Generic - 200mm> with thickness 200 mm and volume 791.05 has 1 layer:
+  Layer 1: function Structure, thickness 200 mm, volume 791.05
+Wall volume = 791.05, total layer volume = 791.05
+
+Compound wall layer volumes formatted as 'wall type : layer function : volume in cubic meters':
+
+Exterior - Block on Mtl. Stud : 33.12
+Exterior - Block on Mtl. Stud : Finish1 : 14.4
+Exterior - Block on Mtl. Stud : Finish2 : 0.94
+Exterior - Block on Mtl. Stud : MembraneLayer : 0
+Exterior - Block on Mtl. Stud : Structure : 10.94
+Exterior - Block on Mtl. Stud : Substrate : 1.37
+Exterior - Block on Mtl. Stud : ThermalOrAir : 5.47
+Generic - 200mm : 22.4
+Generic - 200mm : Structure : 22.4
+</pre>
+
+<p>To see the full text, you will have to copy and paste to a text editor.</p>
+
+<p>The final result is displayed in a dialogue box:</p>
+
+<img src="img/compound_wall_layer_volumes.png" alt="Compound wall layer volumes"/>
+
+<p>Here is an updated
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/bc10021.zip">
+version 1.0.0.21</a>
+
+of the complete Visual Studio solution with this new command implementation.</p>

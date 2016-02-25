@@ -1,0 +1,57 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Filter for Hosted Elements</h3>
+
+<p>Today was the last day of the Revit programming training here in Barcelona.
+One of the items we examined is
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/barcelona-questions.html#retrieve_windows_hosted_by_a_wall">
+yesterday's suggestion</a>
+
+to use API filtering and the HOST_ID_PARAM to select the doors and windows hosted by a specific wall. Here is a code snippet that implements this and displays the result in a message box:</p>
+
+<pre class="code">
+<span class="teal">ElementId</span> id = wall.Id;
+<span class="teal">Type</span> t = <span class="blue">typeof</span>( <span class="teal">FamilyInstance</span> );
+<span class="teal">BuiltInCategory</span> bicd = <span class="teal">BuiltInCategory</span>.OST_Doors;
+<span class="teal">BuiltInCategory</span> bicw = <span class="teal">BuiltInCategory</span>.OST_Windows;
+<span class="teal">BuiltInParameter</span> bip = <span class="teal">BuiltInParameter</span>.HOST_ID_PARAM;
+&nbsp;
+Autodesk.Revit.Creation.<span class="teal">Filter</span> cf = app.Create.Filter;
+<span class="teal">Filter</span> f1 = cf.NewCategoryFilter( bicd );
+<span class="teal">Filter</span> f2 = cf.NewCategoryFilter( bicw );
+<span class="teal">Filter</span> f3 = cf.NewLogicOrFilter( f1, f2 );
+&nbsp;
+<span class="teal">Filter</span> f4 = cf.NewTypeFilter( t );
+<span class="teal">Filter</span> f5 = cf.NewLogicAndFilter( f3, f4 );
+&nbsp;
+<span class="teal">Filter</span> f6 = cf.NewParameterFilter( bip,
+&nbsp; <span class="teal">CriteriaFilterType</span>.Equal, id );
+&nbsp;
+<span class="teal">Filter</span> f7 = cf.NewLogicAndFilter( f5, f6 );
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; hosted = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+doc.get_Elements( f7, hosted );
+n = hosted.Count;
+&nbsp;
+<span class="blue">string</span> s = <span class="blue">string</span>.Format(
+&nbsp; <span class="maroon">"Wall &lt;{0} {1}&gt; hosts {2} door"</span>
+&nbsp; + <span class="maroon">" and window element{3}{4}\n"</span>,
+&nbsp; wall.Name, id.Value, n,
+&nbsp; ( ( 1 == n ) ? <span class="maroon">""</span> : <span class="maroon">"s"</span> ),
+&nbsp; ( ( 0 == n ) ? <span class="maroon">"."</span> : <span class="maroon">":"</span> ) );
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">FamilyInstance</span> fi <span class="blue">in</span> hosted )
+{
+&nbsp; s += <span class="blue">string</span>.Format( <span class="maroon">"\n&nbsp; {0} {1} {2}"</span>,
+&nbsp; &nbsp; fi.Category.Name, fi.Name, fi.Id.Value );
+}
+<span class="teal">MessageBox</span>.Show( s, <span class="maroon">"Anfitrion"</span> );
+</pre>
+
+<p>In case you are wondering, 'anfitri&oacute;n' means 'host' in Spanish.</p>

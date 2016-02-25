@@ -1,0 +1,168 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>Inserting a Column</h3>
+
+<p>Here I continue the discussion of another of the topics that were raised in the
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/01/verona-revit-api-training.html">
+Revit API training in Verona</a>
+
+last week, on creating new column types and inserting column instances through the API.</p>
+
+<p>We explored the following topics:</p>
+
+<ul>
+<li>Retrieving all family elements in current document in order to check whether the family we are interested in is loaded.</li>
+<li>Exploring the results of using a FamilyFilter.</li>
+<li>Loading a new family, if not already present.</li>
+<li>Creating a new family symbol, i.e. duplicating a type and setting its name and dimensions.</li>
+<li>Inserting a new column instance into the model.</li>
+</ul>
+
+<p>We implemented a new external command CmdNewColumnTypeInstance to demonstrate these steps. First, we set up some constants to define the family we are interested in, our library path, the structural type and a unit conversion:</p>
+
+<pre class="code">
+<span class="blue">const</span> <span class="blue">string</span> family_name
+&nbsp; = <span class="maroon">"M_Rectangular Column"</span>;
+&nbsp;
+<span class="blue">const</span> <span class="blue">string</span> extension
+&nbsp; = <span class="maroon">".rfa"</span>;
+&nbsp;
+<span class="blue">const</span> <span class="blue">string</span> directory
+&nbsp; = <span class="maroon">"C:/Documents and Settings/All Users"</span>
+&nbsp; + <span class="maroon">"/Application Data/Autodesk/RAC 2009"</span>
+&nbsp; + <span class="maroon">"/Metric Library/Columns/"</span>;
+&nbsp;
+<span class="blue">const</span> <span class="blue">string</span> path
+&nbsp; = directory + family_name + extension;
+&nbsp;
+StructuralType nonStructural
+&nbsp; = StructuralType.NonStructural;
+&nbsp;
+<span class="blue">const</span> <span class="blue">double</span> _foot_to_mm
+&nbsp; = 25.4 * 12;
+</pre>
+
+<p>Here is the implementation of the Execute method which achieves the steps listed above:</p>
+
+<p>In order to check whether the family we are interested in is already loaded, we make use of a family filter to get all family elements in the current document.
+If so, we store it in the variable 'f'.</p>
+
+<p>The family filter returns both the symbols contained within the family and the family itself.
+In real life, we would probably eliminate the symbols by creating a Boolean 'and' filter and filtering for the Family class as well as the family name.</p>
+
+<pre class="code">
+<span class="teal">CmdResult</span> rc
+&nbsp; = <span class="teal">CmdResult</span>.Failed;
+&nbsp;
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; symbols = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+<span class="teal">Filter</span> filter = app.Create.Filter.NewFamilyFilter(
+&nbsp; family_name );
+&nbsp;
+doc.get_Elements( filter, symbols );
+
+<span class="teal">Family</span> f = <span class="blue">null</span>;
+<span class="blue">foreach</span>( <span class="teal">Element</span> e <span class="blue">in</span> symbols )
+{
+&nbsp; <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">Family</span> )
+&nbsp; {
+&nbsp; &nbsp; f = e <span class="blue">as</span> <span class="teal">Family</span>;
+&nbsp; }
+&nbsp; <span class="blue">else</span> <span class="blue">if</span>( e <span class="blue">is</span> <span class="teal">FamilySymbol</span> )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">FamilySymbol</span> s = e <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; <span class="maroon">"Family name={0}, symbol name={1}"</span>,
+&nbsp; &nbsp; &nbsp; s.Family.Name, s.Name );
+&nbsp; }
+}
+</pre>
+
+<p>If the family was not already loaded, then 'f' remains null, and we load it with the LoadFamily method.
+It would also be sufficient to load one single symbol from the family:</p>
+
+<pre class="code">
+<span class="blue">if</span>( <span class="blue">null</span> == f )
+{
+&nbsp; <span class="blue">if</span>( !doc.LoadFamily( path, <span class="blue">ref</span> f ) )
+&nbsp; {
+&nbsp; &nbsp; message = <span class="maroon">"Unable to load '"</span> + path + <span class="maroon">"'."</span>;
+&nbsp; }
+}
+</pre>
+
+<p>If the loading does not succeed, 'f' is still null and we cannot proceed.
+Otherwise, we pick one of them for duplication and store it in the variable 's'.
+Any one will do, so we simply select the first one.</p>
+
+<pre class="code">
+<span class="blue">if</span>( <span class="blue">null</span> != f )
+{
+&nbsp; <span class="teal">Debug</span>.Print( <span class="maroon">"Family name={0}"</span>, f.Name );
+
+&nbsp; <span class="teal">FamilySymbol</span> s = <span class="blue">null</span>;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> s2 <span class="blue">in</span> f.Symbols )
+&nbsp; {
+&nbsp; &nbsp; s = s2;
+&nbsp; &nbsp; <span class="blue">break</span>;
+&nbsp; }
+&nbsp; <span class="teal">Debug</span>.Assert( <span class="blue">null</span> != s,
+&nbsp; &nbsp; <span class="maroon">"expected at least one symbol"</span>
+&nbsp; &nbsp; + <span class="maroon">" to be defined in family"</span> );
+</pre>
+
+<p>We duplicate it using the Duplicate method, simultaneously defining the new symbol name.
+To find out what parameters are available for setting the new type's dimensions, we first list all of them.
+We set the new type's dimensions and demonstrate that we can change its name at a later stage as well if desired.
+By trial and error, we definitely proved that when using a localised name to set the parameter value, the specified name is case sensitive.</p>
+
+<pre class="code">
+&nbsp; <span class="teal">Symbol</span> s1 = s.Duplicate( <span class="maroon">"Nuovo simbolo"</span> );
+&nbsp; s = s1 <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Parameter</span> param <span class="blue">in</span> s.Parameters )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; &nbsp; <span class="maroon">"Parameter name={0}, value={1}"</span>,
+&nbsp; &nbsp; &nbsp; param.Definition.Name,
+&nbsp; &nbsp; &nbsp; param.AsValueString() );
+&nbsp; }
+
+&nbsp; s.get_Parameter( <span class="maroon">"Width"</span> ).Set(
+&nbsp; &nbsp; 500 / _foot_to_mm );
+&nbsp;
+&nbsp; s.get_Parameter( <span class="maroon">"Depth"</span> ).Set(
+&nbsp; &nbsp; 1000 / _foot_to_mm );
+
+&nbsp; s.Name = <span class="maroon">"Nuovo simbolo due"</span>;
+</pre>
+
+<p>Finally, we insert an instance of our new symbol. We also tested inserting it using a non-vertical reference direction, but that is ignored for columns, because columns are inherently vertical:</p>
+
+<pre class="code">
+&nbsp; XYZ p = XYZ.Zero;
+&nbsp; doc.Create.NewFamilyInstance(
+&nbsp; &nbsp; p, s, nonStructural );
+
+&nbsp; rc = <span class="teal">CmdResult</span>.Succeeded;
+}
+<span class="blue">return</span> rc;
+</pre>
+
+<p>The next step we took was to explore the similar concepts for beams and braces, but the discussion of those steps will have to wait until some later time.</p>
+
+<p>Here is 
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/bc10023.zip">
+version 1.0.0.23</a>
+
+of the complete Visual Studio solution with this new command implementation.</p>

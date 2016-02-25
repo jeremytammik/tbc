@@ -1,0 +1,132 @@
+<style>
+.blue { color: blue; }
+.teal { color: teal; }
+.maroon { color: maroon; }
+.green { color: green; }
+</style>
+
+<h3>List Railing Types</h3>
+
+<p>This is in response to a query from Berria on 
+
+<a href="http://thebuildingcoder.typepad.com/blog/2009/02/inserting-a-column.html#comments">
+iterating over the railing types</a>
+
+in the model.
+
+It is also once again about teaching how to fish, and not just feeding people, at least I hope so.
+If I want to list all the railing types, the best way to go is probably to define an API filter which retrieves them from the model for me.
+How do I design that filter?
+I start by opening a new model, inserting a railing, and examining it with 
+
+<a href="http://download.autodesk.com/media/adn/RvtMgdDbg2009_0429_2008.zip">
+RvtMgdDbg</a>.
+
+There I can easily determine that its built-in category is OST_StairsRailing.
+Therefore, I first thought that an API filter selecting all family symbols of this category should suffice.
+The project browser shows me the following stair and railing symbols in my current model:</p>
+
+<img src="img/browser_railings_and_stairs.png" alt="Railing and stair types in project browser"/>
+
+<p>I implemented a new external command CmdListRailingTypes to test this approach, with the following code:</p>
+
+<pre class="code">
+<span class="teal">Application</span> app = commandData.Application;
+<span class="teal">Document</span> doc = app.ActiveDocument;
+<span class="teal">CreationFilter</span> cf = app.Create.Filter;
+&nbsp;
+<span class="teal">List</span>&lt;<span class="teal">Element</span>&gt; symbols = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Element</span>&gt;();
+&nbsp;
+<span class="teal">BuiltInCategory</span> bic 
+&nbsp; = <span class="teal">BuiltInCategory</span>.OST_StairsRailing;
+&nbsp;
+<span class="teal">Filter</span> f1 
+&nbsp; = cf.NewCategoryFilter( bic );
+&nbsp;
+<span class="teal">Filter</span> f2 
+&nbsp; = cf.NewTypeFilter( <span class="blue">typeof</span>( <span class="teal">FamilySymbol</span> ) );
+&nbsp;
+doc.get_Elements( f, symbols );
+
+<span class="blue">foreach</span>( <span class="teal">FamilySymbol</span> s <span class="blue">in</span> symbols )
+{
+&nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; <span class="maroon">"Family name={0}, symbol name={1}"</span>,
+&nbsp; &nbsp; s.Family.Name, s.Name );
+}
+<span class="blue">return</span> <span class="teal">CmdResult</span>.Failed;
+</pre>
+
+<p>It makes use of a new alias for CreationFilter:</p>
+
+<pre class="code">
+<span class="blue">using</span> <span class="teal">CreationFilter</span>
+&nbsp; = Autodesk.Revit.Creation.<span class="teal">Filter</span>;
+</pre>
+
+<p>To my initial surprise, no symbols were found. I thereupon took a closer look at the symbols within the railings family in RvtMgdDbg and discovered that the category of the M_Baluster symbols is not OST_StairsRailing but OST_StairsRailingBaluster. Changing the value of the 'bic' variable to that built-in category returns some valid results:</p>
+
+<pre>
+Family name=M_Baluster - Square, symbol name=25mm
+Family name=M_Baluster - Square, symbol name=20mm
+Family name=M_Baluster - Round, symbol name=25mm
+Family name=M_Baluster - Round, symbol name=20mm
+</pre>
+
+<p>This does still not include all the railing symbols listed in the browser, so I went back into RvtMgdDbg and searched for those as well. They were not listed in the FamilySymbol collection, but under Symbols, this time indeed with the category OST_StairsRailing.</p>
+
+<p>Making use of this info, I implemented a second filter and iteration to retrieve and list Symbol objects like this:</p>
+
+<pre class="code">
+bic = <span class="teal">BuiltInCategory</span>.OST_StairsRailing;
+f1 = cf.NewCategoryFilter( bic );
+f2 = cf.NewTypeFilter( <span class="blue">typeof</span>( <span class="teal">Symbol</span> ) );
+f = cf.NewLogicAndFilter( f1, f2 );
+&nbsp;
+doc.get_Elements( f, symbols );
+&nbsp;
+n = symbols.Count;
+&nbsp;
+<span class="teal">Debug</span>.Print( <span class="maroon">"{0}"</span>
+&nbsp; + <span class="maroon">" OST_StairsRailing symbol{1}:"</span>,
+&nbsp; n, <span class="teal">Util</span>.PluralSuffix( n ) );
+&nbsp;
+<span class="blue">foreach</span>( <span class="teal">Symbol</span> s <span class="blue">in</span> symbols )
+{
+&nbsp; <span class="teal">FamilySymbol</span> fs = s <span class="blue">as</span> <span class="teal">FamilySymbol</span>;
+&nbsp;
+&nbsp; <span class="teal">Debug</span>.Print(
+&nbsp; &nbsp; <span class="maroon">"Family name={0}, symbol name={1}"</span>,
+&nbsp; &nbsp; <span class="blue">null</span> == fs ? <span class="maroon">"&lt;none&gt;"</span> : fs.Family.Name, 
+&nbsp; &nbsp; s.Name );
+}
+</pre>
+
+<p>The result of this code is somewhat surprising too.
+The non-family symbols that we are looking for are retrieved now, just like we hoped, and we also retrieve the family symbols that we already saw above:</p>
+
+<pre>
+6 OST_StairsRailing symbols:
+Family name=M_Baluster - Square, symbol name=25mm
+Family name=M_Baluster - Square, symbol name=20mm
+Family name=M_Baluster - Round, symbol name=25mm
+Family name=M_Baluster - Round, symbol name=20mm
+Family name=&lt;none&gt;, symbol name=900mm Pipe
+Family name=&lt;none&gt;, symbol name=900mm Rectangular
+</pre>
+
+<p>This goes to show several things:</p>
+
+<ul>
+<li>You need to explore the model.</li>
+<li>You may get unexpected results.</li>
+</ul>
+
+<p>I'll just leave it at that for now.</p>
+
+<p>Here is
+
+<a href="http://thebuildingcoder.typepad.com/blog/files/bc10025.zip">
+version 1.0.0.25</a>
+
+of the complete Visual Studio solution with the new CmdListRailingTypes command implementation.</p>
