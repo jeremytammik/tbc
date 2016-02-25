@@ -1,0 +1,131 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!---
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+#dotnet #csharp
+#fsharp #python
+#grevit
+#responsivedesign #typepad
+#ah8 #augi #dotnet
+#stingray #adsklabs #rendering
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #mobile #vr #ecommerce
+#Markdown #Fusion360 #Fusion360Hackathon
+#javascript
+#RestSharp #restapi
+#mongoosejs #mongodb #nodejs
+#rtceur
+#geometry #3d
+#xaml
+
+Revit API, Jeremy Tammik, akn_include
+
+#AU2015, IoC, Banks and Not To Delete While Iterating #revitapi #bim #aec #3dwebcoder #adsk
+
+Autodesk University is already nearing its end. It went by so fast! I attended a bunch of brilliant classes, took notes during Cyrille Fauvel's cloud and mobile expert panel, and successfully presented my own two, the Revit API expert panel and connecting desktop and cloud. That led to a completely different topic
+&ndash; SpatialElementGeometryCalculator bug fix &ndash; do not delete while iterating
+&ndash; SpatialElementGeometryCalculator migration to Revit 2016
+&ndash; IoC, the Internet of Cows
+&ndash; Two nice Iain Banks Quarry quotes...
+
+-->
+
+<h3>AU, IoC, Banks and Not To Delete While Iterating</h3>
+<p>Autodesk University is already nearing its end.</p>
+<p>It went by so fast!</p>
+<p>I attended a bunch of brilliant classes, took notes during Cyrille Fauvel's
+<a href="http://the3dwebcoder.typepad.com/blog/2015/12/autodesk-uni-cloud-and-mobile-expert-panel-qa.html">cloud and mobile expert panel</a>,
+and successfully presented my own two,
+the <a href="http://thebuildingcoder.typepad.com/blog/2015/12/au-keynote-and-revit-api-panel.html#9">SD10181 &ndash; Revit API expert panel</a>
+and <a href="http://thebuildingcoder.typepad.com/blog/2015/11/connecting-desktop-and-cloud-room-editor-update.html">SD11048 &ndash; connecting desktop and cloud</a>.</p>
+<p>That led to a completely different topic... here are a couple of them:</p>
+<ul>
+<li><a href="#2">SpatialElementGeometryCalculator bug fix &ndash; do not delete while iterating</a></li>
+<li><a href="#3">SpatialElementGeometryCalculator migration to Revit 2016</a></li>
+<li><a href="#4">IoC, the Internet of Cows</a></li>
+<li><a href="#5">Two nice Iain Banks Quarry quotes</a></li>
+</ul>
+<h4><a name="2"></a>SpatialElementGeometryCalculator Bug Fix &ndash; Do Not Delete While Iterating</h4>
+<p>The Revit API added a check to prevent deletion of database elements during the iteration over the results of a filtered element collector.</p>
+<p>Here it crops up again.</p>
+<p>Arif Hanif attended the class SD11048 on connecting desktop and cloud, and we were able to take time off together afterwards to analyse and fix the issue with
+the <a href="http://thebuildingcoder.typepad.com/blog/2015/03/findinserts-retrieves-all-openings-in-all-wall-types.html">SpatialElementGeometryCalculator</a> that
+he reported in
+his <a href="http://thebuildingcoder.typepad.com/blog/2015/03/findinserts-retrieves-all-openings-in-all-wall-types.html#comment-2380592080">comment</a> last week:</p>
+<blockquote>
+<p>I am finding an issue with the temp delete. I implemented the code as on GitHub. The problem appears in both Revit 2015 and 2016. I went through the code and the issue is in the temp delete...</p>
+</blockquote>
+<p><center>
+<img src="img/spatial_element_geomatry_calculator_error_ah.jpg" alt="SpatialElementGeometryCalculator error" width="800">
+</center></p>
+<p>I was able to reproduce the issue on my system right out of the box:</p>
+<p><center>
+<img src="img/spatial_element_geomatry_calculator_error.png" alt="SpatialElementGeometryCalculator error" width="366">
+</center></p>
+<p>Read the error message. It tells you exactly what is going wrong:</p>
+<blockquote>
+<p>The iterator cannot proceed due to changes made to the Element table in Revit's database (typically, this can be the result of an Element deletion) at Autodesk.Revit.DB.FilteredElementIterator.MoveNext...</p>
+</blockquote>
+<p>Here is the snippet of code causing the issue:</p>
+<pre class="code">
+&nbsp; <span class="blue">var</span> roomCol = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">SpatialElement</span> ) );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> e <span class="blue">in</span> roomCol )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> room = e <span class="blue">as</span> <span class="teal">Room</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( room == <span class="blue">null</span> ) <span class="blue">continue</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( room.Location == <span class="blue">null</span> ) <span class="blue">continue</span>;
+</pre>
+
+<p>The error message does not appear until much later, though, when existing the code block encapsulating this snippet.</p>
+<p>Fixing this problem is very easy: just extract the element ids from the collector and dispose of it before starting to loop over the results and potentially deleting things, e.g., like this:</p>
+<pre class="code">
+&nbsp; <span class="blue">var</span> roomIds = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">SpatialElement</span> ) )
+&nbsp; &nbsp; .ToElementIds();
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> id <span class="blue">in</span> roomIds )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> room = doc.GetElement( id ) <span class="blue">as</span> <span class="teal">Room</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( room == <span class="blue">null</span> ) <span class="blue">continue</span>;
+&nbsp; &nbsp; <span class="blue">if</span>( room.Location == <span class="blue">null</span> ) <span class="blue">continue</span>;
+</pre>
+
+<p>Please take note, Håkon &nbsp; :-)</p>
+<p>Accordingly, here is my updated <a href="http://thebuildingcoder.typepad.com/blog/2015/03/findinserts-retrieves-all-openings-in-all-wall-types.html#comment-2391775373">answer</a> to Arif's problem report:</p>
+<blockquote>
+<p>Thank you for sitting down together with me at Autodesk University today and exploring this issue further.</p>
+<p>First of all, by 'follow-up article', I actually meant this one on <a href="http://thebuildingcoder.typepad.com/blog/2015/04/gross-and-net-wall-area-calculation-enhancement-and-events.html#6">wall area calculation handling multiple openings in multiple walls in multiple rooms</a>.</p>
+<p>Another interesting take on this topic is using <a href="http://thebuildingcoder.typepad.com/blog/2015/03/ifcexportutils-methods-determine-door-and-window-area.html">IFCExportUtils to determine door and window area</a>.</p>
+<p>Secondly, we succeeded in finding and resolving the issue.</p>
+<p>The fix is provided by the new <a href="https://github.com/jeremytammik/SpatialElementGeometryCalculator/releases/tag/2015.0.0.4">SpatialElementGeometryCalculator release 2015.0.0.4</a>.</p>
+<p>The error was caused by deleting elements while iterating over them using a filtered element collector.</p>
+<p>To fix, simply store the filtered element collector result as a list of element ids, close the collector, then iterate over the ids and optionally delete elements after the collector is closed.</p>
+</blockquote>
+<p>Thank you again, Arif, for raising this issue!</p>
+<p>By the way, the preferred method to submit a problem report on a GitHub sample is to raise a GitHub issue directly on the repository itself.</p>
+<h4><a name="3"></a>SpatialElementGeometryCalculator Migration to Revit 2016</h4>
+<p>With that issue out of the way, I also went ahead and migrated the add-in to Revit 2016.</p>
+<p>It was trivially simple, since all I had to do was replace the Revit API .NET assembly DLL references.</p>
+<p>The result is captured in <a href="https://github.com/jeremytammik/SpatialElementGeometryCalculator/releases/tag/2016.0.0.0">SpatialElementGeometryCalculator release 2016.0.0.0</a>.</p>
+<h4><a name="4"></a>IoC, The Internet of Cows</h4>
+<p>Zebra made an RFID tracking system for cows &ndash; aka the <a href="http://www.developer.com/daily_news/building-the-internet-of-cows.html">Internet of Cows</a>, or IoC &ndash; so that farmers know when the cows are giving birth &ndash; they tend to find a private place and hide. They also closely track the water consumed by the cows, because they realized that this metric can be used to accurately predict how much milk they’ll yield in the coming weeks, which can be combined with demand to predict market prices.</p>
+<h4><a name="5"></a>Two Nice Iain Banks Quarry Quotes</h4>
+<p>One of my favourite authors is <a href="https://en.wikipedia.org/wiki/Iain_Banks">Iain Banks</a>, as well as his SciFi alter ego, Iain M. Banks.</p>
+<p>I am just finishing off his posthumous book <em><a href="https://en.wikipedia.org/wiki/The_Quarry_(Iain_Banks_novel)">Quarry</a></em>.</p>
+<p>Here are two nice quotes from it that I really like:</p>
+<ul>
+<li><em>...the end of the nineties and beginning of the noughties.</em></li>
+<li><em>The opposite of lesson is moron.</em></li>
+</ul>
+<p><center>
+<img src="img/400px-IainBanks2009.jpg" alt="Iain Banks" width="400">
+</center></p>
+<p>I was unaware of his death until today, writing this post, looking at the Wikipedia entries pointed to above.</p>
+<p>Oh dear.</p>

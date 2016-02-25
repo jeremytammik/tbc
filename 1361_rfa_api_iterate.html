@@ -1,0 +1,234 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!---
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+- change selected instance type
+  email [Revit API]
+  taking a second look at this question, i note that most of what the developer needs is already implemented in the external command Lab3_4_ChangeSelectedInstanceType in the module https://github.com/jeremytammik/AdnRevitApiLabsXtra/blob/master/XtraCs/Labs3.cs
+
+- IterateOverCollector
+  email [Regarding [CaseNo:11090027.] ElementIdを取得する方法] Ryuji Ogasawara 
+
+- creating an electrical family
+  email [RFA API (especially in Electrical content context)]
+
+
+#adsk #adskdevnetwrk
+#dotnet #csharp #geometry
+#fsharp #dynamobim #python
+#grevit
+#responsivedesign #typepad
+#ah8 #augi #au2015 #dotnet #dynamobim
+#stingray #adsklabs #cloud #rendering
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #mobile #vr #ecommerce
+#Markdown #Fusion360 #Fusion360Hackathon #revitapi #adsk #3dwebcoder
+#javascript
+#au2015 #rtceur
+#RestSharp #restapi
+
+Revit API, Jeremy Tammik, akn_include
+
+#revitapi #au2015 #bim #aec #3dwebcoder #mongoosejs #mongodb #nodejs
+
+
+-->
+
+<h3>Change Type, Iterate Elements, Create Family</h3>
+<p>Let's wrap up this hectic week with a couple more recently answered issues and one non-Revit note:</p>
+<ul>
+<li><a href="#2">Changing element type</a></li>
+<li><a href="#3">Iterating over elements</a></li>
+<li><a href="#4">Creating an electrical family</a></li>
+<li><a href="#5">La costola di Adamo</a></li>
+</ul>
+<h4><a name="2"></a>Changing Element Type</h4>
+<p><strong>Question:</strong>
+I am programing an application that basically makes three simple steps. Its main purpose is to easily change family types.</p>
+<p>You select a Revit view. The application retrieves all the families and types in the view.
+You select a family and it shows you the different types.
+Finally it displays two columns A and B. In Column A you select the type of family you have in the view and want to be substituted.
+In Column B you select the new one.
+You click apply and the change is done.</p>
+<p>The problem is that when I implement this in Revit, some families do not show their family names or types.</p>
+<p>What do you think I am  missing?</p>
+<p><strong>Answer:</strong>
+First of all, most questions like this have already been answered. Make sure you perform some Internet searches, check
+<a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5">The Building Coder topic groups</a>, look through
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> etc.</p>
+<p>Note that the <code>Category</code> property is not always implemented on families, so you may have to use <code>FamilyCategory</code> instead, or the category of the family's first symbol.</p>
+<p>The thread
+on <a href="http://forums.autodesk.com/t5/revit-api/extracting-family-name-and-type-from-object/m-p/3093998">extracting family name and type from object</a> addresses a similar topic.</p>
+<p>Taking a deeper look at your question, I believe that almost everything you need is already implemented in the external command Lab3_4_ChangeSelectedInstanceType of
+the <a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra">ADN Xtra Labs</a> module <a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra/blob/master/XtraCs/Labs3.cs">Labs3.cs</a>.</p>
+<p>Here are links to two more related discussions for you,
+on <a href="http://thebuildingcoder.typepad.com/blog/2010/07/change-element-type.html">changing an element type</a> and <a href="http://thebuildingcoder.typepad.com/blog/2011/08/changing-the-type-of-many-instances.html">changing the type of many instances</a>.</p>
+<h4><a name="3"></a>Iterating over Elements</h4>
+<p>All too many people make use of filtered element collectors like this:</p>
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> collector
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">Family</span> ) ).ToElements();
+&nbsp;
+&nbsp; <span class="teal">IEnumerable</span>&lt;<span class="teal">Family</span>&gt; nestedFamilies
+&nbsp; &nbsp; = collector.Cast&lt;<span class="teal">Family</span>&gt;();
+&nbsp;
+&nbsp; <span class="teal">String</span> str = <span class="maroon">&quot;&quot;</span>;
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Family</span> f <span class="blue">in</span> nestedFamilies )
+&nbsp; {
+&nbsp; &nbsp; str = str + f.Name + <span class="maroon">&quot;\n&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> symbolId <span class="blue">in</span>
+&nbsp; &nbsp; &nbsp; f.GetFamilySymbolIds() )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Element</span> symbolElem = doc.GetElement(
+&nbsp; &nbsp; &nbsp; &nbsp; symbolId );
+&nbsp;
+&nbsp; &nbsp; &nbsp; str = str + <span class="maroon">&quot; family type&#65306; &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; + symbolElem.Name + <span class="maroon">&quot;\n&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Please do desist.</p>
+<p>I have explained a couple of hundred times now that this can be significantly <strong>simplified</strong>, <strong>shortened</strong> and made <strong>more efficient</strong> all at the same time, e.g., in my explanation of possibilities
+for <a href="http://thebuildingcoder.typepad.com/blog/2012/09/findelement-and-collector-optimisation.html">FindElement and collector optimisation</a>.</p>
+<p>You can iterate directly over the filtered element collector.</p>
+<p>In general, there is no need to create a copy of it.</p>
+<p>Calling ToElements creates a copy, allocating space and wasting both memory and time.</p>
+<p>There is no need for a cast either, since foreach can do that for you automatically.</p>
+<p>Then the snippet above can be cut down to something like this:</p>
+<pre class="code">
+&nbsp; <span class="teal">FilteredElementCollector</span> families
+&nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">Family</span> ) );
+&nbsp;
+&nbsp; <span class="blue">foreach</span>( <span class="teal">Family</span> f <span class="blue">in</span> families )
+&nbsp; {
+&nbsp; &nbsp; str = str + f.Name + <span class="maroon">&quot;\n&quot;</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="green">// ...</span>
+&nbsp; }
+</pre>
+
+<p>For future reference, I added this example code snippet
+to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
+in the method <code>IterateOverCollector</code> in the
+module <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs">CmdCollectorPerformance.cs</a>,
+currently at line 299.</p>
+<h4><a name="4"></a>Creating an Electrical Family</h4>
+<p><strong>Question:</strong>
+I’m getting involved working with electrical components and am primarily (but not exclusively) interested in intelligent creation of RFAs, most likely via a separate independent configurator application useful in its own right with an option to pass configured data to a Revit add-in for automatic creation of RFAs, probably typically based on the <em>Metric Generic Model</em> and <em>Metric Electrical Equipment</em> templates.</p>
+<p>I haven’t been involved too much in either the RFA API or specific Electrical API so far, so I would appreciate some pointers towards sections of The Building Coder blog, API samples, whitepapers, etc., to save me research time, about where to further explore the following topics:</p>
+<ul>
+<li>Generic RFA API &ndash; I am aware of the 3_Revit_Family_API section in the Revit API Training, but where can I find the latest version?</li>
+<li>Specific RFA API aspects for Electrical Circuits and if any other 'E-specifics'.</li>
+</ul>
+<p>As said, so far, I am mainly interested in configuration of electrical equipment.</p>
+<p><strong>Answer:</strong>
+In general, Revit’s electrical data model of electrical equipment is rather simple.
+The category is set to Electrical Equipment, and an electrical connector with appropriate properties of the connector set is added.
+You can cheat and look at the settings on one of the existing Equipment families.
+They tend to vary by geographical location, though.</p>
+<p>Once in the project, there are some type and instance parameters that affect circuiting, but they work just like any other parameter.</p>
+<p>The Revit SDK includes the PowerCircuit sample that shows how to create and modify Circuits.
+This will hardly be necessary for an equipment configurator.</p>
+<p>Just as you say, the generic Family API is explained and illustrated by the
+standard <a href="https://github.com/ADN-DevTech/RevitTrainingMaterial">ADN Revit API training material</a> in
+the section <a href="https://github.com/ADN-DevTech/RevitTrainingMaterial/tree/master/Labs/3_Revit_Family_API">3_Revit_Family_API</a>.
+The most up-to-date version is always provided on GitHub.</p>
+<p>A quick way to find links on The Building Coder to specific topics is to look at
+the <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5">topic groups</a>.
+The list of interesting posts is by no means complete, nor does it actually include all the best ones, but it is a good place to start.</p>
+<p>For example, you might be interested in
+the topic group on <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.25">Family API and Placing Family Instances</a>.</p>
+<p>Besides the official Revit API training labs mentioned above, you might also like
+the <a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra">ADN Xtra labs</a>, which include the former.</p>
+<h4><a name="5"></a>La Costola di Adamo</h4>
+<p>To wrap up, let me mention a non-Revit-API issue:</p>
+<p>I was deeply touched as well as horrified and angry after
+reading <a href="http://sellerio.it/it/catalogo/Costola-Adamo/Manzini/7240">La Costola di Adamo</a> by
+Antonio Manzini, an Italian detective story. Here is a quote from the diary of the female victim of the story:</p>
+<p>Domenica sono andata in chiesa. Non volevo sentire la messa. Voleva guardare la chiesa. Ho sbagliato orario. Sono entrata e c'era proprio la messa. Il prete ha letto la Genesi, 2:21.23. Me la sono riletta a casa. Dice: Allora l'eterno Iddio fece cadere un profondo sonno sull'uomo, che s'addormento. E prese una delle costole di lui; e richiuse la carne al posto d'essa. E l'eterno Iddio, con la costola che aveva tolto all'uomo, formo una donna e la condusse all'uomo. E l'uomo disse: "Questa finalmente e ossa delle mie ossa e carne della mia carne. Ella sarà chiamata donna perché e stata tratta dall'uomo."</p>
+<p>Mi sono messa a pensare. A sentire la storiella, la donna nasce dall'uomo, anzi ne e proprio un pezzo. E l'uomo impazzisce per la donna, la ama. In realtà ama se stesso. Ama un pezzo di se, non un altro da se. Vive e fa i figli e fa l'amore con se stesso. Un amore concentrato sulla propria persona che niente ha che fare con l'amore. Credo che sia quanto di più perverso abbia mai letto. Il maschio e innamorato solo di se. Questo dicono le Sacre Scritture. L'inferiorità femminile non c'entra. E solo un mezzo per coprire tutto il resto.</p>
+<p>L'appartenenza. Una persona appartiene ad un'altra. Per decreto divino. Ovvia la mia vita ha valore perché appartengo all'uomo. Bestie, case, terreni e donne. Appartengono.</p>
+<p><em>Sunday I went to church. I did not want to hear mass. I wanted to look at the church.
+I mistook the time. I entered and mass had already started. The priest read Genesis 2:21.23.
+I re-read it at home. It says:
+And the LORD God caused a deep sleep to fall upon Adam, and he slept: and he took one of his ribs, and closed up the flesh instead thereof;
+And the rib, which the LORD God had taken from man, made he a woman, and brought her unto the man.
+And Adam said, This is now bone of my bones, and flesh of my flesh: she shall be called Woman, because she was taken out of Man.</em></p>
+<p><em>I started to think. According to the story, the woman comes from the man, and indeed, is a piece of him.
+And the man loves the woman. Actually he loves himself. He loves a piece of himself, not another.
+They live together and have children and he makes love with himself.
+A love focused on one's self has nothing to do with love.
+I think that is the most perverse thing I have ever read.
+The male in love only with himself. This is what the Holy Scriptures say.
+The female inferiority is not even part of it. It is only a means to cover all the rest.</em></p>
+<p><em>Belonging. One person belongs to another. By divine decree. Obviously my life has value because I belong to the man. Animals, houses, land and women. Belonging.</em></p>
+<p>In his acknowledgements at the end of the book, Manzini clarifies:</p>
+<blockquote>
+<p>Al 21 novembre dell'anno 2013, anno in cui ho scritto il libro, i casi di femmicidio in Italia sono stati 122. Finche il numero non si azzererà, non potremmo definirci un paese civile.</p>
+<p><em>On November 21. 2013, the year in which I wrote this book, the cases of femicide in Italy were 122.
+Until this number is reduced, we cannot consider ourselves a civilised country.</em></p>
+</blockquote>
+<p><center>
+<img src="img/la_costola_di_adamo.jpg" alt="La Costola di Adamo" width="224"/>
+</center></p>
+<p>So, I'll end the week on this rather sombre note and wish everybody a peaceful and relaxing weekend.</p>
+<!----
+
+<pre class="code">
+</pre>
+
+**Question:**
+
+**Answer:**
+
+<center>
+<img src="img/.png" alt="" width=""/>
+</center>
+
+- create a roof
+  http://forums.autodesk.com/t5/revit-api/help-creating-roof/m-p/5828806
+  http://stackoverflow.com/questions/32718999/creating-a-roof-function/32732012#32732012
+
+#### <a name="5"></a>Creating a Roof
+
+email jaime...
+
+http://stackoverflow.com/questions/32718999/creating-a-roof-function/32732012#32732012
+
+**Question:**
+I'm having trouble to create a roof via code. I know how to create a stairs for example : I start a StairsEditScope and use CreateSketchedLanding with all the right parameters to create my stairs and just commit the StairsEditScope, but for a roof i cant find a clue on how to create it from scratch, any leads?
+
+**Answer:**
+Revit provides different kinds of roofs. It is best to understand the various types from an end user point of view before starting to drive them programmatically. The simplest one is defined by a horizontal outline. You can create a roof from such an outline using the Document.NewFootPrintRoof method. Such a roof can be flat, or you can specify a slope for each edge of the outline profile. The Building Coder Xtra labs provide a working sample in the external command Lab2_0_CreateLittleHouse in Labs2.cs:
+
+https://github.com/jeremytammik/AdnRevitApiLabsXtra/blob/master/XtraCs/Labs2.cs
+
+Here are some other roof-related posts on The Building Coder:
+
+RoomsRoofs SDK Sample
+Roof Eave Cut
+Creating an Extrusion Roof
+
+I hope this helps.
+
+Cheers, Jeremy.
+
+<!- 0015 0198 1215 ->
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/09/roomsroofs-sdk.html">RoomsRoofs SDK Sample</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/08/roof-eave-cut-in-revit-and-aca.html">Roof Eave Cut in AutoCAD Architecture and Revit</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/09/events-again-and-creating-an-extrusion-roof.html">Events, Again, and Creating an Extrusion Roof</a></li>
+</ul>
+
+-->

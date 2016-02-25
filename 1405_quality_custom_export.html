@@ -1,0 +1,223 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!---
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+- i survived the reorg that
+  [kean mentioned](http://through-the-interface.typepad.com/through_the_interface/2016/02/time-for-a-change.html).
+  [Securing your AutoCAD app using .NET](http://through-the-interface.typepad.com/through_the_interface/2016/02/securing-your-autocad-app-using-net.html)
+  One of my closer colleagues had to leave, though, Vladimir of the Moscow office.
+
+- publish jim's talk on 1_future_of_making_things_iot_forge
+  /a/doc/hack/2016-01-26_bim_programming_madrid/1_future_of_making_things_iot_forge.pdf
+  clean up 1_future_of_making_things_iot_forge_public.pptx slides
+  and integrate into 1_future_of_making_things_iot_forge.rtf
+  /a/doc/hack/2016-01-26_bim_programming_madrid/1_future_of_making_things_iot_forge.rtf
+
+- forge devcon -- Caroline Ward FW: Autodesk® Developer News Special Edition - February 16, 2016
+
+- https://www.linkedin.com/pulse/top-12-things-i-learned-ted-2016-bill-gross
+  the last three items are of special interest to developers:
+  10. desire paths and low friction in design
+  11. Deep Learning and a [self-driving-car](http://www.bloomberg.com/features/2015-george-hotz-self-driving-car)
+  12. virtual reality (VR) and augmented reality (AR)
+
+- exporting data:
+  FireRating
+  Adn Xtra Lab?
+  ArchSample
+  RoomSchedule
+  RDBLink_2010.zip
+  cloud based FireRating sample
+
+- [Revit QRCode Generator](https://www.linkedin.com/pulse/revit-qrcode-generator-fausto-mendez) by
+  Fausto Mendez, Technology Manager at Corbins Electric
+  http://www.faustomendez.com/2016/02/revit-qrcode-generator/
+  utilize the power of a cloud base API for the QR Code generation  and System.Net to retrieve that generated image from the cloud.
+  to generate a QR code image with an embedded link that points to the material specs website page using the URL link that is located inside this family’s Type Properties.
+  the QR Code image can be used in a Label Schedule, Title block or inside a detail sheet:
+  fm_ScheduleQrcode-1-1024x527.png
+  Screen shoot of the scanned QR Code on a smartphone:
+  fm_qrc-768x1365.png
+
+- 11377787 [Quality of the geometry on Custom Export]
+  The level of detail of tessellated surfaces is controlled via LevelOfDetail property of ViewNode of which instance is received in OnViewBegin method of the IExportContext interface.
+  The level of detail can only be set for the entire view, not for individual elements. It is so because alternating LoD between element would create discrepancies in tessellated meshes.
+
+
+#dotnet #csharp
+#fsharp #python
+#grevit
+#responsivedesign #typepad
+#ah8 #augi #dotnet
+#stingray #rendering
+#3dweb #3dviewAPI #html5 #threejs #webgl #3d #mobile #vr #ecommerce
+#Markdown #Fusion360 #Fusion360Hackathon
+#javascript
+#RestSharp #restAPI
+#mongoosejs #mongodb #nodejs
+#rtceur
+#xaml
+#3dweb #a360 #3dwebaccel #webgl @adskForge
+@AutodeskReCap @Adsk3dsMax
+#revitAPI #bim #aec #3dwebcoder #adsk #adskdevnetwrk @jimquanci @keanw
+#au2015 #rtceur
+#eraofconnection
+#RMS @researchdigisus
+
+Revit API, Jeremy Tammik, akn_include
+
+Reorg, FoMT, DevCon, TED, QR, Custom Exporter Quality #revitAPI #3dwebcoder @AutodeskRevit @adskForge #3dwebaccel #a360 #bim
+
+I had last week off and terminated it with a nice ski tour climbing the Albristhorn.
+Here are some topics to get going again
+&ndash; Reorg and Octo
+&ndash; The Future of Making Things, Iot, Forge and more
+&ndash; Forge and the DevCon in SF
+&ndash; T<sup>4</sup> &ndash; Top Twelve TED Topics
+&ndash; RDBLink and Exporting data from Revit
+&ndash; Revit QRCode generator
+&ndash; Controlling custom exporter geometry quality...
+
+-->
+
+<h3>Reorg, FoMT, DevCon, TED, QR, Custom Exporter Quality</h3>
+<p>I had last week off and terminated it with a nice ski tour climbing the Albristhorn:</p>
+<p><center>
+<a data-flickr-embed="true"  href="https://www.flickr.com/photos/jeremytammik/albums/72157664235570149" title="Skitour Albristhore"><img src="https://farm2.staticflickr.com/1624/25056609062_66b1e71786_n.jpg" width="320" height="240" alt="Skitour Albristhore"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+</center></p>
+<p>Here are some topics to get going again:</p>
+<ul>
+<li><a href="#2">Reorg and Octo</a></li>
+<li><a href="#3">The Future of Making Things, Iot, Forge and more</a></li>
+<li><a href="#4">Forge and the DevCon in SF</a></li>
+<li><a href="#5">T<sup>4</sup> &ndash; Top Twelve TED Topics</a></li>
+<li><a href="#6">RDBLink and Exporting data from Revit</a></li>
+<li><a href="#7">Revit QRCode generator</a></li>
+<li><a href="#8">Controlling custom exporter geometry quality</a></li>
+</ul>
+<h4><a name="2"></a>Reorg and Octo</h4>
+<p><a href="http://news.autodesk.com/press-release/corporate-sustainability/autodesk-announces-restructuring-plan-accelerate-transition-c">Autodesk restructured</a> the
+week before I left.</p>
+<p>Luckily, I survived that.</p>
+<p>My colleague Kean Walmsley only escaped
+by <a href="http://through-the-interface.typepad.com/through_the_interface/2016/02/time-for-a-change.html">switching to a different team</a>,
+OCTO, the Office of the CTO, which is a very nice career move, in fact.</p>
+<p>Congratulations on that, Kean!</p>
+<p>The changes did affect several others of my closer colleagues, though.</p>
+<p>Good luck to them in their new projects!</p>
+<p>A lot of Kean's AutoCAD.NET discussions are also valid for Revit, by the way, such as these recent ones:</p>
+<ul>
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2016/02/disabling-the-autocad-ribbon-using-net.html">Disabling the AutoCAD ribbon using .NET</a></li>
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2016/02/disabling-autocads-complete-ui-using-net.html">Disabling AutoCAD’s complete UI using .NET</a></li>
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2016/02/securing-your-autocad-app-using-net.html">Securing your AutoCAD app using .NET</a></li>
+</ul>
+<p>The latter one highlights the Entitlement API, which was also covered in the past specifically for Revit and Exchange Store Apps by Mikako Harada and Daniel Du, who now also left the company:</p>
+<ul>
+<li><a href="http://adndevblog.typepad.com/aec/2015/04/entitlement-api-for-revit-exchange-store-apps.html">Entitlement API for Revit Exchange Store Apps</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/05/exchange-apps-webinar-recording-and-resources.html#3">Exchange Apps resources &ndash; Entitlement API information:</a></li>
+</ul>
+<p>Talking about restructuring and so on:</p>
+<h4><a name="3"></a>The Future of Making Things, Iot, Forge and More</h4>
+<p>Restructuring and reorienting to take advantage of new opportunities and technologies is not just something we face within Autodesk &ndash; of course all other fellow developers do so too, including, probably (hopefully!), you.</p>
+<p>In order to get a handle on the Autodesk view of things and a number of important hints for the developer community, I published my notes from Jim Quanci's presentation
+on <a href="http://the3dwebcoder.typepad.com/blog/2016/02/future-of-making-things-iot-forge-devcon.html#3">The Future of Making Things, Iot, Forge and More</a>.</p>
+<p>Jim presents an exciting, visionary, yet down-to earth and practical guide for the developer community today.</p>
+<p>It was used as the introductory keynote presentation for all of our
+recent <a href="http://autodeskdevdays.com">DevDay conferences</a>
+and the recent four-day <a href="http://autodeskcloudaccelerator.com">Autodesk Cloud Accelerator</a> in Munich.</p>
+<p>The main topic is how design, engineering, making and operating are changing &ndash; changes that effect all of us &ndash; the tool makers.</p>
+<p>I like it so much that I also showed it at
+the <a href="http://www.bimprogramming.com">BIM Programming</a> conference in Madrid.</p>
+<p>I hope you find it interesting too!</p>
+<h4><a name="4"></a>Forge and the DevCon in SF</h4>
+<p>Carrying on from the future of making things, let's look at <a href="http://forge.autodesk.com">Forge</a>.</p>
+<p>The <a href="http://forge.autodesk.com/conference">Forge DevCon</a> developer conference registration being
+held at Fort Mason in San Francisco on June 15-16, 2016 is now open.</p>
+<p>Forge and the conference address the technologies being used to create the Future of Making Things, such as Virtual and Augmented Reality, BIM, Computational Design, ERP, PLM, Internet of Things, 3D Printing, Digital Fabrication, Fusion 360, web-based 2D and 3D design visualization, etc.</p>
+<p>You can save a lot of money be registering and booking your hotel early.</p>
+<p>You might also want to come early for the conference, stay late, e.g., to take advantage of the opportunity to participate in cloud and web technology Meetups on June 13-14 that can only be found in Northern California and to participate in the Computational Design &amp; Digital Fabrication or
+the <a href="http://autodeskcloudaccelerator.com">Forge Cloud Accelerator</a> at
+Autodesk June 20-24.</p>
+<p>Learn all about <a href="http://forge.autodesk.com/conference">Forge DevCon and why to attend</a>,
+and get your early bird discount by <a href="https://forgedevcon.eventbrite.com">booking your ticket here</a>.</p>
+<p>If you have any questions, please reach out to us
+at <a href="mailto:contact.forgedevcon@autodesk.com">contact.forgedevcon@autodesk.com</a>.</p>
+<p>Forge is Autodesk’s Cloud based design and engineering app platform of the future (and now) connecting people that Design, Make and Use. Visit <a href="http://forge.autodesk.com">forge.autodesk.com</a> for more information.</p>
+<h4><a name="5"></a>T<sup>4</sup> &ndash; Top Twelve TED Topics</h4>
+<p>While we are on the topic of future oriented technologies, you should not miss this personal selection by Bill Gross of his <a href="https://www.linkedin.com/pulse/top-12-things-i-learned-ted-2016-bill-gross">top twelve things learned at TED 2016</a>.</p>
+<p>The last three items are of special interest to us designers and developers:</p>
+<ul>
+<li>10 &ndash; Desire Paths and Low Friction in Design</li>
+<li>11 &ndash; Deep Learning and a <a href="http://www.bloomberg.com/features/2015-george-hotz-self-driving-car">self-driving-car</a></li>
+<li>12 &ndash; Virtual Reality (VR) and Augmented Reality (AR)</li>
+</ul>
+<h4><a name="6"></a>RDBLink and Exporting data from Revit</h4>
+<p>Now for some pure Revit API oriented topics as well.</p>
+<p>An obvious and frequently asked question is how to export data from Revit.</p>
+<p>It came up again, prompted by an update to the ancient Revit API discussion forum thread
+on <a href="http://forums.autodesk.com/t5/revit-api/revit-server-rest-api-and-project-data-exporting/m-p/3810739">Revit Server REST API and Project Data Exporting</a> and
+a new thread
+on <a href="http://forums.autodesk.com/t5/revit-api/need-support-in-exporting-database/m-p/5602871">support in exporting database</a>:</p>
+<p><strong>Question:</strong> Is there a way to get all information regarding a model or project in a transferable format?</p>
+<p>I have heard of ODBC links and DBLink, but I'm looking for an API enabled way to get data and then push it into a secondary system.</p>
+<p>JSON, CSV, XML I can work with any format and do any of the necessary scrubbing and ETL leg work.</p>
+<p><strong>Question 2:</strong> I want to create a desktop application that can export RVT data to a SQLServer.</p>
+<p><strong>Question 3:</strong> We are building a plugin in C# using API that exports project data to our SQL server. DBLink has been good so far but now we need to enhance and make it feature rich for our users.</p>
+<p>Can you provide source code for DBLink please?  If it's in open source, or guide us in right direction. Or some method in which we are able to transfer all the project data direct to our SQL server.</p>
+<p>Basically what we are looking is a simple UI that users can export Revit project data into our SQL server; we are making certain reports based on this export.</p>
+<p><strong>Answer:</strong> First of all, good luck with this. It sounds like you've got quite a lot of work ahead of you.</p>
+<p>I'd recommend taking a look at the source code for RevitLookup.  It provides a good starting point for figuring out how to access the data for different kinds of elements.  Unfortunately, you'll notice is that not all model data is accessible through the API.</p>
+<p>The other addin you'll want to take a look at is the Revit DB Link addin.  It's also from Autodesk and available to subscription customers for free.  To automate the export, you may be able to use some sort of UI Automation.  It may be able to export more data than what you'd normally be able to access through the API, but I suspect it would have the same limitations.</p>
+<p>You may also want to take a look at programs like Codebook and Ideate BIMLink, which have some pretty powerful data import/export capabilities.</p>
+<p>Here are some other relevant SDK samples and topics on The Building Coder:</p>
+<ul>
+<li>FireRating SDK sample</li>
+<li>Some of the <a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra">Adn Xtra Labs</a></li>
+<li>ArchSample SDK sample</li>
+<li>RoomSchedule SDK sample</li>
+<li>The <a href="https://github.com/jeremytammik/FireRatingCloud">FireRatingCloud</a> cloud based FireRating sample</li>
+<li>The entire <a href="http://thebuildingcoder.typepad.com/blog/export">Export category</a></li>
+</ul>
+<p>Returning to the RDBLink sample mentioned above, its source code was originally provided as part of the Revit SDK, before it was promoted to an official subscription package.</p>
+<p>Here is the <a href="zip/RDBLink_2010.zip">last Revit SDK version of RDBLink</a> for Revit 2010.</p>
+<p>I have no idea how useful it might be to migrate it to Revit 2016.</p>
+<p>It will show you all the principles, at least.</p>
+<p>I find it much easier and more effective to export to a cloud-based NoSQL database rather than SQL, nowadays, though.</p>
+<p>More on this anon.</p>
+<p>Finally, here are some pretty ancient articles discussing various uses of RDBLink:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/07/integration-with-a-database-or-erp-system.html">Integration with a Database or ERP System</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/11/adding-a-column-to-rdblink-export.html">Adding a Column to RDBLink Export</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/01/retrieving-project-parameters.html">Retrieving Project Parameters</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/05/parameter-access-and-scheduling.html">Parameter Access and Scheduling</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/09/exporting-parameter-data-to-excel.html">Exporting Parameter Data to Excel, and Re-importing</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/11/survey-and-project-base-point.html">Survey and Project Base Point</a></li>
+</ul>
+<h4><a name="7"></a>Revit QRCode Generator</h4>
+<p>Here is a really easy one:</p>
+<p>I'll simply point out this nice blog post by Fausto Mendez, Technology Manager at Corbins Electric, who presents a full implementation of
+a <a href="http://www.faustomendez.com/2016/02/revit-qrcode-generator">Revit QRCode Generator</a>
+(<a href="https://www.linkedin.com/pulse/revit-qrcode-generator-fausto-mendez">^</a>).</p>
+<p>In Fausto's own words, it utilises the power of a cloud based API for the QR Code generation and System.Net to retrieve the result to generate a QR code image with an embedded link that points to the material specs website page using the URL link that is located inside this family’s Type Properties.</p>
+<p>The QR Code image can be used in a Label Schedule, Title block or inside a detail sheet:</p>
+<p><center>
+<img src="img/fm_ScheduleQrcode-1-1024x527.png" alt="QR Code image used in a Label Schedule" width="500">
+</center></p>
+<p>Here is a screen snapshot of the scanned QR code on a smartphone:</p>
+<p><center>
+<img src="img/fm_qrc-768x1365.png" alt="QR Code scanned on mobile device" width="400">
+</center></p>
+<p>Thank you, Fausto, for making this available!</p>
+<h4><a name="8"></a>Controlling the Quality of the Geometry on Custom Export</h4>
+<p>In case you had not noticed, the level of detail of tessellated surfaces generated by
+the <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.1">custom exporter</a> can be controlled via the  <code>LevelOfDetail</code> property of the <code>ViewNode</code>, of which an instance is received in the <code>OnViewBegin</code> method of the <code>IExportContext</code> interface.</p>
+<p>The level of detail can only be set for the entire view, not for individual elements.</p>
+<p>It has to be so, because alternating LoD between elements would create discrepancies in tessellated meshes.</p>
+<p>That is more than enough for today, isn't it?</p>
+<p>Happy?</p>

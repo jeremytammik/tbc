@@ -1,0 +1,46 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!---
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head>
+
+<!---
+
+#dotnet #csharp #geometry
+#fsharp #python
+#grevit
+#responsivedesign #typepad
+#ah8 #augi #dotnet
+#stingray #adsklabs #cloud #rendering
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #mobile #vr #ecommerce
+#Markdown #Fusion360 #Fusion360Hackathon #revitapi #3dwebcoder
+#javascript
+#RestSharp #restapi
+#mongoosejs #mongodb #nodejs
+#au2015 #rtceur
+#adskdevnetwrk
+
+Revit API, Jeremy Tammik, akn_include
+
+Happy Halloween from RTC in Budapest #revitapi #bim #aec #3dwebcoder #dynamobim #au2015 #rtceur #au2015
+
+The Revit Technology Conference RTC Europe in Budapest is just wrapping up. Happy Halloween!
+
+-->
+
+### Happy Halloween!
+
+The Revit Technology Conference [RTC Europe](http://www.rtcevents.com/rtc2015eu) in Budapest is just wrapping up.
+
+<center>
+<img src="/j/photo/jeremy/2015/2015-08-15_tel_glarisegg/5DII-4150Ns_moni_kathrin_jeremy_cropped.jpg" alt="Happy Halloween">
+</center>
+
+Happy Halloween!
+
+<center>
+<img src="/j/photo/jeremy/2015/2015-08-15_tel_glarisegg/5DII-4156Ns_jeremy.jpg" alt="Happy Halloween">
+</center>

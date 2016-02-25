@@ -1,0 +1,123 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!---
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+- setting IES photmetric mesh data  -AND- learning to use the database exploration tools:
+  11230137 [Datei für fotometrisches Netz ändern]
+
+#dotnet #csharp
+#fsharp #python
+#grevit
+#responsivedesign #typepad
+#ah8 #augi #dotnet
+#stingray #rendering
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #mobile #vr #ecommerce
+#Markdown #Fusion360 #Fusion360Hackathon
+#javascript
+#RestSharp #restapi
+#mongoosejs #mongodb #nodejs
+#rtceur
+#xaml
+#3dweb #a360 #3dwebaccel #webgl @adskForge
+@AutodeskReCap @Adsk3dsMax
+
+Revit API, Jeremy Tammik, akn_include
+
+Loading an IES Photometric Web and Exciting Times #revitapi #bim #aec #3dwebcoder #adsk @AutodeskRevit
+
+Today, let's look at an MEP related issue, loading the IES photometric web data for a light source, plus all the exciting things happening both for myself in the next weeks and for Autodesk as a company as a whole, reinventing itself for the modern cloud-based collaborative sharing technoculture
+&ndash; The first annual Autodesk X summit
+&ndash; Jeremy's January
+&ndash; DevDay in Munich
+&ndash; Accelerator Workshop
+&ndash; BIM Workshop in Madrid
+&ndash; Loading the IES photometric web data for a light source...
+
+-->
+
+<h3>Loading an IES Photometric Web and Exciting Times</h3>
+<p>Today, let's look at an MEP related issue, loading the IES photometric web data for a light source, plus all the exciting things happening both for myself in the next weeks and for Autodesk as a company as a whole, reinventing itself for the modern cloud-based collaborative sharing technoculture:</p>
+<ul>
+<li><a href="#2">The first annual Autodesk X summit</a></li>
+<li><a href="#3">Jeremy's January</a>:<ul>
+<li><a href="#4">DevDay in Munich</a></li>
+<li><a href="#5">Accelerator Workshop</a></li>
+<li><a href="#6">BIM Workshop in Madrid</a></li>
+</ul>
+</li>
+<li><a href="#7">Loading the IES photometric web data for a light source</a></li>
+</ul>
+<h4><a name="2"></a>The First Annual Autodesk X Summit</h4>
+<p>You may have noticed a global trend towards more openness, collaborativity, sharing, community building in software and other businesses as well.</p>
+<p>I hope you are taking note and embracing this for yourself, just as I am.</p>
+<p>As we embark on this new year 2016, Autodesk is going through a time of unprecedented change in every way. Although change is challenging, and at times uncomfortable, we are truly excited to be on this journey with you.</p>
+<p>You can get an impression of some of the directions we are headed by taking a look at</p>
+<p><center>
+<a href="http://xsummit.autodesk.com"><span style="font-size: 150%; font-weight: bold">xsummit.autodesk.com</span></a>
+<br/><span style="font-size: 80%">This experience works best when viewed in Chrome</span>
+</center></p>
+<p>Last October, we held our first annual Autodesk X Summit.</p>
+<p>This event marked an exciting moment in Autodesk history &ndash; the beginning of the era of experiences over technologies.   As we transform from a company that sells software products to companies into a platform company that offers services and solutions, we have to place human-centred experience design at the heart of our work and company culture to be successful.  This new way of working cannot involve only those in the traditional design or experience roles  &ndash; delivering excellent experiences for our customers is a shared responsibility for every one of us.</p>
+<p>In this spirit, the Autodesk X Summit was broadly inclusive, and gathered designers, engineers, architects, product leaders, customer advocates, salespeople, and makers from all across the company and the globe.  This event marked the beginning of our connected culture, our experience-led era, that binds us all together.</p>
+<p>We curated some of the best content and highlights of the event into a virtual experience which will give you a sense of what happened at the X Summit, and hopefully inspire you to find ways to start to design, connect &amp; lead in your own work.</p>
+<p>I invite you to explore the experience, watch the videos, and join this transformation.
+I am excited to work together with you in 2016 and moving forward.</p>
+<h4><a name="3"></a>Jeremy's January</h4>
+<p>I will be travelling quite a bit in the next couple of weeks, but only to places beginning with the letter 'M'.</p>
+<p>I would love to run into you at one of the venues listed below.</p>
+<h4><a name="4"></a>DevDay in Munich</h4>
+<p>This year, we will be holding just one single DevDay conference in Europe, in Munich on Monday January 18.</p>
+<p>Attending DevDays is the best way for you to keep abreast of, and maintain compatibility with, new Autodesk web service and desktop technologies.</p>
+<p>DevDays has always been about looking at our newest products, features, and services.</p>
+<p>As always, you will see and learn about the upcoming enhancements in the desktop platform capabilities and APIs.</p>
+<p>This year, we will also cover the Autodesk Forge Cloud Services, providing a technology and business platform for a new generation of connected Cloud, Web and Mobile apps and based on our web services such as View &amp; Data, AutoCAD I/O, Fusion 360, BIM 360, ReCap 360, and InfraWorks 360.</p>
+<p>For the web service APIs, the learning curve is steep, and a few hours during a DevDay conference is just not enough.</p>
+<p>Therefore, new for this year, we are appending a four day abbreviated form of
+the <a href="http://autodeskcloudaccelerator.com">Autodesk Cloud Accelerator</a> program, cf. <a href="#5">below</a>.</p>
+<p>Registration is easy.  Simply visit the event website at <a href="http://www.autodeskdevdays.com">autodeskdevdays.com</a> &gt; <a href="http://autodeskdevdays.com/munich-3">Munich</a> for full information and click
+on <a href="https://www.eventbrite.com/e/devdays-20152016-tickets-18549596342">Register Now</a>.</p>
+<p>If you have any questions about this event, please don't hesitate to contact us
+at <a href="mailto:devdaysinfo@autodesk.com">devdaysinfo@autodesk.com</a>.</p>
+<p>Please keep in mind that part of material at Developer Days is forward-looking and confidential, so you will be required to sign a non-disclosure agreement to attend.</p>
+<h4><a name="5"></a>Accelerator Workshop</h4>
+<p>As said, you can extend your and deepen your exploration of the Autodesk web services by staying on after the DevDay conference and participating in all or part of a four day abbreviated form of
+the <a href="http://autodeskcloudaccelerator.com">Autodesk Cloud Accelerator</a> program.</p>
+<p>The Accelerator workshops provide an unparalleled opportunity for you to learn and work intensively on your chosen project with direct face-to-face help, support and training from Autodesk Cloud Engineering experts.</p>
+<p>Invest a few days now &ndash; you will save precious development time later and significantly accelerate your learning curve and project development.</p>
+<h4><a name="6"></a>BIM Workshop in Madrid</h4>
+<p>Directly after the DevDay conference and accelerator workshop, I will head off to Madrid for
+the <a href="http://www.bimprogramming.com">BIM Programming Workshop</a> there.</p>
+<p>As the name implies, it is focused on architectural programming and dives into both desktop and web based aspects, including hands-on workshops exploring
+the <a href="http://www.autodesk.com/developrevit">Revit</a>
+and <a href="https://developer.autodesk.com">View and Data</a> APIs.</p>
+<p>To explore the detailed agenda and register for the workshops, please
+visit <b><a href="http://www.bimprogramming.com">bimprogramming.com</a></b>.</p>
+<h4><a name="7"></a>Loading the IES Photometric Web Data for a Light Source</h4>
+<p><strong>Question:</strong> How can I programmatically load an IES file defining the photometric web of a light source?</p>
+<p><center>
+<img src="img/photometric_web.gif" alt="Photometric web" width="224">
+</center></p>
+<p>In the user interface, I have to first select the IES file in the file system:</p>
+<p><center>
+<img src="img/photometric_web_ies_file_select.jpg" alt="IES file selection" width="393">
+</center></p>
+<p>Then, I can specify the photometric web file name as a property on the light source:</p>
+<p><center>
+<img src="img/photometric_web_file.jpg" alt="Photometric web file" width="628">
+</center></p>
+<p>Now I wish to achieve the same result programmatically.</p>
+<p><strong>Answer:</strong> The built-in parameter FBX_LIGHT_PHOTOMETRIC_FILE just stores the IES file name.</p>
+<p>The IES file data defined in the file is stored separately in the parameter FBX_LIGHT_PHOTOMETRIC_FILE_CACHE.</p>
+<p>So, here is a possible way to load the IES file by API:</p>
+<ul>
+<li>Open the IES file and read its data into a string.</li>
+<li>Set the string of IES file data into parameter FBX_LIGHT_PHOTOMETRIC_FILE_CACHE.</li>
+<li>Set the IES file name to parameter FBX_LIGHT_PHOTOMETRIC_FILE.</li>
+</ul>
+<p>Good luck!</p>

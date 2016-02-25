@@ -1,0 +1,118 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!---
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+- 11399855 [modeless dialog, external event and asynchronous API calls]
+  WPF DoEvents sample code
+
+#dotnet #csharp
+#fsharp #python
+#grevit
+#responsivedesign #typepad
+#ah8 #augi #dotnet
+#stingray #rendering
+#3dweb #3dviewAPI #html5 #threejs #webgl #3d #mobile #vr #ecommerce
+#Markdown #Fusion360 #Fusion360Hackathon
+#javascript
+#RestSharp #restAPI
+#mongoosejs #mongodb #nodejs
+#rtceur
+#xaml
+#3dweb #a360 #3dwebaccel #webgl @adskForge
+@AutodeskReCap @Adsk3dsMax
+#revitAPI #bim #aec #3dwebcoder #adsk #adskdevnetwrk @jimquanci @keanw
+#au2015 #rtceur
+#eraofconnection
+
+Revit API, Jeremy Tammik, akn_include
+
+DevDay Conference in Munich and WPF DoEvents #revitAPI #bim #aec #3dwebcoder #adsk @AutodeskRevit #adskdevnetwrk @jimquanci @keanw
+
+Let's talk about doing events, from two radically different perspectives, one great big external one and lots of teeny-weeny little internal ones.
+I'll share some pictures from the European DevDay conference and snow in Munich today, then discuss a WPF issue that came up last week
+&ndash; DevDay conference in Munich
+&ndash; WPF DoEvents...
+
+-->
+
+<h3>DevDay Conference in Munich and WPF DoEvents</h3>
+<p>Let's talk about doing events, from two radically different perspectives, one great big external one and lots of teeny-weeny little internal ones.</p>
+<p>I'll share some pictures from the European DevDay conference and snow in Munich today, then discuss a WPF issue that came up last week:</p>
+<ul>
+<li><a href="#2">DevDay conference in Munich</a></li>
+<li><a href="#3">WPF DoEvents</a></li>
+<li><a href="#4">Addendum on WPF versus WinForms</a></li>
+</ul>
+<h4><a name="2"></a>DevDay Conference in Munich</h4>
+<p>Today we held the one and only European DevDay conference in Munich:</p>
+<p><center>
+<a data-flickr-embed="true"  href="https://www.flickr.com/photos/jeremytammik/albums/72157662970001709" title="DevDay Conference Munich"><img src="https://farm2.staticflickr.com/1675/23827373054_eb50a70d72_n.jpg" width="320" height="240" alt="DevDay Conference Munich"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+</center></p>
+<p><a href="http://adndevblog.typepad.com/aec/jaime-rosales.html">Jaime Rosales Duque</a> came all the way from New York to help, and
+<a href="http://dances-with-elephants.typepad.com/blog/about-the-author.html">Jim Quanci</a> even further, from San Francisco.</p>
+<p>We have participants from all over Europe and even some from India.</p>
+<p>The next few days are dedicated to an abbreviated <a href="http://autodeskcloudaccelerator.com">Cloud Accelerator</a> here that I am looking forward to very much.</p>
+<p>Meanwhile, here is Maciej Szlek's WPF issue and solution:</p>
+<h4><a name="3"></a>WPF DoEvents</h4>
+<p>Exactly two months back, we discussed <a href="http://thebuildingcoder.typepad.com/blog/2015/11/pickpoint-with-wpf-and-no-threads.html">PickPoint with WPF and no threads attached</a>.</p>
+<p>Now another modeless WPF issue was raised and solved by <a href="http://maciejszlek.pl">Maciej 'Max' Szlek</a>:</p>
+<p><strong>Question:</strong> I'm creating a WPF addin that performs operations which will take much time.</p>
+<p>During this time the add-in dialogue don't respond until the operation ends, even when calling the external event Raise method by view-model command.</p>
+<p>Do you have some workaround to achieve dialogue responsively during performing API operations?</p>
+<p><strong>Answer:</strong> Yes, I have heard about similar issues in the past involving blocking of modeless WPF forms.</p>
+<p>Unfortunately, I cannot find the relevant thread any longer.</p>
+<p>The workarounds involved stuff like setting the window focus, e.g. using GetForegroundWindow and SetForegroundWindow, and allowing the WPF form to access the Windows message queue.</p>
+<p>I think Revit was somehow blocking the message queue, for some reason.</p>
+<p>I think the solution involved <a href="http://stackoverflow.com/questions/5181777/use-of-application-doevents">calling the DoEvents method</a>.</p>
+<p>A couple of WPF issues came up in the forum in the past couple of years, e.g.:</p>
+<ul>
+<li><a href="http://forums.autodesk.com/t5/revit-API/revit-API-dll-preventing-wpf-window-regeneration/m-p/5545975">Revit API preventing WPF window regeneration</a></li>
+<li><a href="http://forums.autodesk.com/t5/revit-API/wpf-window-loses-control-when-revit-API-displays-an-error/m-p/5319853">WPF window loses control when Revit API displays an error</a></li>
+<li><a href="http://tech.pro/tutorial/799/wpf-tutorial-using-wpf-in-winforms">WPF tutorial using WPF in Winforms</a></li>
+</ul>
+<p>On the other hand, you can tell from these discussions that some people are successfully using WPF forms, and the development team are not aware of any issues with them.</p>
+<p>I recommend <a href="http://forums.autodesk.com/t5/revit-API/winforms-or-wpf/m-p/5558289">sticking with Windows Forms</a> if you have a choice.</p>
+<p>Here is another recent article on <a href="http://thebuildingcoder.typepad.com/blog/2015/11/pickpoint-with-wpf-and-no-threads.html">modeless WPF forms, PickPoint and multithreading</a>, addressing other issues that also might be of interest to you,
+an <a href="http://thebuildingcoder.typepad.com/blog/2012/10/ensure-wpf-add-in-remains-in-foreground.html#2">older one on WPF</a>, and
+a <a href="http://thebuildingcoder.typepad.com/blog/2013/12/triggering-immediate-external-event-execute.html?cid=6a00e553e16897883301a3fd3c071c970b#comment-6a00e553e16897883301a3fd3c071c970b">comment on triggering an event from Jon</a>.</p>
+<p>Later, one little addition; I searched for "<a href="https://duckduckgo.com/?q=revit+API+WPF+doevents">Revit API WPF DoEvents</a>" and found this article
+on <a href="http://thebuildingcoder.typepad.com/blog/2014/05/multithreading-throws-exceptions-in-revit-2015.html">multithreading throwing exceptions in Revit 2015</a>.</p>
+<p><strong>Response:</strong> I grabbed this <a href="http://stackoverflow.com/a/11899439">DoEvents implementation on StackOverflow</a> to
+"start work on a method that runs on the Dispatcher thread, and it needs to block without blocking the UI Thread... implement a DoEvents based on the Dispatcher itself".</p>
+<p>I don't like it, it's not too elegant, it forces to
+break <a href="https://de.wikipedia.org/wiki/Model_View_ViewModel">mvvm</a> pattern, but it works.</p>
+<p>If you would like to see my ugly non-refactored test code, clone
+my <a href="https://bitbucket.org/kedziormsz/externaleventtests.git">ExternalEventTests sample on BitBucket</a>,
+also <a href="zip/kedziormsz-externaleventtests-6c9eee0b346a.zip">saved locally</a> here on The Building Coder.</p>
+<p>I haven't tested it much yet but it seems to be stable.</p>
+<p>You can run it from the add-in manager &ndash; lack of static references to IExternalApplication.</p>
+<p>On the occasion it allows to check if raised external events are queued or running next to each other. They are queued which is gooood but I think safer would be adapting below solution to the one external event &ndash; we don't know how the API engine will change in the future... ;) <a href="http://thebuildingcoder.typepad.com/blog/2010/11/pattern-for-semi-asynchronous-idling-API-access.html">pattern for semi-asynchronous Idling API access</a>...</p>
+<p>Anyways thank you for your very accurate advice!</p>
+<p>What would be in your circle of interest is WpfCommand.</p>
+<p>WpfWindow contains a WPF implementation of the DoEvents method (in the way mentioned before) which is injected to ViewModel to minimize dependencies.</p>
+<p>ViewModel contains 3 commands.</p>
+<p>The first picks doors (it use part of my little cross API version framework) &ndash; simply to check how modeless WPF window would behave during hiding, picking and showing again.</p>
+<p>The second and third flip doors &ndash; both have their own external event with different handler implementation. ViewModel's setStatus method calls injected DoEvents method.</p>
+<p>If you have some more questions let me know.</p>
+<p>Oh, and you can feel free to publish this solution on the blog of course, I don't have any problem with that ;)</p>
+<p><strong>Answer:</strong> When you mention picking and flipping doors, that reminds me of the Revit SDK ModelessDialog <code>ModelessForm_ExternalEvent</code> and <code>ModelessForm_IdlingEvent</code> samples.</p>
+<p>Are you aware of those?</p>
+<p>Is there any similarity, or is your sample completely unrelated to those?</p>
+<p><strong>Response:</strong> Yes, I'm aware of those, but my approach is quite different.</p>
+<p>Congratulations to Max on solving this, and many thanks for sharing it here with us!</p>
+<h4><a name="4"></a>Addendum on WPF versus WinForms</h4>
+<p>Jeroen Van Vlierden adds an update:</p>
+<blockquote>
+<p>Just to let you know: I noticed that you mentioned my thread on
+a <a href="http://forums.autodesk.com/t5/revit-API/wpf-window-loses-control-when-revit-API-displays-an-error/m-p/5319853">WPF window losing control when Revit API displays an error</a> above.</p>
+<p>I can add to this that I managed to work around the issue by converting the wpf form to a user control and using this user control in a winforms window with a wpf element host.</p>
+<p>That works fine.</p>
+<p>It was however disappointing that I was forced to do this after I spent a lot of work on my application.</p>
+<p>Converting the application to winforms is no longer an option, so I will stick to this for now.</p>
+</blockquote>

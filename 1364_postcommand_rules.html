@@ -1,0 +1,211 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!---
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+- 11091133 [Revit 2016 Service Pack 2,  results in exceptions (JVA/AP)]
+
+- 11052512 [Revit 2016 SP2 causes InternalException]
+
+#dotnet #csharp #geometry
+#fsharp #dynamobim #python
+#grevit
+#responsivedesign #typepad
+#ah8 #augi #au2015 #dotnet #dynamobim
+#stingray #adsklabs #cloud #rendering
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #mobile #vr #ecommerce
+#Markdown #Fusion360 #Fusion360Hackathon #revitapi #3dwebcoder
+#javascript
+#au2015 #rtceur
+#RestSharp #restapi
+#au2015
+#mongoosejs #mongodb #nodejs
+#au2015 #rtceur
+
+Revit API, Jeremy Tammik, akn_include
+
+PostCommand causes Internal Exceptions #revitapi #bim #aec #3dwebcoder #adsk #adskdevnetwrk
+
+For the past few years now, the development team has been adding various checks to prevent illegal use of Revit API entry points from outside a valid Revit API context. Read all about the valid Revit API context and how to access it &ndash; Idling and External Events for modeless access and driving Revit from outside &ndash; New checks were just added in the Revit 2016 service pack 2 which uncovered more long-standing illegal API calls
+&ndash; CompHound connects desktop and cloud
+&ndash; Do not call `PostCommand` from a modeless context
+&ndash; Do Not Call `PostCommand` from an `Idling` Event Handler
+&ndash; Vacation time...
+
+-->
+
+<h3>PostCommand causes Internal Exceptions, a Break</h3>
+<p>Inscrutable are the ways of the Lord, and innumerable the illegal usage examples of the Revit API...</p>
+<p>For the past few years now, the development team has been adding various checks to prevent illegal use of Revit API entry points from outside a valid Revit API context.</p>
+<p>Read all about the valid Revit API context and how to access it in The Building Coder topic group
+on <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">Idling and External Events for modeless access and driving Revit from outside</a>.</p>
+<p>Apparently, some new checks were just added in the Revit 2016 service pack 2 which uncovered more long-standing illegal API calls, addressed below by our resident Revit API expert Arnošt Löbel:</p>
+<ul>
+<li><a href="#1">CompHound connects desktop and cloud</a></li>
+<li><a href="#2">Do not call <code>PostCommand</code> from a modeless context</a></li>
+<li><a href="#3">Do Not Call <code>PostCommand</code> from an <code>Idling</code> Event Handler</a></li>
+<li><a href="#4">Vacation time</a></li>
+</ul>
+<h4><a name="1"></a>CompHound Connects Desktop and Cloud</h4>
+<p>I have been spending part of my time in the past few days working on
+the <a href="https://github.com/CompHound/CompHound.github.io">CompHound</a> project
+for two presentations on connecting the desktop with the cloud at
+<a href="http://www.rtcevents.com/rtc2015eu">RTC Europe</a> in Budapest end of October and
+<a href="http://au.autodesk.com">Autodesk University</a> in Las Vegas in December.</p>
+<p>Yesterday, I finally hooked up
+the <a href="http://the3dwebcoder.typepad.com/blog/2015/10/comphound-viewer-and-authorisation-service.html#5">LMV viewer</a> and
+set up a <a href="https://developer.autodesk.com">View and Data API</a>
+<a href="http://the3dwebcoder.typepad.com/blog/2015/10/comphound-viewer-and-authorisation-service.html#3">authorisation token server</a> for it.</p>
+<p>I have therefore been posting more
+to <a href="http://the3dwebcoder.typepad.com">The 3D Web Coder</a> than here...</p>
+<p>If you are interested in connecting Revit or any other desktop application with the cloud, you may be interested in that, and in the preceding, simpler,
+<a href="https://github.com/jeremytammik/firerating">FireRating in the Cloud</a> sample.</p>
+<p>Now let's talk a bit about the pure desktop Revit API, before taking a break...</p>
+<h4><a name="2"></a>Do Not Call PostCommand from a Modeless Context</h4>
+<p><strong>Question:</strong>
+Revit throws an internal exception when I call Revit API methods that have user interaction.</p>
+<p>I can reproduce it like this:</p>
+<ol>
+<li>Run in Revit 2016 Service Pack 2, build 20150714_1515.</li>
+<li>Start a custom command via <code>PostCommand</code> from a modeless window.</li>
+<li>From within the custom command call an API method that has user interaction, e.g., <code>PromptForFamilyInstancePlacement</code>, <code>PickObject</code>, <code>PickElementsByRectangle</code>.</li>
+<li>An <code>InternalException</code> is thrown and Revit is left in a ‘frozen’ state, e.g.:</li>
+</ol>
+<pre>
+Autodesk.Revit.Exceptions.InvalidOperationException was caught
+HResult=-2146233088
+Message=Unprocessed internal exception is caught.
+Source=RevitAPIUI
+StackTrace:
+at Autodesk.Revit.UI.UIDocument.PromptForFamilyInstancePlacement(FamilySymbol familySymbol)
+
+Autodesk.Revit.Exceptions.InternalException was caught
+HResult=-2146233088
+Message=A managed exception was thrown by Revit or by one of its external applications.
+Source=RevitAPIUI
+StackTrace:
+at ?A0x86b480fb.PerformObjectsPick(ADocument* pADoc, ObjectType objectType, Boolean bMulSel, ISelectionFilter pSelFilter, String pUserDefindStatusPrompt, IList`1 pPreSelected)
+at Autodesk.Revit.UI.Selection.Selection.PickObjects(ObjectType objectType, ISelectionFilter selectionFilter, String statusPrompt)
+</pre>
+
+<p><strong>Answer by Arnošt:</strong>
+You say that your add-in is using <code>PostCommand</code> to call another external command that calls <code>PickObject</code>.</p>
+<p>Now, regardless of this particular workflow leading to an exception (justified or not), we have an obligation to inform the user that this workflow is wrong and should be avoided. Just because we allow it (or rather pretend allowing it) does not make this workflow right or justified. If the user when in his external command posts another external command of his it means that the design of his application is flawed. There should never be a need for such an obscure complication. Since both commands belong to the same programmer (my assumption, but I believe I am correct), the programmer has far better means to call one command from another. Even if those two commands are in different assemblies, there are still ways of invoking one from the other. Using the posting mechanism and <code>Idling</code> to invoke functions in the same application is quite crazy, even if it is allowed. I do not think we should allow picking or posting a command from another posted external command, and to be perfectly honest, I am not even sure that we should allow posting external commands from regularly invoked external commands (but that is another topic).</p>
+<p><strong>Response:</strong>
+We do NOT post an external command from within another external command!</p>
+<p>Problem:</p>
+<p>We have a MODELESS form. When the user clicks a button we want to start a command in Revit.</p>
+<p>How do we get in the ‘best’ Revit context to call the Revit API?</p>
+<p>In my opinion is that via <code>PostCommand</code>. Then our class that implements IExternalCommand is called and we get also the ExternalCommandData.</p>
+<p>In order to get in the SAFEST way into the ‘BEST’ Revit context we perform some steps:</p>
+<ol>
+<li>First we send 2 <ESCAPE> characters to the Revit window.</li>
+<li>Then we have a timer 100 ms.</li>
+<li>Then we call <code>CanPostCommand</code>. If it returns false we send again an <ESCAPE> character to the Revit window and have again a timer 100 ms.</li>
+<li>If <code>CanPostCommand</code> returns true, we raise an ExternalEvent.</li>
+<li>In the <code>IExternalEventHander.Execute</code> we call <code>PostCommand</code>.</li>
+</ol>
+<p>If this is not correct please:</p>
+<ul>
+<li>Provide the OFFICIAL way how this should be done.</li>
+<li>Publish this in the SDK documentation.</li>
+<li>Let it be stable. Don’t change it each Revit version.</li>
+</ul>
+<p><strong>Answer:</strong>
+I am sorry to say that your approach is not valid either.</p>
+<p>It is actually even more illegal than I thought it was...</p>
+<p>I am happy to inform you that the correct and valid approaches have been documented numerous times already, both in the Revit SDK samples and on The Building Coder blog.</p>
+<p>A valid Revit API context is only provided by Revit API events for which you implement an event handler.</p>
+<p>If you are calling <code>PostCommand</code> or even just <code>CanPostCommand</code> from a modeless dialogue, then you are NOT in a valid API context and that call can cause problems all in itself.</p>
+<p>This applies to every single Revit API call, not just <code>PostCommand</code> or <code>CanPostCommand</code>.</p>
+<p>The only correct way to achieve what you described above is by using an external event.</p>
+<p>There are several ways to access a valid Revit API context from a modeless context.</p>
+<p>The best place to start is to study the two ModelessDialog SDK samples, ModelessForm_ExternalEvent and ModelessForm_IdlingEvent.</p>
+<p>As said, this topic has been extensively discussed by The Building Coder. Some posts are listed in the topic group
+on <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">Idling and External Events for modeless access and driving Revit from outside</a>.</p>
+<p>You might want to start at the end.</p>
+<p>You will probably need to re-architect your add-in to use external events.</p>
+<p>If you are averse to reading the discussions pointed to above, you can simply jump straight to the appropriate Revit SDK sample, <code>ModelessDialog</code> &rarr; <code>ModelessForm_ExternalEvent</code>, and work it out from there yourself.</p>
+<p>It demonstrates the best practices accessing the Revit API from a modeless form via an external event.</p>
+<p>Base your application on that and you can continue to avoid all additional reading.</p>
+<h4><a name="3"></a>Do Not Call PostCommand from an Idling Event Handler</h4>
+<p><strong>Question:</strong>
+We have just observed that certain circumstances cause Revit add-in command to throw an internal exception.</p>
+<p>This apparently happens always when calling the <code>PickObject</code> method from the external command code WHEN the corresponding command has been invoked with <code>UIApplication.PostCommand</code>:</p>
+<!---
+<center>
+<img src="img/command_failure_for_external_command.png" alt="Exception" width="400"/>
+</center>
+-->
+
+<p>Calling <code>PickObject</code> in a "normal" external command scenario seems to be working as expected.</p>
+<p><strong>Answer by Arnošt:</strong>
+The same applies as above:</p>
+<p>Regardless of this particular workflow leading to an exception (justified or not), we have an obligation to inform the user that this workflow is wrong and should be avoided. Just because we allow it (or rather pretend allowing it) does not make this workflow right or justified. If the user when in his external command posts another external command of his it means that the design of his application is flawed. There should never be a need for such an obscure complication. Since both commands belong to the same programmer (my assumption, but I believe I am correct), the programmer has far better means to call one command from another. Even if those two commands are in different assemblies, there are still ways of invoking one from the other. Using the posting mechanism and <code>Idling</code> to invoke functions in the same application is quite crazy, even if it is allowed. I do not think we should allow picking or posting a command from another posted external command, and to be perfectly honest, I am not even sure that we should allow posting external commands from regularly invoked external commands (but that is another topic).</p>
+<p><strong>Response:</strong>
+I think I need to explain the scenario where we are using the technique. I believe it’s perfectly reasonable but I also understand that it’s testing the limits of Revit API. I would be more than happy if you could show me better way of doing it.</p>
+<p>We have a command that allows user to give certain options that she wants to use during the (i.e.) duct drawing. After the options are accepted, our add-in enables those and starts Revit’s own duct drawing method. Same time an <code>Idling</code> event has been registered to inform our code, when the drawing ends.</p>
+<p>There can be various reasons why drawing ends, one which tells that user actually wants to do some additional things we offer. These functionalities we offer are implemented within a separate command. Therefore we use <code>PostCommand</code> from the <code>Idling</code> event handler to launch external command properly. As there’s no way of constructing an ExternalCommandData object manually, we have decided to use <code>PostCommand</code> to deal the command invoke.</p>
+<p>I created a <a href="http://screencast.com/t/YMsRQJJGV">two-minute screencast recording</a> that demonstrates using our add-in in practice in Revit 2015, where everything works well.</p>
+<p><strong>Answer by Arnošt:</strong>
+My advice to you is still: Please try to modify your application so posting a command and then picking objects from it is not necessary. Technically, as far as I know, posting an external command should never be necessary. If the customer already knows that an external command exists and where, and also knows what the command does, then the customer most likely knows how the command is implemented. Thus invoking the command (or another main method that the command executes) via dynamic binding not only solves this customer's problem, but is also a preferred programming technique. By the way, this is also how things are done inside Revit.</p>
+<p><strong>Response:</strong>
+I understand the criticism against the design, where one external command post for another. Yes. It would be crazy as I understand that two or more external commands could be chained more easily.</p>
+<p>But there’s a misunderstanding here! Although I made the example code for you where another command was posted from another one, that’s not the actual case we have! In our case we post the command from the <code>Idling</code> event. From there it’s the only way of invoking our own external command properly I think. If I’m wrong, please tell me asap :-).</p>
+<p>I’m launching our external command from the <code>Idling</code> event handler (and yes, the symptoms are the same).</p>
+<p>How can I do that properly without <code>PostCommand</code>?</p>
+<p>I know that doing it is pretty obvious actually, but it means that we would need to cache the ExternalCommandData object. It doesn’t feel reliable. Other possibility is to refactor the related external command class to offer alternative interface, where only mandatory set of data is needed. But this is not a small thing to do, as every command has been build assuming that it will get complete and fresh set of data from the ExternalCommandData. Using <code>PostCommand</code>, the advantage IMO is that the invoked command is guaranteed to get fresh data from the Revit, just like in a command invocation normal scenario.</p>
+<p>This is my honest feedback to API team: The current fact that we should not use the <code>PostCommand</code> for external commands is not in any means obvious! It’s totally other way around. The <code>PostCommand</code> API supports calling other commands than those listed in the enumeration!! We have even read tips on The Building Coder how to get the command id for the external command. I have to admit I’m a bit disappointed about the current situation :-(.</p>
+<p><strong>Answer by Arnošt:</strong>
+You say, "We have even read tips on The Building Coder how to get the command id for the external command. I have to admit I’m a bit disappointed about the current situation."</p>
+<p>The Building Coder is not an official support site run by Autodesk and/or the Revit development team. Jeremy can pretty much publish whatever he wants, whether it is correct, valid, officially supported, or not. Just because something is on Building Coder does not make it a supported way. We certainly do not mean to restrict users in what they can do, but we cannot support just any idea they might chose to pursue.</p>
+<p>You say, "The current fact that we should not use the <code>PostCommand</code> for external commands is not in any means obvious! It’s totally other way around."</p>
+<p>I agree that some may see it that way. On the other hand, I could also claim (without even remotely trying be controversial), that it was not all obvious to us that users would ever try posting an external command. The fact that doing so is such an obscure technique kind of put it out of our radar and concerns. We simply did not consider it because they are other, standard ways of invoking code that is from the same add-in (or even in another add-in). And that is my honest point of view.</p>
+<p>You say, "But this is not a small thing to do, as every command has been build assuming that it will get complete and fresh set of data from the ExternalCommandData."</p>
+<p>Actually, I do not think it is necessary to instantiate ExternalCommandData in order to execute a method that implements an external command. It depends on how the external command is structured. I seriously doubt that external commands need anything else from ExternalCommandData other than the UIApplication object or the currently active document. I am quite confident that is the majority of external commands out there, and definitely all of those which do not need journaling (not many those exist), which does not look like it’s the case.</p>
+<p>The way I personally structure my external commands is (simplified):</p>
+<pre classs="code">
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">return</span> ExecuteImpl( commandData.Application );
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> ExecuteImpl( <span class="teal">UIApplication</span> uiapp )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// .. implementation of the commands goes here</span>
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+</pre>
+
+<p>Naturally, other ways are possible &ndash; for example I have a lot of tests that need only the DB <code>Application</code> instead or just the current DB <code>Document</code>. However, the main idea here is that the implementation (typically a DB part of the command) is separated from the command itself. By structuring my code this way I am free to invoke the implementation routine from anywhere I wish, within or out of the command’s assembly.</p>
+<p>I typically do not use the ‘message’ and ‘elements’ arguments of external commands, but if I need them I can easily pass them to my implementation routine too along with the application instance.</p>
+<p>The "application instance" is available pretty much in any situation when Revit invokes an add-in. For example in the <code>Idling</code> event the application is the ‘sender’ of the event. Thus, by simply casting the ‘sender’ to <code>UIApplication</code> the programmer has enough data to call a command’s execution routine with.</p>
+<p>You say, "We have a command that allows user to give certain options which he/she wants to use during the (i.e.) duct drawing. After the options are accepted, our add-in enables those and starts Revit’s own duct drawing method. Same time an <code>Idling</code> event has been registered to inform our code, when the drawing ends."</p>
+<p>This is pretty risky workflow, although I admit it is quite popular among our users (and popularized by Jeremy too). Again, without trying to dictate users what they may or may not do, I hope that my twenty plus years of experience as a software engineer will persuade most of them to not use such a technique. The problem is manifold:</p>
+<ol>
+<li>In most cases it is not obvious to decide when (and even if) a command ends.</li>
+<li>It cannot be guaranteed that the <code>Idling</code> handler which is waiting for the command to finish is the only <code>Idling</code> handler waiting for his chance. Imagine a session with five <code>Idling</code> handlers with each wanting to post commands or external commands. Order of their execution could be pretty much random, thus none of them could ever be sure what has really happened since the original command was posted (the one the <code>Idling</code> handler is waiting for to finish).</li>
+</ol>
+<p>You say, "Revit 2015 is used where everything works well."</p>
+<p>Actually, not everything in Revit 2015 works well. Besides other issues, there had been multiple problems with posting commands, which was why we had to use significantly different implementation, now available in 2015UR2. That is actually our right to improve our product. I am very sorry, I really am, that some workflows have been broken by the fix. It was totally not our intention. Again, it never had occurred to us that someone might actually depend on a workflow in which an external command is posted and especially several times (PickObject is kind of posted command too).</p>
+<p>Naturally, this discussion could continue for much longer, one’s argument put against the others. However, I believe our stand is quite reasonable. There is a very reasonable way to invoke one command’s execution routine, and that way most likely satisfies most developers. On the other hand, a workflow that involves recursively posting commands is quite technically challenging to implement and thus, in my personal opinion at least, does not justify the need.</p>
+<p><strong>Response:</strong>
+Thank you all for your detailed answers.</p>
+<p>There has been a lot of discussion around the issue, so I agree it’s time for actions now. But still it has been very useful discussion. It’s much easier to understand the circumstances you have had.</p>
+<p>It’s easy to agree on those technical approaches.</p>
+<p>We can probably fix everything and get satisfactory results.</p>
+<p>It just requires work that we haven’t scheduled  :-(</p>
+<h4><a name="4"></a>Vacation Time</h4>
+<p>I'm leaving on vacation for two weeks.</p>
+<p><center>
+<img src="/j/photo/jeremy/2008/2008-10-28_la_garnatilla/jeremy_in_wave_2.jpg" alt="Jeremy in a wave" width="300"/>
+</center></p>
+<p>Take care!</p>

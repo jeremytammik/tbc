@@ -1,0 +1,201 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!---
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+11316493 [FilteredElementCollectors with LINQ]
+10696417 [How to retrieve System Families]
+
+#dotnet #csharp
+#fsharp #python
+#grevit
+#responsivedesign #typepad
+#ah8 #augi #dotnet
+#stingray #adsklabs #rendering
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #mobile #vr #ecommerce
+#Markdown #Fusion360 #Fusion360Hackathon
+#javascript
+#RestSharp #restapi
+#mongoosejs #mongodb #nodejs
+#rtceur
+#geometry #3d
+#xaml
+
+Revit API, Jeremy Tammik, akn_include
+
+Quick, Slow and LINQ Element Filtering #revitapi #bim #aec #3dwebcoder #adsk
+
+I arrived back safe and sound in Switzerland after the exciting week at Autodesk University. Another happy arrival is my first grandson: He was preceded by his big sister almost two years ago. Life goes on. I have been wanting to highlight the difference between quick and slow element filters for quite a while, and now a query came in that provides an ideal opportunity
+&ndash; Use of LINQ with filtered element collectors
+&ndash; Revit element filter classification
+&ndash; Filter types
+&ndash; Efficiency guidelines
+&ndash; Logical filters
+&ndash; Quick filters
+&ndash; Slow filters...
+
+-->
+
+<h3>Quick, Slow and LINQ Element Filtering</h3>
+<p>I arrived back safe and sound in Switzerland after the exciting week at Autodesk University.</p>
+<p>Another happy arrival is my first grandson:</p>
+<p><center>
+<img src="/p/people/marlon/20151208_marlon_cropped.jpg" alt="Grandson" width="400">
+</center></p>
+<p>He was preceded by his big sister almost two years ago.</p>
+<p>Life goes on.</p>
+<p>I have been wanting to highlight the difference between quick and slow element filters for quite a while, and now a query came in that provides an ideal opportunity.</p>
+<ul>
+<li><a href="#2">Use of LINQ with filtered element collectors</a></li>
+<li><a href="#3">Revit element filter classification</a><ul>
+<li><a href="#4">Filter types</a></li>
+<li><a href="#5">Efficiency guidelines</a></li>
+<li><a href="#5">Logical filters</a></li>
+<li><a href="#6">Quick filters</a></li>
+<li><a href="#7">Slow filters</a></li>
+</ul>
+</li>
+</ul>
+<h4><a name="2"></a>Use of LINQ with Filtered Element Collectors</h4>
+<p><strong>Question:</strong> I have been using lots of LINQ with delegates to perform database queries.</p>
+<p>Now I am wondering how to use them with Revit filtered element collectors.</p>
+<p>I see several different possibilities, e.g. like this:</p>
+<p><center>
+<img src="img/jo_collector_samples.png" alt="Filtered element collector sample code snippets" width="889">
+</center></p>
+<p>I have the following questions regarding this:</p>
+<ol>
+<li>What is the primary difference/benefit between the sample 1 code, which uses the Revit <code>ElementFilter</code> objects, and the sample 3 code, which just uses pure LINQ on the FilteredElementCollector itself? I assume they would get the same results but I don't quite grasp when I should be using the native Revit filter objects versus pure LINQ queries.</li>
+<li>In sample 2, is the <code>ToElements</code> method required? Is there any difference between that and the <code>foreach</code> loop on the FilteredElementCollector directly in sample 1?</li>
+<li>Similar question 2, in sample 3 is it safe to perform LINQ on the FilteredElementCollector directly or should I be invoking <code>ToElements</code> first then performing LINQ?</li>
+</ol>
+<p>I've found LINQ to be incredibly fast but I'm just trying to make sure I fully understand the impacts of using it on the FilteredElementCollector objects.</p>
+<p><strong>Answer:</strong> These are very relevant and important questions, I think.</p>
+<p>However, I would <em>always</em> much prefer having the sample code snippets in text form rather than as a screen snapshot!</p>
+<p>To start from the essentials and basics, you need to understand and consider three different levels of filtering element collector data access and performance:</p>
+<ul>
+<li>Quick filters</li>
+<li>Slow filters</li>
+<li>.NET filtering, aka post-processing</li>
+</ul>
+<p>Quick filters are fast, because they operate on data present in the Revit element header.</p>
+<p>In a huge project, Revit will not load the entire Revit database element information, only a small header for each element.</p>
+<p>A quick filter can execute immediately using only the header information, which is always available in the project.</p>
+<p>A slow filter may need to load the complete element information in order to execute. In a huge project, that may affect performance.</p>
+<p>These two kinds of filters are built into the Revit filtered element collector framework and execute directly on the Revit element data within the Revit memory, with no need to translate and marshal the element information to pass it out to the .NET add-in client.</p>
+<p>As soon as you use any kind of .NET operation to filter that data, you are requesting Revit to translate and marshal the element information and pass it out from the Revit memory space to the .NET add-in client. That is a hugely inefficient process, compared to the internal filtering.</p>
+<p>Regardless of what you are searching for, doing it in .NET instead of using a built-in filter is guaranteed to double the execution time and halve the performance.</p>
+<p>I tested various combinations of this quite extensively, starting with
+the <a href="http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html">collector benchmark</a> in 2010.</p>
+<p>You can find more examples by searching the Internet for CmdCollectorPerformance, optionally adding 'revit api' or 'building coder'.</p>
+<p>They refer to
+the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs">CmdCollectorPerformance.cs module</a>
+in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>.</p>
+<p>Your question 2 regarding the optional use of <code>ToElements</code> is answered in my discussion of <a href="http://thebuildingcoder.typepad.com/blog/2012/12/toelementids-performance.html">ToElementIds performance</a>.</p>
+<p>In short, you should avoid it unless you really need it.</p>
+<p>One situation in which it might be useful is when you really need to determine the number of elements returned by the collector before starting to iterate over them. Unlike the collector itself, ToElements returns a generic List of Element objects providing a Count property.</p>
+<p>A more common need might be to access the element ids.</p>
+<p>I recently discussed an example that demonstrates the imperative need
+to <a href="http://thebuildingcoder.typepad.com/blog/2015/12/au-ioc-banks-and-not-to-delete-while-iterating.html#2">close the collector before deleting elements</a>,
+in which case <code>ToElementIds</code> can come in handy.</p>
+<p>By now, I hope that it is clear that your sample 3 is an utter abomination and could be regarded as verging on criminal inefficiency.</p>
+<p>If you say that you found LINQ to be incredibly fast, you will be happy to hear that the Revit filtered element collectors are at least twice as fast, in the worst case.</p>
+<p>For the sake of completeness, see <a href="#3">below</a> for more on the topic of the different Revit API filter types and quick versus slow ones.</p>
+<p>An interesting specialised topic is how to convert from .NET post-process filtering to built-in Revit filtering in order to optimise performance. One typical situation in which the .NET filtering may seem easier to implement is when checking for specific element parameter values.</p>
+<p>The collector performance samples pointed to above provide several samples of avoiding that by setting up appropriate element parameter filters instead, e.g., to <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs#L148-L200">filter for elements in a specific view having a specific phase</a>.</p>
+<p>Please also explore and understand the related discussion
+on <a href="http://thebuildingcoder.typepad.com/blog/2012/09/findelement-and-collector-optimisation.html">FindElement and collector
+optimisation</a>.</p>
+<p>Now back to the overview that I have been planning to publish for so long:</p>
+<h4><a name="3"></a>Revit Element Filter Classification</h4>
+<p>Here is an overview of the different types of element filters, based on
+the <a href="https://github.com/ADN-DevTech/RevitTrainingMaterial/blob/master/Presentation/1_Revit_API_Intro.pptx">Revit API Introduction slide deck</a> from
+the <a href="https://github.com/ADN-DevTech/RevitTrainingMaterial">ADN Revit API training material</a>.</p>
+<p>All Revit database elements are bundled in one single container.</p>
+<p>To retrieve an element of interest, you filter for it using a filtered element collector.</p>
+<p>The <code>FilteredElementCollector</code> class is used to search, filter and iterate through a set of elements.</p>
+<p>You can assign a variety of conditions to filter the elements that are returned.</p>
+<p>The system requires that at least one condition be set before making the attempt to access the elements, otherwise an exception thrown.</p>
+<p>The <code>FilteredElementCollector</code> class supports the <code>IEnumerable</code> interface, so you can iterate over the resulting elements directly using <code>foreach</code>.</p>
+<p><strong>Tip:</strong> because all built-in Revit element filters process elements in native code before their managed wrappers are generated, better performance will be obtained by using as many native filters as possible on the collector before attempting to process the results using LINQ queries or other .NET methods.</p>
+<h4><a name="4"></a>Filter Types</h4>
+<ul>
+<li>Logical Filters &ndash; help to combine filter logic<ul>
+<li>And</li>
+<li>Or</li>
+</ul>
+</li>
+<li>Quick filters &ndash; use internal element record header to determine passing state<ul>
+<li>Examples: ElementClassFilter, ElementCategoryFilter</li>
+</ul>
+</li>
+<li>Slow filters &ndash; expand element to determine passing state<ul>
+<li>Examples: FamilyInstanceFilter, AreaFilter</li>
+</ul>
+</li>
+</ul>
+<p>Quick filters can use the internal element record to determine passing state. This allows Revit to find elements that have not been expanded into internal memory yet.</p>
+<p>Slow filters cannot determine the passing state based on the minimal element record, so these filters must load and expand each element to determine its passing state.</p>
+<h4><a name="5"></a>Efficiency Guidelines</h4>
+<ul>
+<li>Filter quick aspects first</li>
+<li>Filter slow aspects later</li>
+<li>Do not use .NET or LINQ until after exhausting the built-in filtering techniques</li>
+</ul>
+<p><strong>Tip:</strong> Use the shortcut methods on FilteredElementCollector.</p>
+<ul>
+<li>Because there are currently no shortcuts for slow filters, you can be sure you are getting a quick filter when using a shortcut.</li>
+<li>Examples: OfClass, OfCategoryId</li>
+</ul>
+<h4><a name="5"></a>Logical Filters</h4>
+<ul>
+<li>LogicalAndFilter: elements must pass two or more filters<ul>
+<li>WherePasses &ndash; adds an additional filter</li>
+<li>IntersectWith &ndash; joins two sets of independent filters</li>
+</ul>
+</li>
+<li>LogicalOrFilter &ndash; elements must pass at least one of two or more filters<ul>
+<li>UnionWith &ndash; joins two sets of independent filters</li>
+</ul>
+</li>
+</ul>
+<h4><a name="6"></a>Quick Filters</h4>
+<p>All quick filters are visible as shortcut methods on the filtered element collector.</p>
+<p>Here is a list of the filter class name, shortcut method, if available, and description:</p>
+<ul>
+<li>ElementCategoryFilter &ndash; <code>OfCategoryId</code> &ndash; elements matching the input category id.</li>
+<li>ElementClassFilter &ndash; OfClass &ndash; elements matching the input runtime class.</li>
+<li>ElementIsElementTypeFilter &ndash; WhereElementIsElementType, WhereElementIsNotElementType &ndash; elements that are element types, also called family symbols.</li>
+<li>ElementOwnerViewFilter &ndash; OwnedByView, WhereElementIsViewIndependent &ndash; elements that are view-specific.</li>
+<li>ElementDesignOptionFilter &ndash; ContainedInDesignOption &ndash; elements in a particular design option.</li>
+<li>ElementIsCurveDrivenFilter &ndash; WhereElementIsCurveDriven &ndash; elements that are curve driven.</li>
+<li>ElementStructuralTypeFilter &ndash; none &ndash; elements matching the given structural type.</li>
+<li>FamilySymbolFilter &ndash; none &ndash; symbols of a particular family.</li>
+<li>ExclusionFilter &ndash; Excluding &ndash; all elements except the ones who's ids are passed into to the filter.</li>
+<li>BoundingBoxIntersectsFilter &ndash; none &ndash; elements that have a bounding box intersecting a given outline.</li>
+<li>BoundingBoxIsInsideFilter &ndash; none &ndash; elements that have a bounding box inside a given outline.</li>
+<li>BoundingBoxContainsPointFilter &ndash; none &ndash; elements that have a bounding box containing a given point.</li>
+</ul>
+<h4><a name="7"></a>Slow Filters</h4>
+<p>Slow filters have no corresponding shortcut method on the collector class:</p>
+<ul>
+<li>FamilyInstanceFilter &ndash; instances of a particular family symbol.</li>
+<li>ElementLevelFilter &ndash; elements associated to a given level id.</li>
+<li>ElementParameterFilter &ndash; parameter existence, value matching, range matching, and/or string matching.</li>
+<li>PrimaryDesignOptionMemberFilter &ndash; elements owned by any primary design option..</li>
+<li>StructuralInstanceUsageFilter &ndash; structural usage parameter for family instances.</li>
+<li>StructuralWallUsageFilter &ndash; structural usage parameter for walls.</li>
+<li>StructuralMaterialTypeFilter &ndash; material type applied to family instances.</li>
+<li>RoomFilter &ndash; finds rooms.</li>
+<li>SpaceFilter &ndash; finds spaces.</li>
+<li>AreaFilter &ndash; finds areas.</li>
+<li>RoomTagFilter &ndash; finds room tags.</li>
+<li>SpaceTagFilter &ndash; finds space tags.</li>
+<li>AreaTagFilter &ndash; finds area tags.</li>
+<li>CurveElementFilter &ndash; finds specific types of curve elements, e.g. model curves, symbolic curves, detail curves, etc.</li>
+</ul>

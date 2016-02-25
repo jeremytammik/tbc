@@ -1,0 +1,250 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!---
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+#dotnet #csharp #geometry
+#fsharp #dynamobim #python
+#grevit
+#responsivedesign #typepad
+#ah8 #augi #au2015 #dotnet #dynamobim
+#stingray #adsklabs #cloud #rendering
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #mobile #vr #ecommerce
+#Markdown #Fusion360 #Fusion360Hackathon #revitapi #3dwebcoder
+#javascript
+#RestSharp #restapi
+#au2015
+#mongoosejs #mongodb #nodejs
+#au2015 #rtceur
+
+Revit API, Jeremy Tammik, akn_include
+
+Sheet to Model Coordinate Conversion #revitapi #bim #aec #3dwebcoder #adsk #adskdevnetwrk #au2015 #rtceur
+
+&ndash;
+
+-->
+
+<h3>Sheet to Model Coordinate Conversion</h3>
+<p>James Carroll raised
+a <a href="http://thebuildingcoder.typepad.com/blog/2013/10/exact-viewport-positioning-conceptual-design-automation-and-graitec.html#comment-2296469077">question</a> on the discussion
+of <a href="http://thebuildingcoder.typepad.com/blog/2013/10/exact-viewport-positioning-conceptual-design-automation-and-graitec.html">exact viewport positioning</a>:</p>
+<p><strong>Question:</strong>
+You mentioned that "there is currently a gap in the API related to converting between model and sheet coordinates."</p>
+<p>This is exactly what we are trying to do!</p>
+<p>We want to get element boundary geometry in paper space.</p>
+<p>Is this gap still present in the Revit 2016 API?</p>
+<p>Are you aware of a workaround?</p>
+<p><strong>Answer:</strong>
+There is still a gap, as you will see if you read through Miro's sample below.</p>
+<p>It is however possible to quite easily convert from sheet coordinates to Revit model coordinates, e.g., to place model text notes and other geometric elements based on input read from something in sheet coordinates, for example a linked DWFX file.</p>
+<p>Paolo Serra, Technical BIM Consultant at Autodesk in Milano, provides a nice example demonstrating this:</p>
+<blockquote>
+<p>I've been doing something related to this subject for a client in Italy, given that the level height is the same as the view in the viewport on the sheet I collected the DWF markups (polyLines and arcs) to write a textnote, for instance, or to place families... here is something I did on the fly... hope it helps.</p>
+</blockquote>
+<p><strong>Jeremy says:</strong>
+I implemented a new external
+command <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSheetToModel.cs">CmdSheetToModel</a>
+in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder</a> samples
+version <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.121.0">2016.0.121.0</a> to
+host and test Paolo's code.</p>
+<h4><a name="2"></a>Converting Sheet to Model Coordinate Sample</h4>
+<p>I ran it in a trivial Revit sample model with a linked DWFX file attached to it:</p>
+<p><center>
+<img src="img/sheet_to_model_01.png" alt="Sample model with linked DWFX" width="404">
+</center></p>
+<p>Here is the viewport that we can use to grab coordinates from:</p>
+<p><center>
+<img src="img/sheet_to_model_02.png" alt="Viewport" width="616">
+</center></p>
+<p>The sample command reads the DWFX markup in sheet coordinates, converts them to model coordinates, and places a text element at the centre of each DWFX arc element:</p>
+<p><center>
+<img src="img/sheet_to_model_03.png" alt="Text notes added based on DWFX markup location" width="567"/>
+</center></p>
+<p>The generated test notes on each DWFX arc look like this:</p>
+<p><center>
+<img src="img/sheet_to_model_04.png" alt="Sample model with linked DWFX" width="442"/>
+</center></p>
+<p>As said, I implemented a new external
+command <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSheetToModel.cs">CmdSheetToModel</a>
+in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder</a> samples
+version <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.121.0">2016.0.121.0</a> to implement and test this.</p>
+<h4><a name="2"></a>Setting Plan View Location within Sheet</h4>
+<p>Miroslav Schonauer, Solution Architect for Autodesk Consulting, has another interesting sample to share that shows a very powerful approach that is hopefully edifying and useful to many other add-in developers as well and also hits the limits:</p>
+<p>I have an interesting requirement to set each Plan View within Sheet (always that single view on it!) so that the <em>physical model</em> X-Y position is always the same among different sheets, regardless of the View/Viewport shape, crops, etc.
+This is so that when multiple printed Sheets are 'overlapped', the Plans coordinate systems (physical XY position) are also overlapped…</p>
+<p>After a lot of research about the Sheet, Viewport and View classes, I thought I worked out how to do the task. For simplicity, I temporarily use single-sheet to test. In the code, I also made assumptions that the Sheet is active and that there are 'Level 0' Floor Plan (Master to which to align to) and several other Floor Plans (Slaves whose Viewports are to be moved), all of the same Scale.</p>
+<p>It all works great apart when aligning the views which are cropped, BUT for some reason one of their Elevation symbols although outside the crop box STILL shows in the View. Strangely, it always seems to be East Elevation – if that one is left outside the crop box, it still shows in the Viewport, all others don't!</p>
+<p>Two questions:</p>
+<ul>
+<li>Is this a bug in UI that the Elevation Symbol shows in plan Viewport even though it's outside of the crop box?</li>
+<li>Regardless of the answer to above, is there a way to adjust my code to cover that case as well? The problem is that I made hopefully reasonable assumption that the centre of View Outline is also the centre of Viewport (from my number-crunching analyses, Revit seems to add a 0.01ft buffer on all 4 sides to the former in order to create the latter), but that assumption is not valid when the elevation symbol outside the very cropped view is 'bundled' alongside that view in its sheet viewport L.</li>
+</ul>
+<p>The code command is fully copied below and I attach a 2015 RVT model with walls used to write some sample text that can be used to repro the problem. The 'culprit' View is 'Level 1 View2' for which it can be seen that Elevation Symbols outside crop box is displayed. Other 2 views ('Level 0 Test1' and 'Level 1') align spot-on.</p>
+<p>Before command:</p>
+<p><center>
+<img src="img/sheet_to_model_05.png" alt="Before command" width="960"/>
+</center></p>
+<p>After command:</p>
+<p><center>
+<img src="img/sheet_to_model_06.png" alt="After command" width="960"/>
+</center></p>
+<p>Here is the code I use to test this:</p>
+<pre class="code">
+[<span class="teal">Transaction</span>( <span class="teal">TransactionMode</span>.Automatic )]
+<span class="blue">public</span> <span class="blue">class</span> <span class="teal">CmdMiroTest2</span> : <span class="teal">IExternalCommand</span>
+{
+&nbsp; <span class="green">// KIS - public fields</span>
+&nbsp; <span class="blue">public</span> <span class="teal">UIApplication</span> _appUI = <span class="blue">null</span>;
+&nbsp; <span class="blue">public</span> <span class="teal">ApplicationRvt</span> _app = <span class="blue">null</span>;
+&nbsp; <span class="blue">public</span> <span class="teal">UIDocument</span> _docUI = <span class="blue">null</span>;
+&nbsp; <span class="blue">public</span> <span class="teal">Document</span> _doc = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="teal">Result</span> <span class="teal">IExternalCommand</span>.Execute(
+&nbsp; &nbsp; <span class="teal">ExternalCommandData</span> commandData,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">string</span> message,
+&nbsp; &nbsp; <span class="teal">ElementSet</span> elements )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// cache admin data</span>
+&nbsp; &nbsp; _appUI = commandData.Application;
+&nbsp; &nbsp; _app = _appUI.Application;
+&nbsp; &nbsp; _docUI = commandData.Application.ActiveUIDocument;
+&nbsp; &nbsp; _doc = _docUI.Document;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">try</span> <span class="green">// generic</span>
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="green">// Current View must be Sheet</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">ViewSheet</span> sheet = _doc.ActiveView <span class="blue">as</span> <span class="teal">ViewSheet</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == sheet )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="maroon">&quot;Current View is NOT a Sheet!&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// There must be a Floor Plan named &quot;Level 0&quot; </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// which is the &quot;master&quot; to align to</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">Viewport</span> vpMaster = <span class="blue">null</span>;
+&nbsp; &nbsp; &nbsp; <span class="green">// There must be at least one more Floor Plan </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// View to align (move)</span>
+&nbsp; &nbsp; &nbsp; <span class="teal">List</span>&lt;<span class="teal">Viewport</span>&gt; vpsSlave = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">Viewport</span>&gt;();
+&nbsp; &nbsp; &nbsp; <span class="green">// Find them:</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">ElementId</span> idVp <span class="blue">in</span> sheet.GetAllViewports() )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Viewport</span> vp = _doc.GetElement( idVp ) <span class="blue">as</span> <span class="teal">Viewport</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ViewRvt</span> v = _doc.GetElement( vp.ViewId ) <span class="blue">as</span> <span class="teal">ViewRvt</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( v.ViewType == <span class="teal">ViewType</span>.FloorPlan )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( v.Name.Equals( <span class="maroon">&quot;Level 0&quot;</span>, <span class="teal">StringComparison</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .CurrentCultureIgnoreCase ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; vpMaster = vp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; vpsSlave.Add( vp );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; } <span class="green">//if FloorPlan</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; } <span class="green">//foreeach idVp</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Check if got them all</span>
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> == vpMaster )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="maroon">&quot;NO 'Level 0' Floor Plan on the Sheet!&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( vpsSlave.Count == 0 )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="maroon">&quot;NO other Floor Plans to adjust on the Sheet!&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Cancelled;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Process Master</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// --------------</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> ptMasterVpCenter = vpMaster.GetBoxCenter();
+&nbsp; &nbsp; &nbsp; <span class="teal">ViewRvt</span> viewMaster = _doc.GetElement(
+&nbsp; &nbsp; &nbsp; &nbsp; vpMaster.ViewId ) <span class="blue">as</span> <span class="teal">ViewRvt</span>;
+&nbsp; &nbsp; &nbsp; <span class="blue">double</span> scaleMaster = viewMaster.Scale;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Process Slaves</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// --------------</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Viewport</span> vpSlave <span class="blue">in</span> vpsSlave )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> ptSlaveVpCenter = vpSlave.GetBoxCenter();
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ViewRvt</span> viewSlave = _doc.GetElement(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; vpSlave.ViewId ) <span class="blue">as</span> <span class="teal">ViewRvt</span>;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> scaleSlave = viewSlave.Scale;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// MUST be the same scale, otherwise can't really overlap</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">if</span>( scaleSlave != scaleMaster ) <span class="blue">continue</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Work out how to move the center of Slave </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Viewport to coincide model-wise with Master</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// (must use center as only Viewport.SetBoxCenter </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// is provided in API)</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// We can ignore View.Outline as Viewport.GetBoxOutline </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// is ALWAYS the same dimensions enlarged by </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// 0.01 ft in each direction.</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// This guarantees that the center of View is </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// also center of Viewport, BUT there is a </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// problem when any Elevation Symbols outside </span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// the crop box are visible (can't work out why</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// - BUG?, or how to calculate it all if BY-DESIGN)</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> bbm = viewMaster.CropBox;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BoundingBoxXYZ</span> bbs = viewSlave.CropBox;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// 0) Center points in WCS</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> wcsCenterMaster = 0.5 * bbm.Min.Add( bbm.Max );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> wcsCenterSlave = 0.5 * bbs.Min.Add( bbs.Max );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// 1) Delta (in model's feet) of the slave center w.r.t master center</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> deltaX = wcsCenterSlave.X - wcsCenterMaster.X;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">double</span> deltaY = wcsCenterSlave.Y - wcsCenterMaster.Y;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// 1a) Scale to Delta in Sheet's paper-space feet</span>
+&nbsp; &nbsp; &nbsp; &nbsp; deltaX *= 1.0 / (<span class="blue">double</span>) scaleMaster;
+&nbsp; &nbsp; &nbsp; &nbsp; deltaY *= 1.0 / (<span class="blue">double</span>) scaleMaster;
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// 2) New center point for the slave viewport, so *models* &quot;overlap&quot;:</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">XYZ</span> newCenter = <span class="blue">new</span> <span class="teal">XYZ</span>(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ptMasterVpCenter.X + deltaX,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ptMasterVpCenter.Y + deltaY,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ptSlaveVpCenter.Z );
+&nbsp; &nbsp; &nbsp; &nbsp; vpSlave.SetBoxCenter( newCenter );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">catch</span>( <span class="teal">Exception</span> ex )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.ErrorMsg( <span class="maroon">&quot;Generic exception: &quot;</span> + ex.Message );
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Failed;
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+} <span class="green">// CmdMiroTest2</span>
+</pre>
+
+<p>An update after some help from a local user expert &ndash; he explained that what I'm seeing in 'Level 1 View2' is due to the View's Annotation Crop settings.</p>
+<p>So, it is now confirmed that Q1) is no bug, but it's legal and likely that there may be annotation elements outside the crop box within a Viewport.</p>
+<p>Therefore, the whole feasibility of my task boils to the answer on now more-specific Q2:</p>
+<p>As the Crop Box is NOT guaranteed to be centred within a Viewport, is there a way to determine where within the Viewport's Outline the Crop Box is positioned?</p>
+<p>Or any other way to determine 2D Viewport to 3D Model mapping?</p>
+<p>I am not too optimistic, but can someone pls confirm either way as I need to be sure about the feasibility?</p>
+<p><strong>Scott Conover responds:</strong>
+This is a known gap tracked as an enhancement request in the change request REVIT-10373.</p>
+<!--- http://manjraprd01/browse/REVIT-10373 -->
+
+<!--- [As an add-in developer, I need to be able to transform view points between commonly understood reference frames, such as model coordinates, viewport coordinates and sheet coordinates.] -->
+
+<p>Thank you very much, Paolo and Miro, for sharing these important insights and samples!</p>
+<p>I just added Miro's sample code to
+the module <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSheetToModel.cs">CmdSheetToModel</a> as well,
+in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder</a> samples
+version <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.121.1">2016.0.121.1</a>.</p>

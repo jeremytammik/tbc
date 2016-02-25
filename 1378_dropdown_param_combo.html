@@ -1,0 +1,83 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!---
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+#dotnet #csharp
+#fsharp #python
+#grevit
+#responsivedesign #typepad
+#ah8 #augi #dotnet
+#stingray #adsklabs #rendering
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #mobile #vr #ecommerce
+#Markdown #Fusion360 #Fusion360Hackathon
+#javascript
+#RestSharp #restapi
+#mongoosejs #mongodb #nodejs
+#rtceur
+#geometry #3d
+#xaml
+
+Revit API, Jeremy Tammik, akn_include
+
+Drop-down Enumerated Parameter Values #revitapi #bim #aec #3dwebcoder #adsk #au2015 #apis
+
+I repeatedly hear from developers who wish to define a specific enumerated set of parameter values for their add-ins and limit the selection to these values in the element property palette user interface. Internally, Revit does implement a system to handle this, for instance by using negative element ids for element property drop-down list enumerations. This has also been a long-standing wish list item, and unfortunately still remains in that state, currently incorporated in the issue CF-3498 API wish: drop-down enumeration parameters for combo box...
+
+-->
+
+<h3>Drop-down Enumerated Parameter Values</h3>
+<p>I repeatedly hear from developers who wish to define a specific enumerated set of parameter values for their add-ins and limit the selection to these values in the element property palette user interface.</p>
+<p>Internally, Revit does implement a system to handle this, for instance by
+using <a href="http://thebuildingcoder.typepad.com/blog/2014/04/element-id-export-unique-navisworks-and-other-ids.html#5">negative element ids for element property drop-down list enumerations</a>.</p>
+<p>This has also been a long-standing wish list item, and unfortunately still remains in that state, currently incorporated in the issue CF-3498 <em>API wish: drop-down enumeration parameters for combo box</em>.</p>
+<p>I would not bore you with this, except that Marcelo Quevedo of <a href="http://hsbcad.com">hsbcad</a> recently brought it up again and also kindly provided suggestions for two workarounds:</p>
+<h4><a name="2"></a>Drop-down Combo of Enumerated Parameter Values</h4>
+<p>In Marcelo's own words:</p>
+<p>We need to create drop-down parameters for our families such as Enums in C#.
+For instance, a set of enumerated values such as this:</p>
+<p>Parameter 1: <code>Orientation</code> with following drop-down values:</p>
+<ul>
+<li>Parallel to mortise bm</li>
+<li>Perpendicular to mortise bm</li>
+<li>Parallel to projected Y axis of tenon bm</li>
+<li>Perpendicular to projected Y axis of tenon bm</li>
+<li>Parallel to projected Z axis of tenon bm</li>
+<li>Perpendicular to projected Z axis of tenon bm</li>
+</ul>
+<p>Parameter 2: <code>Shape</code>:</p>
+<ul>
+<li>Square</li>
+<li>Round</li>
+<li>Rounded</li>
+</ul>
+<p>We found two workarounds, but they aren’t perfect.</p>
+<h4><a name="3"></a>1. Workaround using Nested Families and Types</h4>
+<p>For the first workaround, we created nested Generic Model families for each drop-down (one nested family for orientation, and other for Shape). We created types for these families named according to the desired drop-down values. In addition, we added two 'Generic Model Family Type' parameters: one to link the Orientation nested family, and one for the Shape nested family. However, the issue is that the 'Generic Model Family Type' parameter links the Category and displays all nested Generic Model family types as available options.</p>
+<p>It would be better if the family type parameter would link one single family instead of the entire category.</p>
+<p>Here is a screen snapshot of the result:</p>
+<p><center>
+<img src="img/dropdown_param_enum_workaround_1.png" alt="Drop-down parameter enum combo" width="600">
+</center></p>
+<h4><a name="4"></a>2. Workaround using Integer Values and Tooltips</h4>
+<p>For the second workaround, we created Integer parameters and defined a tooltip to explain what each integer value represents.</p>
+<p>For example, for <code>Orientation</code>, we created an integer parameter called <code>Orientation</code> and specified the following tooltip:</p>
+<ol>
+<li>Parallel to mortise bm</li>
+<li>Perpendicular to mortise bm</li>
+<li>Parallel to projected Y axis of tenon bm</li>
+<li>Perpendicular to projected Y axis of tenon bm</li>
+<li>Parallel to projected Z axis of tenon bm</li>
+<li>Perpendicular to projected Z axis of tenon bm</li>
+</ol>
+<p>The result looks like this:</p>
+<p><center>
+<img src="img/dropdown_param_enum_workaround_2.png" alt="Drop-down parameter enum combo" width="600">
+</center></p>
+<p>I hope this helps.</p>
+<p>Many thanks to Marcelo for sharing these two creative workarounds!</p>

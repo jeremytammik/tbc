@@ -1,0 +1,122 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!---
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+11256445 [Revit API Development]
+
+#dotnet #csharp
+#fsharp #python
+#grevit
+#responsivedesign #typepad
+#ah8 #augi #dotnet
+#stingray #rendering
+#3dweb #3dviewapi #html5 #threejs #webgl #3d #apis #mobile #vr #ecommerce
+#Markdown #Fusion360 #Fusion360Hackathon
+#javascript
+#RestSharp #restapi
+#mongoosejs #mongodb #nodejs
+#rtceur
+#geometry #3d
+#xaml
+
+Revit API, Jeremy Tammik, akn_include
+
+REX Add-In Development and Migration #revitapi #bim #aec #3dwebcoder #adsk #RevitStructure #adsklabs
+
+
+It's been a while since I talked about REX. Some old dedicated posts include
+&ndash; The REX SDK
+&ndash; Extensions for Revit 2012
+&ndash; REX Content Generator.
+More recent mentions occur in my discussion of a framing cross section analyser with and without REX and its migration to Revit 2015. Now the time has come for another look...
+
+-->
+
+<h3>REX Add-In Development and Migration</h3>
+<p>It's been a while since I talked about REX.</p>
+<p>Some old dedicated posts include:</p>
+<!--- 0570 0601 0691 -->
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/04/the-rex-sdk.html">The REX SDK</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/06/extensions-for-revit-2012.html">Extensions for Revit 2012</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/12/rex-content-generator.html">REX Content Generator</a></li>
+</ul>
+<!--- 1076 1294 -->
+
+<p>More recent mentions occur in my discussion of
+a <a href="http://thebuildingcoder.typepad.com/blog/2013/12/security-framing-cross-section-analyser-and-rex.html">framing cross section analyser with and without REX</a> and
+its <a href="http://thebuildingcoder.typepad.com/blog/2015/03/framing-cross-section-analyser-and-rex-in-revit-2015.html">migration to Revit 2015</a>.</p>
+<p>Now the time has come for another look, prompted by the following developer query:</p>
+<p><strong>Question:</strong> I am currently working on an API to generate plan views with loads. The API works fine on my machine, it's not super-efficient probably; as I am not an expert about programming (limitations of structural engineers &ndash; sorry), but it does the job.</p>
+<p>The project has been built based on the REX 2014 SDK.</p>
+<p>When I started the project, I used my personal <!--- Visual Studio --> account, without any subscription, thus I was not entitled to use the advanced settings. This is because I didn't intend to deploy it to the entire company &ndash; however, we are now thinking of doing so.</p>
+<p>I had a look at the REX SDK manual and it says that I need the subscription to use the advanced settings.</p>
+<!--- Attached, a small document showing the problem I encounter, as per my understanding. -->
+
+<p>In general, I am not entirely sure about how to finalise the job so I would be very grateful if someone could give me advice on the following:</p>
+<ol>
+<li>Upgrade the API to newer versions;</li>
+<li>Create a custom ribbon palette that is automatically installed when Revit is installed on someone else's machine;</li>
+<li>Make sure the add-in goes under that ribbon palette;</li>
+<li>Generate an installer EXE file to distribute to the company.</li>
+</ol>
+<p>Thank you very much in advance.</p>
+<p><strong>Answer:</strong> Congratulations on implementing an add-in that does the job.</p>
+<p>I am not familiar with the advanced settings that you mention.</p>
+<!--- I also do not see 'attached small document' that you refer to. -->
+
+<p>As far as I know, all different possible flavours of the Revit and REX APIs are identical, and there is no differentiation whatsoever between different levels of entitlement or access.</p>
+<!---
+Therefore, I assume that you are referring to some kind of product feature.
+
+Can you confirm that, please, and maybe clarify exactly what you mean by 'advanced settings'?
+-->
+
+<p>I do not have anything much to suggest regarding your questions on creating an installer, either.</p>
+<p>That is obviously not really related to the Revit or REX APIs.</p>
+<p>I have seen various cool examples of installers in several publicly available sample applications, and mentioned some of them now and then on The Building Coder, e.g.,
+for the <a href="http://thebuildingcoder.typepad.com/blog/2012/07/revitrubyshell-implementation-and-installer.html">RevitRubyShell</a>.</p>
+<p>One way to get official help from Autodesk with you installer is to package your add-in for the <a href="https://apps.autodesk.com">AppStore</a>.</p>
+<p>If you are happy to make it available in public, that would probably be the easiest way to go, and offer lots of possible additional benefits as well.</p>
+<p><strong>Answer II:</strong> This was followed up by a more in-depth answer from the development team:</p>
+<p>I assume that user project was built in Visual Studio 2010 for Revit 2014 and now it's planned to have it working in Revit 2016.</p>
+<p>It's possible to update your project to new version by following steps:</p>
+<ol>
+<li>Install Autodesk Revit 2016.</li>
+<li>Install Microsoft Visual Studio 2012 (or later).</li>
+<li>Open source project, update all references to 2016 version, e.g., RevitAPI.dll, RevitAPIUI.dll, Autodesk.REX.Framework, etc.</li>
+<li>Change target .NET platform version from 4.0 to 4.5.</li>
+<li>Update version in settings.xml file</li>
+<li>Update version in DirectRevitAccess.cs in the method <code>currentDomain_AssemblyResolve</code> replacing "2014" by <code>Autodesk.REX.Framework.REXConfiguration.Control.VersionName</code>.</li>
+<li>Update version in Program.cs in similar way as point 6</li>
+<li>Update source code with latest Revit API changes &ndash; the documentation file "Revit Platform API Changes and Additions.docx" might be helpful.</li>
+<li>Addin manifest file should be placed now in Revit 2016 addins directory.</li>
+</ol>
+<p>There is information about advanced settings in SDK but it means that the end user needs to have the Revit Extensions (subscription only) installed.</p>
+<p>If you would like to have your module working for users without Revit Extensions installed, you need to handle this yourself, for example by creating your own external application.</p>
+<p>In this case you can do everything supported by the Revit API with the ribbon, e.g., create your own ribbon tab, add panels and buttons to it, etc.</p>
+<p>The 'advanced settings' give the ability to integrate the module into the Revit Extension ribbon and create an installation project (Visual Studio 2010 only):</p>
+<p><center>
+<img src="img/rex_app_1.png" alt="REX app" width="798">
+</center></p>
+<p>It appears that you would like to create your own ribbon.</p>
+<p>Another option is create a new module with 'Support for Exchange' enabled and move all code to that:</p>
+<p><center>
+<img src="img/rex_app_2.png" alt="REX app" width="754">
+</center></p>
+<p>This will give the possibility to launch the Extension ribbon on computers with or without Revit Extensions with following results:</p>
+<p><center>
+<img src="img/rex_app_3.png" alt="REX app" width="710">
+</center></p>
+<p>The REX SDK documentation includes a description about how this can be achieved. The new module is also an external application ready to be installed in the ApplicationPlugins directory.</p>
+<p>Unfortunately, you have to manage your own deployment and installation using the current Visual Studio deployment projects or some other installation system
+like <a href="http://sourceforge.net/projects/nsis">NSIS</a>.</p>
+<p>I hope this helps.</p>
+<p>Good luck and have fun making use of the REX SDK!</p>
