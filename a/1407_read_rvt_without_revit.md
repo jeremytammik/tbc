@@ -101,3 +101,7 @@ build [a house that costs just $20,000 &ndash; but it’s nicer than yours](http
 <center>
 <img src="img/20k_house.jpg" alt="20k house" width="400">
 </center>
+
+Look at their list of [beautiful low-budget 5th year architecture projects](http://www.ruralstudio.org/projects.html).
+
+I bet they made many people very happy with those!
