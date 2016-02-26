@@ -53,9 +53,19 @@
 
 Revit API, Jeremy Tammik, akn_include
 
- #revitAPI #3dwebcoder @AutodeskRevit #bim #aec #adsk #adskdevnetwrk
+The Building Coder Source and Index on GitHub #revitAPI #3dwebcoder @AutodeskRevit #bim #aec #adsk #adskdevnetwrk @github
 
-&ndash;
+Developers frequently lament bad search functionality on Typepad-hosted blogs.
+Furthermore, it is always handy to have an offline local copy of any kind of important documentation you need to consult regularly.
+With a local copy of The Building Coder source text, you can use your standard system tools to search and index locally in any form you like.
+Finally, wouldn't it be nice to have a simple line-by-line index of all The Building Coder blog posts ever published?
+&ndash; Publishing The Building Coder source and index on GitHub
+&ndash; GitHub size limitations
+&ndash; Alternative blogging platforms
+&ndash; Fork and clone to create your own local installation
+&ndash; El Perro Semihundido by Goya...
+
+
 ...
 
 -->
@@ -64,11 +74,20 @@ Revit API, Jeremy Tammik, akn_include
 
 Developers frequently lament bad search functionality on Typepad-hosted blogs.
 
-Furthermore, it is always handy to have an an offline local copy of any kind of important documentation you need to cansult.
+Furthermore, it is always handy to have an offline local copy of any kind of important documentation you need to consult regularly.
 
-With a local copy the The Building Coder source text, you can use your standard system tools to search and index locally in any form you like.
+With a local copy of The Building Coder source text, you can use your standard system tools to search and index locally in any form you like.
 
 Finally, wouldn't it be nice to have a simple line-by-line index of all The Building Coder blog posts ever published?
+
+- [Publishing The Building Coder source and index on GitHub](#2)
+- [GitHub size limitations](#3)
+- [Alternative blogging platforms](#4)
+- [Fork and clone to create your own local installation](#5)
+- [El Perro Semihundido by Goya](#6)
+
+
+#### <a name="2"></a>Publishing The Building Coder Source and Index on GitHub
 
 I took these requirements into account right from the start when setting out
 on [The 3D Web Coder](http://the3dwebcoder.typepad.com),
@@ -108,17 +127,17 @@ If you have more than 1000 files in one directory, some of the them are not disp
 <img src="img/github_directory_truncated_1000.png" alt="GitHub directory truncated to 1000 files" width="505">
 </center>
 
-Without the 'a' subfolder, the README.md in the top level folder was hidden by all the blog posts and therrefore not displayed.
+Without the 'a' subfolder, the README.md in the top level folder was hidden by all the blog posts and therefore not displayed.
 
 The killer was that its contents were also not shown.
 
 I added `a` to hold the blog posts and left [README.md](https://github.com/jeremytammik/tbc/blob/gh-pages/README.md) in the top-level directory.
 
-A simpler issue occured with images and attachments.
+A simpler issue occurred with images and attachments.
 
 They live in the two subfolders `img` and `zip`, respectively, currently weighing in at 225 and 410 MB in total size.
 
-Luckily, all the indivisual image and attachment file sizes are smaller than 100 MB, or GitHub would refuse to host them at all.
+Luckily, all the individual image and attachment file sizes are smaller than 100 MB, or GitHub would refuse to host them at all.
 
 As it is, I just got warning messages on two or three files that exceeded a threshold of 30 MB, but were still accepted.
 
@@ -135,7 +154,7 @@ another recording, 63 MB in size.
 As you may be aware, my
 colleague [Kean Walmsley](http://through-the-interface.typepad.com/through_the_interface/about-the-author.html) has
 been thinking
-of [moving his blog Through the nterface from Typepad to Wordpress](http://through-the-interface.typepad.com/through_the_interface/2016/01/yet-another-blog-design-on-its-way.html) for
+of [moving his blog Through the Interface from Typepad to Wordpress](http://through-the-interface.typepad.com/through_the_interface/2016/01/yet-another-blog-design-on-its-way.html) for
 a while now.
 
 He mentions that the killer feature of WordPress is search, considering that Typepad fails miserably on this count.
@@ -143,7 +162,7 @@ He mentions that the killer feature of WordPress is search, considering that Typ
 I think that I can fix that problem satisfactorily for all by making my entire blog source text available in this manner, and offer several additional benefits as well.
 
 For a alternative blogging platform you might also be interested in reading
-about [creating a beautiful and minimal blog using Jekyll, Github Pages, and poole](http://joshualande.com/jekyll-github-pages-poole),
+about [creating a beautiful and minimal blog using Jekyll, GitHub Pages, and poole](http://joshualande.com/jekyll-github-pages-poole),
 entirely avoiding blog servers like Typepad and WordPress, where you give up control over your data.
 
 So all things considered, my current tendency is to keep the main blog staying put on Typepad.
@@ -175,11 +194,11 @@ Checking connectivity... done.
 
 Et voila, Bob's your uncle!
 
-You have your own local copy ot The Building Coder on your system, including the full index and all source text.
+You have your own local copy of The Building Coder on your system, including the full index and all source text.
 
 Please be patient while cloning, because the entire package including images and attachments adds up to over 1 GB of data.
 
-The layout is not in a nice blog format, of course. That is not its purpose.
+The layout is not in a nice readable blog format, of course. That is not its purpose.
 
 
 #### <a name="6"></a>El Perro Semihundido by Goya
@@ -190,4 +209,8 @@ Let's end the week enjoying [Goya](https://en.wikipedia.org/wiki/Francisco_Goya)
 <img src="img/perro_semihundido_goya_500x849.jpg" alt="The Dog &ndash; El Perro Semihundido &ndash; by Goya" width="500">
 </center>
 
-I recently had a chance to enjoy the origianal in the Spanish art museum  [Prado](), on my visit to Madrid, with ...., for the BIM Programming conference and workshops.
+I recently had a chance to enjoy the original in
+the [Museo del Prado](https://en.wikipedia.org/wiki/Museo_del_Prado), on my visit to Madrid for
+the recent [BIM Programming](http://www.bimprogramming.com) conference and workshops.
+
+Happy weekend to all!

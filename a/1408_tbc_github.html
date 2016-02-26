@@ -52,18 +52,36 @@
 
 Revit API, Jeremy Tammik, akn_include
 
- #revitAPI #3dwebcoder @AutodeskRevit #bim #aec #adsk #adskdevnetwrk
+The Building Coder Source and Index on GitHub #revitAPI #3dwebcoder @AutodeskRevit #bim #aec #adsk #adskdevnetwrk @github
 
-&ndash;
+Developers frequently lament bad search functionality on Typepad-hosted blogs.
+Furthermore, it is always handy to have an offline local copy of any kind of important documentation you need to consult regularly.
+With a local copy of The Building Coder source text, you can use your standard system tools to search and index locally in any form you like.
+Finally, wouldn't it be nice to have a simple line-by-line index of all The Building Coder blog posts ever published?
+&ndash; Publishing The Building Coder source and index on GitHub
+&ndash; GitHub size limitations
+&ndash; Alternative blogging platforms
+&ndash; Fork and clone to create your own local installation
+&ndash; El Perro Semihundido by Goya...
+
+
 ...
 
 -->
 
 <h3>tbc &ndash; The Building Coder Source and Index on GitHub</h3>
 <p>Developers frequently lament bad search functionality on Typepad-hosted blogs.</p>
-<p>Furthermore, it is always handy to have an an offline local copy of any kind of important documentation you need to cansult.</p>
-<p>With a local copy the The Building Coder source text, you can use your standard system tools to search and index locally in any form you like.</p>
+<p>Furthermore, it is always handy to have an offline local copy of any kind of important documentation you need to consult regularly.</p>
+<p>With a local copy of The Building Coder source text, you can use your standard system tools to search and index locally in any form you like.</p>
 <p>Finally, wouldn't it be nice to have a simple line-by-line index of all The Building Coder blog posts ever published?</p>
+<ul>
+<li><a href="#2">Publishing The Building Coder source and index on GitHub</a></li>
+<li><a href="#3">GitHub size limitations</a></li>
+<li><a href="#4">Alternative blogging platforms</a></li>
+<li><a href="#5">Fork and clone to create your own local installation</a></li>
+<li><a href="#6">El Perro Semihundido by Goya</a></li>
+</ul>
+<h4><a name="2"></a>Publishing The Building Coder Source and Index on GitHub</h4>
 <p>I took these requirements into account right from the start when setting out
 on <a href="http://the3dwebcoder.typepad.com">The 3D Web Coder</a>,
 as I explained in the discussion
@@ -87,12 +105,12 @@ the reason for the additional 'a' subfolder is that GitHub sets a limit of 1000 
 <p><center>
 <img src="img/github_directory_truncated_1000.png" alt="GitHub directory truncated to 1000 files" width="505">
 </center></p>
-<p>Without the 'a' subfolder, the README.md in the top level folder was hidden by all the blog posts and therrefore not displayed.</p>
+<p>Without the 'a' subfolder, the README.md in the top level folder was hidden by all the blog posts and therefore not displayed.</p>
 <p>The killer was that its contents were also not shown.</p>
 <p>I added <code>a</code> to hold the blog posts and left <a href="https://github.com/jeremytammik/tbc/blob/gh-pages/README.md">README.md</a> in the top-level directory.</p>
-<p>A simpler issue occured with images and attachments.</p>
+<p>A simpler issue occurred with images and attachments.</p>
 <p>They live in the two subfolders <code>img</code> and <code>zip</code>, respectively, currently weighing in at 225 and 410 MB in total size.</p>
-<p>Luckily, all the indivisual image and attachment file sizes are smaller than 100 MB, or GitHub would refuse to host them at all.</p>
+<p>Luckily, all the individual image and attachment file sizes are smaller than 100 MB, or GitHub would refuse to host them at all.</p>
 <p>As it is, I just got warning messages on two or three files that exceeded a threshold of 30 MB, but were still accepted.</p>
 <p>The largest image file
 is the 77-MB <a href="https://github.com/jeremytammik/tbc/blob/gh-pages/a/img/monitor_progress.gif">monitor_progress.gif</a>,
@@ -103,12 +121,12 @@ another recording, 63 MB in size.</p>
 <p>As you may be aware, my
 colleague <a href="http://through-the-interface.typepad.com/through_the_interface/about-the-author.html">Kean Walmsley</a> has
 been thinking
-of <a href="http://through-the-interface.typepad.com/through_the_interface/2016/01/yet-another-blog-design-on-its-way.html">moving his blog Through the nterface from Typepad to Wordpress</a> for
+of <a href="http://through-the-interface.typepad.com/through_the_interface/2016/01/yet-another-blog-design-on-its-way.html">moving his blog Through the Interface from Typepad to Wordpress</a> for
 a while now.</p>
 <p>He mentions that the killer feature of WordPress is search, considering that Typepad fails miserably on this count.</p>
 <p>I think that I can fix that problem satisfactorily for all by making my entire blog source text available in this manner, and offer several additional benefits as well.</p>
 <p>For a alternative blogging platform you might also be interested in reading
-about <a href="http://joshualande.com/jekyll-github-pages-poole">creating a beautiful and minimal blog using Jekyll, Github Pages, and poole</a>,
+about <a href="http://joshualande.com/jekyll-github-pages-poole">creating a beautiful and minimal blog using Jekyll, GitHub Pages, and poole</a>,
 entirely avoiding blog servers like Typepad and WordPress, where you give up control over your data.</p>
 <p>So all things considered, my current tendency is to keep the main blog staying put on Typepad.</p>
 <p>The purpose of the GitHub version is not normal everyday reading, but safe backup and version management, providing full source access to all readers and a version that people can clone for local searching and offline access.</p>
@@ -131,12 +149,15 @@ Checking connectivity... done.
 </pre>
 
 <p>Et voila, Bob's your uncle!</p>
-<p>You have your own local copy ot The Building Coder on your system, including the full index and all source text.</p>
+<p>You have your own local copy of The Building Coder on your system, including the full index and all source text.</p>
 <p>Please be patient while cloning, because the entire package including images and attachments adds up to over 1 GB of data.</p>
-<p>The layout is not in a nice blog format, of course. That is not its purpose.</p>
+<p>The layout is not in a nice readable blog format, of course. That is not its purpose.</p>
 <h4><a name="6"></a>El Perro Semihundido by Goya</h4>
 <p>Let's end the week enjoying <a href="https://en.wikipedia.org/wiki/Francisco_Goya">Goya</a>'s <a href="https://en.wikipedia.org/wiki/The_Dog_(Goya)">The Dog</a> &ndash; <em>El Perro Semihundido</em> &ndash; painted on the walls of his house sometime between 1819 and 1823, for his exclusive private enjoyment:</p>
 <p><center>
 <img src="img/perro_semihundido_goya_500x849.jpg" alt="The Dog &ndash; El Perro Semihundido &ndash; by Goya" width="500">
 </center></p>
-<p>I recently had a chance to enjoy the origianal in the Spanish art museum  <a href="">Prado</a>, on my visit to Madrid, with ...., for the BIM Programming conference and workshops.</p>
+<p>I recently had a chance to enjoy the original in
+the <a href="https://en.wikipedia.org/wiki/Museo_del_Prado">Museo del Prado</a>, on my visit to Madrid for
+the recent <a href="http://www.bimprogramming.com">BIM Programming</a> conference and workshops.</p>
+<p>Happy weekend to all!</p>
