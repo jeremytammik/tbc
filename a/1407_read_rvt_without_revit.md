@@ -99,5 +99,5 @@ Check out this [Rural Studio](http://www.ruralstudio.org) architectural project 
 build [a house that costs just $20,000 &ndash; but it’s nicer than yours](http://www.fastcoexist.com/3056129/this-house-costs-just-20000-but-its-nicer-than-yours/1).
 
 <center>
-<img src="img/20k_house.png" alt="20k house" width="400">
+<img src="img/20k_house.jpg" alt="20k house" width="400">
 </center>
