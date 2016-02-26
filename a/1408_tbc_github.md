@@ -9,6 +9,14 @@
 
 <!---
 
+- blog:
+  - use github as a blog base? via wiki?
+  - open source blog platform?
+  - keep in parallel with typepad tbc?
+  - implement local url base for all links
+  - clear out comments, email addresses and confidential stuff
+  - put all blog source code on github
+
 - blog on github
   Kean Walmsley has been playing around with [moving Threough the Interface from Typepad to Wordpress]().
   I looked at various alternative options as well.
@@ -137,9 +145,15 @@ I have been
 
 I hit a couple of limits built into GitHub and had to implement workarounds to handle some of them:
 
-Luckily, all my images and attachments are smaller than 100 MB, or GitHub would fefuse to host them at all.
+The two main subfolders a re `img` and `zip` containing images and attachments, respectively, 225 and 410 MB in total size.
+
+Luckily, all my images and attachments are smaller than 100 MB, or GitHub would refuse to host them at all.
 
 As it is, I just got warning messages on two or three files that exceeded a threshold of 30 MB, but were still accepted.
+
+The largest image file is monitor_progress.gif, which is an animated GIF, i.e. a video screen recording, so not a still image at all, weighing in at 77 MB.
+
+The largest attachment is track_changes.mp4, another recording, 63 MB in size.
 
 
 
