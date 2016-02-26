@@ -65,9 +65,6 @@ Finally, wouldn't it be nice to have a simple line-by-line index of all The Buil
 &ndash; Fork and clone to create your own local installation
 &ndash; El Perro Semihundido by Goya...
 
-
-...
-
 -->
 
 ### tbc &ndash; The Building Coder Source and Index on GitHub
@@ -82,6 +79,7 @@ Finally, wouldn't it be nice to have a simple line-by-line index of all The Buil
 
 - [Publishing The Building Coder source and index on GitHub](#2)
 - [GitHub size limitations](#3)
+- [wc &ndash; Word Count &ndash; Work Count?](#3.5)
 - [Alternative blogging platforms](#4)
 - [Fork and clone to create your own local installation](#5)
 - [El Perro Semihundido by Goya](#6)
@@ -147,6 +145,42 @@ which is an animated GIF, i.e. a video screen recording, so not a still image at
 
 The largest attachment is [track_changes.mp4](https://github.com/jeremytammik/tbc/blob/gh-pages/a/zip/track_changes.mp4),
 another recording, 63 MB in size.
+
+#### <a name="3.5"></a>wc &ndash; Word Count &ndash; Work Count?
+
+Here is a quick analysis of the word count of the blog posts so far.
+
+I started [using the Markdown blog post format](http://thebuildingcoder.typepad.com/blog/2015/08/markdown-the-fusion-accelerator-revisions-and-bulk-upgrade.html#2) in August 2015.
+
+Before then, they were all hand written in HTML and stored  with a filename extension of `htm`.
+
+The markdown posts have an `md` filename extension, and are used to automatically generate HTML with the extension `html`.
+
+Here are the word counts for each of these formats as of today:
+
+<pre>
+/a/doc/revit/tbc/a/ $ wc *htm | tail -1
+  255150 1525300 13140829 total
+/a/doc/revit/tbc/a/ $ wc *md | tail -1
+   15206  105089  841397 total
+/a/doc/revit/tbc/a/ $ wc *html | tail -1
+   15229  128395 1422270 total
+/a/doc/revit/tbc/git/a/ $ wc *htm *md | tail -1
+  270387 1630572 13983818 total
+</pre>
+
+The hand written stuff summarises to the following:
+
+<center>
+<table>
+<tr><th class="r"></th>      <th class="r">lines</th>   <th class="r">words</th>   <th class="r">characters</th></tr>
+<tr><td class="r">htm</td>   <td class="r">255150</td>  <td class="r">1525300</td> <td class="r">13140829</td></tr>
+<tr><td class="r">md</td>    <td class="r">15206</td>   <td class="r">105089</td>  <td class="r">841397</td></tr>
+<tr><td class="r">total</td> <td class="r">&nbsp;270387</td>  <td class="r">1630572</td> <td class="r">13983818</td></tr>
+</table>
+</center>
+
+More or less, I have written 14 MB of pure text for The Building Coder.
 
 
 #### <a name="4"></a>Alternative Blogging Platforms
