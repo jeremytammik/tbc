@@ -1,0 +1,242 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!---
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+- 11556999 [Export to DWF / PrintSetup]
+
+- delete print setup:
+  http://forums.autodesk.com/t5/revit-api/delete-printsetup-and-viewsheetsettings/m-p/6063449
+
+- reload dll for debugging without restart
+  http://stackoverflow.com/questions/33525908/revit-api-load-command-auto-reload
+
+- draw a curve:
+  http://forums.autodesk.com/t5/revit-api/draw-curve-in-activeuidocument-document-using-ilist-lt-xyz-gt/td-p/6063446
+
+- distance from family instance to floor or elevation
+  http://forums.autodesk.com/t5/revit-api/elevation-of-family-instance-from-floor-or-level-below-it/m-p/6058148
+
+#dotnet #csharp
+#fsharp #python
+#grevit
+#responsivedesign #typepad
+#ah8 #augi #dotnet
+#stingray #rendering
+#3dweb #3dviewAPI #html5 #threejs #webgl #3d #mobile #vr #ecommerce
+#Markdown #Fusion360 #Fusion360Hackathon
+#javascript
+#RestSharp #restAPI
+#mongoosejs #mongodb #nodejs
+#rtceur
+#xaml
+#3dweb #a360 #3dwebaccel #webgl @adskForge
+@AutodeskReCap @Adsk3dsMax
+#revitAPI #bim #aec #3dwebcoder #adsk #adskdevnetwrk @jimquanci @keanw
+#au2015 #rtceur
+#eraofconnection
+#RMS @researchdigisus
+@adskForge #3dwebaccel
+#a360
+ @github
+
+Revit API, Jeremy Tammik, akn_include
+
+Index, Reloading, Curves, Distance and Deleting PrintSetup #revitAPI #3dwebcoder @AutodeskRevit #bim #aec #adsk #adskdevnetwrk
+
+Trying to keep track of the overwhelming information flow provided by the numerous discussions on
+the Revit API discussion forum is impossible.
+Here are two little titbits from the past few days
+&ndash; Basic Revit API and SDK Access, Online and Offline
+&ndash; Filtering for Elements Intersecting a View Section Box...
+
+-->
+
+<h3>Index, Reloading, Curves, Distance and Deleting PrintSetup</h3>
+<p>Here is another bunch of issues addressed in
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> and
+elsewhere in the past day or two:</p>
+<ul>
+<li><a href="#2">The Building Coder blog source text and index</a></li>
+<li><a href="#3">Reloading add-in DLL for debugging without restart</a></li>
+<li><a href="#4">Drawing curves from a list of points</a></li>
+<li><a href="#5">Determining the distance of a family instance to the floor or elevation</a></li>
+<li><a href="#6">Deleting a PrintSetup or ViewSheetSetting</a></li>
+</ul>
+<h4><a name="2"></a>The Building Coder Blog Source Text and Index</h4>
+<p>As you may have noticed, I published
+<a href="http://thebuildingcoder.typepad.com/blog/2016/02/tbc-the-building-coder-source-and-index-on-github.html">The Building Coder entire source text and complete index on GitHub</a> last week.</p>
+<p>If you look now at the right hand side bar or the navigation bar at the bottom, you will see the two new
+entries <a href="https://jeremytammik.github.io/tbc/a">index</a>
+and <a href="https://github.com/jeremytammik/tbc">source</a> that take you straight there.</p>
+<p>I hope you find the complete index and full source text access useful!</p>
+<p><center>
+<img src="img/index_finger.jpg" alt="Index finger" width="360">
+</center></p>
+<h4><a name="3"></a>Reloading Add-in DLL for Debugging Without Restart</h4>
+<p>We have often dealt here with topics
+around <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.49">edit and continue, debug without restart and 'live development'</a>.</p>
+<p>This note is just to point out another contribution to that series, a StackOverflow question
+on <a href="http://stackoverflow.com/questions/33525908/revit-api-load-command-auto-reload">Revit API load command &ndash; auto reload</a>,
+in case you are interested in this too.</p>
+<h4><a name="4"></a>Drawing Curves from a List of Points</h4>
+<p>This is a very common need, brought up again by Dirk Neethling in the thread
+on <a href="http://forums.autodesk.com/t5/revit-api/draw-curve-in-activeuidocument-document-using-ilist-lt-xyz-gt/td-p/6063446">drawing a curve in ActiveUIDocument.Document using IList&lt;XYZ&gt;</a>:</p>
+<p><strong>Question:</strong> I'm trying to draw a contiguous curve in an ActiveUIDocument.Document, using a List of <code>XYZ</code> objects.
+Most examples draw a curve in a FamilyDocument, and I could not adapt it for an ActiveUIDocument.Document.
+Is it necessary to create a plane for such a curve?</p>
+<p><strong>Answer:</strong> Yes, it is.</p>
+<p>You can create a model curve or a detail curve, and both reside on a sketch plane.</p>
+<p>If you care about efficiency, you might care to reuse the sketch planes as much as possible.</p>
+<p>Note that some existing samples create a new sketch plane for each individual curve, which is not a nice thing to do.</p>
+<p>The Building Coder provides a number of samples, e.g.:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/01/model-and-detail-curve-colour.html">Model and Detail Curve Colour</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/05/detail-curve-must-indeed-lie-in-plane.html">Detail Curve Must Indeed lie in Plane</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/05/model-curve-creator.html">Model Curve Creator</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/generating-a-midcurve-between-two-curve-elements.html">Generating a MidCurve Between Two Curve Elements</a></li>
+</ul>
+<p>A <code>Creator</code> model curve helper class is also included in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>,
+in the module <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Creator.cs">Creator.cs</a>.</p>
+<p>Furthermore, the <code>CmdDetailCurves</code> sample command shows how to create detail lines, in the
+module <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdDetailCurves.cs">CmdDetailCurves.cs</a>.</p>
+<p>The GitHub repository master branch is always up to date, and previous versions of the Revit API are supported by
+different <a href="https://github.com/jeremytammik/the_building_coder_samples/releases">releases</a>.</p>
+<p>As you should probably know if you are reading this, detail lines can only be created and viewed in a plan view.</p>
+<p>Also, it is useful to know that the view graphics and visibility settings enable you to control the model line appearance, e.g. colour and line type.</p>
+<h4><a name="5"></a>Determining the Distance of a Family Instance to the Floor or Elevation</h4>
+<p>Here is another common need, to determine
+the <a href="http://forums.autodesk.com/t5/revit-api/elevation-of-family-instance-from-floor-or-level-below-it/m-p/6058148">distance from family instance to the floor or elevation below</a>,
+raised by Kailash Kute:</p>
+<p><strong>Question:</strong> I want to calculate the elevation (distance) of a selected family instance with respect to the Floor or Level below it.</p>
+<p>How to get the floor or level which is below the selected family instance?</p>
+<p>How to get the elevation of the instance with respect to that level?</p>
+<p>Later:</p>
+<p>The help text
+on <a href="http://help.autodesk.com/view/RVT/2016/ENU/?guid=GUID-B3EE488D-2287-49A2-A772-C7164B84A648">finding geometry by ray projection</a>
+(<a href="http://forums.autodesk.com/t5/revit-api/elevation-of-family-instance-from-floor-or-level-below-it/m-p/6057571">Revit 2014 Czech</a>,
+<a href="http://help.autodesk.com/view/RVT/2014/CSY/?guid=GUID-B3EE488D-2287-49A2-A772-C7164B84A648">Revit 2015 English</a>) provides
+part of the answer, but is valid only if there is a Floor below the family instance.</p>
+<p>If I only have a Level below it, the ray passing through does not return any distance (proximity).</p>
+<p>Now my question gets filtered down to: How to find Intersection with Level?</p>
+<p><strong>Answer:</strong> If all you need is the distance between the family instance and the level, I see a possibility for a MUCH easier approach:</p>
+<p>Ask the family instance for its bounding box and determine its bottom Z coordinate <code>Z1</code>.</p>
+<p>Determine the elevation <code>Z0</code> of the level.</p>
+<p>The distance you seek is <code>Z1 - Z0</code>.</p>
+<p><strong>Response:</strong> A little bit of work around with points got from bounding box and done.</p>
+<p>Wow, really a MUCH easier approach.</p>
+<h4><a name="6"></a>Deleting a PrintSetup or ViewSheetSetting</h4>
+<p>Eirik Aasved Holst yesterday brought up and solved the question that regularly comes up on how
+to <a href="http://forums.autodesk.com/t5/revit-api/delete-printsetup-and-viewsheetsettings/m-p/6063449">delete PrintSetup and ViewSheetSettings</a>:</p>
+<p><strong>Question:</strong> <a href="https://en.wikipedia.org/wiki/TL;DR">TL;DR</a>: Is there a way of deleting a specific PrintSetup and ViewSheetSetting programmatically if I know its name?</p>
+<p>Long version:</p>
+<p>I'm writing a function that can print a large set of sheets in various paper sizes to separate/combined PDFs.</p>
+<p>To be able to apply the PrintSetup, it needs to be set in an "in-session" state and saved using <code>SaveAs()</code> (to my knowledge).</p>
+<p>But after saving an "in-session"-PrintSetup to a new PrintSetup, I cannot find a way of deleting said new PrintSetup.</p>
+<p>After the PrintManager has printed the sheets, I'm stuck with lots of temporary PrintSetups. The same goes for ViewSheetSettings.</p>
+<pre class="code">
+  try
+  {
+    pMgr.PrintSetup.Delete();
+    pMgr.ViewSheetSetting.Delete();
+  }
+  catch (Exception ex)
+  {
+    //Shows 'The <in-session> print setup cannot be deleted'
+    TaskDialog.Show("REVIT", ex.Message);
+  }
+</pre>
+
+<p>So the problem is: I'm not able to apply the PrintSetup and ViewSheetSettings unless I'm using them "in-session" and saving them using SaveAs, and I'm not able to delete the PrintSetup and ViewSheetSettings afterwards.</p>
+<p>Has anyone experienced similar issues, or found a way to solve it?</p>
+<p><strong>Answer:</strong> This discussion
+on <a href="http://stackoverflow.com/questions/14946217/setting-viewsheetsetting-insession-views-property">setting the ViewSheetSetting.InSession.Views property</a> makes
+one brief mention of deleting a print setting, afaik can tell.</p>
+<p>This other one
+on <a href="http://forums.autodesk.com/t5/revit-api/printermanager-printsetup-do-not-apply-settings/td-p/3676618">PrinterManager PrintSetup not applying settings</a> appears
+to suggest a similar approach.</p>
+<p><strong>Response:</strong> These links unfortunately do not help much.</p>
+<p>It would be nice if it was possible to loop through the saved PrintSetup's, or at least get a PrintSetup if you knew it's name, so that you can delete it.</p>
+<p>In the thread
+on <a href="http://forums.autodesk.com/t5/revit-api/printermanager-printsetup-do-not-apply-settings/td-p/3676618">PrinterManager PrintSetup not applying settings</a>,
+the user aricke mentions:</p>
+<blockquote>
+<p>Note that once you have done the SaveAs, you can then delete the newly saved PrintSetup.</p>
+</blockquote>
+<p>I cannot seem to get that to work; even the following code raises an exception:</p>
+<pre class="code">
+  pSetup.SaveAs("tmp");
+  pSetup.Delete();
+</pre>
+
+<p><strong>Solution:</strong> I finally managed to create a CleanUp-method that works. If others are interested, here it goes:</p>
+<pre class="code">
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> CleanUp( <span class="teal">Document</span> doc )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> pMgr = doc.PrintManager;
+&nbsp; &nbsp; <span class="blue">using</span>( <span class="blue">var</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; trans.Start( <span class="maroon">&quot;CleanUp&quot;</span> );
+&nbsp; &nbsp; &nbsp; CleanUpTemporaryViewSheets( doc, pMgr );
+&nbsp; &nbsp; &nbsp; CleanUpTemporaryPrintSettings( doc, pMgr );
+&nbsp; &nbsp; &nbsp; trans.Commit();
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> CleanUpTemporaryPrintSettings(
+&nbsp; &nbsp; <span class="teal">Document</span> doc, <span class="teal">PrintManager</span> pMgr )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> printSetup = pMgr.PrintSetup;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> printSettingsToDelete
+&nbsp; &nbsp; &nbsp; <span class="blue">in</span> ( <span class="blue">from</span> element
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">PrintSetting</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ToElements()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">where</span> element.Name.Contains( _tmpName )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; element.IsValidObject
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">select</span> element <span class="blue">as</span> <span class="teal">PrintSetting</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ToList()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Distinct( <span class="blue">new</span> EqualElementId() ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; printSetup.CurrentPrintSetting
+&nbsp; &nbsp; &nbsp; &nbsp; = pMgr.PrintSetup.InSession;
+&nbsp;
+&nbsp; &nbsp; &nbsp; printSetup.CurrentPrintSetting
+&nbsp; &nbsp; &nbsp; &nbsp; = printSettingsToDelete <span class="blue">as</span> <span class="teal">PrintSetting</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; pMgr.PrintSetup.Delete();
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">private</span> <span class="blue">void</span> CleanUpTemporaryViewSheets(
+&nbsp; &nbsp; <span class="teal">Document</span> doc, <span class="teal">PrintManager</span> pMgr )
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">var</span> viewSheetSettings = pMgr.ViewSheetSetting;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="blue">var</span> viewSheetSetToDelete
+&nbsp; &nbsp; &nbsp; <span class="blue">in</span> ( <span class="blue">from</span> element
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">in</span> <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .OfClass( <span class="blue">typeof</span>( <span class="teal">ViewSheetSet</span> ) )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ToElements()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">where</span> element.Name.Contains( _tmpName )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; element.IsValidObject
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">select</span> element <span class="blue">as</span> <span class="teal">ViewSheetSet</span> )
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .ToList()
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .Distinct( <span class="blue">new</span> EqualElementId() ) )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; viewSheetSettings.CurrentViewSheetSet
+&nbsp; &nbsp; &nbsp; &nbsp; = pMgr.ViewSheetSetting.InSession;
+&nbsp;
+&nbsp; &nbsp; &nbsp; viewSheetSettings.CurrentViewSheetSet
+&nbsp; &nbsp; &nbsp; &nbsp; = viewSheetSetToDelete <span class="blue">as</span> <span class="teal">ViewSheetSet</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; pMgr.ViewSheetSetting.Delete();
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Many thanks to Eirik for discovering and sharing this solution!</p>
