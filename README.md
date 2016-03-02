@@ -16,7 +16,7 @@ Thank you!
 
 Enjoy.
 
-For more background informationn on this, here are two articles on
+For more background information, here are two articles on
 publishing [The Building Coder source and index on GitHub](http://thebuildingcoder.typepad.com/blog/2016/02/tbc-the-building-coder-source-and-index-on-github.html)
 and [hosting The 3D Web Coder source HTML and index on GitHub pages](http://the3dwebcoder.typepad.com/blog/2015/03/hosting-a-node-server-on-heroku-pages-and-3d-web.html#2).
 
