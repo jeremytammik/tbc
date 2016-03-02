@@ -48,17 +48,20 @@
 
 Revit API, Jeremy Tammik, akn_include
 
-Index, Reloading, Curves, Distance and Deleting PrintSetup #revitAPI #3dwebcoder @AutodeskRevit #bim #aec #adsk #adskdevnetwrk
+Index, Debug, Curves, Distance, Deleting PrintSetup #revitAPI #3dwebcoder @AutodeskRevit #bim #aec #adsk #adskdevnetwrk
 
-Trying to keep track of the overwhelming information flow provided by the numerous discussions on
-the Revit API discussion forum is impossible.
-Here are two little titbits from the past few days
-&ndash; Basic Revit API and SDK Access, Online and Offline
-&ndash; Filtering for Elements Intersecting a View Section Box...
+Here is another bunch of issues addressed in
+the Revit API discussion forum and
+elsewhere in the past day or two
+&ndash; The Building Coder blog source text and index
+&ndash; Reloading add-in DLL for debugging without restart
+&ndash; Drawing curves from a list of points
+&ndash; Determining the distance of a family instance to the floor or elevation
+&ndash; Deleting a PrintSetup or ViewSheetSetting...
 
 -->
 
-### Index, Reloading, Curves, Distance and Deleting PrintSetup
+### Index, Debug, Curves, Distance, Deleting PrintSetup
 
 Here is another bunch of issues addressed in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api/bd-p/160) and
@@ -80,11 +83,11 @@ If you look now at the right hand side bar or the navigation bar at the bottom, 
 entries [index](https://jeremytammik.github.io/tbc/a)
 and [source](https://github.com/jeremytammik/tbc) that take you straight there.
 
-I hope you find the complete index and full source text access useful!
-
 <center>
 <img src="img/index_finger.jpg" alt="Index finger" width="360">
 </center>
+
+I hope you find the complete index and full source text access useful!
 
 
 #### <a name="3"></a>Reloading Add-in DLL for Debugging Without Restart
