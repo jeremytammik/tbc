@@ -1,0 +1,437 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!---
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+#dotnet #csharp
+#fsharp #python
+#grevit
+#responsivedesign #typepad
+#ah8 #augi #dotnet
+#stingray #rendering
+#3dweb #3dviewAPI #html5 #threejs #webgl #3d #mobile #vr #ecommerce
+#Markdown #Fusion360 #Fusion360Hackathon
+#javascript
+#RestSharp #restAPI
+#mongoosejs #mongodb #nodejs
+#rtceur
+#xaml
+#3dweb #a360 #3dwebaccel #webgl @adskForge
+@AutodeskReCap @Adsk3dsMax
+#revitAPI #bim #aec #3dwebcoder #adsk #adskdevnetwrk @jimquanci @keanw
+#au2015 #rtceur
+#eraofconnection
+#RMS @researchdigisus
+@adskForge #3dwebaccel
+#a360
+ @github
+
+Revit API, Jeremy Tammik, akn_include
+
+ #revitAPI #3dwebcoder @AutodeskRevit #bim #aec #adsk #adskdevnetwrk
+
+Here is another bunch of issues addressed in
+the Revit API discussion forum and
+elsewhere in the past day or two
+&ndash; The Building Coder blog source text and index
+&ndash; Reloading add-in DLL for debugging without restart
+&ndash; Drawing curves from a list of points
+&ndash; Determining the distance of a family instance to the floor or elevation
+&ndash; Deleting a PrintSetup or ViewSheetSetting...
+
+-->
+
+<h3>TrackChangesCloud External Event</h3>
+<p>Today, I'll discuss this morning's work:</p>
+<ul>
+<li><a href="#2">TrackChanges Enhancement Idea</a></li>
+<li><a href="#3">The TrackChangesCloud add-in</a></li>
+<li><a href="#4">The TrackChangesCloud external event</a></li>
+<li><a href="#5">Creating and raising an external event</a></li>
+<li><a href="#6">Raising the external event from a separate thread</a></li>
+<li><a href="#7">First test run</a></li>
+<li><a href="#8">Trigger immediate execution by setting Revit foreground window</a></li>
+<li><a href="#9">Complete external application module</a></li>
+<li><a href="#10">Next steps</a></li>
+<li><a href="#11">Download</a></li>
+</ul>
+<p>I implemented a suggestion
+for <a href="http://thebuildingcoder.typepad.com/blog/2016/01/tracking-element-modification.html">tracking element modification</a> a
+month ago and created
+the <a href="https://github.com/jeremytammik/TrackChanges">TrackChanges GitHub repository</a> to host its solution and source code.</p>
+<p>That met with significant interest and triggered the following idea for an enhancement.</p>
+<h4><a name="2"></a>TrackChanges Enhancement Idea</h4>
+<p>I am pondering an enhancement of this external command that I suggested to Tim Corneliussen in
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> thread
+on <a href="http://forums.autodesk.com/t5/revit-api/dynamic-model-update-after-loading-family/m-p/6052310">dynamic model update after loading family</a>:</p>
+<p>Tim says he needs to track changes, and wondered whether to use the DocumentChanged event or the dynamic model updater framework DMU to do so.</p>
+<p>I suggested that he take a look at TrackChanges instead.</p>
+<p><strong>Response:</strong> Your solution looks really impressive. I haven't had the chance to implement the main fundamentals in my project yet. As a starting programmer, the concept of hash code is still new to me but it looks like the right way to go. My main concern is how it will affect the performance of the routine.</p>
+<p>The main purpose of my tool is that each addition or modification will be registered by modifying some parameters including a "time-parameter" and "date-parameter". To do so, but correct me if I'm wrong, I need to trigger an event or use a DMU to determine when an element is added or modified.</p>
+<p>Maybe I can use your snapshot technique combining it with a DMU. But doing so the DMU also collects a lot of data next to the snapshot routine. Is this necessary? Are there alternatives to avoid this sort of useless multiple data collecting?</p>
+<p>Do elements themselves contain relevant information about their own creation or modification (perhaps a certain property that most people aren't aware of)? If so, I can use a single event (sort of like your suggestion on your blog), for example the DocumentSavingAs event. Last possible solution I can think of at the moment is a way to look even deeper in to the updaterdata/-information hoping it contains more general information about the addition or modification of the relevant elements.</p>
+<p>Hoping that you'll understand the scenario I'm describing. For now I will try to use the snapshot routine combining it with a DMU and a viewactivating event. Last mentioned will be used to determine whether another document becomes active (when a user has opened multiple projects). I will place an update when I have successfully created a working solution to discuss the results with you fellow readers. If someone can tell me if this solution probably won't really work please do so.</p>
+<p><strong>Answer:</strong> Thank you very much for your appreciation.</p>
+<p>I think the main characteristic of the modification tracker is simplicity, rather than impressiveness.</p>
+<p>Of course, simplicity is much more impressive than impressiveness :-)</p>
+<p>If you want to be notified on every single modification of an element and store that information immediately, then indeed you can and have to use either DMU or the DocumentChanged event.</p>
+<p>The latter does not allow you to modify anything in the same transaction, though, whereas the former does.</p>
+<p>If you want to guarantee that your date and time markers stored in Revit parameters are always up to date, immediately, then you need to use DMU.</p>
+<p>But do you really need that?</p>
+<p>You need to understand that DMU is complex and adds a significant burden to Revit, depending on how many elements trigger it, which in your case would be many.</p>
+<p>Do you really need to keep track of the element modification on a split second-by-second basis?</p>
+<p>Would it not be enough to track changes every minute, or every ten minutes?</p>
+<p>If so, then you can vastly simplify your approach and vastly reduce the burden on Revit by using the modification tracker and completely avoiding DMU and the DocumentChanged event.</p>
+<p>Just track changes based on snapshots taken every X minutes, for instance.</p>
+<p>Regarding the issue of the hash code: that is a minor detail, and pretty irrelevant.</p>
+<p>You can just store the full data. Depending on what criteria you use to define when an element has changed, you might need to store a lot of information for each element.</p>
+<p>I suggested the hash code as a way to reduce and unify that data storage, but that has absolutely nothing to do with the fundamental concept.</p>
+<p>To quote the original post: "We use the hash code to determine whether the state has been modified compared to a new element state snapshot made at a later time. We could obviously also store the entire original string representation instead of using a hash code. The hash code is small and handy, whereas the entire string contains all the original data. It is up to you to choose which you would like to use."</p>
+<p>The hash code will not affect performance much, just reduce the memory used to cache the starting snapshot.</p>
+<p>I would recommend thinking this through in depth and peace and quiet.</p>
+<p>If you do not require split-second time slice data, I would avoid the DMU and DocumentChanged events, both, completely.</p>
+<p>I am very much looking forward to hearing and discussing your further thoughts on this.</p>
+<h4><a name="3"></a>The TrackChangesCloud Add-In</h4>
+<p>I am thinking of testing the suggestions I propose above myself.</p>
+<p>My idea is:</p>
+<ul>
+<li>Trigger automatic snapshots of element modifications every couple of minutes.</li>
+<li>Store the results in a cloud-based database.</li>
+</ul>
+<p>That will also represent another step in my explorations on connecting the desktop and the cloud.</p>
+<p>I created a new add-in <a href="https://github.com/jeremytammik/TrackChangesCloud">TrackChangesCloud</a> to explore them in.</p>
+<p>I prefer to leave the original TrackChanges unmodified, since it clearly and simply demonstrates the snapshot idea.</p>
+<p>It would be a shame to make it more confusing by adding the complexity required by the external application and event handling.</p>
+<p>One way to trigger the snapshots at regular intervals, and probably the cleanest approach, is by implementing an external event.</p>
+<h4><a name="4"></a>The TrackChangesCloud External Event</h4>
+<p>The Building Coder topic group
+on <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">Idling and external events</a> is
+growing pretty large and explains all the background information on this in full detail.</p>
+<p>I implemented a skeleton for the external event named <code>ModificationLogger</code> that does nothing so far, except get raised when I say so.</p>
+<p>Therefore, the implementation is completely trivial:</p>
+<pre class="code">
+&nbsp; <span class="blue">class</span> <span class="teal">ModificationLogger</span> : <span class="teal">IExternalEventHandler</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Required IExternalEventHandler interface </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> method returning a descriptive name.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">string</span> GetName()
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="maroon">&quot;TrackChangesCloud ModificationLogger&quot;</span>;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Execute method invoked by Revit via the </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> external event as a reaction to a call </span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> to its Raise method.</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; <span class="blue">public</span> <span class="blue">void</span> Execute( <span class="teal">UIApplication</span> a )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.Log( <span class="maroon">&quot;ModificationLogger.Execute&quot;</span> );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Later on, the <code>Execute</code> method will do more, of course, e.g. create a modification tracking snapshot and store it in the cloud.</p>
+<h4><a name="5"></a>Creating and Raising an External Event</h4>
+<p>These two steps are both completely trivial one-liners, implemented in the external application module <code>App.cs</code>.</p>
+<p>In the <code>OnStartup</code> method, I subscribe to the <code>ApplicationInitialized</code> event:</p>
+<pre class="code">
+&nbsp; a.ControlledApplication.ApplicationInitialized
+&nbsp; &nbsp; += OnApplicationInitialized;
+</pre>
+
+<p>In the event handler, I create the external event by instantiating my implementation:</p>
+<pre class="code">
+&nbsp; <span class="green">// Create our custom external event.</span>
+&nbsp;
+&nbsp; _event = <span class="teal">ExternalEvent</span>.Create(
+&nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ModificationLogger</span>() );
+</pre>
+
+<p>To trigger the event, causing Revit to wait for an opportune moment and then call its <code>Execute</code> method, I call its <code>Raise</code> method:</p>
+<pre class="code">
+&nbsp; _event.Raise();
+</pre>
+
+<p>That's all there is to it.</p>
+<p>But how do we ensure that the <code>Raise</code> call is executed at the times we wish?</p>
+<p>For that I implemented a separate driver thread, which is also very simple.</p>
+<h4><a name="6"></a>Raising the External Event from a Separate Thread</h4>
+<p>In order to control the regular raising of my external event, I can run an infinite triggering loop in a separate thread.</p>
+<p>The loop is implemented in the following <code>TriggerModificationLogger</code> method:</p>
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Trigger a modification tracker snapshot at </span>
+&nbsp; <span class="gray">///</span><span class="green"> regular intervals. Relinquish control and wait </span>
+&nbsp; <span class="gray">///</span><span class="green"> for the specified timeout period between each </span>
+&nbsp; <span class="gray">///</span><span class="green"> snapshot. This method runs in a separate thread.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> TriggerModificationLogger()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">while</span>( <span class="blue">true</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ++_nSnapshots;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.Log( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;TriggerModificationLogger snapshot {0}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; _nSnapshots ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; _event.Raise();
+
+&nbsp; &nbsp; &nbsp; <span class="green">// Wait and relinquish control </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// before next snapshot.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Thread</span>.Sleep( _timeout );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>It endlessly loops, raising the external event at regular intervals specified by the <code>_timeout</code> constant.</p>
+<p>I start the looping in the <code>ApplicationInitialized</code> event handler, directly after instantiating my external event:</p>
+<pre class="code">
+&nbsp; <span class="blue">void</span> OnApplicationInitialized(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">ApplicationInitializedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Create our custom external event.</span>
+&nbsp;
+&nbsp; &nbsp; _event = <span class="teal">ExternalEvent</span>.Create(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ModificationLogger</span>() );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Start a thread to raise it regularly.</span>
+&nbsp;
+&nbsp; &nbsp; _thread = <span class="blue">new</span> <span class="teal">Thread</span>(
+&nbsp; &nbsp; &nbsp; TriggerModificationLogger );
+&nbsp;
+&nbsp; &nbsp; _thread.Start();
+&nbsp; }
+</pre>
+
+<h4><a name="7"></a>First Test Run</h4>
+<p>This works perfectly, with one teeny weeny little flaw: even though the external event is raised at the moment I specify, the <code>Execute</code> method is not called until the Revit window is activated:</p>
+<pre>
+TrackChanges 10:59:14.067 TriggerModificationLogger snapshot 1
+TrackChanges 10:59:14.635 ModificationLogger.Execute
+TrackChanges 11:00:14.074 TriggerModificationLogger snapshot 2
+*manually activated Revit*
+TrackChanges 11:00:44.050 ModificationLogger.Execute
+TrackChanges 11:01:14.075 TriggerModificationLogger snapshot 3
+*manually activated Revit*
+TrackChanges 11:01:23.877 ModificationLogger.Execute
+</pre>
+
+<p>This may or may not be a problem, depending on the intended use.</p>
+<p>Maybe you don't care if the external event is not triggered as long as Revit is in the background.</p>
+<p>However, this is quite easy to rectify, so let's do so.</p>
+<h4><a name="8"></a>Trigger Immediate Execution by Setting Revit Foreground Window</h4>
+<p>I implemented the following helper method to check whether Revit is the current foreground window.</p>
+<p>If it is not, it is temporarily brought to the foreground using the Windows API:</p>
+<pre class="code">
+&nbsp; <span class="green">// DLL imports from user32.dll to set focus to</span>
+&nbsp; <span class="green">// Revit to force it to forward the external event</span>
+&nbsp; <span class="green">// Raise to actually call the external event </span>
+&nbsp; <span class="green">// Execute.</span>
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> The GetForegroundWindow function returns a </span>
+&nbsp; <span class="gray">///</span><span class="green"> handle to the foreground window.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span> )]
+&nbsp; <span class="blue">static</span> <span class="blue">extern</span> <span class="teal">IntPtr</span> GetForegroundWindow();
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Move the window associated with the passed </span>
+&nbsp; <span class="gray">///</span><span class="green"> handle to the front.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span> )]
+&nbsp; <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">bool</span> SetForegroundWindow(
+&nbsp; &nbsp; <span class="teal">IntPtr</span> hWnd );
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> SetFocusToRevit()
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IntPtr</span> hRevit = <span class="teal">ComponentManager</span>.ApplicationWindow;
+&nbsp; &nbsp; <span class="teal">IntPtr</span> hBefore = GetForegroundWindow();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( hBefore != hRevit )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; SetForegroundWindow( hRevit );
+&nbsp; &nbsp; &nbsp; SetForegroundWindow( hBefore );
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+<p>Now, if I add a call to <code>SetFocusToRevit</code> directly after calling <code>Raise</code>, the <code>Execute</code> method is invoked immediately, regardless of whether Revit is in the background or not:</p>
+<pre>
+TrackChanges 11:26:23.431 TriggerModificationLogger snapshot 1
+TrackChanges 11:26:24.047 ModificationLogger.Execute
+TrackChanges 11:27:23.445 TriggerModificationLogger snapshot 2
+TrackChanges 11:27:23.499 ModificationLogger.Execute
+TrackChanges 11:28:23.506 TriggerModificationLogger snapshot 3
+TrackChanges 11:28:23.560 ModificationLogger.Execute
+TrackChanges 11:29:23.569 TriggerModificationLogger snapshot 4
+TrackChanges 11:29:23.623 ModificationLogger.Execute
+TrackChanges 11:30:23.638 TriggerModificationLogger snapshot 5
+TrackChanges 11:30:23.697 ModificationLogger.Execute
+TrackChanges 11:31:23.706 TriggerModificationLogger snapshot 6
+TrackChanges 11:31:23.790 ModificationLogger.Execute
+</pre>
+
+<p>No manual intervention required.</p>
+<p>However, the screen will flash!</p>
+<p>If the purpose of this tool is to track modifications made to the BIM by end users, then obviously they will have the Revit window up and visible, so the call to <code>SetFocusToRevit</code> can be removed again.</p>
+<h4><a name="9"></a>Complete External Application Module</h4>
+<p>To show how the external event and thread handling work together, here is the complete implementation of the external application module <code>App.cs</code>:</p>
+<pre class="code">
+<span class="blue">class</span> <span class="teal">App</span> : <span class="teal">IExternalApplication</span>
+{
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Store the external event.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">ExternalEvent</span> _event = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Separate thread running a timer to trigger</span>
+&nbsp; <span class="gray">///</span><span class="green"> the modification tracker at regular intervals.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="teal">Thread</span> _thread = <span class="blue">null</span>;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Count total number of modification tracker</span>
+&nbsp; <span class="gray">///</span><span class="green"> snapshots taken so far in this session.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">int</span> _nSnapshots = 0;
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="blue">int</span> _timeout_minutes = 1;
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Number of milliseconds to wait and relinquish</span>
+&nbsp; <span class="gray">///</span><span class="green"> CPU control before next snapshot.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">int</span> _timeout = 1000 * 60 * _timeout_minutes;
+&nbsp;
+<span class="blue">&nbsp; #region</span> SetFocusToRevit
+&nbsp; <span class="green">// DLL imports from user32.dll to set focus to</span>
+&nbsp; <span class="green">// Revit to force it to forward the external event</span>
+&nbsp; <span class="green">// Raise to actually call the external event </span>
+&nbsp; <span class="green">// Execute.</span>
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> The GetForegroundWindow function returns a </span>
+&nbsp; <span class="gray">///</span><span class="green"> handle to the foreground window.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span> )]
+&nbsp; <span class="blue">static</span> <span class="blue">extern</span> <span class="teal">IntPtr</span> GetForegroundWindow();
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Move the window associated with the passed </span>
+&nbsp; <span class="gray">///</span><span class="green"> handle to the front.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; [<span class="teal">DllImport</span>( <span class="maroon">&quot;user32.dll&quot;</span> )]
+&nbsp; <span class="blue">static</span> <span class="blue">extern</span> <span class="blue">bool</span> SetForegroundWindow(
+&nbsp; &nbsp; <span class="teal">IntPtr</span> hWnd );
+&nbsp;
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> SetFocusToRevit()
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">IntPtr</span> hRevit = <span class="teal">ComponentManager</span>.ApplicationWindow;
+&nbsp; &nbsp; <span class="teal">IntPtr</span> hBefore = GetForegroundWindow();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( hBefore != hRevit )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; SetForegroundWindow( hRevit );
+&nbsp; &nbsp; &nbsp; SetForegroundWindow( hBefore );
+&nbsp; &nbsp; }
+&nbsp; }
+<span class="blue">&nbsp; #endregion</span> <span class="green">// SetFocusToRevit</span>
+&nbsp;
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Trigger a modification tracker snapshot at </span>
+&nbsp; <span class="gray">///</span><span class="green"> regular intervals. Relinquish control and wait </span>
+&nbsp; <span class="gray">///</span><span class="green"> for the specified timeout period between each </span>
+&nbsp; <span class="gray">///</span><span class="green"> snapshot. This method runs in a separate thread.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">static</span> <span class="blue">void</span> TriggerModificationLogger()
+&nbsp; {
+&nbsp; &nbsp; <span class="blue">while</span>( <span class="blue">true</span> )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; ++_nSnapshots;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.Log( <span class="blue">string</span>.Format(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;TriggerModificationLogger snapshot {0}&quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; _nSnapshots ) );
+&nbsp;
+&nbsp; &nbsp; &nbsp; _event.Raise();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Set focus to Revit for a moment.</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Without this, Revit will not forward the </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// event Raise to the external event handler </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// Execute method until the Revit window is</span>
+&nbsp; &nbsp; &nbsp; <span class="green">// activated. This causes the screen to flash.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; SetFocusToRevit();
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="green">// Wait and relinquish control </span>
+&nbsp; &nbsp; &nbsp; <span class="green">// before next snapshot.</span>
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Thread</span>.Sleep( _timeout );
+&nbsp; &nbsp; }
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnStartup( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; a.ControlledApplication.ApplicationInitialized
+&nbsp; &nbsp; &nbsp; += OnApplicationInitialized;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">void</span> OnApplicationInitialized(
+&nbsp; &nbsp; <span class="blue">object</span> sender,
+&nbsp; &nbsp; <span class="teal">ApplicationInitializedEventArgs</span> e )
+&nbsp; {
+&nbsp; &nbsp; <span class="green">// Create our custom external event.</span>
+&nbsp;
+&nbsp; &nbsp; _event = <span class="teal">ExternalEvent</span>.Create(
+&nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">ModificationLogger</span>() );
+&nbsp;
+&nbsp; &nbsp; <span class="green">// Start a thread to raise it regularly.</span>
+&nbsp;
+&nbsp; &nbsp; _thread = <span class="blue">new</span> <span class="teal">Thread</span>(
+&nbsp; &nbsp; &nbsp; TriggerModificationLogger );
+&nbsp;
+&nbsp; &nbsp; _thread.Start();
+&nbsp; }
+&nbsp;
+&nbsp; <span class="blue">public</span> <span class="teal">Result</span> OnShutdown( <span class="teal">UIControlledApplication</span> a )
+&nbsp; {
+&nbsp; &nbsp; _thread.Abort();
+&nbsp; &nbsp; _thread = <span class="blue">null</span>;
+&nbsp; &nbsp; _event.Dispose();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">return</span> <span class="teal">Result</span>.Succeeded;
+&nbsp; }
+}
+</pre>
+
+<h4><a name="10"></a>Next Steps</h4>
+<p>The next steps are obvious:</p>
+<ul>
+<li>Implement the cloud database to hold the modification tracking data.</li>
+<li>Implement the database upload.</li>
+</ul>
+<p>Both of these are clearly and extensively demonstrated by the cloud storage approach developed for
+the <a href="https://github.com/jeremytammik/FireRatingCloud">FireRatingCloud project</a>.</p>
+<h4><a name="11"></a>Download</h4>
+<p>This project is hosted in
+the <a href="https://github.com/jeremytammik/TrackChanges">TrackChanges GitHub repository</a>,
+and the version discussed above
+is <a href="https://github.com/jeremytammik/TrackChangesCloud/releases/tag/2016.0.0.4">release 2016.0.0.4</a>.</p>
+<p><center>
+<img src="img/track_changes_diff.png" alt="TrachChanges diff" width="340">
+</center></p>
