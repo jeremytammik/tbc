@@ -149,7 +149,7 @@ I can raise the external event from another thread like this:
 Many thanks Sizy458 for sharing this nice and succinct example of how to address this need.
 
 
-#### <a name="3"></a>Addendum &ndash; Idling versus External Event
+#### <a name="4"></a>Addendum &ndash; Idling versus External Event
 
 I added this a day later, prompted
 by [Michael's comment](http://thebuildingcoder.typepad.com/blog/2013/12/replacing-an-idling-event-handler-by-an-external-event.html#comment-2402180196):

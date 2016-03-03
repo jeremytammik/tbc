@@ -46,6 +46,7 @@ the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discuss
 <p>I celebrated this momentous event by revamping The Building Coder navigation bar at the bottom of this page, adding direct links to the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">forum</a>,
 <a href="http://revitapisearch.com">online Revit API help</a>, and
 <a href="http://help.autodesk.com/view/RVT/2016/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42">developer guide</a>.</p>
+<p>The number of my forum posts right now is 1366, so it has not yet quite overtaken the number of blog posts, 1383, but it certainly will really soon.</p>
 <h4><a name="2"></a>Use of the Revit API Requires a Valid Context</h4>
 <p>One of the most frequently raised questions around the Revit API
 is <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">how to drive Revit from outside</a>,
@@ -70,7 +71,7 @@ to [call Revit's API from an external thread]:</p>
 <p>The Building Coder provides an overview of the main discussions and explanations related
 to <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">Idling and external events for modeless access and driving Revit from outside</a>.</p>
 <p>You might want to start exploring the links provided there beginning at the end.</p>
-<h4><a name="2"></a>Driving Revit from Outside through an External Event</h4>
+<h4><a name="3"></a>Driving Revit from Outside through an External Event</h4>
 <p>Size458 replied just a few hours later with a perfect summary of a perfect solution:</p>
 <p><strong>Response:</strong> That resolves my problem.</p>
 <p>I used an external event like this:</p>
@@ -88,7 +89,12 @@ to <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28"
 &nbsp; {
 &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">void</span> Execute(<span class="teal">UIApplication</span> uiapp)
 &nbsp; &nbsp; {
-&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uiapp.ActiveUIDocument.Document;
+&nbsp; &nbsp; &nbsp; UIDocument uidoc = uiapp.ActiveDocument;
+&nbsp; &nbsp; &nbsp; if( null == uidoc )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; return; // no document, nothing to do
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="teal">Document</span> doc = uidoc.Document;
 &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> tx = <span class="blue">new</span> <span class="teal">Transaction</span>(doc))
 &nbsp; &nbsp; &nbsp; {
 &nbsp; &nbsp; &nbsp; &nbsp; tx.Start(<span class="maroon">&quot;MyEvent&quot;</span>);
@@ -109,3 +115,16 @@ to <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28"
 </pre>
 
 <p>Many thanks Sizy458 for sharing this nice and succinct example of how to address this need.</p>
+<h4><a name="4"></a>Addendum &ndash; Idling versus External Event</h4>
+<p>I added this a day later, prompted
+by <a href="http://thebuildingcoder.typepad.com/blog/2013/12/replacing-an-idling-event-handler-by-an-external-event.html#comment-2402180196">Michael's comment</a>:</p>
+<p><strong>Question:</strong> I have an Idling function that checks to see if Revit links have been updated so that I can prompt the user to reload the link if its newer. It works great when there are only a couple of links. More than that and it appears the Idling event will stop and start over, in which case the first idling event never finished so I get a repeating dialog. Do you think this is a problem with the Idling event that it could end and fire again without completing the rest of the code in it? If so I can try changing it to an external event. Thanks.</p>
+<p><strong>Answer:</strong> In general, I recommend not to use the Idling event at all, except for a one-off call.</p>
+<p>If you want to use it for continuous polling, it gives you absolutely no control over the frequency.</p>
+<p>Revit will call it as often as it can, hogging the entire CPU time and bringing performance down.</p>
+<p>An external event will give you much more control and flexibility.</p>
+<p>Therefore, I definitely recommend you switch to an external event instead of using Idling.</p>
+<p>That is why I did this myself, as described in the description
+on <a href="http://thebuildingcoder.typepad.com/blog/2013/12/replacing-an-idling-event-handler-by-an-external-event.html">replacing an Idling event handler by an external event</a>.
+You can explore
+the <a href="https://github.com/jeremytammik/RoomEditorApp">RoomEditorApp</a> for more details on that.</p>
