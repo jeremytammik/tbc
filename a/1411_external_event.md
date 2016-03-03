@@ -35,16 +35,19 @@
 
 Revit API, Jeremy Tammik, akn_include
 
- #revitAPI #3dwebcoder @AutodeskRevit #bim #aec #adsk #adskdevnetwrk
+Implementing the TrackChangesCloud External Event #revitAPI #3dwebcoder @AutodeskRevit #bim #aec #adsk #adskdevnetwrk
 
-Here is another bunch of issues addressed in
-the Revit API discussion forum and
-elsewhere in the past day or two
-&ndash; The Building Coder blog source text and index
-&ndash; Reloading add-in DLL for debugging without restart
-&ndash; Drawing curves from a list of points
-&ndash; Determining the distance of a family instance to the floor or elevation
-&ndash; Deleting a PrintSetup or ViewSheetSetting...
+Today, I'll discuss this morning's work
+&ndash; TrackChanges enhancement idea
+&ndash; The TrackChangesCloud add-in
+&ndash; The TrackChangesCloud external event
+&ndash; Creating and raising an external event
+&ndash; Raising the external event from a separate thread
+&ndash; First test run
+&ndash; Trigger immediate execution by setting Revit foreground window
+&ndash; Complete external application module
+&ndash; Next steps
+&ndash; Download...
 
 -->
 
@@ -52,7 +55,7 @@ elsewhere in the past day or two
 
 Today, I'll discuss this morning's work:
 
-- [TrackChanges Enhancement Idea](#2)
+- [TrackChanges enhancement idea](#2)
 - [The TrackChangesCloud add-in](#3)
 - [The TrackChangesCloud external event](#4)
 - [Creating and raising an external event](#5)
