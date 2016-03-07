@@ -1,0 +1,125 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!---
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+#dotnet #csharp
+#fsharp #python
+#responsivedesign #typepad
+#ah8 #augi #dotnet
+#stingray #rendering
+#3dweb #3dviewAPI #html5 #threejs #webgl #3d #mobile #vr #ecommerce
+#Markdown #Fusion360 #Fusion360Hackathon
+#javascript
+#RestSharp #restAPI
+#mongoosejs #mongodb #nodejs
+#rtceur
+#xaml
+#3dweb #a360 #3dwebaccel #webgl @adskForge
+@AutodeskReCap @Adsk3dsMax
+#revitAPI #bim #aec #3dwebcoder #adsk #adskdevnetwrk @jimquanci @keanw
+#au2015 #rtceur
+#eraofconnection
+#RMS @researchdigisus
+@adskForge #3dwebaccel
+#a360
+@github
+
+Revit API, Jeremy Tammik, akn_include
+
+Entitlement API Trial Period and Floating License #revitAPI #3dwebcoder @AutodeskRevit #bim #aec #adsk #grevit
+
+I had an exciting weekend with ski tours under challenging weather conditions around Oberalppass, Sedrun-Andermatt, skiing on Piz Maler on Friday, piste in a snow storm on Saturday, and climbing Piz Cavradi via the Maighelshuette Sunday morning in splendid conditions, with 50 cm of fresh powder snow for the descent.
+Here is today's Revit news for you
+&ndash; Trial period, floating license and the Entitlement API
+&ndash; SketchUp Plugin for Grevit
+&ndash; EMEA ADN team meeting in London...
+
+-->
+
+<h3>Entitlement API, Trial Period and Floating License</h3>
+<p>I had an exciting weekend with ski tours under challenging weather conditions around Oberalppass, Sedrun-Andermatt, skiing on Piz Maler on Friday, piste in a snow storm on Saturday, and climbing Piz Cavradi via the Maighelshuette Sunday morning in splendid conditions, with 50 cm of fresh powder snow for the descent.</p>
+<p>Here is today's Revit news for you:</p>
+<ul>
+<li><a href="#2">Trial period, floating license and the Entitlement API</a></li>
+<li><a href="#3">SketchUp Plugin for Grevit</a></li>
+<li><a href="#4">EMEA ADN team meeting in London</a></li>
+</ul>
+<h4><a name="2"></a>Trial Period, Floating License and the Entitlement API</h4>
+<p>Here is a question that came up in
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a>
+on <a href="http://forums.autodesk.com/t5/revit-api/dynamic-model-update-after-loading-family/m-p/6052310">how to set up a trial period for a custom add-in</a>,
+answered by my
+colleagues <a href="http://adndevblog.typepad.com/cloud_and_mobile/cyrille-fauvel.html">Cyrille Fauvel</a>
+and <a href="http://adndevblog.typepad.com/autocad/virupaksha-aithal.html">Virupaksha Aithal</a>:</p>
+<p><strong>Question:</strong> I have an external application Revit add-in that I want to set a trial period on and sell on Autodesk AppStore, formerly known as Autodesk Exchange Apps.</p>
+<p>My first question is:</p>
+<p>Where should I store the trial period information?</p>
+<p>I tried setting the <code>RegistryKey</code> on <code>Registry.LocalMachine</code> but Revit does not allow that because of the security problem.</p>
+<p>My second question is about the Autodesk Entitlement API service:</p>
+<p>Is it possible for a user to use one single permission account on multiple computers and pass the Entitlement API at the same time?</p>
+<p><strong>Answer:</strong> On the first question, where to store the trial period information:</p>
+<p>That is completely up to you.</p>
+<p>For instance, you can store it in your remote website database, in a local encrypted file, or anywhere else you like.</p>
+<p>On the second question about the Autodesk Entitlement API service:</p>
+<p>Yes, the entitlement API is a REST call to check whether the license is valid. It does not track the usage.
+You would have to implement your own service to track usage.</p>
+<p>I assume that the scenario you wish to avoid is one single user, John, running the app from several different computers at the same time.
+To prevent that, you can use a floating license schema, like this:</p>
+<p>John starts the app on computer A:</p>
+<ul>
+<li>You check the entitlement.</li>
+<li>You log a record on your website noting that computer A is currently using the license, e.g. storing its IP address, the time stamp, the license, etc.</li>
+<li>Every N minutes, refresh the record on your website.<ul>
+<li>Lock the app if the Internet connection is lost.</li>
+</ul>
+</li>
+<li>When John shuts down the app, inform your website and release the 'currently using' record for computer A.</li>
+</ul>
+<p>If John starts the app on computer B, you proceed similarly, but:</p>
+<ul>
+<li>If your website says 'license already in use', give a grace period of N minutes.</li>
+<li>N minutes later:<ul>
+<li>If the record for computer A gets updated, lock the app on Computer B.</li>
+<li>If the record for computer A does not get updated for some reason, e.g. crashed, give another N minutes grace period.</li>
+</ul>
+</li>
+<li>N minutes later still: if there is still no change, take the license, and revoke it for computer A, which will lock down from now on.</li>
+</ul>
+<p>If more than two computers are playing in this game, you may decide on stronger rules, set a priority on who can take the license, etc.</p>
+<p>So, you need to implement your own solution to handle simultaneous use of the app on multiple machines.</p>
+<p>For information on the current implantation entitlement API implementation, please refer to the following material &ndash; it is general in nature and thus holds good for Revit also:</p>
+<ul>
+<li><a href="https://autodesk.box.com/s/aj41r4y9inou6hh3mps2ri8stz9nelt1">Entitlement API recording</a></li>
+<li><a href="https://github.com/ADN-DevTech/EntitlementAPI">Sample application source code</a></li>
+<li><a href="http://usa.autodesk.com/adsk/servlet/item?siteID=123112&amp;id=24243607">Implementing copy protection in your apps</a></li>
+<li><a href="http://usa.autodesk.com/adsk/servlet/item?siteID=123112&amp;id=24243865">Entitlement API for desktop apps</a></li>
+</ul>
+<p>I mentioned some additional resources in the recent discussion of the <a href="http://thebuildingcoder.typepad.com/blog/2016/02/reorg-fomt-devcon-ted-qr-custom-exporter-quality.html#2">Autodesk reorganisation and Kean's move to Octo</a>:</p>
+<ul>
+<li><a href="http://adndevblog.typepad.com/aec/2015/04/entitlement-api-for-revit-exchange-store-apps.html">Entitlement API for Revit Exchange Store Apps</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/05/exchange-apps-webinar-recording-and-resources.html#3">Exchange Apps resources &ndash; Entitlement API information</a></li>
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2016/02/securing-your-autocad-app-using-net.html">Securing your AutoCAD app using .NET</a> &ndash; Kean's sample showing how to use a REST API to check the user entitlement for your application via the Autodesk AppStore.</li>
+</ul>
+<p>I hope that this helps and provides a final, complete and comprehensive overview.</p>
+<h4><a name="3"></a>SketchUp Plugin for Grevit</h4>
+<p>Last year,
+I <a href="http://thebuildingcoder.typepad.com/blog/2015/07/grevit-firerating-in-the-cloud-demo-deployment-vacation.html#3">mentioned</a> the
+exciting open source project <a href="http://grevit.net">Grevit</a>,
+a <a href="http://www.rhino3d.com">Rhino</a> and <a href="http://www.grasshopper3d.com">Grasshopper</a> app
+that enables assembling a BIM in Grasshopper, sending it to Revit or AutoCAD Architecture, and later dynamically updating it.</p>
+<p>Its author, Max Thumfart, Senior Engineer at <a href="http://www.thorntontomasetti.com">Thornton Tomasetti</a> in
+the UK, points out that the latest Grevit release also adds support
+for <a href="http://www.sketchup.com">SketchUp</a>.</p>
+<p>You can now build your BIM Model in either Grasshopper or SketchUp and send it to Revit or ACA, where it is translated into native elements like walls, floors and columns.</p>
+<p><center>
+<img src="img/grevit.png" alt="Grevit" width="464">
+</center></p>
+<h4><a name="4"></a>EMEA ADN Team Meeting in London</h4>
+<p>I am travelling to London tomorrow, for a short team meeting with my closest colleagues, the European ADN team.</p>
+<p>We will discuss many exciting things, our internal organisation, efficiency, meetups, webinars, developing material and samples, best practices, individual achievements, upcoming events, other plans for the coming year, and last but not least all the APIs we support: Manufacturing, Fusion, BIM, BIM360 Docs, the View and Data API, AutoCAD I/O, ReCap, Spark, EXPO, Shotgun, Stingray, Maya I/O, 3ds Max I/O, Rendering, etc. &ndash; all handled by just four people in this part of the world!</p>
