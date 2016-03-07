@@ -522,5 +522,5 @@ and the version discussed above
 is [release 2016.0.0.4](https://github.com/jeremytammik/TrackChangesCloud/releases/tag/2016.0.0.4).
 
 <center>
-<img src="img/track_changes_diff.png" alt="TrachChanges diff" width="340">
+<img src="img/track_changes_diff.png" alt="TrackChanges diff" width="340">
 </center>
