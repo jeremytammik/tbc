@@ -132,7 +132,7 @@ A lot of Kean's AutoCAD.NET discussions are also valid for Revit, by the way, su
 The latter one highlights the Entitlement API, which was also covered in the past specifically for Revit and Exchange Store Apps by Mikako Harada and Daniel Du, who now also left the company:
 
 - [Entitlement API for Revit Exchange Store Apps](http://adndevblog.typepad.com/aec/2015/04/entitlement-api-for-revit-exchange-store-apps.html)
-- [Exchange Apps resources &ndash; Entitlement API information:](http://thebuildingcoder.typepad.com/blog/2014/05/exchange-apps-webinar-recording-and-resources.html#3)
+- [Exchange Apps resources &ndash; Entitlement API information](http://thebuildingcoder.typepad.com/blog/2014/05/exchange-apps-webinar-recording-and-resources.html#3)
 
 Talking about restructuring and so on:
 
