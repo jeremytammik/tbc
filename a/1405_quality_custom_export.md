@@ -113,9 +113,8 @@ week before I left.
 
 Luckily, I survived that.
 
-My colleague Kean Walmsley only escaped
-by [switching to a different team](http://through-the-interface.typepad.com/through_the_interface/2016/02/time-for-a-change.html),
-OCTO, the Office of the CTO, which is a very nice career move, in fact.
+My colleague Kean Walmsley [switched to OCTO](http://through-the-interface.typepad.com/through_the_interface/2016/02/time-for-a-change.html),
+the Office of the CTO, which is a very nice career move, in fact.
 
 Congratulations on that, Kean!
 

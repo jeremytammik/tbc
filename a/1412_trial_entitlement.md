@@ -46,7 +46,8 @@ Here is today's Revit news for you
 
 ### Entitlement API, Trial Period and Floating License
 
-I had an exciting weekend with ski tours under challenging weather conditions around Oberalppass, Sedrun-Andermatt, skiing on Piz Maler on Friday, piste in a snow storm on Saturday, and climbing Piz Cavradi via the Maighelshuette Sunday morning in splendid conditions, with 50 cm of fresh powder snow for the descent.
+I had an exciting weekend with ski tours under challenging weather conditions around Oberalppass, Sedrun-Andermatt, skiing on Piz Maler on Friday, piste in a snow storm on Saturday, and climbing Piz Cavradi via the Maighelshuette Sunday morning in splendid conditions, with 50 cm of fresh powder snow for the descent
+([photo album](https://www.facebook.com/media/set/?set=a.10207632719508939&type=1&l=42a28d5c14)).
 
 Here is today's Revit news for you:
 
