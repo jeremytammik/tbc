@@ -1,0 +1,251 @@
+	Option Explicit 
+	
+'*  Script name:   RSN Cache Update and Model Export.vbs
+'*  Copyright (c) 2015 Wells Concrete
+'*  Author:  Ted Kovacs (ted.kovacs@wellsconcrete.com)
+'*  Purpose:       Automates the running of Autodesk's command line RevitServerTools utility to update accelerator cache and the creation of local models for backup
+'*				   Reads list of projects currently hosted on Revit Server via http using a REST API call to the Revit host server
+'*				   Self Cleaning:  Can be configured to automatically delete backup .rvt files for projects that are no longer hosted on Revit host server
+'*				   Cache Update Only Option:  Can be configured to always delete all backup .rvt files in backup folder on completion if your only goal is to refresh an accelerators cache
+'*				   When run on an Accelerator, automatically uses -a switch in the RevitServerTool command
+'*				   When run on an Host, automatically excludes -a switch in the RevitServerTool command
+'*				   Always uses the -o (overwrite) switch in the RevitServerTool command
+'*  History:       
+'*		Version 1.0 - 7/20/2015
+'*                 
+'* Notices
+'*		 You have a royalty-free right to use, modify, reproduce, and 
+'*		 distribute this script file in any way you find useful, provided that
+'*		 you agree that the copyright owner above has no warranty, obligations,
+'*		 or liability for such use.  
+	
+
+	
+	
+	'=================================================================
+	'= Edit the values assigned to the following variables as needed =
+	'=================================================================
+	Public Const RevitServerHostName = "RevitHost"		'Host name of revit host server
+	Public Const RevitServerVersion = "2015"  			'Script written for 2015, but likely will work for other versions
+	Public Const BackupCopyPath = "C:\Projects\2015" 	'Desired path for exported .rvt files (All models will export to root of this path, will not create subfolders matching location on Revit host server)
+	Public Const DeleteBackupsNotMatched = True  		'Removes any .rvt files found in the BackupCopyPath folder that are for projects not currently hosted on the Revit server host 
+	Public Const DeleteAllBackupsAfterRun = False		'Removes *all* .rvt files found in the BackupCopyPath folder once process is complete - Set to True if all you need is the accelerator cache refreshed
+ 
+ 
+ 
+	'==========================================================================
+	'= Avoid changing anything below here unless you are comfortable doing so =
+	'==========================================================================
+ 
+ 
+	'Get Computer Name & Username
+	Public strComputerName, strUserName
+	Dim wshShell
+	Set wshShell = WScript.CreateObject( "WScript.Shell" )
+	strComputerName = wshShell.ExpandEnvironmentStrings( "%COMPUTERNAME%" )
+	strUserName = wshShell.ExpandEnvironmentStrings( "%USERNAME%" )
+	
+	'Verify BackupCopyPath folder exists, create if necessary
+	Call CheckBackupFolder
+	
+	'Check to see if script is running on the Revit Host
+	Dim IsHost
+	If ucase(strComputerName) <> ucase(RevitServerHostName) Then
+		IsHost = False
+	Else
+		IsHost = True
+	End If
+ 
+	'Setup Projects Array
+	Dim ProjectsCounter, arrProjects()
+	ReDim Preserve arrProjects(0)
+	
+	'Call to read the root of the Revit Host, which will in turn recursively read all subfolders
+	Call ReadFolder("")
+ 
+	'Run the Revit Server Tool for each project
+	Dim ProjectCounter, CmdString
+	For ProjectCounter = 0 to UBound(arrProjects)
+		CmdString = chr(34) & "C:\Program Files\Autodesk\Revit Server " & RevitServerVersion & "\Tools\RevitServerToolCommand\revitservertool" & chr(34) & " createlocalRVT " & chr(34) & arrProjects(ProjectCounter) & chr(34) & " -s " & RevitServerHostName
+		If IsHost = False Then
+			'Add text only for accelerators
+			CmdString = CmdString & " -a " & strComputerName 
+		End If
+		CmdString = CmdString & " -d " & chr(34) & BackupCopyPath & "\" & Mid(arrProjects(ProjectCounter), InStrRev(arrProjects(ProjectCounter),"\")+1, 255) & Chr(34) & " -o"
+		
+		Dim strErrorCode
+		strErrorCode = wshShell.Run(CmdString,1,True)
+		
+	Next
+	
+	'Clean up backup files
+	Dim objFSO, objFolder, colFiles, objFile
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objFolder = objFSO.GetFolder(BackupCopyPath)
+	Set colFiles = objFolder.Files
+	Dim ProjectIsOnRevitHost
+	For Each objFile in colFiles  'Loop through files in backup folder
+		
+		'Check backup files to see if they are related to a project on the host server
+		For ProjectCounter = 0 to UBound(arrProjects)  'Loop through array of projects on the server
+			If objFile.name = Mid(arrProjects(ProjectCounter),InStrRev(arrProjects(ProjectCounter),"\")+1,255) Then
+				ProjectIsOnRevitHost = True
+				Exit For
+			End If
+			If ProjectCounter = UBound(arrProjects) then
+				ProjectIsOnRevitHost = False
+			End If
+		Next
+		
+		'If not found on host, delete backup copy if configured to do so via DeleteBackupsNotMatched variable
+		If DeleteBackupsNotMatched = True Then
+			If ProjectIsOnRevitHost = False Then
+				'Project is not hosted on Revit Server, so delete the backup file
+				If lcase(Right(objFile.Name,4)) = ".rvt" Then  'Delete only .rvt files
+					objFile.Delete
+				End IF
+			End If
+		End If
+		
+		'Delete all backup copies of configured to do so via DeleteAllBackupsAfterRun variable
+		If DeleteAllBackupsAfterRun = True Then
+			If lcase(Right(objFile.Name,4)) = ".rvt" Then  'Delete only .rvt files
+				objFile.Delete
+			End If
+		End If
+	Next	
+	
+	
+ Sub ReadFolder(Path)
+
+	Dim Contents, FoldersSection
+	Contents = GetContents(Path)
+	'msgbox contents
+	
+	FoldersSection = mid(Contents, InStr(Contents,"Folders")+11,Len(Contents))
+	'Clean FoldersSection
+	Dim L, tmpFS, SkipEnabled
+	For L = 1 to len(FoldersSection)
+		If mid(FoldersSection,L,6) = "[{" & Chr(34) & "Age" Then
+			SkipEnabled = True
+		ElseIF SkipEnabled = True and mid(FoldersSection,L,1) = "]" Then
+			SkipEnabled = False
+		ElseIF SkipEnabled = False Then
+			tmpFS = tmpFS & mid(FoldersSection,L,1)
+		End If
+	Next 
+	FoldersSection = mid(tmpFS, 1, InStr(tmpFS,"]")-2)
+	'MsgBox FoldersSection
+	
+ 
+	Dim intRow, arrFolders, FolderInfo
+	arrFolders = Split(FoldersSection,"},{")
+	For Each intRow in arrFolders
+		FolderInfo = Replace(intRow,Chr(34),"")
+
+		If InStr(FolderInfo,"HasContents:true") > 0 Then
+			Dim strFolder
+
+			strFolder = Mid(FolderInfo, InStr(FolderInfo,"Name:")+5,Len(FolderInfo))	
+			strFolder = Mid(strFolder,1, InStr(strFolder,",")-1)
+			
+            		'Recursivly read subfolder
+            		If Len(Path) > 0 Then
+                		ReadFolder Path & "|" & strFolder
+            		Else
+                		ReadFolder strFolder
+            		End If
+        	End If
+	Next
+
+	Dim ModelsSection
+	ModelsSection = mid(Contents, InStr(Contents,"Models")+9,Len(Contents))
+	'MsgBox ModelsSection
+	'Clean ModelsSection
+	Dim tmpMS
+	For L = 1 to len(ModelsSection)
+		If mid(ModelsSection,L,6) = "[{" & Chr(34) & "Age" Then
+			SkipEnabled = True
+		ElseIF SkipEnabled = True and mid(ModelsSection,L,1) = "]" Then
+			SkipEnabled = False
+		ElseIF SkipEnabled = False Then
+			tmpMS = tmpMS & mid(ModelsSection,L,1)
+		End If
+	Next 
+	'MsgBox tmpMS
+	If mid(tmpMS,1,1) <> "]" Then
+		ModelsSection = mid(tmpMS, 2, InStr(tmpMS,"]")-3)
+	Else
+		ModelsSection = ""
+	End If
+	
+	
+	If ModelsSection <> "" Then
+		Dim arrModels, ModelInfo
+		arrModels = Split(ModelsSection,"},{")
+		For Each intRow in arrModels
+			ModelInfo = Replace(intRow,Chr(34),"")
+
+			Dim strModel
+			strModel = Mid(ModelInfo, InStr(ModelInfo,"Name:")+5,Len(ModelInfo))
+			strModel = Mid(strModel,1, InStr(strModel,",")-1) 
+
+			'Expand array, if not first project found
+			If len(arrProjects(0)) > 0 Then
+				ReDim Preserve arrProjects(UBound(arrProjects)+1)
+			End IF
+			
+			'Add project to array
+			'arrProjects(UBound(arrProjects)) = Path & "\" & strModel
+			arrProjects(UBound(arrProjects)) = Replace(Path, "|", "\") & "\" & strModel
+
+		Next	
+	End If
+ End Sub
+ 
+ Function GetContents(Folder)
+	Dim restReq 
+	Dim url 
+	Dim userName 
+	Dim userMachine 
+	Dim GUID 
+	Dim outData 
+	Set restReq = CreateObject ("Microsoft.XMLHTTP") 
+	'Create the headers that we will need to make the request 
+	If Folder = "" Then
+		url = "http://" & RevitServerHostName & "/RevitServerAdminRESTService" & RevitServerVersion & "/AdminRESTService.svc/ /Contents" 
+	Else
+		url = "http://" & RevitServerHostName & "/RevitServerAdminRESTService" & RevitServerVersion & "/AdminRESTService.svc/" & Folder & "/Contents" 
+	End If
+	restReq.open "GET", url, False 
+	restReq.setRequestHeader "User-Name", strUserName 
+	restReq.setRequestHeader "User-Machine-Name", strComputerName 
+	restReq.setRequestHeader "Operation-GUID", GetGuid() '"1640EA28-0C15-40BF-8DDA-5DB9D917D1F3" 
+	restReq.send("") 
+	GetContents = restReq.responseText
+	'MsgBox GetContents
+ End Function
+ 
+ Sub CheckBackupFolder()
+ 	Dim objFSO
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	If NOT objFSO.FolderExists(BackupCopyPath) Then
+		objFSO.CreateFolder BackupCopyPath
+	End IF
+ End Sub
+Function GetGuid()
+Dim restGUID
+Set restGUID = CreateObject("Scriptlet.TypeLib")
+    'GetGuid = Left(CStr(restGUID.GUID), 38)
+    GetGuid = Mid(CStr(restGUID.GUID), 2, Len(CStr(restGUID.GUID)) - 4)
+    Set restGUID = Nothing
+End Function
+Sub WriteLog(txtLine)
+    Dim fso, txtfile
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    Set txtfile = fso.OpenTextFile("C:\Admin\Gee.txt", 8, True)
+    
+    txtfile.WriteLine (txtLine)
+    txtfile.Close
+
+End Sub
