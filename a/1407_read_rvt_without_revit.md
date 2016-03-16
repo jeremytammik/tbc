@@ -90,6 +90,17 @@ It will be much appreciated.
 
 Thank you!
 
+#### <a name="1"></a>Addendum
+
+This  question was raised again shortly afterwards in the Revit API discussion forum thread
+on [accessing Revit data without opening Revit]:
+
+**Question:** How can I access Revit information without opening the Revit application, e.g. from an external application such as content studio?
+
+I would like to explore some parameters without opening the application.
+I know this kind of thread has been created few times but I discovered that Content studio can do this.
+Does anyone know how to deal with this?
+
 
 Oh, and before signing off, here is another thought-provoking idea:
 
