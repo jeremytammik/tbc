@@ -73,11 +73,20 @@ on <a href="http://thebuildingcoder.typepad.com/blog/2015/06/getting-started-cre
 <p>Thank you!</p>
 <h4><a name="1"></a>Addendum</h4>
 <p>This  question was raised again shortly afterwards in the Revit API discussion forum thread
-on [accessing Revit data without opening Revit]:</p>
+on <a href="http://forums.autodesk.com/t5/revit-api/accessing-revit-data-without-open-revit/td-p/6217928">accessing Revit data without opening Revit</a>:</p>
 <p><strong>Question:</strong> How can I access Revit information without opening the Revit application, e.g. from an external application such as content studio?</p>
 <p>I would like to explore some parameters without opening the application.
-I know this kind of thread has been created few times but I discovered that Content studio can do this.
+I know this kind of thread has been created few times but I discovered that Content Studio can do this.
 Does anyone know how to deal with this?</p>
+<p><strong>Answer:</strong> I assume you are referring to the Revit Content Studio application by <a href="http://contentstudioltd.com">Content Studio Limited</a>?</p>
+<p>Just as you already noted, this question has been discussed repeatedly in the past, e.g., in the Revit API discussion forum thread
+on <a href="http://forums.autodesk.com/t5/revit-api/revit-api-code-without-user-interaction-in-application/m-p/5989301">Revit API code without user interaction in application</a>.</p>
+<p>In general, as noted in both there and in the summary above, it is not possible to access Revit data or make any use whatsoever of the Revit API from outside of Revit.</p>
+<p>Moreover, you need to be in a valid Revit API context to make any Revit API calls.</p>
+<p>A valid Revit API context is only available within call back functions, i.e. event handlers that are actively called by Revit after registering to the corresponding API events.</p>
+<p>This is described in detail in numerous discussions in The Building Coder topic group
+on <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">Idling and External Events for Modeless Access and Driving Revit from Outside</a>.</p>
+<p>I assume that the information provided by Content Studio is accessible through the OLE and COM Structured Storage of the RVT and RFA file formats and the part atom functionality and the <code>Application</code> <code>ExtractPartAtomFromFamilyFile</code> method provided by the Revit API and described above.</p>
 <p>Oh, and before signing off, here is another thought-provoking idea:</p>
 <h4><a name="2"></a>A House for $20000 &ndash; but it's Nicer Than Yours</h4>
 <p>Check out this <a href="http://www.ruralstudio.org">Rural Studio</a> architectural project to

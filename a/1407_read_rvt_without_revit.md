@@ -93,13 +93,30 @@ Thank you!
 #### <a name="1"></a>Addendum
 
 This  question was raised again shortly afterwards in the Revit API discussion forum thread
-on [accessing Revit data without opening Revit]:
+on [accessing Revit data without opening Revit](http://forums.autodesk.com/t5/revit-api/accessing-revit-data-without-open-revit/td-p/6217928):
 
 **Question:** How can I access Revit information without opening the Revit application, e.g. from an external application such as content studio?
 
 I would like to explore some parameters without opening the application.
-I know this kind of thread has been created few times but I discovered that Content studio can do this.
+I know this kind of thread has been created few times but I discovered that Content Studio can do this.
 Does anyone know how to deal with this?
+
+**Answer:** I assume you are referring to the Revit Content Studio application by [Content Studio Limited](http://contentstudioltd.com)?
+
+Just as you already noted, this question has been discussed repeatedly in the past, e.g., in the Revit API discussion forum thread
+on [Revit API code without user interaction in application](http://forums.autodesk.com/t5/revit-api/revit-api-code-without-user-interaction-in-application/m-p/5989301).
+
+In general, as noted in both there and in the summary above, it is not possible to access Revit data or make any use whatsoever of the Revit API from outside of Revit.
+
+Moreover, you need to be in a valid Revit API context to make any Revit API calls.
+
+A valid Revit API context is only available within call back functions, i.e. event handlers that are actively called by Revit after registering to the corresponding API events.
+
+This is described in detail in numerous discussions in The Building Coder topic group
+on [Idling and External Events for Modeless Access and Driving Revit from Outside](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28).
+
+I assume that the information provided by Content Studio is accessible through the OLE and COM Structured Storage of the RVT and RFA file formats and the part atom functionality and the `Application` `ExtractPartAtomFromFamilyFile` method provided by the Revit API and described above.
+
 
 
 Oh, and before signing off, here is another thought-provoking idea:
