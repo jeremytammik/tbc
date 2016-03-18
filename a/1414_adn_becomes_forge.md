@@ -36,13 +36,19 @@ By the way, it has already made its way into a first commercial application:
 
 https://twitter.com/BNIM_IS/status/699971782904664064
 
- #revitAPI #3dwebcoder @AutodeskRevit #adsk #dynamobim
+ADN Becomes Forge and Barcelona Accelerator #revitAPI #3dwebcoder @AutodeskRevit #adsk @adskForge #3dwebaccel
 
-&ndash; ...
+Our fearless leader Jim Quanci already
+explained the importance of our Forge platform and his vision
+of the future of making things.
+Now, after more than 20 years, the time has come to change the name of our team, ADN, the Autodesk Developer Network
+&ndash; It's time for a change &ndash; Forge and Cloud
+&ndash; Forge Accelerator in Barcelona
+&ndash; The Block Research Group at ETHZ...
 
 -->
 
-### Block Research, ADN Becomes Forge and Barcelona Accelerator
+### ADN Becomes Forge and Barcelona Accelerator
 
 - [It's time for a change &ndash; Forge and Cloud](#2)
 - [Forge Accelerator in Barcelona](#3)
@@ -72,7 +78,9 @@ This is a clear bold statement to all our partners &ndash; the future is on the 
 
 We obviously continue happily helping with our desktop APIs, such as the Revit API, and the move of our ecosystem to the cloud is obviously going to take a number of years.
 
-Please just understand that we have a clear vision of the way forward, and that we will to focus more on evangelism than on product support.
+The ADN Program continues onward, desktop centric, for developers working with Autodesk desktop platforms, while the new cloud centric Forge Program is available for developers working with our cloud services.
+
+We have a clear vision of the way forward with a stronger focus on evangelism than product support.
 
 <center>
 <img src="img/forge.jpeg" alt="Forge" width="231">
@@ -135,9 +143,9 @@ The [Block Research Group](http://www.block.arch.ethz.ch)
 around [Prof. Dr. Philippe Block](http://www.block.arch.ethz.ch/brg/people/philippe-block)
 specialises on analysis of masonry structures, graphical analysis and design methods, computational form finding and structural design, discrete element assemblies, and fabrication and construction technologies.
 
-Kean described our visit in more depth talking about
-[visit to the Block Research Group](http://through-the-interface.typepad.com/through_the_interface/2016/03/back-to-ethz-to-visit-the-block-research-group.html),
-including lots of fascinating pictures from the research lab.
+Kean described the meeting in more depth talking about
+the [visit to the Block Research Group](http://through-the-interface.typepad.com/through_the_interface/2016/03/back-to-ethz-to-visit-the-block-research-group.html),
+including some pictures of the exciting experiments and prototypes being worked on in the research lab.
 
 Here is Philippe in discussion with Kean, and [Dr. Tom Van Mele](http://www.block.arch.ethz.ch/brg/people/tom-van-mele) happily plugging away in the background:
 
