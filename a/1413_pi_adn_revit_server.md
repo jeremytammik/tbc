@@ -9,18 +9,6 @@
 
 <!---
 
-- Brett Young of
-  3-minute video on BuildingSP Demo - REAL Conference 2016
-  https://www.youtube.com/watch?v=Xb9g9vufMcI
-  This is a demonstration of Reality Computing, Building Information Modeling (BIM), and Generative Design. We algorithmically route MEPS systems through a mechanical room that has been characterized by a point cloud. More information at http://www.buildingsp.com and on twitter at @genmep and @youngbrettyoung.
-  2-minute video on
-  BuildingSP Demo: MEP Autorouting within Point Cloud and Autodesk Revit
-  https://www.youtube.com/watch?v=yXz84VbQuZ8
-  Published on 10 Mar 2016
-  This demo shows the clash-free auto-routing of electrical conduit through both a point cloud and architectural geometry created in Revit. More information at http://www.buildingsp.com and on twitter at @youngbrettyoung and @genmep.
-
-- 11571635 [API issue with linked files on open detached of central file from network drive]
-
 - 11545598 [Help me Jeremy Tammik! or anyone else familiar with REST API calls to Revit Svr]
   http://forums.autodesk.com/t5/revit-api/help-me-jeremy-tammik-or-anyone-else-familiar-with-rest-api/m-p/6053451
   bar separator in Revit Server model path
@@ -34,18 +22,7 @@
   Another exploration of using the Revit Server REST API is provided by Eric Stimmel's exploration of
   [Revit Server model list using the REST API](http://blog.ericstimmel.com/2012/05/08/revit-server-model-list).
 
-- Keith White <keith.white@autodesk.com> Re: Revit API Question
-
-- busy with Revit cases, as always, and wishing I could further pursue my TrackChangesCloud project, which I also want to continue towards database and cloud areas:
-
-https://github.com/jeremytammik/TrackChangesCloud
-
-By the way, it has already made its way into a first commercial application:
-
-https://twitter.com/BNIM_IS/status/699971782904664064
-
 Pi Day, Meeting, Ski Tour, Revit Server Bar Separator #revitAPI #3dwebcoder @AutodeskRevit #adsk #dynamobim
-
 
 You may be surprised to hear that today is Pi Day :-) – as well as the birthday of my S.O.S. or significant other's son.
 I had an exciting week with the ADN team meeting in London followed by a ski tour during the weekend.
@@ -220,6 +197,7 @@ Actually, I now see that this is also documented in the Revit Server REST API do
 It clearly states:
 
 > Since slashes '\' and backslashes '/' are URL special characters, object paths are formatted as:
+
 <pre>
 Server root: '|'
 Folder Path: 'folderName1[|folderName2[...]]'
