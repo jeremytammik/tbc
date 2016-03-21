@@ -9,8 +9,6 @@
 
 <!---
 
-
-
 - jon Kabat-Zinn Achtsamkeit Glücksformel
   search for "Kabat-Zinn Achtsamkeit Glücksformel"
   http://www.srf.ch/play/tv
@@ -44,7 +42,10 @@ https://twitter.com/BNIM_IS/status/699971782904664064
 
 Vipassana and Idling vs External Events #revitAPI #3dwebcoder  #adsk @VipassanaOrg #vipassana #meditation #bim
 
-&ndash; ...
+I am leaving for a ten-day Vipassana meditation retreat next week, so I'll cram in this quick Saturday post on the meditation retreat and mindfulness before I have too much to do getting prepared next week. It includes yet another discussion of Idling versus external events for modeless dialogues and dockable panels. Vipassana means 'seeing'. In this case, seeing is enhanced by concentration on my own self, my body, my mind, my thoughts.
+No talking, no communication whatsoever, no Internet, no mobile devices, no pen and paper, no reading.
+No input, no output.
+Sitting...
 
 -->
 
@@ -70,6 +71,8 @@ In this case, seeing is enhanced by concentration on my own self, my body, my mi
 No talking, no communication whatsoever, no Internet, no mobile devices, no pen and paper, no reading.
 
 No input, no output.
+
+No distraction.
 
 Sitting.
 
@@ -155,11 +158,11 @@ By the way, numerous previous discussions and a lot more background information 
 Now I wish you a happy relaxing weekend, with both aliveness and idling time:
 
 <center>
-<img src="img/367_jeremy_idling_400x306.jpg" alt="Jeremy idling" width="400">
+<img src="img/367_jeremy_idling_400x306.jpg" alt="Idling event" width="400">
 </center>
 
 I hope to get another post in next week before leaving for my meditation retreat:
 
 <center>
-<img src="img/377_jeremy_sitting_250x400.jpg" alt="Jeremy sitting" width="250">
+<img src="img/377_jeremy_sitting_250x400.jpg" alt="External sitting event" width="250">
 </center>
