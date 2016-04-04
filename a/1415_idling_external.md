@@ -52,7 +52,7 @@ Sitting...
 ### Vipassana and Idling versus External Events
 
 I am leaving for
-a [ten-day Vipassana meditation retreat](http://www.sumeru.dhamma.org) next
+a ten-day [Vipassana meditation retreat](http://www.sumeru.dhamma.org) next
 week, so I'll cram in this quick Saturday post
 on the [meditation retreat](#2)
 and [mindfulness](#3) before
