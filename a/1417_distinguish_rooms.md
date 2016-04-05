@@ -15,11 +15,9 @@
 <img src="" alt="" width="321">
 </center>
 
-How to Distinguish Redundant Rooms
-
 How to Distinguish Redundant Rooms #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim
 
-...
+A couple of interesting Revit API issues were resolved during my recent absence. Let's start with this question raised by Miroslav Schonauer and resolved by Diane Christoforo: Using the terminology as shown in Schedules, I need to report all 'Not Placed', 'Redundant' and 'Not Enclosed' rooms...
 
 -->
 
