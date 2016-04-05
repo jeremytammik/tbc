@@ -1,0 +1,102 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!---
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head>
+
+<!---
+
+- Diane Christoforo RE: How to distinguish between "Redundant" and "NotEnclosed" Rooms?
+
+<center>
+<img src="" alt="" width="321">
+</center>
+
+How to Distinguish Redundant Rooms
+
+How to Distinguish Redundant Rooms #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim
+
+...
+
+-->
+
+### How to Distinguish Redundant Rooms
+
+A couple of interesting Revit API issues were resolved during my recent absence.
+
+Let's start with this question raised by Miroslav Schonauer and resolved by Diane Christoforo:
+
+**Question:** Using the terminology as shown in Schedules, I need to report all 'Not Placed', 'Redundant' and 'Not Enclosed' rooms.
+
+I cannot rely on any particular schedule being present in the model.
+
+So far, my research shows that:
+
+- All of these 3 'failure' cases have `.Area` as 0.
+- 'Not Placed' additionally has `.Location` as null.
+
+The only remaining issue is how to distinguish between 'Redundant' and 'Not Enclosed' rooms.
+
+Do you have any ideas how can I do this comprehensively and deterministically from the room properties and params?
+
+BTW, I'm aware that an alternative approach would be via the Failure API. I can see, e.g., the enumeration value  `BuiltInFailures.RoomFailures.RoomNotEnclosed`.
+
+After just reading about it and looking into some samples, I worry about this approach and think that it is possible to 'override' the failures, which may prevent me from determining whether the rooms really are Not Enclosed or Redundant.
+
+Here is sample code illustrating the approach I have been able to develop so far:
+
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> Distinguish 'Not Placed', 'Redundant' and 'Not Enclosed' rooms.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">void</span> DistinguishRooms(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="teal">StringBuilder</span> sb,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">int</span> numErr,
+&nbsp; &nbsp; <span class="blue">ref</span> <span class="blue">int</span> numWarn )
+&nbsp; {
+&nbsp; &nbsp; sb = <span class="blue">new</span> <span class="teal">StringBuilder</span>();
+&nbsp;
+&nbsp; &nbsp; <span class="teal">FilteredElementCollector</span> rooms
+&nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
+&nbsp;
+&nbsp; &nbsp; rooms.WherePasses( <span class="blue">new</span> <span class="teal">RoomFilter</span>() );
+&nbsp;
+&nbsp; &nbsp; <span class="blue">foreach</span>( <span class="teal">Room</span> r <span class="blue">in</span> rooms )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; sb.AppendFormat( <span class="maroon">&quot;\r\n&nbsp; Room {0}:'{1}': &quot;</span>,
+&nbsp; &nbsp; &nbsp; &nbsp; r.Id.ToString(), r.Name );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( r.Area &gt; 0 ) <span class="green">// OK if having Area</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; sb.AppendFormat( <span class="maroon">&quot;OK (A={0}[ft3])&quot;</span>, r.Area );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( <span class="blue">null</span> == r.Location ) <span class="green">// Unplaced if no Location</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; sb.AppendFormat( <span class="maroon">&quot;UnPlaced (Location is null)&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">else</span>
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; sb.AppendFormat( <span class="maroon">&quot;NotEnclosed or Redundant &quot;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; + <span class="maroon">&quot;- how to distinguish?&quot;</span> );
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; }
+&nbsp; }
+</pre>
+
+Any ideas if this is possible?
+
+**Answer:** Rooms that are redundant still have normal boundaries.
+
+So you can call `Room.GetBoundarySegments` to test.
+
+The list will be empty for a non-enclosed or unplaced room.
+
+Jeremy adds: I added Miro's test method as `DistinguishRooms`
+to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) in
+the module [CmdListAllRooms.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdListAllRooms.cs#L30-L65).
+
+Many thanks to Miro and Diane for the interesting question, research and answer.
