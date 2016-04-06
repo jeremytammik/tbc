@@ -53,7 +53,7 @@ The code is too long to show here, but what we do is to call EditFamily on the s
 **Answer:** You can get the shape centrelines (without hooks) in order (from start to end) with the following method:
 
 <pre class="code">
-  IList<Curve> curvesForBrowser = rebarShape.GetCurvesForBrowser();
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">Curve</span>&gt; curvesForBrowser = rebarShape.GetCurvesForBrowser();
 </pre>
 
 Note: You should be able to retrieve the RebarShape element from the family document.
@@ -61,23 +61,23 @@ Note: You should be able to retrieve the RebarShape element from the family docu
 Hook information can be retrieved through these methods:
 
 <pre class="code">
-  int hookangle0 = rebarShape.GetDefaultHookAngle(0);
-  RebarHookOrientation orient0 = rebarShape.GetDefaultHookOrientation(0);
-
-  int hookangle1 = rebarShape.GetDefaultHookAngle(1);
-  RebarHookOrientation orient1 = rebarShape.GetDefaultHookOrientation(1);
+&nbsp; <span class="blue">int</span> hookangle0 = rebarShape.GetDefaultHookAngle( 0 );
+&nbsp; <span class="teal">RebarHookOrientation</span> orient0 = rebarShape.GetDefaultHookOrientation( 0 );
+&nbsp;
+&nbsp; <span class="blue">int</span> hookangle1 = rebarShape.GetDefaultHookAngle( 1 );
+&nbsp; <span class="teal">RebarHookOrientation</span> orient1 = rebarShape.GetDefaultHookOrientation( 1 );
 </pre>
 
 Hook position should be as follows:
 
 - Start hook origin point is:
-<pre class="code">
+```
 curvesForBrowser[0].GetEndPoint(0);
-</pre>
+```
 - End hook origin point is:
-<pre class="code">
+```
 curvesForBrowser[curveSize -1].GetEndPoint(1);
-</pre>
+```
 
 The connection between the curvesForBrowser and the dimensions in the family can be retrieved like this:
 

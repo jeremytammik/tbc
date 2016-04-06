@@ -37,29 +37,25 @@ on <a href="http://forums.autodesk.com/t5/revit-api/getting-the-location-of-hook
 </center></p>
 <p><strong>Answer:</strong> You can get the shape centrelines (without hooks) in order (from start to end) with the following method:</p>
 <pre class="code">
-  IList<Curve> curvesForBrowser = rebarShape.GetCurvesForBrowser();
+&nbsp; <span class="teal">IList</span>&lt;<span class="teal">Curve</span>&gt; curvesForBrowser = rebarShape.GetCurvesForBrowser();
 </pre>
 
 <p>Note: You should be able to retrieve the RebarShape element from the family document.</p>
 <p>Hook information can be retrieved through these methods:</p>
 <pre class="code">
-  int hookangle0 = rebarShape.GetDefaultHookAngle(0);
-  RebarHookOrientation orient0 = rebarShape.GetDefaultHookOrientation(0);
-
-  int hookangle1 = rebarShape.GetDefaultHookAngle(1);
-  RebarHookOrientation orient1 = rebarShape.GetDefaultHookOrientation(1);
+&nbsp; <span class="blue">int</span> hookangle0 = rebarShape.GetDefaultHookAngle( 0 );
+&nbsp; <span class="teal">RebarHookOrientation</span> orient0 = rebarShape.GetDefaultHookOrientation( 0 );
+&nbsp;
+&nbsp; <span class="blue">int</span> hookangle1 = rebarShape.GetDefaultHookAngle( 1 );
+&nbsp; <span class="teal">RebarHookOrientation</span> orient1 = rebarShape.GetDefaultHookOrientation( 1 );
 </pre>
 
 <p>Hook position should be as follows:</p>
 <ul>
 <li>Start hook origin point is:
-<pre class="code">
-curvesForBrowser[0].GetEndPoint(0);
-</pre></li>
+<code>curvesForBrowser[0].GetEndPoint(0);</code></li>
 <li>End hook origin point is:
-<pre class="code">
-curvesForBrowser[curveSize -1].GetEndPoint(1);
-</pre></li>
+<code>curvesForBrowser[curveSize -1].GetEndPoint(1);</code></li>
 </ul>
 <p>The connection between the curvesForBrowser and the dimensions in the family can be retrieved like this:</p>
 <p>First, map the dimensions to their label parameter ids.</p>
