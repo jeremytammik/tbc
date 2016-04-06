@@ -17,11 +17,11 @@ Here is a Revit API add-in installation issue that came up in various forms in t
 
 -->
 
-### Windows 10 Security Blocks External Command
+### .NET Runtime Security Blocks External Command
 
-Here is a Revit API add-in installation issue that came up in various forms in the past and was now raised and resolved once again by Tim Burnham in the special context of Windows 10 configuration:
+Here is a Revit API add-in installation issue that came up in various forms in the past and was now raised and resolved once again by Tim Burnham in the special context of .NET Runtime 4.0 configuration:
 
-**Question:** I have a plugin that has been working fine for all pre-Windows 10 platforms.
+**Question:** I have a plugin that has been working fine for for several years now on all pre-Windows 10 platforms.
 
 Under Win10, the DLL loads into Revit.exe correctly.
 The `.addin` add-in manifest contents are displayed correctly in the Revit UI.
@@ -37,11 +37,7 @@ SP2 is installed.
 
 I don’t think Revit 2016 is officially supported on Windows 10, but this is a really important project and Win 10 is the project platform.
 
-I am using Parallels to remote into the client's work machine but I don’t have VS debugging access to it at the moment.
-
 Any hints on resolving this?
-
-I’ve included my [barebones example](zip/tb_BareBonesSample.zip), and [add-in manifest](zip/tb_BareBonesSample.addin).
 
 
 **Answer:** I have a solution for my plugin not running.

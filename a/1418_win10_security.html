@@ -16,9 +16,9 @@ Here is a Revit API add-in installation issue that came up in various forms in t
 
 -->
 
-<h3>Windows 10 Security Blocks External Command</h3>
-<p>Here is a Revit API add-in installation issue that came up in various forms in the past and was now raised and resolved once again by Tim Burnham in the special context of Windows 10 configuration:</p>
-<p><strong>Question:</strong> I have a plugin that has been working fine for all pre-Windows 10 platforms.</p>
+<h3>.NET Runtime Security Blocks External Command</h3>
+<p>Here is a Revit API add-in installation issue that came up in various forms in the past and was now raised and resolved once again by Tim Burnham in the special context of .NET Runtime 4.0 configuration:</p>
+<p><strong>Question:</strong> I have a plugin that has been working fine for for several years now on all pre-Windows 10 platforms.</p>
 <p>Under Win10, the DLL loads into Revit.exe correctly.
 The <code>.addin</code> add-in manifest contents are displayed correctly in the Revit UI.
 When I issue the command, however, nothing happens.</p>
@@ -27,9 +27,7 @@ When I issue the command, however, nothing happens.</p>
 <p>Are there any known Windows 10 issues for Revit plugins, or Security issues that would prevent a command from being executed?</p>
 <p>SP2 is installed.</p>
 <p>I don’t think Revit 2016 is officially supported on Windows 10, but this is a really important project and Win 10 is the project platform.</p>
-<p>I am using Parallels to remote into the client's work machine but I don’t have VS debugging access to it at the moment.</p>
 <p>Any hints on resolving this?</p>
-<p>I’ve included my <a href="zip/tb_BareBonesSample.zip">barebones example</a>, and <a href="zip/tb_BareBonesSample.addin">add-in manifest</a>.</p>
 <p><strong>Answer:</strong> I have a solution for my plugin not running.</p>
 <p>It was indeed security related, and apparently a common one with regards to Autodesk plugins since .NET 4.0 was released.</p>
 <p>After snooping around the journal files I saw this:</p>
