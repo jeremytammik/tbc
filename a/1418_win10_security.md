@@ -97,3 +97,5 @@ and [Kean Walmsley](http://through-the-interface.typepad.com) provided
 a comprehensive explanation of it back in 2011
 to [unblock ZIP files before installing Plugins of the Month](http://labs.blogs.com/its_alive_in_the_lab/2011/05/unblock-net.html) from
 Autodesk Labs.
+
+<a name="4"></a>**Addendum:** For a little more background information, pleaase refer to this StackOverflow thread on how to [detect if a file has been blocked by the operating system](http://stackoverflow.com/questions/17527347/detect-if-a-file-has-been-blocked-by-the-operating-system).
