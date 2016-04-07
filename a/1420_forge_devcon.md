@@ -31,7 +31,7 @@ Forge DevCon, Spring, Impermanence, BIM Cloud #revitAPI #3dwebcoder @AutodeskRev
 Spring is getting into swing, and new life is budding.
 I hope the same holds true for all your development efforts and visions of the future.
 Not everything is budding into new life, though... part of existence is passing away, as well.
-One of my dearest school classmates and closest friends of my youth, Prof. Dr. Lorenz Poellinger, passed on unexpectedly.
+One of my dearest school classmates and closest friends of my youth, Prof. Dr. Lorenz Poellinger, unexpectedly passed on.
 The two of us travelled together for several of months, climbing and hitchhiking...
 
 -->
@@ -56,7 +56,7 @@ Not everything is budding into new life, though... part of existence is passing 
 
 One of my dearest school classmates and closest friends of my youth,
 [Prof. Dr. Lorenz Poellinger](https://internwebben.ki.se/en/memory-professor-lorenz-poellinger),
-passed on very unexpectedly.
+unexpectedly passed on.
 
 The two of us travelled together for several of months, climbing and hitchhiking all over southern Europe, just after finishing high school and before moving on to university and adult life.
 
