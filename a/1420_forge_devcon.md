@@ -26,13 +26,17 @@
 
 - pictures of spring
 
- #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim @RevitStructure
+Forge DevCon, Spring, Impermanence, BIM Cloud #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim @adskForge #3dwebaccel
 
-
+Spring is getting into swing, and new life is budding.
+I hope the same holds true for all your development efforts and visions of the future.
+Not everything is budding into new life, though... part of existence is passing away, as well.
+One of my dearest school classmates and closest friends of my youth, Prof. Dr. Lorenz Poellinger, passed on unexpectedly.
+The two of us travelled together for several of months, climbing and hitchhiking...
 
 -->
 
-### Forge DevCon, Spring, Impermanence and BIM Cloud
+### Forge DevCon, Spring, Impermanence, BIM Cloud
 
 Spring is getting into swing, and new life is budding.
 
@@ -40,7 +44,7 @@ Spring is getting into swing, and new life is budding.
 <img src="/p/2016/2016-04-07_spring_budding/923_tree_in_bloom_cropped.jpg" alt="Tree in bloom" width="300">
 </center>
 
-I hope the same holds true for all your development efforts and vision of the future.
+I hope the same holds true for all your development efforts and visions of the future.
 
 #### <a name="2"></a>Impermanence
 
