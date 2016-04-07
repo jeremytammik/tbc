@@ -1,0 +1,141 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!---
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+- http://adndevblog.typepad.com/cloud_and_mobile/2016/04/early-bird-registration-for-forge-devcon.html
+
+- upcoming events:
+  Barcelona May 16-20 -- cloud accelerator http://autodeskcloudaccelerator.com
+  Athens June 1-2 -- meetup, BIM und forge workshop
+  San Fransico June 15-16 -- forge developer conference http://forge.autodesk.com/conference
+  San Fransico June 20-24 -- forge accelerator http://autodeskcloudaccelerator.com
+  Porto October 20-22 -- RTC Europe Revit Technology Conference http://www.revitconference.com/rtc2016eur/
+
+- David Manning <dlmanning@me.com> Re: Application for Autodesk Developer Network/Open source
+
+- my class mate passed away
+  a close friend. we travelled together for a couple of months after finishing high school together and before moving on to university and adult life
+  https://internwebben.ki.se/en/memory-professor-lorenz-poellinger
+
+- pictures of spring
+
+ #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim @RevitStructure
+
+
+
+-->
+
+<h3>Forge DevCon, Spring, Impermanence and BIM Cloud</h3>
+<p>Spring is getting into swing, and new life is budding.</p>
+<p><center>
+<img src="/p/2016/2016-04-07_spring_budding/923_tree_in_bloom_cropped.jpg" alt="Tree in bloom" width="300">
+</center></p>
+<p>I hope the same holds true for all your development efforts and vision of the future.</p>
+<h4><a name="2"></a>Impermanence</h4>
+<p>Not everything is budding into new life, though... part of existence is passing away, as well.</p>
+<p><center>
+<img src="/p/2016/2016-04-07_spring_budding/912_petals_cropped.jpg" alt="Petals" width="300">
+</center></p>
+<p>One of my dearest school classmates and closest friends of my youth,
+<a href="https://internwebben.ki.se/en/memory-professor-lorenz-poellinger">Prof. Dr. Lorenz Poellinger</a>,
+passed on very unexpectedly.</p>
+<p>The two of us travelled together for several of months, climbing and hitchhiking all over southern Europe, just after finishing high school and before moving on to university and adult life.</p>
+<p>He was the one who initiated climbing in our hiking circle, and he died in the mountains as well.</p>
+<p><a href="https://en.wikipedia.org/wiki/Impermanence">Impermanence</a>,
+<a href="http://www.changesurfer.com/Bud/Begin.html">arising and passing away</a>.</p>
+<p>Hej då, Lolle.</p>
+<h4><a name="3"></a>Sommerlied</h4>
+<p style="padding-left: 10%">wir sind menschen auf den wiesen
+<br/>bald sind wir menschen unter den wiesen
+<br/>und werden wiesen, und werden wald
+<br/>das wird ein heiterer landaufenthalt</p>
+
+<p style="text-align: right; padding-right: 10%"><i>Ernst Jandl</i></p>
+
+<h4><a name="4"></a>Projects</h4>
+<p>Looking forward, I have a whole bunch of exciting events and projects lined up for the next couple of months:</p>
+<ul>
+<li><a href="http://autodeskcloudaccelerator.com">Cloud accelerator</a> in Barcelona May 16-20</li>
+<li>Meetup, BIM und forge workshop in Athens June 1-2</li>
+<li><a href="http://forge.autodesk.com/conference">Forge DevCon developer conference</a> in San Francisco June 15-16</li>
+<li><a href="http://autodeskcloudaccelerator.com">Forge accelerator</a> in San Fransisco June 20-24</li>
+<li><a href="http://www.revitconference.com/rtc2016eur">RTC Europe Revit Technology Conference</a> in Porto October 20-22 &ndash; somewhat further away in time...</li>
+</ul>
+<p>The most exciting event by far is the <a href="#5">Forge DevCon developer conference</a>.</p>
+<p>Let's look at that in more detail, and add some motivation on the <a href="#6">cloud-based orientation</a> of all this:</p>
+<h4><a name="5"></a>Forge DevCon Developer Conference</h4>
+<p>The first ever Autodesk Forge Developer Conference will take place in San Francisco on June 15-16.
+The conference is for programmers and entrepreneurs interested in using 'cloud' technologies to disrupt the AEC and Manufacturing industries.
+Click the image below to go to the conference website.</p>
+<p><center>
+<a href="http://forge.autodesk.com/conference">
+<img src="img/forge_devcon.png" alt="Forge DevCon" width="600">
+</a>
+</center></p>
+<p>Early bird registration is due to end on April 15th, so you don't have much time to buy your ticket at the low cost of $499.</p>
+<p>If you're a student, you can come for free &ndash; just sign up for a student ticket using an <code>.edu</code> email address.</p>
+<p>We are still working on the agenda.
+You can explore the list of the classes we currently have planned
+at <a href="http://forge.autodesk.com/tracks-and-speakers">forge.autodesk.com/tracks-and-speakers</a>.</p>
+<p>I will definitely be attending both the conference, a meetup or two before and afterwards, and the accelerator in the following week.</p>
+<p>I am already busy planning and researching for my presentation on BIM, connecting the desktop and cloud.</p>
+<h4><a name="6"></a>BIM Cloud? Why?</h4>
+<p><strong>Question:</strong> I am interested is in developing a free library that would provide some manner of abstraction over the Revit API, with an intention of making it more accessible beyond the confines of C#. There are two possible avenues I’d like to explore:</p>
+<ol>
+<li>
+<p>I believe it may be fairly simply to wrap some portion of the API using an open source framework called <a href="http://tjanczuk.github.io/edge">EdgeJS</a>, which would enable JavaScript calls from within Node.js, and thereby provide a bridge to an existing ecosystem of tools and utilities. Developers working against the Revit API are currently unable to leverage this wider world of technologies, and many reduplicate others' efforts attempting to bridge the gap.</p>
+</li>
+<li>
+<p>A somewhat more ambitious approach would involve making some subset of the API accessible over an http server communicating directly with Revit. Traditionally such an approach would use ASP.NET’s WebAPI framework to provide a RESTful interface. However, I would also like to explore integrating an emerging web technology called <a href="http://graphql.org">GraphQL</a>, which has recently been developed and released by Facebook, and which allows for client definable data queries against a server-defined data schema. Here I would begin with the .NET implementation of the <a href="https://github.com/graphql-dotnet/graphql-dotnet">GraphQL standard</a>.</p>
+</li>
+</ol>
+<p>As to why I would want to do this: a friend of mine is a BIM lead for a largish architecture firm and frequently talks to me about tools she wishes existed for Revit. I know many other BIM people are asking for similar functionality. I am a software developer, with no interest in buildings or architecture, but a lot of interest in data modelling.</p>
+<p>I would like to try to make some tools to help the BIM community. Should this effort lead to anything useful, I have no interest in making money from it, but would prefer to release it as open source for others to use in their own projects.</p>
+<p><strong>Answer:</strong> I am sure that the direct Revit API access via http that you describe can be implemented.</p>
+<p>In fact, here is an example of exactly that,
+<a href="Http://thebuildingcoder.typepad.com/blog/2012/11/drive-revit-through-a-wcf-service.html">driving Revit through a WCF service</a>,
+and it is not the only one.</p>
+<p>Look at The Building Coder topic group
+on <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">modeless access and driving Revit from outside</a> for
+several other related ideas.</p>
+<p>It would not be stable, however, so your framework would definitely have to monitor performance, keep track of tasks queued and executed, and deal with the fact that Revit might need to be killed and restarted occasionally.
+A product designed with an end user interface in mind is simply not built to act as a pure server.</p>
+<p>That is why we just recently published a request for feedback on what developers would like to see and to implement in the kind of scenario you describe:</p>
+<ul>
+<li><a href="Http://thebuildingcoder.typepad.com/blog/2016/02/what-can-revit-on-the-cloud-do-for-you.html#2">What can Revit on the cloud do for you?</a></li>
+<li><a href="Http://thebuildingcoder.typepad.com/blog/2016/02/reading-an-rvt-file-without-revit.html">Reading an RVT file without Revit</a></li>
+</ul>
+<p>On the other hand, I can see a number of different ways to approach the wish for powerful BIM analysis and reporting.</p>
+<p>This fits in really well with some projects I have been working on in the past year or so to connect desktop and cloud:</p>
+<ul>
+<li><a href="https://github.com/jeremytammik/RoomEditorApp">RoomEditorApp</a>, a 2D cloud-based Revit room editor</li>
+<li><a href="https://github.com/jeremytammik/FireRatingCloud">FireRating in the cloud</a><ul>
+<li>FireRatingCloud batch upload enhancement</li>
+<li>FireRatingClient ubiquitous BIM data access and editing</li>
+</ul>
+</li>
+<li><a href="https://github.com/CompHound/CompHound.github.io">CompHound</a>, a cloud-based system to analyse, visualise and report on universal component and asset usage</li>
+<li><a href="https://github.com/jeremytammik/TrackChangesCloud">TrackChangesCloud</a></li>
+</ul>
+<p>I am sure they will be of interest to you as well.</p>
+<p>Maybe some parts of them will provide a good basis for implementing exactly what you think your wife would need  :-)</p>
+<p><strong>Response:</strong> Yes, I work with web centric stuff. Most of what I’ve done for the last few years has centred around Node.js and JavaScript. This is probably the perspective that makes me interested in getting Revit content accessible in a more platform agnostic form.</p>
+<p>For example, imagine that there were a JSON serializable format for Revit objects, such as would allow modification and reintroduction into an existing model (substitute protobufs or Cap’n Proto for JSON if you like). Aside from analytics, you could make a voxel representation of a project, or write a custom ReactJS renderer to display model views. A company could hook up a real-time dashboard of statistics about how many different wall types they’ve used today (exciting!). Of course, these things are possible from the .NET API, there’s just a much higher tooling buy in to Visual Studio, .NET, et al, and a higher barrier to integration with existing technologies where many people already have existing skills. This will tend to make 3rd party development a sort of dark art practiced only by a few cognoscenti, and its broader appeal more happenstance. The more accessible the data, the more weird, little, idiosyncratic things Autodesk’s customers can do for themselves, and the more valuable Autodesk’s products become.</p>
+<p>Indeed the links you send are very interesting and I’ll no doubt be referring to them for guidance if I’m able to proceed. RoomEditorApp in particular is very close to the kind of thing I was talking about. You’ve effectively defined a serialization of a subset of Revit objects in defining your <a href="https://github.com/jeremytammik/RoomEditorApp/blob/master/RoomEditorApp/DbModel.cs#L12">DbObj</a>.</p>
+<p>Thanks for pointing this out to me! Of course you’re right that any abstraction layer would need to track API changes, and Revit isn’t intended to function as an http server. Offhand I'd say I’d probably treat it more like a database I wasn’t sure was going to be there, make my own server, and have an addin register itself as a resource with the server when it was around as well as provide the interface.</p>
+<p>Anyway, this would all be a lot of fun to try.</p>
+<p><strong>Answer:</strong> I think trying to capture the entire complexity of a Revit BIM would be a crazy undertaking.</p>
+<p>Doing something limited and specialised like the room editor on the other hand is absolutely trivial and offers an infinite number of incredibly powerful possibilities with extremely little cost and effort.</p>
+<p>That is exactly what I thought when I first had it up and running two or three years ago.</p>
+<p>I realised that with that technology alone in hand, I could go out and found a hundred different startups right away, and dozens of them would certainly be successful.</p>
+<p>It is so simple!</p>
+<p>All you need is ideas.</p>
+<p>I am absolutely convinced you can easily achieve something extremely useful using some flavour or other of the room editor.</p>
+<p>Oh, and have you looked at the <a href="https://duckduckgo.com/?q=open+source+bim">open source BIM</a> initiatives around?</p>
+<p>There are oodles of them!</p>
