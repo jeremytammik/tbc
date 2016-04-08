@@ -1,0 +1,188 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+Determining Wall Cut Area for a Specific Room #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim
+
+We looked at calculating gross and net wall areas last year, with a later enhancement to use IFCExportUtils to determine the door and window area, resulting in the two respective projects and GitHub repositories, SpatialElementGeometryCalculator and ExporterIfcUtilsWinArea. Several developers have been busy expanding on those to determine surface areas of subfaces, for instance for openings in walls spanning multiple rooms...
+
+-->
+
+<h3>Determining Wall Cut Area for a Specific Room</h3>
+<p>We looked
+at <a href="http://thebuildingcoder.typepad.com/blog/2015/03/calculating-gross-and-net-wall-areas.html">calculating gross and net wall areas</a> last
+year, with a later enhancement to
+use <a href="http://thebuildingcoder.typepad.com/blog/2015/03/ifcexportutils-methods-determine-door-and-window-area.html">IFCExportUtils to determine the door and window area</a>,
+resulting in the two respective projects and GitHub repositories:</p>
+<ul>
+<li><a href="https://github.com/jeremytammik/SpatialElementGeometryCalculator">SpatialElementGeometryCalculator</a></li>
+<li><a href="https://github.com/jeremytammik/ExporterIfcUtilsWinArea">ExporterIfcUtilsWinArea</a></li>
+</ul>
+<p>Several developers have been busy expanding on those to determine surface areas of subfaces, for instance for openings in walls spanning multiple rooms.</p>
+<p>These two project demonstrate useful and powerful starting points but obviously do not yet satisfy all needs.</p>
+<p>Here are some additional aspects brought up by <a href="#2">Arif</a>, <a href="#3">Miroslav</a> and <a href="#4">Håvard</a>:</p>
+<h4><a name="2"></a>Arif</h4>
+<p>Arif Hanif explored the use the spatial geometry calculator and noted in
+a <a href="http://thebuildingcoder.typepad.com/blog/2015/03/findinserts-retrieves-all-openings-in-all-wall-types.html#comment-2424158731">comment on FindInserts retrieving openings</a> that
+it <strong>does</strong> in fact return the subface linked instance element ids. You have to set the <code>SpatialElementBoundaryLocation = SpatialElementBoundaryLocation.Center</code> to close the geometry, and it does not work for Finish.</p>
+<p>More significantly, he explored the subface issue in
+a <a href="http://thebuildingcoder.typepad.com/blog/2015/01/getting-the-wall-elevation-profile.html#comment-2567466439">comment on getting the wall elevation profile</a>
+(<a href="http://thebuildingcoder.typepad.com/blog/2015/01/getting-the-wall-elevation-profile.html#comment-2570111596">image</a>):</p>
+<p><strong>Question:</strong> I am working on an interesting problem, which I have been trying to see if anyone else has been solving. I tried searching your blog and Internet (Revit API forum) but did not see it come up. I need to determine the vertices of an embedded wall returned by FindInserts part of a spatial geometry calculator return. I have the edge and curve loops of the wall in the spaces creating the bounding element. I have used <code>SpatialElementBoundarySubface</code> to return the bounding element and determined the id of the embedded wall in this case a curtain wall. The issue I am running into is that the geometry of the embedded wall spans multiple spaces and have not figured out how to determine only the portion of the embedded wall that belongs to the spatial element boundary. As I read more seems maybe the reference intersector class might be something I look at, any recommendations on your end would be greatly appreciated.</p>
+<p><center>
+<img src="img/room_surface_area_02.png" alt="Subfaces in different spaces" width="400">
+</center></p>
+<p>Solve for the shaded curtain wall vertices.</p>
+<p><strong>Answer:</strong> It looks to me as if one way to go would be to project all the relevant elements onto the wall plane to convert the problem to a two-dimensional one, and then use 2D Boolean operations on the partial surfaces to determine their intersections and overlap.</p>
+<p>Look at The Building Coder topic group on <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.2">2D Booleans and Adjacent Areas</a>.</p>
+<h4><a name="3"></a>Miroslav</h4>
+<p>Miroslav Schonauer adds:</p>
+<p>I’ve been playing with <code>SpatialElementGeometryCalculator</code> and <code>SpatialElementGeometryResults</code> in order to retrieve room bounding surfaces for a project to apply finishes.</p>
+<p>I’m successfully getting subfaces which include the originating element ids (at least for the 'vertical' room faces from walls.
+My aim is to get the <em>net</em> wall face geometries rather than <em>gross</em> which I understand is by-design in the <code>SpatialElementBoundary*</code> classes.</p>
+<p>I was hoping that <code>SpatialElementBoundarySubface.GetBoundingElementFace</code> may get me to the source element face, but unfortunately it does not and that also seems by design. The help file remarks say that 'Faces do not contain voids in room-bounding elements (such the voids in walls created by doors and windows'. It gives me the same or typically just a slightly bigger gross Face that goes a bit 'beyond' the room bounding inside shell due to the wall joints</p>
+<p>What would be my best bet to get the geometry of the room bounding parts of walls same as <code>SpatialElementBoundarySubface</code> but excluding the openings in the walls?</p>
+<p>In other words, I need a combination of 'net-ness' of the original wall inside face(s) (which are net as needed, but extend beyond the room inside shell) and the 'room-belong-ness' of <code>SpatialElementBoundarySubface</code> (which are exact in terms of room inside shell, but unfortunately gross excluding the openings).</p>
+<p>Afaik, there is no built-in Revit API functionality to get what I want.</p>
+<p>A solution for <em>planar</em> faces can be implemented but requires some complex geometrical manipulation based on the full wall geometry and the subfaces obtainable via <code>SpatialElement*</code>.</p>
+<h4><a name="4"></a>Håvard</h4>
+<p>Håvard Dagsvik explored this issue further and implemented solutions to address several of these needs after raising the issue in
+a <a href="http://thebuildingcoder.typepad.com/blog/2015/03/calculating-gross-and-net-wall-areas.html#comment-2531680684">comment on calculating gross and net wall areas</a>:</p>
+<p><strong>Question:</strong> Right now I am getting the opening area from built-in height and width parameters.</p>
+<p>But it's not ideal, as doors are made in different ways.</p>
+<p>In theory the opening could be any kind of family instance. And sometimes it only partially cuts the wall, e.g. in a stacked wall.
+It might even extend beyond the room or ceiling as an embedded curtain wall might do, or a standard window for that matter.</p>
+<p><center>
+<img src="img/room_surface_area_03.png" alt="Subfaces in different spaces" width="400">
+</center></p>
+<p>So the temporary transaction trick won't always get the correct 'spatial' opening area but I had to try anyway.</p>
+<p>What sometimes happens is that Revit will throw other warnings, such as 'Geometry no longer defines a plane', as a consequence.
+Sometimes not always, depends on the model.</p>
+<p>Which the user has to cancel manually, even though the function proceeds probably because we roll back.</p>
+<p>I decided not to use a temp transaction.</p>
+<p>If you have a WallOpening or a OpeningByFace the spatial area returned already has those subtracted.</p>
+<p>Strange this doesn't happen with FamilyInstances.</p>
+<p>Anyway the opening area should be available through the EnergyAnalysis API, but then we would have to generate the energy model first.
+If gbXML could generate areas at the room face we could do it all there.
+But I think gbXML only calculates at the wall centreline. (Fine for opening areas though).</p>
+<p>Another method might be to get the actual OpeningCut element in the family.</p>
+<p>Some Boolean subtraction trick using transient solids from the actual wall residing in the family document. A bit like the temp transaction only using transient family document geometry. But as I realize just now you would also have to set the correct family symbol active first.</p>
+<p><strong>Answer:</strong> Yes, things are a bit complicated.</p>
+<p>If you put in enough effort, I think you can catch and
+automatically <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32">handle any kind of warning message that can ever comes up</a>.</p>
+<p>Regarding bits sticking out from the wall, you can always reduce the problem to a much simpler two-dimensional issue by projecting everything onto the wall plane.</p>
+<p>The <a href="http://thebuildingcoder.typepad.com/blog/2013/04/extrusion-analyser-and-plan-view-boundaries.html">ExtrusionAnalyzer class</a> can help with that.</p>
+<p>A <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.2">2D Boolean library</a> might also come in handy.</p>
+<p>I assume that the gbXML functionality does use that kind of functionality, since you say it works in the wall centre line.</p>
+<p><strong>Response:</strong> I found that using solid manipulation worked better for me than temporary transactions.</p>
+<p>Especially when the opening is an embedded curtain wall spanning multiple rooms and stories.</p>
+<p>So I intersect a curtain wall solid with the room solid, where the intersected solid holds the opening area for that specific room.</p>
+<p>I also used more of the <code>IFCUtils</code> classes from Angel's team, and one of your methods from The Building Coder to retrieve the wall profile.</p>
+<p>Modified to include non-visible objects in order
+to <a href="http://thebuildingcoder.typepad.com/blog/2010/05/curtain-wall-geometry.html">get 'invisible' curtain wall geometry</a>,
+also based on one of your suggestions in another case.</p>
+<p>Here is a small example on how I achieve this:</p>
+<pre class="code">
+&nbsp; <span class="blue">public</span> <span class="blue">double</span> GetWallCutArea(
+&nbsp; &nbsp; <span class="teal">Document</span> doc,
+&nbsp; &nbsp; <span class="teal">FamilyInstance</span> fi,
+&nbsp; &nbsp; <span class="teal">Wall</span> wall,
+&nbsp; &nbsp; <span class="blue">bool</span> isStacked )
+&nbsp; {
+&nbsp; &nbsp; <span class="teal">Options</span> optCompRef
+&nbsp; &nbsp; &nbsp; = doc.Application.Create.NewGeometryOptions();
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( <span class="blue">null</span> != optCompRef )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; optCompRef.ComputeReferences = <span class="blue">true</span>;
+&nbsp; &nbsp; &nbsp; optCompRef.DetailLevel = <span class="teal">ViewDetailLevel</span>.Medium;
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="teal">SolidHandler</span> solHandler = <span class="blue">new</span> <span class="teal">SolidHandler</span>();
+&nbsp; &nbsp; <span class="teal">XYZ</span> cutDir = <span class="blue">null</span>;
+&nbsp;
+&nbsp; &nbsp; <span class="blue">if</span>( !isStacked )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">CurveLoop</span> curveLoop
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">ExporterIFCUtils</span>.GetInstanceCutoutFromWall(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; fi.Document, wall, fi, <span class="blue">out</span> cutDir );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">CurveLoop</span>&gt; loops = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">CurveLoop</span>&gt;( 1 );
+&nbsp; &nbsp; &nbsp; loops.Add( curveLoop );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> <span class="teal">ExporterIFCUtils</span>.ComputeAreaOfCurveLoops(
+&nbsp; &nbsp; &nbsp; &nbsp; loops );
+&nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; <span class="blue">else</span> <span class="blue">if</span>( isStacked )
+&nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; <span class="teal">CurveLoop</span> curveLoop
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">ExporterIFCUtils</span>.GetInstanceCutoutFromWall(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; fi.Document, wall, fi, <span class="blue">out</span> cutDir );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">IList</span>&lt;<span class="teal">CurveLoop</span>&gt; loops = <span class="blue">new</span> <span class="teal">List</span>&lt;<span class="teal">CurveLoop</span>&gt;( 1 );
+&nbsp; &nbsp; &nbsp; loops.Add( curveLoop );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">GeometryElement</span> geomElemHost = wall.get_Geometry(
+&nbsp; &nbsp; &nbsp; &nbsp; optCompRef ) <span class="blue">as</span> <span class="teal">GeometryElement</span>;
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solidOpening
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">GeometryCreationUtilities</span>.CreateExtrusionGeometry(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; loops, cutDir.Negate(), .1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> solidHost = solHandler.CreateSolidFromBoundingBox(
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">null</span>, geomElemHost.GetBoundingBox(), <span class="blue">null</span> );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( solidHost == <span class="blue">null</span> )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">return</span> 0;
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="teal">Solid</span> intersectSolid
+&nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">BooleanOperationsUtils</span>.ExecuteBooleanOperation(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; solidOpening, solidHost,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BooleanOperationsType</span>.Intersect );
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( intersectSolid.Faces.Size.Equals( 0 ) )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; solidOpening
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">GeometryCreationUtilities</span>.CreateExtrusionGeometry(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; loops, cutDir, .1 );
+&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; intersectSolid
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = <span class="teal">BooleanOperationsUtils</span>.ExecuteBooleanOperation(
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; solidOpening, solidHost,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">BooleanOperationsType</span>.Intersect );
+&nbsp; &nbsp; &nbsp; }
+&nbsp;
+&nbsp; &nbsp; &nbsp; <span class="blue">if</span>( <span class="teal">DebugHandler</span>.EnableSolidUtilityVolumes )
+&nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">using</span>( <span class="teal">Transaction</span> trans = <span class="blue">new</span> <span class="teal">Transaction</span>( doc ) )
+&nbsp; &nbsp; &nbsp; &nbsp; {
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; trans.Start( <span class="maroon">&quot;stacked1&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">ShapeCreator</span>.CreateDirectShape( doc,
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; intersectSolid, <span class="maroon">&quot;stackedOpening&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; trans.Commit();
+&nbsp; &nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; }
+&nbsp; &nbsp; &nbsp; <span class="blue">return</span> solHandler.GetLargestFaceArea( intersectSolid );
+&nbsp; &nbsp; }
+&nbsp; &nbsp; <span class="blue">return</span> 0;
+&nbsp; }
+</pre>
+
+<p>There are other fall-backs implemented as well such as just getting the area from height and width parameters, and another method for handling curtain walls.</p>
+<p>No temporary transactions are used at all :-)</p>
+<p>Jeremy adds: I started adding Håvard's functionality to
+the <a href="https://github.com/jeremytammik/SpatialElementGeometryCalculator">SpatialElementGeometryCalculator GitHub project</a>,
+and it is integrated into the current <a href="https://github.com/jeremytammik/SpatialElementGeometryCalculator/releases/tag/2016.0.0.2">release 2016.0.0.2</a> but still not hooked up and as of yet completely untested in that project.</p>
+<p>Håvard is using is successfully in his own project, though.</p>
+<p>Please feel free to fork, explore, enhance and issue pull requests back.</p>
+<p>Many thanks to everybody for their valuable contributions, especially Håvard for sharing this solution!</p>
+<p>Happy weekend to all!</p>
