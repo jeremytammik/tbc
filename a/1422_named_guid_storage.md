@@ -42,7 +42,7 @@ Simply create my own Guid for the current Revit project and use that to identify
 
 Actually, I decided for a slightly more generic approach, supporting 'named Guid storage'.
 
-I define an extensible storage schema named `JtNamedGuiStorageSchema` that just stores one single Guid object.
+I define an extensible storage schema named `JtNamedGuidStorageSchema` that just stores one single Guid object.
 
 To create a new project identifier, I create a GUID and store it in an extensible storage entity with that schema on a Revit `DataStorage` element with a specific element name, e.g., `TrackChanges_project_identifier`.
 
@@ -53,20 +53,20 @@ One danger in this approach is that an existing project that already defines its
 Ah well, I guess I will live with that.
 
 
-#### <a name="2"></a>JtNamedGuiStorage Implementation Class
+#### <a name="2"></a>JtNamedGuidStorage Implementation Class
 
-Here is the new `JtNamedGuiStorage` class that I just implemented and added
+Here is the new `JtNamedGuidStorage` class that I just implemented and added
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples):
 
 
 <pre class="code">
-<span class="blue">class</span> <span class="teal">JtNamedGuiStorage</span>
+<span class="blue">class</span> <span class="teal">JtNamedGuidStorage</span>
 {
 &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
 &nbsp; <span class="gray">///</span><span class="green"> The extensible storage schema, </span>
 &nbsp; <span class="gray">///</span><span class="green"> containing one single Guid field.</span>
 &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
-&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">class</span> <span class="teal">JtNamedGuiStorageSchema</span>
+&nbsp; <span class="blue">public</span> <span class="blue">static</span> <span class="blue">class</span> <span class="teal">JtNamedGuidStorageSchema</span>
 &nbsp; {
 &nbsp; &nbsp; <span class="blue">public</span> <span class="blue">readonly</span> <span class="blue">static</span> <span class="teal">Guid</span> SchemaGuid = <span class="blue">new</span> <span class="teal">Guid</span>(
 &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;{5F374308-9C59-42AE-ACC3-A77EF45EC146}&quot;</span> );
@@ -87,7 +87,7 @@ to [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="blue">new</span> <span class="teal">SchemaBuilder</span>( SchemaGuid );
 &nbsp;
 &nbsp; &nbsp; &nbsp; &nbsp; schemaBuilder.SetSchemaName(
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;JtNamedGuiStorage&quot;</span> );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;JtNamedGuidStorage&quot;</span> );
 &nbsp;
 &nbsp; &nbsp; &nbsp; &nbsp; schemaBuilder.AddSimpleField(
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;Guid&quot;</span>, <span class="blue">typeof</span>( <span class="teal">Guid</span> ) );
@@ -120,7 +120,7 @@ to [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 &nbsp;
 &nbsp; &nbsp; <span class="teal">ExtensibleStorageFilter</span> f
 &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">ExtensibleStorageFilter</span>(
-&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">JtNamedGuiStorageSchema</span>.SchemaGuid );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">JtNamedGuidStorageSchema</span>.SchemaGuid );
 &nbsp;
 &nbsp; &nbsp; <span class="teal">DataStorage</span> dataStorage
 &nbsp; &nbsp; &nbsp; = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc )
@@ -146,7 +146,7 @@ to [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="green">// Create entity to store the Guid data</span>
 &nbsp;
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">Entity</span> entity = <span class="blue">new</span> <span class="teal">Entity</span>(
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">JtNamedGuiStorageSchema</span>.GetSchema() );
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">JtNamedGuidStorageSchema</span>.GetSchema() );
 &nbsp;
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; entity.Set( <span class="maroon">&quot;Guid&quot;</span>, guid = <span class="teal">Guid</span>.NewGuid() );
 &nbsp;
@@ -165,7 +165,7 @@ to [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 &nbsp; &nbsp; &nbsp; <span class="green">// Retrieve entity from the data storage element.</span>
 &nbsp;
 &nbsp; &nbsp; &nbsp; <span class="teal">Entity</span> entity = dataStorage.GetEntity(
-&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">JtNamedGuiStorageSchema</span>.GetSchema( <span class="blue">false</span> ) );
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="teal">JtNamedGuidStorageSchema</span>.GetSchema( <span class="blue">false</span> ) );
 &nbsp;
 &nbsp; &nbsp; &nbsp; <span class="teal">Debug</span>.Assert( entity.IsValid(),
 &nbsp; &nbsp; &nbsp; &nbsp; <span class="maroon">&quot;expected a valid extensible storage entity&quot;</span> );
@@ -199,7 +199,7 @@ I exercise it in the trivial external command `CmdNamedGuidStorage` as follows:
 &nbsp; <span class="blue">string</span> name = <span class="maroon">&quot;TrackChanges_project_identifier&quot;</span>;
 &nbsp; <span class="teal">Guid</span> named_guid;
 &nbsp;
-&nbsp; <span class="blue">bool</span> rc = <span class="teal">JtNamedGuiStorage</span>.Get( doc,
+&nbsp; <span class="blue">bool</span> rc = <span class="teal">JtNamedGuidStorage</span>.Get( doc,
 &nbsp; &nbsp; name, <span class="blue">out</span> named_guid, <span class="blue">false</span> );
 &nbsp;
 &nbsp; <span class="blue">if</span>( rc )
@@ -213,7 +213,7 @@ I exercise it in the trivial external command `CmdNamedGuidStorage` as follows:
 &nbsp; }
 &nbsp; <span class="blue">else</span>
 &nbsp; {
-&nbsp; &nbsp; rc = <span class="teal">JtNamedGuiStorage</span>.Get( doc,
+&nbsp; &nbsp; rc = <span class="teal">JtNamedGuidStorage</span>.Get( doc,
 &nbsp; &nbsp; &nbsp; name, <span class="blue">out</span> named_guid, <span class="blue">true</span> );
 &nbsp;
 &nbsp; &nbsp; <span class="blue">if</span>( rc )
@@ -247,7 +247,7 @@ This document already has a project identifier: TrackChanges_project_identifier 
 
 The new functionality discussed above is included
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
-[release 2016.0.127.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.127.0).
+[release 2016.0.127.1](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.127.1).
 
 I look forward to hearing what you think of it.
 Thank you in advance for any comments you may have.
