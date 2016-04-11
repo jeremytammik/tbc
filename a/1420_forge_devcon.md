@@ -58,6 +58,9 @@ One of my dearest school classmates and closest friends of my youth,
 [Prof. Dr. Lorenz Poellinger](https://internwebben.ki.se/en/memory-professor-lorenz-poellinger),
 unexpectedly passed on.
 
+Lorenz was an active and successful scientist at [Karolinska Institutet](http://ki.se/en) in Stockholm
+and the [Cancer Science Institute CSI](https://www.csi.nus.edu.sg/ws/uncategorized/remembering-prof-lorenz-poellinger/remembering-professor-lorenz-poellinger) in Singapore.
+
 The two of us travelled together for several of months, climbing and hitchhiking all over southern Europe, just after finishing high school and before moving on to university and adult life.
 
 He was the one who initiated climbing in our hiking circle, and he died in the mountains as well.
