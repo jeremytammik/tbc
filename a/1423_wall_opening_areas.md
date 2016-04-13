@@ -27,7 +27,7 @@ Determining Wall Opening Areas per Room #revitAPI #3dwebcoder @AutodeskRevit #ad
 
 We continue the rather exhaustive exploration of calculating net and gross wall areas per room, and two other announcements, pointers to interesting sources of information
 &ndash; Why Autodesk has a Labs
-&ndash; Dal BIM in Poi &ndash; Italian BIM
+&ndash; Dal BIM in poi &ndash; Italian BIM
 &ndash; Determining wall opening areas per room
 &ndash; Håvard's SpatialElementGeometryCalculator enhancement
 &ndash; External command mainline
@@ -40,7 +40,7 @@ We continue the rather exhaustive exploration of calculating net and gross wall 
 We continue the rather exhaustive exploration of calculating net and gross wall areas per room, and two other announcements, pointers to interesting sources of information besides The Building Coder:
 
 - [Why Autodesk has a Labs](#2)
-- [Dal BIM in Poi &ndash; Italian BIM](#3)
+- [Dal BIM in poi &ndash; Italian BIM](#3)
 - [Determining wall opening areas per room](#4)
 - [Håvard's SpatialElementGeometryCalculator enhancement](#5)
 - [External command mainline](#6)
