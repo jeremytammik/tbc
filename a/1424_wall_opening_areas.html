@@ -11,6 +11,8 @@
 More on Wall Opening Areas per Room #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim @AutodeskLabs
 
 
+Håvard added some clarifications and background information on his sample code to determine wall opening areas per room: I have some questions on Håvard's initial approaches. Using a Boolean subtraction between transient solids from the actual wall and the family symbol sounds like the right track, but I don’t understand the need for the family instance, because the wall already provides the net geometry...
+
 -->
 
 <h3>More on Wall Opening Areas per Room</h3>
@@ -66,6 +68,6 @@ So when you postprocess the cache ids to get names you have the correct document
 Other than that there are still improvements to be made.
 As I remember, the method for getting the elevation profile from a curtain wall will not get an edited profile.
 This is used to create the opening solid which intersects the room solid.
-And the GetLargestFaceArea method could use a face.Normal check, though you would have to have really thick wall, like 7 feet or so, for it to fail.</p>
-<p><strong>Response:</strong> That is what I did store the document of the subface, as I am primarily working on spaces with linked room data to translate over to energy modeling tool.</p>
+And the <code>GetLargestFaceArea</code> method could use a <code>face.Normal</code> check, though you would have to have really thick wall, like 7 feet or so, for it to fail.</p>
+<p><strong>Response:</strong> That is what I did store the document of the subface, as I am primarily working on spaces with linked room data to translate over to energy modelling tool.</p>
 <p>Many thanks again to Miroslav, Arif and above all Håvard for your contributions!</p>
