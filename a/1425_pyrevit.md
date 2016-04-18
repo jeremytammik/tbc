@@ -18,6 +18,11 @@ The pyRevit IronPython Script Library #revitAPI #3dwebcoder @AutodeskRevit #adsk
 jeremy tammik ‏@jeremytammik  27 May 2015
 RevitLookup in Python Shell and Multi-Release Solution #revitapi #adsk #python #revitpythonshell #revitlookup http://bit.ly/1PMDUgF
 
+Two weeks ago, Maltezc raised a question on the availability of a version of RevitLookup for Python.
+I am not aware of any Python version of RevitLookup, but you can certainly call into RevitLookup from RevitPythonShell.
+Maltezc pointed out the pyRevit IronPython script library.
+Ehsan Iran-Nejad, pyRevit creator and maintainer, now wrote a blog post describing this powerful and popular collection...
+
 -->
 
 ### The pyRevit IronPython Script Library
@@ -37,7 +42,10 @@ I was previously unaware of.
 A [chat](https://github.com/eirannejad/pyRevit/issues/70)
 with [Ehsan Iran-Nejad](https://github.com/eirannejad), pyRevit creator and maintainer, led to him writing
 a [blog post](https://github.com/eirannejad/pyRevit/blob/gh-pages/pyRevitBlogPost.md) describing
-this powerful and popular collection, reproduced below in full.
+this powerful and popular collection, reproduced below in full after a couple
+[of](https://github.com/eirannejad/pyRevit/pull/73)
+[minor](https://github.com/eirannejad/pyRevit/pull/74)
+[updates](https://github.com/eirannejad/pyRevit/pull/75).
 
 I hope you find this as interesting and useful as I do.
 
@@ -203,5 +211,3 @@ If you'd like to find out more about ***pyRevit*** and how to add your own scrip
 Happy scripting!
 
 Many thanks to Ehsan for creating, sharing, maintaining, and documenting pyRevit with and for us all!
-
-
