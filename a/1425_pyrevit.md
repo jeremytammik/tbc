@@ -54,7 +54,7 @@ Here is Ehsan's introduction to the package:
 - [Introduction to pyRevit](#2)
 - [Quick Look at some pyRevit Scripts](#3)
 - [An Even Quicker but Deeper Look at Setting up pyRevit](#4)
-- [pyRevit Installation Video](#5)
+- [pyRevit overview, installation and tutorial video](#5)
 
 
 #### <a name="2"></a>Introduction to pyRevit
@@ -214,9 +214,9 @@ Happy scripting!
 Many thanks to Ehsan for creating, sharing, maintaining, and documenting pyRevit with and for us all!
 
 
-#### <a name="5"></a>pyRevit Installation Video
+#### <a name="5"></a>pyRevit Overview, Installation and Tutorial Video
 
-Neil Reilly created a [26-minute installation video](https://www.youtube.com/watch?v=71rvCspWNHs) on it:
+Neil Reilly created a [26-minute pyRevit overview, installation and tutorial video](https://www.youtube.com/watch?v=71rvCspWNHs) on it:
 
 <center>
 <iframe width="420" height="315" src="https://www.youtube.com/embed/71rvCspWNHs?rel=0" frameborder="0" allowfullscreen></iframe>

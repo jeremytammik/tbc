@@ -1,0 +1,202 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+ #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim #python #dynamobim
+
+-->
+
+<h3>Revit 2017, RevitLookup and SDK Samples</h3>
+<p>Revit 2017 was released yesterday.</p>
+<p>Here is the official Autodesk statement stating
+that <a href="http://inthefold.autodesk.com/in_the_fold/2016/04/revit-2017-advances-bim-for-future-of-designing-buildings.html">Revit 2017 advances BIM for the future of designing buildings</a>.</p>
+<p>Another take by Paul Aubin discusses
+<a href="https://www.linkedin.com/pulse/revit-2017-here-whats-new-paul-aubin">Revit 2017 here! What's new?</a></p>
+<p>I downloaded and installed my version from
+the <a href="http://www.autodesk.com/products/revit-family/free-trial">Autodesk Revit family free trial</a> site.</p>
+<p><center>
+<img src="img/revit_2017_successfully_installed.png" alt="Revit 2017 installed" width="430">
+</center></p>
+<p>Let's look at what I did to install and first add-in compilation experiences:</p>
+<ul>
+<li><a href="#2">Uninstalling prior versions and cleaning the registry</a></li>
+<li><a href="#3">Dummy API assembly folder for compiling samples</a></li>
+<li><a href="#4">Resolving hiccups compiling Revit 2017 SDK samples</a></li>
+<li><a href="#5">RevitLookup for Revit 2017</a></li>
+</ul>
+<h4><a name="2"></a>Uninstalling Prior Versions and Cleaning the Registry</h4>
+<p>It initially refused to install due either to me clicking around too fast or some remnants of the pre-release from the Windows registry:</p>
+<p><center>
+<img src="img/revit_2017_prior_version_installed.png" alt="Revit 2017 prior version installed" width="417">
+</center></p>
+<p>I resolved that after struggling a while to manually remove every trace of 'Revit 2017' from the Windows registry.</p>
+<h4><a name="3"></a>Dummy API assembly Folder for Compiling Samples</h4>
+<p>The first thing I did was to compile the Revit SDK samples.</p>
+<p>To tell the truth, I compiled those last week, before installing Revit 2017.</p>
+<p>In order to achieve that, I manually created a dummy placeholder folder <code>C:\Program Files\Autodesk\Revit 2017</code> and copied the Revit API assemblies into that:</p>
+<pre>
+01/20/2016  23:28      43,680 RevitAddInUtility.dll
+01/20/2016  23:39  26,252,328 RevitAPI.dll
+01/20/2016  23:40      81,568 RevitAPIBrowserUtils.dll
+01/20/2016  23:30   1,255,584 RevitAPIFoundation.dll
+01/20/2016  23:39     384,040 RevitAPIIFC.dll
+01/20/2016  23:39      33,952 RevitAPILink.dll
+01/20/2016  23:40     103,584 RevitAPIMacros.dll
+01/20/2016  23:39     550,952 RevitAPIMacrosInterop.dll
+01/20/2016  23:39     559,144 RevitAPIMacrosInteropAPI.dll
+01/20/2016  23:40   2,695,720 RevitAPIUI.dll
+01/20/2016  23:40      69,792 RevitAPIUILink.dll
+01/20/2016  23:40      83,616 RevitAPIUIMacros.dll
+01/20/2016  23:39     263,208 RevitAPIUIMacrosInterop.dll
+01/20/2016  23:40     463,520 RevitAPIUIMacrosInteropAPI.dll
+01/20/2016  23:32  12,464,168 RevitDBAPI.dll
+01/20/2016  23:32     658,984 RevitMFCAPI.dll
+01/20/2016  23:40   1,454,632 RevitUIAPI.dll
+       17 File(s)  47,418,472 bytes
+</pre>
+
+<p>The final release ones have a newer timestamp and slightly different sizes:</p>
+<pre>
+02/26/2016  03:23      42,968 RevitAddInUtility.dll
+02/26/2016  03:34  26,252,760 RevitAPI.dll
+02/26/2016  03:36      81,928 RevitAPIBrowserUtils.dll
+02/26/2016  03:26   1,254,872 RevitAPIFoundation.dll
+02/26/2016  03:35     385,544 RevitAPIIFC.dll
+02/26/2016  03:35      34,312 RevitAPILink.dll
+02/26/2016  03:35     103,944 RevitAPIMacros.dll
+02/26/2016  03:35     551,384 RevitAPIMacrosInterop.dll
+02/26/2016  03:35     559,576 RevitAPIMacrosInteropAPI.dll
+02/26/2016  03:36   2,696,152 RevitAPIUI.dll
+02/26/2016  03:36      70,152 RevitAPIUILink.dll
+02/26/2016  03:36      83,976 RevitAPIUIMacros.dll
+02/26/2016  03:35     264,712 RevitAPIUIMacrosInterop.dll
+02/26/2016  03:35     462,808 RevitAPIUIMacrosInteropAPI.dll
+02/26/2016  03:28  12,464,600 RevitDBAPI.dll
+02/26/2016  03:28     660,488 RevitMFCAPI.dll
+02/26/2016  03:35   1,455,576 RevitUIAPI.dll
+       17 File(s)  47,425,752 bytes
+</pre>
+
+<h4><a name="4"></a>Resolving Hiccups Compiling Revit 2017 SDK Samples</h4>
+<p>I ran into a couple of minor issues compiling the Revit 2017 SDK samples.</p>
+<p>I was able to resolve them all myself, and so can you.</p>
+<p>I installed the SDK from the MSI file that I received internally:</p>
+<pre>
+  04/15/2016  11:29  307,387,758  REVIT_2017_SDK.msi
+</pre>
+
+<p>I set it up in the root folder <code>C:\a\lib\revit\2017\SDK</code>.</p>
+<p>As always, the first thing I did was to set up a desktop shortcut to the Revit API help file RevitAPI.chm in <code>C:\a\lib\revit\2017\SDK\RevitAPI.chm</code>, and I strongly recommend you do the same thing right away as well.</p>
+<p>I simulated the installation of Revit 2017, which I had not yet installed, a <a href="#3">described above</a>, by copying the Revit API DLLs from the Kepler pre-release version to a manually created dummy folder <code>C:\Program Files\Autodesk\Revit 2017</code>.</p>
+<p>I opened Visual Studio 2015, which required an initial some licencing and log-on procedure, since I had hardly ever used it before.</p>
+<p>I loaded the Revit SDK samples solution file <code>C:\a\lib\revit\2017\SDK\Samples\SDKSamples.sln</code>.</p>
+<p>Initially, <a href="zip/sdk_samples_2017_01.txt">lots of errors</a> occurred and four samples failed to build.</p>
+<p>The first one that I took a closer look at was <code>BRepBuilderExample</code>.</p>
+<p>It was trying to load the Revit API assemblies from a non-existent hint path <code>Releasex64</code> specified in BRepBuilderExample.csproj:</p>
+<pre class="prettyprint">
+<span class="blue">&lt;</span><span class="maroon">Reference</span><span class="blue"> </span><span class="red">Include</span><span class="blue">=</span>&quot;<span class="blue">RevitAPI</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">HintPath</span><span class="blue">&gt;</span>..\..\..\..\..\..\..\..\Releasex64\RevitAPI.dll<span class="blue">&lt;/</span><span class="maroon">HintPath</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">Reference</span><span class="blue">&gt;</span>
+<span class="blue">&lt;</span><span class="maroon">Reference</span><span class="blue"> </span><span class="red">Include</span><span class="blue">=</span>&quot;<span class="blue">RevitAPIUI</span>&quot;<span class="blue">&gt;</span>
+<span class="blue">&nbsp; &lt;</span><span class="maroon">HintPath</span><span class="blue">&gt;</span>..\..\..\..\..\..\..\..\Releasex64\RevitAPIUI.dll<span class="blue">&lt;/</span><span class="maroon">HintPath</span><span class="blue">&gt;</span>
+<span class="blue">&lt;/</span><span class="maroon">Reference</span><span class="blue">&gt;</span>
+</pre>
+
+<p>I fixed that by manually browsing to and re-referencing the DLLs and raised the issue REVIT-89864 [API sample BRepBuilderExample fails to compile] with the development team to have this fixed.</p>
+<p>After successfully compiling BRepBuilderExample, <a href="zip/sdk_samples_2017_02.txt">CancelSave fails to compile</a>, because it requires RevitAddInUtility.dll.</p>
+<p>My mistake, I had forgotten to copy it into my dummy DLL assembly folder:</p>
+<pre>
+&gt; copy "C:\Program Files\Autodesk\Revit Kepler\RevitAddInUtility.dll" "..\Revit 2017"
+</pre>
+
+<p>With CancelSave compiling successfully, the <a href="zip/sdk_samples_2017_03.txt">next error occurred in PlacementOptions</a>, which has a setting requiring all public members to be equipped with an XML documentation comment:</p>
+<pre>
+C:\...\PlacementOptions\CS\Command.cs(151,9,151,18): error CS1591: Missing XML comment for publicly visible type or member 'PlacementOptionsEnum.FaceBased'
+
+C:\...\PlacementOptions\CS\Command.cs(152,9,152,20): error CS1591: Missing XML comment for publicly visible type or member 'PlacementOptionsEnum.SketchBased'
+</pre>
+
+<p>I resolved that by adding the required comments and passed that on to the development team in REVIT-89865 [API: PlacementOptions Revit SDK sample compilation error]:</p>
+<pre class="code">
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; <span class="gray">///</span><span class="green"> The placement options for user to place the family instance.</span>
+&nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; <span class="blue">public</span> <span class="blue">enum</span> <span class="teal">PlacementOptionsEnum</span>
+&nbsp; {
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Face based</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; FaceBased,
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;summary&gt;</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> Sketch based</span>
+&nbsp; &nbsp; <span class="gray">///</span><span class="green"> </span><span class="gray">&lt;/summary&gt;</span>
+&nbsp; &nbsp; SketchBased
+&nbsp; }
+</pre>
+
+<p>Once that was completed, all samples compiled with <a href="zip/sdk_samples_2017_04.txt">zero errors and 15 warnings</a>:</p>
+<p><span style="font-size: 80%">
+<pre>
+------ Project: FrameBuilder ------
+MSB3884: Could not find rule set file "Migrated rules for FrameBuilder.ruleset".
+------ Project: GeometryCreation_BooleanOperation ------
+MSB3884: Could not find rule set file "GeometryCreation_BooleanOperation.ruleset".
+------ Project: ProximityDetection_WallJoinControl ------
+MSB3884: Could not find rule set file "ProximityDetection_WallJoinControl.ruleset".
+------ Project: DatumsModification ------
+MSB3270: There was a mismatch between the processor architecture of the project being built "MSIL" and the processor architecture of the reference "RevitAPI", "AMD64".
+MSB3270: There was a mismatch between the processor architecture of the project being built "MSIL" and the processor architecture of the reference "RevitAPIUI", "AMD64".
+------ Project: FabricationPartLayout ------
+MSB3270: There was a mismatch between the processor architecture of the project being built "MSIL" and the processor architecture of the reference "RevitAPI", "AMD64".
+MSB3270: There was a mismatch between the processor architecture of the project being built "MSIL" and the processor architecture of the reference "RevitAPIUI", "AMD64".
+------ Project: GenericStructuralConnection ------
+MSB3270: There was a mismatch between the processor architecture of the project being built "MSIL" and the processor architecture of the reference "RevitAPI", "AMD64".
+MSB3270: There was a mismatch between the processor architecture of the project being built "MSIL" and the processor architecture of the reference "RevitAPIUI", "AMD64".
+------ Project: CapitalizeAllTextNotes ------
+MSB3270: There was a mismatch between the processor architecture of the project being built "MSIL" and the processor architecture of the reference "RevitAPI", "AMD64".
+MSB3270: There was a mismatch between the processor architecture of the project being built "MSIL" and the processor architecture of the reference "RevitAPIUI", "AMD64".
+------ Project: PlacementOptions ------
+MSB3270: There was a mismatch between the processor architecture of the project being built "MSIL" and the processor architecture of the reference "RevitAPI", "AMD64".
+MSB3270: There was a mismatch between the processor architecture of the project being built "MSIL" and the processor architecture of the reference "RevitAPIUI", "AMD64".
+------ Project: BRepBuilderExample ------
+MSB3270: There was a mismatch between the processor architecture of the project being built "MSIL" and the processor architecture of the reference "RevitAPI", "AMD64".
+MSB3270: There was a mismatch between the processor architecture of the project being built "MSIL" and the processor architecture of the reference "RevitAPIUI", "AMD64".
+</pre>
+</span></p>
+<p>I submitted one final request REVIT-89869 [API SDK samples: eliminate warning messages] to the development team to fix these warning messages as well, but did not look into them myself in more detail.</p>
+<p>They are all trivial to eliminate, and all belong to one of two types:</p>
+<ul>
+<li>MSB3884: Could not find rule set file "Migrated rules for *.ruleset".</li>
+<li>MSB3270: There was a mismatch between the processor architecture of the project being built "MSIL" and the processor architecture of the reference "RevitAPI", "AMD64"...</li>
+</ul>
+<p>I actually implemented a stand-alone tool two years ago to automatically fix the latter warning, the Architecture Mismatch Warning Disabler:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/processor-architecture-mismatch-warning.html">Processor Architecture Mismatch Warning and Key Hook</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/07/recursively-disable-architecture-mismatch-warning.html">Recursively Disable Architecture Mismatch Warning</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/09/architecture-mismatch-warning-disabler-update.html">Architecture Mismatch Warning Disabler Update</a></li>
+</ul>
+<p>Here is Visual Studio 2015 with all the 182 Revit 2017 SDK samples successfully compiled:</p>
+<p><center>
+<img src="img/revit_2017_sdk_samples.png" alt="Revit 2017 SDK samples successfully compiled in Visual Studio 2015" width="331">
+</center></p>
+<h4><a name="5"></a>RevitLookup for Revit 2017</h4>
+<p>Actually, to tell the even deeper truth, on request from Remy and others, I
+compiled <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup for Revit 2017</a> even
+before touching the Revit SDK.</p>
+<p>I mentioned that last week in
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a>
+in the <a href="http://forums.autodesk.com/t5/revit-api/off-topic-for-remy/m-p/5995280">off topic for Remy</a> thread.</p>
+<p>At the time, I did not yet have Revit 2017 installed, so I did that also using the <a href="#3">dummy Revit API assembly container folder</a>.</p>
+<p>Therefore, the most up-to-date version provided in
+the <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup GitHub repository</a> is now for Revit 2017,
+<a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2017.0.0.2">release 2017.0.0.2</a>.</p>
+<p>If you are interested in an earlier release of Revit, please grab the latest appropriate one from the
+<a href="https://github.com/jeremytammik/RevitLookup/releases">release list</a>, e.g.,
+<a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2016.0.0.13">2016.0.0.13</a> for Revit 2016,
+<a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2015.0.0.8">2015.0.0.8</a> for Revit 2015, etc.</p>
