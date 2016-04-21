@@ -11,8 +11,16 @@
 
 RvtSamples for Revit 2017 #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim #python #dynamobim
 
-cd img
-
+Setting up RvtSamples for Revit 2017
+&ndash; Copy Html Markup in Visual Studio 2015
+&ndash; Running Revit 2017 in the Visual Studio 2015 debugger
+&ndash; 'Security &ndash; Unsigned Add-In' message
+&ndash; RvtSamples DLL and TXT should be together
+&ndash; Specifying the Revit SDK samples root path
+&ndash; Correcting errors in individual SDK sample entries
+&ndash; PlacementOptions description line is missing
+&ndash; The five FabricationPartLayout external commands
+&ndash; RvtSamples loads and RvtSamples.txt is cleaned up...
 
 -->
 
