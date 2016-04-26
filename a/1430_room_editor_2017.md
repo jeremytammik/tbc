@@ -9,7 +9,6 @@
 
 <!---
 
-
 Room Editor Revit 2017 Addin Migration #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim @AutodeskForge #3dwebaccel
 
 A wonderful Monday morning to you. We are enjoying perfect April weather, rapidly oscillating back and forth between warm sprintime sunshine, sleet and hail. Meanwhile, I am continuously striving hard yet failing miserably to reduce my pure Revit API focussed case answering and Revit API activity
@@ -42,6 +41,7 @@ and [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api/bd-p/16
     - [Back in the USA](#7.1)
     - [Meanwhile in England](#7.2)
     - [Improvement needed For BIM](#7.3)
+- [Bikeshedding](#8)
 
 
 #### <a name="1"></a>Things To Do
@@ -66,7 +66,8 @@ I really need to start getting these tasks done in order to present them at seve
 imminent [upcoming events](http://thebuildingcoder.typepad.com/blog/2016/04/forge-devcon-spring-impermanence-and-bim-cloud.html#4):
 
 - May 16-20: [Forge Accelerator](http://autodeskcloudaccelerator.com) in Barcelona
-- June 1-2: Forge meetup and workshop in Athens
+- June 1-2: Forge [meetup](http://www.meetup.com/I-love-3D-Athens/events/230543759)
+and [workshop](http://www.meetup.com/I-love-3D-Athens/events/230544059) in Athens
 - June 15-16: [Forge DevCon](http://forge.autodesk.com/conference) developer conference in San Francisco
 - June 20-24: [Forge Accelerator](http://autodeskcloudaccelerator.com) in San Francisco
 - October 20-22: [RTC Europe](http://www.revitconference.com/rtc2016eur) Revit Technology Conference in Porto &ndash; somewhat less imminent, nonetheless exciting...
@@ -105,7 +106,7 @@ the [diffs](https://github.com/jeremytammik/RoomEditorApp/compare/2016.0.0.9...2
 
 Not a single line of source code needed modification.
 
-All I did was switch the Visual Studio version from 2012 to 2015 and update the .NET framework from 4.5 to 4.5.2.
+All I did was switch the Visual Studio version from 2012 to 2015, update the .NET framework from 4.5 to 4.5.2 and reference the new Revit API assemblies.
 
 <center>
 <img src="img/roomedit_2017.png" alt="Room Editor in Revit 2017" width="425">
@@ -233,3 +234,8 @@ Another use of the information part of BIM for complex projects is to prove comp
 Peter L Mann heads up [CodeBook Solutions](http://www.CodeBookSolutions.com).
 
 Many thanks to Peter for his thoughts, experience, and permission to reproduce this [upFront.eZine](http://www.upfrontezine.com) article here as well!
+
+
+#### <a name="8"></a>Bikeshedding
+
+By the way, the statement on "too much discussion is on the technical rather than the conceptual implementation of why-BIM" reminds me of the very useful concept of [bikeshedding](http://bikeshed.org) that I stumbled across yesterday &nbsp; :-)
