@@ -920,6 +920,19 @@ Implements the database polling loop in a separate thread and raises the externa
 </pre>
 
 
+> Typepad blocks me from posting the four source code sections above.
+
+> Every time I try to do so, it triggers a message saying I have been blocked for security reasons:
+
+> Sorry, you have been blocked. You are unable to access typepad.com. Why have I been blocked? This website is using a security service to protect itself from online attacks. The action you just performed triggered the security solution. There are several actions that could trigger this block including submitting a certain word or phrase, a SQL command or malformed data.
+
+> They are working on it, I hope.
+
+> I experienced this once already, last month, and it took hours to resolve, wasted for both me and them. More on my side, of course. Painful.
+
+> Meanwhile, you can read the [full post](http://jeremytammik.github.io/tbc/a/1431_firerating_2017.html) in the [tbc GitHub repository](https://github.com/jeremytammik/tbc) without the Typepad support.
+
+
 #### <a name="9"></a>FireRatingCloud Video Recording
 
 Here is an eight and a half minute recording demonstrating the final result, [FireRatingCloud up and running in Revit 2017](https://youtu.be/8VsQJkikXbA):
