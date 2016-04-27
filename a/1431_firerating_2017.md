@@ -924,7 +924,7 @@ Implements the database polling loop in a separate thread and raises the externa
 
 > Every time I try to do so, it triggers a message saying I have been blocked for security reasons:
 
-> Sorry, you have been blocked. You are unable to access typepad.com. Why have I been blocked? This website is using a security service to protect itself from online attacks. The action you just performed triggered the security solution. There are several actions that could trigger this block including submitting a certain word or phrase, a SQL command or malformed data.
+> Sorry, you have been blocked. You are unable to access typepad.com. Why have I been blocked? This website is using a security service to protect itself from online attacks. The action you just performed triggered the security solution. There are several actions that could trigger this block including submitting a certain word or phrase, a SQL command or malformed data. CloudFlare Ray ID: 29a278666db82690 &ndash; Your IP: XXXXX &ndash; Performance & security by CloudFlare...
 
 > They are working on it, I hope.
 
