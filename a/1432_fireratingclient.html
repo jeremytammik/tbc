@@ -1,0 +1,162 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+Real-Time BIM Update via FireRatingCloud Windows Client #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim @AutodeskForge #3dwebaccel
+
+Today, I address the first item in yesterday's to do list
+&ndash; Document and improve FireRatingClient, the stand-alone Windows client &ndash; we will need this to demonstrate the real-time BIM update from arbitrary sources
+&ndash; Context
+&ndash; FireRatingClient
+&ndash; Adding the <code>modified</code> Field
+&ndash; Updating the <code>modified</code> Field on Edit
+&ndash; FireRatingClient Live BIM Update Demo Recording
+&ndash; Download
+&ndash; To Do...
+
+-->
+
+<h3>Real-Time BIM Update via FireRatingCloud Windows Client</h3>
+<p>Today, I address the first item in <a href="http://thebuildingcoder.typepad.com/blog/2016/04/real-time-bim-update-with-fireratingcloud-2017.html#11">the to do list that I published yesterday</a>:</p>
+<ul>
+<li>Document and improve <a href="https://github.com/jeremytammik/FireRatingCloud/tree/master/FireRatingClient">FireRatingClient</a>,
+the stand-alone Windows client &ndash; we will need this to demonstrate the real-time BIM update from arbitrary sources.</li>
+</ul>
+<p>Let's look at this task in context and then address it right away:</p>
+<ul>
+<li><a href="#2">Context</a></li>
+<li><a href="#3">FireRatingClient</a></li>
+<li><a href="#4">Adding the <code>modified</code> Field</a></li>
+<li><a href="#5">Updating the <code>modified</code> Field on Edit</a></li>
+<li><a href="#6">FireRatingClient Live BIM Update Demo Recording</a></li>
+<li><a href="#7">Download</a></li>
+<li><a href="#8">To Do</a></li>
+</ul>
+<h4><a name="2"></a>Context</h4>
+<p>In the past few days, I worked on updating and migrating my samples connecting BIM and the cloud:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/04/room-editor-first-revit-2017-addin-migration.html#3">RoomEditorApp for Revit 2017</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/04/real-time-bim-update-with-fireratingcloud-2017.html">Real-Time BIM Update with FireRatingCloud 2017</a></li>
+</ul>
+<p>The <a href="https://github.com/jeremytammik/RoomEditorApp">RoomEditorApp</a> demonstrates
+a full round-trip real-time connection between the Revit BIM and a simplified 2D view that can be graphically edited on any mobile device.
+As a side effect, it also includes support for non-graphical editing of parameter values on family instances.</p>
+<p>The <a href="https://github.com/jeremytammik/FireRatingCloud">FireRatingCloud</a> sample is somewhat simpler.
+It also demonstrates a full round-trip real-time connection between the Revit BIM and an external NoSQL database, in this case connecting to a MongoDB database via a node.js web server.
+It supports non-graphical editing of a specific shared parameter value representing the fire rating values on door family instance elements.</p>
+<p>For both these applications, the database and web server can be hosted either in the cloud or locally on the same system running Revit.
+Of course, global accessibility is easier to implement by hosting them on the web.</p>
+<p>The stand-alone Windows client presented here shows that you can make selected BIM data available to absolutely anybody, absolutely anywhere, with a truly minimal amount of effort, providing full real-time round-trip editing capability.</p>
+<h4><a name="3"></a>FireRatingClient</h4>
+<p>This stand-alone Windows client to edit the FireRatingCloud database values was originally implemented by
+Jose Ignacio Montes, <a href="https://github.com/Montesherraiz">@montesherraiz</a>, of <a href="http://avatarbim.com">Avatar BIM</a> in
+Madrid, during the <a href="http://www.bimprogramming.com">BIM Programming Workshop</a> in January.</p>
+<p>It is extremely simple and obviously not fit for real-world use in a production environment in its current state.</p>
+<p>For instance, the project name is not displayed, and elements cannot be filtered by project &ndash; or anything else either, for that matter &ndash; so currently all database records are loaded.
+That will no longer work once there are enough records in the database.</p>
+<p>It is totally inacceptable in the long run, but perfectly fine for my demonstration purposes here.</p>
+<p>Also, simplicity is important for easier understanding.</p>
+<p>I will now add the newly implemented <code>modified</code> timestamp field to each door data record that it displays, and update that field automatically when the <code>firerating</code> value is edited.</p>
+<p>The modified values are immediately written back to the mongo database.</p>
+<p>With the new database polling functionality added yesterday to the Revit add-in, these modifications will be detected and immediately and automatically reflected in the BIM, provided we have subscribed to that notification.</p>
+<p>So let's get going.</p>
+<h4><a name="4"></a>Adding the <code>modified</code> Field</h4>
+<p>In order to support the real-time BIM update from the mongo database,
+I <a href="http://the3dwebcoder.typepad.com/blog/2016/04/fireratingcloud-document-modification-timestamp.html#5">implemented my own timestamp in C#</a>.</p>
+<p>For simplicity, I use
+a <a href="https://en.wikipedia.org/wiki/Unix_time">Unix epoch timestamp</a>,
+i.e., the count of seconds since January 1, 1970, and store it as a simple number in MongoDB.</p>
+<p>In C#, it is implemented by the <code>DoorData</code> class:</p>
+<pre class="code">
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">DoorData</span>
+{
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">string</span>&nbsp;_id&nbsp;{&nbsp;<span style="color:blue;">get</span>;&nbsp;<span style="color:blue;">set</span>;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">string</span>&nbsp;project_id&nbsp;{&nbsp;<span style="color:blue;">get</span>;&nbsp;<span style="color:blue;">set</span>;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">string</span>&nbsp;level&nbsp;{&nbsp;<span style="color:blue;">get</span>;&nbsp;<span style="color:blue;">set</span>;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">string</span>&nbsp;tag&nbsp;{&nbsp;<span style="color:blue;">get</span>;&nbsp;<span style="color:blue;">set</span>;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">double</span>&nbsp;firerating&nbsp;{&nbsp;<span style="color:blue;">get</span>;&nbsp;<span style="color:blue;">set</span>;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">uint</span>&nbsp;modified&nbsp;{&nbsp;<span style="color:blue;">get</span>;&nbsp;<span style="color:blue;">set</span>;&nbsp;}
+
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;Constructor&nbsp;to&nbsp;populate&nbsp;instance&nbsp;by&nbsp;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;deserialising&nbsp;the&nbsp;REST&nbsp;GET&nbsp;response.</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;DoorData()
+&nbsp;&nbsp;{
+&nbsp;&nbsp;}
+</pre>
+
+<p>The corresponding <a href="http://mongoosejs.com">mongoose</a> schema definition to hold it looks like this:</p>
+<pre class="prettyprint">
+var doorSchema = new Schema(
+  { _id          : RvtUniqueId // suppress automatic generation
+    , project_id : String
+    , level      : String
+    , tag        : String
+    , firerating : Number
+    , modified   : Number },
+  { _id          : false } // suppress automatic generation
+);
+</pre>
+
+<p>I updated the FireRatingClient to display the modified field and published the result
+as <a href="https://github.com/jeremytammik/FireRatingCloud/releases/tag/2017.0.0.13">release 2017.0.0.13</a>.</p>
+<p>You can see exactly what I changed to add the new column by looking at
+the <a href="https://github.com/jeremytammik/FireRatingCloud/compare/2017.0.0.12...2017.0.0.13">diffs</a>.</p>
+<p>Here is the new form in all its glory:</p>
+<p><center>
+<img src="img/fireratingclient_with_modified_field.png" alt="FireRatingClient with modified field" width="">
+</center></p>
+<p>As I mentioned directly when initially implementing the <code>modified</code> timestamp, anyone who updates a database entry is now responsible for explicitly setting the correct modified value as well.</p>
+<p>That is exactly what we are about to do right now for FireRatingClient.</p>
+<h4><a name="5"></a>Updating the <code>modified</code> Field on Edit</h4>
+<p>Updating the <code>modified</code> field each time a door data record is edited turned out to be incredibly easy.</p>
+<p>Jose already set up the Windows client to transmit each and every interactive edit immediately to the mongo db via REST in the <code>ExportData</code> method called by the <code>OnDoorsCellEditFinished</code> event handler.</p>
+<p>I added the timestamp update to it like this:</p>
+<pre class="code">
+<span style="color:blue;">void</span>&nbsp;ExportData(&nbsp;<span style="color:#2b91af;">DoorData</span>&nbsp;dd&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:blue;">uint</span>&nbsp;timestamp&nbsp;=&nbsp;<span style="color:#2b91af;">Util</span>.UnixTimestamp();
+
+&nbsp;&nbsp;dd.modified&nbsp;=&nbsp;timestamp;
+
+&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;jsonResponse,&nbsp;errorMessage;
+
+  <span style="color:#2b91af;">HttpStatusCode</span>&nbsp;sc&nbsp;=&nbsp;<span style="color:#2b91af;">Util</span>.Put(&nbsp;
+  &nbsp;&nbsp;<span style="color:blue;">out</span>&nbsp;jsonResponse,&nbsp;<span style="color:blue;">out</span>&nbsp;errorMessage,
+  &nbsp;&nbsp;<span style="color:#a31515;">&quot;doors/&quot;</span>&nbsp;+&nbsp;dd._id,&nbsp;dd&nbsp;);
+}
+
+<span style="color:blue;">void</span>&nbsp;OnDoorsCellEditFinished(
+&nbsp;&nbsp;<span style="color:blue;">object</span>&nbsp;sender,
+&nbsp;&nbsp;BrightIdeasSoftware.<span style="color:#2b91af;">CellEditEventArgs</span>&nbsp;e&nbsp;)
+{
+&nbsp;&nbsp;ExportData(&nbsp;e.RowObject&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">DoorData</span>&nbsp;);
+}
+</pre>
+
+<p>Now all I want to do further is set up a nice demo for you and record it.</p>
+<h4><a name="6"></a>FireRatingClient Live BIM Update Demo Recording</h4>
+<p>Here is an four-minute recording demonstrating the final result,
+<a href="https://youtu.be/vJyXmxHgu9g">real-time Revit BIM update via Windows Forms FireRatingClient</a>:</p>
+<p><center>
+<iframe width="420" height="315" src="https://www.youtube.com/embed/vJyXmxHgu9g?rel=0" frameborder="0" allowfullscreen></iframe>
+</center></p>
+<h4><a name="7"></a>Download</h4>
+<p>The versions of FireRatingCloud and FireRatingClient presented above
+are included in <a href="https://github.com/jeremytammik/FireRatingCloud/releases/tag/2017.0.0.14">release 2017.0.0.14</a>,
+available from the <a href="https://github.com/jeremytammik/FireRatingCloud">FireRatingCloud GitHub repository</a>.</p>
+<h4><a name="8"></a>To Do</h4>
+<p>Let's update <a href="http://thebuildingcoder.typepad.com/blog/2016/04/real-time-bim-update-with-fireratingcloud-2017.html#11">the to do list that I published yesterday</a>.</p>
+<p>I have several more exciting tasks lined up, all related to connecting BIM and the cloud:</p>
+<ul>
+<li>Completely rewrite the existing <a href="https://github.com/jeremytammik/RoomEditorApp">RoomEditorApp</a> sample to move it from CouchDB to node.js plus MongoDB.</li>
+<li>Implement the database portion of the <a href="https://github.com/jeremytammik/TrackChangesCloud">TrackChangesCloud</a> sample.</li>
+</ul>
+<p>I think I'll tackle the latter first...</p>
