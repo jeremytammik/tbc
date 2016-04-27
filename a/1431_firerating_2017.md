@@ -59,6 +59,7 @@ Achieving that required the following steps:
 - [Migration to Revit 2017](#3)
 - [Reusing the RoomEditorApp infrastructure](#4)
 - [Redesign](#5)
+    - [Typepad blocking source code in the blog post](#5.0)
     - [App.cs](#5.1)
     - [BimUpdater.cs](#5.2)
     - [Cmd_4_Subscribe.cs](#5.3)
@@ -199,6 +200,25 @@ I checked all the code comments.
 They are just about as extensive as they ought to be, no more, no less, and all up to date.
 
 So please read them as well  :-)
+
+
+#### <a name="5.0"></a>Typepad Blocking Source Code in the Blog Post
+
+Typepad blocked me from posting the four following source code sections.
+
+Every time I tried, it triggered a message saying I have been blocked for security reasons:
+
+> Sorry, you have been blocked. You are unable to access typepad.com. Why have I been blocked? This website is using a security service to protect itself from online attacks. The action you just performed triggered the security solution. There are several actions that could trigger this block including submitting a certain word or phrase, a SQL command or malformed data. CloudFlare Ray ID: 29a278666db82690 &ndash; Your IP: XXXXX &ndash; Performance & security by CloudFlare...
+
+I submitted a ticket...
+
+I experienced this once already, last month, and it took hours to resolve, wasted for both me and them. More on my side, of course. Painful.
+
+Meanwhile, you can read the [full post](http://jeremytammik.github.io/tbc/a/1431_firerating_2017.html) in the [tbc GitHub repository](https://github.com/jeremytammik/tbc) without the Typepad support.
+
+24 hours later and after several email exchanges and ticket submissions, they say the problem is resolved.
+
+Let's see... yes, it works!
 
 
 #### <a name="5.1"></a>App.cs
@@ -918,19 +938,6 @@ Implements the database polling loop in a separate thread and raises the externa
 &nbsp;&nbsp;}
 }
 </pre>
-
-
-> Typepad blocks me from posting the four source code sections above.
-
-> Every time I try to do so, it triggers a message saying I have been blocked for security reasons:
-
-> Sorry, you have been blocked. You are unable to access typepad.com. Why have I been blocked? This website is using a security service to protect itself from online attacks. The action you just performed triggered the security solution. There are several actions that could trigger this block including submitting a certain word or phrase, a SQL command or malformed data. CloudFlare Ray ID: 29a278666db82690 &ndash; Your IP: XXXXX &ndash; Performance & security by CloudFlare...
-
-> They are working on it, I hope.
-
-> I experienced this once already, last month, and it took hours to resolve, wasted for both me and them. More on my side, of course. Painful.
-
-> Meanwhile, you can read the [full post](http://jeremytammik.github.io/tbc/a/1431_firerating_2017.html) in the [tbc GitHub repository](https://github.com/jeremytammik/tbc) without the Typepad support.
 
 
 #### <a name="9"></a>FireRatingCloud Video Recording
