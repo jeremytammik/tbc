@@ -10,6 +10,12 @@
 
 Real-Time BIM Update with FireRatingCloud 2017 #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim @AutodeskForge #3dwebaccel
 
+Yesterday, I migrated RoomEditorApp to Revit 2017 and mentioned the BIM and cloud related projects I am working on.
+Next, let's focus on the FireRatingCloud sample.
+The main goal there is to implement fully automatic real-time BIM update from the cloud.
+Now, 24 hours after writing the previous sentence, I can tell you that I succeeded.
+Well, add another six hours to edit this post...
+Here is the updated FireRatingCloud custom ribbon tab with its new set of commands...
 
 -->
 
@@ -23,6 +29,7 @@ the <a href="https://github.com/jeremytammik/FireRatingCloud">FireRatingCloud</a
 <p>The main goal there is to implement fully automatic real-time BIM update from the cloud.</p>
 <p>Now, 24 hours after writing the previous sentence, I can tell you that I succeeded.</p>
 <p>Well, add another six hours to edit this post...</p>
+<p>And yet another six hours to struggle with Typepad, which is blocking me from publishing this...</p>
 <p>Here is the updated FireRatingCloud custom ribbon tab with its new set of commands:</p>
 <p><center>
 <img src="img/firerating_2017_ribbon_tab.png" alt="FireRatingCloud ribbon tab and commands in Revit 2017" width="442">
@@ -41,10 +48,13 @@ the <a href="https://github.com/jeremytammik/FireRatingCloud">FireRatingCloud</a
 <li><a href="#2">Already done and yet to do</a></li>
 <li><a href="#3">Migration to Revit 2017</a></li>
 <li><a href="#4">Reusing the RoomEditorApp infrastructure</a></li>
-<li><a href="#5">App.cs</a></li>
-<li><a href="#6">BimUpdater.cs</a></li>
-<li><a href="#7">Cmd_4_Subscribe.cs</a></li>
-<li><a href="#8">DbAccessor.cs</a></li>
+<li><a href="#5">Redesign</a><ul>
+<li><a href="#5.1">App.cs</a></li>
+<li><a href="#5.2">BimUpdater.cs</a></li>
+<li><a href="#5.3">Cmd_4_Subscribe.cs</a></li>
+<li><a href="#5.4">DbAccessor.cs</a></li>
+</ul>
+</li>
 <li><a href="#9">FireRatingCloud video recording</a></li>
 <li><a href="#10">Download</a></li>
 <li><a href="#11">To do</a></li>
@@ -98,6 +108,7 @@ the <a href="https://github.com/jeremytammik/FireRatingCloud/compare/2016.0.0.25
 <p>The migration was trivial, and only a minute part of the task I am addressing.</p>
 <p>Once that was done, I was able to integrate and reuse all the important RoomEditorApp infrastructure to implementing the external application, external event, ribbon UI, command buttons, subscription command toggle button and database polling loop in a separate thread.</p>
 <p>That took about a day.</p>
+<h4><a name="5"></a>Redesign</h4>
 <p>I spent another day cleaning up the result to make it cleaner and easier to understand.</p>
 <p>One important cleanup step, for instance, was to separate the misleadingly named DbUpdater class into two separate classes named BimUpdater and DbAccessor.</p>
 <p>The former implements the actual shared parameter value update in the BIM using a method that is used both by the interactive import command and the external event triggered by the database polling when it detects modification to be applied. It also implements this external event.</p>
@@ -135,16 +146,16 @@ the <a href="https://github.com/jeremytammik/FireRatingCloud/compare/2016.0.0.25
 </ul>
 <p>The most interesting parts are the new additions, of course:</p>
 <ul>
-<li><a href="#5">App.cs</a> implements the external application, ribbon UI, command buttons, subscription command toggle button, and manages the external event.</li>
-<li><a href="#6">BimUpdater.cs</a> implements the external event and the method updating the Revit shared parameters.</li>
-<li><a href="#7">Cmd_4_Subscribe.cs</a> implements the new subscription external command.</li>
-<li><a href="#8">DbAccessor.cs</a> implements the database polling loop in a separate thread and raises the external event when external modifications are detected.</li>
+<li><a href="#5.1">App.cs</a> implements the external application, ribbon UI, command buttons, subscription command toggle button, and manages the external event.</li>
+<li><a href="#5.2">BimUpdater.cs</a> implements the external event and the method updating the Revit shared parameters.</li>
+<li><a href="#5.3">Cmd_4_Subscribe.cs</a> implements the new subscription external command.</li>
+<li><a href="#5.4">DbAccessor.cs</a> implements the database polling loop in a separate thread and raises the external event when external modifications are detected.</li>
 </ul>
 <p>Let's look at them one by one.</p>
 <p>I checked all the code comments.</p>
 <p>They are just about as extensive as they ought to be, no more, no less, and all up to date.</p>
 <p>So please read them as well  :-)</p>
-<h4><a name="5"></a>App.cs</h4>
+<h4><a name="5.1"></a>App.cs</h4>
 <p>Implements the external application, ribbon UI, command buttons, subscription command toggle button, and manages the external event:</p>
 <pre class="code">
 <span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">App</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IExternalApplication</span>
@@ -422,7 +433,7 @@ the <a href="https://github.com/jeremytammik/FireRatingCloud/compare/2016.0.0.25
 }
 </pre>
 
-<h4><a name="6"></a>BimUpdater.cs</h4>
+<h4><a name="5.2"></a>BimUpdater.cs</h4>
 <p>Implements the external event and the method updating the Revit shared parameters:</p>
 <pre class="code">
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
@@ -562,7 +573,7 @@ the <a href="https://github.com/jeremytammik/FireRatingCloud/compare/2016.0.0.25
 }
 </pre>
 
-<h4><a name="7"></a>Cmd_4_Subscribe.cs</h4>
+<h4><a name="5.3"></a>Cmd_4_Subscribe.cs</h4>
 <p>Implements the new subscription external command:</p>
 <pre class="code">
 [<span style="color:#2b91af;">Transaction</span>(&nbsp;<span style="color:#2b91af;">TransactionMode</span>.ReadOnly&nbsp;)]
@@ -592,7 +603,7 @@ the <a href="https://github.com/jeremytammik/FireRatingCloud/compare/2016.0.0.25
 }
 </pre>
 
-<h4><a name="8"></a>DbAccessor.cs</h4>
+<h4><a name="5.4"></a>DbAccessor.cs</h4>
 <p>Implements the database polling loop in a separate thread and raises the external event when external modifications are detected:</p>
 <pre class="code">
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
