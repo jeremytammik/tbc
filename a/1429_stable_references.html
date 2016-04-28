@@ -15,14 +15,14 @@
 
 Reference Stable Representation Magic Voodoo #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim #python #dynamobim
 
-Let's end the week with a truly magnificent contribution and research result provided by Scott Wilson in the the Revit API discussion forum.
+Let's end the week with a truly magnificent contribution and research result provided by Scott Wilson in the Revit API discussion forum.
 Scott responded to Pat Hague's recent thread on converting local family instance coordinate of a selected edge to project coordinates, saying,
 Yeah the Stable Reference Strings can be used to get at areas of the Geometry API that aren't fully exposed &ndash; I love playing around with them. Sometimes I stumble upon something cool such as this solution for a situation in which the geometry returns no reference for a family instance...
 
 -->
 
 <h3>Reference Stable Representation Magic Voodoo</h3>
-<p>Let's end the week with a truly magnificent contribution and research result provided by Scott Wilson in the
+<p>Let's end the week with a truly magnificent contribution and research result provided by Scott Wilson in
 the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a>.</p>
 <p>Scott responded to Pat Hague's recent thread
 on <a href="http://forums.autodesk.com/t5/revit-api/convert-local-family-instance-coordinate-of-selected-edge-to/m-p/6282821">converting local family instance coordinate of a selected edge to project coordinates</a>,
@@ -324,3 +324,27 @@ the <a href="http://forums.autodesk.com/t5/revit-api/geometry-returns-no-referen
 to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
 <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.127.3">release 2016.0.127.3</a> in the
 module <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdDimensionInstanceOrigin.cs#L27-L251">CmdDimensionInstanceOrigin.cs</a>.</p>
+<h4><a name="5"></a>Importance of Setting the Detail Level</h4>
+<p>An addendum by Pat Hague to Scott's original post:</p>
+<p>I would like to stress the importance of setting</p>
+<pre class="code">
+  gOptions.DetailLevel = <span class="teal">ViewDetailLevel</span>.Undefined;
+</pre>
+
+<p>I just spent a solid day trying to figure out why your code would work on some families, and not others.</p>
+<p>Finally, I was able to determine that the family itself was controlling visibility of faces based on the view detail level.</p>
+<p>Strangely enough, when I was blindly troubleshooting the code I tried setting the following to true:</p>
+<pre class="code">
+  gOptions.IncludeNonVisibleObjects = <span class="blue">true</span>; // false
+</pre>
+
+<p>This still did not work.
+Maybe I had something else wrong with my code at the time.
+I don't know.</p>
+<p>What I've been able to get to work every time (so far) is the following:</p>
+<pre class="code">
+  gOptions.DetailLevel = doc.ActiveView.DetailLevel;
+</pre>
+
+<p>To me, this ensures that I can't select a face that isn't visible through a PickObject.</p>
+<p>Thanks again for all of your voodoo!</p>

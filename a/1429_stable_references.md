@@ -16,7 +16,7 @@
 
 Reference Stable Representation Magic Voodoo #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim #python #dynamobim
 
-Let's end the week with a truly magnificent contribution and research result provided by Scott Wilson in the the Revit API discussion forum.
+Let's end the week with a truly magnificent contribution and research result provided by Scott Wilson in the Revit API discussion forum.
 Scott responded to Pat Hague's recent thread on converting local family instance coordinate of a selected edge to project coordinates, saying,
 Yeah the Stable Reference Strings can be used to get at areas of the Geometry API that aren't fully exposed &ndash; I love playing around with them. Sometimes I stumble upon something cool such as this solution for a situation in which the geometry returns no reference for a family instance...
 
@@ -24,7 +24,7 @@ Yeah the Stable Reference Strings can be used to get at areas of the Geometry AP
 
 ### Reference Stable Representation Magic Voodoo
 
-Let's end the week with a truly magnificent contribution and research result provided by Scott Wilson in the
+Let's end the week with a truly magnificent contribution and research result provided by Scott Wilson in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api/bd-p/160).
 
 Scott responded to Pat Hague's recent thread
@@ -361,3 +361,37 @@ P.S. I added Scott's sample code
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
 [release 2016.0.127.3](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.127.3) in the
 module [CmdDimensionInstanceOrigin.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdDimensionInstanceOrigin.cs#L27-L251).
+
+#### <a name="5"></a>Importance of Setting the Detail Level
+
+An addendum by Pat Hague to Scott's original post:
+
+I would like to stress the importance of setting
+
+<pre class="code">
+  gOptions.DetailLevel = <span class="teal">ViewDetailLevel</span>.Undefined;
+</pre>
+
+I just spent a solid day trying to figure out why your code would work on some families, and not others.
+
+Finally, I was able to determine that the family itself was controlling visibility of faces based on the view detail level.
+
+Strangely enough, when I was blindly troubleshooting the code I tried setting the following to true:
+
+<pre class="code">
+  gOptions.IncludeNonVisibleObjects = <span class="blue">true</span>; // false
+</pre>
+
+This still did not work.
+Maybe I had something else wrong with my code at the time.
+I don't know.
+
+What I've been able to get to work every time (so far) is the following:
+
+<pre class="code">
+  gOptions.DetailLevel = doc.ActiveView.DetailLevel;
+</pre>
+
+To me, this ensures that I can't select a face that isn't visible through a PickObject.
+
+Thanks again for all of your voodoo!
