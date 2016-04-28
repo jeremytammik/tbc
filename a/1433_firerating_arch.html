@@ -1,0 +1,104 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+ #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim @AutodeskForge #3dwebaccel
+
+
+-->
+
+<h3>FireRatingCloud Context and Architecture</h3>
+<p>A picture says more than a thousand words.</p>
+<p>I find a compelling and clear picture takes a lot of work, though.</p>
+<p>I normally go for the words instead, as you may have noticed.</p>
+<p>Unfortunately, it probably takes just as much effort to reduce ten thousand meandering words to the one thousand succinct and clear ones that your really need.</p>
+<blockquote>
+<p>Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away &ndash; <em>Antoine de Saint-Exupéry</em></p>
+</blockquote>
+<p>So maybe the net effort remains the same in the end.</p>
+<p>I made an exception last night and created the image below to explain the context and architecture of
+the <a href="https://github.com/jeremytammik/FireRatingCloud">FireRatingCloud</a> and other samples connecting BIM and the cloud
+like <a href="https://github.com/jeremytammik/RoomEditorApp">RoomEditorApp</a>, followed by some musings on using Revit as a server:</p>
+<ul>
+<li><a href="#2">FireRatingCloud context and architecture</a></li>
+<li><a href="#3">You cannot use Revit as a server</a></li>
+</ul>
+<h4><a name="2"></a>FireRatingCloud Context and Architecture</h4>
+<p>I took a first stab yesterday at explaining
+the <a href="http://thebuildingcoder.typepad.com/blog/2016/04/real-time-bim-update-via-fireratingcloud-windows-client.html#2">context of the FireRatingCloud sample</a>.</p>
+<p>Today I went one step further, created the image below and added an in-depth explanation of
+the <a href="https://github.com/jeremytammik/FireRatingCloud#context-and-architecture">context and architecture</a> to
+the [FireRatingCloud GitHub repository]:</p>
+<p>FireRatingCloud is a C# .NET Revit add-in. It is a multi-project re-implementation of the FireRating SDK sample.</p>
+<p>It uses a REST API to access a cloud-based database managed by the
+<a href="https://github.com/jeremytammik/firerating">fireratingdb</a>
+<a href="https://nodejs.org">node.js</a>
+<a href="https://www.mongodb.org">MongoDB</a> web server.</p>
+<p>The <a href="https://github.com/jeremytammik/FireRatingCloud">FireRatingCloud GitHub repository</a> also
+includes two other projects:</p>
+<ul>
+<li><a href="https://github.com/jeremytammik/FireRatingCloud/tree/master/FireRatingClient">FireRatingClient</a>, a stand-alone Windows forms executable implementing a read-write
+fireratingdb client that you can use to remotely edit the BIM without entering or even installing Revit.</li>
+<li><a href="https://github.com/jeremytammik/FireRatingCloud/tree/master/FireRating">FireRating</a>, a shared library used by both FireRatingClient and FireRatingCloud.</li>
+</ul>
+<p>Here is an image showing the links and relationships between BIM, cloud, Revit, node.js and MongoDB and explaining how and where fireratingdb and the three FireRatingCloud components fit into the picture:</p>
+<p><center>
+<img src="img/fireratingcloud_architecture.png" alt="FireRatingCloud modules and architecture" width="">
+</center></p>
+<p>I created this drawing using <a href="https://www.draw.io">draw.io</a>, and the
+source <a href="https://github.com/jeremytammik/FireRatingCloud/blob/master/img/fireratingcloud_architecture.xml">XML file</a> is provided.</p>
+<p>All REST API calls on the desktop are handled by the shared .NET class library FireRating.dll and passed to the <code>firerating</code> database in MongoDB via the node.js web server. It contains one single collection <code>doors</code> containing door data JSON documents. Other clients can connect to that server as well, from any kind of device. Both the node web server and the mongodb database can actually be run either in the cloud or locally on your own system, even on the Windows system running Revit. These two choices are controlled by Boolean flags in the FireRating library and web server, respectively.</p>
+<p>Only a few technical users will interact with full-fledged Revit and the BIM. A much larger number of all kinds of users can be provided access to relevant subsets of the BIM data using this technology. This and others samples demonstrate how that access can include real-time editing and BIM updating, if you so please. The FireRatingCloud sample is intentionally kept simple and limited to managing and providing access to one single shared parameter value. The <a href="https://github.com/jeremytammik/RoomEditorApp">RoomEditorApp</a> shows how you can extract and interact with graphical data as well, including graphical interaction on any mobile device with a simplified 2D view rendered using SVG in the browser.</p>
+<p>I hope that all is clear now, and <a href="https://en.wikipedia.org/wiki/Everything_Is_Illuminated">everything is illuminated</a> (one of my favourite films <em>and</em> books).</p>
+<p>The topic of connecting BIM and the cloud leads to another frequently asked question, which also just came up again this very day in
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a>:</p>
+<h4><a name="3"></a>You Cannot Use Revit as a Server</h4>
+<p>Inevitably, talking about connecting BIM and the cloud, the question on using Revit as a server pops up.</p>
+<p>We provided several examples in the past that help enable this kind of usage, e.g.:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/11/pattern-for-semi-asynchronous-idling-api-access.html">A pattern for semi-asynchronous Idling API access</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/11/drive-revit-through-a-wcf-service.html">Driving Revit through a WCF service</a>,</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/06/behind-the-scenes-of-the-nbs-revit-add-in.html#3">Processing a queue of commands to control Revit from a modeless dialogue</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/08/batch-processing-dwfx-links-and-future-proofing.html#4">Batch processing Revit documents</a>,</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/07/firerating-and-the-revit-python-shell-in-the-cloud-as-web-servers.html#5">Revit Python shell in the cloud as a web server</a></li>
+</ul>
+<p>Please be aware, though, that the EULA or <em>end user license agreement</em> clearly prohibits the use of Revit as a server, and it cannot be used as part of a web site or service.</p>
+<p>If you would be interested in any such-like future functionality,
+<a href="http://thebuildingcoder.typepad.com/blog/2016/02/what-can-revit-on-the-cloud-do-for-you.html">Autodesk is interested in talking with you</a> about
+it to help make a decision on possibly exposing some sort of 'Revit I/O' web service.</p>
+<p>Here is a question raised today by Guillaume
+on <a href="http://forums.autodesk.com/t5/revit-api/updating-family-information-with-scripts-without-using-locally/m-p/6298561">updating family information with scripts without using Revit locally</a>:</p>
+<p><strong>Question:</strong> Is it possible to modify only the information part of a RFA without modifying the geometric part by using  server scripts?</p>
+<p>I know I can do it by using the API within Revit, but is there any other way?</p>
+<p>Is it possible to use some kind of Revit cloud license to update a RFA file with the new parameters?</p>
+<p>Do you have Revit licences for Linux servers?</p>
+<p><strong>Answer:</strong> Thank you for your very relevant and pertinent questions.</p>
+<p>We were just discussing a similar topic internally this very morning.</p>
+<p>Let's start at the end:</p>
+<p>Q: Do you have Revit licences for Linux servers?</p>
+<p>A: No.</p>
+<p>Q: Is it possible to use some kind of Revit cloud license to update a RFA file with the new parameters?</p>
+<p>A: No, there is currently no such license. Revit is not suited for use as a server. It is user interface oriented. Using it as a server violates the EULA. We are thinking about it, though. More on this below.</p>
+<p>Q: Is it possible to modify only the information part of a RFA without modifying the geometric part by using server scripts? I know I can do it by using the API within Revit, but is there any other way?</p>
+<p>A: I do not think so. You can read part atoms, but can you modify them? Please try it out and let us know what you find out. Here is a discussion on the topic
+of <a href="http://thebuildingcoder.typepad.com/blog/2016/02/reading-an-rvt-file-without-revit.html">reading an RVT file without Revit</a>.</p>
+<p>You should definitely contact Jim Quanci and discuss your wishes and requirements with him, as he invited all developers to do in January this year,
+asking <a href="http://thebuildingcoder.typepad.com/blog/2016/02/what-can-revit-on-the-cloud-do-for-you.html#2">what can Revit on the cloud do for you?</a></p>
+<p>I put that discussion into context later,
+exploring <a href="http://thebuildingcoder.typepad.com/blog/2016/04/forge-devcon-spring-impermanence-and-bim-cloud.html#6">why BIM Cloud?</a></p>
+<p>Regardless of the context, all external access to the Revit API has to take into account the rules and restrictions
+that apply to <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">Idling and external events for modeless access and driving Revit from outside</a>.</p>
+<p>Instead of using Revit as a server, you can always explore generating a public format and interacting with that, or interacting with specific subset of the data, as demonstrated by my samples to connect BIM and the cloud, most recently these three based on Revit 2017:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/04/room-editor-first-revit-2017-addin-migration.html">Room Editor &ndash; First Revit 2017 Addin Migration</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/04/real-time-bim-update-with-fireratingcloud-2017.html">Real-Time BIM Update with FireRatingCloud 2017</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/04/real-time-bim-update-via-fireratingcloud-windows-client.html">Real-Time BIM Update via a Windows Forms Client</a></li>
+</ul>
+<p>They demonstrate how you can easily extract a minimal set of relevant data from the BIM and make that globally available, including the possibility to edit it and reintegrate the changes back into the BIM in real-time.</p>
+<p>I hope this helps and look forward to hearing the outcome of your discussion.</p>
