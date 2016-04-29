@@ -9,12 +9,13 @@
 
 <!---
 
- #revitAPI #3dwebcoder @AutodeskRevit #bim @AutodeskForge #3dwebaccel
+Forge and Autodesk University Call for Proposals #revitAPI #3dwebcoder @AutodeskRevit #bim @AutodeskForge #3dwebaccel
 
+In the beginning of the week, I listed my things to do next, including the most important and exciting one, attending and presenting at the Forge DevCon developer conference in San Francisco June 15-16. My to-do list also includes the Forge accelerators being held in Barcelona May 16-20 and in San Francisco June 19-24. Now the calls for proposals have opened for both Autodesk University and the Forge accelerator in San Francisco...
 
 -->
 
-### Forge Proposals and Autodesk University Papers
+### Forge and Autodesk University Call for Proposals
 
 In the beginning of the week, I listed
 my [things to do](http://thebuildingcoder.typepad.com/blog/2016/04/room-editor-first-revit-2017-addin-migration.html#1) next,
