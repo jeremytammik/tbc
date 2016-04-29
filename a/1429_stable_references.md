@@ -395,3 +395,40 @@ What I've been able to get to work every time (so far) is the following:
 To me, this ensures that I can't select a face that isn't visible through a PickObject.
 
 Thanks again for all of your voodoo!
+
+**Response by Scott:** I'm a bit confused pat; are you saying that using `Undefined` is good or bad?
+
+**Answer:** Lets do some testing... for instance, this structural column, I think from a stock Autodesk family, shows straight edges in `Medium` or `Coarse` views:
+
+<center>
+<img src="img/stable_reference_mc.png" alt="Medium and Coarse" width="400">
+</center>
+
+It shows fillet edges on `Fine`:
+
+<center>
+<img src="img/stable_reference_fine.png" alt="Fine" width="400">
+</center>
+
+If I try to get the instance face or edge of the above-mentioned structural column from the symbol reference (using your code), I get a NullReferenceException error if DetailLevel is set to Undefined:
+
+<pre class="code">
+  gOptions.DetailLevel = <span class="teal">ViewDetailLevel</span>.Undefined;
+</pre>
+
+Presumably because the PickObject is allowing me to select an edge or face that is non visible &ndash; I'm not sure how to confirm this.
+
+The same is also true if I purposely mismatch my View Detail Level and my Options.Detail Level. For example:
+
+- Set View Detail Level to `Fine`
+- Set Options.DetailLevel to `Medium`
+
+If I try that same code on a family instance where visibility of edges or faces is not controlled by the view's detail level, then everything works out fine.
+
+Looking up this property in the API help file I see the following:
+
+> Type: Autodesk.Revit.DB.ViewDetailLevel: Value of the detail level. ViewDetailLevel.Undefined means no override is set.
+
+My guess is that there is some sort of disconnect between what PickObject is allowing you to select and the Options class. I should also note that I tested this again to confirm that setting `IncludeNonVisibleObjects` to `true` or `false` made no difference in my test case.
+
+To summarize, if I always make sure my `Options.DetailLevel` is set to that of my view detail level, then I shouldn't run into any problems (I hope).

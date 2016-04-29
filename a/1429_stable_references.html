@@ -348,3 +348,30 @@ I don't know.</p>
 
 <p>To me, this ensures that I can't select a face that isn't visible through a PickObject.</p>
 <p>Thanks again for all of your voodoo!</p>
+<p><strong>Response by Scott:</strong> I'm a bit confused pat; are you saying that using <code>Undefined</code> is good or bad?</p>
+<p><strong>Answer:</strong> Lets do some testing... for instance, this structural column, I think from a stock Autodesk family, shows straight edges in <code>Medium</code> or <code>Coarse</code> views:</p>
+<p><center>
+<img src="img/stable_reference_mc.png" alt="Medium and Coarse" width="400">
+</center></p>
+<p>It shows fillet edges on <code>Fine</code>:</p>
+<p><center>
+<img src="img/stable_reference_fine.png" alt="Fine" width="400">
+</center></p>
+<p>If I try to get the instance face or edge of the above mentioned structural column from the symbol reference (using your code), I get a NullReferenceException error if DetailLevel is set to Undefined:</p>
+<pre class="code">
+  gOptions.DetailLevel = <span class="teal">ViewDetailLevel</span>.Undefined;
+</pre>
+
+<p>Presumably because the PickObject is allowing me to select an edge or face that is non visible &ndash; I'm not sure how to confirm this.</p>
+<p>The same is also true if I purposely mismatch my View Detail Level and my Options.Detail Level. For example:</p>
+<ul>
+<li>Set View Detail Level to <code>Fine</code></li>
+<li>Set Options.DetailLevel to <code>Medium</code></li>
+</ul>
+<p>If I try that same code on a family instance where visiblity of edges or faces is not controlled by the view's detail level, then everything works out fine.</p>
+<p>Looking up this property in the API help file I see the following:</p>
+<blockquote>
+<p>Type: Autodesk.Revit.DB.ViewDetailLevel: Value of the detail level. ViewDetailLevel.Undefined means no override is set.</p>
+</blockquote>
+<p>My guess is that there is some sort of disconnect between what PickObject is allowing you to select and the Options class. I should also note that I tested this again to confirm that setting <code>IncludeNonVisibleObjects</code> to <code>true</code> or <code>false</code> made no difference in my test case.</p>
+<p>To summarize, if I always make sure my <code>Options.DetailLevel</code> is set to that of my view detail level, then I shouldn't run into any problems (I hope).</p>
