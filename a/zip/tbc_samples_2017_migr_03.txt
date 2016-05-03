@@ -1,0 +1,10 @@
+zero errors and 5 warnings after eliminating all obsolete Application.NewPlane and Plance constructor calls taking two XYZ arguments for normal and origin:
+
+------ Rebuild All started: Project: BuildingCoder, Configuration: Debug Any CPU ------
+C:\a\lib\revit\2017\bc\BuildingCoder\BuildingCoder\CmdCategories.cs(50,7,50,44): warning CS0618: 'View.SetVisibility(Category, bool)' is obsolete: 'This method is deprecated in Revit 2017. Use View.SetCategoryHidden() instead.'
+C:\a\lib\revit\2017\bc\BuildingCoder\BuildingCoder\CmdFlatten.cs(71,19,73,32): warning CS0618: 'DirectShape.CreateElement(Document, ElementId, string, string)' is obsolete: 'This function will be obsolete in Revit 2017. Use DirectShape.CreateElement(Document, ElementId) instead. Use DirectShape.ApplicationId, DirectShape.ApplicationDataId properties to set application id and application data id.'
+C:\a\lib\revit\2017\bc\BuildingCoder\BuildingCoder\Creator.cs(242,24,242,45): warning CS0618: 'Application.NewPlane(CurveArray)' is obsolete: 'This method is obsolete in Revit 2017. Please use CurveLoop.GetPlane() instead.'
+C:\a\lib\revit\2017\bc\BuildingCoder\BuildingCoder\CmdWallProfile.cs(307,27,307,52): warning CS0618: 'Application.NewPlane(CurveArray)' is obsolete: 'This method is obsolete in Revit 2017. Please use CurveLoop.GetPlane() instead.'
+C:\a\lib\revit\2017\bc\BuildingCoder\BuildingCoder\CmdWallProfile.cs(441,27,441,52): warning CS0618: 'Application.NewPlane(CurveArray)' is obsolete: 'This method is obsolete in Revit 2017. Please use CurveLoop.GetPlane() instead.'
+  BuildingCoder -> C:\a\lib\revit\2017\bc\BuildingCoder\BuildingCoder\bin\Debug\BuildingCoder.dll
+========== Rebuild All: 1 succeeded, 0 failed, 0 skipped ==========
