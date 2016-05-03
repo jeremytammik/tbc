@@ -70,7 +70,7 @@ on [Digitally Signing Your Revit Add-in](http://help.autodesk.com/view/RVT/2017/
 the [Online Revit 2017 Help](http://help.autodesk.com/view/RVT/2017/ENU) &gt;
 Developers &gt; Revit API Developers Guide &gt; Introduction &gt; Add-In Integration &gt; Digitally Signing Your Revit Add-in.
 
-It was just updated just now and will hopefully resolve all your questions.
+It was updated just now and will hopefully resolve all your questions.
 
 
 #### <a name="3"></a>BIM 2 in the UK
@@ -129,4 +129,3 @@ on [Idling and external events for modeless access and driving Revit from outsid
 Now for the good part: the combination of these two is easily possible.
 
 You can implement a Revit add-in that also makes use of the AutoCAD.NET API and thus achieve the direct link that you suggest in item 1.
-
