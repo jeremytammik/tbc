@@ -432,3 +432,19 @@ Looking up this property in the API help file I see the following:
 My guess is that there is some sort of disconnect between what PickObject is allowing you to select and the Options class. I should also note that I tested this again to confirm that setting `IncludeNonVisibleObjects` to `true` or `false` made no difference in my test case.
 
 To summarize, if I always make sure my `Options.DetailLevel` is set to that of my view detail level, then I shouldn't run into any problems (I hope).
+
+**Response:** The Undefined setting was an attempt to make the code more generalised, It worked fine on a few cases I tested it with before posting it, but i might have just got lucky (or unlucky...). I thought that having `ViewDetailLevel` set to `Undefined` would provide the full set of geometry from which to find the matching face no-matter what the setting of the view where the selection was made. Maybe that's not how `ViewDetailLevel.Undefined` works. If it is as you say and it signifies to only return geometry that does not have the detail visibility override set, then to fix it, I would loop through on each `ViewDetailLevel` setting until the geometry was found. Thanks for testing it out and giving a heads-up. Btw, which documentation mentions "ViewDetailLevel.Undefined means no override is set"? I just checked and the docs say "View does not use Detail Level" which I think means something completly different to both mine and your interpretations; odd.
+
+Out of interest have you changed the code to include the view in the geometry options?
+
+If so, does removing it help?
+
+**Answer:** Scott, I may have been looking in the wrong location on the api help documents.
+
+I found that snippet of text under OverrideGraphicSettings.SetDetailLevel Method.
+
+I am currently using the active view's detail level in my geometry options. For my case its the only reliable way I can ensure that the user doesn't get an exception error.
+
+<pre class="code">
+  gOptions.DetailLevel = doc.ActiveView.DetailLevel;
+</pre>

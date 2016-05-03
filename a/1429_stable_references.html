@@ -357,7 +357,7 @@ I don't know.</p>
 <p><center>
 <img src="img/stable_reference_fine.png" alt="Fine" width="400">
 </center></p>
-<p>If I try to get the instance face or edge of the above mentioned structural column from the symbol reference (using your code), I get a NullReferenceException error if DetailLevel is set to Undefined:</p>
+<p>If I try to get the instance face or edge of the above-mentioned structural column from the symbol reference (using your code), I get a NullReferenceException error if DetailLevel is set to Undefined:</p>
 <pre class="code">
   gOptions.DetailLevel = <span class="teal">ViewDetailLevel</span>.Undefined;
 </pre>
@@ -368,10 +368,19 @@ I don't know.</p>
 <li>Set View Detail Level to <code>Fine</code></li>
 <li>Set Options.DetailLevel to <code>Medium</code></li>
 </ul>
-<p>If I try that same code on a family instance where visiblity of edges or faces is not controlled by the view's detail level, then everything works out fine.</p>
+<p>If I try that same code on a family instance where visibility of edges or faces is not controlled by the view's detail level, then everything works out fine.</p>
 <p>Looking up this property in the API help file I see the following:</p>
 <blockquote>
 <p>Type: Autodesk.Revit.DB.ViewDetailLevel: Value of the detail level. ViewDetailLevel.Undefined means no override is set.</p>
 </blockquote>
 <p>My guess is that there is some sort of disconnect between what PickObject is allowing you to select and the Options class. I should also note that I tested this again to confirm that setting <code>IncludeNonVisibleObjects</code> to <code>true</code> or <code>false</code> made no difference in my test case.</p>
 <p>To summarize, if I always make sure my <code>Options.DetailLevel</code> is set to that of my view detail level, then I shouldn't run into any problems (I hope).</p>
+<p><strong>Response:</strong> The Undefined setting was an attempt to make the code more generalised, It worked fine on a few cases I tested it with before posting it, but i might have just got lucky (or unlucky...). I thought that having <code>ViewDetailLevel</code> set to <code>Undefined</code> would provide the full set of geometry from which to find the matching face no-matter what the setting of the view where the selection was made. Maybe that's not how <code>ViewDetailLevel.Undefined</code> works. If it is as you say and it signifies to only return geometry that does not have the detail visibility override set, then to fix it, I would loop through on each <code>ViewDetailLevel</code> setting until the geometry was found. Thanks for testing it out and giving a heads-up. Btw, which documentation mentions "ViewDetailLevel.Undefined means no override is set"? I just checked and the docs say "View does not use Detail Level" which I think means something completly different to both mine and your interpretations; odd.</p>
+<p>Out of interest have you changed the code to include the view in the geometry options?</p>
+<p>If so, does removing it help?</p>
+<p><strong>Answer:</strong> Scott, I may have been looking in the wrong location on the api help documents.</p>
+<p>I found that snippet of text under OverrideGraphicSettings.SetDetailLevel Method.</p>
+<p>I am currently using the active view's detail level in my geometry options. For my case its the only reliable way I can ensure that the user doesn't get an exception error.</p>
+<pre class="code">
+  gOptions.DetailLevel = doc.ActiveView.DetailLevel;
+</pre>
