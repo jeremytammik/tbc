@@ -85,10 +85,13 @@ That time is now.
 
 The [Autodesk BIM 360](http://bim360.com) web site offers a [whitepaper](http://info.bim360.com/bim-level-2-whitepaper) explaining more.
 
+Have fun with it, and bravo to the UK BIM community for agreeing on such an important undertaking!
+
+<!---
 If you just want to take a quick glance with minimal fuss, here is
 the [infographic](zip/bim-level-2-infographic.pdf)
 and [whitepaper on Autodesk and the UK BIM Level 2 Mandate](zip/Autodesk_and_UK_BIM_Level_2_Mandate.pdf) already downloaded for you.
-
+-->
 
 #### <a name="4"></a>Communication between AutoCAD and Revit
 
