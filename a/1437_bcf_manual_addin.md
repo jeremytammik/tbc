@@ -114,6 +114,19 @@ a [small sample app in C#](https://github.com/BIMit/BCF-Hackathon-Munich/tree/Te
 That might give you some ideas how to use the BCF API itself."
 
 
+#### <a name="2.1"></a>The Kayak Framework &ndash; an Easy Way to Speak HTTP with .NET
+
+One interesting aspect of the BCF-API sample is its use
+of [the Kayak framework &ndash; an easy way to speak HTTP with .NET](http://dotnetslackers.com/articles/aspnet/The-Kayak-Framework-An-easy-way-to-speak-HTTP-with-NET.aspx),
+published in 2010 by [Benjamin van der Veen](http://dotnetslackers.com/community/members/bvanderveen.aspx),
+including [Kayak sample code](http://dotnetslackers.com/code/KayakCMSExample.zip):
+
+- Kayak is a lightweight HTTP server for the CLR, and the Kayak Framework is a utility for mapping HTTP requests to C# method invocations. With Kayak, you can skip the bulk, hassle, and overhead of IIS and ASP.NET. Kayak enables you to do more with less syntax, and is easy to configure to work in any way you care to dream up.
+- Kayak is a simple server with an easy-to-use request framework. It automatically maps HTTP verb/path combinations to your methods, deserialises arguments to invocations of those methods from the query string or JSON request body, and serialises the return values as JSON. It's behaviour is configurable, yet simple to use and understand thanks to its limited scope.
+
+
+
+
 #### <a name="3"></a>Manual Setup of a Revit Add-In
 
 As said, I used the BCF API client sample project to record exactly how to manually set up a Visual Studio C# .NET Revit add-in from scratch.
