@@ -87,6 +87,8 @@ I had some issues getting both the original sample and my Revit version up and r
 
 They were resolved over the week-end, however, and both the stand-alone sample client and the new Revit add-in version now work fine.
 
+Here are some screen snapshots running the Revit add-in version:
+
 The first step is the log in to the BIM-IT server:
 
 <center>
@@ -134,4 +136,3 @@ in [release 2017.0.0.4](https://github.com/jeremytammik/RvtBcfApiExampleClient/r
 
 As said, next I will use the generated files to update
 the [Visual Studio Revit add-in wizard](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.20) for Revit 2017.
-
