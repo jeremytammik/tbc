@@ -143,6 +143,6 @@ Copying VB wizard archive to C:\Users\tammikj\Documents\Visual Studio 2015\Templ
 Y:\VisualStudioRevitAddinWizard &gt;
 </pre>
 
-I hope you find this useful and look forward to hearing about your customisation and suggestions for other enhancements.
+I hope you find this useful and look forward to hearing about your customisations and suggestions for other enhancements.
 
 Have fun!
