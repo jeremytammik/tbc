@@ -11,10 +11,7 @@
 
 Visual Studio 2015 Revit 2017 Add-in Wizards #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim #dynamobim
 
-I updated the Visual Studio Revit C# and VB add-in wizards for Revit 2017.
-They enable you to create a new C# or VB Revit add-in in Visual Studio with one single click on File &gt; New &gt; Project... &gt; Installed &gt; Templates &gt; Visual Basic/Visual C# &gt; Revit 2017 Addin:
-The wizard creates a complete Revit add-in skeleton, ready to immediately compile and run.
-Just hit F5 to start debugging; the add-in manifest is automatically created, copied to the proper location, Revit launched in the debugger, and your shiny new add-in is available in the external tools menu....
+I updated the Visual Studio Revit C# and VB add-in wizards for Revit 2017. They enable you to create a new C# or VB Revit add-in in Visual Studio with one single click on File &gt; New &gt; Project... &gt; Installed &gt; Templates &gt; Visual Basic/Visual C# &gt; Revit 2017 Addin. The wizard creates a complete Revit add-in skeleton, ready to immediately compile and run. Just hit F5 to start debugging; the add-in manifest is automatically created, copied to the proper location, Revit launched in the debugger, and your shiny new add-in is available in the external tools menu...
 
 -->
 
@@ -149,4 +146,3 @@ Y:\VisualStudioRevitAddinWizard &gt;
 I hope you find this useful and look forward to hearing about your customisation and suggestions for other enhancements.
 
 Have fun!
-
