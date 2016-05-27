@@ -308,10 +308,10 @@ La perfection est atteinte, non pas lorsqu'il n'y a plus rien à ajouter, mais l
 
 Now the time has come to show the full solution running live, connecting the [View and Data API](https://developer.autodesk.com/api/view-and-data-api) viewer and the Revit add-in updating the BIM live in real-time.
 
-Here is a [four and a half minute video recording](https://youtu.be/E0X--tInZyo) showing the system up and running:
+Here is a [five-minute video recording](https://youtu.be/EbtyAZPX8Bc) showing the system up and running:
 
 <center>
-<iframe width="400" height="300" src="https://www.youtube.com/embed/E0X--tInZyo?rel=0" frameborder="0" allowfullscreen></iframe>
+<iframe width="400" height="300" src="https://www.youtube.com/embed/EbtyAZPX8Bc" frameborder="0" allowfullscreen></iframe>
 </center>
 
 To my great surprise, I do not have to do anything at all to convert or transform the viewer coordinates back into the Revit model.
