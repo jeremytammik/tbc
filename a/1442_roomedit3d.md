@@ -9,9 +9,11 @@
 
 <!---
 
-Roomedit3d Live Real-Time BIM Update Recording #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim #AutodeskAnswerDay
+Roomedit3d Live Real-Time Socket.io BIM Update #revitAPI #3dwebcoder @AutodeskForge #adsk #aec #bim #socket.io
 
-
+I completed the first running version of my roomedit3d project connecting BIM and the cloud demonstrating two cool possibilities to enhance interaction with the View and Data API
+&ndash; A viewer extension enabling interactive model modification, i.e., translation of selected elements
+&ndash; Real-time communication of the modification back to the source CAD system using a direct socket.io connection to broadcast from the web server to any number of desktop clients...
 
 -->
 
@@ -23,7 +25,7 @@ connecting BIM and the cloud demonstrating two cool possibilities to enhance int
 - A viewer extension enabling interactive model modification, i.e., translation of selected elements
 - Real-time communication of the modification back to the source CAD system using a direct socket.io connection to broadcast from the web server to any number of desktop clients
 
-Let's take an on-depth look at the implementation and a test run recording:
+Let's take a closer look at the implementation and a test run recording:
 
 - [Overview](#1)
 - [Roomedit3d implementation](#2)
