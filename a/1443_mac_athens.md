@@ -96,6 +96,7 @@ So far, I downloaded, installed and reactivated the following components and 'co
 - [Python-Markdown](https://pythonhosted.org/Markdown) to process this blog post &nbsp; :-)
 - [MediaInfo command line version](http://mediaarea.net/en/MediaInfo)
 - [Visual Studio Productivity Power Tools 2015](https://visualstudiogallery.msdn.microsoft.com/34ebc6a2-2777-421d-8914-e29c1dfa7f5d)
+- [Kdiff3](https://sourceforge.net/projects/kdiff3), a graphical text difference analyser
 
 I am still working on getting the 'wherever change directory' utility `wcd` up and running, which requires a wide character version of `ncurses`...
 
