@@ -94,6 +94,8 @@ So far, I downloaded, installed and reactivated the following components and 'co
 - [Roomedit3d](https://github.com/jeremytammik/roomedit3d) sample [release 0.0.6](https://github.com/jeremytammik/roomedit3d/releases/tag/0.0.6)
 - [FireRatingCloud](https://github.com/jeremytammik/FireRatingCloud). sample [release 2017.0.0.18](https://github.com/jeremytammik/FireRatingCloud/releases/tag/2017.0.0.18)
 - [Python-Markdown](https://pythonhosted.org/Markdown) to process this blog post &nbsp; :-)
+- [MediaInfo command line version](http://mediaarea.net/en/MediaInfo)
+- [Visual Studio Productivity Power Tools 2015](https://visualstudiogallery.msdn.microsoft.com/34ebc6a2-2777-421d-8914-e29c1dfa7f5d)
 
 I am still working on getting the 'wherever change directory' utility `wcd` up and running, which requires a wide character version of `ncurses`...
 
