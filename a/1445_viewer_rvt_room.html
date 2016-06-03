@@ -1,0 +1,90 @@
+<p><head>
+<title>The 3D Web Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true&amp;skin=sunburst&amp;lang=css" defer="defer"></script>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true&amp;skin=sunburst" defer="defer"></script>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+</head></p>
+<!---
+
+ #3dwebcoder #revitapi #3dweb @AutodeskForge #nodejs #socketio
+
+&ndash;
+...
+
+-->
+
+<h3>Highlighting Revit Rooms in the Forge Viewer</h3>
+<p>I am leaving Athens today.</p>
+<p>The <a href="http://www.meetup.com/de-DE/I-love-3D-Athens/events/230543759">Athens Forge meetup</a> and
+<a href="http://www.meetup.com/de-DE/I-love-3D-Athens/events/230544059">web server workshop</a>
+at <a href="http://thecube.gr">The Cube</a> went well.</p>
+<p>Now it is full steam ahead towards
+the <a href="http://forge.autodesk.com/conference">Forge DevCon</a> in San Francisco week after next.</p>
+<p>Not to forget the <a href="http://www.3dwebfest.com">3D Web Fest</a> on June 15, in parallel with Forge DevCon, showcasing the best of the 3D web as live performance art with a catered reception in a film festival atmosphere. This year all proceed go to the non-profit <a href="http://www.codame.com">CODAME</a> ART+TECH project.</p>
+<p>At the recent Barcelona <a href="http://forge.autodesk.com">Forge</a> <a href="http://autodeskcloudaccelerator.com">Accelerator</a>, I talked with Jaroslav Daníček
+of <a href="http://www.cadstudio.cz">CAD Studio a.s.</a>.</p>
+<p>Jaroslav very kindly shared his hard-won experience and algorithm how to <a href="#4">highlight a specific Room in the Forge viewer</a>.</p>
+<p>The <a href="http://forums.autodesk.com/t5/view-and-data-api/bd-p/95">Forge Viewer discussion forum</a>
+includes some other hints
+on <a href="http://forums.autodesk.com/t5/view-and-data-api/revit-rooms/m-p/5297233">handling Revit rooms</a> that might be worth mentioning first.</p>
+<h4><a name="2"></a>Accessing Room Data</h4>
+<p>The Forge viewer displays geometrical objects.</p>
+<p>By default, the rooms in a Revit model do not generate any geometry.</p>
+<p>However, their other information, attributes and parameters are all present in the translated model.</p>
+<p>If you know the room element id, you can retrieve it from the translated viewer data.</p>
+<p>It is not immediately accessible through the user interface, since there is no geometry associated with it.</p>
+<p>A room is a void, and the viewer is mainly focused on displaying (non-void) geometrical objects.</p>
+<p>You can easily implement your own extensions to retrieve, display and interact with the room data in any way you like.</p>
+<h4><a name="3"></a>Automatically Navigating to a Specific Room</h4>
+<p>One approach to automatically navigate to a specific room was implemented at
+the <a href="http://the3dwebcoder.typepad.com/blog/2015/09/towards-a-comphound-mongo-database-table-view.html">cloud accelerator in Prague</a>
+in September last year by Jaroslav's colleague Vitezslav Peka:</p>
+<p>Several participant interested in Revit models ran into this issue, and various solutions were implemented.</p>
+<p>The simplest approach to zoom to a Revit room in the Forge viewer seems to be the following:</p>
+<ul>
+<li>Place a family instance with some geometry inside each room. You might want to place it at the ceiling level, somewhere in the 'centre' of the room, for the zooming and cutting described below..</li>
+<li>Save and translate the modified file, then discard it and revert to original state, e.g., by saving active doc A to new project B, open B in background, modify, save, translate, delete, continue working in A.</li>
+<li>Search in the viewer for the Revit <code>Rooms</code> category.</li>
+<li>That returns a list of the (invisible) rooms.</li>
+<li>Find the corresponding family instance for the room to retrieve its data.</li>
+<li>Get its bounding box in the viewer.</li>
+<li>Make a section cut at that location to show the room.</li>
+<li>Set the camera to the correct view and zoom.</li>
+</ul>
+<h4><a name="4"></a>Highlighting a Specific Room in the Forge Viewer</h4>
+<p>Jaroslav took Vitezslav's solution one step further to implement Revit room highlighting in the Forge viewer. In his own words:</p>
+<p>Here is what I did basically:</p>
+<p>Revit side:</p>
+<ul>
+<li>Add lines for every room following its 'floor plan', so in the viewer every line has its own object and DbID.</li>
+<li>Sort them in order like 'drawn with pencil in one move', second line should start where previous ends.</li>
+<li>Upload Revit model to the cloud.</li>
+<li>Store information in the database which lines (respective DbIDs of lines) belongs to which rooms and their order. </li>
+</ul>
+<p>If a room contains holes it is a little bit more complicated for drawing in the viewer; you must also store information whether a line represents a hole or main 'circle'.</p>
+<p>Viewer side (for 3D models only):</p>
+<ul>
+<li>When selecting a room from the room list, identify the room and its lines in the database, via ajax send DbIDs of lines back.</li>
+<li>Now you have got array of DbIDs of lines.</li>
+<li>For every line get its start and end point; they provide coordinates for the vertices.</li>
+<li>Create a 2D shape from the vertices and extrude shape to height of a room or cut plane.</li>
+<li>From shape and extrusion setup create a mesh with transparent material and add it to the viewer.</li>
+<li>Set correct Z coordinate for the new mesh.</li>
+<li>For better orientation and visibility is good to set the cut plane to the height of a level where a room is located and animate the camera to look from above.</li>
+</ul>
+<p>Many thanks to Jaroslav for sharing these valuable hints!</p>
+<p>Have fun implementing your own Forge viewer extensions.</p>
+<p>If you are looking for handy starting points, you can look at 
+my <a href="https://github.com/jeremytammik/roomedit3d">roomedit3d</a> sample,
+Kean Walmsley's <a href="http://through-the-interface.typepad.com/through_the_interface/2016/05/creating-extensions-for-the-autodesk-viewer.html">introduction to creating extensions</a> 
+and <a href="http://through-the-interface.typepad.com/through_the_interface/2016/05/creating-a-vertical-toolbar-extension-for-the-autodesk-viewer.html">vertical toolbar extension</a>,
+and, above all, the mother of them all, Philippe Leefsma's
+<a href="https://github.com/Developer-Autodesk/library-javascript-viewer-extensions">collection of JavaScript extensions for the viewer</a> and gallery.</p>
+<p>Maxim <a href="https://github.com/redcraft">@redcraft</a> Gurkin's 
+<a href="https://github.com/Developer-Autodesk/lmv-extensions">lmv-extensions</a> also 
+look interesting... has anyone taken a look at them?</p>
