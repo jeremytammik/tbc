@@ -52,7 +52,7 @@ In Barcelona, I also just managed to finish reading the Spanish novel [*La Tempe
 Before getting to that, let me point out that I started an exciting new project dubbed `roomedit3d` connecting BIM and the cloud last week as well, demonstrating two cool possibilities to enhance interaction with
 the [View and Data API](https://developer.autodesk.com/api/view-and-data-api):
 
-- A viewer extension enabling interactive model modification, i.e., translation of selected elements
+- A viewer extension enabling interactive model modification, i.e., translation of selected elements, based on Philippe Leefsma's [TransformTool](http://adndevblog.typepad.com/cloud_and_mobile/2015/08/moving-visually-your-components-in-the-viewer-using-the-transformtool.html)
 - Real-time communication of the modification back to the source CAD system using:
     - A REST API POST call from the viewer extension to the node.js web server
     - A direct [socket.io](http://socket.io) connection to broadcast from the web server to any number of desktop clients
