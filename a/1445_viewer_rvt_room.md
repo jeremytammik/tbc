@@ -97,7 +97,7 @@ Revit side:
 - Add lines for every room following its 'floor plan', so in the viewer every line has its own object and DbID.
 - Sort them in order like 'drawn with pencil in one move', second line should start where previous ends.
 - Upload Revit model to the cloud.
-- Store information in the database which lines (respective DbIDs of lines) belongs to which rooms and their order. 
+- Store information in the database which lines (respective DbIDs of lines) belongs to which rooms and their order.
 
 If a room contains holes it is a little bit more complicated for drawing in the viewer; you must also store information whether a line represents a hole or main 'circle'.
 
@@ -111,17 +111,39 @@ Viewer side (for 3D models only):
 - Set correct Z coordinate for the new mesh.
 - For better orientation and visibility is good to set the cut plane to the height of a level where a room is located and animate the camera to look from above.
 
+Here are some sample images:
+
+A clean level cut:
+
+<center>
+	<img src="img/viewer_hilite_room_1.png" alt="Viewer highlight room &mdash; a clean level cut" width="460">
+</center>
+
+A complicated room shape:
+
+<center>
+	<img src="img/viewer_hilite_room_2.png" alt="Viewer highlight room &mdash; a complicated room shape" width="460">
+</center>
+
+A simple room shape next to the complicated one:
+
+<center>
+	<img src="img/viewer_hilite_room_3.png" alt="Viewer highlight room &mdash; a simple room shape next to the complicated one" width="460">
+</center>
+
 Many thanks to Jaroslav for sharing these valuable hints!
 
-Have fun implementing your own Forge viewer extensions.
+Have fun implementing your own Forge viewer extensions!
 
-If you are looking for handy starting points, you can look at 
+#### <a name="5"></a>Forge Viewer Extension Starting Points
+
+If you are looking for handy starting points, you can look at
 my [roomedit3d](https://github.com/jeremytammik/roomedit3d) sample,
-Kean Walmsley's [introduction to creating extensions](http://through-the-interface.typepad.com/through_the_interface/2016/05/creating-extensions-for-the-autodesk-viewer.html) 
+Kean Walmsley's [introduction to creating extensions](http://through-the-interface.typepad.com/through_the_interface/2016/05/creating-extensions-for-the-autodesk-viewer.html)
 and [vertical toolbar extension](http://through-the-interface.typepad.com/through_the_interface/2016/05/creating-a-vertical-toolbar-extension-for-the-autodesk-viewer.html),
 and, above all, the mother of them all, Philippe Leefsma's
 [collection of JavaScript extensions for the viewer](https://github.com/Developer-Autodesk/library-javascript-viewer-extensions) and gallery.
 
-Maxim [@redcraft](https://github.com/redcraft) Gurkin's 
-[lmv-extensions](https://github.com/Developer-Autodesk/lmv-extensions) also 
+Maxim [@redcraft](https://github.com/redcraft) Gurkin's
+[lmv-extensions](https://github.com/Developer-Autodesk/lmv-extensions) also
 look interesting... has anyone taken a look at them?

@@ -11,10 +11,10 @@
 </head></p>
 <!---
 
- #3dwebcoder #revitapi #3dweb @AutodeskForge #nodejs #socketio
+Highlighting Revit Rooms in the Forge Viewer @AutodeskForge @CubeAthens #3dwebcoder #revitapi #3dweb #threejs
 
-&ndash;
-...
+I am leaving Athens today. The Athens Forge meetup and web server workshop at The Cube went well.
+Now it is full steam ahead towards the Forge DevCon in San Francisco week after next. Not to forget the 3D Web Fest on June 15, in parallel with Forge DevCon, showcasing the best of the 3D web as live performance art with a catered reception in a film festival atmosphere...
 
 -->
 
@@ -23,6 +23,10 @@
 <p>The <a href="http://www.meetup.com/de-DE/I-love-3D-Athens/events/230543759">Athens Forge meetup</a> and
 <a href="http://www.meetup.com/de-DE/I-love-3D-Athens/events/230544059">web server workshop</a>
 at <a href="http://thecube.gr">The Cube</a> went well.</p>
+<p>Here are a couple of pictures before and after the events:</p>
+<p><center>
+<a data-flickr-embed="true"  href="https://www.flickr.com/photos/jeremytammik/albums/72157669263727915" title="Athens"><img src="https://c8.staticflickr.com/8/7125/27430452255_afc4f13059_n.jpg" width="320" height="240" alt="Athens"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+</center></p>
 <p>Now it is full steam ahead towards
 the <a href="http://forge.autodesk.com/conference">Forge DevCon</a> in San Francisco week after next.</p>
 <p>Not to forget the <a href="http://www.3dwebfest.com">3D Web Fest</a> on June 15, in parallel with Forge DevCon, showcasing the best of the 3D web as live performance art with a catered reception in a film festival atmosphere. This year all proceed go to the non-profit <a href="http://www.codame.com">CODAME</a> ART+TECH project.</p>
@@ -47,7 +51,7 @@ in September last year by Jaroslav's colleague Vitezslav Peka:</p>
 <p>Several participant interested in Revit models ran into this issue, and various solutions were implemented.</p>
 <p>The simplest approach to zoom to a Revit room in the Forge viewer seems to be the following:</p>
 <ul>
-<li>Place a family instance with some geometry inside each room. You might want to place it at the ceiling level, somewhere in the 'centre' of the room, for the zooming and cutting described below..</li>
+<li>Place a family instance with some geometry inside each room. You might want to place it at the ceiling level, somewhere in the 'centre' of the room, for the zooming and cutting described below.</li>
 <li>Save and translate the modified file, then discard it and revert to original state, e.g., by saving active doc A to new project B, open B in background, modify, save, translate, delete, continue working in A.</li>
 <li>Search in the viewer for the Revit <code>Rooms</code> category.</li>
 <li>That returns a list of the (invisible) rooms.</li>
@@ -64,7 +68,7 @@ in September last year by Jaroslav's colleague Vitezslav Peka:</p>
 <li>Add lines for every room following its 'floor plan', so in the viewer every line has its own object and DbID.</li>
 <li>Sort them in order like 'drawn with pencil in one move', second line should start where previous ends.</li>
 <li>Upload Revit model to the cloud.</li>
-<li>Store information in the database which lines (respective DbIDs of lines) belongs to which rooms and their order. </li>
+<li>Store information in the database which lines (respective DbIDs of lines) belongs to which rooms and their order.</li>
 </ul>
 <p>If a room contains holes it is a little bit more complicated for drawing in the viewer; you must also store information whether a line represents a hole or main 'circle'.</p>
 <p>Viewer side (for 3D models only):</p>
@@ -77,14 +81,28 @@ in September last year by Jaroslav's colleague Vitezslav Peka:</p>
 <li>Set correct Z coordinate for the new mesh.</li>
 <li>For better orientation and visibility is good to set the cut plane to the height of a level where a room is located and animate the camera to look from above.</li>
 </ul>
+<p>Here are some sample images:</p>
+<p>A clean level cut:</p>
+<p><center>
+    <img src="img/viewer_hilite_room_1.png" alt="Viewer highlight room &mdash; a clean level cut" width="460">
+</center></p>
+<p>A complicated room shape:</p>
+<p><center>
+    <img src="img/viewer_hilite_room_2.png" alt="Viewer highlight room &mdash; a complicated room shape" width="460">
+</center></p>
+<p>A simple room shape next to the complicated one:</p>
+<p><center>
+    <img src="img/viewer_hilite_room_3.png" alt="Viewer highlight room &mdash; a simple room shape next to the complicated one" width="460">
+</center></p>
 <p>Many thanks to Jaroslav for sharing these valuable hints!</p>
-<p>Have fun implementing your own Forge viewer extensions.</p>
-<p>If you are looking for handy starting points, you can look at 
+<p>Have fun implementing your own Forge viewer extensions!</p>
+<h4><a name="5"></a>Forge Viewer Extension Starting Points</h4>
+<p>If you are looking for handy starting points, you can look at
 my <a href="https://github.com/jeremytammik/roomedit3d">roomedit3d</a> sample,
-Kean Walmsley's <a href="http://through-the-interface.typepad.com/through_the_interface/2016/05/creating-extensions-for-the-autodesk-viewer.html">introduction to creating extensions</a> 
+Kean Walmsley's <a href="http://through-the-interface.typepad.com/through_the_interface/2016/05/creating-extensions-for-the-autodesk-viewer.html">introduction to creating extensions</a>
 and <a href="http://through-the-interface.typepad.com/through_the_interface/2016/05/creating-a-vertical-toolbar-extension-for-the-autodesk-viewer.html">vertical toolbar extension</a>,
 and, above all, the mother of them all, Philippe Leefsma's
 <a href="https://github.com/Developer-Autodesk/library-javascript-viewer-extensions">collection of JavaScript extensions for the viewer</a> and gallery.</p>
-<p>Maxim <a href="https://github.com/redcraft">@redcraft</a> Gurkin's 
-<a href="https://github.com/Developer-Autodesk/lmv-extensions">lmv-extensions</a> also 
+<p>Maxim <a href="https://github.com/redcraft">@redcraft</a> Gurkin's
+<a href="https://github.com/Developer-Autodesk/lmv-extensions">lmv-extensions</a> also
 look interesting... has anyone taken a look at them?</p>
