@@ -12,8 +12,12 @@
 
 <!---
 
-Highlighting Revit Rooms in the Forge Viewer @AutodeskForge @CubeAthens #3dwebcoder #revitapi #3dweb #threejs
+Point Boundary Condition and Revit 2017 SDK @AutodeskForge @CubeAthens #3dwebcoder #revitapi
 
+I arrived safe and sound in San Francisco via Vancouver and am now working on the final preparations for the Forge DevCon and 3D Web Fest.
+Before getting to that, here are some quick notes from my short exploration last week to produce a rather overdue list of the new Revit 2017 SDK samples and on creating a point boundary condition on a structural column
+&ndash; New Revit 2017 SDK Samples
+&ndash; Creating Point Boundary Condition on End of Structural Column...
 
 -->
 
@@ -47,7 +51,7 @@ I trust you already discovered these samples yourself if they are important to y
 - Samples/GenericStructuralConnection
 - Samples/GeometryAPI/BRepBuilderExample
 - Samples/PlacementOptions
-- Structural Analysis SDK/Examples/Concrete/CodeCheckingConcreteExample/UIComponents/CalculationPointsSelector
+- Structural Analysis SDK CodeCheckingConcreteExample CalculationPointsSelector
 
 Here is the procedure I used to produce that list:
 
