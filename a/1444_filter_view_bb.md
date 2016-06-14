@@ -1,4 +1,5 @@
 <head>
+<title>The Building Coder</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="bc.css">
 <script src="run_prettify.js" type="text/javascript"></script>
