@@ -19,7 +19,7 @@ The Forge DevCon took off yesterday with a big bang, as you have certainly heard
 -->
 
 
-### Freeing your BIM Data and Roomedit3d Forge OAuth
+### Freeing Your BIM Data and Roomedit3d Forge OAuth
 
 The [Forge DevCon](http://forge.autodesk.com/conference) took off yesterday with a big bang, as you have certainly heard by now.
 
