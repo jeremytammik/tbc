@@ -25,6 +25,10 @@ I am really excited to see where our paths will lead us in the near future as we
 
 I published pointers to all the [Free your BIM data resources](http://thebuildingcoder.typepad.com/blog/2016/06/free-your-bim-data-and-roomedit3d-thee-legged-forge-oauth.html) yesterday.
 
+<center>
+<img src="img/jeremy_freeing_bim_data.jpg" alt="Jeremy freeing BIM data" width="450">
+</center>
+
 Here are some more snapshots from the second day at the event, taken during my few ventures outside the festival pavilion building housing it:
 
 <center>
@@ -82,4 +86,3 @@ In Pierre's own words:
 This tutorial is extremely useful from two completely opposite perspectives, both for Revit Python shell users wishing explore the powerful possibilities provided by DMU, and also for Revit API add-in developers with or without DMU experience wishing to acquaint themselves with some of the more powerful aspects of the Revit Python shell.
 
 Many thanks to Pierre for creating and sharing this!
-
