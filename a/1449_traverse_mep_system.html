@@ -190,17 +190,29 @@ the <a href="http://thebuildingcoder.typepad.com/blog/2012/05/the-adn-mep-sample
 <p><center>
 <img src="img/traverse_all_systems_in_rme_advanced_sample_project.png" alt="TraverseAllSystems result in rme_advanced_sample_project.rvt" width="450">
 </center></p>
+<p>It contains 240 MEP systems, 51 of which were deemed 'desirable' by the <code>IsDesirableSystemPredicate</code> method, of which only 35 produced any interesting graph data, exported to individual XML files in a random temporary directory.</p>
 <h4><a name="4"></a>Download</h4>
 <p>The current state of this project is available from
 the <a href="https://github.com/jeremytammik/TraverseAllSystems">TraverseAllSystems GitHub repository</a>, and the version discussed above
 is <a href="https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.1">release 2017.0.0.1</a>.</p>
 <h4><a name="5"></a>To Do</h4>
 <p>The next step will be to implement a Forge viewer extension displaying a custom panel in the user interface hosting a tree view of the MEP system graphs and implementing two-way linking and selection functionality back and forth between the tree view nodes and the 2D and 3D viewer elements.</p>
+<p>We also need to figgure out how to transport the graph information from the Revit add-in to the Forge viewer.</p>
+<p>Presumably, we will encode it in JSON instead of XML, to start with, to make it easier to handle directly in JavaScript.</p>
+<p>Here are some of the storage options:</p>
+<ul>
+<li>Store the graph data in a stand-alone cloud-based repository and link it with the viewer elements dynamically</li>
+<li>Store the graph data as neighbourship relationships in each MEP system element, for instance in a shared parameter.</li>
+<li>Store the entire graph data in one single JSON structure, for instance on each MEP system base equipment element.</li>
+</ul>
+<p>These options can obviously be combined, and even all implemented at once.</p>
+<p>Probaly, the easiest way to transport the data from the BIM to the Forge platform will be to store it in shared parameter data on Revit elements.</p>
+<p>Then it will be automatically included and handled by the standard Forge translation process for Revit RVT files.</p>
 <h4><a name="6"></a>Thanks to Mustafa Salaheldin</h4>
 <p>One last important point before closing.</p>
 <p>In the past weeks,
 <a href="http://forums.autodesk.com/t5/user/viewprofilepage/user-id/1227311">Mustafa Salaheldin</a> has answered more cases on
-the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API forum</a> than any other person before him ever was able to in the past:</p>
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API forum</a> than any other person before him ever was able to do in the past:</p>
 <p><center>
 <img src="img/mustafa_salaheldin_ranking_2.png" alt="Mustafa Salaheldin ranking" width="231">
 </center></p>

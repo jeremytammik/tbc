@@ -215,6 +215,8 @@ The result of doing so looks like this:
 <img src="img/traverse_all_systems_in_rme_advanced_sample_project.png" alt="TraverseAllSystems result in rme_advanced_sample_project.rvt" width="450">
 </center>
 
+It contains 240 MEP systems, 51 of which were deemed 'desirable' by the `IsDesirableSystemPredicate` method, of which only 35 produced any interesting graph data, exported to individual XML files in a random temporary directory.
+
 
 #### <a name="4"></a>Download
 
@@ -227,6 +229,23 @@ is [release 2017.0.0.1](https://github.com/jeremytammik/TraverseAllSystems/relea
 
 The next step will be to implement a Forge viewer extension displaying a custom panel in the user interface hosting a tree view of the MEP system graphs and implementing two-way linking and selection functionality back and forth between the tree view nodes and the 2D and 3D viewer elements.
 
+We also need to figgure out how to transport the graph information from the Revit add-in to the Forge viewer.
+
+Presumably, we will encode it in JSON instead of XML, to start with, to make it easier to handle directly in JavaScript.
+
+Here are some of the storage options:
+
+- Store the graph data in a stand-alone cloud-based repository and link it with the viewer elements dynamically
+- Store the graph data as neighbourship relationships in each MEP system element, for instance in a shared parameter.
+- Store the entire graph data in one single JSON structure, for instance on each MEP system base equipment element.
+
+These options can obviously be combined, and even all implemented at once.
+
+Probaly, the easiest way to transport the data from the BIM to the Forge platform will be to store it in shared parameter data on Revit elements.
+
+Then it will be automatically included and handled by the standard Forge translation process for Revit RVT files.
+
+
 
 #### <a name="6"></a>Thanks to Mustafa Salaheldin
 
@@ -234,7 +253,7 @@ One last important point before closing.
 
 In the past weeks,
 [Mustafa Salaheldin](http://forums.autodesk.com/t5/user/viewprofilepage/user-id/1227311) has answered more cases on
-the [Revit API forum](http://forums.autodesk.com/t5/revit-api/bd-p/160) than any other person before him ever was able to in the past:
+the [Revit API forum](http://forums.autodesk.com/t5/revit-api/bd-p/160) than any other person before him ever was able to do in the past:
 
 <center>
 <img src="img/mustafa_salaheldin_ranking_2.png" alt="Mustafa Salaheldin ranking" width="231">
