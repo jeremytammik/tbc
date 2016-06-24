@@ -9,7 +9,16 @@
 
 MEP System Structure in Hierarchical JSON Graph #revitapi #3dwebcoder @AutodeskForge #ForgeDevCon #3dwebaccel
 
-&ndash; ...
+Yesterday, I presented the new TraverseAllSystems add-in to traverse all MEP system graphs and export their connected hierarchical structure to JSON and XML that I am helping the USC team with here at the San Francisco cloud accelerator. I continued with that today, and also integrated a minor enhancement to RevitLookup
+&ndash; TraverseAllSystems updates
+&ndash; Shared parameter creation
+&ndash; Options
+&ndash; Bottom-up JSON structure
+&ndash; Top-down JSON structure
+&ndash; TraversalTree JSON output generator
+&ndash; TreeNode JSON output generator
+&ndash; Download and to do
+&ndash; RevitLookup updates...
 
 -->
 
@@ -17,7 +26,7 @@ MEP System Structure in Hierarchical JSON Graph #revitapi #3dwebcoder @AutodeskF
 
 Yesterday, I presented the
 new [TraverseAllSystems](https://github.com/jeremytammik/TraverseAllSystems) add-in
-to [traverse all MEP system graphs]() and
+to [traverse all MEP system graphs](http://thebuildingcoder.typepad.com/blog/2016/06/traversing-and-exporting-all-mep-system-graphs.html) and
 export their connected hierarchical structure to JSON and XML that I am helping
 the [USC](http://www.usc.edu) team with here at the San Francisco cloud accelerator.
 
