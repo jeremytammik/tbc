@@ -231,7 +231,7 @@ The next step will be to implement a Forge viewer extension displaying a custom 
 
 We also need to figgure out how to transport the graph information from the Revit add-in to the Forge viewer.
 
-Presumably, we will encode it in JSON instead of XML, to start with, to make it easier to handle directly in JavaScript.
+Presumably, we will encode it in JSON instead of XML, to start with, to make it easier to handle directly in JavaScript, e.g. by implementing a viewer extension making use of [jstree](https://www.jstree.com/docs/json) to interact with the graph.
 
 Here are some of the storage options:
 
