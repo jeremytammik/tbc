@@ -508,6 +508,13 @@ by [awmcc90](https://github.com/awmcc90)
 and [Shayne Hamel](https://github.com/Shayneham)
 to handle exceptions snooping MEP elements, electrical circuits, flex ducts and flex pipes.
 
+Here are the diffs:
+
+- [2017.0.0.5](https://github.com/jeremytammik/RevitLookup/compare/2017.0.0.4...2017.0.0.5) &ndash;
+merged pull request #14 by Shayneham to handle exceptions snooping flex pipe and duct lacking levels etc.
+- [2017.0.0.4](https://github.com/jeremytammik/RevitLookup/compare/2017.0.0.3...2017.0.0.4) &ndash;
+merged pull request #13 by awmcc90 to skip mepSys.Elements for OST_ElectricalInternalCircuits category
+
 Thank you very much for those improvements!
 
 If you run into any issues with RevitLookup, please fork the repository, implement and test your changes, and issue a pull request for me to integrate them back into the master branch.
