@@ -517,7 +517,6 @@ merged pull request #13 by awmcc90 to skip mepSys.Elements for OST_ElectricalInt
 
 Thank you very much for those improvements!
 
-If you run into any issues with RevitLookup, please fork the repository, implement and test your changes, and issue a pull request for me to integrate them back into the master branch.
+If you run into any issues with RevitLookup yourself, please fork the repository, implement and test your changes, and issue a pull request for me to integrate them back into the master branch.
 
 Thank you!
-
