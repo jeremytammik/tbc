@@ -7,7 +7,7 @@
 
 <!---
 
-MEP System Structure in Hierarchical JSON Graph #revitapi #3dwebcoder @AutodeskForge #ForgeDevCon #3dwebaccel
+ #revitapi #3dwebcoder @AutodeskForge #ForgeDevCon #3dwebaccel
 
 &ndash; ...
 
@@ -17,105 +17,72 @@ MEP System Structure in Hierarchical JSON Graph #revitapi #3dwebcoder @AutodeskF
 
 I am back in Switzerland again and glad to be here.
 
-I returned from the Forge DevCon developer conference and cloud accelerator in San Francisco via Vancouver, saving a little on airfare costs and enabling me to visit my son Christopher living there.
-
-I was very busy all the time, though, rounding off the ... and working on an update of the ADN JSON mesh exporter.
-
-
-<pre class="prettyprint">
-[core]
-  repositoryformatversion = 0
-  filemode = true
-  bare = false
-  logallrefupdates = true
-  symlinks = false
-  ignorecase = true
-  precomposeunicode = true
-[remote "origin"]
-  url = https://github.com/jeremytammik/TraverseAllSystems
-  fetch = +refs/heads/*:refs/remotes/origin/*
-  push = +refs/heads/master:refs/heads/gh-pages
-  push = +refs/heads/master:refs/heads/master
-[branch "master"]
-  remote = origin
-  merge = refs/heads/master
-</pre>at the result of running the add-in in the UCS sample model and `rme_advanced_sample_model.rvt`.
-
-Look
-
-new [TraverseAllSystems](https://github.com/jeremytammik/TraverseAllSystems) add-in
-to [traverse all MEP system graphs](http://thebuildingcoder.typepad.com/blog/2016/06/traversing-and-exporting-all-mep-system-graphs.html) and
-export their connected hierarchical structure to JSON and XML that I am helping
-the [USC](http://www.usc.edu) team with here at the San Francisco cloud accelerator.
+I returned from the Forge DevCon developer conference and cloud accelerator in San Francisco via Vancouver, saving a little on airfare costs and enabling me to visit my son Christopher living there:
 
 <center>
-<img src="img/2016-06_sf_accelerator.jpg" alt="San Francisco cloud accelerator" width="400">
+<a data-flickr-embed="true"  href="https://www.flickr.com/photos/jeremytammik/albums/72157670359072255" title="Vancouver"><img src="https://c8.staticflickr.com/8/7554/27886955751_5bda328ae8_n.jpg" width="320" height="240" alt="Vancouver"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
 </center>
 
-I continued with that today, and also integrated a minor enhancement to RevitLookup:
+I was busy during the trip, rounding off the hierarchical MEP system exporter to the Forge viewer, working on an update of the ADN JSON mesh exporter, and, last but not least, helping Christopher getting started with C# scripting to drive audio effects for professional spatialised sound design for computer games:
 
-- [TraverseAllSystems updates](#1)
-- [Shared parameter creation](#2)
-- [Options](#3)
-- [Bottom-up JSON structure](#4)
-- [Top-down JSON structure](#5)
-- [TraversalTree JSON output generator](#6)
-- [TreeNode JSON output generator](#7)
-- [Download and to do](#8)
-- [RevitLookup updates](#9)
+- [More TraverseAllSystems updates](#2)
+- [CustomExporterAdnMeshJson updates](#3)
+- [Options to view RVT in WebGL](#4)
+- [Getting started with Unity C# scripting](#5)
 
 
-#### <a name="1"></a>TraverseAllSystems Updates
+#### <a name="2"></a>More TraverseAllSystems Updates
+
+At the San Francisco cloud accelerator, I started working on
+the [TraverseAllSystems](https://github.com/jeremytammik/TraverseAllSystems) add-in
+to [traverse all MEP system graphs](http://thebuildingcoder.typepad.com/blog/2016/06/traversing-and-exporting-all-mep-system-graphs.html) and
+export their connected hierarchical structure XML and
+a [top-down JSON graph](http://thebuildingcoder.typepad.com/blog/2016/06/store-mep-systems-in-hierarchical-json-graph.html) for
+the [University of Southern California](http://www.usc.edu)
+[Facilities Management](http://facilities.usc.edu)
+[CAD Services](http://facilities.usc.edu/multisidebar_sublinks.asp?ItemID=236) team.
+
+Here is a picture from the last day of [Forge Cloud Accelerator](http://autodeskcloudaccelerator.com) of
+the entire team with me in the background, Cyrille Fauvel, Shiya Luo, Adam Nagy, and Philippe Leefsma:
+
+<center>
+<img src="img/2016-06-23_forge_accelerator_participants.jpg" alt="San Francisco cloud accelerator participants" width="500">
+</center>
 
 The aim of the TraverseAllSystems project is to present the MEP system graphs in a separate tree view panel integrated in
 the [Forge viewer](https://developer.autodesk.com/en/docs/viewer/v2/overview) and
 hook up the tree view nodes bi-directionally with the 2D and 3D viewer elements.
 
-To achieve that, I implemented a couple of significant enhancements over the simple XML file storage:
+With the newest enhancements, it provides the following functionality:
 
-- Store the MEP system graph structure in JSON instead of XML
+- Store the MEP system graph structure in JSON
 - Implement both bottom-up and top-down storage according to
 the [jsTree JSON spec](https://www.jstree.com/docs/json).
 - Support both element id and UniqueId node identifiers.
 - Store the JSON output in a shared parameter attached to the MEP system element,
 so that it is automatically included in the Forge SVF translation generated from the RVT input file.
-
-Here is a list of the update releases so far:
-
-- [2017.0.0.2](https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.2) &ndash; implemented visited element dictionary to prevent infinite recursion loop
-- [2017.0.0.3](https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.3) &ndash; implemented DumpToJson
-- [2017.0.0.4](https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.4) &ndash; implemented shared parameter creation
-- [2017.0.0.5](https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.5) &ndash; implemented shared parameter value population, tested and verified graph structure json is written out
-- [2017.0.0.6](https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.6) &ndash; renamed json text field to name
-- [2017.0.0.7](https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.7) &ndash; implemented top-down json graph storage
-- [2017.0.0.8](https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.8) &ndash; automatically create shared parameter, eliminated separate command, wrap json strings in double quotes, validated json output
-
-#### <a name="2"></a>
+- Store the entire JSON graph for all systems on the project info singleton element in the RVT file instead of separate subgraphs on each individual system
+-
 
 
-<pre class="prettyprint">
-</pre>
+Here is a detailed list of the newest enhancements:
 
-#### <a name="6"></a>
+2017.0.0.10 &ndash; implemented jstree test file and verified proper tree population
+2017.0.0.11 &ndash; implemented test page in gh-pages and test link to it, split out test treedata into separate json file
+2017.0.0.12 &ndash; added json sample data from rme_advanced_sample_model
+2017.0.0.13 &ndash; removed duplicate root id -1
+2017.0.0.14 &ndash; store entire json graph for all systems on project info instead of separate subgraph on each individual system
+2017.0.0.15 &ndash; before integrating pull request #1 from @ChengZY
+2017.0.0.16 &ndash; integrated pull request #1 by @ChengZY
+2017.0.0.17 &ndash; split into three domain specific subgraphs and add full element description
+2017.0.0.18 &ndash; removed redundant top-level nodes and used hash code to generate unique jstree ids for top-level project, mechanical, electrical and piping nodes
 
-
-<pre class="code">
-</pre>
-
-
-#### <a name="8"></a>Download and To Do
 
 The current state of this project is available from
 the [TraverseAllSystems GitHub repository](https://github.com/jeremytammik/TraverseAllSystems), and the version discussed above
 is [release 2017.0.0.9](https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.9).
 
 The next step will consist of the Forge viewer extension implementation displaying a custom panel in the user interface hosting a tree view of the MEP system graphs and implementing two-way linking and selection functionality back and forth between the tree view nodes and the 2D and 3D viewer elements.
-
-List of releases:
-
-
-store entire json graph for all systems on project info instead of separate subgraph on each individual system
-
 
 Do the Elements and ComnnectorManager properties return all system elements?
 
@@ -133,8 +100,20 @@ https://github.com/kevinscake/usc-forge/
   https://docs.google.com/document/d/1nWrnWucfnIahIosIFKagMYlkjITldb3lZ7NF_IUAlSU/edit?usp=sharing_eid&invite=CIS997cK&ts=57684551
 
 
+One of the main new features is the online jsTree test page, hosted by gh-pages at
 
-#### <a name="6"></a>Unity Scripting and C# Events
+There is currently one manual step involved in generating the jsTree test: I copy the JOSN graph string from the Visual Studio debug output window to the respective JSON sounrce files in the test subfolder. That could also easily be automated, but for now, I will leave it as it is.
+
+
+#### <a name="3"></a>CustomExporterAdnMeshJson Updates
+
+/a/doc/revit/tbc/git/a/img/custom_exporter_adn_mesh_json_crash.jpg
+
+/a/doc/revit/tbc/git/a/img/custom_exporter_adn_mesh_json_crash_2.jpg
+
+#### <a name="4"></a>Options to view RVT in WebGL
+
+#### <a name="5"></a>Unity Scripting and C# Events
 
 My son [Christopher](http://tammik.ca) is learning C# for Unity scripting to implement his own personal sound design toolbelt within that framework.
 
@@ -161,95 +140,12 @@ For that events, the Unity discussion on [using C# events with Unity](http://for
 
 
 
-2017.0.0.18
-@jeremytammik jeremytammik released this 15 hours ago
-
-removed redundant top-level nodes and used hash code to generate unique jstree ids for top-level project, mechanical, electrical and piping nodes
-Downloads
-Source code (zip)
-Source code (tar.gz)
- 2017.0.0.17
- 8a5e076
-Edit
-2017.0.0.17
-@jeremytammik jeremytammik released this 2 days ago · 1 commit to master since this release
-
-split into three domain specific subgraphs and add full element description
-Downloads
-Source code (zip)
-Source code (tar.gz)
- 2017.0.0.16
- ab1bd77
-Edit
-2017.0.0.16
-@jeremytammik jeremytammik released this 4 days ago · 6 commits to master since this release
-
-integrated pull request #1 by @ChengZY
-Downloads
-Source code (zip)
-Source code (tar.gz)
- 2017.0.0.15
- f312ebe
-Edit
-2017.0.0.15
-@jeremytammik jeremytammik released this 4 days ago · 11 commits to master since this release
-
-before integrating changes from ziyu
-Downloads
-Source code (zip)
-Source code (tar.gz)
- 2017.0.0.14
- 6a4949b
-Edit
-2017.0.0.14
-@jeremytammik jeremytammik released this 4 days ago · 13 commits to master since this release
-
-store entire json graph for all systems on project info instead of separate subgraph on each individual system
-Downloads
-Source code (zip)
-Source code (tar.gz)
- 2017.0.0.13
- 5adb06b
-Edit
-2017.0.0.13
-@jeremytammik jeremytammik released this 4 days ago · 16 commits to master since this release
-
-removed duplicate root id -1
-Downloads
-Source code (zip)
-Source code (tar.gz)
- 2017.0.0.12
- 48ae4a2
-Edit
-2017.0.0.12
-@jeremytammik jeremytammik released this 4 days ago · 17 commits to master since this release
-
-added json sample data from rme_advanced_sample_model
-Downloads
-Source code (zip)
-Source code (tar.gz)
- 2017.0.0.11
- 875799e
-Edit
-2017.0.0.11
-@jeremytammik jeremytammik released this 4 days ago · 21 commits to master since this release
-
-implemented test page in gh-pages and test link to it, split out test treedata into separate json file
-Downloads
-Source code (zip)
-Source code (tar.gz)
- 2017.0.0.10
- 084fb12
-Edit
-2017.0.0.10
-@jeremytammik jeremytammik released this 4 days ago · 24 commits to master since this release
-
-implemented jstree test file and verified proper tree population
 
 
+<pre class="prettyprint">
+</pre>
 
+#### <a name="6"></a>
 
-
-/a/doc/revit/tbc/git/a/img/custom_exporter_adn_mesh_json_crash.jpg
-
-/a/doc/revit/tbc/git/a/img/custom_exporter_adn_mesh_json_crash_2.jpg
+<pre class="code">
+</pre>
