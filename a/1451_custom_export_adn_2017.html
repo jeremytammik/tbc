@@ -1,0 +1,252 @@
+<p><head>
+<title>The Building Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true" defer="defer"></script>
+</head></p>
+<!---
+
+- Migrated CustomExporterAdnMeshJson from Revit 2014 to Revit 2017
+  https://github.com/jeremytammik/CustomExporterAdnMeshJson/releases/tag/2017.0.0.1
+  prompted by comments from Helen Huang
+
+Exporting RVT BIM to WebGL and Forge #revitapi #3dwebcoder @AutodeskForge #ForgeDevCon #3dwebaccel
+
+Exporting RVT #BIM to #JSON, #WebGL and @AutodeskForge #revitapi #3dwebcoder @AutodeskRevit #threejs
+
+
+I am happy to say that I returned safe and sound to Switzerland from my travels for the Forge DevCon and Cloud Accelerator. Since then, I rounded off the hierarchical MEP system exporter to a JSON graph for interaction with it in the Forge viewer, worked on an update of the ADN JSON mesh exporter and helped my son Christopher getting started with C# scripting to drive audio effects for professional spatialized sound design for computer games
+&ndash; More TraverseAllSystems updates
+&ndash; CustomExporterAdnMeshJson updates
+&ndash; ADN JSON Exporter Alternatives to View RVT in WebGL
+&ndash; vA3C
+&ndash; The Forge Viewer
+&ndash; Getting started with Unity C# scripting
+&ndash; Opendesk at Autodesk Forge Accelerator Barcelona...
+
+-->
+
+<h3>Exporting RVT BIM to JSON, WebGL and Forge</h3>
+<p>I am happy to say that I returned safe and sound to Switzerland from my long stay in San Francisco for
+the <a href="http://forge.autodesk.com/conference">Forge DevCon</a> developer conference
+and <a href="http://autodeskcloudaccelerator.com">Cloud Accelerator</a>.</p>
+<p>I travelled there via Vancouver, saving a little bit on airfare costs and enabling me to visit my son Christopher:</p>
+<p><center>
+<a data-flickr-embed="true"  href="https://www.flickr.com/photos/jeremytammik/albums/72157670359072255" title="Vancouver"><img src="https://c8.staticflickr.com/8/7554/27886955751_5bda328ae8_n.jpg" width="320" height="240" alt="Vancouver"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+</center></p>
+<p>During the trip back and since, I rounded off the hierarchical MEP system exporter to a JSON graph for interaction with it in
+the <a href="https://developer.autodesk.com/en/docs/viewer/v2/overview/">Forge viewer</a>,
+worked on an update of the ADN JSON mesh exporter, and, last but not least, helped my son Christopher getting started with C# scripting to drive audio effects for professional spatialized sound design for computer games:</p>
+<ul>
+<li><a href="#2">More TraverseAllSystems updates</a></li>
+<li><a href="#3">CustomExporterAdnMeshJson updates</a></li>
+<li><a href="#4">ADN JSON Exporter Alternatives to View RVT in WebGL</a><ul>
+<li><a href="#5">vA3C</a></li>
+<li><a href="#6">The Forge Viewer</a></li>
+</ul>
+</li>
+<li><a href="#7">Getting started with Unity C# scripting</a></li>
+<li><a href="#8">Opendesk at Autodesk Forge Accelerator Barcelona</a></li>
+</ul>
+<h4><a name="2"></a>More TraverseAllSystems Updates</h4>
+<p>At the San Francisco cloud accelerator, I started working on
+the <a href="https://github.com/jeremytammik/TraverseAllSystems">TraverseAllSystems</a> add-in
+to <a href="http://thebuildingcoder.typepad.com/blog/2016/06/traversing-and-exporting-all-mep-system-graphs.html">traverse all MEP system graphs</a> and
+export their connected hierarchical structure to XML files and
+a <a href="http://thebuildingcoder.typepad.com/blog/2016/06/store-mep-systems-in-hierarchical-json-graph.html">top-down JSON graph</a> for
+the <a href="http://www.usc.edu">University of Southern California</a>
+<a href="http://facilities.usc.edu">Facilities Management</a>
+<a href="http://facilities.usc.edu/multisidebar_sublinks.asp?ItemID=236">CAD Services</a> team.</p>
+<p>Here is a picture from the last day at
+the <a href="http://autodeskcloudaccelerator.com">Forge Cloud Accelerator</a> of
+the entire USC team, other accelerator participants, and, from the Autodesk side, me, Cyrille Fauvel, Augusto Gonçalves, Shiya Luo, Adam Nagy, Zhong John Wu, Xiaodong Liang and Philippe Leefsma:</p>
+<p><center>
+<img src="img/2016-06-23_forge_accelerator_participants.jpg" alt="San Francisco cloud accelerator participants" width="500">
+</center></p>
+<p>The aim of the TraverseAllSystems project is to present the MEP system graphs in a separate tree view panel integrated in
+the <a href="https://developer.autodesk.com/en/docs/viewer/v2/overview">Forge viewer</a> and
+hook up the tree view nodes bi-directionally with the 2D and 3D viewer elements.</p>
+<p>The <a href="http://thebuildingcoder.typepad.com/blog/2013/02/simple-mep-system-traversal.html">simple MEP system traversal</a> shows
+how to retrieve an unsorted list of system elements, if the connection graph is not needed.</p>
+<p>With the newest enhancements, TraverseAllSystems provides the following functionality:</p>
+<ul>
+<li>Store the MEP system graph structure in JSON.</li>
+<li>Implement both bottom-up and top-down storage according to
+the <a href="https://www.jstree.com/docs/json">jsTree JSON spec</a>.</li>
+<li>Support both element id and UniqueId node identifiers.</li>
+<li>Store the JSON output in a shared parameter attached to the MEP system element,
+so that it is automatically included in the Forge SVF translation generated from the RVT input file.</li>
+<li>Store the entire JSON graph for all systems on the project info singleton element in the RVT file instead of separate subgraphs on each individual system.</li>
+<li>Implement a <a href="https://jeremytammik.github.io/TraverseAllSystems/test">jsTree test page</a> on GitHub pages.</li>
+<li>Integrate <a href="https://github.com/jeremytammik/TraverseAllSystems/pull/1">pull request #1</a>
+from <a href="https://github.com/ChengZY">Ziyu Cheng</a> adding
+single level trees listing all elements of each system.</li>
+</ul>
+<p>One of the main new features is the gh-pages hosted online <a href="https://jeremytammik.github.io/TraverseAllSystems/test">jsTree test page</a>.</p>
+<p>There is currently one manual step involved in generating the jsTree test page: I copy the JOSN graph string from the Visual Studio debug output window to the respective JSON source files in the test subfolder. That could easily be automated, but for now, I will leave it as it is.</p>
+<p>Here is the detailed list of the newer releases:</p>
+<ul>
+<li><a href="https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.10">2017.0.0.10</a> &ndash; implemented jstree test file and verified proper tree population.</li>
+<li><a href="https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.11">2017.0.0.11</a> &ndash; implemented test page in gh-pages and test link to it, split out test treedata into separate json file.</li>
+<li><a href="https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.12">2017.0.0.12</a> &ndash; added json sample data from rme_advanced_sample_model.</li>
+<li><a href="https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.13">2017.0.0.13</a> &ndash; removed duplicate root id -1.</li>
+<li><a href="https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.14">2017.0.0.14</a> &ndash; store entire json graph for all systems on project info instead of separate subgraph on each individual system.</li>
+<li><a href="https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.15">2017.0.0.15</a> &ndash; before integrating pull request #1 from @ChengZY.</li>
+<li><a href="https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.16">2017.0.0.16</a> &ndash; integrated pull request #1 by @ChengZY.</li>
+<li><a href="https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.17">2017.0.0.17</a> &ndash; split into three domain specific subgraphs and add full element description.</li>
+<li><a href="https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.18">2017.0.0.18</a> &ndash; removed redundant top-level nodes and used hash code to generate unique jstree ids for top-level project, mechanical, electrical and piping nodes.</li>
+</ul>
+<p>The current state of this project is available from
+the <a href="https://github.com/jeremytammik/TraverseAllSystems">TraverseAllSystems GitHub repository</a>, and the version discussed above
+is <a href="https://github.com/jeremytammik/TraverseAllSystems/releases/tag/2017.0.0.18">release 2017.0.0.18</a>.</p>
+<p>As said, the next step will consist of the Forge viewer extension implementation displaying a custom panel in the user interface hosting a tree view of the MEP system graphs and implementing two-way linking and selection functionality back and forth between the tree view nodes and the 2D and 3D viewer elements.</p>
+<!--- Do the Elements and ComnnectorManager properties return all system elements?
+
+/a/src/forge/usc-forge/
+
+https://docs.google.com/document/d/1nWrnWucfnIahIosIFKagMYlkjITldb3lZ7NF_IUAlSU/edit?usp=sharing_eid&invite=CIS997cK&ts=57684551
+
+https://github.com/kevinscake/usc-forge/
+
+- usc fm project
+  https://miniruby.atlassian.net/secure/WelcomeToJIRA.jspa jeremy.tammik@autodesk.com qy
+  https://miniruby.atlassian.net/secure/RapidBoard.jspa?projectKey=FOR&useStoredSettings=true&rapidView=3
+  https://docs.google.com/document/d/1nWrnWucfnIahIosIFKagMYlkjITldb3lZ7NF_IUAlSU/edit?usp=sharing_eid&invite=CIS997cK&ts=57684551
+
+--->
+
+<h4><a name="3"></a>CustomExporterAdnMeshJson Updates</h4>
+<p>During the trip back to Europe, I had an extensive correspondence with Helen Huang via a series of comments
+on <a href="http://thebuildingcoder.typepad.com">The Building Coder</a> discussion
+on the <a href="http://thebuildingcoder.typepad.com/blog/2013/07/adn-mesh-data-custom-exporter-to-json.html">ADN Mesh Data Custom Exporter to JSON</a>:</p>
+<p><strong>Question:</strong> I tried to use the code to export the Revit sample project to JSON.</p>
+<p>However, I got a 'cannot divide by zero' exception in the <code>CustomerExporter.Export</code> function.</p>
+<p>My Revit version is 2016.</p>
+<p>I wonder if you have a version of the JSON Exporter that works with this version of Revit.</p>
+<p>Much thanks for your help!</p>
+<p><strong>Answer:</strong> I no longer have Revit 2016 installed, so I cannot say.</p>
+<p>I am sure you will be able to find one.</p>
+<p>I do not think that the version of JSON library has any effect on the custom exporter.</p>
+<p>Good luck!</p>
+<p><strong>Question:</strong> I wonder if you can also help me to understand the meaning of NormalIndices in your example.
+Not sure why all vertices are repeated three times here... Much thanks for your help!</p>
+<pre>
+  "NormalIndices":[0,0,0, 1,1,1, 2,2,2, 3,3,3]
+</pre>
+
+<p><strong>Answer:</strong> Yes, this is easy to explain, although it highlights a rather inefficient aspect of the data structure used in this sample.</p>
+<p>There are four triangles, each with three vertices, resulting in a total count of 12 vertices.</p>
+<p>Hence the 12 numbers in the list of normal indices.</p>
+<p>Each one of these is an index into the list of normals.</p>
+<p><code>Normals</code> defines coordinates for four normal vectors, one for each triangle, hence the values of these 12 numbers range from 0 to 3.</p>
+<p>Each group of 3 numbers specifies the normal vector for three triangle vertices.</p>
+<p>Each triangle has the same normal vector at each of its corners, so each number repeats three times.</p>
+<p>The result is flat triangles, with sharp corners between each of them.</p>
+<p>I hope this clarifies.</p>
+<p><strong>Response:</strong>
+I can upgrade to Revit 2017 if that is the one you are using. Let me try the exporter again with Revit 2017 and see if it works. Thanks!</p>
+<p><strong>Answer:</strong> I created
+a <a href="https://github.com/jeremytammik/CustomExporterAdnMeshJson">GitHub repository for the CustomExporterAdnMeshJson project</a>,
+<a href="https://github.com/jeremytammik/CustomExporterAdnMeshJson/releases/tag/2017.0.0.0">migrated the code to Revit 2017</a> for
+you, and performed a successful test using <a href="https://github.com/jeremytammik/CustomExporterAdnMeshJson/releases/tag/2017.0.0.1">version 2017.0.0.1</a>.</p>
+<p><strong>Response:</strong> I tried the new code with Revit 2017, unfortunately I still got the same exception. I took a couple of screenshots for you. Can you please take a look and see what might be wrong? Also, I wonder if you can share the source code of the exporter. I will be able to step through the code find out more information for you to debug that way.</p>
+<p>By the way my Revit 2017 is a trial version. Do you think it matters?</p>
+<p>The following are the steps to reproduce. Hope they are helpful.</p>
+<ul>
+<li>Build latest code</li>
+<li>Run Revit 2017, open the rac_basic_sample_project in 3D view. Select one object, like the roof, and click the add in, and the exception will be thrown. I tried selection multiple objects, and also not selecting any objects before trying the exporter, but all ends up with the same exception.</li>
+</ul>
+<p>Much thanks again for your help!</p>
+<p><strong>Answer:</strong> Thank you very much for your testing and pointing this out.</p>
+<p>No, I do not have access to the source code of the exporter, so I cannot provide that.</p>
+<p>Yes, I can reproduce what you describe:</p>
+<p><center>
+<img src="img/custom_exporter_adn_mesh_json_crash_3.png" alt="Custom JSON exporter exception" width="500">
+</center></p>
+<p>I removed the some of the calls to throw an exception in the custom export context class, but I still see the following lines logged in the Visual Studio debug output window just before and after the export context Finish method is called:</p>
+<pre>
+  InstanceEnd
+  ElementEnd
+  ElementBegin id 423099
+  ElementEnd
+  Exception thrown: 'Autodesk.Revit.Exceptions.ArgumentException' in RevitAPI.dll
+  Finish
+  Exception thrown: 'Autodesk.Revit.Exceptions.ExternalApplicationException' in RevitAPI.dll
+</pre>
+
+<p>Sorry, I cannot explore this further myself, so I raised the issue <i><b>REVIT-94525</b> CustomExporter throws ExternalApplicationException after call to Finish</i> with the development team for them to analyse in more depth.</p>
+<p>I hope there is a simple solution to this.</p>
+<p>Later: Unexpected good news: wrap the call to exporter.Export in an exception handler and all is well,
+cf. <a href="https://github.com/jeremytammik/CustomExporterAdnMeshJson/releases/tag/2017.0.0.3">release 2017.0.0.3</a>.</p>
+<p>I rather suspect that this add-in code is flawed in some manner, though.</p>
+<p>I hope the devteam will clarify based on the exploration of REVIT-94525.</p>
+<p>Meanwhile, you have a stop-gap solution.</p>
+<p><strong>Response:</strong> Thank Jeremy for your quick response. Can you please let me know how to follow up the issue that you have opened, REVIT-94525?</p>
+<p><strong>Answer:</strong> All you can do about an internal development issue is wait, and prompt me or one of my colleagues for an update status when you feel you have waited long enough. The best channel for such a prompt is the <a href="http://forums.autodesk.com/t5/Revit-API/bd-p/160">Revit API discussion forum</a>, since that is monitored by the entire developer support team.</p>
+<p>Sorry, that we cannot provide an externally accessible online access to the development database.</p>
+<h4><a name="4"></a>ADN JSON Exporter Alternatives to View RVT in WebGL</h4>
+<p><strong>Response:</strong> Thanks a lot for your time and effort. I tried your latest code, revision 2017.0.0.3, and was able to export the model finally. However, it does not seem right after I loaded it with the json/webgl viewer mentioned on this blog. Some of the components of the building are missing. I guess these components could be the ones that have caused the exceptions that we have seen before.</p>
+<p>I also looked at the exported json model, and found it does not contain the information on materials and textures...
+I wonder if you have another exporter which does export this information, along with the faces, indices and normals?
+It does not have to use this particular json format...</p>
+<p>Our goal is to export the Revit model and show it in webgl, and hopefully, when a user clicks any component
+of the model in the web browser, we shall be able to display more information for that component, like the component's name and id... I guess we might have to come up with our own exporter at some point. but can you please point us to some good examples to get started...</p>
+<p>Really appreciate your help!</p>
+<p><strong>Answer:</strong> Thank you for your appreciation and extremely sensible question.</p>
+<p>I was planning to get to that as well, to ask you what your final goal actually is.</p>
+<p>This sample is really targeted at just demonstrating the Revit custom exporter and the custom ADN JSON format.</p>
+<p>For real-world use, however, forget it.</p>
+<p>Happily, there are lots of alternatives.</p>
+<p>The two alternatives of choice would be <a href="#5">vA3C</a> and the <a href="#6">Forge Viewer</a>.</p>
+<h4><a name="5"></a>vA3C</h4>
+<p><a href="https://va3c.github.io">vA3C</a> is an open-source WebGL AEC viewer, complete with a C# .NET Revit API add-in exporter. The advantage of this one is that it is completely open source, also based on the custom exporter, this time exporting the complete model to the
+standard <a href="http://threejs.org">three.js WebGL format</a>.
+Its disadvantages: lack of support for materials and textures, does not perform well for really large models.</p>
+<h4><a name="6"></a>The Forge Viewer</h4>
+<p>The <a href="https://developer-autodesk.github.io">Forge Viewer</a> is
+an important part of the official Autodesk Forge platform with full support for materials, textures, and really large models. In fact, it used to be nicknamed LMV for large model viewer.</p>
+<p>The Forge viewer is completely open source and also based on three.js WebGL. It consumes a JSON stream in a format named <code>SVF</code>.
+The Forge platform supports translation of over 60 CAD seed file formats to SVF, so you can display and interactively manipulate views coming from  basically any standard CAD format.</p>
+<p>The translation process is not open source and happens on Autodesk servers.</p>
+<p>All use of the entire Forge platform is completely free for all research and software development. Customers can use it for free up to a certain limit. The exact limit is currently in the process of being defined, and until September 15 absolutely all usage of Forge is completely free.</p>
+<p>Probably, the Forge viewer is the most promising possibility for you to explore further.</p>
+<p>For more information, please refer to:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/05/rvtva3c-revit-va3c-generic-aec-viewer-json-export.html">vA3C</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.1">Custom exporter</a></li>
+<li><a href="https://developer.autodesk.com">Forge Platform API</a></li>
+<li><a href="http://forge.autodesk.com">Forge</a></li>
+</ul>
+<p>For more information on samples connecting Revit models with Forge, please refer to my recent presentation
+on <a href="http://thebuildingcoder.typepad.com/blog/2016/06/free-your-bim-data-and-roomedit3d-thee-legged-forge-oauth.html">Freeing your BIM data</a>.</p>
+<p>I also implemented a number of earlier samples on connecting the desktop and the cloud, e.g., RoomEditorApp, FireRatingCloud and Roomedit3d, all available from GitHub and extensively documented by The Building Coder.</p>
+<h4><a name="7"></a>Unity Scripting and C# Events</h4>
+<p>My son <a href="http://tammik.ca">Christopher</a> is a professional independent sound designer specialising in audio games and now learning C# for Unity scripting to implement his own personal sound design toolbelt within that framework.</p>
+<p>I am very impressed by the super powerful, clean, effective C# Unity API, and by the rapid progress he is making with it.</p>
+<p>For instance, he is implementing his own events using delegates, dictionaries, abstract base classes, timers, separate threads, called co-routines in Unity &ndash; impressive stuff for just a couple of days of coding.</p>
+<p>For the delegate implementation, the Unity discussion on <a href="http://forum.unity3d.com/threads/using-c-events-with-unity.58367">using C# events with Unity</a> helped, especially the contribution by DifficultMass, supplying these lines of code:</p>
+<pre class="code">
+  class EventTriggerer
+  {
+    public event EventHandler OurEvent;
+
+    public void TriggerEvent()
+    {
+      if(OurEvent != null)
+      {
+        OurEvent();
+      }
+    }
+  }
+</pre>
+
+<p>Here is an early snapshot of the project as WIP:</p>
+<p><center>
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">I have been working on this <a href="https://twitter.com/hashtag/gameaudio?src=hash">#gameaudio</a> script for <a href="https://twitter.com/unity3d">@unity3d</a> over the weekend. Loads more ideas I want to add... <a href="https://twitter.com/hashtag/VR?src=hash">#VR</a> <a href="https://t.co/07ezzqcgKT">pic.twitter.com/07ezzqcgKT</a></p>&mdash; Chris Tammik (@chtammik) <a href="https://twitter.com/chtammik/status/747289609973862404">June 27, 2016</a></blockquote>
+<script async src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</center></p>
+<h4><a name="8"></a>Opendesk at Autodesk Forge Accelerator Barcelona</h4>
+<p>For some background info on Forge and the
+recent <a href="http://autodeskcloudaccelerator.com">Forge accelerator</a> in
+Barcelona, here is feedback from one of the participating
+companies, <a href="https://www.opendesk.cc/blog/opendesk-at-autodesk">Opendesk at the Forge Accelerator</a>.</p>
