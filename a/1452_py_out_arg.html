@@ -1,0 +1,67 @@
+<p><head>
+<title>The Building Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true" defer="defer"></script>
+</head></p>
+<!---
+
+- 10536988 [Door/Window Areas]
+  http://forums.autodesk.com/t5/revit-api/door-window-areas/m-p/5535565
+  out param in python
+  http://stackoverflow.com/questions/2857287/writing-iron-python-method-with-ref-or-out-parameter
+
+- beyond bending: ETH zurich erects sandstone vault at venice architecture biennale
+  http://www.designboom.com/architecture/venice-architecture-biennale-beyond-bending-eth-zurich-block-research-group-05-26-2016/
+
+Retrieving a C# `out` Argument Value in #Python #revitapi #3dwebcoder @AutodeskRevit #dynamobim
+
+Here is a short note on two interesting little items that just cropped up
+&ndash; Retrieving a C# <code>out</code> argument value in Python
+&ndash; ETH Zurich Sandstone Vault at the Venice Architecture Biennale...
+
+-->
+
+<h3>Retrieving a C# <code>out</code> Argument Value in Python</h3>
+<p>Here is a short note on two interesting little items that just cropped up:</p>
+<ul>
+<li><a href="#2">Retrieving a C# <code>out</code> argument value in Python</a></li>
+<li><a href="#3">ETH Zurich Sandstone Vault at the Venice Architecture Biennale</a></li>
+</ul>
+<h4><a name="2"></a>Retrieving a C# <code>out</code> Argument Value in Python</h4>
+<p>This issue was raised and solved by Peter aka KOP in
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> thread
+on <a href="http://forums.autodesk.com/t5/revit-api/door-window-areas/m-p/5535565">door and window areas</a>:</p>
+<p><strong>Question:</strong> I understand that this code returns the curve loop of a cutout:</p>
+<pre class="prettyprint">
+  curveLoop = I.ExporterIFCUtils
+    .GetInstanceCutoutFromWall(
+      doc, wall, familyInstance, out basisY );
+</pre>
+
+<p>unfortunately, i am trying to achieve the result from the python side.</p>
+<p>my efforts end in errors for the <code>out basisY</code>.</p>
+<p>as my coding skills are still limited, can anyone help me out on this?</p>
+<p><strong>Answer:</strong> Issue is solved for the Python code required.</p>
+<p>my solution went like:</p>
+<pre class="prettyprint">
+  for i in openingIds:
+    try:
+      bounding, orient = I.ExporterIFCUtils.GetInstanceCutoutFromWall(doc, element, doc.GetElement(i),)
+      print "success"
+    except:
+      print (" failed for wall %s and opening %s" %(element.Id, i))
+</pre>
+
+<p>Many thanks to Peter for sharing this useful result.</p>
+<p>By the way, here is another explanation of writing
+an <a href="http://stackoverflow.com/questions/2857287/writing-iron-python-method-with-ref-or-out-parameter">IronPython method with <code>ref</code> or <code>out</code> parameter</a>,
+not related to Revit.</p>
+<h4><a name="3"></a>ETH Zurich Sandstone Vault at the Venice Architecture Biennale</h4>
+<p>I recently mentioned
+my <a href="http://thebuildingcoder.typepad.com/blog/2016/03/adn-becomes-forge-and-barcelona-accelerator.html#4">visit to the Block Research Group at ETHZ</a> and
+the fascinating architectural research they are practicing there, on building extremely efficient material-saving vaults.</p>
+<p>Now they are <a href="http://www.designboom.com/architecture/venice-architecture-biennale-beyond-bending-eth-zurich-block-research-group-05-26-2016">exhibiting custom beautiful vaults at the Venice Architecture Biennale</a>:</p>
+<p><center>
+<img src="img/brg_venice_2016_960x540.jpg" alt="BRG at the Venice Architecture Biennale 2016" width="480">
+</center></p>
