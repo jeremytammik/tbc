@@ -33,7 +33,7 @@ I am happy to say that I returned safe and sound to Switzerland from my long sta
 the [Forge DevCon](http://forge.autodesk.com/conference) developer conference
 and [Cloud Accelerator](http://autodeskcloudaccelerator.com).
 
-I travelled there via Vancouver, saving a little bit on airfare costs and enabling me to visit my son Christopher:
+I travelled there via Vancouver, paradoxically saving a little bit on airfare costs and enabling me to visit my son Christopher:
 
 <center>
 <a data-flickr-embed="true"  href="https://www.flickr.com/photos/jeremytammik/albums/72157670359072255" title="Vancouver"><img src="https://c8.staticflickr.com/8/7554/27886955751_5bda328ae8_n.jpg" width="320" height="240" alt="Vancouver"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
@@ -41,7 +41,7 @@ I travelled there via Vancouver, saving a little bit on airfare costs and enabli
 
 During the trip back and since, I rounded off the hierarchical MEP system exporter to a JSON graph for interaction with it in
 the [Forge viewer](https://developer.autodesk.com/en/docs/viewer/v2/overview/),
-worked on an update of the ADN JSON mesh exporter, and, last but not least, helped my son Christopher getting started with C# scripting to drive audio effects for professional spatialized sound design for computer games:
+worked on an update of the ADN JSON mesh exporter, and, last but not least, helped Christopher getting started with C# scripting to drive audio effects for professional spatialized sound design in Unity computer games:
 
 - [More TraverseAllSystems updates](#2)
 - [CustomExporterAdnMeshJson updates](#3)
