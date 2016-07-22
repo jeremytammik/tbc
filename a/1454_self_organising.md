@@ -7,6 +7,10 @@
 
 <!---
 
+- uni augsburg q&a
+  /a/special/uni_augsburg/email01.txt
+  /a/special/uni_augsburg/2016-07-05_notes_jeremy_phil_simon_manuel_sarah.pdf
+  
 Self-Organising Architecture, Voxel-Based Energy Analysis #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #ForgeDevCon
 
 I had an interesting chat last week with a group of students from the University of Augsburg on how to perform energy analysis on a bunch of autonomously assembled small building blocks, such as a colony of ants might put together. How can the resulting small building blocks be converted to a valid Revit BIM that can be used for building performance analysis? 
@@ -45,6 +49,7 @@ the Autodesk Building Performance Analysis blog migrated to a new platform:
 
 <center>
 [blogs.autodesk.com/insight360](http://blogs.autodesk.com/insight360)
+<br/>
 </center>
 
 
@@ -54,8 +59,6 @@ The Augsburg university has the only chair in Germany researching Self-Organisin
 
 They are also hosting the [SASO 2016 conference](https://saso2016.informatik.uni-augsburg.de),
 the 10th IEEE International Conference on Self-Adaptive and Self-Organizing Systems, University of Augsburg, Germany, September 12-16 2016.
-
-
 
 
 #### <a name="4"></a>Back to the Ants &ndash; Project Summary
@@ -75,7 +78,6 @@ That sounds pretty exciting to me.
 <center>
 <img src="img/ant.jpg" alt="Ant" width="246">
 </center>
-
 
 
 #### <a name="5"></a>Q &amp; A
@@ -109,7 +111,6 @@ Here are the notes from the Q &amp; A session we had in the conversation between
     - Open.
 
 
-
 #### <a name="6"></a>Two Different Energy Model Types
 
 This question has come up repeatedly in the past, so it is worthwhile pointing out again.
@@ -132,4 +133,3 @@ to [What's New in the Revit 2016 API](http://thebuildingcoder.typepad.com/blog/2
 
 - SpatialElement &ndash; Energy model based on rooms or spaces. This is the default for calls when this option is not set, and matches the behaviour prior to Revit 2016.
 - BuildingElement &ndash; Energy model based on analysis of building element volumes.
-
