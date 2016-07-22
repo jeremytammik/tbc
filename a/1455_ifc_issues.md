@@ -253,3 +253,15 @@ This might be true at this point in time, but I would hope it might change at so
 To reply to the original question, Geometry Gym offers a 3rd party importer that does generate families and create parameters based on types in `IfcProject` and `IfcProjectLibrary`, cf. [Geometry Gym &gt; Revit](http://geometrygym.blogspot.com.au/search/label/Revit). This is primarily from the user interface, however if you require from the API then I can refactor the method slightly and provide it as a public method in the DLL.  An alternative would be to edit the open source importer and make it recognize these IFC concepts.
  
 Many thanks to Jon for his in-depth knowledge and explanation!
+
+
+#### <a name="7"></a>IFC Family Support Discussion Links
+
+Ryan Schulz points out a number of additional interesting discussions on the topic in
+his [comment below](http://thebuildingcoder.typepad.com/blog/2016/07/ifc-import-and-open-source.html#comment-2797771810):
+
+- [IFC for Revit &ndash; Support for Revit Groups?](https://sourceforge.net/p/ifcexporter/discussion/general/thread/fad5b2f8)
+- [BuildingSMART/mvdXML issue #3 &ndash; Possible to outline an MVD exchange requirement to address the concept of groups? ](https://github.com/BuildingSMART/mvdXML/issues/3)
+- [BuildingSMART/IFC4-CV issue #16 &ndash; Support for a One-to-Many (non-type) of Group](https://github.com/BuildingSMART/IFC4-CV/issues/16)
+- [FreeCAD &ndash; Convert IfcGroups into FreeCAD Compounds](http://forum.freecadweb.org/viewtopic.php?f=23&t=12131)
+- [IndustryFoundationClasses/Questions issue #3 &ndash; Suggested IFC Entity to save a Profile Type](https://github.com/IndustryFoundationClasses/Questions/issues/3)
