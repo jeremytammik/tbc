@@ -79,8 +79,34 @@ Please let him know if you have any feedback on it.
 
 Ever so many thanks to gtalarico for all his work and making this useful resource available to the global Revit API community!
 
+#### <a name="2.1"></a>Contributing and Implementation Details
 
+Gtalarico added some additional info on the project:
 
+The code is on github at [github.com/gtalarico/revitapidocs](https://github.com/gtalarico/revitapidocs).
+ 
+The project is definately open to collaborators. Welcome!
+
+It needs +code docs, +test coverage, and can probably be improved and optimized significantly by more seasoned web developers.
+
+Regarding github pages, it could probably be done, but I haven't used it myself, so I don't know the limitations.
+
+Here are some of the challenges and constraints:
+ 
+1. Namespace Menu:
+    - Each API/year has an index with around 20K nested entries, sometimes many levels deep.
+    Performance can get tricky, and so is creating a good and responsive UI for browsing it, which is why I wanted it  to be collapsible.
+    If I recall correctly, Readthedocs for instance, limits the depth of the menu.
+2. Content: 
+    - The content I had access to (.html files extracted from chm) were not pretty, so I had to do some unusual CSS overrides and eventually batch processed the 60k+ html files to remove unnecessary JS and html code to make the pages look good and perform well. I was also was concerned about appearance to google crawler (cleaned code, and added schema.org structured data on every page).
+3. Performance:
+    - The namespace html file alone was almost 3MB and 140K lines of html code, which is not good.
+    To optimize it, I am serving the menu asynchronously as json, so it loads while the rest of the content is being built, and can be cached.
+4. Built-in search:
+    - I originally tried using google custom search, but google can take a long time to index it (if it happens at all - 60k+ pages) 
+    Even with a full sitemap, it will probably just take time, but I didn't want to wait.
+    So I replaced the Google Custom Search box with my own custom search.
+    I tried a JS client side search, similar to what git pages has, but it was crashing the browser (remember namespace is +100K lines), so I ended up pushing it server side which makes it reasonably fast, e.g., [www.revitapidocs.com/2015/search?query=viewschedule](http://www.revitapidocs.com/2015/search?query=viewschedule).
 
 
 #### <a name="3"></a>2D Convex Hull Algorithm in C# using `XYZ`
@@ -94,7 +120,9 @@ that post and provided a convex hull implementation in C#.
 
 It is a 2D algorithm implementing the [Jarvis march or Gift wrapping algorithm](https://en.wikipedia.org/wiki/Gift_wrapping_algorithm):
 
-It makes use of an extension method `MinBy` on the generic `IEnumerable` class:
+It makes use of an extension method `MinBy` on the generic `IEnumerable` class,
+from [MoreLINQ](https://github.com/morelinq/MoreLINQ/blob/master/MoreLinq/MinBy.cs) by
+Jonathan Skeet:
 
 <pre class="code">
 <span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">IEnumerableExtensions</span>

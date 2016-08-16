@@ -64,6 +64,37 @@ on <a href="http://forums.autodesk.com/t5/revit-api/revit-api-documentation-onli
 </center></p>
 <p>Please let him know if you have any feedback on it.</p>
 <p>Ever so many thanks to gtalarico for all his work and making this useful resource available to the global Revit API community!</p>
+<h4><a name="2.1"></a>Contributing and Implementation Details</h4>
+<p>Gtalarico added some additional info on the project:</p>
+<p>The code is on github at <a href="https://github.com/gtalarico/revitapidocs">github.com/gtalarico/revitapidocs</a>.</p>
+<p>The project is definately open to collaborators. Welcome!</p>
+<p>It needs +code docs, +test coverage, and can probably be improved and optimized significantly by more seasoned web developers.</p>
+<p>Regarding github pages, it could probably be done, but I haven't used it myself, so I don't know the limitations.</p>
+<p>Here are some of the challenges and constraints:</p>
+<ol>
+<li>Namespace Menu:<ul>
+<li>Each API/year has an index with around 20K nested entries, sometimes many levels deep.
+Performance can get tricky, and so is creating a good and responsive UI for browsing it, which is why I wanted it  to be collapsible.
+If I recall correctly, Readthedocs for instance, limits the depth of the menu.</li>
+</ul>
+</li>
+<li>Content: <ul>
+<li>The content I had access to (.html files extracted from chm) were not pretty, so I had to do some unusual CSS overrides and eventually batch processed the 60k+ html files to remove unnecessary JS and html code to make the pages look good and perform well. I was also was concerned about appearance to google crawler (cleaned code, and added schema.org structured data on every page).</li>
+</ul>
+</li>
+<li>Performance:<ul>
+<li>The namespace html file alone was almost 3MB and 140K lines of html code, which is not good.
+To optimize it, I am serving the menu asynchronously as json, so it loads while the rest of the content is being built, and can be cached.</li>
+</ul>
+</li>
+<li>Built-in search:<ul>
+<li>I originally tried using google custom search, but google can take a long time to index it (if it happens at all - 60k+ pages) 
+Even with a full sitemap, it will probably just take time, but I didn't want to wait.
+So I replaced the Google Custom Search box with my own custom search.
+I tried a JS client side search, similar to what git pages has, but it was crashing the browser (remember namespace is +100K lines), so I ended up pushing it server side which makes it reasonably fast, e.g., <a href="http://www.revitapidocs.com/2015/search?query=viewschedule">www.revitapidocs.com/2015/search?query=viewschedule</a>.</li>
+</ul>
+</li>
+</ol>
 <h4><a name="3"></a>2D Convex Hull Algorithm in C# using <code>XYZ</code></h4>
 <p>Yesterday, I mentioned the convex hull calculation as one option for determining
 the <a href="http://thebuildingcoder.typepad.com/blog/2016/08/vacation-end-forge-news-and-bounding-boxes.html#8">bounding box of selected elements or entire model</a>.</p>
@@ -71,7 +102,9 @@ the <a href="http://thebuildingcoder.typepad.com/blog/2016/08/vacation-end-forge
 a <a href="http://thebuildingcoder.typepad.com/blog/2016/08/vacation-end-forge-news-and-bounding-boxes.html#comment-2839904399">comment</a> on
 that post and provided a convex hull implementation in C#.</p>
 <p>It is a 2D algorithm implementing the <a href="https://en.wikipedia.org/wiki/Gift_wrapping_algorithm">Jarvis march or Gift wrapping algorithm</a>:</p>
-<p>It makes use of an extension method <code>MinBy</code> on the generic <code>IEnumerable</code> class:</p>
+<p>It makes use of an extension method <code>MinBy</code> on the generic <code>IEnumerable</code> class,
+from <a href="https://github.com/morelinq/MoreLINQ/blob/master/MoreLinq/MinBy.cs">MoreLINQ</a> by
+Jonathan Skeet:</p>
 <pre class="code">
 <span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">IEnumerableExtensions</span>
 {
