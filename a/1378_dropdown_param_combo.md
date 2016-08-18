@@ -41,6 +41,11 @@ using [negative element ids for element property drop-down list enumerations](ht
 
 This has also been a long-standing wish list item, and unfortunately still remains in that state, currently incorporated in the issue CF-3498 *API wish: drop-down enumeration parameters for combo box*.
 
+- [Drop-down Combo of Enumerated Parameter Values](#2)
+- [1. Workaround using Nested Families and Types](#3)
+- [2. Workaround using Integer Values and Tooltips](#4)
+- [3. Workaround using Family Instance in a Design Option](#5)
+
 I would not bore you with this, except that Marcelo Quevedo of [hsbcad](http://hsbcad.com) recently brought it up again and also kindly provided suggestions for two workarounds:
 
 #### <a name="2"></a>Drop-down Combo of Enumerated Parameter Values
@@ -102,3 +107,17 @@ The result looks like this:
 I hope this helps.
 
 Many thanks to Marcelo for sharing these two creative workarounds!
+
+#### <a name="5"></a>3. Workaround using Family Instance in a Design Option
+
+Proposed by Matt Taylor in his [comment below](http://thebuildingcoder.typepad.com/blog/2015/11/drop-down-enumerated-parameter-values.html#comment-2843954426):
+
+I've just come up with another way of doing this.
+
+It's more of a model template solution than a family solution.
+
+Place a family instance with each value in a design option, then just make sure that design option is omitted from all views and schedules.
+
+Because all values for those parameters exist somewhere in the model, they still appear on the pull-down list.
+
+Many thanks to Matt for this nice idea!

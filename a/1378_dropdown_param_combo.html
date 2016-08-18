@@ -36,6 +36,12 @@ I repeatedly hear from developers who wish to define a specific enumerated set o
 <p>Internally, Revit does implement a system to handle this, for instance by
 using <a href="http://thebuildingcoder.typepad.com/blog/2014/04/element-id-export-unique-navisworks-and-other-ids.html#5">negative element ids for element property drop-down list enumerations</a>.</p>
 <p>This has also been a long-standing wish list item, and unfortunately still remains in that state, currently incorporated in the issue CF-3498 <em>API wish: drop-down enumeration parameters for combo box</em>.</p>
+<ul>
+<li><a href="#2">Drop-down Combo of Enumerated Parameter Values</a></li>
+<li><a href="#3">1. Workaround using Nested Families and Types</a></li>
+<li><a href="#4">2. Workaround using Integer Values and Tooltips</a></li>
+<li><a href="#5">3. Workaround using Family Instance in a Design Option</a></li>
+</ul>
 <p>I would not bore you with this, except that Marcelo Quevedo of <a href="http://hsbcad.com">hsbcad</a> recently brought it up again and also kindly provided suggestions for two workarounds:</p>
 <h4><a name="2"></a>Drop-down Combo of Enumerated Parameter Values</h4>
 <p>In Marcelo's own words:</p>
@@ -81,3 +87,10 @@ For instance, a set of enumerated values such as this:</p>
 </center></p>
 <p>I hope this helps.</p>
 <p>Many thanks to Marcelo for sharing these two creative workarounds!</p>
+<h4><a name="5"></a>3. Workaround using Family Instance in a Design Option</h4>
+<p>Proposed by Matt Taylor in his <a href="http://thebuildingcoder.typepad.com/blog/2015/11/drop-down-enumerated-parameter-values.html#comment-2843954426">comment below</a>:</p>
+<p>I've just come up with another way of doing this.</p>
+<p>It's more of a model template solution than a family solution.</p>
+<p>Place a family instance with each value in a design option, then just make sure that design option is omitted from all views and schedules.</p>
+<p>Because all values for those parameters exist somewhere in the model, they still appear on the pull-down list.</p>
+<p>Many thanks to Matt for this nice idea!</p>
