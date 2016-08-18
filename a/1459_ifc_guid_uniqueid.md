@@ -11,17 +11,17 @@ Angel Velez <angel.velez@autodesk.com> RE: Case 11876523  help:  Anormal modific
 
 http://forums.autodesk.com/t5/revit-api/anormal-modification-of-element-uniqueid/m-p/6372628
 
-UnitUtils Converting Units for Unit Weight #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
+Consistency of IFC GUID and UniqueId #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
 
-Here comes a quick clarification of the units used for the <code>UnitWeight</code> built-in parameter <code>PHY_MATERIAL_PARAM_UNIT_WEIGHT</code>. One example usage is to calculate the total weight of rebars in a project...
+Angel Velez provided further clarification on the relationship between the Revit element UniqueId and the IFC GUID generated from it, prompted by the Revit API discussion forum thread on abnormal modification of Element.UniqueId...
 
 -->
 
 ### Consistency of IFC GUID and UniqueId
 
-Angel Velez provided some further clarification on Revit element `UniqueId` and the IFC GUID generated from it, prompted by
+Angel Velez provided further clarification on the relationship between the Revit element `UniqueId` and the IFC GUID generated from it, prompted by
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api/bd-p/160) thread 
-on [anormal modification of `Element.UniqueId`](http://forums.autodesk.com/t5/revit-api/anormal-modification-of-element-uniqueid/m-p/6372628):
+on [abnormal modification of `Element.UniqueId`](http://forums.autodesk.com/t5/revit-api/anormal-modification-of-element-uniqueid/m-p/6372628):
 
 #### <a name="2"></a>Question
 
