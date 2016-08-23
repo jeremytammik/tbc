@@ -7,7 +7,9 @@
 
 <!---
 
-- 11951105 [Problems converting units for Unit Weight]
+11951105 [Problems converting units for Unit Weight]
+
+REVIT-94710 [API: UnitUtils.ConvertFromInternalUnits DisplayUnitType.DUT_KILOGRAMS_PER_CUBIC_METER error -- 11951105]
 
 UnitUtils Converting Units for Unit Weight #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
 
