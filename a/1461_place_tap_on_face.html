@@ -1,0 +1,288 @@
+<p><head>
+<title>The Building Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true" defer="defer"></script>
+</head></p>
+<!---
+
+- 11716266 [Finding and using an object Face using a real world XYZ point]
+  a meandering case addressing several RME issues
+  how to place a tap on a duct face
+  how to inherit system information
+  how to modify fitting dimensions
+  using routing preferences to select NewTakeOffFitting tap type
+
+Using Routing Preferences to Select and Place a Tap #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
+
+Today, I address a sequence of Revit MEP related steps required to insert a specific tap or take-off fitting into a duct
+&ndash; How to determine duct face from location point?
+&ndash; How to convert <code>XYZ</code> location to duct face <code>UV</code> coordinates?
+&ndash; How to anchor an object like AutoCAD Architecture?
+&ndash; How to inherit system information?
+&ndash; How to inherit system information &ndash; take II
+&ndash; How to control take-off and tap sizing on a duct?
+&ndash; How to select a specific tap type to connect to a duct?
+&ndash; Sample code using routing preferences to select <code>NewTakeOffFitting</code> tap type...
+
+-->
+
+<h3>Using Routing Preferences to Select and Place a Tap</h3>
+<p>Today, I address a sequence of Revit MEP related steps required to insert a specific tap or take-off fitting into a duct:</p>
+<ul>
+<li><a href="#2">How to determine duct face from location point?</a></li>
+<li><a href="#3">How to convert <code>XYZ</code> location to duct face <code>UV</code> coordinates?</a></li>
+<li><a href="#4">How to anchor an object like AutoCAD Architecture?</a></li>
+<li><a href="#5">How to inherit system information?</a></li>
+<li><a href="#6">How to inherit system information &ndash; take II</a></li>
+<li><a href="#7">How to control take-off and tap sizing on a duct?</a></li>
+<li><a href="#8">How to select a specific tap type to connect to a duct?</a></li>
+<li><a href="#9">Sample code using routing preferences to select <code>NewTakeOffFitting</code> tap type</a></li>
+</ul>
+<p>The final result of this exploration is sample code snippet that makes use of routing preferences to select the appropriate take-off fitting type, a very frequently asked question, and produces taps like this:</p>
+<p><center>
+<img src="img/TapScreen.png" alt="Programmatically generated taps" width="421">
+</center></p>
+<p>This issue was raised and all the research performed by Michael Hillis 
+of <a href="http://drawtech.com">DrawTech, Inc</a>.</p>
+<p>Many thanks to Michael for his perseverance and especially for sharing the final solution with us all!</p>
+<h4><a name="2"></a>How to Determine Duct Face from Location Point?</h4>
+<p>I have a duct fitting family with a tap family (or take-off, if you prefer). Along with this, I also have a location point for the tap. The location point is the point at which the tap intersects with and rests upon the tap. It is my assumption that to correctly place this tap family to my duct fitting family, I need to place the tap on the applicable <code>Face</code> on my duct fitting family. I have a couple of questions about performing this.</p>
+<p>Using my location point, what would be the simplest method to retrieve the face that point rests upon?</p>
+<p>Would that be using the <code>EdgeArrayArray</code> method?</p>
+<h4><a name="2.1"></a>Answer</h4>
+<p>Regarding your first question, that is pretty easy to achieve.</p>
+<p>I would suggest retrieving the element geometry, iterating over all its faces, projecting the XYZ point onto each one, and determining the distance between the original and the projected result.</p>
+<p>Here are some early examples from The Building Coder where I played at those kind of games:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/12/raytracebounce-pool-table.html">RayTraceBounce Pool Table</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/01/rectangular-duct-corners.html">Rectangular Duct Corners</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/01/spot-elevation-creation-on-top-of-beam.html">Spot Elevation Creation on Top of Beam</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/02/dimension-walls-by-iterating-faces.html">Dimension Walls by Iterating Faces</a></li>
+</ul>
+<p>The second post demonstrates a method called <code>FaceContainsConnector</code> that might suit your needs.</p>
+<p>The fourth implements <code>GetClosestFace</code>, which takes the face normal vector into account as well as the target point.</p>
+<h4><a name="3"></a>How to Convert <code>XYZ</code> Location to Duct Face <code>UV</code> Coordinates?</h4>
+<p>Once I have that face, is there any means within the API to get the <code>UV</code> point of the face based on its <code>XYZ</code> location within the project?</p>
+<h4><a name="3.1"></a>Answer</h4>
+<p>Regarding the second question, retrieving the <code>UV</code> point on the face for a given <code>XYZ</code> point:</p>
+<p>Yes, absolutely the API provides that.</p>
+<p>Look at the <code>Face.Project</code> method, which projects the specified input <code>XYZ</code> point onto the face.</p>
+<p>It returns an <code>IntersectionResult</code> that includes a <code>UVPoint</code> property with the 2D parameters of the point of intersection in the face coordinate system.</p>
+<p>For one of many examples of using this method in context, please take a look at the method <code>PlaceFamilyInstanceOnFace</code> provided in The Building Coder discussion
+on <a href="http://thebuildingcoder.typepad.com/blog/2015/02/determining-the-face-tangent-at-a-picked-point.html#4">determining the face tangent at a picked point by generic face tangent determination</a>.</p>
+<p>Please note that this face analysis and the nitty-gritty details of <code>XYZ</code> and <code>UV</code> coordinates are not utilised at all in the final solution using the <code>PreferredJunctionMethod</code> described below. We will simply keep these sections in place for narrative purposes, since these are the steps we investigated to make it happen.</p>
+<h4><a name="4"></a>How to Anchor an Object Like AutoCAD Architecture?</h4>
+<p>Thank you for the quick reply and the wealth of information! Your resources are great for getting the actual tap onto my object.</p>
+<p>However, I do have another question to pose:</p>
+<p>I hate to draw a comparison to AutoCAD, but it's the only way I know how to really convey what I'm looking for. In AutoCAD, you have something called Anchoring objects. This basically allows you to take one object and make it a slave to another object. Think of the relationship between a tap and the duct it is attached to. The tap will always be fixed to that duct, go wherever it goes, etc.</p>
+<p>I'm looking for something like this in Revit and was hoping you could confirm if I am on the right track before I spend a lot of time down this avenue.</p>
+<p>Does this also handle inheritance of duct system information?</p>
+<h4><a name="4.1"></a>Answer</h4>
+<p>The AutoCAD ObjectARX anchor functionality only ensures a geometrical relationship. It does not care about duct system information.</p>
+<p>That can be achieved using the Revit
+API <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.31">Dynamic Model Updater framework DMU</a>.</p>
+<p>Look specifically at
+the <a href="http://thebuildingcoder.typepad.com/blog/2011/08/associative-section-view-fix.html#2">Associative Section View SDK sample</a> for
+an example of geometric anchoring of an object to another.</p>
+<p>No, this does not have anything whatsoever to do with handling inheritance of duct system information, and neither does the AutoCAD Architecture Anchor system.</p>
+<h4><a name="5"></a>How to Inherit System Information?</h4>
+<p>OK. I'm looking for a method to attach a tap to a duct fitting and have that tap inherit the fittings information, e.g., things like System Name, Classification, etc. Much like what happens when you connect ducts together using connectors.</p>
+<h4><a name="5.1"></a>Answer</h4>
+<p>Regarding the inheritance of fitting information, dimensions, like duct and pipe diameter, width, height, system name, classification, etc.:</p>
+<p>That is managed by the Revit duct and pipe system itself.</p>
+<p>All MEP elements are assigned to a system, belong to that system, and inherit that kind of information from the system they belong to.</p>
+<p>You mention connecting ducts together using connectors; yes.</p>
+<p>In Revit, the fittings are also equipped with connectors, just like the ducts, and the information conveyed between them is exactly the same, using the exact same mechanism; namely, they all belong to the same MEP system.</p>
+<h4><a name="6"></a>How to Inherit System Information &ndash; Take II</h4>
+<p>Now, back to the second matter. I have two separate families, both custom objects, one is a piece of rectangular duct and the other is a tap object. When I attach the tap to the face of this duct object, it adheres in a geometric sense as it should, however; it does not get any System Information from the duct object. That's what I need now. Is there any possible way to achieve that?</p>
+<p>The goal is that my tap receives the system information from the main duct body.</p>
+<h4><a name="6.1"></a>Answer</h4>
+<p>Yes, the transmission of the system information can be easily resolved.</p>
+<p>Your tap has a connector, and so does the duct.</p>
+<p>You need to connect the two connectors with each other.</p>
+<p>Of course, being a tap, it will not hook up to the standard pre-defined duct connectors at the end points, but somewhere along the walls, in the middle somewhere.</p>
+<p>There is a special mechanism for adding additional connectors for such cases.</p>
+<p>You might have to create that situation manually and analyse the results.</p>
+<p>Explore the differences generated by manually adding taps to a duct using RevitLookup, the BipChecker, element lister
+and <a href="http://thebuildingcoder.typepad.com/blog/2013/11/intimate-revit-database-exploration-with-the-python-shell.html">other database exploration tools</a>.</p>
+<p>Use that understanding to reproduce the same programmatically.</p>
+<p>You may need to use the right overload of the <code>NewFamilyInstance</code> method to place the tap on the duct and generate a new connector for it.</p>
+<p>Actually, maybe the <code>Document.NewTakeoffFitting</code> method is what you need to use:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/02/use-of-newtakeofffitting-on-a-duct.html">Use of <code>NewTakeOffFitting</code> on a duct</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/04/use-of-newtakeofffitting-on-a-pipe.html">Use of <code>NewTakeOffFitting</code> on a pipe</a></li>
+</ul>
+<p>Let's see, what more do I have to offer on taps?</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/adjustable-versus-perpendicular-spud.html">Adjustable versus perpendicular spud</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/02/daylighting-extension-and-splitting-with-taps.html#3">Splitting a duct or pipe with taps</a></li>
+</ul>
+<h4><a name="7"></a>How to Control Take-Off and Tap Sizing on a Duct?</h4>
+<p>So I've been looking at this and have decided my approach has been wrong on this particular matter from the start. As opposed to using a Duct Fitting Family for each individual Duct Joint Length, I'm now using an actual Duct object (the Revit base) and splitting it to represent the joint lengths. This feature is a god send.</p>
+<p>Now I have my take-off/tap, and am attaching it to my duct object and that seems to work.</p>
+<p>However, when I set a family to <code>Tap – Adjustable</code> or <code>Tap – Perpendicular</code>, I cannot change any of its sizing dimensions such as Width, Depth and Diameter.</p>
+<p>How does one change these dimensions?</p>
+<p>I need to be able to insert a Rect/Oval tap with any combination of Width and Depth values.</p>
+<h4><a name="7.1"></a>Answer</h4>
+<p>I'm glad to hear that you made progress and the initial issue is now resolved.</p>
+<p>Regarding the sizing dimensions: I think the sizing dimensions are properties of the system or the duct run, not the individual duct itself.</p>
+<p>You might therefore need to modify them one level higher up in the hierarchy.</p>
+<p>How do you do it in the user interface?</p>
+<p>How is that reflected in the element properties that you explore using RevitLookup?</p>
+<p>That should immediately answer your question.</p>
+<h4><a name="8"></a>How to Select a Specific Tap Type to Connect to a Duct?</h4>
+<p>I think I have a solid grasp on the way TakeOffs and Duct objects work now at least from a User Interface perspective. My question:</p>
+<p>Using the API, is there a way to insert a particular type of tap onto a piece of duct and connect it to a duct?</p>
+<p>Looking at the <code>NewTakeOffFitting</code> method, it takes an <code>MEPCurve</code> and a connector, both of which I can supply, but the TakeOff I'm inserting has to be of a particular type, which usually isn't completely static. I'll need to be able to insert a Bevelled, Straight or Custom (one that I have created) take-off on a whim when I need to.</p>
+<p>It seems my best avenue for being able to insert Taps more 'on-the-fly' based on whatever I'm importing via my add-in is utilizing the <code>RoutingPreferencesManager</code> within the <code>MEPCurve</code> that I am trying to attach my duct to.</p>
+<p>I have a basic idea of what is going on here, but I've run into a little bit of an issue. It seems that the take-off fittings I'm looking to utilize aren't showing up when I list all of the available 'rules' within a given RuleGroup (in this case, Junctions). For example, using the Revit UI (not the API) if I load a take-off family into my project using the "Load Family.." routine in Revit, it will show that take-off fitting if I go and manually modify the Routing Preferences within the UI.</p>
+<p>However, if I do the same thing in the API, I can't get the tap that I'm loading to show up. Even if I manually load the tap in my project before running the add-in. I can't actually see the Tap as an available rule.</p>
+<p>Here is a code sample snippet of what I am doing:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;I&nbsp;start&nbsp;with&nbsp;my&nbsp;Duct&nbsp;(with&nbsp;MEPCurve).</span>
+
+&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;ductElement&nbsp;=&nbsp;MyDuctElement;&nbsp;
+
+&nbsp;&nbsp;<span style="color:#2b91af;">Duct</span>&nbsp;duct&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;ductElement&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;{&nbsp;duct&nbsp;=&nbsp;MyDuctElement;&nbsp;}
+
+&nbsp;&nbsp;<span style="color:#2b91af;">FamilySymbol</span>&nbsp;tapSym&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Load&nbsp;my&nbsp;Take-Off&nbsp;family.</span>
+
+&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">SubTransaction</span>&nbsp;subTrans&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">SubTransaction</span>(&nbsp;doc&nbsp;)&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;subTrans.Start();
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Load&nbsp;the&nbsp;tap&nbsp;FamilySymbol&nbsp;into&nbsp;the&nbsp;project.</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;GetFamilySymbolRoutine(&nbsp;doc,&nbsp;symInfo,&nbsp;<span style="color:blue;">out</span>&nbsp;famSym&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;subTrans.Commit();
+&nbsp;&nbsp;}
+
+&nbsp;&nbsp;<span style="color:#2b91af;">DuctType</span>&nbsp;ductType&nbsp;=&nbsp;duct.DuctType;
+
+&nbsp;&nbsp;type.RoutingPreferenceManager.PreferredJunctionType&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:#2b91af;">PreferredJunctionType</span>.Tap;
+
+&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;ruleCount&nbsp;=&nbsp;ductType
+&nbsp;&nbsp;&nbsp;&nbsp;.RoutingPreferenceManager
+&nbsp;&nbsp;&nbsp;&nbsp;.GetNumberOfRules(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">RoutingPreferenceRuleGroupType</span>.Junctions&nbsp;);
+
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Iterate&nbsp;through&nbsp;all&nbsp;rules&nbsp;within&nbsp;Junctions&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;and&nbsp;get&nbsp;part&nbsp;info&nbsp;for&nbsp;all&nbsp;rules.</span>
+
+&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">string</span>&gt;&nbsp;names&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">string</span>&gt;();
+&nbsp;&nbsp;<span style="color:#2b91af;">RoutingPreferenceRule</span>&nbsp;routeRule&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+
+&nbsp;&nbsp;<span style="color:blue;">for</span>(&nbsp;<span style="color:blue;">int</span>&nbsp;i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;ruleCount;&nbsp;i++&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;routeRule&nbsp;=&nbsp;ductType
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.RoutingPreferenceManager.GetRule(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RoutingPreferenceRuleGroup,&nbsp;i&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;mepId&nbsp;=&nbsp;doc.GetElement(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;routeRule.MEPPartId&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;mepId&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FamilySymbol</span>&nbsp;mepFi&nbsp;=&nbsp;mepId&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">FamilySymbol</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;names.Add(&nbsp;mepFi.Name&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+</pre>
+
+<p>Do you have any resources or tips that might assist me in fully utilizing the RoutingPreferenceManager?</p>
+<h4><a name="8.1"></a>Answer</h4>
+<p>Yes, routing preferences is definitely the way to go.</p>
+<p>The tap needs to be explicitly added to the routing preferences.</p>
+<p>Loading the family alone does not add the rule.</p>
+<p>This is similar to the UI approach: after loading the family, the part needs to be added to the rule in another operation.</p>
+<p>The API could look like this:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">RoutingPreferenceRule</span>&nbsp;newRule(&nbsp;tapFamilySymbolId,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Something&nbsp;about&nbsp;this&nbsp;rule&quot;</span>&nbsp;);
+
+&nbsp;&nbsp;myRoutingPreferenceManager.AddRule(
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">RoutingPreferenceRuleGroupType</span>.Junctions,&nbsp;newRule&nbsp;);
+</pre>
+
+<p>You can find more routing preference API usage examples in the RoutingPreferenceTools Revit SDK sample.</p>
+<h4><a name="9"></a>Sample Code Using Routing Preferences to Select <code>NewTakeOffFitting</code> Tap Type</h4>
+<p>I made progress on the issue and arrive at a solution similar to the set-up the development team recommends.</p>
+<p>Here is another code snippet showing the general gist of what I'm currently utilizing:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Get&nbsp;DuctType&nbsp;-&nbsp;we&nbsp;need&nbsp;this&nbsp;for&nbsp;its</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;RoutingPreferenceManager.&nbsp;This&nbsp;is&nbsp;how&nbsp;we&nbsp;assign</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;our&nbsp;tap&nbsp;object&nbsp;to&nbsp;be&nbsp;used.&nbsp;This&nbsp;is&nbsp;the&nbsp;settings</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;for&nbsp;the&nbsp;duct&nbsp;object&nbsp;we&nbsp;attach&nbsp;our&nbsp;tap&nbsp;to.</span>
+
+&nbsp;&nbsp;<span style="color:#2b91af;">Duct</span>&nbsp;duct&nbsp;=&nbsp;doc.GetElement(&nbsp;mainDuctId&nbsp;);
+
+&nbsp;&nbsp;<span style="color:#2b91af;">DuctType</span>&nbsp;ductType&nbsp;=&nbsp;duct.DuctType;
+
+&nbsp;&nbsp;<span style="color:#2b91af;">RoutingPreferenceManager</span>&nbsp;routePrefManager
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;ductType.RoutingPreferenceManager;
+
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Set&nbsp;Junction&nbsp;Prefernce&nbsp;to&nbsp;Tap.</span>
+
+&nbsp;&nbsp;routePrefManager.PreferredJunctionType
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:#2b91af;">PreferredJunctionType</span>.Tap;
+
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;For&nbsp;simplicity&nbsp;sake,&nbsp;I&nbsp;remove&nbsp;all&nbsp;previous&nbsp;rules</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;for&nbsp;taps&nbsp;so&nbsp;I&nbsp;can&nbsp;just&nbsp;add&nbsp;what&nbsp;I&nbsp;want&nbsp;here.</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;This&nbsp;will&nbsp;probably&nbsp;vary.</span>
+
+&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;initRuleCount&nbsp;=&nbsp;routePrefManager.GetNumberOfRules(
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">RoutingPreferenceRuleGroupType</span>.Junctions&nbsp;);
+
+&nbsp;&nbsp;<span style="color:blue;">for</span>(&nbsp;<span style="color:blue;">int</span>&nbsp;i&nbsp;=&nbsp;0;&nbsp;i&nbsp;!=&nbsp;initRuleCount;&nbsp;++i&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;routePrefManager.RemoveRule(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">RoutingPreferenceRuleGroupType</span>.Junctions,&nbsp;0&nbsp;);
+&nbsp;&nbsp;}
+
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Get&nbsp;FamilySymbol&nbsp;for&nbsp;Tap&nbsp;I&nbsp;want&nbsp;to&nbsp;use.</span>
+
+&nbsp;&nbsp;<span style="color:#2b91af;">FamilySymbol</span>&nbsp;tapSym&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+&nbsp;&nbsp;doc.LoadFamilySymbol(&nbsp;<span style="color:#a31515;">&quot;C:\FamilyLocation\MyTap.rfa&quot;</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;MyTap&quot;</span>,&nbsp;<span style="color:blue;">out</span>&nbsp;tapSym&nbsp;);
+
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Symbol&nbsp;needs&nbsp;to&nbsp;be&nbsp;activated&nbsp;before&nbsp;use.</span>
+
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;(&nbsp;!tapSym.IsActive&nbsp;)&nbsp;&amp;&amp;&nbsp;(&nbsp;tapSym&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;tapSym.Activate();
+&nbsp;&nbsp;&nbsp;&nbsp;doc.Regenerate();
+&nbsp;&nbsp;}
+
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Create&nbsp;Rule&nbsp;that&nbsp;utilizes&nbsp;the&nbsp;Tap.&nbsp;Use&nbsp;the&nbsp;argument</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;MEPPartId&nbsp;=&nbsp;ElementId&nbsp;for&nbsp;the&nbsp;desired&nbsp;FamilySymbol.</span>
+
+&nbsp;&nbsp;<span style="color:#2b91af;">RoutingPreferenceRule</span>&nbsp;newRule
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">RoutingPreferenceRule</span>(&nbsp;tapSym.Id,&nbsp;<span style="color:#a31515;">&quot;MyTap&quot;</span>&nbsp;);
+
+&nbsp;&nbsp;routePrefManager.AddRule(
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">RoutingPreferenceRuleGroupType</span>.Junctions,&nbsp;newRule&nbsp;);
+
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;To&nbsp;create&nbsp;a&nbsp;solid&nbsp;tap,&nbsp;we&nbsp;need&nbsp;to&nbsp;use&nbsp;the&nbsp;Revit</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;doc.Create.NewTakeoffFitting&nbsp;routine.&nbsp;For&nbsp;this,</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;we&nbsp;need&nbsp;a&nbsp;connector.&nbsp;If&nbsp;we&nbsp;don&#39;t&nbsp;have&nbsp;one,&nbsp;we</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;just&nbsp;create&nbsp;a&nbsp;temporary&nbsp;object&nbsp;with&nbsp;a&nbsp;connector</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;where&nbsp;we&nbsp;want&nbsp;it.</span>
+
+&nbsp;&nbsp;<span style="color:#2b91af;">Connector</span>&nbsp;tmpConn&nbsp;=&nbsp;CreateTemporaryConnectorForTap();
+
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Create&nbsp;our&nbsp;tap.</span>
+
+&nbsp;&nbsp;<span style="color:#2b91af;">FamilyInstance</span>&nbsp;tapInst
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;doc.Create.NewTakeoffFitting(&nbsp;tmpConn,&nbsp;duct&nbsp;);
+</pre>
+
+<p>I put this together really quickly for you, but I think it covers all the bases.</p>
+<p>I've found that this solution works extremely well for creating a tap that utilizes the standard features Revit has for taps, producing results like the two samples shown above.</p>
+<p>Thank you for all your support!</p>
