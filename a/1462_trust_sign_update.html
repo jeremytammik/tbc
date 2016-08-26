@@ -1,0 +1,110 @@
+<p><head>
+<title>The Building Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true" defer="defer"></script>
+</head></p>
+<!---
+
+- migrated ADN Xtra labs to Revit 2017
+
+- migrated ADN labs to Revit 2017
+
+- revit 2017 api news
+  devdays online recording
+  summary rtf doc
+
+- trusted signature
+  11397533 [Code signing of Revit Addins]
+  http://forums.autodesk.com/t5/revit-api/code-signing-of-revit-addins/m-p/5981560
+  11782787 [Revit 2017 signed addin warning]
+  11809640 [Code Signing of Revit 2017 Addins]
+
+Trusted Signature and Revit 2017 API Resources #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
+
+
+&ndash; 
+...
+
+-->
+
+<h3>Trusted Signature and Revit 2017 API Resources</h3>
+<p>Here is a bunch of long overdue news items to round off this hot week:</p>
+<ul>
+<li><a href="#2">Trusted add-in signature</a></li>
+<li><a href="#3">Revit 2017 API news summary</a></li>
+<li><a href="#4">ADN training labs for Revit 2017</a></li>
+<li><a href="#5">ADN Xtra labs Revit 2017 migration</a></li>
+</ul>
+<h4><a name="2"></a>Trusted Add-in Signature</h4>
+<p>We had an extensive discussion on the topic of equipping each Revit add-in with a trusted signature in order to avoid the warning presented before loading it that otherwise pops up and needs to be manually confirmed by the user.</p>
+<p>It started off in
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> thread
+on <a href="http://forums.autodesk.com/t5/revit-api/code-signing-of-revit-addins/m-p/5981560">code signing of Revit add-ins</a> even
+before the initial customer release.</p>
+<p>I continued adding new material to it as various more specific queries came in from developers over time.</p>
+<p>I hope it now includes a clear explanation of all aspects of the situation.</p>
+<p>The latest addition is probably the most complete and succinct summary:</p>
+<p>Question: "When Revit 2017 opens with my in-house developed add-in, it prompts the user for an action: always load, load once or do not load. Since the app is in-house developed, I wonder: is it always necessary to have a certificate also for in-house trusted area?"</p>
+<p>Answer: The answer is yes; the warning will always be issued.</p>
+<p>Our security architect adds:</p>
+<p>The add-in must be signed with an approved cert or it will display the popup on first load.</p>
+<p>We've documented the process
+of <a href="http://help.autodesk.com/view/RVT/2017/ENU/?guid=GUID-B9A067F4-234F-47F8-A5EE-0D84A93FA98E">creating a self-signed cert that can be used for your own internal use</a>.</p>
+<p>You
+can <a href="https://technet.microsoft.com/en-us/library/dd807084(v=ws.11).aspx">push the cert to machines in your domain using group policy</a>.</p>
+<p>If you both sign the add-in and push the cert to domain machines, users can use the add-in without the popup.</p>
+<h4><a name="3"></a>Revit 2017 API News Summary</h4>
+<p>Next, here is the rather overdue publication of the Revit 2017 API news presentations from the DevDays conferences around the turn of the year:</p>
+<ul>
+<li><a href="/a/devdays/2015/Revit_API_News/Revit_2017_API_News_notes.pdf">Revit 2017 API News notes</a></li>
+<li><a href="/a/devdays/2015/Revit_API_News/Revit_2017_API_News_slides.pdf">Revit 2017 API News slides</a></li>
+<li>For ADN members<ul>
+<li><a href="http://adn.autodesk.com/adn/servlet/item?siteID=4814862&amp;id=25207102">DevDays Online 2015/2016</a></li>
+<li><a href="http://adn.autodesk.com/adn/servlet/file/developer_days_online_revit_and_project_expo.wmv?siteID=4814862&amp;id=25214065">Revit and Project Expo presentation recording</a> (wmv &ndash; 82440 Kb)</li>
+</ul>
+</li>
+<li>For non-ADN-members<ul>
+<li><a href="http://thebuildingcoder.typepad.com/revit_2017_api_news/developer_days_online_revit_and_project_expo.wmv">Revit and Project Expo presentation recording</a> (wmv &ndash; 84418611 bytes)</li>
+</ul>
+</li>
+</ul>
+<h4><a name="4"></a>ADN Training Labs for Revit 2017</h4>
+<p>As usual, the training material used by the Autodesk Developer Network ADN for hands-on Revit API introductory trainings has been updated for Revit 2017 and is available from GitHub in
+the <a href="https://github.com/ADN-DevTech/RevitTrainingMaterial">Revit API Labs Training Material repository</a>.</p>
+<p>Many thanks to <a href="http://adndevblog.typepad.com/technology_perspective/ryuji-ogasawara.html">Ryuji Ogasawara</a> for
+the migration and clean-up for Revit 2017!</p>
+<h4><a name="5"></a>ADN Xtra Labs Revit 2017 Migration</h4>
+<p>I also migrated the ADN Xtra Labs to Revit 2017.</p>
+<p>It includes the same training material as the official ADN version mentioned above, plus a series of so-called Xtra labs containing the material we before restructuring and documenting the labs in a more didactical fashion.</p>
+<p>The older labs have a different history and approach, provide some alternative insights, and include a couple of tools and utilities that I still find worthwhile to preserve and maintain.</p>
+<p>The migration to Revit 2017 is very straightforward.</p>
+<p>The first step is to update the .NET target framework from 4.5 to 4.5.2 and update the Revit API assembly references to point to the new Revit.exe folder.</p>
+<p>Doing so produces zero errors for this add-in, just a couple of warnings.</p>
+<p>Here are my migration steps with all the intermediate releases, differences between each step and the previous one and log files listing the warnings produced at that point:</p>
+<ol>
+<li><a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra/releases/tag/2017.0.0.0">2017.0.0.0</a>
+&ndash; initial flat migration to Revit 2017
+&ndash; <a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra/compare/2016.0.0.10...2017.0.0.0">diffs</a>
+&ndash; <a href="zip/adn_xtra_2017_warnings_01.txt">25 warnings</a></li>
+<li><a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra/releases/tag/2017.0.0.1">2017.0.0.1</a>
+&ndash; cleaned up various paths pointing to 2016
+&ndash; <a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra/compare/2017.0.0.0...2017.0.0.1">diffs</a></li>
+<li><a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra/releases/tag/2017.0.0.2">2017.0.0.2</a>
+&ndash; fixed all warnings about deprecated API usage except Automatic transaction mode
+&ndash; <a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra/compare/2017.0.0.1...2017.0.0.2">diffs</a>
+&ndash; <a href="zip/adn_xtra_2017_warnings_02.txt">35 warnings</a></li>
+<li><a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra/releases/tag/2017.0.0.3">2017.0.0.3</a>
+&ndash; eliminated some of the deprecated Automatic transaction mode usages
+&ndash; <a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra/compare/2017.0.0.2...2017.0.0.3">diffs</a>
+&ndash; <a href="zip/adn_xtra_2017_warnings_03.txt">29 warnings</a></li>
+<li><a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra/releases/tag/2017.0.0.4">2017.0.0.4</a>
+&ndash; eliminated all deprecated Automatic transaction mode usage in all C# modules except Lab3.cs
+&ndash; <a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra/compare/2017.0.0.3...2017.0.0.4">diffs</a>
+&ndash; <a href="zip/adn_xtra_2017_warnings_04.txt">19 warnings</a></li>
+</ol>
+<p>19 warnings about use of the obsolete and deprecated automatic transaction mode remain, so I am still not completely done.</p>
+<p>In any case, these diffs and logs should give you a very clear idea of how to approach any migration issues that you may encounter.</p>
+<p><center>
+<img src="img/little_house_3d_view.png" alt="Little house" width="380">
+</center></p>
