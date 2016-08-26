@@ -23,9 +23,12 @@
 
 Trusted Signature and Revit 2017 API Resources #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
 
-
-&ndash; 
-...
+Here is a bunch of long overdue news items to round off this hot week
+&ndash; Trusted add-in signature
+&ndash; Revit 2017 API news summary
+&ndash; ADN training labs for Revit 2017
+&ndash; ADN Xtra labs Revit 2017 migration
+&ndash; We had an extensive discussion on the topic of equipping each Revit add-in with a trusted signature in order to avoid the warning presented before loading it that otherwise pops up and needs to be manually confirmed by the user....
 
 -->
 
