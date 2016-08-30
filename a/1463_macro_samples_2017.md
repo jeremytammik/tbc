@@ -28,7 +28,7 @@ Revit Macro Samples Migrated to Revit 2017 #revitapi #3dwebcoder @AutodeskRevit 
 I recently received requests for a migration of the macro samples provided in the <code>Revit_Macro_Samples.rvt</code> project. The version included in the Revit 2017 SDK miraculously is still based on Revit 2013 pre-release version, according to the update message displayed when opening it, and the macros cannot be executed successfully due to a number small Revit API enhancements made in the intervening years
 &ndash; Problem
 &ndash; Solution &ndash; Sam comes to the rescue
-&ndash; See the Diffs on GitHub...
+&ndash; See the diffs on GitHub...
 
 -->
 
@@ -46,7 +46,7 @@ Unfortunately, after the update process, the macro samples included in the proje
 
 - [Problem](#2)
 - [Solution &ndash; Sam comes to the rescue](#3)
-- [See the Diffs on GitHub](#4)
+- [See the diffs on GitHub](#4)
 
 
 #### <a name="2"></a>Problem
