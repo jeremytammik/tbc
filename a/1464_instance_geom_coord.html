@@ -8,17 +8,17 @@
 
 http://jeremytammik.github.io/tbc/a/1464_instance_geom_coord.html
 
- #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
+Voodoo Magic Retrieves Global Instance Edges #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
 
 &ndash; ...
 
 -->
 
-<h3>Using Voodoo Magic to Retrieve Instance Edges</h3>
+<h3>Voodoo Magic Retrieves Global Instance Edges</h3>
 <p>I recently shared
-Scott Wiloson's <a href="http://thebuildingcoder.typepad.com/blog/2016/04/stable-reference-string-magic-voodoo.html">reference stable representation magic voodoo</a>,
+Scott Wilson's <a href="http://thebuildingcoder.typepad.com/blog/2016/04/stable-reference-string-magic-voodoo.html">reference stable representation magic voodoo</a>,
 and you may have asked yourself what use it is.</p>
-<p>Well, here is one example of making use of this, raised and solved by Ola Gunnar Skippervik
+<p>Well, here is one example making effective use of it, raised and solved by Ola Gunnar Skippervik
 of <a href="http://www.multiconsult.no">Multiconsult</a>,
 one of the leading firms of consulting engineers and designers in Norway.</p>
 <ul>
@@ -27,6 +27,7 @@ one of the leading firms of consulting engineers and designers in Norway.</p>
 <li><a href="#4">Partial answer and suggestion</a></li>
 <li><a href="#5">Confirmation</a></li>
 <li><a href="#6">Summary</a></li>
+<li><a href="#7">Structural concrete setout point add-in</a></li>
 </ul>
 <h4><a name="2"></a>Goal: Retrieve Family Instance Edge to Create Direct Shape</h4>
 <p>I have been programing on an add-on for Revit for my company over some time now. One function that I am trying to implement is to create setout lines (separate objects that can during export to DWG be placed on separate layers).</p>
@@ -34,37 +35,37 @@ one of the leading firms of consulting engineers and designers in Norway.</p>
 <ol>
 <li>Select edges</li>
 <li>Extract the Curve from the Edge</li>
-<li>Use FireframeBuilder to create a DirectShape from the curves</li>
+<li>Use <code>WireframeBuilder</code> to create a <code>DirectShape</code> from the curves</li>
 </ol>
 <p>What I just experienced was that for some structural foundations (it is the same family type the is used for all of my instances) this code is for some of my instances producing a direct shape with the global geometry of the foundation, and sometimes it is reading the local geometry in my structural foundation, causing the Direct shape to be inserted near the project basepoint.</p>
 <p>Here are two structural foundations of the same type:</p>
 <p><center>
-<img src="img/instance_edges_1.jpeg" alt="" width="796">
+<img src="img/instance_edges_1.jpeg" alt="Structural foundations" width="796">
 </center></p>
 <p>Retrieving some of their bottom edges produces the desired direct shape:</p>
 <p><center>
-<img src="img/instance_edges_2.jpeg" alt="" width="696">
+<img src="img/instance_edges_2.jpeg" alt="DirectShape" width="696">
 </center></p>
 <p>On other instances, retrieving their bottom edges produces a direct shape at the project base point instead:</p>
 <p><center>
-<img src="img/instance_edges_3.png" alt="" width="895">
+<img src="img/instance_edges_3.png" alt="DirectShape at base point" width="895">
 </center></p>
 <p>Obviously, the family instance geometry is sometimes retrieved in global project coordinates, and sometimes in local family definition coordinates.</p>
-<p>Q1: How can I be sure to alwats get the global geometry to put into the DirectShape?</p>
+<p>Q1: How can I be sure to always get the global geometry to put into the DirectShape?</p>
 <p>Q2: Can you please point me in the right direction when I wish to select the Edge of a curved surface that is joined tangentially with the next surface (also to be used in the same manner as described above)?</p>
 <h4><a name="3"></a>Snooping the Family Instance Geometry</h4>
-<p>I’ve been snooping two objects that produce different behaveour. This is what I found so far:</p>
+<p>I’ve been snooping two objects that produce different behaviour. This is what I found so far:</p>
 <p>The family instances on which I can retrieve the global geometry have direct geometry objects:</p>
 <p><center>
-<img src="img/instance_edges_4.png" alt="" width="1753">
+<img src="img/instance_edges_4.png" alt="Snooping the family instance geometry" width="1753">
 </center></p>
 <p>The other ones have geometry instances, from which the geometry objects have to be retrieved in a second step:</p>
 <p><center>
-<img src="img/instance_edges_5.png" alt="" width="1907">
+<img src="img/instance_edges_5.png" alt="Snooping the family instance geometry" width="1907">
 </center></p>
 <p>The problematic geometry seems to be nested deeper in the latter element. Why so? If I copy the element that behaves as I expected, the new element also works fine. If I add a new instance (place structural foundation or create similar) the new instance the element gets the nested properties.</p>
-<p>Q3: Why are the the elements built up differently?</p>
-<p>Q4: How can I implement a solution that produces geometry at the globaly same place as I picked the edge?</p>
+<p>Q3: Why are the elements built up differently?</p>
+<p>Q4: How can I implement a solution that produces geometry at the globally same place as I picked the edge?</p>
 <h4><a name="4"></a>Partial Answer and Suggestion</h4>
 <p>Some family instances can make use of the unmodified symbol geometry generated by the family definition.</p>
 <p>In that case, they can obtain their geometry from the <code>GeometryInstance</code> object, and share it with other instances.</p>
@@ -78,9 +79,11 @@ on <a href="http://forums.autodesk.com/t5/revit-api/convert-local-family-instanc
 <p>In it, Scott Wilson provides a solution making use of
 some <a href="http://thebuildingcoder.typepad.com/blog/2016/04/stable-reference-string-magic-voodoo.html">reference stable representation magic voodoo</a>.</p>
 <p>Might that come in useful for you too?</p>
+<p>Later, I noticed that I encountered and solved this exact same problem myself in a more direct and offical manner without the use of any voodoo magic for 
+my <a href="#7">structural concrete setout point add-in</a> discussed below.</p>
 <h4><a name="5"></a>Confirmation</h4>
 <p>Thank you!</p>
-<p>I implemented the <code>GetnstanceEdgeFromSymbolRef</code> method suggested by the Voodo Magic, and things works like a charm!</p>
+<p>I implemented the <code>GetInstanceEdgeFromSymbolRef</code> method suggested by the Voodoo Magic, and everything works like a charm!</p>
 <p>This was something that I would not be able to come up with myself.</p>
 <p>Once again, thank you! You saved the day!</p>
 <h4><a name="6"></a>Summary</h4>
@@ -93,17 +96,33 @@ some <a href="http://thebuildingcoder.typepad.com/blog/2016/04/stable-reference-
 <ol>
 <li>Extract edges</li>
 <li>Get the Curves form the edges</li>
-<li>Add curves to wireframeBuilder</li>
-<li>Add the geometry from the wireframe builder to a Direct shape</li>
+<li>Add curves to <code>WireframeBuilder</code></li>
+<li>Add the geometry from the wireframe builder to a direct shape</li>
 </ol>
 <p>What I experienced was that for some instances I got the global geometry, and for other I got the local geometry. This caused some serious headache, because after some time I understood that I had to use <code>GetGeometryInstance</code> to collect the whole bunch of geometry from the element, but then I had no clue how to find the right curve corresponding to the selected edge. This was fixed by the method <code>GetInstanceEdgeFromSymbolRef</code>.</p>
 <p>However, when I selected an edge on an element where the geometry was stored directly in the element, the method cast an error due to the fact that the <code>tokenList</code> count was only 3, not 6 as for the others.</p>
 <p><center>
-<img src="img/instance_edges_6.png" alt="" width="1036">
+<img src="img/instance_edges_6.png" alt="TokenList count" width="1036">
 </center></p>
-<p>My solution to this was to add an <code>if</code> test for the count of the <code>tokenList</code> to the metohod:</p>
+<p>My solution to this was to add an <code>if</code> test for the count of the <code>tokenList</code> to the method:</p>
 <p><center>
-<img src="img/instance_edges_7.png" alt="" width="722">
+<img src="img/instance_edges_7.png" alt="TokenList count" width="722">
 </center></p>
 <p>I hope this proves useful for others as well!</p>
 <p>Many thanks to Ola Gunnar for his useful sample and confirmation!</p>
+<h4><a name="7"></a>Structural Concrete Setout Point Add-In</h4>
+<p>By the way, talking about set-out geometry, I once implemented a full-fledged 
+<a href="http://thebuildingcoder.typepad.com/blog/2012/08/structural-concrete-setout-point-add-in.html">structural concrete setout point add-in</a>,
+later <a href="http://thebuildingcoder.typepad.com/blog/2014/11/concrete-setout-points-for-revit-structure-2015.html">migrated to Revit 2015</a>
+and hosted in the <a href="https://github.com/jeremytammik/SetoutPoints">GitHub SetoutPoints repository</a>.</p>
+<p>It is a Revit add-in for automatic placement and management of structural concrete setout points.</p>
+<p>Here is some more on its history:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-devlab.html">Melbourne DevLab</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html">Commercial use of the SetoutPoints application</a></li>
+<li><a href="http://forums.autodesk.com/t5/revit-api/jeremy-s-setoutpoint/m-p/5372337">Revit API forum discussion thread on Jeremy's SetoutPoints</a></li>
+</ul>
+<p>In the forum discussion, the exact same issue as above is raised and solved to ensure that all points are placed correctly in the global coordinate system using 
+a <a href="http://thebuildingcoder.typepad.com/blog/2014/11/concrete-setout-points-for-revit-structure-2015.html">more direct and officially supported approach</a> without 
+any voodoo magic  :-)</p>
+<p>Now it just remains to compare the two approaches and determine which is better, simpler and more reliable.</p>
