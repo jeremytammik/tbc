@@ -1,0 +1,115 @@
+<p><head>
+<title>The Building Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true" defer="defer"></script>
+</head></p>
+<!---
+
+- why require signed add-in signature?
+  http://forums.autodesk.com/t5/revit-api/code-signing-of-revit-addins/m-p/6535549
+
+- how to search for help on a Revit API question?
+  http://forums.autodesk.com/t5/revit-api/revit-2017-loadcasearray/m-p/6535653
+
+- Autodesk Releases Dynamo 1.1 Update for Computational Design
+  http://architosh.com/2016/08/autodesk-releases-dynamo-1-1-update-for-computational-design/
+
+Trusted Signature Motivation and Fishing #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
+
+Topics for today
+&ndash; How does code signing of Revit add-ins increase security?
+&ndash; What happened to <code>LoadCaseArray</code>?
+&ndash; How and where to search for help on a Revit API question?
+&ndash; Dynamo 1.1 Update...
+
+-->
+
+<h3>Trusted Signature Motivation and Fishing</h3>
+<p>Topics for today:</p>
+<ul>
+<li><a href="#2">How does code signing of Revit add-ins increase security?</a></li>
+<li><a href="#3">What happened to <code>LoadCaseArray</code>, how and where to search for help on a Revit API question?</a></li>
+<li><a href="#4">Dynamo 1.1 Update</a></li>
+</ul>
+<h4><a name="2"></a>How Does Code Signing of Revit Add-Ins Increase Security?</h4>
+<p>I talked about
+the <a href="http://thebuildingcoder.typepad.com/blog/2016/08/trusted-signature-and-updated-revit-2017-api-resources.html#2">trusted add-in signature</a> requirement 
+introduced with the Revit 2017 API last week.</p>
+<p>Neil Smithline, Revit Software Security Architect, added an in-depth explanation on why this requirement was introduced at all, answering a new question from Ken on
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> thread
+on <a href="http://forums.autodesk.com/t5/revit-api/code-signing-of-revit-addins/m-p/5981560">code signing of Revit addins</a>:</p>
+<p><strong>Question:</strong> Can you help me understand how code signing of Revit add-ins improves security? </p>
+<p>I create an add-in, I sign it with my cert, then I install my cert during install of the add-in.</p>
+<p>I'm in control the whole way (other than the user had to run the installer with elevated permissions...)</p>
+<p>I'm not sure I understand how this increases actual security, as opposed to affecting some perception of increased security. </p>
+<p>But I <b><i>am</i></b> willing to learn.</p>
+<p><strong>Answer:</strong> Revit add-in code signing is intended to reduce the risk of you running malicious code within a Revit add-in. Before discussing it in specific, let's take a step back and look at the current state of technology.</p>
+<p>In general, preventing malicious code, commonly called <a href="https://en.wikipedia.org/wiki/Malware">malware</a>, from running on your computer is difficult. The quantity and ingenuity of malware attacks <a href="https://securelist.com/analysis/quarterly-malware-reports/75640/it-threat-evolution-in-q2-2016-statistics">continues to climb</a>. Malware is being used to target everything
+from <a href="http://money.cnn.com/2016/02/17/technology/hospital-bitcoin-ransom/index.html">hospitals</a>
+to <a href="http://www.welivesecurity.com/2013/08/14/blackout-warning-philips-smart-lightbulbs-can-be-switched-off-by-malware-and-wont-come-back-on">lightbulbs</a>.
+It has been used to <a href="https://en.wikipedia.org/wiki/Stuxnet">damage Iranian nuclear facilities</a>, and recently has been thought to be used as a tool to <a href="http://news.softpedia.com/news/malware-used-in-dnc-hack-has-roots-in-chinese-open-source-tool-506773.shtml">influence the US presidential elections</a>. The best security Revit, or any application, can provide is to not make the situation worse. So we need to look at what techniques Windows provides for keeping your computer secure.</p>
+<p>Some of the most important mechanisms that Windows uses to combat malware are:</p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/User_Account_Control">User Account Control</a> &ndash; This generates the "Do you want to allow the following program to make changes to this computer?" popup you frequently get when installing applications.</li>
+<li><a href="https://blogs.msdn.microsoft.com/ieinternals/2011/03/23/understanding-local-machine-zone-lockdown">Mark of the Web</a> &ndash; This generates a dialog when you try to run applications downloaded by your browser.</li>
+<li><a href="https://msdn.microsoft.com/en-us/library/cc750035.aspx">Authenticode</a> &ndash; Microsoft's trademarked term for code signing of executables.</li>
+</ul>
+<p>Due to the way that Revit add-ins are downloaded and installed, they bypass User Account Control, Mark of the Web, and Authenticode. That is, Revit add-ins open a hole in Windows' malware security. So Revit must add security to fix this security flaw. Creating and fixing such a weakness is common for apps with add-ins. For example, <a href="https://developer.chrome.com/extensions/packaging">Chrome requires extensions to be signed</a>, and a company that tries to epitomize openness, <a href="https://www.mozilla.org/en-US/firefox/48.0/releasenotes">Firefox, just added mandatory add-on signing</a> on August 2nd, 2016.</p>
+<p>To fix this security hole, we've added code signing. Code signing in Revit, like Microsoft's Authenticode, is intended to give the user a timely security question and to provide you with the information you need to make an informed decision. This is very similar to what Windows' User Account Control and Authenticode systems provide.</p>
+<p>As a user, when you are given an add-in signature dialog, you know that the add-in you are loading was written by the owner of the certificate, and that it hasn't been modified since it was signed. It is then up to you to determine if you trust that person or not.</p>
+<p>While I would love to have a solution that automatically detected add-in safety and just did the right thing, this is the best that we, as an industry, know how to do. Is it perfect: no. But is it more secure than without signing: I think so.</p>
+<p>Thank you very much, Meil, for this very clear overview and motivating clarification!</p>
+<h4><a name="3"></a>What happened to <code>LoadCaseArray</code>, How and Where to Search for Help on a Revit API Question?</h4>
+<p>While answering another Revit API discussion forum question by Emil
+on <a href="http://forums.autodesk.com/t5/revit-api/revit-2017-loadcasearray/td-p/6535653">the <code>LoadCaseArray</code> class in Revit 2017</a>,
+I also happened to produce an more general answer on how to search for help on any Revit API issue:</p>
+<p><strong>Question:</strong> We are in a process of migrating a project in VB.NET to use with Revit 2017. Previously, it worked with Revit 2016.</p>
+<p>I get several errors of the type <em>Type <code>Autodesk.Revit.DB.Structure.LoadCaseArray</code> is not defined</em>, similarly for <code>LoadCombinationArray</code>, <code>LoadUsageArray</code>, and I can't locate any documentation on these arrays in the Revit 2017 API.</p>
+<p>As far as I can see, they were not marked as obsolete; they were working OK within our 2016 project. </p>
+<p><strong>Answer:</strong> Well, you did not look carefully enough &nbsp; :-)</p>
+<p>I performed a simple Internet search for "Revit API LoadCaseArray". </p>
+<p>One of the first hits is The Building Coder article
+on <a href="http://thebuildingcoder.typepad.com/blog/2016/04/whats-new-in-the-revit-2017-api.html">What's New in the Revit 2017 API</a>.</p>
+<p>Searching that for <code>LoadCaseArray</code>, you first see it listed in the section
+on <a href="http://thebuildingcoder.typepad.com/blog/2016/04/whats-new-in-the-revit-2017-api.html#2.22">Obsolete API removal</a>.</p>
+<p>It does not refer to the <code>LoadCaseArray</code> class, though, but the <code>NewLoadCombination</code> method that was previously using it.</p>
+<p>Another hit is the
+old <a href="http://revitapisearch.com/html/b956962a-5802-cca1-e806-cc0461fac741.htm">online Revit 2014 API documentation entry for <code>LoadCaseArray</code></a>.</p>
+<p>That tells me that this is a collection class.</p>
+<p>In the far distant past, the Revit API defined heaps of custom collection classes.</p>
+<p>They have (almost) all been replaced by generic collections, i.e., something like <code>List&lt;LoadCase&gt;</code>.</p>
+<p>You need to look for the updated signature of whatever method call you need to make.</p>
+<p>What method is it?</p>
+<p><code>NewLoadCombination</code>?</p>
+<p>What argument does it take?</p>
+<p>I performed a new Internet search for "Revit API NewLoadCombination", which turns up The Building Coder article
+on <a href="http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html">What's New in the Revit 2016 API</a>.</p>
+<p>It includes this section:</p>
+<h4><a name="4"></a>Load cases and load combinations</h4>
+<p>The Revit API classes related to Load Cases and Load Combinations have been significantly renovated. This has introduced new members to the LoadCombnation, LoadCase, LoadNature and LoadUsage classes, and resulted in several previously existing member being marked deprecated and replaced, as shown in this table:</p>
+<ul>
+<li>Deprecated member &rarr; New/replacement member</li>
+<li>Document.NewLoadCombination() &rarr; LoadCombination.Create()</li>
+<li>etc.</li>
+</ul>
+<p>I hope this answers your question.</p>
+<p>Well, maybe not quite.</p>
+<p>The whole area of load combinations seems to have been cleaned up quite significantly in the past few releases.</p>
+<p>One of the first places to look for working sample code and see how different classes, method calls and properties are used together to achieve certain tasks is the Revit SDK sample collection.</p>
+<p>Always perform the following searches before asking anyone else for help:</p>
+<ol>
+<li>Revit API help file RevitAPI.chm, provided with the Revit SDK, available online at <a href="http://www.revitapidocs.com">revitapidocs.com</a> for classes, properties and methods.</li>
+<li><a href="http://help.autodesk.com/view/RVT/2017/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42">Developer Guide</a>, provided with the online <a href="http://help.autodesk.com/view/RVT/2017/ENU/">Revit Help</a>, for background understanding.</li>
+<li>Revit SDK samples, provided in the <a href="http://www.autodesk.com/developrevit">Revit developer centre</a>, to see how to solve specific tasks.</li>
+</ol>
+<p>In this case, I see lots of results searching the Revit SDK samples for <code>LoadCombination</code>.</p>
+<p>I much more hope that you are not only fed, but also in the process of being <a href="http://thebuildingcoder.typepad.com/blog/2009/02/creating-a-group-and-how-to-fish.html">transformed into a competent fisherman</a> &nbsp; :-)</p>
+<p>Good luck with your further searches.</p>
+<p><center>
+<img src="img/fishhook.jpg" alt="Stone Age fish hook made from bone" width="100">
+<p style="font-size:smaller">Stone Age fish hook made from bone, from Nordisk Familjebok (1917)<br/><a href="//commons.wikimedia.org/wiki/File:Metkrok_av_ben_fr%C3%A5n_sten%C3%A5ldern,_funnen_i_Sk%C3%A5ne.jpg" title="Metkrok av ben från stenåldern, funnen i Skåne.jpg">Metkrok av ben från stenåldern, funnen i Skåne</a>, public domain</p>
+</center></p>
+<h4><a name="5">Dynamo 1.1 Update</a></h4>
+<p>Finally, to close for today, let me just point out that Autodesk released the <a href="http://architosh.com/2016/08/autodesk-releases-dynamo-1-1-update-for-computational-design">Dynamo 1.1 Update for Computational Design</a>.</p>
+<p>Have fun!</p>
