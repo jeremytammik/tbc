@@ -1,0 +1,86 @@
+<p><head>
+<title>The Building Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true" defer="defer"></script>
+</head></p>
+<!---
+
+A StackButton can be a PushButton with options
+
+using a stacked ribbon panel to display a primary command with a subsidiary option setting button in
+
+
+ #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
+
+&ndash; ...
+
+-->
+
+<h3>Stacked Ribbon Button Panel Options</h3>
+<p>A C# .NET Revit add-in demonstrating use of a split ribbon button to access a secondary command, e.g., option settings.</p>
+<p>In the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> thread
+on using <a href="http://forums.autodesk.com/t5/revit-api/a-stackbutton-can-be-a-pushbutton-with-options/td-p/6530274">a StackButton as a PushButton with options</a>,
+Allan <a href="http://forums.autodesk.com/t5/user/viewprofilepage/user-id/540057">aksaks</a> Seidel recently proposed a neat UI trick, saying:</p>
+<p>Perhaps this idea might be usable for others.</p>
+<p>The <code>StackButton</code> ribbon control is a stack of different <code>PushButton</code> instances where the last used <code>PushButton</code> remains visible to be used again. That visible button is reflected in the stack button's <code>CurrentButton</code> property. Imagine if the <code>StackButton</code> control always shows the first button in the stack, and the other button(s) are secondary to the first button's purpose.</p>
+<p>Using the callback concept described in The Building Coder suggestion 
+to <a href="http://thebuildingcoder.typepad.com/blog/2012/11/roll-your-own-toggle-button.html">roll your own toggle button</a>, you can have the second <code>Pushbutton</code> in a two-button <code>Stackbutton</code> reset the current button property back to that of the first button. Therefore, this <code>StackButton</code> item always shows and activates the first button's action on its button face, but also has a secondary option to invoke a settings manager activated by the second button.</p>
+<p>Set the first button in the button stack to your add-in command of choice. Set the second button in the button stack to show a Windows Forms or WPF window to be the first button's settings manager. Have the settings communicated through the add-in's Properties.Settings. The first button's command reads the current settings prior to acting. The second button's actions reads, sets and saves the settings the first button uses. It ends with a call-back function that resets the StackButton's current button to the first button in the stack. These settings would also persist between Revit sessions.</p>
+<p>For example, this is what a second button might invoke:</p>
+<pre class="code">
+[<span style="color:#2b91af;">Transaction</span>(&nbsp;<span style="color:#2b91af;">TransactionMode</span>.Manual&nbsp;)]
+<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">SectionFarClipResetOptions</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IExternalCommand</span>
+{
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">Result</span>&nbsp;Execute(
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ExternalCommandData</span>&nbsp;commandData,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">ref</span>&nbsp;<span style="color:blue;">string</span>&nbsp;message,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementSet</span>&nbsp;elements&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UIApplication</span>&nbsp;uiapp&nbsp;=&nbsp;commandData.Application;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UIDocument</span>&nbsp;uidoc&nbsp;=&nbsp;uiapp.ActiveUIDocument;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;thisDoc&nbsp;=&nbsp;uidoc.Document;
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FarClipSettingWPF</span>&nbsp;settingWPF&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FarClipSettingWPF</span>(&nbsp;thisDoc&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;settingWPF.ShowDialog();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">AppFarClip</span>.Instance.SetSplitButtonFarClipToTop();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Succeeded;
+&nbsp;&nbsp;}
+}
+</pre>
+
+<p>This is what the callback function might be in a hardcoded style:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;SetSplitButtonFarClipToTop()&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">PushButton</span>&gt;&nbsp;sbList&nbsp;=&nbsp;sbFarClip.GetItems();
+&nbsp;&nbsp;&nbsp;&nbsp;sbFarClip.CurrentButton&nbsp;=&nbsp;sbList[0];
+&nbsp;&nbsp;}
+</pre>
+
+<p><code>sbFarClip</code> is a public <code>SplitButton</code> in this case.</p>
+<p>Many thanks to Allan for this neat suggestion and sample code.</p>
+<p>He implemented the Visual Studio solution <a href="zip/as_SplitButtonOptionConcept.zip">SplitButtonOptionConcept</a> implementing a full sample Revit add-in demonstrating the concept.</p>
+<p>I created the new <a href="https://github.com/jeremytammik/SplitButtonOptionConcept">SplitButtonOptionConcept GitHub repository</a> for it to live in.</p>
+<p>His original solution is set up to compile with the Revit 2013 API assemblies and be automatically installed in the post-build event for Revit 2015 and Revit 2016.</p>
+<p>I stored that initial version as <a href="https://github.com/jeremytammik/SplitButtonOptionConcept/releases/tag/2016.0.0.0">release 2016.0.0.0</a>.</p>
+<p>Next, I migrated and tested it in Revit 2017, tagging that as <a href="https://github.com/jeremytammik/SplitButtonOptionConcept/releases/tag/2017.0.0.0">release 2017.0.0.0</a>.</p>
+<p>The add-in displays the following ribbon panel:</p>
+<p><center>
+<img src="img/split_button_options_panel.png" alt="SplitButtonOptionConcept ribbon panel" width="107">
+</center></p>
+<p>You can either click the main button, which is always displayed at the top as the current option, to trigger the main command, or drop down the rest of the stacked button contents to display the option button:</p>
+<p><center>
+<img src="img/split_button_options_buttons.png" alt="SplitButtonOptionConcept buttons" width="108">
+</center></p>
+<p>The current version is <a href="https://github.com/jeremytammik/SplitButtonOptionConcept/releases/tag/2017.0.0.1">release 2017.0.0.1</a> including
+some further minor cleanup.</p>
+<p>As Allan says, perhaps this idea is usable for others as well.</p>
+<p>I plan to use it right away for my Revit add-in complementing Kean Walmsley's <a href="http://through-the-interface.typepad.com/through_the_interface/2016/08/my-entry-for-autodesks-first-global-hackathon-a-hololens-based-tool-for-navigating-low-visibility-environments.html">entry for Autodesk’s first Global Hackathon: a HoloLens-based tool for navigating low visibility environments</a>,
+part of his <a href="http://through-the-interface.typepad.com/through_the_interface/hololens">Hololens project series</a>, including and not limited to:</p>
+<ul>
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2016/08/using-hololens-to-display-diagnostic-information-for-building-components.html">Using HoloLens to display diagnostic information for building components</a></li>
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2016/08/scaling-our-unity-model-in-hololens.html">Scaling our Unity model in HoloLens</a></li>
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2016/08/adding-spatial-sound-to-our-unity-model-in-hololens-part-3.html">Adding spatial sound to our Unity model in HoloLens</a></li>
+<li><a href="http://through-the-interface.typepad.com/through_the_interface/2016/07/displaying-your-unity-model-in-3d-using-hololens.html">Displaying your Unity model in 3D using HoloLens</a></li>
+</ul>
+<p>Many thanks again to Allan, have fun yourself, and please wish me and Kean lots of luck, fun and success in our hackathon efforts.</p>
