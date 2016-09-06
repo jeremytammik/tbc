@@ -11,6 +11,7 @@ A StackButton can be a PushButton with options
 
 using a stacked ribbon panel to display a primary command with a subsidiary option setting button in
 
+(http://forums.autodesk.com/t5/user/viewprofilepage/user-id/540057)
 
  #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
 
@@ -24,7 +25,7 @@ Topic: a C# .NET Revit add-in demonstrating use of a split ribbon button to acce
 
 In the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api/bd-p/160) thread
 on using [a StackButton as a PushButton with options](http://forums.autodesk.com/t5/revit-api/a-stackbutton-can-be-a-pushbutton-with-options/td-p/6530274),
-Allan [aksaks](http://forums.autodesk.com/t5/user/viewprofilepage/user-id/540057) Seidel recently proposed a neat UI trick, saying:
+[Allan 'aksaks' Seidel](http://wmtao.com) recently proposed a neat UI trick, saying:
 
 Perhaps this idea might be usable for others.
  
