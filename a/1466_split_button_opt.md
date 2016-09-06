@@ -94,7 +94,7 @@ You can either click the main button, which is always displayed at the top as th
 <img src="img/split_button_options_buttons.png" alt="SplitButtonOptionConcept buttons" width="108">
 </center>
 
-The current version is [release 2017.0.0.1](https://github.com/jeremytammik/SplitButtonOptionConcept/releases/tag/2017.0.0.1) including
+The current version is [release 2017.0.0.2](https://github.com/jeremytammik/SplitButtonOptionConcept/releases/tag/2017.0.0.2) including
 some further minor cleanup.
 
 As Allan says, perhaps this idea is usable for others as well.
