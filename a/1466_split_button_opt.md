@@ -20,8 +20,7 @@ using a stacked ribbon panel to display a primary command with a subsidiary opti
 
 ### Stacked Ribbon Button Panel Options
 
-A C# .NET Revit add-in demonstrating use of a split ribbon button to access a secondary command, e.g., option settings.
-
+Topic: a C# .NET Revit add-in demonstrating use of a split ribbon button to access a secondary command, e.g., option settings.
 
 In the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api/bd-p/160) thread
 on using [a StackButton as a PushButton with options](http://forums.autodesk.com/t5/revit-api/a-stackbutton-can-be-a-pushbutton-with-options/td-p/6530274),
