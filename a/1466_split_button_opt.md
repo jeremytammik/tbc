@@ -7,13 +7,11 @@
 
 <!---
 
-A StackButton can be a PushButton with options
+[aksaks](http://forums.autodesk.com/t5/user/viewprofilepage/user-id/540057)
 
-using a stacked ribbon panel to display a primary command with a subsidiary option setting button in
+Stacked Ribbon Button Panel Options #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
 
-(http://forums.autodesk.com/t5/user/viewprofilepage/user-id/540057)
-
- #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
+Topic: a C# .NET Revit add-in demonstrating use of a split ribbon button to access a secondary command, e.g., option settings. In the Revit API discussion forum thread on using a <code>StackButton</code> as a <code>PushButton</code> with options, Allan 'aksaks' Seidel recently proposed a neat UI trick, saying: Perhaps this idea might be usable for others. The <code>StackButton</code> ribbon control is a stack of different <code>PushButton</code> instances where the last used <code>PushButton</code> remains visible to be used again. That visible button is reflected in the stack button's <code>CurrentButton</code> property. Imagine if the <code>StackButton</code> control always shows the first button in the stack, and the other button(s) are secondary to the first button's purpose...
 
 &ndash; ...
 
@@ -31,8 +29,8 @@ Perhaps this idea might be usable for others.
  
 The `StackButton` ribbon control is a stack of different `PushButton` instances where the last used `PushButton` remains visible to be used again. That visible button is reflected in the stack button's `CurrentButton` property. Imagine if the `StackButton` control always shows the first button in the stack, and the other button(s) are secondary to the first button's purpose.
  
-Using the callback concept described in The Building Coder suggestion 
-to [roll your own toggle button](http://thebuildingcoder.typepad.com/blog/2012/11/roll-your-own-toggle-button.html), you can have the second `Pushbutton` in a two-button `Stackbutton` reset the current button property back to that of the first button. Therefore, this `StackButton` item always shows and activates the first button's action on its button face, but also has a secondary option to invoke a settings manager activated by the second button.
+Using the call-back concept described in The Building Coder suggestion 
+to [roll your own toggle button](http://thebuildingcoder.typepad.com/blog/2012/11/roll-your-own-toggle-button.html), you can have the second `Pushbutton` in a two-button `StackButton` reset the current button property back to that of the first button. Therefore, this `StackButton` item always shows and activates the first button's action on its button face, but also has a secondary option to invoke a settings manager activated by the second button.
  
 Set the first button in the button stack to your add-in command of choice. Set the second button in the button stack to show a Windows Forms or WPF window to be the first button's settings manager. Have the settings communicated through the add-in's Properties.Settings. The first button's command reads the current settings prior to acting. The second button's actions reads, sets and saves the settings the first button uses. It ends with a call-back function that resets the StackButton's current button to the first button in the stack. These settings would also persist between Revit sessions.
  
@@ -59,7 +57,7 @@ For example, this is what a second button might invoke:
 }
 </pre>
 
-This is what the callback function might be in a hardcoded style:
+This is what the call-back function might be in a hardcoded style:
  
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;SetSplitButtonFarClipToTop()&nbsp;{
@@ -72,7 +70,7 @@ This is what the callback function might be in a hardcoded style:
 
 Many thanks to Allan for this neat suggestion and sample code.
 
-He implemented the Visual Studio solution [SplitButtonOptionConcept](zip/as_SplitButtonOptionConcept.zip) implementing a full sample Revit add-in demonstrating the concept.
+He provided the <a href="zip/as_SplitButtonOptionConcept.zip">SplitButtonOptionConcept</a>Visual Studio solution implementing a full sample Revit add-in demonstrating the concept.
 
 I created the new [SplitButtonOptionConcept GitHub repository](https://github.com/jeremytammik/SplitButtonOptionConcept) for it to live in.
 
@@ -95,12 +93,12 @@ You can either click the main button, which is always displayed at the top as th
 </center>
 
 The current version is [release 2017.0.0.2](https://github.com/jeremytammik/SplitButtonOptionConcept/releases/tag/2017.0.0.2) including
-some further minor cleanup.
+some further minor clean-up.
 
 As Allan says, perhaps this idea is usable for others as well.
 
 I plan to use it right away for my Revit add-in complementing Kean Walmsley's [entry for Autodesk’s first Global Hackathon: a HoloLens-based tool for navigating low visibility environments](http://through-the-interface.typepad.com/through_the_interface/2016/08/my-entry-for-autodesks-first-global-hackathon-a-hololens-based-tool-for-navigating-low-visibility-environments.html),
-part of his [Hololens project series](http://through-the-interface.typepad.com/through_the_interface/hololens), including and not limited to:
+part of his [HoloLens project series](http://through-the-interface.typepad.com/through_the_interface/hololens), including and not limited to:
 
 - [Using HoloLens to display diagnostic information for building components](http://through-the-interface.typepad.com/through_the_interface/2016/08/using-hololens-to-display-diagnostic-information-for-building-components.html)
 - [Scaling our Unity model in HoloLens](http://through-the-interface.typepad.com/through_the_interface/2016/08/scaling-our-unity-model-in-hololens.html)
