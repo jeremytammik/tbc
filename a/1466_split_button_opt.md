@@ -106,3 +106,10 @@ part of his [HoloLens project series](http://through-the-interface.typepad.com/t
 - [Displaying your Unity model in 3D using HoloLens](http://through-the-interface.typepad.com/through_the_interface/2016/07/displaying-your-unity-model-in-3d-using-hololens.html)
 
 Many thanks again to Allan, have fun yourself, and please wish me and Kean lots of luck, fun and success in our hackathon efforts during the next two days.
+
+#### <a name="2"></a>Addendum &ndash; Simpler Solution
+
+Please do not overlook the much simpler solution to this task provided directly by the Revit API and pointed out in
+the [comment](http://thebuildingcoder.typepad.com/blog/2016/09/stacked-ribbon-button-panel-options.html#comment-2880240616) below by Ehsan Iran Nejad:
+
+> Or you can just set the `RibbonItem.IsSynchronizedWithCurrentItem` to `False` after creating the `SplitButton`. The first button will be fixed and all the other buttons can only be used from the dropdown menu.
