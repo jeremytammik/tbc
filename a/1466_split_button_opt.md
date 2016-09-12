@@ -113,3 +113,9 @@ Please do not overlook the much simpler solution to this task provided directly 
 the [comment](http://thebuildingcoder.typepad.com/blog/2016/09/stacked-ribbon-button-panel-options.html#comment-2880240616) below by Ehsan Iran Nejad:
 
 > Or you can just set the `RibbonItem.IsSynchronizedWithCurrentItem` to `False` after creating the `SplitButton`. The first button will be fixed and all the other buttons can only be used from the dropdown menu.
+
+#### <a name="3"></a>Not so fast...
+
+Allan responds to the simpler solution suggestion:
+
+> Not so fast. Perhaps that is missing the forest because of the trees. The example is just a two button split button where the second button is the settings button. Consider that split button having three or more buttons where the last button is the settings button and you want the split button to show the last button activated, but never the settings button. The other method no longer works, but the same concepts used in the roll your own method do work. One way, and there may be better ones, takes advantage of the splitbutton's current button value not yet having changed when the newly selected settings button is activated. That name can be saved and then used just before the command return to reset the split button back to what was showing when the used pulled the split button down to select the settings button.
