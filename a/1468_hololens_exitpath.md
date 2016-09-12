@@ -13,15 +13,15 @@ https://t.co/8F1cZuEpTI
 
 https://t.co/uhLYBlue2x
 
- #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
+HoloLens Escape Path Waypoint JSON Exporter #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
 
-&ndash; ...
+Last week, I worked with Kean Walmsley on his entry for the first global Autodesk Hackathon: a HoloLens-based tool for navigating low visibility environments, resulting in the new HoloGuide Autodesk Hackathon project. My modest contribution is the ExportWaypointsJson Revit add-in, an external application implementing the main command, exporting the waypoints, and a subsidiary option settings command, displaying a form, validating input and storing the user preferences. The main command simply prompts the user to pick a model line in the Revit project,  traverses it, determines waypoints at predefined intervals and exports them to JSON for consumption by the HoloGuide visualisation...
 
 -->
 
 ### HoloLens Escape Path Waypoint JSON Exporter
 
-This week, I worked with Kean Walmsley on
+Last week, I worked with Kean Walmsley on
 his [entry for the first global Autodesk Hackathon: a HoloLens-based tool for navigating low visibility environments](http://through-the-interface.typepad.com/through_the_interface/2016/08/my-entry-for-autodesks-first-global-hackathon-a-hololens-based-tool-for-navigating-low-visibility-environments.html), resulting in the
 new [HoloGuide Autodesk Hackathon project](http://through-the-interface.typepad.com/through_the_interface/2016/09/hologuide-an-autodesk-hackathon-project.html).
 
