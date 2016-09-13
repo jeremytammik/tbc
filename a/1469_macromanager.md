@@ -90,6 +90,8 @@ at [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 new [CmdDeleteMacros.cs module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdDeleteMacros.cs)
 in [release 2017.0.129.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.129.0).
 
+Just as Revitalizer suggests, I was forced to add references to `RevitAPIMacros.dll` and `RevitAPIUIMacros.dll` in The Building Coder samples Visual Studio project specifically for this command.
+
 <pre class="code">
 <span style="color:blue;">using</span>&nbsp;Autodesk.Revit.Attributes;
 <span style="color:blue;">using</span>&nbsp;Autodesk.Revit.DB;
