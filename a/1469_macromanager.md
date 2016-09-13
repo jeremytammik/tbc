@@ -9,7 +9,7 @@
 
 http://forums.autodesk.com/t5/revit-api-forum/can-t-obtain-macromanager/m-p/6557705
 
-MacroManager, Materials, KISS and Getting Started #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
+MacroManager, Materials and Getting Started #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
 
 I am answering Revit API discussion forum threads and developer cases like crazy. Instead, as usual at this time of the year, I should be focussing and putting higher priority on the exciting upcoming events. I keep promising myself to do so and stop answering cases. Then I address just one more... Here are some of the upcoming events and recent Revit API issues
 &ndash; Events &ndash; Forge Accelerators, DevDay, RTC and AU
@@ -19,7 +19,7 @@ I am answering Revit API discussion forum threads and developer cases like crazy
 
 -->
 
-### MacroManager, Materials, KISS and Getting Started
+### MacroManager, Materials and Getting Started
 
 I am answering [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
 and developer cases like crazy.
@@ -55,7 +55,9 @@ Real soon now!
 
 Next, I address
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api/bd-p/160) thread
-on [obtaining the MacroManager](http://forums.autodesk.com/t5/revit-api-forum/can-t-obtain-macromanager/m-p/6557705):
+on [obtaining the MacroManager](http://forums.autodesk.com/t5/revit-api-forum/can-t-obtain-macromanager/m-p/6557705)
+as well as [Frederic's comment](http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html#comment-2842394984)
+on [What's New in the Revit 2014 API](http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html):
 
 **Question:** I'm stuck with getting MacroManager object.
 There are much more class members listed in API reference then really available.
