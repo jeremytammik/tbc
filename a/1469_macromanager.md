@@ -9,9 +9,13 @@
 
 http://forums.autodesk.com/t5/revit-api-forum/can-t-obtain-macromanager/m-p/6557705
 
- #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
+MacroManager, Materials, KISS and Getting Started #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
 
-Last week, I worked with Kean Walmsley on his entry for the first global Autodesk Hackathon: a HoloLens-based tool for navigating low visibility environments, resulting in the new HoloGuide Autodesk Hackathon project. My modest contribution is the ExportWaypointsJson Revit add-in, an external application implementing the main command, exporting the waypoints, and a subsidiary option settings command, displaying a form, validating input and storing the user preferences. The main command simply prompts the user to pick a model line in the Revit project,  traverses it, determines waypoints at predefined intervals and exports them to JSON for consumption by the HoloGuide visualisation...
+I am answering Revit API discussion forum threads and developer cases like crazy. Instead, as usual at this time of the year, I should be focussing and putting higher priority on the exciting upcoming events. I keep promising myself to do so and stop answering cases. Then I address just one more... Here are some of the upcoming events and recent Revit API issues
+&ndash; Events &ndash; Forge Accelerators, DevDay, RTC and AU
+&ndash; Accessing the MacroManager to Delete Document Macros
+&ndash; Getting Started and Changing the Colour of a Wall
+&ndash; Getting Started and Using the Visual Studio Revit Add-In Wizard Auto-Installer...
 
 -->
 
@@ -22,7 +26,7 @@ and developer cases like crazy.
 
 Instead, as usual at this time of the year, I should be focussing and putting higher priority on the exciting upcoming events.
 
-I keep promising myself to do so and stop answering cases. Just one more...
+I keep promising myself to do so and stop answering cases. Then I address just one more...
 
 Here are some of the upcoming events and recent Revit API issues:
 
