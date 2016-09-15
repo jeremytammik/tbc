@@ -37,6 +37,7 @@ That led to the following topics:
 - [Back to the ants &ndash; project summary](#4)
 - [Q &amp; A](#5)
 - [Two different energy model types](#6)
+- [Addendum &ndash; Advances in Architectural Geometry 2016](#7)
 
 
 #### <a name="2"></a>BPA is now Insight360
@@ -133,3 +134,33 @@ to [What's New in the Revit 2016 API](http://thebuildingcoder.typepad.com/blog/2
 
 - SpatialElement &ndash; Energy model based on rooms or spaces. This is the default for calls when this option is not set, and matches the behaviour prior to Revit 2016.
 - BuildingElement &ndash; Energy model based on analysis of building element volumes.
+
+
+#### <a name="7"></a>Addendum &ndash; Advances in Architectural Geometry 2016
+
+Talking about exciting computational generative architectural innovation, you should take a look at the wonderful, impressive, beautiful and exciting ETH Zürich [Advances in Architectural Geometry 2016](http://vdf.ch/advances-in-architectural-geometry-2016-e-book.html). 
+
+Here is its table of contents:
+
+- Analysis and Design of Curved Support Structures
+- Measuring and Controlling Fairness of Triangulations
+- Face-Offsetting Polygon Meshes with Variable Offset Rates
+- Marionette Mesh: From Descriptive Geometry to Fabrication-Aware Design
+- Designing with Curved Creases: Digital and Analog Constraints
+- A Double-Layered Timber Plate Shell: Computational Methods for Assembly, Prefabrication, and Structural Design
+- On the Hierarchical Construction of SL Blocks: A Generative System that Builds Self-Interlocking Structures
+- Tree Fork Truss: Geometric Strategies for Exploiting Inherent Material Form
+- Textile Fabrication Techniques for Timber Shells: Elastic Bending of Custom-Laminated Veneer for Segmented Shell Construction Systems
+- Bending-Active Plates: Form and Structure
+- Underwood Pavilion: A Parametric Tensegrity Structure
+- Safra Neuron Screen: Design and Fabrication
+- Scissor Mechanisms for Transformable Structures with Curved Shape: The “Jet d’Eau” Movable Footbridge in Geneva
+- Mastering the “Sequential Roof”: Computational Methods for Integrating Design, Structural Analysis, and Robotic Fabrication
+- Adaptive Meshing for Bi-directional Information Flows: A Multi-Scale Approach to Integrating Feedback between Design, Simulation, and Fabrication
+- Dimensionality Reduction for Parametric Design Exploration
+- Force Adaptive Hot-Wire Cutting: Integrated Design, Simulation, and Fabrication of Double-Curved Surface Geometries
+- Designing for Hot-Blade Cutting: Geometric Approaches for High-Speed Manufacturing of Doubly-Curved Architectural Surfaces
+- Cuttable Ruled Surface Strips for Milling
+- The Armadillo Vault: Computational Design and Digital Fabrication of a Freeform Stone Shell
+- CASTonCAST Shell Structures: Realisation of a 1:10 Prototype of a Post-Tensioned Shell Structure from Precast Stackable Components
+- Lightweight Conical Components for Rotational Parabolic Domes: Geometric De nition, Structural Behaviour, Optimisation and Digital Fabrication
