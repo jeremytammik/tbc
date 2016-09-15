@@ -154,8 +154,8 @@ Here is its table of contents:
 - Bending-Active Plates: Form and Structure
 - Underwood Pavilion: A Parametric Tensegrity Structure
 - Safra Neuron Screen: Design and Fabrication
-- Scissor Mechanisms for Transformable Structures with Curved Shape: The “Jet d’Eau” Movable Footbridge in Geneva
-- Mastering the “Sequential Roof”: Computational Methods for Integrating Design, Structural Analysis, and Robotic Fabrication
+- Scissor Mechanisms for Transformable Structures with Curved Shape: The 'Jet d’Eau' Movable Footbridge in Geneva
+- Mastering the 'Sequential Roof': Computational Methods for Integrating Design, Structural Analysis, and Robotic Fabrication
 - Adaptive Meshing for Bi-directional Information Flows: A Multi-Scale Approach to Integrating Feedback between Design, Simulation, and Fabrication
 - Dimensionality Reduction for Parametric Design Exploration
 - Force Adaptive Hot-Wire Cutting: Integrated Design, Simulation, and Fabrication of Double-Curved Surface Geometries
@@ -163,4 +163,4 @@ Here is its table of contents:
 - Cuttable Ruled Surface Strips for Milling
 - The Armadillo Vault: Computational Design and Digital Fabrication of a Freeform Stone Shell
 - CASTonCAST Shell Structures: Realisation of a 1:10 Prototype of a Post-Tensioned Shell Structure from Precast Stackable Components
-- Lightweight Conical Components for Rotational Parabolic Domes: Geometric De nition, Structural Behaviour, Optimisation and Digital Fabrication
+- Lightweight Conical Components for Rotational Parabolic Domes: Geometric Definition, Structural Behaviour, Optimisation and Digital Fabrication
