@@ -7,10 +7,14 @@
 
 <!---
 
- #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
+Roomedit3d Update for Connecting Desktop and Forge #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
 
-&ndash; 
-...
+As I already pointed out, it is really high time now for me to get started preparing for the upcoming presentations on connecting the desktop and the cloud. Let's look at what I prepared for that in the past, in the recent almost-present for the Forge DevCon in June, and plans for the future
+&ndash; Past connecting desktop and cloud samples
+&ndash; DevCon Forge sample for Freeing Your BIM Data
+&ndash; Roomedit3dv3 starting point
+&ndash; Augusto's node.js sample guidelines and naming conventions
+&ndash; Forge Viewer access to Revit 2D views...
 
 -->
 
@@ -225,13 +229,13 @@ It displays both 2D and 3D views.
 Note the list of available 2D views in the Secondary View dropdown:
 
 <center>
-<img src="img/lmvnavtest.png" alt="Default 3D and selected 2D secondary view" width="650">
+<img src="img/lmvnavtest.png" alt="LmvNavTest default 3D and selected 2D secondary view" width="650">
 </center>
 
 It even links the elements in the two views so that anything selected in one is highlighted in the other:
 
 <center>
-<img src="img/lmvnavtest.png" alt="Selected element synchronisation across views" width="619">
+<img src="img/lmvnavtest_select.png" alt="LmvNavTest selected element synchronisation across views" width="619">
 </center>
 
 You could check from where it gets the 2D streams.
