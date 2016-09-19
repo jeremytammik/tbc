@@ -211,7 +211,7 @@ on [displaying a webcam image on a building element face](http://thebuildingcode
 
 Currently I'm trying to change the colour of a wall according to a certain value. For example: value 20 will make the wall red when I click on it and if I click on the wall again it will be green according to a new value. The values are stored in an array and currently have 4 values. I use the sample library project `WorkThread` and it uses the same `SetupDisplayStyle` function to set the display style. There I pick the colour from array values. However, the wall is coloured in 4th colour when I click on the wall for the 4th time, and the first three times the wall isn't coloured at all. Could you please tell me in which function/method should I change/iterate through in order to have different colours (defined from array values) every time I click on a wall.
 
-**Answer:** If you are new to the Revit PI, I would strongly suggest that you work through
+**Answer:** If you are new to the Revit API, I would strongly suggest that you work through
 the [Revit API getting started material](http://thebuildingcoder.typepad.com/blog/about-the-author.html#2) first
 of all, especially the DevTV and My First Revit Plugin video tutorials.
 
