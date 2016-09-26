@@ -7,6 +7,8 @@
 
 <!---
 
+12177368 [创建剖面视图时遇到的问题 -- When you create a cross-sectional view of the problems encountered]
+
 Flipping a Section View and @AutodeskForge Webinar 3 #revitapi #3dwebcoder @AutodeskRevit #aec #bim
 
 I already created a starting point for the new roomedit3d incarnation last week, in its own repository. This week, I agreed with Philippe to retain the new project in an own branch within the Forge boilerplate code sample collection. Hopefully, that will simplify keeping my BIM sample synchronised with any future updates make to that. Now I need to get started implementing and testing the actual viewer extension functionality itself. My main topic today is something different and purely Revit API oriented, besides the next Forge session
