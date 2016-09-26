@@ -23,7 +23,7 @@ I made my choice on the starting point for the new [roomedit3d](https://github.c
 - [Forge webinar series](#3)
 
 
-#### <a name="3"></a>The Birth of Roomedit3dv3
+#### <a name="2"></a>The Birth of Roomedit3dv3
 
 So far, I evaluated two of Augusto's apps and Philippe's series of boilerplate sample apps as potential starting points for a new incarnation
 of [roomedit3d](https://github.com/jeremytammik/roomedit3d):
