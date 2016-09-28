@@ -1,0 +1,108 @@
+<p><head>
+<title>The Building Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true" defer="defer"></script>
+</head></p>
+<!---
+
+Roomedit3d Broadcast, Teigha BIM and @AutodeskForge Webinar 3 #revitapi #3dwebcoder @AutodeskRevit #aec #bim
+
+My discussion with Philippe on integrating <code>roomedit3dv3</code> with the rest of his Forge node.js boilerplate samples continues, as does the Forge hackathon webinar series. Furthermore, the Open Design Alliance made an interesting Revit related announcement
+&ndash; REST vs WebSocket and Roomedit3dv3 broadcast architecture
+&ndash; Teigha BIM announcement
+&ndash; Forge webinar series...
+
+-->
+
+<h3>Roomedit3d Broadcast, Teigha BIM and Forge Webinar 3</h3>
+<p>My discussion with Philippe on
+integrating <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/roomedit3d">roomedit3dv3</a> with the rest of
+his <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs">Forge node.js boilerplate samples</a> continues, as does the Forge hackathon webinar series.</p>
+<p>Furthermore, the Open Design Alliance made an interesting Revit related announcement:</p>
+<ul>
+<li><a href="#2">REST vs WebSocket and Roomedit3dv3 broadcast architecture</a></li>
+<li><a href="#3">Teigha BIM announcement</a></li>
+<li><a href="#4">Forge webinar series</a></li>
+</ul>
+<h4><a name="2"></a>REST vs WebSocket and Roomedit3dv3 Broadcast Architecture</h4>
+<p><a href="http://twitter.com/F3lipek">Philippe Leefsma</a> and I discussed how to communicate end user modifications made using the custom viewer extension back to the Revit add-in to update the BIM.</p>
+<p>Philippe suggested:</p>
+<blockquote>
+<p>Putting all the code into a viewer extension to make it pretty easy to manage. I could add potentially useful features to my server if needed by your app.</p>
+</blockquote>
+<p><strong>Question:</strong> In my previous architecture, I used REST to notify the server from the client, and <code>socket.io</code> from the server to the rest of the world.</p>
+<ul>
+<li>Client viewer extension &rarr; REST &rarr; server &rarr; <code>socket.io</code> &rarr; desktop</li>
+</ul>
+<p>Therefore, I did not just add a pure client viewer extension, but also fiddled around in the server a bit as well.</p>
+<p>Should I try to put the <code>socket.io</code> broadcast directly into the viewer extension, and avoid the extra communication step?</p>
+<ul>
+<li>Client viewer extension &rarr; <code>socket.io</code> &rarr; desktop</li>
+</ul>
+<p>Here is the architecture implementation that I used successfully for that last time around:</p>
+<ul>
+<li><a href="https://github.com/jeremytammik/roomedit3d/blob/master/www/js/extensions/Roomedit3dTranslationTool.js">Viewer extension</a></li>
+<li><a href="https://github.com/jeremytammik/roomedit3d/blob/master/www/js/roomedit3dapiclient.js">Client notification to server</a></li>
+<li><a href="https://github.com/jeremytammik/roomedit3d/blob/master/routes/api/roomedit3d.js">Server broadcast request API endpoint</a></li>
+<li><a href="https://github.com/jeremytammik/roomedit3d/blob/master/server.js#L54-L60">Server broadcast relay</a></li>
+</ul>
+<p><strong>Answer:</strong> You have to go from client to server if you want to broadcast a message to other connected clients, but it seems like you don't need to handle any very specific logic on the server; basically the server can expose a generic REST endpoint which will receive a message and dispatch it to all other clients except the one that initiated the request.</p>
+<p>The server already implements a <code>SocketSvc</code> socket service which we can use for that.</p>
+<p>There are two options how this can be implemented:</p>
+<ol>
+<li>Similar to what you did last time: REST endpoint exposed by server, client calls POST with a payload containing message, server broadcast to all other clients.</li>
+<li>Client uses socket to send message to server, server broadcasts message to all other clients.</li>
+</ol>
+<p>In both cases I need to add a little piece of code to my server, so the feature is more generic than what you did last time. I will also add a SocketService on the client side, so it's easy to use.</p>
+<p>Here is an illuminating read on a <a href="http://blog.arungupta.me/rest-vs-websocket-comparison-benchmarks">REST vs WebSocket comparison and benchmarks</a>.</p>
+<p>Take a look at that and decide which is more suitable for your scenario.</p>
+<p>Later: I just finished adding a thin wrapper around client side socket.</p>
+<p>It is now wrapped in a 'service' making it avail application-wide through the client-side <code>ServiceManager</code> like this:</p>
+<pre class="prettyprint">
+import ServiceManager from 'Services/SvcManager'
+
+var svc = ServiceManager.getService('SocketSvc')
+
+svc.broadcast('your-msg-id', {data...})
+</pre>
+
+<p>All other clients but the initiator will receive the message.</p>
+<p>An example of using this is provided in the <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/blob/master/6%20-%20viewer%2Bserver%2Bdata-mng%2Bderivatives/src/client/App.js#L251">client App.js</a>.</p>
+<p>Time for me to get going on implementing and using this, then.</p>
+<h4><a name="3"></a>Teigha BIM Announcement</h4>
+<p>The <a href="https://www.opendesign.com">Open Design Alliance ODA</a> is working on <a href="https://www.opendesign.com/products/teigha-bim">Teigha BIM</a> to provide access to Revit model data and family definitions in <code>RVT</code> and <code>RFA</code> files without a running session of Revit.</p>
+<p>Here is the <a href="https://www.opendesign.com/news/2016/september/oda-announces-teigha%C2%AE-bim">ODA Teigha BIM announcement</a> and
+an <a href="http://architosh.com/2016/09/oda-accelerates-bim-interoperability-with-native-revit-file-support">Architosh article</a> on its current status.</p>
+<h4><a name="4"></a>Forge Webinar Series</h4>
+<p>Yesterday, Adam Nagy presented the third session in the ongoing Forge webinar series, on the Model Derivative API.</p>
+<p>Here are the recordings, presentations and support material of the sessions held so far:</p>
+<ul>
+<li>September 20 &ndash; <a href="http://adndevblog.typepad.com/cloud_and_mobile/2016/09/introduction-to-autodesk-forge-and-the-autodesk-app-store.html">Introduction to Autodesk Forge and the Autodesk App Store</a></li>
+<li>September 22 &ndash; <a href="http://adndevblog.typepad.com/cloud_and_mobile/2016/09/introduction-to-oauth-and-data-management-api.html">Introduction to OAuth and Data Management API</a>
+&ndash; on <a href="https://developer.autodesk.com/en/docs/oauth/v2/overview">OAuth</a>
+and <a href="https://developer.autodesk.com/en/docs/data/v2/overview">Data Management API</a>, providing token-based authentication, authorization and a unified and consistent way to access data across A360, Fusion 360, and the Object Storage Service.</li>
+<li>September 27 &ndash; <a href="http://adndevblog.typepad.com/cloud_and_mobile/2016/09/introduction-to-model-derivative-api.html">Introduction to Model Derivative API</a>
+&ndash; on the <a href="https://developer.autodesk.com/en/docs/model-derivative/v2/overview">Model Derivative API</a> that enables users to represent and share their designs in different formats and extract metadata.</li>
+</ul>
+<p>Upcoming sessions continue during the remainder of
+the <a href="http://autodeskforge.devpost.com">Autodesk App Store Forge and Fusion 360 Hackathon</a> until the end of October:</p>
+<ul>
+<li>September 29 &ndash; <a href="https://developer.autodesk.com/en/docs/viewer/v2/overview">Viewer API</a> &ndash; 
+formerly part of the 'View and Data API', a WebGL-based, JavaScript library for 3D and 2D model rendering a CAD data from seed models, e.g., <a href="http://www.autodesk.com/products/autocad/overview">AutoCAD</a>, <a href="http://www.autodesk.com/products/fusion-360/overview">Fusion 360</a>, <a href="http://www.autodesk.com/products/revit-family/overview">Revit</a>, and many other formats.</li>
+<li>October 4 &ndash; <a href="https://developer.autodesk.com/en/docs/design-automation/v2/overview">Design Automation API</a> &ndash; formerly known as 'AutoCAD I/O', run scripts on design files.</li>
+<li>October 6 &ndash; <a href="https://developer.autodesk.com/en/docs/bim360/v1/overview">BIM360</a> &ndash; develop apps that integrate with BIM 360 to extend its capabilities in the construction ecosystem.</li>
+<li>October 11 &ndash; <a href="http://help.autodesk.com/view/NINVFUS/ENU/?guid=GUID-A92A4B10-3781-4925-94C6-47DA85A4F65A">Fusion 360 Client API</a> &ndash; an integrated CAD, CAM, and CAE tool for product development, built for the new ways products are designed and made.</li>
+<li>October 13 &ndash; Q&amp;A on all APIs.</li>
+<li>October 20 &ndash; Q&amp;A on all APIs.</li>
+<li>October 27 &ndash; Submitting a web service app to Autodesk App store.</li>
+</ul>
+<p>Quick access links:</p>
+<ul>
+<li>For API keys, go to <a href="https://developer.autodesk.com">developer.autodesk.com</a></li>
+<li>For code samples, go to <a href="https://github.com/Developer-Autodesk">github.com/Developer-Autodesk</a></li>
+</ul>
+<p>Feel free to contact us at <a href="mailto:forgehackathon@autodesk.com">forgehackathon@autodesk.com</a> at any time with any questions.</p>
+<p><center>
+<img src="img/forge_accelerator.png" alt="Forge &ndash; build the future of making things together" width="400">
+</center></p>
