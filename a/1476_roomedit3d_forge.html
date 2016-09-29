@@ -1,0 +1,231 @@
+<p><head>
+<title>The Building Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true" defer="defer"></script>
+</head></p>
+<!---
+
+- warning swallower
+  http://forums.autodesk.com/t5/revit-api-forum/general-warning-swallower/m-p/6589045
+
+Warning Swallower, Roomedit3d Viewer Extension @AutodeskForge #revitapi #3dwebcoder @AutodeskRevit #aec #bim
+
+I continue my work on the <code>roomedit3dv3</code> sample connecting the desktop with the cloud by enabling a real-time round-trip modification of the BIM via the Forge viewer, mention a neat solution enabling a Revit add-in to swallowing warning messages, and point out the Forge webinar session on the Forge Viewer later today
+&ndash; Warning swallower
+&ndash; Roomedit3dv3 transform viewer extension
+&ndash; Forge webinar series...
+
+-->
+
+<h3>Warning Swallower and Roomedit3d Viewer Extension</h3>
+<p>I continue my work on the <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/roomedit3d">roomedit3dv3</a> sample
+connecting the desktop with the cloud by enabling a real-time round-trip modification of the BIM via the Forge viewer,
+mention a neat solution enabling a Revit add-in to swallowing warning messages,
+and point out the Forge webinar session on the Forge Viewer later today:</p>
+<ul>
+<li><a href="#2">Warning swallower</a></li>
+<li><a href="#3">Roomedit3dv3 transform viewer extension</a></li>
+<li><a href="#4">Forge webinar series</a></li>
+</ul>
+<h4><a name="2"></a>Warning Swallower</h4>
+<p><a href="http://forums.autodesk.com/t5/user/viewprofilepage/user-id/3946573">Adam Krug</a>
+and <a href="http://forums.autodesk.com/t5/user/viewprofilepage/user-id/1211382">Wolfgang Weh</a> provide a neat warning swallower solution in 
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> thread 
+on a <a href="http://forums.autodesk.com/t5/revit-api-forum/general-warning-swallower/m-p/6589045">general warning swallower</a>:</p>
+<p><strong>Question:</strong> In my solution I'm opening a lot of families from within a project. Sometimes some popups appear during opening a family. I enclosed the opening process inside a transaction in which I handle warnings via IFailuresPreprocessor. I noticed that:</p>
+<p>About 90% warnings can be suppressed with the following:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">FailuresAccessor</span>&nbsp;a;
+&nbsp;&nbsp;a.DeleteAllWarnings();
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">FailureProcessingResult</span>.Continue;
+</pre>
+
+<p>But the remaining 10% won't get suppressed with such treatment, whereas they do get suppressed with:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">FailuresAccessor</span>&nbsp;a;
+&nbsp;&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">FailureMessageAccessor</span>&gt;&nbsp;failures&nbsp;=&nbsp;a.GetFailureMessages();
+&nbsp;&nbsp;a.ResolveFailures(&nbsp;failures&nbsp;);
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">FailureProcessingResult</span>.ProceedWithCommit;
+</pre>
+
+<p>Is there a general way to check with what kind of treatment current warning can get suppressed? I don't want to go into a switch case block because the warnings are really various and it'd take ages before I covered them all. Another issue is that it doesn't matter so much how I treat the warnings because I don't resave the families in my solution - I just close them without saving.</p>
+<p><strong>Answer:</strong> I am not aware of any generic warning swallower within the Revit API.</p>
+<p>The solution you have already seems pretty good to me.</p>
+<p>For something yet more generic, all I can suggest is
+a <a href="http://thebuildingcoder.typepad.com/blog/2009/10/dismiss-dialogue-using-windows-api.html">Windows dialogue handler</a>,
+e.g., <a href="https://github.com/jeremytammik/JtClicker">JtClicker</a>.</p>
+<p>The Building Coder provides an entire topic group on the subject
+of <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32">Detecting and Handling Dialogues and Failures</a>.</p>
+<p><strong>Answer 2:</strong> The solution suggested in the thread
+on <a href="http://forums.autodesk.com/t5/revit-api-forum/supressing-warning-pop-ups/td-p/4764741">suppressing warning pop-ups</a> works
+fine for me.</p>
+<p><strong>Response:</strong> Indeed, the <code>Severity</code> is what I was looking for. My solution seems to be working fine now. Here is the code:</p>
+<pre class="code">
+<span style="color:#2b91af;">FailureProcessingResult</span>&nbsp;PreprocessFailures(&nbsp;
+&nbsp;&nbsp;<span style="color:#2b91af;">FailuresAccessor</span>&nbsp;a&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">FailureMessageAccessor</span>&gt;&nbsp;failures&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;a.GetFailureMessages();
+
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">FailureMessageAccessor</span>&nbsp;f&nbsp;<span style="color:blue;">in</span>&nbsp;failures&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FailureSeverity</span>&nbsp;fseverity&nbsp;=&nbsp;a.GetSeverity();
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;fseverity&nbsp;==&nbsp;<span style="color:#2b91af;">FailureSeverity</span>.Warning&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a.DeleteWarning(&nbsp;f&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">else</span>
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a.ResolveFailure(&nbsp;f&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">FailureProcessingResult</span>.ProceedWithCommit;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">FailureProcessingResult</span>.Continue;
+}
+</pre>
+
+<p>Many thanks to Adam and Wolfgang for sharing this solution!</p>
+<p>I added it
+to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.130.1">release 2017.0.130.1</a> in
+the module <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdPreprocessFailure.cs#L44-L67">CmdPreprocessFailure.cs</a>.</p>
+<h4><a name="3"></a>Roomedit3dv3 Transform Viewer Extension</h4>
+<p>I am implementing
+the <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/roomedit3d">roomedit3dv3</a> sample
+connecting the desktop with the cloud based on
+<a href="http://twitter.com/F3lipek">Philippe Leefsma</a>'s
+<a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs">Forge node.js boilerplate samples</a>.</p>
+<p><a name="3.1"></a>I now added a viewer extension enabling the user to select and translate a BIM element in the Forge viewer.</p>
+<p><center>
+<img src="img/roomedit3dv3_transform_extension.png" alt="Roomedit3dv3 transform extension" width="456">
+</center></p>
+<p>With that up and running, the next step will be to communicate back that modification to update the source Revit BIM.</p>
+<p>I am basing the roomedit viewer transform tool on Philippe's 
+<a href="https://github.com/Developer-Autodesk/library-javascript-viewer-extensions/tree/master/src/Viewing.Extension.Transform">Viewing.Extension.Transform viewer extension</a>,
+from his
+huge <a href="https://github.com/Developer-Autodesk/library-javascript-viewer-extensions">library of JavaScript viewer extensions</a>.</p>
+<p>You can see it in action in the <a href="https://react-gallery.autodesk.io/embed?id=57609f6b177a241809da305e&amp;extIds=Viewing.Extension.Transform">Forge React gallery</a>.</p>
+<p>It took me several steps, lots of advice from Philippe, and some small enhancements to his underlying base boilerplate code to actually get it up and running:</p>
+<blockquote>
+<p>To add the transform extension to the viewer client, first load the three.js script before loading the viewer.</p>
+</blockquote>
+<p>This is implemented in
+the <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/roomedit3d/6%20-%20viewer%2Bserver%2Bdata-mng%2Bderivatives/layout">layout</a>.</p>
+<blockquote>
+<p>Copy the four files viewing extension into your app.</p>
+</blockquote>
+<p>I placed them in
+the <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/roomedit3d/6%20-%20viewer%2Bserver%2Bdata-mng%2Bderivatives/src/client/Components/Viewer/extensions">src/client/Components/Viewer/extensions</a> subfolder.</p>
+<blockquote>
+<p>Load the transform extension by importing the main extension file.</p>
+</blockquote>
+<p>Done in <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/blob/roomedit3d/6%20-%20viewer%2Bserver%2Bdata-mng%2Bderivatives/src/client/Components/Viewer/ViewerPanel.js#L20">ViewerPanel.js</a>.</p>
+<blockquote>
+<p>The extension will register itself, and <code>activateTool</code> activates either the translate or rotate tool.</p>
+<p>The <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/blob/roomedit3d/6%20-%20viewer%2Bserver%2Bdata-mng%2Bderivatives/src/client/Components/Viewer/extensions/Viewing.Tool.Translate.js#L4">translate tool is derived from event emitter</a>.</p>
+<p>It can therefore notify clients about its work by <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/blob/roomedit3d/6%20-%20viewer%2Bserver%2Bdata-mng%2Bderivatives/src/client/Components/Viewer/extensions/Viewing.Tool.Translate.js#L108-L111">emitting events using <code>this.emit</code></a>.</p>
+<p>At this point, you can add the <code>dbid</code> of the selected element to the transmitted data package. From <code>dbid</code> you can get the external id, which corresponds to the Revit <code>UniqueId</code>.</p>
+<p>In the extension constructor, you can subscribe to the events fired by the tool:</p>
+</blockquote>
+<pre class="prettyprint">
+  import ServiceManager // cf. sample in App.js
+
+  translateTool.on('transform.translate', (data) => {
+    
+    viewer.getProperties(data.dbId, callback...)
+      
+    var socketSvc = ServiceManager.getService('SocketSvc')
+
+    socketSvc.broadcast('your-msgid', {some data ...})
+    
+  })
+</pre>
+
+<p><strong>Question:</strong> I loaded the extension as described, but the call to <code>loadExtension</code> call is not yet working.</p>
+<p>Initially, I hooked it up to a load button and added this code:</p>
+<pre class="prettyprint">
+  var loadBtn = document.getElementById('loadBtn');
+
+  loadBtn.addEventListener("click", function(){
+    this.viewer.loadExtension(
+      'Viewing.Extension.Transform')
+  });
+</pre>
+
+<p>But when I click the button, 'this.viewer' is no longer valid, because <code>this</code> refers to the <code>ViewerPanel</code> instance.</p>
+<p>When I try to call</p>
+<pre class="prettyprint">
+  this.viewer.loadExtension('Viewing.Extension.Transform')
+</pre>
+
+<p>directly without using a button click, nothing happens either.</p>
+<p><strong>Answer:</strong> This code is correct. However, as ALWAYS in JavaScript, you need to be careful to what <code>this</code> is pointing to. Inside an event handler, it will not be the same as in the calling context.</p>
+<p>An easy way to fix your code is to use arrow function <code>=&gt;</code> instead, which has the characteristic of implicitly binding <code>this</code> to the calling context.</p>
+<p><strong>Response:</strong> Yes, the call works now, and <code>loadExtension</code> is called successfully, cf.
+the <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/compare/0.0.8...0.0.9">diff 0.0.8 to 0.0.9</a>.</p>
+<p>However, the extension is still not loaded successfully, neither with or without the button click.</p>
+<p>In both cases, calling <code>loadExtension</code> triggers this error message in the js console:</p>
+<pre>
+Uncaught TypeError: Cannot read property 'parentControl' of undefined
+</pre>
+
+<p>What could be causing that?</p>
+<p><strong>Answer:</strong> Simply pass an empty options object to the extensions, e.g., a default argument:</p>
+<pre class="prettyprint">
+  viewer.loadExtension('extid...', {})
+</pre>
+
+<p>Alternatively, you can pass a <code>parentControl</code> object, which is a viewer UI control to host the extension controls:</p>
+<pre class="prettyprint">
+  viewer.loadExtension('extid...', {
+    parentControl: yourCustomControl
+})
+</pre>
+
+<p><strong>Response:</strong> Thank you, yes, perfect, it works.</p>
+<p>The result now looks like this:</p>
+<p><center>
+<img src="img/roomedit3dv3_extension_lacks_icons.png" alt="Roomedit3dv3 extension lacks icons" width="263">
+</center></p>
+<p>Am I missing some icon resources?</p>
+<p><strong>Answer:</strong> You need <code>font-awesome</code> for the icons to show up. I just added it to <code>package.json</code> and in the code in my latest commit.</p>
+<p>The Roomedit3dv3 transform extension is up and running right now in my local build, as shown <a href="#3.1">above</a>.</p>
+<p>I have not tested deploying to Heroku yet, though, and, as said, I still need to add the code to communicate the modifications back to the desktop BIM.</p>
+<p>Plus, today is the deadline to submit my material for the <a href="http://www.rtcevents.com/rtc2016eur">RTCEU Revit Technology Conference Europe</a> in Porto next month.</p>
+<h4><a name="4"></a>Forge Webinar Series</h4>
+<p>Today, 
+<a href="http://adndevblog.typepad.com/aec/jaime-rosales.html">Jaime Rosales</a>
+<a href="http://core.thorntontomasetti.com/jaime-rosales-duque">Duque</a> presents
+the fourth session in the ongoing Forge webinar series, on the Viewer.</p>
+<p>Here are the recordings, presentations and support material of the sessions held so far:</p>
+<ul>
+<li>September 20 &ndash; <a href="http://adndevblog.typepad.com/cloud_and_mobile/2016/09/introduction-to-autodesk-forge-and-the-autodesk-app-store.html">Introduction to Autodesk Forge and the Autodesk App Store</a></li>
+<li>September 22 &ndash; <a href="http://adndevblog.typepad.com/cloud_and_mobile/2016/09/introduction-to-oauth-and-data-management-api.html">Introduction to OAuth and Data Management API</a>
+&ndash; on <a href="https://developer.autodesk.com/en/docs/oauth/v2/overview">OAuth</a>
+and <a href="https://developer.autodesk.com/en/docs/data/v2/overview">Data Management API</a>, providing token-based authentication, authorization and a unified and consistent way to access data across A360, Fusion 360, and the Object Storage Service.</li>
+<li>September 27 &ndash; <a href="http://adndevblog.typepad.com/cloud_and_mobile/2016/09/introduction-to-model-derivative-api.html">Introduction to Model Derivative API</a>
+&ndash; on the <a href="https://developer.autodesk.com/en/docs/model-derivative/v2/overview">Model Derivative API</a> that enables users to represent and share their designs in different formats and extract metadata.</li>
+</ul>
+<p>Upcoming sessions continue during the remainder of
+the <a href="http://autodeskforge.devpost.com">Autodesk App Store Forge and Fusion 360 Hackathon</a> until the end of October:</p>
+<ul>
+<li>September 29 &ndash; <a href="https://developer.autodesk.com/en/docs/viewer/v2/overview">Viewer</a> &ndash; 
+formerly part of the 'View and Data API', a WebGL-based, JavaScript library for 3D and 2D model rendering a CAD data from seed models, e.g., <a href="http://www.autodesk.com/products/autocad/overview">AutoCAD</a>, <a href="http://www.autodesk.com/products/fusion-360/overview">Fusion 360</a>, <a href="http://www.autodesk.com/products/revit-family/overview">Revit</a>, and many other formats.</li>
+<li>October 4 &ndash; <a href="https://developer.autodesk.com/en/docs/design-automation/v2/overview">Design Automation API</a> &ndash; formerly known as 'AutoCAD I/O', run scripts on design files.</li>
+<li>October 6 &ndash; <a href="https://developer.autodesk.com/en/docs/bim360/v1/overview">BIM360</a> &ndash; develop apps that integrate with BIM 360 to extend its capabilities in the construction ecosystem.</li>
+<li>October 11 &ndash; <a href="http://help.autodesk.com/view/NINVFUS/ENU/?guid=GUID-A92A4B10-3781-4925-94C6-47DA85A4F65A">Fusion 360 Client API</a> &ndash; an integrated CAD, CAM, and CAE tool for product development, built for the new ways products are designed and made.</li>
+<li>October 13 &ndash; Q&amp;A on all APIs.</li>
+<li>October 20 &ndash; Q&amp;A on all APIs.</li>
+<li>October 27 &ndash; Submitting a web service app to Autodesk App store.</li>
+</ul>
+<p>Quick access links:</p>
+<ul>
+<li>For API keys, go to <a href="https://developer.autodesk.com">developer.autodesk.com</a></li>
+<li>For code samples, go to <a href="https://github.com/Developer-Autodesk">github.com/Developer-Autodesk</a></li>
+</ul>
+<p>Feel free to contact us at <a href="mailto:forgehackathon@autodesk.com">forgehackathon@autodesk.com</a> at any time with any questions.</p>
+<p><center>
+<img src="img/forge_accelerator.png" alt="Forge &ndash; build the future of making things together" width="400">
+</center></p>
