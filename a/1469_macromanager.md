@@ -43,8 +43,9 @@ Here are my main upcoming events:
 - Oct. 20-22 &ndash; RTCEU Revit Technology Conference Europe, Porto
 - Oct. 24-28 &ndash; Forge Accelerator, Munich
 - Nov. 4 &ndash; Forge and BIM Workshop, Darmstadt University
+- Nov. 14-17 &ndash; Autodesk university, Las vegas
 - Dec. 5 &ndash; DevDay Europe, Munich
-- Oct. 6-9 &ndash; Forge Accelerator, Munich
+- Dec. 6-9 &ndash; Forge Accelerator, Munich
 
 I'll present my projects and material for these as soon as I get around to preparing them.
 
