@@ -1,0 +1,156 @@
+<p><head>
+<title>The Building Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true" defer="defer"></script>
+</head></p>
+<!---
+
+- http://forums.autodesk.com/t5/revit-api-forum/create-solid-from-boundingbox/m-p/6587841
+  sample model and code provided
+
+ @AutodeskForge #revitapi #3dwebcoder @AutodeskRevit #aec #bim
+
+&ndash; 
+...
+
+-->
+
+<h3>Bounding Box Solid and Forge Webinar</h3>
+<p>Yesterday I submitted the handout for my presentation on connecting the desktop and cloud for
+the <a href="http://www.rtcevents.com/rtc2016eur">RTC Revit Technology Conference Europe</a> in Porto next month.</p>
+<p>I still have to finish my work on the <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/roomedit3d">roomedit3dv3</a> sample
+to demonstrate connecting the desktop with the cloud by enabling a real-time round-trip modification of the BIM via the Forge viewer;
+yesterday I <a href="http://thebuildingcoder.typepad.com/blog/2016/09/warning-swallower-and-roomedit3d-viewer-extension.html#3">integrated the transform viewer extension</a>;
+now I have to hook up the <code>socket.io</code> messaging back to the Revit add-in to update the BIM.</p>
+<p>Meanwhile, let's pick up a nice little geometric Revit API topic and mention the recording from the latest Forge webinar session:</p>
+<ul>
+<li><a href="#2">Create solid from bounding box</a></li>
+<li><a href="#3">Forge webinar series 4 &ndash; Viewer</a></li>
+</ul>
+<h4><a name="2"></a>Create Solid from Bounding Box</h4>
+<p><a href="http://forums.autodesk.com/t5/user/viewprofilepage/user-id/4064240">Owen Merrick</a> provides a very nice sample add-in in 
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> thread 
+on <a href="http://forums.autodesk.com/t5/revit-api-forum/create-solid-from-boundingbox/m-p/6587841">creating a solid from a bounding box</a>:</p>
+<p><strong>Question:</strong> I have a bounding box and want to convert in to a solid;
+one possible solution is to use <code>CreateExtrusionGeometry</code> using a curve loop from some lines created from its bounding box.</p>
+<p>Is there a better solution to accomplish this?</p>
+<p>For now, I used <code>CreateExtrusionGeometry</code> and it is OK, but I would appreciate a better solution if one exists.</p>
+<p><strong>Answer:</strong> Do you want to generate a persistent Revit database element?</p>
+<p>If so, the simplest solution is almost certainly to use
+a <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.50">DirectShape element</a>.</p>
+<p><strong>Response:</strong> In my case, this solid is a temporary one to use with <code>ElementIntersectsSolidFilter</code>.</p>
+<p>Since the intersecting element is a brace, I can't use <code>BoundingBoxIntersectsFilter</code>.</p>
+<p>If the Revit API would offer a gradient bounding box, that could be of great use for elements such as braces.</p>
+<p><strong>Answer:</strong> I was looking for an approach to address the very same question, ended up here, and re-created your solution.</p>
+<p>To save the next person a bit of typing, here is my code:  </p>
+<pre class="code">
+<span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;Create&nbsp;and&nbsp;return&nbsp;a&nbsp;solid&nbsp;representing&nbsp;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;the&nbsp;bounding&nbsp;box&nbsp;of&nbsp;the&nbsp;input&nbsp;solid.</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;Assumption:&nbsp;aligned&nbsp;with&nbsp;Z&nbsp;axis.</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;Written,&nbsp;described&nbsp;and&nbsp;tested&nbsp;by&nbsp;Owen&nbsp;Merrick&nbsp;for&nbsp;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;http://forums.autodesk.com/t5/revit-api-forum/create-solid-from-boundingbox/m-p/6592486</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">Solid</span>&nbsp;CreateSolidFromBoundingBox(&nbsp;
+&nbsp;&nbsp;<span style="color:#2b91af;">Solid</span>&nbsp;inputSolid&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:#2b91af;">BoundingBoxXYZ</span>&nbsp;bbox&nbsp;=&nbsp;inputSolid.GetBoundingBox();
+
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Corners&nbsp;in&nbsp;BBox&nbsp;coords</span>
+
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;pt0&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;bbox.Min.X,&nbsp;bbox.Min.Y,&nbsp;bbox.Min.Z&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;pt1&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;bbox.Max.X,&nbsp;bbox.Min.Y,&nbsp;bbox.Min.Z&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;pt2&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;bbox.Max.X,&nbsp;bbox.Max.Y,&nbsp;bbox.Min.Z&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;pt3&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;bbox.Min.X,&nbsp;bbox.Max.Y,&nbsp;bbox.Min.Z&nbsp;);
+
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Edges&nbsp;in&nbsp;BBox&nbsp;coords</span>
+
+&nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;edge0&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;pt0,&nbsp;pt1&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;edge1&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;pt1,&nbsp;pt2&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;edge2&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;pt2,&nbsp;pt3&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;edge3&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;pt3,&nbsp;pt0&nbsp;);
+&nbsp;&nbsp;
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Create&nbsp;loop,&nbsp;still&nbsp;in&nbsp;BBox&nbsp;coords</span>
+
+&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Curve</span>&gt;&nbsp;edges&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Curve</span>&gt;();
+&nbsp;&nbsp;edges.Add(&nbsp;edge0&nbsp;);
+&nbsp;&nbsp;edges.Add(&nbsp;edge1&nbsp;);
+&nbsp;&nbsp;edges.Add(&nbsp;edge2&nbsp;);
+&nbsp;&nbsp;edges.Add(&nbsp;edge3&nbsp;);
+
+&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;height&nbsp;=&nbsp;bbox.Max.Z&nbsp;-&nbsp;bbox.Min.Z;
+
+&nbsp;&nbsp;<span style="color:#2b91af;">CurveLoop</span>&nbsp;baseLoop&nbsp;=&nbsp;<span style="color:#2b91af;">CurveLoop</span>.Create(&nbsp;edges&nbsp;);
+
+&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">CurveLoop</span>&gt;&nbsp;loopList&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">CurveLoop</span>&gt;();
+&nbsp;&nbsp;loopList.Add(&nbsp;baseLoop&nbsp;);
+
+&nbsp;&nbsp;<span style="color:#2b91af;">Solid</span>&nbsp;preTransformBox&nbsp;=&nbsp;<span style="color:#2b91af;">GeometryCreationUtilities</span>
+&nbsp;&nbsp;&nbsp;&nbsp;.CreateExtrusionGeometry(&nbsp;loopList,&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisZ,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;height&nbsp;);
+
+&nbsp;&nbsp;<span style="color:#2b91af;">Solid</span>&nbsp;transformBox&nbsp;=&nbsp;<span style="color:#2b91af;">SolidUtils</span>.CreateTransformed(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;preTransformBox,&nbsp;bbox.Transform&nbsp;);
+
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;transformBox;
+}
+</pre>
+
+<p>I'd love a more elegant answer, but this works for my needs.</p>
+<p>Upon selecting the planar face of a solid, two new solids are created: the two halves of the bounding box of the original, split by the plane of the selected face.</p>
+<p><center>
+<img src="img/solid_from_bounding_box.png" alt="Sample split by solid generated from bounding box" width="500">
+</center></p>
+<p>Here is <a href="zip/om_sampleSplitBoundingBox.zip">sampleSplitBoundingBox.zip</a> containing an external command showing a simplified version of how I'm using the bounding box code.</p>
+<p>Whether this command meets the definition of 'doing something handy' is debatable, but it's at least a functional command.</p>
+<p>I'm working on solid modelling tools for working with non-parametric masses using somewhat different formal logic than the built-in "form" tools. The step demonstrated here is really just one piece of construction geometry on the way to a more complex, yet-unfinished tool, but it illustrates a few useful functions:</p>
+<ul>
+<li>From user face selection, retrieve both the face and the solid.</li>
+<li>From solid, generate solid of bounding box.</li>
+<li>Insert solid into family context.</li>
+</ul>
+<p>This draws <strong>very</strong> heavily on the sample code provided with the Revit SDK, particularly the <code>FreeFormElement</code> sample and planar face selection filter.</p>
+<p>For the sample code I copied the relevant bits into a fresh add-in and zipped the whole thing up. This includes the source, working <code>.dll</code>, sample image and <code>rfa</code> in the <code>doc</code> folder.</p>
+<p><strong>Response:</strong> As a use case, we use very similar code to do interference checking within a provided tolerance.</p>
+<p>I think you nailed it and I don't think there is a more elegant solution.</p>
+<p>Many thanks to Owen for sharing this solution and putting together such a nice reproducible case to demonstrate it in action!</p>
+<p>I added <code>CreateSolidFromBoundingBox</code> as a new utility method 
+to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.130.2">release 2017.0.130.2</a> in
+the module <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs#L404-L453">Util.cs</a>,
+with <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2017.0.130.1...2017.0.130.2">these diffs to the previous release</a>.</p>
+<h4><a name="3"></a>Forge Webinar Series 4 &ndash; Viewer</h4>
+<p><a href="http://adndevblog.typepad.com/aec/jaime-rosales.html">Jaime Rosales</a>
+<a href="http://core.thorntontomasetti.com/jaime-rosales-duque">Duque</a> presented
+the fourth session in the ongoing Forge webinar series, on the Viewer.</p>
+<p>Recordings, presentations and support material of all past sessions are available for viewing and download:</p>
+<ul>
+<li>September 20 &ndash; <a href="http://adndevblog.typepad.com/cloud_and_mobile/2016/09/introduction-to-autodesk-forge-and-the-autodesk-app-store.html">Introduction to Autodesk Forge and the Autodesk App Store</a></li>
+<li>September 22 &ndash; <a href="http://adndevblog.typepad.com/cloud_and_mobile/2016/09/introduction-to-oauth-and-data-management-api.html">Introduction to OAuth and Data Management API</a>
+&ndash; on <a href="https://developer.autodesk.com/en/docs/oauth/v2/overview">OAuth</a>
+and <a href="https://developer.autodesk.com/en/docs/data/v2/overview">Data Management API</a>, providing token-based authentication, authorization and a unified and consistent way to access data across A360, Fusion 360, and the Object Storage Service.</li>
+<li>September 27 &ndash; <a href="http://adndevblog.typepad.com/cloud_and_mobile/2016/09/introduction-to-model-derivative-api.html">Introduction to Model Derivative API</a>
+&ndash; on the <a href="https://developer.autodesk.com/en/docs/model-derivative/v2/overview">Model Derivative API</a> that enables users to represent and share their designs in different formats and extract metadata.</li>
+<li>September 29 &ndash; <a href="http://adndevblog.typepad.com/cloud_and_mobile/2016/09/introduction-to-viewer-api.html">Introduction  to Viewer</a>
+&ndash; the <a href="https://developer.autodesk.com/en/docs/viewer/v2/overview">Viewer</a>, formerly part of the 'View and Data API', is a WebGL-based JavaScript library for 3D and 2D model rendering of CAD models from seed files, e.g., <a href="http://www.autodesk.com/products/autocad/overview">AutoCAD</a>, <a href="http://www.autodesk.com/products/fusion-360/overview">Fusion 360</a>, <a href="http://www.autodesk.com/products/revit-family/overview">Revit</a> and many other formats.</li>
+</ul>
+<p>Upcoming sessions continue during the remainder of
+the <a href="http://autodeskforge.devpost.com">Autodesk App Store Forge and Fusion 360 Hackathon</a> until the end of October:</p>
+<ul>
+<li>October 4 &ndash; <a href="https://developer.autodesk.com/en/docs/design-automation/v2/overview">Design Automation API</a> &ndash; formerly known as 'AutoCAD I/O', run scripts on design files.</li>
+<li>October 6 &ndash; <a href="https://developer.autodesk.com/en/docs/bim360/v1/overview">BIM360</a> &ndash; develop apps that integrate with BIM 360 to extend its capabilities in the construction ecosystem.</li>
+<li>October 11 &ndash; <a href="http://help.autodesk.com/view/NINVFUS/ENU/?guid=GUID-A92A4B10-3781-4925-94C6-47DA85A4F65A">Fusion 360 Client API</a> &ndash; an integrated CAD, CAM, and CAE tool for product development, built for the new ways products are designed and made.</li>
+<li>October 13 &ndash; Q&amp;A on all APIs.</li>
+<li>October 20 &ndash; Q&amp;A on all APIs.</li>
+<li>October 27 &ndash; Submitting a web service app to Autodesk App store.</li>
+</ul>
+<p>Quick access links:</p>
+<ul>
+<li>For API keys, go to <a href="https://developer.autodesk.com">developer.autodesk.com</a></li>
+<li>For code samples, go to <a href="https://github.com/Developer-Autodesk">github.com/Developer-Autodesk</a></li>
+</ul>
+<p>Feel free to contact us at <a href="mailto:forgehackathon@autodesk.com">forgehackathon@autodesk.com</a> at any time with any questions.</p>
+<p><center>
+<img src="img/forge_accelerator.png" alt="Forge &ndash; build the future of making things together" width="400">
+</center></p>
