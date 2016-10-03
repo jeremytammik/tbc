@@ -6,23 +6,18 @@
 </head></p>
 <!---
 
-- http://forums.autodesk.com/t5/revit-api-forum/create-solid-from-boundingbox/m-p/6587841
-  sample model and code provided
+Retrieving and Broadcasting the Roomedit3dv3 Translation @AutodeskForge #revitapi #3dwebcoder @AutodeskRevit #aec #bim @RTCEvents
 
-Solid From Bounding Box and Forge Webinar 4 @AutodeskForge #revitapi #3dwebcoder @AutodeskRevit #aec #bim @RTCEvents
-
-I submitted the handout for my presentation on connecting the desktop and cloud for the RTC Revit Technology Conference Europe in Porto next month. I still have to finish my work on the <code>roomedit3dv3</code> sample to demonstrate connecting the desktop with the cloud by enabling a real-time round-trip modification of the BIM via the Forge viewer; yesterday I integrated the transform viewer extension; now I have to hook up the <code>socket.io</code> messaging back to the Revit add-in to update the BIM
-&ndash; Create solid from bounding box
-&ndash; Forge webinar series 4 &ndash; Viewer...
+As I discussed last week, the translation tool emits info about its activity via <code>socket.io</code>. Now I want to pick up that information higher up, in the viewer transform extension, and relay it to the node.js web server or broadcast it to the rest of the world. The existing sample call to <code>emit</code> is inside <code>onTxChange</code>, which is called on each mouse move. We do not need to track each mouse movement in such fine detail...
 
 -->
 
 <h3>Retrieving and Broadcasting the Roomedit3dv3 Translation</h3>
 <p>As I discussed last week,
-<a href="http://thebuildingcoder.typepad.com/blog/2016/09/warning-swallower-and-roomedit3d-viewer-extension.html#3">the translation tool emits its activity</a> via
+<a href="http://thebuildingcoder.typepad.com/blog/2016/09/warning-swallower-and-roomedit3d-viewer-extension.html#3">the translation tool emits info on its activity</a> via
 <code>socket.io</code>.</p>
 <p>Now I want to pick up that information higher up, in the viewer transform extension, and relay it to the node.js web server or broadcast it to the rest of the world.</p>
-<p>The existing call to <code>emit</code> in inside <code>onTxChange</code>, which is called on each mouse move.</p>
+<p>The existing sample call to <code>emit</code> is inside <code>onTxChange</code>, which is called on each mouse move.</p>
 <p>We do not need to track each mouse movement in such fine detail, just the beginning and end of the translation.</p>
 <p><center>
 <img src="img/roomedit3dv3_broadcast.png" alt="Roomedit3dv3 Forge extension in action" width="385">
@@ -62,7 +57,6 @@ where this is handled by the <code>handleButtonUp</code> function:</p>
     if (_transformControlTx.onPointerUp(event))
       return true;
 
-    //return _transRotControl.onPointerUp(event);
     return false;
   };
 </pre>
@@ -71,7 +65,7 @@ where this is handled by the <code>handleButtonUp</code> function:</p>
 <pre class="prettyprint">
   handleButtonUp(event, button) {
 
-    console.log( 'transform.translate complete' ); // jeremy
+    console.log( 'transform.translate complete' );
 
     if (this._selection) {
       if (this._selection.dbIdArray) {
@@ -84,7 +78,7 @@ where this is handled by the <code>handleButtonUp</code> function:</p>
             this._transformMesh.position.y - this._selection.model.offset.y,
             this._transformMesh.position.z - this._selection.model.offset.z)
 
-          this._viewer.getProperties(dbId, (result) => {
+          this._viewer.getProperties(dbId, (result) =&gt; {
 
             var externalId = result.externalId;
 
@@ -135,7 +129,7 @@ class TransformExtension extends ExtensionBase {
     this._viewer.toolController.registerTool(
       this.rotateTool)
 
-    this.translateTool.on('transform.translate.complete', (data) => {
+    this.translateTool.on('transform.translate.complete', (data) =&gt; {
 
       console.log( 'broadcast transform of '
         + data.externalId
@@ -168,7 +162,7 @@ the <a href="http://www.rtcevents.com/rtc2016eur">RTC Revit Technology Conferenc
     MongoDB web server demonstrating real-time round-trip editing of Revit element shared parameter values
   &ndash; <a href="https://heroku.com">Heroku</a> requires an update to MongoDB 3.2.</li>
 <li>Update the <a href="https://github.com/jeremytammik/Roomedit3dApp">Roomedit3dApp</a> Revit add-in to work with the 
-  new <a href="https://github.com/jeremytammik/roomedit3d">roomedit3dv3</a> Forge Viewer extension demonstrating translation of BIM element instances in the viewer and updating the Revit model in real time via a <code>socket.io</code> broadcast.</li>
+  new <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/roomedit3d">roomedit3dv3</a> Forge Viewer extension demonstrating translation of BIM element instances in the viewer and updating the Revit model in real time via a <code>socket.io</code> broadcast.</li>
 </ul>
 <p>For the latter, I need to set up a production environment and deploy to Heroku.</p>
 <p>So far, I have just been developing and testing in a <code>DEV</code> environment on the local machine.</p>

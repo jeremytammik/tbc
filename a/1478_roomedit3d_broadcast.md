@@ -176,7 +176,7 @@ In fact, I have to go over my whole suite of samples connecting the desktop and 
 	MongoDB web server demonstrating real-time round-trip editing of Revit element shared parameter values
   &ndash; [Heroku](https://heroku.com) requires an update to MongoDB 3.2.
 - Update the [Roomedit3dApp](https://github.com/jeremytammik/Roomedit3dApp) Revit add-in to work with the 
-  new [roomedit3dv3](https://github.com/jeremytammik/roomedit3d) Forge Viewer extension demonstrating translation of BIM element instances in the viewer and updating the Revit model in real time via a `socket.io` broadcast.
+  new [roomedit3dv3](https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/roomedit3d) Forge Viewer extension demonstrating translation of BIM element instances in the viewer and updating the Revit model in real time via a `socket.io` broadcast.
 
 For the latter, I need to set up a production environment and deploy to Heroku.
 
