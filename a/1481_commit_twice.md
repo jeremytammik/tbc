@@ -26,8 +26,13 @@
   
 Need to Commit Twice, Roomedit3dv3 and Forge @AutodeskForge #revitapi #3dwebcoder @AutodeskRevit #aec #bim @RTCEvents
 
-&ndash; 
-...
+Lots of exciting news for today, like every day, once again on the pure Revit API, connecting the desktop and the cloud, and Autodesk Forge
+&ndash; Isolating an element in a newly created view requires two transactions
+&ndash; Forge research enquiry
+&ndash; Connecting desktop and cloud &ndash; Roomedit3dv3 live
+&ndash; Could you demo this remotely?
+&ndash; Connecting desktop and cloud draft handout
+&ndash; Table of contents...
 
 -->
 
