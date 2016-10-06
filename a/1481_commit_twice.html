@@ -1,0 +1,262 @@
+<p><head>
+<title>The Building Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true" defer="defer"></script>
+</head></p>
+<!---
+
+- Elitsa Slavova <Slavova@cobuilder.no> Re: Autodesk Forge Research Enquiry
+
+- where will i demo connecting desktop and cloud?
+  https://twitter.com/DarickBrokaw/status/783844746418675712?cn=ZmF2b3JpdGVfbWVudGlvbmVkX3VzZXI%3D&refsrc=email 
+  Darick Brokaw
+  ‏@DarickBrokaw
+  @jeremytammik would you be willing to demo this remotely via Web for @dtoug6 Design Technology Orlando, maybe 45mins..? DM me if interested
+  @DarickBrokaw @dtoug6 i would love to if i had the time. please attend one of the upcoming public demos
+  1. try it yurself at home; most effective: 1. fork, clone, compile install revit add-in, run my web instance; get your autodesk forge app credentials, click the deploy to horoku button;
+  2. attend one of the upcoming public demonstrations
+  3. questions in public, please: http://thebuildingcoder.typepad.com/blog/about-the-author.html#1
+
+- need for two transactions, need for regen
+  http://forums.autodesk.com/t5/revit-api-forum/isolate-elements-on-a-newly-created-view/m-p/6604625
+  12169975 [Isolate elements on a newly created view]
+  http://forums.autodesk.com/t5/revit-api-forum/isolate-elements-on-a-newly-created-view/m-p/6206355
+
+ @AutodeskForge #revitapi #3dwebcoder @AutodeskRevit #aec #bim @RTCEvents
+
+&ndash; 
+...
+
+-->
+
+<h3>Need to Commit Twice, Roomedit3dv3 and Forge</h3>
+<p>Lots of exciting news for today, like every day, once again on the pure Revit API, connecting the desktop and the cloud, and Autodesk Forge:</p>
+<ul>
+<li><a href="#2">Isolating an element in a newly created view requires two transactions</a></li>
+<li><a href="#3">Forge research enquiry</a></li>
+<li><a href="#4">Connecting desktop and cloud &ndash; live roomedit3dv3 demonstrations</a></li>
+<li><a href="#5">Could you demo this remotely?</a></li>
+<li><a href="#6">Connecting desktop and cloud draft handout</a><ul>
+<li><a href="#7">Table of contents</a></li>
+</ul>
+</li>
+</ul>
+<h4><a name="2"></a>Isolating an Element in a Newly Created View Requires Two Transactions</h4>
+<p>The aim
+of <a href="http://forums.autodesk.com/t5/revit-api-forum/isolate-elements-on-a-newly-created-view/m-p/6206355">isolating an element in a newly created view</a> was
+discussed by Tuuletin, Revitalizer, Scott Wilson, FirstJet and Michal-sk in
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> and
+resolved by an interesting workaround discovered by Michael Morris, Principal Engineer of the Revit development team.</p>
+<p>This is another example in the series of situations with a
+special <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33">need to regenerate</a>
+and <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.53">handling transactions and transaction groups</a>:</p>
+<p><strong>Question:</strong> My isolation of an element in a newly created view does not work.</p>
+<p>I do the following:</p>
+<ol>
+<li>I have a set of elements to isolate <code>els = System.Collections.Generic.List(ElementId)</code>.</li>
+<li>Then a view is created: <code>view = ViewSection.CreateSection(doc, viewFamilyTypeId, BoundingBox)</code>.</li>
+<li>After that I try to isolate <code>els</code>: <code>view.IsolateElementsTemporary(els)</code>.</li>
+</ol>
+<p>If I open this view, the isolation mode is on (light blue frame is on), but nothing from <code>els</code> is isolated. The other view parameters (via <code>get_Parameter</code>) are accessible and writeable.</p>
+<p>On the other hand, <code>view.IsolateCategoriesTemporary()</code> works fine!</p>
+<p>What's the problem?</p>
+<p><strong>Answer:</strong> Perhaps you need a call to <code>document.Regenerate</code> or <code>uiDocument.RefreshActiveView</code>?</p>
+<p><strong>Response:</strong> No, this doesn't help.</p>
+<p>More peculiarity: the 'reverse' method, <code>View.HideElements</code>, works perfectly!</p>
+<p>Now, I see no other way to solve my task.</p>
+<p>The first collector will include any element in model (including links).</p>
+<p>The second collector will include elements to be isolated.</p>
+<p>The third collector consists of the first collector with the excluded second collector.</p>
+<p>Then, I just hide any element I don't want to be isolated by means of the third collector.</p>
+<p>Seems like a very bad way to evade this bug...</p>
+<p><strong>Answer:</strong> Are the elements actually visible in the view if you don't enable the isolate?</p>
+<p><strong>Response:</strong> Yes, they are visible.</p>
+<p>I create a new view (so, any graphic settings are set to default — all elements are visible), then I want to isolate some elements in this created view...</p>
+<p>I have stopped seeking the solution. Maybe it is just a lack of the Revit 2015 API. Hope, this will be fixed in later versions.</p>
+<p><strong>Question 2:</strong> I would like to re-open this issue. It is still happening in Revit 2017. I have created a simple test case with macros embedded to show it
+in <a href="zip/isolate_element_in_new_view.rvt">isolate_element_in_new_view.rvt</a>:</p>
+<ul>
+<li><code>testOne</code> macro shows that we can isolate a element in the view.</li>
+<li><code>testTwo</code> macro duplicates the Level 1 floorplan view and tries to isolate a Element. But the element is not isolated, unexpected behaviour.</li>
+</ul>
+<p><strong>Answer:</strong> I escalated this thread to an ADN case <em>12169975 [Isolate elements on a newly created view]</em> and created an internal development issue <em>REVIT-99069 [Isolate elements on a newly created view -- 12169975]</em> for the development team to take a closer look. They say:</p>
+<p>I can reproduce this issue. When just 1 transaction is used to create the new view and also to isolate the element, then the isolate element fails. </p>
+<p>However, I can get the desired behaviour using two separate transactions as follows:</p>
+<ul>
+<li>Use a transaction to create the new view. Close transaction.</li>
+<li>Activate the new view. This is important; isolation fails if the view is not active.</li>
+<li>Use 2nd transaction to isolate the wall. Close transaction.</li>
+</ul>
+<p>Is this an acceptable workaround?</p>
+<p>Note: I also tried the attached file and macros in our internal development release cannot reproduce the behaviour there.</p>
+<p>I tested macro <code>test 2</code> which uses just 1 transaction to create the new view and isolate the wall, and when the screen updates the single wall is really and truly isolated in the new view.</p>
+<p>So the workaround described above will not be needed forever.</p>
+<p>Also, it appears the real issue here is that isolate element only works in the active view. For example, edit macro <code>testOne</code> to NOT activate floor plan Level 1. In the UI, open views Level 1 and Level 2 side by side, but make Level 2 be the active view. Run macro <code>testOne</code>. Notice that Level 1 view is not updated and the wall is not isolated.</p>
+<p>So you need to activate the view before doing <code>IsolateElementTemporary</code>.</p>
+<p>In fact, this appears to be needed for all uses of <code>IsolateElementTemporary</code>, regardless of if the view is newly created or not.</p>
+<p><strong>Response:</strong> Thanks for the work around.</p>
+<p>I tried two transactions myself as well before, but it didn't work then.</p>
+<p>The trick is, as you guys described, to set the active view to the new created view.</p>
+<p>Here is the working snippet for those interested:</p>
+<pre class="code">
+  public void testTwo()
+  {
+    View newView;
+
+    using (Transaction t = new Transaction(this.Document))
+    {
+      t.Start("Trans");
+
+      // Get Floorplan for Level1 and copy its properties for ouw newly to create ViewPlan.
+      View existingView = this.Document.GetElement(new ElementId(312)) as View;
+
+      // Create new Floorplan.
+      newView = this.Document.GetElement(existingView.Duplicate(ViewDuplicateOption.Duplicate)) as View;
+
+      t.Commit();
+
+      // important to set new view as active view.
+      this.ActiveView = newView;
+
+      t.Start("Trans 2");
+
+      // Try to isolate a Wall. Fails.
+      newView.IsolateElementTemporary(new ElementId(317443));
+
+      t.Commit();
+    }
+
+    // Change the View to the new View.
+    this.ActiveView = newView;
+  }
+</pre>
+
+<p>It somewhat sucks having to commit twice and therefore having to regenerate twice. But the workaround is solid and does the job. Thanks guys!</p>
+<p>Many thanks indeed to everybody involved in this exploration, especially to Michael for his in-depth research and effective workaround!</p>
+<h4><a name="3"></a>Forge Research Enquiry</h4>
+<p>An example of the many daily requests I receive and try to solve as efficiently and publicly as possible.</p>
+<p>I am sorry that I cannot answer each issue in private and thank you for your understanding!</p>
+<p><strong>Question:</strong> I am conducting research related to Autodesk Forge and how we can collaborate with it.</p>
+<p>I have several questions with regard to Forge. </p>
+<p>Can we arrange a Skype conversation?</p>
+<p><strong>Answer:</strong> I avoid one-on-one conversations where possible, since most questions I encounter are of general interest to a large number of people.</p>
+<p>Could you please first of all consult the existing online documentation, and then formulate your questions you have in writing?</p>
+<ul>
+<li><a href="https://forge.autodesk.com">forge.autodesk.com</a></li>
+<li><a href="https://developer.autodesk.com">developer.autodesk.com</a></li>
+</ul>
+<p>With your concrete questions in hand, I will happily take them up with you personally or direct you to one of my colleagues.</p>
+<p>Thank you for your understanding!</p>
+<p><strong>Response:</strong> I have already checked the websites. Here are my questions:</p>
+<ol>
+<li>Since the Forge platform is a set of cloud services: if I am developing an application for the desktop, e.g., Revit or NavisWorks, will this mean that the Forge Platform will not be relevant?</li>
+<li>Could you give some examples of companies/and apps that utilize the Data Management API? By using this API, can I access data from Revit via A360?</li>
+<li>Can the Model Derivative API translate the design into IFC format? Does it support IFC 4? Does it support the buildingSMART International standards for Model View Definitions, like reference view, design transfer view etc.?</li>
+<li>Can the Viewer render only SVF file format?</li>
+<li>Can you apply for the Forge Funding only if you are building apps using the Forge platform web services?</li>
+</ol>
+<p><strong>Answer:</strong> Thank you very much for your pertinent questions.</p>
+<p>I discussed them with my colleagues, and we put together the following answers for you:</p>
+<ol>
+<li>Forge may be extremely important for a Revit or NavisWorks add-in or other desktop application.
+For instance, if your Revit add-in needs to use A360, or connect with any of your own or the Autodesk or other web services, Forge may be very important indeed.
+The number of web services is growing daily, and you should urgently consider implementing your own functionality along those lines as well.
+That is the whole point of my presentation
+on <a href="http://thebuildingcoder.typepad.com/blog/2016/06/free-your-bim-data-and-roomedit3d-thee-legged-forge-oauth.html">freeing your BIM data</a> that
+I held at the Forge Developer Conference in June.
+You may want to make use of cloud services to address a larger audience with your application, and yet connect it back to the Revit BIM, cf. my newest sample on <a href="http://thebuildingcoder.typepad.com/blog/2016/10/roomedit3dv3-up-and-running-with-demo-recording.html">connecting the desktop and the cloud</a>.</li>
+<li>If a CAD model is uploaded to A360 in a way that the references can be resolved, so it becomes viewable in the A360 UI, then it can be translated into SVF as well (in A360 this happens automatically), which will also trigger property generation for it that can be accessed through the Model Derivative endpoints as well as from the Viewer. 
+Anyone uploading a file to translate for the viewer is using the Data Management API.
+Uploading a file is a necessary part of the translation service.
+Look at the Forge samples on GitHub and the Forge DevCon presentations:<ul>
+<li><a href="https://github.com/Developer-Autodesk">github.com/Developer-Autodesk</a></li>
+<li><a href="https://github.com/Autodesk-Forge">github.com/Autodesk-Forge</a></li>
+<li><a href="https://forge.autodesk.com/devcon-2016">forge.autodesk.com/devcon-2016</a></li>
+</ul>
+</li>
+<li>Not yet.
+The other way around is supported, IFC to Forge.
+We are in the process of adding IFC support to the MD API right now.
+Revit itself offers IFC4 support.  What that means right now is:<ul>
+<li>We generate IFC4 Reference View files.  These aren’t certified, because certification doesn’t exist yet.  We continue to improve our output so that our output passes certification, when it officially begins.</li>
+<li>We generate IFC4 Design Transfer View files.  These aren’t certified, because certification doesn’t exist yet.  Furthermore, there is still some discussion about what would be certified, which may lead to further modifications of this MVD.  We will continue to improve our output so that our output passes certification, when it officially begins and is finalized.</li>
+<li>For extraction, it is intended to work as well as Revit itself.</li>
+</ul>
+</li>
+<li><code>SVF</code> for 3D and <code>F2D</code> for 2D views.
+The render format depends on the input format and its extension (<code>obj</code>, <code>glTF</code>, etc.).
+Different formats may interact slightly differently in the viewer regarding selection, metadata, etc.
+The viewer is primarily intended to read the single file format (what we generically refer to as SVF for both 2D and 3D models).
+The Model Derivative API allows you to convert all other formats into SVF.
+The viewer is not intended to be a standalone multi-format viewer &ndash; it is intended to be used in conjunction with the Model Derivative API.</li>
+<li>You can apply without necessarily using Forge API.
+You should definitely mention what Forge APIs and how you are planning to use them.</li>
+</ol>
+<p>I hope this helps.</p>
+<h4><a name="4"></a>Connecting Desktop and Cloud &ndash; Live Roomedit3dv3 Demonstrations</h4>
+<p>On popular request, here are the various upcoming events at which I will be presenting on the topics
+of <a href="http://thebuildingcoder.typepad.com/blog/2016/06/free-your-bim-data-and-roomedit3d-thee-legged-forge-oauth.html">freeing your BIM data</a>
+and <a href="http://thebuildingcoder.typepad.com/blog/2016/10/roomedit3dv3-up-and-running-with-demo-recording.html">Connecting the desktop and the cloud with a live roomedit3dv3 demonstration</a>:</p>
+<ul>
+<li>Oct. 18-19 &ndash; Forge and BIM, <a href="https://www.facebook.com/ISEPBIM">ISEPBIM</a> at <a href="http://www.isep.ipp.pt">ISEP</a>, Porto University  </li>
+<li>Oct. 20-22 &ndash; <a href="http://www.rtcevents.com/rtc2016eur">RTCEU Revit Technology Conference Europe</a>, Porto</li>
+<li>Oct. 24-28 &ndash; <a href="http://autodeskcloudaccelerator.com">Forge Accelerator</a>, Munich</li>
+<li>Nov. 4 &ndash; Forge and BIM Workshop, <a href="http://www.tu-darmstadt.de">Darmstadt University</a></li>
+<li>Nov. 14-17 &ndash; <a href="http://au.autodesk.com">Autodesk University</a>, Las Vegas</li>
+<li>Dec. 5 &ndash; <a href="http://autodeskdevdays.com/devdays-2016">DevDay Europe</a>, Munich</li>
+<li>Dec. 6-9 &ndash; <a href="http://autodeskdevdays.com/accelerator">DevDay Forge Accelerator</a>, Munich</li>
+</ul>
+<p>I hope to be able to meet you in person at one of these.</p>
+<h4><a name="5"></a>Could You Demo this Remotely?</h4>
+<p>I completed the <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/roomedit3d">roomedit3dv3</a> project and published
+a <a href="http://thebuildingcoder.typepad.com/blog/2016/10/roomedit3dv3-up-and-running-with-demo-recording.html">demo recording</a> to show it in action.</p>
+<p>One response via twitter includes another request for a non-public answer, which I am sorry to say I am unable to satisfy:</p>
+<p><strong>Question:</strong> Would you be willing to demo this remotely via web, maybe 45 mins...? </p>
+<p><strong>Answer:</strong> I would love to if I had the time to spare.</p>
+<p>Unfortunately, I am rather busy trying to answer as many questions as possible for the whole community.</p>
+<p>Therefore, I always <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#1">prefer to discuss everything I do in public</a> and
+enable the entire community to contribute and share when possible.</p>
+<p>Here are the most effective ways to see the demo live and explore it in further depth yourself:</p>
+<ol>
+<li>Attend one of the demos at the <a href="#3">upcoming public events listed above</a>.</li>
+<li>Try it for yourself at home; that is probably the most effective approach of all.
+You can fork, clone, compile and install
+the <a href="https://github.com/jeremytammik/Roomedit3dApp">Roomedit3dApp</a> Revit add-in and either run my
+existing <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/roomedit3d">web instance roomedit3dv3</a>,
+or <a href="https://developer.autodesk.com">get your own Autodesk forge app credentials</a> and use those
+to <a href="https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/roomedit3d#prerequisites-and-sample-setup">deploy your own Heroku instance</a>.</li>
+</ol>
+<p>As I keep saying all too often now, please ask all your questions in public, e.g., Revit API related ones in 
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a>
+and <a href="https://developer.autodesk.com/en/support/get-help">all Forge related issues on StackOverflow</a>.</p>
+<h4><a name="6"></a>Connecting Desktop and Cloud Draft Handout</h4>
+<p>I completed an initial version of the handout document for my presentation on connecting the desktop and the cloud at 
+the <a href="http://www.rtcevents.com/rtc2016eur">RTC Revit Technology Conference Europe</a> in Porto the week after next.</p>
+<p>Here is the complete PDF handout document <a href="/a/doc/revit/rtc/2016/doc/s1_4_hand_connect_desktop_cloud_jtammik.pdf">s1_4_hand_connect_desktop_cloud_jtammik.pdf</a>.</p>
+<p>For your convenience, I extracted this sneak preview of the class description and table of contents:</p>
+<h4><a name="7"></a>Session 1.4 &ndash; Connecting any Desktop Application or Revit Add-in with Autodesk Forge and the Cloud</h4>
+<p>Class Description: We discuss the opportunities and advantages offered by accessing and interacting with BIM from the cloud, using both open source and Autodesk Forge web services and cloud-based APIs. We show how they can be accessed and used from any desktop application, including your Revit custom add-in. This provides access to powerful functionality to design, visualise, collaborate, make and use BIM and other CAD data. I present a Forge overview and my suite of examples connecting the desktop and the cloud, culminating in the newest 3D Forge round-trip real-time room editor.</p>
+<p>Table of Contents:</p>
+<ul>
+<li>Introduction</li>
+<li>Free Your BIM Data!</li>
+<li>What Cloud? Private Versus Public; Security!</li>
+<li>Message, Takeaway and Sample Overview</li>
+<li>The 2D Cloud-Based Round-Trip Room Editor</li>
+<li>Software Architecture Connecting Desktop and Cloud</li>
+<li>NoSQL Databases, CAP Theorem and ACID vs BASE</li>
+<li>FireRating in the Cloud</li>
+<li>Revit Add-In C REST Client</li>
+<li>Nodejs MongoDB Web Server</li>
+<li>Autodesk Forge</li>
+<li>Forge-Based 2D + 3D Round-Trip BIM Editor</li>
+<li>Samples Connecting Desktop and Cloud</li>
+<li>Conclusion</li>
+<li>Learning More</li>
+</ul>
+<p>I hope this is of interest and use to you!</p>
+<p>Now I am really looking forward to a week's vacation before RTC!</p>
+<p><center>
+<img src="img/RTC-EUR-2016-240w.png" alt="RTC Europe 2016" width="240">
+</center></p>
