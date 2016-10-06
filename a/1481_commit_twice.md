@@ -140,36 +140,46 @@ The trick is, as you guys described, to set the active view to the new created v
 Here is the working snippet for those interested:
  
 <pre class="code">
-  public void testTwo()
-  {
-    View newView;
-        
-    using (Transaction t = new Transaction(this.Document))
-    {
-      t.Start("Trans");
-          
-      // Get Floorplan for Level1 and copy its properties for ouw newly to create ViewPlan.
-      View existingView = this.Document.GetElement(new ElementId(312)) as View;
-      
-      // Create new Floorplan.
-      newView = this.Document.GetElement(existingView.Duplicate(ViewDuplicateOption.Duplicate)) as View;
-    
-      t.Commit();
-
-      // important to set new view as active view.
-      this.ActiveView = newView;
-      
-      t.Start("Trans 2");
-          
-      // Try to isolate a Wall. Fails.
-      newView.IsolateElementTemporary(new ElementId(317443));
-    
-      t.Commit();
-    }
-    
-    // Change the View to the new View.
-    this.ActiveView = newView;
-  }
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;testTwo(&nbsp;<span style="color:#2b91af;">UIDocument</span>&nbsp;uidoc&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;uidoc.Document;
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">View</span>&nbsp;newView;
+ 
+&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;t&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;t.Start(&nbsp;<span style="color:#a31515;">&quot;Trans&quot;</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Get&nbsp;Floorplan&nbsp;for&nbsp;Level1&nbsp;and&nbsp;copy&nbsp;its&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;properties&nbsp;for&nbsp;ouw&nbsp;newly&nbsp;to&nbsp;create&nbsp;ViewPlan.</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">View</span>&nbsp;existingView&nbsp;=&nbsp;doc.GetElement(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementId</span>(&nbsp;312&nbsp;)&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">View</span>;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Create&nbsp;new&nbsp;Floorplan.</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;newView&nbsp;=&nbsp;doc.GetElement(&nbsp;existingView.Duplicate(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ViewDuplicateOption</span>.Duplicate&nbsp;)&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">View</span>;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;t.Commit();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Important&nbsp;to&nbsp;set&nbsp;new&nbsp;view&nbsp;as&nbsp;active&nbsp;view.</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;uidoc.ActiveView&nbsp;=&nbsp;newView;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;t.Start(&nbsp;<span style="color:#a31515;">&quot;Trans&nbsp;2&quot;</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Try&nbsp;to&nbsp;isolate&nbsp;a&nbsp;Wall.&nbsp;Fails.</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;newView.IsolateElementTemporary(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementId</span>(&nbsp;317443&nbsp;)&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;t.Commit();
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Change&nbsp;the&nbsp;View&nbsp;to&nbsp;the&nbsp;new&nbsp;View.</span>
+ 
+&nbsp;&nbsp;uidoc.ActiveView&nbsp;=&nbsp;newView;
+}
 </pre>
 
 It somewhat sucks having to commit twice and therefore having to regenerate twice. But the workaround is solid and does the job. Thanks guys!
