@@ -91,10 +91,11 @@ Quick access links:
  
 Feel free to contact us at [forgehackathon@autodesk.com](mailto:forgehackathon@autodesk.com) at any time with any questions.
 
+<!----
 <center>
 <img src="img/forge_accelerator.png" alt="Forge &ndash; build the future of making things together" width="400">
 </center>
-
+---->
 
 #### <a name="3"></a>Listing Material Asset Textures and Sub-Textures
 
