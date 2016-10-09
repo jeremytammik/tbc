@@ -1,0 +1,49 @@
+https://github.com/jeremytammik/DirectObjLoader/issues/2
+
+Question from truevis:
+
+What do we have to change to get this to work in Revit 2017? Seems there are changes in DirectShape.CreateElement and TessellatedShapeBuilderResult.
+
+Answer:
+
+I migrated the sample to Revit 2017 for you.
+
+Here is what i did:
+
+- Updated the Revit API references
+- Incremented the .NET framework from 4.5 to 4.5.2
+- Reinstalled the FileFormatWavefront NuGet package
+- Recompiled
+
+That produces two warnings:
+
+- Error CS1501 No overload for method 'Build' takes 3 arguments DirectObjLoader C:\a\vs\DirectObjLoader\DirectObjLoader\Command.cs 126 Active
+- Warning CS0618 'DirectShape.CreateElement(Document, ElementId, string, string)' is obsolete: 'This function will be obsolete in Revit 2017. Use DirectShape.CreateElement(Document, ElementId) instead. Use DirectShape.ApplicationId, DirectShape.ApplicationDataId properties to set application id and application data id.' DirectObjLoader C:\a\vs\DirectObjLoader\DirectObjLoader\Command.cs 131 Active
+
+The warning is completely self-explanatory and trivial.
+
+The error is caused by the changes described in What's New in the Revit 2017 API:
+
+http://thebuildingcoder.typepad.com/blog/2016/04/whats-new-in-the-revit-2017-api.html
+
+http://thebuildingcoder.typepad.com/blog/2016/04/whats-new-in-the-revit-2017-api.html#2.12.2
+
+**TessellatedShapeBuilder Changes**
+
+The options for building are now set as options in the TessellatedShapeBuilder itself. Access these options through the new properties:
+
+- TessellatedShapeBuilder.Target
+- TessellatedShapeBuilder.Fallback
+- TessellatedShapeBuilder.GraphicsStyleId
+
+The build result is now accessible through GetBuildResult instead of being returned by the Build method.
+
+I published a new released 2017.0.0.0 including the corresponding changes.
+
+The flat migration works fine, and this image was produced as a result:
+
+/a/doc/revit/tbc/git/a/img/directobjloader_2017_emser.png
+
+I am rather disappointed that you do not solve this yourself and create a pull request to share your solution.
+
+What kind of one-way sharing is this supposed to be?
