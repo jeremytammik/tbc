@@ -9,16 +9,16 @@
 
 DirectObjLoader for Revit 2017 @AutodeskForge #revitapi #3dwebcoder @AutodeskRevit #aec #bim @RTCEvents
 
-&ndash; 
-...
+Here is a last quick Sunday morning post before I head off on vacation, on the DirectObjLoader migration to Revit 2017, handling the changes in <code>DirectShape.CreateElement</code> and <code>TessellatedShapeBuilderResult</code>...
 
 -->
 
 ### DirectObjLoader for Revit 2017
 
 Here is a last quick Sunday morning post before I head off on vacation, prompted
-by the [truevis](https://github.com/truevis) comment on
-the GitHub [DirectObjLoader issue #2](https://github.com/jeremytammik/DirectObjLoader/issues/2):
+by [truevis](https://github.com/truevis)' comment on
+the [DirectObjLoader](https://github.com/jeremytammik/DirectObjLoader)
+[GitHub issue #2](https://github.com/jeremytammik/DirectObjLoader/issues/2):
 
 #### <a name="2"></a>Question
 
@@ -47,11 +47,9 @@ To fix it, just do what the man says.
 The error is caused by the changes described
 in [What's New in the Revit 2017 API](http://thebuildingcoder.typepad.com/blog/2016/04/whats-new-in-the-revit-2017-api.html):
 
-http://thebuildingcoder.typepad.com/blog/2016/04/whats-new-in-the-revit-2017-api.html#2.12.2
-
 <font color="darkblue">
 
-#### <a name="4"></a>TessellatedShapeBuilder Changes
+#### <a name="4"></a>[TessellatedShapeBuilder Changes](http://thebuildingcoder.typepad.com/blog/2016/04/whats-new-in-the-revit-2017-api.html#2.12.2)
 
 The options for building are now set as options in the `TessellatedShapeBuilder` itself. Access these options through the new properties:
 
