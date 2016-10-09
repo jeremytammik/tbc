@@ -65,6 +65,10 @@ I published a new [release 2017.0.0.0](https://github.com/jeremytammik/DirectObj
 
 You can [compare the changes](https://github.com/jeremytammik/DirectObjLoader/compare/2015.0.0.22...2017.0.0.0) to see exactly what I did.
 
+Here is the code for Revit 2017:
+
+<script src="https://gist.github.com/jeremytammik/1b1b36cbcadc0be957ea4492b0093fca.js"></script>
+
 The flat migration works fine, and this image was produced as a result from a 6 MB OBJ apartment model:
 
 <center>
