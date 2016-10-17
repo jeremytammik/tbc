@@ -497,3 +497,12 @@ Room 7; Concrete Masonry Units: net 60; opening 0; gross 60
 Wonderful, isn't it?
 
 Thank you again, Håvard!
+
+
+#### <a name="8"></a>Addendum
+
+[Zhbing0322](https://github.com/zhbing0322) added
+a [comment](https://github.com/jeremytammik/SpatialElementGeometryCalculator/commit/18ebcd1283bf64a595505871987c3089d53037e6#commitcomment-19391593) on
+a [commit](https://github.com/jeremytammik/SpatialElementGeometryCalculator/commit/18ebcd1283bf64a595505871987c3089d53037e6):
+
+> The result of `spatialSubFace.GetSubface().Area` is the Gross area of the Wall in a room.

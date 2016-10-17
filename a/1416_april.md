@@ -54,7 +54,7 @@ May all sentient beings be happy!
 
 <center>
 
-<!--- <img src="file:////j/photo/jeremy/2012/2012-01-12_haircut_shave_head/haircut-small.gif" alt="Shaving Jeremy's head"/> -->
+<!--- <img src="/p/2012/2012-01-12_haircut_shave_head/haircut-small.gif" alt="Shaving Jeremy's head"/> -->
 
 <a class="asset-img-link"  style="display: inline;" href="http://thebuildingcoder.typepad.com/.a/6a00e553e1689788330167670e6a0a970b-popup" onclick="window.open( this.href, '_blank', 'width=640,height=480,scrollbars=no,resizable=no,toolbar=no,directories=no,location=no,menubar=no,status=no,left=0,top=0' ); return false"><img class="asset  asset-image at-xid-6a00e553e1689788330167670e6a0a970b" alt="Shaving Jeremy's head" title="Shaving Jeremy's head" src="http://thebuildingcoder.typepad.com/.a/6a00e553e1689788330167670e6a0a970b-800wi" border="0" /></a><br />
 
