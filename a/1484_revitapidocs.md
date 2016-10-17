@@ -7,10 +7,13 @@
 
 <!---
 
+<code></code>
+
 Token Expiry and Online Revit API Docs @AutodeskForge #revitapi @AutodeskRevit #aec #bim @RTCEvents
 
-<code></code>
-...
+My vacation ended and I am now in Porto, putting the last touches to my presentation material for the RTC Revit Technology Conference Europe and the ISEPBIM Forge and BIM workshops at ISEP, Porto University. Here are today's Revit API and Forge news items
+&ndash; Updated Online Revit API Docs
+&ndash; Handling Forge token expiry...
 
 -->
 
@@ -18,7 +21,8 @@ Token Expiry and Online Revit API Docs @AutodeskForge #revitapi @AutodeskRevit #
 
 My vacation ended and I am now in Porto, putting the last touches to my presentation material for 
 the [RTC Revit Technology Conference Europe](http://www.rtcevents.com/rtc2016eur) and 
-the [ISEPBIM](https://www.facebook.com/ISEPBIM) Forge and BIM workshops at [ISEP](http://www.isep.ipp.pt), Porto University.
+the [ISEPBIM](https://www.facebook.com/ISEPBIM) Forge and BIM workshops at [ISEP](http://www.isep.ipp.pt), 
+the [Instituto Superior de Engenharia do Porto](http://www.isep.ipp.pt).
 
 <center>
 <img src="/p/2016/2016-10-17_porto/634.jpg" alt="Porto" width="500">
@@ -47,21 +51,25 @@ In his own words:
 
 > In case you haven't seen it yet, I just wanted to share with you the latest version of [RevitAPIdocs.com](http://www.revitapidocs.com):
 
->    - Redesigned home page 
-- Consolidated search for all APIs: Search results highlight if entry is not part of the active 'Year' and redirect you (i.e., to leaders in Revit 2015)
-- Result filtering by type (Class, Method, etc.)
+>
+- Redesigned home page.
+- Consolidated search for all APIs: search results highlight if entry is not part of the active 'Year' and redirect you (i.e., to leaders in Revit 2015).
+- Result filtering by type (Class, Method, etc.).
 - Built in autocomplete engine to help users find most relevant entries &ndash; it will improve further over time!
 
-Here is a quick summary overview of the new features:
+Here is an animation showing a quick overview of the new features:
 
 <center>
 <img src="img/revitapidocs_newfeat.gif" alt="Revit API Docs new features" width="524">
+<img src="http://thebuildingcoder.typepad.com/revitapidocs_newfeat.gif" alt="Revit API Docs new features">
+<p/>
 </center>
 
 The revamped search result landing page looks like this:
 
 <center>
-<img src="img/revitapidocs_landing2.gif" alt="Revit API Docs landing page" width="601">
+<img src="img/revitapidocs_landing2.gif" alt="Revit API Docs search landing page" width="601">
+<img src="http://thebuildingcoder.typepad.com/revitapidocs_landing2.gif" alt="Revit API Docs search landing page">
 </center>
 
 Many thanks to Gui for providing this really important tool!
@@ -69,7 +77,8 @@ Many thanks to Gui for providing this really important tool!
 
 #### <a name="3"></a>Handling Forge Token Expiry
 
-**Question:** I am working on an app for the Forge and AppStore hackathon challenge.
+**Question:** I am working on an app for
+the [Forge and AppStore hackathon challenge](http://autodeskforge.devpost.com).
 
 I am using the [models.autodesk.io online tool](https://models.autodesk.io) for token generation.
 
