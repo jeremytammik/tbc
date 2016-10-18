@@ -34,6 +34,7 @@ Jim Quanci very kindly supplied an updated list of really cool demo sites, plus 
 Here are a number of links to various Forge demos that I can use myself and point others to play with in the coming days:
 
 - [Fun cool site](http://lmv.rocks) &ndash; [lmv.rocks](http://lmv.rocks)
+- [Animated physics simulation](http://viewer.autodesk.io/node/physics/#/viewer) &ndash; [viewer.autodesk.io/node/physics/#/viewer](http://viewer.autodesk.io/node/physics/#/viewer)
 <!---- [Mongodb to Viewer](http://mongo.autodesk.io) &ndash; [mongo.autodesk.io](http://mongo.autodesk.io) ---->
 - [Connect mongo database to viewer](https://forge-rcdb.autodesk.io) &ndash; [forge-rcdb.autodesk.io](https://forge-rcdb.autodesk.io)
 - [Synchronized 2D/3D](http://calm-inlet-4387.herokuapp.com/?_sm_au_=iVVvSjRVVjbtJSQ7) &ndash; [calm-inlet-4387.herokuapp.com](http://calm-inlet-4387.herokuapp.com/?_sm_au_=iVVvSjRVVjbtJSQ7)
