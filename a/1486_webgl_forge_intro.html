@@ -10,15 +10,18 @@
 
 <code></code>
 
-Cool Forge Demos and Roomedit Caveat @AutodeskForge #revitapi @AutodeskRevit #aec #bim @RTCEvents
+Forge Formats, Webinars and Fusion 360 Client API @AutodeskForge #revitapi @AutodeskRevit #aec #bim @RTCEvents
 
-Getting ready to present an overview of Forge and talk about connecting the desktop and the cloud at the RTC Revit Technology Conference Europe and the ISEPBIM Forge and BIM workshops at ISEP, the Instituto Superior de Engenharia do Porto, Jim Quanci very kindly supplied an updated list of really cool demo sites, plus a word of warning:
-&ndash; Cool Forge demos
-&ndash; Caveat on connecting desktop and cloud...
+I updated the WebGL and Forge introduction for BIM programming and its GitHub source for the presentations in the coming days at the RTC Revit Technology Conference Europe and the ISEPBIM Forge and BIM workshops at ISEP, in Porto, implemented two little curl wrapper scripts to help me list the supported file formats, explored why they changed and updated the hackathon webinar overview. Before getting to that, I'll also highlight a helpful note by Christian on how to access the 'Symbolic Representation' setting:
+&ndash; 'Symbolic Representation' setting parameter
+&ndash; Forge intro for BIM programming
+&ndash; <code>cURL</code> wrapper scripts to list Forge file formats
+&ndash; Updated Forge file formats
+&ndash; Forge hackathon webinar series and Fusion 360 Client API recording...
 
 -->
 
-<h3>WebGL and Forge Introduction and Formats</h3>
+<h3>Forge Formats, Webinars and Fusion 360 Client API</h3>
 <p>I updated
 the <a href="http://jeremytammik.github.io/forge_bim_programming">WebGL and Forge introduction for BIM programming</a> and
 its <a href="https://github.com/jeremytammik/forge_bim_programming">GitHub source</a> for
@@ -27,7 +30,7 @@ the <a href="http://www.rtcevents.com/rtc2016eur">RTC Revit Technology Conferenc
 the <a href="https://www.facebook.com/ISEPBIM">ISEPBIM</a> Forge and BIM workshops at <a href="http://www.isep.ipp.pt">ISEP</a>, 
 the <a href="http://www.isep.ipp.pt">Instituto Superior de Engenharia do Porto</a>,
 implemented two little <code>curl</code> wrapper scripts to help me list the supported file formats, explored why they changed and updated the hackathon webinar overview.</p>
-<p>Before getting to that, though, I'll also highlight a little helpful note by Christian on how to access the 'Symbolic Representation' setting:</p>
+<p>Before getting to that, though, I'll also highlight a helpful little note by Christian on how to access the 'Symbolic Representation' setting:</p>
 <ul>
 <li><a href="#1">'Symbolic Representation' setting parameter</a></li>
 <li><a href="#2">Forge intro for BIM programming</a></li>
@@ -109,10 +112,10 @@ echo "Now you might want to export FORGE_ACCESS_TOKEN=... for consumption by for
 $ export FORGE_ACCESS_TOKEN=XzVxWJoVbNWcnJeKJPRnkYjp1tgt
 </pre>
 
-<p>From there, it is retrieved by the second script, <code>forgeformats</code>, which feeds it into the second endoint like this:</p>
+<p>From there, it is retrieved by the second script, <code>forgeformats</code>, which feeds it into the second endpoint like this:</p>
 <pre class="prettyprint">
 #!/bin/bash
-curl -X 'GET' -H "Authorization: Bearer $FORGE_ACCESS_TOKEN" -v 'https://developer.api.autodesk.com/modelderivative/v2/designdata/formats'
+curl -X 'GET' -H &quot;Authorization: Bearer $FORGE_ACCESS_TOKEN&quot; -v 'https://developer.api.autodesk.com/modelderivative/v2/designdata/formats'
 </pre>
 
 <p>Right now, that returns the following list:</p>

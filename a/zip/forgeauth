@@ -1,0 +1,5 @@
+#!/bin/bash
+
+curl -v 'https://developer.api.autodesk.com/authentication/v1/authenticate' -X 'POST' -H 'Content-Type: application/x-www-form-urlencoded' -d "client_id=$ROOMEDIT3DV3_PROD_CONSUMER_KEY&client_secret=$ROOMEDIT3DV3_PROD_CONSUMER_SECRET&grant_type=client_credentials&scope=data:read"
+
+echo "Now you might want to export FORGE_ACCESS_TOKEN=... for consumption by forgeformats"

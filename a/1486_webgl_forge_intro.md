@@ -13,8 +13,12 @@
 
 Forge Formats, Webinars and Fusion 360 Client API @AutodeskForge #revitapi @AutodeskRevit #aec #bim @RTCEvents
 
-&ndash; 
-...
+I updated the WebGL and Forge introduction for BIM programming and its GitHub source for the presentations in the coming days at the RTC Revit Technology Conference Europe and the ISEPBIM Forge and BIM workshops at ISEP, in Porto, implemented two little curl wrapper scripts to help me list the supported file formats, explored why they changed and updated the hackathon webinar overview. Before getting to that, I'll also highlight a helpful note by Christian on how to access the 'Symbolic Representation' setting:
+&ndash; 'Symbolic Representation' setting parameter
+&ndash; Forge intro for BIM programming
+&ndash; <code>cURL</code> wrapper scripts to list Forge file formats
+&ndash; Updated Forge file formats
+&ndash; Forge hackathon webinar series and Fusion 360 Client API recording...
 
 -->
 
@@ -29,7 +33,7 @@ the [ISEPBIM](https://www.facebook.com/ISEPBIM) Forge and BIM workshops at [ISEP
 the [Instituto Superior de Engenharia do Porto](http://www.isep.ipp.pt),
 implemented two little `curl` wrapper scripts to help me list the supported file formats, explored why they changed and updated the hackathon webinar overview.
 
-Before getting to that, though, I'll also highlight a little helpful note by Christian on how to access the 'Symbolic Representation' setting:
+Before getting to that, though, I'll also highlight a helpful little note by Christian on how to access the 'Symbolic Representation' setting:
 
 - ['Symbolic Representation' setting parameter](#1)
 - [Forge intro for BIM programming](#2)
@@ -135,7 +139,7 @@ From there, it is retrieved by the second script, `forgeformats`, which feeds it
 
 <pre class="prettyprint">
 #!/bin/bash
-curl -X 'GET' -H "Authorization: Bearer $FORGE_ACCESS_TOKEN" -v 'https://developer.api.autodesk.com/modelderivative/v2/designdata/formats'
+curl -X 'GET' -H &quot;Authorization: Bearer $FORGE_ACCESS_TOKEN&quot; -v 'https://developer.api.autodesk.com/modelderivative/v2/designdata/formats'
 </pre>
 
 Right now, that returns the following list:
