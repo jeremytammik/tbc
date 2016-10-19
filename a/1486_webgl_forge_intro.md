@@ -103,7 +103,7 @@ the [Forge](https://developer.autodesk.com/)
 **Typepad crashes at this point**
 
 You can look at what I actually intend to publish in
-the [tbc GitHub reporitory](https://github.com/jeremytammik/tbc),
+the [tbc GitHub repository](https://github.com/jeremytammik/tbc),
 where this blog posts is mirrored
 as [tbc/a/1486_webgl_forge_intro.html](http://jeremytammik.github.io/tbc/a/1486_webgl_forge_intro.html).
 
