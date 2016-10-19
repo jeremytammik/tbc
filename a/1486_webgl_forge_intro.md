@@ -100,6 +100,20 @@ the [Forge](https://developer.autodesk.com/)
 [Model Derivative API](https://developer.autodesk.com/en/docs/model-derivative/v2/overview/)
 [GET formats](https://developer.autodesk.com/en/docs/model-derivative/v2/reference/http/formats-GET/) endpoint:
 
+**Typepad crashes at this point**
+
+You can look at what I actually intend to publish in
+the [tbc GitHub reporitory](https://github.com/jeremytammik/tbc),
+where this blog posts is mirrored
+as [tbc/a/1486_webgl_forge_intro.html](http://jeremytammik.github.io/tbc/a/1486_webgl_forge_intro.html).
+
+Sorry, I am unable to add the scripts inline to this typepad post.
+
+Here they are as links instead:
+
+- [forgeauth](zip/forgeauth)
+- [forgeformats](zip/forgeformats)
+
 <pre class="prettyprint">
 curl -X 'GET' -H 'Authorization: Bearer ztcaB2R0f92bsV6iV0bSDgwmSVaW' -v 'https://developer.api.autodesk.com/modelderivative/v2/designdata/formats'
 </pre>
