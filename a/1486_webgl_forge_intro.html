@@ -1,0 +1,201 @@
+<p><head>
+<title>The Building Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true" defer="defer"></script>
+</head></p>
+<!---
+
+/a/src/web/forge/doc/forge_bim_programming/
+
+<code></code>
+
+Cool Forge Demos and Roomedit Caveat @AutodeskForge #revitapi @AutodeskRevit #aec #bim @RTCEvents
+
+Getting ready to present an overview of Forge and talk about connecting the desktop and the cloud at the RTC Revit Technology Conference Europe and the ISEPBIM Forge and BIM workshops at ISEP, the Instituto Superior de Engenharia do Porto, Jim Quanci very kindly supplied an updated list of really cool demo sites, plus a word of warning:
+&ndash; Cool Forge demos
+&ndash; Caveat on connecting desktop and cloud...
+
+-->
+
+<h3>WebGL and Forge Introduction and Formats</h3>
+<p>I updated
+the <a href="http://jeremytammik.github.io/forge_bim_programming">WebGL and Forge introduction for BIM programming</a> and
+its <a href="https://github.com/jeremytammik/forge_bim_programming">GitHub source</a> for
+the presentations in the coming days at 
+the <a href="http://www.rtcevents.com/rtc2016eur">RTC Revit Technology Conference Europe</a> and 
+the <a href="https://www.facebook.com/ISEPBIM">ISEPBIM</a> Forge and BIM workshops at <a href="http://www.isep.ipp.pt">ISEP</a>, 
+the <a href="http://www.isep.ipp.pt">Instituto Superior de Engenharia do Porto</a>,
+implemented two little <code>curl</code> wrapper scripts to help me list the supported file formats, explored why they changed and updated the hackathon webinar overview.</p>
+<p>Before getting to that, though, I'll also highlight a little helpful note by Christian on how to access the 'Symbolic Representation' setting:</p>
+<ul>
+<li><a href="#1">'Symbolic Representation' setting parameter</a></li>
+<li><a href="#2">Forge intro for BIM programming</a></li>
+<li><a href="#3"><code>cURL</code> wrapper scripts to list Forge file formats</a></li>
+<li><a href="#4">Updated Forge file formats</a></li>
+<li><a href="#5">Forge hackathon webinar series and Fusion 360 Client API recording</a></li>
+</ul>
+<h4><a name="1"></a>'Symbolic Representation' Setting Parameter</h4>
+<p>Christian shared how to access the 'Symbolic Representation' setting in a family definition in 
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> thread
+on <a href="http://forums.autodesk.com/t5/revit-api-forum/symbolic-representation-parameter/m-p/6623135">symbolic representation - parameter</a>:</p>
+<blockquote>
+<p>just wanted to share some code as I "lost" one hour of my life to look for it. If you want to access the setting for "Symbolic Representation" inside a family document, here we go:</p>
+</blockquote>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">Parameter</span>&nbsp;param&nbsp;=&nbsp;famdoc.OwnerFamily.get_Parameter(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.FAMILY_SYMBOLIC_REP&nbsp;);
+
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;param&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;0&nbsp;-&nbsp;From&nbsp;Family&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;1&nbsp;-&nbsp;From&nbsp;Project&nbsp;Setting</span>
+&nbsp;&nbsp;&nbsp;&nbsp;param.Set(&nbsp;1&nbsp;);
+&nbsp;&nbsp;}
+</pre>
+
+<p>Thank you very much for sharing that, Christian!</p>
+<h4><a name="2"></a>Forge Intro for BIM Programming</h4>
+<p><a href="https://github.com/jeremytammik/forge_bim_programming">Forge for BIM Programming</a> is
+a <a href="https://github.com/hakimel/reveal.js">reveal.js</a> presentation
+on <a href="https://www.khronos.org/webgl">WebGL</a>
+and <a href="https://developer.autodesk.com">Autodesk Forge platform</a> introduction.</p>
+<p>It was first used for
+the <a href="http://www.bimprogramming.com">BIM Programming</a> conference
+and workshops in Madrid, January 2016, and now updated for 
+the <a href="http://www.rtcevents.com/rtc2016eur">RTC Revit Technology Conference Europe</a> and 
+the <a href="https://www.facebook.com/ISEPBIM">ISEPBIM</a> Forge and BIM workshops at <a href="http://www.isep.ipp.pt">ISEP</a>, 
+the <a href="http://www.isep.ipp.pt">Instituto Superior de Engenharia do Porto</a> in Porto, October 2016.</p>
+<p>For more information on Forge, please refer
+to the overview at <a href="https://forge.autodesk.com">forge.autodesk.com</a>
+and all the technical details, samples and further documentation
+at <a href="https://developer.autodesk.com">developer.autodesk.com</a>.</p>
+<p>To view this presentation online, visit <a href="http://jeremytammik.github.io/forge_bim_programming">jeremytammik.github.io/forge_bim_programming</a>.</p>
+<p><center>
+<img src="img/forge_platform_diagram.png" alt="Forge platform diagram" width="400">
+</center></p>
+<h4><a name="3"></a><code>cURL</code> Wrapper Scripts to List Forge File Formats</h4>
+<p>One of the slides in the presentation above lists the file formats currently supported by the Forge platform.</p>
+<p>This list can be obtained by a REST call to
+the <a href="https://developer.autodesk.com/">Forge</a>
+<a href="https://developer.autodesk.com/en/docs/model-derivative/v2/overview/">Model Derivative API</a>
+<a href="https://developer.autodesk.com/en/docs/model-derivative/v2/reference/http/formats-GET/">GET formats</a> endpoint:</p>
+<pre class="prettyprint">
+curl -X 'GET' -H 'Authorization: Bearer ztcaB2R0f92bsV6iV0bSDgwmSVaW' -v 'https://developer.api.autodesk.com/modelderivative/v2/designdata/formats'
+</pre>
+
+<p>We need to supply a valid access token, though, instead of the placeholder listed above.</p>
+<p>This in turn is obtained by a call to
+the <a href="https://developer.autodesk.com/en/docs/oauth/v2/overview/">authentication</a>
+<a href="https://developer.autodesk.com/en/docs/oauth/v2/reference/http/authenticate-POST/">POST authenticate</a> endpoint,
+specifying our client id and secret.</p>
+<p>To easily complete this two-step process from the command line, I implemented two Unix shell scripts, <code>forgeauth</code> and <code>forgeformats</code>.</p>
+<p>The former retrieves my client id and secret from two environment variables and calls the <code>authenticate</code> endpoint like this:</p>
+<pre class="prettyprint">
+#!/bin/bash
+
+curl -v 'https://developer.api.autodesk.com/authentication/v1/authenticate' -X 'POST' -H 'Content-Type: application/x-www-form-urlencoded' -d "client_id=$ROOMEDIT3DV3_PROD_CONSUMER_KEY&client_secret=$ROOMEDIT3DV3_PROD_CONSUMER_SECRET&grant_type=client_credentials&scope=data:read"
+
+echo "Now you might want to export FORGE_ACCESS_TOKEN=... for consumption by forgeformats"
+</pre>
+
+<p>This returns the following JSON formatted access token data:</p>
+<pre class="prettyprint">
+{"access_token":"XzVxWJoVbNWcnJeKJPRnkYjp1tgt","token_type":"Bearer","expires_in":86399}
+</pre>
+
+<p>As the script suggests, I store the transient access token in another environment variable <code>FORGE_ACCESS_TOKEN</code>:</p>
+<pre class="prettyprint">
+$ export FORGE_ACCESS_TOKEN=XzVxWJoVbNWcnJeKJPRnkYjp1tgt
+</pre>
+
+<p>From there, it is retrieved by the second script, <code>forgeformats</code>, which feeds it into the second endoint like this:</p>
+<pre class="prettyprint">
+#!/bin/bash
+curl -X 'GET' -H "Authorization: Bearer $FORGE_ACCESS_TOKEN" -v 'https://developer.api.autodesk.com/modelderivative/v2/designdata/formats'
+</pre>
+
+<p>Right now, that returns the following list:</p>
+<pre class="prettyprint">
+{"formats":{"svf":["3dm","3ds","asm","catpart","catproduct","cgr","collaboration","dae","dgn","dlv3","dwf","dwfx","dwg","dwt","dxf","exp","f3d","fbx","g","gbxml","iam","idw","ifc","ige","iges","igs","ipt","jt","model","neu","nwc","nwd","obj","pdf","prt","rcp","rvt","sab","sat","session","skp","sldasm","sldprt","smb","smt","ste","step","stl","stla","stlb","stp","stpz","wire","x_b","x_t","xas","xpr","zip","prt\\.\\d+$","neu\\.\\d+$","asm\\.\\d+$"],"thumbnail":["3dm","3ds","asm","catpart","catproduct","cgr","collaboration","dae","dgn","dlv3","dwf","dwfx","dwg","dwt","dxf","exp","f3d","fbx","g","gbxml","iam","idw","ifc","ige","iges","igs","ipt","jt","model","neu","nwc","nwd","obj","pdf","prt","rcp","rvt","sab","sat","session","skp","sldasm","sldprt","smb","smt","ste","step","stl","stla","stlb","stp","stpz","wire","x_b","x_t","xas","xpr","zip","prt\\.\\d+$","neu\\.\\d+$","asm\\.\\d+$"],"stl":["f3d","fbx","iam","ipt","wire"],"step":["f3d","fbx","iam","ipt","wire"],"iges":["f3d","fbx","iam","ipt","wire"],"obj":["f3d","fbx","iam","ipt","step","stp","stpz","wire"]}}
+</pre>
+
+<h4><a name="4"></a>Updated Forge file formats</h4>
+<p>Here is the list of extensions currently returned by call to the <code>formats</code> endpoint shown above, cleaned up and alphabetically sorted:</p>
+<ul>
+<li>3dm, 3ds, asm, asm, catpart, catproduct, cgr, collaboration, dae, dgn, dlv3, dwf, dwfx, dwg, dwt, dxf, exp, f3d, fbx, g, gbxml, iam, idw, ifc, ige, iges, igs, ipt, jt, model, neu, neu, nwc, nwd, obj, pdf, prt, prt, rcp, rvt, sab, sat, session, skp, sldasm, sldprt, smb, smt, ste, step, stl, stla, stlb, stp, stpz, wire, x_b, x_t, xas, xpr, zip</li>
+</ul>
+<p>I compared that with the previous list that I generated in January:</p>
+<ul>
+<li>3dm, 3ds, asm, bmp, cam360, catpart, catproduct, cgr, csv, dae, dlv3, doc, docx, dwf, dwfx, dwg, dwt, exp, f3d, fbx, g, gbxml, iam, ifc, ige, iges, igs, ipt, jpeg, jpg, jt, model, neu, nwc, nwd, obj, pdf, png, pps, ppt, pptx, prt, rcp, rtf, rvt, sab, sat, session, sim, sim360, skp, sldasm, sldprt, smb, smt, ste, step, stl, stla, stlb, stp, tif, tiff, txt, wire, x_b, x_t, xas, xls, xlsx, xpr, zip</li>
+</ul>
+<p>As you can see, support for quite a number of new formats has been added.</p>
+<p>A few have also been removed, such as BMP and TIFF.</p>
+<p>I asked for an explanation for that, and learned the following:</p>
+<p>Here are the ones that seem to have been added:</p>
+<ul>
+<li>collaboration, dgn, dxf, idw, stpz</li>
+</ul>
+<p>We assume it was easy (and made sense) to extend to more CAD-related formats such as <code>dgn</code>, <code>dxf</code> and <code>idw</code>.</p>
+<p><code>Stpz</code> is probably just compressed STP, so that was presumably a no-brainer, too.</p>
+<p>The following have been removed:</p>
+<ul>
+<li>bmp, cam360, csv, doc, docx, jpeg, jpg, png, pps, ppt, pptx, rtf, sim, sim360, tif, tiff, txt, xls, xlsx</li>
+</ul>
+<p>Aside from <code>cam360</code>, <code>sim</code> and <code>sim360</code>, these are all Office or image formats.</p>
+<p>Some were not actually supported by the Model Derivative service but are supported in the A360 product and its viewers.</p>
+<p>This looks like good progress, to me.</p>
+<p>Many thanks to Adam, Kean and Lee for their analysis, suggestions and clarifications!</p>
+<h4><a name="5"></a>Forge Hackathon Webinar Series and Fusion 360 Client API Recording</h4>
+<p>The <a href="http://autodeskforge.devpost.com/details/webinars">Forge webinar series</a> is nearing its end.</p>
+<p>Here are the recordings and documentation pointers for the topics covered so far:</p>
+<ul>
+<li>September 20
+&ndash; <a href="http://adndevblog.typepad.com/cloud_and_mobile/2016/09/introduction-to-autodesk-forge-and-the-autodesk-app-store.html">Introduction to Autodesk Forge and the Autodesk App Store</a></li>
+<li>September 22
+&ndash; <a href="http://adndevblog.typepad.com/cloud_and_mobile/2016/09/introduction-to-oauth-and-data-management-api.html">Introduction to OAuth and Data Management API</a>
+&ndash; on <a href="https://developer.autodesk.com/en/docs/oauth/v2/overview">OAuth</a>
+and <a href="https://developer.autodesk.com/en/docs/data/v2/overview">Data Management API</a>, providing token-based authentication, authorization and a unified and consistent way to access data across A360, Fusion 360, and the Object Storage Service.</li>
+<li>September 27
+&ndash; <a href="http://adndevblog.typepad.com/cloud_and_mobile/2016/09/introduction-to-model-derivative-api.html">Introduction to Model Derivative API</a>
+&ndash; on the <a href="https://developer.autodesk.com/en/docs/model-derivative/v2/overview">Model Derivative API</a> that enables users to represent and share their designs in different formats and extract metadata.</li>
+<li>September 29
+&ndash; <a href="http://adndevblog.typepad.com/cloud_and_mobile/2016/09/introduction-to-viewer-api.html">Introduction  to Viewer</a>
+&ndash; the <a href="https://developer.autodesk.com/en/docs/viewer/v2/overview">Viewer</a>, formerly part of the 'View and Data API', is a WebGL-based JavaScript library for 3D and 2D model rendering of CAD models from seed files, e.g., <a href="http://www.autodesk.com/products/autocad/overview">AutoCAD</a>, <a href="http://www.autodesk.com/products/fusion-360/overview">Fusion 360</a>, <a href="http://www.autodesk.com/products/revit-family/overview">Revit</a> and many other formats.</li>
+<li>October 4
+&ndash; <a href="http://adndevblog.typepad.com/cloud_and_mobile/2016/10/introduction-to-design-automation.html">Introduction to Design Automation</a>
+&ndash; the <a href="https://developer.autodesk.com/en/docs/design-automation/v2/overview">Design Automation API</a>, formerly known as 'AutoCAD I/O', enables running scripts on native CAD design files such as <code>DWG</code>,
+cf. <a href="https://github.com/szilvaa/acadio-tutorials">Albert's tutorials</a>.</li>
+<li>October 6
+&ndash; <a href="http://adndevblog.typepad.com/cloud_and_mobile/2016/10/introduction-to-bim-360.html">Introduction to BIM360</a> and
+the <a href="https://www.youtube.com/watch?v=cOQEyI-EMAQ">Forge DevCon recording on BIM 360</a>
+&ndash; <a href="https://developer.autodesk.com/en/docs/bim360/v1/">BIM360</a> enables apps to integrate with BIM360 to extend its capabilities in the construction ecosystem.</li>
+<li>October 11
+&ndash; <a href="http://adndevblog.typepad.com/manufacturing/2016/10/introduction-to-fusion-360-api.html">Introduction to Fusion 360 Client API</a>
+&ndash; <a href="http://help.autodesk.com/view/NINVFUS/ENU/?guid=GUID-A92A4B10-3781-4925-94C6-47DA85A4F65A">Fusion 360 Client API</a> implements an integrated CAD, CAM, and CAE tool for product development, built for the new ways products are designed and made;
+resources:
+<a href="http://forums.autodesk.com/t5/api-and-scripts/bd-p/22">forum</a>,
+<a href="https://autodeskfusion360.github.io">samples</a>,
+<a href="http://fusion360.autodesk.com/learning/learning.html?guid=GUID-A18E7686-1C84-4690-95EE-E2076A1BD84E&amp;_ga=1.102015364.466522287.1440788713">learning material</a></li>
+</ul>
+<p>For code samples on any of these, please refer to the Forge Platform samples on GitHub
+at <a href="https://github.com/Developer-Autodesk">Developer-Autodesk</a>
+and <a href="https://github.com/Autodesk-Forge">Autodesk-Forge</a>,
+optionally adding a filter, e.g., like this for <code>Design.automation</code>: <a href="https://github.com/Developer-Autodesk?query=Design.automation">...Developer-Autodesk?query=Design.automation</a>.</p>
+<p>The Forge Webinar series continues during the remainder of
+the <a href="http://autodeskforge.devpost.com">Autodesk App Store Forge and Fusion 360 Hackathon</a> until the end of October:</p>
+<ul>
+<li>October 27 @ 8.00 AM PST &ndash; Submitting a web service app to Autodesk App store.</li>
+</ul>
+<p>Please feel free to contact us at <a href="mailto:forgehackathon@autodesk.com">forgehackathon@autodesk.com</a> at
+any time with any questions you may have on Autodesk Forge or the Autodesk Fusion 360 API.</p>
+<p>We will be happy to work with you to resolve your issues 1-on-1. </p>
+<p>Please note that the Q&amp;A session 2 originally scheduled for October 20th 8.00 AM PST has been cancelled, since we will instead be working directly with developers who have issues or questions.</p>
+<p>Quick access links:</p>
+<ul>
+<li>For API keys, go to <a href="https://developer.autodesk.com">developer.autodesk.com</a></li>
+<li>For code samples, go to <a href="https://github.com/Developer-Autodesk">github.com/Developer-Autodesk</a></li>
+</ul>
+<p><center>
+<img src="img/forge_accelerator.png" alt="Forge &ndash; build the future of making things together" width="400">
+</center></p>
