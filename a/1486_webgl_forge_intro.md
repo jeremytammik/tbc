@@ -174,7 +174,7 @@ Here is the list of extensions currently returned by call to the `formats` endpo
 
 - 3dm, 3ds, asm, asm, catpart, catproduct, cgr, collaboration, dae, dgn, dlv3, dwf, dwfx, dwg, dwt, dxf, exp, f3d, fbx, g, gbxml, iam, idw, ifc, ige, iges, igs, ipt, jt, model, neu, neu, nwc, nwd, obj, pdf, prt, prt, rcp, rvt, sab, sat, session, skp, sldasm, sldprt, smb, smt, ste, step, stl, stla, stlb, stp, stpz, wire, x_b, x_t, xas, xpr, zip
 
-I compared that with the previous list that I generated in January:
+I compared that with [the previous list that I generated in January](http://the3dwebcoder.typepad.com/blog/2015/04/displaying-2d-graphics-via-a-node-server.html#3.1):
 
 - 3dm, 3ds, asm, bmp, cam360, catpart, catproduct, cgr, csv, dae, dlv3, doc, docx, dwf, dwfx, dwg, dwt, exp, f3d, fbx, g, gbxml, iam, ifc, ige, iges, igs, ipt, jpeg, jpg, jt, model, neu, nwc, nwd, obj, pdf, png, pps, ppt, pptx, prt, rcp, rtf, rvt, sab, sat, session, sim, sim360, skp, sldasm, sldprt, smb, smt, ste, step, stl, stla, stlb, stp, tif, tiff, txt, wire, x_b, x_t, xas, xls, xlsx, xpr, zip
 
