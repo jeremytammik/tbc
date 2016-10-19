@@ -83,7 +83,8 @@ at <a href="https://developer.autodesk.com">developer.autodesk.com</a>.</p>
 the <a href="https://developer.autodesk.com/">Forge</a>
 <a href="https://developer.autodesk.com/en/docs/model-derivative/v2/overview/">Model Derivative API</a>
 <a href="https://developer.autodesk.com/en/docs/model-derivative/v2/reference/http/formats-GET/">GET formats</a> endpoint:</p>
-<p><strong>Typepad crashes at this point</strong></p>
+<p><font color="darkblue"></p>
+<p>I had an temporarily insurmountable problem with Typepad crashing at this point... it was resolved by escaping the character <code>c</code> using <code>&amp;#99;</code> in all calls to the <code>curl</code> command in the following scripts, i.e., replacing the string <code>curl</code> by <code>&amp;#99;url</code>. Weird, probably protects against some potential hack, and now solved...</p>
 <p>You can look at what I actually intend to publish in
 the <a href="https://github.com/jeremytammik/tbc">tbc GitHub repository</a>,
 where this blog posts is mirrored
@@ -94,8 +95,10 @@ as <a href="http://jeremytammik.github.io/tbc/a/1486_webgl_forge_intro.html">tbc
 <li><a href="zip/forgeauth">forgeauth</a></li>
 <li><a href="zip/forgeformats">forgeformats</a></li>
 </ul>
+<p>OK, back to normal now, problem resolved...</p>
+<p></font></p>
 <pre class="prettyprint">
-curl -X 'GET' -H 'Authorization: Bearer ztcaB2R0f92bsV6iV0bSDgwmSVaW' -v 'https://developer.api.autodesk.com/modelderivative/v2/designdata/formats'
+&#99;url -X 'GET' -H 'Authorization: Bearer ztcaB2R0f92bsV6iV0bSDgwmSVaW' -v 'https://developer.api.autodesk.com/modelderivative/v2/designdata/formats'
 </pre>
 
 <p>We need to supply a valid access token, though, instead of the placeholder listed above.</p>
@@ -108,7 +111,7 @@ specifying our client id and secret.</p>
 <pre class="prettyprint">
 #!/bin/bash
 
-curl -v 'https://developer.api.autodesk.com/authentication/v1/authenticate' -X 'POST' -H 'Content-Type: application/x-www-form-urlencoded' -d "client_id=$ROOMEDIT3DV3_PROD_CONSUMER_KEY&client_secret=$ROOMEDIT3DV3_PROD_CONSUMER_SECRET&grant_type=client_credentials&scope=data:read"
+&#99;url -v 'https://developer.api.autodesk.com/authentication/v1/authenticate' -X 'POST' -H 'Content-Type: application/x-www-form-urlencoded' -d "client_id=$ROOMEDIT3DV3_PROD_CONSUMER_KEY&client_secret=$ROOMEDIT3DV3_PROD_CONSUMER_SECRET&grant_type=client_credentials&scope=data:read"
 
 echo "Now you might want to export FORGE_ACCESS_TOKEN=... for consumption by forgeformats"
 </pre>
@@ -126,7 +129,7 @@ $ export FORGE_ACCESS_TOKEN=XzVxWJoVbNWcnJeKJPRnkYjp1tgt
 <p>From there, it is retrieved by the second script, <code>forgeformats</code>, which feeds it into the second endpoint like this:</p>
 <pre class="prettyprint">
 #!/bin/bash
-curl -X 'GET' -H &quot;Authorization: Bearer $FORGE_ACCESS_TOKEN&quot; -v 'https://developer.api.autodesk.com/modelderivative/v2/designdata/formats'
+&#99;url -X 'GET' -H &quot;Authorization: Bearer $FORGE_ACCESS_TOKEN&quot; -v 'https://developer.api.autodesk.com/modelderivative/v2/designdata/formats'
 </pre>
 
 <p>Right now, that returns the following list:</p>

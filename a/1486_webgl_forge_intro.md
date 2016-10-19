@@ -100,7 +100,9 @@ the [Forge](https://developer.autodesk.com/)
 [Model Derivative API](https://developer.autodesk.com/en/docs/model-derivative/v2/overview/)
 [GET formats](https://developer.autodesk.com/en/docs/model-derivative/v2/reference/http/formats-GET/) endpoint:
 
-**Typepad crashes at this point**
+<font color="darkblue">
+
+I had an temporarily insurmountable problem with Typepad crashing at this point... it was resolved by escaping the character `c` using `&#99;` in all calls to the `curl` command in the following scripts, i.e., replacing the string `curl` by `&#99;url`. Weird, probably protects against some potential hack, and now solved...
 
 You can look at what I actually intend to publish in
 the [tbc GitHub repository](https://github.com/jeremytammik/tbc),
@@ -114,8 +116,12 @@ Here they are as links instead:
 - [forgeauth](zip/forgeauth)
 - [forgeformats](zip/forgeformats)
 
+OK, back to normal now, problem resolved...
+
+</font>
+
 <pre class="prettyprint">
-curl -X 'GET' -H 'Authorization: Bearer ztcaB2R0f92bsV6iV0bSDgwmSVaW' -v 'https://developer.api.autodesk.com/modelderivative/v2/designdata/formats'
+&#99;url -X 'GET' -H 'Authorization: Bearer ztcaB2R0f92bsV6iV0bSDgwmSVaW' -v 'https://developer.api.autodesk.com/modelderivative/v2/designdata/formats'
 </pre>
 
 We need to supply a valid access token, though, instead of the placeholder listed above.
@@ -132,7 +138,7 @@ The former retrieves my client id and secret from two environment variables and 
 <pre class="prettyprint">
 #!/bin/bash
 
-curl -v 'https://developer.api.autodesk.com/authentication/v1/authenticate' -X 'POST' -H 'Content-Type: application/x-www-form-urlencoded' -d "client_id=$ROOMEDIT3DV3_PROD_CONSUMER_KEY&client_secret=$ROOMEDIT3DV3_PROD_CONSUMER_SECRET&grant_type=client_credentials&scope=data:read"
+&#99;url -v 'https://developer.api.autodesk.com/authentication/v1/authenticate' -X 'POST' -H 'Content-Type: application/x-www-form-urlencoded' -d "client_id=$ROOMEDIT3DV3_PROD_CONSUMER_KEY&client_secret=$ROOMEDIT3DV3_PROD_CONSUMER_SECRET&grant_type=client_credentials&scope=data:read"
 
 echo "Now you might want to export FORGE_ACCESS_TOKEN=... for consumption by forgeformats"
 </pre>
@@ -153,7 +159,7 @@ From there, it is retrieved by the second script, `forgeformats`, which feeds it
 
 <pre class="prettyprint">
 #!/bin/bash
-curl -X 'GET' -H &quot;Authorization: Bearer $FORGE_ACCESS_TOKEN&quot; -v 'https://developer.api.autodesk.com/modelderivative/v2/designdata/formats'
+&#99;url -X 'GET' -H &quot;Authorization: Bearer $FORGE_ACCESS_TOKEN&quot; -v 'https://developer.api.autodesk.com/modelderivative/v2/designdata/formats'
 </pre>
 
 Right now, that returns the following list:
