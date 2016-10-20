@@ -11,7 +11,8 @@
 
 Connecting Desktop and Cloud #RTCEUR Material @RTCEvents @AutodeskForge #revitapi @AutodeskRevit #aec #bim
 
-I am in the last stages of preparing my presentation this afternoon on connecting the desktop and the cloud for the RTC Revit Technology Conference Europe. For your and the audience's convenience, here are the materials I am presenting, and some of the main links to further information &ndash; Handout &ndash; Slide deck &ndash; Samples Connecting Desktop and Cloud...
+&ndash; 
+...
 
 -->
 
