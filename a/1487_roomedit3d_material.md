@@ -22,11 +22,12 @@ the [RTC Revit Technology Conference Europe](http://www.rtcevents.com/rtc2016eur
 
 For your and the audience's convenience, here are the materials I am presenting, and some of the main links to further information:
 
-- [Handout](/a/doc/revit/rtc/2016/doc/s1_4_hand_connect_desktop_cloud_jtammik.pdf)
 - [Slide deck](/a/doc/revit/rtc/2016/doc/s1_4_pres_connect_desktop_cloud_jtammik.pdf)
+- [Handout document](/a/doc/revit/rtc/2016/doc/s1_4_hand_connect_desktop_cloud_jtammik.pdf)
 - [Recording (1h 15min)](https://youtu.be/XJ3OLsOeeUc)
 
 <center>
+<br/>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/XJ3OLsOeeUc?rel=0" frameborder="0" allowfullscreen></iframe>
 </center>
 
