@@ -11,8 +11,11 @@
 
 Connecting Desktop and Cloud @ TUDa #RTCEUR @RTCEvents @AutodeskForge #revitapi @AutodeskRevit #aec #bim
 
-&ndash; 
-...
+The RTC Revit Technology Conference Europe and my stay here in Porto is nearing its end
+&ndash; Wrapping up in Porto
+&ndash; Connecting BIM and Cloud @ <b>TUDa</b>
+&ndash; Creating a Revit add-in with one single click
+&ndash; Connecting Revit and Forge in 55 minutes...
 
 -->
 
@@ -112,7 +115,7 @@ download the Revit SDK containing documentation and samples:
     - The Revit SDK provides the basic Revit API help file documentation in <code>RevitAPI.chm</code>.
     - The Revit API Developer Guide provides in-depth explanations.
 
-I wrote some instructions
+I already wrote similar instructions
 for [preparing for a hands-on Revit API training](http://thebuildingcoder.typepad.com/blog/2012/01/preparing-for-a-hands-on-revit-api-training.html) back in 2012 which are also still absolutely relevant.
 
 
