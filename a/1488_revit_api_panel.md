@@ -92,7 +92,7 @@ Things are moving forward. Lately, several important issues were resolved, some 
 
 <b>[Q]:</b> Is there any difference between programming in Dynamo and the pure Revit API?
 
-<b>[A]:</b> No, not really, as far as Revit is concerned. Dynamo is just a wrapper on top of the Revit API via the .NET framework. Dynamo does include other additional exciting functionality such as DesignScript that has nothing to do with Revit. There are currently two versions of Dynamo nowadays, with and without its own geometry kernel. 
+<b>[A]:</b> No, not really, as far as Revit is concerned. Dynamo is just a wrapper on top of the Revit API via the .NET framework. Dynamo does include other additional exciting functionality that has nothing to do with Revit such as DesignScript and its own geometry kernel. There are currently two versions of Dynamo: a standalone one and Dynamo for Revit, containing Revit-specific nodes and interactions.
 
 <b>[Q]:</b> How does Python interact with Revit?
 
