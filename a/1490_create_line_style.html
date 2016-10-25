@@ -1,0 +1,154 @@
+<p><head>
+<title>The Building Coder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="3dwc.css"/>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true" defer="defer"></script>
+</head></p>
+<!---
+
+Join in the Revit UI can mean several completely different things:
+
+- Family editor, two solids -- CombineElements
+- Family editor, two colinear beams of same material -- visual join only, remove edges
+- Project editor, two colinear walls of same material -- creates a single wall?
+- Project editor, two perpendicular walls of same material -- visual join only, remove edges
+- what other joins are there?
+- how are they represented and accessible in the API?
+
+
+<code></code>
+
+How to Create a New Line Style @AutodeskForge #RTCEUR @RTCEvents #revitapi @AutodeskRevit #aec #bim
+
+&ndash; 
+...
+
+-->
+
+<h3>How to Create a New Line Style</h3>
+<p>I arrived safe and sound in Munich to provide support for the
+one-week <a href="http://autodeskcloudaccelerator.com">Forge accelerator</a> workshop
+at the Autodesk offices here.</p>
+<ul>
+<li><a href="#2">Arrival in Munich and Hotel Schlicker</a></li>
+<li><a href="#3">Official pictures from RTC in Porto</a></li>
+<li><a href="#4">Art of README</a></li>
+<li><a href="#5">What is Join?</a></li>
+<li><a href="#6">How to Create a Line Style</a></li>
+</ul>
+<h4><a name="2"></a>Arrival in Munich and Hotel Schlicker</h4>
+<p>I am visiting a friend here in Munich starting today and needed a hotel for the first night.</p>
+<p>I had no time to research and book anything in advance, so I just got off the subway at Marienplatz and started walking.</p>
+<p>As luck would have it, I discovered the nicest hotel I have ever stayed at.</p>
+<p>With just three stars and a moderate price,
+<a href="http://www.hotel-schlicker.de">Hotel Schlicker</a> beats
+every single one of the five-star global hotel chain establishments that I normally have the bad luck to end up in.</p>
+<p>Highly recommended!</p>
+<h4><a name="3"></a>Official Pictures from RTC in Porto</h4>
+<p>Here are links to the official photo collections from 
+the <a href="http://www.rtcevents.com/rtc2016eur">RTC Revit Technology Conference Europe</a> in
+Porto during the last few days:</p>
+<ul>
+<li><a href="https://www.dropbox.com/sh/4ni6jamslxbc2yn/AACcdvHV_E4YogTswTF4nBPza?dl=0">Highlights Day 1</a></li>
+<li><a href="https://www.dropbox.com/sh/7lqifbca203ttg1/AAB3IksT6rRdY3Ofs-xGe9sea?dl=0">Highlights Day 2</a></li>
+<li><a href="https://www.dropbox.com/sh/m4rhkakiseh7pyz/AADZxZYhJcLWF41Utw7wb2AOa?dl=0">Highlights Day 3</a></li>
+</ul>
+<p>Thanks to Lejla Secerbegovic for sharing these!</p>
+<p>Here are my own pictures from the RTC Saturday evening gala dinner in the <a href="https://en.wikipedia.org/wiki/Pal%C3%A1cio_da_Bolsa">Palácio da Bolsa</a>, including the one and only Jay Zallan in his beautiful stripy fur coat in the arabic hall, a perfect fit tor the highlight of the palace, decorated in the exotic Moorish Revival style, used as reception hall for visiting personalities and heads of state:</p>
+<p><center>
+<a data-flickr-embed="true"  href="https://www.flickr.com/photos/jeremytammik/albums/72157672114668283" title="RTC Gala Dinner"><img src="https://c3.staticflickr.com/6/5645/29924672034_fb23f87594_n.jpg" width="320" height="240" alt="RTC Gala Dinner"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+</center></p>
+<h4><a name="4"></a>Art of README</h4>
+<p>A very nice and fundamentally important article for anyone sharing code, whether on GitHub or elsewhere, pointed out by  <a href="http://twitter.com/F3lipek">Philippe Leefsma</a>:</p>
+<p><center>
+<span style="font-size: 120%; font-weight: bold">
+<a href="https://github.com/noffle/art-of-readme">Art of README</a>
+</span>
+</center></p>
+<p>Thank you, Philippe, for this instructive read.</p>
+<h4><a name="5"></a>What is Join?</h4>
+<p>I made a shocking discovery in a discussion with a participant here at the Forge accelerator.</p>
+<p>I thought the Revit 'Join' operation was a sort of Boolean operation.</p>
+<p>Apparently, that is not the case at all, at least not always.</p>
+<p>In some cases, it is just a means to suppress the display of certain edges between adjacent collinear and coplanar elements of the same type and material.</p>
+<p>Maybe this is also the functionality driven by the <a href="http://www.revitapidocs.com/2017/c45b6484-3efd-1d81-0b47-ba678857fff1.htm">JoinGeometryUtils class</a>?</p>
+<p>Not a Boolean operation at all?</p>
+<p>Under other circumstances, it can apparently mean other things.</p>
+<p>For instance, in the family editor, joining two solids may or may not cause a Boolean operation, which may or may not correspond to the <a href="http://www.revitapidocs.com/2017/5c33a711-2891-f353-5f39-24ba175be452.htm">CombineElements method</a>.</p>
+<p>I would love to have more clarity on this, and so might others as well...</p>
+<h4><a name="6"></a>How to Create a Line Style</h4>
+<p>Scott Conover, Senior Engineering Manager of the Revit development team, pointed out the following important Revit 2017 API enhancement that now fully enables the programmatic creation of new line styles:</p>
+<p><strong>Question:</strong> How can I create a new line style?</p>
+<p><strong>Answer:</strong> Creating a line style is really easy.</p>
+<p>One little stumbling block relates to terminology, as there is no <code>LineStyle</code> object in the Revit API.   </p>
+<p>The <code>LineStyle</code> is in fact a <code>GraphicsStyle</code> element in the API.   </p>
+<p>Actually new <code>LineStyle</code> instances are defined as subcategories of <code>Line</code>, so are you can set one up by making a new subcategory and setting its weight, colour, and pattern as you please.
+ 
+Up until 2017, there was a gap around assigning the line pattern to the category. </p>
+<p>Happily, this is now exposed in Revit 2017.
+ 
+Here is a macro that creates and sets up a new Line Style:</p>
+<pre class="code">
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;Create&nbsp;a&nbsp;new&nbsp;line&nbsp;style&nbsp;using&nbsp;NewSubcategory</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:blue;">void</span>&nbsp;CreateLineStyle(<span style="color:#2b91af;">Document</span>&nbsp;doc)
+{
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Use&nbsp;this&nbsp;to&nbsp;access&nbsp;the&nbsp;current&nbsp;document&nbsp;in&nbsp;a&nbsp;macro.</span>
+&nbsp;&nbsp;<span style="color:green;">//</span>
+&nbsp;&nbsp;<span style="color:green;">//Document&nbsp;doc&nbsp;=&nbsp;this.ActiveUIDocument.Document;</span>
+
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Find&nbsp;existing&nbsp;linestyle.  Can&nbsp;also&nbsp;opt&nbsp;to</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;create&nbsp;one&nbsp;with&nbsp;LinePatternElement.Create()</span>
+
+&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;fec&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">LinePatternElement</span>&nbsp;)&nbsp;);
+
+&nbsp;&nbsp;<span style="color:#2b91af;">LinePatternElement</span>&nbsp;linePatternElem&nbsp;=&nbsp;fec
+&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">LinePatternElement</span>&gt;()
+&nbsp;&nbsp;&nbsp;&nbsp;.First&lt;<span style="color:#2b91af;">LinePatternElement</span>&gt;(&nbsp;linePattern&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;linePattern.Name&nbsp;==&nbsp;<span style="color:#a31515;">&quot;Long&nbsp;dash&quot;</span>&nbsp;);
+
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;The&nbsp;new&nbsp;linestyle&nbsp;will&nbsp;be&nbsp;a&nbsp;subcategory&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;of&nbsp;the&nbsp;Lines&nbsp;category        </span>
+
+&nbsp;&nbsp;<span style="color:#2b91af;">Categories</span>&nbsp;categories&nbsp;=&nbsp;doc.Settings.Categories;
+
+&nbsp;&nbsp;<span style="color:#2b91af;">Category</span>&nbsp;lineCat&nbsp;=&nbsp;categories.get_Item(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Lines&nbsp;);
+
+&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;t&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;t.Start(&nbsp;<span style="color:#a31515;">&quot;Create&nbsp;LineStyle&quot;</span>&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Add&nbsp;the&nbsp;new&nbsp;linestyle </span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Category</span>&nbsp;newLineStyleCat&nbsp;=&nbsp;categories
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.NewSubcategory(&nbsp;lineCat,&nbsp;<span style="color:#a31515;">&quot;New&nbsp;LineStyle&quot;</span>&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;doc.Regenerate();
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Set&nbsp;the&nbsp;linestyle&nbsp;properties&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;(weight,&nbsp;color,&nbsp;pattern).</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;newLineStyleCat.SetLineWeight(&nbsp;8,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">GraphicsStyleType</span>.Projection&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;newLineStyleCat.LineColor&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Color</span>(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0xFF,&nbsp;0x00,&nbsp;0x00&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;newLineStyleCat.SetLinePatternId(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;linePatternElem.Id,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">GraphicsStyleType</span>.Projection&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;t.Commit();
+&nbsp;&nbsp;}
+}
+</pre>
+
+<p>I added Scott's code 
+to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> 
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.130.4">release 2017.0.131.0</a> 
+in the new module <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCreateLineStyle.cs">CmdCreateLineStyle.cs</a>.</p>
+<p>Thank you very much, Scott, for pointing out and demonstrating this important enhancement!</p>
