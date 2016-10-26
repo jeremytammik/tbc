@@ -122,7 +122,7 @@ Scott Conover, Senior Engineering Manager of the Revit development team, pointed
 
 One little stumbling block relates to terminology, as there is no `LineStyle` object in the Revit API.   
 
-The `LineStyle` is in fact a `GraphicsStyle` element in the API.   
+The `LineStyle` is in fact represented by a `GraphicsStyle` element in the API.
 
 Actually new `LineStyle` instances are defined as subcategories of `Line`, so are you can set one up by making a new subcategory and setting its weight, colour, and pattern as you please.
  
@@ -197,4 +197,3 @@ to [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 in the new module [CmdCreateLineStyle.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCreateLineStyle.cs).
 
 Thank you very much, Scott, for pointing out and demonstrating this important enhancement!
-
