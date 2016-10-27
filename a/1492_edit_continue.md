@@ -7,15 +7,6 @@
 
 <!---
 
-Join in the Revit UI can mean several completely different things:
-
-- Family editor, two solids -- CombineElements
-- Family editor, two colinear beams of same material -- visual join only, remove edges
-- Project editor, two colinear walls of same material -- creates a single wall?
-- Project editor, two perpendicular walls of same material -- visual join only, remove edges
-- what other joins are there?
-- how are they represented and accessible in the API?
-
 - Michael Porskær of [Orbicon A/S](http://www.orbicon.dk)
 
 - Historic Achievement: Microsoft researchers reach human parity in conversational speech recognition
@@ -29,107 +20,88 @@ http://blogs.microsoft.com/next/2016/10/18/historic-achievement-microsoft-resear
 
 <code></code>
 
- @AutodeskForge #revitapi @AutodeskRevit #aec #bim
+AI, Edit and Continue #RTCEUR @RTCEvents @AutodeskForge #revitapi @AutodeskRevit #aec #bim
 
-&ndash; 
-...
+I am still in Munich supporting the one-week Forge accelerator workshop, returning back to Switzerland by train tonight. For ecological reasons, I prefer to avoid flying whenever I possibly can. Lots of exciting development is going on here, and we are making great progress. I have another important detail to report from the the RTC Revit Technology Conference Europe in Porto last week, and other little titbits to share as well
+&ndash; Use AddInManager and attach to process to edit and continue
+&ndash; Can I replace myself by artificial intelligence?
+&ndash; Autodesk Design Graph
+&ndash; Artificial intelligence recognises conversational speech
+&ndash; Good portable loudspeakers...
 
 -->
 
-### Edit and Continue
+### AI, Edit and Continue
 
-Here I am in Munich, supporting the
-one-week [Forge accelerator](http://autodeskcloudaccelerator.com) workshop.
+I am still in Munich supporting the
+one-week [Forge accelerator](http://autodeskcloudaccelerator.com) workshop,
+returning back to Switzerland by train tonight.
 
-I still have lots of exciting things to report from the
-the [RTC Revit Technology Conference Europe](http://www.rtcevents.com/rtc2016eur) in Porto last week.
+For ecological reasons, I prefer to avoid flying whenever I possibly can.
 
-Maybe the most , and
+Lots of exciting development is going on here, and we are making great progress.
 
-here at the Autodesk offices in Munich.
+I have another important detail to report from the
+the [RTC Revit Technology Conference Europe](http://www.rtcevents.com/rtc2016eur) in
+Porto last week, and other little titbits to share as well:
 
-A lot of questions already came up:
+- [Use AddInManager and attach to process to edit and continue](#2)
+- [Can I replace myself by artificial intelligence?](#3)
+- [Autodesk Design Graph](#4)
+- [Artificial intelligence recognises conversational speech](#5)
+- [Good portable loudspeakers](#6)
 
-- [](#2)
-- [](#3)
-- [](#4)
-- [](#5)
 
-- [The first-ever public Revit roadmap](#7)
+#### <a name="2"></a>Using AddInManager and Attach to Process to Edit and Continue
 
+
+As I mentioned in the notes from
+the [Revit API discussion panel](http://thebuildingcoder.typepad.com/blog/2016/10/rtc-revit-api-panel-idea-station-edit-and-continue.html),
+one of the topics we touched upon was how
+to [edit and continue, aka debug without restart or live development](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.49),
+i.e., enable the full cycle of debugging an add-in, discovering an error, editing the code to fix it, and continuing debugging in the same Revit model without being forced to terminate and restart Revit and reload the project.
+
+This is not immediately achievable, because if you use the Visual Studio debugger to launch Revit, it will lock the DLL that you are debugging, and you will not be able to edit it.
+
+The standard suggestion to work around this that I made in the past is to convert your add-in code to a macro for debugging, and then convert it back again when done.
+
+Various other suggestions have been made (and are listed in [The Building Coder topic group 5.49](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.49) mentioned above) to enable reloading the add-in without converting the code to a macro, e.g., by loading it from an in-memory byte stream instead of a file.
+
+Michael Porskær of [Orbicon A/S](http://www.orbicon.dk) pointed out that he uses a much simpler and more direct method by running Revit.exe in normal standalone mode instead of launching it from the Visual Studio debugger, attaching the debugger to the Revit.exe process, and using the AddInManager provided with the Revit SDK to load the add-in.
+
+Here are the exact steps:
+
+1. Load add-in project in Visual Studio.
+2. Compile/build DLL.
+3. Start Revit externally.
+4. In Visual Studio, click on Debug &gt; Attach to Process.
+5. Find and select the Revit.exe process in the list.
+6. Load the DLL-file through Add-In Manager in Revit (you will find Add-In Manager in the SDK).
+7. Click on the command you would like to debug and click Run.
+8. Debug your code.
+9. Stop debug.
+10. Fix your code and start from number 4 again.
+
+Michael published the [52-second video *DebugCommandWithoutRestartRevit*](https://youtu.be/I3NA2VUB8Hc) showing these steps live:
 
 <center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/I3NA2VUB8Hc?rel=0" frameborder="0" allowfullscreen></iframe>
 </center>
 
-#### <a name="2"></a>Arrival in Munich and Hotel Schlicker
-
-I am visiting a friend here in Munich starting today and needed a hotel for the first night.
-
-I had no time to research and book anything in advance, so I just got off the subway at Marienplatz and started walking.
-
-As luck would have it, I discovered the nicest hotel I have ever stayed at.
-
-With just three stars and a moderate price,
-[Hotel Schlicker](http://www.hotel-schlicker.de) beats
-every single one of the five-star global hotel chain establishments that I normally have the bad luck to end up in.
-
-Highly recommended!
+Thank you very much, Michael, for documenting and sharing this!
 
 
-#### <a name="3"></a>Art of README
-
-A very nice and fundamentally important article for anyne sharing code, whether on GitHub or elsewhere, pointed out by  [Philippe Leefsma](http://twitter.com/F3lipek):
-
-<center>
-<span style="font-size: 120%; font-weight: bold">
-[Art of README](https://github.com/noffle/art-of-readme)
-</span>
-</center>
-
-Thank you, Philippe, very nice indeed!
-
-
-
-#### <a name="4"></a>Neo4j
-
-[Neo4j](https://neo4j.com/)
-
-
-[document-based or graph database, MongoDB vs Neo4j](http://stackoverflow.com/questions/14793335/should-i-go-for-document-based-or-graph-database-mongodb-vs-neo4j)
-
-
-#### <a name="5"></a>What is Join?
-
-I made a shocking discovery in a discussion with a participant here at the Forge accelerator.
-
-I always thought that Revit 'Join' operation was a sort of Boolean operation.
-
-Now I discovered that it is not at all.
-
-In some cases, it is more about not displaying certain edges of adjacent colinear and coplanar elements of the same type and material.
-
-Maybe this is also the functionality driven by the [JoinGeometryUtils class](http://www.revitapidocs.com/2017/c45b6484-3efd-1d81-0b47-ba678857fff1.htm)?
-
-Not a Boolean operation at all?
-
-Under other circumstances, it can apparently mean other things.
-
-For instance, in the family editor, joining two solids may or may not cause a Boolean operation, which may or may not correspond to the [CombineElements method](http://www.revitapidocs.com/2017/5c33a711-2891-f353-5f39-24ba175be452.htm).
-
-I would love to have more clarity on this, and so might others as well...
-
-
-#### <a name="2"></a>Can I Replace Myself by Artificial Intelligence?
+#### <a name="3"></a>Can I Replace Myself by Artificial Intelligence?
 
 I answered a lot of repetitive questions in the last couple of weeks and months &ndash; not to mention years and decades.
 
 That led me to realise recently that I am pretty sure that at least 10-20% of my work could be automated.
 
-The tasks that seem most easy to address are responses to simple beginner or background questions raised in certain email messages and discussion forum threads.
+The tasks that seem most easy to address are responses to simple questions on getting started raised in email messages and discussion forum threads.
 
 I would need tools to:
 
-- Monitor everything I do, specifically email and discussion forum thread responses.
+- Monitor all my computer interaction, specifically email and discussion forum thread responses.
 - Observe and learn which cases lead to similar and simple replies.
 - Be able to automatically and autonomously scan my email input and certain discussion forums.
 
@@ -150,55 +122,36 @@ Same might be way off, of course.
 
 Training would begin.
 
-Who know, maybe I am already much further, and the text you are reading here now was AI generated?
+Who knows, maybe I am already much further, and the text you read here now was AI generated?
 
-Here are two other AI, CAD and communication related items:
+Check out these other AI, CAD and communication related items:
 
-- [Autodesk Design Graph](#)
-- [Artificial Intelligence Recognises conversational speech](#)
+- [AlphaGo](https://en.wikipedia.org/wiki/AlphaGo) (already [mentioned in January](http://thebuildingcoder.typepad.com/blog/2016/01/bim-programming-madrid-and-spanish-connectivity.html#7))
+- [Autodesk Design Graph](#4)
+- [Artificial intelligence recognises conversational speech](#5)
 
 
-
-#### <a name="2"></a>Design Graph
+#### <a name="4"></a>Autodesk Design Graph
 
 [Design Graph](https://dg.autodesk.com) provides a new way to explore your 3D design data using shape-based machine learning to recognize and understand parts, assemblies and entire designs. It learns to identify the relationships between all parts within and across all of your designs, irrespective of whether cross-references exist. It learns to interpret designs in terms of those parts and provides a way to navigate your data using simple text search, learned categories of parts, shape similarity, usage patterns and even smart filters for part numbers, materials and other properties.
 
 
-#### <a name="5"></a>Artificial Intelligence Recognises conversational speech
+#### <a name="5"></a>Artificial Intelligence Recognises Conversational Speech
 
-[Historic Achievement: Microsoft researchers reach human parity in conversational speech recognition](http://blogs.microsoft.com/next/2016/10/18/historic-achievement-microsoft-researchers-reach-human-parity-conversational-speech-recognition/#c4Eb3dzo3TjivSZY.99)
+Microsoft announced progress and
+a [historic achievement reaching human parity in conversational speech recognition](http://blogs.microsoft.com/next/2016/10/18/historic-achievement-microsoft-researchers-reach-human-parity-conversational-speech-recognition).
 
-[Historic Achievement: Microsoft researchers reach human parity in conversational speech recognition](http://blogs.microsoft.com/next/2016/10/18/historic-achievement-microsoft-researchers-reach-human-parity-conversational-speech-recognition/#sm.0000otuyxfvc7fj810qiwj3udx94g)
+#### <a name="6"></a>Good Portable Loudspeakers
 
-#### <a name="5"></a>Good Portable Loudspeakers
-
-I went to a nice little [open floor](http://openfloor.org/) dance event Sunday evening after arriving here in Munich, in
+I went to a nice little [open floor](http://openfloor.org/) dance event last Sunday evening immediately after my arrival here in Munich, in
 the [Mohr-Villa Kulturzentrum](http://www.mohr-villa.de/), organised
-by [who?](http://www.moving-awareness.com).
+by [Juliana Barrett](http://www.moving-awareness.com).
 
-I only mention it to point out (and remember for myself) that she was using a portable sound system with really good loudpseakers,
-the [HK Audio Lucas Nano 600](http://hkaudio.com/products.php?id=414)... just a note to self.
+I only mention it to point out (and as a note to self) that she was using a portable sound system with pretty good loudpseakers,
+the [HK Audio Lucas Nano 600](http://hkaudio.com/products.php?id=414).
 
-
+A picture from my last morning walk to the office across the Isar:
 
 <center>
-<img src="img/.png" alt="" width="309">
+<a href="https://flic.kr/s/aHskKjyb4g"><img src="img/789_500.jpg" alt="Isar" width="500"></a>
 </center>
-
-aggregation sample https://forge.autodesk.io
-
-https://github.com/leefsmp/forge
-
-
-
-#### <a name="6"></a>The First-Ever Public Revit Roadmap
-
-Join the discussion!
-
-http://www.autodesk.com/revitroadmap
-
-http://forums.autodesk.com/t5/revit-roadmaps/the-first-ever-public-revit-roadmap/ba-p/6633199
-
-mentioned briefly in the Revit API panel discussion notes
-
-http://thebuildingcoder.typepad.com/blog/2016/10/rtc-revit-api-panel-idea-station-edit-and-continue.html

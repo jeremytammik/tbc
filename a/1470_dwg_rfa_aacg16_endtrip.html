@@ -18,22 +18,25 @@
   https://www.youtube.com/watch?v=WjLWsTdISfY -- Sergio Ramis - Endtrip Rescored
   https://vimeo.com/148054745 christopher Endtrip (full sound replacement)
 
- #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim
+Avoid CAD Import in RFA, #AAG2016 and Endtrip #revitapi #3dwebcoder @AutodeskRevit @AutodeskForge #aec #bim @chtammik
 
-&ndash; 
-...
+Some interesting topics of the day for this first cloudy one after a truly wonderful Indian summer
+&ndash; Avoid imported CAD content in RFA family definitions
+&ndash; Advances in Architectural Geometry 2016
+&ndash; Endtrip full sound replacement...
 
 -->
 
 <h3>Avoid CAD Import in RFA, AAG16 and Endtrip</h3>
 <p>Some interesting topics of the day for this first cloudy one after a truly wonderful Indian summer:</p>
 <ul>
-<li><a href="#2">Avoid imported CAD content in RFA family definitions</a></li>
+<li><a href="#2">Think twice before importing CAD into RFA</a></li>
 <li><a href="#3">Advances in Architectural Geometry 2016</a></li>
 <li><a href="#4">Endtrip full sound replacement</a></li>
 </ul>
-<h4><a name="2"></a>Avoid Imported CAD Content in RFA Family Definitions</h4>
-<p>I was in a meeting with Sasha Crotty, Revit API Product Manager, last week, and she mentioned an important aspect of content creation that I was not previously fully aware of:</p>
+<h4><a name="2"></a>Think Twice Before Importing CAD Into RFA</h4>
+<p>I was in a meeting with Sasha Crotty, Revit API Product Manager, last week, and she mentioned an important aspect of content creation that I was not previously fully aware of.</p>
+<p>I initially summarised that under the title <em>Avoid Imported CAD Content in RFA Family Definitions</em> as follows:</p>
 <p>Here is some general advice on creating Revit families: do not import DWG instances into a family definition.</p>
 <p>CAD import into a family is considered bad content.</p>
 <p>As much as possible, you would want to define a family using native Revit geometry native lines etc., not imported CAD data.</p>
@@ -42,6 +45,19 @@
 <p>Obviously the degradation will depend on the detail and complexity of the CAD content, and the replication of the family instances.</p>
 <p>In general, though, it is to be avoided.</p>
 <p>As if we couldn't have guessed...</p>
+<p>Sasha asked me to correct that, saying:</p>
+<blockquote>
+<p>... the warning as posted is too dire. I don't want to be responsible for how people choose to model their content. Every situation is different. I certainly didn't mean to say all CAD content was bad, but it is something that should be considered carefully, particularly if it involves DWG meshes with lots of vertices as this is the part that can kill performance. We don't gather quantitative data on this (we'd have to model buildings 10 different ways and compare &ndash; we don't have those kinds of resources), so I can't answer the question the partner has posed. My answer would be 'if you don't see a performance degradation, then don't change anything.'</p>
+<p>Revit is good with dealing with simple geometries and families are good with dealing with repeated objects. Is it better to model something natively? Probably. Can I guarantee that it will perform better? No. Will free-form elements be faster in the case of a simple CAD geometry? Quite possibly not, because they have to regenerate more if the geometry is truly simple. People need to draw their own conclusions based on their own performance assessment. My comments were meant as something to think about &ndash; not as a rule for creating content.</p>
+</blockquote>
+<p>Suggestion &ndash; Think twice before importing CAD into RFA</p>
+<p>Here is some general advice on creating Revit families: consider if there is a better solution than importing DWG instances into a family definition.</p>
+<p>Some CAD imports into a family may cause performance issues in the project.</p>
+<p>When importing CAD, consider using native Revit geometry instead, particularly for meshes with a high vertex count.</p>
+<p>An imported CAD object in a family definition will cause performance issues and slow down Revit.</p>
+<p>The view navigation performance impact of an unnecessarily complex import grows in the project for every family instance placed.</p>
+<p>Obviously the degradation will depend on the detail and complexity of the CAD content, and the replication of the family instances.</p>
+<p>In general, if you're seeing performance degradations, consider whether there is a simpler way to model the geometry.</p>
 <h4><a name="3"></a>Advances in Architectural Geometry 2016</h4>
 <p>The <a href="http://www.aag2016.ch">AAG16</a> conference on advances in architectural geometry at the ETH Zurich just completed.</p>
 <p>For some exciting computational generative architectural innovation idea, you can take a look at the wonderful, impressive, beautiful and
@@ -60,7 +76,7 @@ exciting <a href="http://vdf.ch/advances-in-architectural-geometry-2016-e-book.h
 <li>Bending-Active Plates: Form and Structure</li>
 <li>Underwood Pavilion: A Parametric Tensegrity Structure</li>
 <li>Safra Neuron Screen: Design and Fabrication</li>
-<li>Scissor Mechanisms for Transformable Structures with Curved Shape: The 'Jet d’Eau' Movable Footbridge in Geneva</li>
+<li>Scissor Mechanisms for Transformable Structures with Curved Shape: The 'Jet d'Eau' Movable Footbridge in Geneva</li>
 <li>Mastering the 'Sequential Roof': Computational Methods for Integrating Design, Structural Analysis, and Robotic Fabrication</li>
 <li>Adaptive Meshing for Bi-directional Information Flows: A Multi-Scale Approach to Integrating Feedback between Design, Simulation, and Fabrication</li>
 <li>Dimensionality Reduction for Parametric Design Exploration</li>
