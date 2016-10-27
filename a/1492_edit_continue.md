@@ -50,6 +50,7 @@ Porto last week, and other little titbits to share as well:
 - [Can I replace myself by artificial intelligence?](#3)
 - [Autodesk Design Graph](#4)
 - [Artificial intelligence recognises conversational speech](#5)
+- [Artificial intelligence teaching assistant](#5.1)
 - [Good portable loudspeakers](#6)
 
 
@@ -147,7 +148,8 @@ Check out these other AI, CAD and communication related items:
 
 - [AlphaGo](https://en.wikipedia.org/wiki/AlphaGo) (already [mentioned in January](http://thebuildingcoder.typepad.com/blog/2016/01/bim-programming-madrid-and-spanish-connectivity.html#7))
 - [Autodesk Design Graph](#4)
-- [Artificial intelligence recognises conversational speech](#5)
+- [AI recognises conversational speech](#5)
+- [AI teaching assistant](#5.1)
 
 
 #### <a name="4"></a>Autodesk Design Graph
@@ -160,7 +162,24 @@ Check out these other AI, CAD and communication related items:
 Microsoft announced progress and
 a [historic achievement reaching human parity in conversational speech recognition](http://blogs.microsoft.com/next/2016/10/18/historic-achievement-microsoft-researchers-reach-human-parity-conversational-speech-recognition).
 
+#### <a name="5.1"></a>Artificial Intelligence Teaching Assistant
+
+Matt Taylor pointed out the interesting report on an [artificial intelligence course creating an AI teaching assistant](http://www.news.gatech.edu/2016/05/09/artificial-intelligence-course-creates-ai-teaching-assistant).
+
+The students didn’t even know their TA was a computer.
+
+The key phrase for me is that "... the number of questions increases if you have more students, but the number of *different* questions doesn’t really go up ... the same questions [are repeated] over and over again."
+
+That is exactly what I have been noting more and more in my work recently, and what spawned my interest in this.
+
+"The students ... studying artificial intelligence ... were unknowingly interacting with it... The goal is to have the virtual teaching assistant answer 40 percent of all questions by the end of year."
+
+Thank you very much, Matt, for pointing out this perfect example of what I am after!
+
+
 #### <a name="6"></a>Good Portable Loudspeakers
+
+On a completely different topic...
 
 I went to a nice little [open floor](http://openfloor.org/) dance event last Sunday evening immediately after my arrival here in Munich, in
 the [Mohr-Villa Kulturzentrum](http://www.mohr-villa.de/), organised
