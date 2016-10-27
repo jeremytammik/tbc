@@ -46,6 +46,7 @@ the [RTC Revit Technology Conference Europe](http://www.rtcevents.com/rtc2016eur
 Porto last week, and other little titbits to share as well:
 
 - [Use AddInManager and attach to process to edit and continue](#2)
+    - [Resurrect](#2.1)
 - [Can I replace myself by artificial intelligence?](#3)
 - [Autodesk Design Graph](#4)
 - [Artificial intelligence recognises conversational speech](#5)
@@ -89,6 +90,24 @@ Michael published the [52-second video *DebugCommandWithoutRestartRevit*](https:
 </center>
 
 Thank you very much, Michael, for documenting and sharing this!
+
+
+#### <a name="2.1"></a>Resurrect
+
+I am very glad that Sander Obdeijn of [Itannex](http://www.itannex.com/) is here participating in the Munich Forge accelerator.
+
+He has extremely deep Revit experience, both in the user interface and API.
+
+He uses the approach described above to debug his Revit add-ins and pointed out a handy tool to make it yet more efficient:
+
+> You can use the [Resurrect Visual Studio extension](https://visualstudiogallery.msdn.microsoft.com/043c7c91-e127-4616-bce0-39b869cee4b3) ([source on GitHub](https://github.com/jwaliszko/Resurrect)) to automatically re-attach the debugger to previously debugged processes with one single click.
+
+<center>
+<img src="img/resurrect_icon32.png" alt="Resurrect" width="32">
+</center>
+
+<!---- <a class="asset-img-link"  style="float: right;" href="http://thebuildingcoder.typepad.com/.a/6a00e553e16897883301b8d231ff5e970c-popup" onclick="window.open( this.href, '_blank', 'width=640,height=480,scrollbars=no,resizable=no,toolbar=no,directories=no,location=no,menubar=no,status=no,left=0,top=0' ); return false"><img class="asset  asset-image at-xid-6a00e553e16897883301b8d231ff5e970c img-responsive" style="width: 32px; margin: 0px 0px 5px 5px;" alt="Resurrect" title="Resurrect" src="http://thebuildingcoder.typepad.com/.a/6a00e553e16897883301b8d231ff5e970c-50wi" /></a> --->
+
 
 
 #### <a name="3"></a>Can I Replace Myself by Artificial Intelligence?
