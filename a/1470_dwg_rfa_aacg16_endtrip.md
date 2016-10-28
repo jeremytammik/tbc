@@ -37,34 +37,29 @@ Some interesting topics of the day for this first cloudy one after a truly wonde
 - [Endtrip full sound replacement](#4)
 
 
-#### <a name="2"></a>Think Twice Before Importing CAD Into RFA
+#### <a name="2"></a>Think Twice Before Importing CAD into RFA
 
 I was in a meeting with Sasha Crotty, Revit API Product Manager, last week, and she mentioned an important aspect of content creation that I was not previously fully aware of.
 
-I initially summarised that under the title *Avoid Imported CAD Content in RFA Family Definitions* as follows:
-
+<p style="font-size:80%">I initially summarised that under the title *Avoid Imported CAD Content in RFA Family Definitions* as follows:
 Here is some general advice on creating Revit families: do not import DWG instances into a family definition.
-
 CAD import into a family is considered bad content.
-
 As much as possible, you would want to define a family using native Revit geometry native lines etc., not imported CAD data.
-
 An imported CAD object in a family definition will cause performance issues and slow down Revit.
-
 It gets duplicated in the project for every family instance placed.
-
 Obviously the degradation will depend on the detail and complexity of the CAD content, and the replication of the family instances.
-
 In general, though, it is to be avoided.
-
 As if we couldn't have guessed...
+Sasha asked me to correct that, saying:</p>
 
-Sasha asked me to correct that, saying:
+<!---
 
 > ... the warning as posted is too dire. I don't want to be responsible for how people choose to model their content. Every situation is different. I certainly didn't mean to say all CAD content was bad, but it is something that should be considered carefully, particularly if it involves DWG meshes with lots of vertices as this is the part that can kill performance. We don't gather quantitative data on this (we'd have to model buildings 10 different ways and compare &ndash; we don't have those kinds of resources), so I can't answer the question the partner has posed. My answer would be 'if you don't see a performance degradation, then don't change anything.'
  
 > Revit is good with dealing with simple geometries and families are good with dealing with repeated objects. Is it better to model something natively? Probably. Can I guarantee that it will perform better? No. Will free-form elements be faster in the case of a simple CAD geometry? Quite possibly not, because they have to regenerate more if the geometry is truly simple. People need to draw their own conclusions based on their own performance assessment. My comments were meant as something to think about &ndash; not as a rule for creating content.
- 
+
+--->
+
 Suggestion &ndash; Think twice before importing CAD into RFA
  
 Here is some general advice on creating Revit families: consider if there is a better solution than importing DWG instances into a family definition.
