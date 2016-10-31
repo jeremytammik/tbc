@@ -13,35 +13,39 @@ Pawel Madej RE: New version of Revit SDK 2017.1 with new REX SDK sample - Freeze
 
 <code></code>
 
- @AutodeskForge #revitapi @AutodeskRevit #aec #bim
+AU, Revit 2017.1 SDK and REX FreezeDrawing @AutodeskForge #revitapi @AutodeskRevit #aec #bim @RevitStructure
 
-&ndash; 
-...
+I returned from the Munich Forge accelerator, travelling back to Switzerland by train. For ecological reasons, I prefer to avoid flying whenever I possibly can. Last Friday was the deadline for submitting my Autodesk University handout, so that kept me busy. I still need to improve it a bit, and I hope a post-deadline update is feasible. I am presenting two classes, and I have a special discount to offer you. Lots of other things are happening as well
+&ndash; My classes at Autodesk University
+&ndash; $400 AU registration discount
+&ndash; Revit 2017.1 SDK
+&ndash; REX SDK FreezeDrawing sample
+&ndash; Determining the height of a column...
 
 -->
 
-### Revit 2017.1 SDK and REX FreezeDrawing
+### AU, Revit 2017.1 SDK and REX FreezeDrawing
 
-I returned from the 
-one-week [Munich Forge accelerator](http://autodeskcloudaccelerator.com) workshop,
+I returned from 
+the [Munich Forge accelerator](http://autodeskcloudaccelerator.com),
 travelling back to Switzerland by train.
 For ecological reasons, I prefer to avoid flying whenever I possibly can.
 
 Last Friday was the deadline for submitting my Autodesk University handout, so that kept me busy.
 
-I still need to improve them a bit, so I hope a post-deadline update is feasible.
+I still need to improve it a bit, and I hope a post-deadline update is feasible.
 
-I am presenting two classes, and I have a special discount of $400 to offer you.
+I am presenting two classes, and I have a special discount to offer you.
 
 Lots of other things are happening as well.
 
 Here is the list of topics for today:
 
 - [My classes at Autodesk University](#2)
-- [$400 discuout for Autodesk University](#3)
+- [$400 AU registration discount](#3)
 - [Revit 2017.1 SDK](#4)
 - [REX SDK FreezeDrawing sample](#5)
-- [Determine height of a column](#6)
+- [Determining the height of a column](#6)
 
 #### <a name="2"></a>My Classes at Autodesk University
 
@@ -50,6 +54,9 @@ This year, I am presenting two classes at [Autodesk University](http://au.autode
 - SD20891 &ndash; Revit API Expert Roundtable &ndash; Open House on the Factory Floor
 - SD20908 &ndash; Connect Desktop and Cloud &ndash; Free Your BIM Data!
 
+One way to access them and check out their details is
+to [search the AU catalogue for 'tammik'](https://events.au.autodesk.com/connect/dashboard.ww#loadSearch-searchPhrase=tammik&searchType=session).
+
 I really hope you can make it to my live sessions, of course.
 
 In case not, I'll share my handouts for both as soon as I have cleaned them up a little bit more.
@@ -57,7 +64,7 @@ In case not, I'll share my handouts for both as soon as I have cleaned them up a
 Meanwhile, I have another AU goodie to share, in case you have not already discovered it elsewhere:
 
 
-#### <a name="3"></a>$400 Discuout for Autodesk University
+#### <a name="3"></a>$400 Autodesk University Registration Discount
 
 I have a special offer to share with you:
 
@@ -65,21 +72,21 @@ You can get $400 off the regular AU conference price of $2,175 on any new regist
 
 Simply use the discount code `400AU16REFSP`.
 
-Here is [the registration link](https://events.au.autodesk.com/portal/login.ww).
+Here is [the AU registration link](https://events.au.autodesk.com/portal/login.ww).
 
 
 #### <a name="4"></a>Revit 2017.1 SDK
 
-As you probably also know by now, Revit 2017.1 has been released, with an [impressive list of enhancements](https://knowledge.autodesk.com/support/revit-products/learn-explore/caas/CloudHelp/cloudhelp/2017/ENU/Revit-WhatsNew/files/GUID-E287E537-7122-4ED8-8845-B8E24F287B62-htm.html).
+As you probably know by now, Revit 2017.1 has been released, with an [impressive list of enhancements](https://knowledge.autodesk.com/support/revit-products/learn-explore/caas/CloudHelp/cloudhelp/2017/ENU/Revit-WhatsNew/files/GUID-E287E537-7122-4ED8-8845-B8E24F287B62-htm.html).
 
-An updated Revit SDK for Revit 2017.1 is now available from
+An updated Revit SDK for Revit 2017.1 has been posted to
 the [Revit Developer Centre](http://www.autodesk.com/developrevit):
 
 - <a href="http://images.autodesk.com/adsk/files/Revit_2017.1_SDK_(Update_Oct_19__2016).msi">Revit 2017.1 SDK Update Oct 19, 2016.msi</a> (msi &ndash; 301220Kb)
 
-The new version quite a large list of exciting API improvements, as you can see by looking at the extensive documentation in the documentation included with the SDK, either the stand-alone doucment *Revit Platform API Changes and Additions.docx* or the section on *What's New* in the Revit API help file `RevitAPI.chm`.
+The new version sports quite a large list of exciting API improvements, as you can see by looking at the extensive documentation of them included with the SDK, both in the stand-alone document *Revit Platform API Changes and Additions.docx* and the section on *What's New* in the Revit API help file `RevitAPI.chm`.
 
-Here is one additional aspect:
+Here is one additional Revit 2017.1 SDK enhancement:
 
 
 #### <a name="3"></a>REX SDK FreezeDrawing Sample
@@ -153,7 +160,7 @@ Thanks again to Paweł for pointing it out!
 
 Two completely different approaches toward the implementation of a web or Forge based house configurator, a la IKEA for a house:
     
-estonia - rhino -> threejs --> revit
+estonia - rhino &rarr; threejs &rarr; revit
 
 belgium - aggregation sample https://forge.autodesk.io
 
@@ -174,13 +181,13 @@ Leo van Ruijven thought leader - http://www.iso.org/iso/catalogue_detail.htm?csn
 ---->
 
 
-#### <a name="6"></a>Determine Height of a Column
+#### <a name="6"></a>Determining the Height of a Column
 
 There is no API query or property to retrieve the length of a column directly, because it depends on the column type and its relationships with other objects.
 
 Here are two alternative approaches suggested by Jim Jia.
 
-This method uses the bottom and top level parameters to calcuate the column length:
+This method uses the bottom and top level parameters to calculate the length of a vertical column:
 
 <pre class="code">
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
@@ -230,14 +237,14 @@ This method uses the bottom and top level parameters to calcuate the column leng
 }
 </pre>
 
-In this approache, a number of Z offset parameters on the column may affect the final result.
+In this approach, a number of Z offset parameters on the column instance may affect the final result.
 
 The second method retrieves the column bounding box and uses its maximum and minimum coordinates to determine its height:
 
 <pre class="code">
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;Determine&nbsp;the&nbsp;height&nbsp;of&nbsp;any&nbsp;given&nbsp;element&nbsp;</span>
-<span style="color:gray;">///</span><span style="color:green;">&nbsp;from&nbsp;its&nbsp;boudnding&nbsp;box.</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;from&nbsp;its&nbsp;bounding&nbsp;box.</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
 <span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">Double</span>&nbsp;GetElementHeightFromBoundingBox(&nbsp;
 &nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;)
@@ -267,14 +274,14 @@ The second method retrieves the column bounding box and uses its maximum and min
 
 This approach is more generic and can be used for any geometric BIM element.
 
-Furthermore, the result obtained from the bounding box already takes the coliumn Z offset parameters into account.
+Furthermore, the result obtained from the bounding box already takes the column Z offset parameters into account.
 
 More approaches are possible, e.g., some columns have a location curve, from which its start and end points can be determined.
 
 You can also query the start and end points of the column's analytical line. Be aware that this may not be in the same location as the physical element.
 
-Thanks to Jim for sharing tese snippets!
+Thanks to Jim for sharing these snippets!
 
-I added these two methods
+I also added them 
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
 [release 2017.0.131.1](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.131.1) in the module  [CmdColumnRound.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdColumnRound.cs#L30-L104), cf. the [diff from the previous release](https://github.com/jeremytammik/the_building_coder_samples/compare/2017.0.131.0...2017.0.131.1).
