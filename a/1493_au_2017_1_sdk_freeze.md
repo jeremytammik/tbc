@@ -86,7 +86,7 @@ the [Revit Developer Centre](http://www.autodesk.com/developrevit):
 
 The new version sports quite a large list of exciting API improvements, as you can see by looking at the extensive documentation of them included with the SDK, both in the stand-alone document *Revit Platform API Changes and Additions.docx* and the section on *What's New* in the Revit API help file `RevitAPI.chm`.
 
-Here is one additional Revit 2017.1 SDK enhancement:
+It also includes a new REX SDK sample:
 
 
 #### <a name="3"></a>REX SDK FreezeDrawing Sample
