@@ -38,8 +38,8 @@ The agenda there consists of two parts:
 
 - 10:45-12:15 presentation &ndash; [Connecting desktop and  cloud](http://thebuildingcoder.typepad.com/blog/2016/10/connecting-desktop-and-cloud-at-rtc-material.html)
 - 13:00-17:00 hands-on workshop with two topics:
-    - Revit API &ndash; [creating a Revit add-in with one single click](#4)
-    - Connecting BIM with the cloud &ndash; [connecting Revit and Forge in 55 minutes](#5)
+    - Revit API &ndash; [creating a Revit add-in with one single click](http://thebuildingcoder.typepad.com/blog/2016/10/revit-api-and-connecting-desktop-and-cloud-tuda.html#4)
+    - Connecting BIM with the cloud &ndash; [connecting Revit and Forge in 55 minutes](http://thebuildingcoder.typepad.com/blog/2016/10/revit-api-and-connecting-desktop-and-cloud-tuda.html#5)
 
 I already prepared the material pointed to by the links above.
 
