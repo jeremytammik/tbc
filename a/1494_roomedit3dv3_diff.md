@@ -17,7 +17,7 @@
 
 -->
 
-### Roomedit3dv3 Diff From Boilerplate Code
+### Roomedit3dv3 Diff from Boilerplate Code
 
 I am still busy preparing
 my [Autodesk University sessions](http://thebuildingcoder.typepad.com/blog/2016/10/au-revit-20171-and-rex-freezedrawing.html#2),
@@ -54,6 +54,11 @@ BIM with the cloud.
 - [Starting fresh from scratch](#4)
 - [Copy, install and load the viewer extension](#5)
 - [Adding the link to load the viewer extension](#6)
+- [Renamed viewer extension base and toolkit `js` modules](#7)
+- [Successful test and final diff](#8)
+
+Please note that I abandoned my initial comparison attempt after the first two steps listed above, so if you are not interested in the painful beginnings of this exploration, you can skip straight to [starting fresh from scratch](#4).
+
 
 #### <a name="2"></a>Comparing the Root Folder Contents
 
@@ -246,9 +251,9 @@ Philippe seems to have changed quite a lot  since I initially implemented this b
 
 I'll start fresh from scratch.
 
-#### <a name="4"></a>Starting Fresh From Scratch
+#### <a name="4"></a>Starting Fresh from Scratch
 
-Let's firdst of all grab an updated version of the code and run it as is in the development environment.
+Let's grab an updated version of his boilerplate code and run it as is in the development environment.
 
 Before starting with the sample itself, set up environment variables for the boilerplate app to access your Forge credentials:
 
@@ -258,6 +263,8 @@ export FORGE_DEV_CLIENT_SECRET=$ROOMEDIT3DV3_DEV_CONSUMER_SECRET
 export FORGE_CALLBACK_URL=$ROOMEDIT3DV3_DEV_CALLBACK_URL
 export PORT=3000
 </pre>
+
+With your Forge credential environment variables defined, we can install and test the unmodified boilerplate code:
 
 - Create a fresh clone of the [forge-boilers.nodejs repo](https://github.com/Autodesk-Forge/forge-boilers.nodejs).
 - Navigate to the step 6 sample app: `$ cd forge-boilers.nodejs/6\ -\ viewer+server+data-mng+derivatives/`
@@ -271,7 +278,9 @@ That works fine for me.
 
 #### <a name="5"></a>Copy, Install and Load the Viewer Extension
 
-Install the viewer extension.
+I copied the working updated code into my own repository hosting the `roomedit3d` branch and started updating it to run my extension.
+
+First of all, I install the viewer extension.
 
 In my case, I can copy it from my previous version:
 
@@ -280,8 +289,8 @@ In my case, I can copy it from my previous version:
 </pre>
 
 If you prefer to grab it from the original repository, clone
-the [library-javascript-viewer-extensions](https://github.com/Developer-Autodesk/library-javascript-viewer-extensions) and
-copy the four files from the folder `library-javascript-viewer-extensions/src/Viewing.Extension.Transform` in it to a new subfolder `src/client/Components/Viewer/extensions`:
+Philippe's [library-javascript-viewer-extensions](https://github.com/Developer-Autodesk/library-javascript-viewer-extensions) and
+copy the four files from the `library-javascript-viewer-extensions/src/Viewing.Extension.Transform` folder to a new subfolder `src/client/Components/Viewer/extensions`:
 
 - TransformGizmos.js
 - Viewing.Extension.Transform.js
@@ -337,13 +346,33 @@ For that, I modify `layout/index.ejs` and replace the right navigation bar conte
 
 Here is the [commit diff to add the roomedit3dv3 about, start and stop links](https://github.com/Autodesk-Forge/forge-boilers.nodejs/commit/9f14a9508275d16ae9664a0cd7d1c606fef03c5c).
 
+#### <a name="7"></a>Renamed Viewer Extension Base and Toolkit `js` Modules
+
+Philippe renamed the JavaScript modules defining the viewer `ExtensionBase` and `Toolkit` classes.
+
+After a little bit of searching, I found the solution and updated the module names accordingly in `Viewing.Extension.Transform.js`:
 
 <pre class="prettyprint">
+-import ExtensionBase from 'ExtensionBase'
+-import ViewerToolkit from 'ViewerToolkit'
++import ExtensionBase from 'Viewer.ExtensionBase'
++import ViewerToolkit from 'Viewer.Toolkit'
 </pre>
 
+Here is the [commit diff to renamed viewer extension base and toolkit js modules](https://github.com/Autodesk-Forge/forge-boilers.nodejs/commit/381abe7be657085daed066dfc9eea067d15eecd1).
 
 
+#### <a name="8"></a>Successful Test and Final Diff
 
-<pre class="code">
-</pre>
+After those steps, I had the updated roomedit3dv3 viewer extension successfully up and running
+in [release 0.0.20](https://github.com/Autodesk-Forge/forge-boilers.nodejs/releases/tag/0.0.20) of 
+the [roomedit3d branch](https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/roomedit3d) of
+the [forge-boilers.nodejs repo](https://github.com/Autodesk-Forge/forge-boilers.nodejs).
+
+The important changes are obvious from
+the [diff between 0.0.18 and 0,.0.20](https://github.com/Autodesk-Forge/forge-boilers.nodejs/compare/0.0.18...0.0.20).
+
+I hope this simplifies your job of creating your own extensions.
+
+Happy [Forge](https://forge.autodesk.com) coding!
 
