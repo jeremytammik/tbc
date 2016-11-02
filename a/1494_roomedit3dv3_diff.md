@@ -18,7 +18,7 @@ I am preparing the Forge and BIM presentation and hands-on workshop this coming 
 &ndash; Starting fresh from scratch
 &ndash; Copy, install and load the viewer extension
 &ndash; Adding the link to load the viewer extension
-&ndash; Renamed viewer extension base and toolkit `js` modules
+&ndash; Renamed viewer extension base and toolkit <code>js</code> modules
 &ndash; All Viewer Extension Modifications
 &ndash; Successful test and final diff  &ndash; 25 lines of code...
 
