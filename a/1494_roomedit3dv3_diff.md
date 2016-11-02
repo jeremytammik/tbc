@@ -10,14 +10,21 @@
 
 <code></code>
 
- @AutodeskForge #revitapi @AutodeskRevit #aec #bim @RevitStructure
+Roomedit3dv3 Diff from Forge Boilerplate Code @AutodeskForge #revitapi @AutodeskRevit #aec #bim
 
-&ndash;
-...
+I am preparing the Forge and BIM presentation and hands-on workshop this coming Friday at Technische Universität Darmstadt, Institut für Numerische Methoden und Informatik im Bauwesen, the institute for numerical methods and computer science in the construction industry at the technical university in Darmstadt. Now I prepared a detailed analysis of the exact changes I made to the forge-boilers.nodejs boilerplate code to implement the roomedit3dv3 sample connecting BIM with the cloud
+&ndash; Comparing the root folder contents
+&ndash; Comparing the Forge node.js boilerplate
+&ndash; Starting fresh from scratch
+&ndash; Copy, install and load the viewer extension
+&ndash; Adding the link to load the viewer extension
+&ndash; Renamed viewer extension base and toolkit `js` modules
+&ndash; All Viewer Extension Modifications
+&ndash; Successful test and final diff  &ndash; 25 lines of code...
 
 -->
 
-### Roomedit3dv3 Diff from Boilerplate Code
+### Roomedit3dv3 Diff from Forge Boilerplate Code
 
 I am still busy preparing
 my [Autodesk University sessions](http://thebuildingcoder.typepad.com/blog/2016/10/au-revit-20171-and-rex-freezedrawing.html#2),
@@ -55,9 +62,13 @@ BIM with the cloud.
 - [Copy, install and load the viewer extension](#5)
 - [Adding the link to load the viewer extension](#6)
 - [Renamed viewer extension base and toolkit `js` modules](#7)
-- [Successful test and final diff](#8)
+- [All Viewer Extension Modifications](#8)
+- [Successful test and final diff  &ndash; 25 lines of code](#9)
 
 Please note that I abandoned my initial comparison attempt after the first two steps listed above, so if you are not interested in the painful beginnings of this exploration, you can skip straight to [starting fresh from scratch](#4).
+
+Or, if you are really in a hurry, just skip straight to the end to the [successful test and final diff](#9) to examine the 25 lines of code that I modified or added all in all.
+
 
 
 #### <a name="2"></a>Comparing the Root Folder Contents
@@ -359,20 +370,44 @@ After a little bit of searching, I found the solution and updated the module nam
 +import ViewerToolkit from 'Viewer.Toolkit'
 </pre>
 
-Here is the [commit diff to renamed viewer extension base and toolkit js modules](https://github.com/Autodesk-Forge/forge-boilers.nodejs/commit/381abe7be657085daed066dfc9eea067d15eecd1).
+Here is the [commit diff to rename the viewer extension base and toolkit js modules](https://github.com/Autodesk-Forge/forge-boilers.nodejs/commit/381abe7be657085daed066dfc9eea067d15eecd1).
 
 
-#### <a name="8"></a>Successful Test and Final Diff
+#### <a name="8"></a>All Viewer Extension Modifications
 
-After those steps, I had the updated roomedit3dv3 viewer extension successfully up and running
-in [release 0.0.20](https://github.com/Autodesk-Forge/forge-boilers.nodejs/releases/tag/0.0.20) of 
+Besides adding the viewer extension to the boilerplate app, I also need to modify it slightly to ensure that the BIM element translation we are interested in and want to broadcast to be picked up by the Revit add-in is properly retrieved and transmitted.
+
+I copied the original `Viewing.Extension.Transform` viewer extension implementation
+from [library-javascript-viewer-extensions](https://github.com/Developer-Autodesk/library-javascript-viewer-extensions),
+tagged it as [release 0.0.21](https://github.com/Autodesk-Forge/forge-boilers.nodejs/releases/tag/0.0.21),
+reapplied the required changes,
+and tagged that as [release 0.0.22](https://github.com/Autodesk-Forge/forge-boilers.nodejs/releases/tag/0.0.22)
+in order to present this nice
+little [comparison showing the exact differences](https://github.com/Autodesk-Forge/forge-boilers.nodejs/compare/0.0.21...0.0.22) to you...
+
+15 lines of code modified or added.
+
+
+#### <a name="9"></a>Successful Test and Final Diff &ndash; 25 Lines of Code
+
+After those steps and some further clean-up, I had the updated roomedit3dv3 viewer extension successfully up and running
+in [release 0.0.23](https://github.com/Autodesk-Forge/forge-boilers.nodejs/releases/tag/0.0.23) of 
 the [roomedit3d branch](https://github.com/Autodesk-Forge/forge-boilers.nodejs/tree/roomedit3d) of
 the [forge-boilers.nodejs repo](https://github.com/Autodesk-Forge/forge-boilers.nodejs).
 
-The important changes are obvious from
-the [diff between 0.0.18 and 0,.0.20](https://github.com/Autodesk-Forge/forge-boilers.nodejs/compare/0.0.18...0.0.20).
+<center>
+<img src="img/roomedit3dv3_running_2.png" alt="Roomedit3dv3 in action" width="400">
+</center>
+
+The important changes to the app are shown by the diffs
+between [0.0.18 and 0.0.20](https://github.com/Autodesk-Forge/forge-boilers.nodejs/compare/0.0.18...0.0.20),
+and the viewer extension ones
+by [0.0.21...0.0.22](https://github.com/Autodesk-Forge/forge-boilers.nodejs/compare/0.0.21...0.0.22).
+
+All in all, I added and modified about 25 lines of code.
 
 I hope this simplifies your job of creating your own extensions.
 
 Happy [Forge](https://forge.autodesk.com) coding!
+
 
