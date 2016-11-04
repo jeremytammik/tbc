@@ -399,6 +399,12 @@ the [forge-boilers.nodejs repo](https://github.com/Autodesk-Forge/forge-boilers.
 <img src="img/roomedit3dv3_running_2.png" alt="Roomedit3dv3 in action" width="400">
 </center>
 
+By the way, note that the new version of the boilerplate code implements tabs to explore the model derivative information:
+
+<center>
+<img src="img/roomedit3dv3_md_tabs.png" alt="Model derivative tabs" width="378">
+</center>
+
 The important changes to the app are shown by the diffs
 between [0.0.18 and 0.0.20](https://github.com/Autodesk-Forge/forge-boilers.nodejs/compare/0.0.18...0.0.20),
 and the viewer extension ones
