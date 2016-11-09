@@ -48,6 +48,7 @@ as part of the <a href="http://help.autodesk.com/view/RVT/2017/ENU">Revit 2017 H
 </li>
 <li><a href="#2.9">Text API changes</a><ul>
 <li><a href="#2.9.1">Text related to CustomExporter contexts</a></li>
+<li><a href="#2.9.2">TextNote creation behavior change</a></li>
 </ul>
 </li>
 <li><a href="#2.10">Event API changes</a></li>
@@ -287,6 +288,8 @@ as part of the <a href="http://help.autodesk.com/view/RVT/2017/ENU">Revit 2017 H
 <li>TextNode.GetFormattedTextRuns() &rarr; TextNode.GetFormattedText()</li>
 </ul>
 <p>Note that the class FormattedTextRun has been marked obsolete. It is replaced by the new class FormattedText.</p>
+<h4><a name="2.9.2"></a>TextNote creation behavior change</h4>
+<p>The various <code>TextNote.Create</code> methods now need to be followed by a call to <code>Document.Regenerate</code> before the newly created <code>TextNote</code> can be queried for data.</p>
 <h3><a name="2.10"></a>Event API changes</h3>
 <p>The following member has been deprecated and replaced:</p>
 <ul>
