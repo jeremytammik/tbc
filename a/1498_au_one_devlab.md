@@ -137,7 +137,7 @@ Rwanda, 'home of the best coffee in the world', architect, talked about
 Anna Nixon, 16 years old, high school student, presented her experiences participating in
 the [FIRST Robotics Competition](https://en.wikipedia.org/wiki/FIRST_Robotics_Competition).
 
-She quotes John Dewey
+She quotes John Dewey:
 
 > We only think when confronted with a problem.
 
