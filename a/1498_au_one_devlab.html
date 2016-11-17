@@ -189,6 +189,9 @@ cf. how to <a href="https://social.msdn.microsoft.com/Forums/en-US/31466763-4f0d
   <span style="color:#2b91af;">GeometryObject</span>&nbsp;geo&nbsp;=&nbsp;e.GetGeometryObjectFromReference(&nbsp;r&nbsp;);
 </pre>
 
+<p>However, please note that <code>GetGeometryObjectFromReference</code> is not foolproof, especially for references to datums,
+We have a pending wish list item <code>REVIT-102253</code> to provide more direct access to the common references stored in families.
+There are also several Revit Idea Station requests related to access to references. </p>
 <p><b>[Q]</b> How can I refresh the graphics after updating the element from a modeless WPF form?</p>
 <p><b>[A]</b> Check out these two posts on refreshing graphics:</p>
 <ul>

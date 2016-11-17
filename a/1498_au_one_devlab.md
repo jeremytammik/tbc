@@ -231,6 +231,10 @@ cf. how to [collapse 'My Computer' in tree view of explorer.exe by program](http
   <span style="color:#2b91af;">GeometryObject</span>&nbsp;geo&nbsp;=&nbsp;e.GetGeometryObjectFromReference(&nbsp;r&nbsp;);
 </pre>
 
+However, please note that `GetGeometryObjectFromReference` is not foolproof, especially for references to datums,
+We have a pending wish list item `REVIT-102253` to provide more direct access to the common references stored in families.
+There are also several Revit Idea Station requests related to access to references. 
+
 <b>[Q]</b> How can I refresh the graphics after updating the element from a modeless WPF form?
 
 <b>[A]</b> Check out these two posts on refreshing graphics:
