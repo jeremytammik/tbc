@@ -1,0 +1,204 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+AU Day Two, IFC and Revit API Panel #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge #AU2016
+
+The second day. I finally got to attend Angel Velez' IFC class &ndash; it always clashed with my own in previous years &ndash; followed by the product keynote and the Revit API panel discussion
+&ndash; Angel Velez on IFC
+&ndash; Product keynote
+&ndash; Revit API panel
+&ndash; Panel members
+&ndash; Questions and answers
+&ndash; Notes from previous Revit API panel sessions
+&ndash; Session materials...
+
+-->
+
+<h3>AU Day Two, IFC and Revit API Panel</h3>
+<p>The second day.</p>
+<p>I finally got to attend Angel Velez' IFC class
+&ndash; it always clashed with my own in previous years 
+&ndash; followed by the product keynote and the Revit API panel discussion:</p>
+<ul>
+<li><a href="#2">Angel Velez on IFC</a></li>
+<li><a href="#3">Product keynote</a></li>
+<li><a href="#4">Revit API panel</a><ul>
+<li><a href="#5">Panel members</a></li>
+<li><a href="#6">Questions and answers</a></li>
+<li><a href="#7">Notes from previous Revit API panel sessions</a></li>
+<li><a href="#8">Session materials</a></li>
+</ul>
+</li>
+</ul>
+<p>Before diving into that, here is 
+<a href="https://flic.kr/s/aHskNSZLp8">a handful of snapshots from AU day two</a>:</p>
+<p><center>
+<a data-flickr-embed="true"  href="https://www.flickr.com/photos/jeremytammik/albums/72157676670264565" title="AU2016 Day Two"><img src="https://c6.staticflickr.com/6/5348/30920166821_d5fc293b94_n.jpg" width="320" height="240" alt="AU2016 Day Two"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+</center></p>
+<h4><a name="2"></a>Angel Velez on IFC</h4>
+<p>Here are the slides and handout from Angel Velez' class <strong>AR20462</strong> <em>IFC Technical Overview and Survey of Autodesk Products, including Revit 2017</em>:</p>
+<ul>
+<li><a href="zip/ar20462_angel_velez_ifc_handout.pdf">Handout</a></li>
+<li><a href="zip/ar20462_angel_velez_ifc_slides.pdf">Slide deck</a></li>
+</ul>
+<p>Their content is not identical, so you might want to go through both.</p>
+<p><center>
+<img src="img/116_angel_velez_500.jpg" alt="Angel Velez" width="500">
+</center></p>
+<p>I took a very few notes on some of the slides:</p>
+<ul>
+<li>8: It makes no sense to talk of IFC without also specifying what MVD you are interested in. Each MVD specifies a subset of IFC that is mandatory, and another is forbidden</li>
+<li>16: Use reference view MVD only if you cannot use transfer view. </li>
+<li>42: Check the handout for more info.</li>
+<li>48: Explained in much greater detail in the repo, and step by step in handout.</li>
+<li>55+57: You can completely redefine both link and open IFC yourself. Link is more fully supported, though.</li>
+</ul>
+<p>Especially noteworthy: the number of downloads of the open source implementation over the course of the years, currently well over 140k:</p>
+<p><center>
+<img src="img/ifc_open_source_downloads.png" alt="IFC open source download numbers over time from 2011 until today" width="500">
+</center></p>
+<p>I snapped up one Forge and IFC related question:</p>
+<p><b>[Q]</b> What settings are used by the Forge RVT IFC translation?</p>
+<p><b>[A]</b> Forge RVT IFC translation uses default settings. We are discussing internally how to enable users to set specific additional options.</p>
+<h4><a name="3"></a>Product Keynote</h4>
+<p>Extremely fragmentary notes from the product keynote:</p>
+<ul>
+<li>Fusion 360, Shotgun, BIM 360...</li>
+<li>Project IQ pilot...</li>
+<li>Project Quantum: connect design, engineering, structural analysis, construction and fabrication.
+This project will be presented in more detail this afternoon at 2-4 pm in Marco Polo 703, Level 1.
+In case of interest, <a href="mailto:quantum@autodesk.com">email quantum@autodesk.com</a>.
+Looks a bit like Dynamo...</li>
+<li>John Jacobs, CIO of <a href="http://www.jedunn.com">JE Dunn Construction</a>, talked about their use of Forge already today to significantly enhance and accelerate real live construction industry projects.</li>
+</ul>
+<h4><a name="4"></a>Revit API Panel</h4>
+<p>My last session of AU day two was the Revit API Panel <strong>SD20891</strong> <em>Revit API Expert Roundtable: Open House on the Factory Floor</em>:</p>
+<ul>
+<li><a href="#5">Panel members</a></li>
+<li><a href="#6">Questions and answers</a></li>
+<li><a href="#7">Notes from previous Revit API panel sessions</a></li>
+<li><a href="#8">Session materials</a></li>
+</ul>
+<h4><a name="5"></a>Panel Members</h4>
+<p>We have the following panel members:</p>
+<ul>
+<li>Angel Velez, Senior Principal Engineer, Autodesk</li>
+<li>Mikako Harada, AEC Technical Lead and Americas Manager, Autodesk</li>
+<li>Miroslav Schonauer, Solutions Software Architect, Autodesk</li>
+<li>Saikat Bhattacharya, Senior Technical Consulting Manager, Autodesk</li>
+<li>Sasha Crotty, Revit Core Product Manager, Autodesk</li>
+<li>Jeremy Tammik, Developer Support, Forge Platform Development</li>
+</ul>
+<p>This represents an ideal combination of API designers, users and supporters.</p>
+<p>Now we just await the participants input.</p>
+<p>And here it comes!</p>
+<h4><a name="6"></a>Questions and Answers</h4>
+<p>Q. We heard that wishes now go into Revit Idea Station:</p>
+<ul>
+<li><a href="http://forums.autodesk.com/t5/revit-ideas/idb-p/302">Revit Idea Station</a></li>
+<li><a href="http://forums.autodesk.com/t5/tag/API/tg-p/board-id/302">Tag: API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/05/idea-station-and-textnote-bounding-box.html#2">Introducing the Revit Idea Station</a></li>
+</ul>
+<p>Will you pre-populate it with existing wish list items?</p>
+<p>A. Please report them again. Please refer to the existing wish list numbers. We would like to clean up and separate the external ones from internal ones. All the existing wish list items still exist!</p>
+<p>Q. How to separate product features and API requests?</p>
+<p>A. Use the API tag.</p>
+<p>Q. Access to the scale list?</p>
+<p>A. We don’t know off-hand.</p>
+<p>Q. Will you be exposing APIs for old missing objects, like ceilings?</p>
+<p>A. All new functionality is required to be equipped with an API. Other than that, get many votes for it on Idea Station. Cut-off is currently 50, apparently.</p>
+<p>Q. Suppressing messages?</p>
+<p>A. There are several levels, cf. The Building Coder topic group
+on <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32">Detecting and Handling Dialogues and Failures</a>.</p>
+<p>Tell us what specific messages you have problems with. If all else fails, there is a Windows API that you can use as a workaround.</p>
+<p>Q. Task dialogue ids are undocumented. We are forced to debug and reverse engineer to determine which id to catch. All info is in the UIFramework.dll, so it’s available. Could it be documented?</p>
+<p>A. You can solve this more easily using logging. Every command can be logged. The log includes the id. Implement a log for everything you do, log all the dialogue info, the more info you have the better.</p>
+<p>Q. Instantiating thousands of family instances (millions of bricks, in fact!) takes a long time. Also, a simple transformation. AutoCAD does this much faster.</p>
+<p>A. Revit is more complicated. Submit a very specific reproducible case. We need a file to analyse. Analyse whether you can make it more effective. Revit was not designed for that kind of scale. Group things differently. Don’t model individual bricks, for instance.</p>
+<p>Q. Multithreading support in the API?</p>
+<p>A. Revit runs all API operations in a single thread. We cannot change this easily. We can move other operations into other threads. This applies to model modification. Extraction can conceivably run in a different worker thread. That might be exposed to the API sometime.</p>
+<p>Q. Copy monitor in API?</p>
+<p>A. No.</p>
+<p>Q. Support programmatic material creation with images?</p>
+<p>A. Look at the <a href="http://www.autodesk.com/revitroadmap">public Revit roadmap</a>:</p>
+<p><center>
+<a href="http://www.autodesk.com/revitroadmap">www.autodesk.com/revitroadmap</a>
+</center></p>
+<p>It is on there (applause).</p>
+<p>Q. Is there a significant difference between the size of a Revit family inside versus outside a project?</p>
+<p>A. They should be pretty close. The contents are copied from the family into the project, some things are shared, reducing size, nested stuff increases it, …</p>
+<p>Q. Does the size matter?</p>
+<p>A. High level yes, but it depends. A few instances make no difference. Millions of instances do. So does complex geometry and complex joins. We have worked hard at improving scalability and performance. Views and navigation has been speeded up.</p>
+<p>Q. Can I edit a group?</p>
+<p>A. No, sorry. Ungroup and regroup.</p>
+<p>Q. New functionality coming out is built using the API. How many developers are working on that kind of thing?</p>
+<p>A. A lot of our teams. We build as many features as we can on top of the API. They may be working on internal functionality at the same time. API and core functionality… </p>
+<p>Q. Can you provide more examples using Python? </p>
+<p>A. Nothing planned at this point. Good idea though. Log it.</p>
+<p>Q. Point snapping when you manually instantiate. Can that be monitored? We would like to snap to specific points. A snap filter.</p>
+<p>A. Not currently.</p>
+<p>Q. Documentation has very little detail. Could this be published in a wiki-style format, so we can add comments?</p>
+<p>A. We are looking at that. We need something more scalable. There are challenges.</p>
+<p>By the way, look at <a href="http://thebuildingcoder.typepad.com/blog/2016/10/token-expiry-and-online-revit-api-docs.html#2">Revit API docs, web-hosted CHM content</a>:</p>
+<p><center>
+<a href="http://www.revitapidocs.com">www.revitapidocs.com</a>
+</center></p>
+<p>Q. Can we get location points from free-form elements? And rotation?</p>
+<p>A. Use <code>DirectShape</code> instead. We use that a lot, and it is being actively developed.</p>
+<p>Q. Can we use free-form surfaces with <code>DirectShape</code>?</p>
+<p>A. The Revit 2015 API introduced the tessellated shape builder. In 2017 the b-rep shape builder was added for curved surfaces. The original Dynamo builder was built early. If the B-rep builder fails, it tries to use the tessellated one.</p>
+<p>Q. In the worksharing tooltip info, can the dates be exposed as well?</p>
+<p>A. Not to our knowledge.</p>
+<p>Q. How can I know when <code>PostCommand</code> is complete? Or a modal window?</p>
+<p>A. Maybe using the Idling event? Or the progress changed notification?</p>
+<p>Q. Can I host a fixture to linked elements?</p>
+<p>A. We guess not. One participant adds: I wouldn’t do that. We tried it. As an MEP coordinator, we explicitly un-host things for many reasons. Another participant copies the fixture to keep track of …</p>
+<p>Q. How much custom development was done to integrate Dynamo?</p>
+<p>A. Dynamo uses the Revit API. It may use one or two undocumented API hooks, but definitely nothing fundamental. If it was, it should be made public.</p>
+<p>Q. Is the Dynamo player supported by the API?</p>
+<p>A. It has no additional API at all. It is simply built on top of Dynamo and the public Revit API.</p>
+<p>Q. Can I control the visibility state of face edges, hide specific face edges? E.g., for multiple tessellated faces, hide internal edges.</p>
+<p>A. No. In the UI, you might be able to manually override. In direct shape, you have control over categories, and could use those to control visibility.</p>
+<p>Q. What do you say about <a href="http://thebuildingcoder.typepad.com/blog/2016/09/roomedit3d-broadcast-teigha-bim-and-forge-webinar-3.html#3">ODA Teigha BIM</a>?</p>
+<p>A. No comment. We do however see that there is considerable interest for that sort of thing out there.</p>
+<p>Q. Will we see Forge design automation support for Revit?</p>
+<p>A. Yes, we are looking at that. The Forge model derivative API already supports generating IFC and DWG from RVT.</p>
+<p>Q. Access to link visibility settings?</p>
+<p>A. No.</p>
+<p>Q. Access to element relationships? Stair to handrail, e.g.</p>
+<p>A. In many cases there is a one-directional relationship.
+You can easily invert it, cf. blog post number 16 from 2008 on
+the <a href="http://thebuildingcoder.typepad.com/blog/2008/10/relationship-in.html">relationship inverter</a>.</p>
+<p>You can use filtered element collectors to very effectively implement such a relationship inverter.</p>
+<p>Q. Debug and continue?</p>
+<p>A. Yes! Please refer to the recent blog post on <a href="http://thebuildingcoder.typepad.com/blog/2016/10/ai-edit-and-continue.html#2">edit and continue</a> using 'attach to process' and the AddInManager.</p>
+<p>Q. New database connections, e.g. SQL server 2016?</p>
+<p>A. Please submit to Revit Idea Station.</p>
+<p>Q. Will you recycle aging Revit Idea Station entries?</p>
+<p>A. Yes, if a wish sits for months with few votes it will be archived.</p>
+<p>Q. Is 50 the right threshold for API wishes?</p>
+<p>A. The number one API wish list has been implemented and had more votes than that. We may consider lower rated wishes as well.</p>
+<h4><a name="7"></a>Notes from Previous Revit API Panel Sessions</h4>
+<p>Here are the notes from previous similar Revit API panel sessions:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/12/the-revit-api-panel-at-autodesk-university.html#1">SD5156 &ndash; The Revit API Expert Panel at Autodesk University 2014</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/11/rtc-budapest-and-the-revit-api-panel.html#5">The Building Coder Revit API Panel at the Revit Technology Conference RTC Europe 2015</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/12/au-keynote-and-revit-api-panel.html#9">SD10181 &ndash; Revit API Expert Roundtable at Autodesk University 2015</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/10/rtc-revit-api-panel-idea-station-edit-and-continue.html">RTC 2016 Revit API Panel, Idea Station, Edit and Continue</a></li>
+</ul>
+<h4><a name="8"></a>Session Materials</h4>
+<p>Here are the class materials:</p>
+<ul>
+<li><a href="zip/sd20908_connect_desktop_cloud_handout.pdf">Handout</a></li>
+<li><a href="zip/sd20908_connect_desktop_cloud_slides.pdf">Slide deck</a></li>
+</ul>
+<p><center>
+<img src="img/au2016_2.jpeg" alt="AU2016" width="624">
+</center></p>
