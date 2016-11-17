@@ -118,7 +118,7 @@ Looks a bit like Dynamo...</li>
 <p>A. There are several levels, cf. The Building Coder topic group
 on <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32">Detecting and Handling Dialogues and Failures</a>.</p>
 <p>Tell us what specific messages you have problems with. If all else fails, there is a Windows API that you can use as a workaround.</p>
-<p>Q. Task dialogue ids are undocumented. We are forced to debug and reverse engineer to determine which id to catch. All info is in the UIFramework.dll, so it’s available. Could it be documented?</p>
+<p>Q. Task dialogue ids are undocumented. We are forced to debug and reverse engineer to determine which id to catch. All info is in the UIFrameworkRes.dll, so it’s available. Could it be documented?</p>
 <p>A. You can solve this more easily using logging. Every command can be logged. The log includes the id. Implement a log for everything you do, log all the dialogue info, the more info you have the better.</p>
 <p>Q. Instantiating thousands of family instances (millions of bricks, in fact!) takes a long time. Also, a simple transformation. AutoCAD does this much faster.</p>
 <p>A. Revit is more complicated. Submit a very specific reproducible case. We need a file to analyse. Analyse whether you can make it more effective. Revit was not designed for that kind of scale. Group things differently. Don’t model individual bricks, for instance.</p>

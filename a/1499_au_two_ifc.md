@@ -152,7 +152,7 @@ on [Detecting and Handling Dialogues and Failures](http://thebuildingcoder.typep
 
 Tell us what specific messages you have problems with. If all else fails, there is a Windows API that you can use as a workaround.
 
-Q. Task dialogue ids are undocumented. We are forced to debug and reverse engineer to determine which id to catch. All info is in the UIFramework.dll, so it’s available. Could it be documented?
+Q. Task dialogue ids are undocumented. We are forced to debug and reverse engineer to determine which id to catch. All info is in the UIFrameworkRes.dll, so it’s available. Could it be documented?
 
 A. You can solve this more easily using logging. Every command can be logged. The log includes the id. Implement a log for everything you do, log all the dialogue info, the more info you have the better.
 
