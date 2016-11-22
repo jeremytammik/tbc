@@ -82,7 +82,7 @@ beginneon()
 <li><a href="#2">DevDay Europe in Munich</a></li>
 <li><a href="#3">AEC Symposium in New York</a></li>
 <li><a href="#4">Embedding a Forge viewer</a></li>
-<li><a href="#5">Storing a dictionary in the Revit database</a></li>
+<li><a href="#5">Storing a dictionary &ndash; use <code>DataStorage</code>, not <code>ProjectInfo</code></a></li>
 </ul>
 <h4><a name="2"></a>DevDay Europe in Munich</h4>
 <p>Autodesk University ended, and all went well,
@@ -136,15 +136,14 @@ TrueVis <a href="http://truevis.com/a360-embedder-wordpress-plugin">A360 embedde
 accompanying <a href="http://truevis.com/a360-embedder-examples">A360 embedder examples</a>.</p>
 <p>Using those, you can completely automate the viewer embedding in a WordPress blog post.</p>
 <p>And now, back to the Revit API.</p>
-<h4><a name="3"></a>Storing a Dictionary in the Revit Database</h4>
+<h4><a name="5"></a>Storing a Dictionary &ndash; Use <code>DataStorage</code>, not <code>ProjectInfo</code></h4>
 <p>I had an interesting discussion with my colleagues Simon Jones, Miroslav Schonauer and Scott Conover on storing a dictionary in the Revit database &ndash; note that the AutoCAD ObjectARX environment provides support for so-called named dictionaries:</p>
 <p><strong>Question:</strong> Is there a way of defining named dictionary storage for data in a Revit project?</p>
 <p>The only option I can find is to use Extensible Storage on an arbitrary element placed in the model &ndash; but is there a way that avoids the requirement for an inserted element (and the risk that someone deletes it)?</p>
 <p><strong>Answer 1:</strong> Yes.</p>
 <p>Officially, extensible storage is the only way... if you place it onto the <code>ProjectInformation</code> instance, that is equivalent of per-doc data as <code>ProjectInformation</code> is <b><i>GUARANTEED</i></b> to be a singleton in RVT.</p>
-<p>I personally use a mechanism that I devised a few releases before projInfo had been introduced &ndash; serialising a class into binary stream, encoding it via <code>String64</code> and then storing into an invisible string parameter. I found it much quicker to design my custom data-class than fiddling with ExtStorage definitions…</p>
+<p>I personally use a mechanism that I devised a few releases before extensible storage had been introduced &ndash; serialising a class into binary stream, encoding it via <code>String64</code> and then storing into an invisible string parameter. I found it much quicker to design my custom data-class than fiddling with extensible storage definitions…</p>
 <p>But in either case, the <code>ProjectInfo</code> element is the way to get per-doc data…</p>
-<p>BTW I think they later even introduced something more official for per-RVT data, but no need if you use either ExtStorage or param-based on <code>ProjInfo</code>.</p>
 <p><strong>Answer 2:</strong> <b><i>No!</i></b></p>
 <p>Sorry, but please stop using the <code>ProjectInfo</code> class in that manner immediately.</p>
 <p>I used to recommend that earlier as well, and have stopped since learning better last year.</p>
@@ -160,3 +159,4 @@ the <a href="http://thebuildingcoder.typepad.com/blog/2015/02/extensible-storage
 <p>In any case, if starting from scratch, I agree that <code>DataStorage</code> should be used!</p>
 <p><strong>Answer 4:</strong> If you are certain that Worksharing will not be involved, there’s not much difference between using <code>ProjectInfo</code> and <code>DataStorage</code>, except that using <code>DataStorage</code> provides better encapsulation from another add-in accidentally deleting your data from <code>ProjectInfo</code> when it accesses its own.</p>
 <p>If Worksharing is to be involved, you should definitely avoid using the <code>ProjectInfo</code> instance.</p>
+<p>Please refer to <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.23">The Building Coder topic group on extensible storage</a> for more information on it in all its aspects.</p>

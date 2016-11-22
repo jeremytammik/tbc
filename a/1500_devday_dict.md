@@ -85,7 +85,7 @@ Today I discuss upcoming events, new simple samples to embed a Forge viewer in a
 - [DevDay Europe in Munich](#2)
 - [AEC Symposium in New York](#3)
 - [Embedding a Forge viewer](#4)
-- [Storing a dictionary in the Revit database](#5)
+- [Storing a dictionary &ndash; use `DataStorage`, not `ProjectInfo`](#5)
 
 
 ####<a name="2"></a>DevDay Europe in Munich
@@ -159,7 +159,7 @@ Using those, you can completely automate the viewer embedding in a WordPress blo
 And now, back to the Revit API.
 
 
-####<a name="3"></a>Storing a Dictionary in the Revit Database
+####<a name="5"></a>Storing a Dictionary &ndash; Use `DataStorage`, not `ProjectInfo`
 
 I had an interesting discussion with my colleagues Simon Jones, Miroslav Schonauer and Scott Conover on storing a dictionary in the Revit database &ndash; note that the AutoCAD ObjectARX environment provides support for so-called named dictionaries:
 
@@ -171,11 +171,9 @@ The only option I can find is to use Extensible Storage on an arbitrary element 
  
 Officially, extensible storage is the only way... if you place it onto the `ProjectInformation` instance, that is equivalent of per-doc data as `ProjectInformation` is <b><i>GUARANTEED</i></b> to be a singleton in RVT.
  
-I personally use a mechanism that I devised a few releases before projInfo had been introduced &ndash; serialising a class into binary stream, encoding it via `String64` and then storing into an invisible string parameter. I found it much quicker to design my custom data-class than fiddling with ExtStorage definitions…
+I personally use a mechanism that I devised a few releases before extensible storage had been introduced &ndash; serialising a class into binary stream, encoding it via `String64` and then storing into an invisible string parameter. I found it much quicker to design my custom data-class than fiddling with extensible storage definitions…
  
 But in either case, the `ProjectInfo` element is the way to get per-doc data…
-
-BTW I think they later even introduced something more official for per-RVT data, but no need if you use either ExtStorage or param-based on `ProjInfo`.
 
 **Answer 2:** <b><i>No!</i></b>
 
@@ -205,4 +203,6 @@ In any case, if starting from scratch, I agree that `DataStorage` should be used
 **Answer 4:** If you are certain that Worksharing will not be involved, there’s not much difference between using `ProjectInfo` and `DataStorage`, except that using `DataStorage` provides better encapsulation from another add-in accidentally deleting your data from `ProjectInfo` when it accesses its own.
  
 If Worksharing is to be involved, you should definitely avoid using the `ProjectInfo` instance.
+
+Please refer to [The Building Coder topic group on extensible storage](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.23) for more information on it in all its aspects.
 
