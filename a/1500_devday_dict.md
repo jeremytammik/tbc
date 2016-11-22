@@ -192,7 +192,11 @@ That is a new Revit database element class whose sole purpose is to host extensi
 You can create as many of these as you like, and tag them in any way you like in order to make your one and only or several of them with all the associated element-specific or projectwide data easily accessible.
  
 The Building Coder defines a dedicated topic group on [extensible storage](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.23).
- 
+
+One of its entries actually points to a discussion quite similar tpo what you are asking for,
+[named GUID storage for project identification](http://thebuildingcoder.typepad.com/blog/2016/04/named-guid-storage-for-project-identification.html).
+All you would need to do to adapt it to your requirements would be to replace the GUID that is stores by a suitable dictionary.
+
 Here is some more on
 the [DataStorage element hosting extensible storage in a worksharing environment](http://thebuildingcoder.typepad.com/blog/2015/02/extensible-storage-in-a-worksharing-environment.html).
 
