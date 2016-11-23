@@ -13,8 +13,13 @@ http://forums.autodesk.com/t5/revit-api-forum/event-to-run-a-iexternalcommand/m-
 
 Using Other Events to Execute Add-In Code #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
+The Revit API is very simple.
+It is entirely event driven.
+Any and every use of the Revit API requires a valid API context.
+The most common and obvious way to get into a valid Revit API context &ndash; and the most commonly used event &ndash; is the one to launch an external command, which calls the <code>IExternalCommand</code> <code>Execute</code> handler method.
+Other important ones to be aware of are <code>ApplicationInitialized</code> and <code>DialogBoxShowing</code>, unconnected with any external command at all...
+
 &ndash; 
-...
 
 -->
 
@@ -22,7 +27,7 @@ Using Other Events to Execute Add-In Code #RevitAPI @AutodeskRevit #aec #bim #dy
 <p>The Revit API is very simple.</p>
 <p>It is entirely event driven.</p>
 <p>Any and every use of the Revit API requires a valid API context.</p>
-<p>The most common and obvious way to get into a valid Revit API context, and the most commonly used event is the one to launch an external command, which calls the <code>IExternalCommand</code> <code>Execute</code> handler method.</p>
+<p>The most common and obvious way to get into a valid Revit API context &ndash; and the most commonly used event &ndash; is the one to launch an external command, which calls the <code>IExternalCommand</code> <code>Execute</code> handler method.</p>
 <p>Other important ones to be aware of are <code>ApplicationInitialized</code> and <code>DialogBoxShowing</code>, unconnected with any external command at all, as you can see below.</p>
 <p>Here is an interesting discussion exploring some options from
 the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> thread
@@ -40,9 +45,10 @@ searching for an <a href="http://forums.autodesk.com/t5/revit-api-forum/event-to
 <p>In my external app I am trying to execute the command using </p>
 <pre class="code">
   <span style="color:#2b91af;">Command</span>&nbsp;cmd&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Command</span>();
-  cmd.Execute();
+  &#99;md.Execute();
 </pre>
 
+<p>(Editor's note on Typepad crash: I was forced to replace the character 'c' in the last line above by the HTML escape code <code>&amp;#99;</code> before I was able to post this.)</p>
 <p>However, that understandably gives me the error</p>
 <pre>
 Error CS7036 There is no argument given that corresponds to the required formal parameter 'commandData' of 'Command.Execute(ExternalCommandData, ref string, ElementSet)'
