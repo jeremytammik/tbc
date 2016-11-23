@@ -63,7 +63,7 @@ In my external app I am trying to execute the command using
   cmd.Execute();
 </pre>
 
-However; that understandably gives me the error
+However, that understandably gives me the error
 
 <pre>
 Error CS7036 There is no argument given that corresponds to the required formal parameter 'commandData' of 'Command.Execute(ExternalCommandData, ref string, ElementSet)'
@@ -166,6 +166,8 @@ To finalise, my end result was to register a dialog event on startup and shutdow
    
   &nbsp;&nbsp;<span style="color:green;">//&nbsp;etc&nbsp;etc&nbsp;etc</span>
 </pre>
+
+Many thanks to Mike, Matt, Erik and Gonçalo for raising and helping to solve this!
 
 <center>
 <img src="img/131_apples_500x375.jpg" alt="Apples" width="500">
