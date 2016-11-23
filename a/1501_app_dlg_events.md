@@ -12,7 +12,7 @@
 12375256 [Event to run a IExternalCommand]
 http://forums.autodesk.com/t5/revit-api-forum/event-to-run-a-iexternalcommand/m-p/6692479
 
- #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge #DevLab @TT_CORE
+Using Other Events to Execute Add-In Code #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
 &ndash; 
 ...
