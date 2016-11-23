@@ -14,8 +14,13 @@ http://forums.autodesk.com/t5/revit-api-forum/event-to-run-a-iexternalcommand/m-
 
 Using Other Events to Execute Add-In Code #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
+The Revit API is very simple.
+It is entirely event driven.
+Any and every use of the Revit API requires a valid API context.
+The most common and obvious way to get into a valid Revit API context &ndash; and the most commonly used event &ndash; is the one to launch an external command, which calls the <code>IExternalCommand</code> <code>Execute</code> handler method.
+Other important ones to be aware of are <code>ApplicationInitialized</code> and <code>DialogBoxShowing</code>, unconnected with any external command at all...
+
 &ndash; 
-...
 
 -->
 
@@ -27,7 +32,7 @@ It is entirely event driven.
 
 Any and every use of the Revit API requires a valid API context.
 
-The most common and obvious way to get into a valid Revit API context, and the most commonly used event is the one to launch an external command, which calls the `IExternalCommand` `Execute` handler method.
+The most common and obvious way to get into a valid Revit API context &ndash; and the most commonly used event &ndash; is the one to launch an external command, which calls the `IExternalCommand` `Execute` handler method.
 
 Other important ones to be aware of are `ApplicationInitialized` and `DialogBoxShowing`, unconnected with any external command at all, as you can see below.
 
@@ -60,8 +65,10 @@ In my external app I am trying to execute the command using
 
 <pre class="code">
   <span style="color:#2b91af;">Command</span>&nbsp;cmd&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Command</span>();
-  cmd.Execute();
+  &#99;md.Execute();
 </pre>
+
+(Editor's note on Typepad crash: I was forced to replace the character 'c' in the last line above by the HTML escape code `&#99;` before I was able to post this.)
 
 However, that understandably gives me the error
 
