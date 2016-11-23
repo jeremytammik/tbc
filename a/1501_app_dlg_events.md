@@ -38,8 +38,7 @@ Other important ones to be aware of are `ApplicationInitialized` and `DialogBoxS
 
 Here is an interesting discussion exploring some options from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api/bd-p/160) thread
-searching for an [event to run a IExternalCommand](http://forums.autodesk.com/t5/revit-api-forum/event-to-run-a-iexternalcommand/m-p/6692479
-):
+searching for an [event to run an IExternalCommand](http://forums.autodesk.com/t5/revit-api-forum/event-to-run-a-iexternalcommand/m-p/6692479):
 
 **Question:** Wondering if you can assist with an issue I'm having that I just can't seem to solve.
 
