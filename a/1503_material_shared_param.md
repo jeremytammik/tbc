@@ -9,11 +9,18 @@
 
 <!---
 
+- AU classes posted
+  https://www.linkedin.com/pulse/au2016-classes-posted-fernando-malard?trk=hb_ntf_MEGAPHONE_ARTICLE_POST
+  https://www.linkedin.com/pulse/au2016-classes-posted-fernando-malard
+  
 - updated ADN Xtra
 
 - shared param on material element - email with orsi Re: API
 
 - connect desktop and cloud recording from AU
+  http://au.autodesk.com/au-online/classes-on-demand/class-catalog/2016/revit/sd20908#chapter=0
+  http://au.autodesk.com/au-online/classes-on-demand/class-catalog/2016/forge/sd16837#
+  http://player.ooyala.com/iframe.js#pbid=34ee2c04f0304af88c76585f87c5bd8c&ec=xyM2hvNzE6uwSdozxVspBc0eDumVZA5F
 
 - Cornelius story: cured by natural remedies
   http://on-lyme.org/en/sufferers/lyme-stories/item/241-cornelius-story-cured-by-natural-remedies
@@ -40,190 +47,206 @@ Finally, I end with an absolutely non-technical topic, on healing:
 
 - [AU2016 Classes posted](#2)
 - [ADN Xtra labs updated](#3)
-- [Attaching a shared parameter to `Material` elements](#4)
-- [Cornelius story &ndash; cured by natural remedies](#5)
+- [Linking `Material` elements to external database entries](#4)
+- [Attaching a shared parameter to `Material` elements](#5)
+- [Cornelius story &ndash; cured by natural remedies](#6)
 
 
 ####<a name="2"></a>AU2016 Classes Posted
 
-All the Autodesk University 2016 class materials have now been posted and are available through Autodesk University's website
-at [AU Online](http://au.autodesk.com/au-online/overview).
+All the recordings made of Autodesk University 2016 classes have now been posted and are available
+via [AU Online](http://au.autodesk.com/au-online/overview).
 
 You can explore the material 
 for [my two classes](http://thebuildingcoder.typepad.com/blog/2016/10/au-revit-20171-and-rex-freezedrawing.html#2)
 by [filtering for `tammik`](http://au.autodesk.com/au-online/classes-on-demand/search?full-text=tammik),
 or directly through the following links:
 
-- [**SD20891** &ndash; Revit API Expert Roundtable &ndash; Open House on the Factory Floor]
-- [**SD20908** &ndash; Connect Desktop and Cloud &ndash; Free Your BIM Data!]
-
-One way to access them and check out their details is to search the AU catalogue for 'tammik'.
-
-This includes
-the [90-minute recording](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/2016/revit/sd20908) of
-my class **SD20908** *Connect Desktop and Cloud - Free Your BIM Data*:
+- [**SD20891** &ndash; Revit API Expert Roundtable &ndash; Open House on the Factory Floor](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/2016/revit/sd20891)
+- [**SD20908** &ndash; Connect Desktop and Cloud &ndash; Free Your BIM Data!](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/2016/revit/sd20908)
 
 <center>
-<script height="468px" width="832px" src="http://player.ooyala.com/iframe.js#pbid=34ee2c04f0304af88c76585f87c5bd8c"></script>
+<script height="468px" width="832px" src="http://player.ooyala.com/iframe.js#pbid=34ee2c04f0304af88c76585f87c5bd8c&ec=xyM2hvNzE6uwSdozxVspBc0eDumVZA5F"></script>
 </center>
 
-Another related class is
-Fernando Malard's [From Desktop to the Cloud with Autodesk Forge](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/2016/forge/sd16837).
+A related class that may also be of interest is
+Fernando Malard's [**SD16837** *From Desktop to the Cloud with Autodesk Forge*](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/2016/forge/sd16837).
 
-http://au.autodesk.com/au-online/classes-on-demand/class-catalog/2016/revit/sd20908#chapter=0
-
-http://au.autodesk.com/au-online/classes-on-demand/class-catalog/2016/revit/sd20908#chapter=0
-
-http://au.autodesk.com/au-online/classes-on-demand/class-catalog/2016/forge/sd16837#
-
-http://player.ooyala.com/iframe.js#pbid=34ee2c04f0304af88c76585f87c5bd8c&ec=xyM2hvNzE6uwSdozxVspBc0eDumVZA5F
+In case you have not yet enjoyed it, you might also want to check out
+the great [AU2016 opening keynote](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/2016/class-detail/22760).
 
 
-My class and all other AU2016 classes were just made
 
-My class can be found here: 
+####<a name="3"></a>ADN Xtra Labs Updated
 
-More classes here: AU Online
+The last time I worked on the *ADN Xtra Labs* hosted in 
+the [AdnRevitApiLabsXtra GitHub repository](https://github.com/jeremytammik/AdnRevitApiLabsXtra) was for
+the [Revit 2017 migration](http://thebuildingcoder.typepad.com/blog/2016/08/trusted-signature-and-updated-revit-2017-api-resources.html#5),
+and the [migration to Revit 2016](http://thebuildingcoder.typepad.com/blog/2015/06/adn-labs-xtra-multi-version-add-ins-and-cnc-direct.html#2) before that.
 
-The great Opening Keynote here: AU2016 Opening Keynote﻿
+They are a superset of the
+official [ADN Revit API labs training material]()
+([2016](http://thebuildingcoder.typepad.com/blog/2015/05/autodesk-university-q1-adn-labs-and-wizard-update.html#4))
+available from
+the [Revit Developer Centre](http://www.autodesk.com/developrevit) and
+the [Revit API Training GitHub repository](https://github.com/ADN-DevTech/RevitTrainingMaterial).
 
+They are used for our standard two- or three-day hands-on Revit API introduction training courses.
+They are also suitable for self-learning and include full step-by-step instructions, separate for both C# and VB add-ins.
 
-[BIM 360](http://www.autodesk.com/products/bim-360/overview) had its best quarter ever.
+I maintain an extended version of these including the precursor versions, repackaged in the ADN Revit API Training Labs Xtra modules.
 
-It has come a long way in connecting the office to the field.
-It is a smash hit with construction companies around the world and remains the fastest growing product in Autodesk history.
-
-It scored a big win at [JE Dunn Construction](http://www.jedunn.com) and several other important sites.
-
-At the same time,
-[Collaboration for Revit (C4R)](http://www.autodesk.com/products/collaboration-for-revit/overview) is
-bringing collaboration to the design and engineering office and connecting BIM teams around the world.  
-
-We continue to see enterprise wide adoption of C4R with customer quotes saying things like, *'C4R has connected our design offices like no other tool has before.  It has transformed how we workshare, for the better'*.
-
-Autodesk is working on bringing these two technologies together to form a common data environment that spans the entire project from concept to commissioning to building operations and beyond.
-
-The common data environment can be programmatically accessed and driven through the Forge web services.
-
-
-####<a name="3"></a>Forge Web Services
-
-Here are the main groups Forge web service endpoints as of today &ndash; please always refer
-to [developer.autodesk.com](https://developer.autodesk.com) for the most up-to-date list:
-
-- General Availability
-    - Authentication (OAuth)
-    - Data Management API
-    - Design Automation API
-    - Model Derivative API
-    - Viewer
-- Beta
-    - 3D Print API (deprecated)
-    - BIM 360 API
-    - Reality Capture API
-
-
-####<a name="4"></a>BIM 360 Docs
-
-[BIM 360 Docs](http://info.bim360.autodesk.com/construction-document-software) provides real-time access to the most recent versions of digital plans and documents, so contractors, foremen, document managers, architects, and other key personnel can spend less time struggling with files and more time building. From concept to completion, BIM 360 software helps the entire team stay on-schedule.
-
-####<a name="5"></a>The Forge Issues Service API
-
-Mikako Harada and Galia Traub presented a session
-on [extending BIM 360 Docs with the Issues Service API](https://www.youtube.com/watch?v=cOQEyI-EMAQ)
-at [Forge DevCon 2016](https://forge.autodesk.com/devcon-2016):
+The Xtra version Visual Studio solution implements the following projects:
 
 <center>
-<iframe width="480" height="270" src="https://www.youtube.com/embed/cOQEyI-EMAQ?rel=0" frameborder="0" allowfullscreen></iframe>
+<img src="img/AdnXtra_solution.png" alt="ADN Revit API Training Labs Xtra Visual Studio solution" width="210"/>
 </center>
 
-This session introduces the Issues Service, one of the first BIM 360 APIs to be made available in Forge.
-It allows users to create issues related to documents that are stored either in BIM 360 Docs, or more broadly within the Forge ecosystem. It walks you step-by-step through using the Issues API and showing what is possible through a series of demonstrations of practical examples.
+The first six are the official, standard, ADN training labs to introduce the Revit API basics, UI programming and Family API.
 
-If you are interested in more API related BIM 360 information, please refer to Mikako's blog, [The Field of View &ndash; BIM 360 API &amp; cloud-based technologies for the AEC industry](https://fieldofviewblog.wordpress.com).
+Obviously, the Xtra labs have advantages and disadvantages over the standard labs, so you should check out both and decide which you prefer for yourself.
 
+They also include a couple of additional utilities that I frequently find useful, especially a simplified version of the
+<a href="http://thebuildingcoder.typepad.com/blog/2015/05/geometry-creation-and-line-intersection-exceptions.html#5">BipChecker</a>
+(<a href="http://thebuildingcoder.typepad.com/blog/2014/05/bipchecker-for-revit-2015-on-github.html#3">2015</a>) and the
+<a href="http://thebuildingcoder.typepad.com/blog/2014/09/debugging-and-maintaining-the-image-relationship.html#2">element lister</a>.
 
-####<a name="6"></a>24 Forge DevCon Presentation Recordings
+Anyway, I left off the migration to the Revit 2017 API before it was entirely completed; several of the external commands were still making use of the obsolete and deprecated automatic transaction mode.
 
-Mikako's presentation is just one of a collection 
-of [24 DevCon presentation recordings](http://www.slideshare.net/Autodesk/clipboards/autodesk-forge-devcon-2016) is
-available on SlideShare.
+I finally got around to fixing that now, resulting in a
+new [release ]().
 
-For your convenience, here is a table of contents:
+You can examine the changes I made
+by [comparing versions ...]().
 
-- Introduction to WebVR &ndash; Tony Parisi
-- Building a Drone Imagery Service &ndash; Jia Huang, Software Engineer @ 3DRobotics
-- From Desktop to the Cloud with Forge &ndash; Fernando Malard, CTO, ofcdesk, llc
-- 10 Great Fusion 360 Apps &ndash; Brian Ekins and Patrick Rainsberry
-- Forecast for Design, Make, and Use is Cloudy &ndash; Justin Berger, Open Innovation Strategist
-- Introduction to Forge 3D Print API with Sample Applications &ndash; Tomer Galon, Product Manager, and Ania Lipka, Principal Developer
-- You Had Me at HoloWorld &ndash; Introduction to Building for HoloLens &ndash; Dona Sarkar, Principal Product Person
-- Creating your next VR Walkthrough with Cloud Rendered Stereo Panoramas &ndash; Michael Beale, Autodesk Developer
-- Collaborative VR using Google Cardboard and the Forge Viewer &ndash; Kean Walmsley, Platform Architect &amp; Evangelist, Autodesk Research
-- Building Data Centric Applications on Forge &ndash; Oleg Shilovitsky, openBoM CEO and co-founder, and Boris Shoov, AMC Bridge, Executive VP
-- Drawings! Drawings! Everywhere! &ndash; Albert Szilvasy, Autodesk, Abhishek Singhal, Risersoft, Ben O'Donnell, BIMobject
-- Bringing BIM to Facility Management with Forge &ndash; Collaboration in the Cloud &ndash; Autodesk
-- Dancing with Elephants, Leveraging Market Leaders to Grow your Startup &ndash; Jim Quanci, Senior Director, Autodesk Developer Network
-- Free your design data &ndash; Shiya Luo and Adam Nagy, Developer Advocates
-- Building Value-Added Integrations with Autodesk IoT APIs &ndash; Brian Sherman, Senior Developer, Allan O'Leary, Product Manager
-- Implementing Rich Applications in the Browser &ndash; Sebastian Dunkel, Software Engineer
-- The Future of Making Buildings Forms Follow Formulae &ndash; Anthony A. Hauck, Director of Product Strategy, AEC Generative Design
-- Collaborating with Design Data &ndash; Augusto Goncalves, Forge Partner Development, Phaneendra Kumar Divi, A360 Development Manager
-- Extend BIM 360 Docs with the Issues Service API &ndash; Galia Traub, BIM 360 Senior Software Engineer, Mikako Harada, AEC Technical Lead and Americas Manager, Developer Technical Services, Autodesk
-- Developing & Deploying Secure, Scalable Applications on Amazon Web Services &ndash; Tom Jones, Solution Architect, Amazon Web Services
-- Visual Reporting with Connected Design Data &ndash; Philippe Leefsma, Forge Partner Development
-- IoT is also for existing things &ndash; Pat Chartrand, CEO, DASBOX Inc.
-- Cloud PDM Demystified &ndash; The Future of File Management &ndash; William Sterbenz and Hagay Dvir
-- Free your BIM data &ndash; Jeremy Tammik, Forge Program Development, Autodesk
-
-
-#### <a name="7"></a>Forge Hackathon Webinar Series Recordings
-
-If you are interested in the above, you should also check out the more
-recent [Forge webinar series](http://autodeskforge.devpost.com/details/webinars) held during
-the [Autodesk App Store Forge and Fusion 360 Hackathon](http://autodeskforge.devpost.com) in September and October 2016.
-
-The recordings and documentation pointers provide a full introduction to all important aspects of Forge programming as of today:
-
-- [Introduction to Autodesk Forge and the Autodesk App Store](http://adndevblog.typepad.com/cloud_and_mobile/2016/09/introduction-to-autodesk-forge-and-the-autodesk-app-store.html)
-- [Introduction to OAuth and Data Management API](http://adndevblog.typepad.com/cloud_and_mobile/2016/09/introduction-to-oauth-and-data-management-api.html)
-&ndash; on [OAuth](https://developer.autodesk.com/en/docs/oauth/v2/overview)
-and [Data Management API](https://developer.autodesk.com/en/docs/data/v2/overview), providing token-based authentication, authorization and a unified and consistent way to access data across A360, Fusion 360, and the Object Storage Service.
-- [Introduction to Model Derivative API](http://adndevblog.typepad.com/cloud_and_mobile/2016/09/introduction-to-model-derivative-api.html)
-&ndash; on the [Model Derivative API](https://developer.autodesk.com/en/docs/model-derivative/v2/overview) that enables users to represent and share their designs in different formats and extract metadata.
-- [Introduction  to Viewer](http://adndevblog.typepad.com/cloud_and_mobile/2016/09/introduction-to-viewer-api.html)
-&ndash; the [Viewer](https://developer.autodesk.com/en/docs/viewer/v2/overview), formerly part of the 'View and Data API', is a WebGL-based JavaScript library for 3D and 2D model rendering of CAD models from seed files, e.g., [AutoCAD](http://www.autodesk.com/products/autocad/overview), [Fusion 360](http://www.autodesk.com/products/fusion-360/overview), [Revit](http://www.autodesk.com/products/revit-family/overview) and many other formats.
-- [Introduction to Design Automation](http://adndevblog.typepad.com/cloud_and_mobile/2016/10/introduction-to-design-automation.html)
-&ndash; the [Design Automation API](https://developer.autodesk.com/en/docs/design-automation/v2/overview), formerly known as 'AutoCAD I/O', enables running scripts on native CAD design files such as `DWG`,
-cf. [Albert's tutorials](https://github.com/szilvaa/acadio-tutorials).
-- [Introduction to BIM360](http://adndevblog.typepad.com/cloud_and_mobile/2016/10/introduction-to-bim-360.html) and
-the [Forge DevCon recording on BIM 360](https://www.youtube.com/watch?v=cOQEyI-EMAQ)
-&ndash; [BIM360](https://developer.autodesk.com/en/docs/bim360/v1/) enables apps to integrate with BIM360 to extend its capabilities in the construction ecosystem.
-- [Introduction to Fusion 360 Client API](http://adndevblog.typepad.com/manufacturing/2016/10/introduction-to-fusion-360-api.html)
-&ndash; [Fusion 360 Client API](http://help.autodesk.com/view/NINVFUS/ENU/?guid=GUID-A92A4B10-3781-4925-94C6-47DA85A4F65A) implements an integrated CAD, CAM, and CAE tool for product development, built for the new ways products are designed and made;
-resources:
-[forum](http://forums.autodesk.com/t5/api-and-scripts/bd-p/22),
-[samples](https://autodeskfusion360.github.io),
-[learning material](http://fusion360.autodesk.com/learning/learning.html?guid=GUID-A18E7686-1C84-4690-95EE-E2076A1BD84E&_ga=1.102015364.466522287.1440788713)
-- [Submitting a web service app to Autodesk App store](http://adndevblog.typepad.com/cloud_and_mobile/2016/10/submitting-a-web-service-app-to-autodesk-app-store.html)
-
-For API keys to get started programming Forge, go to [developer.autodesk.com](https://developer.autodesk.com).
-
-For code samples on any of the topics above, please refer to the Forge Platform samples on GitHub
-at [Developer-Autodesk](https://github.com/Developer-Autodesk)
-and [Autodesk-Forge](https://github.com/Autodesk-Forge),
-optionally adding a filter, e.g., like this for `Design.automation`: [...Developer-Autodesk?query=Design.automation](https://github.com/Developer-Autodesk?query=Design.automation).
-
-#### <a name="8"></a>DevDay Europe and Forge Accelerator in Munich
-
-My next upcoming Forge related event is
-the [DevDay conference and Forge accelerator](http://thebuildingcoder.typepad.com/blog/2016/11/1500-posts-devday-and-storing-a-dictionary.html#2) in
-Munich next week.
-
-High time to start getting ready for that...
-
-It would be great to see you there!
+Here is my external application RvtSamples listing entry points to launch all the Revit SDK, ADN Xtra lab and The Building Coder samples:
 
 <center>
-<img src="img/forge_accelerator.png" alt="Forge &ndash; build the future of making things together" width="400">
+<img src="img/AdnXtra_2016.png" alt="RvtSamples listing SDK, Adn Xtra and The Building Coder samples" width="452"/>
+</center>
+
+As always, the most up-to-date version of the ADN Revit API Training Labs Xtra is provided in the
+<a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra">AdnRevitApiLabsXtra GitHub repository</a>,
+and the current version right now is
+<a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra/releases/tag/2016.0.0.6">release 2016.0.0.6</a>.</p>
+
+
+
+####<a name="4"></a>Linking `Material` Elements to External Database Entries
+
+**Question:** Is it possible (maybe through API?) to assign new parameters for materials?
+
+The original question in in German:
+ 
+*Um die Bilanzierung der Materialmassen zu automatisieren, wäre es hilfreich den Materialien in Revit eine Datenbank-ID zuzuschreiben, welche dauerhaft im Modell mitwandert. Über shared Parameter konnte ich bisher nur Elemente (Wand), aber nicht den untergeordneten Materialien zuschreiben. Die Funktionenen des Materialkatalogs wirken eingeschränkt. Gibt es hierfür Möglichkeiten Materialparameter neu zu erstellen?*
+ 
+Practically he would like to add specific IDs (parameters) to materials that he could write out to a database. He mentions the analogy with shared parameters &ndash; it seems he would like to create custom shared parameters and add them to materials.
+
+Do you know any solution for this idea?
+
+**Answer 1:**
+
+so, the user has an external database and wishes to link revit materials to database entries.
+ 
+that is good, and easy.
+ 
+now i would suggest that we all switch on our brains for a moment, escpecially this developer.
+ 
+the revit materials reside in the revit database and are therefore revit elements.
+ 
+they are therefore equipped with an element id and a unique id.
+ 
+the external database exists and has entries for the materials, and needs some kind of link.
+ 
+the developer is now considering to add something new to the revit database, e.g. a shared parameter on each material.
+ 
+that is completely unnecessary, as far as i can tell.
+ 
+since he is already managing an external database, and since each material already is equipped with a unique id, i would suggest that he use that existing unique id to identify the material, and store that in the database.
+ 
+if he needs to link multiple materials to the same database entry and is using a relational database, he might want to implement a 1:n link using an auxiliary table.
+ 
+unless there is more to the problem than has been mentioned so far, i would maintain that this is the most efficient solution.
+ 
+it also has the advantage of solving the problem without introducing any new data elements or shared parameters anywhere.
+ 
+what do you think?
+ 
+what does the developer think?
+ 
+on the other hand, if he insists on pursuing the path he suggests, the fact is that as far as i know any revit element can be equipped with a shared parameter, as long as it has a valid category.
+ 
+is there a category for materials?
+ 
+if so, materials can have a shared parameter attached to them.
+ 
+here is an explanation of this:
+ 
+http://thebuildingcoder.typepad.com/blog/2008/11/adding-a-shared-parameter-to-a-dwg-file.html
+ 
+here is a list of things i already tested:
+ 
+https://github.com/jeremytammik/AdnRevitApiLabsXtra/blob/master/XtraCs/Labs4.cs#L511-L535
+ 
+i am just in the process of testing for myself whether a shared param can be added to a material as well.
+ 
+i'll let you know when i know.
+
+**Answer 2:**
+
+i verified and tested successfully that shared parameters can be added to material elements.
+ 
+you can see so by checking out and running version
+ 
+https://github.com/jeremytammik/AdnRevitApiLabsXtra/releases/tag/2017.0.0.6
+ 
+i switched backl to the standard test using doors again after that, in version
+ 
+https://github.com/jeremytammik/AdnRevitApiLabsXtra/releases/tag/2017.0.0.7
+ 
+the link to the list of things i already tested has changed, since the line numbers moved:
+ 
+https://github.com/jeremytammik/AdnRevitApiLabsXtra/blob/master/XtraCs/Labs4.cs#L518-L539
+ 
+You should also always be aware of the possibility to
+use [extensible storage](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.23) instead
+of shared parameters to store custom data, cf. also the SDK samples ExtensibleStorageManager and ExtensibleStorageUtility.
+
+Shared parameters make sense if the user and/or Revit should be aware of the properties, e.g. to view or edit them in the properties panel or to make us of them for scheduling purposes.
+
+If the data is purely intended for internal add-in use, extensible storage is normally the better way to go.
+
+
+
+####<a name="5"></a>Binding a Shared Parameter to Elements
+
+One way to add customm properties to Revit elements is by using a shared parameter.
+If you can do that in the user interface, then you can do so programmatically as well.
+
+The FireRating SDK sample shows how this can be achieved, and so does my modernised version of it,
+[FireRatingCloud](), in
+the [module ...]().
+
+However, this is one of the few things that can be done programmatically for some element types even when it is not allowed in the UI.
+If the Revit development team decided that the end user should not be able to add a shared parameter to a certain element type, it will not show up in the UI.
+As long as it has a valid category, you can mostly attach a shared parameter to it programmatically anyway.
+
+The option `xxx` is related to this...
+
+
+ 
+ 
+
+
+####<a name="5"></a>Attaching a Shared Parameter to `Material` Elements
+
+
+
+####<a name="6"></a>Cornelius Story &ndash; Cured by Natural Remedies
+
+Let me finish off on a much more personal note, sharing with you my
+son [Cornelius story &ndash; cured by natural remedies](http://on-lyme.org/en/sufferers/lyme-stories/item/241-cornelius-story-cured-by-natural-remedies).
+
+<center>
+<img src="img/.png" alt="Iris" width="400">
 </center>
