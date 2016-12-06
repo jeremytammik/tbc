@@ -67,6 +67,7 @@ Before getting to all that, let me mention that I am now busy at the Munich DevD
 <img src="img/2016-12-05_devday_munich_305_500x225.jpg" alt="Munich DevDay" width="500"/>
 </center>
 
+For more impressions from this event, check out Kean Walmsley's notes on [the European DevDay in Munich](http://through-the-interface.typepad.com/through_the_interface/2016/12/the-european-devday-in-munich.html).
 
 ####<a name="2"></a>AU2016 Classes Posted
 
