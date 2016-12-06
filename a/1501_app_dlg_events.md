@@ -34,7 +34,7 @@ Any and every use of the Revit API requires a valid API context.
 
 The most common and obvious way to get into a valid Revit API context &ndash; and the most commonly used event &ndash; is the one to launch an external command, which calls the `IExternalCommand` `Execute` handler method.
 
-Other important ones to be aware of are `ApplicationInitialized` and `DialogBoxShowing`, unconnected with any external command at all, as you can see below.
+Other important ones to be aware of are `ApplicationInitialized` and `DialogBoxShowing`, unconnected with any external command at all, as you can see below, and the method described by David Echols to [load and execute assembly code on the fly](#2) in an `Idling` event handler by subscribing to that event in the application `OnStartup` method.
 
 Here is an interesting discussion exploring some options from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api/bd-p/160) thread
@@ -179,3 +179,95 @@ Many thanks to Mike, Matt, Erik and Gonçalo for raising and helping to solve th
 <img src="img/131_apples_500x375.jpg" alt="Apples" width="500">
 </center>
 
+
+####<a name="2"></a>Addendum &ndash; Load and Execute Code on the Fly
+
+In the [comment below](http://thebuildingcoder.typepad.com/blog/2016/11/using-other-events-to-execute-add-in-code.html#comment-3039130901),
+David Echols explains how he can load and execute assembly code on the fly by subscribing to the `Idling` event in the application `OnStartup` method:
+
+> I have used the following code in the last four versions of Revit for overnight batch processing of PDF and DWG exports and sheet lists across multiple workstations. This is not the most elegant way to do this, but it does show how I load the assembly on the fly and execute the command that does the processing.
+
+<pre class="code">
+<span style="color:green;">//&nbsp;The&nbsp;event&nbsp;is&nbsp;added&nbsp;in&nbsp;IExternalApplication.OnStartup.</span>
+<span style="color:green;">//&nbsp;Note:&nbsp;The&nbsp;handler&nbsp;is&nbsp;unloaded&nbsp;on&nbsp;the&nbsp;first&nbsp;line&nbsp;in&nbsp;</span>
+<span style="color:green;">//&nbsp;the&nbsp;handler.&nbsp;The&nbsp;event&nbsp;is&nbsp;started&nbsp;again&nbsp;in&nbsp;the&nbsp;</span>
+<span style="color:green;">//&nbsp;DocumentClosed&nbsp;event&nbsp;handler&nbsp;when&nbsp;the&nbsp;current&nbsp;</span>
+<span style="color:green;">//&nbsp;document&nbsp;is&nbsp;closed.</span>
+ 
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">void</span>&nbsp;RemoteJobHandler(
+&nbsp;&nbsp;<span style="color:blue;">object</span>&nbsp;sender,&nbsp;
+&nbsp;&nbsp;<span style="color:#2b91af;">IdlingEventArgs</span>&nbsp;e&nbsp;)
+{
+&nbsp;&nbsp;GlobalSettings.RevitUiControlledApp.Idling&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;-=&nbsp;IdlingHandler.RemoteJobHandler;
+ 
+&nbsp;&nbsp;LogManager.LogMessage(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;IdlingHandler.RemoteJobHandler&nbsp;-&nbsp;Enter&nbsp;handler&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;LogSeverityType.Debug&nbsp;);
+ 
+&nbsp;&nbsp;Job&nbsp;job&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Job(&nbsp;GlobalSettings.RemoteJobXmlData&nbsp;);
+&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;dllLocation&nbsp;=&nbsp;job.DllFileName;
+&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;className&nbsp;=&nbsp;job.CommandName;
+&nbsp;&nbsp;<span style="color:blue;">try</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;do&nbsp;a&nbsp;bunch&nbsp;of&nbsp;stuff&nbsp;here&nbsp;to&nbsp;setup</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ModelPath</span>&nbsp;modelPath&nbsp;=&nbsp;<span style="color:#2b91af;">ModelPathUtils</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.ConvertUserVisiblePathToModelPath(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;item.RevitFileName&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;uiDocument&nbsp;=&nbsp;GlobalSettings.RevitUiApp
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OpenAndActivateDocument(&nbsp;modelPath,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;openOptions,&nbsp;<span style="color:blue;">false</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Type</span>&nbsp;type&nbsp;=&nbsp;LoadDllWithReflection(&nbsp;dllLocation,&nbsp;className&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;IRemoteCommand&nbsp;command&nbsp;=&nbsp;GetCommandFromType(&nbsp;type&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;command.RunRemotely(&nbsp;uiDocument.Document,&nbsp;item&nbsp;);
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">catch</span>(&nbsp;<span style="color:#2b91af;">Exception</span>&nbsp;ex&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;handle/log&nbsp;errors</span>
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">finally</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;cleanup</span>
+&nbsp;&nbsp;}
+}
+ 
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">Type</span>&nbsp;LoadDllWithReflection(&nbsp;
+&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;dllLocation,
+&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;className&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:blue;">try</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Assembly</span>&nbsp;assembly&nbsp;=&nbsp;<span style="color:#2b91af;">Assembly</span>.LoadFrom(&nbsp;dllLocation&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Type</span>&nbsp;type&nbsp;=&nbsp;assembly.GetType(&nbsp;className&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;type;
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">catch</span>(&nbsp;<span style="color:#2b91af;">ReflectionTypeLoadException</span>&nbsp;ex&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;exceptions&nbsp;=&nbsp;ex.LoaderExceptions;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;failedType&nbsp;<span style="color:blue;">in</span>&nbsp;ex.Types&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;failedType&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Debug</span>.WriteLine(&nbsp;failedType.FullName&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Exception</span>&nbsp;loadException&nbsp;<span style="color:blue;">in</span>&nbsp;exceptions&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Debug</span>.WriteLine(&nbsp;loadException.ToString()&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">null</span>;
+}
+ 
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;IRemoteCommand&nbsp;GetCommandFromType(&nbsp;<span style="color:#2b91af;">Type</span>&nbsp;type&nbsp;)
+{
+&nbsp;&nbsp;IRemoteCommand&nbsp;command&nbsp;=&nbsp;<span style="color:#2b91af;">Activator</span>.CreateInstance(&nbsp;type&nbsp;)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">as</span>&nbsp;IRemoteCommand;
+ 
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;command&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;th&nbsp;row&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Exception</span>(&nbsp;<span style="color:#a31515;">&quot;Could&nbsp;not&nbsp;get&nbsp;Remote&nbsp;Command&quot;</span>&nbsp;);
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;command;
+}
+</pre>
