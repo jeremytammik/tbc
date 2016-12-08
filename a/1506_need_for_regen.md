@@ -9,15 +9,20 @@
 
 <!---
 
- #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+Need for Regen and Duplicate Parameter Access #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
-...
+A Python Revit API question on renumbering viewports helps highlight two separate important programming aspects; I also add some other notes from the Munich Forge accelerator
+&ndash; Question
+&ndash; The need to regenerate
+&ndash; Use built-in parameters to access parameters
+&ndash; Forge accelerator and outage report
+&ndash; Added materials to 210 King model...
 
 -->
 
-### Need for Regen and Parameter Display Name Confusion
+### Need for Regen and Duplicate Parameter Access
 
-A Python Revit API question on renumbering viewports helps highlight two separate important programming aspects, plus a couple of other notes from the Munich Forge accelerator:
+A Python Revit API question on renumbering viewports helps highlight two separate important programming aspects; I also add some other notes from the Munich Forge accelerator:
 
 - [Question](#2)
 - [The need to regenerate](#3)
@@ -141,7 +146,9 @@ on [Dropbox](https://www.dropbox.com/sh/51beylyeor41jnm/AAB7PaDA5t0H5Hg7DDgaslpl
 
 One of them is the model of the [210 King Street Autodesk Toronto office](https://www.dropbox.com/sh/51beylyeor41jnm/AAATil-xM2Y8qC3N5WtmHQZca/210%20King%20-%20Autodesk%20Toronto.rvt?dl=0).
 
-Philippe is using that in his [oss.autodesk.io](https://oss.autodesk.io) and other  Forge demonstrations and asked me to
+Philippe is using that in
+his [responsive connected database viewer](https://forge-rcdb.autodesk.io) Forge
+demonstration ([GitHub repo](https://github.com/Autodesk-Forge/forge-rcdb.nodejs)) and asked me to
 help [clean up its material settings](http://thebuildingcoder.typepad.com/blog/2016/12/material-shared-parameters-and-adn-xtra-labs.html#7).
 
 That led me to implement

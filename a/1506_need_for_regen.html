@@ -8,14 +8,19 @@
 </head></p>
 <!---
 
- #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+Need for Regen and Duplicate Parameter Access #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
-...
+A Python Revit API question on renumbering viewports helps highlight two separate important programming aspects; I also add some other notes from the Munich Forge accelerator
+&ndash; Question
+&ndash; The need to regenerate
+&ndash; Use built-in parameters to access parameters
+&ndash; Forge accelerator and outage report
+&ndash; Added materials to 210 King model...
 
 -->
 
-<h3>Need for Regen and Parameter Display Name Confusion</h3>
-<p>A Python Revit API question on renumbering viewports helps highlight two separate important programming aspects, plus a couple of other notes from the Munich Forge accelerator:</p>
+<h3>Need for Regen and Duplicate Parameter Access</h3>
+<p>A Python Revit API question on renumbering viewports helps highlight two separate important programming aspects; I also add some other notes from the Munich Forge accelerator:</p>
 <ul>
 <li><a href="#2">Question</a></li>
 <li><a href="#3">The need to regenerate</a></li>
@@ -109,7 +114,9 @@ The first place to go to check is always the <a href="https://developer.autodesk
 a <a href="http://thebuildingcoder.typepad.com/blog/2016/01/happy-new-top-cad-blog-public-models-and-forge.html#4">collection of public Revit models</a>
 on <a href="https://www.dropbox.com/sh/51beylyeor41jnm/AAB7PaDA5t0H5Hg7DDgaslpla?dl=0">Dropbox</a>.</p>
 <p>One of them is the model of the <a href="https://www.dropbox.com/sh/51beylyeor41jnm/AAATil-xM2Y8qC3N5WtmHQZca/210%20King%20-%20Autodesk%20Toronto.rvt?dl=0">210 King Street Autodesk Toronto office</a>.</p>
-<p>Philippe is using that in his <a href="https://oss.autodesk.io">oss.autodesk.io</a> and other  Forge demonstrations and asked me to
+<p>Philippe is using that in
+his <a href="https://forge-rcdb.autodesk.io">responsive connected database viewer</a> Forge
+demonstration (<a href="https://github.com/Autodesk-Forge/forge-rcdb.nodejs">GitHub repo</a>) and asked me to
 help <a href="http://thebuildingcoder.typepad.com/blog/2016/12/material-shared-parameters-and-adn-xtra-labs.html#7">clean up its material settings</a>.</p>
 <p>That led me to implement
 the <a href="https://github.com/jeremytammik/PopulateMaterialProperty">PopulateMaterialProperty add-in</a>.</p>
