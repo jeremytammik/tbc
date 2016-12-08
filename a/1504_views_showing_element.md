@@ -14,8 +14,9 @@
 
 Determining Views Showing an Element #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
-&ndash;
-...
+The topic of how to determine all views in which a given element is visible has been discussed several times on the past, and a couple of viable solutions have been suggested.
+However, for large projects, performance becomes an issue.
+This question was raised again by Abba Lustgarten and Erik Eriksson in the Revit API discussion forum thread on finding views in which an element is visible (by geometry or actual visibility), with Erik sharing a <code>View</code> extension method <code>IntersectsBoundingBox</code> that helps alleviate the performance impact...
 
 -->
 
