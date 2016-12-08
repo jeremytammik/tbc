@@ -83,7 +83,7 @@ the <a href="zip/rename_view_numbers.py">complete Python file rename_view_number
 <p>So, this issue actually had nothing to do with transactions or doc regeneration. I discovered (with some help :) ), that the problem lay in how I was setting/getting the parameter. The "Detail Number" on a viewport element, like a lot of Revit element parameters, has duplicate versions that share the same descriptive parameter display name.</p>
 </blockquote>
 <p><center>
-<img src="img/duplicate_parameter_display_names.png" alt="Duplicate parameter display names" width="300"/>
+<img src="img/duplicate_parameter_display_names.png" alt="Duplicate parameter display names" width="304"/>
 </center></p>
 <p>Apparently, the reason for this might be a legacy issue, though I'm not sure.
 When I was trying to get/set the detail number, it was somehow grabbing the incorrect read-only parameter occasionally, one associated with the built-in parameter enum value <code>VIEWER_DETAIL_NUMBER</code>.
