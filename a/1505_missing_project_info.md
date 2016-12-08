@@ -11,7 +11,11 @@
 
 Restoring a Missing Project Information Element #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
-...
+Some people have recently reported that they encountered models lacking the <code>ProjectInfo</code> project information singleton element.
+Apparently, it was possible in previous versions of Revit for a faulty or malicious add-in to simply delete this element.
+That obviously causes problems for other add-ins and Revit itself, who rely on its presence.
+Luckily, it is not hard to fix.
+Here is the latest discussion addressing this issue...
 
 -->
 
