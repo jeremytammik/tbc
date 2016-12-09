@@ -409,7 +409,7 @@ Here are the two formatting strings that they use:
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;in&nbsp;child&nbsp;node&nbsp;for&nbsp;bottom-up&nbsp;structure.</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
 <span style="color:blue;">const</span>&nbsp;<span style="color:blue;">string</span>&nbsp;_json_format_to_store_parent_in_child
-&nbsp;&nbsp;=&nbsp;<span style="color:#a31515;">&quot;{{&quot;</span>
+&nbsp;&nbsp;=&nbsp;<span style="color:#a31515;">&quot;&#123;&#123;&quot;</span>
 &nbsp;&nbsp;+&nbsp;<span style="color:#a31515;">&quot;\&quot;id\&quot;&nbsp;:&nbsp;{0},&nbsp;&quot;</span>
 &nbsp;&nbsp;+&nbsp;<span style="color:#a31515;">&quot;\&quot;name\&quot;&nbsp;:&nbsp;\&quot;{1}\&quot;,&nbsp;&quot;</span>
 &nbsp;&nbsp;+&nbsp;<span style="color:#a31515;">&quot;\&quot;parent\&quot;&nbsp;:&nbsp;{2}}}&quot;</span>;
