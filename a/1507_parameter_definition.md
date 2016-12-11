@@ -9,28 +9,31 @@
 
 <!---
 
-http://thebuildingcoder.typepad.com/blog/2014/04/determining-the-size-and-location-of-viewports-on-a-sheet.html#comment-3045289101
+Parameter Definition Overview #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
- #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
-
-&ndash; 
-...
+I am happy to present a pretty comprehensive overview and explanation of the process of defining a shared parameter by Scott Conover.
+Question: What do I need to do to programmatically create a shared parameter? I would like to set the <code>SetAllowVaryBetweenGroups</code> flag on it.
+Answer: You create the details needed to define a shared parameter from <code>ExternalDefinition</code>.
+Existing shared parameter file entries can be read to become an <code>ExternalDefinition</code> in your code, or you can create a new entry in the current shared parameter file using the <code>DefinitionGroup.Create</code> method...
 
 -->
 
-### Parameter Definition Basics
+### Parameter Definition Overview
 
 We have repeatedly discussed all kinds of different aspects
 of [Revit element parameters](http://thebuildingcoder.typepad.com/blog/parameters),
-but not yet put together a
-comprehensive [topic group](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5) for them.
+but not put together
+a [topic group](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5) for them yet.
 
-Today I am happy to present a pretty comprehensive overview and explanation of the process of definig a shared parameter by none less than Scott Conover himself, Senior Revit Engineering Manager:
+Today I am happy to present a pretty comprehensive overview and explanation of the process of defining a shared parameter by none less than Scott Conover himself, Senior Revit Engineering Manager:
 
 
 **Question:** What do I need to do to programmatically create a shared parameter?
 I would like to set the `SetAllowVaryBetweenGroups` flag on it. 
 
+<center>
+<img src="img/new_shared_parameter.jpg" alt="New shared parameter" width="332"/>
+</center>
 
 **Answer:** You create the details needed to define a shared parameter from `ExternalDefinition`.
 Existing shared parameter file entries can be read to become an `ExternalDefinition` in your code, or you can create a new entry in the current shared parameter file using the `DefinitionGroup.Create` method.
@@ -42,51 +45,51 @@ this process best.
 Here is part of that sample snippet:
 
 <pre class="code">
-public bool SetNewParameterToInstanceWall(
-  UIApplication app,
-  DefinitionFile myDefinitionFile)
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">bool</span>&nbsp;SetNewParameterToInstanceWall(
+&nbsp;&nbsp;<span style="color:#2b91af;">UIApplication</span>&nbsp;app,
+&nbsp;&nbsp;<span style="color:#2b91af;">DefinitionFile</span>&nbsp;myDefinitionFile&nbsp;)
 {
-  // Create a new group in the shared parameters file
-  DefinitionGroups myGroups = myDefinitionFile.Groups;
-  DefinitionGroup myGroup = myGroups.Create("MyParameters");
-
-  // Create an instance definition in definition group MyParameters
-  ExternalDefinitionCreationOptions option
-    = new ExternalDefinitionCreationOptions(
-      "Instance_ProductDate", ParameterType.Text);
-      
-  // Don't let the user modify the value, only the API
-  option.UserModifiable = false;
-  
-  // Set tooltip
-  option.Description = "Wall product date";
-  Definition myDefinition_ProductDate
-    = myGroup.Definitions.Create(option);
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Create&nbsp;a&nbsp;new&nbsp;group&nbsp;in&nbsp;the&nbsp;shared&nbsp;parameters&nbsp;file</span>
+&nbsp;&nbsp;<span style="color:#2b91af;">DefinitionGroups</span>&nbsp;myGroups&nbsp;=&nbsp;myDefinitionFile.Groups;
+&nbsp;&nbsp;<span style="color:#2b91af;">DefinitionGroup</span>&nbsp;myGroup&nbsp;=&nbsp;myGroups.Create(&nbsp;<span style="color:#a31515;">&quot;MyParameters&quot;</span>&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Create&nbsp;an&nbsp;instance&nbsp;definition&nbsp;in&nbsp;definition&nbsp;group&nbsp;MyParameters</span>
+&nbsp;&nbsp;<span style="color:#2b91af;">ExternalDefinitionCreationOptions</span>&nbsp;option
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ExternalDefinitionCreationOptions</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Instance_ProductDate&quot;</span>,&nbsp;<span style="color:#2b91af;">ParameterType</span>.Text&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Don&#39;t&nbsp;let&nbsp;the&nbsp;user&nbsp;modify&nbsp;the&nbsp;value,&nbsp;only&nbsp;the&nbsp;API</span>
+&nbsp;&nbsp;option.UserModifiable&nbsp;=&nbsp;<span style="color:blue;">false</span>;
+ 
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Set&nbsp;tooltip</span>
+&nbsp;&nbsp;option.Description&nbsp;=&nbsp;<span style="color:#a31515;">&quot;Wall&nbsp;product&nbsp;date&quot;</span>;
+&nbsp;&nbsp;<span style="color:#2b91af;">Definition</span>&nbsp;myDefinition_ProductDate
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;myGroup.Definitions.Create(&nbsp;option&nbsp;);
 
   . . .
 </pre>
 
 The return from `DefinitionGroup.Create` is an `ExternalDefinition`, even though the type declared is the parent class.
- 
+
 Once you have an `ExternalDefinition`, you add it to the document.
 
 There are several ways:
- 
+
 1. Use `InstanceBinding` as shown in that sample.
 2. Use `FamilyManager.AddParameter` to add the parameter to a family.
 3. Use `FamilyManager.ReplaceParameter` to replace a family parameter with the shared one.
 4. Use `SharedParameterElement.Create` to create the element that represents the parameter without binding it to any categories.
- 
+
 There are also some `RebarShape` related utilities which I would not recommend for general usage but might be OK for rebar-specific code.
- 
+
 Once the parameter is in the document, it has an `InternalDefinition`.
 
 The best ways to get it:
- 
+
 1. If you have the `ParameterElement` from #4 you can use `ParameterElement.GetDefinition`.
 2. If you have the GUID (which you should, since it is provided by the `ExternalDefinition`), you can use `SharedParameterElement.Lookup` followed by `ParameterElement.GetDefinition`.
 3. If you have an instance of an element whose category has this parameter bound, get the `Parameter` and use `Parameter.Definition`.
- 
+
 Once you have the `InternalDefinition`, you can access the vary across groups option as well as other things.
 You can also use an `InternalDefintion` for adding and removing `InstanceBindings` to categories.
 

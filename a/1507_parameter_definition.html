@@ -8,23 +8,26 @@
 </head></p>
 <!---
 
-http://thebuildingcoder.typepad.com/blog/2014/04/determining-the-size-and-location-of-viewports-on-a-sheet.html#comment-3045289101
+Parameter Definition Overview #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
- #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
-
-&ndash; 
-...
+I am happy to present a pretty comprehensive overview and explanation of the process of defining a shared parameter by Scott Conover.
+Question: What do I need to do to programmatically create a shared parameter? I would like to set the <code>SetAllowVaryBetweenGroups</code> flag on it.
+Answer: You create the details needed to define a shared parameter from <code>ExternalDefinition</code>.
+Existing shared parameter file entries can be read to become an <code>ExternalDefinition</code> in your code, or you can create a new entry in the current shared parameter file using the <code>DefinitionGroup.Create</code> method...
 
 -->
 
-<h3>Parameter Definition Basics</h3>
+<h3>Parameter Definition Overview</h3>
 <p>We have repeatedly discussed all kinds of different aspects
 of <a href="http://thebuildingcoder.typepad.com/blog/parameters">Revit element parameters</a>,
-but not yet put together a
-comprehensive <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5">topic group</a> for them.</p>
-<p>Today I am happy to present a pretty comprehensive overview and explanation of the process of definig a shared parameter by none less than Scott Conover himself, Senior Revit Engineering Manager:</p>
+but not put together
+a <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5">topic group</a> for them yet.</p>
+<p>Today I am happy to present a pretty comprehensive overview and explanation of the process of defining a shared parameter by none less than Scott Conover himself, Senior Revit Engineering Manager:</p>
 <p><strong>Question:</strong> What do I need to do to programmatically create a shared parameter?
 I would like to set the <code>SetAllowVaryBetweenGroups</code> flag on it. </p>
+<p><center>
+<img src="img/new_shared_parameter.jpg" alt="New shared parameter" width="332"/>
+</center></p>
 <p><strong>Answer:</strong> You create the details needed to define a shared parameter from <code>ExternalDefinition</code>.
 Existing shared parameter file entries can be read to become an <code>ExternalDefinition</code> in your code, or you can create a new entry in the current shared parameter file using the <code>DefinitionGroup.Create</code> method.</p>
 <p>The sample code listed in the Revit API help file <code>RevitAPI.chm</code> or the online Revit API docs
@@ -32,26 +35,26 @@ under <a href="http://www.revitapidocs.com/2017/7978cb57-0a48-489e-2c8f-116fa256
 this process best.</p>
 <p>Here is part of that sample snippet:</p>
 <pre class="code">
-public bool SetNewParameterToInstanceWall(
-  UIApplication app,
-  DefinitionFile myDefinitionFile)
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">bool</span>&nbsp;SetNewParameterToInstanceWall(
+&nbsp;&nbsp;<span style="color:#2b91af;">UIApplication</span>&nbsp;app,
+&nbsp;&nbsp;<span style="color:#2b91af;">DefinitionFile</span>&nbsp;myDefinitionFile&nbsp;)
 {
-  // Create a new group in the shared parameters file
-  DefinitionGroups myGroups = myDefinitionFile.Groups;
-  DefinitionGroup myGroup = myGroups.Create("MyParameters");
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Create&nbsp;a&nbsp;new&nbsp;group&nbsp;in&nbsp;the&nbsp;shared&nbsp;parameters&nbsp;file</span>
+&nbsp;&nbsp;<span style="color:#2b91af;">DefinitionGroups</span>&nbsp;myGroups&nbsp;=&nbsp;myDefinitionFile.Groups;
+&nbsp;&nbsp;<span style="color:#2b91af;">DefinitionGroup</span>&nbsp;myGroup&nbsp;=&nbsp;myGroups.Create(&nbsp;<span style="color:#a31515;">&quot;MyParameters&quot;</span>&nbsp;);
 
-  // Create an instance definition in definition group MyParameters
-  ExternalDefinitionCreationOptions option
-    = new ExternalDefinitionCreationOptions(
-      "Instance_ProductDate", ParameterType.Text);
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Create&nbsp;an&nbsp;instance&nbsp;definition&nbsp;in&nbsp;definition&nbsp;group&nbsp;MyParameters</span>
+&nbsp;&nbsp;<span style="color:#2b91af;">ExternalDefinitionCreationOptions</span>&nbsp;option
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ExternalDefinitionCreationOptions</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Instance_ProductDate&quot;</span>,&nbsp;<span style="color:#2b91af;">ParameterType</span>.Text&nbsp;);
 
-  // Don't let the user modify the value, only the API
-  option.UserModifiable = false;
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Don&#39;t&nbsp;let&nbsp;the&nbsp;user&nbsp;modify&nbsp;the&nbsp;value,&nbsp;only&nbsp;the&nbsp;API</span>
+&nbsp;&nbsp;option.UserModifiable&nbsp;=&nbsp;<span style="color:blue;">false</span>;
 
-  // Set tooltip
-  option.Description = "Wall product date";
-  Definition myDefinition_ProductDate
-    = myGroup.Definitions.Create(option);
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Set&nbsp;tooltip</span>
+&nbsp;&nbsp;option.Description&nbsp;=&nbsp;<span style="color:#a31515;">&quot;Wall&nbsp;product&nbsp;date&quot;</span>;
+&nbsp;&nbsp;<span style="color:#2b91af;">Definition</span>&nbsp;myDefinition_ProductDate
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;myGroup.Definitions.Create(&nbsp;option&nbsp;);
 
   . . .
 </pre>
