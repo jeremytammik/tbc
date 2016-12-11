@@ -39,6 +39,7 @@ suggesting:
 &nbsp;&nbsp;t.Start();
 &nbsp;&nbsp;ViewSheet1.DeleteViewport(&nbsp;ViewportList1[listBox1.SelectedIndex]&nbsp;);
 &nbsp;&nbsp;<span style="color:#2b91af;">Viewport</span>&nbsp;vvp&nbsp;=&nbsp;<span style="color:#2b91af;">Viewport</span>.Create(&nbsp;doc,&nbsp;ViewSheet1.Id,&nbsp;ViewElementID,&nbsp;storetheposition&nbsp;);
+&nbsp;&nbsp;vvp.ChangeTypeId(&nbsp;storetypetypeID&nbsp;);
 &nbsp;&nbsp;t.Commit();</pre>
 </pre>
 
@@ -69,6 +70,7 @@ I cleaned up your code significantly like this:
 &nbsp;&nbsp;&nbsp;&nbsp;t.Start(&nbsp;<span style="color:#a31515;">&quot;Delete&nbsp;and&nbsp;Recreate&nbsp;Viewport&quot;</span>&nbsp;);
 &nbsp;&nbsp;&nbsp;&nbsp;sheet.DeleteViewport(&nbsp;viewport&nbsp;);
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Viewport</span>&nbsp;vvp&nbsp;=&nbsp;<span style="color:#2b91af;">Viewport</span>.Create(&nbsp;doc,&nbsp;sheet.Id,&nbsp;viewId,&nbsp;boxCenter&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;vvp.ChangeTypeId(&nbsp;typeId&nbsp;);
 &nbsp;&nbsp;&nbsp;&nbsp;t.Commit();
 &nbsp;&nbsp;}
 }
@@ -78,6 +80,7 @@ Notes:
 
 - Separate code from user interface implementation details. Isolate real functionality in separate methods. [Keep it simple](https://en.wikipedia.org/wiki/KISS_principle)!
 - Encapsulate `Transaction` use in a separate `using` statement. Look at the explanations in The Building Coder topic group on [handling transactions and transaction groups](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.53).
+- Simplified variable names for better readability and clarity.
 - Commented out unused variables.
 
 I added this method to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) in the
