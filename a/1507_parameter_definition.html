@@ -23,7 +23,9 @@ of <a href="http://thebuildingcoder.typepad.com/blog/parameters">Revit element p
 but not yet put together a
 comprehensive <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5">topic group</a> for them.</p>
 <p>Today I am happy to present a pretty comprehensive overview and explanation of the process of definig a shared parameter by none less than Scott Conover himself, Senior Revit Engineering Manager:</p>
-<p><strong>Question:</strong> What do I need to do to programmatically create a shared parameter? Why is it so complicated?</p>
+<p><strong>Question:</strong> What do I need to do to programmatically create a shared parameter?
+I would like to set the <code>SetAllowVaryBetweenGroups</code> flag on it. 
+Why is it so complicated?</p>
 <p><strong>Answer:</strong> You create the details needed to define a shared parameter from <code>ExternalDefinition</code>.
 Existing shared parameter file entries can be read to become an <code>ExternalDefinition</code> in your code, or you can create a new entry in the current shared parameter file using the <code>DefinitionGroup.Create</code> method.</p>
 <p>The sample code listed in the Revit API help file <code>RevitAPI.chm</code> or the online Revit API docs
@@ -51,26 +53,28 @@ public bool SetNewParameterToInstanceWall(
   option.Description = "Wall product date";
   Definition myDefinition_ProductDate
     = myGroup.Definitions.Create(option);
+
+  . . .
 </pre>
 
-<p>The return for DefinitionGroup.Create() is an ExternalDefinition even though the type declared is the parent class.</p>
-<p>Once you have an ExternalDefinition, you add it to the document.  There are several ways:</p>
+<p>The return from <code>DefinitionGroup.Create</code> is an <code>ExternalDefinition</code>, even though the type declared is the parent class.</p>
+<p>Once you have an <code>ExternalDefinition</code>, you add it to the document.</p>
+<p>There are several ways:</p>
 <ol>
-<li>Use InstanceBinding as shown in that sample.</li>
-<li>Use FamilyManager.AddParameter() to add the parameter to a family.</li>
-<li>Use FamilyManager.ReplaceParameter() to replace a family parameter with the shared one.</li>
-<li>Use SharedParameterElement.Create() to create the element that represents the parameter without binding it to any categories.</li>
+<li>Use <code>InstanceBinding</code> as shown in that sample.</li>
+<li>Use <code>FamilyManager.AddParameter</code> to add the parameter to a family.</li>
+<li>Use <code>FamilyManager.ReplaceParameter</code> to replace a family parameter with the shared one.</li>
+<li>Use <code>SharedParameterElement.Create</code> to create the element that represents the parameter without binding it to any categories.</li>
 </ol>
-<p>There are also some RebarShape related utilities which I would not recommend for general usage but might be OK for rebar-specific code.</p>
-<p>Once the parameter is in the document, it has an InternalDefinition.   The best ways to get it:</p>
+<p>There are also some <code>RebarShape</code> related utilities which I would not recommend for general usage but might be OK for rebar-specific code.</p>
+<p>Once the parameter is in the document, it has an <code>InternalDefinition</code>.</p>
+<p>The best ways to get it:</p>
 <ol>
-<li>If you have the ParameterElement from #4 you can use ParameterElement.GetDefinition()</li>
-<li>If you have the GUID (which you should, it’s in the ExternalDefinition), you can use SharedParameterElement.Lookup() followed by ParameterElement.GetDefinition()</li>
-<li>If you have an instance of an element whose category has this parameter bound, get the Parameter and use Parameter.Definition</li>
+<li>If you have the <code>ParameterElement</code> from #4 you can use <code>ParameterElement.GetDefinition</code>.</li>
+<li>If you have the GUID (which you should, since it is provided by the <code>ExternalDefinition</code>), you can use <code>SharedParameterElement.Lookup</code> followed by <code>ParameterElement.GetDefinition</code>.</li>
+<li>If you have an instance of an element whose category has this parameter bound, get the <code>Parameter</code> and use <code>Parameter.Definition</code>.</li>
 </ol>
-<p>Once you have the InternalDefinition you can access the vary across groups option as well as other things.
-You can also use an InternalDefintion for adding and removing InstanceBindings to categories.</p>
+<p>Once you have the <code>InternalDefinition</code>, you can access the vary across groups option as well as other things.
+You can also use an <code>InternalDefintion</code> for adding and removing <code>InstanceBindings</code> to categories.</p>
+<p>As to why it may seem complicated or confusing... Sorry, that has historical reasons.</p>
 <p>Many thanks to Scott for this nice comprehensive summary and overview!</p>
-<h4><a name="2"></a></h4>
-<p>I added this method to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> in the
-<a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdViewsShowingElements.cs#L424-L445">module CmdViewsShowingElements.cs line 424-445</a>.</p>
