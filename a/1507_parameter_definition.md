@@ -27,9 +27,10 @@ comprehensive [topic group](http://thebuildingcoder.typepad.com/blog/about-the-a
 
 Today I am happy to present a pretty comprehensive overview and explanation of the process of definig a shared parameter by none less than Scott Conover himself, Senior Revit Engineering Manager:
 
+
 **Question:** What do I need to do to programmatically create a shared parameter?
 I would like to set the `SetAllowVaryBetweenGroups` flag on it. 
-Why is it so complicated?
+
 
 **Answer:** You create the details needed to define a shared parameter from `ExternalDefinition`.
 Existing shared parameter file entries can be read to become an `ExternalDefinition` in your code, or you can create a new entry in the current shared parameter file using the `DefinitionGroup.Create` method.
@@ -88,7 +89,5 @@ The best ways to get it:
  
 Once you have the `InternalDefinition`, you can access the vary across groups option as well as other things.
 You can also use an `InternalDefintion` for adding and removing `InstanceBindings` to categories.
-
-As to why it may seem complicated or confusing... Sorry, that has historical reasons.
 
 Many thanks to Scott for this nice comprehensive summary and overview!
