@@ -52,6 +52,8 @@ I'll share some pictures from the European DevDay conference and snow in Munich 
 - [WPF DoEvents](#3)
 - [Addendum on WPF versus WinForms](#4)
 - [Addendum on Not Using Revit API within WPF `DataContext`](#5)
+- [WPF element id converter](#6)
+
 
 #### <a name="2"></a>DevDay Conference in Munich
 
@@ -182,3 +184,52 @@ on [Revit API DLL preventing WPF window regeneration](http://forums.autodesk.com
 > There may be other solutions out there but this is the solution I have so far.
 
 Many thanks to Hps for sharing this!
+
+
+#### <a name="6"></a>WPF Element Id Converter
+
+In the same thread, Gonçalo Feio shared his WPF element id converter, saying, This works for me:
+
+<pre class="code">
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">ElementIdConverter</span>&nbsp;:&nbsp;IValueConverter
+{
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">object</span>&nbsp;Convert(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">object</span>&nbsp;value,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Type</span>&nbsp;targetType,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">object</span>&nbsp;parameter,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;CultureInfo&nbsp;culture&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;value&nbsp;<span style="color:blue;">is</span>&nbsp;R.ElementId&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;(&nbsp;value&nbsp;<span style="color:blue;">as</span>&nbsp;ElementId&nbsp;).IntegerValue;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;-1;
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">object</span>&nbsp;ConvertBack(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">object</span>&nbsp;value,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Type</span>&nbsp;targetType,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">object</span>&nbsp;parameter,
+&nbsp;&nbsp;&nbsp;&nbsp;CultureInfo&nbsp;culture&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;value&nbsp;<span style="color:blue;">is</span>&nbsp;<span style="color:blue;">string</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;id;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">int</span>.TryParse(&nbsp;value&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:blue;">string</span>,&nbsp;<span style="color:blue;">out</span>&nbsp;id&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">new</span>&nbsp;ElementId(&nbsp;id&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;ElementId.InvalidElementId;
+&nbsp;&nbsp;}
+}
+</pre>
+
+In this case, I expose a ElementId property in the view model.
+
+You can also add validation to give some feedback to the end user.
+
+Many thanks to Gonçalo for sharing this!
+
+#### Hi
