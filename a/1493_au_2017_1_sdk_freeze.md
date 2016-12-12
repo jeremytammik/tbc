@@ -89,7 +89,7 @@ The new version sports quite a large list of exciting API improvements, as you c
 It also includes a new REX SDK sample:
 
 
-#### <a name="3"></a>REX SDK FreezeDrawing Sample
+#### <a name="5"></a>REX SDK FreezeDrawing Sample
 
 One important structural part of the Revit SDK is the [REX SDK](http://thebuildingcoder.typepad.com/blog/2015/12/rex-app-development-and-migration.html).
 
