@@ -48,6 +48,7 @@ I'll share some pictures from the European DevDay conference and snow in Munich 
 <li><a href="#2">DevDay conference in Munich</a></li>
 <li><a href="#3">WPF DoEvents</a></li>
 <li><a href="#4">Addendum on WPF versus WinForms</a></li>
+<li><a href="#5">Addendum on Not Using Revit API within WPF <code>DataContext</code></a></li>
 </ul>
 <h4><a name="2"></a>DevDay Conference in Munich</h4>
 <p>Today we held the one and only European DevDay conference in Munich:</p>
@@ -116,3 +117,13 @@ a <a href="http://forums.autodesk.com/t5/revit-API/wpf-window-loses-control-when
 <p>It was however disappointing that I was forced to do this after I spent a lot of work on my application.</p>
 <p>Converting the application to winforms is no longer an option, so I will stick to this for now.</p>
 </blockquote>
+<h4><a name="5"></a>Addendum on Not Using Revit API within WPF <code>DataContext</code></h4>
+<p>Hps Anave shares another nugget of WPF experience in
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> thread 
+on <a href="http://forums.autodesk.com/t5/revit-api-forum/revit-api-dll-preventing-wpf-window-regeneration/m-p/6742531">Revit API DLL preventing WPF window regeneration</a>:</p>
+<blockquote>
+<p>Well, after a very long time integrating WPF in my own programs, my recommendation is NOT to use any Revit API class inside the view model class where you assign to the WPF window's <code>DataContext</code>.</p>
+<p>If ever you want to pass or get any information coming from an element or a parameter, it is better to extract its element Id's <code>IntegerValue</code>, and, when you are done with the WPF window, just create an <code>ElementId</code> from the integer value you acquired from the WPF window.</p>
+<p>There may be other solutions out there but this is the solution I have so far.</p>
+</blockquote>
+<p>Many thanks to Hps for sharing this!</p>
