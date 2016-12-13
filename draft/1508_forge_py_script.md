@@ -106,8 +106,8 @@ currently with a count of one:
 [py_forge_formats.py](https://github.com/jeremytammik/forge_python_script/blob/master/py_forge_formats.py)
 implements a Python wrapper around two basic Forge web service calls:
 
-- Authenticate an app.
-- Query the file formats currently supported by the translation processes.
+- Authenticate an app &ndash; [forge_authenticate_app](#5)
+- Query the file formats currently supported by the translation processes &ndash; [forge_formats](#6)
 
 Here is the result of running this script at the time of writing:
 
@@ -150,3 +150,10 @@ at [developer.autodesk.com](https://developer.autodesk.com)
 
 These scripts assume that you have stored these creadentials in the environment variables `FORGE_CLIENT_ID` and `FORGE_CLIENT_SECRET`.
 
+####<a name="5"></a>forge_authenticate_app
+
+<script src="https://gist.github.com/jeremytammik/819084fdc8bc52965b7ce8f3d64cc18b.js"></script>
+
+####<a name="6"></a>forge_formats
+
+<script src="https://gist.github.com/jeremytammik/4e8df567c15f8fab1fa40e17962045b9.js"></script>
