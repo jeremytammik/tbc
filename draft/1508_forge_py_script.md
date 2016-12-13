@@ -82,9 +82,9 @@ After that I segment the DAE files so that each IFC storey/space/etc. gets its o
 That way, the clients can download only the storey/space they are interested in.
 Then I convert each storey/space DAE file to JSON, which is smaller and has much less memory requirements due to the browser not needing to parse an XML document (which it has to if loading the DAE file).
 
-**Answer:** Very cool. That sounds like a very useful workflow. Might come in handy in other contexts as well.
+**Answer:** Cool. That sounds like a very useful workflow. Might come in handy in other contexts as well.
 
-People just recently asked how to compress large BIM models for Forge. Your approach might help in that situation as well.
+People just recently asked how to compress large BIM models for Forge. Your approach might help there too.
 
 Other suggestions include:
 
