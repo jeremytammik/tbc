@@ -109,9 +109,11 @@ implements a Python wrapper around two basic Forge web service calls:
 - Authenticate an app &ndash; [forge_authenticate_app](#5)
 - Query the file formats currently supported by the translation processes &ndash; [forge_formats](#6)
 
-Here is the result of running this script at the time of writing:
+The result is prettyfied using the [jprettyprint](#7) helper function.
 
-```
+The [mainline](#8) ties it all together and presents the final result, which looks like this at the time of writing:
+
+<pre class="prettyprint">
 $ ./py_forge_formats.py
 9 Forge output formats:
   dwg: f2d, f3d, rvt
@@ -134,7 +136,7 @@ $ ./py_forge_formats.py
     prt, rcp, rvt, sab, sat, session, skp, sldasm, sldprt, smb, smt,
     ste, step, stl, stla, stlb, stp, stpz, wire, x_b, x_t, xas, xpr,
     zip, asm.NNN, neu.NNN, prt.NNN
-```
+</pre>
 
 This script replaces and improves on the
 previous [forgeauth](https://github.com/jeremytammik/forge_python_script/blob/master/forgeauth)
@@ -157,3 +159,12 @@ These scripts assume that you have stored these creadentials in the environment 
 ####<a name="6"></a>forge_formats
 
 <script src="https://gist.github.com/jeremytammik/4e8df567c15f8fab1fa40e17962045b9.js"></script>
+
+####<a name="7"></a>jprettyprint
+
+<script src="https://gist.github.com/jeremytammik/d3c3b02b5fe2636436cc6acc7173bef2.js"></script>
+
+####<a name="8"></a>Mainline
+
+<script src="https://gist.github.com/jeremytammik/9a9caddec09a44ddceaab677abcc9887.js"></script>
+
