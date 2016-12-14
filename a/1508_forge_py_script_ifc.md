@@ -46,8 +46,8 @@ However, two other interesting topics also cropped up when I finally let go of t
 
 - [The Sellout by Paul Beatty](#2)
 - [IFC Ids and Open Shell](#3)
-- [Forge Python scripts](#4)
-    - [py_forge_formats.py](#5)
+- [Forge formats Python script](#4)
+    - [Setup and usage](#5)
     - [forge_authenticate_app](#6)
     - [forge_formats](#7)
     - [jprettyprint](#8)
@@ -144,26 +144,21 @@ Other suggestions include:
 - Split the BIM RVT into separate files, e.g., by level or discipline, before submitting them for Forge translation. You can use the Forge aggregation functionality to put them back together again at need.
 
 
-####<a name="4"></a>Forge Python Scripts
+####<a name="4"></a>Forge Formats Python Script
 
 I just published the beginning of a
 new [collection of Forge Python scripts](https://github.com/jeremytammik/forge_python_script),
 currently with a count of one:
 
-- [py_forge_formats.py](#4)
-
-
-####<a name="5"></a>py_forge_formats.py
-
 [py_forge_formats.py](https://github.com/jeremytammik/forge_python_script/blob/master/py_forge_formats.py)
 implements a Python wrapper around two basic RESTful Forge web service calls:
 
-- Authenticate an app &ndash; [forge_authenticate_app](#5)
-- Query the file formats currently supported by the translation processes &ndash; [forge_formats](#6)
+- Authenticate an app &ndash; [forge_authenticate_app](#6)
+- Query the file formats currently supported by the translation processes &ndash; [forge_formats](#7)
 
-The result is prettified using the [jprettyprint](#7) helper function.
+The result is prettified using the [jprettyprint](#8) helper function.
 
-The [mainline](#8) ties it all together and presents the final result, which looks like this at the time of writing:
+The [mainline](#9) ties it all together and presents the final result, which looks like this at the time of writing:
 
 <pre class="prettyprint">
 $ ./py_forge_formats.py
@@ -198,11 +193,22 @@ the [`cURL` wrapper scripts to list Forge file formats](http://thebuildingcoder.
 
 For the sake of completeness, those two scripts have been added to this repository as well.
 
+####<a name="5"></a>Setup and Usage
+
+Two aspects need to be prepared: Forge and Python.
+
 Before you can make any use of the Forge web services, you will need to register an app and request the API client id and client secret for it
 at [developer.autodesk.com](https://developer.autodesk.com)
 &gt; [my apps](https://developer.autodesk.com/myapps).
 
 These scripts assume that you have stored these credentials in the environment variables `FORGE_CLIENT_ID` and `FORGE_CLIENT_SECRET`.
+
+Regarding the Python components:
+
+- Install [Python](https://www.python.org).
+- Install the [requests Python library](http://docs.python-requests.org).
+
+Now you should be all set to run as shown above.
 
 ####<a name="6"></a>forge_authenticate_app
 
@@ -219,4 +225,13 @@ These scripts assume that you have stored these credentials in the environment v
 ####<a name="9"></a>Mainline
 
 <script src="https://gist.github.com/jeremytammik/9a9caddec09a44ddceaab677abcc9887.js"></script>
+
+<hr/>
+
+# Cloud and Mobile
+
+### Forge Formats Python Scripts
+
+By [Jeremy Tammik](http://thebuildingcoder.typepad.com/blog/about-the-author.html).
+
 

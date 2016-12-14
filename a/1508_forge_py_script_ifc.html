@@ -43,8 +43,8 @@ the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discuss
 <ul>
 <li><a href="#2">The Sellout by Paul Beatty</a></li>
 <li><a href="#3">IFC Ids and Open Shell</a></li>
-<li><a href="#4">Forge Python scripts</a><ul>
-<li><a href="#5">py_forge_formats.py</a></li>
+<li><a href="#4">Forge formats Python script</a><ul>
+<li><a href="#5">Setup and usage</a></li>
 <li><a href="#6">forge_authenticate_app</a></li>
 <li><a href="#7">forge_formats</a></li>
 <li><a href="#8">jprettyprint</a></li>
@@ -107,22 +107,18 @@ Then I convert each storey/space DAE file to JSON, which is smaller and has much
 <li>Simplify the BIM model before translation. Reduce geometry complexity, remove overly detailed aspects.</li>
 <li>Split the BIM RVT into separate files, e.g., by level or discipline, before submitting them for Forge translation. You can use the Forge aggregation functionality to put them back together again at need.</li>
 </ul>
-<h4><a name="4"></a>Forge Python Scripts</h4>
+<h4><a name="4"></a>Forge Formats Python Script</h4>
 <p>I just published the beginning of a
 new <a href="https://github.com/jeremytammik/forge_python_script">collection of Forge Python scripts</a>,
 currently with a count of one:</p>
-<ul>
-<li><a href="#4">py_forge_formats.py</a></li>
-</ul>
-<h4><a name="5"></a>py_forge_formats.py</h4>
 <p><a href="https://github.com/jeremytammik/forge_python_script/blob/master/py_forge_formats.py">py_forge_formats.py</a>
 implements a Python wrapper around two basic RESTful Forge web service calls:</p>
 <ul>
-<li>Authenticate an app &ndash; <a href="#5">forge_authenticate_app</a></li>
-<li>Query the file formats currently supported by the translation processes &ndash; <a href="#6">forge_formats</a></li>
+<li>Authenticate an app &ndash; <a href="#6">forge_authenticate_app</a></li>
+<li>Query the file formats currently supported by the translation processes &ndash; <a href="#7">forge_formats</a></li>
 </ul>
-<p>The result is prettified using the <a href="#7">jprettyprint</a> helper function.</p>
-<p>The <a href="#8">mainline</a> ties it all together and presents the final result, which looks like this at the time of writing:</p>
+<p>The result is prettified using the <a href="#8">jprettyprint</a> helper function.</p>
+<p>The <a href="#9">mainline</a> ties it all together and presents the final result, which looks like this at the time of writing:</p>
 <pre class="prettyprint">
 $ ./py_forge_formats.py
 9 Forge output formats:
@@ -154,10 +150,18 @@ and <a href="https://github.com/jeremytammik/forge_python_script/blob/master/for
 shell cURL scripts documented in the discussion of
 the <a href="http://thebuildingcoder.typepad.com/blog/2016/10/forge-intro-formats-webinars-and-fusion-360-client-api.html#3"><code>cURL</code> wrapper scripts to list Forge file formats</a>.</p>
 <p>For the sake of completeness, those two scripts have been added to this repository as well.</p>
+<h4><a name="5"></a>Setup and Usage</h4>
+<p>Two aspects need to be prepared: Forge and Python.</p>
 <p>Before you can make any use of the Forge web services, you will need to register an app and request the API client id and client secret for it
 at <a href="https://developer.autodesk.com">developer.autodesk.com</a>
 &gt; <a href="https://developer.autodesk.com/myapps">my apps</a>.</p>
 <p>These scripts assume that you have stored these credentials in the environment variables <code>FORGE_CLIENT_ID</code> and <code>FORGE_CLIENT_SECRET</code>.</p>
+<p>Regarding the Python components:</p>
+<ul>
+<li>Install <a href="https://www.python.org">Python</a>.</li>
+<li>Install the <a href="http://docs.python-requests.org">requests Python library</a>.</li>
+</ul>
+<p>Now you should be all set to run as shown above.</p>
 <h4><a name="6"></a>forge_authenticate_app</h4>
 <script src="https://gist.github.com/jeremytammik/819084fdc8bc52965b7ce8f3d64cc18b.js"></script>
 
@@ -169,3 +173,9 @@ at <a href="https://developer.autodesk.com">developer.autodesk.com</a>
 
 <h4><a name="9"></a>Mainline</h4>
 <script src="https://gist.github.com/jeremytammik/9a9caddec09a44ddceaab677abcc9887.js"></script>
+
+<hr/>
+
+<h1>Cloud and Mobile</h1>
+<h3>Forge Formats Python Scripts</h3>
+<p>By <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html">Jeremy Tammik</a>.</p>
