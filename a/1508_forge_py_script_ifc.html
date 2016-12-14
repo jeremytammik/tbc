@@ -1,0 +1,162 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+- Like Nazis at a Ku Klux Klan rally, they were comfortable ideologically, but not in terms of corporate culture.
+  Paul Beatty, The Sellout
+  Book review of Paul Beatty’s ‘The Sellout’ By Kevin Young, April 9, 2015
+  http://www.nytimes.com/2015/04/12/books/review/paul-beatty-sellout.html
+
+- open source IFC library
+  https://github.com/IfcOpenShell/IfcOpenShell
+  http://ifcopenshell.org/
+  http://academy.ifcopenshell.org/
+  https://github.com/jmirtsch/GeometryGymIFC
+  Jon Mirtschin @jmirtsch  
+
+ #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+
+
+...
+
+-->
+
+<h3>Forge Python Script and IFC Open Shell</h3>
+<p>I went back to answering way too many questions in
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> yesterday.</p>
+<p>However, two other interesting topics also cropped up when I finally let go of that pastime, and I just finished a good book:</p>
+<ul>
+<li><a href="#2">The Sellout by Paul Beatty</a></li>
+<li><a href="#3">IFC Ids and Open Shell</a></li>
+<li><a href="#4">Forge Python scripts</a><ul>
+<li><a href="#5">py_forge_formats.py</a></li>
+<li><a href="#6">forge_authenticate_app</a></li>
+<li><a href="#7">forge_formats</a></li>
+<li><a href="#8">jprettyprint</a></li>
+<li><a href="#9">Mainline</a></li>
+</ul>
+</li>
+</ul>
+<h4><a name="2"></a>The Sellout by Paul Beatty</h4>
+<p>I just finished
+reading <a href="https://en.wikipedia.org/wiki/The_Sellout_(book)">The Sellout</a>
+by <a href="https://en.wikipedia.org/wiki/Paul_Beatty">Paul Beatty</a>.</p>
+<p>I struggled a bit initially before getting used to his style, then really deeply enjoyed this unique American satire on racism.</p>
+<p>It won the <a href="https://en.wikipedia.org/wiki/Man_Booker_Prize">Man Booker Prize</a>, and Beatty is now the first writer from the United States ever to be thus honoured.</p>
+<p>It hits hard to caringly and lovingly reach into and explore some pretty deep and subtly hidden everyday truths.</p>
+<p>It is sometimes also just funny.</p>
+<p>Here is a metaphor I liked describing two men who don't quite fit in: "Like Nazis at a Ku Klux Klan rally, they were comfortable ideologically, but not in terms of corporate culture."</p>
+<p>:-)</p>
+<p><center>
+<img src="img/PaulBeatty.jpg" alt="Paul Beatty" width="220"/>
+</center></p>
+<h4><a name="3"></a>IFC Ids and Open Shell</h4>
+<p><strong>Question:</strong> Where can I ask questions about general IFC related stuff?</p>
+<p>I would like to hack together something to display IFC models in the browser.</p>
+<p>To do that, the server is converting uploaded IFC files first to Collada, then to a JSON format used by <a href="https://threejs.org">three.js</a>.</p>
+<p>This conversion process is problematic if the IFC IDs are not unique, which sometimes they are not.</p>
+<p>I could burp out an error at the user, but I'd rather try to fix it silently if possible.</p>
+<p>I've thought about 'fixing' the IFC file before conversion by simply searching for duplicated IFC IDs and creating new (unique) IDs for those elements.</p>
+<p>Since I'm only doing this conversion for 3D display purposes, do you think that could work, or is it fundamentally flawed?</p>
+<p>I'm basing this on the assumption that all IFC elements seem to be referred to by line number, not ID, so the specific ID doesn't really matter for my purposes, as long as it's unique.</p>
+<p><strong>Answer:</strong> I am not an IFC expert by any means, but here is a recent Autodesk University class
+an [IFC Technical Overview] presented by someone who is &nbsp; :-)</p>
+<p>I was heavily involved a long, long time ago.</p>
+<p>Yes, the IFC id just has to be unique within the context of the IFC file itself, afaik.</p>
+<p>[Q]: Are there any situations where several different IFC files cross reference each other and refer to their respective internal ids?</p>
+<p>I recently summarised all I know about
+the <a href="http://thebuildingcoder.typepad.com/blog/2016/08/consistency-of-ifc-guid-and-uniqueid.html">consistency of IFC GUID and <code>UniqueId</code></a>,
+including links to earlier discussions.</p>
+<p>If the answer to [Q] is no, then you can assign any id you like, of course.</p>
+<p>Even if the answer is yes, but no such cross-referencing occurs in your situation, you should still be able to go ahead.</p>
+<p>Also, if you are getting all your elements from Revit BIM, you can use the Revit element <code>UniqueId</code> just as it is. It is guaranteed to be unique, and thus enables cross referencing between different files and models... unless the files contain copies of element that occur elsewhere as well, e.g., you copied the BIM and the elements contained within it, of course. That obviously leads to duplication.</p>
+<p>Regarding the three.js viewer:</p>
+<ul>
+<li>Are you aware of the <a href="https://va3c.github.io">VA3C</a> three.js AEC viewer project?</li>
+<li>Are you aware of <a href="https://forge.autodesk.com">Forge</a> and its <a href="https://developer.autodesk.com">developer resources</a>?</li>
+<li>Are you aware of the <a href="https://sourceforge.net/projects/ifcexporter">Revit IFC importer/exporter open source project</a>?</li>
+</ul>
+<p>You might want to discuss your question with the Revit IFC open source community.</p>
+<p>You might also want to
+contact <a href="https://github.com/jmirtsch">Jon @jmirtsch Mirtschin</a>, author of
+the <a href="https://github.com/jmirtsch/GeometryGymIFC">GeomGym IFC library</a>.</p>
+<p>The <a href="http://ifcopenshell.org">IfcOpenShell project</a> (<a href="https://github.com/IfcOpenShell/IfcOpenShell">GitHub</a>) also looks very promising.</p>
+<p><strong>Response:</strong> I actually currently use IfcOpenShell to convert from IFC to DAE via <code>IfcConvert</code>.</p>
+<p>After that I segment the DAE files so that each IFC storey/space/etc. gets its own file based on information in the IFC model, parsed using <a href="http://www.xbim.net">Xbim</a>.</p>
+<p>That way, the clients can download only the storey/space they are interested in.
+Then I convert each storey/space DAE file to JSON, which is smaller and has much less memory requirements due to the browser not needing to parse an XML document (which it has to if loading the DAE file).</p>
+<p><strong>Answer:</strong> Cool. That sounds like a very useful workflow. Might come in handy in other contexts as well.</p>
+<p>People just recently asked how to compress large BIM models for Forge. Your approach might help there too.</p>
+<p>Other suggestions include:</p>
+<ul>
+<li>Simplify the BIM model before translation. Reduce geometry complexity, remove overly detailed aspects.</li>
+<li>Split the BIM RVT into separate files, e.g., by level or discipline, before submitting them for Forge translation. You can use the Forge aggregation functionality to put them back together again at need.</li>
+</ul>
+<h4><a name="4"></a>Forge Python Scripts</h4>
+<p>I just published the beginning of a
+new <a href="https://github.com/jeremytammik/forge_python_script">collection of Forge Python scripts</a>,
+currently with a count of one:</p>
+<ul>
+<li><a href="#4">py_forge_formats.py</a></li>
+</ul>
+<h4><a name="5"></a>py_forge_formats.py</h4>
+<p><a href="https://github.com/jeremytammik/forge_python_script/blob/master/py_forge_formats.py">py_forge_formats.py</a>
+implements a Python wrapper around two basic Forge web service calls:</p>
+<ul>
+<li>Authenticate an app &ndash; <a href="#5">forge_authenticate_app</a></li>
+<li>Query the file formats currently supported by the translation processes &ndash; <a href="#6">forge_formats</a></li>
+</ul>
+<p>The result is prettified using the <a href="#7">jprettyprint</a> helper function.</p>
+<p>The <a href="#8">mainline</a> ties it all together and presents the final result, which looks like this at the time of writing:</p>
+<pre class="prettyprint">
+$ ./py_forge_formats.py
+9 Forge output formats:
+  dwg: f2d, f3d, rvt
+  fbx: f3d
+  ifc: rvt
+  iges: f3d, fbx, iam, ipt, wire
+  obj: asm, f3d, fbx, iam, ipt, neu, prt, sldasm, sldprt, step, stp, stpz,
+    wire, x_b, x_t, asm.NNN, neu.NNN, prt.NNN
+  step: f3d, fbx, iam, ipt, wire
+  stl: f3d, fbx, iam, ipt, wire
+  svf: 3dm, 3ds, asm, catpart, catproduct, cgr, collaboration, dae, dgn,
+    dlv3, dwf, dwfx, dwg, dwt, dxf, exp, f3d, fbx, g, gbxml, iam, idw,
+    ifc, ige, iges, igs, ipt, jt, max, model, neu, nwc, nwd, obj, pdf,
+    prt, rcp, rvt, sab, sat, session, skp, sldasm, sldprt, smb, smt,
+    ste, step, stl, stla, stlb, stp, stpz, wire, x_b, x_t, xas, xpr,
+    zip, asm.NNN, neu.NNN, prt.NNN
+  thumbnail: 3dm, 3ds, asm, catpart, catproduct, cgr, collaboration, dae, dgn,
+    dlv3, dwf, dwfx, dwg, dwt, dxf, exp, f3d, fbx, g, gbxml, iam, idw,
+    ifc, ige, iges, igs, ipt, jt, max, model, neu, nwc, nwd, obj, pdf,
+    prt, rcp, rvt, sab, sat, session, skp, sldasm, sldprt, smb, smt,
+    ste, step, stl, stla, stlb, stp, stpz, wire, x_b, x_t, xas, xpr,
+    zip, asm.NNN, neu.NNN, prt.NNN
+</pre>
+
+<p>This script replaces and improves on the
+previous <a href="https://github.com/jeremytammik/forge_python_script/blob/master/forgeauth">forgeauth</a>
+and <a href="https://github.com/jeremytammik/forge_python_script/blob/master/forgeformats">forgeformats</a> Unix
+shell cURL scripts documented in the discussion of
+the <a href="http://thebuildingcoder.typepad.com/blog/2016/10/forge-intro-formats-webinars-and-fusion-360-client-api.html#3"><code>cURL</code> wrapper scripts to list Forge file formats</a>.</p>
+<p>For the sake of completeness, those two scripts have been added to this repository as well.</p>
+<p>Before you can make any use of the Forge web services, you will need to register an app and request the API client id and client secret for it
+at <a href="https://developer.autodesk.com">developer.autodesk.com</a>
+&gt; <a href="https://developer.autodesk.com/myapps">my apps</a>.</p>
+<p>These scripts assume that you have stored these credentials in the environment variables <code>FORGE_CLIENT_ID</code> and <code>FORGE_CLIENT_SECRET</code>.</p>
+<h4><a name="6"></a>forge_authenticate_app</h4>
+<script src="https://gist.github.com/jeremytammik/819084fdc8bc52965b7ce8f3d64cc18b.js"></script>
+
+<h4><a name="7"></a>forge_formats</h4>
+<script src="https://gist.github.com/jeremytammik/4e8df567c15f8fab1fa40e17962045b9.js"></script>
+
+<h4><a name="8"></a>jprettyprint</h4>
+<script src="https://gist.github.com/jeremytammik/d3c3b02b5fe2636436cc6acc7173bef2.js"></script>
+
+<h4><a name="9"></a>Mainline</h4>
+<script src="https://gist.github.com/jeremytammik/9a9caddec09a44ddceaab677abcc9887.js"></script>
