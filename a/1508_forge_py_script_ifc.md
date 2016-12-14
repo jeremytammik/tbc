@@ -148,7 +148,7 @@ currently with a count of one:
 ####<a name="5"></a>py_forge_formats.py
 
 [py_forge_formats.py](https://github.com/jeremytammik/forge_python_script/blob/master/py_forge_formats.py)
-implements a Python wrapper around two basic Forge web service calls:
+implements a Python wrapper around two basic RESTful Forge web service calls:
 
 - Authenticate an app &ndash; [forge_authenticate_app](#5)
 - Query the file formats currently supported by the translation processes &ndash; [forge_formats](#6)
