@@ -128,7 +128,7 @@ Notes:
 - Commented out unused variables.
 
 I added this method to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) in the
-[module CmdViewsShowingElements.cs line 424-445](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdViewsShowingElements.cs#L424-L445).
+[module CmdViewsShowingElements.cs line 424-449](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdViewsShowingElements.cs#L424-L449).
 
 Very many thanks to Joshua for sharing this and putting in all the work to document it, edit the draft markdown file and create
 a [pull request](https://github.com/jeremytammik/tbc/pull/1) for it in
