@@ -45,10 +45,38 @@ suggesting:
 
 As you can see, it is simply taking out a viewport and putting it back in the same place, because Revit paints viewports in the order they were created, so the most recently created viewport will come to the front.
 
+This is the first view which has been placed on a sheet:
+
+<center>
+<img src="img/viewport_bring_front_1_initial_view.jpg" alt="The intial view" width="368"/>
+</center>
+
+Now we need to pretty it up with patterns, e.g., the ceiling grid and cable ladder fill taken from a 'medium' level detail view:
+
+<center>
+<img src="img/viewport_bring_front_2_second_third_view.jpg" alt="Placing a second and third view for ceiling grid and cable ladder background" width="369"/>
+</center>
+
+As you can see, these new views have been placed over the main view and now block it.
+
+The code automates removing a viewport and making an identical one in the same place with a new element ID. 
+
+You can see here the supplementry ceiling grid and ladder background (filtered to appear light red) adds value, but does not interfere with main view because it is now 'behind':
+
+<center>
+<img src="img/viewport_bring_front_3_reordering.jpg" alt="Reordering the viewports and done" width="375"/>
+</center>
+
+Btw I changed the furniture to halftone manually; this is not an effect of the layering.
+
+Obviously the perfect draftsman would be placing views in the correct sequence to begin with, but because the stylistic 'touch ups' are the last stages of making a drawing and you can never know in advance what you are going to need.
+
+In my opinion making a drawing nice to look at is just as important as the content itself.
+
 
 ####<a name="2"></a>Code Clean-Up
 
-I cleaned up your code significantly like this:
+I cleaned up the initial code suggestion like this:
 
 <pre class="code">
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
@@ -86,25 +114,7 @@ Notes:
 I added this method to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) in the
 [module CmdViewsShowingElements.cs line 424-445](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdViewsShowingElements.cs#L424-L445).
 
-
-![](viewport_bring_front_1_initial_view.jpg)
-
-This is the first view which has been placed on a sheet, but now we need to pretty it up with patterns (ceiling grid and cable ladder fill taken from a 'medium' level detail view). 
-
-
-![](viewport_bring_front_2_second_third_view.jpg)
-
-As you can see these new views which have been placed over the main view now blocks it.
-
-![](viewport_bring_front_3_reordering.jpg)
-
-The code automates removing a viewport and making an identical one in the same place with a new element ID. 
-
-So you can see here the supplementry ceiling grid and ladder background (filtered to appear light red) adds value, but does not interfere with main view because it is now 'behind'. btw i changed the furntire to halftone manually, this is not an effect of the layering.
-
-Obviously the perfect draftsman would be placing views in the correct sequence to begin with, but because the stylistic 'touch ups' are the last stages of making a drawing and you can never know in advanced what your going to need.
-
-In my opinion making a drawing nice to look at is just as important as the content itself.
-
-
+Very many thanks to Joshua for sharing this and putting in all the work to document it, edit the draft markdown file and create
+a [pull request](https://github.com/jeremytammik/tbc/pull/1) for it in
+the [tbc GitHub repo](https://github.com/jeremytammik/tbc)!
 
