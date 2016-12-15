@@ -87,18 +87,26 @@ I added this method to [The Building Coder samples](https://github.com/jeremytam
 [module CmdViewsShowingElements.cs line 424-445](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdViewsShowingElements.cs#L424-L445).
 
 
-![](step 1 the intial view.jpg)
+![](viewport_bring_front_1_initial_view.jpg)
+
 This is the first view which has been placed on a sheet, but now we need to pretty it up with patterns (ceiling grid and cable ladder fill taken from a 'medium' level detail view). 
 
 
-![](step2 placing a second and third view for ceiling grid and cable ladder background.jpg)
+![](viewport_bring_front_2_second_third_view.jpg)
+
 As you can see these new views which have been placed over the main view now blocks it.
 
-![](step3 reordering the viewports.jpg)
+![](viewport_bring_front_3_reordering.jpg)
+
 The code automates removing a viewport and making an identical one in the same place with a new element ID. 
+
 So you can see here the supplementry ceiling grid and ladder background (filtered to appear light red) adds value, but does not interfere with main view because it is now 'behind'. btw i changed the furntire to halftone manually, this is not an effect of the layering.
 
-Obviously the perfect draftsman would be placing views in the correct sequence to begin with, but because the stylistic 'touch ups' are the last stages of making a drawing and you can never know in advanced what your going to need. In my opinion making a drawing nice to look at is just as important as the content itself.
+![](viewport_bring_front_4_finished.jpg)
+
+Obviously the perfect draftsman would be placing views in the correct sequence to begin with, but because the stylistic 'touch ups' are the last stages of making a drawing and you can never know in advanced what your going to need.
+
+In my opinion making a drawing nice to look at is just as important as the content itself.
 
 
 
