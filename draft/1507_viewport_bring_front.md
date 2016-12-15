@@ -87,7 +87,7 @@ I added this method to [The Building Coder samples](https://github.com/jeremytam
 [module CmdViewsShowingElements.cs line 424-445](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdViewsShowingElements.cs#L424-L445).
 
 
-![step 1 the intial view.jpg]({/draft/step 1 the intial view.jpg)
+![step 1 the intial view.jpg]({draft/step 1 the intial view.jpg)
 
 
 ![step2 placing a second and third view for ceiling grid and cable ladder background.jpg]({{site.baseurl}}/draft/step2 placing a second and third view for ceiling grid and cable ladder background.jpg)
