@@ -9,6 +9,10 @@
 
 <!---
 
+[Forge](https://forge.autodesk.com) [Forge](http://autode.sk/2gRqSU1)
+[developer.autodesk.com](https://developer.autodesk.com) [developer.autodesk.com](http://autode.sk/2gRmOmI)
+[my apps](https://developer.autodesk.com/myapps) [my apps](http://autode.sk/2gRrf0Q)
+
 - Like Nazis at a Ku Klux Klan rally, they were comfortable ideologically, but not in terms of corporate culture.
   Paul Beatty, The Sellout
   Book review of Paul Beatty’s ‘The Sellout’ By Kevin Young, April 9, 2015
@@ -116,7 +120,7 @@ Also, if you are getting all your elements from Revit BIM, you can use the Revit
 Regarding the three.js viewer:
 
 - Are you aware of the [VA3C](https://va3c.github.io) three.js AEC viewer project?
-- Are you aware of [Forge](https://forge.autodesk.com) and its [developer resources](https://developer.autodesk.com)?
+- Are you aware of [Forge](http://autode.sk/2gRqSU1) and its [developer resources](http://autode.sk/2gRmOmI)?
 - Are you aware of the [Revit IFC importer/exporter open source project](https://sourceforge.net/projects/ifcexporter)?
 
 You might want to discuss your question with the Revit IFC open source community.
@@ -198,7 +202,7 @@ For the sake of completeness, those two scripts have been added to this reposito
 Two aspects need to be prepared: Forge and Python.
 
 Before you can make any use of the Forge web services, you will need to register an app and request the API client id and client secret for it
-at [developer.autodesk.com](https://developer.autodesk.com)
+at [developer.autodesk.com](http://autode.sk/2gRmOmI)
 &gt; [my apps](https://developer.autodesk.com/myapps).
 
 These scripts assume that you have stored these credentials in the environment variables `FORGE_CLIENT_ID` and `FORGE_CLIENT_SECRET`.
