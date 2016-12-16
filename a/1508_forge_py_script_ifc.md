@@ -203,7 +203,7 @@ Two aspects need to be prepared: Forge and Python.
 
 Before you can make any use of the Forge web services, you will need to register an app and request the API client id and client secret for it
 at [developer.autodesk.com](http://autode.sk/2gRmOmI)
-&gt; [my apps](https://developer.autodesk.com/myapps).
+&gt; [my apps](http://autode.sk/2gRrf0Q).
 
 These scripts assume that you have stored these credentials in the environment variables `FORGE_CLIENT_ID` and `FORGE_CLIENT_SECRET`.
 
