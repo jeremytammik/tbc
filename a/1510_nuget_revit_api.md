@@ -17,7 +17,8 @@ For me, this is a time of retreat, calm, reflection, and renewal of energy.
 Today brings a nice gift from Andrey Bushman
 &ndash; NuGet Revit API package
 &ndash; RevitLookup using the NuGet Revit API package
-&ndash; Creating a NuGet package from assembly DLLs...
+&ndash; Creating a NuGet package from assembly DLLs
+&ndash; More NuGet packages...
 
 -->
 
@@ -41,7 +42,7 @@ Today brings a nice gift from Andrey Bushman:
 - [NuGet Revit API package](#2)
 - [RevitLookup using the NuGet Revit API package](#3)
 - [Creating a NuGet package from assembly DLLs](#4)
-
+- [More NuGet packages](#5)
 
 
 ####<a name="2"></a>NuGet Revit API Package
@@ -106,6 +107,12 @@ e.g., *[Pro NuGet &ndash; your salvation from dependency hell](http://www.allite
 and the *[NuGet 2 essentials](http://www.allitebooks.com/nuget-2-essentials/)*;
 I read the former myself.
 
+
+####<a name="5"></a>More NuGet Packages
+
+Here is a link to [all of Andrey's NuGet packages for Revit](https://www.nuget.org/packages?q=owner%3A%22Bush%22+tags%3A%22revit%22).
+
+NuGet packages for Revit 2015 and 2016 are being added soon.
 
 Very many thanks to Andrey for creating, sharing and documenting this useful approach!
 
