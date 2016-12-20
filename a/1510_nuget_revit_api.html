@@ -1,0 +1,88 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+NuGet Revit API Package #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge @AndreyBushman
+
+Most of the work of the year has been done, and it is time to settle down and clear out for the new.
+Tomorrow is the winter solstice, followed by Christmas and Yuletide, ending with the Twelfth Night.
+For me, this is a time of retreat, calm, reflection, and renewal of energy.
+Today brings a nice gift from Andrey Bushman
+&ndash; NuGet Revit API package
+&ndash; RevitLookup using the NuGet Revit API package
+&ndash; Creating a NuGet package from assembly DLLs...
+
+-->
+
+<h3>NuGet Revit API Package</h3>
+<p>Most of the work of the year has been done, and it is time to settle down and clear out for the new.</p>
+<p>Tomorrow is the <a href="https://en.wikipedia.org/wiki/Winter_solstice">winter solstice</a>,
+followed by Christmas and
+<a href="https://en.wikipedia.org/wiki/Yule">Yuletide</a>, ending with
+the <a href="https://en.wikipedia.org/wiki/Twelfth_Night_(holiday)">Twelfth Night</a>.</p>
+<p>For me, this is a time of retreat, calm, reflection, and renewal of energy.</p>
+<p><center>
+<img src="img/220px-StonehengeSunrise1980s.jpg" alt="Sunrise at Stonehenge on the Winter Solstice" width="220"/>
+</center></p>
+<p>Today brings a nice gift from Andrey Bushman:</p>
+<ul>
+<li><a href="#2">NuGet Revit API package</a></li>
+<li><a href="#3">RevitLookup using the NuGet Revit API package</a></li>
+<li><a href="#4">Creating a NuGet package from assembly DLLs</a></li>
+</ul>
+<h4><a name="2"></a>NuGet Revit API Package</h4>
+<p><a href="http://bushman-andrey.blogspot.ru">Andrey Bushman</a> (<a href="https://twitter.com/AndreyBushman">twitter</a>) made
+numerous contributions to the AutoCAD developer community, provided and documented in 
+his <a href="https://sites.google.com/site/bushmansnetlaboratory">AutoCAD.NET laboratory</a>.</p>
+<p>Now he has provided something new for Revit as well,
+in <a href="https://github.com/jeremytammik/RevitLookup/pull/18">pull request #18 for RevitLookup</a>,
+saying:</p>
+<blockquote>
+<p>I replaced the explicit Revit API assembly references by the <a href="https://www.nuget.org/packages/Revit-2017x64.Base">Revit 2017 x64 .NET API NuGet package</a>.</p>
+<p>I did it because some users (who aren't programmers) had problems with Revit references when compiling this project code.</p>
+<p>Therefore, I wrote a <a href="https://youtu.be/N0itQZDUEeA">four-and-a-half-minute video</a> for them explaining the steps to replace the explicit Revit API assembly references by the NuGet package:</p>
+</blockquote>
+<p><center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/N0itQZDUEeA?rel=0" frameborder="0" allowfullscreen></iframe>
+</center></p>
+<p>Here is a link to the <a href="https://youtu.be/ajgSGp6gp5E">original Russian version of the video</a>.</p>
+<blockquote>
+<p>I created it for those who aren't familiar with Visual Studio and the handling of the Revit API assembly references.</p>
+<p>If you plan to apply my correction, then this video will stop being useful.</p>
+</blockquote>
+<p>I have in fact applied the correction, and hope that the video remains useful anyway, at least in parts &nbsp; :-)</p>
+<h4><a name="3"></a>RevitLookup using the NuGet Revit API Package</h4>
+<p>I followed Andrey's advice and merged
+his <a href="https://github.com/jeremytammik/RevitLookup/pull/18">pull request #18</a> into
+the <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup GitHub repo</a> master branch to
+create <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2017.0.0.7">release 2017.0.0.7</a>,
+which automatically updates its Revit API assemblies from NuGet.</p>
+<h4><a name="4"></a>Creating a NuGet Package from Assembly DLLs</h4>
+<p>What happens when I need to update to a new release of the Revit API, or if I wish to support an older version?</p>
+<p>I asked Andrey:</p>
+<p>How easy is it to create an updated NuGet package each time the assemblies change?</p>
+<blockquote>
+<p>It is very simple and convenient.
+To create new NuGet package takes only a couple of minutes.
+Updating NuGet package through Visual Studio takes ten seconds.
+I can create a video if you want.
+NuGet is a very useful and popular tool.
+It completely fixes the problems with the lost references.
+The project can be copied on any computer and is right there sent to compilation without the need for editing references.
+NuGet also allows to monitor the updates for these assemblies and to quickly apply them if the programmer wants. </p>
+</blockquote>
+<p>Do you have a step-by-step documentation for that also, by any chance?</p>
+<blockquote>
+<p>You can download and read free books about NuGet,
+e.g., <em><a href="http://www.allitebooks.com/pro-nuget-2nd-edition/">Pro NuGet &ndash; your salvation from dependency hell</a></em>
+and the <em><a href="http://www.allitebooks.com/nuget-2-essentials/">NuGet 2 essentials</a></em>;
+I read the former myself.</p>
+</blockquote>
+<p>Very many thanks to Andrey for creating, sharing and documenting this useful approach!</p>
+<p>I wish everybody a wonderful Christmas time and a peaceful and happy end of the year!</p>
