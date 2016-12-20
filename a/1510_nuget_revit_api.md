@@ -46,8 +46,8 @@ Today brings a nice gift from Andrey Bushman:
 
 ####<a name="2"></a>NuGet Revit API Package
 
-[Andrey Bushman](http://bushman-andrey.blogspot.ru) ([twitter](https://twitter.com/AndreyBushman)) made
-numerous contributions to the AutoCAD developer community, provided and documented in 
+[Andrey Bushman](http://bushman-andrey.blogspot.ru) ([twitter](https://twitter.com/AndreyBushman)),
+aka Андрей Бушман, made numerous contributions to the AutoCAD developer community, provided and documented in 
 his [AutoCAD.NET laboratory](https://sites.google.com/site/bushmansnetlaboratory).
 
 Now he has provided something new for Revit as well,
