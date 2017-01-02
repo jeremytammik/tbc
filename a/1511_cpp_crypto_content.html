@@ -1,0 +1,116 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+http://forums.autodesk.com/t5/revit-api-forum/remaking-cad-objects-necessary/m-p/6752234
+
+ #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+
+Happy New Year to one and all! I had a great break over Christmas and New Year and hope you did as well. I continued checking into the Revit API discussion forum throughout and had several interesting discussions with the busy souls hanging out there
+&ndash; C++, audio, crypto and security
+&ndash; Prayer of the Mothers
+&ndash; Avoid remaking CAD content...
+
+-->
+
+<h3>Happy New Year, C++, Crypto and Content</h3>
+<p>Happy New Year to one and all!</p>
+<p><center>
+<p id="dis" style="font-size: 150%; font-weight: bold; font-family: monospace; color:orange">Happy New Year!</p>
+</center></p>
+<!-- The JavaScript Source http://www.javascriptsource.com Ben Joffe http://www.joffe.tk/ -->
+
+<script>
+
+var text="Happy New Year!";
+
+var symtype=new Array(" ","A","a","B","b","C","c","D","d","E","e","F","f","G","g","H","h","I","i","J","j","K","k","L","l","M","m","N","n","O","o","P","p","Q","q","R","r","S","s","T","t","U","u","V","v","W","w","X","x","Y","y","Z","z","0","1","2","3","4","5","6","7","8","9",".",",","&","!","?","-","_");
+
+var symarray=new Array();
+
+for (var i=0; i<text.length; i++){
+  symarray[i]=" ";
+}
+function scroll(){
+  for (var i=0; i<text.length; i++){
+    if (symarray[i]!=text.substring(i,i+1)) {
+      for (var x=0; x<70; x++) if (symarray[i]==symtype[x]) {symarray[i]=symtype[x+1]; break}
+    }
+  }
+  var outsym="";
+  for (var i=0; i<text.length; i++) outsym+=symarray[i];
+  dis.innerHTML=outsym;
+  setTimeout('scroll()',100);
+}
+scroll();
+
+</script>
+
+<p>I had a great break over Christmas and New Year and hope you did as well.</p>
+<p>I did continue checking into
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> anyway
+throughout and had several interesting discussions with the busy souls hanging out there.</p>
+<p>Some topics to get started with the year:</p>
+<ul>
+<li><a href="#2">C++, audio, crypto and security</a></li>
+<li><a href="#3">Prayer of the Mothers</a></li>
+<li><a href="#4">Avoid remaking CAD content</a></li>
+</ul>
+<h4><a name="2"></a>C++, Audio, Crypto and Security</h4>
+<p>I obviously chatted with my kids, some of them rather dispersed.</p>
+<p><a href="https://twitter.com/chtammik">Chris</a> is embarking on new programming adventures in C++ land.</p>
+<p>He pointed out a couple of cool projects he is delving into, e.g.,
+the <a href="http://www.openal.org">OpenAL</a> cross-platform 3D audio API and 
+the <a href="http://puredata.info">PureData</a> open source visual programming language that can run on anything from personal computers and Raspberry Pis to smartphones, enables you to create software graphically without writing any code, and can generate output in multiple formats, including C++ suitable for OpenAL and C# suitable for Unity programming.</p>
+<p>Cool stuff.</p>
+<p>He also pointed out the
+funny <a href="https://www.youtube.com/watch?v=6eX9gPithBo">presentation of a favourite C++ feature</a> by James McNellis
+and a fundamental <a href="https://www.youtube.com/watch?v=3rmCGsCYJF8">Crypto 101</a> by
+Laurens Van Houtven at PyCon.</p>
+<p>A friend of my daughter, Appenzeller, implemented
+an <a href="https://appenzeller.servebeer.com/pwco">online C++ password strength evaluator</a> complete with a visualisation of the decomposition graph
+and <a href="https://appenzeller.servebeer.com">full documentation and source code</a>.</p>
+<p><center>
+<img src="img/password_complexity_graph.png" alt="Password complexity graph" width="542"/>
+</center></p>
+<h4><a name="3"></a>Prayer of the Mothers</h4>
+<p>On a less technical note, other friends shared the very moving 
+song <a href="https://www.youtube.com/watch?v=YyFM-pWdqrY">Prayer of the Mothers</a> by
+Yael Deckelbaum featuring singers from all sectors and religions of Israeli society:</p>
+<p><center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/YyFM-pWdqrY?rel=0" frameborder="0" allowfullscreen></iframe>
+</center></p>
+<p>It was born as a result of the movement 'Women Wage Peace', which arose during an escalation of violence between Israel and Palestine, prompting Jewish and Arab women to begin with the joint 'March of Hope' project.</p>
+<h4><a name="3"></a>Avoid Remaking CAD Content</h4>
+<p>Let's close with a Revit API related discussion on how to avoid
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/remaking-cad-objects-necessary/m-p/6752234">remaking of CAD objects</a>:</p>
+<p><strong>Question:</strong> We are an office furniture manufacturer that purchased the Revit software in order to offer our customers our products in the .rfa format.  We have hundreds of products in CAD and various other 3D formats.  We've been told we would need to remake every one of our products in Revit from scratch.  However, I've been able to import our CAD files and work with them in the software but I was told that because they weren't made natively in Revit that they're essentially useless.  Is this true and if so, what sort of training would be required to move forward?  Can't we just add the dimension information to our previously made items within Revit?  We've been quoted thousands just to make a portion of our library into Revit families and we've already spent thousands leasing the software thus far with no success.</p>
+<p><strong>Answer:</strong> Sorry to hear that this issue is troubling you.</p>
+<p>I always recommend generating all such libraries completely parametrically from scratch.</p>
+<p>That would have meant, way back then before you created any CAD content at all, defining a programmatic way to generate that CAD content from a database of parametric definitions and lists of dimensions of all your library parts.</p>
+<p>I have been recommending that approach (mostly in vain) for about four decades now.</p>
+<p>The people who listened to it back then are very happy now that they did.</p>
+<p>They are all too few.</p>
+<p>Most people go and implement CAD content by hand, over and over again, every time the system changes.</p>
+<p>Well, so be it then.</p>
+<p>If the content is generated programmatically from a database of rules and dimensions, you can simply implement a new content generator for each system that you wish to populate. The database content driving it remains unchanged.</p>
+<p>Back to your issue at hand:</p>
+<p>If you have tested using families based on the imported CAD geometry in Revit without problems, then that is obviously a feasible option.</p>
+<p>However, you really need to ensure and verify that this works reliably under all circumstances.</p>
+<p>For instance, if you are a chair manufacturer, try using your CAD-import-based family in a hospital or airport with thousands or tens of thousands of instances.</p>
+<p>That may cause problems.</p>
+<p>Furthermore, it might not be easy to equip the CAD-import-based parts with all the dimensions that drive their different sizes, aka family types aka symbols.</p>
+<p>Here is a recommendation
+to <a href="http://thebuildingcoder.typepad.com/blog/2016/09/avoid-cad-import-in-rfa-aag16-and-endtrip.html#2">think twice before importing CAD into RFA</a>.</p>
+<p>Good luck finding an efficient and viable solution for your task!</p>
+<p><strong>Response:</strong> Thank you so much for your reply,</p>
+<p>Your post along with the provided links will help me rationalise to the company why we need to create the content natively.</p>
+<p>I'm essentially a one-man band over here and re-making all of the thousands of items from scratch, especially when coding
+is not my forte, is not a feasible option.  </p>
+<p>I greatly appreciate your reply!</p>

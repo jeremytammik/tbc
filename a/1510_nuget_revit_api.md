@@ -9,6 +9,15 @@
 
 <!---
 
+- https://twitter.com/AndreyBushman
+  Andrey Bushman
+  @AndreyBushman
+  https://github.com/Andrey-Bushman
+  https://bitbucket.org/Andrey-Bushman/
+  https://www.facebook.com/andrey.bushman
+  https://www.nuget.org/packages/Revit-2017x64.Base/ -- evit 2017 x64 .NET API 2.0.0
+  Revit 2017 x64 .NET API
+
 NuGet Revit API Package #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge @AndreyBushman
 
 Most of the work of the year has been done, and it is time to settle down and clear out for the new.
