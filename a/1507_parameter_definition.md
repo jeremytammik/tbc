@@ -94,3 +94,65 @@ Once you have the `InternalDefinition`, you can access the vary across groups op
 You can also use an `InternalDefintion` for adding and removing `InstanceBindings` to categories.
 
 Many thanks to Scott for this nice comprehensive summary and overview!
+
+
+####<a name="2"></a>Addemdum
+
+Joshua Lumley pointed out some possible enhancements
+in [his two](http://thebuildingcoder.typepad.com/blog/2016/12/parameter-definition-overview.html#comment-3079825547)
+[comments](http://thebuildingcoder.typepad.com/blog/2016/12/parameter-definition-overview.html#comment-3079829813) below:
+
+To run the code more than twice I added:
+
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">bool</span>&nbsp;dgMatchFound&nbsp;=&nbsp;<span style="color:blue;">false</span>;
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">DefinitionGroup</span>&nbsp;dg&nbsp;<span style="color:blue;">in</span>&nbsp;myGroups&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;dg.Name&nbsp;==&nbsp;myGroupName&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dgMatchFound&nbsp;=&nbsp;<span style="color:blue;">true</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myGroup&nbsp;=&nbsp;dg;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;dgMatchFound&nbsp;==&nbsp;<span style="color:blue;">false</span>&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;myGroup&nbsp;=&nbsp;myGroups.Create(&nbsp;myGroupName&nbsp;);
+&nbsp;&nbsp;}
+</pre>
+
+and
+
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">bool</span>&nbsp;dMatchFound&nbsp;=&nbsp;<span style="color:blue;">false</span>;
+ 
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Definition</span>&nbsp;d&nbsp;<span style="color:blue;">in</span>&nbsp;myGroup.Definitions&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;d.Name&nbsp;==&nbsp;newParameterName&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dMatchFound&nbsp;=&nbsp;<span style="color:blue;">true</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myDefinition_ProductDate&nbsp;=&nbsp;d;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;!dMatchFound&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;myDefinition_ProductDate
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;myGroup.Definitions.Create(&nbsp;option&nbsp;);
+&nbsp;&nbsp;}
+</pre>
+
+I called it like this:
+
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">DefinitionFile</span>&nbsp;defFile&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;GetOrCreateSharedParamsFile(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ActiveUIDocument.Application.Application&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:blue;">bool</span>&nbsp;AddParameterResult&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;SetNewParameterToInstanceWall(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ActiveUIDocument.Application,&nbsp;defFile&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;Did&nbsp;it&nbsp;work&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;AddParameterResult.ToString()&nbsp;);
+</pre>
+
+Many thanks to Josh for the helpful usage hints!

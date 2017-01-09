@@ -1,0 +1,320 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+https://forums.autodesk.com/t5/revit-api-forum/listing-all-views-in-a-project-on-a-winform-throwing-an/m-p/6786228
+
+http://forums.autodesk.com/t5/revit-api-forum/revit-command-line-switches/m-p/6782154
+
+http://forums.autodesk.com/t5/revit-api-forum/distance-between-two-points-xyz-along-a-given-vector/m-p/6747568
+  point distance along a vector
+  /a/doc/revit/tbc/git/a/img/point_dist_along_vector.png 
+
+ #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+
+&ndash; ...
+
+- [RevitLookup spot dimension and Escape](#5)
+
+-->
+
+<h3>Kiss and RevitLookup Update</h3>
+<p>I continued my activity in 
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> and 
+had lots of interesting discussions there.</p>
+<p>One recent thread caused me to bring up a favourite topic of mine, on keeping things simple.</p>
+<p>I'll also mention two other less recent recurring questions &ndash; one of them partly because I went to the effort of creating a nice figure illustrating it &nbsp; :-)</p>
+<p>Finally, I made several updates to RevitLookup:</p>
+<ul>
+<li><a href="#2">Distance between two points in a specific direction</a></li>
+<li><a href="#3">Revit command-line switches</a></li>
+<li><a href="#4">Keeping things simple with the Revit API</a></li>
+<li><a href="#5">Dino pondering lengthening days</a></li>
+</ul>
+<h4><a name="2"></a>Distance Between Two Points in a Specific Direction</h4>
+<p>This question on determining 
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/distance-between-two-points-xyz-along-a-given-vector/m-p/6747568">distance between two points along a given vector</a> has
+come up several times in the past, so let's capture it here for future reference:</p>
+<p><strong>Question:</strong> Does the Revit API provide a method of returning the distance between two points along a given vector?</p>
+<p>I realize there are ways to manually do this, but I was wondering if the Revit API had something natively to make my code a little cleaner.</p>
+<p><strong>Answer 1:</strong> You can use a <code>Autodesk.Revit.DB.Line</code>. It provides a double <code>Length</code> property that it inherits from <code>Curve</code>.</p>
+<p><strong>Answer 2:</strong> Where <code>pointA</code> and <code>pointB</code> are <code>XYZ</code> points:</p>
+<pre class="code">
+  dim&nbsp;distance&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:blue;">double</span>&nbsp;=&nbsp;pointA.DistanceTo(pointB)
+</pre>
+
+<p>The XYZ class also has <code>.multiply</code> and <code>.divide</code> functions if you want to go a proportion of that distance along a vector.</p>
+<p><strong>Answer 3:</strong> If you need the distance of the points projected onto the given vector:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;p1&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;0,&nbsp;10,&nbsp;0&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;p2&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;10,&nbsp;60,&nbsp;0&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;direction&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;30,&nbsp;60,&nbsp;0&nbsp;);
+&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;distance&nbsp;=&nbsp;direction.Normalize().DotProduct(&nbsp;p1.Subtract(&nbsp;p2&nbsp;)&nbsp;);
+&nbsp;&nbsp;distance&nbsp;=&nbsp;Math.Abs(&nbsp;distance );
+</pre>
+
+<p><strong>Answer 4:</strong> I would award the main prize and cigar to answer 3 above.</p>
+<p>Partly for providing what I guess might be the right answer.</p>
+<p>Above all for guessing what may or may not be the right intended question.</p>
+<p>Is this an accurate description of your needs?</p>
+<p><strong>Question rephrased:</strong> Given points <code>p1</code> and <code>p2</code>, what is the distance between them, measured along the line <code>L</code>?</p>
+<p><center>
+<img src="img/point_dist_along_vector.png" alt="Point distances in a specified direction" width="275"/>
+</center></p>
+<p>If that is indeed what you need, you are actually not asking about the distance between the points at all.</p>
+<p>These two points, together with the direction <code>w</code> of <code>L</code>, define two planes.</p>
+<p>You are asking about the distance between those two planes.</p>
+<p>Are you?</p>
+<p>If so, answer 3 above is absolutely accurate and can be reformulated as:</p>
+<p>Answer:</p>
+<pre>
+  v = p2 - p1
+  w = L.direction.normalise
+  distance_along_w = v.dotProduct( w )
+</pre>
+
+<p>Unfortunately, the Revit geometry API is not full-fledged and therefore lacks a method to return the distance between two planes.</p>
+<p>Otherwise, that would probably provide an even more straightforward path.</p>
+<p>The suggested one is very direct and efficient, though, and hard to beat in those respects.</p>
+<p>I hope this helps and that we collectively succeeded at nailing your intention.</p>
+<h4><a name="3"></a>Revit Command-Line Switches</h4>
+<p>Another recurring question is
+on <a href="http://forums.autodesk.com/t5/revit-api-forum/revit-command-line-switches/m-p/6782154">Revit command line switches</a>,
+which Matt Taylor just summarised succinctly:</p>
+<p>These are the switches I'm aware of and tested in Revit 2017:</p>
+<ul>
+<li><em>no switch</em> &lt;fully qualified path of file to open&gt; &ndash; Open a Revit file. Seems to work with a template or project file. Haven't tried a family. I've been doing this since Revit 2011, though I put <code>/o</code> in there so I know what it is, though that seems to be ignored.</li>
+<li><em>no switch</em> &lt;fully qualified path of journal file&gt; &ndash; Replay a journal file.</li>
+<li><code>/language</code> &lt;language code such as ENU&gt; &ndash; Set user interface language.</li>
+<li><code>/viewer</code> &ndash; Launch Revit in viewer mode.</li>
+</ul>
+<p>Many thanks to Matt for providing this list!</p>
+<h4><a name="4"></a>Keeping Things Simple with the Revit API</h4>
+<p>The most interesting issue today is 
+on <a href="http://forums.autodesk.com/t5/revit-api-forum/listing-all-views-in-a-project-on-a-winform-throwing-an/m-p/6786228">listing all views in a project on a Winform throwing an exception</a> providing 
+ma an opportunity 
+to <a href="http://english.stackexchange.com/questions/21673/is-there-any-other-way-you-can-wax-as-you-do-when-you-wax-philosophical">wax philisophical</a> on 
+keeping things simple, although Rudi 'Revitalizer' provided the more succinct and accurate fix to the underlying problem:</p>
+<p><strong>Question:</strong> I am attempting to create a WinForm which lists all the views in the project as a viewTree. The WinForm run command is then packaged into a Dynamo ZeroTouch node, however the views are not displayed when the form launches, and when I relaunch the form I get an error that line 53 (the foreach statement that attempts to use the view name to populate the viewTree) is "not set to an instance of an object". This is my first attempt to raise and consume events and I've done everything I can to get it to work; what is the cause of this error?</p>
+<p>The form successfully launches via the dynamo node:</p>
+<p><center>
+<img src="img/dynamo_list_views_1.jpg" alt="Dynamo node displaying Windows form" width="550"/>
+</center></p>
+<p>The exception:</p>
+<p><center>
+<img src="img/dynamo_list_views_2.jpg" alt="Dynamo exception displaying Windows form" width="478"/>
+</center></p>
+<p>The code:</p>
+<pre class="code"> 
+<span style="color:blue;">using</span>&nbsp;System;
+<span style="color:blue;">using</span>&nbsp;System.Collections.Generic;
+<span style="color:blue;">using</span>&nbsp;System.ComponentModel;
+<span style="color:blue;">using</span>&nbsp;System.Data;
+<span style="color:blue;">using</span>&nbsp;System.Drawing;
+<span style="color:blue;">using</span>&nbsp;System.Linq;
+<span style="color:blue;">using</span>&nbsp;System.Text;
+<span style="color:blue;">using</span>&nbsp;System.Threading.Tasks;
+<span style="color:blue;">using</span>&nbsp;System.Windows.Forms;
+<span style="color:blue;">using</span>&nbsp;Autodesk.DesignScript.Runtime;
+<span style="color:blue;">using</span>&nbsp;Autodesk.DesignScript.Interfaces;
+<span style="color:blue;">using</span>&nbsp;Autodesk.DesignScript.Geometry;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.DB;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.DB.Architecture;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.UI;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.UI.Selection;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.ApplicationServices;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.Attributes;
+<span style="color:blue;">using</span>&nbsp;RevitServices.Persistence;
+<span style="color:blue;">using</span>&nbsp;RevitServices.Transactions;
+<span style="color:blue;">using</span>&nbsp;Revit.Elements;
+<span style="color:blue;">using</span>&nbsp;Revit.GeometryConversion;
+
+<span style="color:blue;">namespace</span>&nbsp;SelectSheetsAndViews
+{
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span><span style="color:green;">&nbsp;The&nbsp;form&nbsp;class</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">partial</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">FormRevitSelect</span>&nbsp;:&nbsp;System.Windows.Forms.<span style="color:#2b91af;">Form</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;FormRevitSelect()
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitializeComponent();
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">void</span>&nbsp;DynamoTreeListSelect_Activated(&nbsp;<span style="color:blue;">object</span>&nbsp;sender,&nbsp;System.<span style="color:#2b91af;">EventArgs</span>&nbsp;e&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">void</span>&nbsp;textBox1_TextChanged(&nbsp;<span style="color:blue;">object</span>&nbsp;sender,&nbsp;<span style="color:#2b91af;">EventArgs</span>&nbsp;e&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">void</span>&nbsp;tableLayoutPanel1_Paint(&nbsp;<span style="color:blue;">object</span>&nbsp;sender,&nbsp;<span style="color:#2b91af;">PaintEventArgs</span>&nbsp;e&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">void</span>&nbsp;Form1_Load(&nbsp;<span style="color:blue;">object</span>&nbsp;sender,&nbsp;<span style="color:#2b91af;">EventArgs</span>&nbsp;e&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;Autodesk.Revit.DB.<span style="color:#2b91af;">View</span>&gt;&nbsp;d1&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ThresholdReachedEventArgs</span>().Views;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//List&lt;string&gt;&nbsp;d&nbsp;=&nbsp;new&nbsp;List&lt;string&gt;&nbsp;{&nbsp;&quot;A&quot;,&nbsp;&quot;B&quot;,&nbsp;&quot;C&quot;,&nbsp;&quot;D&quot;};</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;Autodesk.Revit.DB.<span style="color:#2b91af;">View</span>&nbsp;x&nbsp;<span style="color:blue;">in</span>&nbsp;d1&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//foreach&nbsp;(string&nbsp;x&nbsp;in&nbsp;d)</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;treeView1.Nodes.Add(&nbsp;x.ToString()&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">void</span>&nbsp;checkedListBox1_SelectedIndexChanged(&nbsp;<span style="color:blue;">object</span>&nbsp;sender,&nbsp;<span style="color:#2b91af;">EventArgs</span>&nbsp;e&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">void</span>&nbsp;button1_Click(&nbsp;<span style="color:blue;">object</span>&nbsp;sender,&nbsp;<span style="color:#2b91af;">EventArgs</span>&nbsp;e&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">this</span>.Close();
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">void</span>&nbsp;treeView1_AfterSelect(&nbsp;<span style="color:blue;">object</span>&nbsp;sender,&nbsp;<span style="color:#2b91af;">TreeViewEventArgs</span>&nbsp;e&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+
+
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span><span style="color:green;">A&nbsp;Revit&nbsp;class&nbsp;to&nbsp;get&nbsp;all&nbsp;the&nbsp;sheets&nbsp;and&nbsp;views&nbsp;in&nbsp;the&nbsp;document</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">RevitWinForm</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">object</span>&gt;&nbsp;_sheetsAndViews;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">object</span>&gt;&nbsp;sheetsAndViewsToDelete;
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">internal</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">object</span>&gt;&nbsp;GetSheetAndViewsToDelete&nbsp;{&nbsp;<span style="color:blue;">get</span>&nbsp;{&nbsp;<span style="color:blue;">return</span>&nbsp;sheetsAndViewsToDelete;&nbsp;}&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;RevitWinForm(&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">object</span>&gt;&nbsp;sheetsAndViews&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_sheetsAndViews&nbsp;=&nbsp;sheetsAndViews;
+
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">internal</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">object</span>&gt;&nbsp;GetSheetAndViewList&nbsp;{&nbsp;<span style="color:blue;">get</span>&nbsp;{&nbsp;<span style="color:blue;">return</span>&nbsp;_sheetsAndViews;&nbsp;}&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;Function&nbsp;to&nbsp;collect&nbsp;all&nbsp;the&nbsp;views&nbsp;and&nbsp;sheets&nbsp;in&nbsp;the&nbsp;document</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span><span style="color:green;">&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">internal</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;Autodesk.Revit.DB.<span style="color:#2b91af;">View</span>&gt;&nbsp;SheetsAndView()
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;DocumentManager.Instance.CurrentDBDocument;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;).OfCategory(&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Views&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;Autodesk.Revit.DB.<span style="color:#2b91af;">View</span>&gt;&nbsp;viewList&nbsp;=&nbsp;collector.ToElements()&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;Autodesk.Revit.DB.<span style="color:#2b91af;">View</span>&gt;;
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;viewList;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;The&nbsp;MultiReturn&nbsp;attribute&nbsp;can&nbsp;be&nbsp;used&nbsp;to&nbsp;specify</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;the&nbsp;names&nbsp;of&nbsp;multiple&nbsp;output&nbsp;ports&nbsp;on&nbsp;a&nbsp;node&nbsp;that&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;returns&nbsp;a&nbsp;dictionary.&nbsp;The&nbsp;node&nbsp;must&nbsp;return&nbsp;a&nbsp;dictionary</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;to&nbsp;be&nbsp;recognized&nbsp;as&nbsp;a&nbsp;multi-out&nbsp;node.</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">param</span><span style="color:gray;">&nbsp;name</span><span style="color:gray;">=</span><span style="color:gray;">&quot;</span>refresh<span style="color:gray;">&quot;</span><span style="color:gray;">&gt;</span><span style="color:green;">Refresh</span><span style="color:gray;">&lt;/</span><span style="color:gray;">param</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">returns</span><span style="color:gray;">&gt;</span><span style="color:green;">DynamoTreeListSelect</span><span style="color:gray;">&lt;/</span><span style="color:gray;">returns</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">string</span>&nbsp;CompactDocument(&nbsp;<span style="color:blue;">bool</span>&nbsp;refresh&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.Windows.Forms.<span style="color:#2b91af;">Application</span>.Run(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FormRevitSelect</span>()&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#a31515;">&quot;Process&nbsp;Complete&quot;</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;}
+
+&nbsp;&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">Program</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">void</span>&nbsp;Main(&nbsp;<span style="color:blue;">string</span>[]&nbsp;args&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">RevitSheetsAndViews</span>&nbsp;v&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">RevitSheetsAndViews</span>();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v.GetRevitViews&nbsp;+=&nbsp;v_ViewsOUT;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">void</span>&nbsp;v_ViewsOUT(&nbsp;<span style="color:blue;">object</span>&nbsp;sender,&nbsp;<span style="color:#2b91af;">ThresholdReachedEventArgs</span>&nbsp;e&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;Autodesk.Revit.DB.<span style="color:#2b91af;">View</span>&gt;&nbsp;d1&nbsp;=&nbsp;e.Views;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+
+&nbsp;&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">RevitSheetsAndViews</span>
+&nbsp;&nbsp;{
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;Autodesk.Revit.DB.<span style="color:#2b91af;">View</span>&gt;&nbsp;views;
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">/*public&nbsp;RevitSheetsAndViews(List&lt;Autodesk.Revit.DB.View&gt;&nbsp;viewsOUT)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;views&nbsp;=&nbsp;viewsOUT;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;*/</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;RevitSheetsAndViews()
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;DocumentManager.Instance.CurrentDBDocument;
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;).OfCategory(&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Views&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;views&nbsp;=&nbsp;collector.ToElements()&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;Autodesk.Revit.DB.<span style="color:#2b91af;">View</span>&gt;;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ThresholdReachedEventArgs</span>&nbsp;args&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ThresholdReachedEventArgs</span>();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;args.Views&nbsp;=&nbsp;views;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RevitViewsEventHandler(&nbsp;args&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">protected</span>&nbsp;<span style="color:blue;">virtual</span>&nbsp;<span style="color:blue;">void</span>&nbsp;RevitViewsEventHandler(&nbsp;<span style="color:#2b91af;">ThresholdReachedEventArgs</span>&nbsp;e&nbsp;)&nbsp;<span style="color:green;">//raise&nbsp;the&nbsp;EventHandler&nbsp;delegate&nbsp;and&nbsp;associate&nbsp;GetRevitViews&nbsp;to&nbsp;it</span>
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">EventHandler</span>&lt;<span style="color:#2b91af;">ThresholdReachedEventArgs</span>&gt;&nbsp;handler&nbsp;=&nbsp;GetRevitViews;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;handler&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;handler(&nbsp;<span style="color:blue;">this</span>,&nbsp;e&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">event</span>&nbsp;<span style="color:#2b91af;">EventHandler</span>&lt;<span style="color:#2b91af;">ThresholdReachedEventArgs</span>&gt;&nbsp;GetRevitViews;&nbsp;<span style="color:green;">//&nbsp;declare&nbsp;an&nbsp;event&nbsp;named&nbsp;GetRevitViews.&nbsp;The&nbsp;event&nbsp;is&nbsp;associated&nbsp;with&nbsp;the&nbsp;EventHandler&nbsp;delegate&nbsp;and&nbsp;raised&nbsp;in&nbsp;a&nbsp;method&nbsp;named&nbsp;OnThresholdReached.</span>
+&nbsp;&nbsp;}
+
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">ThresholdReachedEventArgs</span>&nbsp;:&nbsp;<span style="color:#2b91af;">EventArgs</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;Autodesk.Revit.DB.<span style="color:#2b91af;">View</span>&gt;&nbsp;Views&nbsp;{&nbsp;<span style="color:blue;">get</span>;&nbsp;<span style="color:blue;">set</span>;&nbsp;}
+&nbsp;&nbsp;}
+}
+</pre>
+
+<p><strong>Answer 1:</strong>  The answer to every question in the universe is identical:</p>
+<p><a href="https://en.wikipedia.org/wiki/KISS_principle">KISS</a>!</p>
+<p>Unfortunately, that often raises a follow-up question:</p>
+<p>How?</p>
+<p>How can I simplify my problem?</p>
+<p>In programming, simplification can often be achieved by separating separate tasks.</p>
+<p>That was one of the main goals of object oriented programming OOP when it was invented or at least started emerging six (!) decades ago.</p>
+<p>In this case, you are talking with the Revit API to obtain information about views, e.g., their names, or whatever other information you wish to display.</p>
+<p>That is one task.</p>
+<p>Another issue, completely separate, is to display that information.</p>
+<p>I suggest you separate the two completely.</p>
+<p>In other words, talk with the Revit API, obtain the information you require, store it, and stop communicating with Revit.</p>
+<p>Then, and only then, proceed with other things, such as displaying your stuff.</p>
+<p><strong>Answer 2:</strong> The cause is:</p>
+<p>When you create a new ThresholdReachedEventArgs instance, its Views property is null, initially.</p>
+<p>It must be set before accessing it via a foreach loop.</p>
+<p><strong>Response:</strong> Thanks Rudi and Jeremy.</p>
+<p>Very helpful advice. I realised one of the exceptions was caused by problems with the way I'd written the element collector. Once I fixed that, I acted upon Jeremys advice and did away with extending the Event Handler class, and simply implemented the collector and the rest of my function within the Load event of the form. All now works as expected:</p>
+<p><center>
+<img src="img/dynamo_list_views_3_Bimorph_WinForm.jpg" alt="Dynamo displaying Bimorph Windows form" width="600"/>
+</center></p>
+<h4><a name="5"></a>Dino Pondering Lengthening Days</h4>
+<p>Let me end by pointing out that it is pretty cold and snowy here, even though the days are gradually getting longer again:</p>
+<p><center>
+<img src="img/dino_in_snow_669_cropped_500.jpg" alt="Dino pondering the gradual lengthening of daytime" width="500"/>
+</center></p>
+<p>Some warm-blooded creatures prefer to stay inside and interact with the forum instead of pondering nature:</p>
+<p><center>
+<img src="img/2017-01-09_top_solution_author.png" alt="Top solution authors" width="233"/>
+</center></p>
