@@ -18,19 +18,24 @@ http://forums.autodesk.com/t5/revit-api-forum/distance-between-two-points-xyz-al
 
  #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
-&ndash; ...
+I continued my activity in the Revit API discussion forum and had lots of interesting discussions there.
+One recent thread caused me to bring up a favourite topic of mine, on keeping things simple.
+I'll also mention two other less recent recurring questions
+&ndash; Distance between two points in a specific direction
+&ndash; Revit command-line switches
+&ndash; Keeping things simple with the Revit API
+&ndash; Dino pondering lengthening days...
 
 - [RevitLookup spot dimension and Escape](#5)
 
 -->
 
-<h3>Kiss and RevitLookup Update</h3>
+<h3>Distances, Switches, Kiss-ing and a Dino</h3>
 <p>I continued my activity in 
 the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> and 
 had lots of interesting discussions there.</p>
 <p>One recent thread caused me to bring up a favourite topic of mine, on keeping things simple.</p>
 <p>I'll also mention two other less recent recurring questions &ndash; one of them partly because I went to the effort of creating a nice figure illustrating it &nbsp; :-)</p>
-<p>Finally, I made several updates to RevitLookup:</p>
 <ul>
 <li><a href="#2">Distance between two points in a specific direction</a></li>
 <li><a href="#3">Revit command-line switches</a></li>
@@ -65,7 +70,7 @@ come up several times in the past, so let's capture it here for future reference
 <p>Is this an accurate description of your needs?</p>
 <p><strong>Question rephrased:</strong> Given points <code>p1</code> and <code>p2</code>, what is the distance between them, measured along the line <code>L</code>?</p>
 <p><center>
-<img src="img/point_dist_along_vector.png" alt="Point distances in a specified direction" width="275"/>
+<img src="img/point_dist_along_vector.png" alt="Distance between points in a specified direction" width="275"/>
 </center></p>
 <p>If that is indeed what you need, you are actually not asking about the distance between the points at all.</p>
 <p>These two points, together with the direction <code>w</code> of <code>L</code>, define two planes.</p>
@@ -99,16 +104,16 @@ which Matt Taylor just summarised succinctly:</p>
 <p>The most interesting issue today is 
 on <a href="http://forums.autodesk.com/t5/revit-api-forum/listing-all-views-in-a-project-on-a-winform-throwing-an/m-p/6786228">listing all views in a project on a Winform throwing an exception</a> providing 
 ma an opportunity 
-to <a href="http://english.stackexchange.com/questions/21673/is-there-any-other-way-you-can-wax-as-you-do-when-you-wax-philosophical">wax philisophical</a> on 
+to <a href="http://english.stackexchange.com/questions/21673/is-there-any-other-way-you-can-wax-as-you-do-when-you-wax-philosophical">wax philosophical</a> on 
 keeping things simple, although Rudi 'Revitalizer' provided the more succinct and accurate fix to the underlying problem:</p>
-<p><strong>Question:</strong> I am attempting to create a WinForm which lists all the views in the project as a viewTree. The WinForm run command is then packaged into a Dynamo ZeroTouch node, however the views are not displayed when the form launches, and when I relaunch the form I get an error that line 53 (the foreach statement that attempts to use the view name to populate the viewTree) is "not set to an instance of an object". This is my first attempt to raise and consume events and I've done everything I can to get it to work; what is the cause of this error?</p>
+<p><strong>Question:</strong> I am attempting to create a WinForm which lists all the views in the project as a viewTree. The WinForm run command is then packaged into a Dynamo ZeroTouch node, however the views are not displayed when the form launches, and when I relaunch the form I get an error that line 53 (the <code>foreach</code> statement that attempts to use the view name to populate the viewTree) is "not set to an instance of an object". This is my first attempt to raise and consume events and I've done everything I can to get it to work; what is the cause of this error?</p>
 <p>The form successfully launches via the dynamo node:</p>
 <p><center>
 <img src="img/dynamo_list_views_1.jpg" alt="Dynamo node displaying Windows form" width="550"/>
 </center></p>
 <p>The exception:</p>
 <p><center>
-<img src="img/dynamo_list_views_2.jpg" alt="Dynamo exception displaying Windows form" width="478"/>
+<img src="img/dynamo_list_views_2.jpg" alt="Exception displaying Windows form" width="478"/>
 </center></p>
 <p>The code:</p>
 <pre class="code"> 
@@ -302,9 +307,9 @@ keeping things simple, although Rudi 'Revitalizer' provided the more succinct an
 <p>In other words, talk with the Revit API, obtain the information you require, store it, and stop communicating with Revit.</p>
 <p>Then, and only then, proceed with other things, such as displaying your stuff.</p>
 <p><strong>Answer 2:</strong> The cause is:</p>
-<p>When you create a new ThresholdReachedEventArgs instance, its Views property is null, initially.</p>
-<p>It must be set before accessing it via a foreach loop.</p>
-<p><strong>Response:</strong> Thanks Rudi and Jeremy.</p>
+<p>When you create a new <code>ThresholdReachedEventArgs</code> instance, its <code>Views</code> property is <code>null</code>, initially.</p>
+<p>It must be set before accessing it via a <code>foreach</code> loop.</p>
+<p><strong>Response:</strong> Thanks, Rudi and Jeremy.</p>
 <p>Very helpful advice. I realised one of the exceptions was caused by problems with the way I'd written the element collector. Once I fixed that, I acted upon Jeremys advice and did away with extending the Event Handler class, and simply implemented the collector and the rest of my function within the Load event of the form. All now works as expected:</p>
 <p><center>
 <img src="img/dynamo_list_views_3_Bimorph_WinForm.jpg" alt="Dynamo displaying Bimorph Windows form" width="600"/>
@@ -312,7 +317,7 @@ keeping things simple, although Rudi 'Revitalizer' provided the more succinct an
 <h4><a name="5"></a>Dino Pondering Lengthening Days</h4>
 <p>Let me end by pointing out that it is pretty cold and snowy here, even though the days are gradually getting longer again:</p>
 <p><center>
-<img src="img/dino_in_snow_669_cropped_500.jpg" alt="Dino pondering the gradual lengthening of daytime" width="500"/>
+<img src="img/dino_in_snow_669_cropped_500.jpg" alt="Dino pondering the gradual lengthening of daytime" width="250"/>
 </center></p>
 <p>Some warm-blooded creatures prefer to stay inside and interact with the forum instead of pondering nature:</p>
 <p><center>
