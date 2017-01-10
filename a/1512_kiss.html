@@ -314,6 +314,124 @@ keeping things simple, although Rudi 'Revitalizer' provided the more succinct an
 <p><center>
 <img src="img/dynamo_list_views_3_Bimorph_WinForm.jpg" alt="Dynamo displaying Bimorph Windows form" width="600"/>
 </center></p>
+<p>For anyone interested, here's the working 'after' code, demonstrating the simplification:</p>
+<pre class="code"> 
+<span style="color:blue;">namespace</span>&nbsp;Revit
+{
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span><span style="color:green;">&nbsp;The&nbsp;form&nbsp;class</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:blue;">internal</span>&nbsp;<span style="color:blue;">partial</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">FormRevitSelect</span>&nbsp;:&nbsp;System.Windows.Forms.<span style="color:#2b91af;">Form</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">int</span>&gt;&nbsp;_viewId;
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">int</span>&gt;&nbsp;GetViewIds
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">get</span>&nbsp;{&nbsp;<span style="color:blue;">return</span>&nbsp;_viewId;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">set</span>&nbsp;{&nbsp;_viewId&nbsp;=&nbsp;<span style="color:blue;">value</span>;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;FormRevitSelect()
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitializeComponent();
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">void</span>&nbsp;textBox1_TextChanged(&nbsp;<span style="color:blue;">object</span>&nbsp;sender,&nbsp;<span style="color:#2b91af;">EventArgs</span>&nbsp;e&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">void</span>&nbsp;Form1_Load(&nbsp;<span style="color:blue;">object</span>&nbsp;sender,&nbsp;<span style="color:#2b91af;">EventArgs</span>&nbsp;e&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;DocumentManager.Instance.CurrentDBDocument;
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BrowserOrganization</span>&nbsp;browserOrg&nbsp;=&nbsp;<span style="color:#2b91af;">BrowserOrganization</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetCurrentBrowserOrganizationForViews(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;doc&nbsp;);&nbsp;<span style="color:green;">//Get&nbsp;the&nbsp;browser&nbsp;item&nbsp;from&nbsp;the&nbsp;document</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfCategory(&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Views&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;Autodesk.Revit.DB.<span style="color:#2b91af;">Element</span>&gt;&nbsp;viewList&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;(<span style="color:#2b91af;">List</span>&lt;Autodesk.Revit.DB.<span style="color:#2b91af;">Element</span>&gt;)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;collector.ToElements().ToList();
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;Autodesk.Revit.DB.<span style="color:#2b91af;">View</span>&nbsp;v&nbsp;<span style="color:blue;">in</span>&nbsp;viewList&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//v.ViewType.ToString()&nbsp;!=&nbsp;&quot;&quot;&nbsp;is&nbsp;used&nbsp;to&nbsp;remove&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;views&nbsp;which&nbsp;are&nbsp;present&nbsp;in&nbsp;templates&nbsp;by&nbsp;default&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;but&nbsp;only&nbsp;picked&nbsp;up&nbsp;by&nbsp;the&nbsp;element&nbsp;collector.&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;They&nbsp;need&nbsp;to&nbsp;be&nbsp;removed&nbsp;from&nbsp;the&nbsp;list.</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;v.Name&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;v.ViewType.ToString()&nbsp;!=&nbsp;<span style="color:#a31515;">&quot;&quot;</span>&nbsp;)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">FolderItemInfo</span>&gt;&nbsp;folderInfo&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;browserOrg.GetFolderItems(&nbsp;v.Id&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.ToList();&nbsp;<span style="color:green;">//Get&nbsp;the&nbsp;folder&nbsp;information&nbsp;for&nbsp;the&nbsp;view</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;treeView1.Nodes.Add(&nbsp;v.Id.ToString(),&nbsp;v.Name&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}
+</pre>
+
+<p>ZeroTouch code for Dynamo library import:</p>
+<pre class="code"> 
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span><span style="color:green;">A&nbsp;Revit&nbsp;class&nbsp;to&nbsp;get&nbsp;all&nbsp;the&nbsp;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;sheets&nbsp;and&nbsp;views&nbsp;in&nbsp;the&nbsp;document</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">DocumentUtilities</span>
+{
+&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">object</span>&gt;&nbsp;_sheetsAndViews;
+
+&nbsp;&nbsp;<span style="color:blue;">internal</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">object</span>&gt;&nbsp;GetSheetAndViewsToDelete
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">get</span>&nbsp;{&nbsp;<span style="color:blue;">return</span>&nbsp;_sheetsAndViews;&nbsp;}
+&nbsp;&nbsp;}
+
+&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;DocumentUtilities(&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">object</span>&gt;&nbsp;sheetsAndViews&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;_sheetsAndViews&nbsp;=&nbsp;sheetsAndViews;
+&nbsp;&nbsp;}
+
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;Work&nbsp;in&nbsp;progress</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">param</span><span style="color:gray;">&nbsp;name</span><span style="color:gray;">=</span><span style="color:gray;">&quot;</span>refresh<span style="color:gray;">&quot;</span><span style="color:gray;">&gt;</span><span style="color:green;">Refresh&nbsp;to&nbsp;reopen&nbsp;the&nbsp;form</span><span style="color:gray;">&lt;/</span><span style="color:gray;">param</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">returns</span><span style="color:gray;">&gt;</span><span style="color:green;">Revit&nbsp;View&nbsp;Elements</span><span style="color:gray;">&lt;/</span><span style="color:gray;">returns</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;Revit.Elements.Element&gt;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;ExporttDocument(&nbsp;<span style="color:blue;">bool</span>&nbsp;refresh&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;DocumentManager.Instance.CurrentDBDocument;
+
+&nbsp;&nbsp;&nbsp;&nbsp;FormRevitSelect&nbsp;form1&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;FormRevitSelect();
+&nbsp;&nbsp;&nbsp;&nbsp;System.Windows.Forms.<span style="color:#2b91af;">Application</span>.Run(&nbsp;form1&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;Revit.Elements.Element&gt;&nbsp;vList&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;Revit.Elements.Element&gt;();
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:blue;">int</span>&nbsp;i&nbsp;<span style="color:blue;">in</span>&nbsp;form1.GetViewIds&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Autodesk.Revit.DB.<span style="color:#2b91af;">Element</span>&nbsp;v&nbsp;=&nbsp;doc.GetElement(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;Autodesk.Revit.DB.<span style="color:#2b91af;">ElementId</span>(&nbsp;i&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">as</span>&nbsp;Autodesk.Revit.DB.<span style="color:#2b91af;">Element</span>;
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vList.Add(&nbsp;v.ToDSType(&nbsp;<span style="color:blue;">true</span>&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;vList;
+&nbsp;&nbsp;}
+}
+</pre>
+
+<p>Run in Dynamo:</p>
+<p><center>
+<img src="img/dynamo_list_views_4_Bimorph_Select.png" alt="Bimorph select" width="600"/>
+</center></p>
+<p>Result:</p>
+<p><center>
+<img src="img/dynamo_list_views_5_result.png" alt="List views result" width="600"/>
+</center></p>
+<p>Many thanks to Thomas for rasing the issue in the first place, sharing the final result, and Rudi 'Revitalizer' for helping to solve it!</p>
 <h4><a name="5"></a>Dino Pondering Lengthening Days</h4>
 <p>Let me end by pointing out that it is pretty cold and snowy here, even though the days are gradually getting longer again:</p>
 <p><center>

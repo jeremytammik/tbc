@@ -1,0 +1,74 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+ #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+
+RevitLookup sports two new useful enhancements since adding support for the NuGet Revit API package in mid-December
+&ndash; Close all forms using the <code>Escape</code> key
+&ndash; Support for spot dimension...
+
+-->
+
+<h3>RevitLookup Supports Spot Dimension and Escape</h3>
+<p><a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a> sports
+two new useful enhancements 
+since <a href="http://thebuildingcoder.typepad.com/blog/2016/12/nuget-revit-api-package.html#3">adding support for the NuGet Revit API package</a> in mid-December:</p>
+<ul>
+<li><a href="#2">Close all forms using the <code>Escape</code> key</a></li>
+<li><a href="#3">Support for spot dimension</a></li>
+</ul>
+<h4><a name="2"></a>Close all Forms Using the Escape Key</h4>
+<p>Paul <a href="https://github.com/luftbanana">@luftbanana</a> van Nassau added support to close all the nested RevitLookup forms using the <code>Escape</code> key by assigning them the appropriate cancel button behaviour 
+in <a href="https://github.com/jeremytammik/RevitLookup/pull/20">pull request #20</a>:</p>
+<blockquote>
+<p>I assigned the CancelButton field (in each form that didn't have a CancelButton field assigned yet) to the proper button available.</p>
+<p>This provides the function of closing each form with the keyboard ESC key (which can be faster than pointing and clicking your mouse).</p>
+</blockquote>
+<p>I integrated Paul significant time-saving enhancement 
+into <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2017.0.0.10">RevitLookup release 2017.0.0.10</a>.</p>
+<p>Many thanks to Paul for implementing this!</p>
+<p>Here is <a href="https://github.com/jeremytammik/RevitLookup/compare/2017.0.0.9...2017.0.0.10">the diff showing what he added</a>.</p>
+<h4><a name="3"></a>Support for Spot Dimension</h4>
+<p>LeeJaeYoung reported an issue snooping spot dimensions in
+a <a href="http://thebuildingcoder.typepad.com/blog/2016/04/revit-2017-revitlookup-and-sdk-samples.html#comment-3077972791">comment</a> on 
+the discussion of <a href="http://thebuildingcoder.typepad.com/blog/2016/04/revit-2017-revitlookup-and-sdk-samples.html">Revit 2017, RevitLookup and SDK Samples</a>, saying:</p>
+<blockquote>
+<p>Spot dimension position and text position causes an error in RevitLookup 2017.0.0.8, but works okay in Revit 2015.
+I think the leader and text position properties of spot dimension are causing this.
+Snooping a <code>SpotDimension</code> displays the message:</p>
+</blockquote>
+<pre>
+  Can't set/get leader position for one of these cases:
+
+  1. SpotElevation.
+  2. When using equality formula.
+  3. When dimension style is ordinate.
+</pre>
+
+<p><center>
+<img src="img/revitlookup_spot_dimension_error.png" alt="RevitLookup spot dimension error" width="456"/>
+</center></p>
+<p>Here are the <a href="http://thebuildingcoder.typepad.com/blog/2016/04/revit-2017-revitlookup-and-sdk-samples.html#comment-3083808853">steps to reproduce</a>:</p>
+<ul>
+<li>Create a spot dimension on a slab.</li>
+<li>Select it.</li>
+<li>Pick RevitLookup &gt; Snoop Current Selection.</li>
+<li>The error occurs.</li>
+</ul>
+<p>Here is a <a href="https://www.youtube.com/watch?v=CFCHpmyYDa4">47-second YouTube recording</a> demonstrating the problem:</p>
+<p><center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/CFCHpmyYDa4?rel=0" frameborder="0" allowfullscreen></iframe>
+</center></p>
+<p>Many thanks to LeeJaeYoung for reporting and documenting this problem!</p>
+<p>I fixed it
+in <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2017.0.0.11">RevitLookup release 2017.0.0.11</a>.</p>
+<p>Here is <a href="https://github.com/jeremytammik/RevitLookup/compare/2017.0.0.10...2017.0.0.11">the diff showing what I changed</a>.</p>
+<p>As always, you can grab the most up-to-date version from
+the <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup repository <code>master</code> branch</a>.</p>
