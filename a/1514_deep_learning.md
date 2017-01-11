@@ -19,7 +19,7 @@
 
 - http://forums.autodesk.com/t5/revit-api-forum/hermite-to-bezier-or-nurbs/m-p/6789868
 
- #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+#RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
 I took a first look at deep learning for question answering systems. Before that, I share some news on AU in Europe, thoughts on UI and innovation, and point out a useful Revit API feature for converting a Hermite spline to Bezier
 &ndash; Autodesk University in London
@@ -28,6 +28,8 @@ I took a first look at deep learning for question answering systems. Before that
 &ndash; Conclusions from lexical analysis of top news stories
 &ndash; Converting a Revit Hermite spline to Bezier or NURBS
 &ndash; Lots of literature on deep learning...
+
+Deep learning for question answering systems, #AULondon, #UI, #innovation, #RevitAPI, @AutodeskRevit bit.ly/2j7Sxkb
 
 -->
 

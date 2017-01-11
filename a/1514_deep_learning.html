@@ -18,21 +18,29 @@
 
 - http://forums.autodesk.com/t5/revit-api-forum/hermite-to-bezier-or-nurbs/m-p/6789868
 
- #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+#RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
-&ndash; ...
+I took a first look at deep learning for question answering systems. Before that, I share some news on AU in Europe, thoughts on UI and innovation, and point out a useful Revit API feature for converting a Hermite spline to Bezier
+&ndash; Autodesk University in London
+&ndash; Rules of thumb for change agents
+&ndash; Invisible user interfaces
+&ndash; Conclusions from lexical analysis of top news stories
+&ndash; Converting a Revit Hermite spline to Bezier or NURBS
+&ndash; Lots of literature on deep learning...
+
+Deep learning for question answering systems, #AULondon, #UI, #innovation, #RevitAPI, @AutodeskRevit bit.ly/2j7Sxkb
 
 -->
 
-<h3>Deep Learning and AU in London</h3>
+<h3>AU in London and Deep Learning</h3>
 <p>I took a first look at deep learning for question answering systems.</p>
-<p>Before that, I share some news on AU in Europe, thoughts on UI and innovation, and point out a useful Revit API feature for converting ...</p>
+<p>Before that, I share some news on AU in Europe, thoughts on UI and innovation, and point out a useful Revit API feature for converting a Hermite spline to Bezier:</p>
 <ul>
 <li><a href="#2">Autodesk University in London</a></li>
 <li><a href="#3">Rules of thumb for change agents</a></li>
 <li><a href="#4">Invisible user interfaces</a></li>
 <li><a href="#5">Conclusions from lexical analysis of top news stories</a></li>
-<li><a href="#6">Converting a Revit Hermite Spline to Bezier or NURBS</a></li>
+<li><a href="#6">Converting a Revit Hermite spline to Bezier or NURBS</a></li>
 <li><a href="#7">Lots of literature on deep learning</a></li>
 </ul>
 <h4><a name="2"></a>Autodesk University in London</h4>
@@ -83,7 +91,7 @@ on <a href="http://forums.autodesk.com/t5/revit-api-forum/hermite-to-bezier-or-n
 <p><strong>Question:</strong> I'm trying to find a way to convert a Hermite Spline to a Bezier Spline.
 Take a flexible pipe (or duct) as an example:</p>
 <p><center>
-<img src="img/140602_hermite_spline_to_bezier.png" alt="AU London" width="425"/>
+<img src="img/140602_hermite_spline_to_bezier.png" alt="Hermite Spline to Bezier" width="425"/>
 </center></p>
 <p>It seems Autodesk must have conversion routines in the core as DWG export provides a NURBS curve.</p>
 <p><strong>Answer:</strong> Check the Revit 2017 API. It introduces
@@ -137,8 +145,8 @@ is coming up now as the Georgia Tech course prepares for its third semester with
 <li><a href="http://www.irdindia.in/journal_ijeecs/pdf/vol3_iss2/8.pdf">Domain Specific Question Answering System</a>: Closed-Domain QA System: Closed-domain question answering deals with the questions under a specific domain, and can be seen as an easier task because NLP systems can exploit domain-specific knowledge frequently formalized in ontologies. It has very high accuracy but requires extensive language processing and limited to one domain. The example of such a system is medicines or automotive maintenance.</li>
 <li><a href="https://www.researchgate.net/publication/261795194_A_question_answering_system_on_domain_specific_knowledge_with_semantic_web_support">A Question Answering System on Domain Specific Knowledge with Semantic Web Support</a> &ndash; for Slovenian.</li>
 <li><a href="https://fartashh.github.io/post/qa-system-watson/">Creating a Natural Language Question Answering System with IBM Watson</a> provides some practical implementation guidance and real-world advice.</li>
-<li><a href="http://datascience.stackexchange.com/questions/12225/creating-domain-specific-question-answering-systems">Creating Domain-specific Question Answering Systems</a> &ndash; In short, the typical approach people took there was similar to what you're suggesting: (i) build a knowledge base from domain specific articles and/or Wikipedia (ii) index these articles with lucene or other IR system (iii) for each question/answer pair retrieve most relevant articles and use them as features (iv) build a classifier using these features for classifying if the answer is correct or incorrect.</li>
-<li><a href="http://datascience.stackexchange.com/questions/12248/approaches-for-implementing-domain-specific-question-answering-system">Approaches for implementing Domain-specific Question answering Systems</a> &ndash;  IR = Information retrieval, Ontology based, Machine learning; All of the best systems (ex: IBM Watson) use a hybrid approach.</li>
+<li><a href="http://datascience.stackexchange.com/questions/12225/creating-domain-specific-question-answering-systems">Creating Domain-specific Question Answering Systems</a> &ndash; In short, the typical approach people took: (i) build a knowledge base from domain specific articles and/or Wikipedia (ii) index these articles with lucene or other IR system (iii) for each question/answer pair, retrieve most relevant articles and use them as features (iv) build a classifier using these features to classifying whether an answer is correct or incorrect.</li>
+<li><a href="http://datascience.stackexchange.com/questions/12248/approaches-for-implementing-domain-specific-question-answering-system">Approaches for implementing Domain-specific Question answering Systems</a> &ndash; IR == Information retrieval, Ontology based, Machine learning; all the best systems (e.g., IBM Watson) use a hybrid approach.</li>
 </ul>
-<p>The last three are most down to earth and provide quick and easily accessible introductions including practical implementation aspects.</p>
-<p>I guess my next move might be registering for a Watson test account and starting to assembly my test cases and base data set for teaching.</p>
+<p>The last three are most practical, down to earth and provide quick and easily accessible introductions including practical implementation aspects.</p>
+<p>My next moves might be registering for an IBM Watson account and starting to assemble test cases and a base data set for training.</p>
