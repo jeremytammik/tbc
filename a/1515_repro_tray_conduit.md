@@ -26,13 +26,23 @@ REVIT-79737 [As a third part developers I want to be able to access the cable/tr
 
 #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
-&ndash; ...
+I have probably asked developers for reproducible cases a couple of thousand times by now.
+Let's discuss that and also return to the topic of how to research a Revit API problem in general.
+Finally, I'll point out a Revit 2017 API MEP electrical feature.
+Oh, and I continued my research into deep learning for a Revit API question answering system
+&ndash; Creating a reproducible case may well solve the issue at hand
+&ndash; How to research to find a Revit API solution
+&ndash; Access to cable tray and conduit settings
+&ndash; Getting started implementing a question answering system
+&ndash; First impression from IBM Bluemix
+&ndash; Open source QAS options
+&ndash; Building a Revit API ontology...
 
 #AULondon, #UI, #innovation, #RevitAPI, @AutodeskRevit bit.ly/2j7Sxkb
 
 -->
 
-### Virtues of Reproduction, Research, Settings, Ontology
+### Virtues Reproduction, Research, Settings, Ontology
 
 I have probably asked developers for reproducible cases a couple of thousand times by now.
 
