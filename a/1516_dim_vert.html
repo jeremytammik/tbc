@@ -1,0 +1,255 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+- create vertical dimensioning
+12551564 [How can I create dimension line that is not parallel to detail line]
+http://forums.autodesk.com/t5/revit-api-forum/how-can-i-create-dimension-line-that-is-not-parallel-to-detail/m-p/6801271
+
+#RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+
+Today, I highlight yet another interesting Revit API discussion forum thread and list my ongoing research links on implementing a Revit API question answering system
+&ndash; Creating vertical dimensioning
+&ndash; Revit API QAS research continued
+&ndash; QnA Maker
+&ndash; First steps with DeepDive
+&ndash; YodaQA, DL-Learner and OWL
+&ndash; My current open questions...
+
+Vertical Dimensioning and Revit API QAS Research #RevitAPI @AutodeskRevit #dynamobim
+
+-->
+
+<h3>Vertical Dimensioning and Revit API QAS Research</h3>
+<p>Today, I highlight yet another
+interesting <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> thread
+and list my ongoing research links on implementing a Revit API question answering system:</p>
+<ul>
+<li><a href="#2">Creating vertical dimensioning</a></li>
+<li><a href="#3">Revit API QAS research continued</a></li>
+<li><a href="#4">QnA Maker</a></li>
+<li><a href="#5">First steps with DeepDive</a></li>
+<li><a href="#6">YodaQA, DL-Learner and OWL</a></li>
+<li><a href="#7">My current open questions</a></li>
+</ul>
+<h4><a name="2"></a>Creating Vertical Dimensioning</h4>
+<p>A summary of the discussion thread
+on <a href="http://forums.autodesk.com/t5/revit-api-forum/how-can-i-create-dimension-line-that-is-not-parallel-to-detail/m-p/6801271">how to create dimension line that is not parallel to detail
+line</a>,
+answered by Fair59:</p>
+<p><strong>Question:</strong> I am trying to create a dimension line that measures the Z component of a sloped detail line.</p>
+<p>I can do this manually in the Revit user interface but cannot figure out how to do it with the API.</p>
+<p>I've used <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a> to compare the differences in the dimension lines.</p>
+<p>The <code>ReferenceArray</code> is the same; the main difference seems to be the <code>Curve</code> property which I'm assuming is set with the <code>Line</code> property when I call <code>NewDimension(Section, Line, ReferenceArray)</code>. </p>
+<p>Here is my current (failing) code:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;point3&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;417.8,&nbsp;80.228,&nbsp;46.8&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;point4&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;417.8,&nbsp;80.811,&nbsp;46.3&nbsp;);
+
+&nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;geomLine3&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;point3,&nbsp;point4&nbsp;);
+
+&nbsp;&nbsp;<span style="color:green;">//Plane&nbsp;geomPlane&nbsp;=&nbsp;new&nbsp;Plane(&nbsp;XYZ.BasisX,&nbsp;XYZ.Zero&nbsp;);&nbsp;//&nbsp;2016</span>
+
+&nbsp;&nbsp;<span style="color:#2b91af;">Plane</span>&nbsp;geomPlane&nbsp;=&nbsp;<span style="color:#2b91af;">Plane</span>.CreateByNormalAndOrigin(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>.Zero,&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisX&nbsp;);&nbsp;<span style="color:green;">//&nbsp;2017</span>
+
+&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;tx&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;tx.Start(&nbsp;<span style="color:#a31515;">&quot;tx&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">SketchPlane</span>&nbsp;sketch&nbsp;=&nbsp;<span style="color:#2b91af;">SketchPlane</span>.Create(&nbsp;doc,&nbsp;geomPlane&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">DetailLine</span>&nbsp;line3&nbsp;=&nbsp;doc.Create.NewDetailCurve(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;viewSection,&nbsp;geomLine3&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">DetailLine</span>;
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ReferenceArray</span>&nbsp;refArray&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ReferenceArray</span>();
+&nbsp;&nbsp;&nbsp;&nbsp;refArray.Append(&nbsp;line3.GeometryCurve.GetEndPointReference(&nbsp;0&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;refArray.Append(&nbsp;line3.GeometryCurve.GetEndPointReference(&nbsp;1&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;dimPoint1&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;417.8,&nbsp;80.118,&nbsp;46.8&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;dimPoint2&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;417.8,&nbsp;80.118,&nbsp;46.3&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;dimLine3&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;dimPoint1,&nbsp;dimPoint2&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Dimension</span>&nbsp;dim&nbsp;=&nbsp;doc.Create.NewDimension(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;viewSection,&nbsp;dimLine3,&nbsp;refArray&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;tx.Commit();
+&nbsp;&nbsp;}
+</pre>
+
+<p>The line I'm sending into <code>NewDimension</code> is along the Z axis, but the dimension line I'm getting back is sloped parallel to the detail line and gives the length of the entire detail line when I want just its Z component. Using RevitLookup, I see the <code>Curve</code> <code>Direction</code> has non-zero components for both Y and Z: <code>(0, 0.759, -0.651)</code>. When I create the line I want in Revit manually, the <code>Curve</code> has a <code>Direction</code> of <code>(0, 0, 1)</code> and gives just the length of the Z component of the sloped detail line. </p>
+<p>Here is an image of the section with the sloped detail line at the bottom right. It shows the dimension I created with the API (labelled with length of 0' - 9 7/32") and the one I created manually that I want to create with the API (labelled as 0' - 6"):</p>
+<p><center>
+<img src="img/revit_dimension_parallel.png" alt="Creating vertical dimensioning" width="270"/>
+</center></p>
+<p>I think I am in the correct plane. I am in the Y-Z plane with the X axis perpendicular to the plane and trying to measure a dimension in the Z direction. This works with a detail line that has end points with the same Y or Z coordinate, but is not working with the detail line with end points with different Y and Z coordinates, although the X coordinates are the same, so still in the Y-Z plane.</p>
+<p>I did more debugging in the code and found that the <code>Dimension</code> object returned by <code>doc.Create.NewDimension</code> is correct and what I want. For example, it has the value string of "0' - 6\"" which is the length of the detail line in the Z direction as I expect. But after the call to <code>Transaction.Commit</code>, the <code>Dimension</code> object changes. For example, the value string changes to "0' - 9 7/32\"", which is the total length of the detail line.</p>
+<p>So, the call to <code>Transaction.Commit</code> is changing the <code>Dimension</code> object and forcing the dimension line to be parallel to the detail line. I tried setting the <code>Dimension</code> property <code>IsLocked</code> to true before calling <code>Commit</code>, hoping that would fix the problem, but that does something even more odd. Here is an image to showing the new output, which has a line with the correct value string but parallel to the detail line instead of only in the Z direction:</p>
+<p><center>
+<img src="img/revit_dimension_parallel_2.png" alt="Creating vertical dimensioning" width="270"/>
+</center></p>
+<p><strong>Answer:</strong> I examined your code and see that you are not using the <code>geomPlane</code> variable.</p>
+<p>I found this method that will result in a "stable" dimension with a correct direction and value:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;point3&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;417.8,&nbsp;80.228,&nbsp;46.8&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;point4&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;417.8,&nbsp;80.811,&nbsp;46.3&nbsp;);
+
+&nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;geomLine3&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;point3,&nbsp;point4&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;dummyLine&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;<span style="color:#2b91af;">XYZ</span>.Zero,&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisY&nbsp;);
+
+&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;tx&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;tx.Start(&nbsp;<span style="color:#a31515;">&quot;tx&quot;</span>&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">DetailLine</span>&nbsp;line3&nbsp;=&nbsp;doc.Create.NewDetailCurve(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;viewSection,&nbsp;geomLine3&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">DetailLine</span>;
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">DetailLine</span>&nbsp;dummy&nbsp;=&nbsp;doc.Create.NewDetailCurve(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;viewSection,&nbsp;dummyLine&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">DetailLine</span>;
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ReferenceArray</span>&nbsp;refArray&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ReferenceArray</span>();
+&nbsp;&nbsp;&nbsp;&nbsp;refArray.Append(&nbsp;dummy.GeometryCurve.Reference&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;refArray.Append(&nbsp;line3.GeometryCurve.GetEndPointReference(&nbsp;0&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;refArray.Append(&nbsp;line3.GeometryCurve.GetEndPointReference(&nbsp;1&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;dimPoint1&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;417.8,&nbsp;80.118,&nbsp;46.8&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;dimPoint2&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;417.8,&nbsp;80.118,&nbsp;46.3&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;dimLine3&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;dimPoint1,&nbsp;dimPoint2&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Dimension</span>&nbsp;dim&nbsp;=&nbsp;doc.Create.NewDimension(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;viewSection,&nbsp;dimLine3,&nbsp;refArray&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;doc.Delete(&nbsp;dummy.Id&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;tx.Commit();
+&nbsp;&nbsp;}
+</pre>
+
+<p><strong>Response:</strong> This solved the issue. I was able to adapt it to get the Y dimension of the sloped line as well. Thank you for the solution!</p>
+<p>I wonder what happens if you delete the dummy line... will the stable reference remain? Probably not...</p>
+<h4><a name="3"></a>More Research on a Revit QAS</h4>
+<p>Back to my favourite current 'hobby' topic.</p>
+<p>As I already reported, I would like to implement a question answering system for the Revit API and all aspects of Revit API usage and add-in programming:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/01/au-in-london-and-deep-learning.html#7">Jill Watson as motivation and lots of literature on deep learning</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/01/virtues-of-reproduction-research-mep-settings-ontology.html#5">Getting started implementing a question answering system</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/01/virtues-of-reproduction-research-mep-settings-ontology.html#6">First impression from IBM Bluemix</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/01/virtues-of-reproduction-research-mep-settings-ontology.html#7">Open source QAS options</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/01/virtues-of-reproduction-research-mep-settings-ontology.html#8">Building a Revit API ontology</a></li>
+</ul>
+<p>Here are some new additions and further steps in my exploration:</p>
+<h4><a name="4"></a>QnA Maker</h4>
+<p>Matt Taylor added
+a <a href="http://thebuildingcoder.typepad.com/blog/2017/01/au-in-london-and-deep-learning.html#comment-3095462007">comment</a> to
+the last post, pointing out
+the <a href="https://qnamaker.ai">Microsoft QnA Maker</a> service
+that supports you in building, training and publishing a simple question and answer bot based on FAQ URLs, structured documents or editorial content in minutes:</p>
+<blockquote>
+<p>I posted another comment on your last AI post that you may have missed.
+This is the link I thought would be of interest: 
+<a href="http://www.infoworld.com/article/3149710/cloud-computing/microsofts-new-service-turns-faqs-into-bots.html">Microsoft's new service turns FAQs into bots</a>. Good luck with your quest!</p>
+</blockquote>
+<p>Checking out further related news, I also noticed:</p>
+<ul>
+<li><a href="http://www.nohold.com/sicura-quickstart.html">noHold launches Sicura QuickStart</a> empowering non-programmers to create their own Virtual Assistant (bot).</li>
+<li><a href="http://www.albertai.com/">Albert</a>, a virtual assistant or bot that can ingest information from a document; looks similar to a live chat application, but end users interact with artificial intelligence (AI) instead of a person.</li>
+</ul>
+<p>Yes, these do indeed look similar to my goal.</p>
+<p>It seems I am on to a hot topic here...</p>
+<h4><a name="5"></a>First Steps with DeepDive</h4>
+<p>I installed <a href="http://deepdive.stanford.edu/">Stanford DARPA DeepDive</a>, ran through its tutorial and looked at some related papers:</p>
+<ul>
+<li><a href="http://deepdive.stanford.edu/ops-data">Managing input data and data products</a></li>
+<li><a href="http://deepdive.stanford.edu/papers">DeepDive papers</a></li>
+<li><a href="http://cs.stanford.edu/people/czhang/zhang.thesis.pdf">DeepDive: A Data Management System for Automatic Knowledge Base Construction</a></li>
+<li><a href="https://gitter.im/HazyResearch/deepdive">HazyResearch DeepDive chat</a></li>
+<li><a href="https://github.com/raphaelhoffmann/tutorials">Tutorial: Entity Linking for Locations</a> detects
+mentions of geographic locations (in 20k Reuters news articles) and links these unambiguously to
+a <a href="http://www.wikidata.org">Wikidata</a> database of locations.</li>
+<li>Tips on <a href="http://stackoverflow.com/questions/25228106/how-to-extract-text-from-an-existing-docx-file-using-python-docx">extracting text from an existing docx file using <code>python-docx</code></a> to use as DeepDive input.</li>
+</ul>
+<p>The <code>spouse_example</code> used in the DeepDive tutorial and other examples I have seen so far don't look much like Q &amp; A to me, so I took another look at alternatives.</p>
+<h4><a name="6"></a>YodaQA, DL-Learner and OWL</h4>
+<p>At a certain point, I went back to exploring alternative open source answering systems to see whether some other system might be more accessible:</p>
+<ul>
+<li><a href="https://www.quora.com/Are-there-any-automatic-open-source-question-answering-system-engines">Are there any automatic open source question answering system engines</a>?</li>
+<li><a href="https://github.com/brmson/yodaqa">YodaQA</a>, and a <a href="http://pasky.or.cz/dev/brmson/brmson-cig2015.pdf">YodaQA slide deck</a></li>
+<li><a href="https://github.com/brmson/hub">Hub for preprocessing of questions for YodaQA</a></li>
+<li><a href="http://petr-marek.com/blog/2016/04/03/yodaqa-learned-to-tweet/">YodaQA learned to tweet</a></li>
+<li><a href="https://eclubprague.com/blog/">YodaQA on Docker</a></li>
+<li><a href="https://pdfs.semanticscholar.org/6060/5dc7210eb9986c7e8c037430ffb37a0da532.pdf">Biomedical question answering using the YodaQA system: prototype notes</a></li>
+<li><a href="http://stackoverflow.com/questions/27602489/running-java-program-by-considering-import-dependencies">Petr answered question on StackOverflow</a></li>
+<li><a href="https://pypi.python.org/pypi/dragonfire">DragonFire</a> &ndash; combine <a href="https://github.com/brmson/yodaqa">YodaQA</a> and <a href="http://teach.dragon.computer/gui/jquery/multibot_gui_with_chatlog.php">Teachable AI</a> (<a href="https://github.com/Program-O/Program-O">Program O</a>?)</li>
+<li><a href="https://github.com/AKSW/NLIWOD">NLIWOD &ndash; natural language interfaces for the web of data</a></li>
+<li><a href="https://github.com/AKSW/openQA">OpenQA open source question answering framework</a></li>
+<li><a href="http://dl-learner.org/">DL-Learner</a>, a framework for supervised Machine Learning in OWL, RDF and Description Logics, <a href="http://dl-learner.org/Resources/Documents/manual.pdf">manual</a></li>
+</ul>
+<p>DL-Learner sounds very much like what I need... this led me deeper into ontology again:</p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Web_Ontology_Language">OWL Web Ontology Language</a>, built on the W3C <a href="https://en.wikipedia.org/wiki/Resource_Description_Framework">RDF Resource Description Framework</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Description_logic">Description logic</a></li>
+<li><a href="http://technologies.kmi.open.ac.uk/aqualog/">AquaLog</a>, a portable question-answering system which takes queries expressed in natural language and an ontology as input and returns answers drawn from one or more knowledge bases, <a href="http://technologies.kmi.open.ac.uk/aqualog/demo.html">demo</a> not working, latest publication from 2007...</li>
+<li><a href="https://github.com/SolrSherlock/SolrSherlock">SolrSherlock</a>, last update 2013...</li>
+<li><a href="https://www.researchgate.net/publication/220746985_Flexible_Ontology_Population_from_Text_The_OwlExporter">Flexible ontology population from text: the OwlExporter</a></li>
+<li><a href="http://www.scienpress.com/Upload/JCM/Vol%202_4_4.pdf">Domain ontology for programming languages</a> uses Protege4 and Reasoner from Stanford</li>
+<li><a href="http://protege.stanford.edu/">Protégé</a> <a href="http://protegewiki.stanford.edu">wiki</a>, a free, open-source platform that provides a growing user community with a suite of tools to construct domain models and knowledge-based applications with ontologies.</li>
+<li>Create an ontology for the Revit API including all the known tips and tricks for using it, collected from reference docs, blogs and public discussion forums.</li>
+<li><a href="http://protegewiki.stanford.edu/wiki/Ontology101">Ontology development 101: a guide to creating your first ontology</a></li>
+<li><a href="http://protegewiki.stanford.edu/wiki/Protege_Ontology_Library">Protege ontology library</a> &ndash; existing ontologies</li>
+</ul>
+<p>After a deeper look, it seems like an ontology might possibly be an overkill.</p>
+<p>At least, it is insufficient on its own to implement a complex answering system.</p>
+<p>Such as system would seem to require more generic, complex and fuzzy reactions than a pure ontology based one can provide.</p>
+<p>I do not need to ask hard facts, like 'what is a ModelLine?'</p>
+<p>I need fuzzier stuff like 'how do I set the view direction of a 3D view?'</p>
+<p>Something like this looks like a good mix, but a bit dated:</p>
+<ul>
+<li><a href="http://www.sersc.org/journals/IJDTA/vol4_no2/9.pdf">QASYO: A Question Answering System for YAGO Ontology</a> (2011) &ndash; integrate natural language processing, ontologies and information retrieval technologies in a unified framework.</li>
+</ul>
+<p>Looking again at YodaQA, I see that it clearly states support for all three data source types: full text, database and ontology. That sounds perfect for my purposes, so I went ahead and followed the YodaQA installation instructions. Unfortunately, I have not yet been able to get an answer from the system, because it times out accessing the YodaQA system author's knowledge base in Prague.</p>
+<p>In fact, two existing YodaQA GitHub issues pretty precisely match my needs:</p>
+<ul>
+<li><a href="https://github.com/brmson/yodaqa/issues/17">YodaQA issue #17 Domain Adaptations</a></li>
+<li><a href="https://github.com/brmson/yodaqa/issues/62">YodaQA issue #62 How to add more full text sources</a></li>
+</ul>
+<p>Also, just a few days ago,
+<a href="http://ai.stackexchange.com/users/4627/charles-miller">Charles Miller</a> asked
+about <a href="http://ai.stackexchange.com/questions/2649/anyone-used-yodaqa">Using YodaQA with a non-Wikipedia source</a> to
+implement a closed-domain QAS:</p>
+<blockquote>
+<p>Has anyone used YodaQA for natural language processing? How easy is it to link to a document database other than Wikipedia?</p>
+<p>We're thinking we can create a bot to use AI to analyse our developer and user documentation and provide a written or spoken answer in reply. YodaQA comes linked to Wikipedia for starters, but we'd need to link to our own source info. I'm trying to get an idea of the development time required to set up the AI and then to link to the database.</p>
+</blockquote>
+<p>I am eagerly awaiting an answer to that question as well...</p>
+<h4><a name="7"></a>My Current Open Questions on Question Answering Systems</h4>
+<p>So, all in all, I am currently exploring both DeepDive and YodaQA. 
+Both seem promising and not completely straightforward to use, expand, or adapt to a closed domain.</p>
+<p>Here the main question I currently have and would love to hear an answer on:</p>
+<ul>
+<li>Does it make sense for me to combine all three knowledge base sources, i.e., an ontology, full text and a Q &amp; A database?</li>
+</ul>
+<p>Some obvious follow-up questions arise:</p>
+<ul>
+<li>If so, how do I achieve that?</li>
+<li>How do I create these sources, format and store them?</li>
+<li>How do I feed them into the existing systems, e.g., DeepDive and YodaQA?</li>
+<li>Should I consider some other system instead?</li>
+<li>Is there a simpler approach?</li>
+</ul>
+<p>Let me reiterate the raw information sources available:</p>
+<ul>
+<li>The Revit API help file <code>RevitAPI.chm</code> contents, accessible <a href="http://www.revitapidocs.com">online at <code>revitapidocs.com</code></a>.</li>
+<li>The Revit <a href="http://help.autodesk.com/view/RVT/2017/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42">Developer Guide</a>.</li>
+<li>The <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>.</li>
+<li>StackOverflow questions tagged with <a href="http://stackoverflow.com/questions/tagged/revit-api"><code>revit-api</code></a> and <a href="http://stackoverflow.com/questions/tagged/revitpythonshell"><code>revitpythonshell</code></a>.</li>
+<li><a href="http://thebuildingcoder.typepad.com">The Building Coder</a> and other blog content.</li>
+<li>Emails and other sources.</li>
+</ul>
+<p>The mapping between these raw sources and the target knowledge base components appears obvious to me:</p>
+<ul>
+<li>Ontology &ndash; generate automatically (by programming) from RevitAPI.chm.</li>
+<li>Full text &ndash; generate from developer guide and blog posts.</li>
+<li>Q &amp; A database &ndash; generate from discussion forum threads and blog posts containing clearly marked pairs of questions and answers.</li>
+</ul>
