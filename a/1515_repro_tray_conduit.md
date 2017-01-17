@@ -258,7 +258,7 @@ I'm raring to get going diving deeper into DeepDive.
 
 Obviously, the system will never know more than what you tell it to start with, and teach it as it goes along.
 
-Luckily, this is a so-called <b><i>closed domain</i></b> and thus an easier task because the system can exploit domain-specific knowledge., as opposed to an open domain dealing with questions about nearly anything whatsoever.
+Luckily, this is a so-called <b><i>closed domain</i></b> and thus an easier task because the system can exploit domain-specific knowledge, as opposed to an open domain dealing with questions about nearly anything whatsoever.
 
 I need to assemble a Revit API [ontology](https://en.wikipedia.org/wiki/Ontology_(information_science)).
 
