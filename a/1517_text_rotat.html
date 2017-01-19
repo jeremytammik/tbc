@@ -80,9 +80,6 @@ the <a href="http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-r
 </pre>
 
 <p><strong>Response:</strong> This is how I managed to create the rotated text aligned with existing curve based elements:</p>
-<p>// get vector representing the pipe
-  XYZ v = PipeEnd - PipeStart;</p>
-<p>double angle = Math.Atan2( v.Y, v.X );</p>
 <pre class="code">
   <span style="color:green;">//&nbsp;get&nbsp;the&nbsp;curve&nbsp;of&nbsp;the&nbsp;element</span>
   <span style="color:#2b91af;">Curve</span>&nbsp;curve&nbsp;=&nbsp;(&nbsp;(<span style="color:#2b91af;">LocationCurve</span>)&nbsp;elem.Location&nbsp;)

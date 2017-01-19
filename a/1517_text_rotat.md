@@ -108,11 +108,6 @@ Also, how do I change the rotation of existing text notes?
 
 **Response:** This is how I managed to create the rotated text aligned with existing curve based elements:
  
-   // get vector representing the pipe
-  XYZ v = PipeEnd - PipeStart;
-
-  double angle = Math.Atan2( v.Y, v.X );
-
 <pre class="code">
   <span style="color:green;">//&nbsp;get&nbsp;the&nbsp;curve&nbsp;of&nbsp;the&nbsp;element</span>
   <span style="color:#2b91af;">Curve</span>&nbsp;curve&nbsp;=&nbsp;(&nbsp;(<span style="color:#2b91af;">LocationCurve</span>)&nbsp;elem.Location&nbsp;)
