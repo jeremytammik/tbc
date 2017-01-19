@@ -15,7 +15,12 @@ http://forums.autodesk.com/t5/revit-api-forum/textnote-how-to-set-rotation-in-re
 
 #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
-&ndash; ...
+The Forge DevCon developer conference has been happily united with Autodesk University, text note rotation is easy, and I continued my deep learning exploration for implementing a Revit API question answering system
+&ndash; Forge DevCon at AU
+&ndash; Setting <code>TextNote</code> rotation
+&ndash; TensorFlow and Keras
+&ndash; Updating restricted Python packages
+&ndash; Rules of machine learning...
 
 #AULondon, #UI, #innovation, #RevitAPI, @AutodeskRevit bit.ly/2j7Sxkb
 
@@ -192,17 +197,28 @@ It is explained in greater detail in the StackOverflow question
 on [restricted folder and files in OS X El Capitan](http://stackoverflow.com/questions/30768087/restricted-folder-files-in-os-x-el-capitan):
 
 > To temporarily disable SIP (System Integrity Protection):
-<ul><li>Reboot</li>
-<li>As soon as you hear the "Mac sound" on the grey screen, press Cmd+R to enter Recovery mode</li>
-<li>Open Utilities &gt; Terminal</li>
-<li>Run the command `csrutil disable`</li>
-<li>Reboot, you'll land in the normal OS with SIP disabled</li>
-<li>Do all the changes you'd like to do</li>
-<li>Reboot again</li>
-<li>As soon as you hear the "Mac sound" on the grey screen, press Cmd+R to enter Recovery mode</li>
-<li>Enable SIP with `csrutil enable`</li>
-<li>Reboot again</li>
-<li>Done</li></ul>
+
+> - Reboot
+
+> - As soon as you hear the "Mac sound" on the grey screen, press Cmd+R to enter Recovery mode
+
+> - Open Utilities &gt; Terminal
+
+> - Run the command `csrutil disable`
+
+> - Reboot, you'll land in the normal OS with SIP disabled
+
+> - Do all the changes you'd like to do
+
+> - Reboot again
+
+> - As soon as you hear the "Mac sound" on the grey screen, press Cmd+R to enter Recovery mode
+
+> - Enable SIP with `csrutil enable`
+
+> - Reboot again
+
+> - Done
 
 On my system, the problematic packages live in the folder
 
@@ -211,7 +227,7 @@ On my system, the problematic packages live in the folder
 You can examine their restricted status using `ls`:
 
 <pre>
-$ ls -lhdO num*
+&#36; &#108;s -lhdO num*
 drwxr-xr-x  36 root  wheel  restricted             1.2K May 25  2016 numpy
 -rw-r--r--   1 root  wheel  restricted,compressed  1.6K Aug  1  2015 numpy-1.8.0rc1-py2.7.egg-info
 </pre>
@@ -219,16 +235,16 @@ drwxr-xr-x  36 root  wheel  restricted             1.2K May 25  2016 numpy
 By temporarily disabling SIP, I was finally able to move them out of the way and continue normal installation:
 
 <pre>
-$ sudo -H pip install tensorflow
+&#36; sudo -H pip install tensorflow
 </pre>
 
 With TensorFlow in place, I successfully ran the standard Python install in the `keras` folder and immediately executed one of its interesting examples:
 
 <pre>
-/a/src/deep_learning $ cd kears
-/a/src/deep_learning/keras $ sudo python setup.py install
-/a/src/deep_learning/keras $ cd examples
-/a/src/deep_learning/keras/examples $ python babi_rnn.py
+/a/src/deep_learning &#36; cd kears
+/a/src/deep_learning/keras &#36; sudo python setup.py install
+/a/src/deep_learning/keras &#36; cd examples
+/a/src/deep_learning/keras/examples &#36; python babi_rnn.py
 </pre>
 
 
@@ -345,11 +361,15 @@ split up into useful consecutive phases:
 To quote Martin:
 
 > The document is arranged in four parts:
-<ol>
-<li>The first part should help you understand whether the time is right for building a machine learning system.</li>
-<li>The second part is about deploying your first pipeline.</li>
-<li>The third part is about launching and iterating while adding new features to your pipeline, how to evaluate models and training-­serving skew.</li>
-<li>The final part is about what to do when you reach a plateau.</li>
-<li>Afterwards, there is a list of related work and an appendix with some background on the systems commonly used as examples in this document.</ol></li>
+
+>- The first part should help you understand whether the time is right for building a machine learning system.
+
+>- The second part is about deploying your first pipeline.
+
+>- The third part is about launching and iterating while adding new features to your pipeline, how to evaluate models and training-­serving skew.
+
+>- The final part is about what to do when you reach a plateau.
+
+>- Afterwards, there is a list of related work and an appendix with some background on the systems commonly used as examples in this document.
 
 It is strongly geared towards ranking.
