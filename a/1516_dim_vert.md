@@ -23,7 +23,7 @@ Today, I highlight yet another interesting Revit API discussion forum thread and
 &ndash; YodaQA, DL-Learner and OWL
 &ndash; My current open questions...
 
-Vertical Dimensioning and Revit API QAS Research #RevitAPI @AutodeskRevit #dynamobim
+Vertical Dimensioning and Revit API QAS Research #RevitAPI @AutodeskRevit #dynamobim http://bit.ly/1516_dim_vert
 
 -->
 
