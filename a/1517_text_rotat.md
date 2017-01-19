@@ -196,29 +196,19 @@ The short description of the solution for this is given there:
 It is explained in greater detail in the StackOverflow question
 on [restricted folder and files in OS X El Capitan](http://stackoverflow.com/questions/30768087/restricted-folder-files-in-os-x-el-capitan):
 
-> To temporarily disable SIP (System Integrity Protection):
+To temporarily disable SIP (System Integrity Protection):
 
-> - Reboot
-
-> - As soon as you hear the "Mac sound" on the grey screen, press Cmd+R to enter Recovery mode
-
-> - Open Utilities &gt; Terminal
-
-> - Run the command `csrutil disable`
-
-> - Reboot, you'll land in the normal OS with SIP disabled
-
-> - Do all the changes you'd like to do
-
-> - Reboot again
-
-> - As soon as you hear the "Mac sound" on the grey screen, press Cmd+R to enter Recovery mode
-
-> - Enable SIP with `csrutil enable`
-
-> - Reboot again
-
-> - Done
+- Reboot
+- As soon as you hear the "Mac sound" on the grey screen, press Cmd+R to enter Recovery mode
+- Open Utilities &gt; Terminal
+- Run the command `csrutil disable`
+- Reboot, you'll land in the normal OS with SIP disabled
+- Do all the changes you'd like to do
+- Reboot again
+- As soon as you hear the "Mac sound" on the grey screen, press Cmd+R to enter Recovery mode
+- Enable SIP with `csrutil enable`
+- Reboot again
+- Done
 
 On my system, the problematic packages live in the folder
 
@@ -360,16 +350,11 @@ split up into useful consecutive phases:
 
 To quote Martin:
 
-> The document is arranged in four parts:
-
->- The first part should help you understand whether the time is right for building a machine learning system.
-
->- The second part is about deploying your first pipeline.
-
->- The third part is about launching and iterating while adding new features to your pipeline, how to evaluate models and training-­serving skew.
-
->- The final part is about what to do when you reach a plateau.
-
->- Afterwards, there is a list of related work and an appendix with some background on the systems commonly used as examples in this document.
+The document is arranged in four parts:
+- The first part should help you understand whether the time is right for building a machine learning system.
+- The second part is about deploying your first pipeline.
+- The third part is about launching and iterating while adding new features to your pipeline, how to evaluate models and training-­serving skew.
+- The final part is about what to do when you reach a plateau.
+- Afterwards, there is a list of related work and an appendix with some background on the systems commonly used as examples in this document.
 
 It is strongly geared towards ranking.
