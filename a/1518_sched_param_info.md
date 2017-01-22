@@ -32,7 +32,7 @@ Lots of information on, from and about schedule parameters, and a new elegant so
 
 ####<a name="2"></a>Direct Access to Shared Parameter GUID
 
-Alexander Ignatovich already shared several exciting solutions with us all in the past.
+Alexander Ignatovich (Александр Игнатович) already shared several exciting solutions with us all in the past.
 
 Today he faced a new problem.
 
@@ -101,7 +101,7 @@ I am sure it will make many people very happy!
 I therefore added it to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) 
 in [release 2017.0.132.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.132.0).
 
-
+We can make use of this right away to enhance the answer to the question below as well.
 
 
 
