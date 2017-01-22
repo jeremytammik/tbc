@@ -79,6 +79,10 @@ The agenda is simple:
 
 #### <a name="4"></a>Creating a Revit Add-In with One Single Click
 
+I can create a new Revit add-in DLL, compile, load and execute it with one single click or two using
+the [Visual Studio Revit add-in wizards](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.20),
+and I demonstrate that live in a handful of seconds.
+
 Obviously, if everything were as simple as one single click, life would be extremely boring and no challenge at all.
 
 It makes things a lot more interesting if you understand what is going on under the hood.
