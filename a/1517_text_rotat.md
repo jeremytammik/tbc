@@ -351,6 +351,7 @@ split up into useful consecutive phases:
 To quote Martin:
 
 The document is arranged in four parts:
+
 - The first part should help you understand whether the time is right for building a machine learning system.
 - The second part is about deploying your first pipeline.
 - The third part is about launching and iterating while adding new features to your pipeline, how to evaluate models and training-­serving skew.
