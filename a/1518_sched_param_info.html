@@ -19,66 +19,146 @@
 
 -->
 
-<h3>Retrieving Schedule Parameter Information</h3>
+<h3>Shared Parameter GUID, Schedule and Other</h3>
+<p>Lots of information on, from and about schedule parameters, and a new elegant solution to a long-standing challenge:</p>
 <ul>
-<li><a href="#2"></a></li>
+<li><a href="#2">Direct access to shared parameter GUID</a></li>
+<li><a href="#3">Getting parameter information from a schedule</a></li>
 </ul>
-<h4><a name="2"></a></h4>
-<p><strong>Question:</strong></p>
-<p>The "ScheduleField" class has a property "ParameterId", which is good.</p>
-<p>Now I would like to know more about the this parameter:</p>
+<h4><a name="2"></a>Direct Access to Shared Parameter GUID</h4>
+<p>Alexander Ignatovich already shared several exciting solutions with us all in the past.</p>
+<p>Today he faced a new problem.</p>
+<p>As usual, he came up with an impressively direct solution to share.</p>
+<p>The problem is rather old and known, and he found an elegant new way to solve it:</p>
+<p>I wanted to get shared parameters GUIDs directly from project parameters.</p>
+<p>Of course I found the solution demonstrated by 
+the <a href="http://thebuildingcoder.typepad.com/blog/2015/12/shared-project-parameter-guid-reporter.html">shared project parameter GUID reporter</a>, where you need to attach the parameter to the project information (for instance parameters) and wall (for type parameters) categories.</p>
+<p>I also found another blog post on <a href="http://spiderinnet.typepad.com/blog/2011/05/parameter-of-revit-api-30-project-parameter-information.html">parameter of Revit API 30 &ndash; project parameter information</a>, but this solution did not work for me, because all definitions in <code>doc.ParameterBindings</code> are <code>InternalDefinition</code> objects in Revit 2017.</p>
+<p>I investigated further and found that <code>InternalDefinition</code> has an <code>Id</code>. I retrieved the corresponding database element from the document by this <code>Id</code>. I saw that <code>SharedParameterElement</code> is returned for shared project parameters and <code>ParameterElement</code> for non-shared project parameters. <code>SharedParameterElement</code> has a <code>GuidValue</code> property, which is exactly what I need.</p>
+<p>The code:</p>
+<pre class="code">
+&nbsp;&nbsp;[<span style="color:#2b91af;">Transaction</span>(&nbsp;<span style="color:#2b91af;">TransactionMode</span>.ReadOnly&nbsp;)]
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">CmdSharedParamGuids</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IExternalCommand</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">Result</span>&nbsp;Execute(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ExternalCommandData</span>&nbsp;commandData,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">ref</span>&nbsp;<span style="color:blue;">string</span>&nbsp;message,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementSet</span>&nbsp;elements&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;uiapp&nbsp;=&nbsp;commandData.Application;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;uidoc&nbsp;=&nbsp;uiapp.ActiveUIDocument;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;doc&nbsp;=&nbsp;uidoc.Document;
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;bindingMap&nbsp;=&nbsp;doc.ParameterBindings;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;it&nbsp;=&nbsp;bindingMap.ForwardIterator();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;it.Reset();
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">while</span>(&nbsp;it.MoveNext()&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;definition&nbsp;=&nbsp;(<span style="color:#2b91af;">InternalDefinition</span>)&nbsp;it.Key;
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;sharedParameterElement&nbsp;=&nbsp;doc.GetElement(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;definition.Id&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">SharedParameterElement</span>;
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;sharedParameterElement&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;non-shared&nbsp;parameter&quot;</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;definition.Name&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">else</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;shared&nbsp;parameter&quot;</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">$&quot;</span>{sharedParameterElement.GuidValue}<span style="color:#a31515;">&quot;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;<span style="color:#a31515;">&quot;-&nbsp;{definition.Name}&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Succeeded;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+</pre>
+
+<p>Thank you very much for this elegant solution, Alexander!</p>
+<p>Sweet and simple!</p>
+<p>I am sure it will make many people very happy!</p>
+<p>I therefore added it to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> 
+in <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.132.0">release 2017.0.132.0</a>.</p>
+<h4><a name="3"></a>Getting Parameter Information from a Schedule</h4>
+<p>From
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> thread
+on <a href="http://forums.autodesk.com/t5/revit-api-forum/getting-parameter-information-from-a-schedule/m-p/6802850">getting parameter information from a schedule</a>:</p>
+<p><strong>Question:</strong> The <code>ScheduleField</code> class has a property <code>ParameterId</code>, which is good.</p>
+<p>Now I would like to know more about this parameter:</p>
 <ol>
-<li>The name of the parameter,</li>
-<li>If it is an instance or type parameter,</li>
-<li>If it is a shared or built-in parameter,</li>
-<li>The parameter Unit,</li>
+<li>The name of the parameter.</li>
+<li>If it is an instance or type parameter.</li>
+<li>If it is a shared or built-in parameter.</li>
+<li>The parameter Unit.</li>
 <li>GUID of the parameter if it is shared.</li>
 </ol>
 <p>I think I can get 1 and 2 working, but pretty much clueless about 3, 4 and 5.</p>
-<p><strong>Answer:</strong></p>
-<p>Before anything else, I must ask you:</p>
+<p><strong>Answer:</strong> Before anything else, I must ask you:</p>
 <p>Have you installed <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a> and are you using it on a regular basis in your Revit database exploration?</p>
-<p>If the answer is 'no', I suggest we terminate this discussion right here and now until you have installed it and tested using it for your situation:</p>
 <p>With that tool, you can interactively snoop the database.</p>
-<p>In this case, you could grab one of those ParameterId values, use the Revit API Manage tab to select the corresponding database element, regardless of whether it has a graphical representation or not, and interactively explore its nature, contents, parameters, relationships with other elements, etc.</p>
-<p>That will probably answer your question right then and there.</p>
+<p>In this case, you could grab one of those ParameterId values, use the built-in Revit <em>Select by Id</em> command in the <em>Manage</em> tab to select the corresponding database element, regardless of whether it has a graphical representation or not, and interactively explore its nature, contents, parameters, relationships with other elements, etc.</p>
+<p>That will probably answer your question.</p>
 <p>It is statically compiled, however, so it mainly displays properties. It does not dynamically evaluate all methods available on all classes.</p>
 <p>For that, you can use other,
 even <a href="http://thebuildingcoder.typepad.com/blog/2013/11/intimate-revit-database-exploration-with-the-python-shell.html">more powerful and interactive database exploration tools</a>.</p>
 <p>Also, my discussion
-on <a href="http://thebuildingcoder.typepad.com/blog/2017/01/virtues-of-reproduction-research-mep-settings-ontology.html#3">How to Research to Find a Revit API Solution</a> might
+on <a href="http://thebuildingcoder.typepad.com/blog/2017/01/virtues-of-reproduction-research-mep-settings-ontology.html#3">how to research to find a Revit API solution</a> might
 come in handy for you at this point.</p>
-<p><strong>Response:</strong> </p>
-<p>I have installed RevitLookup for Revit 2015 (the version I'm developing as our development needs to be backward compatible with our current projects).</p>
-<p>RevitLookup is a great tool that can save hundreds hours of time on browsing the "watch" in the debug mode, which I have been using.</p>
-<p>However, I still can't find the field parameter definitions (shared or builtin) for the "schedulefield" class. I understand the "viewschedule" and "schedulefield" are different classes. I suspect this may have to do with Revit API's limitation.</p>
-<p>By the way it seems RevitLookup is a ribbon panel in the "Add-ins" tab, I can't see "API Manage Tab", am I missing something here?</p>
+<p><strong>Response:</strong> I have installed RevitLookup for Revit 2015 (the version I'm developing as our development needs to be backward compatible with our current projects).</p>
+<p>RevitLookup is a great tool that can save hundreds of hours of time on browsing the "watch" in the debug mode, which I have been using.</p>
+<p>However, I still can't find the field parameter definitions (shared or built-in) for the <code>ScheduleField</code> class. I understand the "viewschedule" and "schedulefield" are different classes. I suspect this may have to do with Revit API's limitation.</p>
+<p>By the way, it seems RevitLookup defines a ribbon panel in the 'Add-ins' tab &ndash; however, I can't see the 'Manage Tab'; am I missing something here?</p>
 <p><strong>Answer:</strong></p>
-<p>1  Name =  Field.GetName()</p>
-<p>2  Type or Instance?  Probably only a definitive answer for a schedule of 1 System Family Category. Shared Parameters in User Created Families can be both Type and Instance ( in different families)</p>
-<p>3  Shared or BuiltIn? 
-Field.ParameterId &lt; -1 : BuiltInParameter     Field.ParameterId == BuiltInParameter value
-Field.ParameterId &gt;0:    SharedParameter
-Field.ParameterId = -1: miscellaneous ( calculated value, percentage)
-Shared Parameter:
-SharedParameterElement shElem = doc.GetElement(Field.ParameterId) as SharedParameterElement
-You can find the answer to 4 and 5 in shElem.Definition </p>
-<p>BuiltParameter:
-You need a element (Elem) to get access to a BuiltInParameter, so you need to have a non empty schedule.
-Parameter par = Elem.get_Parameter((BuiltInParameter) Field.ParameterId.IntegerValue);
-You can find the answer to 4 in par.Definition</p>
-<p><strong>Response:</strong> </p>
-<p>Very nice answers, thanks a lot.</p>
-<p>Regarding 2, I guess I have to use the <code>FamilyManager</code> to open the families to find out if the shared parameter is a "Type" or "Instance" one.</p>
-<p><strong>Answer:</strong></p>
-<p><a href="">Select element by id</a> is part of the standard end user interface:</p>
-<p>https://knowledge.autodesk.com/support/revit-products/learn-explore/caas/CloudHelp/cloudhelp/2015/EN...</p>
-<p>As said, it comes in handy for using RevitLookup to snoop element data and properties, since it can be used on invisible elements that cannot be selected in any other way as well.</p>
-<p><strong>Response:</strong> </p>
-<p>I have found the post you mentioned and tried, it works well that I can find the the shared parameter visually on the Revit property panel even it is a "hidden" element, that's quite cool. :)</p>
-<p><center>
-<img src="img/.png" alt="" width="500"/>
-</center></p>
-<h4><a name="3"></a></h4>
+<ol>
+<li>name of the parameter:</li>
+</ol>
 <pre class="code">
+  Name = Field.GetName()
 </pre>
+
+<ol>
+<li>Type or Instance?</li>
+</ol>
+<p>Probably only a definitive answer for a schedule of 1 System Family Category. Shared Parameters in User Created Families can be both Type and Instance (in different families).</p>
+<ol>
+<li>
+<p>Shared or BuiltIn?</p>
+</li>
+<li>
+<p>Field.ParameterId &lt; -1 : BuiltInParameter &ndash; Field.ParameterId == BuiltInParameter value</p>
+</li>
+<li>Field.ParameterId &gt; 0 : SharedParameter</li>
+<li>Field.ParameterId = -1 : miscellaneous (calculated value, percentage)</li>
+</ol>
+<p>Shared Parameter:</p>
+<pre class="code">
+  SharedParameterElement shElem = doc.GetElement(
+    Field.ParameterId) as SharedParameterElement;
+</pre>
+
+<p>You can find the answer to 4 and 5 in <code>shElem.Definition</code> .</p>
+<p>Built-in Parameter:</p>
+<p>You need an element (Elem) to get access to a BuiltInParameter, so you need to have a non-empty schedule.</p>
+<pre class="code">
+  Parameter par = Elem.get_Parameter(
+    (BuiltInParameter) Field.ParameterId.IntegerValue );
+</pre>
+
+<p>You can find the answer to 4 in <code>par.Definition</code>.</p>
+<p><strong>Response:</strong> Very nice answers, thanks a lot.</p>
+<p>Regarding 2, I guess I have to use the <code>FamilyManager</code> to open the families to find out if the shared parameter is a 'Type' or 'Instance' one.</p>
+<p><strong>Answer:</strong> More on <em>Select by Id</em>:</p>
+<p><a href="https://knowledge.autodesk.com/support/revit-products/learn-explore/caas/CloudHelp/cloudhelp/2017/ENU/Revit-Troubleshooting/files/GUID-2B1CC22C-CB1F-45DA-B57B-62C36013D9E0-htm.html">Select element by id</a> is
+part of the standard end user interface:</p>
+<ul>
+<li>Help entry on <a href="http://help.autodesk.com/view/RVT/2017/ENU/?guid=GUID-2B1CC22C-CB1F-45DA-B57B-62C36013D9E0">Select Elements by ID</a></li>
+<li>101-second YouTube video on <a href="https://www.youtube.com/watch?v=prv8nGrU56o">Selecting Elements Using the Element ID</a>:</li>
+</ul>
+<p><center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/prv8nGrU56o?rel=0" frameborder="0" allowfullscreen></iframe>
+</center></p>
+<p>As said, it comes in handy for using RevitLookup to snoop element data and properties, since it can be used on invisible elements that cannot be selected in any other way as well.</p>
+<p><strong>Response:</strong> I found the post you mentioned and tried; it works well that I can find the shared parameter visually on the Revit property panel even it is a 'hidden' element; that's quite cool. :)</p>
