@@ -14,13 +14,15 @@
 
 #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
-&ndash; ...
+Lots of information on, from and about schedule parameters, and a new elegant solution to a long-standing challenge
+&ndash; Direct access to shared parameter GUID
+&ndash; Getting parameter information from a schedule...
 
 #AULondon, #UI, #innovation, #RevitAPI, @AutodeskRevit bit.ly/2j7Sxkb
 
 -->
 
-### Shared Parameter GUID, Schedule and Other
+### Schedule Parameter and Shared Parameter GUID
 
 Lots of information on, from and about schedule parameters, and a new elegant solution to a long-standing challenge:
 
