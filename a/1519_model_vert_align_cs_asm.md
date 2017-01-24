@@ -9,17 +9,17 @@
 
 <!---
 
-- Alexander Ignatovich (Александр Игнатович) 
-  Elegant solution to get project parameters GUID directly for the building coder
+- add to 'select all model elements'
+  http://forums.autodesk.com/t5/revit-api-forum/select-all-physical-items-in-model/m-p/6822940
+  
+- 12566528 [Textnote - vertical alignment on line i Revit 2016?]
+  http://forums.autodesk.com/t5/revit-api-forum/textnote-vertical-alignment-on-line-i-revit-2016/m-p/6810367
 
-- 12553492 [Getting parameter information from a schedule]
-  http://forums.autodesk.com/t5/revit-api-forum/getting-parameter-information-from-a-schedule/m-p/6802850
+- pyRevit Idea: Add support for C# assemblies #143 -- https://github.com/eirannejad/pyRevit/issues/143 
 
 #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
-Lots of information on, from and about schedule parameters, and a new elegant solution to a long-standing challenge
-&ndash; Direct access to shared parameter GUID
-&ndash; Getting parameter information from a schedule...
+&ndash; ...
 
 #AULondon, #UI, #innovation, #RevitAPI, @AutodeskRevit bit.ly/2j7Sxkb
 
@@ -27,13 +27,12 @@ Lots of information on, from and about schedule parameters, and a new elegant so
 
 ### Schedule Parameter and Shared Parameter GUID
 
-Lots of information on, from and about schedule parameters, and a new elegant solution to a long-standing challenge:
 
-- [Direct access to shared parameter GUID](#2)
-- [Getting parameter information from a schedule](#3)
+- [](#2)
+- [](#3)
 
 
-####<a name="2"></a>Direct Access to Shared Parameter GUID
+####<a name="2"></a>
 
 Alexander Ignatovich (Александр Игнатович) already shared several exciting solutions with us all in the past.
 
