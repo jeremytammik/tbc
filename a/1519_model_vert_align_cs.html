@@ -120,8 +120,7 @@ on <a href="http://forums.autodesk.com/t5/revit-api-forum/select-all-physical-it
 &nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;e.Category&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;e.LevelId&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;e.get_Geometry(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Options</span>()&nbsp;)&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;e.get_Geometry(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Options</span>()&nbsp;)&nbsp;)&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;modelElements.Add(&nbsp;e&nbsp;);
 &nbsp;&nbsp;&nbsp;&nbsp;}
@@ -174,7 +173,12 @@ of <a href="http://thebuildingcoder.typepad.com/blog/2015/12/quick-slow-and-linq
 to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>,
 implementing <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.132.1"><code>SelectAllPhysicalElements</code> in release 2017.0.132.1</a> and
 adding the <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.132.2"><code>WhereElementIsViewIndependent</code> check in release 2017.0.132.2</a>.</p>
-<p>Many thanks to Fair59 and Matt Taylor for the good suggestions!</p>
+<p><strong>Answer 4:</strong> I agree that you should use the <code>WhereElementIsViewIndependent</code> filter instead of checking <code>Element.ViewSpecific</code>.</p>
+<p>The rest of the checks in the <code>IsPhysicalElement</code> predicate check properties of the <code>Element.Category</code> and I think those can't be filtered in a fast filter.</p>
+<p>An alternative approach would be to define your own set of categories (maybe 20-30).
+All elements in the 'physical' model would belong to that set, if you have defined it correctly.
+Then you can use an <code>ElementMulticategoryFilter</code> combined with <code>WhereElementIsNotElementType</code> and <code>WhereElementIsViewIndependent</code>.</p>
+<p>Many thanks to Frank 'Fair59' and Matt Taylor for the good suggestions!</p>
 <h4><a name="4"></a>Vertical TextNote Alignment</h4>
 <p>This is a continuation of
 the <a href="http://thebuildingcoder.typepad.com/blog/2017/01/textnote-rotation-forge-devcon-tensorflow-and-keras.html#3"><code>TextNote</code> rotation issue</a> discussed

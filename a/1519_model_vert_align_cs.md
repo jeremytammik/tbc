@@ -146,8 +146,7 @@ on [selecting all physical items in model](http://forums.autodesk.com/t5/revit-a
 &nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;e.Category&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;e.LevelId&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;e.get_Geometry(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Options</span>()&nbsp;)&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;e.get_Geometry(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Options</span>()&nbsp;)&nbsp;)&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;modelElements.Add(&nbsp;e&nbsp;);
 &nbsp;&nbsp;&nbsp;&nbsp;}
@@ -212,7 +211,15 @@ to [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 implementing [`SelectAllPhysicalElements` in release 2017.0.132.1](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.132.1) and
 adding the [`WhereElementIsViewIndependent` check in release 2017.0.132.2](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.132.2).
 
-Many thanks to Fair59 and Matt Taylor for the good suggestions!
+**Answer 4:** I agree that you should use the `WhereElementIsViewIndependent` filter instead of checking `Element.ViewSpecific`.
+
+The rest of the checks in the `IsPhysicalElement` predicate check properties of the `Element.Category` and I think those can't be filtered in a fast filter.
+ 
+An alternative approach would be to define your own set of categories (maybe 20-30).
+All elements in the 'physical' model would belong to that set, if you have defined it correctly.
+Then you can use an `ElementMulticategoryFilter` combined with `WhereElementIsNotElementType` and `WhereElementIsViewIndependent`.
+
+Many thanks to Frank 'Fair59' and Matt Taylor for the good suggestions!
 
 
 ####<a name="4"></a>Vertical TextNote Alignment
