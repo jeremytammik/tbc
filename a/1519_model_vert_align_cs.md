@@ -26,7 +26,11 @@ Meanwhile, we continue our usual ongoing celebration of exciting Revit API news 
 &ndash; Selecting all physical elements in model
 &ndash; Vertical <code>TextNote</code> alignment...
 
-#AULondon, #UI, #innovation, #RevitAPI, @AutodeskRevit bit.ly/2j7Sxkb
+#AULondon, #UI, #innovation, #RevitAPI, @AutodeskRevit
+
+Dynamic Scripts, Model Elements and Vertical Alignment #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+
+http://bit.ly/cs_phys_el_vert_al
 
 -->
 

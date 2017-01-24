@@ -21,7 +21,7 @@ Lots of information on, from and about schedule parameters, and a new elegant so
 &ndash; Direct access to shared parameter GUID
 &ndash; Getting parameter information from a schedule...
 
-#AULondon, #UI, #innovation, #RevitAPI, @AutodeskRevit bit.ly/2j7Sxkb
+#AULondon, #UI, #innovation, #RevitAPI, @AutodeskRevit
 
 Direct access to shared param GUID & param info from a schedule #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/paramguid
 
