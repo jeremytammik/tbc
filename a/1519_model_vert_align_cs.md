@@ -19,13 +19,28 @@
 
 #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
-&ndash; ...
+Happy New Year of the Rooster!
+The Spring Festival is underway celebrating the Chinese New Year.
+Meanwhile, we continue our usual ongoing celebration of exciting Revit API news items
+&ndash; PyRevit dynamic <code>cs</code> script loader
+&ndash; Selecting all physical elements in model
+&ndash; Vertical <code>TextNote</code> alignment...
 
 #AULondon, #UI, #innovation, #RevitAPI, @AutodeskRevit bit.ly/2j7Sxkb
 
 -->
 
 ### Dynamic Scripts, Model Elements and Vertical Alignment
+
+Happy New Year of the Rooster!
+
+<center>
+<!----
+<iframe width='480' height='360' frameborder='0' allowfullscreen
+src='http://player.ooyala.com/static/v4/stable/4.7.9/skin-plugin/iframe.html?ec=42Njdmazp8OPIKJRyChESz2RevNqe2aQ&pbid=ZTIxYmJjZDM2NWYzZDViZGRiOWJjYzc5&pcode=RvbGU6Z74XE_a3bj4QwRGByhq9h2'></iframe>
+---->
+<img src="img/year_of_the_rooster_2017.jpeg" alt="Happy New Year of the Rooster!" width="327"/>
+</center>
 
 The Spring Festival is underway celebrating 
 the [Chinese New Year](https://en.wikipedia.org/wiki/Chinese_New_Year) and 
@@ -39,14 +54,6 @@ cf. e.g. [The Telegraph newspaper article](http://www.telegraph.co.uk/news/0/chi
 - What does your Chinese zodiac sign mean?
 - Chinese New Year's Day taboos
 - When does the party start?
-
-<center>
-<!----
-<iframe width='480' height='360' frameborder='0' allowfullscreen
-src='http://player.ooyala.com/static/v4/stable/4.7.9/skin-plugin/iframe.html?ec=42Njdmazp8OPIKJRyChESz2RevNqe2aQ&pbid=ZTIxYmJjZDM2NWYzZDViZGRiOWJjYzc5&pcode=RvbGU6Z74XE_a3bj4QwRGByhq9h2'></iframe>
----->
-<img src="img/year_of_the_rooster_2017.jpeg" alt="Happy New Year of the Rooster" width="327"/>
-</center>
 
 Meanwhile, we continue our usual ongoing celebration of exciting Revit API news items:
 
@@ -371,4 +378,5 @@ Meanwhile we will have a look to see what is involved to get this formally expos
 
 **Response:**
 
-Perfect!! Just what I needed.
+Perfect! Just what I needed.
+
