@@ -25,187 +25,350 @@
 
 -->
 
-### Schedule Parameter and Shared Parameter GUID
+### Dynamic Scripts, Model Elements and Vertical Alignment
+
+The Spring Festival is underway celebrating 
+the [Chinese New Year](https://en.wikipedia.org/wiki/Chinese_New_Year) and 
+another [year of the Rooster](https://en.wikipedia.org/wiki/Rooster_(zodiac)),
+cf. e.g. [The Telegraph newspaper article](http://www.telegraph.co.uk/news/0/chinese-new-year/) covering all these aspects:
+
+- Popular Chinese New Year greetings
+- The personality of the Rooster
+- Lucky Signs for the Rooster
+- Which Chinese zodiac sign are you?
+- What does your Chinese zodiac sign mean?
+- Chinese New Year's Day taboos
+- When does the party start?
+
+<center>
+<!----
+<iframe width='480' height='360' frameborder='0' allowfullscreen
+src='http://player.ooyala.com/static/v4/stable/4.7.9/skin-plugin/iframe.html?ec=42Njdmazp8OPIKJRyChESz2RevNqe2aQ&pbid=ZTIxYmJjZDM2NWYzZDViZGRiOWJjYzc5&pcode=RvbGU6Z74XE_a3bj4QwRGByhq9h2'></iframe>
+---->
+<img src="img/year_of_the_rooster_2017.jpeg" alt="Happy New Year of the Rooster" width="327"/>
+</center>
+
+Meanwhile, we continue our usual ongoing celebration of exciting Revit API news items:
+
+- [PyRevit dynamic `cs` script loader](#2)
+- [Selecting all physical elements in model](#3)
+- [Vertical `TextNote` alignment](#4)
 
 
-- [](#2)
-- [](#3)
+####<a name="2"></a>PyRevit Dynamic `cs` Script Loader
+
+[Ehsan Iran-Nejad](https://github.com/eirannejad) announces happy news on 
+[pyRevit](https://github.com/eirannejad/pyRevit), which provides support for IronPython scripts and an add-in tab in Revit.
+
+The [idea #143 &ndash; add support for C# assemblies](https://github.com/eirannejad/pyRevit/issues/143#issuecomment-272913198) is
+already implemented:
+
+**Idea:** I would like to propose adding support for loading C# assemblies.
+
+To elaborate:
+
+Instead of executing a Python script, a button would dynamically load and execute an `IExternalCommand` from a C# assembly, a bit like the Revit SDK Add-in Manager.
+
+**Answer:** I'm glad you mentioned this.
+
+pyRevit currently supports C# scripts.
+
+It compiles them at runtime and creates executable commands for `IExternalCommand`.
+
+It also supports `IExternalCommandAvailability`.
+
+Just as with the Add-In Manager, you can modify the C# code on the fly and reload pyRevit without closing the current Revit session.
+
+Look at the button bundle listed below.
+
+It only has a `.cs` file instead of a `.py` file.
+
+This is a work-in-progress feature and thus not announced yet, but technically you can create C# bundles right now already.
+
+The unfinished component of this feature is that I need to make the compiler smart about the assemblies it needs to reference for the C# script to work.
+
+Currently, it references these assemblies by default, which is more than enough for most commands:
+
+- RevitAPI
+- RevitAPIUI
+- IronPython
+- IronPython.Modules
+- Microsoft.Dynamic
+- Microsoft.Scripting
+- Microsoft.CSharp
+- System
+- System.Core
+- System.Drawing
+- System.Windows.Forms
+- PresentationCore
+- PresentationFramework
+- WindowsBase
+
+Here is [the bundle folder to `Test C# Script.pushbutton`](https://github.com/eirannejad/pyRevit/blob/master/extensions/pyRevitCore.extension/pyRevit.tab/pyRevit.panel/Labs.pulldown/Test%20C%23%20Script.pushbutton/script.cs).
 
 
-####<a name="2"></a>
 
-Alexander Ignatovich (Александр Игнатович) already shared several exciting solutions with us all in the past.
+####<a name="3"></a>Selecting all Physical Elements in Model
 
-Today he faced a new problem.
+Here is yet another new solution 
+for [using `FilteredElementCollector` to select model elements, i.e., visible 3D elements](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.9b),
+from the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api/bd-p/160) thread 
+on [selecting all physical items in model](http://forums.autodesk.com/t5/revit-api-forum/select-all-physical-items-in-model/m-p/6822940):
 
-As usual, he came up with an impressively direct solution to share.
-
-The problem is rather old and known, and he found an elegant new way to solve it:
-
-I wanted to get shared parameters GUIDs directly from project parameters.
-
-Of course I found the solution demonstrated by 
-the [shared project parameter GUID reporter](http://thebuildingcoder.typepad.com/blog/2015/12/shared-project-parameter-guid-reporter.html), where you need to attach the parameter to the project information (for instance parameters) and wall (for type parameters) categories.
-
-I also found another blog post on [parameter of Revit API 30 &ndash; project parameter information](http://spiderinnet.typepad.com/blog/2011/05/parameter-of-revit-api-30-project-parameter-information.html), but this solution did not work for me, because all definitions in `doc.ParameterBindings` are `InternalDefinition` objects in Revit 2017.
-
-I investigated further and found that `InternalDefinition` has an `Id`. I retrieved the corresponding database element from the document by this `Id`. I saw that `SharedParameterElement` is returned for shared project parameters and `ParameterElement` for non-shared project parameters. `SharedParameterElement` has a `GuidValue` property, which is exactly what I need.
-
-The code:
+**Question:** I am trying to select all the model element instances in my model. i.e. anything that is a physical object, so I can change the value of a certain property on them. The property value will be different depending on where the instance is in the model. I have the below method but it is not picking up host families or the likes of ducts:
 
 <pre class="code">
-&nbsp;&nbsp;[<span style="color:#2b91af;">Transaction</span>(&nbsp;<span style="color:#2b91af;">TransactionMode</span>.ReadOnly&nbsp;)]
-&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">CmdSharedParamGuids</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IExternalCommand</span>
+<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;GetFamilyInstanceModelElements(&nbsp;
+&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:#2b91af;">ElementClassFilter</span>&nbsp;familyInstanceFilter&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementClassFilter</span>(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">FamilyInstance</span>&nbsp;)&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;familyInstanceCollector&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;elementsCollection&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;familyInstanceCollector.WherePasses(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;familyInstanceFilter&nbsp;).ToElements();
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;modelElements&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Element</span>&gt;();
+ 
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;<span style="color:blue;">in</span>&nbsp;elementsCollection&nbsp;)
 &nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">Result</span>&nbsp;Execute(
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ExternalCommandData</span>&nbsp;commandData,
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">ref</span>&nbsp;<span style="color:blue;">string</span>&nbsp;message,
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementSet</span>&nbsp;elements&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;e.Category&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;e.LevelId&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;e.get_Geometry(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Options</span>()&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;uiapp&nbsp;=&nbsp;commandData.Application;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;uidoc&nbsp;=&nbsp;uiapp.ActiveUIDocument;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;doc&nbsp;=&nbsp;uidoc.Document;
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;bindingMap&nbsp;=&nbsp;doc.ParameterBindings;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;it&nbsp;=&nbsp;bindingMap.ForwardIterator();
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;it.Reset();
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">while</span>(&nbsp;it.MoveNext()&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;definition&nbsp;=&nbsp;(<span style="color:#2b91af;">InternalDefinition</span>)&nbsp;it.Key;
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;sharedParameterElement&nbsp;=&nbsp;doc.GetElement(
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;definition.Id&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">SharedParameterElement</span>;
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;sharedParameterElement&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;non-shared&nbsp;parameter&quot;</span>,
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;definition.Name&nbsp;);
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">else</span>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;shared&nbsp;parameter&quot;</span>,
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">$&quot;</span>{sharedParameterElement.GuidValue}<span style="color:#a31515;">&quot;</span>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;<span style="color:#a31515;">&quot;-&nbsp;{definition.Name}&quot;</span>&nbsp;);
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Succeeded;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;modelElements.Add(&nbsp;e&nbsp;);
 &nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;modelElements;
+}
+</pre>
+
+**Answer 1:** Your filter looks OK to me.
+
+Please note that the conversion from the `familyInstanceCollector` to the generic list `elementsCollection` is unnecessary and inefficient, as explained numerous times in the past, e.g.
+in the discussions 
+of [`ToElementIds` performance](http://thebuildingcoder.typepad.com/blog/2012/12/toelementids-performance.html)
+and [use of LINQ with filtered element collectors](http://thebuildingcoder.typepad.com/blog/2015/12/quick-slow-and-linq-element-filtering.html#2).
+ 
+Please also look at The Building Coder topic group
+on [using `FilteredElementCollector` to select model elements, i.e., visible 3D elements](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.9b).
+
+**Answer 2:** When you  use a `FamilyInstance` filter, you only find user created families, i.e., RFA-based, and not the built-in system families.
+ 
+Try:
+
+<pre class="code">
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">JtElementExtensionMethods</span>
+{
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">bool</span>&nbsp;IsPhysicalElement(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">this</span>&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;e.Category&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">false</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;e.ViewSpecific&nbsp;)&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">false</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;exclude&nbsp;specific&nbsp;unwanted&nbsp;categories</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;(&nbsp;(<span style="color:#2b91af;">BuiltInCategory</span>)&nbsp;e.Category.Id.IntegerValue&nbsp;)&nbsp;==&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_HVAC_Zones&nbsp;)&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">false</span>;
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;e.Category.CategoryType&nbsp;==&nbsp;<span style="color:#2b91af;">CategoryType</span>.Model&nbsp;&amp;&amp;&nbsp;e.Category.CanAddSubcategory;
+&nbsp;&nbsp;}
+}
+
+<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;SelectAllPhysicalElements(
+&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
+&nbsp;&nbsp;&nbsp;&nbsp;.Where(&nbsp;e&nbsp;=&gt;&nbsp;e.IsPhysicalElement()&nbsp;);
+}
+</pre>
+
+**Answer 3:** I'd probably use `.WhereElementIsViewIndependent` in there somewhere also.
+
+Faster than some of the iteration/LINQ methods, cf. the comparison
+of [quick, slow and LINQ element filtering](http://thebuildingcoder.typepad.com/blog/2015/12/quick-slow-and-linq-element-filtering.html).
+
+Extracting element data from Revit to .NET and checking it there, e.g., with LINQ, costs at least twice as much time as leaving it on the Revit side and applying some kind of filter instead.
+ 
+Therefore, whenever possible, it pays off hugely to analyse all the element properties and how they are reflected in parameter values.
+ 
+The parameter values can be filtered using a filtered element collector parameter filter.
+ 
+[50% speed improvement over using LINQ post-processing guaranteed](http://thebuildingcoder.typepad.com/blog/2010/06/element-name-parameter-filter-correction.html)!
+
+I added these new model element selection methods 
+to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples),
+implementing [`SelectAllPhysicalElements` in release 2017.0.132.1](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.132.1) and
+adding the [`WhereElementIsViewIndependent` check in release 2017.0.132.2](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.132.2).
+
+Many thanks to Fair59 and Matt Taylor for the good suggestions!
+
+
+####<a name="4"></a>Vertical TextNote Alignment
+
+This is a continuation of
+the [`TextNote` rotation issue](http://thebuildingcoder.typepad.com/blog/2017/01/textnote-rotation-forge-devcon-tensorflow-and-keras.html#3) discussed
+last week, raised in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api/bd-p/160) thread 
+on [`TextNote` vertical alignment on line in Revit 2016](http://forums.autodesk.com/t5/revit-api-forum/textnote-vertical-alignment-on-line-i-revit-2016/m-p/6810367):
+
+**Question:**
+
+I've managed to position text notes rotated along lines.
+
+<center>
+<img src="img/rotate_text.png" alt="Rotate text" width="400"/> <!-- 754 -->
+</center>
+ 
+Now I need to set the vertical alignment of the text, so the text is centred on the lines like this:
+
+<center>
+<img src="img/rotate_text_aligned.png" alt="Rotate text" width="400"/> <!-- 623 -->
+</center>
+
+In Revit 2015 I used the `TextAlignFlags.TEF_ALIGN_MIDDLE`, but it seems to be removed in 2016.
+ 
+Is there method to align the vertical position of the text, or do I have to calculate a new position of the text according to its height and scale?
+
+**Answer 1:**
+
+<b><i>&lt;`rant`&gt;</i></b>
+
+The (frustrating) omission of the vertical text alignment mimics the user interface. Gah.
+
+Labels in tag families do have a modifiable vertical alignment, but these can't often be rotated. Gah.
+ 
+So you're in the frustrating position of working out the text position manually. Gah.
+ 
+Enough to drive you gaga? ;-)
+
+<!----
+
+Here are some other examples of people running into this issue:
+
+2016 issues: vertical text alignment missing and setbarresults modification 
+
+- [Comments by David Rushforth](http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html#comment-6a00e553e16897883301bb08261e9a970d)
+on [What's New in the Revit 2016 API](http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html)
+- [Comment by ... ](http://thebuildingcoder.typepad.com/blog/2015/04/add-in-migration-to-revit-2016-and-updated-wizards.html?cid=6a00e553e16897883301bb08264ea1970d#comment-6a00e553e16897883301bb08264ea1970d)
+on [xxx](http://thebuildingcoder.typepad.com/blog/2015/04/add-in-migration-to-revit-2016-and-updated-wizards.html)
+- [creating-a-textnote-with-the-2016-api-changes](http://forums.autodesk.com/t5/revit-api/creating-a-textnote-with-the-2016-api-changes/m-p/5629284)
+- [text-alignments](http://forums.autodesk.com/t5/revit-api/text-alignments/m-p/6272246)
+ 
+---->
+
+It seems to me that the Revit developers have a mandate to stay away from simple drawing objects such as lines and text, and lean towards smarter objects like line-based families and tags. I commend that (if that is what is happening), but it also drives me nuts at times.
+
+<b><i>&lt;`/rant`&gt;</i></b>
+ 
+I was in the situation you are in. I ended up creating a line-based family with a nested annotation symbol in it. I needed to programmatically manage some of the family placement/scale etc. The bonus of this was that it allowed the user to modify the lines once placed (without needing an iUpdater to do so).
+ 
+If you just want text, you may be able to get away with getting the centre of the text bounding box and moving it to the midpoint of your line. You'll probably need two transactions to do that.
+
+**Answer 2:**
+
+Very sorry about the frustrating situation.
+ 
+Have you raised a wish list for this in the Revit Idea Station?
+ 
+You might get a lot of votes for that one.
+ 
+Now to go on with the topic at hand.
+ 
+It has been discussed here in the past in the thread
+on [text alignments](http://forums.autodesk.com/t5/revit-api/text-alignments/m-p/6272246).
+ 
+Apparently, as far as the development team is concerned, the vertical alignment possibility should never have been implemented.
+ 
+Arnošt Löbel explained that in detail in a discussion thread
+on [creating a text note with the 2016 API changes](http://forums.autodesk.com/t5/revit-api/creating-a-textnote-with-the-2016-api-changes/m-p/5629284).
+ 
+Please also refer to the comments by David Rushforth on [What's New in the Revit 2016 API](http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html).
+ 
+Can you check these out and see whether they help?
+ 
+I do hope we can resolve this somehow, because this request has cropped up a few times now.
+
+Is it possible to achieve what you show in your second figure using a custom line type?
+ 
+Here are two solutions that come up immediately in an Internet search:
+ 
+- [Creating linetype with text to represent utility and fence lines](https://knowledge.autodesk.com/support/revit-products/troubleshooting/caas/sfdcarticles/sfdcarticles...)
+- [YouTube video in Russian](https://www.youtube.com/watch?v=swR-zJkc1fQ)
+
+**Response:**
+
+For now, I prefer to use simple text notes, as these texts are only used for sheet views.
+ 
+Also, some users might need to delete or move a text element, to give way for more important geometry.
+ 
+Thanks for the idea about getting values from the text bounding box. That's probably the best way of calculating the offset distance.
+ 
+I'm not using detail lines. The lines shown are actually pipe system, shown with single line representation.
+ 
+A line based family is too constricted for our needs.
+
+**Answer 3:**
+
+The discussions you point to don't help me understand why vertical alignment isn't included in either the UI or the API.
+
+If Revit could do everything as a user would want it, text wouldn't exist. It would all be internal/external databases, tags, references etc. That is not the case.
+
+So, a user (or programmer) must be able to add text that can be positioned in a manner that editing the text element's content doesn't make it wrap in an undesirable way.
+ 
+There are 21 ideas in the Idea Station using the search 'text alignment'.
+
+While the 'no vertical alignment' stance may make sense from an Autodesk point of view, it makes zero sense from a user viewpoint. Any user would have told the development team that. The 21 ideas voice this also.
+ 
+I've been using the Revit API since Revit 2011.
+
+Originally, I was like, I'll use `TextNoteCreationData` to batch create text, because that'll be faster than creating them individually (after some testing).
+
+That got deprecated in Revit 2013 and obsoleted in Revit 2014.
+
+In Revit 2013, the `NewTextNote` creation method was heralded as being as efficient as the batch method.
+
+Then that was deprecated in Revit 2016, and obsoleted in Revit 2017.
+
+In Revit 2016, enter the 'new' static `Create` method. A devolved version, in preparation for the Revit 2017 text element overhaul. Adjustment required after initial creation transaction.
+ 
+The roadmap isn't clear.
+ 
+It's not annoying, really, just disappointing, time sapping, and ambiguous. The 2017 'improvements' weren't enough!
+
+Sorry, this message is longer than I wanted! And sorry it's another rant...
+
+**Answer 4:**
+
+Note that this is not supported functionality...
+ 
+But it so happens that you can still set the vertical alignment through the `TEXT_ALIGN_VERT` built-in parameter.  
+ 
+It needs to be set to `TextAlignFlags.TEF_ALIGN_TOP`, `TextAlignFlags.TEF_ALIGN_MIDDLE` or `TextAlignFlags.TEF_ALIGN_BOTTOM`, like in this C# snippet:
+ 
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;t&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;t.Start(&nbsp;<span style="color:#a31515;">&quot;AlignTextNote&quot;</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Parameter</span>&nbsp;p&nbsp;=&nbsp;textNote.get_Parameter(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.TEXT_ALIGN_VERT&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;p.Set(&nbsp;(<span style="color:#2b91af;">Int32</span>)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TextAlignFlags</span>.TEF_ALIGN_MIDDLE&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;t.Commit();
 &nbsp;&nbsp;}
 </pre>
 
-Thank you very much for this elegant solution, Alexander!
-
-Sweet and simple!
-
-I am sure it will make many people very happy!
-
-I therefore added it to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) 
-in [release 2017.0.132.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.132.0).
-
-We can make use of this right away to enhance the answer to the question below as well.
-
-
-
-####<a name="3"></a>Getting Parameter Information from a Schedule
-
-From
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api/bd-p/160) thread
-on [getting parameter information from a schedule](http://forums.autodesk.com/t5/revit-api-forum/getting-parameter-information-from-a-schedule/m-p/6802850):
-
-**Question:** The `ScheduleField` class has a property `ParameterId`, which is good.
-
-Now I would like to know more about this parameter:
-
-1. The name of the parameter.
-2. If it is an instance or type parameter.
-3. If it is a shared or built-in parameter.
-4. The parameter Unit.
-5. GUID of the parameter if it is shared.
-
-I think I can get 1 and 2 working, but pretty much clueless about 3, 4 and 5.
-
-**Answer:** Before anything else, I must ask you:
-
-Have you installed [RevitLookup](https://github.com/jeremytammik/RevitLookup) and are you using it on a regular basis in your Revit database exploration?
-
-With that tool, you can interactively snoop the database.
-
-In this case, you could grab one of those ParameterId values, use the built-in Revit *Select by Id* command in the *Manage* tab to select the corresponding database element, regardless of whether it has a graphical representation or not, and interactively explore its nature, contents, parameters, relationships with other elements, etc.
-
-That will probably answer your question.
-
-It is statically compiled, however, so it mainly displays properties. It does not dynamically evaluate all methods available on all classes.
-
-For that, you can use other,
-even [more powerful and interactive database exploration tools](http://thebuildingcoder.typepad.com/blog/2013/11/intimate-revit-database-exploration-with-the-python-shell.html).
-
-Also, my discussion
-on [how to research to find a Revit API solution](http://thebuildingcoder.typepad.com/blog/2017/01/virtues-of-reproduction-research-mep-settings-ontology.html#3) might
-come in handy for you at this point.
-
-**Response:** I have installed RevitLookup for Revit 2015 (the version I'm developing as our development needs to be backward compatible with our current projects).
-
-RevitLookup is a great tool that can save hundreds of hours of time on browsing the "watch" in the debug mode, which I have been using.
-
-However, I still can't find the field parameter definitions (shared or built-in) for the `ScheduleField` class. I understand the "viewschedule" and "schedulefield" are different classes. I suspect this may have to do with Revit API's limitation.
-
-By the way, it seems RevitLookup defines a ribbon panel in the 'Add-ins' tab &ndash; however, I can't see the 'Manage Tab'; am I missing something here?
-
-**Answer:**
-
-1. name of the parameter:
-
-<pre class="code">
-  Name = Field.GetName()
-</pre>
-
-2. Type or Instance?
-
-Probably only a definitive answer for a schedule of 1 System Family Category. Shared Parameters in User Created Families can be both Type and Instance (in different families).
-
-3. Shared or BuiltIn?
-
-- Field.ParameterId < -1 : BuiltInParameter &ndash; Field.ParameterId == BuiltInParameter value
-- Field.ParameterId > 0 : SharedParameter
-- Field.ParameterId = -1 : miscellaneous (calculated value, percentage)
-
-Shared Parameter:
-
-<pre class="code">
-  SharedParameterElement shElem = doc.GetElement(
-    Field.ParameterId) as SharedParameterElement;
-</pre>
-
-You can find the answer to 4 and 5 in `shElem.Definition` .
-
-Built-in Parameter:
-
-You need an element (Elem) to get access to a BuiltInParameter, so you need to have a non-empty schedule.
-
-<pre class="code">
-  Parameter par = Elem.get_Parameter(
-    (BuiltInParameter) Field.ParameterId.IntegerValue );
-</pre>
-
-You can find the answer to 4 in `par.Definition`.
-
-**Response:** Very nice answers, thanks a lot.
-
-Regarding 2, I guess I have to use the `FamilyManager` to open the families to find out if the shared parameter is a 'Type' or 'Instance' one.
-
-**Answer:** More on *Select by Id*:
-
-[Select element by id](https://knowledge.autodesk.com/support/revit-products/learn-explore/caas/CloudHelp/cloudhelp/2017/ENU/Revit-Troubleshooting/files/GUID-2B1CC22C-CB1F-45DA-B57B-62C36013D9E0-htm.html) is
-part of the standard end user interface:
-
-- Help entry on [Select Elements by ID](http://help.autodesk.com/view/RVT/2017/ENU/?guid=GUID-2B1CC22C-CB1F-45DA-B57B-62C36013D9E0)
-- 101-second YouTube video on [Selecting Elements Using the Element ID](https://www.youtube.com/watch?v=prv8nGrU56o):
-
-<center>
-<iframe width="480" height="270" src="https://www.youtube.com/embed/prv8nGrU56o?rel=0" frameborder="0" allowfullscreen></iframe>
-</center>
+Hope that helps.
  
-As said, it comes in handy for using RevitLookup to snoop element data and properties, since it can be used on invisible elements that cannot be selected in any other way as well.
- 
-**Response:** I found the post you mentioned and tried; it works well that I can find the shared parameter visually on the Revit property panel even it is a 'hidden' element; that's quite cool. :)
+Meanwhile we will have a look to see what is involved to get this formally exposed.
+
+**Response:**
+
+Perfect!! Just what I needed.

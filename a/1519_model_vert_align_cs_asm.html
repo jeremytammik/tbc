@@ -1,0 +1,276 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+- add to 'select all model elements'
+  http://forums.autodesk.com/t5/revit-api-forum/select-all-physical-items-in-model/m-p/6822940
+
+- 12566528 [Textnote - vertical alignment on line i Revit 2016?]
+  http://forums.autodesk.com/t5/revit-api-forum/textnote-vertical-alignment-on-line-i-revit-2016/m-p/6810367
+
+- pyRevit Idea: Add support for C# assemblies #143 -- https://github.com/eirannejad/pyRevit/issues/143 
+
+#RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+
+&ndash; ...
+
+#AULondon, #UI, #innovation, #RevitAPI, @AutodeskRevit bit.ly/2j7Sxkb
+
+-->
+
+<h3>Dynamic Scripts, Model Elements and Vertical Alignment</h3>
+<p>The Spring Festival is underway celebrating 
+the <a href="https://en.wikipedia.org/wiki/Chinese_New_Year">Chinese New Year</a> and 
+another <a href="https://en.wikipedia.org/wiki/Rooster_(zodiac)">year of the Rooster</a>,
+cf. e.g. <a href="http://www.telegraph.co.uk/news/0/chinese-new-year/">The Telegraph newspaper article</a> covering all these aspects:</p>
+<ul>
+<li>Popular Chinese New Year greetings</li>
+<li>The personality of the Rooster</li>
+<li>Lucky Signs for the Rooster</li>
+<li>Which Chinese zodiac sign are you?</li>
+<li>What does your Chinese zodiac sign mean?</li>
+<li>Chinese New Year's Day taboos</li>
+<li>When does the party start?</li>
+</ul>
+<p><center>
+<!----
+<iframe width='480' height='360' frameborder='0' allowfullscreen
+src='http://player.ooyala.com/static/v4/stable/4.7.9/skin-plugin/iframe.html?ec=42Njdmazp8OPIKJRyChESz2RevNqe2aQ&pbid=ZTIxYmJjZDM2NWYzZDViZGRiOWJjYzc5&pcode=RvbGU6Z74XE_a3bj4QwRGByhq9h2'></iframe>
+---->
+<img src="img/year_of_the_rooster_2017.jpeg" alt="Happy New Year of the Rooster" width="327"/>
+</center></p>
+<p>Meanwhile, we continue our usual ongoing celebration of exciting Revit API news items:</p>
+<ul>
+<li><a href="#2">PyRevit dynamic <code>cs</code> script loader</a></li>
+<li><a href="#3">Selecting all physical elements in model</a></li>
+<li><a href="#4">Vertical <code>TextNote</code> alignment</a></li>
+</ul>
+<h4><a name="2"></a>PyRevit Dynamic <code>cs</code> Script Loader</h4>
+<p><a href="https://github.com/eirannejad">Ehsan Iran-Nejad</a> announces happy news on 
+<a href="https://github.com/eirannejad/pyRevit">pyRevit</a>, which provides support for IronPython scripts and an add-in tab in Revit.</p>
+<p>The <a href="https://github.com/eirannejad/pyRevit/issues/143#issuecomment-272913198">idea #143 &ndash; add support for C# assemblies</a> is
+already implemented:</p>
+<p><strong>Idea:</strong> I would like to propose adding support for loading C# assemblies.</p>
+<p>To elaborate:</p>
+<p>Instead of executing a Python script, a button would dynamically load and execute an <code>IExternalCommand</code> from a C# assembly, a bit like the Revit SDK Add-in Manager.</p>
+<p><strong>Answer:</strong> I'm glad you mentioned this.</p>
+<p>pyRevit currently supports C# scripts.</p>
+<p>It compiles them at runtime and creates executable commands for <code>IExternalCommand</code>.</p>
+<p>It also supports <code>IExternalCommandAvailability</code>.</p>
+<p>Just as with the Add-In Manager, you can modify the C# code on the fly and reload pyRevit without closing the current Revit session.</p>
+<p>Look at the button bundle listed below.</p>
+<p>It only has a <code>.cs</code> file instead of a <code>.py</code> file.</p>
+<p>This is a work-in-progress feature and thus not announced yet, but technically you can create C# bundles right now already.</p>
+<p>The unfinished component of this feature is that I need to make the compiler smart about the assemblies it needs to reference for the C# script to work.</p>
+<p>Currently, it references these assemblies by default, which is more than enough for most commands:</p>
+<ul>
+<li>RevitAPI</li>
+<li>RevitAPIUI</li>
+<li>IronPython</li>
+<li>IronPython.Modules</li>
+<li>Microsoft.Dynamic</li>
+<li>Microsoft.Scripting</li>
+<li>Microsoft.CSharp</li>
+<li>System</li>
+<li>System.Core</li>
+<li>System.Drawing</li>
+<li>System.Windows.Forms</li>
+<li>PresentationCore</li>
+<li>PresentationFramework</li>
+<li>WindowsBase</li>
+</ul>
+<p>Here is <a href="https://github.com/eirannejad/pyRevit/blob/master/extensions/pyRevitCore.extension/pyRevit.tab/pyRevit.panel/Labs.pulldown/Test%20C%23%20Script.pushbutton/script.cs">the bundle folder to <code>Test C# Script.pushbutton</code></a>.</p>
+<h4><a name="3"></a>Selecting all Physical Elements in Model</h4>
+<p>Here is yet another new solution 
+for <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.9b">using <code>FilteredElementCollector</code> to select model elements, i.e., visible 3D elements</a>,
+from the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> thread 
+on <a href="http://forums.autodesk.com/t5/revit-api-forum/select-all-physical-items-in-model/m-p/6822940">selecting all physical items in model</a>:</p>
+<p><strong>Question:</strong> I am trying to select all the model element instances in my model. i.e. anything that is a physical object, so I can change the value of a certain property on them. The property value will be different depending on where the instance is in the model. I have the below method but it is not picking up host families or the likes of ducts:</p>
+<pre class="code">
+<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;GetFamilyInstanceModelElements(&nbsp;
+&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:#2b91af;">ElementClassFilter</span>&nbsp;familyInstanceFilter&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementClassFilter</span>(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">FamilyInstance</span>&nbsp;)&nbsp;);
+
+&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;familyInstanceCollector&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;);
+
+&nbsp;&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;elementsCollection&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;familyInstanceCollector.WherePasses(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;familyInstanceFilter&nbsp;).ToElements();
+
+&nbsp;&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;modelElements&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Element</span>&gt;();
+
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;<span style="color:blue;">in</span>&nbsp;elementsCollection&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;e.Category&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;e.LevelId&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;e.get_Geometry(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Options</span>()&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;modelElements.Add(&nbsp;e&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;modelElements;
+}
+</pre>
+
+<p><strong>Answer 1:</strong> Your filter looks OK to me.</p>
+<p>Please note that the conversion from the <code>familyInstanceCollector</code> to the generic list <code>elementsCollection</code> is unnecessary and inefficient, as explained numerous times in the past, e.g.
+in the discussions 
+of <a href="http://thebuildingcoder.typepad.com/blog/2012/12/toelementids-performance.html"><code>ToElementIds</code> performance</a>
+and <a href="http://thebuildingcoder.typepad.com/blog/2015/12/quick-slow-and-linq-element-filtering.html#2">use of LINQ with filtered element collectors</a>.</p>
+<p>Please also look at The Building Coder topic group
+on <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.9b">using <code>FilteredElementCollector</code> to select model elements, i.e., visible 3D elements</a>.</p>
+<p><strong>Answer 2:</strong> When you  use a <code>FamilyInstance</code> filter, you only find user created families, i.e., RFA-based, and not the built-in system families.</p>
+<p>Try:</p>
+<pre class="code">
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">JtElementExtensionMethods</span>
+{
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">bool</span>&nbsp;IsPhysicalElement(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">this</span>&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;e.Category&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">false</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;e.ViewSpecific&nbsp;)&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">false</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;exclude&nbsp;specific&nbsp;unwanted&nbsp;categories</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;(&nbsp;(<span style="color:#2b91af;">BuiltInCategory</span>)&nbsp;e.Category.Id.IntegerValue&nbsp;)&nbsp;==&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_HVAC_Zones&nbsp;)&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">false</span>;
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;e.Category.CategoryType&nbsp;==&nbsp;<span style="color:#2b91af;">CategoryType</span>.Model&nbsp;&amp;&amp;&nbsp;e.Category.CanAddSubcategory;
+&nbsp;&nbsp;}
+}
+
+<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;SelectAllPhysicalElements(
+&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
+&nbsp;&nbsp;&nbsp;&nbsp;.Where(&nbsp;e&nbsp;=&gt;&nbsp;e.IsPhysicalElement()&nbsp;);
+}
+</pre>
+
+<p><strong>Answer 3:</strong> I'd probably use <code>.WhereElementIsViewIndependent</code> in there somewhere also.</p>
+<p>Faster than some of the iteration/LINQ methods, cf. the comparison
+of <a href="http://thebuildingcoder.typepad.com/blog/2015/12/quick-slow-and-linq-element-filtering.html">quick, slow and LINQ element filtering</a>.</p>
+<p>Extracting element data from Revit to .NET and checking it there, e.g., with LINQ, costs at least twice as much time as leaving it on the Revit side and applying some kind of filter instead.</p>
+<p>Therefore, whenever possible, it pays off hugely to analyse all the element properties and how they are reflected in parameter values.</p>
+<p>The parameter values can be filtered using a filtered element collector parameter filter.</p>
+<p><a href="http://thebuildingcoder.typepad.com/blog/2010/06/element-name-parameter-filter-correction.html">50% speed improvement over using LINQ post-processing guaranteed</a>!</p>
+<p>I added these new model element selection methods 
+to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>,
+implementing <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.132.1"><code>SelectAllPhysicalElements</code> in release 2017.0.132.1</a> and
+adding the <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.132.2"><code>WhereElementIsViewIndependent</code> check in release 2017.0.132.2</a>.</p>
+<p>Many thanks to Fair59 and Matt Taylor for the good suggestions!</p>
+<h4><a name="4"></a>Vertical TextNote Alignment</h4>
+<p>This is a continuation of
+the <a href="http://thebuildingcoder.typepad.com/blog/2017/01/textnote-rotation-forge-devcon-tensorflow-and-keras.html#3"><code>TextNote</code> rotation issue</a> discussed
+last week, raised in
+the <a href="http://forums.autodesk.com/t5/revit-api/bd-p/160">Revit API discussion forum</a> thread 
+on <a href="http://forums.autodesk.com/t5/revit-api-forum/textnote-vertical-alignment-on-line-i-revit-2016/m-p/6810367"><code>TextNote</code> vertical alignment on line in Revit 2016</a>:</p>
+<p><strong>Question:</strong></p>
+<p>I've managed to position text notes rotated along lines.</p>
+<p><center>
+<img src="img/rotate_text.png" alt="Rotate text" width="400"/> <!-- 754 -->
+</center></p>
+<p>Now I need to set the vertical alignment of the text, so the text is centred on the lines like this:</p>
+<p><center>
+<img src="img/rotate_text_aligned.png" alt="Rotate text" width="400"/> <!-- 623 -->
+</center></p>
+<p>In Revit 2015 I used the <code>TextAlignFlags.TEF_ALIGN_MIDDLE</code>, but it seems to be removed in 2016.</p>
+<p>Is there method to align the vertical position of the text, or do I have to calculate a new position of the text according to its height and scale?</p>
+<p><strong>Answer 1:</strong></p>
+<p><b><i>&lt;<code>rant</code>&gt;</i></b></p>
+<p>The (frustrating) omission of the vertical text alignment mimics the user interface. Gah.</p>
+<p>Labels in tag families do have a modifiable vertical alignment, but these can't often be rotated. Gah.</p>
+<p>So you're in the frustrating position of working out the text position manually. Gah.</p>
+<p>Enough to drive you gaga? ;-)</p>
+<!----
+
+Here are some other examples of people running into this issue:
+
+2016 issues: vertical text alignment missing and setbarresults modification 
+
+- [Comments by David Rushforth](http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html#comment-6a00e553e16897883301bb08261e9a970d)
+on [What's New in the Revit 2016 API](http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html)
+- [Comment by ... ](http://thebuildingcoder.typepad.com/blog/2015/04/add-in-migration-to-revit-2016-and-updated-wizards.html?cid=6a00e553e16897883301bb08264ea1970d#comment-6a00e553e16897883301bb08264ea1970d)
+on [xxx](http://thebuildingcoder.typepad.com/blog/2015/04/add-in-migration-to-revit-2016-and-updated-wizards.html)
+- [creating-a-textnote-with-the-2016-api-changes](http://forums.autodesk.com/t5/revit-api/creating-a-textnote-with-the-2016-api-changes/m-p/5629284)
+- [text-alignments](http://forums.autodesk.com/t5/revit-api/text-alignments/m-p/6272246)
+
+---->
+
+<p>It seems to me that the Revit developers have a mandate to stay away from simple drawing objects such as lines and text, and lean towards smarter objects like line-based families and tags. I commend that (if that is what is happening), but it also drives me nuts at times.</p>
+<p><b><i>&lt;<code>/rant</code>&gt;</i></b></p>
+<p>I was in the situation you are in. I ended up creating a line-based family with a nested annotation symbol in it. I needed to programmatically manage some of the family placement/scale etc. The bonus of this was that it allowed the user to modify the lines once placed (without needing an iUpdater to do so).</p>
+<p>If you just want text, you may be able to get away with getting the centre of the text bounding box and moving it to the midpoint of your line. You'll probably need two transactions to do that.</p>
+<p><strong>Answer 2:</strong></p>
+<p>Very sorry about the frustrating situation.</p>
+<p>Have you raised a wish list for this in the Revit Idea Station?</p>
+<p>You might get a lot of votes for that one.</p>
+<p>Now to go on with the topic at hand.</p>
+<p>It has been discussed here in the past in the thread
+on <a href="http://forums.autodesk.com/t5/revit-api/text-alignments/m-p/6272246">text alignments</a>.</p>
+<p>Apparently, as far as the development team is concerned, the vertical alignment possibility should never have been implemented.</p>
+<p>Arnošt Löbel explained that in detail in a discussion thread
+on <a href="http://forums.autodesk.com/t5/revit-api/creating-a-textnote-with-the-2016-api-changes/m-p/5629284">creating a text note with the 2016 API changes</a>.</p>
+<p>Please also refer to the comments by David Rushforth on <a href="http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html">What's New in the Revit 2016 API</a>.</p>
+<p>Can you check these out and see whether they help?</p>
+<p>I do hope we can resolve this somehow, because this request has cropped up a few times now.</p>
+<p>Is it possible to achieve what you show in your second figure using a custom line type?</p>
+<p>Here are two solutions that come up immediately in an Internet search:</p>
+<ul>
+<li><a href="https://knowledge.autodesk.com/support/revit-products/troubleshooting/caas/sfdcarticles/sfdcarticles...">Creating linetype with text to represent utility and fence lines</a></li>
+<li><a href="https://www.youtube.com/watch?v=swR-zJkc1fQ">YouTube video in Russian</a></li>
+</ul>
+<p><strong>Response:</strong></p>
+<p>For now, I prefer to use simple text notes, as these texts are only used for sheet views.</p>
+<p>Also, some users might need to delete or move a text element, to give way for more important geometry.</p>
+<p>Thanks for the idea about getting values from the text bounding box. That's probably the best way of calculating the offset distance.</p>
+<p>I'm not using detail lines. The lines shown are actually pipe system, shown with single line representation.</p>
+<p>A line based family is too constricted for our needs.</p>
+<p><strong>Answer 3:</strong></p>
+<p>The discussions you point to don't help me understand why vertical alignment isn't included in either the UI or the API.</p>
+<p>If Revit could do everything as a user would want it, text wouldn't exist. It would all be internal/external databases, tags, references etc. That is not the case.</p>
+<p>So, a user (or programmer) must be able to add text that can be positioned in a manner that editing the text element's content doesn't make it wrap in an undesirable way.</p>
+<p>There are 21 ideas in the Idea Station using the search 'text alignment'.</p>
+<p>While the 'no vertical alignment' stance may make sense from an Autodesk point of view, it makes zero sense from a user viewpoint. Any user would have told the development team that. The 21 ideas voice this also.</p>
+<p>I've been using the Revit API since Revit 2011.</p>
+<p>Originally, I was like, I'll use <code>TextNoteCreationData</code> to batch create text, because that'll be faster than creating them individually (after some testing).</p>
+<p>That got deprecated in Revit 2013 and obsoleted in Revit 2014.</p>
+<p>In Revit 2013, the <code>NewTextNote</code> creation method was heralded as being as efficient as the batch method.</p>
+<p>Then that was deprecated in Revit 2016, and obsoleted in Revit 2017.</p>
+<p>In Revit 2016, enter the 'new' static <code>Create</code> method. A devolved version, in preparation for the Revit 2017 text element overhaul. Adjustment required after initial creation transaction.</p>
+<p>The roadmap isn't clear.</p>
+<p>It's not annoying, really, just disappointing, time sapping, and ambiguous. The 2017 'improvements' weren't enough!</p>
+<p>Sorry, this message is longer than I wanted! And sorry it's another rant...</p>
+<p><strong>Answer 4:</strong></p>
+<p>Note that this is not supported functionality...</p>
+<p>But it so happens that you can still set the vertical alignment through the <code>TEXT_ALIGN_VERT</code> built-in parameter.  </p>
+<p>It needs to be set to <code>TextAlignFlags.TEF_ALIGN_TOP</code>, <code>TextAlignFlags.TEF_ALIGN_MIDDLE</code> or <code>TextAlignFlags.TEF_ALIGN_BOTTOM</code>, like in this C# snippet:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;t&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;t.Start(&nbsp;<span style="color:#a31515;">&quot;AlignTextNote&quot;</span>&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Parameter</span>&nbsp;p&nbsp;=&nbsp;textNote.get_Parameter(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.TEXT_ALIGN_VERT&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;p.Set(&nbsp;(<span style="color:#2b91af;">Int32</span>)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TextAlignFlags</span>.TEF_ALIGN_MIDDLE&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;t.Commit();
+&nbsp;&nbsp;}
+</pre>
+
+<p>Hope that helps.</p>
+<p>Meanwhile we will have a look to see what is involved to get this formally exposed.</p>
+<p><strong>Response:</strong></p>
+<p>Perfect!! Just what I needed.</p>
