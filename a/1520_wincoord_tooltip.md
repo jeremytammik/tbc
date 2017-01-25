@@ -14,6 +14,8 @@
 
 #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
+I revisited the custom tooltip implementation that I prepared to demonstrate the Revit 2013 API features including the View API and its <code>UIView</code> class. It class still provides the only possibility to convert back and forth between Revit model coordinates and Windows device screen points. That functionality can be combined with the <code>ReferenceIntersector</code> to shoot a ray through the model to determine what Revit database element is located under the current cursor position and display a custom tooltip presenting information about it or anything else you please...
+
 &ndash; ...
 
 #AULondon, #UI, #innovation, #RevitAPI, @AutodeskRevit
