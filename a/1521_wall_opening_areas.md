@@ -26,7 +26,6 @@ Let's pick up two more topics from the Revit API discussion forum today
 &ndash; <code>EnergyAnalysisDetailModel</code> creation from building elements and volumes
 &ndash; <code>EnergyAnalysisDetailModelOptions</code>...
 
-
 -->
 
 ### Family Category and Two Energy Model Types
@@ -134,7 +133,7 @@ Devon Powell suggested working around this by changing the `ExportEnergyModelTyp
  
 > You can use the API to use the spaces export method to export the gbXML file (not sure if you want to use this, or you are specifically trying to use the energy settings method.) You first need to setup your energy model settings then create the energy model. Then you can export the gbXML file. See example code below. 
  
-<pre class="prettyprint">
+<pre class="code">
 <span style="color:green;">&#39;define&nbsp;the&nbsp;energy&nbsp;model&nbsp;options</span>
 <span style="color:blue;">Dim</span>&nbsp;EmOpt&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;EnergyAnalysisDetailModelOptions
 EmOpt.EnergyModelType&nbsp;=&nbsp;EnergyModelType.SpatialElement
