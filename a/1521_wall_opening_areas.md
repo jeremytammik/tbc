@@ -39,6 +39,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api/bd-p/16
     - [`BuildingEnvelopeAnalyzer` class](#5)
     - [`EnergyAnalysisDetailModel` creation from building elements and volumes](#6)
     - [`EnergyAnalysisDetailModelOptions`](#7)
+- [Quo Vadis Revit API QAS?](#8)
 
 
 #### <a name="2"></a>Family Category Property is not Always Set
@@ -245,3 +246,49 @@ The new property `EnergyAnalysisDetailModelOptions.EnergyModelType` indicates wh
 - SpatialElement &ndash; Energy model based on rooms or spaces. This is the default for calls when this option is not set, and matches behaviour in Revit 2015.
 - BuildingElement &ndash; Energy model based on analysis of building element volumes.
 
+
+#### <a name="8"></a>Quo Vadis Revit API QAS?
+
+This is a note to myself and my colleagues on my on-going research to implement a question answering system to handle the closed-domain topic of *Getting started with the Revit API*.
+
+I would really appreciate some guidance on which system to start working seriously with and where to go next.
+
+Here are some systems I took a look at so far:
+
+- [Jill Watson](http://thebuildingcoder.typepad.com/blog/2017/01/au-in-london-and-deep-learning.html#7)
+- [IBM Watson and Bluemix](http://thebuildingcoder.typepad.com/blog/2017/01/virtues-of-reproduction-research-mep-settings-ontology.html#6)
+- [Microsoft QnA Maker](http://thebuildingcoder.typepad.com/blog/2017/01/vertical-dimensioning-and-revit-api-qas-research.html#4)
+- [Open Source QAS Options](http://thebuildingcoder.typepad.com/blog/2017/01/virtues-of-reproduction-research-mep-settings-ontology.html#7)
+- [Stanford DARPA DeepDive](http://thebuildingcoder.typepad.com/blog/2017/01/vertical-dimensioning-and-revit-api-qas-research.html#5)
+- [YodaQA and DL-Learner](http://thebuildingcoder.typepad.com/blog/2017/01/vertical-dimensioning-and-revit-api-qas-research.html#6)
+- [TensorFlow and Keras](http://thebuildingcoder.typepad.com/blog/2017/01/textnote-rotation-forge-devcon-tensorflow-and-keras.html#4)
+
+Watson and QnA Maker looks simplest to get started with.
+
+I would much prefer to use an open source system, though, and avoid everything proprietary.
+
+I summarised my thoughts on what I would like to achieve and what material I can use to build a knowledge base and teach the system:
+
+- [More Research on a Revit QAS](http://thebuildingcoder.typepad.com/blog/2017/01/vertical-dimensioning-and-revit-api-qas-research.html#3)
+- [Building a Revit API Ontology](http://thebuildingcoder.typepad.com/blog/2017/01/virtues-of-reproduction-research-mep-settings-ontology.html#8)
+
+Here are my main open questions ten days ago:
+
+- [My Current Open Questions on Question Answering Systems](http://thebuildingcoder.typepad.com/blog/2017/01/vertical-dimensioning-and-revit-api-qas-research.html#7)
+
+Nothing much has changed since then.
+
+I still wonder:
+
+- Which system should I choose?
+- Where should I go next?
+
+<!----
+I really need some guidance here.
+
+I cannot imagine that I am the only person in Autodesk interested in created a question answering system.
+
+Looking forward to a quick chat with someone sometime.
+
+Thank you!
+---->

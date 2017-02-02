@@ -15,6 +15,18 @@
 - 12566528 [Textnote - vertical alignment on line i Revit 2016?]
   http://forums.autodesk.com/t5/revit-api-forum/textnote-vertical-alignment-on-line-i-revit-2016/m-p/6810367
 
+- 2016 issues: vertical text alignment missing and setbarresults modification
+  comments by David Rushforth on whats-new-in-the-revit-2016-api:
+  http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html#comment-6a00e553e16897883301bb08261e9a970d
+  http://thebuildingcoder.typepad.com/blog/2015/04/add-in-migration-to-revit-2016-and-updated-wizards.html?cid=6a00e553e16897883301bb08264ea1970d#comment-6a00e553e16897883301bb08264ea1970d
+  10707501 [Text Note VerticalAlignment  is Read Only]
+  rvt65682 [VerticalAlignment is read-only]
+  http://forums.autodesk.com/t5/revit-api/creating-a-textnote-with-the-2016-api-changes/m-p/5629284
+  http://forums.autodesk.com/t5/revit-api/text-alignments/m-p/6272246
+  11708648 [Text alignments]
+  12566528 [Textnote - vertical alignment on line i Revit 2016?]
+  http://forums.autodesk.com/t5/revit-api-forum/textnote-vertical-alignment-on-line-i-revit-2016/m-p/6810367
+
 - pyRevit Idea: Add support for C# assemblies #143 -- https://github.com/eirannejad/pyRevit/issues/143 
 
 #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
