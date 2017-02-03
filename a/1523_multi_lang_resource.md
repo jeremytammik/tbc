@@ -208,7 +208,7 @@ You can fix this problem in Revit 2017.1.1 by using a class like this:
   }
 </pre>
 
-Place code of methods of each external command and external application inside a `using` block with this class member initializing, and the problem will be fixed. My monologue is ended.
+Place code of methods of each external command and external application inside a `using` block with this class member initializing, and the problem will be fixed. 
 
 Expanded info and the patch are provided in the [Russian blog post on Revit 2017.1.1](https://revit-addins.blogspot.ru/2017/01/revit-201711.html).
 
@@ -220,6 +220,13 @@ When you use the `/language RUS` key the UI of my add-in, its tooltip, expanded 
 When you use `/language ENU` key the UI of my add-in, its tooltip, expanded tooltip, and help file displayed on pressing F1 are in English.
  
 The same applies for the TaskDialog content.
+
+The expected correct behaviour is shown in the
+[two-minute video on Revit lang bug](https://www.youtube.com/watch?v=f1IBVgP7T1I):
+
+<center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/f1IBVgP7T1I?rel=0" frameborder="0" allowfullscreen></iframe>
+</center>
 
 Many thanks to Andrey for this beautiful and illuminating sample!
 
