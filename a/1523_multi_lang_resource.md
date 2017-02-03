@@ -22,11 +22,12 @@
 
 -->
 
-### Supporting Multiple Language Resource Files
+### Multiple Language RESX Resource Files
 
+A large contribution today from Andrey Bushman, and a couple of upcoming Forge events:
 
 - [Supporting multiple language resource files](#2)
-- [Creating and Using Localised Resource `RESX` Files](#3)
+- [Creating and using localised resource `RESX` files](#3)
 - [Upcoming Forge accelerators](#4)
 
 
@@ -49,7 +50,7 @@ By the way, this add-in obviously also makes use of
 Andrey's [NuGet Revit API package](http://thebuildingcoder.typepad.com/blog/2016/12/nuget-revit-api-package.html),
 now updated to support the recent additional Revit 2017.X.Y releases.
 
-Andrey's reason for raising the thread in the first place was a weire behaviour setting the UI culture in Revit 2017.1.1, which I passed on to the development team for further exploration.
+Andrey's reason for raising the thread in the first place was a weird behaviour setting the UI culture in Revit 2017.1.1, which I passed on to the development team for further exploration.
 
 However, Andrey provides a workaround for that too, in the module 
 [RevitPatches.cs](https://github.com/Andrey-Bushman/RevitMultiLanguageAddInExample/blob/master/RevitMultiLanguageAddInExample/RevitPatches.cs):
@@ -67,7 +68,6 @@ span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</sp
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">param</span><span style="color:gray;">&nbsp;name</span><span style="color:gray;">=</span><span style="color:gray;">&quot;</span>lang<span style="color:gray;">&quot;</span><span style="color:gray;">&gt;</span><span style="color:green;">The&nbsp;target&nbsp;language.</span><span style="color:gray;">&lt;/</span><span style="color:gray;">param</span><span style="color:gray;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">void</span>&nbsp;PatchCultures(&nbsp;<span style="color:#2b91af;">LanguageType</span>&nbsp;lang&nbsp;)
 &nbsp;&nbsp;{
- 
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;!<span style="color:#2b91af;">Enum</span>.IsDefined(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">LanguageType</span>&nbsp;),&nbsp;lang&nbsp;)&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">throw</span>&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ArgumentException</span>(&nbsp;<span style="color:blue;">nameof</span>(&nbsp;lang&nbsp;)&nbsp;);
@@ -196,12 +196,10 @@ You can fix this problem in Revit 2017.1.1 by using a class like this:
 <pre class="code">
 <span style="color:blue;">public</span>&nbsp;<span style="color:blue;">sealed</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">UICultureSwitcher</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IDisposable</span>
 {
- 
 &nbsp;&nbsp;<span style="color:#2b91af;">CultureInfo</span>&nbsp;previous;
  
 &nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;UICultureSwitcher()
 &nbsp;&nbsp;{
- 
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">CultureInfo</span>&nbsp;culture&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">CultureInfo</span>(&nbsp;<span style="color:#2b91af;">Thread</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.CurrentThread.CurrentCulture.Name&nbsp;);
  
@@ -257,9 +255,8 @@ Additional information and expanded code examples are available from his Russian
 
 #### <a name="4"></a>Upcoming Forge Accelerators
 
-We have a number
-of [Forge accelerators](http://autodeskcloudaccelerator.com/) coming up in
-the [next couple of months](http://autodeskcloudaccelerator.com/prague-2/):
+We have several [Forge accelerators](http://autodeskcloudaccelerator.com/) coming up
+in the [next couple of months](http://autodeskcloudaccelerator.com/prague-2/):
 
 - San Francisco, USA &ndash; March 6-10
 - Gothenburg, Sweden &ndash; March 27-30
@@ -271,11 +268,9 @@ the [next couple of months](http://autodeskcloudaccelerator.com/prague-2/):
 
 I am planning on attending the two European ones and would love to see you there too.
 
-Before that, however, the San Fransisco accelerator provides the very next chance to attend &ndash; and the early bird get the worm &ndash; so grab you chance while you can!
+Before that, however, the San Francisco accelerator provides the very next chance to attend &ndash; and the early bird gets the worm &ndash; so grab you chance while you can!
 
 <center>
 <img src="img/bird_with_worm.png" alt="Bird with worm" width="183"/>
 </center>
-
-
 

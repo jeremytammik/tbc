@@ -21,10 +21,11 @@
 
 -->
 
-<h3>Supporting Multiple Language Resource Files</h3>
+<h3>Multiple Language RESX Resource Files</h3>
+<p>A large contribution today from Andrey Bushman, and a couple of upcoming Forge events:</p>
 <ul>
 <li><a href="#2">Supporting multiple language resource files</a></li>
-<li><a href="#3">Creating and Using Localised Resource <code>RESX</code> Files</a></li>
+<li><a href="#3">Creating and using localised resource <code>RESX</code> files</a></li>
 <li><a href="#4">Upcoming Forge accelerators</a></li>
 </ul>
 <h4><a name="2"></a>Supporting Multiple Language Resource Files</h4>
@@ -42,7 +43,7 @@ the Russian blog  :-)</p>
 <p>By the way, this add-in obviously also makes use of
 Andrey's <a href="http://thebuildingcoder.typepad.com/blog/2016/12/nuget-revit-api-package.html">NuGet Revit API package</a>,
 now updated to support the recent additional Revit 2017.X.Y releases.</p>
-<p>Andrey's reason for raising the thread in the first place was a weire behaviour setting the UI culture in Revit 2017.1.1, which I passed on to the development team for further exploration.</p>
+<p>Andrey's reason for raising the thread in the first place was a weird behaviour setting the UI culture in Revit 2017.1.1, which I passed on to the development team for further exploration.</p>
 <p>However, Andrey provides a workaround for that too, in the module 
 <a href="https://github.com/Andrey-Bushman/RevitMultiLanguageAddInExample/blob/master/RevitMultiLanguageAddInExample/RevitPatches.cs">RevitPatches.cs</a>:</p>
 <pre class="code">
@@ -58,7 +59,6 @@ span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</sp
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">param</span><span style="color:gray;">&nbsp;name</span><span style="color:gray;">=</span><span style="color:gray;">&quot;</span>lang<span style="color:gray;">&quot;</span><span style="color:gray;">&gt;</span><span style="color:green;">The&nbsp;target&nbsp;language.</span><span style="color:gray;">&lt;/</span><span style="color:gray;">param</span><span style="color:gray;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">void</span>&nbsp;PatchCultures(&nbsp;<span style="color:#2b91af;">LanguageType</span>&nbsp;lang&nbsp;)
 &nbsp;&nbsp;{
-
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;!<span style="color:#2b91af;">Enum</span>.IsDefined(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">LanguageType</span>&nbsp;),&nbsp;lang&nbsp;)&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">throw</span>&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ArgumentException</span>(&nbsp;<span style="color:blue;">nameof</span>(&nbsp;lang&nbsp;)&nbsp;);
@@ -177,12 +177,10 @@ in <a href="https://bitbucket.org/Andrey-Bushman/research_of_revit_culture_switc
 <pre class="code">
 <span style="color:blue;">public</span>&nbsp;<span style="color:blue;">sealed</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">UICultureSwitcher</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IDisposable</span>
 {
-
 &nbsp;&nbsp;<span style="color:#2b91af;">CultureInfo</span>&nbsp;previous;
 
 &nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;UICultureSwitcher()
 &nbsp;&nbsp;{
-
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">CultureInfo</span>&nbsp;culture&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">CultureInfo</span>(&nbsp;<span style="color:#2b91af;">Thread</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.CurrentThread.CurrentCulture.Name&nbsp;);
 
@@ -223,9 +221,8 @@ the simplest way to create and make use of localized add-in  resources.</p>
 <li><a href="https://revit-addins.blogspot.ru/2017/01/revit-201711.html">Fix Revit 2017.1.1 localisation issue</a></li>
 </ul>
 <h4><a name="4"></a>Upcoming Forge Accelerators</h4>
-<p>We have a number
-of <a href="http://autodeskcloudaccelerator.com/">Forge accelerators</a> coming up in
-the <a href="http://autodeskcloudaccelerator.com/prague-2/">next couple of months</a>:</p>
+<p>We have several <a href="http://autodeskcloudaccelerator.com/">Forge accelerators</a> coming up
+in the <a href="http://autodeskcloudaccelerator.com/prague-2/">next couple of months</a>:</p>
 <ul>
 <li>San Francisco, USA &ndash; March 6-10</li>
 <li>Gothenburg, Sweden &ndash; March 27-30</li>
@@ -235,7 +232,7 @@ the <a href="http://autodeskcloudaccelerator.com/prague-2/">next couple of month
 <img src="img/2017-02_upcoming_accelerators.png" alt="Upcoming Forge accelerators" width="668"/>
 </center></p>
 <p>I am planning on attending the two European ones and would love to see you there too.</p>
-<p>Before that, however, the San Fransisco accelerator provides the very next chance to attend &ndash; and the early bird get the worm &ndash; so grab you chance while you can!</p>
+<p>Before that, however, the San Francisco accelerator provides the very next chance to attend &ndash; and the early bird gets the worm &ndash; so grab you chance while you can!</p>
 <p><center>
 <img src="img/bird_with_worm.png" alt="Bird with worm" width="183"/>
 </center></p>
