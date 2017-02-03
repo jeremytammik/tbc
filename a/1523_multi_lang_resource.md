@@ -155,30 +155,35 @@ Why does the `/language` key not switch the setting of `Thread.CurrentThread.Cur
 Is it bug?
 
 <pre class="code">
-  Result IExternalApplication.OnStartup(UIControlledApplication application)
-  {
-    ...
-    // I use the `/language RUS` key for revit.exe
-    // But I see that my add-in user the 'default' localization
-    // instead of 'ru'. Hm...
-    // Ok,I will check the CurrentCulture and CurrentUICulture 
-    // values...
-    //
-    // Oops... Localization was changed by the `/language RUS` 
-    // key, but not for that thread which shall to have this 
-    // change! Why???
-    CultureInfo n = Thread.CurrentThread.CurrentCulture; // ru-RU
-    CultureInfo m = Thread.CurrentThread.CurrentUICulture; // en
-  
-    // I can fix this problem myself:
-    // The CurrentUICulture switching fixes the problem, but 
-    // why such problem occurs in Revit?
-    CultureInfo k = new CultureInfo("ru");
-    Thread.CurrentThread.CurrentUICulture = k;
-    
-    // Now my add-in uses right localization. 
-    ...
-  }
+<span style="color:#2b91af;">Result</span>&nbsp;<span style="color:#2b91af;">IExternalApplication</span>.OnStartup(
+&nbsp;&nbsp;<span style="color:#2b91af;">UIControlledApplication</span>&nbsp;application&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;...</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;I&nbsp;use&nbsp;the&nbsp;`/language&nbsp;RUS`&nbsp;key&nbsp;for&nbsp;revit.exe</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;But&nbsp;I&nbsp;see&nbsp;that&nbsp;my&nbsp;add-in&nbsp;user&nbsp;the&nbsp;&#39;default&#39;&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;localization&nbsp;instead&nbsp;of&nbsp;&#39;ru&#39;.&nbsp;Hm...</span>
+&nbsp;&nbsp;<span style="color:green;">//</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Ok,I&nbsp;will&nbsp;check&nbsp;the&nbsp;CurrentCulture&nbsp;and&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;CurrentUICulture&nbsp;&nbsp;values...</span>
+&nbsp;&nbsp;<span style="color:green;">//</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Oops...&nbsp;Localization&nbsp;was&nbsp;changed&nbsp;by&nbsp;the&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;`/language&nbsp;RUS`&nbsp;key,&nbsp;but&nbsp;not&nbsp;for&nbsp;that&nbsp;thread&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;which&nbsp;shall&nbsp;to&nbsp;have&nbsp;this&nbsp;change!&nbsp;Why???</span>
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">CultureInfo</span>&nbsp;n&nbsp;=&nbsp;<span style="color:#2b91af;">Thread</span>.CurrentThread.CurrentCulture;&nbsp;<span style="color:green;">//&nbsp;ru-RU</span>
+&nbsp;&nbsp;<span style="color:#2b91af;">CultureInfo</span>&nbsp;m&nbsp;=&nbsp;<span style="color:#2b91af;">Thread</span>.CurrentThread.CurrentUICulture;&nbsp;<span style="color:green;">//&nbsp;en</span>
+ 
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;I&nbsp;can&nbsp;fix&nbsp;this&nbsp;problem&nbsp;myself:</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;The&nbsp;CurrentUICulture&nbsp;switching&nbsp;fixes&nbsp;the&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;problem,&nbsp;but&nbsp;why&nbsp;such&nbsp;problem&nbsp;occurs&nbsp;in&nbsp;Revit?</span>
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">CultureInfo</span>&nbsp;k&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">CultureInfo</span>(&nbsp;<span style="color:#a31515;">&quot;ru&quot;</span>&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">Thread</span>.CurrentThread.CurrentUICulture&nbsp;=&nbsp;k;
+ 
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Now&nbsp;my&nbsp;add-in&nbsp;uses&nbsp;right&nbsp;localization.&nbsp;</span>
+ 
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;...</span>
+}
 </pre>
 
 Later, I found that this problem exists in Revit 2017.1.1, but this problem is absent in Revit 2017.
@@ -189,23 +194,26 @@ in [Andrey-Bushman/research_of_revit_culture_switching_problem](https://bitbucke
 You can fix this problem in Revit 2017.1.1 by using a class like this:
 
 <pre class="code">
-  public sealed class UICultureSwitcher : IDisposable {
-  
-    CultureInfo previous;
-    
-    public UICultureSwitcher() {
-  
-      CultureInfo culture = new CultureInfo(Thread
-        .CurrentThread.CurrentCulture.Name);
-  
-      previous = Thread.CurrentThread.CurrentUICulture;
-      Thread.CurrentThread.CurrentUICulture = culture;
-    }
-  
-    void IDisposable.Dispose() {
-      Thread.CurrentThread.CurrentUICulture = previous;
-    }
-  }
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">sealed</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">UICultureSwitcher</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IDisposable</span>
+{
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">CultureInfo</span>&nbsp;previous;
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;UICultureSwitcher()
+&nbsp;&nbsp;{
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">CultureInfo</span>&nbsp;culture&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">CultureInfo</span>(&nbsp;<span style="color:#2b91af;">Thread</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.CurrentThread.CurrentCulture.Name&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;previous&nbsp;=&nbsp;<span style="color:#2b91af;">Thread</span>.CurrentThread.CurrentUICulture;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Thread</span>.CurrentThread.CurrentUICulture&nbsp;=&nbsp;culture;
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">void</span>&nbsp;<span style="color:#2b91af;">IDisposable</span>.Dispose()
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Thread</span>.CurrentThread.CurrentUICulture&nbsp;=&nbsp;previous;
+&nbsp;&nbsp;}
+}
 </pre>
 
 Place code of methods of each external command and external application inside a `using` block with this class member initializing, and the problem will be fixed. 
