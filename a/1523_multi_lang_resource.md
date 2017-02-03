@@ -26,8 +26,8 @@
 
 
 - [Supporting multiple language resource files](#2)
-- [Upcoming Forge accelerators](#3)
-- [Find label or tag containing specific shared parameter](#4)
+- [Creating and Using Localised Resource `RESX` Files](#3)
+- [Upcoming Forge accelerators](#4)
 
 
 #### <a name="2"></a>Supporting Multiple Language Resource Files
@@ -140,11 +140,9 @@ span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</sp
 }
 </pre>
 
-Here is a summary of our discussion of this:
+Here is a summary of our discussion consisting mainly of Andrey's explanation:
 
-Revit 2017.1.1
- 
-My external application (add-in) has two localizations: English (by default) and Russian. I saw that my external application (add-in) on the some computers uses wrong localization. One of that computers has a 'clear' Revit without installed custom add-ins.
+My external application (add-in) has two localizations: English (by default) and Russian. I now noticed that my external application (add-in) uses wrong localization on some computers. One of those computers has a 'clear' Revit without any other installed custom add-ins.
  
 If I launch `revit.exe` with the `/language RUS` command line option, then the Revit UI is Russian, but my add-in  UI still uses the default localization (i.e. "en") instead of "ru".
  
@@ -214,13 +212,8 @@ Place code of methods of each external command and external application inside a
 
 Expanded info and the patch are provided in the [Russian blog post on Revit 2017.1.1](https://revit-addins.blogspot.ru/2017/01/revit-201711.html).
 
-I also created the [RevitMultiLanguageAddInExample](https://github.com/Andrey-Bushman/RevitMultiLanguageAddInExample) simple example and published it on GitHub here:
-
-I made an [eight-minute video on resx using](https://www.youtube.com/watch?v=DKCm3p9Gp9M) which shows the easiest way of creating and editing resource files:
-
-<center>
-<iframe width="480" height="270" src="https://www.youtube.com/embed/DKCm3p9Gp9M?rel=0" frameborder="0" allowfullscreen></iframe>
-</center>
+I also created a multi-language add-in example, published in
+the [RevitMultiLanguageAddInExample GitHub repository](https://github.com/Andrey-Bushman/RevitMultiLanguageAddInExample).
 
 When you use the `/language RUS` key the UI of my add-in, its tooltip, expanded tooltip, and help file displayed on pressing F1 are in Russian.
 
@@ -229,9 +222,25 @@ When you use `/language ENU` key the UI of my add-in, its tooltip, expanded tool
 The same applies for the TaskDialog content.
 
 Many thanks to Andrey for this beautiful and illuminating sample!
- 
 
-#### <a name="3"></a>Upcoming Forge Accelerators
+
+#### <a name="3"></a>Creating and Using Localised Resource `RESX` Files
+
+Andrey just published
+an [eight-minute video tutorial on resx using](https://www.youtube.com/watch?v=DKCm3p9Gp9M) explaining
+the simplest way to create and make use of localized add-in  resources.
+
+<center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/DKCm3p9Gp9M?rel=0" frameborder="0" allowfullscreen></iframe>
+</center>
+
+Additional information and expanded code examples are available from his Russian blog:
+
+- [Binding commands to the help system](https://revit-addins.blogspot.ru/2017/01/blog-post_28.html)
+- [Fix Revit 2017.1.1 localisation issue](https://revit-addins.blogspot.ru/2017/01/revit-201711.html)
+
+
+#### <a name="4"></a>Upcoming Forge Accelerators
 
 We have a number
 of [Forge accelerators](http://autodeskcloudaccelerator.com/) coming up in
@@ -253,17 +262,5 @@ Before that, however, the San Fransisco accelerator provides the very next chanc
 <img src="img/bird_with_worm.png" alt="Bird with worm" width="183"/>
 </center>
 
-
-
-#### <a name="4"></a>Find Label or Tag Containing Specific Shared Parameter
-
-[find label or tag containing specific shared parameter](http://forums.autodesk.com/t5/revit-api-forum/find-label-tag-containing-specific-shared-parameter/m-p/6834034)
-
-**Question:** 
-
-**Answer:** 
-
-<pre class="code">
-</pre>
 
 

@@ -24,8 +24,8 @@
 <h3>Supporting Multiple Language Resource Files</h3>
 <ul>
 <li><a href="#2">Supporting multiple language resource files</a></li>
-<li><a href="#3">Upcoming Forge accelerators</a></li>
-<li><a href="#4">Find label or tag containing specific shared parameter</a></li>
+<li><a href="#3">Creating and Using Localised Resource <code>RESX</code> Files</a></li>
+<li><a href="#4">Upcoming Forge accelerators</a></li>
 </ul>
 <h4><a name="2"></a>Supporting Multiple Language Resource Files</h4>
 <p>Andrey Bushman raised another interesting issue in 
@@ -131,9 +131,8 @@ span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</sp
 }
 </pre>
 
-<p>Here is a summary of our discussion of this:</p>
-<p>Revit 2017.1.1</p>
-<p>My external application (add-in) has two localizations: English (by default) and Russian. I saw that my external application (add-in) on the some computers uses wrong localization. One of that computers has a 'clear' Revit without installed custom add-ins.</p>
+<p>Here is a summary of our discussion consisting mainly of Andrey's explanation:</p>
+<p>My external application (add-in) has two localizations: English (by default) and Russian. I now noticed that my external application (add-in) uses wrong localization on some computers. One of those computers has a 'clear' Revit without any other installed custom add-ins.</p>
 <p>If I launch <code>revit.exe</code> with the <code>/language RUS</code> command line option, then the Revit UI is Russian, but my add-in  UI still uses the default localization (i.e. "en") instead of "ru".</p>
 <p>I extract the localized resources through the <code>ResourcesManager</code> class in my code. That is the native way to work with resources in .NET. I know that <code>ResourcesManager</code> chooses the localized resources based on the value of  <code>Thread.CurrentThread.CurrentUICulture</code>.</p>
 <p>Therefore, I assumed that this value isn't <code>"ru"</code> or <code>"ru-RU"</code>, for some reason, despite the <code>/language RUS</code> key. I checked and confirmed that assumption (look my code below):  the <code>Thread.CurrentThread.CurrentUICulture</code> property is set to <code>"en"</code> instead of <code>"ru"</code>. Also, I see that <code>Thread.CurrentThread.CurrentCulture</code> uses <code>"ru-RU"</code> instead of <code>"en"</code>.</p>
@@ -192,16 +191,25 @@ in <a href="https://bitbucket.org/Andrey-Bushman/research_of_revit_culture_switc
 
 <p>Place code of methods of each external command and external application inside a <code>using</code> block with this class member initializing, and the problem will be fixed. My monologue is ended.</p>
 <p>Expanded info and the patch are provided in the <a href="https://revit-addins.blogspot.ru/2017/01/revit-201711.html">Russian blog post on Revit 2017.1.1</a>.</p>
-<p>I also created the <a href="https://github.com/Andrey-Bushman/RevitMultiLanguageAddInExample">RevitMultiLanguageAddInExample</a> simple example and published it on GitHub here:</p>
-<p>I made an <a href="https://www.youtube.com/watch?v=DKCm3p9Gp9M">eight-minute video on resx using</a> which shows the easiest way of creating and editing resource files:</p>
-<p><center>
-<iframe width="480" height="270" src="https://www.youtube.com/embed/DKCm3p9Gp9M?rel=0" frameborder="0" allowfullscreen></iframe>
-</center></p>
+<p>I also created a multi-language add-in example, published in
+the <a href="https://github.com/Andrey-Bushman/RevitMultiLanguageAddInExample">RevitMultiLanguageAddInExample GitHub repository</a>.</p>
 <p>When you use the <code>/language RUS</code> key the UI of my add-in, its tooltip, expanded tooltip, and help file displayed on pressing F1 are in Russian.</p>
 <p>When you use <code>/language ENU</code> key the UI of my add-in, its tooltip, expanded tooltip, and help file displayed on pressing F1 are in English.</p>
 <p>The same applies for the TaskDialog content.</p>
 <p>Many thanks to Andrey for this beautiful and illuminating sample!</p>
-<h4><a name="3"></a>Upcoming Forge Accelerators</h4>
+<h4><a name="3"></a>Creating and Using Localised Resource <code>RESX</code> Files</h4>
+<p>Andrey just published
+an <a href="https://www.youtube.com/watch?v=DKCm3p9Gp9M">eight-minute video tutorial on resx using</a> explaining
+the simplest way to create and make use of localized add-in  resources.</p>
+<p><center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/DKCm3p9Gp9M?rel=0" frameborder="0" allowfullscreen></iframe>
+</center></p>
+<p>Additional information and expanded code examples are available from his Russian blog:</p>
+<ul>
+<li><a href="https://revit-addins.blogspot.ru/2017/01/blog-post_28.html">Binding commands to the help system</a></li>
+<li><a href="https://revit-addins.blogspot.ru/2017/01/revit-201711.html">Fix Revit 2017.1.1 localisation issue</a></li>
+</ul>
+<h4><a name="4"></a>Upcoming Forge Accelerators</h4>
 <p>We have a number
 of <a href="http://autodeskcloudaccelerator.com/">Forge accelerators</a> coming up in
 the <a href="http://autodeskcloudaccelerator.com/prague-2/">next couple of months</a>:</p>
@@ -218,9 +226,3 @@ the <a href="http://autodeskcloudaccelerator.com/prague-2/">next couple of month
 <p><center>
 <img src="img/bird_with_worm.png" alt="Bird with worm" width="183"/>
 </center></p>
-<h4><a name="4"></a>Find Label or Tag Containing Specific Shared Parameter</h4>
-<p><a href="http://forums.autodesk.com/t5/revit-api-forum/find-label-tag-containing-specific-shared-parameter/m-p/6834034">find label or tag containing specific shared parameter</a></p>
-<p><strong>Question:</strong> </p>
-<p><strong>Answer:</strong> </p>
-<pre class="code">
-</pre>
