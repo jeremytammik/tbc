@@ -121,7 +121,7 @@ describe the new syntax, but they don't really explain how you would create the 
 <p>Many thanks to Mario for sharing!</p>
 
 
-<h4>Addendum</h4>
+<a name="2"></a><h4>Addendum</h4>
 
 <p>Colmag adds in
 his <a href="http://thebuildingcoder.typepad.com/blog/2013/04/setting-up-your-vieworientation3d.html#comment-2904374676">comment</a> below:</p>
@@ -146,3 +146,33 @@ his <a href="http://thebuildingcoder.typepad.com/blog/2013/04/setting-up-your-vi
 </ul>
 
 <p>Many thanks to Colmag for this useful addition!</p>
+
+<a name="3"></a><h4>Addendum 2</h4>
+
+<p>K C Tang added a further simplification in
+his <a href="http://thebuildingcoder.typepad.com/blog/2013/04/setting-up-your-vieworientation3d.html#comment-3137491963">comment</a> below:</p>
+
+<p>I found that the formula above using <code>( a * b, a * c, d )</code> to calculate the return value from <code>VectorFromHorizVertAngles</code> can be further simplified, because:</p>
+
+<pre>
+  ( a * b, a * c, d )
+    = ( a * b / a , a * c / a, d / a )
+    = (b, c, d/a)
+    = (b, c, e),
+</pre>
+
+<p>where</p>
+
+<pre>
+  double e = Math.Tan( angleVertR ).
+</pre>
+
+<p>In words, the return value from <code>VectorFromHorizVertAngles</code> can be defined as:</p>
+
+<ul>
+<li>cos (horizontal angle) for X</li>
+<li>sin (horizontal angle) for Y</li>
+<li>tan (vertical angle) for Z</li>
+</ul>
+
+<p>Many thanks to K C Tang for this simplification and explanation highlighting the basic trigonometric relationships between the angles and the vectors involved so much better than the original version!</p>
