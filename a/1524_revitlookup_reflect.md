@@ -41,6 +41,7 @@ of [RevDev Studios](https://twitter.com/revdevstudios) that will help significan
     - [File Changes](#9)
 - [Download](#10)
 - [RevDev Studios](#11)
+- [Addendum &ndash; never catch all exceptions](#12)
 
 
 #### <a name="2"></a>Drastic Changes Making Use of Object Inspection via Reflection
@@ -235,3 +236,45 @@ on [finding a development partner](http://thebuildingcoder.typepad.com/blog/2011
 or update that post in general.
 
 
+#### <a name="12"></a>Addendum &ndash; Never Catch All Exceptions
+
+
+Compilation
+of [RevitLookup release 2017.0.0.14](https://github.com/jeremytammik/RevitLookup/releases/tag/2017.0.0.14) discussed
+above causes two warnings `CS0168` in `CollectorExtElement.cs` saying, "The variable 'ex' is declared but never used" in exception handlers like this:
+
+<pre class="code">
+  <span style="color:blue;">catch</span>(&nbsp;<span style="color:#2b91af;">Exception</span>&nbsp;ex&nbsp;)
+  {
+  &nbsp;&nbsp;<span style="color:green;">//&nbsp;Probably&nbsp;is&nbsp;that&nbsp;this&nbsp;specific&nbsp;element
+  &nbsp;&nbsp;// doesn&#39;t&nbsp;have&nbsp;the&nbsp;property&nbsp;-&nbsp;ignore</span>
+  &nbsp;&nbsp;<span style="color:green;">//data.Add(new&nbsp;Snoop.Data.Exception(pi.Name,&nbsp;ex));</span>
+  }
+</pre>
+
+However, you should [never, ever, catch all exceptions](http://thebuildingcoder.typepad.com/blog/2016/04/how-to-distinguish-redundant-rooms.html#3).
+
+Andy very kindly fixed that as well,
+submitting [pull request #23 &ndash; catching proper exceptions for reflection invocation](https://github.com/jeremytammik/RevitLookup/pull/23).
+
+Now the exception handler looks like this instead, catching specific exceptions and leaving the really unexpected, exceptional exceptions untouched:
+
+<pre class="code">
+  <span style="color:blue;">catch</span>&nbsp;(<span style="color:#2b91af;">TargetException</span>&nbsp;ex)
+  {
+&nbsp;&nbsp;&nbsp;&nbsp;data.Add(<span style="color:blue;">new</span>&nbsp;Snoop.Data.<span style="color:#2b91af;">Exception</span>(pi.Name,&nbsp;ex));
+  }
+  <span style="color:blue;">catch</span>&nbsp;(<span style="color:#2b91af;">TargetInvocationException</span>&nbsp;ex)
+  {
+&nbsp;&nbsp;&nbsp;&nbsp;data.Add(<span style="color:blue;">new</span>&nbsp;Snoop.Data.<span style="color:#2b91af;">Exception</span>(pi.Name,&nbsp;ex));
+  }
+  <span style="color:blue;">catch</span>&nbsp;(<span style="color:#2b91af;">TargetParameterCountException</span>&nbsp;ex)
+  {
+&nbsp;&nbsp;&nbsp;&nbsp;data.Add(<span style="color:blue;">new</span>&nbsp;Snoop.Data.<span style="color:#2b91af;">Exception</span>(pi.Name,&nbsp;ex));
+  }
+</pre>
+
+[RevitLookup release 2017.0.0.15](https://github.com/jeremytammik/RevitLookup/releases/tag/2017.0.0.15) with
+this fix integrated no longer violates this recommendation and compiles with zero warnings.
+
+Thanks again to Andy!
