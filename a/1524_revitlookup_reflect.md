@@ -9,8 +9,7 @@
 
 <!---
 
-
-#RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+RevitLookup Using Reflection for Cross-Version Compatibility #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
 Today, I present a large and drastic contribution to RevitLookup from Andy @awmcc90 McCloskey of RevDev Studios that will help significantly in supporting both past and future releases of Revit
 &ndash; Drastic changes making use of object inspection via <code>Reflection</code>
@@ -25,7 +24,7 @@ Today, I present a large and drastic contribution to RevitLookup from Andy @awmc
 
 -->
 
-### RevitLookup Using Reflection for Cross-Version Compatibility
+### RevitLookup Reflection Cross-Version Compatibility
 
 Today, I present a large and drastic contribution 
 to [RevitLookup](https://github.com/jeremytammik/RevitLookup) from
