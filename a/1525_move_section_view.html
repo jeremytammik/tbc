@@ -37,11 +37,11 @@ to <a href="http://thebuildingcoder.typepad.com/blog/2012/06/create-section-view
 <p>I'm working on a project in which the wall angle will change and I need to rotate an existing section to match it.  </p>
 <p>Is it possible to set a curve similar to a wall?  I can't seem to find any curve or location point on the section view in RevitLookup.</p>
 <pre class="code">
-  LocationCurve locationCurve = wall.WallCurve;
+  <span style="color:#2b91af;">LocationCurve</span>&nbsp;locationCurve&nbsp;=&nbsp;wall.WallCurve;
 
-  Transaction t = new Transaction(doc);
-  t.Start("Move Wall");
-  locationCurve.Curve = LinkedProfile;
+  <span style="color:#2b91af;">Transaction</span>&nbsp;t&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;);
+  t.Start(&nbsp;<span style="color:#a31515;">&quot;Move&nbsp;Wall&quot;</span>&nbsp;);
+  locationCurve.Curve&nbsp;=&nbsp;LinkedProfile;
   t.Commit();
 </pre>
 
@@ -53,11 +53,11 @@ to <a href="http://thebuildingcoder.typepad.com/blog/2012/06/create-section-view
 on <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.53">handling transactions and transaction groups</a>.</p>
 <p>I think you can indeed change the wall location curve in a manner similar to what you show.</p>
 <p>However, the code you list above is guaranteed not to work.</p>
-<p><strong>Beginning of misunderstanding</strong></p>
+<p><u>Beginning of misunderstanding</u></p>
 <p>Look:</p>
 <p>In this line, you make a copy of the wall location curve:</p>
 <pre class="code">
-  LocationCurve locationCurve = wall.WallCurve;
+  <span style="color:#2b91af;">LocationCurve</span>&nbsp;locationCurve&nbsp;=&nbsp;wall.WallCurve;
 </pre>
 
 <p>Then, you change something in the copy:</p>
@@ -81,31 +81,37 @@ command <a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra/blob/master
 </pre>
 
 <p>by a given vector v.</p>
-<p><strong>End of misunderstanding</strong></p>
-<p>Oh no, re-reading your query, I see you are trying to modify the section view, not the wall location line.</p>
+<p><u>End of misunderstanding</u></p>
+<p>Oh, no, re-reading your query, I see you are trying to modify the section view, not the wall location line.</p>
 <p>No, the section view does not have a location line.</p>
 <p>It is controlled differently. The Revit SDK sample DynamicModelUpdate shows how to dynamically update a section view to follow a window placed in the model. You can adapt that to follow a wall in a similar fashion.</p>
 <p>Here is a quick rundown of the places to look in that sample step by step:</p>
 <ul>
-<li>Module <code>2017.1/SDK/Samples/DynamicModelUpdate/CS/SectionUpdater.cs</code></li>
+<li>Folder <code>2017.1/SDK/Samples/DynamicModelUpdate/CS</code></li>
+<li>Module <code>SectionUpdater.cs</code></li>
 <li>Method <code>public void Execute(UpdaterData data)</code></li>
 <li>Variables and method call:</li>
 </ul>
 <pre class="code">
-FamilyInstance window = doc.GetElement(m_windowId) as FamilyInstance;
-ViewSection section = doc.GetElement(m_sectionId) as ViewSection;
-RejustSectionView(doc, window, section);
+<span style="color:#2b91af;">FamilyInstance</span>&nbsp;window&nbsp;=&nbsp;doc.GetElement(&nbsp;m_windowId&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">FamilyInstance</span>;
+
+<span style="color:#2b91af;">ViewSection</span>&nbsp;section&nbsp;=&nbsp;doc.GetElement(&nbsp;m_sectionId&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">ViewSection</span>;
+
+RejustSectionView(&nbsp;doc,&nbsp;window,&nbsp;section&nbsp;);
 </pre>
 
 <ul>
 <li>Method implementation and action:</li>
 </ul>
 <pre class="code">
-internal void RejustSectionView(Document doc, Element elem, ViewSection section)
+<span style="color:blue;">internal</span>&nbsp;<span style="color:blue;">void</span>&nbsp;RejustSectionView(&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc,
+  <span style="color:#2b91af;">Element</span>&nbsp;elem,&nbsp;<span style="color:#2b91af;">ViewSection</span>&nbsp;section&nbsp;)
 
-ElementTransformUtils.RotateElement(doc, m_sectionElement.Id, axis, rotateAngle);
+<span style="color:#2b91af;">ElementTransformUtils</span>.RotateElement(doc,&nbsp;m_sectionElement.Id,
+  axis,&nbsp;rotateAngle);
 
-ElementTransformUtils.MoveElement(doc, m_sectionElement.Id, translationVec);
+<span style="color:#2b91af;">ElementTransformUtils</span>.MoveElement(doc,&nbsp;m_sectionElement.Id,
+  translationVec);
 </pre>
 
 <p><strong>Response:</strong> Perfect!  I forget the many awesome examples in the SDK.  I really need to look through them instead of always using Google. </p>
