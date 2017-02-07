@@ -1,0 +1,128 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+- 12600423 [Move Location of Section View]
+  http://forums.autodesk.com/t5/revit-api-forum/move-location-of-section-view/m-p/6831743
+
+#RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+
+&ndash; 
+...
+
+-->
+
+<h3>Moving the Section View Location</h3>
+<p>Today, let's recap 
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="http://forums.autodesk.com/t5/revit-api-forum/why-the-language-key-switches-currentculture-instead-of/m-p/6837625">moving the location of a section view</a> raised
+by <a href="http://forums.autodesk.com/t5/user/viewprofilepage/user-id/2615791">Danny Bentley</a>,
+BIM Structural Technician at <a href="http://www.som.com">SOM</a> in California, since Danny very kindly created a video and GitHub repo to demonstrate and share the solution, which will certainly be of use to others as well.</p>
+<p><center>
+<img src="img/danny_bentley_x120.jpg" alt="Danny Bentley" width="120"/>
+</center></p>
+<p>By the way, Danny also
+writes <a href="http://revitdynamoapi.blogspot.ch/">Bentley's Revit Dynamo &amp; API blog</a> on
+his personal exploration of the Revit API and Dynamo.</p>
+<p>Why does it have a <code>ch</code> domain, Danny?</p>
+<p>Anyway, here is the issue moving the location of a section view:</p>
+<p><strong>Question:</strong> I saw a great post on the <em>The Building Coder</em> on how
+to <a href="http://thebuildingcoder.typepad.com/blog/2012/06/create-section-view-parallel-to-wall.html">create a section view to be aligned with a wall</a>.</p>
+<p>I'm working on a project in which the wall angle will change and I need to rotate an existing section to match it.  </p>
+<p>Is it possible to set a curve similar to a wall?  I can't seem to find any curve or location point on the section view in RevitLookup.</p>
+<pre class="code">
+  LocationCurve locationCurve = wall.WallCurve;
+
+  Transaction t = new Transaction(doc);
+  t.Start("Move Wall");
+  locationCurve.Curve = LinkedProfile;
+  t.Commit();
+</pre>
+
+<p><strong>Answer:</strong> Thank you for your query and appreciation.</p>
+<p>First of all, out of habit, I repeat:</p>
+<p>For your own comfort and security,
+<a href="http://thebuildingcoder.typepad.com/blog/2012/04/using-using-automagically-disposes-and-rolls-back.html">all use of transactions should be encapsulated in a <code>using</code> statement</a>.</p>
+<p>The Building Coder defines an entire topic group
+on <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.53">handling transactions and transaction groups</a>.</p>
+<p>I think you can indeed change the wall location curve in a manner similar to what you show.</p>
+<p>However, the code you list above is guaranteed not to work.</p>
+<p><strong>Beginning of misunderstanding</strong></p>
+<p>Look:</p>
+<p>In this line, you make a copy of the wall location curve:</p>
+<pre class="code">
+  LocationCurve locationCurve = wall.WallCurve;
+</pre>
+
+<p>Then, you change something in the copy:</p>
+<pre class="code">
+  locationCurve.Curve = LinkedProfile;
+</pre>
+
+<p>And then you expect the wall to change?</p>
+<p>Good luck with that.</p>
+<p>You might have better luck with</p>
+<pre class="code">
+  wall.WallCurve = LinkedProfile;
+</pre>
+
+<p>You might also want to take a look at
+the <a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra">ADN Xtra labs</a> sample
+command <a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra/blob/master/XtraCs/Labs2.cs#L837-L1102">Lab2_5_SelectAndMoveWallAndAddColumns</a>.</p>
+<p>It moves a wall using </p>
+<pre class="code">
+  wall.Location.Move( v )
+</pre>
+
+<p>by a given vector v.</p>
+<p><strong>End of misunderstanding</strong></p>
+<p>Oh no, re-reading your query, I see you are trying to modify the section view, not the wall location line.</p>
+<p>No, the section view does not have a location line.</p>
+<p>It is controlled differently. The Revit SDK sample DynamicModelUpdate shows how to dynamically update a section view to follow a window placed in the model. You can adapt that to follow a wall in a similar fashion.</p>
+<p>Here is a quick rundown of the places to look in that sample step by step:</p>
+<ul>
+<li>Module <code>2017.1/SDK/Samples/DynamicModelUpdate/CS/SectionUpdater.cs</code></li>
+<li>Method <code>public void Execute(UpdaterData data)</code></li>
+<li>Variables and method call:</li>
+</ul>
+<pre class="code">
+FamilyInstance window = doc.GetElement(m_windowId) as FamilyInstance;
+ViewSection section = doc.GetElement(m_sectionId) as ViewSection;
+RejustSectionView(doc, window, section);
+</pre>
+
+<ul>
+<li>Method implementation and action:</li>
+</ul>
+<pre class="code">
+internal void RejustSectionView(Document doc, Element elem, ViewSection section)
+
+ElementTransformUtils.RotateElement(doc, m_sectionElement.Id, axis, rotateAngle);
+
+ElementTransformUtils.MoveElement(doc, m_sectionElement.Id, translationVec);
+</pre>
+
+<p><strong>Response:</strong> Perfect!  I forget the many awesome examples in the SDK.  I really need to look through them instead of always using Google. </p>
+<p><strong>Answer:</strong> I think you need to use both SDK and Internet searches, and more besides, as described
+in <a href="http://thebuildingcoder.typepad.com/blog/2017/01/virtues-of-reproduction-research-mep-settings-ontology.html#3">how to research to find a Revit API solution</a>.</p>
+<p><strong>Response:</strong> I just wanted to add my solution in case anyone else is looking to align section views and create aligned sections.  </p>
+<p>Here is a <a href="https://www.youtube.com/watch?v=gkgV2Ff6zC8">30-second video on YouTube</a> showing my add-in in action:</p>
+<p><center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/gkgV2Ff6zC8?rel=0" frameborder="0" allowfullscreen></iframe>
+</center></p>
+<p>The source code is provided on GitHub, in <a href="https://github.com/dannysbentley/Sections">dannysbentley Sections repo</a>.</p>
+<p>It sports four external commands:</p>
+<ul>
+<li>CommandUpdate</li>
+<li>CommandCreateStart</li>
+<li>CommandCreateEnd</li>
+<li>CommandCreatePerpendicular</li>
+</ul>
+<p>It also creates a neat little external application presenting a custom ribbon panel to drive them.</p>
+<p>Many thanks to Danny for sharing this solution!</p>
