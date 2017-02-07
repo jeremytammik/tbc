@@ -14,6 +14,8 @@
 
 #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
+Today, let's recap the Revit API discussion forum thread on moving the location of a section vie raised by Danny Bentley, BIM Structural Technician at SOM in California, since Danny very kindly created a video and GitHub repo to demonstrate and share the solution, which will certainly be of use to others as well. By the way, Danny also writes Bentley's Revit Dynamo &amp API blog on his personal exploration of the Revit API and Dynamo...
+
 &ndash; 
 ...
 
@@ -23,7 +25,7 @@
 
 Today, let's recap 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [moving the location of a section view](http://forums.autodesk.com/t5/revit-api-forum/why-the-language-key-switches-currentculture-instead-of/m-p/6837625) raised
+on [moving the location of a section view](http://forums.autodesk.com/t5/revit-api-forum/move-location-of-section-view/m-p/6831743) raised
 by [Danny Bentley](http://forums.autodesk.com/t5/user/viewprofilepage/user-id/2615791),
 BIM Structural Technician at [SOM](http://www.som.com) in California, since Danny very kindly created a video and GitHub repo to demonstrate and share the solution, which will certainly be of use to others as well.
 
