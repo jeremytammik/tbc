@@ -22,11 +22,15 @@
 
 #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
-Here is a summary of the discussion and solution for setting <code>ActiveView</code> during the <code>Idling</code> event from the Revit API discussion forum raised and solved by Rudi 'Revitalizer' and Kinjal Desai; As per API documentation, this operation should not be invalid: no open transactions; <code>IsModifiable</code> is ok; <code>IsReadOnly</code> is ok; No pre-action events around. However, trying to do so throws an <code>InvalidOperationException</code> with the message "Setting active view is temporarily disabled"...
+I have been maintaining a simple Visual Studio Revit add-in wizard for a number of years. Now Andrey Bushman implemented a set of more advanced and convenient Visual Studio templates for creation of Revit add-ins for his own use. The discussion of those led us to once more revisit the topic of the Visual Studio settings for debugging Revit add-ins
+&ndash; New Visual Studio 2015 templates for Revit add-ins
+&ndash; Use Managed Compatibility Mode or Enable Native Code Debugging?
+&ndash; Machine learning software engineer job in Switzerland
+&ndash; FreeCodeCamp...
 
 -->
 
-<h3>Visual Studio 2015 Templates for Revit Add-Ins</h3>
+<h3>New Visual Studio Templates for Revit Add-Ins</h3>
 <p>I have been maintaining a
 simple <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.20">Visual Studio Revit add-in wizard</a> for
 a number of years.</p>
@@ -35,11 +39,12 @@ a number of years.</p>
 <ul>
 <li><a href="#2">New Visual Studio 2015 templates for Revit add-ins</a><ul>
 <li><a href="#3">Q &amp; A</a></li>
+<li><a href="#4">Feature comparison</a></li>
 </ul>
 </li>
-<li><a href="#4">Use Managed Compatibility Mode or Enable Native Code Debugging?</a></li>
-<li><a href="#5">Machine learning software engineer job in Switzerland</a></li>
-<li><a href="#6">FreeCodeCamp</a></li>
+<li><a href="#5">Use Managed Compatibility Mode or Enable Native Code Debugging?</a></li>
+<li><a href="#6">Machine learning software engineer job in Switzerland</a></li>
+<li><a href="#7">FreeCodeCamp</a></li>
 </ul>
 <h4><a name="2"></a>Visual Studio 2015 Templates for Revit Add-Ins</h4>
 <p>http://forums.autodesk.com/t5/revit-api-forum/visual-studio-2015-templates-for-revit-add-ins/m-p/6866605</p>
@@ -88,7 +93,104 @@ What do you think? Should we aim at maintaining just one version together, or ke
 <p>In my opinion VisualStudioRevitAddinWizard is not a "wizard". I expected that wizard opens some dialog window and allows to user to point some predefined settings on the base of which wizard will generate a new project. Am I right? Therefore, my projects haven't "Wizard" word inside of their names.</p>
 <p>On a slightly different topic that lead to the following subsequent discussion, 
 I turned off the <code>Enable native code debugging</code> option in the project templates.</p>
-<h4><a name="4"></a>Use Managed Compatibility Mode or Enable Native Code Debugging?</h4>
+<h4><a name="4"></a>Feature Comparison</h4>
+<p>Andrey provided the following table comparing the feature list of the old and simple VisualStudioRevitAddinWizard <code>W</code> versus the new and feature-packed Revit2017AddInTemplateSet <code>T</code>:</p>
+<ol>
+<li>Templates for C#.</li>
+<li>Templates for VB.NET.</li>
+<li>Use NuGet-packages for Revit assemblies.</li>
+<li>Visual Studio Project Templates for external application.</li>
+<li>Visual Studio Project Templates for external DB-level application.</li>
+<li>Visual Studio Item Templates for external command.</li>
+<li>Visual Studio Item Templates for external command availability.</li>
+<li>Visual Studio Item Templates for Updater.</li>
+<li>Require writing of additional code for the registration of commands.</li>
+<li>Automatically create the ribbon tabs, panels, and buttons for your commands. Also, allows to you to manage by this behaviour.</li>
+<li>Automatically create the binding for your commands and some default topic for the stub help file.</li>
+<li>Allow creation of multilanguage add-ins.</li>
+<li>Create a subfolder for each add-in in the Revit Add-Ins folder (for the DEBUG configuration).</li>
+<li>Uses PVS-Studio static code analyzer.</li>
+</ol>
+<p><center>
+<table>
+ <tr>
+ <td style="text-align: right">#&nbsp;&nbsp;&nbsp;</td>
+ <td>W</td>
+ <td>T</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">1&nbsp;&nbsp;&nbsp;</td>
+ <td>+</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">2&nbsp;&nbsp;&nbsp;</td>
+ <td>+</td>
+ <td>-</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">3&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">4&nbsp;&nbsp;&nbsp;</td>
+ <td>+</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">5&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">6&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">7&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">8&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">9&nbsp;&nbsp;&nbsp;</td>
+ <td>+</td>
+ <td>-</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">10&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">11&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">12&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">13&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">14&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+</table>
+</center></p>
+<h4><a name="5"></a>Use Managed Compatibility Mode or Enable Native Code Debugging?</h4>
 <p>Andrey raised another topic in the thread 
 on <a href="http://forums.autodesk.com/t5/revit-api-forum/use-managed-compatibility-mode-or-enable-native-code-debugging/m-p/6868848">using <code>Managed compatibility mode</code> or <code>Enable native code debugging</code></a>:</p>
 <p><strong>Question:</strong> I write .NET add-ins for Autodesk Revit using Visual Studio 2015. Revit is an unmanaged application. So, for successfully debugging I have to turn ON either the <code>Use managed compatibility mode</code> or <code>Enable native code debugging</code> option (or for both). Otherwise, debugging cannot be launched.</p>
@@ -111,10 +213,10 @@ on <a href="http://forums.autodesk.com/t5/revit-api-forum/use-managed-compatibil
 <p><center>
 <img src="img/GeneralDebugOptions.png" alt="General debug options" width="800"/> <!-- 4465 --> 
 </center></p>
-<h4><a name="5"></a>Machine Learning Software Engineer Job in Switzerland</h4>
+<h4><a name="6"></a>Machine Learning Software Engineer Job in Switzerland</h4>
 <p>Autodesk is seeking a <a href="https://autodesk.taleo.net/careersection/adsk_gen/jobdetail.ftl?job=17WD22765">Machine Learning Software Engineer for a post in Neuch&acirc;tel</a>.</p>
 <p>Check it out in case of interest.</p>
-<h4><a name="6"></a>FreeCodeCamp</h4>
+<h4><a name="7"></a>FreeCodeCamp</h4>
 <p>I took a quick look at <a href="https://www.freecodecamp.com">FreeCodeCamp</a> and am very impressed.</p>
 <p>A non-profit organisation that also does not accept donations of any kind, their goal is to efficiently educate new software engineers, and they have a track record of doing so with great success.</p>
 <p>If you would like to learn more about programming and practice the skills that are of real importance today and for the future, this is probably one of the best choices you can make.</p>

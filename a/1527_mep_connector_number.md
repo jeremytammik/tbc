@@ -15,6 +15,8 @@ http://forums.autodesk.com/t5/revit-mep-forum/connector-numbers-of-mechanical-eq
 
 I answered a question in the Revit MEP forum, prompted by Robert Klempau's direct mention in the thread on connector numbers of mechanical equipment. Since it is rather technical and even includes a snippet of Revit source code, let me reiterate it here for better readability and future reference &ndash; Question: I created a mechanical exhaust fan with four connectors...
 
+The Revit MEP Connector Number 
+
 -->
 
 ### Revit MEP Connector Number

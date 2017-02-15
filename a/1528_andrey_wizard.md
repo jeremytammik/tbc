@@ -43,9 +43,10 @@ The discussion of those led us to once more revisit the topic of the Visual Stud
 
 - [New Visual Studio 2015 templates for Revit add-ins](#2)
     - [Q &amp; A](#3)
-- [Use Managed Compatibility Mode or Enable Native Code Debugging?](#4)
-- [Machine learning software engineer job in Switzerland](#5)
-- [FreeCodeCamp](#6)
+    - [Feature comparison](#4)
+- [Use Managed Compatibility Mode or Enable Native Code Debugging?](#5)
+- [Machine learning software engineer job in Switzerland](#6)
+- [FreeCodeCamp](#7)
 
 
 
@@ -121,7 +122,106 @@ In my opinion VisualStudioRevitAddinWizard is not a "wizard". I expected that wi
 On a slightly different topic that lead to the following subsequent discussion, 
 I turned off the `Enable native code debugging` option in the project templates.
 
-#### <a name="4"></a>Use Managed Compatibility Mode or Enable Native Code Debugging?
+#### <a name="4"></a>Feature Comparison
+
+Andrey provided the following table comparing the feature list of the old and simple VisualStudioRevitAddinWizard `W` versus the new and feature-packed Revit2017AddInTemplateSet `T`:
+
+1. Templates for C#.
+2. Templates for VB.NET.
+3. Use NuGet-packages for Revit assemblies.
+4. Visual Studio Project Templates for external application.
+5. Visual Studio Project Templates for external DB-level application.
+6. Visual Studio Item Templates for external command.
+7. Visual Studio Item Templates for external command availability.
+8. Visual Studio Item Templates for Updater.
+9. Require writing of additional code for the registration of commands.
+10. Automatically create the ribbon tabs, panels, and buttons for your commands. Also, allows to you to manage by this behaviour.
+11. Automatically create the binding for your commands and some default topic for the stub help file.
+12. Allow creation of multilanguage add-ins.
+13. Create a subfolder for each add-in in the Revit Add-Ins folder (for the DEBUG configuration).
+14. Uses PVS-Studio static code analyzer.
+
+<center>
+<table>
+ <tr>
+ <td style="text-align: right">#&nbsp;&nbsp;&nbsp;</td>
+ <td>W</td>
+ <td>T</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">1&nbsp;&nbsp;&nbsp;</td>
+ <td>+</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">2&nbsp;&nbsp;&nbsp;</td>
+ <td>+</td>
+ <td>-</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">3&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">4&nbsp;&nbsp;&nbsp;</td>
+ <td>+</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">5&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">6&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">7&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">8&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">9&nbsp;&nbsp;&nbsp;</td>
+ <td>+</td>
+ <td>-</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">10&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">11&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">12&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">13&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+ <tr>
+ <td style="text-align: right">14&nbsp;&nbsp;&nbsp;</td>
+ <td>-</td>
+ <td>+</td>
+ </tr>
+</table>
+</center>
+
+#### <a name="5"></a>Use Managed Compatibility Mode or Enable Native Code Debugging?
 
 Andrey raised another topic in the thread 
 on [using `Managed compatibility mode` or `Enable native code debugging`](http://forums.autodesk.com/t5/revit-api-forum/use-managed-compatibility-mode-or-enable-native-code-debugging/m-p/6868848):
@@ -162,13 +262,13 @@ Much the same story for "Use Native Compatibility Mode", it enables an older ver
 </center>
 
 
-#### <a name="5"></a>Machine Learning Software Engineer Job in Switzerland
+#### <a name="6"></a>Machine Learning Software Engineer Job in Switzerland
 
 Autodesk is seeking a [Machine Learning Software Engineer for a post in Neuch&acirc;tel](https://autodesk.taleo.net/careersection/adsk_gen/jobdetail.ftl?job=17WD22765).
 
 Check it out in case of interest.
 
-#### <a name="6"></a>FreeCodeCamp
+#### <a name="7"></a>FreeCodeCamp
 
 I took a quick look at [FreeCodeCamp](https://www.freecodecamp.com) and am very impressed.
 
