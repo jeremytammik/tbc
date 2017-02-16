@@ -33,13 +33,14 @@ I have been maintaining a simple Visual Studio Revit add-in wizard for a number 
 <h3>New Visual Studio Templates for Revit Add-Ins</h3>
 <p>I have been maintaining a
 simple <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.20">Visual Studio Revit add-in wizard</a> for
-a number of years.</p>
+a number of years, hosted in
+the <a href="https://github.com/jeremytammik/VisualStudioRevitAddinWizard">VisualStudioRevitAddinWizard GitHub repo</a>.</p>
 <p>Now Andrey Bushman implemented a set of more advanced and convenient Visual Studio templates for creation of  Revit add-ins for his own use.</p>
 <p>The discussion of those led us to once more revisit the topic of the Visual Studio settings for debugging Revit add-ins:</p>
 <ul>
 <li><a href="#2">New Visual Studio 2015 templates for Revit add-ins</a><ul>
-<li><a href="#3">Q &amp; A</a></li>
-<li><a href="#4">Feature comparison</a></li>
+<li><a href="#3">Feature comparison</a></li>
+<li><a href="#4">Q &amp; A</a></li>
 </ul>
 </li>
 <li><a href="#5">Use Managed Compatibility Mode or Enable Native Code Debugging?</a></li>
@@ -47,7 +48,6 @@ a number of years.</p>
 <li><a href="#7">FreeCodeCamp</a></li>
 </ul>
 <h4><a name="2"></a>Visual Studio 2015 Templates for Revit Add-Ins</h4>
-<p>http://forums.autodesk.com/t5/revit-api-forum/visual-studio-2015-templates-for-revit-add-ins/m-p/6866605</p>
 <p>Andrey Bushman shared a new and more advanced set of convenient Visual Studio templates for creation of Revit add-ins in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="http://forums.autodesk.com/t5/revit-api-forum/visual-studio-2015-templates-for-revit-add-ins/m-p/6866605">Visual Studio 2015 Templates for Revit Add-Ins</a>:</p>
@@ -72,28 +72,7 @@ Therefore, I made templates myself.</p>
 </ol>
 <p>Also, I wrote an article <a href="https://revit-addins.blogspot.ru/2017/02/revit-visual-studio.html">Revit Visual Studio</a> about it in my blog (Russian text).</p>
 <p>Perhaps these templates will be useful for other programmers too.</p>
-<h4><a name="3"></a>Q &amp; A</h4>
-<p><b>[Q]</b> Is the new <code>Revit2017AddInTemplateSet</code> compatible with the previous <code>VisualStudioRevitAddinWizard</code>?</p>
-<p><b>[A]</b> Revit2017AddInTemplateSet is not based on the VisualStudioRevitAddinWizard. Revit2017AddInTemplateSet has other architecture and ideas.
-Therefore, Revit2017AddInTemplateSet cannot automatically be merged with VisualStudioRevitAddinWizard.</p>
-<p><b>[Q]</b> What about a version for Visual Basic?</p>
-<p><b>[A]</b> I don't use VB.NET. I created the templates for the programming language which I use. If someone creates variant for VB and sends this patch to me, then I won't mind and I will accept this patch provided that it is made qualitatively.</p>
-<p><b>[Q]</b> If possible, I imagine it would be useful for the entire Revit API developer community if we can manage to maintain a single optimal set of Wizards that satisfies all needs.
-What do you think? Should we aim at maintaining just one version together, or keep the two separate?</p>
-<p><b>[A]</b> Jeremy, if you apply my pull request and replace the hard references of Revit API to their NuGet package then your template will be more convenient for using.</p>
-<!-- I described my wishes about VisualStudioRevitAddinWizard in my article which I pointed to in [my previous post](???). -->
-
-<p>All developers are different. Some of them prefer to write code manually completely. VisualStudioRevitAddinWizard template can be interesting for such people. Other developers prefer to concentrate completely on the solvable task, without being distracted by the minor things, such as UI creation. For such people, the Revit2017AddInTemplateSet templates can be interesting.</p>
-<p>My template is more difficult than yours because it shall decide automatically much more tasks. But my template isn't so difficult that it was difficult to be understood. Having created the new project on the basis of my template it is possible to study the generated code and to understand how it works.</p>
-<p>Therefore, perhaps it makes a sense that at the same time there were two different templates (VisualStudioRevitAddinWizard and Revit2017AddInTemplateSet) that allow to people to select that which more suits them.</p>
-<p>In my opinion your template requires improving. If it is interesting for you then I am ready to discuss it. At this case I recommend to you to read those notes which I listed in the article of my blog.</p>
-<p><b>[Q]</b> In that case, we should also compile a list of differences to explain to people why they might want to choose one above the other.</p>
-<p>No problem. I can do it if it will be necessary.</p>
-<p>P.S.</p>
-<p>In my opinion VisualStudioRevitAddinWizard is not a "wizard". I expected that wizard opens some dialog window and allows to user to point some predefined settings on the base of which wizard will generate a new project. Am I right? Therefore, my projects haven't "Wizard" word inside of their names.</p>
-<p>On a slightly different topic that lead to the following subsequent discussion, 
-I turned off the <code>Enable native code debugging</code> option in the project templates.</p>
-<h4><a name="4"></a>Feature Comparison</h4>
+<h4><a name="3"></a>Feature Comparison</h4>
 <p>Andrey provided the following table comparing the feature list of the old and simple VisualStudioRevitAddinWizard <code>W</code> versus the new and feature-packed Revit2017AddInTemplateSet <code>T</code>:</p>
 <ol>
 <li>Templates for C#.</li>
@@ -115,8 +94,8 @@ I turned off the <code>Enable native code debugging</code> option in the project
 <table>
  <tr>
  <td style="text-align: right">#&nbsp;&nbsp;&nbsp;</td>
- <td>W</td>
- <td>T</td>
+ <td><code>W</code></td>
+ <td><code>T</code></td>
  </tr>
  <tr>
  <td style="text-align: right">1&nbsp;&nbsp;&nbsp;</td>
@@ -190,6 +169,27 @@ I turned off the <code>Enable native code debugging</code> option in the project
  </tr>
 </table>
 </center></p>
+<h4><a name="4"></a>Q &amp; A</h4>
+<p><b>[Q]</b> Is the new <code>Revit2017AddInTemplateSet</code> compatible with the previous <code>VisualStudioRevitAddinWizard</code>?</p>
+<p><b>[A]</b> Revit2017AddInTemplateSet is not based on the VisualStudioRevitAddinWizard. Revit2017AddInTemplateSet has other architecture and ideas.
+Therefore, Revit2017AddInTemplateSet cannot automatically be merged with VisualStudioRevitAddinWizard.</p>
+<p><b>[Q]</b> What about a version for Visual Basic?</p>
+<p><b>[A]</b> I don't use VB.NET. I created the templates for the programming language which I use. If someone creates variant for VB and sends this patch to me, then I won't mind and I will accept this patch provided that it is made qualitatively.</p>
+<p><b>[Q]</b> If possible, I imagine it would be useful for the entire Revit API developer community if we can manage to maintain a single optimal set of Wizards that satisfies all needs.
+What do you think? Should we aim at maintaining just one version together, or keep the two separate?</p>
+<p><b>[A]</b> Jeremy, if you apply my pull request and replace the hard references of Revit API to their NuGet package then your template will be more convenient for using.</p>
+<!-- I described my wishes about VisualStudioRevitAddinWizard in my article which I pointed to in [my previous post](???). -->
+
+<p>All developers are different. Some of them prefer to write code manually completely. VisualStudioRevitAddinWizard template can be interesting for such people. Other developers prefer to concentrate completely on the solvable task, without being distracted by the minor things, such as UI creation. For such people, the Revit2017AddInTemplateSet templates can be interesting.</p>
+<p>My template is more difficult than yours because it shall decide automatically much more tasks. But my template isn't so difficult that it was difficult to be understood. Having created the new project on the basis of my template it is possible to study the generated code and to understand how it works.</p>
+<p>Therefore, perhaps it makes a sense that at the same time there were two different templates (VisualStudioRevitAddinWizard and Revit2017AddInTemplateSet) that allow to people to select that which more suits them.</p>
+<p>In my opinion your template requires improving. If it is interesting for you then I am ready to discuss it. At this case I recommend to you to read those notes which I listed in the article of my blog.</p>
+<p><b>[Q]</b> In that case, we should also compile a list of differences to explain to people why they might want to choose one above the other.</p>
+<p>No problem. I can do it if it will be necessary.</p>
+<p>P.S.</p>
+<p>In my opinion VisualStudioRevitAddinWizard is not a "wizard". I expected that wizard opens some dialog window and allows to user to point some predefined settings on the base of which wizard will generate a new project. Am I right? Therefore, my projects haven't "Wizard" word inside of their names.</p>
+<p>On a slightly different topic that lead to the following subsequent discussion, 
+I turned off the <code>Enable native code debugging</code> option in the project templates.</p>
 <h4><a name="5"></a>Use Managed Compatibility Mode or Enable Native Code Debugging?</h4>
 <p>Andrey raised another topic in the thread 
 on <a href="http://forums.autodesk.com/t5/revit-api-forum/use-managed-compatibility-mode-or-enable-native-code-debugging/m-p/6868848">using <code>Managed compatibility mode</code> or <code>Enable native code debugging</code></a>:</p>
