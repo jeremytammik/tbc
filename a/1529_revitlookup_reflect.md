@@ -11,8 +11,7 @@
 
 RevitLookup Using Reflection Cleanup #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
-Last week, I presented a drastic change to RevitLookup using <code>Reflection</code> to provide more complete coverage of all the Revit database element methods and properties. Now Victor Chekalin took a critical look at this new version and cleaned it up significantly.
-Now all is well and significant order has been restored again
+Last week, I presented a drastic change to RevitLookup using <code>Reflection</code> to provide more complete coverage of all the Revit database element methods and properties. Victor Chekalin took a critical look at this new version and cleaned it up significantly. Now all is well and significant order has been restored again
 &ndash; Shock and gripe
 &ndash; Commit summary
 &ndash; 1. Methods and properties extraction
