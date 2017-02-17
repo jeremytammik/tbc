@@ -15,7 +15,7 @@ RevitLookup Using Reflection Cleanup #RevitAPI @AutodeskRevit #aec #bim #dynamob
 
 -->
 
-### RevitLookup Reflection Cleanup
+### RevitLookup with Reflection Cleanup
 
 Last week, I presented a drastic change 
 to [RevitLookup](https://github.com/jeremytammik/RevitLookup) contributed by 
@@ -23,8 +23,8 @@ Andy [@awmcc90](https://github.com/awmcc90) McCloskey, [RevDev Studios](https://
 using `Reflection` to provide more complete coverage of all the Revit database element methods and properties.
 
 Now [Victor Chekalin](http://www.facebook.com/profile.php?id=100003616852588), aka Виктор Чекалин, took
-a critical look at this new version and cleaned it up significantly to address a number of raw edges
-in [pull request #25 &ndash; old bug fixes and improvements of the new approach ](https://github.com/jeremytammik/RevitLookup/pull/25).
+a critical look at this new version and cleaned it up significantly to address a number of raw edges in 
+his [pull request #25 &ndash; old bug fixes and improvements of the new approach ](https://github.com/jeremytammik/RevitLookup/pull/25).
 
 At first sight, Victor was not at all impressed.
 Happily, on second thoughts, all is well and significant order has been restored again:
@@ -38,6 +38,7 @@ Happily, on second thoughts, all is well and significant order has been restored
     - [5. Fixed `Fine` `DetailLevel` bug](#3.5)
     - [6. Visual style of separator](#3.6)
 - [Download and access to old functionality](#4)
+- [Reaction and read-only assurance](#5)
 
 
 #### <a name="2"></a>Shock and Gripe
@@ -50,32 +51,32 @@ I think this is important to share our discussion on the first impression, since
 after Andrew's commit with serious changes, RevitLookup looks ugly.
 He completely changed the algorithm of data retrieving, using `Reflection`, but lost some functionality.
 In the latest version, for example, I cannot get symbol geometry. It's disabled.
-So the idea is good, bad the implementation needs to be improved :-)
+So, the idea is good, bad the implementation needs to be improved :-)
 And I'll get send you pull request soon with bug fixed.
 
 On second thoughts, luckily, things cleared up a bit:
 
-> Probably yesterday I was a bit emotional. Because my first opinion was &ndash what the hell?
+> Probably yesterday I was a bit emotional. Because my first opinion was &ndash; what the hell?
 Everything is absolutely different, not as usual, difficult to find a property, and I could not get the desired property `SymbolGeometry`.
 I found that the new version is very raw.
 Looking at it in more detail, I like the general idea to use reflection.
 Indeed, it allows to get more information and not worry about the new methods/properties in future versions.
 
-> My biggest consern is in the Methods. We are getting the methods using reflection.
+> My biggest concern is with the methods. We are getting the methods using reflection.
 Andrew gets all the methods without parameters and return type is not void.
 But we cannot ensure the method is just a 'get' method.
 A method might modify something and return a value.
 For example, `bool Remove() { // remove something return true; }`
  
 > Some issues:
-The properties/methods are not sorted. In the previos version they were not sorted either.
+The properties/methods are not sorted. In the previous version, they were not sorted either.
 But as all the properties were added manually, the order looked more intelligent, like `Id` and `Name` at the top.
-With reflection, the properties are sorted in the custom order and difficult to find a particlar property.
+With reflection, the properties are sorted in the custom order and difficult to find a particular property.
 I think would be better to sort them. I'll do that, no prob.
  
 > `SymbolGeometry` is not populated because this is a bug.
 I've found where exactly in the code &ndash; `GeometryInstance` is cast to `Element`, but is not in fact derived from it.
-Will try to fix it myself or submit an issue on Github.
+Will try to fix it myself or submit an issue on GitHub.
 
 
 #### <a name="3"></a>Commit Summary
@@ -111,7 +112,7 @@ After:
 
 #### <a name="3.2"></a>2. Show Enum Values
 
-Changed behavior to show enum values.
+Changed behaviour to show enum values.
 
 Before:
 
@@ -125,7 +126,7 @@ After:
 <img src="img/revitlookup_vc_2b.png" alt="After" width="802"/>
 </center>
 
-#### <a name="3.3"></a>3. Drill Down Into SymbolGeometry
+#### <a name="3.3"></a>3. Drill Down into SymbolGeometry
 
 Fixed the issue related with GeometryInstance.SymbolGeometry. We could not drill down this property.
 
@@ -143,7 +144,7 @@ After:
 
 #### <a name="3.4"></a>4. Remove Duplicate `get_` Property Getter Method
 
-Removed property getter from the methods extraction. Otherwise, for each property, we shaw the property itself as well as a method like `get_SomeProperty`:
+Removed property getter from the methods extraction. Otherwise, for each property, we see the property itself as well as a method like `get_SomeProperty`:
 
 Before:
 
@@ -177,7 +178,7 @@ After:
 
 #### <a name="3.6"></a>6. Visual Style of Separator
 
-Changed visual style of the separator. Changed color and shifted the title a bit.
+Changed visual style of the separator. Changed colour and shifted the title a bit.
 
 Before:
 
@@ -203,3 +204,17 @@ from [release 2017.0.0.13](https://github.com/jeremytammik/RevitLookup/releases/
 
 I am also perfectly happy to restore code that was removed and that you would like preserved. Simply create a pull request for that, explain your need and motivation, and I will gladly merge it back again.
 
+
+#### <a name="5"></a>Reaction and Read-Only Assurance
+
+Andy responds to the update and answers the question on the methods that might modify something:
+
+> The changes look great, and yes, this version is absolutely more raw, but, when all is said and done, I think it will be a lot better. 
+
+> As far as your concern for modifying the model by executing methods that would modify the model data: this cannot happen, given that we are outside of a transaction. Method such as `Rotate`, etc., will return `false` when they cannot execute, which is what you are seeing. 
+
+> This is one thing that I recognised early on as a potential issue but is not a problem &ndash; unless there is something I'm completely missing here. 
+Let me know if you find anything to the contrary; otherwise, I still believe this version is safe. 
+
+
+Ever so many thanks again to Andy for his brave initiative and for Victor for his critical and constructive clean-up!
