@@ -11,7 +11,7 @@
 
 RevitLookup Using Reflection Cleanup #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
-Last week, I presented a drastic change to RevitLookup using <code>Reflection</code> to provide more complete coverage of all the Revit database element methods and properties. Victor Chekalin took a critical look at this new version and cleaned it up significantly. Now all is well and significant order has been restored again
+Last week, I presented a drastic change to RevitLookup using <code>Reflection</code> to provide more complete coverage of all the Revit database element methods and properties. Victor Chekalin took a critical look at this new version and cleaned it up significantly. Now all is well and order has been restored again
 &ndash; Shock and gripe
 &ndash; Commit summary
 &ndash; 1. Methods and properties extraction
@@ -37,7 +37,7 @@ a critical look at this new version and cleaned it up significantly to address a
 his [pull request #25 &ndash; old bug fixes and improvements of the new approach ](https://github.com/jeremytammik/RevitLookup/pull/25).
 
 At first sight, Victor was not at all impressed.
-Happily, on second thoughts, all is well and significant order has been restored again:
+Happily, on second thoughts, all is well and order has been restored again:
 
 - [Shock and gripe](#2)
 - [Commit summary](#3)
@@ -205,8 +205,11 @@ After:
 
 #### <a name="4"></a>Download and Access to Old Functionality
 
+The most up-to-date version is always provided in the master branch of 
+the [RevitLookup GitHub repository](https://github.com/jeremytammik/RevitLookup).
+
 Victor's bug fixes and enhancements are provided
-in [RevitLookup release 2017.0.0.17](https://github.com/jeremytammik/RevitLookup/releases/tag/2017.0.0.14) and
+in [RevitLookup release 2017.0.0.16](https://github.com/jeremytammik/RevitLookup/releases/tag/2017.0.0.16) and
 later versions.
 
 If you would like to access any part of the functionality that was removed when switching to the `Reflection` based approach, please grab it
