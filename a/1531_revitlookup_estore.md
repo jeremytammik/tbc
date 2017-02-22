@@ -11,8 +11,10 @@
 
 RevitLookup Extensible Storage Restored #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
-&ndash;
-...
+I already discussed the first clean-up of the new <code>Reflection</code> based version of RevitLookup; here comes the second one, restoring access to view extensible storage data
+&ndash; Recent changes to RevitLookup
+&ndash; Restore access to extensible storage data
+&ndash; Download and access to old functionality...
 
 -->
 
@@ -71,7 +73,7 @@ The most up-to-date version is always provided in the master branch of
 the [RevitLookup GitHub repository](https://github.com/jeremytammik/RevitLookup).
 
 Alexander's enhancement is provided
-in [RevitLookup release ...](https://github.com/jeremytammik/RevitLookup/releases/tag/...) and
+in [RevitLookup release 2017.0.0.17](https://github.com/jeremytammik/RevitLookup/releases/tag/2017.0.0.17) and
 later versions.
 
 If you would like to access any part of the functionality that was removed when switching to the `Reflection` based approach, please grab it
