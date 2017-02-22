@@ -11,8 +11,9 @@
 
  #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
-&ndash; 
-...
+Last week, I presented Andrey Bushman's new Visual Studio templates for Revit add-ins.
+Furthermore, we discussed many aspects of edit and continue in the past, including the solution to use the Add-in Manager.
+These two topics have now met and united, because Andrey added support for that and a bunch of other new functionality in his commit...
 
 -->
 
