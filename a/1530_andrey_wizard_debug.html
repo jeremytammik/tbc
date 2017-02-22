@@ -1,0 +1,37 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+ #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+
+&ndash; 
+...
+
+-->
+
+<h3>Add-In Templates Supporting Edit and Continue</h3>
+<p>Last week, I presented Andrey
+Bushman's <a href="http://thebuildingcoder.typepad.com/blog/2017/02/new-visual-studio-2015-templates-for-revit-add-ins.html">new Visual Studio templates for Revit add-ins</a>.</p>
+<p>Furthermore, we discussed many aspects
+of <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.49">edit and continue</a> in
+the past, including the solution to use
+the <a href="http://thebuildingcoder.typepad.com/blog/2016/10/ai-edit-and-continue.html#2">Add-in Manager</a>.</p>
+<p>These two topics have now met and united, because Andrey added support for that and a bunch of other new functionality in
+his <a href="https://github.com/Andrey-Bushman/Revit2017AddInTemplateSet/commit/e1a3ceb811717929b5d758cacd41e9f46917758f">commit</a>:</p>
+<ul>
+<li>Revit 2017 class library (C# project template).</li>
+<li>Revit 2017 new class (C# item template).</li>
+<li>The <code>Revit 2017 External Application</code> contains a special additional configuration &ndash; <code>Debug via Revit Add-In Manager</code>. It enables you to edit and debug your external command code without restarting Revit.</li>
+<li>Templates of all projects include a search engine to search for missing .NET assemblies. You can use the <code>AssemblyResolves.xml</code> configuration file for managing where your missing assemblies might be located.</li>
+<li>Video tutorial on <a href="https://www.youtube.com/watch?v=QFFwG6rz0gc">Debugging using the Add-In Manager</a>.</li>
+</ul>
+<p>Please refer to
+the <a href="https://github.com/Andrey-Bushman/Revit2017AddInTemplateSet">Revit2017AddInTemplateSet documentation</a> to
+see the full context and list of other video tutorials.</p>
+<p>Many thanks to Andrey for setting up and maintaining these powerful and full-fledged templates!</p>
