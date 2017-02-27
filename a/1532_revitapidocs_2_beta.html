@@ -1,0 +1,48 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+ #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+
+&ndash; 
+...
+
+-->
+
+<h3>Revit API Docs 2.0 Beta</h3>
+<p>As we noted back
+in <a href="http://thebuildingcoder.typepad.com/blog/2016/08/online-revit-api-docs-and-convex-hull.html#2">August</a>
+and <a href="http://thebuildingcoder.typepad.com/blog/2016/10/token-expiry-and-online-revit-api-docs.html#2">October</a> last
+year, Gui Talarico created an extremely useful online version of the contents of the Revit API help file <em>RevitAPI.chm</em>.</p>
+<p>It sports several significant advantages over the locally hosted Windows help file:</p>
+<ul>
+<li>Online access from anywhere, any platorm, OS, device.</li>
+<li>Share links to specific topics for discussion with peers.</li>
+<li>Covers and compares between multiple versions of the Revit API.</li>
+</ul>
+<p>During the expansion to integrate the new information to cover Revit 2017.1, Gui implemented a number of other significant enhancements as well:</p>
+<ul>
+<li><a href="http://beta.revitapidocs.com/2017.1/">Revit 2017.1 API added</a>.</li>
+<li>New parsers written from the ground up. This creates cleaner and more consistent html markups from the original CHM content.</li>
+<li>Content is compared across yearly versions, and when identical, only one copy is being stored and served (storing only 25k html files vs +80k, previously).</li>
+<li>Smarter nav-bar now also indicates if the doc was updated/removed across years, <a href="http://beta.revitapidocs.com/2016/29a6e040-a36e-2a0c-5339-c69aa7776301.htm">for example the WallFoundation class</a> &ndash; note the coloured bars and tootips under the year numbers.</li>
+<li>Result filtering: search result page now has a text box user can use to further filter results; <a href="http://beta.revitapidocs.com/2016/b0a5f22c-6951-c3af-cd29-1f28f574035d.htm?query=wall">try it out</a>.</li>
+<li><a href="http://beta.revitapidocs.com/2016/b0a5f22c-6951-c3af-cd29-1f28f574035d.htm">Python Examples</a> &ndash; adds Python snippets if one is found (beta).</li>
+<li>Ajax loading: when possible, content is loaded asynchronously, for a more seamless navigation..</li>
+<li>Language switcher: allows user to only see code from the selected language.</li>
+<li>Copy code &ndash; <a href="http://beta.revitapidocs.com/2016/29a6e040-a36e-2a0c-5339-c69aa7776301.htm">code examples</a> now have a <code>Copy</code> button which copies to the clipboard.</li>
+<li>Implemented <a href="http://handlebarsjs.com">Handlebars JS</a> templating engine for more maintainable front-end code.</li>
+<li>All API documentation pages are now fully editable; just click <code>Edit</code> in the upper-right corner, to <a href="https://github.com/gtalarico/revitapidocs/edit/dev/new_html_parser/app/templates/api_docs/2016/29a6e040-a36e-2a0c-5339-c69aa7776301.htm">edit and send a pull request</a>.</li>
+<li>Many other bug fixes and improvements behind the scenes.</li>
+</ul>
+<p>These updates are currently available for testing at <strong><a href="http://beta.revitapidocs.com/">beta.revitapidocs.com</a></strong> and
+will be pushed to the main server once they have been battle tested.</p>
+<p>Please report any <a href="https://github.com/gtalarico/revitapidocs/milestone/7">issues or bugs on the 2.0 milestone</a>.</p>
+<p>Thank you for participating, and many thanks to Gui for creating and maintaining this wonderful tool for the entire community!</p>
+<p>For more information, please refer to Gui's own <a href="http://thebar.cc/revit-api-docs-2-0">full description of Revit API Docs 2.0</a>.</p>
