@@ -11,8 +11,12 @@
 
  #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
 
-&ndash; 
-...
+Gui Talarico created an extremely useful online version of the contents of the Revit API help file RevitAPI.chm.
+It sports significant advantages over the locally hosted Windows help file
+&ndash; Online access from anywhere, any platform, OS, device
+&ndash; Share links to specific topics for discussion with peers
+&ndash; Covers and compares between multiple versions of the Revit API;
+During the expansion cover Revit 2017.1, Gui implemented a number of other significant enhancements...
 
 -->
 
@@ -25,19 +29,19 @@ year, Gui Talarico created an extremely useful online version of the contents of
 
 It sports several significant advantages over the locally hosted Windows help file:
 
-- Online access from anywhere, any platorm, OS, device.
+- Online access from anywhere, any platform, OS, device.
 - Share links to specific topics for discussion with peers.
 - Covers and compares between multiple versions of the Revit API.
 
 During the expansion to integrate the new information to cover Revit 2017.1, Gui implemented a number of other significant enhancements as well:
 
 - [Revit 2017.1 API added](http://beta.revitapidocs.com/2017.1/).
-- New parsers written from the ground up. This creates cleaner and more consistent html markups from the original CHM content.
+- New parsers written from the ground up. This creates cleaner and more consistent html mark-ups from the original CHM content.
 - Content is compared across yearly versions, and when identical, only one copy is being stored and served (storing only 25k html files vs +80k, previously).
-- Smarter nav-bar now also indicates if the doc was updated/removed across years, [for example the WallFoundation class](http://beta.revitapidocs.com/2016/29a6e040-a36e-2a0c-5339-c69aa7776301.htm) &ndash; note the coloured bars and tootips under the year numbers.
+- Smarter nav-bar now also indicates if the doc was updated/removed across years, [for example the WallFoundation class](http://beta.revitapidocs.com/2016/29a6e040-a36e-2a0c-5339-c69aa7776301.htm) &ndash; note the coloured bars and tooltips under the year numbers.
 - Result filtering: search result page now has a text box user can use to further filter results; [try it out](http://beta.revitapidocs.com/2016/b0a5f22c-6951-c3af-cd29-1f28f574035d.htm?query=wall).
 - [Python Examples](http://beta.revitapidocs.com/2016/b0a5f22c-6951-c3af-cd29-1f28f574035d.htm) &ndash; adds Python snippets if one is found (beta).
-- Ajax loading: when possible, content is loaded asynchronously, for a more seamless navigation..
+- Ajax loading: when possible, content is loaded asynchronously, for a more seamless navigation.
 - Language switcher: allows user to only see code from the selected language.
 - Copy code &ndash; [code examples](http://beta.revitapidocs.com/2016/29a6e040-a36e-2a0c-5339-c69aa7776301.htm) now have a `Copy` button which copies to the clipboard.
 - Implemented [Handlebars JS](http://handlebarsjs.com) templating engine for more maintainable front-end code.
@@ -52,4 +56,8 @@ Please report any [issues or bugs on the 2.0 milestone](https://github.com/gtala
 Thank you for participating, and many thanks to Gui for creating and maintaining this wonderful tool for the entire community!
 
 For more information, please refer to Gui's own [full description of Revit API Docs 2.0](http://thebar.cc/revit-api-docs-2-0).
+
+<center>
+<img src="img/revitapidocs_2_beta.png" alt="Revit API Docs 2.0 Beta" width="975"/>
+</center>
 
