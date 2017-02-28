@@ -18,7 +18,7 @@
 Are you interested in easy access to your Revit model properties?
 Well, you can have that even without a need to install Revit.
 The Forge Model Derivative API extracts a streamlined copy of all geometry, BIM element hierarchy and properties from over fifty file formats, and Revit RVT files are just one of them.
-Augusto Goncalves implemented the <code>viewer-javascript-extract.spreadsheet</code> Forge sample to read all the properties on all BIM elements in an RVT file and export them to an XLSX spreadsheet
+Augusto Goncalves implemented a Forge sample to read all the properties on all BIM elements in an RVT file and export them to an XLSX spreadsheet
 &ndash; Test run it yourself
 &ndash; Source code on GitHub...
 
@@ -56,7 +56,7 @@ in the [next couple of months](http://autodeskcloudaccelerator.com/prague-2/):
 - Barcelona, Spain &ndash; June 12-16
 
 <center>
-<img src="img/2017-02_upcoming_accelerators.png" alt="Upcoming Forge accelerators" width="668"/>
+<img src="img/2017-02_upcoming_accelerators.png" alt="Upcoming Forge accelerators" width="400"/>
 </center>
 
 I am planning on attending both of these and would love to see you there too.
@@ -78,5 +78,3 @@ Please note that space is limited to two persons per company.
 <center>
 <img src="img/bird_with_worm.png" alt="Bird with worm" width="183"/>
 </center>
- 
-
