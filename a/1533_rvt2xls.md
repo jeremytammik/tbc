@@ -13,7 +13,7 @@
   [viewer-javascript-extract.spreadsheet](https://github.com/Autodesk-Forge/viewer-javascript-extract.spreadsheet)
   [blog post](https://forge.autodesk.com/blog/create-spreadsheet-excel-client-translated-revit-files)
 
- #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+RVT Properties to XLS and Forge Accelerators #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/rvt2xls
 
 Are you interested in easy access to your Revit model properties?
 Well, you can have that even without a need to install Revit.
