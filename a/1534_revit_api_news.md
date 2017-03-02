@@ -9,6 +9,12 @@
 
 <!---
 
+- Revit API News
+  https://www.youtube.com/watch?v=7haXE4oOgZk&list=PL4CYqBFEfhpJ5oh_vZzqpD_8mIpFLk5yB&index=2
+  https://www.youtube.com/watch?v=7haXE4oOgZk
+  The section discussing the Revit API news begins at [12:45](https://www.youtube.com/watch?v=7haXE4oOgZk&t=765s).
+  To learn more about Revit API basics, please refer to the [discussion and overview of getting started material](http://thebuildingcoder.typepad.com/blog/about-the-author.html#2﻿).
+
 RevitLookup and DevDays Online API News #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/devdays2016online
 
 Unprecedented exciting information to share with you today!
@@ -60,6 +66,7 @@ the [Autodesk DevTV YouTube channel](https://www.youtube.com/channel/UC6Fl_1mFNt
 - [BIM 360 API update](https://youtu.be/_BpV0D4y-U8?list=PL4CYqBFEfhpJ5oh_vZzqpD_8mIpFLk5yB), Feb 23, 2017
 - [Forge API updates in detail](https://youtu.be/f4pzeGqIS0Q?list=PL4CYqBFEfhpJ5oh_vZzqpD_8mIpFLk5yB), Feb 14, 2017
 - [Revit API, Civil 3D and Infraworks updates](https://youtu.be/7haXE4oOgZk?list=PL4CYqBFEfhpJ5oh_vZzqpD_8mIpFLk5yB), Feb 21, 2017
+&ndash; the Revit API news begins at [12:45](https://www.youtube.com/watch?v=7haXE4oOgZk&t=765s)
 - [Inventor and Fusion API updates](https://youtu.be/byZYsUJcyHc?list=PL4CYqBFEfhpJ5oh_vZzqpD_8mIpFLk5yB), Feb 16, 2017
 
 
@@ -71,6 +78,9 @@ Here is the link to that, plus the supporting material:
 
 - [Revit API News DevDays Online webinar recording](https://adn.autodesk.io/uploads/file/revit_2018_api_news/index.html) with TOC
 - [Slide deck](http://thebuildingcoder.typepad.com/devday/2016/Revit_API_2018.pdf)
+
+To learn more about Revit API basics, please refer to
+the [discussion and overview of getting started material](http://thebuildingcoder.typepad.com/blog/about-the-author.html#2﻿).
 
 For the sake of completeness, I am also adding the slide deck contents here:
 
