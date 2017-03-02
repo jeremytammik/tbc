@@ -9,8 +9,7 @@
 
 <!---
 
-
- #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/rvt2xls
+RevitLookup and DevDays Online API News #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/devdays2016online
 
 Unprecedented exciting information to share with you today!
 DevDays Online recordings are available right now, before the product launch!
