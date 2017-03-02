@@ -12,8 +12,16 @@
 
  #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/rvt2xls
 
-&ndash; 
-...
+Unprecedented exciting information to share with you today!
+DevDays Online recordings are available right now, before the product launch!
+Furthermore, we are proud to present another little update of the revamped version of RevitLookup
+&ndash; Forward-looking DevDays Online API news
+&ndash; Revit API news for the next major release
+&ndash; Revit API news slide deck contents
+&ndash; Must do
+&ndash; New functionality
+&ndash; Revit roadmap
+&ndash; RevitLookup enhancements...
 
 -->
 
