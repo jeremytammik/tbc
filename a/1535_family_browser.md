@@ -9,11 +9,16 @@
 
 <!---
 
- #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/devdays2016online
+- rfa browser -- https://github.com/RomanLavrov/RevitFamilyBrowser
+  I am working on family browser for Revit using RevitAPI and WPF. Your blog helps me a lot, so I decide to share my work with you. I think, some ideas will be useful for other coders. If you had time, please have a look my program https://github.com/RomanLavrov/RevitFamilyBrowser. 
+  
+WPF Revit Family Browser and Vacation #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/familybrowser
 
 I am away on vacation.
 In the meantime, Roman Lavrov shared his Revit Family Browser, saying:
 I am working on family browser for Revit using Revit API and WPF. Your blog helps me a lot, so I decide to share my work with you. I think, some ideas will be useful for other coders. If you have time, please take a look my program on GitHub at github.com/RomanLavrov/RevitFamilyBrowser...
+
+
 
 -->
 
