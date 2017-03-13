@@ -8,14 +8,6 @@
 </head></p>
 <!---
 
-- blog on elasticsearch
-
-
- #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/devdays2016online
-
-&ndash; 
-...
-
 RAQAS
 raq
 howtorevitapi
@@ -26,22 +18,39 @@ qarp
 q4r4
 r4q4
 
+- blog on elasticsearch
+
+
+ #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/devdays2016online
+
+I am back from my short vacation and raring to go again.
+I checked in to the Revit API discussion forum today, of course.
+I am much more interested in implementing a question answering system or QAS for the Revit API, though.
+Now I finally had a chat with a real human being who put me on the right track to getting started for real
+&ndash; The Revit API question answering system Q4R4
+&ndash; Three steps towards implementing a QAS
+&ndash; Obsolete pre-Sacha notes...
+
 -->
 
-<h3>R4Q4 &ndash; Plans for the Revit API Question Answering System</h3>
-<p>I repeatedly mentioned my explorations into the very hip subject of machine learning, with a goal to implement a question ansering system or QAS for the Revit API.</p>
+<h3>Q4R4 &ndash; Plans for the Revit API Question Answering System</h3>
+<p>I am back from my short vacation and raring to go again.</p>
+<p>I checked in to
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> today, of course.</p>
+<p>I am much more interested in doing more to implement a question answering system or QAS for the Revit API, though.</p>
+<p>I repeatedly mentioned my explorations into the very hip subject of machine learning with that goal in mind.</p>
 <p>Now I finally had a chat with a real human being AI expert, a fellow Autodesk employee, who put me on the right track to getting started for real:</p>
 <ul>
-<li><a href="#2">The Revit API Question Answering system R4Q4</a></li>
+<li><a href="#2">The Revit API question answering system Q4R4</a></li>
 <li><a href="#3">Three steps towards implementing a QAS</a></li>
-<li><a href="#4">Previous and new research, all obsolete now</a></li>
+<li><a href="#4">Obsolete pre-Sacha notes</a></li>
 </ul>
-<h4><a name="2"></a>The Revit API Question Answering system R4Q4</h4>
+<h4><a name="2"></a>The Revit API Question Answering system Q4R4</h4>
 <p>I last mentioned this topic when asking <a href="http://thebuildingcoder.typepad.com/blog/2017/01/family-category-and-two-energy-model-types.html#8">quo vadis Revit API QAS?</a></p>
 <p>At the time, I was searching for an expert to talk with and get some real hands-on advice from before getting started for real.</p>
 <p>This person materialised in the form of Autodesk colleague Sacha Leprêtre, AI expert in Montreal.</p>
 <p>Before explaining what I learned from our conversation, I'll mention the name that I came up with for this:</p>
-<p><code>R4Q4</code>, a more unique acronym than RAQA, short for Revit API Question Answering system.</p>
+<p><code>Q4R4</code>, a more unique acronym than QARA, short for <em>Question Answering system for Revit API</em>.</p>
 <h4><a name="3"></a>Three steps towards implementing a QAS</h4>
 <p>Sacha consulted with a colleague before our chat and came up with the following advice, in three steps:</p>
 <ol>
@@ -49,7 +58,7 @@ r4q4
 <li>Machine learning.</li>
 <li>Deep learning.</li>
 </ol>
-<p>It is pretty useless diving into deep learning before first implementing and measuring the results of other specialised search approaches, optionally enhanced and optimised using machine learning techniques.</p>
+<p>It is useless diving into deep learning before first implementing and measuring the results of other specialised search approaches, optionally enhanced and optimised using machine learning techniques.</p>
 <p>The latter can only be applied after the former is up and running, and deep learning makes no sense until the first two steps have been completed.</p>
 <p>In summary:</p>
 <ol>
@@ -57,23 +66,25 @@ r4q4
 <p>The first thing to do is to customise a search engine.
 <a href="https://www.elastic.co">Elasticsearch</a> also includes <a href="https://en.wikipedia.org/wiki/Natural_language_processing">NLP</a>.
 It is available in several languages, Java based, using <a href="https://lucene.apache.org">Lucene</a>, a state of the art search engine.
-It is driven using a REST API, supports semantic analysis. Use this to create an own extractor for the Revirt API domain information extraction.</p>
+It is driven using a REST API, supports semantic analysis. Use this to create an own extractor for the Revit API domain information extraction.</p>
 </li>
 <li>
 <p>Second step: optimise the searches using machine learning.
 This is not the same as deep learning.
-Many algorithms exist, e.g., random forest, xg boost, etc..
+Many algorithms exist, e.g., random forest, xg boost, etc.
 You need samples to test and enhance your approach.</p>
 </li>
 <li>
-<p>Third step: you may want to apply deep learning techniquesto further enhance the solution.
-Depp learning techniques need to consume a lot of data to bring results.</p>
+<p>Third step: you may want to apply deep learning techniques to further enhance the solution.
+Deep learning techniques need to consume a lot of data to bring results.</p>
 </li>
 </ol>
-<p>Here is the French original of the advicce provided by Sasha's unnamed friend:</p>
+<p>Here is the French original of the advice provided by Sasha's unnamed friend:</p>
 <ol>
 <li>
-<p>Dans un premier temps, une approche par moteur de recherche spécialisé est probablement la plus efficace, al moins risquée et la plus rapide à mettre en oeuvre. Cela peut constituer un plan de contingence (contingency plan) ou une référence (baseline) à l'utilisation d'un système plus sophistiqué faisant appel à l'apprentissage statistique conventionnel voire à de l'apprentissage profond. Je verrais très bien un projet réalisé par étapes.</p>
+<p>Dans un premier temps, une approche par moteur de recherche spécialisé est probablement la plus efficace, la moins risquée et la plus rapide à mettre en œuvre.
+Cela peut constituer un plan de contingence (contingency plan) ou une référence (baseline) à l'utilisation d'un système plus sophistiqué faisant appel à l'apprentissage statistique conventionnel voire à de l'apprentissage profond.
+Je verrais très bien un projet réalisé par étapes.</p>
 </li>
 <li>
 <p>Algorithmes d'apprentissage statistique conventionnels:
@@ -88,7 +99,7 @@ Concrètement on parle de forêt d'arbres aléatoires (Random Forest), de Gradie
 <p>Apprentissage profond: 
 Le principal obstacle pour l'utilisation de l'apprentissage profond est de disposer de suffisamment de données.
 Typiquement, la règle du pouce est qu'un algorithme d'apprentissage profond supervisé atteindra des performances acceptables avec environ 5000 exemples étiquetés (labeled samples) par question et dépassera la performance humaine lorsqu'il sera entraîné avec un ensemble de données contenant au moins 10 millions d'exemples / observations.
-Dans le cas d'un nombre insuffisants de données, il existe en gros quatre solutions potentielles. L'étiquetage « par la foule » (crowdsourcing), l'apprentissage semi-supervisé (étiquetage automatique ou semi-automatique) à partir de jeux de données importants mais non étiquetés,  l'amplification de données (data augmentation) où l'on génère automatiquement des variantes des données disponibles et le transfert d'apprentissage (learning transfer) qui consiste à ajouter à un réseau de neurones profonds pré-entraînés sur un énorme corpus générique une couche applicative spécifique.</p>
+Dans le cas d'un nombre insuffisants de données, il existe en gros quatre solutions potentielles. L'étiquetage « par la foule » (crowdsourcing), l'apprentissage semi-supervisé (étiquetage automatique ou semi-automatique) à partir de jeux de données importants mais non étiquetés, l'amplification de données (data augmentation) où l'on génère automatiquement des variantes des données disponibles et le transfert d'apprentissage (learning transfer) qui consiste à ajouter à un réseau de neurones profonds pré-entraînés sur un énorme corpus générique une couche applicative spécifique.</p>
 </li>
 </ol>
 <p>Here is my translation of that:</p>
@@ -98,9 +109,9 @@ Dans le cas d'un nombre insuffisants de données, il existe en gros quatre solut
 </li>
 <li>
 <p>Conventional statistical learning algorithms:
-What works best in statistical learning remains supervised learning from labeled examples / observations.
+What works best in statistical learning remains supervised learning from labelled examples / observations.
 This is even truer for deep learning, where unsupervised learning is more about research than application.
-With conventional learning algorithms, the best ones are the set methods (explained below), which may provide good results with just a few hundred labeled samples.
+With conventional learning algorithms, the best ones are the set methods (explained below), which may provide good results with just a few hundred labelled samples.
 Set algorithms are meta-algorithms where we combine the results of a set of simple classifiers.
 The best known are bagging (resampling and voting or average) and boosting (weighting of classifiers).
 Concretely, we speak about random forests of trees (Random Forest), Gradient Tree Boosting and especially XGBoost (Extreme Gradient Boosting).</p>
@@ -108,9 +119,9 @@ Concretely, we speak about random forests of trees (Random Forest), Gradient Tre
 <li>
 <p>Deep learning:
 The main obstacle to the use of deep learning is to have sufficient data.
-Typically, the rule of thumb is that a supervised deep learning algorithm will achieve acceptable performance with about 5000 labeled samples per question and will exceed human performance when trained with a data set containing at least 10 million examples / observations.
+Typically, the rule of thumb is that a supervised deep learning algorithm will achieve acceptable performance with about 5000 labelled samples per question and will exceed human performance when trained with a data set containing at least 10 million examples / observations.
 In the case of insufficient data, there are roughly four potential solutions.
-Crowdsourcing, semi-supervised learning (automatic or semi-automatic labeling) from large but unlabeled datasets, data augmentation by automatically generating variants of the available data and learning transfer, which consists in adding a specific application layer to a network of deep neurons pre-trained on a huge generic corpus.</p>
+Crowdsourcing, semi-supervised learning (automatic or semi-automatic labelling) from large but unlabelled datasets, data augmentation by automatically generating variants of the available data and learning transfer, which consists in adding a specific application layer to a network of deep neurons pre-trained on a huge generic corpus.</p>
 </li>
 </ol>
 <p>In all cases, the most important point remains creating a good knowledge base:
@@ -119,11 +130,11 @@ it can consist of just documents, knowing how to connect them, unstructured docu
 <p>The UI is another challenge, e.g., when to display a result, display portion of text already, not only links.</p>
 <p>Creating an ontology is tough, and that is not what works well.</p>
 <p>Better: dictionaries, simple bag of words related to a topic.</p>
-<p>First step: create a search engine and ask the system after indexing all words in the content, ask for frequiencies of terms, analyse what you have, understand the content.
+<p>First step: create a search engine and ask the system after indexing all words in the content, ask for frequencies of terms, analyse what you have, understand the content.
 Build on NLP techniques, develop your own extractor.
 It creates topics based on bag of words.
 Use machine learning to cluster words.
-But first of all, just implement manual search.</p>
+But first just implement manual search.</p>
 <p>Many thanks to Sacha and his friend for their invaluable advice!</p>
 <p>After the chat with him, I looked more at topics involving NLP and searching, e.g.,
 <a href="http://stackoverflow.com/questions/8772692/semantic-search-with-nlp-and-elasticsearch">semantic search with NLP and Elasticsearch</a>,
@@ -134,8 +145,14 @@ explaining <a href="https://youtu.be/DAHZPL6voc4">what question answering is</a>
 <p><center>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/DAHZPL6voc4?rel=0" frameborder="0" allowfullscreen></iframe>
 </center></p>
-<h4><a name="4"></a></h4>
-<p>Before our chat and deciding to get started with Elasticsearch and the implementation of step 1 above, I was still browsing through reams of other interesting stuff that all seems pretty useless now.</p>
+<p>An interesting way to go might also be to integrate Q4R4 
+with <a href="https://en.wikipedia.org/wiki/DuckDuckGo">DuckDuckGo</a>
+(cf. <a href="https://docs.duckduckhack.com">DuckDuckHack</a>) or some other Internet search engine.</p>
+<p><center>
+<img src="img/duckduckgo.png" alt="DuckDuckGo" width="100"/>
+</center></p>
+<h4><a name="4"></a>Obsolete Pre-Sacha Notes</h4>
+<p>Before our chat and deciding to get started with Elasticsearch and the implementation of step 1 above, I was still browsing through reams of other interesting stuff that all seems useless now.</p>
 <p>Still, here are my notes to self on all that:</p>
 <ul>
 <li><a href="https://aws.amazon.com/amazon-ai">Amazon AI</a> &ndash; Autodesk signed a contract with Amazon, so we might be able to tap into their resources.<ul>
@@ -153,7 +170,7 @@ explaining <a href="https://youtu.be/DAHZPL6voc4">what question answering is</a>
 <li><a href="https://codelabs.developers.google.com/">Google Developers Codelabs</a></li>
 <li><a href="http://playground.tensorflow.org">TensorFlow Playground</a></li>
 <li><a href="https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/index.html#0">Tensorflow for poets</a> tutorial</li>
-<li>[Tensorflow and deep learning withut a PhD](https://codelabs.developers.google.com/codelabs/cloud-tensorflow-mnist/index.html?index=..%2F..%2Findex#0</li>
+<li><a href="https://codelabs.developers.google.com/codelabs/cloud-tensorflow-mnist/index.html?index=..%2F..%2Findex#0">Tensorflow and deep learning withut a PhD</a></li>
 <li><a href="https://www.youtube.com/watch?v=2FmcHiLCwTU">TensorFlow in 5 Minutes</a></li>
 <li><a href="http://www.memdump.io/tag/tensorflow/">MemDump machine learning blog on TensorFlow</a></li>
 <li><a href="https://www.wired.com/2017/02/libratus/">Inside Libratus, the Poker AI That Out-Bluffed the Best Humans</a></li>
@@ -165,13 +182,5 @@ explaining <a href="https://youtu.be/DAHZPL6voc4">what question answering is</a>
 <li><a href="https://github.com/terryum/awesome-deep-learning-papers">Awesome &ndash; Most Cited Deep Learning Papers</a></li>
 <li><a href="http://ndesign.co/2017/03/08/adding-tensorflow-module-to-fusion-360/">Adding Tensorflow module to Fusion 360</a>, a super minimal test addition of the basic TensorFlow Python module to Fusion 360</li>
 </ul>
-<p>sources:</p>
-<p>q&amp;a from blog comments
-q&amp;a from discussion forum
-q&amp;a from cases</p>
-<ul>
-<li>integrate Revit API QAS with DuckDuckGo and other Internet search engines?</li>
-</ul>
-<p><center>
-<img src="img/.png" alt="" width="505"/>
-</center></p>
+<p>Enough of that for now.</p>
+<p>I can't wait to get started exploring Elasticsearch in more depth.</p>
