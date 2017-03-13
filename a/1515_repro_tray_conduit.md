@@ -266,10 +266,13 @@ I can use various sources for that:
 
 - The Revit API help file `RevitAPI.chm` contents, now accessible [online at `revitapidocs.com`](http://www.revitapidocs.com).
 - The Revit [Developer Guide](http://help.autodesk.com/view/RVT/2017/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42).
-- The [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160).
-- StackOverflow questions tagged with [`revit-api`](http://stackoverflow.com/questions/tagged/revit-api) and [`revitpythonshell`](http://stackoverflow.com/questions/tagged/revitpythonshell).
 - [The Building Coder](http://thebuildingcoder.typepad.com) and other blog content.
-- Emails I sent.
+- Existing Q &amp; A:
+    - The [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160).
+    - StackOverflow questions tagged with [`revit-api`](http://stackoverflow.com/questions/tagged/revit-api) and [`revitpythonshell`](http://stackoverflow.com/questions/tagged/revitpythonshell).
+    - [The Building Coder](http://thebuildingcoder.typepad.com) comments and posts explicitly listing Q &amp; A.
+    - Revit API related ADN cases. Luckily, I even have all my cases stored locally in text files...
+    - Email.
 - Many other sources.
 
 That is normally the biggest job in setting up such a system.
