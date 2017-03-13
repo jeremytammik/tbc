@@ -77,7 +77,8 @@ As said, I extracted and slightly edited the Revit API news portion of the DevDa
 Here is the link to that, plus the supporting material:
 
 - [Revit API News DevDays Online webinar recording](https://adn.autodesk.io/uploads/file/revit_2018_api_news/index.html) with TOC
-- [Slide deck](http://thebuildingcoder.typepad.com/devday/2016/Revit_API_2018.pdf)
+- Slide deck: [PDF](http://thebuildingcoder.typepad.com/devday/2016/Revit_API_2018.pdf)
+and on [SlideShare](https://www.slideshare.net/JeremyTammik1/revit-2018-api-news-73083190)
 
 To learn more about Revit API basics, please refer to
 the [discussion and overview of getting started material](http://thebuildingcoder.typepad.com/blog/about-the-author.html#2﻿).
