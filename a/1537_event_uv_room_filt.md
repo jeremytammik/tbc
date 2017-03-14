@@ -17,8 +17,12 @@
 
  #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/devdays2016online
 
-&ndash; 
-...
+A lot of interesting discussion and solutions were shared in the Revit API discussion forum and private email messages during my absence last week, and several exciting events are looming
+&ndash; Forge Accelerator in Gothenburg
+&ndash; AEC Hackathon in Munich
+&ndash; Autodesk University in London
+&ndash; Retrieve and map texture UV coordinates exporting geometry and material
+&ndash; Collect all rooms on a given level...
 
 -->
 
