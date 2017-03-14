@@ -17,7 +17,7 @@
 
  #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/devdays2016online
 
-A lot of interesting discussion and solutions were shared in the Revit API discussion forum and private email messages during my absence last week, and several exciting events are looming
+A lot of interesting solutions were shared in the Revit API discussion forum and private email messages during my absence last week, and several exciting events are looming
 &ndash; Forge Accelerator in Gothenburg
 &ndash; AEC Hackathon in Munich
 &ndash; Autodesk University in London
@@ -28,7 +28,7 @@ A lot of interesting discussion and solutions were shared in the Revit API discu
 
 ### Events, UV Coordinates and Rooms on Level
 
-A lot of interesting discussion and solutions were shared in 
+A lot of interesting solutions were shared in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
 private email messages during my absence last week, and several exciting events are looming:
 
