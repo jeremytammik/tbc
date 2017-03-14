@@ -1,0 +1,139 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+- http://aechackathon-germany.de/
+
+- https://forums.autodesk.com/t5/revit-api-forum/collect-all-room-in-leve-xx/m-p/6939202
+  tbc sample update
+  filtering for a non-native class
+
+ #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/devdays2016online
+
+&ndash; 
+...
+
+-->
+
+<h3>Events, UV Coordinates and Rooms on Level</h3>
+<p>A lot of interesting discussion and solutions were shared in 
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> and
+private email messages during my absence last week, and several exciting events are looming:</p>
+<ul>
+<li><a href="#2">Forge Accelerator in Gothenburg</a></li>
+<li><a href="#3">AEC Hackathon in Munich</a></li>
+<li><a href="#4">Autodesk University in London</a></li>
+<li><a href="#5">Retrieve and map texture UV coordinates exporting geometry and material</a></li>
+<li><a href="#6">Collect all rooms on a given level</a></li>
+</ul>
+<h4><a name="2"></a>Forge Accelerator in Gothenburg</h4>
+<p>We have two <a href="http://autodeskcloudaccelerator.com/">Forge accelerators</a> coming up in Europe
+in the <a href="http://autodeskcloudaccelerator.com/prague-2/">next couple of months</a>:</p>
+<ul>
+<li>Gothenburg, Sweden &ndash; March 27-30</li>
+<li>Barcelona, Spain &ndash; June 12-16</li>
+</ul>
+<p>I am planning to attend both and would love to see you there too.</p>
+<p>In fact, the complete EMEA DevTech Team will be present to support you over the course of the week.</p>
+<p>They take place in the Autodesk offices with lots of space and cool recreation areas.</p>
+<p>Attendance is free of charge &ndash; all you pay for is your travel, accommodation and living expenses.  </p>
+<p>You can still apply to participate in either of these two events by sending your Forge App development project ideas to <a href="mailto:adn-training-worldwide@autodesk.com">adn-training-worldwide@autodesk.com</a>.</p>
+<p>More information is available at <a href="http://autodeskcloudaccelerator.com">autodeskcloudaccelerator.com</a>.</p>
+<p>Check out the videos on the landing page to hear what great results the attendees at previous accelerators achieved after just one week of intensive teamwork and training.</p>
+<h4><a name="3"></a>AEC Hackathon in Munich</h4>
+<p>Directly after the Gothenburg accelerator, March 31 - April 2,
+the <a href="http://aechackathon-germany.de">AEC Hackathon Germany</a> is
+taking off at the Technical University Munich.</p>
+<p>It gives everyone designing, building, and maintaining our built environment the opportunity to collaborate with cutting edge technologies and its developers and designers.</p>
+<p>It’s a weekend of geeking at its finest for improving the industries that affect all that live or work in a house or building.</p>
+<p>Jaime is going, and unfortunately, I am not...</p>
+<h4><a name="4"></a>Autodesk University in London</h4>
+<p>As I mentioned,
+<a href="http://thebuildingcoder.typepad.com/blog/2017/01/au-in-london-and-deep-learning.html#2">Autodesk University is coming to London</a>,
+to Tobacco Dock, E1 on June 21-22, 2017;
+the first English speaking Autodesk University in Northern Europe!</p>
+<p>Registration for Autodesk University London 2017 is now open.
+Number are limited and an early bird discount is available until April 14.</p>
+<p>To get a taste of what we’ve got in store for you this year, check out the venue, view the agenda and timings and find out all you need to know, visit the <a href="https://gems.autodesk.com/events/au-london-2017/event-summary-9dba4a429f994dbab348c68dfad1ca6a.aspx">AU London website</a>.</p>
+<p><center>
+<img src="img/2017_au_london_2.png" alt="AU London 2017" width="500"/>
+</center></p>
+<h4><a name="5"></a>Retrieve and Map Texture UV Coordinates Exporting Geometry and Material</h4>
+<p><strong>Question:</strong> I have a question looking at the rather outdated discussion
+on <a href="http://thebuildingcoder.typepad.com/blog/2010/02/texture-data-uv-coordinates-and-fbx.html">texture data UV coordinates and FBX</a>:</p>
+<p>I find that the API <code>Mesh.UVs</code> is not available in Revit 2014 or later.</p>
+<p>How can I retrieve the mesh UVs now?</p>
+<p>How can I map texture UV accurately when exporting Revit geometry and materials?</p>
+<p>I already tried <code>Edge.TessellateOnFace(Face)</code> and <code>Face.GetBoundBoxingUV</code>; neither of them works as desired (not accurate).</p>
+<pre class="code">
+  <span style="color:#2b91af;">Mesh</span>&nbsp;geomMesh&nbsp;=&nbsp;geomFace.Triangulate();
+  XYZArray&nbsp;vertices&nbsp;=&nbsp;geomMesh.Vertices;
+  UVArray&nbsp;uvs&nbsp;=&nbsp;geomMesh.UVs;&nbsp;<span style="color:green;">//&nbsp;This&nbsp;API&nbsp;is&nbsp;not&nbsp;available</span>
+</pre>
+
+<p><strong>Answer:</strong> You should use the <code>CustomExporter</code> &ndash; the <code>OnMaterial</code> and <code>OnPolymesh</code> methods are designed for these sorts of export operations.</p>
+<p><code>XYZArray</code> is way obsolete, and most custom Revit API collections have been replaced by generic ones in the past few years, e.g., <code>List&lt;XYZ&gt;</code>, in this case.</p>
+<h4><a name="6"></a>Collect all Rooms on a Given Level</h4>
+<p>From
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/collect-all-room-in-leve-xx/m-p/6939202">collecting all rooms in level xx</a>:</p>
+<p><strong>Question:</strong> How can I collect all rooms on a given level?</p>
+<p><strong>Answer 1:</strong> You can't collect <code>Rooms</code> directly, you need to collect <code>SpatialElement</code> instead, its parent class, and then post-process the results:</p>
+<pre class="code">
+  <span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Room</span>&gt;&nbsp;GetRoomFromLevel(&nbsp;
+  &nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;document,&nbsp;
+  &nbsp;&nbsp;<span style="color:#2b91af;">Level</span>&nbsp;level&nbsp;)
+  {
+  &nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;Rooms&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;document&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">SpatialElement</span>&nbsp;)&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Where(&nbsp;room&nbsp;=&gt;&nbsp;room.GetType()&nbsp;==&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">Room</span>&nbsp;)&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.ToList();
+
+  &nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Room</span>&gt;(&nbsp;Rooms.Where(&nbsp;room&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;document.GetElement(&nbsp;room.LevelId&nbsp;)&nbsp;==&nbsp;level&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;.Select(&nbsp;r&nbsp;=&gt;&nbsp;r&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Room</span>&nbsp;)&nbsp;);
+  }
+</pre>
+
+<p>The <code>Where</code> and <code>List&lt;&gt;</code> stuff comes from the <code>System.Collections.Generic</code> namespace.</p>
+<p><strong>Answer 2:</strong> Here is a new method <code>GetRoomsOnLevel</code> that I added
+to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.132.8">release 2017.0.132.8</a> sporting
+some small improvements:</p>
+<pre class="code">
+  <span style="color:blue;">#region</span>&nbsp;Retrieve&nbsp;all&nbsp;rooms&nbsp;on&nbsp;a&nbsp;given&nbsp;level
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;Retrieve&nbsp;all&nbsp;rooms&nbsp;on&nbsp;a&nbsp;given&nbsp;level.</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+  <span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">Room</span>&gt;&nbsp;GetRoomsOnLevel(&nbsp;
+  &nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc,
+  &nbsp;&nbsp;<span style="color:#2b91af;">ElementId</span>&nbsp;idLevel&nbsp;)
+  {
+  &nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
+  &nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">SpatialElement</span>&nbsp;)&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;.Where(&nbsp;e&nbsp;=&gt;&nbsp;e.GetType()&nbsp;==&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">Room</span>&nbsp;)&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;.Where(&nbsp;e&nbsp;=&gt;&nbsp;e.LevelId.IntegerValue.Equals(&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;idLevel.IntegerValue&nbsp;)&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">Room</span>&gt;();
+  }
+  <span style="color:blue;">#endregion</span>&nbsp;<span style="color:green;">//&nbsp;Retrieve&nbsp;all&nbsp;rooms&nbsp;on&nbsp;a&nbsp;given&nbsp;level</span>
+</pre>
+
+<p>This is more efficient than the first version due to:</p>
+<ul>
+<li>Elimination of <code>ToList</code></li>
+<li>Elimination of <code>New List&lt;&gt;</code></li>
+<li>Elimination of <code>doc.GetElement</code></li>
+</ul>
+<p>The reason you cannot filter directly for <code>Room</code> elements is explained in the discussion 
+on <a href="http://thebuildingcoder.typepad.com/blog/2010/08/filtering-for-a-nonnative-class.html">filtering for a non-native class</a> and in
+the <a href="http://www.revitapidocs.com/2017/4b7fb6d7-cb9c-d556-56fc-003a0b8a51b7.htm">remarks on the <code>ElementClassFilter</code> class</a>.</p>
