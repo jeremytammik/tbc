@@ -69,7 +69,7 @@ Attendance is free of charge &ndash; all you pay for is your travel, accommodati
 
 You can still apply to participate in either of these two events by sending your Forge App development project ideas to [adn-training-worldwide@autodesk.com](mailto:adn-training-worldwide@autodesk.com).
 
-More information is available at [autodeskcloudaccelerator.com](http://autodeskcloudaccelerator.com)
+More information is available at [autodeskcloudaccelerator.com](http://autodeskcloudaccelerator.com).
 
 Check out the videos on the landing page to hear what great results the attendees at previous accelerators achieved after just one week of intensive teamwork and training.
 
