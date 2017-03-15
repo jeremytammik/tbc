@@ -15,7 +15,9 @@
   tbc sample update
   filtering for a non-native class
 
- #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/devdays2016online
+Registration opened for Autodesk University in London #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/events_uv_rooms_level
+Preparing the Forge Accelerator in Gotherburg #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/events_uv_rooms_level
+Collect all rooms on a given level #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/events_uv_rooms_level
 
 A lot of interesting solutions were shared in the Revit API discussion forum and private email messages during my absence last week, and several exciting events are looming
 &ndash; Forge Accelerator in Gothenburg
