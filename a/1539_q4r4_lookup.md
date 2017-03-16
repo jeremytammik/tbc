@@ -14,7 +14,7 @@ RevitLookup and DevDays Online API News #RevitAPI @AutodeskRevit #aec #bim #dyna
 
 -->
 
-### Q4R4 and RevitLookup 
+### Q4R4 tbc Import and RevitLookup 
 
 I started working on the question answering
 system [Q4R4 *Question Answering for Revit API*](http://thebuildingcoder.typepad.com/blog/2017/03/q4r4-revit-api-question-answering-system.html).
