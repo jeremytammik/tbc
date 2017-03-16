@@ -7,10 +7,18 @@
 
 <!---
 
-RevitLookup and DevDays Online API News #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/devdays2016online
+ #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http
 
-&ndash; 
-...
+I started working on the question answering system Q4R4 Question Answering for Revit API.
+The first step is to import The Building Coder blog posts into Elasticsearch and experiment with full-text queries on them.
+Furthermore, we are proud to present yet more enhancements to the revamped version of RevitLookup
+&ndash; Q4R4 sources and result presentation
+&ndash; Importing <code>tbc</code> blog posts into Elasticsearch
+&ndash; Listing and clearing the Elasticsearch <code>tbc</code> index
+&ndash; Strip and clean up HTML for JSON document
+&ndash; Q4R4 GitHub repo and <code>tbcimport.py</code> script
+&ndash; RevitLookup bug fixes
+&ndash; RevitLookup icons...
 
 -->
 
@@ -61,7 +69,7 @@ about [Elasticsearch](https://www.elastic.co/products/elasticsearch) and
 figuring out how to set up an experimental system to try this out.
 
 <center>
-<img src="img/icon-elasticsearch-bb.svg" alt="Elasticsearch" width="100"/>
+<img src="img/icon-elasticsearch-bb.png" alt="Elasticsearch" width="84"/>
 </center>
 
 I started with the The Building Coder blog posts, since I have them all in handy text format, either HTML or Markdown, publicly accessible in
