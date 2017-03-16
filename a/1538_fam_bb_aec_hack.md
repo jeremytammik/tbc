@@ -15,9 +15,10 @@
  #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/devdays2016online
 
 I briefly mentioned the AEC Hackathon in Munich yesterday.
-Here is some more information on that, highlighting the exciting speaker line-up and target topics, plus a solution for determining the bounding box of an entire family:
+Here is some more information on that, highlighting the exciting speaker line-up and target topics, plus a solution for determining the bounding box of an entire family
 &ndash; AEC Hackathon Munich Topics and Speakers
-&ndash; Family bounding box...
+&ndash; Family bounding box
+&ndash; Continuous integration for RevitLookup? ...
 
 -->
 
@@ -26,10 +27,11 @@ Here is some more information on that, highlighting the exciting speaker line-up
 I briefly mentioned
 the [AEC Hackathon in Munich](http://thebuildingcoder.typepad.com/blog/2017/03/events-uv-coordinates-and-rooms-on-level.html#3) yesterday.
 
-Here is some more information on that, highlighting the exciting speaker line-up and target topics, plus a solution for determining the bounding box of an entire family:
+Here is some more information on that, highlighting the exciting speaker line-up and target topics, plus a solution for determining the bounding box of an entire family and a suggestion to implement a continuous integration service for RevitLookup:
 
 - [AEC Hackathon Munich Topics and Speakers](#2)
 - [Family bounding box](#3)
+- [Continuous integration for RevitLookup?](#4)
 
 
 #### <a name="2"></a>AEC Hackathon Munich Topics and Speakers
@@ -272,4 +274,34 @@ the [FamilyBoundingBox Command.cs module](https://github.com/jeremytammik/Family
 &nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;mergedResult;
 }
 </pre>
+
+
+#### <a name="4"></a>Continuous integration for RevitLookup?
+
+Peter Hirn of [Build Informed GmbH](https://www.buildinformed.com) very kindly offered to implement
+a [continuous integration](https://en.wikipedia.org/wiki/Continuous_integration) service
+for [RevitLookup](https://github.com/jeremytammik/RevitLookup), similar to the daily builds provided
+for [Dynamo](http://www.dynamobim.org/)
+at [dynamobuilds.com](http://dynamobuilds.com/).
+
+He raised
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [CI for RevitLookup](https://forums.autodesk.com/t5/revit-api-forum/ci-for-revit-lookup/m-p/6947111) to
+discuss the issue.
+
+> We're considering to set up a public CI for [RevitLookup](https://github.com/jeremytammik/RevitLookup).
+
+> The output could be something like the [Dynamo builds](http://dynamobuilds.com).
+ 
+> I'm thinking [Travis](https://travis-ci.org/) or [Jenkins](https://jenkins.io/) for the builds.
+
+> We would provide the infrastructure and maintenance for this service.
+ 
+> I'd love to get your feedback on this idea.
+
+If you have any thought or suggestion on this, please participate in
+the [CI for RevitLookup discussion](https://forums.autodesk.com/t5/revit-api-forum/ci-for-revit-lookup/m-p/6947111) and
+let us know.
+
+Thank you!
 
