@@ -7,7 +7,8 @@
 
 <!---
 
- #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http
+Import blog posts into @ElasticsearchQA #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/tbcimport_lookupicon
+RevitLookup updated and with new icon #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/tbcimport_lookupicon
 
 I started working on the question answering system Q4R4 Question Answering for Revit API.
 The first step is to import The Building Coder blog posts into Elasticsearch and experiment with full-text queries on them.
