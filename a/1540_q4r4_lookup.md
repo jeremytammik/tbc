@@ -13,8 +13,11 @@
  @ElasticsearchQA #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge 
 RevitLookup updated #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge 
 
-&ndash; 
-...
+I ran the first query on the collection of tbc blog posts imported into Elasticsearch to experiment for the question answering system Q4R4 Question Answering for Revit API and installed the elasticsearch-head web front end to better explore and understand my local Elasticsearch cluster
+&ndash; Elasticsearch text field mapping
+&ndash; Elasticsearch-head web front end
+&ndash; More RevitLookup updates
+&ndash; Get area scheme from an area...
 
 -->
 
@@ -261,8 +264,8 @@ Here's the code for a little test to get the areas that are on the 'Gross Buildi
 
 There is no need for the `Cast<>`, and more importantly, `ToList` adds no value for this use case and consumes both time and memory, cf.:
 
-- [A](http://thebuildingcoder.typepad.com/blog/2012/09/findelement-and-collector-optimisation.html)
-- [B](http://thebuildingcoder.typepad.com/blog/2017/03/events-uv-coordinates-and-rooms-on-level.html#6)
+- [FindElement and collector optimisation](http://thebuildingcoder.typepad.com/blog/2012/09/findelement-and-collector-optimisation.html)
+- [Collect all rooms on a given level](http://thebuildingcoder.typepad.com/blog/2017/03/events-uv-coordinates-and-rooms-on-level.html#6)
  
 I refactored the parameter accessing code as a separate little method to retrieve the area scheme name from the area element like this:
  

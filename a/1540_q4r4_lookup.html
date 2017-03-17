@@ -12,8 +12,11 @@
  @ElasticsearchQA #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge 
 RevitLookup updated #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge 
 
-&ndash; 
-...
+I ran the first query on the collection of tbc blog posts imported into Elasticsearch to experiment for the question answering system Q4R4 Question Answering for Revit API and installed the elasticsearch-head web front end to better explore and understand my local Elasticsearch cluster
+&ndash; Elasticsearch text field mapping
+&ndash; Elasticsearch-head web front end
+&ndash; More RevitLookup updates
+&ndash; Get area scheme from an area...
 
 -->
 
@@ -221,8 +224,8 @@ out to be a pretty trivial matter of accessing and evaluating a simple series of
 <p><strong>Answer:</strong> First, there are a couple of unnecessary inefficiencies in the sample code snippet.</p>
 <p>There is no need for the <code>Cast&lt;&gt;</code>, and more importantly, <code>ToList</code> adds no value for this use case and consumes both time and memory, cf.:</p>
 <ul>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2012/09/findelement-and-collector-optimisation.html">A</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2017/03/events-uv-coordinates-and-rooms-on-level.html#6">B</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/09/findelement-and-collector-optimisation.html">FindElement and collector optimisation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/03/events-uv-coordinates-and-rooms-on-level.html#6">Collect all rooms on a given level</a></li>
 </ul>
 <p>I refactored the parameter accessing code as a separate little method to retrieve the area scheme name from the area element like this:</p>
 <pre class="code">
