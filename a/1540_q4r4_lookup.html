@@ -1,0 +1,288 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!-- <script src="run_prettify.js" type="text/javascript"></script> --> 
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- 12773525 [Get Area Scheme from an Area]
+  https://forums.autodesk.com/t5/revit-api-forum/get-area-scheme-from-an-area/m-p/6949212
+
+ @ElasticsearchQA #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge 
+RevitLookup updated #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge 
+
+&ndash; 
+...
+
+-->
+
+<h3>Elasticsearch-Head, RevitLookup and Area Schemes</h3>
+<p>I ran the first query on the collection
+of <a href="https://github.com/jeremytammik/tbc">tbc</a> blog
+posts imported into Elasticsearch to experiment for the question answering
+system <a href="http://thebuildingcoder.typepad.com/blog/2017/03/q4r4-revit-api-question-answering-system.html">Q4R4 <em>Question Answering for Revit API</em></a>.</p>
+<p>No spectacular results to report so far, but at least it works.</p>
+<p>I installed the <a href="https://github.com/mobz/elasticsearch-head">elasticsearch-head</a> web
+front end to better explore and understand my local Elasticsearch cluster.</p>
+<p>Alexander made a small correction to the latest RevitLookup enhancements, reverting one of the changes made yesterday.</p>
+<p>Lots of interesting solutions on
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>,
+including a nice little filtering sample that I picked up:</p>
+<ul>
+<li><a href="#2">Elasticsearch text field mapping</a></li>
+<li><a href="#3">Elasticsearch-head web front end</a></li>
+<li><a href="#4">More RevitLookup updates</a></li>
+<li><a href="#5">Get area scheme from an area</a></li>
+</ul>
+<h4><a name="2"></a>Elasticsearch Text Field Mapping</h4>
+<p>Yesterday, I described
+the <a href="http://thebuildingcoder.typepad.com/blog/2017/03/q4r4-tbc-import-and-revitlookup.html">q4r4 tbc import script <code>tbcimport.py</code></a> that
+I implemented to import all The Building Coder blog posts
+into <a href="https://www.elastic.co/products/elasticsearch">Elasticsearch</a> to
+start experimenting with queries on them.</p>
+<p>By default, the blog post <code>text</code> field was apparently imported and populated as a type <code>keyword</code> field:</p>
+<pre>
+$ &#99;url -XGET 'localhost:9200/tbc/_mapping?pretty'
+{
+  "tbc" : {
+    "mappings" : {
+      "blogpost" : {
+        "properties" : {
+          "date" : {
+            "type" : "date"
+          },
+          "nr" : {
+            "type" : "long"
+          },
+          "text" : {
+            "type" : "text",
+            "fields" : {
+              "keyword" : {
+                "type" : "keyword",
+                "ignore_above" : 256
+              }
+            }
+          },
+          "title" : {
+            "type" : "text",
+            "fields" : {
+              "keyword" : {
+                "type" : "keyword",
+                "ignore_above" : 256
+              }
+            }
+          },
+          "url" : {
+            "type" : "text",
+            "fields" : {
+              "keyword" : {
+                "type" : "keyword",
+                "ignore_above" : 256
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+</pre>
+
+<p>Since I want to run a full text search on the blog post text, I need to change that mapping.
+Actually, I might as well change it for the <code>title</code> field as well:</p>
+<pre>
+$ &#99;url -XPUT 'localhost:9200/tbc?pretty' -H 'Content-Type: application/json' -d'
+{
+  "mappings": {
+    "blogpost": {
+      "properties": {
+        "text": { "type":  "text" },
+        "title": { "type":  "text" }
+      }
+    }
+  }
+}
+'
+</pre>
+
+<p>Now the mapping looks more suitable:</p>
+<pre>
+$ &#99;url -XGET 'localhost:9200/tbc/_mapping?pretty'
+{
+  "tbc" : {
+    "mappings" : {
+      "blogpost" : {
+        "properties" : {
+          "date" : {
+            "type" : "date"
+          },
+          "nr" : {
+            "type" : "long"
+          },
+          "text" : {
+            "type" : "text"
+          },
+          "title" : {
+            "type" : "text"
+          },
+          "url" : {
+            "type" : "text",
+            "fields" : {
+              "keyword" : {
+                "type" : "keyword",
+                "ignore_above" : 256
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+</pre>
+
+<h4><a name="3"></a>Elasticsearch-Head Web Front End</h4>
+<p>Typing <code>curl</code> scripts on the command line is probably not the most effective way to explore my local Elasticsearch cluster.</p>
+<p>I installed the <a href="https://github.com/mobz/elasticsearch-head">elasticsearch-head</a> web front end to improve and simplify my interactive access.</p>
+<p>As explained in its readme documentation, I must add two CORS settings to the elasticsearch config file <code>elasticsearch.yml</code> to allow elastic-head to connect to it:</p>
+<pre>
+  http.cors.enabled: true
+  http.cors.allow-origin: "*"
+</pre>
+
+<p>With those settings in place, I can browse the cluster contents and start experimenting with queries on them:</p>
+<p><center>
+<img src="img/elasticsearch-head.png" alt="Elasticsearch-head" width="500"/>
+</center></p>
+<h4><a name="4"></a>More RevitLookup Updates</h4>
+<p>Two minor RevitLookup updates today, each encapsulated in an own new version.</p>
+<p>Alexander Ignatovich, <a href="https://github.com/CADBIMDeveloper">@CADBIMDeveloper</a>, aka Александр Игнатович,
+disagreed with one of the changes made yesterday and reverted that in his pull request
+<a href="https://github.com/jeremytammik/RevitLookup/pull/31">#31 try-catch for each element in cycle is bad idea and looks ugly</a>.</p>
+<p>Many thanks to Alexander for paying attention and fixing this!</p>
+<p>That change is merged
+in <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2017.0.0.21">RevitLookup release 2017.0.0.21</a>.</p>
+<p>I was unhappy with a couple of warning messages during compilation and fixed those
+in <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2017.0.0.22">RevitLookup release 2017.0.0.22</a>.</p>
+<p>The most up-to-date version is always provided in the master branch of 
+the <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup GitHub repository</a>.</p>
+<p>If you would like to access any part of the functionality that was removed when switching to the <code>Reflection</code> based approach, please grab it
+from <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2017.0.0.13">release 2017.0.0.13</a> or earlier.</p>
+<p>I am also happy to restore any other code that was removed and that you would like preserved.
+Simply create a pull request for that, explain your need and motivation, and I will gladly merge it back again.</p>
+<h4><a name="5"></a>Get Area Scheme from an Area</h4>
+<p>A <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> question
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/get-area-scheme-from-an-area/m-p/6949212">getting the area scheme from an area</a> turned
+out to be a pretty trivial matter of accessing and evaluating a simple series of parameter values on the area and area scheme:</p>
+<p><strong>Question:</strong> I'm not sure if this is possible but I've been trying to get the AREA_SCHEME_NAME from a collection of areas.</p>
+<p>I've tried several ways without luck.</p>
+<p>Can an area report what Area Scheme (Gross, Rentable) it belongs to?</p>
+<p><strong>Answer:</strong> Have you tried this?</p>
+<pre class="code">
+  <span style="color:#2b91af;">Area</span>&nbsp;area;
+
+  <span style="color:#2b91af;">AreaScheme</span>&nbsp;scheme&nbsp;=&nbsp;doc.GetElement(
+  &nbsp;&nbsp;area.get_Parameter(
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.AREA_SCHEME_ID&nbsp;).AsElementId()&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">AreaScheme</span>;
+
+  <span style="color:blue;">string</span>&nbsp;areaSchemeName&nbsp;=&nbsp;scheme.get_Parameter(
+  &nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.AREA_SCHEME_NAME&nbsp;).AsString();
+</pre>
+
+<p><strong>Response:</strong> Thanks.</p>
+<p>Here's the code for a little test to get the areas that are on the 'Gross Building' scheme:</p>
+<pre class="code">
+<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">SpatialElement</span>&gt;&nbsp;areas&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;.OfCategory(&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Areas&nbsp;)
+&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">SpatialElement</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">SpatialElement</span>&gt;()
+&nbsp;&nbsp;.ToList();
+
+<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;<span style="color:blue;">in</span>&nbsp;areas&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:#2b91af;">AreaScheme</span>&nbsp;_scheme&nbsp;=&nbsp;doc.GetElement(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;e.get_Parameter(&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.AREA_SCHEME_ID&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.AsElementId()&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">AreaScheme</span>;
+
+&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;_AreaSchemeName&nbsp;=&nbsp;_scheme.get_Parameter(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.AREA_SCHEME_NAME&nbsp;).AsString();
+
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;_AreaSchemeName.ToString()&nbsp;==&nbsp;<span style="color:#a31515;">&quot;Gross&nbsp;Building&quot;</span>&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;Revit&quot;</span>,&nbsp;_AreaSchemeName&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;ox&nbsp;=&nbsp;e.LookupParameter(&nbsp;<span style="color:#a31515;">&quot;Area&quot;</span>&nbsp;).AsDouble();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;Revit&quot;</span>,&nbsp;ox.ToString()&nbsp;);
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">else</span>&nbsp;{&nbsp;<span style="color:blue;">continue</span>;&nbsp;}
+}</pre>
+
+<p><strong>Answer:</strong> First, there are a couple of unnecessary inefficiencies in the sample code snippet.</p>
+<p>There is no need for the <code>Cast&lt;&gt;</code>, and more importantly, <code>ToList</code> adds no value for this use case and consumes both time and memory, cf.:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/09/findelement-and-collector-optimisation.html">A</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/03/events-uv-coordinates-and-rooms-on-level.html#6">B</a></li>
+</ul>
+<p>I refactored the parameter accessing code as a separate little method to retrieve the area scheme name from the area element like this:</p>
+<pre class="code">
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;the&nbsp;area&nbsp;scheme&nbsp;name&nbsp;of&nbsp;a&nbsp;given&nbsp;area&nbsp;element</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;using&nbsp;only&nbsp;generic&nbsp;Element&nbsp;Parameter&nbsp;access.</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">string</span>&nbsp;GetAreaSchemeNameFromArea(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;!(&nbsp;e&nbsp;<span style="color:blue;">is</span>&nbsp;<span style="color:#2b91af;">Area</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">throw</span>&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ArgumentException</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Expected&nbsp;Area&nbsp;element&nbsp;input&nbsp;argument.&quot;</span>&nbsp;);
+&nbsp;&nbsp;}
+
+&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;e.Document;
+
+&nbsp;&nbsp;<span style="color:#2b91af;">Parameter</span>&nbsp;p&nbsp;=&nbsp;e.get_Parameter(
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.AREA_SCHEME_ID&nbsp;);
+
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">null</span>&nbsp;==&nbsp;p&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">throw</span>&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ArgumentException</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;element&nbsp;lacks&nbsp;AREA_SCHEME_ID&nbsp;parameter&quot;</span>&nbsp;);
+&nbsp;&nbsp;}
+
+&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;areaScheme&nbsp;=&nbsp;doc.GetElement(&nbsp;p.AsElementId()&nbsp;);
+
+&nbsp;&nbsp;p&nbsp;=&nbsp;areaScheme.get_Parameter(
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.AREA_SCHEME_NAME&nbsp;);
+
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">null</span>&nbsp;==&nbsp;p&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">throw</span>&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ArgumentException</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;area&nbsp;scheme&nbsp;lacks&nbsp;AREA_SCHEME_NAME&nbsp;parameter&quot;</span>&nbsp;);
+&nbsp;&nbsp;}
+
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;p.AsString();
+}
+</pre>
+
+<p>With that in hand, the retrieval of all areas matching a given area scheme can we rewritten like this:</p>
+<pre class="code">
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;Retrieve&nbsp;all&nbsp;areas&nbsp;belonging&nbsp;to&nbsp;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;a&nbsp;specific&nbsp;area&nbsp;scheme.</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;GetAreasInAreaScheme(
+&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc,
+&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;areaSchemeName&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.OfCategory(&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Areas&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">SpatialElement</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.Where&lt;<span style="color:#2b91af;">Element</span>&gt;(&nbsp;e&nbsp;=&gt;&nbsp;areaSchemeName.Equals(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GetAreaSchemeNameFromArea(&nbsp;e&nbsp;)&nbsp;)&nbsp;);
+}
+</pre>
+
+<p>I added these two methods to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
+in <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.132.10">release 2017.0.132.10</a>.</p>
+<p>You can see the new code
+by <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2017.0.132.9...2017.0.132.10">comparing with the preceding release 2017.0.132.9</a>.</p>
