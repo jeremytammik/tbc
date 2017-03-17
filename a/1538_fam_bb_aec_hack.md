@@ -11,8 +11,7 @@
 
 - http://aechackathon-germany.de/
 
-
- #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/devdays2016online
+AEC Hackathon Munich sports an impressive speaker line-up #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/family_bb_hack_tu_mu
 
 I briefly mentioned the AEC Hackathon in Munich yesterday.
 Here is some more information on that, highlighting the exciting speaker line-up and target topics, plus a solution for determining the bounding box of an entire family
