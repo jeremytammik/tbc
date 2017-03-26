@@ -38,10 +38,10 @@ sharing his [3D Aimer, just because](https://forums.autodesk.com/t5/revit-api-fo
 Later, I noticed that he shared a second, related project that also looks very useful and exciting,
 the mysteriously-named [family plunk](https://forums.autodesk.com/t5/revit-api-forum/another-family-plunk-concept-share/m-p/6972598):
 
-- [WTA FireP 3D Aimer Tools](#2)
-- [GitHub Repository and YouTube Video](#3)
-- [Source Code Documentation](#4)
-- [WTA Elec &ndash; Another Family Plunk and Concept Share](#5)
+- [WTA FireP 3D Aimer tools](#2)
+- [GitHub repository and YouTube video](#3)
+- [Source code documentation](#4)
+- [WTA Elec &ndash; another family plunk and concept share](#5)
 
 
 #### <a name="2"></a>WTA FireP 3D Aimer Tools
