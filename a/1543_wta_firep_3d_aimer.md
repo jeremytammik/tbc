@@ -14,7 +14,8 @@
 
 Modeless WPF
 
-Electrical sprinkler family instance placement and parameter setting tools #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/3daimer
+Sprinkler family placement param setting and 3D Aimer #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/3daimer 
+Electrical fixture lighting control occupancy sensor and modeless WPF head-up tools #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/3daimer
 
 I am traveling to Gothenburg for the Forge accelerator. Meanwhile, Allan Seidel shared his WTA FireP 3D Aimer add-in that creates a custom ribbon tab with discipline related tools for placing specific Revit family types with some families requiring parameter settings made on the fly and the 3D Aimer example that "aims" a special Revit family to a target
 &ndash; WTA FireP 3D Aimer Tools
