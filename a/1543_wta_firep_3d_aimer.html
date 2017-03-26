@@ -11,8 +11,9 @@
   https://github.com/akseidel/WTA_FireP
   https://www.youtube.com/watch?v=fKrtMx0R9k8
 
-Modeless WPF sprinkler family instance placement parameter setting 
-#RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/3daimer
+Modeless WPF
+
+Electrical sprinkler family instance placement and parameter setting tools #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/3daimer
 
 I am traveling to Gothenburg for the Forge accelerator. Meanwhile, Allan Seidel shared his WTA FireP 3D Aimer add-in that creates a custom ribbon tab with discipline related tools for placing specific Revit family types with some families requiring parameter settings made on the fly and the 3D Aimer example that "aims" a special Revit family to a target
 &ndash; WTA FireP 3D Aimer Tools
@@ -64,7 +65,9 @@ from <a href="http://thebuildingcoder.typepad.com/">The Building Coder</a> site.
 <iframe width="480" height="270" src="https://www.youtube.com/embed/fKrtMx0R9k8?rel=0" frameborder="0" allowfullscreen></iframe>
 </center></p>
 <h4><a name="4"></a>Source Code Documentation</h4>
-<p><img alt="RibbonTab" src="img/akseidel_FPRibbonTab.png" /></p>
+<p><center>
+<img src="img/akseidel_FPRibbonTab.png" alt="WTA FireP ribbon tab" width="695"/>
+</center></p>
 <p>Revit Add-in in C# : Creates a custom ribbon Tab with discipline related tools. The tools at this writing are for placing specific Revit family types with some families requiring parameter settings made on the fly.</p>
 <p>Included is the 3dAimer example that "aims" a special Revit family to a target. The enclosed Revit project is for demonstrating the 3dAimer.</p>
 <p>This repository is provided for sharing and learning purposes. Perhaps someone might provide improvements or education. Perhaps it will help to boost someone further up the steep learning curve needed to create Revit task add-ins. Hopefully it does not show too much of the wrong way.  </p>
@@ -95,6 +98,10 @@ from <a href="http://thebuildingcoder.typepad.com/">The Building Coder</a> site.
 <h4><a name="5"></a>WTA Elec &ndash; Another Family Plunk and Concept Share</h4>
 <p>Allan shared a second, related project related to electrical fixtures in his thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/another-family-plunk-concept-share/m-p/6972598">another family plunk, concept share</a>:</p>
+<p><center>
+<img src="img/akseidel_ElecRibbonTab.png" alt="WTA Elec ribbon tab" width="491"/>
+</center></p>
+<p></center></p>
 <p>Blurring the line between Revit API and Revit to visualize an abstraction, here is a video and code share. Perhaps it has value. One add-in picks ceilings and reports information about the lighting in the room that cannot be scheduled because Revit schedules lighting power by what it learns through the light fixture connector, which is apparent power, not dissipated power. Dissipated power is needed for some purposes. The second add-in picks ceilings to get the ceiling height and passes that information to a family plunk. The family's purpose is to visualize a detection field. The detection field geometry depends on the device hight. That gets passes to the family instance. The floating window seen in the video in both add-in examples is the same UI device concept.</p>
 <ul>
 <li><a href="https://github.com/akseidel/WTA_Elec">WTA_Elec GitHub repo</a></li>

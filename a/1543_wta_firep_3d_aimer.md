@@ -12,8 +12,9 @@
   https://github.com/akseidel/WTA_FireP
   https://www.youtube.com/watch?v=fKrtMx0R9k8
 
-Modeless WPF sprinkler family instance placement parameter setting 
-#RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/3daimer
+Modeless WPF
+
+Electrical sprinkler family instance placement and parameter setting tools #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/3daimer
 
 I am traveling to Gothenburg for the Forge accelerator. Meanwhile, Allan Seidel shared his WTA FireP 3D Aimer add-in that creates a custom ribbon tab with discipline related tools for placing specific Revit family types with some families requiring parameter settings made on the fly and the 3D Aimer example that "aims" a special Revit family to a target
 &ndash; WTA FireP 3D Aimer Tools
@@ -82,7 +83,9 @@ I have created a public GitHub repository and a YouTube posting for it:
 
 #### <a name="4"></a>Source Code Documentation
 
-![RibbonTab](img/akseidel_FPRibbonTab.png)
+<center>
+<img src="img/akseidel_FPRibbonTab.png" alt="WTA FireP ribbon tab" width="695"/>
+</center>
 
 Revit Add-in in C# : Creates a custom ribbon Tab with discipline related tools. The tools at this writing are for placing specific Revit family types with some families requiring parameter settings made on the fly.
 
@@ -119,6 +122,12 @@ Many thanks to Allan for sharing this!
 
 Allan shared a second, related project related to electrical fixtures in his thread
 on [another family plunk, concept share](https://forums.autodesk.com/t5/revit-api-forum/another-family-plunk-concept-share/m-p/6972598):
+
+<center>
+<img src="img/akseidel_ElecRibbonTab.png" alt="WTA Elec ribbon tab" width="491"/>
+</center>
+
+</center>
 
 Blurring the line between Revit API and Revit to visualize an abstraction, here is a video and code share. Perhaps it has value. One add-in picks ceilings and reports information about the lighting in the room that cannot be scheduled because Revit schedules lighting power by what it learns through the light fixture connector, which is apparent power, not dissipated power. Dissipated power is needed for some purposes. The second add-in picks ceilings to get the ceiling height and passes that information to a family plunk. The family's purpose is to visualize a detection field. The detection field geometry depends on the device hight. That gets passes to the family instance. The floating window seen in the video in both add-in examples is the same UI device concept.
  
