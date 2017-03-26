@@ -61,7 +61,7 @@ The 3d Aimer, which rotates a family in many directions, is part of a larger pro
 I have created a public GitHub repository and a YouTube posting for it:
  
 - [WTA_FireP GitHub repo](https://github.com/akseidel/WTA_FireP)
-- [https://www.youtube.com/watch?v=fKrtMx0R9k8](https://www.youtube.com/watch?v=fKrtMx0R9k8)
+- [Revit 3D Aimer add-in example concept](https://www.youtube.com/watch?v=fKrtMx0R9k8)
 
 <center>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/fKrtMx0R9k8?rel=0" frameborder="0" allowfullscreen></iframe>
