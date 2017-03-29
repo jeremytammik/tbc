@@ -137,7 +137,8 @@ the [HoloLens escape path waypoint JSON exporter](http://thebuildingcoder.typepa
 </center>
 
 For more details on the implementation steps, please refer to
-the [list of releases](releases) and [commits](commits).
+the [list of releases](https://github.com/jeremytammik/RvtFader/releases)
+and [commits](https://github.com/jeremytammik/RvtFader/commits).
 
 
 #### <a name="6"></a> Further Reading
