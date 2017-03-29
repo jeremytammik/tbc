@@ -126,3 +126,48 @@ A debug helper displaying lines in the model representing the ray tracing rays:
 - Generate a bitmap based on that information, or simply a mapping of `(u.v)` values to the desired colour value.
 - Implement a custom fragment shader to display the (u,v) to colour mapping on the floor top face mesh.
 
+
+#### <a name="7"></a>Detailed Notes and Pointers
+
+I made the following notes during the research and implementation steps.
+
+- Colour gradient examples:
+    - A series of three consecutive approaches to solve the task, starting with the most obvious, for the learning curve.
+      However, the last in the series, using shaders, although last in the learning curve, once understood, is actually probably the most effective and simplest approach.
+    - [Projecting Dynamic Textures onto Flat Surfaces with Three.js](https://forge.autodesk.com/cloud_and_mobile/2016/07/projecting-dynamic-textures-onto-flat-surfaces-with-threejs.html).
+    - [Using Shaders to Generate Dynamic Textures in the Viewer API](https://forge.autodesk.com/cloud_and_mobile/2016/07/using-shaders-to-generate-dynamic-textures.html).
+    - [mourner/simpleheat](https://github.com/mourner/simpleheat), A super-tiny JavaScript library for drawing heatmaps with Canvas
+- Setting up the new project based on boilerplate code:
+    - Fork [forge-react-boiler.nodejs](https://github.com/Autodesk-Forge/forge-react-boiler.nodejs).
+    - Clone, npm install, npm start.
+    - Translate my Revit model to obtain a `urn`: [models.autodesk.io](https://models.autodesk.io).
+    - Load model into boilerplate: [localhost:3000/viewer?urn=...](http://localhost:3000/viewer?urn=...)
+    - My urn for the little house floor is `dXJuOm...ydnQ`
+    - [localhost:3000/viewer?urn=dXJuOm...ydnQ](http://localhost:3000/viewer?urn=dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bW9kZWwyMDE3LTAzLTI3LTEwLTM4LTMzLWQ0MWQ4Y2Q5OGYwMGIyMDRlOTgwMDk5OGVjZjg0MjdlL2xpdHRsZV9ob3VzZV9mbG9vci5ydnQ)
+- Looked at `forge-rcdb.nodejs` sample `Viewing.Extension.Configurator.Predix.js` `onSelection`; it relies on `EventTool` and `EventsEmitter`.
+- [How to get the model object tree of 2d drawing](http://stackoverflow.com/questions/41558468/how-to-get-the-model-object-tree-of-2d-drawing).
+- `Viewer.Toolkit/Viewer.Toolkit.js` `getLeafNodes`.
+- For ray tracing, look at `library-javascript-viewer-extensions` `Viewing.Extension.Transform/Viewing.Tool.Rotate.js` `onPointerDown` and `pointerToRaycaster`.
+- [Create a custom mesh](http://stackoverflow.com/questions/9252764/how-to-create-a-custom-mesh-on-three-js) with a finer resolution than the original face.
+- [Assign colours to the mesh](http://stackoverflow.com/questions/32063065/assigning-non-interpolated-colors-on-a-mesh-in-three-js).
+- Call `scene.add` and pass a mesh.
+- The viewer does not have any concept of the face of an element. 
+  It is all just individual triangular fragments.
+- Philippe implemented a snapper tool to collect as many triangles as possible to guess what the face might be in
+  his  [GeometrySelector](http://viewer.autodesk.io/node/gallery/embed?id=560c6c57611ca14810e1b2bf&extIds=Autodesk.ADN.Viewing.Extension.GeometrySelector) in
+  the [library-javascript-viewer-extensions](https://github.com/Autodesk-Forge/library-javascript-viewer-extensions).
+- Check out the function `drawFace` in [Snapper.js](https://github.com/Autodesk-Forge/library-javascript-viewer-extensions/blob/master/src/Autodesk.ADN.Viewing.Extension.GeometrySelector/Autodesk.ADN.Viewing.Tool.Snapper.js).
+- Shader produces all the points, calculates and sets result.
+- [Stemkoski Three.js Examples](https://stemkoski.github.io/Three.js/),
+[Shader &ndash; Attributes](https://stemkoski.github.io/Three.js/Shader-Attributes.html)
+([source](view-source:https://stemkoski.github.io/Three.js/Shader-Attributes.html)).
+- [Intro to Pixel Shaders in Three.js](https://www.airtightinteractive.com/2013/02/intro-to-pixel-shaders-in-three-js).
+
+I want to attach a fragment shader to the picked floor face.
+My shader should draw an image or texture directly, i.e., the desired 'heat map'.
+Here are [som more complex pixel shader samples](https://threejs.org/examples/webgl_shader2.html).
+I need to implement a fragment shader script and equip it with an id.
+  
+- WebGL shaders are written in GLSL, the [OpenGL Shading Language](https://en.wikipedia.org/wiki/OpenGL_Shading_Language).
+- [Pixel Shaders](http://pixelshaders.com) by Toby Schachman and the [sample tutorial chapter](http://pixelshaders.com/sample).
+- Philippe's first article on [Forge viewer custom shaders](http://adndevblog.typepad.com/cloud_and_mobile/2017/01/forge-viewer-custom-shaders-part-1.html).
