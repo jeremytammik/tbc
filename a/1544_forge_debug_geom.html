@@ -1,0 +1,96 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!-- <script src="run_prettify.js" type="text/javascript"></script> --> 
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- debugging node.js with vs 2015 on mac
+  http://through-the-interface.typepad.com/through_the_interface/2017/02/enabling-visual-studio-codes-integrated-web-debugging.html
+  [Visual Studio Code](https://code.visualstudio.com)
+
+
+ #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge 
+
+I am in Gothenburg supporting the Forge accelerator.
+My project here is ForgeFader, implementing the same end user functionality as the RvtFader Revit C# .NET API add-in that I implemented last week.
+I have not quite finished it yet, but the existing functionality looks as if it already ought to be very useful indeed to anyone working with geometry in the Forge viewer
+&ndash; Working in Visual Studio Code
+&ndash; ForgeFader
+&ndash; Implementation
+&ndash; Adding custom geometry to the Forge Viewer
+&ndash; Next steps...
+
+-->
+
+<h3>Adding Custom Geometry to the Forge Viewer</h3>
+<p>I am in Gothenburg supporting the
+<a href="http://thebuildingcoder.typepad.com/blog/2017/03/events-uv-coordinates-and-rooms-on-level.html#2">Forge accelerator</a>.</p>
+<p>My project here is <a href="https://github.com/jeremytammik/forgefader">ForgeFader</a>,
+implementing the same end user functionality as
+the <a href="https://github.com/jeremytammik/RvtFader">RvtFader</a> Revit
+C# .NET API add-in that I implemented last week.</p>
+<p>I have not quite finished it yet, but the existing functionality looks as if it already ought to be very useful indeed to anyone working with geometry in the Forge viewer.</p>
+<ul>
+<li><a href="#2">Working in Visual Studio Code</a></li>
+<li><a href="#3">ForgeFader</a></li>
+<li><a href="#4">Implementation</a></li>
+<li><a href="#5">Adding custom geometry to the Forge Viewer</a></li>
+<li><a href="#6">Next steps</a></li>
+</ul>
+<h4><a name="2"></a>Working in Visual Studio Code</h4>
+<p>Inspired by Kean Walmsley's note
+on <a href="http://through-the-interface.typepad.com/through_the_interface/2017/02/enabling-visual-studio-codes-integrated-web-debugging.html">enabling Visual Studio Code’s integrated web debugging</a>,
+I am using <a href="https://code.visualstudio.com">Visual Studio Code</a> to develop ForgeFader and very happy with it indeed.</p>
+<p><center>
+<img src="img/forgefader_in_vs_code.png" alt="ForgeFaver in Visual Studio Code" width="500"/>
+</center></p>
+<p>I have not actually enabled
+the <a href="https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome">integration with Chrome debugging</a> that
+is the main point of Kean's article, but just using this as an editor is a good start.</p>
+<h4><a name="3"></a>ForgeFader</h4>
+<p>ForgeFader implements a Forge viewer extension to calculate and display signal attenuation caused by distance and obstacles in a building model with a floor plan containing walls.</p>
+<p>It implements a functionality similar to <a href="https://github.com/jeremytammik/RvtFader">RvtFader</a>:</p>
+<p>Given a source point, calculate the attenuation in a widening circle around it and display that as a heat map.</p>
+<p>Two signal attenuation values in decibels are defined in the application settings:</p>
+<ul>
+<li>Attenuation per metre in air</li>
+<li>Attenuation by a wall</li>
+</ul>
+<p>This app is based on Philippe Leefsma's <a href="https://github.com/Autodesk-Forge/forge-react-boiler.nodejs">Forge React boilerplate sample</a>.</p>
+<p>Please refer to that for more details on the underlying architecture and components used.</p>
+<h4><a name="4"></a>Implementation</h4>
+<p>The ForgeFader implementation lives
+in <a href="https://github.com/jeremytammik/forgefader/blob/master/src/client/viewer.components/Viewing.Extension.Fader/Viewing.Extension.Fader.js">Viewing.Extension.Fader.js</a>.</p>
+<p>On loading, in <code>onGeometryLoaded</code>, it determines the Revit BIM wall fragments for subsequent ray tracing.</p>
+<p>On picking a point on a floor in the model, in <code>onSelection</code>, it launches the <code>attenuationCalculator</code> function to do the work.</p>
+<p>That fiddles around a bit to determine the picked floor top faces and add a new mesh to the model on which to draw the attenuation map.</p>
+<p>Once the mesh has been added, it in turn calls <code>rayTraceToFindWalls</code> to create a bitmap representing the signal attenuation to be displayed by a custom shader.</p>
+<h4><a name="5"></a>Adding Custom Geometry to the Forge Viewer</h4>
+<p>When debugging any kind of geometrical programming task, it is of utmost importance to be able to comfortably visualise the situation.</p>
+<p>In this app, I add three different kinds of geometry dynamically to the model displayed by the Forge viewer:</p>
+<ul>
+<li>Points and lines representing the top face of the floor and the picked source point.</li>
+<li>A mesh representing the top face of the floor to be equipped with a custom shader and offset slightly above and away from the floor element surface.</li>
+<li>Points and lines representing the raytracing rays.</li>
+</ul>
+<p>Three example screen snapshots illustrate what I mean.</p>
+<p>Display points and lines for debugging using <code>drawVertex</code> and <code>drawLine</code>:</p>
+<p><center>
+<img src="img/forgefader_line_vertex_debug_marker_300.png" alt="Line and vertex debug markers" width="300"/>
+</center></p>
+<p>Create a mesh to represent the floor top face and offset it up slightly above the floor surface:</p>
+<p><center>
+<img src="img/forgefader_floor_top_face_mesh_250.png" alt="Floor top face mesh" width="250"/>
+</center></p>
+<p>A debug helper displaying lines in the model representing the ray tracing rays:</p>
+<p><center>
+<img src="img/forgefader_ray_trace_rays_250.png" alt="Ray tracing rays" width="250"/>
+</center></p>
+<h4><a name="6"></a>Next Steps</h4>
+<ul>
+<li>Perform the raytracing to determine the number of walls between the picked signal source point and a grid of target points</li>
+<li>Generate a bitmap based on that information, or simply a mapping of <code>(u.v)</code> values to the desired colour value.</li>
+<li>Implement a custom fragment shader to display the (u,v) to colour mapping on the floor top face mesh.</li>
+</ul>
