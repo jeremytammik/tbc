@@ -42,6 +42,7 @@ I have not quite finished it yet, but the existing functionality looks as if it 
 - [Implementation](#4)
 - [Adding custom geometry to the Forge Viewer](#5)
 - [Next steps](#6)
+- [Detailed notes and pointers](#7)
 
 
 
