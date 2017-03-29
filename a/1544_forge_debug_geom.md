@@ -12,7 +12,7 @@
   [Visual Studio Code](https://code.visualstudio.com)
 
 
- #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge 
+Adding Custom Geometry to the Forge Viewer #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/addforgegeom
 
 I am in Gothenburg supporting the Forge accelerator.
 My project here is ForgeFader, implementing the same end user functionality as the RvtFader Revit C# .NET API add-in that I implemented last week.
