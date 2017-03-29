@@ -1,0 +1,236 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!-- <script src="run_prettify.js" type="text/javascript"></script> --> 
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+Three.js Raytracing in the Forge Viewer #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge 
+
+&ndash; 
+...
+
+-->
+
+<h3>Three.js Raytracing in the Forge Viewer</h3>
+<p>I am still in Gothenburg supporting
+the <a href="http://thebuildingcoder.typepad.com/blog/2017/03/events-uv-coordinates-and-rooms-on-level.html#2">Forge accelerator</a> and 
+working on my <a href="https://github.com/jeremytammik/forgefader">ForgeFader</a> project.</p>
+<p>ForgeFader implements the same end user functionality as
+the <a href="https://github.com/jeremytammik/RvtFader">RvtFader</a> Revit
+C# .NET API add-in that I implemented last week.</p>
+<p>Yesterday, I showed how you
+can <a href="http://thebuildingcoder.typepad.com/blog/2017/03/adding-custom-geometry-to-the-forge-viewer.html">add custom geometry to the Forge viewer</a>
+for debugging or other purposes and to control graphically what is going on.</p>
+<p>Today, I address the ray tracing required to determine the number of walls between the user selected signal source point and the other target points spread out across the picked floor slab.</p>
+<ul>
+<li><a href="#2">Connecting Visual Studio Code to the Chrome debugger</a></li>
+<li><a href="#3">Creating a fully functional three.js mesh from Forge viewer fragments</a></li>
+<li><a href="#4">Use high-level built-in viewer functionality instead of your own fragile stuff</a></li>
+</ul>
+<h4><a name="2"></a>Connecting Visual Studio Code to the Chrome Debugger</h4>
+<p>I mentioned yesterday that I started using <a href="https://code.visualstudio.com">Visual Studio Code</a> to
+develop ForgeFader, inspired by Kean Walmsley's note
+on <a href="http://through-the-interface.typepad.com/through_the_interface/2017/02/enabling-visual-studio-codes-integrated-web-debugging.html">enabling Visual Studio Code’s integrated web debugging</a>.</p>
+<p>I now installed 
+the <a href="https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome">integration with Chrome debugging</a> and
+verified that it works as expected.</p>
+<p>It requires setting up the debugging commands to launch or attach to a process in <code>launch.json</code>.</p>
+<p>I added the two following to launch the client and the server, respectively:</p>
+<pre class="prettyprint">
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch forgedader client",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000/viewer?urn=dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bW9kZWwyMDE3LTAzLTI3LTEwLTM4LTMzLWQ0MWQ4Y2Q5OGYwMGIyMDRlOTgwMDk5OGVjZjg0MjdlL2xpdHRsZV9ob3VzZV9mbG9vci5ydnQ",
+      "port": 9222,
+      "webRoot": "${workspaceRoot}/src/client"
+    },
+    {
+      "name": "Launch forgefader server",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceRoot}/bin/start.js",
+      "port": 3000
+    }
+  ]
+}
+</pre>
+
+<p>Here is a screen snapshot of the client debugging console:</p>
+<p><center>
+<img src="img/forgefader_vs_code_debug.png" alt="Running ForgeFader in Visual Studio Code hooked up to Chrome debugging" width="500"/>
+</center></p>
+<p>As of yet, I still do most of my debugging in Chrome itself, though.</p>
+<p>Old habits die hard, and even young habits can be obstinate.</p>
+<p>No, there are more compelling reasons.</p>
+<p>The Chrome debugger displays more detailed data when exploring internals of local variables.</p>
+<p>Furthermore, VS Code does not understand the connection between the source modules and the webpack-generated js output, just displaying helpful messages saying 'Breakpoint ignored because generated code not found'.</p>
+<h4><a name="3"></a>Creating a Fully Functional Three.js Mesh from Forge Viewer Fragments</h4>
+<p>I tried to call the three.js <code>Raycaster.intersectObjects</code> on the Forge viewer fragments representing the Revit BIM walls with little success.</p>
+<p>After struggling significantly with that, I determined that the easiest solution to achieve that was to analyse the Forge viewer fragments and generate new three.js mesh objects from them.</p>
+<p>That is achieved by the following <code>getMeshFromRenderProxy</code> function for my specific use case covering Revit BIM floors and walls:</p>
+<pre class="prettyprint">
+/////////////////////////////////////////////////////////////////
+// getMeshFromRenderProxy - generate a new mesh from render proxy
+//
+// floor_normal: skip all triangles whose normal differs from that
+// top_face_z: use for the face Z coordinates unless null
+// debug_draw: draw lines and points representing edges and vertices
+/////////////////////////////////////////////////////////////////
+getMeshFromRenderProxy( render_proxy, floor_normal, top_face_z, debug_draw )
+{
+  var matrix = render_proxy.matrixWorld;
+  var geometry = render_proxy.geometry;
+  var attributes = geometry.attributes;
+
+  var vA = new THREE.Vector3();
+  var vB = new THREE.Vector3();
+  var vC = new THREE.Vector3();
+
+  var geo = new THREE.Geometry();
+  var iv = 0;
+
+  if (attributes.index !== undefined) {
+
+    var indices = attributes.index.array || geometry.ib;
+    var positions = geometry.vb ? geometry.vb : attributes.position.array;
+    var stride = geometry.vb ? geometry.vbstride : 3;
+    var offsets = geometry.offsets;
+
+    if (!offsets || offsets.length === 0) {
+      offsets = [{start: 0, count: indices.length, index: 0}];
+    }
+
+    for (var oi = 0, ol = offsets.length; oi &lt; ol; ++oi) {
+
+      var start = offsets[oi].start;
+      var count = offsets[oi].count;
+      var index = offsets[oi].index;
+
+      for (var i = start, il = start + count; i &lt; il; i += 3) {
+
+        var a = index + indices[i];
+        var b = index + indices[i + 1];
+        var c = index + indices[i + 2];
+
+        vA.fromArray(positions, a * stride);
+        vB.fromArray(positions, b * stride);
+        vC.fromArray(positions, c * stride);
+
+        vA.applyMatrix4(matrix);
+        vB.applyMatrix4(matrix);
+        vC.applyMatrix4(matrix);
+
+        var n = THREE.Triangle.normal(vA, vB, vC);
+
+        if( null === floor_normal 
+          || this.isEqualVectorsWithPrecision( n, floor_normal )) 
+        {
+          if( debug_draw )
+          {
+            this.drawVertex (vA);
+            this.drawVertex (vB);
+            this.drawVertex (vC);
+
+            this.drawLine(vA, vB);
+            this.drawLine(vB, vC);
+            this.drawLine(vC, vA);
+          }
+          geo.vertices.push(new THREE.Vector3(vA.x, vA.y, null===top_face_z?vA.z:top_face_z));
+          geo.vertices.push(new THREE.Vector3(vB.x, vB.y, null===top_face_z?vB.z:top_face_z));
+          geo.vertices.push(new THREE.Vector3(vC.x, vC.y, null===top_face_z?vC.z:top_face_z));
+          geo.faces.push( new THREE.Face3( iv, iv+1, iv+2 ) );
+          iv = iv+3;
+        }
+      }
+    }
+  }
+  else {
+
+    throw 'Is this section of code ever called?'
+
+    var positions = geometry.vb ? geometry.vb : attributes.position.array;
+    var stride = geometry.vb ? geometry.vbstride : 3;
+
+    for (var i = 0, il = positions.length; i &lt; il; i += 3) {
+
+      var a = i;
+      var b = i + 1;
+      var c = i + 2;
+
+      // copy code from above if this `else` clause is ever required
+    }
+  }
+  // console.log(floor_top_vertices);
+  // var geo = new THREE.Geometry(); 
+  // var holes = [];
+  // var triangles = ShapeUtils.triangulateShape( floor_top_vertices, holes );
+  // console.log(triangles);
+  // for( var i = 0; i &lt; triangles.length; i++ ){
+  //   geo.faces.push( new THREE.Face3( triangles[i][0], triangles[i][1], triangles[i][2] ));
+  // }
+  console.log(geo);
+  geo.computeFaceNormals();
+  geo.computeVertexNormals();
+  geo.computeBoundingBox();
+  //geo.computeBoundingSphere();
+  var mesh = new THREE.Mesh( geo, this._shaderMaterial );
+  return mesh;
+}
+</pre>
+
+<p>I use it like this in <code>onGeometryLoaded</code> to generate meshes representing all the walls in my model:</p>
+<pre class="prettyprint">
+  this.wallMeshes = fragIds.map((fragId) => {
+    return this.getMeshFromRenderProxy( 
+      this.viewer.impl.getRenderProxy( 
+        this.viewer.model, fragId ), null, null, null );
+  })
+</pre>
+
+<p>Then, when the time is ripe, I can determine all walls between a given pair of source and target points like this:</p>
+<pre class="prettyprint">
+/////////////////////////////////////////////////////////////////
+// ray trace to count walls between source and target points
+/////////////////////////////////////////////////////////////////
+getWallCountBetween( psource, ptarget, max_dist )
+{
+  this.drawLine(psource, ptarget)
+  this.drawVertex(ptarget);
+
+  var vray = new THREE.Vector3( ptarget.x - psource.x, 
+    ptarget.y - psource.y, ptarget.z - psource.z );
+
+  vray.normalize()
+
+  var ray = new THREE.Raycaster( 
+    psource, vray, 0, max_dist )
+
+  var intersectResults = ray.intersectObjects(
+    this.wallMeshes, true)
+
+  console.log(intersectResults)
+
+  var nWalls = intersectResults.length
+
+  return nWalls
+}
+</pre>
+
+<p>With that in hand, I am now ready to feed this information into a custom fragment shader to display the signal attenuation as a colour gradient across the top face of the floor.</p>
+<h4><a name="4"></a>Use High-level Built-in Viewer Functionality Instead of your own Fragile Stuff</h4>
+<p>I raised a question with the Forge viewer development team before embarking on the research to implement the above.</p>
+<p>Unfortunately, due to time differences, they replied only after I had completed it.</p>
+<p>Here is the result:</p>
+<p>[Q@2:19 PM] how can i invoke <code>Raycaster.intersectObjects</code> with viewer fragments?</p>
+<p>[Q@9:35 PM] i solved my <code>Raycaster.intersectObjects</code> challenge by <a href="https://github.com/jeremytammik/forgefader/compare/0.0.13...0.0.15">generating my own threejs mesh from the lmv original</a></p>
+<p>[A@9:39 PM] Ok well, for the record, you can intersect the whole scene using <code>viewer.impl.rayIntersect</code>, or you can do it per model via <code>model.rayIntersect</code>, or per mesh via <code>VBIntersector.rayCast</code>. The first two approaches take advantage of the spatial index acceleration structure.</p>
+<p>[Q@9:42 PM] thank you for the info! i assume these approaches would offer multiple advantages: (i) more efficient (ii) easier to set up and use (iii) more fool- and future-proof. do you agree?</p>
+<p>[A@9:43 PM] Probably better to use the high level hit testing APIs instead of messing with internal mesh representation directly... i.e. avoid doing fragile stuff like <code>this.viewer.impl.getRenderProxy(this.viewer.model, fragId)</code></p>
+<p>In summary, please ignore the interesting solution I present above and use the built-in viewer functionality instead.</p>
+<p>As a next step, I should rewrite my implementation to do so as well.</p>
