@@ -12,7 +12,7 @@ Three.js Raytracing in the Forge Viewer #RevitAPI @AutodeskRevit #aec #bim #dyna
 
 Yesterday, I showed how you can add custom geometry to the Forge viewer for debugging or other purposes and to control graphically what is going on.
 Today, I address the ray tracing required to determine the number of walls between the user selected signal source point and the other target points spread out across the picked floor slab.
-Please note the important information in the final section: the viewer implements built-in raycast functionality that probably obviates the need for this:
+Please note the important information in the final section: the viewer implements built-in raycast functionality that obviates the need for this
 &ndash; Connecting Visual Studio Code to the Chrome debugger
 &ndash; Creating a three.js mesh from Forge viewer fragments
 &ndash; Use built-in viewer raycast instead...
@@ -35,7 +35,7 @@ for debugging or other purposes and to control graphically what is going on.
 
 Today, I address the ray tracing required to determine the number of walls between the user selected signal source point and the other target points spread out across the picked floor slab.
 
-Please note the important information in the final section: the viewer implements built-in raycast functionality that probably obviates the need for this:
+Please note the important information in the final section: the viewer implements built-in raycast functionality that obviates the need for this:
 
 - [Connecting Visual Studio Code to the Chrome debugger](#2)
 - [Creating a three.js mesh from Forge viewer fragments](#3)
