@@ -7,14 +7,10 @@
 
 <!---
 
-Three.js Raytracing in the Forge Viewer http://bit.ly/forgeraytrace #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #threejs #javascript
+ http://bit.ly/forgeraytrace #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #threejs #javascript
 
-Yesterday, I showed how you can add custom geometry to the Forge viewer for debugging or other purposes and to control graphically what is going on.
-Today, I address the ray tracing required to determine the number of walls between the user selected signal source point and the other target points spread out across the picked floor slab.
-Please note the important information in the final section: the viewer implements built-in raycast functionality that obviates the need for this
-&ndash; Connecting Visual Studio Code to the Chrome debugger
-&ndash; Creating a three.js mesh from Forge viewer fragments
-&ndash; Use built-in viewer raycast instead...
+&ndash; 
+...
 
 -->
 
@@ -122,7 +118,60 @@ Here are some aspects that may be of specific interest:
 - **Multiple view annotation placement** &mdash; This add-in can place the annotations, the tags, simultaneously in more than one view at a time. The final tag placement code iterates through a list of candidate views when placing the tag. That list is developed by a single function using specific rules, which one has to adapt to one's needs, operating on parent view names. For example, if the active view is a dependent view, its parent view name is used in the candidate logic. The reason for this feature is due to one of Revit's worst usability problems, where annotation is relegated to the output composition task and not visible during the more important design and engineering tasks.         
 
 
-#### <a name="3"></a>
+#### <a name="3"></a>Slack Conversation
+
+Jeremy Tammik [3:42 PM] 
+what parameters can we use in a custom shader for lmv?
+we currently have a totally trivial shader up and running:
+https://github.com/jeremytammik/forgefader/blob/master/src/client/viewer.components/Viewing.Extension.Fader/Viewing.Extension.Fader.js#L10-L21
+https://github.com/jeremytammik/forgefader/blob/master/src/client/viewer.components/Viewing.Extension.Fader/Viewing.Extension.Fader.js#L10-L21.
+unfortunately, it just defines a constant colour.
+how are the uv coordinates passed in?
+what other parameters exist?
+
+Traian Stanev [3:48 PM] 
+@tammikj Are you interested in vertex attributes or adding more uniforms?
+
+Jeremy Tammik [3:50 PM] 
+both, vertex + fragment, existing + adding more. thx!
+
+Traian Stanev [4:00 PM] 
+Should be possible to set a breakpoint after the shader is generated to see what's already there. Or, you can look in `src/wgs.js/render/WebGLProgram.js` to see what uniforms it adds generally to all shaders (search for "identifiers"). As far as vertex attributes, that will vary per geometry, each geometry has an attributes property that you can look to see what vertex channels it has.
+
+Jeremy Tammik [4:18 PM] 
+where to set that breakpoint? we cannot find it in the viewer code.
+
+[4:18]  
+what file could it be?
+
+[4:20]  
+looking now at wgs.js...
+
+Traian Stanev [4:23 PM] 
+You can set it in your own code, e.g. here: https://github.com/jeremytammik/forgefader/blob/master/src/client/viewer.components/Viewing.Extension.Fader/Viewing.Extension.Fader.js#L183  and when it gets hit, look inside the shader material that you created, it should have the full shader text in it. (edited)
+
+Jeremy Tammik [4:27 PM] 
+ok. apparently, also in wgs.js at the lines `var vertexShader = resolve(material.__webglShader.vertexShader)` and `var fragmentShader = resolve(material.__webglShader.fragmentShader)`
+
+Jeremy Tammik [4:44 PM] 
+setting the breakpoint you suggest, i only see the shaders i created myself on the material i created myself. how to see from there what the default shaders provide?
+
+Traian Stanev [4:48 PM] 
+As mentioned: https://git.autodesk.com/A360/firefly.js/blob/develop/src/wgs.js/render/WebGLProgram.js#L225  That function adds a quite long preamble of stuff to every shader.
+
+Ben Humberston [4:50 PM] 
+If it helps, you also might add a `debugger` line here to see shader code right as it's being sent to the GPU: https://git.autodesk.com/A360/firefly.js/blob/develop/src/wgs.js/render/WebGLShader.js#L15
+
+
+
+Grab the viewer source file from the Autodesk server, save to a local file and explore in depth:
+
+- [viewer3D.js](https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.js?v=v2.13)
+- [wgs.js](https://developer.api.autodesk.com/viewingservice/v1/viewers/wgs.js)
+
+You can try it out live
+at [forge-rcdb.autodesk.io/configurator](https://forge-rcdb.autodesk.io/configurator)
+&gt; [Fader](https://forge-rcdb.autodesk.io/configurator?id=58dd255f57ecef9ad46149f6)
 
 
 <pre class="prettyprint">
