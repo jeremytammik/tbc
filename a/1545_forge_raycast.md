@@ -10,8 +10,12 @@
 
 Three.js Raytracing in the Forge Viewer #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge 
 
-&ndash; 
-...
+Yesterday, I showed how you can add custom geometry to the Forge viewer for debugging or other purposes and to control graphically what is going on.
+Today, I address the ray tracing required to determine the number of walls between the user selected signal source point and the other target points spread out across the picked floor slab.
+Please note the important information in the final section: the viewer implements built-in raycast functionality that probably obviates the need for this:
+&ndash; Connecting Visual Studio Code to the Chrome debugger
+&ndash; Creating a three.js mesh from Forge viewer fragments
+&ndash; Use built-in viewer raycast instead...
 
 -->
 
@@ -31,9 +35,11 @@ for debugging or other purposes and to control graphically what is going on.
 
 Today, I address the ray tracing required to determine the number of walls between the user selected signal source point and the other target points spread out across the picked floor slab.
 
+Please note the important information in the final section: the viewer implements built-in raycast functionality that probably obviates the need for this:
+
 - [Connecting Visual Studio Code to the Chrome debugger](#2)
-- [Creating a fully functional three.js mesh from Forge viewer fragments](#3)
-- [Use high-level built-in viewer functionality instead of your own fragile stuff](#4)
+- [Creating a three.js mesh from Forge viewer fragments](#3)
+- [Use built-in viewer raycast instead](#4)
 
 
 
@@ -80,7 +86,7 @@ Here is a screen snapshot of the client debugging console:
 <img src="img/forgefader_vs_code_debug.png" alt="Running ForgeFader in Visual Studio Code hooked up to Chrome debugging" width="500"/>
 </center>
 
-As of yet, I still do most of my debugging in Chrome itself, though.
+I currently still do most of my debugging in Chrome itself, though.
 
 Old habits die hard, and even young habits can be obstinate.
 
@@ -88,14 +94,14 @@ No, there are more compelling reasons.
 
 The Chrome debugger displays more detailed data when exploring internals of local variables.
 
-Furthermore, VS Code does not understand the connection between the source modules and the webpack-generated js output, just displaying helpful messages saying 'Breakpoint ignored because generated code not found'.
+Furthermore, VS Code does not understand the connection between the source modules and the webpack-generated js output, just displaying helpful messages saying, 'Breakpoint ignored because generated code not found'.
 
 
-#### <a name="3"></a>Creating a Fully Functional Three.js Mesh from Forge Viewer Fragments
+#### <a name="3"></a>Creating a Three.js Mesh from Forge Viewer Fragments
 
 I tried to call the three.js `Raycaster.intersectObjects` on the Forge viewer fragments representing the Revit BIM walls with little success.
 
-After struggling significantly with that, I determined that the easiest solution to achieve that was to analyse the Forge viewer fragments and generate new three.js mesh objects from them.
+After struggling significantly with it, I determined that the easiest solution to achieve that was to analyse the Forge viewer fragments and generate new three.js mesh objects from them.
 
 That is achieved by the following `getMeshFromRenderProxy` function for my specific use case covering Revit BIM floors and walls:
 
@@ -249,10 +255,18 @@ getWallCountBetween( psource, ptarget, max_dist )
 }
 </pre>
 
+<center>
+<img src="img/forgefader_raycast.png" alt="ForgeFader raycast result in Chrome debugging console" width="500"/>
+</center>
+
 With that in hand, I am now ready to feed this information into a custom fragment shader to display the signal attenuation as a colour gradient across the top face of the floor.
 
+The code above is included in
+the [ForgeFader](https://github.com/jeremytammik/forgefader) project
+in [release 0.0.16](https://github.com/jeremytammik/forgefader/releases/tag/0.0.16) and later.
 
-#### <a name="4"></a>Use High-level Built-in Viewer Functionality Instead of your own Fragile Stuff
+
+#### <a name="4"></a>Use Built-in Viewer Raycast Instead
 
 I raised a question with the Forge viewer development team before embarking on the research to implement the above.
 
@@ -260,17 +274,21 @@ Unfortunately, due to time differences, they replied only after I had completed 
 
 Here is the result:
 
-[Q@2:19 PM] how can i invoke `Raycaster.intersectObjects` with viewer fragments?
+[Q@14:19 PM] How can I invoke `Raycaster.intersectObjects` with viewer fragments?
 
-[Q@9:35 PM] i solved my `Raycaster.intersectObjects` challenge by [generating my own threejs mesh from the lmv original](https://github.com/jeremytammik/forgefader/compare/0.0.13...0.0.15)
+[Q@21:35 PM] I solved my `Raycaster.intersectObjects` challenge by [generating my own threejs mesh from the lmv original](https://github.com/jeremytammik/forgefader/compare/0.0.13...0.0.15)
 
-[A@9:39 PM] Ok well, for the record, you can intersect the whole scene using `viewer.impl.rayIntersect`, or you can do it per model via `model.rayIntersect`, or per mesh via `VBIntersector.rayCast`. The first two approaches take advantage of the spatial index acceleration structure.
+[A@21:39 PM] Ok well, for the record, you can intersect the whole scene using `viewer.impl.rayIntersect`, or you can do it per model via `model.rayIntersect`, or per mesh via `VBIntersector.rayCast`. The first two approaches take advantage of the spatial index acceleration structure.
 
-[Q@9:42 PM] thank you for the info! i assume these approaches would offer multiple advantages: (i) more efficient (ii) easier to set up and use (iii) more fool- and future-proof. do you agree?
+[Q@21:42 PM] Thank you for the info! I assume these approaches would offer multiple advantages: (i) more efficient (ii) easier to set up and use (iii) more fool- and future-proof. Do you agree?
 
-[A@9:43 PM] Probably better to use the high level hit testing APIs instead of messing with internal mesh representation directly... i.e. avoid doing fragile stuff like `this.viewer.impl.getRenderProxy(this.viewer.model, fragId)`
+[A@21:43 PM] Probably better to use the high level hit testing APIs instead of messing with internal mesh representation directly... i.e. avoid doing fragile stuff like `this.viewer.impl.getRenderProxy(this.viewer.model, fragId)`
 
 In summary, please ignore the interesting solution I present above and use the built-in viewer functionality instead.
 
 As a next step, I should rewrite my implementation to do so as well.
+
+First, however, I want to get a first revision of this project up and running at all.
+
+That means addressing the shader next, i.e., to calculate and display the signal attenuation gradient colouring.
 
