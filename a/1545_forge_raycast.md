@@ -7,8 +7,7 @@
 
 <!---
 
-
-Three.js Raytracing in the Forge Viewer #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge 
+Three.js Raytracing in the Forge Viewer http://bit.ly/forgeraytrace #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #threejs #javascript
 
 Yesterday, I showed how you can add custom geometry to the Forge viewer for debugging or other purposes and to control graphically what is going on.
 Today, I address the ray tracing required to determine the number of walls between the user selected signal source point and the other target points spread out across the picked floor slab.
@@ -276,13 +275,13 @@ Here is the result:
 
 [Q@14:19 PM] How can I invoke `Raycaster.intersectObjects` with viewer fragments?
 
-[Q@21:35 PM] I solved my `Raycaster.intersectObjects` challenge by [generating my own threejs mesh from the lmv original](https://github.com/jeremytammik/forgefader/compare/0.0.13...0.0.15)
+[Q@21:35 PM] I solved my `Raycaster.intersectObjects` challenge by [generating my own threejs mesh from the lmv original](https://github.com/jeremytammik/forgefader/compare/0.0.13...0.0.15).
 
 [A@21:39 PM] Ok well, for the record, you can intersect the whole scene using `viewer.impl.rayIntersect`, or you can do it per model via `model.rayIntersect`, or per mesh via `VBIntersector.rayCast`. The first two approaches take advantage of the spatial index acceleration structure.
 
 [Q@21:42 PM] Thank you for the info! I assume these approaches would offer multiple advantages: (i) more efficient (ii) easier to set up and use (iii) more fool- and future-proof. Do you agree?
 
-[A@21:43 PM] Probably better to use the high level hit testing APIs instead of messing with internal mesh representation directly... i.e. avoid doing fragile stuff like `this.viewer.impl.getRenderProxy(this.viewer.model, fragId)`
+[A@21:43 PM] Probably better to use the high level hit testing APIs instead of messing with internal mesh representation directly... i.e. avoid doing fragile stuff like `this.viewer.impl.getRenderProxy(this.viewer.model, fragId)`.
 
 In summary, please ignore the interesting solution I present above and use the built-in viewer functionality instead.
 
