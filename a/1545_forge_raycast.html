@@ -238,11 +238,11 @@ in <a href="https://github.com/jeremytammik/forgefader/releases/tag/0.0.16">rele
 <p>I raised a question with the Forge viewer development team before embarking on the research to implement the above.</p>
 <p>Unfortunately, due to time differences, they replied only after I had completed it.</p>
 <p>Here is the result:</p>
-<p>[Q@14:19 PM] How can I invoke <code>Raycaster.intersectObjects</code> with viewer fragments?</p>
-<p>[Q@21:35 PM] I solved my <code>Raycaster.intersectObjects</code> challenge by <a href="https://github.com/jeremytammik/forgefader/compare/0.0.13...0.0.15">generating my own threejs mesh from the lmv original</a>.</p>
-<p>[A@21:39 PM] Ok well, for the record, you can intersect the whole scene using <code>viewer.impl.rayIntersect</code>, or you can do it per model via <code>model.rayIntersect</code>, or per mesh via <code>VBIntersector.rayCast</code>. The first two approaches take advantage of the spatial index acceleration structure.</p>
-<p>[Q@21:42 PM] Thank you for the info! I assume these approaches would offer multiple advantages: (i) more efficient (ii) easier to set up and use (iii) more fool- and future-proof. Do you agree?</p>
-<p>[A@21:43 PM] Probably better to use the high level hit testing APIs instead of messing with internal mesh representation directly... i.e. avoid doing fragile stuff like <code>this.viewer.impl.getRenderProxy(this.viewer.model, fragId)</code>.</p>
+<p>[Q@14:19] How can I invoke <code>Raycaster.intersectObjects</code> with viewer fragments?</p>
+<p>[Q@21:35] I solved my <code>Raycaster.intersectObjects</code> challenge by <a href="https://github.com/jeremytammik/forgefader/compare/0.0.13...0.0.15">generating my own threejs mesh from the lmv original</a>.</p>
+<p>[A@21:39] Ok well, for the record, you can intersect the whole scene using <code>viewer.impl.rayIntersect</code>, or you can do it per model via <code>model.rayIntersect</code>, or per mesh via <code>VBIntersector.rayCast</code>. The first two approaches take advantage of the spatial index acceleration structure.</p>
+<p>[Q@21:42] Thank you for the info! I assume these approaches would offer multiple advantages: (i) more efficient (ii) easier to set up and use (iii) more fool- and future-proof. Do you agree?</p>
+<p>[A@21:43] Probably better to use the high level hit testing APIs instead of messing with internal mesh representation directly... i.e. avoid doing fragile stuff like <code>this.viewer.impl.getRenderProxy(this.viewer.model, fragId)</code>.</p>
 <p>In summary, please ignore the interesting solution I present above and use the built-in viewer functionality instead.</p>
 <p>As a next step, I should rewrite my implementation to do so as well.</p>
 <p>First, however, I want to get a first revision of this project up and running at all.</p>
