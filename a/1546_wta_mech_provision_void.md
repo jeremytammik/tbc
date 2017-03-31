@@ -24,6 +24,11 @@ the [Forge accelerator](http://thebuildingcoder.typepad.com/blog/2017/03/events-
 and I am still working on 
 the [ForgeFader](https://github.com/jeremytammik/forgefader) project.
 
+The topics today are mainly related to Revit, though:
+
+- [Google prettifier on GitHub](#2)
+- [WTA mechanical family placement add-in](#3)
+- [TTT to Create Provision For Voids](#4)
 
 #### <a name="2"></a>Google Prettifier on GitHub
 
@@ -36,7 +41,7 @@ The script can now be loaded like this:
 </pre>
 
 
-#### <a name="3"></a>Allan's Mechanical Family Placement Add-in
+#### <a name="3"></a>WTA Mechanical Family Placement Add-in
 
 Allan
 [@aksaks](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/540057)
