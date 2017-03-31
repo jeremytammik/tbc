@@ -7,8 +7,8 @@
 
 <!---
 
-- new ttt
-  https://forums.autodesk.com/t5/revit-api-forum/how-can-i-get-the-coordinates-of-the-endpoints-for-a-section/m-p/6928342
+- 12826620 [An automation experiment, family placement, its tag and then a remote tag]
+  https://forums.autodesk.com/t5/revit-api-forum/an-automation-experiment-family-placement-its-tag-and-then-a/m-p/6976559
 
  #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge 
 
@@ -36,6 +36,7 @@ The topics today are mainly related to Revit, though:
 - [Provision for void](#4)
 - [What is a provision for void?](#5)
 - [Creating a provision for void](#6)
+- [Provision for void user interface](#7)
 
 #### <a name="2"></a>Google Prettifier on GitHub
 
@@ -66,7 +67,17 @@ Seidel made a number of contributions here in the past, including:
     - 3d Aimer that "aims" a special Revit family instance at a target
 - [WTA Elec &ndash; another family plunk and concept share](http://thebuildingcoder.typepad.com/blog/2017/03/wta-firep-and-3d-aimer-tools.html#5)
 
-His newest sample provides a similar ribbon panel and tool collection for family instance placement and management for tasks primarily oriented towards the mechanical domain:
+[Revit, Add-in, complex family placement using the plunk class](https://www.youtube.com/watch?v=_x7yyx4Yk_I)
+
+<iframe width="480" height="270" src="https://www.youtube.com/embed/_x7yyx4Yk_I?rel=0" frameborder="0" allowfullscreen></iframe>
+
+This sequence shows a complex placement of three family instances as handled by a "plunk" class intended to provide a universal placement handling.
+
+His newest sample is presented in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread 
+on [an automation experiment, family placement, its tag and then a remote tag](https://forums.autodesk.com/t5/revit-api-forum/an-automation-experiment-family-placement-its-tag-and-then-a/m-p/6976559).
+
+It provides a similar ribbon panel and tool collection for family instance placement and management for tasks primarily oriented towards the mechanical domain:
 
 > Apologizing for beginning to wear out a welcome, here is a video and code share for yet another custom ribbon specific task command involving family placement and tags. The ribbon panel split button control being used is a variant of what is mentioned
 in [stacked ribbon button panel options](http://thebuildingcoder.typepad.com/blog/2016/09/stacked-ribbon-button-panel-options.html).
@@ -83,11 +94,11 @@ The remote tag here is simply a tag on item where the tag itself is placed in pr
 <iframe width="480" height="270" src="https://www.youtube.com/embed/_x7yyx4Yk_I?rel=0" frameborder="0" allowfullscreen></iframe>
 </center>
 
+Here is Allan's more detailed description from the GitHub repo:
+
 <center>
 <img src="img/akseidel_MechRibbonTab.png" alt="WTA_MECH mechanical ribbon tab" width="500"/>
 </center>
-
-Here is Allan's more detailed description from the GitHub repo:
 
 Revit Add-in in C# &mdash; Creates a custom ribbon tab with discipline related tools. The tools at this writing are for placing specific Revit family types with some families requiring parameter settings made on the fly.
 
@@ -286,3 +297,29 @@ Hopefully what we have here can be of use to someone out there ;-)
 
 Many thanks to Håvard for this advanced and well-tested yet simple solution to a very challenging task!
 
+#### <a name="7"></a>Provision for Void User Interface
+
+An additional comment on the user interface...
+
+I implemented a modeless environment with an exit button to interact with this functionality.
+ 
+The UI looks like this:
+
+<center>
+<img src="img/hd_provision_for_void_ui.jpg" alt="Provision for void user interface" width="600"/>
+</center>
+
+The ProvisionForVoid code above is launched from this UI when the user selects "Doors" or "Wall" and presses "Create".
+
+And we are using this type of UI in several ways now; this is another example that writes Fire or Acoustic codes to elements:
+
+<center>
+<img src="img/hd_fire_or_acoustic_ui.jpg" alt="Fire or Acoustic code user interface" width="600"/>
+</center>
+
+Both of them could have been done "the usual way" with a Windows Form.
+
+This is just so much better, "modeless" but still inside a valid API context.
+
+No need for `OnIdling` or external events here, a few others, but not those.
+ 

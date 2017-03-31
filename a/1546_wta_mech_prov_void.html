@@ -6,8 +6,8 @@
 </head></p>
 <!---
 
-- new ttt
-  https://forums.autodesk.com/t5/revit-api-forum/how-can-i-get-the-coordinates-of-the-endpoints-for-a-section/m-p/6928342
+- 12826620 [An automation experiment, family placement, its tag and then a remote tag]
+  https://forums.autodesk.com/t5/revit-api-forum/an-automation-experiment-family-placement-its-tag-and-then-a/m-p/6976559
 
  #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge 
 
@@ -33,6 +33,7 @@ the <a href="https://github.com/jeremytammik/forgefader">ForgeFader</a> project.
 <li><a href="#4">Provision for void</a></li>
 <li><a href="#5">What is a provision for void?</a></li>
 <li><a href="#6">Creating a provision for void</a></li>
+<li><a href="#7">Provision for void user interface</a></li>
 </ul>
 <h4><a name="2"></a>Google Prettifier on GitHub</h4>
 <p>I happened to notice yesterday that the
@@ -59,7 +60,14 @@ Seidel made a number of contributions here in the past, including:</p>
 </li>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/03/wta-firep-and-3d-aimer-tools.html#5">WTA Elec &ndash; another family plunk and concept share</a></li>
 </ul>
-<p>His newest sample provides a similar ribbon panel and tool collection for family instance placement and management for tasks primarily oriented towards the mechanical domain:</p>
+<p><a href="https://www.youtube.com/watch?v=_x7yyx4Yk_I">Revit, Add-in, complex family placement using the plunk class</a></p>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/_x7yyx4Yk_I?rel=0" frameborder="0" allowfullscreen></iframe>
+
+<p>This sequence shows a complex placement of three family instances as handled by a "plunk" class intended to provide a universal placement handling.</p>
+<p>His newest sample is presented in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread 
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/an-automation-experiment-family-placement-its-tag-and-then-a/m-p/6976559">an automation experiment, family placement, its tag and then a remote tag</a>.</p>
+<p>It provides a similar ribbon panel and tool collection for family instance placement and management for tasks primarily oriented towards the mechanical domain:</p>
 <blockquote>
 <p>Apologizing for beginning to wear out a welcome, here is a video and code share for yet another custom ribbon specific task command involving family placement and tags. The ribbon panel split button control being used is a variant of what is mentioned
 in <a href="http://thebuildingcoder.typepad.com/blog/2016/09/stacked-ribbon-button-panel-options.html">stacked ribbon button panel options</a>.</p>
@@ -74,10 +82,10 @@ The remote tag here is simply a tag on item where the tag itself is placed in pr
 <p><center>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/_x7yyx4Yk_I?rel=0" frameborder="0" allowfullscreen></iframe>
 </center></p>
+<p>Here is Allan's more detailed description from the GitHub repo:</p>
 <p><center>
 <img src="img/akseidel_MechRibbonTab.png" alt="WTA_MECH mechanical ribbon tab" width="500"/>
 </center></p>
-<p>Here is Allan's more detailed description from the GitHub repo:</p>
 <p>Revit Add-in in C# &mdash; Creates a custom ribbon tab with discipline related tools. The tools at this writing are for placing specific Revit family types with some families requiring parameter settings made on the fly.</p>
 <p>This repository is provided for sharing and learning purposes. Perhaps someone might provide improvements or education. Perhaps it will help to boost someone further up the steep learning curve needed to create Revit task add-ins. Hopefully it does not show too much of the wrong way.  </p>
 <p>The tools in this ribbon use classes that provide Revit family instance placement functionality with less overhead the standard Revit user interface.
@@ -250,3 +258,18 @@ Their visible geometry is hard to analyse with a consistent result.
 I needed a consistent way of getting that opening request correct in every case.</p>
 <p>Hopefully what we have here can be of use to someone out there ;-)</p>
 <p>Many thanks to Håvard for this advanced and well-tested yet simple solution to a very challenging task!</p>
+<h4><a name="7"></a>Provision for Void User Interface</h4>
+<p>An additional comment on the user interface...</p>
+<p>I implemented a modeless environment with an exit button to interact with this functionality.</p>
+<p>The UI looks like this:</p>
+<p><center>
+<img src="img/hd_provision_for_void_ui.jpg" alt="Provision for void user interface" width="600"/>
+</center></p>
+<p>The ProvisionForVoid code above is launched from this UI when the user selects "Doors" or "Wall" and presses "Create".</p>
+<p>And we are using this type of UI in several ways now; this is another example that writes Fire or Acoustic codes to elements:</p>
+<p><center>
+<img src="img/hd_fire_or_acoustic_ui.jpg" alt="Fire or Acoustic code user interface" width="600"/>
+</center></p>
+<p>Both of them could have been done "the usual way" with a Windows Form.</p>
+<p>This is just so much better, "modeless" but still inside a valid API context.</p>
+<p>No need for <code>OnIdling</code> or external events here, a few others, but not those.</p>
