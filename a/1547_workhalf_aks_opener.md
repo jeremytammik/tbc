@@ -78,6 +78,12 @@ on [giving back &ndash; a workshared file to be local file opener](https://forum
 > - [Video](https://www.youtube.com/watch?v=oquPOrq7ORA) 
 > - [Repository](https://github.com/akseidel/RevitAKSOpen)
 
+This is a beautiful and advanced sample that provides many important programming pointers.
+
+I love the `RevitFileSniffer` to read `BasicFileInfo` directly from binary RVT.
+
+Thank you very much for sharing this!
+
 Here are Allan's video and repository notes:
 
 #### <a name="4"></a>AKS Opener Video
