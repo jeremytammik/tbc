@@ -10,7 +10,8 @@
 - 12837247 [Giving back - A workshared file to be local file opener]
   https://forums.autodesk.com/t5/revit-api-forum/giving-back-a-workshared-file-to-be-local-file-opener/m-p/6990230
 
- #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge 
+Modeless WPF RVT file sniffer and opener http://bit.ly/aksopenforgefader #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+RvtFader and ForgeFader compare #RevitAPI w/ @AutodeskForge http://bit.ly/aksopenforgefader @AutodeskRevit #aec #bim #dynamobim 
 
 I completed a first revision of the ForgeFader project, bringing it up to par with RvtFader.
 It is pretty cool seeing the same functionality implemented in two such different ways, on completely different platforms, using different tools.
@@ -82,8 +83,6 @@ This is a beautiful and advanced sample that provides many important programming
 
 I love the `RevitFileSniffer` to read `BasicFileInfo` directly from binary RVT.
 
-Thank you very much for sharing this!
-
 Here are Allan's video and repository notes:
 
 #### <a name="4"></a>AKS Opener Video
@@ -145,6 +144,7 @@ This repository is provided for sharing and learning purposes. Perhaps someone m
 
 Much of the code is by others. Its mangling and ignorant misuse is my ongoing doing. Much thanks to the professionals like Jeremy Tammik who provided the means directly or by mention one way or another for probably all the code needed.
 
+Many thanks to Allan for putting together and sharing this!
 
 #### <a name="8"></a>RvtFader
 
