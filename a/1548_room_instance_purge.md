@@ -17,7 +17,8 @@ https://github.com/jeremytammik/RoomEditorApp/blob/master/RoomEditorApp/CmdUploa
 - https://lookupbuilds.com/
   https://forums.autodesk.com/t5/revit-api-forum/ci-for-revit-lookup/m-p/6976335
 
-ForgeFader UI, Lookup Builds, Purge &amp; Room Instances #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+Automated RevitLookup builds using @jenkinsci http://bit.ly/2nNvKch #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge
+@BoostYourBIM purges types, families and materials using #RevitAPI bit.ly/2nNvKch @AutodeskRevit #bim #dynamobim @AutodeskForge
 
 Blogging despite having already exceeded my work quota for the week, but there is so much to share 
 &ndash; ForgeFader user interface
