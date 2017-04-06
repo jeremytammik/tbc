@@ -82,6 +82,8 @@ on [giving back &ndash; a workshared file to be local file opener](https://forum
 This is a beautiful and advanced sample that provides many important programming pointers.
 
 I love the `RevitFileSniffer` to read `BasicFileInfo` directly from binary RVT.
+I love all the aspects of it!
+Modeless WPF, the works!
 
 Here are Allan's video and repository notes:
 
