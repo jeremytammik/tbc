@@ -12,22 +12,19 @@
   https://github.com/jeremytammik/the_building_coder_samples
   /a/doc/revit/tbc/git/a/zip/tbc_samples_2018_migr_01.txt
 
-- revit_2018
-  12730663 [Create dimension for detail items in drafting view]
-  "I want to dimension the detail item in drafting view. But the geometry of the family instance only can be retrieved by GetOriginalGeometry method, and there is any reference can be got. How can I add the dimension to detail items by API?
-  For Revit 2018, we have new capabilities to get the standard references for family instances.  I haven’t tested specifically with detail items, but I believe this should work for them as well:
-  Section Title "API access to FamilyInstance references"
-  Prior to 2018 I don’t believe there is a technique to get at the available references.
-  11909355 [Parametric family instance placement] wishlist item CF-1271 [API wish: need a way to relate view specific geometry in project with particular ref plane in family] Scott Conover closed CF-1271 as Fixed
-
 RevitLookup 2018 and Forge DevCon CFP #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge #ForgeDevCon
 
 SEO Keyword Phrase and Relevant Hashtags: DevCon, ForgeDevCon, API, Developers, BIM, IoT, VR, AR, 3D, webGL, CloudComputing, Cloud, App, MobileDev
 
-
-
-&ndash; 
-...
+Revit 2018 has been released.
+The Revit 2018 SDK is available from
+the Revit Developer Centre.
+I migrated RevitLookup and The Building Coder samples.
+Finally, the call for proposals has opened for the Forge DevCon at Autodesk University in Las Vegas
+Revit 2018 Software Developers Kit
+RevitLookup 2018
+The Building Coder samples 2018
+Forge DevCon call for proposals...
 
 -->
 
@@ -89,7 +86,7 @@ Another main source of more in-depth official information is provided by
 the [developer guide](http://help.autodesk.com/view/RVT/2018/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42) in
 the [online help](http://help.autodesk.com/view/RVT/2018/ENU/).
 
-Obviously, while migrating your existing samples, the first place to consult in case of problems is the list of `Revit Platform API Changes and Additions.docx`.
+Obviously, while migrating your existing samples, the first place to consult in case of problems is the list of *Revit Platform API Changes and Additions.docx*.
 
 It is also included as a separate section in the help file.
 
@@ -145,6 +142,8 @@ These fixes have been applied in [release 2018.0.132.1](https://github.com/jerem
 
 Three warnings remain to be sorted out, listed
 in [my migration notes](zip/tbc_samples_2018_migr_01.txt).
+
+The asset related ones are explained in the section on *Asset API Changes* in the *changes and additions* document mentioned above.
 
 Good luck with your own add-in migrations!
 
