@@ -1,0 +1,150 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!-- <script src="run_prettify.js" type="text/javascript"></script> --> 
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- Revit 2018
+  https://github.com/jeremytammik/RevitLookup
+  https://github.com/jeremytammik/the_building_coder_samples
+  /a/doc/revit/tbc/git/a/zip/tbc_samples_2018_migr_01.txt
+
+- revit_2018
+  12730663 [Create dimension for detail items in drafting view]
+  "I want to dimension the detail item in drafting view. But the geometry of the family instance only can be retrieved by GetOriginalGeometry method, and there is any reference can be got. How can I add the dimension to detail items by API?
+  For Revit 2018, we have new capabilities to get the standard references for family instances.  I haven’t tested specifically with detail items, but I believe this should work for them as well:
+  Section Title "API access to FamilyInstance references"
+  Prior to 2018 I don’t believe there is a technique to get at the available references.
+  11909355 [Parametric family instance placement] wishlist item CF-1271 [API wish: need a way to relate view specific geometry in project with particular ref plane in family] Scott Conover closed CF-1271 as Fixed
+
+RevitLookup 2018 and Forge DevCon CFP #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge #ForgeDevCon
+
+SEO Keyword Phrase and Relevant Hashtags: DevCon, ForgeDevCon, API, Developers, BIM, IoT, VR, AR, 3D, webGL, CloudComputing, Cloud, App, MobileDev
+
+
+
+&ndash; 
+...
+
+-->
+
+<h3>RevitLookup 2018 and Forge DevCon CFP</h3>
+<p>Revit 2018 has been released.</p>
+<p>The Revit 2018 SDK (Software Developers Kit) is available from
+the <a href="http://www.autodesk.com/developrevit">Revit Developer Centre</a>.</p>
+<p>I migrated <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a>
+and <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>.</p>
+<p>Finally, the call for proposals has opened for the Forge DevCon at Autodesk University in Las Vegas:</p>
+<ul>
+<li><a href="#2">Revit 2018 Software Developers Kit</a></li>
+<li><a href="#3">RevitLookup 2018</a></li>
+<li><a href="#4">The Building Coder samples 2018</a></li>
+<li><a href="#5">Forge DevCon call for proposals</a></li>
+</ul>
+<h4><a name="2"></a>Revit 2018 Software Developers Kit</h4>
+<p>Revit 2018 has been released and the Revit 2018 SDK is available from
+the <a href="http://www.autodesk.com/developrevit">Revit Developer Centre</a>.</p>
+<p>First of all, you might want to check out
+the <a href="http://www.autodesk.com/products/revit-family/features">overview of new product features</a> and
+check how they correlate with the API functionality enhancements discussed in
+the <a href="http://thebuildingcoder.typepad.com/blog/2017/03/revitlookup-enhancements-future-revit-and-other-api-news.html">DevDays Online API news</a>.</p>
+<p>The Revit SDK contains documentation and samples, which I unpacked in my local folder <code>C:\a\lib\revit\2018\SDK</code>:</p>
+<ul>
+<li>Subdirectories:<ul>
+<li>Add-In Manager</li>
+<li>Macro Samples</li>
+<li>Revit Server SDK</li>
+<li>Revit Structure</li>
+<li>REX SDK</li>
+<li>Samples</li>
+<li>Structural Analysis SDK</li>
+</ul>
+</li>
+<li>Documents:<ul>
+<li>Autodesk Icon Guidelines.pdf</li>
+<li>Getting Started with the Revit API.docx</li>
+<li>Read Me First.doc</li>
+<li>Revit Platform API Changes and Additions.docx</li>
+<li>RevitAddInUtility.chm</li>
+<li>RevitAPI.chm</li>
+<li>RevitAPISDK_Eula.rtf</li>
+</ul>
+</li>
+</ul>
+<p>The most important things to install and always keep at hand are:</p>
+<ul>
+<li>The Revit API help file <code>RevitAPI.chm</code></li>
+<li>The Visual Studio solution containing all the SDK samples, <code>Samples\SDKSamples.sln</code></li>
+</ul>
+<p>You will need these constantly for research on how to solve specific Revit API programming tasks.</p>
+<p>Another main source of more in-depth official information is provided by 
+the <a href="http://help.autodesk.com/view/RVT/2018/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42">developer guide</a> in
+the <a href="http://help.autodesk.com/view/RVT/2018/ENU/">online help</a>.</p>
+<p>Obviously, while migrating your existing samples, the first place to consult in case of problems is the list of <code>Revit Platform API Changes and Additions.docx</code>.</p>
+<p>It is also included as a separate section in the help file.</p>
+<h4><a name="3"></a>RevitLookup 2018</h4>
+<p>After installing Revit 2018, the first thing I did was to update and
+recompile <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a>.</p>
+<p>The flat migration with no significant changes produced
+the <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2018.0.0.0">release 2018.0.0.0</a>.</p>
+<p>That was rather easy!</p>
+<h4><a name="4"></a>The Building Coder Samples 2018</h4>
+<p>Next, I turned to something more complex,
+<a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>.</p>
+<p>The flat migration from Revit 2017 to Revit 2018 initially caused several compilation errors.</p>
+<p>I fixed those with the
+following <a href="https://github.com/jeremytammik/the_building_coder_samples/commits/master">GitHub commits</a>:</p>
+<ul>
+<li>updated Revit API references to Revit 2018</li>
+<li>replaced old <code>Autodesk.Revit.Utility</code> namespace by new <code>Autodesk.Revit.DB.Visual</code></li>
+<li>added <code>RevitAPIUIMacros.dll</code></li>
+<li><code>Ellipse.Create</code> renamed to <code>Ellipse.CreateCurve</code></li>
+<li><code>Ellipse.CreateCurve</code> returns a curve not an ellipse</li>
+<li><code>RevitLinkLoadResult</code> was renamed to <code>LinkLoadResult</code></li>
+</ul>
+<p>After that, compilation completed successfully with zero errors.</p>
+<p>Seven warnings about deprecated API usage remained:</p>
+<ul>
+<li>CmdAzimuth.cs(104,13,104,53): warning CS0618: <code>ProjectLocation.get_ProjectPosition(XYZ)</code> is obsolete: This property is deprecated in Revit 2018. Use <code>ProjectLocation.GetProjectPosition</code> instead.</li>
+<li>CmdUnrotateNorth.cs(48,33,48,61): warning CS0618: <code>ProjectLocation.SiteLocation</code> is obsolete: This property is deprecated in Revit 2018. Use <code>ProjectLocation.GetSiteLocation</code> instead.</li>
+<li>CmdUnrotateNorth.cs(79,33,79,61): warning CS0618: <code>ProjectLocation.SiteLocation</code> is obsolete: This property is deprecated in Revit 2018. Use <code>ProjectLocation.GetSiteLocation</code> instead.</li>
+<li>CmdUnrotateNorth.cs(163,17,163,57): warning CS0618: <code>ProjectLocation.get_ProjectPosition(XYZ)</code> is obsolete: This property is deprecated in Revit 2018. Use <code>ProjectLocation.GetProjectPosition</code> instead.</li>
+<li>CmdSetTagType.cs(226,30,228,48): warning CS0618: <code>Document.NewTag(View, Element, bool, TagMode, TagOrientation, XYZ)</code> is obsolete: This method is deprecated in Revit 2018 and will be removed in a future version. Use <code>IndependentTag.Create</code> instead.</li>
+<li>CmdGetMaterials.cs(248,48,248,62): warning CS0618: <code>AssetPropertyDoubleArray3d.Value</code> is obsolete: This property is deprecated in Revit 2018. Use <code>getValueAsDoubles</code> or <code>getValueAsXYZ</code> instead.</li>
+<li>CmdGetMaterials.cs(254,48,254,62): warning CS0618: <code>AssetPropertyDoubleArray4d.Value</code> is obsolete: This property is deprecated in Revit 2018. Use <code>getValueAsDoubles</code> instead.</li>
+</ul>
+<p>I captured this state in <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.132.0">The Building Coder sample release 2018.0.132.0</a>.</p>
+<p>Later, I fixed the trivial warnings:</p>
+<ul>
+<li><code>get_ProjectPosition</code> renamed to <code>GetProjectPosition</code></li>
+<li>replaced <code>ProjectLocation</code> <code>SiteLocation</code> property by <code>GetSiteLocation</code> method</li>
+</ul>
+<p>These fixes have been applied in <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.132.1">release 2018.0.132.1</a>.</p>
+<p>Three warnings remain to be sorted out, listed
+in <a href="zip/tbc_samples_2018_migr_01.txt">my migration notes</a>.</p>
+<p>Good luck with your own add-in migrations!</p>
+<p>Meanwhile, looking a bit further ahead:</p>
+<h4><a name="5"></a>Forge DevCon Call for Proposals</h4>
+<p>The <a href="https://forge.autodesk.com/DevCon">Forge DevCon</a>
+<a href="https://forge.autodesk.com/DevCon/call-for-proposals">call for proposals</a> is open.
+Applications are now being accepted to speak at the November event in Las Vegas.
+The deadline for submission is next month, May 17.</p>
+<p>Forge DevCon is taking place on November 13–14 in Las Vegas and will constitute the world’s largest gathering of design- and engineering-focused software developers.</p>
+<p>Would you like to share your experience working with the Forge platform, or how you creatively used Forge to enhance a project or solve a challenge?</p>
+<p>If so, the <a href="https://forge.autodesk.com/DevCon/call-for-proposals">DevCon call for speakers</a> is for you.
+It is open now and closes May 17.</p>
+<p>If you speak at Forge DevCon, you also get the benefit of attending <a href="http://au.autodesk.com">Autodesk University</a>,
+the premier Autodesk learning and networking event.</p>
+<p>AU takes place immediately after DevCon, November 14–16, in the same location.</p>
+<p>About <strong>DevCon</strong>: The <a href="https://forge.autodesk.com/DevCon">Forge Developer Conference</a> is
+the largest global gathering of design- and engineering-focused software developers, bringing together over 1,500 software developers, engineers, business owners and information officers as a community interested in creating web and mobile applications that use the Autodesk Forge or Fusion 360 APIs.</p>
+<p>About <strong>Autodesk University</strong>: <a href="http://au.autodesk.com/las-vegas">AU Las Vegas 2017</a> is your chance to connect with the best in the business, share technical knowledge, solve unique business challenges, and gain a deeper understanding of cross-industry opportunities. Plus, you can learn best practices, stay on top of the latest trends, and experience advanced technology first-hand. Join your global community of professional designers and engineers as we explore the Future of Making Things.</p>
+<p>About <strong>Forge</strong>: <a href="https://forge.autodesk.com">Autodesk Forge</a> is a
+connected <a href="https://developer.autodesk.com">developer cloud platform</a> that
+powers the future of making things. It comprises software components, technical resources, and an engaged community.</p>
+<p>I am looking forward to seeing you in Las Vegas this year!</p>
+<p><center>
+<img src="img/2017_forge_devcon_promo_image3_1024x512.png" alt="Forge DevCon" width="512"/>
+</center></p>

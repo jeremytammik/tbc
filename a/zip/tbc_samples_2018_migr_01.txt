@@ -1,0 +1,39 @@
+flat migration of The Building Coder samples from Revit 2017 to Revit 2018 initially caused several compilation errors.
+
+they were fixed by the following GitHub commits:
+
+- updated Revit API references to Revit 2018
+- replaced old Autodesk.Revit.Utility namespace by new Autodesk.Revit.DB.Visual
+- added RevitAPIUIMacros.dll
+- Ellipse.Create renamed to Ellipse.CreateCurve
+- Ellipse.CreateCurve returns a curve not an ellipse
+- RevitLinkLoadResult was renamed to LinkLoadResult
+
+zero errors and 7 warnings remain after those fixes in the first successful compilation for Revit 2018:
+
+------ Build started: Project: BuildingCoder, Configuration: Debug Any CPU ------
+C:\a\vs\the_building_coder_samples\BuildingCoder\BuildingCoder\CmdAzimuth.cs(104,13,104,53): warning CS0618: 'ProjectLocation.get_ProjectPosition(XYZ)' is obsolete: 'This property is deprecated in Revit 2018. Use ProjectLocation.GetProjectPosition() instead.'
+C:\a\vs\the_building_coder_samples\BuildingCoder\BuildingCoder\CmdUnrotateNorth.cs(48,33,48,61): warning CS0618: 'ProjectLocation.SiteLocation' is obsolete: 'This property is deprecated in Revit 2018. Use ProjectLocation.GetSiteLocation() instead.'
+C:\a\vs\the_building_coder_samples\BuildingCoder\BuildingCoder\CmdUnrotateNorth.cs(79,33,79,61): warning CS0618: 'ProjectLocation.SiteLocation' is obsolete: 'This property is deprecated in Revit 2018. Use ProjectLocation.GetSiteLocation() instead.'
+C:\a\vs\the_building_coder_samples\BuildingCoder\BuildingCoder\CmdUnrotateNorth.cs(163,17,163,57): warning CS0618: 'ProjectLocation.get_ProjectPosition(XYZ)' is obsolete: 'This property is deprecated in Revit 2018. Use ProjectLocation.GetProjectPosition() instead.'
+C:\a\vs\the_building_coder_samples\BuildingCoder\BuildingCoder\CmdSetTagType.cs(226,30,228,48): warning CS0618: 'Document.NewTag(View, Element, bool, TagMode, TagOrientation, XYZ)' is obsolete: 'This method is deprecated in Revit 2018 and will be removed in a future version. Use IndependentTag.Create() instead.'
+C:\a\vs\the_building_coder_samples\BuildingCoder\BuildingCoder\CmdGetMaterials.cs(248,48,248,62): warning CS0618: 'AssetPropertyDoubleArray3d.Value' is obsolete: 'This property is deprecated in Revit 2018. Use getValueAsDoubles() or getValueAsXYZ() instead.'
+C:\a\vs\the_building_coder_samples\BuildingCoder\BuildingCoder\CmdGetMaterials.cs(254,48,254,62): warning CS0618: 'AssetPropertyDoubleArray4d.Value' is obsolete: 'This property is deprecated in Revit 2018. Use getValueAsDoubles() instead.'
+  BuildingCoder -> C:\a\vs\the_building_coder_samples\BuildingCoder\BuildingCoder\bin\Debug\BuildingCoder.dll
+========== Build: 1 succeeded, 0 failed, 0 up-to-date, 0 skipped ==========
+
+captured in
+
+https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.132.0
+
+later fixed some of these warnings:
+
+- get_ProjectPosition renamed to GetProjectPosition
+- replaced ProjectLocation SiteLocation property by GetSiteLocation method
+ 
+captured in
+ 
+https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.132.1
+
+3 warnings remain in
+
