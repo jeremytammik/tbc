@@ -12,7 +12,9 @@
   https://github.com/jeremytammik/the_building_coder_samples
   /a/doc/revit/tbc/git/a/zip/tbc_samples_2018_migr_01.txt
 
-RevitLookup 2018 and Forge DevCon CFP #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge #ForgeDevCon
+RevitLookup 2018 and Forge DevCon CFP #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/2018_devcon
+
+https://twitter.com/jeremytammik/status/855709326094323712
 
 SEO Keyword Phrase and Relevant Hashtags: DevCon, ForgeDevCon, API, Developers, BIM, IoT, VR, AR, 3D, webGL, CloudComputing, Cloud, App, MobileDev
 
