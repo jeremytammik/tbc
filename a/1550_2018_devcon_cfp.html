@@ -11,22 +11,19 @@
   https://github.com/jeremytammik/the_building_coder_samples
   /a/doc/revit/tbc/git/a/zip/tbc_samples_2018_migr_01.txt
 
-- revit_2018
-  12730663 [Create dimension for detail items in drafting view]
-  "I want to dimension the detail item in drafting view. But the geometry of the family instance only can be retrieved by GetOriginalGeometry method, and there is any reference can be got. How can I add the dimension to detail items by API?
-  For Revit 2018, we have new capabilities to get the standard references for family instances.  I haven’t tested specifically with detail items, but I believe this should work for them as well:
-  Section Title "API access to FamilyInstance references"
-  Prior to 2018 I don’t believe there is a technique to get at the available references.
-  11909355 [Parametric family instance placement] wishlist item CF-1271 [API wish: need a way to relate view specific geometry in project with particular ref plane in family] Scott Conover closed CF-1271 as Fixed
-
 RevitLookup 2018 and Forge DevCon CFP #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge #ForgeDevCon
 
 SEO Keyword Phrase and Relevant Hashtags: DevCon, ForgeDevCon, API, Developers, BIM, IoT, VR, AR, 3D, webGL, CloudComputing, Cloud, App, MobileDev
 
-
-
-&ndash; 
-...
+Revit 2018 has been released.
+The Revit 2018 SDK is available from
+the Revit Developer Centre.
+I migrated RevitLookup and The Building Coder samples.
+Finally, the call for proposals has opened for the Forge DevCon at Autodesk University in Las Vegas
+&ndash; Revit 2018 Software Developers Kit
+&ndash; RevitLookup 2018
+&ndash; The Building Coder samples 2018
+&ndash; Forge DevCon call for proposals...
 
 -->
 
@@ -82,7 +79,7 @@ the <a href="http://thebuildingcoder.typepad.com/blog/2017/03/revitlookup-enhanc
 <p>Another main source of more in-depth official information is provided by 
 the <a href="http://help.autodesk.com/view/RVT/2018/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42">developer guide</a> in
 the <a href="http://help.autodesk.com/view/RVT/2018/ENU/">online help</a>.</p>
-<p>Obviously, while migrating your existing samples, the first place to consult in case of problems is the list of <code>Revit Platform API Changes and Additions.docx</code>.</p>
+<p>Obviously, while migrating your existing samples, the first place to consult in case of problems is the list of <em>Revit Platform API Changes and Additions.docx</em>.</p>
 <p>It is also included as a separate section in the help file.</p>
 <h4><a name="3"></a>RevitLookup 2018</h4>
 <p>After installing Revit 2018, the first thing I did was to update and
@@ -124,6 +121,7 @@ following <a href="https://github.com/jeremytammik/the_building_coder_samples/co
 <p>These fixes have been applied in <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.132.1">release 2018.0.132.1</a>.</p>
 <p>Three warnings remain to be sorted out, listed
 in <a href="zip/tbc_samples_2018_migr_01.txt">my migration notes</a>.</p>
+<p>The asset related ones are explained in the section on <em>Asset API Changes</em> in the <em>changes and additions</em> document mentioned above.</p>
 <p>Good luck with your own add-in migrations!</p>
 <p>Meanwhile, looking a bit further ahead:</p>
 <h4><a name="5"></a>Forge DevCon Call for Proposals</h4>

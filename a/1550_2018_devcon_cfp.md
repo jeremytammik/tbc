@@ -21,10 +21,10 @@ The Revit 2018 SDK is available from
 the Revit Developer Centre.
 I migrated RevitLookup and The Building Coder samples.
 Finally, the call for proposals has opened for the Forge DevCon at Autodesk University in Las Vegas
-Revit 2018 Software Developers Kit
-RevitLookup 2018
-The Building Coder samples 2018
-Forge DevCon call for proposals...
+&ndash; Revit 2018 Software Developers Kit
+&ndash; RevitLookup 2018
+&ndash; The Building Coder samples 2018
+&ndash; Forge DevCon call for proposals...
 
 -->
 
