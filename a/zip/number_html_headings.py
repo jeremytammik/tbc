@@ -5,7 +5,9 @@
 # Copyright (C) 2017-04-25 by Jeremy Tammik, Autodesk Inc. 
 #
 
-filename = '/a/doc/revit/tbc/git/a/zip/Revit_Platform_API_Changes_and_Additions_2018_03.htm'
+filename = 'Revit_Platform_API_Changes_and_Additions_2018_03.htm'
+
+filepath = '/a/doc/revit/tbc/git/a/zip/' + filename
 
 nlevels = 10 # max heading level to number
 

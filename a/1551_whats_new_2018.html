@@ -54,6 +54,9 @@ in the <a href="http://help.autodesk.com/view/RVT/2018/ENU">Revit 2018 Help</a>.
 <li><a href="http://thebuildingcoder.typepad.com/blog/2016/11/whats-new-in-the-revit-20171-api.html">What's New in the Revit 2017.1 API</a></li>
 </ul>
 <h3><a name="1"></a>Table of Contents</h3>
+<p>I implemented
+the <a href="#4">Python script <code>number_html_headings.py</code> described below</a> to
+generate the HTML heading numbering for this table of contents:</p>
 <ul>
 <li><a href="#2">API changes</a><ul>
 <li><a href="#2.1">API enabled in perspective views</a><ul>
@@ -1686,3 +1689,14 @@ in the <a href="http://help.autodesk.com/view/RVT/2018/ENU">Revit 2018 Help</a>.
 </ul>
 
 <p>returns true if all conditions of the fabrication service button are straight pieces. This indicates the button is suitable for use with multi-point routing, among other uses.</p>
+
+<h3><a name="4"></a>Python Automatic HTML Heading Numbering Script</h3>
+<p>The following Python script <a href="zip/number_html_headings.py">number_html_headings.py</a> automatically
+adds HTML hypertext reference <code>A</code> tags to an HTML file:</p>
+<pre class="prettyprint">
+</pre>
+
+<p>I used it to generate 
+the <a href="#1">table of contents</a> above.</p>
+<p>It handles up to ten heading levels <code>H1</code>..<code>H9</code> and assumes the heading tags are all at the beginning of a line.</p>
+<p>I would be happy if you can make use of this as well.</p>
