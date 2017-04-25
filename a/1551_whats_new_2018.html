@@ -6,12 +6,10 @@
 </head></p>
 <!---
 
-What's New in the Revit 2018 API #REVITAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge @adskdevnetwrk
+What's New in the Revit 2018 API #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge http://bit.ly/rvt2018apinews
+Python Automatic HTML Heading Numbering Script #RevitAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge @python_devv @html5doctor http://bit.ly/py_html_heading_numbering
 
 The Revit 2018 includes numerous exciting enhancements for add-in developers.
-The highlights were pointed out in the DevDays Online API news presentation and video recording.
-That information is based on the contents of the Revit Platform API Changes and Additions.docx document included with the Revit 2018 software developers kit or SDK available from the Revit Developer Centre.
-It is also provided in the section on What's New in the Revit 2018 API help file RevitAPI.chm included with the SDK.
 The What's New section always provides very important information, both for discovering and exploring the newly added API functionality and for later reference.
 If you encounter any issues migrating your existing add-ins between different versions, this is one of the first places to look...
 
@@ -1728,11 +1726,11 @@ if __name__ == '__main__':
     for line in lines:
       line = line.strip()
       a = ''
-      if line.startswith('<h'):
+      if line.startswith('&lt;h'):
         level = int(line[2])
         ih[level-1] = ih[level-1] + 1
         a = '.'.join( [str(ih[l]) for l in range(level)] )
-        a = '<a name="' + a + '"></a>'
+        a = '&lt;a name="' + a + '"&gt;&lt;/a&gt;'
       print a + line
 
 main()
