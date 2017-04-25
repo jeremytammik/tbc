@@ -4,7 +4,6 @@
 #
 # Copyright (C) 2017-04-25 by Jeremy Tammik, Autodesk Inc. 
 #
-import re
 
 filename = '/a/doc/revit/tbc/git/a/zip/Revit_Platform_API_Changes_and_Additions_2018_03.htm'
 
