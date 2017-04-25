@@ -1,16 +1,19 @@
 <p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="bc.css">
-<script src="run_prettify.js" type="text/javascript"></script>
-<!--
-<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
--->
+<!-- <script src="run_prettify.js" type="text/javascript"></script> --> 
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
 </head></p>
 <!---
 
 What's New in the Revit 2018 API #REVITAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge @adskdevnetwrk
 
-...
+The Revit 2018 includes numerous exciting enhancements for add-in developers.
+The highlights were pointed out in the DevDays Online API news presentation and video recording.
+That information is based on the contents of the Revit Platform API Changes and Additions.docx document included with the Revit 2018 software developers kit or SDK available from the Revit Developer Centre.
+It is also provided in the section on What's New in the Revit 2018 API help file RevitAPI.chm included with the SDK.
+The What's New section always provides very important information, both for discovering and exploring the newly added API functionality and for later reference.
+If you encounter any issues migrating your existing add-ins between different versions, this is one of the first places to look...
 
 -->
 
@@ -36,7 +39,7 @@ the <a href="http://www.autodesk.com/developrevit">Revit Developer Centre</a>.</
 <li>The Revit API help file <code>RevitAPI.chm</code></li>
 <li>The Visual Studio solution containing all the SDK samples, <code>Samples\SDKSamples.sln</code></li>
 </ul>
-<p>You will need these constantly for research on how to solve specific Revit API programming tasks.</p>
+<p>You will need both of these constantly for research on how to solve specific Revit API programming tasks.</p>
 <p>More in-depth official explanations and background information is provided by the
 online <a href="http://help.autodesk.com/view/RVT/2018/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42">Revit API Developers Guide</a> included 
 in the <a href="http://help.autodesk.com/view/RVT/2018/ENU">Revit 2018 Help</a>.</p>
@@ -1692,7 +1695,7 @@ generate the HTML heading numbering for this table of contents:</p>
 
 <h3><a name="4"></a>Python Automatic HTML Heading Numbering Script</h3>
 <p>The following Python script <a href="zip/number_html_headings.py">number_html_headings.py</a> automatically
-adds HTML hypertext reference <code>A</code> tags to an HTML file:</p>
+adds HTML hypertext reference <code>A</code> tags to an HTML file sequentially numbering up to ten levels of headings:</p>
 <pre class="prettyprint">
 #!/usr/bin/python
 #
@@ -1738,4 +1741,7 @@ main()
 <p>I used it to generate 
 the <a href="#1">table of contents</a> above.</p>
 <p>It handles up to ten heading levels <code>H1</code>..<code>H9</code> and assumes the heading tags are all at the beginning of a line.</p>
-<p>I would be happy if you can make use of this as well.</p>
+<p>I implemented it for and tested it on
+the <a href="zip/Revit_Platform_API_Changes_and_Additions_2018_03.htm">input file <code>Revit_Platform_API_Changes_and_Additions_2018_03.htm</code></a>, generating
+the <a href="zip/Revit_Platform_API_Changes_and_Additions_2018_04.htm">output file <code>Revit_Platform_API_Changes_and_Additions_2018_04.htm</code></a>.</p>
+<p>It will gladden me if you can make use of this as well.</p>
