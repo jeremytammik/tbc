@@ -1,15 +1,15 @@
 
-<a name="0"></a><h1>Major changes and renovations to the Revit API</h1></h1>
+<a name="1"></a><h1>Major changes and renovations to the Revit API</h1>
 
-<a name="0"></a><h1>API changes</h1></h1>
+<a name="2"></a><h1>API changes</h1>
 
-<a name="0.2"></a><h2>API enabled in perspective views</h2>
+<a name="2.1"></a><h2>API enabled in perspective views</h2>
 
-<a name="0.2.1"></a><h3>Element modifications and contextual commands</h3></h3>
+<a name="2.1.1"></a><h3>Element modifications and contextual commands</h3>
 
 <p>Modification of many different object types is now allowed in perspective views. Most commands allowed in 3D orthographic views are now also allowed in perspective views. This includes contextual commands. Annotations are an exception and cannot be created in perspective views. </p>
 
-<a name="0.2.1"></a><h3>External commands and applications</h3></h3>
+<a name="2.1.2"></a><h3>External commands and applications</h3>
 <p>External API commands and applications are now enabled by default in perspective views. The following behavior applies:</p>
 <ul>
 <li>Any external command that was automatically disabled by Revit when a perspective view is active will now be active.  No code changes are necessary to make this happen.</li>
@@ -18,7 +18,7 @@
 </ul>
 
 
-<a name="0.2"></a><h2>Subelements</h2>
+<a name="2.2"></a><h2>Subelements</h2>
 
 
 <p>Several Revit elements can now contain a subdivision known as a Subelement.   Subelements provide a way for parts of an element to behave as though they were real elements without incurring the overhead of adding more full elements to the model.</p>
@@ -79,7 +79,7 @@
 </ul>
 
 
-<a name="0.2.2"></a><h3>References and selection of subelements</h3></h3>
+<a name="2.2.3"></a><h3>References and selection of subelements</h3>
 
 
 <p>The new enumerated value:</p>
@@ -100,7 +100,7 @@
 <p>provide useful checks related to the contents of a given Reference object, applicable to subelement references as well as other types of references.</p>
 
 
-<a name="0.2"></a><h2>Changes to APIs for accessing version</h2>
+<a name="2.3"></a><h2>Changes to APIs for accessing version</h2>
 
 
 <p>The property:</p>
@@ -123,7 +123,7 @@
 <p>This new string property returns a similar major-minor version number for installed Revit versions.</p>
 
 
-<a name="0.2"></a><h2>Asset API Changes</h2>
+<a name="2.4"></a><h2>Asset API Changes</h2>
 
 
 <p>The following API classes moved from the Autodesk.Revit.Utility namespace to a new namespace Autodesk.Revit.DB.Visual:</p>
@@ -186,25 +186,25 @@
 </ol>
 
 
-<a name="0.2"></a><h2>Dynamic Updaters on Reload Latest</h2>
+<a name="2.5"></a><h2>Dynamic Updaters on Reload Latest</h2>
 
 
 <p>Dynamic updaters are now triggered on Reload Latest for the elements added or changed in the central file.</p>
 
 
-<a name="0.2"></a><h2>Export to DWG/DXF API change</h2>
+<a name="2.6"></a><h2>Export to DWG/DXF API change</h2>
 
 
 <p>The new AutoCAD version (R2018) has been added to the ACADVersion enumerated type.  This is now the default version used when exporting to DWG and DXF.  </p>
 
 
-<a name="0.2"></a><h2>UIDocument.PromptForFamilyInstancePlacement() behavioral change</h2>
+<a name="2.7"></a><h2>UIDocument.PromptForFamilyInstancePlacement() behavioral change</h2>
 
 
 <p>The behavior for UIDocument.PromptForFamilyInstancePlacement() was changed to be same as that of PickObject() methods &ndash; the placement operation will be cancelled when the "x" button of Revit is clicked during the placement operation instead of closing Revit directly.</p>
 
 
-<a name="0.2"></a><h2>IndependentTag API changes</h2>
+<a name="2.8"></a><h2>IndependentTag API changes</h2>
 
 
 <p>The new method:</p>
@@ -240,7 +240,7 @@
 <p>indicates if the leader of the tag has an elbow point or not.</p>
 
 
-<a name="0.2"></a><h2>Shared Coordinates API changes</h2>
+<a name="2.9"></a><h2>Shared Coordinates API changes</h2>
 
 
 <p>The following properties have been deprecated and replaced:</p>
@@ -252,7 +252,7 @@
 </ul>
 
 
-<a name="0.2"></a><h2>New DirectShape behaviors</h2>
+<a name="2.10"></a><h2>New DirectShape behaviors</h2>
 
 
 <p>DirectShape elements now support new behaviors.  Other than the limitations listed below, no code changes are required to enable these new behaviors for DirectShape elements.</p>
@@ -276,7 +276,7 @@
 </ul>
 
 
-<a name="0.2"></a><h2>Rebar API Changes</h2>
+<a name="2.11"></a><h2>Rebar API Changes</h2>
 
 
 <p>Rebar now supports two different layout options: shape-driven and free-form.  Previously, all Rebar elements were shape-driven.  The new methods:</p>
@@ -311,7 +311,7 @@
 <li>Rebar.RebarShapeId &rarr; getter &ndash; Rebar.GetShapeId() and setter &ndash; RebarShapeDrivenAccessor.SetRebarShapeId()</li>
 </ul>
 
-<a name="0.2"></a><h2>FabricSheet API Changes</h2>
+<a name="2.12"></a><h2>FabricSheet API Changes</h2>
 
 
 <p>The following methods have been deprecated and replaced:</p>
@@ -322,7 +322,7 @@
 <li>FabricWireItem.Create(double distance, double wireLength, ElementId wireType) &rarr; FabricWireItem.Create(double distance, double wireLength, ElementId wireType, double wireOffset) &ndash; Older calls can use the new method with wireOffset set to 0.0.</li>
 </ul>
 
-<a name="0.2"></a><h2>Structural Section API Changes</h2>
+<a name="2.13"></a><h2>Structural Section API Changes</h2>
 
 <p>Several section properties were moved from subclasses to the base class StructuralSection:</p>
 <ul>
@@ -376,7 +376,7 @@
 </ul>
 
 
-<a name="0.2"></a><h2>ElectricalSystem API changes</h2>
+<a name="2.14"></a><h2>ElectricalSystem API changes</h2>
 
 
 <p>The following functions have been deprecated and replaced:</p>
@@ -387,7 +387,7 @@
 <li>Autodesk.Revit.Creation.Document.NewElectricalSystem(ICollection &lt; ElementId &gt; , ElectricalSystemType) &rarr; ElectricalSystem.Create(Document, IList&lt;ElementId&gt;, ElectricalSystemType)</li>
 </ul>
 
-<a name="0.2"></a><h2>Pipe Pressure Loss Calculation change</h2>
+<a name="2.15"></a><h2>Pipe Pressure Loss Calculation change</h2>
 
 <p>The methods:</p>
 <ul>
@@ -397,7 +397,7 @@
 <p>have been deprecated in Revit 2018 and will be removed in the next version of Revit. Custom pipe pressure loss calculations will no longer be supported. Similar functionality can be accessed by setting Autodesk.Revit.DB.Plumbing.PipeSettings.AnalysisForClosedLoopHydronicPipingNetworks.</p>
 
 
-<a name="0.2"></a><h2>Corrected names of AutoRouteFailures values</h2>
+<a name="2.16"></a><h2>Corrected names of AutoRouteFailures values</h2>
 
 
 <p>The following BuiltInFailures.AutoRouteFailures values were renamed due to spelling errors:</p>
@@ -407,13 +407,13 @@
 </ul>
 
 
-<a name="0.2"></a><h2>Obsolete API removal</h2>
+<a name="2.17"></a><h2>Obsolete API removal</h2>
 
 
 <p>The following API members and classes which had previously been marked Obsolete have been removed in this release.  Consult the API documentation from prior releases for information on the replacements to use:</p>
 
 
-<a name="0.2.17"></a><h3>Classes</h3>
+<a name="2.17.4"></a><h3>Classes</h3>
 
 
 <ul>
@@ -426,7 +426,7 @@
 </ul>
 
 
-<a name="0.2.17"></a><h3>Methods</h3>
+<a name="2.17.5"></a><h3>Methods</h3>
 
 
 <ul>
@@ -459,7 +459,7 @@
 </ul>
 
 
-<a name="0.2.17"></a><h3>Properties</h3>
+<a name="2.17.6"></a><h3>Properties</h3>
 
 
 <ul>
@@ -478,7 +478,7 @@
 </ul>
 
 
-<a name="0.2.17"></a><h3>Enumerated types</h3>
+<a name="2.17.7"></a><h3>Enumerated types</h3>
 
 
 <ul>
@@ -488,12 +488,12 @@
 
 
 
-<a name="0"></a><h1>API additions</h1></h1>
+<a name="3"></a><h1>API additions</h1>
 
 
 
 
-<a name="0.3"></a><h2>API to get list of reviewable warnings from a Document</h2>
+<a name="3.18"></a><h2>API to get list of reviewable warnings from a Document</h2>
 
 
 <p>The new method:</p>
@@ -503,7 +503,7 @@
 <p>returns a list of failure messages generated from persistent (reviewable) warnings accumulated in the document.</p>
 
 
-<a name="0.3"></a><h2>API access to FamilyInstance references</h2>
+<a name="3.19"></a><h2>API access to FamilyInstance references</h2>
 
 
 <p>The following new methods have been added to enable easy access to FamilyInstance references that correspond to reference planes and reference lines in the family.  Some use the options in the new enumeration FamilyInstanceReferenceType as input to identify "Strong" or "Weak" references or specific positional references in each of the 3 coordinate directions (as determined by the possible values of parameter "Is Reference" of reference planes and parameter "Reference" of reference lines in families).</p>
@@ -515,7 +515,7 @@
 </ul>
 
 
-<a name="0.3"></a><h2>Multistory Stairs API</h2>
+<a name="3.20"></a><h2>Multistory Stairs API</h2>
 
 
 <p>The new class:</p>
@@ -551,7 +551,7 @@
 <p>support creation of new stairs paths in a plan view for stairs instances in a multistory stairs element.</p>
 
 
-<a name="0.3.20"></a><h3>Railings API additions related to MultistoryStairs</h3></h3>
+<a name="3.20.8"></a><h3>Railings API additions related to MultistoryStairs</h3>
 
 
 <p>The new methods:</p>
@@ -578,12 +578,12 @@
 <p>now supports stairs or stairs components coming from MultistoryStairs elements as well. </p>
 
 
-<a name="0.3"></a><h2>Dimension API additions</h2>
+<a name="3.21"></a><h2>Dimension API additions</h2>
 
 
 
 
-<a name="0.3.21"></a><h3>DimensionEqualityLabelFormating API</h3></h3>
+<a name="3.21.9"></a><h3>DimensionEqualityLabelFormating API</h3>
 
 
 <p>The new class:</p>
@@ -607,7 +607,7 @@
 </ul>
 
 
-<a name="0.3.21"></a><h3>UnitsFormatOptions in DimensionType</h3></h3>
+<a name="3.21.10"></a><h3>UnitsFormatOptions in DimensionType</h3>
 
 
 <p>The new functions:</p>
@@ -618,7 +618,7 @@
 <p>allow users to get or set the FormatOptions for a DimensionType.</p>
 
 
-<a name="0.3.21"></a><h3>OrdinateDimensionSetting</h3></h3>
+<a name="3.21.11"></a><h3>OrdinateDimensionSetting</h3>
 
 
 <p>The new class:</p>
@@ -658,7 +658,7 @@
 </ul>
 
 
-<a name="0.3"></a><h2>SpatialElementTag API additions</h2>
+<a name="3.22"></a><h2>SpatialElementTag API additions</h2>
 
 
 <p>SpatialElementTag is the base element for Room, Area and Space tag classes.</p>
@@ -669,12 +669,12 @@
 </ul>
 
 
-<a name="0.3"></a><h2>Geometry API additions</h2>
+<a name="3.23"></a><h2>Geometry API additions</h2>
 
 
 
 
-<a name="0.3.23"></a><h3>Surface and Face API</h3></h3>
+<a name="3.23.12"></a><h3>Surface and Face API</h3>
 
 
 <p>The new method:</p>
@@ -690,7 +690,7 @@
 <p>identify whether the face's orientation matches the surface orientation, and whether the surface orientation is the same as or opposite to its parametric orientation.</p>
 
 
-<a name="0.3.23"></a><h3>RevolvedSurface API</h3></h3>
+<a name="3.23.13"></a><h3>RevolvedSurface API</h3>
 
 
 <p>The new method:</p>
@@ -700,7 +700,7 @@
 <p>returns a copy of the profile curve expressed in the world coordinate system.</p>
 
 
-<a name="0.3.23"></a><h3>RuledSurface API</h3></h3>
+<a name="3.23.14"></a><h3>RuledSurface API</h3>
 
 
 <p>The newly added methods:</p>
@@ -711,7 +711,7 @@
 <p>check if a point was used to define one of the surface profiles. </p>
 
 
-<a name="0.3"></a><h2>Level API addition</h2>
+<a name="3.24"></a><h2>Level API addition</h2>
 
 
 <p>The new method:</p>
@@ -721,7 +721,7 @@
 <p>finds the id of the first available associated floor or structural plan view associated with this level. If there are multiple associated views, Revit will return the first one it finds. </p>
 
 
-<a name="0.3"></a><h2>Dockable Frame API Additions</h2>
+<a name="3.25"></a><h2>Dockable Frame API Additions</h2>
 
 
 <p>Custom Dockable Panes now support the ability for display of dynamic UI elements, such as web browser controls.  This capability should be used in cases where the UI for the pane (layout, buttons etc.) changes dynamically during the lifetime of the Revit session. To use this, implement the new interface:</p>
@@ -746,7 +746,7 @@
 <p>is now allowed to be null, in situations where the FrameworkElement will be dynamically created.</p>
 
 
-<a name="0.3"></a><h2>DirectContext3D for display of externally managed 3D graphics in Revit</h2>
+<a name="3.26"></a><h2>DirectContext3D for display of externally managed 3D graphics in Revit</h2>
 
 
 <p>DirectContext3D is an API for displaying external graphics in the context of a Revit model. The API provides a more connected experience to users who can benefit from the ability to display graphics based on geometry that is either difficult or costly to fully import into Revit.</p>
@@ -771,7 +771,7 @@
 </ul>
 
 
-<a name="0.3.26"></a><h3>View update for DirectContext3D</h3></h3>
+<a name="3.26.15"></a><h3>View update for DirectContext3D</h3>
 
 
 <p>The new method:</p>
@@ -782,7 +782,7 @@
 <p>This function is potentially expensive as many views may be updated at once, including regeneration of view's geometry and redisplay of graphics.  Thus for most situations it is recommended that API applications rely on the Revit application framework to update views more deliberately.</p>
 
 
-<a name="0.3"></a><h2>Coordination Model elements</h2>
+<a name="3.27"></a><h2>Coordination Model elements</h2>
 
 
 <p>Coordination Model elements current can link the graphical contents of Navisworks files and display them in context in the Revit session.  These elements leverage the DirectContext3D framework to handle the display of the external graphics, and are the first example of an element which is designated to contain a link to externally managed DirectContext3D graphics (a "DirectContext3D handle" element).</p>
@@ -794,12 +794,12 @@
 </ul>
 
 
-<a name="0.3"></a><h2>Shared Coordinates API additions</h2>
+<a name="3.28"></a><h2>Shared Coordinates API additions</h2>
 
 
 
 
-<a name="0.3.28"></a><h3>Acquire and Publish coordinates API additions</h3></h3>
+<a name="3.28.16"></a><h3>Acquire and Publish coordinates API additions</h3>
 
 
 <p>Two new methods allow users to acquire and publish shared coordinates:</p>
@@ -808,7 +808,7 @@
 <li>Document.PublishCoordinates() &ndash; Publishes shared coordinates to the specified ProjectLocation. This method works only on Revit links.</li>
 </ul>
 
-<a name="0.3.28"></a><h3>SiteLocation API additions</h3>
+<a name="3.28.17"></a><h3>SiteLocation API additions</h3>
 
 <p>Two new read-only properties have been added to provide information on the geographic coordinate system of a SiteLocation. The geographic coordinate system is imported from a DWG file from AutoCAD or Civil 3D. If the SiteLocation has geographic coordinate system information, the latitude and longitude of the SiteLocation will be updated automatically</p>
 <p>when the model's Survey Point is moved.</p>
@@ -821,7 +821,7 @@
 <li>SiteLocation.IsCompatibleWith() &ndash; Checks whether the geographic coordinate system of this site is compatible with the given site.</li>
 </ul>
 
-<a name="0.3.28"></a><h3>ProjectLocation API additions</h3>
+<a name="3.28.18"></a><h3>ProjectLocation API additions</h3>
 
 <p>The new method:</p>
 <ul>
@@ -829,7 +829,7 @@
 </ul>
 <p>creates a new ProjectLocation in the document from the given SiteLocation and with the given name.</p>
 
-<a name="0.3.28"></a><h3>Revit Link API additions</h3>
+<a name="3.28.19"></a><h3>Revit Link API additions</h3>
 
 <p>The new method:</p>
 <ul>
@@ -837,10 +837,10 @@
 </ul>
 <p>creates a new instance of a linked Revit project (RevitLinkType). Instances will be placed origin-to-origin or by shared coordinates according to the input placement type.</p>
 
-<a name="0.3"></a><h2><h2>Link API additions</h2>
+<a name="3.29"></a><h2><h2>Link API additions</h2>
 
 
-<a name="0.3.29"></a><h3>External Resource framework additions</h3>
+<a name="3.29.20"></a><h3>External Resource framework additions</h3>
 
 <p>IExternalResourceServer can now provide CAD format links, DWF markups, and IFC links. The following new values have been added to ExternalResourceType.BuiltInExternalResourceTypes:</p>
 <ul>
@@ -849,7 +849,7 @@
 <li>IFCLink</li>
 </ul>
 
-<a name="0.3.29"></a><h3>CADLinkType additions</h3>
+<a name="3.29.21"></a><h3>CADLinkType additions</h3>
 
 <p>Several new methods have been added to CADLinkType as part of external resource framework enhancements:</p>
 <ul>
@@ -859,7 +859,7 @@
 <li>CADLinkType.LoadFrom(ExternalResourceReference reference) &ndash; Reloads a CADLinkType from an external resource server.</li>
 </ul>
 
-<a name="0.3.29"></a><h3>ImportInstance additions</h3>
+<a name="3.29.22"></a><h3>ImportInstance additions</h3>
 
 <p>Several new methods have been added to create ImportInstance elements, either from an existing link type or a new link type:</p>
 <ul>
@@ -869,7 +869,7 @@
 </ul>
 <p>Methods have also been added to create DGN, SAT, and SKP links from external resource locations.</p>
 
-<a name="0.3.29"></a><h3>IFC Link API additions</h3>
+<a name="3.29.23"></a><h3>IFC Link API additions</h3>
 
 <p>The method:</p>
 <ul>
@@ -877,12 +877,12 @@
 </ul>
 <p>now has a new version that allows for an ExternalResourceReference to specify the IFC file name, instead of a string.</p>
 
-<a name="0.3"></a><h2><h2>Workshared operation progress changed events</h2>
+<a name="3.30"></a><h2><h2>Workshared operation progress changed events</h2>
 
 <p>Subscribe to the Autodesk.Revit.ApplicationServices.Application.WorksharedOperationProgressChanged event to be notified when progress has changed during Collaboration for Revit's synchronizing.</p>
 <p>This event consists of several phases. Different event arguments are used during each phase.</p>
 
-<a name="0.3.30"></a><h3>WorksharedOperationProgressChangedEventArgs</h3>
+<a name="3.30.24"></a><h3>WorksharedOperationProgressChangedEventArgs</h3>
 
 <p>The new class:</p>
 <ul>
@@ -890,7 +890,7 @@
 </ul>
 <p>provides a base class for event arguments for worksharing-based progress events.</p>
 
-<a name="0.3.30"></a><h3>DocumentSaveToLocalProgressChangedEventArgs</h3>
+<a name="3.30.25"></a><h3>DocumentSaveToLocalProgressChangedEventArgs</h3>
 
 <p>The new class:</p>
 <ul>
@@ -906,7 +906,7 @@
 <li>DocumentSaveToLocalProgressChangedEventArgs.SaveToLocalFinished &ndash; Indicates if the current "save to local" operation has finished.</li>
 </ul>
 
-<a name="0.3.30"></a><h3>DataTransferProgressChangedEventArgs</h3>
+<a name="3.30.26"></a><h3>DataTransferProgressChangedEventArgs</h3>
 
 <p>The new class:</p>
 <ul>
@@ -922,7 +922,7 @@
 <li>DataTransferProgressChangedEventArgs.TotalSize &ndash; Total expected data size to download, in bytes.</li>
 </ul>
 
-<a name="0.3.30"></a><h3>DocumentReloadLatestProgressChangedEventArgs</h3>
+<a name="3.30.27"></a><h3>DocumentReloadLatestProgressChangedEventArgs</h3>
 
 <p>The new class:</p>
 <ul>
@@ -942,7 +942,7 @@
 </ul>
 
 
-<a name="0.3.30"></a><h3>DocumentSaveToCentralProgressChangedEventArgs</h3>
+<a name="3.30.28"></a><h3>DocumentSaveToCentralProgressChangedEventArgs</h3>
 
 <p>The new class:</p>
 <ul>
@@ -963,7 +963,7 @@
 </ul>
 
 
-<a name="0.3.30"></a><h3>CreateRelatedFileProgressChangedEventArgs</h3>
+<a name="3.30.29"></a><h3>CreateRelatedFileProgressChangedEventArgs</h3>
 
 <p>The new class:</p>
 <ul>
@@ -983,7 +983,7 @@
 <li>CreateRelatedFileProgressChangedEventArgs.FullDownload &ndash; Indicates if download the full data of the document, which will take longer than subsequent downloads.</li>
 </ul>
 
-<a name="0.3"></a><h2><h2>Events related to linked resources</h2>
+<a name="3.31"></a><h2><h2>Events related to linked resources</h2>
 
 <p>Subscribe to the events:</p>
 <ul>
@@ -996,7 +996,7 @@
 <p>This event will not be raised if there are no updates for linked CAD or IFC resources.  The linked resource cannot be modified during these events.</p>
 
 
-<a name="0.3.31"></a><h3>LinkedResourceOpeningEventArgs</h3>
+<a name="3.31.30"></a><h3>LinkedResourceOpeningEventArgs</h3>
 
 <p>The new class:</p>
 <ul>
@@ -1010,7 +1010,7 @@
 </ul>
 
 
-<a name="0.3.31"></a><h3>LinkedResourceOpenedEventArgs</h3>
+<a name="3.31.31"></a><h3>LinkedResourceOpenedEventArgs</h3>
 
 <p>The new class:</p>
 <ul>
@@ -1023,7 +1023,7 @@
 <li>LinkedResourceOpenedEventArgs.LinkedResourcePathName &ndash; Opened linked resource name.</li>
 </ul>
 
-<a name="0.3"></a><h2><h2>Events related to parallel View Export</h2>
+<a name="3.32"></a><h2><h2>Events related to parallel View Export</h2>
 
 <p>When exporting multiple views to DWF or DWFx format, Revit uses background processes to compute the exported output of several views in parallel. Two events are now available on the Application class to receive progress updates during a parallel export operation:</p>
 <ul>
@@ -1032,7 +1032,7 @@
 </ul>
 <p>These two events are raised only during accelerated export jobs, in which views are exported in parallel using a background process. Accelerated export only occurs when exporting to DWF formats and not combining views into a single file. </p>
 
-<a name="0.3"></a><h2>DWG export API additions</h2>
+<a name="3.33"></a><h2>DWG export API additions</h2>
 
 <p>The new enumerated value:</p>
 <ul>
@@ -1047,7 +1047,7 @@
 <p>allow assignment of a color that will be set as hatch background color on the exported hatch. </p>
 
 
-<a name="0.3.33"></a><h3><h3>ExportDWGSettings API additions</h3>
+<a name="3.33.32"></a><h3><h3>ExportDWGSettings API additions</h3>
 
 <p>Two new methods have been added to ExportDWGSettings:</p>
 <ul>
@@ -1056,7 +1056,7 @@
 </ul>
 <p>Note that these functions cannot return in-session settings. To access the in-session settings, save them with a name.</p>
 
-<a name="0.3"></a><h2>Part API additions</h2>
+<a name="3.34"></a><h2>Part API additions</h2>
 
 <p>The new methods:</p>
 <ul>
@@ -1065,7 +1065,7 @@
 </ul>
 <p>provide further capabilities to access and manipulate the offset applied to a given face of a Part element.</p>
 
-<a name="0.3"></a><h2>Freeform Rebar API additions</h2>
+<a name="3.35"></a><h2>Freeform Rebar API additions</h2>
 
 <p>The new methods:</p>
 <ul>
@@ -1096,7 +1096,7 @@
 <li>RebarFreeFormAccessor.GetHookOrientationAngle()</li>
 </ul>
 
-<a name="0.3"></a><h2>Custom Service for Freeform Rebar Definition</h2>
+<a name="3.36"></a><h2>Custom Service for Freeform Rebar Definition</h2>
 
 <p>The new interface class:</p>
 <ul>
@@ -1149,7 +1149,7 @@
 <li>RebarConstraintsManager.AllowConstraintTargets()</li>
 </ul>
 
-<a name="0.3"></a><h2>HVACSpaceType and Space air ventilation API</h2>
+<a name="3.37"></a><h2>HVACSpaceType and Space air ventilation API</h2>
 
 <p>The following new properties have been added to Autodesk.Revit.DB.Space:</p>
 <ul>
@@ -1161,7 +1161,7 @@
 <li>Space.OutdoorAirFlowStandard &ndash; Gets the outdoor air flow standard of the space.</li>
 </ul>
 
-<a name="0.3"></a><h2>Energy Analysis API additions</h2>
+<a name="3.38"></a><h2>Energy Analysis API additions</h2>
 
 <p>Several new classes have been added to allow better control over spaces when doing energy analysis.</p>
 <p>The new class:</p>
@@ -1219,11 +1219,11 @@
 <p>allow users to set the energy analysis type associated with a space or mass zone.</p>
 <p>Note that these classes are not ElementTypes. They represent properties of a space or building when doing energy analysis, and do not have instances.</p>
 
-<a name="0.3"></a><h2>Electrical API additions</h2>
+<a name="3.39"></a><h2>Electrical API additions</h2>
 
 
 
-<a name="0.3.39"></a><h3><h3>Electrical Circuit Path API</h3>
+<a name="3.39.33"></a><h3><h3>Electrical Circuit Path API</h3>
 
 <p>The new API members:</p>
 <ul>
@@ -1238,7 +1238,7 @@
 <p>support different options and operations related to electrical circuit paths.</p>
 
 
-<a name="0.3.39"></a><h3><h3>PanelScheduleView API</h3>
+<a name="3.39.34"></a><h3><h3>PanelScheduleView API</h3>
 
 <p>The following new methods handle space or spare circuit operations:</p>
 <ul>
@@ -1248,7 +1248,7 @@
 <li>PanelScheduleView.RemoveSpare() &ndash; Remove a spare at specific cell.</li>
 </ul>
 
-<a name="0.3"></a><h2>MEPAnalyticalConnection API additions</h2>
+<a name="3.40"></a><h2>MEPAnalyticalConnection API additions</h2>
 
 <p>Two new classes have been added to allow API users to create analytical connections between elements. The behavior is the same as in Revit's UI.</p>
 <p>The new class:</p>
@@ -1281,9 +1281,9 @@
 <p>indicates whether to enable analysis for closed loop hydronic piping networks in the background.</p>
 
 
-<a name="0.3"></a><h2>Fabrication API additions</h2>
+<a name="3.41"></a><h2>Fabrication API additions</h2>
 
-<a name="0.3.41"></a><h3>Hanger Rod additions</h3>
+<a name="3.41.35"></a><h3>Hanger Rod additions</h3>
 
 <p>The following new methods and properties allow better control of hanger rod lengths:</p>
 <ul>
@@ -1300,7 +1300,7 @@
 <p>allows users to get or set the support rod kit override. This gives the user better control over hanger rod thicknesses.</p>
 
 
-<a name="0.3.41"></a><h3>Placing and splitting fabrication parts</h3>
+<a name="3.41.36"></a><h3>Placing and splitting fabrication parts</h3>
 
 <p>The following methods allow placing and splitting fabrication parts:</p>
 <ul>
@@ -1314,7 +1314,7 @@
 </ul>
 
 
-<a name="0.3.41"></a><h3>Fabrication Part export additions</h3>
+<a name="3.41.37"></a><h3>Fabrication Part export additions</h3>
 
 <p>The new method:</p>
 <ul>
@@ -1328,7 +1328,7 @@
 <p>allows control over Spool names in PCF output.</p>
 
 
-<a name="0.3.41"></a><h3>Fabrication Part status additions</h3>
+<a name="3.41.38"></a><h3>Fabrication Part status additions</h3>
 
 <p>Two properties were added to FabricationPart to allow the user to query and set the part fabrication status field:</p>
 <ul>
@@ -1337,7 +1337,7 @@
 </ul>
 
 
-<a name="0.3.41"></a><h3>Fabrication part comparison</h3>
+<a name="3.41.39"></a><h3>Fabrication part comparison</h3>
 
 <p>The new method:</p>
 <ul>
@@ -1346,7 +1346,7 @@
 <p>compares basic dimensional information of two fabrication parts but also allows the user to specify additional fabrication data to ignore. This allows users to compare parts including fabrication data not exposed in Revit.</p>
 
 
-<a name="0.3.41"></a><h3>Fabrication Part ancillary usage additions</h3>
+<a name="3.41.40"></a><h3>Fabrication Part ancillary usage additions</h3>
 
 <p>The new method:</p>
 <ul>
@@ -1370,7 +1370,7 @@
 </ul>
 
 
-<a name="0.3.41"></a><h3>Fabrication Part custom data additions</h3>
+<a name="3.41.41"></a><h3>Fabrication Part custom data additions</h3>
 
 <p>The following methods allow access to Fabrication Part custom data defined per part. This can be used for querying and changing values:</p>
 <ul>
@@ -1380,7 +1380,7 @@
 </ul>
 
 
-<a name="0.3.41"></a><h3>FabricationConfiguration additions</h3>
+<a name="3.41.42"></a><h3>FabricationConfiguration additions</h3>
 
 <p>New methods have been added to access fabrication data defined by the currently loaded fabrication configuration. These can be used to query what fabrication data is available for fabrication parts to use:</p>
 <ul>
@@ -1396,7 +1396,7 @@
 </ul>
 
 
-<a name="0.3.41"></a><h3>Routing exclusions additions</h3>
+<a name="3.41.43"></a><h3>Routing exclusions additions</h3>
 
 <p>The following methods allow users to override routing exclusions:</p>
 <ul>
@@ -1408,7 +1408,7 @@
 </ul>
 
 
-<a name="0.3.41"></a><h3>FabricationServiceButton addition</h3>
+<a name="3.41.44"></a><h3>FabricationServiceButton addition</h3>
 
 <p>The new property:</p>
 <ul>

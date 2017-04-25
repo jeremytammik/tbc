@@ -30,9 +30,9 @@ if __name__ == '__main__':
       a = ''
       if line.startswith('<h'):
         level = int(line[2])
+        ih[level-1] = ih[level-1] + 1
         a = '.'.join( [str(ih[l]) for l in range(level)] )
         a = '<a name="' + a + '"></a>'
-        ih[level] = ih[level] + 1
       print a + line
 
 main()
