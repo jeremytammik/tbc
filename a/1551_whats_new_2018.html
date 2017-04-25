@@ -15,12 +15,12 @@ What's New in the Revit 2018 API #REVITAPI @AutodeskRevit #aec #bim #dynamobim @
 -->
 
 <h3>What's New in the Revit 2018 API</h3>
-<p>The Revit 2018 includes numerous exciting enhancments for add-in developers.</p>
+<p>The Revit 2018 includes numerous exciting enhancements for add-in developers.</p>
 <p>The highlights were pointed out in
 the <a href="http://thebuildingcoder.typepad.com/blog/2017/03/revitlookup-enhancements-future-revit-and-other-api-news.html">DevDays Online API news</a> presentation
 and video recording.</p>
 <p>That information is based on the contents of the <em>Revit Platform API Changes and Additions.docx</em> document included with
-the <a href="http://thebuildingcoder.typepad.com/blog/2017/04/revitlookup-2018-and-forge-devcon-cfp.html#2">Revit 2018 software developers kit</a> or \
+the <a href="http://thebuildingcoder.typepad.com/blog/2017/04/revitlookup-2018-and-forge-devcon-cfp.html#2">Revit 2018 software developers kit</a> or 
 SDK available from 
 the <a href="http://www.autodesk.com/developrevit">Revit Developer Centre</a>.</p>
 <p>It is also provided in the section on <em>What's New</em> in the Revit 2018 API help file <code>RevitAPI.chm</code> included with the SDK:</p>
@@ -29,19 +29,19 @@ the <a href="http://www.autodesk.com/developrevit">Revit Developer Centre</a>.</
 </center></p>
 <p>For convenient, easy and effective web searching, this blog post provides an online version of that information.</p>
 <p>The <em>What's New</em> section always provides very important information, both for discovering and exploring the newly added API functionality and for later reference.</p>
-<p>If you encounter any issues migrating your existing add-ins between different versions, this is one of the first ports of call.</p>
-<p>For detailed information on all aspects of the Revit API, please refer to the rest of the API documentation and samples provided in the SDK.</p>
+<p>If you encounter any issues migrating your existing add-ins between different versions, this is one of the first places to look.</p>
+<p>For detailed information on all other aspects of the Revit API, please refer to the rest of the API documentation and samples provided in the SDK.</p>
 <p>The most important things to install and always keep at hand are:</p>
 <ul>
 <li>The Revit API help file <code>RevitAPI.chm</code></li>
 <li>The Visual Studio solution containing all the SDK samples, <code>Samples\SDKSamples.sln</code></li>
 </ul>
 <p>You will need these constantly for research on how to solve specific Revit API programming tasks.</p>
-<p>Another main source of more in-depth official information is provided by the
+<p>More in-depth official explanations and background information is provided by the
 online <a href="http://help.autodesk.com/view/RVT/2018/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42">Revit API Developers Guide</a> included 
 in the <a href="http://help.autodesk.com/view/RVT/2018/ENU">Revit 2018 Help</a>.</p>
 <h4><a name="0"></a>What's New in Previous Versions</h4>
-<p>Here are links to the preceding 'What's New in the API' discussions:</p>
+<p>Here are links to discussions of <em>What's New in the Revit API</em> for previous versions:</p>
 <ul>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2010-api.html">What's New in the Revit 2010 API</a></li>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2011-api.html">What's New in the Revit 2011 API</a></li>
@@ -55,45 +55,131 @@ in the <a href="http://help.autodesk.com/view/RVT/2018/ENU">Revit 2018 Help</a>.
 </ul>
 <h3><a name="1"></a>Table of Contents</h3>
 <ul>
-<li><a href="#4.1">API enabled in perspective views</a><ul>
-<li><a href="#4.1.1">Element modifications and contextual commands</a></li>
-<li><a href="#4.1.2">External commands and applications</a></li>
+<li><a href="#2">API changes</a><ul>
+<li><a href="#2.1">API enabled in perspective views</a><ul>
+<li><a href="#2.1.1">Element modifications and contextual commands</a></li>
+<li><a href="#2.1.2">External commands and applications</a></li>
 </ul>
 </li>
-<li><a href="#4.2">Geometry API additions</a><ul>
-<li><a href="#4.2.1">BRepBuilder API additions</a></li>
-<li><a href="#4.2.2">BRepBuilderSurfaceGeometry API additions</a></li>
-<li><a href="#4.2.3">Ellipse API additions</a></li>
-<li><a href="#4.2.4">RevolvedSurface API additions</a></li>
+<li><a href="#2.2">Subelements</a><ul>
+<li><a href="#2.2.3">References and selection of subelements</a></li>
 </ul>
 </li>
-<li><a href="#4.3">Dimension API additions</a><ul>
-<li><a href="#4.3.1">DimensionEqualityLabelFormating API</a></li>
-<li><a href="#4.3.2">UnitsFormatOptions in DimensionType</a></li>
-<li><a href="#4.3.3">OrdinateDimensionSetting</a></li>
-</ul>
-</li>
-<li><a href="#4.4">FabricationPart detailing API</a><ul>
-<li><a href="#4.4.1">Split Parts API</a></li>
-<li><a href="#4.4.2">Detailed Fabrication additions</a></li>
-<li><a href="#4.4.3">Ancillary usage additions</a></li>
-<li><a href="#4.4.4">Part status</a></li>
-<li><a href="#4.4.5">Hanger rod additions</a></li>
-</ul>
-</li>
-<li><a href="#4.5">Import API additions</a><ul>
-<li><a href="#4.5.1">ShapeImporter additions</a></li>
-</ul>
-</li>
-<li><a href="#4.6">Worksharing events addition</a><ul>
-<li><a href="#4.6.1">WorksharedOperationProgressChangedEventArgs</a></li>
-<li><a href="#4.6.2">DocumentSaveToLocalProgessChangedEventArgs</a></li>
-<li><a href="#4.6.3">DocumentReloadLatestProgressChangedEventArgs</a></li>
-<li><a href="#4.6.4">DocumentSaveToCentralProgessChangedEventArgs</a></li>
+<li><a href="#2.3">Changes to APIs for accessing version</a></li>
+<li><a href="#2.4">Asset API Changes</a></li>
+<li><a href="#2.5">Dynamic Updaters on Reload Latest</a></li>
+<li><a href="#2.6">Export to DWG/DXF API change</a></li>
+<li><a href="#2.7">UIDocument.PromptForFamilyInstancePlacement() behavioral change</a></li>
+<li><a href="#2.8">IndependentTag API changes</a></li>
+<li><a href="#2.9">Shared Coordinates API changes</a></li>
+<li><a href="#2.10">New DirectShape behaviors</a></li>
+<li><a href="#2.11">Rebar API Changes</a></li>
+<li><a href="#2.12">FabricSheet API Changes</a></li>
+<li><a href="#2.13">Structural Section API Changes</a></li>
+<li><a href="#2.14">ElectricalSystem API changes</a></li>
+<li><a href="#2.15">Pipe Pressure Loss Calculation change</a></li>
+<li><a href="#2.16">Corrected names of AutoRouteFailures values</a></li>
+<li><a href="#2.17">Obsolete API removal</a><ul>
+<li><a href="#2.17.4">Classes</a></li>
+<li><a href="#2.17.5">Methods</a></li>
+<li><a href="#2.17.6">Properties</a></li>
+<li><a href="#2.17.7">Enumerated types</a></li>
 </ul>
 </li>
 </ul>
-<p><a name="2"></a><h1>API changes</h1></p>
+</li>
+<li><a href="#3">API additions</a><ul>
+<li><a href="#3.18">API to get list of reviewable warnings from a Document</a></li>
+<li><a href="#3.19">API access to FamilyInstance references</a></li>
+<li><a href="#3.20">Multistory Stairs API</a><ul>
+<li><a href="#3.20.8">Railings API additions related to MultistoryStairs</a></li>
+</ul>
+</li>
+<li><a href="#3.21">Dimension API additions</a><ul>
+<li><a href="#3.21.9">DimensionEqualityLabelFormating API</a></li>
+<li><a href="#3.21.10">UnitsFormatOptions in DimensionType</a></li>
+<li><a href="#3.21.11">OrdinateDimensionSetting</a></li>
+</ul>
+</li>
+<li><a href="#3.22">SpatialElementTag API additions</a></li>
+<li><a href="#3.23">Geometry API additions</a><ul>
+<li><a href="#3.23.12">Surface and Face API</a></li>
+<li><a href="#3.23.13">RevolvedSurface API</a></li>
+<li><a href="#3.23.14">RuledSurface API</a></li>
+</ul>
+</li>
+<li><a href="#3.24">Level API addition</a></li>
+<li><a href="#3.25">Dockable Frame API Additions</a></li>
+<li><a href="#3.26">DirectContext3D for display of externally managed 3D graphics in Revit</a><ul>
+<li><a href="#3.26.15">View update for DirectContext3D</a></li>
+</ul>
+</li>
+<li><a href="#3.27">Coordination Model elements</a></li>
+<li><a href="#3.28">Shared Coordinates API additions</a><ul>
+<li><a href="#3.28.16">Acquire and Publish coordinates API additions</a></li>
+<li><a href="#3.28.17">SiteLocation API additions</a></li>
+<li><a href="#3.28.18">ProjectLocation API additions</a></li>
+<li><a href="#3.28.19">Revit Link API additions</a></li>
+</ul>
+</li>
+<li><a href="#3.29">Link API additions</a><ul>
+<li><a href="#3.29.20">External Resource framework additions</a></li>
+<li><a href="#3.29.21">CADLinkType additions</a></li>
+<li><a href="#3.29.22">ImportInstance additions</a></li>
+<li><a href="#3.29.23">IFC Link API additions</a></li>
+</ul>
+</li>
+<li><a href="#3.30">Workshared operation progress changed events</a><ul>
+<li><a href="#3.30.24">WorksharedOperationProgressChangedEventArgs</a></li>
+<li><a href="#3.30.25">DocumentSaveToLocalProgressChangedEventArgs</a></li>
+<li><a href="#3.30.26">DataTransferProgressChangedEventArgs</a></li>
+<li><a href="#3.30.27">DocumentReloadLatestProgressChangedEventArgs</a></li>
+<li><a href="#3.30.28">DocumentSaveToCentralProgressChangedEventArgs</a></li>
+<li><a href="#3.30.29">CreateRelatedFileProgressChangedEventArgs</a></li>
+</ul>
+</li>
+<li><a href="#3.31">Events related to linked resources</a><ul>
+<li><a href="#3.31.30">LinkedResourceOpeningEventArgs</a></li>
+<li><a href="#3.31.31">LinkedResourceOpenedEventArgs</a></li>
+</ul>
+</li>
+<li><a href="#3.32">Events related to parallel View Export</a></li>
+<li><a href="#3.33">DWG export API additions</a><ul>
+<li><a href="#3.33.32">ExportDWGSettings API additions</a></li>
+</ul>
+</li>
+<li><a href="#3.34">Part API additions</a></li>
+<li><a href="#3.35">Freeform Rebar API additions</a></li>
+<li><a href="#3.36">Custom Service for Freeform Rebar Definition</a></li>
+<li><a href="#3.37">HVACSpaceType and Space air ventilation API</a></li>
+<li><a href="#3.38">Energy Analysis API additions</a></li>
+<li><a href="#3.39">Electrical API additions</a><ul>
+<li><a href="#3.39.33">Electrical Circuit Path API</a></li>
+<li><a href="#3.39.34">PanelScheduleView API</a></li>
+</ul>
+</li>
+<li><a href="#3.40">MEPAnalyticalConnection API additions</a></li>
+<li><a href="#3.41">Fabrication API additions</a><ul>
+<li><a href="#3.41.35">Hanger Rod additions</a></li>
+<li><a href="#3.41.36">Placing and splitting fabrication parts</a></li>
+<li><a href="#3.41.37">Fabrication Part export additions</a></li>
+<li><a href="#3.41.38">Fabrication Part status additions</a></li>
+<li><a href="#3.41.39">Fabrication part comparison</a></li>
+<li><a href="#3.41.40">Fabrication Part ancillary usage additions</a></li>
+<li><a href="#3.41.41">Fabrication Part custom data additions</a></li>
+<li><a href="#3.41.42">FabricationConfiguration additions</a></li>
+<li><a href="#3.41.43">Routing exclusions additions</a></li>
+<li><a href="#3.41.44">FabricationServiceButton addition</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><center>
+<div style="border-style:solid; border-width:2px 0px 2px 0px">
+<a name="2"></a><h3 style="font-weight: bold">API Changes</h3>
+</div>
+</center></p>
 <p><a name="2.1"></a><h2>API enabled in perspective views</h2></p>
 <p><a name="2.1.1"></a><h3>Element modifications and contextual commands</h3></p>
 <p>Modification of many different object types is now allowed in perspective views. Most commands allowed in 3D orthographic views are now also allowed in perspective views. This includes contextual commands. Annotations are an exception and cannot be created in perspective views. </p>
@@ -286,6 +372,7 @@ in the <a href="http://help.autodesk.com/view/RVT/2018/ENU">Revit 2018 Help</a>.
 <li>APT_Double44 &rarr; Double44</li>
 <li>APT_String &rarr; String</li>
 <li>APT_Time &rarr; Time</li>
+<li>N/A</li>
 <li>APT_Distance &rarr; Distance</li>
 <li>APT_Asset &rarr; Asset</li>
 <li>APT_Reference &rarr; Reference</li>
@@ -574,7 +661,11 @@ in the <a href="http://help.autodesk.com/view/RVT/2018/ENU">Revit 2018 Help</a>.
 <li>Autodesk.Revit.Attributes.TransactionMode.Automatic</li>
 </ul>
 
-<p><a name="3"></a><h1>API additions</h1></p>
+<p><center>
+<div style="border-style:solid; border-width:2px 0px 2px 0px">
+<a name="3"></a><h3 style="font-weight: bold">API Additions</h3>
+</div>
+</center></p>
 <p><a name="3.18"></a><h2>API to get list of reviewable warnings from a Document</h2></p>
 <p>The new method:</p>
 
