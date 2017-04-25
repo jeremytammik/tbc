@@ -1,12 +1,11 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="bc.css">
 <script src="run_prettify.js" type="text/javascript"></script>
 <!--
 <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
 -->
-</head>
-
+</head></p>
 <!---
 
 What's New in the Revit 2018 API #REVITAPI @AutodeskRevit #aec #bim #dynamobim @AutodeskForge @adskdevnetwrk
@@ -15,178 +14,110 @@ What's New in the Revit 2018 API #REVITAPI @AutodeskRevit #aec #bim #dynamobim @
 
 -->
 
-### What's New in the Revit 2018 API
-
-The Revit 2018 includes numerous exciting enhancments for add-in developers.
-
-The highlights were pointed out in
-the [DevDays Online API news](http://thebuildingcoder.typepad.com/blog/2017/03/revitlookup-enhancements-future-revit-and-other-api-news.html) presentation
-and video recording.
-
-That information is based on the contents of the *Revit Platform API Changes and Additions.docx* document included with
-the [Revit 2018 software developers kit](http://thebuildingcoder.typepad.com/blog/2017/04/revitlookup-2018-and-forge-devcon-cfp.html#2) or \
+<h3>What's New in the Revit 2018 API</h3>
+<p>The Revit 2018 includes numerous exciting enhancments for add-in developers.</p>
+<p>The highlights were pointed out in
+the <a href="http://thebuildingcoder.typepad.com/blog/2017/03/revitlookup-enhancements-future-revit-and-other-api-news.html">DevDays Online API news</a> presentation
+and video recording.</p>
+<p>That information is based on the contents of the <em>Revit Platform API Changes and Additions.docx</em> document included with
+the <a href="http://thebuildingcoder.typepad.com/blog/2017/04/revitlookup-2018-and-forge-devcon-cfp.html#2">Revit 2018 software developers kit</a> or \
 SDK available from 
-the [Revit Developer Centre](http://www.autodesk.com/developrevit).
-
-It is also provided in the section on *What's New* in the Revit 2018 API help file `RevitAPI.chm` included with the SDK:
-
-<center>
+the <a href="http://www.autodesk.com/developrevit">Revit Developer Centre</a>.</p>
+<p>It is also provided in the section on <em>What's New</em> in the Revit 2018 API help file <code>RevitAPI.chm</code> included with the SDK:</p>
+<p><center>
 <img src="img/revit_2018_api_help.png" alt="Revit 2018 API help on What's New" width="512"/>
-</center>
-
-For convenient, easy and effective web searching, this blog post provides an online version of that information.
-
-The *What's New* section always provides very important information, both for discovering and exploring the newly added API functionality and for later reference.
-
-If you encounter any issues migrating your existing add-ins between different versions, this is one of the first ports of call.
-
-For detailed information on all aspects of the Revit API, please refer to the rest of the API documentation and samples provided in the SDK.
-
-The most important things to install and always keep at hand are:
-
-- The Revit API help file `RevitAPI.chm`
-- The Visual Studio solution containing all the SDK samples, `Samples\SDKSamples.sln`
-
-You will need these constantly for research on how to solve specific Revit API programming tasks.
-
-Another main source of more in-depth official information is provided by the
-online [Revit API Developers Guide](http://help.autodesk.com/view/RVT/2018/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42) included 
-in the [Revit 2018 Help](http://help.autodesk.com/view/RVT/2018/ENU).
-
-
-#### <a name="0"></a>What's New in Previous Versions
-
-Here are links to the preceding 'What's New in the API' discussions:
-
-- [What's New in the Revit 2010 API](http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2010-api.html)
-- [What's New in the Revit 2011 API](http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2011-api.html)
-- [What's New in the Revit 2012 API](http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2012-api.html)
-- [What's New in the Revit 2013 API](http://thebuildingcoder.typepad.com/blog/2013/03/whats-new-in-the-revit-2013-api.html)
-- [What's New in the Revit 2014 API](http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html)
-- [What's New in the Revit 2015 API](http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html)
-- [What's New in the Revit 2016 API](http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html)
-- [What's New in the Revit 2017 API](http://thebuildingcoder.typepad.com/blog/2016/04/whats-new-in-the-revit-2017-api.html)
-- [What's New in the Revit 2017.1 API](http://thebuildingcoder.typepad.com/blog/2016/11/whats-new-in-the-revit-20171-api.html)
-
-
-### <a name="1"></a>Table of Contents
-
-- [API changes](#2)
-    - [API enabled in perspective views](#2.1)
-        - [Element modifications and contextual commands](#2.1.1)
-        - [External commands and applications](#2.1.2)
-    - [Subelements](#2.2)
-        - [References and selection of subelements](#2.2.3)
-    - [Changes to APIs for accessing version](#2.3)
-    - [Asset API Changes](#2.4)
-    - [Dynamic Updaters on Reload Latest](#2.5)
-    - [Export to DWG/DXF API change](#2.6)
-    - [UIDocument.PromptForFamilyInstancePlacement() behavioral change](#2.7)
-    - [IndependentTag API changes](#2.8)
-    - [Shared Coordinates API changes](#2.9)
-    - [New DirectShape behaviors](#2.10)
-    - [Rebar API Changes](#2.11)
-    - [FabricSheet API Changes](#2.12)
-    - [Structural Section API Changes](#2.13)
-    - [ElectricalSystem API changes](#2.14)
-    - [Pipe Pressure Loss Calculation change](#2.15)
-    - [Corrected names of AutoRouteFailures values](#2.16)
-    - [Obsolete API removal](#2.17)
-        - [Classes](#2.17.4)
-        - [Methods](#2.17.5)
-        - [Properties](#2.17.6)
-        - [Enumerated types](#2.17.7)
-- h1 [API additions](#3)
-    - [API to get list of reviewable warnings from a Document](#3.18)
-    - [API access to FamilyInstance references](#3.19)
-    - [Multistory Stairs API](#3.20)
-        - [Railings API additions related to MultistoryStairs](#3.20.8)
-    - [Dimension API additions](#3.21)
-        - [DimensionEqualityLabelFormating API](#3.21.9)
-        - [UnitsFormatOptions in DimensionType](#3.21.10)
-        - [OrdinateDimensionSetting](#3.21.11)
-    - [SpatialElementTag API additions](#3.22)
-    - [Geometry API additions](#3.23)
-        - [Surface and Face API](#3.23.12)
-        - [RevolvedSurface API](#3.23.13)
-        - [RuledSurface API](#3.23.14)
-    - [Level API addition](#3.24)
-    - [Dockable Frame API Additions](#3.25)
-    - [DirectContext3D for display of externally managed 3D graphics in Revit](#3.26)
-        - [View update for DirectContext3D](#3.26.15)
-    - [Coordination Model elements](#3.27)
-    - [Shared Coordinates API additions](#3.28)
-        - [Acquire and Publish coordinates API additions](#3.28.16)
-        - [SiteLocation API additions](#3.28.17)
-        - [ProjectLocation API additions](#3.28.18)
-        - [Revit Link API additions](#3.28.19)
-    - [Link API additions](#3.29)
-        - [External Resource framework additions](#3.29.20)
-        - [CADLinkType additions](#3.29.21)
-        - [ImportInstance additions](#3.29.22)
-        - [IFC Link API additions](#3.29.23)
-    - [Workshared operation progress changed events](#3.30)
-        - [WorksharedOperationProgressChangedEventArgs](#3.30.24)
-        - [DocumentSaveToLocalProgressChangedEventArgs](#3.30.25)
-        - [DataTransferProgressChangedEventArgs](#3.30.26)
-        - [DocumentReloadLatestProgressChangedEventArgs](#3.30.27)
-        - [DocumentSaveToCentralProgressChangedEventArgs](#3.30.28)
-        - [CreateRelatedFileProgressChangedEventArgs](#3.30.29)
-    - [Events related to linked resources](#3.31)
-        - [LinkedResourceOpeningEventArgs](#3.31.30)
-        - [LinkedResourceOpenedEventArgs](#3.31.31)
-    - [Events related to parallel View Export](#3.32)
-    - [DWG export API additions](#3.33)
-        - [ExportDWGSettings API additions](#3.33.32)
-    - [Part API additions](#3.34)
-    - [Freeform Rebar API additions](#3.35)
-    - [Custom Service for Freeform Rebar Definition](#3.36)
-    - [HVACSpaceType and Space air ventilation API](#3.37)
-    - [Energy Analysis API additions](#3.38)
-    - [Electrical API additions](#3.39)
-        - [Electrical Circuit Path API](#3.39.33)
-        - [PanelScheduleView API](#3.39.34)
-    - [MEPAnalyticalConnection API additions](#3.40)
-    - [Fabrication API additions](#3.41)
-        - [Hanger Rod additions](#3.41.35)
-        - [Placing and splitting fabrication parts](#3.41.36)
-        - [Fabrication Part export additions](#3.41.37)
-        - [Fabrication Part status additions](#3.41.38)
-        - [Fabrication part comparison](#3.41.39)
-        - [Fabrication Part ancillary usage additions](#3.41.40)
-        - [Fabrication Part custom data additions](#3.41.41)
-        - [FabricationConfiguration additions](#3.41.42)
-        - [Routing exclusions additions](#3.41.43)
-        - [FabricationServiceButton addition](#3.41.44)
-
-
-
-<a name="2"></a><h1>API changes</h1>
-
-<a name="2.1"></a><h2>API enabled in perspective views</h2>
-
-<a name="2.1.1"></a><h3>Element modifications and contextual commands</h3>
-
+</center></p>
+<p>For convenient, easy and effective web searching, this blog post provides an online version of that information.</p>
+<p>The <em>What's New</em> section always provides very important information, both for discovering and exploring the newly added API functionality and for later reference.</p>
+<p>If you encounter any issues migrating your existing add-ins between different versions, this is one of the first ports of call.</p>
+<p>For detailed information on all aspects of the Revit API, please refer to the rest of the API documentation and samples provided in the SDK.</p>
+<p>The most important things to install and always keep at hand are:</p>
+<ul>
+<li>The Revit API help file <code>RevitAPI.chm</code></li>
+<li>The Visual Studio solution containing all the SDK samples, <code>Samples\SDKSamples.sln</code></li>
+</ul>
+<p>You will need these constantly for research on how to solve specific Revit API programming tasks.</p>
+<p>Another main source of more in-depth official information is provided by the
+online <a href="http://help.autodesk.com/view/RVT/2018/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42">Revit API Developers Guide</a> included 
+in the <a href="http://help.autodesk.com/view/RVT/2018/ENU">Revit 2018 Help</a>.</p>
+<h4><a name="0"></a>What's New in Previous Versions</h4>
+<p>Here are links to the preceding 'What's New in the API' discussions:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2010-api.html">What's New in the Revit 2010 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2011-api.html">What's New in the Revit 2011 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2012-api.html">What's New in the Revit 2012 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/whats-new-in-the-revit-2013-api.html">What's New in the Revit 2013 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">What's New in the Revit 2014 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html">What's New in the Revit 2015 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html">What's New in the Revit 2016 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/04/whats-new-in-the-revit-2017-api.html">What's New in the Revit 2017 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/11/whats-new-in-the-revit-20171-api.html">What's New in the Revit 2017.1 API</a></li>
+</ul>
+<h3><a name="1"></a>Table of Contents</h3>
+<ul>
+<li><a href="#4.1">API enabled in perspective views</a><ul>
+<li><a href="#4.1.1">Element modifications and contextual commands</a></li>
+<li><a href="#4.1.2">External commands and applications</a></li>
+</ul>
+</li>
+<li><a href="#4.2">Geometry API additions</a><ul>
+<li><a href="#4.2.1">BRepBuilder API additions</a></li>
+<li><a href="#4.2.2">BRepBuilderSurfaceGeometry API additions</a></li>
+<li><a href="#4.2.3">Ellipse API additions</a></li>
+<li><a href="#4.2.4">RevolvedSurface API additions</a></li>
+</ul>
+</li>
+<li><a href="#4.3">Dimension API additions</a><ul>
+<li><a href="#4.3.1">DimensionEqualityLabelFormating API</a></li>
+<li><a href="#4.3.2">UnitsFormatOptions in DimensionType</a></li>
+<li><a href="#4.3.3">OrdinateDimensionSetting</a></li>
+</ul>
+</li>
+<li><a href="#4.4">FabricationPart detailing API</a><ul>
+<li><a href="#4.4.1">Split Parts API</a></li>
+<li><a href="#4.4.2">Detailed Fabrication additions</a></li>
+<li><a href="#4.4.3">Ancillary usage additions</a></li>
+<li><a href="#4.4.4">Part status</a></li>
+<li><a href="#4.4.5">Hanger rod additions</a></li>
+</ul>
+</li>
+<li><a href="#4.5">Import API additions</a><ul>
+<li><a href="#4.5.1">ShapeImporter additions</a></li>
+</ul>
+</li>
+<li><a href="#4.6">Worksharing events addition</a><ul>
+<li><a href="#4.6.1">WorksharedOperationProgressChangedEventArgs</a></li>
+<li><a href="#4.6.2">DocumentSaveToLocalProgessChangedEventArgs</a></li>
+<li><a href="#4.6.3">DocumentReloadLatestProgressChangedEventArgs</a></li>
+<li><a href="#4.6.4">DocumentSaveToCentralProgessChangedEventArgs</a></li>
+</ul>
+</li>
+</ul>
+<p><a name="2"></a><h1>API changes</h1></p>
+<p><a name="2.1"></a><h2>API enabled in perspective views</h2></p>
+<p><a name="2.1.1"></a><h3>Element modifications and contextual commands</h3></p>
 <p>Modification of many different object types is now allowed in perspective views. Most commands allowed in 3D orthographic views are now also allowed in perspective views. This includes contextual commands. Annotations are an exception and cannot be created in perspective views. </p>
 
-<a name="2.1.2"></a><h3>External commands and applications</h3>
+<p><a name="2.1.2"></a><h3>External commands and applications</h3>
 <p>External API commands and applications are now enabled by default in perspective views. The following behavior applies:</p>
 <ul>
 <li>Any external command that was automatically disabled by Revit when a perspective view is active will now be active.  No code changes are necessary to make this happen.</li>
 <li>Any external command that was explicitly disabled in perspective views will remain disabled. For example, if your command has an accessibility function limiting it to use in certain view types, the command will not be accessible in perspective views unless that function accepts ViewType.ThreeD as a view type that is allowed.</li>
 <li>Macros, the Macro Manager tools, Dynamo scripts and the Dynamo editor are also newly enabled when a perspective view is active.</li>
-</ul>
-
-
-<a name="2.2"></a><h2>Subelements</h2>
-
-
+</ul></p>
+<p><a name="2.2"></a><h2>Subelements</h2></p>
 <p>Several Revit elements can now contain a subdivision known as a Subelement.   Subelements provide a way for parts of an element to behave as though they were real elements without incurring the overhead of adding more full elements to the model.</p>
+
 <p>Many Revit features &ndash; for example parameters, schedules, and tags &ndash; were designed to operate on Elements. As a result, the Revit code needs to represent objects as Elements for them to participate in those features. This can lead to scalability problems, because every Element adds overhead and adding many Elements may decrease the performance of the model.  </p>
+
 <p>An alternative is to use Subelements. An element can expose a set of "Subelements" that it contains, specifying characteristics like their category and parameters, and certain Revit capabilities will treat those Subelements the same as ordinary Elements.  For example, a Subelement may contribute geometry to the main element and may be able to be selected independently of its parent Element.  It will possibly have its own (settable) type as well as an assigned category which can be different from its parent Element.</p>
+
 <p>In the API, the new Subelement class is used to refer to either an Element or a specific subelement of a given Element.   It is typically directly related to a Reference to either the Element or the specific subelement.</p>
+
 <p>Note that creation of new Subelements for a given element is not done generically.  Instead, the given Element may provide the ability to modify its definition, resulting in the creation of new Subelements.</p>
+
 <p>Examples of Elements which may incorporate Subelements in practice include:</p>
+
 <ul>
 <li>Rebar</li>
 <li>RebarContainer</li>
@@ -195,7 +126,9 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>Railing</li>
 <li>ContinuousRail</li>
 </ul>
+
 <p>To get access to a particular Subelement, you may use any of the following:</p>
+
 <ul>
 <li>Subelement.Create()</li>
 <li>Subelement.IsValidSubelementReference()</li>
@@ -203,7 +136,9 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>Document.GetSubelement(String uniqueId) &ndash; Gets the subelement referenced by a unique id string.</li>
 <li>Element.GetSubelements() &ndash; Returns the collection of the Element's Subelements.</li>
 </ul>
+
 <p>To access the basic Subelement properties, including its category and geometry, use:</p>
+
 <ul>
 <li>Subelement.GetBoundingBox()</li>
 <li>Subelement.GetGeometryObject()</li>
@@ -215,7 +150,9 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>Subelement.UniqueId</li>
 <li>ExportUtils.GetExportId(Subelement)</li>
 </ul>
+
 <p>To access the Subelement's type, use:</p>
+
 <ul>
 <li>Subelement.TypeId</li>
 <li>Subelement.ChangeTypeId()</li>
@@ -223,7 +160,9 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>Subelement.IsValidType()</li>
 <li>Subelement.CanHaveTypeAssigned()</li>
 </ul>
+
 <p>To access the Subelement's parameters, use:</p>
+
 <ul>
 <li>Subelement.GetAllParameters()</li>
 <li>Subelement.GetParameterValue()</li>
@@ -231,62 +170,73 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>Subelement.IsParameterModifiable()</li>
 <li>Subelement.HasParameter()</li>
 </ul>
+
 <p>For Elements which allow deletion of individual Subelements, use:</p>
+
 <ul>
 <li>Element.DeleteSubelement()</li>
 <li>Element.DeleteSubelements()</li>
 <li>Element.CanDeleteSubelement()</li>
 </ul>
 
-
-<a name="2.2.3"></a><h3>References and selection of subelements</h3>
-
-
+<p><a name="2.2.3"></a><h3>References and selection of subelements</h3></p>
 <p>The new enumerated value:</p>
+
 <ul>
 <li>ObjectType.Subelement</li>
 </ul>
+
 <p>provides the ability to prompt a user to select subelements interactively using Selection.PickObject() or Selection.PickObjects().</p>
+
 <p>The new enumerated value:</p>
+
 <ul>
 <li>ElementReferenceType.REFERENCE_TYPE_SUBELEMENT</li>
 </ul>
+
 <p>identify a reference as a reference to a specific subelement.</p>
+
 <p>The new methods:</p>
+
 <ul>
 <li>Reference.EqualTo()</li>
 <li>Reference.Contains()</li>
 </ul>
+
 <p>provide useful checks related to the contents of a given Reference object, applicable to subelement references as well as other types of references.</p>
 
-
-<a name="2.3"></a><h2>Changes to APIs for accessing version</h2>
-
-
+<p><a name="2.3"></a><h2>Changes to APIs for accessing version</h2></p>
 <p>The property:</p>
+
 <ul>
 <li>Application.IsSubscriptionUpdate</li>
 </ul>
+
 <p>has been deprecated and replaced by:</p>
+
 <ul>
 <li>Application.SubVersionNumber</li>
 </ul>
+
 <p>The new property returns a string representing the major-minor version number for the Revit application. For example, "2018.0.0".  This number is updated for major and minor updates. </p>
+
 <p>In RevitAddinUtility, the similar property:</p>
+
 <ul>
 <li>RevitProduct.IsSubscriptionUpdate</li>
 </ul>
+
 <p>has been deprecated and replaced by:</p>
+
 <ul>
 <li>RevitProduct.ReleaseSubVersion</li>
 </ul>
+
 <p>This new string property returns a similar major-minor version number for installed Revit versions.</p>
 
-
-<a name="2.4"></a><h2>Asset API Changes</h2>
-
-
+<p><a name="2.4"></a><h2>Asset API Changes</h2></p>
 <p>The following API classes moved from the Autodesk.Revit.Utility namespace to a new namespace Autodesk.Revit.DB.Visual:</p>
+
 <ul>
 <li>AssetProperty</li>
 <li>AssetProperties</li>
@@ -345,42 +295,38 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>APT_FloatArray &rarr; Float3</li>
 </ol>
 
-
-<a name="2.5"></a><h2>Dynamic Updaters on Reload Latest</h2>
-
-
+<p><a name="2.5"></a><h2>Dynamic Updaters on Reload Latest</h2></p>
 <p>Dynamic updaters are now triggered on Reload Latest for the elements added or changed in the central file.</p>
 
-
-<a name="2.6"></a><h2>Export to DWG/DXF API change</h2>
-
-
+<p><a name="2.6"></a><h2>Export to DWG/DXF API change</h2></p>
 <p>The new AutoCAD version (R2018) has been added to the ACADVersion enumerated type.  This is now the default version used when exporting to DWG and DXF.  </p>
 
-
-<a name="2.7"></a><h2>UIDocument.PromptForFamilyInstancePlacement() behavioral change</h2>
-
-
+<p><a name="2.7"></a><h2>UIDocument.PromptForFamilyInstancePlacement() behavioral change</h2></p>
 <p>The behavior for UIDocument.PromptForFamilyInstancePlacement() was changed to be same as that of PickObject() methods &ndash; the placement operation will be cancelled when the "x" button of Revit is clicked during the placement operation instead of closing Revit directly.</p>
 
-
-<a name="2.8"></a><h2>IndependentTag API changes</h2>
-
-
+<p><a name="2.8"></a><h2>IndependentTag API changes</h2></p>
 <p>The new method:</p>
+
 <ul>
 <li>IndependentTag.Create()</li>
 </ul>
+
 <p>replaces Autodesk.Revit.Creation.Document.NewTag(), which has been marked obsolete.  The new version supports tagging of either elements or subelements.</p>
+
 <p>The new method:</p>
+
 <ul>
 <li>IndependentTag.GetTaggedReference()</li>
 </ul>
+
 <p>returns a reference to the item which has been tagged.  This reference may be to a Subelement, which can also be identified by:</p>
+
 <ul>
 <li> IndependentTag.IsTaggedOnSubelement()</li>
 </ul>
+
 <p>The following properties and their methods now throw more informative exceptions:</p>
+
 <ul>
 <li>IndependentTag.LeaderElbow:</li>
 <ul>
@@ -393,16 +339,16 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>IndependentTag.SetLeaderEnd() &ndash; "There is no leader end because the tag does not use a free end leader."</li>
 </ul>
 </ul>
+
 <p>The new property:</p>
+
 <ul>
 <li>IndependentTag.HasElbow</li>
 </ul>
+
 <p>indicates if the leader of the tag has an elbow point or not.</p>
 
-
-<a name="2.9"></a><h2>Shared Coordinates API changes</h2>
-
-
+<p><a name="2.9"></a><h2>Shared Coordinates API changes</h2></p>
 <p>The following properties have been deprecated and replaced:</p>
 
 <ul>
@@ -411,11 +357,9 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>ProjectLocation.SiteLocation &rarr; ProjectLocation.GetSiteLocation()</li>
 </ul>
 
-
-<a name="2.10"></a><h2>New DirectShape behaviors</h2>
-
-
+<p><a name="2.10"></a><h2>New DirectShape behaviors</h2></p>
 <p>DirectShape elements now support new behaviors.  Other than the limitations listed below, no code changes are required to enable these new behaviors for DirectShape elements.</p>
+
 <ul>
 <li>Tagging &ndash; if the element's assigned category supports tagging and a tag type exists, the DirectShape can be tagged with Revit tagging tools. </li>
 <li>Edge dimensions &ndash; if the DirectShape is referenceable, it will now support dimensioning to edge references as well as face references.</li>
@@ -435,17 +379,16 @@ Here are links to the preceding 'What's New in the API' discussions:
 </ul>
 </ul>
 
-
-<a name="2.11"></a><h2>Rebar API Changes</h2>
-
-
+<p><a name="2.11"></a><h2>Rebar API Changes</h2></p>
 <p>Rebar now supports two different layout options: shape-driven and free-form.  Previously, all Rebar elements were shape-driven.  The new methods:</p>
+
 <ul>
 <li>Rebar.GetShapeDrivenAccessor() &ndash; Returns the Shape Driven interface which exposes specific Shape Driven logic.</li>
 <li>Rebar.GetFreeFormAccessor() &ndash; Returns the Free Form interface which exposes specific Free Form logic.</li>
 <li>Rebar.IsRebarFreeForm &ndash; Returns true if the rebar is free form and false if shape driven.</li>
 <li>Rebar.IsRebarShapeDriven &ndash; Returns true if the rebar is shape driven and false if free form.</li>
 </ul>
+
 <p>Rebar members which are applicable only for shape-driven rebar have been deprecated and replaced with equivalents in the class RebarShapeDrivenAccessor.  Specifically, the following members are deprecated:</p>
 
 <ul>
@@ -471,9 +414,7 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>Rebar.RebarShapeId &rarr; getter &ndash; Rebar.GetShapeId() and setter &ndash; RebarShapeDrivenAccessor.SetRebarShapeId()</li>
 </ul>
 
-<a name="2.12"></a><h2>FabricSheet API Changes</h2>
-
-
+<p><a name="2.12"></a><h2>FabricSheet API Changes</h2></p>
 <p>The following methods have been deprecated and replaced:</p>
 
 <ul>
@@ -482,9 +423,9 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>FabricWireItem.Create(double distance, double wireLength, ElementId wireType) &rarr; FabricWireItem.Create(double distance, double wireLength, ElementId wireType, double wireOffset) &ndash; Older calls can use the new method with wireOffset set to 0.0.</li>
 </ul>
 
-<a name="2.13"></a><h2>Structural Section API Changes</h2>
-
+<p><a name="2.13"></a><h2>Structural Section API Changes</h2></p>
 <p>Several section properties were moved from subclasses to the base class StructuralSection:</p>
+
 <ul>
 <li>StructuralSection.ElasticModulusStrongAxis</li>
 <li>StructuralSection.ElasticModulusWeakAxis</li>
@@ -502,7 +443,9 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>StructuralSection.TorsionalMomentOfInertia</li>
 <li>StructuralSection.WarpingConstant</li>
 </ul>
+
 <p>Several specific structural sections offer new constructors with additional input parameters.  Their original constructors have been deprecated.</p>
+
 <ul>
 <li>StructuralSectionCSlopedFlange</li>
 <li>StructuralSectionISlopedFlange</li>
@@ -510,7 +453,9 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>StructuralSectionLAngle</li>
 <li>StructuralSectionStructuralTees</li>
 </ul>
+
 <p>Several new specific structural section classes have been introduced:</p>
+
 <ul>
 <li>StructuralSectionGeneralC &ndash; Defines parameters for Channel Cold Formed shape.</li>
 <li>StructuralSectionGeneralCEx &ndash; Defines parameters for Channel with Fold Cold Formed shape.</li>
@@ -525,7 +470,9 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>StructuralSectionGeneralU &ndash; Defines parameters for general Channel shape.</li>
 <li>StructuralSectionGeneralW &ndash; Defines parameters for Angle structural section.</li>
 </ul>
+
 <p>In addition, the API for structural sections offers a few other new capabilities:</p>
+
 <ul>
 <li>StructuralSection.GetBoundarySize() &ndash; returns the size of the section boundary.</li>
 <li>StructuralSection.AnalysisParams &ndash; accesses a common set of parameters for structural analysis which can be associated to a section.</li>
@@ -535,10 +482,7 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>StructuralSectionUtils.GetStructuralElementDefinitionData() &ndash; returns data defining the section and the position of the structural element.</li>
 </ul>
 
-
-<a name="2.14"></a><h2>ElectricalSystem API changes</h2>
-
-
+<p><a name="2.14"></a><h2>ElectricalSystem API changes</h2></p>
 <p>The following functions have been deprecated and replaced:</p>
 
 <ul>
@@ -547,35 +491,28 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>Autodesk.Revit.Creation.Document.NewElectricalSystem(ICollection &lt; ElementId &gt; , ElectricalSystemType) &rarr; ElectricalSystem.Create(Document, IList&lt;ElementId&gt;, ElectricalSystemType)</li>
 </ul>
 
-<a name="2.15"></a><h2>Pipe Pressure Loss Calculation change</h2>
-
+<p><a name="2.15"></a><h2>Pipe Pressure Loss Calculation change</h2></p>
 <p>The methods:</p>
+
 <ul>
 <li>Autodesk.Revit.DB.Plumbing.PipeSettings.GetPressLossCalculationServerInfo()</li>
 <li>Autodesk.Revit.DB.Plumbing.PipeSettings.SetPressLossCalculationServerInfo()</li>
 </ul>
+
 <p>have been deprecated in Revit 2018 and will be removed in the next version of Revit. Custom pipe pressure loss calculations will no longer be supported. Similar functionality can be accessed by setting Autodesk.Revit.DB.Plumbing.PipeSettings.AnalysisForClosedLoopHydronicPipingNetworks.</p>
 
-
-<a name="2.16"></a><h2>Corrected names of AutoRouteFailures values</h2>
-
-
+<p><a name="2.16"></a><h2>Corrected names of AutoRouteFailures values</h2></p>
 <p>The following BuiltInFailures.AutoRouteFailures values were renamed due to spelling errors:</p>
+
 <ul>
 <li>AttemptToConnectNonSlopingElementToSlopedPipeWarning (renamed from AttemptToComnnectNonSlopingElementToSlopedPipeWarning)</li>
 <li>AttemptToConnectNonSlopingElementToSlopedPipeError (renamed from AttemptToComnnectNonSlopingElementToSlopedPipeError)</li>
 </ul>
 
-
-<a name="2.17"></a><h2>Obsolete API removal</h2>
-
-
+<p><a name="2.17"></a><h2>Obsolete API removal</h2></p>
 <p>The following API members and classes which had previously been marked Obsolete have been removed in this release.  Consult the API documentation from prior releases for information on the replacements to use:</p>
 
-
-<a name="2.17.4"></a><h3>Classes</h3>
-
-
+<p><a name="2.17.4"></a><h3>Classes</h3></p>
 <ul>
 <li>Autodesk.Revit.DB.Plumbing.PipeType</li>
 <li>Autodesk.Revit.DB.Structure.FabricSheet.BentFabricWiresOrientation</li>
@@ -585,10 +522,7 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>Autodesk.Revit.DB.PropertySetLibrary</li>
 </ul>
 
-
-<a name="2.17.5"></a><h3>Methods</h3>
-
-
+<p><a name="2.17.5"></a><h3>Methods</h3></p>
 <ul>
 <li>Autodesk.Revit.DB.NurbSpline.Create(IList&lt;XYZ&gt;, IList&lt;Double&gt;) : NurbSpline</li>
 <li>Autodesk.Revit.DB.NurbSpline.Create(IList&lt;XYZ&gt;, IList&lt;Double&gt;, IList&lt;Double&gt;, Int32, Boolean, Boolean) : NurbSpline</li>
@@ -618,10 +552,7 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>Autodesk.Revit.DB.Ellipse.Create(XYZ, double, double, XYZ, XYZ, double, double) : Ellipse</li>
 </ul>
 
-
-<a name="2.17.6"></a><h3>Properties</h3>
-
-
+<p><a name="2.17.6"></a><h3>Properties</h3></p>
 <ul>
 <li>Autodesk.Revit.DB.Structure.LoadCase.NatureCategory : LoadNatureCategory</li>
 <li>Autodesk.Revit.DB.Mechanical.MechanicalSystem.Flow : Double</li>
@@ -637,36 +568,25 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>Autodesk.Revit.UI.Events.DialogBoxShowingEventArgs.HelpId : Int32</li>
 </ul>
 
-
-<a name="2.17.7"></a><h3>Enumerated types</h3>
-
-
+<p><a name="2.17.7"></a><h3>Enumerated types</h3></p>
 <ul>
 <li>Autodesk.Revit.DB.Structure.LoadNatureCategory</li>
 <li>Autodesk.Revit.Attributes.TransactionMode.Automatic</li>
 </ul>
 
-
-
-<a name="3"></a><h1>API additions</h1>
-
-
-
-
-<a name="3.18"></a><h2>API to get list of reviewable warnings from a Document</h2>
-
-
+<p><a name="3"></a><h1>API additions</h1></p>
+<p><a name="3.18"></a><h2>API to get list of reviewable warnings from a Document</h2></p>
 <p>The new method:</p>
+
 <ul>
 <li>Document.GetWarnings()</li>
 </ul>
+
 <p>returns a list of failure messages generated from persistent (reviewable) warnings accumulated in the document.</p>
 
-
-<a name="3.19"></a><h2>API access to FamilyInstance references</h2>
-
-
+<p><a name="3.19"></a><h2>API access to FamilyInstance references</h2></p>
 <p>The following new methods have been added to enable easy access to FamilyInstance references that correspond to reference planes and reference lines in the family.  Some use the options in the new enumeration FamilyInstanceReferenceType as input to identify "Strong" or "Weak" references or specific positional references in each of the 3 coordinate directions (as determined by the possible values of parameter "Is Reference" of reference planes and parameter "Reference" of reference lines in families).</p>
+
 <ul>
 <li>FamilyInstance.GetReferences()</li>
 <li>FamilyInstance.GetReferenceByName()</li>
@@ -674,19 +594,23 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>FamilyInstance.GetReferenceName()</li>
 </ul>
 
-
-<a name="3.20"></a><h2>Multistory Stairs API</h2>
-
-
+<p><a name="3.20"></a><h2>Multistory Stairs API</h2></p>
 <p>The new class:</p>
+
 <ul>
 <li>MultistoryStairs</li>
 </ul>
+
 <p>allows users to create stairs that span multiple levels.  A multistory stairs element may contain multiple stairs whose extents are governed by base and top levels.</p>
+
 <p>This element will contain one or more Stairs elements. Stairs elements are either a reference instance which is copied to each level covered by groups of identical stairs instances which share the same level height, or individual Stairs instances which are not connected to a group with the same level height. By default, when adding new levels to the multistory stair, new stairs will be added to the group.</p>
+
 <p>For groups of duplicate stairs at different levels, the instances can be found as Subelements of the Stairs element.</p>
+
 <p>Stairs in a connected group can be edited together by modifying the associated Stairs instance. For specific floors that need special designs, stairs can be separated from a group by unpinning the element, changes made to this Stairs will not affect other any other instance in the element, or add the stairs back into the group if needed. However, any changes made to the stair will be lost since the stair's properties will be overridden by the group specifications.</p>
+
 <p>The class has the following methods:</p>
+
 <ul>
 <li>MultistoryStairs.AddStairsByLevelIds() &ndash; Adds stairs to the given levels.</li>
 <li>MultistoryStairs.RemoveStairsByLevelIds() &ndash; Removes stairs from the given levels. This will regenerate the multistory stairs from the remaining levels.</li>
@@ -700,58 +624,69 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>MultistoryStairs.Unpin() &ndash; Unpins a story of stairs by giving its base level id.</li>
 <li>MultistoryStairs.Pin() &ndash; Pins a unpinned stairs back into a story of a stairs.</li>
 </ul>
+
 <p>The new property:</p>
+
 <ul><li>Stairs.MultistoryStairsId</li></ul>
+
 <p>indicates the id of the MultistoryStairs element to which the Stairs belong to.</p>
+
 <p>Related to StairsPath functionality for multistory stairs, the new functions:</p>
+
 <ul>
 <li>StairsPath.CanCreateOnMultistoryStairs()</li>
 <li>StairsPath.CreateOnMultistoryStairs()</li>
 </ul>
+
 <p>support creation of new stairs paths in a plan view for stairs instances in a multistory stairs element.</p>
 
-
-<a name="3.20.8"></a><h3>Railings API additions related to MultistoryStairs</h3>
-
-
+<p><a name="3.20.8"></a><h3>Railings API additions related to MultistoryStairs</h3></p>
 <p>The new methods:</p>
+
 <ul>
 <li>Railing.GetMultistoryStairsPlacementLevels()</li>
 <li>Railing.SetMultistoryStairsPlacementLevels()</li>
 <li>Railing.GetSubelementOnLevel()</li>
 </ul>
+
 <p>provide access to Railing elements which are hosted on members of Multistory stairs.  </p>
+
 <p>The method:</p>
+
 <ul>
 <li>Railing.Create(Document document, ElementId multistoryStairsId, ElementId levelId,  ElementId railingTypeId,  RailingPlacementPosition placePosition)</li>
 </ul>
+
 <p>Creates new railings on a given level of given multistory stairs &ndash; the created railing will be hosted on stairs included in MultistoryStairs element on given level.  </p>
+
 <p>The existing method:</p>
+
 <ul>
 <li>Railing.Create(Document document, ElementId stairsId,  ElementId railingTypeId,  RailingPlacementPosition placePosition)</li>
 </ul>
+
 <p>now supports MulitstoryStairs elements as input, where the resulting railing will be added on every level of given stairs in multistory stairs.</p>
+
 <p>The existing property:</p>
+
 <ul>
 <li>Railing.HostId</li>
 </ul>
+
 <p>now supports stairs or stairs components coming from MultistoryStairs elements as well. </p>
 
-
-<a name="3.21"></a><h2>Dimension API additions</h2>
-
-
-
-
-<a name="3.21.9"></a><h3>DimensionEqualityLabelFormating API</h3>
-
-
+<p><a name="3.21"></a><h2>Dimension API additions</h2></p>
+<p><a name="3.21.9"></a><h3>DimensionEqualityLabelFormating API</h3></p>
 <p>The new class:</p>
+
 <ul>
 <li>DimensionEqualityLabelFormatting</li>
 </ul>
+
 <p>allows users to set dimension equality formulas for continuous linear or angular dimensions.</p>
+
 <p>New methods and properties include:</p>
+
 <ul>
 <li>DimensionEqualityLabelFormatting.LeadingSpaces</li>
 <li>DimensionEqualityLabelFormatting.LabelType</li>
@@ -760,49 +695,60 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>DimensionEqualityLabelFormatting.GetFormatOptions()</li>
 <li>DimensionEqualityLabelFormatting.SetFormatOptions()</li>
 </ul>
+
 <p>The following new methods in DimensionType allow access to equality formulas:</p>
+
 <ul>
 <li>DimensionType.GetEqualityFormula()</li>
 <li>DimensionType.SetEqualityFormula()</li>
 </ul>
 
-
-<a name="3.21.10"></a><h3>UnitsFormatOptions in DimensionType</h3>
-
-
+<p><a name="3.21.10"></a><h3>UnitsFormatOptions in DimensionType</h3></p>
 <p>The new functions:</p>
+
 <ul>
 <li>DimensionType.GetUnitsFormatOptions()</li>
 <li>DimensionType.SetUnitsFormatOptions()</li>
 </ul>
+
 <p>allow users to get or set the FormatOptions for a DimensionType.</p>
 
-
-<a name="3.21.11"></a><h3>OrdinateDimensionSetting</h3>
-
-
+<p><a name="3.21.11"></a><h3>OrdinateDimensionSetting</h3></p>
 <p>The new class:</p>
+
 <ul>
 <li>OrdinateDimensionSetting</li>
 </ul>
+
 <p>allows users to customize ordinate dimensions.</p>
+
 <p>The new enum:</p>
+
 <ul>
 <li>OrdinateDimensionLineStyle</li>
 </ul>
+
 <p>allows users to choose continuous or segmented line styles for their dimensions.</p>
+
 <p>The new enums:</p>
+
 <ul>
 <li>OrdinateTextOrientation</li>
 <li>OrdinateTextPosition</li>
 </ul>
+
 <p>allows users to orient text in relation to the dimension lines or witness lines.</p>
+
 <p>The new enum:</p>
+
 <ul>
 <li>OrdinateOriginVisibility</li>
 </ul>
+
 <p>allows users to control visibility of their dimensions.</p>
+
 <p>New properties in OrdinateDimensionSetting include:</p>
+
 <ul>
 <li>OrdinateDimensionSetting.DimLineLength</li>
 <li>OrdinateDimensionSetting.DimLineStyle</li>
@@ -811,107 +757,110 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>OrdinateDimensionSetting.OriginVisibility</li>
 <li>OrdinateDimensionSetting.OriginTickMarkId</li>
 </ul>
+
 <p>The following new methods in DimensionType allow access to the OrdinateDimensionSetting:</p>
+
 <ul>
 <li> DimensionType.GetOrdinateDimensionSetting()</li>
 <li> DimensionType.SetOrdinateDimensionSetting()</li>
 </ul>
 
-
-<a name="3.22"></a><h2>SpatialElementTag API additions</h2>
-
-
+<p><a name="3.22"></a><h2>SpatialElementTag API additions</h2></p>
 <p>SpatialElementTag is the base element for Room, Area and Space tag classes.</p>
+
 <p>The following new properties have been added:</p>
+
 <ul>
 <li>SpatialElementTag.HasElbow &ndash; Identifies if the tag's leader has an elbow point or not.</li>
 <li>SpatialElementTag.TagText &ndash; The text displayed by the tag.</li>
 </ul>
 
-
-<a name="3.23"></a><h2>Geometry API additions</h2>
-
-
-
-
-<a name="3.23.12"></a><h3>Surface and Face API</h3>
-
-
+<p><a name="3.23"></a><h2>Geometry API additions</h2></p>
+<p><a name="3.23.12"></a><h3>Surface and Face API</h3></p>
 <p>The new method:</p>
+
 <ul>
 <li>Face.GetSurface()</li>
 </ul>
+
 <p>returns a copy of the Face's surface.</p>
+
 <p>In order to correctly leverage this information, the following properties:</p>
+
 <ul>
 <li>Face.OrientationMatchesSurfaceOrientation</li>
 <li>Surace.OrientationMatchesParametricOrientation</li>
 </ul>
+
 <p>identify whether the face's orientation matches the surface orientation, and whether the surface orientation is the same as or opposite to its parametric orientation.</p>
 
-
-<a name="3.23.13"></a><h3>RevolvedSurface API</h3>
-
-
+<p><a name="3.23.13"></a><h3>RevolvedSurface API</h3></p>
 <p>The new method:</p>
+
 <ul>
 <li>RevolvedSurface.GetProfileCurveInWorldCoordinates()</li>
 </ul>
+
 <p>returns a copy of the profile curve expressed in the world coordinate system.</p>
 
-
-<a name="3.23.14"></a><h3>RuledSurface API</h3>
-
-
+<p><a name="3.23.14"></a><h3>RuledSurface API</h3></p>
 <p>The newly added methods:</p>
+
 <ul>
 <li>RuledSurface.HasFirstProfilePoint()</li>
 <li>RuledSurface.HasSecondProfilePoint()</li>
 </ul>
+
 <p>check if a point was used to define one of the surface profiles. </p>
 
-
-<a name="3.24"></a><h2>Level API addition</h2>
-
-
+<p><a name="3.24"></a><h2>Level API addition</h2></p>
 <p>The new method:</p>
+
 <ul>
 <li>Level.FindAssociatedPlanViewId()</li>
 </ul>
+
 <p>finds the id of the first available associated floor or structural plan view associated with this level. If there are multiple associated views, Revit will return the first one it finds. </p>
 
-
-<a name="3.25"></a><h2>Dockable Frame API Additions</h2>
-
-
+<p><a name="3.25"></a><h2>Dockable Frame API Additions</h2></p>
 <p>Custom Dockable Panes now support the ability for display of dynamic UI elements, such as web browser controls.  This capability should be used in cases where the UI for the pane (layout, buttons etc.) changes dynamically during the lifetime of the Revit session. To use this, implement the new interface:</p>
+
 <ul>
 <li>IFrameworkElementCreator</li>
 </ul>
+
 <p>with a method:</p>
+
 <ul>
 <li>IFrameworkElementCreator.CreateFrameworkElement()</li>
 </ul>
+
 <p>that constructs and returns the WPF Framework element to embedded in the Revit dockable pane.</p>
+
 <p>The new members:</p>
+
 <ul>
 <li>DockablePaneProviderData.GetFrameworkElement()</li>
 <li>DockablePaneProviderData.FrameworkElementCreator</li>
 </ul>
+
 <p>provide the ability for the application to deliver a dynamic framework element to the dockable pane.  </p>
+
 <p>The property:</p>
+
 <ul>
 <li>DockablePaneProviderData.FrameworkElement</li>
 </ul>
+
 <p>is now allowed to be null, in situations where the FrameworkElement will be dynamically created.</p>
 
-
-<a name="3.26"></a><h2>DirectContext3D for display of externally managed 3D graphics in Revit</h2>
-
-
+<p><a name="3.26"></a><h2>DirectContext3D for display of externally managed 3D graphics in Revit</h2></p>
 <p>DirectContext3D is an API for displaying external graphics in the context of a Revit model. The API provides a more connected experience to users who can benefit from the ability to display graphics based on geometry that is either difficult or costly to fully import into Revit.</p>
+
 <p>An external plugin can use DirectContext3D API to render geometry by encoding it inside pairs of vertex and index buffers. The communication between Revit and the plugin is accomplished with the use of the External Service Framework (ESF). Revit's rendering pipeline asks registered servers of the DirectContext3D service to provide the geometry for rendering. Revit informs the plugin about certain rendering state, such as the display style and whether the current rendering pass is for transparent objects. The plugin also communicates certain information to Revit, such as the bounding box of the geometry to be rendered.</p>
+
 <p>The following list contains the major added classes and their descriptions:</p>
+
 <ul>
 <li>DirectContext3D.IDirectContext3DServer &ndash; The interface to be implemented by a server of the DirectContext3D external service.</li>
 <li>DirectContext3D.DrawContext &ndash; A class that provides drawing functionality for use by DirectContext3D servers.</li>
@@ -930,88 +879,84 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>DirectContext3D.Camera &ndash; A collection of camera settings for DirectContext3D.</li>
 </ul>
 
-
-<a name="3.26.15"></a><h3>View update for DirectContext3D</h3>
-
-
+<p><a name="3.26.15"></a><h3>View update for DirectContext3D</h3></p>
 <p>The new method:</p>
+
 <ul>
 <li>UIDocument.UpdateAllOpenViews()</li>
 </ul>
+
 <p>updates all open views in this document after elements have been changed, deleted, selected or de-selected. Graphics in the views are fully redrawn regardless of which elements have changed.  This function should only rarely be needed, but might be required when working with graphics drawn from outside of Revit's transactions and elements, for example, when using DirectContext3D.</p>
+
 <p>This function is potentially expensive as many views may be updated at once, including regeneration of view's geometry and redisplay of graphics.  Thus for most situations it is recommended that API applications rely on the Revit application framework to update views more deliberately.</p>
 
-
-<a name="3.27"></a><h2>Coordination Model elements</h2>
-
-
+<p><a name="3.27"></a><h2>Coordination Model elements</h2></p>
 <p>Coordination Model elements current can link the graphical contents of Navisworks files and display them in context in the Revit session.  These elements leverage the DirectContext3D framework to handle the display of the external graphics, and are the first example of an element which is designated to contain a link to externally managed DirectContext3D graphics (a "DirectContext3D handle" element).</p>
+
 <p>There is no current way to create new Coordination Model or DirectContext3D handle elements via the API.  However, you can use the capabilities of the related classes to identify and manipulate these elements. These elements can be accessed from the following new API classes:</p>
+
 <ul>
 <li>DirectContext3DHandleUtils &ndash; provides utilities related to the identification of types and instances which are storing externalized graphics via DirectContext3D</li>
 <li>DirectContext3DHandleSettings &ndash; provides access to override settings applied to DirectContext3D handles through the Visibility/Graphics dialog.</li>
 <li>DirectContext3DHandleOverrides &ndash; provides access to DirectContext3DHandleSettings that are stored by a given view.</li>
 </ul>
 
-
-<a name="3.28"></a><h2>Shared Coordinates API additions</h2>
-
-
-
-
-<a name="3.28.16"></a><h3>Acquire and Publish coordinates API additions</h3>
-
-
+<p><a name="3.28"></a><h2>Shared Coordinates API additions</h2></p>
+<p><a name="3.28.16"></a><h3>Acquire and Publish coordinates API additions</h3></p>
 <p>Two new methods allow users to acquire and publish shared coordinates:</p>
+
 <ul>
 <li>Document.AcquireCoordinates() &ndash; Acquires project coordinates from the specified link instance. This method accepts both Revit links (RevitLinkInstance) and DWG links (ImportInstance).</li>
 <li>Document.PublishCoordinates() &ndash; Publishes shared coordinates to the specified ProjectLocation. This method works only on Revit links.</li>
 </ul>
 
-<a name="3.28.17"></a><h3>SiteLocation API additions</h3>
-
+<p><a name="3.28.17"></a><h3>SiteLocation API additions</h3></p>
 <p>Two new read-only properties have been added to provide information on the geographic coordinate system of a SiteLocation. The geographic coordinate system is imported from a DWG file from AutoCAD or Civil 3D. If the SiteLocation has geographic coordinate system information, the latitude and longitude of the SiteLocation will be updated automatically</p>
+
 <p>when the model's Survey Point is moved.</p>
+
 <ul>
 <li>SiteLocation.GeoCoordinateSystemId &ndash; Gets a string corresponding to geographic coordinate system ID, such as "AMG-50" or "Beijing1954/a.GK3d-40" for the SiteLocation. The value will be the empty string if there is no coordinate system specified for the SiteLocation. This property is read-only.</li>
 <li>SiteLocation.GeoCoordinateSystemDefinition &ndash; Gets an XML string describing the geographic coordinate system. The value will be the empty string if there is no coordinate system specified for the SiteLocation. This property is read-only.</li>
 </ul>
+
 <p>The new method:</p>
+
 <ul>
 <li>SiteLocation.IsCompatibleWith() &ndash; Checks whether the geographic coordinate system of this site is compatible with the given site.</li>
 </ul>
 
-<a name="3.28.18"></a><h3>ProjectLocation API additions</h3>
-
+<p><a name="3.28.18"></a><h3>ProjectLocation API additions</h3></p>
 <p>The new method:</p>
+
 <ul>
 <li>ProjectLocation.Create()</li>
 </ul>
+
 <p>creates a new ProjectLocation in the document from the given SiteLocation and with the given name.</p>
 
-<a name="3.28.19"></a><h3>Revit Link API additions</h3>
-
+<p><a name="3.28.19"></a><h3>Revit Link API additions</h3></p>
 <p>The new method:</p>
+
 <ul>
 <li>static RevitLinkInstance.Create(ImportPlacement placement)</li>
 </ul>
+
 <p>creates a new instance of a linked Revit project (RevitLinkType). Instances will be placed origin-to-origin or by shared coordinates according to the input placement type.</p>
 
-<a name="3.29"></a><h2><h2>Link API additions</h2>
-
-
-<a name="3.29.20"></a><h3>External Resource framework additions</h3>
-
+<p><a name="3.29"></a><h2><h2>Link API additions</h2></p>
+<p><a name="3.29.20"></a><h3>External Resource framework additions</h3></p>
 <p>IExternalResourceServer can now provide CAD format links, DWF markups, and IFC links. The following new values have been added to ExternalResourceType.BuiltInExternalResourceTypes:</p>
+
 <ul>
 <li>CADLink</li>
 <li>DWFMarkup</li>
 <li>IFCLink</li>
 </ul>
 
-<a name="3.29.21"></a><h3>CADLinkType additions</h3>
-
+<p><a name="3.29.21"></a><h3>CADLinkType additions</h3></p>
 <p>Several new methods have been added to CADLinkType as part of external resource framework enhancements:</p>
+
 <ul>
 <li>CADLinkType.Reload() &ndash; Reloads a CADLinkType from its current location.</li>
 <li>CADLinkType.Reload(CADLinkOptions options) &ndash; Reloads a CADLinkType from its current location, including options to control graphic overrides.</li>
@@ -1019,44 +964,49 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>CADLinkType.LoadFrom(ExternalResourceReference reference) &ndash; Reloads a CADLinkType from an external resource server.</li>
 </ul>
 
-<a name="3.29.22"></a><h3>ImportInstance additions</h3>
-
+<p><a name="3.29.22"></a><h3>ImportInstance additions</h3></p>
 <p>Several new methods have been added to create ImportInstance elements, either from an existing link type or a new link type:</p>
+
 <ul>
 <li>ImportInstance.Create(DWGImportOptions options, String fileName) &ndash; Creates a new DWG or DXF type and instance from a file on disk.</li>
 <li>ImportInstance.Create(DWGImportOptions options, ExternalResourceReference reference) &ndash; Creates a new DWG or DXF type and instance from an external resource location.</li>
 <li>ImportInstance.Create(ElementId typeId) &ndash; Creates a new DWG or DXF instance from an existing CADLinkType.</li>
 </ul>
+
 <p>Methods have also been added to create DGN, SAT, and SKP links from external resource locations.</p>
 
-<a name="3.29.23"></a><h3>IFC Link API additions</h3>
-
+<p><a name="3.29.23"></a><h3>IFC Link API additions</h3></p>
 <p>The method:</p>
+
 <ul>
 <li>RevitLinkType.UpdateFromIFC()</li>
 </ul>
+
 <p>now has a new version that allows for an ExternalResourceReference to specify the IFC file name, instead of a string.</p>
 
-<a name="3.30"></a><h2><h2>Workshared operation progress changed events</h2>
-
+<p><a name="3.30"></a><h2><h2>Workshared operation progress changed events</h2></p>
 <p>Subscribe to the Autodesk.Revit.ApplicationServices.Application.WorksharedOperationProgressChanged event to be notified when progress has changed during Collaboration for Revit's synchronizing.</p>
+
 <p>This event consists of several phases. Different event arguments are used during each phase.</p>
 
-<a name="3.30.24"></a><h3>WorksharedOperationProgressChangedEventArgs</h3>
-
+<p><a name="3.30.24"></a><h3>WorksharedOperationProgressChangedEventArgs</h3></p>
 <p>The new class:</p>
+
 <ul>
 <li>Autodesk.Revit.DB.Events.WorksharedOperationProgressChangedEventArgs</li>
 </ul>
+
 <p>provides a base class for event arguments for worksharing-based progress events.</p>
 
-<a name="3.30.25"></a><h3>DocumentSaveToLocalProgressChangedEventArgs</h3>
-
+<p><a name="3.30.25"></a><h3>DocumentSaveToLocalProgressChangedEventArgs</h3></p>
 <p>The new class:</p>
+
 <ul>
 <li>Autodesk.Revit.DB.Events.DocumentSaveToLocalProgressChangedEventArgs provides information during the save to local phase of the DocumentSynchronizingWithCentralProgressChanged event.</li>
 </ul>
+
 <p>It has the following properties:</p>
+
 <ul>
 <li>DocumentSaveToLocalProgressChangedEventArgs.Location &ndash; Full path of the central model which is to be synchronized.</li>
 <li>DocumentSaveToLocalProgressChangedEventArgs.Status &ndash; Gets the API event status, which reflects the current operation execution status.</li>
@@ -1066,13 +1016,15 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>DocumentSaveToLocalProgressChangedEventArgs.SaveToLocalFinished &ndash; Indicates if the current "save to local" operation has finished.</li>
 </ul>
 
-<a name="3.30.26"></a><h3>DataTransferProgressChangedEventArgs</h3>
-
+<p><a name="3.30.26"></a><h3>DataTransferProgressChangedEventArgs</h3></p>
 <p>The new class:</p>
+
 <ul>
 <li>Autodesk.Revit.DB.Events.DataTransferProgressChangedEventArgs provides information during the data transferring phase of the WorksharedOperationProgressChanged event. Generally, it is not used directly because It is the base class of Autodesk.Revit.DB.Events.DocumentReloadLatestProgressChangedEventArgs, Autodesk.Revit.DB.Events.DocumentSaveToCentralProgressChangedEventArgs and Autodesk.Revit.DB.Events.CreateRelatedFileProgressChangedEventArgs</li>
 </ul>
+
 <p>It has the following properties:</p>
+
 <ul>
 <li>DataTransferProgressChangedEventArgs.Location &ndash; Full path of the central model which is to be synchronized.</li>
 <li>DataTransferProgressChangedEventArgs.Status &ndash; Gets the API event status, which reflects the current operation execution status.</li>
@@ -1082,13 +1034,15 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>DataTransferProgressChangedEventArgs.TotalSize &ndash; Total expected data size to download, in bytes.</li>
 </ul>
 
-<a name="3.30.27"></a><h3>DocumentReloadLatestProgressChangedEventArgs</h3>
-
+<p><a name="3.30.27"></a><h3>DocumentReloadLatestProgressChangedEventArgs</h3></p>
 <p>The new class:</p>
+
 <ul>
 <li>Autodesk.Revit.DB.Events.DocumentReloadLatestProgressChangedEventArgs provides information during the reload latest phase of the DocumentSynchronizingWithCentralProgressChanged event.</li>
 </ul>
+
 <p>It has the following properties:</p>
+
 <ul>
 <li>DocumentReloadLatestProgressChangedEventArgs.Location &ndash; The full path of the central model which is to be synchronized.</li>
 <li>DocumentReloadLatestProgressChangedEventArgs.Status &ndash; Gets API event status, reflecting the current operation execution status.</li>
@@ -1101,15 +1055,17 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>DocumentReloadLatestProgressChangedEventArgs.ReloadLatestFinished &ndash; Indicates if current 'reload latest' progress is finished or not.</li>
 </ul>
 
-
-<a name="3.30.28"></a><h3>DocumentSaveToCentralProgressChangedEventArgs</h3>
-
+<p><a name="3.30.28"></a><h3>DocumentSaveToCentralProgressChangedEventArgs</h3></p>
 <p>The new class:</p>
+
 <ul>
 <li>Autodesk.Revit.DB.Events.DocumentSaveToCentralProgressChangedEventArgs</li>
 </ul>
+
 <p>provides information during the save to central phase of the DocumentSynchronizingWithCentralProgressChanged event.</p>
+
 <p>It has the following properties:</p>
+
 <ul>
 <li>DocumentSaveToCentralProgressChangedEventArgs.Location &ndash; Full path of the central model which is to be synchronized.</li>
 <li>DocumentSaveToCentralProgressChangedEventArgs.Status &ndash; Gets API event status, reflecting the current operation execution status.</li>
@@ -1122,15 +1078,17 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>DocumentSaveToCentralProgressChangedEventArgs.FailureDueToConflicts &ndash; Indicates the 'save to central' failure is caused by submission, that is because another user finished saving to central first.</li>
 </ul>
 
-
-<a name="3.30.29"></a><h3>CreateRelatedFileProgressChangedEventArgs</h3>
-
+<p><a name="3.30.29"></a><h3>CreateRelatedFileProgressChangedEventArgs</h3></p>
 <p>The new class:</p>
+
 <ul>
 <li>Autodesk.Revit.DB.Events.CreateRelatedFileProgressChangedEventArgs</li>
 </ul>
+
 <p>provides information about the creation of related files when Collaboration for Revit models are being opened.</p>
+
 <p>It has the following properties:</p>
+
 <ul>
 <li>CreateRelatedFileProgressChangedEventArgs.Location &ndash; Full path of the model which is to be created related file.</li>
 <li>CreateRelatedFileProgressChangedEventArgs.Status &ndash; Gets API event status, reflecting the current operation execution status.</li>
@@ -1143,106 +1101,125 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>CreateRelatedFileProgressChangedEventArgs.FullDownload &ndash; Indicates if download the full data of the document, which will take longer than subsequent downloads.</li>
 </ul>
 
-<a name="3.31"></a><h2><h2>Events related to linked resources</h2>
-
+<p><a name="3.31"></a><h2><h2>Events related to linked resources</h2></p>
 <p>Subscribe to the events:</p>
+
 <ul>
 <li>Autodesk.Revit.ApplicationServices.Application.LinkedResourceOpening</li>
 <li>Autodesk.Revit.ApplicationServices.ControlledApplication.LinkedResourceOpening</li>
 <li>Autodesk.Revit.ApplicationServices.Application.LinkedResourceOpened</li>
 <li>Autodesk.Revit.ApplicationServices.ControlledApplication.LinkedResourceOpened</li>
 </ul>
+
 <p>to be notified when Revit is just about to open, or has just opened, a linked resource.  This event supports linked resources of the following types: Revit; IFC; CAD (DWG, DXF, DGN, SAT).</p>
+
 <p>This event will not be raised if there are no updates for linked CAD or IFC resources.  The linked resource cannot be modified during these events.</p>
 
-
-<a name="3.31.30"></a><h3>LinkedResourceOpeningEventArgs</h3>
-
+<p><a name="3.31.30"></a><h3>LinkedResourceOpeningEventArgs</h3></p>
 <p>The new class:</p>
+
 <ul>
 <li>Autodesk.Revit.DB.Events.LinkedResourceOpeningEventArgs</li>
 </ul>
+
 <p>provides information when Revit is just about to open a linked resource.</p>
+
 <p>It has the following properties:</p>
+
 <ul>
 <li>LinkedResourceOpeningEventArgs.ResourceType &ndash; Linked resource type.</li>
 <li>LinkedResourceOpeningEventArgs.LinkedResourcePathName &ndash; The linked resource name to open.</li>
 </ul>
 
-
-<a name="3.31.31"></a><h3>LinkedResourceOpenedEventArgs</h3>
-
+<p><a name="3.31.31"></a><h3>LinkedResourceOpenedEventArgs</h3></p>
 <p>The new class:</p>
+
 <ul>
 <li>Autodesk.Revit.DB.Events.LinkedResourceOpenedEventArgs</li>
 </ul>
+
 <p>provides information when Revit finishes opening a linked resource.</p>
+
 <p>It has the following properties:</p>
+
 <ul>
 <li>LinkedResourceOpenedEventArgs.ResourceType &ndash; Linked resource type.</li>
 <li>LinkedResourceOpenedEventArgs.LinkedResourcePathName &ndash; Opened linked resource name.</li>
 </ul>
 
-<a name="3.32"></a><h2><h2>Events related to parallel View Export</h2>
-
+<p><a name="3.32"></a><h2><h2>Events related to parallel View Export</h2></p>
 <p>When exporting multiple views to DWF or DWFx format, Revit uses background processes to compute the exported output of several views in parallel. Two events are now available on the Application class to receive progress updates during a parallel export operation:</p>
+
 <ul>
 <li>Application.ViewExporting &ndash; This event is raised when Revit is just about to export a view of the document.</li>
 <li>Application.ViewExported &ndash; This event is raised immediately after Revit has finished exporting a view of the document.</li>
 </ul>
+
 <p>These two events are raised only during accelerated export jobs, in which views are exported in parallel using a background process. Accelerated export only occurs when exporting to DWF formats and not combining views into a single file. </p>
 
-<a name="3.33"></a><h2>DWG export API additions</h2>
-
+<p><a name="3.33"></a><h2>DWG export API additions</h2></p>
 <p>The new enumerated value:</p>
+
 <ul>
 <li>ExportColorMode.TrueColorPerView</li>
 </ul>
+
 <p>specified an export where all colors from the Revit project will be exported as 24-bit RGB values as specified in view (where ExportColorMode.TrueColor indicates that all colors from the Revit project will be exported as 24-bit RGB values as specified in object styles)</p>
+
 <p>The new properties:</p>
+
 <ul>
 <li>ACADExportOptions.UseHatchBackgroundColor</li>
 <li>ACADExportOptions.HatchBackgroundColor</li>
 </ul>
+
 <p>allow assignment of a color that will be set as hatch background color on the exported hatch. </p>
 
-
-<a name="3.33.32"></a><h3><h3>ExportDWGSettings API additions</h3>
-
+<p><a name="3.33.32"></a><h3><h3>ExportDWGSettings API additions</h3></p>
 <p>Two new methods have been added to ExportDWGSettings:</p>
+
 <ul>
 <li>ExportDWGSettings.FindByName() &ndash; Returns the pre-defined DWG export settings in the given document with the specified name.</li>
 <li>ExportDWGSettings.GetActivePredefinedSettings() &ndash; Returns the active DWG export settings in the given document.</li>
 </ul>
+
 <p>Note that these functions cannot return in-session settings. To access the in-session settings, save them with a name.</p>
 
-<a name="3.34"></a><h2>Part API additions</h2>
-
+<p><a name="3.34"></a><h2>Part API additions</h2></p>
 <p>The new methods:</p>
+
 <ul>
 <li>Part.ResetFaceOffset()</li>
 <li>Part.GetFaceOffset()</li>
 </ul>
+
 <p>provide further capabilities to access and manipulate the offset applied to a given face of a Part element.</p>
 
-<a name="3.35"></a><h2>Freeform Rebar API additions</h2>
-
+<p><a name="3.35"></a><h2>Freeform Rebar API additions</h2></p>
 <p>The new methods:</p>
+
 <ul>
 <li>Rebar.CreateFreeForm(Document, RebarBarType, Element, IList&lt;IList&lt;Curve&gt;&gt;, out RebarFreeFormValidationResult)</li>
 <li>Rebar.CreateFreeForm(Document, RebarBarType, Element, IList&lt;CurveLoop&gt;, out RebarFreeFormValidationResult)</li>
 </ul>
+
 <p>Create a freeform rebar instance where bars are created along the path of the input curves.  Constraints cannot later be added to this rebar.</p>
+
 <p>Freeform rebar instances have properties accessible from the RebarFreeFormAccessor class, which can be obtained from:</p>
+
 <ul>
 <li>Rebar.GetFreeFormAccessor()</li>
 </ul>
+
 <p>The new members of this accessor class allow you to change the bar curves only for unconstrained rebar:</p>
+
 <ul>
 <li>RebarFreeFormAccessor.SetCurves()</li>
 <li>RebarFreeFormAccessor.IsUnconstrained()</li>
 </ul>
+
 <p>They also provide access to layout, distribution path and hook properties of the rebar, if applicable:</p>
+
 <ul>
 <li>RebarFreeFormAccessor.SetLayoutAsSingle()</li>
 <li>RebarFreeFormAccessor.SetLayoutAsNumberWithSpacing()</li>
@@ -1256,13 +1233,15 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>RebarFreeFormAccessor.GetHookOrientationAngle()</li>
 </ul>
 
-<a name="3.36"></a><h2>Custom Service for Freeform Rebar Definition</h2>
-
+<p><a name="3.36"></a><h2>Custom Service for Freeform Rebar Definition</h2></p>
 <p>The new interface class:</p>
+
 <ul>
 <li>IRebarUpdateServer</li>
 </ul>
+
 <p>represents an interface that can be overridden to drive the generation and update of freeform rebar geometry.  The interface features several methods:</p>
+
 <ul>
 <li>IRebarUpdateServer.GetCustomHandles() &ndash; This method should define all handles that the Rebar instance will have. This method is called when the Rebar is created.</li>
 <li>IRebarUpdateServer.GetCustomHandleName() &ndash; This function should return the user-visible name of the handle.  This function is called during an editing operation for the Rebar constraints when the mouse is over a handle</li>
@@ -1270,8 +1249,11 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>IRebarUpdateServer.TrimExtendCurves() &ndash; This function should calculate the trim and/or extension of the curves that were obtained from calling GenerateCurves(), as well as to assign new constraints for the start and end handles.</li>
 <li>IRebarUpdateServer.GetHandlesPosition() &ndash; This function is supposed to provide the positions of handles defined in GetCustomHandles(). These positions will be shown on screen when the bar constraints are edited.</li>
 </ul>
+
 <p>If a position for a handle isn't provided, that handle will not be represented on screen while edit constraints.</p>
+
 <p>The interfaces methods each provide an input argument which carries data needed for the calculation, as well as the results.  These new argument classes are:</p>
+
 <ul>
 <li>RebarHandlesData</li>
 <li>RebarHandleNameData</li>
@@ -1280,21 +1262,29 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>RebarTrimExtendData</li>
 <li>RebarHandlePositionData</li>
 </ul>
+
 <p>You can programmatically create a freeform Rebar whose geometry and constraints are governed by the external service using:</p>
+
 <ul>
 <li>Rebar.Create(Document, GUID, RebarBarType, Element)</li>
 </ul>
+
 <p>You can convert a FreeForm rebar governed by an external service to an unconstrained element using:</p>
+
 <ul>
 <li>RebarFreeFormAccessor.DisconnectFromServer()</li>
 </ul>
+
 <p>In order to access and modify constraints associated to any custom handles associated to the service-driven freeform Rebar, you may use the members of the RebarConstrainedHandle class:</p>
+
 <ul>
 <li>RebarConstrainedHandle.IsCustomHandle()</li>
 <li>RebarConstrainedHandle.HandleName</li>
 <li>RebarConstrainedHandle.GetCustomHandleTag()</li>
 </ul>
+
 <p>and use the new members of RebarConstraint and RebarConstraintsManager:</p>
+
 <ul>
 <li>RebarConstraint.Create(RebarConstrainedHandle, IList&lt;Reference&gt;, bool, double)</li>
 <li>RebarConstraint.ReplaceReferenceTargets()</li>
@@ -1309,9 +1299,9 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>RebarConstraintsManager.AllowConstraintTargets()</li>
 </ul>
 
-<a name="3.37"></a><h2>HVACSpaceType and Space air ventilation API</h2>
-
+<p><a name="3.37"></a><h2>HVACSpaceType and Space air ventilation API</h2></p>
 <p>The following new properties have been added to Autodesk.Revit.DB.Space:</p>
+
 <ul>
 <li>Space.SpaceTypeId &ndash; Gets or sets the Space type element of the Space.</li>
 <li>Space.OutdoorAirPerPerson &ndash; Gets the specified outdoor air per person, in cubic feet per second.</li>
@@ -1321,15 +1311,19 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>Space.OutdoorAirFlowStandard &ndash; Gets the outdoor air flow standard of the space.</li>
 </ul>
 
-<a name="3.38"></a><h2>Energy Analysis API additions</h2>
-
+<p><a name="3.38"></a><h2>Energy Analysis API additions</h2></p>
 <p>Several new classes have been added to allow better control over spaces when doing energy analysis.</p>
+
 <p>The new class:</p>
+
 <ul>
 <li>Autodesk.Revit.DB.Analysis.HVACLoadType</li>
 </ul>
+
 <p>is the base class for HVACLoadSpaceType and HVACLoadBuildingType.</p>
+
 <p>It has the following properties:</p>
+
 <ul>
 <li>Autodesk.Revit.DB.Analysis.HVACLoadType.AirChangesPerHour &ndash; The air changes per hour.</li>
 <li>Autodesk.Revit.DB.Analysis.HVACLoadType.AreaPerPerson &ndash; The area per person.</li>
@@ -1342,12 +1336,17 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>Autodesk.Revit.DB.Analysis.HVACLoadType.PowerLoadDensity &ndash; The power load density.</li>
 <li>Autodesk.Revit.DB.Analysis.HVACLoadType.SensibleHeatGainPerPerson &ndash; The sensible heat gain per person.</li>
 </ul>
+
 <p>The new class:</p>
+
 <ul>
 <li>Autodesk.Revit.DB.Analysis.HVACLoadSpaceType</li>
 </ul>
+
 <p>allows users to set the usage type associated with the space, such as 'Dining Area' or 'Lobby'.</p>
+
 <p>It has the following methods and properties:</p>
+
 <ul>
 <li>Autodesk.Revit.DB.Analysis.HVACLoadSpaceType.Create()</li>
 <li>Autodesk.Revit.DB.Analysis.HVACLoadSpaceType.IsNameUnique(String)</li>
@@ -1355,12 +1354,17 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>Autodesk.Revit.DB.Analysis.HVACLoadSpaceType.IsPlenum</li>
 <li>Autodesk.Revit.DB.Analysis.HVACLoadSpaceType.SpaceTypeName</li>
 </ul>
+
 <p>The new class:</p>
+
 <ul>
 <li>Autodesk.Revit.DB.Analysis.HVACLoadBuildingType</li>
 </ul>
+
 <p>allows users to set the energy analysis usage type associated with a building, such as 'Museum' or 'Office'.</p>
+
 <p>It has the following methods and properties:</p>
+
 <ul>
 <li>Autodesk.Revit.DB.Analysis.HVACLoadBuildingType.Create()</li>
 <li>Autodesk.Revit.DB.Analysis.HVACLoadBuildingType.IsNameUnique(String)</li>
@@ -1371,21 +1375,22 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>Autodesk.Revit.DB.Analysis.HVACLoadBuildingType.IsValidTime() &ndash; Checks if the string can be parsed to a valid time for opening time and closing time. A valid string can be "16:30" or "4:30 PM".</li>
 <li>Autodesk.Revit.DB.Analysis.HVACLoadBuildingType.UnoccupiedCoolingSetPoint &ndash; The unoccupied cooling set point of the building type with unit Kelvin (K).</li>
 </ul>
+
 <p>The new properties:</p>
+
 <ul>
 <li>Autodesk.Revit.DB.Analysis.MassZone.SpaceTypeId</li>
 <li>Autodesk.Revit.DB.Mechanical.Space.SpaceTypeId</li>
 </ul>
+
 <p>allow users to set the energy analysis type associated with a space or mass zone.</p>
+
 <p>Note that these classes are not ElementTypes. They represent properties of a space or building when doing energy analysis, and do not have instances.</p>
 
-<a name="3.39"></a><h2>Electrical API additions</h2>
-
-
-
-<a name="3.39.33"></a><h3><h3>Electrical Circuit Path API</h3>
-
+<p><a name="3.39"></a><h2>Electrical API additions</h2></p>
+<p><a name="3.39.33"></a><h3><h3>Electrical Circuit Path API</h3></p>
 <p>The new API members:</p>
+
 <ul>
 <li>ElectricalSystem.PathOffset</li>
 <li>ElectricalSystem.HasPathOffset</li>
@@ -1395,12 +1400,12 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>ElectricalSystem.SetCircuitPath()</li>
 <li>ElectricalSystem.IsCircuitPathValid()</li>
 </ul>
+
 <p>support different options and operations related to electrical circuit paths.</p>
 
-
-<a name="3.39.34"></a><h3><h3>PanelScheduleView API</h3>
-
+<p><a name="3.39.34"></a><h3><h3>PanelScheduleView API</h3></p>
 <p>The following new methods handle space or spare circuit operations:</p>
+
 <ul>
 <li>PanelScheduleView.AddSpace() &ndash; Add a space at specific cell.</li>
 <li>PanelScheduleView.AddSpare() &ndash; Add a spare at specific cell.</li>
@@ -1408,44 +1413,54 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>PanelScheduleView.RemoveSpare() &ndash; Remove a spare at specific cell.</li>
 </ul>
 
-<a name="3.40"></a><h2>MEPAnalyticalConnection API additions</h2>
-
+<p><a name="3.40"></a><h2>MEPAnalyticalConnection API additions</h2></p>
 <p>Two new classes have been added to allow API users to create analytical connections between elements. The behavior is the same as in Revit's UI.</p>
+
 <p>The new class:</p>
+
 <ul>
 <li>MEPAnalyticalConnection</li>
 </ul>
+
 <p>represents an analytical element that connected mechanical equipment to a piping network. The analytical connection can be used to create a network even if no real pipes are placed yet. It enables the fast establishment of a piping network to analyze the flow and pressure, especially at the early stage of the design process.</p>
+
 <p>It has the following methods:</p>
+
 <ul>
 <li>MEPAnalyticalConnection.Create() &ndash; Creates a new analytical connection between two connectors.</li>
 <li>MEPAnalyticalConnection.CreateMultipleConnections() &ndash; Creates new analytical connections between the equipment connector and the nearest point on the piping network.</li>
 <li>MEPAnalyticalConnection.GetFlow() &ndash; Returns the up-to-date flow value. If the network is asynchronously calculated, this method would wait until the calculation is completed.</li>
 </ul>
+
 <p>The new class:</p>
+
 <ul>
 <li>MEPAnalyticalConnectionType</li>
 </ul>
+
 <p>is the type element of an MEPAnalyticalConnection. Its pressure loss value is included in the network critical path calculation.</p>
+
 <p>It has the following methods and properties:</p>
+
 <ul>
 <li>MEPAnalyticalConnectionType.Create() &ndash; Creates a new analytical connection type with the specified name.</li>
 <li>MEPAnalyticalConnectionType.IsNameUnused() &ndash; Checks if the name is already used.</li>
 <li>MEPAnalyticalConnectionType.GetAllTypes() &ndash; Returns all types in the document.</li>
 <li>MEPAnalyticalConnectionType.PressureLoss &ndash; The pressure loss associated with this type. This property is writable.</li>
 </ul>
+
 <p>The new property:</p>
+
 <ul>
 <li>Autodesk.Revit.DB.Plumbing.PipeSettings.AnalysisForClosedLoopHydronicPipingNetworks</li>
 </ul>
+
 <p>indicates whether to enable analysis for closed loop hydronic piping networks in the background.</p>
 
-
-<a name="3.41"></a><h2>Fabrication API additions</h2>
-
-<a name="3.41.35"></a><h3>Hanger Rod additions</h3>
-
+<p><a name="3.41"></a><h2>Fabrication API additions</h2></p>
+<p><a name="3.41.35"></a><h3>Hanger Rod additions</h3></p>
 <p>The following new methods and properties allow better control of hanger rod lengths:</p>
+
 <ul>
 <li>FabricationRodInfo.GetRodStructureExtension()</li>
 <li>FabricationRodInfo.SetRodStructureExtension() &ndash; Sets the extension of the rod into the structure. The rod will remain hosted by structure and have the extension applied on top of any calculated length. This method is only valid for rods which are already hosted by structure.</li>
@@ -1453,16 +1468,18 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>FabricationRodInfo.GetRodLength() &ndash; Gets the current rod length for the specified rod index (including any extension), whether it is hosted or not.</li>
 <li>FabricationRodInfo.SetRodLength() &ndash; Sets the current rod length for the specified rod index &ndash; but only if hosting is disabled by setting CanRodsBeHosted = false first.</li>
 </ul>
+
 <p>The new property:</p>
+
 <ul>
 <li>FabricationPart.HangerRodKit</li>
 </ul>
+
 <p>allows users to get or set the support rod kit override. This gives the user better control over hanger rod thicknesses.</p>
 
-
-<a name="3.41.36"></a><h3>Placing and splitting fabrication parts</h3>
-
+<p><a name="3.41.36"></a><h3>Placing and splitting fabrication parts</h3></p>
 <p>The following methods allow placing and splitting fabrication parts:</p>
+
 <ul>
 <li>FabricationPart.AlignPartByConnectorToConnector() &ndash; Aligns a part by its connector to another connector.</li>
 <li>FabricationPart.AlignPartByInsertionPoint() &ndash; Aligns the part by its insertion point to a point and rotation in free space.</li>
@@ -1473,51 +1490,57 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>FabricationPart.SplitStraight() &ndash; Splits a straight at a given position.</li>
 </ul>
 
-
-<a name="3.41.37"></a><h3>Fabrication Part export additions</h3>
-
+<p><a name="3.41.37"></a><h3>Fabrication Part export additions</h3></p>
 <p>The new method:</p>
+
 <ul>
 <li>Autodesk.Revit.DB.Fabrication.FabricationUtils.ExportToPCF()</li>
 </ul>
+
 <p>exports Fabrication parts to PCF format.</p>
+
 <p>The new property:</p>
+
 <ul>
 <li>FabricationPart.SpoolName</li>
 </ul>
+
 <p>allows control over Spool names in PCF output.</p>
 
-
-<a name="3.41.38"></a><h3>Fabrication Part status additions</h3>
-
+<p><a name="3.41.38"></a><h3>Fabrication Part status additions</h3></p>
 <p>Two properties were added to FabricationPart to allow the user to query and set the part fabrication status field:</p>
+
 <ul>
 <li>FabricationPart.PartStatus &ndash; Queries or changes the part fabrication status field current value. Setting the value will track when it was changed.</li>
 <li>FabricationPart.PartGuid &ndash; Queries the part's fabrication globally unique identifier, as used in applications such as Tracker.</li>
 </ul>
 
-
-<a name="3.41.39"></a><h3>Fabrication part comparison</h3>
-
+<p><a name="3.41.39"></a><h3>Fabrication part comparison</h3></p>
 <p>The new method:</p>
+
 <ul>
 <li>FabricationPart.IsSameAs()</li>
 </ul>
+
 <p>compares basic dimensional information of two fabrication parts but also allows the user to specify additional fabrication data to ignore. This allows users to compare parts including fabrication data not exposed in Revit.</p>
 
-
-<a name="3.41.40"></a><h3>Fabrication Part ancillary usage additions</h3>
-
+<p><a name="3.41.40"></a><h3>Fabrication Part ancillary usage additions</h3></p>
 <p>The new method:</p>
+
 <ul>
 <li>FabricationPart.GetPartAncillaryUsage()</li>
 </ul>
+
 <p>gets a list of FabricationAncillaryUsage structures that lists the ancillaries that the fabrication part uses. This method can be used to populate cut lists and procure ancillaries needed to fabricate and install the fabrication part.</p>
+
 <p>The new class:</p>
+
 <ul>
 <li>FabricationAncillaryUsage</li>
 </ul>
+
 <p>contains the ancillary usage data. It has the following read-only properties:</p>
+
 <ul>
 <li>FabricationAncillaryUsage.Type &ndash; A new enumerated type FabricationAncillaryType which describes what kind of ancillary it is (eg. a fixing, airturn vane or support material).</li>
 <li>FabricationAncillaryUsage.UsageType &ndash; a new enumerated type FabricationAncillaryUsageType describing the usage of the ancillary (eg. in a support, connector or airturn).</li>
@@ -1529,20 +1552,18 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>FabricationAncillaryUsage.ProductCode</li>
 </ul>
 
-
-<a name="3.41.41"></a><h3>Fabrication Part custom data additions</h3>
-
+<p><a name="3.41.41"></a><h3>Fabrication Part custom data additions</h3></p>
 <p>The following methods allow access to Fabrication Part custom data defined per part. This can be used for querying and changing values:</p>
+
 <ul>
 <li>FabricationPart.HasCustomData() &ndash; Queries if a part has a certain optional custom data.</li>
 <li>FabricationPart.Get/SetPartCustomDataText/Integer/Real() &ndash; Gets or sets the fabrication part's custom data.</li>
 <li>FabricationPart.Add/RemovePartCustomData() &ndash; Adds or removes optional custom data on fabrication parts.</li>
 </ul>
 
-
-<a name="3.41.42"></a><h3>FabricationConfiguration additions</h3>
-
+<p><a name="3.41.42"></a><h3>FabricationConfiguration additions</h3></p>
 <p>New methods have been added to access fabrication data defined by the currently loaded fabrication configuration. These can be used to query what fabrication data is available for fabrication parts to use:</p>
+
 <ul>
 <li>FabricationConfiguration.GetAllDampers()</li>
 <li>FabricationConfiguration.GetDamperName()</li>
@@ -1555,10 +1576,9 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>FabricationConfiguration.GetPartCustomDataType()</li>
 </ul>
 
-
-<a name="3.41.43"></a><h3>Routing exclusions additions</h3>
-
+<p><a name="3.41.43"></a><h3>Routing exclusions additions</h3></p>
 <p>The following methods allow users to override routing exclusions:</p>
+
 <ul>
 <li>FabricationService.IsGroupExcluded() &ndash; Gets whether a service group is excluded from routing.</li>
 <li>FabricationService.SetServiceGroupExclusions() &ndash; Sets the service group exclusions.</li>
@@ -1567,11 +1587,11 @@ Here are links to the preceding 'What's New in the API' discussions:
 <li>FabricationServiceButton.IsExcluded() &ndash; Gets if the service button is excluded from routing.</li>
 </ul>
 
-
-<a name="3.41.44"></a><h3>FabricationServiceButton addition</h3>
-
+<p><a name="3.41.44"></a><h3>FabricationServiceButton addition</h3></p>
 <p>The new property:</p>
+
 <ul>
 <li>FabricationServiceButton.IsStraight</li>
 </ul>
+
 <p>returns true if all conditions of the fabrication service button are straight pieces. This indicates the button is suitable for use with multi-point routing, among other uses.</p>
