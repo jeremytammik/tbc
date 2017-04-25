@@ -25,7 +25,7 @@ def filereadlines( filename ):
 if __name__ == '__main__':
 
   def main():
-    lines = filereadlines( filename )
+    lines = filereadlines( filepath )
     for line in lines:
       line = line.strip()
       a = ''
