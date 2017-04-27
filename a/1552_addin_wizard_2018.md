@@ -19,9 +19,8 @@
 Revit 2018 Visual Studio .NET Add-in Wizards #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim #dynamobim 
 
 I updated the Visual Studio Revit C# and VB add-in templates for Revit 2018.
-They enable you to create a new C# or VB Revit add-in in Visual Studio with one single click on File &gt; New &gt; Project... &gt; Visual Basic/Visual C# &gt; Revit 2018 Addin:
-The templates define a complete skeleton Revit add-in, ready to immediately compile and run, including an add-in manifest file, an external application and an external command.
-Just hit F5 to start debugging; the add-in manifest is automatically copied to the proper location, Revit is launched in the Visual Studio debugger, and your shiny new add-in is immediately available in the external tools menu...
+They enable you to create a new C# or VB Revit add-in in Visual Studio with one single click on File &gt; New &gt; Project... &gt; Visual Basic/Visual C# &gt; Revit 2018 Addin and define a complete skeleton Revit add-in, ready to immediately compile and run, including an add-in manifest file, external application and external command.
+Just hit F5 to start debugging; the add-in manifest is installed, Revit launched and the command is immediately available...
 
 -->
 
@@ -68,7 +67,7 @@ You install them by simply copying the zip file of your choice &ndash; for C#, V
 
 - C# – copy [Revit2018AddinWizardCs0.zip](zip/Revit2018AddinWizardCs0.zip)
 to [My Documents]\Visual Studio 2015\Templates\ProjectTemplates\Visual C#
-- Visual Basic – copy [Revit2018AddinWizardVb0](zip/Revit2018AddinWizardVb0.zip)
+- Visual Basic – copy [Revit2018AddinWizardVb0.zip](zip/Revit2018AddinWizardVb0.zip)
 to [My Documents]\Visual Studio 2015\Templates\ProjectTemplates\Visual Basic
 
 Or, in other words:
