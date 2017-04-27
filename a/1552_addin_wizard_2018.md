@@ -16,7 +16,7 @@
 /a/doc/revit/tbc/git/a/zip/wiz/2018/vb $ zip -r ../../../Revit2018AddinWizardVb0.zip *
 /a/doc/revit/tbc/git/a/zip/wiz/2018/vb $ cp ../../../Revit2018AddinWizardVb0.zip /v/C/Users/tammikj/Documents/Visual\ Studio\ 2015/Templates/ProjectTemplates/Visual\ Basic/
 
-Revit 2018 Visual Studio .NET Add-in Wizards #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim #dynamobim 
+Revit 2018 Visual Studio .NET Add-in Wizards #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim #dynamobim http://bit.ly/rvt2018addinwizards
 
 I updated the Visual Studio Revit C# and VB add-in templates for Revit 2018.
 They enable you to create a new C# or VB Revit add-in in Visual Studio with one single click on File &gt; New &gt; Project... &gt; Visual Basic/Visual C# &gt; Revit 2018 Addin and define a complete skeleton Revit add-in, ready to immediately compile and run, including an add-in manifest file, external application and external command.
