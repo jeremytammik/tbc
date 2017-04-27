@@ -9,43 +9,48 @@
 
 <!---
 
-Visual Studio 2015 Revit 2018 Add-in Wizards #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim #dynamobim 
+- update vs revit add-in wizards for Revit 2018
+  /a/doc/revit/tbc/git/a/zip $ cp Revit2018AddinWizardCs0.zip /v/C/Users/tammikj/Documents/Visual\ Studio\ 2015/Templates/ProjectTemplates/Visual\ C#/
+/a/doc/revit/tbc/git/a/zip/wiz/2018/cs $ zip -r ../../../Revit2018AddinWizardCs0.zip *
+/a/doc/revit/tbc/git/a/zip/wiz/2018/vb $ cp ../../../Revit2018AddinWizardCs0.zip /v/C/Users/tammikj/Documents/Visual\ Studio\ 2015/Templates/ProjectTemplates/Visual\ C#/
+/a/doc/revit/tbc/git/a/zip/wiz/2018/vb $ zip -r ../../../Revit2018AddinWizardVb0.zip *
+/a/doc/revit/tbc/git/a/zip/wiz/2018/vb $ cp ../../../Revit2018AddinWizardVb0.zip /v/C/Users/tammikj/Documents/Visual\ Studio\ 2015/Templates/ProjectTemplates/Visual\ Basic/
 
-I updated the Visual Studio Revit C# and VB add-in wizards for Revit 2018. They enable you to create a new C# or VB Revit add-in in Visual Studio with one single click on File &gt; New &gt; Project... &gt; Installed &gt; Templates &gt; Visual Basic/Visual C# &gt; Revit 2018 Addin. The wizard creates a complete Revit add-in skeleton, ready to immediately compile and run. Just hit F5 to start debugging; the add-in manifest is automatically created, copied to the proper location, Revit launched in the debugger, and your shiny new add-in is available in the external tools menu...
+Revit 2018 Visual Studio .NET Add-in Wizards #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim #dynamobim 
+
+I updated the Visual Studio Revit C# and VB add-in templates for Revit 2018.
+They enable you to create a new C# or VB Revit add-in in Visual Studio with one single click on File &gt; New &gt; Project... &gt; Visual Basic/Visual C# &gt; Revit 2018 Addin:
+The templates define a complete skeleton Revit add-in, ready to immediately compile and run, including an add-in manifest file, an external application and an external command.
+Just hit F5 to start debugging; the add-in manifest is automatically copied to the proper location, Revit is launched in the Visual Studio debugger, and your shiny new add-in is immediately available in the external tools menu...
 
 -->
 
-### Visual Studio 2015 Revit 2018 C# and VB .NET Add-in Wizards
+### Revit 2018 Visual Studio .NET Add-in Wizards
 
-I updated the Visual Studio Revit C# and VB add-in wizards for Revit 2018.
+I updated
+the [Visual Studio Revit C# and VB add-in templates](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.20) for
+Revit 2018.
 
-They enable you to create a new C# or VB Revit add-in in Visual Studio with one single click on File &gt; New &gt; Project... &gt; Installed &gt; Templates &gt; Visual Basic/Visual C# &gt; Revit 2018 Addin:
+They enable you to create a new C# or VB Revit add-in in Visual Studio with one single click on File &gt; New &gt; Project... &gt; Visual Basic/Visual C# &gt; Revit 2018 Addin:
 
 <center>
-<img src="img/addin_wizard_2018.png" alt="Revit 2018 Add-in Wizards" width="800">
+<img src="img/revit_2018_addin_wizard.png" alt="Revit 2018 Add-in Wizards" width="800">
 </center>
 
-The wizard creates a complete Revit add-in skeleton, ready to immediately compile and run.
+The templates define a complete skeleton Revit add-in, ready to immediately compile and run, including an add-in manifest file, an external application and an external command.
 
-Just hit `F5` to start debugging; the add-in manifest is automatically created, copied to the proper location, Revit launched in the debugger, and your shiny new add-in is available in the external tools menu.
+Just hit `F5` to start debugging; the add-in manifest is automatically copied to the proper location, Revit is launched in the Visual Studio debugger, and your shiny new add-in is immediately available in the external tools menu.
 
-Here are the corresponding notes on the migration, customisation, usage and installation from the analogue task previous year:
+You can see it in action in this two-and-a-half-minute [Revit 2018 C# and VB .NET add-in wizard recording](https://youtu.be/OEQdKfwf0Ss):
 
-- [Revit add-in wizards for Revit 2016](http://thebuildingcoder.typepad.com/blog/2015/04/add-in-migration-to-revit-2016-and-updated-wizards.html#3)
-- [Revit add-in wizard customisation](http://thebuildingcoder.typepad.com/blog/2015/04/add-in-migration-to-revit-2016-and-updated-wizards.html#4)
-- [Revit add-in wizard usage](http://thebuildingcoder.typepad.com/blog/2015/04/add-in-migration-to-revit-2016-and-updated-wizards.html#5)
-- [Download and installation](http://thebuildingcoder.typepad.com/blog/2015/04/add-in-migration-to-revit-2016-and-updated-wizards.html#6)
-- [Revit add-in wizards on GitHub and installer](http://thebuildingcoder.typepad.com/blog/2015/08/revit-add-in-wizard-github-installer.html)
-- [Revit 2017 add-in wizards](http://thebuildingcoder.typepad.com/blog/2016/05/visual-studio-vb-and-c-net-revit-2017-add-in-wizards.html)
+<center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/OEQdKfwf0Ss?rel=0" frameborder="0" allowfullscreen></iframe>
+</center>
 
-Please refer to those for all further background information, since I will not repeat it here.
+Please refer to 
+the [Visual Studio Revit add-in wizards topic group](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.20) for 
+further information on usage, customising the templates for your own needs and migrations in previous years.
 
-These wizards are not really wizards at all, just simple templates generating and installing an add-in manifest file and simple external application and external command skeletons.
-
-Please also note that Andrey Bushman implemented much more full-featured
-[Visual Studio templates for Revit add-ins](http://thebuildingcoder.typepad.com/blog/2017/02/new-visual-studio-2015-templates-for-revit-add-ins.html)
-including support for numerous other features such 
-as [edit and continue, multi-langage resources, ribbon UI, DMU, etc.](http://thebuildingcoder.typepad.com/blog/2017/02/add-in-templates-supporting-edit-and-continue.html)
 
 #### <a name="3"></a>Download
 
@@ -61,9 +66,9 @@ The exact locations to install the wizards for Visual Studio are language depend
 
 You install them by simply copying the zip file of your choice &ndash; for C#, VB, or both &ndash; to the appropriate Visual Studio project template folder in your local file system:
 
-- C# – copy [Revit2016AddinWizardCs0.zip](zip/Revit2018AddinWizardCs0.zip)
+- C# – copy [Revit2018AddinWizardCs0.zip](zip/Revit2018AddinWizardCs0.zip)
 to [My Documents]\Visual Studio 2015\Templates\ProjectTemplates\Visual C#
-- Visual Basic – copy [Revit2016AddinWizardVb0](zip/Revit2018AddinWizardVb0.zip)
+- Visual Basic – copy [Revit2018AddinWizardVb0](zip/Revit2018AddinWizardVb0.zip)
 to [My Documents]\Visual Studio 2015\Templates\ProjectTemplates\Visual Basic
 
 Or, in other words:
@@ -78,7 +83,7 @@ Or, in other words:
   2015/Templates/ProjectTemplates/Visual Basic/"
 </pre>
 
-I implemented a batch file `install.bat` to automate this process:
+The GitHub repository includes a batch file `install.bat` to automate this process:
 
 <pre class="prettyprint">
 @echo off
@@ -107,7 +112,7 @@ copy "%F%" "%D%\Visual Basic"
 It assumes that you cloned the VisualStudioRevitAddinWizard to your local file system and call it from that directory, e.g., like this:
 
 <pre>
-Y:\VisualStudioRevitAddinWizard &gt; install.bat
+C:\a\vs\VisualStudioRevitAddinWizard &gt; install.bat
 
 Creating C# wizard archive C:\Users\tammikj\AppData\Local\Temp\Revit2018AddinWizardCs0.zip...
 updating: App.cs (deflated 54%)
@@ -116,11 +121,12 @@ updating: Properties/ (stored 0%)
 updating: Properties/AssemblyInfo.cs (deflated 56%)
 updating: RegisterAddin.addin (deflated 66%)
 updating: TemplateIcon.ico (deflated 67%)
-updating: TemplateRevitCs.csproj (deflated 68%)
+updating: TemplateRevitCs.csproj (deflated 69%)
 updating: TemplateRevitCs.csproj.user (deflated 30%)
 updating: TemplateRevitCs.vstemplate (deflated 65%)
+
 Copying C# wizard archive to C:\Users\tammikj\Documents\Visual Studio 2015\Templates\ProjectTemplates\Visual C#...
-        1 file(s) copied.
+  1 file(s) copied.
 
 Creating VB wizard archive C:\Users\tammikj\AppData\Local\Temp\Revit2018AddinWizardVb0.zip...
 updating: AdskApplication.vb (deflated 68%)
@@ -132,9 +138,7 @@ updating: TemplateIcon.ico (deflated 67%)
 updating: TemplateRevitVb.vbproj (deflated 72%)
 updating: TemplateRevitVb.vstemplate (deflated 62%)
 Copying VB wizard archive to C:\Users\tammikj\Documents\Visual Studio 2015\Templates\ProjectTemplates\Visual Basic...
-        1 file(s) copied.
-
-Y:\VisualStudioRevitAddinWizard &gt;
+  1 file(s) copied.
 </pre>
 
 I hope you find this useful and look forward to hearing about your customisations and suggestions for other enhancements.
