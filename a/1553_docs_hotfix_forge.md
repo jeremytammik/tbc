@@ -14,7 +14,7 @@
 
 Updates on Revit 2017, Revit 2018, and above all our treasured Revit API Docs.
 Plus, the clock is running now on two Forge enhancements.
-Finally, a note on female coders and the <i>Women Who Code</i> conference
+Finally, notes on DevCon, AU, female coders and the <i>Women Who Code</i> conference
 &ndash; Revit 2018 added to Revit API Docs
 &ndash; Revit 2018.0.1 hot fix
 &ndash; Revit 2017.2.1 update
@@ -34,7 +34,7 @@ Plus, the clock is running now on two Forge enhancements.
 
 If your existing app uses the obsolete View and Data API or unscoped tokens, it will stop working soon!
 
-Finally, a note on female coders and the Twitter *Women Who Code* conference:
+Finally, notes on DevCon, AU, female coders and the Twitter *Women Who Code* conference:
 
 - [Revit 2018 added to Revit API Docs](#2)
 - [Revit 2018.0.1 hot fix](#3)
@@ -44,8 +44,6 @@ Finally, a note on female coders and the Twitter *Women Who Code* conference:
 - [Forge DevCon call for speakers is open](#7)
 - [Autodesk University Call for Proposals](#8)
 - [Five Autodeskers speak at *Women Who Code*](#9)
-
-
 
 
 #### <a name="2"></a>Revit 2018 Added to Revit API Docs
