@@ -15,8 +15,10 @@
  @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim
  @AutodeskForge #ForgeDevCon #RevitAPI
 
-&ndash;
-...
+Let's turn to a geometric question on tessellation, expanding on the discussion on TessellateSolidOrShell.
+I am exporting Revit wall geometry to an external application for comparison of net and gross wall areas.
+I have a problem with the fact that Face.Triangulate(double levelOfDetail) creates a different tessellation segmentation of neighbouring faces for the wall and its opening, although the underlying intersection curve between them is obviously the same.
+Why does the tessellation segmentation differ in this manner? The levelOfDetail in unchanged...
 
 -->
 
