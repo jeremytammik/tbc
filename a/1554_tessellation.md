@@ -11,9 +11,7 @@
 
 - 12841920 [segmentation/tessellation in Revit API method Face.Triangulate(double levelOfDetail)]
 
- #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim
- @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim
- @AutodeskForge #ForgeDevCon #RevitAPI
+Wall and Opening Tessellation @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim http://bit.ly/openingtessellation
 
 Let's turn to a geometric question on tessellation, expanding on the discussion on TessellateSolidOrShell.
 I am exporting Revit wall geometry to an external application for comparison of net and gross wall areas.
