@@ -121,9 +121,9 @@ on [Idling and External Events for Modeless Access and Driving Revit from Outsid
  
 Here are some other recent Revit API forum discussion threads addressing similar issues:
 
-- [Calling of Revit API from external application not working in C#](https://forums.autodesk.com/t5/revit-api-forum/calling-of-revit-api-from-external-application-not-workin-in-c/m-p/6752245)
-- [Issue in running API from external application](https://forums.autodesk.com/t5/revit api-forum/issue-in-running-api-from-external-application/m-p/6420798)
-- [Standalone application (not plug-in) possible?](https://forums.autodesk.com/t5/revit-api-forum/standalone-application-not-plug-in-possible/td-p/4298946)
+- [Calling of Revit API from external application not working in C&#35;](https://forums.autodesk.com/t5/revit-api-forum/calling-of-revit-api-from-external-application-not-workin-in-c/m-p/6752245)
+- [Issue in running API from external application](https://forums.autodesk.com/t5/revit-api-forum/issue-in-running-api-from-external-application/m-p/6420798)
+- [Standalone application &ndash; not plug-in &ndash; possible?](https://forums.autodesk.com/t5/revit-api-forum/standalone-application-not-plug-in-possible/td-p/4298946)
 - [Updating a form from an external event handler](https://forums.autodesk.com/t5/revit-api-forum/updating-a-form-from-an-externalevent-handler/m-p/6935614)
 
 <center>
