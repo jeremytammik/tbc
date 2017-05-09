@@ -59,6 +59,8 @@ the [Model Derivative API](https://developer.autodesk.com/en/docs/model-derivati
 the [supported translation formats](https://developer.autodesk.com/en/docs/model-derivative/v2/overview/supported-translations/) and
 note that `RVT` can be converted to `DWG` and `IFC`, besides the thumbnail and Forge-specific `SVF` formats.
 
+If your requirements to access RVT files from an external context are driven by the need to view the BIM, not modify it, Forge can probably cover all your needs right now.
+
 
 #### <a name="3"></a>Question
 
