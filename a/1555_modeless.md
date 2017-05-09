@@ -14,14 +14,23 @@
 
  @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim 
 
-
-...
+We are currently being flooded with questions about a topic that has already been discussed repeatedly and in depth in the past, external access to the Revit API.
+Possibly, the cause is the growing interest in implementing web driven solutions to generate RFA and RVT files.
+It is in fact possible to implement a web server driving Revit in the background to execute such tasks, as demonstrated by the old sample showing how
+to drive Revit through a WCF service and other examples listed in the topic group on Idling and external events for modeless access and driving Revit from outside
+&ndash; Revit I/O and Forge
+&ndash; Question
+&ndash; Answer...
 
 -->
 
 ### External Access to the Revit API
 
 We are currently being flooded with questions about a topic that has already been discussed repeatedly and in depth in the past, external access to the Revit API.
+
+- [Revit I/O and Forge](#2)
+- [Question](#3)
+- [Answer](#4)
 
 #### <a name="2"></a>Revit I/O and Forge
 
