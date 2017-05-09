@@ -50,7 +50,7 @@ Note that the segmentation of the exported wall and opening solids differs:
 I also tried to use the method `TessellateSolidOrShell(Solid, SolidOrShellTessellationControls)`, but the result is similar and the segmentation of the exported wall and opening solids differs there too, cf. the discussion
 on [TessellateSolidOrShell &ndash; holes versus wholes](http://thebuildingcoder.typepad.com/blog/2014/05/tessellatesolidorshell-holes-versus-wholes.html).
  
-#### <a name="2"></a>Answer
+#### <a name="3"></a>Answer
 
 Actually, the problem in this case is different.
 
