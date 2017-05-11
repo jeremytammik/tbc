@@ -21,6 +21,7 @@ In Revit 2018, cancelling family instance placement during a call to <code>Promp
 &ndash; Change in Behaviour
 &ndash; Exceptions Should be Exceptional
 &ndash; Answer
+&ndash; The Building Coder samples <code>CmdPlaceFamilyInstance<code>
 &ndash; Easily fixed, once discovered...
 
 -->
@@ -168,9 +169,6 @@ No bug, just a change in behaviour.
 
 I hope this clarifies and all is now illuminated.
 
-<center>
-<img src="img/the_exception.jpg" alt="The Exception" width="220">
-</center>
 
 #### <a name="7"></a>The Building Coder Samples CmdPlaceFamilyInstance
 
@@ -182,9 +180,13 @@ exercise the `PromptForFamilyInstancePlacement` method when it was originally in
 It also includes code using the `DocumentChanged` event
 to [retrieve the newly created elements](http://thebuildingcoder.typepad.com/blog/2010/06/place-family-instance.html).
 
-I updated it to handle the the `OperationCanceledException` as shown by Matt 
+I updated it to handle the `OperationCanceledException` as shown by Matt 
 in [release 2018.0.132.2](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.132.2).
 
 Here is the [diff to the preceding release](https://github.com/jeremytammik/the_building_coder_samples/compare/2018.0.132.1...2018.0.132.2) that
-shows exactly the exact modifications made.
+shows exactly what modifications were made.
+
+<center>
+<img src="img/the_exception.jpg" alt="The Exception" width="220">
+</center>
 
