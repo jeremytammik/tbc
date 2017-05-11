@@ -16,13 +16,13 @@
 
  @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim 
 
-In Revit 2018, cancelling family instance placement during a call to <code>PromptForFamilyInstancePlacement</code> throws an <code>OperationCanceledException</code> exception.
+In Revit 2018, cancelling family instance placement during a call to <code>PromptForFamilyInstancePlacement</code> throws an <code>OperationCanceledException</code> exception
+&ndash; Easily fixed, once discovered
 &ndash; Question
 &ndash; Change in Behaviour
 &ndash; Exceptions Should be Exceptional
 &ndash; Answer
-&ndash; The Building Coder samples <code>CmdPlaceFamilyInstance<code>
-&ndash; Easily fixed, once discovered...
+&ndash; The Building Coder samples <code>CmdPlaceFamilyInstance</code>...
 
 -->
 
