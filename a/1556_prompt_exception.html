@@ -8,9 +8,10 @@
 </head></p>
 <!---
 
-12953375 [Revit API UIDocument.PromptForFamilyInstancePlacement Issue]
-12965336 [Revit 2018 API - Undocumented Changes - Have you found any?]
-https://forums.autodesk.com/t5/revit-api-forum/revit-2018-api-undocumented-changes-have-you-found-any/m-p/7074819
+- 12953375 [Revit API UIDocument.PromptForFamilyInstancePlacement Issue]
+
+- 12965336 [Revit 2018 API - Undocumented Changes - Have you found any?]
+  https://forums.autodesk.com/t5/revit-api-forum/revit-2018-api-undocumented-changes-have-you-found-any/m-p/7074819
 
  @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim 
 
@@ -27,12 +28,13 @@ In Revit 2018, cancelling family instance placement during a call to <code>Promp
 <p>I just picked up an ADN case on a topic that was already raised yesterday in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-2018-api-undocumented-changes-have-you-found-any/m-p/7074819">Revit 2018 API undocumented changes</a>,
-so it is worth highlighting here as well:</p>
+so it is definitely worth highlighting here as well:</p>
 <ul>
 <li><a href="#3">Question</a></li>
-<li><a href="#4">Change in Behaviour</a></li>
-<li><a href="#5">Exceptions Should be Exceptional</a></li>
+<li><a href="#4">Change in behaviour</a></li>
+<li><a href="#5">Exceptions should be exceptional</a></li>
 <li><a href="#6">Answer</a></li>
+<li><a href="#7">The Building Coder samples <code>CmdPlaceFamilyInstance</code></a></li>
 </ul>
 <h4><a name="3"></a>Question</h4>
 <p>A bug may have been introduced into the Revit 2018 API <code>UIDocument</code> <code>PromptForFamilyInstancePlacement</code> method.</p>
@@ -118,3 +120,14 @@ on <a href="http://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-re
 <p><center>
 <img src="img/the_exception.jpg" alt="The Exception" width="220">
 </center></p>
+<h4><a name="7"></a>The Building Coder Samples CmdPlaceFamilyInstance</h4>
+<p>I implemented
+the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdPlaceFamilyInstance.cs">external command CmdPlaceFamilyInstance</a>
+in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> to
+exercise the <code>PromptForFamilyInstancePlacement</code> method when it was originally introduced.</p>
+<p>It also includes code using the <code>DocumentChanged</code> event
+to <a href="http://thebuildingcoder.typepad.com/blog/2010/06/place-family-instance.html">retrieve the newly created elements</a>.</p>
+<p>I updated it to handle the the <code>OperationCanceledException</code> as shown by Matt 
+in <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.132.2">release 2018.0.132.2</a>.</p>
+<p>Here is the <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2018.0.132.1...2018.0.132.2">diff to the preceding release</a> that
+shows exactly the exact modifications made.</p>

@@ -9,9 +9,10 @@
 
 <!---
 
-12953375 [Revit API UIDocument.PromptForFamilyInstancePlacement Issue]
-12965336 [Revit 2018 API - Undocumented Changes - Have you found any?]
-https://forums.autodesk.com/t5/revit-api-forum/revit-2018-api-undocumented-changes-have-you-found-any/m-p/7074819
+- 12953375 [Revit API UIDocument.PromptForFamilyInstancePlacement Issue]
+
+- 12965336 [Revit 2018 API - Undocumented Changes - Have you found any?]
+  https://forums.autodesk.com/t5/revit-api-forum/revit-2018-api-undocumented-changes-have-you-found-any/m-p/7074819
 
  @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim 
 
@@ -29,12 +30,13 @@ In Revit 2018, cancelling family instance placement during a call to <code>Promp
 I just picked up an ADN case on a topic that was already raised yesterday in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [Revit 2018 API undocumented changes](https://forums.autodesk.com/t5/revit-api-forum/revit-2018-api-undocumented-changes-have-you-found-any/m-p/7074819),
-so it is worth highlighting here as well:
+so it is definitely worth highlighting here as well:
 
 - [Question](#3)
-- [Change in Behaviour](#4)
-- [Exceptions Should be Exceptional](#5)
+- [Change in behaviour](#4)
+- [Exceptions should be exceptional](#5)
 - [Answer](#6)
+- [The Building Coder samples `CmdPlaceFamilyInstance`](#7)
 
 
 #### <a name="3"></a>Question
@@ -170,5 +172,19 @@ I hope this clarifies and all is now illuminated.
 <img src="img/the_exception.jpg" alt="The Exception" width="220">
 </center>
 
+#### <a name="7"></a>The Building Coder Samples CmdPlaceFamilyInstance
 
+I implemented
+the [external command CmdPlaceFamilyInstance](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdPlaceFamilyInstance.cs)
+in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) to
+exercise the `PromptForFamilyInstancePlacement` method when it was originally introduced.
+
+It also includes code using the `DocumentChanged` event
+to [retrieve the newly created elements](http://thebuildingcoder.typepad.com/blog/2010/06/place-family-instance.html).
+
+I updated it to handle the the `OperationCanceledException` as shown by Matt 
+in [release 2018.0.132.2](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.132.2).
+
+Here is the [diff to the preceding release](https://github.com/jeremytammik/the_building_coder_samples/compare/2018.0.132.1...2018.0.132.2) that
+shows exactly the exact modifications made.
 
