@@ -14,16 +14,26 @@ https://forums.autodesk.com/t5/revit-api-forum/revit-2018-api-undocumented-chang
 
  @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim 
 
-&ndash; 
-...
+In Revit 2018, cancelling family instance placement during a call to <code>PromptForFamilyInstancePlacement</code> throws an <code>OperationCanceledException</code> exception.
+&ndash; Question
+&ndash; Change in Behaviour
+&ndash; Exceptions Should be Exceptional
+&ndash; Answer
+&ndash; Easily fixed, once discovered...
 
 -->
 
-<h3>Prompt Throws Exception in Revit 2018</h3>
+<h3>Prompt Cancel Throws Exception in Revit 2018</h3>
 <p>I just picked up an ADN case on a topic that was already raised yesterday in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-2018-api-undocumented-changes-have-you-found-any/m-p/7074819">Revit 2018 API undocumented changes</a>,
-so it is probably worth highlighting here as well:</p>
+so it is worth highlighting here as well:</p>
+<ul>
+<li><a href="#3">Question</a></li>
+<li><a href="#4">Change in Behaviour</a></li>
+<li><a href="#5">Exceptions Should be Exceptional</a></li>
+<li><a href="#6">Answer</a></li>
+</ul>
 <h4><a name="3"></a>Question</h4>
 <p>A bug may have been introduced into the Revit 2018 API <code>UIDocument</code> <code>PromptForFamilyInstancePlacement</code> method.</p>
 <p>In Revit 2017, hitting the <code>Escape</code> key twice after placing the families would end the command.</p>
@@ -40,7 +50,7 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-2018-api-undocu
 <p>This function used to just return focus to your function upon cancelling by the Reviteer.</p>
 <p>In Revit 2018, cancelling of this function by your Reviteers throws an <code>Exceptions.OperationCanceledException</code> [sic] exception.</p>
 <p>Easily fixed, once discovered:</p>
-<pre class="code"> 
+<pre class="code">
   Try
     docUi.PromptForFamilyInstancePlacement(familySymbol)
   Catch ex As Exceptions.OperationCanceledException
@@ -100,6 +110,11 @@ on <a href="http://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-re
 <li><a href="http://thebuildingcoder.typepad.com/blog/2014/09/planes-projections-and-picking-points.html#07">The Pick Point Methods Throw an Exception on Cancel</a></li>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/02/revitlookup-using-reflection-for-cross-version-compatibility.html#12">Never Catch All Exceptions</a></li>
 </ul>
+<p>To answer the original <a href="#3">question</a> raised above: You need to catch and handle (or ignore) the <code>OperationCanceledException</code> as shown by Matt.</p>
+<p>If you code does not, your transaction will presumably not be committed.</p>
+<p>The family instances that were successfully placed before the user cancelled the placement and the exception was thrown are probably removed as the transaction is rolled back.</p>
+<p>No bug, just a change in behaviour.</p>
+<p>I hope this clarifies and all is now illuminated.</p>
 <p><center>
 <img src="img/the_exception.jpg" alt="The Exception" width="220">
 </center></p>

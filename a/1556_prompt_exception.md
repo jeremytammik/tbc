@@ -15,17 +15,26 @@ https://forums.autodesk.com/t5/revit-api-forum/revit-2018-api-undocumented-chang
 
  @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim 
 
-&ndash; 
-...
+In Revit 2018, cancelling family instance placement during a call to <code>PromptForFamilyInstancePlacement</code> throws an <code>OperationCanceledException</code> exception.
+&ndash; Question
+&ndash; Change in Behaviour
+&ndash; Exceptions Should be Exceptional
+&ndash; Answer
+&ndash; Easily fixed, once discovered...
 
 -->
 
-### Prompt Throws Exception in Revit 2018
+### Prompt Cancel Throws Exception in Revit 2018
 
 I just picked up an ADN case on a topic that was already raised yesterday in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [Revit 2018 API undocumented changes](https://forums.autodesk.com/t5/revit-api-forum/revit-2018-api-undocumented-changes-have-you-found-any/m-p/7074819),
-so it is probably worth highlighting here as well:
+so it is worth highlighting here as well:
+
+- [Question](#3)
+- [Change in Behaviour](#4)
+- [Exceptions Should be Exceptional](#5)
+- [Answer](#6)
 
 
 #### <a name="3"></a>Question
@@ -59,7 +68,7 @@ In Revit 2018, cancelling of this function by your Reviteers throws an `Exceptio
 
 Easily fixed, once discovered:
 
-<pre class="code"> 
+<pre class="code">
   Try
     docUi.PromptForFamilyInstancePlacement(familySymbol)
   Catch ex As Exceptions.OperationCanceledException
@@ -146,6 +155,16 @@ I have been preaching this for years to little avail:
 - [External Command Lister and Adding Ribbon Commands](http://thebuildingcoder.typepad.com/blog/2013/05/external-command-lister-and-adding-ribbon-commands.html)
 - [The Pick Point Methods Throw an Exception on Cancel](http://thebuildingcoder.typepad.com/blog/2014/09/planes-projections-and-picking-points.html#07)
 - [Never Catch All Exceptions](http://thebuildingcoder.typepad.com/blog/2017/02/revitlookup-using-reflection-for-cross-version-compatibility.html#12)
+
+To answer the original [question](#3) raised above: You need to catch and handle (or ignore) the `OperationCanceledException` as shown by Matt.
+
+If you code does not, your transaction will presumably not be committed.
+
+The family instances that were successfully placed before the user cancelled the placement and the exception was thrown are probably removed as the transaction is rolled back.
+
+No bug, just a change in behaviour.
+
+I hope this clarifies and all is now illuminated.
 
 <center>
 <img src="img/the_exception.jpg" alt="The Exception" width="220">
