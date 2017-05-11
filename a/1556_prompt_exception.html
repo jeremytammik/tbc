@@ -1,0 +1,105 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+12953375 [Revit API UIDocument.PromptForFamilyInstancePlacement Issue]
+12965336 [Revit 2018 API - Undocumented Changes - Have you found any?]
+https://forums.autodesk.com/t5/revit-api-forum/revit-2018-api-undocumented-changes-have-you-found-any/m-p/7074819
+
+ @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim 
+
+&ndash; 
+...
+
+-->
+
+<h3>Prompt Throws Exception in Revit 2018</h3>
+<p>I just picked up an ADN case on a topic that was already raised yesterday in 
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-2018-api-undocumented-changes-have-you-found-any/m-p/7074819">Revit 2018 API undocumented changes</a>,
+so it is probably worth highlighting here as well:</p>
+<h4><a name="3"></a>Question</h4>
+<p>A bug may have been introduced into the Revit 2018 API <code>UIDocument</code> <code>PromptForFamilyInstancePlacement</code> method.</p>
+<p>In Revit 2017, hitting the <code>Escape</code> key twice after placing the families would end the command.</p>
+<p>In Revit 2018, hitting the <code>Escape</code> key twice generates an <code>OperationCanceledException</code> and all the elements that were just placed are deleted.</p>
+<p>The problem can be observed by comparing the behaviour of the Revit 2017 SDK <code>PlacementOptions</code> sample add-in with the Revit 2018 SDK version of the <code>PlacementOptions</code> sample add-in.</p>
+<h4><a name="4"></a>Change in Behaviour</h4>
+<p>Matt Taylor describes the situation differently in
+his <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-2018-api-undocumented-changes-have-you-found-any/m-p/7074819">Revit 2018 API undocumented changes</a>:</p>
+<p>Each year I upgrade my codebase for use with the new version of Revit. Each year, I rid my code of deprecated and/or obsolete function warnings/errors.</p>
+<p>Each year I seem to find an undocumented change in the way the Revit API works.</p>
+<p>'The Factory', can we <em>please</em> have a more detailed and complete list of changes? Can you add this change to the documentation, please?</p>
+<p>My 'find' this year is a change in the way <code>PromptForFamilyInstancePlacement</code> works.</p>
+<p>This function used to just return focus to your function upon cancelling by the Reviteer.</p>
+<p>In Revit 2018, cancelling of this function by your Reviteers throws an <code>Exceptions.OperationCanceledException</code> [sic] exception.</p>
+<p>Easily fixed, once discovered:</p>
+<pre class="code"> 
+  Try
+    docUi.PromptForFamilyInstancePlacement(familySymbol)
+  Catch ex As Exceptions.OperationCanceledException
+    ' The user cancelled placement.
+    ' This should only trigger in Revit 2018.
+    ' Do something if you like
+  End Try
+</pre>
+
+<p>This change even makes sense!</p>
+<p>It's a good idea!</p>
+<p>It also fills me with dread. What else is going to throw an exception unexpectedly?</p>
+<p>What other changes are there?</p>
+<p>(Yes, I know that this item
+is <a href="http://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-revit-2018-api.html#2.7"><em>vaguely</em> alluded to in the 'what's new' document</a>,
+but it's not documented anywhere.)</p>
+<p>Have you found any hidden 'treasures' that you want to share?</p>
+<h4><a name="5"></a>Exceptions Should be Exceptional</h4>
+<p>Greg '<a href="">Sherbs</a>' adds a very valid additional point:</p>
+<p>Yikes!</p>
+<p>Good catch!</p>
+<p>This is more than a bit concerning.</p>
+<p>Undocumented exceptions are generally going to be application fatal.</p>
+<p>I hope this sort of thing can be addressed more systematically in upcoming releases.</p>
+<p>Regarding the specific find, my opinion differs:</p>
+<p>There really is nothing 'exceptional' or 'unexpected' here.</p>
+<p>Cancelling placement may be infrequent, but it is an entirely normal user action.</p>
+<p>Why even throw in this case at all? </p>
+<p>I'm not terribly passionate about this, just throwing out another viewpoint.</p>
+<p>I'm a bit of minimalist when it comes to the use of exceptions. </p>
+<p><center>
+<img src="img/interrupt_process.png" alt="Interrupt Process" width="435">
+<p style="font-size:smaller">By <a href="//commons.wikimedia.org/wiki/User:Anon_lynx" title="User:Anon lynx">Stephen Charles Thompson</a> &ndash; <span class="int-own-work" lang="en">Own work</span>, <a href="http://creativecommons.org/licenses/by-sa/3.0" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=23385273">Link</a></p>
+</center></p>
+<h4><a name="6"></a>Answer</h4>
+<p>Many thanks to Matt for pointing this out!</p>
+<p>I would say that this change in behaviour is <em>precisely</em> alluded to, not <em>vaguely</em>, in the documentation
+of <a href="http://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-revit-2018-api.html">What's New in the Revit 2018 API</a> section 
+on <a href="http://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-revit-2018-api.html#2.7">UIDocument.PromptForFamilyInstancePlacement() behavioral change</a>:</p>
+<blockquote>
+<p>The behavior for UIDocument.PromptForFamilyInstancePlacement() was changed to be same as that of PickObject() methods...</p>
+</blockquote>
+<p>Raising the exception you mention corresponds exactly to the <code>PickPoint</code> behaviour.</p>
+<p>However, just as you say, the detailed consequences are not explicitly spelled out.</p>
+<p>I also fully agree with Greg's statement:
+<a href="http://jacopretorius.net/2009/10/exceptions-should-be-exceptional.html">exceptions should be exceptional</a>.</p>
+<p>Expected behaviour should not be communicated using exceptions.</p>
+<p>I have been preaching this for years to little avail:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/08/fixing-rvtmgddbg-for-mep-connectors.html">Fixing RvtMgdDbg for MEP Connectors</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/03/duplicate-mark-values.html">Duplicate Mark Values</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/10/selecting-model-elements.html">Selecting Model Elements</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/01/language-independent-subcategory-creation.html">Language Independent Subcategory Creation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/09/exporting-parameter-data-to-excel.html">Exporting Parameter Data to Excel, and Re-importing</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/parameter-displayunittype-and-decompilers.html">Parameter DisplayUnitType, Bretagne and Decompilers</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/05/external-command-lister-and-adding-ribbon-commands.html">External Command Lister and Adding Ribbon Commands</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/09/planes-projections-and-picking-points.html#07">The Pick Point Methods Throw an Exception on Cancel</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/02/revitlookup-using-reflection-for-cross-version-compatibility.html#12">Never Catch All Exceptions</a></li>
+</ul>
+<p><center>
+<img src="img/the_exception.jpg" alt="The Exception" width="220">
+</center></p>
