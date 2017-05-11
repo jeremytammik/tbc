@@ -20,6 +20,7 @@ In Revit 2018, cancelling family instance placement during a call to <code>Promp
 &ndash; Change in Behaviour
 &ndash; Exceptions Should be Exceptional
 &ndash; Answer
+&ndash; The Building Coder samples <code>CmdPlaceFamilyInstance<code>
 &ndash; Easily fixed, once discovered...
 
 -->
@@ -117,9 +118,6 @@ on <a href="http://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-re
 <p>The family instances that were successfully placed before the user cancelled the placement and the exception was thrown are probably removed as the transaction is rolled back.</p>
 <p>No bug, just a change in behaviour.</p>
 <p>I hope this clarifies and all is now illuminated.</p>
-<p><center>
-<img src="img/the_exception.jpg" alt="The Exception" width="220">
-</center></p>
 <h4><a name="7"></a>The Building Coder Samples CmdPlaceFamilyInstance</h4>
 <p>I implemented
 the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdPlaceFamilyInstance.cs">external command CmdPlaceFamilyInstance</a>
@@ -127,7 +125,10 @@ in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Buil
 exercise the <code>PromptForFamilyInstancePlacement</code> method when it was originally introduced.</p>
 <p>It also includes code using the <code>DocumentChanged</code> event
 to <a href="http://thebuildingcoder.typepad.com/blog/2010/06/place-family-instance.html">retrieve the newly created elements</a>.</p>
-<p>I updated it to handle the the <code>OperationCanceledException</code> as shown by Matt 
+<p>I updated it to handle the <code>OperationCanceledException</code> as shown by Matt 
 in <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.132.2">release 2018.0.132.2</a>.</p>
 <p>Here is the <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2018.0.132.1...2018.0.132.2">diff to the preceding release</a> that
-shows exactly the exact modifications made.</p>
+shows exactly what modifications were made.</p>
+<p><center>
+<img src="img/the_exception.jpg" alt="The Exception" width="220">
+</center></p>
