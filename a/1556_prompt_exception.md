@@ -14,7 +14,7 @@
 - 12965336 [Revit 2018 API - Undocumented Changes - Have you found any?]
   https://forums.autodesk.com/t5/revit-api-forum/revit-2018-api-undocumented-changes-have-you-found-any/m-p/7074819
 
- @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim 
+Prompt Cancel Throws Exception in Revit 2018 @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim http://bit.ly/prompt_exception
 
 In Revit 2018, cancelling family instance placement during a call to <code>PromptForFamilyInstancePlacement</code> throws an <code>OperationCanceledException</code> exception
 &ndash; Easily fixed, once discovered
@@ -72,13 +72,13 @@ In Revit 2018, cancelling of this function by your Reviteers throws an `Exceptio
 Easily fixed, once discovered:
 
 <pre class="code">
-  Try
-    docUi.PromptForFamilyInstancePlacement(familySymbol)
-  Catch ex As Exceptions.OperationCanceledException
-    ' The user cancelled placement.
-    ' This should only trigger in Revit 2018.
-    ' Do something if you like
-  End Try
+<span style="color:blue;">Try</span>
+&nbsp;&nbsp;docUi.PromptForFamilyInstancePlacement(FamilySymbol)
+<span style="color:blue;">Catch</span>&nbsp;ex&nbsp;<span style="color:blue;">As</span>&nbsp;Exceptions.<span style="color:#2b91af;">OperationCanceledException</span>
+&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;The&nbsp;user&nbsp;cancelled&nbsp;placement.</span>
+&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;This&nbsp;should&nbsp;only&nbsp;trigger&nbsp;in&nbsp;Revit&nbsp;2018.</span>
+&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;Do&nbsp;something&nbsp;if&nbsp;you&nbsp;like</span>
+<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Try</span>
 </pre>
  
 This change even makes sense!
@@ -184,7 +184,19 @@ I updated it to handle the `OperationCanceledException` as shown by Matt
 in [release 2018.0.132.2](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.132.2).
 
 Here is the [diff to the preceding release](https://github.com/jeremytammik/the_building_coder_samples/compare/2018.0.132.1...2018.0.132.2) that
-shows exactly what modifications were made.
+shows exactly what modifications were made; simply add an exception handler around the call to `PromptForFamilyInstancePlacement`:
+
+<pre class="code">
+  <span style="color:blue;">try</span>
+  {
+  &nbsp;&nbsp;uidoc.PromptForFamilyInstancePlacement(&nbsp;symbol&nbsp;);
+  }
+  <span style="color:blue;">catch</span>(&nbsp;Autodesk.Revit.Exceptions.<span style="color:#2b91af;">OperationCanceledException</span>&nbsp;ex&nbsp;)
+  {
+  &nbsp;&nbsp;<span style="color:#2b91af;">Debug</span>.Print(&nbsp;ex.Message&nbsp;);
+  }
+</pre>
+
 
 <center>
 <img src="img/the_exception.jpg" alt="The Exception" width="220">
