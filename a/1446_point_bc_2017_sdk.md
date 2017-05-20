@@ -51,7 +51,7 @@ I trust you already discovered these samples yourself if they are important to y
 - Samples/GenericStructuralConnection
 - Samples/GeometryAPI/BRepBuilderExample
 - Samples/PlacementOptions
-- Structural Analysis SDK CodeCheckingConcreteExample CalculationPointsSelector
+- Structural Analysis SDK/Examples/CodeCheckingConcreteExample and CalculationPointsSelector
 
 Here is the procedure I used to produce that list:
 
