@@ -13,7 +13,13 @@
 
 Finding the Right Project Location @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim 
 
-...
+An explanation of the Revit project location elements and selecting the right one to use.
+I see two project location elements: 'Internal 21748' and 'Project 111428'.
+The active Project Location is 'Internal 21748'.
+However, the values in 'Project 111428' are correct and can be used to transform the coordinates, whereas the values in 'Internal 21748' are nonsense.
+Why is the active project location wrong?
+How can I determine which of the two to use?
+What is the difference between these two? ...
 
 -->
 
