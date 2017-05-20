@@ -1,0 +1,58 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+- 12981176 [How to find the right Project Location]
+
+Finding the Right Project Location @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim 
+
+...
+
+-->
+
+<h3>Finding the Right Project Location</h3>
+<p>Here is an explanation of the Revit project location elements and selecting the right one to use.</p>
+<h4><a name="2"></a>Question</h4>
+<p>The sample project 'rac_basic_sample_project.rvt' for Revit 2016 defines project location elements: 'Internal 21748' and 'Project 111428'.</p>
+<p><center>
+<img src="img/project_location_1.png" alt="Project locations" width="802">
+</center></p>
+<p>The active Project Location is 'Internal 21748'.</p>
+<p><center>
+<img src="img/project_location_2.png" alt="Active project location" width="800">
+</center></p>
+<p>However, the values in 'Project 111428' are correct and can be used to transform the coordinates, whereas the values in 'Internal 21748' are nonsense.</p>
+<p>That leads to the following questions:</p>
+<ol>
+<li>Why is the active project location 'Internal 21748' and not 'Project 111428'?</li>
+<li>How can I determine which of the two to use when retrieving all project location elements, given that I cannot rely on the active project location?</li>
+<li>What is the difference between these two? Why do they exist? Are there always exactly two project locations in a Revit project?</li>
+</ol>
+<!----
+<center>
+<img src="img/project_location.png" alt="Project locations" width="846">
+</center>
+---->
+
+<h4><a name="3"></a>Answer</h4>
+<p>In the case you describe, the <code>Document.ProjectLocations</code> property will return only one single <code>ProjectLocation</code> element &ndash; it will hide the location named "Project'.</p>
+<p>I have to explain a little bit about how Revit works internally here. A normal Revit model has two SiteLocations &ndash; one tied to the shared coordinates, and one tied to the project coordinates. Each one starts with one <code>ProjectLocation</code>. Those are the two ProjectLocations you mention &ndash; 'Internal' for the shared coordinates, and 'Project' for the project coordinates.</p>
+<p>The API does not expose the project ones directly, because they are confusing and not particularly helpful for normal use, as you've seen.</p>
+<p>If you created more ProjectLocations via the Location/Weather/Site dialog on the Manage tab, they'd share the same SiteLocation as the Internal location.</p>
+<p>As far as coordinates are concerned &ndash; assuming you have a ProjectLocation <code>projLoc</code> and you execute the following:</p>
+<pre class="code">
+  ProjectPosition pos = projLoc.GetProjectPosition(XYZ.Zero);
+  TaskDialog.Show("Revit", pos.EastWest);
+</pre>
+
+<p>This will tell you the relationship between the project coordinates and shared coordinates when that location is active. For example, in the little test I did to check my understanding, it says 18, and my project base point is 18 feet east of my survey point.</p>
+<p>I don't know what the 'Project' ProjectLocation's coordinates mean in this circumstance, because it would be comparing to itself. Possibly it's a transform between Revit's internal origin and the project coordinates.</p>
+<p>If <code>Document.ProjectLocations</code> does actually return both ProjectLocations in Revit 2016, you should simply ignore the 'Project' one. It's part of the project coordinates and isn't actually a ProjectLocation in the sense of the locations you see in Location/Weather/Site.</p>
+<p>This information is given in terms of the 2018 API. It should mostly apply to Revit 2016 as well. I think the code internals are the same. You might need to make small trivial changes, such as use <code>get_ProjectPosition()</code> instead of <code>GetProjectPosition()</code> or similar.</p>
+<p>Many thanks to Diane Christoforo for this illuminating explanation!</p>
