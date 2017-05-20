@@ -68,8 +68,8 @@ If you created more ProjectLocations via the Location/Weather/Site dialog on the
 As far as coordinates are concerned &ndash; assuming you have a ProjectLocation `projLoc` and you execute the following:
 
 <pre class="code">
-  ProjectPosition pos = projLoc.GetProjectPosition(XYZ.Zero);
-  TaskDialog.Show("Revit", pos.EastWest);
+<span style="color:#2b91af;">ProjectPosition</span>&nbsp;pos&nbsp;=&nbsp;projLoc.GetProjectPosition(&nbsp;<span style="color:#2b91af;">XYZ</span>.Zero&nbsp;);
+<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;Revit&quot;</span>,&nbsp;pos.EastWest&nbsp;);
 </pre>
 
 This will tell you the relationship between the project coordinates and shared coordinates when that location is active. For example, in the little test I did to check my understanding, it says 18, and my project base point is 18 feet east of my survey point.
