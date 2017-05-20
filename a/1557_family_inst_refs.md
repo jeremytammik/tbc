@@ -21,7 +21,7 @@
 - 12980827 [Get Specific Reference from Family]
   https://forums.autodesk.com/t5/revit-api-forum/get-specific-reference-from-family/m-p/7085619
 
-API Access to Family Instance References @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim 
+API Access to Family Instance References @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim http://bit.ly/family_inst_refs
 
 Here is another Revit 2018 API enhancement that is obviously worth highlighting, since it immediately answers the question on getting a specific reference from a family instance raised in the Revit API discussion forum: Is it possible to get a named reference plane from a family without going into the family editor API? For example, I would like to have users be able to name a reference plane '<i>my arbitrary location</i>' when they are creating a family...
 

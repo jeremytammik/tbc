@@ -11,7 +11,7 @@
 
 - 12981176 [How to find the right Project Location]
 
-Finding the Right Project Location @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim 
+Finding the Right Project Location @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim http://bit.ly/right_project_loc
 
 An explanation of the Revit project location elements and selecting the right one to use.
 I see two project location elements: 'Internal 21748' and 'Project 111428'.
