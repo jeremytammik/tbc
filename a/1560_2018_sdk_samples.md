@@ -12,8 +12,9 @@
 - https://forums.autodesk.com/t5/revit-api-forum/draw-render-over-the-activeview/m-p/7088026
   DuplicateGraphics SDK sample
 
+DuplicateGraphics DirectContext3D SDK sample @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #bim #dynamobim http://bit.ly/2018sdksamples
 
-Revit 2017 and 2018 SDK Samples @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim
+Revit 2018 SDK sample overview @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim http://bit.ly/2018sdksamples
 
 The Revit API discussion forum thread on drawing or rendering over the active view brought to my attention that an important new SDK sample created to demonstrate the use of the Revit 2018 functionality <code>DirectContext3D</code> for display of externally managed 3D graphics in Revit is missing in the SDK.
 I added it right here, in DuplicateGraphics.zip, and also provide an overview of the new SDK samples
