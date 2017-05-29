@@ -1,0 +1,148 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+- 11203423 [Get ElementId of all visible entities in a viewport]
+  http://forums.autodesk.com/t5/revit-api/get-elementid-of-all-visible-entities-in-a-viewport/m-p/5879077
+
+- http://stackoverflow.com/questions/44012630/determine-is-a-familyinstance-is-visible-in-a-view
+I have found that the most reliable way of knowing whether an element is visible in a view is to use a FilteredElementCollector specific to that view. There are so many different ways of controlling the visibility of an element that it would be impractical to try to determine this any other way.
+Below is the utility function I use to achieve this. Note this works for any element, and not just for family instances.
+...
+The category filter is used to eliminate any element not of the desired category before using the slower parameter filter to find the desired element. It is probably possible to speed this up further with clever usage of filters, but I have found that it is plenty fast enough for me in practice.
+Colin Stark
+Thank you for that, Colin! I added it to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) [CmdViewsShowingElements](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdViewsShowingElements.cs), described in the discussion of [Determining Views Showing an Element](http://thebuildingcoder.typepad.com/blog/2016/12/determining-views-showing-an-element.html).
+
+- CmdViewsShowingElements
+  - [Determine Views Displaying Given Element](http://thebuildingcoder.typepad.com/blog/2014/05/views-displaying-given-element-svg-and-nosql.html)
+  - [Determining Views Showing an Element](http://thebuildingcoder.typepad.com/blog/2016/12/determining-views-showing-an-element.html)
+
+ @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #bim #dynamobim 
+
+Minho re-opened the Revit API discussion forum thread on getting the ElementId of all visible entities in a viewport, providing a good opportunity to mention Colin Stark's answer to the StackOverflow thread on determining whether a FamilyInstance is visible in a View. Question: I am looking for code to get the ElementIds of all entities inside a viewport. A viewport is a region of a big view plan...
+
+-->
+
+<h3>Retrieving Elements Visible in View</h3>
+<p>Song 'Minho'  <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1967259">@moshpit</a> Min re-opened
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="http://forums.autodesk.com/t5/revit-api/get-elementid-of-all-visible-entities-in-a-viewport/m-p/5879077">getting the <code>ElementId</code> of all visible entities in a viewport</a>,
+providing a good opportunity to mention Colin Stark's answer to the StackOverflow thread
+on <a href="http://stackoverflow.com/questions/44012630/determine-is-a-familyinstance-is-visible-in-a-view">determining whether a <code>FamilyInstance</code> is visible in a View</a>:</p>
+<h4><a name="2"></a>Question</h4>
+<p>I am looking for code to get the ElementIds of all entities inside a viewport.</p>
+<p>A viewport is a region of a big view plan.</p>
+<p>How to retrieve the <code>ElementId</code> of all visible entities in a viewport?</p>
+<h4><a name="3"></a>Answer</h4>
+<p>Use the <code>FilteredElementCollector</code> constructor overload taking a view id argument:</p>
+<pre>
+  public FilteredElementCollector(
+    Document document,
+    ElementId viewId )
+</pre>
+
+<p>It returns the host document elements visible in this view.</p>
+<p>There is a limitation for elements in linked documents, as explained in the thread
+on <a href="http://forums.autodesk.com/t5/revit-api/elements-from-linked-document/m-p/5867049">elements from linked document</a>.</p>
+<p>In order to include linked elements, you can use
+a <a href="http://thebuildingcoder.typepad.com/blog/2013/07/graphics-pipeline-custom-exporter.html">custom exporter</a>.
+For more info on that, please refer
+to <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.1">The Building Coder custom exporter topic group</a>.</p>
+<p>The solution for your specific case is to find the <code>ViewPlan</code> associated with the viewport and check the  <code>BoundingBox</code> of all elements on the level of this <code>ViewPlan</code> to find ones that fit inside the <code>ViewPlan.CropBox</code>.</p>
+<h4><a name="4"></a>Question 2</h4>
+<p>I am learning Revit API and a beginner. I am so desperate to learn what you have mentioned. Could you provide a code of how the method you have mentioned can be fleshed out? </p>
+<h4><a name="5"></a>Answer 2</h4>
+<p>Welcome to Revit API programming!</p>
+<p>I suggest that you first of all take a look at
+the <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#2">Revit API getting started material</a> and
+work through the step-by-step instructions provided by the DevTV and My First Revit Plugin video tutorials.</p>
+<p>That will show you what other important material is available that you MUST be aware of, answer this question of yours, and many, many more besides.</p>
+<p>Once you understand the basics of using filtered element collectors, the answers provided above will become self-explanatory.</p>
+<p>They already answer your question in full.</p>
+<p>The Building Coder discussed the related topic of determining all views displaying a specific element in depth, implementing an external command named <code>CmdViewsShowingElements</code> to try out some approaches:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/05/views-displaying-given-element-svg-and-nosql.html">Determine views displaying given element</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/12/determining-views-showing-an-element.html">Determining views showing an element</a></li>
+</ul>
+<p>A similar question recently also arose in the StackOverflow thread on how
+to <a href="http://stackoverflow.com/questions/44012630/determine-is-a-familyinstance-is-visible-in-a-view">determine whether a <code>FamilyInstance</code> is visible in a <code>View</code></a>.</p>
+<p>Colin Stark answered that succinctly, saying:</p>
+<blockquote>
+<p>I have found that the most reliable way of knowing whether an element is visible in a view is to use a FilteredElementCollector specific to that view. There are so many different ways of controlling the visibility of an element that it would be impractical to try to determine this any other way.</p>
+<p>Below is the utility function I use to achieve this. Note this works for any element, and not just for family instances.</p>
+<p>The category filter is used to eliminate any element not of the desired category before using the slower parameter filter to find the desired element. It is probably possible to speed this up further with clever usage of filters, but I have found that it is plenty fast enough for me in practice.</p>
+</blockquote>
+<p>I added Colin's code to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
+module <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdViewsShowingElements.cs">CmdViewsShowingElement</a>.</p>
+<pre class="code">
+&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;Determine&nbsp;whether&nbsp;an&nbsp;element&nbsp;is&nbsp;visible&nbsp;in&nbsp;a&nbsp;view,&nbsp;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;by&nbsp;Colin&nbsp;Stark,&nbsp;described&nbsp;in</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;http://stackoverflow.com/questions/44012630/determine-is-a-familyinstance-is-visible-in-a-view</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">bool</span>&nbsp;IsElementVisibleInView(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">this</span>&nbsp;<span style="color:#2b91af;">View</span>&nbsp;view,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;el&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;view&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">throw</span>&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ArgumentNullException</span>(&nbsp;<span style="color:blue;">nameof</span>(&nbsp;view&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;el&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">throw</span>&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ArgumentNullException</span>(&nbsp;<span style="color:blue;">nameof</span>(&nbsp;el&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Obtain&nbsp;the&nbsp;element&#39;s&nbsp;document.</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;el.Document;
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementId</span>&nbsp;elId&nbsp;=&nbsp;el.Id;
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Create&nbsp;a&nbsp;FilterRule&nbsp;that&nbsp;searches&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;for&nbsp;an&nbsp;element&nbsp;matching&nbsp;the&nbsp;given&nbsp;Id.</span>
+&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FilterRule</span>&nbsp;idRule&nbsp;=&nbsp;<span style="color:#2b91af;">ParameterFilterRuleFactory</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.CreateEqualsRule(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementId</span>(&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.ID_PARAM&nbsp;),&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elId&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;idFilter&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementParameterFilter</span>(&nbsp;idRule&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Use&nbsp;an&nbsp;ElementCategoryFilter&nbsp;to&nbsp;speed&nbsp;up&nbsp;the&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;search,&nbsp;as&nbsp;ElementParameterFilter&nbsp;is&nbsp;a&nbsp;slow&nbsp;filter.</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Category</span>&nbsp;cat&nbsp;=&nbsp;el.Category;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;catFilter&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementCategoryFilter</span>(&nbsp;cat.Id&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Use&nbsp;the&nbsp;constructor&nbsp;of&nbsp;FilteredElementCollector&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;that&nbsp;accepts&nbsp;a&nbsp;view&nbsp;id&nbsp;as&nbsp;a&nbsp;parameter&nbsp;to&nbsp;only&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;search&nbsp;that&nbsp;view.</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Also&nbsp;use&nbsp;the&nbsp;WhereElementIsNotElementType&nbsp;filter&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;to&nbsp;eliminate&nbsp;element&nbsp;types.</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc,&nbsp;view.Id&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WherePasses(&nbsp;catFilter&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WherePasses(&nbsp;idFilter&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;If&nbsp;the&nbsp;collector&nbsp;contains&nbsp;any&nbsp;items,&nbsp;then&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;we&nbsp;know&nbsp;that&nbsp;the&nbsp;element&nbsp;is&nbsp;visible&nbsp;in&nbsp;the</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;given&nbsp;view.</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;collector.Any();
+&nbsp;&nbsp;}
+}
+</pre>
+
+<p><center>
+<img src="img/eyes26.gif" alt="Eyes" width="160">
+</center></p>
