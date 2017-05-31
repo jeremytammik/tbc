@@ -13,8 +13,10 @@
 
  @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #bim #dynamobim 
 
-&ndash; 
-...
+An updated version of the Revit SDK was published, I set up <code>RvtSamples</code> for Revit 2018, which I use to load The Building Coder samples, and we present a useful employment of the <code>DatumPlane</code> class methods <code>GetCurvesInView</code> and <code>SetCurveInView</code>
+&ndash; Revit 2018 SDK Update
+&ndash; RvtSamples for Revit 2018
+&ndash; How to Modify Grid Curve End Points...
 
 -->
 
