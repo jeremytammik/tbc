@@ -11,7 +11,8 @@
 
 - 13012962 [通り芯の始終点（３D)を編集する方法]
 
- @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #bim #dynamobim
+SDK Update and RvtSamples 2018 @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #bim #dynamobim http://bit.ly/mod_grid_point
+SetCurveInView to modify grid endpoint @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #bim #dynamobim http://bit.ly/mod_grid_point
 
 An updated version of the Revit SDK was published, I set up <code>RvtSamples</code> for Revit 2018, which I use to load The Building Coder samples, and we present a useful employment of the <code>DatumPlane</code> class methods <code>GetCurvesInView</code> and <code>SetCurveInView</code>
 &ndash; Revit 2018 SDK Update
