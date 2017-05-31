@@ -10,16 +10,18 @@
 
 - 13012962 [通り芯の始終点（３D)を編集する方法]
 
- @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #bim #dynamobim 
+ @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #bim #dynamobim
 
-&ndash; 
-...
+An updated version of the Revit SDK was published, I set up <code>RvtSamples</code> for Revit 2018, which I use to load The Building Coder samples, and we present a useful employment of the <code>DatumPlane</code> class methods <code>GetCurvesInView</code> and <code>SetCurveInView</code>
+&ndash; Revit 2018 SDK Update
+&ndash; RvtSamples for Revit 2018
+&ndash; How to Modify Grid Curve End Points...
 
 -->
 
 <h3>SDK Update, RvtSamples and Setting Grid Endpoint</h3>
 <p>An updated version of the Revit SDK was published, I set up <code>RvtSamples</code> for Revit 2018, which I use to
-load <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>, 
+load <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>,
 and we present a useful employment of the  <code>DatumPlane</code> class methods <code>GetCurvesInView</code> and <code>SetCurveInView</code>:</p>
 <ul>
 <li><a href="#2">Revit 2018 SDK Update</a></li>
@@ -60,11 +62,9 @@ it stands now, up and running on my system.</p>
 </center></p>
 <p>Now to return to the topic for today:</p>
 <h4><a name="4"></a>How to Modify Grid Curve End Points</h4>
-<p><strong>Question:</strong> I would like to modify end points of a grid curve for 3D extent, but the <code>Grid.Curve</code> property is read-only, so I cannot set a new curve.
- 
-Is there any way to edit a grid curve?
- 
-<strong>Answer:</strong> Ever since Revit 2016, the <code>Grid</code> class provides the methods <code>GetCurvesInView</code> and `SetCurveInView.</p>
+<p><strong>Question:</strong> I would like to modify end points of a grid curve for 3D extent, but the <code>Grid.Curve</code> property is read-only, so I cannot set a new curve.</p>
+<p>Is there any way to edit a grid curve?</p>
+<p><strong>Answer:</strong> Ever since Revit 2016, the <code>Grid</code> class provides the methods <code>GetCurvesInView</code> and `SetCurveInView.</p>
 <p>More precisely, these methods were added to the <code>DatumPlane</code> class, which is a base class of <code>Grid</code>.</p>
 <p><a href="http://www.revitapidocs.com/2017/2f93dd88-baac-8e61-377e-b937f3faaff6.htm">GetCurvesInView</a> retrieves a collection of curves representing a <code>DatumPlane</code> element in a given view:</p>
 <pre class="code">
@@ -86,41 +86,50 @@ Is there any way to edit a grid curve?
 <p>The <code>DatumExtentType</code> specifies what type of datum extent that is displayed in a particular view.</p>
 <p>If you want the actual 3D extents, you need to pass in <code>DatumExtentType.Model</code>.</p>
 <p>After retrieving the current grid curves, you can determine their end points, create a new line using those points, and set it back to the grid via <code>Grid.SetCurveInView</code>.</p>
-<p>Here is code snippet demonstrating this:
- 
+<p>Here is code snippet demonstrating this:</p>
 <pre class="code">
 <span style="color:#2b91af;">UIApplication</span>&nbsp;uiapp&nbsp;=&nbsp;commandData.Application;
 <span style="color:#2b91af;">UIDocument</span>&nbsp;uidoc&nbsp;=&nbsp;uiapp.ActiveUIDocument;
 <span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;uidoc.Document;
 <span style="color:#2b91af;">Selection</span>&nbsp;sel&nbsp;=&nbsp;uidoc.Selection;
-<span style="color:#2b91af;">View</span>&nbsp;view&nbsp;=&nbsp;doc.ActiveView;</p>
-<p><span style="color:#2b91af;">ISelectionFilter</span>&nbsp;f
-&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">JtElementsOfClassSelectionFilter</span>&lt;<span style="color:#2b91af;">Grid</span>&gt;();</p>
-<p><span style="color:#2b91af;">Reference</span>&nbsp;elemRef&nbsp;=&nbsp;sel.PickObject(
-&nbsp;&nbsp;<span style="color:#2b91af;">ObjectType</span>.Element,&nbsp;f,&nbsp;<span style="color:#a31515;">&quot;Pick&nbsp;a&nbsp;grid&quot;</span>&nbsp;);</p>
-<p><span style="color:#2b91af;">Grid</span>&nbsp;grid&nbsp;=&nbsp;doc.GetElement(&nbsp;elemRef&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Grid</span>;</p>
-<p><span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">Curve</span>&gt;&nbsp;gridCurves&nbsp;=&nbsp;grid.GetCurvesInView(&nbsp;
-&nbsp;&nbsp;<span style="color:#2b91af;">DatumExtentType</span>.Model,&nbsp;view&nbsp;);</p>
-<p><span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;tx&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)
+<span style="color:#2b91af;">View</span>&nbsp;view&nbsp;=&nbsp;doc.ActiveView;
+
+<span style="color:#2b91af;">ISelectionFilter</span>&nbsp;f
+&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">JtElementsOfClassSelectionFilter</span>&lt;<span style="color:#2b91af;">Grid</span>&gt;();
+
+<span style="color:#2b91af;">Reference</span>&nbsp;elemRef&nbsp;=&nbsp;sel.PickObject(
+&nbsp;&nbsp;<span style="color:#2b91af;">ObjectType</span>.Element,&nbsp;f,&nbsp;<span style="color:#a31515;">&quot;Pick&nbsp;a&nbsp;grid&quot;</span>&nbsp;);
+
+<span style="color:#2b91af;">Grid</span>&nbsp;grid&nbsp;=&nbsp;doc.GetElement(&nbsp;elemRef&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Grid</span>;
+
+<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">Curve</span>&gt;&nbsp;gridCurves&nbsp;=&nbsp;grid.GetCurvesInView(&nbsp;
+&nbsp;&nbsp;<span style="color:#2b91af;">DatumExtentType</span>.Model,&nbsp;view&nbsp;);
+
+<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;tx&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)
 {
-&nbsp;&nbsp;tx.Start(&nbsp;<span style="color:#a31515;">&quot;Modify&nbsp;Grid&nbsp;Endpoints&quot;</span>&nbsp;);</p>
-<p>&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Curve</span>&nbsp;c&nbsp;<span style="color:blue;">in</span>&nbsp;gridCurves&nbsp;)
+&nbsp;&nbsp;tx.Start(&nbsp;<span style="color:#a31515;">&quot;Modify&nbsp;Grid&nbsp;Endpoints&quot;</span>&nbsp;);
+
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Curve</span>&nbsp;c&nbsp;<span style="color:blue;">in</span>&nbsp;gridCurves&nbsp;)
 &nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;start&nbsp;=&nbsp;c.GetEndPoint(&nbsp;0&nbsp;);
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;end&nbsp;=&nbsp;c.GetEndPoint(&nbsp;1&nbsp;);</p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;newStart&nbsp;=&nbsp;start&nbsp;+&nbsp;10&nbsp;<em>&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisY;
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;newEnd&nbsp;=&nbsp;end&nbsp;-&nbsp;10&nbsp;</em>&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisY;</p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;newLine&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;newStart,&nbsp;newEnd&nbsp;);</p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;grid.SetCurveInView(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;end&nbsp;=&nbsp;c.GetEndPoint(&nbsp;1&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;newStart&nbsp;=&nbsp;start&nbsp;+&nbsp;10&nbsp;*&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisY;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;newEnd&nbsp;=&nbsp;end&nbsp;-&nbsp;10&nbsp;*&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisY;
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;newLine&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;newStart,&nbsp;newEnd&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;grid.SetCurveInView(&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">DatumExtentType</span>.Model,&nbsp;view,&nbsp;newLine&nbsp;);
 &nbsp;&nbsp;}
 &nbsp;&nbsp;tx.Commit();
 }
-</pre></p>
+</pre>
+
 <p>Many thanks to Ryuji Ogasawara for sharing this!</p>
 <p>There is hardly any error checking here, so you need to know exactly what to pick.</p>
 <p>It moves the grid endpoints vertically, so you need to select a vertically oriented grid for it to work.</p>
-<p>I added Ryuji's sample as a new external command<br />
+<p>I added Ryuji's sample as a new external command
 to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
 <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.133.0">release 2018.0.133.0</a> in the
 module <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSetGridEndpoint.cs">CmdSetGridEndpoint.cs</a>.</p>
