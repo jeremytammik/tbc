@@ -1,0 +1,134 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+- 13012962 [通り芯の始終点（３D)を編集する方法]
+
+ @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #bim #dynamobim 
+
+&ndash; 
+...
+
+-->
+
+<h3>SDK Update, RvtSamples and Setting Grid Endpoint</h3>
+<p>An updated version of the Revit SDK was published, I set up <code>RvtSamples</code> for Revit 2018, which I use to
+load <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>, 
+and we present a useful employment of the  <code>DatumPlane</code> class methods <code>GetCurvesInView</code> and <code>SetCurveInView</code>:</p>
+<ul>
+<li><a href="#2">Revit 2018 SDK Update</a></li>
+<li><a href="#3">RvtSamples for Revit 2018</a></li>
+<li><a href="#4">How to Modify Grid Curve End Points</a></li>
+</ul>
+<h4><a name="2"></a>Revit 2018 SDK Update</h4>
+<p>An update of the Revit SDK has been posted to
+the <a href="http://www.autodesk.com/developrevit">Revit Developer Centre</a>:</p>
+<ul>
+<li><a href="http://download.autodesk.com/us/revit-sdk/REVIT_2018_SDK_1.msi">Revit 2018 SDK (Update May 19, 2017)</a> (msi - 355088Kb)</li>
+</ul>
+<p>It includes the
+new <a href="http://thebuildingcoder.typepad.com/blog/2017/05/revit-2017-and-2018-sdk-samples.html#4.2">DuplicateGraphics</a> sample
+that was omitted in the first customer shipment of the Revit 2018 SDK.</p>
+<h4><a name="3"></a>RvtSamples for Revit 2018</h4>
+<p>I use the Revit SDK external application <code>RvtSamples</code> to load all the SDK samples for testing and debugging purposes.</p>
+<p>I first described it in The Building Coder's fifth blog post
+on <a href="http://thebuildingcoder.typepad.com/blog/2008/08/managing-sdk-sa.html">Managing SDK Samples</a>.</p>
+<p>I soon implemented
+the <a href="http://thebuildingcoder.typepad.com/blog/2008/11/loading-the-building-coder-samples.html">include file functionality</a> to
+also use it to load all other sample commands that I regularly use,
+including <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>.</p>
+<p>Last year, Dan Tartaglia raised and I addressed several issues setting
+up <a href="http://thebuildingcoder.typepad.com/blog/2016/04/rvtsamples-for-revit-2017.html">RvtSamples for Revit 2017</a>.</p>
+<p>This year, I went through a similar process.</p>
+<p>For the sake of efficiency, I am here simply posting
+the <a href="zip/RvtSamples_2018.zip">entire contents of my RvtSamples folder</a> as
+it stands now, up and running on my system.</p>
+<p>The only files that I modified are:</p>
+<ul>
+<li>Application.cs</li>
+<li>RvtSamples.addin</li>
+<li>RvtSamples.txt</li>
+</ul>
+<p><center>
+<img src="img/rvtsamples_2018.png" alt="RvtSamples in Revit 2018" width="794">
+</center></p>
+<p>Now to return to the topic for today:</p>
+<h4><a name="4"></a>How to Modify Grid Curve End Points</h4>
+<p><strong>Question:</strong> I would like to modify end points of a grid curve for 3D extent, but the <code>Grid.Curve</code> property is read-only, so I cannot set a new curve.
+ 
+Is there any way to edit a grid curve?
+ 
+<strong>Answer:</strong> Ever since Revit 2016, the <code>Grid</code> class provides the methods <code>GetCurvesInView</code> and `SetCurveInView.</p>
+<p>More precisely, these methods were added to the <code>DatumPlane</code> class, which is a base class of <code>Grid</code>.</p>
+<p><a href="http://www.revitapidocs.com/2017/2f93dd88-baac-8e61-377e-b937f3faaff6.htm">GetCurvesInView</a> retrieves a collection of curves representing a <code>DatumPlane</code> element in a given view:</p>
+<pre class="code">
+  <span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">Curve</span>&gt;&nbsp;GetCurvesInView(
+  &nbsp;&nbsp;<span style="color:#2b91af;">DatumExtentType</span>&nbsp;extentMode,
+  &nbsp;&nbsp;<span style="color:#2b91af;">View</span>&nbsp;view
+  )
+</pre>
+
+<p>They can be set using <a href="http://www.revitapidocs.com/2017/eaff0038-34f2-03cf-185b-2872cffb84af.htm">SetCurveInView</a>:</p>
+<pre class="code">
+  <span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;SetCurveInView(
+  &nbsp;&nbsp;<span style="color:#2b91af;">DatumExtentType</span>&nbsp;extentMode,
+  &nbsp;&nbsp;<span style="color:#2b91af;">View</span>&nbsp;view,
+  &nbsp;&nbsp;<span style="color:#2b91af;">Curve</span>&nbsp;curve
+  )
+</pre>
+
+<p>The <code>DatumExtentType</code> specifies what type of datum extent that is displayed in a particular view.</p>
+<p>If you want the actual 3D extents, you need to pass in <code>DatumExtentType.Model</code>.</p>
+<p>After retrieving the current grid curves, you can determine their end points, create a new line using those points, and set it back to the grid via <code>Grid.SetCurveInView</code>.</p>
+<p>Here is code snippet demonstrating this:
+ 
+<pre class="code">
+<span style="color:#2b91af;">UIApplication</span>&nbsp;uiapp&nbsp;=&nbsp;commandData.Application;
+<span style="color:#2b91af;">UIDocument</span>&nbsp;uidoc&nbsp;=&nbsp;uiapp.ActiveUIDocument;
+<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;uidoc.Document;
+<span style="color:#2b91af;">Selection</span>&nbsp;sel&nbsp;=&nbsp;uidoc.Selection;
+<span style="color:#2b91af;">View</span>&nbsp;view&nbsp;=&nbsp;doc.ActiveView;</p>
+<p><span style="color:#2b91af;">ISelectionFilter</span>&nbsp;f
+&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">JtElementsOfClassSelectionFilter</span>&lt;<span style="color:#2b91af;">Grid</span>&gt;();</p>
+<p><span style="color:#2b91af;">Reference</span>&nbsp;elemRef&nbsp;=&nbsp;sel.PickObject(
+&nbsp;&nbsp;<span style="color:#2b91af;">ObjectType</span>.Element,&nbsp;f,&nbsp;<span style="color:#a31515;">&quot;Pick&nbsp;a&nbsp;grid&quot;</span>&nbsp;);</p>
+<p><span style="color:#2b91af;">Grid</span>&nbsp;grid&nbsp;=&nbsp;doc.GetElement(&nbsp;elemRef&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Grid</span>;</p>
+<p><span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">Curve</span>&gt;&nbsp;gridCurves&nbsp;=&nbsp;grid.GetCurvesInView(&nbsp;
+&nbsp;&nbsp;<span style="color:#2b91af;">DatumExtentType</span>.Model,&nbsp;view&nbsp;);</p>
+<p><span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;tx&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)
+{
+&nbsp;&nbsp;tx.Start(&nbsp;<span style="color:#a31515;">&quot;Modify&nbsp;Grid&nbsp;Endpoints&quot;</span>&nbsp;);</p>
+<p>&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Curve</span>&nbsp;c&nbsp;<span style="color:blue;">in</span>&nbsp;gridCurves&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;start&nbsp;=&nbsp;c.GetEndPoint(&nbsp;0&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;end&nbsp;=&nbsp;c.GetEndPoint(&nbsp;1&nbsp;);</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;newStart&nbsp;=&nbsp;start&nbsp;+&nbsp;10&nbsp;<em>&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisY;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;newEnd&nbsp;=&nbsp;end&nbsp;-&nbsp;10&nbsp;</em>&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisY;</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;newLine&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;newStart,&nbsp;newEnd&nbsp;);</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;grid.SetCurveInView(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">DatumExtentType</span>.Model,&nbsp;view,&nbsp;newLine&nbsp;);
+&nbsp;&nbsp;}
+&nbsp;&nbsp;tx.Commit();
+}
+</pre></p>
+<p>Many thanks to Ryuji Ogasawara for sharing this!</p>
+<p>There is hardly any error checking here, so you need to know exactly what to pick.</p>
+<p>It moves the grid endpoints vertically, so you need to select a vertically oriented grid for it to work.</p>
+<p>I added Ryuji's sample as a new external command<br />
+to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.133.0">release 2018.0.133.0</a> in the
+module <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSetGridEndpoint.cs">CmdSetGridEndpoint.cs</a>.</p>
+<p>Here are the isolated grids in <em>rac_basic_sample.rvt</em>:</p>
+<p><center>
+<img src="img/rac_basic_sample_project_grids.png" alt="Grids in rac_basic_sample.rvt" width="329">
+</center></p>
+<p>Launching <code>CmdSetGridEndpoint</code> and picking 3, 4, 5 and 6 generates this:</p>
+<p><center>
+<img src="img/rac_basic_sample_project_grids_mod.png" alt="Modified grid endpoints" width="332">
+</center></p>

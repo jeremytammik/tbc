@@ -24,7 +24,7 @@ Thank you for that, Colin! I added it to [The Building Coder samples](https://gi
   - [Determine Views Displaying Given Element](http://thebuildingcoder.typepad.com/blog/2014/05/views-displaying-given-element-svg-and-nosql.html#6)
   - [Determining Views Showing an Element](http://thebuildingcoder.typepad.com/blog/2016/12/determining-views-showing-an-element.html)
 
- @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #bim #dynamobim 
+Retrieving Elements Visible in View @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #bim #dynamobim http://bit.ly/elem_visible_view
 
 Minho re-opened the Revit API discussion forum thread on getting the ElementId of all visible entities in a viewport, providing a good opportunity to mention Colin Stark's answer to the StackOverflow thread on determining whether a FamilyInstance is visible in a View. Question: I am looking for code to get the ElementIds of all entities inside a viewport. A viewport is a region of a big view plan...
 
