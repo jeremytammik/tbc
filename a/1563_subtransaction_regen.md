@@ -16,7 +16,9 @@
   
 - Александр Игнатович Re: for the tbc blogpost
 
-AI News and Sub-Transaction Regen @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #bim #dynamobim 
+AI beats all + invents new moves post 3000 year @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #bim #dynamobim http://bit.ly/ai_sub_tx_regen
+
+Sub-Transaction requires regeneration @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #bim #dynamobim http://bit.ly/ai_sub_tx_regen
 
 Things continue moving fast in AI, and the need to regenerate in the Revit API remains unchanged
 &ndash; AI News
