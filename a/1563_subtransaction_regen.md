@@ -46,7 +46,7 @@ That revolutionised the expectation and perception of AI of scientists and the i
 Now another important step was taken, completely settling the matter:
 [AlphaGo retires from competitive Go after defeating world number one Ke Jie 3-0](https://www.theverge.com/2017/5/27/15704088/alphago-ke-jie-game-3-result-retires-future).
 
-In this game, Ke Jie made use of some unconventional new moves that AlphaGo invented and first demonstrated in its previous public games... nota bene, it invented new moves after 3000 years of human exploration...
+In this game, Ke Jie made use of some unconventional new moves that AlphaGo invented and first demonstrated in its previous public games... nota bene, it invented new moves after 3000 years of human exploration... one question this raises: 'Invent'? Or discover?
 
 <center>
 <img src="img/go_game_kobayashi_kato.png" alt="Go game" width="300"> <!-- 437 -->
