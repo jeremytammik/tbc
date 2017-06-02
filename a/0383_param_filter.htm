@@ -358,6 +358,8 @@ Filter levels whose top offset is greater than specified value:
 &nbsp; paramFr = <span class="blue">new</span> <span class="teal">FilterDoubleRule</span>(
 &nbsp; &nbsp; pvp, fnrv, ruleValDb, <span class="blue">double</span>.Epsilon );
 &nbsp;
+&nbsp; epf = new ElementParameterFilter( paramFr );
+&nbsp;
 &nbsp; collector = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
 &nbsp;
 &nbsp; collector.OfClass( <span class="blue">typeof</span>( <span class="teal">ViewPlan</span> ) )
@@ -369,7 +371,7 @@ Filter levels whose top offset is greater than specified value:
 
 <h4>String Parameter</h4>
 
-<p>use string evaluator and string rule to test string parameter;
+<p>Use string evaluator and string rule to test string parameter;
 Filter all elements whose view name contains level:
 
 <pre class="code">
@@ -385,6 +387,8 @@ Filter all elements whose view name contains level:
 &nbsp;
 &nbsp; paramFr = <span class="blue">new</span> <span class="teal">FilterStringRule</span>(
 &nbsp; &nbsp; pvp, fnrvStr, ruleValStr, <span class="blue">false</span> );
+&nbsp;
+&nbsp; epf = new ElementParameterFilter( paramFr );
 &nbsp;
 &nbsp; collector = <span class="blue">new</span> <span class="teal">FilteredElementCollector</span>( doc );
 &nbsp;
