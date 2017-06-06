@@ -32,8 +32,11 @@
 
  @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #bim #dynamobim
  
- &ndash; 
- ...
+We continue patrolling the well-trodden paths of BIM, AI, Revit precision and RevitLookup
+&ndash; Connected BIM
+&ndash; Intuitive AI
+&ndash; Fuzzy Comparison
+&ndash; RevitLookup 2018.0.0.1...
 
 -->
 
