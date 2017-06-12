@@ -30,8 +30,10 @@
 
 - https://github.com/jeremytammik/RevitLookup/pull/34
 
- @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #bim #dynamobim
- 
+Connected BIM and Intuitive AI @AutodeskForge #ForgeDevCon #RevitAPI @AutodeskRevit #bim #dynamobim http://bit.ly/fuzz_lookup_future
+Fuzzy comparison of reals in #RevitAPI @AutodeskForge #ForgeDevCon @AutodeskRevit #bim #dynamobim http://bit.ly/fuzz_lookup_future
+RevitLookup 2018.0.0.1 enhanced by Александр Игнатович #RevitAPI @AutodeskForge #ForgeDevCon @AutodeskRevit #bim #dynamobim http://bit.ly/fuzz_lookup_future
+
 We continue patrolling the well-trodden paths of BIM, AI, Revit precision and RevitLookup
 &ndash; Connected BIM
 &ndash; Intuitive AI
