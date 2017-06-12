@@ -66,7 +66,7 @@ Or should I retain the same `AddinId`?
 
 **Answer:** The different versions can have the same GUID.
 
-Not only can, but should keep the same add-in id.
+Not only can, but they definitely should keep the same add-in id.
 
 Some frameworks, e.g., updaters, external services and extensible storage, use the add-in id and serialise it with relevant data.
 

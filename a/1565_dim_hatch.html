@@ -54,7 +54,7 @@ its <a href="http://thebuildingcoder.typepad.com/blog/2016/05/roomedit3d-console
 <p><strong>Question:</strong> If I create a Revit add-in, should the <code>AddinId</code> be unique across different versions of Revit (2017/2018/2019)?</p>
 <p>Or should I retain the same <code>AddinId</code>?</p>
 <p><strong>Answer:</strong> The different versions can have the same GUID.</p>
-<p>Not only can, but should keep the same add-in id.</p>
+<p>Not only can, but they definitely should keep the same add-in id.</p>
 <p>Some frameworks, e.g., updaters, external services and extensible storage, use the add-in id and serialise it with relevant data.</p>
 <p>Therefore, you will want to retain the same add-in id in future versions, so that Revit doesn't treat the capability as unrecognized.</p>
 <h4><a name="4"></a>Dimension on Hatch Pattern</h4>

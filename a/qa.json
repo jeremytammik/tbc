@@ -4,7 +4,7 @@
     "url": "http://thebuildingcoder.typepad.com/blog/2017/06/hatch-line-dimensioning-voodoo.html#3",
     "title": "Retain the Add-In GUID",
     "q": "If I create a Revit add-in, should the AddinId be unique across different versions of Revit (2017/2018/2019)? Or should I retain the same AddinId?",
-    "a": "They can have the same GUID. Not only can, but should keep the same add-in id. Some frameworks - updaters, external services and extensible storage, uses the add-in id and serializes it with relevant data.  So you will want the same add-in id in future versions so that Revit doesn't treat the capability as unrecognized."
+    "a": "The different versions can have the same GUID. Not only can, but they definitely should keep the same add-in id. Some frameworks, e.g., updaters, external services and extensible storage, use the add-in id and serialise it with relevant data. Therefore, you will want to retain the same add-in id in future versions, so that Revit doesn't treat the capability as unrecognized."
   },
   {
     "type": "adsk_revit_api_forum_thread",
