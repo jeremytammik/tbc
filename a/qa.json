@@ -1,8 +1,23 @@
 [
   {
-    "type": "adsk slack msg",
-    "url": "https://autodesk.slack.com/archives/C0SJ4U3PE/p1497273372195629",
-    "q": "if we create a revit addin, should the AddinId be unique across different versions of Revit (2017/2018/2019)? Or should they keep the same AddinId?",
+    "type": "tbc_blog_post_section",
+    "url": "http://thebuildingcoder.typepad.com/blog/2017/06/hatch-line-dimensioning-voodoo.html#3",
+    "title": "Retain the Add-In GUID",
+    "q": "If I create a Revit add-in, should the AddinId be unique across different versions of Revit (2017/2018/2019)? Or should I retain the same AddinId?",
     "a": "They can have the same GUID. Not only can, but should keep the same add-in id. Some frameworks - updaters, external services and extensible storage, uses the add-in id and serializes it with relevant data.  So you will want the same add-in id in future versions so that Revit doesn't treat the capability as unrecognized."
-  }
+  },
+  {
+    "type": "adsk_revit_api_forum_thread",
+    "url": "https://forums.autodesk.com/t5/revit-api-forum/extensible-storage-elementid-lost-after-copying-object/m-p/7146719",
+    "title": "Extensible Storage - ElementId lost after copying object",
+    "q": "When I store ElementId on a project element (via Estorage), the ElementId reference is dropped if I copy the project element (unless I copy the referenced Element as well, then it gets remapped). Is there a way to have Revit treat this as 'Soft Pointer' like in AutoCAD?",
+    "a": "Simply put, NO, cf. http://thebuildingcoder.typepad.com/blog/2011/06/extensible-storage-features.html#7. If you need to retain a link to an element that is not copied, you should implement it differently."
+  },
+  {
+    "type": "adsk_adn_case",
+    "casenr": "13047490",
+    "title": "Revit object events",
+    "q": "We've created an application for AutoCAD (and AutoCAD OEM) that among the many features it has, it interacts a lot with the events.\n\nWe need to be alerted whenever something happens to 'our' objects, for example in AutoCAD we work with blocks and we need to know when the user deletes, copies, moves, ... 'our' blocks Inside the drawing, so we can perform operations on an external database.\n\nThe software is already finalized and distributed to customers.\n\nNow we would like to make a further step by creating the same application for Revit platform as well. The first issue that we have encountering is on event management, in Revit can I be notified when a family instance is copied (copy / paste or dedicated copy command), moved, rotated, deleted?",
+    "a": "The Revit API is much smaller and simpler than the AutoCAD API.\n\nOn the other hand, the BIM environment is much stricter than AutoCAD, so many rules and restrictions apply.\n \nTherefore, when you say that 'we would like to ... create the same application for Revit platform as well', be aware that you are definitely facing a complete rewrite, and take leave of any thoughts about porting or migrating code.\n\nThe Revit API is a different animal:\n\nhttp://thebuildingcoder.typepad.com/blog/about-the-author.html#5.41\n\nThe individual notification events in Revit are limited and simple.\n\nHowever, the Dynamic Model Updater framework or DMU is very powerful.\n\nHere is a pretty old explanation of the two:\n\nhttp://thebuildingcoder.typepad.com/blog/2010/04/element-level-events.html\n\nFor more information on the DMU, please refer to The Building Coder topic group:\n\nhttp://thebuildingcoder.typepad.com/blog/about-the-author.html#5.31"
+  },
 ]

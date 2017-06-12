@@ -64,7 +64,7 @@ Let's look at two Revit API issues before I dig in deeper into Forge:
 
 Or should I retain the same `AddinId`?
 
-**Answer:** They different versions can have the same GUID.
+**Answer:** The different versions can have the same GUID.
 
 Not only can, but should keep the same add-in id.
 
