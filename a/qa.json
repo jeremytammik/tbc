@@ -1,0 +1,8 @@
+[
+  {
+    "type": "adsk slack msg",
+    "url": "https://autodesk.slack.com/archives/C0SJ4U3PE/p1497273372195629",
+    "q": "if we create a revit addin, should the AddinId be unique across different versions of Revit (2017/2018/2019)? Or should they keep the same AddinId?",
+    "a": "They can have the same GUID. Not only can, but should keep the same add-in id. Some frameworks - updaters, external services and extensible storage, uses the add-in id and serializes it with relevant data.  So you will want the same add-in id in future versions so that Revit doesn't treat the capability as unrecognized."
+  }
+]

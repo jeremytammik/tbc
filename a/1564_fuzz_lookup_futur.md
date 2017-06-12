@@ -127,7 +127,8 @@ Here are his commits:
 
 Many thanks to Alexander for his continuous and efficient enhancement work!
 
-Also note what a lot he achieves by modifying a very few lines of code.
+Also note what a lot he achieves
+by [modifying a very few lines of code](https://github.com/jeremytammik/RevitLookup/compare/2018.0.0.0...2018.0.0.1).
  
 I integrated his improvements 
 in [RevitLookup](https://github.com/jeremytammik/RevitLookup)
