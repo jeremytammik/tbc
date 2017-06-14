@@ -21,6 +21,14 @@
     "a": "Check out this collection of public Revit models: http://thebuildingcoder.typepad.com/blog/2016/01/happy-new-top-cad-blog-public-models-and-forge.html#4"
   },
   {
+    "type": "stackoverflow",
+    "format": "md",
+    "url": "https://stackoverflow.com/questions/44533377/how-to-make-a-filter-who-isolate-only-lines-in-a-view-revit-api-c-sharp",
+    "title": "How to make a filter to isolate only lines in a view Revit API C#",
+    "q": "I am trying to hide a certain type of text and lines in views. I could do it for the text but couldn't isolate the lines to hide them. Any idea about how I can filter the view for lines?",
+    "a": "Use [RevitLookup](https://github.com/jeremytammik/RevitLookup) to analyse what the elements you wish to hide look like through the API. Use a [FilteredElementCollector](http://www.revitapidocs.com/2017/263cf06b-98be-6f91-c4da-fb47d01688f3.htm) to retrieve the lines from the database. You can specify the view `ElementId` to retrieve lines displayed in your specific view. If any of these suggestions are unclear, work through the [Revit API getting started material](http://thebuildingcoder.typepad.com/blog/about-the-author.html#2) before doing anything else whatsoever."
+  },
+  {
     "type": "adsk_adn_case",
     "casenr": "13047490",
     "title": "Revit object events",
