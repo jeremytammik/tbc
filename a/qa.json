@@ -1,38 +1,42 @@
 [
   {
-    "type": "tbc_blog_post_section",
+    "src": "tbc_blog_post_section",
     "url": "http://thebuildingcoder.typepad.com/blog/2017/06/hatch-line-dimensioning-voodoo.html#3",
     "title": "Retain the Add-In GUID",
     "q": "If I create a Revit add-in, should the AddinId be unique across different versions of Revit (2017/2018/2019)? Or should I retain the same AddinId?",
     "a": "The different versions can have the same GUID. Not only can, but they definitely should keep the same add-in id. Some frameworks, e.g., updaters, external services and extensible storage, use the add-in id and serialise it with relevant data. Therefore, you will want to retain the same add-in id in future versions, so that Revit doesn't treat the capability as unrecognized."
   },
   {
-    "type": "adsk_revit_api_forum_thread",
+    "src": "adsk_revit_api_forum_thread",
     "url": "https://forums.autodesk.com/t5/revit-api-forum/extensible-storage-elementid-lost-after-copying-object/m-p/7146719",
     "title": "Extensible Storage - ElementId lost after copying object",
     "q": "When I store ElementId on a project element (via Estorage), the ElementId reference is dropped if I copy the project element (unless I copy the referenced Element as well, then it gets remapped). Is there a way to have Revit treat this as 'Soft Pointer' like in AutoCAD?",
-    "a": "Simply put, NO, cf. http://thebuildingcoder.typepad.com/blog/2011/06/extensible-storage-features.html#7. If you need to retain a link to an element that is not copied, you should implement it differently."
+    "a": "Simply put, NO, cf. the [extensible storage features](http://thebuildingcoder.typepad.com/blog/2011/06/extensible-storage-features.html#7). If you need to retain a link to an element that is not copied, you should implement it differently."
   },
   {
-    "type": "adsk_revit_api_forum_thread",
+    "src": "adsk_revit_api_forum_thread",
     "url": "https://forums.autodesk.com/t5/revit-api-forum/large-sample-revit-files-for-performance-testing/m-p/7129074",
     "title": "Large sample Revit files for performance testing",
-    "q": "I'm developing a revit addin, and I'm concerned over it's performance when interacting with large models. I'd like to isolate a set of projects that I can use as a set of benchmarks going forward. I've considered generating large models via the API, but these models will obviously differ in subtle and unsubtle ways from real models; ideally I'd be able to test performance against the sort of messiness that emerges in real projects. Does anyone know of a repository for sample files that would fit the bill (or have a few large project files sitting around that they'd be willing to share)? How do other folks test and validate tools against realistic projects?",
-    "a": "Check out this collection of public Revit models: http://thebuildingcoder.typepad.com/blog/2016/01/happy-new-top-cad-blog-public-models-and-forge.html#4"
+    "q": "I'm developing a Revit add-in, and I'm concerned over it's performance when interacting with large models. I'd like to isolate a set of projects that I can use as a set of benchmarks going forward. I've considered generating large models via the API, but these models will obviously differ in subtle and unsubtle ways from real models; ideally I'd be able to test performance against the sort of messiness that emerges in real projects. Does anyone know of a repository for sample files that would fit the bill (or have a few large project files sitting around that they'd be willing to share)? How do other folks test and validate tools against realistic projects?",
+    "a": "Check out this [collection of public Revit models](http://thebuildingcoder.typepad.com/blog/2016/01/happy-new-top-cad-blog-public-models-and-forge.html#4)."
   },
   {
-    "type": "stackoverflow",
-    "format": "md",
+    "src": "stackoverflow",
     "url": "https://stackoverflow.com/questions/44533377/how-to-make-a-filter-who-isolate-only-lines-in-a-view-revit-api-c-sharp",
     "title": "How to make a filter to isolate only lines in a view Revit API C#",
     "q": "I am trying to hide a certain type of text and lines in views. I could do it for the text but couldn't isolate the lines to hide them. Any idea about how I can filter the view for lines?",
     "a": "Use [RevitLookup](https://github.com/jeremytammik/RevitLookup) to analyse what the elements you wish to hide look like through the API. Use a [FilteredElementCollector](http://www.revitapidocs.com/2017/263cf06b-98be-6f91-c4da-fb47d01688f3.htm) to retrieve the lines from the database. You can specify the view `ElementId` to retrieve lines displayed in your specific view. If any of these suggestions are unclear, work through the [Revit API getting started material](http://thebuildingcoder.typepad.com/blog/about-the-author.html#2) before doing anything else whatsoever."
   },
   {
-    "type": "adsk_adn_case",
+    "src": "adsk_adn_case",
     "casenr": "13047490",
     "title": "Revit object events",
-    "q": "We've created an application for AutoCAD (and AutoCAD OEM) that among the many features it has, it interacts a lot with the events.\n\nWe need to be alerted whenever something happens to 'our' objects, for example in AutoCAD we work with blocks and we need to know when the user deletes, copies, moves, ... 'our' blocks Inside the drawing, so we can perform operations on an external database.\n\nThe software is already finalized and distributed to customers.\n\nNow we would like to make a further step by creating the same application for Revit platform as well. The first issue that we have encountering is on event management, in Revit can I be notified when a family instance is copied (copy / paste or dedicated copy command), moved, rotated, deleted?",
-    "a": "The Revit API is much smaller and simpler than the AutoCAD API.\n\nOn the other hand, the BIM environment is much stricter than AutoCAD, so many rules and restrictions apply.\n \nTherefore, when you say that 'we would like to ... create the same application for Revit platform as well', be aware that you are definitely facing a complete rewrite, and take leave of any thoughts about porting or migrating code.\n\nThe Revit API is a different animal:\n\nhttp://thebuildingcoder.typepad.com/blog/about-the-author.html#5.41\n\nThe individual notification events in Revit are limited and simple.\n\nHowever, the Dynamic Model Updater framework or DMU is very powerful.\n\nHere is a pretty old explanation of the two:\n\nhttp://thebuildingcoder.typepad.com/blog/2010/04/element-level-events.html\n\nFor more information on the DMU, please refer to The Building Coder topic group:\n\nhttp://thebuildingcoder.typepad.com/blog/about-the-author.html#5.31"
+    "q": "We've created an application for AutoCAD that interacts a lot with events. We need to be alerted whenever something happens to our objects, e.g., we need to know when the user deletes, copies or movesthem, so we can perform operations on an external database. Now we would like to create the same application for Revit platform as well. The first issue that we have encountered is on event management; in Revit, can I be notified when a family instance is copied, moved, rotated or deleted?",
+    "a": "The Revit API is much smaller and simpler than the AutoCAD API. On the other hand, the BIM environment is much stricter than AutoCAD, so many rules and restrictions apply. Therefore, when you say that 'we would like to create the same application for Revit platform as well', be aware that you are definitely facing a complete rewrite, and take leave of any thoughts about porting or migrating code. The [Revit API is a different animal](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.41). The individual notification events in Revit are limited and simple. However, the Dynamic Model Updater framework or DMU is very powerful. Here is a pretty old explanation of the two, discussing [element level events](http://thebuildingcoder.typepad.com/blog/2010/04/element-level-events.html). For more information on the DMU, please refer to [The Building Coder topic group](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.31)."
   },
+  {
+    "src": "adam",
+    "q": "What is Revit API?",
+    "a": "An [API](https://en.wikipedia.org/wiki/Application_programming_interface) is an application programming interface, and this one is for Revit. For more information, please refer to the introduction in the official [Revit API Developers Guide](http://help.autodesk.com/view/RVT/2018/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42) and the [Revit API getting started material](http://thebuildingcoder.typepad.com/blog/about-the-author.html#2)."
+  }
 ]
