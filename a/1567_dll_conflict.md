@@ -55,5 +55,5 @@ I have no official solution to suggest for this, just these discussion threads a
 - You can also use [ILMerge](https://www.microsoft.com/en-us/download/details.aspx?id=17630) to merge all of your DLLs into one single .NET assembly, cf. the CodeProject article on [Merging .NET assemblies using ILMerge](https://www.codeproject.com/articles/9364/merging-net-assemblies-using-ilmerge)
 
 <center>
-<img src="img/darvasa_gas_crater_panorama.jpg" alt="Crater" width="300"> 
+<img src="img/darvasa_gas_crater_panorama.jpg" alt="DLL hell?" width="300"> 
 </center>
