@@ -35,12 +35,11 @@ Merging .NET assemblies using ILMerge -- https://www.codeproject.com/articles/93
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-
-...
+A recurring question just came up again, on handling conflicts between DLLs loaded by Revit add-ins. For instance, this can be caused by a scenario in which add-ins A and B both make use of library DLL C, but specify different versions. A soon as the first add-in has loaded its version of C, the second add-in is prevented from loading the version it requires and cannot run...
 
 -->
 
-### Handling Library DLL Conflict
+### Handling Third Party Library DLL Conflicts
 
 A recurring question just came up again, on handling conflicts between DLLs loaded by Revit add-ins.
 
