@@ -14,7 +14,7 @@
   https://forums.autodesk.com/t5/revit-api-forum/grids-off-axis/m-p/7129065
   https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSetGridEndpoint.cs
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Aligning a Slightly Off-Axis Grid using #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/aligngrid
 
 Here is a follow-up on the recent discussion on how to modify a grid curve end point using <code>Grid.SetCurveInView</code>.
 In the Revit API discussion forum thread on off-axis grids causing warnings in Revit, an attempt to use the same approach fails. Instead, Fair59 presents a solution using <code>RotateElement</code> to align an almost horizontal or almost vertical grid that is slightly off-axis...
