@@ -13,14 +13,14 @@
   https://forums.autodesk.com/t5/revit-api-forum/how-to-retrieve-a-dimension-s-segment-geometry/m-p/7145688
   https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdGetDimensionPoints.cs
 
-#RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Determining Dimension Segment Endoints #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/dimsegendpt
 
-...
+A rather hard struggle led to a rather simple solution for determining the start and end points of dimension segments. In summary, the solution looks like this &ndash; A <code>Dimension</code> element is either single- or multi-segment; these two cases need to be handled separately &ndash; In case of a single segment, the dimension element itself has a line, an origin and a value; the line is indeed the dimension line. However, it may be unbounded...
 
 -->
 
-<h3>Determining Dimension Segment Points</h3>
-<p>A rather hard struggle led to a rather simple solution to determining the start and end points of dimension segments.</p>
+<h3>Determining Dimension Segment Endoints</h3>
+<p>A rather hard struggle led to a rather simple solution for determining the start and end points of dimension segments.</p>
 <p>In summary, the solution looks like this:</p>
 <ul>
 <li>A <code>Dimension</code> element is either single- or multi-segment; these two cases need to be handled separately.</li>
@@ -37,20 +37,23 @@
 </ul>
 <p>I implemented and added a new external
 command <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdGetDimensionPoints.cs">CmdGetDimensionPoints</a>
-to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> that
+to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
+I added it 
+to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.134.0">release 2018.0.134.0</a> that
 calculates the segment endpoints accordingly.</p>
 <p>Here is a dimension between three parallel walls:</p>
 <p><center>
 <img src="img/dim_three_walls_final.png" alt="Dimensioning of three walls" width="300"> 
 </center></p>
-<p><code>CmdGetDimensionPoints</code> adds the green model line markers denoting the dimension origin in the middle of the first segment and at the three start and end points of the two segment calculated along the dimension line from that starting point:</p>
+<p><code>CmdGetDimensionPoints</code> adds the green model line markers denoting the dimension origin in the middle of the first segment and at the three start and end points of the two segments calculated along the dimension line from that starting point:</p>
 <p><center>
 <img src="img/dim_three_walls_markers_final.png" alt="Dimension origin and segment points" width="300"> 
 </center></p>
 <p>For the full research and discussion leading up to this, please refer to
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread 
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-retrieve-a-dimension-s-segment-geometry/m-p/7145688">how to retrieve a dimension's segment  geometry</a>.</p>
-<p>Many thanks to Fair59 for his important contributions and to Jonathan 'Maisoui' for raising it.</p>
+<p>Many thanks to Fair59 for his important contributions and to Jonathan 'Maisoui' for raising the issue.</p>
 <p>Here is the full final implementation based on this:</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>

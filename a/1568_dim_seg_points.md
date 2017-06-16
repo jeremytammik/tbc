@@ -14,7 +14,7 @@
   https://forums.autodesk.com/t5/revit-api-forum/how-to-retrieve-a-dimension-s-segment-geometry/m-p/7145688
   https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdGetDimensionPoints.cs
 
-Determining Dimension Segment Endoints #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Determining Dimension Segment Endoints #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/dimsegendpt
 
 A rather hard struggle led to a rather simple solution for determining the start and end points of dimension segments. In summary, the solution looks like this &ndash; A <code>Dimension</code> element is either single- or multi-segment; these two cases need to be handled separately &ndash; In case of a single segment, the dimension element itself has a line, an origin and a value; the line is indeed the dimension line. However, it may be unbounded...
 
