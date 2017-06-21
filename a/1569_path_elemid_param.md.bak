@@ -1,0 +1,646 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head>
+
+<!---
+
+
+ #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+
+
+...
+
+-->
+
+### Finding a Path and ElementId Parameter Values
+
+Lots of exciting discussions are being conducted in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160).
+
+I'll just highlight two going on right now:
+
+- Finding a path through the BIM
+- Finding all possible ElementId values for specific Parameter
+
+#### <a name="2"></a>Finding a Path Through the BIM
+
+haozheng.xu15
+
+
+1 Post
+Post 1 of 5
+Report
+How to extract points of areas for pathfinding algorithm 
+Options
+41 Views, 4 Replies
+2017-06-20 06:01 AM
+I  want to find shortest safefty path from any room to the exit in Revit.
+ 
+Thus, I plan to divide areas (like rooms, exit, floor, doors) into two-dimensional grids to form vertex or nodes, so that I can apply them in pathfinding algorithm like A*.
+ 
+I noticed that Revit has provided coordinates in floats number which cannot be used directly, though. Is there some similar functionality which can achieve my plan in Revit API?
+ 
+If any of you have some tips for me, please help me.
+ 
+Thank you.
+Everyone's Tags: filtergeometrypath algorithmView All (3)
+ Add Tag...
+QUICK REPLY
+REPLY
+Kudo
+ESCALATE TO SALESFORCE
+jeremytammik
+The Building Coder
+
+
+
+3052 Posts
+1163 Kudos
+438 Solutions
+
+Post 2 of 5
+Report
+Re: How to extract points of areas for pathfinding algorithm   
+Options
+2017-06-20 09:39 AM in reply to: haozheng.xu15
+Here is a Revit add-in that prompts the user to select a model curve representing the optimal exit path:
+ 
+http://thebuildingcoder.typepad.com/blog/2016/09/hololens-escape-path-waypoint-json-exporter.html
+ 
+Do you know what a Voronoi diagram is?
+ 
+It might help generate the optimal path automatically.
+ 
+Check out Max Thumfart's sample using the C++ Boost library Voronoi implementation in a Revit add-in:
+ 
+http://thebuildingcoder.typepad.com/blog/2015/07/grevit-firerating-in-the-cloud-demo-deployment-vaca...
+ 
+I also was told that Adam Sheather presented an example of wrapping the A* algorithm in a Dynamo node at AU 2016; I don't see it in his material, though:
+ 
+http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2016/dynamo-studio/sd2...
+ 
+https://royalexander.wordpress.com/2009/07/07/new-version-a-pathfinding-in-3d/
+ 
+Regarding tips about handling the Revit floating point coordinates: That is pretty trivial. I suggest that you convert them to millimetres, store those in integer numbers, and base your calculations on that. Then you can convert the results back to the Revit imperial coordinates when needed.
+ 
+Cheers,
+ 
+Jeremy
+ 
+
+Jeremy Tammik
+Developer Technical Services
+Autodesk Developer Network, ADN Open
+The Building Coder
+
+ Add Tag...
+QUICK REPLY
+REPLY
+1 Kudo  Kudo|
+ACCEPT AS SOLUTION
+jeremytammik
+The Building Coder
+
+
+
+3052 Posts
+1163 Kudos
+438 Solutions
+
+Post 3 of 5
+Report
+Re: How to extract points of areas for pathfinding algorithm 
+Options
+2017-06-21 08:43 AM in reply to: haozheng.xu15
+An update on the use of the A* algorithm for pathfinding in a Revit model:
+ 
+Here is the link to the A* C# library code you can use:
+ 
+Another faster version of A* (2D+3D) in C# by Roy T, www.roy-t.nl -- http://www.roy-t.nl/2011/09/24/another-faster-version-of-a-2d3d-in-c.html
+ 
+You can use the geometry library in Dynamo or C# to check whether Revit elements intersect with the A* voxel space and use that to blank out that area.
+ 
+With that in hand, you can specify a box and how many items you want to check against for the pathfinding.
+ 
+Cheers,
+ 
+Jeremy
+ 
+
+Jeremy Tammik
+Developer Technical Services
+Autodesk Developer Network, ADN Open
+The Building Coder
+
+ Add Tag...
+QUICK REPLY
+REPLY
+ Kudo
+ACCEPT AS SOLUTION
+Success! Click to go to your post.
+haozheng.xu15
+
+
+1 Post
+Post 4 of 5
+Report
+Re: How to extract points of areas for pathfinding algorithm   
+Options
+2017-06-21 09:21 AM in reply to: jeremytammik
+Thank you very much for your reply! The A* for 3D in C# is of great help in my furutre work.
+ 
+I also found another simple path algorithm using dynamo which extract points in grid. And a Dynamo package called lunch box would find the shortest It will give much inspiration for the pathfinding algorithm.
+ 
+https://revitbeyondbim.wordpress.com/2017/01/03/fire-exit-risk-assessment-with-revit-and-dynamo/
+ 
+Terry
+ Add Tag...
+QUICK REPLY
+REPLY
+Kudo
+ACCEPT AS SOLUTION
+jeremytammik
+The Building Coder
+
+
+
+3052 Posts
+1163 Kudos
+438 Solutions
+
+Post 5 of 5
+Report
+Re: How to extract points of areas for pathfinding algorithm 
+Options
+2017-06-21 09:43 AM in reply to: haozheng.xu15
+Dear Teryy,
+ 
+Thank you for the link and glad to hear it is looking good.
+ 
+I look forward very much to hearing how you end up implementing your solution.
+ 
+Thank you!
+ 
+Cheers,
+ 
+Jeremy
+
+
+
+
+
+#### <a name="3"></a>Finding all Possible ElementId Values for a Specific Parameter
+
+jalbert300
+Developer
+
+
+89 Posts
+1 Solution
+Post 1 of 10
+Report
+Accepted SolutionElegant way to get possible ElementId values for specific Parameter 
+Options
+83 Views, 9 Replies
+2017-06-19 12:36 AM
+Hello,
+ 
+I'm creating a sort of "Property Editor" dialog for user selected elements. In my dialog, the user may pick from a list of non read-only parameters, and specify an alternate value that my application will use later on under particular circumstances (see dialog image below).
+ 
+The challenge is to provide a list of relevant alternate "Element Id Values" based on the selected parameter. So far, my approach is to explicitly exam the "Current Value (ElementId)" of selected parameter and create alternate value list accordingly. For some "Current Values" I use the "GetSimilarTypes" function, while others I simply filter the document for elements of same category (see code below image).
+ 
+So far I have two questions...
+ 
+Can someone suggest a less explicit, more elegant way of populating the alternate ElementId values?
+Based on my current approach, if the "Current Value" is NULL, I have no way of getting alternate values.
+Thanks,
+ 
+Jon
+ 
+ 
+ 
+2017-06-18_18-07-28.jpg
+ 
+ 
+if (request == EditPropertyOptRequest.GetAvailableValues) {
+
+	cond.SelElemValue = null;
+	cond.PropertyOpt.ElementValues = new ObservableCollection<Element>();
+
+	try {
+		dynamic CurrentElem = doc.GetElement(cond.SelProperty.AsElementId);
+
+
+		if ((CurrentElem) is WallType) {
+			WallType obj = CurrentElem;
+
+			foreach (void ElemId_loopVariable in obj.GetSimilarTypes) {
+				ElemId = ElemId_loopVariable;
+				cond.PropertyOpt.ElementValues.Add(doc.GetElement(ElemId));
+			}
+
+
+		} else if ((CurrentElem) is FloorType) {
+			FloorType obj = CurrentElem;
+
+			foreach (void ElemId_loopVariable in obj.GetSimilarTypes) {
+				ElemId = ElemId_loopVariable;
+				cond.PropertyOpt.ElementValues.Add(doc.GetElement(ElemId));
+			}
+
+
+		} else if ((CurrentElem) is FamilySymbol) {
+			FamilySymbol obj = CurrentElem;
+
+			foreach (void ElemId_loopVariable in obj.GetSimilarTypes) {
+				ElemId = ElemId_loopVariable;
+				cond.PropertyOpt.ElementValues.Add(doc.GetElement(ElemId));
+			}
+
+
+		} else if ((CurrentElem) is Level) {
+			FilteredElementCollector collector = new FilteredElementCollector(doc);
+			collector.OfCategory(BuiltInCategory.OST_Levels).WhereElementIsNotElementType();
+
+			foreach (void elem_loopVariable in collector) {
+				elem = elem_loopVariable;
+				cond.PropertyOpt.ElementValues.Add(elem);
+			}
+
+
+		} else if ((CurrentElem) is Phase) {
+			FilteredElementCollector collector = new FilteredElementCollector(doc);
+			collector.OfCategory(BuiltInCategory.OST_Phases).WhereElementIsNotElementType();
+
+			foreach (void elem_loopVariable in collector) {
+				elem = elem_loopVariable;
+				cond.PropertyOpt.ElementValues.Add(elem);
+			}
+
+		}
+
+		cond.SelElemValue = cond.PropertyOpt.ElementValues(0);
+
+	} catch (Exception ex) {
+	}
+
+}
+ 
+Solved! by jalbert300. See the answer in context.
+Kudo
+Quick update...
+ 
+After realizing "GetSimilarTypes" method is inherited from "ElementType" base class, I now attempt to cast Element to ElementType, then use "GetSimilarTypes" method if "ElemType" is Not NULL. Otherwise I filter document for NonElementTypes of same Category. I still need to handle elements with No Category, which so far I've identified Line Styles as being this way.
+ 
+I am quite happy with this approach!
+ 
+Jon 
+ 
+if (request == EditPropertyOptRequest.GetAvailableValues) {
+cond.SelElemValue = null;
+cond.PropertyOpt.ElementValues = new ObservableCollection<Element>();
+if (cond.SelProperty.StorageType == StorageType.ElementId) {
+ElementId ElemId = cond.SelProperty.AsElementId;
+if (ElemId == null)
+return;
+Element Elem = doc.GetElement(ElemId);
+ElementType ElemType = Elem as ElementType;
+if (ElemType != null) {
+foreach ( ElemId in ElemType.GetSimilarTypes) {
+cond.PropertyOpt.ElementValues.Add(doc.GetElement(ElemId));
+}
+} else if (Elem.Category != null) {
+FilteredElementCollector collector = new FilteredElementCollector(doc);
+collector.OfCategory(Elem.Category.Id.IntegerValue).WhereElementIsNotElementType();
+foreach ( Elem in collector) {
+cond.PropertyOpt.ElementValues.Add(Elem);
+}
+} else {
+//
+//Handle non-category elements. Namely Line Styles(aka GraphicStlyes)
+//
+}
+cond.SelElemValue = cond.PropertyOpt.ElementValues(0);
+}
+}
+ 
+Solved! by FAIR59. See the answer in context.
+Kudo
+you can use a ElementParameterFilter, to get all the elements that have a value other then ElementId.InvalidElementId  for a specific parameter.
+ 
+this code filters for elements in the active view, that are demolished in some phase.
+ 
+ ParameterValueProvider pvp_Demolished = new ParameterValueProvider(new ElementId((int)BuiltInParameter.PHASE_DEMOLISHED));
+FilterNumericGreater fgreater = new FilterNumericGreater();
+FilterElementIdRule IdFilter = new FilterElementIdRule(pvp_Demolished, fgreater, ElementId.InvalidElementId);
+ElementParameterFilter efilter = new ElementParameterFilter(IdFilter);
+FilteredElementCollector elems = new FilteredElementCollector(doc, doc.ActiveView.Id)
+.WherePasses(efilter);
+ 
+ 
+Solved! by FAIR59. See the answer in context.
+Kudo
+Actually, it is part of what you are trying to accomplish. With an ElementParameterFilter you get a list of Elements (if there are any) that have a value for the parameter in question, and then you may find all the relevant values, or display all the found values.  
+ Add Tag...
+QUICK REPLY
+REPLY
+Kudo
+ESCALATE TO SALESFORCE
+jalbert300
+Developer
+
+
+89 Posts
+1 Solution
+Post 2 of 10
+Report
+Solution!Re: Elegant way to get possible ElementId values for specific Parameter 
+Options
+2017-06-19 02:09 PM in reply to: jalbert300
+Quick update...
+ 
+After realizing "GetSimilarTypes" method is inherited from "ElementType" base class, I now attempt to cast Element to ElementType, then use "GetSimilarTypes" method if "ElemType" is Not NULL. Otherwise I filter document for NonElementTypes of same Category. I still need to handle elements with No Category, which so far I've identified Line Styles as being this way.
+ 
+I am quite happy with this approach!
+ 
+Jon 
+ 
+if (request == EditPropertyOptRequest.GetAvailableValues) {
+	cond.SelElemValue = null;
+	cond.PropertyOpt.ElementValues = new ObservableCollection<Element>();
+
+	if (cond.SelProperty.StorageType == StorageType.ElementId) {
+		ElementId ElemId = cond.SelProperty.AsElementId;
+		if (ElemId == null)
+			return;
+
+		Element Elem = doc.GetElement(ElemId);
+		ElementType ElemType = Elem as ElementType;
+
+		if (ElemType != null) {
+			foreach ( ElemId in ElemType.GetSimilarTypes) {
+				cond.PropertyOpt.ElementValues.Add(doc.GetElement(ElemId));
+			}
+
+		} else if (Elem.Category != null) {
+			FilteredElementCollector collector = new FilteredElementCollector(doc);
+			collector.OfCategory(Elem.Category.Id.IntegerValue).WhereElementIsNotElementType();
+
+			foreach ( Elem in collector) {
+				cond.PropertyOpt.ElementValues.Add(Elem);
+			}
+		} else {
+			//
+			//Handle non-category elements. Namely Line Styles(aka GraphicStlyes)
+			//
+		}
+
+		cond.SelElemValue = cond.PropertyOpt.ElementValues(0);
+
+	}
+
+}
+ 
+ Add Tag...
+QUICK REPLY
+REPLY
+Kudo
+jeremytammik
+The Building Coder
+
+
+
+3052 Posts
+1163 Kudos
+438 Solutions
+
+Post 3 of 10
+Report
+Re: Elegant way to get possible ElementId values for specific Parameter 
+Options
+2017-06-20 09:59 AM in reply to: jalbert300
+Dear Jon,
+ 
+Thank you for sharing this.
+ 
+How does this fit in with the combo box dropdown workarounds suggested here?
+ 
+http://thebuildingcoder.typepad.com/blog/2015/11/drop-down-enumerated-parameter-values.html
+ 
+Should I add your solution as a new workaround, or is it a different class of animal?
+ 
+Thank you!
+ 
+Cheers,
+ 
+Jeremy
+ 
+
+Jeremy Tammik
+Developer Technical Services
+Autodesk Developer Network, ADN Open
+The Building Coder
+
+ Add Tag...
+QUICK REPLY
+REPLY
+ Kudo
+ACCEPT AS SOLUTION
+jalbert300
+Developer
+
+
+89 Posts
+1 Solution
+Post 4 of 10
+Report
+Re: Elegant way to get possible ElementId values for specific Parameter 
+Options
+2017-06-20 12:49 PM in reply to: jeremytammik
+Hi Jeremy,
+ 
+I believe this is a "different class of animal". In brief, the post touches on how to mimic contextual content of Element Properties Panel using Revit API. More specifically, how to get a list of available ElementId values for a given Parameter whos Storage Type = ElementId and has an existing value to use as reference. Mostly revolving around use of 'ElementType.GetSimilarTypes' method.
+ 
+Note: I still cant find a way to get available values for a Parameter that does not have existing value for reference.
+ 
+Thanks,
+ 
+Jon
+ 
+ 
+ Add Tag...
+QUICK REPLY
+REPLY
+Kudo
+ACCEPT AS SOLUTION
+jeremytammik
+The Building Coder
+
+
+
+3052 Posts
+1163 Kudos
+438 Solutions
+
+Post 5 of 10
+Report
+Re: Elegant way to get possible ElementId values for specific Parameter 
+Options
+2017-06-20 01:48 PM in reply to: jalbert300
+Dear Jon,
+ 
+Thank you, all clear now.
+ 
+To get available values for a Parameter that does not have an existing value for reference, you might be able to create a suitable template element in a temporary transaction, grab the data you require from it, and roll back the transaction without committing, also know as the 'temporary transaction trick' TTT:
+ 
+http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.53
+ 
+Cheers,
+ 
+Jeremy
+ 
+
+Jeremy Tammik
+Developer Technical Services
+Autodesk Developer Network, ADN Open
+The Building Coder
+
+ Add Tag...
+QUICK REPLY
+REPLY
+ Kudo
+ACCEPT AS SOLUTION
+jalbert300
+Developer
+
+
+89 Posts
+1 Solution
+Post 6 of 10
+Report
+Re: Elegant way to get possible ElementId values for specific Parameter 
+Options
+2017-06-20 02:33 PM in reply to: jeremytammik
+Thanks for suggestion Jeremy,
+ 
+TTT may work, but I don't see a way to determine what a "suitable template element" might be. Given a parameter with <null> ElementID value, the only helpful information looks like BuiltInParameter Id, but that doesn't get me very far. Worst case, I make exceptions for my favorite BuiltInParameter Id's to assist in determining "suitable template element".
+ 
+Almost as if the Parameter class would benefit from something like a "GetSampleValueType" method.
+ 
+Jon
+ 
+ 
+ Add Tag...
+QUICK REPLY
+REPLY
+Kudo
+ACCEPT AS SOLUTION
+FAIR59
+
+
+199 Posts
+110 Kudos
+55 Solutions
+1 Idea
+Post 7 of 10
+Report
+Solution!Re: Elegant way to get possible ElementId values for specific Parameter 
+Options
+2017-06-20 10:43 PM in reply to: jalbert300
+you can use a ElementParameterFilter, to get all the elements that have a value other then ElementId.InvalidElementId  for a specific parameter.
+ 
+this code filters for elements in the active view, that are demolished in some phase.
+ 
+            ParameterValueProvider pvp_Demolished = new ParameterValueProvider(new ElementId((int)BuiltInParameter.PHASE_DEMOLISHED));
+            FilterNumericGreater fgreater = new FilterNumericGreater();
+            FilterElementIdRule IdFilter = new FilterElementIdRule(pvp_Demolished, fgreater, ElementId.InvalidElementId);
+            ElementParameterFilter efilter = new ElementParameterFilter(IdFilter);
+
+            FilteredElementCollector elems = new FilteredElementCollector(doc, doc.ActiveView.Id)
+                .WherePasses(efilter);
+ 
+ 
+ Add Tag...
+QUICK REPLY
+REPLY
+Kudo
+jalbert300
+Developer
+
+
+89 Posts
+1 Solution
+Post 8 of 10
+Report
+Re: Elegant way to get possible ElementId values for specific Parameter 
+Options
+2017-06-20 11:19 PM in reply to: FAIR59
+Thanks for the suggestion FAIR59,
+ 
+Unfortunately that's not what I'm looking to accomplish. Please see video below for better explanation of what I'm trying to do. Maybe you might have another idea.
+ 
+Thanks,
+ 
+Jon
+ 
+
+ Add Tag...
+QUICK REPLY
+REPLY
+Kudo
+ACCEPT AS SOLUTION
+FAIR59
+
+
+199 Posts
+110 Kudos
+55 Solutions
+1 Idea
+Post 9 of 10
+Report
+Solution!Re: Elegant way to get possible ElementId values for specific Parameter 
+Options
+2017-06-20 11:44 PM in reply to: jalbert300
+Actually, it is part of what you are trying to accomplish. With an ElementParameterFilter you get a list of Elements (if there are any) that have a value for the parameter in question, and then you may find all the relevant values, or display all the found values.  
+ Add Tag...
+QUICK REPLY
+REPLY
+Kudo
+jalbert300
+Developer
+
+
+89 Posts
+1 Solution
+Post 10 of 10
+Report
+Re: Elegant way to get possible ElementId values for specific Parameter 
+Options
+2017-06-21 12:02 AM in reply to: FAIR59
+Oh I see now, VERY CLEVER!!!
+ 
+Just implemented and works like a charm. Only caveat like you say is "if there are any", but I can live with that.
+ 
+Thanks for the great tip!!!
+ 
+Jon
+
+
+
+
+<center>
+<img src="img/.png" alt="" width="300"> 
+</center>
+
+
+Many thanks to Fair59 for his important contributions and to Jonathan 'Maisoui' for raising the issue.
+
+
+<pre class="code">
+</pre>
+
