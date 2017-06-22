@@ -30,7 +30,7 @@ We discussed several approaches to read the <code>BasicFileInfo</code> and RVT O
 
 Before diving into a programming topic, albeit a non-Revit-API one, let me highlight this interesting read 
 on [The View from Inside the Factory: What’s Next for Revit 2018](http://blogs.autodesk.com/revit/2017/05/18/whats-next-revit-2018),
-wellworth while for programmers and non-programmers alike, discussing stuff like:
+well worthwhile for programmers and non-programmers alike, discussing stuff like:
 
 > The way we develop and deliver Revit software...  what that means to you, and to us, the folks 'inside the factory'...
 agile development and delivery... more frequent releases...
