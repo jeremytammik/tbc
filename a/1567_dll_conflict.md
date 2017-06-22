@@ -9,6 +9,7 @@
 
 <!---
 
+12914853 [several versions of a control inside same APPDomain using XAML/BAML craches REVIT]
 12494378 [Addins have conflicts with DLL's from other developers]
 11655345 [Addin conflicts]
 http://forums.autodesk.com/t5/revit-api/proper-way-to-handle-app-config-bindingredirects-in-revit-add-in/m-p/5692149
