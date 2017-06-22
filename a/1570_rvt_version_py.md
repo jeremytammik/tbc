@@ -19,6 +19,8 @@
 
 Determine RVT version using #Python #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
+We discussed several approaches to read the <code>BasicFileInfo</code> and RVT OLE storage, aka COM Structured Storage, to retrieve stuff like the file version and preview image, and, more lately, alternative access to BIM data via Forge...
+
 &ndash; 
 ...
 
