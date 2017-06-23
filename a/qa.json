@@ -16,21 +16,21 @@
   {
     "src": "adsk_revit_api_forum_thread",
     "url": "https://forums.autodesk.com/t5/revit-api-forum/large-sample-revit-files-for-performance-testing/m-p/7129074",
-    "title": "Large sample Revit model files for performance testing",
+    "title": "Where can I find large sample Revit model RVT project files for performance testing?",
     "q": "I'm developing a Revit add-in, and I'm concerned over it's performance when interacting with large models. I'd like to isolate a set of projects that I can use as a set of benchmarks going forward. I've considered generating large models via the API, but these models will obviously differ in subtle and unsubtle ways from real models; ideally I'd be able to test performance against the sort of messiness that emerges in real projects. Does anyone know of a repository for sample files that would fit the bill (or have a few large project files sitting around that they'd be willing to share)? How do other folks test and validate tools against realistic projects?",
     "a": "Check out this [collection of public Revit models](http://thebuildingcoder.typepad.com/blog/2016/01/happy-new-top-cad-blog-public-models-and-forge.html#4)."
   },
   {
     "src": "adsk_revit_api_forum_thread",
     "url": "https://forums.autodesk.com/t5/revit-api-forum/view-icons-in-revit/m-p/7159636",
-    "title": "View icons in Revit",
+    "title": "Where can I find the View and other built-in Revit icons",
     "q": "Where are the different view icons stored in Revit, for example the Floor Plan View icon?",
     "a": "They are stored in a resource DLL, in the file Utility.dll, in the same folder as Revit.exe."
   },
   {
     "src": "stackoverflow",
     "url": "https://stackoverflow.com/questions/44533377/how-to-make-a-filter-who-isolate-only-lines-in-a-view-revit-api-c-sharp",
-    "title": "How to make a filter to isolate only lines in a view Revit API C#",
+    "title": "How can I filter to isolate only lines in a view using C# .NET Revit API?",
     "q": "I am trying to hide a certain type of text and lines in views. I could do it for the text but couldn't isolate the lines to hide them. Any idea about how I can filter the view for lines?",
     "a": "Use [RevitLookup](https://github.com/jeremytammik/RevitLookup) to analyse what the elements you wish to hide look like through the API. Use a [FilteredElementCollector](http://www.revitapidocs.com/2017/263cf06b-98be-6f91-c4da-fb47d01688f3.htm) to retrieve the lines from the database. You can specify the view `ElementId` to retrieve lines displayed in your specific view. If any of these suggestions are unclear, work through the [Revit API getting started material](http://thebuildingcoder.typepad.com/blog/about-the-author.html#2) before doing anything else whatsoever."
   },
