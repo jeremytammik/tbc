@@ -17,11 +17,23 @@ Determine RVT version using #Python #RevitAPI @AutodeskRevit #bim #dynamobim @Au
 
 -->
 
-### Determining Void Instances Cutting a Floor
+### FindInserts Determines Void Instances Cutting Floor
 
-Yet another brilliant and super succinct solution provided by Fair59, answering
+Is it hot enough for you?
+
+It sure is for this guy:
+
+<center>
+<img src="img/221_melted_candle_400.jpg" alt="Melted candle" width="400">
+</center>
+
+Time for some rest and recuperation, meseems...
+
+Before that, let me share another brilliant and super succinct solution provided by Fair59, answering
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread on how
-to [get cutting void instances in the floor](https://forums.autodesk.com/t5/revit-api-forum/get-cutting-void-instances-in-the-floor/m-p/7170237):
+to [get cutting void instances in the floor](https://forums.autodesk.com/t5/revit-api-forum/get-cutting-void-instances-in-the-floor/m-p/7170237) using 
+the [`HostObject`](http://www.revitapidocs.com/2017/56a32e0b-df65-a6ba-40bd-8f50a1f31dcd.htm)
+[`FindInserts`](http://www.revitapidocs.com/2017/58990230-38cb-3af7-fd25-96ed3215a43d.htm) method:
 
 **Question:** I have a floor on which a family instance is inserted on the face of the floor (the instance host is also the floor).
 
@@ -67,30 +79,39 @@ Second case &ndash; area = 607.558m2 and Volume = 243.023m3:
 Here is the code I use:
 
 <pre class="code">
-Solid solid = floor.get_Geometry(new Options())
-.OfType<Solid>()
-.Where<Solid>(s => null != s && !s.Edges.IsEmpty)
-.FirstOrDefault();
-
-FilteredElementCollector intersectingInstances = new FilteredElementCollector(doc)
-.OfClass(typeof(FamilyInstance))
-.WherePasses(new ElementIntersectsSolidFilter(solid));
-
-int n1 = intersectingInstances.Count<Element>();
-
-intersectingInstances = new FilteredElementCollector(doc)
-.OfClass(typeof(FamilyInstance))
-.WherePasses(new ElementIntersectsElementFilter(floor));
-
-int n = intersectingInstances.Count<Element>();
+  <span style="color:#2b91af;">Solid</span>&nbsp;solid&nbsp;=&nbsp;floor.get_Geometry(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Options</span>()&nbsp;)
+  &nbsp;&nbsp;.OfType&lt;<span style="color:#2b91af;">Solid</span>&gt;()
+  &nbsp;&nbsp;.Where&lt;<span style="color:#2b91af;">Solid</span>&gt;(&nbsp;s&nbsp;=&gt;&nbsp;(<span style="color:blue;">null</span>&nbsp;!=&nbsp;s)&nbsp;&amp;&amp;&nbsp;(!s.Edges.IsEmpty)&nbsp;)
+  &nbsp;&nbsp;.FirstOrDefault();
+   
+  <span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;intersectingInstances&nbsp;
+  &nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">FamilyInstance</span>&nbsp;)&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;.WherePasses(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementIntersectsSolidFilter</span>(&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solid&nbsp;)&nbsp;);
+   
+  <span style="color:blue;">int</span>&nbsp;n1&nbsp;=&nbsp;intersectingInstances.Count&lt;<span style="color:#2b91af;">Element</span>&gt;();
+   
+  intersectingInstances&nbsp;
+  &nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">FamilyInstance</span>&nbsp;)&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;.WherePasses(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementIntersectsElementFilter</span>(&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;floor&nbsp;)&nbsp;);
+   
+  <span style="color:blue;">int</span>&nbsp;n&nbsp;=&nbsp;intersectingInstances.Count&lt;<span style="color:#2b91af;">Element</span>&gt;();
 </pre>
 
 Here, both `n` and `n1` are equal to 0.
  
-**Answer:** Try using
- 
+**Answer:** Try using 
+the [`HostObject`](http://www.revitapidocs.com/2017/56a32e0b-df65-a6ba-40bd-8f50a1f31dcd.htm)
+[`FindInserts`](http://www.revitapidocs.com/2017/58990230-38cb-3af7-fd25-96ed3215a43d.htm) method instead:
+
 <pre class="code">
-List<ElementId> intersectingInstanceIds = floor.FindInserts(false,false,false,true).ToList();
+  <span style="color:#2b91af;">HostObject</span>&nbsp;floor;
+  <span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">ElementId</span>&gt;&nbsp;intersectingInstanceIds&nbsp;
+  &nbsp;&nbsp;=&nbsp;floor.FindInserts(&nbsp;<span style="color:blue;">false</span>,&nbsp;<span style="color:blue;">false</span>,&nbsp;<span style="color:blue;">false</span>,&nbsp;<span style="color:blue;">true</span>&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;.ToList();
 </pre>
 
 **Response:** I have done some tests and here are my results:
