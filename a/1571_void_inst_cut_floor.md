@@ -12,8 +12,7 @@
 
 Determine RVT version using #Python #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+Here is another brilliant and super succinct solution provided by Fair59, answering the Revit API discussion forum thread on how to get cutting void instances in the floor using the <code>HostObject</code> <code>FindInserts</code> method &ndash; Question: I have a floor on which a family instance is inserted on the face of the floor (the instance host is also the floor). I checked in the family the "Cut with Void When Loaded" parameter, so that the void is created in the floor. Now, I want to retrieve all the instances that create voids in the floor...
 
 -->
 
