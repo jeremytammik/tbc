@@ -11,7 +11,6 @@
 <!---
 
 - 13121211 [GetInstanceCutoutFromWall Problem]
-  Jan Grenov
   https://forums.autodesk.com/t5/revit-api-forum/getinstancecutoutfromwall-problem/m-p/7167002
   Use ExporterIFCUtils.GetInstanceCutoutFromWall to get the outer CurveLoop of a window or a door.
   Openings must have an OpeningCut object. If not, GetInstanceCutoutFromWall will fail!
@@ -48,15 +47,32 @@ The documenation states that it
 
 Jan determined that each opening must have an `OpeningCut` object. If not, `GetInstanceCutoutFromWall` will fail!
 
-This ties in with several groups of topics discussed in the past, such
-as [the frequently overlooked Revit API utility classes](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.52)
-determining wall openings in general, gross versus net areas and volumes in particular.
+Here is Jan's full explanation in all its gory detail:
+
+> **Question:** I find that the `ExporterIFCUtils` `GetInstanceCutoutFromWall` is a fine way to get the outer CurveLoop of a window or a door, but sometimes for some strange reason it does not work, and no helpful error message is supplied.
+ 
+> I attached:
+
+> - a [simple test project including only one wall containing two windows](zip/GetWindowCurveLoopTest.rvt)
+> - [sample code that demonstrates the problem](zip/GetWindowCurveLoop.zip)
+
+> Now my hope is, that someone is able to explain why `GetInstanceCutoutFromWall` works on one window but not on the other?
+ 
+> **Answer:** Now I determined when the error occurs!
+
+> It happens whenever an opening family (door or window ) is defined without an opening cut.
+
+> Openings must have an `OpeningCut` object. If not, `GetInstanceCutoutFromWall` will fail!
+
+This helps explain some issues people had with this method in the past, and also fits into several existing topic groups, such as use
+of [the frequently overlooked Revit API utility classes](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.52) on
+one hand, determining wall openings in general, gross versus net areas and volumes in particular, on the other:
 
 - [Opening geometry](http://thebuildingcoder.typepad.com/blog/2012/01/opening-geometry.html)
 - [The temporary transaction trick for gross slab data](http://thebuildingcoder.typepad.com/blog/2012/10/the-temporary-transaction-trick-for-gross-slab-data.html)
 - [Retrieving wall openings and sorting points](http://thebuildingcoder.typepad.com/blog/2015/12/retrieving-wall-openings-and-sorting-points.html)
-- [Wall opening profiles](http://thebuildingcoder.typepad.com/blog/2015/12/wall-opening-profiles-and-happy-holidays.html)
-- [Determining wall opening areas per room](http://thebuildingcoder.typepad.com/blog/2016/04/determining-wall-opening-areas-per-room.html)
+- [Wall opening profiles](http://thebuildingcoder.typepad.com/blog/2015/12/wall-opening-profiles-and-happy-holidays.html#3)
+- [Determining wall opening areas per room](http://thebuildingcoder.typepad.com/blog/2016/04/determining-wall-opening-areas-per-room.html#4)
 - [More on wall opening areas per room](http://thebuildingcoder.typepad.com/blog/2016/04/more-on-wall-opening-areas-per-room.html)
 - [Two energy model types](http://thebuildingcoder.typepad.com/blog/2017/01/family-category-and-two-energy-model-types.html#3)
 
