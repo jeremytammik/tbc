@@ -22,13 +22,16 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-...
+New important issued are researched and brilliant solutions shared daily in the Revit API discussion forum.
+Here are two from the current crop
+&ndash; IFC helper returns outer <code>CurveLoop</code> of door or window
+&ndash; Setting <code>Copy Local</code> to <code>False</code> resolves AddIn Manager issue...
 
 -->
 
 ### Copy Local False and IFC Utils for Wall Openings
 
-New important issued are researched and brilliant solutions shared daily in 
+New important issues are researched and brilliant solutions shared daily in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160).
 
 Here are two from the current crop:
