@@ -60,10 +60,10 @@ Here is Jan's full explanation in all its gory detail:
  
 > I attached:
 
-> - a [simple test project including only one wall containing two windows](zip/GetWindowCurveLoopTest.rvt)
-> - [sample code that demonstrates the problem](zip/GetWindowCurveLoop.zip)
+> - A [simple test project including only one wall containing two windows](zip/GetWindowCurveLoopTest.rvt)
+> - [Sample code that demonstrates the problem](zip/GetWindowCurveLoop.zip)
 
-> Now my hope is, that someone is able to explain why `GetInstanceCutoutFromWall` works on one window but not on the other?
+> I hope someone can explain why `GetInstanceCutoutFromWall` works on one window but not on the other.
  
 > **Answer:** Now I determined when the error occurs!
 

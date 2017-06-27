@@ -52,10 +52,10 @@ determine the outer CurveLoop of a window or a door.</p>
 <p><strong>Question:</strong> I find that the <code>ExporterIFCUtils</code> <code>GetInstanceCutoutFromWall</code> is a fine way to get the outer CurveLoop of a window or a door, but sometimes for some strange reason it does not work, and no helpful error message is supplied.</p>
 <p>I attached:</p>
 <ul>
-<li>a <a href="zip/GetWindowCurveLoopTest.rvt">simple test project including only one wall containing two windows</a></li>
-<li><a href="zip/GetWindowCurveLoop.zip">sample code that demonstrates the problem</a></li>
+<li>A <a href="zip/GetWindowCurveLoopTest.rvt">simple test project including only one wall containing two windows</a></li>
+<li><a href="zip/GetWindowCurveLoop.zip">Sample code that demonstrates the problem</a></li>
 </ul>
-<p>Now my hope is, that someone is able to explain why <code>GetInstanceCutoutFromWall</code> works on one window but not on the other?</p>
+<p>I hope someone can explain why <code>GetInstanceCutoutFromWall</code> works on one window but not on the other.</p>
 <p><strong>Answer:</strong> Now I determined when the error occurs!</p>
 <p>It happens whenever an opening family (door or window) is defined without an opening cut.</p>
 <p>Openings must have an <code>OpeningCut</code> object. If not, <code>GetInstanceCutoutFromWall</code> will fail!</p>
