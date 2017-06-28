@@ -45,5 +45,12 @@
     "src": "adam",
     "q": "What is Revit API?",
     "a": "An [API](https://en.wikipedia.org/wiki/Application_programming_interface) is an application programming interface, and this one is for Revit. For more information, please refer to the introduction in the official [Revit API Developers Guide](http://help.autodesk.com/view/RVT/2018/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42) and the [Revit API getting started material](http://thebuildingcoder.typepad.com/blog/about-the-author.html#2)."
+  },
+  {
+    "src": "adsk_adn_case",
+    "casenr": "13125105",
+    "date": "2017-06-28",
+    "q": "How can I avoid displaying the 'Missing Third Party Updater' dialogue?",
+    "a": "The [missing updater message was introduced with the original DMU implementation in Revit 2011](http://thebuildingcoder.typepad.com/blog/2010/12/vsta-to-stay-and-updater-to-go.html#2). That changed with [Revit 2012](http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2012-api.html), cf. the section on 'Dynamic Update Framework API changes'. Here is a summary of the result from an [AU panel discussion](http://thebuildingcoder.typepad.com/blog/2012/11/the-champions-roundtable-at-au.html): [Q] The dynamic updater framework can display a missing updater warning. Can I suppress that? [A] There is an option to suppress that screen. When you register the updater you can set it as optional, so the end user is not bothered by the message if it is missing. Before that option appeared, you could just open the file without the updater, choose to ignore the missing updater, and save the file before sending it to someone else. Now you can control it as the updater implementer. Finally, check out the [more detailed description of using optional updaters](http://thebuildingcoder.typepad.com/blog/2013/12/devdayau-chronicle-estorage-view-depth-sound-of-noise.html#9)."
   }
 ]
