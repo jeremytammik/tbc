@@ -20,7 +20,8 @@
   https://forums.autodesk.com/t5/revit-api-forum/addin-manager-how-to-disable-copy-dialog/m-p/7180913
   AddIn Manager issues and set copy local to false
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Set the Copy Local to False for #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/ifc_utils_openings
+IFC Utils return wall openings in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/ifc_utils_openings
 
 New important issues are researched and brilliant solutions shared daily in the Revit API discussion forum.
 Here are two from the current crop

@@ -9,6 +9,9 @@
 
 <!---
 
+- 11727316 [Convert local family instance coordinate of selected Edge to project coordinates]
+  http://forums.autodesk.com/t5/revit-api/convert-local-family-instance-coordinate-of-selected-edge-to/m-p/6282821
+
 - building a custom reference for a FamilyInstance
   9 special references
   The API doesn't expose the control plane references but there is a fun hack I developed to get the embedded control plane references of a family instance. If you create a dimension in the UI which references a named control reference of a family instance, you can then study the dimension's references using the API to obtain the information required to build your own stable reference string and have the API convert it into a valid reference for you which can then be used for creation of dimensions and alignment constraints. I'll go look through my code an come back soon with a few code snippets for you.
