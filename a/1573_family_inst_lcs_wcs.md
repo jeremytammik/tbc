@@ -28,18 +28,23 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+Depending on circumstances, interactively picked family instance geometry may be returned in the global Revit world coordinate system WCS, or in the family instance definition local coordinate system LCS.
+A family instance may have its own non-empty solid, or use the symbol geometry. The symbol geometry requires keeping track of the instance transform to map it to the actual instance project location
+&ndash; Question on Incorrect Face Normal
+&ndash; Working Plane has no Effect
+&ndash; Non-Picked Face Normals are Correct
+&ndash; Solution &ndash; Detecting When to Use LCS versus WCS
+&ndash; Retrieval of Picked Geometry Face from Instance is Untransformed...
 
 --->
 
-### Picked Face on Family Instance has Geometry in LCS Versus WCS
+### Picked Instance Face Geometry in LCS Versus WCS
 
-A number of people have run into issues retrieving geometry from family instances.
+A number of people have run into issues retrieving geometry from interactively picked family instances.
 
 Depending on circumstances, the geometry may be returned in the global Revit world coordinate system WCS, or in the family instance definition local coordinate system LCS.
 
-My first encounter with that was
+My first encounter with that effect was
 when [retrieving a solid from an element](http://thebuildingcoder.typepad.com/blog/2012/06/obj-model-exporter-take-one.html#7)
 during the implementation of the OBJ exporter, then expanding that
 to [handle elements with multiple solids](http://thebuildingcoder.typepad.com/blog/2012/07/obj-model-exporter-with-multiple-solid-support.html#3):
@@ -49,21 +54,26 @@ to [handle elements with multiple solids](http://thebuildingcoder.typepad.com/bl
 I also used this approach in
 the [structural concrete setout point add-in](http://thebuildingcoder.typepad.com/blog/2016/08/voodoo-magic-retrieves-global-instance-edges.html#7).
 
-The issue keeps coming up again all the time, most recently in
+The issue is even more confusing when combined with interactive picking, and keeps coming up from time to  time, most recently in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread on
 an [incorrect face normal](https://forums.autodesk.com/t5/revit-api-forum/incorrect-face-normal/m-p/7108787).
 
-Once again, Fair59 presenteds a brilliant solution and explanation of this issue, reminding me of the lessons learned 
+Once again, Fair59 presented a brilliant solution and explanation of this issue, making use of some of the lessons learned 
 using [Voodoo magic to retrieve global instance edges](http://thebuildingcoder.typepad.com/blog/2016/08/voodoo-magic-retrieves-global-instance-edges.html)
 and [snooping the family instance geometry](http://thebuildingcoder.typepad.com/blog/2016/08/voodoo-magic-retrieves-global-instance-edges.html#3):
 
+- [Question on Incorrect Face Normal](#2)
+- [Working Plane has no Effect](#3)
+- [Non-Picked Face Normals are Correct](#4)
+- [Solution &ndash; Detecting When to Use LCS versus WCS](#5)
+- [Retrieval of Picked Geometry Face from Instance is Untransformed](#6)
 
 #### <a name="2"></a>Question on Incorrect Face Normal
 
 **Question:** I created two beams through different codes. Their FamilySymbols are the same. But their left faces' (marked as red in pic) normal are different!
 
 <center>
-<img src="img/incorrect_face_normal_test1.png" alt="Incorrect face normal" width="200">
+<img src="img/incorrect_face_normal_test1.png" alt="Incorrect face normal" width="971">
 </center>
 
 The face normal of the left beam is the same as I expected, (-1,0,0). 
@@ -78,10 +88,16 @@ Attached is my [project](zip/incorrect_face_normal_project1.rvt) for your refere
 **Answer:** It seems that one beam is bound to a working plane, and the other one is unbound. Is this intended? This binding can influence the position of the FamilyInstance in WCS.
 
 **Response:** Bounding to a working plane is not my intention.
-For the both beams, I used `Instance = Doc.Create.NewFamilyInstance(line, FamilySymbol, Level, StructuralType.Beam)` to create them. 
-How can i avoid bounding to a working plane when creating? Why and how would a working plane influence the `FamilyInstance`? If I can't change the way of creating the right beam, how can I get the correct face normal like the left beam? Thanks!
+Both beams are created using this method:
 
-**Answer:** You can try passing null for `Level`. Unfortunately, it's not explicitly mentioned in the documentation, but the `Level` parameter is optional. The beam, after all, it is a family; like every family, it has a local coordinate system. If you bind it to a plane, than it's LCS is might no longer be identical to WCS; it's local Z axis will correspond to the Z axis of the reference plane. What you are seeing is the beam's face normal in LCS, that's why they differ even if they point in the same WCS direction.
+<pre>
+  Instance = Doc.Create.NewFamilyInstance( line,
+    FamilySymbol, Level, StructuralType.Beam)
+</pre>
+
+How can I avoid bounding to a working plane when creating? Why and how would a working plane influence the `FamilyInstance`? If I can't change the way of creating the right beam, how can I get the correct face normal like the left beam? Thanks!
+
+**Answer:** You can try passing null for `Level`. Unfortunately, it's not explicitly mentioned in the documentation, but the `Level` parameter is optional. The beam, after all, it is a family; like every family, it has a local coordinate system. If you bind it to a plane, then its LCS may no longer be identical to WCS; its local Z axis will correspond to the Z axis of the reference plane. What you are seeing is the beam's face normal in LCS; that's why they differ, even if they point in the same WCS direction.
 
 **Response:** I passed null for Level and the right beam was bound to no working plane this time. But both beams' faces' normal are the same as previous.
 
@@ -99,37 +115,48 @@ I downloaded your sample file and investigated the face normals. For each of the
 **Response:** I understand your points and thank you. Below is my test code to calculate the face normal and snapshot of the result. I was not using index to get the face.
 
 <pre class="code">
-  Reference refFace = null;
-  while (true)
+  <span style="color:#2b91af;">Reference</span>&nbsp;refFace&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+  <span style="color:blue;">while</span>(&nbsp;<span style="color:blue;">true</span>&nbsp;)
   {
-    try
-    {
-      refFace = sel.PickObject(ObjectType.Face, "select a face");
-      Element selectedElement = Doc.GetElement(refFace);
-      GeometryObject selectedGeoObject = selectedElement.GetGeometryObjectFromReference(refFace);
-      Face selectedFace = selectedGeoObject as Face;
-      PlanarFace selectedPlanarFace = selectedFace as PlanarFace;
-  
-      BoundingBoxUV box = selectedFace.GetBoundingBox();
-      UV faceCenter = (box.Max + box.Min) / 2;
-  
-      XYZ computedFaceNormal = selectedFace.ComputeNormal(faceCenter).Normalize();
-      XYZ faceNormal = selectedPlanarFace.FaceNormal;
-  
-      MessageBox.Show($"computedFaceNormal: {computedFaceNormal.ToString()}, faceNormal: {faceNormal.ToString()}");
-    }
-    catch (Autodesk.Revit.Exceptions.OperationCanceledException e)
-    {
-      return Result.Cancelled;
-    }
+  &nbsp;&nbsp;<span style="color:blue;">try</span>
+  &nbsp;&nbsp;{
+  &nbsp;&nbsp;&nbsp;&nbsp;refFace&nbsp;=&nbsp;sel.PickObject(&nbsp;<span style="color:#2b91af;">ObjectType</span>.Face,
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;select&nbsp;a&nbsp;face&quot;</span>&nbsp;);
+   
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;selectedElement&nbsp;=&nbsp;doc.GetElement(
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;refFace&nbsp;);
+   
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">GeometryObject</span>&nbsp;selectedGeoObject&nbsp;=&nbsp;selectedElemen
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t.GetGeometryObjectFromReference(&nbsp;refFace&nbsp;);
+   
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Face</span>&nbsp;selectedFace&nbsp;=&nbsp;selectedGeoObject&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Face</span>;
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">PlanarFace</span>&nbsp;selectedPlanarFace&nbsp;=&nbsp;selectedFace&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">PlanarFace</span>;
+   
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BoundingBoxUV</span>&nbsp;box&nbsp;=&nbsp;selectedFace.GetBoundingBox();
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UV</span>&nbsp;faceCenter&nbsp;=&nbsp;(&nbsp;box.Max&nbsp;+&nbsp;box.Min&nbsp;)&nbsp;/&nbsp;2;
+   
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;computedFaceNormal&nbsp;=&nbsp;selectedFace
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.ComputeNormal(&nbsp;faceCenter&nbsp;).Normalize();
+   
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;faceNormal&nbsp;=&nbsp;selectedPlanarFace.FaceNormal;
+   
+  &nbsp;&nbsp;&nbsp;&nbsp;MessageBox.Show(&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">$&quot;computedFaceNormal:&nbsp;</span>{computedFaceNormal.ToString()}<span style="color:#a31515;">,&nbsp;&quot;</span>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;<span style="color:#a31515;">&quot;faceNormal:&nbsp;{faceNormal.ToString()}&quot;</span>&nbsp;);
+  &nbsp;&nbsp;}
+  &nbsp;&nbsp;<span style="color:blue;">catch</span>(&nbsp;Autodesk.Revit.Exceptions.<span style="color:#2b91af;">OperationCanceledException</span>&nbsp;e&nbsp;)
+  &nbsp;&nbsp;{
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Cancelled;
+  &nbsp;&nbsp;}
   }
 </pre>
 
 <center>
-<img src="img/incorrect_face_normal_test2.png" alt="Incorrect face normal" width="200">
+<img src="img/incorrect_face_normal_test2.png" alt="Incorrect face normal" width="721">
 </center>
 
-When you say "there are six sides having FaceNormal values as expected", do you mean the left face's normal of the right beam is (-1,0,0)?
+When you say, "there are six sides having FaceNormal values as expected", do you mean the left face's normal of the right beam is (-1,0,0)?
 
 **Answer:** Yes. I just read the solid's faces via RevitLookup. For both of the elements, there were six PlanarFaces, each with perfect `FaceNormal` values. May it be that the selection function itself returns a false face? Seems to be the front face instead of the displayed lateral one.
 
@@ -137,21 +164,21 @@ When you say "there are six sides having FaceNormal values as expected", do you 
 
 <pre class="code">
   MessageBox.Show(
-    $"computedFaceNormal: {computedFaceNormal.ToString()}, "
-    + "faceNormal: {faceNormal.ToString()}, "
-    + " Area: {selectedFace.Area.ToString()}");
+  &nbsp;&nbsp;<span style="color:#a31515;">$&quot;computedFaceNormal:&nbsp;</span>{computedFaceNormal.ToString()}<span style="color:#a31515;">,&nbsp;&quot;</span>
+  &nbsp;&nbsp;+&nbsp;<span style="color:#a31515;">&quot;faceNormal:&nbsp;{faceNormal.ToString()},&nbsp;&quot;</span>
+  &nbsp;&nbsp;+&nbsp;<span style="color:#a31515;">&quot;&nbsp;Area:&nbsp;{selectedFace.Area.ToString()}&quot;</span>&nbsp;);
 </pre>
 
 I tested it again. The area is correct, but the face normal is not.
 
 <center>
-<img src="img/incorrect_face_normal_test3.png" alt="Incorrect face normal" width="200">
+<img src="img/incorrect_face_normal_test3.png" alt="Incorrect face normal" width="721">
 </center>
 
-**Answer:** When getting the solids and their faces, I draw the normals as ModelLines, starting at the faces' center points:
+**Answer:** When getting the solids and their faces, I draw the normals as ModelLines, starting at the faces' centre points:
 
 <center>
-<img src="img/incorrect_face_normal_normals.png" alt="Incorrect face normal" width="200">
+<img src="img/incorrect_face_normal_normals.png" alt="Incorrect face normal" width="400">
 </center>
 
 Everything looks correct, this way.
@@ -159,13 +186,13 @@ Everything looks correct, this way.
 When I pick a face, I get this result with the left one:
  
 <center>
-<img src="img/incorrect_face_normal_normals_picked_left.png" alt="Incorrect face normal" width="200">
+<img src="img/incorrect_face_normal_normals_picked_left.png" alt="Incorrect face normal" width="400">
 </center>
 
 But I get this when picking the right one:
 
 <center>
-<img src="img/incorrect_face_normal_normals_picked_right.png" alt="Incorrect face normal" width="200">
+<img src="img/incorrect_face_normal_normals_picked_right.png" alt="Incorrect face normal" width="500">
 </center>
 
 What does it mean ?
@@ -177,7 +204,7 @@ The solid resides around the 0/0/0 project origin.
 I've drawn the face boundaries, too:
 
 <center>
-<img src="img/incorrect_face_normal_normals_picked_rightallsides.png" alt="Incorrect face normal" width="200">
+<img src="img/incorrect_face_normal_normals_picked_rightallsides.png" alt="Incorrect face normal" width="500">
 </center>
  
 Strange. No idea.
@@ -195,30 +222,38 @@ When a family instance is
 - coped
 - and (apparently) has been copied
 
-Revit has to calculate the solids of the instance "in situ" as it will be different from the solids from the family definition. So the normal of the face will be relative to the project.
+Revit has to calculate the solids of the instance "in situ" as it will be different from the solids from the family definition. So, the normal of the face will be relative to the project.
  
 In all (??) other cases Revit treats the solids as "instances" of the solids from the family definition. And by some Revit-logic, when asked for `Face.ComputeNormal`, it gives the normal relative to the family. Quirkier still, it gives the `Face.Origin` in project coordinates.
  
-So with family instances that are not cut, joined or coped, you need to transform the faceNormal to project coordinates.
+So, with family instances that are not cut, joined or coped, you need to transform the faceNormal to project coordinates.
 
 As you already have a reference to the face, you can easily test for this condition:
 
 <pre class="code">
-  refFace.ConvertToStableRepresentation(doc).Contains("INSTANCE")
+  refFace.ConvertToStableRepresentation(&nbsp;doc&nbsp;)
+  &nbsp;&nbsp;.Contains(&nbsp;<span style="color:#a31515;">&quot;INSTANCE&quot;</span>&nbsp;)
 </pre>
 
-So add this to your code:
+So, add this to your code:
 
 <pre class="code">
-  if (refFace.ConvertToStableRepresentation(doc).Contains("INSTANCE"))
+  <span style="color:blue;">if</span>(&nbsp;refFace.ConvertToStableRepresentation(&nbsp;doc&nbsp;)
+  &nbsp;&nbsp;.Contains(&nbsp;<span style="color:#a31515;">&quot;INSTANCE&quot;</span>&nbsp;)&nbsp;)
   {
-    Transform trans = (selectedElement as FamilyInstance).GetTransform();
-    computedFaceNormal = trans.OfVector(computedFaceNormal);
-    faceNormal = trans.OfVector( faceNormal));
+  &nbsp;&nbsp;<span style="color:#2b91af;">Transform</span>&nbsp;trans&nbsp;=&nbsp;(&nbsp;selectedElement&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">FamilyInstance</span>&nbsp;).GetTransform();
+   
+  &nbsp;&nbsp;computedFaceNormal&nbsp;=&nbsp;trans.OfVector(&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;computedFaceNormal&nbsp;);
+   
+  &nbsp;&nbsp;faceNormal&nbsp;=&nbsp;trans.OfVector(&nbsp;faceNormal&nbsp;);
   }
 </pre>
 
 **Response:** Classic! Thank you all so much!
+
+Ever so many thanks to Fair59 for coming to the rescue once again!
 
 
 <!---
@@ -296,24 +331,20 @@ If you have a familyInstance that is cut, joined (or Coped) your code will work.
 **Response:** Thanks for the tip. As suggested if the "host" family is joined/cut/copped by another element it works as expected. If not the exception is thrown.
 --->
 
-<center>
-<img src="img/.png" alt="" width="200">
-</center>
-
 
 #### <a name="6"></a>Retrieval of Picked Geometry Face from Instance is Untransformed
 
-The discussion above also helps resolve this old ADN case:
-
-On a related note, here is an explanation on how to transform picked element geometry to WCS:
+The discussion above also helps understand this old case on how to transform picked element face geometry to WCS:
 
 **Question:** I am currently picking faces from geometry that is likely to be inside of a linked DWG file.
 
 From the reference, I access the element geometry like this:
 
-<pre class="code>"
-  Element e = Document.GetElement( reference );
-  GeometryObject go = e.GetGeometryObjectFromReference( reference );
+<pre class="code">
+  <span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;=&nbsp;<span style="color:#2b91af;">Document</span>.GetElement(&nbsp;reference&nbsp;);
+   
+  <span style="color:#2b91af;">GeometryObject</span>&nbsp;go&nbsp;
+  &nbsp;&nbsp;=&nbsp;e.GetGeometryObjectFromReference(&nbsp;reference&nbsp;);
 </pre>
 
 My problem is that the faces that are retrieved in this case are not transformed to the instance location.
@@ -326,7 +357,7 @@ My problem is that the faces that are retrieved in this case are not transformed
 
 **Response:** The problem is that I'm trying to select specific faces from within a DWG instance which has hundreds of faces.
 
-So while I can get all of the geometry from the element (transformed), I'm not sure if I can figure out which `Reference` or `GeometryObject` matches the selected face.
+So, while I can get all of the geometry from the element (transformed), I'm not sure if I can figure out which `Reference` or `GeometryObject` matches the selected face.
 
 **Answer:** You can use the `Instance.GetTransform` method. That is at the element level.
 
