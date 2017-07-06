@@ -88,6 +88,14 @@ come up several times in the past, so let's capture it here for future reference
 <p>Otherwise, that would probably provide an even more straightforward path.</p>
 <p>The suggested one is very direct and efficient, though, and hard to beat in those respects.</p>
 <p>I hope this helps and that we collectively succeeded at nailing your intention.</p>
+<h4><a name="2.1"></a></h4>
+<p><strong>Clarification:</strong> Why can you not simply use the built-in <code>XYZ.DistanceTo</code> method like this?</p>
+<pre class="code">
+  double rDist = p1.DistanceTo( p2 );
+</pre>
+
+<p>Because <code>DistanceTo</code> returns the shortest distance between two points, not the distance along a given direction.
+The latter is actually not the distance between two points, but the distance between two planes.</p>
 <h4><a name="3"></a>Revit Command-Line Switches</h4>
 <p>Another recurring question is
 on <a href="http://forums.autodesk.com/t5/revit-api-forum/revit-command-line-switches/m-p/6782154">Revit command line switches</a>,
