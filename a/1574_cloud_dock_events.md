@@ -16,7 +16,10 @@
 
 - Autodesk® Developer News - Accelerator dates announced for India & Europe, BIM 360 hackathon webinar schedule, and more
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Do you use #RevitAPI dockable panels? Please call Autodesk! @AutodeskRevit #bim #dynamobim @AutodeskForge http://bit.ly/clouddockevents
+Do you use the #RevitAPI point cloud API? Please call Autodesk! @AutodeskRevit #bim #dynamobim @AutodeskForge http://bit.ly/clouddockevents
+Forge accelerators in India, France, and at AU events #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/clouddockevents
+BIM360 hackathon, AppStore and webinar recording #RevitAPI @AutodeskRevit @AutodeskForge #ForgeDevCon http://bit.ly/clouddockevents
 
 Summer is here. Autodesk shut down for the first week of July. I went on a few mountain hikes. Explorations to apply artificial intelligence in construction projects are under way. World-wide Autodesk University, Forge Accelerator and BIM360 events have been announced
 &ndash; Forge accelerators in India and France
@@ -28,7 +31,7 @@ Summer is here. Autodesk shut down for the first week of July. I went on a few m
 
 --->
 
-### Dockable Pane, Point Cloud, AI, BIM360, Forge and AU
+### Dockable Pane, Point Cloud, AI, BIM360, Forge, AU
 
 Summer is here.
 
