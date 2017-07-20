@@ -126,8 +126,8 @@ I downloaded your sample file and investigated the face normals. For each of the
   &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;selectedElement&nbsp;=&nbsp;doc.GetElement(
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;refFace&nbsp;);
    
-  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">GeometryObject</span>&nbsp;selectedGeoObject&nbsp;=&nbsp;selectedElemen
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t.GetGeometryObjectFromReference(&nbsp;refFace&nbsp;);
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">GeometryObject</span>&nbsp;selectedGeoObject&nbsp;=&nbsp;selectedElement
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetGeometryObjectFromReference(&nbsp;refFace&nbsp;);
    
   &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Face</span>&nbsp;selectedFace&nbsp;=&nbsp;selectedGeoObject&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Face</span>;
   &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">PlanarFace</span>&nbsp;selectedPlanarFace&nbsp;=&nbsp;selectedFace&nbsp;
