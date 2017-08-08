@@ -1,0 +1,67 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- 13232905 [Revit 2018 Update 1 'Visual Materials API']
+  https://forums.autodesk.com/t5/revit-api-forum/revit-2018-update-1-visual-materials-api/m-p/7260170
+
+#RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge 
+@AutodeskRevit #bim #dynamobim @AutodeskForge 
+#RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+BIM360 hackathon, AppStore and webinar recording #RevitAPI @AutodeskRevit @AutodeskForge #ForgeDevCon http://bit.ly/clouddockevents
+
+&ndash; ...
+
+--->
+
+<h3>Revit 2018.1 and the Visual Materials API</h3>
+<p><a href="http://blogs.autodesk.com/revit/2017/07/12/revit-2018-1-update-now-available">The Revit 2018.1 update</a> was released last month.</p>
+<p>It implements one of the most important and long-standing API wishes, providing programmatic access to materials.</p>
+<p><a href="http://blogs.autodesk.com/revit/2017/07/12/revit-2018-1-update-now-available">Check out the main new features</a>.</p>
+<p>Here is an extracted summary of the main API related ones:</p>
+<ul>
+<li><b>Dynamo Player improvements</b> &ndash; the Dynamo Player which is the powerful scripting tool that installs with Revit as a way to automate tasks. You can now adapt Dynamo scripts to better fit your needs by requesting user input before use. Providing user input directly in the Dynamo Player interface lets customers make project-specific adjustments to scripts without having to know how to use Dynamo.  In addition to a UI refresh that makes it easier to use, the Dynamo player in the Revit 2018.1 update includes  additional scripts.</li>
+<li><b>Visual Materials API</b> &ndash; you can create and edit Appearance Assets &ndash; the particular instances of classes representing visual material properties &ndash; of materials in Revit. A top customer request, the opening of the materials API allows the automated creation of materials libraries and better transfer of material information between products. Now you can use any third-party tool to make changes to material finishes.</li>
+<li><b>Fabrication parts centre line length API</b> &ndash; the API now allows you to interrogate the centreline length of fabrication parts to facilitate automation and point load calculations. By user request, we exposed the centreline length parameter on the fabrication side in the API for Revit, providing access to the centreline length on fittings like elbows, tees and crosses. This information is useful to MEP contractors in several ways.</li>
+<li><b>MAJ file creation API</b> &ndash; the API provides the ability to improve manufacturing workflows by customising your MAJ export to suit your company standards and how you want the data to come back into Fabrication CAMduct. You can create a MAJ file that is used for advanced spooling tool which lets you modify how you export your jobs whether by section or by certain details in a fabrication part, facilitating the spooling process  in Fabrication CAMduct and Fabrication CADmep.</li>
+</ul>
+<p>Here are the relevant Revit 2018.1 links:</p>
+<ul>
+<li><a href="http://up.autodesk.com/2018/RVT/Autodesk_Revit_2018_1.exe">Direct download</a></li>
+<li><a href="http://up.autodesk.com/2018/RVT/Autodesk_Revit_2018_1_Readme.htm">Readme</a></li>
+<li><a href="http://revit.downloads.autodesk.com/download/2018_1_RVT/Docs/RelNotes/Autodesk_Revit_2018_1_ReleaseNotes.html">Release notes</a></li>
+</ul>
+<p><center>
+<img src="img/revit_2018_1.png" alt="Revit 2018.1" width="224" />
+</center></p>
+<h4><a name="2"></a>Revit 2018.1 SDK Update</h4>
+<p><strong>Question:</strong> So, you say, the Revit API has been updated.
+How can I access the updated API?</p>
+<p><strong>Answer:</strong> The Revit API is provided by the Revit API .NET assembly DLLs, which are included with the product in the same directory as Revit.exe itself.
+Install the update and you have the new API at your disposal.</p>
+<p>However, that leads to another question, also raised in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread 
+on the <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-2018-update-1-visual-materials-api/m-p/7260170">Revit 2018 Update 1 'Visual Materials API'</a>:</p>
+<p><strong>Question:</strong> Where is the API documentation for the API improvements made available in the Revit 2018 Update 1 release?</p>
+<p>Specifically, I'm interested in the new 'Visual Materials API'.</p>
+<p><strong>Answer:</strong> An update 2018.1 to the Revit SDK is provided in
+the <a href="http://www.autodesk.com/developrevit">Revit Developer Centre</a>.</p>
+<p>It includes two new samples:</p>
+<ul>
+<li>Appearance Asset Editing</li>
+<li>Duplicate Graphics</li>
+</ul>
+<p>The former will hopefully answer all your questions in full.</p>
+<p>The latter was already published separately and briefly discussed in the summary
+of <a href="http://thebuildingcoder.typepad.com/blog/2017/05/revit-2017-and-2018-sdk-samples.html">Revit 2017 and 2018 SDK samples</a>.</p>
+<p>Here is a direct download link:</p>
+<ul>
+<li><a href="http://download.autodesk.com/us/revit-sdk/REVIT_2018_1_SDK.msi">Revit 2018.1 SDK (Update August 01, 2017)</a> (msi - 351268Kb).</li>
+</ul>
