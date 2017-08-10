@@ -1,0 +1,191 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- Forge Viewer: Unique IDs for clickable objects
+  https://stackoverflow.com/questions/45577971/forge-viewer-unique-ids-for-clickable-objects
+  https://github.com/Autodesk-Forge/bim360appstore-model.derivative-nodejs-xls.exporter
+  I mentioned http://thebuildingcoder.typepad.com/blog/2017/02/rvt-properties-to-xls-and-forge-accelerators.html
+  Augusto Goncalves implemented the viewer-javascript-extract.spreadsheet Forge sample to read all the properties on all BIM elements in an RVT file and export them to an XLSX spreadsheet.
+  https://forge.autodesk.com/blog/create-spreadsheet-excel-client-translated-revit-files
+
+- revitlookup installation
+  email [Revit2017 Look UP - How to install?] Erik Troelsen <erik.troelsen@forumarkitekter.no>
+
+- updated wizard installation
+
+#RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+
+&ndash; ...
+
+--->
+
+<h3>Forge Ids, Wizard and Lookup Installation</h3>
+<p>Still getting back into normal work flow after some time off, I have a bunch of stuff to share:</p>
+<ul>
+<li><a href="#2">Forge versus Revit programming</a></li>
+<li><a href="#3">Access Revit BIM data and element ids from BIM360</a></li>
+<li><a href="#4">Unique IDs for Forge viewer elements</a></li>
+<li><a href="#5">Edit and export Revit properties in Forge</a></li>
+<li><a href="#6">Upcoming Forge accelerators</a></li>
+<li><a href="#7">Updated Visual Studio Revit add-in wizard installation</a></li>
+<li><a href="#8">Question on RevitLookup installation</a></li>
+<li><a href="#9">RevitLookup cannot snoop everything</a></li>
+</ul>
+<h4><a name="2"></a>Forge versus Revit Programming</h4>
+<p>Before designing or implementing a Revit add-in, it is well worth pondering the status, use and cost of Revit in depth.</p>
+<p>Who is supposed to make use of your add-in?</p>
+<p>Who is supposed to install &ndash; and pay for &ndash; Revit?</p>
+<p>Revit is a very specialised and quite expense high-level BIM design tool.</p>
+<p>I would expect a limited number of people to be directly involved in creative hard-core BIM work.</p>
+<p>Many add-ins do not contribute to the BIM design itself.</p>
+<p>Many add specific data items or perform read-only analysis and reporting tasks.</p>
+<p>For all such tasks, it may be well worthwhile thinking of shifting your app development platform to a much more accessible &ndash; and cheaper &ndash; environment, e.g., <a href="https://autodesk-forge.github.io">Forge</a>.</p>
+<p>Two of my recent samples demonstrate the implementation of equivalent functionality using Revit and its API versus Forge and JavaScript:</p>
+<ul>
+<li><a href="https://github.com/jeremytammik/RvtFader">RvtFader</a> &ndash; C# .NET Revit add-in to calculate and display signal attenuation using AVF</li>
+<li><a href="https://github.com/jeremytammik/forgefader">ForgeFader</a> &ndash; Forge viewer extension to calculate and display signal attenuation, cf.
+the <a href="https://forge-rcdb.autodesk.io/configurator?id=59041f250007f5c0eef482f2">online demo</a></li>
+</ul>
+<p>Furthermore, if you really do require Revit specific functionality, e.g., you wish to modify the BIM and write <code>RVT</code> files, and want to provide your app to a large or unlimited number of users in a flexible fashion, not necessarily bound to a full-fledged Revit desktop installation, be aware that we are continuing to work hard on a Forge design automation API
+to <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28b">provide all you need online, aka Revit I/O</a>.</p>
+<h4><a name="3"></a>Access Revit BIM Data and Element Ids from BIM360</h4>
+<p>Continuing in this vein, are you interested in easy and ubiquitous access to your Revit model properties?</p>
+<p>Well, you can have that right now, even without any Revit installation whatsoever.</p>
+<p>The Forge <a href="https://developer.autodesk.com/en/docs/model-derivative/v2/overview/">Model Derivative API</a> extracts
+a streamlined copy of all geometry, BIM element hierarchy and properties from over fifty file formats, and Revit <code>RVT</code> files are just one of them.</p>
+<p>As <a href="http://thebuildingcoder.typepad.com/blog/2017/02/rvt-properties-to-xls-and-forge-accelerators.html">mentioned</a> a
+while ago, <a href="https://twitter.com/search?q=augusto%20goncalves">Augusto Goncalves</a> implemented
+the <code>viewer-javascript-extract.spreadsheet</code> Forge sample to read all the properties on all BIM elements in an <code>RVT</code> file and export them to an <code>XLSX</code> spreadsheet.</p>
+<ul>
+<li><a href="https://autodesk-forge.github.io/viewer-javascript-extract.spreadsheet">Test run it yourself</a></li>
+<li><a href="https://github.com/Autodesk-Forge/viewer-javascript-extract.spreadsheet">Source code on GitHub</a></li>
+<li><a href="https://forge.autodesk.com/blog/create-spreadsheet-excel-client-translated-revit-files">Blog post announcement</a></li>
+</ul>
+<p>He now released another sample that adds the functionality to access a Revit BIM stored in BIM360</p>
+<p>The
+<a href="https://github.com/Autodesk-Forge/bim360appstore-model.derivative-nodejs-xls.exporter">BIM360 Revit Export to Excel sample</a>
+demonstrates how to access and extract Revit data on your BIM360 account using 3-legged <code>OAuth</code> to log in, a simple viewer extension and code to read the Revit meta-data and format it into an Excel spreadsheet file:</p>
+<ul>
+<li><a href="https://bim360xls.autodesk.io">Live demo</a></li>
+<li><a href="https://youtu.be/800d2xmQl0s">Video</a></li>
+</ul>
+<p><center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/800d2xmQl0s?rel=0" frameborder="0" allowfullscreen></iframe>
+</center></p>
+<p>Many thanks to Augusto for putting these together!</p>
+<h4><a name="4"></a>Unique IDs for Forge Viewer Elements</h4>
+<p>Augusto uses his newest sample to answer the StackOverflow question
+on <a href="https://stackoverflow.com/questions/45577971/forge-viewer-unique-ids-for-clickable-objects">Forge Viewer: unique IDs for clickable objects</a>:</p>
+<p><strong>Question:</strong> I am experimenting with Revit and the Forge Viewer.
+I noticed that Forge has its own unique IDs for everything you can click on in the Revit model, so I used those instead of the Revit identifiers.</p>
+<p>For example, the door of my building has the id: "3003".</p>
+<p>My question is: where is this data stored and how can I change "3003" into "Door 1"?</p>
+<p><strong>Answer:</strong> The Viewer gives access to three types of IDs when dealing with Revit files:</p>
+<ul>
+<li><code>dbId</code>: this is viewer specific and used to manipulate elements within the viewer, such as for the <code>.getProperties()</code> method.</li>
+<li>Revit <code>ElementID</code>: exposed as part of the <code>Name</code> property in the viewer. When you select something, the Property panel title is in the form of 'Name [12345]'. You can parse this name string and extract the element id.</li>
+<li>Revit <code>UniqueID</code>: exposed as the <code>externalId</code> property in the <code>.getProperty()</code> response.</li>
+</ul>
+<p>The
+<a href="https://github.com/Autodesk-Forge/bim360appstore-model.derivative-nodejs-xls.exporter">BIM360 Revit Export to Excel sample</a>
+mentioned above exports properties into a spreadsheet, which ought to answer your question.</p>
+<h4><a name="5"></a>Edit and Export Revit Properties in Forge</h4>
+<p>Philippe Leefsma demonstrates similar functionality in his <a href="https://forge-rcdb.autodesk.io/configurator?id=59780eec17d671029c53420e">Configurator &ndash; Meta Properties</a> sample.</p>
+<ul>
+<li>Look at
+the <a href="https://forge-rcdb.autodesk.io/configurator">online Forge configurator sample</a>.</li>
+<li>Scroll down through the models to <em>Meta Properties</em>.</li>
+<li>In the left-hand drop-down menu, select <em>Office</em>.</li>
+<li>Click on the <em>Meta Properties</em> box.</li>
+</ul>
+<p>The office model is displayed, and its properties displayed in a panel on the right-hand side.</p>
+<p>You can select any BIM element and see all its properties as well.</p>
+<p>The buttons on the right-hand side of the property panel enable search, export to <code>CSV</code> and <code>JSON</code>, and adding new properties.</p>
+<p>Each property can also be deleted.</p>
+<h4><a name="6"></a>Upcoming Forge Accelerators</h4>
+<p>If you would like to learn more about Forge, don't miss the chance to join one of the <a href="http://autodeskcloudaccelerator.com/prague-2">upcoming accelerators</a>:</p>
+<ul>
+<li>Bangalore, India &ndash; September 4-8</li>
+<li>Moscow, Russia &ndash; September 25-29</li>
+<li>Lyon, France &ndash; October 23-27</li>
+<li>Munich, Germany &ndash; date TBD</li>
+</ul>
+<p><center>
+<img src="img/2017-08_upcoming_accelerators.png" alt="Upcoming Forge accelerators" width="500"/>
+</center></p>
+<h4><a name="7"></a>Updated Visual Studio Revit Add-In Wizard Installation</h4>
+<p><a href="https://github.com/irneb">Irneb</a> raised an issue with the <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.20">Visual Studio Revit Add-In Wizards</a> 
+in his <a href="https://github.com/jeremytammik/VisualStudioRevitAddinWizard/issues/6">issue #6 &ndash; install script alteration suggestion</a>, and solved it 
+with <a href="https://github.com/jeremytammik/VisualStudioRevitAddinWizard/pull/7">pull request #7 &ndash; path to profile folder</a>.</p>
+<p>He says:</p>
+<p>In the install.bat file you're getting to the documents folder by building up the path using the username. Unfortunately, this isn't always the case. Also, the C drive is not necessarily where the user's home folder resides.</p>
+<p>I suggest changing the 6th line from this:</p>
+<pre>
+set "D=C:\Users\%USERNAME%\Documents\Visual Studio 2015\Templates\ProjectTemplates"
+</pre>
+
+<p>to this:</p>
+<pre>
+set "D=%userprofile%\Documents\Visual Studio 2015\Templates\ProjectTemplates"
+</pre>
+
+<p>That should at least help where the user's home folder isn't in the usual position (or named the same as the username).</p>
+<p>What is a bit cumbersome though is if the Documents folder under that has been relocated. Unfortunately, the only place this is available is in registry. Else you can get to it using vbscript or PowerShell.</p>
+<p>Here's a way to use PowerShell inside a <code>BAT</code> file:</p>
+<pre>
+set T="%TEMP%\docspath.tmp" powershell -Command "[Environment]::GetFolderPath('MyDocuments') | Out-File '%T%' -Encoding ascii" set /p DOCSPATH=< "%T%" del "%T%"
+</pre>
+
+<p>Thereafter the line above can be changed to this instead:</p>
+<pre>
+set "D=%DOCSPATH%\Visual Studio 2015\Templates\ProjectTemplates"
+</pre>
+
+<p>Though it just feels way too complicated for my taste.</p>
+<p>I fully agree.</p>
+<p>I'm definitely not a Windows shell or installation expert, and I am sure there are much more elegant ways to address this.</p>
+<p>Still, being as it is, the updated version is captured
+in <a href="https://github.com/jeremytammik/VisualStudioRevitAddinWizard/releases/tag/2018.0.0.1">release 2018.0.0.1</a>.</p>
+<p>The <a href="https://github.com/jeremytammik/VisualStudioRevitAddinWizard/compare/2018.0.0.0...2018.0.0.1">difference to the previous version</a> consists
+of just two modified lines in <code>TemplateRevitCs.csproj</code> and <code>install.bat</code>.</p>
+<h4><a name="8"></a>Question on RevitLookup Installation</h4>
+<p><strong>Question:</strong> I am trying to install RevitLookup on Revit 2017, and having a bit of difficulty figuring out how to go about the installation in Revit.</p>
+<p>I downloaded it from GitHub and unpacked the <code>ZIP</code> file. Now, according to the instructions, I have to do the following:</p>
+<ul>
+<li>Copy the add-in manifest and assembly DLL to the Revit <code>AddIns</code> folder.</li>
+</ul>
+<p>I located the folder with this path: Local disk (C:) &ndash; Program Data &ndash; Autodesk &ndash; Revit &ndash; Addins &ndash; 2017</p>
+<p>Now, I am wondering how to identify the assembly DLL and whether I need to specify a 'key' in order to sign it.</p>
+<p>Secondly, I can’t find the add-in manifest anywhere in the repository.</p>
+<p><strong>Answer:</strong> To understand the Revit add-in installation process properly in depth, I suggest that you study the <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#2">Revit API getting started material</a>.</p>
+<p>It explains all you need to know about installing a Revit add-in.</p>
+<p>So does the <a href="http://help.autodesk.com/view/RVT/2018/ENU/?guid=GUID-F0A122E0-E556-4D0D-9D0F-7E72A9315A42">developer guide</a> in
+the <a href="http://help.autodesk.com/view/RVT/2018/ENU">Revit help</a>,
+specifically in its more succinct section
+on <a href="http://help.autodesk.com/view/RVT/2018/ENU/?guid=GUID-4FFDB03E-6936-417C-9772-8FC258A261F7">add-in registration</a>.</p>
+<p>No, you do not need to sign anything.</p>
+<p>Normally, you do not need to make any changes at to the add-in manifest.</p>
+<p>It is provided right there, in the repository
+folder <a href="https://github.com/jeremytammik/RevitLookup/blob/master/CS"><code>CS</code></a>:</p>
+<ul>
+<li><a href="https://github.com/jeremytammik/RevitLookup/blob/master/CS/RevitLookup.addin">RevitLookup.addin</a></li>
+</ul>
+<p>Furthermore, very conveniently, YouTube presents
+several <a href="https://www.youtube.com/results?search_query=revitlookup">videos on installing RevitLookup</a>.</p>
+<h4><a name="9"></a>RevitLookup Cannot Snoop Everything</h4>
+<p>Another little note on RevitLookup.</p>
+<p>Prompted by the <a href="https://github.com/jeremytammik/RevitLookup/issues/35">issue #35 &ndash; RevitLookup doesn't snoop all members</a>,
+I enhanced the documentation with the <a href="https://github.com/jeremytammik/RevitLookup#caveat--revitlookup-cannot-snoop-everything">caveat &ndash; RevitLookup cannot snoop everything</a>:</p>
+<p><strong>Question:</strong> I tried snooping a selected Structural Rebar element in the active view and found not all of the Rebar class members showed up in the Snoop Objects window. One of many members that weren't there: <code>Rebar.GetFullGeometryForView</code> method.</p>
+<p>Is this the expected behaviour? I was thinking I could get all object members just with  RevitLookup and without the Revit API help file <code>RevitAPI.chm</code>.</p>
+<p><strong>Answer:</strong> RevitLookup cannot report <strong>all</strong> properties and methods on <strong>all</strong> elements.</p>
+<p>For instance, in the case of GetFullGeometryForView, a view input argument is required. How is RevitLookup supposed to be able to guess what view you are interested in?</p>
+<p>For methods requiring dynamic input that cannot be automatically determined, you will have to <a href="http://thebuildingcoder.typepad.com/blog/2013/11/intimate-revit-database-exploration-with-the-python-shell.html">make use of more intimate interactive database exploration tools, e.g. RevitPythonShell</a>.</p>
