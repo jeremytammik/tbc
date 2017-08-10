@@ -96,7 +96,10 @@ the `viewer-javascript-extract.spreadsheet` Forge sample to read all the propert
 - [Source code on GitHub](https://github.com/Autodesk-Forge/viewer-javascript-extract.spreadsheet)
 - [Blog post announcement](https://forge.autodesk.com/blog/create-spreadsheet-excel-client-translated-revit-files)
 
-My new colleague Michael Beale now released another sample that adds the functionality to access a Revit BIM stored in BIM360: the
+My new colleague
+[Michael](https://forge.autodesk.com/author/michael-beale)
+[Beale](https://twitter.com/micbeale) now
+released another sample that adds the functionality to access a Revit BIM stored in BIM360: the
 [BIM360 Revit Export to Excel sample](https://github.com/Autodesk-Forge/bim360appstore-model.derivative-nodejs-xls.exporter)
 demonstrates how to access and extract Revit data on your BIM360 account using 3-legged `OAuth` to log in, a simple viewer extension and code to read the Revit meta-data and format it into an Excel spreadsheet file:
 
