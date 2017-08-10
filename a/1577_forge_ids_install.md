@@ -18,7 +18,7 @@
   https://forge.autodesk.com/blog/create-spreadsheet-excel-client-translated-revit-files
 
 - revitlookup installation
-  email [Revit2017 Look UP - How to install?] Erik Troelsen <erik.troelsen@forumarkitekter.no>
+  email [Revit2017 Look UP - How to install?] 
 
 - updated wizard installation
 
@@ -169,6 +169,7 @@ If you would like to learn more about Forge, don't miss the chance to
 
 ####<a name="7"></a>Updated Visual Studio Revit Add-In Wizard Installation
 
+Back to pure Revit API related topics, 
 [Irneb](https://github.com/irneb) raised an issue with the [Visual Studio Revit Add-In Wizards](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.20) 
 in his [issue #6 &ndash; install script alteration suggestion](https://github.com/jeremytammik/VisualStudioRevitAddinWizard/issues/6), and solved it 
 with [pull request #7 &ndash; path to profile folder](https://github.com/jeremytammik/VisualStudioRevitAddinWizard/pull/7).
@@ -219,6 +220,8 @@ of just two modified lines in `TemplateRevitCs.csproj` and `install.bat`.
 
 
 ####<a name="8"></a>Question on RevitLookup Installation
+
+[RevitLookup](https://github.com/jeremytammik/RevitLookup) is *the* main Revit BIM database exploration tool.
 
 **Question:** I am trying to install RevitLookup on Revit 2017, and having a bit of difficulty figuring out how to go about the installation in Revit.
 
