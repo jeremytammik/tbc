@@ -57,11 +57,11 @@ Who is supposed to make use of your add-in?
 
 Who is supposed to install &ndash; and pay for &ndash; Revit?
 
-Revit is a very specialised and quite expense high-level BIM design tool.
+Revit is a very specialised, high-level and costly BIM design tool.
 
 I would expect a limited number of people to be directly involved in creative hard-core BIM work.
 
-Many add-ins do not contribute to the BIM design itself.
+Many add-ins can add immense value to the BIM and construction process with no need for such a tight integration with Revit.
 
 Many add specific data items or perform read-only analysis and reporting tasks.
 
@@ -72,6 +72,8 @@ Two of my recent samples demonstrate the implementation of equivalent functional
 - [RvtFader](https://github.com/jeremytammik/RvtFader) &ndash; C# .NET Revit add-in to calculate and display signal attenuation using AVF
 - [ForgeFader](https://github.com/jeremytammik/forgefader) &ndash; Forge viewer extension to calculate and display signal attenuation, cf.
 the [online demo](https://forge-rcdb.autodesk.io/configurator?id=59041f250007f5c0eef482f2)
+
+Interestingly enough, moving your app development out of the specialised .NET Revit API into a much more generic JavaScript based development platform makes development easier, faster, enables much better integration with other components, and provides access to a  larger number of existing libraries for almost any conceivable task.
 
 Furthermore, if you really do require Revit specific functionality, e.g., you wish to modify the BIM and write `RVT` files, and want to provide your app to a large or unlimited number of users in a flexible fashion, not necessarily bound to a full-fledged Revit desktop installation, be aware that we are continuing to work hard on a Forge design automation API
 to [provide all you need online, aka Revit I/O](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28b).
@@ -94,9 +96,7 @@ the `viewer-javascript-extract.spreadsheet` Forge sample to read all the propert
 - [Source code on GitHub](https://github.com/Autodesk-Forge/viewer-javascript-extract.spreadsheet)
 - [Blog post announcement](https://forge.autodesk.com/blog/create-spreadsheet-excel-client-translated-revit-files)
 
-He now released another sample that adds the functionality to access a Revit BIM stored in BIM360
-
-The
+He now released another sample that adds the functionality to access a Revit BIM stored in BIM360: the
 [BIM360 Revit Export to Excel sample](https://github.com/Autodesk-Forge/bim360appstore-model.derivative-nodejs-xls.exporter)
 demonstrates how to access and extract Revit data on your BIM360 account using 3-legged `OAuth` to log in, a simple viewer extension and code to read the Revit meta-data and format it into an Excel spreadsheet file:
 
@@ -154,7 +154,8 @@ Each property can also be deleted.
 
 ####<a name="6"></a>Upcoming Forge Accelerators
 
-If you would like to learn more about Forge, don't miss the chance to join one of the [upcoming accelerators](http://autodeskcloudaccelerator.com/prague-2):
+If you would like to learn more about Forge, don't miss the chance to
+[join one of the upcoming accelerators](http://autodeskcloudaccelerator.com/prague-2):
 
 - Bangalore, India &ndash; September 4-8
 - Moscow, Russia &ndash; September 25-29

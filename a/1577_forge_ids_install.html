@@ -50,9 +50,9 @@ Forge versus Revit programming
 <p>Before designing or implementing a Revit add-in, it is well worth pondering the status, use and cost of Revit in depth.</p>
 <p>Who is supposed to make use of your add-in?</p>
 <p>Who is supposed to install &ndash; and pay for &ndash; Revit?</p>
-<p>Revit is a very specialised and quite expense high-level BIM design tool.</p>
+<p>Revit is a very specialised, high-level and costly BIM design tool.</p>
 <p>I would expect a limited number of people to be directly involved in creative hard-core BIM work.</p>
-<p>Many add-ins do not contribute to the BIM design itself.</p>
+<p>Many add-ins can add immense value to the BIM and construction process with no need for such a tight integration with Revit.</p>
 <p>Many add specific data items or perform read-only analysis and reporting tasks.</p>
 <p>For all such tasks, it may be well worthwhile thinking of shifting your app development platform to a much more accessible &ndash; and cheaper &ndash; environment, e.g., <a href="https://autodesk-forge.github.io">Forge</a>.</p>
 <p>Two of my recent samples demonstrate the implementation of equivalent functionality using Revit and its API versus Forge and JavaScript:</p>
@@ -61,6 +61,7 @@ Forge versus Revit programming
 <li><a href="https://github.com/jeremytammik/forgefader">ForgeFader</a> &ndash; Forge viewer extension to calculate and display signal attenuation, cf.
 the <a href="https://forge-rcdb.autodesk.io/configurator?id=59041f250007f5c0eef482f2">online demo</a></li>
 </ul>
+<p>Interestingly enough, moving your app development out of the specialised .NET Revit API into a much more generic JavaScript based development platform makes development easier, faster, enables much better integration with other components, and provides access to a  larger number of existing libraries for almost any conceivable task.</p>
 <p>Furthermore, if you really do require Revit specific functionality, e.g., you wish to modify the BIM and write <code>RVT</code> files, and want to provide your app to a large or unlimited number of users in a flexible fashion, not necessarily bound to a full-fledged Revit desktop installation, be aware that we are continuing to work hard on a Forge design automation API
 to <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28b">provide all you need online, aka Revit I/O</a>.</p>
 <h4><a name="3"></a>Access Revit BIM Data and Element Ids from BIM360</h4>
@@ -76,8 +77,7 @@ the <code>viewer-javascript-extract.spreadsheet</code> Forge sample to read all 
 <li><a href="https://github.com/Autodesk-Forge/viewer-javascript-extract.spreadsheet">Source code on GitHub</a></li>
 <li><a href="https://forge.autodesk.com/blog/create-spreadsheet-excel-client-translated-revit-files">Blog post announcement</a></li>
 </ul>
-<p>He now released another sample that adds the functionality to access a Revit BIM stored in BIM360</p>
-<p>The
+<p>He now released another sample that adds the functionality to access a Revit BIM stored in BIM360: the
 <a href="https://github.com/Autodesk-Forge/bim360appstore-model.derivative-nodejs-xls.exporter">BIM360 Revit Export to Excel sample</a>
 demonstrates how to access and extract Revit data on your BIM360 account using 3-legged <code>OAuth</code> to log in, a simple viewer extension and code to read the Revit meta-data and format it into an Excel spreadsheet file:</p>
 <ul>
@@ -118,7 +118,8 @@ the <a href="https://forge-rcdb.autodesk.io/configurator">online Forge configura
 <p>The buttons on the right-hand side of the property panel enable search, export to <code>CSV</code> and <code>JSON</code>, and adding new properties.</p>
 <p>Each property can also be deleted.</p>
 <h4><a name="6"></a>Upcoming Forge Accelerators</h4>
-<p>If you would like to learn more about Forge, don't miss the chance to join one of the <a href="http://autodeskcloudaccelerator.com/prague-2">upcoming accelerators</a>:</p>
+<p>If you would like to learn more about Forge, don't miss the chance to
+<a href="http://autodeskcloudaccelerator.com/prague-2">join one of the upcoming accelerators</a>:</p>
 <ul>
 <li>Bangalore, India &ndash; September 4-8</li>
 <li>Moscow, Russia &ndash; September 25-29</li>
