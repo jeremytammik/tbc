@@ -24,11 +24,18 @@
 
 #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; ...
+Forge versus Revit programming
+&ndash; Access Revit BIM data and element ids from BIM360
+&ndash; Unique IDs for Forge viewer elements
+&ndash; Edit and export Revit properties in Forge
+&ndash; Upcoming Forge accelerators
+&ndash; Updated Visual Studio Revit add-in wizard installation
+&ndash; Question on RevitLookup installation
+&ndash; RevitLookup cannot snoop everything...
 
 --->
 
-### Forge Ids, Wizard and Lookup Installation
+### Revit versus Forge, Ids and Add-In Installation
 
 Still getting back into normal work flow after some time off, I have a bunch of stuff to share:
 
