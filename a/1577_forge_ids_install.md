@@ -22,7 +22,7 @@
 
 - updated wizard installation
 
-#RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Revit versus Forge, Ids and Add-In Installation #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/forgervtidsinstall
 
 Forge versus Revit programming
 &ndash; Access Revit BIM data and element ids from BIM360
