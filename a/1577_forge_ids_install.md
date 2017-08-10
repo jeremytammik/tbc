@@ -96,7 +96,7 @@ the `viewer-javascript-extract.spreadsheet` Forge sample to read all the propert
 - [Source code on GitHub](https://github.com/Autodesk-Forge/viewer-javascript-extract.spreadsheet)
 - [Blog post announcement](https://forge.autodesk.com/blog/create-spreadsheet-excel-client-translated-revit-files)
 
-He now released another sample that adds the functionality to access a Revit BIM stored in BIM360: the
+My new colleague Michael Beale now released another sample that adds the functionality to access a Revit BIM stored in BIM360: the
 [BIM360 Revit Export to Excel sample](https://github.com/Autodesk-Forge/bim360appstore-model.derivative-nodejs-xls.exporter)
 demonstrates how to access and extract Revit data on your BIM360 account using 3-legged `OAuth` to log in, a simple viewer extension and code to read the Revit meta-data and format it into an Excel spreadsheet file:
 
@@ -107,12 +107,12 @@ demonstrates how to access and extract Revit data on your BIM360 account using 3
 <iframe width="480" height="270" src="https://www.youtube.com/embed/800d2xmQl0s?rel=0" frameborder="0" allowfullscreen></iframe>
 </center>
 
-Many thanks to Augusto for putting these together!
+Many thanks to Augusto and Michael for putting these together!
 
 
 ####<a name="4"></a>Unique IDs for Forge Viewer Elements
 
-Augusto uses his newest sample to answer the StackOverflow question
+Augusto uses Michael's sample to answer the StackOverflow question
 on [Forge Viewer: unique IDs for clickable objects](https://stackoverflow.com/questions/45577971/forge-viewer-unique-ids-for-clickable-objects):
 
 **Question:** I am experimenting with Revit and the Forge Viewer.
