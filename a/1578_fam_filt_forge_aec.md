@@ -36,7 +36,9 @@
   https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.134.2
   https://forums.autodesk.com/t5/revit-api-forum/family-instance-filter/m-p/7287113
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Forge for AEC demos & sample code #RevitAPI @AutodeskRevit #bim @AutodeskForge #ForgeDevCon http://bit.ly/fam_filt_forge_aec https://youtu.be/5xVwvBzemkg
+Determining the @AutodeskRevit starting view #RevitAPI #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/fam_filt_forge_aec
+Filtering for family instances and types by family name #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/fam_filt_forge_aec
 
 A biggish post rather late in the week... still answering too many cases
 &ndash; Forge for AEC demos and sample code
