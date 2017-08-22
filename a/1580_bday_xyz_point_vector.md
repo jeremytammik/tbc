@@ -16,7 +16,7 @@
   13096971 [Distinct XYZ]
   https://forums.autodesk.com/t5/revit-api-forum/distinct-xyz/m-p/7161065
 
-#RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+The Building Coder Birthday Post: the #RevitAPI XYZ Class @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/xyzpntvec
 
 Today is The Building Coder's ninth birthday.
 We'll celebrate by discussing the pretty fundamental issue of XYZ points versus vectors, and how to distinguish different points
