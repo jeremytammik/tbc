@@ -249,6 +249,22 @@ Another direction to go, again suggested by Bobby, assuming you implemented your
 Here's a shell of the `Point3D` class showing an implementation:
 
 <pre class="code">
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">DoubleExtensions</span>
+{
+&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">const</span>&nbsp;<span style="color:blue;">double</span>&nbsp;Tolerance&nbsp;=&nbsp;1.0e-10;
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">bool</span>&nbsp;IsAlmostEqualTo(
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">this</span>&nbsp;<span style="color:blue;">double</span>&nbsp;double1,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;double2&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;isAlmostEqual&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Math</span>.Abs(&nbsp;double1&nbsp;-&nbsp;double2&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;=&nbsp;Tolerance;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;isAlmostEqual;
+&nbsp;&nbsp;}
+}
+
 <span style="color:blue;">public</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">Point3D</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IEquatable</span>&lt;<span style="color:#2b91af;">Point3D</span>&gt;
 {
 &nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;Point3D(&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;revitXyz&nbsp;)
