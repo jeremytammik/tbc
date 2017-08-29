@@ -46,6 +46,7 @@ A whole bunch of exciting Revit API topics to start the week:
 - [Determining the outer-most `EdgeLoop`](#3)
 - [How to determine the location curve for a steel column](#4)
 - [Determining a reference plane from a reference point](#5)
+- [Beware of multiple outer loops](#6)
 
 ####<a name="2"></a>RevitLookup Updated to use NuGet Revit API Package
 
@@ -474,3 +475,34 @@ The planes you are after are faces of the solid of the reference line, the solid
 </pre>
 
 Many thanks to Fair59 for explaining this and sharing the solution!
+
+
+####<a name="6"></a>Beware of Multiple Outer Loops
+
+Adrian Esdaile added 
+a [warning in his comment below](http://thebuildingcoder.typepad.com/blog/2017/08/edge-loop-point-reference-plane-and-column-line.html#comment-3491949399) that
+you should definitely be aware of:
+
+In reference to the question about Outer loops: Unfortunately, the quirky nature of Revit will defeat you here. It is entire possible to create valid geometry in Revit composed of TWO (yes, TWO, or more...) OUTER loops. How this will behave with your code (or indeed ANY code!) is questionable.
+
+For example &ndash; create a Floor in Sketch mode, create two 'islands' of floor, click OK... done! Revit calls this ONE floor object, but it's clearly TWO separate pieces &ndash; that behave as one. It is considered VERY POOR DRAFTING to create floors like this; but "users gonna use" if you give them a chance, and it's a quick and lazy way of doing things.
+
+In a perfect world, Revit would slap you with an error for trying to create a daft and confusing object like this; but this world (and Revit, bless its binary heart) is far from perfect.
+
+For an example of unimaginably bad practice in Revit drafting (but very common in the field, dammit...) See this [example file](zip/floors_of_unimaginable_evil.zip) I call
+&ndash; [floors_of_unimaginable_evil.rvt](zip/floors_of_unimaginable_evil.rvt):
+
+<center>
+<img src="img/floors_of_unimagnable_evil_rvt.png" alt="Floors of unimagnable evil" width="500"/>
+</center>
+
+Look at the image above &ndash; there is something terribly wrong with the area reported for this floor... and what about the volume...? Huh? Why would someone do that? Doesn't matter why, but "users gonna use" as I said &ndash; if Revit allows it, users WILL do it! RVT 2016 format, by the way. Feel free to use this file as a test case for 'what can happen' :-D
+
+Yes, I've used a Floor in this example, but Revit is not consistent in when it will or won't allow multiple curves to count as single curve. I suspect you can do this with columns, too, as a column might be defined by a swept blend... which greatly expands the possibilities for evil.
+
+**Response:** Obviously, it is not that hard to test whether a Revit so-called edge loop consists of multiple disjoint loops, but it places substantial additional burden on the programmer.
+
+My preferred way to deal with this (or at least protect myself as an add-in developer) would be to implement a reliable model checking algorithm, run automatically at regular intervals as well as before saving the BIM project, that checks for and warns about weird user input of this kind.
+
+Obviously, the number of creative and involuntarily evil things that users can get up to is absolutely unlimited, so the number of checks performed would grow with time as new evil possibilities are discovered and discouraged.
+
