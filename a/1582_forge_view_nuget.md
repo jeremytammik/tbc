@@ -22,7 +22,9 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; ...
+Two little items to point out before we end the week
+&ndash; Select Rooms and Views to Publish to the Cloud
+&ndash; Revit 2018.1 API NuGet Packages...
 
 --->
 
