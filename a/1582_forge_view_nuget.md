@@ -20,7 +20,8 @@
 - 13323030 [Revit2018AddInTemplateSet]
   https://forums.autodesk.com/t5/revit-api-forum/revit2018addintemplateset/m-p/7331376
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Select Rooms and Views to Publish to the Cloud #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/forge_view_nuget
+Updated #RevitAPI 2018.1 NuGet packages @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/forge_view_nuget
 
 Two little items to point out before we end the week
 &ndash; Select Rooms and Views to Publish to the Cloud
