@@ -10,7 +10,7 @@
 
 <!---
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Use Forge or Spreadsheet to Create Shared Parameters #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/rvtmetaprop
 
 I spent last week working on a new little BIM sample showing a round trip connection between Revit and Forge, and an automated way of generating and populating shared parameters from spreadsheet data
 &ndash; RvtMetaProp &ndash; Revit meta property add-in
@@ -24,7 +24,7 @@ I spent last week working on a new little BIM sample showing a round trip connec
 
 --->
 
-### Creating Shared Parameters from Spreadsheet
+### Use Forge or Spreadsheet to Create Shared Parameters
 
 I spent last week working on a new little BIM sample showing a round trip connection between Revit and Forge, and an automated way of generating and populating shared parameters from spreadsheet data:
 
