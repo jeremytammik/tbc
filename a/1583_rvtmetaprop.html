@@ -1,0 +1,204 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+ #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+
+I spent last week working on a new little BIM sample showing a round trip connection between Revit and Forge, and an automated way of generating and populating shared parameters from spreadsheet data:
+&ndash; RvtMetaProp &ndash; Revit meta property add-in
+&ndash; CSV and JSON input file format
+&ndash; Forge configurator sample
+&ndash; Round-Trip Forge meta property editor
+&ndash; BipGroupList lists built-in parameter group enums and labels
+&ndash; Two options to add custom properties to the Revit BIM
+&ndash; Translation of shared parameters to Forge
+&ndash; Handling BIM floors in Forge...
+
+--->
+
+<h3>Creating Shared Parameters from Spreadsheet</h3>
+<p>I spent last week working on a new little BIM sample showing a round trip connection between Revit and Forge, and an automated way of generating and populating shared parameters from spreadsheet data:</p>
+<ul>
+<li><a href="#1">RvtMetaProp &ndash; Revit meta property add-in</a></li>
+<li><a href="#2">CSV and JSON input file format</a></li>
+<li><a href="#3">Forge configurator sample</a></li>
+<li><a href="#4">Round-Trip Forge meta property editor</a></li>
+<li><a href="#5">BipGroupList lists built-in parameter group enums and labels</a></li>
+<li><a href="#6">Two options to add custom properties to the Revit BIM</a></li>
+<li><a href="#7">Translation of shared parameters to Forge</a></li>
+<li><a href="#8">Handling BIM floors in Forge</a></li>
+</ul>
+<h4><a name="1"></a>RvtMetaProp &ndash; Revit Meta Property Add-In</h4>
+<p>In Forge, <a href="https://twitter.com/F3lipek">Philippe Leefsma</a> implemented
+a <a href="http://meta-editor.autodesk.link">meta property editor</a> enabling
+you to modify existing and add custom data to any Forge model.</p>
+<p>The additional data is stored in a parallel database.</p>
+<p>On the Revit side, I implemented
+the <a href="https://github.com/jeremytammik/rvtmetaprop">RvtMetaProp add-in</a> to
+read in the additional or modified properties and update the BIM accordingly.</p>
+<p>Handily enough, it can also be used as a stand-alone utility to automatically create shared parameters and populate their values on BIM elements from a spreadsheet, completely independent of the Forge app.</p>
+<p>It reads the properties associated with individual BIM elements from a <code>CSV</code> or <code>JSON</code> file.</p>
+<p>If the property corresponds to an existing parameter on a BIM element, its value is updated accordingly.</p>
+<p>For a new property, a shared parameter is created.</p>
+<p>For a quick first impression, check out
+the <a href="https://youtu.be/I5AvbSrZ3Wk">four-and-a-half-minute recording</a> of this add-in in action.</p>
+<p><center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/I5AvbSrZ3Wk?rel=0" frameborder="0" allowfullscreen></iframe>
+</center></p>
+<h4><a name="2"></a>CSV and JSON Input File Format</h4>
+<p>The <code>CSV</code> and <code>JSON</code> input files specify the following data, which correspond to the list Revit information:</p>
+<ul>
+<li><code>externalId</code> &ndash; the Revit database element <code>UniqueId</code></li>
+<li><code>component</code> &ndash; element name and element id (ignored)</li>
+<li><code>displayCategory</code> &ndash; built-in parameter group name under which to display and store a shared parameter</li>
+<li><code>categoryId</code> &ndash; built-in parameter group enumeration value as string</li>
+<li><code>displayName</code> &ndash; meta property name</li>
+<li><code>displayValue</code> &ndash; meta property value</li>
+<li><code>metaType</code> &ndash; meta property data type; for Revit, all but Double, Int and Text are ignored</li>
+<li><code>filelink</code> &ndash; meta property file URL (ignored)</li>
+<li><code>filename</code> &ndash; meta property file name (ignored)</li>
+<li><code>link</code> &ndash; meta property link URL (ignored)</li>
+</ul>
+<p>As you can see, some information defined in Forge and specified in the files may be ignored when importing into Revit.</p>
+<p>The <code>CSV</code> file format looks like this:</p>
+<pre>
+"externalId","component","displayCategory","categoryId","displayName","displayValue","metaType","filelink","filename","link"
+"7df7740a-9736-4a3e-81ec-45e05b0d2ad2-0000c28d","Basic Wall [49805]","General","PG_GENERAL","test_text","this is a text added in forge","Text",,,
+"7df7740a-9736-4a3e-81ec-45e05b0d2ad2-0000c28d","Basic Wall [49805]","General","PG_GENERAL","test_real","0.12","Double",,,
+"7df7740a-9736-4a3e-81ec-45e05b0d2ad2-0000c28d","Basic Wall [49805]","General","PG_GENERAL","test_int","12","Int",,,
+</pre>
+
+<p>The fields are read in an order dependent manner.</p>
+<p>The <code>JSON</code> file contents are analogous:</p>
+<pre>
+[
+  {
+    "displayCategory": "General",
+    "displayValue": "this is a text added in forge",
+    "displayName": "test_text",
+    "categoryId": "PG_GENERAL",
+    "externalId": "7df7740a-9736-4a3e-81ec-45e05b0d2ad2-0000c28d",
+    "component": "Basic Wall [49805]",
+    "metaType": "Text"
+  },
+  {
+    "displayCategory": "General",
+    "displayValue": "0.12",
+    "displayName": "test_real",
+    "categoryId": "PG_GENERAL",
+    "externalId": "7df7740a-9736-4a3e-81ec-45e05b0d2ad2-0000c28d",
+    "component": "Basic Wall [49805]",
+    "metaType": "Double"
+  },
+  {
+    "displayCategory": "General",
+    "displayValue": "12",
+    "displayName": "test_int",
+    "categoryId": "PG_GENERAL",
+    "externalId": "7df7740a-9736-4a3e-81ec-45e05b0d2ad2-0000c28d",
+    "component": "Basic Wall [49805]",
+    "metaType": "Int"
+  }
+]
+</pre>
+
+<p>You can create a <code>CSV</code> or <code>JSON</code> input file matching this format to generate new shared parameters in your BIM, either using the Forge meta property editor, or in any other way you like.</p>
+<h4><a name="3"></a>Forge Configurator Sample</h4>
+<p>A sample meta property editor is included in 
+the <a href="https://forge-rcdb.autodesk.io/configurator">online Forge configurator sample</a>:</p>
+<ul>
+<li>Scroll down through the models to <em>Meta Properties</em>.</li>
+<li>In the left-hand drop-down menu, select <em>Office</em>.</li>
+<li>Click on the <em>Meta Properties</em> box.</li>
+</ul>
+<p>The <a href="https://forge-rcdb.autodesk.io/configurator?id=59780eec17d671029c53420e">office model</a> is
+displayed, and its properties displayed in a panel on the right-hand side.</p>
+<p>You can select any BIM element and see all its properties as well.</p>
+<p>The buttons on the top right-hand side of the property panel enable search, export to <code>CSV</code> and <code>JSON</code>, and adding new properties.</p>
+<p>Each property can also be deleted.</p>
+<p>The models in this sample are hard-wired.</p>
+<h4><a name="4"></a>Round-Trip Forge Meta Property Editor</h4>
+<p>To demonstrate round-trip meta property editing on your own Revit BIM model in the Forge Viewer, Philippe implemented
+the <a href="http://meta-editor.autodesk.link">Forge meta property editor</a>.</p>
+<p><center>
+<img src="img/meta_editor.png" alt="Forge meta property editor" width="600"/>
+</center></p>
+<p>It enables you to upload your own model, add properties to it in the Forge viewer, download the meta property specifications, and integrate them into the BIM seed CAD file using the RvtMetaProp add-in.</p>
+<p>Again, the buttons on the top right-hand side of the property panel enable adding new properties (the plus sign icon) and export to <code>CSV</code> and <code>JSON</code> (the cloud icon).</p>
+<p>RvtMetaProp reads modification into Revit and updates the BIM accordingly.</p>
+<p>Retranslation of the updated BIM to Forge completes the round trip.</p>
+<p>In order to enable the round trip intact, the meta property data types and group names are restricted to those supported by Revit shared parameters:</p>
+<ul>
+<li>Data types &ndash; restricted to Revit parameter storage types<ul>
+<li>Text</li>
+<li>Double</li>
+<li>Int</li>
+</ul>
+</li>
+</ul>
+<p><center>
+<img src="img/meta_editor_data_types.png" alt="Forge meta property editor data types" width="334"/>
+</center></p>
+<ul>
+<li>Property group &ndash; restricted to one of the 116 Revit built-in parameter groups<ul>
+<li>Data</li>
+<li>General</li>
+<li>Other</li>
+<li>Text</li>
+<li>...</li>
+</ul>
+</li>
+</ul>
+<p><center>
+<img src="img/meta_editor_param_group.png" alt="Forge meta property editor parameter groups" width="488"/>
+</center></p>
+<h4><a name="5"></a>BipGroupList Lists Built-In Parameter Group Enums and Labels</h4>
+<p>The list of Revit built-in parameter group enumeration values and display string labels was generated by
+the <a href="https://github.com/jeremytammik/BipGroupList">BipGroupList add-in</a> and
+reformatted into a JavaScript dictionary mapping the enums to the labels using a regular expression.</p>
+<h4><a name="6"></a>Two Options to Add Custom Properties to the Revit BIM</h4>
+<p>Before implementing RvtMetaProp, I pondered the best way to add custom properties to a Revit BIM.</p>
+<p>Basically, there are two fundamentally different approaches, as shown by the following Q &amp; A:</p>
+<p><strong>Question:</strong> How can I import updated and added properties into the Revit BIM?</p>
+<p><strong>Answer:</strong> If all you need to do is attach additional information such as your database GUID to a Revit database element, the solution is easy.</p>
+<p>You have two options to programmatically attach arbitrary data to building elements in the Revit BIM:</p>
+<ul>
+<li>Traditional end user approach: <a href="https://knowledge.autodesk.com/support/revit-products/learn-explore/caas/CloudHelp/cloudhelp/2015/ENU/Revit-Model/files/GUID-E7D12B71-C50D-46D8-886B-8E0C2B285988-htm.html">shared parameters</a> &ndash; pros and cons:<ul>
+<li>It comes with a user interface, the standard element property panel.</li>
+<li>It is visible to Revit, exported to Forge can be used for scheduling, etc.</li>
+<li>Shared parameters are defined per <code>Category</code>, not on a per-<code>Element</code> basis.</li>
+</ul>
+</li>
+<li>New, API specific functionality: <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.23">extensible storage</a> &ndash; pros and cons:<ul>
+<li>No UI, you would have to implement that yourself.</li>
+<li>The data is equipped with a protection level, is mostly ignored by Revit, therefore cannot be used for scheduling, is not exported to Forge, etc.</li>
+<li>Extensible storage is assigned on a per-<code>Element</code> basis.</li>
+</ul>
+</li>
+</ul>
+<h4><a name="7"></a>Translation of Shared Parameters to Forge</h4>
+<p>An important fundamental factor affecting this workflow is the question of how shared parameter values make it across through the translation into Forge.</p>
+<p><strong>Question:</strong> Are shared parameters included in the RVT to Forge translation? Or only some of them? What are the criteria, please? I added a shared parameter to a BIM, and it does not appear in the translated Forge result. Thank you!</p>
+<p><strong>Answer:</strong> Shared parameters are NOT included in Revit extraction. Since shared parameters are saved in external file outside of RVT, the shared parameter files are not available to extractor during translation.</p>
+<p><strong>Response:</strong> the shared parameter values, however, seem to make it across, according to my testing. here is the value of a shared parameter named "jeremy_text" in the built-in parameter group '<code>General</code> that I created in Revit being displayed on A360: (edited)</p>
+<p><center>
+<img src="img/shared_property_a360.png" alt="Shared parameter in A360 viewer" width="489"/>
+</center></p>
+<p><strong>Answer:</strong> Visible shared parameters are included in the Revit extraction. While invisible shared parameters are Not included.</p>
+<h4><a name="8"></a>Handling BIM Floors in Forge</h4>
+<p>While on the topic of using Forge with BIM, let's also mention some tips and tricks on handling floors in Forge:</p>
+<p><strong>Question:</strong> Can you suggest a viable approach to identify (and display) building objects (from furniture to multi-floor structural objects) on specific floors?</p>
+<p>I would like to present analysis results 'by floor' and am challenged to deal with some entities on a specific floor while others (like columns and curtain walls) span multiple floors.</p>
+<p><strong>Answer:</strong> Floors is definitely an issue, especially in some models which include half-floors.</p>
+<p>We also see limitations associated with model elements which span multiple floors.</p>
+<p>Another problem is caused by modelling errors, generating elements whose levels have been incorrectly designated in the source BIM.</p>
+<p>One possible approach to address the first issue would be to use Revit Parts to divide elements by level, enabling each part to be separately associated with its appropriate floor level. This process can be automated using an add-in. Otherwise, it requires extensive input to the Revit model.</p>
+<p>One can use a settings file to specify an association between the floor names to display for a particular model and the level property associated with each element coming from the BIM model. Often there are multiple levels defined in Revit for a single floor; these multiples can be mapped to a single floor name which appears in the Forge navigation. The highlighting functionality associated with the Forge navigation is enabled by the room objects in the model and their association with a particular level. Once a user selects a level to view in isolation, the visibility of elements is filtered based on the level property of each individual object.</p>
+<p>Aside from the elements which span multiple floors, the effective display of floor levels in the Forge Viewer is dependent on the rigor used in developing the BIM model itself. For example, if elements are associated with the 1st floor but reside on the 2nd floor, the results in the viewer will be messy once the filters are applied to the display.</p>
