@@ -12,7 +12,7 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-I spent last week working on a new little BIM sample showing a round trip connection between Revit and Forge, and an automated way of generating and populating shared parameters from spreadsheet data:
+I spent last week working on a new little BIM sample showing a round trip connection between Revit and Forge, and an automated way of generating and populating shared parameters from spreadsheet data
 &ndash; RvtMetaProp &ndash; Revit meta property add-in
 &ndash; CSV and JSON input file format
 &ndash; Forge configurator sample
