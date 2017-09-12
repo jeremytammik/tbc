@@ -42,7 +42,7 @@ answered several interesting questions in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and elsewhere:
 
 - [`ExtentElem` and duplicate legend components remastered](#2)
-- [Obtaining generic model references for dimensioning](#3)
+- [Obtaining generic model square face references for dimensioning](#3)
 - [Creating a line perpendicular to another](#4)
 
 
@@ -104,7 +104,7 @@ Since I don't see this type of element mentioned by The Building Coder, I though
 
 Very many thanks to Alexander for this deep research and valuable insight!
 
-####<a name="3"></a>Obtaining Generic Model References for Dimensioning
+####<a name="3"></a>Obtaining Generic Model Square Face References for Dimensioning
 
 Next, Alexander implemented an add-in to help answer 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) forum thread
