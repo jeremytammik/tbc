@@ -26,11 +26,14 @@ Sincerely, Alexander
 I still use the This sample is licensed under the terms of the [MIT License](http://opensource.org/licenses/MIT), a lax, permissive non-copyleft free software license. For substantial programs it is better to use the Apache 2.0 license since it blocks patent treachery. Mine samples are not substantial.
 - I've fixed the code (there was much more tricks working with revit references) and pushed to the github.
 
-#RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Obtaining square face references for dimensioning #RevitAPI @AutodeskRevit #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/dimfaceref
+The ExtentElem + duplicating legend components #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/dimfaceref
+Creating a line perpendicular to another using #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/dimfaceref
 
 Alexander Ignatovich answered several interesting questions in the Revit API discussion forum
 &ndash; <code>ExtentElem</code> and duplicate legend components remastered
-&ndash; Obtaining generic model references for dimensioning
+&ndash; Obtaining generic model square face references for dimensioning
+&ndash; Preparing family with reference planes for dimensioning
 &ndash; Creating a line perpendicular to another...
 
 --->
@@ -41,12 +44,13 @@ Alexander Ignatovich, [@CADBIMDeveloper](https://github.com/CADBIMDeveloper), ak
 answered several interesting questions in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and elsewhere:
 
-- [`ExtentElem` and duplicate legend components remastered](#2)
+- [`ExtentElem` and duplicating legend components](#2)
 - [Obtaining generic model square face references for dimensioning](#3)
+- [Preparing family with reference planes for dimensioning](#3.1)
 - [Creating a line perpendicular to another](#4)
 
 
-####<a name="2"></a>ExtentElem and Duplicate Legend Components Remastered
+####<a name="2"></a>ExtentElem and Duplicating Legend Components
 
 In Alexander's own words:
 
@@ -97,7 +101,7 @@ In this case, all other elements have a valid category, and this one does not, s
 &nbsp;&nbsp;&nbsp;&nbsp;.Select(&nbsp;x&nbsp;=&gt;&nbsp;x.Id&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;.ToList();
 </pre>
-	
+ 
 So, this code remains simple and clear. The `ExtentElem` is a common problem and its id should not be passed to the `CopyElements` method.
 
 Since I don't see this type of element mentioned by The Building Coder, I thought it worthwhile to point out.
@@ -118,7 +122,7 @@ The Edge class has a Property which should return a reference to the edge - but 
 This is the code:
 
 <pre class="prettyprint">
- # Dynamo
+# Dynamo
 import clr
 clr.AddReference('RevitAPI')
 clr.AddReference('RevitAPIUI')
@@ -137,7 +141,7 @@ uidoc = DocumentManager.Instance.CurrentUIApplication.ActiveUIDocument
 
 #The inputs to this node will be stored as a list in the IN variables.
 dataEnteringNode = IN
-selobject		= UnwrapElement(IN[0])	# Object to select
+selobject  = UnwrapElement(IN[0]) # Object to select
 
 #Get user to pick a face
 selob = uidoc.Selection.PickObject(Selection.ObjectType.PointOnElement, "Pick something now")
@@ -196,6 +200,43 @@ Jeremy adds: I added a readme and license to the code for him, because:
 I myself use the [MIT License](http://opensource.org/licenses/MIT) for my samples, "a lax, permissive non-copyleft free software license. For substantial programs, it is better to use the Apache 2.0 license since it blocks patent treachery".
 
 My samples are not substantial.
+
+
+####<a name="3.1"></a>Preparing Family with Reference Planes for Dimensioning
+
+Alexander later added another, simpler solution to the conversation:
+
+If you use Revit 2018 or later, you can prepare your family for easier dimensioning by adding specific reference planes in the family definition, e.g., xLeft, xRight, yTop, yBottom, and then access them on the family instance in the project environment like this:
+
+<pre class="prettyprint">
+def CreateDimension(instance, refNames, direction):
+  references = ReferenceArray()
+  
+  for x in refNames:
+    references.Append(instance.GetReferenceByName(x))
+  
+  origin = instance.Location.Point
+  
+  transform = instance.GetTotalTransform()
+  transform.Origin = XYZ.Zero
+  
+  dimensionDirection = transform.OfPoint(direction)
+  
+  dimensionLine = Line.CreateUnbound(origin, dimensionDirection)
+  
+  doc.Create.NewDimension(doc.ActiveView, dimensionLine, references)
+
+
+famInst = selection[0]
+
+tx = Transaction(doc, "create dimensions")
+tx.Start()
+
+CreateDimension(famInst, ["xLeft", "xRight"], XYZ.BasisX)
+CreateDimension(famInst, ["yBottom", "yTop"], XYZ.BasisY)
+
+tx.Commit()
+</pre>
 
 
 ####<a name="4"></a>Creating a Line Perpendicular to Another
