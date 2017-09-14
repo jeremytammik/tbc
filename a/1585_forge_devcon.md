@@ -10,7 +10,7 @@
 
 <!---
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Forge DevCon at AU in Darmstadt and Las Vegas #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/forgedevcon
 
 I'll be attending the two Autodesk University conferences in Darmstadt, Germany, October 17-18, and Las Vegas, USA, November 14-16.
 Both of these are preceded by a Forge DevCon developer conference.
