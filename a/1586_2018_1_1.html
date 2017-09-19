@@ -32,17 +32,20 @@
   https://forums.autodesk.com/t5/revit-api-forum/setting-cropbox-for-a-3d-view-with-revit-2018/m-p/7129460
   workaround
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Revit 2018.1.1 fixes CropBox setting in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/2018_1_1
+Revit 2018.1 #RevitAPI docs online at http://www.revitapidocs.com @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/2018_1_1
 
-I'll be attending the two Autodesk University conferences in Darmstadt, Germany, October 17-18, and Las Vegas, USA, November 14-16.
-Both of these are preceded by a Forge DevCon developer conference.
-You may be interested only in Revit and its API or other desktop oriented programming and asking yourself why you should care about Forge and all that cloud stuff.
-If so, you might want to expand your horizon and take a look at Stephen Preston's analysis and explanation in his article
-on 'developing for Autodesk desktop software? Here's why you should care about Forge DevCon (and Autodesk University)'...
+The Revit 2018.1.1 hotfix was released last week and solves an API issue that was already being discussed in
+the Revit API discussion forum. Further, Gui Talarico updated the online Revit API documentation for
+Revit 2018.1
+&ndash; Revit and Revit LT 2018.1.1 released
+&ndash; CropBox setting in Revit 2018 API fixed
+&ndash; CropBox setting workaround
+&ndash; Revit 2018.1 API documentation online...
 
 --->
 
-<h3>Revit 2018.1.1 Fixes CropBox Setting</h3>
+<h3>Revit 2018.1.1 API Docs and CropBox Setting</h3>
 <p>The Revit 2018.1.1 hotfix was released last week and solves an API issue that was already being discussed in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>.</p>
 <p>Further, <a href="http://www.gtalarico.com">Gui Talarico</a> updated
@@ -106,8 +109,8 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/setting-cropbox-for-a
 
 <p>After further investigation, I found that ensuring that the new bounding box assigned to the View3D's cropbox has the same transform assigned to it as the original crop box corrects the crop setting. In prior versions of Revit, the <code>Min</code> and <code>Max</code> coordinates would stay the same after assignment to the <code>CropBox</code> property. However, in Revit 2018 it appears that if the bounding box <code>Transform</code> does not match the View3D's crop box, Revit transforms the <code>Min</code> and <code>Max</code> values upon assignment to the <code>CropBox</code> property.</p>
 <p>Hard to tell if this was a silent fix to incorrect behaviour in prior versions or if it's a bug in Revit 2018....</p>
-<p><strong>Report 2:</strong> I have also had this problem in Revit 2018. One of our addins crops a 3D view to the extents of a section box, which has worked in all prior versions of Revit until now (2018). The crop seems to be off by a variable amount depending on the location of the section box but it's not particularly consistent. It tends to be off by about 10 feet or so in X and Y directions...</p>
-<p><strong>Report 3:</strong> Section Box in Revit 2018 is indeed not working. I am having the same experience as fellas above. Code that used to work just fine in 2017 is not working in 2018. There are no errors or warnings, so I am not really sure what the issues are. My section box values look ok when I am debugging, transactions all complete, but when I open the view created, section box is off in space, even though its <code>BoundingBox</code> min and max would indicate that it's located properly. It's all very strange behavior. </p>
+<p><strong>Report 2:</strong> I have also had this problem in Revit 2018. One of our add-ins crops a 3D view to the extents of a section box, which has worked in all prior versions of Revit until now (2018). The crop seems to be off by a variable amount depending on the location of the section box but it's not particularly consistent. It tends to be off by about 10 feet or so in X and Y directions...</p>
+<p><strong>Report 3:</strong> Section Box in Revit 2018 is indeed not working. I am having the same experience as fellas above. Code that used to work just fine in 2017 is not working in 2018. There are no errors or warnings, so I am not really sure what the issues are. My section box values look ok when I am debugging, transactions all complete, but when I open the view created, section box is off in space, even though its <code>BoundingBox</code> min and max would indicate that it's located properly. It's all very strange behaviour. </p>
 <p><strong>Answer:</strong> Happily, as said, this issue is resolved by the new update.</p>
 <h4><a name="4"></a>CropBox Setting Workaround</h4>
 <p><strong>Workaround:</strong> Immediately before the release of the fix,
@@ -132,10 +135,10 @@ the following workaround:</p>
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> forum thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-api-2018-1-documentation/m-p/7388174">Revit 2018.1 API Documentation</a>:</p>
 <blockquote>
-<p><a href="http://www.revitapidocs.com">RevitApiDocs.com</a> has been updated to include the latest 2018.1 API:
-    - <a href="http://www.revitapidocs.com/2018.1"><b>www.revitapidocs.com/2018.1</b></a></p>
+<p><a href="http://www.revitapidocs.com">RevitApiDocs.com</a> has been updated to include the latest 2018.1 API:</br></br>
+<center><a href="http://www.revitapidocs.com/2018.1"><b>www.revitapidocs.com/2018.1</b></a></center></p>
 </blockquote>
 <p><center>
-<img src="img/revitapidocs_2018_1.png" alt="RevitApiDocs.com includes Revit 2018.1 API" width="762"/>
+<img src="img/revitapidocs_2018_1.png" alt="RevitApiDocs.com covers Revit 2018.1 API" width="762"/>
 </center></p>
 <p>Ever so many thanks to Gui for maintaining this invaluable resource!</p>
