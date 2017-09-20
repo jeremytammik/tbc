@@ -23,6 +23,21 @@
 --->
 
 <h3>ADN Xtra Labs and API Changes since Revit 2013</h3>
+<p>As usual, I am answering Revit API cases and maintaining the documentation and training material.</p>
+<p>What I really should be doing is preparing my upcoming class for Autodesk University in Darmstadt.</p>
+<p>On the good side, I went for a
+nice <a href="https://flic.kr/s/aHsm4AuoeE">climb up the south ridge of Bergseeschijen</a>:</p>
+<p><center>
+<a data-flickr-embed="true"  href="https://www.flickr.com/photos/jeremytammik/albums/72157686328819344" title="Bergseeschijen"><img src="img/bergseeschijen_813_500x375.jpg" width="500" height="375" alt="Bergseeschijen"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script></p>
+<!-- http://thebuildingcoder.typepad.com/img/bergseeschijen_813_500x375.jpg -->
+
+<p></center></p>
+<p>Here are some of the things I dealt with today:</p>
+<ul>
+<li><a href="#2">API Changes from Revit 2013 to Revit 2017</a></li>
+<li><a href="#3">ADN Xtra Revit API Labs for Revit 2018</a></li>
+<li><a href="#4">Access to Modified Combo Box Setting</a></li>
+</ul>
 <h4><a name="2"></a>API Changes from Revit 2013 to Revit 2017</h4>
 <p><a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1979353">Stever66</a> very
 kindly shared an useful document in 
@@ -73,8 +88,8 @@ produced <a href="zip/adn_xtra_2018_warnings_01.txt">7 warnings</a>.</p>
 <p>I removed one of them by deleting references to Revit API namespaces containing no members from the <code>FamilyVb</code> project,
 leaving  <a href="zip/adn_xtra_2018_warnings_02.txt">6 warnings</a> about due to use of a deprecated API call in <code>Labs2</code>, where tags are added to the little house model:</p>
 <ul>
-<li>C# warning CS0618: <code>Document.NewTag(View, Element, bool, TagMode, TagOrientation, XYZ)</code> is obsolete: This method is deprecated in Revit 2018 and will be removed in a future version. Use <code>IndependentTag.Create()</code> instead.</li>
-<li>VB warning BC40000: <code>Public Overloads Function NewTag(dbview As View, elemToTag As Element, addLeader As Boolean, tagMode As TagMode, tagOrientation As TagOrientation, pnt As XYZ) As IndependentTag</code> is obsolete: This method is deprecated in Revit 2018 and will be removed in a future version. Use <code>IndependentTag.Create()</code> instead.</li>
+<li>C# warning CS0618: <em>Document.NewTag(View, Element, bool, TagMode, TagOrientation, XYZ)</em> is obsolete: This method is deprecated in Revit 2018 and will be removed in a future version. Use <em>IndependentTag.Create()</em> instead.</li>
+<li>VB warning BC40000: <em>Public Overloads Function NewTag(dbview As View, elemToTag As Element, addLeader As Boolean, tagMode As TagMode, tagOrientation As TagOrientation, pnt As XYZ) As IndependentTag</em> is obsolete: This method is deprecated in Revit 2018 and will be removed in a future version. Use <em>IndependentTag.Create()</em> instead.</li>
 </ul>
 <p>I still need to find out how to determine the proper reference to the family instance to pass in to the new method.</p>
 <p>If anyone knows off-hand, please tell me.</p>
