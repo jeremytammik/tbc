@@ -18,8 +18,12 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+As usual, I am answering Revit API cases and maintaining the documentation and training material.
+What I really should be doing is preparing my upcoming class for Autodesk University in Darmstadt.
+Here are some of the things I dealt with today
+&ndash; API changes from Revit 2013 to Revit 2017
+&ndash; ADN Xtra Revit API Labs for Revit 2018
+&ndash; Access to modified combo box setting...
 
 --->
 
@@ -41,9 +45,9 @@ nice [climb up the south ridge of Bergseeschijen](https://flic.kr/s/aHsm4AuoeE):
 
 Here are some of the things I dealt with today:
 
-- [API Changes from Revit 2013 to Revit 2017](#2)
+- [API changes from Revit 2013 to Revit 2017](#2)
 - [ADN Xtra Revit API Labs for Revit 2018](#3)
-- [Access to Modified Combo Box Setting](#4)
+- [Access to modified combo box setting](#4)
 
 
 ####<a name="2"></a>API Changes from Revit 2013 to Revit 2017
