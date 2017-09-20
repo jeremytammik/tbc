@@ -16,7 +16,7 @@
 - 13399063 [Ribbon combobox string]
   https://forums.autodesk.com/t5/revit-api-forum/ribbon-combobox-string/m-p/7392732
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+ADN Xtra #RevitAPI Labs updated for Revit 2018 @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/changes_xtra
 
 As usual, I am answering Revit API cases and maintaining the documentation and training material.
 What I really should be doing is preparing my upcoming class for Autodesk University in Darmstadt.
