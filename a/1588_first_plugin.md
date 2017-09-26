@@ -18,7 +18,7 @@
   https://forums.autodesk.com/t5/revit-api-forum/modelessform-externalevent-sdk-sample/m-p/7370034
   workaround
 
-#RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+My First #RevitAPI Plugin Enhancements @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/firstplugin
 
 Today, let's return to the recurring topic of getting started with the Revit API, its SDK samples, and programming in general
 &ndash; My First Revit Plugin enhancements
