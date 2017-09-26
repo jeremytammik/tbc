@@ -20,12 +20,16 @@
 
 #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
 
-&ndash; 
-...
+Today, let's return to the recurring topic of getting started with the Revit API, its SDK samples, and programming in general
+&ndash; My First Revit Plugin enhancements
+&ndash; Getting started with web programming &ndash; FreeCodeCamp
+&ndash; ModelessForm_ExternalEvent initialisation...
 
 --->
 
 ### My First Revit Plugin Enhancements
+
+Today, let's return to the recurring topic of getting started with the Revit API, its SDK samples, and programming in general:
 
 - [My First Revit Plugin enhancements](#2)
 - [Getting started with web programming &ndash; FreeCodeCamp](#3)
