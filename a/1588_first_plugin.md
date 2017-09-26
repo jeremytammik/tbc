@@ -120,8 +120,12 @@ I passed it on to my colleagues for consideration next time the tutorial is re-r
 
 ####<a name="3"></a>Getting Started with Web Programming &ndash; FreeCodeCamp 
 
-By the way, in case you are interested in getting started with web programming in addition to the desktop and .NET based Revit API, I can highly recommend the training sequence provided 
-by [freeCodeCamp](https://www.freecodecamp.org/) covering the following list of topics:
+By the way, in case you are interested in getting started with web programming in addition to the desktop and .NET based Revit API, I can recommend the training sequence provided 
+by [freeCodeCamp](https://www.freecodecamp.org) covering the following list of topics:
+
+<center>
+<img src="img/freecodecamp_logo.png" alt="freeCodeCamp" width="263"/>
+</center>
 
 - Front End Development Certification
     - HTML5 and CSS
