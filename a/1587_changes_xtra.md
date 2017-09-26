@@ -165,5 +165,3 @@ The `comboBx_CurrentChanged` event handler is notified and called when the combo
 </pre>
  
 Store the updated value somewhere and make it available via an externally accessible method or property on your class and you will be all set and ready to go.
-
-

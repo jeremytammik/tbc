@@ -1,0 +1,173 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- https://forums.autodesk.com/t5/revit-api-forum/my-first-plugin-quick-modification/m-p/7408596
+
+- getting started with web programming
+
+- problem in SDK sample?
+  https://forums.autodesk.com/t5/revit-api-forum/modelessform-externalevent-sdk-sample/m-p/7370034
+  workaround
+
+#RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+
+&ndash; 
+...
+
+--->
+
+<h3>My First Revit Plugin Enhancements</h3>
+<ul>
+<li><a href="#2">My First Revit Plugin enhancements</a></li>
+<li><a href="#3">Getting started with web programming &ndash; FreeCodeCamp</a></li>
+<li><a href="#4">ModelessForm_ExternalEvent initialisation</a></li>
+</ul>
+<h4><a name="2"></a>My First Revit Plugin Enhancements</h4>
+<p>A couple of people recently mentioned issues getting started with the Revit API, e.g. in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> threads
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-api-visual-studio-error-warnings/m-p/7357530/thread-id/24998">Revit API Visual Studio error/warnings</a> 
+and <a href="https://forums.autodesk.com/t5/revit-api-forum/iexternalcommand-could-not-be-found/m-p/7386154">IExternalCommand could not be found</a>.</p>
+<p>There are several ways to quickly get started with the Revit API, which I present as completely and succinctly as I can in
+the <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#2">getting started overview</a>.</p>
+<p>The first problem you might encounter is getting your add-in loaded into Revit.</p>
+<p>That is simple to resolve once you understand what is going on.</p>
+<p>Once way is to follow
+the <a href="http://help.autodesk.com/view/RVT/2018/ENU/?guid=GUID-C574D4C8-B6D2-4E45-93A5-7E35B7E289BE">developer guide section on getting started</a> and
+work through the hello world samples presented there.</p>
+<p>Another way is to follow the <a href="http://www.autodesk.com/myfirstrevitplugin"><em>My First Plugin</em> video tutorial</a>.</p>
+<p><a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/5126255">Elie Accari</a> very
+kindly shared a couple of valuable enhancement suggestions for it in his thread 
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/my-first-plugin-quick-modification/m-p/7408596">My First Plugin &ndash; quick modification</a>:</p>
+<p>I refer to the high entropy body of knowledge
+in <a href="http://www.autodesk.com/myfirstrevitplugin">My First Plugin</a>.</p>
+<p>Other threads mentioned issues some users are facing getting the plugin to work.</p>
+<p>The above linked page includes a feedback email which has bounced back ("myfirstplugin wasn't found at autodesk.com"), so I am posting here in case new users seek to implement the same modification.</p>
+<p><b><u>Issue #1:</u></b> Location of the Plugin</p>
+<p>Not all users have access to the <code>AddIns</code> folder in <code>Program Files</code>, but all users have access to the <em>%AppData%\Roaming\Autodesk\Revit\addins\<version></em> folder. If this is mentioned in the tutorial, it can reduce the number of questions asked.</p>
+<p><b><u>Issue #2:</u></b> Unfamiliar Behaviour</p>
+<p>The code does not properly copy the group. It just places it where you click, which could be in the middle of the other room. A more familiar way is to do a Copy-From:-To:. Only 3 lines of code including 2 modifications are required.</p>
+<p><b><u>Modification #1:</u></b> Pick 2 points and calculate the distance between the two, instead of picking only 1 point.</p>
+<p>To do so, replace the following code in the original lesson:</p>
+<pre class="code">
+  //Pick a point
+  XYZ point = sel.PickPoint("Please pick a point to place group");
+</pre>
+
+<p>With the following:</p>
+<pre class="code">
+  //Pick a point
+  XYZ pointFrom = sel.PickPoint("Pick a point to copy From");
+  XYZ pointTo = sel.PickPoint("Pick a point to copy To");
+  //Calculate the distance between the two points
+  XYZ ptDist = pointTo - pointFrom;
+</pre>
+
+<p><b><u>Modification #2:</u></b> Use the Copy method instead of Place</p>
+<p>Replace the following line between the <code>trans.Start</code> and <code>trans.Commit</code> lines:</p>
+<pre class="code">
+  doc.Create.PlaceGroup(point, group.GroupType);     
+</pre>
+
+<p>With this line:</p>
+<pre class="code">
+  ElementTransformUtils.CopyElement(doc, elem.Id, ptDist);
+</pre>
+
+<p>Finally, a suggestion: the text seem to entice Revit users into programming. In this regard, I would consider doing the following:</p>
+<p>Add Lesson 0 (or renumber the lessons): Implement the same code in a macro using the Edit / SharpDevelop IDE readily accessible from inside Revit, without going to Microsoft Visual Studio.</p>
+<p>Then Lesson 1 could become: <em>Now let's do this again by converting this macro into an add-in</em>.</p>
+<p>Ever so many thanks to Elie for his constructive criticism and extremely helpful advice and suggestions!</p>
+<p>I passed it on to my colleagues for consideration next time the tutorial is re-recorded.</p>
+<h4><a name="3"></a>Getting Started with Web Programming &ndash; FreeCodeCamp</h4>
+<p>By the way, in case you are interested in getting started with web programming in addition to the desktop and .NET based Revit API, I can highly recommend the training sequence provided 
+by <a href="https://www.freecodecamp.org/">freeCodeCamp</a> covering the following list of topics:</p>
+<ul>
+<li>Front End Development Certification<ul>
+<li>HTML5 and CSS</li>
+<li>Responsive Design with Bootstrap</li>
+<li>jQuery</li>
+<li>Basic Front End Development Projects</li>
+<li>Basic JavaScript</li>
+<li>Object Oriented and Functional Programming</li>
+<li>Basic Algorithm Scripting</li>
+<li>JSON APIs and Ajax</li>
+<li>Intermediate Front End Development Projects</li>
+<li>Intermediate Algorithm Scripting</li>
+<li>Advanced Algorithm Scripting</li>
+<li>Advanced Front End Development Projects</li>
+<li>Claim Your Front End Development Certificate</li>
+</ul>
+</li>
+<li>Data Visualization Certification<ul>
+<li>Sass</li>
+<li>React</li>
+<li>React Projects</li>
+<li>D3</li>
+<li>Data Visualization Projects</li>
+<li>Claim Your Data Visualization Certificate</li>
+</ul>
+</li>
+<li>Back End Development Certification<ul>
+<li>Automated Testing and Debugging</li>
+<li>Node.js and Express.js</li>
+<li>Git</li>
+<li>MongoDB</li>
+<li>API Projects</li>
+<li>Dynamic Web Application Projects</li>
+<li>Claim Your Back End Development Certificate</li>
+</ul>
+</li>
+<li>Video Challenges<ul>
+<li>Computer Basics</li>
+<li>The DOM</li>
+<li>JavaScript Lingo</li>
+<li>Chrome Developer Tools</li>
+<li>Big O Notation</li>
+<li>Accessibility</li>
+<li>Agile</li>
+<li>Computer Science</li>
+<li>Data Visualization</li>
+<li>Embedded and Internet of Things</li>
+<li>Game Development</li>
+<li>Gamification</li>
+<li>Machine Learning</li>
+<li>Math for Programmers</li>
+<li>Mobile JavaScript Development</li>
+<li>DevOps</li>
+<li>Software Engineering Principles</li>
+<li>Statistics</li>
+<li>Tools</li>
+<li>User Experience Design</li>
+<li>Visual Design</li>
+</ul>
+</li>
+<li>Open Source for Good</li>
+<li>Coding Interview Preparation<ul>
+<li>Coding Interview Training</li>
+<li>Mock Interviews</li>
+</ul>
+</li>
+</ul>
+<p>If you are a complete beginner undecided what language to start with, the 11-minute video on <a href="https://youtu.be/VqiEhZYmvKk">what programming language should I learn? Front-end? Back-end? Machine learning?</a> might help:</p>
+<p><center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/VqiEhZYmvKk" frameborder="0" allowfullscreen></iframe>
+</center></p>
+<h4><a name="4"></a>ModelessForm_ExternalEvent Initialisation</h4>
+<p>Before closing, let me mention another little hint resolving an issue encountered
+by <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/2043172">Aziz</a> in 
+the <a href="https://forums.autodesk.com/t5/revit-api-forum/modelessform-externalevent-sdk-sample/m-p/7370034">ModelessForm_ExternalEvent SDK sample</a>:</p>
+<p><strong>Question:</strong> I am new to develop in Revit API getting started tutorials and all is going well until now, when I started with the SDK samples.</p>
+<p>I am just trying to implement the <code>ModelessForm_ExternalEvent</code> sample, but it keeps throwing me an exception stating that <em>Object reference not set to an instance of an object</em>.</p>
+<p><strong>Answer:</strong> However, after more trials, I tried to change something and it did magically work. I created a class instance from but not assigning it a null value. I am sharing it below in case someone else is experiencing the same issue:</p>
+<pre class="code">
+  // class instance
+  Public static Application thisApp = new Application();
+</pre>
