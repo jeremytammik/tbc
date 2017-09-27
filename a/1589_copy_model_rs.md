@@ -58,7 +58,7 @@ I had several different people try this and reproduce the error at `CopyModel` t
 
 Why am I so lucky?  If I log on to another machine using my credentials, it doesn’t work at download time for me either.
 
-I’m using Revit 2017 via RCE.
+I’m using Revit 2017.
  
 **Answer:** After much head banging and debugging, I discovered that if you use the `Application.CopyModel` .NET API for Revit Server downloads, the associated central server you wish to download from must be listed in the local workstation `RSN.INI` file:
 

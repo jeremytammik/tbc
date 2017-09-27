@@ -50,7 +50,7 @@ We are using a specific server <code>A</code>.  When users of <code>A</code> run
 </pre>
 
 <p>Why am I so lucky?  If I log on to another machine using my credentials, it doesn’t work at download time for me either.</p>
-<p>I’m using Revit 2017 via RCE.</p>
+<p>I’m using Revit 2017.</p>
 <p><strong>Answer:</strong> After much head banging and debugging, I discovered that if you use the <code>Application.CopyModel</code> .NET API for Revit Server downloads, the associated central server you wish to download from must be listed in the local workstation <code>RSN.INI</code> file:</p>
 <ul>
 <li>C:\ProgramData\Autodesk\Revit Server 2017\Config\RSN.INI</li>
