@@ -1,0 +1,102 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- email [Solved: Application.CopyModel error for Revit Server]
+
+- [Manage the point cloud visibility in Revit 3D view](https://www.linkedin.com/pulse/manage-point-cloud-visibility-revit-3d-view-sonas-api-pierre-navarra)
+  https://forums.autodesk.com/t5/revit-api-forum/hidding-scans-in-pointcloudinstance/m-p/7369983
+  solution
+
+ #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+
+&ndash; 
+...
+
+--->
+
+<h3>Copy Model to Revit Server</h3>
+<p>Today, I have two important results to share based on hard work by Tim Burnham and Pierre Navarra:</p>
+<ul>
+<li><a href="#2">Download from Revit Server requires RSN.INI entry</a></li>
+<li><a href="#3">Hiding a point cloud scan RCS in an RCP instance</a></li>
+</ul>
+<h4><a name="2"></a>Download from Revit Server Requires RSN.INI Entry</h4>
+<p>I discussed <a href="http://thebuildingcoder.typepad.com/blog/2011/12/copy-a-model-from-a-revit-server.html">copying a model from a Revit Server</a> six
+years ago.</p>
+<p>After all this time, an important caveat is required, prompted by Tim Burnham and all the blood, sweat and tears he spent on resolving an issue with an <code>Application.CopyModel</code> error for Revit Server:</p>
+<p><strong>Question:</strong> I wrote an application that interacts with Revit Server and downloads files for some RVT analytic processing.
+This always works well for me on my machine, but not for others.
+We are using a specific server <code>A</code>.  When users of <code>A</code> run my application, they can ping and iterate through all the server contents using my REST code, no problem.  However, when the app goes to download the file via <code>Application.CopyModel</code>, we are getting <em>The central model is missing</em> errors.  My Win7 laptop is not receiving these errors and is able to download fine every time.  Nobody else works.</p>
+<p>I had several different people try this and reproduce the error at <code>CopyModel</code> time.  Two are Win7, two are Win8.  All get the error.  As you can see here, there is nothing out of the ordinary with my sample:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;serverFilePath&nbsp;=&nbsp;<span style="color:maroon;">@&quot;RSN://XX.XX.X.XXX/Project1.rvt&quot;</span>;
+
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:#2b91af;">ModelPathUtils</span>.IsValidUserVisibleFullServerPath(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;serverFilePath&nbsp;)&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ModelPath</span>&nbsp;tempMp&nbsp;=&nbsp;<span style="color:#2b91af;">ModelPathUtils</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.ConvertUserVisiblePathToModelPath(&nbsp;serverFilePath&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;app.CopyModel(&nbsp;tempMp,&nbsp;<span style="color:maroon;">@&quot;C:\Temp\Project1.rvt&quot;</span>,&nbsp;<span style="color:blue;">true</span>&nbsp;);
+&nbsp;&nbsp;}
+</pre>
+
+<p>Why am I so lucky?  If I log on to another machine using my credentials, it doesn’t work at download time for me either.</p>
+<p>I’m using Revit 2017 via RCE.</p>
+<p><strong>Answer:</strong> After much head banging and debugging, I discovered that if you use the <code>Application.CopyModel</code> .NET API for Revit Server downloads, the associated central server you wish to download from must be listed in the local workstation <code>RSN.INI</code> file:</p>
+<ul>
+<li>C:\ProgramData\Autodesk\Revit Server 2017\Config\RSN.INI</li>
+</ul>
+<p>This file may not even exist if the client hasn’t done any RS integration work.</p>
+<p>Removing the central server IP from the .INI file will yield either <em>network communication</em> or <em>can’t detach from central</em> type errors.   </p>
+<p>I don’t believe this is documented for API use.</p>
+<p>If your local Revit install is set up with the server already, I assume the API will always work and this hidden behaviour will go undetected.</p>
+<p>I would expect the API should interact with RS assuming port 808 is open and you’re within the LAN/WAN confines.</p>
+<p>It might be useful to amend the initial article
+on <a href="http://thebuildingcoder.typepad.com/blog/2011/12/copy-a-model-from-a-revit-server.html">copying a model from a Revit Server</a> to
+include this info.</p>
+<p>Someone will thank you!</p>
+<p>Above all, a big thank you to Tim for sharing this important information and all his hard work in detecting and resolving the issue!</p>
+<h4><a name="3"></a>Hiding a Point Cloud Scan RCS in an RCP Instance</h4>
+<p>Another thank you is due
+to <a href="https://fr.linkedin.com/in/pierre-navarra-62032a107">Pierre Navarra</a>
+of <a href="http://www.sona-architecture.com">SONA Architecture</a> for
+his solution
+for <a href="https://www.linkedin.com/pulse/manage-point-cloud-visibility-revit-3d-view-sonas-api-pierre-navarra">managing the point cloud visibility in a Revit 3D view</a> discussed in 
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/hidding-scans-in-pointcloudinstance/m-p/7369983">hiding scans in <code>PointCloudInstance</code></a>:</p>
+<p><strong>Question:</strong> <code>PointCloudInstance</code> can return the list of scans by using <code>GetScans</code>.</p>
+<p>I'd like to make invisible a specific scan of a point cloud instance in my 3D view.</p>
+<p>The Revit API documentation says, "PointCloudOverrideSettings - Used to get or set the visibility, color mode, and PointCloudColorSettings for a PointCloudInstance or one of its scans."</p>
+<p>I can't find how to do it, though... Could you help me, please?</p>
+<p>Manually, in the user interface, I can make invisible an <code>rcs</code> from an <code>rcp</code> instance:</p>
+<p><center>
+<img src="img/rcs_visibility_in_rcp.jpg" alt="RCS visibility in RCP instance" width="793"/>
+</center></p>
+<p>I can use <code>GetScans</code> to obtain the list of all rcs from my rcp instance.</p>
+<p>With RevitLookup, however, I see no way to get the element ids of an individual rcs...</p>
+<p>And the help says about scans, "An .rcp file can contain multiple scans. The method PointCloudInstance.GetScans() returns a list of scan names which can be used to set visibility and fixed color overrides independently for each scan in the PointCloudInstance. PointCloudInstance.ContainsScan() indicates whether the given scan name is contained in the point cloud instance while PointCloudInstance.GetScanOrigin() will return the origin of the given scan in model coordinates."</p>
+<p>"PointCloudColorSettings - Used to assign specific colors for certain color modes to a PointCloudInstance element, or one of its scans. Does not apply if the PointCloudColorMode is NoOverride or Normals."</p>
+<p>But how to access the rcs id ?</p>
+<p><strong>Answer:</strong> I'm done, and it works!</p>
+<p>I wrote about it
+in <a href="https://www.linkedin.com/pulse/manage-point-cloud-visibility-revit-3d-view-sonas-api-pierre-navarra">managing the point cloud visibility in a Revit 3D view</a>.</p>
+<p>I use these API calls:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">PointCloudOverrideSettings</span>
+&nbsp;&nbsp;&nbsp;&nbsp;ptc_overridesettings_invisible
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">PointCloudOverrideSettings</span>();
+
+&nbsp;&nbsp;ptc_overrides.SetPointCloudScanOverrideSettings(
+&nbsp;&nbsp;&nbsp;&nbsp;pti.Id,&nbsp;ptc_overridesettings_invisible,
+&nbsp;&nbsp;&nbsp;&nbsp;scanname,&nbsp;doc&nbsp;);
+</pre>
+
+<p>Thank you for sharing this, Pierre!</p>
