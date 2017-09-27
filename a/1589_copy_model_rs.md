@@ -16,7 +16,7 @@
   https://forums.autodesk.com/t5/revit-api-forum/hidding-scans-in-pointcloudinstance/m-p/7369983
   solution
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Revit Server Download and Hiding Point Cloud Scan #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/downloadrs
 
 Today, I have two important results to share based on hard work by Tim Burnham and Pierre Navarra
 &ndash; Download from Revit Server requires RSN.INI entry
