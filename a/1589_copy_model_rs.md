@@ -23,7 +23,7 @@
 
 --->
 
-### Copy Model to Revit Server
+### Download from Revit Server and Hide a Point Cloud Scan
 
 Today, I have two important results to share based on hard work by Tim Burnham and Pierre Navarra:
 
