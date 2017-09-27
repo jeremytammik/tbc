@@ -18,12 +18,13 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+Today, I have two important results to share based on hard work by Tim Burnham and Pierre Navarra
+&ndash; Download from Revit Server requires RSN.INI entry
+&ndash; Hiding a point cloud scan RCS in an RCP instance...
 
 --->
 
-### Download from Revit Server and Hide a Point Cloud Scan
+### Revit Server Download and Hiding Point Cloud Scan
 
 Today, I have two important results to share based on hard work by Tim Burnham and Pierre Navarra:
 
