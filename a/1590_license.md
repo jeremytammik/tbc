@@ -10,7 +10,7 @@
 
 <!---
 
-Vacation and Open Source Code Licenses #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Vacation and Open Source Code Licenses #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/oslicense
 
 Let me take leave from you for a short vacation.
 I recently repeated the importance of a license when sharing source code for reuse by others and pointed to these previous discussions
