@@ -1,0 +1,378 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- 13270564 [Revit 2018 loses focus on close of modeless Addin]
+  two workarunds to keep Revit on top
+
+ #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+
+&ndash; 
+...
+
+--->
+
+<h3>Modeless Form Keeping Revit Focused and On Top</h3>
+<p>Hank DiVincenzo, Sr. Software Engineer at <a href="http://www.ideateinc.com">Ideate, Inc</a>.</p>
+<p>We here at Ideate Software are seeing what appears to be Revit Addin ownership issues with Revit’s Main Window. </p>
+<p>The behavior has changed between Revit 2017 and Revit 2018 for modeless Addins.</p>
+<p>For Revit 2018, when a Modeless Addin is closed, Revit does not retain is focus; it is pushed behind another application. </p>
+<p>With some experimentation, it was found the application that had focus before Revit is the one that gains focus after the Modeless Addin is closed. </p>
+<p>Revit 2016 and 2017 do not show this behavior, only Revit 2018 does. </p>
+<p>Looking for advice on this issue. Is this a known issue? And is there a known method to solve it? </p>
+<p>Also Note: </p>
+<p>What we understand as the preferred method of getting Revit’s MainWindowHandle has issues when there are multiple Modeless Addins opened. </p>
+<p>When the MainWindowHandle is gotten from the Revit process (i.e. Process.GetCurrentProcess().MainWindowHandle), Modeless Addin ownership is not correct. </p>
+<p>Any Modeless Addin that is started after the first one has its ownership set to that previous Modeless Addin. This can be seen by closing any of the interim Modeless Addins and any Modeless Addins started after the one being closed, also closes. </p>
+<p>Any information or assistance on this would be appreciated, though our current concern is the change in the 2018 behavior.</p>
+<p><strong>Answer:</strong></p>
+<p>I assume that you in fact mean 'parent relationship of the modeless form' when you say 'ownership of the add-in'.</p>
+<p>Is that assumption correct?</p>
+<p>I myself have always used the JtWindowHandle class to retrieve the main Revit window handle, and set up the parent window relationshipe for my modeless forms using that as described here:</p>
+<p>http://thebuildingcoder.typepad.com/blog/2010/06/revit-parent-window.html</p>
+<p>I have been notified by the development team that this method will cease to work in the next major release of Revit, after Revit 2018.</p>
+<p>I am not aware of any such issues in Revit 2018.</p>
+<p>Did it appear in the initial release or a subsequent update?</p>
+<p><strong>Response:</strong></p>
+<p>First thanks for the response and yes, what I have called Owner is the parent relationship. </p>
+<p>NOTE:</p>
+<ul>
+<li>The Addin is a WPF Addin. </li>
+<li>The Revit focus issue is only seen in Revit 2018 </li>
+</ul>
+<p>To reproduce the Revit 2018 focus issue: </p>
+<p>1) Start another app, like the Windows File Manager 
+2) Start Revit 2018 
+3) From the Addin-Ins Tab &gt;&gt; External Tool Panel Start the app “Id8 SearchWindow Owner Setup” 
+4) From the Addin’s dialog open the model dialog by pressing the button “Start Dialog” in the lower right corner of the Addin dialog. 
+5) Close the second/modal dialog 
+6) Close the Addin 
+7) At this point the first app that was started, “File Manager”, will be brought to the foreground, covering Revit; Revit is no longer the top application having focus. </p>
+<p>Now for Some perinate history: </p>
+<p>Within the External Tools there are two applications. </p>
+<p>The “Search Window” Addin is currently how we are getting Revit’s main window and exhibits the issue I am talking about. </p>
+<p>The second or “Id8 MainWindow Owner Setup” is how we use to get Revit’s main window, and uses the prescribed way of getting the main window the Process.GetCurrentProcess.MainWindow property. </p>
+<p>When we moved to using WPF Addins, using the “current process” MainWindow property had issues and we came up with the current method what I am calling the “Search Window”. This method of getting Revit’s Main Window is somewhat complicated but got us working for the Revit 2017 release, it was only during the 2018 release did we see the loss of focus issue within Revit 2018. </p>
+<p>Now the issues we had with using the Process.GetCurrentProcess.MainWindow property. </p>
+<p>When multiple (any number) of Modeless Addins are started, when the first Addin that was open is closed all of the Modeless Addins close. </p>
+<p>Matter of fact if any Modeless Addin is closed all Modeless Addin start after the one being closed also close. </p>
+<p>i.e. if three Modeless Addins are opened, if the second Addin is closed the third started addin is closed also. </p>
+<p>NOTE: this was first seen with two Forms base Addins so WPF was not in play when we ran into this behavior. </p>
+<p>To Reproduce the original Closing issue: </p>
+<p>1) Start Revit 
+2) From the Addin-Ins Tab &gt;&gt; External Tool Panel Start the app “Id8 MainWindow Owner Setup” 
+3) Start a second “Id8 MainWindow Owner Setup” 
+4) Start a third “Id8 MainWindow Owner Setup” 
+5) Close the first “Id8 MainWindow Owner Setup” App 
+6) All three of the “Id8 MainWindow Owner Setup” Apps close down. </p>
+<p><strong>Answer:</strong></p>
+<p>Can you work around it for the time being, or live with it?</p>
+<p>The reason I ask is the following information I received from the development team:</p>
+<p>One of the Revit Advanced Steel developers pointed out that they followed The Building Code advice in building a new add-in:</p>
+<p>http://thebuildingcoder.typepad.com/blog/2012/10/ensure-wpf-add-in-remains-in-foreground.html</p>
+<p>This was written about 5 years ago.</p>
+<p>Please note that as of Revit 2019, the method described in the blog will no longer work. </p>
+<p>There is a way to fix this. The Revit API team has added two new APIs that provide an official way to get the application window handle:</p>
+<ul>
+<li><code>Autodesk.Revit.UI.UIControlledApplication.MainWindowHandle</code></li>
+<li><code>Autodesk.Revit.UI.UIApplication.MainWindowHandle</code></li>
+<li>Get the handle of the Revit main window.</li>
+<li>Returns the main window handle of the Revit application. This handle should be used when displaying modal dialogs and message windows to ensure that they are properly parented. This property replaces the System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle property, which is no longer a reliable method for retrieving the main window handle starting with Revit 2019.</li>
+</ul>
+<p>Therefore, the issue you describe has already been resolved for future versions.</p>
+<p>I don't know how much can be done about it for the current version.</p>
+<p>I would expect that an experienced Windows programming expert could devise some kind of workaround.</p>
+<p>Do you have one already, or can you create one?</p>
+<p><strong>Response:</strong></p>
+<p>Yes, I did solve it but was hoping there was a solution like you have explained below, where an Addin could just get the Main Window handle from a Revit API call, so this is good news, I will look for it in the latest Revit Preview?</p>
+<p>I am more than willing to do a write up on what was done to solve the issue. Let me know what form you want it in, via this case, a direct email, etc.</p>
+<p>Here is the writeup of the window issues we ran into and have solved.</p>
+<p>Also I have uploaded to the case (ModelessAddinSolution.zip) a VS project for an Add-In that can be used to demonstrate the focus issue and it’s solution. Note, also below in the write up are the instruction on how to duplicate the focus issue with the Add-In. Note, within the VS project is the .addin file for the Add-In, it is in the “External Application” folder.</p>
+<p>Let me know if you need more information or clarification.</p>
+<p>The project is a Visual Studio 2013 project.</p>
+<p>Thanks, Hank</p>
+<h4><a name="2"></a>Writeup of the Issues</h4>
+<h4><a name="2"></a>First Issue Context:</h4>
+<p>This describes my journey to solve two issues with Revit add-in windows. The first issue was a general problem seen in all version of Revit, the second issue was specific to Revit 2018.</p>
+<h4><a name="2"></a>The First Problem</h4>
+<p>While developing a second modeless add-in we ran into an issue with add-in window parenting/ownership. The problem manifested itself when having two modeless add-ins open: when the first add-in opened was closed, the second add-in opened also closed. With this behavior, it was apparent the second add-in was somehow being associated with the first add-in. We were using the prescribed method of getting the main window for Revit, Process.GetCurrentProcess().MainWindow. Somehow once the first modeless add-in was opened, the MainWindow property for the Revit process changed. A new method for getting Revit’s main window was needed.</p>
+<h4><a name="2"></a>The First Resolution</h4>
+<p>An alternate solution was needed to get the window handle for Revit’s main window, the window that holds the ribbon and is the first window opened.</p>
+<p>The following solution was implemented:</p>
+<ul>
+<li>Find all windows within the Revit process</li>
+<li>
+<p>Find the Revit windows that do not have a parent assigned to them, i.e. their parent/owner property is null.
+The thought here is windows that have no parent are those opened by the OS and not another part of Revit.</p>
+</li>
+<li>
+<p>Then for the Revit windows not having a parent, find the one window that has “Autodesk Revit” within its title.</p>
+</li>
+</ul>
+<p>This method seems fragile because it depends on text from Revit’s main window title, but it consistently gets the Revit main window no matter what add-ins are open. And localization is not an issue, the main window title text “Autodesk Revit” does not change for other languages, see the two language examples.</p>
+<p>Examples of other languages:</p>
+<p>French:
+[cid:image001.jpg@01D33936.232E7220]</p>
+<p>German
+[cid:image002.png@01D33936.232E7220]</p>
+<p>NOTE: See the below section “Code Example for First Resolution” for the solution to this first issue.</p>
+<h4><a name="2"></a>Second Issue Context:</h4>
+<p>With the main window found and working for Revit 2016 and 2017, all was good and a couple more WPF modeless applications were developed. Then came Revit 2018…</p>
+<h4><a name="2"></a>The Second Problem:</h4>
+<p>While porting our add-in(s) to Revit 2018, we noticed Revit lose focus from time to time. When our modeless (WinForms based) add-in window was closed, Revit was not left on top with focus, rather the application that had focus before Revit was placed on top. This was a surprise being something that Windows should handle. Notable was this new losing focus behavior was only seen in Revit 2018, and not in 2017 or 2016.</p>
+<p>An example of the sequence would be:</p>
+<ul>
+<li>open Revit</li>
+<li>open Windows File Manager and ensure it is placed on top of Revit</li>
+<li>switch back to Revit</li>
+<li>open the add-in</li>
+<li>close the add-in</li>
+</ul>
+<p>File Manager would now be placed on top, i.e. Revit lost its position in the application stack/show, and was replaced by File Manager.</p>
+<p>The above was the case for the WinForms based add-ins, but WPF based add-ins needed additional steps:</p>
+<ul>
+<li>open Revit</li>
+<li>open Windows File Manager and ensure it is placed on top of Revit</li>
+<li>switch back to Revit</li>
+<li>open the add-in</li>
+<li>open a modal dialog from the Modeless add-in</li>
+<li>close the modal dialog</li>
+<li>close the add-in</li>
+</ul>
+<p>File Manager would then be placed on top, replacing Revit as the top application.</p>
+<h4><a name="2"></a>The Second Resolution:</h4>
+<p>The resolution for the loss of focus ended up being somewhat simple.</p>
+<p>I registered for the OnClosing() event in the add-in’s main window. Within the OnClosing() event handler, I set Revit to be on top with the User32.dll call SetForegroundWindow().</p>
+<p>Because the owner/parent of the add-in window was set correctly for Revit, setting the add-in’s Owner (Revit) on closing to be in the foreground solved the focus problem.</p>
+<p>NOTE: See the section “Code for Second Resolution” below for the solution to this issue.</p>
+<p>To Run the Sample Add-In:</p>
+<ul>
+<li>Open Revit 2018</li>
+<li>Open File Manager, ensure it is on top of Revit</li>
+<li>Switch back Revit, bring Revit to the top</li>
+<li>To see the solution</li>
+<li>Pick the “Id8 Revit 2018 Focus Solution” command From the Add-Ins Panel &gt; Extern Tools</li>
+<li>Press the “Start Dialog” button</li>
+<li>Close the new dialog</li>
+<li>Close the Add-In dialog</li>
+<li>Revit Stays on top</li>
+<li>To see the Focus issue</li>
+<li>Pick the “Id8 Revit 2018 Focus Solution” command From the Add-Ins Panel &gt; Extern Tools</li>
+<li>Uncheck the “Fix Focus Issue” checkbox</li>
+<li>Press the “Start Dialog” button</li>
+<li>Close the new dialog</li>
+<li>Close the Add-In dialog</li>
+<li>Revit is no longer on top, replaced by File Manager</li>
+</ul>
+<h4><a name="2"></a>Code Example for First Resolution:</h4>
+<p>Class usage within the Addin’s Main Window, Addin is WPF app</p>
+<pre class="code">
+// Set Revit as owner of given child window
+WindowHandleSearch handle = WindowHandleSearch.MainWindowHandle;
+handle.SetAsOwner(this);
+
+Main Window Handle Class
+
+/// <summary>
+/// Wrapper class for window handles
+/// </summary>
+public class WindowHandleSearch : IWin32Window, System.Windows.Forms.IWin32Window
+{
+#region Static methods
+/// <summary>
+/// Revit main window handle
+/// </summary>
+static public WindowHandleSearch MainWindowHandle
+{
+get
+{
+// Get handle of main window
+var revitProcess = Process.GetCurrentProcess();
+return new WindowHandleSearch(GetMainWindow(revitProcess.Id));
+}
+}
+#endregion
+
+#region Constructor
+/// <summary>
+/// Constructor - From WinForms window handle
+/// </summary>
+/// <param name="hwnd">Window handle</param>
+public WindowHandleSearch(IntPtr hwnd)
+{
+// Assert valid window handle
+Debug.Assert(IntPtr.Zero != hwnd, "Null window handle");
+
+Handle = hwnd;
+}
+#endregion
+
+#region Methods
+/// <summary>
+/// Window handle
+/// </summary>
+public IntPtr Handle { get; private set; }
+
+/// <summary>
+/// Set this window handle as the owner of the given window
+/// </summary>
+/// <param name="childWindow">Child window whose parent will be set to be this window handle</param>
+public void SetAsOwner(Window childWindow)
+{
+var helper = new WindowInteropHelper(childWindow) { Owner = Handle };
+}
+
+// User32.dll calls used to get the Main Window for a Process Id (PID)
+private delegate bool EnumWindowsProc(HWND hWnd, int lParam);
+
+[DllImport("user32.DLL")]
+private static extern bool EnumWindows(EnumWindowsProc enumFunc, int lParam);
+
+[DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
+private static extern IntPtr GetParent(IntPtr hWnd);
+
+[DllImport("user32.dll", SetLastError = true)]
+private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+
+[DllImport("user32.DLL")]
+private static extern IntPtr GetShellWindow();
+
+[DllImport("user32.DLL")]
+private static extern bool IsWindowVisible(HWND hWnd);
+
+[DllImport("user32.DLL")]
+private static extern int GetWindowTextLength(HWND hWnd);
+
+[DllImport("user32.DLL")]
+private static extern int GetWindowText(HWND hWnd, StringBuilder lpString, int nMaxCount);
+
+/// <summary>
+/// Returns the main Window Handle for the Process Id (pid) passed in.
+/// IF the Main Window is not found then a handle value of Zreo is returned, no handle.
+/// </summary>
+/// <param name="pid"></param>
+/// <returns></returns>
+public static IntPtr GetMainWindow(int pid)
+{
+HWND shellWindow = GetShellWindow();
+List<HWND> windowsForPid = new List<IntPtr>();
+
+try
+{
+EnumWindows(
+// EnumWindowsProc Function, does the work on each window.
+delegate(HWND hWnd, int lParam)
+{
+if (hWnd == shellWindow) return true;
+if (!IsWindowVisible(hWnd)) return true;
+
+uint windowPid = 0;
+GetWindowThreadProcessId(hWnd, out windowPid);
+
+// if window is from Pid of interest, see if its the Main Window
+if (windowPid == pid)
+{
+// By default Main Window has a Parent Window of Zero, no parent.
+HWND parentHwnd = GetParent(hWnd);
+if (parentHwnd == IntPtr.Zero)
+windowsForPid.Add(hWnd);
+}
+
+return true;
+}
+// lParam, nothing, null...
+, 0);
+}
+catch (Exception)
+{ }
+
+return DetermineMainWindow(windowsForPid);
+}
+
+/// <summary>
+/// Finds Revit's Main Window from the list of window handles passed in.
+/// If the Main Window for Revit is not found then a Null (IntPtr.Zero) handle is returnd.
+/// </summary>
+/// <param name="handels"></param>
+/// <returns></returns>
+private static IntPtr DetermineMainWindow(List<HWND> handels)
+{
+// Safty conditions, bail if not met.
+if (handels == null || handels.Count <= 0)
+return IntPtr.Zero;
+
+// default Null handel
+HWND mainWindow = IntPtr.Zero;
+
+// only one window so return it, must be the Main Window??
+if (handels.Count == 1)
+{
+mainWindow = handels[0];
+}
+// more than one window
+else
+{
+// more than one candidate for Main Window so find the
+// Main Window by its Title, it will contain "Autodesk Revit"
+foreach (var hWnd in handels)
+{
+int length = GetWindowTextLength(hWnd);
+if (length == 0) continue;
+
+StringBuilder builder = new StringBuilder(length);
+GetWindowText(hWnd, builder, length + 1);
+
+// Depending on the Title of the Main Window to have "Autodesk Revit" in it.
+if (builder.ToString().ToLower().Contains("autodesk revit"))
+{
+mainWindow = hWnd;
+break; // found Main Window stop and return it.
+}
+}
+}
+
+return mainWindow;
+}
+#endregion
+}
+</pre>
+
+<h4><a name="2"></a>Code Example for Second Resolution:</h4>
+<pre class="code">
+/// <summary>
+/// User32 calls used to set Revit focus
+/// </summary>
+[DllImport("USER32.DLL")]
+internal static extern bool SetForegroundWindow(HWND hWnd);
+
+/// <summary>
+/// Use the OnClose event to ensure Revit is brought back into focus.
+/// </summary>
+/// <param name="e"></param>
+protected override void OnClosing(CancelEventArgs e)
+{
+// do the base work first.
+base.OnClosing(e);
+
+// Set Revit to the foreground
+try
+{
+IntPtr ownerIntPtr = new WindowInteropHelper(this).Owner;
+if (ownerIntPtr != IntPtr.Zero)
+User32.SetForegroundWindow(ownerIntPtr);
+}
+catch (Exception)
+{}
+}
+</pre>
+
+<p><center>
+<img src="img/.jpg" alt="" width="200"/>
+</center></p>
