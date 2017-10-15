@@ -22,14 +22,16 @@
 
 ### Modeless Form Keeping Revit Focused and On Top
 
-I am back from a nice break on the Maremma beach:
+I am back from a nice break in Italy, including a visit to
+the [Giardino dei Tarocchi](https://en.wikipedia.org/wiki/Tarot_Garden),
+the Tarot Garden sculpture garden based on the tarot cards, created by Niki de Saint Phalle
+([photos](https://flic.kr/s/aHsm6U4nnA)):
 
 <center>
-<img src="img/.jpg" alt="" width="200"/>
+<img src="img/975_beach_breakfast_1k.jpg" alt="Breakfost on the beach" width="500"/>
 </center>
 
-
-Hank DiVincenzo, Sr. Software Engineer at [Ideate, Inc](http://www.ideateinc.com).
+Before I get back to work properly, here is a note from Hank DiVincenzo, Sr. Software Engineer at [Ideate, Inc](http://www.ideateinc.com), on keeping Revit focused and on top when working with a modeless form:
 
 We here at Ideate Software are seeing what appears to be Revit Addin ownership issues with Revit’s Main Window. 
 
