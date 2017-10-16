@@ -28,43 +28,54 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-...
+I am attending the Forge DevCon conference in Darmstadt, Germany, right now, and putting the final touches to my presentation on <i>Rational BIM programming using Revit and Forge</i> at the European Autodesk University on Wednesday.
+We discussed several different approaches to retrieve the outer loop of a planar face.
+Richard Thomas recently shared a possible solution to determine the outer-most EdgeLoop.
+He now posted a new approach:
+I found a more straightforward and likely reliable way of getting outer loops of planar faces. This method also allows for faces made up of disjointed parts...
 
 --->
 
-### Disjunct Outer Loops from Planar Face with Separate Parts
+### Disjunct Planar Face Outer Loops
 
-I am attending the Forge DevCon conference in Darmstadt, Germany, right now, and putting the final touches to my presentation on rational BIM programming using Revit and Forge my European Autodesk University on Wednesday.
+I am attending the Forge DevCon conference in Darmstadt, Germany, right now, and putting the final touches to my presentation on *Rational BIM programming using Revit and Forge* at the European Autodesk University on Wednesday.
 
-We discussed several different approaches to retrieve the outer loop of a planar face in the past:
+We discussed several different approaches to retrieve the outer loop of a planar face.
+
+One useful piece of related functionality was provided early on by 
+the [point in polygon algorithm](http://thebuildingcoder.typepad.com/blog/2010/12/point-in-polygon-containment-algorithm.html).
+
+Previous discussions of this topic include:
 
 - [Determining Wall Opening Areas per Room](http://thebuildingcoder.typepad.com/blog/2016/04/determining-wall-opening-areas-per-room.html)
-- [Copy Local False and IFC Utils for Wall Openings](http://thebuildingcoder.typepad.com/blog/2017/06/copy-local-false-and-ifc-utils-for-wall-openings.html)
-- [Edge Loop, Point Reference Plane and Column Line](http://thebuildingcoder.typepad.com/blog/2017/08/edge-loop-point-reference-plane-and-column-line.html)
+- [The `ExporterIFCUtils` method `GetInstanceCutoutFromWall` returns the outer CurveLoop of a window or a door](http://thebuildingcoder.typepad.com/blog/2017/06/copy-local-false-and-ifc-utils-for-wall-openings.html)
 
-Recently, it also turned to the additional complexity of retrieving the multiple outer loops required for disjunct planar faces:
+Recently, it also turned to the additional complexity of retrieving the multiple outer loops required for disjunct planar faces, raised in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on whether [the first edge loop is still the outer loop](https://forums.autodesk.com/t5/revit-api-forum/is-the-first-edgeloop-still-the-outer-loop/m-p/7225379),
+for which Richard [@rpthomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+shared a possible solution:
 
-Richard [@rpthomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
-shared a valuable new contribution to this ongoing discussion in
+- [Determining the outer-most EdgeLoop](http://thebuildingcoder.typepad.com/blog/2017/08/edge-loop-point-reference-plane-and-column-line.html)
+
+He now posted a new approach to this question in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [outer loops of planar face with separate parts](https://forums.autodesk.com/t5/revit-api-forum/outer-loops-of-planar-face-with-separate-parts/m-p/7461348):
 
 Just wanted to report that I've found a more straightforward and likely reliable way of getting outer loops of planar faces (than previous discussed). This method also allows for faces made up of disjointed parts.
  
-The approach is to create some undocumented solid extrusions using GeometryCreationUtilities based on curve loop parts of original face. Then extract the parallel top face from these (now separated out) and use powerful built in functionality of the PlanarFace class (PlanarFace.IsInside) to check for loops with points not inside other faces. We only have to check one point because curveloops can't be self intersecting.
+The approach is to create some undocumented solid extrusions using GeometryCreationUtilities based on curve loop parts of original face. Then extract the parallel top face from these (now separated out) and use powerful built in functionality of the `PlanarFace` class (`PlanarFace.IsInside`) to check for loops with points not inside other faces. We only have to check one point because curve loops can't be self-intersecting.
  
-It would be nice if we could create PlanarFace elements directly with the GeometryCreationUtilities (to cut out some of the above steps) but that does not seem possible yet. I've created an idea entry here for this.
+It would be nice if we could create `PlanarFace` elements directly with the `GeometryCreationUtilities` (to cut out some of the above steps), but that does not seem possible yet. I've created an idea entry here for this:
+[API GeometryCreationUtilities to create faces](https://forums.autodesk.com/t5/revit-ideas/api-geometrycreationutilities-to-create-faces/idi-p/7461357).
 
-https://forums.autodesk.com/t5/revit-ideas/api-geometrycreationutilities-to-create-faces/idi-p/7461357
-
-I've tested this on some interesting slab shapes below and results seem reliable.
+I've tested this solution on some interesting slab shapes shown below and results seem reliable.
 
 <center>
 <img src="img/disjunct_outer_loops.png" alt="Disjunct outer loops" width="501"/>
 </center>
 
-
-VB:
+####<a name="2"></a>VB Implementation
  
 <pre class="code">
 <span style="color:blue;">Public</span>&nbsp;<span style="color:blue;">Function</span>&nbsp;GetPlanarFaceOuterLoops(
@@ -180,7 +191,7 @@ VB:
 <span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Function</span>
 </pre>
 
-C#:
+####<a name="3"></a>C# Implementation
  
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">Result</span>&nbsp;GetPlanarFaceOuterLoops(&nbsp;
@@ -327,3 +338,9 @@ C#:
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;outval;
 &nbsp;&nbsp;}
 </pre>
+ 
+I added the latter 
+to [The Building Coder samples release 2018.0.134.4](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.134.4)
+module [CmdSlabBoundaryArea.cs L29-L176](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSlabBoundaryArea.cs#L29-L176).
+ 
+Many thanks to Richard for implementing, testing and sharing this improved solution!
