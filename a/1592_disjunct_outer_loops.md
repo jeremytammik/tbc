@@ -1,0 +1,329 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head>
+
+<!---
+
+- https://forums.autodesk.com/t5/revit-api-forum/outer-loops-of-planar-face-with-separate-parts/m-p/7461348
+  - 11223294 [face.EdgeLoops, identify inner and outer loops]
+  - determine outer edges:
+    C:\a\doc\revit\blog\img\line_contour.jpg
+    Problem sounds quite simple - to find contour of lines (as in attached picture).
+    do you mean the outer lines only?
+    'contour' is the wrong word, it is used for elevation contour lines in gis.
+    i think a lot depends on where you are getting these edges from.
+    you could certainly use the in polygon algorithm, pick a point on each edge and check whether it lies within the total polygon:
+    http://thebuildingcoder.typepad.com/blog/2010/12/point-in-polygon-containment-algorithm.html
+    you may have to check points slightly to the right and to the left of each edge segment. if both the left and the right-hand point is inside the total polygon, the edge is internal.
+  1423 1572 1581
+  - 13179537 [Is the first Edgeloop still the outer loop?]
+    https://forums.autodesk.com/t5/revit-api-forum/is-the-first-edgeloop-still-the-outer-loop/m-p/7225379
+
+
+ #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+
+...
+
+--->
+
+### Disjunct Outer Loops from Planar Face with Separate Parts
+
+I am attending the Forge DevCon conference in Darmstadt, Germany, right now, and putting the final touches to my presentation on rational BIM programming using Revit and Forge my European Autodesk University on Wednesday.
+
+We discussed several different approaches to retrieve the outer loop of a planar face in the past:
+
+- [Determining Wall Opening Areas per Room](http://thebuildingcoder.typepad.com/blog/2016/04/determining-wall-opening-areas-per-room.html)
+- [Copy Local False and IFC Utils for Wall Openings](http://thebuildingcoder.typepad.com/blog/2017/06/copy-local-false-and-ifc-utils-for-wall-openings.html)
+- [Edge Loop, Point Reference Plane and Column Line](http://thebuildingcoder.typepad.com/blog/2017/08/edge-loop-point-reference-plane-and-column-line.html)
+
+Recently, it also turned to the additional complexity of retrieving the multiple outer loops required for disjunct planar faces:
+
+Richard [@rpthomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+shared a valuable new contribution to this ongoing discussion in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [outer loops of planar face with separate parts](https://forums.autodesk.com/t5/revit-api-forum/outer-loops-of-planar-face-with-separate-parts/m-p/7461348):
+
+Just wanted to report that I've found a more straightforward and likely reliable way of getting outer loops of planar faces (than previous discussed). This method also allows for faces made up of disjointed parts.
+ 
+The approach is to create some undocumented solid extrusions using GeometryCreationUtilities based on curve loop parts of original face. Then extract the parallel top face from these (now separated out) and use powerful built in functionality of the PlanarFace class (PlanarFace.IsInside) to check for loops with points not inside other faces. We only have to check one point because curveloops can't be self intersecting.
+ 
+It would be nice if we could create PlanarFace elements directly with the GeometryCreationUtilities (to cut out some of the above steps) but that does not seem possible yet. I've created an idea entry here for this.
+
+https://forums.autodesk.com/t5/revit-ideas/api-geometrycreationutilities-to-create-faces/idi-p/7461357
+
+I've tested this on some interesting slab shapes below and results seem reliable.
+
+<center>
+<img src="img/disjunct_outer_loops.png" alt="Disjunct outer loops" width="501"/>
+</center>
+
+
+VB:
+ 
+<pre class="code">
+<span style="color:blue;">Public</span>&nbsp;<span style="color:blue;">Function</span>&nbsp;GetPlanarFaceOuterLoops(
+&nbsp;&nbsp;<span style="color:blue;">ByVal</span>&nbsp;commandData&nbsp;<span style="color:blue;">As</span>&nbsp;Autodesk.Revit.UI.<span style="color:#2b91af;">ExternalCommandData</span>,
+&nbsp;&nbsp;<span style="color:blue;">ByRef</span>&nbsp;message&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">String</span>,
+&nbsp;&nbsp;<span style="color:blue;">ByVal</span>&nbsp;elements&nbsp;<span style="color:blue;">As</span>&nbsp;Autodesk.Revit.DB.<span style="color:#2b91af;">ElementSet</span>)&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Result</span>
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;IntApp&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">UIApplication</span>&nbsp;=&nbsp;commandData.Application
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;IntUIDoc&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">UIDocument</span>&nbsp;=&nbsp;IntApp.ActiveUIDocument
+&nbsp;&nbsp;<span style="color:blue;">If</span>&nbsp;IntUIDoc&nbsp;<span style="color:blue;">Is</span>&nbsp;<span style="color:blue;">Nothing</span>&nbsp;<span style="color:blue;">Then</span>&nbsp;<span style="color:blue;">Return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Failed&nbsp;<span style="color:blue;">Else</span>
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;IntDoc&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;=&nbsp;IntUIDoc.Document
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;R&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Reference</span>&nbsp;=&nbsp;<span style="color:blue;">Nothing</span>
+&nbsp;&nbsp;<span style="color:blue;">Try</span>
+&nbsp;&nbsp;&nbsp;&nbsp;R&nbsp;=&nbsp;IntUIDoc.Selection.PickObject(<span style="color:#2b91af;">Selection</span>.ObjectType.Face)
+&nbsp;&nbsp;<span style="color:blue;">Catch</span>&nbsp;ex&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Exception</span>
+&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Try</span>
+&nbsp;&nbsp;<span style="color:blue;">If</span>&nbsp;R&nbsp;<span style="color:blue;">Is</span>&nbsp;<span style="color:blue;">Nothing</span>&nbsp;<span style="color:blue;">Then</span>&nbsp;<span style="color:blue;">Return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Cancelled&nbsp;<span style="color:blue;">Else</span>
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;F_El&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;=&nbsp;IntDoc.GetElement(R.ElementId)
+&nbsp;&nbsp;<span style="color:blue;">If</span>&nbsp;F_El&nbsp;<span style="color:blue;">Is</span>&nbsp;<span style="color:blue;">Nothing</span>&nbsp;<span style="color:blue;">Then</span>&nbsp;<span style="color:blue;">Return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Failed&nbsp;<span style="color:blue;">Else</span>
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;F&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">PlanarFace</span>&nbsp;=&nbsp;<span style="color:blue;">TryCast</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;F_El.GetGeometryObjectFromReference(R),&nbsp;<span style="color:#2b91af;">PlanarFace</span>)
+
+&nbsp;&nbsp;<span style="color:blue;">If</span>&nbsp;F&nbsp;<span style="color:blue;">Is</span>&nbsp;<span style="color:blue;">Nothing</span>&nbsp;<span style="color:blue;">Then</span>&nbsp;<span style="color:blue;">Return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Failed&nbsp;<span style="color:blue;">Else</span>
+ 
+&nbsp;&nbsp;<span style="color:green;">&#39;Create&nbsp;individual&nbsp;CurveLoops&nbsp;to&nbsp;compare&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;From&nbsp;the&nbsp;orginal&nbsp;CurveLoopArray</span>
+&nbsp;&nbsp;<span style="color:green;">&#39;If&nbsp;floor&nbsp;has&nbsp;separate&nbsp;parts&nbsp;these&nbsp;will&nbsp;now&nbsp;be&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;separated&nbsp;out&nbsp;into&nbsp;individual&nbsp;faces&nbsp;rather&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;than&nbsp;one&nbsp;face&nbsp;with&nbsp;multiple&nbsp;loops.</span>
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;CLoop&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">List</span>(<span style="color:blue;">Of</span>&nbsp;<span style="color:#2b91af;">Tuple</span>(<span style="color:blue;">Of</span>&nbsp;<span style="color:#2b91af;">PlanarFace</span>,&nbsp;<span style="color:#2b91af;">CurveLoop</span>,&nbsp;<span style="color:blue;">Integer</span>))
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;Ix&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">Integer</span>&nbsp;=&nbsp;0
+&nbsp;&nbsp;<span style="color:blue;">For</span>&nbsp;<span style="color:blue;">Each</span>&nbsp;item&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">CurveLoop</span>&nbsp;<span style="color:blue;">In</span>&nbsp;F.GetEdgesAsCurveLoops
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;CLL&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">List</span>(<span style="color:blue;">Of</span>&nbsp;<span style="color:#2b91af;">CurveLoop</span>)
+&nbsp;&nbsp;&nbsp;&nbsp;CLL.Add(item)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;Create&nbsp;a&nbsp;solid&nbsp;extrusion&nbsp;for&nbsp;each&nbsp;CurveLoop&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;(we&nbsp;want&nbsp;to&nbsp;get&nbsp;the&nbsp;planarFace&nbsp;from&nbsp;this&nbsp;to&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;use&nbsp;built&nbsp;in&nbsp;functionality&nbsp;(.PlanarFace.IsInside).</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;Would&nbsp;be&nbsp;nice&nbsp;if&nbsp;you&nbsp;could&nbsp;skip&nbsp;this&nbsp;step&nbsp;and&nbsp;create&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;PlanarFaces&nbsp;directly&nbsp;from&nbsp;CuveLoops?&nbsp;Does&nbsp;no&nbsp;appear&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;To&nbsp;be&nbsp;possible,&nbsp;I&nbsp;only&nbsp;looked&nbsp;in&nbsp;GeometryCreationUtilities.</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;Below&nbsp;creates&nbsp;geometry&nbsp;in&nbsp;memory&nbsp;rather&nbsp;than&nbsp;actual&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;Geometry&nbsp;in&nbsp;the&nbsp;document,&nbsp;therefore&nbsp;no&nbsp;transaction&nbsp;required.</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;S&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Solid</span>&nbsp;=&nbsp;<span style="color:#2b91af;">GeometryCreationUtilities</span>&nbsp;_
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.CreateExtrusionGeometry(CLL,&nbsp;F.FaceNormal,&nbsp;1)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">For</span>&nbsp;<span style="color:blue;">Each</span>&nbsp;Fx&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Face</span>&nbsp;<span style="color:blue;">In</span>&nbsp;S.Faces
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;PFx&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">PlanarFace</span>&nbsp;=&nbsp;<span style="color:blue;">TryCast</span>(Fx,&nbsp;<span style="color:#2b91af;">PlanarFace</span>)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">If</span>&nbsp;PFx&nbsp;<span style="color:blue;">Is</span>&nbsp;<span style="color:blue;">Nothing</span>&nbsp;<span style="color:blue;">Then</span>&nbsp;<span style="color:blue;">Continue</span>&nbsp;<span style="color:blue;">For</span>&nbsp;<span style="color:blue;">Else</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">If</span>&nbsp;PFx.FaceNormal.IsAlmostEqualTo(F.FaceNormal)&nbsp;<span style="color:blue;">Then</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ix&nbsp;+=&nbsp;1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CLoop.Add(<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">Tuple</span>(<span style="color:blue;">Of</span>&nbsp;<span style="color:#2b91af;">PlanarFace</span>,&nbsp;<span style="color:#2b91af;">CurveLoop</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Integer</span>)(PFx,&nbsp;item,&nbsp;Ix))
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">If</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Next</span>
+&nbsp;&nbsp;<span style="color:blue;">Next</span>
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;FirstPointIsInsideFace&nbsp;=&nbsp;<span style="color:blue;">Function</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;CL&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">CurveLoop</span>,&nbsp;PFace&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">PlanarFace</span>)&nbsp;_
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">Boolean</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;Trans&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Transform</span>&nbsp;=&nbsp;PFace.ComputeDerivatives(<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">UV</span>(0,&nbsp;0))
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">If</span>&nbsp;CL.Count&nbsp;=&nbsp;0&nbsp;<span style="color:blue;">Then</span>&nbsp;<span style="color:blue;">Return</span>&nbsp;<span style="color:blue;">False</span>&nbsp;<span style="color:blue;">Else</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;Pt&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;=&nbsp;Trans.Inverse.OfPoint(CL(0).GetEndPoint(0))
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;Res&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">IntersectionResult</span>&nbsp;=&nbsp;<span style="color:blue;">Nothing</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;out&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">Boolean</span>&nbsp;=&nbsp;PFace.IsInside(<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">UV</span>(Pt.X,&nbsp;Pt.Y),&nbsp;Res)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Return</span>&nbsp;out
+&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Function</span>
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;OuterLoops&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">List</span>(<span style="color:blue;">Of</span>&nbsp;<span style="color:#2b91af;">CurveLoop</span>)
+&nbsp;&nbsp;<span style="color:green;">&#39;If&nbsp;there&nbsp;is&nbsp;more&nbsp;than&nbsp;one&nbsp;outerloop&nbsp;we&nbsp;know&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;the&nbsp;original&nbsp;face&nbsp;has&nbsp;separate&nbsp;parts.</span>
+&nbsp;&nbsp;<span style="color:green;">&#39;We&nbsp;could&nbsp;therefore&nbsp;stop&nbsp;the&nbsp;creation&nbsp;of&nbsp;floors&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;With&nbsp;separate&nbsp;parts&nbsp;via&nbsp;posting&nbsp;failures&nbsp;etc.</span>
+&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;Or&nbsp;more&nbsp;passively&nbsp;create&nbsp;a&nbsp;geometry&nbsp;checking</span>
+&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;utility&nbsp;To&nbsp;identify&nbsp;them.</span>
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;InnerLoops&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">List</span>(<span style="color:blue;">Of</span>&nbsp;<span style="color:#2b91af;">CurveLoop</span>)
+&nbsp;&nbsp;<span style="color:blue;">For</span>&nbsp;<span style="color:blue;">Each</span>&nbsp;item&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Tuple</span>(<span style="color:blue;">Of</span>&nbsp;<span style="color:#2b91af;">PlanarFace</span>,&nbsp;<span style="color:#2b91af;">CurveLoop</span>,&nbsp;<span style="color:blue;">Integer</span>)&nbsp;<span style="color:blue;">In</span>&nbsp;CLoop
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;To&nbsp;identify&nbsp;an&nbsp;inner&nbsp;loop&nbsp;we&nbsp;just&nbsp;need&nbsp;to&nbsp;see&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;If&nbsp;any&nbsp;Then&nbsp;Of&nbsp;it&#39;s&nbsp;points&nbsp;are&nbsp;inside&nbsp;another&nbsp;face.</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;The&nbsp;exception&nbsp;to&nbsp;this&nbsp;is&nbsp;a&nbsp;loop&nbsp;compared&nbsp;to&nbsp;the&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;Face&nbsp;it&nbsp;was&nbsp;taken&nbsp;from.&nbsp;This&nbsp;will&nbsp;also&nbsp;be&nbsp;considered&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;inside&nbsp;as&nbsp;the&nbsp;points&nbsp;are&nbsp;on&nbsp;the&nbsp;boundary.</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;Therefore&nbsp;give&nbsp;each&nbsp;item&nbsp;an&nbsp;integer&nbsp;ID&nbsp;to&nbsp;ensure&nbsp;it</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;isn&nbsp;&#39;t&nbsp;self&nbsp;comparing.&nbsp;An&nbsp;alternative&nbsp;would&nbsp;be&nbsp;to&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;look&nbsp;for&nbsp;J=1&nbsp;instead&nbsp;of&nbsp;J=0&nbsp;below&nbsp;(perhaps).</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;J&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">Integer</span>&nbsp;=&nbsp;CLoop.ToList.FindAll(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Function</span>(z)&nbsp;FirstPointIsInsideFace(item.Item2,&nbsp;z.Item1)&nbsp;_
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">True</span>&nbsp;<span style="color:blue;">AndAlso</span>&nbsp;z.Item3&nbsp;&lt;&gt;&nbsp;item.Item3).Count
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">If</span>&nbsp;J&nbsp;=&nbsp;0&nbsp;<span style="color:blue;">Then</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OuterLoops.Add(item.Item2)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Else</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InnerLoops.Add(item.Item2)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">If</span>
+&nbsp;&nbsp;<span style="color:blue;">Next</span>
+ 
+&nbsp;&nbsp;<span style="color:blue;">Using</span>&nbsp;Tx&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(IntDoc,&nbsp;<span style="color:#a31515;">&quot;Outer&nbsp;loops&quot;</span>)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">If</span>&nbsp;Tx.Start&nbsp;=&nbsp;<span style="color:#2b91af;">TransactionStatus</span>.Started&nbsp;<span style="color:blue;">Then</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;SKP&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">SketchPlane</span>&nbsp;=&nbsp;<span style="color:#2b91af;">SketchPlane</span>.Create(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IntDoc,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Plane</span>.CreateByThreePoints(F.Origin,&nbsp;F.Origin&nbsp;+&nbsp;F.XVector,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;F.Origin&nbsp;+&nbsp;F.YVector))
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">For</span>&nbsp;<span style="color:blue;">Each</span>&nbsp;Crv&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">CurveLoop</span>&nbsp;<span style="color:blue;">In</span>&nbsp;OuterLoops
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">For</span>&nbsp;<span style="color:blue;">Each</span>&nbsp;C&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Curve</span>&nbsp;<span style="color:blue;">In</span>&nbsp;Crv
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IntDoc.Create.NewModelCurve(C,&nbsp;SKP)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Next</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Next</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tx.Commit()
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">If</span>
+&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Using</span>
+&nbsp;&nbsp;<span style="color:blue;">Return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Succeeded
+<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Function</span>
+</pre>
+
+C#:
+ 
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">Result</span>&nbsp;GetPlanarFaceOuterLoops(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;Autodesk.Revit.UI.<span style="color:#2b91af;">ExternalCommandData</span>&nbsp;commandData,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">ref</span>&nbsp;<span style="color:blue;">string</span>&nbsp;message,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;Autodesk.Revit.DB.<span style="color:#2b91af;">ElementSet</span>&nbsp;elements&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UIApplication</span>&nbsp;IntApp&nbsp;=&nbsp;commandData.Application;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UIDocument</span>&nbsp;IntUIDoc&nbsp;=&nbsp;IntApp.ActiveUIDocument;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;IntUIDoc&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Failed;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;IntDoc&nbsp;=&nbsp;IntUIDoc.Document;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Reference</span>&nbsp;R&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">try</span>
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;R&nbsp;=&nbsp;IntUIDoc.Selection.PickObject(&nbsp;<span style="color:#2b91af;">ObjectType</span>.Face&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">catch</span>
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;R&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Cancelled;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;F_El&nbsp;=&nbsp;IntDoc.GetElement(&nbsp;R.ElementId&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;F_El&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Failed;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">PlanarFace</span>&nbsp;F&nbsp;=&nbsp;F_El.GetGeometryObjectFromReference(&nbsp;R&nbsp;)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">PlanarFace</span>;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;F&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Failed;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Create&nbsp;individual&nbsp;CurveLoops&nbsp;to&nbsp;compare&nbsp;from&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;the&nbsp;orginal&nbsp;CurveLoopArray</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//If&nbsp;floor&nbsp;has&nbsp;separate&nbsp;parts&nbsp;these&nbsp;will&nbsp;now&nbsp;be&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;separated&nbsp;out&nbsp;into&nbsp;individual&nbsp;faces&nbsp;rather&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;than&nbsp;one&nbsp;face&nbsp;with&nbsp;multiple&nbsp;loops.</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Tuple</span>&lt;<span style="color:#2b91af;">PlanarFace</span>,&nbsp;<span style="color:#2b91af;">CurveLoop</span>,&nbsp;<span style="color:blue;">int</span>&gt;&gt;&nbsp;CLoop&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Tuple</span>&lt;<span style="color:#2b91af;">PlanarFace</span>,&nbsp;<span style="color:#2b91af;">CurveLoop</span>,&nbsp;<span style="color:blue;">int</span>&gt;&gt;();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;Ix&nbsp;=&nbsp;0;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">CurveLoop</span>&nbsp;item&nbsp;<span style="color:blue;">in</span>&nbsp;F.GetEdgesAsCurveLoops()&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">CurveLoop</span>&gt;&nbsp;CLL&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">CurveLoop</span>&gt;();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CLL.Add(&nbsp;item&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Create&nbsp;a&nbsp;solid&nbsp;extrusion&nbsp;for&nbsp;each&nbsp;CurveLoop&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;(&nbsp;we&nbsp;want&nbsp;to&nbsp;get&nbsp;the&nbsp;planarFace&nbsp;from&nbsp;this&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;to&nbsp;use&nbsp;built&nbsp;in&nbsp;functionality&nbsp;(.PlanarFace.IsInside).</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Would&nbsp;be&nbsp;nice&nbsp;if&nbsp;you&nbsp;could&nbsp;skip&nbsp;this&nbsp;step&nbsp;and&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;create&nbsp;PlanarFaces&nbsp;directly&nbsp;from&nbsp;CuveLoops?&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Does&nbsp;not&nbsp;appear&nbsp;to&nbsp;be&nbsp;possible,&nbsp;I&nbsp;only&nbsp;looked&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;in&nbsp;GeometryCreationUtilities.</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Below&nbsp;creates&nbsp;geometry&nbsp;in&nbsp;memory&nbsp;rather&nbsp;than&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;actual&nbsp;geometry&nbsp;in&nbsp;the&nbsp;document,&nbsp;therefore&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;no&nbsp;transaction&nbsp;required.</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Solid</span>&nbsp;S&nbsp;=&nbsp;<span style="color:#2b91af;">GeometryCreationUtilities</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.CreateExtrusionGeometry(&nbsp;CLL,&nbsp;F.FaceNormal,&nbsp;1&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Face</span>&nbsp;Fx&nbsp;<span style="color:blue;">in</span>&nbsp;S.Faces&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">PlanarFace</span>&nbsp;PFx&nbsp;=&nbsp;Fx&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">PlanarFace</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;PFx&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">continue</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;PFx.FaceNormal.IsAlmostEqualTo(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;F.FaceNormal&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ix&nbsp;+=&nbsp;1;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CLoop.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Tuple</span>&lt;<span style="color:#2b91af;">PlanarFace</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">CurveLoop</span>,&nbsp;<span style="color:blue;">int</span>&gt;(&nbsp;PFx,&nbsp;item,&nbsp;Ix&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">CurveLoop</span>&gt;&nbsp;OuterLoops&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">CurveLoop</span>&gt;();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//If&nbsp;there&nbsp;is&nbsp;more&nbsp;than&nbsp;one&nbsp;outerloop&nbsp;we&nbsp;know&nbsp;the&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;original&nbsp;face&nbsp;has&nbsp;separate&nbsp;parts.</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//We&nbsp;could&nbsp;therefore&nbsp;stop&nbsp;the&nbsp;creation&nbsp;of&nbsp;floors&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;with&nbsp;separate&nbsp;parts&nbsp;via&nbsp;posting&nbsp;failures&nbsp;etc.&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;or&nbsp;more&nbsp;passively&nbsp;create&nbsp;a&nbsp;geometry&nbsp;checking</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;utility&nbsp;to&nbsp;identify&nbsp;them.</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">CurveLoop</span>&gt;&nbsp;InnerLoops&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">CurveLoop</span>&gt;();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Tuple</span>&lt;<span style="color:#2b91af;">PlanarFace</span>,&nbsp;<span style="color:#2b91af;">CurveLoop</span>,&nbsp;<span style="color:blue;">int</span>&gt;&nbsp;item&nbsp;<span style="color:blue;">in</span>&nbsp;CLoop&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//To&nbsp;identify&nbsp;an&nbsp;inner&nbsp;loop&nbsp;we&nbsp;just&nbsp;need&nbsp;to&nbsp;see&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;if&nbsp;any&nbsp;of&nbsp;it&#39;s&nbsp;points&nbsp;are&nbsp;inside&nbsp;another&nbsp;face.</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//The&nbsp;exception&nbsp;to&nbsp;this&nbsp;is&nbsp;a&nbsp;loop&nbsp;compared&nbsp;to&nbsp;the</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;face&nbsp;it&nbsp;was&nbsp;taken&nbsp;from.&nbsp;This&nbsp;will&nbsp;also&nbsp;be&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;considered&nbsp;inside&nbsp;as&nbsp;the&nbsp;points&nbsp;are&nbsp;on&nbsp;the&nbsp;boundary.</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Therefore&nbsp;give&nbsp;each&nbsp;item&nbsp;an&nbsp;integer&nbsp;ID&nbsp;to&nbsp;ensure</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;it&nbsp;isn&#39;t&nbsp;self&nbsp;comparing.&nbsp;An&nbsp;alternative&nbsp;would</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;be&nbsp;to&nbsp;look&nbsp;for&nbsp;J=1&nbsp;instead&nbsp;of&nbsp;J=0&nbsp;below&nbsp;(perhaps).</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;J&nbsp;=&nbsp;CLoop.ToList().FindAll(&nbsp;z&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;FirstPointIsInsideFace(&nbsp;item.Item2,&nbsp;z.Item1&nbsp;)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;==&nbsp;<span style="color:blue;">true</span>&nbsp;&amp;&amp;&nbsp;z.Item3&nbsp;!=&nbsp;item.Item3&nbsp;).Count;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;J&nbsp;==&nbsp;0&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OuterLoops.Add(&nbsp;item.Item2&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">else</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InnerLoops.Add(&nbsp;item.Item2&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;Tx&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;IntDoc,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Outer&nbsp;loops&quot;</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;Tx.Start()&nbsp;==&nbsp;<span style="color:#2b91af;">TransactionStatus</span>.Started&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">SketchPlane</span>&nbsp;SKP&nbsp;=&nbsp;<span style="color:#2b91af;">SketchPlane</span>.Create(&nbsp;IntDoc,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Plane</span>.CreateByThreePoints(&nbsp;F.Origin,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;F.Origin&nbsp;+&nbsp;F.XVector,&nbsp;F.Origin&nbsp;+&nbsp;F.YVector&nbsp;)&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">CurveLoop</span>&nbsp;Crv&nbsp;<span style="color:blue;">in</span>&nbsp;OuterLoops&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Curve</span>&nbsp;C&nbsp;<span style="color:blue;">in</span>&nbsp;Crv&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IntDoc.Create.NewModelCurve(&nbsp;C,&nbsp;SKP&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tx.Commit();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Succeeded;
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">bool</span>&nbsp;FirstPointIsInsideFace(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">CurveLoop</span>&nbsp;CL,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">PlanarFace</span>&nbsp;PFace&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Transform</span>&nbsp;Trans&nbsp;=&nbsp;PFace.ComputeDerivatives(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">UV</span>(&nbsp;0,&nbsp;0&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;CL.Count()&nbsp;==&nbsp;0&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">false</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;Pt&nbsp;=&nbsp;Trans.Inverse.OfPoint(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CL.ToList()[0].GetEndPoint(&nbsp;0&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">IntersectionResult</span>&nbsp;Res&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">bool</span>&nbsp;outval&nbsp;=&nbsp;PFace.IsInside(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">UV</span>(&nbsp;Pt.X,&nbsp;Pt.Y&nbsp;),&nbsp;<span style="color:blue;">out</span>&nbsp;Res&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;outval;
+&nbsp;&nbsp;}
+</pre>
