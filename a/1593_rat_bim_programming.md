@@ -580,7 +580,7 @@ PUT helper method using RestSharp: (look at the PDF).
 
 The entire mainline server implementation:
 
-<pre>
+<pre class="prettyprint">
 var pkg = require( './package.json' );
 var express = require('express');
 var mongoose = require( 'mongoose' );
