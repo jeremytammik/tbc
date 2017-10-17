@@ -13,7 +13,7 @@
 - au darmstadt
   /p/2017/2017-10-17_au_darmstadt/027.jpg
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Rational BIM Programming at AU Darmstadt #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/cloud_desktop_api
 
 I am attending Autodesk University in Darmstadt, Germany, and putting the final touches to my presentation tomorrow on <i>Rational BIM programming using Revit and Forge</i>.
 Here are the slides and the handout document in their current state in PDF format
