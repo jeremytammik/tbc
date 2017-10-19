@@ -35,8 +35,13 @@ Antonio Manzini: Era di maggio [it] [i love rocco schiavione and antonio manzani
 Forge #RevitAPI BIM Programming https://youtu.be/vbiCj0S4mv8 AU Darmstadt class recording @AutodeskRevit #dynamobim @AutodeskForge #ForgeDevCon
 #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
 
-&ndash; 
-...
+I completed the presentation and recording of my presentation yesterday on <i>Rational BIM programming using Revit and Forge</i> at Autodesk University in Darmstadt, Germany
+&ndash; <i>Rational BIM Programming</i> recording
+&ndash; Pleasant walks in the Odenwald
+&ndash; Some of my favourite recent books
+&ndash; Where to continue after finishing school
+&ndash; New AlphaGo Zero is completely self-taught
+&ndash; <code>TotalPressureLoss</code> units...
 
 --->
 
