@@ -60,7 +60,7 @@ Here are a few remarks along the way:
 
 ####<a name="2"></a>Rational BIM Programming Recording
 
-I recorded my one-hour presentation
+I recorded my one-hour presentation in German language 
 on [Rational BIM Programming using Forge and Revit API](https://youtu.be/vbiCj0S4mv8) at
 Autodesk University in Darmstadt, Germany:
 
