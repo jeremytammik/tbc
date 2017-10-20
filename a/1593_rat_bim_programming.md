@@ -33,10 +33,11 @@ I am attending Autodesk University in Darmstadt, Germany, and putting the final 
 
 Here are the slides and the handout document in their current state in PDF format:
 
-- [Slide deck](/a/doc/au/2017/doc/au_de_2_3_tammik_forge_revit_api_slides.pdf)
-- [Handout document](/a/doc/au/2017/doc/au_de_2_3_tammik_forge_revit_api_handout.pdf)
+- [Slide deck (English)](/a/doc/au/2017/doc/au_de_2_3_tammik_forge_revit_api_slides.pdf)
+- [Handout document (English)](/a/doc/au/2017/doc/au_de_2_3_tammik_forge_revit_api_handout.pdf)
+- [Recording (German)](http://thebuildingcoder.typepad.com/blog/2017/10/au-recording-books-education-and-units.html)
 
-For your convenience, here is the full text of the latter as well, omitting all images:
+For your convenience, here is the full handout document text as well, omitting all images:
 
 ####<a name="0.1"></a>Rational BIM Programming with Forge versus the Revit API
 
