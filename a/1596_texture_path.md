@@ -10,11 +10,12 @@
 
 <!---
 
+- Scott Conover Re: Material texture path extraction in Revit API
 
 #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
 
-Here is an official answer from the Revit development team on the long-standing and recurrent issue on retrieving the path to a specific material texture bitmap file:
-Question: I am working on an exporter plugin for Revit that exports all geometry from selected objects using the <code>CustomExporter</code> framework.
+Here is an official answer from the Revit development team on the long-standing and recurrent issue on retrieving the path to a specific material texture bitmap file
+&ndash; Question: I am working on an exporter plugin for Revit that exports all geometry from selected objects using the <code>CustomExporter</code> framework.
 When extracting object materials, I can successfully get most of the information, but I can't seem to find the path to the material texture...
 
 --->
