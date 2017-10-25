@@ -12,7 +12,7 @@
 
 - 13504038 [How to retrieve geometry for a basic wall being a panel in a curtain wall]
 
-#RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+Curtain wall geometry with basic wall panel via #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/curtainwallgeo
 
 A quick geometrical question on retrieving geometry from a basic wall being used as a panel in a curtain wall.
 I am struggling to retrieve the geometry data from a curtain wall that contains a Basic wall in one of the curtain wall panels. My example curtain wall has two panels. With one of the panels, a basic wall type is associated. I need to get the geometry data (i.e., the faces) for the entire curtain wall. When I reach the second panel in my code, the <code>SymbolGeometry</code> contains zero objects, so my code cannot retrieve any geometry for it...
