@@ -33,7 +33,8 @@ Antonio Manzini: Era di maggio [it] [i love rocco schiavione and antonio manzani
   https://forums.autodesk.com/t5/revit-api-forum/totalpressureloss-units/m-p/7452507
 
 Forge #RevitAPI BIM Programming https://youtu.be/vbiCj0S4mv8 AU Darmstadt class recording @AutodeskRevit #dynamobim @AutodeskForge #ForgeDevCon
-#RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+Rational BIM Programming AU recording #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/ratbimunit
+TotalPressureLoss units in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/ratbimunit
 
 I completed the presentation and recording of my presentation yesterday on <i>Rational BIM programming using Revit and Forge</i> at Autodesk University in Darmstadt, Germany
 &ndash; <i>Rational BIM Programming</i> recording
@@ -143,7 +144,7 @@ The Revit UI tells me, in this example, the pressure drop is 5853Pa.
 When I get the value using the API, or Revit Lookup, I get the number 1784.0906645432:
 
 <center>
-<img src="img/TotalPressureLoss_units.jpg" alt="AU Darmstadt keynote" width="712"/>
+<img src="img/TotalPressureLoss_units.jpg" alt="TotalPressureLoss units" width="712"/>
 </center>
 
 What units is this value in?
