@@ -30,6 +30,9 @@ https://forge.autodesk.com/blog/visit-forge-devcon-village-monday?mc_cid=dfd134e
 [Collaborate in the Cloud with AWS at Forge DevCon](http://autode.sk/2gYTa0m)
 https://forge.autodesk.com/blog/collaborate-cloud-aws-forge-devcon?mc_cid=dfd134ea95&mc_eid=80ee34fe7e
 
+[Discover the AR/VR Toolkit at Forge DevCon](http://autode.sk/2h1pz6n)
+https://forge.autodesk.com/blog/discover-arvr-toolkit-forge-devcon?utm_campaign=devcon_CFP_April&utm_source=swu&utm_medium=email
+
 [Forge in action &ndash; community using Forge to make the future](http://autode.sk/2gYq29r)
 https://forge.autodesk.com/customers?mc_cid=dfd134ea95&mc_eid=80ee34fe7e
 
