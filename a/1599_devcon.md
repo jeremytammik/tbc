@@ -40,11 +40,11 @@ https://forge.autodesk.com/blog/forge-devcon-its-not-just-programmers?mc_cid=dfd
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-A "don't miss" list of the main highlights and a heads-up on some of the biggest happenings.
+A "don't miss" list of the main highlights and a heads-up on some of the biggest happenings
 &ndash; See into the future of Forge with partner and executive keynotes
-&ndash; Choose from over 50 AU classes on ways to take advantage of cloud solutions.
-&ndash; Visit the Village, an exclusive exhibit open only to Forge DevCon attendees.
-&ndash; Demo and witness first hand the new AR/VR Toolkit.
+&ndash; Choose from over 50 AU classes on ways to take advantage of cloud solutions
+&ndash; Visit the Village, an exclusive exhibit open only to Forge DevCon attendees
+&ndash; Demo and witness first hand the new AR/VR Toolkit
 &ndash; Get to know Amazon Web Services through these classes and exhibits...
 
 --->
