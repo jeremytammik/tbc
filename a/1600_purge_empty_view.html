@@ -1,0 +1,169 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- https://forums.autodesk.com/t5/revit-api-forum/cf-1201-purge-unused-objects/m-p/7507455
+  13551712 [CF-1201 Purge unused objects]
+
+- https://forums.autodesk.com/t5/revit-api-forum/purge-unused-via-the-api/m-p/7525966
+  [Determining purgeable elements](http://thebuildingcoder.typepad.com/blog/2013/03/determining-purgeable-elements.html) and the thread 
+  [Writing a purge utility](http://forums.autodesk.com/t5/revit-api/writing-a-purge-utility/m-p/2735359/highlight/true)
+
+- purge:
+[Types, Families and Materials](http://thebuildingcoder.typepad.com/blog/2017/04/forgefader-ui-lookup-builds-purge-and-room-instances.html#4)
+[Text Note Types](http://thebuildingcoder.typepad.com/blog/2010/11/purge-unused-text-note-types.html)
+[Determining Purgeable Elements](http://thebuildingcoder.typepad.com/blog/2013/03/determining-purgeable-elements.html)
+[Reference Planes Not Hosting Any Elements](http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-devlab.html#2)
+[Unnamed Non-Hosting Reference Planes](http://thebuildingcoder.typepad.com/blog/2014/02/deleting-unnamed-non-hosting-reference-planes.html)
+09095866 [How to truly purge Project (Shared) Parameters](http://forums.autodesk.com/t5/Revit-API/How-to-truly-purge-Project-Shared-Parameters/m-p/4719271)
+13551712 [CF-1201 Purge unused objects](https://forums.autodesk.com/t5/revit-api-forum/cf-1201-purge-unused-objects/m-p/7507455)
+CF-1201 [Purge unused objects]
+
+- [Detecting empty views] Philipp Kast
+
+- https://chtammik.bandcamp.com/album/collection-from-the-past
+tweet: My son Chris released a music album, collection from the past, https://chtammik.bandcamp.com/album/collection-from-the-past by http://tammik.ca
+
+ #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+
+One topic that keeps cropping up is how to purge different kinds of Revit database elements
+&ndash; Purge
+&ndash; Detecting empty views
+&ndash; JavaScript debugging tips
+&ndash; Collection from the past...
+
+--->
+
+<h3>Purge and Detecting an Empty View</h3>
+<p>I am behind schedule blogging, working too much on answering cases and participating in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread 
+while my colleagues are busy at DevCon and AU in Las Vegas.</p>
+<p>In spite of that, this is blog number 1600, a nice round number to celebrate.</p>
+<p>One topic that keeps cropping up is how to purge different kinds of Revit database elements:</p>
+<ul>
+<li><a href="#2">Purge</a></li>
+<li><a href="#3">Detecting empty views</a></li>
+<li><a href="#4">JavaScript debugging tips</a></li>
+<li><a href="#5">Collection from the past</a></li>
+</ul>
+<p><center>
+<img src="img/purge_unused.png" alt="Purge unused" width="75"/>
+</center></p>
+<h4><a name="2"></a>Purge</h4>
+<p>The topic of purging various elements came up repeatedly in the past:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/11/purge-unused-text-note-types.html">Text note types</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-devlab.html#2">Reference planes not hosting any elements</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/determining-purgeable-elements.html">Determining purgeable elements</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/02/deleting-unnamed-non-hosting-reference-planes.html">Unnamed non-hosting reference planes</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/04/forgefader-ui-lookup-builds-purge-and-room-instances.html#4">Types, families and materials</a></li>
+</ul>
+<p>Two recent Revit API discussion threads re-raise the topic of programmatic access to the purge functionality:</p>
+<ul>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/cf-1201-purge-unused-objects/m-p/7507455">CF-1201 Purge unused objects</a></li>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/purge-unused-via-the-api/m-p/7525966">Purge unused via the API</a></li>
+</ul>
+<p>In the latter, Thomas the Coder asks:</p>
+<p><strong>Question:</strong> So I've read The Building Coder article
+on <a href="http://thebuildingcoder.typepad.com/blog/2013/03/determining-purgeable-elements.html">determining purgeable elements</a> and
+the discussion forum thread 
+on <a href="http://forums.autodesk.com/t5/revit-api/writing-a-purge-utility/m-p/2735359">writing a purge utility</a>.</p>
+<p>They both say that triggering the 'Purge Unused' button under the 'Manage' tab via code isn't possible and that you have to write your own code to handle the not so small task of doing it manually.</p>
+<p><strong>Answer by Ali <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/5242763">@imaliasad</a> Asad:</strong>
+I've come up with the solution, using <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.3">PostCommand</a> to launch the built-in Revit command:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">UIApplication</span>&nbsp;uiapp&nbsp;=&nbsp;commandData.Application;
+
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Store&nbsp;the&nbsp;ID&nbsp;of&nbsp;desired&nbsp;plugin&nbsp;button,</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;in&nbsp;this&nbsp;case&nbsp;its&nbsp;&#39;purge&nbsp;unused&#39;</span>
+
+&nbsp;&nbsp;<span style="color:#2b91af;">String</span>&nbsp;s_commandToDisable&nbsp;=&nbsp;<span style="color:#a31515;">&quot;ID_PURGE_UNUSED&quot;</span>;
+&nbsp;&nbsp;<span style="color:#2b91af;">RevitCommandId</span>&nbsp;s_commandId&nbsp;=&nbsp;<span style="color:#2b91af;">RevitCommandId</span>
+&nbsp;&nbsp;&nbsp;&nbsp;.LookupCommandId(&nbsp;s_commandToDisable&nbsp;);
+
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;This&nbsp;revit&nbsp;button&nbsp;will&nbsp;run&nbsp;at&nbsp;the&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;end&nbsp;of&nbsp;your&nbsp;application.&nbsp;</span>
+
+&nbsp;&nbsp;uiapp.PostCommand(&nbsp;s_commandId&nbsp;);
+</pre>
+
+<p>The limitation I'm facing: I can't run the Revit command button instantly; it runs after the add-in external command terminates.</p>
+<p><strong>Question:</strong> How do I run the Revit command instantly within my add-in external command, before it terminates?</p>
+<p><strong>Answer:</strong> <code>PostCommand</code> launches a Revit command. The command cannot run in parallel with your add-in,
+because there is <a href="http://thebuildingcoder.typepad.com/blog/2011/06/no-multithreading-in-revit.html">no multithreading support in the Revit API</a>
+and <a href="http://thebuildingcoder.typepad.com/blog/2014/11/the-revit-api-is-never-ever-thread-safe.html">the Revit API is never ever thread safe</a>.</p>
+<p>Therefore, your add-in must terminate before the next command can run.</p>
+<p>You can add another <code>PostCommand</code> to call a second add-in command to be executed afterwards to continue the process, or use other means, such
+as <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">Idling and external events for modeless access and driving Revit from outside</a>.</p>
+<h4><a name="3"></a>Detecting Empty Views</h4>
+<p>On another related topic, my colleague Philipp Kast, Principal Engineer at Autodesk, shared an approach to detect empty views, i.e., views which do not display any visible object, and his research steps leading up to his current approach:</p>
+<p>I am working on the Revit Extractor. We are creating so-called master views, which are views for each phase in the Revit model.</p>
+<p>Recently we fixed an issue concerning empty views for phases that have no content.</p>
+<p>So, we added the following code to detect whether a given view is empty:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">bool</span>&nbsp;IsEmptyMasterView(&nbsp;<span style="color:#2b91af;">View</span>&nbsp;view&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc,&nbsp;view.Id&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;!collector.Any();
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+</pre>
+
+<p>That worked well. But then a model came along that had empty views again, because it contained division and curtain elements that are not visible.</p>
+<p>So, we adapted this code, basically skipping those categories:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc,&nbsp;view.Id&nbsp;)&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;invisibleCategories&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">HashSet</span>&lt;<span style="color:#2b91af;">ElementId</span>&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementId</span>(<span style="color:#2b91af;">BuiltInCategory</span>.OST_Divisions),
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementId</span>(<span style="color:#2b91af;">BuiltInCategory</span>.OST_CurtaSystemFaceManager)
+&nbsp;&nbsp;&nbsp;&nbsp;};
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;collector.All(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;element&nbsp;=&gt;&nbsp;element.Category&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;invisibleCategories.Contains(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;element.Category.Id&nbsp;)&nbsp;);
+&nbsp;&nbsp;}
+</pre>
+
+<p>Now again, yet another model includes other invisible elements.</p>
+<p>So, I came up with the following check, by experimenting around:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc,&nbsp;view.Id&nbsp;)&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;collector.All(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;element&nbsp;=&gt;&nbsp;element.Category&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;!element.Category.get_AllowsVisibilityControl(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;view&nbsp;)&nbsp;);
+&nbsp;&nbsp;}
+</pre>
+
+<p>This seems to work, but I’m not sure if it makes sense.</p>
+<p>Any comment or input would be appreciated.</p>
+<p>Thank you!</p>
+<p>And thanks to Philipp for sharing this!</p>
+<h4><a name="4"></a>JavaScript Debugging Tips</h4>
+<p>Philippe <a href="https://twitter.com/F3lipek">@F3lipek</a> Leefsma just pointed
+out <a href="https://raygun.com/javascript-debugging-tips">the 14 JavaScript debugging tips you probably didn't know</a>.</p>
+<p>They are really helpful, so I'll make a note of them for myself here.</p>
+<p>Thanks, Philippe!</p>
+<h4><a name="5"></a>Collection from the Past</h4>
+<p>My son Chris released a music album, <a href="https://chtammik.bandcamp.com/album/collection-from-the-past">collection from the past</a>, by <a href="http://tammik.ca">Chris Tammik</a>, saying:</p>
+<p>This collection spans my composition catalogue from around 2011 to 2015. This time was mainly centred around me learning to handle digital audio editing and composition tools. </p>
+<p>After some months playing around with the Traktor DJ software I started exploring electronic music production with Ableton Live. I started working with sound professionally and made my passion to a job. In between I discovered REAPER as my ideal sound design environment. </p>
+<p>Since then I have focused more on the programing side of things and am now creating audio tools for video games. The release of this collection shall serve as a reminder for the stems of my passion for sound and the incredible journey I still find myself on. Hopefully you find something enjoyable here.
+There are songs in various genres, sound design exercises, and pretty much each track has its own story &ndash; :)</p>
+<p><center>
+<img src="img/banner_tammik_ca.png" alt="Chris Tammik" width="400"/>
+</center></p>
