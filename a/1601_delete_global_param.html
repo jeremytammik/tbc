@@ -1,0 +1,67 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- 13580220 [Deletion of Global Parameters]
+
+ #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+
+I have list of all global parameters from the active Revit document. I want to delete a specific global parameter from the list programmatically. Kindly suggest a way to delete a global parameter from the active document...
+
+--->
+
+<h3>Deleting a Global Parameter and RevitPythonShell</h3>
+<p>This is another entry in the endless list of my attempts to teaching the developer community how to fish instead of feeding it.</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/02/creating-a-group-and-how-to-fish.html">Creating a group and how to fish</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/07/teaching-a-man-how-to-fish-and-schedule-creation.html">Teaching a man how to fish and schedule creation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/09/trusted-signature-motivation-and-fishing.html">Trusted signature motivation and fishing</a></li>
+</ul>
+<p>This time, we address the question on how to delete a global parameter:</p>
+<p><strong>Question:</strong> I have list of all global parameters from the active Revit document. I want to delete a specific global parameter from the list programmatically. Kindly suggest a way to delete a global parameter from the active document.</p>
+<p><strong>Answer:</strong> Thank you for your query.</p>
+<p>You can easily answer this question yourself, you know.</p>
+<p>I did not know either, on first reading your question.</p>
+<p>Here is the path I took to search for an answer:</p>
+<p>I initially <a href="https://duckduckgo.com/?q=revit+api+delete+global+parameter">searched the Internet for 'revit api delete global parameter'</a>.</p>
+<p>This led to some non-API discussions, such as the one
+by <a href="http://revitcat.blogspot.de">RevitCat</a> 
+on <a href="http://revitcat.blogspot.de/2017/04/deleting-global-parameters-in-revit.html">Deleting Global Parameters in Revit</a>.</p>
+<p>It also led to the official <a href="https://knowledge.autodesk.com/support/revit-products/getting-started/caas/CloudHelp/cloudhelp/2017/ENU/Revit-API/files/GUID-9FDC35A5-C054-46CA-B2DC-E20958FD197F-htm.html">developer guide discussion on managing global parameters</a>.</p>
+<p>There, I learned that this is achieved programmatically using
+the <a href="http://www.revitapidocs.com/2018.1/f3af05ec-1f0c-fe86-6708-0a211a40bcda.htm"><code>GlobalParametersManager</code> class</a>.</p>
+<p>It does not provide any method to delete a global parameter.</p>
+<p>However, the access to global parameters is provided by
+the <a href="http://www.revitapidocs.com/2018.1/7c7a7bd3-18e8-d9be-d9a7-66cd9ecdccc7.htm"><code>FindByName</code> method</a>.</p>
+<p>That method simply returns an element id.</p>
+<p>This means that each global parameter is stored in the document database as a normal Revit element.</p>
+<p>This means that it can be deleted using the <code>Document.Delete</code> method taking an <code>ElementId</code> or a collection, just like any other Revit element.</p>
+<h4><a name="2"></a>Testing Using RevitPythonShell</h4>
+<p>I decided to try this out on the fly
+using <a href="https://github.com/architecture-building-systems/revitpythonshell">RevitPythonShell</a>.</p>
+<p>I did not have it installed previously, but that can be achieved in seconds with a single click on
+the <a href="https://github.com/architecture-building-systems/revitpythonshell#installation">RevitPythonShell installer</a>.</p>
+<p>I then launched Revit and created a global parameter manually through the user interface:</p>
+<p><center>
+<img src="img/global_parameter_01.png" alt="Global parameter" width="475"/>
+</center></p>
+<p>Next, I started the interactive Python shell and ran the following code:</p>
+<pre class="prettyprint">
+from Autodesk.Revit.DB import *
+doc = __revit__.ActiveUIDocument.Document
+id = GlobalParametersManager.FindByName(doc,'Test')
+t = Transaction(doc)
+t.Start('delete gp')
+doc.Delete(id)
+t.Commit()
+</pre>
+
+<p>Immediately after running this code, the global parameter is no longer listed in the user interface.</p>
+<p>I trust this solves your issue.</p>
