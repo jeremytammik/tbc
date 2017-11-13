@@ -24,7 +24,12 @@ I have list of all global parameters from the active Revit document. I want to d
 <li><a href="http://thebuildingcoder.typepad.com/blog/2014/07/teaching-a-man-how-to-fish-and-schedule-creation.html">Teaching a man how to fish and schedule creation</a></li>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2016/09/trusted-signature-motivation-and-fishing.html">Trusted signature motivation and fishing</a></li>
 </ul>
-<p>This time, we address the question on how to delete a global parameter:</p>
+<p>This time, we address the question on how to:</p>
+<ul>
+<li><a href="#2">Delete a global parameter</a> and </li>
+<li><a href="#3">Test the result using RevitPythonShell</a></li>
+</ul>
+<h4><a name="2"></a>Deleting a Global Parameter</h4>
 <p><strong>Question:</strong> I have list of all global parameters from the active Revit document. I want to delete a specific global parameter from the list programmatically. Kindly suggest a way to delete a global parameter from the active document.</p>
 <p><strong>Answer:</strong> Thank you for your query.</p>
 <p>You can easily answer this question yourself, you know.</p>
@@ -43,7 +48,7 @@ the <a href="http://www.revitapidocs.com/2018.1/7c7a7bd3-18e8-d9be-d9a7-66cd9ecd
 <p>That method simply returns an element id.</p>
 <p>This means that each global parameter is stored in the document database as a normal Revit element.</p>
 <p>This means that it can be deleted using the <code>Document.Delete</code> method taking an <code>ElementId</code> or a collection, just like any other Revit element.</p>
-<h4><a name="2"></a>Testing Using RevitPythonShell</h4>
+<h4><a name="3"></a>Testing Using RevitPythonShell</h4>
 <p>I decided to try this out on the fly
 using <a href="https://github.com/architecture-building-systems/revitpythonshell">RevitPythonShell</a>.</p>
 <p>I did not have it installed previously, but that can be achieved in seconds with a single click on
