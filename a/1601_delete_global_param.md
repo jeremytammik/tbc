@@ -20,7 +20,8 @@ I have list of all global parameters from the active Revit document. I want to d
 
 ### Deleting a Global Parameter and RevitPythonShell
 
-This is another entry in the endless list of my attempts to teaching the developer community how to fish instead of feeding it.
+This is another entry in the list of my attempts at teaching Revit API developers how to fish instead of feeding them.
+Mostly, it ends up a mixture between the two, of course:
 
 - [Creating a group and how to fish](http://thebuildingcoder.typepad.com/blog/2009/02/creating-a-group-and-how-to-fish.html)
 - [Teaching a man how to fish and schedule creation](http://thebuildingcoder.typepad.com/blog/2014/07/teaching-a-man-how-to-fish-and-schedule-creation.html)
