@@ -52,7 +52,7 @@ In spite of that, this is blog number 1600, a nice round number to celebrate.
 
 One topic that keeps cropping up is how to purge different kinds of Revit database elements:
 
-- [Purge](#2)
+- [Purge and `PostCommand`](#2)
 - [Detecting empty views](#3)
 - [JavaScript debugging tips](#4)
 - [Collection from the past](#5)
@@ -61,7 +61,7 @@ One topic that keeps cropping up is how to purge different kinds of Revit databa
 <img src="img/purge_unused.png" alt="Purge unused" width="75"/>
 </center>
 
-####<a name="2"></a>Purge
+####<a name="2"></a>Purge and PostCommand
 
 The topic of purging various elements came up repeatedly in the past:
 
@@ -117,6 +117,9 @@ Therefore, your add-in must terminate before the next command can run.
 You can add another `PostCommand` to call a second add-in command to be executed afterwards to continue the process, or use other means, such
 as [Idling and external events for modeless access and driving Revit from outside](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28).
 
+Also note 
+Ali's [list of `PostCommand` limitations](https://stackoverflow.com/questions/47151567/how-to-call-revit-purge-button-from-the-revit-api) on
+StackOverflow.
 
 ####<a name="3"></a>Detecting Empty Views
 

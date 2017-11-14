@@ -48,7 +48,7 @@ while my colleagues are busy at DevCon and AU in Las Vegas.</p>
 <p>In spite of that, this is blog number 1600, a nice round number to celebrate.</p>
 <p>One topic that keeps cropping up is how to purge different kinds of Revit database elements:</p>
 <ul>
-<li><a href="#2">Purge</a></li>
+<li><a href="#2">Purge and <code>PostCommand</code></a></li>
 <li><a href="#3">Detecting empty views</a></li>
 <li><a href="#4">JavaScript debugging tips</a></li>
 <li><a href="#5">Collection from the past</a></li>
@@ -56,7 +56,7 @@ while my colleagues are busy at DevCon and AU in Las Vegas.</p>
 <p><center>
 <img src="img/purge_unused.png" alt="Purge unused" width="75"/>
 </center></p>
-<h4><a name="2"></a>Purge</h4>
+<h4><a name="2"></a>Purge and PostCommand</h4>
 <p>The topic of purging various elements came up repeatedly in the past:</p>
 <ul>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2010/11/purge-unused-text-note-types.html">Text note types</a></li>
@@ -102,6 +102,9 @@ and <a href="http://thebuildingcoder.typepad.com/blog/2014/11/the-revit-api-is-n
 <p>Therefore, your add-in must terminate before the next command can run.</p>
 <p>You can add another <code>PostCommand</code> to call a second add-in command to be executed afterwards to continue the process, or use other means, such
 as <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">Idling and external events for modeless access and driving Revit from outside</a>.</p>
+<p>Also note 
+Ali's <a href="https://stackoverflow.com/questions/47151567/how-to-call-revit-purge-button-from-the-revit-api">list of <code>PostCommand</code> limitations</a> on
+StackOverflow.</p>
 <h4><a name="3"></a>Detecting Empty Views</h4>
 <p>On another related topic, my colleague Philipp Kast, Principal Engineer at Autodesk, shared an approach to detect empty views, i.e., views which do not display any visible object, and his research steps leading up to his current approach:</p>
 <p>I am working on the Revit Extractor. We are creating so-called master views, which are views for each phase in the Revit model.</p>
