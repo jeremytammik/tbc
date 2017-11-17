@@ -1,0 +1,40 @@
+After updating license year, .NET build target version and Revit API DLL references:
+
+------ Rebuild All started: Project: PlaceInstances, Configuration: Debug Any CPU ------
+C:\a\vs\PlaceInstances\PlaceInstances\PlaceInstancesForm.cs(167,7,167,22): error CS0246: The type or namespace name 'FamilySymbolSet' could not be found (are you missing a using directive or an assembly reference?)
+C:\a\vs\PlaceInstances\PlaceInstances\PlaceInstancesForm.cs(167,35,167,42): error CS1061: 'Family' does not contain a definition for 'Symbols' and no extension method 'Symbols' accepting a first argument of type 'Family' could be found (are you missing a using directive or an assembly reference?)
+C:\a\vs\PlaceInstances\PlaceInstances\PlaceInstancesForm.cs(243,9,243,14): warning CS0162: Unreachable code detected
+========== Rebuild All: 0 succeeded, 1 failed, 0 skipped ==========
+
+
+After replacing the Revit 2014 code:
+
+  FamilySymbolSet symbols = f.Symbols; // 2014
+
+  // I have to convert the FamilySymbolSet to a
+  // List, or the DataSource assignment will throw 
+  // an exception saying "Complex DataBinding 
+  // accepts as a data source either an IList or
+  // an IListSource.
+
+  List<FamilySymbol> symbols2
+    = new List<FamilySymbol>(
+      symbols.Cast<FamilySymbol>() ); // 2014
+
+By the Revit 2018 code:
+
+  ISet<ElementId> ids = f.GetFamilySymbolIds(); // 2018
+
+  Document doc = f.Document;
+
+  List<FamilySymbol> symbols2
+    = new List<FamilySymbol>( 
+      ids.Select<ElementId, FamilySymbol>( id 
+        => doc.GetElement( id ) as FamilySymbol ) ); // 2018
+
+------ Build started: Project: PlaceInstances, Configuration: Debug Any CPU ------
+C:\a\vs\PlaceInstances\PlaceInstances\PlaceInstancesForm.cs(252,9,252,14): warning CS0162: Unreachable code detected
+  PlaceInstances -> C:\a\vs\PlaceInstances\PlaceInstances\bin\Debug\PlaceInstances.dll
+          1 file(s) copied.
+          1 file(s) copied.
+========== Build: 1 succeeded, 0 failed, 0 up-to-date, 0 skipped ==========
