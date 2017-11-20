@@ -23,11 +23,14 @@ https://autodeskuniversity.smarteventscloud.com/connect/search.ww#loadSearch-sea
 
 #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
 
-...
+Question: How can I set the Material Render Appearance through the API?
+I can see there is the <code>Autodesk.Revit.DB.Visual.Asset</code> class, but how do I add to the list of <code>Autodesk.Revit.DB.Visual.AssetProperty</code> objects for a new material?
+Answer: The good news is that this is possible in Revit 2018.1 using the Visual Materials API.
+Check out Boris Shafiro's class at AU to learn about it...
 
 --->
 
-### Setting Material Render Appearance
+### Modifying Material Visual Appearance
 
 Several queries concerning rendering issues were discussed recently and solved by the new Visual Materials API included in Revit 2018.1:
 
