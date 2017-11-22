@@ -60,13 +60,16 @@ Here are some notes from previous similar Revit API panel sessions:
  
 ####<a name="4"></a>Panel Members
 
-- Angel Velez, Senior Principal Engineer, Autodesk
 - Boris Shafiro, Software Development Manager, Autodesk
 - Diane Christoforo, Revit Development, Autodesk
 - Keith White, Technical Consultant, Autodesk,
 - Miroslav Schonauer, Senior Solutions Architect, Autodesk
 - Rahul Bhobe, Principal Engineer, Autodesk
 - Sasha Crotty, Revit Core Product Manager, Autodesk
+
+<center>
+<img src="img/1604_au_revit_api_panel.jpg" alt="Revit API panel members" width="500"/>
+</center>
 
 
 ####<a name="5"></a>Learning Objectives
@@ -196,6 +199,3 @@ A: The longer term how to use parameter via cloud services instead shared parame
 
 Many thanks to Augusto for facilitating and all the panel members for allowing us to pick their valuable brains!
 
-<center>
-<img src="img/1604_au_revit_api_panel.png" alt="Revit API panel" width="289"/>
-</center>
