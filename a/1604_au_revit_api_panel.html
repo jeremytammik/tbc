@@ -1,0 +1,132 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+#RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+
+Notes on the questions and answers at the Revit API panel at Autodesk University in Las Vegas November 2017
+&ndash; Description
+&ndash; Previous panels
+&ndash; Panel members
+&ndash; Learning objectives
+&ndash; Questions and answers
+&ndash; Recording and materials...
+
+--->
+
+<h3>Revit API Panel @ AU Las Vegas 2017</h3>
+<p>I skipped AU in Las Vegas this year, for the first time since 2005.</p>
+<p>The Revit API panel took place as normal, thanks to the Revit API development and consultancy team panel members and my
+colleague <a href="http://adndevblog.typepad.com/autocad/augusto-goncalves.html">Augusto</a>
+<a href="https://www.linkedin.com/in/augustomaia">Gonçalves</a>,
+who took the notes:</p>
+<ul>
+<li><a href="#2">Description</a></li>
+<li><a href="#3">Previous panels</a></li>
+<li><a href="#4">Panel members</a></li>
+<li><a href="#5">Learning objectives</a></li>
+<li><a href="#6">Questions and answers</a></li>
+<li><a href="#7">Recording and materials</a></li>
+</ul>
+<h4><a name="2"></a>Description</h4>
+<p>The Revit API Panel class at Autodesk University 2017 is listed in the AU class catalogue entry
+as <a href="https://autodeskuniversity.smarteventscloud.com/connect/sessionDetail.ww?SESSION_ID=124625">SD124063 &ndash; <em>Revit API Expert Roundtable: Open House on the Factory Floor</em></a>:</p>
+<p>Interact with a panel of Revit API experts to answer your questions and discuss all relevant topics of your choice. For anyone writing add-ins for Revit software, this is the perfect forum to better get to know the people who shape the APIs you work with and explain your views, ideas, and problems face to face. Please note that prior .NET programming and Revit add-in development experience is required. This class is not suitable for beginners.</p>
+<h4><a name="3"></a>Previous Panels</h4>
+<p>Here are some notes from previous similar Revit API panel sessions:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/12/the-revit-api-panel-at-autodesk-university.html#1">SD5156 &ndash; The Revit API Expert Panel at Autodesk University 2014</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/11/rtc-budapest-and-the-revit-api-panel.html#5">Revit Technology Conference RTC Europe 2015</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/12/au-keynote-and-revit-api-panel.html#9">SD10181 &ndash; Revit API Expert Roundtable at Autodesk University 2015</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/10/rtc-revit-api-panel-idea-station-edit-and-continue.html">RTC Revit Technology Conference Europe 2016</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/11/au-day-two-ifc-and-revit-api-panel.html#4">SD20891 &ndash; Autodesk University 2016</a></li>
+</ul>
+<h4><a name="4"></a>Panel Members</h4>
+<ul>
+<li>Angel Velez, Senior Principal Engineer, Autodesk</li>
+<li>Boris Shafiro, Software Development Manager, Autodesk</li>
+<li>Diane Christoforo, Revit Development, Autodesk</li>
+<li>Keith White, Technical Consultant, Autodesk,</li>
+<li>Miroslav Schonauer, Senior Solutions Architect, Autodesk</li>
+<li>Rahul Bhobe, Principal Engineer, Autodesk</li>
+<li>Sasha Crotty, Revit Core Product Manager, Autodesk</li>
+</ul>
+<h4><a name="5"></a>Learning Objectives</h4>
+<ul>
+<li>Get answers to Revit programming questions that are bugging you</li>
+<li>Meet and make yourself heard to the Revit development team and developer support experts</li>
+<li>Discuss your needs, wishes, and solutions with Autodesk employees and your peers</li>
+<li>Gain a first-hand impression of the current hot Revit API issues</li>
+</ul>
+<h4><a name="6"></a>Questions and Answers</h4>
+<p>Q: Start a project to import and having performance, looking how to reduce the cylinder mashes to reduce the complexity.</p>
+<p>A: The first thing to remember when importing geometry is about scale. Revit works best in a specific range of scale, miles and fraction of centimeters are the edges of this range. On architectural scales, it should work best. Direct shapes is something new that still needs performance improvements. When importing Direct Shapes the Revit team needs to understand more about the mashes being used. Miroslav (on Consulting) is using Direct Shapes to visualize, but can’t attach parameters, therefore using it to import entire models are not best use of the API. In terms of performance, when having many elements with the same geometry, use types and instances to reuse graphical representation. Maybe IFC can help track what’s similar and avoid duplicated instances.</p>
+<p>Q: Would grouping objects affect performance?</p>
+<p>A: Should not.</p>
+<p>Q: Code signing when dealing with single site, it doesn’t recognize the signer when moving versions. When having many different items, in case of a site license for Revit the developer doesn’t have to buy different signing.</p>
+<p>A: If on the standard Microsoft storage, it should work better.</p>
+<p>Q: If developing for local or for yourself.</p>
+<p>A: In this case it goes on the local machine registry so it recognizes. If not, there is a fix from Jeremy to fix it. For every new build, there is a new version of the DLL, therefore needs a new signature. If after a time the license is lost, then it’s a Windows issue.</p>
+<p>There is a group policy on Windows that prevents that on Windows networks. And you can create a signature provider for local networks.</p>
+<p>Q: Is there a way to programmatically place keynotes.</p>
+<p>A: No, by Miroslav. Now it’s noticed and Dev Team will check. And remember to place your suggestions on <a href="http://www.autodesk.com/revitideas">Revit Ideas at www.autodesk.com/revitideas</a>, which is being actively monitored, specially for APIs. One of the requirements for the teams is to include APIs on any new product feature.</p>
+<p>Q: Room tag editing, select the views, update properties, sheets, etc., which works well when rooms are on the current model, but when rooms are on the linked model there is no way to find to which room that tag is connected to.</p>
+<p>A: That’s something that Dev Team needs to work on, the <code>LinkElementId</code> should go on that direction, but still need some work.</p>
+<p>Q: There is no way to determine if a link model exists on a view, like a room on a linked model. The workaround is to check the tag on the room and check that.</p>
+<p>A: Same as above.</p>
+<p>Q: On ray tracer, is there any precaution to make sure if it will find the nearest surface and filter by category.</p>
+<p>A: Toposurface, if it is a mesh (not a Revit surface) it will not work at its best, make sure to use Revit Surface. It may be possible to use an element filter and pass as during the ray tracer, it should be one of the arguments.</p>
+<p>Q: Having problems importing shared parameters to system families. The set function is causing problems.</p>
+<p>A: It should be added as project parameters that will be imported. If the category is visible, the binding should work. It should require finishing the binding transaction before setting any parameter (e.g. finish the binding transaction, start another transaction). Before the transaction is committed, the parameter is not actually there. Between open and close transaction, the state is not consistent, the commit will then regenerate. Sometimes it is even required to create multiple transactions.</p>
+<p>Q: How to edit family parameter programmatically without opening on the screen the reload family and to dismiss the “reload family dialog”</p>
+<p>A: As the family is a document, you can open and access the manager from there. After saves, it needs to reload, so inherit from interface <code>LoadFamilyOptions</code> and handle how the family is reloaded. After changing the family, you need to reload the family. Edit the family is necessary as the family is a separated file.</p>
+<p>Q: Display contour lines on AVF lines.</p>
+<p>A: Revit 2018 has improvements, use Direct Contacts API which allow drawing anything without passing through Revit.</p>
+<p>Q: And what about printing?</p>
+<p>A: Direct Contact is different from AVF, about printing text/number, the direct contact is a graph only. If you do use AVF with colored surface with gradient color or solid color.</p>
+<p>Q: Still not possible to assign material to family, what about improvements?</p>
+<p>A: Revit 2018 have some improvements to modify visual materials. To assign material to a family instance is to open the family for editing and assign there. For walls, you need to assign material to layers. There is no unified way as Revit different types of elements. For custom material as a parameter, you should be able to look at the parameter. But this is an area that needs investigation.</p>
+<p>Q: Replicate the project browser level and modify nested families to find them. As of now we need to go to every family.</p>
+<p>A: Nested families do not exist on the project level.</p>
+<p>Q: Spec wires and spec sheets that are sparse over several drawings.</p>
+<p>A: There are some partner working on this, but Revit does not support it. A note: Revit is not the best place to store all of that information.</p>
+<p>Q: Create legend on Revit using an empty that is modified to specific needs. <code>FindReference</code> on family symbol does not work for legends. Find by the UI is possible, but not on the API. Same for rotating these legends.</p>
+<p>A: Nothing concrete on the roadmap around legends as of today. Note that these are not part of the native geometry with reference, so needs extra work. Please vote at the Revit Ideas.</p>
+<p>Q: Have a requirement to accept design options on the project.</p>
+<p>A: Not exposed on the API, but just accept design option is easier, but needs to be on Revit Ideas.</p>
+<p>Q: Document opening event is missing the options to audit the model</p>
+<p>A: Not available, post on Revit Ideas.</p>
+<p>Q: Update the host based family loose the host when reattach.</p>
+<p>A: Host parameter is read-only, probably the API is missing a re-host method, another topic for Revit Ideas.</p>
+<p>Q: About piping via API, automate slopping piping, how this is done internally? The z coordinate is read-only via API.</p>
+<p>A: Sorry, MEP developers are not present.</p>
+<p>Audience: Workaround: do some math, calculate the points, create a line, then turn a line into a curve, then into a pipe.</p>
+<p>Q: How to specify the flow on a pipe and make sure Revit uses that property, specially on complex systems.</p>
+<p>A: Connectors are supposed to specify direction. Need to take this offline.</p>
+<p>Q: Load as group not available on the API, so mimic, but the insertion point cannot be moved</p>
+<p>A: Needs some extra work, not available.</p>
+<p>Q: How to control how an object is mirrored.</p>
+<p>A: Check (via API) if for the mirror property and use a shared parameter to monitor it.</p>
+<p>Q: When moving groups the extensible storage is lost.</p>
+<p>A: Change the level of a group loses the extensible storage as it changes the instance ID, but any problems on this should be reported.</p>
+<p>Q: Rotation information is not kept.</p>
+<p>A: Check the transform matrix of the group instance, if still null, then needs to be logged.</p>
+<p>Q: Shared parameter file not able to rename, so needs compute power to iterate though the list</p>
+<p>A: The longer term how to use parameter via cloud services instead shared parameter, which needs some extra work.</p>
+<h4><a name="7"></a>Recording and Materials</h4>
+<ul>
+<li><a href="zip/sd124063-handout.pdf">Handout PDF</a></li>
+<li><a href="zip/sd124063-presentation.pdf">Slide desk PDF</a></li>
+<li><a href="zip/sd124063-recording.m4a">Recording M4A</a></li>
+</ul>
+<p>Many thanks to Augusto for facilitating and all the panel members for allowing us to pick their valuable brains!</p>
+<p><center>
+<img src="img/1604_au_revit_api_panel.png" alt="Revit API panel" width="289"/>
+</center></p>
