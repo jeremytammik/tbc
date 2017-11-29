@@ -32,7 +32,8 @@ CF-1201 [Purge unused objects]
 - https://chtammik.bandcamp.com/album/collection-from-the-past
 tweet: My son Chris released a music album, collection from the past, https://chtammik.bandcamp.com/album/collection-from-the-past by http://tammik.ca
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Purge and PostCommand #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/purgepost
+Detecting empty views #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/purgepost
 
 One topic that keeps cropping up is how to purge different kinds of Revit database elements
 &ndash; Purge
