@@ -21,7 +21,7 @@ It happens that @Boris Shafiro is teaching a class at this topic at AU this week
 https://autodeskuniversity.smarteventscloud.com/connect/search.ww#loadSearch-searchPhrase=shafiro&searchType=session&tc=0&sortBy=relevance
 https://autodeskuniversity.smarteventscloud.com/connect/search.ww#loadSearch-searchPhrase=shafiro&searchType=session&tc=0&sortBy=relevance&p=
 
-#RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+Modifying material visual appearance using #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/modifymaterial
 
 Question: How can I set the Material Render Appearance through the API?
 I can see there is the <code>Autodesk.Revit.DB.Visual.Asset</code> class, but how do I add to the list of <code>Autodesk.Revit.DB.Visual.AssetProperty</code> objects for a new material?

@@ -10,8 +10,7 @@
 
 <!---
 
-
-#RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+#RevitAPI panel @ AU Las Vegas 2017 @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/apipanel
 
 Notes on the questions and answers at the Revit API panel at Autodesk University in Las Vegas November 2017
 &ndash; Description
@@ -198,4 +197,3 @@ A: The longer term how to use parameter via cloud services instead shared parame
 - [Recording M4A](zip/sd124063-recording.m4a)
 
 Many thanks to Augusto for facilitating and all the panel members for allowing us to pick their valuable brains!
-
