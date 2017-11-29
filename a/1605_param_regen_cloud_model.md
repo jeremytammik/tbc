@@ -21,7 +21,7 @@
 
 --->
 
-### Cloud Model Predicate and Set Parameter Regenerates
+### Cloud Model Predicate, and Set Parameter Regenerates
 
 The [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) continues 
 to reach ever new levels of depth and coverage.
@@ -42,7 +42,7 @@ can only be achieved thanks to a growing amount of input from real developers &n
 They are honoured in the list of top solution authors:
 
 <center>
-<img src="img/2017-11-28_top_solution_author.png" alt="" width="230"/>
+<img src="img/2017-11-28_top_solution_author.png" alt="Top solution authors" width="230"/>
 </center>
 
 Very many thanks as always to 
@@ -78,7 +78,7 @@ My macro doesn't have errors, but I can't see the new roof in any view.
 
 I can find it only in a roof schedule, but I cannot see the 3D element.
 
-I have tried to refresh the view in the code and I have noticed that the roof appears on the screen only for one second and than it disappears again.
+I have tried to refresh the view in the code and I have noticed that the roof appears on the screen only for one second and then it disappears again.
 
 I have tried using Basic roof and Sloped glazing, but it still doesn't work.
 
