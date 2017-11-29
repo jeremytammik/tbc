@@ -13,8 +13,8 @@
 - need for regen: set parameter to regen model
   [New Sloped roof not visible](https://forums.autodesk.com/t5/revit-api-forum/new-sloped-roof-not-visible/m-p/7574411)
 
-
-#RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+Setting a parameter to regenerate the BIM via #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/cloudmodelregen
+Checking BIM for C4R versus local file in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/cloudmodelregen
 
 The Revit API discussion forum continues to reach ever new levels of depth and coverage.
 Here are a couple of recent topics
@@ -133,4 +133,3 @@ Is it simply file extension, or a document property?
 Many thanks to
 Paul [@pvella](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/561100) Vella
 for sharing this neat little secret!
-
