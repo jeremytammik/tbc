@@ -14,7 +14,7 @@
   avoid exorbitant coordinates
   https://en.wiktionary.org/wiki/exorbitant#English
   
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/cloudmodelregen
+Avoid exorbitant coordinates in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/exorbitantcoord
 
 Slabs created by an add-in are displayed perfectly in Revit 2015.
 In Revit 2016, they are not.
