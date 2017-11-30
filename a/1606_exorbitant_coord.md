@@ -28,8 +28,8 @@ Relocating them closer to the origin resolves the problem...
 ### Avoid Exorbitant Coordinates
 
 With help from the Revit API development team, my
-colleague [Jim Jia](http://thebuildingcoder.typepad.com/blog/2017/11/cloud-model-predicate-and-set-parameter-regenerates.html#2) resolved
-an issue involving large coordinates that is important to be aware of:
+colleague [Jim Jia](http://thebuildingcoder.typepad.com/blog/2017/11/cloud-model-predicate-and-set-parameter-regenerates.html#2) resolved an issue involving large coordinates beyond
+the [20-mile limit](#2) that is important to be aware of:
 
 **Question:** My program sets the parameters for a precast concrete slab family.
 
