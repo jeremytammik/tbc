@@ -11,6 +11,7 @@
 <!---
 
 - 13559666 [Strange graphics in Revit 2016 from a plug-in working fine in 2015]
+  REVIT-123143 [Strange graphics in Revit 2016 from a plug-in working fine in 2015 - case 13559666]
   avoid exorbitant coordinates
   https://en.wiktionary.org/wiki/exorbitant#English
   
@@ -97,3 +98,20 @@ No idea, but placing elements at these distances has never, ever, been a good id
 
 I moved the family instances near to the origin and they are now created well.
 
+####<a name="2"></a>Why the Limit?
+
+**Question:** David Veld asks [below](http://thebuildingcoder.typepad.com/blog/2017/11/avoid-exorbitant-coordinates.html#comment-3639729627): I've always wondered where this 20 mile limit comes from, from a coding-technical point of view. If Revit is written in native C++ and stores its coordinates in feet, as doubles, the limit should be 1.8 × 10^308 (right?) &ndash; this is waaaay beyond 20 miles. Or does this mean they are not and perhaps stored in another way?  
+
+**Answer:** First of all, read about [demystifying floating point precision](https://blog.demofox.org/2017/11/21/floating-point-precision).
+The precision is reduced the higher the number that is stored.
+
+20 miles is 105600 feet. According to the table there, the precision is about 0.008 feet at that range for floats. This is about 0.2 cm, which is pretty close to Revit's built-in precision limit of about 1/16th of an inch that we repeatedly encountered in the past:
+
+- [Think big in Revit](http://thebuildingcoder.typepad.com/blog/2009/07/think-big-in-revit.html)
+- [DirectShape minimum size](http://thebuildingcoder.typepad.com/blog/2014/05/directshape-performance-and-minimum-size.html#3)
+
+The Revit help clearly documents
+the [maximum distance limit of 20 miles](https://knowledge.autodesk.com/support/revit-products/learn-explore/caas/CloudHelp/cloudhelp/2018/ENU/Revit-Model/files/GUID-3F79BF5A-F051-49F3-951E-D3E86F51BECC-htm.html).
+
+It covers the projection of a plane onto a curved spherical surface, and also the double accuracy issue
+that is probably causing the weird slabs.

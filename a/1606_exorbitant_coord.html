@@ -10,10 +10,11 @@
 <!---
 
 - 13559666 [Strange graphics in Revit 2016 from a plug-in working fine in 2015]
+  REVIT-123143 [Strange graphics in Revit 2016 from a plug-in working fine in 2015 - case 13559666]
   avoid exorbitant coordinates
   https://en.wiktionary.org/wiki/exorbitant#English
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/cloudmodelregen
+Avoid exorbitant coordinates in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/exorbitantcoord
 
 Slabs created by an add-in are displayed perfectly in Revit 2015.
 In Revit 2016, they are not.
@@ -70,3 +71,16 @@ an issue involving large coordinates that is important to be aware of:</p>
 <p>No idea, but placing elements at these distances has never, ever, been a good idea.</p>
 <p><strong>Response:</strong> Wow, great!</p>
 <p>I moved the family instances near to the origin and they are now created well.</p>
+<h4><a name="2"></a>Why the Limit?</h4>
+<p><strong>Question:</strong> David Veld asks <a href="http://thebuildingcoder.typepad.com/blog/2017/11/avoid-exorbitant-coordinates.html#comment-3639729627">below</a>: I've always wondered where this 20 mile limit comes from, from a coding-technical point of view. If Revit is written in native C++ and stores its coordinates in feet, as doubles, the limit should be 1.8 × 10^308 (right?) &ndash; this is waaaay beyond 20 miles. Or does this mean they are not and perhaps stored in another way?  </p>
+<p><strong>Answer:</strong> First of all, read about <a href="https://blog.demofox.org/2017/11/21/floating-point-precision">demystifying floating point precision</a>.
+The precision is reduced the higher the number that is stored.</p>
+<p>20 miles is 105600 feet. According to the table there, the precision is about 0.008 feet at that range for floats. This is about 0.2 cm, which is pretty close to Revit's built-in precision limit of about 1/16th of an inch that we repeatedly encountered in the past:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/07/think-big-in-revit.html">Think big in Revit</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/05/directshape-performance-and-minimum-size.html#3">DirectShape minimum size</a></li>
+</ul>
+<p>The Revit help clearly documents
+the <a href="https://knowledge.autodesk.com/support/revit-products/learn-explore/caas/CloudHelp/cloudhelp/2018/ENU/Revit-Model/files/GUID-3F79BF5A-F051-49F3-951E-D3E86F51BECC-htm.html">maximum distance limit of 20 miles</a>.</p>
+<p>It covers the projection of a plane onto a curved spherical surface, and also the double accuracy issue
+that is probably causing the weird slabs.</p>
