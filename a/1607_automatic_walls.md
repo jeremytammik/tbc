@@ -16,8 +16,13 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/cloudmodelregen
 
-&ndash; 
-...
+Alexander Ignatovich shares an exceedingly elegant solution for automatic wall creation, illustrating a number of important concepts and implementing the following functionality very succinctly indeed
+&ndash; Retrieve all the <code>cube</code> family instances
+&ndash; Retrieve their <code>height</code> parameter value
+&ndash; Retrieve their solids making use of the .NET <code>yield</code> operator
+&ndash; Extract their horizontal outline contours using an <code>ExtrusionAnalyzer</code>
+&ndash; Create walls along each contour curve segment
+&ndash; Place a door family instance at the midpoint of each wall...
 
 --->
 
@@ -29,7 +34,7 @@ on [mathematical translations for automatic wall creation](https://forums.autode
 with an exceedingly elegant solution
 by Alexander [@aignatovich](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478) Ignatovich.
 
-Alexander's macro illustrates a number of important concept and implements the following functionality very succinctly indeed:
+Alexander's macro illustrates a number of important concepts and implements the following functionality very succinctly indeed:
 
 - Retrieve all the `cube` family instances
 - Retrieve their `height` parameter value
