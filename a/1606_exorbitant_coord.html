@@ -84,3 +84,36 @@ The precision is reduced the higher the number that is stored.</p>
 the <a href="https://knowledge.autodesk.com/support/revit-products/learn-explore/caas/CloudHelp/cloudhelp/2018/ENU/Revit-Model/files/GUID-3F79BF5A-F051-49F3-951E-D3E86F51BECC-htm.html">maximum distance limit of 20 miles</a>.</p>
 <p>It covers the projection of a plane onto a curved spherical surface, and also the double accuracy issue
 that is probably causing the weird slabs.</p>
+<p><strong>Response:</strong> This makes sense and also raises more questions.</p>
+<ol>
+<li>
+<p>The shown calculations are based on 32bit floats; could it be that temporary upgrading to 64 bits environment Autodesk made coordinates 64 bit floats (thus showing Jim Jia's script working fine in 2015)? Then, later, when improving performance, they switched back to 32 bits? If this is possible could this be set as a variable setting (I'd love to be able to work beyond the 20-mile radius (with precision)).</p>
+</li>
+<li>
+<p>Autodesk sets the precision of 1/16th of an inch for the ENTIRE 20-mile zone; however, this should only apply for the very far exorbitant areas of the circle. Doesn't this mean there is A LOT of potential precision in your normal range of let say 250 feet or so from the origin where most buildings would fit in?</p>
+</li>
+<li>
+<p>Since we are talking about Cartesian coordinates (X &amp; Y), should the zone be a square rather than a circle?</p>
+</li>
+</ol>
+<p>Food for thought, but Revit's (internal as well as shared) coordinate systems keeps surprising and confusing me.</p>
+<p><strong>Answer:</strong> Ours is not to wonder why; ours is but to do or die.</p>
+<p>No answer to any of these questions is going to help you or affect your work in any way whatsoever.</p>
+<p>I still find them interesting, of course, just as you and many others also.</p>
+<p>It may well be that Revit uses floats internally. No idea.</p>
+<p>Revit coordinates are not stored in floats.</p>
+<p>However, even before precision issues actually cause full storage error as described in the article
+on <a href="https://blog.demofox.org/2017/11/21/floating-point-precision">demystifying floating point precision</a> mentioned
+above, imprecision can affect double calculations, e.g., when is 10 not equal to 10? When you add 0.1 (double) 100 times and expect it to be exactly 10. It never is. These effects are exacerbated at higher orders of magnitude.</p>
+<p>You cannot work beyond the 20-mile radius, and you cannot work below the 1/16th inch size, ca. 2mm.</p>
+<p>That is a fact you have to accept.</p>
+<p>That is why it is so clearly documented.</p>
+<p>As always, you can work around it. Here is an example of doing so,
+for <a href="http://thebuildingcoder.typepad.com/blog/2016/02/modelling-small-details.html">modelling small details</a>,
+by importing a DWG file &ndash; however, please also be aware that it is in general recommended
+to <a href="http://thebuildingcoder.typepad.com/blog/2016/09/avoid-cad-import-in-rfa-aag16-and-endtrip.html#2">avoid importing CAD into RFA</a>.</p>
+<p>The recommendation to avoid exorbitant coordinates is not specific to Revit, by the way.</p>
+<p>Almost all CAD systems behave weirdly at large distances from the origin.</p>
+<p>AutoCAD used to be an exception, making use of doubles, as demonstrated by John Walkers planetary system sample way back then.</p>
+<p>However, under certain circumstances, for certain workflows, this even applies to AutoCAD, I'm afraid.</p>
+<p>I recommend getting into the habit of staying close to the origin always, for everything, and managing some kind of base point information to offset your design to wherever you really want it in the larger universe of things.</p>
