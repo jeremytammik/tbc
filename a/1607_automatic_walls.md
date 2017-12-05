@@ -14,7 +14,7 @@
   https://forums.autodesk.com/t5/revit-api-forum/mathematical-translations/m-p/7580510
   automatically create walls in cubical family instances
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/cloudmodelregen
+Automatic wall creation via #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/autowallrvt
 
 Alexander Ignatovich shares an exceedingly elegant solution for automatic wall creation, illustrating a number of important concepts and implementing the following functionality very succinctly indeed
 &ndash; Retrieve all the <code>cube</code> family instances
