@@ -1,0 +1,413 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+Revit 2018.2 #RevitAPI docs online at http://www.revitapidocs.com @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/2018_1_1
+
+&ndash; 
+...
+
+--->
+
+<h3>Revit 2018.2 Product and SDK Update</h3>
+<p>Let's discuss the Revit API enhancements added since the initial release of Revit 2018.</p>
+<p>Before getting to that, let me briefly mention the new AUGI material pointing
+out <a href="https://issuu.com/iuidesign/docs/101_revit_tips-iftikhar_ismail">101 Best Practice Tips for Revit Model Management</a>, 
+in case you are interested in such things.</p>
+<ul>
+<li><a href="#2">Revit 2018.2 Product Update and Resolved API Issues</a></li>
+<li><a href="#3">Revit 2018.2 SDK Update</a></li>
+<li><a href="#4">What's New in Previous Versions</a></li>
+<li><a href="#5">Major Additions to the Revit 2018.1 API</a><ul>
+<li><a href="#5.1">Material API additions</a><ul>
+<li><a href="#5.1.1">Editing the properties of an Appearance Asset</a></li>
+<li><a href="#5.1.2">Editing AssetProperty values</a></li>
+<li><a href="#5.1.3">Connected Assets</a></li>
+<li><a href="#5.1.4">Validation</a></li>
+<li><a href="#5.1.5">Schemas &amp; Property Names</a></li>
+<li><a href="#5.1.6">Utilities</a></li>
+</ul>
+</li>
+<li><a href="#5.2">Geometry API additions</a><ul>
+<li><a href="#5.2.1">Surface API additions</a></li>
+<li><a href="#5.2.2">Curve API additions</a></li>
+</ul>
+</li>
+<li><a href="#5.3">BrowserOrganization API additions</a></li>
+<li><a href="#5.4">IFC additions</a></li>
+<li><a href="#5.5">Rebar API additions</a><ul>
+<li><a href="#5.5.1">BarTypeDiameterOptions</a></li>
+<li><a href="#5.5.2">GetDistributionPath()</a></li>
+<li><a href="#5.5.3">RebarUpdateCurvesData</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#6">Major Additions to the Revit 2018.2 API</a><ul>
+<li><a href="#6.1">Fabrication API additions</a><ul>
+<li><a href="#6.1.1">FabricationNetworkChangeService</a></li>
+<li><a href="#6.1.2">FabricationNetworkChangeServiceResult</a></li>
+<li><a href="#6.1.3">FabricationPartSizeMap</a></li>
+</ul>
+</li>
+<li><a href="#6.2">Other API additions</a><ul>
+<li><a href="#6.2.1">RevitLinkType API addition</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4><a name="2"></a>Revit 2018.2 Product Update and Resolved API Issues</h4>
+<p>I installed the Revit 2018.2 product update last week from
+the <a href="https://knowledge.autodesk.com/support/revit-products/downloads/caas/downloads/content/autodesk-revit-2018-product-updates.html?v=2018">Autodesk Revit 2018 Product Updates</a>.</p>
+<p>In the process, I checked out
+the <a href="http://revit.downloads.autodesk.com/download/2018_2_RVT/Docs/RelNotes/Autodesk_Revit_2018_2_ReleaseNotes.html">release notes</a> to
+analyse what API issues have been addressed in the various 2018 updates, and extracted the following list of <em>reported issues resolved within Revit 2018</em>:</p>
+<ul>
+<li>2018.0.2 Hot Fix &ndash; API:<ul>
+<li>Improved stability when using the API to print or export from modal dialogs.</li>
+</ul>
+</li>
+<li>2018.2 Update &ndash; Resolved Issues &ndash; API:<ul>
+<li>Enabled the FabricationPart.GeometryChecksum property to simplify the checking of fabrication part geometry.</li>
+<li>Fixed an issue so that the crop box is correctly set using the API.</li>
+<li>Improved stability when placing a wall-hosted family on a ceiling through Dynamo.</li>
+</ul>
+</li>
+<li>2018.1.1 Hot Fix &ndash; API:<ul>
+<li>Fixed an issue so that the extents of a crop box are correctly set using the API.</li>
+</ul>
+</li>
+<li>2018.1 Update &ndash; Improvements<ul>
+<li>Integrated Materials API.</li>
+</ul>
+</li>
+<li>2018.0.2 Hot Fix &ndash; API:<ul>
+<li>Improved stability when using the API to print or export from modal dialogs.</li>
+</ul>
+</li>
+</ul>
+<p>As we shall see below, a number of other enhancements have also been added.</p>
+<h4><a name="3"></a>Revit 2018.2 SDK Update</h4>
+<p>Next, I visited 
+the <a href="http://www.autodesk.com/developrevit">Revit Developer Centre</a> to 
+download and install
+the <a href="http://download.autodesk.com/us/revit-sdk/REVIT_2018_2_SDK.msi">Revit 2018.2 SDK (Update December 6, 2017)</a> (msi &ndash; 369528Kb).</p>
+<p><center>
+<img src="img/revit_2018_2_sdk.png" alt="Revit 2018.2 SDK" width="604"/>
+</center></p>
+<p>As far as I can tell, it has no differences at all to the previous version in the <code>Samples</code> collection.</p>
+<p>The only changes I see affect the help file and <em>changes and additions</em> document.</p>
+<pre>
+C:\a\lib\revit>dir 2018.1\SDK
+27/07/17  14:21      53'781 Revit Platform API Changes and Additions.docx
+27/07/17  17:02  48'063'436 RevitAPI.chm
+
+C:\a\lib\revit>dir 2018.2\SDK
+05/12/17  13:31      55'881 Revit Platform API Changes and Additions.docx
+05/12/17  15:05  48'155'903 RevitAPI.chm
+</pre>
+
+<p>Studying those in more depth, I do notice significant enhancements.</p>
+<p>I also notice that I did not document the updates listed in the corresponding <em>changes and additions</em> document for Revit 2018.1.</p>
+<p>So here goes:</p>
+<h4><a name="4"></a>What's New in Previous Versions</h4>
+<p>Here are links to discussions of <em>What's New in the Revit API</em> for previous versions:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2010-api.html">What's New in the Revit 2010 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2011-api.html">What's New in the Revit 2011 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2012-api.html">What's New in the Revit 2012 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/whats-new-in-the-revit-2013-api.html">What's New in the Revit 2013 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">What's New in the Revit 2014 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html">What's New in the Revit 2015 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html">What's New in the Revit 2016 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/04/whats-new-in-the-revit-2017-api.html">What's New in the Revit 2017 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/11/whats-new-in-the-revit-20171-api.html">What's New in the Revit 2017.1 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-revit-2018-api.html">What's New in the Revit 2018 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/08/revit-20181-and-the-visual-materials-api.html">Revit 2018.1 and the Visual Materials API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/09/revit-201811-fixes-cropbox-setting.html">Revit 2018.1.1 and 2018.1 API Docs Online</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html">Revit 2018.1 Visual Materials API</a></li>
+</ul>
+<p><center>
+<div style="border-style:solid; border-width:2px 0px 2px 0px">
+<a name="5"></a><h3 style="font-weight: bold">Major Additions to the Revit 2018.1 API</h3>
+</div>
+</center></p>
+<h3><a name="5.1"></a>Material API additions</h3>
+<h4><a name="5.1.1"></a>Editing the properties of an Appearance Asset</h4>
+<p>New Revit API capabilties have been introduced to edit the properties contained in an appearance asset of a material. These properties appear in the Appearance tab of the Materials dialog and govern the appearance of the material in realistic views and rendering.</p>
+<p>Editing the properties in an appearance Asset requires establishment of an edit scope. The new class</p>
+<ul>
+<li>Autodesk.Revit.DB.Visual.AppearanceAssetEditScope</li>
+</ul>
+<p>allows an application to create and maintain an editing session for an appearance asset. The scope provides access to an editable Asset object whose properties may be changed. Once all of the desired changes have been made to the asset's properties, the edit scope should be committed, which causes the changes to be sent back into the document. (This is the only part of the process when a transaction must be opened).</p>
+<p>The new class has the following methods:</p>
+<ul>
+<li>AppearanceAssetEditScope.Start() &ndash; Starts the edit scope for the asset contained in a particular AppearanceAssetElement. The editable Asset is returned from this method.</li>
+<li>AppearanceAssetEditScope.Commit() &ndash; Finishes the edit scope: all changes made during the edit scope will be committed. Provides an option to forces the update of all open views.</li>
+<li>AppearanceAssetEditScope.Cancel() &ndash; Cancels the edit scope and discards any changes.</li>
+</ul>
+<h4><a name="5.1.2"></a>Editing AssetProperty values</h4>
+<p>The following properties are now writeable from within an AppearanceAssetEditScope, to support modification of an asset property's stored value:</p>
+<ul>
+<li>AssetPropertyString.Value</li>
+<li>AssetPropertyBoolean.Value</li>
+<li>AssetPropertyString.Value</li>
+<li>AssetPropertyInteger.Value</li>
+<li>AssetPropertyDouble.Value</li>
+<li>AssetPropertyFloat.Value</li>
+<li>AssetPropertyEnum.Value</li>
+<li>AssetPropertyDistance.Value</li>
+</ul>
+<p>In addition, the following new methods have been added to support modification of property values:</p>
+<ul>
+<li>AssetPropertyDouble3.SetValueAsXYZ()</li>
+<li>AssetPropertyDouble4.SetValueAsDoubles()</li>
+<li>AssetPropertyDouble4.SetValueAsColor()</li>
+</ul>
+<p>AssetPropertyList now has new methods to allow changes to the members of the list:</p>
+<ul>
+<li>AssetPropertyList.AddNewAssetPropertyDouble()</li>
+<li>AssetPropertyList.InsertNewAssetPropertyDouble()</li>
+<li>AssetPropertyList.AddNewAssetAsColor()</li>
+<li>AssetPropertyList.InsertNewAssetAsColor()</li>
+<li>AssetPropertyList.AddNewAssetPropertyInteger()</li>
+<li>AssetPropertyList.InsertNewAssetPropertyInteger()</li>
+<li>AssetPropertyList.RemoveAssetProperty()</li>
+</ul>
+<h4><a name="5.1.3"></a>Connected Assets</h4>
+<p>Connected assets are associated to properties in appearance assets, and represent subordinate objects encapsulating a collection of related properties. One example of a connected asset is the "Unified Bitmap" representing an image and its mapping parameters and values. AssetProperty offers new methods to provide the ability to modify, add or delete the asset connected to a property:</p>
+<ul>
+<li>AssetProperty.GetSingleConnectedAsset() &ndash; Gets the single connected asset of this property.</li>
+<li>AssetProperty.RemoveConnectedAsset() &ndash; Removes the single connected asset of this property.</li>
+<li>AssetProperty.AddConnectedAsset (String schemaId) &ndash; Create a new default asset of schema type and connects it to this property.</li>
+<li>AssetProperty.AddCopyAsConnectedAsset() &ndash; Connects the property to a copy of the asset.</li>
+</ul>
+<h4><a name="5.1.4"></a>Validation</h4>
+<p>Inputs to change the value of asset properties are validated against the requirements of the associated schema. </p>
+<p>The new methods:</p>
+<ul>
+<li>AssetPropertyString.IsValidValue(String)</li>
+<li>AssetPropertyInteger.IsValidValue (int)</li>
+<li>AssetPropertyEnum.IsValidValue (int)</li>
+<li>AssetPropertyDouble.IsValidValue (double)</li>
+<li>AssetPropertyFloat.IsValidValue (float)</li>
+<li>AssetPropertyDistance.IsValidValue (double)</li>
+<li>AssetPropertyDouble3.IsValidValue (XYZ)</li>
+<li>AssetPropertyDouble4.IsValidValue (IList&lt;double&gt;)</li>
+<li>AssetPropertyDouble4.IsValidValue (Color)</li>
+</ul>
+<p>identify if the input value is a valid value that can be set to the given asset property.</p>
+<p>The new method: </p>
+<ul>
+<li>AssetProperty.IsEditable()</li>
+</ul>
+<p>identifies the the AssetProperty can currently be edited.</p>
+<h4><a name="5.1.5"></a>Schemas &amp; Property Names</h4>
+<p>Appearance asset properties are aligned with specific schemas. Each schema contains necessary properties which define how the appearance of the material will be generated. There are 14 standard material schemas:</p>
+<ul>
+<li>Ceramic</li>
+<li>Concrete</li>
+<li>Generic</li>
+<li>Glazing</li>
+<li>Hardwood</li>
+<li>MasonryCMU</li>
+<li>Metal</li>
+<li>MetallicPaint</li>
+<li>Mirror</li>
+<li>PlasticVinyl</li>
+<li>SolidGlass</li>
+<li>Stone</li>
+<li>WallPaint</li>
+<li>Water</li>
+</ul>
+<p>In addition, there are 5 schemas representing "advanced" materials &ndash; these may be encountered as a result of import from other Autodesk products:</p>
+<ul>
+<li>AdvancedLayered</li>
+<li>AdvancedMetal</li>
+<li>AdvancedOpaque</li>
+<li>AdvancedTransparent</li>
+<li>AdvancedWood</li>
+</ul>
+<p>Finally, there are 10 schemas used for the aspects of the connected assets:</p>
+<ul>
+<li>BumpMap</li>
+<li>Checker</li>
+<li>Gradient</li>
+<li>Marble</li>
+<li>Noise</li>
+<li>Speckle</li>
+<li>Tile</li>
+<li>UnifiedBitmap</li>
+<li>Wave</li>
+<li>Wood</li>
+</ul>
+<p>The new method:</p>
+<ul>
+<li>AssetProperty.IsValidSchemaIdentifier(String schemaName)</li>
+</ul>
+<p>identifies if the input name is a valid name for a supported schema.</p>
+<p>To assist in creating code accessing and manipulating the properties of a given schema, predefined properties have been introduced to allow a compile-time reference to a property name without requiring you to transcribe it as a string in your code. These predefined property names are available in static classes named similar to the schema names, above, e.g. Autodesk.Revit.DB.Visual.Ceramic.</p>
+<h4><a name="5.1.6"></a>Utilities</h4>
+<p>The new method:</p>
+<ul>
+<li>Application.GetAssets(AssetType)</li>
+</ul>
+<p>returns a list of assets available to the session.</p>
+<p>The new method: </p>
+<ul>
+<li>AppearanceAssetElement.Duplicate()</li>
+</ul>
+<p>creates a copy of an appearance asset element and the asset contained by it.</p>
+<p>The new operator: </p>
+<ul>
+<li>Asset.operator[]</li>
+</ul>
+<p>accesses a particular AssetProperty associated to the given asset. </p>
+<h3><a name="5.2"></a>Geometry API additions</h3>
+<h4><a name="5.2.1"></a>Surface API additions</h4>
+<p>Two new methods allow projecting a point onto a surface:</p>
+<ul>
+<li>Surface.Project() &ndash; Projects a 3D point orthogonally onto a surface (to find the nearest point).</li>
+<li>Surface.ProjectWithGuessPoint() &ndash; Projects a 3D point orthogonally onto a surface (to find the nearest point). This method is meant to be used when a good approximate solution for the projection is available.</li>
+</ul>
+<h4><a name="5.2.2"></a>Curve API additions</h4>
+<p>The new class:</p>
+<ul>
+<li>ClosestPointsPairBetweenTwoCurves</li>
+</ul>
+<p>captures the results of computation of closest points between two generic curves.</p>
+<p>It has the following properties:</p>
+<ul>
+<li>ClosestPointsPairBetweenTwoCurves.XYZPointOnFirstCurve &ndash; The point on the first curve in 3d coordinates.</li>
+<li>ClosestPointsPairBetweenTwoCurves.XYZPointOnSecondCurve &ndash; The point on the second curve in 3d coordinates.</li>
+<li>ClosestPointsPairBetweenTwoCurves.ParameterOnFirstCurve &ndash; 1d raw (not normalized) parameter of the point on first curve.</li>
+<li>ClosestPointsPairBetweenTwoCurves.ParameterOnSecondCurve &ndash; 1d raw (not normalized) parameter of the point on second curve.</li>
+<li>ClosestPointsPairBetweenTwoCurves.Distance &ndash; Distance (as a double) from the point on the first curve to the point on the second curve.</li>
+</ul>
+<p>The new Curve method:</p>
+<ul>
+<li>Curve.ComputeClosestPoints()</li>
+</ul>
+<p>outputs a list of closest points between two generic curves using ClosestPointsPairBetweenTwoCurves.</p>
+<h3><a name="5.3"></a>BrowserOrganization API additions</h3>
+<p>The new enumerated value: </p>
+<ul>
+<li>BrowserOrganizationType.Schedules </li>
+</ul>
+<p>corresponds to the type of the browser organization definition for schedules. </p>
+<p>The new method:</p>
+<ul>
+<li>BrowserOrganization.GetCurrentBrowserOrganizationForSchedules() </li>
+</ul>
+<p>gets the BrowserOrganization that applies to the Schedules section of the project browser.</p>
+<h3><a name="5.4"></a>IFC additions</h3>
+<p>The new functions:</p>
+<ul>
+<li>IFCImportOptions.GetExtraOptions()</li>
+<li>IFCImportOptions.SetExtraOptions()</li>
+</ul>
+<p>allow for passing in arbitrary options for custom IFC importers. Users can pass in a string to string map specifying extra data they wish to pass for IFC import.</p>
+<h3><a name="5.5"></a>Rebar API additions</h3>
+<h4><a name="5.5.1"></a>BarTypeDiameterOptions</h4>
+<p>The new options class:</p>
+<ul>
+<li>BarTypeDiameterOptions</li>
+</ul>
+<p>allows creation of a new set of diameter values for a RebarBarType. It can be used when copying the diameter information as a bulk of data from one RebarBarType to another.</p>
+<p>The diameter options can be set for a RebarBarType with the new method:</p>
+<ul>
+<li>Autodesk.Revit.DB.Structure.RebarBarType.setBarTypeDiameters </li>
+</ul>
+<p>which sets all input diameters from the input BarTypeDiameterOptions in the current RebarBarType.</p>
+<h4><a name="5.5.2"></a>GetDistributionPath()</h4>
+<p>The new method:</p>
+<ul>
+<li>Autodesk.Revit.DB.Structure.RebarHandlePositionData.GetDistributionPath()</li>
+</ul>
+<p>gets the distribution path currently stored in the rebar.</p>
+<p>For a free form rebar set the distance between two consecutive bars may be different if it is calculated between different points on bars. The distribution path is an array of curves with the property that based on these curves the set was calculated to respect the layout rule and number of bars or spacing.</p>
+<h4><a name="5.5.3"></a>RebarUpdateCurvesData</h4>
+<p>Several new properties have been added to Autodesk.Revit.DB.Structure.RebarUpdateCurvesData:</p>
+<ul>
+<li>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.HostMirrored &ndash; If true, then host of the rebar was mirrorred (along with the rebar) before the most recent regeneration.</li>
+<li>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.IsReversed &ndash; Used to store the state of the bar refering to the direction of the bars. This is useful when using face intersection to calculate bars. After mirroring, curves created from intersecting faces may be reversed, so we use this to store the state and keep the rebar pointing in the correct direction.</li>
+<li>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.ErrorMessage &ndash; The reason for calculation failure. If the calculation fails, this message will be shown in an error, or warning if we are editing the constraints.</li>
+</ul>
+<p><center>
+<div style="border-style:solid; border-width:2px 0px 2px 0px">
+<a name="6"></a><h3 style="font-weight: bold">Major Additions to the Revit 2018.2 API</h3>
+</div>
+</center></p>
+<h3><a name="6.1"></a>Fabrication API additions</h3>
+<p>New APIs have been added to change the service or size of a selection of fabrication parts. </p>
+<h4><a name="6.1.1"></a>FabricationNetworkChangeService</h4>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.Fabrication.FabricationNetworkChangeService </li>
+</ul>
+<p>exposes the ability to change the service or size of a selection of fabrication parts.</p>
+<p>It has the following methods:</p>
+<ul>
+<li>FabricationNetworkChangeService.Create() &ndash; Creates a new instance of a fabrication change service.</li>
+<li>FabricationNetworkChangeService.ChangeService() &ndash; Changes the service of a selection of element identifiers to the passed in service and group identifiers.</li>
+<li>FabricationNetworkChangeService.ChangeSize() &ndash; Changes the size of a selection of element identifiers to the passed in map of sizes.</li>
+<li>FabricationNetworkChangeService.SetSelection() &ndash; The set of element identifiers of fabrication parts to change the service or size for.</li>
+<li>FabricationNetworkChangeService.SetServiceId() &ndash; Sets the fabrication service identifier to change the elements to.</li>
+<li>FabricationNetworkChangeService.SetGroupId() &ndash; Sets the fabrication group identifier to change the elements to.</li>
+<li>FabricationNetworkChangeService.GetInLinePartTypes() &ndash; Gets a set of element identifiers of fabrication part types for in-line parts.</li>
+<li>FabricationNetworkChangeService.SetMapOfInLinePartTypes() &ndash; Sets the mapping of fabrication part types for in-line parts for the service and group to change to.</li>
+<li>FabricationNetworkChangeService.GetMapOfAllSizesForStraights() &ndash; Gets a set of FabricationPartSizeMapSet of all straight sizes for all services.</li>
+<li>FabricationNetworkChangeService.SetMapOfSizesForStraights() &ndash; Sets the mapping for sizes of fabrication part straights to change the sizes to.</li>
+<li>FabricationNetworkChangeService.Apply() &ndash; Applies the previously set changes to the selection of fabrication parts to change the size, change the service, or both.</li>
+<li>FabricationNetworkChangeService.GetElementsThatFailed() &ndash; Gets the set of fabrication parts that had failures. Possible reasons are: there was no corresponding part in the service, the size was out of range, or a connection could not be made.</li>
+<li>FabricationNetworkChangeService.GetStraightsThatWereNotChanged() &ndash; Gets the set of fabrication part straights that were not changed. Possible reasons are: there was no corresponding part in the service, or the size was out of range.</li>
+</ul>
+<h4><a name="6.1.2"></a>FabricationNetworkChangeServiceResult</h4>
+<p>The new enum:</p>
+<ul>
+<li>Autodesk.Revit.DB.Fabrication.FabricationNetworkChangeServiceResult</li>
+</ul>
+<p>provides a result status from applying changes to the service or size of fabrication parts.</p>
+<p>It has the following values:</p>
+<ul>
+<li>Success &ndash; The change was successful.</li>
+<li>PartialFailure &ndash; The change contained partial failures and will need to be fixed manually.</li>
+<li>UserAborted &ndash; The change was aborted by the user.</li>
+<li>InvalidSelection &ndash; The selection of fabrication parts was invalid.</li>
+</ul>
+<h4><a name="6.1.3"></a>FabricationPartSizeMap</h4>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.Fabrication.FabricationPartSizeMap</li>
+</ul>
+<p>represents the fabrication part size map for straights. This class allows is an input to several functions of FabricationNetworkServiceChange, and allows multiple straights of different sizes to be changed at once. </p>
+<p>It has the following properties:</p>
+<ul>
+<li>FabricationPartSizeMap.WidthDiameter &ndash; Gets or sets the width or diameter of the straight</li>
+<li>FabricationPartSizeMap.Depth &ndash; Gets or sets the depth of the straight.</li>
+<li>FabricationPartSizeMap.IsProductList &ndash; Gets or sets whether the sizes are for a product listed fabrication part.</li>
+<li>FabricationPartSizeMap.ProfileType &ndash; Gets or sets the shape of the straight.</li>
+<li>FabricationPartSizeMap.ServiceId &ndash; Gets or sets the service identifier of the straight.</li>
+<li>FabricationPartSizeMap.GroupId &ndash; Gets or sets the group identifier of the straight.</li>
+<li>FabricationPartSizeMap.MappedWidthDiameter &ndash; Gets or sets the mapped width or diameter of the straight.</li>
+<li>FabricationPartSizeMap.MappedDepth &ndash; Gets or sets the mapped depth of the straight.</li>
+<li>FabricationPartSizeMap.IsMappedProductList &ndash; Gets or sets whether the mapped sizes are for a product listed fabrication part.</li>
+<li>FabricationPartSizeMap.MappedProfileType &ndash; Gets or sets the mapped shape of the straight.</li>
+<li>FabricationPartSizeMap.MappedServiceId &ndash; Gets or sets the mapped service identifier of the straight.</li>
+<li>FabricationPartSizeMap.AllowMultipleServiceSizes &ndash; Gets or sets the state flag to allow multiple services to include the same size.</li>
+</ul>
+<h4><a name="6.2"></a>Other API additions</h4>
+<h4><a name="6.2.1"></a>RevitLinkType API addition</h4>
+<p>The new method:</p>
+<ul>
+<li>RevitLinkType.GetLinkedFileStatus()</li>
+</ul>
+<p>returns the LinkedFileStatus enum value indicating the link's load status (loaded, unloaded, missing, etc.). This function returns the same value as ExternalFileReference.GetLinkedFileStatus() but can be called on Collaboration for Revit links. </p>
