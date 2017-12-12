@@ -9,14 +9,23 @@
 </head></p>
 <!---
 
-Revit 2018.2 #RevitAPI docs online at http://www.revitapidocs.com @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/2018_1_1
+Revit 2018.2 @AutodeskRevit product, #RevitAPI and SDK update #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/rvt2018_2
 
-&ndash; 
-...
+Let's discuss the Revit API enhancements added since the initial release of Revit 2018
+&ndash; Revit 2018.2 Product Update and Resolved API Issues
+&ndash; Revit 2018.2 SDK Update
+&ndash; Major Additions to the Revit 2018.1 API
+&ndash; Material API additions
+&ndash; Geometry API additions
+&ndash; BrowserOrganization API additions
+&ndash; IFC additions
+&ndash; Rebar API additions
+&ndash; Major Additions to the Revit 2018.2 API
+&ndash; Fabrication API additions...
 
 --->
 
-<h3>Revit 2018.2 Product and SDK Update</h3>
+<h3>What's New in the Revit 2018.2 API</h3>
 <p>Let's discuss the Revit API enhancements added since the initial release of Revit 2018.</p>
 <p>Before getting to that, let me briefly mention the new AUGI material pointing
 out <a href="https://issuu.com/iuidesign/docs/101_revit_tips-iftikhar_ismail">101 Best Practice Tips for Revit Model Management</a>, 
@@ -142,7 +151,7 @@ C:\a\lib\revit>dir 2018.2\SDK
 </center></p>
 <h3><a name="5.1"></a>Material API additions</h3>
 <h4><a name="5.1.1"></a>Editing the properties of an Appearance Asset</h4>
-<p>New Revit API capabilties have been introduced to edit the properties contained in an appearance asset of a material. These properties appear in the Appearance tab of the Materials dialog and govern the appearance of the material in realistic views and rendering.</p>
+<p>New Revit API capabilities have been introduced to edit the properties contained in an appearance asset of a material. These properties appear in the Appearance tab of the Materials dialog and govern the appearance of the material in realistic views and rendering.</p>
 <p>Editing the properties in an appearance Asset requires establishment of an edit scope. The new class</p>
 <ul>
 <li>Autodesk.Revit.DB.Visual.AppearanceAssetEditScope</li>
@@ -209,7 +218,7 @@ C:\a\lib\revit>dir 2018.2\SDK
 <ul>
 <li>AssetProperty.IsEditable()</li>
 </ul>
-<p>identifies the the AssetProperty can currently be edited.</p>
+<p>identifies whether the AssetProperty can currently be edited.</p>
 <h4><a name="5.1.5"></a>Schemas &amp; Property Names</h4>
 <p>Appearance asset properties are aligned with specific schemas. Each schema contains necessary properties which define how the appearance of the material will be generated. There are 14 standard material schemas:</p>
 <ul>
@@ -337,8 +346,8 @@ C:\a\lib\revit>dir 2018.2\SDK
 <h4><a name="5.5.3"></a>RebarUpdateCurvesData</h4>
 <p>Several new properties have been added to Autodesk.Revit.DB.Structure.RebarUpdateCurvesData:</p>
 <ul>
-<li>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.HostMirrored &ndash; If true, then host of the rebar was mirrorred (along with the rebar) before the most recent regeneration.</li>
-<li>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.IsReversed &ndash; Used to store the state of the bar refering to the direction of the bars. This is useful when using face intersection to calculate bars. After mirroring, curves created from intersecting faces may be reversed, so we use this to store the state and keep the rebar pointing in the correct direction.</li>
+<li>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.HostMirrored &ndash; If true, then host of the rebar was mirrored (along with the rebar) before the most recent regeneration.</li>
+<li>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.IsReversed &ndash; Used to store the state of the bar referring to the direction of the bars. This is useful when using face intersection to calculate bars. After mirroring, curves created from intersecting faces may be reversed, so we use this to store the state and keep the rebar pointing in the correct direction.</li>
 <li>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.ErrorMessage &ndash; The reason for calculation failure. If the calculation fails, this message will be shown in an error, or warning if we are editing the constraints.</li>
 </ul>
 <p><center>
