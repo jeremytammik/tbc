@@ -15,7 +15,12 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
 
-&ndash; ...
+I'm trying to retrieve connected framing elements through the API.
+My end goal is to select a beam and retrieve the element id of the elements its ends are framing into.
+I have been able to do this by checking location intersection of all other beams, but this scales by <code>n^2</code> based on the number of beams for the check.
+I read the article on finding connected structural elements, but I'm confused on the actual implementation of it.
+Has anybody come across a working example showing how to
+call <code>GetAnalyticalModelSupports</code>? ...
 
 --->
 
@@ -67,7 +72,7 @@ call <a href="http://www.revitapidocs.com/2018.1/15f01976-9e34-8850-6fa8-79c77a7
 
 <p>Thanks so much for any help you can give.</p>
 <p><strong>Answer:</strong> Does this snippet work for you and answer your question?</p>
-<pre class="code"> 
+<pre class="code">
 &nbsp;&nbsp;<span style="color:#2b91af;">AnalyticalModel</span>&nbsp;model
 &nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;aWallFoundation.GetAnalyticalModel()&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">AnalyticalModel</span>;
@@ -92,7 +97,7 @@ call <a href="http://www.revitapidocs.com/2018.1/15f01976-9e34-8850-6fa8-79c77a7
 <p>I was imagining the supports would be similar to what pressing tab on a beam element does; however, it seems the supports are actually the members involved in the gravity load path.</p>
 <p>More importantly, the analytical supports will be null if Revit has 'Automatic Member Supports' turned off (as it should be, Revit is unusably slow on large projects with it on).</p>
 <p>I had to run a manual support check before anything would show up.</p>
-<p>Hope this helps anyone having similar issue to what I ran into. Also if there is any way to programmatically get the connected beams similar to how tab behavior works, I would still be interested to learn how.</p>
+<p>Hope this helps anyone having similar issue to what I ran into. Also, if there is any way to programmatically get the connected beams similar to how tab behaviour works, I would still be interested to learn how.</p>
 <p>Many thanks to Dragos and J. for raising and solving this issue!</p>
 <p><center>
 <img src="img/rst_framing_supports.png" alt="Structural framing supports" width="323"/>

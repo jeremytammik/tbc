@@ -16,7 +16,12 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
 
-&ndash; ...
+I'm trying to retrieve connected framing elements through the API.
+My end goal is to select a beam and retrieve the element id of the elements its ends are framing into.
+I have been able to do this by checking location intersection of all other beams, but this scales by <code>n^2</code> based on the number of beams for the check.
+I read the article on finding connected structural elements, but I'm confused on the actual implementation of it.
+Has anybody come across a working example showing how to
+call <code>GetAnalyticalModelSupports</code>? ...
 
 --->
 
@@ -79,7 +84,7 @@ Thanks so much for any help you can give.
 
 **Answer:** Does this snippet work for you and answer your question?
 
-<pre class="code"> 
+<pre class="code">
 &nbsp;&nbsp;<span style="color:#2b91af;">AnalyticalModel</span>&nbsp;model
 &nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;aWallFoundation.GetAnalyticalModel()&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">AnalyticalModel</span>;
