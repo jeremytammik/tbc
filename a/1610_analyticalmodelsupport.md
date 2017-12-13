@@ -14,7 +14,7 @@
   https://forums.autodesk.com/t5/revit-api-forum/getanalyticalmodelsupports-how-to-use-this/m-p/7503547
   /a/doc/revit/tbc/git/a/1608_analyticalmodelsupport.md
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+How to Use GetAnalyticalModelSupports in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/analyticalmodelsupport
 
 I'm trying to retrieve connected framing elements through the API.
 My end goal is to select a beam and retrieve the element id of the elements its ends are framing into.
