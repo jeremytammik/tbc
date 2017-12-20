@@ -107,7 +107,7 @@ to [add a category to a shared parameter binding](http://thebuildingcoder.typepa
 Here is a code snippet providing enough to get the gist of how the above can be used (ignore my helper classes and error handling):
 
 <pre class="code">
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Assumes&nbsp;outer&nbsp;transaction</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Assumes&nbsp;outer&nbsp;transaction</span>
 &nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">Parameter</span>&nbsp;GetOrCreateElemSharedParam(&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;elem,
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;paramName,
