@@ -199,3 +199,11 @@ the edge cases such as these.</p>
 <p>The inputs are parallel lines with only one common intersection point, or the curve used to invoke the intersection check is a line entirely within the unbound line passed as argument curve. If the former, the output argument has the details of the intersection point.</p>
 </blockquote>
 <p>The customer didn't indicate what the return value was for them; if it is subset, that matches what we have told them it would be.</p>
+<p><strong>Response:</strong> Indeed, using <code>SetcomparisonResult.Subset</code> works for my problem and is much more elegant than my previous workaround solution (which was, in essence: check if <code>SetComparisonResult</code> is either <code>Overlap</code> or <code>Disjoint</code>; if not, check if the 2 elements are line, collinear, and have same end; if so, treat the case as <code>Overlap</code>).</p>
+<p>The improved test is now:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;scr&nbsp;!=&nbsp;<span style="color:#2b91af;">SetComparisonResult</span>.Overlap
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;scr&nbsp;!=&nbsp;<span style="color:#2b91af;">SetComparisonResult</span>.Disjoint
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;!(&nbsp;scr&nbsp;==&nbsp;<span style="color:#2b91af;">SetComparisonResult</span>.Subset&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;ira.Size&nbsp;==&nbsp;1&nbsp;)&nbsp;)
+</pre>
