@@ -17,17 +17,18 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+I bring up two recurring topics, fresh every time around
+&ndash; Project identifier
+&ndash; Fuzzy comparison versus exact arithmetic for curve intersection...
 
 --->
 
-<h3>Project Identifier and Fuzzy Comparisons</h3>
+<h3>Project Identifier and Fuzzy Comparison</h3>
 <p>I bring up two recurring topics...</p>
 <p>Fresh every time around:</p>
 <ul>
 <li><a href="#2">Project identifier</a></li>
-<li><a href="#3">Fuzzy comparison for curve intersection results</a></li>
+<li><a href="#3">Fuzzy comparison versus exact arithmetic for curve intersection</a></li>
 </ul>
 <h4><a name="2"></a>Project Identifier</h4>
 <p><strong>Question:</strong> I have a problem with the unique id for <code>Document.ProjectInformation</code>.</p>
@@ -43,7 +44,7 @@ using <a href="http://thebuildingcoder.typepad.com/blog/2016/04/named-guid-stora
 <p>Furthermore, it is completely untested, as far as I know.</p>
 <p>If anyone has made using of this or enhanced it in any way, please let us know.</p>
 <p>Thank you!</p>
-<h4><a name="3"></a>Fuzzy Comparison for Curve Intersection Results</h4>
+<h4><a name="3"></a>Fuzzy Comparison versus Exact Arithmetic for Curve Intersection</h4>
 <p>An interesting discussion ensued in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread on
 a <a href="https://forums.autodesk.com/t5/revit-api-forum/problem-with-the-function-curve-intersect-curve/m-p/7632649">problem with the function <code>Curve.Intersect(Curve)</code></a>:</p>
@@ -74,6 +75,7 @@ a <a href="https://forums.autodesk.com/t5/revit-api-forum/problem-with-the-funct
 <p>If the 2 lines are not parallel to each other, the result is overlap (correct):</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;pt4&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;0,&nbsp;1,&nbsp;0&nbsp;);
+
 &nbsp;&nbsp;<span style="color:#2b91af;">SetComparisonResult</span>&nbsp;scr2&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;pt1,&nbsp;pt2&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;.Intersect(&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;pt1,&nbsp;pt4&nbsp;),&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">out</span>&nbsp;IntersectionResultArray&nbsp;ira2&nbsp;);

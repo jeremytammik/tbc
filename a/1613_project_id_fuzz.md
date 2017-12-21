@@ -18,19 +18,20 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+I bring up two recurring topics, fresh every time around
+&ndash; Project identifier
+&ndash; Fuzzy comparison versus exact arithmetic for curve intersection...
 
 --->
 
-### Project Identifier and Fuzzy Comparisons
+### Project Identifier and Fuzzy Comparison
 
 I bring up two recurring topics...
 
 Fresh every time around:
 
 - [Project identifier](#2)
-- [Fuzzy comparison for curve intersection results](#3)
+- [Fuzzy comparison versus exact arithmetic for curve intersection](#3)
 
 
 ####<a name="2"></a>Project Identifier
@@ -61,7 +62,7 @@ If anyone has made using of this or enhanced it in any way, please let us know.
 Thank you!
 
 
-####<a name="3"></a>Fuzzy Comparison for Curve Intersection Results
+####<a name="3"></a>Fuzzy Comparison versus Exact Arithmetic for Curve Intersection
 
 An interesting discussion ensued in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread on
@@ -98,6 +99,7 @@ If the 2 lines are not parallel to each other, the result is overlap (correct):
 
 <pre class="code">
 &nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;pt4&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;0,&nbsp;1,&nbsp;0&nbsp;);
+
 &nbsp;&nbsp;<span style="color:#2b91af;">SetComparisonResult</span>&nbsp;scr2&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;pt1,&nbsp;pt2&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;.Intersect(&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;pt1,&nbsp;pt4&nbsp;),&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">out</span>&nbsp;IntersectionResultArray&nbsp;ira2&nbsp;);
