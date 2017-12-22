@@ -49,10 +49,10 @@ Command line Russian roulette
 
 Time to wind down for the year...
 Here are some last things to share before signing off
-&ndash; Magic Number for Schedule Instance Bounding Box Margin
+&ndash; Magic number for schedule instance bounding box margin
 &ndash; Using <code>PostCommand</code> with the Windows Automation API
-&ndash; Programmer Jokes
-&ndash; Season's Greetings...
+&ndash; Programmer jokes
+&ndash; Season's greetings...
 
 --->
 
@@ -60,10 +60,10 @@ Here are some last things to share before signing off
 <p>Time to wind down for the year...</p>
 <p>Here are some last things to share before signing off:</p>
 <ul>
-<li><a href="#2">Magic Number for Schedule Instance Bounding Box Margin</a></li>
+<li><a href="#2">Magic number for schedule instance bounding box margin</a></li>
 <li><a href="#3">Using PostCommand with the Windows Automation API</a></li>
-<li><a href="#4">Programmer Jokes</a></li>
-<li><a href="#5">Season's Greetings</a></li>
+<li><a href="#4">Programmer jokes</a></li>
+<li><a href="#5">Season's greetings</a></li>
 </ul>
 <h4><a name="2"></a>Magic Number for Schedule Instance Bounding Box Margin</h4>
 <p>I discussed
@@ -89,10 +89,14 @@ and the Revit development team confirmed the magic number he determined empirica
   tx = Transaction(doc, "bounds")
   tx.Start()
 
-  doc.Create.NewDetailCurve(doc.ActiveView, Line.CreateBound(bb.Min, XYZ(bb.Min.X, bb.Max.Y, 0)))
-  doc.Create.NewDetailCurve(doc.ActiveView, Line.CreateBound(XYZ(bb.Min.X, bb.Max.Y, 0), bb.Max))
-  doc.Create.NewDetailCurve(doc.ActiveView, Line.CreateBound(bb.Max, XYZ(bb.Max.X, bb.Min.Y, 0)))
-  doc.Create.NewDetailCurve(doc.ActiveView, Line.CreateBound(XYZ(bb.Max.X, bb.Min.Y, 0), bb.Min))
+  doc.Create.NewDetailCurve(doc.ActiveView,
+    Line.CreateBound(bb.Min, XYZ(bb.Min.X, bb.Max.Y, 0)))
+  doc.Create.NewDetailCurve(doc.ActiveView,
+    Line.CreateBound(XYZ(bb.Min.X, bb.Max.Y, 0), bb.Max))
+  doc.Create.NewDetailCurve(doc.ActiveView,
+    Line.CreateBound(bb.Max, XYZ(bb.Max.X, bb.Min.Y, 0)))
+  doc.Create.NewDetailCurve(doc.ActiveView,
+    Line.CreateBound(XYZ(bb.Max.X, bb.Min.Y, 0), bb.Min))
 
   tx.Commit()
 </pre>
