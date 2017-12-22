@@ -50,10 +50,10 @@ Command line Russian roulette
 
 Time to wind down for the year...
 Here are some last things to share before signing off
-&ndash; Magic Number for Schedule Instance Bounding Box Margin
+&ndash; Magic number for schedule instance bounding box margin
 &ndash; Using <code>PostCommand</code> with the Windows Automation API
-&ndash; Programmer Jokes
-&ndash; Season's Greetings...
+&ndash; Programmer jokes
+&ndash; Season's greetings...
 
 --->
 
@@ -63,10 +63,10 @@ Time to wind down for the year...
 
 Here are some last things to share before signing off:
 
-- [Magic Number for Schedule Instance Bounding Box Margin](#2)
+- [Magic number for schedule instance bounding box margin](#2)
 - [Using PostCommand with the Windows Automation API](#3)
-- [Programmer Jokes](#4)
-- [Season's Greetings](#5)
+- [Programmer jokes](#4)
+- [Season's greetings](#5)
 
 ####<a name="2"></a>Magic Number for Schedule Instance Bounding Box Margin
 
@@ -100,10 +100,14 @@ I've draw borders with this Python shell code:
   tx = Transaction(doc, "bounds")
   tx.Start()
   
-  doc.Create.NewDetailCurve(doc.ActiveView, Line.CreateBound(bb.Min, XYZ(bb.Min.X, bb.Max.Y, 0)))
-  doc.Create.NewDetailCurve(doc.ActiveView, Line.CreateBound(XYZ(bb.Min.X, bb.Max.Y, 0), bb.Max))
-  doc.Create.NewDetailCurve(doc.ActiveView, Line.CreateBound(bb.Max, XYZ(bb.Max.X, bb.Min.Y, 0)))
-  doc.Create.NewDetailCurve(doc.ActiveView, Line.CreateBound(XYZ(bb.Max.X, bb.Min.Y, 0), bb.Min))
+  doc.Create.NewDetailCurve(doc.ActiveView,
+    Line.CreateBound(bb.Min, XYZ(bb.Min.X, bb.Max.Y, 0)))
+  doc.Create.NewDetailCurve(doc.ActiveView,
+    Line.CreateBound(XYZ(bb.Min.X, bb.Max.Y, 0), bb.Max))
+  doc.Create.NewDetailCurve(doc.ActiveView,
+    Line.CreateBound(bb.Max, XYZ(bb.Max.X, bb.Min.Y, 0)))
+  doc.Create.NewDetailCurve(doc.ActiveView,
+    Line.CreateBound(XYZ(bb.Max.X, bb.Min.Y, 0), bb.Min))
   
   tx.Commit()
 </pre>
