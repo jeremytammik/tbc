@@ -96,32 +96,76 @@ scroll();
 
 I had a great break over Christmas and New Year and hope you did as well.
 
-I'll begin the new year by discussing several topics I collected addressing various aspects of `DirectShape` elements:
+I'll begin the new year by discussing a collection of topics addressing various aspects of `DirectShape` elements:
+
+- [Updated DirectShapeFromFace](#2)
+- [Improve Loft Form Creation Speed using DirectShape](#3)
+- [Another DirectShape Example](#4)
+- [Create DirectShape Instead of Conceptual Mass](#5)
+- [Create DirectShape from Solid](#6)
+- [Control DirectShape Colour and Material](#7)
+- [Create DirectShape Without Representation](#8)
+- [Create DirectShape from Room](#9)
+- [Control DirectShape Visibility in Family Definition](#10)
 
 
-####<a name="2"></a>
+####<a name="2"></a>Updated DirectShapeFromFace 
+
+####<a name="3"></a>Improve Loft Form Creation Speed using DirectShape
+
+####<a name="4"></a>Another DirectShape Example
+
+- 10467085 [Create surface from face] -- 
+
+####<a name="5"></a>Create DirectShape Instead of Conceptual Mass
+
+- create direct shape instead of conceptual mass
+creating wall and roof elements on face of mass
+new topic group
+http://forums.autodesk.com/t5/revit-api/create-a-surface-through-revit-api/m-p/5867952
+
+####<a name="6"></a>Create DirectShape from Solid
+
+- 11770403 -- [Hermite,Nurbs Spline Do they need to be on a plane?](http://forums.autodesk.com/t5/revit-api/hermite-nurbs-spline-do-they-need-to-be-on-a-plane/m-p/6301635)
+
+[Q] You state in Point 3 "... create a DirectShape element using the 'solid' geometry created above." Where can I find code which shows how to do that?
+
+[A] You just have to package the solid in a GeometryObject Array, then DirectShape.CreateElement works:
+
+https://knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhelp/2016/ENU/Revit-API/files/GUID-DF7B9D4A-5A8A-4E39-8721-B7782CBD7730-htm.html
+
+####<a name="7"></a>Control DirectShape Colour and Material
+
+- 12950253 [Using API to change color (and/or material) of DirectShape](https://forums.autodesk.com/t5/revit-api-forum/using-api-to-change-color-and-or-material-of-directshape/m-p/7064149)
+
+####<a name="8"></a>Create DirectShape Without Representation
+
+- Re: Create DirectShape without representation when generating shape -- Toshiaki Isezaki
+
+####<a name="9"></a>Create DirectShape from Room
+
+- 12390855 [Create Direct Shape from Room](http://forums.autodesk.com/t5/revit-api-forum/create-direct-shape-from-room/m-p/6703123)
+
+Using spatial geometry calculator versus room boundary...
+
+####<a name="10"></a>Control DirectShape Visibility in Family Definition
+
+- 13676056 [ファミリ内のDirectShapeについて -- About DirectShape in family]
 
 
 **Question:** 
 
-<center>
-<img src="img/.png" alt="" width="470"/>
-</center>
+**Answer:** 
 
+<center>
+<img src="img/.png" alt="" width="100"/>
+</center>
 
 <pre class="prettyprint">
 </pre>
 
-
-**Answer:** 
-
-####<a name="3"></a>
-
 <pre class="code">
 </pre>
 
-
-
-####<a name="4"></a>
 
 
