@@ -1,0 +1,109 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- updated https://github.com/jeremytammik/DirectShapeFromFace -- direct shape from face
+  test sketch plane creation and refinding
+  generics for searching faces, edges, etc.
+  parameter filter
+
+- loft form creation speed ---  >> directshape
+  [Q] I have a developer from Revit Vanguard having a function which create a new mass family and load it in the project, but he cannot provide this function due to take much time to create a loft form.
+  He creates a form by using Document.FamilyCreate.NewLoftForm with ReferenceArray of CurveByPoints or ModelCurve.
+  I think that it seems to be general way to create Family.
+  I tested the attached minimal sample code, I got a similar result as he mentioned.
+  It takes about 4 minutes to create a family in the test code.
+  Eventually, he wants to visualize calculation result of sky view factor by 3D model.
+  And his addin already works well in ArchCad as the same function.
+  Is there any work-around to create a loft form more faster?
+  [A] depending on the kind of geometry he wants to create, he might be able to use a DirectShape element instead.
+  that should be about 100 times faster.
+  http://thebuildingcoder.typepad.com/blog/2014/05/directshape-performance-and-minimum-size.html
+  http://thebuildingcoder.typepad.com/blog/2014/11/directshape-versus-families-category-and-texture.html
+  http://thebuildingcoder.typepad.com/blog/2015/02/from-hack-to-app-obj-mesh-import-to-directshape.html
+
+- directshape 10467085 [Create surface from face] -- another DirectShape example
+
+- create direct shape instead of conceptual mass
+  creating wall and roof elements on face of mass
+  new topic group
+  http://forums.autodesk.com/t5/revit-api/create-a-surface-through-revit-api/m-p/5867952
+
+- 11770403 [Hermite,Nurbs Spline Do they need to be on a plane?]
+http://forums.autodesk.com/t5/revit-api/hermite-nurbs-spline-do-they-need-to-be-on-a-plane/m-p/6301635
+[Q] You state in Point 3 "... create a DirectShape element using the 'solid' geometry created above." Where can I find code which shows how to do that?
+[A] You just have to package the solid in a GeometryObject Array, then DirectShape.CreateElement works: https://knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhelp/2016/ENU/Revit-API/files/GUID-DF7B9D4A-5A8A-4E39-8721-B7782CBD7730-htm.html
+
+- 12950253 [Using API to change color (and/or material) of DirectShape]
+  https://forums.autodesk.com/t5/revit-api-forum/using-api-to-change-color-and-or-material-of-directshape/m-p/7064149
+
+- Re: Create DirectShape without representation when generating shape -- Toshiaki Isezaki
+
+- 12390855 [Create Direct Shape from Room]
+  http://forums.autodesk.com/t5/revit-api-forum/create-direct-shape-from-room/m-p/6703123
+  spatial geometry calculator versus room boundary
+
+- control direct shape visibility in family definition
+  13676056 [ファミリ内のDirectShapeについて -- About DirectShape in family]
+
+ #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+
+&ndash; ...
+
+--->
+
+<h3>DirectShape Topics and Happy New Year!</h3>
+<p><center>
+<p id="dis" style="font-size: 150%; font-weight: bold; font-family: monospace; color:orange">Happy New Year!</p>
+</center></p>
+<!-- The JavaScript Source http://www.javascriptsource.com Ben Joffe http://www.joffe.tk/ -->
+
+<script>
+
+var text="Happy New Year!";
+
+var symtype=new Array(" ","A","a","B","b","C","c","D","d","E","e","F","f","G","g","H","h","I","i","J","j","K","k","L","l","M","m","N","n","O","o","P","p","Q","q","R","r","S","s","T","t","U","u","V","v","W","w","X","x","Y","y","Z","z","0","1","2","3","4","5","6","7","8","9",".",",","&","!","?","-","_");
+
+var symarray=new Array();
+
+for (var i=0; i<text.length; i++){
+  symarray[i]=" ";
+}
+function scroll(){
+  for (var i=0; i<text.length; i++){
+    if (symarray[i]!=text.substring(i,i+1)) {
+      for (var x=0; x<70; x++) if (symarray[i]==symtype[x]) {symarray[i]=symtype[x+1]; break}
+    }
+  }
+  var outsym="";
+  for (var i=0; i<text.length; i++) outsym+=symarray[i];
+  dis.innerHTML=outsym;
+  setTimeout('scroll()',100);
+}
+scroll();
+
+</script>
+
+<p>I had a great break over Christmas and New Year and hope you did as well.</p>
+<p>I'll begin the new year by discussing several topics I collected addressing various aspects of <code>DirectShape</code> elements:</p>
+<h4><a name="2"></a></h4>
+<p><strong>Question:</strong> </p>
+<p><center>
+<img src="img/.png" alt="" width="470"/>
+</center></p>
+<pre class="prettyprint">
+</pre>
+
+<p><strong>Answer:</strong> </p>
+<h4><a name="3"></a></h4>
+<pre class="code">
+</pre>
+
+<h4><a name="4"></a></h4>
