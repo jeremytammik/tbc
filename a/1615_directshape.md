@@ -54,7 +54,7 @@ http://forums.autodesk.com/t5/revit-api/hermite-nurbs-spline-do-they-need-to-be-
 - control direct shape visibility in family definition
   13676056 [ファミリ内のDirectShapeについて -- About DirectShape in family]
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+DirectShape topics and Happy New Year in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/directshape2018
 
 I'll begin the new year by discussing a bunch of topics addressing various aspects of <code>DirectShape</code> elements
 &ndash; Updated DirectShapeFromFace
