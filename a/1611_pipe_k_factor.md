@@ -26,7 +26,7 @@ Enjoy!
   http://archi-lab.net/create-your-own-tab-and-buttons-in-revit/
   https://forums.autodesk.com/t5/revit-api-forum/api-to-make-installer-and-install-to-revit/m-p/7616236
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Pipe Fitting K Factor, archi+lab blog and #RevitAPI add-in installer @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/pipekfactor
 
 Two recent Revit MEP related cases brought up some new information on the pipe <code>K</code> factor table and custom calculations for pipe fittings, the Forge DevCon class recordings are now available, and I discovered Konrad Sobon's wonderful archi+lab Revit API blog, which helps resolve an installation and setup issue
 &ndash; Pipe <code>K</code> factor table
