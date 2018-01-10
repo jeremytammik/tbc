@@ -55,7 +55,15 @@ http://forums.autodesk.com/t5/revit-api/hermite-nurbs-spline-do-they-need-to-be-
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; ...
+I'll begin the new year by discussing a bunch of topics addressing various aspects of <code>DirectShape</code> elements
+&ndash; Updated DirectShapeFromFace
+&ndash; Improve loft form creation speed using <code>DirectShape</code>
+&ndash; Create <code>DirectShape</code> instead of conceptual mass
+&ndash; Create surface from face
+&ndash; Create <code>DirectShape</code> from solid
+&ndash; Control <code>DirectShape</code> colour and material
+&ndash; Improve family performance suppressing <code>DirectShape</code> generation
+&ndash; Create <code>DirectShape</code> from room...
 
 --->
 
@@ -92,62 +100,311 @@ scroll();
 </script>
 
 <p>I had a great break over Christmas and New Year and hope you did as well.</p>
-<p>I'll begin the new year by discussing a collection of topics addressing various aspects of <code>DirectShape</code> elements:</p>
+<p>I'll begin the new year by discussing a bunch of topics addressing various aspects of <code>DirectShape</code> elements:</p>
 <ul>
 <li><a href="#2">Updated DirectShapeFromFace</a></li>
-<li><a href="#3">Improve Loft Form Creation Speed using DirectShape</a></li>
-<li><a href="#4">Another DirectShape Example</a></li>
-<li><a href="#5">Create DirectShape Instead of Conceptual Mass</a></li>
-<li><a href="#6">Create DirectShape from Solid</a></li>
-<li><a href="#7">Control DirectShape Colour and Material</a></li>
-<li><a href="#8">Create DirectShape Without Representation</a></li>
-<li><a href="#9">Create DirectShape from Room</a></li>
-<li><a href="#10">Control DirectShape Visibility in Family Definition</a></li>
+<li><a href="#3">Improve loft form creation speed using <code>DirectShape</code></a></li>
+<li><a href="#4">Create <code>DirectShape</code> instead of conceptual mass</a></li>
+<li><a href="#5">Create surface from face</a></li>
+<li><a href="#6">Create <code>DirectShape</code> from solid</a></li>
+<li><a href="#7">Control <code>DirectShape</code> colour and material</a></li>
+<li><a href="#8">Improve family performance suppressing <code>DirectShape</code> generation</a></li>
+<li><a href="#9">Create <code>DirectShape</code> from room</a></li>
 </ul>
 <h4><a name="2"></a>Updated DirectShapeFromFace</h4>
+<p>One useful little <code>DirectShape</code> utility is<br />
+the <a href="https://github.com/jeremytammik/DirectShapeFromFace">DirectShapeFromFace</a> add-in.</p>
+<p>It  creates a <code>DirectShape</code> element from a selected element face.</p>
+<p>We initially discussed it in 2015, in the article
+on <a href="http://thebuildingcoder.typepad.com/blog/2015/09/directshape-from-face-and-sketch-plane-reuse.html">DirectShape From Face and Sketch Plane Reuse</a>.</p>
+<p>It demonstrates several approaches, including
+a <a href="http://thebuildingcoder.typepad.com/blog/2015/09/simpler-directshape-from-face-restsharp-put-and-post.html#2">simpler access to the picked face using <code>GetTotalTransform</code></a>.</p>
+<p>Now I migrated it from Revit 2016 to Revit 2018, replacing a couple of obsolete API calls.</p>
 <h4><a name="3"></a>Improve Loft Form Creation Speed using DirectShape</h4>
-<h4><a name="4"></a>Another DirectShape Example</h4>
+<p>One of the most important features of direct shapes is the ability to generate geometry directly in place in the model without needing to create a separate family definition and instantiate that, resulting in a  vast speed improvement.</p>
+<p>For example, a developer was creating a new mass family and loading it in the project, taking so much time to create a loft form that it ended up unusable.</p>
+<p>The form was generated in a standard way to create families, using <code>Document.FamilyCreate.NewLoftForm</code> with a <code>ReferenceArray</code> of <code>CurveByPoint</code> or <code>ModelCurve</code> elements.</p>
+<p>It takes about 4 minutes to create a family in this manner.</p>
+<p><strong>Question:</strong> Is there any work-around to create a loft form faster?</p>
+<p><strong>Answer:</strong> Depending on the kind of geometry you want to create, you might be able to use a <code>DirectShape</code> element instead:</p>
 <ul>
-<li>10467085 [Create surface from face] -- </li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/05/directshape-performance-and-minimum-size.html">DirectShape performance and minimum size</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/11/directshape-versus-families-category-and-texture.html">DirectShape versus families, category and texture</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/02/from-hack-to-app-obj-mesh-import-to-directshape.html">From Hack to App &ndash; OBJ Mesh Import to DirectShape</a></li>
 </ul>
-<h4><a name="5"></a>Create DirectShape Instead of Conceptual Mass</h4>
+<h4><a name="4"></a>Create DirectShape Instead of Conceptual Mass</h4>
+<p>I the same vein,
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="http://forums.autodesk.com/t5/revit-api/create-a-surface-through-revit-api/m-p/5867952">creating a surface through Revit API</a> suggests
+using a <code>DirectShape</code> instead of a conceptual mass element and also introduces
+the new topic group #5.50 dedicated to
+the <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.50"><code>DirectShape</code> element</a>.</p>
+<h4><a name="5"></a>Create Surface from Face</h4>
+<p>Another discussion also deals with creating a surface from a picked element face:</p>
+<p><strong>Question:</strong> I'm working on a function that creates surfaces from selected faces.
+It really does not matter what type of element the resulting surface is as long as it gets exported to Navisworks.</p>
+<p>What I have been able to do is to collect the faces with the <code>PickObjects</code> method.
+I have also succeeded creating a mass family representing a surface.
+This I have achieved by collecting the edges of the face and then I have created the surface object by using <code>NewFormByCap</code>.</p>
+<p>But this approach does not work on all faces, especially if one of the edges is a <code>HermiteSpline</code>.
+I have tried to create a mesh out of the face and then create a tiny surface of each of the triangles using the <code>NewFormByCap</code> method. This do sort of works, but it takes way too long &ndash; hours for just a single face.</p>
+<p>Do you have any idea how I can solve this issue? It does not have to be a surface; it can also be a very thin solid.
+The function should work on all possible faces in Revit. Any help is appreciated.</p>
+<p><strong>Answer:</strong> Surprisingly, yes, I do have a viable suggestion for you.</p>
+<p>It is even significantly easier and simpler and more efficient than what you have been trying so far, and I think it can work for all surfaces.</p>
+<p>In Revit 2015, the DirectShape element was introduced as a possibility to generate faceted geometry directly in the project space.</p>
+<p>All previous methods to define custom geometry required a family definition, like the method you describe.</p>
+<p>Here is my simple suggestion:</p>
 <ul>
-<li>create direct shape instead of conceptual mass
-creating wall and roof elements on face of mass
-new topic group
-http://forums.autodesk.com/t5/revit-api/create-a-surface-through-revit-api/m-p/5867952</li>
+<li>Grab the surface that you are interested in and tessellate it. You now have a bunch of triangles.</li>
+<li>Create a <code>DirectShape</code> based on these triangles.</li>
 </ul>
+<p>This discussion ultimately gave rise to the <a href="#2">DirectShapeFromFace project discussed above</a>.</p>
 <h4><a name="6"></a>Create DirectShape from Solid</h4>
-<ul>
-<li>11770403 -- <a href="http://forums.autodesk.com/t5/revit-api/hermite-nurbs-spline-do-they-need-to-be-on-a-plane/m-p/6301635">Hermite,Nurbs Spline Do they need to be on a plane?</a></li>
-</ul>
-<p>[Q] You state in Point 3 "... create a DirectShape element using the 'solid' geometry created above." Where can I find code which shows how to do that?</p>
-<p>[A] You just have to package the solid in a GeometryObject Array, then DirectShape.CreateElement works:</p>
-<p>https://knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhelp/2016/ENU/Revit-API/files/GUID-DF7B9D4A-5A8A-4E39-8721-B7782CBD7730-htm.html</p>
+<p>Another question on creating direct shapes was raised in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on whether <a href="http://forums.autodesk.com/t5/revit-api/hermite-nurbs-spline-do-they-need-to-be-on-a-plane/m-p/6301635">Hermite and Nurb Spline need to be created on a plane</a>.
+It also compares <code>NewLoftForm</code> with <code>DirectShape</code>, and then ends up asking:</p>
+<p><strong>Question:</strong> You state that you can "... create a DirectShape element using the 'solid' geometry created above." Where can I find code which shows how to do that?</p>
+<p><strong>Answer:</strong> You just have to package the solid in a <code>GeometryObject</code> array, then <code>DirectShape.CreateElement</code> works, as described in
+the <a href="https://knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhelp/2016/ENU/Revit-API/files/GUID-DF7B9D4A-5A8A-4E39-8721-B7782CBD7730-htm.html">knowledge base article on <code>DirectShape</code></a>.</p>
 <h4><a name="7"></a>Control DirectShape Colour and Material</h4>
+<p>Let's round off with some aspects of controlling <code>DirectShape</code> colour and material, e.g., 
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/using-api-to-change-color-and-or-material-of-directshape/m-p/7064149">using API to change color and/or material of DirectShape</a>:</p>
+<p><strong>Question:</strong> When importing my IFC file, all elements get converted to <code>DirectShape</code> elements.</p>
+<p>But they now get colored fully black when viewing in shaded mode, and there seems to be no way to change this.</p>
+<p>Only workaround is to overwrite graphics per view, but I would rather work to a more solid solution.</p>
+<p>Is there some way to change the color of the <code>DirectShape</code> elements? From what I understood, a material could not be applied to a <code>DirectShape</code>.</p>
+<p>When I import more IFC's from the same source with different export settings, it seems I sometimes get different color results.</p>
+<p>So, I can conclude that the color is stored somewhere within these <code>DirectShape</code> elements. I still cannot find where, and whether it can be changed though API.</p>
+<p><strong>Answer:</strong> The best way to control the colour of a direct shape element is probably by setting an appropriate category or subcategory on it.</p>
+<p>As you presumably know, there
+are <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.24">many ways to control the material and colour of a Revit element</a></p>
+<p>If you prefer setting the colour explicitly, you can look at</p>
 <ul>
-<li>12950253 <a href="https://forums.autodesk.com/t5/revit-api-forum/using-api-to-change-color-and-or-material-of-directshape/m-p/7064149">Using API to change color (and/or material) of DirectShape</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/03/change-element-colour.html">Change element colour</a></li>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/how-change-the-color-a-element/td-p/5651177">How to change the colour of an element</a></li>
 </ul>
-<h4><a name="8"></a>Create DirectShape Without Representation</h4>
+<p>Here is some code for that using <code>OverrideGraphicSettings</code>
+to <a href="https://forums.autodesk.com/t5/revit-api-forum/change-colour-of-extrusion-object/m-p/7060824">change the colour of an extrusion object</a>:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">Color</span>&nbsp;color&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Color</span>(&nbsp;0,&nbsp;0,&nbsp;0&nbsp;);&nbsp;<span style="color:green;">//&nbsp;RGB&nbsp;(0,&nbsp;255,&nbsp;255)</span>
+&nbsp;&nbsp;<span style="color:#2b91af;">OverrideGraphicSettings</span>&nbsp;ogs&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">OverrideGraphicSettings</span>();
+&nbsp;&nbsp;ogs.SetProjectionLineColor(&nbsp;color&nbsp;);
+&nbsp;&nbsp;ogs.SetProjectionFillColor(&nbsp;color&nbsp;);
+&nbsp;&nbsp;ogs.SetCutFillColor(&nbsp;color&nbsp;);
+&nbsp;&nbsp;ogs.SetCutLineColor(&nbsp;color&nbsp;);
+&nbsp;&nbsp;doc.ActiveView.SetElementOverrides(&nbsp;fiProfile.Id,&nbsp;ogs&nbsp;);
+</pre>
+
+<p>However, controlling the material and colour via the direct shape category is much more BIMish!</p>
+<p>If your IFC DirectShapes do not provide <code>Material</code> parameters you can set, and if you cannot change their categories, then you could try to:</p>
 <ul>
-<li>Re: Create DirectShape without representation when generating shape -- Toshiaki Isezaki</li>
+<li>Read their geometry</li>
+<li>Create new <code>DirectShape</code> elements using this geometry</li>
+<li>Delete the original IFC <code>DirectShape</code> elements</li>
 </ul>
+<p>The advantage is that you have more control over the <code>DirectShape</code> properties at creation time.</p>
+<h4><a name="8"></a>Improve Family Performance Suppressing DirectShape Generation</h4>
+<p><strong>Question:</strong> I use <code>DirectShape</code> to accelerate creating shapes in my family definition.</p>
+<p>It includes so many shapes now that Revit exhibits slow performance. </p>
+<p>Can I improve this?</p>
+<p>Is it possible to temporarily suppress the representation and drawing of DirectShape regeneration?</p>
+<p><strong>Answer:</strong> Drawing of elements can be suppressed by hiding the associated category in the view, however it is unlikely that the impact of excessive element creation will be limited to creation. Having too many elements in a family will slow down family load and update times. Further I expect that performance problems may be encountered in the project environment as well. There is likely a better, more scalable solution to the problem they are trying to solve that doesn’t involve creation of too many elements.</p>
+<p>When you add an element to a family definition, you can always specify its visibility using
+the <a href="http://www.revitapidocs.com/2017/fae58e2d-817c-77f6-1747-58b0a4e01c7a.htm">FamilyElementVisibility class</a>.</p>
+<p>This includes both view direction and level of detail:</p>
+<ul>
+<li>Fine / medium / coarse</li>
+<li>2D front / top / back</li>
+<li>3D</li>
+</ul>
+<p>This applies to all geometry in a family definition.</p>
+<p>Therefore, you can simply define the visibility for all complex direct shapes to be visible only in 3D views and only in fine level of detail.</p>
+<p>I would expect that to solve the issue effectively.</p>
+<p>Please note that unlike other elements, it is not yet possible to associate <code>DirectShape</code> elements in family definitions with visibility controls.
+It should apply to all geometric elements, but the operation is actually element based, and has not been enabled for DirectShapes yet.
+There doesn’t seem to be a Revit Ideas item filed for this functionality, although the team is already aware of the gap.</p>
+<p>Happily, this can be worked around making use of the fact that visibility can be set for a family instance nested in the family definition document and creating a <code>FamilyInstance</code> containing the <code>DirectShape</code> inside the family document.</p>
 <h4><a name="9"></a>Create DirectShape from Room</h4>
+<p>Finally, to round off this collectio0n of DirectShape topics, yet
+another <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="http://forums.autodesk.com/t5/revit-api-forum/create-direct-shape-from-room/m-p/6703123">creating direct shape from room</a> and 
+using the spatial geometry calculator versus room boundary to achieve that:</p>
+<p><strong>Question:</strong> How can I create <code>DirectShape</code> from rooms with holes?</p>
+<p>I read many discussion and post but I wasn't able to solve the problem!</p>
+<p>More info and source in this GitHub issue:</p>
 <ul>
-<li>12390855 <a href="http://forums.autodesk.com/t5/revit-api-forum/create-direct-shape-from-room/m-p/6703123">Create Direct Shape from Room</a></li>
+<li><a href="https://github.com/Tamu/Revit3Drooms/issues/1">GitHub issue</a></li>
+<li><a href="https://github.com/Tamu/Revit3Drooms">Revit3Drooms source code</a></li>
 </ul>
-<p>Using spatial geometry calculator versus room boundary...</p>
-<h4><a name="10"></a>Control DirectShape Visibility in Family Definition</h4>
+<p>Last reading:</p>
 <ul>
-<li>13676056 [ファミリ内のDirectShapeについて -- About DirectShape in family]</li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html">2D polygon areas and outer loop</a></li>
+<li><a href="http://forums.autodesk.com/t5/revit-api-forum/create-mass-from-room/td-p/3674458">Create mass from room</a></li>
 </ul>
-<p><strong>Question:</strong> </p>
-<p><strong>Answer:</strong> </p>
+<p>Many thanks for help!</p>
 <p><center>
-<img src="img/.png" alt="" width="100"/>
+<img src="img/3droom.png" alt="3D room" width="600"/>
 </center></p>
+<p><strong>Answer:</strong> If you want the room with holes, then there will be nothing left.</p>
+<p>The room is a hole.</p>
+<p>What else is a room except a hole?</p>
+<p>Do you mean that you would like to recreate the shape of all the walls with their openings?</p>
+<p>Do you mean that you have a room whose plan view includes holes?</p>
+<p>Let's assume the latter.</p>
+<p>In that case, if your walls are all vertical, this is absolutely trivial.</p>
+<p>You can collect the room boundary edges and assemble them into the outer and inner wall loops.</p>
+<p>This is demonstrated very effectively by
+the <a href="https://github.com/jeremytammik/RoomEditorApp">2D room editor</a>,
+which retrieves this information, converts it to a simplified 2D view in SVG, and displays the room outline in a web browser:</p>
+<p>Here is a <a href="http://thebuildingcoder.typepad.com/blog/2016/10/connecting-desktop-and-cloud-at-rtc-material.html">demo recording and lots of other supporting material</a>.</p>
+<p>If you want a 3D direct shape instead of a 2D flat version, you will obviously need to determine the ceiling height and location and take that into account as well.</p>
+<p>Update:</p>
+<p>OK, I now went and read your problem description.</p>
+<p>:-)</p>
+<p>Very clear. Thank you for that.</p>
+<p>Thank you also for your appreciation!</p>
+<p>That issue is indeed addressed by
+the <a href="https://github.com/jeremytammik/RoomEditorApp">RoomEditorApp</a> that
+I already pointed to.</p>
+<p>When you retrieve the room boundary, the edges may not be contiguous in the right order.</p>
+<p>You may need to order them yourself.</p>
+<p>There are several ways of achieving that:</p>
+<p>DIY. I love do it yourself. Search for <code>SortCurvesContiguous</code>.</p>
+<p>ExporterIFCUtils.ValidateCurveLoops. Maybe. The Edge.AsCurveFollowingFace method. Maybe. But read on through the following, and note the note in the last of the discussions listed below.</p>
+<p>For the former, here is some more reading material:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html">2D Polygon Areas and Outer Loop</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/sort-and-orient-curves-to-form-a-contiguous-loop.html">Curve Following Face and Bounding Box Implementation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/revit-2014-api-and-room-plan-view-boundary-polygon-loops.html#3">Retrieving Plan View Room Boundary Polygon Loops</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/extrusion-analyser-and-plan-view-boundaries.html">Extrusion Analyser and Plan View Boundaries</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/room-and-furniture-loops-using-symbols.html">Room and Furniture Loops Using Symbols</a></li>
+<li><a href="ttps://github.com/jeremytammik/RoomEditorApp/blob/master/RoomEditorApp/ContiguousCurveSorter.cs">ContiguousCurveSorter</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/01/autodesk-internship-in-california-and-sorting-edges.html#3">Sorting Face Loop Edges</a></li>
+</ul>
+<p>I have explored and written lots more on this topic, as you can see if you follow the various links in the discussions listed above.</p>
+<p>I am confident that this will give you all you need.</p>
+<p>I see that what you are after is basically the floor slabs under the rooms.</p>
+<p>I assume that you are not interested in querying the slabs for their geometry?</p>
+<p>You want to create these shapes from the room boundaries?</p>
+<p>Well, I think you have all you need now for that.</p>
+<p><strong>Response:</strong> You ask:</p>
+<blockquote>
+<p>"Do you mean that you have a room whose plan view includes holes?"</p>
+</blockquote>
+<p>Yes, I would like to create the volume of the room. If the room has holes (Because walls), I would also like to subtract the volume of the hole.</p>
+<p>In short, I feel ... that you translated perfectly my strange English !</p>
+<blockquote>
+<p>"You want to create these shapes from the room boundaries?"</p>
+</blockquote>
+<p>Yes, exactly. For the elevation, I need only a fixed height (very simple).</p>
+<p>Update &ndash; here is the solution: </p>
+<p>It was necessary to add a call in the boundary loop: <code>curveLoopList.Add(curveLoop);</code></p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;IList&lt;<span style="color:#2b91af;">BoundarySegment</span>&gt;&nbsp;b&nbsp;<span style="color:blue;">in</span>&nbsp;boundaries&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;List&lt;<span style="color:#2b91af;">Curve</span>&gt;&nbsp;profile&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;List&lt;<span style="color:#2b91af;">Curve</span>&gt;();
+&nbsp;&nbsp;&nbsp;&nbsp;++iBoundary;
+&nbsp;&nbsp;&nbsp;&nbsp;iSegment&nbsp;=&nbsp;0;
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">BoundarySegment</span>&nbsp;s&nbsp;<span style="color:blue;">in</span>&nbsp;b&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++iSegment;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Curve</span>&nbsp;curve&nbsp;=&nbsp;s.GetCurve();
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;profile.Add(&nbsp;curve&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">try</span>
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">CurveLoop</span>&nbsp;curveLoop&nbsp;=&nbsp;<span style="color:#2b91af;">CurveLoop</span>.Create(&nbsp;profile&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;curveLoopList.Add(&nbsp;curveLoop&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">catch</span>(&nbsp;Exception&nbsp;ex&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Debug</span>.WriteLine(&nbsp;ex.Message&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+</pre>
+
+<p>Full code/demo in
+the <a href="https://github.com/Tamu/Revit3Drooms">Revit3Drooms GitHub repository</a>.</p>
+<p><strong>Answer:</strong> Maybe I'm missing something here, but why can't you use the <code>SpatialElementGeometryCalculator</code>?</p>
+<p>That gives you the solid you require for the <code>DirectShape</code> immediately; I've used this for quite a few implementations. </p>
+<p>Does this not take holes into account?</p>
+<p><strong>Response:</strong> The <code>SpatialElementGeometryCalculator</code> works for rooms?</p>
+<p>For a general case this works well but I did not succeed for rooms. Have you already tried ?</p>
+<p><strong>Answer:</strong> I haven't read through all your material, so I'm not sure about if your specific case needs something special, but it can extract solid geometry and I haven't seen any drawbacks. </p>
+<p>The <code>Room</code> type directly inherits <code>SpatialElement</code>, so yes, it sure works.</p>
+<p>Here is a sample from the documentation:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Calculate&nbsp;a&nbsp;room&#39;s&nbsp;geometry&nbsp;and&nbsp;find&nbsp;its&nbsp;boundary&nbsp;faces</span>
+
+&nbsp;&nbsp;<span style="color:#2b91af;">SpatialElementGeometryCalculator</span>&nbsp;calculator&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">SpatialElementGeometryCalculator</span>(&nbsp;doc&nbsp;);
+
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Compute&nbsp;the&nbsp;room&nbsp;geometry&nbsp;</span>
+
+&nbsp;&nbsp;<span style="color:#2b91af;">SpatialElementGeometryResults</span>&nbsp;results&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;calculator.CalculateSpatialElementGeometry(&nbsp;room&nbsp;);
+
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Get&nbsp;the&nbsp;solid&nbsp;representing&nbsp;the&nbsp;room&nbsp;geometry</span>
+
+&nbsp;&nbsp;<span style="color:#2b91af;">Solid</span>&nbsp;roomSolid&nbsp;=&nbsp;results.GetGeometry();&nbsp;
+
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Face</span>&nbsp;face&nbsp;<span style="color:blue;">in</span>&nbsp;roomSolid.Faces&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;faceArea&nbsp;=&nbsp;face.Area;
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Get&nbsp;the&nbsp;sub-faces&nbsp;for&nbsp;the&nbsp;face&nbsp;of&nbsp;the&nbsp;room</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;IList&lt;<span style="color:#2b91af;">SpatialElementBoundarySubface</span>&gt;&nbsp;subfaceList&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;results.GetBoundaryFaceInfo(&nbsp;face&nbsp;);&nbsp;
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">SpatialElementBoundarySubface</span>&nbsp;subface&nbsp;<span style="color:blue;">in</span>&nbsp;subfaceList&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;There&nbsp;are&nbsp;multiple&nbsp;sub-faces&nbsp;that&nbsp;define&nbsp;the&nbsp;face</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;subfaceList.Count&nbsp;&gt;&nbsp;1&nbsp;)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;subfaceArea&nbsp;=&nbsp;subface.GetSubface().Area;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;get&nbsp;the&nbsp;area&nbsp;of&nbsp;each&nbsp;sub-face</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;sub-faces&nbsp;exist&nbsp;in&nbsp;situations&nbsp;such&nbsp;as&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;when&nbsp;a&nbsp;room-bounding&nbsp;wall&nbsp;has&nbsp;been</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;horizontally&nbsp;split&nbsp;and&nbsp;the&nbsp;faces&nbsp;of&nbsp;each</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;split&nbsp;wall&nbsp;combine&nbsp;to&nbsp;create&nbsp;the&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;entire&nbsp;face&nbsp;of&nbsp;the&nbsp;room</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+</pre>
+
+<p><strong>Response:</strong> Thank you very much! That seems really good!</p>
+<p>The only special thing: I must have a cut to 1 ft from the floor.</p>
+<p><strong>Answer:</strong> The <code>BooleanOperationsUtils</code> class gives you some options where I think the <code>CutWithHalfSpace</code> seems like the most useful one.</p>
+<p>However, I mean, if your code works, then go for it. I was just hinting at a more easy solution for future use. </p>
+<!---
+
+####<a name="10"></a>Control DirectShape Visibility in Family Definition
+
+13676056 [ファミリ内のDirectShapeについて -- About DirectShape in family]
+
+**Question:** 
+
+**Answer:** 
+
+<center>
+<img src="img/.png" alt="" width="100"/>
+</center>
+
 <pre class="prettyprint">
 </pre>
 
 <pre class="code">
 </pre>
+
+--->
+
+<p>OK, that is more than enough on direct shapes for now, isn't it?</p>
