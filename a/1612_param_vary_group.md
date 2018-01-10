@@ -11,7 +11,7 @@
 <!---
 
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Setting parameter varies between groups in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/paramvarygroups
 
 Looking at setting the <code>SetAllowVaryBetweenGroups</code> flag on a shared parameter;
 is there any way to set <i>can vary by group instance</i> (what I need) the default for API-created bindings? ...
