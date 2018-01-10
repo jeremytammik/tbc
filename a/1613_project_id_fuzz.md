@@ -16,7 +16,7 @@
   13710363 [Problem with the function Curve.Intersect(Curve)]
   https://forums.autodesk.com/t5/revit-api-forum/problem-with-the-function-curve-intersect-curve/m-p/7632649
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Project identifier and fuzzy comparison in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/projectidfuzz
 
 I bring up two recurring topics, fresh every time around
 &ndash; Project identifier
