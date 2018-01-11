@@ -23,7 +23,8 @@ First, though, let's highlight an even more important upcoming event, the series
 
 ### Transform Utils, DirectShape Builder and DevDays Online Webinars
 
-Revitalizer shared two important hints: a performance issue using `ElementTransformUtils` and a problem reporting mechanism built into the `TessellatedShapeBuilderResult` method `GetIssuesForFaceSet`.
+Rudi [@Revitalizer](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1103138) Honke
+shared two important hints: a performance issue using `ElementTransformUtils` and a problem reporting mechanism built into the `TessellatedShapeBuilderResult` method `GetIssuesForFaceSet`.
 
 First, though, let's highlight an even more important upcoming event, the series of DevDays online webinars:
 
@@ -31,6 +32,18 @@ First, though, let's highlight an even more important upcoming event, the series
 - [Avoid using `ElementTransformUtils` for batches](#3)
 - [Finding cause of `DirectShape` generation problem](#4)
 
+Update: Rudi disagrees with my statement and corrects it, saying:
+
+> Thank you for mentioning me in the current TBC post!
+
+> I must admit that for both topics (ElementTransformUtils and DirectShape), I could not help the people, in fact:
+
+>     - For the ElementTransformUtils method, FAIR59 provided the solution (SetCoordinateSystem), but he isn't even mentioned on TBC.
+>     - For the DirectShape problem, the user said that he already checked my suggestions, without any success.
+
+I still think Rudi's suggestions are helpful and important and worth highlighting.
+
+Many thanks to FAIR59 as well, of course, as so often before in the past couple of months.
 
 ####<a name="2"></a>Register now for Autodesk DevDays Online Webinars
 
@@ -177,7 +190,8 @@ something similar using an `XyzEqualityComparer`.
 
 You would simply have to replace the face vertex index of any ignored vertex by the index of its replacement.
 
-There is also an `Appliation.MinimumThickness` property. It says in the RevitAPI.chm:
+There is also an `Appliation.MinimumThickness` property. It says in
+the [Revit API help file RevitAPI.chm](http://www.revitapidocs.com/2018.1/8bff8d69-bc8d-b0ea-ed2f-6af1bed07e75.htm):
 
 > The minimum thickness allowed in Revit for a variety of geometric constructs. These include blends, extrusions, and wall layers.
 

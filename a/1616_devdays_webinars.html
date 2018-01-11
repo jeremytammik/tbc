@@ -20,13 +20,24 @@ First, though, let's highlight an even more important upcoming event, the series
 --->
 
 <h3>Transform Utils, DirectShape Builder and DevDays Online Webinars</h3>
-<p>Revitalizer shared two important hints: a performance issue using <code>ElementTransformUtils</code> and a problem reporting mechanism built into the <code>TessellatedShapeBuilderResult</code> method <code>GetIssuesForFaceSet</code>.</p>
+<p>Rudi <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1103138">@Revitalizer</a> Honke
+shared two important hints: a performance issue using <code>ElementTransformUtils</code> and a problem reporting mechanism built into the <code>TessellatedShapeBuilderResult</code> method <code>GetIssuesForFaceSet</code>.</p>
 <p>First, though, let's highlight an even more important upcoming event, the series of DevDays online webinars:</p>
 <ul>
 <li><a href="#2">Register now for Autodesk DevDays online webinars</a></li>
 <li><a href="#3">Avoid using <code>ElementTransformUtils</code> for batches</a></li>
 <li><a href="#4">Finding cause of <code>DirectShape</code> generation problem</a></li>
 </ul>
+<p>Update: Rudi disagrees with my statement and corrects it, saying:</p>
+<blockquote>
+<p>Thank you for mentioning me in the current TBC post!</p>
+<p>I must admit that for both topics (ElementTransformUtils and DirectShape), I could not help the people, in fact:</p>
+<pre><code>- For the ElementTransformUtils method, FAIR59 provided the solution (SetCoordinateSystem), but he isn't even mentioned on TBC.
+- For the DirectShape problem, the user said that he already checked my suggestions, without any success.
+</code></pre>
+</blockquote>
+<p>I still think Rudi's suggestions are helpful and important and worth highlighting.</p>
+<p>Many thanks to FAIR59 as well, of course, as so often before in the past couple of months.</p>
 <h4><a name="2"></a>Register now for Autodesk DevDays Online Webinars</h4>
 <p>Join us for the series of seven DevDays Webinars beginning on February 6th.  </p>
 <p>DevDays Online is the best way to keep up to date with new and upcoming technology and features.
@@ -137,7 +148,8 @@ be <a href="http://thebuildingcoder.typepad.com/blog/2014/05/directshape-perform
 in <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdNestedInstanceGeo.cs#L30-L85">The Building Coder samples CmdNestedInstanceGeo.cs</a> does
 something similar using an <code>XyzEqualityComparer</code>.</p>
 <p>You would simply have to replace the face vertex index of any ignored vertex by the index of its replacement.</p>
-<p>There is also an <code>Appliation.MinimumThickness</code> property. It says in the RevitAPI.chm:</p>
+<p>There is also an <code>Appliation.MinimumThickness</code> property. It says in
+the <a href="http://www.revitapidocs.com/2018.1/8bff8d69-bc8d-b0ea-ed2f-6af1bed07e75.htm">Revit API help file RevitAPI.chm</a>:</p>
 <blockquote>
 <p>The minimum thickness allowed in Revit for a variety of geometric constructs. These include blends, extrusions, and wall layers.</p>
 </blockquote>
