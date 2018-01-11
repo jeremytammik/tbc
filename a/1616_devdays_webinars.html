@@ -1,0 +1,148 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+ #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+
+Revitalizer shared two important hints: a performance issue using <code>ElementTransformUtils</code> and a problem reporting mechanism built into the <code>TessellatedShapeBuilderResult</code> method <code>GetIssuesForFaceSet</code>.
+First, though, let's highlight an even more important upcoming event, the series of DevDays online webinars
+&ndash; Register now for Autodesk DevDays online webinars
+&ndash; Avoid using <code>ElementTransformUtils</code> for batches
+&ndash; Finding cause of <code>DirectShape</code> generation problem...
+
+--->
+
+<h3>Transform Utils, DirectShape Builder and DevDays Online Webinars</h3>
+<p>Revitalizer shared two important hints: a performance issue using <code>ElementTransformUtils</code> and a problem reporting mechanism built into the <code>TessellatedShapeBuilderResult</code> method <code>GetIssuesForFaceSet</code>.</p>
+<p>First, though, let's highlight an even more important upcoming event, the series of DevDays online webinars:</p>
+<ul>
+<li><a href="#2">Register now for Autodesk DevDays online webinars</a></li>
+<li><a href="#3">Avoid using <code>ElementTransformUtils</code> for batches</a></li>
+<li><a href="#4">Finding cause of <code>DirectShape</code> generation problem</a></li>
+</ul>
+<h4><a name="2"></a>Register now for Autodesk DevDays Online Webinars</h4>
+<p>Join us for the series of seven DevDays Webinars beginning on February 6th.  </p>
+<p>DevDays Online is the best way to keep up to date with new and upcoming technology and features.
+After the introductory business-oriented session that reviews Autodesk's business growth curves &ndash; past, present and future, most of the webinars focus on desktop application development, and additionally two on Forge and one on BIM 360 for cloud development. </p>
+<p>As in previous DevDays events, we have a theme: <em>The Journey Continues</em>.</p>
+<p>In the first webinar &ndash; DevDays Keynotes &ndash; Jim Quanci, Senior Director, Software Partner Development, will cover the journey in-depth with a presentation on Autodesk's strategic direction.  This includes the move to subscription licenses, Forge strategy, the Autodesk App Store and more.  As he discusses the transition Autodesk is going through from a business and technical perspective, Jim will also explain the opportunities this transition creates for software partners, including our plans to build a much larger customer base &ndash; accessible to you.</p>
+<p>In the desktop software webinars, you will learn about the product and API changes and enhancements for AutoCAD, Revit, Civil 3D, InfraWorks, Inventor, Vault and Fusion.
+These sessions will help you prepare for the upcoming Autodesk 2019 family of products, so that you can be ready to delight our joint customers by having your applications compatible with the new releases. </p>
+<p>In addition to making sure you stay current with Autodesk desktop technology, now is the time to start investing in 'what's next' &ndash; the next wave in the journey.  Forge is Autodesk's answer to 'what's next'.  Forge is the foundation cloud/web technology platform that Autodesk is building its next generation of tools on &ndash; and also making available to you. Forge is not an Autodesk experiment.  It's your opportunity to catch the next wave &ndash; the shift to the cloud. Autodesk itself is the largest user of Forge in the world &ndash; with several hundred thousand users every day using BIM 360, Fusion 360, A360 and more. Join us &ndash; and over a thousand other companies that have built Forge into their apps/services already. Attend the two Forge webinars to learn how you too can deliver new capabilities to your customers.  <a href="https://forge.autodesk.com">Learn more about Forge</a>.</p>
+<p>Register today for the webinars of your choice:</p>
+<ul>
+<li>Tue 2018-02-06 &ndash; DevDays Keynotes &ndash; <a href="https://register.gotowebinar.com/register/797707066268687619">Register</a></li>
+<li>Wed 2018-02-07 &ndash; Forge Platform overview and Roadmap &ndash; <a href="https://register.gotowebinar.com/register/4102861009595953155">Register</a></li>
+<li>Thu 2018-02-08 &ndash; Revit API, Civil 3D and InfraWorks updates &ndash; <a href="https://register.gotowebinar.com/register/490550796468203011">Register</a></li>
+<li>Tue 2018-02-13 &ndash; Forge API update (in detail) &ndash; <a href="https://register.gotowebinar.com/register/8531203464091738883">Register</a></li>
+<li>Wed 2018-02-14 &ndash; Inventor, Vault and Fusion API updates &ndash; <a href="https://register.gotowebinar.com/register/4033528005371724547">Register</a></li>
+<li>Thu 2018-02-15 &ndash; AutoCAD and Design Automation for AutoCAD API updates &ndash; <a href="https://register.gotowebinar.com/register/8219783288198582531">Register</a></li>
+<li>Tue 2018-02-20 &ndash; BIM 360 product and API update &ndash; <a href="https://register.gotowebinar.com/register/3690479277994010883">Register</a></li>
+</ul>
+<p><center>
+<img src="img/038_jim_quanci_600x415.jpg" alt="Jim Quanci at DevDays@AU" width="600"/>
+</center></p>
+<h4><a name="3"></a>Avoid Using ElementTransformUtils for Batches</h4>
+<p>The <code>ElementTransformUtils</code> <code>MoveElement</code> method has an important performance issue when used on a large number of elements, as pointed out by Revitalizer in 
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/is-there-a-batch-method-for-placing-adaptive-component-points/m-p/7672487">a batch method for placing adaptive component points</a>:</p>
+<p><strong>Question:</strong> I have a performance issue placing and moving adaptive components using the following code:</p>
+<pre class="prettyprint">
+  # place family instance, get default placement points,
+  # subtract from my desired coordinates (list) and move element
+
+  inst = AdaptiveComponentInstanceUtils.CreateAdaptiveComponentInstance(
+    doc, inst)
+
+  placePointIds = []
+
+  placePointIds = AdaptiveComponentInstanceUtils.GetInstancePlacementPointElementRefIds(
+    inst)
+
+  for ind, item in enumerate(placePointIds):
+
+    # assign a point object to refpt
+    # refpt is the orginal point of the family
+    # newpt the new point derived from pt information
+
+    refpt = doc.GetElement(item)
+
+    newpt = pt[ind]
+
+    trans = newpt.Subtract(refpt.Position)
+
+    ElementTransformUtils.MoveElement(doc, item, trans)
+</pre>
+
+<p><strong>Answer:</strong> There is a performance problem with <code>ElementTransformUtils</code>, as pointed out in the thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/elementtransformutils-performance-issue/m-p/5775624">ElementTransformUtils: performance issue</a>.</p>
+<p>It seems to auto regenerate after each movement.</p>
+<p>In that case, you have to move every point separately. If the bad performance issue is related to the <code>ElementTransformUtils</code> methods, this might give better performance. To know for sure, you'd have to test.</p>
+<p>Maybe you can use <code>SetCoordinateSystem</code> instead:</p>
+<pre class="prettyprint">
+  (refpt as ReferencePoint).SetCoordinateSystem()
+</pre>
+
+<p>Fleshed out a bit more, it could look like this:</p>
+<pre class="prettyprint">
+  Element refpt = doc.GetElement(item);
+  XYZ newpt = pt[ind];
+  Transform tf = Transform.Identity;
+  tf.Origin = newpt;
+  (refpt as ReferencePoint).SetCoordinateSystem(tf);
+</pre>
+
+<p><strong>Response:</strong> Hey, awesome!!! It works! Performance is way better and the code runs fluid!</p>
+<p>I suppose this is even better than moving components, although I would be interested to compare both methods once it is fixed.</p>
+<p>My code now looks like this:</p>
+<pre class="prettyprint">
+  placePointIds = AdaptiveComponentInstanceUtils.GetInstancePlacementPointElementRefIds(
+    inst):
+
+  for ind, item in enumerate(placePointIds):
+    refpt = doc.GetElement(item)
+    newpt = pt[ind]
+    tf = Transform.Identity
+    tf.Origin = newpt
+    refpt.SetCoordinateSystem(tf);
+</pre>
+
+<h4><a name="4"></a>Finding Cause of DirectShape Generation Problem</h4>
+<p>Revitalizer provided more important hints on detecting problems in 
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on a <a href="https://forums.autodesk.com/t5/revit-api-forum/problem-with-solid-creation-by-tessellatedshapebuilder/m-p/7678156">problem with solid creation by <code>TessellatedShapeBuilder</code></a>:</p>
+<p><strong>Question:</strong> I want to import some solids created by an external library into Revit with TessellatedShapeBuilder.</p>
+<p>All solids are correctly tessellated and closed.</p>
+<p>But I got sometimes the following error on calling <code>TessellatedShapeBuilder.Build</code>:</p>
+<blockquote>
+<p>Could not create consistent vertex list</p>
+</blockquote>
+<p>As far as I know there are some restriction about triangles, e.g., the distance between two vertices.</p>
+<p>I could merge two vertices in this case.</p>
+<p>But I don't know any other restriction, and how could I adjust my vertex list and triangle list to avoid the above error?</p>
+<p><strong>Answer:</strong></p>
+<p>The problem might indeed be due to vertices lying too close together; they need to
+be <a href="http://thebuildingcoder.typepad.com/blog/2014/05/directshape-performance-and-minimum-size.html">at least about 2 mm apart</a>.</p>
+<p>What I always do in these kind of cases:</p>
+<p>While reading the input vertices one by one, I put them into a dictionary equipped with an <code>XYZ</code> comparison operator.</p>
+<p>If a new vertex is very close to an existing one, my comparison operator considers the two vertices to be equal, so I ignore it and use the existing one instead.</p>
+<p>The <code>GetVertices</code> method
+in <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdNestedInstanceGeo.cs#L30-L85">The Building Coder samples CmdNestedInstanceGeo.cs</a> does
+something similar using an <code>XyzEqualityComparer</code>.</p>
+<p>You would simply have to replace the face vertex index of any ignored vertex by the index of its replacement.</p>
+<p>There is also an <code>Appliation.MinimumThickness</code> property. It says in the RevitAPI.chm:</p>
+<blockquote>
+<p>The minimum thickness allowed in Revit for a variety of geometric constructs. These include blends, extrusions, and wall layers.</p>
+</blockquote>
+<p>Whatever problem you run into, try reproducing the same issue manually through the user interface.</p>
+<p>That will probably provide more information on what the problem is than the Revit API does.</p>
+<p>You should also have a look at <code>TessellatedShapeBuilderResult.GetIssuesForFaceSet</code>.</p>
+<p>In fact, it may localize exactly the faces and vertices causing the problem.</p>
+<p>Each <code>TesselatedBuildIssue</code> provides a <code>GetDescription</code> method.</p>
