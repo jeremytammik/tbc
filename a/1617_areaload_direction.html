@@ -1,0 +1,101 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- learned the basics of CMake
+  implemented a Windows DLL and EXE build system
+  https://github.com/chtammik/YoAudio
+  https://github.com/chtammik/YoAudioEditor
+
+- 13782556 [SDK Available]
+  AutoCAD and Revit SDK access
+
+- 13747652 [How do I find a direction and a value of AreaLoad from its 3 ForceVectors?]
+  https://forums.autodesk.com/t5/revit-api-forum/how-do-i-find-a-direction-and-a-value-of-areaload-from-its-3/m-p/7660527
+
+- cnc export video https://www.youtube.com/watch?v=uNJ9RTppqoU
+  updated for 2018
+
+ #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+
+Here are some of the topics I dealt with in the last couple of days
+&ndash; CMake and YoAudio
+&ndash; AutoCAD and Revit SDK Access and Content
+&ndash; Determining <code>AreaLoad</code> direction and value from its force vectors
+&ndash; ExportCncFab 2018...
+
+--->
+
+<h3>AreaLoad Force Direction, CMake, SDK Access</h3>
+<p>Here are some of the topics I dealt with in the last couple of days:</p>
+<ul>
+<li><a href="#2">CMake and YoAudio</a></li>
+<li><a href="#3">AutoCAD and Revit SDK Access and Content</a></li>
+<li><a href="#4">Determining <code>AreaLoad</code> direction and value from its force vectors</a></li>
+<li><a href="#5">ExportCncFab 2018</a></li>
+</ul>
+<h4><a name="2"></a>CMake and YoAudio</h4>
+<p>I spend some time last week learning the basics
+of <a href="https://cmake.org">CMake</a> to
+help Chris set up a build system for
+their <a href="https://github.com/chtammik/YoAudio">stand-alone YoAudio C++ audio environment</a> and
+the <a href="https://github.com/chtammik/YoAudioEditor">accompanying YoAudioEditor</a>.</p>
+<p>CMake provides a pretty efficient way to handle multi-platform configuration, once figured out, as explained in the comparison
+with <a href="https://stackoverflow.com/questions/9791127/using-make-for-cross-platform-compilation">using <code>make</code> for cross platform compilation</a>.</p>
+<p>Once we had the build environment set up, we still needed to figure out how to access the required C++ symbols from within the DLL, either
+by <a href="https://stackoverflow.com/questions/225432/export-all-symbols-when-creating-a-dll">exporting all symbols at once</a>,
+or, as we ended up doing, using <code>__declspec(dllexport)</code> on each individual symbol.</p>
+<h4><a name="3"></a>AutoCAD and Revit SDK Access and Content</h4>
+<p><strong>Question:</strong> I have an add-in for Revit 2017, so I have to compile it against the Revit 2017 assemblies.</p>
+<p>Is there an SDK or lightweight download for these assemblies, or do I have to install Revit 2018 in parallel with 2017?</p>
+<p>Also, is there any SDK available for AutoCAD?</p>
+<p><strong>Answer:</strong> Let's start from the end:</p>
+<blockquote>
+<p>Is there an SDK for AutoCAD?</p>
+</blockquote>
+<p>Yes, several. AutoCAD sports a Lisp interface, the ObjectARX C++ API, and the AutoCAD.NET .NET API.</p>
+<p>Please refer to 
+the <a href="http://www.autodesk.com/developautocad">AutoCAD developer centre at www.autodesk.com/developautocad</a> for
+more information.</p>
+<blockquote>
+<p>Is there an SDK or lightweight download for the Revit assemblies, or do I have to install Revit 2018 in parallel with 2017?</p>
+</blockquote>
+<p>You may very well be able to run your Revit API add-in compiled for Revit 2017 unmodified on Revit 2018.</p>
+<p>You would have to test, of course. It will only cause problems if you use Revit API calls in the Revit 2017 API that have been removed or modified in the Revit 2018 API. This is probably not the case.</p>
+<p>You can download the Revit SDK only without a full Revit installation for the last couple of SDK releases from
+the <a href="http://www.autodesk.com/developrevit">Revit developer centre at www.autodesk.com/developrevit</a>.</p>
+<p>However, you do not need the SDK at all to compile or run your add-in.</p>
+<p>The SDK contains documentation and sample code, nothing else.</p>
+<p>All you need to <b><i>compile</i></b> the add-in are the Revit API assemblies, e.g. RevitAPI.dll and RevitAPIUI.dll. These are included with the Revit product installation in the same folder as Revit.exe.</p>
+<p>As you know, you need to launch Revit.exe to <b><i>run</i></b> the add-in.</p>
+<h4><a name="4"></a>Determining AreaLoad Direction and Value from its Force Vectors</h4>
+<p>This topic came up in 
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-do-i-find-a-direction-and-a-value-of-areaload-from-its-3/m-p/7660527">direction and a value of <code>AreaLoad</code> from its 3 force vectors</a>:</p>
+<p><strong>Question:</strong> There can be 2 or even 3 directions of <code>AreaLoad</code>: <code>ForceVector1</code>, <code>ForceVector2</code> and <code>ForceVector3</code>.</p>
+<p>But Revit always draws the <code>AreaLoad</code> as directed to one direction.</p>
+<p>How do I find that one direction?</p>
+<p>How do I find a value of that one-directed load, at least at the points returned by the <code>GetRefPoint</code> method?</p>
+<p><center>
+<img src="img/AreaLoad2.png" alt="AreaLoad" width="491"/>
+</center></p>
+<p><strong>Answer:</strong> Internally, all three forces are being stored as vectors and their length is the actual force. </p>
+<p>The direction of the load is a vector that, simplified, equals <code>(F1+F2+F3).Normalize()</code> &ndash; this is not exposed.</p>
+<p>I will ask for a request to add an API property the force direction since, well, it is only logical to exist. </p>
+<p>Many thanks to Dragos Turmac and
+Alexander <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478">@aignatovich</a> Ignatovich
+for helping to verify this.</p>
+<h4><a name="5"></a>ExportCncFab 2018</h4>
+<p>Based on new requests, I updated
+the <a href="https://github.com/jeremytammik/ExportCncFab">ExportCncFab add-in to export Revit wall parts to DXF or SAT for CNC fabrication</a>:</p>
+<p><center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/uNJ9RTppqoU" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</center></p>
+<p>Happily, no code modification was required at all for the update.</p>

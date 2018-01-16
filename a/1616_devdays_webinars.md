@@ -10,6 +10,9 @@
 
 <!---
 
+- move elem util inefficient
+  use other method
+  https://forums.autodesk.com/t5/revit-api-forum/is-there-a-batch-method-for-placing-adaptive-component-points/m-p/7666601
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
@@ -31,19 +34,6 @@ First, though, let's highlight an even more important upcoming event, the series
 - [Register now for Autodesk DevDays online webinars](#2)
 - [Avoid using `ElementTransformUtils` for batches](#3)
 - [Finding cause of `DirectShape` generation problem](#4)
-
-Update: Rudi disagrees with my statement and corrects it, saying:
-
-> Thank you for mentioning me in the current TBC post!
-
-> I must admit that for both topics (ElementTransformUtils and DirectShape), I could not help the people, in fact:
-
->     - For the ElementTransformUtils method, FAIR59 provided the solution (SetCoordinateSystem), but he isn't even mentioned on TBC.
->     - For the DirectShape problem, the user said that he already checked my suggestions, without any success.
-
-I still think Rudi's suggestions are helpful and important and worth highlighting.
-
-Many thanks to FAIR59 as well, of course, as so often before in the past couple of months.
 
 ####<a name="2"></a>Register now for Autodesk DevDays Online Webinars
 
@@ -206,3 +196,17 @@ In fact, it may localize exactly the faces and vertices causing the problem.
 Each `TesselatedBuildIssue` provides a `GetDescription` method.
 
 
+####<a name="5"></a>Addendum
+
+Rudi disagrees with my statement in the introduction above and corrects it, saying:
+
+> Thank you for mentioning me in the current TBC post!
+
+> I must admit that for both topics (ElementTransformUtils and DirectShape), I could not help the people, in fact:
+
+> - For the ElementTransformUtils method, FAIR59 provided the solution (SetCoordinateSystem), but he isn't even mentioned on TBC.
+> - For the DirectShape problem, the user said that he already checked my suggestions, without any success.
+
+I still think Rudi's suggestions are helpful and important and worth highlighting.
+
+Many thanks to FAIR59 as well, of course, as so often before in the past couple of months.
