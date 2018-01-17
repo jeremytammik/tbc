@@ -33,21 +33,17 @@ Many of the Revit-related
 presented by well-known friends from here at TBC and
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
 
-- Category: Instructional Demo
-    - Honourable Mentions
-        - Deepak Maini, Mark Abrahams, and Aaron Coats &ndash; [Collaboration for Revit: Opening the Doors for Real Collaborative Project Execution](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2017/collaboration-for-revit/as119047)
-        - Paul Aubin &ndash; [Global Parameters, Global Control: Revit Global Parameters in Practice](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2017/revit/as121828)
-- Category: Hands-On Lab
-    - Honourable Mentions
-        - Paul Aubin &ndash; [Revit Family Creation: A Step-by-Step Introduction (Just for Beginners)](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2017/revit/as121825-l)
-        - Gui Talarico &ndash; [Untangling Python: A Crash Course on Dynamo's Python Node](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2017/dynamo-studio/as124816-l#chapter=0)
-        - Håvard Vasshaug &ndash; [Creating Transparency in France with Dynamo](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2017/revit/as126493-l)
-- Category: Roundtable
-    - Winner
-        - Steven Shell &ndash; [Switching from AutoCAD to Revit: A Discussion About Various Approaches, Training, and How It Impacts a Firm](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2017/revit/as122756-r)
-- Best New Speaker Award
-    - Winner
-        - Gui Talarico &ndash; [Untangling Python: A Crash Course on Dynamo's Python Node](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2017/dynamo-studio/as124816-l#chapter=0)
+- Instructional Demo &ndash; Honourable Mentions
+    - Deepak Maini, Mark Abrahams, and Aaron Coats &ndash; [Collaboration for Revit: Opening the Doors for Real Collaborative Project Execution](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2017/collaboration-for-revit/as119047)
+    - Paul Aubin &ndash; [Global Parameters, Global Control: Revit Global Parameters in Practice](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2017/revit/as121828)
+- Hands-On Lab &ndash; Honourable Mentions
+    - Paul Aubin &ndash; [Revit Family Creation: A Step-by-Step Introduction (Just for Beginners)](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2017/revit/as121825-l)
+    - Gui Talarico &ndash; [Untangling Python: A Crash Course on Dynamo's Python Node](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2017/dynamo-studio/as124816-l)
+    - Håvard Vasshaug &ndash; [Creating Transparency in France with Dynamo](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2017/revit/as126493-l)
+- Roundtable &ndash; Winner
+    - Steven Shell &ndash; [Switching from AutoCAD to Revit: A Discussion About Various Approaches, Training, and How It Impacts a Firm](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2017/revit/as122756-r)
+- Best New Speaker Award &ndash; Winner
+    - Gui Talarico &ndash; [Untangling Python: A Crash Course on Dynamo's Python Node](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2017/dynamo-studio/as124816-l)
 
 Congratulations, all!
 
