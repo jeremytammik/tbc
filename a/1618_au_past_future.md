@@ -11,7 +11,7 @@
 <!---
 
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+ #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon #AULONDON
 
 Quick notes on the best speakers at the last event in Las Vegas, and your chance to become one of them at the next in London
 &ndash; Best AU Speakers in Las Vegas 2017 

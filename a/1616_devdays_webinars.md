@@ -14,7 +14,7 @@
   use other method
   https://forums.autodesk.com/t5/revit-api-forum/is-there-a-batch-method-for-placing-adaptive-component-points/m-p/7666601
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Transform Utils, DirectShape Builder and DevDays Online Webinars coming up for #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/devdays2018
 
 Revitalizer shared two important hints: a performance issue using <code>ElementTransformUtils</code> and a problem reporting mechanism built into the <code>TessellatedShapeBuilderResult</code> method <code>GetIssuesForFaceSet</code>.
 First, though, let's highlight an even more important upcoming event, the series of DevDays online webinars

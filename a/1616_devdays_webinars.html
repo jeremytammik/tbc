@@ -9,7 +9,11 @@
 </head></p>
 <!---
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+- move elem util inefficient
+  use other method
+  https://forums.autodesk.com/t5/revit-api-forum/is-there-a-batch-method-for-placing-adaptive-component-points/m-p/7666601
+
+Transform Utils, DirectShape Builder and DevDays Online Webinars coming up for #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/devdays2018
 
 Revitalizer shared two important hints: a performance issue using <code>ElementTransformUtils</code> and a problem reporting mechanism built into the <code>TessellatedShapeBuilderResult</code> method <code>GetIssuesForFaceSet</code>.
 First, though, let's highlight an even more important upcoming event, the series of DevDays online webinars
@@ -28,16 +32,6 @@ shared two important hints: a performance issue using <code>ElementTransformUtil
 <li><a href="#3">Avoid using <code>ElementTransformUtils</code> for batches</a></li>
 <li><a href="#4">Finding cause of <code>DirectShape</code> generation problem</a></li>
 </ul>
-<p>Update: Rudi disagrees with my statement and corrects it, saying:</p>
-<blockquote>
-<p>Thank you for mentioning me in the current TBC post!</p>
-<p>I must admit that for both topics (ElementTransformUtils and DirectShape), I could not help the people, in fact:</p>
-<pre><code>- For the ElementTransformUtils method, FAIR59 provided the solution (SetCoordinateSystem), but he isn't even mentioned on TBC.
-- For the DirectShape problem, the user said that he already checked my suggestions, without any success.
-</code></pre>
-</blockquote>
-<p>I still think Rudi's suggestions are helpful and important and worth highlighting.</p>
-<p>Many thanks to FAIR59 as well, of course, as so often before in the past couple of months.</p>
 <h4><a name="2"></a>Register now for Autodesk DevDays Online Webinars</h4>
 <p>Join us for the series of seven DevDays Webinars beginning on February 6th.  </p>
 <p>DevDays Online is the best way to keep up to date with new and upcoming technology and features.
@@ -158,3 +152,15 @@ the <a href="http://www.revitapidocs.com/2018.1/8bff8d69-bc8d-b0ea-ed2f-6af1bed0
 <p>You should also have a look at <code>TessellatedShapeBuilderResult.GetIssuesForFaceSet</code>.</p>
 <p>In fact, it may localize exactly the faces and vertices causing the problem.</p>
 <p>Each <code>TesselatedBuildIssue</code> provides a <code>GetDescription</code> method.</p>
+<h4><a name="5"></a>Addendum</h4>
+<p>Rudi disagrees with my statement in the introduction above and corrects it, saying:</p>
+<blockquote>
+<p>Thank you for mentioning me in the current TBC post!</p>
+<p>I must admit that for both topics (ElementTransformUtils and DirectShape), I could not help the people, in fact:</p>
+<ul>
+<li>For the ElementTransformUtils method, FAIR59 provided the solution (SetCoordinateSystem), but he isn't even mentioned on TBC.</li>
+<li>For the DirectShape problem, the user said that he already checked my suggestions, without any success.</li>
+</ul>
+</blockquote>
+<p>I still think Rudi's suggestions are helpful and important and worth highlighting.</p>
+<p>Many thanks to FAIR59 as well, of course, as so often before in the past couple of months.</p>
