@@ -10,8 +10,7 @@
 
 <!---
 
-
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon #AULONDON
+Autodesk University Past and Future #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon #AULONDON http://bit.ly/aupastfuture
 
 Quick notes on the best speakers at the last event in Las Vegas, and your chance to become one of them at the next in London
 &ndash; Best AU Speakers in Las Vegas 2017 
@@ -62,5 +61,3 @@ If you'd like to speak at this year's event, [propose your class now](https://au
 <center>
 <img src="img/2018_au_london.jpg" alt="AU London 2018" width="500"/>
 </center>
-
-
