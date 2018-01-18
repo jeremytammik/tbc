@@ -20,18 +20,25 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon #AULONDON
 
-&ndash;
-...
+Christian Thieme of the Chair of Computational Modeling and Simulation at TUM, the Technical University Munich, shares his tools connecting Revit to the MomenTUM agent-based pedestrian simulation framework
+&ndash; Giving something back to the community
+&ndash; Project overview
+&ndash; Export workflow
+&ndash; Import and display results workflow
+&ndash; Transformation from <code>XYZ</code> to <code>UV</code>...
 
 --->
 
-### Revit Export for MomenTUM Pedestrian Simulation
+### Revit Tools for MomenTUM Pedestrian Simulation
 
 Occasionally, I have the delight of receiving messages entitled something like *Giving something back to the Community*.
 
 This time, the pleasure was provided by Christian Thieme, master's degree student at
 the [Chair of Computational Modeling and Simulation](https://www.cms.bgu.tum.de/en) at
-[TUM, the Technical University Munich](https://www.tum.de).
+[TUM, the Technical University Munich](https://www.tum.de),
+working on tools connecting Revit to
+the [MomenTUM](https://www.cms.bgu.tum.de/en/31-forschung/projekte/456-momentum) agent-based
+pedestrian simulation framework.
 
 Many thanks, Christian, for sharing this!
 
@@ -61,7 +68,7 @@ Then I processed the xml-data using a Java Project of the University Chair I was
 
 The Java projects generates a 2D array out of the input xml file, and computes a metric &ndash; in my case, a type
 of [space syntax](https://en.wikipedia.org/wiki/Space_syntax) operation
-&ndash; [Visibility Graph Analysis](Visibility graph analysis)).
+&ndash; [Visibility Graph Analysis](https://en.wikipedia.org/wiki/Visibility_graph_analysis)).
 
 The result of the visibility graph analysis is a 2D array of values that is then fed in to my plugin.
 
