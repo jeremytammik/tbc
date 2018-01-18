@@ -106,7 +106,8 @@ Executing the plugin prompts the user to select one level or all levels of a pro
 
 Note: Walls and doors are exported as obstacles as type 'Wall'. Stairs can will either be shown as areas of either type 'Origin' or 'Destination'.
 
-Detailed information on the add-in installation and workflow is provided in [HowTo_MomenTumV2RevitLayouting.pdf](zip/HowTo_MomenTumV2RevitLayouting.pdf).
+Detailed information on the add-in installation and workflow is provided in
+the [MomenTumV2RevitLayouting how-to documentation](zip/HowTo_MomenTumV2RevitLayouting.pdf).
 
 
 ####<a name="5"></a>Import and Display Results Workflow
