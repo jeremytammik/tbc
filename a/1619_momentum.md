@@ -18,7 +18,7 @@
   https://github.com/tumcms/MomenTUM/tree/master/momentum-tools/momentum-layout-tools/momentum-layout-tools-revit
   This plugin is used to export geometrical information from a Revit project to a xml. The generated xml contains layouts (scenarios/levels) which can be used for Momentum simulations.
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon #AULONDON
+MomenTUM Pedestrian Simulation with #RevitAPI in @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/momentumrvt
 
 Christian Thieme of the Chair of Computational Modeling and Simulation at TUM, the Technical University Munich, shares his tools connecting Revit to the MomenTUM agent-based pedestrian simulation framework
 &ndash; Giving something back to the community
@@ -44,11 +44,11 @@ Many thanks, Christian, for sharing this!
 
 In his own words:
 
-- [Giving Something Back to the Community](#2) 
-- [Project Overview](#3) 
-- [Export Workflow](#4) 
-- [Import and Display Results Workflow](#5) 
-- [Transformation from XYZ to UV](#6) 
+- [Giving something back to the community](#2)
+- [Project overview](#3)
+- [Export workflow](#4)
+- [Import and display results workflow](#5)
+- [Transformation from `XYZ` to `UV`](#6)
 
 
 ####<a name="2"></a>Giving Something Back to the Community
@@ -91,7 +91,7 @@ I hope you find this interesting and worth sharing.
 ####<a name="3"></a>Project Overview
 
 The project goal was to visualize an analytical result.
- 
+
 - Step 1: use
 the [MomenTumV2RevitLayouting Revit add-in](https://github.com/tumcms/MomenTUM/tree/master/momentum-tools/momentum-layout-tools/momentum-layout-tools-revit) to
 export geometrical information from a Revit project to XML.
