@@ -14,13 +14,15 @@
   https://forums.autodesk.com/t5/revit-api-forum/return-failure-information-to-command/m-p/7695676
 
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Gathering and Returning Failure Information in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-...
+Is there a way to return failure information to your main command when creating a transaction?
+My program does some error logging and creates an error report at the end, and I'd like to include some information from specific types of Revit failures (i.e., include if multiple instances were created in the same place).
+Yes, you can use the <code>PreprocessFailures</code> method argument <code>failuresAccessor</code> to review and store failure message information for later use...
 
 --->
 
-### Returning Failure Information to Command
+### Gathering and Returning Failure Information
 
 Here is a nice solution shared
 by [Mastjaso](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1058186) based on significant help
