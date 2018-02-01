@@ -1,0 +1,327 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head>
+
+<!---
+
+- 13797675 [Return Failure Information to Command?]
+  https://forums.autodesk.com/t5/revit-api-forum/return-failure-information-to-command/m-p/7695676
+
+
+ #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+
+...
+
+--->
+
+### Returning Failure Information to Command
+
+Here is a nice solution shared
+by [Mastjaso](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1058186) based on significant help
+from [Rpthomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [returning failure information to command](https://forums.autodesk.com/t5/revit-api-forum/return-failure-information-to-command/m-p/7695676):
+
+**Question:** Is there a way to return failure information to your main command when creating a transaction?
+
+My program is doing some error logging and creating an error report at the end of it, and I'd like to include some information from specific types of Revit failures (i.e., include if multiple instances were created in the same place).
+
+I looked over the failure SDK samples, forum and blog posts but have not yet come across, nor can think of a way to accomplish this. Implementing a preprocessor and passing it to the transaction is simple enough, but how do I get that information back to my main program? Since I'm not passing the preprocessor in using `ref`, I can't save it to a property on the preprocessor for accessing after and the transaction object itself doesn't appear to contain any information about failures that occur.
+
+Do I have to write to a file on disk with my preprocessor and then read that back with the tail end of my main program?
+
+As far as I can tell, the general stage for this process is as follow:
+
+- Addin creates a transaction.
+- Addin calls `Transaction.Commit` to end the transaction.
+- The failure preprocessor is executed.
+- Failure processing event is flagged, and all failure processing event handlers are run.
+- Failure processor is run.
+- The transaction is either committed or rolled back by Revit.
+- The addin will now execute the line of code that comes after `Transaction.Commit`.
+
+My issue is that I want Revit to continue with its standard failure processing, and I just want the information about those failures. From the perspective of my add-in, I can call a transaction and pass it a custom preprocessor class; however, this doesn't appear to be a real object, just a method that gets run with a set return value. I could also hook up a preprocessor event handler, but again, there's no simple way to get information from my event handler, back into my main program.
+
+Here's the preprocessor example from the ErrorHandling SDK sample:
+
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;transaction&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;m_doc,&nbsp;Warning_FailurePreproccessor_OverlappedWall&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">FailureHandlingOptions</span>&nbsp;options&nbsp;=&nbsp;transaction
+&nbsp;&nbsp;&nbsp;&nbsp;.GetFailureHandlingOptions();
+ 
+&nbsp;&nbsp;FailurePreproccessor&nbsp;preproccessor
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;FailurePreproccessor();
+ 
+&nbsp;&nbsp;options.SetFailuresPreprocessor(&nbsp;preproccessor&nbsp;);
+&nbsp;&nbsp;transaction.SetFailureHandlingOptions(&nbsp;options&nbsp;);
+&nbsp;&nbsp;transaction.Start();
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;line&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;-10,&nbsp;0,&nbsp;0&nbsp;),
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;-20,&nbsp;0,&nbsp;0&nbsp;)&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">Wall</span>&nbsp;wall1&nbsp;=&nbsp;<span style="color:#2b91af;">Wall</span>.Create(&nbsp;m_doc,&nbsp;line,&nbsp;level1.Id,&nbsp;<span style="color:blue;">false</span>&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">Wall</span>&nbsp;wall2&nbsp;=&nbsp;<span style="color:#2b91af;">Wall</span>.Create(&nbsp;m_doc,&nbsp;line,&nbsp;level1.Id,&nbsp;<span style="color:blue;">false</span>&nbsp;);
+&nbsp;&nbsp;m_doc.Regenerate();
+ 
+&nbsp;&nbsp;transaction.Commit();
+</pre>
+
+So, I can pass in a preprocessor object to handle the preprocessing where I can access the failure errors.
+
+However, the preprocessor object just looks like this:
+
+<pre class="code">
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;Implements&nbsp;the&nbsp;interface&nbsp;IFailuresPreprocessor</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">FailurePreproccessor</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IFailuresPreprocessor</span>
+{
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;This&nbsp;method&nbsp;is&nbsp;called&nbsp;when&nbsp;there&nbsp;have&nbsp;been&nbsp;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;failures&nbsp;found&nbsp;at&nbsp;the&nbsp;end&nbsp;of&nbsp;a&nbsp;transaction&nbsp;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;and&nbsp;Revit&nbsp;is&nbsp;about&nbsp;to&nbsp;start&nbsp;processing&nbsp;them.&nbsp;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">param</span><span style="color:gray;">&nbsp;name</span><span style="color:gray;">=</span><span style="color:gray;">&quot;</span>failuresAccessor<span style="color:gray;">&quot;</span><span style="color:gray;">&gt;</span><span style="color:green;">The&nbsp;Interface&nbsp;class&nbsp;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;that&nbsp;provides&nbsp;access&nbsp;to&nbsp;the&nbsp;failure&nbsp;information.&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">param</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">returns</span><span style="color:gray;">&gt;&lt;/</span><span style="color:gray;">returns</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">FailureProcessingResult</span>&nbsp;PreprocessFailures(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FailuresAccessor</span>&nbsp;failuresAccessor&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;}
+}
+</pre>
+
+With just a single method (`PreprocessFailures`) that presumably gets called by Revit, with a set return value to Revit. So, my issue is here, how do I get information from this failure preprocessing method, back into my main program? The preprocessor's return value gets returned to Revit, not my addin, and if I want to implement the `IFailuresPreprocessor` interface I can't pass in a `ref` or `out` variable to the preprocessor to write to, as far as I can tell.
+
+ 
+**Answer:** The implementation of the `PreprocessFailures` method has an argument `failuresAccessor` which is used for reviewing and dealing with failure messages.
+
+The below is an example implementation. Failure messages have to be dealt with before you can commit a transaction either by resolving them or deleting them so there are generally no messages left after transaction is committed. You can get information out, but you would need to create your own class to store the information. `IFailurePreprocessor` is more for resolving the messages beforehand.
+
+If you were passing API objects `ByRef` or holding onto them you'd likely get errors due to those objects being out of context.
+
+<pre class="code">
+<span style="color:blue;">Private</span>&nbsp;<span style="color:blue;">Class</span>&nbsp;<span style="color:#2b91af;">FailurePP</span>
+&nbsp;&nbsp;<span style="color:blue;">Implements</span>&nbsp;<span style="color:#2b91af;">IFailuresPreprocessor</span>
+&nbsp;&nbsp;<span style="color:blue;">Private</span>&nbsp;FailureList&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;List(<span style="color:blue;">Of</span>&nbsp;<span style="color:blue;">String</span>)
+ 
+&nbsp;&nbsp;<span style="color:blue;">Public</span>&nbsp;<span style="color:blue;">Function</span>&nbsp;PreprocessFailures(failuresAccessor&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">FailuresAccessor</span>)&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">FailureProcessingResult</span>&nbsp;<span style="color:blue;">Implements</span>&nbsp;<span style="color:#2b91af;">IFailuresPreprocessor</span>.PreprocessFailures
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">For</span>&nbsp;<span style="color:blue;">Each</span>&nbsp;item&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">FailureMessageAccessor</span>&nbsp;<span style="color:blue;">In</span>&nbsp;failuresAccessor.GetFailureMessages
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FailureList.Add(item.GetDescriptionText)
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;FailDefID&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">FailureDefinitionId</span>&nbsp;=&nbsp;item.GetFailureDefinitionId
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">If</span>&nbsp;FailDefID&nbsp;=&nbsp;<span style="color:#2b91af;">BuiltInFailures</span>.<span style="color:#2b91af;">GeneralFailures</span>.DuplicateValue&nbsp;<span style="color:blue;">Then</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;failuresAccessor.DeleteWarning(item)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">If</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Next</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Return</span>&nbsp;<span style="color:#2b91af;">FailureProcessingResult</span>.ProceedWithCommit
+&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Function</span>
+&nbsp;&nbsp;<span style="color:blue;">Public</span>&nbsp;<span style="color:blue;">Sub</span>&nbsp;ShowDialogue()
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;SB&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;Text.<span style="color:#2b91af;">StringBuilder</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">For</span>&nbsp;<span style="color:blue;">Each</span>&nbsp;item&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">String</span>&nbsp;<span style="color:blue;">In</span>&nbsp;FailureList
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SB.AppendLine(item)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Next</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(<span style="color:#a31515;">&quot;Some&nbsp;info&quot;</span>,&nbsp;SB.ToString)
+&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Sub</span>
+<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Class</span>
+ 
+<span style="color:blue;">Private</span>&nbsp;<span style="color:blue;">Function</span>&nbsp;FailureEx(<span style="color:blue;">ByVal</span>&nbsp;commandData&nbsp;<span style="color:blue;">As</span>&nbsp;Autodesk.Revit.UI.<span style="color:#2b91af;">ExternalCommandData</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">ByRef</span>&nbsp;message&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">String</span>,&nbsp;<span style="color:blue;">ByVal</span>&nbsp;elements&nbsp;<span style="color:blue;">As</span>&nbsp;Autodesk.Revit.DB.<span style="color:#2b91af;">ElementSet</span>)
+ 
+&nbsp;&nbsp;<span style="color:blue;">If</span>&nbsp;commandData.Application.ActiveUIDocument&nbsp;<span style="color:blue;">Is</span>&nbsp;<span style="color:blue;">Nothing</span>&nbsp;<span style="color:blue;">Then</span>&nbsp;<span style="color:blue;">Return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Succeeded&nbsp;<span style="color:blue;">Else</span>
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;IntUIDoc&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">UIDocument</span>&nbsp;=&nbsp;commandData.Application.ActiveUIDocument
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;IntDoc&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;=&nbsp;IntUIDoc.Document
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;F_PP&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">FailurePP</span>
+&nbsp;&nbsp;<span style="color:blue;">Using</span>&nbsp;tx&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(IntDoc,&nbsp;<span style="color:#a31515;">&quot;Marks&quot;</span>)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;Ops&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">FailureHandlingOptions</span>&nbsp;=&nbsp;tx.GetFailureHandlingOptions
+&nbsp;&nbsp;&nbsp;&nbsp;Ops.SetFailuresPreprocessor(F_PP)
+&nbsp;&nbsp;&nbsp;&nbsp;tx.SetFailureHandlingOptions(Ops)
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">If</span>&nbsp;tx.Start&nbsp;=&nbsp;<span style="color:#2b91af;">TransactionStatus</span>.Started&nbsp;<span style="color:blue;">Then</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;FEC&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(IntDoc)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;ECF&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">ElementCategoryFilter</span>(<span style="color:#2b91af;">BuiltInCategory</span>.OST_StructuralColumns)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;Jx&nbsp;<span style="color:blue;">As</span>&nbsp;List(<span style="color:blue;">Of</span>&nbsp;<span style="color:#2b91af;">Element</span>)&nbsp;=&nbsp;FEC.WherePasses(ECF).WhereElementIsNotElementType.ToElements
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">If</span>&nbsp;Jx.Count&nbsp;&gt;=&nbsp;2&nbsp;<span style="color:blue;">Then</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">For</span>&nbsp;I&nbsp;=&nbsp;0&nbsp;<span style="color:blue;">To</span>&nbsp;1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Jx(I).Parameter(<span style="color:#2b91af;">BuiltInParameter</span>.ALL_MODEL_MARK).Set(<span style="color:#a31515;">&quot;Duplicate&nbsp;Mark&quot;</span>)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Next</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">If</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tx.Commit()
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">If</span>
+&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Using</span>
+&nbsp;&nbsp;F_PP.ShowDialogue()
+&nbsp;&nbsp;<span style="color:blue;">Return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Succeeded
+<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Function</span>
+</pre>
+
+**Response:** The preprocessor doesn't necessarily need to resolve or delete them, though, since if it leaves them they'll just be handled by the failure processor, which I believe by default is those Revit popup boxes. I was looking at `failuresAccessor` to get the failure messages, but how do I get that information back into my program?
+
+You mention that I would need to create my own class to store the information, but I'm confused as to how the method or object I pass would ever be able to get information back out into my main command.
+
+**Answer:** They'll continue to a further stage of the failure framework but the point of the preprocessor is to deal with them so they don't arrive at that stage.
+
+In the code above, I got the failure message out as a string, I could have also obtained the failure ID, the name of the transaction amongst other things. I'm not sure what information you are after?
+
+The code below doesn't require you to cancel or delete warnings, but this depends on severity of warnings. The old Revit 2012 document states that returning `FailureProcessingResult.Continue` rolls back the transaction, but I find for the example below that not to be the case (since parameters have been changed). Probably this depends on failure severity. The warnings of duplicate mark still exist in the document, but the API objects are no more.
+
+The API objects are not directly accessible after transaction commit, so you have to mirror the information within them in your own class.
+
+The other two parts of the Failure API framework are probably not suitable for what you describe since they have no direct relation to your `IExternalcommand`, i.e., the `IFailuresProcessingEvent` is for everything called for all transactions, and the `IFailuresProcessor` is to replace the dialogue for the whole Revit session.
+
+<pre class="code">
+<span style="color:blue;">Private</span>&nbsp;<span style="color:blue;">Class</span>&nbsp;<span style="color:#2b91af;">FailurePP</span>
+&nbsp;&nbsp;<span style="color:blue;">Implements</span>&nbsp;<span style="color:#2b91af;">IFailuresPreprocessor</span>
+&nbsp;&nbsp;<span style="color:blue;">Private</span>&nbsp;FailureList&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;List(<span style="color:blue;">Of</span>&nbsp;<span style="color:blue;">String</span>)
+ 
+&nbsp;&nbsp;<span style="color:blue;">Public</span>&nbsp;<span style="color:blue;">Function</span>&nbsp;PreprocessFailures(failuresAccessor&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">FailuresAccessor</span>)&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">FailureProcessingResult</span>&nbsp;<span style="color:blue;">Implements</span>&nbsp;<span style="color:#2b91af;">IFailuresPreprocessor</span>.PreprocessFailures
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">For</span>&nbsp;<span style="color:blue;">Each</span>&nbsp;item&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">FailureMessageAccessor</span>&nbsp;<span style="color:blue;">In</span>&nbsp;failuresAccessor.GetFailureMessages
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FailureList.Add(item.GetDescriptionText)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;FailDefID&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">FailureDefinitionId</span>&nbsp;=&nbsp;item.GetFailureDefinitionId
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">If</span>&nbsp;FailDefID&nbsp;=&nbsp;<span style="color:#2b91af;">BuiltInFailures</span>.<span style="color:#2b91af;">GeneralFailures</span>.DuplicateValue&nbsp;<span style="color:blue;">Then</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;failuresAccessor.DeleteWarning(item)</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">If</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Next</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Return</span>&nbsp;<span style="color:#2b91af;">FailureProcessingResult</span>.Continue
+&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Function</span>
+&nbsp;&nbsp;<span style="color:blue;">Public</span>&nbsp;<span style="color:blue;">Sub</span>&nbsp;ShowDialogue()
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;SB&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;Text.<span style="color:#2b91af;">StringBuilder</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">For</span>&nbsp;<span style="color:blue;">Each</span>&nbsp;item&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">String</span>&nbsp;<span style="color:blue;">In</span>&nbsp;FailureList
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SB.AppendLine(item)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Next</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(<span style="color:#a31515;">&quot;Some&nbsp;info&quot;</span>,&nbsp;SB.ToString)
+&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Sub</span>
+<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Class</span>
+</pre>
+
+**Response:** Thanks for your replies! The code does indeed work perfectly. I had a fundamental misunderstanding of how objects behaved in C# and had missed that you were calling `ShowDialogue` from outside the `PreprocessFailures` method.
+
+In case anyone happens to come across this, I ported the code to C# and figure I may as well share it:
+
+<pre class="code">
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;Collect&nbsp;all&nbsp;failure&nbsp;message&nbsp;description&nbsp;strings.</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">MessageDescriptionGatheringPreprocessor</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IFailuresPreprocessor</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">string</span>&gt;&nbsp;FailureList&nbsp;{&nbsp;<span style="color:blue;">get</span>;&nbsp;<span style="color:blue;">set</span>;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;MessageDescriptionGatheringPreprocessor()
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FailureList&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">string</span>&gt;();
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">FailureProcessingResult</span>&nbsp;PreprocessFailures(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FailuresAccessor</span>&nbsp;failuresAccessor&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">FailureMessageAccessor</span>&nbsp;fMA
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">in</span>&nbsp;failuresAccessor.GetFailureMessages()&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FailureList.Add(&nbsp;fMA.GetDescriptionText()&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FailureDefinitionId</span>&nbsp;FailDefID&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;fMA.GetFailureDefinitionId();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//if&nbsp;(FailDefID&nbsp;==&nbsp;BuiltInFailures</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;&nbsp;.GeneralFailures.DuplicateValue)</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;&nbsp;&nbsp;&nbsp;failuresAccessor.DeleteWarning(fMA);</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">FailureProcessingResult</span>.Continue;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;ShowDialogue()
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;s&nbsp;=&nbsp;<span style="color:blue;">string</span>.Join(&nbsp;<span style="color:#a31515;">&quot;\r\n&quot;</span>,&nbsp;FailureList&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;Post&nbsp;Processing&nbsp;Failures:&quot;</span>,&nbsp;s&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;[<span style="color:#2b91af;">Transaction</span>(&nbsp;<span style="color:#2b91af;">TransactionMode</span>.Manual&nbsp;)]
+&nbsp;&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">CmdFailureGatherer</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">Result</span>&nbsp;Execute(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ExternalCommandData</span>&nbsp;commandData,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">ref</span>&nbsp;<span style="color:blue;">string</span>&nbsp;message,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementSet</span>&nbsp;elements&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UIApplication</span>&nbsp;uiApp&nbsp;=&nbsp;commandData.Application;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;activeDoc&nbsp;=&nbsp;uiApp.ActiveUIDocument.Document;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">MessageDescriptionGatheringPreprocessor</span>&nbsp;pp
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">MessageDescriptionGatheringPreprocessor</span>();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;t&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;activeDoc&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FailureHandlingOptions</span>&nbsp;ops
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;t.GetFailureHandlingOptions();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ops.SetFailuresPreprocessor(&nbsp;pp&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t.SetFailureHandlingOptions(&nbsp;ops&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t.Start(&nbsp;<span style="color:#a31515;">&quot;Marks&quot;</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;specEqu
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;activeDoc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfCategory(&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_SpecialityEquipment&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.ToElements();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;specEqu.Count&nbsp;&gt;=&nbsp;2&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">for</span>(&nbsp;<span style="color:blue;">int</span>&nbsp;i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;2;&nbsp;i++&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;specEqu[i].get_Parameter(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.ALL_MODEL_MARK&nbsp;).Set(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Duplicate&nbsp;Mark&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t.Commit();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pp.ShowDialogue();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Succeeded;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+</pre>
+
+Many thanks to Mastjaso and Rpthomas108 for putting this together!
+
+I added it 
+to [The Building Coder Samples](https://github.com/jeremytammik/the_building_coder_samples) 
+[release 2018.0.135.1](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.135.1)
+in the new module 
+[CmdFailureGatherer.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdFailureGatherer.cs).
+
+In that command, I generate a warning by creating two overlapping walls:
+
+<pre class="code">
+  <span style="color:green;">//&nbsp;Generate&nbsp;an&nbsp;&#39;duplicate&nbsp;wall&#39;&nbsp;warning&nbsp;message:</span>
+   
+  <span style="color:#2b91af;">Element</span>&nbsp;level&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+  &nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">Level</span>&nbsp;)&nbsp;)
+  &nbsp;&nbsp;.FirstElement();
+   
+  <span style="color:#2b91af;">Line</span>&nbsp;line&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;<span style="color:#2b91af;">XYZ</span>.Zero,&nbsp;10&nbsp;*&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisX&nbsp;);
+  <span style="color:#2b91af;">Wall</span>&nbsp;wall1&nbsp;=&nbsp;<span style="color:#2b91af;">Wall</span>.Create(&nbsp;doc,&nbsp;line,&nbsp;level.Id,&nbsp;<span style="color:blue;">false</span>&nbsp;);
+  <span style="color:#2b91af;">Wall</span>&nbsp;wall2&nbsp;=&nbsp;<span style="color:#2b91af;">Wall</span>.Create(&nbsp;doc,&nbsp;line,&nbsp;level.Id,&nbsp;<span style="color:blue;">false</span>&nbsp;);
+</pre>
+
+During the command execution, this displays the standard Revit warning message, which is not suppressed:
+
+<center>
+<img src="img/failure_message_dlg.png" alt="Standard Revit failure message" width="451"/>
+</center>
+
+At the end of the command, the failure message descriptions have all been collected and are reported in a separate task dialogue:
+
+<center>
+<img src="img/failure_message_report.png" alt="Failure message report" width="373"/>
+</center>
