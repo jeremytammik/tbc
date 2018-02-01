@@ -10,8 +10,7 @@
 
 <!---
 
-
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Creating a swept blend DirectShape in C++ in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/sweptblenddirectshape
 
 Question: I am trying to create a swept blend geometry and assign it to a <code>DirectShape</code> element.
 The initial code threw an exception when calling the <code>GeometryCreationUtilities</code> <code>CreateSweptBlendGeometry</code> method. 
@@ -20,7 +19,7 @@ Answer: The path parameters assume that they should be normalized or that the cu
 
 --->
 
-### Create Swept Blend in C++
+### Create Swept Blend DirectShape in C++
 
 This solution is shared by my colleague Ryuji Ogasawara:
 
