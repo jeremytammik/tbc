@@ -13,7 +13,7 @@
 - get crop box for a given view
   http://thebuildingcoder.typepad.com/blog/2013/09/rotating-a-plan-view.html#comment-3734421721
 
-Efficiently retrieve crop box for given view using #RevitAPI parameter filter @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Efficiently retrieve crop box for given view using #RevitAPI parameter filter @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/getcropboxforview
 
 Konrads Samulis shared a very nice solution to retrieve the crop box for a given view using a highly efficient parameter filter in
 his comment on rotating a plan view.
