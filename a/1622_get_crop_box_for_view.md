@@ -15,7 +15,12 @@
 
 Efficiently retrieve crop box for given view using #RevitAPI parameter filter @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-...
+Konrads Samulis shared a very nice solution to retrieve the crop box for a given view using a highly efficient parameter filter in
+his comment on rotating a plan view.
+In digging up this old thread, I found something quite curious in the API in 18.1, that I'm not sure was there before.
+The method of using a temporary transaction (with rollback) to find the element id of the crop box was taking a very long time on a large model, so I did a bit of digging to see how I could improve it.
+I noticed that in the built-in parameter <code>ID_PARAM</code> of the crop box contains the element id of the view it's in.
+E.g., the crop box 'points' to the id of the view it is in using <code>ID_PARAM</code>...
 
 --->
 
