@@ -35,14 +35,14 @@
 - 13840360 [How do I create conduit between 2 connectors?]
   https://forums.autodesk.com/t5/revit-api-forum/how-do-i-create-conduit-between-2-connectors/m-p/7727929
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Rotation adjusts and fixes conduit end #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/rotationfixconduit
 
 I listed several possible approaches to trigger a refresh of an element's graphics display.
 Here is another one: Applying element rotation to adjust and fix conduit end...
 
 --->
 
-### Rotation Adjusts Conduit End
+### Rotation Adjusts and Fixes Conduit End
 
 Quite a while ago, I listed a bunch of possible approaches
 to [refresh element graphics display](http://thebuildingcoder.typepad.com/blog/2014/06/refresh-element-graphics-display.html).
