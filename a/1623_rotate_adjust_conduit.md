@@ -37,7 +37,8 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-...
+I listed several possible approaches to trigger a refresh of an element's graphics display.
+Here is another one: Applying element rotation to adjust and fix conduit end...
 
 --->
 
