@@ -12,7 +12,7 @@
 
 - 13865502 [export multi views into one dwg]
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+MergedViews and exporting to a single DWG #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/mergedviews
 
 Some insight on the use of the <code>MergedViews</code> property provided by the DGN, DWG and DWG export options classes and other ideas to export multiple views into a single DWG file
 &ndash; Question: I want to combine and export multiple views into one single DWG file. I set the option <code>MergedViews</code>, but the code still generates multiple DWG files for the views...

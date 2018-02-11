@@ -16,7 +16,7 @@
   https://forums.autodesk.com/t5/revit-api-forum/sweep-profile-from-family/m-p/7751112
   https://forums.autodesk.com/t5/revit-api-forum/sweep-using-profile-family/m-p/6057115
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+NewFamilySymbolProfile sample #RevitAPI add-in @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/newfamilysymbolprofile
 
 Questions on how to use <code>NewFamilySymbolProfile</code> have come up a couple of times in the Revit API discussion forum.
 The short answer is: retrieve the family symbol from the profile family, then call the creation application <code>NewFamilySymbolProfile</code> method.
