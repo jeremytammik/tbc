@@ -17,11 +17,16 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-...
+Questions on how to use <code>NewFamilySymbolProfile</code> have come up a couple of times in the Revit API discussion forum.
+The short answer is: retrieve the family symbol from the profile family, then call the creation application <code>NewFamilySymbolProfile</code> method.
+I implemented a new sample add-in for you to demonstrate the steps using the <i>Profiles_L-Angles.rfa</i> profile family...
 
 --->
 
 <h3>NewFamilySymbolProfile Sample Add-In</h3>
+<p>I've been answering rather a lot of queries in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> lately,
+leading me to once again become <a href="#2">top solution author</a>; here is one of the latest:</p>
 <p>Questions on how to use <code>NewFamilySymbolProfile</code> have come up a couple of times in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> threads
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/load-profile-for-newsweep-command/td-p/5117864">load profile for <code>NewSweep</code> command</a>,
@@ -148,4 +153,9 @@ you to demonstrate the steps using the <em>Profiles_L-Angles.rfa</em> profile fa
 <p>The comments explain all the important steps.</p>
 <p><center>
 <img src="img/l_angle_rfa.png" alt="UK Profiles Framing Steel Profiles_L-Angles.rfa" width="177"/>
+</center></p>
+<h4><a name="2"></a>Top Solution Author</h4>
+<p>As said, I have been answering rather a lot of queries lately, leading to a new top solution author record score of 37, afaik:</p>
+<p><center>
+<img src="img/2018-02-08_top_solution_author_37.png" alt="Top solution author" width="231"/>
 </center></p>

@@ -18,11 +18,17 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-...
+Questions on how to use <code>NewFamilySymbolProfile</code> have come up a couple of times in the Revit API discussion forum.
+The short answer is: retrieve the family symbol from the profile family, then call the creation application <code>NewFamilySymbolProfile</code> method.
+I implemented a new sample add-in for you to demonstrate the steps using the <i>Profiles_L-Angles.rfa</i> profile family...
 
 --->
 
 ### NewFamilySymbolProfile Sample Add-In
+
+I've been answering rather a lot of queries in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) lately,
+leading me to once again become [top solution author](#2); here is one of the latest:
 
 Questions on how to use `NewFamilySymbolProfile` have come up a couple of times in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
@@ -165,3 +171,12 @@ The comments explain all the important steps.
 <center>
 <img src="img/l_angle_rfa.png" alt="UK Profiles Framing Steel Profiles_L-Angles.rfa" width="177"/>
 </center>
+
+####<a name="2"></a>Top Solution Author
+
+As said, I have been answering rather a lot of queries lately, leading to a new top solution author record score of 37, afaik:
+
+<center>
+<img src="img/2018-02-08_top_solution_author_37.png" alt="Top solution author" width="231"/>
+</center>
+
