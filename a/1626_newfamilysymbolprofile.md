@@ -30,11 +30,13 @@ I've been answering rather a lot of queries in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) lately,
 leading me to once again become [top solution author](#2); here is one of the latest:
 
-Questions on how to use `NewFamilySymbolProfile` have come up a couple of times in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
-on [load profile for `NewSweep` command](https://forums.autodesk.com/t5/revit-api-forum/load-profile-for-newsweep-command/td-p/5117864),
-[sweep using profile family](https://forums.autodesk.com/t5/revit-api-forum/sweep-using-profile-family/m-p/6057115) and
-[sweep profile from family](https://forums.autodesk.com/t5/revit-api-forum/sweep-profile-from-family/m-p/7751112).
+####<a name="1"></a>How to use NewFamilySymbolProfile
+
+Questions on how to use `NewFamilySymbolProfile` have come up a couple of times, e.g., in the following threads:
+
+- [Load profile for `NewSweep` command](https://forums.autodesk.com/t5/revit-api-forum/load-profile-for-newsweep-command/td-p/5117864)
+- [Sweep using profile family](https://forums.autodesk.com/t5/revit-api-forum/sweep-using-profile-family/m-p/6057115)
+- [Sweep profile from family](https://forums.autodesk.com/t5/revit-api-forum/sweep-profile-from-family/m-p/7751112)
 
 In the second, Revitalizer provides a succinct answer, saying:
 
@@ -47,7 +49,7 @@ In the second, Revitalizer provides a succinct answer, saying:
       FamilySymbol familySymbol )
 </pre>
  
-The first two thread answers were insufficiently complete and clear, hence the third follow-up thread.
+However, the first two thread answers were insufficiently complete and clear, hence the third follow-up thread.
 
 **Question:** I want to pass a profile from an existing profile family to `FamilyCreate.NewSweep`.
 

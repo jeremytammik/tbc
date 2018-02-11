@@ -27,11 +27,13 @@ I implemented a new sample add-in for you to demonstrate the steps using the <i>
 <p>I've been answering rather a lot of queries in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> lately,
 leading me to once again become <a href="#2">top solution author</a>; here is one of the latest:</p>
-<p>Questions on how to use <code>NewFamilySymbolProfile</code> have come up a couple of times in
-the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> threads
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/load-profile-for-newsweep-command/td-p/5117864">load profile for <code>NewSweep</code> command</a>,
-<a href="https://forums.autodesk.com/t5/revit-api-forum/sweep-using-profile-family/m-p/6057115">sweep using profile family</a> and
-<a href="https://forums.autodesk.com/t5/revit-api-forum/sweep-profile-from-family/m-p/7751112">sweep profile from family</a>.</p>
+<h4><a name="1"></a>How to use NewFamilySymbolProfile</h4>
+<p>Questions on how to use <code>NewFamilySymbolProfile</code> have come up a couple of times, e.g., in the following threads:</p>
+<ul>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/load-profile-for-newsweep-command/td-p/5117864">Load profile for <code>NewSweep</code> command</a></li>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/sweep-using-profile-family/m-p/6057115">Sweep using profile family</a></li>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/sweep-profile-from-family/m-p/7751112">Sweep profile from family</a></li>
+</ul>
 <p>In the second, Revitalizer provides a succinct answer, saying:</p>
 <blockquote>
 <p>The next step after retrieving the family symbol from the profile family is to call
@@ -43,7 +45,7 @@ the <a href="http://www.revitapidocs.com/2018.1/0fd22223-8ca8-2955-e2ee-7d83d853
       FamilySymbol familySymbol )
 </pre>
 
-<p>The first two thread answers were insufficiently complete and clear, hence the third follow-up thread.</p>
+<p>However, the first two thread answers were insufficiently complete and clear, hence the third follow-up thread.</p>
 <p><strong>Question:</strong> I want to pass a profile from an existing profile family to <code>FamilyCreate.NewSweep</code>.</p>
 <p>I looked at the thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/load-profile-for-newsweep-command/td-p/5117864">loading a profile for the <code>NewSweep</code> command</a>.</p>
