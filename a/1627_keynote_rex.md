@@ -80,6 +80,9 @@ been posted to the ADN site.
 
 ####<a name="3"></a>External Command with Ribbon Button Sample
 
+Continuing with the forum threads, let's begin with this simple one
+on [Revit add-ins](https://forums.autodesk.com/t5/revit-api-forum/revit-addins/m-p/7767351):
+
 **Question:** I want to start an external tool from a button in the ribbon.
 
 **Answer:** Read the [Revit API getting started material](http://thebuildingcoder.typepad.com/blog/about-the-author.html#2).
@@ -120,7 +123,7 @@ The ribbon panel it creates handles four basic user needs in regard to Revit Use
 - **KeyNote Editor** &ndash; launches the WpfRevitUserKeynoteManager application, a user keynote editor, with the current Revit project's user keynote file loaded up ready for creating and editing user keynotes. This editor provides a few convenient editing features germane to user keynote table files. It allows more than one person to edit the same user keynotes file at the same time, provided they edit different keynote categories.
 - **UpDate** &ndash; reloads the current Revit project's user keynote table file.
 - **KeyNote** &ndash; launches the Revit place keynote command.
-- **Displays Help** &ndash; explains how to use the WpfRevitUserKeynoteManager application by launching it in its own documentation mode.
+- **Display Help** &ndash; explains how to use the WpfRevitUserKeynoteManager application by launching it in its own documentation mode.
 
 Many thanks to Allan for sharing this!
 
