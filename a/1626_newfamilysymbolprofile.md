@@ -79,6 +79,10 @@ you to demonstrate the steps using the *Profiles_L-Angles.rfa* profile family.
 
 - C:/Users/All Users/Autodesk/RVT 2018/Libraries/UK/Profiles/Framing/Steel/Profiles_L-Angles.rfa
 
+<center>
+<img src="img/l_angle_rfa.png" alt="UK Profiles Framing Steel Profiles_L-Angles.rfa" width="177"/>
+</center>
+
 Here is the code:
 
 <pre class="code">
@@ -170,10 +174,6 @@ Here is the code:
 
 The comments explain all the important steps.
  
-<center>
-<img src="img/l_angle_rfa.png" alt="UK Profiles Framing Steel Profiles_L-Angles.rfa" width="177"/>
-</center>
-
 ####<a name="2"></a>Top Solution Author
 
 As said, I have been answering rather a lot of queries lately, leading to a new top solution author record score of 37, afaik:
