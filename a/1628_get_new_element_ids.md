@@ -13,19 +13,25 @@
 - retrieving newly created elements:
   https://stackoverflow.com/questions/48869272/python-revit-part-utils-how-to-get-append-the-results-out
   https://forums.autodesk.com/t5/revit-api-forum/how-to-get-a-merged-part-after-merging-with-some-parts/td-p/7772648
-I believe I just answered a very similar question in the Revit API discussion forum thread on [how to get a merged part after merging with some parts](https://forums.autodesk.com/t5/revit-api-forum/how-to-get-a-merged-part-after-merging-with-some-parts/td-p/7772648): 
+I believe I just answered a very similar question in the Revit API discussion forum thread on [how to get a merged part after merging with some parts](https://forums.autodesk.com/t5/revit-api-forum/how-to-get-a-merged-part-after-merging-with-some-parts/td-p/7772648):
 You can subscribe to [the DocumentChanged event](http://www.revitapidocs.com/2018.1/988dd6cf-fcaa-85d2-622d-c50f13917a13.htm) just before calling CreateParts, and unsubscribe just afterwards.
 That will tell you all the element ids added to the database during the call.
 This is demonstrated in the discussion on [retrieving newly placed family instances](http://thebuildingcoder.typepad.com/blog/2010/06/place-family-instance.html).
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+Retrieving newly created element ids in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/new_element_ids
 
-&ndash; 
-...
+An add-in will often need to retrieve the elements that it just created for further processing.
+Frequently, the Revit API method used to create them will return their element ids.
+Sometimes, that is not the case.
+Now this topic arose again in a couple of cases and brought some other aspects to mind
+&ndash; Using the element lister
+&ndash; Consecutive element ids
+&ndash; Retrieving recently added elements
+&ndash; AEC job openings in Munich and elsewhere...
 
 --->
 
-### Retrieving Newly Created Elements
+### Retrieving Newly Created Element Ids
 
 An add-in will often need to retrieve the elements that it just created for further processing.
 
@@ -36,20 +42,20 @@ Sometimes, that is not the case.
 We already discussed a simple and effective method to retrieve all newly created elements following a call to
 the [`PromptForFamilyInstancePlacement` method](http://www.revitapidocs.com/2018.1/b05a17df-3f63-9172-8e49-d2e1e6b8e9e2.htm) by
 subscribing to the [`DocumentChanged` event](http://www.revitapidocs.com/2018.1/988dd6cf-fcaa-85d2-622d-c50f13917a13.htm) just
-beforehand in the discussion 
+beforehand in the discussion
 on [placing family instances](http://thebuildingcoder.typepad.com/blog/2010/06/place-family-instance.html).
 
 Now this topic arose again in a couple of cases and brought some other aspects to mind:
 
-- [Using the Element Lister](#2) 
-- [Consecutive Element Ids](#3) 
-- [Retrieving Recently Added Elements](#4) 
-- [Hot Job Openings in Munich and Elsewhere](#5) 
+- [Using the element lister](#2)
+- [Consecutive element ids](#3)
+- [Retrieving recently added elements](#4)
+- [AEC job openings in Munich and elsewhere](#5)
 
 
 ####<a name="2"></a>Using the Element Lister
 
-The [element lister](http://thebuildingcoder.typepad.com/blog/2014/09/debugging-and-maintaining-the-image-relationship.html#2) provides 
+The [element lister](http://thebuildingcoder.typepad.com/blog/2014/09/debugging-and-maintaining-the-image-relationship.html#2) provides
 an easy way to discover element relationships between related objects that are added to Revit by certain operations.
 
 It is included
@@ -91,16 +97,16 @@ We discuss their uses in lots of places, e.g.,
 
 For connecting with an external database, I would suggest using the UniqueId.
 
-One simple sample that shows the whole connection strategy is provided by 
+One simple sample that shows the whole connection strategy is provided by
 the [FireRatingCloud add-in](https://github.com/jeremytammik/FireRatingCloud).
 
 
 ####<a name="4"></a>Retrieving Recently Added Elements
 
-So let us summarise the above again to answer 
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread 
-on [how to get a merged part after merging with some parts](https://forums.autodesk.com/t5/revit-api-forum/how-to-get-a-merged-part-after-merging-with-some-parts/td-p/7772648) and 
-the StackOverflow question 
+So let us summarise the above again to answer
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [how to get a merged part after merging with some parts](https://forums.autodesk.com/t5/revit-api-forum/how-to-get-a-merged-part-after-merging-with-some-parts/td-p/7772648) and
+the StackOverflow question
 on [Python Revit `Part.Utils` how to get append the results out](https://stackoverflow.com/questions/48869272/python-revit-part-utils-how-to-get-append-the-results-out):
 
 **Question 1:** I have merged some parts using `PartUtils.CreateMergedPart`.
@@ -126,11 +132,14 @@ This is demonstrated in the discussion on [retrieving newly placed family instan
 <img src="img/road_narrows.png" alt="Merge parts" width="211"/>
 </center>
 
-####<a name="5"></a>Hot Job Openings in Munich and Elsewhere
+####<a name="5"></a>AEC Job Openings in Munich and Elsewhere
 
 I see Autodesk offering several AEC related job openings.
 
-Here are two located in Munich, Germany, for offsite and home office:
+Below are two located in Munich, Germany, for offsite and home office.
+
+For more, please check
+the [Autodesk job search site](https://autodesk.taleo.net/careersection/adsk_gen/jobsearch.ftl).
 
 #####<a name="6"></a> [Industry Program Manager, AEC](https://autodesk.taleo.net/careersection/adsk_gen/jobdetail.ftl?job=18WD26910&tz=GMT%2B00%3A00)
 
@@ -153,14 +162,14 @@ This is a unique individual contributor position at Autodesk. Your job is to mak
 You will work with smart, global industry teams that are responsible for building and managing marketing programs and campaigns for our AEC industries. It will be your mission to:
 
 - Communicate and coordinate the execution of campaigns across the country teams
-- Gather input from the field 
+- Gather input from the field
 - Represent EMEA Demand Gen teams back to the industry strategy teams
 
 It requires a unique combination of marketing experience, business acumen, industry know-how, project management, communication, and leadership skills. And at the heart of it, you have love to get things done.
 
 Responsibilities
 
-- Communicate global programs and campaigns to align marketing initiatives in EMEA and execute to the AEC strategic vision 
+- Communicate global programs and campaigns to align marketing initiatives in EMEA and execute to the AEC strategic vision
 - Ensure the availability of assets for Account-based Marketing, Lead Gen Marketing, Digital Direct teams and support Channel Marketing in communicating strategic goals to partners
 - Lead the annual planning process for EMEA with the key Sales, Marketing and Industry stakeholders
 - Develop and deliver professional written and spoken communications that ensure team members and leadership have clear, concise, and up-to-date information on progress
@@ -173,7 +182,7 @@ Responsibilities
 Minimum Qualifications
 
 - Excellent communication & collaboration skills and organizational talent to manage projects from start to end successfully
-- Business acumen and industry knowledge to drive thought-leadership for the Architecture, Engineering, and Construction  
+- Business acumen and industry knowledge to drive thought-leadership for the Architecture, Engineering, and Construction
 - Change champion, motivator, and coach; demonstrated success delivering meaningful results through teams
 - Strong analytical and problem-solving skills
 - Excellent relationship management and expectation setting skills

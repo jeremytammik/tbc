@@ -37,7 +37,11 @@
   https://gist.github.com/imAliAsad/01893377dedef31b1e059a6241fc9b22#file-unitconvertor-cs
   https://gist.github.com/imAliAsad/01893377dedef31b1e059a6241fc9b22#file-extractfamilyparameterdata-cs
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+DevDays online presentations on #RevitAPI updates @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/keynotes_rex https://youtu.be/w1WskGTzX3s
+
+External command with ribbon button sample and keynote manager add-in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/keynotes_rex
+
+REX extensions versus Revit add-ins #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/keynotes_rex
 
 Let's highlight a few recent threads from the Revit API discussion forum.
 Before getting to those, a quick pointer to the DevDays Online recording from last week

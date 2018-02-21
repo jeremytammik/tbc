@@ -12,40 +12,46 @@
 - retrieving newly created elements:
   https://stackoverflow.com/questions/48869272/python-revit-part-utils-how-to-get-append-the-results-out
   https://forums.autodesk.com/t5/revit-api-forum/how-to-get-a-merged-part-after-merging-with-some-parts/td-p/7772648
-I believe I just answered a very similar question in the Revit API discussion forum thread on [how to get a merged part after merging with some parts](https://forums.autodesk.com/t5/revit-api-forum/how-to-get-a-merged-part-after-merging-with-some-parts/td-p/7772648): 
+I believe I just answered a very similar question in the Revit API discussion forum thread on [how to get a merged part after merging with some parts](https://forums.autodesk.com/t5/revit-api-forum/how-to-get-a-merged-part-after-merging-with-some-parts/td-p/7772648):
 You can subscribe to [the DocumentChanged event](http://www.revitapidocs.com/2018.1/988dd6cf-fcaa-85d2-622d-c50f13917a13.htm) just before calling CreateParts, and unsubscribe just afterwards.
 That will tell you all the element ids added to the database during the call.
 This is demonstrated in the discussion on [retrieving newly placed family instances](http://thebuildingcoder.typepad.com/blog/2010/06/place-family-instance.html).
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+Retrieving newly created element ids in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/new_element_ids
 
-&ndash; 
-...
+An add-in will often need to retrieve the elements that it just created for further processing.
+Frequently, the Revit API method used to create them will return their element ids.
+Sometimes, that is not the case.
+Now this topic arose again in a couple of cases and brought some other aspects to mind
+&ndash; Using the element lister
+&ndash; Consecutive element ids
+&ndash; Retrieving recently added elements
+&ndash; AEC job openings in Munich and elsewhere...
 
 --->
 
-<h3>Retrieving Newly Created Elements</h3>
+<h3>Retrieving Newly Created Element Ids</h3>
 <p>An add-in will often need to retrieve the elements that it just created for further processing.</p>
 <p>Frequently, the Revit API method used to create them will return their element ids.</p>
-<p>Somethimes, that is not the case.</p>
+<p>Sometimes, that is not the case.</p>
 <p>We already discussed a simple and effective method to retrieve all newly created elements following a call to
-the <a href="http://www.revitapidocs.com/2018.1/b05a17df-3f63-9172-8e49-d2e1e6b8e9e2.htm"><code>PromptForFamilyInstancePlacement</code> methond</a> by
+the <a href="http://www.revitapidocs.com/2018.1/b05a17df-3f63-9172-8e49-d2e1e6b8e9e2.htm"><code>PromptForFamilyInstancePlacement</code> method</a> by
 subscribing to the <a href="http://www.revitapidocs.com/2018.1/988dd6cf-fcaa-85d2-622d-c50f13917a13.htm"><code>DocumentChanged</code> event</a> just
-beforehand in the dicussion 
+beforehand in the discussion
 on <a href="http://thebuildingcoder.typepad.com/blog/2010/06/place-family-instance.html">placing family instances</a>.</p>
 <p>Now this topic arose again in a couple of cases and brought some other aspects to mind:</p>
 <ul>
-<li><a href="#2">Using the Element Lister</a> </li>
-<li><a href="#3">Consecutive Element Ids</a> </li>
-<li><a href="#4">Retrieving Recently Added Elements</a> </li>
-<li><a href="#5">Hot Job Openings in Munich and Elsewhere</a> </li>
+<li><a href="#2">Using the element lister</a></li>
+<li><a href="#3">Consecutive element ids</a></li>
+<li><a href="#4">Retrieving recently added elements</a></li>
+<li><a href="#5">AEC job openings in Munich and elsewhere</a></li>
 </ul>
 <h4><a name="2"></a>Using the Element Lister</h4>
-<p>The <a href="http://thebuildingcoder.typepad.com/blog/2014/09/debugging-and-maintaining-the-image-relationship.html#2">element lister</a> provides 
+<p>The <a href="http://thebuildingcoder.typepad.com/blog/2014/09/debugging-and-maintaining-the-image-relationship.html#2">element lister</a> provides
 an easy way to discover element relationships between related objects that are added to Revit by certain operations.</p>
 <p>It is included
 in <a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra">AdnRevitApiLabsXtra, the ADN Revit API Training Labs including Xtra</a>.</p>
-<p>All it does is grab all elements in the entire database and klist whatever properties you are interested in, e.g., element id, category, level, .NET class, etc.</p>
+<p>All it does is grab all elements in the entire database and list whatever properties you are interested in, e.g., element id, category, level, .NET class, etc.</p>
 <p>Then you can use
 a <a href="https://en.wikipedia.org/wiki/Diff_utility">Unix <code>diff</code> tool</a> to
 compare states before and after doing your thing.</p>
@@ -56,9 +62,9 @@ the <a href="http://thebuildingcoder.typepad.com/blog/2013/11/intimate-revit-dat
 a live read-evaluate-print console.</p>
 <h4><a name="3"></a>Consecutive Element Ids</h4>
 <p>Using any of the techniques listed above, you will quickly determine that Revit element ids are basically consecutive numbers.</p>
-<p>There is no guarantee for this, of course, and they can be mixed up by owrksharing operations.</p>
+<p>There is no guarantee for this, of course, and they can be mixed up by work-sharing operations.</p>
 <p>They can only be used to identify an element within one single Revit document.</p>
-<p>Because they are assigned consecutively, Revit automatically generats
+<p>Because they are assigned consecutively, Revit automatically generates
 many <a href="http://thebuildingcoder.typepad.com/blog/2011/11/undocumented-elementid-relationships.html">undocumented <code>ElementId</code> relationships</a>.</p>
 <p>For more persistent identification, a <code>UniqueId</code> is recommended.</p>
 <p>For the sake of completeness, Revit elements have two identifiers:</p>
@@ -69,13 +75,13 @@ many <a href="http://thebuildingcoder.typepad.com/blog/2011/11/undocumented-elem
 <p>We discuss their uses in lots of places, e.g.,
 <a href="http://thebuildingcoder.typepad.com/blog/2015/02/understanding-the-use-of-the-uniqueid.html">understanding the use of the <code>UniqueId</code></a>.</p>
 <p>For connecting with an external database, I would suggest using the UniqueId.</p>
-<p>One simple sample that shows the whole connection strategy is provided by 
+<p>One simple sample that shows the whole connection strategy is provided by
 the <a href="https://github.com/jeremytammik/FireRatingCloud">FireRatingCloud add-in</a>.</p>
 <h4><a name="4"></a>Retrieving Recently Added Elements</h4>
-<p>So let us summarise the above again to answer 
-the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread 
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-get-a-merged-part-after-merging-with-some-parts/td-p/7772648">how to get a merged part after merging with some parts</a> and 
-the StackOverflow question 
+<p>So let us summarise the above again to answer
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-get-a-merged-part-after-merging-with-some-parts/td-p/7772648">how to get a merged part after merging with some parts</a> and
+the StackOverflow question
 on <a href="https://stackoverflow.com/questions/48869272/python-revit-part-utils-how-to-get-append-the-results-out">Python Revit <code>Part.Utils</code> how to get append the results out</a>:</p>
 <p><strong>Question 1:</strong> I have merged some parts using <code>PartUtils.CreateMergedPart</code>.</p>
 <p>The output is not a <code>Part</code>, but a <code>PartMaker</code>.</p>
@@ -90,9 +96,11 @@ the <a href="http://www.revitapidocs.com/2018.1/988dd6cf-fcaa-85d2-622d-c50f1391
 <p><center>
 <img src="img/road_narrows.png" alt="Merge parts" width="211"/>
 </center></p>
-<h4><a name="5"></a>Hot Job Openings in Munich and Elsewhere</h4>
+<h4><a name="5"></a>AEC Job Openings in Munich and Elsewhere</h4>
 <p>I see Autodesk offering several AEC related job openings.</p>
-<p>Here are two located in Munich, Germany, for offsite and home office:</p>
+<p>Below are two located in Munich, Germany, for offsite and home office.</p>
+<p>For more, please check
+the <a href="https://autodesk.taleo.net/careersection/adsk_gen/jobsearch.ftl">Autodesk job search site</a>.</p>
 <h5><a name="6"></a> <a href="https://autodesk.taleo.net/careersection/adsk_gen/jobdetail.ftl?job=18WD26910&amp;tz=GMT%2B00%3A00">Industry Program Manager, AEC</a></h5>
 <p>Requisition ID: 18WD26910</p>
 <p>Are you interested in a marketing job at Autodesk and wondering if this is the right one? Start by answering these five questions:</p>
@@ -109,13 +117,13 @@ the <a href="http://www.revitapidocs.com/2018.1/988dd6cf-fcaa-85d2-622d-c50f1391
 <p>You will work with smart, global industry teams that are responsible for building and managing marketing programs and campaigns for our AEC industries. It will be your mission to:</p>
 <ul>
 <li>Communicate and coordinate the execution of campaigns across the country teams</li>
-<li>Gather input from the field </li>
+<li>Gather input from the field</li>
 <li>Represent EMEA Demand Gen teams back to the industry strategy teams</li>
 </ul>
 <p>It requires a unique combination of marketing experience, business acumen, industry know-how, project management, communication, and leadership skills. And at the heart of it, you have love to get things done.</p>
 <p>Responsibilities</p>
 <ul>
-<li>Communicate global programs and campaigns to align marketing initiatives in EMEA and execute to the AEC strategic vision </li>
+<li>Communicate global programs and campaigns to align marketing initiatives in EMEA and execute to the AEC strategic vision</li>
 <li>Ensure the availability of assets for Account-based Marketing, Lead Gen Marketing, Digital Direct teams and support Channel Marketing in communicating strategic goals to partners</li>
 <li>Lead the annual planning process for EMEA with the key Sales, Marketing and Industry stakeholders</li>
 <li>Develop and deliver professional written and spoken communications that ensure team members and leadership have clear, concise, and up-to-date information on progress</li>
@@ -128,7 +136,7 @@ the <a href="http://www.revitapidocs.com/2018.1/988dd6cf-fcaa-85d2-622d-c50f1391
 <p>Minimum Qualifications</p>
 <ul>
 <li>Excellent communication &amp; collaboration skills and organizational talent to manage projects from start to end successfully</li>
-<li>Business acumen and industry knowledge to drive thought-leadership for the Architecture, Engineering, and Construction  </li>
+<li>Business acumen and industry knowledge to drive thought-leadership for the Architecture, Engineering, and Construction</li>
 <li>Change champion, motivator, and coach; demonstrated success delivering meaningful results through teams</li>
 <li>Strong analytical and problem-solving skills</li>
 <li>Excellent relationship management and expectation setting skills</li>
@@ -147,7 +155,7 @@ the <a href="http://www.revitapidocs.com/2018.1/988dd6cf-fcaa-85d2-622d-c50f1391
 <p>Responsibilities</p>
 <ul>
 <li>Carry out the implementation of Autodesk's BIM solution on projects, collaborating with Autodesk sales and consulting delivery and business development teams</li>
-<li>Analyze customer business workflows and document findings</li>
+<li>Analyse customer business workflows and document findings</li>
 <li>Define, construct, and carry out the adoption of BIM implementation plans, leveraging your industry experience and best practices</li>
 <li>Manage customer relationships on implementation projects</li>
 <li>Document, share and promote BIM team best practices for redistribution and consistent implementation at a corporate level</li>
