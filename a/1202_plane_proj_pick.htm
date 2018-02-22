@@ -327,7 +327,9 @@ The result can be easily determined by subtracting the plane normal multiplied b
 &nbsp; {
 &nbsp; &nbsp; <span class="blue">double</span> d = plane.SignedDistanceTo( p );
 &nbsp;
-&nbsp; &nbsp; <span class="teal">XYZ</span> q = p + d * plane.Normal;
+&nbsp; &nbsp; //XYZ q = p + d * plane.Normal; // wrong according to Ruslan Hanza and Alexander Pekshev in their comments below
+
+&nbsp; &nbsp; <span class="teal">XYZ</span> q = p - d * plane.Normal;
 &nbsp;
 &nbsp; &nbsp; <span class="teal">Debug</span>.Assert(
 &nbsp; &nbsp; &nbsp; <span class="teal">Util</span>.IsZero( plane.SignedDistanceTo( q ) ),
