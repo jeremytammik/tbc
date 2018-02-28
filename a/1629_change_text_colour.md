@@ -13,8 +13,9 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+Here are some notes on changing text colour and a nice <code>node.js</code> web scraping tutorial
+&ndash; Changing text colour via the text note type
+&ndash; Web scraping using <code>node.js</code>...
 
 --->
 
@@ -40,20 +41,20 @@ Here are some notes on that and a nice `node.js` web scraping tutorial:
 
 This topic came up when Rudi [@Revitalizer](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1103138) Honke
 added a comment on colours in the thread 
-on [changing color of labels within tags family per tag instance](https://forums.autodesk.com/t5/revit-api-forum/changing-color-of-labels-within-tags-family-per-tag-instance/m-p/7794532), saying,
+on [changing colour of labels within tags family per tag instance](https://forums.autodesk.com/t5/revit-api-forum/changing-color-of-labels-within-tags-family-per-tag-instance/m-p/7794532), saying,
 
-> color parameters are of type integer, but the raw value may be difficult to read for the user.
+> colour parameters are of type integer, but the raw value may be difficult to read for the user.
 
 He explained how to read them in the earlier thread 
-on [how to change text color](https://forums.autodesk.com/t5/revit-api-forum/how-to-change-text-color/td-p/2567672):
+on [how to change text colour](https://forums.autodesk.com/t5/revit-api-forum/how-to-change-text-color/td-p/2567672):
 
-**Question:** I am using the `ColorDialog` control from Visual Studio 2008 to select a color, and then I retrieve the RGB components in three variables:
+**Question:** I am using the `ColorDialog` control from Visual Studio 2008 to select a colour, and then I retrieve the RGB components in three variables:
 
 - ColorComponentRed
 - ColorComponentGreen
 - ColorComponentBlue
 
-I want to assign this color to some text, but the following code is not working:
+I want to assign this colour to some text, but the following code is not working:
 
 <pre class="code">
   <span style="color:blue;">Dim</span>&nbsp;colorparam&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Parameter</span>
@@ -109,7 +110,7 @@ Then, for example:
 
 Also note that starting with Revit 2017, the Revit API provides a `ColorSelectionDialog`.
 
-You can use its `SelectedColor` property to get a Revit color instead of a system color.
+You can use its `SelectedColor` property to get a Revit colour instead of a system colour.
 
 Richard [@RPTHOMAS108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas added some 'quite convenient extension methods' to that:
 

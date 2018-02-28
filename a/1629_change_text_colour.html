@@ -31,19 +31,19 @@ to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Buil
 <h4><a name="2"></a>Changing Text Colour via the Text Note Type</h4>
 <p>This topic came up when Rudi <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1103138">@Revitalizer</a> Honke
 added a comment on colours in the thread 
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/changing-color-of-labels-within-tags-family-per-tag-instance/m-p/7794532">changing color of labels within tags family per tag instance</a>, saying,</p>
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/changing-color-of-labels-within-tags-family-per-tag-instance/m-p/7794532">changing colour of labels within tags family per tag instance</a>, saying,</p>
 <blockquote>
-<p>color parameters are of type integer, but the raw value may be difficult to read for the user.</p>
+<p>colour parameters are of type integer, but the raw value may be difficult to read for the user.</p>
 </blockquote>
 <p>He explained how to read them in the earlier thread 
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-change-text-color/td-p/2567672">how to change text color</a>:</p>
-<p><strong>Question:</strong> I am using the <code>ColorDialog</code> control from Visual Studio 2008 to select a color, and then I retrieve the RGB components in three variables:</p>
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-change-text-color/td-p/2567672">how to change text colour</a>:</p>
+<p><strong>Question:</strong> I am using the <code>ColorDialog</code> control from Visual Studio 2008 to select a colour, and then I retrieve the RGB components in three variables:</p>
 <ul>
 <li>ColorComponentRed</li>
 <li>ColorComponentGreen</li>
 <li>ColorComponentBlue</li>
 </ul>
-<p>I want to assign this color to some text, but the following code is not working:</p>
+<p>I want to assign this colour to some text, but the following code is not working:</p>
 <pre class="code">
   <span style="color:blue;">Dim</span>&nbsp;colorparam&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Parameter</span>
   colorparam&nbsp;=&nbsp;elem.ObjectType.Parameter(
@@ -93,7 +93,7 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-change-text-co
 </pre>
 
 <p>Also note that starting with Revit 2017, the Revit API provides a <code>ColorSelectionDialog</code>.</p>
-<p>You can use its <code>SelectedColor</code> property to get a Revit color instead of a system color.</p>
+<p>You can use its <code>SelectedColor</code> property to get a Revit colour instead of a system colour.</p>
 <p>Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">@RPTHOMAS108</a> Thomas added some 'quite convenient extension methods' to that:</p>
 <pre class="code">
   &lt;Extension()&gt;
