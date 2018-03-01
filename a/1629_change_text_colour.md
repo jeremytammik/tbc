@@ -10,8 +10,7 @@
 
 <!---
 
-
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Changing text colour via the text note type in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/2CR6M2k
 
 Here are some notes on changing text colour and a nice <code>node.js</code> web scraping tutorial
 &ndash; Changing text colour via the text note type

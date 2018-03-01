@@ -1,4 +1,4 @@
-<p><head>
+<head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="bc.css">
 <!--
@@ -6,10 +6,12 @@
 <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
 -->
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
-</head></p>
+</head>
+
 <!---
 
-Changing text colour via the text note type in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/2CR6M2k
+
+ #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
 Here are some notes on changing text colour and a nice <code>node.js</code> web scraping tutorial
 &ndash; Changing text colour via the text note type
@@ -17,51 +19,62 @@ Here are some notes on changing text colour and a nice <code>node.js</code> web 
 
 --->
 
-<h3>Changing Text Colour</h3>
-<p>Lately, I have been spending more time participating in the interesting discussions in
-the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> than writing blog posts.</p>
-<p>Occasionally, I grab some new code snippet worth preserving for posterity and add it
-to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>.</p>
-<p>Even more occasionally, I actually test it &nbsp; :-) &nbsp;</p>
-<p>I did so now for the trivial task of changing text colour.</p>
-<p>Here are some notes on that and a nice <code>node.js</code> web scraping tutorial:</p>
-<ul>
-<li><a href="#2">Changing text colour via the text note type</a> </li>
-<li><a href="#3">Web scraping using <code>node.js</code></a> </li>
-</ul>
-<h4><a name="2"></a>Changing Text Colour via the Text Note Type</h4>
-<p>This topic came up when Rudi <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1103138">@Revitalizer</a> Honke
+### Changing Text Colour
+
+Lately, I have been spending more time participating in the interesting discussions in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) than writing blog posts.
+
+Occasionally, I grab some new code snippet worth preserving for posterity and add it
+to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples).
+
+Even more occasionally, I actually test it &nbsp; :-) &nbsp;
+
+I did so now for the trivial task of changing text colour.
+
+Here are some notes on that and a nice `node.js` web scraping tutorial:
+
+- [Changing text colour via the text note type](#2) 
+- [Web scraping using `node.js`](#3) 
+
+
+####<a name="2"></a>Changing Text Colour via the Text Note Type
+
+This topic came up when Rudi [@Revitalizer](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1103138) Honke
 added a comment on colours in the thread 
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/changing-color-of-labels-within-tags-family-per-tag-instance/m-p/7794532">changing colour of labels within tags family per tag instance</a>, saying,</p>
-<blockquote>
-<p>colour parameters are of type integer, but the raw value may be difficult to read for the user.</p>
-</blockquote>
-<p>He explained how to read them in the earlier thread 
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-change-text-color/td-p/2567672">how to change text colour</a>:</p>
-<p><strong>Question:</strong> I am using the <code>ColorDialog</code> control from Visual Studio 2008 to select a colour, and then I retrieve the RGB components in three variables:</p>
-<ul>
-<li>ColorComponentRed</li>
-<li>ColorComponentGreen</li>
-<li>ColorComponentBlue</li>
-</ul>
-<p>I want to assign this colour to some text, but the following code is not working:</p>
+on [changing colour of labels within tags family per tag instance](https://forums.autodesk.com/t5/revit-api-forum/changing-color-of-labels-within-tags-family-per-tag-instance/m-p/7794532), saying,
+
+> colour parameters are of type integer, but the raw value may be difficult to read for the user.
+
+He explained how to read them in the earlier thread 
+on [how to change text colour](https://forums.autodesk.com/t5/revit-api-forum/how-to-change-text-color/td-p/2567672):
+
+**Question:** I am using the `ColorDialog` control from Visual Studio 2008 to select a colour, and then I retrieve the RGB components in three variables:
+
+- ColorComponentRed
+- ColorComponentGreen
+- ColorComponentBlue
+
+I want to assign this colour to some text, but the following code is not working:
+
 <pre class="code">
   <span style="color:blue;">Dim</span>&nbsp;colorparam&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Parameter</span>
   colorparam&nbsp;=&nbsp;elem.ObjectType.Parameter(
   &nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.TEXT_COLOR)
-
+   
   <span style="color:blue;">Dim</span>&nbsp;app&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;Autodesk.Revit.Creation.<span style="color:#2b91af;">Application</span>()
   <span style="color:blue;">Dim</span>&nbsp;color&nbsp;<span style="color:blue;">As</span>&nbsp;Autodesk.Revit.Color&nbsp;=&nbsp;app.NewColor()
-
+   
   color.Red&nbsp;=&nbsp;ColorComponentRed
   color.Green&nbsp;=&nbsp;ColorComponentGreen
   color.Blue&nbsp;=&nbsp;ColorComponentBlue
-
+   
   colorparam.Set(color)
 </pre>
 
-<p>Can anybody tell me what I am doing wrong and how to do it properly, please?</p>
-<p><strong>Answer:</strong> Hi.</p>
+Can anybody tell me what I am doing wrong and how to do it properly, please?
+
+**Answer:** Hi.
+
 <pre class="code">
   <span style="color:blue;">private</span>&nbsp;<span style="color:blue;">int</span>&nbsp;GetRevitTextColorFromSystemColor(
   &nbsp;&nbsp;System.Drawing.<span style="color:#2b91af;">Color</span>&nbsp;color&nbsp;)
@@ -72,7 +85,8 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-change-text-co
   }
 </pre>
 
-<p>I know that 2^0 is just 1, so you can simplify that to:</p>
+I know that 2^0 is just 1, so you can simplify that to:
+
 <pre class="code">
   <span style="color:blue;">private</span>&nbsp;<span style="color:blue;">int</span>&nbsp;GetRevitTextColorFromSystemColor(
   &nbsp;&nbsp;System.Drawing.<span style="color:#2b91af;">Color</span>&nbsp;color&nbsp;)
@@ -83,19 +97,23 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-change-text-co
   }
 </pre>
 
-<p>Then, for example:</p>
+Then, for example:
+
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;color&nbsp;=&nbsp;GetRevitTextColorFromSystemColor(&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;yourSystemColor&nbsp;);
-
+ 
 &nbsp;&nbsp;textNoteType.get_Parameter(&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.LINE_COLOR&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Set(&nbsp;color&nbsp;);
 </pre>
 
-<p>Also note that starting with Revit 2017, the Revit API provides a <code>ColorSelectionDialog</code>.</p>
-<p>You can use its <code>SelectedColor</code> property to get a Revit colour instead of a system colour.</p>
-<p>Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">@RPTHOMAS108</a> Thomas added some 'quite convenient extension methods' to that:</p>
+Also note that starting with Revit 2017, the Revit API provides a `ColorSelectionDialog`.
+
+You can use its `SelectedColor` property to get a Revit colour instead of a system colour.
+
+Richard [@RPTHOMAS108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas added some 'quite convenient extension methods' to that:
+
 <pre class="code">
   &lt;Extension()&gt;
   <span style="color:blue;">Public</span>&nbsp;<span style="color:blue;">Function</span>&nbsp;AsRGB(<span style="color:blue;">ByVal</span>&nbsp;Parameter&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Parameter</span>)&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">Byte</span>()
@@ -121,10 +139,12 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-change-text-co
   <span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Function</span>
 </pre>
 
-<p>Many thanks to Rudi and Richard for the helpful solutions!</p>
-<p>I added Rudi's utility function
-to <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs#L455-L488">The Building Coder samples Util.cs module</a> like
-this:</p>
+Many thanks to Rudi and Richard for the helpful solutions!
+
+I added Rudi's utility function
+to [The Building Coder samples Util.cs module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs#L455-L488) like
+this:
+
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">#region</span>&nbsp;Colour&nbsp;Conversion
 &nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
@@ -138,7 +158,7 @@ this:</p>
 &nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;red&nbsp;+&nbsp;(green&nbsp;&lt;&lt;&nbsp;8)&nbsp;+&nbsp;(blue&nbsp;&lt;&lt;&nbsp;16);
 &nbsp;&nbsp;}
-
+ 
 &nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
 &nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;Revit&nbsp;text&nbsp;colour&nbsp;parameter&nbsp;value&nbsp;stored&nbsp;as&nbsp;an&nbsp;integer&nbsp;</span>
 &nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;in&nbsp;text&nbsp;note&nbsp;type&nbsp;BuiltInParameter.LINE_COLOR.</span>
@@ -149,42 +169,49 @@ this:</p>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;ToColorParameterValue(&nbsp;color.R,&nbsp;color.G,&nbsp;color.B&nbsp;);
 &nbsp;&nbsp;}
 &nbsp;&nbsp;<span style="color:blue;">#endregion</span>&nbsp;<span style="color:green;">//&nbsp;Colour&nbsp;Conversion</span></pre>
-
 </pre>
 
-<p>To test it, I added an additional transaction step
-to <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdNewTextNote.cs#L196-L216">CmdNewTextNote</a>:</p>
+To test it, I added an additional transaction step
+to [CmdNewTextNote](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdNewTextNote.cs#L196-L216):
+
 <pre class="code">
 <span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;t&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)
 {
 &nbsp;&nbsp;t.Start(&nbsp;<span style="color:#a31515;">&quot;Change&nbsp;Text&nbsp;Colour&quot;</span>&nbsp;);
-
+ 
 &nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;color&nbsp;=&nbsp;<span style="color:#2b91af;">Util</span>.ToColorParameterValue(&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;255,&nbsp;0,&nbsp;0&nbsp;);
-
+ 
 &nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;textNoteType&nbsp;=&nbsp;doc.GetElement(&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;txNote.GetTypeId()&nbsp;);
-
+ 
 &nbsp;&nbsp;<span style="color:#2b91af;">Parameter</span>&nbsp;param&nbsp;=&nbsp;textNoteType.get_Parameter(
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.LINE_COLOR&nbsp;);
-
+ 
 &nbsp;&nbsp;<span style="color:green;">//&nbsp;Note&nbsp;that&nbsp;this&nbsp;modifies&nbsp;the&nbsp;existing&nbsp;text&nbsp;</span>
 &nbsp;&nbsp;<span style="color:green;">//&nbsp;note&nbsp;type&nbsp;for&nbsp;all&nbsp;instances&nbsp;using&nbsp;it.&nbsp;If</span>
 &nbsp;&nbsp;<span style="color:green;">//&nbsp;not&nbsp;desired,&nbsp;use&nbsp;Duplicate()&nbsp;first.</span>
-
+ 
 &nbsp;&nbsp;param.Set(&nbsp;color&nbsp;);
-
+ 
 &nbsp;&nbsp;t.Commit();
 }
 </pre>
 
-<p>As the comment says, this modifies the text note type and consequently all text note instances referring to that type.</p>
-<p><center>
+As the comment says, this modifies the text note type and consequently all text note instances referring to that type.
+
+<center>
 <img src="img/text_note_color.png" alt="Text note colour" width="443"/>
-</center></p>
-<h4><a name="3"></a>Web Scraping Using Node.js</h4>
-<p>On a different tack, if you are interested in <code>node.js</code> and web scraping, here is a very pleasant and super clear 27-minute step by step introduction to basic <a href="https://www.youtube.com/watch?v=eUYMiztBEdY">web scraping with <code>node.js</code></a>:</p>
-<p><center>
+</center>
+
+
+####<a name="3"></a>Web Scraping Using Node.js
+
+On a different tack, if you are interested in `node.js` and web scraping, here is a very pleasant and super clear 27-minute step by step introduction to basic [web scraping with `node.js`](https://www.youtube.com/watch?v=eUYMiztBEdY):
+
+<center>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/eUYMiztBEdY" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-</center></p>
-<p>It implements a minimal app live using the <code>request-promise</code> and <code>cheerio</code> libraries to gather and correlate data from two web sites.</p>
+</center>
+
+It implements a minimal app live using the `request-promise` and `cheerio` libraries to gather and correlate data from two web sites.
+
