@@ -23,7 +23,7 @@
   You should get ready for future versions as well.
   Eliminating all warning messages is a fool-proof no-brainer first step to get started with that.
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+Updated ADN web site, Revit API Labs and tag creation in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/adnlabstagcreation
 
 Here are a couple of Revit API related updates to take note of
 &ndash; Autodesk Developer Network ADN web site update
@@ -34,7 +34,7 @@ Here are a couple of Revit API related updates to take note of
 
 --->
 
-### Updated ADN Web Site and Revit API Labs
+### Updated ADN Web Site, Revit API Labs, Tag Creation
 
 Here are a couple of Revit API related updates to take note of:
 
