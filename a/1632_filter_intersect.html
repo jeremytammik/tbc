@@ -1,4 +1,4 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="bc.css">
 <!--
@@ -6,8 +6,7 @@
 <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
 -->
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
-</head>
-
+</head></p>
 <!---
 
 - [Retrieving All Family Instances in a Room](http://thebuildingcoder.typepad.com/blog/2017/04/forgefader-ui-lookup-builds-purge-and-room-instances.html#5)
@@ -31,94 +30,59 @@ If the containing volume of interest is not, too many elements may be selected
 
 --->
 
-### Create 2D Arc and Filter for Intersecting Elements
-
-Several questions on filtering for intersecting elements came up recently.
-
-It is pretty easy as long as a bounding box can be used.
-
-However, the bounding box is generally aligned with the cardinal X, Y and Z axes.
-
-If the containing volume of interest is not, too many elements may be selected.
-
-This can be addressed in various ways, e.g., post-processing the bounding box results, or using a more precise intersection filter.
-
-- [Family instances in a diagonal room](#2)
-- [Conduits intersecting a junction box](#3)
-- [Generate 2D arc from radius, start and end points](#4)
-
-
-####<a name="2"></a>Family Instances in a Diagonal Room
-
-Kavitha asked the question in
-his [comment](http://thebuildingcoder.typepad.com/blog/2013/03/filter-for-family-instances-in-a-room.html#comment-3781548196)
-on [filtering for family instances in a room](http://thebuildingcoder.typepad.com/blog/2013/03/filter-for-family-instances-in-a-room.html):
-
-**Question:** Can someone explain for me: if the room is diagonal, then the bounding box value will be wrong; in that case, how can I get the elements properly?
-
-**Answer:** You are right, of course.
-
-The bounding box will be too large and therefore possibly contain too many elements.
-
-You can eliminate the elements outside the room by many means.
-
-[IsPointInRoom](http://www.revitapidocs.com/2018.1/21d28ce3-3c1a-43cd-9714-0fe7223c5636.htm), for example, determines whether a given point lies within the volume of the room.
-
-If you have an element with some geometry, e.g., a solid, you could test each of its vertices with that method.
-
-If you are interested in the 2D plan view only, you could also implement a more precise test by performing a Boolean operation between a polygon containing the element and the room boundary polygon.
-
-My [RoomEditorApp](https://github.com/jeremytammik/RoomEditorApp) exports
+<h3>Create 2D Arc and Filter for Intersecting Elements</h3>
+<p>Several questions on filtering for intersecting elements came up recently.</p>
+<p>It is pretty easy as long as a bounding box can be used.</p>
+<p>However, the bounding box is generally aligned with the cardinal X, Y and Z axes.</p>
+<p>If the containing volume of interest is not, too many elements may be selected.</p>
+<p>This can be addressed in various ways, e.g., post-processing the bounding box results, or using a more precise intersection filter.</p>
+<ul>
+<li><a href="#2">Family instances in a diagonal room</a></li>
+<li><a href="#3">Conduits intersecting a junction box</a></li>
+<li><a href="#4">Generate 2D arc from radius, start and end points</a></li>
+</ul>
+<h4><a name="2"></a>Family Instances in a Diagonal Room</h4>
+<p>Kavitha asked the question in
+his <a href="http://thebuildingcoder.typepad.com/blog/2013/03/filter-for-family-instances-in-a-room.html#comment-3781548196">comment</a>
+on <a href="http://thebuildingcoder.typepad.com/blog/2013/03/filter-for-family-instances-in-a-room.html">filtering for family instances in a room</a>:</p>
+<p><strong>Question:</strong> Can someone explain for me: if the room is diagonal, then the bounding box value will be wrong; in that case, how can I get the elements properly?</p>
+<p><strong>Answer:</strong> You are right, of course.</p>
+<p>The bounding box will be too large and therefore possibly contain too many elements.</p>
+<p>You can eliminate the elements outside the room by many means.</p>
+<p><a href="http://www.revitapidocs.com/2018.1/21d28ce3-3c1a-43cd-9714-0fe7223c5636.htm">IsPointInRoom</a>, for example, determines whether a given point lies within the volume of the room.</p>
+<p>If you have an element with some geometry, e.g., a solid, you could test each of its vertices with that method.</p>
+<p>If you are interested in the 2D plan view only, you could also implement a more precise test by performing a Boolean operation between a polygon containing the element and the room boundary polygon.</p>
+<p>My <a href="https://github.com/jeremytammik/RoomEditorApp">RoomEditorApp</a> exports
 rooms and the family instances they contain to a cloud database; for that, it obviously determines which instances lie within which room, as mentioned in the note
-on [retrieving all family instances in a room](http://thebuildingcoder.typepad.com/blog/2017/04/forgefader-ui-lookup-builds-purge-and-room-instances.html#5) elsewhere,
-
-It just uses a filtered element collector based on the room bounding box, though, in the
-method [`GetFurniture( Room room )`](https://github.com/jeremytammik/RoomEditorApp/blob/master/RoomEditorApp/CmdUploadRooms.cs#L157-L217),
-so it does not answer your question on the diagonal case.
-
-For a precise handling of the diagonal or any other irregularly shaped case, you could also retrieve the room solid from
-its [`ClosedShell` property](http://www.revitapidocs.com/2018.1/1a510aef-63f6-4d32-c0ff-a8071f5e23b8.htm) and use
-an [`ElementIntersectsSolidFilter`](http://www.revitapidocs.com/2018.1/19276b94-fa39-64bb-bfb8-c16967c83485.htm) based on that, cf. below.
-
-####<a name="3"></a>Conduits Intersecting a Junction Box
-
-Right after that, I started out discussing another intersection and containment issue with Tiago Cerqueria
-in [his](http://thebuildingcoder.typepad.com/blog/2010/12/find-intersecting-elements.html#comment-3783584153)
-[comments](http://thebuildingcoder.typepad.com/blog/2010/12/find-intersecting-elements.html#comment-3783587401)
-on [finding intersecting elements](http://thebuildingcoder.typepad.com/blog/2010/12/find-intersecting-elements.html)
-and StackOverflow question on [bounding box intersection](https://stackoverflow.com/questions/49070566/bounding-box-intersection):
-
-**Question:** To find elements that are intersecting a geometry, I am using the example
-to [find intersecting elements](http://thebuildingcoder.typepad.com/blog/2010/12/find-intersecting-elements.html).
-
-The main goal of my add-in was find conduits clashing with a junction box and access all the elements connected with it to insert information.
-
-But the bounding box is always parallel to the cardinal X, Y and Z axes, and this may cause a problem, like returning elements that are not really clashing, because sometimes the bounding box is not coincident with the geometry because the family instance is rotated.
-
-Besides that, there is the problem that the bounding box will consider the geometry of the symbol and not the instance, and will consider the flipped geometry too, meaning that the bounding box is bigger than I am looking for.
-
-Is there a way to get the real geometry that are in the currently view? How can I solve this problem?
-
-**Answer:** There are many ways to address this.
-
-Generally, when performing clash detection, you will always run a super fast pre-processing step first to determine candidate elements, and then narrow down the search step by step more precisely in following steps. In this case, you can consider the bounding box intersection the first step, and then perform post-processing afterwards to narrow down the result to your exact goal.
-
-One important question is: does the bounding box really give you all the elements you need, plus more? Are you sure there are none missing?
-
-Once that is settled, all you need to do is add post-processing steps applying the detailed considerations that you care about to remove superfluous elements.
-
-A simple property to check might be: are all the target element geometry vertices contained in the target volume?
-
-A more complex one might involve retrieving the full solid of the target element and the target volume and performing a Boolean intersection between them to determine completely and exactly whether they intersect, are disjunct, or contained in each other.
-
-Many others are conceivable.
-
-**Response:** I am using another strategy that accesses the geometry of the instance to verify whether the face of the family instance clashes with a closer conduit:
-
-Here follows the code that I created and that works perfectly.
-
-I am accessing the geometry of the family by the method `get_Geometry(options)` to retrieve the instance geometry  located in project coordinates. From this I get the face and verify whether there is an intersection:
-
+on <a href="http://thebuildingcoder.typepad.com/blog/2017/04/forgefader-ui-lookup-builds-purge-and-room-instances.html#5">retrieving all family instances in a room</a> elsewhere,</p>
+<p>It just uses a filtered element collector based on the room bounding box, though, in the
+method <a href="https://github.com/jeremytammik/RoomEditorApp/blob/master/RoomEditorApp/CmdUploadRooms.cs#L157-L217"><code>GetFurniture( Room room )</code></a>,
+so it does not answer your question on the diagonal case.</p>
+<p>For a precise handling of the diagonal or any other irregularly shaped case, you could also retrieve the room solid from
+its <a href="http://www.revitapidocs.com/2018.1/1a510aef-63f6-4d32-c0ff-a8071f5e23b8.htm"><code>ClosedShell</code> property</a> and use
+an <a href="http://www.revitapidocs.com/2018.1/19276b94-fa39-64bb-bfb8-c16967c83485.htm"><code>ElementIntersectsSolidFilter</code></a> based on that, cf. below.</p>
+<h4><a name="3"></a>Conduits Intersecting a Junction Box</h4>
+<p>Right after that, I started out discussing another intersection and containment issue with Tiago Cerqueria
+in <a href="http://thebuildingcoder.typepad.com/blog/2010/12/find-intersecting-elements.html#comment-3783584153">his</a>
+<a href="http://thebuildingcoder.typepad.com/blog/2010/12/find-intersecting-elements.html#comment-3783587401">comments</a>
+on <a href="http://thebuildingcoder.typepad.com/blog/2010/12/find-intersecting-elements.html">finding intersecting elements</a>
+and StackOverflow question on <a href="https://stackoverflow.com/questions/49070566/bounding-box-intersection">bounding box intersection</a>:</p>
+<p><strong>Question:</strong> To find elements that are intersecting a geometry, I am using the example
+to <a href="http://thebuildingcoder.typepad.com/blog/2010/12/find-intersecting-elements.html">find intersecting elements</a>.</p>
+<p>The main goal of my add-in was find conduits clashing with a junction box and access all the elements connected with it to insert information.</p>
+<p>But the bounding box is always parallel to the cardinal X, Y and Z axes, and this may cause a problem, like returning elements that are not really clashing, because sometimes the bounding box is not coincident with the geometry because the family instance is rotated.</p>
+<p>Besides that, there is the problem that the bounding box will consider the geometry of the symbol and not the instance, and will consider the flipped geometry too, meaning that the bounding box is bigger than I am looking for.</p>
+<p>Is there a way to get the real geometry that are in the currently view? How can I solve this problem?</p>
+<p><strong>Answer:</strong> There are many ways to address this.</p>
+<p>Generally, when performing clash detection, you will always run a super fast pre-processing step first to determine candidate elements, and then narrow down the search step by step more precisely in following steps. In this case, you can consider the bounding box intersection the first step, and then perform post-processing afterwards to narrow down the result to your exact goal.</p>
+<p>One important question is: does the bounding box really give you all the elements you need, plus more? Are you sure there are none missing?</p>
+<p>Once that is settled, all you need to do is add post-processing steps applying the detailed considerations that you care about to remove superfluous elements.</p>
+<p>A simple property to check might be: are all the target element geometry vertices contained in the target volume?</p>
+<p>A more complex one might involve retrieving the full solid of the target element and the target volume and performing a Boolean intersection between them to determine completely and exactly whether they intersect, are disjunct, or contained in each other.</p>
+<p>Many others are conceivable.</p>
+<p><strong>Response:</strong> I am using another strategy that accesses the geometry of the instance to verify whether the face of the family instance clashes with a closer conduit:</p>
+<p>Here follows the code that I created and that works perfectly.</p>
+<p>I am accessing the geometry of the family by the method <code>get_Geometry(options)</code> to retrieve the instance geometry  located in project coordinates. From this I get the face and verify whether there is an intersection:</p>
 <pre class="code">
 <span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">FindIntersection</span>
 {
@@ -199,19 +163,13 @@ I am accessing the geometry of the family by the method `get_Geometry(options)` 
 }
 </pre>
 
-**Answer:** I considered this problem myself as well in the meantime and thought of two filters that may achieve a similar result more efficiently.
-
-Using those, you do not have to retrieve the conduits and their geometry one by one and analyse them yourself, because the filters already do it for you.
-
-One is quick and compares the axis-aligned bounding box.
-
-The other is slow and intersects the exact element geometry.
-
-It is important to realise and always have in mind
-the [important difference between quick and slow filters](http://thebuildingcoder.typepad.com/blog/2015/12/quick-slow-and-linq-element-filtering.html#3).
-
-You may want to try them out yourself:
-
+<p><strong>Answer:</strong> I considered this problem myself as well in the meantime and thought of two filters that may achieve a similar result more efficiently.</p>
+<p>Using those, you do not have to retrieve the conduits and their geometry one by one and analyse them yourself, because the filters already do it for you.</p>
+<p>One is quick and compares the axis-aligned bounding box.</p>
+<p>The other is slow and intersects the exact element geometry.</p>
+<p>It is important to realise and always have in mind
+the <a href="http://thebuildingcoder.typepad.com/blog/2015/12/quick-slow-and-linq-element-filtering.html#3">important difference between quick and slow filters</a>.</p>
+<p>You may want to try them out yourself:</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;=&nbsp;<span style="color:#2b91af;">Util</span>.SelectSingleElement(
 &nbsp;&nbsp;&nbsp;&nbsp;uidoc,&nbsp;<span style="color:#a31515;">&quot;a&nbsp;junction&nbsp;box&quot;</span>&nbsp;);
@@ -252,43 +210,32 @@ You may want to try them out yourself:
 &nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;<span style="color:#a31515;">&quot;than&nbsp;bounding&nbsp;box&nbsp;containment&quot;</span>&nbsp;);
 </pre>
 
-I implemented a new external
-command [CmdIntersectJunctionBox](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdIntersectJunctionBox.cs)
-in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) to try this out, in
-[release 2018.0.137.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.137.0).
-
-Waiting for a suitable sample model to test this on...
-
-Thank you, Thiago, for sharing your alternative approach!
-
-
-####<a name="4"></a>Generate 2D Arc from Radius, Start and End Points
-
-Finally, a pure geometric non-filtering question that came up today and was answered very precisely and exhaustively by Scott Wilson,
-on [creating an arc when only the radius, start and end point is known](https://forums.autodesk.com/t5/revit-api-forum/create-a-curve-when-only-the-start-point-end-point-amp-radius-is/m-p/7830079):
-
-**Question:** I am attempting to create an arc, but I only know the following properties:
-
-- Radius
-- Start point (`XYZ`)
-- End point (`XYZ`)
-
-Afaik, there aren't any functions that can create an arc using this information.
-
-**Answer:** Technically speaking, 2 points and a radius are not enough to define a unique arc, as there are up to 4 possible arcs that will fit for any plane of reference. Test this yourself by drawing 2 circles of the same size that overlap each other and then draw a line between the 2 intersecting points. Each side of the line will contain 2 arcs that have the same end points and radius.
-
-You can get away with it if you firstly adopt the convention that all arcs are to be drawn in the same direction from start to end (say, anticlockwise) when looking at them in the negative Z direction of the target plane, and secondly, that you always want either the arc with included angle of less than or equal to 180 degrees or the larger arc of over 180 degrees.
-
-That aside, your best option is to calculate a point that lies on the arc and use the 3 points method that you have already used, but this time you will be giving it the correct 3rd point, and there will be no need to attempt changing the radius afterwards. We will use the anti-clockwise convention as that is what Revit also uses, we will also assume that the smaller arc is desired.
-
-Here is a little bit of code I just whipped up for you; I have done some minimal testing and it appears to be working fine. I have assumed that you have the 3 following variables already defined and in scope:
-
-- `XYZ end0`
-- `XYZ end1`
-- `Double radius`
-
-I have also assumed that the arc lies on a plane with a normal vector of `XYZ.BasisZ`:
-
+<p>I implemented a new external
+command <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdIntersectJunctionBox.cs">CmdIntersectJunctionBox</a>
+in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> to try this out, in
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.137.0">release 2018.0.137.0</a>.</p>
+<p>Waiting for a suitable sample model to test this on...</p>
+<p>Thank you, Thiago, for sharing your alternative approach!</p>
+<h4><a name="4"></a>Generate 2D Arc from Radius, Start and End Points</h4>
+<p>Finally, a pure geometric non-filtering question that came up today and was answered very precisely and exhaustively by Scott Wilson,
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/create-a-curve-when-only-the-start-point-end-point-amp-radius-is/m-p/7830079">creating an arc when only the radius, start and end point is known</a>:</p>
+<p><strong>Question:</strong> I am attempting to create an arc, but I only know the following properties:</p>
+<ul>
+<li>Radius</li>
+<li>Start point (<code>XYZ</code>)</li>
+<li>End point (<code>XYZ</code>)</li>
+</ul>
+<p>Afaik, there aren't any functions that can create an arc using this information.</p>
+<p><strong>Answer:</strong> Technically speaking, 2 points and a radius are not enough to define a unique arc, as there are up to 4 possible arcs that will fit for any plane of reference. Test this yourself by drawing 2 circles of the same size that overlap each other and then draw a line between the 2 intersecting points. Each side of the line will contain 2 arcs that have the same end points and radius.</p>
+<p>You can get away with it if you firstly adopt the convention that all arcs are to be drawn in the same direction from start to end (say, anticlockwise) when looking at them in the negative Z direction of the target plane, and secondly, that you always want either the arc with included angle of less than or equal to 180 degrees or the larger arc of over 180 degrees.</p>
+<p>That aside, your best option is to calculate a point that lies on the arc and use the 3 points method that you have already used, but this time you will be giving it the correct 3rd point, and there will be no need to attempt changing the radius afterwards. We will use the anti-clockwise convention as that is what Revit also uses, we will also assume that the smaller arc is desired.</p>
+<p>Here is a little bit of code I just whipped up for you; I have done some minimal testing and it appears to be working fine. I have assumed that you have the 3 following variables already defined and in scope:</p>
+<ul>
+<li><code>XYZ end0</code></li>
+<li><code>XYZ end1</code></li>
+<li><code>Double radius</code></li>
+</ul>
+<p>I have also assumed that the arc lies on a plane with a normal vector of <code>XYZ.BasisZ</code>:</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:#2b91af;">Double</span>&nbsp;sagitta&nbsp;=&nbsp;radius&nbsp;-&nbsp;<span style="color:#2b91af;">Math</span>.Sqrt(&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Math</span>.Pow(&nbsp;radius,&nbsp;2.0&nbsp;)&nbsp;
@@ -305,32 +252,21 @@ I have also assumed that the arc lies on a plane with a normal vector of `XYZ.Ba
 &nbsp;&nbsp;<span style="color:#2b91af;">Arc</span>&nbsp;myArc&nbsp;=&nbsp;<span style="color:#2b91af;">Arc</span>.Create(&nbsp;end0,&nbsp;end1,&nbsp;midPointOfArc&nbsp;);
 </pre>
 
-If you want the larger arc, simply change the sagitta calculation to be `radius +` instead of `radius -`.
-
-If you aren't familiar with the mathematics used to calculate arcs, I would suggest heading over
-to the [Math Open Reference sagitta explanation](http://www.mathopenref.com/sagitta.html).
-
-No problems, I've just recently been doing some work on line-based families with arc location lines, so it was all fresh in my head.
-
-I think you may have some issues achieving what you are after though; the solution I gave will only really work accurately for 2D data unless you also plug in the correct normal vector (axis) of each arc, basically everywhere that I have used `XYZ.BasisZ` would need to be replaced with the correct normal vector.
-
-From the data you have it is not possible to determine the correct orientation of the arcs. You will need either a 3rd point on the arc provided for you (which would solve all your problems), or a normal vector of the target plane. Are you sure that there isn't any other information exported for arcs? If not, then the exporter isn't doing a very good job.
-
-A possible solution then could be to see if you can first tessellate the arcs in the source software and then export just the straight line data. You could then rebuild the arcs from the lines as they will give you enough points to define a plane, but the trick would be knowing which lines belong to an arc and which don't. To solve this, you could export 2 sets of data, one with tessellation and one without and then match the end points found in the tessellated data against the other set to determine whether you need to build an arc or not.
-
-Ok, I'll stop rambling now. Long story short: you need more data!
-
-Edit: I just had the thought that if you have a mixture of arcs and lines and the lines are always tangent to the arcs, you could use the lines each side of an arc to calculate the correct plane.
-
-If your data is actually 2D (null Z value), you should be fine unless you also encounter data with Z-values.
-
-Many thanks to Scott for this nice solution and complete explanation!
-
-I added it
-to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) as well, in C#,
-in [release 2018.0.137.1](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.137.1),
-[like this](https://github.com/jeremytammik/the_building_coder_samples/compare/2018.0.137.0...2018.0.137.1):
-
+<p>If you want the larger arc, simply change the sagitta calculation to be <code>radius +</code> instead of <code>radius -</code>.</p>
+<p>If you aren't familiar with the mathematics used to calculate arcs, I would suggest heading over
+to the <a href="http://www.mathopenref.com/sagitta.html">Math Open Reference sagitta explanation</a>.</p>
+<p>No problems, I've just recently been doing some work on line-based families with arc location lines, so it was all fresh in my head.</p>
+<p>I think you may have some issues achieving what you are after though; the solution I gave will only really work accurately for 2D data unless you also plug in the correct normal vector (axis) of each arc, basically everywhere that I have used <code>XYZ.BasisZ</code> would need to be replaced with the correct normal vector.</p>
+<p>From the data you have it is not possible to determine the correct orientation of the arcs. You will need either a 3rd point on the arc provided for you (which would solve all your problems), or a normal vector of the target plane. Are you sure that there isn't any other information exported for arcs? If not, then the exporter isn't doing a very good job.</p>
+<p>A possible solution then could be to see if you can first tessellate the arcs in the source software and then export just the straight line data. You could then rebuild the arcs from the lines as they will give you enough points to define a plane, but the trick would be knowing which lines belong to an arc and which don't. To solve this, you could export 2 sets of data, one with tessellation and one without and then match the end points found in the tessellated data against the other set to determine whether you need to build an arc or not.</p>
+<p>Ok, I'll stop rambling now. Long story short: you need more data!</p>
+<p>Edit: I just had the thought that if you have a mixture of arcs and lines and the lines are always tangent to the arcs, you could use the lines each side of an arc to calculate the correct plane.</p>
+<p>If your data is actually 2D (null Z value), you should be fine unless you also encounter data with Z-values.</p>
+<p>Many thanks to Scott for this nice solution and complete explanation!</p>
+<p>I added it
+to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> as well, in C#,
+in <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.137.1">release 2018.0.137.1</a>,
+<a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2018.0.137.0...2018.0.137.1">like this</a>:</p>
 <pre class="code">
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;Create&nbsp;an&nbsp;arc&nbsp;in&nbsp;the&nbsp;XY&nbsp;plane&nbsp;from&nbsp;a&nbsp;given</span>
@@ -367,6 +303,6 @@ in [release 2018.0.137.1](https://github.com/jeremytammik/the_building_coder_sam
 }
 </pre>
 
-<center>
+<p><center>
 <img src="img/sagitta.png" alt="Sagitta" width="299"/>
-</center>
+</center></p>
