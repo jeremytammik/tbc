@@ -14,36 +14,7 @@
   13922857 [Change active document]
   https://forums.autodesk.com/t5/revit-api-forum/change-active-document/m-p/7787792
   https://forums.autodesk.com/t5/revit-api-forum/how-to-open-and-active-a-new-document-that-is-not-saved/m-p/7710749
-  http://www.architecture-tech.com/2012/09/zoom-to-awesome.html
   Zoom To Awesome!
-
-  UIApplication app = commandData.Application;
-  UIDocument doc = app.ActiveUIDocument;
-
-  ElementSet set = doc.Selection.Elements;
-  int n = set.Size;
-
-  if( 0 == n )
-  {
-      message = "Please select at least one element to zoom to.";
-      return Result.Cancelled;
-  }
-  try
-  {
-      doc.ShowElements(set);
-  }
-  catch
-  {
-      foreach (Element e in set)
-      {
-          elements.Insert(e);
-      }
-      message = string.Format( "Cannot zoom to element{0}.",
-        1 == n ? "" : "s" );
-
-      return Result.Failed;
-  }
-  return Result.Succeeded;
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
 
@@ -52,9 +23,15 @@
 
 --->
 
-### Switch View by Showing Elements
+### Switch View or Document by Showing Elements
 
-####<a name="2"></a>
+A recent discussion on using the `ShowElements` method to toggle between documents and views brought up a few intersting points:
+
+- [Open and Active an Unsaved Document](#2) 
+- [Zoom to Selected Elements](#3) 
+- [Toggle Between Documents and Views](#4) 
+
+####<a name="2"></a>Open and Active an Unsaved Document
 
 Normally, you can open and switch between documents using the `OpenAndActivateDocument` method.
 
@@ -103,18 +80,38 @@ on [mirroring in a new family and changing active view](http://thebuildingcoder.
 
 > As you can see on reading the final solution carefully, you can use the `ShowElements` method to change the active view and even switch it between the family and project documents. The official Revit 2011 API does not provide any method to switch the active view, but using `ShowElements` can be used to create a workaround for that."
 
-####<a name="3"></a>
-
-<pre class="code">
-</pre>
-
 I implemented a new external
 command [CmdSwitchDoc](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSwitchDoc.cs)
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) to try this out, in
 [release 2018.0.138.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.138.0).
 
-####<a name="4"></a>
+It demonstrates two uses of the the `ShowElements` method:
+
+- [Zoom to selected elements](#3)
+- [Toggle between documents and views](#4)
+
+####<a name="3"></a>Zoom to Selected Elements
+
+<pre class="code">
+</pre>
+
+This functionality is similar to that provided by
+the [Zoom to Awesome! add-in](https://bimopedia.com/2013/04/02/zoom-to-awesome).
+
+Here is a 40-second demo
+of [using Zoom to Awesome](https://knowledge.autodesk.com/support/revit-products/getting-started/caas/screencast/Main/Details/8e9a043d-9383-496b-8e86-6ec3ab055c0e.html),
+also showing how to add a keyboard shortcut:
 
 <center>
-<img src="img/.png" alt="" width="100"/>
+<iframe width="400" height="470" src="https://screencast.autodesk.com/Embed/Timeline/8e9a043d-9383-496b-8e86-6ec3ab055c0e" frameborder="0" allowfullscreen webkitallowfullscreen></iframe>
+</center>
+
+####<a name="4"></a>Toggle Between Documents and Views
+
+<pre class="code">
+</pre>
+
+
+<center>
+<img src="img/toggle.png" alt="Toggle" width="183"/>
 </center>
