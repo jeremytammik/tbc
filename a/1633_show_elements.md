@@ -138,9 +138,9 @@ It demonstrates two uses of the the `ShowElements` method:
 </pre>
 
 This functionality is similar to that provided by
-the [Zoom to Awesome! add-in](https://bimopedia.com/2013/04/02/zoom-to-awesome).
+the [Zoom to Awesome! add-in](https://bimopedia.com/2013/04/02/zoom-to-awesome) by Phil Read.
 
-Here is a 40-second demo
+Here is a 40-second demo by Luke Johnson 
 of [using Zoom to Awesome](https://knowledge.autodesk.com/support/revit-products/getting-started/caas/screencast/Main/Details/8e9a043d-9383-496b-8e86-6ec3ab055c0e.html),
 also showing how to add a keyboard shortcut:
 
