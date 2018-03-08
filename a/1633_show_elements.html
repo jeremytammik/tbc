@@ -17,17 +17,19 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
 
-&ndash; 
-...
+A recent discussion on using the <code>ShowElements</code> method to toggle between documents and views brought up a few interesting points
+&ndash; Open and active an unsaved document
+&ndash; Zoom to selected elements
+&ndash; Toggle between documents and views...
 
 --->
 
 <h3>Switch View or Document by Showing Elements</h3>
 <p>A recent discussion on using the <code>ShowElements</code> method to toggle between documents and views brought up a few interesting points:</p>
 <ul>
-<li><a href="#2">Open and active an unsaved document</a> </li>
-<li><a href="#3">Zoom to selected elements</a> </li>
-<li><a href="#4">Toggle between documents and views</a> </li>
+<li><a href="#2">Open and active an unsaved document</a></li>
+<li><a href="#3">Zoom to selected elements</a></li>
+<li><a href="#4">Toggle between documents and views</a></li>
 </ul>
 <h4><a name="2"></a>Open and Active an Unsaved Document</h4>
 <p>Normally, you can open and switch between documents using the <code>OpenAndActivateDocument</code> method.</p>
@@ -40,7 +42,7 @@ and previously
 in <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-open-and-active-a-new-document-that-is-not-saved/m-p/7710749">how to open and active a new document that is not saved</a>:</p>
 <p><strong>Question:</strong> When you have 2 Revit projects open and want to switch between them, it can be done with:</p>
 <pre class="code">
-application.OpenAndActivateDocument(file).
+  application.OpenAndActivateDocument(file);
 </pre>
 
 <p>I used <code>Document.PathName</code> to get the filename required.</p>
@@ -63,8 +65,8 @@ on <a href="http://thebuildingcoder.typepad.com/blog/2010/11/mirroring-in-a-new-
 <p>I implemented a new external
 command <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSwitchDoc.cs">CmdSwitchDoc</a>
 in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> to try this out, in
-<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.138.0">release 2018.0.138.0</a>.</p>
-<p>It demonstrates two uses of the the <code>ShowElements</code> method:</p>
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.138.1">release 2018.0.138.1</a>.</p>
+<p>It demonstrates two uses of the <code>ShowElements</code> method:</p>
 <ul>
 <li><a href="#3">Zoom to selected elements</a></li>
 <li><a href="#4">Toggle between documents and views</a></li>
@@ -117,7 +119,7 @@ in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Buil
 
 <p>This functionality is similar to that provided by
 the <a href="https://bimopedia.com/2013/04/02/zoom-to-awesome">Zoom to Awesome! add-in</a> by Phil Read.</p>
-<p>Here is a 40-second demo by Luke Johnson 
+<p>Here is a 40-second demo by Luke Johnson
 of <a href="https://knowledge.autodesk.com/support/revit-products/getting-started/caas/screencast/Main/Details/8e9a043d-9383-496b-8e86-6ec3ab055c0e.html">using Zoom to Awesome</a>,
 also showing how to add a keyboard shortcut:</p>
 <p><center>
