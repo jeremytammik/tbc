@@ -13,12 +13,15 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
 
-&ndash; 
-...
+Александр Пекшев aka Modis @Pekshev implemented another useful RevitLookup enhancement to search and snoop elements by element id or unique id
+&ndash; Search and snoop by element id or unique id
+&ndash; File changes
+&ndash; The built-in Select by Id command, Zoom To and StringSearch
+&ndash; RevitLookup update...
 
 --->
 
-### RevitLookup Search and Snoop
+### RevitLookup Search by Element and Unique Id
 
 Александр Пекшев aka Modis [@Pekshev](https://github.com/Pekshev) recently
 submitted a pull request
@@ -27,16 +30,20 @@ for [RevitLookup](https://github.com/jeremytammik/RevitLookup).
 
 Now he implemented another useful enhancement to search and snoop elements by element id or unique id:
 
+- [Search and snoop by element id or unique id](#2) 
+- [File changes](#3) 
+- [The built-in Select by Id command, Zoom To and StringSearch](#4) 
+- [RevitLookup update](#5) 
 
 
 ####<a name="2"></a>Search and Snoop by Element Id or Unique Id
 
-Pekshev's RevitLookup [pull request #42 adds a 'search by and snoop' command](https://github.com/jeremytammik/RevitLookup/pull/42):
+Alexander's RevitLookup [pull request #42 adds a 'search by and snoop' command](https://github.com/jeremytammik/RevitLookup/pull/42):
 
 Add "Search by and snoop" command that allows you to search and snoop for elements by condition:
 
 <center>
-<img src="img/revitlookup_search_snoop_cmd.png" alt="Search and Snoop command" width="390"/>
+<img src="img/revitlookup_search_snoop_cmd.png" alt="Search and Snoop command" width="380"/>
 </center>
 
 A small addition to the project: search for items by `ElementId` or `UniqueId` and then snoop them.
@@ -126,9 +133,9 @@ It prompts you to enter the element id and adds the element to the current selec
 <img src="img/select_by_id_form.png" alt="Select by ID form" width="342"/>
 </center>
 
-Once you have selected an element in this manner, you can use the traditional RevitLookup 'snooop current selection' to explore its data.
+Once you have selected an element in this manner, you can use the traditional RevitLookup 'snoop current selection' to explore its data.
 
-The 'zoom to' option is very similar to the 
+The 'zoom to' option is very similar to 
 the [zoom to selected elements](http://thebuildingcoder.typepad.com/blog/2018/03/switch-view-or-document-by-showing-elements.html#3) functionality
 discussed last week, implemented using `ShowElements`.
 
