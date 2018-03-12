@@ -11,22 +11,31 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
 
-&ndash; 
-...
+Александр Пекшев aka Modis @Pekshev implemented another useful RevitLookup enhancement to search and snoop elements by element id or unique id
+&ndash; Search and snoop by element id or unique id
+&ndash; File changes
+&ndash; The built-in Select by Id command, Zoom To and StringSearch
+&ndash; RevitLookup update...
 
 --->
 
-<h3>RevitLookup Search and Snoop</h3>
+<h3>RevitLookup Search by Element and Unique Id</h3>
 <p>Александр Пекшев aka Modis <a href="https://github.com/Pekshev">@Pekshev</a> recently
 submitted a pull request
 to <a href="http://thebuildingcoder.typepad.com/blog/2018/03/export-geometry-and-snoop-stable-representation-of-reference.html#2">snoop the stable representation of references</a>
 for <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a>.</p>
 <p>Now he implemented another useful enhancement to search and snoop elements by element id or unique id:</p>
+<ul>
+<li><a href="#2">Search and snoop by element id or unique id</a> </li>
+<li><a href="#3">File changes</a> </li>
+<li><a href="#4">The built-in Select by Id command, Zoom To and StringSearch</a> </li>
+<li><a href="#5">RevitLookup update</a> </li>
+</ul>
 <h4><a name="2"></a>Search and Snoop by Element Id or Unique Id</h4>
-<p>Pekshev's RevitLookup <a href="https://github.com/jeremytammik/RevitLookup/pull/42">pull request #42 adds a 'search by and snoop' command</a>:</p>
+<p>Alexander's RevitLookup <a href="https://github.com/jeremytammik/RevitLookup/pull/42">pull request #42 adds a 'search by and snoop' command</a>:</p>
 <p>Add "Search by and snoop" command that allows you to search and snoop for elements by condition:</p>
 <p><center>
-<img src="img/revitlookup_search_snoop_cmd.png" alt="Search and Snoop command" width="390"/>
+<img src="img/revitlookup_search_snoop_cmd.png" alt="Search and Snoop command" width="380"/>
 </center></p>
 <p>A small addition to the project: search for items by <code>ElementId</code> or <code>UniqueId</code> and then snoop them.</p>
 <p>Search options implemented in the form of a drop-down list provide for the possibility of further future expansion (for example, search by parameters or something similar):</p>
@@ -100,8 +109,8 @@ the <a href="https://github.com/jeremytammik/RevitLookup/pull/42/files">pull req
 <p><center>
 <img src="img/select_by_id_form.png" alt="Select by ID form" width="342"/>
 </center></p>
-<p>Once you have selected an element in this manner, you can use the traditional RevitLookup 'snooop current selection' to explore its data.</p>
-<p>The 'zoom to' option is very similar to the 
+<p>Once you have selected an element in this manner, you can use the traditional RevitLookup 'snoop current selection' to explore its data.</p>
+<p>The 'zoom to' option is very similar to 
 the <a href="http://thebuildingcoder.typepad.com/blog/2018/03/switch-view-or-document-by-showing-elements.html#3">zoom to selected elements</a> functionality
 discussed last week, implemented using <code>ShowElements</code>.</p>
 <p>This could obviously be integrated into RevitLookup as well, if so desired.</p>
