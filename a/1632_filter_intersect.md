@@ -19,7 +19,7 @@
   http://thebuildingcoder.typepad.com/blog/2010/12/find-intersecting-elements.html#comment-3783587401
   https://stackoverflow.com/questions/49070566/bounding-box-intersection
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+Filter for intersecting elements and create 2D arc in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/filterintersect
 
 Several questions on filtering for intersecting elements came up recently.
 It is pretty easy as long as a bounding box can be used.

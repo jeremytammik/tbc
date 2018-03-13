@@ -10,7 +10,8 @@
 
 <!---
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+RevitLookup snoops stable representation of references in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/snoopstablerep
+Export geometry to AutoCAD via XML using #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/snoopstablerep
 
 Александр Пекшев aka Modis @Pekshev submitted
 a very succinct and useful pull request for RevitLookup that
