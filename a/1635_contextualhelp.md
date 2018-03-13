@@ -11,7 +11,7 @@
 <!---
 
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+Contextual help best practice in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/contextualhelp
 
 Dragos Turmac of the Revit development team solved
 the Revit API discussion forum questions
