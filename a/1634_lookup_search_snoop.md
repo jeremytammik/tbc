@@ -11,7 +11,7 @@
 <!---
 
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+RevitLookup search by element and unique id in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/lookupsearchbyid
 
 Александр Пекшев aka Modis @Pekshev implemented another useful RevitLookup enhancement to search and snoop elements by element id or unique id
 &ndash; Search and snoop by element id or unique id

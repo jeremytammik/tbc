@@ -16,7 +16,7 @@
   https://forums.autodesk.com/t5/revit-api-forum/how-to-open-and-active-a-new-document-that-is-not-saved/m-p/7710749
   Zoom To Awesome!
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+Switch view or document by showing elements #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/showelements
 
 A recent discussion on using the <code>ShowElements</code> method to toggle between documents and views brought up a few interesting points
 &ndash; Open and active an unsaved document
