@@ -1,0 +1,92 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- https://forums.autodesk.com/t5/revit-api-forum/get-tree-view-from-system-browser-revit-mep/m-p/7855032
+
+- connector neighbours
+  https://forums.autodesk.com/t5/revit-api-forum/connector-neighbours/m-p/7816952
+  https://github.com/geoffoverfield/RevitAPI_SystemSearch
+  https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/MepSystemSearch.cs
+
+- connect into
+  https://forums.autodesk.com/t5/revit-api-forum/connect-into/m-p/7834417
+
+- 13840360 [How do I create conduit between 2 connectors?]
+  https://forums.autodesk.com/t5/revit-api-forum/how-do-i-create-conduit-between-2-connectors/m-p/7727929
+
+- [read-only transition diameter](https://forums.autodesk.com/t5/revit-api-forum/transition-diameter-read-only/m-p/7620036)
+  Q: in pipe transition, parameters for Diameter is Read Only, any one know how to walk around this?
+  I thing I can do small pipes on both site, but I would like to avoid this.
+  A: you can use dummy pipes for creating transitions.
+  Create two pipes of the desired diameters somewhere outside all other elements.
+  Connect them by doc.NewTransitionFitting.
+  Delete the dummy pipes.
+  The remaining transition FamilyInstance will still have the correct diameter parameter values.
+  Move it to the desired location.
+  Revitalizer
+
+ #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+
+&ndash;
+...
+
+--->
+
+<h3>Connector, Neighbour, Conduit, Transition</h3>
+<p>Here are a couple of MEP and connector related cases that I made notes of during the past few weeks:</p>
+<ul>
+<li><a href="#2">Traversing an MEP system and retrieving connected elements</a></li>
+<li><a href="#3">Reproducing the MEP electrical system browser hierarchy</a></li>
+<li><a href="#4">Connect into</a></li>
+<li><a href="#4">Creating a conduit between two connectors</a></li>
+<li><a href="#5">Dealing with the read-only transition diameter</a></li>
+</ul>
+<h4><a name="2"></a>Traversing an MEP System and Retrieving Connected Elements</h4>
+<p>connector neighbours
+https://forums.autodesk.com/t5/revit-api-forum/connector-neighbours/m-p/7816952
+https://github.com/geoffoverfield/RevitAPI_SystemSearch
+https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/MepSystemSearch.cs</p>
+<p>I am not sure which of the apporaches is best.</p>
+<p>It can't hurt to check them out and compare them.</p>
+<p>Please let me know what you think and how well they suit your needs.</p>
+<h4><a name="3"></a>Reproducing the MEP Electrical System Browser Hierarchy</h4>
+<p>https://forums.autodesk.com/t5/revit-api-forum/get-tree-view-from-system-browser-revit-mep/m-p/7855032</p>
+<p>I implemented two different methods to reproduce the MEP Electrical System Browser Hierarchy structure.</p>
+<ul>
+<li>Before the advent of any MEP specific functionality in the Revit API, I made use of generic parameter values stored on the respective system elements.</li>
+<li>After the introduction of the Revit MEP API, I implemented a simpler and safer solution making use of that.</li>
+</ul>
+<h4><a name="4"></a>Connect Into</h4>
+<p><a href="https://forums.autodesk.com/t5/revit-api-forum/connect-into/m-p/7834417">connect into</a></p>
+<h4><a name="4"></a>Creating a Conduit Between Two Connectors</h4>
+<p><a href="https://forums.autodesk.com/t5/revit-api-forum/how-do-i-create-conduit-between-2-connectors/m-p/7727929">How do I create conduit between 2 connectors</a></p>
+<h4><a name="5"></a>Dealing with the Read-Only Transition Diameter</h4>
+<p>In the
+corresponding <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread,
+Rudi <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1103138">@Revitalizer</a> Honke
+explained how to deal with
+the <a href="https://forums.autodesk.com/t5/revit-api-forum/transition-diameter-read-only/m-p/7620036">read-only transition diameter</a>:</p>
+<p><strong>Question:</strong> In a pipe transition the parameters defining the diameter are read-only; does anyone know how to walk around this?</p>
+<p>I think I can create small dummy pipes on both sides, but I would like to avoid this.</p>
+<p><strong>Answer:</strong> You can use dummy pipes for creating transitions.</p>
+<ul>
+<li>Create two pipes of the desired diameters somewhere far away from all other elements.</li>
+<li>Connect them by calling <code>doc.NewTransitionFitting</code>.</li>
+<li>Delete the dummy pipes.</li>
+</ul>
+<p>The remaining transition <code>FamilyInstance</code> will retain the correct diameter parameter values.</p>
+<p>Move it to the desired location.</p>
+<p>Many thanks to Revitalizer for this hint!</p>
+<p><center>
+<img src="img/.png" alt="" width="100"/>
+</center></p>
+<pre class="code">
+</pre>
