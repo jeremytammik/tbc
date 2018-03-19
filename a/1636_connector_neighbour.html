@@ -35,40 +35,183 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
 
-&ndash;
-...
+Here are a couple of threads from
+the Revit API discussion forum related
+to MEP and connectors from the past few weeks that seem worth taking note of
+&ndash; Traversing an MEP system and retrieving connected elements
+&ndash; Reproducing the MEP electrical system browser hierarchy
+&ndash; Creating a conduit between two connectors
+&ndash; Dealing with the read-only transition diameter...
 
 --->
 
 <h3>Connector, Neighbour, Conduit, Transition</h3>
-<p>Here are a couple of MEP and connector related cases that I made notes of during the past few weeks:</p>
+<p>Here are a couple of threads from
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> related
+to MEP and connectors from the past few weeks that seem worth taking note of:</p>
 <ul>
 <li><a href="#2">Traversing an MEP system and retrieving connected elements</a></li>
 <li><a href="#3">Reproducing the MEP electrical system browser hierarchy</a></li>
-<li><a href="#4">Connect into</a></li>
 <li><a href="#4">Creating a conduit between two connectors</a></li>
 <li><a href="#5">Dealing with the read-only transition diameter</a></li>
 </ul>
 <h4><a name="2"></a>Traversing an MEP System and Retrieving Connected Elements</h4>
-<p>connector neighbours
-https://forums.autodesk.com/t5/revit-api-forum/connector-neighbours/m-p/7816952
-https://github.com/geoffoverfield/RevitAPI_SystemSearch
-https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/MepSystemSearch.cs</p>
-<p>I am not sure which of the apporaches is best.</p>
+<p>The discussion 
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/connector-neighbours/m-p/7816952">connector neighbours</a>
+brought up a number of aspects of and solutions for traversing an MEP system and retrieving connected elements:</p>
+<p><strong>Question:</strong> Connectors seems like a pretty powerful system. It started to give me some ideas for other Connector uses regarding mechanical systems.  I was hoping to be able to do something like the following:</p>
+<ul>
+<li>Get an element</li>
+<li>Get its connectors</li>
+<li>Find the connector ends</li>
+<li>Use the ends to "climb" down the system branch by finding the neighbouring element and repeating the process</li>
+</ul>
+<p>The issues that have been arising are the following:</p>
+<p>An element can have more than two ends</p>
+<ul>
+<li>I'm not sure how to get a reference to a neighbouring element using connected Connectors.</li>
+<li>Branching through systems in this fashion could cause you to essentially get lost in the branches unless you map N number of forks.</li>
+<li>The directions of the connectors are often bi-directional, so how does one know you're progressing in the correct direction even if you could get the neighbours?</li>
+</ul>
+<p>Essentially, if you wanted to grab piece A on a duct, and iterate through the neighbouring ducts to Piece B, what would be the correct method to do this? You don't have to get super detailed with source, I'm just looking for the high-level approach.</p>
+<p><strong>Answer:</strong> Nice task!</p>
+<p>Maybe these discussions and other ones they point to will help:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/06/traversing-and-exporting-all-mep-system-graphs.html">Traversing and exporting all MEP system graphs</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/06/store-mep-systems-in-hierarchical-json-graph.html">MEP system structure in hierarchical JSON graph</a></li>
+</ul>
+<p>I work on pipes, but maybe it is not that different from ducts.</p>
+<ul>
+<li>First, RevitLookup will help you with what is reference to what, so I suggest installing it, if you didn't already.</li>
+<li>All pipes have connector manager with connectors, connectors have all ref (that show to what there are connected), with pipe there is this little thing that you have to check: is connector from all refs is not the second connector from connector manager.</li>
+<li>You need to check if connector is right kind (physicalConn).</li>
+<li>Usually the neighbour connector has the same origin and opposite direction (this is not always the rule, like in placeholders).</li>
+</ul>
+<p>In family, you can check which connector is prime and which is secondary  and go with this link.</p>
+<p>With branches, you can always make a list of points to look at to detect if you make a full loop, not the best solution, but for big project.</p>
+<p>In my case, I only needed to go through all connectors until I will find pipe (I had like 4 or 5 families connected with each other).</p>
+<p><center>
+<img src="img/pipe_connector.jpg" alt="Pipe connectors" width="400"/>
+</center></p>
+<p>Here are some additional pinpointed leads to answer your questions that should help in accompaniment with Jeremy's posts:</p>
+<ul>
+<li><em>An element can have more than two ends</em>
+&ndash; Check if the <code>connector.connectortype == connectortype.end</code>.</li>
+<li><em>I'm not sure how to get a reference to a neighbouring element using connected Connectors</em>
+&ndash; <code>Connector.AllRefs</code> will return connectors connected to the one you're looking at, then you can look at their hosts</li>
+<li><em>Branching through systems in this fashion could cause you to essentially get lost in the branches unless you map N number of forks</em> &ndash; Yup. But this is why you're a programmer, you're the bad ass that will get this licked ;)</li>
+<li><em>The directions of the connectors are often bi-directional, so how does one know you're progressing in the correct direction even if you could get the neighbours?</em> &ndash; <code>Connector.CoordinateSystem.BasisZ</code> will help you make sure you're facing OUT from the fitting if airflow is not the concern.</li>
+</ul>
+<p>I've had to do this for a couple different tools, so I thought I'd just create a
+quick <a href="https://github.com/geoffoverfield/RevitAPI_SystemSearch">Revit API SystemSearch repo</a> for you to check it out.</p>
+<p>It's a pretty basic bit of source that I threw together real quick, but the general idea is there.  You'll definitely need to tweak it to meet your needs, but I hope it helps:</p>
+<p>It is now also included in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>,
+in <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/MepSystemSearch.cs">the module MepSystemSearch.cs</a>.</p>
+<p>You also need to be aware of the Revit SDK TraverseSystem sample. It determines the correct order of the individual system elements in the direction of the flow and stores the entire directed graph in XML.</p>
+<p>Here are some discussions of it:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/06/revit-mep-api.html">The Revit MEP 2010 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/09/the-revit-mep-api.html">The Revit MEP API</a> and some <a href="http://thebuildingcoder.typepad.com/blog/2009/09/the-revit-mep-api.html#6">Revit MEP sample applications</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/05/the-revit-mep-2011-api.html#samples">Revit MEP API Samples</a></li>
+</ul>
+<p>My <a href="https://github.com/jeremytammik/AdnRme">AdnRme sample</a> performs
+traversal of electrical systems, and is discussed further in
+the <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.40">AdnRme topic group</a>.</p>
+<p>Here is <a href="http://thebuildingcoder.typepad.com/blog/2013/02/simple-mep-system-traversal.html">yet another much simpler traversal implementation</a>.</p>
+<p><strong>Question:</strong> Another high-level question regarding these branching systems:</p>
+<p>Considering the potential for loops to be present, am I right in assuming that finding the shortest/all routes from a given start and end is non-trivial?</p>
+<p>My workflow intention was something like:</p>
+<ol>
+<li>Select start and end point in a given system.</li>
+<li>Find the user's intended route through the system (likely the shortest one).</li>
+<li>Do a calculation on the given run using connectors and their references.</li>
+</ol>
+<p>I'm wondering if at step two the intended route could be ambiguous, and if so, how do you handle it?</p>
+<p>I'm also wondering how you use the map once you map the system to proceed from the start in a direction that brings you closer to the end. This can't really be done with spacial location because to assume the end is specially further from the start than the middle may be a false assumption.</p>
+<p>At the moment I'm considering making the user select the entire run, but the original intent would be a lot simpler (for the user...).</p>
+<p><strong>Answer:</strong> So, it seems to me that you have a couple options on your hand.  You can:</p>
+<ol>
+<li>Let the user pick their own route.</li>
+<li>Offer the most direct route.</li>
+<li>Offer the shortest route (not necessarily the same as #2).</li>
+<li>Take a path that passes points (like if you have some kind check system everything needs to pass).</li>
+</ol>
+<p>Based on that, you'll have to do some math &amp; logic on the search process.  Check out the image below (it's pipes - not ductwork... but same principle):</p>
+<p><center>
+<img src="img/connector_routes.png" alt="Pipe connector routes" width="518"/>
+</center></p>
+<p>You'll encounter tons of systems that have an infinite number of ways of laying them out.  In the drawing above, if you were to go from start to finish taking the "direct route", which may be the least amount of turns, you'd go straight down south, the east - covering 300' of pipe/ductwork in your case.  If you wanted the shortest route, you could take the top route (follow the most northern pipes) and you would only pass through 296' 1/12" of pipe...</p>
+<p>Never presume to know what the user wants...  Most users will all have different ways of doing things - from East Coast to West Coast; North to South America and Europe...  If you want to give them options (which I would always recommend for enhanced UX), give them options.  Otherwise just build what you can, and add to it later.</p>
+<p>If you really want to explore this and make a powerful tool, look at the differences between depth-first vs breadth-first searches, which are intended for graph systems like this:</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/3332947/when-is-it-practical-to-use-depth-first-search-dfs-vs-breadth-first-search-bf">When is it practical to use Depth-First Search (DFS) vs Breadth-First Search (BFS)?</a></li>
+<li><a href="https://stackoverflow.com/questions/687731/breadth-first-vs-depth-first/687752">Breadth First Vs Depth First</a></li>
+<li>10-minute video on <a href="https://www.youtube.com/watch?v=bIA8HEEUxZI">Graph Traversals &ndash; Breadth First and Depth First</a></li>
+<li><a href="https://cs.stackexchange.com/questions/298/graph-searching-breadth-first-vs-depth-first">Graph searching: Breadth-first vs. depth-first</a></li>
+<li><a href="https://www.geeksforgeeks.org/depth-first-traversal-for-a-graph">Depth First Traversal or DFS for a Graph</a></li>
+<li><a href="https://www.geeksforgeeks.org/breadth-first-traversal-for-a-graph">Breadth First Traversal or BFS for a Graph</a></li>
+</ul>
+<p>There really isn't a 'right' answer for this.</p>
+<p>It's got to be a balanced combination of what the users want and what you can reasonably create in a timely manner.  What's important is that whatever you create, make it scalable so you can always come back and build on it later!  So, if you start by making them select their entire path, make it so that you can make edits and build on it without having to rewrite the whole thing...  I've had to do that.  It's not fun.</p>
+<p>Many thanks to MarryTookMyCoffe, r.singleton
+and Geoff Overfield, Software Engineer at <a href="https://fabpro1.com">FabPro1, LLC</a>,
+for sharing all these useful suggestions!</p>
+<p><center>
+<img src="img/fabpro1_logo_dark.png" alt="FabPro1, LLC" width="60"/>
+</center></p>
+<p>I am not sure which of the approaches is best.</p>
 <p>It can't hurt to check them out and compare them.</p>
 <p>Please let me know what you think and how well they suit your needs.</p>
 <h4><a name="3"></a>Reproducing the MEP Electrical System Browser Hierarchy</h4>
-<p>https://forums.autodesk.com/t5/revit-api-forum/get-tree-view-from-system-browser-revit-mep/m-p/7855032</p>
+<p>A related, simpler question was raised on
+<a href="https://forums.autodesk.com/t5/revit-api-forum/get-tree-view-from-system-browser-revit-mep/m-p/7855032">getting the tree view from the Revit MEP system browser</a>:</p>
+<p><strong>Question:</strong> How can I get tree view in the System Browser in Revit?</p>
+<p>I need it to create a form has tree view like this:</p>
+<p><center>
+<img src="img/mep_system_browswer_tree_view.png" alt="MEP system browser tree view" width="301"/>
+</center></p>
+<p><strong>Answer:</strong> My <a href="https://github.com/jeremytammik/AdnRme">AdnRme HVAC sample</a> does that.</p>
 <p>I implemented two different methods to reproduce the MEP Electrical System Browser Hierarchy structure.</p>
 <ul>
 <li>Before the advent of any MEP specific functionality in the Revit API, I made use of generic parameter values stored on the respective system elements.</li>
-<li>After the introduction of the Revit MEP API, I implemented a simpler and safer solution making use of that.</li>
+<li>After the introduction of the Revit MEP API, I implemented a simpler and safer solution making use of that and the connector information it provides.</li>
 </ul>
-<h4><a name="4"></a>Connect Into</h4>
-<p><a href="https://forums.autodesk.com/t5/revit-api-forum/connect-into/m-p/7834417">connect into</a></p>
+<!----
+####<a name="4"></a>Connect Into
+
+[connect into](https://forums.autodesk.com/t5/revit-api-forum/connect-into/m-p/7834417)
+---->
+
 <h4><a name="4"></a>Creating a Conduit Between Two Connectors</h4>
-<p><a href="https://forums.autodesk.com/t5/revit-api-forum/how-do-i-create-conduit-between-2-connectors/m-p/7727929">How do I create conduit between 2 connectors</a></p>
+<p>We also discussed 
+<a href="https://forums.autodesk.com/t5/revit-api-forum/how-do-i-create-conduit-between-2-connectors/m-p/7727929">how to create a conduit between two connectors</a>:</p>
+<p><strong>Question:</strong> I have conduit connectors on junction box family instances and I'd like to connect two boxes using a conduit.</p>
+<p>I couldn't find any method to achieve this.</p>
+<p><strong>Answer:</strong> In general, Revit will automatically and happily connect everything that can be connected.</p>
+<p>Of course, in order to achieve this, I assume that the boxes need to be equipped with connector elements.</p>
+<p>Are they?</p>
+<p>Furthermore, have you tested and verified that the connection you wish to achieve works as expected when you drive it manually through the user interface?</p>
+<p>In general, if a feature is not available in the Revit product manually through the user interface, then the Revit API will not provide it either.</p>
+<p>You should therefore research the optimal workflow and best practices to address your task at hand manually through the user interface first.</p>
+<p>To do so, please discuss and analyse it with an application engineer, product usage expert, or product support.</p>
+<p>Once you have got that part sorted out, it is time to step into the programming environment.</p>
+<p>Assuming you have (or can get) the connector points, simply substitute the <code>XYZ</code> below:</p>
+<pre class="code">
+  Autodesk.Revit.DB.Electrical.Conduit.Create(
+    pDoc, type.Id, new XYZ(0, 0, 0), new XYZ(10, 0, 0), level.Id );
+</pre>
+
+<p><strong>Response:</strong> Yes. I have created a conduit connector in the box. I can manually connect 2 boxes with conduit.</p>
+<p>I tried <code>Conduit.Create</code>, and this method only requests coordinates as parameter.
+I successfully created a conduit between two boxes, but they are not connected.</p>
+<p>I used this method, but the conduit didn't connect to the boxes.</p>
+<p><strong>Answer:</strong> What happens if you ask the connector on one of the boxes to connect to the connector on the other box?</p>
+<p>Does it automatically create a conduit between them?</p>
+<p>Please study the series of research articles on <a href="http://thebuildingcoder.typepad.com/blog/2014/01/final-rolling-offset-using-pipecreate.html">rolling offset creation</a>.</p>
+<p><strong>Response:</strong> Yes, it worked.</p>
+<p>Thank you again.</p>
 <h4><a name="5"></a>Dealing with the Read-Only Transition Diameter</h4>
+<p>Finally, a question on transitions between different pipe diameters:</p>
 <p>In the
 corresponding <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread,
 Rudi <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1103138">@Revitalizer</a> Honke
@@ -85,8 +228,3 @@ the <a href="https://forums.autodesk.com/t5/revit-api-forum/transition-diameter-
 <p>The remaining transition <code>FamilyInstance</code> will retain the correct diameter parameter values.</p>
 <p>Move it to the desired location.</p>
 <p>Many thanks to Revitalizer for this hint!</p>
-<p><center>
-<img src="img/.png" alt="" width="100"/>
-</center></p>
-<pre class="code">
-</pre>
