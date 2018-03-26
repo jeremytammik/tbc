@@ -16,6 +16,25 @@ Do you Dynamo?
 Do you have a potential application for Autodesk Dynamo on the Cloud?
 If yes, we want to talk to you...
 
+published links:
+ 
+blog post: http://thebuildingcoder.typepad.com/blog/2018/03/dynamo-on-the-web.html
+dynamo forum post: https://forum.dynamobim.com/t/your-input-on-dynamo-on-the-web-is-needed
+revit api forum thread: https://forums.autodesk.com/t5/revit-api-forum/your-input-on-dynamo-on-the-web-is-needed/m-p/7883652
+tweet: https://twitter.com/jeremytammik/status/978224636163973120
+ 
+Your input on Dynamo on the Web is needed
+
+Do you Dynamo?
+
+Do you have a potential application for Dynamo on the Cloud?
+
+If yes, we want to talk to you!
+
+Please read all about it on The Building Coder: Dynamo on the Web.
+
+Looking forward to hearing from you!
+
 --->
 
 ### Dynamo on the Web?
@@ -48,9 +67,9 @@ We want to talk to customers and partners about how they might want to leverage 
 
 We are considering three possible implementations of Dynamo on the Cloud, and would like to know which of them most interests you, why, and how you envision using it:
 
-1. [Dynamo as part of Forge Design Automation for Revit](#3.1) 
-2. [Headless Dynamo](#3.2) 
-3. [Full Dynamo on the Web](#3.3) 
+1. [Dynamo as part of Forge Design Automation for Revit](#3.1)
+2. [Headless Dynamo](#3.2)
+3. [Full Dynamo on the Web](#3.3)
 
 ####<a name="3.1"></a>1. Dynamo as part of Forge Design Automation for Revit
 
