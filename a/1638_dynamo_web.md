@@ -52,11 +52,13 @@ We visited the place
 that the Hauslabjoch mummy [Ötzi](https://en.wikipedia.org/wiki/%C3%96tzi) was
 found and climbed the [Finailspitze (3514 m)](https://en.wikipedia.org/wiki/Fineilspitze),
 [Weißkugel (3739 m)](https://en.wikipedia.org/wiki/Wei%C3%9Fkugel) and
-Fluchtkogel (3500 m) in splendid conditions:
+Fluchtkogel (3500 m) in splendid conditions
+([high resolution](http://thebuildingcoder.typepad.com/img/588_finailspitze_jeremy.jpg) [^](/p/2018/2018-03-24_skitour_venter_runde/thomas/588_finailspitze_jeremy.jpg)):
 
 <center>
 <img src="img/588_finailspitze_jeremy.jpg" alt="Jeremy on the Finailspitze summit in Austria" width="1182"/>
 </center>
+
 
 ####<a name="3"></a>Do You want Dynamo on the Web?
 
