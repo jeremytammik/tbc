@@ -79,7 +79,9 @@ As you may have heard already, Autodesk is well down the path
 developing [Forge Design Automation for Revit](http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2017/autocad/sd124720#chapter=0),
 aka [Revit I/O](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28b).
 
-This is Revit as an 'engine' on the cloud.  No user interface, aka 'headless' &ndash; an engine you can drive using the Revit API we have today.  As we get closer to moving Forge Design Automation for Revit from private to public beta, and likely public release around mid-year, do you want to be able to leverage Dynamo too?  No user interface means you would be programmatically loading a Revit app and your Dynamo project into a Revit instance on the cloud, pushing parameters and getting results &ndash; with your own handling of all user interaction (and maybe even server to server?).
+This is Revit as an 'engine' on the cloud.  No user interface, aka 'headless' &ndash; an engine you can drive using the Revit API we have today.  We are currently working on moving Forge Design Automation for Revit from private to public beta.
+
+Would you like to be able to leverage Dynamo too?  No user interface means you would be programmatically loading a Revit app and your Dynamo project into a Revit instance on the cloud, pushing parameters and getting results &ndash; with your own handling of all user interaction (and maybe even server to server?).
 
 ####<a name="3.2"></a>2. Headless Dynamo
 
