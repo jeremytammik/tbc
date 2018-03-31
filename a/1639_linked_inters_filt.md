@@ -26,7 +26,7 @@ We recently
 discussed [filtering for intersecting elements](http://thebuildingcoder.typepad.com/blog/2018/03/create-2d-arc-and-filter-for-intersecting-elements.html).
 
 Here is a closely related issue with an additional twist that I discussed
-with Gustav Blom, Sivilingeniør at [Rambøll](http://www.ramboll.no) in Norway:
+with Gustav Blom, structural engineer at [Rambøll](http://www.ramboll.no) in Norway:
 
 - [Determining elements intersecting mass in a linked file](#2) 
 - [Coding suggestions and transformations](#3) 
