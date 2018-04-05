@@ -188,7 +188,8 @@ in [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 ####<a name="5"></a>Windows Explorer BasicFileInfo Right Click Utility
 
 Håvard also used Victor's code as a base to implement his
-own [Windows Explorer `BasicFileInfo` right click utility](https://www.screencast.com/t/o78ugUUwY):
+own [Windows Explorer `BasicFileInfo` right click utility](https://www.screencast.com/t/o78ugUUwY), cf.
+the [20-second recording of his RVT BasicFileInfo in Windows Explorer](https://youtu.be/WJCsNywPMVU):
 
 <!---
 <center>
@@ -205,6 +206,10 @@ own [Windows Explorer `BasicFileInfo` right click utility](https://www.screencas
 </object>
 </center>
 --->
+
+<center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/WJCsNywPMVU?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</center>
 
 Works nicely &nbsp; :-)
 
