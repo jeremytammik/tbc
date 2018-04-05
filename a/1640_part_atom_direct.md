@@ -189,7 +189,8 @@ in [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 
 Håvard also used Victor's code as a base to implement his
 own [Windows Explorer `BasicFileInfo` right click utility](https://www.screencast.com/t/o78ugUUwY), cf.
-the [20-second recording of his RVT BasicFileInfo in Windows Explorer](https://youtu.be/WJCsNywPMVU):
+the [20-second recording of his RVT BasicFileInfo in Windows Explorer](https://youtu.be/WJCsNywPMVU)
+[^](zip/ExplorerBasicFileInfo.mp4):
 
 <!---
 <center>
