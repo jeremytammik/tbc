@@ -190,6 +190,7 @@ in [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 Håvard also used Victor's code as a base to implement his
 own [Windows Explorer `BasicFileInfo` right click utility](https://www.screencast.com/t/o78ugUUwY):
 
+<!---
 <center>
  <object id="scPlayer"  width="480" height="389" type="application/x-shockwave-flash" data="https://content.screencast.com/users/HD12310/folders/Jing/media/0d7dc04f-2085-44ab-8b4b-e98d53f91f2d/jingswfplayer.swf" >
  <param name="movie" value="https://content.screencast.com/users/HD12310/folders/Jing/media/0d7dc04f-2085-44ab-8b4b-e98d53f91f2d/jingswfplayer.swf" />
@@ -203,6 +204,7 @@ own [Windows Explorer `BasicFileInfo` right click utility](https://www.screencas
  Unable to display content. Adobe Flash is required.
 </object>
 </center>
+--->
 
 Works nicely &nbsp; :-)
 
