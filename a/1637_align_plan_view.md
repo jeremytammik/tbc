@@ -89,6 +89,10 @@ Although `ViewPlan.Origin` seems to correct for the mysterious origin offset, I 
 
 The API documentation states that 'The origin of a plan view is not meaningful'.
 
+By the way, I used an earlier article to first figure out the sheet to model transform and the .01 ft viewport buffer,
+discussing [Sheet to Model Coordinate Conversion](http://thebuildingcoder.typepad.com/blog/2015/10/sheet-to-model-coordinate-conversion.html).
+
+
 
 ####<a name="3"></a>Answer, View Origin and Outline
 

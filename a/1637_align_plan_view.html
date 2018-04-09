@@ -70,6 +70,8 @@ Before we get to that, I'd like to point out the imminent Forge accelerator in B
 
 <p>Although <code>ViewPlan.Origin</code> seems to correct for the mysterious origin offset, I am not sure I am using a sanctioned API method.</p>
 <p>The API documentation states that 'The origin of a plan view is not meaningful'.</p>
+<p>By the way, I used an earlier article to first figure out the sheet to model transform and the .01 ft viewport buffer,
+discussing <a href="http://thebuildingcoder.typepad.com/blog/2015/10/sheet-to-model-coordinate-conversion.html">Sheet to Model Coordinate Conversion</a>.</p>
 <h4><a name="3"></a>Answer, View Origin and Outline</h4>
 <p>It seems that you figured out correct relation between <code>View.Outline</code> and <code>View.Origin</code>.</p>
 <p>However, the description of the <code>View.Origin</code> property in the API documentation does not sound right.</p>
