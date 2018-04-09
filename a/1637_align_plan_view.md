@@ -34,6 +34,7 @@ Before we get to that, I'd like to point out the imminent Forge accelerator in B
 - [Question on aligning plan views](#3)
 - [Answer, view origin and outline](#3)
 - [Suggestion for aligning views](#4)
+- [Addendum &ndash; response](#5)
 
 
 ####<a name="2"></a>Boston Forge Accelerator
@@ -89,8 +90,10 @@ Although `ViewPlan.Origin` seems to correct for the mysterious origin offset, I 
 
 The API documentation states that 'The origin of a plan view is not meaningful'.
 
-By the way, I used an earlier article to first figure out the sheet to model transform and the .01 ft viewport buffer,
-discussing [Sheet to Model Coordinate Conversion](http://thebuildingcoder.typepad.com/blog/2015/10/sheet-to-model-coordinate-conversion.html).
+By the way, I used an earlier article
+discussing [sheet to model coordinate conversion](http://thebuildingcoder.typepad.com/blog/2015/10/sheet-to-model-coordinate-conversion.html) to
+figure out the sheet to model transform and the .01 foot viewport buffer.
+
 
 
 
@@ -116,6 +119,25 @@ Although the use of View.Origin in your code sample looks technically correct, I
 If I would try to automatically place some view, PlanB, on a sheet, that already contains PlanA, in such a way that PlanB aligns with PlanA, I would first place PlanB at an arbitrary place. Then I would take some imaginary vertical line in the model, compute what point on the sheet it ends up as visible in PlanA and in PlanB, and then compute the vector to shift PlanB's viewport on the sheet to get these two points aligned (vertically or horizontally). This is oversimplification, of course, but there is no place where view origin is required or matters.
 
 Many thanks to Arkady for this good idea!
+
+####<a name="5"></a>Addendum &ndash; Response
+
+Have you been able to make use of these suggestions to improve my alignment algorithm?
+
+Yes, if all plans views knew about some common vertical line in the model, and in each sheet view the position of that vertical line relative to the sheet, then that could be used to align views across sheet.
+
+I’m not sure what that element would be?  We also have the case were the two plan views have different cropping, and in fact may not have any common X,Y points &ndash; i.e., their crop boxes do not overlap.  In general, views do not own elements that are outside their cropping.
+
+The original algorithm modification using `View.Origin` with `View.Scale` has tested out to be reliable method to align plan views across sheets.
+
+Interestingly, we are able to reliably create the 'mysterious offset' corrected for subtracting the scaled `View.Origin`.
+
+The offset occurs when a plan view crop box is rotated.  Here are the steps to reproduce:
+
+- In the view properties, check 'Select crop region visible'.
+- Select visible Crop Box.
+- Rotate Crop Box using the Modify > Modify > Rotate command.
+
 
 <center>
 <img src="img/Three_Planets_Dance_Over_La_Silla.jpg" alt="Alignment of three planets over La Silla observatorium" width="400"/>
