@@ -47,20 +47,32 @@ This list represents the reported issues resolved in Autodesk Revit 2018 within 
   https://github.com/CyrilWaechter/pyRevitMEP/blob/master/pyRevitMEP.tab/Tools.panel/ViewRename.pushbutton/script.py
   You can work around this by wrapping the Revit event. For example, you can do the following:
 
-#RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+@AutodeskRevit 2018.3 update, avoiding SetValueString and passing data via an external event #RevitAPI #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/2018_3
 
-&ndash;
-...
+I installed the latest Revit update, and want to highlight two of the numerous interesting ongoing Revit API forum discussions
+&ndash; Revit 2018.3 update
+&ndash; Avoid <code>SetValueString</code>
+&ndash; Passing Data via <code>ExternalEvent.Raise</code>...
 
 --->
 
-<h3>Revit 2018.3 Update</h3>
+<h3>Revit 2018.3, SetValueString and External Events</h3>
+<p>I installed the latest Revit update, and want to highlight two of the numerous interesting ongoing Revit API forum discussions:</p>
+<ul>
+<li><a href="#2">Revit 2018.3 update</a> </li>
+<li><a href="#3">Avoid <code>SetValueString</code></a> </li>
+<li><a href="#4">Passing Data via <code>ExternalEvent.Raise</code></a></li>
+</ul>
 <h4><a name="2"></a>Revit 2018.3 Update</h4>
-<p>I installed the Revit 2018.3 update released yesterday, April 9, 2018, with the build numbers 20180329_1100 and 18.3.0.81 specified in Help &gt; About.</p>
-<p>It includes new functionality and contains the fixes included in the previous Revit hot fixes and updates. It updates Revit 2018 itself, Collaboration for Revit 2018, and Dynamo. </p>
+<p>I installed the Revit 2018.3 update released yesterday, April 9, 2018, with the build numbers 20180329_1100 and 18.3.0.81 specified in Help &gt; About.
+Here is
+the <a href="http://up.autodesk.com/2018/RVT/9CA05B9A-1809-0510-A1B4-98696E090436/Autodesk_Revit_2018_3.exe">direct download link</a>.</p>
+<p>This update is required for Revit 2018 to work in the new BIM 360 Design platform.</p>
+<p>Furthermore, it includes other new functionality and contains the fixes included in the previous Revit hot fixes and updates. It updates Revit 2018 itself, Collaboration for Revit 2018, and Dynamo. </p>
 <p>For details, please check
-the <a href="https://up.autodesk.com/2018/RVT/Autodesk_Revit_2018_3_Readme.htm">release notes</a>.</p>
-<p>I extracted the following API relevant items from the release notes:</p>
+the <a href="https://up.autodesk.com/2018/RVT/Autodesk_Revit_2018_3_Readme.htm">readme</a>
+and <a href="http://revit.downloads.autodesk.com/download/2018_3_RVT/Docs/RelNotes/Autodesk_Revit_2018_3_ReleaseNotes.html">release notes</a>.</p>
+<p>I extracted the following API relevant items from the latter:</p>
 <ul>
 <li>Resolved Issues<ul>
 <li>Platform ...</li>
