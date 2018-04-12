@@ -14,17 +14,23 @@
 
 #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
 
-&ndash;
-...
+This is pretty obvious, once you think about it, and apparently worth pointing out anyway:
+The outline defining a bounding box filter is always aligned with the cardinal axes
+&ndash; Rotating `Min` and `Max` distorts the box
+&ndash; Rotate target elements or use a solid filter...
 
 --->
 
-<h3>Bounding Box Filter Always Axis Aligned</h3>
-<p>It is pretty obvious, once you think about it, and apparently worth pointing out anyway:</p>
+<h3>Bounding Box Filter is Always Axis Aligned</h3>
+<p>This is pretty obvious, once you think about it, and apparently worth pointing out anyway:</p>
 <p>The outline defining a bounding box filter is always aligned with the cardinal axes.</p>
 <p>This question was clarified in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread 
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/boundingbox-outline-and-boundingboxisinsidefilter/m-p/7921336"><code>BoundingBox</code> outline and <code>BoundingBoxIsInsideFilter</code></a>:</p>
+<ul>
+<li><a href="#2">Rotating <code>Min</code> and <code>Max</code> distorts the box</a> </li>
+<li><a href="#3">Rotate target elements or use a solid filter</a> </li>
+</ul>
 <h4><a name="2"></a>Rotating Min and Max Distorts the Box</h4>
 <p><strong>Question:</strong> I have a question about a bounding box.</p>
 <p>I tried to get its outline and retrieve the elements inside it.</p>
@@ -36,7 +42,7 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/boundingbox-outline-a
 <img src="img/rotated_bounding_box_1.png" alt="Bounding box rotated 0 degrees" width="545"/>
 </center></p>
 <ul>
-<li>Rotation = 10 ~ 20 deg &ndash; I can still get the BoundingBox outline, but cannot select all element inside:</li>
+<li>Rotation = 10 ~ 20 deg &ndash; I can still get the BoundingBox outline, but cannot select all elements inside:</li>
 </ul>
 <p><center>
 <img src="img/rotated_bounding_box_2.png" alt="Bounding box rotated 10 ~ 20 degrees" width="575"/>

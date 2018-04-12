@@ -15,14 +15,16 @@
   
 #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
 
-&ndash;
-...
+This is pretty obvious, once you think about it, and apparently worth pointing out anyway:
+The outline defining a bounding box filter is always aligned with the cardinal axes
+&ndash; Rotating `Min` and `Max` distorts the box
+&ndash; Rotate target elements or use a solid filter...
 
 --->
 
-### Bounding Box Filter Always Axis Aligned
+### Bounding Box Filter is Always Axis Aligned
 
-It is pretty obvious, once you think about it, and apparently worth pointing out anyway:
+This is pretty obvious, once you think about it, and apparently worth pointing out anyway:
 
 The outline defining a bounding box filter is always aligned with the cardinal axes.
 
@@ -30,6 +32,8 @@ This question was clarified in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread 
 on [`BoundingBox` outline and `BoundingBoxIsInsideFilter`](https://forums.autodesk.com/t5/revit-api-forum/boundingbox-outline-and-boundingboxisinsidefilter/m-p/7921336):
 
+- [Rotating `Min` and `Max` distorts the box](#2) 
+- [Rotate target elements or use a solid filter](#3) 
 
 ####<a name="2"></a>Rotating Min and Max Distorts the Box
 
@@ -45,7 +49,7 @@ I encountered 3 cases:
 <img src="img/rotated_bounding_box_1.png" alt="Bounding box rotated 0 degrees" width="545"/>
 </center>
 
-- Rotation = 10 ~ 20 deg &ndash; I can still get the BoundingBox outline, but cannot select all element inside:
+- Rotation = 10 ~ 20 deg &ndash; I can still get the BoundingBox outline, but cannot select all elements inside:
 
 <center>
 <img src="img/rotated_bounding_box_2.png" alt="Bounding box rotated 10 ~ 20 degrees" width="575"/>
