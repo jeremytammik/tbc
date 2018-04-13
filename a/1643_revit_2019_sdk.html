@@ -1,0 +1,173 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+#RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+
+&ndash; 
+...
+
+--->
+
+<h3>Compiling the Revit 2019 SDK Samples</h3>
+<p>I installed Revit 2019 and compiled the Revit 2019 SDK.</p>
+<p>That was quite a struggle:</p>
+<ul>
+<li><a href="#2">Installing Revit 2019</a> </li>
+<li><a href="#3">Installing the Revit 2019 SDK</a> </li>
+<li><a href="#4">Installing the .NET Framework 4.7</a> </li>
+<li><a href="#5">Compiling the Revit 2019 SDK samples</a> </li>
+<li><a href="#6">Processor architecture mismatch warnings</a> </li>
+<li><a href="#7">DimensionLeaderEnd <code>OutputPath</code> missing</a> </li>
+<li><a href="#8">Numerous Revit API assembly reference conflicts</a> </li>
+<li><a href="#9">SampleCommandsSteelElements lacks components</a> </li>
+<li><a href="#10">AppearanceAssetEditing using deprecated API</a> </li>
+</ul>
+<h4><a name="2"></a>Installing Revit 2019</h4>
+<p>That was easy and unproblematic.</p>
+<h4><a name="3"></a>Installing the Revit 2019 SDK</h4>
+<p>I searched the installation subfolders for <code>RevitSDK.exe</code> and found it here:</p>
+<ul>
+<li>C:\Autodesk\Revit_2019_G1_Win_64bit_dlm\Utilities\SDK\RevitSDK.exe</li>
+</ul>
+<p>That was easy to install as well.</p>
+<h4><a name="4"></a>Installing the .NET Framework 4.7</h4>
+<p>I set about compiling the SDK samples and discovered that this is not possible without first installing the .NET framework 4.7.</p>
+<p>I am still using Visual Studio 2015, by the way.</p>
+<p>For that information, all further API details and system requirements, please refer to
+the <a href="http://help.autodesk.com/view/RVT/2019/ENU/?guid=Revit_API_Revit_API_Developers_Guide_html">Revit 2019 API Developers Guide</a>.</p>
+<p>I searched for <code>install .net 4.7 framework</code> and was led
+to <a href="https://www.microsoft.com/en-us/download/confirmation.aspx?id=55167">download it from the Microsoft download centre</a>,
+providing <em>NDP47-KB3186497-x86-x64-AllOS-ENU.exe</em>.</p>
+<p>The .NET framework 4.7 was still not listed in the Visual Studio 2015 target framework options, though.</p>
+<p>How to fix that is explained in the StackOverflow thread
+on <a href="https://stackoverflow.com/questions/43420178/can-i-use-visual-studio-2015-to-target-net-framework-4-7">using Visual Studio 2015 to target .NET framework 4.7</a>:</p>
+<blockquote>
+<p>Having the 4.7 runtime and having the "4.7 Targeting pack" to write code in 4.7 are two very different things.</p>
+<p>The targeting packs are available from <a href="">microsoft.com/net/targeting</a>.</p>
+</blockquote>
+<p>Accordingly, I installed the 4.7 targeting pack <em>NDP47-DevPack-KB3186612-ENU.exe</em> (86492264 bytes).</p>
+<p>Now the .NET framework 4.7 is indeed listed in the VS target framework options, and I can load the SDK samples successfully with no warnings.</p>
+<p>Unfortunately, though, compiling them is quite another matter:</p>
+<h4><a name="5"></a>Compiling the Revit 2019 SDK Samples</h4>
+<p>The SDK samples solution now contains 186 projects.</p>
+<p>On the first attempt, many of them compiled successfully.</p>
+<p>In fact, there
+were <a href="zip/revit_2019_sdk_samples_errors_warnings_1.txt">182 projects succeeded and 4 failed with 2 errors and 70 warnings, cf. the error and warning list</a>.</p>
+<!---
+The two errors concern DimensionLeaderEnd and ExtensibleStorageManager:
+
+- Error: The OutputPath property is not set for project 'DimensionLeaderEnd.csproj'.  Please check to make sure that you have specified a valid combination of Configuration and Platform for this project.  Configuration='Debug'  Platform='AnyCPU'.  This error may also appear if some other project is trying to follow a project-to-project reference to this project, this project has been unloaded or is not included in the solution, and the referencing project does not build using the same or an equivalent Configuration or Platform.   DimensionLeaderEnd          
+- Error: Metadata file 'C:\a\lib\revit\2019\SDK\Samples\ExtensibleStorageManager\SchemaWrapperTools\CS\bin\Debug\SchemaWrapperTools.dll' could not be found ExtensibleStorageManager    C:\a\lib\revit\2019\SDK\Samples\ExtensibleStorageManager\ExtensibleStorageManager\CS\CSC        
+-->
+
+<h4><a name="6"></a>Processor Architecture Mismatch Warnings</h4>
+<p>Many of the warnings concern
+an <a href="http://thebuildingcoder.typepad.com/blog/2013/06/processor-architecture-mismatch-warning.html">architecture mismatch warning</a>:</p>
+<ul>
+<li>Warning: There was a mismatch between the processor architecture of the project being built "MSIL" and the processor architecture of the reference "RevitAPI", "AMD64". This mismatch may cause runtime failures. Please consider changing the targeted processor architecture of your project through the Configuration Manager so as to align the processor architectures between your project and references, or take a dependency on references with a processor architecture that matches the targeted processor architecture of your project.   RebarFreeForm           </li>
+</ul>
+<p>These warnings can be suppressed using
+my <a href="https://github.com/jeremytammik/DisableMismatchWarning">DisableMismatchWarning exe utility</a> 
+to <a href="http://thebuildingcoder.typepad.com/blog/2013/07/recursively-disable-architecture-mismatch-warning.html">recursively disable architecture mismatch warnings</a>.</p>
+<p>After running that, the number of problems is reduced
+to <a href="zip/revit_2019_sdk_samples_errors_warnings_2.txt">183 succeeded and 3 failed with 1 error and 40 warnings</a>.</p>
+<h4><a name="7"></a>DimensionLeaderEnd OutputPath Missing</h4>
+<p>Next, I addressed the first serious hurdle for successful compilation, which took me a while to figure out:</p>
+<ul>
+<li>Error: The OutputPath property is not set for project 'DimensionLeaderEnd.csproj'.  Please check to make sure that you have specified a valid combination of Configuration and Platform for this project.  Configuration='Debug'  Platform='AnyCPU'.  This error may also appear if some other project is trying to follow a project-to-project reference to this project, this project has been unloaded or is not included in the solution, and the referencing project does not build using the same or an equivalent Configuration or Platform.   DimensionLeaderEnd          </li>
+</ul>
+<p>After some head scratching, I finally fixed it very easily, by manually adding an <code>OutputPath</code> tag to <code>Debug</code> <code>AnyCPU</code> <code>PropertyGroup</code> the project file:</p>
+<pre class="code">
+<span style="color:blue;">&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">PropertyGroup</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">Configuration</span><span style="color:blue;">&nbsp;</span><span style="color:red;">Condition</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">&nbsp;&#39;$(Configuration)&#39;&nbsp;==&nbsp;&#39;&#39;&nbsp;</span>&quot;<span style="color:blue;">&gt;</span>Debug<span style="color:blue;">&lt;/</span><span style="color:#a31515;">Configuration</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">Platform</span><span style="color:blue;">&nbsp;</span><span style="color:red;">Condition</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">&nbsp;&#39;$(Platform)&#39;&nbsp;==&nbsp;&#39;&#39;&nbsp;</span>&quot;<span style="color:blue;">&gt;</span>AnyCPU<span style="color:blue;">&lt;/</span><span style="color:#a31515;">Platform</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">ProductVersion</span><span style="color:blue;">&gt;</span>9.0.30729<span style="color:blue;">&lt;/</span><span style="color:#a31515;">ProductVersion</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">SchemaVersion</span><span style="color:blue;">&gt;</span>2.0<span style="color:blue;">&lt;/</span><span style="color:#a31515;">SchemaVersion</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">ProjectGuid</span><span style="color:blue;">&gt;</span>{4E3C160F-1FC8-4BD7-8E01-B62C58E79CD4}<span style="color:blue;">&lt;/</span><span style="color:#a31515;">ProjectGuid</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">OutputType</span><span style="color:blue;">&gt;</span>Library<span style="color:blue;">&lt;/</span><span style="color:#a31515;">OutputType</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">AppDesignerFolder</span><span style="color:blue;">&gt;</span>Properties<span style="color:blue;">&lt;/</span><span style="color:#a31515;">AppDesignerFolder</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">RootNamespace</span><span style="color:blue;">&gt;</span>Revit.SDK.Samples.DimensionLeaderEnd.CS<span style="color:blue;">&lt;/</span><span style="color:#a31515;">RootNamespace</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">AssemblyName</span><span style="color:blue;">&gt;</span>DimensionLeaderEnd<span style="color:blue;">&lt;/</span><span style="color:#a31515;">AssemblyName</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">StartupObject</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;/</span><span style="color:#a31515;">StartupObject</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">TargetFrameworkVersion</span><span style="color:blue;">&gt;</span>v4.7<span style="color:blue;">&lt;/</span><span style="color:#a31515;">TargetFrameworkVersion</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">TargetFrameworkProfile</span><span style="color:blue;">&nbsp;/&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">OutputPath</span><span style="color:blue;">&gt;</span>bin\x64\Debug\<span style="color:blue;">&lt;/</span><span style="color:#a31515;">OutputPath</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&lt;/</span><span style="color:#a31515;">PropertyGroup</span><span style="color:blue;">&gt;</span>
+</pre>
+
+<p>This results in <a href="zip/revit_2019_sdk_samples_errors_warnings_3.txt">0 errors, 29 warnings, 184 succeeded, 2 failed</a>.</p>
+<h4><a name="8"></a>Numerous Revit API Assembly Reference Conflicts</h4>
+<p>Some of the remaining warnings are caused by the AppearanceAssetEditing project and concern an assembly reference conflict:</p>
+<ul>
+<li>Warning: Could not resolve this reference. Could not locate the assembly "RevitAPIUI". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors.    AppearanceAssetEditing          </li>
+<li>Warning: No way to resolve conflict between "RevitAPIUI, Version=19.0.0.0, Culture=neutral, PublicKeyToken=null" and "RevitAPIUI". Choosing "RevitAPIUI, Version=19.0.0.0, Culture=neutral, PublicKeyToken=null" arbitrarily. AppearanceAssetEditing          </li>
+</ul>
+<p>I deleted the existing references to RevitAPI.dll and RevitAPIUI.dll and added them again manually, pointing to the installed assemblies in the Revit.exe folder.</p>
+<p>That reduced the number of warnings from 29 to 25, so we now have <a href="zip/revit_2019_sdk_samples_errors_warnings_4.txt">0 errors, 25 warnings, 184 succeeded, 2 failed</a>.</p>
+<p>I did the same for the RebarFreeForm project, resulting in 21 warnings, leaving <a href="zip/revit_2019_sdk_samples_errors_warnings_5.txt">0 errors, 21 warnings, 184 succeeded, 2 failed</a>.</p>
+<p>RebarFreeForm still has a problem with the RevitAddInUtility reference, though:</p>
+<ul>
+<li>Warning: Could not resolve this reference. Could not locate the assembly "RevitAddInUtility". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. RebarFreeForm           </li>
+<li>Warning: No way to resolve conflict between "RevitAddInUtility, Version=19.0.0.0, Culture=neutral, PublicKeyToken=null" and "RevitAddInUtility". Choosing "RevitAddInUtility, Version=19.0.0.0, Culture=neutral, PublicKeyToken=null" arbitrarily.    RebarFreeForm           </li>
+</ul>
+<p>That one did not even need re-referencing; it is superfluous.</p>
+<p>I simply removed it entirely, resulting in 19 warnings, leaving <a href="zip/revit_2019_sdk_samples_errors_warnings_6.txt">0 errors, 19 warnings, 184 succeeded, 2 failed</a>.</p>
+<h4><a name="9"></a>SampleCommandsSteelElements Lacks Components</h4>
+<p>The SampleCommandsSteelElements cannot be compiled due to numerous unresolved references:</p>
+<ul>
+<li>Warning: Could not resolve this reference. Could not locate the assembly "RevitAddInUtility". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. SampleCommandsSteelElements         </li>
+<li>Warning: Could not resolve this reference. Could not locate the assembly "RvtDwgAddon". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors.   SampleCommandsSteelElements         </li>
+<li>Warning: Could not resolve this reference. Could not locate the assembly "ASObjectsMgd". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors.  SampleCommandsSteelElements         </li>
+<li>Warning: Could not resolve this reference. Could not locate the assembly "RevitAPI". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors.  SampleCommandsSteelElements         </li>
+<li>Warning: No way to resolve conflict between "RevitAddInUtility, Version=19.0.0.0, Culture=neutral, PublicKeyToken=null" and "RevitAddInUtility". Choosing "RevitAddInUtility, Version=19.0.0.0, Culture=neutral, PublicKeyToken=null" arbitrarily.    SampleCommandsSteelElements         </li>
+<li>Warning: The referenced component 'RevitAPISteel' could not be found. SampleCommandsSteelElements         </li>
+<li>Warning: Could not resolve this reference. Could not locate the assembly "RevitAPISteel". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. SampleCommandsSteelElements         </li>
+<li>Warning: The referenced component 'RvtDwgAddon' could not be found.   SampleCommandsSteelElements         </li>
+<li>Warning: Could not resolve this reference. Could not locate the assembly "ASCADLinkMgd". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors.  SampleCommandsSteelElements         </li>
+<li>Warning: The referenced component 'ASCADLinkMgd' could not be found.  SampleCommandsSteelElements         </li>
+<li>Warning: No way to resolve conflict between "RevitAPIUI, Version=19.0.0.0, Culture=neutral, PublicKeyToken=null" and "RevitAPIUI". Choosing "RevitAPIUI, Version=19.0.0.0, Culture=neutral, PublicKeyToken=null" arbitrarily. SampleCommandsSteelElements         </li>
+<li>Warning: Could not resolve this reference. Could not locate the assembly "ASGeometryMgd". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. SampleCommandsSteelElements         </li>
+<li>Warning: The referenced component 'ASGeometryMgd' could not be found. SampleCommandsSteelElements         </li>
+<li>Warning: Could not resolve this reference. Could not locate the assembly "RevitAPIUI". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors.    SampleCommandsSteelElements         </li>
+<li>Warning: No way to resolve conflict between "RevitAPI, Version=19.0.0.0, Culture=neutral, PublicKeyToken=null" and "RevitAPI". Choosing "RevitAPI, Version=19.0.0.0, Culture=neutral, PublicKeyToken=null" arbitrarily.   SampleCommandsSteelElements         </li>
+<li>Warning: The referenced component 'ASObjectsMgd' could not be found.  SampleCommandsSteelElements         </li>
+</ul>
+<p>One of these references refers to the module ASObjectsMgd.</p>
+<p>This is in fact available in the add-ins packaged with Revit itself, in the subdirectory <em>/AddIns/SteelConnections</em>:</p>
+<pre>
+/v/C/Program Files/Autodesk/Revit 2019 $ find . | grep ASObjectsMgd
+./AddIns/SteelConnections/ASObjectsMgd.dll
+</pre>
+
+<p>I found and re-referenced all the required references:</p>
+<p><center>
+<img src="img/SampleCommandsSteelElements_references.png" alt="SampleCommandsSteelElements references" width="232"/>
+</center></p>
+<p>It now compiles successfully, so we have just one failing project left.</p>
+<p>SampleCommandsSteelElements is now producing other warnings, though.</p>
+<h4><a name="10"></a>AppearanceAssetEditing Using Deprecated API</h4>
+<p>The remaining failing project is AppearanceAssetEditing.</p>
+<p>It is producing new errors, so we now
+see <a href="zip/revit_2019_sdk_samples_errors_warnings_7.txt">185 succeeded, 1 failed, 7 errors, 9 warnings</a>.</p>
+<p>The seven errors in AppearanceAssetEditing are caused by deprecated API calls:</p>
+<ul>
+<li>Error CS0618: 'AssetProperties.this[string]' is obsolete: ' This property is deprecated in Revit 2019 and will be removed in the next version of Revit. We suggest you use the 'FindByName(String)' or 'Get(int)' method instead.'    AppearanceAssetEditing  C:\a\lib\revit\2019\SDK\Samples\AppearanceAssetEditing\CS\Application.cs    208 Active</li>
+</ul>
+<p>These calls are classed as errors instead of warnings, causing the project compilation to fail, because this is explicitly requested in the project build properties &ndash; treat all warnings as errors:</p>
+<p><center>
+<img src="img/AppearanceAssetEditing_build_properties.png" alt="AppearanceAssetEditing build properties" width="314"/>
+</center></p>
+<p>I changed the setting from 'All' to 'None'.</p>
+<p>Now I can build that project as well, and finally the Revit 2019 SDK compilation is complete.</p>
+<p>186 projects succeeded, 0 failed and 0 were skipped.</p>
+<p>0 errors, but <a href="revit_2019_sdk_samples_errors_warnings_8.txt">16 warnings still remain</a>.</p>
+<p>I will ask the development team to clean this up asap to avoid forcing other Revit add-in developers to repeat these utterly unneccessary and frustrating steps.</p>

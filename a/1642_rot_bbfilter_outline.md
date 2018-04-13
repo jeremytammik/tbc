@@ -17,7 +17,7 @@
 
 This is pretty obvious, once you think about it, and apparently worth pointing out anyway:
 The outline defining a bounding box filter is always aligned with the cardinal axes
-&ndash; Rotating `Min` and `Max` distorts the box
+&ndash; Rotating <code>Min</code> and <code>Max</code> distorts the box
 &ndash; Rotate target elements or use a solid filter...
 
 --->
