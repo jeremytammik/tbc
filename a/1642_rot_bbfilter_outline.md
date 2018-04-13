@@ -13,7 +13,7 @@
 - you cannot rotate the outline; rotate the elements instead, or create a solid yourself
   https://forums.autodesk.com/t5/revit-api-forum/boundingbox-outline-and-boundingboxisinsidefilter/m-p/7921336
   
-#RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+Bounding box filter is always axis aligned #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/bbfilteraxisaligned
 
 This is pretty obvious, once you think about it, and apparently worth pointing out anyway:
 The outline defining a bounding box filter is always aligned with the cardinal axes
