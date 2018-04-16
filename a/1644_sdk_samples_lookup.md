@@ -52,7 +52,8 @@ from [lookupbuilds.com](https://lookupbuilds.com).
 
 Comparing the Revit SDK directory contents, I discovered the following new samples:
 
-- [AppearanceAssetEditing](http://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html) &ndash; added in Revit 2018.1.
+- [AppearanceAssetEditing](http://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html) &ndash; added
+in [Revit 2018.1](http://thebuildingcoder.typepad.com/blog/2017/08/revit-20181-and-the-visual-materials-api.html).
 - RebarFreeForm &ndash; external command to create a Rebar FreeForm element and external application to implement the custom server used to regenerate the rebar geometry based on constraints.
 - SampleCommandsSteelElements &ndash; sample commands for steel elements demonstrating creation, modification and deletion of them.
 
