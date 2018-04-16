@@ -10,7 +10,7 @@
 
 <!---
 
-New Revit 2019 SDK samples  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/rvt2019sdk
+RevitLookup 2019 and new Revit SDK samples for #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/lookup2019newsamples
 
 I migrated RevitLookup to Revit 2019, which was very easy.
 Next, I compared the directory contents to discover the new SDK samples
@@ -63,9 +63,6 @@ The SDK also sports a new undocumented structural analysis DLL:
 
 - Structural Analysis SDK/Examples/References/CodeChecking/Engineering/rcuapiNET.dll
 
-
 <center>
 <img src="img/steel_connection.png" alt="Steel connection" width="260"/>
 </center>
-
-
