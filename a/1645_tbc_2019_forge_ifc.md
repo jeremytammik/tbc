@@ -77,10 +77,10 @@ They all occur in the module `CmdGetMaterials.cs` and concern the use of the `As
 
 I will ignore them for the time being.
 
-The flat migrated version is [releases 2019.0.138.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.138.0).
+The flat migrated version is [release 2019.0.138.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.138.0).
 
-The [diff between 2019.0.138.0 and 2019.0.138.0](https://github.com/jeremytammik/the_building_coder_samples/compare/2018.0.138.4...2019.0.138.0) shows
-the minimal changes I made.
+The [diff between the last 2018 version, 2018.0.138.4, and 2019.0.138.0](https://github.com/jeremytammik/the_building_coder_samples/compare/2018.0.138.4...2019.0.138.0),
+shows the minimal changes I made.
 
 To add the final finishing touch, I also updated the readme file with new Revit and .NET framework version badges.
 
@@ -107,7 +107,7 @@ The current version is [2019.0.0.1](https://github.com/jeremytammik/AdnRevitApiL
 ####<a name="5"></a>Convert RVT to IFC via Forge
 
 Looking toward the future making use of web-based component technology,
-[Simon Moreau](https://github.com/simonmoreau) of [Bouygues Immobilier], author of the [BIM42 blog](http://bim42.com),
+[Simon Moreau](https://github.com/simonmoreau) of [Bouygues Immobilier](https://www.bouygues-immobilier.com), author of the [BIM42 blog](http://bim42.com),
 shared his nice new [RevitToIFC web app](https://github.com/simonmoreau/RevitToIFC).
 
 Revit To IFC is a web application using
@@ -151,12 +151,12 @@ You might also want to check out the recording on the topic from the Forge DevCo
 </center>
 
 ####<a name="8"></a>Open Position for an Infrastructure BIM Implementation Consultant in Northern Europe
+
+Let's end for today with something completely different:
  
 Would you be interested in a position as a *BIM Implementation Consultant for AEC Infrastructure* with a flexible location in Northern Europe?
 
 ####<a name="8.1"></a>Position Overview
-
-Let's end for today with something completely different:
 
 Autodesk Consulting implements Autodesk BIM solutions for our customers across the region. We are looking for a BIM Implementation Consultant for the infrastructure industry (Rail, Road, Airport, Utilities) to implement our solutions on customer sites.
 
