@@ -31,53 +31,15 @@ Let's discuss the Revit API enhancements added since the initial release of Revi
 --->
 
 <h3>What's New in the Revit 2019 API</h3>
+<h4><a name="2"></a>Installation and Migration From Previous Versions</h4>
 <ul>
-<li><a href="#2">Revit 2018.2 Product Update and Resolved API Issues</a></li>
-<li><a href="#3">Revit 2018.2 SDK Update</a></li>
-<li><a href="#4">What's New in Previous Versions</a></li>
-<li><a href="#5">Major Additions to the Revit 2018.1 API</a><ul>
-<li><a href="#5.1">Material API additions</a><ul>
-<li><a href="#5.1.1">Editing the properties of an Appearance Asset</a></li>
-<li><a href="#5.1.2">Editing AssetProperty values</a></li>
-<li><a href="#5.1.3">Connected Assets</a></li>
-<li><a href="#5.1.4">Validation</a></li>
-<li><a href="#5.1.5">Schemas &amp; Property Names</a></li>
-<li><a href="#5.1.6">Utilities</a></li>
+<li>The <a href="http://thebuildingcoder.typepad.com/blog/2018/04/compiling-the-revit-2019-sdk-samples.html">Revit 2019 SDK samples</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2018/04/revitlookup-2019-and-new-sdk-samples.html">RevitLookup</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2018/04/forge-rvt-to-ifc-adn-xtra-tbc-and-adnrme-updates.html#2">The Building Coder samples</a></li>
+<li>The <a href="http://thebuildingcoder.typepad.com/blog/2018/04/forge-rvt-to-ifc-adn-xtra-tbc-and-adnrme-updates.html#3">AdnRme MEP HVAC and electrical samples</a></li>
+<li>The <a href="http://thebuildingcoder.typepad.com/blog/2018/04/forge-rvt-to-ifc-adn-xtra-tbc-and-adnrme-updates.html#4">AdnRevitApiLabsXtra training labs</a></li>
+<li>The <a href="http://thebuildingcoder.typepad.com/blog/2018/04/rvtsamples-2019.html">RvtSamples add-in</a></li>
 </ul>
-</li>
-<li><a href="#5.2">Geometry API additions</a><ul>
-<li><a href="#5.2.1">Surface API additions</a></li>
-<li><a href="#5.2.2">Curve API additions</a></li>
-</ul>
-</li>
-<li><a href="#5.3">BrowserOrganization API additions</a></li>
-<li><a href="#5.4">IFC additions</a></li>
-<li><a href="#5.5">Rebar API additions</a><ul>
-<li><a href="#5.5.1">BarTypeDiameterOptions</a></li>
-<li><a href="#5.5.2">GetDistributionPath()</a></li>
-<li><a href="#5.5.3">RebarUpdateCurvesData</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#6">Major Additions to the Revit 2018.2 API</a><ul>
-<li><a href="#6.1">Fabrication API additions</a><ul>
-<li><a href="#6.1.1">FabricationNetworkChangeService</a></li>
-<li><a href="#6.1.2">FabricationNetworkChangeServiceResult</a></li>
-<li><a href="#6.1.3">FabricationPartSizeMap</a></li>
-</ul>
-</li>
-<li><a href="#6.2">Other API additions</a><ul>
-<li><a href="#6.2.1">RevitLinkType API addition</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h4><a name="2"></a>Migration Efforts So Far</h4>
-<p><center>
-<img src="img/.png" alt="" width="100"/>
-</center></p>
 <h4><a name="3"></a>What's New in Previous Versions</h4>
 <p>Here are links to discussions of <em>What's New in the Revit API</em> for previous versions:</p>
 <ul>
@@ -94,8 +56,10 @@ Let's discuss the Revit API enhancements added since the initial release of Revi
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/08/revit-20181-and-the-visual-materials-api.html">Revit 2018.1 and the Visual Materials API</a></li>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/09/revit-201811-fixes-cropbox-setting.html">Revit 2018.1.1 and 2018.1 API Docs Online</a></li>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html">Revit 2018.1 Visual Materials API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/12/whats-new-in-the-revit-20182-api.html">What's New in the Revit 2018.2 API</a></li>
 </ul>
-<h4><a name="4"></a>Table of Contents</h4>
+<h4><a name="4"></a>What's New in the Revit 2019 API &ndash; ToC</h4>
+<p>Table of Contents:</p>
 <ul class="toc">
 <li>1.  <a href="#4.1">API changes</a></li>
 <ul class="toc">
@@ -125,7 +89,7 @@ Let's discuss the Revit API enhancements added since the initial release of Revi
 <li>1.8.3.  <a href="#4.1.8.3">Support for double patterns for FilledRegion</a></li>
 </ul>
 <li>1.9.    <a href="#4.1.9">Document.Title consistency</a></li>
-<li>1.10.   <a href="#4.1.10">View printing & exporting - activation events behavioral change</a></li>
+<li>1.10.   <a href="#4.1.10">View printing & exporting &ndash; activation events behavioral change</a></li>
 <li>1.11.   <a href="#4.1.11">Structural API change</a></li>
 <li>1.12.   <a href="#4.1.12">Rebar API changes</a></li>
 <li>1.13.   <a href="#4.1.13">MEP API changes</a></li>
@@ -164,8 +128,8 @@ Let's discuss the Revit API enhancements added since the initial release of Revi
 </ul>
 <li>2.8.    <a href="#4.2.8">Steel Fabrication API additions</a></li>
 <ul class="toc">
-<li>2.8.1.  <a href="#4.2.8.1">SteelElementProperties - linking between Revit elements and steel fabrication elements</a></li>
-<li>2.8.2.  <a href="#4.2.8.2">Custom steel connections - API additions</a></li>
+<li>2.8.1.  <a href="#4.2.8.1">SteelElementProperties &ndash; linking between Revit elements and steel fabrication elements</a></li>
+<li>2.8.2.  <a href="#4.2.8.2">Custom steel connections &ndash; API additions</a></li>
 </ul>
 <li>2.9.    <a href="#4.2.9">MEP API additions</a></li>
 <ul class="toc">
@@ -201,50 +165,51 @@ Let's discuss the Revit API enhancements added since the initial release of Revi
 </div>
 </center></p>
 <p><p/></p>
-<h4><a name="4.1.1"></a>.NET 4.7</h4>
+<h4><a name="4.1.1"></a>1.1. .NET 4.7</h4>
 <p>Revit's API assemblies are built using .NET 4.7. At a minimum, add-ons will need to target .NET 4.7 for Revit 2019.</p>
-<p><p/></p>
-<h4><a name="4.1.2"></a> View Filters support OR operators and nesting</h4>
-<h4><a name="4.1.2.1"></a>ParameterFilterElement API changes</h4>
+<h4><a name="4.1.2"></a>1.2.  View Filters support OR operators and nesting</h4>
+<h4><a name="4.1.2.1"></a>1.2.1. ParameterFilterElement API changes</h4>
 <p>View filters now support multiple nested levels of combinations of criteria joined with either "AND" or "OR". In the API, an ElementFilter hierarchy is replacing the use of lists of FilterRules previously obtained from ParameterFilterElement. Several methods are deprecated and replaced. Note that the deprecated methods will still function as before when accessing the criteria contained within a filter joined by a single AND, but cannot function as expected when accessing more complicated sets of criteria. The new method:</p>
 <ul>
 <li>ParameterFilterElement.UsesConjunctionOfFilterRules()</li>
 </ul>
-<p>can be used to check if a ParameterFilterElement uses a conjunction of filter rules (without any logical OR operations), as was always the case before Revit release 2019. This function is also deprecated, as are all functions related to the use of FilterRules in ParameterFilterElement.
-Deprecated function Replacement function    Notes
-ParameterFilterElement.Create(Document, String, ICollection<ElementId>, IList<FilterRule>)  ParameterFilterElement.Create(Document, String, ICollection<ElementId>, ElementFilter)  The ElementFilter input now specifies the filtering rules. This allows combinations of filter rules using logical AND and OR operations. The ElementFilter must be either an ElementParameterFilter or an ElementLogicalFilter containing only ElementParameterFilters and other ElementLogicalFilters.
-ParameterFilterElement.GetRules()   ParameterFilterElement.GetElementFilter()   The new function returns an ElementFilter representing the combination of filter rules used by the ParameterFilterElement. Note that logical combinations using both AND and OR operations are possible. GetRules() is applicable only to filters with rules conjoined with a single AND operation.
-ParameterFilterElement.SetRules()   ParameterFilterElement.SetElementFilter()   The new function sets the ParameterFilterElement to contain an ElementFilter representing the combination of filter rules.
-ParameterFilterElement.AllRuleParametersApplicable (IList<FilterRule>)  ParameterFilterElement.AllRuleParametersApplicable (ElementFilter)  The new function checks that the parameters of the rules used by the given ElementFilter are valid for this filter's categories.
-ParameterFilterElement.AllRuleParametersApplicable (Document, ICollection<ElementId>, IList<FilterRule>)    ParameterFilterElement.AllRuleParametersApplicable (Document, ICollection<ElementId>, ElementFilter)    The new function checks that the parameters of the given ElementFilter (representing a combination of rules) are valid for the given set of categories
-ParameterFilterElement.GetRuleParameter(FilterRule) FilterRule.GetRuleParameter() <br />
-ParameterFilterElement.GetRuleParameters()  ParameterFilterElement.GetElementFilterParameters() </p>
+<p>can be used to check if a ParameterFilterElement uses a conjunction of filter rules (without any logical OR operations), as was always the case before Revit release 2019. This function is also deprecated, as are all functions related to the use of FilterRules in ParameterFilterElement.</p>
+<ul>
+<li>Deprecated function &rarr; Replacement function &ndash; Notes</li>
+<li>ParameterFilterElement.Create(Document, String, ICollection&lt;ElementId&gt;, IList&lt;FilterRule&gt;) &rarr; ParameterFilterElement.Create(Document, String, ICollection&lt;ElementId&gt;, ElementFilter) &ndash; The ElementFilter input now specifies the filtering rules. This allows combinations of filter rules using logical AND and OR operations. The ElementFilter must be either an ElementParameterFilter or an ElementLogicalFilter containing only ElementParameterFilters and other ElementLogicalFilters.</li>
+<li>ParameterFilterElement.GetRules() &rarr; ParameterFilterElement.GetElementFilter() &ndash; The new function returns an ElementFilter representing the combination of filter rules used by the ParameterFilterElement. Note that logical combinations using both AND and OR operations are possible. GetRules() is applicable only to filters with rules conjoined with a single AND operation.</li>
+<li>ParameterFilterElement.SetRules() &rarr; ParameterFilterElement.SetElementFilter() &ndash; The new function sets the ParameterFilterElement to contain an ElementFilter representing the combination of filter rules.</li>
+<li>ParameterFilterElement.AllRuleParametersApplicable (IList&lt;FilterRule&gt;) &rarr; ParameterFilterElement.AllRuleParametersApplicable (ElementFilter) &ndash; The new function checks that the parameters of the rules used by the given ElementFilter are valid for this filter's categories.</li>
+<li>ParameterFilterElement.AllRuleParametersApplicable (Document, ICollection&lt;ElementId&gt;, IList&lt;FilterRule&gt;) &rarr; ParameterFilterElement.AllRuleParametersApplicable (Document, ICollection&lt;ElementId&gt;, ElementFilter) &ndash; The new function checks that the parameters of the given ElementFilter (representing a combination of rules) are valid for the given set of categories</li>
+<li>ParameterFilterElement.GetRuleParameter(FilterRule) &rarr; FilterRule.GetRuleParameter() &ndash; </li>
+<li>ParameterFilterElement.GetRuleParameters() &rarr; ParameterFilterElement.GetElementFilterParameters() &ndash;</li>
+</ul>
 <p>The new function:</p>
 <ul>
 <li>ParameterFilterElement.ElementFilterIsAcceptableForParameterFilterElement()</li>
 </ul>
 <p>can be used to check if an ElementFilter is suitable to be used for a view filter (it consists only of logical filters joining ElementParameterFilters in combination).</p>
-<h4><a name="4.1.2.2"></a>ElementLogicalFilter API addition</h4>
+<h4><a name="4.1.2.2"></a>1.2.2. ElementLogicalFilter API addition</h4>
 <p>The new function:</p>
 <ul>
 <li>ElementLogicalFilter.GetFilters()</li>
 </ul>
 <p>returns the set of ElementFilters that are combined by the given ElementLogicalFilter. This is useful to read the contents of an ElementFilter obtained from a ParameterFilterElement.</p>
-<h4><a name="4.1.3"></a>View.ViewName deprecated</h4>
+<h4><a name="4.1.3"></a>1.3. View.ViewName deprecated</h4>
 <p>The property</p>
 <ul>
 <li>DB.View.ViewName</li>
 </ul>
-<p>has been deprecated. It was a duplication of Element.Name and this property should be used in its place. </p>
-<h4><a name="4.1.4"></a>UI API changes</h4>
-<h4><a name="4.1.4.1"></a>Main window handle access</h4>
+<p>has been deprecated. It was a duplication of Element.Name and this property should be used in its place.</p>
+<h4><a name="4.1.4"></a>1.4. UI API changes</h4>
+<h4><a name="4.1.4.1"></a>1.4.1. Main window handle access</h4>
 <p>Two new properties allow access to the handle of the Revit main window:</p>
 <ul>
 <li>Autodesk.Revit.UI.UIApplication.MainWindowHandle</li>
 <li>Autodesk.Revit.UI.UIControlledApplication.MainWindowHandle</li>
 </ul>
 <p>This handle should be used when displaying modal dialogs and message windows to insure that they are properly parented. Use these properties instead of System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle, which is no longer a reliable method for retrieving the main window handle starting with Revit 2019.</p>
-<h4><a name="4.1.4.2"></a>Changes to PostableCommand enumeration</h4>
+<h4><a name="4.1.4.2"></a>1.4.2. Changes to PostableCommand enumeration</h4>
 <p>Some commands were renamed or removed as a result of changes to Revit's windowing system:</p>
 <ul>
 <li>PostableCommand.ReplicateWindow &rarr; N/A &ndash; This command is no longer available</li>
@@ -252,908 +217,616 @@ ParameterFilterElement.GetRuleParameters()  ParameterFilterElement.GetElementFil
 <li>PostableCommand.TileWindows &rarr; PostableCommand.TileViews</li>
 <li>PostableCommand.CloseHiddenWindows &rarr; PostableCommand.CloseInactiveViews</li>
 </ul>
-<h4><a name="4.1.5"></a>Existing APIs now support open from cloud paths (Collaboration for Revit)&lt;</h4>
-<h4><a name="4.1.5.1"></a>Document Open APIs support cloud paths</h4>
+<h4><a name="4.1.5"></a>1.5. Existing APIs now support open from cloud paths (Collaboration for Revit)&lt;</h4>
+<h4><a name="4.1.5.1"></a>1.5.1. Document Open APIs support cloud paths</h4>
 <p>The existing methods:</p>
 <ul>
-<li>
-<p>Application.OpenDocumentFile(ModelPath modelPath, OpenOptions openOptions)</p>
-</li>
-<li>
-<p>UIApplication.OpenAndActivateDocument(ModelPath modelPath, OpenOptions openOptions, bool detachAndPrompt)
-and the new methods:</p>
-</li>
-<li>
-<p>Application.OpenDocumentFile(ModelPath modelPath,OpenOptions openOptions, IOpenFromCloudCallback openFromCloudCallback)</p>
-</li>
-<li>
-<p>UIApplication.OpenAndActivateDocument(ModelPath modelPath, OpenOptions openOptions, bool detachAndPrompt, IOpenFromCloudCallback openFromCloudCallback)
-now offer the ability to open a C4R model from its location on the cloud. Obtain a relevant ModelPath representing the document from:</p>
-</li>
-<li>
-<p>ModelPathUtils.ConvertCloudGUIDsToCloudPath(Guid, Guid)
-by inputting the the project Guid and model Guid (which could be obtained from various Forge APIs).</p>
-</li>
+<li>Application.OpenDocumentFile(ModelPath modelPath, OpenOptions openOptions)</li>
+<li>UIApplication.OpenAndActivateDocument(ModelPath modelPath, OpenOptions openOptions, bool detachAndPrompt)</li>
 </ul>
-<h4><a name="4.1.5.2"></a>Callback for conflict cases when opening from a cloud path</h4>
+<p>and the new methods:</p>
+<ul>
+<li>Application.OpenDocumentFile(ModelPath modelPath,OpenOptions openOptions, IOpenFromCloudCallback openFromCloudCallback)</li>
+<li>UIApplication.OpenAndActivateDocument(ModelPath modelPath, OpenOptions openOptions, bool detachAndPrompt, IOpenFromCloudCallback openFromCloudCallback)</li>
+</ul>
+<p>now offer the ability to open a C4R model from its location on the cloud. Obtain a relevant ModelPath representing the document from:</p>
+<ul>
+<li>ModelPathUtils.ConvertCloudGUIDsToCloudPath(Guid, Guid)</li>
+</ul>
+<p>by inputting the the project Guid and model Guid (which could be obtained from various Forge APIs).</p>
+<h4><a name="4.1.5.2"></a>1.5.2. Callback for conflict cases when opening from a cloud path</h4>
 <p>The callback method:</p>
 <ul>
-<li>
-<p>Autodesk.Revit.DB.IOpenFromCloudCallback.OnOpenConflict()
-can be passed to the document open methods to gain to handle conflict cases. The method is passed an OpenConflictScenario value identifying the reason for the conflict ( Rollback, Relinquished or OutOfDate) and should return an OpenConflictResult with the desired response (keep local changes, discard local changes and open the latest version or cancel).
-The new class:</p>
-</li>
-<li>
-<p>DefaultOpenFromCloudCallback
-provides a default way to handle conflicts: it always discards the local change and gets the latest version from the cloud.</p>
-</li>
+<li>Autodesk.Revit.DB.IOpenFromCloudCallback.OnOpenConflict()</li>
 </ul>
-<h4><a name="4.1.6"></a>BasicFileInfo changes</h4>
+<p>can be passed to the document open methods to gain to handle conflict cases. The method is passed an OpenConflictScenario value identifying the reason for the conflict ( Rollback, Relinquished or OutOfDate) and should return an OpenConflictResult with the desired response (keep local changes, discard local changes and open the latest version or cancel).</p>
+<p>The new class:</p>
+<ul>
+<li>DefaultOpenFromCloudCallback</li>
+</ul>
+<p>provides a default way to handle conflicts: it always discards the local change and gets the latest version from the cloud.</p>
+<h4><a name="4.1.6"></a>1.6. BasicFileInfo changes</h4>
 <p>The structure of BasicFileInfo storage has been changed. As a result, calling:</p>
 <ul>
-<li>BasicFileInfo.Extract() 
-from a version of Revit prior to Revit 2019 will result in an exception if it is called on a Revit 2019 or later file. The class and method documentation has been clarified to reflect this posssibility that may occur again in the future.
-The following BasicFileInfo property was deprecated and replaced:
-Deprecated property Replacement/new property    Notes
-SavedInVersion  Format  The new property contains only the file format indicator (the major release version such as "2019") used for saving the file. No build information or product information is included in this string, making it easier to use for comparisons or messaging.
-Calling BasicFileInfo.Extract() from Revit 2019 on any Revit file version should work as expected. Both SavedInVersion and Format should be populated for old and new files. </li>
+<li>BasicFileInfo.Extract() </li>
 </ul>
-<h4><a name="4.1.7"></a>Asset-related API members deprecated</h4>
-<p>As a part of the introduction of new Appearance Asset editing API's, some members were deprecated and replaced:
-Deprecated member   Replacement method
-Autodesk.Revit.DB.Visual.AssetProperties[String]    Autodesk.Revit.DB.Visual.AssetProperties.FindByName(String)
-Autodesk.Revit.DB.Visual.AssetProperties[int]   Autodesk.Revit.DB.Visual.AssetProperties.Get(int)
-Autodesk.Revit.DB.Visual.Asset.GetConnectedProperty(String) Autodesk.Revit.DB.Visual.Asset.GetSingleConnectedAsset()
-Autodesk.Revit.DB.Visual.Asset.GetConnectedPropertiesNames()    Autodesk.Revit.DB.Visual.Asset.GetSingleConnectedAsset()</p>
-<h4><a name="4.1.8"></a>Double Pattern Support</h4>
-<h4><a name="4.1.8.1"></a>Material API support for double patterns</h4>
-<p>With the introduction of double patterns in materials Revit now distinguishes between a background and a foreground pattern. The existing properties for the patterns and colors of the surface and cut faces have been deprecated. New properties have been introduced for the background and foreground patterns and colors for both surface and cut faces. (The deprecated properties will return the same values as the new foreground versions.)
-Deprecated property Replacement/new properties
-Material.SurfacePatternColor    Material.SurfaceForegroundPatternColor
-Material.SurfaceBackgroundPatternColor
-Material.SurfacePatternId   Material.SurfaceForegroundPatternId
-Material.SurfaceBackgroundPatternId
-Material.CutPatternColor    Material.CutForegroundPatternColor
-Material.CutBackgroundPatternColor
-Material.CutPatternId   Material.CutForegroundPatternId
-Material.CutBackgroundPatternId</p>
-<h4><a name="4.1.8.2"></a>Support for overriding double patterns</h4>
-<p>Several methods and properties in the OverrideGraphicSettings class have been replaced with versions specific to the foreground or background pattern:
-Deprecated method/property  Replacement/new property/method
-OverrideGraphicSettings.SetProjectionFillColor  OverrideGraphicSettings.SetSurfaceForegroundPatternColor
-OverrideGraphicSettings.SetSurfaceBackgroundPatternColor
-OverrideGraphicSettings.ProjectionFillColor OverrideGraphicSettings.SurfaceForegroundPatternColor
-OverrideGraphicSettings.SurfaceBackgroundPatternColor
-OverrideGraphicSettings.SetProjectionFillPatternId  OverrideGraphicSettings.SetSurfaceForegroundPatternId
-OverrideGraphicSettings.SetSurfaceBackgroundPatternId
-OverrideGraphicSettings.ProjectionFillPatternId OverrideGraphicSettings.SurfaceForegroundPatternId
-OverrideGraphicSettings.SurfaceBackgroundPatternId
-OverrideGraphicSettings.SetProjectionFillPatternVisible OverrideGraphicSettings.SetSurfaceForegroundPatternVisible
-OverrideGraphicSettings.SetSurfaceBackgroundPatternVisible
-OverrideGraphicSettings.IsProjectionFillPatternVisible  OverrideGraphicSettings.IsSurfaceForegroundPatternVisible
-OverrideGraphicSettings.IsSurfaceBackgroundPatternVisible
-OverrideGraphicSettings.SetCutFillColor OverrideGraphicSettings.SetCutForegroundPatternColor
-OverrideGraphicSettings.SetCutBackgroundPatternColor
-OverrideGraphicSettings.CutFillColor    OverrideGraphicSettings.CutForegroundPatternColor
-OverrideGraphicSettings.CutBackgroundPatternColor
-OverrideGraphicSettings.SetCutFillPatternId OverrideGraphicSettings.SetCutForegroundPatternId
-OverrideGraphicSettings.SetCutBackgroundPatternId
-OverrideGraphicSettings.CutFillPatternId    OverrideGraphicSettings.CutForegroundPatternId
-OverrideGraphicSettings.CutBackgroundPatternId
-OverrideGraphicSettings.SetCutFillPatternVisible    OverrideGraphicSettings.SetCutForegroundPatternVisible
-OverrideGraphicSettings.SetCutBackgroundPatternVisible
-OverrideGraphicSettings.IsCutFillPatternVisible OverrideGraphicSettings.IsCutForegroundPatternVisible
-OverrideGraphicSettings.IsCutBackgroundPatternVisible</p>
-<h4><a name="4.1.8.3"></a>Support for double patterns for FilledRegion</h4>
-<p>Three properties in the FilledRegionType class have been deprecated and replaced to support double patterns: 
-Deprecated property Replacement/new properties
-FilledRegionType.Background FilledRegionType.IsMasking
-FilledRegionType.Color  FilledRegionType.ForegroundPatternColor
-FilledRegionType.BackgroundPatternColor</p>
-<p>FilledRegionType.FillPatternId  FilledRegionType.ForegroundPatternId
-FilledRegionType.BackgroundPatternId</p>
-<h4><a name="4.1.9"></a>Document.Title consistency</h4>
+<p>from a version of Revit prior to Revit 2019 will result in an exception if it is called on a Revit 2019 or later file. The class and method documentation has been clarified to reflect this posssibility that may occur again in the future.</p>
+<p>The following BasicFileInfo property was deprecated and replaced:</p>
+<ul>
+<li>SavedInVersion &rarr; Format &ndash; The new property contains only the file format indicator (the major release version such as "2019") used for saving the file. No build information or product information is included in this string, making it easier to use for comparisons or messaging.</li>
+</ul>
+<p>Calling BasicFileInfo.Extract() from Revit 2019 on any Revit file version should work as expected. Both SavedInVersion and Format should be populated for old and new files.</p>
+<h4><a name="4.1.7"></a>1.7. Asset-related API members deprecated</h4>
+<p>As a part of the introduction of new Appearance Asset editing API's, some members were deprecated and replaced:</p>
+<ul>
+<li>Autodesk.Revit.DB.Visual.AssetProperties[String] &rarr; Autodesk.Revit.DB.Visual.AssetProperties.FindByName(String)</li>
+<li>Autodesk.Revit.DB.Visual.AssetProperties[int] &rarr; Autodesk.Revit.DB.Visual.AssetProperties.Get(int)</li>
+<li>Autodesk.Revit.DB.Visual.Asset.GetConnectedProperty(String) &rarr; Autodesk.Revit.DB.Visual.Asset.GetSingleConnectedAsset()</li>
+<li>Autodesk.Revit.DB.Visual.Asset.GetConnectedPropertiesNames() &rarr; Autodesk.Revit.DB.Visual.Asset.GetSingleConnectedAsset()</li>
+</ul>
+<h4><a name="4.1.8"></a>1.8. Double Pattern Support</h4>
+<h4><a name="4.1.8.1"></a>1.8.1. Material API support for double patterns</h4>
+<p>With the introduction of double patterns in materials Revit now distinguishes between a background and a foreground pattern. The existing properties for the patterns and colors of the surface and cut faces have been deprecated. New properties have been introduced for the background and foreground patterns and colors for both surface and cut faces. (The deprecated properties will return the same values as the new foreground versions.)</p>
+<ul>
+<li>Deprecated property &rarr; Replacement/new properties</li>
+<li>Material.SurfacePatternColor &rarr; Material.SurfaceForegroundPatternColor, Material.SurfaceBackgroundPatternColor</li>
+<li>Material.SurfacePatternId  &rarr; Material.SurfaceForegroundPatternId, Material.SurfaceBackgroundPatternId</li>
+<li>Material.CutPatternColor  &rarr; Material.CutForegroundPatternColor, Material.CutBackgroundPatternColor</li>
+<li>Material.CutPatternId  &rarr; Material.CutForegroundPatternId, Material.CutBackgroundPatternId</li>
+</ul>
+<h4><a name="4.1.8.2"></a>1.8.2. Support for overriding double patterns</h4>
+<p>Several methods and properties in the OverrideGraphicSettings class have been replaced with versions specific to the foreground or background pattern:</p>
+<ul>
+<li>Deprecated method/property &rarr; Replacement/new property/method</li>
+<li>OverrideGraphicSettings.SetProjectionFillColor &rarr; OverrideGraphicSettings.SetSurfaceForegroundPatternColor, OverrideGraphicSettings.SetSurfaceBackgroundPatternColor</li>
+<li>OverrideGraphicSettings.ProjectionFillColor &rarr; OverrideGraphicSettings.SurfaceForegroundPatternColor, OverrideGraphicSettings.SurfaceBackgroundPatternColor</li>
+<li>OverrideGraphicSettings.SetProjectionFillPatternId &rarr; OverrideGraphicSettings.SetSurfaceForegroundPatternId, OverrideGraphicSettings.SetSurfaceBackgroundPatternId</li>
+<li>OverrideGraphicSettings.ProjectionFillPatternId &rarr; OverrideGraphicSettings.SurfaceForegroundPatternId, OverrideGraphicSettings.SurfaceBackgroundPatternId</li>
+<li>OverrideGraphicSettings.SetProjectionFillPatternVisible &rarr; OverrideGraphicSettings.SetSurfaceForegroundPatternVisible, OverrideGraphicSettings.SetSurfaceBackgroundPatternVisible</li>
+<li>OverrideGraphicSettings.IsProjectionFillPatternVisible &rarr; OverrideGraphicSettings.IsSurfaceForegroundPatternVisible, OverrideGraphicSettings.IsSurfaceBackgroundPatternVisible</li>
+<li>OverrideGraphicSettings.SetCutFillColor &rarr; OverrideGraphicSettings.SetCutForegroundPatternColor, OverrideGraphicSettings.SetCutBackgroundPatternColor</li>
+<li>OverrideGraphicSettings.CutFillColor &rarr; OverrideGraphicSettings.CutForegroundPatternColor, OverrideGraphicSettings.CutBackgroundPatternColor</li>
+<li>OverrideGraphicSettings.SetCutFillPatternId &rarr; OverrideGraphicSettings.SetCutForegroundPatternId, OverrideGraphicSettings.SetCutBackgroundPatternId</li>
+<li>OverrideGraphicSettings.CutFillPatternId &rarr; OverrideGraphicSettings.CutForegroundPatternId, OverrideGraphicSettings.CutBackgroundPatternId</li>
+<li>OverrideGraphicSettings.SetCutFillPatternVisible &rarr; OverrideGraphicSettings.SetCutForegroundPatternVisible, OverrideGraphicSettings.SetCutBackgroundPatternVisible</li>
+<li>OverrideGraphicSettings.IsCutFillPatternVisible &rarr; OverrideGraphicSettings.IsCutForegroundPatternVisible, OverrideGraphicSettings.IsCutBackgroundPatternVisible</li>
+</ul>
+<h4><a name="4.1.8.3"></a>1.8.3. Support for double patterns for FilledRegion</h4>
+<p>Three properties in the FilledRegionType class have been deprecated and replaced to support double patterns:</p>
+<ul>
+<li>Deprecated property &rarr; Replacement/new properties</li>
+<li>FilledRegionType.Background &rarr; FilledRegionType.IsMasking</li>
+<li>FilledRegionType.Color &rarr; FilledRegionType.ForegroundPatternColor, FilledRegionType.BackgroundPatternColor</li>
+<li>FilledRegionType.FillPatternId &rarr; FilledRegionType.ForegroundPatternId, FilledRegionType.BackgroundPatternId</li>
+</ul>
+<h4><a name="4.1.9"></a>1.9. Document.Title consistency</h4>
 <p>In prior releases, the property:</p>
 <ul>
-<li>Document.Title
-honored the Windows user setting requiring dlsplay of file extensions. The property has been changed to consistently return a title with no extension.</li>
+<li>Document.Title</li>
 </ul>
-<h4><a name="4.1.10"></a>View printing &amp; exporting - activation events behavioral change</h4>
-<p>Because of an improvement to Revit processing, views will no longer be activated prior to being printed or exported. This means that the ViewActivating and ViewActivated events are no longer triggered as each view is printed or exported from a set. </p>
-<h4><a name="4.1.11"></a>Structural API change</h4>
-<p>The following method has been deprecated:
-Deprecated property Replacement
-StructuralConnectionHandler.SetDefaultPrimaryElement()  StructuralConnectionHandler.SetDefaultElementOrder()</p>
-<h4><a name="4.1.12"></a>Rebar API changes</h4>
+<p>honored the Windows user setting requiring dlsplay of file extensions. The property has been changed to consistently return a title with no extension.</p>
+<h4><a name="4.1.10"></a>1.10. View printing &amp; exporting &ndash; activation events behavioral change</h4>
+<p>Because of an improvement to Revit processing, views will no longer be activated prior to being printed or exported. This means that the ViewActivating and ViewActivated events are no longer triggered as each view is printed or exported from a set.</p>
+<h4><a name="4.1.11"></a>1.11. Structural API change</h4>
+<p>The following method has been deprecated:</p>
+<ul>
+<li>Deprecated property &rarr; Replacement</li>
+<li>StructuralConnectionHandler.SetDefaultPrimaryElement() &rarr; StructuralConnectionHandler.SetDefaultElementOrder()</li>
+</ul>
+<h4><a name="4.1.12"></a>1.12. Rebar API changes</h4>
 <p>The method:</p>
 <ul>
-<li>Autodesk.Revit.DB.Structure.Rebar.GetShapeId()
-now throws an exception if the rebar is a free-form which has multiple shapes (ie. its WorkshopInstructions type is Bent.)</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.GetShapeId()</li>
 </ul>
-<h4><a name="4.1.13"></a>MEP API changes</h4>
-<p>The following members have been deprecated:
-Deprecated property Replacement Notes
-MEPAnalyticalConnectionType.GetAllTypes()   none    Use FilteredElementCollector to find elements that match this class.
-Duct.IsLevelId()    none    Use GetElement() to check the element type
-FlexDuct.IsLevelId()    none    Use GetElement() to check the element type
-Pipe.IsLevelId()    none    Use GetElement() to check the element type
-FlexPipe.IsLevelId()    none    Use GetElement() to check the element type</p>
-<h4><a name="4.1.14"></a>ProjectLocation changes</h4>
-<p>The original version of ProjectLocation.IsProjectLocationNameUnique checked for name uniqueness across the entire document. The replacement version only enforces uniqueness among the ProjectLocations belonging to a given SiteLocation. 
-Deprecated function Replacement function
-ProjectLocation.IsProjectLocationNameUnique(Document doc, String name)  ProjectLocation.IsProjectLocationNameUnique(Document doc, String name, ElementId siteLocationId)</p>
-<h4><a name="4.1.15"></a>Building Site export removed</h4>
+<p>now throws an exception if the rebar is a free-form which has multiple shapes (i.e., its WorkshopInstructions type is Bent.)</p>
+<h4><a name="4.1.13"></a>1.13. MEP API changes</h4>
+<p>The following members have been deprecated:</p>
+<ul>
+<li>Deprecated property &rarr; Replacement &ndash; Notes</li>
+<li>MEPAnalyticalConnectionType.GetAllTypes() &rarr; none &ndash; Use FilteredElementCollector to find elements that match this class.</li>
+<li>Duct.IsLevelId() &rarr; none &ndash; Use GetElement() to check the element type</li>
+<li>FlexDuct.IsLevelId() &rarr; none &ndash; Use GetElement() to check the element type</li>
+<li>Pipe.IsLevelId() &rarr; none &ndash; Use GetElement() to check the element type</li>
+<li>FlexPipe.IsLevelId() &rarr; none &ndash; Use GetElement() to check the element type</li>
+</ul>
+<h4><a name="4.1.14"></a>1.14. ProjectLocation changes</h4>
+<p>The original version of ProjectLocation.IsProjectLocationNameUnique checked for name uniqueness across the entire document. The replacement version only enforces uniqueness among the ProjectLocations belonging to a given SiteLocation.</p>
+<ul>
+<li>Deprecated function &rarr; Replacement function</li>
+<li>ProjectLocation.IsProjectLocationNameUnique(Document doc, String name) &rarr; ProjectLocation.IsProjectLocationNameUnique(Document doc, String name, ElementId siteLocationId)</li>
+</ul>
+<h4><a name="4.1.15"></a>1.15. Building Site export removed</h4>
 <p>The following method and class were removed:</p>
 <ul>
-<li>
-<p>BuildingSiteExportOptions</p>
-</li>
-<li>
-<p>Document.Export(String,String,View3D, ViewPlan, BuildingSiteExportOptions) 
-corresponding to the removal of this capability from Revit itself.</p>
-</li>
+<li>BuildingSiteExportOptions</li>
+<li>Document.Export(String,String,View3D, ViewPlan, BuildingSiteExportOptions)</li>
 </ul>
-<h4><a name="4.1.16"></a>Obsolete API removal</h4>
-<p>The following API members and classes which had previously been marked Obsolete have been removed in this release. Consult the API documentation from prior releases for information on the replacements to use:
-Classes
-Methods</p>
+<p>corresponding to the removal of this capability from Revit itself.</p>
+<h4><a name="4.1.16"></a>1.16. Obsolete API removal</h4>
+<p>The following API members and classes which had previously been marked Obsolete have been removed in this release. Consult the API documentation from prior releases for information on the replacements to use:</p>
+<h4><a name="4.1.16.1"></a>Classes</h4>
+<h4><a name="4.1.16.2"></a>Methods</h4>
 <ul>
-<li>
-<p>Autodesk.Revit.Creation.Document.NewElectricalSystem(Autodesk.Revit.DB.Connector, Autodesk.Revit.DB.Electrical.ElectricalSystemType)</p>
-</li>
-<li>
-<p>Autodesk.Revit.Creation.Document.NewElectricalSystem(System.Collections.Generic.ICollection<Autodesk.Revit.DB.ElementId>, Autodesk.Revit.DB.Electrical.ElectricalSystemType)</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.ComputeDrivingCurves()</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.GetBarPositionTransform()</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.GetDistributionPath()</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.ScaleToBox()</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.ScaleToBoxFor3D()</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.SetLayoutAsFixedNumber()</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.SetLayoutAsMaximumSpacing()</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.SetLayoutAsMinimumClearSpacing()</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.SetLayoutAsNumberWithSpacing()</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.SetLayoutAsSingle()</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Plumbing.PipeSettings.GetPressLossCalculationServerInfo()</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Plumbing.PipeSettings.SetPressLossCalculationServerInfo()</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.ExternalResourceBrowserData.IsValidResouceName()
-Properties</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.ArrayLength</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.BarsOnNormalSide</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.BaseFinishingTurns</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.Height</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.MultiplanarDepth</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.Normal</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.Pitch</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.RebarShapeId</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.TopFinishingTurns</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.ProjectLocation.ProjectPosition</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.ProjectLocation.SitePosition</p>
-</li>
+<li>Autodesk.Revit.Creation.Document.NewElectricalSystem(Autodesk.Revit.DB.Connector, Autodesk.Revit.DB.Electrical.ElectricalSystemType)</li>
+<li>Autodesk.Revit.Creation.Document.NewElectricalSystem(System.Collections.Generic.ICollection&lt;Autodesk.Revit.DB.ElementId&gt;, Autodesk.Revit.DB.Electrical.ElectricalSystemType)</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.ComputeDrivingCurves()</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.GetBarPositionTransform()</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.GetDistributionPath()</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.ScaleToBox()</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.ScaleToBoxFor3D()</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.SetLayoutAsFixedNumber()</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.SetLayoutAsMaximumSpacing()</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.SetLayoutAsMinimumClearSpacing()</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.SetLayoutAsNumberWithSpacing()</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.SetLayoutAsSingle()</li>
+<li>Autodesk.Revit.DB.Plumbing.PipeSettings.GetPressLossCalculationServerInfo()</li>
+<li>Autodesk.Revit.DB.Plumbing.PipeSettings.SetPressLossCalculationServerInfo()</li>
+<li>Autodesk.Revit.DB.ExternalResourceBrowserData.IsValidResouceName()</li>
+</ul>
+<h4><a name="4.1.16.3"></a>Properties</h4>
+<ul>
+<li>Autodesk.Revit.DB.Structure.Rebar.ArrayLength</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.BarsOnNormalSide</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.BaseFinishingTurns</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.Height</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.MultiplanarDepth</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.Normal</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.Pitch</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.RebarShapeId</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.TopFinishingTurns</li>
+<li>Autodesk.Revit.DB.ProjectLocation.ProjectPosition</li>
+<li>Autodesk.Revit.DB.ProjectLocation.SitePosition</li>
 </ul>
 <p><center>
 <div style="border-style:solid; border-width:2px 0px 2px 0px">
 <a name="4.2"></a><h3 style="font-weight: bold">API Additions</h3>
 </div>
 </center></p>
-<h3><a name="6.1"></a></h3>
-<h4><a name="6.1.1"></a></h4>
-<h4><a name="4.2"></a>API additions</h4>
-<h4><a name="4.2.1"></a>Material API additions</h4>
-<h4><a name="4.2.1.1"></a>Editing the properties of an Appearance Asset</h4>
+<h4><a name="4.2.1"></a>2.1. Material API additions</h4>
+<h4><a name="4.2.1.1"></a>2.1.1. Editing the properties of an Appearance Asset</h4>
 <p>New Revit API capabilties have been introduced to edit the properties contained in an appearance asset of a material. These properties appear in the Appearance tab of the Materials dialog and govern the appearance of the material in realistic views and rendering.
 Editing the properties in an appearance Asset requires establishment of an edit scope. The new class</p>
 <ul>
-<li>
-<p>Autodesk.Revit.DB.Visual.AppearanceAssetEditScope
-allows an application to create and maintain an editing session for an appearance asset. The scope provides access to an editable Asset object whose properties may be changed. Once all of the desired changes have been made to the asset's properties, the edit scope should be committed, which causes the changes to be sent back into the document. (This is the only part of the process when a transaction must be opened).
-The new class has the following methods:</p>
-</li>
-<li>
-<p>AppearanceAssetEditScope.Start() – Starts the edit scope for the asset contained in a particular AppearanceAssetElement. The editable Asset is returned from this method.</p>
-</li>
-<li>
-<p>AppearanceAssetEditScope.Commit() – Finishes the edit scope: all changes made during the edit scope will be committed. Provides an option to forces the update of all open views.</p>
-</li>
-<li>
-<p>AppearanceAssetEditScope.Cancel() – Cancels the edit scope and discards any changes.</p>
-</li>
+<li>Autodesk.Revit.DB.Visual.AppearanceAssetEditScope</li>
 </ul>
-<h4><a name="4.2.1.2"></a>Editing AssetProperty values</h4>
+<p>allows an application to create and maintain an editing session for an appearance asset. The scope provides access to an editable Asset object whose properties may be changed. Once all of the desired changes have been made to the asset's properties, the edit scope should be committed, which causes the changes to be sent back into the document. (This is the only part of the process when a transaction must be opened).</p>
+<p>The new class has the following methods:</p>
+<ul>
+<li>AppearanceAssetEditScope.Start() &ndash; Starts the edit scope for the asset contained in a particular AppearanceAssetElement. The editable Asset is returned from this method.</li>
+<li>AppearanceAssetEditScope.Commit() &ndash; Finishes the edit scope: all changes made during the edit scope will be committed. Provides an option to forces the update of all open views.</li>
+<li>AppearanceAssetEditScope.Cancel() &ndash; Cancels the edit scope and discards any changes.</li>
+</ul>
+<h4><a name="4.2.1.2"></a>2.1.2. Editing AssetProperty values</h4>
 <p>The following properties are now writeable from within an AppearanceAssetEditScope, to support modification of an asset property's stored value:</p>
 <ul>
-<li>
-<p>AssetPropertyString.Value</p>
-</li>
-<li>
-<p>AssetPropertyBoolean.Value</p>
-</li>
-<li>
-<p>AssetPropertyInteger.Value</p>
-</li>
-<li>
-<p>AssetPropertyDouble.Value</p>
-</li>
-<li>
-<p>AssetPropertyFloat.Value</p>
-</li>
-<li>
-<p>AssetPropertyEnum.Value</p>
-</li>
-<li>
-<p>AssetPropertyDistance.Value
-In addition, the following new methods have been added to support modification of property values:</p>
-</li>
-<li>
-<p>AssetPropertyDoubleArray3d.SetValueAsXYZ()</p>
-</li>
-<li>
-<p>AssetPropertyDoubleArray4d.SetValueAsDoubles()</p>
-</li>
-<li>
-<p>AssetPropertyDoubleArray4d.SetValueAsColor()
-AssetPropertyList now has new methods to allow changes to the members of the list:</p>
-</li>
-<li>
-<p>AssetPropertyList.AddNewAssetPropertyDouble()</p>
-</li>
-<li>
-<p>AssetPropertyList.InsertNewAssetPropertyDouble()</p>
-</li>
-<li>
-<p>AssetPropertyList.AddNewAssetAsColor()</p>
-</li>
-<li>
-<p>AssetPropertyList.InsertNewAssetAsColor()</p>
-</li>
-<li>
-<p>AssetPropertyList.AddNewAssetPropertyInteger()</p>
-</li>
-<li>
-<p>AssetPropertyList.InsertNewAssetPropertyInteger()</p>
-</li>
-<li>
-<p>AssetPropertyList.RemoveAssetProperty()</p>
-</li>
+<li>AssetPropertyString.Value</li>
+<li>AssetPropertyBoolean.Value</li>
+<li>AssetPropertyInteger.Value</li>
+<li>AssetPropertyDouble.Value</li>
+<li>AssetPropertyFloat.Value</li>
+<li>AssetPropertyEnum.Value</li>
+<li>AssetPropertyDistance.Value</li>
 </ul>
-<h4><a name="4.2.1.3"></a>Connected Assets</h4>
+<p>In addition, the following new methods have been added to support modification of property values:</p>
+<ul>
+<li>AssetPropertyDoubleArray3d.SetValueAsXYZ()</li>
+<li>AssetPropertyDoubleArray4d.SetValueAsDoubles()</li>
+<li>AssetPropertyDoubleArray4d.SetValueAsColor()</li>
+</ul>
+<p>AssetPropertyList now has new methods to allow changes to the members of the list:</p>
+<ul>
+<li>AssetPropertyList.AddNewAssetPropertyDouble()</li>
+<li>AssetPropertyList.InsertNewAssetPropertyDouble()</li>
+<li>AssetPropertyList.AddNewAssetAsColor()</li>
+<li>AssetPropertyList.InsertNewAssetAsColor()</li>
+<li>AssetPropertyList.AddNewAssetPropertyInteger()</li>
+<li>AssetPropertyList.InsertNewAssetPropertyInteger()</li>
+<li>AssetPropertyList.RemoveAssetProperty()</li>
+</ul>
+<h4><a name="4.2.1.3"></a>2.1.3. Connected Assets</h4>
 <p>Connected assets are associated to properties in appearance assets, and represent subordinate objects encapsulating a collection of related properties. One example of a connected asset is the "Unified Bitmap" representing an image and its mapping parameters and values. AssetProperty offers new methods to provide the ability to modify, add or delete the asset connected to a property:</p>
 <ul>
-<li>
-<p>AssetProperty.GetSingleConnectedAsset() – Gets the single connected asset of this property.</p>
-</li>
-<li>
-<p>AssetProperty.RemoveConnectedAsset() – Removes the single connected asset of this property.</p>
-</li>
-<li>
-<p>AssetProperty.AddConnectedAsset (String schemaId) – Create a new default asset of schema type and connects it to this property.</p>
-</li>
-<li>
-<p>AssetProperty.AddCopyAsConnectedAsset() – Connects the property to a copy of the asset.</p>
-</li>
+<li>AssetProperty.GetSingleConnectedAsset() &ndash; Gets the single connected asset of this property.</li>
+<li>AssetProperty.RemoveConnectedAsset() &ndash; Removes the single connected asset of this property.</li>
+<li>AssetProperty.AddConnectedAsset (String schemaId) &ndash; Create a new default asset of schema type and connects it to this property.</li>
+<li>AssetProperty.AddCopyAsConnectedAsset() &ndash; Connects the property to a copy of the asset.</li>
 </ul>
-<h4><a name="4.2.1.4"></a>Validation</h4>
+<h4><a name="4.2.1.4"></a>2.1.4. Validation</h4>
 <p>Inputs to change the value of asset properties are validated against the requirements of the associated schema. 
 The new methods:</p>
 <ul>
-<li>
-<p>AssetPropertyString.IsValidValue(String)</p>
-</li>
-<li>
-<p>AssetPropertyInteger.IsValidValue (int)</p>
-</li>
-<li>
-<p>AssetPropertyEnum.IsValidValue (int)</p>
-</li>
-<li>
-<p>AssetPropertyDouble.IsValidValue (double)</p>
-</li>
-<li>
-<p>AssetPropertyFloat.IsValidValue (float)</p>
-</li>
-<li>
-<p>AssetPropertyDistance.IsValidValue (double)</p>
-</li>
-<li>
-<p>AssetPropertyDoubleArray3d.IsValidValue (XYZ)</p>
-</li>
-<li>
-<p>AssetPropertyDoubleArray4d.IsValidValue (IList<double>)</p>
-</li>
-<li>
-<p>AssetPropertyDoubleArray4d.IsValidValue (Color)
-identify if the input value is a valid value that can be set to the given asset property.
-The new method: </p>
-</li>
-<li>
-<p>AssetProperty.IsEditable()
-identifies the the AssetProperty can currently be edited.</p>
-</li>
+<li>AssetPropertyString.IsValidValue(String)</li>
+<li>AssetPropertyInteger.IsValidValue (int)</li>
+<li>AssetPropertyEnum.IsValidValue (int)</li>
+<li>AssetPropertyDouble.IsValidValue (double)</li>
+<li>AssetPropertyFloat.IsValidValue (float)</li>
+<li>AssetPropertyDistance.IsValidValue (double)</li>
+<li>AssetPropertyDoubleArray3d.IsValidValue (XYZ)</li>
+<li>AssetPropertyDoubleArray4d.IsValidValue (IList&lt;double&gt;)</li>
+<li>AssetPropertyDoubleArray4d.IsValidValue (Color)</li>
 </ul>
-<h4><a name="4.2.1.5"></a>Schemas &amp; Property names</h4>
+<p>identify if the input value is a valid value that can be set to the given asset property.</p>
+<p>The new method:</p>
+<ul>
+<li>AssetProperty.IsEditable()</li>
+</ul>
+<p>identifies the the AssetProperty can currently be edited.</p>
+<h4><a name="4.2.1.5"></a>2.1.5. Schemas &amp; Property names</h4>
 <p>Appearance asset properties are aligned with specific schemas. Each schema contains necessary properties which define how the appearance of the material will be generated. There are 14 standard material schemas:</p>
 <ul>
-<li>
-<p>Ceramic</p>
-</li>
-<li>
-<p>Concrete</p>
-</li>
-<li>
-<p>Generic</p>
-</li>
-<li>
-<p>Glazing</p>
-</li>
-<li>
-<p>Hardwood</p>
-</li>
-<li>
-<p>MasonryCMU</p>
-</li>
-<li>
-<p>Metal</p>
-</li>
-<li>
-<p>MetallicPaint</p>
-</li>
-<li>
-<p>Mirror</p>
-</li>
-<li>
-<p>PlasticVinyl</p>
-</li>
-<li>
-<p>SolidGlass</p>
-</li>
-<li>
-<p>Stone</p>
-</li>
-<li>
-<p>WallPaint</p>
-</li>
-<li>
-<p>Water
-In addition, there are 5 schemas representing "advanced" materials - these may be encountered as a result of import from other Autodesk products:</p>
-</li>
-<li>
-<p>AdvancedLayered</p>
-</li>
-<li>
-<p>AdvancedMetal</p>
-</li>
-<li>
-<p>AdvancedOpaque</p>
-</li>
-<li>
-<p>AdvancedTransparent</p>
-</li>
-<li>
-<p>AdvancedWood
-Finally, there are 10 schemas used for the aspects of the connected assets:</p>
-</li>
-<li>
-<p>BumpMap</p>
-</li>
-<li>
-<p>Checker</p>
-</li>
-<li>
-<p>Gradient</p>
-</li>
-<li>
-<p>Marble</p>
-</li>
-<li>
-<p>Noise</p>
-</li>
-<li>
-<p>Speckle</p>
-</li>
-<li>
-<p>Tile</p>
-</li>
-<li>
-<p>UnifiedBitmap</p>
-</li>
-<li>
-<p>Wave</p>
-</li>
-<li>
-<p>Wood
-The new method:</p>
-</li>
-<li>
-<p>AssetProperty.IsValidSchemaIdentifier(String schemaName)
-identifies if the input name is a valid name for a supported schema.
-To assist in creating code accessing and manipulating the properties of a given schema, predefined properties have been introduced to allow a compile-time reference to a property name without requiring you to transcribe it as a string in your code. These predefined property names are available in static classes named similar to the schema names, above, e.g. Autodesk.Revit.DB.Visual.Ceramic.</p>
-</li>
+<li>Ceramic</li>
+<li>Concrete</li>
+<li>Generic</li>
+<li>Glazing</li>
+<li>Hardwood</li>
+<li>MasonryCMU</li>
+<li>Metal</li>
+<li>MetallicPaint</li>
+<li>Mirror</li>
+<li>PlasticVinyl</li>
+<li>SolidGlass</li>
+<li>Stone</li>
+<li>WallPaint</li>
+<li>Water</li>
 </ul>
-<h4><a name="4.2.1.6"></a>Utilities</h4>
+<p>In addition, there are 5 schemas representing "advanced" materials &ndash; these may be encountered as a result of import from other Autodesk products:</p>
+<ul>
+<li>AdvancedLayered</li>
+<li>AdvancedMetal</li>
+<li>AdvancedOpaque</li>
+<li>AdvancedTransparent</li>
+<li>AdvancedWood</li>
+</ul>
+<p>Finally, there are 10 schemas used for the aspects of the connected assets:</p>
+<ul>
+<li>BumpMap</li>
+<li>Checker</li>
+<li>Gradient</li>
+<li>Marble</li>
+<li>Noise</li>
+<li>Speckle</li>
+<li>Tile</li>
+<li>UnifiedBitmap</li>
+<li>Wave</li>
+<li>Wood</li>
+</ul>
 <p>The new method:</p>
 <ul>
-<li>
-<p>Application.GetAssets(AssetType)
-returns a list of assets available to the session.
-The new method: </p>
-</li>
-<li>
-<p>AppearanceAssetElement.Duplicate()
-creates a copy of an appearance asset element and the asset contained by it.
-The new operator: </p>
-</li>
-<li>
-<p>Asset.operator[ ]
-accesses a particular AssetProperty associated to the given asset. </p>
-</li>
+<li>AssetProperty.IsValidSchemaIdentifier(String schemaName)</li>
 </ul>
-<h4><a name="4.2.2"></a>Railing API additions</h4>
-<h4><a name="4.2.2.1"></a>Non-Continuous Rail Structure</h4>
-<p>The new property:</p>
-<ul>
-<li>RailingType.RailStructure
-provide access to a collection of the information about non-continuous rails that are part of a RailingType. The Autodesk.Revit.DB.Architecture.NonContinuousRailStructure object returns contains a collection of Autodesk.Revit.DB.Architecture.NonContinuousRailInfo objects, each of which represents the properties needed to define a single non-continuous rail. </li>
-</ul>
-<h4><a name="4.2.2.2"></a>Baluster Placement</h4>
-<p>The new property:</p>
-<ul>
-<li>
-<p>RailingType.BalusterPlacement
-provides access to the baluster and post placement information for a given railing type. The Autodesk.Revit.DB.Architecture.BalusterPlacement object returned may contain instances of:</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Architecture.BalusterPattern - represents the baluster pattern properties, containing 1 or more objects of the type BalusterInfo.</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Architecture.PostPattern - represents the post pattern properties, containing up to 3 objects of the type BalusterInfo</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Architecture.BalusterInfo - represents the properties governing an instance of a single railing baluster or post.</p>
-</li>
-</ul>
-<h4><a name="4.2.3"></a>Find Element Dependencies</h4>
+<p>identifies if the input name is a valid name for a supported schema.</p>
+<p>To assist in creating code accessing and manipulating the properties of a given schema, predefined properties have been introduced to allow a compile-time reference to a property name without requiring you to transcribe it as a string in your code. These predefined property names are available in static classes named similar to the schema names, above, e.g. Autodesk.Revit.DB.Visual.Ceramic.</p>
+<h4><a name="4.2.1.6"></a>2.1.6. Utilities</h4>
 <p>The new method:</p>
 <ul>
-<li>Element.GetDependentElements()
-returns a list of ids of elements which are "children" of this element; that is, those elements which will be deleted along with this element. The method optionally takes an ElementFilter which can be used to reduce the output list to the collection of elements matching specific criteria.</li>
+<li>Application.GetAssets(AssetType)</li>
 </ul>
-<h4><a name="4.2.4"></a>Dimension API additions</h4>
-<p>The dimension API now supports adding linear dimensions to cut geometry which is view-specific. 
-The new property:</p>
+<p>returns a list of assets available to the session.</p>
+<p>The new method:</p>
 <ul>
-<li>
-<p>Dimension.AreReferencesAvailable
-always returns true for dimensions which are not view-specific. It can return false for view-specific dimensions that can lose their references in certain situations. For example, the host element references may not be available when the view containing the dimension is closed. In general, if the host element view-specific geometry is not available, dimensions that reference that geometry will not be able to resolve their references.
-The new property:</p>
-</li>
-<li>
-<p>Dimension.IsValid
-always returns true for dimensions which are not view-specific. It can return false for view-specific dimensions that are hidden because they are in an invalid state. An example of an invalid state is having misaligned references for generation of an aligned dimension.</p>
-</li>
+<li>AppearanceAssetElement.Duplicate()</li>
 </ul>
-<h4><a name="4.2.5"></a>Set vertical alignment for text</h4>
+<p>creates a copy of an appearance asset element and the asset contained by it.</p>
+<p>The new operator:</p>
+<ul>
+<li>Asset.operator[]</li>
+</ul>
+<p>accesses a particular AssetProperty associated to the given asset.</p>
+<h4><a name="4.2.2"></a>2.2. Railing API additions</h4>
+<h4><a name="4.2.2.1"></a>2.2.1. Non-Continuous Rail Structure</h4>
 <p>The new property:</p>
 <ul>
-<li>Autodesk.Revit.DB.TextNoteOptions.VerticalAlignment
-allows you to specify the vertical alignment for a new text note created by TextNote.Create().</li>
+<li>RailingType.RailStructure</li>
 </ul>
-<h4><a name="4.2.6"></a>BrowserOrganization API additions</h4>
-<p>The new enumerated value: </p>
+<p>provides access to a collection of the information about non-continuous rails that are part of a RailingType. The Autodesk.Revit.DB.Architecture.NonContinuousRailStructure object returns contains a collection of Autodesk.Revit.DB.Architecture.NonContinuousRailInfo objects, each of which represents the properties needed to define a single non-continuous rail.</p>
+<h4><a name="4.2.2.2"></a>2.2.2. Baluster Placement</h4>
+<p>The new property:</p>
 <ul>
-<li>
-<p>BrowserOrganizationType.Schedules 
-corresponds to the type of the browser organization definition for schedules. 
-The new method:</p>
-</li>
-<li>
-<p>BrowserOrganization.GetCurrentBrowserOrganizationForSchedules() 
-gets the BrowserOrganization that applies to the Schedules section of the project browser.</p>
-</li>
+<li>RailingType.BalusterPlacement</li>
 </ul>
-<h4><a name="4.2.7"></a>Rebar API additions</h4>
-<h4><a name="4.2.7.1"></a>BarTypeDiameterOptions</h4>
+<p>provides access to the baluster and post placement information for a given railing type. The Autodesk.Revit.DB.Architecture.BalusterPlacement object returned may contain instances of:</p>
+<ul>
+<li>Autodesk.Revit.DB.Architecture.BalusterPattern &ndash; represents the baluster pattern properties, containing 1 or more objects of the type BalusterInfo.</li>
+<li>Autodesk.Revit.DB.Architecture.PostPattern &ndash; represents the post pattern properties, containing up to 3 objects of the type BalusterInfo</li>
+<li>Autodesk.Revit.DB.Architecture.BalusterInfo &ndash; represents the properties governing an instance of a single railing baluster or post.</li>
+</ul>
+<h4><a name="4.2.3"></a>2.3. Find Element Dependencies</h4>
+<p>The new method:</p>
+<ul>
+<li>Element.GetDependentElements()</li>
+</ul>
+<p>returns a list of ids of elements which are "children" of this element; that is, those elements which will be deleted along with this element. The method optionally takes an ElementFilter which can be used to reduce the output list to the collection of elements matching specific criteria.</p>
+<h4><a name="4.2.4"></a>2.4. Dimension API additions</h4>
+<p>The dimension API now supports adding linear dimensions to cut geometry which is view-specific. </p>
+<p>The new property:</p>
+<ul>
+<li>Dimension.AreReferencesAvailable</li>
+</ul>
+<p>always returns true for dimensions which are not view-specific. It can return false for view-specific dimensions that can lose their references in certain situations. For example, the host element references may not be available when the view containing the dimension is closed. In general, if the host element view-specific geometry is not available, dimensions that reference that geometry will not be able to resolve their references.</p>
+<p>The new property:</p>
+<ul>
+<li>Dimension.IsValid</li>
+</ul>
+<p>always returns true for dimensions which are not view-specific. It can return false for view-specific dimensions that are hidden because they are in an invalid state. An example of an invalid state is having misaligned references for generation of an aligned dimension.</p>
+<h4><a name="4.2.5"></a>2.5. Set vertical alignment for text</h4>
+<p>The new property:</p>
+<ul>
+<li>Autodesk.Revit.DB.TextNoteOptions.VerticalAlignment</li>
+</ul>
+<p>allows you to specify the vertical alignment for a new text note created by TextNote.Create().</p>
+<h4><a name="4.2.6"></a>2.6. BrowserOrganization API additions</h4>
+<p>The new enumerated value:</p>
+<ul>
+<li>BrowserOrganizationType.Schedules </li>
+</ul>
+<p>corresponds to the type of the browser organization definition for schedules. </p>
+<p>The new method:</p>
+<ul>
+<li>BrowserOrganization.GetCurrentBrowserOrganizationForSchedules() </li>
+</ul>
+<p>gets the BrowserOrganization that applies to the Schedules section of the project browser.</p>
+<h4><a name="4.2.7"></a>2.7. Rebar API additions</h4>
+<h4><a name="4.2.7.1"></a>2.7.1. BarTypeDiameterOptions</h4>
 <p>The new options class:</p>
 <ul>
-<li>
-<p>BarTypeDiameterOptions
-allows creation of a new set of diameter values for a RebarBarType. It can be used when copying the diameter information as a bulk of data from one RebarBarType to another.
-The diameter options can be set for a RebarBarType with the new method:</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.RebarBarType.SetBarTypeDiameters()
-which sets all input diameters from the input BarTypeDiameterOptions in the current RebarBarType.</p>
-</li>
+<li>BarTypeDiameterOptions</li>
 </ul>
-<h4><a name="4.2.7.2"></a>GetDistributionPath()</h4>
+<p>allows creation of a new set of diameter values for a RebarBarType. It can be used when copying the diameter information as a bulk of data from one RebarBarType to another.</p>
+<p>The diameter options can be set for a RebarBarType with the new method:</p>
+<ul>
+<li>Autodesk.Revit.DB.Structure.RebarBarType.SetBarTypeDiameters()</li>
+</ul>
+<p>which sets all input diameters from the input BarTypeDiameterOptions in the current RebarBarType.</p>
+<h4><a name="4.2.7.2"></a>2.7.2. GetDistributionPath()</h4>
 <p>The new method:</p>
 <ul>
 <li>Autodesk.Revit.DB.Structure.RebarHandlePositionData.GetDistributionPath()
 gets the distribution path currently stored in the rebar.
 For a free form rebar set the distance between two consecutive bars may be different if it is calculated between different points on bars. The distribution path is an array of curves with the property that based on these curves the set was calculated to respect the layout rule and number of bars or spacing.</li>
 </ul>
-<h4><a name="4.2.7.3"></a>RebarUpdateCurvesData</h4>
+<h4><a name="4.2.7.3"></a>2.7.3. RebarUpdateCurvesData</h4>
 <p>Several new properties have been added to RebarUpdateCurvesData:</p>
 <ul>
-<li>
-<p>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.HostMirrored - If true, then host of the rebar was mirrored (along with the rebar) before the most recent regeneration.</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.IsReversed - Used to store the state of the bar referring to the direction of the bars. This is useful when using face intersection to calculate bars. After mirroring, curves created from intersecting faces may be reversed, so we use this to store the state and keep the rebar pointing in the correct direction.</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.ErrorMessage - The reason for calculation failure. If the calculation fails, this message will be shown in an error, or warning if we are editing the constraints.</p>
-</li>
+<li>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.HostMirrored &ndash; If true, then host of the rebar was mirrored (along with the rebar) before the most recent regeneration.</li>
+<li>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.IsReversed &ndash; Used to store the state of the bar referring to the direction of the bars. This is useful when using face intersection to calculate bars. After mirroring, curves created from intersecting faces may be reversed, so we use this to store the state and keep the rebar pointing in the correct direction.</li>
+<li>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.ErrorMessage &ndash; The reason for calculation failure. If the calculation fails, this message will be shown in an error, or warning if we are editing the constraints.</li>
 </ul>
-<h4><a name="4.2.7.4"></a>RebarShapes</h4>
+<h4><a name="4.2.7.4"></a>2.7.4. RebarShapes</h4>
 <p>Two new methods in the Rebar class check or get associated RebarShape objects:</p>
 <ul>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.GetAllRebarShapeIds() - Gets the ids of the RebarShape elements which define the shape of this Rebar.</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.Rebar.CanBeMatchedWithMultipleShapes() - Determines whether this Rebar can be matched with more than one RebarShape.</p>
-</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.GetAllRebarShapeIds() &ndash; Gets the ids of the RebarShape elements which define the shape of this Rebar.</li>
+<li>Autodesk.Revit.DB.Structure.Rebar.CanBeMatchedWithMultipleShapes() &ndash; Determines whether this Rebar can be matched with more than one RebarShape.</li>
 </ul>
-<h4><a name="4.2.7.5"></a>Workshop Instructions</h4>
+<h4><a name="4.2.7.5"></a>2.7.5. Workshop Instructions</h4>
 <p>Several new properties identify the workshop instructions of a Rebar:</p>
 <ul>
-<li>
-<p>Autodesk.Revit.DB.Structure.RebarFreeFormAccessor.WorkshopInstructions - Gets or sets the workshop instructions for the current Rebar element (in other words, is it bent or straight.)</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.WorkshopInstructions - Gets the workshop instructions for this Rebar. This property is read-only.</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.AreWorkshopInstructionsChanged - Determines if the workshop instructions have changed since the last regeneration.</p>
-</li>
+<li>Autodesk.Revit.DB.Structure.RebarFreeFormAccessor.WorkshopInstructions &ndash; Gets or sets the workshop instructions for the current Rebar element (in other words, is it bent or straight.)</li>
+<li>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.WorkshopInstructions &ndash; Gets the workshop instructions for this Rebar. This property is read-only.</li>
+<li>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.AreWorkshopInstructionsChanged &ndash; Determines if the workshop instructions have changed since the last regeneration.</li>
 </ul>
-<h4><a name="4.2.7.6"></a>RebarFreeFormAccessor Additions</h4>
+<h4><a name="4.2.7.6"></a>2.7.6. RebarFreeFormAccessor Additions</h4>
 <p>Several new methods have been added to determine information about the bar at a specific index of the set:</p>
 <ul>
-<li>
-<p>Autodesk.Revit.DB.Structure.RebarFreeFormAccessor.GetShapeIdAtIndex() - Returns the shape id for the bar at the given position index.</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.RebarFreeFormAccessor.IsBarMatchedWithShapeInReverseOrder() - Checks if the bar at the given index is matched in reverse order with its shape.</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.RebarFreeFormAccessor.GetHookTypeIdAtIndex()</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.RebarFreeFormAccessor.GetHookOrientationAngleAtIndex()</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.RebarFreeFormAccessor.GetCouplerIdAtIndex()</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.Structure.RebarFreeFormAccessor.GetEndTreatmentTypeIdAtIndex()</p>
-</li>
+<li>Autodesk.Revit.DB.Structure.RebarFreeFormAccessor.GetShapeIdAtIndex() &ndash; Returns the shape id for the bar at the given position index.</li>
+<li>Autodesk.Revit.DB.Structure.RebarFreeFormAccessor.IsBarMatchedWithShapeInReverseOrder() &ndash; Checks if the bar at the given index is matched in reverse order with its shape.</li>
+<li>Autodesk.Revit.DB.Structure.RebarFreeFormAccessor.GetHookTypeIdAtIndex()</li>
+<li>Autodesk.Revit.DB.Structure.RebarFreeFormAccessor.GetHookOrientationAngleAtIndex()</li>
+<li>Autodesk.Revit.DB.Structure.RebarFreeFormAccessor.GetCouplerIdAtIndex()</li>
+<li>Autodesk.Revit.DB.Structure.RebarFreeFormAccessor.GetEndTreatmentTypeIdAtIndex()</li>
 </ul>
-<h4><a name="4.2.8"></a>Steel Fabrication API additions</h4>
-<h4><a name="4.2.8.1"></a>SteelElementProperties - linking between Revit elements and steel fabrication elements</h4>
+<h4><a name="4.2.8"></a>2.8. Steel Fabrication API additions</h4>
+<h4><a name="4.2.8.1"></a>2.8.1. SteelElementProperties &ndash; linking between Revit elements and steel fabrication elements</h4>
 <p>The new class:</p>
 <ul>
-<li>
-<p>Autodesk.Revit.DB.Steel.SteelElementProperties
-is used to attach steel fabrication information to various Revit elements. Elements which can have fabrication information include:</p>
-</li>
-<li>
-<p>FamilyInstance elements (structural beams and columns)</p>
-</li>
-<li>
-<p>StructuralConnectionHandler elements associated to the connection</p>
-</li>
-<li>
-<p>Specific steel connection elements (bolts, anchors, plates, etc). These connection elements will be of type Element but with categories related to structural connections, for example:
-o   OST_StructConnectionWelds 
-o   OST_StructConnectionHoles 
-o   OST_StructConnectionShearStuds
-o   OST_StructConnectionBolts
-o   OST_StructConnectionAnchors 
-o   OST_StructConnectionPlates</p>
-</li>
-<li>
-<p>Some concrete elements (walls, floors, concrete beams) when they are used as input elements to creation of steel connections.
-Use the static method:</p>
-</li>
-<li>
-<p>SteelElementProperties.GetSteelElementProperties()
-to obtain the properties if they exist.
-The properties contain:</p>
-</li>
-<li>
-<p>SteelElementProperties.UniqueID
-which is the id of the object in fabrication terms, and can be used to determine the Steel Core element corresponding to this Revit element, for use with the Advance Steel API.
-You can also look up the id about a Revit element using the static method:</p>
-</li>
-<li>
-<p>SteelElementProperties.GetFabricationUniqueID()
-For Revit elements which do not currently have a fabrication link, it can be added using:</p>
-</li>
-<li>
-<p>SteelElementProperties.AddFabricationInformationForRevitElements()
-If you have a fabrication id, you can lookup the corresponding Revit element using:</p>
-</li>
-<li>
-<p>SteelElementProperties.GetReference()
-This may return a reference to an element or a subelement.</p>
-</li>
+<li>Autodesk.Revit.DB.Steel.SteelElementProperties</li>
 </ul>
-<h4><a name="4.2.8.2"></a>Custom steel connections - API additions</h4>
+<p>is used to attach steel fabrication information to various Revit elements. Elements which can have fabrication information include:</p>
+<ul>
+<li>FamilyInstance elements (structural beams and columns)</li>
+<li>StructuralConnectionHandler elements associated to the connection</li>
+<li>Specific steel connection elements (bolts, anchors, plates, etc). These connection elements will be of type Element but with categories related to structural connections, for example:<ul>
+<li>OST_StructConnectionWelds </li>
+<li>OST_StructConnectionHoles </li>
+<li>OST_StructConnectionShearStuds</li>
+<li>OST_StructConnectionBolts</li>
+<li>OST_StructConnectionAnchors </li>
+<li>OST_StructConnectionPlates</li>
+</ul>
+</li>
+<li>Some concrete elements (walls, floors, concrete beams) when they are used as input elements to creation of steel connections.</li>
+</ul>
+<p>Use the static method:</p>
+<ul>
+<li>SteelElementProperties.GetSteelElementProperties()</li>
+</ul>
+<p>to obtain the properties if they exist.</p>
+<p>The properties contain:</p>
+<ul>
+<li>SteelElementProperties.UniqueID</li>
+</ul>
+<p>which is the id of the object in fabrication terms, and can be used to determine the Steel Core element corresponding to this Revit element, for use with the Advance Steel API.</p>
+<p>You can also look up the id about a Revit element using the static method:</p>
+<ul>
+<li>SteelElementProperties.GetFabricationUniqueID()</li>
+</ul>
+<p>For Revit elements which do not currently have a fabrication link, it can be added using:</p>
+<ul>
+<li>SteelElementProperties.AddFabricationInformationForRevitElements()</li>
+</ul>
+<p>If you have a fabrication id, you can lookup the corresponding Revit element using:</p>
+<ul>
+<li>SteelElementProperties.GetReference()</li>
+</ul>
+<p>This may return a reference to an element or a subelement.</p>
+<h4><a name="4.2.8.2"></a>2.8.2. Custom steel connections &ndash; API additions</h4>
 <p>The new method:</p>
 <ul>
-<li>
-<p>StructuralConnectionHandler.Create(Document, IList<ElementId>, String)
-creates a custom StructuralConnectionHandler along with its associated StructuralConnectionHandlerType. Input elements should include structural members and steel connection members, and at least one StructuralConnectionHandler representing the generic connection to replace with the new detailed custom connection. 
-The methods:</p>
-</li>
-<li>
-<p>StructuralConnectionHandlerType.AddElementsToCustomConnection()</p>
-</li>
-<li>
-<p>StructuralConnectionHandlerType.RemoveMainSubelementsFromCustomConnection()
-provide support for adding or removing steel connection elements in a custom connection.
-The new properties:</p>
-</li>
-<li>
-<p>StructuralConnectionHandler.IsCustom</p>
-</li>
-<li>
-<p>StructuralConnectionHandlerType.IsCustom</p>
-</li>
-<li>
-<p>StructuralConnectionHandlerType.IsDetailed
-provide read access to information about the structural connection handler elements.</p>
-</li>
+<li>StructuralConnectionHandler.Create(Document, IList&lt;ElementId&gt;, String)</li>
 </ul>
-<h4><a name="4.2.9"></a>MEP API additions</h4>
-<h4><a name="4.2.9.1"></a>MEPCurveType Shape</h4>
-<p>The new property:</p>
+<p>creates a custom StructuralConnectionHandler along with its associated StructuralConnectionHandlerType. Input elements should include structural members and steel connection members, and at least one StructuralConnectionHandler representing the generic connection to replace with the new detailed custom connection. </p>
+<p>The methods:</p>
 <ul>
-<li>MEPCurveType.Shape
-returns the shape of the profile for the MEP curve type.</li>
+<li>StructuralConnectionHandlerType.AddElementsToCustomConnection()</li>
+<li>StructuralConnectionHandlerType.RemoveMainSubelementsFromCustomConnection()</li>
 </ul>
-<h4><a name="4.2.9.2"></a>Mechanical Equipment Set API</h4>
-<p>Two new classes allow creation and manipulation of a mechanical equipment set, which is a set of interrelated mechanical equipment in an MEP system that may operate in parallel. This release is limited to supporting one or more pump sets that are part of a piping system. The mechanical equipment set settings will be used for the MEP flow and pressure drop calculations.
-The Element subclass Autodesk.Revit.DB.Mechanical.MechanicalEquipmentSet represents an instance of a set associated to an MEP system. It includes:
-The new members:</p>
-<ul>
-<li>
-<p>MechanicalEquipmentSet.Create() </p>
-</li>
-<li>
-<p>MechanicalEquipmentSet.GetMembers()</p>
-</li>
-<li>
-<p>MechanicalEquipmentSet.Add()</p>
-</li>
-<li>
-<p>MechanicalEquipmentSet.Remove()</p>
-</li>
-<li>
-<p>MechanicalEquipmentSet.AreValidMembers()</p>
-</li>
-<li>
-<p>MechanicalEquipmentSet.AreElementsNotConnectedInSeries() </p>
-</li>
-<li>
-<p>MechanicalEquipmentSet.Classification </p>
-</li>
-<li>
-<p>MechanicalEquipmentSet.OnDuty</p>
-</li>
-<li>
-<p>MechanicalEquipmentSet.OnStandby
-The ElementType subclass Autodesk.Revit.DB.Mechanical.MechanicalEquipmentSetType represents a type for a set of mechanical equipment in a MEP system. It includes:</p>
-</li>
-<li>
-<p>MechanicalEquipmentSetType.Create()
-used to create a uniquely named type of mechanical equipment set.
-For pump sets, the new method:</p>
-</li>
-<li>
-<p>PipingSystem.GetPumpSets()
-gets the set of element ids of pump sets associated with this system.</p>
-</li>
-</ul>
-<h4><a name="4.2.9.3"></a>Hydraulic Separation API</h4>
-<p>New methods implemented in the PipingSystem class support hydraulic separation. Hydraulically separated systems allow independent flow and pressure analysis for each hydraulic loop. For example, each hydraulic loop has its own critical path. The calculated pressure drop on the primary pump consists of all pressure drop on the primary critical path. Any pressure drop on the secondary loop would only contribute to the calculated pressure drop of the secondary pump.
-The new methods:</p>
-<ul>
-<li>
-<p>PipingSystem.CreateHydraulicSeparation() </p>
-</li>
-<li>
-<p>PipingSystem.DeleteHydraulicSeparation()</p>
-</li>
-<li>
-<p>PipingSystem.IsHydraulicLoopBoundary()</p>
-</li>
-<li>
-<p>PipingSystem.CanBeHydraulicLoopBoundary()
-support creation, deletion, and validation of members of a hydraulically separated system. Separated systems will have their own associated system elements from which you can read and modify the members after creation. </p>
-</li>
-</ul>
-<h4><a name="4.2.10"></a>MEP Fabrication API additions</h4>
-<h4><a name="4.2.10.1"></a>Exporting fabrication job files</h4>
-<p>The new method:</p>
-<ul>
-<li>FabricationPart.SaveAsFabricationJob()
-writes a fabrication job to disk in the MAJ file format. The exported file will contain the fabrication parts included in the input. It takes an options class, FabricationSaveJobOptions, allowing for the possibility of including holes branches meet the main straight.</li>
-</ul>
-<h4><a name="4.2.10.2"></a>API for load and unload of one-off fabrication parts from loose item files</h4>
-<p>The new class:</p>
-<ul>
-<li>
-<p>Autodesk.Revit.DB.FabricationItemFile
-contains information about one-off items that can be loaded into a fabrication configuration.
-The new class:</p>
-</li>
-<li>
-<p>Autodesk.Revit.DB.FabricationItemFolder 
-may contain nested FabricationItemFolders and a list of FabricationItemFiles.
-The new members:</p>
-</li>
-<li>
-<p>FabricationConfiguration.LoadItemFiles()</p>
-</li>
-<li>
-<p>FabricationConfiguration.UnloadItemFiles()</p>
-</li>
-<li>
-<p>FabricationConfiguration.GetAllLoadedItemFiles()</p>
-</li>
-<li>
-<p>FabricationConfiguration.GetAllUsedItemFiles()</p>
-</li>
-<li>
-<p>FabricationConfiguration.CanUnloadItemFiles()</p>
-</li>
-<li>
-<p>FabricationConfiguration.AreItemFilesLoaded()</p>
-</li>
-<li>
-<p>FabricationConfiguration.GetItemFolders()
-allow control over the loading and unloading of item files into the configuration.
-The new method:</p>
-</li>
-<li>
-<p>FabricationPart.Create(Document, FabricationItemFile, ElementId)
-creates a FabricationPart from an item file.</p>
-</li>
-</ul>
-<h4><a name="4.2.10.3"></a>API for version history of parts</h4>
-<p>The new class:</p>
-<ul>
-<li>
-<p>Autodesk.Revit.DB.FabricationVersionInfo
-gives the information about differerent versions of fabrication data, including the reason why the data was changed.
-The new method:</p>
-</li>
-<li>
-<p>FabricationPart.GetVersionHistory()
-returns a list of FabricationVersionInfo classes that describe the history of the changes made to the part. The most recent changes are first in the list.</p>
-</li>
-</ul>
-<h4><a name="4.2.10.4"></a>API for part swap out information</h4>
-<p>The new class:</p>
-<ul>
-<li>
-<p>Autodesk.Revit.DB.ReloadSwapOutInfo
-gives information about a part that was swapped out during reload.
-The new members:</p>
-</li>
-<li>
-<p>ConfigurationReloadInfo.OutOfDatePartCount</p>
-</li>
-<li>
-<p>ConfigurationReloadInfo.GetOutOfDatePartStatus()
-identify the parts that had newer versions found during a reload and which Revit attempted to swap out.</p>
-</li>
-</ul>
-<h4><a name="4.2.10.5"></a>Centerline length API</h4>
-<p>The new property:</p>
-<ul>
-<li>FabricationPart.CenterlineLength
-returns the length of the fabrication part's centerline.</li>
-</ul>
-<h4><a name="4.2.11"></a>Analysis Visualization Framework API addition</h4>
-<p>The new property:</p>
-<ul>
-<li>AnalysisDisplayColoredSurfaceSettings.Transparency
-allows for the use of transparency in the display of the colored surface.</li>
-</ul>
-<h4><a name="4.2.12"></a>IFC additions</h4>
-<p>The new functions:</p>
-<ul>
-<li>
-<p>IFCImportOptions.GetExtraOptions()</p>
-</li>
-<li>
-<p>IFCImportOptions.SetExtraOptions()
-allow for passing in arbitrary options for custom IFC importers. Users can pass in a string to string map specifying extra data they wish to pass for IFC import.</p>
-</li>
-</ul>
-<h4><a name="4.2.13"></a>Revit Link Additions</h4>
-<p>The new function:</p>
-<ul>
-<li>RevitLinkType.GetPhaseMap()
-allows users to read the Phase Map parameter for the link. The phase map is a correspondence between phases in the host document and phases in the linked document, and is used by room calculations. Note that the link must be loaded to read the phase map. </li>
-</ul>
-<h4><a name="4.2.14"></a>Export Additions</h4>
-<p>The new property:</p>
-<ul>
-<li>DWFExportOptions.ExportOnlyViewId
-indicates that only the specified view should be exported when creating a DWF export.</li>
-</ul>
-<h4><a name="4.2.15"></a>Access to add-in data paths</h4>
+<p>provide support for adding or removing steel connection elements in a custom connection.</p>
 <p>The new properties:</p>
 <ul>
-<li>
-<p>Autodesk.Revit.ApplicationServices.Application.CurrentUsersDataFolderPath</p>
-</li>
-<li>
-<p>Autodesk.Revit.ApplicationServices.Application.CurrentUsersAddinsDataFolderPath
-provide access to the data folder and add-in data folder for the current Revit version and current user. </p>
-</li>
+<li>StructuralConnectionHandler.IsCustom</li>
+<li>StructuralConnectionHandlerType.IsCustom</li>
+<li>StructuralConnectionHandlerType.IsDetailed</li>
 </ul>
-<h4><a name="4.2.16"></a>Site API additions</h4>
+<p>provide read access to information about the structural connection handler elements.</p>
+<h4><a name="4.2.9"></a>2.9. MEP API additions</h4>
+<h4><a name="4.2.9.1"></a>2.9.1. MEPCurveType Shape</h4>
 <p>The new property:</p>
 <ul>
-<li>TopographySurface.ArePointsEditable
-identifies whether the points of this TopographySurface can be edited independently. This property is used to check validity for several TopographySurface editing methods.</li>
+<li>MEPCurveType.Shape</li>
 </ul>
-<h4><a name="4.2.17"></a>UI API additions</h4>
-<h4><a name="4.2.17.1"></a>BeforeExecutedEventArgs Cancellation</h4>
+<p>returns the shape of the profile for the MEP curve type.</p>
+<h4><a name="4.2.9.2"></a>2.9.2. Mechanical Equipment Set API</h4>
+<p>Two new classes allow creation and manipulation of a mechanical equipment set, which is a set of interrelated mechanical equipment in an MEP system that may operate in parallel. This release is limited to supporting one or more pump sets that are part of a piping system. The mechanical equipment set settings will be used for the MEP flow and pressure drop calculations.</p>
+<p>The Element subclass Autodesk.Revit.DB.Mechanical.MechanicalEquipmentSet represents an instance of a set associated to an MEP system.</p>
+<p>It includes the new members:</p>
+<ul>
+<li>MechanicalEquipmentSet.Create()</li>
+<li>MechanicalEquipmentSet.GetMembers()</li>
+<li>MechanicalEquipmentSet.Add()</li>
+<li>MechanicalEquipmentSet.Remove()</li>
+<li>MechanicalEquipmentSet.AreValidMembers()</li>
+<li>MechanicalEquipmentSet.AreElementsNotConnectedInSeries()</li>
+<li>MechanicalEquipmentSet.Classification</li>
+<li>MechanicalEquipmentSet.OnDuty</li>
+<li>MechanicalEquipmentSet.OnStandby</li>
+</ul>
+<p>The ElementType subclass Autodesk.Revit.DB.Mechanical.MechanicalEquipmentSetType represents a type for a set of mechanical equipment in a MEP system. It includes:</p>
+<ul>
+<li>MechanicalEquipmentSetType.Create()</li>
+</ul>
+<p>used to create a uniquely named type of mechanical equipment set.</p>
+<p>For pump sets, the new method:</p>
+<ul>
+<li>PipingSystem.GetPumpSets()</li>
+</ul>
+<p>gets the set of element ids of pump sets associated with this system.</p>
+<h4><a name="4.2.9.3"></a>2.9.3. Hydraulic Separation API</h4>
+<p>New methods implemented in the PipingSystem class support hydraulic separation. Hydraulically separated systems allow independent flow and pressure analysis for each hydraulic loop. For example, each hydraulic loop has its own critical path. The calculated pressure drop on the primary pump consists of all pressure drop on the primary critical path. Any pressure drop on the secondary loop would only contribute to the calculated pressure drop of the secondary pump.</p>
+<p>The new methods:</p>
+<ul>
+<li>PipingSystem.CreateHydraulicSeparation()</li>
+<li>PipingSystem.DeleteHydraulicSeparation()</li>
+<li>PipingSystem.IsHydraulicLoopBoundary()</li>
+<li>PipingSystem.CanBeHydraulicLoopBoundary()</li>
+</ul>
+<p>support creation, deletion, and validation of members of a hydraulically separated system. Separated systems will have their own associated system elements from which you can read and modify the members after creation.</p>
+<h4><a name="4.2.10"></a>2.10. MEP Fabrication API additions</h4>
+<h4><a name="4.2.10.1"></a>2.10.1. Exporting fabrication job files</h4>
+<p>The new method:</p>
+<ul>
+<li>FabricationPart.SaveAsFabricationJob()</li>
+</ul>
+<p>writes a fabrication job to disk in the MAJ file format. The exported file will contain the fabrication parts included in the input. It takes an options class, FabricationSaveJobOptions, allowing for the possibility of including holes branches meet the main straight.</p>
+<h4><a name="4.2.10.2"></a>2.10.2. API for load and unload of one-off fabrication parts from loose item files</h4>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.FabricationItemFile</li>
+</ul>
+<p>contains information about one-off items that can be loaded into a fabrication configuration.</p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.FabricationItemFolder </li>
+</ul>
+<p>may contain nested FabricationItemFolders and a list of FabricationItemFiles.</p>
+<p>The new members:</p>
+<ul>
+<li>FabricationConfiguration.LoadItemFiles()</li>
+<li>FabricationConfiguration.UnloadItemFiles()</li>
+<li>FabricationConfiguration.GetAllLoadedItemFiles()</li>
+<li>FabricationConfiguration.GetAllUsedItemFiles()</li>
+<li>FabricationConfiguration.CanUnloadItemFiles()</li>
+<li>FabricationConfiguration.AreItemFilesLoaded()</li>
+<li>FabricationConfiguration.GetItemFolders()</li>
+</ul>
+<p>allow control over the loading and unloading of item files into the configuration.</p>
+<p>The new method:</p>
+<ul>
+<li>FabricationPart.Create(Document, FabricationItemFile, ElementId)</li>
+</ul>
+<p>creates a FabricationPart from an item file.</p>
+<h4><a name="4.2.10.3"></a>2.10.3. API for version history of parts</h4>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.FabricationVersionInfo</li>
+</ul>
+<p>gives the information about differerent versions of fabrication data, including the reason why the data was changed.</p>
+<p>The new method:</p>
+<ul>
+<li>FabricationPart.GetVersionHistory()</li>
+</ul>
+<p>returns a list of FabricationVersionInfo classes that describe the history of the changes made to the part. The most recent changes are first in the list.</p>
+<h4><a name="4.2.10.4"></a>2.10.4. API for part swap out information</h4>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.ReloadSwapOutInfo</li>
+</ul>
+<p>gives information about a part that was swapped out during reload.</p>
+<p>The new members:</p>
+<ul>
+<li>ConfigurationReloadInfo.OutOfDatePartCount</li>
+<li>ConfigurationReloadInfo.GetOutOfDatePartStatus()</li>
+</ul>
+<p>identify the parts that had newer versions found during a reload and which Revit attempted to swap out.</p>
+<h4><a name="4.2.10.5"></a>2.10.5. Centerline length API</h4>
+<p>The new property:</p>
+<ul>
+<li>FabricationPart.CenterlineLength</li>
+</ul>
+<p>returns the length of the fabrication part's centerline.</p>
+<h4><a name="4.2.11"></a>2.11. Analysis Visualization Framework API addition</h4>
+<p>The new property:</p>
+<ul>
+<li>AnalysisDisplayColoredSurfaceSettings.Transparency</li>
+</ul>
+<p>allows for the use of transparency in the display of the colored surface.</p>
+<h4><a name="4.2.12"></a>2.12. IFC additions</h4>
+<p>The new functions:</p>
+<ul>
+<li>IFCImportOptions.GetExtraOptions()</li>
+<li>IFCImportOptions.SetExtraOptions()</li>
+</ul>
+<p>allow for passing in arbitrary options for custom IFC importers. Users can pass in a string to string map specifying extra data they wish to pass for IFC import.</p>
+<h4><a name="4.2.13"></a>2.13. Revit Link Additions</h4>
+<p>The new function:</p>
+<ul>
+<li>RevitLinkType.GetPhaseMap()</li>
+</ul>
+<p>allows users to read the Phase Map parameter for the link. The phase map is a correspondence between phases in the host document and phases in the linked document, and is used by room calculations. Note that the link must be loaded to read the phase map.</p>
+<h4><a name="4.2.14"></a>2.14. Export Additions</h4>
+<p>The new property:</p>
+<ul>
+<li>DWFExportOptions.ExportOnlyViewId</li>
+</ul>
+<p>indicates that only the specified view should be exported when creating a DWF export.</p>
+<h4><a name="4.2.15"></a>2.15. Access to add-in data paths</h4>
+<p>The new properties:</p>
+<ul>
+<li>Autodesk.Revit.ApplicationServices.Application.CurrentUsersDataFolderPath</li>
+<li>Autodesk.Revit.ApplicationServices.Application.CurrentUsersAddinsDataFolderPath</li>
+</ul>
+<p>provide access to the data folder and add-in data folder for the current Revit version and current user.</p>
+<h4><a name="4.2.16"></a>2.16. Site API additions</h4>
+<p>The new property:</p>
+<ul>
+<li>TopographySurface.ArePointsEditable</li>
+</ul>
+<p>identifies whether the points of this TopographySurface can be edited independently. This property is used to check validity for several TopographySurface editing methods.</p>
+<h4><a name="4.2.17"></a>2.17. UI API additions</h4>
+<h4><a name="4.2.17.1"></a>2.17.1. BeforeExecutedEventArgs Cancellation</h4>
 <p>The property:</p>
 <ul>
-<li>BeforeExecutedEventArgs.Cancel
-is now permitted to be set to true. This allows the callback to cancel the execution of the impending command. This can be useful if an add-in wishes to selectively allow the command to proceed based on interactions which take place in this callback. The property should also report the cancellation status if it has been canceled by a different subscriber.</li>
+<li>BeforeExecutedEventArgs.Cancel</li>
 </ul>
+<p>is now permitted to be set to true. This allows the callback to cancel the execution of the impending command. This can be useful if an add-in wishes to selectively allow the command to proceed based on interactions which take place in this callback. The property should also report the cancellation status if it has been canceled by a different subscriber.</p>
+<p><center>
+<img src="img/.png" alt="" width="100"/>
+</center></p>
