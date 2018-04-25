@@ -14,24 +14,96 @@
 </head></p>
 <!---
 
+- what's new -- /a/doc/revit/tbc/doc/Revit_Platform_API_Changes_and_Additions_2019_0.docx
+
 @AutodeskRevit #RevitAPI #bim #dynamobim @AutodeskForge #ForgeDevCon
 
-Let's discuss the Revit API enhancements added since the initial release of Revit 2018
-&ndash; Revit 2018.2 Product Update and Resolved API Issues
-&ndash; Revit 2018.2 SDK Update
-&ndash; Major Additions to the Revit 2018.1 API
-&ndash; Material API additions
-&ndash; Geometry API additions
-&ndash; BrowserOrganization API additions
-&ndash; IFC additions
-&ndash; Rebar API additions
-&ndash; Major Additions to the Revit 2018.2 API
-&ndash; Fabrication API additions...
+The Revit 2019 API includes numerous exciting enhancements for add-in developers. Many relate directly to explicit developer wishes and requests
+&ndash; Information Sources
+&ndash; Installation and migration from previous versions
+&ndash; What's new in previous versions
+&ndash; What's new in the Revit 2019 API
+&ndash; API Changes
+&ndash; API Additions...
 
 --->
 
 <h3>What's New in the Revit 2019 API</h3>
+<p>The Revit 2019 API includes numerous exciting enhancements for add-in developers. Many relate directly to explicit developer wishes and requests:</p>
+<ul>
+<li><a href="#1">Information Sources</a> </li>
+<li><a href="#2">Installation and migration from previous versions</a> </li>
+<li><a href="#3">What's new in previous versions</a> </li>
+<li><a href="#4">What's new in the Revit 2019 API &ndash; detailed ToC</a> </li>
+<li><a href="#4.1">1. API Changes</a> <ul>
+<li><a href="#4.1.1">1.1. .NET 4.7</a> </li>
+<li><a href="#4.1.2">1.2.  View Filters support OR operators and nesting</a> </li>
+<li><a href="#4.1.3">1.3. View.ViewName deprecated</a> </li>
+<li><a href="#4.1.4">1.4. UI API changes</a> </li>
+<li><a href="#4.1.5">1.5. Existing APIs now support open from cloud paths and C4R</a> </li>
+<li><a href="#4.1.6">1.6. BasicFileInfo changes</a> </li>
+<li><a href="#4.1.7">1.7. Asset-related API members deprecated</a> </li>
+<li><a href="#4.1.8">1.8. Double Pattern Support</a> </li>
+<li><a href="#4.1.9">1.9. Document.Title consistency</a> </li>
+<li><a href="#4.1.10">1.10. View printing &amp; exporting &ndash; activation events behavioral change</a> </li>
+<li><a href="#4.1.11">1.11. Structural API change</a> </li>
+<li><a href="#4.1.12">1.12. Rebar API changes</a> </li>
+<li><a href="#4.1.13">1.13. MEP API changes</a> </li>
+<li><a href="#4.1.14">1.14. ProjectLocation changes</a> </li>
+<li><a href="#4.1.15">1.15. Building Site export removed</a> </li>
+<li><a href="#4.1.16">1.16. Obsolete API removal</a> </li>
+</ul>
+</li>
+<li><a href="#4.2">2. API Additions</a> <ul>
+<li><a href="#4.2.1">2.1. Material API additions</a> </li>
+<li><a href="#4.2.2">2.2. Railing API additions</a> </li>
+<li><a href="#4.2.3">2.3. Find Element Dependencies</a> </li>
+<li><a href="#4.2.4">2.4. Dimension API additions</a> </li>
+<li><a href="#4.2.5">2.5. Set vertical alignment for text</a> </li>
+<li><a href="#4.2.6">2.6. BrowserOrganization API additions</a> </li>
+<li><a href="#4.2.7">2.7. Rebar API additions</a> </li>
+<li><a href="#4.2.8">2.8. Steel Fabrication API additions</a> </li>
+<li><a href="#4.2.9">2.9. MEP API additions</a> </li>
+<li><a href="#4.2.10">2.10. MEP Fabrication API additions</a> </li>
+<li><a href="#4.2.11">2.11. Analysis Visualization Framework API addition</a> </li>
+<li><a href="#4.2.12">2.12. IFC additions</a> </li>
+<li><a href="#4.2.13">2.13. Revit Link Additions</a> </li>
+<li><a href="#4.2.14">2.14. Export Additions</a> </li>
+<li><a href="#4.2.15">2.15. Access to add-in data paths</a> </li>
+<li><a href="#4.2.16">2.16. Site API additions</a> </li>
+<li><a href="#4.2.17">2.17. UI API additions</a> </li>
+</ul>
+</li>
+</ul>
+<h4><a name="1"></a>Information Sources</h4>
+<p>The highlights were pointed out in
+the <a href="http://thebuildingcoder.typepad.com/blog/2018/02/devdays-keynote-manager-and-rex-extensions.html#2">DevDays Online Revit API news video recording</a>.</p>
+<p>The information below is based on the contents of the <em>Revit Platform API Changes and Additions.docx</em> document included with
+the <a href="http://thebuildingcoder.typepad.com/blog/2018/04/compiling-the-revit-2019-sdk-samples.html#3">Revit 2019 SDK</a>
+&ndash; software developers kit &ndash; available from the Revit installation package and 
+the <a href="https://www.autodesk.com/developer-network/platform-technologies/revit">Revit Developer Centre</a> (not posted yet, but coming soon).</p>
+<p>It is also provided in the section on <em>What's New</em> in the Revit 2019 API help file <code>RevitAPI.chm</code> included with the SDK:</p>
+<p><center>
+<img src="img/revit_2019_api_help.png" alt="Revit 2019 API help on What's New" width="431"/>
+</center></p>
+<p>For convenient, easy and effective web searching, this blog post provides an online version of that information, both in pure HTML (below) as as a PDF document:</p>
+<ul>
+<li><a href="zip/Revit_Platform_API_Changes_and_Additions_2019.pdf">Revit_Platform_API_Changes_and_Additions_2019.pdf</a></li>
+</ul>
+<p>The <em>What's New</em> section always provides very important information, both for discovering and exploring the newly added API functionality and for later reference.</p>
+<p>If you encounter any issues migrating your existing add-ins between different versions, this is one of the first places to look.</p>
+<p>For detailed information on all other aspects of the Revit API, please refer to the rest of the API documentation and samples provided in the SDK.</p>
+<p>The most important things to install and always keep at hand are:</p>
+<ul>
+<li>The Revit API help file <code>RevitAPI.chm</code></li>
+<li>The Visual Studio solution containing all the SDK samples, <code>Samples\SDKSamples.sln</code></li>
+</ul>
+<p>You will need both of these constantly for research on how to solve specific Revit API programming tasks.</p>
+<p>More in-depth official explanations and background information is provided by the
+online <a href="http://help.autodesk.com/view/RVT/2019/ENU/?guid=Revit_API_Revit_API_Developers_Guide_html">Revit API Developers Guide</a> included 
+in the <a href="http://help.autodesk.com/view/RVT/2019/ENU">Revit 2019 Help</a>.</p>
 <h4><a name="2"></a>Installation and Migration From Previous Versions</h4>
+<p>Here are the steps I performed so far setting up the Revit 2019 SDK and samples:</p>
 <ul>
 <li>The <a href="http://thebuildingcoder.typepad.com/blog/2018/04/compiling-the-revit-2019-sdk-samples.html">Revit 2019 SDK samples</a></li>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2018/04/revitlookup-2019-and-new-sdk-samples.html">RevitLookup</a></li>
@@ -41,7 +113,7 @@ Let's discuss the Revit API enhancements added since the initial release of Revi
 <li>The <a href="http://thebuildingcoder.typepad.com/blog/2018/04/rvtsamples-2019.html">RvtSamples add-in</a></li>
 </ul>
 <h4><a name="3"></a>What's New in Previous Versions</h4>
-<p>Here are links to discussions of <em>What's New in the Revit API</em> for previous versions:</p>
+<p>Here are links to previous discussions of <em>What's New in the Revit API</em>:</p>
 <ul>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2010-api.html">What's New in the Revit 2010 API</a></li>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2011-api.html">What's New in the Revit 2011 API</a></li>
@@ -58,86 +130,86 @@ Let's discuss the Revit API enhancements added since the initial release of Revi
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html">Revit 2018.1 Visual Materials API</a></li>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/12/whats-new-in-the-revit-20182-api.html">What's New in the Revit 2018.2 API</a></li>
 </ul>
-<h4><a name="4"></a>What's New in the Revit 2019 API &ndash; ToC</h4>
+<h4><a name="4"></a>What's New in the Revit 2019 API &ndash; Detailed ToC</h4>
 <p>Table of Contents:</p>
 <ul class="toc">
-<li>1.  <a href="#4.1">API changes</a></li>
+<li>1. <a href="#4.1">API changes</a></li>
 <ul class="toc">
-<li>1.1.    <a href="#4.1.1">.NET 4.7</a></li>
-<li>1.2.    <a href="#4.1.2">View Filters support OR operators and nesting</a></li>
+<li>1.1. <a href="#4.1.1">.NET 4.7</a></li>
+<li>1.2. <a href="#4.1.2">View Filters support OR operators and nesting</a></li>
 <ul class="toc">
-<li>1.2.1.  <a href="#4.1.2.1">ParameterFilterElement API changes</a></li>
-<li>1.2.2.  <a href="#4.1.2.2">ElementLogicalFilter API addition</a></li>
+<li>1.2.1. <a href="#4.1.2.1">ParameterFilterElement API changes</a></li>
+<li>1.2.2. <a href="#4.1.2.2">ElementLogicalFilter API addition</a></li>
 </ul>
-<li>1.3.    <a href="#4.1.3">View.ViewName deprecated</a></li>
-<li>1.4.    <a href="#4.1.4">UI API changes</a></li>
+<li>1.3. <a href="#4.1.3">View.ViewName deprecated</a></li>
+<li>1.4. <a href="#4.1.4">UI API changes</a></li>
 <ul class="toc">
-<li>1.4.1.  <a href="#4.1.4.1">Main window handle access</a></li>
-<li>1.4.2.  <a href="#4.1.4.2">Changes to PostableCommand enumeration</a></li>
+<li>1.4.1. <a href="#4.1.4.1">Main window handle access</a></li>
+<li>1.4.2. <a href="#4.1.4.2">Changes to PostableCommand enumeration</a></li>
 </ul>
-<li>1.5.    <a href="#4.1.5">Existing APIs now support open from cloud paths (Collaboration for Revit)<</a></li>
+<li>1.5. <a href="#4.1.5">Existing APIs now support open from cloud paths (Collaboration for Revit)</a></li>
 <ul class="toc">
-<li>1.5.1.  <a href="#4.1.5.1">Document Open APIs support cloud paths</a></li>
-<li>1.5.2.  <a href="#4.1.5.2">Callback for conflict cases when opening from a cloud path</a></li>
+<li>1.5.1. <a href="#4.1.5.1">Document Open APIs support cloud paths</a></li>
+<li>1.5.2. <a href="#4.1.5.2">Callback for conflict cases when opening from a cloud path</a></li>
 </ul>
-<li>1.6.    <a href="#4.1.6">BasicFileInfo changes</a></li>
-<li>1.7.    <a href="#4.1.7">Asset-related API members deprecated</a></li>
-<li>1.8.    <a href="#4.1.8">Double Pattern Support</a></li>
+<li>1.6. <a href="#4.1.6">BasicFileInfo changes</a></li>
+<li>1.7. <a href="#4.1.7">Asset-related API members deprecated</a></li>
+<li>1.8. <a href="#4.1.8">Double Pattern Support</a></li>
 <ul class="toc">
-<li>1.8.1.  <a href="#4.1.8.1">Material API support for double patterns</a></li>
-<li>1.8.2.  <a href="#4.1.8.2">Support for overriding double patterns</a></li>
-<li>1.8.3.  <a href="#4.1.8.3">Support for double patterns for FilledRegion</a></li>
+<li>1.8.1. <a href="#4.1.8.1">Material API support for double patterns</a></li>
+<li>1.8.2. <a href="#4.1.8.2">Support for overriding double patterns</a></li>
+<li>1.8.3. <a href="#4.1.8.3">Support for double patterns for FilledRegion</a></li>
 </ul>
-<li>1.9.    <a href="#4.1.9">Document.Title consistency</a></li>
-<li>1.10.   <a href="#4.1.10">View printing & exporting &ndash; activation events behavioral change</a></li>
-<li>1.11.   <a href="#4.1.11">Structural API change</a></li>
-<li>1.12.   <a href="#4.1.12">Rebar API changes</a></li>
-<li>1.13.   <a href="#4.1.13">MEP API changes</a></li>
-<li>1.14.   <a href="#4.1.14">ProjectLocation changes</a></li>
-<li>1.15.   <a href="#4.1.15">Building Site export removed</a></li>
-<li>1.16.   <a href="#4.1.16">Obsolete API removal</a></li>
+<li>1.9. <a href="#4.1.9">Document.Title consistency</a></li>
+<li>1.10. <a href="#4.1.10">View printing & exporting &ndash; activation events behavioral change</a></li>
+<li>1.11. <a href="#4.1.11">Structural API change</a></li>
+<li>1.12. <a href="#4.1.12">Rebar API changes</a></li>
+<li>1.13. <a href="#4.1.13">MEP API changes</a></li>
+<li>1.14. <a href="#4.1.14">ProjectLocation changes</a></li>
+<li>1.15. <a href="#4.1.15">Building Site export removed</a></li>
+<li>1.16. <a href="#4.1.16">Obsolete API removal</a></li>
 </ul>
-<li>2.  <a href="#4.2">API additions</a></li>
+<li>2. <a href="#4.2">API additions</a></li>
 <ul class="toc">
-<li>2.1.    <a href="#4.2.1">Material API additions</a></li>
+<li>2.1. <a href="#4.2.1">Material API additions</a></li>
 <ul class="toc">
-<li>2.1.1.  <a href="#4.2.1.1">Editing the properties of an Appearance Asset</a></li>
-<li>2.1.2.  <a href="#4.2.1.2">Editing AssetProperty values</a></li>
-<li>2.1.3.  <a href="#4.2.1.3">Connected Assets</a></li>
-<li>2.1.4.  <a href="#4.2.1.4">Validation</a></li>
-<li>2.1.5.  <a href="#4.2.1.5">Schemas & Property names</a></li>
-<li>2.1.6.  <a href="#4.2.1.6">Utilities</a></li>
+<li>2.1.1. <a href="#4.2.1.1">Editing the properties of an Appearance Asset</a></li>
+<li>2.1.2. <a href="#4.2.1.2">Editing AssetProperty values</a></li>
+<li>2.1.3. <a href="#4.2.1.3">Connected Assets</a></li>
+<li>2.1.4. <a href="#4.2.1.4">Validation</a></li>
+<li>2.1.5. <a href="#4.2.1.5">Schemas & Property names</a></li>
+<li>2.1.6. <a href="#4.2.1.6">Utilities</a></li>
 </ul>
-<li>2.2.    <a href="#4.2.2">Railing API additions</a></li>
+<li>2.2. <a href="#4.2.2">Railing API additions</a></li>
 <ul class="toc">
-<li>2.2.1.  <a href="#4.2.2.1">Non-Continuous Rail Structure</a></li>
-<li>2.2.2.  <a href="#4.2.2.2">Baluster Placement</a></li>
+<li>2.2.1. <a href="#4.2.2.1">Non-Continuous Rail Structure</a></li>
+<li>2.2.2. <a href="#4.2.2.2">Baluster Placement</a></li>
 </ul>
-<li>2.3.    <a href="#4.2.3">Find Element Dependencies</a></li>
-<li>2.4.    <a href="#4.2.4">Dimension API additions</a></li>
-<li>2.5.    <a href="#4.2.5">Set vertical alignment for text</a></li>
-<li>2.6.    <a href="#4.2.6">BrowserOrganization API additions</a></li>
-<li>2.7.    <a href="#4.2.7">Rebar API additions</a></li>
+<li>2.3. <a href="#4.2.3">Find Element Dependencies</a></li>
+<li>2.4. <a href="#4.2.4">Dimension API additions</a></li>
+<li>2.5. <a href="#4.2.5">Set vertical alignment for text</a></li>
+<li>2.6. <a href="#4.2.6">BrowserOrganization API additions</a></li>
+<li>2.7. <a href="#4.2.7">Rebar API additions</a></li>
 <ul class="toc">
-<li>2.7.1.  <a href="#4.2.7.1">BarTypeDiameterOptions</a></li>
-<li>2.7.2.  <a href="#4.2.7.2">GetDistributionPath()</a></li>
-<li>2.7.3.  <a href="#4.2.7.3">RebarUpdateCurvesData</a></li>
-<li>2.7.4.  <a href="#4.2.7.4">RebarShapes</a></li>
-<li>2.7.5.  <a href="#4.2.7.5">Workshop Instructions</a></li>
-<li>2.7.6.  <a href="#4.2.7.6">RebarFreeFormAccessor Additions</a></li>
+<li>2.7.1. <a href="#4.2.7.1">BarTypeDiameterOptions</a></li>
+<li>2.7.2. <a href="#4.2.7.2">GetDistributionPath()</a></li>
+<li>2.7.3. <a href="#4.2.7.3">RebarUpdateCurvesData</a></li>
+<li>2.7.4. <a href="#4.2.7.4">RebarShapes</a></li>
+<li>2.7.5. <a href="#4.2.7.5">Workshop Instructions</a></li>
+<li>2.7.6. <a href="#4.2.7.6">RebarFreeFormAccessor Additions</a></li>
 </ul>
-<li>2.8.    <a href="#4.2.8">Steel Fabrication API additions</a></li>
+<li>2.8. <a href="#4.2.8">Steel Fabrication API additions</a></li>
 <ul class="toc">
-<li>2.8.1.  <a href="#4.2.8.1">SteelElementProperties &ndash; linking between Revit elements and steel fabrication elements</a></li>
-<li>2.8.2.  <a href="#4.2.8.2">Custom steel connections &ndash; API additions</a></li>
+<li>2.8.1. <a href="#4.2.8.1">SteelElementProperties &ndash; linking between Revit elements and steel fabrication elements</a></li>
+<li>2.8.2. <a href="#4.2.8.2">Custom steel connections &ndash; API additions</a></li>
 </ul>
-<li>2.9.    <a href="#4.2.9">MEP API additions</a></li>
+<li>2.9. <a href="#4.2.9">MEP API additions</a></li>
 <ul class="toc">
-<li>2.9.1.  <a href="#4.2.9.1">MEPCurveType Shape</a></li>
-<li>2.9.2.  <a href="#4.2.9.2">Mechanical Equipment Set API</a></li>
-<li>2.9.3.  <a href="#4.2.9.3">Hydraulic Separation API</a></li>
+<li>2.9.1. <a href="#4.2.9.1">MEPCurveType Shape</a></li>
+<li>2.9.2. <a href="#4.2.9.2">Mechanical Equipment Set API</a></li>
+<li>2.9.3. <a href="#4.2.9.3">Hydraulic Separation API</a></li>
 </ul>
-<li>2.10.   <a href="#4.2.10">MEP Fabrication API additions</a></li>
+<li>2.10. <a href="#4.2.10">MEP Fabrication API additions</a></li>
 <ul class="toc">
 <li>2.10.1. <a href="#4.2.10.1">Exporting fabrication job files</a></li>
 <li>2.10.2. <a href="#4.2.10.2">API for load and unload of one-off fabrication parts from loose item files</a></li>
@@ -145,13 +217,13 @@ Let's discuss the Revit API enhancements added since the initial release of Revi
 <li>2.10.4. <a href="#4.2.10.4">API for part swap out information</a></li>
 <li>2.10.5. <a href="#4.2.10.5">Centerline length API</a></li>
 </ul>
-<li>2.11.   <a href="#4.2.11">Analysis Visualization Framework API addition</a></li>
-<li>2.12.   <a href="#4.2.12">IFC additions</a></li>
-<li>2.13.   <a href="#4.2.13">Revit Link Additions</a></li>
-<li>2.14.   <a href="#4.2.14">Export Additions</a></li>
-<li>2.15.   <a href="#4.2.15">Access to add-in data paths</a></li>
-<li>2.16.   <a href="#4.2.16">Site API additions</a></li>
-<li>2.17.   <a href="#4.2.17">UI API additions</a></li>
+<li>2.11. <a href="#4.2.11">Analysis Visualization Framework API addition</a></li>
+<li>2.12. <a href="#4.2.12">IFC additions</a></li>
+<li>2.13. <a href="#4.2.13">Revit Link Additions</a></li>
+<li>2.14. <a href="#4.2.14">Export Additions</a></li>
+<li>2.15. <a href="#4.2.15">Access to add-in data paths</a></li>
+<li>2.16. <a href="#4.2.16">Site API additions</a></li>
+<li>2.17. <a href="#4.2.17">UI API additions</a></li>
 <ul class="toc">
 <li>2.17.1. <a href="#4.2.17.1">BeforeExecutedEventArgs Cancellation</a></li>
 </ul>
@@ -217,7 +289,7 @@ Let's discuss the Revit API enhancements added since the initial release of Revi
 <li>PostableCommand.TileWindows &rarr; PostableCommand.TileViews</li>
 <li>PostableCommand.CloseHiddenWindows &rarr; PostableCommand.CloseInactiveViews</li>
 </ul>
-<h4><a name="4.1.5"></a>1.5. Existing APIs now support open from cloud paths (Collaboration for Revit)&lt;</h4>
+<h4><a name="4.1.5"></a>1.5. Existing APIs now support open from cloud paths (Collaboration for Revit)</h4>
 <h4><a name="4.1.5.1"></a>1.5.1. Document Open APIs support cloud paths</h4>
 <p>The existing methods:</p>
 <ul>
@@ -233,13 +305,13 @@ Let's discuss the Revit API enhancements added since the initial release of Revi
 <ul>
 <li>ModelPathUtils.ConvertCloudGUIDsToCloudPath(Guid, Guid)</li>
 </ul>
-<p>by inputting the the project Guid and model Guid (which could be obtained from various Forge APIs).</p>
+<p>by inputting the project Guid and model Guid (which could be obtained from various Forge APIs).</p>
 <h4><a name="4.1.5.2"></a>1.5.2. Callback for conflict cases when opening from a cloud path</h4>
 <p>The callback method:</p>
 <ul>
 <li>Autodesk.Revit.DB.IOpenFromCloudCallback.OnOpenConflict()</li>
 </ul>
-<p>can be passed to the document open methods to gain to handle conflict cases. The method is passed an OpenConflictScenario value identifying the reason for the conflict ( Rollback, Relinquished or OutOfDate) and should return an OpenConflictResult with the desired response (keep local changes, discard local changes and open the latest version or cancel).</p>
+<p>can be passed to the document open methods to gain to handle conflict cases. The method is passed an OpenConflictScenario value identifying the reason for the conflict (Rollback, Relinquished or OutOfDate) and should return an OpenConflictResult with the desired response (keep local changes, discard local changes and open the latest version or cancel).</p>
 <p>The new class:</p>
 <ul>
 <li>DefaultOpenFromCloudCallback</li>
@@ -250,7 +322,7 @@ Let's discuss the Revit API enhancements added since the initial release of Revi
 <ul>
 <li>BasicFileInfo.Extract() </li>
 </ul>
-<p>from a version of Revit prior to Revit 2019 will result in an exception if it is called on a Revit 2019 or later file. The class and method documentation has been clarified to reflect this posssibility that may occur again in the future.</p>
+<p>from a version of Revit prior to Revit 2019 will result in an exception if it is called on a Revit 2019 or later file. The class and method documentation has been clarified to reflect this possibility that may occur again in the future.</p>
 <p>The following BasicFileInfo property was deprecated and replaced:</p>
 <ul>
 <li>SavedInVersion &rarr; Format &ndash; The new property contains only the file format indicator (the major release version such as "2019") used for saving the file. No build information or product information is included in this string, making it easier to use for comparisons or messaging.</li>
@@ -304,7 +376,7 @@ Let's discuss the Revit API enhancements added since the initial release of Revi
 <ul>
 <li>Document.Title</li>
 </ul>
-<p>honored the Windows user setting requiring dlsplay of file extensions. The property has been changed to consistently return a title with no extension.</p>
+<p>honoured the Windows user setting requiring display of file extensions. The property has been changed to consistently return a title with no extension.</p>
 <h4><a name="4.1.10"></a>1.10. View printing &amp; exporting &ndash; activation events behavioral change</h4>
 <p>Because of an improvement to Revit processing, views will no longer be activated prior to being printed or exported. This means that the ViewActivating and ViewActivated events are no longer triggered as each view is printed or exported from a set.</p>
 <h4><a name="4.1.11"></a>1.11. Structural API change</h4>
@@ -384,7 +456,7 @@ Let's discuss the Revit API enhancements added since the initial release of Revi
 </center></p>
 <h4><a name="4.2.1"></a>2.1. Material API additions</h4>
 <h4><a name="4.2.1.1"></a>2.1.1. Editing the properties of an Appearance Asset</h4>
-<p>New Revit API capabilties have been introduced to edit the properties contained in an appearance asset of a material. These properties appear in the Appearance tab of the Materials dialog and govern the appearance of the material in realistic views and rendering.
+<p>New Revit API capabilities have been introduced to edit the properties contained in an appearance asset of a material. These properties appear in the Appearance tab of the Materials dialog and govern the appearance of the material in realistic views and rendering.
 Editing the properties in an appearance Asset requires establishment of an edit scope. The new class</p>
 <ul>
 <li>Autodesk.Revit.DB.Visual.AppearanceAssetEditScope</li>
@@ -450,7 +522,7 @@ The new methods:</p>
 <ul>
 <li>AssetProperty.IsEditable()</li>
 </ul>
-<p>identifies the the AssetProperty can currently be edited.</p>
+<p>identifies the AssetProperty can currently be edited.</p>
 <h4><a name="4.2.1.5"></a>2.1.5. Schemas &amp; Property names</h4>
 <p>Appearance asset properties are aligned with specific schemas. Each schema contains necessary properties which define how the appearance of the material will be generated. There are 14 standard material schemas:</p>
 <ul>
@@ -653,7 +725,7 @@ For a free form rebar set the distance between two consecutive bars may be diffe
 <ul>
 <li>SteelElementProperties.AddFabricationInformationForRevitElements()</li>
 </ul>
-<p>If you have a fabrication id, you can lookup the corresponding Revit element using:</p>
+<p>If you have a fabrication id, you can look up the corresponding Revit element using:</p>
 <ul>
 <li>SteelElementProperties.GetReference()</li>
 </ul>
@@ -758,7 +830,7 @@ For a free form rebar set the distance between two consecutive bars may be diffe
 <ul>
 <li>Autodesk.Revit.DB.FabricationVersionInfo</li>
 </ul>
-<p>gives the information about differerent versions of fabrication data, including the reason why the data was changed.</p>
+<p>gives the information about different versions of fabrication data, including the reason why the data was changed.</p>
 <p>The new method:</p>
 <ul>
 <li>FabricationPart.GetVersionHistory()</li>
@@ -826,7 +898,4 @@ For a free form rebar set the distance between two consecutive bars may be diffe
 <ul>
 <li>BeforeExecutedEventArgs.Cancel</li>
 </ul>
-<p>is now permitted to be set to true. This allows the callback to cancel the execution of the impending command. This can be useful if an add-in wishes to selectively allow the command to proceed based on interactions which take place in this callback. The property should also report the cancellation status if it has been canceled by a different subscriber.</p>
-<p><center>
-<img src="img/.png" alt="" width="100"/>
-</center></p>
+<p>is now permitted to be set to true. This allows the call-back to cancel the execution of the impending command. This can be useful if an add-in wishes to selectively allow the command to proceed based on interactions which take place in this call-back. The property should also report the cancellation status if it has been cancelled by a different subscriber.</p>
