@@ -74,6 +74,7 @@ presented by Harlan Brumm, Revit Product Manager, Autodesk.</p>
 <p>Your questions also indicate that you are confusing what BIM360 versus Forge is.</p>
 <p>Note that A360 and BIM360 are end user products.</p>
 <p>Forge is not. Forge is a platform for building applications.</p>
+<p>Forge has no concept of a 'user'. It provides web services to a client. The client can be the viewer, or a web app. A web app can include the viewer. The cost for Forge services is paid by the client owner, e.g., the company running the app.</p>
 <p>In many cases, a Forge application will wish to access user data stored in one of the end user products.</p>
 <p>In order to fully enable this in an efficient manner, you will need to understand and implement 2-legged and 3-legged authorisation.</p>
 <p>Please read some background information on that topic, e.g.,
@@ -113,11 +114,11 @@ In any case, a simple yes or no answer to this will be completely misleading, gi
 </li>
 <li>
 <p>Is it possible to have user access restricted based on roles or other rights for either platform? 
-<br/>&rarr; No</p>
+<br/>&rarr; No. Although, obviously, with Forge, you can implement anything you like yourself.</p>
 </li>
 <li>
 <p>My research shows it's not possible with BIM360 but is possible with Forge. Am I correct?
-<br/>&rarr; No, there is no concept of 'user' in 2-legged.
+<br/>&rarr; No; there is no concept of 'user' in 2-legged.
 For 3-legged, an app would be able to access the hubs and project that are accessible to the user.
 This has to be managed through A360; there is no API to control of that at the moment. </p>
 </li>
@@ -142,4 +143,14 @@ This has to be managed through A360; there is no API to control of that at the m
 <br/>&rarr; As said, you can use Forge without BIM360 and BIM360 without Forge. You can also connect the two.
 It depends the business model, 2-legged vs 3-legged app.</p>
 </li>
+</ul>
+<p>My recommendations:</p>
+<ul>
+<li>If your users require BIM360 functionality, use it.</li>
+<li>If you have to implement functionality for them yourself, you might be better off just using Forge.</li>
+<li>You might also want consider data and user ownership: with Forge, the models are sent to a server that you have little control over for translation. All else remains your own: your app data, your users' data, and your users themselves.</li>
+<li>As a developer, simplification and optimisation fanatic, I would try to avoid all unneccessary complexity and cost.
+Forge is probably simpler for you to integrate with than A360, you have total control, and much more work to do.
+<a href="https://en.wikipedia.org/wiki/Do_it_yourself">DIY</a>
+and <a href="https://en.wikipedia.org/wiki/KISS_principle">KISS</a>.</li>
 </ul>
