@@ -76,7 +76,7 @@ presented by Harlan Brumm, Revit Product Manager, Autodesk.</p>
 <p>Forge is not. Forge is a platform for building applications.</p>
 <p>Forge has no concept of a 'user'. It provides web services to a client. The client can be the viewer, or a web app. A web app can include the viewer. The cost for Forge services is paid by the client owner, e.g., the company running the app.</p>
 <p>You could say that A360 and BIM360 are Forge clients, as well.</p>
-<p>You have the choice of including them with yur customer offering, or building your own clients that may or may not partially replace the functionality they provide.</p>
+<p>You have the choice of including them with your customer offering, or building your own clients that may or may not partially replace the functionality they provide.</p>
 <p>If you want to integrate use of A360 or BIM360 with your own Forge application, it will probably need to access user data stored in one of the end user products.</p>
 <p>In order to fully enable this in an efficient manner, you will need to understand and implement 2-legged and 3-legged authorisation.</p>
 <p>Please read some background information on that topic, e.g.,
@@ -151,8 +151,28 @@ It depends the business model, 2-legged vs 3-legged app.</p>
 <li>If your users require BIM360 functionality, use it.</li>
 <li>If you have to implement functionality for them yourself, you might be better off just using Forge.</li>
 <li>You might also want consider data and user ownership: with Forge, the models are sent to a server that you have little control over for translation. All else remains your own: your app data, your users' data, and your users themselves.</li>
-<li>As a developer, simplification and optimisation fanatic, I would try to avoid all unneccessary complexity and cost.
+<li>As a developer, simplification and optimisation fanatic, I would try to avoid all unnecessary complexity and cost.
 Forge is probably simpler for you to integrate with than A360, you have total control, and much more work to do.
 <a href="https://en.wikipedia.org/wiki/Do_it_yourself">DIY</a>
 and <a href="https://en.wikipedia.org/wiki/KISS_principle">KISS</a>.</li>
 </ul>
+<p><strong>Response:</strong> Thank you.</p>
+<p>I do actually know the difference between Forge (backend) and BIM360 (front-end implementation).</p>
+<p>Perhaps I didn't state the question correctly.</p>
+<p>The question I am researching is this:</p>
+<ul>
+<li>Would using Forge to create a custom viewer give me an advantage over simply implementing BIM360?</li>
+</ul>
+<p>One of the major issues my client has is that they manage a large set of buildings, over 100.000 square metres.
+At any given moment, multiple refurbishment projects are running with different design teams and contractors working on them.
+My client wants to provide all necessary information through 3D models.
+However, they don't want contractor A to see all specific information meant for contractor B, C, and D.
+And vice-versa.</p>
+<p>In my opinion, the only way to do this with BIM360 is to provide each contractor with a tailored version of the Master Model that only contains the specific information for their project and use folder rights to give different contractors their own folder with their own tailored submodel.
+This would require some serious work in managing all those tailored submodels.</p>
+<p>I was hoping Forge would allow me to build an application that would provide me with the means of visualising tailored versions of the Master Model based on which project a contractor is working on, and still keep a single Master Model without having to actually create physical copies as tailored submodels.</p>
+<p>Does that make more sense?</p>
+<p>Again: thanks a lot for your answers and clarifications.</p>
+<p>I think I have enough info to give proper advice on this now.</p>
+<p>Looks like the client can choose to start with BIM360 and may sooner or later run into its limitations.</p>
+<p>Then, they might have to switch to Forge.</p>
