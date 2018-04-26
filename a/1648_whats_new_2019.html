@@ -30,7 +30,7 @@ here is a webinar invitation to walk through the results live from the product p
 <p>I also share a high-level comparison of some aspects of Forge versus A360 for a total newbie thinking about building a solution for a client to manage 3D models and collaborate on them with sub-contractors:</p>
 <ul>
 <li><a href="#2">Webinar on What’s New in Revit 2019</a> </li>
-<li><a href="#3">Forge versus A360</a> </li>
+<li><a href="#3">Forge versus A360 and BIM360</a> </li>
 </ul>
 <h4><a name="2"></a>Webinar on What’s New in Revit 2019</h4>
 <p>Join Autodesk Revit technical experts as they walk through what’s new and improved in the latest release of Revit for BIM.</p>
@@ -48,7 +48,7 @@ presented by Harlan Brumm, Revit Product Manager, Autodesk.</p>
 <p><center>
 <img src="img/revit_2019.jpg" alt="Revit 2019" width="431"/>
 </center></p>
-<h4><a name="3"></a>Forge versus A360</h4>
+<h4><a name="3"></a>Forge versus A360 and BIM360</h4>
 <p>Let's clarify some basic questions on differences between Forge and A360.</p>
 <p><strong>Question:</strong> I am looking into different possibilities to provide a client, a hospital owner, with a good solution to manage their 3D models and provide them to their (sub)contractors.</p>
 <p>They want to use Revit and Navisworks to provide information about all the on-going internal refurbishment projects, add planning data and visualise which parts of the hospital need to temporarily relocate, are closed down, and so on.</p>
@@ -75,7 +75,9 @@ presented by Harlan Brumm, Revit Product Manager, Autodesk.</p>
 <p>Note that A360 and BIM360 are end user products.</p>
 <p>Forge is not. Forge is a platform for building applications.</p>
 <p>Forge has no concept of a 'user'. It provides web services to a client. The client can be the viewer, or a web app. A web app can include the viewer. The cost for Forge services is paid by the client owner, e.g., the company running the app.</p>
-<p>In many cases, a Forge application will wish to access user data stored in one of the end user products.</p>
+<p>You could say that A360 and BIM360 are Forge clients, as well.</p>
+<p>You have the choice of including them with yur customer offering, or building your own clients that may or may not partially replace the functionality they provide.</p>
+<p>If you want to integrate use of A360 or BIM360 with your own Forge application, it will probably need to access user data stored in one of the end user products.</p>
 <p>In order to fully enable this in an efficient manner, you will need to understand and implement 2-legged and 3-legged authorisation.</p>
 <p>Please read some background information on that topic, e.g.,
 by <a href="https://duckduckgo.com/?q=2-legged+versus+3-legged">searching the Internet for '2-legged versus 3-legged'</a>.</p>
@@ -89,7 +91,7 @@ the <a href="https://stackoverflow.com/questions/5593348/difference-between-oaut
 </li>
 <li>
 <p>Both have the same functionality. Is that correct? 
-<br/>&rarr; Almost yes, but not quite.
+<br/>&rarr; The viewer is shared. Nothing else is comparable, though.
 No, A360 has additional customizations that are not part of the public viewer API.
 Separate source code for that not available to third parties.</p>
 </li>
@@ -110,11 +112,11 @@ In any case, a simple yes or no answer to this will be completely misleading, gi
 </li>
 <li>
 <p>Technically speaking, this shouldn't be an issue, but is it allowed / supported?
-<br/>&rarr; No; it's not technically doable.</p>
+<br/>&rarr; Makes no sense; see above.</p>
 </li>
 <li>
 <p>Is it possible to have user access restricted based on roles or other rights for either platform? 
-<br/>&rarr; No. Although, obviously, with Forge, you can implement anything you like yourself.</p>
+<br/>&rarr; Makes no sense; see above. Obviously, with Forge, you can implement anything you like yourself.</p>
 </li>
 <li>
 <p>My research shows it's not possible with BIM360 but is possible with Forge. Am I correct?
@@ -127,19 +129,19 @@ This has to be managed through A360; there is no API to control of that at the m
 <br/>&rarr; Please look at the <a href="https://forge.autodesk.com/pricing">Forge pricing page</a>.</p>
 </li>
 <li>
-<p>But does that also constitute each update?
+<p>Does that also constitute each update?
 <br/>&rarr; Yes.</p>
 </li>
 <li>
-<p>E.g.: if a new project is planned, and the model is updated in Forge, does that constitute as a new upload?
+<p>E.g., if a new project is planned, and the model is updated in Forge, does that constitute as a new upload?
 <br/>&rarr; Yes. Each new upload requires a new translation, so the cloud credit fee applies.</p>
 </li>
 <li>
 <p>The Forge website says you will need a BIM360 account. Does that mean the pricing for Forge comes on top of the BIM360 pricing? 
-<br/>&rarr; You don't need a BIM360 account to use Forge, it's independent.</p>
+<br/>&rarr; You don't need a BIM360 account to use Forge; it's independent.</p>
 </li>
 <li>
-<p>And would we need a separate BIM360 account for every Forge user or can we use one "master" account and provide access to the models without having to create a BIM360 account for everyone that needs to view the files?
+<p>Would we need a separate BIM360 account for every Forge user or can we use one 'master' account and provide access to the models without having to create a BIM360 account for everyone that needs to view the files?
 <br/>&rarr; As said, you can use Forge without BIM360 and BIM360 without Forge. You can also connect the two.
 It depends the business model, 2-legged vs 3-legged app.</p>
 </li>
