@@ -33,7 +33,7 @@ I finally solved that once and for all by implementing a couple of methods to pe
 - [BitmapImageToBitmap](#3) &ndash; convert a `BitmapImage` to `Bitmap`
 - [BitmapToBitmapSource](#4) &ndash; convert a `Bitmap` to a `BitmapSource`
 - [ResizeImage](#5) &ndash; resize an image to the specified width and height
-- [ScaledIcon](#6) &ndash; scale down large icon to desired size for Revit ribbon button, e.g., 32 x 32 or 16 x 16
+- [ScaledIcon](#6) &ndash; return a scaled down icon of desired size for Revit ribbon button
 - [Usage sample](#7) &ndash; putting them together
 
 Here they are one by one:
