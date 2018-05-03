@@ -9,7 +9,7 @@
 
 <!---
 
- @AutodeskRevit #RevitAPI #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/fpdopportunity
+Scaling a bitmap for the #RevitAPI external application large and small image icons @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/scaleribbonicon
 
 Every time I created a ribbon button, I was faced with the task of creating appropriately scaled icons for it to populate the <code>PushButton</code> large and small image icon properties <code>LargeImage</code> and <code>Image</code>.
 They seem to expect a 32 x 32 and 16 x 16 icon, respectively.
@@ -156,13 +156,13 @@ Here they are one by one:
 </pre>
 
 
-####<a name="7"></a>Usage
+####<a name="7"></a>Usage Sample
 
 Within the external application `PopulatePanel` method, simply read the embedded resource icon image and apply `ScaledIcon` to it to populate the large and small image properties with appropriately scaled images:
 
 <pre class="code">
 &nbsp;&nbsp;<span style="color:#2b91af;">BitmapImage</span>&nbsp;bmi&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">BitmapImage</span>(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Uri</span>(&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;icons/unlinked.png&quot;</span>,&nbsp;<span style="color:#2b91af;">UriKind</span>.Relative&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;icons/cmdx.png&quot;</span>,&nbsp;<span style="color:#2b91af;">UriKind</span>.Relative&nbsp;)&nbsp;);
  
 &nbsp;&nbsp;<span style="color:#2b91af;">PushButton</span>&nbsp;pb&nbsp;=&nbsp;p.AddItem(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">PushButtonData</span>(&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Command&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;Command&quot;</span>,&nbsp;path,&nbsp;<span style="color:#a31515;">&quot;CmdX&quot;</span>&nbsp;)&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">PushButton</span>;

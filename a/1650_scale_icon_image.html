@@ -142,11 +142,11 @@ I finally solved that once and for all by implementing a couple of methods to pe
 }
 </pre>
 
-<h4><a name="7"></a>Usage</h4>
+<h4><a name="7"></a>Usage Sample</h4>
 <p>Within the external application <code>PopulatePanel</code> method, simply read the embedded resource icon image and apply <code>ScaledIcon</code> to it to populate the large and small image properties with appropriately scaled images:</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:#2b91af;">BitmapImage</span>&nbsp;bmi&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">BitmapImage</span>(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Uri</span>(&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;icons/unlinked.png&quot;</span>,&nbsp;<span style="color:#2b91af;">UriKind</span>.Relative&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;icons/cmdx.png&quot;</span>,&nbsp;<span style="color:#2b91af;">UriKind</span>.Relative&nbsp;)&nbsp;);
 
 &nbsp;&nbsp;<span style="color:#2b91af;">PushButton</span>&nbsp;pb&nbsp;=&nbsp;p.AddItem(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">PushButtonData</span>(&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Command&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;Command&quot;</span>,&nbsp;path,&nbsp;<span style="color:#a31515;">&quot;CmdX&quot;</span>&nbsp;)&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">PushButton</span>;
