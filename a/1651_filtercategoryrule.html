@@ -13,16 +13,19 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+@CaptainDan raised a very pertinent question in
+the discussion forum on using <code>FilterCategoryRule<code> in the Revit API that
+led to some discussion and clarification with the development team:
+I have three questions regarding the filter rule represented by this class...
 
 --->
 
-<h3>How to Use FilterCategoryRule</h3>
+<h3>How to use FilterCategoryRule</h3>
 <p><a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1003305">@CaptainDan</a> raised
-a pertinent question in
+a very pertinent question in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/using-filtercategoryrule-in-the-revit-api/m-p/7983645">using <code>FilterCategoryRule</code> in the Revit API</a>:</p>
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/using-filtercategoryrule-in-the-revit-api/m-p/7983645">using <code>FilterCategoryRule</code> in the Revit API</a> that
+led to some discussion and clarification with the development team:</p>
 <p><strong>Question:</strong> I have three questions regarding the filter rule represented by the class <code>FilterCategoryRule</code>:</p>
 <ol>
 <li>What does this rule correspond to in the Revit user interface?</li>
@@ -35,7 +38,7 @@ to <a href="http://www.revitapidocs.com/2018.1/afa22520-52de-c6b3-fac8-246fe2f8e
 <li><em>An internal error has occurred</em></li>
 </ul>
 <p>I tried the same code in Revit 2017 and 2018 with the same exception occurring.</p>
-<p>I searched the internet and SDK and couldn't find much mention of it anywhere.</p>
+<p>I searched the Internet and SDK and couldn't find much mention of it anywhere.</p>
 <p>The Revit API help docs on <a href="http://www.revitapidocs.com/2018.1/7df5b10b-c423-b5c8-6492-1274d7a447d9.htm">FilterCategoryRule</a> just
 say <em>A filter rule that matches elements of a set of categories</em>.</p>
 <p><strong>Answer:</strong> Yes, the only significant mention of this that I can find is from The Building Coder
@@ -52,13 +55,21 @@ It represents a filter rule that matches elements of a set of categories.</p>
 <ul>
 <li>FilterCategoryRule.AllCategoriesFilterable()</li>
 </ul>
-<p>I passed this on to the development team, and they reply:</p>
-<p>Q1. What does <code>FilterCategoryRule</code> correspond to in the Revit user interface?</p>
-<p>A1. There is no direct correspondence in Revit UI, this is the FilterRule to be used in API.</p>
-<p>Q2. If this filters by category, then what is the relationship between the set of categories assigned to this rule and the set of categories passed to <code>ParameterFilterElement.Create()</code>?</p>
-<p>A2. There is no relation to <code>ParameterFilterElement.Create()</code>.</p>
-<p>Q3. How do I successfully create a filter based on this filter rule?</p>
-<p>A3. You cannot create a <code>ParameterFilterElement</code> based on this <code>FilterCategoryRule</code>, but you can create an <code>ElementParameterFilter</code>, an API construct, based on it.</p>
+<p>I passed on your questions to the development team, and they reply:</p>
+<ol>
+<li>
+<p>Q: What does <code>FilterCategoryRule</code> correspond to in the Revit user interface?
+<br/>&ndash; A: There is no direct correspondence in Revit UI, this is the FilterRule to be used in API.</p>
+</li>
+<li>
+<p>Q: If this filters by category, then what is the relationship between the set of categories assigned to this rule and the set of categories passed to <code>ParameterFilterElement.Create()</code>?
+<br/>&ndash; A: There is no relation to <code>ParameterFilterElement.Create</code>.</p>
+</li>
+<li>
+<p>Q: How do I successfully create a filter based on this filter rule?
+<br/>&ndash; A: You cannot create a <code>ParameterFilterElement</code> based on this <code>FilterCategoryRule</code>, but you can create an <code>ElementParameterFilter</code>, an API construct, based on it.</p>
+</li>
+</ol>
 <p>Here is an example:</p>
 <pre class="code">
   // Find all walls and windows in the document
@@ -66,22 +77,28 @@ It represents a filter rule that matches elements of a set of categories.</p>
   <span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">ElementId</span>&gt;&nbsp;cats&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">ElementId</span>&gt;();
   cats.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementId</span>(&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Walls&nbsp;)&nbsp;);
   cats.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementId</span>(&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Windows&nbsp;)&nbsp;);
-  <span style="color:#2b91af;">FilterCategoryRule</span>&nbsp;f&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilterCategoryRule</span>(&nbsp;cats&nbsp;);
+  <span style="color:#2b91af;">FilterCategoryRule</span>&nbsp;r&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilterCategoryRule</span>(&nbsp;cats&nbsp;);
 
-  <span style="color:#2b91af;">ElementParameterFilter</span>&nbsp;wallsAndWindows&nbsp;
-  &nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementParameterFilter</span>(&nbsp;f,&nbsp;<span style="color:blue;">true</span>&nbsp;);
+  <span style="color:#2b91af;">ElementParameterFilter</span>&nbsp;f&nbsp;
+  &nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementParameterFilter</span>(&nbsp;r,&nbsp;<span style="color:blue;">true</span>&nbsp;);
 
-  <span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;doorsAndWindows&nbsp;
+  <span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;wallsAndWindows&nbsp;
   &nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
-  &nbsp;&nbsp;&nbsp;&nbsp;.WherePasses(&nbsp;wallsAndWindows&nbsp;);
+  &nbsp;&nbsp;&nbsp;&nbsp;.WherePasses(&nbsp;f&nbsp;);
 </pre>
 
+<p>The Revit API docs are confusing and not entirely correct, especially this statement: "The new class FilterCategoryRule can be used in the definition of a ParameterFilterElement". the <code>ParameterFilterElement.Create</code> method could potentially take a <code>FilterCategoryRule</code> object instead of a set of category ids, but this flavour of the <code>Create</code> method was never introduced. We have filed a development task to either correct the docs or add the method. Additional confusion comes from the two API names: <code>ParameterFilterElement</code> and <code>ElementParameterFilter</code> &nbsp; :-~ </p>
 <p>Just as <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/4496032">Benoit</a> points
-out, this can be seen as an extension of
+out, <code>FilterCategoryRule</code> can simply be seen as an extension of
 the <a href="http://www.revitapidocs.com/2018.1/b492ddf4-3058-8f9b-dfcc-8d5c4abb3605.htm">ElementCategoryFilter</a>
-and theassociated quick filter shortcut methods 
+and the associated quick filter shortcut methods 
 <a href="http://www.revitapidocs.com/2018.1/c3523c35-4a07-9723-3c28-de3cc47b2ad0.htm">OfCategory</a>
 and <a href="http://www.revitapidocs.com/2018.1/63304108-73f8-844e-82fc-5b8fad9839b0.htm">OfCategoryId</a>.</p>
+<p>It seems to me that it is completely equivalent to a logical or of a bunch of <code>ElementCategoryFilter</code> instances, such as I used in the MEP and structural filtered element collector examples:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/06/retrieve-mep-elements-and-connectors.html">Retrieve MEP and structural elements</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/07/retrieve-structural-elements.html">Retrieve structural elements</a></li>
+</ul>
 <p><center>
 <img src="img/steel_ruler_closeup.jpg" alt="Steel rule" width="320"/>
 </center></p>
