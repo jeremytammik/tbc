@@ -15,7 +15,7 @@
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
 @CaptainDan raised a very pertinent question in
-the discussion forum on using <code>FilterCategoryRule<code> in the Revit API that
+the discussion forum on using <code>FilterCategoryRule</code> in the Revit API that
 led to some discussion and clarification with the development team:
 I have three questions regarding the filter rule represented by this class...
 
@@ -106,7 +106,7 @@ and [OfCategoryId](http://www.revitapidocs.com/2018.1/63304108-73f8-844e-82fc-5b
 
 It seems to me that it is completely equivalent to a logical or of a bunch of `ElementCategoryFilter` instances, such as I used in the MEP and structural filtered element collector examples:
 
-- [Retrieve MEP and structural elements](http://thebuildingcoder.typepad.com/blog/2010/06/retrieve-mep-elements-and-connectors.html)
+- [Retrieve MEP elements](http://thebuildingcoder.typepad.com/blog/2010/06/retrieve-mep-elements-and-connectors.html)
 - [Retrieve structural elements](http://thebuildingcoder.typepad.com/blog/2010/07/retrieve-structural-elements.html)
 
 <center>
