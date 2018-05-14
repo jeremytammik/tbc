@@ -395,6 +395,19 @@ Since the wall function filter is just checking a parameter value, the performan
 a [parameter filter](http://thebuildingcoder.typepad.com/blog/2010/06/parameter-filter.html) instead
 of the slow .NET based `IsExterior` method post-processing.
 
+Unfortunately, the wall function parameter is not always correctly set. In that case, of course, the GIGO principle applies:
+[Garbage in, garbage out](https://en.wikipedia.org/wiki/Garbage_in,_garbage_out).
+
+If you wish to avoid the dependency on the wall type and its parameters, you can try to judge whether a wall is exterior based on geometrical analysis instead.
+
+The Revit API also provides a `BuildingEnvelopeAnalyzer` class that should help with this, but there seem to be problems using it, cf.:
+
+- [Filtering exterior walls](https://forums.autodesk.com/t5/revit-api-forum/filtering-exterior-walls/m-p/5677706)
+
+Some related challenges and solutions that might help here are discussed in The Building Coder topic group
+on [2D Booleans and Adjacent Areas](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.2).
+
+
 
 ####<a name="9"></a>Getting and Setting a Shared parameter Value
 
