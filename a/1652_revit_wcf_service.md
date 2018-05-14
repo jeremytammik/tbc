@@ -406,7 +406,7 @@ The Revit API also provides a `BuildingEnvelopeAnalyzer` class that should help 
 - [Filtering exterior walls](https://forums.autodesk.com/t5/revit-api-forum/filtering-exterior-walls/m-p/5677706)
 
 Some related challenges and solutions that might help here are discussed in The Building Coder topic group
-on [2D Booleans and Adjacent Areas](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.2).
+on [2D Booleans and adjacent areas](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.2).
 
 
 
