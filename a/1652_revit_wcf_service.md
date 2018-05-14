@@ -402,6 +402,7 @@ If you wish to avoid the dependency on the wall type and its parameters, you can
 
 The Revit API also provides a `BuildingEnvelopeAnalyzer` class that should help with this, but there seem to be problems using it, cf.:
 
+- [Finding exterior walls by `BuildingEnvelopeAnalyzer`](https://forums.autodesk.com/t5/revit-api-forum/finding-exterior-walls-by-buildingenvelopeanalyzer/m-p/5647404)
 - [Filtering exterior walls](https://forums.autodesk.com/t5/revit-api-forum/filtering-exterior-walls/m-p/5677706)
 
 Some related challenges and solutions that might help here are discussed in The Building Coder topic group
