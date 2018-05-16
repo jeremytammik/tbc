@@ -14,7 +14,7 @@
 
 - 14216556 [raster image Import in Revit]
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Foreground image import and visible DWG geometry in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/visibledwggeo
 
 Today, we explore how to retrieve visible DWG geometry, i.e., geometry elements contained in a CAD import instance on a layer that is visible in the currently active view, and how to import an image to the foreground instead of the default background setting
 &ndash; Retrieve CAD import geometry on visible layer
@@ -22,7 +22,7 @@ Today, we explore how to retrieve visible DWG geometry, i.e., geometry elements 
 
 --->
 
-<h3>Retrieve Visible DWG Geometry and Foreground Image Import</h3>
+<h3>Foreground Image Import and Visible DWG Geometry</h3>
 <p>Today, we explore how to retrieve visible DWG geometry, i.e., geometry elements contained in a CAD import instance on a layer that is visible in the currently active view, and how to import an image to the foreground instead of the default background setting:</p>
 <ul>
 <li><a href="#2">Retrieve CAD import geometry on visible layer</a> </li>
@@ -32,7 +32,7 @@ Today, we explore how to retrieve visible DWG geometry, i.e., geometry elements 
 <p>Ryan Goertzen of <a href="http://goertzen-ltd.com">Goertzen Enterprises</a> shared a nice sample showing how to retrieve visible DWG geometry, i.e., geometry elements contained in a CAD import instance on a layer that is visible in the currently active view, in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/visibility-of-dwg-layer/m-p/7975284">visibility of DWG layer</a>:</p>
-<p><strong>Question:</strong> I am trying to extract geometry from an import instance who's layers are currently visible in the current view.</p>
+<p><strong>Question:</strong> I am trying to extract geometry from an import instance whose layers are currently visible in the current view.</p>
 <p>I pass the view into the geometry options, but it still returns all geometry in the instance.</p>
 <p>I can get the name of the DWG layer from:</p>
 <pre class="code">
@@ -58,28 +58,32 @@ It refers to 'imported categories'.</p>
 <p>In my testing, I was thinking that the API wanted a built-in category. For that, all I could find was the built-in category <code>OST_ImportObjectStyles</code>.</p>
 <p>The following code works as expected, only adding the DWG geometry that is currently visible in view to the list:</p>
 <pre class="code">
-  foreach (GeometryObject gObject in gElement)
-  {
-    gInstance = (GeometryInstance)gObject;
-    gElement2 = gInstance.GetInstanceGeometry();
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">GeometryObject</span>&nbsp;gObject&nbsp;<span style="color:blue;">in</span>&nbsp;gElement&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;gInstance&nbsp;=&nbsp;(<span style="color:#2b91af;">GeometryInstance</span>)&nbsp;gObject;
+&nbsp;&nbsp;&nbsp;&nbsp;gElement2&nbsp;=&nbsp;gInstance.GetInstanceGeometry();
 
-    foreach (GeometryObject obj in gElement2)
-    {
-      var gStyle = curDoc.GetElement(obj.GraphicsStyleId) as GraphicsStyle;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">GeometryObject</span>&nbsp;obj&nbsp;<span style="color:blue;">in</span>&nbsp;gElement2&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;gStyle&nbsp;=&nbsp;curDoc.GetElement(&nbsp;obj.GraphicsStyleId&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">GraphicsStyle</span>;
 
-      //Try Catch because i was getting some Object Instance errors with the graphics style object.
-      try
-      {
-        //add object to list
-        if (!view.GetCategoryHidden(gStyle.GraphicsStyleCategory.Id))
-          list.Add(obj);
-      }
-      catch { continue; }
-    }
-  }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Try&nbsp;Catch&nbsp;because&nbsp;i&nbsp;was&nbsp;getting&nbsp;some&nbsp;Object</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Instance&nbsp;errors&nbsp;with&nbsp;the&nbsp;graphics&nbsp;style&nbsp;object.</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">try</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Add&nbsp;object&nbsp;to&nbsp;list</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;!view.GetCategoryHidden(&nbsp;gStyle.GraphicsStyleCategory.Id&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;list.Add(&nbsp;obj&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">catch</span>&nbsp;{&nbsp;<span style="color:blue;">continue</span>;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
 </pre>
 
-<p>I cleaned it up a bit to avoid calling <code>GetInstanceGeometry</code> without first checking whether <code>gInstance</code> is null, and eliminate
+<p>This required cleaning it up a bit to avoid calling <code>GetInstanceGeometry</code> without first checking whether <code>gInstance</code> is null, and eliminate
 the <a href="http://thebuildingcoder.typepad.com/blog/2017/05/prompt-cancel-throws-exception-in-revit-2018.html#5">evil catch-all exception handler</a>.</p>
 <p>To try it out yourself at home, here is
 a <a href="zip/dwg_visible_geo_2018.rvt">simple demonstration project, <code>dwg_visible_geo_2018.rvt</code></a>
@@ -160,7 +164,6 @@ the <a href="zip/dwg_visible_geo.dwg">linked CAD file, <code>dwg_visible_geo.dwg
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfType&lt;<span style="color:#2b91af;">FilledRegionType</span>&gt;()
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.First();
 
-
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;t&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t.Start(&nbsp;<span style="color:#a31515;">&quot;ProcessDWG&quot;</span>&nbsp;);
@@ -198,10 +201,10 @@ the <a href="zip/dwg_visible_geo.dwg">linked CAD file, <code>dwg_visible_geo.dwg
 <p><center>
 <img src="img/dwg_visible_geo.png" alt="Visible DWG geometry" width="407"/>
 </center></p>
-<p>Many thanks ton Ryan for raising, solving and sharing this!</p>
+<p>Many thanks to Ryan for raising, solving and sharing this!</p>
 <p>I copied the macro code to
 <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
-<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.139.1">release 2019.0.139.1</a>
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.139.2">release 2019.0.139.2</a>
 in
 order to format and preserve it for posterity in
 the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdProcessVisibleDwg.cs">module CmdProcessVisibleDwg.cs</a>.</p>
