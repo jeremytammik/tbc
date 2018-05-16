@@ -412,6 +412,11 @@ Yet another workaround was suggested: Place some room separation lines outside t
 Then, it’s just a matter of getting room boundaries, filtering out the RSLs, appending the remaining elements to your list, deleting the room and RSLs, and moving up to the next level.
 It may not work for some bad modelling cases, but catches most.
 
+After further discussion with the development team, they asked:
+Is the building model enclosed?
+It needs to be in order for the analyzer to work.
+In other words, do you have Roof and Floor elements to form enclosed spaces in the model?
+
 ####<a name="9"></a>Getting and Setting a Shared parameter Value
 
 Let's end for today with a very basic question asked on StackOverflow,
