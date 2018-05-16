@@ -23,7 +23,7 @@
 
 - https://stackoverflow.com/questions/50285764/how-to-get-the-value-a-room-parameter-which-was-defined-by-a-third-party
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Drive Revit via a WCF service, wall directions and parameters in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/rvtwcfwalls
 
 Exciting news from Russia and some mundane updates on other repetitive topics
 &ndash; Driving Revit from a modeless context via a WCF service 
