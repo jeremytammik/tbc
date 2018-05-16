@@ -410,7 +410,7 @@ on [2D Booleans and adjacent areas](http://thebuildingcoder.typepad.com/blog/abo
 
 Yet another workaround was suggested: Place some room separation lines outside the building envelope and create a huge room around the entire building.
 Then, it’s just a matter of getting room boundaries, filtering out the RSLs, appending the remaining elements to your list, deleting the room and RSLs, and moving up to the next level.
-It may not work for some bad modeling cases, but catches most.
+It may not work for some bad modelling cases, but catches most.
 
 ####<a name="9"></a>Getting and Setting a Shared parameter Value
 
