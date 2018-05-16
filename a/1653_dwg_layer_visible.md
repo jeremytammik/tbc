@@ -15,7 +15,7 @@
 
 - 14216556 [raster image Import in Revit]
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Foreground image import and visible DWG geometry in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/visibledwggeo
 
 Today, we explore how to retrieve visible DWG geometry, i.e., geometry elements contained in a CAD import instance on a layer that is visible in the currently active view, and how to import an image to the foreground instead of the default background setting
 &ndash; Retrieve CAD import geometry on visible layer
