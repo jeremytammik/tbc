@@ -25,7 +25,7 @@ Let's implement a solution to do so
 &ndash; FilterCategoryRule versus category filters 
 &ndash; Category description extension method 
 &ndash; Retrieve parameter data for all elements of given categories 
-&ndash; External command `Execute` mainline 
+&ndash; External command <code>Execute</code> mainline 
 &ndash; Sample run results
 &ndash; Download...
 
