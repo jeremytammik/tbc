@@ -26,7 +26,14 @@ Poeple sometimes ask how to export all the Revit data to an external database.
 
 Obviously, a huge amount of data is embedded in BIM specific constraints and relationships that are hard to extract.
 
-It is very simple to extract all the parameter data, though.
+It is very simple to extract all the parameter data, though, as you can see by looking at the numerous existing samples that do so.
+
+Let's implement yet another one ourselves:
+
+
+
+
+####<a name="2"></a>Existing Sample Implementations
 
 In fact, this is achieved by one of the very
 first [ADN Revit API training labs](https://github.com/jeremytammik/AdnRevitApiLabsXtra),
@@ -60,247 +67,301 @@ When an RVT file is translated by [Forge](https://autodesk-forge.github.io), the
 Since it is easy to modify them and add new ones in the Forge viewer, I implemented an add-in to support a full read-write round-trip workflow,
 [RvtMetaProp](https://github.com/jeremytammik/rvtmetaprop):
 
-- [Use Forge or Spreadsheet to Create Shared Parameters](http://thebuildingcoder.typepad.com/blog/2017/09/use-forge-or-spreadsheet-to-create-shared-parameters.html) 
-- [Rational BIM Programming at AU Darmstadt](http://thebuildingcoder.typepad.com/blog/2017/10/rational-bim-programming-at-au-darmstadt.html)
+- [Forge meta property editor and RvtMetaProp Revit add-in &ndash; executive summary](http://thebuildingcoder.typepad.com/blog/2017/10/rational-bim-programming-at-au-darmstadt.html#5.5)
+- [Use Forge or spreadsheet to create shared parameters](http://thebuildingcoder.typepad.com/blog/2017/09/use-forge-or-spreadsheet-to-create-shared-parameters.html) 
 
 Today, I thought I would isolate the most basic and generic functionality conceivable to support this kind of workflow, by implementing a simple black box that takes a very specific input and returns a specific output for that:
 
 - Input: a list of BIM categories
 - Output: for each category, a dictionary mapping all the elements of that category to a collection of all their parameter values.
 
-The interface could look like this:
-
-
-
-####<a name="2"></a>Retrieve
-
-Ryan Goertzen of [Goertzen Enterprises](http://goertzen-ltd.com) shared a nice sample showing how to retrieve visible DWG geometry, i.e., geometry elements contained in a CAD import instance on a layer that is visible in the currently active view, in 
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [visibility of DWG layer](https://forums.autodesk.com/t5/revit-api-forum/visibility-of-dwg-layer/m-p/7975284):
-
-**Question:** I am trying to extract geometry from an import instance whose layers are currently visible in the current view.
-
-I pass the view into the geometry options, but it still returns all geometry in the instance.
-
-I can get the name of the DWG layer from:
-
-<pre class="code">
-  (curDoc.GetElement(curObj.GraphicsStyleId)
-    as GraphicsStyle).Name;
-</pre>
-
-However, I cannot seem to find anywhere in the `View` class to check if this layer is on or off, which is achievable with the UI visibility dialog.
-
-What would be the best way to approach this?
-
-**Answer:** I looked at the description how
-to [hide layers in CAD files](http://help.autodesk.com/view/RVT/2019/ENU/?guid=GUID-EBCAFF76-1BF5-45F1-AB51-9130227091D1) (also
-in [LT](https://knowledge.autodesk.com/support/revit-lt/learn-explore/caas/CloudHelp/cloudhelp/2019/ENU/RevitLT-Model/files/GUID-EBCAFF76-1BF5-45F1-AB51-9130227091D1-htm.html?_ga=2.222683099.1372620627.1525160338-2130181328.1465883366)).
-It refers to 'imported categories'.
-
-Therefore, you may be able to affect the visibility in the Revit view by controlling the category visibility.
-
-The following two methods do so:
-
-- [GetCategoryHidden](http://www.revitapidocs.com/2018.1/52ce4cea-6f27-9e85-f82a-115e308eebfc.htm) &ndash; Checks if elements of the given category are set to be invisible (hidden) in this view
-- [SetCategoryHidden](http://www.revitapidocs.com/2018.1/87a1e1e2-ee81-1a73-19d7-895b1fa10158.htm) &ndash; Sets if elements of the given category will be visible in this view
-
-To test, you might call `GetCategoryHidden`, make a note of what it returns, modify the setting for a specific layer manually, and check the return value again to see whether it changed.
-
-If so, it may be possible to use `SetCategoryHidden` to control the layer visibility.
-
-**Response:** I see now that the layer categories that I was after to pass into `GetCategoryHidden` are nested  one step further down in `GraphicsStyle` &rarr; `GraphicsStyleCategory` &rarr; `Id`.
-
-In my testing, I was thinking that the API wanted a built-in category. For that, all I could find was the built-in category `OST_ImportObjectStyles`.
-
-The following code works as expected, only adding the DWG geometry that is currently visible in view to the list:
-
-<pre class="code">
-&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">GeometryObject</span>&nbsp;gObject&nbsp;<span style="color:blue;">in</span>&nbsp;gElement&nbsp;)
-&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;gInstance&nbsp;=&nbsp;(<span style="color:#2b91af;">GeometryInstance</span>)&nbsp;gObject;
-&nbsp;&nbsp;&nbsp;&nbsp;gElement2&nbsp;=&nbsp;gInstance.GetInstanceGeometry();
- 
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">GeometryObject</span>&nbsp;obj&nbsp;<span style="color:blue;">in</span>&nbsp;gElement2&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;gStyle&nbsp;=&nbsp;curDoc.GetElement(&nbsp;obj.GraphicsStyleId&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">GraphicsStyle</span>;
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Try&nbsp;Catch&nbsp;because&nbsp;i&nbsp;was&nbsp;getting&nbsp;some&nbsp;Object</span>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Instance&nbsp;errors&nbsp;with&nbsp;the&nbsp;graphics&nbsp;style&nbsp;object.</span>
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">try</span>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Add&nbsp;object&nbsp;to&nbsp;list</span>
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;!view.GetCategoryHidden(&nbsp;gStyle.GraphicsStyleCategory.Id&nbsp;)&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;list.Add(&nbsp;obj&nbsp;);
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">catch</span>&nbsp;{&nbsp;<span style="color:blue;">continue</span>;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;}
-</pre>
-
-This required cleaning it up a bit to avoid calling `GetInstanceGeometry` without first checking whether `gInstance` is null, and eliminate
-the [evil catch-all exception handler](http://thebuildingcoder.typepad.com/blog/2017/05/prompt-cancel-throws-exception-in-revit-2018.html#5).
-
-To try it out yourself at home, here is
-a [simple demonstration project, `dwg_visible_geo_2018.rvt`](zip/dwg_visible_geo_2018.rvt)
-([also for Revit 2019](zip/zip/dwg_visible_geo_2019.rvt)).
-
-The project includes a basic macro that will draw a detailed region around the visible layer in
-the [linked CAD file, `dwg_visible_geo.dwg`](zip/dwg_visible_geo.dwg):
+The list of categories can simply consist of an array of built-in categories like this:
 
 <pre class="code">
 &nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
-&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;Pick&nbsp;a&nbsp;DWG&nbsp;import&nbsp;instance,&nbsp;extract&nbsp;polylines&nbsp;</span>
-&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;from&nbsp;it&nbsp;visible&nbsp;in&nbsp;the&nbsp;current&nbsp;view&nbsp;and&nbsp;create</span>
-&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;filled&nbsp;regions&nbsp;from&nbsp;them.</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;List&nbsp;all&nbsp;built-in&nbsp;categories&nbsp;of&nbsp;interest</span>
 &nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
-&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;ProcessVisible(&nbsp;<span style="color:#2b91af;">UIDocument</span>&nbsp;uidoc&nbsp;)
+&nbsp;&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>[]&nbsp;_cats&nbsp;=
 &nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;uidoc.Document;
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">View</span>&nbsp;active_view&nbsp;=&nbsp;doc.ActiveView;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Doors,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Rooms,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Windows
+&nbsp;&nbsp;};
+</pre>
+
+Defining the output and its structure is more challending and depends on the exact requirements.
+
+
+####<a name="3"></a>Choices for the Output and its Structure
+
+As simple as this sounds, there are quite a couple of choices to be made:
+
+- Parameter identification: name? multiple names?
+- Parameter value storage: string representation or underlying database value.
+- Element parameters to retrieve: `Parameters` property, `GetOrderedParameters` method, etc.
+
+In order to simplify things, the parameter values could all be returned as strings.
+In the simplest solution, the display strings shown in the Revit user interface, returned by the `AsValueString` method.
+A more complex solution might return their real underlying database values instead.
+
+Ideally, the parameters could be identified by their name.
+
+In that case, in the return value could be structured like this, as a dictionary mapping category names to dictionaries mapping element unique ids to dictionaries mapping each elements parameter name to the corresponding value:
+
+<pre class="code">
+  <span style="color:#2b91af;">Dictionary</span>&lt;<span style="color:blue;">string</span>,
+  &nbsp;&nbsp;<span style="color:#2b91af;">Dictionary</span>&lt;<span style="color:blue;">string</span>,
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Dictionary</span>&lt;<span style="color:blue;">string</span>,&nbsp;<span style="color:blue;">string</span>&gt;&gt;&gt;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;map_cat_to_uid_to_param_values;
+</pre>
+
+Unfortunately, though, parameter names are not guaranteed to be unique.
+
+Therefore, it may be impossible to include all parameter values in a dictionary using the parameter name as a key.
+
+Therefore, I resorted to the simple solution of returning a list of strings instread, where each string is formatted by separating the parameter name and the value by an equal sign '=' like this:
+
+<pre class="code">
+  param_values.Add(&nbsp;<span style="color:blue;">string</span>.Format(&nbsp;<span style="color:#a31515;">&quot;{0}={1}&quot;</span>,&nbsp;
+  &nbsp;&nbsp;p.Definition.Name,&nbsp;p.AsValueString()&nbsp;)&nbsp;);
+</pre>
+
+That leads to the following structure for the return value:
+
+<pre class="code">
+  <span style="color:#2b91af;">Dictionary</span>&lt;<span style="color:blue;">string</span>,
+  &nbsp;&nbsp;<span style="color:#2b91af;">Dictionary</span>&lt;<span style="color:blue;">string</span>,
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">string</span>&gt;&gt;&gt;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;map_cat_to_uid_to_param_values;
+</pre>
+
+Finally, we have serveral different possibilities to retrieve the parameters from the element.
+
+Two obvious choices are to use the `Element` `Parameters` property that retrieves a set containing all the parameters.
+
+Another one offered by the API is the `GetOrderedParameters` method that gets the visible parameters in the order they appear in the UI.
+
+Finally, you can attempt to retrieve values for all the built-in paramaters; this approach is used by
+the [RevitLookup snooping tool](https://github.com/jeremytammik/RevitLookup) and
+the [BipChecker](https://github.com/jeremytammik/BipChecker) built-in parameter checker.
+
+
+####<a name="4"></a>Retrieve Parameter Values from an Element
+
+Based on the choices made above above, opting for the simplest solution, we can retrieve the parameter values from a given element like this:
+
+<pre class="code">
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;all&nbsp;the&nbsp;parameter&nbsp;values&nbsp;&nbsp;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;deemed&nbsp;relevant&nbsp;for&nbsp;the&nbsp;given&nbsp;element</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;in&nbsp;string&nbsp;form.</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">string</span>&gt;&nbsp;GetParamValues(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Two&nbsp;choices:&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Element.Parameters&nbsp;property&nbsp;--&nbsp;Retrieves&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;a&nbsp;set&nbsp;containing&nbsp;all&nbsp;&nbsp;the&nbsp;parameters.</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;GetOrderedParameters&nbsp;method&nbsp;--&nbsp;Gets&nbsp;the&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;visible&nbsp;parameters&nbsp;in&nbsp;order.</span>
  
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">GeometryObject</span>&gt;&nbsp;visible_dwg_geo&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">GeometryObject</span>&gt;();
+&nbsp;&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">Parameter</span>&gt;&nbsp;ps&nbsp;=&nbsp;e.GetOrderedParameters();
  
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Pick&nbsp;Import&nbsp;Instance</span>
+&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">string</span>&gt;&nbsp;param_values&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">string</span>&gt;(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;ps.Count&nbsp;);
  
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Reference</span>&nbsp;r&nbsp;=&nbsp;uidoc.Selection.PickObject(&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ObjectType</span>.Element,
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">JtElementsOfClassSelectionFilter</span>&lt;<span style="color:#2b91af;">ImportInstance</span>&gt;()&nbsp;);
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Parameter</span>&nbsp;p&nbsp;<span style="color:blue;">in</span>&nbsp;ps)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;AsValueString&nbsp;displays&nbsp;the&nbsp;value&nbsp;as&nbsp;the&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;user&nbsp;sees&nbsp;it.&nbsp;In&nbsp;some&nbsp;cases,&nbsp;the&nbsp;underlying</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;database&nbsp;value&nbsp;returned&nbsp;by&nbsp;AsInteger,&nbsp;AsDouble,</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;etc.,&nbsp;may&nbsp;be&nbsp;more&nbsp;relevant.</span>
  
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;import&nbsp;=&nbsp;doc.GetElement(&nbsp;r&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">ImportInstance</span>;
- 
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Get&nbsp;Geometry</span>
- 
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;ge&nbsp;=&nbsp;import.get_Geometry(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Options</span>()&nbsp;);
- 
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;go&nbsp;<span style="color:blue;">in</span>&nbsp;ge&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;go&nbsp;<span style="color:blue;">is</span>&nbsp;<span style="color:#2b91af;">GeometryInstance</span>&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;gi&nbsp;=&nbsp;go&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">GeometryInstance</span>;
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;ge2&nbsp;=&nbsp;gi.GetInstanceGeometry();
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;ge2&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;obj&nbsp;<span style="color:blue;">in</span>&nbsp;ge2&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Only&nbsp;work&nbsp;on&nbsp;PolyLines</span>
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;obj&nbsp;<span style="color:blue;">is</span>&nbsp;<span style="color:#2b91af;">PolyLine</span>&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Use&nbsp;the&nbsp;GraphicsStyle&nbsp;to&nbsp;get&nbsp;the&nbsp;</span>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;DWG&nbsp;layer&nbsp;linked&nbsp;to&nbsp;the&nbsp;Category&nbsp;</span>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;for&nbsp;visibility.</span>
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;gStyle&nbsp;=&nbsp;doc.GetElement(&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;obj.GraphicsStyleId&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">GraphicsStyle</span>;
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Check&nbsp;if&nbsp;the&nbsp;layer&nbsp;is&nbsp;visible&nbsp;in&nbsp;the&nbsp;view.</span>
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;!active_view.GetCategoryHidden(
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gStyle.GraphicsStyleCategory.Id&nbsp;)&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;visible_dwg_geo.Add(&nbsp;obj&nbsp;);
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;}
- 
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Do&nbsp;something&nbsp;with&nbsp;the&nbsp;info</span>
- 
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;visible_dwg_geo.Count&nbsp;&gt;&nbsp;0&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Retrieve&nbsp;first&nbsp;filled&nbsp;region&nbsp;type</span>
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;filledType&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsElementType()
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">FilledRegionType</span>&nbsp;)&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfType&lt;<span style="color:#2b91af;">FilledRegionType</span>&gt;()
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.First();
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;t&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t.Start(&nbsp;<span style="color:#a31515;">&quot;ProcessDWG&quot;</span>&nbsp;);
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;obj&nbsp;<span style="color:blue;">in</span>&nbsp;visible_dwg_geo&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;poly&nbsp;=&nbsp;obj&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">PolyLine</span>;
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Draw&nbsp;a&nbsp;filled&nbsp;region&nbsp;for&nbsp;each&nbsp;polyline</span>
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;poly&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Create&nbsp;loops&nbsp;for&nbsp;detail&nbsp;region</span>
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;curveLoop&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">CurveLoop</span>();
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;points&nbsp;=&nbsp;poly.GetCoordinates();
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">for</span>(&nbsp;<span style="color:blue;">int</span>&nbsp;i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;points.Count&nbsp;-&nbsp;1;&nbsp;++i&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;curveLoop.Append(&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;points[i],&nbsp;points[i&nbsp;+&nbsp;1]&nbsp;)&nbsp;);
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FilledRegion</span>.Create(&nbsp;doc,&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;filledType.Id,&nbsp;active_view.Id,&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">CurveLoop</span>&gt;()&nbsp;{&nbsp;curveLoop&nbsp;}&nbsp;);
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;param_values.Add(&nbsp;<span style="color:blue;">string</span>.Format(&nbsp;<span style="color:#a31515;">&quot;{0}={1}&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p.Definition.Name,&nbsp;p.AsValueString()&nbsp;)&nbsp;);
 &nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;param_values;
+}
+</pre>
+
+
+####<a name="5"></a>FilterCategoryRule versus Category Filters
+
+<pre class="code">
+</pre>
+
+####<a name="6"></a>Category Description Extension Method
+
+<pre class="code">
+</pre>
+
+####<a name="7"></a>Retrieve Parameter Data for all Elements of Given Categories
+
+With that method in place, we can retrieve the parameter data for all elements of a given list categories like this:
+
+<pre class="code">
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;parameter&nbsp;data&nbsp;for&nbsp;all&nbsp;&nbsp;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;elements&nbsp;of&nbsp;all&nbsp;the&nbsp;given&nbsp;categories</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:#2b91af;">Dictionary</span>&lt;<span style="color:blue;">string</span>,&nbsp;<span style="color:#2b91af;">Dictionary</span>&lt;<span style="color:blue;">string</span>,&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">string</span>&gt;&gt;&gt;
+&nbsp;&nbsp;GetParamValuesForCats(
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>[]&nbsp;cats&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Set&nbsp;up&nbsp;the&nbsp;return&nbsp;value&nbsp;dictionary</span>
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">Dictionary</span>&lt;<span style="color:blue;">string</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Dictionary</span>&lt;<span style="color:blue;">string</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">string</span>&gt;&gt;&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;map_cat_to_uid_to_param_values
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Dictionary</span>&lt;<span style="color:blue;">string</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Dictionary</span>&lt;<span style="color:blue;">string</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">string</span>&gt;&gt;&gt;();
+ 
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;One&nbsp;top&nbsp;level&nbsp;dictionary&nbsp;per&nbsp;category</span>
+ 
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>&nbsp;cat&nbsp;<span style="color:blue;">in</span>&nbsp;cats&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;map_cat_to_uid_to_param_values.Add(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cat.Description(),
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Dictionary</span>&lt;<span style="color:blue;">string</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">string</span>&gt;&gt;()&nbsp;);
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Collect&nbsp;all&nbsp;required&nbsp;elements</span>
+ 
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;The&nbsp;FilterCategoryRule&nbsp;as&nbsp;used&nbsp;here&nbsp;seems&nbsp;to&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;have&nbsp;no&nbsp;filtering&nbsp;effect&nbsp;at&nbsp;all!&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;It&nbsp;passes&nbsp;every&nbsp;single&nbsp;element,&nbsp;afaict.&nbsp;</span>
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">ElementId</span>&gt;&nbsp;ids
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">BuiltInCategory</span>&gt;(&nbsp;cats&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.ConvertAll&lt;<span style="color:#2b91af;">ElementId</span>&gt;(&nbsp;c
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementId</span>(&nbsp;(<span style="color:blue;">int</span>)&nbsp;c&nbsp;)&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">FilterCategoryRule</span>&nbsp;r&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilterCategoryRule</span>(&nbsp;ids&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">ElementParameterFilter</span>&nbsp;f
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementParameterFilter</span>(&nbsp;r,&nbsp;<span style="color:blue;">true</span>&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Use&nbsp;a&nbsp;logical&nbsp;OR&nbsp;of&nbsp;category&nbsp;filters</span>
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">ElementFilter</span>&gt;&nbsp;a
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">ElementFilter</span>&gt;(&nbsp;cats.Length&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>&nbsp;bic&nbsp;<span style="color:blue;">in</span>&nbsp;cats&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;a.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementCategoryFilter</span>(&nbsp;bic&nbsp;)&nbsp;);
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">LogicalOrFilter</span>&nbsp;categoryFilter
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">LogicalOrFilter</span>(&nbsp;a&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Run&nbsp;the&nbsp;collector</span>
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;els
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsViewIndependent()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WherePasses(&nbsp;categoryFilter&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Retrieve&nbsp;parameter&nbsp;data&nbsp;for&nbsp;each&nbsp;element</span>
+ 
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;<span style="color:blue;">in</span>&nbsp;els&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Category</span>&nbsp;cat&nbsp;=&nbsp;e.Category;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">null</span>&nbsp;==&nbsp;cat&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Debug</span>.Print(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;element&nbsp;{0}&nbsp;{1}&nbsp;has&nbsp;null&nbsp;category&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e.Id,&nbsp;e.Name&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">continue</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">string</span>&gt;&nbsp;param_values&nbsp;=&nbsp;GetParamValues(&nbsp;e&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>&nbsp;bic&nbsp;=&nbsp;(<span style="color:#2b91af;">BuiltInCategory</span>)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(e.Category.Id.IntegerValue);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;catkey&nbsp;=&nbsp;bic.Description();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;uid&nbsp;=&nbsp;e.UniqueId;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;map_cat_to_uid_to_param_values[catkey].Add(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uid,&nbsp;param_values&nbsp;);
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;map_cat_to_uid_to_param_values;
+}
+</pre>
+
+
+####<a name="8"></a>Sample Run Results
+
+Running this in the Revit basic sample project displays the following in the Visual Studio debug output window:
+
+<pre>
+door (16 elements):
+  first element 59371552-5800-43eb-9ba3-609565158fc5-00067242 has 11 parameters:
+    Comments=
+    Finish=
+    Frame Material=
+    Frame Type=
+    Head Height=2100
+    Image=<None>
+    Level=Level 1
+    Mark=
+    Phase Created=Working Drawings
+    Phase Demolished=None
+    Sill Height=0
+room (14 elements):
+  first element e6ac360b-aaed-4c3b-a130-36b4c2ac9d13-000d1467 has 21 parameters:
+    Area=27 m²
+    Base Finish=
+    Base Offset=0
+    Ceiling Finish=
+    Comments=
+    Computation Height=0
+    Department=
+    Floor Finish=
+    Image=<None>
+    Level=Level 2
+    Limit Offset=6500
+    Name=
+    Number=
+    Occupancy=
+    Occupant=
+    Perimeter=29060
+    Phase=Working Drawings
+    Unbounded Height=6500
+    Upper Limit=Level 2
+    Volume=118.32 m³
+    Wall Finish=
+window (17 elements):
+  first element 6cbabf1d-e8d0-47f0-ac4d-9a7923128d37-0006fb07 has 22 parameters:
+    Bottom Hung Casement=No
+    Casement Pivot=No
+    Casement Swing in Plan=No
+    Casement=SH_Aluminum, Anodized Black
+    Comments=
+    Frame=SH_Aluminum, Anodized Black
+    Glass=<By Category>
+    Head Height=2700
+    Height=2700
+    Image=<None>
+    Install Depth (from outside)=80
+    Level=Level 2
+    Mark=
+    Phase Created=Working Drawings
+    Phase Demolished=None
+    Rough Height=2700
+    Rough Width=1500
+    Sill Height=0
+    Top Hung Casement=Yes
+    Width=1500
+    Window Cill Exterior=SH_Aluminum, Anodized Black
+    Window Cill Interior=Wood_Walnut black
 </pre>
 
 <center>
-<img src="img/dwg_visible_geo.png" alt="Visible DWG geometry" width="407"/>
+<img src="img/.png" alt="" width="100"/>
 </center>
 
-Many thanks to Ryan for raising, solving and sharing this!
-
-I copied the macro code to
-[The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
-[release 2019.0.139.2](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.139.2)
-in
-order to format and preserve it for posterity in
-the [module CmdProcessVisibleDwg.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdProcessVisibleDwg.cs).
-
-
-####<a name="3"></a>Import Image Using Foreground Option
- 
-Another import question, this time on images:
-
-**Question:** When I insert a raster image into Revit, by default, it is displayed as 'background'.
-
-Is there any way I can do it using the 'Foreground' option?
-
-It would be a great help to know the property that I can set using the C# Revit API.
-
-I am working on some automation projects, and all the images must be displayed as 'Foreground'.
-
-**Answer:** I first took a look at the Revit API documentation on
-the [Import method with `ImageImportOptions`](http://www.revitapidocs.com/2018.1/493d203e-ef4c-b447-f979-52b22725b2ad.htm),
-the [ImageImportOptions class](http://www.revitapidocs.com/2018.1/0d92888c-aa24-5d7e-c7f9-a7bdf24e5581.htm) and
-[its members](http://www.revitapidocs.com/2018.1/b45a2657-8cdf-6471-4929-a758d1675b17.htm).
-It does not answer your question off-hand.
-
-Next, I asked the development team, who explained:
-
-> Not at the time of import.
-
-> However, you can set the built-in parameter `IMPORT_BACKGROUND` to `0` on the `ImageInstance` afterwards.
-
-> The element id of the image instance is returned from the `Document.Import` overloaded method for importing images.
-
-**Response:** As you suggested, I set the parameter `IMPORT_BACKGROUND` to `0`.
-
-It worked.
-
-Thanks a lot for your help.
