@@ -11,15 +11,20 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+After the significant struggle I had to compile the initial release of the Revit 2019 SDK samples and set up RvtSamples 2019, I am happy to report that installing and compiling the Revit 2019 SDK April 27 update is a lot easier
+&ndash; Downloading the April 27 SDK update 
+&ndash; Initial compilation &ndash; 41 warnings 
+&ndash; Processor architecture mismatch suppressed &ndash; 5 warnings 
+&ndash; Update reference to <code>RevitAPISteel.dll</code> &ndash; 3 warnings 
+&ndash; Setting up <code>RvtSamples</code> 
+&ndash; Updated <code>RvtSamples</code> download...
 
 --->
 
 <h3>Installing the Revit 2019 SDK April Update</h3>
 <p>After the significant struggle I had
 to <a href="http://thebuildingcoder.typepad.com/blog/2018/04/compiling-the-revit-2019-sdk-samples.html">compile the initial release of the Revit 2019 SDK samples</a>
-and <a href="http://thebuildingcoder.typepad.com/blog/2018/04/rvtsamples-2019.html">setting up RvtSamples 2019</a>,
+and <a href="http://thebuildingcoder.typepad.com/blog/2018/04/rvtsamples-2019.html">set up RvtSamples 2019</a>,
 I am happy to report that installing and compiling the Revit 2019 SDK April 27 update is a lot easier:</p>
 <ul>
 <li><a href="#2">Downloading the April 27 SDK update</a> </li>
@@ -63,7 +68,7 @@ the <a href="zip/revit_2019_sdk_samples_errors_warnings_9_2.txt">number of warni
 <p>I will ignore the first three for now.</p>
 <p>The last two are more serious, of course.</p>
 <h4><a name="5"></a>Update Reference to RevitAPISteel.dll &ndash; 3 Warnings</h4>
-<p>The missing reference to the <code>RevitAPISteel.dll</code> .NET library assembly can be easily resolved by manually updating it to point to the existing DLL in the Revit executable folder::</p>
+<p>The missing reference to the <code>RevitAPISteel.dll</code> .NET library assembly can be easily resolved by manually updating it to point to the existing DLL in the Revit executable folder:</p>
 <ul>
 <li>C:\Program Files\Autodesk\Revit 2019\RevitAPISteel.dll</li>
 </ul>

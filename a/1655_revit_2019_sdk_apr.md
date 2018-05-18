@@ -12,8 +12,13 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+After the significant struggle I had to compile the initial release of the Revit 2019 SDK samples and set up RvtSamples 2019, I am happy to report that installing and compiling the Revit 2019 SDK April 27 update is a lot easier
+&ndash; Downloading the April 27 SDK update 
+&ndash; Initial compilation &ndash; 41 warnings 
+&ndash; Processor architecture mismatch suppressed &ndash; 5 warnings 
+&ndash; Update reference to <code>RevitAPISteel.dll</code> &ndash; 3 warnings 
+&ndash; Setting up <code>RvtSamples</code> 
+&ndash; Updated <code>RvtSamples</code> download...
 
 --->
 
@@ -21,7 +26,7 @@
 
 After the significant struggle I had
 to [compile the initial release of the Revit 2019 SDK samples](http://thebuildingcoder.typepad.com/blog/2018/04/compiling-the-revit-2019-sdk-samples.html)
-and [setting up RvtSamples 2019](http://thebuildingcoder.typepad.com/blog/2018/04/rvtsamples-2019.html),
+and [set up RvtSamples 2019](http://thebuildingcoder.typepad.com/blog/2018/04/rvtsamples-2019.html),
 I am happy to report that installing and compiling the Revit 2019 SDK April 27 update is a lot easier:
 
 - [Downloading the April 27 SDK update](#2) 
@@ -80,7 +85,7 @@ The last two are more serious, of course.
 
 ####<a name="5"></a>Update Reference to RevitAPISteel.dll &ndash; 3 Warnings
 
-The missing reference to the `RevitAPISteel.dll` .NET library assembly can be easily resolved by manually updating it to point to the existing DLL in the Revit executable folder::
+The missing reference to the `RevitAPISteel.dll` .NET library assembly can be easily resolved by manually updating it to point to the existing DLL in the Revit executable folder:
 
 - C:\Program Files\Autodesk\Revit 2019\RevitAPISteel.dll
 
