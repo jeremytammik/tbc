@@ -24,13 +24,13 @@
 
 
 
-####<a name="2"></a>Several Possible Approaches
+####<a name="2"></a>Task at Hand
 
+####<a name="3"></a>Several Possible Approaches
 
-####<a name="3"></a>Implementing the Huge Surrounding Room Approach
+####<a name="4"></a>Implementing the Huge Surrounding Room Approach
 
-
-####<a name="4"></a>Eliminated Processor Architecture Mismatch Warnings &ndash; 5 Warnings
+####<a name="5"></a>Determining Model Extents via Wall Bounding Box
 
 
 <center>
