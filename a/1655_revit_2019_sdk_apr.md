@@ -10,7 +10,7 @@
 
 <!---
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Installing the Revit 2019 SDK April update in #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/rvt2019sdkapril
 
 After the significant struggle I had to compile the initial release of the Revit 2019 SDK samples and set up RvtSamples 2019, I am happy to report that installing and compiling the Revit 2019 SDK April 27 update is a lot easier
 &ndash; Downloading the April 27 SDK update 
