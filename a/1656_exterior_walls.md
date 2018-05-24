@@ -15,7 +15,8 @@
 
 - https://forums.autodesk.com/t5/revit-api-forum/how-to-filter-element-which-satisfy-filter-rule/m-p/8020317
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Retrieving exterior walls for an incomplete BIM in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/exteriorwalls
+Retrieving family instances satisfying a filter rule in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/exteriorwalls
 
 Today, we revisit the interesting and generic question on retrieving all exterior walls.
 That may be easy in a perfect and complete model.
@@ -27,7 +28,7 @@ However, it raises some challenges in an incomplete BIM
 &ndash; Encapsulate transactions and roll back instead of deleting 
 &ndash; Determining model extents via wall bounding box 
 &ndash; Implementing the huge surrounding room approach 
-&ndash; Retrieve family instances satisfying filter rule...
+&ndash; Retrieving family instances satisfying a filter rule...
 
 --->
 
@@ -46,7 +47,7 @@ However, it raises some challenges in an incomplete BIM:
 - [Encapsulate transactions and roll back instead of deleting](#6) 
 - [Determining model extents via wall bounding box](#7) 
 - [Implementing the huge surrounding room approach](#8) 
-- [Retrieve family instances satisfying filter rule](#9) 
+- [Retrieving family instances satisfying a filter rule](#9) 
 
 
 
@@ -424,7 +425,7 @@ This is implemented by the following methods:
 Many thanks to Feng Wang and the development team for helping to sort this out!
 
 
-####<a name="9"></a>Retrieve Family Instances Satisfying Filter Rule
+####<a name="9"></a>Retrieving Family Instances Satisfying a Filter Rule
 
 Once again, in a completely unrelated area,
 Frank [@Fair59](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/2083518) Aarssen
