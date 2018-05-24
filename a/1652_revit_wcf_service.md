@@ -338,7 +338,7 @@ on [how to get all the outermost walls in the model](https://forums.autodesk.com
 
 **Question:** How do I get all the outermost walls in the model?
 
- Here is a picture showing what I mean:
+Here is a picture showing what I mean:
 
 <center>
 <img src="img/exterior_walls.png" alt="Exterior walls" width="434"/>
