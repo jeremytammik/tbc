@@ -57,7 +57,7 @@ by Feng [@718066900](https://forums.autodesk.com/t5/user/viewprofilepage/user-id
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [how to get all the outermost walls in the model](https://forums.autodesk.com/t5/revit-api-forum/how-do-i-get-all-the-outermost-walls-in-the-model/m-p/7998948).
 
-We already explored some aspects of this question last week,
+We already explored some aspects last week,
 on [retrieving all exterior walls](http://thebuildingcoder.typepad.com/blog/2018/05/drive-revit-via-a-wcf-service-wall-directions-and-parameters.html#8).
 
 Today, we can present a working solution for an incomplete BIM.
