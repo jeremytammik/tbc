@@ -14,7 +14,8 @@
 
 - https://forums.autodesk.com/t5/revit-api-forum/how-to-filter-element-which-satisfy-filter-rule/m-p/8020317
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Retrieving exterior walls for an incomplete BIM in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/exteriorwalls
+Retrieving family instances satisfying a filter rule in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/exteriorwalls
 
 Today, we revisit the interesting and generic question on retrieving all exterior walls.
 That may be easy in a perfect and complete model.
@@ -26,7 +27,7 @@ However, it raises some challenges in an incomplete BIM
 &ndash; Encapsulate transactions and roll back instead of deleting 
 &ndash; Determining model extents via wall bounding box 
 &ndash; Implementing the huge surrounding room approach 
-&ndash; Retrieve family instances satisfying filter rule...
+&ndash; Retrieving family instances satisfying a filter rule...
 
 --->
 
@@ -42,7 +43,7 @@ However, it raises some challenges in an incomplete BIM
 <li><a href="#6">Encapsulate transactions and roll back instead of deleting</a> </li>
 <li><a href="#7">Determining model extents via wall bounding box</a> </li>
 <li><a href="#8">Implementing the huge surrounding room approach</a> </li>
-<li><a href="#9">Retrieve family instances satisfying filter rule</a> </li>
+<li><a href="#9">Retrieving family instances satisfying a filter rule</a> </li>
 </ul>
 <h4><a name="2"></a>Retrieving All Exterior Walls</h4>
 <p>This time around, this question was raised
@@ -365,7 +366,7 @@ implements a bounding box extension method <code>ExpandToContain</code> that we 
 </pre>
 
 <p>Many thanks to Feng Wang and the development team for helping to sort this out!</p>
-<h4><a name="9"></a>Retrieve Family Instances Satisfying Filter Rule</h4>
+<h4><a name="9"></a>Retrieving Family Instances Satisfying a Filter Rule</h4>
 <p>Once again, in a completely unrelated area,
 Frank <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/2083518">@Fair59</a> Aarssen
 comes to the rescue, providing a succinct answer to 
