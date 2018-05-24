@@ -13,7 +13,7 @@
   https://github.com/jeremytammik/rvtmetaprop -- read properties from Forge and update model accordingly
   https://github.com/jeremytammik/AdnRevitApiLabsXtra -- Lab4_2_ExportParametersToExcel
 
- in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Getting All Parameter Values through the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/getparams
 
 How to export all the Revit data to an external database?
 It is very simple to extract all the parameter data.
