@@ -30,7 +30,7 @@
 - Senior Software Engineer – Computer Graphics
   Israel – Tel-Aviv, OR other European locations
 
- in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+Compiling add-ins for multiple Revit versions in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/multitarget
 
 Let's finish this week with a blog post completely free of source code &ndash; but not of Revit API topics
 &ndash; Compiling add-ins for multiple Revit versions 
