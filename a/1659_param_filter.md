@@ -43,8 +43,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Today, let's revisit the topic of filtering for a parameter value, and mention the updated Fiorge tutorials:
 
+- [Learning Forge Tutorials](#2) 
+- [Filtering for a Specific Parameter Value](#3) 
+
 <center>
-<img src="img/revit_structure.jpg" alt="Revit Strucutre" width="500"/>
+<img src="img/query_filter.png" alt="Query filter" width="245"/>
 </center>
 
 ####<a name="2"></a>Learning Forge Tutorials
@@ -80,21 +83,91 @@ Check them out for yourself at your leaisure at
 </center>
 
 
-####<a name="3"></a>
+####<a name="3"></a>Filtering for a Specific Parameter Value
 
-This question was raised in
+A frequent Revit API task is to extract elements based on specific parameter values.
+
+This question was raised yet again and brought up some fresh aspects in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [filtering for elements by parameter value](https://forums.autodesk.com/t5/revit-api-forum/filter-elements-by-parameter-value/m-p/8035505):
 
-**Question:** 
+**Question:** Hi, I've searched the forums for this but couldn't find a clear answer.
+
+I'm trying to select all elements in a filtered element collector where a parameter, let's say, "house number", equals "12".
+
+Any other solution where I'd be able to loop through or list all elements that have this parameter value are welcome too.
+
+**Answer:** I think you can just do the following:
 
 <pre class="code">
+  var collector = new FilteredElementCollector(doc)
+    .Where(a => a.LookupParameter("house number")
+      .AsString() == "12")
 </pre>
 
+Assuming that the storage type of your parameter is string.
 
-**Answer:** 
+**Response:** I tried using it (also checked wether the parameter was a string just to be sure), but the var collector is null. The message I get when looking at it in the locals is: "The collector does not have a filter applied.  Extraction or iteration of elements is not permitted without a filter."
 
-**Response:** 
+**Answer 1:** My mistake.
 
-####<a name="4"></a>
+The `Where` clause is actually a .NET post-processing `LINQ` statement, so the filtered element collector does not see any filter at all.
 
-####<a name="5"></a>
+I normally always look for a specific element type when using a collector. 
+
+This code filters for family instances first.
+
+It works for me:
+
+<pre class="code">
+  List<FamilyInstance> list
+    = new FilteredElementCollector(doc)
+      .OfClass(typeof(FamilyInstance))
+      .Where(a => a.LookupParameter("house number")
+        .AsString() == "12")
+      .Cast<FamilyInstance>()
+      .ToList();
+</pre>
+
+It creates a list of FamilyInstance elements. You can change the type to any desired one. There might be other ways to not apply a filter and get all element types in one go; however, I would not recommend that, because you never know beforehand which kind of elements may pass the filter if you do.
+
+**Answer 2:** The first answer uses post-processing in .NET.
+
+That means that the initial filtering takes place in Revit; then, all family instances are transferred to .NET to check the parameter value.
+
+That causes a huge overhead.
+
+The overhead can be eliminated by using a parameter filter instead, that checks for the parameter value directly in Revit, before transferring any data to .NET.
+
+If you don't care, the first solution is fine, of course.
+
+Here are some examples of using parameter filters:
+
+- [abc](http://thebuildingcoder.typepad.com/blog/2010/06/parameter-filter.html)
+- [abc](http://thebuildingcoder.typepad.com/blog/2010/06/element-name-parameter-filter-correction.html)
+- [abc](http://thebuildingcoder.typepad.com/blog/2009/12/parameter-filter-units.html)
+- [abc](http://thebuildingcoder.typepad.com/blog/2017/06/finding-an-exit-path-and-elementid-parameter-values.html#3)
+
+[The Building Coder](http://thebuildingcoder.typepad.com) provides many more.
+
+**Response:** Hmmm...
+
+Now I'm in doubt about whether or not I should rewrite the collecters in all my own add-ins to remove that overhead myself...
+
+Some commands that take a long time might actually benefit from that if it's a big difference.
+
+Most commands are nearly instant, though, so I don't think it would matter in that case.
+
+Thanks for the insight Jeremy, as always, very helpful! :)
+
+**Answer:** Thank you for your appreciation and very glad to hear you find it useful.
+
+Years ago, [I benchmarked different filtered element collectors](http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html) and
+found that moving from .NET post-processing to a parameter filter will save at least 50% overhead.
+
+In a large model, it might be more.
+
+Benchmark first, before you do anything!
+
+If it works, don't fix it.
+
