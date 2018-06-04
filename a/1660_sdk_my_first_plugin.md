@@ -33,7 +33,11 @@ Also, will get the link added in the page https://www.autodesk.com/developrevit 
 </center>
 
 
-####<a name="2"></a>
+####<a name="2"></a>Revit 2019 SDK Published
+
+The Revit 2019 SDK has now been properly and completely published.
+
+I pointed out
 
 
 ####<a name="3"></a>
