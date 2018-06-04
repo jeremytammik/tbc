@@ -29,7 +29,7 @@ Total 517 46
       37% 16%
 Extensions 302 April, 17
 
-Filter for parameter value in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Forge Tutorials and filtering for a parameter value in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/filterforparam
 
 Today, let's revisit the topic of filtering for a parameter value, and mention the updated Forge tutorials
 &ndash; Learning Forge tutorials
@@ -78,6 +78,8 @@ Here is some data gathered so far: we had around 1900 unique visitors; 1402 went
 <tr><td class="r"></td><td class="r"></td><td class="r">37%</td><td class="r"></td><td class="r">16%</td></tr>
 <tr><td class="r">Extensions</td><td class="r">April, 17</td><td class="r">302</td></tr>
 </table>
+
+<br/>
 
 Check them out for yourself at your leisure at
 
