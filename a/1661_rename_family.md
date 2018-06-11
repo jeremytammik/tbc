@@ -22,7 +22,7 @@
 - Extensible Storage - best practices with plug-in development & growth
   https://forums.autodesk.com/t5/revit-api-forum/extensible-storage-best-practices-with-plug-in-development-amp/m-p/8050177
 
- in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+Extensible storage versioning and renaming a family in a project in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/renamefamily
 
 An interesting question was raised on renaming a family after it has been loaded into a project, which throws some light on the underlying relationship between the family name and the <code>RFA</code> filename.
 Before that, we revisit the eternal topic of getting started with the Revit API, and what to do to prepare for it before actually touching Revit at all.
