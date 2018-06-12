@@ -10,7 +10,7 @@
 
 <!---
 
- in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+Creating a warning using the Failure API in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/newwarning
 
 The Failure API enables both failure definition and handling capabilities
 &ndash; The ability to define and post failures from within API code when a user-visible problem has occurred
