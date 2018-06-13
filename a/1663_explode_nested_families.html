@@ -9,36 +9,49 @@
 
  in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+José Alberto Torres Jaraute has been working on an add-in tool to protect the intellectual property built into a complex hierarchy of nested family instances by replacing them with a flatter and simpler hierarchy, yet retaining all the relevant non-confidential custom data.
+Basically, his tool also enables location of overlapping elements and duplicates elimination.
+In the course of this work, Alberto raised a number of questions in
+the Revit API discussion forum
+&ndash; Explode nested families
+&ndash; Insert a curve-based family instance associated to a face
+&ndash; Explode family instance to get all the components of a family in project
+&ndash; Change the host and work plane of a family...
 
 --->
 
 <h3>Simplifying Nested Family Instances</h3>
-<p><a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/71628">Alberto Torres</a> has
+<p>José <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/71628">Alberto Torres</a> Jaraute has
 been working on an add-in tool to protect the intellectual property built into a complex hierarchy of nested family instances by replacing them with a flatter and simpler hierarchy, yet retaining all the relevant non-confidential custom data.</p>
-<p>Basically, his tool also enables to locate overlapping elements and to eliminate duplicates.</p>
-<p>In the course of this work, Alberto raised a number of interesting questions in
+<p>Basically, his tool also enables location of overlapping elements and duplicates elimination.</p>
+<p>In the course of this work, Alberto raised a number of questions in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>:</p>
 <ul>
-<li><a href="https://forums.autodesk.com/t5/revit-api-forum/explode-nested-familes/m-p/8042667">Explode nested familes</a></li>
-<li><a href="https://forums.autodesk.com/t5/revit-api-forum/insert-a-family-curvebased-with-newfamilyinstance-associated-to/m-p/7390334">Insert a curve based family instance associated to a face</a></li>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/explode-nested-familes/m-p/8042667">Explode nested families</a></li>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/insert-a-family-curvebased-with-newfamilyinstance-associated-to/m-p/7390334">Insert a curve-based family instance associated to a face</a></li>
 <li><a href="https://forums.autodesk.com/t5/revit-api-forum/explode-familyinstance-to-get-all-the-components-of-the-family/m-p/6984603">Explode family instance to get all the components of a family in project</a></li>
 <li><a href="https://forums.autodesk.com/t5/revit-api-forum/is-there-no-way-to-change-the-host-and-work-plan-of-a-family/m-p/7252070">Change the host and work plane of a family</a></li>
 </ul>
-<p>These discussion led to a fruitful conclusion, and Alberto now very kindly reports on the successful project completion:</p>
+<p>These discussions led to a fruitful conclusion, and Alberto now very kindly reports on the successful project completion:</p>
 <p>I use the term <code>SET</code> to denote all the <code>FamilyInstance</code> children of a <code>FamilyInstance</code> with multiple sub-instances.</p>
-<p>I implemented the following procedure to dealing with a <code>SET</code>:</p>
+<p>I implemented the following procedure to deal with a <code>SET</code>:</p>
 <ul>
 <li>Select a <code>SET</code>.</li>
 <li>Save in a class the main corporate parameters of this <code>SET</code>: Phases, Manufacturer, custom data, etc.</li>
 <li>Remove all <code>FamilyInstance</code> daughters with <code>GetSubComponentIds</code> to a collection of element ids.</li>
 <li>Go through each element of the collection and convert it to a <code>FamilyInstance</code>.</li>
-<li>From each element, retrieve its transformation from <code>GeometryInstance</code> and extract the insertion point and BasisX to determine its rotation.</li>
+<li>From each element, retrieve its transformation from <code>GeometryInstance</code> and extract the insertion point and <code>BasisX</code> to determine its rotation.</li>
 <li>Create a <code>SketchPlane</code> using this data and the normal vector it defines.</li>
 <li>Analyse the <code>FamilySymbol</code>, <code>Mirrored</code> and <code>FacingFlipped</code> properties.</li>
-<li>Insert a new <code>FamilyInstance</code> into the new <code>SketchPlane</code> taking the insertion point and rotation of the original family into account:
-<code>doc.Create.NewFamilyInstance (point, symbol, xvec, sketchPlane, StructuralType.NonStructural)</code>.</li>
+<li>Insert a new <code>FamilyInstance</code> into the new <code>SketchPlane</code> taking the insertion point and rotation of the original family into account:</li>
+</ul>
+<pre class="code">
+      doc.Create.NewFamilyInstance(
+        point, symbol, xvec, sketchPlane,
+        StructuralType.NonStructural );
+</pre>
+
+<ul>
 <li>Copy all the parameter data of the original family instance to the new one.</li>
 <li>Copy the saved parameters of the SET to the new family instance.</li>
 <li>Determine whether the original family instance has <code>Mirrored</code> or <code>FacingFlipped</code> set.</li>
@@ -49,9 +62,9 @@ the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API d
 <p>I also implemented an event to cancel the warnings displayed when inserting a new family instance at a point where another one already exists. It is removed again after terminating this process.</p>
 <p>Unfortunately, I cannot share the complete code for confidentiality reasons.</p>
 <p>Thank you very much for the fruitful discussions!</p>
-<p>Very many thanks to Alberto for sharing his experience and workflow!</p>
-<p>By the way, in case you are interested in flattening and simplifying, you might also want to check out this more radical approach,
-<a href="http://thebuildingcoder.typepad.com/blog/2015/11/flatten-all-elements-to-directshape.html">flattening all elements to <code>DirectShape</code></a>.</p>
+<p>Many thanks to Alberto for sharing his experience and workflow!</p>
+<p>By the way, in case you are interested in flattening and simplifying, you might also want to check out the more radical approach 
+of <a href="http://thebuildingcoder.typepad.com/blog/2015/11/flatten-all-elements-to-directshape.html">flattening all elements to <code>DirectShape</code></a>.</p>
 <p><center>
 <img src="img/nesting_matryoshka_dolls.png" alt="Nested matryoshka dolls" width="270"/>
 </center></p>

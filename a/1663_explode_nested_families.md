@@ -10,41 +10,53 @@
 
  in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+José Alberto Torres Jaraute has been working on an add-in tool to protect the intellectual property built into a complex hierarchy of nested family instances by replacing them with a flatter and simpler hierarchy, yet retaining all the relevant non-confidential custom data.
+Basically, his tool also enables location of overlapping elements and duplicates elimination.
+In the course of this work, Alberto raised a number of questions in
+the Revit API discussion forum
+&ndash; Explode nested families
+&ndash; Insert a curve-based family instance associated to a face
+&ndash; Explode family instance to get all the components of a family in project
+&ndash; Change the host and work plane of a family...
 
 --->
 
 ### Simplifying Nested Family Instances
 
-[Alberto Torres](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/71628) has
+José [Alberto Torres](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/71628) Jaraute has
 been working on an add-in tool to protect the intellectual property built into a complex hierarchy of nested family instances by replacing them with a flatter and simpler hierarchy, yet retaining all the relevant non-confidential custom data.
 
-Basically, his tool also enables to locate overlapping elements and to eliminate duplicates.
+Basically, his tool also enables location of overlapping elements and duplicates elimination.
 
-In the course of this work, Alberto raised a number of interesting questions in
+In the course of this work, Alberto raised a number of questions in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
 
-- [Explode nested familes](https://forums.autodesk.com/t5/revit-api-forum/explode-nested-familes/m-p/8042667)
-- [Insert a curve based family instance associated to a face](https://forums.autodesk.com/t5/revit-api-forum/insert-a-family-curvebased-with-newfamilyinstance-associated-to/m-p/7390334)
+- [Explode nested families](https://forums.autodesk.com/t5/revit-api-forum/explode-nested-familes/m-p/8042667)
+- [Insert a curve-based family instance associated to a face](https://forums.autodesk.com/t5/revit-api-forum/insert-a-family-curvebased-with-newfamilyinstance-associated-to/m-p/7390334)
 - [Explode family instance to get all the components of a family in project](https://forums.autodesk.com/t5/revit-api-forum/explode-familyinstance-to-get-all-the-components-of-the-family/m-p/6984603)
 - [Change the host and work plane of a family](https://forums.autodesk.com/t5/revit-api-forum/is-there-no-way-to-change-the-host-and-work-plan-of-a-family/m-p/7252070)
 
-These discussion led to a fruitful conclusion, and Alberto now very kindly reports on the successful project completion:
+These discussions led to a fruitful conclusion, and Alberto now very kindly reports on the successful project completion:
  
 I use the term `SET` to denote all the `FamilyInstance` children of a `FamilyInstance` with multiple sub-instances.
 
-I implemented the following procedure to dealing with a `SET`:
+I implemented the following procedure to deal with a `SET`:
 
 - Select a `SET`.
 - Save in a class the main corporate parameters of this `SET`: Phases, Manufacturer, custom data, etc.
 - Remove all `FamilyInstance` daughters with `GetSubComponentIds` to a collection of element ids.
 - Go through each element of the collection and convert it to a `FamilyInstance`.
-- From each element, retrieve its transformation from `GeometryInstance` and extract the insertion point and BasisX to determine its rotation.
+- From each element, retrieve its transformation from `GeometryInstance` and extract the insertion point and `BasisX` to determine its rotation.
 - Create a `SketchPlane` using this data and the normal vector it defines.
 - Analyse the `FamilySymbol`, `Mirrored` and `FacingFlipped` properties.
 - Insert a new `FamilyInstance` into the new `SketchPlane` taking the insertion point and rotation of the original family into account:
-`doc.Create.NewFamilyInstance (point, symbol, xvec, sketchPlane, StructuralType.NonStructural)`.
+
+<pre class="code">
+      doc.Create.NewFamilyInstance(
+        point, symbol, xvec, sketchPlane,
+        StructuralType.NonStructural );
+</pre>
+
 - Copy all the parameter data of the original family instance to the new one.
 - Copy the saved parameters of the SET to the new family instance.
 - Determine whether the original family instance has `Mirrored` or `FacingFlipped` set.
@@ -58,10 +70,10 @@ Unfortunately, I cannot share the complete code for confidentiality reasons.
 
 Thank you very much for the fruitful discussions!
 
-Very many thanks to Alberto for sharing his experience and workflow!
+Many thanks to Alberto for sharing his experience and workflow!
 
-By the way, in case you are interested in flattening and simplifying, you might also want to check out this more radical approach,
-[flattening all elements to `DirectShape`](http://thebuildingcoder.typepad.com/blog/2015/11/flatten-all-elements-to-directshape.html).
+By the way, in case you are interested in flattening and simplifying, you might also want to check out the more radical approach 
+of [flattening all elements to `DirectShape`](http://thebuildingcoder.typepad.com/blog/2015/11/flatten-all-elements-to-directshape.html).
 
 <center>
 <img src="img/nesting_matryoshka_dolls.png" alt="Nested matryoshka dolls" width="270"/>
