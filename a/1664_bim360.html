@@ -11,34 +11,100 @@
 
  in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+I am participating in a <i>Digital Construction Live</i> event in the UK next week and presenting there on Forge for the BIM domain.
+In preparation, I'll jot down some notes here on what I learned about this myself lately
+&ndash; Forge for AEC in Five Minutes
+&ndash; What do the Forge APIs do?
+&ndash; BIM360 &ndash; Connect the Docs
+&ndash; Overview
+&ndash; Packages
+&ndash; Platform and Subscriptions
+&ndash; Subscription Entitlements
+&ndash; Docs
+&ndash; Design
+&ndash; Glue
+&ndash; Build
+&ndash; Summary...
 
 --->
 
 <h3>Forge for AEC and BIM360 Overview</h3>
-<p>I am participating in a <em>Digital Contruction Day</em> in the UK next week and presenting there on Forge for the BIM domain.</p>
+<p>I am participating in a <em>Digital Construction Live</em> event in the UK next week and presenting there on Forge for the BIM domain.</p>
 <p>In preparation, I'll jot down some notes here on what I learned about this myself lately:</p>
-<p><center>
-<img src="img/" alt="" width="100"/>
-</center></p>
+<ul>
+<li><a href="#2">Forge for AEC in Five Minutes</a> </li>
+<li><a href="#3">What do the Forge APIs do?</a> </li>
+<li><a href="#4">BIM360 &ndash; Connect the Docs</a> </li>
+<li><a href="#5">BIM 360 Overview</a> </li>
+<li><a href="#6">BIM 360 Packages</a> <ul>
+<li><a href="#6.1">BIM 360 Platform and Subscriptions</a> </li>
+<li><a href="#6.2">BIM 360 Subscription Entitlements</a> </li>
+<li><a href="#6.3">BIM 360 Docs</a> </li>
+<li><a href="#6.4">BIM 360 Design</a> </li>
+<li><a href="#6.5">BIM 360 Glue</a> </li>
+<li><a href="#6.6">BIM 360 Build</a> </li>
+<li><a href="#6.7">Summary</a> </li>
+</ul>
+</li>
+</ul>
 <h4><a name="2"></a>Forge for AEC in Five Minutes</h4>
 <p>A good first impression of the Forge aspect of things is provided by Jim Quanci, Senior Director Forge Partner Development,
 presenting <a href="https://youtu.be/BLHzTh_NsFM">Forge for AEC in 5 minutes</a> [<a href="/a/doc/forge/bam/video/forge_for_aec_in_5_minutes.mkv">^</a>].</p>
-<p>As he says in the byline, Forge is a set of web service APIs that power the future of making things.
+<p>As he says in the by-line, Forge is a set of web service APIs that power the future of making things.
 To learn more, please visit <a href="https://developer.autodesk.com">developer.autodesk.com</a>
 and <a href="https://autodesk-forge.github.io">autodesk-forge.github.io</a>.</p>
+<p>The important words to note here are <em>web service APIs</em>.</p>
+<p>Forge is not a product that you buy.</p>
+<p>The web services provide powerful functionality enabling you to interact with your models and design data for design, visualisation, collaboration, manufacturing, maintenance and other usage purposes.</p>
+<p><center>
+<img src="img/forge_platform_diagram.png" alt="Forge platform diagram" width="800"/>
+</center></p>
+<p>Since the APIs are all web-based, it becomes extremely easy to combine the Forge functionality with other web-based components.</p>
+<p>The numerous and powerful open source projects based on JavaScript, Node.js and others tools with their  thousands of available libraries make it easy to put together something very useful very fast.</p>
 <p>To get started programming a Forge app yourself, check out
 the updated <a href="http://learnforge.autodesk.io">Learning Forge Tutorials</a>.</p>
-<h4><a name="3"></a>BIM 360 Overview</h4>
-<p>I started out at <a href="https://bim360.autodesk.com">bim360.autodesk.com</a> and learned this:</p>
+<h4><a name="3"></a>What do the Forge APIs do?</h4>
+<p>Check out the list of available APIs here:</p>
+<p><center>
+<img src="img/2018-06_forge_apis.png" alt="Forge APIs" width="489"/>
+</center></p>
+<p>The Autodesk Forge Viewer enables web developers to very easily display 3D (and 2D) models in a WebGL-enabled browser or smartphone app. If you've got a model you've created using some kind of design software, then you can probably display it using this technology.</p>
 <ul>
-<li>For Project Teams &ndash; BIM 360 is the single cloud platform that supports informed decision-making through the project lifecycle, leading to more predictable and profitable outcomes. Connect teams and collaborate on shared designs with BIM 360, the next-generation project delivery and construction management platform. Make better decisions and eliminate costly delays with BIM 360, the next-generat</li>
+<li>The Data Management API provides a unified and consistent way to access data across BIM 360 Team, Fusion Team (formerly known as A360 Team), A360 Personal, and the Object Storage Service.</li>
+<li>The Model Derivative API enables users to represent and share their designs in different formats, as well as to extract valuable metadata.</li>
+<li>The Design Automation API provides the ability to run scripts on your design files, leveraging the scale of the Forge Platform to automate repetitive tasks. At present, it supports AutoCAD DWG files, with plans in the works to expand to file types generated by other design software, including Inventor and Revit.</li>
+</ul>
+<h4><a name="4"></a>BIM360 &ndash; Connect the Docs</h4>
+<p>The BIM360 tools provide some examples of how products can be built on top of the Forge platform.</p>
+<p>A nice quick first introduction to them is provided by Carl Storm, announcing his AU session, 
+in <a href="https://projectdelivery.autodesk.com/blog/connect-the-docs-bim-360">Connect the Docs: BIM 360</a>:</p>
+<p>BIM 360 is Autodesk’s cloud and mobile platform for the architecture, engineering, and construction (AEC) Industry. The platform currently consists of 7 products that span from conceptual design to construction to commissioning and handover, and even extending into operations:</p>
+<ul>
+<li>Docs</li>
+<li>Field</li>
+<li>Glue</li>
+<li>Layout</li>
+<li>Ops</li>
+<li>Plan</li>
+<li>Team</li>
+</ul>
+<p>Because the BIM 360 platform is a cloud-based common data environment, you can exchange project data between products without cumbersome exports or time-consuming steps. You can even share this same data instantly across your team via a web browser or on mobile device in the field.</p>
+<p>While there are seven offerings in the platform, it doesn’t mean that you need to be using all of them, as they each have their own place within the AEC project lifecycle.</p>
+<p>This graph shows where each of the seven BIM 360 solutions can be used to connect stakeholders to project information throughout the entire AEC project lifecycle:</p>
+<p><center>
+<img src="img/connect-the-docs-bim-360-team-field-layout-glue-plan-1.jpg" alt="BIM360 during the AEC project lifecycle" width="600"/>
+</center></p>
+<p>For the rest of Carl's discussion, please refer to <a href="https://projectdelivery.autodesk.com/blog/connect-the-docs-bim-360">his original post</a>.</p>
+<h4><a name="5"></a>BIM 360 Overview</h4>
+<p>The next call of port for me was the official Autodesk web site 
+at <a href="https://bim360.autodesk.com">bim360.autodesk.com</a>, where I learned this:</p>
+<ul>
+<li>For Project Teams &ndash; BIM 360 is the single cloud platform that supports informed decision-making through the project lifecycle, leading to more predictable and profitable outcomes. Connect teams and collaborate on shared designs with BIM 360, the next-generation project delivery and construction management platform. Make better decisions and eliminate costly delays.</li>
 <li>For Design Teams &ndash; Connect teams and collaborate on shared designs with BIM 360, the next-generation project delivery and construction management platform.</li>
 <li>For Construction Teams &ndash; Make better decisions and eliminate costly delays with BIM 360, the next-generation project delivery and construction management platform.</li>
 </ul>
-<p>Manage the entire project lifecycle with BIM 360</p>
-<p>BIM 360 improves construction project delivery by supporting informed decision-making throughout the project lifecycle. From design collaboration, documentation and reviews, to pre-construction, and through quality and safety and operations, BIM 360 connects the people, data and workflows on your project. So you can see the big picture and keep your projects on track.</p>
+<p>Manage the entire project lifecycle with BIM 360
+&ndash; BIM 360 improves construction project delivery by supporting informed decision-making throughout the project lifecycle. From design collaboration, documentation and reviews, to pre-construction, and through quality and safety and operations, BIM 360 connects the people, data and workflows on your project. So you can see the big picture and keep your projects on track.</p>
 <ul>
 <li>Controlled Worksharing &ndash; 
 Control cloud-based Revit worksharing so the right user has the right access to the right design data at the right time.    </li>
@@ -59,6 +125,98 @@ Identify issues in the context of designs, assign work, and track issue resoluti
 <li>RFIs and Submittals &ndash; 
 Create, manage, distribute and approve submittals packages with tight project controls and activity tracking.   </li>
 </ul>
-<p>All this BIM 360 functionality is provided to the end user by the various packages, so let's take a look at those now.</p>
-<h4><a name="3"></a>BIM 360 Package Overview</h4>
+<p>The BIM 360 functionality is provided to the end user by the various packages, so let's take a look at those now.</p>
+<h4><a name="6"></a>BIM 360 Packages</h4>
 <p>Here is a brief set of six succinct slides presenting a <a href="zip/bim_360_packages_2018.pdf">BIM 360 Package Overview</a>.</p>
+<p>I extracted the text portion from them for easier immediate online access:</p>
+<h4><a name="6.1"></a>BIM 360 Platform and Subscriptions</h4>
+<ul>
+<li>Docs &ndash; For all project stakeholders who need controlled access to information</li>
+<li>Design &ndash; For teams who need to collaborate in real-time on Revit models and track deliverables</li>
+<li>Glue &ndash; For teams who need to coordinate multi-discipline designs across trades</li>
+<li>Build &ndash; For teams who need to collaborate on work performed during construction</li>
+</ul>
+<p>The next-generation BIM 360 platform has brought a set of previously separate, point applications together into a single BIM 360 brand that supports Design, Build and Operate. BIM 360 is our AEC cloud platform for project delivery and construction management. The BIM 360 platform is available in four subscription offerings: BIM 360 Docs, BIM 360 Design, BIM 360 Glue and BIM 360 Design.</p>
+<p>BIM 360 Ops and BIM 360 Plan continue to be sold as standalone subscriptions, with no change. BIM 360 Plan leverages the centralized administration functions of the BIM 360 platform, but does not share project data.</p>
+<h4><a name="6.2"></a>BIM 360 Subscription Entitlements</h4>
+<p><center>
+<img src="img/bim360_subscription_entitlements.png" alt="BIM360 subscription entitlements" width="800"/>
+</center></p>
+<p>This next-generation platform removes the need for single point applications and unifies your project data. The unified BIM 360 solution aggregates the data and provides transparency to project stakeholders making everyone more accountable and improving visibility in real time.</p>
+<ul>
+<li>BIM 360 Docs is the entry point to the BIM 360 platform and provides controlled data and document management for all project information, from design through construction.</li>
+</ul>
+<p>Project workflows are supported in three process management offerings.</p>
+<ul>
+<li>BIM 360 Design supports collaboration across multi-discipline design firms and coordination of deliverables.</li>
+<li>BIM 360 Glue allows teams to coordinate multi-discipline models, and automate tasks such as model aggregation and clash detection.</li>
+<li>BIM 360 Build provides teams with the ability to manage RFIs and Submittals, as well as execute quality and safety management programs during construction.</li>
+</ul>
+<p>Each of these subscriptions includes a set of BIM 360 platform modules, along with access to classic BIM 360 solutions to ensure that customers can continue to use the products they are using today on their projects without disruption.</p>
+<p>All project information in BIM 360 is managed in a single data repository &ndash; or common data platform &ndash; and access is controlled by user, role or company permissions. Design, Glue and Build are all connected to the common data platform and bring together information and workflows in a way that was previously unavailable with point solutions.</p>
+<p>User-friendly dashboards and advanced data analytics are available across all subscription offerings, making it simple to track and prioritize work.</p>
+<p>All participating companies, projects and members are managed in a centralized administration area to ensure the right people have access to the right information and the right tools.</p>
+<h4><a name="6.3"></a>BIM 360 Docs</h4>
+<ul>
+<li>Controlled publishing, viewing and sharing of information</li>
+<li>Document control and versioning for all file types</li>
+<li>Perform design reviews with 2D and 3D compare and markups</li>
+<li>Manage contract docs and track project activity</li>
+<li>iOS and Android apps with offline sync</li>
+</ul>
+<p>Document Management: Controlled access to all project documents, plans and models, serving as the single data repository for BIM 360.</p>
+<p>The Document Management module, which can be purchased alone as BIM 360 Docs and is included in all BIM 360 products, is the foundation for all work managed in BIM 360. As any AEC project kicks off, this is where it should start. It's the place to centralize, control and give access to project information for all team members.</p>
+<p>Built on top of this, as a superset, we have three premium process management products.</p>
+<h4><a name="6.4"></a>BIM 360 Design</h4>
+<ul>
+<li>Collaborate across multi-discipline design teams</li>
+<li>Control worksharing with granular permissions</li>
+<li>Track and coordinate exchange of deliverable packages</li>
+<li>Visualize changes between deliverables</li>
+</ul>
+<p>Cloud Worksharing: Co-author Revit models in real time and review design development with the extended team at any time.</p>
+<p>Design Collaboration: Control design deliverable exchange to keep the right information in the right hands throughout the project.</p>
+<p>Document Management: Controlled access to all project documents, plans and models, serving as the single data repository for BIM 360.</p>
+<p>Design teams will start their work in BIM 360 Design. This is our next generation design collaboration solution for controlled cloud worksharing and milestone and deliverable tracking across teams. Customers using C4R asked us for greater control over shared models and access—and we are delivering it.</p>
+<h4><a name="6.5"></a>BIM 360 Glue</h4>
+<ul>
+<li>Identify costly issues through constructability reviews</li>
+<li>Improve trade coordination</li>
+<li>Automate clash detection and speed reviews</li>
+<li>View aggregated models and filter by discipline</li>
+</ul>
+<p>Model Coordination: For 3D projects, offers simplified model aggregation, viewing and automated clash detection.</p>
+<p>Document Management: Controlled access to all project documents, plans and models, serving as the single data repository for BIM 360.</p>
+<p>As the project moves to Preconstruction, contractors and VDC managers will work in next-generation BIM 360 Glue, now available and connected to the same common data platform in BIM 360, for model coordination and constructability reviews. Tasks such as clash detection are automated allowing insights to be provided in real time to inform the project.</p>
+<h4><a name="6.6"></a>BIM 360 Build</h4>
+<ul>
+<li>Improve quality control to reduce rework</li>
+<li>Drive quality/safety program conformance</li>
+<li>Create, assign and manage issues, RFIs and Submittals</li>
+<li>Track field performance with daily reports and analytics</li>
+</ul>
+<p>Field Management: Issue management, checklists and daily reports for on-site execution and collaboration between the field and the office</p>
+<p>Project Management: Creation, assignment and approval of RFIs and Submittals with controlled workflow processes across teams</p>
+<p>Document Management: Controlled access to all project documents, plans and models, serving as the single data repository for BIM 360.</p>
+<p>And as the project moves to the construction site, teams can work in BIM 360 Build, our next-gen field management solution. BIM 360 Build also includes RFIs and submittals workflows keeping critical project data centralized and accessible. Subcontractors and trades can now respond to submittals in the same system as they manage quality programs. And all work is tracked and auditable.</p>
+<h4><a name="6.7"></a>Summary</h4>
+<p>The BIM 360 platform provides project teams &ndash; from design to construction to owners &ndash; with significant advantages over using point solutions for project delivery.</p>
+<ul>
+<li>All project data collected in a common data platform</li>
+<li>Frictionless data flow from design to construction</li>
+<li>Data-driven decisions replacing "last known information"</li>
+<li>Teams and data across the project lifecycle connected and coordinated</li>
+<li>More predictable, and profitable, project outcomes</li>
+</ul>
+<p>And we've made it simple to get projects started with BIM 360 through a set of packages built for the personas that need to connect as the project progresses from design to construction.</p>
+<p>BIM 360 Docs is the entry point to the platform, and supports all project stakeholders who need controlled access to information</p>
+<p>We then offer three premium process management products:</p>
+<ul>
+<li>BIM 360 Design, for teams who need to collaborate in real-time on Revit model authoring, then create, review, track and distribute deliverables.</li>
+<li>BIM 360 Glue, for multi-discipline teams who need to coordinate designs across trades and fabricators to ensure constructability and avoid costly project issues.</li>
+<li>BIM 360 Build, for teams both on the jobsite and in the office, who need to collaborate on work performed during construction to keep the project on time, on budget and in conformance with quality and safety standards.</li>
+</ul>
+<p>We also recognize that our customers have projects in place that will continue to use our classic BIM 360 products, and so we've designed these packages to include access to those solutions.</p>
+<p>For pricing information, please refer to 
+the online <a href="https://bim360.autodesk.com/docs-pricing">BIM 360 Docs pricing</a> overview.</p>
+<p>Next, I need to dig up some nice samples and demos to show how this functionality can be integrated into specific workflows.</p>
