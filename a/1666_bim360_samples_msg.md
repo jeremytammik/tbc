@@ -29,7 +29,7 @@ Today, let's forcus on the real message and some live samples putting it to use:
 - [Connecting Forge with BIM360 Sample](#5) 
 
 
-####<a name="2"></a> The Real Message 
+#### <a name="2"></a> The Real Message 
 
 The real message about Forge for AEC and BIM360, according to Jim Quanci, with whom I luckily was able to chat yesterday, is this:
 
@@ -46,7 +46,7 @@ Autodesk University in Darmstadt, Germany, last year.
 One of the main motivating aspects in that talk is basically exactly what Jim points out:
 
 
-#### <a name="3"></a>BIM Collaboration Roles and Magnitudes
+#### <a name="3"></a> BIM Collaboration Roles and Magnitudes
 
 I am not a very graphical person, and generally use much too few images in my presentations.
 
@@ -68,7 +68,7 @@ For more details, please refer
 to [my presentation mentioned above](http://thebuildingcoder.typepad.com/blog/2017/10/rational-bim-programming-at-au-darmstadt.html).
 
 
-####<a name="4"></a>Forge for AEC Sample Live
+#### <a name="4"></a> Forge for AEC Sample Live
 
 One of Jim's favourite Forge AEC examples
 is [BLDNG360](https://bldng360.com)
@@ -86,7 +86,7 @@ This kind of dashboard information can be used to easily assess how complete the
 This kind of application can be built using the generic Forge components, for any type of CAD model.
 
 
-####<a name="5"></a>Connecting Forge with BIM360 Sample
+#### <a name="5"></a> Connecting Forge with BIM360 Sample
 
 Another sample specifically targeted at BIM360
 is the [BIM360 Visual Reports app](https://bim360reports.autodesk.io) written by my FPD colleage Augusto Goncalves.
