@@ -29,7 +29,7 @@ Today, let's forcus on the real message and some live samples putting it to use:
 - [Connecting Forge with BIM360 Sample](#5) 
 
 
-####<a name="2"></a>The Real Message 
+####<a name="2"></a> The Real Message 
 
 The real message about Forge for AEC and BIM360, according to Jim Quanci, with whom I luckily was able to chat yesterday, is this:
 
