@@ -46,7 +46,7 @@ Autodesk University in Darmstadt, Germany, last year.
 One of the main motivating aspects in that talk is basically exactly what Jim points out:
 
 
-####<a name="3"></a>BIM Collaboration Roles and Magnitudes
+#### <a name="3"></a>BIM Collaboration Roles and Magnitudes
 
 I am not a very graphical person, and generally use much too few images in my presentations.
 
