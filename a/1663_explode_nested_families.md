@@ -8,7 +8,7 @@
 
 <!---
 
- in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Simplifying nested family instances in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/simplifynestedinstance
 
 José Alberto Torres Jaraute implemented an add-in tool to protect the intellectual property built into a complex hierarchy of nested family instances by replacing them with a flatter and simpler hierarchy, yet retaining all the relevant non-confidential custom data.
 Basically, his tool also enables location of overlapping elements and duplicates elimination.
