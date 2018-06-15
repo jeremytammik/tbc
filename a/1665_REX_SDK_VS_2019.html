@@ -1,0 +1,61 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<!--
+<script src="run_prettify.js" type="text/javascript"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- C# advice: in math-heavy codes, use struct instead of class to bunch small chunks of data.
+this is explained in detail by Aras Pranckevičius in his article on [daily pathtracer part 3: C# &amp; Unity &amp; Burst](http://aras-p.info/blog/2018/03/28/Daily-Pathtracer-Part-3-CSharp-Unity-Burst/)
+
+- revit i/o status
+https://twitter.com/in4matikerCH/status/1007506246134624256
+Bruno Grutsch
+‏@in4matikerCH
+Q: Do you have information when RevitAPI / Revit I/O (this is same same?) will be available in Forge for public? What will be possible compared to today?
+A: Yes, I will happily answer. However, that merits a whole blog post of its own. Private beta is on-going. Your question is asked in the private beta forum every day as well. No answer yet. More in The Building Coder topic group
+
+&ndash;
+...
+
+--->
+
+<h3>REX SDK Templates for Revit Structure 2019</h3>
+<p>Apparently, the Revit SDK REX Visual Studio templates are obsolete.</p>
+<p>Let's fix that problem.</p>
+<p>Also, two little notes on a C# optimisation trick for math-heavy code, and the current status of the Forge Design Automation API for Revit:</p>
+<ul>
+<li><a href="#2">Revit Structure 2019 REX Extension SDK Visual Studio Templates</a> </li>
+<li><a href="#3">Improve C# Performance Using Struct Instead of Class</a> </li>
+<li><a href="#4">Update on the Forge Design Automation API for Revit</a> </li>
+</ul>
+<p><center>
+<img src="img/tyrannosaurus_skeleton.jpg" alt="Tyrannosaurus rex skeleton" width="348"/>
+</center></p>
+<h4><a name="2"></a>Revit Structure 2019 REX Extension SDK Visual Studio Templates</h4>
+<p>Apparently, the Visual Studio templates provided with the REX SDK to make use of the Revit Structure Extensions have not yet been updated for Revit 2019.</p>
+<p>This came up in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on an <a href="https://forums.autodesk.com/t5/revit-api-forum/issue-with-sdk-and-visual-studio/m-p/8070414">Issue with SDK and Visual Studio</a>.</p>
+<p>I now heard back from the development team on this, and they sent
+an <a href="zip/REX_SDK_Visual_Studio_templates_2019.zip">updated set of REX SDK Visual Studio templates for Revit Structure 2019</a>.</p>
+<p>I hope this solves the issue.</p>
+<h4><a name="3"></a>Improve C# Performance Using Struct Instead of Class</h4>
+<p>A useful piece of C# optimisation advice: in math-heavy code, use <code>struct</code> instead of <code>class</code> to bunch small chunks of data.</p>
+<p>This suggestion and the detailed explanation is provided by Aras Pranckevičius in
+his <a href="http://aras-p.info/blog/2018/03/28/Daily-Pathtracer-Part-3-CSharp-Unity-Burst.">daily pathtracer article part 3: C# &amp; Unity &amp; Burst</a>.</p>
+<h4><a name="4"></a>Update on the Forge Design Automation API for Revit</h4>
+<p>Bruno <a href="https://twitter.com/in4matikerCH">@in4matikerCH</a> Grutsch reacted to yesterday's post
+on <a href="http://thebuildingcoder.typepad.com/blog/2018/06/forge-for-aec-and-bim360-overview.html#3">what the Forge APIs do</a>
+and <a href="https://twitter.com/in4matikerCH/status/1007506246134624256">asks</a>:</p>
+<p><strong>Question:</strong> Do you have information when the Forge Design Automation API for Revit, i.e. online access to Revit API functionality &ndash; aka Revit I/O &ndash; will be publicly available? What will be possible compared to today?</p>
+<p><strong>Answer:</strong> Yes, I will happily answer. However, that would merit an entire blog post of its own.</p>
+<p>The Forge Design Automation API for Revit is currently in a very limited private beta.</p>
+<p>Your question is asked regularly in the private beta forum as well.</p>
+<p>Last time it was raised, no answer could yet be provided.</p>
+<p>Read more about this in The Building Coder topic group
+on <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28b">thoughts and input on Revit I/O</a>.</p>
