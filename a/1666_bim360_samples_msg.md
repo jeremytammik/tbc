@@ -17,7 +17,7 @@
 
 --->
 
-### BIM360 and Forge for AEC Samples and the Real Message
+### BIM360 and Forge for AEC Real Message and Samples
 
 As I pointed out in
 the [overview of Forge for AEC and BIM360](http://thebuildingcoder.typepad.com/blog/2018/06/forge-for-aec-and-bim360-overview.html),
