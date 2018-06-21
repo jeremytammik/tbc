@@ -12,7 +12,7 @@
 
 - 14337750 [Invoke the "Draw Model Line" Command]
 
- in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Digital construction slide deck and drawing a model line in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
 I am attending the BAM <i>Digital Construction Live</i> event in the UK and presenting on Forge for that domain.
 Today, I'll share my slide deck from this event and welcome my colleague Xiaodong answering his first Revit API cases
@@ -67,36 +67,37 @@ the <a href="zip/bam_bim360_forge_aec_slides.pdf">BAM Forge for Digital Construc
 
 <p>If your workflow is to create a model line yourself with the parameters the user inputs, you can use the following:</p>
 <pre class="code">
-<span style="color:#2b91af;">UIApplication</span>&nbsp;uiApp&nbsp;=&nbsp;commandData.Application;
-<span style="color:#2b91af;">Application</span>&nbsp;rvtApp&nbsp;=&nbsp;uiApp.Application;
-<span style="color:#2b91af;">UIDocument</span>&nbsp;uiDoc&nbsp;=&nbsp;uiApp.ActiveUIDocument;
-<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;uiDoc.Document;
+  <span style="color:#2b91af;">UIApplication</span>&nbsp;uiApp&nbsp;=&nbsp;commandData.Application;
+  <span style="color:#2b91af;">Application</span>&nbsp;rvtApp&nbsp;=&nbsp;uiApp.Application;
+  <span style="color:#2b91af;">UIDocument</span>&nbsp;uiDoc&nbsp;=&nbsp;uiApp.ActiveUIDocument;
+  <span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;uiDoc.Document;
 
-<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;transaction&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)
-{
-&nbsp;&nbsp;transaction.Start(&nbsp;<span style="color:#a31515;">&quot;Create&nbsp;Model&nbsp;Line&nbsp;By&nbsp;Me&quot;</span>&nbsp;);
+  <span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;transaction&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)
+  {
+  &nbsp;&nbsp;transaction.Start(&nbsp;<span style="color:#a31515;">&quot;Create&nbsp;Model&nbsp;Line&nbsp;By&nbsp;Me&quot;</span>&nbsp;);
 
-&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;startPoint&nbsp;=&nbsp;<span style="color:#2b91af;">XYZ</span>.Zero;
-&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;endPoint&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;10,&nbsp;10,&nbsp;0&nbsp;);
+  &nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;startPoint&nbsp;=&nbsp;<span style="color:#2b91af;">XYZ</span>.Zero;
+  &nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;endPoint&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;10,&nbsp;10,&nbsp;0&nbsp;);
 
-&nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;geomLine&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;startPoint,&nbsp;endPoint&nbsp;);
+  &nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;geomLine&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;startPoint,&nbsp;endPoint&nbsp;);
 
-&nbsp;&nbsp;<span style="color:green;">//&nbsp;Create&nbsp;a&nbsp;geometry&nbsp;plane&nbsp;in&nbsp;Revit&nbsp;application&nbsp;memory</span>
+  &nbsp;&nbsp;<span style="color:green;">//&nbsp;Create&nbsp;a&nbsp;geometry&nbsp;plane&nbsp;in&nbsp;Revit&nbsp;application&nbsp;memory</span>
 
-&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;origin&nbsp;=&nbsp;<span style="color:#2b91af;">XYZ</span>.Zero;
-&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;normal&nbsp;=&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisZ;
-&nbsp;&nbsp;<span style="color:#2b91af;">Plane</span>&nbsp;geomPlane&nbsp;=&nbsp;<span style="color:#2b91af;">Plane</span>.CreateByNormalAndOrigin(
-&nbsp;&nbsp;&nbsp;&nbsp;normal,&nbsp;origin&nbsp;);
+  &nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;origin&nbsp;=&nbsp;<span style="color:#2b91af;">XYZ</span>.Zero;
+  &nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;normal&nbsp;=&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisZ;
+  &nbsp;&nbsp;<span style="color:#2b91af;">Plane</span>&nbsp;geomPlane&nbsp;=&nbsp;<span style="color:#2b91af;">Plane</span>.CreateByNormalAndOrigin(
+  &nbsp;&nbsp;&nbsp;&nbsp;normal,&nbsp;origin&nbsp;);
 
-&nbsp;&nbsp;<span style="color:green;">//&nbsp;Create&nbsp;a&nbsp;sketch&nbsp;plane&nbsp;in&nbsp;current&nbsp;document</span>
+  &nbsp;&nbsp;<span style="color:green;">//&nbsp;Create&nbsp;a&nbsp;sketch&nbsp;plane&nbsp;in&nbsp;current&nbsp;document</span>
 
-&nbsp;&nbsp;<span style="color:#2b91af;">SketchPlane</span>&nbsp;sketch&nbsp;=&nbsp;<span style="color:#2b91af;">SketchPlane</span>.Create(
-&nbsp;&nbsp;&nbsp;&nbsp;doc,&nbsp;geomPlane&nbsp;);
+  &nbsp;&nbsp;<span style="color:#2b91af;">SketchPlane</span>&nbsp;sketch&nbsp;=&nbsp;<span style="color:#2b91af;">SketchPlane</span>.Create(
+  &nbsp;&nbsp;&nbsp;&nbsp;doc,&nbsp;geomPlane&nbsp;);
 
-&nbsp;&nbsp;<span style="color:#2b91af;">ModelLine</span>&nbsp;modelLine&nbsp;=&nbsp;doc.Create.NewModelCurve(
-&nbsp;&nbsp;&nbsp;&nbsp;geomLine,&nbsp;sketch&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">ModelLine</span>;
+  &nbsp;&nbsp;<span style="color:#2b91af;">ModelLine</span>&nbsp;modelLine&nbsp;=&nbsp;doc.Create.NewModelCurve(
+  &nbsp;&nbsp;&nbsp;&nbsp;geomLine,&nbsp;sketch&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">ModelLine</span>;
 
-&nbsp;&nbsp;transaction.Commit();
+  &nbsp;&nbsp;transaction.Commit();
+  }
 </pre>
 
 <p>Xiaodong adds:</p>
