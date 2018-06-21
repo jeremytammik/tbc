@@ -8,7 +8,7 @@
 
 <!---
 
- in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+BIM360 and Forge for digital construction message and samples #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/bim360forgeaecsamples
 
 I am participating in a <i>Digital Construction Live</i> event in the UK next week and presenting there on Forge for the BIM domain. Today, let's focus on the real message and some live samples putting it to use:
 &ndash; The real message
