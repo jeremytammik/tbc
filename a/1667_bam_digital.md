@@ -79,7 +79,7 @@ Here is one of his first:
 **Answer:** If your workflow is to simply to invoke the built-in *Draw Model Line* command as is, you could find the command id and execute it using `PostCommand`:
 
 <pre class="code">
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Autodesk.Revit.UI.<span style="color:#2b91af;">RevitCommandId</span>&nbsp;cmd_id
+&nbsp;&nbsp;Autodesk.Revit.UI.<span style="color:#2b91af;">RevitCommandId</span>&nbsp;cmd_id
 &nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:#2b91af;">RevitCommandId</span>.LookupPostableCommandId(
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">PostableCommand</span>.ModelLine&nbsp;);
  

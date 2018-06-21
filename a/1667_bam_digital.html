@@ -58,7 +58,7 @@ the <a href="zip/bam_bim360_forge_aec_slides.pdf">BAM Forge for Digital Construc
 <p><strong>Question:</strong> How can I programmatically invoke the <em>Draw Model Line</em> command?</p>
 <p><strong>Answer:</strong> If your workflow is to simply to invoke the built-in <em>Draw Model Line</em> command as is, you could find the command id and execute it using <code>PostCommand</code>:</p>
 <pre class="code">
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Autodesk.Revit.UI.<span style="color:#2b91af;">RevitCommandId</span>&nbsp;cmd_id
+&nbsp;&nbsp;Autodesk.Revit.UI.<span style="color:#2b91af;">RevitCommandId</span>&nbsp;cmd_id
 &nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:#2b91af;">RevitCommandId</span>.LookupPostableCommandId(
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">PostableCommand</span>.ModelLine&nbsp;);
 
