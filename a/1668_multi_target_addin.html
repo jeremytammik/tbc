@@ -1,11 +1,10 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="bc.css">
 <!--
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
 -->
-</head>
-
+</head></p>
 <!---
 
 - email [Multi-targeting Revit versions made simple ;-)] Olivier Bastide of [BBS Slama](http://www.bbs-slama.com),
@@ -29,56 +28,41 @@
 
 --->
 
-### Multi-Targeting Revit Versions
-
-Here comes another solution for efficiently compiling add-ins for multiple Revit version targets from one single code base, a short note on CAD terms databases for consistent terminology translation, and a discussion on access to custom texture maps in Forge and Revit:
-
-- [Multi-targeting Revit versions made simple](#2) 
-- [Further enhancement using the `CSPROJ` `Import` tag](#3) 
-- [CAD Terminology Databases for Consistent Translation](#4) 
-- [Showing a Custom Revit Texture Map in the Forge Viewer](#5) 
-
-<center>
+<h3>Multi-Targeting Revit Versions</h3>
+<p>Here comes another solution for efficiently compiling add-ins for multiple Revit version targets from one single code base, a short note on CAD terms databases for consistent terminology translation, and a discussion on access to custom texture maps in Forge and Revit:</p>
+<ul>
+<li><a href="#2">Multi-targeting Revit versions made simple</a> </li>
+<li><a href="#3">Further enhancement using the <code>CSPROJ</code> <code>Import</code> tag</a> </li>
+<li><a href="#4">CAD Terminology Databases for Consistent Translation</a> </li>
+<li><a href="#5">Showing a Custom Revit Texture Map in the Forge Viewer</a> </li>
+</ul>
+<p><center>
 <img src="img/.jpg" alt="" width="100"/>
-</center>
-
-
-
-#### <a name="2"></a> Multi-Targeting Revit Versions Made Simple
-
-Just recently, we pointed out a suggestion
-for [compiling add-ins for multiple Revit versions](http://thebuildingcoder.typepad.com/blog/2018/05/multi-target-add-ins-ai-markdown-and-job-offer.html).
-
-Here are some other, previous, related discussions:
-
-- [Add-In Applications for Multiple Revit Products](http://thebuildingcoder.typepad.com/blog/2010/06/addin-applications-for-multiple-revit-products.html)
-- [Multi-Version Add-in](http://thebuildingcoder.typepad.com/blog/2012/07/multi-version-add-in.html)
-- [Multi-Version Visual Studio Revit Add-In Wizard](http://thebuildingcoder.typepad.com/blog/2013/11/multi-version-visual-studio-revit-add-in-wizard.html)
-- [RevitLookup in Python Shell and Multi-Release Solution](http://thebuildingcoder.typepad.com/blog/2015/05/revitlookup-in-python-shell-and-multi-release-solution.html)
-- [ADN Labs Xtra, Multi-Version Add-Ins and CNC Direct](http://thebuildingcoder.typepad.com/blog/2015/06/adn-labs-xtra-multi-version-add-ins-and-cnc-direct.html)
-
-Today, Olivier 'Vilo' Bastide of [BBS Slama](http://www.bbs-slama.com), *éditeur de logiciels de calculs thermiques*,
-thermal calculation software editor, suggests a different and simpler approach making use of the `TargetFrameworks` functionality, and a further enhancement to that using the `Import` tag.
-
-In his own words:
-
-I'd like to give you some new stuff I've recently found, that can vastly simplify Revit add-in deployment.
-
-This is about add-in multi-targeting.
-
-Targeting all Revit versions can become a nightmare in terms of VS projects.
-
-I'm personally developing 6 projects for Revit, and I have to compile each one for all Revit versions (2016 to 2019), resulting in 24 projects to maintain.
-
-Source code is (thankfully) unique using conditional coding, but having all these projects is not elegant at all.
- 
-You recently posted 
-a [suggestion for handling this](http://thebuildingcoder.typepad.com/blog/2018/05/multi-target-add-ins-ai-markdown-and-job-offer.html#2), but after some tuning I couldn't manage to make it work as I wanted.
-
-So I dug into new `csproj` format (introduced with .NET Core) and managed to find a pretty simple solution to target all Revit versions with only one `csproj` and source code per project.
- 
-Here is the `csproj` code skeleton; it works with the latest VS Community 2017, at least:
-
+</center></p>
+<h4><a name="2"></a> Multi-Targeting Revit Versions Made Simple</h4>
+<p>Just recently, we pointed out a suggestion
+for <a href="http://thebuildingcoder.typepad.com/blog/2018/05/multi-target-add-ins-ai-markdown-and-job-offer.html">compiling add-ins for multiple Revit versions</a>.</p>
+<p>Here are some other, previous, related discussions:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/06/addin-applications-for-multiple-revit-products.html">Add-In Applications for Multiple Revit Products</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/07/multi-version-add-in.html">Multi-Version Add-in</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/11/multi-version-visual-studio-revit-add-in-wizard.html">Multi-Version Visual Studio Revit Add-In Wizard</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/05/revitlookup-in-python-shell-and-multi-release-solution.html">RevitLookup in Python Shell and Multi-Release Solution</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/06/adn-labs-xtra-multi-version-add-ins-and-cnc-direct.html">ADN Labs Xtra, Multi-Version Add-Ins and CNC Direct</a></li>
+</ul>
+<p>Today, Olivier 'Vilo' Bastide of <a href="http://www.bbs-slama.com">BBS Slama</a>, <em>éditeur de logiciels de calculs thermiques</em>,
+thermal calculation software editor, suggests a different and simpler approach making use of ???,
+and a further enhancement to that using ???</p>
+<p>In his own words:</p>
+<p>I'd like to give you some new stuff I've recently found, that can vastly simplify Revit add-in deployment.</p>
+<p>This is about add-in multi-targeting.</p>
+<p>Targeting all Revit versions can become a nightmare in terms of VS projects.</p>
+<p>I'm personally developing 6 projects for Revit, and I have to compile each one for all Revit versions (2016 to 2019), resulting in 24 projects to maintain.</p>
+<p>Source code is (thankfully) unique using conditional coding, but having all these projects is not elegant at all.</p>
+<p>You recently posted 
+a <a href="http://thebuildingcoder.typepad.com/blog/2018/05/multi-target-add-ins-ai-markdown-and-job-offer.html#2">suggestion for handling this</a>, but after some tuning I couldn't manage to make it work as I wanted.</p>
+<p>So I dug into new <code>csproj</code> format (introduced with .NET Core) and managed to find a pretty simple solution to target all Revit versions with only one <code>csproj</code> and source code per project.</p>
+<p>Here is the <code>csproj</code> code skeleton; it works with the latest VS Community 2017, at least:</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">Project</span>&nbsp;<span style="color:red;">Sdk</span><span style="color:blue;">=</span><span style="color:blue;">&quot;Microsoft.NET.Sdk&quot;</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">PropertyGroup</span><span style="color:blue;">&gt;</span>
@@ -95,28 +79,28 @@ Here is the `csproj` code skeleton; it works with the latest VS Community 2017, 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">DebugType</span><span style="color:blue;">&gt;</span>full<span style="color:blue;">&lt;/</span><span style="color:maroon;">DebugType</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">DebugSymbols</span><span style="color:blue;">&gt;</span>true<span style="color:blue;">&lt;/</span><span style="color:maroon;">DebugSymbols</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">PropertyGroup</span><span style="color:blue;">&gt;</span>
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">PropertyGroup</span>&nbsp;<span style="color:red;">Condition</span><span style="color:blue;">=</span><span style="color:blue;">&quot;&#39;$(Configuration)&#39;==&#39;Release&#39;&quot;</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">PlatformTarget</span><span style="color:blue;">&gt;</span>x64<span style="color:blue;">&lt;/</span><span style="color:maroon;">PlatformTarget</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">DebugType</span><span style="color:blue;">&gt;</span>none<span style="color:blue;">&lt;/</span><span style="color:maroon;">DebugType</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">DebugSymbols</span><span style="color:blue;">&gt;</span>false<span style="color:blue;">&lt;/</span><span style="color:maroon;">DebugSymbols</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">PropertyGroup</span><span style="color:blue;">&gt;</span>
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">PropertyGroup</span>&nbsp;<span style="color:red;">Condition</span><span style="color:blue;">=</span><span style="color:blue;">&quot;&nbsp;&#39;$(TargetFramework)&#39;&nbsp;==&nbsp;&#39;net452&#39;&nbsp;&quot;</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">DefineConstants</span><span style="color:blue;">&gt;</span>$(DefineConstants);REVIT2017<span style="color:blue;">&lt;/</span><span style="color:maroon;">DefineConstants</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">AssemblyName</span><span style="color:blue;">&gt;</span>SomeProject_2017<span style="color:blue;">&lt;/</span><span style="color:maroon;">AssemblyName</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">PropertyGroup</span><span style="color:blue;">&gt;</span>
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">PropertyGroup</span>&nbsp;<span style="color:red;">Condition</span><span style="color:blue;">=</span><span style="color:blue;">&quot;&nbsp;&#39;$(TargetFramework)&#39;&nbsp;==&nbsp;&#39;net46&#39;&nbsp;&quot;</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">DefineConstants</span><span style="color:blue;">&gt;</span>$(DefineConstants);REVIT2018<span style="color:blue;">&lt;/</span><span style="color:maroon;">DefineConstants</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">AssemblyName</span><span style="color:blue;">&gt;</span>SomeProject_2018<span style="color:blue;">&lt;/</span><span style="color:maroon;">AssemblyName</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">PropertyGroup</span><span style="color:blue;">&gt;</span>
- 
+
 &nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">PropertyGroup</span>&nbsp;<span style="color:red;">Condition</span><span style="color:blue;">=</span><span style="color:blue;">&quot;&nbsp;&#39;$(TargetFramework)&#39;&nbsp;==&nbsp;&#39;net47&#39;&nbsp;&quot;</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">DefineConstants</span><span style="color:blue;">&gt;</span>$(DefineConstants);REVIT2019<span style="color:blue;">&lt;/</span><span style="color:maroon;">DefineConstants</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">AssemblyName</span><span style="color:blue;">&gt;</span>SomeProject_2019<span style="color:blue;">&lt;/</span><span style="color:maroon;">AssemblyName</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">PropertyGroup</span><span style="color:blue;">&gt;</span>
- 
+
 &nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">ItemGroup</span>&nbsp;<span style="color:red;">Condition</span><span style="color:blue;">=</span><span style="color:blue;">&quot;&nbsp;&#39;$(TargetFramework)&#39;&nbsp;==&nbsp;&#39;net452&#39;&nbsp;&quot;</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">Reference</span>&nbsp;<span style="color:red;">Include</span><span style="color:blue;">=</span><span style="color:blue;">&quot;AdWindows,&nbsp;Version=2015.11.1.0,&nbsp;Culture=neutral,&nbsp;PublicKeyToken=null&quot;</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">HintPath</span><span style="color:blue;">&gt;</span>......\2017\AdWindows.dll<span style="color:blue;">&lt;/</span><span style="color:maroon;">HintPath</span><span style="color:blue;">&gt;</span>
@@ -134,7 +118,7 @@ Here is the `csproj` code skeleton; it works with the latest VS Community 2017, 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">Private</span><span style="color:blue;">&gt;</span>false<span style="color:blue;">&lt;/</span><span style="color:maroon;">Private</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">Reference</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">ItemGroup</span><span style="color:blue;">&gt;</span>
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">ItemGroup</span>&nbsp;<span style="color:red;">Condition</span><span style="color:blue;">=</span><span style="color:blue;">&quot;&nbsp;&#39;$(TargetFramework)&#39;&nbsp;==&nbsp;&#39;net46&#39;&nbsp;&quot;</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">Reference</span>&nbsp;<span style="color:red;">Include</span><span style="color:blue;">=</span><span style="color:blue;">&quot;AdWindows&quot;</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">HintPath</span><span style="color:blue;">&gt;</span>......\2018\AdWindows.dll<span style="color:blue;">&lt;/</span><span style="color:maroon;">HintPath</span><span style="color:blue;">&gt;</span>
@@ -152,7 +136,7 @@ Here is the `csproj` code skeleton; it works with the latest VS Community 2017, 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">Private</span><span style="color:blue;">&gt;</span>false<span style="color:blue;">&lt;/</span><span style="color:maroon;">Private</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">Reference</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">ItemGroup</span><span style="color:blue;">&gt;</span>
- 
+
 &nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">ItemGroup</span>&nbsp;<span style="color:red;">Condition</span><span style="color:blue;">=</span><span style="color:blue;">&quot;&nbsp;&#39;$(TargetFramework)&#39;&nbsp;==&nbsp;&#39;net47&#39;&nbsp;&quot;</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">Reference</span>&nbsp;<span style="color:red;">Include</span><span style="color:blue;">=</span><span style="color:blue;">&quot;AdWindows&quot;</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">HintPath</span><span style="color:blue;">&gt;</span>......\2019\AdWindows.dll<span style="color:blue;">&lt;/</span><span style="color:maroon;">HintPath</span><span style="color:blue;">&gt;</span>
@@ -170,46 +154,29 @@ Here is the `csproj` code skeleton; it works with the latest VS Community 2017, 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">Private</span><span style="color:blue;">&gt;</span>false<span style="color:blue;">&lt;/</span><span style="color:maroon;">Private</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">Reference</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">ItemGroup</span><span style="color:blue;">&gt;</span>
- 
+
 &nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">ItemGroup</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">Compile</span>&nbsp;<span style="color:red;">Include</span><span style="color:blue;">=</span><span style="color:blue;">&quot;SomeFile.cs&quot;</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">Compile</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">ItemGroup</span><span style="color:blue;">&gt;</span>
 </pre>
 
-Obviously, you will have to customise the file paths appropriately...
- 
-By using the new `TargetFrameworks` mechanism, it is possible to configure separate settings for each version.
-
-Actually, the trick is possible because each Revit version is targeting a different .NET framework...
- 
-I've included 'non-mandatory' things in the above example.
-
-For example, the `AssemblyName` tag is optional, but I've included it to show how to change the output DLL filename according to the Revit version.
- 
-When a new Revit version is released, the only thing to do is to declare a new target in the `TargetFrameworks` tag and configure the matching `ItemGroup` to tell VS where to find new SDK's DLLs.
-
-If the new version does not target a different .NET framework, it is possible to keep the thing working by targeting a sub-version (like 4.7.1).
- 
-Finally, to make your source code `version agnostic`, you can use conditional definitions such as `REVIT2017`, `REVIT2018`, `REVIT2019`, etc., as usual.
- 
-Hope this will help.
-
-
-#### <a name="3"></a> Further Enhancement Using `CSPROJ` `Import` Tag
-
-MultiTarget addins : season 01 episode 02...
-
-Here is an addendum to my preceding suggestion with a further enhancement.
-
-In the eternal fight to reduce efforts involved to obtain the same achievements, I've made some new progress.
-
-The `csproj` format (both old and new) supports a kind of sequential inheritance through the tag `<Import>`.
-
-Using that, you can tailor a 'root' `.csproj` file that contains all the basic logic about Revit versions, and then inherits from it in each of the 'real' projects, overriding only the specific varying tags.
-
-Here is a sample root `csproj`, named *C:\ROOT.CSPROJ* for this sample to work:
-
+<p>Obviously, you will have to customise the file paths appropriately...</p>
+<p>By using the new <code>TargetFrameworks</code> mechanism, it is possible to configure separate settings for each version.</p>
+<p>Actually, the trick is possible because each Revit version is targeting a different .NET framework...</p>
+<p>I've included 'non-mandatory' things in the above example.</p>
+<p>For example, the <code>AssemblyName</code> tag is optional, but I've included it to show how to change the output DLL filename according to the Revit version.</p>
+<p>When a new Revit version is released, the only thing to do is to declare a new target in the <code>TargetFrameworks</code> tag and configure the matching <code>ItemGroup</code> to tell VS where to find new SDK's DLLs.</p>
+<p>If the new version does not target a different .NET framework, it is possible to keep the thing working by targeting a sub-version (like 4.7.1).</p>
+<p>Finally, to make your source code <code>version agnostic</code>, you can use conditional definitions such as <code>REVIT2017</code>, <code>REVIT2018</code>, <code>REVIT2019</code>, etc., as usual.</p>
+<p>Hope this will help.</p>
+<h4><a name="3"></a> Further Enhancement Using <code>CSPROJ</code> <code>Import</code> Tag</h4>
+<p>MultiTarget addins : season 01 episode 02...</p>
+<p>Here is an addendum to my preceding suggestion with a further enhancement.</p>
+<p>In the eternal fight to reduce efforts involved to obtain the same achievements, I've made some new progress.</p>
+<p>The <code>csproj</code> format (both old and new) supports a kind of sequential inheritance through the tag <code>&lt;Import&gt;</code>.</p>
+<p>Using that, you can tailor a 'root' <code>.csproj</code> file that contains all the basic logic about Revit versions, and then inherits from it in each of the 'real' projects, overriding only the specific varying tags.</p>
+<p>Here is a sample root <code>csproj</code>, named <em>C:\ROOT.CSPROJ</em> for this sample to work:</p>
 <pre class="code">
 <span style="color:blue;">&lt;</span><span style="color:maroon;">Project</span>&nbsp;<span style="color:red;">Sdk</span><span style="color:blue;">=</span><span style="color:blue;">&quot;Microsoft.NET.Sdk&quot;</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">PropertyGroup</span>&nbsp;<span style="color:red;">Condition</span><span style="color:blue;">=</span><span style="color:blue;">&quot;&#39;$(TargetFrameworks)&#39;==&#39;&#39;&quot;</span><span style="color:blue;">&gt;</span>
@@ -226,15 +193,15 @@ Here is a sample root `csproj`, named *C:\ROOT.CSPROJ* for this sample to work:
 &nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">PropertyGroup</span>&nbsp;<span style="color:red;">Condition</span><span style="color:blue;">=</span><span style="color:blue;">&quot;&nbsp;&#39;$(TargetFramework)&#39;&nbsp;==&nbsp;&#39;net45&#39;&nbsp;&quot;</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">RevitVersion</span><span style="color:blue;">&gt;</span>2016<span style="color:blue;">&lt;/</span><span style="color:maroon;">RevitVersion</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">PropertyGroup</span><span style="color:blue;">&gt;</span>
- 
+
 &nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">PropertyGroup</span>&nbsp;<span style="color:red;">Condition</span><span style="color:blue;">=</span><span style="color:blue;">&quot;&nbsp;&#39;$(TargetFramework)&#39;&nbsp;==&nbsp;&#39;net452&#39;&nbsp;&quot;</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">RevitVersion</span><span style="color:blue;">&gt;</span>2017<span style="color:blue;">&lt;/</span><span style="color:maroon;">RevitVersion</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">PropertyGroup</span><span style="color:blue;">&gt;</span>
- 
+
 &nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">PropertyGroup</span>&nbsp;<span style="color:red;">Condition</span><span style="color:blue;">=</span><span style="color:blue;">&quot;&nbsp;&#39;$(TargetFramework)&#39;&nbsp;==&nbsp;&#39;net46&#39;&nbsp;&quot;</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">RevitVersion</span><span style="color:blue;">&gt;</span>2018<span style="color:blue;">&lt;/</span><span style="color:maroon;">RevitVersion</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">PropertyGroup</span><span style="color:blue;">&gt;</span>
- 
+
 &nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">PropertyGroup</span>&nbsp;<span style="color:red;">Condition</span><span style="color:blue;">=</span><span style="color:blue;">&quot;&nbsp;&#39;$(TargetFramework)&#39;&nbsp;==&nbsp;&#39;net47&#39;&nbsp;&quot;</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">RevitVersion</span><span style="color:blue;">&gt;</span>2019<span style="color:blue;">&lt;/</span><span style="color:maroon;">RevitVersion</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">PropertyGroup</span><span style="color:blue;">&gt;</span>
@@ -268,54 +235,40 @@ Here is a sample root `csproj`, named *C:\ROOT.CSPROJ* for this sample to work:
 <span style="color:blue;">&lt;/</span><span style="color:maroon;">Project</span><span style="color:blue;">&gt;</span>
 </pre>
 
-This one is suitable to compile for Revit versions 2016 to 2019 (by targeting 4 different frameworks).
-
-And here is a sample child project using it:
-
+<p>This one is suitable to compile for Revit versions 2016 to 2019 (by targeting 4 different frameworks).</p>
+<p>And here is a sample child project using it:</p>
 <pre class="code">
 <span style="color:blue;">&lt;</span><span style="color:maroon;">Project</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:darkgreen;">&lt;!--&nbsp;this&nbsp;group&nbsp;must&nbsp;stay&nbsp;before&nbsp;&lt;Import&gt;&nbsp;!!&nbsp;--&gt;</span>
 &nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">PropertyGroup</span><span style="color:blue;">&gt;</span>
 <span style="color:darkgreen;">&lt;!--&nbsp;this&nbsp;tag&nbsp;allows&nbsp;generic&nbsp;naming,&nbsp;for&nbsp;example&nbsp;this&nbsp;will&nbsp;lead&nbsp;to&nbsp;assemblies&nbsp;named&nbsp;&quot;SomeAssembly_2016&quot;,&nbsp;&quot;SomeAssembly_2017&quot;,&nbsp;...&nbsp;--&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">PrefixAssembly</span><span style="color:blue;">&gt;</span>SomeAssembly<span style="color:blue;">&lt;/</span><span style="color:maroon;">PrefixAssembly</span><span style="color:blue;">&gt;</span>&nbsp;
- 
+
 <span style="color:darkgreen;">&lt;!--&nbsp;by&nbsp;setting&nbsp;this&nbsp;tag&nbsp;here,&nbsp;you&nbsp;can&nbsp;override&nbsp;default&nbsp;behaviour&nbsp;that&nbsp;is&nbsp;to&nbsp;compile&nbsp;for&nbsp;versions&nbsp;2016&nbsp;to&nbsp;2019
 Delete&nbsp;it&nbsp;to&nbsp;restore&nbsp;default&nbsp;behaviour&nbsp;and&nbsp;compile&nbsp;for&nbsp;2016&nbsp;to&nbsp;2019&nbsp;--&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">TargetFrameworks</span><span style="color:blue;">&gt;</span>net452<span style="color:blue;">&lt;/</span><span style="color:maroon;">TargetFrameworks</span><span style="color:blue;">&gt;</span>
 &nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">PropertyGroup</span><span style="color:blue;">&gt;</span>
- 
+
 <span style="color:darkgreen;">&lt;!--&nbsp;import&nbsp;root&nbsp;csproj&nbsp;--&gt;</span>
 &nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">Import</span>&nbsp;<span style="color:red;">Project</span><span style="color:blue;">=</span><span style="color:blue;">&quot;C:\ROOT.CSPROJ&quot;</span>&nbsp;<span style="color:blue;">/&gt;</span>&nbsp;<span style="color:darkgreen;">&lt;!--&nbsp;FQPN&nbsp;to&nbsp;file&nbsp;defined&nbsp;above&nbsp;--&gt;</span>
- 
+
 <span style="color:darkgreen;">&lt;!--&nbsp;all&nbsp;other&nbsp;stuff&nbsp;that&nbsp;is&nbsp;project&nbsp;specific&nbsp;--&gt;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;...
 <span style="color:blue;">&lt;/</span><span style="color:maroon;">Project</span><span style="color:blue;">&gt;</span>
 </pre>
 
-Of course these 2 samples are just a proof of concept, and tailored for my own needs.
-
-Feel free to make what you want with it ;-)
-
-Many thanks to Olivier 'Vilo' for researching and sharing this very sensible solution!
-
-
-#### <a name="4"></a> CAD Terminology Databases for Consistent Translation
-
-cade terminology translation, terms database
+<p>Of course these 2 samples are just a proof of concept, and tailored for my own needs.</p>
+<p>Feel free to make what you want with it ;-)</p>
+<p>Many thanks to Olivier 'Vilo' for researching and sharing this very sensible solution!</p>
+<h4><a name="4"></a> CAD Terminology Databases for Consistent Translation</h4>
+<p>cade terminology translation, terms database
 Dictionary for Revit and AutoCAD Terms for Localisation
 https://forums.autodesk.com/t5/revit-api-forum/dictionary-for-revit-and-autocad-terms-for-localisation/m-p/8074233
 https://knowledge.autodesk.com/de/support/autocad/learn-explore/caas/CloudHelp/cloudhelp/2016/DEU/AutoCAD-Core/files/GUID-C4325DCB-3648-4463-8135-629EA7F72AB0-htm.html?_ga=2.27437948.1327081858.1529427624-2130181328.1465883366
 Glossary of AutoCAD Terms
-https://knowledge.autodesk.com/support/autocad/learn-explore/caas/CloudHelp/cloudhelp/2016/ENU/AutoCAD-Core/files/GUID-C4325DCB-3648-4463-8135-629EA7F72AB0-htm.html
-
-#### <a name="5"></a> Showing a Custom Revit Texture Map in the Forge Viewer
-
-Show Revit custom texture map in the Forge Viewer by Eason Kang
-https://forge.autodesk.com/blog/show-revit-custom-texture-map-viewer
-
-
-
-**Question:** 
-
-**Answer:** 
-
+https://knowledge.autodesk.com/support/autocad/learn-explore/caas/CloudHelp/cloudhelp/2016/ENU/AutoCAD-Core/files/GUID-C4325DCB-3648-4463-8135-629EA7F72AB0-htm.html</p>
+<h4><a name="5"></a> Showing a Custom Revit Texture Map in the Forge Viewer</h4>
+<p>Show Revit custom texture map in the Forge Viewer by Eason Kang
+https://forge.autodesk.com/blog/show-revit-custom-texture-map-viewer</p>
+<p><strong>Question:</strong> </p>
+<p><strong>Answer:</strong> </p>
