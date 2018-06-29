@@ -23,12 +23,15 @@
 
  in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+Here comes another solution for efficiently compiling add-ins for multiple Revit version targets from one single code base, a note on resources for CAD term databases for consistent terminology translation, and a discussion on accessing custom texture maps in Forge and Revit
+&ndash; Multi-targeting Revit versions using <code>TargetFrameworks</code>
+&ndash; Further enhancement using the <code>CSPROJ</code> <code>Import</code> tag
+&ndash; CAD terminology resources for consistent translation
+&ndash; Showing a custom Revit texture map in the Forge Viewer...
 
 --->
 
-<h3>Multi-Targeting Revit Versions</h3>
+<h3>Multi-Targeting Revit Versions, CAD Terms, Textures</h3>
 <p>Here comes another solution for efficiently compiling add-ins for multiple Revit version targets from one single code base, a note on resources for CAD term databases for consistent terminology translation, and a discussion on accessing custom texture maps in Forge and Revit:</p>
 <ul>
 <li><a href="#2">Multi-targeting Revit versions using <code>TargetFrameworks</code></a> </li>
@@ -37,7 +40,7 @@
 <li><a href="#5">Showing a custom Revit texture map in the Forge Viewer</a> </li>
 </ul>
 <p><center>
-<img src="img/change_target.png" alt="Change traget" width="360"/>
+<img src="img/change_target.png" alt="Change target" width="360"/>
 </center></p>
 <h4><a name="2"></a> Multi-Targeting Revit Versions Using TargetFrameworks</h4>
 <p>Just recently, we pointed out a suggestion
