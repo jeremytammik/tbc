@@ -301,9 +301,59 @@ Many thanks to Olivier 'Vilo' for researching and sharing this very sensible sol
 
 #### <a name="4"></a> CAD Terminology Databases for Consistent Translation
 
+People occasionally ask for help translating CAD terms, and I already mentioned a couple of helpful resources in the past.
+
+one solution 
 cade terminology translation, terms database
-Dictionary for Revit and AutoCAD Terms for Localisation
-https://forums.autodesk.com/t5/revit-api-forum/dictionary-for-revit-and-autocad-terms-for-localisation/m-p/8074233
+
+This question came up again in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on a [dictionary for Revit and AutoCAD terms for localisation](https://forums.autodesk.com/t5/revit-api-forum/dictionary-for-revit-and-autocad-terms-for-localisation/m-p/8074233):
+
+**Question:** I want to use the correct Autodesk terms in our localized add-in user documentation.
+
+I am searching for a table of translations of Revit and AutoCAD terms into multiple languages which can be used for our automated translation dictionary.  I just need a mapping English term &rarr; Localized term. The supported languages are currently German, French, Spanish (Mexico), Chinese (Simpified), Portugiese (Brasil), Japanese and Italian.
+
+I found a good [Glossary of AutoCAD Terms](https://knowledge.autodesk.com/de/support/autocad/learn-explore/caas/CloudHelp/cloudhelp/2016/DEU/AutoCAD-Core/files/GUID-C4325DCB-3648-4463-8135-629EA7F72AB0-htm.html?_ga=2.226928601.558689868.1529839545-2130181328.1465883366) which
+can be displayed in different languages.
+
+I see that, e.g., `LAYER` in English is the same in German, but `SOLID` is `VOLUMENKÖRPER`.
+
+I would prefer a table instead of an HTML page for more automation.
+
+**Answer:** I provided an answer to a similar question
+on [CAD terminology translation back in 2014](http://thebuildingcoder.typepad.com/blog/2014/10/autodesk-open-source-all-over-germany-and-japan.html#4).
+
+It mentions a number of useful resources:
+
+- [AutoCAD command dictionary](http://www.cadforum.cz/cadforum_en/command.asp)
+&ndaqsh; lists AutoCAD command translations and does not support all languages.
+- [Autodesk localisation team cross product corpus database NeXLT](http://langtech.autodesk.com/nexlt) &ndash; terminology and message translation.
+- AutoCAD end user online document per language:
+
+<li><a href="http://help.autodesk.com/view/ACD/2015/ENU/">English</a></li>
+<li><a href="http://help.autodesk.com/view/ACD/2015/JPN/">Japanese</a></li>
+<li><a href="http://help.autodesk.com/view/ACD/2015/FRA/">French</a></li>
+<li><a href="http://help.autodesk.com/view/ACD/2015/KOR/">Korean</a></li>
+<li><a href="http://help.autodesk.com/view/ACD/2015/RUS/">Russian</a></li>
+<li>...</li>
+
+<p>You can obviously also use the language packs, e.g. the
+
+<a href="http://knowledge.autodesk.com/support/autocad/downloads/caas/downloads/content/autocad-2015-language-packs.html">AutoCAD 2015 language packs</a>.</p>
+
+
+I hope that the Autodesk CAD Terminology Translation database will be of use to you:
+
+ 
+
+CAD Terminology Translation
+
+ 
+
+http://thebuildingcoder.typepad.com/blog/2014/10/autodesk-open-source-all-over-germany-and-japan.htm...
+
+
 https://knowledge.autodesk.com/de/support/autocad/learn-explore/caas/CloudHelp/cloudhelp/2016/DEU/AutoCAD-Core/files/GUID-C4325DCB-3648-4463-8135-629EA7F72AB0-htm.html?_ga=2.27437948.1327081858.1529427624-2130181328.1465883366
 Glossary of AutoCAD Terms
 https://knowledge.autodesk.com/support/autocad/learn-explore/caas/CloudHelp/cloudhelp/2016/ENU/AutoCAD-Core/files/GUID-C4325DCB-3648-4463-8135-629EA7F72AB0-htm.html
@@ -314,8 +364,4 @@ Show Revit custom texture map in the Forge Viewer by Eason Kang
 https://forge.autodesk.com/blog/show-revit-custom-texture-map-viewer
 
 
-
-**Question:** 
-
-**Answer:** 
 
