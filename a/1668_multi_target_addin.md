@@ -31,20 +31,20 @@
 
 ### Multi-Targeting Revit Versions
 
-Here comes another solution for efficiently compiling add-ins for multiple Revit version targets from one single code base, a short note on CAD terms databases for consistent terminology translation, and a discussion on access to custom texture maps in Forge and Revit:
+Here comes another solution for efficiently compiling add-ins for multiple Revit version targets from one single code base, a note on resources for CAD term databases for consistent terminology translation, and a discussion on accessing custom texture maps in Forge and Revit:
 
-- [Multi-targeting Revit versions made simple](#2) 
+- [Multi-targeting Revit versions using `TargetFrameworks`](#2) 
 - [Further enhancement using the `CSPROJ` `Import` tag](#3) 
-- [CAD Terminology Databases for Consistent Translation](#4) 
-- [Showing a Custom Revit Texture Map in the Forge Viewer](#5) 
+- [CAD terminology resources for consistent translation](#4) 
+- [Showing a custom Revit texture map in the Forge Viewer](#5) 
 
 <center>
-<img src="img/.jpg" alt="" width="100"/>
+<img src="img/change_target.png" alt="Change traget" width="360"/>
 </center>
 
 
 
-#### <a name="2"></a> Multi-Targeting Revit Versions Made Simple
+#### <a name="2"></a> Multi-Targeting Revit Versions Using TargetFrameworks 
 
 Just recently, we pointed out a suggestion
 for [compiling add-ins for multiple Revit versions](http://thebuildingcoder.typepad.com/blog/2018/05/multi-target-add-ins-ai-markdown-and-job-offer.html).
@@ -75,7 +75,7 @@ Source code is (thankfully) unique using conditional coding, but having all thes
 You recently posted 
 a [suggestion for handling this](http://thebuildingcoder.typepad.com/blog/2018/05/multi-target-add-ins-ai-markdown-and-job-offer.html#2), but after some tuning I couldn't manage to make it work as I wanted.
 
-So I dug into new `csproj` format (introduced with .NET Core) and managed to find a pretty simple solution to target all Revit versions with only one `csproj` and source code per project.
+So, I dug into new `csproj` format (introduced with .NET Core) and managed to find a pretty simple solution to target all Revit versions with only one `csproj` and source code per project.
  
 Here is the `csproj` code skeleton; it works with the latest VS Community 2017, at least:
 
@@ -177,7 +177,7 @@ Here is the `csproj` code skeleton; it works with the latest VS Community 2017, 
 &nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">ItemGroup</span><span style="color:blue;">&gt;</span>
 </pre>
 
-Obviously, you will have to customise the file paths appropriately...
+Obviously, you will have to customize the file paths appropriately...
  
 By using the new `TargetFrameworks` mechanism, it is possible to configure separate settings for each version.
 
@@ -196,7 +196,7 @@ Finally, to make your source code `version agnostic`, you can use conditional de
 Hope this will help.
 
 
-#### <a name="3"></a> Further Enhancement Using `CSPROJ` `Import` Tag
+#### <a name="3"></a> Further Enhancement Using the `CSPROJ` `Import` Tag
 
 MultiTarget addins : season 01 episode 02...
 
@@ -292,19 +292,16 @@ Delete&nbsp;it&nbsp;to&nbsp;restore&nbsp;default&nbsp;behaviour&nbsp;and&nbsp;co
 <span style="color:blue;">&lt;/</span><span style="color:maroon;">Project</span><span style="color:blue;">&gt;</span>
 </pre>
 
-Of course these 2 samples are just a proof of concept, and tailored for my own needs.
+Of course, these 2 samples are just a proof of concept, and tailored for my own needs.
 
 Feel free to make what you want with it ;-)
 
 Many thanks to Olivier 'Vilo' for researching and sharing this very sensible solution!
 
 
-#### <a name="4"></a> CAD Terminology Databases for Consistent Translation
+#### <a name="4"></a> CAD Terminology Resources for Consistent Translation
 
-People occasionally ask for help translating CAD terms, and I already mentioned a couple of helpful resources in the past.
-
-one solution 
-cade terminology translation, terms database
+People occasionally ask for help translating CAD terms, and I already mentioned a couple of useful resources for this in the past.
 
 This question came up again in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -312,9 +309,9 @@ on a [dictionary for Revit and AutoCAD terms for localisation](https://forums.au
 
 **Question:** I want to use the correct Autodesk terms in our localized add-in user documentation.
 
-I am searching for a table of translations of Revit and AutoCAD terms into multiple languages which can be used for our automated translation dictionary.  I just need a mapping English term &rarr; Localized term. The supported languages are currently German, French, Spanish (Mexico), Chinese (Simpified), Portugiese (Brasil), Japanese and Italian.
+I am searching for a table of translations of Revit and AutoCAD terms into multiple languages which can be used for our automated translation dictionary.  I just need a mapping English term &rarr; Localized term. The supported languages are currently German, French, Spanish (Mexico), Chinese (Simplified), Portuguese (Brazil), Japanese and Italian.
 
-I found a good [Glossary of AutoCAD Terms](https://knowledge.autodesk.com/de/support/autocad/learn-explore/caas/CloudHelp/cloudhelp/2016/DEU/AutoCAD-Core/files/GUID-C4325DCB-3648-4463-8135-629EA7F72AB0-htm.html?_ga=2.226928601.558689868.1529839545-2130181328.1465883366) which
+I found a good [Glossary of German AutoCAD Terms](https://knowledge.autodesk.com/de/support/autocad/learn-explore/caas/CloudHelp/cloudhelp/2016/DEU/AutoCAD-Core/files/GUID-C4325DCB-3648-4463-8135-629EA7F72AB0-htm.html?_ga=2.226928601.558689868.1529839545-2130181328.1465883366) which
 can be displayed in different languages.
 
 I see that, e.g., `LAYER` in English is the same in German, but `SOLID` is `VOLUMENKÖRPER`.
@@ -324,44 +321,34 @@ I would prefer a table instead of an HTML page for more automation.
 **Answer:** I provided an answer to a similar question
 on [CAD terminology translation back in 2014](http://thebuildingcoder.typepad.com/blog/2014/10/autodesk-open-source-all-over-germany-and-japan.html#4).
 
-It mentions a number of useful resources:
+It mentions a number of useful resources back then.
 
+Here is an expanded and updated list for today:
+
+- [Glossary of AutoCAD Terms](https://knowledge.autodesk.com/support/autocad/learn-explore/caas/CloudHelp/cloudhelp/2016/ENU/AutoCAD-Core/files/GUID-C4325DCB-3648-4463-8135-629EA7F72AB0-htm.html).
+- [AutoCAD language packs, e.g., for AutoCAD 2019](http://knowledge.autodesk.com/support/autocad/downloads/caas/downloads/content/autocad-2019-language-packs.html).
 - [AutoCAD command dictionary](http://www.cadforum.cz/cadforum_en/command.asp)
-&ndaqsh; lists AutoCAD command translations and does not support all languages.
-- [Autodesk localisation team cross product corpus database NeXLT](http://langtech.autodesk.com/nexlt) &ndash; terminology and message translation.
+&ndash; lists AutoCAD command translations and does not support all languages.
 - AutoCAD end user online document per language:
+    - [English](http://help.autodesk.com/view/ACD/2019/ENU/)
+    - [Japanese](http://help.autodesk.com/view/ACD/2019/JPN/)
+    - [French](http://help.autodesk.com/view/ACD/2019/FRA/)
+    - [Korean](http://help.autodesk.com/view/ACD/2019/KOR/)
+    - [Russian](http://help.autodesk.com/view/ACD/2019/RUS/)
+    - etc.
+- [Autodesk localisation team cross product corpus database NeXLT](http://langtech.autodesk.com/nexlt) &ndash; terminology and message translation.
 
-<li><a href="http://help.autodesk.com/view/ACD/2015/ENU/">English</a></li>
-<li><a href="http://help.autodesk.com/view/ACD/2015/JPN/">Japanese</a></li>
-<li><a href="http://help.autodesk.com/view/ACD/2015/FRA/">French</a></li>
-<li><a href="http://help.autodesk.com/view/ACD/2015/KOR/">Korean</a></li>
-<li><a href="http://help.autodesk.com/view/ACD/2015/RUS/">Russian</a></li>
-<li>...</li>
+The latter resource is product agnostic, so it will hopefully include all you need for Revit, AEC and BIM.
 
-<p>You can obviously also use the language packs, e.g. the
-
-<a href="http://knowledge.autodesk.com/support/autocad/downloads/caas/downloads/content/autocad-2015-language-packs.html">AutoCAD 2015 language packs</a>.</p>
-
-
-I hope that the Autodesk CAD Terminology Translation database will be of use to you:
-
- 
-
-CAD Terminology Translation
-
- 
-
-http://thebuildingcoder.typepad.com/blog/2014/10/autodesk-open-source-all-over-germany-and-japan.htm...
-
-
-https://knowledge.autodesk.com/de/support/autocad/learn-explore/caas/CloudHelp/cloudhelp/2016/DEU/AutoCAD-Core/files/GUID-C4325DCB-3648-4463-8135-629EA7F72AB0-htm.html?_ga=2.27437948.1327081858.1529427624-2130181328.1465883366
-Glossary of AutoCAD Terms
-https://knowledge.autodesk.com/support/autocad/learn-explore/caas/CloudHelp/cloudhelp/2016/ENU/AutoCAD-Core/files/GUID-C4325DCB-3648-4463-8135-629EA7F72AB0-htm.html
 
 #### <a name="5"></a> Showing a Custom Revit Texture Map in the Forge Viewer
 
-Show Revit custom texture map in the Forge Viewer by Eason Kang
-https://forge.autodesk.com/blog/show-revit-custom-texture-map-viewer
+To help address the recurring question of accessing texture map data in a Revit model, my colleague Eason Kang researched and published how 
+to [show Revit custom texture map in the Forge Viewer](https://forge.autodesk.com/blog/show-revit-custom-texture-map-viewer).
+
+Many thanks to Eason for sharing this important information!
+
+
 
 
 

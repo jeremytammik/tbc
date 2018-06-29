@@ -29,17 +29,17 @@
 --->
 
 <h3>Multi-Targeting Revit Versions</h3>
-<p>Here comes another solution for efficiently compiling add-ins for multiple Revit version targets from one single code base, a short note on CAD terms databases for consistent terminology translation, and a discussion on access to custom texture maps in Forge and Revit:</p>
+<p>Here comes another solution for efficiently compiling add-ins for multiple Revit version targets from one single code base, a note on resources for CAD term databases for consistent terminology translation, and a discussion on accessing custom texture maps in Forge and Revit:</p>
 <ul>
-<li><a href="#2">Multi-targeting Revit versions made simple</a> </li>
+<li><a href="#2">Multi-targeting Revit versions using <code>TargetFrameworks</code></a> </li>
 <li><a href="#3">Further enhancement using the <code>CSPROJ</code> <code>Import</code> tag</a> </li>
-<li><a href="#4">CAD Terminology Databases for Consistent Translation</a> </li>
-<li><a href="#5">Showing a Custom Revit Texture Map in the Forge Viewer</a> </li>
+<li><a href="#4">CAD terminology resources for consistent translation</a> </li>
+<li><a href="#5">Showing a custom Revit texture map in the Forge Viewer</a> </li>
 </ul>
 <p><center>
-<img src="img/.jpg" alt="" width="100"/>
+<img src="img/change_target.png" alt="Change traget" width="360"/>
 </center></p>
-<h4><a name="2"></a> Multi-Targeting Revit Versions Made Simple</h4>
+<h4><a name="2"></a> Multi-Targeting Revit Versions Using TargetFrameworks</h4>
 <p>Just recently, we pointed out a suggestion
 for <a href="http://thebuildingcoder.typepad.com/blog/2018/05/multi-target-add-ins-ai-markdown-and-job-offer.html">compiling add-ins for multiple Revit versions</a>.</p>
 <p>Here are some other, previous, related discussions:</p>
@@ -51,8 +51,7 @@ for <a href="http://thebuildingcoder.typepad.com/blog/2018/05/multi-target-add-i
 <li><a href="http://thebuildingcoder.typepad.com/blog/2015/06/adn-labs-xtra-multi-version-add-ins-and-cnc-direct.html">ADN Labs Xtra, Multi-Version Add-Ins and CNC Direct</a></li>
 </ul>
 <p>Today, Olivier 'Vilo' Bastide of <a href="http://www.bbs-slama.com">BBS Slama</a>, <em>éditeur de logiciels de calculs thermiques</em>,
-thermal calculation software editor, suggests a different and simpler approach making use of ???,
-and a further enhancement to that using ???</p>
+thermal calculation software editor, suggests a different and simpler approach making use of the <code>TargetFrameworks</code> functionality, and a further enhancement to that using the <code>Import</code> tag.</p>
 <p>In his own words:</p>
 <p>I'd like to give you some new stuff I've recently found, that can vastly simplify Revit add-in deployment.</p>
 <p>This is about add-in multi-targeting.</p>
@@ -61,7 +60,7 @@ and a further enhancement to that using ???</p>
 <p>Source code is (thankfully) unique using conditional coding, but having all these projects is not elegant at all.</p>
 <p>You recently posted 
 a <a href="http://thebuildingcoder.typepad.com/blog/2018/05/multi-target-add-ins-ai-markdown-and-job-offer.html#2">suggestion for handling this</a>, but after some tuning I couldn't manage to make it work as I wanted.</p>
-<p>So I dug into new <code>csproj</code> format (introduced with .NET Core) and managed to find a pretty simple solution to target all Revit versions with only one <code>csproj</code> and source code per project.</p>
+<p>So, I dug into new <code>csproj</code> format (introduced with .NET Core) and managed to find a pretty simple solution to target all Revit versions with only one <code>csproj</code> and source code per project.</p>
 <p>Here is the <code>csproj</code> code skeleton; it works with the latest VS Community 2017, at least:</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">&lt;</span><span style="color:maroon;">Project</span>&nbsp;<span style="color:red;">Sdk</span><span style="color:blue;">=</span><span style="color:blue;">&quot;Microsoft.NET.Sdk&quot;</span><span style="color:blue;">&gt;</span>
@@ -161,7 +160,7 @@ a <a href="http://thebuildingcoder.typepad.com/blog/2018/05/multi-target-add-ins
 &nbsp;&nbsp;<span style="color:blue;">&lt;/</span><span style="color:maroon;">ItemGroup</span><span style="color:blue;">&gt;</span>
 </pre>
 
-<p>Obviously, you will have to customise the file paths appropriately...</p>
+<p>Obviously, you will have to customize the file paths appropriately...</p>
 <p>By using the new <code>TargetFrameworks</code> mechanism, it is possible to configure separate settings for each version.</p>
 <p>Actually, the trick is possible because each Revit version is targeting a different .NET framework...</p>
 <p>I've included 'non-mandatory' things in the above example.</p>
@@ -170,7 +169,7 @@ a <a href="http://thebuildingcoder.typepad.com/blog/2018/05/multi-target-add-ins
 <p>If the new version does not target a different .NET framework, it is possible to keep the thing working by targeting a sub-version (like 4.7.1).</p>
 <p>Finally, to make your source code <code>version agnostic</code>, you can use conditional definitions such as <code>REVIT2017</code>, <code>REVIT2018</code>, <code>REVIT2019</code>, etc., as usual.</p>
 <p>Hope this will help.</p>
-<h4><a name="3"></a> Further Enhancement Using <code>CSPROJ</code> <code>Import</code> Tag</h4>
+<h4><a name="3"></a> Further Enhancement Using the <code>CSPROJ</code> <code>Import</code> Tag</h4>
 <p>MultiTarget addins : season 01 episode 02...</p>
 <p>Here is an addendum to my preceding suggestion with a further enhancement.</p>
 <p>In the eternal fight to reduce efforts involved to obtain the same achievements, I've made some new progress.</p>
@@ -257,18 +256,42 @@ Delete&nbsp;it&nbsp;to&nbsp;restore&nbsp;default&nbsp;behaviour&nbsp;and&nbsp;co
 <span style="color:blue;">&lt;/</span><span style="color:maroon;">Project</span><span style="color:blue;">&gt;</span>
 </pre>
 
-<p>Of course these 2 samples are just a proof of concept, and tailored for my own needs.</p>
+<p>Of course, these 2 samples are just a proof of concept, and tailored for my own needs.</p>
 <p>Feel free to make what you want with it ;-)</p>
 <p>Many thanks to Olivier 'Vilo' for researching and sharing this very sensible solution!</p>
-<h4><a name="4"></a> CAD Terminology Databases for Consistent Translation</h4>
-<p>cade terminology translation, terms database
-Dictionary for Revit and AutoCAD Terms for Localisation
-https://forums.autodesk.com/t5/revit-api-forum/dictionary-for-revit-and-autocad-terms-for-localisation/m-p/8074233
-https://knowledge.autodesk.com/de/support/autocad/learn-explore/caas/CloudHelp/cloudhelp/2016/DEU/AutoCAD-Core/files/GUID-C4325DCB-3648-4463-8135-629EA7F72AB0-htm.html?_ga=2.27437948.1327081858.1529427624-2130181328.1465883366
-Glossary of AutoCAD Terms
-https://knowledge.autodesk.com/support/autocad/learn-explore/caas/CloudHelp/cloudhelp/2016/ENU/AutoCAD-Core/files/GUID-C4325DCB-3648-4463-8135-629EA7F72AB0-htm.html</p>
+<h4><a name="4"></a> CAD Terminology Resources for Consistent Translation</h4>
+<p>People occasionally ask for help translating CAD terms, and I already mentioned a couple of useful resources for this in the past.</p>
+<p>This question came up again in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on a <a href="https://forums.autodesk.com/t5/revit-api-forum/dictionary-for-revit-and-autocad-terms-for-localisation/m-p/8074233">dictionary for Revit and AutoCAD terms for localisation</a>:</p>
+<p><strong>Question:</strong> I want to use the correct Autodesk terms in our localized add-in user documentation.</p>
+<p>I am searching for a table of translations of Revit and AutoCAD terms into multiple languages which can be used for our automated translation dictionary.  I just need a mapping English term &rarr; Localized term. The supported languages are currently German, French, Spanish (Mexico), Chinese (Simplified), Portuguese (Brazil), Japanese and Italian.</p>
+<p>I found a good <a href="https://knowledge.autodesk.com/de/support/autocad/learn-explore/caas/CloudHelp/cloudhelp/2016/DEU/AutoCAD-Core/files/GUID-C4325DCB-3648-4463-8135-629EA7F72AB0-htm.html?_ga=2.226928601.558689868.1529839545-2130181328.1465883366">Glossary of German AutoCAD Terms</a> which
+can be displayed in different languages.</p>
+<p>I see that, e.g., <code>LAYER</code> in English is the same in German, but <code>SOLID</code> is <code>VOLUMENKÖRPER</code>.</p>
+<p>I would prefer a table instead of an HTML page for more automation.</p>
+<p><strong>Answer:</strong> I provided an answer to a similar question
+on <a href="http://thebuildingcoder.typepad.com/blog/2014/10/autodesk-open-source-all-over-germany-and-japan.html#4">CAD terminology translation back in 2014</a>.</p>
+<p>It mentions a number of useful resources back then.</p>
+<p>Here is an expanded and updated list for today:</p>
+<ul>
+<li><a href="https://knowledge.autodesk.com/support/autocad/learn-explore/caas/CloudHelp/cloudhelp/2016/ENU/AutoCAD-Core/files/GUID-C4325DCB-3648-4463-8135-629EA7F72AB0-htm.html">Glossary of AutoCAD Terms</a>.</li>
+<li><a href="http://knowledge.autodesk.com/support/autocad/downloads/caas/downloads/content/autocad-2019-language-packs.html">AutoCAD language packs, e.g., for AutoCAD 2019</a>.</li>
+<li><a href="http://www.cadforum.cz/cadforum_en/command.asp">AutoCAD command dictionary</a>
+&ndash; lists AutoCAD command translations and does not support all languages.</li>
+<li>AutoCAD end user online document per language:<ul>
+<li><a href="http://help.autodesk.com/view/ACD/2019/ENU/">English</a></li>
+<li><a href="http://help.autodesk.com/view/ACD/2019/JPN/">Japanese</a></li>
+<li><a href="http://help.autodesk.com/view/ACD/2019/FRA/">French</a></li>
+<li><a href="http://help.autodesk.com/view/ACD/2019/KOR/">Korean</a></li>
+<li><a href="http://help.autodesk.com/view/ACD/2019/RUS/">Russian</a></li>
+<li>etc.</li>
+</ul>
+</li>
+<li><a href="http://langtech.autodesk.com/nexlt">Autodesk localisation team cross product corpus database NeXLT</a> &ndash; terminology and message translation.</li>
+</ul>
+<p>The latter resource is product agnostic, so it will hopefully include all you need for Revit, AEC and BIM.</p>
 <h4><a name="5"></a> Showing a Custom Revit Texture Map in the Forge Viewer</h4>
-<p>Show Revit custom texture map in the Forge Viewer by Eason Kang
-https://forge.autodesk.com/blog/show-revit-custom-texture-map-viewer</p>
-<p><strong>Question:</strong> </p>
-<p><strong>Answer:</strong> </p>
+<p>To help address the recurring question of accessing texture map data in a Revit model, my colleague Eason Kang researched and published how 
+to <a href="https://forge.autodesk.com/blog/show-revit-custom-texture-map-viewer">show Revit custom texture map in the Forge Viewer</a>.</p>
+<p>Many thanks to Eason for sharing this important information!</p>
