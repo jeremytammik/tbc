@@ -301,9 +301,9 @@ Feel free to make what you want with it ;-)
 
 Many thanks to Olivier 'Vilo' for researching and sharing this very sensible solution!
 
-Vilo responds: Cool &nbsp; &nbsp; ;-) &nbsp; &nbsp; Hope it will help some people simplify their DevEnv.
+<a name="3.1"></a> Vilo responds: Cool &nbsp; &nbsp; ;-) &nbsp; &nbsp; Hope it will help some people simplify their DevEnv.
 
-Jeremy answers: if people take the trouble to read and the time to improve, it will for sure &nbsp; &nbsp; :-) &nbsp; &nbsp; mostly, one does not have the time to improve things in order to save ten times the time it costs to make the improvement...
+Jeremy answers: if people take the trouble to read and the time to improve, it will for sure &nbsp; &nbsp; :-) &nbsp; &nbsp; all too often, however, one does not take the time to improve things, even though it would save ten times the time it costs to make the improvement...
 
 
 #### <a name="4"></a> CAD Terminology Resources for Consistent Translation
