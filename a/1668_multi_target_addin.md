@@ -24,12 +24,15 @@
 
  in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+Here comes another solution for efficiently compiling add-ins for multiple Revit version targets from one single code base, a note on resources for CAD term databases for consistent terminology translation, and a discussion on accessing custom texture maps in Forge and Revit
+&ndash; Multi-targeting Revit versions using <code>TargetFrameworks</code>
+&ndash; Further enhancement using the <code>CSPROJ</code> <code>Import</code> tag
+&ndash; CAD terminology resources for consistent translation
+&ndash; Showing a custom Revit texture map in the Forge Viewer...
 
 --->
 
-### Multi-Targeting Revit Versions
+### Multi-Targeting Revit Versions, CAD Terms, Textures
 
 Here comes another solution for efficiently compiling add-ins for multiple Revit version targets from one single code base, a note on resources for CAD term databases for consistent terminology translation, and a discussion on accessing custom texture maps in Forge and Revit:
 
@@ -39,7 +42,7 @@ Here comes another solution for efficiently compiling add-ins for multiple Revit
 - [Showing a custom Revit texture map in the Forge Viewer](#5) 
 
 <center>
-<img src="img/change_target.png" alt="Change traget" width="360"/>
+<img src="img/change_target.png" alt="Change target" width="360"/>
 </center>
 
 
@@ -347,8 +350,4 @@ To help address the recurring question of accessing texture map data in a Revit 
 to [show Revit custom texture map in the Forge Viewer](https://forge.autodesk.com/blog/show-revit-custom-texture-map-viewer).
 
 Many thanks to Eason for sharing this important information!
-
-
-
-
 
