@@ -8,7 +8,7 @@
 
 <!---
 
- in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Add-in registration, VendorId and trusted digital signature in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/addinvendorid
 
 I am aking lots of time off in July, so this may be my last post for a while.
 Before leaving, I will share my answers to a list of pertinent questions on add-in registration, especially how to populate the add-in manifest <code>VendorId</code> tag and handle the trusted digital DLL signature
