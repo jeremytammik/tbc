@@ -22,7 +22,7 @@
 - Show Revit custom texture map in the Forge Viewer by Eason Kang
   https://forge.autodesk.com/blog/show-revit-custom-texture-map-viewer
 
- in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Multi-targeting Revit versions, CAD terms and texture maps in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/multitargetaddin
 
 Here comes another solution for efficiently compiling add-ins for multiple Revit version targets from one single code base, a note on resources for CAD term databases for consistent terminology translation, and a discussion on accessing custom texture maps in Forge and Revit
 &ndash; Multi-targeting Revit versions using <code>TargetFrameworks</code>
