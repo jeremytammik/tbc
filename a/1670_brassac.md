@@ -10,12 +10,17 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; Vacation
-...
+As I already mentioned, I am taking lots of time off in July.
+This is just a note to let you know I am alive, well and happy, currently in Brassac in Occitanie in southern France,
+on my way to practice awareness, care and attentiveness in 
+the Buddhist monastery Plum Village near Bordeaux.
+On the road, I'll just share this quick note from
+a comment by Zhmayev Yaroslav on multi-targeting Revit versions using <code>TargetFrameworks</code>
+&ndash; Multi-Version Revit Add-In Template...
 
 --->
 
-### Vacation
+### Vacation and Multi-Version Revit Add-In Template
 
 As I mentioned in
 my [last post](http://thebuildingcoder.typepad.com/blog/2018/06/add-in-registration-vendorid-and-signature.html),
