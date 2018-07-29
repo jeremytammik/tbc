@@ -38,7 +38,13 @@ by the Vietnamese monk and Zen master [Thich Nhat Hanh](https://plumvillage.org/
 <img src="img/760_lotus_pond_and_bell_tower_680x440.jpg" alt="Lotus pond and bell tower" width="400"/>
 </center>
 
-Here are some personal notes from my experiences there, followed by a Revit API related issue that just cropped up:
+On the way there, I also visited my school classmate Gerald's fablab FabD'Oc in Brassac and spent two night sleeping out on the beach of the Atlantic at Le Porge. Here are some photos from the trip:
+
+- [The FabLab FabD'Oc in Brassac](https://flic.kr/s/aHsmjY48Ud)
+- [Sleeping on the beach of the Atlantic at Le Porge](https://flic.kr/s/aHskFjTwhd)
+- [Plum Village](https://flic.kr/s/aHsmnjabHR)
+
+Below, I share some personal notes from my experiences in Plum Village, followed by a Revit API related issue that just cropped up:
 
 - [Plum Village and its visitors](#2) 
 - [Mindfulness and relaxation](#3) 
@@ -49,7 +55,7 @@ Here are some personal notes from my experiences there, followed by a Revit API 
 I translated the following text from English to German language to share with some of our friends.
 Please click here for the German version:
 
-- [Plum Village, achtsames Leben und mein Ringen mit dem L&auml;cheln](zip/plumvillage_de.pdf)
+- [Achtsames Leben und mein Ringen mit dem L&auml;cheln](zip/plumvillage_de.pdf)
 
 
 #### <a name="2"></a> Plum Village and Its Visitors
