@@ -20,7 +20,7 @@
 
 --->
 
-### Plum Village, Mindfulness and Smiling to Myself
+### Mindful Living and Smiling to Myself
 
 I am back from my July vacation.
 
@@ -32,14 +32,13 @@ by the Vietnamese monk and Zen master [Thich Nhat Hanh](https://plumvillage.org/
 <img src="img/760_lotus_pond_and_bell_tower_680x440.jpg" alt="Lotus pond and bell tower" width="400"/>
 </center>
 
-Here are some personal notes from my experiences there, followed by a couple of Revit API related issues:
+Here are some personal notes from my experiences there, followed by a Revit API related issue that just cropped up:
 
 - [Plum Village and its visitors](#2) 
 - [Mindfulness and relaxation](#3) 
 - [My struggle with the smile](#4) 
 - [Mindful watering of seeds](#5) 
 - [Line intersection with topography surface](#6) 
-
 
 I translated the following text from English to German language to share with some of our friends.
 Please click here for the German version:
@@ -178,6 +177,9 @@ The lotus stands for the result of a conscious choice that we make.
 
 Englishmen may prefer the image of roses growing out of compost and horse dung.
 
+<!--
+
+German translation
 
 Plum Village und seine Besucher
 
@@ -295,13 +297,13 @@ Buddhisten benutzen oft das Bild der Lotusblume, die aus dem Schlamm wächst. De
 
 Engländer bevorzugen vielleicht das Bild von Rosen, die aus Kompost und Pferdemist wachsen.
 
-
+-->
 
 
 #### <a name="6"></a> Line Intersection with Topography Surface
 
-A question was raised on StackOverflow
-on [`ReferenceIntersector` with topography surfaces](https://stackoverflow.com/questions/51498527/revit-api-referenceintersector-with-topografysurfaces):
+I'll add one little note on a Revit API related issue as well, a suggestion for the question raised on StackOverflow
+on using [`ReferenceIntersector` with topography surfaces](https://stackoverflow.com/questions/51498527/revit-api-referenceintersector-with-topografysurfaces):
 
 **Question:** Does anyone know if `ReferenceIntersector` works with topograpy surfaces?
 
@@ -317,7 +319,3 @@ Then, implement your own [algorithm to intersect a triangle with the line](https
 
 That should give you all you need, really.
 
-
-#### <a name="7"></a> ???
-
-Many thanks to ... for sharing this!
