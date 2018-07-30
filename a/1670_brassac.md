@@ -8,7 +8,7 @@
 
 <!---
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Multi-version Revit add-in template #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/multiversiontemplate
 
 As I already mentioned, I am taking lots of time off in July.
 This is just a note to let you know I am alive, well and happy, currently in Brassac in Occitanie in southern France,

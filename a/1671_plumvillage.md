@@ -13,7 +13,7 @@
   Does anyone know if ReferenceIntersector works with TopografySurfaces? Cannot make it work. I need to find a point on the surface based on a intersection with a line.
   Regardless of whether the `ReferenceIntersector` does or does not work with topography surfaces, you can pretty easily solve the problem you describe yourself using other means. Simply ask the surface for its tessellated representation. That will return a bunch of triangles. Then, implement your own [algorithm to intersect a triangle with the line](https://duckduckgo.com/?q=line+triangle+intersect). That should give you all you need, really.
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Mindful living, smiling to myself and line intersection with topography surface in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/struggetosmile
 
 I am back from my July vacation.
 As planned, I visited the Buddhist monastery Plum Village near Bordeaux.
