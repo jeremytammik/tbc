@@ -56,8 +56,8 @@ Here are some other noteworthy items to keep company with my debugging and fixin
 
 
 Eden Oo, Modeler at Tiong Seng Construction Pte Ltd, raised an issue with The Building Coder samples to retrieve wall profile loops in 
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread 
-on a [get wall profile error](https://forums.autodesk.com/t5/revit-api-forum/get-wall-profile-error-cmdwallprofile-cs/m-p/8179152
+his [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread 
+on the [get wall profile error](https://forums.autodesk.com/t5/revit-api-forum/get-wall-profile-error-cmdwallprofile-cs/m-p/8179152
 ):
 
 
@@ -122,7 +122,9 @@ Revit encountered a Autodesk.Revit.Exceptions.InvalidOperationException: Curve l
    at apiManagedExecuteCommand...
 </pre>
 
-This is caused by the call to `CurveLoop.CreateViaOffset` in all the walls hosting windows and doors.
+This looks like the issue you are facing too.
+
+It is caused by the call to `CurveLoop.CreateViaOffset` in all the walls hosting windows and doors.
 
 It may be due to some specific aspect of the door and window definition.
 

@@ -36,7 +36,7 @@
 <h3>Wall Profile Command Update</h3>
 <p>I returned from my time off in July and am still taking it easy in August as well.</p>
 <p>I dived in deep into the Revit API again to help resolve an issue with The Building Coder samples external command to retrieve wall profile curves.</p>
-<p>Here are some other noteworthy notes to keep company with my debugging and fixing report, including a very creative workaround to rotate an element in chunks:</p>
+<p>Here are some other noteworthy items to keep company with my debugging and fixing report, including a creative workaround to rotate an element in chunks:</p>
 <ul>
 <li><a href="#2">CmdWallProfile update</a> </li>
 <li><a href="#3">Access to the IUpdater original value</a> </li>
@@ -48,8 +48,8 @@
 </center></p>
 <h4><a name="2"></a> CmdWallProfile Update</h4>
 <p>Eden Oo, Modeler at Tiong Seng Construction Pte Ltd, raised an issue with The Building Coder samples to retrieve wall profile loops in 
-the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread 
-on a [get wall profile error]:</p>
+his <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread 
+on the <a href="https://forums.autodesk.com/t5/revit-api-forum/get-wall-profile-error-cmdwallprofile-cs/m-p/8179152">get wall profile error</a>:</p>
 <p><strong>Question:</strong> I got an error testing
 the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdWallProfile.cs">CmdWallProfile external command</a>:</p>
 <p><center>
@@ -96,7 +96,8 @@ Revit encountered a Autodesk.Revit.Exceptions.InvalidOperationException: Curve l
    at apiManagedExecuteCommand...
 </pre>
 
-<p>This is caused by the call to <code>CurveLoop.CreateViaOffset</code> in all the walls hosting windows and doors.</p>
+<p>This looks like the issue you are facing too.</p>
+<p>It is caused by the call to <code>CurveLoop.CreateViaOffset</code> in all the walls hosting windows and doors.</p>
 <p>It may be due to some specific aspect of the door and window definition.</p>
 <p>However, happily, that call can now be removed, since it is no longer needed.</p>
 <p>Once it is gone, I can retrieve all the inner and outer loops of all the walls successfully, as you can see in the screen snapshot at the top.</p>
