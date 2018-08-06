@@ -40,7 +40,7 @@ I returned from my time off in July and am still taking it easy in August as wel
 
 I dived in deep into the Revit API again to help resolve an issue with The Building Coder samples external command to retrieve wall profile curves.
 
-Here are some other noteworthy notes to keep company with my debugging and fixing report, including a very creative workaround to rotate an element in chunks:
+Here are some other noteworthy items to keep company with my debugging and fixing report, including a creative workaround to rotate an element in chunks:
 
 - [CmdWallProfile update](#2) 
 - [Access to the IUpdater original value](#3) 
@@ -57,7 +57,8 @@ Here are some other noteworthy notes to keep company with my debugging and fixin
 
 Eden Oo, Modeler at Tiong Seng Construction Pte Ltd, raised an issue with The Building Coder samples to retrieve wall profile loops in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread 
-on a [get wall profile error]:
+on a [get wall profile error](https://forums.autodesk.com/t5/revit-api-forum/get-wall-profile-error-cmdwallprofile-cs/m-p/8179152
+):
 
 
 **Question:** I got an error testing
