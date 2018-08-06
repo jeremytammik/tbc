@@ -28,8 +28,13 @@
 
  in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+I returned from my time off in July.
+I dived in deep into the Revit API again to resolve an issue retrieving wall profile curves.
+Here are some other noteworthy items to keep company with my debugging report
+&ndash; CmdWallProfile update
+&ndash; Access to the IUpdater original value
+&ndash; Getting element dimensions from IFC files
+&ndash; Creative workaround to rotate elevation marker in chunks...
 
 --->
 
@@ -61,7 +66,7 @@ the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/mas
 <p><center>
 <img src="img/exception_curve_must_be_in_plane.png" alt="Exception 'curve must be in plane'" width="503"/>
 </center></p>
-<p>Here are the exception detials:</p>
+<p>Here are the exception details:</p>
 <pre>
 Revit encountered a Autodesk.Revit.Exceptions.ArgumentException: Curve must be in the plane
 Parameter name: pCurveCopy
@@ -72,22 +77,22 @@ Parameter name: pCurveCopy
    at apiManagedExecuteCommand
 </pre>
 
-<p>I debugged <code>CmdWallProfile</code>, especialy the method <code>Execute3</code>, and added some debug logging messages.</p>
+<p>I debugged <code>CmdWallProfile</code>, especially the method <code>Execute3</code>, and added some debug logging messages to it.</p>
 <p>The offset distance is defined as 5.</p>
-<p>The messages tell me the following:</p>
+<p>The messages tell me the following to help understand the situation:</p>
 <pre>
   wall orientation (1,0,0)
   face origin (5.06,24.16,0), face normal (1,0,0)
   plane origin (5.06,24.82,4.92), plane normal (1,0,0)
 </pre>
 
-<p>I replaced the plane definition using <code>curveLoopOffset.GetPlane</code> by a plane defined using the nromal and face origin instead.
-That solves the initial problem.</p>
+<p>Pondering this, I replaced the plane definition using <code>curveLoopOffset.GetPlane</code> by a plane defined using the normal and face origin instead.</p>
+<p>That solves the initial problem.</p>
 <p>In the next wall face curve loop, however, I encounter a new issue:</p>
 <p><center>
 <img src="img/exception_curve_loop_cannot_be_trimmed.png" alt="Exception 'curve cannot be trimmed'" width="503"/>
 </center></p>
-<p>Here are the new exception detials:</p>
+<p>Here are the new exception details:</p>
 <pre>
 Revit encountered a Autodesk.Revit.Exceptions.InvalidOperationException: Curve loop couldn't be properly trimmed.
    at Autodesk.Revit.DB.CurveLoop.CreateViaOffset...
@@ -113,11 +118,11 @@ the <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread 
 on retrieving
 the <a href="https://forums.autodesk.com/t5/revit-api-forum/getchangetypeparameter-old-value/m-p/8172990"><code>GetChangeTypeParameter</code> old value</a>:</p>
-<p><strong>Question:</strong> I added a <code>IUpdater</code> trigger for when a certain project parameter is changed.</p>
+<p><strong>Question:</strong> I added an <code>IUpdater</code> trigger for when a certain project parameter is changed.</p>
 <p>This works fine, and I am able to hook into the moment the parameter is getting a new value.</p>
 <p>The goal is to lock the parameter when it has a certain value (for example 400) and is then only allowed certain new values based on that old value.</p>
 <p>For now, it seems I can only get the new value that the user put in when I get the data from <code>GetChangeTypeParameter</code>.</p>
-<p>Is there any way to retreive the parameter value prior to the user change that triggered the <code>GetChangeTypeParameter</code> event?</p>
+<p>Is there any way to retrieve the parameter value prior to the user change that triggered the <code>GetChangeTypeParameter</code> event?</p>
 <p><strong>Answer:</strong> Don't believe so, as the change has occurred.</p>
 <p>Is understandable, since the updater is responding to a change and as far as I know isn't recording at the same time the old parameter values.</p>
 <p>I would probably create a backing value on the element via extensible storage (last valid change).</p>
@@ -125,14 +130,14 @@ the <a href="https://forums.autodesk.com/t5/revit-api-forum/getchangetypeparamet
 <h4><a name="4"></a> Getting Element Dimensions from IFC Files</h4>
 <p>A question from StackOverflow,
 on <a href="https://stackoverflow.com/questions/51558189/getting-entity-dimensions-from-ifc-files">getting entity dimensions from IFC files</a>:</p>
-<p><strong>Question:</strong> I am looking for a way to get dimensions of walls for example from an IFC file. I tried using Xbim and IfcOpenShell with no luck. How does Revit get dimensions for each entity like length, area and volume.</p>
+<p><strong>Question:</strong> I am looking for a way to get dimensions of walls for example from an IFC file. I tried using Xbim and IfcOpenShell with no luck. How does Revit get dimensions for each entity like length, area and volume?</p>
 <p>How can I achieve this?</p>
 <p><strong>Answer:</strong> Revit is a BIM software that creates and manages a building information model. Within Revit, most elements are parametrically defined. For instance, a wall's height is defined by its lower and upper levels and optional offsets up and down from those levels. Therefore, Revit automatically knows the wall's height from its parametrical definition. That answers the first part of your question.</p>
 <p>To answer the second part of your question, I would say that you can achieve that by implementing your own BIM management software.</p>
 <p>That sounds like rather a daunting task to me.</p>
 <p>Maybe that is not exactly what you are after.</p>
 <p>More details by <a href="https://stackoverflow.com/users/5168875/andy-ward">Andy Ward</a>: If you're using XBIM there's
-an [example][http://docs.xbim.net/examples/excel-space-report-from-ifc.html] on
+an <a href="http://docs.xbim.net/examples/excel-space-report-from-ifc.html">example</a> on
 finding the Area and Volume of spaces/rooms, which could serve as a good starting point.</p>
 <p>It's worth noting there are multiple means of establishing these quantities from IFC which largely fall into two approaches:</p>
 <p>1) You acquire the pre-calculated data from the semantic data. This is the approach the XBIM sample uses.</p>
@@ -140,7 +145,7 @@ finding the Area and Volume of spaces/rooms, which could serve as a good startin
 <a href="http://www.buildingsmart-tech.org/ifc/IFC2x4/rc2/html/schema/ifcproductextension/lexical/ifcelementquantity.htm">IfcElementQuantity</a>.</p>
 <p>2) You calculate the quantities from the raw geometry. This is much more involved. You'd need to calculate the solid geometry from the Ifc Representation (which XBIM.Geometry can do), before doing the calculations to work out the dimensions. If your walls are 'regular' rectangular extruded solids that's pretty simple; but if they're not, it's going to be more complex. Depending on what you're doing you may be able to use bounding box representation to simplify calculating dimensions, but areas and volumes are going to be off.</p>
 <h4><a name="5"></a> Creative Workaround to Rotate Elevation Marker in Chunks</h4>
-<p>Graham Cook, CAD Developer at Premier BIM Ltd, implemented a very nice little workaround to solve an issue rotating elevation markers, explained in 
+<p>Graham Cook, CAD Developer at Premier BIM Ltd, implemented a nice little workaround to solve an issue rotating elevation markers, explained in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread 
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/elevationmarker-does-not-rotate-180-deg/m-p/8010880">ElevationMarker does not rotate 180 deg</a>:</p>
 <blockquote>
@@ -178,4 +183,4 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/elevationmarker-does-
 }
 </pre>
 
-<p>Many thatnks to Greg for raisinfg this and sharing his workaround.</p>
+<p>Many thanks to Greg for raising this and sharing his workaround.</p>

@@ -29,8 +29,13 @@
 
  in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+I returned from my time off in July.
+I dived in deep into the Revit API again to resolve an issue retrieving wall profile curves.
+Here are some other noteworthy items to keep company with my debugging report
+&ndash; CmdWallProfile update
+&ndash; Access to the IUpdater original value
+&ndash; Getting element dimensions from IFC files
+&ndash; Creative workaround to rotate elevation marker in chunks...
 
 --->
 
@@ -57,8 +62,7 @@ Here are some other noteworthy items to keep company with my debugging and fixin
 
 Eden Oo, Modeler at Tiong Seng Construction Pte Ltd, raised an issue with The Building Coder samples to retrieve wall profile loops in 
 his [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread 
-on the [get wall profile error](https://forums.autodesk.com/t5/revit-api-forum/get-wall-profile-error-cmdwallprofile-cs/m-p/8179152
-):
+on the [get wall profile error](https://forums.autodesk.com/t5/revit-api-forum/get-wall-profile-error-cmdwallprofile-cs/m-p/8179152):
 
 
 **Question:** I got an error testing
@@ -79,7 +83,7 @@ I can reproduce a problem. However, initially, it is different from yours:
 <img src="img/exception_curve_must_be_in_plane.png" alt="Exception 'curve must be in plane'" width="503"/>
 </center>
 
-Here are the exception detials:
+Here are the exception details:
 
 <pre>
 Revit encountered a Autodesk.Revit.Exceptions.ArgumentException: Curve must be in the plane
@@ -91,11 +95,11 @@ Parameter name: pCurveCopy
    at apiManagedExecuteCommand
 </pre>
 
-I debugged `CmdWallProfile`, especialy the method `Execute3`, and added some debug logging messages.
+I debugged `CmdWallProfile`, especially the method `Execute3`, and added some debug logging messages to it.
 
 The offset distance is defined as 5.
 
-The messages tell me the following:
+The messages tell me the following to help understand the situation:
 
 <pre>
   wall orientation (1,0,0)
@@ -103,7 +107,8 @@ The messages tell me the following:
   plane origin (5.06,24.82,4.92), plane normal (1,0,0)
 </pre>
 
-I replaced the plane definition using `curveLoopOffset.GetPlane` by a plane defined using the nromal and face origin instead.
+Pondering this, I replaced the plane definition using `curveLoopOffset.GetPlane` by a plane defined using the normal and face origin instead.
+
 That solves the initial problem.
 
 In the next wall face curve loop, however, I encounter a new issue:
@@ -112,7 +117,7 @@ In the next wall face curve loop, however, I encounter a new issue:
 <img src="img/exception_curve_loop_cannot_be_trimmed.png" alt="Exception 'curve cannot be trimmed'" width="503"/>
 </center>
 
-Here are the new exception detials:
+Here are the new exception details:
 
 <pre>
 Revit encountered a Autodesk.Revit.Exceptions.InvalidOperationException: Curve loop couldn't be properly trimmed.
@@ -151,7 +156,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 on retrieving
 the [`GetChangeTypeParameter` old value](https://forums.autodesk.com/t5/revit-api-forum/getchangetypeparameter-old-value/m-p/8172990):
 
-**Question:** I added a `IUpdater` trigger for when a certain project parameter is changed.
+**Question:** I added an `IUpdater` trigger for when a certain project parameter is changed.
 
 This works fine, and I am able to hook into the moment the parameter is getting a new value.
 
@@ -159,7 +164,7 @@ The goal is to lock the parameter when it has a certain value (for example 400) 
 
 For now, it seems I can only get the new value that the user put in when I get the data from `GetChangeTypeParameter`.
 
-Is there any way to retreive the parameter value prior to the user change that triggered the `GetChangeTypeParameter` event?
+Is there any way to retrieve the parameter value prior to the user change that triggered the `GetChangeTypeParameter` event?
 
 **Answer:** Don't believe so, as the change has occurred.
 
@@ -175,7 +180,7 @@ Then, after seeing current value is invalid, revert back to that value, or, if v
 A question from StackOverflow,
 on [getting entity dimensions from IFC files](https://stackoverflow.com/questions/51558189/getting-entity-dimensions-from-ifc-files):
 
-**Question:** I am looking for a way to get dimensions of walls for example from an IFC file. I tried using Xbim and IfcOpenShell with no luck. How does Revit get dimensions for each entity like length, area and volume.
+**Question:** I am looking for a way to get dimensions of walls for example from an IFC file. I tried using Xbim and IfcOpenShell with no luck. How does Revit get dimensions for each entity like length, area and volume?
 
 How can I achieve this?
 
@@ -188,7 +193,7 @@ That sounds like rather a daunting task to me.
 Maybe that is not exactly what you are after.
 
 More details by [Andy Ward](https://stackoverflow.com/users/5168875/andy-ward): If you're using XBIM there's
-an [example][http://docs.xbim.net/examples/excel-space-report-from-ifc.html] on
+an [example](http://docs.xbim.net/examples/excel-space-report-from-ifc.html) on
 finding the Area and Volume of spaces/rooms, which could serve as a good starting point.
 
 It's worth noting there are multiple means of establishing these quantities from IFC which largely fall into two approaches:
@@ -204,7 +209,7 @@ In this scenario Revit (or any other authoring tool) is assumed to have already 
 #### <a name="5"></a> Creative Workaround to Rotate Elevation Marker in Chunks
 
 
-Graham Cook, CAD Developer at Premier BIM Ltd, implemented a very nice little workaround to solve an issue rotating elevation markers, explained in 
+Graham Cook, CAD Developer at Premier BIM Ltd, implemented a nice little workaround to solve an issue rotating elevation markers, explained in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread 
 on [ElevationMarker does not rotate 180 deg]( https://forums.autodesk.com/t5/revit-api-forum/elevationmarker-does-not-rotate-180-deg/m-p/8010880):
 
@@ -243,5 +248,5 @@ Graham adds:
 }
 </pre>
 
-Many thatnks to Greg for raisinfg this and sharing his workaround.
+Many thanks to Greg for raising this and sharing his workaround.
 
