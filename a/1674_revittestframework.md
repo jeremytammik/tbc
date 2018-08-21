@@ -10,7 +10,7 @@
 
  in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
 
-The UpCodes AI team shared some significant Revit Test Framework improvements.
+The UpCodes AI team shared some significant Revit Test Framework improvements
 &ndash; Created a NuGet package
 &ndash; Added the ability to group tests by the model
 &ndash; Added ability to use wildcards for model filenames
