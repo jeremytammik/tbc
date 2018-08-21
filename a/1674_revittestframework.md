@@ -18,7 +18,7 @@ The UpCodes AI team shared some significant Revit Test Framework improvements.
 
 --->
 
-### Revit Test Framework Improvements
+### Revit Unit Test Framework Improvements
 
 Today, let's highlight an exciting and very useful contribution by Mark Vulfson
 at [UpCodes](https://up.codes) Engineering and the entire 
@@ -29,7 +29,7 @@ on [Revit Test Framework improvements](https://forums.autodesk.com/t5/revit-api-
 Many thanks to Mark and the UpCodes team for making this available!
 
 <center>
-<img src="img/framework_girder_with_load.png" alt="Framework girder with load" width="361"/>
+<img src="img/sigmaxxmax.png" alt="Test load" width="275"/>
 </center>
 
 Hello everyone,
@@ -121,7 +121,7 @@ This includes:
 This way, you can go grab a coffee while the tests run and know if there were any errors with a quick glance at the summary.
 - We utilize categories (e.g. [Category("Doors")]) for grouping.
 But RTF UI didn't show tests without a category; this is now fixed.
-- All `Console.PrintLine` messages from the actual unit tests are now sent back to the RTF server so you can see them in a single contiguous log &ndash; yay (this one is my favorite)!
+- All `Console.PrintLine` messages from the actual unit tests are now sent back to the RTF server so you can see them in a single contiguous log &ndash; yay (this one is my favourite)!
 - Test completion information is displayed in the console as soon as the test itself is completed; RTF used to wait till all tests have finished before showing you the status of all individual tests; now each pass/fail is printed as soon as the test is completed.
 
 We also made a bunch of small bug fixes around the stability of the RTF.

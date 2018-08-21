@@ -17,7 +17,7 @@ The UpCodes AI team shared some significant Revit Test Framework improvements.
 
 --->
 
-<h3>Revit Test Framework Improvements</h3>
+<h3>Revit Unit Test Framework Improvements</h3>
 <p>Today, let's highlight an exciting and very useful contribution by Mark Vulfson
 at <a href="https://up.codes">UpCodes</a> Engineering and the entire 
 <a href="https://up.codes/ai">UpCodes AI team</a>, presented in 
@@ -25,7 +25,7 @@ his <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API d
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-test-framework-improvements/m-p/8212702">Revit Test Framework improvements</a>.</p>
 <p>Many thanks to Mark and the UpCodes team for making this available!</p>
 <p><center>
-<img src="img/framework_girder_with_load.png" alt="Framework girder with load" width="361"/>
+<img src="img/sigmaxxmax.png" alt="Test load" width="275"/>
 </center></p>
 <p>Hello everyone,</p>
 <p>We are currently developing a pretty elaborate Revit plugin,
@@ -93,7 +93,7 @@ Luckily for us, none of our tests have side effects (which, in general, is a goo
 This way, you can go grab a coffee while the tests run and know if there were any errors with a quick glance at the summary.</li>
 <li>We utilize categories (e.g. [Category("Doors")]) for grouping.
 But RTF UI didn't show tests without a category; this is now fixed.</li>
-<li>All <code>Console.PrintLine</code> messages from the actual unit tests are now sent back to the RTF server so you can see them in a single contiguous log &ndash; yay (this one is my favorite)!</li>
+<li>All <code>Console.PrintLine</code> messages from the actual unit tests are now sent back to the RTF server so you can see them in a single contiguous log &ndash; yay (this one is my favourite)!</li>
 <li>Test completion information is displayed in the console as soon as the test itself is completed; RTF used to wait till all tests have finished before showing you the status of all individual tests; now each pass/fail is printed as soon as the test is completed.</li>
 </ul>
 <p>We also made a bunch of small bug fixes around the stability of the RTF.</p>
