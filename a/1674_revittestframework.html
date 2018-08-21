@@ -1,0 +1,103 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- https://forums.autodesk.com/t5/revit-api-forum/revit-test-framework-improvements/m-p/8212702
+
+ in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+
+The UpCodes AI team shared some significant Revit Test Framework improvements.
+&ndash; Created a NuGet package
+&ndash; Added the ability to group tests by the model
+&ndash; Added ability to use wildcards for model filenames
+&ndash; Clear messaging and indication of failures...
+
+--->
+
+<h3>Revit Test Framework Improvements</h3>
+<p>Today, let's highlight an exciting and very useful contribution by Mark Vulfson
+at <a href="https://up.codes">UpCodes</a> Engineering and the entire 
+<a href="https://up.codes/ai">UpCodes AI team</a>, presented in 
+his <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-test-framework-improvements/m-p/8212702">Revit Test Framework improvements</a>.</p>
+<p>Many thanks to Mark and the UpCodes team for making this available!</p>
+<p><center>
+<img src="img/framework_girder_with_load.png" alt="Framework girder with load" width="361"/>
+</center></p>
+<p>Hello everyone,</p>
+<p>We are currently developing a pretty elaborate Revit plugin,
+the <a href="https://up.codes/features/ai">UpCodes AI for building code automation</a>:</p>
+<blockquote>
+<p>UpCodes AI is a design aid for architects and engineers. View code errors in real-time directly in Revit with a “spell check” for compliance.</p>
+</blockquote>
+<p>During the course of this work, we ran into many issues (and surely will run into many more), and this forum has helped us resolve many of them.</p>
+<p>We'd like to contribute something back to the community by telling you about the improvements we've made to the awesome
+<a href="http://thebuildingcoder.typepad.com/blog/2013/10/the-dynamo-revit-unit-test-framework.html">Dynamo Revit unit test framework</a>,
+<code>RevitTestFramework</code> or RTF, by the Dynamo team.</p>
+<p>It's an invaluable tool if you are developing a Revit add-in, as it allows you to run integration tests and control Revit in an automated fashion.</p>
+<p>However, the RTF hasn't had much development done on it in a while (other than making it compatible with Revit 2019) and as such we found a few things lacking; the biggest such shortcoming was a lack of NuGet package making usage of the RTF on a build server/continuous integration server very difficult.</p>
+<p>Along the way, we made a few other improvements that I think you will find interesting and useful.</p>
+<p>Summary of main changes we've made so far:</p>
+<ul>
+<li><a href="#1">1. Created a NuGet package</a> </li>
+<li><a href="#2">2. Added the ability to group tests by the model</a> </li>
+<li><a href="#3">3. Added ability to use wildcards for model filenames</a> </li>
+<li><a href="#4">4. Clear messaging and indication of failures</a></li>
+</ul>
+<h4><a name="1"></a> 1. Created a NuGet package</h4>
+<p>You can download it here:</p>
+<ul>
+<li><a href="https://www.nuget.org/packages/revittestframework">www.nuget.org/packages/revittestframework</a></li>
+</ul>
+<h4><a name="2"></a> 2. Added the ability to group tests by the model</h4>
+<p>Opening a new RVT file for each test significantly slows down the execution of the tests. We wanted our Revit tests to run for each pull request our engineers make, so it has to be fast (and reliable).</p>
+<p>The <code>groupByModel</code> option significantly improves performance if you have multiple tests that operate on the same model.</p>
+<p>When using <code>--groupByModel</code>, the RTF will order the tests such that all tests that operate on the same model file are executed sequentially without closing and reopening the model. Naturally, it requires the <code>--continuous</code> parameter to be effective.</p>
+<p>Also, it goes without saying that if your tests leave side effects on a model which may break a subsequent test, this option will not work for you.
+Luckily for us, none of our tests have side effects (which, in general, is a good practice).</p>
+<h4><a name="3"></a> 3. Added ability to use wildcards for model filenames</h4>
+<p>We have multiple models which we want to run a particular test on.</p>
+<p>Today, every time we make a new model we have to copy/paste a unit test with a new model file.</p>
+<p>To make this simpler, you can now specify a wildcard for your model file on a test and RTF will enumerate all files in the directory and run the test on each one.</p>
+<p>For example:</p>
+<pre class="prettyprint">
+  [TestFixture]
+  public class TestAllModels
+  {
+    [Test, TestModel(@"C:\Models\test_models_2019\*.rvt")]
+    public void SomeTest()
+    {
+      ...
+    }
+  }
+</pre>
+
+<p>will run <code>SomeTest</code> on every RVT file it finds under <em>C:\Models\test_models_2019</em>.</p>
+<p>One of the ways we use this is for performance testing. All that this test does is measure the speed with which we finish processing a given model.</p>
+<p>This way, we can run the test suite on each release and assess whether we have significantly regressed our performance from our previous release.</p>
+<h4><a name="4"></a> 4. Clear messaging and indication of failures</h4>
+<p>Engineers don't love writing tests and they hate debugging tests. Especially, when diagnosing what went wrong is very difficult.</p>
+<p>We wanted to make sure that an engineer could:</p>
+<ul>
+<li>Look at the log output from a build server and quickly be able to tell what went wrong and where to start debugging.</li>
+<li>Run the test easily with nice UI on their local computer to quickly iterate on a solution to fix the problem.</li>
+</ul>
+<p>This includes:</p>
+<ul>
+<li>Clear indication when a model file is not found (prior to that RTF would just silently complete the test suite without errors).</li>
+<li>Automatically expand failing tests in the UI so that errors are super obvious.</li>
+<li>Have a clear summary at the end of a test run for the number of passed/failed/etc tests.
+This way, you can go grab a coffee while the tests run and know if there were any errors with a quick glance at the summary.</li>
+<li>We utilize categories (e.g. [Category("Doors")]) for grouping.
+But RTF UI didn't show tests without a category; this is now fixed.</li>
+<li>All <code>Console.PrintLine</code> messages from the actual unit tests are now sent back to the RTF server so you can see them in a single contiguous log &ndash; yay (this one is my favorite)!</li>
+<li>Test completion information is displayed in the console as soon as the test itself is completed; RTF used to wait till all tests have finished before showing you the status of all individual tests; now each pass/fail is printed as soon as the test is completed.</li>
+</ul>
+<p>We also made a bunch of small bug fixes around the stability of the RTF.</p>
+<p>There is still work to be done on the framework, but we hope you find these changes useful.</p>
+<p>We are working with the Dynamo team to bring all these changes back to the main branch of RTF, but, for now, you are welcome to contribute with us in our <a href="https://github.com/upcodes/RevitTestFramework">forked RevitTestFramework repo</a>.</p>
+<p>Mark &ndash; Engineering at <a href="https://up.codes">UpCodes</a></p>
+<p>p.s. <a href="https://up.codes/careers">we are hiring</a> &ndash; if you love building Revit add-ins please reach out!</p>
