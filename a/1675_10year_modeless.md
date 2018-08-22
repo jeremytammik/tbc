@@ -6,15 +6,53 @@
 
 <!---
 
-- https://forums.autodesk.com/t5/revit-api-forum/revit-test-framework-improvements/m-p/8212702
+- tbc birthday ten years
 
-Revit Unit Test Framework improvements for the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/rvtunittest
+- Out of clutter, find Simplicity.
+  From discord, find Harmony.
+  In the middle of difficulty lies Opportunity.
+  ALBERT EINSTEIN
+  Three Rules of Work
 
-The UpCodes AI team shared some significant Revit Test Framework improvements
-&ndash; Created a NuGet package
-&ndash; Added the ability to group tests by the model
-&ndash; Added ability to use wildcards for model filenames
-&ndash; Clear messaging and indication of failures...
+- Revit API with WPF (New message on the Autodesk forums or ideas)
+  https://forums.autodesk.com/t5/revit-api-forum/revit-api-with-wpf/m-p/8209618
+https://stackoverflow.com/questions/51918495/revit-pick-element-from-winform
+Your Windows form is presumably not running as a modal form within a valid Revit API context.
+
+Consequently, you are trying to access Revit and its API from outside. This is basically not possible. A workaround exists via the use of an [external event](http://www.revitapidocs.com/2018/05089477-4612-35b2-81a2-89c4f44370ea.htm).
+
+This issue is currently also being discussed in the [Revit API discussion forum](https://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread on [Revit API with WPF](https://forums.autodesk.com/t5/revit-api-forum/revit-api-with-wpf/m-p/8209618).
+
+The official approach is presented in the Revit SDK sample ModelessDialog/ModelessForm_ExternalEvent.
+
+Many other discussions and soutions are listed by The Building Coder in the topic group on [Idling and External Events for Modeless Access and Driving Revit from Outside](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28).
+
+https://forums.autodesk.com/t5/revit-api-forum/using-mvvm-amp-wpf-with-transaction-amp-doc-regenerate/m-p/8207716
+using mvvm & wpf with transaction & doc.regenerate()
+[Q]
+i'm working on simple command
+it have wpf form bonded to class as per mvvm methods
+i call the wpf from my command and it show up using wpf,show();
+i use the form and change data then click the buttom to run command on viewmodel from my form as usual in mvvm to pick the objects and change its data
+i can close my form
+when selecting the object after that i can see that parameter data has changed as i want but document can't fell that changes and i can't generate the document
+my problem is i cant use transaction.start on my mvvm command and ca't regenerate the document to see the changes in the tags
+how can i solve that?
+[A]
+It sounds as if your WPF form is not running as a modal form within a valid Revit API context.
+Consequently, you are trying to access Revit and its API from outside. This is basically not possible. A workaround exists via the use of an external event:
+http://www.revitapidocs.com/2018/05089477-4612-35b2-81a2-89c4f44370ea.htm
+This issue was recently discussed in another thread on Revit API with WPF:
+https://forums.autodesk.com/t5/revit-api-forum/revit-api-with-wpf/m-p/8209618
+The official approach is presented in the Revit SDK sample ModelessDialog/ModelessForm_ExternalEvent.
+Many other discussions and solutions are listed by The Building Coder in the topic group on Idling and External Events for Modeless Access and Driving Revit from Outside:
+http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28
+
+
+ #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+
+&ndash; 
+...
 
 --->
 
