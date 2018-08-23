@@ -29,7 +29,10 @@ The Revit 2019 API includes numerous exciting enhancements for add-in developers
 --->
 
 <h3>What's New in the Revit 2019.1 API</h3>
-<p>The Revit 2019.1 API includes numerous exciting enhancements for add-in developers.</p>
+<p>As I mentioned last week,
+the <a href="http://thebuildingcoder.typepad.com/blog/2018/08/revit-20191-cefsharp-forge-accelerator-in-rome.html#2">Revit 2019.1 update</a> has
+been released.</p>
+<p>It is equipped with an updated API that includes several exciting enhancements for add-in developers.</p>
 <p>Many relate directly to explicit developer wishes and requests:</p>
 <ul>
 <li><a href="#1">Information Sources</a> </li>
@@ -271,7 +274,7 @@ in the <a href="http://help.autodesk.com/view/RVT/2019/ENU">Revit 2019 Help</a>.
 <li>Autodesk.Revit.UI.UIApplication.MainWindowHandle</li>
 <li>Autodesk.Revit.UI.UIControlledApplication.MainWindowHandle</li>
 </ul>
-<p>This handle should be used when displaying modal dialogs and message windows to insure that they are properly parented. Use these properties instead of System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle, which is no longer a reliable method for retrieving the main window handle starting with Revit 2019.</p>
+<p>This handle should be used when displaying modal dialogs and message windows to ensure that they are properly parented. Use these properties instead of System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle, which is no longer a reliable method for retrieving the main window handle starting with Revit 2019.</p>
 <h4><a name="3.1.4.2"></a> Changes to PostableCommand enumeration</h4>
 <p>Some commands were renamed or removed as a result of changes to Revit's windowing system:</p>
 <ul>
@@ -314,7 +317,7 @@ The new class:</p>
 <ul>
 <li>BasicFileInfo.Extract()</li>
 </ul>
-<p>from a version of Revit prior to Revit 2019 will result in an exception if it is called on a Revit 2019 or later file. The class and method documentation has been clarified to reflect this posssibility that may occur again in the future.</p>
+<p>from a version of Revit prior to Revit 2019 will result in an exception if it is called on a Revit 2019 or later file. The class and method documentation has been clarified to reflect this possibility that may occur again in the future.</p>
 <p>The following BasicFileInfo property was deprecated and replaced:</p>
 <ul>
 <li>Deprecated property &rarr; Replacement/new property &ndash; Notes</li>
@@ -372,7 +375,7 @@ The new class:</p>
 <ul>
 <li>Document.Title</li>
 </ul>
-<p>honored the Windows user setting requiring dlsplay of file extensions. The property has been changed to consistently return a title with no extension.</p>
+<p>honoured the Windows user setting requiring dlsplay of file extensions. The property has been changed to consistently return a title with no extension.</p>
 <h4><a name="3.1.10"></a> View printing &amp; exporting &ndash; activation events behavioral change</h4>
 <p>Because of an improvement to Revit processing, views will no longer be activated prior to being printed or exported. This means that the ViewActivating and ViewActivated events are no longer triggered as each view is printed or exported from a set.</p>
 <h4><a name="3.1.11"></a> Structural API change</h4>
@@ -386,7 +389,7 @@ The new class:</p>
 <ul>
 <li>Autodesk.Revit.DB.Structure.Rebar.GetShapeId()</li>
 </ul>
-<p>now throws an exception if the rebar is a free-form which has multiple shapes (ie. its WorkshopInstructions type is Bent.)</p>
+<p>now throws an exception if the rebar is a free-form which has multiple shapes (i.e., its WorkshopInstructions type is Bent).</p>
 <h4><a name="3.1.13"></a> MEP API changes</h4>
 <p>The following members have been deprecated:</p>
 <ul>
@@ -452,7 +455,7 @@ The new class:</p>
 </center></p>
 <h4><a name="3.2.17"></a> Material API additions</h4>
 <h4><a name="3.2.17.1"></a> Editing the properties of an Appearance Asset</h4>
-<p>New Revit API capabilties have been introduced to edit the properties contained in an appearance asset of a material. These properties appear in the Appearance tab of the Materials dialog and govern the appearance of the material in realistic views and rendering.</p>
+<p>New Revit API capabilities have been introduced to edit the properties contained in an appearance asset of a material. These properties appear in the Appearance tab of the Materials dialog and govern the appearance of the material in realistic views and rendering.</p>
 <p>Editing the properties in an appearance Asset requires establishment of an edit scope. The new class</p>
 <ul>
 <li>Autodesk.Revit.DB.Visual.AppearanceAssetEditScope</li>
@@ -721,11 +724,11 @@ The new class:</p>
 <ul>
 <li>SteelElementProperties.AddFabricationInformationForRevitElements()</li>
 </ul>
-<p>If you have a fabrication id, you can lookup the corresponding Revit element using:</p>
+<p>If you have a fabrication id, you can look up the corresponding Revit element using:</p>
 <ul>
 <li>SteelElementProperties.GetReference()</li>
 </ul>
-<p>This may return a reference to an element or a subelement.</p>
+<p>This may return a reference to an element or a sub-element.</p>
 <h4><a name="3.2.24.2"></a> Custom steel connections &ndash; API additions</h4>
 <p>The new method:</p>
 <ul>
@@ -753,8 +756,8 @@ The new class:</p>
 </ul>
 <p>returns the shape of the profile for the MEP curve type.</p>
 <h4><a name="3.2.25.2"></a> Mechanical Equipment Set API</h4>
-<p>Two new classes allow creation and manipulation of a mechanical equipment set, which is a set of interrelated mechanical equipment in an MEP system that may operate in parallel. This release is limited to supporting one or more pump sets that are part of a piping system. The mechanical equipment set settings will be used for the MEP flow and pressure drop calculations.</p>
-<p>The Element subclass Autodesk.Revit.DB.Mechanical.MechanicalEquipmentSet represents an instance of a set associated to an MEP system. It includes:</p>
+<p>Two new classes allow creation and manipulation of a mechanical equipment set, which is a set of interrelated mechanical equipment in a MEP system that may operate in parallel. This release is limited to supporting one or more pump sets that are part of a piping system. The mechanical equipment set settings will be used for the MEP flow and pressure drop calculations.</p>
+<p>The Element subclass Autodesk.Revit.DB.Mechanical.MechanicalEquipmentSet represents an instance of a set associated to a MEP system. It includes:</p>
 <p>The new members:</p>
 <ul>
 <li>MechanicalEquipmentSet.Create()</li>
@@ -826,7 +829,7 @@ The new class:</p>
 <ul>
 <li>Autodesk.Revit.DB.FabricationVersionInfo</li>
 </ul>
-<p>gives the information about differerent versions of fabrication data, including the reason why the data was changed.</p>
+<p>gives the information about different versions of fabrication data, including the reason why the data was changed.</p>
 <p>The new method:</p>
 <ul>
 <li>FabricationPart.GetVersionHistory()</li>
@@ -855,7 +858,7 @@ The new class:</p>
 <ul>
 <li>AnalysisDisplayColoredSurfaceSettings.Transparency</li>
 </ul>
-<p>allows for the use of transparency in the display of the colored surface.</p>
+<p>allows for the use of transparency in the display of the coloured surface.</p>
 <h4><a name="3.2.28"></a> IFC additions</h4>
 <p>The new functions:</p>
 <ul>
@@ -894,4 +897,4 @@ The new class:</p>
 <ul>
 <li>BeforeExecutedEventArgs.Cancel</li>
 </ul>
-<p>is now permitted to be set to true. This allows the callback to cancel the execution of the impending command. This can be useful if an add-in wishes to selectively allow the command to proceed based on interactions which take place in this callback. The property should also report the cancellation status if it has been canceled by a different subscriber.</p>
+<p>is now permitted to be set to true. This allows the callback to cancel the execution of the impending command. This can be useful if an add-in wishes to selectively allow the command to proceed based on interactions which take place in this callback. The property should also report the cancellation status if it has been cancelled by a different subscriber.</p>
