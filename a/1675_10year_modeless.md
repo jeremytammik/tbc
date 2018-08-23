@@ -48,7 +48,7 @@ The official approach is presented in the Revit SDK sample ModelessDialog/Modele
 Many other discussions and solutions are listed by The Building Coder in the topic group on Idling and External Events for Modeless Access and Driving Revit from Outside:
 http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+Ten Years Anniversary and Revit add-ins using MVVM, WPF and WinForm in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/tbc10years
 
 Today is The Building Coder's tenth birthday!
 The first post was a warm welcome on August 22, 2008.
