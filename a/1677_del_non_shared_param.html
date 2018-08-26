@@ -80,12 +80,11 @@ how to delete a shared parameter, but I could not find the proper way to delete 
 <p>If you delete that element, the non-shared parameter will also be removed. </p>
 </blockquote>
 <p>I verified this with the following sample code:</p>
-<pre class="code>
+<pre class="code>">
 &nbsp;&nbsp;<span style="color:blue;">void</span>&nbsp;DeleteNonSharedProjectParam(&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc,&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;parametername&nbsp;)
 &nbsp;&nbsp;{
-
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;ps
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()

@@ -132,12 +132,11 @@ They responded:
 
 I verified this with the following sample code:
  
-<pre class="code>
+<pre class="code>">
 &nbsp;&nbsp;<span style="color:blue;">void</span>&nbsp;DeleteNonSharedProjectParam(&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc,&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;parametername&nbsp;)
 &nbsp;&nbsp;{
- 
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;ps
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
