@@ -110,9 +110,28 @@ how to delete a shared parameter, but I could not find the proper way to delete 
 
 <p>It works as expected.</p>
 <p>I hope this helps.</p>
+<p>Many thanks again to Zhong for his clear analysis and nice solution.</p>
 <p>I added Zhong's solution to
 to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder Samples</a> 
 in <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.143.2">release 2019.0.143.2</a>.</p>
 <p>You can see the changes I made by looking at
 the <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2019.0.143.1...2019.0.143.2">diff to the preceding release</a>.</p>
-<p>Many thanks again to Zhong for his clear analysis and nice solution.</p>
+<p>I later noticed that Zhong's code can be shortened a little bit further like this making use of a LINQ <code>Where</code> clause:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">ParameterElement</span>&nbsp;projectparameter
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">ParameterElement</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">ParameterElement</span>&gt;()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Where(&nbsp;e&nbsp;=&gt;&nbsp;e.GetDefinition()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Name.Equals(&nbsp;parametername&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.FirstOrDefault();
+
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;projectparameter&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;doc.Delete(&nbsp;projectparameter.Id&nbsp;);
+&nbsp;&nbsp;}
+</pre>
+
+<p>The modification is preserved
+in <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.143.3">The Building Coder samples release 2019.0.143.3</a>.</p>

@@ -164,6 +164,8 @@ It works as expected.
 
 I hope this helps.
 
+Many thanks again to Zhong for his clear analysis and nice solution.
+
 I added Zhong's solution to
 to [The Building Coder Samples](https://github.com/jeremytammik/the_building_coder_samples) 
 in [release 2019.0.143.2](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.143.2).
@@ -171,4 +173,24 @@ in [release 2019.0.143.2](https://github.com/jeremytammik/the_building_coder_sam
 You can see the changes I made by looking at
 the [diff to the preceding release](https://github.com/jeremytammik/the_building_coder_samples/compare/2019.0.143.1...2019.0.143.2).
 
-Many thanks again to Zhong for his clear analysis and nice solution.
+I later noticed that Zhong's code can be shortened a little bit further like this making use of a LINQ `Where` clause:
+
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">ParameterElement</span>&nbsp;projectparameter
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">ParameterElement</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">ParameterElement</span>&gt;()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Where(&nbsp;e&nbsp;=&gt;&nbsp;e.GetDefinition()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Name.Equals(&nbsp;parametername&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.FirstOrDefault();
+ 
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;projectparameter&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;doc.Delete(&nbsp;projectparameter.Id&nbsp;);
+&nbsp;&nbsp;}
+</pre>
+
+The modification is preserved
+in [The Building Coder samples release 2019.0.143.3](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.143.3).
+
