@@ -166,6 +166,12 @@ I hope this helps.
 
 Many thanks again to Zhong for his clear analysis and nice solution.
 
+This version is slightly updated from the code posted by Zhong in the forum discussion thread, because there is no need to use `ToElements` if you just want to iterate over the results of a filtered element collector.
+
+You can iterate directly over the collector itself.
+
+Using `ToElements` crerates a copy of the information and uses time and space for no reason.
+
 I added Zhong's solution to
 to [The Building Coder Samples](https://github.com/jeremytammik/the_building_coder_samples) 
 in [release 2019.0.143.2](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.143.2).
@@ -191,6 +197,6 @@ I later noticed that Zhong's code can be shortened a little bit further like thi
 &nbsp;&nbsp;}
 </pre>
 
-The modification is preserved
+The latter modification is preserved
 in [The Building Coder samples release 2019.0.143.3](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.143.3).
 

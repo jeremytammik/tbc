@@ -111,6 +111,9 @@ how to delete a shared parameter, but I could not find the proper way to delete 
 <p>It works as expected.</p>
 <p>I hope this helps.</p>
 <p>Many thanks again to Zhong for his clear analysis and nice solution.</p>
+<p>This version is slightly updated from the code posted by Zhong in the forum discussion thread, because there is no need to use <code>ToElements</code> if you just want to iterate over the results of a filtered element collector.</p>
+<p>You can iterate directly over the collector itself.</p>
+<p>Using <code>ToElements</code> crerates a copy of the information and uses time and space for no reason.</p>
 <p>I added Zhong's solution to
 to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder Samples</a> 
 in <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.143.2">release 2019.0.143.2</a>.</p>
@@ -133,5 +136,5 @@ the <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/
 &nbsp;&nbsp;}
 </pre>
 
-<p>The modification is preserved
+<p>The latter modification is preserved
 in <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.143.3">The Building Coder samples release 2019.0.143.3</a>.</p>
