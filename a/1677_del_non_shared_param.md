@@ -9,7 +9,7 @@
 
 <!---
 
- #RevitAPI  @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
+Two new colleagues and deleting a non-shared project parameter in the #RevitAPI  @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/delnonsharedparam
 
 Some happy news about two new Revit API supporter colleagues, Naveen Kumar and Zhong Wu.
 They already reached second and third place in the list of top solution providers.
