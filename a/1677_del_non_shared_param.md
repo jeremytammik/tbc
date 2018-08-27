@@ -11,8 +11,14 @@
 
  #RevitAPI  @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
 
-&ndash; 
-...
+Some happy news about two new Revit API supporter colleagues, Naveen Kumar and Zhong Wu.
+They already reached second and third place in the list of top solution providers.
+Here is also a very relevant recent case handled by Zhong
+&ndash; Top solution authors
+&ndash; Naveen on Naveen
+&ndash; Zhong shifts to AEC
+&ndash; Zhong on Zhong
+&ndash; Deleting a non-shared project parameter...
 
 --->
 
@@ -24,11 +30,11 @@ They already reached second and third place in the list of top solution provider
 
 Here is also a very relevant recent case handled by Zhong:
 
-- [Top Solution Authors](#2) 
+- [Top solution authors](#2) 
 - [Naveen on Naveen](#3) 
-- [Zhong in FPD](#4) 
+- [Zhong shifts to AEC](#4) 
 - [Zhong on Zhong](#5) 
-- [Deleting a Non-Shared Project Parameter](#6)
+- [Deleting a non-shared project parameter](#6)
 
 ####<a name="2"></a> Top Solution Authors
 
@@ -56,7 +62,7 @@ Apart from this, I am a mime Artist and love to do pencil sketching.
 
 I enjoy watching movies and am a huge fan of music, only movie songs; my favourite composer is A.R Rahman.
 
-####<a name="4"></a> Zhong in FPD
+####<a name="4"></a> Zhong shifts to AEC
 
 Zhong started working with the Revit API quite recently.
 
