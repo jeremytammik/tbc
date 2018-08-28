@@ -25,6 +25,10 @@ He now adds something really special to celebrate this:
 - [PurgeTool.vb implements GetPurgeableElements](#3) 
 - [PurgeUnused.vb External Command](#4) 
 
+<center>
+<img src="img/broomstick.png" alt="Broomstick" width="201"/>
+</center>
+
 ####<a name="2"></a> Purge Unused using the Performance Adviser
 
 I’m sharing with you a new discovery of mine.
@@ -146,6 +150,3 @@ by [PurgeUnused.vb](https://gitlab.com/MattTaylor/RevitPurgeUnused/blob/master/P
   End If
 </pre>
 
-<center>
-<img src="img/broomstick.png" alt="Broomstick" width="201"/>
-</center>
