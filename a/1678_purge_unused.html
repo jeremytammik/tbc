@@ -7,8 +7,9 @@
 
  in the #RevitAPI  @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/delnonsharedparam
 
-&ndash; 
-...
+Matt Taylor of WSP shares a solution to Purge Unused using the Performance Adviser
+&ndash; <code>PurgeTool.vb</code> implements <code>GetPurgeableElements</code>
+&ndash; <code>PurgeUnused.vb</code> external command...
 
 --->
 
@@ -19,7 +20,7 @@ on <a href="http://thebuildingcoder.typepad.com/blog/2018/08/ten-years-anniversa
 <p>He now adds something really special to celebrate this:</p>
 <ul>
 <li><a href="#2">Purge Unused using the Performance Adviser</a> </li>
-<li><a href="#3">PurgeTool.vb implements GetPurgeableElements</a> </li>
+<li><a href="#3">PurgeTool.vb implements <code>GetPurgeableElements</code></a> </li>
 <li><a href="#4">PurgeUnused.vb External Command</a> </li>
 </ul>
 <p><center>
@@ -36,6 +37,12 @@ do a similar job to the native <code>Purge Unused</code> command.</p>
 my <a href="https://gitlab.com/MattTaylor/RevitPurgeUnused">RevitPurgeUnused GitLab repository</a>.</p>
 <p>While the code will compile back to Revit 2012, it actually throws an <code>InternalException</code> for versions 2012-2016 (in my experience).</p>
 <p>It doesn’t do a perfect job (e.g., it doesn’t purge materials and material assets), but it is very, very good, and quite fast.</p>
+<p>I also added a note of my solution to some of the existing threads on this topic in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>:</p>
+<ul>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/purge-unused-via-the-api/m-p/8229573">Purge Unused Via the API</a></li>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/cf-1201-purge-unused-objects/m-p/8229574">CF-1201 <em>Purge unused objects</em></a></li>
+</ul>
 <p>Very many thanks to Matt for sharing this solution to one of the top developer wish list items!</p>
 <h4><a name="3"></a> PurgeTool.vb implements GetPurgeableElements</h4>
 <p>Here is Matt's VB.NET code
