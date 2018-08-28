@@ -13,7 +13,7 @@
 
 --->
 
-### Purge Unused using the Performance Adviser
+### Purge Unused using Performance Adviser
 
 Matt Taylor, associate and CAD developer at [WSP](https://www.wsp.com),
 was [the first to congratulate](http://thebuildingcoder.typepad.com/blog/2018/08/ten-years-anniversary-and-revit-api-with-mvvm-wpf-and-winform.html#comment-4053631853)
