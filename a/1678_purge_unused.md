@@ -6,7 +6,7 @@
 
 <!---
 
- in the #RevitAPI  @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/delnonsharedparam
+Purge Unused in the #RevitAPI using Performance Adviser @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/purgeunused
 
 Matt Taylor of WSP shares a solution to Purge Unused using the Performance Adviser
 &ndash; <code>PurgeTool.vb</code> implements <code>GetPurgeableElements</code>

@@ -451,3 +451,24 @@ I am currently using the active view's detail level in my geometry options. For 
 <pre class="code">
   gOptions.DetailLevel = doc.ActiveView.DetailLevel;
 </pre>
+
+#### <a name="6"></a>Reformat Stable Representation String for Dimensioning
+
+Joshua Lumley added an important note on using the stable references to create dimensioning in
+his [comment below](http://thebuildingcoder.typepad.com/blog/2016/04/stable-reference-string-magic-voodoo.html#comment-4068022721):
+
+When creating dimensions based on objects from linked files, you may see an error message saying *Invalid number of references*.
+
+To resolve that, all you do is rearrange the string a little to match the following format:
+
+<pre>
+  fb332d47-8286-4829-bd40-46c26de8ebac-000258d5:0:RVTLINK:2796184:1:SURFACE/5"
+</pre>
+
+You do NOT want this:
+
+<pre>
+  fb332d47-8286-4829-bd40-46c26de8ebac-000258d5:RVTLINK/fb332d47-8286-4829-bd40-46c26de8ebac-000258d4:2796184:1:SURFACE/5"
+</pre>
+
+Many thanks to Joshua for pointing it out!
