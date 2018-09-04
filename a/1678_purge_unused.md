@@ -16,6 +16,10 @@ Matt Taylor of WSP shares a solution to Purge Unused using the Performance Advis
 
 ### Purge Unused using Performance Adviser
 
+We repeatedly looked at ways to detect and purge unused elements. 
+A list of some previous discussions of the topic was given last time we looked
+at [purge and detecting an empty view](http://thebuildingcoder.typepad.com/blog/2017/11/purge-and-detecting-an-empty-view.html).
+
 Matt Taylor, associate and CAD developer at [WSP](https://www.wsp.com),
 was [the first to congratulate](http://thebuildingcoder.typepad.com/blog/2018/08/ten-years-anniversary-and-revit-api-with-mvvm-wpf-and-winform.html#comment-4053631853)
 on [The Building Coder's ten-year anniversary](http://thebuildingcoder.typepad.com/blog/2018/08/ten-years-anniversary-and-revit-api-with-mvvm-wpf-and-winform.html).
@@ -35,7 +39,7 @@ He now adds something really special to celebrate this:
 I’m sharing with you a new discovery of mine.
  
 Apparently, nobody has previously publicly discovered a simple and effective way of purging all unused elements.
- 
+
 I now found one:
 
 I have successfully used

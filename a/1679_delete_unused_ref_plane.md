@@ -29,7 +29,7 @@
 
 
 <center>
-<img src="img/2018-08-26_top_solution_author.png" alt="Top solution authors" width="233"/>
+<img src="img/2018-08-.png" alt="" width="233"/>
 </center>
 
 
