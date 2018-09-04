@@ -172,7 +172,8 @@ Many thanks for your helpful contributions, Joshua!
 ####<a name="6"></a> Deleting Unnamed Non-Hosting Reference Planes Updated 
 
 Another important update was initiated by Austin Sudtelgte, who pointed out that the approach described in 2014
-for [deleting unnamed non-hosting reference planes](http://thebuildingcoder.typepad.com/blog/2014/02/deleting-unnamed-non-hosting-reference-planes.html) no longer works. Austin adds:
+for [deleting unnamed non-hosting reference planes](http://thebuildingcoder.typepad.com/blog/2014/02/deleting-unnamed-non-hosting-reference-planes.html) no longer works.
+[Austin adds](http://thebuildingcoder.typepad.com/blog/2014/02/deleting-unnamed-non-hosting-reference-planes.html#comment-3985629186):
 
 > As of 2017 this method no longer works, because Revit doesn't throw an error when deleting a plane with something hosted to it. You will have to get all family instances in the document, check their host ID parameter, get all reference planes excluding the ones whose IDs we just collected, then delete. Dimensions that measure to a reference plane will be removed with the reference plane. The methods used above will still work to determine if one of those will be deleted or not. Alternatively, as of 2018.1, there is an `Element.GetDependentElements` method that will return the same things as what is returned when deleting the element, just without having to delete it and roll back a transaction.
 
