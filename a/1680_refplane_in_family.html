@@ -22,13 +22,15 @@
 
  in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+Today I highlight two of Fair59's numerous solutions in the Revit API forum, and also mention a joke I picked up in a Swedish cartoon
+&ndash; Fadaesen on racism versus realism
+&ndash; Retrieving a reference plane location in a family instance
+&ndash; Accessing the Revit ribbon icons...
 
 --->
 
-<h3>Reference Plane Location in Family Instance</h3>
-<p>A little joke I picked up in a Swedish cartoon</p>
+<h3>Icon Access and Reference Plane in Family Instance</h3>
+<p>Today I highlight two of Fair59's numerous solutions in the Revit API forum, and also mention a joke I picked up in a Swedish cartoon:</p>
 <ul>
 <li><a href="#2">Fadaesen on racism versus realism</a> </li>
 <li><a href="#3">Retrieving a reference plane location in a family instance</a> </li>
@@ -56,7 +58,7 @@ I visited Sweden in the beginning of August for a week's hiking.</p>
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>,
 such as for this thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/get-position-referenceplane-in-familyinstance/m-p/8243347">getting the position of a reference plane in a family instance</a>:</p>
-<p><strong>Question:</strong> Is it possible get the position of a reference plane in a family instance that is not aligned with any mass or other object?</p>
+<p><strong>Question:</strong> Is it possible to determine the position of a reference plane in a family instance that is not aligned with any mass or other object?</p>
 <p>I need its direction and position.</p>
 <p>I tried to use the <code>ReferenceIntersector</code>, but it does not detect this reference.</p>
 <p><strong>Answer:</strong> You could start out from the very informative and useful previous thread on retrieving
@@ -106,18 +108,18 @@ However, from the dimension in the code, you could also find a point on the plan
 </pre>
 
 <p>Many thanks to Frank <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/2083518">@Fair59</a> Aarssen
-for this effective solution, and his many other helpful answers, and
-to and Alexander <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478">@aignatovich</a> Ignatovich, aka Александр Игнатович, for the blog post suggestion.</p>
+for this effective solution, and his many other helpful answers, and also 
+to Alexander <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478">@aignatovich</a> Ignatovich, aka Александр Игнатович, for the blog post suggestion.</p>
 <p>By the way, I added this method 
 to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>,
 which heretofore lacked any example at all of using the relatively new family instance <code>GetReferences</code> method, in
 the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdDimensionInstanceOrigin.cs">module <code>CmdDimensionInstanceOrigin.cs</code></a>.</p>
 <h4><a name="4"></a> Accessing the Revit Ribbon Icons</h4>
-<p>Fair59 and Matt Taylor also recently provided another useful forum answer,
+<p>Fair59 and Matt Taylor also recently provided another useful forum answer, in the two threads 
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-ribbon-icons-pictograms/m-p/8126270">Revit ribbon icons and pictograms</a>
 and <a href="https://forums.autodesk.com/t5/revit-api-forum/view-icons-in-revit/m-p/7156748">view icons in Revit</a>:</p>
 <p><strong>Question:</strong> I would like to display icons instead of dumb text in my add-in ribbon user interface.</p>
-<p>Does anybody where I can find the built-in Revit icons and pictorgrams?</p>
+<p>Does anybody where I can find the built-in Revit icons and pictograms?</p>
 <p><strong>Answer:</strong> You can quickly check to see what icons are available in any DLL by:</p>
 <ul>
 <li>Right click on any desktop shortcut &gt; Properties &gt; Change Icon &gt; Browse to the DLL file.</li>

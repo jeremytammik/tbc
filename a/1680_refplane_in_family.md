@@ -23,14 +23,16 @@
 
  in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+Today I highlight two of Fair59's numerous solutions in the Revit API forum, and also mention a joke I picked up in a Swedish cartoon
+&ndash; Fadaesen on racism versus realism
+&ndash; Retrieving a reference plane location in a family instance
+&ndash; Accessing the Revit ribbon icons...
 
 --->
 
-### Reference Plane Location in Family Instance
+### Icon Access and Reference Plane in Family Instance
 
-A little joke I picked up in a Swedish cartoon
+Today I highlight two of Fair59's numerous solutions in the Revit API forum, and also mention a joke I picked up in a Swedish cartoon:
 
 - [Fadaesen on racism versus realism](#2) 
 - [Retrieving a reference plane location in a family instance](#3) 
@@ -67,7 +69,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 such as for this thread
 on [getting the position of a reference plane in a family instance](https://forums.autodesk.com/t5/revit-api-forum/get-position-referenceplane-in-familyinstance/m-p/8243347):
 
-**Question:** Is it possible get the position of a reference plane in a family instance that is not aligned with any mass or other object?
+**Question:** Is it possible to determine the position of a reference plane in a family instance that is not aligned with any mass or other object?
 
 I need its direction and position.
 
@@ -124,8 +126,8 @@ You can create a sketch plane using the reference, then query the origin and nor
 </pre>
 
 Many thanks to Frank [@Fair59](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/2083518) Aarssen
-for this effective solution, and his many other helpful answers, and
-to and Alexander [@aignatovich](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478) Ignatovich, aka Александр Игнатович, for the blog post suggestion.
+for this effective solution, and his many other helpful answers, and also 
+to Alexander [@aignatovich](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478) Ignatovich, aka Александр Игнатович, for the blog post suggestion.
 
 By the way, I added this method 
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples),
@@ -135,13 +137,13 @@ the [module `CmdDimensionInstanceOrigin.cs`](https://github.com/jeremytammik/the
 
 ####<a name="4"></a> Accessing the Revit Ribbon Icons
 
-Fair59 and Matt Taylor also recently provided another useful forum answer,
+Fair59 and Matt Taylor also recently provided another useful forum answer, in the two threads 
 on [Revit ribbon icons and pictograms](https://forums.autodesk.com/t5/revit-api-forum/revit-ribbon-icons-pictograms/m-p/8126270)
 and [view icons in Revit](https://forums.autodesk.com/t5/revit-api-forum/view-icons-in-revit/m-p/7156748):
 
 **Question:** I would like to display icons instead of dumb text in my add-in ribbon user interface.
 
-Does anybody where I can find the built-in Revit icons and pictorgrams?
+Does anybody where I can find the built-in Revit icons and pictograms?
 
 **Answer:** You can quickly check to see what icons are available in any DLL by:
 

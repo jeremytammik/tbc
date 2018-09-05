@@ -86,7 +86,9 @@ Thank you, Alain, and thank you, Bea, for inviting and organising!
 
 ####<a name="3"></a> B&ouml;s Fulen Mountain Hike
 
-I followed up on the dance workshop with a mountain hike with Alex to the [B&ouml;s Fulen](https://en.wikipedia.org/wiki/B%C3%B6s_Fulen):
+I followed up on the dance workshop with a mountain hike with Alex to
+the [B&ouml;s Fulen](https://en.wikipedia.org/wiki/B%C3%B6s_Fulen),
+highest mountain in the Swiss Canton Schwyz:
 
 <center>
 <img src="img/boes_fulen.png" alt="B&ouml;s Fulen" width="269"/>
@@ -94,8 +96,14 @@ I followed up on the dance workshop with a mountain hike with Alex to the [B&oum
 
 In spite of its looks, it in in fact a pretty easy hike across the entire ridge a couple of hundred meters to the summit.
 
-Unfortunately, the weather we had was not as good as in the picture.
+Unfortunately, the weather we had was not as good as in the picture above.
 We had some sight, though much of it was of dramatic clouds forming all around us, and we got pretty wet walking out again.
+
+Here is Alex' [15-minute GoPro video of the foggy walk back across the ridge](https://youtu.be/jPsrhhfrUGs), just before the rain started coming in fully:
+
+<center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/jPsrhhfrUGs" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</center>
 
 
 ####<a name="4"></a> Using ReferenceIntersector to Place Lighting Fixture on Ceiling Face
