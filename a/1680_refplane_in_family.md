@@ -21,7 +21,7 @@
 - Fadaesen on Racism
   /a/doc/revit/tbc/git/a/img/2018-08-14_marja_nyberg_fadaesen.jpg
 
- in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+@AutodeskRevit icon access and determining a reference plane location in a family instance in the #revitapi #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/refplaneininstance
 
 Today I highlight two of Fair59's numerous solutions in the Revit API forum, and also mention a joke I picked up in a Swedish cartoon
 &ndash; Fadaesen on racism versus realism
