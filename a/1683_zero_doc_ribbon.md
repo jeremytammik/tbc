@@ -172,7 +172,8 @@ of this month, September 24-28.
 
 I expect that it is too late to decide to join that one now.
 
-However, [you can still submit proposals for the Boston accelerator taking place in October](https://forums.autodesk.com/t5/bim-360-api-forum/forge-accelerator-boston-ma-october-1-5-2018/td-p/8249266):
+However, [you can still submit proposals for the Boston accelerator taking place in October](https://forums.autodesk.com/t5/bim-360-api-forum/forge-accelerator-boston-ma-october-1-5-2018/td-p/8249266)
+&ndash; note that the deadline for submitting one is next Saturday, September 15:
 
 The Forge team is finishing the review of proposals for the upcoming accelerator taking place in the Autodesk Boston office October 1-5.
 
