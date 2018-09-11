@@ -24,7 +24,7 @@
   Images attached.
   Natalia Polikarpova Re: Please tweet about Boston Accelerator
 
- #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim #dynamobim rvt2019addinwizards
+Support DLL, Zero Doc State and Forge Accelerators #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/zerodoc2019
 
 If you are interested in Forge programming, don't miss the upcoming deadline for proposals for the Boston Forge accelerator!
 Looking at the Revit API, I migrated my sample demonstrating how
@@ -36,7 +36,7 @@ Let's look at that, and another recurring topic, on loading add-in support DLLs
 
 -->
 
-### Enable Ribbon Items in Zero Document State Update
+### Support DLL, Zero Doc State and Forge Accelerators
 
 If you are interested in diving deep into Forge programming, don't miss the upcoming deadline for proposals for the Boston Forge accelerator!
 
