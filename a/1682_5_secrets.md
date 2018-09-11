@@ -9,7 +9,7 @@
 
 <!---
 
- #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim #dynamobim rvt2019addinwizards
+Five Secrets of #RevitAPI Coding @AutodeskRevit #adsk #aec #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/rvtaddinsecrets
 
 Joshua Lumley pointed out the recording he made for his BILT submission on five secrets of Revit API C# coding.
 Before getting to that, here are a couple of pictures from this last weekend's mountain tour

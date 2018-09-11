@@ -9,7 +9,7 @@
 
 <!---
 
-Revit 2019 Visual Studio .NET Add-in Wizards #revitAPI #3dwebcoder @AutodeskRevit #adsk #aec #bim #dynamobim http://bit.ly/wizard2019
+Revit 2019 Visual Studio .NET Add-in Wizards #RevitAPI @AutodeskRevit #adsk #aec #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/wizard2019
 
 I updated the Visual Studio Revit C# and VB add-in templates for Revit 2019.
 They enable you to create a new C# or VB Revit add-in in Visual Studio with one single click on File &gt; New &gt; Project... &gt; Visual Basic/Visual C# &gt; Revit 2019 Addin and define a complete skeleton Revit add-in, ready to immediately compile and run, including an add-in manifest file, external application and external command.
