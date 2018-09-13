@@ -27,8 +27,13 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+My colleague Zhong John Wu just solved a Revit API discussion forum issue on how to create dimension line for rebar.
+I took this as a prompt to clean out a bunch of other dimensioning related issues lurking in my infinite and growing to-do list
+&ndash; Create dimension line for rebar
+&ndash; Newly created dimensioning not displayed
+&ndash; Dimension leader remains visible after removal
+&ndash; Dimension wall centreline, centre and faces of core
+&ndash; Grid references for dimensioning...
 
 -->
 
@@ -38,7 +43,7 @@ My colleague Zhong John Wu just solved
 a [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) issue
 on how to [create dimension line for rebar](https://forums.autodesk.com/t5/revit-api-forum/create-dimension-line-for-rebar/m-p/8217536).
 
-I took this as a prompt to clean out a bunch of other dimensioning related issues dwelling in my infinite and growing to-do list:
+I took this as a prompt to clean out a bunch of other dimensioning related issues lurking in my infinite and growing to-do list:
 
 - [Create dimension line for rebar](#2) 
 - [Newly created dimensioning not displayed](#3) 
