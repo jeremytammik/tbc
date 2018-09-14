@@ -12,6 +12,10 @@
   https://forums.autodesk.com/t5/revit-api-forum/copy-dimensions-from-a-view-to-another/m-p/7226217 -- 13180620 [Copy dimensions from a View to another]
   https://forums.autodesk.com/t5/revit-api-forum/newdimension-dimension-created-but-not-visible/m-p/6340985
 
+- New Dimension are not Visible
+  https://forums.autodesk.com/t5/revit-api-forum/new-dimension-are-not-visible/m-p/8268048
+  get_linear_reference_from_surface.png
+
 - need to regen, or even move element to force regen
   13595991 [Removing dimension leader not visible - only after reselection or reopening mode]
   https://forums.autodesk.com/t5/revit-api-forum/removing-dimension-leader-not-visible-only-after-reselection-or/m-p/7545212
@@ -44,6 +48,7 @@ on how to <a href="https://forums.autodesk.com/t5/revit-api-forum/create-dimensi
 <ul>
 <li><a href="#2">Create dimension line for rebar</a> </li>
 <li><a href="#3">Newly created dimensioning not displayed</a> </li>
+<li><a href="#3b">Linear reference from surface filtering for all</a> </li>
 <li><a href="#4">Dimension leader remains visible after removal</a> </li>
 <li><a href="#5">Dimension wall centreline, centre and faces of core</a> </li>
 <li><a href="#6">Grid references for dimensioning</a> </li>
@@ -363,6 +368,33 @@ once again comes to the rescue:</p>
 <li><a href="https://forums.autodesk.com/t5/revit-api-forum/newdimension-dimension-created-but-not-visible/m-p/6340985">NewDimension - dimension created but not visible</a></li>
 </ul>
 <p>Fair59 says: The workaround for dimensions to model elements, is rather simple. Create a new Dimension, using the References from the non-visible dimension.</p>
+<h4><a name="3b"></a> Linear Reference from Surface Filtering for All</h4>
+<p>In yet another visibility question,
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/new-dimension-are-not-visible/m-p/8268048">new dimensions are not visible</a>,
+Unknowz describes another interesting approach:</p>
+<p><strong>Question:</strong> 
+I continued to check my code and found an interesting point which is probably at the origin of the problem. 
+I use this to obtain a reference to <code>theBiggestFace</code>:</p>
+<pre class="code">
+  PlanarFace planarFace = theBiggestFace as PlanarFace;
+  Reference refer = planarFace.Reference;
+</pre>
+
+<p>This returns a <code>Reference</code> whose <code>ElementReferenceType</code> is <code>REFERENCE_TYPE_SURFACE</code>. 
+However, in my case (with the faces parallel to the view), the dimensioning will only work with <code>REFERENCE_TYPE_LINEAR</code>.</p>
+<p><center>
+<img src="img/get_linear_reference_from_surface.png" alt="Rebar dimensioning" width="498">
+</center></p>
+<p>Do you have an idea of how to obtain a <code>Reference</code> with a type <code>Linear</code> from a <code>Surface</code> <code>Reference</code>?</p>
+<p>It's probably a simple additional line at my existing code, but I couldn't find it yet...</p>
+<p><strong>Solution:</strong> 
+Yes and No &ndash; I couldn’t properly find the reference line from the face, so now I do it another way.</p>
+<p>I catch all the geometry objects from the view, both visible and invisible, and filter all these elements to find:</p>
+<ul>
+<li>A reference line parallel to the middle axis of the face</li>
+<li>The closest reference to the middle axis</li>
+</ul>
+<p>It seems like a dirty solution, but it works, and, with good filtering, the performance stays acceptable.</p>
 <h4><a name="4"></a> Dimension Leader Remains Visible After Removal</h4>
 <p>Another dimensioning display issue that came up
 involves <a href="https://forums.autodesk.com/t5/revit-api-forum/removing-dimension-leader-not-visible-only-after-reselection-or/m-p/7545212">removing dimension leader not visible &ndash; only after reselection or reopening</a>.</p>

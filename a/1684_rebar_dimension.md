@@ -13,6 +13,10 @@
   https://forums.autodesk.com/t5/revit-api-forum/copy-dimensions-from-a-view-to-another/m-p/7226217 -- 13180620 [Copy dimensions from a View to another]
   https://forums.autodesk.com/t5/revit-api-forum/newdimension-dimension-created-but-not-visible/m-p/6340985
 
+- New Dimension are not Visible
+  https://forums.autodesk.com/t5/revit-api-forum/new-dimension-are-not-visible/m-p/8268048
+  get_linear_reference_from_surface.png
+
 - need to regen, or even move element to force regen
   13595991 [Removing dimension leader not visible - only after reselection or reopening mode]
   https://forums.autodesk.com/t5/revit-api-forum/removing-dimension-leader-not-visible-only-after-reselection-or/m-p/7545212
@@ -47,6 +51,7 @@ I took this as a prompt to clean out a bunch of other dimensioning related issue
 
 - [Create dimension line for rebar](#2) 
 - [Newly created dimensioning not displayed](#3) 
+- [Linear reference from surface filtering for all](#3b) 
 - [Dimension leader remains visible after removal](#4) 
 - [Dimension wall centreline, centre and faces of core](#5) 
 - [Grid references for dimensioning](#6) 
@@ -392,6 +397,42 @@ once again comes to the rescue:
 
 Fair59 says: The workaround for dimensions to model elements, is rather simple. Create a new Dimension, using the References from the non-visible dimension.
 
+
+#### <a name="3b"></a> Linear Reference from Surface Filtering for All
+
+In yet another visibility question,
+on [new dimensions are not visible](https://forums.autodesk.com/t5/revit-api-forum/new-dimension-are-not-visible/m-p/8268048),
+Unknowz describes another interesting approach:
+
+**Question:** 
+I continued to check my code and found an interesting point which is probably at the origin of the problem. 
+I use this to obtain a reference to `theBiggestFace`:
+
+<pre class="code">
+  PlanarFace planarFace = theBiggestFace as PlanarFace;
+  Reference refer = planarFace.Reference;
+</pre>
+
+This returns a `Reference` whose `ElementReferenceType` is `REFERENCE_TYPE_SURFACE`. 
+However, in my case (with the faces parallel to the view), the dimensioning will only work with `REFERENCE_TYPE_LINEAR`.
+
+<center>
+<img src="img/get_linear_reference_from_surface.png" alt="Rebar dimensioning" width="498">
+</center>
+
+Do you have an idea of how to obtain a `Reference` with a type `Linear` from a `Surface` `Reference`?
+
+It's probably a simple additional line at my existing code, but I couldn't find it yet...
+
+**Solution:** 
+Yes and No &ndash; I couldn’t properly find the reference line from the face, so now I do it another way.
+
+I catch all the geometry objects from the view, both visible and invisible, and filter all these elements to find:
+
+- A reference line parallel to the middle axis of the face
+- The closest reference to the middle axis
+
+It seems like a dirty solution, but it works, and, with good filtering, the performance stays acceptable.
 
 #### <a name="4"></a> Dimension Leader Remains Visible After Removal
 
