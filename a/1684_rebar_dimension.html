@@ -47,6 +47,7 @@ on how to <a href="https://forums.autodesk.com/t5/revit-api-forum/create-dimensi
 <li><a href="#4">Dimension leader remains visible after removal</a> </li>
 <li><a href="#5">Dimension wall centreline, centre and faces of core</a> </li>
 <li><a href="#6">Grid references for dimensioning</a> </li>
+<li><a href="#7">Simple, better grid references for dimensioning</a> </li>
 </ul>
 <h4><a name="2"></a> Create Dimension Line for Rebar</h4>
 <p><strong>Question:</strong> I'm struggling to create a rebar dimension line because I can't find a way to get the edges of the element in a section view:</p>
@@ -440,3 +441,19 @@ Richard Thomas suggested:</p>
 <p>If you only have the curve information to start with, you need to get the grid element from the curve's reference and then create a new reference from that.</p>
 <p>THE <code>Create.NewDimension</code> method expects the reference type of a grid or reference plane to be <code>REFERENCE_TYPE_NONE</code> (for element), not <code>REFERENCE_TYPE_SURFACE</code>.</p>
 </blockquote>
+<h4><a name="7"></a> Simple, Better Grid References for Dimensioning</h4>
+<p>My colleague Jim Jia adds:</p>
+<blockquote>
+<p>Please also look at the simple and better code to build reference for <code>Grid</code> below; we don't need to retrieve reference from <code>Grid</code> geometry. We verified that this works well:</p>
+</blockquote>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;a&nbsp;reference&nbsp;built&nbsp;directly&nbsp;from&nbsp;grid</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:#2b91af;">Reference</span>&nbsp;GetGridRef(&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementId</span>&nbsp;idGrid&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementId</span>(&nbsp;397028&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;eGrid&nbsp;=&nbsp;doc.GetElement(&nbsp;idGrid&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Reference</span>(&nbsp;eGrid&nbsp;);
+&nbsp;&nbsp;}
+</pre>

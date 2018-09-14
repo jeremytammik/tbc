@@ -50,6 +50,7 @@ I took this as a prompt to clean out a bunch of other dimensioning related issue
 - [Dimension leader remains visible after removal](#4) 
 - [Dimension wall centreline, centre and faces of core](#5) 
 - [Grid references for dimensioning](#6) 
+- [Simple, better grid references for dimensioning](#7) 
 
 
 #### <a name="2"></a> Create Dimension Line for Rebar
@@ -483,3 +484,21 @@ Richard Thomas suggested:
 
 > THE `Create.NewDimension` method expects the reference type of a grid or reference plane to be `REFERENCE_TYPE_NONE` (for element), not `REFERENCE_TYPE_SURFACE`.
 
+
+#### <a name="7"></a> Simple, Better Grid References for Dimensioning
+
+My colleague Jim Jia adds:
+
+> Please also look at the simple and better code to build reference for `Grid` below; we don't need to retrieve reference from `Grid` geometry. We verified that this works well:
+
+<pre class="code">
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;a&nbsp;reference&nbsp;built&nbsp;directly&nbsp;from&nbsp;grid</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:#2b91af;">Reference</span>&nbsp;GetGridRef(&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementId</span>&nbsp;idGrid&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementId</span>(&nbsp;397028&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;eGrid&nbsp;=&nbsp;doc.GetElement(&nbsp;idGrid&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Reference</span>(&nbsp;eGrid&nbsp;);
+&nbsp;&nbsp;}
+</pre>
