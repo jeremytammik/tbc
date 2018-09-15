@@ -417,7 +417,7 @@ This returns a `Reference` whose `ElementReferenceType` is `REFERENCE_TYPE_SURFA
 However, in my case (with the faces parallel to the view), the dimensioning will only work with `REFERENCE_TYPE_LINEAR`.
 
 <center>
-<img src="img/get_linear_reference_from_surface.png" alt="Rebar dimensioning" width="498">
+<img src="img/get_linear_reference_from_surface.png" alt="Get linear reference from surface" width="498">
 </center>
 
 Do you have an idea of how to obtain a `Reference` with a type `Linear` from a `Surface` `Reference`?
