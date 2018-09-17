@@ -10,7 +10,7 @@
 <!---
 
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Reality Solutions SDK enables RCP file read-write #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/rcpreadwrite
 
 Today, we proudly present a DLL for reading and writing RCP files,
 announcing the Reality Solutions SDK,
