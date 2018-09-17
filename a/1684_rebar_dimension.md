@@ -29,7 +29,7 @@
   https://forums.autodesk.com/t5/revit-api-forum/fail-to-get-reference-for-grid-for-dimension-in-2017/m-p/6636474
   https://forums.autodesk.com/t5/revit-api-forum/newdimension-between-grids-invalid-number-of-references/m-p/7459503
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Dimensioning leaders and references in the #RevitAPI for @AutodeskRevit rebar, grids, surfaces, wall centreline, centre and face of core #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/dimensionrefs
 
 My colleague Zhong John Wu just solved a Revit API discussion forum issue on how to create dimension line for rebar.
 I took this as a prompt to clean out a bunch of other dimensioning related issues lurking in my infinite and growing to-do list
