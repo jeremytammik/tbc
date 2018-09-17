@@ -12,14 +12,18 @@
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+Today, we proudly present a DLL for reading and writing RCP files,
+announcing the Reality Solutions SDK,
+providing full access to the Autodesk proprietary point cloud format
+&ndash; Announcing the Reality Solutions SDK
+&ndash; How do I access the SDK?
+&ndash; Discussion and support resources...
 
 -->
 
 ### Reality Solutions SDK Enables RCP File Read-Write
 
-Today, we proudly present a DLL for reading and writing RCP files,
+Today, rather belatedly, we proudly present a DLL for reading and writing RCP files,
 [announcing the Reality Solutions SDK](http://blogs.autodesk.com/recap/announcing-the-reality-solutions-sdk),
 which provides full access to the Autodesk proprietary point cloud format and
 is [available for free to registered ADN members](https://adn.autodesk.io/index.php?r=custom_pages%2Fview&id=174):
@@ -49,6 +53,8 @@ Use of the ReCap point cloud format spans across all industries from design to c
 All of these essential products access point clouds through the RCP file format.
 
 #### <a name="3"></a> How do I access the SDK?
+
+Two ways:
 
 Get in touch! [Email ask.recap@autodesk.com](mailto:ask.recap@autodesk.com) mentioning 'Reality Solutions SDK' in the subject line.
 
