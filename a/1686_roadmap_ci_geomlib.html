@@ -1,0 +1,78 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="run_prettify.js" type="text/javascript"></script>
+<!--
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
+-->
+</head></p>
+<!---
+
+- Sasha Crotty updated the [Revit Public Roadmap &ndash; September 2018](http://blogs.autodesk.com/revit/2018/09/14/revit-public-roadmap-september-2018)
+
+&ndash; Configuring CI to use the RevittestFramework](https://github.com/upcodes/RevitTestFramework/blob/mark/Revit2019/docs/using_with_ci.md)
+We recently discussed some [Revit Unit Test Framework Improvements](http://thebuildingcoder.typepad.com/blog/2018/08/revit-unit-test-framework-improvements.html).
+Mark Vulfson now added some very informative additional notes on [Configuring CI to use the RevittestFramework](https://github.com/upcodes/RevitTestFramework/blob/mark/Revit2019/docs/using_with_ci.md).
+Check them out if you have any ioterest in this topic.
+
+- geometry library in addition to revit
+a little [twitter discussion](https://twitter.com/HossZamani/status/1035128771735474179) on geometry library 
+with [Hoss Zamani](https://twitter.com/HossZamani)
+Q: This is an excerpt of the awesome Building Coder blog by @jeremytammik in 2008. 10 years from this post Revit still doesn't provide a solid Geometry library through its API? Is it only me that finds this absurd?
+img/readonlygeometrylibrary.jpg
+A: Yes.  :-)
+R: Lol. Apparently you're right 🙂 But why is that, that the developers are expected to have their own math library? Why a software that one of its main uses is to create geometry, makes it so hard to create & manipulate geometry through its API?
+A: because the main purpose is NOT to create geometry, like a geometry library, freeform, unrestricted. the one and only purpose is to manage a BIM, which is almost exactly the opposite of freeform unrestricted geometry.
+therefore, if you want to create geometry yourself, you really will need your own geometry library, and revit will not do very much to help. although its geometry library is gradually also adding some read-write access... previously, it was totally and purely read-only...
+
+ #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+
+Lots going on, and off to Rome next week for the Forge accelerator.
+Meanwhile, here three of the many topics recently discussed
+&ndash; Revit Public Roadmap &ndash; September 2018](#2) 
+&ndash; Configuring CI to use the RevitTestFramework RTF
+&ndash; Revit Geometry library limitations...
+
+-->
+
+<h3>Roadmap, CI for RTF, Geometry Library</h3>
+<p>Lots going on, and off to Rome next week for the Forge accelerator.</p>
+<p>Meanwhile, here three of the many topics recently discussed:</p>
+<ul>
+<li><a href="#2">Revit Public Roadmap &ndash; September 2018</a> </li>
+<li><a href="#3">Configuring CI to use the RevitTestFramework RTF</a> </li>
+<li><a href="#4">Revit Geometry library limitations</a> </li>
+</ul>
+<h4><a name="2"></a> Revit Public Roadmap &ndash; September 2018</h4>
+<p>Sasha Crotty updated the <a href="http://blogs.autodesk.com/revit/2018/09/14/revit-public-roadmap-september-2018">Revit Public Roadmap &ndash; September 2018</a>.</p>
+<p>Check it out to see where Revit is heading, and get some idea about why and how.</p>
+<p>To help drive development, please submit your wishes to the <a href="https://forums.autodesk.com/t5/revit-ideas/idb-p/302">Revit Idea Station</a> at <a href="http://www.autodesk.com/revitideas">www.autodesk.com/revitideas</a>.</p>
+<p>There is a tag for <a href="https://forums.autodesk.com/t5/revit-ideas/idb-p/302/label-name/api">API related wishes</a>.</p>
+<h4><a name="3"></a> Configuring CI to use the RevitTestFramework RTF</h4>
+<p>We recently discussed
+some <a href="http://thebuildingcoder.typepad.com/blog/2018/08/revit-unit-test-framework-improvements.html">Revit Unit Test Framework Improvements</a>.</p>
+<p>Mark Vulfson now added additional notes to that,
+on <a href="https://github.com/upcodes/RevitTestFramework/blob/mark/Revit2019/docs/using_with_ci.md">configuring CI to use the RevitTestFramework RTF</a>.</p>
+<p>Check them out if you have any interest in this specific topic, or even
+just <a href="https://en.wikipedia.org/wiki/Continuous_integration">continuous integration</a> in general.</p>
+<h4><a name="4"></a> Revit Geometry Library Limitations</h4>
+<p>People often ask why the Revit geometry library is not as full-fledged as some others, e.g., AutoCAD ObjectARX <code>AcGe</code>.</p>
+<p>Here are some thought of mine on that subject from 
+a <a href="https://twitter.com/HossZamani/status/1035128771735474179">twitter discussion on geometry library</a> 
+with <a href="https://twitter.com/HossZamani">Hoss Zamani</a>:</p>
+<p><strong>Question:</strong> This is an excerpt of the awesome Building Coder blog
+by <a href="https://twitter.com/jeremytammik">@jeremytammik</a> in 2008.</p>
+<p><center>
+<img src="img/readonlygeomliblimitation2008.jpg" alt="Read-only geometry library limitation in 2008" width="400">
+</center></p>
+<p>Ten years later, Revit still doesn't provide a solid geometry library through its API? Is it only me that finds this absurd?</p>
+<p><strong>Answer:</strong> Yes.  :-)</p>
+<p><strong>Response:</strong> Lol. Apparently you're right &nbsp; :-)</p>
+<p>But why is it that developers are expected to have their own math library?</p>
+<p>Why does a software, one of whose main uses is to create geometry, make it so hard to create and manipulate geometry through its API?</p>
+<p><strong>Answer:</strong> Because the main purpose of Revit is NOT to create geometry, like a geometry library, freeform, unrestricted.</p>
+<p>Its one and only purpose is to manage a BIM, which is almost exactly the opposite of freeform unrestricted geometry.</p>
+<p>Therefore, if you want to create geometry yourself, you really will need your own geometry library, and Revit will not do very much to help.</p>
+<p>Although, on the other hand, its geometry library is gradually also adding some read-write access.</p>
+<p>Previously, it was totally and purely read-only.</p>
+<p>Many thanks to Hoss for raising this pertinent question!</p>
