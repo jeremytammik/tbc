@@ -40,7 +40,7 @@ Meanwhile, here three of the many topics recently discussed
 
 Lots going on, and off to Rome next week for the Forge accelerator.
 
-Meanwhile, here three of the many topics recently discussed:
+Meanwhile, here are three of the many topics recently discussed:
 
 - [Revit Public Roadmap &ndash; September 2018](#2) 
 - [Configuring CI to use the RevitTestFramework RTF](#3) 
