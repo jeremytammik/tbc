@@ -123,7 +123,7 @@ As always, when you have no time, something else urgent cropped up as well requi
 
 I am making final travel preparations for the Forge accelerator in Rome next week, and need to start preparing for DevCon Europe as well.
 
-As always, when you have no time, something else urgent cropped up as well requiring immediate attention:
+As always, when you have no time to spare, something else urgent cropped up as well requiring immediate attention:
 
 - [Forge DevCon Europe coming](#2) 
 - [Hijacking Typepad search input for Google site search](#3) 
