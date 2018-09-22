@@ -100,7 +100,7 @@ type "IExternalCommandAvailability" in the search input text box and click 'Subm
 
 the built-in search reports that no results are found:
 
-No Results Found -- Sorry, there were no results returned for “IExternalCommandAvailability” — please check your spelling, or try something less specific.
+No Results Found -- Sorry, there were no results returned for “IExternalCommandAvailability” &ndash; please check your spelling, or try something less specific.
 
 i open a new tab with a google search engine limited to thebuildingcoder site, and it reports many results.
 
@@ -112,14 +112,21 @@ I have no other questions, thank you, Typepad.
 
  #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+I am making final travel preparations for the Forge accelerator in Rome next week, and need to start preparing for DevCon Europe as well.
+As always, when you have no time, something else urgent cropped up as well requiring immediate attention
+&ndash; Forge DevCon Europe coming
+&ndash; Hijacking Typepad search input for Google site search...
 
 -->
 
 ### DevCon Europe and Typepad versus Google Search
 
+I am making final travel preparations for the Forge accelerator in Rome next week, and need to start preparing for DevCon Europe as well.
 
+As always, when you have no time, something else urgent cropped up as well requiring immediate attention:
+
+- [Forge DevCon Europe coming](#2) 
+- [Hijacking Typepad search input for Google site search](#3) 
 
 #### <a name="2"></a> Forge DevCon Europe Coming
 
@@ -161,7 +168,7 @@ the [Forge accelerator](http://autodeskcloudaccelerator.com).
 I hope you can make it to one of our upcoming events as well.
 
 
-#### <a name="3"></a> Kidnapping the Typepad Search Input for a Parallel Google Site Search
+#### <a name="3"></a> Hijacking Typepad Search Input for Google Site Search
 
 Matt Taylor submitted
 a [comment](http://thebuildingcoder.typepad.com/blog/2018/09/roadmap-ci-for-rtf-geometry-library-limitations.html#comment-4106874384)
@@ -188,7 +195,7 @@ so you can always download from there to your own system and search there with f
 
 After some in-depth research and JavaScript twiddling, I am now opening my own Google search window in a new tab in parallel with the dysfunctional Typepad search.
 
-I dived into the blog source code to determine and retrieve the search input text box and submit button and hijack it to open a second Google search window doing just that.
+I dove into the blog source code to determine and retrieve the search input text box and submit button and hijack it to open a second Google search window doing just that.
 
 Here is the code that I added to the site to achieve this:
 
@@ -211,9 +218,9 @@ Here is the code that I added to the site to achieve this:
   &lt;/script&gt;
 </pre>
 
-I initially tried to override the Typepad functionality complete using `window.location.href`, but that failed.
+I initially tried to override the Typepad functionality completely using `window.location.href`, but that failed.
 
-Therefore, I open the second window in parallel and set the focus to that instead.
+Therefore, I open the second Google site search window in parallel and set the focus to that instead.
 
 By the way, I found
 this [ultimate guide to the Google search parameters](https://moz.com/blog/the-ultimate-guide-to-the-google-search-parameters) useful
@@ -224,11 +231,11 @@ Finally, I discussed the issue with Typepad, saying:
 > the built-in typepad search module does not work.
 i now implemented my own javascript version to open a google search engine in a separate tab.
 what can i do to make the built-in typepad search module work as intended?
-to see what i mean, please go to [thebuildingcoder.typepad.com](http://thebuildingcoder.typepad.com)
+to see what i mean, please go to [thebuildingcoder.typepad.com](http://thebuildingcoder.typepad.com),
 type `IExternalCommandAvailability` in the search input text box and click 'Submit'.
 the built-in search reports that no results are found:
 
-> *No Results Found -- Sorry, there were no results returned for “IExternalCommandAvailability” — please check your spelling, or try something less specific.*
+> *No Results Found &ndash; Sorry, there were no results returned for “IExternalCommandAvailability” &ndash; please check your spelling, or try something less specific.*
 
 > i open a new tab with a google search engine limited to thebuildingcoder site, and it reports many results.
 
