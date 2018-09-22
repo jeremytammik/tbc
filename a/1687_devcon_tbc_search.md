@@ -110,7 +110,7 @@ Thank you for reaching out to us. We are aware search results are not displaying
 
 I have no other questions, thank you, Typepad.
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+DevCon Europe and Google site search for The Building Coder and the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/devconeusitesearch
 
 I am making final travel preparations for the Forge accelerator in Rome next week, and need to start preparing for DevCon Europe as well.
 As always, when you have no time to spare, something else urgent cropped up as well requiring immediate attention
