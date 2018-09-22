@@ -26,7 +26,7 @@ R: Lol. Apparently you're right 🙂 But why is that, that the developers are ex
 A: because the main purpose is NOT to create geometry, like a geometry library, freeform, unrestricted. the one and only purpose is to manage a BIM, which is almost exactly the opposite of freeform unrestricted geometry.
 therefore, if you want to create geometry yourself, you really will need your own geometry library, and revit will not do very much to help. although its geometry library is gradually also adding some read-write access... previously, it was totally and purely read-only...
 
- #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Revit public roadmap update, CI for RTF and geometry library limitations in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/roadmapgeomlib
 
 Lots going on, and off to Rome next week for the Forge accelerator.
 Meanwhile, here three of the many topics recently discussed
