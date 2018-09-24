@@ -9,16 +9,20 @@
 
  the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
-&ndash; 
-...
+I arrived in Rome Sunday afternoon and am now happy to be here at 
+the Forge accelerator together
+with my Autodesk colleagues and the other attending companies.
+Before diving in further into the accelerator, I would like to point out the new inspiring AEC resources shared by That Bim Girl, and also post some notes to self on Q4R4
+&ndash; That BIM Girl
+&ndash; Notes to Self on AskNow for Q4R4...
 
 -->
 
-### That BIM Girl
+### That BIM Girl and AskNow
 
 I ate a dubious mushroom Saturday evening with dire consequences.
 
-In spite of that, I managed the trip to Rom Sunday afternoon and am now happy to be here at 
+In spite of that, I managed the trip to Rome Sunday afternoon and am now happy to be here at 
 the [Forge accelerator](http://autodeskcloudaccelerator.com) together
 with my Autodesk colleagues and the other attending companies.
 
