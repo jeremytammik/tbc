@@ -6,8 +6,9 @@
 
 <!---
 
+@ThatBIMGirl helps getting started with the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/thatbimgirl
 
- the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+That BIM Girl helps getting started with the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/thatbimgirl
 
 I arrived in Rome Sunday afternoon and am now happy to be here at 
 the Forge accelerator together
