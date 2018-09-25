@@ -43,6 +43,8 @@ the [Forge](https://autodesk-forge.github.io)
 [Design Automation API](https://forge.autodesk.com/en/docs/design-automation/v2/overview) for Revit.
 
 It is not yet available or documented, except to a closely restricted private beta that I am not a member of, so I cannot go into any details.
+For more information on its current status, please refer to
+[Mikako Harada's discussion of Design Automation for Revit](https://fieldofviewblog.wordpress.com/revit).
 
 However, you can prepare for the day when it comes by handling your add-in warnings properly.
 
