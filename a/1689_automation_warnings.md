@@ -26,6 +26,11 @@
 
  the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
 
+One important step to take before trying to run your Revit API code fully automated and unattended is to ensure that it does not create or modify UI in any way.
+For example, you must ensure that it does not cause Revit to display any warnings.
+This can be achieved with a warning swallower.
+Let's implement one for the StairsAutomation SDK sample...
+
 &ndash; 
 ...
 
