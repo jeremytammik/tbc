@@ -24,7 +24,7 @@
 - warning swallower
   C:\a\vs\the_building_coder_samples\BuildingCoder\BuildingCoder\CmdPreprocessFailure.cs
 
- the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Swallowing StairsAutomation warnings preparing for Forge Design Automation in the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/warningswallower
 
 One important step to take before trying to run your Revit API code fully automated and unattended is to ensure that it does not create or modify UI in any way.
 For example, you must ensure that it does not cause Revit to display any warnings.
