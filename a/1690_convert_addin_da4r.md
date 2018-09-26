@@ -1,0 +1,322 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head>
+
+<!---
+
+the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+
+Still at the Forge Accelerator in Rome and looking further into
+the Forge Design Automation API for Revit.
+Althpough it is not yet available or documented, you can still start preparing your add-in for the day when it comes
+- [Aspects to Consider](#2) 
+- [Accessing the Revit Application Object](#3) 
+- [DB Application Add-In Manifest](#4) 
+- [Next Steps](#5)
+
+&ndash; 
+...
+
+-->
+
+### Auto-Run an Add-In for Design Automation
+
+Still at the Forge Accelerator in Rome and looking further into
+the [Forge](https://autodesk-forge.github.io)
+[Design Automation API](https://forge.autodesk.com/en/docs/design-automation/v2/overview) for Revit.
+
+As mentioned yesterday, it is not yet available or documented, except to a closely restricted private beta.
+For more information on its current status, please refer to
+[Mikako Harada's discussion of Design Automation for Revit](https://fieldofviewblog.wordpress.com/revit).
+
+However, you can stiil start preparing your add-in for the day when it comes:
+
+- [Aspects to Consider](#2) 
+- [Accessing the Revit Application Object](#3) 
+- [DB Application Add-In Manifest](#4) 
+- [Next Steps](#5)
+
+
+#### <a name="2"></a> Aspects to Consider
+
+Here are some aspects to consider:
+
+- No user interface
+- Ensure that no warnings are displayed <!-- <br/>&ndash; done, cf. yesterday's discussion on [swallowing StairsAutomation warnings](http://thebuildingcoder.typepad.com/blog/2018/09/swallowing-stairsautomation-warnings.html) -->
+- No references to RevitAPIUI, Windows Forms, or other user interface related assemblies
+- Driven automatically with input received via JSON files and model path of RVT document to process
+- The app is responsible for opening the model itself
+
+Yesterday, as a first example step,
+we [modified the StairsAutomations sample to avoid displaying any warnings](http://thebuildingcoder.typepad.com/blog/2018/09/swallowing-stairsautomation-warnings.html),
+so the second item listed above is handled.
+
+Today, we'll address most of the remaining ones:
+
+We'll move the execution away from an external command and trigger it from the `ApplicationInitialized` event instead.
+
+In fact, we'll entirely remove all references to `RevitAPIUI.dll`.
+
+We'll also open the model file ourselves.
+
+In Forge, a different system will be used, so you cannot later use the `ApplicationInitialized` event there.
+Design Automation for Revit continues doing setup past the point at which `ApplicationInitialized` is raised.
+For the time being, though, we can use it to just mimic the 'run automatically' behaviour.
+
+
+#### <a name="3"></a> Accessing the Revit Application Object
+
+The trickiest step for me was finding out how to access the Revit `Application` object using only the `IExternalDBApplication` interface, because that is apparently not documented anywhere at all.
+
+I finally found the solution in a previous blog post
+on [automatically opening a project on start-up](http://thebuildingcoder.typepad.com/blog/2015/03/automatically-open-a-project-on-startup.html) &ndash;
+the `sender` argument passed in to the `ApplicationInitialized` can be cast to `Application`.
+
+That enables me to implement the entirely UI-independent DB application to drive the stairs creation utility class like this:
+
+<pre class="code">
+<span style="color:blue;">using</span>&nbsp;System;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.DB;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.DB.Events;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.ApplicationServices;
+ 
+<span style="color:blue;">namespace</span>&nbsp;Revit.SDK.Samples.StairsAutomation.CS
+{
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;Implement&nbsp;the&nbsp;Revit&nbsp;add-in&nbsp;IExternalDBApplication&nbsp;interface</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">DbApp</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IExternalDBApplication</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;_model_path&nbsp;=&nbsp;<span style="color:#a31515;">&quot;C:/a/vs/StairsAutomation/CS/Stairs_automation_2019_1.rvt&quot;</span>;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;The&nbsp;implementation&nbsp;of&nbsp;the&nbsp;automatic&nbsp;stairs&nbsp;creation.</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;Execute(&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;document&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Create&nbsp;an&nbsp;automation&nbsp;utility&nbsp;with&nbsp;a&nbsp;hardcoded&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;stairs&nbsp;configuration&nbsp;number</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">StairsAutomationUtility</span>&nbsp;utility
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:#2b91af;">StairsAutomationUtility</span>.Create(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;document,&nbsp;stairsConfigs[stairsIndex]&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Generate&nbsp;the&nbsp;stairs</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;utility.GenerateStairs();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++stairsIndex;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;stairsIndex&nbsp;&gt;&nbsp;4&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stairsIndex&nbsp;=&nbsp;0;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">void</span>&nbsp;OnApplicationInitialized(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">object</span>&nbsp;sender,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ApplicationInitializedEventArgs</span>&nbsp;e&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Sender&nbsp;is&nbsp;an&nbsp;Application&nbsp;instance:</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Application</span>&nbsp;app&nbsp;=&nbsp;sender&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Application</span>;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;app.OpenDocumentFile(&nbsp;_model_path&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;doc&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">throw</span>&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">InvalidOperationException</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Could&nbsp;not&nbsp;open&nbsp;document.&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Execute(&nbsp;doc&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">ExternalDBApplicationResult</span>&nbsp;OnStartup(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ControlledApplication</span>&nbsp;a&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;ApplicationInitialized&nbsp;cannot&nbsp;be&nbsp;used&nbsp;in&nbsp;Forge!</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a.ApplicationInitialized&nbsp;+=&nbsp;OnApplicationInitialized;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">ExternalDBApplicationResult</span>.Succeeded;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">ExternalDBApplicationResult</span>&nbsp;OnShutdown(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ControlledApplication</span>&nbsp;a&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">ExternalDBApplicationResult</span>.Succeeded;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">int</span>&nbsp;stairsIndex&nbsp;=&nbsp;0;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">int</span>[]&nbsp;stairsConfigs&nbsp;=&nbsp;{&nbsp;0,&nbsp;3,&nbsp;4,&nbsp;1,&nbsp;2&nbsp;};
+&nbsp;&nbsp;}
+}
+</pre>
+
+Note the absence of all references to the `Autodesk.Revit.UI` namespace.
+
+
+#### <a name="4"></a> DB Application Add-In Manifest
+
+Now that we implement no external command, Revit complains that no external command is found:
+
+<center>
+<img src="img/external_command_not_found.png" alt="External command not found" width="366">
+</center>
+
+That makes perfect sense, of course.
+
+We need to adapt the add-in manifest and inform Revit that we are loading a DB application instead.
+
+As an external application, it requires a `Name` node:
+
+<center>
+<img src="img/external_application_requires_name_node.png" alt="External application requires a Name node" width="369">
+</center>
+
+We end up with the following add-in manifest file:
+
+<pre class="code">
+<span style="color:blue;">&lt;?</span><span style="color:#a31515;">xml</span><span style="color:blue;">&nbsp;</span><span style="color:red;">version</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">1.0</span>&quot;<span style="color:blue;">&nbsp;</span><span style="color:red;">encoding</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">utf-8</span>&quot;<span style="color:blue;">?&gt;</span>
+<span style="color:blue;">&lt;</span><span style="color:#a31515;">RevitAddIns</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">AddIn</span><span style="color:blue;">&nbsp;</span><span style="color:red;">Type</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">DBApplication</span>&quot;<span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">Assembly</span><span style="color:blue;">&gt;</span>StairsAutomation.dll<span style="color:blue;">&lt;/</span><span style="color:#a31515;">Assembly</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">ClientId</span><span style="color:blue;">&gt;</span>4ce08562-a2e1-4cbf-816d-4923e1363a21<span style="color:blue;">&lt;/</span><span style="color:#a31515;">ClientId</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">FullClassName</span><span style="color:blue;">&gt;</span>Revit.SDK.Samples.StairsAutomation.CS.DbApp<span style="color:blue;">&lt;/</span><span style="color:#a31515;">FullClassName</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">Name</span><span style="color:blue;">&gt;</span>StairsAutomation<span style="color:blue;">&lt;/</span><span style="color:#a31515;">Name</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">Description</span><span style="color:blue;">&gt;</span>A&nbsp;utility&nbsp;sample&nbsp;that&nbsp;creates&nbsp;a&nbsp;series&nbsp;of&nbsp;stairs,&nbsp;stairs&nbsp;runs&nbsp;and&nbsp;stairs&nbsp;landings&nbsp;configurations&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;based&nbsp;upon&nbsp;predefined&nbsp;rules&nbsp;and&nbsp;parameters.<span style="color:blue;">&lt;/</span><span style="color:#a31515;">Description</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">VendorId</span><span style="color:blue;">&gt;</span>ADSK<span style="color:blue;">&lt;/</span><span style="color:#a31515;">VendorId</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&lt;/</span><span style="color:#a31515;">AddIn</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&lt;/</span><span style="color:#a31515;">RevitAddIns</span><span style="color:blue;">&gt;</span>
+</pre>
+
+#### <a name="5"></a> Next Steps
+
+There is not much more left to do now, really.
+
+These are all that come to mind off-hand:
+
+- Save the resulting model
+- Do we need to shut down Revit when we are done?
+- Read the required stair configuration from a JSON input file
+- Test in the real Forge environment
+
+The first three we can address right away...
+
+<!--
+<hr/>
+
+# How to convert your addin to work with Design Automation for Revit
+
+Thank you so much for participating in our beta! This is our current documentation on how to get started. This documentation is also something for which we are seeking feedback, so don't hesitate to e-mail or talk to us on Slack as things don't work or don't make sense. 
+
+## Start with a small subset of your code
+
+You'll want to start with a single operation. Converting an External Command may be a good idea. 
+
+## Referencing the DesignAutomationBridge DLL
+
+Download the `DesignAutomationBridge.dll` and add it as a dependency for your project.
+
+## Convert your IExternalApplication or IExternalCommand to IExternalDBApplication
+
+You won't be adding any buttons or ribbon commands, since there won't be any UI interaction. 
+
+You will need to implement `OnStartup` and `OnShutdown`. These functions will get a `ControlledApplication` instead of a `UIControlledApplication`. The functions return an `ExternalDBApplicationResult` object. 
+
+    using Autodesk.Revit.ApplicationServices;
+    using Autodesk.Revit.DB;
+    using DesignAutomationFramework;
+    namespace DeleteWalls
+    {    
+      [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
+      [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
+      public class DeleteWallsApp : IExternalDBApplication
+      {
+        public ExternalDBApplicationResult OnStartup(Autodesk.Revit.ApplicationServices.ControlledApplication app)
+        {
+          return ExternalDBApplicationResult.Succeeded;
+        }
+  
+        public ExternalDBApplicationResult OnShutdown(Autodesk.Revit.ApplicationServices.ControlledApplication app)
+        {
+          return ExternalDBApplicationResult.Succeeded;
+        }
+      }
+    }
+
+The .addin file can go in the normal place, but the addin type is `DBApplication`.
+
+- Don't include references to RevitAPIUI! (Don't include WPF or Windows Forms or anything either, but we do not currently have a way to check this.) There's no UI interaction, so anything that pops up a dialog expecting user input will hang the system. 
+
+## Add a reference to DesignAutomationBridge.dll and add an event handler for DesignAutomationReady
+
+Add a reference `DesignAutomationBridge.dll`.  
+
+> For a C# project in Visual Studio, this is done by opening the Solution Explorer, finding your C# project, expanding its contents, right-clicking on the References node and doing “Add Reference…”  
+> In the Reference Manager dialog, use the “Browse…” button to browse to DesignAutomationBridge.dll.  Click “Add” and then “OK” to add the reference to your project.
+
+The `DesignAutomationBridge` defines an event `DesignAutomationReadyEvent`. Revit's engine will raise this event when it's ready for you to run your addin. You should execute your code inside the event handler. 
+
+    public class DeleteWallsApp : IExternalDBApplication
+    {
+      public ExternalDBApplicationResult OnStartup(Autodesk.Revit.ApplicationServices.ControlledApplication app)
+      {
+        DesignAutomationBridge.DesignAutomationReadyEvent += HandleDesignAutomationReadyEvent;
+        return ExternalDBApplicationResult.Succeeded;
+      } 
+      public void HandleDesignAutomationReadyEvent(object sender, DesignAutomationReadyEventArgs e)
+      {
+        e.Succeeded = true;
+        DeleteAllWalls(e.DesignAutomationData);
+      }
+    }
+
+The event will give you a path `DesignAutomationData.MainModelPath` to the "main" model indicated in the WorkItem's arguments. (We do not pre-open this model for you.) There is also a success/failure argument `DesignAutomationReadyEventArgs.Succeeded` you should set; it will let the service know whether potential failures happened in your code or elsewhere. 
+
+Any files you load or create should be put into the working directory. On the cloud your write access is limited to the working directory and its children.
+ 
+## Handle failures encountered by Revit
+
+A fundamental feature in Revit is how warnings and errors (collectively referred to as "failures") are handled.  Understand your options for [handling failures](../FailureProcessor/) in Revit and implement a failure handling strategy in your application.
+
+## Check that it works locally
+
+We are currently working on an application which will make testing more convenient. However, we have provided an alternate way of testing:
+
+#### Handling Revit's `ApplicationInitialized` Event
+
+Don't use this event on the cloud, because Design Automation for Revit continues doing setup past the point at which `ApplicationInitialized` is raised. Locally it should mimic the "run automatically" behavior. For example, in `DeleteWalls`, we can do this:
+
+    public class DeleteWallsApp : IExternalDBApplication
+    {
+      public ExternalDBApplicationResult OnStartup(Autodesk.Revit.ApplicationServices.ControlledApplication app)
+      {
+        //Stop handling the event used by jobs on the cloud:
+        //DesignAutomationBridge.DesignAutomationReadyEvent += HandleDesignAutomationReadyEvent;
+        // And instead execute the code when desktop Revit is initialized.
+        app.ApplicationInitialized += HandleApplicationInitializedEvent;
+        return ExternalDBApplicationResult.Succeeded;
+      }
+      
+      //public void HandleDesignAutomationReadyEvent(object sender, DesignAutomationReadyEventArgs e)
+      //{
+      //  e.Succeeded = true;
+      //  DeleteAllWalls(e.DesignAutomationData);
+      //}
+      
+      public void HandleApplicationInitializedEvent(object sender, Autodesk.Revit.DB.Events.ApplicationInitializedEventArgs e)
+      {
+        Autodesk.Revit.ApplicationServices.Application app = sender as Autodesk.Revit.ApplicationServices.Application;
+        // We don't need to provide the file
+        DesignAutomationData data = new DesignAutomationData(app, "/path/to/file.rvt");
+        DeleteAllWalls(data);
+      }
+    }
+
+Additionally, we must provide the .addin file to Revit. We added [this addin file](../DeleteWalls/DeleteWallsApp/DeleteWalls.addin) to `C:\ProgramData\Autodesk\Revit\Addins\2018\` (or `2019` if the target is Revit 2019) and changed `<Assembly>` to point to our DLL:
+
+- &lt;Assembly&gt;C:\test\DeleteWalls\DeleteWallsTest\bin\Debug\DeleteWalls.dll&lt;/Assembly&gt;
+
+This way, we are able to run this locally without any UI intervention on Revit startup. See [this guide](http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=20132893) on debugging.
+
+**Note:** Your application cannot use the network, or write to any files outside of the current working directory. Restrictions on Design Automation for Revit can be found [here](QuotasAndRestrictions.md).
+-->
