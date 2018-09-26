@@ -27,7 +27,7 @@ For more information on its current status, please refer to
 <p>However, you can stiil start preparing your add-in for the day when it comes:</p>
 <ul>
 <li><a href="#2">Aspects to consider</a> </li>
-<li><a href="#3">Accessing the Revit <code>Application</code> object</a> </li>
+<li><a href="#3">Implementing DB application and accessing the Revit <code>Application</code> object</a> </li>
 <li><a href="#4">DB application add-in manifest</a> </li>
 <li><a href="#5">Next steps</a></li>
 </ul>
@@ -50,7 +50,7 @@ so the second item listed above is handled.</p>
 <p>In Forge, a different system will be used, so you cannot later use the <code>ApplicationInitialized</code> event there.
 Design Automation for Revit continues doing setup past the point at which <code>ApplicationInitialized</code> is raised.
 For the time being, though, we can use it to just mimic the 'run automatically' behaviour.</p>
-<h4><a name="3"></a> Accessing the Revit Application Object</h4>
+<h4><a name="3"></a> Implementing DB Application and Accessing the Revit Application Object</h4>
 <p>The trickiest step for me was finding out how to access the Revit <code>Application</code> object using only the <code>IExternalDBApplication</code> interface, because that is apparently not documented anywhere at all.</p>
 <p>I finally found the solution in a previous blog post
 on <a href="http://thebuildingcoder.typepad.com/blog/2015/03/automatically-open-a-project-on-startup.html">automatically opening a project on start-up</a> &ndash;

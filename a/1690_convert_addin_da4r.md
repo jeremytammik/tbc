@@ -31,7 +31,7 @@ For more information on its current status, please refer to
 However, you can stiil start preparing your add-in for the day when it comes:
 
 - [Aspects to consider](#2) 
-- [Accessing the Revit `Application` object](#3) 
+- [Implementing DB application and accessing the Revit `Application` object](#3) 
 - [DB application add-in manifest](#4) 
 - [Next steps](#5)
 
@@ -63,7 +63,7 @@ Design Automation for Revit continues doing setup past the point at which `Appli
 For the time being, though, we can use it to just mimic the 'run automatically' behaviour.
 
 
-#### <a name="3"></a> Accessing the Revit Application Object
+#### <a name="3"></a> Implementing DB Application and Accessing the Revit Application Object
 
 The trickiest step for me was finding out how to access the Revit `Application` object using only the `IExternalDBApplication` interface, because that is apparently not documented anywhere at all.
 
