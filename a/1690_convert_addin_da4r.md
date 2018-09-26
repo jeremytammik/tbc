@@ -34,6 +34,7 @@ However, you can stiil start preparing your add-in for the day when it comes:
 - [Implementing DB application and accessing the Revit `Application` object](#3) 
 - [DB application add-in manifest](#4) 
 - [Next steps](#5)
+- [Download](#6)
 
 
 #### <a name="2"></a> Aspects to Consider
@@ -197,6 +198,14 @@ These are all that come to mind off-hand:
 - Test in the real Forge environment
 
 The first three we can address right away...
+
+
+#### <a name="6"></a> Download
+
+Oops, I almost forgot:
+You can download the modified SDK sample and examine every step I took in modifying it so far from and in
+the [StairsAutomation GitHub repository](https://github.com/jeremytammik/StairsAutomation).
+
 
 <!--
 <hr/>
