@@ -11,13 +11,10 @@ the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon
 Still at the Forge Accelerator in Rome and looking further into
 the Forge Design Automation API for Revit.
 Althpough it is not yet available or documented, you can still start preparing your add-in for the day when it comes
-- [Aspects to Consider](#2) 
-- [Accessing the Revit Application Object](#3) 
-- [DB Application Add-In Manifest](#4) 
-- [Next Steps](#5)
-
-&ndash; 
-...
+&ndash; Aspects to consider
+&ndash; Accessing the Revit <code>Application</code> object
+&ndash; DB application add-in manifest
+&ndash; Next steps...
 
 -->
 
@@ -33,10 +30,10 @@ For more information on its current status, please refer to
 
 However, you can stiil start preparing your add-in for the day when it comes:
 
-- [Aspects to Consider](#2) 
-- [Accessing the Revit Application Object](#3) 
-- [DB Application Add-In Manifest](#4) 
-- [Next Steps](#5)
+- [Aspects to consider](#2) 
+- [Accessing the Revit `Application` object](#3) 
+- [DB application add-in manifest](#4) 
+- [Next steps](#5)
 
 
 #### <a name="2"></a> Aspects to Consider
