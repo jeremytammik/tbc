@@ -16,7 +16,7 @@
   > I've coded in CATIA, Rhino, AutoCAD, and Maya for years without any issues, but I've never had such trouble than when I want to do the simplest things in Revit.
   Fair59 explains in loving, detailed, didactic depth... very many thanks indeed for your continued invaluable support!
 
- #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Floor area above room and mysterious hidden elements in new 3D view in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/floorarea
 
 Today, we focus on two pure programming questions from the Revit API discussion forum
 &ndash; Area of an exterior floor above a room
