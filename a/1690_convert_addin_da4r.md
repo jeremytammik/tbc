@@ -6,7 +6,7 @@
 
 <!---
 
-the #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon 
+Auto-run a #RevitAPI add-in for @AutodeskForge Design Automation for @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/autorun4da4r
 
 Still at the Forge Accelerator in Rome and looking further into
 the Forge Design Automation API for Revit.
