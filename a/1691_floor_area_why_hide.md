@@ -18,8 +18,9 @@
 
  #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash; 
-...
+Today, we focus on two pure programming questions from the Revit API discussion forum
+&ndash; Area of an exterior floor above a room
+&ndash; Mysterious element hiding activity...
 
 -->
 
@@ -33,10 +34,14 @@ and [auto-running an add-in](http://thebuildingcoder.typepad.com/blog/2018/09/au
 focus on two pure programming questions from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread instead:
 
+- [Area of an exterior floor above a room](#2) 
+- [Mysterious element hiding activity](#3) 
+
+
 #### <a name="2"></a> Area of an Exterior Floor Above a Room
 
 Sicheng Zhu asked how
-to [Get the Floor Area above a Room](https://forums.autodesk.com/t5/revit-api-forum/get-the-floor-area-above-a-room/m-p/8295372):
+to [get the floor area above a room](https://forums.autodesk.com/t5/revit-api-forum/get-the-floor-area-above-a-room/m-p/8295372):
 
 **Question:** I want to get the exterior floor area above a room, assuming that the floors are modelled separately and I already know which floor is an exterior floor:
 
@@ -133,8 +138,8 @@ You can then hide all elements (that can be hidden) except the error elements.
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">ViewFamilyType</span>&nbsp;)&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">ViewFamilyType</span>&gt;()
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">where</span>&nbsp;v.ViewFamily&nbsp;==&nbsp;<span style="color:#2b91af;">ViewFamily</span>.ThreeDimensional
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">select</span>&nbsp;v&nbsp;).First();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">where</span>&nbsp;v.ViewFamily&nbsp;==&nbsp;<span style="color:#2b91af;">ViewFamily</span>.ThreeDimensional
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">select</span>&nbsp;v&nbsp;).First();
  
 &nbsp;&nbsp;<span style="color:#2b91af;">View3D</span>&nbsp;view;
 &nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">TransactionGroup</span>&nbsp;tg&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">TransactionGroup</span>(&nbsp;doc&nbsp;)&nbsp;)
@@ -236,6 +241,6 @@ Then I use this `ViewFamilyType` to create the 3D view.
 
 Revit has the possibility to [divide (system) families into `Parts`](htttp://help.autodesk.com/view/RVT/2018/ENU/?guid=GUID-DA150C6B-996C-4C70-9E8C-3C536C232851).
 
-A view can show either the original element, the parts, or both. By setting the `BuiltinParameter` to `2`, I set the view to show the original element and the parts.
+A view can show either the original element, the parts, or both. By setting the `BuiltInParameter` to `2`, I set the view to show the original element and the parts.
 
 Once again, very many thanks indeed to Fair59 for your continued invaluable support!

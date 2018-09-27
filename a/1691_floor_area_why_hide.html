@@ -17,8 +17,9 @@
 
  #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash; 
-...
+Today, we focus on two pure programming questions from the Revit API discussion forum
+&ndash; Area of an exterior floor above a room
+&ndash; Mysterious element hiding activity...
 
 -->
 
@@ -30,9 +31,13 @@ on <a href="http://thebuildingcoder.typepad.com/blog/2018/09/swallowing-stairsau
 and <a href="http://thebuildingcoder.typepad.com/blog/2018/09/auto-run-an-add-in-for-design-automation.html">auto-running an add-in</a> and
 focus on two pure programming questions from
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread instead:</p>
+<ul>
+<li><a href="#2">Area of an exterior floor above a room</a> </li>
+<li><a href="#3">Mysterious element hiding activity</a> </li>
+</ul>
 <h4><a name="2"></a> Area of an Exterior Floor Above a Room</h4>
 <p>Sicheng Zhu asked how
-to <a href="https://forums.autodesk.com/t5/revit-api-forum/get-the-floor-area-above-a-room/m-p/8295372">Get the Floor Area above a Room</a>:</p>
+to <a href="https://forums.autodesk.com/t5/revit-api-forum/get-the-floor-area-above-a-room/m-p/8295372">get the floor area above a room</a>:</p>
 <p><strong>Question:</strong> I want to get the exterior floor area above a room, assuming that the floors are modelled separately and I already know which floor is an exterior floor:</p>
 <p><center>
 <img src="img/findexteriorfloorarea0.png" alt="Find exterior floor area above room" width="400">
@@ -99,8 +104,8 @@ of Frank <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/20
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">ViewFamilyType</span>&nbsp;)&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">ViewFamilyType</span>&gt;()
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">where</span>&nbsp;v.ViewFamily&nbsp;==&nbsp;<span style="color:#2b91af;">ViewFamily</span>.ThreeDimensional
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">select</span>&nbsp;v&nbsp;).First();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">where</span>&nbsp;v.ViewFamily&nbsp;==&nbsp;<span style="color:#2b91af;">ViewFamily</span>.ThreeDimensional
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">select</span>&nbsp;v&nbsp;).First();
 
 &nbsp;&nbsp;<span style="color:#2b91af;">View3D</span>&nbsp;view;
 &nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">TransactionGroup</span>&nbsp;tg&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">TransactionGroup</span>(&nbsp;doc&nbsp;)&nbsp;)
@@ -192,5 +197,5 @@ Is that better than the <code>Create</code> method?</li>
 <p>Then I use this <code>ViewFamilyType</code> to create the 3D view.</p>
 <p><em>Regarding <code>BuiltInParameter.VIEW_PARTS_VISIBILITY</code></em>:</p>
 <p>Revit has the possibility to <a href="htttp://help.autodesk.com/view/RVT/2018/ENU/?guid=GUID-DA150C6B-996C-4C70-9E8C-3C536C232851">divide (system) families into <code>Parts</code></a>.</p>
-<p>A view can show either the original element, the parts, or both. By setting the <code>BuiltinParameter</code> to <code>2</code>, I set the view to show the original element and the parts.</p>
+<p>A view can show either the original element, the parts, or both. By setting the <code>BuiltInParameter</code> to <code>2</code>, I set the view to show the original element and the parts.</p>
 <p>Once again, very many thanks indeed to Fair59 for your continued invaluable support!</p>
