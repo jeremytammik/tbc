@@ -9,7 +9,7 @@
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
 The Forge accelerator in Rome is winding down with the demonstrations of what was achieved being recorded as I write.
-I had an interesting conversation at the celebratory dinner last night gave me an idea for a solution to a longstanding question on family tampering protection
+An interesting conversation I had at the celebratory dinner last night gave me an idea for a solution to a longstanding question on family tampering protection
 &ndash; Roma accelerator group photo
 &ndash; Protecting a family from tampering
 &ndash; Implementing a canonical key for geometrical objects...
@@ -22,7 +22,7 @@ The [Forge](https://autodesk-forge.github.io)
 [accelerator in Rome](http://autodeskcloudaccelerator.com)  is
 winding down with the demonstrations of what was achieved being recorded as I write.
 
-I had an interesting conversation at the celebratory dinner last night gave me an idea for a solution to a longstanding question on family tampering protection:
+An interesting conversation I had at the celebratory dinner last night gave me an idea for a solution to a longstanding question on family tampering protection:
 
 - [Roma accelerator group photo](#2) 
 - [Protecting a family from tampering](#3) 
