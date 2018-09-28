@@ -7,8 +7,11 @@
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+The Forge accelerator in Rome is winding down with the demonstrations of what was achieved being recorded as I write.
+I had an interesting conversation at the celebratory dinner last night gave me an idea for a solution to a longstanding question on family tampering protection
+&ndash; Roma accelerator group photo
+&ndash; Protecting a family from tampering
+&ndash; Implementing a canonical key for geometrical objects...
 
 -->
 
@@ -45,7 +48,7 @@ protect the intellectual property built into a complex hierarchy of nested famil
 <p>Here is an AUGI discussion from 2009 on the pros and cons
 of <a href="http://forums.augi.com/showthread.php?73233-Protecting-Revit-Families">protecting Revit families</a>.</p>
 <p>Today, I make a suggestion to protect from tampering, nothing totally safe yet afaik.</p>
-<p>You want a foolproof method to protect your family definitions from tampering?</p>
+<p>You want a fool-proof method to protect your family definitions from tampering?</p>
 <p>You can encode a secret hash code or something and hide it somewhere.</p>
 <p>For brevity, let's call this secret hash code your <u>key</u>.</p>
 <p>However, the tamperer might just retain it, either intentionally or not.</p>
@@ -59,10 +62,10 @@ of <a href="http://forums.augi.com/showthread.php?73233-Protecting-Revit-Familie
 </ul>
 <p><a href="http://thebuildingcoder.typepad.com/blog/2012/03/great-ocean-road-and-creating-your-own-key.html#2">Creating your own key</a> can
 be useful in numerous ways, so I already discussed this topic and suggested doing so back in 2012.</p>
-<p>Therefore, I hope that all the families that you care about are already adequately ptotected against tampering.</p>
+<p>Therefore, I hope that all the families that you care about are already adequately protected against tampering.</p>
 <p>If not, go ahead and do so now.</p>
 <h4><a name="4"></a> Implementing a Canonical Key for Geometrical Objects</h4>
-<p>To further illustrate what I mean by the key I mentioned above, let's illustrate how to generate a checksum or hash code from geometry, preferrably using
+<p>To further illustrate what I mean by the key I mentioned above, let's illustrate how to generate a checksum or hash code from geometry, preferably using
 a <a href="https://en.wikipedia.org/wiki/Canonical_form">canonical form</a>.</p>
 <p>Let's explore defining a simple canonical form for a point, line (two ordered points), curve, etc.</p>
 <p>A very simple and useful way to go is to define your canonical form as a string.</p>
@@ -97,13 +100,15 @@ a <a href="https://en.wikipedia.org/wiki/Canonical_form">canonical form</a>.</p>
 <ul>
 <li>A sorted array of points:</li>
 </ul>
-<p><pre style="font-family:Consolas;font-size:13;color:black;background:white;"><span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">string</span>&nbsp;PointArrayString(&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">XYZ</span>&gt;&nbsp;pts&nbsp;)
+<pre class="code">
+  <span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">string</span>&nbsp;PointArrayString(&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">XYZ</span>&gt;&nbsp;pts&nbsp;)
   {
   &nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">string</span>.Join(&nbsp;<span style="color:#a31515;">&quot;,&nbsp;&quot;</span>,
   &nbsp;&nbsp;&nbsp;&nbsp;pts.Select&lt;<span style="color:#2b91af;">XYZ</span>,&nbsp;<span style="color:blue;">string</span>&gt;(
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p&nbsp;=&gt;&nbsp;PointString(&nbsp;p&nbsp;)&nbsp;)&nbsp;);
   }
-</pre></p>
+</pre>
+
 <ul>
 <li>A bounded line <code>(p,q)</code>:<ul>
 <li>Sort <code>p</code> and <code>q</code> lexicographically</li>
@@ -111,12 +116,12 @@ a <a href="https://en.wikipedia.org/wiki/Canonical_form">canonical form</a>.</p>
 </ul>
 </li>
 <li>A curve <code>c</code>:<ul>
-<li>Return <code>PointArrayString( c..Tessellate() )</code></li>
+<li>Return <code>PointArrayString( c.Tessellate() )</code></li>
 </ul>
 </li>
 </ul>
 <p>Most of these are implemented
 in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
 <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs">Util module</a>.</p>
-<p>I'll leave it up to your imagination to improve these and define canocical keys for more complex data as required.</p>
+<p>I'll leave it up to your imagination to improve these and define canonical keys for more complex data as required.</p>
 <p>Migliori saluti a Stefano!</p>
