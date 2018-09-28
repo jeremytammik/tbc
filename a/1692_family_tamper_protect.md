@@ -6,7 +6,7 @@
 
 <!---
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Protecting a family from tampering and implementing a canonical key for geometrical objects in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/familytampering
 
 The Forge accelerator in Rome is winding down with the demonstrations of what was achieved being recorded as I write.
 An interesting conversation I had at the celebratory dinner last night gave me an idea for a solution to a longstanding question on family tampering protection
