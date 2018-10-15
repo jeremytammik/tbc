@@ -20,7 +20,8 @@ Here are some quick recent topics I want to share before jumping on the train
 &ndash; BIM 360 Docs API change for European data centre access
 &ndash; Revit add-in locations
 &ndash; Autodesk AppStore bundle format
-&ndash; Juli Zeh über das <i>Turbo-Ich</i>...
+&ndash; Juli Zeh über das <i>Turbo-Ich</i>
+&ndash; YouTube video subtitles and auto-translation...
 
 -->
 
@@ -33,7 +34,8 @@ Here are some quick recent topics I want to share before jumping on the train:
 - [BIM 360 Docs API change for European data centre access](#2) 
 - [Revit add-in locations](#3) 
 - [Autodesk AppStore bundle format](#4) 
-- [Juli Zeh über das *Turbo-Ich*](#5) 
+- [Juli Zeh über das *Turbo-Ich*](#5)
+- [YouTube video subtitles and auto-translation](#6)
 
 
 #### <a name="2"></a> BIM 360 Docs API Change for European Data Centre Access
@@ -147,3 +149,17 @@ Juli Zeh spricht über die Macht von Stimmungen und die Zukunft der Demokratie i
 <center>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/-5djf2rZMD4?start=872" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </center>
+
+#### <a name="6"></a> YouTube Video Subtitles and Auto-Translation
+
+Wow, here is yet another note after all, of technical nature this time.
+
+I just tested turning on auto-generated subtitles for this video and requesting them to be auto-translated to English, with astonishingly good results.
+
+Go to YouTube and enable these two options in the right-hand bottom corner.
+
+Nope, looking a bit further, there is still considerable room for improvement.
+
+This talk is still too complex for the functionality available today...
+
+It is pretty impressive anyway, though.
