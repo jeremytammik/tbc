@@ -12,8 +12,20 @@ with my FPD colleague [Augusto](http://adndevblog.typepad.com/autocad/augusto-go
 
  #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash; 
-...
+Today, I am presenting a class on Design Automation for Revit or DA4R at the Forge DevCon preceding the German Autodesk University in Darmstadt
+&ndash; What is Forge Design Automation API for Revit?
+&ndash; Examples?
+&ndash; How do you use it?
+&ndash; Workflow: uploading a Revit add-in
+&ndash; Workflow: running a client application
+&ndash; Things to consider
+&ndash; How to create a Revit add-in which works with Design Automation API?
+&ndash; Create an IExternalDBApplication
+&ndash; Determine inputs
+&ndash; Use the bridge library to be notified when Design Automation is executing
+&ndash; Create a failure handler
+&ndash; Logging and errors 
+&ndash; Further reading...
 
 -->
 
@@ -42,6 +54,12 @@ with my FPD colleague [Augusto](http://adndevblog.typepad.com/autocad/augusto-go
 <li><a href="#5">Further Reading</a> </li>
 </ul>
 <p>It will also help me get my act together for the two presentations &nbsp; :-)</p>
+<p>For your convenience, here are also the AU 2017 slide deck and handout document in PDF format:</p>
+<ul>
+<li><a href="zip/sd125457_forge_design_automation_rvt_diane_christoforo_slides.pdf">Slide deck</a></li>
+<li><a href="zip/sd125457_forge_design_automation_rvt_diane_christoforo_handout.pdf">Handout</a></li>
+</ul>
+<p>Please refer to the further reading material for a link to the session recording.</p>
 <h4><a name="2"></a> Disclaimer</h4>
 <p>Forge Design Automation API for Revit is an unreleased service which is currently in invitation-only beta. The information presented here will change.</p>
 <p>Any statements regarding planned or future development efforts are not intended to be a promise or guarantee of future availability of products, services or features but merely reflect current plans and based on factors currently known. These planned and future development efforts may change without notice. Purchasing decisions should not be made based upon reliance on these statements.</p>
@@ -101,11 +119,11 @@ system is similar to Design Automation API for AutoCAD and the endpoints should 
 </ol>
 <h4><a name="3.5"></a> Things to consider when using the service</h4>
 <p>There are a few important things to keep in mind as you plan for how to use the service.</p>
-<ol>
+<ul>
 <li>You will only have access to Revit’s 'business logic'. You won’t have access to Revit’s UI. In technical terms, this means you can call RevitAPI.dll functions but not RevitAPIUI.dll functions. (Or, you won’t have access to the Autodesk.Revit.UI namespace.) You can put whatever UI you want in your client application, but your Revit add-in shouldn’t display UI.</li>
 <li>There is no intermediate feedback. Your add-in will run to completion once it starts, so it’ll need to have all input up front. There is also no way to get partial results. You can check the status of a job but you’ll get all results at the end.</li>
 <li>There is no persistence between jobs. If a job is meant to be a follow-on to a previous job, you’ll need to send the second job with any info it needs to set up the proper state. Every job is run in a clean environment.</li>
-</ol>
+</ul>
 <h4><a name="4"></a> How can I create a Revit add-in which works with Design Automation API?</h4>
 <p>Your full client application may not be a Revit add-in specifically. It may be a website or a standalone application. But part of your system will be a Revit add-in. This add-in is what will be executed against Revit in the cloud when you invoke the Design Automation API.</p>
 <p>Even though the Forge service isn’t public today, we can explain the steps to create a Design Automation-ready add-in now. You can use these steps to convert an existing add-in or to create a new one.</p>
@@ -132,8 +150,8 @@ system is similar to Design Automation API for AutoCAD and the endpoints should 
 <p>You must ensure that it handles all possible warnings, errors and other failures gracefully.</p>
 <p>The Building Coder recently discussed this topic using the StairsAutomation SDK sample:</p>
 <ul>
-<li><a href="zip/da4r_au_2018/FailureProcessor.html">About handling failures</a></li>
-<li><a href="zip/da4r_au_2018/FailureProcessor.cs">Sample failure processor module <code>FailureProcessor.cs</code></a></li>
+<li><a href="zip/da4r_au_2018_FailureProcessor.html">About handling failures</a></li>
+<li><a href="zip/da4r_au_2018_FailureProcessor.cs">Sample failure processor module <code>FailureProcessor.cs</code></a></li>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2018/09/swallowing-stairsautomation-warnings.html">Swallowing StairsAutomation warnings</a></li>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2018/09/auto-run-an-add-in-for-design-automation.html">Auto-Run an add-in for Design Automation</a></li>
 </ul>
