@@ -1,0 +1,63 @@
+# Handling Failures
+
+Normally posted failures are processed by Revit's standard failure resolution UI at the end of a transaction when Transaction.Commit() or Transaction.Rollback() are invoked. The user is presented information and options to deal with the failures.
+
+If an operation (or set of operations) on the document requires some special treatment from a Revit addin for certain errors, failure handling can be customized to carry out this resolution. Custom failure handling can be supplied:
+
+  * For a given transaction using the interface IFailuresPreprocessor.
+  * For all possible errors using the FailuresProcessing event.
+
+Finally, the API offers the ability to completely replace the standard failure processing user interface using the interface IFailuresProcessor. Although the first two methods for handling failures should be sufficient in most cases, this last option can be used in special cases, such as to provide a better failure processing UI (UI is not available in Design Automation for Revit) or when an application is used as a front-end on top of Revit.
+  
+## Overview of Failure Processing 
+
+It is important to remember there are many things happening between the call to Transaction.Commit() and the actual processing of failures. Auto-join, overlap checks, group checks and workset editability checks are just to name a few. These checks and changes may make some failures disappear or, more likely, can post new failures. Therefore, conclusions cannot be drawn about the state of failures to be processed when Transaction.Commit() is called. To process failure correctly, it is necessary to hook up the actual failure processing mechanism.
+
+When failures processing begins, all changes to a document that are supposed to be made in the transaction are made, and all failures are posted. Therefore, no uncontrolled changes to a document are allowed during failures processing. There is a limited ability to resolve failures via the restricted interface provided by FailureAccesor. If this has happened all end of transaction checks and failure processing must be repeated. So, there may be a few failure resolution cycles at the end of one transaction.
+
+Each cycle of failures processing includes 3 steps:
+
+ 1. Preprocessing of failures (FailuresPreprocessor)
+ 2. Broadcasting of failures processing events (FailuresProcessing event)
+ 3. Final processing (FailuresProcessor)
+
+Each of these 3 steps can control what happens next by returning different FailureProcessingResults. The options are:
+
+ * **Continue** - has no impact on execution flow. If FailuresProcessor returns "Continue" with unresolved failures, Revit will instead act as if "ProceedWithRollBack" was returned.
+ * **ProceedWithCommit** - interrupts failures processing and immediately triggers another loop of end-of-transaction checks followed by another failures processing. Should be returned after an attempt to resolve failures. Can easily lead to an infinite loop if returned without any successful failure resolution. Cannot be returned if transaction is already being rolled back and will be treated as "ProceedWithRollBack" in this case.
+ * **ProceedWithRollback** - continues execution of failure processing, but forces transaction to be rolled back, even if it was originally requested to commit. If before ProceedWithRollBack is returned FailureHandlingOptions are set to clear errors after rollback, no further error processing will take place, all failures will be deleted and the transaction is rolled back silently. Otherwise default failure processing will continue but the transaction is guaranteed to be rolled back.
+
+Depending on the severity of failures posted in the transaction and whether the transaction is being committed or rolled back, each of these 3 steps may have certain options to resolve errors. All information about failures posted in a document, information about ability to perform certain operations to resolve failures and API to perform such operations are provided via the FailuresAccesor class. The Document can be used to obtain additional information, but it cannot be changed other than via FailuresAccessor.
+
+
+## Failure Handling in Design Automation for Revit
+
+### Default Failure Handling
+
+The DesignAutomationBridge comes with a default failure handler. This failure handler will suppress all the warnings it encounters. In case of errors it will try to resolve them. If resolved successfully, the transaction will proceed with commit. If the default resolution is to delete elements the failure handler will not perform the delete action and will proceed with roll back.
+
+### Custom Failure Handling 
+
+You can implement your own custom failure handler to override the default failure handler. The failure posting API is easy to use. A custom failure definition can be registered in the HandleDesignAutomationReadyEvent() method of an external application, and then the failure severity and resolution type can be set. To register a failures processor, implement the interface IFailuresProcessor and register it using the Application.RegisterFailuresProcessor() method. Here is a code fragment to register a custom failure handler.
+
+<pre>
+  public void HandleDesignAutomationReadyEvent(object sender, DesignAutomationReadyEventArgs e)
+  {
+    // Hook up the CustomFailureHandling failure processor.
+    Application.RegisterFailuresProcessor(new CustomFailureHandlingProcessor());
+    
+    // Run the application logic.
+    SketchItFunc(e.DesignAutomationData);
+    
+    e.Succeeded = true;
+  }
+</pre>
+
+### FailuresProcessor
+
+The IFailuresProcessor interface gets control last, after the FailuresProcessing event is processed. There is only one active IFailuresProcessor in a Revit session. If there is a previously registered failures processor, it is discarded. If the addin does not provide a failure processor of its own, then the default failure processor from Design Automation for Revit will be active. You can deactivate the default failure processor from Design Automation for Revit by passing null to RegisterFailuresProcessor(). In the absence of all failure processors, Revit resolves failures via the default failure resolution type.
+
+Warning: The IFailuresProcessor.ProcessFailures() method is allowed to return WaitForUserInput, which leaves the transaction pending so that the FailuresProcessor can display UI and get user input before resolving the failure. Don't use WaitForUserInput in Design Automation for Revit; there is no UI or user interaction in Design Automation for Revit.
+
+The code for the default failure handler from Design Automation for Revit can be seen in [FailureProcessor.cs](FailureProcessor.cs). The code implements IFailuresProcessor and suppresses any warnings. If there are errors, the code rolls back the transaction. If you need a different behavior, you can modify the code for the default FailureProcessor to fit your specifications.
+

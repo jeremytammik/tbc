@@ -1,0 +1,109 @@
+<h1>Alias</h1>
+<p>An <code>alias</code> is a label to a specific version of <code>app</code> or <code>activity</code>. Aliasing gives you more control over how you update appbundles and activities.</p>
+<p>For example, versions of an app <code>DeleteWallsApp</code> may be referenced by aliases <code>test</code> and <code>prod</code>.</p>
+<p>id       |    alias      | version 
+------------- |:-------------:| :-----:    <br />
+DeleteWallsApp | prod | 1  <br />
+DeleteWallsApp |  | 2 
+DeleteWallsApp |  | 3
+DeleteWallsApp |  test  | 4</p>
+<p>The alias <code>prod</code> refers to version <code>1</code> of the <code>DeleteWallsApp</code> app, which could be a stable version of your app.
+The alias <code>test</code> refers to version <code>4</code> of the <code>DeleteWallsApp</code> app, which could be the latest version you are debugging.</p>
+<p>Here is an example activity <code>DeleteWallsActivity</code> whose versions are referenced by aliases <code>test</code> and <code>prod</code>.</p>
+<p>id       |    alias      | version<br />
+ ----- |:-----:| :------:
+ DeleteWallsActivity | prod | 1 <br />
+ DeleteWallsActivity |  | 2 
+ DeleteWallsActivity  |  test   |  3 </p>
+<p>The alias <code>prod</code> refers to version <code>1</code> of the <code>DeleteWallsActivity</code> activity, which could be a stable version of your activity.
+The alias <code>test</code> refers to version <code>3</code> of the <code>DeleteWallsActivity</code> activity, which could be the latest version you are still testing.</p>
+<h2>Using Aliases</h2>
+<p>In Design Automation, workitems uses aliases to reference activities, and activities use aliases to reference appbundles. </p>
+<p><code>sh
+DeleteWallsWorkitem
+ ---&gt; DeleteWallsActivity
+       ---&gt; DeleteWallsApp</code> </p>
+<p>To reference a specific version of app or activity, build a string in the format <strong>"<code>owner</code>.<code>id</code>+<code>alias</code>"</strong> for this version of app or activity.  </p>
+<p>Parameter | Description
+--------|-----------
+<code>owner</code> | The nickname for your Forge Client App id.
+<code>id</code> | The <code>app</code> or <code>activity</code> id.
+<code>alias</code> | The alias id labeling the specific version.</p>
+<p>For example, "<code>YourNickname.DeleteWallsApp+test</code>" would reference version <code>2</code> of the app <code>DeleteWallsApp</code>.</p>
+<p>id       |    alias      | version 
+------------- |:-------------:| :-----:    <br />
+DeleteWallsApp | prod | 1  <br />
+DeleteWallsApp | test | 2 
+DeleteWallsApp |    | 3
+DeleteWallsApp |    | 4</p>
+<p>then your activity can reference version <code>2</code> of the app <code>DeleteWallsApp</code> by the alias <code>test</code>.
+For example, <code>YourNickname.DeleteWallsActivity+test</code> references <code>YourNickname.DeleteWallsApp+test</code></p>
+<p>If you later reassign the alias <code>test</code> to the latest version <code>4</code> of <code>DeleteWallsApp</code>, then the activity <code>YourNickname.DeleteWallsActivity+test</code> will automatically run against version <code>4</code> of <code>DeleteWallsApp</code> without any changes to the definition of this activity.</p>
+<h2>Create an Alias for an app/activity</h2>
+<ul>
+<li>This example creates an alias with id <code>test</code>. The alias labels version <code>2</code> of app <code>DeleteWallsApp</code>.</li>
+</ul>
+<p><code>sh
+  curl -X POST \ 
+    https://developer.api.autodesk.com/da/us-east/v3/appbundles/DeleteWallsApp/aliases \
+    -H 'Content-Type: application/json' \
+    -H 'Authorization: Bearer LongStringAccessTokenObtainedDuringAuthenthication' \
+    -d '{
+        "version": 2,
+        "id": "test"
+      }'</code>
+  Notes: <code>https://developer.api.autodesk.com/da/us-east/v3/appbundles/{appId}/aliases</code> - The {appId} can be changed to use this example with other app's id. </p>
+<ul>
+<li>This example creates an alias with id <code>test</code>. The alias labels version <code>2</code> of activity <code>DeleteWallsActivity</code>.</li>
+</ul>
+<p><code>sh
+  curl -X POST \ 
+    https://developer.api.autodesk.com/da/us-east/v3/activities/DeleteWallsActivity/aliases \
+    -H 'Content-Type: application/json' \
+    -H 'Authorization: Bearer LongStringAccessTokenObtainedDuringAuthenthication' \
+    -d '{
+        "version": 2,
+        "id": "test"
+      }'</code>
+  Notes: <code>https://developer.api.autodesk.com/da/us-east/v3/activities/{activityId}/aliases</code> - The {activityId} can be changed to use this example with other activity's id. </p>
+<h2>Update an Alias for an app/activity</h2>
+<ul>
+<li>This example uses PATCH to reassign the alias <code>test</code> to version <code>4</code> of the app <code>DeleteWallsApp</code>.</li>
+</ul>
+<p><code>sh
+  curl -X PATCH \
+    https://developer.api.autodesk.com/da/us-east/v3/appbundles/DeleteWallsApp/aliases/test \
+    -H 'Content-Type: application/json' \
+    -H 'Authorization: Bearer LongStringAccessTokenObtainedDuringAuthenthication' \
+    -d '{
+        "version": 4
+      }'</code></p>
+<p>Notes:
+  * <code>https://developer.api.autodesk.com/da/us-east/v3/appbundles/{appId}/aliases/{aliasId}</code> - The {appId} and {aliasId} can be changed to use this example with other app's id and alias's id.
+  * <code>version</code> - The version number of the app the alias will label.</p>
+<ul>
+<li>This example uses PATCH to reassign the alias <code>test</code> to version <code>3</code> of the activity <code>DeleteWallsActivity</code>.</li>
+</ul>
+<p><code>sh
+  curl -X PATCH \
+    https://developer.api.autodesk.com/da/us-east/v3/activities/DeleteWallsActivity/aliases/test \
+    -H 'Content-Type: application/json' \
+    -H 'Authorization: Bearer LongStringAccessTokenObtainedDuringAuthenthication' \
+    -d '{
+        "version": 3
+      }'</code></p>
+<p>Notes:
+  * <code>https://developer.api.autodesk.com/da/us-east/v3/activities/{activityId}/aliases/{aliasId}</code> - The {activityId} and {aliasId} can be changed to use this example with other activity's id and alias's id. 
+  * <code>version</code> - The version number of the activity the alias will label.</p>
+<h2>References</h2>
+<ul>
+<li>
+<p>The APIs for <code>app</code> can be found <a href="http://v3doc.s3-website-us-west-2.amazonaws.com/#/AppsApi">here</a>.</p>
+</li>
+<li>
+<p>The APIs for <code>activity</code> can be found <a href="http://v3doc.s3-website-us-west-2.amazonaws.com/#/ActivitiesApi">here</a>.</p>
+</li>
+<li>
+<p>If you get an error, please refer to some common errors listed <a href="ForgeErrors.md">here</a>.</p>
+</li>
+</ul>

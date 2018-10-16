@@ -1,0 +1,21 @@
+<h1>Common Forge REST API Request errors</h1>
+<h2>Client id not whitelisted</h2>
+<p><code>Status: 403 Unauthorized
+Body: {fault.name} - The client_id specified does not have access to the api product</code>
+If you see such an error, it is likely that the client id you used is not authorized to use the Design Automation for Revit's private beta service. Please <a href="mailto:revit.io.support@autodesk.com">contact us</a> to get your client id whitelisted or use the one that is already whitelisted. Also, refer to our <a href="Forge.md#creating-a-forge-app">Getting Started on Forge</a> documentation.</p>
+<p>If you are already using a whitelisted client id and if you still see this error, please contact us at <a href="mailto:revit.io.support@autodesk.com">revit.io.support@autodesk.com</a>.</p>
+<h2>Expired token</h2>
+<p><code>Status: 401 Unauthorized
+Body: The token has expired or is invalid</code>
+This error can happen when the token attained to authenticate the Forge Application has expired. Please obtain a fresh token and perform the original request once again.</p>
+<p>Please refer to the <a href="Forge.md#authentication">link</a> to learn more.</p>
+<h2>Invalid scope</h2>
+<p><code>Status: 403 Forbidden
+Body: Token does not have the privilege for this request.</code>
+This error can happen when wrong scope is provided while authenticating the Forge Application. Please use <code>scope=code:all</code> to obtain a fresh token and perform the original request once again.</p>
+<p>Please refer to the <a href="Forge.md#authentication">link</a> to learn more.</p>
+<h2>Too Many Requests</h2>
+<p><code>Status: 429 Too Many Requests
+Body: You reached Quota limit. Your total free Quota is 20 requests per minute. Please try again soon.</code>
+This error can happen when more than allowed WorkItems are posted within a given minute. The current quota limit is 20 WorkItems per minute.</p>
+<p>Please refer to the <a href="QuotasAndRestrictions.md#workitem-limits">link</a> to learn more.</p>

@@ -1,0 +1,88 @@
+<h1>Activity</h1>
+<p>An <code>activity</code> is an action which can be executed in Design Automation. You create and post your own activities to run against target appbundles.</p>
+<h3>APIs for activity</h3>
+<p>This page will explain the first of the sample <code>activity</code> APIs below:</p>
+<ul>
+<li>Command &ndash; Endpoint URL &ndash; Description</li>
+<li><strong>POST</strong> &ndash; <strong>/v3/activities</strong> &ndash; <a href="#create-a-new-activity">Creates a new activity</a></li>
+<li><strong>POST</strong> &ndash; <strong>/v3/activities/{id}/aliases</strong> &ndash; Creates a new alias for this activity</li>
+<li><strong>POST</strong> &ndash; <strong>/v3/activities/{id}/versions</strong> &ndash; Creates a new version of the activity</li>
+<li><strong>PATCH</strong> &ndash; <strong>/v3/activities/{id}/aliases/{aliasId}</strong> &ndash; Modify alias details</li>
+</ul>
+<p>The other three are similar to the <a href="AppBundle.html"><code>appbundle</code> APIs</a>.</p>
+<p>The base URL is <em>https://developer.api.autodesk.com/da/us-east</em>.</p>
+<p>More APIs for <code>activity</code> can be found <a href="http://v3doc.s3-website-us-west-2.amazonaws.com/#/ActivitiesApi">here</a>.</p>
+<h2>Create a New Activity</h2>
+<p>To create a new <code>activity</code> with the id <code>DeleteWallsActivity</code>, post this request:</p>
+<pre>
+curl -X POST \
+  https://developer.api.autodesk.com/da/us-east/v3/activities \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer LongStringAccessTokenObtainedDuringAuthenthication' \
+  -d '{
+            "id": "DeleteWallsActivity",
+            "commandLine": [ "$(engine.path)\\\\revitcoreconsole.exe /i $(args[rvtFile].path) /al $(appbundles[DeleteWallsApp].path)" ],
+            "parameters": {
+              "rvtFile": {
+                "zip": false,
+                "ondemand": false,
+                "verb": "get",
+                "description": "Input Revit model",
+                "required": true,
+                "localName": "$(rvtFile)"
+              },
+              "result": {
+                "zip": false,
+                "ondemand": false,
+                "verb": "put",
+                "description": "Results",
+                "required": true,
+                "localName": "result.rvt"
+              }
+            },
+            "engine": "Autodesk.Revit+2018",
+            "appbundles": [ "YourNickname.DeleteWallsApp+test" ],
+            "description": "Delete walls from Revit file."
+    }'
+</pre>
+
+<ul>
+<li><code>id</code> &ndash; The name given to your new activity.</li>
+<li><code>commandLine</code> &ndash; The command run by this activity.</li>
+<li><code>$(engine.path)\\\\revitcoreconsole.exe</code> - The full path to the folder from which the engine for Revit executes. </li>
+<li><code>engine</code> &ndash; The engine on which your activity runs. </li>
+</ul>
+<h4>Response</h4>
+<pre>
+{
+    "commandLine": [
+        "$(engine.path)\\\\revitcoreconsole.exe /i $(args[rvtFile].path) /al $(appbundles[DeleteWallsApp].path)"
+    ],
+    "parameters": {
+        "rvtFile": {
+            "verb": "get",
+            "description": "Input Revit model",
+            "required": true,
+            "localName": "$(rvtFile)"
+        },
+        "result": {
+            "verb": "put",
+            "description": "Results",
+            "required": true,
+            "localName": "result.rvt"
+        }
+    },
+    "engine": "Autodesk.Revit+2018",
+    "appbundles": [
+        "YourNickname.DeleteWallsApp+test"
+    ],
+    "description": "Delete walls from Revit file.",
+    "version": 1,
+    "id": "YourNickname.DeleteWallsActivity"
+}
+</pre>
+
+<p>The response to the new <code>activity</code> post includes:</p>
+<ul>
+<li><code>version</code> &ndash; The version number for the activity created by the POST request. For the Post request creating a new activity, version always returns <code>1</code>.</li>
+</ul>

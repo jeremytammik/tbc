@@ -1,0 +1,212 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+/a/doc/au/2017/doc2/sd125457_forge_design_automation_rvt_diane_christoforo_handout.pdf
+/a/doc/au/2018/doc/forge_da4r.pptx
+
+with my FPD colleague [Augusto](http://adndevblog.typepad.com/autocad/augusto-goncalves.html) [Gonçalves](https://www.linkedin.com/in/augustomaia),
+
+ #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+
+&ndash; 
+...
+
+-->
+
+<h3>Forge Design Automation for Revit</h3>
+<p>Today, I am presenting a class on Design Automation for Revit or DA4R at the Forge DevCon preceding the German Autodesk University in Darmstadt.</p>
+<p>I will present very similar material again tomorrow in German in the AU session on <em>BIM360 News und Online Revit-Programmierung von BIM via Forge Design Automation API für RVT</em>.</p>
+<p>This is all based on last year's presentation <em><b>SD125457</b> &ndash; Design Automation &ndash; Building Web Applications with Revit Data on Forge</em> by Diane Christoforo, Sasha Crotty, Rahul Bhobe and Ryan Duell at Autodesk University last year in Las Vegas.</p>
+<p>I consider that enough public exposure to allow me to share this information here with you as well:</p>
+<ul>
+<li><a href="#2">Disclaimer</a> </li>
+<li><a href="#3">What is Forge Design Automation API for Revit?</a> </li>
+<li><a href="#3.1">What are some examples of what the service can do?</a> </li>
+<li><a href="#3.2">How do you use the service?</a> </li>
+<li><a href="#3.3">Workflow: Uploading a Revit add-in</a> </li>
+<li><a href="#3.4">Workflow: Running a client application</a> </li>
+<li><a href="#3.5">Things to consider when using the service</a> </li>
+<li><a href="#4">How can I create a Revit add-in which works with Design Automation API?</a> </li>
+<li><a href="#4.1">Decide what your add-in will do</a> </li>
+<li><a href="#4.2">Create an IExternalDBApplication</a> </li>
+<li><a href="#4.3">Determine what inputs you need</a> </li>
+<li><a href="#4.4">Use our bridge library to be notified when Design Automation is executing</a> </li>
+<li><a href="#4.5">Create a failure handler</a> </li>
+<li><a href="#4.6">Decide how to handle logging and errors specific to your add-in</a> </li>
+<li><a href="#4.7">Plan how to access or create files</a> </li>
+<li><a href="#4.8">Move any Internet operations to the client application</a> </li>
+<li><a href="#5">Further Reading</a> </li>
+</ul>
+<p>It will also help me get my act together for the two presentations &nbsp; :-)</p>
+<h4><a name="2"></a> Disclaimer</h4>
+<p>Forge Design Automation API for Revit is an unreleased service which is currently in invitation-only beta. The information presented here will change.</p>
+<p>Any statements regarding planned or future development efforts are not intended to be a promise or guarantee of future availability of products, services or features but merely reflect current plans and based on factors currently known. These planned and future development efforts may change without notice. Purchasing decisions should not be made based upon reliance on these statements.</p>
+<p>Please note that you currently cannot make any practical use whatsoever of anything discussed below.</p>
+<h4><a name="3"></a> What is Forge Design Automation API for Revit?</h4>
+<p>The Forge Design Automation API for Revit lets you build web applications that create, read,
+and modify Revit models. We'll review the kinds of apps you will be able to build and their
+API architecture so that you can get ready to use Design Automation for Revit in your own
+applications.</p>
+<p>Design Automation API for Revit is a Forge service that will allow developers to access the 'business logic' of Revit on the cloud. Like Design Automation API for AutoCAD, developers can create client applications which speak to the Revit engine via our REST API. Developers will be able to automate existing workflows or create new cloud workflows.</p>
+<p>Because Design Automation API for Revit is a Forge service, you can take advantage of other Forge services to easily connect your applications together.</p>
+<p>Today, you can use and read the existing documentation for <a href="https://developer.autodesk.com/en/docs/design-automation/v2/overview">Design Automation API for AutoCAD</a>.</p>
+<h4><a name="3.1"></a> What are some examples of what the service can do?</h4>
+<p>There are many options falling under three major workflows: Create, Extract, and Modify.</p>
+<p>Create:</p>
+<ul>
+<li>Convert from a third-party format to RVT/RFA</li>
+<li>Generate documentation from a specification</li>
+<li>Create families from a catalog</li>
+</ul>
+<p>Extract:</p>
+<ul>
+<li>Put data into a format Revit doesn’t natively support</li>
+<li>Share model info with consultants who don’t have Revit</li>
+<li>Create daily model reports</li>
+</ul>
+<p>Modify:</p>
+<ul>
+<li>Design option generation</li>
+<li>Automatically replace out-of-date content</li>
+<li>Fix common modeling mistakes</li>
+</ul>
+<h4><a name="3.2"></a> How do you use the service?</h4>
+<p>Like other Forge services, you’ll create a Forge client application which will call our REST API endpoints. You can use any language which can make REST calls. This client application will also do any 'front-end' work you need &ndash; displaying UI to an end-user, for example. Overall, the
+system is similar to Design Automation API for AutoCAD and the endpoints should be familiar to someone familiar with that service.</p>
+<p>In addition to the client application, you will create one or more Revit add-ins to execute against the Revit engine. You will upload these to the Design Automation service and your client application will refer to them when invoking the service. (You can keep them private or public depending on what you want.) We’ll talk more about these add-ins in the next section.</p>
+<h4><a name="3.3"></a> Workflow: Uploading a Revit add-in</h4>
+<p><center>
+<img src="img/da4r_upload_appbundle.png" alt="Uploading an AppBundle" width="600">
+</center></p>
+<ol>
+<li>You write the code for your Revit add-in.</li>
+<li>You define and upload an 'apps' object with the Design Automation API. Apps refers to one or more add-ins and can be used later by multiple applications. (It's your choice whether to make this public or private.)</li>
+<li>You define an 'activity' with the Design Automation API. An activity specifies one or more apps, a set of inputs and outputs, and a product engine to run against.</li>
+</ol>
+<h4><a name="3.4"></a> Workflow: Running a client application</h4>
+<p><center>
+<img src="img/da4r_running_workitem.png" alt="Running a workitem" width="600">
+</center></p>
+<ol>
+<li>You or your end user uploads their input files to a cloud location.</li>
+<li>The client application POSTs a 'workitem'. This is a specific invocation of an activity, indicating specific input files and an output location.</li>
+<li>The Design Automation service downloads the input files.</li>
+<li>The service runs your add-in against the Revit engine.</li>
+<li>The service uploads the output to the specified location.</li>
+<li>The client application retrieves the output, either for display to the end user or further processing.</li>
+</ol>
+<h4><a name="3.5"></a> Things to consider when using the service</h4>
+<p>There are a few important things to keep in mind as you plan for how to use the service.</p>
+<ol>
+<li>You will only have access to Revit’s 'business logic'. You won’t have access to Revit’s UI. In technical terms, this means you can call RevitAPI.dll functions but not RevitAPIUI.dll functions. (Or, you won’t have access to the Autodesk.Revit.UI namespace.) You can put whatever UI you want in your client application, but your Revit add-in shouldn’t display UI.</li>
+<li>There is no intermediate feedback. Your add-in will run to completion once it starts, so it’ll need to have all input up front. There is also no way to get partial results. You can check the status of a job but you’ll get all results at the end.</li>
+<li>There is no persistence between jobs. If a job is meant to be a follow-on to a previous job, you’ll need to send the second job with any info it needs to set up the proper state. Every job is run in a clean environment.</li>
+</ol>
+<h4><a name="4"></a> How can I create a Revit add-in which works with Design Automation API?</h4>
+<p>Your full client application may not be a Revit add-in specifically. It may be a website or a standalone application. But part of your system will be a Revit add-in. This add-in is what will be executed against Revit in the cloud when you invoke the Design Automation API.</p>
+<p>Even though the Forge service isn’t public today, we can explain the steps to create a Design Automation-ready add-in now. You can use these steps to convert an existing add-in or to create a new one.</p>
+<h4><a name="4.1"></a> Decide what your add-in will do</h4>
+<p>When you send a job to Design Automation API, it will go into a queue. When it reaches the head of the queue, it will run to completion and then return. Everything the job needs to run must be available to it at start time. As such, add-ins should be able to do self-contained chunks of work.</p>
+<p>This does not mean the add-in can only do simple tasks, just that all the inputs need to be present up front. For example, take an add-in which does nightly data extraction from a model. It might export all views to images, convert all schedules into the company’s format, create charts on what changes have happened in the model over the past day, and update cost estimates. You could structure this as one add-in or as four, depending on what you want to do and whether you think you might reuse the pieces elsewhere. One add-in means only having to open the model once. Four add-ins lets your client application send the work as four different jobs and you may get intermediate results faster.</p>
+<h4><a name="4.2"></a> Create an IExternalDBApplication</h4>
+<p>Most Revit add-ins are external commands (IExternalCommand) or external applications (IExternalApplication.) There is a third kind, the IExternalDBApplication, which is an add-in which can run without Revit’s UI logic. You will not have access to Revit’s UI logic as part of Design Automation API, so you will need to create an IExternalDBApplication.</p>
+<p>Your add-in will have access to all the functionality in RevitAPI.dll but none of the functionality in RevitAPIUI.dll. You should avoid using other UI libraries as well. There is no way to click on dialogs or message boxes; the system will effectively hang if you try to present one.</p>
+<p>If you have an existing app, splitting into UI and logic layers will allow you to run against both desktop Revit and Design Automation API. You can preserve your existing UI functionality within an IExternalApplication which communicates with your IExternalDBApplication.</p>
+<h4><a name="4.3"></a> Determine what inputs you need</h4>
+<p>'Inputs' to a Design Automation job can include simple parameters and files of any type. The framework will put any input files into the cloud machine’s working directory before running your add-in.</p>
+<p>As mentioned, a Design Automation job must have all the information it needs to run at launch time. There is no ability to send more data or call back to the user in the middle of a job. This can present a problem if your add-in expects to do partial calculations and then ask the user for more input.</p>
+<p>In this situation, you can either attempt to collect the input up front, or set up your client application so that it run several smaller jobs. Here are two examples:</p>
+<ul>
+<li>If your application warns a user when an operation is expected to take a long time, you might have a user setting indicating how long to wait before cancelling.</li>
+<li>If your application runs into errors while trying to generate geometry, you might return early, ask the user to make corrections, and re-submit the job.</li>
+</ul>
+<h4><a name="4.4"></a> Use our bridge library to be notified when Design Automation is executing</h4>
+<p>We will provide a small library with an event your add-in can subscribe to in order to be notified when the Design Automation service is ready to run your add-in. Your add-in should create an event handler and execute its functionality inside. (The add-in will be registered in Revit normally, but this provides an entry point for starting your code.)</p>
+<p>Until the library is available, you can get a similar effect for testing purposes by subscribing to Revit’s ApplicationInitialized event. You should not do this if you are actually running your add-in against Design Automation, because we will do more system setup after the ApplicationInitialized event is raised. Additionally, the framework will use the success/failure parameter of the event to determine whether the job succeeded.</p>
+<h4><a name="4.5"></a> Create a failure handler</h4>
+<p>One side effect of there being no UI available is that you will need to handle Revit errors. We will ignore or take a default action for user-facing dialogs. We will also ignore warnings. However, we do not take any default actions for errors. You should either create an event handler for the FailuresProcessing event, or implement an IFailuresProcessor.</p>
+<p>You must ensure that it handles all possible warnings, errors and other failures gracefully.</p>
+<p>The Building Coder recently discussed this topic using the StairsAutomation SDK sample:</p>
+<ul>
+<li><a href="zip/da4r_au_2018/FailureProcessor.html">About handling failures</a></li>
+<li><a href="zip/da4r_au_2018/FailureProcessor.cs">Sample failure processor module <code>FailureProcessor.cs</code></a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2018/09/swallowing-stairsautomation-warnings.html">Swallowing StairsAutomation warnings</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2018/09/auto-run-an-add-in-for-design-automation.html">Auto-Run an add-in for Design Automation</a></li>
+</ul>
+<h4><a name="4.6"></a> Decide how to handle logging and errors specific to your add-in</h4>
+<p>Design Automation API for Revit does not have any built-in logging functionality. You can add comments to the Revit journal via Application.WriteJournalComment(). You can also create a log file of your own and include it in your output zip package.</p>
+<h4><a name="4.7"></a> Plan how to access or create files</h4>
+<p>During your add-in’s execution, you will only have access to the working directory of the cloud machine. As such, any Revit models or other files you create will need to be saved to the working directory, or to a subfolder under the working directory. This also applies to any log files you create.</p>
+<p>You can specify input files from cloud locations by providing a signed URL when running a Design Automation job. The framework will download the file or files to the working directory.</p>
+<h4><a name="4.8"></a> Move any Internet operations to the client application</h4>
+<p>Your Revit add-in will not have access to the network. Any cloud files you need will have to be specified as inputs. The Design Automation framework will take care of downloading any input files before running any Revit code. The service will also upload your output to the URL you specify.</p>
+<p>If you need to communicate with an online database or something similar, your client application will need to do this before your after your add-in runs. You may need to temporarily store your data in an input or output file.</p>
+<h4><a name="5"></a> Further Reading</h4>
+<p>Here are links to the current Forge Design Automation API reference (for DWG), Revit API guides and past online AU classes for Design Automation:</p>
+<p><strong>Design Automation API Reference:</strong></p>
+<ul>
+<li><a href="http://v3doc.s3-website-us-west-2.amazonaws.com/">Existing documentation for the Design Automation API</a>.</li>
+</ul>
+<p><strong>Revit API:</strong></p>
+<ul>
+<li><a href="http://help.autodesk.com/view/RVT/2018/ENU/?guid=Revit_API_Revit_API_Developers_Guide_html">Revit Developer Guide</a></li>
+<li><a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&amp;id=16777469">My First Plug-in Training</a></li>
+</ul>
+<p><strong>Past Autodesk University Classes:</strong></p>
+<ul>
+<li><a href="http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2017/autocad/sd124720#chapter=0">SD124720: The New and Expanded Forge Design Automation API</a></li>
+<li><a href="http://au.autodesk.com/au-online/classes-on-demand/class-catalog/classes/year-2017/revit/sd125457">SD125457: Design Automation: Building Web Applications with Revit Data on Forge</a></li>
+</ul>
+<hr/>
+
+<ul>
+<li><a href="#12">Design Automation for Revit &ndash; DA4R</a> </li>
+<li><a href="#13">Getting started &ndash; Step by Step</a> </li>
+<li><a href="#14">Design automation terminology</a> </li>
+<li><a href="#15">Handling failures in Revit app bundles</a> </li>
+<li><a href="#16">References</a> </li>
+</ul>
+<h4><a name="12"></a> Design Automation for Revit &ndash; DA4R</h4>
+<p>Design Automation lets you write your own applications for Revit, so that you can process and manipulate Revit models via Autodesk Forge.</p>
+<h4><a name="13"></a> Getting Started &ndash; Step by Step</h4>
+<p>Please follow these steps to run your first Revit job in Design Automation:</p>
+<ol>
+<li><a href="zip/da4r_au_2018/ConvertAddin.html">Convert your Revit AddIn</a> &ndash; Applications run on Design Automation are very similar to normal Revit addins.</li>
+<li><a href="zip/da4r_au_2018/Forge.html">Create a Forge App and get authenticated</a> &ndash; Design Automation runs on the Autodesk Forge platform, so you need an account and access to the pricvate DA4R beta.</li>
+<li><a href="zip/da4r_au_2018/Nickname.html">Create a nickname for your Forge App</a></li>
+<li><a href="zip/da4r_au_2018/AppBundle.html">Publish your Design Automation app</a></li>
+<li><a href="zip/da4r_au_2018/Activity.html">Publish your Design Automation activity</a></li>
+<li><a href="zip/da4r_au_2018/WorkItem.html">Post your Design Automation workitem</a></li>
+</ol>
+<h4><a name="14"></a> Design Automation Terminology</h4>
+<p>Before we discuss any details, let's define some important terms:</p>
+<ul>
+<li><a href="zip/da4r_au_2018/Nickname.html">nickname</a> &ndash; A way to map a Forge App <code>Client Id</code> to a customized string. The nickname lets you create a friendly, easy-to-read, string that can be used in place of the long Forge App <code>Client Id</code>.</li>
+<li><a href="zip/da4r_au_2018/Alias.html">alias</a> &ndash; A label to a specific version of an <code>app</code> or <code>activity</code>.</li>
+<li><a href="zip/da4r_au_2018/AppBundle.html">app</a> &ndash; A package of binaries and supporting files which make your Revit Addin application.</li>
+<li><a href="zip/da4r_au_2018/Activity.html">activity</a>  &ndash; An action which can be executed in Design Automation. You create and post your own activities to run against particular <code>apps</code>.</li>
+<li><a href="zip/da4r_au_2018/WorkItem.html">workitem</a> &ndash; A request to execute an <code>activity</code>.  The relationship between an activity and workitem can be thought of as a 'function definition' and 'function call', respectively. </li>
+</ul>
+<p>The naming rules for <code>nickname</code>, <code>alias</code> and <code>id</code> of <code>app</code>/<code>activity</code> limit the possible characters to the purely alphnumerical set of [a-zA-Z_0-9].</p>
+<h4><a name="15"></a> Handling Failures in Revit App Bundles</h4>
+<p>Before you convert your Revit add-in to DA4R, you must ensure that it handles all possible warnings, errors and other failures gracefully.</p>
+<p>The Building Coder recently discussed this topic using the StairsAutomation SDK sample:</p>
+<ul>
+<li><a href="zip/da4r_au_2018/FailureProcessor.html">About handling failures</a></li>
+<li><a href="zip/da4r_au_2018/FailureProcessor.cs">Sample failure processor module <code>FailureProcessor.cs</code></a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2018/09/swallowing-stairsautomation-warnings.html">Swallowing StairsAutomation warnings</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2018/09/auto-run-an-add-in-for-design-automation.html">Auto-Run an add-in for Design Automation</a></li>
+</ul>
+<p>forge use cases - general categories</p>
+<p>dashboard and data visualisation
+analysis + simulation
+saas integration
+batch editing of designs
+ar + vr
+configurators
+content catalogues
+photogrammetry</p>

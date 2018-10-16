@@ -1,0 +1,216 @@
+<h1>App</h1>
+<p>An <code>appbundle</code> is the package of binaries and supporting files which make your Revit 
+Addin application.</p>
+<h2>Appbundle Structure</h2>
+<p>Design Automation API for Revit expects your <code>appbundle</code> to be a zip file with certain contents.  Here is the zip file for a sample appbundle called DeleteWallsApp.zip:</p>
+<pre>
+DeleteWallsApp.zip
+|-- DeleteWalls.bundle
+|   |-- PackageContents.xml
+|   |-- Contents
+|   |   |-- DeleteWalls.dll
+|   |   |-- DeleteWalls.addin
+</pre>
+
+<p>The top-level folder needs be named <code>*.bundle</code>.  In <code>*.bundle</code> put a <code>PackageContents.xml</code> file that contains the description of the appbundle and the relative path to its .addin file.</p>
+<pre>
+&lt;?xml version="1.0" encoding="utf-8" ?&gt;
+&lt;ApplicationPackage&gt;
+  &lt;Components Description="Delete Walls"&gt;
+    &lt;RuntimeRequirements OS="Win64" 
+                         Platform="Revit" 
+                         SeriesMin="R2018" 
+                         SeriesMax="R2018" /&gt;
+    &lt;ComponentEntry AppName="DeleteWalls" 
+                    Version="1.0.0" 
+                    ModuleName="./Contents/DeleteWalls.addin" 
+                    AppDescription="Deletes walls" 
+                    LoadOnCommandInvocation="False" 
+                    LoadOnRevitStartup="True" /&gt;
+  &lt;/Components&gt;
+&lt;/ApplicationPackage&gt;
+</pre>
+
+<p>Note: <code>SeriesMin</code> and <code>SeriesMax</code> both refer to Revit 2018 as <code>R2018</code>.  As of September 2018, Design Automation for Revit supports appbundles which run on Revit <code>R2018</code> and <code>R2019</code>.</p>
+<p>In the <code>*.bundle\Contents</code> folder, put the <code>addin</code> file and the application <code>DLL</code> and its dependencies.  </p>
+<pre>
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;RevitAddIns&gt;
+  &lt;AddIn Type="DBApplication"&gt;
+    &lt;Name&gt;DeleteWalls&lt;/Name&gt;
+    &lt;Assembly&gt;.\DeleteWalls.dll&lt;/Assembly&gt;
+    &lt;AddInId&gt;d7fe1983-8f10-4983-98e2-c3cc332fc978&lt;/AddInId&gt;
+    &lt;FullClassName&gt;DeleteWalls.DeleteWallsApp&lt;/FullClassName&gt;
+    &lt;Description&gt;"Walls Deleter"&lt;/Description&gt;
+    &lt;VendorId&gt;Autodesk&lt;/VendorId&gt;
+    &lt;VendorDescription&gt;
+    &lt;/VendorDescription&gt;
+  &lt;/AddIn&gt;
+&lt;/RevitAddIns&gt;
+</pre>
+
+<p>Note: <code>Type</code> must be <code>DBApplication</code>.  Design Automation for Revit doesn't support applications that need Revit's UI functionality. </p>
+<p><code>Assembly</code> must be a relative path to the <code>DLL</code>.</p>
+<p>Examples of the format for the <code>*.bundle</code> folder and <code>PackageContent.xml</code> file can been found in the presentation on Autodesk Exchange Revit Apps <a href="http://adndevblog.typepad.com/aec/ExchangeStorePublisher/3%20Autodesk%20Exchange%20Publish%20Revit%20Apps%20-%20Preparing%20Apps%20for%20the%20Store_Guidelines.pptx">here</a>. While <code>PackageContents.xml</code> from existing Autodesk Exchange Revit apps can be used as-is, Design Automation for Revit only reads the <code>RuntimeRequirements</code> and <code>ComponentEntry</code> blocks which are circled in the image below.</p>
+<h2>Publish an Appbundle</h2>
+<h3>APIs for app</h3>
+<p>This page explains the following <code>appbundle</code> APIs:</p>
+<ul>
+<li>Command &ndash; Endpoint URL &ndash; Description</li>
+<li><strong>POST</strong> &ndash; <strong>/v3/appbundles</strong> &ndash;  <a href="#create-a-new-app">Creates a new app</a>.</li>
+<li><strong>POST</strong> &ndash; <strong>/v3/appbundles/{id}/aliases</strong> &ndash;  <a href="#create-an-alias-for-the-app">Creates a new alias for this app</a>.</li>
+<li><strong>POST</strong> &ndash; <strong>/v3/appbundles/{id}/versions</strong> &ndash;  <a href="#create-a-new-version-number">Creates a new version of the app</a>.</li>
+<li><strong>PATCH</strong> &ndash; <strong>/v3/appbundles/{id}/aliases/{aliasId}</strong> &ndash;  <a href="#assign-an-existing-alias-to-another-version-of-an-app">Modify alias details</a>.</li>
+</ul>
+<p>The base URL is <em>https://developer.api.autodesk.com/da/us-east</em>.</p>
+<p>More APIs for <code>app</code> can be found <a href="http://v3doc.s3-website-us-west-2.amazonaws.com/#/AppsApi">here</a>.</p>
+<h3>Create a New App</h3>
+<p>To publish your appbundle to Design Automation, you need to POST your appbundle's identity and upload its package.</p>
+<p>This example creates a new app <code>DeleteWallsApp</code> by posting its identity. The target engine of Revit running in Design Automation for this example app is Revit 2018. </p>
+<pre>
+curl -X POST \
+  https://developer.api.autodesk.com/da/us-east/v3/appbundles \
+  -H 'Authorization: Bearer LongStringAccessTokenObtainedDuringAuthenthication' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "id": "DeleteWallsApp",
+  "engine": "Autodesk.Revit+2018",
+  "description": "Delete Walls app based on Revit 2018"
+}'
+</pre>
+
+<ul>
+<li><code>id</code> &ndash;  The name given to the new app.</li>
+<li><code>engine</code> &ndash;  The engine running in Design Automation used by the app.</li>
+</ul>
+<h4>Response</h4>
+<pre>
+{
+  "uploadParameters": {
+    "endpointURL": "https://dasdev-store.s3.amazonaws.com",
+    "formData": {
+      "key": "apps/Revit/DeleteWallsApp/1",
+      "content-type": "application/octet-stream",
+      "policy": "eyJleHBpcmF0aW9uIjoiMjAxOC... (truncated)",
+      "success_action_status": "200",
+      "success_action_redirect": null,
+      "x-amz-signature": "6c68268e23ecb8452... (truncated)",
+      "x-amz-credential": "ASIAQ2W... (truncated)",
+      "x-amz-algorithm": "AWS4-HMAC-SHA256",
+      "x-amz-date": "20180810... (truncated)",
+      "x-amz-server-side-encryption": "AES256",
+      "x-amz-security-token": "FQoGZXIvYXdzEPj//////////wEaDHavu... (truncated)"
+    }
+  },
+  "engine": "Autodesk.Revit+2018",
+  "description": "Delete Walls app based on Revit 2018",
+  "version": 1,
+  "id": "YourNickname.DeleteWallsApp"
+}
+</pre>
+
+<ul>
+<li><code>endpointURL</code> &ndash; This is the URL to which you must upload your app's ZIP file.</li>
+<li><code>version</code> &ndash;  The version number for the app created by the POST request. For the Post request creating a new app, version always returns <code>1</code>.</li>
+<li><code>formData</code> &ndash;  The form data that needs to be sent back when uploading the file in the following POST request.</li>
+</ul>
+<h3>Upload app zip file</h3>
+<p>Now you can upload your app's ZIP to the signed URL returned by <code>endpointURL</code>:</p>
+<pre>
+curl -X POST \
+  https://dasdev-store.s3.amazonaws.com \
+  -H 'Cache-Control: no-cache' \
+  -F key=apps/Revit/DeleteWallsApp/1 \
+  -F content-type=application/octet-stream \
+  -F policy=eyJleHBpcmF0aW9uIjoiMjAxOC... (truncated) \
+  -F success_action_status=200 \
+  -F x-amz-signature=6c68268e23ecb8452... (truncated) \
+  -F x-amz-credential=ASIAQ2W... (truncated) \
+  -F x-amz-algorithm=AWS4-HMAC-SHA256 \
+  -F x-amz-date=20180810... (truncated) \
+  -F x-amz-server-side-encryption=AES256 \
+  -F 'x-amz-security-token=FQoGZXIvYXdzEPj//////////wEaDHavu... (truncated)' \
+  -F 'file=@path/to/your/app/zip'
+</pre>
+
+<p>This is a <code>curl</code> example. You can use other way, e.g. Postman, to do the uploading. Just remember to include all form-data in your request.</p>
+<h3>Create an Alias for the App</h3>
+<p>The new version of your app will be referenced via an <a href="Alias.md">alias</a>.  </p>
+<p>This example creates an alias with id <code>test</code>. This alias labels version <code>1</code> of app <code>DeleteWallsApp</code>.</p>
+<pre>
+curl -X POST \
+  https://developer.api.autodesk.com/da/us-east/v3/appbundles/DeleteWallsApp/aliases \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer LongStringAccessTokenObtainedDuringAuthenthication' \
+  -d '{
+      "version": 1,
+      "id": "test"
+    }'
+</pre>
+
+<h3>Update an Existing App</h3>
+<h3>Create a New Version Number</h3>
+<p>To update an existing app, you need to create a new version for the app and then upload the updated zip package. </p>
+<p>If you still do the Post request for creating a new app <a href="#create-a-new-app">above</a> , you will get a <code>409 Conflict</code> error.</p>
+<p>This Post creates a new version for the app <code>DeleteWallsApp</code>.</p>
+<pre>
+curl -X POST \
+  https://developer.api.autodesk.com/da/us-east/v3/appbundles/DeleteWallsApp/versions\
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer LongStringAccessTokenObtainedDuringAuthenthication' \
+  -d '{
+      "id": null,
+      "engine": "Autodesk.Revit+2018",
+      "description": "Delete Walls app based on Revit 2018 Update"
+    }'
+</pre>
+
+<h4>Response</h4>
+<pre>
+{
+    "package": "https://dasprod-store.s3.amazonaws.com/appbundles/xxxxxxxx",
+    "engine": "Autodesk.Revit+2018",
+    "description": "Delete Walls app based on Revit 2018",
+    "version": 2,
+    "id": "YourNickname.DeleteWallsApp"
+}
+</pre>
+
+<p>The response to the app version post includes:</p>
+<ul>
+<li><code>package</code> &ndash;  This is the signed URL to which you must upload your updated app package ZIP file.</li>
+<li><code>version</code> &ndash;  The new version number for the app created by the above POST request.</li>
+</ul>
+<p>Now you can upload the updated app's zip file to the new signed URL returned by <code>package</code> same as <a href="#upload-app-zip-file">above</a>.</p>
+<h3>Assign an existing alias to another version of an app</h3>
+<p>You can update an existing alias to point to another version of an app.  </p>
+<p>For example, after you post a new version of an app, you may wish to assign an existing alias to point to that new app's version.</p>
+<p>Here is an example where alias <code>test</code> labels version <code>1</code> of an app <code>DeleteWallsApp</code>. A new version <code>2</code> has been posted for this app, but no alias labels version <code>2</code>:</p>
+<ul>
+<li>id       &ndash;     alias      &ndash;  version  </li>
+<li>DeleteWallsApp &ndash;  test &ndash;  1  </li>
+<li>DeleteWallsApp &ndash;  n/a    &ndash;   2 </li>
+</ul>
+<p>You can reassign alias <code>test</code> to label app version <code>2</code>:</p>
+<ul>
+<li>id       &ndash;     alias      &ndash;  version  </li>
+<li>DeleteWallsApp &ndash;   n/a  &ndash;  1  </li>
+<li>DeleteWallsApp  &ndash;  test &ndash;   2 </li>
+</ul>
+<p>To update the alias, you can either</p>
+<ul>
+<li>Delete the existing alias and recreate it with the version which you want to label.</li>
+<li>Do a PATCH request:</li>
+</ul>
+<pre>
+curl -X PATCH \
+  https://developer.api.autodesk.com/da/us-east/v3/appbundles/DeleteWallsApp/aliases/test \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer LongStringAccessTokenObtainedDuringAuthenthication' \
+  -d '{
+      "version": 2
+    }'
+</pre>
+
+<h2>Engine Version Aliases</h2>
+<p>Each app POST request specifies the <code>engine</code> on which the application will run.  Different Design Automation engine version aliases correspond to different releases of Revit. The specified <code>engine</code> needs to be compatible with your app's PackageContent.xml <code>SeriesMin</code> and <code>SeriesMax</code>.</p>

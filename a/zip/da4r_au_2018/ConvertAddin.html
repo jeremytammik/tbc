@@ -1,0 +1,103 @@
+<h1>How to convert your addin to work with Design Automation for Revit</h1>
+<p>Thank you so much for your interest in Design Automation for Revit. </p>
+<h2>Start with a small subset of your code</h2>
+<p>You'll want to start with a single operation. Converting an External Command may be a good idea. </p>
+<h2>Referencing the DesignAutomationBridge DLL</h2>
+<p>The <code>DesignAutomationBridge.dll</code> is only available to participant in the private beta.</p>
+<h2>Convert your IExternalApplication or IExternalCommand to IExternalDBApplication</h2>
+<p>You won't be adding any buttons or ribbon commands, since there won't be any UI interaction. </p>
+<p>You will need to implement <code>OnStartup</code> and <code>OnShutdown</code>. These functions will get a <code>ControlledApplication</code> instead of a <code>UIControlledApplication</code>. The functions return an <code>ExternalDBApplicationResult</code> object. </p>
+<pre>
+  using Autodesk.Revit.ApplicationServices;
+  using Autodesk.Revit.DB;
+  using DesignAutomationFramework;
+  namespace DeleteWalls
+  {   
+    [Transaction(TransactionMode.Manual)]
+    public class DeleteWallsApp : IExternalDBApplication
+    {
+      public ExternalDBApplicationResult OnStartup(
+        ControlledApplication app)
+      {
+        return ExternalDBApplicationResult.Succeeded;
+      }
+
+      public ExternalDBApplicationResult OnShutdown(
+        ControlledApplication app)
+      {
+        return ExternalDBApplicationResult.Succeeded;
+      }
+</pre>
+
+<p>The .addin file can go in the normal place, but the addin type is <code>DBApplication</code>.</p>
+<ul>
+<li>Don't include references to RevitAPIUI! (Don't include WPF or Windows Forms or anything either, but we do not currently have a way to check this.) There's no UI interaction, so anything that pops up a dialog expecting user input will hang the system. </li>
+</ul>
+<h2>Add a reference to DesignAutomationBridge.dll and add an event handler for DesignAutomationReady</h2>
+<p>Add a reference <code>DesignAutomationBridge.dll</code>.  </p>
+<blockquote>
+<p>For a C# project in Visual Studio, this is done by opening the Solution Explorer, finding your C# project, expanding its contents, right-clicking on the References node and doing 'Add Reference...'<br />
+In the Reference Manager dialog, use the 'Browse...' button to browse to DesignAutomationBridge.dll.  Click 'Add' and then 'OK' to add the reference to your project.</p>
+</blockquote>
+<p>The <code>DesignAutomationBridge</code> defines an event <code>DesignAutomationReadyEvent</code>. Revit's engine will raise this event when it's ready for you to run your addin. You should execute your code inside the event handler. </p>
+<pre>
+  public class DeleteWallsApp : IExternalDBApplication
+  {
+    public ExternalDBApplicationResult OnStartup(
+      ControlledApplication app)
+    {
+      DesignAutomationBridge.DesignAutomationReadyEvent
+       += HandleDesignAutomationReadyEvent;
+      return ExternalDBApplicationResult.Succeeded;
+    } 
+    public void HandleDesignAutomationReadyEvent(
+      object sender,
+      DesignAutomationReadyEventArgs e)
+    {
+      e.Succeeded = true;
+      DeleteAllWalls(e.DesignAutomationData);
+    }
+</pre>
+
+<p>The event will give you a path <code>DesignAutomationData.MainModelPath</code> to the "main" model indicated in the WorkItem's arguments. (We do not pre-open this model for you.) There is also a success/failure argument <code>DesignAutomationReadyEventArgs.Succeeded</code> you should set; it will let the service know whether potential failures happened in your code or elsewhere. </p>
+<p>Any files you load or create should be put into the working directory. On the cloud your write access is limited to the working directory and its children.</p>
+<h2>Handle failures encountered by Revit</h2>
+<p>A fundamental feature in Revit is how warnings and errors (collectively referred to as "failures") are handled.  Understand your options for <a href="FailureProcessor.html">handling failures</a> in Revit and implement a failure handling strategy in your application.</p>
+<h2>Check that it works locally</h2>
+<p>We are currently working on an application which will make testing more convenient. However, we have provided an alternate way of testing:</p>
+<h4>Handling Revit's <code>ApplicationInitialized</code> Event</h4>
+<p>Don't use this event on the cloud, because Design Automation for Revit continues doing setup past the point at which <code>ApplicationInitialized</code> is raised. Locally it should mimic the "run automatically" behavior. For example, in <code>DeleteWalls</code>, we can do this:</p>
+<pre>
+  public class DeleteWallsApp : IExternalDBApplication
+  {
+    public ExternalDBApplicationResult OnStartup(Autodesk.Revit.ApplicationServices.ControlledApplication app)
+    {
+      //Stop handling the event used by jobs on the cloud:
+      //DesignAutomationBridge.DesignAutomationReadyEvent += HandleDesignAutomationReadyEvent;
+      // And instead execute the code when desktop Revit is initialized.
+      app.ApplicationInitialized += HandleApplicationInitializedEvent;
+      return ExternalDBApplicationResult.Succeeded;
+    }
+
+    //public void HandleDesignAutomationReadyEvent(object sender, DesignAutomationReadyEventArgs e)
+    //{
+    //  e.Succeeded = true;
+    //  DeleteAllWalls(e.DesignAutomationData);
+    //}
+
+    public void HandleApplicationInitializedEvent(object sender, Autodesk.Revit.DB.Events.ApplicationInitializedEventArgs e)
+    {
+      Autodesk.Revit.ApplicationServices.Application app = sender as Autodesk.Revit.ApplicationServices.Application;
+      // We don't need to provide the file
+      DesignAutomationData data = new DesignAutomationData(app, "/path/to/file.rvt");
+      DeleteAllWalls(data);
+    }
+</pre>
+
+<p>Additionally, we must provide the .addin file to Revit. Add the add-in manifest to the appropriate location, e.g., <em>C:\ProgramData\Autodesk\Revit\Addins\2018</em> and set the <code>&lt;Assembly&gt;</code> tag to point to your DLL:</p>
+<pre>
+  &lt;Assembly&gt;C:\test\DeleteWalls\DeleteWallsTest\bin\Debug\DeleteWalls.dll&lt;/Assembly&gt;
+</pre>
+
+<p>This way, we are able to run this locally without any UI intervention on Revit startup. See <a href="http://usa.autodesk.com/adsk/servlet/index?siteID=123112&amp;id=20132893">this guide</a> on debugging.</p>
+<p><strong>Note:</strong> Your application cannot use the network, or write to any files outside of the current working directory. Restrictions on Design Automation for Revit can be found <a href="QuotasAndRestrictions.html">here</a>.</p>

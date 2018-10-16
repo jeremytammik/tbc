@@ -1,0 +1,21 @@
+<h1>Getting Started on Forge</h1>
+<h2>Creating a Forge App</h2>
+<p>The first step to using Design Automation for Revit is to create a Forge app.  Please create a Forge app using instructions in the following link: <a href="https://developer.autodesk.com/en/docs/oauth/v2/tutorials/create-app/">https://developer.autodesk.com/en/docs/oauth/v2/tutorials/create-app/</a></p>
+<p><strong>Action Required:</strong> When you have successfully created the app, please email <a href="mailto:revit.io.support@autodesk.com">revit.io.support@autodesk.com</a> the <code>Client ID</code> associated with your app so we can whitelist this app for the private beta. We do <strong>not</strong> require your app’s <code>Client Secret</code>.</p>
+<h2>Authentication</h2>
+<p>Please refer to the following links for more details:
+<a href="https://developer.autodesk.com/en/docs/oauth/v2/reference/http/authenticate-POST/">https://developer.autodesk.com/en/docs/oauth/v2/reference/http/authenticate-POST/</a>
+<a href="https://developer.autodesk.com/en/docs/oauth/v2/overview/field-guide/">https://developer.autodesk.com/en/docs/oauth/v2/overview/field-guide/</a></p>
+<p>You use the <code>Client ID</code> and <code>Client Secret</code> obtained above to authenticate your application and obtain a two-legged access token. The details of the HTTP response is given in the above link.  Please learn about the access tokens and their validity.</p>
+<p>Please use <code>scope=code:all</code> instead of <code>scope=data:read</code> to obtain a token. All Design Automation for Revit APIs require this scope.</p>
+<p><code>sh
+curl -v 'https://developer.api.autodesk.com/authentication/v1/authenticate'
+  -X 'POST'
+  -H 'Content-Type: application/x-www-form-urlencoded'
+  -d 'client_id=YourForgeAppClientID'
+  -d 'client_secret=YourForgeAppClientSecret'
+  -d 'grant_type=client_credentials'
+  -d 'scope=code:all'</code>
+The response body to this request contains the token that you shall use for all our APIs. The response also contains the expiration time of the token.</p>
+<h2>Forge API Errors</h2>
+<p>Some of the common errors returned by the APIs and their potential causes are listed <a href="ForgeErrors.md">here</a>.</p>

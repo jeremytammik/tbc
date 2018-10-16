@@ -1,0 +1,255 @@
+<h1>Workitem</h1>
+<p>When you post a workitem to Design Automation, you are requesting a job to be run on Design Automation.</p>
+<p>A workitem is used to execute an activity. The relationship between an activity and a workitem can be thought of as a 'function definition' and 'function call', respectively. Named parameters of the activity have corresponding named arguments of the workitem. Like in function calls, optional parameters of the activity can be skipped and left unspecified while posting a workitem.</p>
+<h2>APIs for workitem</h2>
+<p>This page will explain some sample <code>workitem</code> APIs below.</p>
+<ul>
+<li>Command &ndash; Endpoint URL &ndash; Description</li>
+<li><strong>POST</strong> &ndash; <strong>/v3/workitems</strong> &ndash; <a href="#post-a-workitem">Creates a new workitem and queues it for processing</a>.</li>
+<li><strong>GET</strong> &ndash; <strong>/v3/workitems/{id}</strong> &ndash; <a href="#workitem-status">Gets the status of a specific workitem</a>.</li>
+</ul>
+<h2>POST a Workitem</h2>
+<p>Here is an example of a workitem that executes the <code>DeleteWallsActivity</code>.</p>
+<pre>
+curl -X POST \
+  https://developer.api.autodesk.com/da/us-east/v3/workitems \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer LongStringAccessTokenObtainedDuringAuthenthication' \
+  -d '{
+        "activityId": "YourNickname.DeleteWallsActivity+test",
+        "arguments": {
+          "rvtFile": {
+            "url": "https://s3-us-west-2.amazonaws.com/revitio-dev/test-data/DeleteWalls.rvt"
+          },
+          "result": {
+            "verb": "put",
+            "url": "https://myWebsite/signed/url/to/result"
+          }
+        }
+      }'
+</pre>
+
+<p><code>LongStringAccessTokenObtainedDuringAuthenthication</code> needs to be replaced with your authentication token string.</p>
+<ul>
+<li><code>activityId</code> &ndash; The target activity defined by "owner.activity+alias"(<code>YourNickname.DeleteWallsActivity+test</code>) this workitem will execute.</li>
+<li><code>arguments</code> &ndash; The argument list that is required by the activity.</li>
+<li><code>rvtFile</code> - It is the URL to get the input file that will be processed by the workitem.</li>
+<li><code>result</code> - It is the URL to which the output will be 'put' (uploaded).</li>
+</ul>
+<h3>Reponse</h3>
+<p>The HTTP response will contain the <code>id</code> of the posted workitem.
+<pre>
+{
+    "status": "pending",
+    "stats": {
+        "timeQueued": "2018-04-16T21:45:08.1357163Z"
+    },
+    "id": "e8a3ee53770a4eaeb86f267aab76af47"
+}
+</pre></p>
+<h2>Workitem Status</h2>
+<p>Design Automation workitems are queued before they are processed.  Processed workitems may have run successfully or may have failed execution.</p>
+<p>You can check the status of a workitem by calling <code>[GET] /workitems/{id}</code>:</p>
+<pre>
+curl -X GET \
+  https://developer.api.autodesk.com/da/us-east/v3/workitems/e8a3ee53770a4eaeb86f267aab76af47 \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer LongStringAccessTokenObtainedDuringAuthenthication'
+</pre>
+
+<p><code>LongStringAccessTokenObtainedDuringAuthenthication</code> needs to be replaced with your authentication token string.</p>
+<p>Notes: The <code>workitemId</code> must be changed to use your workitem id. </p>
+<h3>Response</h3>
+<p>The Response is like below:
+<pre>
+{
+    "status": "success",
+    "reportUrl":  "https://dasprod-store.s3.amazonaws.com/workItem/Revit/e8a3ee53770a4eaeb86f267aab76af47/report.txt?XXXXXXXXX",
+    "stats": {
+        "timeQueued": "2018-04-13T03:15:15.9772282Z",
+        "timeDownloadStarted": "2018-04-13T03:15:17.2960823Z",
+        "timeInstructionsStarted": "2018-04-13T03:15:20.2803318Z",
+        "timeInstructionsEnded": "2018-04-13T03:15:41.6075799Z",
+        "timeUploadEnded": "2018-04-13T03:15:42.0450494Z"
+    },
+    "id": "e8a3ee53770a4eaeb86f267aab76af47"
+}
+</pre></p>
+<ul>
+<li><code>status</code> &ndash; Indicates if execution is pending, successful, failed or cancelled.</li>
+<li><code>reportUrl</code> &ndash; The URL to get the report log for this workitem's execution.</li>
+<li><em><code>progress</code></em> &ndash; <em>A place holder for future use. You can ignore this now.</em></li>
+</ul>
+<h2>Arguments: More Support</h2>
+<h3>Input Arguments: Embedded JSON</h3>
+<p>If an input argument of an activity requires JSON values, the JSON values can be embedded in the workitem itself.  </p>
+<p>For example, the activity <code>CountItActivity</code> requires an parameter named <code>countItParams</code>. The activity expects the argument value to be a JSON file. The workitem is able to embed the JSON values in the workitem itself as below.<br />
+By prefixing those values with <code>data:application/json,</code>, it instructs the Design Automation framework to treat them as JSON stream and save them as a JSON file.</p>
+<pre>
+curl -X POST \
+  https://developer.api.autodesk.com/da/us-east/v3/workitems \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer LongStringAccessTokenObtainedDuringAuthenthication' \
+  -d '{
+          "activityId": "YourNickname.CountItActivity+test",
+          "arguments": {
+            "rvtFile": {
+              "url": "https://s3-us-west-2.amazonaws.com/revitio-dev/test-data/CountIt.rvt"
+            },
+            "countItParams": {
+              "url": "data:application/json,{'walls': false, 'floors': true, 'doors': true, 'windows': true}"
+            },
+            "result": {
+              "verb": "put",
+              "url": "https://myWebsite/signed/url/to/result"
+            }
+          }
+      }'
+</pre>
+
+<h3>Input Arguments: ETransmit Files</h3>
+<p>Design Automation is capable of processing outputs from ETransmit for Revit, so long as you first create a zip file from those outputs.</p>
+<pre>
+curl POST \
+  https://developer.api.autodesk.com/da/us-east/v3/workitems \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer LongStringAccessTokenObtainedDuringAuthenthication' \
+  -d '{
+        "activityId" : "YourNickname.CountItActivity+test",
+        "arguments": {
+          "rvtFile": {
+            "url": "https://s3-us-west-2.amazonaws.com/revitio-dev/test-data/TopHost.zip"
+          },
+          "countItParams": {
+            "url": "data:application/json,{'walls': true, 'floors': true, 'doors': true, 'windows': true}"
+          },
+          "result": {
+            "verb": "put",
+            "url": "https://myWebsite/signed/url/to/result"
+          }
+        }
+    }'
+</pre>
+
+<p>The name of the 'Root Model' is read from the manifest file. The root model is then found in the zip.</p>
+<h3>Host RVT File with Linked Models</h3>
+<pre>
+curl POST \
+  https://developer.api.autodesk.com/da/us-east/v3/workitems \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer LongStringAccessTokenObtainedDuringAuthenthication' \
+  -d '{
+        "activityId": "YourNickname.CountItActivity+test",
+        "arguments": {
+          "rvtFile": {
+            "url": "https://s3-us-west-2.amazonaws.com/revitio-dev/test-data/TopHost.rvt",
+            "references": [
+              {
+                "url": "https://s3-us-west-2.amazonaws.com/revitio-dev/test-data/LinkA.rvt",
+                "references": [
+                  {
+                    "url": "https://s3-us-west-2.amazonaws.com/revitio-dev/test-data/LinkA1.rvt"
+                  },
+                  {
+                    "url": "https://s3-us-west-2.amazonaws.com/revitio-dev/test-data/LinkA2.rvt"
+                  }
+                ]
+              },
+              {
+                "url": "https://s3-us-west-2.amazonaws.com/revitio-dev/test-data/LinkB.rvt"
+              }
+            ]
+          },
+          "countItParams": {
+            "url": "data:application/json,{'walls': true, 'floors': true, 'doors': true, 'windows': true}"
+          },
+          "result": {
+            "verb": "put",
+            "url": "https://myWebsite/signed/url/to/result"
+          }
+        }
+    }'
+
+</pre>
+
+<p>The root model in this example is <code>TopHost.rvt</code> and it contains <code>LinkA.rvt</code> and <code>LinkB.rvt</code>. The file <code>LinkA.rvt</code> in turn contains <code>LinkA1.rvt</code> and <code>LinkA2.rvt</code>. Each of these files are uploaded to a Cloud location and the path is provided for each individually.</p>
+<pre>
+TopHost.rvt
+|-- LinkA.rvt
+|   |-- LinkA1.rvt
+|   |-- LinkA2.rvt
+|
+|-- LinkB.rvt  
+</pre>
+
+<h3>RvtLinks in Sub-Folders</h3>
+<p>The workitem's <code>localName</code> variable can be used to create a folder structure inside the working directory. For example, a Revit file <strong>Host.rvt</strong> containing a relative link <strong>SubFolder/Link.rvt</strong> can be defined in this way for <code>rvtFile</code> in the workitem:</p>
+<pre>
+{
+  "url": "https://s3-us-west-2.amazonaws.com/revitio-dev/test-data/TestForSubFolders/Host.rvt",
+  "references": [
+    {
+      "url": "https://s3-us-west-2.amazonaws.com/revitio-dev/test-data/TestForSubFolders/Link.rvt",
+      "localName": "SubFolder/Link.rvt"
+    }
+  ]
+}
+</pre>
+
+<p>This will create the directory/file structure in the current working directory (CWD):</p>
+<pre>
+{CWD}/Host.rvt
+{CWD}/SubFolder/Link.rvt
+</pre>
+
+<p>Because you are not allowed to create a folder structure outside of your current working directory, if the host file has linked files with relative paths like <strong>../ParallelFolder/Link.rvt</strong>, you can move the entire structure down one level by creating a top level folder of your own. The same <code>localName</code> variable can be used for the top host like you use for linked files. Here is an example json.</p>
+<pre>
+{
+ "url": "https://path/to/Host.rvt",
+ "localName": "TopFolder/Host.rvt",
+ "references": [
+   {
+     "url": "https://path/to/Link.rvt",
+     "localName": "ParallelFolder/Link.rvt"
+   }
+ ]
+}
+</pre>
+
+<p>This will create the directory/file structure:</p>
+<pre>
+{CWD}/TopFolder/Host.rvt
+{CWD}/ParallelFolder/Link.rvt
+</pre>
+
+<h3>Output Arguments: onComplete callback</h3>
+<p>Each <code>workitem</code> is furnished with a special output argument named <code>onComplete</code>.  When provided, the callback URL will be called on completion of the workitem.</p>
+<p>Here is an example of how to call <code>[POST] /workitems</code>, which adds <code>onComplete</code> argument to an earlier <a href="#post-a-workitem">example</a>.</p>
+<pre>
+curl -X POST \
+  https://developer.api.autodesk.com/da/us-east/v3/workitems \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer LongStringAccessTokenObtainedDuringAuthenthication' \
+  -d '{
+        "activityId": "YourNickname.DeleteWallsActivity+test",
+        "arguments": {
+          "rvtFile": {
+            "url": "https://s3-us-west-2.amazonaws.com/revitio-dev/test-data/DeleteWalls.rvt"
+          },
+          "result": {
+            "verb": "put",
+            "url": "https://myWebsite/signed/url/to/result"
+          },
+          "onComplete": {
+            "verb": "post",
+            "url": "https://myWebsite/callback"
+          }
+        }
+      }'
+</pre>
+
+<blockquote>
+<p>This argument is not <code>required</code> to be provided on every <code>[POST] /workitems</code> call.</p>
+</blockquote>
+<p>On completion of the workitem, the sepecified url is called with a payload identical to the response received on <code>[GET] /workitems/{id}</code> call. </p>
+<p>Since the nature of the implementation of the callback url is similar to how one may implement a callback url for <a href="https://developer.autodesk.com/en/docs/webhooks/v1/overview/">Webhooks API</a>, you may refer the Webhooks API documentation. You may also find the documentation for <a href="https://developer.autodesk.com/en/docs/webhooks/v1/tutorials/configuring-your-server/">configuring local server</a> helpful.</p>
