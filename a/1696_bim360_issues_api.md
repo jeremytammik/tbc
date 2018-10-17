@@ -41,7 +41,7 @@ The first and main part is similar to yesterday's presentation
 on [Forge Design Automation for Revit](http://thebuildingcoder.typepad.com/blog/2018/10/forge-design-automation-for-revit.html) at
 the Forge DevCon conference.
 
-Therefore, I will just share the BIM 360 slides (just the text, with most images missing) here now:
+Therefore, I will only share the BIM 360 slides (just the text, with most images missing) here now:
 
 - [Overview](#3) 
     - [Four types of issues](#4) 
