@@ -9,7 +9,7 @@
 /a/doc/au/2017/doc2/sd125457_forge_design_automation_rvt_diane_christoforo_handout.pdf
 /a/doc/au/2018/doc/forge_da4r.pptx
 
- #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+BIM 360 Issues API #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/bim360issues
 
 Today, I am presenting a class on Design Automation for Revit or DA4R and the BIM 360 Issues API at the German Autodesk University in Darmstadt.
 The first and main part is similar to yesterday's presentation at the Forge DevCon conference.
@@ -63,7 +63,7 @@ For your convenience, here is the slide deck including images in PDF format:
 
 - [Slide deck](zip/bim360_issues_api.pdf)
 
-All the following information comes from a few simple sources, so please refer to those to get it straight from the horse's mouth:
+All the following information comes from a few base sources, so please refer to those to get it straight from the horse's mouth:
 
 - [BIM 360 API documentation](https://forge.autodesk.com/en/docs/bim360/v1/overview)
 - [Introducing the BIM 360 Issues API blog post](https://forge.autodesk.com/blog/introducing-bim-360-issues-api)
