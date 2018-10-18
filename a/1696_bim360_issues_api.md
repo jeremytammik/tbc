@@ -63,6 +63,16 @@ For your convenience, here is the slide deck including images in PDF format:
 
 - [Slide deck](zip/bim360_issues_api.pdf)
 
+All the following information comes from a few simple sources, so please refer to those to get it straight from the horse's mouth:
+
+- [BIM 360 API documentation](https://forge.autodesk.com/en/docs/bim360/v1/overview)
+- [Introducing the BIM 360 Issues API blog post](https://forge.autodesk.com/blog/introducing-bim-360-issues-api)
+including [.NET core sample code `bim360-csharp-issues`](https://github.com/Autodesk-Forge/bim360-csharp-issues) 
+and [live demo](https://bim360issues.herokuapp.com)
+- [BIM 360 Issues API sample by Node.js](https://forge.autodesk.com/blog/bim-360-issues-api-sample-nodejs)
+including [`bim360-api-demo-node.js` for Issue API sample code](https://github.com/xiaodongliang/BIM360-API-Demo-Node.js/tree/IssueAPI) 
+and [live demo](https://bim360-issue-csv.herokuapp.com)
+
 #### <a name="3"></a> Overview
 
 - Four Types of Issues
