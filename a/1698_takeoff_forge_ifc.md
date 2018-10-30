@@ -36,7 +36,7 @@
 
 - takeoff with no fitting
 
-the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Tailor Your BIM with F#, Forge IFC tranlation, lat/long in IFC and takeoff creation in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/fstakeoff
 
 I have a whole bunch of exciting overdue topics lined up.
 Let's start with these
