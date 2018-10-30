@@ -38,54 +38,66 @@
 
 the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash; 
-...
+I have a whole bunch of exciting overdue topics lined up.
+Let's start with these
+&ndash; Tailor Your BIM sums room areas with F#
+&ndash; Control view for design option elements with F#
+&ndash; Copy legend view and component from background file
+&ndash; Forge RVT to IFC translation defaults to 2x3
+&ndash; Latitude and longitude in Revit IFC export
+&ndash; Takeoff creation requires branch duct...
 
 -->
 
-### Tailor Your BIM with F#, Takeoff and Forge IFC
+### Tailor Your BIM with F#, Forge, IFC and Takeoffs
 
 I have a whole bunch of exciting overdue topics lined up.
 
 Let's start with these:
 
-- [Tailor Your BIM sums area of rooms in F#](#2) 
+- [Tailor Your BIM sums room areas with F#](#2) 
 - [Control view for design option elements with F#](#3) 
 - [Copy legend view and component from background file](#4) 
 - [Forge RVT to IFC translation defaults to 2x3](#5) 
 - [Latitude and longitude in Revit IFC export](#6) 
 - [Takeoff creation requires branch duct](#7) 
 
+<center>
+<img src="img/takeoff_curve_connector.png" alt="Takeoff curve connector" width="224">
+</center>
 
 
-#### <a name="2"></a> Tailor Your BIM Sums Area of Rooms in F#
+#### <a name="2"></a> Tailor Your BIM Sums Room Areas with F&#35;
 
-[Ching]() shared several nice F# Revit API macros on
+[Ching](https://tailoryourbim.com/about)-[Hua Chen](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/5219233) shared
+several nice F# Revit API macros on
 his blog [Tailor Your BIM](https://tailoryourbim.com).
 
-As you know, the .NET framework enables you to use any programming languuage you choose to support it, and F# is a fully viable option with some advantages.
+As you know, the .NET framework enables you to use any supported programming language you like, and F# is a fully viable option with some advantages.
 
 Ching pointed out his blog and new post in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [finding the sum area of rooms](https://forums.autodesk.com/t5/revit-api-forum/efficiently-find-the-sum-of-room-areas-with-f-tailoryourbim-com/m-p/8348542).
+on [efficiently finding the sum of room areas with F#](https://forums.autodesk.com/t5/revit-api-forum/efficiently-find-the-sum-of-room-areas-with-f-tailoryourbim-com/m-p/8348542):
 
-By the way, it also addresses the Revit Architecture topic
-of  [finding the sum of areas](https://forums.autodesk.com/t5/revit-architecture-forum/finding-the-sum-of-areas/m-p/7860005).
+While working on Revit, I noticed there could be a few possibilities to improve the efficiency when retrieving the sum of room areas by writing external commands. I posted an external command with F# and Revit API that instantly reports the sum of selected room areas. I would like to share this knowledge with you:
 
-Here is the direct link to
-the [Tailor Your BIM blog post on ](), written in alternating ?? and English.
+- [Find sum of room areas / 空間面積總合](https://tailoryourbim.com/2018/10/20/find-sum-area-of-rooms-%E7%A9%BA%E9%96%93%E9%9D%A2%E7%A9%8D%E7%B8%BD%E5%90%88) <br/>(alternating Chinese and English text)
+
+This solution also addresses a related thread in the Revit Architecture forum 
+on [finding the sum of areas](https://forums.autodesk.com/t5/revit-architecture-forum/finding-the-sum-of-areas/m-p/7860005).
 
 
-#### <a name="3"></a> Control View for Design Option Elements with F#
+#### <a name="3"></a> Control View for Design Option Elements with F&#35;
 
 Ching followed that up with a second post
-on [Efficiently Control View for Design Option Elements with F# - tailoryourbim.com](), saying:
+on an [efficient control view for Design Option elements with F#](https://forums.autodesk.com/t5/revit-api-forum/efficiently-control-view-for-design-option-elements-with-f/m-p/8365817#M34366),
+saying:
 
-After the last post about efficiently find the sum of room areas, in the new post we'll see how to control the color of the elements within Design Options in the active view:
+After the last post about efficiently find the sum of room areas, in the new post, we'll see how to control the colour of the elements within Design Options in the active view:
 
-- [View Control for Design Option Elements / 圖形取代設計選項中的物件顏色](http://tailoryourbim.com/2018/10/27/view-control-for-design-option-elements-%e5%9c%96%e5%bd%a2%e5%8f%96%e4%bb%a3%e8%a8%ad%e8%a8%88%e9%81%b8%e9%a0%85%e4%b8%ad%e7%9a%84%e7%89%a9%e4%bb%b6%e9%a1%8f%e8%89%b2/)
+- [View control for Design Option elements / <br/>圖形取代設計選項中的物件顏色](http://tailoryourbim.com/2018/10/27/view-control-for-design-option-elements-%e5%9c%96%e5%bd%a2%e5%8f%96%e4%bb%a3%e8%a8%ad%e8%a8%88%e9%81%b8%e9%a0%85%e4%b8%ad%e7%9a%84%e7%89%a9%e4%bb%b6%e9%a1%8f%e8%89%b2/)
 
-When we work with design options in Revit, we often have more than one design option group in the same model file. By default in, Revit 2017, I haven't found a way to display them distinctivly in view. Writing a small external command as posted here might help at work.
+When we work with design options in Revit, we often have more than one design option group in the same model file. By default, in Revit 2017, I haven't found a way to display them distinctively in the view. Writing a small external command as posted here might help at work.
 
 Many thanks to Ching for these nice contributions!
 
@@ -93,19 +105,47 @@ Many thanks to Ching for these nice contributions!
 #### <a name="4"></a> Copy legend view and component from background file
 
 Håvard Dagsvik shared a new suggestion for creating a legend view in
-a [comment]()
-on []():
+a [comment](http://thebuildingcoder.typepad.com/blog/2010/05/duplicate-legend-component.html#comment-4158350001)
+on [duplicating a legend component](https://thebuildingcoder.typepad.com/blog/2010/05/duplicate-legend-component.html):
 
+Old post and still no methods for creating legend views and components.
 
-create legend view
-  http://thebuildingcoder.typepad.com/blog/2010/05/duplicate-legend-component.html#comment-4158350001
-  Old post and still no methods for creating legend views and components.
-  But it an be done by copying a legend view and component from a background file using ElementTransformUtils. In the background file group an instance of a legend component. Copy the GroupType and the legend view from the file. Once copied place the GroupType in the copied legend view and ungroup it.
-  Ungroup will leave you with a "new" legend component in your new legend view.
-  This way you can create a legend view incl component from scratch.
-  A bit of a hack but it works.
+But it can be done by copying a legend view and component from a background file using `ElementTransformUtils`. In the background file group an instance of a legend component. Copy the GroupType and the legend view from the file. Once copied place the GroupType in the copied legend view and ungroup it.
+
+Ungroup will leave you with a 'new' legend component in your new legend view.
+
+This way you can create a legend view incl. component from scratch.
+
+A bit of a hack but it works.
+
+**Answer:** Yes, sorry that nothing has happened yet in this area.
+
+I have collected a bunch of existing wishes for this and submitted them in the wish list item *CF-4442 [API support for legends -- 07320991]*.
+
+Have you checked whether a wish list item for this functionality has also been submitted to the Revit Idea Station?
+
+That is one of the main driving forces for setting priorities on developer wishes.
+
+Please do so, submit it if it does not exist, vote for it if it does, and let me know, so I can add that input to the development issue as well.
+
+**Response:** The biggest wish regarding legends would be to add support for using standard tags on Legend Components. So, a Door Tag for a door legend, etc. It's the one thing I've been checking in new Revit versions since 2009. Basically, be able to tag the Type Properties of a component.
+A couple of threads on that here:
+
+- [Allow tags in legend views](https://forums.autodesk.com/t5/revit-ideas/allow-tags-in-legend-views/idi-p/6598921)
+- [Tag Legend Component](https://forums.autodesk.com/t5/revit-ideas/tag-legend-component/idi-p/7952189)
+
+Here is the API request
+
+- [API for creating Legend views and Legend components](https://forums.autodesk.com/t5/revit-ideas/api-for-creating-legend-views-and-legend-components/idi-p/8352835)
+
+Many thanks to Håvard for his valuable input.
+
+I added his notes to the wish list item as well.
+
 
 #### <a name="5"></a> Forge RVT to IFC Translation Defaults to 2x3
+
+Now for some IFC related notes.
 
 **Question:** Regarding translation of RVT to IFC via Forge Model Derivative: are there any known issues, limitations or good practices, pls?
 
@@ -115,19 +155,19 @@ They can specify a name of the IFC export settings in the `output.advanced.expor
 
 Currently, user modified IFC Mapping Files are not supported.
 
-However, there is currently a known issue with the `output.advanced.exportSettingName`. Unfortunately, the specified IFC Exporting option will not be assigned properly to the Revit extractor. Afaik, we can currently only get the file exported in the default IFC 2x3 format
+However, there is currently a known issue with the `output.advanced.exportSettingName`. Unfortunately, the specified IFC Exporting option will not be assigned properly to the Revit extractor. Afaik, we can currently only get the file exported in the default IFC 2x3 format.
 
 
 #### <a name="6"></a> Latitude and Longitude in Revit IFC Export
 
-Let's mention another little IFC related issue while we are at it:
+Here is another little IFC related issue, while we are at it:
 
 Q: How is the lat/long information from an IFC exported from Revit read by Navisworks?
 
-This image shaws what we see in Revit (right) and how it shows up in Navisworks via the IFC export:
+This image shows what we see in Revit and how it shows up in Navisworks via the IFC export:
 
 <center>
-<img src="img/lat_long_in_nw_from_rvt_ifc.jpg" alt="" width="1099">
+<img src="img/lat_long_in_nw_from_rvt_ifc.jpg" alt="IFC lat/long information" width="1099">
 </center>
 
 How is this information exported to IFC? Is any formula applied to these values?
@@ -143,7 +183,7 @@ Maybe Navisworks needs to parse this information more correctly.
 
 #### <a name="7"></a> Takeoff Creation Requires Branch Duct
 
-**Question:** I want to programatically connect a takeoff fitting onto the body of a duct, the other end of takeoff may or may not be connected to another duct's connector:
+**Question:** I want to programmatically connect a takeoff fitting onto the body of a duct, the other end of takeoff may or may not be connected to another duct's connector:
 
 <center>
 <img src="img/duct_takeoff.png" alt="Duct takeoff" width="416">
@@ -177,7 +217,7 @@ In example above, I purposely draw a takeoff which only attaches to one duct and
 
 **Response:** One way is to make sure the routing preferences uses tap, draw two connected ducts so it creates a tap, then delete one duct. I have not tried to connect a takeoff directly on the body of duct, not sure if that can be done.
 
-My task is to capture the state of the user's design and enable the user to restore and recreate the exact same design and same drawing later reading back the data we stored. The user's design may not be the finial design yet, so the source drawing can be anything that Revit allows. So what is shown on the image is a valid drawing that our plugin needs to recreate on a project drawing.
+My task is to capture the state of the user's design and enable the user to restore and recreate the exact same design and same drawing later reading back the data we stored. The user's design may not be the final design yet, so the source drawing can be anything that Revit allows. So, what is shown on the image is a valid drawing that our plugin needs to recreate on a project drawing.
 
 I can handle other fitting types when they are not connecting to other element on some of their connectors. When the connection is needed, I just call `Connector.ConnectTo`. I am not sure what to do with takeoff when it needs to attach to a duct body at a location like that.
 
@@ -189,7 +229,7 @@ Maybe the other question to ask is: when can I use the API to create the third c
 
 **Response:** Which API function is used to create the third connector in a duct for the case above? 
 
-**Answer:** Revit ahndles the curve connectors automagically. Any time there is a tap on an element, the third (or additional) connectors are added. When the tap(s) are removed, the connectors are automatically removed.  I wouldn't expect there to be a way to add/remove connectors independent of taps.
+**Answer:** Revit handles the curve connectors automagically. Any time there is a tap on an element, the third (or additional) connectors are added. When the tap(s) are removed, the connectors are automatically removed.  I wouldn't expect there to be a way to add/remove connectors independent of taps.
 
 `NewTakeoffFitting` seems to be the only function to connect takeoff for now.
 
