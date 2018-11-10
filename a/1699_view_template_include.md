@@ -7,7 +7,7 @@
 <!---
 
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+View template include setting in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/viewtemplateinclude
 
 A solution to a longstanding question on the view template 'include' setting
 &ndash; Does the Revit API provide any access to the view template 'include' settings defined by the check boxes in this form?
