@@ -9,6 +9,8 @@
 - https://forums.autodesk.com/t5/revit-api-forum/combine-multiple-transactions-into-one-undo/m-p/8393152
   Mentioned in the discussion on [Using Transaction Groups](https://thebuildingcoder.typepad.com/blog/2015/02/using-transaction-groups.html)
 
+More on transaction groups and assimilation in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/txgroups
+
 We return to
 the question on how
 to combine multiple transactions into one undo with a new answer by Arnošt Löbel, ex Senior Principal Engineer of the Revit development team
