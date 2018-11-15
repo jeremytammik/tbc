@@ -28,7 +28,7 @@
   https://www.pinvoke.net/default.aspx/user32/getwindowtext.html?diff=y
   Revitalizer
 
-Revit window handle and parenting an add-in form in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Revit window handle and parenting an add-in form in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/rvthwnd
 
 Access to the Revit main window handle changed in Revit 2019, raising a couple of questions
 &ndash; Making Revit the add-in parent
