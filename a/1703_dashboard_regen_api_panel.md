@@ -34,9 +34,21 @@ Here are the topics to start this week:
 
 #### <a name="2"></a> Revit API Panel at AU in Las Vegas
 
-Augusto Goncalves 
+Augusto Goncalves hosted the Revit API Panel at AU in Las Vegas
 
-[session catalogue](https://www.autodesk.com/autodesk-university/las-vegas/sessions)
+search for 'Revit API Panel', 'Augusto Goncalves' or 'SD195990' in the 
+[AU session catalogue](https://www.autodesk.com/autodesk-university/las-vegas/sessions)
+
+ - Revit API Expert Roundtable: Open House on the Factory Floor
+
+
+
+https://autodeskuniversity.smarteventscloud.com/connect/search.ww#loadSearch-searchPhrase=SD195990&searchType=session&tc=0&sortBy=relevance&i(41005)=&i(57245)=&p=
+
+https://autodeskuniversity.smarteventscloud.com/connect/search.ww#loadSearch-searchPhrase=SD195990&searchType=session
+
+- [Handout](zip/sd195990_revit_api_panel_augusto_goncalves_handout.pdf)
+- [Recording](zip/2018-11-15_revit_api_panel_recording_au_las_vegas.m4a)
 
 Diane 
 
