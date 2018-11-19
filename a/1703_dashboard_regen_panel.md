@@ -16,7 +16,7 @@
 
 - RevitLookup -- Center parent for forms (#45)
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Dashboard, Regen and Revit API Panel at AU in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/dashboardregen
 
 Topics to start the week
 &ndash; Revit API panel at AU in Las Vegas
