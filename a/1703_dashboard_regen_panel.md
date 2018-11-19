@@ -48,7 +48,7 @@ the [Revit API Panel at AU in Las Vegas](https://autodeskuniversity.smarteventsc
 <img src="img/2018-11-15_revit_api_panel_recording_au_las_vegas.jpg" alt="Revit API Panel at AU in Las Vegas" width="320">
 </center>
 
-The panellists are Lijuan Zhu, Diane Christoforo, Rahul and Miroslav Schonauer.
+The panellists are Lijuan Zhu, Diane Christoforo, Rahul Bhobe and Miroslav Schonauer.
 
 Unfortunately, no notes were taken, so all I have to offer you here are the session handout and recording:
 
