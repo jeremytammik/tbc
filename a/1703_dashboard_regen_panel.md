@@ -18,24 +18,27 @@
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash; 
-...
+Topics to start the week
+&ndash; Revit API panel at AU in Las Vegas
+&ndash; Automatic BIM dashboard data extraction
+&ndash; When to regenerate the document?
+&ndash; RevitLookup centre parent for forms...
 
 -->
 
 ### Dashboard, Regen and Revit API Panel at AU
 
-Here are the topics to start this week:
+Let's start this week with this:
 
 - [Revit API panel at AU in Las Vegas](#2) 
 - [Automatic BIM dashboard data extraction](#3) 
 - [When to regenerate the document?](#4) 
-- [RevitLookup center parent for forms](#5)
+- [RevitLookup centre parent for forms](#5)
 
 
 #### <a name="2"></a> Revit API Panel at AU in Las Vegas
 
-Last week, Augusto Goncalves hosted
+Last week, Augusto Gonçalves hosted
 the [Revit API Panel at AU in Las Vegas](https://autodeskuniversity.smarteventscloud.com/connect/search.ww#loadSearch-searchPhrase=SD195990&searchType=session)
 (search for 'Revit API Panel', 'Augusto Goncalves' or 'SD195990' in the [AU session catalogue](https://www.autodesk.com/autodesk-university/las-vegas/sessions)):
 
@@ -45,7 +48,7 @@ the [Revit API Panel at AU in Las Vegas](https://autodeskuniversity.smarteventsc
 <img src="img/2018-11-15_revit_api_panel_recording_au_las_vegas.jpg" alt="Revit API Panel at AU in Las Vegas" width="320">
 </center>
 
-The panelists included Diane Christoforo, Keith With and Miroslav Schonauer.
+The panellists included Diane Christoforo, Keith With and Miroslav Schonauer.
 
 Unfortunately, no notes were taken, so all I have to offer you here are the session handout and recording:
 
@@ -64,9 +67,9 @@ Please leave a comment below in case of interest.
 An interesting, recurring and fundamental issue of ever growing importance was raised in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [automatic extraction of the database revives](https://forums.autodesk.com/t5/revit-api-forum/automatic-extraction-of-the-database-revives/m-p/8408934)
-&ndash; ignoring the fact that we don't know what 'revives' might be:
+&ndash; ignoring the fact that we don't know what 'revives' might be (reviews?):
 
-**Question:** I am currently working on an internal project that will eventually extract the databases of all our projects modeled (with Revit) automatically every night, to be then proposed in the form of dashboards to the various members of the company. My IT Director is currently working on the subject but not knowing the API Revit, and me too. I would like him / us to save time by asking the question in this forum who could guide us on a solution.
+**Question:** I am currently working on an internal project that will eventually extract database overviews of all our projects modelled with Revit automatically every night, to be then presented in the form of dashboards to the various members of the company. My IT Director is currently working on the subject but not knowledgeable in the API Revit, and me too. I would like to save some time by asking in this forum who could guide us towards a solution.
 
 **Answer:** Here are some suggestions on various topics:
 
@@ -74,7 +77,7 @@ First of all, you need to work through the material to help [getting started wit
 
 Before getting started with the Revit API, you should acquire as much knowledge as possible about Revit from the end user point of view.
 
-I would assume that you already have that  :-)
+I would assume that you already have that &nbsp; :-)
 
 Here is one very old analysis
 of [integrating Revit with an external database](https://thebuildingcoder.typepad.com/blog/2009/01/database-integration.html).
@@ -107,7 +110,7 @@ concerns [when to use `doc.Regenerate`](https://forums.autodesk.com/t5/revit-api
 
 **Question:** I am starting to write an add-in in Revit that will deal with the creation of thousands of family instances, addition of parameters and its values on the fly. I have most of the bits of code required for the task, but I really have no clue on when to use `doc.Regenerate` or not (the less the better for best performance, and I understand that I may have to organize my add-in in order to minimize the number of calls).
 
-I have browsed the Intenret, including Jeremy's blog notes on the topic, but it still seems to me that it remains some kind of trial and error operation.
+I have browsed the Internet, including Jeremy's blog notes on the topic, but it still seems to me that it remains some kind of trial and error operation.
 
 Are there any guidelines, recommendations or documentation on the type of Revit database update operations that require the use of `doc.Regenerate` inside a transaction?
 
@@ -138,9 +141,9 @@ Good luck!
 I will re-read your blog inputs on the topic before getting deeply into the add-in and I will test sequences of operations to check whether they require a `Regenerate` operation or not.
 
 
-#### <a name="5"></a> RevitLookup Center Parent for Forms
+#### <a name="5"></a> RevitLookup Centre Parent for Forms
 
-Last and probably least important, I'll point out a minor update made to center the forms displayed by RevitLookup over their parent.
+Last and probably least important, I'll point out a minor update made to centre the forms displayed by RevitLookup over their parent.
 
 This modification was prompted
 by [issue #45 &ndash; Center parent for forms](https://github.com/jeremytammik/RevitLookup/issues/45) raised
