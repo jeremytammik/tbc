@@ -28,7 +28,7 @@ Topics to start the week
 
 ### Dashboard, Regen and Revit API Panel at AU
 
-Let's start this week with this:
+Topics to start the week:
 
 - [Revit API panel at AU in Las Vegas](#2)
     - [Notes by Diane Christoforo](#2.0) 
