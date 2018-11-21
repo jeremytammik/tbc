@@ -30,11 +30,15 @@ Topics to start the week
 
 Let's start this week with this:
 
-- [Revit API panel at AU in Las Vegas](#2) 
+- [Revit API panel at AU in Las Vegas](#2)
+    - [Notes by Diane Christoforo](#2.0) 
+    - [Revit Ideas](#2.1) 
+    - [Requests](#2.2) 
+    - [Issues](#2.3) 
+    - [Questions](#2.4) 
 - [Automatic BIM dashboard data extraction](#3) 
 - [When to regenerate the document?](#4) 
-- [RevitLookup centre parent for forms](#5)
-
+- [RevitLookup centre parent for forms](#5) 
 
 #### <a name="2"></a> Revit API Panel at AU in Las Vegas
 
@@ -60,19 +64,30 @@ Very many thanks to Diane for the valuable notes!
 
 I reprint them here in full:
 
+#### <a name="2.0"></a> Notes by Diane Christoforo
+
+- [Revit Ideas](#2.1) 
+- [Requests](#2.2) 
+- [Issues](#2.3) 
+- [Questions](#2.4) 
+
 #### <a name="2.1"></a> Revit Ideas
 
-Revit ideas is here: https://forums.autodesk.com/t5/revit-ideas/idb-p/302 Your request may already be there! Vote! Add new ideas! (If you want the API ideas specifically, you can go to this filter: https://forums.autodesk.com/t5/revit-ideas/idb-p/302/label-name/api)
+Here is a [link to Revit Ideas](https://forums.autodesk.com/t5/revit-ideas/idb-p/302).
+
+Your request may already be there! Vote! Add new ideas!
+
+If you want the API ideas specifically, you can [use the `API` tag filter](https://forums.autodesk.com/t5/revit-ideas/idb-p/302/label-name/api).
 
 #### <a name="2.2"></a> Requests
 
 - MEP systems need to keep their properties when demolished
-- Easy way to get the wall core structure centerline from the wall type
+- Easy way to get the wall core structure centreline from the wall type
     - [There is a suggestion in the recording but not in my notes]
 - Ceiling API
 - Need to tab-select into linked model elements (And in general, APIs need to work with links if we’re going to say something is supported!) 
 - The API documentation is pretty sparse. Can we get more detail and more examples?
-- Access to the actual lineweight definitions (ie. lineweight 5 means 8 pixels, for example) 
+- Access to the actual line weight definitions (i.e., line weight 5 means 8 pixels, for example) 
 - Expose the group transform
 - Rehost a family instance
     - Definitely doesn't work on face based but would like it to work in all cases
@@ -94,7 +109,7 @@ Revit ideas is here: https://forums.autodesk.com/t5/revit-ideas/idb-p/302 Your r
 - Rearrange the parameter list from the API
 - [non-API?] When making a section or section box, can we have the new view keep the same design options as the original view?
 
-#### <a name="2.3"></a> Bugs?
+#### <a name="2.3"></a> Issues
 
 - Area property seems buggy. A comment that view-specific representations might not show the full picture and to use the model one.
 - Changes to MEP fabrication elements do not trigger element updaters
@@ -114,7 +129,7 @@ Revit ideas is here: https://forums.autodesk.com/t5/revit-ideas/idb-p/302 Your r
 - Revit core console, similar to the AutoCAD core console? 
     - No, this is not something we’re planning to support at this time.
 - Why are slow FilteredElementCollectors of variable speed depending on whether the view's been opened or not? 
-    - [trying to condense a rambling answer] The fast filters don’t need all of an element’s information to work. The slow filters need everything, and that 'everything' is usually first read in when you open a view containing the element. It’s a one-time operation. So if the view is already open, the slow filters are faster because that work’s already been done. 
+    - [trying to condense a rambling answer] The fast filters don’t need all of an element’s information to work. The slow filters need everything, and that 'everything' is usually first read in when you open a view containing the element. It’s a one-time operation. So, if the view is already open, the slow filters are faster because that work’s already been done. 
 
 
 #### <a name="3"></a> Automatic BIM Dashboard Data Extraction

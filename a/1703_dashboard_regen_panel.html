@@ -28,10 +28,17 @@ Topics to start the week
 <h3>Dashboard, Regen and Revit API Panel at AU</h3>
 <p>Let's start this week with this:</p>
 <ul>
-<li><a href="#2">Revit API panel at AU in Las Vegas</a> </li>
+<li><a href="#2">Revit API panel at AU in Las Vegas</a><ul>
+<li><a href="#2.0">Notes by Diane Christoforo</a> </li>
+<li><a href="#2.1">Revit Ideas</a> </li>
+<li><a href="#2.2">Requests</a> </li>
+<li><a href="#2.3">Issues</a> </li>
+<li><a href="#2.4">Questions</a> </li>
+</ul>
+</li>
 <li><a href="#3">Automatic BIM dashboard data extraction</a> </li>
 <li><a href="#4">When to regenerate the document?</a> </li>
-<li><a href="#5">RevitLookup centre parent for forms</a></li>
+<li><a href="#5">RevitLookup centre parent for forms</a> </li>
 </ul>
 <h4><a name="2"></a> Revit API Panel at AU in Las Vegas</h4>
 <p>Last week, Augusto Gonçalves hosted
@@ -52,19 +59,28 @@ the <a href="https://autodeskuniversity.smarteventscloud.com/connect/search.ww#l
 </ul>
 <p>Very many thanks to Diane for the valuable notes!</p>
 <p>I reprint them here in full:</p>
+<h4><a name="2.0"></a> Notes by Diane Christoforo</h4>
+<ul>
+<li><a href="#2.1">Revit Ideas</a> </li>
+<li><a href="#2.2">Requests</a> </li>
+<li><a href="#2.3">Issues</a> </li>
+<li><a href="#2.4">Questions</a> </li>
+</ul>
 <h4><a name="2.1"></a> Revit Ideas</h4>
-<p>Revit ideas is here: https://forums.autodesk.com/t5/revit-ideas/idb-p/302 Your request may already be there! Vote! Add new ideas! (If you want the API ideas specifically, you can go to this filter: https://forums.autodesk.com/t5/revit-ideas/idb-p/302/label-name/api)</p>
+<p>Here is a <a href="https://forums.autodesk.com/t5/revit-ideas/idb-p/302">link to Revit Ideas</a>.</p>
+<p>Your request may already be there! Vote! Add new ideas!</p>
+<p>If you want the API ideas specifically, you can <a href="https://forums.autodesk.com/t5/revit-ideas/idb-p/302/label-name/api">use the <code>API</code> tag filter</a>.</p>
 <h4><a name="2.2"></a> Requests</h4>
 <ul>
 <li>MEP systems need to keep their properties when demolished</li>
-<li>Easy way to get the wall core structure centerline from the wall type<ul>
+<li>Easy way to get the wall core structure centreline from the wall type<ul>
 <li>[There is a suggestion in the recording but not in my notes]</li>
 </ul>
 </li>
 <li>Ceiling API</li>
 <li>Need to tab-select into linked model elements (And in general, APIs need to work with links if we’re going to say something is supported!) </li>
 <li>The API documentation is pretty sparse. Can we get more detail and more examples?</li>
-<li>Access to the actual lineweight definitions (ie. lineweight 5 means 8 pixels, for example) </li>
+<li>Access to the actual line weight definitions (i.e., line weight 5 means 8 pixels, for example) </li>
 <li>Expose the group transform</li>
 <li>Rehost a family instance<ul>
 <li>Definitely doesn't work on face based but would like it to work in all cases</li>
@@ -98,7 +114,7 @@ the <a href="https://autodeskuniversity.smarteventscloud.com/connect/search.ww#l
 <li>Rearrange the parameter list from the API</li>
 <li>[non-API?] When making a section or section box, can we have the new view keep the same design options as the original view?</li>
 </ul>
-<h4><a name="2.3"></a> Bugs?</h4>
+<h4><a name="2.3"></a> Issues</h4>
 <ul>
 <li>Area property seems buggy. A comment that view-specific representations might not show the full picture and to use the model one.</li>
 <li>Changes to MEP fabrication elements do not trigger element updaters</li>
@@ -128,7 +144,7 @@ the <a href="https://autodeskuniversity.smarteventscloud.com/connect/search.ww#l
 </ul>
 </li>
 <li>Why are slow FilteredElementCollectors of variable speed depending on whether the view's been opened or not? <ul>
-<li>[trying to condense a rambling answer] The fast filters don’t need all of an element’s information to work. The slow filters need everything, and that 'everything' is usually first read in when you open a view containing the element. It’s a one-time operation. So if the view is already open, the slow filters are faster because that work’s already been done. </li>
+<li>[trying to condense a rambling answer] The fast filters don’t need all of an element’s information to work. The slow filters need everything, and that 'everything' is usually first read in when you open a view containing the element. It’s a one-time operation. So, if the view is already open, the slow filters are faster because that work’s already been done. </li>
 </ul>
 </li>
 </ul>
