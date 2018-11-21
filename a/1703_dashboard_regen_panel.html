@@ -44,14 +44,94 @@ the <a href="https://autodeskuniversity.smarteventscloud.com/connect/search.ww#l
 <img src="img/2018-11-15_revit_api_panel_recording_au_las_vegas.jpg" alt="Revit API Panel at AU in Las Vegas" width="320">
 </center></p>
 <p>The panellists from left to right are Lijuan Zhu, Diane Christoforo, Rahul Bhobe and Miroslav Schonauer.</p>
-<p>Unfortunately, no notes were taken, so all I have to offer you here are the session handout and recording:</p>
+<p>Here are the notes taken by Diane, session handout and recording:</p>
 <ul>
+<li><a href="zip/2018-11-15_diane_christoforo_au_api_panel_notes.pdf">Notes</a></li>
 <li><a href="zip/sd195990_revit_api_panel_augusto_goncalves_handout.pdf">Handout</a></li>
 <li><a href="zip/2018-11-15_revit_api_panel_recording_au_las_vegas.m4a">Recording</a></li>
 </ul>
-<p>Volunteers for transcribing the recording are very welcome.</p>
-<p>I would love to publish it as written text.</p>
-<p>Please leave a comment below in case of interest.</p>
+<p>Very many thanks to Diane for the valuable notes!</p>
+<p>I reprint them here in full:</p>
+<h4><a name="2.1"></a> Revit Ideas</h4>
+<p>Revit ideas is here: https://forums.autodesk.com/t5/revit-ideas/idb-p/302 Your request may already be there! Vote! Add new ideas! (If you want the API ideas specifically, you can go to this filter: https://forums.autodesk.com/t5/revit-ideas/idb-p/302/label-name/api)</p>
+<h4><a name="2.2"></a> Requests</h4>
+<ul>
+<li>MEP systems need to keep their properties when demolished</li>
+<li>Easy way to get the wall core structure centerline from the wall type<ul>
+<li>[There is a suggestion in the recording but not in my notes]</li>
+</ul>
+</li>
+<li>Ceiling API</li>
+<li>Need to tab-select into linked model elements (And in general, APIs need to work with links if we’re going to say something is supported!) </li>
+<li>The API documentation is pretty sparse. Can we get more detail and more examples?</li>
+<li>Access to the actual lineweight definitions (ie. lineweight 5 means 8 pixels, for example) </li>
+<li>Expose the group transform</li>
+<li>Rehost a family instance<ul>
+<li>Definitely doesn't work on face based but would like it to work in all cases</li>
+<li>Also needs to work on links</li>
+</ul>
+</li>
+<li>Ability to draw on the canvas in front of elements<ul>
+<li><code>DirectContext3D</code> draws behind elements</li>
+</ul>
+</li>
+<li>Make <code>DirectContext3D</code> show up in printing</li>
+<li><code>ReferenceIntersector</code><ul>
+<li>Make the calculation cached somehow so it's not slow every time you use it on a closed view?</li>
+<li>Can it work in non-3d views? </li>
+</ul>
+</li>
+<li>CAD links<ul>
+<li>Get text box notes out of a CAD link from the API</li>
+<li>Also allow explode via the API</li>
+<li>Workaround: use dxf file?</li>
+</ul>
+</li>
+<li>Getting multiple lines when two elements intersect in multiple places<ul>
+<li>[The note taker is not sure what she meant here. Interference check?] </li>
+</ul>
+</li>
+<li>Key schedules<ul>
+<li>Either need to be able to make key schedules using shared parameters, or need to be able to make internal parameters with the API. [Note taker: it might mean normal where it says internal?]</li>
+</ul>
+</li>
+<li>Rearrange the parameter list from the API</li>
+<li>[non-API?] When making a section or section box, can we have the new view keep the same design options as the original view?</li>
+</ul>
+<h4><a name="2.3"></a> Bugs?</h4>
+<ul>
+<li>Area property seems buggy. A comment that view-specific representations might not show the full picture and to use the model one.</li>
+<li>Changes to MEP fabrication elements do not trigger element updaters</li>
+<li>Revit warnings covering a WPF dialog<ul>
+<li>We recommended writing a failure handler but are not sure if this is an expected problem. It would be expected if you have a modal dialog. </li>
+</ul>
+</li>
+<li>If you modify the two coordinates of a sloped pipe in the API, then the UI doesn't update properly. [not sure this was written down properly]</li>
+<li>Geometric properties of a solid in structural elements were giving different values depending on the zoom level.</li>
+</ul>
+<h4><a name="2.4"></a> Questions</h4>
+<ul>
+<li>How do you know when Revit is in a state where it will respond to an event? <ul>
+<li>You can’t definitively know. It’s why it has to be an asynchronous mechanism.  </li>
+</ul>
+</li>
+<li>Can you have arguments with ExternalEvents?<ul>
+<li>Yes, although [didn’t manage to write the answer down]</li>
+</ul>
+</li>
+<li>Can I make an OptionsBar via the API?<ul>
+<li>No because Revit is moving away from options bars. We want everything on the ribbon. </li>
+</ul>
+</li>
+<li>Revit core console, similar to the AutoCAD core console? <ul>
+<li>No, this is not something we’re planning to support at this time.</li>
+</ul>
+</li>
+<li>Why are slow FilteredElementCollectors of variable speed depending on whether the view's been opened or not? <ul>
+<li>[trying to condense a rambling answer] The fast filters don’t need all of an element’s information to work. The slow filters need everything, and that 'everything' is usually first read in when you open a view containing the element. It’s a one-time operation. So if the view is already open, the slow filters are faster because that work’s already been done. </li>
+</ul>
+</li>
+</ul>
 <h4><a name="3"></a> Automatic BIM Dashboard Data Extraction</h4>
 <p>An interesting, recurring and fundamental issue of ever growing importance was raised in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread

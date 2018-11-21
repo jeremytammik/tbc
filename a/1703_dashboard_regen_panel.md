@@ -50,16 +50,71 @@ the [Revit API Panel at AU in Las Vegas](https://autodeskuniversity.smarteventsc
 
 The panellists from left to right are Lijuan Zhu, Diane Christoforo, Rahul Bhobe and Miroslav Schonauer.
 
-Unfortunately, no notes were taken, so all I have to offer you here are the session handout and recording:
+Here are the notes taken by Diane, session handout and recording:
 
+- [Notes](zip/2018-11-15_diane_christoforo_au_api_panel_notes.pdf)
 - [Handout](zip/sd195990_revit_api_panel_augusto_goncalves_handout.pdf)
 - [Recording](zip/2018-11-15_revit_api_panel_recording_au_las_vegas.m4a)
 
-Volunteers for transcribing the recording are very welcome.
+Very many thanks to Diane for the valuable notes!
 
-I would love to publish it as written text.
+I reprint them here in full:
 
-Please leave a comment below in case of interest.
+#### <a name="2.1"></a> Revit Ideas
+
+Revit ideas is here: https://forums.autodesk.com/t5/revit-ideas/idb-p/302 Your request may already be there! Vote! Add new ideas! (If you want the API ideas specifically, you can go to this filter: https://forums.autodesk.com/t5/revit-ideas/idb-p/302/label-name/api)
+
+#### <a name="2.2"></a> Requests
+
+- MEP systems need to keep their properties when demolished
+- Easy way to get the wall core structure centerline from the wall type
+    - [There is a suggestion in the recording but not in my notes]
+- Ceiling API
+- Need to tab-select into linked model elements (And in general, APIs need to work with links if we’re going to say something is supported!) 
+- The API documentation is pretty sparse. Can we get more detail and more examples?
+- Access to the actual lineweight definitions (ie. lineweight 5 means 8 pixels, for example) 
+- Expose the group transform
+- Rehost a family instance
+    - Definitely doesn't work on face based but would like it to work in all cases
+    - Also needs to work on links
+- Ability to draw on the canvas in front of elements
+    - `DirectContext3D` draws behind elements
+- Make `DirectContext3D` show up in printing
+- `ReferenceIntersector`
+    - Make the calculation cached somehow so it's not slow every time you use it on a closed view?
+    - Can it work in non-3d views? 
+- CAD links
+    - Get text box notes out of a CAD link from the API
+    - Also allow explode via the API
+    - Workaround: use dxf file?
+- Getting multiple lines when two elements intersect in multiple places
+    - [The note taker is not sure what she meant here. Interference check?] 
+- Key schedules
+    - Either need to be able to make key schedules using shared parameters, or need to be able to make internal parameters with the API. [Note taker: it might mean normal where it says internal?]
+- Rearrange the parameter list from the API
+- [non-API?] When making a section or section box, can we have the new view keep the same design options as the original view?
+
+#### <a name="2.3"></a> Bugs?
+
+- Area property seems buggy. A comment that view-specific representations might not show the full picture and to use the model one.
+- Changes to MEP fabrication elements do not trigger element updaters
+- Revit warnings covering a WPF dialog
+    - We recommended writing a failure handler but are not sure if this is an expected problem. It would be expected if you have a modal dialog. 
+- If you modify the two coordinates of a sloped pipe in the API, then the UI doesn't update properly. [not sure this was written down properly]
+- Geometric properties of a solid in structural elements were giving different values depending on the zoom level.
+
+#### <a name="2.4"></a> Questions
+
+- How do you know when Revit is in a state where it will respond to an event? 
+    - You can’t definitively know. It’s why it has to be an asynchronous mechanism.  
+- Can you have arguments with ExternalEvents?
+    - Yes, although [didn’t manage to write the answer down]
+- Can I make an OptionsBar via the API?
+    - No because Revit is moving away from options bars. We want everything on the ribbon. 
+- Revit core console, similar to the AutoCAD core console? 
+    - No, this is not something we’re planning to support at this time.
+- Why are slow FilteredElementCollectors of variable speed depending on whether the view's been opened or not? 
+    - [trying to condense a rambling answer] The fast filters don’t need all of an element’s information to work. The slow filters need everything, and that 'everything' is usually first read in when you open a view containing the element. It’s a one-time operation. So if the view is already open, the slow filters are faster because that work’s already been done. 
 
 
 #### <a name="3"></a> Automatic BIM Dashboard Data Extraction
