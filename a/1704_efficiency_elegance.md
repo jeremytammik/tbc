@@ -100,15 +100,19 @@ Thanks.
 
 - Change `List` to `Array`; you don't have to change `foreach` to `for`, because the compiler usually does it for you, but remember that without optimization of code, `for` is faster than `foreach`.
 - Delete the first
+
 <pre class="code">
 using (Transaction t = new Transaction(doc, "parameters"))
 </pre>
-Why is this even there? You put using transaction into using transaction; why?
+
+- Why is this even there? You put `using` transaction inside `using` transaction; why?
 - Put the loop inside transaction, not outside (every start and commit takes a lot of time).
 - If you get parameter with string property, you have to check if parameter is not null:
+
 <pre class="code">
   if(s_parameter != null)
 </pre>
+
 - Check if the parameter is read-only and if it takes double as value.
 - So, application can only return `Succeeded`.
 - Are you changing types or instances? You can add `WhereElementIsElementType` to the filtered element collector.
