@@ -16,12 +16,16 @@
 
 Efficiency and elegance in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/dashboardregen
 
-&ndash; 
-...
+I remain busy, mainly in 
+the Revit API discussion forum.
+Here are three recent samples dealing with pretty generic questions
+&ndash; Efficiency and elegance in simple code
+&ndash; Pushing wall type to doors
+&ndash; Automatic extraction of database reviews...
 
 -->
 
-<h3>Efficiency and Elegance</h3>
+<h3>Efficient, Elegant Code and Automatic Dashboard</h3>
 <p>I remain busy, mainly in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>.
 Here are three recent samples dealing with pretty generic questions:</p>
@@ -37,7 +41,12 @@ Here are three recent samples dealing with pretty generic questions:</p>
 <p>One recent topic in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> asks 
 for <a href="https://forums.autodesk.com/t5/revit-api-forum/need-help-with-efficiency-and-elegance-in-simple-code/m-p/8410687">help with efficiency and elegance in simple code</a>:</p>
-<p><strong>Question:</strong> My code works, but I don't believe it's as efficient as it could be. Specifically the Try/catch area of the code. If I don't try/catch each line separately, it misses some of the doors. Like to reduce the regeneration time too if possible. Any pointers are appreciated. Thanks.</p>
+<p><strong>Question:</strong> My code works, but I don't believe it's as efficient as it could be.
+Specifically, the Try/catch area of the code.
+If I don't try/catch each line separately, it misses some of the doors.
+Like to reduce the regeneration time too if possible.
+Any pointers are appreciated.
+Thanks.</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:green;">//&nbsp;Get&nbsp;doors</span>
 &nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;);
@@ -82,26 +91,28 @@ for <a href="https://forums.autodesk.com/t5/revit-api-forum/need-help-with-effic
 </pre>
 
 <p><strong>Answer by MarryTookMyCoffe:</strong></p>
-<ol>
-<li>
-<p>Change <code>List</code> to <code>Array</code>; you don't have to change <code>foreach</code> to <code>for</code>, because the compiler usually does it for you, but remember that without optimization of code, <code>for</code> is faster than <code>foreach</code>.</p>
-</li>
-<li>
-<p>Delete the first
+<ul>
+<li>Change <code>List</code> to <code>Array</code>; you don't have to change <code>foreach</code> to <code>for</code>, because the compiler usually does it for you, but remember that without optimization of code, <code>for</code> is faster than <code>foreach</code>.</li>
+<li>Delete the first</li>
+</ul>
 <pre class="code">
 using (Transaction t = new Transaction(doc, "parameters"))
 </pre>
-Why is this even there? You put using transaction into using transaction; why?</p>
-</li>
+
+<ul>
+<li>Why is this even there? You put <code>using</code> transaction inside <code>using</code> transaction; why?</li>
 <li>Put the loop inside transaction, not outside (every start and commit takes a lot of time).</li>
-<li>If you get parameter with string property, you have to check if parameter is not null:
+<li>If you get parameter with string property, you have to check if parameter is not null:</li>
+</ul>
 <pre class="code">
   if(s_parameter != null)
-</pre></li>
+</pre>
+
+<ul>
 <li>Check if the parameter is read-only and if it takes double as value.</li>
 <li>So, application can only return <code>Succeeded</code>.</li>
 <li>Are you changing types or instances? You can add <code>WhereElementIsElementType</code> to the filtered element collector.</li>
-</ol>
+</ul>
 <p>Try this:</p>
 <pre class="code">
 &nbsp;&nbsp;[<span style="color:#2b91af;">Transaction</span>(&nbsp;<span style="color:#2b91af;">TransactionMode</span>.Manual&nbsp;)]
@@ -160,7 +171,7 @@ Why is this even there? You put using transaction into using transaction; why?</
 &nbsp;&nbsp;}
 </pre>
 
-<p><strong>Response:</strong> Thanks works perfectly. Now I'll step through the code so I can learn what you did. Thanks Again!</p>
+<p><strong>Response:</strong> Thanks, works perfectly. Now I'll step through the code so I can learn what you did. Thanks Again!</p>
 <p><strong>Answer 2:</strong> I would like to add a few points more:</p>
 <p><code>LookupParameter</code> will only retrieve the first parameter of the given name. In order to use it, you must be absolutely certain that only one parameter with the given name exists. I would suggest adding a test somewhere in your add-in startup code to ensure that this really is the case.</p>
 <p>It is always safer to use other means to retrieve parameters, e.g., the built-in parameter enumeration value, if it exists, or simply the <code>Parameter</code> definition, which you can look up and cache beforehand, e.g., in the afore-mentioned code ensuring that the parameter name on that element type really is unique.</p>
@@ -183,7 +194,7 @@ on:</p>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2017/03/q4r4-first-queries-revitlookup-and-areas-in-schemes.html#5">Getting the area scheme from an area</a></li>
 </ul>
 <h4><a name="3"></a> Pushing Wall Type to Doors</h4>
-<p>Some pretty similar copde appeared in the question
+<p>Some pretty similar code appeared in the question
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/push-walltype-to-doors/m-p/8411858">pushing wall type to doors</a>:</p>
 <p><strong>Question:</strong> I have been working on this macro for a while, we are looking for a way to have our door schedule to include the wall type (available in the Type Mark parameter). I have attached where I am at. I had no issues with pulling an instance parameter in the wall to the instance parameter in the door, but I was not having much luck with the type parameter in the wall. The only area I am unsure of is if I am accessing the type parameters from the wall correctly:</p>
 <pre class="code">
