@@ -26,15 +26,14 @@ Here are three recent samples dealing with pretty generic questions
 
 -->
 
-### Efficient, Elegant Code and Automatic Dashboard
+### Efficient and Elegant Code
 
 I remain busy, mainly in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160).
-Here are three recent samples dealing with pretty generic questions:
+Here are two recent samples dealing with pretty generic efficiency related questions:
 
 - [Efficiency and elegance in simple code](#2) 
 - [Pushing wall type to doors](#3) 
-- [Automatic extraction of database reviews](#4) 
 
 <center>
 <img src="img/1704_elegance_efficiency.png" alt="Elegance and efficiency" width="370">
@@ -292,38 +291,3 @@ You may be endangering your computer and your valued person.
 
 Well, at least your valued Revit model.
 
-
-#### <a name="4"></a> Automatic Extraction of Database Reviews
-
-Finally, a slightly different question of much larger scope
-on [automatic extraction of the database reviews](https://forums.autodesk.com/t5/revit-api-forum/automatic-extraction-of-the-database-revives/m-p/8408934):
-
-**Question:** I am working on a project that will eventually extract the databases of all our Revit models automatically every night to make them available in the form of dashboards to various members of the company. Can you help guide us to a solution?
-
-**Answer:** Here are some suggestions on various topics:
-
-Once you know that you need to work with the Revit PI at all, here are suggestions
-on [getting started with the Revit API](https://thebuildingcoder.typepad.com/blog/about-the-author.html#2).
-
-Before getting started with the Revit API, however, you should acquire as much knowledge as possible about Revit from the end user point of view.
-
-I would assume that you already have that.
-
-Here is one very old analysis of [integrating Revit with an external database](https://thebuildingcoder.typepad.com/blog/2009/01/database-integration.html).
-
-Many things have improved significantly since then, and your target is probably quite different (and much simpler than) the one discussed there.
-
-It might still give a few hints.
-
-Oh, and by the way, talking about dashboards and things:
-
-I would strongly encourage you to look at a partially cloud-based solution, to provide convenient access to a much larger audience in a much more scalable manner, with access to a huge number of public domain JavaScript-based libraries that can vastly simplify your work and integration efforts.
-
-Here are some of my own samples [integrating desktop and cloud](https://github.com/jeremytammik/FireRatingCloud).
-
-They are already pretty dated.
-
-Since then, Autodesk has made significant progress with [Forge](https://autodesk-forge.github.io),
-and [Forge Design Automation for Revit is just around the corner](https://thebuildingcoder.typepad.com/blog/2018/11/forge-design-automation-for-revit-at-au-and-in-public.html).
-
-Maybe the will provide the most efficient path forward for your project as well?
