@@ -17,7 +17,7 @@ Mikako Harada Re: Doc API AutoCAD Architecture 2019
 
 ### AutoCAD Architecture 2019 API Documentation
 
-Let's share a snippet of AutoCAD Architecture information here as well for a change, kindly provided by Mikako Harada, AEC technical lead in the Forge Platform Development group, home of developer technnical support and ADN, the Autodesk Developer Network.
+Let's share a snippet of AutoCAD Architecture information here as well for a change, kindly provided by Mikako Harada, AEC technical lead in the Forge Platform Development group, home of ADN, the Autodesk Developer Network.
 
 **Question:** Nous avons besoin de basculer nos outils spécifiques sur AutoCAD Architecture 2019.
 
@@ -33,7 +33,7 @@ Can you share a link?
 For Revit, we use [revitapidocs.com](http://www.revitapidocs.com), but I cannot find anything equivalent for AutoCAD Architecture 2019.*
 
 **Answer:** The AutoCAD Architecture .NET reference guide in included in the product install, as explained in 
-the [AutoCAD Architecture and MEP Developer Center](https://www.autodesk.com/developer-network/platform-technologies/autocad-architecture):
+the [AutoCAD Architecture and MEP Developer Centre](https://www.autodesk.com/developer-network/platform-technologies/autocad-architecture):
 
 > Because AutoCAD Architecture is based on AutoCAD, you can take advantage of
 all the AutoCAD source code samples for .NET that are included with the installation
