@@ -9,7 +9,9 @@
 - 12243183 [Dimension between walls corners using Revit's API]
   http://forums.autodesk.com/t5/revit-api-forum/dimension-between-walls-corners-using-revit-s-api/m-p/6537043
 
-- email Toshiaki Isezaki Re: Dimension on evit
+- email Toshiaki Isezaki Re: Dimension on Revit
+
+- 14840395 [Revit APIでの寸法作成時の参照設定]
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
@@ -208,5 +210,18 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 </pre>
 
 
-#### <a name="3"></a> 
+#### <a name="3"></a> Dimension Grids
+
+
+
+#### <a name="4"></a> Dimension Detail Lines
+
+14840395 [Revit APIでの寸法作成時の参照設定]
+
+`DimensionBetweenDetailLines`
+
+[The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
+
+[release 2019.0.144.3](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.144.3)
+
 

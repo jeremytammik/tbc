@@ -18,7 +18,7 @@ Can you share a link? ...
 
 ### AutoCAD Architecture 2019 API Documentation
 
-Let's share a snippet of AutoCAD Architecture information here as well for a change, kindly provided by Mikako Harada, AEC technical lead in the Forge Platform Development group, home of ADN, the Autodesk Developer Network.
+Let's share a snippet of AutoCAD Architecture information here as well for a change, answering a question that just came up:
 
 **Question:** Nous avons besoin de basculer nos outils spécifiques sur AutoCAD Architecture 2019.
 
