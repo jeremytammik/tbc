@@ -6,8 +6,7 @@
 
 <!---
 
-
-#ForgeDevCon DevCon Keynote and BIM360 model access in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim 
+#ForgeDevCon DevCon Keynote and BIM360 model access in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim http://bit.ly/devconbim360
 
 The November Forge DevCon keynote address has been published.
 Fittingly, some new hints on accessing Revit models from BIM360
