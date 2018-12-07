@@ -15,8 +15,8 @@
 Intersecting elements has always been a hot topic, cf. various previous discussions on 3D Booleans, cutting and joining elements;
 intersecting with elements in a linked file is even more challenging.
 Happily, the Revit API provides tools to support that as well
-Intersecting linked elements with current project ones
-Retrieving rebars intersecting a structural element...
+&ndash; Intersecting linked elements with current project ones
+&ndash; Retrieving rebars intersecting a structural element...
 
 -->
 
