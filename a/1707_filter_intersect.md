@@ -12,8 +12,11 @@
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash;
-...
+Intersecting elements has always been a hot topic, cf. various previous discussions on 3D Booleans, cutting and joining elements;
+intersecting with elements in a linked file is even more challenging.
+Happily, the Revit API provides tools to support that as well
+Intersecting linked elements with current project ones
+Retrieving rebars intersecting a structural element...
 
 -->
 
@@ -85,7 +88,8 @@ Here is a slightly cleaned up version of Yongyu Deng's code that I added to
    
   &nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">RevitLinkInstance</span>&nbsp;i&nbsp;<span style="color:blue;">in</span>&nbsp;links&nbsp;)
   &nbsp;&nbsp;{
-  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Transform</span>&nbsp;transform&nbsp;=&nbsp;i.GetTransform();&nbsp;<span style="color:green;">//&nbsp;GetTransform&nbsp;or&nbsp;GetTotalTransform&nbsp;or&nbsp;what?</span>
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;GetTransform&nbsp;or&nbsp;GetTotalTransform&nbsp;or&nbsp;what?</span>
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Transform</span>&nbsp;transform&nbsp;=&nbsp;i.GetTransform();&nbsp;
   &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;!transform.AlmostEqual(&nbsp;<span style="color:#2b91af;">Transform</span>.Identity)&nbsp;)
   &nbsp;&nbsp;&nbsp;&nbsp;{
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solid&nbsp;=&nbsp;<span style="color:#2b91af;">SolidUtils</span>.CreateTransformed(&nbsp;
