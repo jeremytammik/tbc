@@ -19,14 +19,19 @@
 
 ### More Intersection Filters
 
+Intersecting elements has always been a hot topic; intersecting with elements in a linked file is even mroe challenging. Happily, the Revit API provides tools to support that as well:
+
+- [Intersecting linked elements with current project ones](#2) 
+- [Retrieving rebars intersecting a structural element](#3) 
+
 <center>
-<img src="img/" alt="" width="100">
+<img src="img/rebar_intersect_column.png" alt="Rebar intersecting column" width="103">
 </center>
 
-#### <a name="2"></a> Intersecting Linked MEP Elements with Current Project Structural Ones
+#### <a name="2"></a> Intersecting Linked Elements with Current Project Ones
 
 Yongyu [@wlmsingle](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/6363417) Deng raised and answered an interesting question in 
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) discussion thread
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [how to use the `ElementIntersectsElementFilter` from the `RevitLinkInstance`](https://forums.autodesk.com/t5/revit-api-forum/how-to-use-the-elementintersectselementfilter-from-the/m-p/8440333) to
 retrieve MEP elements from a linked file and intersect them with structural elements in the current project:
 
@@ -98,20 +103,31 @@ Here is a slightly cleaned up version of Yongyu Deng's code that I added to
 
 #### <a name="3"></a> Retrieving Rebars Intersecting a Structural Element
 
+Another [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+deals with [getting all associated rebars that attach to a structural element](https://forums.autodesk.com/t5/revit-api-forum/get-all-associated-rebars-which-attach-to-the-structural-element/m-p/8446328):
 
+**Question:** How can I get all associated rebars which attach to a structural element such as a column by picking that?
 
-**Question:** How can i get all associated Rebars which attach to the Structural Element such as a column by picking that?
+**Answer:** Picking an element is described in
+the [Revit API getting started material](https://thebuildingcoder.typepad.com/blog/about-the-author.html#2) and
+also demonstrated in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples).
 
-**Answer:** Use a filtered element collector.
+For instance, in the latter, you can check out
+the [various element selection utility methods](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs#L1227-L1365) and
+examine how they are used in the sample commands.
+
+Once you have found a usage pattern that you like in some sample command, search for the description of it
+in [The Building Coder blog](https://thebuildingcoder.typepad.com).
+
+Once you have picked your structural element, use a filtered element collector to retrieve the intersecting rebar.
 
 Set it up to retrieve rebar elements only, and add a filter for the column solid:
 
 - [Bounding box filter is always axis aligned](https://thebuildingcoder.typepad.com/blog/2018/04/bounding-box-filter-always-axis-aligned.html)
 - [Using intersection filter with linked file](https://thebuildingcoder.typepad.com/blog/2018/04/using-intersection-filter-with-linked-file.html)
 
-Some examples of using a solid intersection filter are given in
-[The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples),
-e.g., the [`GetInstancesIntersectingElement` method](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs#L1294-L1430) showing
+[The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
+includes some examples of using a solid intersection filter, e.g., the [`GetInstancesIntersectingElement` method](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs#L1294-L1430) showing
 how to retrieve family instances intersecting a given BIM element:
 
 <pre class="code">

@@ -17,12 +17,17 @@
 -->
 
 <h3>More Intersection Filters</h3>
+<p>Intersecting elements has always been a hot topic; intersecting with elements in a linked file is even mroe challenging. Happily, the Revit API provides tools to support that as well:</p>
+<ul>
+<li><a href="#2">Intersecting linked elements with current project ones</a> </li>
+<li><a href="#3">Retrieving rebars intersecting a structural element</a> </li>
+</ul>
 <p><center>
-<img src="img/" alt="" width="100">
+<img src="img/rebar_intersect_column.png" alt="Rebar intersecting column" width="103">
 </center></p>
-<h4><a name="2"></a> Intersecting Linked MEP Elements with Current Project Structural Ones</h4>
+<h4><a name="2"></a> Intersecting Linked Elements with Current Project Ones</h4>
 <p>Yongyu <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/6363417">@wlmsingle</a> Deng raised and answered an interesting question in 
-the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> discussion thread
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-use-the-elementintersectselementfilter-from-the/m-p/8440333">how to use the <code>ElementIntersectsElementFilter</code> from the <code>RevitLinkInstance</code></a> to
 retrieve MEP elements from a linked file and intersect them with structural elements in the current project:</p>
 <p><strong>Question:</strong> I need to get the MEP elements from a linked file and intersect them with some structural elements in the current project.</p>
@@ -79,16 +84,25 @@ the <a href="https://apidocs.co/apps/revit/2019/22592761-f39c-4f53-d33b-6c21a4fa
 </pre>
 
 <h4><a name="3"></a> Retrieving Rebars Intersecting a Structural Element</h4>
-<p><strong>Question:</strong> How can i get all associated Rebars which attach to the Structural Element such as a column by picking that?</p>
-<p><strong>Answer:</strong> Use a filtered element collector.</p>
+<p>Another <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+deals with <a href="https://forums.autodesk.com/t5/revit-api-forum/get-all-associated-rebars-which-attach-to-the-structural-element/m-p/8446328">getting all associated rebars that attach to a structural element</a>:</p>
+<p><strong>Question:</strong> How can I get all associated rebars which attach to a structural element such as a column by picking that?</p>
+<p><strong>Answer:</strong> Picking an element is described in
+the <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#2">Revit API getting started material</a> and
+also demonstrated in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>.</p>
+<p>For instance, in the latter, you can check out
+the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs#L1227-L1365">various element selection utility methods</a> and
+examine how they are used in the sample commands.</p>
+<p>Once you have found a usage pattern that you like in some sample command, search for the description of it
+in <a href="https://thebuildingcoder.typepad.com">The Building Coder blog</a>.</p>
+<p>Once you have picked your structural element, use a filtered element collector to retrieve the intersecting rebar.</p>
 <p>Set it up to retrieve rebar elements only, and add a filter for the column solid:</p>
 <ul>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2018/04/bounding-box-filter-always-axis-aligned.html">Bounding box filter is always axis aligned</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2018/04/using-intersection-filter-with-linked-file.html">Using intersection filter with linked file</a></li>
 </ul>
-<p>Some examples of using a solid intersection filter are given in
-<a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>,
-e.g., the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs#L1294-L1430"><code>GetInstancesIntersectingElement</code> method</a> showing
+<p><a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
+includes some examples of using a solid intersection filter, e.g., the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs#L1294-L1430"><code>GetInstancesIntersectingElement</code> method</a> showing
 how to retrieve family instances intersecting a given BIM element:</p>
 <pre class="code">
 &nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
