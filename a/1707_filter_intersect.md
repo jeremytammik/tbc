@@ -17,9 +17,13 @@
 
 -->
 
-### More Intersection Filters
+### Using an Intersection Filter for Linked Elements
 
-Intersecting elements has always been a hot topic; intersecting with elements in a linked file is even mroe challenging. Happily, the Revit API provides tools to support that as well:
+Intersecting elements has always been a hot topic, cf. various previous discussions
+on [3D Booleans, cutting and joining elements](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.30);
+intersecting with elements in a linked file is even more challenging.
+
+Happily, the Revit API provides tools to support that as well:
 
 - [Intersecting linked elements with current project ones](#2) 
 - [Retrieving rebars intersecting a structural element](#3) 
