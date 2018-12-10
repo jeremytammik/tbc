@@ -8,7 +8,14 @@
 
 - [Automatic Creation of Void Extrusion Element/ Retrieve Cut Area from element](https://forums.autodesk.com/t5/revit-api-forum/automatic-creation-of-void-extrusion-element-retrieve-cut-area/m-p/8451742)
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Fire rating zone intersection in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/zoneintersect
+
+Other tweet:
+
+Petar Penchev 
+https://s2.gifyu.com/images/PatternDims.gif
+/a/doc/revit/tbc/git/a/img/patterndims.jpeg
+@PetarPPenchev used #RevitAPI voodoo to extract surface pattern layout dimensions into #DynamoBim #Dynamo #Python @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/patterndims 
 
 Let's tackle a 2D fire rating zone intersection task.
 Actually, it was originally raised a 3D intersection task.

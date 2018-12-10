@@ -7,10 +7,23 @@
 
 - [Automatic Creation of Void Extrusion Element/ Retrieve Cut Area from element](https://forums.autodesk.com/t5/revit-api-forum/automatic-creation-of-void-extrusion-element-retrieve-cut-area/m-p/8451742)
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Fire rating zone intersection in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/zoneintersect
 
-&ndash; 
-...
+Other tweet:
+
+Petar Penchev 
+https://s2.gifyu.com/images/PatternDims.gif
+/a/doc/revit/tbc/git/a/img/patterndims.jpeg
+@PetarPPenchev used #RevitAPI voodoo to extract surface pattern layout dimensions into #DynamoBim #Dynamo #Python @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/patterndims 
+
+Let's tackle a 2D fire rating zone intersection task.
+Actually, it was originally raised a 3D intersection task.
+Reducing it to 2D makes it much more tractable
+&ndash; 3D solid extrusion creation and intersection task
+&ndash; 2D area intersection task
+&ndash; Jack's sample and description
+&ndash; Soffit subdivision sample code
+&ndash; Cleanup and GitHub repository..
 
 -->
 
@@ -857,7 +870,7 @@ namespace AddPanel.Classes
 <p>I set it up and tested it by performing the following steps:</p>
 <ul>
 <li>Cleaned up the sample code</li>
-<li>Added minimal implementations for the missing Triangle and TrianglePair classes</li>
+<li>Added minimal implementations for the missing <code>Triangle</code> and <code>TrianglePair</code> classes</li>
 <li>Downloaded and installed the <a href="http://angusj.com/delphi/clipper.php">Clipper open source freeware library for clipping and offsetting lines and polygons</a></li>
 <li>Implemented an external command to drive the code</li>
 <li>Tested it in the sample model</li>
@@ -868,7 +881,7 @@ namespace AddPanel.Classes
 </center></p>
 <p>The result is a bunch of new floor elements:</p>
 <p><center>
-<img src="img/fire_rating_zone_intersection_result.png" alt="Fire rating zone intersection model" width="691">
+<img src="img/fire_rating_zone_intersection_result.png" alt="Fire rating zone intersection result" width="691">
 </center></p>
 <p>I published the cleaned-up sample in its own
 new <a href="https://github.com/jeremytammik/FireRatingZoneIntersection">FireRatingZoneIntersection GitHub repository</a>.</p>
