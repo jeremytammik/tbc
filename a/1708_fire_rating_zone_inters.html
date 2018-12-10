@@ -1,172 +1,122 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="bc.css">
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
-</head>
-
+</head></p>
 <!---
 
 - [Automatic Creation of Void Extrusion Element/ Retrieve Cut Area from element](https://forums.autodesk.com/t5/revit-api-forum/automatic-creation-of-void-extrusion-element-retrieve-cut-area/m-p/8451742)
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-Let's tackle a 2D fire rating zone intersection task.
-Actually, it was originally raised a 3D intersection task.
-Reducing it to 2D makes it much more tractable
-&ndash; 3D solid extrusion creation and intersection task
-&ndash; 2D area intersection task
-&ndash; Jack's sample and description
-&ndash; Soffit subdivision sample code
-&ndash; Cleanup and GitHub repository..
+&ndash; 
+...
 
 -->
 
-### Fire Rating Zone Intersection
-
-Last week, we looked at some [3D intersection and filtering tasks](https://thebuildingcoder.typepad.com/blog/2018/12/using-an-intersection-filter-for-linked-elements.html).
-
-Now, let's tackle a 2D intersection one, brought up and solved 
-by [Jack Bird](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/6830764) in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [automatic creation of void extrusion and retrieval of cut area from element](https://forums.autodesk.com/t5/revit-api-forum/automatic-creation-of-void-extrusion-element-retrieve-cut-area/m-p/8451742):
-
-Actually, it was originally raised a 3D intersection task.
-
-Reducing it to 2D makes it much more tractable:
-
-- [3D solid extrusion creation and intersection task](#3) 
-- [2D area intersection task](#4) 
-- [Jack's sample and description](#5) 
-- [Soffit subdivision sample code](#6) 
-- [Cleanup and GitHub repository](#7) 
-
-
-#### <a name="3"></a> 3D Solid Extrusion Creation and Intersection Task
-
-**Question:** I’m finding it difficult to find any informative material on a subject in the API that I was hoping might have already been explored.
-
-Specifically, I was hoping there would be an instance where a “model in place” void element is programmatically created in the model using given parameters for shape and dimensions.
-
-For my purposes I was hoping to find a way to use an existing Solid Extrusion Element’s Geometry to define the geometry of this void as I create it.
-
-The overall point would be to:
-
-- Have a Transparent extrusion hidden in the model that represents the Property Boundary for the Site of the Building, and the area 900 mm in from it (like a 3D cubic Object that represents the legal fire rating zone).
-- Create a list of elements from the exterior of the building that need to be tested for needing a fire proof layer; (such as Walls, Soffits ETC).
-
-Then in the same transaction:
-
-- Create a void Extrusion element the same shape and size as the Solid extrusion,
-- Iterate through each of the elements in need of testing and attempt to cut them with the void,
-- If the cut is successful record the cut area of the element that is being tested,
-- Keep that as the area of that element that needs to be fire rated,
-- Then, having tested all the relevant elements, Rolling back the transaction.
-
-I don’t know if that is even possible, but I thought it might allow me to automatically store the required fire rated area for each element. All the drafts person has to do is draw in a Solid extrusion 900 mm wide and as tall as the building based on the plan of subdivision and hide it in the model.
-
-I would be really stoked for any advice, references or links that seem relevant to the task. it would be much appreciated.
-
-Here is an image that may help with visualizing the problem:
-
-<center>
+<h3>Fire Rating Zone Intersection</h3>
+<p>Last week, we looked at some <a href="https://thebuildingcoder.typepad.com/blog/2018/12/using-an-intersection-filter-for-linked-elements.html">3D intersection and filtering tasks</a>.</p>
+<p>Now, let's tackle a 2D intersection one, brought up and solved 
+by <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/6830764">Jack Bird</a> in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/automatic-creation-of-void-extrusion-element-retrieve-cut-area/m-p/8451742">automatic creation of void extrusion and retrieval of cut area from element</a>:</p>
+<p>Actually, it was originally raised a 3D intersection task.</p>
+<p>Reducing it to 2D makes it much more tractable:</p>
+<ul>
+<li><a href="#3">3D solid extrusion creation and intersection task</a> </li>
+<li><a href="#4">2D area intersection task</a> </li>
+<li><a href="#5">Jack's sample and description</a> </li>
+<li><a href="#6">Soffit subdivision sample code</a> </li>
+<li><a href="#7">Cleanup and GitHub repository</a> </li>
+</ul>
+<h4><a name="3"></a> 3D Solid Extrusion Creation and Intersection Task</h4>
+<p><strong>Question:</strong> I’m finding it difficult to find any informative material on a subject in the API that I was hoping might have already been explored.</p>
+<p>Specifically, I was hoping there would be an instance where a “model in place” void element is programmatically created in the model using given parameters for shape and dimensions.</p>
+<p>For my purposes I was hoping to find a way to use an existing Solid Extrusion Element’s Geometry to define the geometry of this void as I create it.</p>
+<p>The overall point would be to:</p>
+<ul>
+<li>Have a Transparent extrusion hidden in the model that represents the Property Boundary for the Site of the Building, and the area 900 mm in from it (like a 3D cubic Object that represents the legal fire rating zone).</li>
+<li>Create a list of elements from the exterior of the building that need to be tested for needing a fire proof layer; (such as Walls, Soffits ETC).</li>
+</ul>
+<p>Then in the same transaction:</p>
+<ul>
+<li>Create a void Extrusion element the same shape and size as the Solid extrusion,</li>
+<li>Iterate through each of the elements in need of testing and attempt to cut them with the void,</li>
+<li>If the cut is successful record the cut area of the element that is being tested,</li>
+<li>Keep that as the area of that element that needs to be fire rated,</li>
+<li>Then, having tested all the relevant elements, Rolling back the transaction.</li>
+</ul>
+<p>I don’t know if that is even possible, but I thought it might allow me to automatically store the required fire rated area for each element. All the drafts person has to do is draw in a Solid extrusion 900 mm wide and as tall as the building based on the plan of subdivision and hide it in the model.</p>
+<p>I would be really stoked for any advice, references or links that seem relevant to the task. it would be much appreciated.</p>
+<p>Here is an image that may help with visualizing the problem:</p>
+<p><center>
 <img src="img/fire_rating_zone_intersection.png" alt="Fire rating zone intersection and subdivision" width="1104">
-</center>
-
-**Answer:** Here are some discussions dealing with various aspects of voids:
-
-- [Boolean operations and `InstanceVoidCutUtils`](http://thebuildingcoder.typepad.com/blog/2011/06/boolean-operations-and-instancevoidcututils.html)
-- [Beam maker using a void extrusion to cut](http://thebuildingcoder.typepad.com/blog/2010/07/beam-maker-using-a-void-extrusion-to-cut.html)
-- [Transaction group regeneration for `InstanceVoidCutUtils`](http://thebuildingcoder.typepad.com/blog/2014/04/instancevoidcututils-and-need-for-regeneration.html)
-- [Voids in the family editor](https://thebuildingcoder.typepad.com/blog/2014/10/brussels-hackathon-and-determining-pipe-wall-thickness.html#4)
-- [TTT for provision for voids](http://thebuildingcoder.typepad.com/blog/2017/03/wta-mech-and-ttt-for-provision-for-voids.html)
-- [`FindInserts` determines void instances cutting floor](https://thebuildingcoder.typepad.com/blog/2017/06/findinserts-determines-void-instances-cutting-a-floor.html)
-
-#### <a name="4"></a> 2D Area Intersection Task
-
-Looking more closely at your descriptive image, the problem seems quite simple to me.
-
-You have a certain area of interest, and certain elements that partially intersect the volume above it.
-
-Instead of determining the intersecting volume, I would suggest retaining the area of interest in 2D, in the XY plane, and projecting the elements onto the XY plane as well.
-
-Once you have everything in 2D in the XY plane, you have reduced the problem to a simple 2D Boolean intersection task.
-
-That can be perfectly and completely addressed using a library to
-compute [Boolean Operations for 2D Polygons](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.2).
-
-**Response:** That  RvtClipper.zip  was a very useful resource thank you.
-I had a play with the clipperlib on a previous task but did not consider putting it to use here.
-
-I am currently working on adapting it to my aim and will update this post as soon as I've figured it out.
-
-**Answer:** Great! I am very glad it helped.
+</center></p>
+<p><strong>Answer:</strong> Here are some discussions dealing with various aspects of voids:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/06/boolean-operations-and-instancevoidcututils.html">Boolean operations and <code>InstanceVoidCutUtils</code></a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/07/beam-maker-using-a-void-extrusion-to-cut.html">Beam maker using a void extrusion to cut</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/04/instancevoidcututils-and-need-for-regeneration.html">Transaction group regeneration for <code>InstanceVoidCutUtils</code></a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2014/10/brussels-hackathon-and-determining-pipe-wall-thickness.html#4">Voids in the family editor</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/03/wta-mech-and-ttt-for-provision-for-voids.html">TTT for provision for voids</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2017/06/findinserts-determines-void-instances-cutting-a-floor.html"><code>FindInserts</code> determines void instances cutting floor</a></li>
+</ul>
+<h4><a name="4"></a> 2D Area Intersection Task</h4>
+<p>Looking more closely at your descriptive image, the problem seems quite simple to me.</p>
+<p>You have a certain area of interest, and certain elements that partially intersect the volume above it.</p>
+<p>Instead of determining the intersecting volume, I would suggest retaining the area of interest in 2D, in the XY plane, and projecting the elements onto the XY plane as well.</p>
+<p>Once you have everything in 2D in the XY plane, you have reduced the problem to a simple 2D Boolean intersection task.</p>
+<p>That can be perfectly and completely addressed using a library to
+compute <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.2">Boolean Operations for 2D Polygons</a>.</p>
+<p><strong>Response:</strong> That  RvtClipper.zip  was a very useful resource thank you.
+I had a play with the clipperlib on a previous task but did not consider putting it to use here.</p>
+<p>I am currently working on adapting it to my aim and will update this post as soon as I've figured it out.</p>
+<p><strong>Answer:</strong> Great! I am very glad it helped.
 I think this can be used to create a very optimal solution to the ask you describe.
-I look forward very much to hearing what you come up with.
-
-**Response:** Thanks again, that worked out really well.
-
-In the end I swapped out the RvtClipper `Result` `Execute` method to return a <code>List&lt;CurveArray&gt;</code> and substituted the `doc.Selection` based component for two element parameters that I pass in when calling it: the boundary element and whichever element I am currently testing for an intersection as I iterate through them.
-
-I then loop through the resulting `CurveArray` instances that it returns and:
-
-- Subject the curve arrays to your `SortCurvesContiguous` method
-- Convert them to CurveLoops,
-- Check if the CurveLoop is open,
-- If it is; I take the start of the first Curve and the end of the last Curve and add a new Curve to the loop using these vertices as its start and end,
-- Convert the loop back to the Array,
-- Apply your `SortCurvesContiguous` method again just to be sure,
-- Lastly, just create a floor of a previously prepared type named "Fire Rated Layer" using these curves that sits just on top of the soffit that was being tested.
-
-All in all, I'm chuffed with the outcome.
-
-All the best and Thank You.
-
-I would be glad to share the code and sample &ndash; I wonder though &ndash; as I have utilized this function as a component of a bigger two-part method &ndash; and have to some degree intertwined the two functions, would you still like to have it?
-
-Furthermore, I have developed it to be reliant on several other methods, so it may seem somewhat verbose as a sample.
-
-With all this taken into account, I wasn't sure if you would like to retract your offer as the sample will be quite large and not entirely focused on the topics touched on in this conversation.
-
-I will outline the whole thing so you may consider.
-
-The overall method now takes all of the soffits of a specific type (Named "Eave") and:
-
-- First, spends some time breaking them into segments that replace the initial elements.
-- Secondly, collects and subjects the new elements to the boundary overlap query, creating the fire rating layer elements.
-
-Step one not being entirely relevant to step two, but contingent none the less.
-
-Having gone back through and doing a bit of housekeeping, it is not as bad as I had apprehended.
-
-Please forgive my habit of notating via regions, I have a bit of a thing for abstraction whilst I work.
-
-It is all attached below.
-
-#### <a name="5"></a> Jack's Sample and Description
-
-Based on that discussion, Jack very kindly shared
-a [complete soffit subdivision and fire rating sample](zip/jb_soffit_subdivision_and_fire_rating.zip) including
-a [sample model](zip/jb_soffit_subdivision_and_fire_rating_example.rvt),
-the [sample C# code below](#4) and the following description:
-
-The notation within the sample will hopefully take care of most of the describing,
-
-I would however like to make note of the fact that any time I use the term 'Soffit', it is because that is what 
-the element in question represents as far as function goes. Where in reality the 'Soffits' are all floors.
-
-The three types that are used in this sample are a floor named "Boundary", a floor named "Eave" and a floor named
+I look forward very much to hearing what you come up with.</p>
+<p><strong>Response:</strong> Thanks again, that worked out really well.</p>
+<p>In the end I swapped out the RvtClipper <code>Result</code> <code>Execute</code> method to return a <code>List&lt;CurveArray&gt;</code> and substituted the <code>doc.Selection</code> based component for two element parameters that I pass in when calling it: the boundary element and whichever element I am currently testing for an intersection as I iterate through them.</p>
+<p>I then loop through the resulting <code>CurveArray</code> instances that it returns and:</p>
+<ul>
+<li>Subject the curve arrays to your <code>SortCurvesContiguous</code> method</li>
+<li>Convert them to CurveLoops,</li>
+<li>Check if the CurveLoop is open,</li>
+<li>If it is; I take the start of the first Curve and the end of the last Curve and add a new Curve to the loop using these vertices as its start and end,</li>
+<li>Convert the loop back to the Array,</li>
+<li>Apply your <code>SortCurvesContiguous</code> method again just to be sure,</li>
+<li>Lastly, just create a floor of a previously prepared type named "Fire Rated Layer" using these curves that sits just on top of the soffit that was being tested.</li>
+</ul>
+<p>All in all, I'm chuffed with the outcome.</p>
+<p>All the best and Thank You.</p>
+<p>I would be glad to share the code and sample &ndash; I wonder though &ndash; as I have utilized this function as a component of a bigger two-part method &ndash; and have to some degree intertwined the two functions, would you still like to have it?</p>
+<p>Furthermore, I have developed it to be reliant on several other methods, so it may seem somewhat verbose as a sample.</p>
+<p>With all this taken into account, I wasn't sure if you would like to retract your offer as the sample will be quite large and not entirely focused on the topics touched on in this conversation.</p>
+<p>I will outline the whole thing so you may consider.</p>
+<p>The overall method now takes all of the soffits of a specific type (Named "Eave") and:</p>
+<ul>
+<li>First, spends some time breaking them into segments that replace the initial elements.</li>
+<li>Secondly, collects and subjects the new elements to the boundary overlap query, creating the fire rating layer elements.</li>
+</ul>
+<p>Step one not being entirely relevant to step two, but contingent none the less.</p>
+<p>Having gone back through and doing a bit of housekeeping, it is not as bad as I had apprehended.</p>
+<p>Please forgive my habit of notating via regions, I have a bit of a thing for abstraction whilst I work.</p>
+<p>It is all attached below.</p>
+<h4><a name="5"></a> Jack's Sample and Description</h4>
+<p>Based on that discussion, Jack very kindly shared
+a <a href="zip/jb_soffit_subdivision_and_fire_rating.zip">complete soffit subdivision and fire rating sample</a> including
+a <a href="zip/jb_soffit_subdivision_and_fire_rating_example.rvt">sample model</a>,
+the <a href="#4">sample C# code below</a> and the following description:</p>
+<p>The notation within the sample will hopefully take care of most of the describing,</p>
+<p>I would however like to make note of the fact that any time I use the term 'Soffit', it is because that is what 
+the element in question represents as far as function goes. Where in reality the 'Soffits' are all floors.</p>
+<p>The three types that are used in this sample are a floor named "Boundary", a floor named "Eave" and a floor named
 "Fire Rated Layer". They have no particular properties that are essential to the method other than their names, 
-as that is how I identify and collect them.
-
-Other than that, the view in the model called "Isolated" is just the "Soffit" and the boundary by themselves;
-that is the best view to test in, I find.
-
-All the best.
-
-Thanks.
-
-#### <a name="6"></a> Soffit Subdivision Sample Code
-
+as that is how I identify and collect them.</p>
+<p>Other than that, the view in the model called "Isolated" is just the "Soffit" and the boundary by themselves;
+that is the best view to test in, I find.</p>
+<p>All the best.</p>
+<p>Thanks.</p>
+<h4><a name="6"></a> Soffit Subdivision Sample Code</h4>
 <pre class="code">
 using System;
 using System.Collections.Generic;
@@ -901,40 +851,32 @@ namespace AddPanel.Classes
 }
 </pre>
 
-#### <a name="7"></a> Cleanup and GitHub Repository
-
-Very many thanks to Jack for creating, cleaning up and sharing this.
-
-Very cool indeed.
-
-I set it up and tested it by performing the following steps:
-
-- Cleaned up the sample code
-- Added minimal implementations for the missing `Triangle` and `TrianglePair` classes
-- Downloaded and installed the [Clipper open source freeware library for clipping and offsetting lines and polygons](http://angusj.com/delphi/clipper.php)
-- Implemented an external command to drive the code
-- Tested it in the sample model
-
-Here is a picture of the model:
-
-<center>
+<h4><a name="7"></a> Cleanup and GitHub Repository</h4>
+<p>Very many thanks to Jack for creating, cleaning up and sharing this.</p>
+<p>Very cool indeed.</p>
+<p>I set it up and tested it by performing the following steps:</p>
+<ul>
+<li>Cleaned up the sample code</li>
+<li>Added minimal implementations for the missing Triangle and TrianglePair classes</li>
+<li>Downloaded and installed the <a href="http://angusj.com/delphi/clipper.php">Clipper open source freeware library for clipping and offsetting lines and polygons</a></li>
+<li>Implemented an external command to drive the code</li>
+<li>Tested it in the sample model</li>
+</ul>
+<p>Here is a picture of the model:</p>
+<p><center>
 <img src="img/fire_rating_zone_intersection_model.png" alt="Fire rating zone intersection model" width="477">
-</center>
-
-The result is a bunch of new floor elements:
-
-<center>
-<img src="img/fire_rating_zone_intersection_result.png" alt="Fire rating zone intersection result" width="691">
-</center>
-
-I published the cleaned-up sample in its own
-new [FireRatingZoneIntersection GitHub repository](https://github.com/jeremytammik/FireRatingZoneIntersection).
-
-Some things could be cleaned up further, I believe:
-
-- Why convert the filtered element collectors to `List`?
-- Why create floor elements? Wouldn't a simple model curve polyline do the job?
-- Use a built-in parameter enumeration value and `get_Parameter` instead of `LookupParameter`.
-- I tend to avoid `SetValueString` and use `Set` instead.
-
-Still, I hope others find it useful as well, and look forward to seeing your pull requests for these and further enhancements.
+</center></p>
+<p>The result is a bunch of new floor elements:</p>
+<p><center>
+<img src="img/fire_rating_zone_intersection_result.png" alt="Fire rating zone intersection model" width="691">
+</center></p>
+<p>I published the cleaned-up sample in its own
+new <a href="https://github.com/jeremytammik/FireRatingZoneIntersection">FireRatingZoneIntersection GitHub repository</a>.</p>
+<p>Some things could be cleaned up further, I believe:</p>
+<ul>
+<li>Why convert the filtered element collectors to <code>List</code>?</li>
+<li>Why create floor elements? Wouldn't a simple model curve polyline do the job?</li>
+<li>Use a built-in parameter enumeration value and <code>get_Parameter</code> instead of <code>LookupParameter</code>.</li>
+<li>I tend to avoid <code>SetValueString</code> and use <code>Set</code> instead.</li>
+</ul>
+<p>Still, I hope others find it useful as well, and look forward to seeing your pull requests for these and further enhancements.</p>
