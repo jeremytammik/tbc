@@ -88,7 +88,9 @@ Many thanks to Einar for pointing this out!
 
 **Question:** I am walking through the Autodesk University 2018 course on Revit add-ins:
 
-- [Pushing Revit to the Next Level &NDASH; an Intro to Revit Plugins with C#](https://www.autodesk.com/autodesk-university/class/Pushing-Revit-Next-Level-Intro-Revit-Plugins-C-2018)
+- [Pushing Revit to the Next Level &ndash; an Intro to Revit Plugins with C#](https://www.autodesk.com/autodesk-university/class/Pushing-Revit-Next-Level-Intro-Revit-Plugins-C-2018)
+
+Revit 2019.1 add-in programming apparently requires the .NET framework 4.7.
 
 <center>
 <img src="img/net47_figure_20_create_project.png" alt="Figure 20 Create Project" width="689">
