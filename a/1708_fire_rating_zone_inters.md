@@ -24,7 +24,7 @@ Reducing it to 2D makes it much more tractable
 &ndash; 2D area intersection task
 &ndash; Jack's sample and description
 &ndash; Soffit subdivision sample code
-&ndash; Cleanup and GitHub repository..
+&ndash; Cleanup and GitHub repository...
 
 -->
 
