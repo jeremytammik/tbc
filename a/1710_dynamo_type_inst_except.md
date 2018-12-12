@@ -58,7 +58,7 @@ Let's highlight a couple of Dynamo considerations, Revit family and element fund
 
 **Question:** Does anybody have a matrix comparing the capabilities and functionalities of the Revit API versus Dynamo for Revit?
 
-My understanding is that Dynamo targets designers, engineers and architects who don’t know or like text based programming.
+My understanding is that Dynamo targets designers, engineers and architects who don’t know or like text-based programming.
 
 I am often asked by people interested in Forge in the BIM domain about differences between Revit API and Dynamo.
 Often they are not programmers, but are interested in spreading BIM info and data to a wide audience.
@@ -70,7 +70,7 @@ Maybe a comparison matrix will help?
  
 It is the one and only API for Revit.
  
-Dynamo makes ose of it, and you can use all of it.
+Dynamo makes use of it, and you can use all of it.
  
 So, Dynamo is a layer over the Revit API, and you can use all of the Revit API from Dynamo.
  
@@ -107,7 +107,7 @@ For Dynamo scalability, also COM and .NET can be included, as they can be used v
 
 For example, one developer wrote an extensive library in C# for Dynamo that uses multiple frameworks at the same time such as COM for Civil 3D and .NET for Revit.
 
-Another impressive example of interoperabbility between the different .NET languages is provided by 
+Another impressive example of interoperability between the different .NET languages is provided by 
 the [Python code external command loader and compiler implemented in F#](https://tailoryourbim.com/2018/11/10/efficiently-at-compiling-python-code-as-external-command-%E8%A3%9D%E8%BC%89-python-%E7%B7%A8%E7%A2%BC%E6%88%90-revit-%E5%A4%96%E9%83%A8%E7%A8%8B%E5%BC%8F) shared by [tailoryourbim](https://tailoryourbim.com).
 I have repeatedly pointed out that the Revit API can be used from any .NET supporting language.
 [Ching](https://tailoryourbim.com/about) shows how this can be taken to extremes by implementing an external command in F#
@@ -141,11 +141,11 @@ Talking about Dynamo, here is a question on the different versions floating arou
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [Dynamo 2.0.X vs box shipped 1.3.3 &ndash; Which to use for production environment?](https://forums.autodesk.com/t5/revit-api-forum/dynamo-2-0-x-vs-box-shipped-1-3-3-which-to-use-for-production/m-p/8457964):
 
-**Question:** Been searching online for some answers and thought maybe the best would be to post to this forumn as I don't have a login for dynamo's git hub to post there.  We have some conflicting opinions in our department and I am looking at getting some "good" "professional" concrete advice.
+**Question:** Been searching online for some answers and thought maybe the best would be to post this here as I don't have a login for Dynamo's git hub to post there.  We have some conflicting opinions in our department and I am looking at getting some "good" "professional" concrete advice.
 
 One of the guys here has been putting together some dynamo scripts using 2.0 and now upgraded to 2.0.1.  We are running Revit 2019.1 for the most part.  Autodesk however packages 1.3.3 (?) with their 2019 software releases.
 
-For scripts we release to production/end users to use, would you recommend we stick with 1.3.3 or develop in 2.0.X.  From what I understand 2.0 is a pretty big overhaul of dynamo and it's node packages.  So I am aware of the upgrading and compatibility issues with trying to write scripts in 1.3.3 vs 2.0.  Pretty much have to re-write them.  However with the stability of 2.0 up in the air there is some hesitation to move forward with this.  What are some thoughts out there on the subject?  Is there "real" definite reasons on why a person would or would not want to use 2.0.X or 1.3.3 ?
+For scripts we release to production/end users to use, would you recommend we stick with 1.3.3 or develop in 2.0.X.  From what I understand 2.0 is a pretty big overhaul of dynamo and it's node packages.  So, I am aware of the upgrading and compatibility issues with trying to write scripts in 1.3.3 vs 2.0.  Pretty much have to re-write them.  However, with the stability of 2.0 up in the air, there is some hesitation to move forward with this.  What are some thoughts out there on the subject?  Is there "real" definite reasons on why a person would or would not want to use 2.0.X or 1.3.3 ?
 
 **Answer:** 1.3.3 is the latest version that was shipped with a point release of Revit, and 1.3.4 is in the pipeline for the next update release.
 
@@ -223,25 +223,16 @@ section [Introduction](http://help.autodesk.com/view/RVT/2019/ENU/?guid=Revit_AP
 
 #### <a name="5"></a> Custom Exporter Execute May Throw
 
-[mesh data export to json](https://forums.autodesk.com/t5/revit-api-forum/mesh-data-export-to-json/m-p/8459164)
+Let's wrap up with a
+final [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread 
+on [mesh data export to json](https://forums.autodesk.com/t5/revit-api-forum/mesh-data-export-to-json/m-p/8459164):
 
-**Question:** I try to retrieve the geometry info from a Revit model to JSON data that I can load to draw geometry by three.js.
+**Question:** I try to retrieve the geometry info from a Revit model to JSON data that I can load to draw geometry by three.js like in
+the [ADN mesh data custom exporter to JSON](https://thebuildingcoder.typepad.com/blog/2013/07/adn-mesh-data-custom-exporter-to-json.html).
 
-This page: https://thebuildingcoder.typepad.com/blog/2013/07/adn-mesh-data-custom-exporter-to-json.html
+Of course, the demo is right and works well with some changes from Revit 2015 or 2016 to 2019.
 
-Him had show me how to do.
-
-Of course, the demo is right and work well by some changes from revit 2015or6 to 2019.
-
-https://thebuildingcoder.typepad.com/files/curvedwall.rvt
-
-this reivt file work well in my computer.
-
-But when I do with other revit file, error comes from the
-
-`exporter.Export(view)`
-
-which the error say: `cannot devide by zero`
+However, working with a different Revit model, an error comes from the call to `exporter.Export(view)`, saying `cannot divide by zero`.
 
 
 **Answer:** Run the add-in in the debugger and see for yourself which line of code is causing the problem.
@@ -249,31 +240,29 @@ which the error say: `cannot devide by zero`
 Then you will probably be able to see how to fix it as well.
 
 
-**Response:** The debugger does not help, because the exception is thrown inside Revit internal code while executing the `???` method.
+**Response:** The debugger does not help, because the exception is thrown inside Revit internal code while executing the `Export` method.
 
-The debugger will just raise a error top of the logic.
+The debugger will just raise an error on top of the built-in logic.
 
-Finally I add the `try` `catch` handler and caught the error.
+Finally, I added a `try` `catch` handler and caught the error.
 
 Thank you very much, and thanks for your demo about the use of `CustomExportContext`.
 
 
 **Answer:** Glad to hear you resolved your problem.
 
-By the way, rather belatedly, may I point out that others ran into the same problem in the past:
+By the way, rather belatedly, may I point out
+that [others ran into the same problem in the past](https://thebuildingcoder.typepad.com/blog/2016/07/exporting-rvt-bims-to-webgl-and-forge.html#3).
 
-https://thebuildingcoder.typepad.com/blog/2016/07/exporting-rvt-bims-to-webgl-and-forge.html#3
-
-The exception thrown by the internal custom exporter implementation can simply be caught and ignored:
-
-https://github.com/jeremytammik/CustomExporterAdnMeshJson/commit/23a95aad8f4a3cca85a72b32e2b699bde1d...
+The [exception thrown by the internal custom exporter implementation can simply be caught and ignored](https://github.com/jeremytammik/CustomExporterAdnMeshJson/commit/23a95aad8f4a3cca85a72b32e2b699bde1d46bcb).
 
 
 #### <a name="6"></a> Turned on Git LFS
 
-Uploading Paolo's Dynamo primer PDF triggered the GiHub warning about large files exceeding 50 MB in size.
+Uploading Paolo's Dynamo primer PDF triggered the GitHub warning about large files exceeding 50 MB in size.
 
-The warning incldues a suggestion to turn on Git LFS.
+The warning includes a suggestion to turn on
+the [Git LFS Large File Storage](https://git-lfs.github.com).
 
 I read about it and did so for three file extensions:
 
@@ -287,5 +276,4 @@ Listing tracked patterns
 
 Hence, the [tbc](https://github.com/jeremytammik/tbc) repository
 hosting all [The Building Coder](https://thebuildingcoder.typepad.com) blog posts
-and support material should be much smaller now.
-
+and support material should be significantly smaller now.
