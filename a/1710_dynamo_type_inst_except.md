@@ -16,6 +16,26 @@
 - Revit API vs. Dynamo for Revit
   Paolo Serra <paolo.serra@autodesk.com>
 
+- Revit API vs. Dynamo for Revit Toshiaki Isezaki
+Q: Does somebody have a matrix which compare the capabilities or functionalities of Revit API and Dynamo for Revit?
+A: the revit api is pretty clear, isn't it?
+it is the one and only api for revit.
+dynamo makes ose of it, and you can use all of it.
+so dynamo is a layer over the revit api, and you can use al of the revit api from dynamo (i think).
+dynamo also includes other functionality, e.g., DesignScript and its own geometry library.
+so in some areas, you can do more in dynamo than in revit api.
+however, for manipulating RVT files, dynamo has nothing more to offer than what is provided by the revit api.
+for architects, dynamo seems to be the more effective path, cf., e.g., this suggestion to learn dynamo:
+https://vasshaug.net/2015/09/18/learn-dynamo/
+i hope this clarifies.
+
+- Python code external command loader and compiler implemented in F#
+  https://tailoryourbim.com/2018/11/10/efficiently-at-compiling-python-code-as-external-command-%E8%A3%9D%E8%BC%89-python-%E7%B7%A8%E7%A2%BC%E6%88%90-revit-%E5%A4%96%E9%83%A8%E7%A8%8B%E5%BC%8F/
+  I have repeatedly pointed out that the Revit API can be used from any .NET supporting language.
+  [Ching](https://tailoryourbim.com/about) shows how this can be taken to extremes by implementing an external command in F#
+  that loads and compiles an external command implemented in Python.
+  In his own words, he 'wrote a simple Python code loader in F#, which loads a Python script into Revit as an external command, combining with [IronPython](http://ironpython.net).'
+
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
 &ndash; 
@@ -29,7 +49,79 @@ Let's highlight a couple of Dynamo considerations, Revit family and element fund
 
 #### <a name="2"></a> Revit API versus Dynamo for Revit
 
-sharpdevelop_cs_vb_rb_py.png 579 px
+**Question:** Does anybody have a matrix comparing the capabilities and functionalities of the Revit API versus Dynamo for Revit?
+
+My understanding is that Dynamo targets designers, engineers and architects who don’t know or like text based programming.
+
+I am often asked by people interested in Forge in the BIM domain about differences between Revit API and Dynamo.
+Often they are not programmers, but are interested in spreading BIM info and data to a wide audience.
+In considering the use of Forge, they face the terminology of ‘API’ and remember that Revit has such a thing.
+Forge is also a kind of API. So, clarifying the different possibilities provided by these APIs would be useful.
+Maybe a comparison matrix will help?
+
+**Answer:** The Revit API is pretty clear, isn't it?
+ 
+It is the one and only API for Revit.
+ 
+Dynamo makes ose of it, and you can use all of it.
+ 
+So, Dynamo is a layer over the Revit API, and you can use all of the Revit API from Dynamo.
+ 
+Dynamo also includes other functionality, e.g., DesignScript and its own geometry library.
+ 
+So, in some areas, you can do more in Dynamo than in the native Revit API.
+ 
+However, for manipulating RVT files, Dynamo has nothing more to offer than what is provided by the Revit API.
+ 
+For architects, Dynamo seems to be the more effective path, cf., e.g., this compelling suggestion
+to [learn dynamo](https://vasshaug.net/2015/09/18/learn-dynamo).
+ 
+The [Dynamo Primer slide deck](zip/)
+by [Paolo Emilio Serra](https://twitter.com/PaoloESerra),
+Autodesk Implementation Consultant and author
+of [punto revit](http://puntorevit.blogspot.com),
+includes some references to the Revit API and how to access it via Python Script.
+
+<!--- https://wiki.autodesk.com/download/attachments/487396126/Dynamo%20Primer.pptx?version=1&modificationDate=1544112611952&api=v2 --->
+ 
+As Jeremy said, from an API standpoint, Dynamo objects are wrappers around Revit objects, there are some “shortcuts” to convert parameter values to match the Display Unit Types, or alternative syntax to manage transactions etc. but there is nothing out of this world. The good idea behind Dynamo for Revit, with the full user interface, is that it has a serialization/binding feature with Revit elements for free, so it’s like adding intelligence to your Revit model rather than mere automation of tasks you can achieve with traditional programming.
+For an end user that is not accustom to coding it is much easier to set a value using the units they are using in the project rather than
+ 
+The visual programming approach is different, the way Dynamo handles namespaces, inheritance and polymorphism defines how to read the find the nodes in the library.
+The way a function is called multiple times on a list of inputs, the lacing strategy, replication guides, etc.. are concepts that belong to visual programming and don’t even find a good parallel in a traditional coding language sometimes.
+ 
+Not all the Revit API calls are converted into nodes (i.e. the MEP objects are completely missing and customers complained a lot, but in those cases you just use the Revit API.
+People started to create Dynamo packages to expand the out of the box functionalities.
+For example, for the Forge users, there is a package called DynaWeb that enables REST API calls from Dynamo… It was developed wrapping the System.Net objects into Dynamo nodes and the end users can use them in a visual programming context.
+The dependencies are still a pain to manage and the “graphs” (read the Dynamo code) cannot be compiled into an unmodifiable .DLL, with risks, IP concerns etc..
+Even so, Dynamo is really popular because, as Rob Todd once said, it “commoditizes programming”, and it enables our customer to do more, with better results with less effort.
+
+For Dynamo scalability also COM and .NET can be included as they can be used via Python scripting (it’s in fact IronPython that supports managed .DLLs for example).
+
+For example, one developer wrote an extensive library in C# for Dynamo that uses multiple frameworks at the same time such as COM for Civil 3D and .NET for Revit.
+
+Another impressive example of interoperabbility between the different .NET languyages is provided by 
+
+in fact, macro and add-in functionality is identical in all respects, i would say, just as reflected by your matrix.
+ 
+you can probably find an exception to that statement, but it probably would be something rather obscure.
+
+both VS and SharpDevelop support C#, VB, Ruby and Python. But I believe IronRuby and IronPython for VS need optional installation.
+SharpDevelop installs Ruby and Python as default while Revit installation.
+ 
+img/sharpdevelop_cs_vb_rb_py.png 579 px
+
+FAQ in Revit online-help:
+
+http://help.autodesk.com/view/RVT/2019/ENU/?guid=Revit_API_Revit_API_Developers_Guide_FAQ_html
+
+says this:
+ 
+What languages are supported for Revit API development?
+
+> C#, VB.NET, and C++/CLI are supported for addin development. C#, VB.NET, IronPython, and IronRuby are supported for macro development. Other CLR languages may work with the Revit API, but they are untested and unsupported. Note that for mixed managed/native applications using C++, Revit uses the Visual C++ Redistributable for Visual Studio 2015, specifically, version 14.0.23026.0. Add-ins compiled with other versions of the VC runtime may not work correctly since the Revit install does not include any other VC runtimes.
+ 
+I'm not sure this FAQ has revised properly.
 
 
 #### <a name="3"></a> Dynamo 2.0.X versus 1.3.3
