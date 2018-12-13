@@ -36,7 +36,7 @@ i hope this clarifies.
   that loads and compiles an external command implemented in Python.
   In his own words, he 'wrote a simple Python code loader in F#, which loads a Python script into Revit as an external command, combining with [IronPython](http://ironpython.net).'
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Dynamo, FamilySymbol vs ElementType and handling a custom exporter exception in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/dynsymtyp
 
 Today we discuss a couple of Dynamo considerations, Revit family and element fundamental concepts, and an exception handler required for a custom exporter
 &ndash; Revit API versus Dynamo for Revit
@@ -92,6 +92,8 @@ by [Paolo Emilio Serra](https://twitter.com/PaoloESerra),
 Autodesk Implementation Consultant and author of
 the [Punto Revit blog](http://puntorevit.blogspot.com),
 includes some references to the Revit API and how to access it via Python Script.
+For more details, please refer to his own presentation of
+his [Dynamo Primer Slide Deck](https://puntorevit.blogspot.com/2018/12/dynamo-primer-slide-deck.html).
 
 <!--- https://wiki.autodesk.com/download/attachments/487396126/Dynamo%20Primer.pptx?version=1&modificationDate=1544112611952&api=v2 --->
  

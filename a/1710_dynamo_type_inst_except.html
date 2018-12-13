@@ -35,7 +35,7 @@ i hope this clarifies.
   that loads and compiles an external command implemented in Python.
   In his own words, he 'wrote a simple Python code loader in F#, which loads a Python script into Revit as an external command, combining with [IronPython](http://ironpython.net).'
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Dynamo, FamilySymbol vs ElementType and handling a custom exporter exception in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/dynsymtyp
 
 Today we discuss a couple of Dynamo considerations, Revit family and element fundamental concepts, and an exception handler required for a custom exporter
 &ndash; Revit API versus Dynamo for Revit
@@ -76,7 +76,9 @@ to <a href="https://vasshaug.net/2015/09/18/learn-dynamo">learn dynamo</a>.</p>
 by <a href="https://twitter.com/PaoloESerra">Paolo Emilio Serra</a>,
 Autodesk Implementation Consultant and author of
 the <a href="http://puntorevit.blogspot.com">Punto Revit blog</a>,
-includes some references to the Revit API and how to access it via Python Script.</p>
+includes some references to the Revit API and how to access it via Python Script.
+For more details, please refer to his own presentation of
+his <a href="https://puntorevit.blogspot.com/2018/12/dynamo-primer-slide-deck.html">Dynamo Primer Slide Deck</a>.</p>
 <!--- https://wiki.autodesk.com/download/attachments/487396126/Dynamo%20Primer.pptx?version=1&modificationDate=1544112611952&api=v2 --->
 
 <p>As said, from an API standpoint, Dynamo objects are wrappers around Revit objects, there are some 'shortcuts' to convert parameter values to match the Display Unit Types, or alternative syntax to manage transactions etc. but there is nothing out of this world. The good idea behind Dynamo for Revit, with the full user interface, is that it has a serialization/binding feature with Revit elements for free, so it’s like adding intelligence to your Revit model rather than mere automation of tasks you can achieve with traditional programming.
