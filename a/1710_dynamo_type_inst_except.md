@@ -38,14 +38,18 @@ i hope this clarifies.
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash; 
-...
+Today we discuss a couple of Dynamo considerations, Revit family and element fundamental concepts, and an exception handler required for a custom exporter
+&ndash; Revit API versus Dynamo for Revit
+&ndash; Dynamo 2.0.X versus 1.3.3
+&ndash; Difference between <code>FamilySymbol</code> and <code>ElementType</code>
+&ndash; Custom exporter <code>Execute</code> may throw
+&ndash; Turned on Git LFS...
 
 -->
 
 ### Dynamo, Symbol vs Type and Exporter Exception
 
-Let's highlight a couple of Dynamo considerations, Revit family and element fundamental concepts, and an exception handler required for a custom exporter:
+Today we discuss a couple of Dynamo considerations, Revit family and element fundamental concepts, and an exception handler required for a custom exporter:
 
 - [Revit API versus Dynamo for Revit](#2) 
 - [Dynamo 2.0.X versus 1.3.3](#3) 
@@ -121,8 +125,8 @@ Both VS and SharpDevelop support C#, VB, Ruby and Python. Probably, IronRuby and
 SharpDevelop installs Ruby and Python as default while Revit installation:
  
 <center>
-<img src="img/sharpdevelop_cs_vb_rb_py.png" alt="SharpDevelop supports C#, VB, Ruby and Python" width="579">
-<p style="font-size: 80%; font-style:italic">SharpDevelop supports C#, VB, Ruby and Python</p>
+<img src="img/sharpdevelop_cs_vb_rb_py.png" alt="SharpDevelop IDE supports C#, VB, Ruby and Python" width="579">
+<p style="font-size: 80%; font-style:italic">SharpDevelop IDE supports C#, VB, Ruby and Python</p>
 </center>
 
 You might also want to check out the [FAQ in the Revit online help](http://help.autodesk.com/view/RVT/2019/ENU/?guid=Revit_API_Revit_API_Developers_Guide_FAQ_html),
