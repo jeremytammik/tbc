@@ -1,0 +1,38 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+ in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+
+Today we share a quickie from the Revit API discussion forum thread on how to access the line weight for dimension lines
+&ndash; I want to programmatically access a dimension line's line weight...
+
+-->
+
+<h3>Accessing Dimension Line Weight</h3>
+<p>Today we share a quickie from 
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on how to <a href="https://forums.autodesk.com/t5/revit-api-forum/access-line-weight-for-dimension-lines/m-p/8463046">access the line weight for dimension lines</a>:</p>
+<p><strong>Question:</strong> I want to programmatically access a dimension line's line weight.</p>
+<p>Here is a screenshot of what I am after:</p>
+<p><center>
+<img src="img/dimension_line_weight.png" alt="Dimension line weight" width="637">
+<p style="font-size: 80%; font-style:italic">Dimension line weight</p>
+</center></p>
+<p><strong>Answer:</strong> Before you do anything else whatsoever, install <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a>.</p>
+<p>It is an interactive Revit BIM database exploration tool to view and navigate element properties and relationships.</p>
+<p>Use that to discover the relationships between the dimension lines, their styles, and the properties you are looking for.</p>
+<p>Once you have that installed, you will quickly be able to determine that the dimension line weight is stored in a parameter value on the dimension type.</p>
+<p>You can access it like this using the built-in parameter enumeration value <code>BuiltInParameter.LINE_PEN</code>:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">ElementId</span>&nbsp;dimTypeId&nbsp;=&nbsp;dimension.GetTypeId();
+&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;dimType&nbsp;=&nbsp;document.GetElement(&nbsp;dimTypeId&nbsp;);
+
+&nbsp;&nbsp;<span style="color:#2b91af;">Parameter</span>&nbsp;lineWeight&nbsp;=&nbsp;dimType.get_Parameter(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.LINE_PEN&nbsp;);
+</pre>
+
+<p>Many thanks to <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/4145125">Bardia Jahangiri</a> for the precise detailed answer.</p>
