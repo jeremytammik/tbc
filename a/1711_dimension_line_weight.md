@@ -6,7 +6,7 @@
 
 <!---
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Accessing the line weight for dimension lines in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/dimelineweight
 
 Today we share a quickie from the Revit API discussion forum thread on how to access the line weight for dimension lines
 &ndash; I want to programmatically access a dimension line's line weight...
