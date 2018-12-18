@@ -8,7 +8,7 @@
 
 - https://stackoverflow.com/questions/53756458/how-to-get-the-bounding-box-from-a-revit-element-with-revit-api-then-call-to-ce
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Rotate picked element around its bounding box centre using Python in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon @ThePSF http://bit.ly/pybbcentre
 
 Let's highlight a nice interactive didactical Python-based Revit API learning challenge on how to get the bounding box from a Revit element and determine its centre
 &ndash; Cyril's Python HVAC blog
@@ -31,14 +31,16 @@ on [how to get the bounding box from a Revit element and determine its centre](h
 - [Retrieve element and bounding box from picked reference](#3) 
 - [Use location point instead of bounding box centre](#4) 
 - [Final working solution](#5) 
+- [Python popularity growing](#6) 
 
 <center>
-<img src="img/pyRevitMepRotate3d.png" alt="PyRevitMEP 3D rotation scripnt" width="391">
+<img src="img/pyRevitMepRotate3d.png" alt="PyRevitMEP 3D rotation script" width="391">
 </center>
+
 
 #### <a name="1"></a> Cyril's Python HVAC Blog
 
-You can see below why this discussion also prompted me to look at
+You can see below why the following discussion also prompted me to look at
 Cyril's very nice [Python HVAC blog](http://pythoncvc.net).
 
 In his own words:
@@ -208,4 +210,15 @@ Here is how I was able to solve my problem using pyRevit. This code allows you t
     t.Commit()
 </pre>
 
-Many thanks to Christian for the interesting discussion and Cyril for all the additional information he provides!
+Many thanks to Christian for the interesting discussion and Cyril for the wealth of additional information he provides!
+
+
+#### <a name="6"></a> Python Popularity Growing
+
+Talking about Python, 
+[Python is becoming the world’s most popular coding language](https://www.economist.com/graphic-detail/2018/07/26/python-is-becoming-the-worlds-most-popular-coding-language), according to the Economist and global search engine statistics:
+
+<center>
+<img src="img/python_gains_popularity.png" alt="Python popularity growing" width="640">
+</center>
+
