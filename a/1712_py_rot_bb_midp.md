@@ -30,7 +30,8 @@ on [how to get the bounding box from a Revit element and determine its centre](h
 - [Rotating elements around their centre in Python](#2) 
 - [Retrieve element and bounding box from picked reference](#3) 
 - [Use location point instead of bounding box centre](#4) 
-- [Final working solution](#5) 
+- [Final working solution](#5)
+- [Updated final working solution](#5.1)
 - [Python popularity growing](#6) 
 
 <center>
@@ -211,6 +212,76 @@ Here is how I was able to solve my problem using pyRevit. This code allows you t
 </pre>
 
 Many thanks to Christian for the interesting discussion and Cyril for the wealth of additional information he provides!
+
+#### <a name="5.1"></a> Updated Final Working Solution
+
+After the winter break, Christian added:
+
+> I have updated my code solution to work directly in the Revit Python Shell without any further modifications. I have also added comments that better explain the code. Would you mind updating your blog post with this latest solution? I feel that the new solution is more beneficial to people with this same issue. Thanks!
+
+Here is how I was able to solve my problem using pyRevit. This code allows you to rotate an element about its Z axis from the center of its bounding box.
+
+To use this code, select a single Revit element and then open the Revit Python Shell. Copy and paste the code below into the Revit Python Shell notepad and click the run button. This will rotate the element by 45 degrees because the current `rotateSelectedElement` argument is `45`. You may change this number to any value before running.
+
+<pre class="prettyprint">
+  # Import the math module to convert user input degrees to radians.
+  import math
+  
+  # Get a list of all user selected objects in the Revit Document.
+  selection = [doc.GetElement(x) for x in uidoc.Selection.GetElementIds()]
+  
+  # Definitions
+  def rotateSelectedElement(degrees_to_rotate):
+    from Autodesk.Revit.UI.Selection import ObjectType
+  
+    #define the active Revit application and document
+    app = __revit__.Application
+    doc = __revit__.ActiveUIDocument.Document
+    uidoc = __revit__.ActiveUIDocument
+  
+    #define a transaction variable and describe the transaction
+    t = Transaction(doc, 'This is my new transaction')
+  
+    # Convert the user input from degrees to radians.
+    converted_value = float(degrees_to_rotate) * (math.pi / 180.0)
+  
+    # Begin new transaction
+    t.Start()
+  
+    # Get the first selected element from the current Revit doc.
+    el = selection[0].Id
+  
+    # Get the element from the selected element reference
+    el_ID = doc.GetElement(el)      
+  
+    # Get the Bounding Box of the selected element.
+    el_bb = el_ID.get_BoundingBox(doc.ActiveView)
+  
+    # Get the min and max values of the elements bounding box.
+    el_bb_max = el_bb.Max
+    el_bb_min = el_bb.Min
+  
+    # Get the center of the selected elements bounding box.
+    el_bb_center = (el_bb_max + el_bb_min) / 2
+  
+    #Create a line to use as a vector using the center location of the bounding box.
+    p1 = XYZ(el_bb_center[0], el_bb_center[1], 0)
+    p2 = XYZ(el_bb_center[0], el_bb_center[1], 1)
+    myLine = Line.CreateBound(p1, p2)
+  
+    # Rotate the selected element.
+    ElementTransformUtils.RotateElement(doc, el, myLine, converted_value)
+  
+    # Close the transaction
+    t.Commit()
+  
+    
+  # Execute    
+  # Add the desired degrees to rotate by as an argument for rotateSelectedElement()
+  rotateSelectedElement(45)
+</pre>
+
+Happy New Year to Christian and all!
 
 
 #### <a name="6"></a> Python Popularity Growing

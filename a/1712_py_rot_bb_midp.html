@@ -28,7 +28,8 @@ on <a href="https://stackoverflow.com/questions/53756458/how-to-get-the-bounding
 <li><a href="#2">Rotating elements around their centre in Python</a> </li>
 <li><a href="#3">Retrieve element and bounding box from picked reference</a> </li>
 <li><a href="#4">Use location point instead of bounding box centre</a> </li>
-<li><a href="#5">Final working solution</a> </li>
+<li><a href="#5">Final working solution</a></li>
+<li><a href="#5.1">Updated final working solution</a></li>
 <li><a href="#6">Python popularity growing</a> </li>
 </ul>
 <p><center>
@@ -179,6 +180,72 @@ on a <a href="http://pythoncvc.net/?p=255">script rotating elements in any direc
 </pre>
 
 <p>Many thanks to Christian for the interesting discussion and Cyril for the wealth of additional information he provides!</p>
+<h4><a name="5.1"></a> Updated Final Working Solution</h4>
+<p>After the winter break, Christian added:</p>
+<blockquote>
+<p>I have updated my code solution to work directly in the Revit Python Shell without any further modifications. I have also added comments that better explain the code. Would you mind updating your blog post with this latest solution? I feel that the new solution is more beneficial to people with this same issue. Thanks!</p>
+</blockquote>
+<p>Here is how I was able to solve my problem using pyRevit. This code allows you to rotate an element about its Z axis from the center of its bounding box.</p>
+<p>To use this code, select a single Revit element and then open the Revit Python Shell. Copy and paste the code below into the Revit Python Shell notepad and click the run button. This will rotate the element by 45 degrees because the current <code>rotateSelectedElement</code> argument is <code>45</code>. You may change this number to any value before running.</p>
+<pre class="prettyprint">
+  # Import the math module to convert user input degrees to radians.
+  import math
+
+  # Get a list of all user selected objects in the Revit Document.
+  selection = [doc.GetElement(x) for x in uidoc.Selection.GetElementIds()]
+
+  # Definitions
+  def rotateSelectedElement(degrees_to_rotate):
+    from Autodesk.Revit.UI.Selection import ObjectType
+
+    #define the active Revit application and document
+    app = __revit__.Application
+    doc = __revit__.ActiveUIDocument.Document
+    uidoc = __revit__.ActiveUIDocument
+
+    #define a transaction variable and describe the transaction
+    t = Transaction(doc, 'This is my new transaction')
+
+    # Convert the user input from degrees to radians.
+    converted_value = float(degrees_to_rotate) * (math.pi / 180.0)
+
+    # Begin new transaction
+    t.Start()
+
+    # Get the first selected element from the current Revit doc.
+    el = selection[0].Id
+
+    # Get the element from the selected element reference
+    el_ID = doc.GetElement(el)      
+
+    # Get the Bounding Box of the selected element.
+    el_bb = el_ID.get_BoundingBox(doc.ActiveView)
+
+    # Get the min and max values of the elements bounding box.
+    el_bb_max = el_bb.Max
+    el_bb_min = el_bb.Min
+
+    # Get the center of the selected elements bounding box.
+    el_bb_center = (el_bb_max + el_bb_min) / 2
+
+    #Create a line to use as a vector using the center location of the bounding box.
+    p1 = XYZ(el_bb_center[0], el_bb_center[1], 0)
+    p2 = XYZ(el_bb_center[0], el_bb_center[1], 1)
+    myLine = Line.CreateBound(p1, p2)
+
+    # Rotate the selected element.
+    ElementTransformUtils.RotateElement(doc, el, myLine, converted_value)
+
+    # Close the transaction
+    t.Commit()
+
+
+  # Execute    
+  # Add the desired degrees to rotate by as an argument for rotateSelectedElement()
+  rotateSelectedElement(45)
+</pre>
+
+<p>Happy New Year to Christian and all!</p>
 <h4><a name="6"></a> Python Popularity Growing</h4>
 <p>Talking about Python, 
 <a href="https://www.economist.com/graphic-detail/2018/07/26/python-is-becoming-the-worlds-most-popular-coding-language">Python is becoming the world’s most popular coding language</a>, according to the Economist and global search engine statistics:</p>
