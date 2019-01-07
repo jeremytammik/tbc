@@ -14,7 +14,7 @@
   - Develop @AutodeskRevit add-ins using WPF
   - Ready to use MVVM code in your application
 
-Retrieve room boundaries for Forge surface classification from the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon and a new Visual Studio WPF MVVM Revit add-in template by @imaliasad
+Happy New Year! Retrieve room boundaries for Forge surface classification from the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon and a new Visual Studio WPF MVVM Revit add-in template by @imaliasad http://bit.ly/roombdrycsv
 
 Happy New Year!
 I spent some time during the winter break working on CSV export of room boundaries for a Forge BIM surface classification tool.
