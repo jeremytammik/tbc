@@ -17,7 +17,7 @@
   jeremy tammik: cool! can i look at the repo and documentation somewhere?
   Ehsan Iran-Nejad: It's part of pyRevit toolset (https://eirannejad.github.io/pyRevit/ ). docs are work in progress
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+pyRevit Keynote Manager by @eirannejad and @CADBeckerde Forge blog using #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/pykeynote
 
 Today, I discuss a simple Revit API getting started question from StackOverflow, a new Forge blog and a request for feedback on the keynote manager beta
 &ndash; Retrieving a wall type for creating a wall
@@ -30,9 +30,9 @@ Today, I discuss a simple Revit API getting started question from StackOverflow,
 
 Today, I discuss a simple Revit API getting started question from StackOverflow, a new Forge blog and a request for feedback on the keynote manager beta:
 
-- [Retrieving a Wall Type for Creating a Wall](#2) 
-- [CAD Becker Forge Blog](#3) 
-- [pyRevit Keynote Manager Beta](#4) 
+- [Retrieving a wall type for creating a wall](#2) 
+- [CAD Becker Forge blog](#3) 
+- [pyRevit keynote manager beta](#4) 
 
 
 #### <a name="2"></a> Retrieving a Wall Type for Creating a Wall
@@ -93,7 +93,8 @@ Your getting started link is also helpful information for newbies.
 
 A quick welcome to another member of the Forge blogosphere:
 
-Jürgen Becker of [CAD-Becker.de](https://www.cad-becker.de) published two German-language blog posts on 3-legged Forge authentication:
+Jürgen [@CADBeckerde](https://twitter.com/CADBeckerde) Becker of [CAD-Becker.de](https://www.cad-becker.de) published
+two German-language blog posts on 3-legged Forge authentication:
 
 - [Autodesk Forge &ndash; 3-legged Authentifizierung](https://cad-becker.de/index.php/de/blog/autodesk-forge-3-legged-authentifizierung)
 - [Autodesk Forge &ndash; 3-legged Authentifizierung die Zweite](https://cad-becker.de/index.php/de/blog/blog-development/autodesk-forge-3-legged-authentifizierung-die-zweite)
