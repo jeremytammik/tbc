@@ -1,0 +1,94 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- Ehsan Iran-Nejad @eirannejad: Who has used the new keynote manager successfully? Does it work fine? Is it intuitive?
+  [pyRevit 4.6.9 and Keynote Manager Beta](https://youtu.be/1s6JZOBVAHs)
+  Ehsan Iran-Nejad: Keynote change history with full diff view is next. Open to suggestions...
+  jeremy tammik: cool! can i look at the repo and documentation somewhere?
+  Ehsan Iran-Nejad: It's part of pyRevit toolset (https://eirannejad.github.io/pyRevit/ ). docs are work in progress
+
+
+Happy New Year! Retrieve room boundaries for Forge surface classification from the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon and a new Visual Studio WPF MVVM Revit add-in template by @imaliasad http://bit.ly/roombdrycsv
+
+&ndash; 
+...
+
+-->
+
+<h3>pyRevit Keynote Manager and Becker Forge Blog</h3>
+<p>Today, I discuss a simple Revit API getting started question from StackOverflow, a new Forge blog and a request for feedback on the keynote manager beta:</p>
+<ul>
+<li><a href="#2">Retrieving a Wall Type for Creating a Wall</a> </li>
+<li><a href="#3">CAD Becker Forge Blog</a> </li>
+<li><a href="#4">pyRevit Keynote Manager Beta</a> </li>
+</ul>
+<h4><a name="2"></a> Retrieving a Wall Type for Creating a Wall</h4>
+<p>Here is a quick 'getting started' Q and A from the StackOverflow question
+on the <a href="https://stackoverflow.com/questions/53921260/c-sharp-revit-api-how-to-create-a-simple-wall-using-externalcommand">C# Revit API and how to create a simple wall using <code>ExternalCommand</code></a>:</p>
+<p><strong>Question:</strong> I just wanted to create a simple wall using <code>ExternalCommand</code>, but I cannot figure it out...</p>
+<p>I think my problem is here:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;symbolId&nbsp;=&nbsp;document.GetDefaultFamilyTypeId(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementId</span>(&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Walls&nbsp;)&nbsp;);
+</pre>
+
+<p>When I debug it, <code>symbolId</code> always equals <code>-1</code>.</p>
+<p><strong>Answer:</strong> Work through
+the <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#2">Revit API getting started material</a> and
+all will be explained.
+That will save you and others many further questions and answers.</p>
+<p>To address this specific question anyway, <code>GetDefaultFamilyTypeId</code> presumably does not do what you expect it to for wall elements.
+In the <a href="https://apidocs.co/apps/revit/2019/34d20683-dfea-b1f8-14cf-750611b218ed.htm"><code>GetDefaultFamilyTypeId</code> method API documentation</a>,
+it is used for structural columns, a standard loadable family hosted by individual RFA files.
+Walls are built-in system families and behave differently.
+Maybe <code>GetDefaultFamilyTypeId</code> only works for non-system families.</p>
+<p>The <code>-1</code> value represent an undefined element id, equal to
+the <a href="https://apidocs.co/apps/revit/2019/08ae8886-6ab3-3ef5-d2e0-0da2ffa7bd2c.htm">constant <code>ElementId.InvalidElementId</code> property</a>.</p>
+<p>To retrieve an arbitrary (not default) wall type, use a filtered element collector to retrieve all <code>WallType</code> elements and pick the first one you find.</p>
+<p>Here is a code snippet that retrieves all wall types with a filtered element collector and applies .NET LINQ post-processing to that to pick the first one with a specific name,
+from <a href="https://thebuildingcoder.typepad.com">The Building Coder</a> discussion
+on <a href="https://thebuildingcoder.typepad.com/blog/2017/12/creating-face-wall-and-mass-floor.html">creating face wall and mass floor
+</a>:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">WallType</span>&nbsp;wType&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">WallType</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">WallType</span>&gt;().FirstOrDefault(&nbsp;q
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;q.Name&nbsp;==&nbsp;<span style="color:#a31515;">&quot;Generic&nbsp;-&nbsp;6\&quot;&nbsp;Masonry&quot;</span>&nbsp;);
+</pre>
+
+<p>When you start getting deeper into the use of filtered element collectors, be aware of the significant performance difference
+between <a href="http://thebuildingcoder.typepad.com/blog/2015/12/quick-slow-and-linq-element-filtering.html">quick and slow filters versus .NET post-processing</a>.</p>
+<p><strong>Response:</strong> I solved the problem and created many different types of walls already after readng
+the <a href="https://help.autodesk.com/cloudhelp/2019/ENU/Revit-API/Revit_API_Developers_Guide.html">Revit API Developers Guide</a>.
+Your getting started link is also helpful information for newbies.</p>
+<h4><a name="3"></a> CAD Becker Forge Blog</h4>
+<p>A quick welcome to another member of the Forge blogosphere:</p>
+<p>Jürgen Becker of <a href="https://www.cad-becker.de">CAD-Becker.de</a> published two German-language blog posts on 3-legged Forge authentication:</p>
+<ul>
+<li><a href="https://cad-becker.de/index.php/de/blog/autodesk-forge-3-legged-authentifizierung">Autodesk Forge &ndash; 3-legged Authentifizierung</a></li>
+<li><a href="https://cad-becker.de/index.php/de/blog/blog-development/autodesk-forge-3-legged-authentifizierung-die-zweite">Autodesk Forge &ndash; 3-legged Authentifizierung die Zweite</a></li>
+</ul>
+<p>Thank you very much, Jürgen, for sharing this information for our German-speaking friends!</p>
+<p>It is also useful for any non-German-speaker willing to run a translation tool on it.</p>
+<p>Keep up the good work &nbsp; :-)</p>
+<h4><a name="4"></a> pyRevit Keynote Manager Beta</h4>
+<p>Ehsan <a href="https://twitter.com/eirannejad">@eirannejad</a> Iran-Nejad
+requests input on his pyRevit keynote manager prototype, included with
+the <a href="https://eirannejad.github.io/pyRevit">pyRevit toolset</a>:</p>
+<blockquote>
+<p>Who has used the new keynote manager successfully? Does it work fine? Is it intuitive?</p>
+<p>Docs are work in progress. Keynote change history with full diff view is next. Open to suggestions...</p>
+</blockquote>
+<p><center>
+<img src="img/pyrevit_keynote_manager_diff.png" alt="pyRevit keynote manager change history" width="600">
+</center></p>
+<p>For more information, please look at the 56-minute presentation
+of <a href="https://youtu.be/1s6JZOBVAHs">pyRevit 4.6.9 and Keynote Manager Beta</a>:</p>
+<p><center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/1s6JZOBVAHs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center></p>
+<p>Thank you very much, Ehsan, for your invaluable work on pyRevit and the new useful keynote manager!</p>
