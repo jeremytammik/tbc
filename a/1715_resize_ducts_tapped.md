@@ -16,7 +16,7 @@ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
 -->
 
-###
+### Resize Ducts to Handle Oversized Taps
 
 #### <a name="2"></a>
 
@@ -49,36 +49,15 @@ Revit Developer's Guide
 
 Thank you very much,
 
-14918470 [Find all ducts that have been tapped into]
+Jared Wilson
 
-Jared Wilson, jared.wilson@benham.com, Jared Wilson
-
-https://forums.autodesk.com/t5/revit-api-forum/find-all-ducts-that-have-been-tapped-into/m-p/8485269
-
-wils02  17 Views, 0 Replies 2018-12-23
-‎2018-12-23 04:52 AM  
-Find all ducts that have been tapped into
-
-I have been going back and forth on how to approach this task, and I have thought myself into a rut. So here is my question...How do I retrieve ALL instances of where a duct has been tapped into by another duct?
+[Q] I have been going back and forth on how to approach this task, and I have thought myself into a rut. So here is my question...How do I retrieve ALL instances of where a duct has been tapped into by another duct?
 
 The most important aspect of this challenge is I DO NOT want to do this by filtering systems in a collector. Lets assume for this task, none of the ductwork is actually assigned a system, they are all undefined.
 
 BONUS POINTS: I also ONLY want the largest instance tapped for each duct. I.e. if a single duct has eight taps, I only want to add the largest tap to my list or collector or whatever.
 
-Sincerely,
-
-J
-
-This topic was escalated to Salesforce Case 14918470 on 12-22-2018 by an automatic escalation. Case status: Open.
-
------------------------------------------------------------------------
-jeremytammik  in reply to:  Rankwils02
-‎2018-12-23 04:59 PM  
-Re: Find all ducts that have been tapped into
-
-Dear Jared,
-
-Thank you for your query.
+[A]
 
 Please excuse my naivety, but this seems quite simple to me.
 
@@ -98,16 +77,7 @@ Grab the connector with the largest whatever-you-want, width, height, diameter, 
 
 Bob's your uncle.
 
-I hope this helps.
-
-Best regards,
-
-Jeremy
-
------------------------------------------------------------------------
-wils02  in reply to:  Rankjeremytammik
-‎2018-12-26 02:24 PM  
-Re: Find all ducts that have been tapped into
+[R]
 
 Now we are getting somewhere, but my pseudo-code translator is not as # as others.
 
@@ -122,14 +92,7 @@ Make a change to the duct in question.
 
 Where do I put my transaction? Should I search and filter the document and create some sort of paired list: largest connector and associated duct, and then inside my transaction, edit the duct? Do I wrap everything numbered above in the transaction?
 
-Jared
-
------------------------------------------------------------------------
-Yulong.Jin
-2018-12-27 04:02 AM  
-Re: Find all ducts that have been tapped into
-
-Hi:
+[A]
 
 Filtering elements from Revit DB requires no open transaction. And neither does the task of accessing parameters of an element or connector.
 
@@ -145,12 +108,7 @@ Furthermore, suppose you do someting in your task 3 to change the document, you 
 
 If you wrap everything into 1 single transation and commit it, there will be only 1 new record in Undo list.
 
------------------------------------------------------------------------
-wils02
-2018-12-27 07:01 PM  
-Re: Find all ducts that have been tapped into
-
-@Yulong.Jin and @jeremytammik
+[R]
 
 We did it! Now to pretty it up...
 
@@ -160,16 +118,9 @@ With your help, we made a routine that finds all instances of duct with taps, fi
 
 Even though I have a solution, it is not elegant by any means, and that bothers me. Please, please, please give me feedback regarding improvements I could make to simplify/clean up the code! Any and all is welcome. Attached is the source code.
 
-Jared
-
-TapResize.txt
-
 /a/case/sfdc/14918470/attach/tap_resize.txt
 
------------------------------------------------------------------------
-wils02
-2018-12-27 09:12 PM  
-Re: Find all ducts that have been tapped into
+[R]
 
 Woops...haha no I do NOT have it.
 
@@ -183,40 +134,13 @@ My questions is, how do I actually access the shape property found under the All
 
 Sorry for the confusion with the last post, but I would appreciate any help with this one before revising the code obviously.
 
-Jared
-
------------------------------------------------------------------------
-Yulong.Jin
-2018-12-28 07:42 AM  
-Re: Find all ducts that have been tapped into
-
-Hi @wils02:
+[A]
 
 In your last post, your prupose is to get the SHAPE of a connector, isn't it?
 
 If so, there is a property of Connector class named as Shape, which is an enum, and it can tell you what shape the connector is (Rectangular, Oval, Round, Invalid). No matter you get the connector instance from Duct.ConnectorManager, or AllRefs, the Shape property is always accessible.
 
 Please note that Tap connector on a duct is of type 'Curve', the normal two connectors at both ends of a duct are of type 'End'.
-
------------------------------------------------------------------------
-Yulong.Jin
-2018-12-28 07:45 AM  
-Re: Find all ducts that have been tapped into
-
-Oops @wils02:
-
-Sorry for my last reply. I wrote the words before I read you .txt attachment.
-
-In you code, you have achieved all you want I guess.
-
-And question is? I hope you have already make it.
-
------------------------------------------------------------------------
-jeremytammik  in reply to:  Rankwils02
-‎2018-12-28 01:08 PM  
-Re: Find all ducts that have been tapped into
-
-Dear Jared,
 
 You say:
 
@@ -242,15 +166,7 @@ https://thebuildingcoder.typepad.com/blog/about-the-author.html#1b
 
 Might be useful for others to take a look... thank you!
 
-Best regards and Happy New Year!
-
-Jeremy
-
------------------------------------------------------------------------
-wils02  in reply to:  Rankjeremytammik
-‎2018-12-28 04:29 PM  
-Re: Find all ducts that have been tapped into  
-@Yulong.Jin and @jeremytammik
+[R]
 
 Attached is my testing project w/ the application-level macro. I managed to make a few simplifications. A few tweaks I want to make are:
 
@@ -259,9 +175,56 @@ Rather than using a blanket duct collector, collect all ducts that are physicall
 A slightly better UI rather than a black-box approach.
 This will do for now, and I do hope people find it useful! On to the next macro...hear from you guys soon.
 
-Jared
-
-TapResize test environment.rvt
-
 /a/case/sfdc/14918470/attach/tap_resize_test_environment.rvt
+
+I have attached the old code that simply resizes every duct for the largest tap and nothing more.
+
+Jeremy says:
+
+I implemented a new external command CmdDuctResize in The Building Coder samples,
+cf. [release 2019.0.145.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.145.0).
+
+Now for the cleanup:
+
+- You have one catch-all exception handler.
+That should be avoided.
+Don't catch all exceptions
+&ndash; [never catch all exceptions](https://thebuildingcoder.typepad.com/blog/2017/05/prompt-cancel-throws-exception-in-revit-2018.html#5),
+only the ones that you really can handle.
+- The second exception handler catches a `NullReferenceException`.
+That is unnecessary and inefficient.
+A better solution would be to simply check for ductHeight != null before trying to call Set on it.
+- There is no need to roll back the transaction if nothing has been changed.
+So why ask the user anything at all if i == 0?
+In fact, there is never any need to roll back a transaction at all.
+Just don't commit it, and it will automatically leave everything unchanged.
+
+Check out the [diffs between your code and mine](https://github.com/jeremytammik/the_building_coder_samples/compare/2019.0.145.1...2019.0.145.2).
+
+I made more changes.
+
+Check out [release 2019.0.145.3](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.145.3).
+
+In it, I made the following improvements:
+
+- Only set updated height if it differs from old
+- Show results dialogue when nothing was changed
+- Use GetElementCount
+- Only count really modified ducts
+
+Successfully tested in a system requiring modification.
+
+Alas, it still included the catch-all exception handler.
+
+So I went on to implement [release 2019.0.145.4](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.145.4)
+
+- Rebuilt duct size retrieval logic from scratch
+- Eliminated catch-all exception handler
+
+Please study the incremental improvements carefully and let me know whether I misunderstood anything and whether it still does what you need and expect.
+
+Here is the current version of the code:
+
+<pre class="code">
+</pre>
 
