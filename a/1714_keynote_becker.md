@@ -6,6 +6,8 @@
 
 <!---
 
+- https://stackoverflow.com/questions/53921260/c-sharp-revit-api-how-to-create-a-simple-wall-using-externalcommand
+
 - https://cad-becker.de/index.php/de/blog/autodesk-forge-3-legged-authentifizierung
   Autodesk Forge - 3-legged Authentifizierung
   [Blog.CAD-Becker.de]()

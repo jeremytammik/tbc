@@ -49,6 +49,7 @@ Access to the Revit main window handle changed in Revit 2019, raising a couple o
 
 <center>
 <img src="img/shattered_window.jpg" alt="Shattered window" width="320">
+<p style="font-size: 80%; font-style:italic">Shattered window &#169; Benoit Brummer, <a href="https://commons.wikimedia.org/wiki/User:Trougnouf">@Trougnouf</a></p>
 </center>
 
 #### <a name="2"></a> Making Revit the Add-In Parent
