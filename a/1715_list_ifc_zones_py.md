@@ -13,245 +13,216 @@
 
 the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash; 
-...
+Today, I present a little exploration of how to access zones defined in an IFC file in Revit.
+If you are following this blog closely, you might guess that this is related to the room boundary CSV exporter project that I recently discussed.
+For this exploration, I installed and used RevitPythonShell.
+Here are the detailed steps
+&ndash; Importing IFC zones into Revit
+&ndash; Installing and using RevitPythonShell
+&ndash; Programmatically accessing IFC zones in Revit...
 
 -->
 
-### Resize Ducts to Handle Oversized Taps
+### Retrieving Linked IfcZone Elements Using Python
 
-#### <a name="2"></a>
+I spent a lot of time last week and during the weekend playing around with
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) topic
+of [finding all ducts that have been tapped into](https://forums.autodesk.com/t5/revit-api-forum/find-all-ducts-that-have-been-tapped-into/m-p/8485269).
 
-**Question:**
+It led to several new releases
+of [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.145.4).
 
-<pre class="code">
-</pre>
+Since we have not reached a final conclusion yet, however, I'll postpone the discussion of that.
 
-**Answer:**
+Instead, I present a little exploration of how to access zones defined in an IFC file in Revit.
 
-the [Revit API getting started material](https://thebuildingcoder.typepad.com/blog/about-the-author.html#2) and
+If you are following this blog closely, you might guess that this is related to
+the [room boundary CSV exporter project](https://thebuildingcoder.typepad.com/blog/2019/01/room-boundaries-to-csv-and-wpf-template.html) that
+I recently discussed.
 
-from [The Building Coder](https://thebuildingcoder.typepad.com) discussion
-on [creating face wall and mass floor
-](https://thebuildingcoder.typepad.com/blog/2017/12/creating-face-wall-and-mass-floor.html):
+For this exploration, I installed and used RevitPythonShell.
 
-**Response:**
+Here are the detailed steps:
 
-the [Revit online help](http://help.autodesk.com/view/RVT/2019/ENU) &gt;
-Revit Developer's Guide
-&gt; [Revit API Developers Guide](http://help.autodesk.com/view/RVT/2019/ENU/?guid=Revit_API_Revit_API_Developers_Guide_html).
+- [Importing IFC zones into Revit](#2) 
+- [Installing and using RevitPythonShell](#3) 
+- [Programmatically accessing IFC zones in Revit](#4) 
 
-#### <a name="3"></a>
 
-#### <a name="4"></a>
+#### <a name="2"></a> Importing IFC Zones into Revit
+
+I started out my explorations by chatting with our IFC expert Angel Velez:
+
+[Q] Does Revit IFC import also support IFCZONE? Can we use IFCZONE to generate Revit Zone elements? 
+
+[A] Exporting zones from Revit to IFC is supported,
+and [you have to set up the project properly](https://sourceforge.net/p/ifcexporter/wiki/Exporting%20Zones) for that.
+
+BTW, happy to say that Googling for 'Revit IfcZone' got me to that link!
+
+Import, however, ignores zones.
+
+Link creates them, as a subset of generic models.
+
+[Q] When you say, 'link creates them', does it mean: in  a Revit project, link in an IFC file.
+
+IFCZONE elements are now accessible and visible in Revit and we can query their properties and boundaries? 
+
+[A] Correct &ndash; for link at least. Import does nothing with them.
+
+[Q] OK... I have now linked an IFC file into a blank Revit document.
+
+How can I access the zone information from here?
+
+Is there any way in the UI?
+
+[A] You have to tab into the document until you choose the zone.  It will overlap the rooms it contains.
 
 <center>
-<img src="img/.png" alt="" width="600">
+<img src="img/ifc_zone_tabbed_to.png" alt="IFC zone tabbed to" width="669">
 </center>
 
-Thank you very much,
+[Q] Yes, I see it now.
 
-Jared Wilson
+I see a generic element with the `IFCZONE` properties, e.g., `IfcName`, and `IfcExportsAs` set to `IfcZone`.
 
-[Q] I have been going back and forth on how to approach this task, and I have thought myself into a rut. So here is my question...How do I retrieve ALL instances of where a duct has been tapped into by another duct?
+What would be the workflow to generate a mapping from room elements to `IFCZONE` elements using the Revit API?
 
-The most important aspect of this challenge is I DO NOT want to do this by filtering systems in a collector. Lets assume for this task, none of the ductwork is actually assigned a system, they are all undefined.
+[A] I believe the rooms have a property that has the name of the zone(s) they belong to.
 
-BONUS POINTS: I also ONLY want the largest instance tapped for each duct. I.e. if a single duct has eight taps, I only want to add the largest tap to my list or collector or whatever.
+Although the 'rooms' are also generic elements. The Revit IFC import does not create real rooms, just space volumes.  Converting to rooms is a request.
 
-[A]
+Thank you very much, Angel, for all the help!
 
-Please excuse my naivety, but this seems quite simple to me.
+The IFC zones are imported as `DirectShape` elements and assigned to the `Generic Model` category.
 
-Or maybe I should say, fundamental, my dear Wilson.
+Their IFC properties are stored in shared parameters, like this:
 
-However, as far as I know there is no way to retrieve elements from a Revit database except by using a filtered element collector.
+<center>
+<img src="img/ifc_zone_properties.png" alt="IFC zone properties" width="565">
+</center>
 
-Why in heaven's name would you want to avoid using that?
+As far as I can tell, I just need to look at the `IfcName` and `IfcExportAs` properties.
 
-How about this approach?
 
-Filter for all ducts in the model.
-On each duct, grab all its connectors.
-If there are more than two, you have a duct with a tap, so ignore all others.
-That gives you your list of ducts with taps.
-Grab the connector with the largest whatever-you-want, width, height, diameter, flow, you name it.
+#### <a name="3"></a> Installing and Using RevitPythonShell
 
-Bob's your uncle.
+Based on that discussion, I linked in an IFC file containing zones representing apartments into a blank Revit project document.
 
-[R]
+I started out exploring the model using [RevitLookup](https://github.com/jeremytammik/RevitLookup).
 
-Now we are getting somewhere, but my pseudo-code translator is not as # as others.
+Since the objects of interest resided in the linked IFC file, however, I soon had to take recourse
+to [another, more flexible, advanced and intimate database exploration tool](http://thebuildingcoder.typepad.com/blog/2013/11/intimate-revit-database-exploration-with-the-python-shell.html).
 
-I DEFINITELY wanted to use a filtered element collector. After your billion or so posts about it, I know it's powerful. I only meant, I don't want to rely on filtering by systems for this code.
+I visited the [RevitPythonShell home page](https://github.com/architecture-building-systems/revitpythonshell) and
+downloaded the installer for Revit 2019.
+ 
+It is a one-click install.
+ 
+You can even do it while Revit is up and running &ndash; it will be auto-loaded into the running session.
+ 
+Then, go to the `Add-In` tab and click the icon. That displays the console. Then copy-paste the code into that.
+ 
+You can also load and run scripts in other ways &ndash; I've never tried that, though.
 
-So far so good, I got the ducts in my document, and have the shape of what you said, but now for my next question.
+#### <a name="4"></a> Programmatically Accessing IFC Zones in Revit
 
-I want to get all of the ducts with more than two connectors.
-I want to find the diameter or height of the largest connector, excluding its own two.
-Do something with this information.
-Make a change to the duct in question.
+The RevitPythonShell enabled me to interact with the linked database, explore its elements and develop the following script step by step:
 
-Where do I put my transaction? Should I search and filter the document and create some sort of paired list: largest connector and associated duct, and then inside my transaction, edit the duct? Do I wrap everything numbered above in the transaction?
+<pre class="prettyprint">
+import clr
+import math
+clr.AddReference('RevitAPI')
+clr.AddReference('RevitAPIUI')
+from Autodesk.Revit.DB import *
+from Autodesk.Revit.DB.Architecture import *
+from Autodesk.Revit.DB.Analysis import *
+uidoc = __revit__.ActiveUIDocument
+doc = __revit__.ActiveUIDocument.Document
+app = doc.Application
+docs = app.Documents
 
-[A]
+n = docs.Size
 
-Filtering elements from Revit DB requires no open transaction. And neither does the task of accessing parameters of an element or connector.
+print n, 'open documents:'
 
-You can either wrap your task 1,2 into an open transaction or not.
+for d in docs:
+  s = d.PathName
+  print s
+  if s.endswith('.ifc.RVT'): ifcdoc = d
 
-For you task 3, you wanna do something with this information. I'm not sure what kind of 'something' you are gonna do, so if you want to 'write some parameters into an exisiting element', you need an STARTED transaction. But if you only want to do some calculations, transations is not necessary.
+print 'Linked-in IFC document:'
+print ifcdoc.PathName
 
-For your task 4, yep, you definitily need an STARTED transaction, because you are about to change the Revit DB.
+collector = FilteredElementCollector(ifcdoc).OfClass(clr.GetClrType(DirectShape)).OfCategory(BuiltInCategory.OST_GenericModel)
 
-For my experience, requiring an open transaction or not depends on the procedure of UI interaction, for example, modal or modeless dialog you are using, needing the user to pick elements or not. If all your task 1-4 are in the same ExternalCommand, I tend to wrap them into one transaction, and start it at the beginning of IExternalCommand.Execute() method.
+print collector.GetElementCount(), 'generic model direct shape elements'
 
-Furthermore, suppose you do someting in your task 3 to change the document, you can start an transation and commit it. Then you proceed to handle task 4, you start another new transaction and commit it. This will add 2 records in Undo list (Ctrl + Z).
+def get_param(e,s):
+  "Return string parameter value for given parameter name"
+  ps = e.GetParameters(s)
+  n = ps.Count
+  assert(2 > n)
+  if 0 < n: return ps[0].AsString()
+  else: return None
+  
+def is_zone(e):
+  "Predicate returning True is e is an IfcZone"
+  export_as = get_param(e,'IfcExportAs')
+  return export_as and export_as == 'IfcZone'
 
-If you wrap everything into 1 single transation and commit it, there will be only 1 new record in Undo list.
+def zone_name(e):
+  "Return IfcName of IfcZone element or None"
+  if is_zone(e):
+    return get_param(e,'IfcName')
 
-[R]
+zone_names = []
 
-We did it! Now to pretty it up...
+for e in collector:
+  if is_zone(e):
+    zone_names.append(get_param(e,'IfcName'))
 
-First, I'll explain. Sometimes in Revit, using the duct sizing tool or sizing manually, the branch ducts can end up being larger than the main duct they are tapping into. Revit doesn't do a great job bringing it to your attention, and if you do not think about it as you are working on a project, it's easy to forget about. So, you end up with questions about duct sizes when people go to build your system(s). We can't have that, especially when it can be easily found and resolved with a simple script.
+zone_names.sort()
 
-With your help, we made a routine that finds all instances of duct with taps, finds the largest tap, and sizes the main duct 2" larger than the largest tap. There will probably be a few revisions I'm sure, but overall I am very happy and excited to use it on the next large project (which I should be working on at the moment but I can't help myself).
+n = len(zone_names)
 
-Even though I have a solution, it is not elegant by any means, and that bothers me. Please, please, please give me feedback regarding improvements I could make to simplify/clean up the code! Any and all is welcome. Attached is the source code.
-
-/a/case/sfdc/14918470/attach/tap_resize.txt
-
-[R]
-
-Woops...haha no I do NOT have it.
-
-I believe I am wrong with my looping through connectors. If I use the Snoop tool on my main duct and navigate to the connector manager; I have a connector set. This is where I went awry. If I open this connector set, I see the NUMBER of connectors for this main duct, but they ALL have the shape of the main duct which I was not expecting. After I clicked around for a while, I saw the "AllRefs" property of each connector brings me to another connector set. THIS is the one that shows me actual shape of each connector I choose.
-
-After I selected the main duct in my project, the following is my click path with the Revit Snoop tool:
-
-"Snoop Current Selection" --> "MEPCurve.Properties.ConnectorManager - Connector Manager" --> "Connector Set" --> (At this point I have a list of all the connectors associated with the main duct) "Connector.Properties - AllRefs"
-
-My questions is, how do I actually access the shape property found under the AllRefs property?
-
-Sorry for the confusion with the last post, but I would appreciate any help with this one before revising the code obviously.
-
-[A]
-
-In your last post, your prupose is to get the SHAPE of a connector, isn't it?
-
-If so, there is a property of Connector class named as Shape, which is an enum, and it can tell you what shape the connector is (Rectangular, Oval, Round, Invalid). No matter you get the connector instance from Duct.ConnectorManager, or AllRefs, the Shape property is always accessible.
-
-Please note that Tap connector on a duct is of type 'Curve', the normal two connectors at both ends of a duct are of type 'End'.
-
-You say:
-
-> My questions is, how do I actually access the shape property found under the AllRefs property?
-
-My answer is:
-
-The same as always: RTFM:
-
-https://apidocs.co/apps/revit/2019/bfd0a83e-c6a4-cec6-8428-b5b8b4357ee5.htm
-
-I hope this helps.
-
-Oh, I looked at your sample code in the text document too now, and see that you are already reading the AllRefs and Shape properties there.
-
-So, to repeat Yulong's question:
-
-Have you achieved all you wanted?
-
-Would you like to provide a complete minimal reproducible case with steps to follow to show how your code works?
-
-https://thebuildingcoder.typepad.com/blog/about-the-author.html#1b
-
-Might be useful for others to take a look... thank you!
-
-[R]
-
-Attached is my testing project w/ the application-level macro. I managed to make a few simplifications. A few tweaks I want to make are:
-
-Better exception handling or some other way to determine the main duct's shape.
-Rather than using a blanket duct collector, collect all ducts that are physically connected together and size them in the direction of flow.
-A slightly better UI rather than a black-box approach.
-This will do for now, and I do hope people find it useful! On to the next macro...hear from you guys soon.
-
-/a/case/sfdc/14918470/attach/tap_resize_test_environment.rvt
-
-I have attached the old code that simply resizes every duct for the largest tap and nothing more.
-
-Jeremy says:
-
-I implemented a new external command CmdDuctResize in The Building Coder samples,
-cf. [release 2019.0.145.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.145.0).
-
-Now for the cleanup:
-
-- You have one catch-all exception handler.
-That should be avoided.
-Don't catch all exceptions
-&ndash; [never catch all exceptions](https://thebuildingcoder.typepad.com/blog/2017/05/prompt-cancel-throws-exception-in-revit-2018.html#5),
-only the ones that you really can handle.
-- The second exception handler catches a `NullReferenceException`.
-That is unnecessary and inefficient.
-A better solution would be to simply check for ductHeight != null before trying to call Set on it.
-- There is no need to roll back the transaction if nothing has been changed.
-So why ask the user anything at all if i == 0?
-In fact, there is never any need to roll back a transaction at all.
-Just don't commit it, and it will automatically leave everything unchanged.
-
-Check out the [diffs between your code and mine](https://github.com/jeremytammik/the_building_coder_samples/compare/2019.0.145.1...2019.0.145.2).
-
-I made more changes.
-
-Check out [release 2019.0.145.3](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.145.3).
-
-In it, I made the following improvements:
-
-- Only set updated height if it differs from old
-- Show results dialogue when nothing was changed
-- Use GetElementCount
-- Only count really modified ducts
-
-Successfully tested in a system requiring modification.
-
-Alas, it still included the catch-all exception handler.
-
-So I went on to implement [release 2019.0.145.4](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.145.4)
-
-- Rebuilt duct size retrieval logic from scratch
-- Eliminated catch-all exception handler
-
-Please study the incremental improvements carefully and let me know whether I misunderstood anything and whether it still does what you need and expect.
-
-Here is the current version of the code:
-
-<pre class="code">
+print n, 'zones:', zone_names
 </pre>
 
-Looking forward to hearing what you think about all these changes.
+I am also linking in this script source here as a separate text
+file [get_ifc_zone_properties.py](zip/get_ifc_zone_properties.py).
 
-I still have some fundamental questions open.
+It lists all the open documents, namely two, the blank hosting project and the imported IFC file.
 
-For instance, you only handle height, not width, for rectangular ducts.
+The imported IFC file has generated a placeholder RVT.
 
-You seem to be comparing diameter and height directly.
+That is the document that I need to dig deeper into.
 
-Wouldn't it make more sense to compare the cross-section area instead?
+Using a filtered element collector, I retrieve all `DirectShape` elements belonging to the `Generic Model` category.
 
-It is related to the height multiplied by the width, and on the other hand to the diameter squared.
+A couple of helper functions extract a named parameter from an element and implement a Boolean predicate to determine whether an element represents an IFC zone.
 
-So, height alone makes little sense, are is related linearly to height and quadratically to diameter.
+With those in hand, I can iterate over all the 1012 direct shapes, access the 25 zones, and save their `IfcName` properties to a list.
 
-Height multiplied by width would be better, and comparing that with pi * (d/2)**2.
+Here is the result of running the script:
 
-Secondly: you iterate over all the duct connectors, and then, within each connector, you call AllRefs:
+<pre>
+2 open documents:
+C:\...\test\010-123xx3-arc-bat01-apt01_2_2018-12-27_1507_ifc_link_host.rvt
+C:\...\010-123xx3-arc-bat01-apt01_2_2018-12-27_1507.ifc.RVT
 
-https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/C...
+Linked-in IFC document:
+C:\...\010-123xx3-arc-bat01-apt01_2_2018-12-27_1507.ifc.RVT
 
-Does that not go one step too far away from the duct?
+1012 generic model direct shape elements
 
-Could you not skip the AllRefs call, and just grab the dimensions from the connector `c` directly, skipping the `cd` loop entirely?
+25 zones: ['APT0101', 'APT0102', 'APT0103', 'APT0104',
+  'APT0105', 'APT0106', 'APT0201', 'APT0202', 'APT0203',
+  ...
+  'APT0402', 'APT0403', 'APT0404', 'APT0405', 'APT0406',
+  u'Par d\xe9faut:127272']
+</pre>
 
- 
+I very much enjoyed this little excursion into IFC matters and playing around interactively with the Revit API and Python.
+
+I hope you enjoyed this short summary of my experiences.
