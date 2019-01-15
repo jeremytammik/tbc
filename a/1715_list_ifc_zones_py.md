@@ -6,6 +6,8 @@
 
 <!---
 
+- /Users/tammikj/a/special/bouygues/2019_bim_surface_info/test/get_zone_properties.py
+
 - 14918470 [Find all ducts that have been tapped into]
   https://forums.autodesk.com/t5/revit-api-forum/find-all-ducts-that-have-been-tapped-into/m-p/8485269
 
@@ -228,3 +230,28 @@ Here is the current version of the code:
 <pre class="code">
 </pre>
 
+Looking forward to hearing what you think about all these changes.
+
+I still have some fundamental questions open.
+
+For instance, you only handle height, not width, for rectangular ducts.
+
+You seem to be comparing diameter and height directly.
+
+Wouldn't it make more sense to compare the cross-section area instead?
+
+It is related to the height multiplied by the width, and on the other hand to the diameter squared.
+
+So, height alone makes little sense, are is related linearly to height and quadratically to diameter.
+
+Height multiplied by width would be better, and comparing that with pi * (d/2)**2.
+
+Secondly: you iterate over all the duct connectors, and then, within each connector, you call AllRefs:
+
+https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/C...
+
+Does that not go one step too far away from the duct?
+
+Could you not skip the AllRefs call, and just grab the dimensions from the connector `c` directly, skipping the `cd` loop entirely?
+
+ 
