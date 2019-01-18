@@ -7,8 +7,11 @@
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash; 
-...
+Håvard Leding of Symetri added three new commands to RevitLookup
+&ndash; Three new RevitLookup commands
+&ndash; About "Snoop Pick Face"
+&ndash; About "Pick Linked Element"
+&ndash; Running in a family document...
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) topic
 
@@ -21,10 +24,10 @@ of [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 to <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a> by 
 Håvard Leding of <a href="https://www.symetri.com">Symetri</a>:</p>
 <ul>
-<li><a href="#3">Three New RevitLookup Commands</a> </li>
+<li><a href="#3">Three new RevitLookup commands</a> </li>
 <li><a href="#4">About "Snoop Pick Face..."</a> </li>
 <li><a href="#5">About "Pick Linked Element..."</a> </li>
-<li><a href="#6">Running in a Family Document</a> </li>
+<li><a href="#6">Running in a family document</a> </li>
 </ul>
 <p>I added and tested the new commands
 in <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2019.0.0.6">RevitLookup release 2019.0.0.6</a>.</p>
@@ -34,7 +37,7 @@ in <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2019.0.0.6"
 <p>This is perhaps something of interest to someone.</p>
 <p>Three very simple additions:</p>
 <p><center>
-<img src="img/hl_revitlookup_01.jpg" alt="" width="268">
+<img src="img/hl_revitlookup_01.jpg" alt="Three new commands" width="268">
 </center></p>
 <p>The first one really helped when debugging stable references on joined solid geometry in families.
 Just the picked <code>Reference</code> passed into the <code>Object</code> form.
@@ -73,7 +76,7 @@ And that face (really the same face) will have a usable reference.</p>
 And so, I knew I had to include <code>GeomCombination</code> in my <code>FilteredElementCollector</code>.</p>
 <p>Perhaps this could be an improvement on <code>GetGeometryObjectFromReference</code>?
 An overload to calcuate references if possible.
-<code>GetGeometryObjectFromReference( Reference, bool CalculatedReference )</code>.</p>
+<code>GetGeometryObjectFromReference(</code> <code>Reference,</code> <code>bool</code> <code>CalculatedReference )</code>.</p>
 <p>The new pick options helped guide me to my target face.</p>
 <h4><a name="4"></a> About "Pick Linked Element..."</h4>
 <p>"Snoop Pick Linked Element..." I haven't had use for yet.</p>

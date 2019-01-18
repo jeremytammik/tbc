@@ -8,8 +8,11 @@
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash; 
-...
+Håvard Leding of Symetri added three new commands to RevitLookup
+&ndash; Three new RevitLookup commands
+&ndash; About "Snoop Pick Face"
+&ndash; About "Pick Linked Element"
+&ndash; Running in a family document...
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) topic
 
@@ -23,10 +26,10 @@ Before leaving for the weekend, let me highlight some recent additions
 to [RevitLookup](https://github.com/jeremytammik/RevitLookup) by 
 Håvard Leding of [Symetri](https://www.symetri.com):
 
-- [Three New RevitLookup Commands](#3) 
+- [Three new RevitLookup commands](#3) 
 - [About "Snoop Pick Face..."](#4) 
 - [About "Pick Linked Element..."](#5) 
-- [Running in a Family Document](#6) 
+- [Running in a family document](#6) 
 
 I added and tested the new commands
 in [RevitLookup release 2019.0.0.6](https://github.com/jeremytammik/RevitLookup/releases/tag/2019.0.0.6).
@@ -43,7 +46,7 @@ This is perhaps something of interest to someone.
 Three very simple additions:
 
 <center>
-<img src="img/hl_revitlookup_01.jpg" alt="" width="268">
+<img src="img/hl_revitlookup_01.jpg" alt="Three new commands" width="268">
 </center>
 
 The first one really helped when debugging stable references on joined solid geometry in families.
@@ -96,7 +99,7 @@ And so, I knew I had to include `GeomCombination` in my `FilteredElementCollecto
 
 Perhaps this could be an improvement on `GetGeometryObjectFromReference`?
 An overload to calcuate references if possible.
-`GetGeometryObjectFromReference( Reference, bool CalculatedReference )`.
+`GetGeometryObjectFromReference(` `Reference,` `bool` `CalculatedReference )`.
 
 The new pick options helped guide me to my target face.
 
