@@ -6,6 +6,11 @@
 
 <!---
 
+- revitlookup update
+  https://github.com/jeremytammik/RevitLookup/releases/tag/2019.0.0.6
+  [diff](https://github.com/jeremytammik/RevitLookup/compare/2019.0.0.5...2019.0.0.6)
+
+
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
 Håvard Leding of Symetri added three new commands to RevitLookup
