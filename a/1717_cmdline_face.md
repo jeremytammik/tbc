@@ -30,7 +30,7 @@
 - Cool interactive [Human Terrain visualization of population density over time](https://pudding.cool/2018/10/city_3d) by [The Pudding](https://pudding.cool).
 
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Face methods, custom command line arguments and line segment extraction from point cloud in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/cmdlineargs
 
 Inundated with interesting topics, let's skim a few topmost ones off
 &ndash; Passing an add-in custom command line parameters
