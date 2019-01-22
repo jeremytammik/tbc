@@ -10,8 +10,7 @@
   https://github.com/jeremytammik/RevitLookup/releases/tag/2019.0.0.6
   [diff](https://github.com/jeremytammik/RevitLookup/compare/2019.0.0.5...2019.0.0.6)
 
-
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+New RevitLookup snoops edges, faces and links in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/lookupedgefacelink
 
 Håvard Leding of Symetri added three new commands to RevitLookup
 &ndash; Three new RevitLookup commands
@@ -183,4 +182,3 @@ Then the `Face` has no reference:
 Which more or less prevents any interaction with it, such as placing dimensions, alignments or face-based families.
 
 Enjoy!
-
