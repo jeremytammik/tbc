@@ -10,13 +10,13 @@
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/cmdlineargs
 
 I am working on extracting room and zone information from IFC files, both geometry and relationships, specifically room and zone boundaries and containment.
-My new IfcSpaceZoneBoundaries add-in project retrieves this information and exports it to CSV and demonstrates a host of other important aspects:
+My new IfcSpaceZoneBoundaries add-in project retrieves this information, exports it to CSV and demonstrates a host of other important aspects
 &ndash; What happens on linking in an IFC file?
 &ndash; Read user configuration input settings from a file
 &ndash; Log messages, warnings and errors to an output file
-&ndash; Read the IFC properties stared as shared parameters
-&ndash; Extract the horizontal boundary information from a `DirectShape` element
-&ndash; Export the relevant data to `CSV`
+&ndash; Read the IFC properties stored as shared parameters
+&ndash; Extract the horizontal boundary information from a <code>DirectShape</code> element
+&ndash; Export the relevant data to <code>CSV</code>
 &ndash; Programmatically link in an IFC file into a Revit RVT project
 &ndash; Retrieve all currently linked-in IFC files from the Revit application...
 
@@ -41,7 +41,7 @@ Besides that, it demonstrates a host of other important aspects:
 
 - Read user configuration input settings from a file
 - Log messages, warnings and errors to an output file
-- Read the IFC properties stared as shared parameters
+- Read the IFC properties stored as shared parameters
 - Extract the horizontal boundary information from a `DirectShape` element
   - Analyse the element solid to determine the bottom horizontal planar face
   - Retrieve the sorted face vertices
