@@ -8,8 +8,13 @@
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; Retrieve
-...
+Today I discuss the next step in my IfcSpaceZoneBoundaries project, how to prepare a Revit add-in for use in the DA4R
+or Design Automation for Revit environment and figuring out how to best handle it in the VS solution
+&ndash; Context, add-in functionality and history
+&ndash; Preparing the add-in for DA4R
+&ndash; Local testing versus live deployment
+&ndash; User defined input arguments for DA4R
+&ndash; Logging of results...
 
 of [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.145.4).
 
