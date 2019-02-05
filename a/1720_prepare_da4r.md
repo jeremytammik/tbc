@@ -6,7 +6,9 @@
 
 <!---
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+twitter:
+
+Preparing a Revit Add-in for Forge Design Automation #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/da4rprep
 
 Today I discuss the next step in my IfcSpaceZoneBoundaries project, how to prepare a Revit add-in for use in the DA4R
 or Design Automation for Revit environment and figuring out how to best handle it in the VS solution
@@ -15,6 +17,21 @@ or Design Automation for Revit environment and figuring out how to best handle i
 &ndash; Local testing versus live deployment
 &ndash; User defined input arguments for DA4R
 &ndash; Logging of results...
+
+linkedin:
+
+Preparing a Revit add-in for Forge Design Automation #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+Today I discuss the next step in my IfcSpaceZoneBoundaries project, how to prepare a Revit add-in for use in the DA4R
+or Design Automation for Revit environment and figuring out how to best handle it in the VS solution:
+
+- Context, add-in functionality and history
+- Preparing the add-in for DA4R
+- Local testing versus live deployment
+- User defined input arguments for DA4R
+- Logging of results...
+
+http://bit.ly/da4rprep
 
 of [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.145.4).
 
