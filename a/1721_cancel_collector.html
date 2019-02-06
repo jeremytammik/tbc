@@ -9,6 +9,10 @@ twitter:
 
  #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
+I just discovered an interesting and not completely obvious aspect of using a filtered element collector in
+the Revit API discussion forum thread on aborting a long running filtered element collector
+&ndash; Question: I have really large models where I do use an <code>ElementIntersectsElementFilter</code> that can take a long time to process, and sometimes I want to abort them in a graceful way. Is this possible?
+
 &ndash; 
 ...
 
@@ -18,209 +22,98 @@ of [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 
 -->
 
-<h3>Cancelling Filtered Element Collection</h3>
-<p>I just discussed an interesting aspect of using a filtered element collector that I was not previously so clear on, and that you might find interesting too, raised in
+<h3>Aborting Filtered Element Collection</h3>
+<p>I just discovered an interesting and not completely obvious aspect of using a filtered element collector in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/aborting-long-running-elementintersectselementfilter/m-p/8576368">aborting a long running <code>ElementIntersectsElementFilter</code></a>:</p>
-<p><strong>Question:</strong></p>
-<p>I have really large models where I do some ElementIntersectsElementFilter that can take a long time to process, and sometimes I want to abort them in a graceful way. Is this possible?</p>
+<p><strong>Question:</strong> I have really large models where I use an <code>ElementIntersectsElementFilter</code> that can take a long time to process, and sometimes I want to abort it in a graceful way. Is this possible?</p>
 <p>I've read about task cancellation tokens, but all the examples I've seen using this approach have been loops where I can check if cancellation has been requested. But the ElementIntersectsElementFilter is out of my control and I can't really see how I can cancel it.</p>
 <p>I tried to implement the filter as efficiently as possible.</p>
 <p>I thought maybe a bounding box filter would make it quicker.</p>
 <p>However, after trying, the <code>ElementIntersectsElementFilter</code> seemed to be a bit faster than that.</p>
-<p>But this is how it currently looks. I have a loop that I can cancel via a cancellation token. But I'm still interested in a more efficient filter if possible. Do you see anything obvious?</p>
-<p>private List<Element> WallMepClashDetection(Document doc, List<Element> walls)
-{
-    var filterCategories = new List<BuiltInCategory>
-        {
-            BuiltInCategory.OST_DuctCurves,
-            BuiltInCategory.OST_PipeCurves
-        };</p>
-<pre><code>foreach (var wall in walls)
-{
-    var clashingElements = new FilteredElementCollector(doc)
-        .WhereElementIsNotElementType()
-        .WherePasses(new ElementMulticategoryFilter(filterCategories))
-        .WherePasses(new ElementIntersectsElementFilter(wall));
-
-    // Do stuff...
-}
-</code></pre>
-<p>}</p>
-<p><strong>Answer:</strong></p>
-<p>I can hardly imagine that it remains slow if you optimise it as much as possible, however large the model is.</p>
-<p>The bounding box filter is a quick filter, whereas the element intersection one is slow.</p>
-<p>This can make a huge difference, especially in large models:</p>
-<p>http://thebuildingcoder.typepad.com/blog/2015/12/quick-slow-and-linq-element-filtering.html</p>
-<p>Can you try this for starters?</p>
-<p>var cats = new List<BuiltInCategory>
-  {
-    BuiltInCategory.OST_DuctCurves,
-    BuiltInCategory.OST_PipeCurves
-  };</p>
-<p>var mepfilter = new ElementMulticategoryFilter( cats );</p>
-<p>BoundingBoxXYZ bb = wall.get_BoundingBox( null );
-  Outline o = new Outline( bb.Min, bb.Max );</p>
-<p>var bbfilter = new BoundingBoxIntersectsFilter( o );</p>
-<p>var clashingElements 
-    = new FilteredElementCollector( doc )
-      .WhereElementIsNotElementType()
-      .WherePasses( mepfilter )
-      .WherePasses( bbfilter );</p>
-<p>If the element intersection filter is equally fast or faster, that means that all your elements have already been completely loaded when the collector is executed. I guess you have a lot of memory.</p>
-<p><strong>Response:</strong> Should I use the BoundingBoxIntersectsFilter to lower the memory footprint?</p>
-<p><strong> Answer:</strong> If your elements are not already all loaded in memory, the element intersection filter will force them to load. The bounding box filter will not.</p>
-<p>Another question: Do you want to cancel because you found what you were looking for, or because you reached some time limit?</p>
-<p>Generally, the evaluation is on demand, using iterators, so as long as you don't try to convert the results to a collection, you can write the code to stop whenever you  want.</p>
-<p>Oh, that's interesting. I will have to check memory usage when comparing the two cases, just out of curiosity.</p>
-<p>When I started out I didn't have any means of seeing progress when running heavy intersection filters. And my main motivation was to be able to cancel if the command felt unresponsive or hung. But I've since refactored to use the loop approach which makes it possible to do that and also show a progress bar. I think this applies to any long running command that is out of the control of the developer.</p>
-<p>Yes, please check memory usage.</p>
-<p>Also understand the concept of iterators.</p>
-<p>You can do the following:</p>
-<p>filtered element collector X = ...
-  foreach element in X:
-    do something to X
-    break out of the loop if you wish at any time</p>
-<p>You can interrupt your processing of the results returned by the collector at any time.</p>
-<p>You should NOT convert the collector to a list or any other collection.</p>
-<p>That would force it to return all the elements, which would cost time if there are many.</p>
-<p>Iterating over them one by one does not, costs no time, and can be interrupted any time you like.</p>
-<p>In one of the samples, they loop over walls and call the same filter for each. So there's an opportunity to stop at each wall before calling it again. But even within the same iteration, it should be possible to break early if it's reached some limit.</p>
-<p><strong>Response:</strong> Thank you for the information. I use loops now so I will be able to cancel the command as suggested.</p>
-<p>Thanks for taking the time to help, I've learned some things =)</p>
-<h4><a name="2"></a></h4>
-<h4><a name="3"></a></h4>
-<p>I spent some thought on how to best prepare the existing add-in project for creating the DA4R version.</p>
-<p>Create a separate branch in GitHub?
-Define compile-time switches?
-Implement a multi-target Visual Studio project?</p>
-<p>In the end, I decided that the simplest and most obvious approach would probably be best:</p>
-<ul>
-<li>Isolate almost all the add-in functionality into a separate <code>Exporter</code> class library</li>
-<li>Reimplement and reduce the add-in to the bare minimum essentials, and call the <code>Exporter</code> to do all the work</li>
-<li>Implement a new DA4R-specific DB application, also reduced to the bare minimum essentials</li>
-</ul>
-<p>Accordingly, the Visual Studio solution now contains three projects:</p>
-<ul>
-<li>Exporter &ndash; does all the work</li>
-<li>Addin &ndash; the normal Revit desktop add-in</li>
-<li>AppBundle &ndash; the Forge DA4R app</li>
-</ul>
-<p>Both the desktop add-in and the Forge DA4R <code>AppBundle</code> use the same <code>Exporter</code> class library and only contain minimal architectural code.</p>
-<h4><a name="4"></a> Local Testing versus Live Deployment</h4>
-<p>In addition to the separation between desktop add-in and DA4R appbundle, the latter can also be switched back and forth for local testing versus real live Forge DA4R deployment, by defining or undefining the constant <code>FORGE_DA4R_TEST_LOCALLY</code>
-in <a href="https://github.com/jeremytammik/IfcSpaceZoneBoundaries/blob/master/AppBundle/App.cs">AppBundle/App.cs</a>.</p>
-<p>Here is a <a href="https://github.com/jeremytammik/IfcSpaceZoneBoundaries/compare/2019.0.0.21..2019.0.0.22">diff between the two states</a>.</p>
-<p>Depending on which state we are in, we use either the <code>ApplicationInitialized</code> or the <code>DesignAutomationReadyEvent</code> to run the application functionality.</p>
-<p>Here is the entire external DB application implementation:</p>
+<p>This is how it currently looks.
+I have a loop that I can cancel via a cancellation token.
+But I'm still interested in a more efficient filter if possible.
+Do you see anything obvious?</p>
 <pre class="code">
-<span style="color:green;">//#define&nbsp;FORGE_DA4R_TEST_LOCALLY</span>
-
-<span style="color:blue;">#region</span>&nbsp;Namespaces
-<span style="color:blue;">using</span>&nbsp;System;
-<span style="color:blue;">using</span>&nbsp;System.IO;
-<span style="color:blue;">using</span>&nbsp;System.Reflection;
-<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.ApplicationServices;
-<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.DB;
-<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.DB.Events;
-<span style="color:blue;">using</span>&nbsp;DesignAutomationFramework;
-<span style="color:blue;">using</span>&nbsp;IfcSpaceZoneBoundaries.Exporter;
-<span style="color:blue;">#endregion</span>
-
-<span style="color:blue;">namespace</span>&nbsp;IfcSpaceZoneBoundaries.AppBundle
-{
-&nbsp;&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">App</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IExternalDBApplication</span>
+&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;WallMepClashDetection(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;walls&nbsp;)
 &nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;Export&nbsp;all&nbsp;linked-in&nbsp;IFC&nbsp;document&nbsp;rooms&nbsp;and&nbsp;zones</span>
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;ExportLinkedInIfcDocs(&nbsp;<span style="color:#2b91af;">Application</span>&nbsp;app&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;filterCategories&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">BuiltInCategory</span>&gt;
 &nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;0&nbsp;==&nbsp;app.Documents.Size&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;path&nbsp;=&nbsp;<span style="color:#2b91af;">JtSettings</span>.Instance
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.IfcRvtInputFilePath;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_DuctCurves,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_PipeCurves
+&nbsp;&nbsp;&nbsp;&nbsp;};
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;app.OpenDocumentFile(&nbsp;path&nbsp;);
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;doc&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;s&nbsp;=&nbsp;<span style="color:blue;">string</span>.Format(
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Could&nbsp;not&nbsp;open&nbsp;document&nbsp;{0}.&quot;</span>,&nbsp;path&nbsp;);
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">JtLogger</span>.Log(&nbsp;s&nbsp;);
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">throw</span>&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">InvalidOperationException</span>(&nbsp;s&nbsp;);
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">RoomZoneExporter</span>.ExportAll(&nbsp;app&nbsp;);
-&nbsp;&nbsp;&nbsp;&nbsp;}
-
-<span style="color:blue;">#if</span>&nbsp;FORGE_DA4R_TEST_LOCALLY
-<span style="color:gray;">&nbsp;&nbsp;&nbsp;&nbsp;void&nbsp;OnApplicationInitialized(
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;object&nbsp;sender,
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ApplicationInitializedEventArgs&nbsp;e&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;wall&nbsp;<span style="color:blue;">in</span>&nbsp;walls&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;`sender`&nbsp;is&nbsp;an&nbsp;Application&nbsp;instance:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;clashingElements&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WherePasses(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementMulticategoryFilter</span>(&nbsp;filterCategories&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WherePasses(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementIntersectsElementFilter</span>(&nbsp;wall&nbsp;)&nbsp;);
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Application&nbsp;app&nbsp;=&nbsp;sender&nbsp;as&nbsp;Application;
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ExportLinkedInIfcDocs(&nbsp;app&nbsp;);
-&nbsp;&nbsp;&nbsp;&nbsp;}
-</span><span style="color:blue;">#else</span>&nbsp;<span style="color:green;">//&nbsp;if&nbsp;not&nbsp;FORGE_DA4R_TEST_LOCALLY</span>
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">void</span>&nbsp;OnDesignAutomationReadyEvent(&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">object</span>&nbsp;sender,&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">DesignAutomationReadyEventArgs</span>&nbsp;e&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;`sender`&nbsp;is&nbsp;an&nbsp;Application&nbsp;instance:</span>
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Application</span>&nbsp;app&nbsp;=&nbsp;sender&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Application</span>;
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ExportLinkedInIfcDocs(&nbsp;app&nbsp;);
-&nbsp;&nbsp;&nbsp;&nbsp;}
-<span style="color:blue;">#endif</span>&nbsp;<span style="color:green;">//&nbsp;FORGE_DA4R_TEST_LOCALLY</span>
-
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">ExternalDBApplicationResult</span>&nbsp;OnStartup(
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ControlledApplication</span>&nbsp;a&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;path&nbsp;=&nbsp;<span style="color:#2b91af;">Assembly</span>.GetExecutingAssembly().Location;
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">JtLogger</span>.Init(&nbsp;<span style="color:#2b91af;">Path</span>.ChangeExtension(&nbsp;path,&nbsp;<span style="color:#a31515;">&quot;log&quot;</span>&nbsp;)&nbsp;);
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">JtSettings</span>.Init(&nbsp;<span style="color:#2b91af;">Path</span>.ChangeExtension(&nbsp;path,&nbsp;<span style="color:#a31515;">&quot;json&quot;</span>&nbsp;)&nbsp;);
-
-<span style="color:blue;">#if</span>&nbsp;FORGE_DA4R_TEST_LOCALLY
-<span style="color:gray;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a.ApplicationInitialized&nbsp;+=&nbsp;OnApplicationInitialized;
-</span><span style="color:blue;">#else</span>&nbsp;<span style="color:green;">//&nbsp;if&nbsp;not&nbsp;FORGE_DA4R_TEST_LOCALLY</span>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">DesignAutomationBridge</span>.DesignAutomationReadyEvent&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+=&nbsp;OnDesignAutomationReadyEvent;
-<span style="color:blue;">#endif</span>&nbsp;<span style="color:green;">//&nbsp;FORGE_DA4R_TEST_LOCALLY</span>
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">ExternalDBApplicationResult</span>.Succeeded;
-&nbsp;&nbsp;&nbsp;&nbsp;}
-
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">ExternalDBApplicationResult</span>&nbsp;OnShutdown(
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ControlledApplication</span>&nbsp;a&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">JtSettings</span>.Save();
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">JtLogger</span>.Done();
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">ExternalDBApplicationResult</span>.Succeeded;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Do&nbsp;stuff...</span>
 &nbsp;&nbsp;&nbsp;&nbsp;}
 &nbsp;&nbsp;}
-}
 </pre>
 
-<h4><a name="5"></a> User Defined Input Arguments for DA4R</h4>
-<p>I implemented the <code>JtSettings</code> class to demonstrate defining and passing in input parameters to a DA4R app via an input parameter file.</p>
-<p>I simplified and minimised its interface to reduce the amount of code to be duplicated in the add-in and appbundle, e.g., by converting it to a self-contained singleton.</p>
-<p>The interface to read the user-defined settings in DA4R currently consists of just two lines of code, as you can see above:</p>
-<ul>
-<li>A call to <code>JtSettings.Init</code> specifying the path to read from</li>
-<li>A call to the setting itself via the static singleton instance:</li>
-</ul>
+<p><strong>Answer:</strong> I can hardly imagine that it remains slow if you optimise it as much as possible, however large the model is.</p>
+<p>The bounding box filter is a quick filter, whereas the element intersection one is slow,
+cf., <a href="http://thebuildingcoder.typepad.com/blog/2015/12/quick-slow-and-linq-element-filtering.html">quick, slow and LINQ element filtering</a></p>
+<p>This can make a huge difference, especially in large models.</p>
+<p>Can you try this for starters?</p>
 <pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;cats&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">BuiltInCategory</span>&gt;
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_DuctCurves,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_PipeCurves
+&nbsp;&nbsp;};
+
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;mepfilter&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementMulticategoryFilter</span>(&nbsp;cats&nbsp;);
+
+&nbsp;&nbsp;<span style="color:#2b91af;">BoundingBoxXYZ</span>&nbsp;bb&nbsp;=&nbsp;wall.get_BoundingBox(&nbsp;<span style="color:blue;">null</span>&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">Outline</span>&nbsp;o&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Outline</span>(&nbsp;bb.Min,&nbsp;bb.Max&nbsp;);
+
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;bbfilter&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">BoundingBoxIntersectsFilter</span>(&nbsp;o&nbsp;);
+
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;clashingElements
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WherePasses(&nbsp;mepfilter&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WherePasses(&nbsp;bbfilter&nbsp;);
 </pre>
 
+<p>If the element intersection filter is equally fast or faster, that means that all your elements have already been completely loaded when the collector is executed.
+I guess you have a lot of memory.</p>
+<p><strong>Response:</strong> Should I use the <code>BoundingBoxIntersectsFilter</code> to lower the memory footprint?</p>
+<p><strong>Answer:</strong> If your elements are not already all loaded in memory, the element intersection filter will force them to load.
+The bounding box filter will not.</p>
+<p>Another question: Do you want to cancel because you found what you were looking for, or because you reached some time limit?</p>
+<p>Generally, the evaluation is on demand, using iterators, so as long as you don't try to convert the results to a collection, you can write the code to stop whenever you  want.</p>
+<p><strong>Response:</strong> Oh, that's interesting. I will have to check memory usage when comparing the two cases, just out of curiosity.</p>
+<p>When I started out I didn't have any means of seeing progress when running heavy intersection filters. And my main motivation was to be able to cancel if the command felt unresponsive or hung. But I've since refactored to use the loop approach which makes it possible to do that and also show a progress bar. I think this applies to any long running command that is out of the control of the developer.</p>
+<p><strong>Answer:</strong> Yes, please check memory usage.</p>
+<p>Also understand the concept of iterators.</p>
+<p>You can do the following:</p>
+<pre class="code">
+  filtered element collector X = ...
+  foreach element in X:
+    do something with element
+    break out of the loop if you wish at any time
+</pre>
+
+<p>You can interrupt your processing of the results returned by the collector at any time.</p>
+<p>You should NOT convert the collector to a list or any other collection.</p>
+<p>That would force it to return all the elements, which would cost time and memory, with a performance hit if there are many of them.</p>
+<p>Iterating over them one by one does not, costs no time, and can be interrupted any time you like.</p>
+<p>You loop over walls and call the same filter for each.
+So, there's an opportunity to stop at each wall before calling it again.
+In addition, even within the same iteration, you can break early, any time you like, e.g., if you reach some limit.</p>
+<p><strong>Response:</strong> Thank you for the information.</p>
+<p>I use loops now so I will be able to cancel the command as suggested.</p>
+<p>Thanks for taking the time to help, I've learned some things &nbsp; =)</p>
 <p><center>
-<img src="img/" alt="" width="100">
+<img src="img/file_is_processing.png" alt="File is processing..." width="117">
 </center></p>
