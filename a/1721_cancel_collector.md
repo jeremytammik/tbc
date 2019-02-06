@@ -12,7 +12,7 @@ twitter:
 
 I just discovered an interesting and not completely obvious aspect of using a filtered element collector in
 the Revit API discussion forum thread on aborting a long running filtered element collector.
-Question: I have really large models where I do use an <code>ElementIntersectsElementFilter</code> that can take a long time to process, and sometimes I want to abort it in a graceful way. Is this possible?
+Question: I have really large models where I use an <code>ElementIntersectsElementFilter</code> that can take a long time to process, and sometimes I want to abort it in a graceful way. Is this possible?
 
 &ndash; 
 ...
