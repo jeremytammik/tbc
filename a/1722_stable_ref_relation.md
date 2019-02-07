@@ -90,9 +90,9 @@ Investigating this, I was hoping `Sketch` was using the same "Parent + sub ident
 
 That way we could get the element being sketched, i.e., the Parent.
  
-Having something like this would be nice:
+Having something analogous like this would be nice:
 
-Sketch &ndash; 
+- Sketch &ndash; 
 A stable reference to a Sketch is prefixed by the __Floor.UniqueID__ its belongs to:
 __17627a50-6c26-4b9d-a7cc-0deeb5800e11-00050110__:0:SKETCH
 
