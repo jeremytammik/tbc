@@ -10,9 +10,9 @@ twitter:
 
  #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-I just discovered an interesting and not completely obvious aspect of using a filtered element collector in
-the Revit API discussion forum thread on aborting a long running filtered element collector.
-Question: I have really large models where I use an <code>ElementIntersectsElementFilter</code> that can take a long time to process, and sometimes I want to abort it in a graceful way. Is this possible?
+Håvard Leding explores relationships between stable reference of main elements and their sub-elements, related to the intriguing undocumented <code>ElementId</code> relationships and stable representation magic voodoo.
+We need to access the sketch association to the element being sketched.
+I printed out stable references for 3 floors, and also the references for each <code>ModelLine</code> in their 3 <code>Sketch</code> elements...
 
 &ndash; 
 ...
@@ -35,10 +35,10 @@ and [stable representation magic voodoo](http://thebuildingcoder.typepad.com/blo
 In his own words:
 
 We have a Revit Idea Station request to access 
-the [sketch association to element being sketched](https://forums.autodesk.com/t5/revit-ideas/sketch-association-to-element-being-sketched/idi-p/8578998).
+the [sketch association to the element being sketched](https://forums.autodesk.com/t5/revit-ideas/sketch-association-to-element-being-sketched/idi-p/8578998).
  
 > As a developer, I need access to the model lines that constitute the sketch lines for objects like Floors/Walls/Roofs etc.
-As of now these sketclines are contained in a Sketch.
+As of now these sketch lines are contained in a Sketch.
 I need the stable reference of the Sketch element (or the ModelLines themselves) to reflect its subordinate relationship to the element being sketched.
 So, the first part of a Sketch stable reference could be the UniqueId of a Floor, followed by its own Id.
 
@@ -96,8 +96,14 @@ Sketch &ndash;
 A stable reference to a Sketch is prefixed by the __Floor.UniqueID__ its belongs to:
 __17627a50-6c26-4b9d-a7cc-0deeb5800e11-00050110__:0:SKETCH
 
-Many thanks to Håvard for sharing these observations!
+I guess there already is a request for getting the profile of a Floor or Wall.
+
+To do it now, we have to analyse each edge of each triangulated face.
+
+Here is an image of a Floor modelled by a landscape architect:
 
 <center>
-<img src="img/linking_chains.jpg" alt="Linking chains" width="300">
+<img src="img/floor_by_landscape_architect.jpg" alt="Floor modelled by a landscape architect" width="423">
 </center>
+
+Many thanks to Håvard for sharing these observations!
