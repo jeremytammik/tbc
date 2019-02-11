@@ -40,6 +40,7 @@ Dynamo, FamilySymbol vs ElementType and handling a custom exporter exception in 
 Today we discuss a couple of Dynamo considerations, Revit family and element fundamental concepts, and an exception handler required for a custom exporter
 &ndash; Revit API versus Dynamo for Revit
 &ndash; Dynamo 2.0.X versus 1.3.3
+&ndash; Dynamo Future Version Handling
 &ndash; Difference between <code>FamilySymbol</code> and <code>ElementType</code>
 &ndash; Custom exporter <code>Execute</code> may throw
 &ndash; Turned on Git LFS...
@@ -50,7 +51,8 @@ Today we discuss a couple of Dynamo considerations, Revit family and element fun
 <p>Today we discuss a couple of Dynamo considerations, Revit family and element fundamental concepts, and an exception handler required for a custom exporter:</p>
 <ul>
 <li><a href="#2">Revit API versus Dynamo for Revit</a> </li>
-<li><a href="#3">Dynamo 2.0.X versus 1.3.3</a> </li>
+<li><a href="#3">Dynamo 2.0.X versus 1.3.3</a></li>
+<li><a href="#3.1">Dynamo future version handling</a> </li>
 <li><a href="#4">Difference between <code>FamilySymbol</code> and <code>ElementType</code></a> </li>
 <li><a href="#5">Custom exporter <code>Execute</code> may throw</a> </li>
 <li><a href="#6">Turned on Git LFS</a> </li>
@@ -143,6 +145,8 @@ additional <a href="http://dynamobim.org/extensions-now-supported-in-package-man
 <p>More information on <a href="http://dynamobim.org/new-dynamo-developer-resources-and-updating-packages-for-dynamo-2-0">what it takes to upgrade packages</a>.</p>
 <p>Finally, here are the more granular <a href="https://github.com/DynamoDS/Dynamo/wiki/Release-Notes">release notes</a>.</p>
 <p>I hope this provides a good and professional complete answer to your question.</p>
+<h4><a name="3.1"></a> Dynamo Future Version Handling</h4>
+<p><strong>Addendum:</strong> The Dynamo team is working to have a more regular 'heartbeat' of releases that allows for steady integrations with host applications. This will establish an update process that allows users to get the latest version of Dynamo with the latest release and point release of Revit. Additionally, we intend for future releases of Dynamo to not have a shared library, allowing for different versions of Revit to have different version of Dynamo and remove the "cross talk" of Dynamo in new installations. This will allowg Revit v.A to have the most up to date version of Dynamo available when Revit v.A was released, and Revit v.B to have the most up to date version of Dynamo available when Revit v.B was released without version B installation interfering with version A.</p>
 <h4><a name="4"></a> Difference Between FamilySymbol and ElementType</h4>
 <p>Another recent <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread concerns
 the <a href="https://forums.autodesk.com/t5/revit-api-forum/difference-between-familysymbol-and-elementtype/m-p/8461805">difference between <code>FamilySymbol</code> and <code>ElementType</code></a>:</p>

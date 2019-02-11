@@ -41,6 +41,7 @@ Dynamo, FamilySymbol vs ElementType and handling a custom exporter exception in 
 Today we discuss a couple of Dynamo considerations, Revit family and element fundamental concepts, and an exception handler required for a custom exporter
 &ndash; Revit API versus Dynamo for Revit
 &ndash; Dynamo 2.0.X versus 1.3.3
+&ndash; Dynamo Future Version Handling
 &ndash; Difference between <code>FamilySymbol</code> and <code>ElementType</code>
 &ndash; Custom exporter <code>Execute</code> may throw
 &ndash; Turned on Git LFS...
@@ -52,7 +53,8 @@ Today we discuss a couple of Dynamo considerations, Revit family and element fun
 Today we discuss a couple of Dynamo considerations, Revit family and element fundamental concepts, and an exception handler required for a custom exporter:
 
 - [Revit API versus Dynamo for Revit](#2) 
-- [Dynamo 2.0.X versus 1.3.3](#3) 
+- [Dynamo 2.0.X versus 1.3.3](#3)
+- [Dynamo future version handling](#3.1) 
 - [Difference between `FamilySymbol` and `ElementType`](#4) 
 - [Custom exporter `Execute` may throw](#5) 
 - [Turned on Git LFS](#6) 
@@ -184,6 +186,9 @@ Finally, here are the more granular [release notes](https://github.com/DynamoDS/
 
 I hope this provides a good and professional complete answer to your question.
 
+#### <a name="3.1"></a> Dynamo Future Version Handling
+
+**Addendum:** The Dynamo team is working to have a more regular 'heartbeat' of releases that allows for steady integrations with host applications. This will establish an update process that allows users to get the latest version of Dynamo with the latest release and point release of Revit. Additionally, we intend for future releases of Dynamo to not have a shared library, allowing for different versions of Revit to have different version of Dynamo and remove the "cross talk" of Dynamo in new installations. This will allowg Revit v.A to have the most up to date version of Dynamo available when Revit v.A was released, and Revit v.B to have the most up to date version of Dynamo available when Revit v.B was released without version B installation interfering with version A.
 
 #### <a name="4"></a> Difference Between FamilySymbol and ElementType
 
