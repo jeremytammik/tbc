@@ -151,7 +151,7 @@ Many thanks to Frank for this solution!
 #### <a name="3"></a> Poverty versus Universal Basic Income
 
 In case you are interested in the topic of universal basic income, you might find this TED talk quite illuminating:
-[Poverty isn't a lack of character; it's a lack of cash](https://youtu.be/ydKcaIE6O1k), by historian Rutger Bregman on June 13, 2017.
+[Poverty isn't a lack of character; it's a lack of cash](https://youtu.be/ydKcaIE6O1k), by historian Rutger Bregman, on June 13, 2017.
 
 > "Ideas can and do change the world," he says, sharing his case for a provocative one: guaranteed basic income. Learn more about the idea's 500-year history and a forgotten modern experiment where it actually worked &ndash; and imagine how much energy and talent we would unleash if we got rid of poverty once and for all.
 
