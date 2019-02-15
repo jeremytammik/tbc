@@ -16,7 +16,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Creating a sweep with multiple closed loops in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
 A demonstration of using the <code>NewSweep</code> method was very kindly provided in yet another helpful answer by Frank @Fair59 Aarssen to the Revit API discussion forum thread on how to create a sweep with multiple closed loops in profile.
 Let me also highlight an interesting TED talk on the topic of poverty versus universal basic income
