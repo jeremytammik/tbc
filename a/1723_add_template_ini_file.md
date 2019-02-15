@@ -12,7 +12,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Accessing and modifying settings in the Revit.ini file, e.g., adding a project template to the 'New Project' dialog on the Start Window, using the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/modini
  
 Some interesting settings are stored in and can be modified by editing the Revit ini file.
 Peter <i>@pgerz</i> pointed out yet another possibility in his answer to 
