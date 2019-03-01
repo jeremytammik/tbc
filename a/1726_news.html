@@ -1,0 +1,176 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- naveen second top solution author
+
+- patrick.emin
+  [Use a form in Revit API](https://forums.autodesk.com/t5/revit-api-forum/use-a-form-in-revit-api/m-p/8617102)
+  Bonjour, pour votre information, nous avons un forum en français: https://forums.autodesk.com/t5/revit-et-bim-francais/bd-p/198
+  [Revit et BIM - Français](https://forums.autodesk.com/t5/revit-et-bim-francais/bd-p/198)
+  Bienvenue sur les forums Revit d’Autodesk. Partagez vos connaissances, posez des questions, collaborez sur des idées, et explorez les sujets Revit populaires.
+
+- 15089827 [WPF - Window With TreeView - Slow Load With Virtualization]
+  https://forums.autodesk.com/t5/revit-api-forum/wpf-window-with-treeview-slow-load-with-virtualization/m-p/8609110
+  performance
+
+
+twitter:
+
+ in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+
+&ndash; 
+...
+
+linkedin:
+
+of [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.145.4).
+
+-->
+
+<h3>Forum Français</h3>
+<p>I have been much too active in 
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> recently
+and written less here in the blog.</p>
+<p>Here are some of the recent items that cropped up plus a few pictures from my latest mountain outing:</p>
+<ul>
+<li><a href="#3">Revit et BIM en Français</a> </li>
+<li><a href="#3">Underture</a> </li>
+</ul>
+<h4><a name="2"></a> Marat's Shapka Ushanka and Balmer's Graetli</h4>
+<p>I have not been out in the mountains as much as I would like yet this year.</p>
+<p>Here is a picture from a little climb to Balmer's Graetli last Sunday, sporting a nice new warm fur hat with ear flaps, aka <a href="https://en.wikipedia.org/wiki/Ushanka">shapka ushanka</a>, that my ex-Autodesk-colleague Marat got me:</p>
+<p><center>
+<img src="img/677_jeremy_with_shapka_ushanka_800x600.jpg" alt="Jeremy with Marat's nice warm shapka ushanka" width="400">
+</center></p>
+<p>You can see more photos from the tour in my <a href="https://flic.kr/s/aHsmyTUkrv">Balmer's Graetli album</a>.</p>
+<p>Many thanks to Marat for the hat and to Conny for the nice destination!</p>
+<p>More and longer ski tours are planned for the end of March and April.</p>
+<h4><a name="3"></a> Naveen is a Top Solution Author Now</h4>
+<p>Congratulations to my Indian Colleague Naveen Kumar T. for reaching place two in the list of top solution authors!</p>
+<p><center>
+<img src="img/naveen_top_solution_author.png" alt="Naveen listed as top solution author" width="400">
+</center></p>
+<p>I am really looking forward to the day he overtakes me!</p>
+<p>Thank you ever so much, Naveen, for all the hard work and great success!</p>
+<h4><a name="4"></a> Revit et BIM en Français</h4>
+<p>Another discussion forum related news item:</p>
+<p>For your information, Patrick Emin recently pointed out the new French language Revit and BIM discussion forum in the thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/use-a-form-in-revit-api/m-p/8617102">using a form in Revit API</a>:</p>
+<blockquote>
+<p>Bonjour, pour votre information, nous avons un forum en français:
+<a href="https://forums.autodesk.com/t5/revit-et-bim-francais/bd-p/198">Revit et BIM &ndash; Français</a>
+&ndash; <a href="https://forums.autodesk.com/t5/revit-et-bim-francais/bd-p/198">forums.autodesk.com/t5/revit-et-bim-francais/bd-p/198</a></p>
+<p><i>Bienvenue sur les forums Revit d’Autodesk.
+Partagez vos connaissances, posez des questions, collaborez sur des idées, et explorez les sujets Revit populaires.</i></p>
+</blockquote>
+<h4><a name="5"></a> Tree View Performance Optimisation</h4>
+<p>Let's return to a more technical Revit API oriented topic in the thread
+on a <a href="https://forums.autodesk.com/t5/revit-api-forum/wpf-window-with-treeview-slow-load-with-virtualization/m-p/8622528">WPF window with treeview and slow load with virtualization</a>:</p>
+<p><strong>Question:</strong> </p>
+<p>A tool I'm building has a TreeView control that will show all element instances in a Project/Active/Selection.</p>
+<p>The problem is that even with UI virtualization the window load times are far too long.</p>
+<p>I'm not sure what to suspect now and am hoping one of the community has run across this.</p>
+<p>Some examples of window load times below.</p>
+<ul>
+<li>Project with around 150,000 model Element Instances it takes about 2 minutes to build.</li>
+<li>Project with around 66,000 model Element Instances it takes about a minute to build</li>
+<li>Project with less than 400 model Element Instances it takes about 5 seconds to build</li>
+</ul>
+<p>Here is some additional pertinent information .</p>
+<ul>
+<li>I'm using WPF / XAML / MVVM / C# to build it.</li>
+<li>I've timed the Filtered Element Collectors and found they are incredible fast and don't seem to be the issue.</li>
+<li>I've submitted a support ticket to Telerik which only confirmed that the code should be working and does outside of Revit where I can create 180000 objects into 4 tiers in seconds.</li>
+<li>There are 4 tiers (See screenshot 1) of data arranged in the following manner:<ul>
+<li>Tier 1: Category</li>
+<li>Tier 2: Family Name</li>
+<li>Tier 3: Type</li>
+<li>Tier 4: Instance</li>
+</ul>
+</li>
+<li>The TreeView is initially fully collapsed with only the first tier showing.</li>
+<li>I've enabled UI Virtualization to show more as a user expands each node.</li>
+<li>I've attached a zip file with the code in question</li>
+</ul>
+<p>Screenshot #1:</p>
+<p><center>
+<img src="img/wpf_treeview_performance_1.png" alt="WPF TreeView" width="424">
+</center></p>
+<p>Screenshot #2:</p>
+<p><center>
+<img src="img/wpf_treeview_performance_2.png" alt="WPF TreeView" width="504">
+</center></p>
+<p>Here is <a href="zip/wpf_treeview_all_element_instances.zip">TreeViewAllElementInstances.zip containing my sample code</a>.</p>
+<p><strong>Answer:</strong> I would suggest initially populating only the Tier 1, and then populating the other ones and their subnodes on demand when clicked by the user to open them.</p>
+<p>If a specific node is never opened, there is no need to ever load its subnodes.</p>
+<p>I am sure such techniques have already been implemented and published in the past.</p>
+<p>In fact, I see a large number of solutions when searching the Internet for <a href="https://duckduckgo.com/?q=populate+tree+view+on+demand">populate tree view on demand</a>.</p>
+<p><strong>Response:</strong> Jeremy, thank you for your suggestions and for continuing to help me and the community!</p>
+<p>Much has happened since last Wednesday and i can report back that i now have a virtualized TreeView which will quickly handles projects with 200,000+ model elements!</p>
+<p>I will gladly share this solution with any needing it so if you're interested please contact me.</p>
+<p>Initially, my inexperience drove me to go the 'safe' route towards populating the TreeView, but on Thursday, I deleted most of what I'd done and fully embraced MVVM and working with Objects, in an object, in an object, in an object! Was a mind melter for me but it really paid off!</p>
+<p>The method below is truly the meat of the solution and along with the XAML in the previously attached ZIP file make it work. Way shorter and simpler than I thought it would be.</p>
+<pre class="code">
+  private static void InitializeDataSource()
+  {
+    Tier1CategoryNames = new ObservableCollection<Tier1Object>();
+    Tier1Object tier1Object = null;
+    Tier2Object tier2Object = null;
+    Tier3Object tier3Object = null;
+    Tier4Object tier4Object = null;
+
+    foreach(var revitElementInstance in _revitElementInstances)
+    {
+      // ########## Tier 1 Start ##########
+      var currentCategoryName = revitElementInstance.Category.Name;
+
+      if(Tier1CategoryNames.Count == 0 || Tier1CategoryNames.All(tier1Object1 => tier1Object1.Tier1CategoryName != currentCategoryName))
+      {
+        Tier1CategoryNames.Add(tier1Object = new Tier1Object(currentCategoryName));
+      }
+
+      // ########## Tier 2 Start ##########
+      var currentFamilyName = revitElementInstance.FamilyName;
+
+      if(tier1Object.Tier2FamilyNames.Count == 0 || tier1Object.Tier2FamilyNames.All(tier2Object1 => tier2Object1.Tier2FamilyName != currentFamilyName))
+      {
+        tier1Object.Tier2FamilyNames.Add(tier2Object = new Tier2Object(currentFamilyName));
+      }
+
+      // ########## Tier 3 Start ##########
+      var currentElementTypeName = revitElementInstance.ElementType.Name;
+
+      if(tier2Object.Tier3ElementTypeNames.Count == 0 || tier2Object.Tier3ElementTypeNames.All(tier3Object1 => tier3Object1.Tier3ElementTypeName != currentElementTypeName))
+      {
+        tier2Object.Tier3ElementTypeNames.Add(tier3Object = new Tier3Object(currentElementTypeName));
+      }
+
+      // ########## Tier 4 Start ##########
+      var currentElementInstanceName = revitElementInstance.ElementInstance.Name;
+
+      tier3Object.Tier4ElementInstanceNames.Add(tier4Object = new Tier4Object(currentElementInstanceName));
+    }
+  }
+</pre>
+
+<p>Congratulations on the brilliant result and many thanks to Chris for sharing the solution!</p>
+<h4><a name="6"></a> Underture</h4>
+<p>Unrelated to the Revit API and technology, you might be interested
+in <a href="https://youtu.be/JJvDaBhofyc">Underture</a>, 
+a truly beautiful two-minute underwater video
+by <a href="https://www.youtube.com/channel/UCdD9nAv0ITzU-fiZr8cEXNw">LaughingEelVideo</a> with
+masses of fascinating creatures filmed in Indonesia to the music
+of <a href="https://en.wikipedia.org/wiki/The_Barber_of_Seville">The Barber of Seville</a>
+by <a href="https://en.wikipedia.org/wiki/Gioachino_Rossini">Gioachino Rossini</a>:</p>
+<blockquote>
+<p>Sometimes, being underwater feels like a window on the world's biggest stage.
+Here's a bouncy 4K introduction to some of its principal characters, shot in Indonesia: Komodo, Ambon, Raja Ampat, and Bali.</p>
+</blockquote>
+<p><center>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/JJvDaBhofyc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center></p>
