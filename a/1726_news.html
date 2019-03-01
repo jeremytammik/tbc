@@ -33,17 +33,23 @@ of [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 -->
 
 <h3>Forum Français</h3>
-<p>I have been much too active in 
+<p>As usual, I have been much too active in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> recently
-and written less here in the blog.</p>
-<p>Here are some of the recent items that cropped up plus a few pictures from my latest mountain outing:</p>
+and worked too little for my taste here in the blog.</p>
+<p>Here are some of the recent items that I want to share plus a few pictures from my latest mountain outing:</p>
 <ul>
-<li><a href="#3">Revit et BIM en Français</a> </li>
-<li><a href="#3">Underture</a> </li>
+<li><a href="#2">Marat's shapka ushanka and Balmer's Graetli</a> </li>
+<li><a href="#3">Naveen is a top solution author now</a> </li>
+<li><a href="#4">Revit et BIM en Français</a> </li>
+<li><a href="#5">Tree view performance optimisation</a> </li>
+<li><a href="#6">Underture</a> </li>
 </ul>
 <h4><a name="2"></a> Marat's Shapka Ushanka and Balmer's Graetli</h4>
-<p>I have not been out in the mountains as much as I would like yet this year.</p>
-<p>Here is a picture from a little climb to Balmer's Graetli last Sunday, sporting a nice new warm fur hat with ear flaps, aka <a href="https://en.wikipedia.org/wiki/Ushanka">shapka ushanka</a>, that my ex-Autodesk-colleague Marat got me:</p>
+<p>Here is a picture from a little ski tour to Balmer's Graetli
+in <a href="https://en.wikipedia.org/wiki/Muotathal">Muotathal</a> last Sunday,
+sporting a nice new warm fur hat with ear flaps,
+aka <a href="https://en.wikipedia.org/wiki/Ushanka">shapka ushanka</a>,
+that my ex-Autodesk-colleague Marat got me:</p>
 <p><center>
 <img src="img/677_jeremy_with_shapka_ushanka_800x600.jpg" alt="Jeremy with Marat's nice warm shapka ushanka" width="400">
 </center></p>
@@ -53,7 +59,7 @@ and written less here in the blog.</p>
 <h4><a name="3"></a> Naveen is a Top Solution Author Now</h4>
 <p>Congratulations to my Indian Colleague Naveen Kumar T. for reaching place two in the list of top solution authors!</p>
 <p><center>
-<img src="img/naveen_top_solution_author.png" alt="Naveen listed as top solution author" width="400">
+<img src="img/naveen_top_solution_author.png" alt="Naveen listed as top solution author" width="236">
 </center></p>
 <p>I am really looking forward to the day he overtakes me!</p>
 <p>Thank you ever so much, Naveen, for all the hard work and great success!</p>
@@ -111,51 +117,60 @@ on a <a href="https://forums.autodesk.com/t5/revit-api-forum/wpf-window-with-tre
 <p>I am sure such techniques have already been implemented and published in the past.</p>
 <p>In fact, I see a large number of solutions when searching the Internet for <a href="https://duckduckgo.com/?q=populate+tree+view+on+demand">populate tree view on demand</a>.</p>
 <p><strong>Response:</strong> Jeremy, thank you for your suggestions and for continuing to help me and the community!</p>
-<p>Much has happened since last Wednesday and i can report back that i now have a virtualized TreeView which will quickly handles projects with 200,000+ model elements!</p>
+<p>Much has happened since last Wednesday and I can report back that I now have a virtualized TreeView which will quickly handles projects with 200,000+ model elements!</p>
 <p>I will gladly share this solution with any needing it so if you're interested please contact me.</p>
 <p>Initially, my inexperience drove me to go the 'safe' route towards populating the TreeView, but on Thursday, I deleted most of what I'd done and fully embraced MVVM and working with Objects, in an object, in an object, in an object! Was a mind melter for me but it really paid off!</p>
 <p>The method below is truly the meat of the solution and along with the XAML in the previously attached ZIP file make it work. Way shorter and simpler than I thought it would be.</p>
-<pre class="code">
-  private static void InitializeDataSource()
-  {
-    Tier1CategoryNames = new ObservableCollection<Tier1Object>();
-    Tier1Object tier1Object = null;
-    Tier2Object tier2Object = null;
-    Tier3Object tier3Object = null;
-    Tier4Object tier4Object = null;
+<pre class="code"><span style="color:blue;">private</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">void</span>&nbsp;InitializeDataSource()
+{
+&nbsp;&nbsp;Tier1CategoryNames&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;ObservableCollection&lt;Tier1Object&gt;();
+&nbsp;&nbsp;Tier1Object&nbsp;tier1Object&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+&nbsp;&nbsp;Tier2Object&nbsp;tier2Object&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+&nbsp;&nbsp;Tier3Object&nbsp;tier3Object&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+&nbsp;&nbsp;Tier4Object&nbsp;tier4Object&nbsp;=&nbsp;<span style="color:blue;">null</span>;
 
-    foreach(var revitElementInstance in _revitElementInstances)
-    {
-      // ########## Tier 1 Start ##########
-      var currentCategoryName = revitElementInstance.Category.Name;
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;revitElementInstance&nbsp;<span style="color:blue;">in</span>&nbsp;_revitElementInstances&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;##########&nbsp;Tier&nbsp;1&nbsp;Start&nbsp;##########</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;currentCategoryName&nbsp;=&nbsp;revitElementInstance.Category.Name;
 
-      if(Tier1CategoryNames.Count == 0 || Tier1CategoryNames.All(tier1Object1 => tier1Object1.Tier1CategoryName != currentCategoryName))
-      {
-        Tier1CategoryNames.Add(tier1Object = new Tier1Object(currentCategoryName));
-      }
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;Tier1CategoryNames.Count&nbsp;==&nbsp;0&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;||&nbsp;Tier1CategoryNames.All(&nbsp;tier1Object1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;tier1Object1.Tier1CategoryName&nbsp;!=&nbsp;currentCategoryName&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tier1CategoryNames.Add(&nbsp;tier1Object&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Tier1Object(&nbsp;currentCategoryName&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
 
-      // ########## Tier 2 Start ##########
-      var currentFamilyName = revitElementInstance.FamilyName;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;##########&nbsp;Tier&nbsp;2&nbsp;Start&nbsp;##########</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;currentFamilyName&nbsp;=&nbsp;revitElementInstance.FamilyName;
 
-      if(tier1Object.Tier2FamilyNames.Count == 0 || tier1Object.Tier2FamilyNames.All(tier2Object1 => tier2Object1.Tier2FamilyName != currentFamilyName))
-      {
-        tier1Object.Tier2FamilyNames.Add(tier2Object = new Tier2Object(currentFamilyName));
-      }
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;tier1Object.Tier2FamilyNames.Count&nbsp;==&nbsp;0&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;||&nbsp;tier1Object.Tier2FamilyNames.All(&nbsp;tier2Object1&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;tier2Object1.Tier2FamilyName&nbsp;!=&nbsp;currentFamilyName&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tier1Object.Tier2FamilyNames.Add(&nbsp;tier2Object&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Tier2Object(&nbsp;currentFamilyName&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
 
-      // ########## Tier 3 Start ##########
-      var currentElementTypeName = revitElementInstance.ElementType.Name;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;##########&nbsp;Tier&nbsp;3&nbsp;Start&nbsp;##########</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;currentElementTypeName&nbsp;=&nbsp;revitElementInstance.ElementType.Name;
 
-      if(tier2Object.Tier3ElementTypeNames.Count == 0 || tier2Object.Tier3ElementTypeNames.All(tier3Object1 => tier3Object1.Tier3ElementTypeName != currentElementTypeName))
-      {
-        tier2Object.Tier3ElementTypeNames.Add(tier3Object = new Tier3Object(currentElementTypeName));
-      }
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;tier2Object.Tier3ElementTypeNames.Count&nbsp;==&nbsp;0&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;||&nbsp;tier2Object.Tier3ElementTypeNames.All(&nbsp;tier3Object1&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;tier3Object1.Tier3ElementTypeName&nbsp;!=&nbsp;currentElementTypeName&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tier2Object.Tier3ElementTypeNames.Add(&nbsp;tier3Object&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Tier3Object(&nbsp;currentElementTypeName&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
 
-      // ########## Tier 4 Start ##########
-      var currentElementInstanceName = revitElementInstance.ElementInstance.Name;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;##########&nbsp;Tier&nbsp;4&nbsp;Start&nbsp;##########</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;currentElementInstanceName&nbsp;=&nbsp;revitElementInstance.ElementInstance.Name;
 
-      tier3Object.Tier4ElementInstanceNames.Add(tier4Object = new Tier4Object(currentElementInstanceName));
-    }
-  }
+&nbsp;&nbsp;&nbsp;&nbsp;tier3Object.Tier4ElementInstanceNames.Add(&nbsp;tier4Object&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Tier4Object(&nbsp;currentElementInstanceName&nbsp;)&nbsp;);
+&nbsp;&nbsp;}
+}
 </pre>
 
 <p>Congratulations on the brilliant result and many thanks to Chris for sharing the solution!</p>
