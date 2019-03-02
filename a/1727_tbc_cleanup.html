@@ -1,0 +1,94 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- https://youtu.be/GW9cbFYnKAc
+<iframe width="560" height="315" src="https://www.youtube.com/embed/GW9cbFYnKAc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+TITAN VS ROBO-CAR - The Multi-Billion Dollar Company You’ve Never Heard Of
+Titan travels to Zoox to meet with Chairman Carl Bass and discuss their incredible self-driving car. Not only do they have the artificial intelligence (AI) to autonomously drive the car through the streets of San Francisco, they are manufacturing their own vehicle to compete with the biggest names in ride-sharing. CNC machining, Advanced 3D printing, and 7-Axis robots to name a few of their production capabilities. Check out how their technology works, and why it is the future of driving. 
+
+- https://youtu.be/EH-z9gE2uGY
+<iframe width="560" height="315" src="https://www.youtube.com/embed/EH-z9gE2uGY" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+The Mystery at the Bottom of Physics
+Actually gets deep enough into physics to wax philosophical on gratitude for life and the reason to be grateful and happy for every moment of my own personal existence.
+
+twitter:
+
+ in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+&ndash; 
+...
+
+linkedin:
+
+of [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.145.4).
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) recently
+
+-->
+
+<h3>Yearly Deprecated Method Cleanup</h3>
+<p>Same procedure as every year:
+eliminate all deprecated Revit API usage warnings before even thinking of migrating to the next major release.</p>
+<ul>
+<li><a href="#2">Deprecated API Usage Warnings</a> </li>
+<li><a href="#3">Replace GetRules by GetElementFilter</a> </li>
+<li><a href="#4">Deprecated Material Asset Accessors</a> </li>
+<li><a href="#5">Update with Zero Compilation Warnings</a> </li>
+</ul>
+<h4><a name="2"></a> Deprecated API Usage Warnings</h4>
+<p>Before I started out eliminating the deprecated Revit API usage warnings,
+compiling <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
+generated <a href="zip/tbc_samples_2019_errors_warnings_2.txt">eight warnings</a>.</p>
+<p>The first is just a notification of unreachable code in the module <code>CmdListAllRooms.cs</code> that I recently worked on
+to <a href="https://thebuildingcoder.typepad.com/blog/2019/01/room-boundaries-to-csv-and-wpf-template.html#2">export room boundaries to CSV for Forge surface classification</a>,
+so I'll fix that first.</p>
+<p>It was caused by a <code>const bool</code> variable <code>_exportInMillimetres</code>.
+The warning disappeared after I changed that to <code>static bool</code> instead.</p>
+<p>That leaves <a href="zip/tbc_samples_2019_errors_warnings_3.txt">seven warnings</a>, all numbered <code>CS0618</code> and caused by deprecated Revit API usage, from two different API calls:</p>
+<ul>
+<li>In CmdCollectorPerformance.cs: <code>ParameterFilterElement.GetRules</code> is obsolete: This method is deprecated in Revit 2019 and will be removed in the next version of Revit. We suggest you use <code>GetElementFilter</code> instead.</li>
+<li>In CmdGetMaterials.cs, repeated six times: <code>AssetProperties.this[string]</code> is obsolete: This property is deprecated in Revit 2019 and will be removed in the next version of Revit. We suggest you use the <code>FindByName(String)</code> or <code>Get(int)</code> method instead.</li>
+</ul>
+<h4><a name="3"></a> Replace GetRules by GetElementFilter</h4>
+<p>Both of these deprecated API usages can be easily fixed by following the instructions given by the warning messages.</p>
+<p>In the first case, we can replace GetRules by GetElementFilter and simplify the code using it like as follows; before:</p>
+<pre class="code">
+  <span style="color:#2b91af;">ParameterFilterElement</span>&nbsp;pfe ...
+
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">FilterRule</span>&nbsp;rule&nbsp;<span style="color:blue;">in</span>&nbsp;pfe.GetRules()&nbsp;)&nbsp;<span style="color:green;">//&nbsp;2018</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;elemsByFilter2
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;elemsByFilter.Where(&nbsp;e
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;rule.ElementPasses(&nbsp;e&nbsp;)&nbsp;);
+&nbsp;&nbsp;}
+</pre>
+
+<p>After:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">ElementFilter</span>&nbsp;ef&nbsp;=&nbsp;pfe.GetElementFilter();&nbsp;<span style="color:green;">//&nbsp;2019</span>
+&nbsp;&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;elemsByFilter2
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;elemsByFilter.WherePasses(&nbsp;ef&nbsp;);
+</pre>
+
+<h4><a name="4"></a> Deprecated Material Asset Accessors</h4>
+<p>That leaves <a href="zip/tbc_samples_2019_errors_warnings_4.txt">six warnings caused by calls to deprecated material asset accessors</a>.</p>
+<p>Again, easily eliminated by doing what the man says, calling <code>Get</code> for <code>int</code> accessors and <code>FindByName</code> for the ones taking a string argument.</p>
+<h4><a name="5"></a> Update with Zero Compilation Warnings</h4>
+<p>The cleaned-up code is available
+from <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.145.11">release 2019.0.145.11</a>.</p>
+<p>We are now ready to face whatever it takes to migrate to the new major release, if and when that shows up.</p>
+<p><strong>Question:</strong> </p>
+<p><strong>Answer:</strong> </p>
+<p><strong>Response:</strong> </p>
+<pre class="code">
+</pre>
+
+<p><center>
+<img src="img/" alt="" width="100">
+</center></p>
+<pre class="code">
+</pre>
