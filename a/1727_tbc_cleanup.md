@@ -47,7 +47,7 @@ rendering)
   
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Self-teaching AI, CAD trends and deprecated Revit API usage cleanup in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/deprecated2019
 
 Same procedure as every year:
 eliminate all deprecated Revit API usage warnings before even thinking of migrating to the next major release.
