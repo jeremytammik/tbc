@@ -131,7 +131,7 @@ Download the webinar or survey results from the links above in case you are inte
 
 #### <a name="4"></a> Deprecated API Usage Warnings
 
-Back to the nitty-gritty Revit API...
+Back to the nitty-gritty details of the Revit API...
 
 As pointed out above, we expect a new major release sometime in the future, and I highly recommend eliminating all deprecated Revit API usage warnings before even thinking of migrating to the next major release.
 
