@@ -5,22 +5,57 @@
 </head></p>
 <!---
 
-- https://youtu.be/GW9cbFYnKAc
-<iframe width="560" height="315" src="https://www.youtube.com/embed/GW9cbFYnKAc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-TITAN VS ROBO-CAR - The Multi-Billion Dollar Company You’ve Never Heard Of
-Titan travels to Zoox to meet with Chairman Carl Bass and discuss their incredible self-driving car. Not only do they have the artificial intelligence (AI) to autonomously drive the car through the streets of San Francisco, they are manufacturing their own vehicle to compete with the biggest names in ride-sharing. CNC machining, Advanced 3D printing, and 7-Axis robots to name a few of their production capabilities. Check out how their technology works, and why it is the future of driving. 
+- Google's AlphaZero Destroys Stockfish In 100-Game Match
+  https://www.chess.com/news/view/google-s-alphazero-destroys-stockfish-in-100-game-match
+Chess changed forever today. And maybe the rest of the world did, too.
+A little more than a year after AlphaGo sensationally won against the top Go player, the artificial-intelligence program AlphaZero has obliterated the highest-rated chess engine. 
+Oh, and it took AlphaZero only four hours to "learn" chess...
+AlphaZero was not "taught" the game in the traditional sense. That means no opening book, no endgame tables, and apparently no complicated algorithms dissecting minute differences between center pawns and side pawns. 
+One expert said, "After reading the paper but especially seeing the games I thought, well, I always wondered how it would be if a superior species landed on earth and showed us how they play chess. I feel now I know."
+Ex-champion Kasparov said, "We have always assumed that chess required too much empirical knowledge for a machine to play so well from scratch, with no human knowledge added at all... The ability of a machine to replicate and surpass centuries of human knowledge in complex closed systems is a world-changing tool."
 
-- https://youtu.be/EH-z9gE2uGY
-<iframe width="560" height="315" src="https://www.youtube.com/embed/EH-z9gE2uGY" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-The Mystery at the Bottom of Physics
-Actually gets deep enough into physics to wax philosophical on gratitude for life and the reason to be grateful and happy for every moment of my own personal existence.
+- cad trends
+  /a/doc/revit/tbc/git/a/zip/cad_trends_2019.pdf
+  https://www.business-advantage.com/CAD-Trends-Webinars.php
+  [Worldwide CAD Trends 2018/19 Survey Results](http://www.business-advantage.com/CAD-Trends-Webinar-2018.php)
+  [Worldwide CAD Trends 2018/19 Survey Results](https://www.business-advantage.com/CAD-Trends-Results-2018.php)
+  16 Key CAD trends were identified for the survey this year – most of the topics as researched in previous years, 4 topics removed and 6 new requested topics are added
+  newly added to the list are marked with (*)
+1. 3D Modelling
+2. BIM (Building Information Modelling)
+3. Cloud Based CAD
+4. Mobile access to CAD (via laptops/tablets/mobile phones)
+5. *Collaborative Design (team of people working on one design)
+6. PLM (Product Lifecycle Management)
+7. *Rendering (previously, advanced real-time
+rendering)
+8. CAD Licensing Options
+9. PDM (Product Data Management)
+10. Augmented Reality (use of non-geometrical data to augment a CAD model view with direct or indirect physical, real-world environment)
+11. 2D Drafting
+12. CAM
+13. *Virtual Reality (computer-generated experience taking place within a simulated environment)
+14. *Machine Learning (an application of artificial intelligence (AI) that provides the ability for systems to automatically learn and improve from experience without being explicitly programmed)
+15. *Artificial Intelligence (the simulation of intelligent behaviour in computers)
+16. *Generative Design (use of software to generate optimum forms for products and buildings based on design parameters)  
+  Adoption Ratio, AWARENESS AND CURRENT USAGE
+  Changes in Awareness Over Time, Usage over time
+  IMPORTANCE RANKING
+  Looking to the Future PREDICTED FUTURE USAGE
 
 twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Same procedure as every year:
+eliminate all deprecated Revit API usage warnings before even thinking of migrating to the next major release.
+First, however, two other technical news items
+&ndash; Self-teaching AI surpasses human knowledge
+&ndash; CAD trends 2019
+&ndash; Deprecated API usage warnings
+&ndash; Replace <code>GetRules</code> by <code>GetElementFilter</code>
+&ndash; Deprecated material asset accessors
+&ndash; Update with zero compilation warnings...
 
 linkedin:
 
@@ -29,16 +64,56 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Yearly Deprecated Method Cleanup</h3>
+<h3>AI, Trends and Yearly API Usage Cleanup</h3>
 <p>Same procedure as every year:
 eliminate all deprecated Revit API usage warnings before even thinking of migrating to the next major release.</p>
+<p>First, however, two other technical news items:</p>
 <ul>
-<li><a href="#2">Deprecated API Usage Warnings</a> </li>
-<li><a href="#3">Replace GetRules by GetElementFilter</a> </li>
-<li><a href="#4">Deprecated Material Asset Accessors</a> </li>
-<li><a href="#5">Update with Zero Compilation Warnings</a> </li>
+<li><a href="#2">Self-teaching AI surpasses human knowledge</a> </li>
+<li><a href="#3">CAD trends 2019</a> </li>
+<li><a href="#4">Deprecated API usage warnings</a> </li>
+<li><a href="#5">Replace <code>GetRules</code> by <code>GetElementFilter</code></a> </li>
+<li><a href="#6">Deprecated material asset accessors</a> </li>
+<li><a href="#7">Update with zero compilation warnings</a> </li>
 </ul>
-<h4><a name="2"></a> Deprecated API Usage Warnings</h4>
+<p><center>
+<img src="img/alphazero_vs_stockfish_8.png" alt="AlphaZero vs. Stockfish 8" width="363">
+</center></p>
+<h4><a name="2"></a> Self-Teaching AI Surpasses Human Knowledge</h4>
+<p>I followed the progress of <a href="https://en.wikipedia.org/wiki/AlphaGo">AlphaGo</a> with great fascination.</p>
+<p>Now, <a href="https://en.wikipedia.org/wiki/AlphaZero">AlphaZero</a> seems more fascinating still:</p>
+<blockquote>
+<p>AlphaZero is a computer program or algorithm by DeepMind to master go, chess and shogi. On December 5, 2017 the DeepMind team released a preprint introducing AlphaZero, which, within 24 hours, achieved a superhuman level of play in these three games by defeating world-champion programs, Stockfish, elmo, and the 3-day version of AlphaGo Zero, in each case making use of custom tensor processing units (TPUs) that the Google programs were optimized to use.
+AlphaZero was trained solely via "self-play" using 5,000 first-generation TPUs to generate the games and 64 second-generation TPUs to train the neural networks, all in parallel, with no access to opening books or endgame tables.
+After ... 9 hours of training, the algorithm decisively defeated Stockfish 8 in a time-controlled 100-game tournament (28 wins, 0 losses, and 72 draws)...</p>
+</blockquote>
+<p><a href="https://www.chess.com">Chess.com</a> describes the chess implications in the article <a href="https://www.chess.com/news/view/google-s-alphazero-destroys-stockfish-in-100-game-match">Google's AlphaZero Destroys Stockfish In 100-Game Match</a>:</p>
+<blockquote>
+<p>Chess changed forever today. And maybe the rest of the world did, too.</p>
+<p>A little more than a year after AlphaGo sensationally won against the top Go player, the artificial-intelligence program AlphaZero has obliterated the highest-rated chess engine. </p>
+<p>Oh, and it took AlphaZero only four hours to "learn" chess...</p>
+<p>AlphaZero was not "taught" the game in the traditional sense. That means no opening book, no endgame tables, and apparently no complicated algorithms dissecting minute differences between center pawns and side pawns. </p>
+<p>One expert said, "After reading the paper but especially seeing the games I thought, well, I always wondered how it would be if a superior species landed on earth and showed us how they play chess. I feel now I know."</p>
+<p>Ex-champion Kasparov said, "We have always assumed that chess required too much empirical knowledge for a machine to play so well from scratch, with no human knowledge added at all... The ability of a machine to replicate and surpass centuries of human knowledge in complex closed systems is a world-changing tool."</p>
+</blockquote>
+<h4><a name="3"></a> CAD Trends 2019</h4>
+<p>Possibly more relevant to us today, or possibly not,
+the <a href="https://www.business-advantage.com">Business Advantage Group</a> published
+its survey of 2018/2019 CAD trends in the form of both
+a <a href="http://www.business-advantage.com/CAD-Trends-Webinar-2018.php">webinar recording</a>
+and <a href="https://www.business-advantage.com/CAD-Trends-Results-2018.php">survey results</a>.</p>
+<p>16 Key CAD trends were identified for the survey this year; newly added ones italic:</p>
+<ul>
+<li>3D Modelling, BIM, Cloud Based CAD, Mobile access to CAD, <em>Collaborative Design</em>, PLM, <em>Rendering</em>, CAD Licensing Options, PDM, Augmented Reality, 2D Drafting, CAM, <em>Virtual Reality</em>, <em>Machine Learning</em>, <em>Artificial Intelligence</em>, <em>Generative Design</em></li>
+</ul>
+<p>The analysis includes aspects such as:</p>
+<ul>
+<li>Adoption ratio, Awareness, Current usage, Changes in awareness over time, Usage over time, Importance ranking, Looking to the future and Predicted future usage.</li>
+</ul>
+<p>Download the webinar or survey results from the links above in case you are interested in the detailed results.</p>
+<h4><a name="4"></a> Deprecated API Usage Warnings</h4>
+<p>Back to the nitty-gritty Revit API...</p>
+<p>As pointed out above, we expect a new major release sometime in the future, and I highly recommend eliminating all deprecated Revit API usage warnings before even thinking of migrating to the next major release.</p>
 <p>Before I started out eliminating the deprecated Revit API usage warnings,
 compiling <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
 generated <a href="zip/tbc_samples_2019_errors_warnings_2.txt">eight warnings</a>.</p>
@@ -50,11 +125,11 @@ The warning disappeared after I changed that to <code>static bool</code> instead
 <p>That leaves <a href="zip/tbc_samples_2019_errors_warnings_3.txt">seven warnings</a>, all numbered <code>CS0618</code> and caused by deprecated Revit API usage, from two different API calls:</p>
 <ul>
 <li>In CmdCollectorPerformance.cs: <code>ParameterFilterElement.GetRules</code> is obsolete: This method is deprecated in Revit 2019 and will be removed in the next version of Revit. We suggest you use <code>GetElementFilter</code> instead.</li>
-<li>In CmdGetMaterials.cs, repeated six times: <code>AssetProperties.this[string]</code> is obsolete: This property is deprecated in Revit 2019 and will be removed in the next version of Revit. We suggest you use the <code>FindByName(String)</code> or <code>Get(int)</code> method instead.</li>
+<li>In CmdGetMaterials.cs, repeated six times: <code>AssetProperties.this[]</code> is obsolete: This property is deprecated in Revit 2019 and will be removed in the next version of Revit. We suggest you use the <code>FindByName(String)</code> or <code>Get(int)</code> method instead.</li>
 </ul>
-<h4><a name="3"></a> Replace GetRules by GetElementFilter</h4>
 <p>Both of these deprecated API usages can be easily fixed by following the instructions given by the warning messages.</p>
-<p>In the first case, we can replace GetRules by GetElementFilter and simplify the code using it like as follows; before:</p>
+<h4><a name="5"></a> Replace GetRules by GetElementFilter</h4>
+<p>To eliminate the first warning, we can replace <code>GetRules</code> by <code>GetElementFilter</code> and simplify the code using it like as follows; before:</p>
 <pre class="code">
   <span style="color:#2b91af;">ParameterFilterElement</span>&nbsp;pfe ...
 
@@ -73,22 +148,11 @@ The warning disappeared after I changed that to <code>static bool</code> instead
 &nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;elemsByFilter.WherePasses(&nbsp;ef&nbsp;);
 </pre>
 
-<h4><a name="4"></a> Deprecated Material Asset Accessors</h4>
+<h4><a name="6"></a> Deprecated Material Asset Accessors</h4>
 <p>That leaves <a href="zip/tbc_samples_2019_errors_warnings_4.txt">six warnings caused by calls to deprecated material asset accessors</a>.</p>
 <p>Again, easily eliminated by doing what the man says, calling <code>Get</code> for <code>int</code> accessors and <code>FindByName</code> for the ones taking a string argument.</p>
-<h4><a name="5"></a> Update with Zero Compilation Warnings</h4>
+<h4><a name="7"></a> Update with Zero Compilation Warnings</h4>
 <p>The cleaned-up code is available
 from <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
 <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.145.11">release 2019.0.145.11</a>.</p>
 <p>We are now ready to face whatever it takes to migrate to the new major release, if and when that shows up.</p>
-<p><strong>Question:</strong> </p>
-<p><strong>Answer:</strong> </p>
-<p><strong>Response:</strong> </p>
-<pre class="code">
-</pre>
-
-<p><center>
-<img src="img/" alt="" width="100">
-</center></p>
-<pre class="code">
-</pre>
