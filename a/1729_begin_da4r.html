@@ -9,8 +9,11 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash; 
-...
+Several people have recently asked how to get started with Forge Design Automation for Revit or DA4R.
+I will not get into any nitty-gritty details, since they are well covered by the Forge Design Automation API documentation, which includes DA4R tutorials and samples.
+Here are examples of two conversations on planning first steps for DA4R solutions
+&ndash; Structural analysis with DA4R
+&ndash; Implementing a DA4R RVT round trip...
 
 linkedin:
 
@@ -21,11 +24,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 <h3>Before Getting Started with Design Automation</h3>
 <p>Several people have recently asked how to get started
-with <a href="">Forge</a>
-<a href="">Design Automation for Revit or DA4R</a>.</p>
+with <a href="https://forge.autodesk.com">Forge</a>
+<a href="https://thebuildingcoder.typepad.com/blog/2018/11/forge-design-automation-for-revit-at-au-and-in-public.html">Design Automation for Revit or DA4R</a>.</p>
 <p>I will not get into any nitty-gritty details, since they are well covered by
-the <a href="">Forge Design Automation API documentation</a>,
-which includes a <a href="">DA4R tutorial and samples</a>.</p>
+the <a href="https://forge.autodesk.com/api/design-automation-cover-page">Forge Design Automation API documentation</a>.</p>
+<p>The official documentation is for the released version 2, which only supports DWG.
+<a href="https://forge.autodesk.com/en/docs/design-automation/v3/developers_guide/overview">Version 3</a> covers
+RVT as well and
+includes <a href="https://forge.autodesk.com/en/docs/design-automation/v3/tutorials/revit-samples">DA4R tutorials and samples</a>.</p>
 <p>In case you are interested in the approach I took myself to prepare an existing Revit add-in for DA4R, check out
 the <a href="https://github.com/jeremytammik/IfcSpaceZoneBoundaries">IfcSpaceZoneBoundaries add-in</a> and
 the detailed information pointed out there.</p>
@@ -35,7 +41,7 @@ the detailed information pointed out there.</p>
 <li><a href="#3">Implementing a DA4R RVT round trip</a></li>
 </ul>
 <p><center>
-<img src="img/roomedit3dv3_running_2.png" alt="Moving wall in Forge viewer" width="771">
+<img src="img/roomedit3dv3_running_2.png" alt="Moving a wall in the Forge viewer" width="771">
 </center></p>
 <h4><a name="2"></a> Structural Analysis with DA4R</h4>
 <p><strong>Question:</strong> I would like to extract the analytical structural model out of a Revit BIM via the Revit API.</p>
@@ -77,7 +83,7 @@ new <a href="https://github.com/jeremytammik/IfcSpaceZoneBoundaries">IfcSpaceZon
 <ul>
 <li>Initially as an external command, for manual testing,</li>
 <li>Then in the <code>ApplicationInitialised</code> event, for local automated testing, and</li>
-<li>Finally in the <code>DesignAutomationReadyEvent</code>, for real DA4R deployment:</li>
+<li>Finally, in the <code>DesignAutomationReadyEvent</code>, for real DA4R deployment:</li>
 </ul>
 <p>The repository documentation includes links to the blog posts discussing the process in more detail.</p>
 <p>Good luck and have fun!</p>
@@ -98,5 +104,20 @@ new <a href="https://github.com/jeremytammik/IfcSpaceZoneBoundaries">IfcSpaceZon
 
 <p>As I mentioned above, my favourite minimal roundtrip RVT data extraction, cloud storage, and reintegration sample
 is <a href="https://github.com/jeremytammik/FireRatingCloud">FireRatingCloud</a>.</p>
-<h4><a name="4"></a></h4>
-<h4><a name="5"></a></h4>
+<p><strong>Response:</strong> Thanks for the help so far.</p>
+<p>I could fake my way through Revit API.</p>
+<p>My app is almost working, so I'm able to send transforms to DA4R from the Forge viewer.</p>
+<p>However, depending on which elements are being moved, some constraints are being applied and prevent the transforms, cf. this message saying "Can't keep elements joined"...</p>
+<p><center>
+<img src="img/cannot_keep_elements_joined.png" alt="Cannot keep elements joined" width="459">
+</center></p>
+<p>Is there a way to delete the constraints or unjoin the element I am moving in DA4R?</p>
+<p>Later: I found a way to get joined elements and tried to unjoin them.</p>
+<p>To my great despair the error message still shows up ... any suggestions?</p>
+<p><strong>Answer:</strong> The easiest may be to implement a warning swallower like I did for the stairs example:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2018/09/swallowing-stairsautomation-warnings.html">Swallowing StairsAutomation warnings</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2018/09/auto-run-an-add-in-for-design-automation.html">Auto-run an add-in for Design Automation</a></li>
+</ul>
+<p><strong>Response:</strong> This is what I ended up doing.</p>
+<p>My wall editor round-trip with DA4R is working now :-)</p>

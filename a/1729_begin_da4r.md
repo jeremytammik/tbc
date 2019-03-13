@@ -46,11 +46,9 @@ Here are examples of two conversations on planning first steps for DA4R solution
 - [Structural analysis with DA4R](#2) 
 - [Implementing a DA4R RVT round trip](#3)
 
-
 <center>
 <img src="img/roomedit3dv3_running_2.png" alt="Moving a wall in the Forge viewer" width="771">
 </center>
-
 
 #### <a name="2"></a> Structural Analysis with DA4R
 
@@ -82,7 +80,6 @@ The data you extract can be stored locally or in the cloud in any format and/or 
 It can be integrated back into the Revit RVT model again, both on the desktop, using the Revit API, and in the cloud, using the Forge Design Automation for Revit API.
 
 My favourite minimal roundtrip RVT data extraction, cloud storage, and reintegration sample is [FireRatingCloud](https://github.com/jeremytammik/FireRatingCloud).
-
 
 #### <a name="3"></a> Implementing a DA4R RVT Round Trip
 
@@ -152,3 +149,29 @@ I will get back to the basics in more details later :)
 As I mentioned above, my favourite minimal roundtrip RVT data extraction, cloud storage, and reintegration sample
 is [FireRatingCloud](https://github.com/jeremytammik/FireRatingCloud).
 
+**Response:** Thanks for the help so far.
+
+I could fake my way through Revit API.
+
+My app is almost working, so I'm able to send transforms to DA4R from the Forge viewer.
+
+However, depending on which elements are being moved, some constraints are being applied and prevent the transforms, cf. this message saying "Can't keep elements joined"...
+
+<center>
+<img src="img/cannot_keep_elements_joined.png" alt="Cannot keep elements joined" width="459">
+</center>
+
+Is there a way to delete the constraints or unjoin the element I am moving in DA4R?
+
+Later: I found a way to get joined elements and tried to unjoin them.
+
+To my great despair the error message still shows up ... any suggestions?
+
+**Answer:** The easiest may be to implement a warning swallower like I did for the stairs example:
+
+- [Swallowing StairsAutomation warnings](http://thebuildingcoder.typepad.com/blog/2018/09/swallowing-stairsautomation-warnings.html)
+- [Auto-run an add-in for Design Automation](http://thebuildingcoder.typepad.com/blog/2018/09/auto-run-an-add-in-for-design-automation.html)
+
+**Response:** This is what I ended up doing.
+
+My wall editor round-trip with DA4R is working now :-)
