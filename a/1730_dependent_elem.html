@@ -1,0 +1,143 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+twitter:
+
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+&ndash; 
+...
+
+linkedin:
+
+
+of [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.145.4).
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) recently
+
+-->
+
+<h3>Retrieving and Snooping Dependent Elements</h3>
+<p>Håvard Leding of <a href="https://www.symetri.com">Symetri</a> already made some exciting contributions here,
+adding <a href="https://thebuildingcoder.typepad.com/blog/2019/01/new-revitlookup-snoops-edge-face-link.html">RevitLookup commands to snoops edges, faces and links</a>
+and <a href="https://thebuildingcoder.typepad.com/blog/2019/02/stable-reference-relationships.html">exploring stable reference relationships</a>.</p>
+<p>Now he raises another exciting topic on retrieving dependent elements, e.g., the sketch of a floor and the model lines defining the floor boundary in that sketch.</p>
+<p>Some previous related discussions include use of the temporary transaction trick to 
+the <a href="https://adndevblog.typepad.com/aec/2013/10/change-the-boundary-of-floorsslabs.html">change the boundary of floor slabs</a>
+and <a href="https://thebuildingcoder.typepad.com/blog/2008/11/editing-a-floor-profile.html">editing a floor profile</a></p>
+<p>In Håvard's own words:</p>
+<h4><a name="2"></a> The GetDependentElements Method</h4>
+<p>We were talking about getting the boundaries of a floor through the Sketch element.</p>
+<p>The Revit 2019 API provides a new helpful method for this:</p>
+<p>The <code>Element</code> class has a method <code>GetDependentElements</code> taking an <code>ElementFilter</code> argument that returns 'elements which will be deleted along with this element'.</p>
+<p>It is listed
+in <a href="https://thebuildingcoder.typepad.com/blog/2018/04/whats-new-in-the-revit-2019-api.html">What's New in the Revit 2019 API</a>
+under <a href="https://thebuildingcoder.typepad.com/blog/2018/04/whats-new-in-the-revit-2019-api.html#4.2.3">Find Element Dependencies</a>:</p>
+<blockquote>
+<p>The new method <code>Element.GetDependentElements</code> returns a list of ids of elements which are 'children' of this element; that is, those elements which will be deleted along with this element. The method optionally takes an <code>ElementFilter</code> which can be used to reduce the output list to the collection of elements matching specific criteria.</p>
+</blockquote>
+<p>That includes the <code>Sketch</code> element with the profile containing the boundary lines of a floor.</p>
+<p>So, to get the boundary lines of a floor, wall or anything else that you can sketch, you can do this
+(it might also apply to things like Crop Boundaries &ndash; not sure):</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">ElementClassFilter</span>&nbsp;filter&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementClassFilter</span>(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">Sketch</span>&nbsp;)&nbsp;);
+
+&nbsp;&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">ElementId</span>&gt;&nbsp;dependentIds&nbsp;=&nbsp;e.GetDependentElements(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;filter&nbsp;);
+
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">ElementId</span>&nbsp;id&nbsp;<span style="color:blue;">in</span>&nbsp;dependentIds&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;depElem&nbsp;=&nbsp;doc.GetElement(&nbsp;id&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;depElem&nbsp;<span style="color:blue;">is</span>&nbsp;<span style="color:#2b91af;">Sketch</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;depElem&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Sketch</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+</pre>
+
+<p>Then you can get the boundaries in a <code>CurveArrArray</code> from the <code>Sketch.Profile</code>.</p>
+<p>A well as references to each <code>CurveElement</code>; for a floor, those would be model lines.</p>
+<p>Taking separate openings and cuts into account, these boundaries may not be the visible shape of the element, like doors or windows, if the element is a wall.</p>
+<p>This goes a long way.</p>
+<h4><a name="3"></a> Snoop Dependent Elements</h4>
+<p>This could be a new Revit Lookup command :-)</p>
+<p>Passing null as ElementFilter to get all ids.</p>
+<p><center>
+<img src="img/snoop_dependent_elements_1.png" alt="Snoop dependent elements" width="364">
+</center></p>
+<p>Here is the result after picking a floor:</p>
+<p><center>
+<img src="img/snoop_dependent_elements_2.png" alt="Snoop dependent elements" width="802">
+</center></p>
+<p>I realized one thing.</p>
+<p>As you can see, there are two <code>Sketch</code> elements listed.</p>
+<p>That is because the floor has an opening, which in turn has its own sketch.</p>
+<p>So, it will take some elimination to get the sketch for the floor itself, but very doable.</p>
+<h4><a name="4"></a> CmdSnoopModScopeDependents</h4>
+<p>Here is a RevitLookup command implementation set up to process a preselected element:</p>
+<pre class="code">
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;Snoop&nbsp;dependent&nbsp;elements&nbsp;using&nbsp;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;Element.GetDependentElements</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+[<span style="color:#2b91af;">Transaction</span>(&nbsp;<span style="color:#2b91af;">TransactionMode</span>.Manual&nbsp;)]
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">CmdSnoopModScopeDependents</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IExternalCommand</span>
+{
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">Result</span>&nbsp;Execute(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ExternalCommandData</span>&nbsp;cmdData,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">ref</span>&nbsp;<span style="color:blue;">string</span>&nbsp;msg,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementSet</span>&nbsp;elems&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Result</span>&nbsp;result&nbsp;=&nbsp;<span style="color:#2b91af;">Result</span>.Failed;
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">try</span>
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Snoop.CollectorExts.<span style="color:#2b91af;">CollectorExt</span>.m_app&nbsp;=&nbsp;cmdData.Application;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UIDocument</span>&nbsp;uidoc&nbsp;=&nbsp;cmdData.Application.ActiveUIDocument;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">ElementId</span>&gt;&nbsp;idPickfirst&nbsp;=&nbsp;uidoc.Selection.GetElementIds();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;uidoc.Document;
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;elemSet&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Element</span>&gt;(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;idPickfirst.Select&lt;<span style="color:#2b91af;">ElementId</span>,&nbsp;<span style="color:#2b91af;">Element</span>&gt;(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id&nbsp;=&gt;&nbsp;doc.GetElement(&nbsp;id&nbsp;)&nbsp;)&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">ElementId</span>&gt;&nbsp;ids&nbsp;=&nbsp;elemSet.SelectMany(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t&nbsp;=&gt;&nbsp;t.GetDependentElements(&nbsp;<span style="color:blue;">null</span>&nbsp;)&nbsp;).ToList();
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Snoop.Forms.<span style="color:#2b91af;">Objects</span>&nbsp;form&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Snoop.Forms.<span style="color:#2b91af;">Objects</span>(&nbsp;doc,&nbsp;ids&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ActiveDoc</span>.UIApp&nbsp;=&nbsp;cmdData.Application;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;form.ShowDialog();
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;result&nbsp;=&nbsp;<span style="color:#2b91af;">Result</span>.Succeeded;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">catch</span>(&nbsp;System.<span style="color:#2b91af;">Exception</span>&nbsp;e&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;msg&nbsp;=&nbsp;e.Message;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;result;
+&nbsp;&nbsp;}
+}
+</pre>
+
+<p>Implementing the preselection enables a view to be selected in the project browser and snooping that.</p>
+<p>For instance, here is the result of snooping a level:</p>
+<p><center>
+<img src="img/snoop_dependent_level.png" alt="Snoop dependent elements from level" width="634">
+</center></p>
+<p>Ever so many thanks to Håvard for this great suggestion and implementation!</p>
+<h4><a name="5"></a> RevitLookup Update</h4>
+<p>I integrated Håvard's enhancement
+into <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2019.0.0.9">RevitLookup release 2019.0.0.9</a>.</p>
+<p>Here are two screen snapshots from my sample run, selecting this floor with two holes, one of them elliplical:</p>
+<p><center>
+<img src="img/snoop_dependent_floor_1.png" alt="Sample floor element" width="499">
+</center></p>
+<p><code>CmdSnoopModScopeDependents</code> lists the following dependent elements:</p>
+<p><center>
+<img src="img/snoop_dependent_floor_2.png" alt="Snooping floor dependent elements" width="661">
+</center></p>
+<p>I hope you find this useful and wish you lots of fun and success experimenting and enhancing further.</p>
