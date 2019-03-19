@@ -9,8 +9,11 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Håvard Leding of Symetri raises another exciting topic on using the the <code>GetDependentElements</code> method to retrieve and snoop dependent elements, e.g., the sketch of a floor and the model lines defining the floor boundary in that sketch
+&ndash; The <code>GetDependentElements</code> method
+&ndash; Snoop dependent elements
+&ndash; <code>CmdSnoopModScopeDependents</code>
+&ndash; RevitLookup update...
 
 linkedin:
 
@@ -24,11 +27,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>Håvard Leding of <a href="https://www.symetri.com">Symetri</a> already made some exciting contributions here,
 adding <a href="https://thebuildingcoder.typepad.com/blog/2019/01/new-revitlookup-snoops-edge-face-link.html">RevitLookup commands to snoops edges, faces and links</a>
 and <a href="https://thebuildingcoder.typepad.com/blog/2019/02/stable-reference-relationships.html">exploring stable reference relationships</a>.</p>
-<p>Now he raises another exciting topic on retrieving dependent elements, e.g., the sketch of a floor and the model lines defining the floor boundary in that sketch.</p>
+<p>Now he raises another exciting topic on using the the <code>GetDependentElements</code> method to retrieve and snoop dependent elements, e.g., the sketch of a floor and the model lines defining the floor boundary in that sketch.</p>
 <p>Some previous related discussions include use of the temporary transaction trick to 
 the <a href="https://adndevblog.typepad.com/aec/2013/10/change-the-boundary-of-floorsslabs.html">change the boundary of floor slabs</a>
-and <a href="https://thebuildingcoder.typepad.com/blog/2008/11/editing-a-floor-profile.html">editing a floor profile</a></p>
+and <a href="https://thebuildingcoder.typepad.com/blog/2008/11/editing-a-floor-profile.html">editing a floor profile</a>.</p>
 <p>In Håvard's own words:</p>
+<ul>
+<li><a href="#2">The <code>GetDependentElements</code> method</a> </li>
+<li><a href="#3">Snoop dependent elements</a> </li>
+<li><a href="#4"><code>CmdSnoopModScopeDependents</code></a> </li>
+<li><a href="#5">RevitLookup update</a> </li>
+</ul>
 <h4><a name="2"></a> The GetDependentElements Method</h4>
 <p>We were talking about getting the boundaries of a floor through the Sketch element.</p>
 <p>The Revit 2019 API provides a new helpful method for this:</p>
@@ -73,7 +82,7 @@ under <a href="https://thebuildingcoder.typepad.com/blog/2018/04/whats-new-in-th
 <p><center>
 <img src="img/snoop_dependent_elements_2.png" alt="Snoop dependent elements" width="802">
 </center></p>
-<p>I realized one thing.</p>
+<p>I realised one thing.</p>
 <p>As you can see, there are two <code>Sketch</code> elements listed.</p>
 <p>That is because the floor has an opening, which in turn has its own sketch.</p>
 <p>So, it will take some elimination to get the sketch for the floor itself, but very doable.</p>
