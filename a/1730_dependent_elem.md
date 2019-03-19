@@ -10,8 +10,11 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Håvard Leding of Symetri raises another exciting topic on using the the <code>GetDependentElements</code> method to retrieve and snoop dependent elements, e.g., the sketch of a floor and the model lines defining the floor boundary in that sketch
+&ndash; The <code>GetDependentElements</code> method
+&ndash; Snoop dependent elements
+&ndash; <code>CmdSnoopModScopeDependents</code>
+&ndash; RevitLookup update...
 
 linkedin:
 
@@ -27,13 +30,18 @@ Håvard Leding of [Symetri](https://www.symetri.com) already made some exciting 
 adding <a href="https://thebuildingcoder.typepad.com/blog/2019/01/new-revitlookup-snoops-edge-face-link.html">RevitLookup commands to snoops edges, faces and links</a>
 and <a href="https://thebuildingcoder.typepad.com/blog/2019/02/stable-reference-relationships.html">exploring stable reference relationships</a>.
 
-Now he raises another exciting topic on retrieving dependent elements, e.g., the sketch of a floor and the model lines defining the floor boundary in that sketch.
+Now he raises another exciting topic on using the the `GetDependentElements` method to retrieve and snoop dependent elements, e.g., the sketch of a floor and the model lines defining the floor boundary in that sketch.
 
 Some previous related discussions include use of the temporary transaction trick to 
 the [change the boundary of floor slabs](https://adndevblog.typepad.com/aec/2013/10/change-the-boundary-of-floorsslabs.html)
-and [editing a floor profile](https://thebuildingcoder.typepad.com/blog/2008/11/editing-a-floor-profile.html)
+and [editing a floor profile](https://thebuildingcoder.typepad.com/blog/2008/11/editing-a-floor-profile.html).
  
 In Håvard's own words:
+
+- [The `GetDependentElements` method](#2) 
+- [Snoop dependent elements](#3) 
+- [`CmdSnoopModScopeDependents`](#4) 
+- [RevitLookup update](#5) 
 
 #### <a name="2"></a> The GetDependentElements Method
 
@@ -95,7 +103,7 @@ Here is the result after picking a floor:
 <img src="img/snoop_dependent_elements_2.png" alt="Snoop dependent elements" width="802">
 </center>
 
-I realized one thing.
+I realised one thing.
 
 As you can see, there are two `Sketch` elements listed.
 
@@ -168,7 +176,7 @@ Ever so many thanks to Håvard for this great suggestion and implementation!
 I integrated Håvard's enhancement
 into [RevitLookup release 2019.0.0.9](https://github.com/jeremytammik/RevitLookup/releases/tag/2019.0.0.9).
 
-Here are two screen snapshots from my sample run, selecting this floor with two holes, one of them elliplical:
+Here are two screen snapshots from my sample run, selecting this floor with two holes, one of them elliptical:
 
 <center>
 <img src="img/snoop_dependent_floor_1.png" alt="Sample floor element" width="499">
