@@ -83,7 +83,7 @@ a [.NET `Decorator` class](https://docs.microsoft.com/en-us/dotnet/api/system.wi
 
 This problem is apparently fixed in Revit 2019, so the solution is relevant for the preceding versions.
 
-The `Decorator` class may still have other uses as well, of course.
+The `Decorator` class still has other uses as well, of course.
 
 #### <a name="4"></a> Exporting View Image Extents
 
@@ -137,7 +137,7 @@ Thank you very much for helping me again.
 
 I'm afraid I cannot find the method "OrientationMatchesSurfaceOrientation" maybe because my API is from Revit 2017.
 
-I test the code without the method and found that the normal calculated in this method:
+I tested the code without the method and found that the normal calculated in this method always returns the same direction as the face.project method does:
 
 <pre class="code">
   var tri = mesh.get_Triangle(I);
@@ -149,15 +149,8 @@ I test the code without the method and found that the normal calculated in this 
   XYZ normal = vec1.CrossProduct(vec2);
 </pre>
 
-can always return the same direction as the face.project method does. is that sufficient to say the Revit software have taken the direction of the vertices of the mesh into consideration?
+Is that sufficient to say the Revit software have taken the direction of the vertices of the mesh into consideration?
 
 Thank you again.
 
-<pre class="code">
-</pre>
 
-<center>
-<img src="img/.png" alt="" width="100">
-</center>
-
-I hope you find this useful and wish you lots of fun and success experimenting and enhancing further.
