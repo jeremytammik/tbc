@@ -30,6 +30,13 @@ Today, let's look at the Forge architecture, Revit add-in debug, edit and contin
 
 linkedin:
 
+High-level picture of Forge architecture, RevitLookup snooping appearance assets, debug and continue in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/snoopasset
+
+Today, let's look at the Forge architecture, Revit add-in debug, edit and continue, and yet another RevitLookup enhancement:
+
+- High-level picture of Forge
+- Debug and continue in a Revit add-in
+- Snooping appearance assets...
 
 of [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.145.4).
 
