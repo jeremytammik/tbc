@@ -21,8 +21,10 @@
 
 twitter:
 
-&ndash; 
-...
+Today, let's look at the Forge architecture, Revit add-in debug, edit and continue, and yet another RevitLookup enhancement
+&ndash; High-level picture of Forge
+&ndash; Debug and continue in a Revit add-in
+&ndash; Snooping appearance assets...
 
 linkedin:
 
@@ -31,23 +33,31 @@ of [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 
 -->
 
-### Snooping Appearance Assets
+###  Forge Picture, Debugging, Snooping Appearances
 
+Today, let's look at the Forge architecture, Revit add-in debug, edit and continue, and yet another RevitLookup enhancement:
+
+- [High-level picture of Forge](#2) 
+- [Debug and continue in a Revit add-in](#3) 
+- [Snooping appearance assets](#4) 
 
 #### <a name="2"></a> High-Level Picture of Forge
 
-Would you like to quickly understand the Forge architecture, including all relevant aspects, without getting inundated in nitty-gritty details?
+Would you like to quickly understand
+the [Forge](https://forge.autodesk.com) architecture,
+including all relevant aspects, without getting mired in its nitty-gritty details?
 
-Check out Scott Sheppard's very cool high-level executive overview in
+Check out Scott Sheppard's very cool executive overview in
 the [Forge high-level picture for software development managers](https://labs.blogs.com/its_alive_in_the_lab/2019/03/whats-so-hot-about-this-forge-thing-the-high-level-picture-for-software-development-managers.html).
 
 <center>
 <img src="img/forge_high_level_picture.jpg" alt="Forge high-level picture" width="400">
 </center>
 
+
 #### <a name="3"></a> Debug and Continue in a Revit Add-In
 
-Developers are continuously seeking reliable efficient development approaches.
+Developers are continuously seeking reliable, efficient development approaches.
 Some ways have been described in the past implementing the functionality
 to [edit and continue, and debug without restarting](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.49).
 
@@ -58,7 +68,7 @@ Konrad Sobon jumped in and pointed out his solution:
 
 > I did a write-up on my blog that explains how you can use the Revit Add-In Manager to achieve the result you are after:
 
-> [debugging revit add-ins](http://archi-lab.net/debugging-revit-add-ins)
+>    - [debugging revit add-ins](http://archi-lab.net/debugging-revit-add-ins)
 
 > The difference between this and a standard method of debugging is that Revit loads the DLL using the `LoadFrom` method, locking it up for as long as the Revit.exe process is running, while the Add-In Manager uses the `Load` method that only reads the `byte[]` stream of the DLL which means it remains available, and you can re-build your solution in VS, and reload in Revit without closing it. It does have drawbacks, obviously, so please read the post.
 
@@ -71,13 +81,13 @@ enabling snooping of appearance assets, based on two pull requests
 by [Victor Chekalin](http://www.facebook.com/profile.php?id=100003616852588), aka Виктор Чекалин:
 
 - [#48 &ndash; snoop rendering `AssetProperty`](https://github.com/jeremytammik/RevitLookup/pull/48)
-- [#49 ^ndash; pushed the missed files](https://github.com/jeremytammik/RevitLookup/pull/49)
+- [#49 &ndash; pushed the missed files](https://github.com/jeremytammik/RevitLookup/pull/49)
 
 The description is sweet and simple:
 
 - Snoop rendering `AssetProperty` &ndash; `Material` &rarr; `AppearanceAssetId` &rarr; `GetRenderingAssset`
 
-This is supported by something saying more than a thousand words:
+This is supported by more than a thousand words:
 
 <center>
 <img src="img/revitlookup_snoop_appearance_asset_1.png" alt="Snooping appearance assets" width="401">
@@ -90,7 +100,7 @@ This is supported by something saying more than a thousand words:
 <br/>
 </center>
 
+I integrated Victor's pull requests
+in [RevitLookup release 2019.0.0.10](https://github.com/jeremytammik/RevitLookup/releases/tag/2019.0.0.10).
+
 Many thanks to Victor for this useful enhancement!
-
-
-
