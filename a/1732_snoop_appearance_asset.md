@@ -82,6 +82,7 @@ by [Victor Chekalin](http://www.facebook.com/profile.php?id=100003616852588), ak
 
 - [#48 &ndash; snoop rendering `AssetProperty`](https://github.com/jeremytammik/RevitLookup/pull/48)
 - [#49 &ndash; pushed the missed files](https://github.com/jeremytammik/RevitLookup/pull/49)
+- [#50 &ndash; handle `AssetPropertyDoubleArray4d`](https://github.com/jeremytammik/RevitLookup/pull/50)
 
 The description is sweet and simple:
 
@@ -98,9 +99,11 @@ This is supported by more than a thousand words:
 <br/>
 <img src="img/revitlookup_snoop_appearance_asset_4.png" alt="Snooping appearance assets" width="401">
 <br/>
+<img src="img/revitlookup_snoop_appearance_asset_5.png" alt="Snooping appearance assets" width="401">
+<br/>
 </center>
 
 I integrated Victor's pull requests
-in [RevitLookup release 2019.0.0.10](https://github.com/jeremytammik/RevitLookup/releases/tag/2019.0.0.10).
+in [RevitLookup release 2019.0.0.11](https://github.com/jeremytammik/RevitLookup/releases/tag/2019.0.0.11).
 
 Many thanks to Victor for this useful enhancement!
