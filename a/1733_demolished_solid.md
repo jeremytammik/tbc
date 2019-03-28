@@ -13,7 +13,7 @@ twitter:
 
 We have looked at numerous different approaches to determine wall openings in the past, so it seems pretty hard to nail down, and pretty important to solve.
 Now Håvard Leding of Symetri contributed yet another exciting idea which highlights a number of surprising aspects,
-demonstrates a further creative use case for <code>GetDependentElements<code> and expands on his 
+demonstrates a further creative use case for <code>GetDependentElements</code> and expands on his 
 recent RevitLookup enhancement to retrieve and snoop dependent elements
 &ndash; Get demolished solid
 &ndash; Why?
