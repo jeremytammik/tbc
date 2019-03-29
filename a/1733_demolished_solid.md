@@ -9,7 +9,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Determine exact wall opening dimensions by demolishing in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/demolishopening
 
 We have looked at numerous different approaches to determine wall openings in the past, so it seems pretty hard to nail down, and pretty important to solve.
 Now Håvard Leding of Symetri contributed yet another exciting idea which highlights a number of surprising aspects,
@@ -20,6 +20,18 @@ recent RevitLookup enhancement to retrieve and snoop dependent elements
 &ndash; Questions...
 
 linkedin:
+
+Determine exact wall opening dimensions by demolishing in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/demolishopening
+
+We have looked at numerous different approaches to determine wall openings in the past, so it seems pretty hard to nail down, and pretty important to solve.
+
+Now Håvard Leding of Symetri contributed yet another exciting idea which highlights a number of surprising aspects,
+demonstrates a further creative use case for <code>GetDependentElements</code> and expands on his 
+recent RevitLookup enhancement to retrieve and snoop dependent elements:
+
+- Get demolished solid
+- Why?
+- Questions...
 
 
 of [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.145.4).

@@ -7,12 +7,29 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Determine exact wall opening dimensions by demolishing in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/demolishopening
 
-&ndash;
-...
+We have looked at numerous different approaches to determine wall openings in the past, so it seems pretty hard to nail down, and pretty important to solve.
+Now Håvard Leding of Symetri contributed yet another exciting idea which highlights a number of surprising aspects,
+demonstrates a further creative use case for <code>GetDependentElements</code> and expands on his 
+recent RevitLookup enhancement to retrieve and snoop dependent elements
+&ndash; Get demolished solid
+&ndash; Why?
+&ndash; Questions...
 
 linkedin:
+
+Determine exact wall opening dimensions by demolishing in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/demolishopening
+
+We have looked at numerous different approaches to determine wall openings in the past, so it seems pretty hard to nail down, and pretty important to solve.
+
+Now Håvard Leding of Symetri contributed yet another exciting idea which highlights a number of surprising aspects,
+demonstrates a further creative use case for <code>GetDependentElements</code> and expands on his 
+recent RevitLookup enhancement to retrieve and snoop dependent elements:
+
+- Get demolished solid
+- Why?
+- Questions...
 
 
 of [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.145.4).
@@ -32,7 +49,7 @@ of [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/01/family-category-and-two-energy-model-types.html#3">Two energy model types</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2017/06/copy-local-false-and-ifc-utils-for-wall-openings.html#2">IFC helper returns outer <code>CurveLoop</code> of door or window</a></li>
 </ul>
-<p>So it seems pretty hard to nail down, and pretty important to solve.</p>
+<p>So, it seems pretty hard to nail down, and pretty important to solve.</p>
 <p>Now Håvard Leding of <a href="https://www.symetri.com">Symetri</a> contributed
 yet another exciting idea which highlights a number of surprising aspects,
 demonstrates a further creative use case for <code>GetDependentElements</code> and expands on his 
@@ -126,17 +143,17 @@ And sometimes, it's just an opening family. (No solids)</p>
 <p>Still, you need to analyse something, and preferably solids.
 But sometimes, solids don't represent the true opening, like in this case, where you have a gap:</p>
 <p><center>
-<img src="img/window_opening_with_gap.jpg" alt="" width="302">
+<img src="img/window_opening_with_gap.jpg" alt="Window opening with gap" width="302">
 </center></p>
 <p>It's just safer and a lot easier to use the final 'opening solid' from a demolished state.</p>
 <p>If you want to try it out yourself, the method is easy enough to use; 
-it just requires a door or window ro run &nbsp; :-)</p>
+it just requires a door or window to run &nbsp; :-)</p>
 <h4><a name="4"></a> Questions?</h4>
 <p><strong>Question:</strong> Reading the code in more detail, though, I don't really understand...</p>
 <p>The family instance <code>fi</code> is a window, for example, yes?</p>
 <p>From the window, you call <code>GetDependentElements</code>, which returns "all elements that, from a logical point of view, are the children of this Element".</p>
 <p>From those, you extract the wall.</p>
-<p>Hmm. So the wall is dependent on the window? That seems weird.</p>
+<p>Hmm. So, the wall is dependent on the window? That seems weird.</p>
 <p>OK, let's accept that the wall is returned.</p>
 <p>Now, from the wall, you retrieve the first geometry element.</p>
 <p>That is now saved as the solid opening.</p>
@@ -151,7 +168,7 @@ There is no longer a hole in the wall.</p>
 <p>Very easy to get dimensions from the bounding box, once transformed into the family editor coordinate system.
 Because there, the host wall direction is always aligned with the coordinate system cardinal axes.
 I guess opening dimensions could be extracted without the transform, but I wouldn't know how to do that.</p>
-<p>You could also analyze the shape of the opening by looking at the vertical front face of the solid.</p>
+<p>You could also analyse the shape of the opening by looking at the vertical front face of the solid.</p>
 <p>You would have to do so to handle cases where the window is not rectangular, e.g., circular or something else.</p>
 <p><strong>Response:</strong> Wow. I am impressed. And surprised.</p>
 <p>Many thanks to Håvard for this innovative solution and interesting explanation!</p>
