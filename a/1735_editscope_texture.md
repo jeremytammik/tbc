@@ -11,22 +11,32 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Lukáš Kohout brought up an interesting and important issue on changing material texture path with <code>EditScope</code>
+&ndash; How to set the material texture path?
+&ndash; Suggestions
+&ndash; Solution and sample material
+&ndash; <code>ChangeRenderingTexturePath</code> method
+&ndash; Step by step guide
+&ndash; Test run...
 
 linkedin:
 
 -->
 
-### Changing material texture path with EditScope
+### Set Material Texture Path in EditScope
 
 Lukáš [kohoulu3](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/767846) Kohout
 brought up an interesting and important issue in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [changing material texture path with EditScope](https://forums.autodesk.com/t5/revit-api-forum/changing-material-texture-path-with-editscope/m-p/8017578) that
+on [changing material texture path with `EditScope`](https://forums.autodesk.com/t5/revit-api-forum/changing-material-texture-path-with-editscope/m-p/8017578) that
 I wanted to highlight last year. Here it is, finally:
 
-
+- [How to set the material texture path?](#2) 
+- [Suggestions](#3) 
+- [Solution and sample material](#4) 
+- [`ChangeRenderingTexturePath` method](#5) 
+- [Step by step guide](#6) 
+- [Test run](#7) 
  
 #### <a name="2"></a> How to Set the Material Texture Path?
 
@@ -89,7 +99,7 @@ I am using the latest Revit 2018 API with the asset editing functionality includ
 
 I am able to duplicate and edit `AppearanceAsset`.
 
-I have searched The Building Coder and read both the releant posts:
+I have searched The Building Coder and read both the relevant posts:
 
 - [Modifying Material Visual Appearance](http://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html)
 - [Material Texture Path](http://thebuildingcoder.typepad.com/blog/2017/10/material-texture-path.html)
@@ -105,7 +115,7 @@ Exception message:
   Additional information: The asset property is not editable. Asset can be edited only in an edit scope.
 </pre>
 
-Problem is that the returned asset from `AppearanceAssetEditScope.Start` does not contain the desired `UnifiedBitmapSchema` property. That property is containd only in the `RenderingAsset`.
+Problem is that the returned asset from `AppearanceAssetEditScope.Start` does not contain the desired `UnifiedBitmapSchema` property. That property is contained only in the `RenderingAsset`.
 
 
 #### <a name="3"></a> Suggestions
@@ -119,7 +129,7 @@ I'd recommend starting from the code snippet which shows how to do this, availab
 
 #### <a name="4"></a> Solution and Sample Material
 
-Thanks Jeremy. Finally I got it to work. It was quite simple, actually, in the end.
+Thanks Jeremy. Finally, I got it to work. It was quite simple, actually, in the end.
 
 There is just one small change from the code snippet I posted at first.
 
@@ -198,7 +208,7 @@ Here is the final code:
 &nbsp;&nbsp;}
 </pre>
 
-#### <a name="5"></a> Step by Step Guide
+#### <a name="6"></a> Step by Step Guide
 
 Here are the steps to reproduce the solution:
 
@@ -229,44 +239,44 @@ Guide to reproduce the solution:
 8. Navigate to the Add-Ins ribbon tab and click the Change texture path button.
 9. Go to Manage/Materials again and note that the texture path changed.
 
-#### <a name="5"></a> Test Run
+#### <a name="7"></a> Test Run
 
 Here are screen snapshots illustrating some of the steps from my test run:
 
 Store the sample texture file on desktop:
 
 <center>
-<img src="img/material_texture_path_texture.png" alt="Sample texture file on desktop" width="190">
+<img src="img/material_texture_path_texture.png" alt="Sample texture file on desktop" width="88">
 </center>
 
 Open the sample model and observe the instructions:
 
 <center>
-<img src="img/material_texture_path_instruction.png" alt="Instructions" width="190">
+<img src="img/material_texture_path_instruction.png" alt="Instructions" width="475">
 </center>
 
 The sample model contains one single sample material:
 
 <center>
-<img src="img/material_texture_path_sample.png" alt="Sample material" width="190">
+<img src="img/material_texture_path_sample.png" alt="Sample material" width="500">
 </center>
 
 Click the sample command in its custom ribbon panel:
 
 <center>
-<img src="img/material_texture_path_cmd.png" alt="Ribbon panel and command" width="190">
+<img src="img/material_texture_path_cmd.png" alt="Ribbon panel and command" width="245">
 </center>
 
 The add-in displays a message on completion:
 
 <center>
-<img src="img/material_texture_path_msg.png" alt="Result message" width="190">
+<img src="img/material_texture_path_msg.png" alt="Result message" width="372">
 </center>
 
 The sample material texture is updated:
 
 <center>
-<img src="img/material_texture_path_sample_updated.png" alt="Updated sample material" width="190">
+<img src="img/material_texture_path_sample_updated.png" alt="Updated sample material" width="500">
 </center>
 
 Many thanks to Lukáš for his research, putting together and documenting this sample so well!

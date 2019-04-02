@@ -9,19 +9,32 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Lukáš Kohout brought up an interesting and important issue on changing material texture path with <code>EditScope</code>
+&ndash; How to set the material texture path?
+&ndash; Suggestions
+&ndash; Solution and sample material
+&ndash; <code>ChangeRenderingTexturePath</code> method
+&ndash; Step by step guide
+&ndash; Test run...
 
 linkedin:
 
 -->
 
-<h3>Changing material texture path with EditScope</h3>
+<h3>Set Material Texture Path in EditScope</h3>
 <p>Lukáš <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/767846">kohoulu3</a> Kohout
 brought up an interesting and important issue in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/changing-material-texture-path-with-editscope/m-p/8017578">changing material texture path with EditScope</a> that
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/changing-material-texture-path-with-editscope/m-p/8017578">changing material texture path with <code>EditScope</code></a> that
 I wanted to highlight last year. Here it is, finally:</p>
+<ul>
+<li><a href="#2">How to set the material texture path?</a> </li>
+<li><a href="#3">Suggestions</a> </li>
+<li><a href="#4">Solution and sample material</a> </li>
+<li><a href="#5"><code>ChangeRenderingTexturePath</code> method</a> </li>
+<li><a href="#6">Step by step guide</a> </li>
+<li><a href="#7">Test run</a> </li>
+</ul>
 <h4><a name="2"></a> How to Set the Material Texture Path?</h4>
 <p>I am trying to set material texture path using following code (Revit 2018):</p>
 <pre class="code">
@@ -76,7 +89,7 @@ I wanted to highlight last year. Here it is, finally:</p>
 <p>Finally, we can create materials with API, but without textures? Does not make sense.</p>
 <p>I am using the latest Revit 2018 API with the asset editing functionality included.</p>
 <p>I am able to duplicate and edit <code>AppearanceAsset</code>.</p>
-<p>I have searched The Building Coder and read both the releant posts:</p>
+<p>I have searched The Building Coder and read both the relevant posts:</p>
 <ul>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html">Modifying Material Visual Appearance</a></li>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/10/material-texture-path.html">Material Texture Path</a></li>
@@ -89,13 +102,13 @@ I wanted to highlight last year. Here it is, finally:</p>
   Additional information: The asset property is not editable. Asset can be edited only in an edit scope.
 </pre>
 
-<p>Problem is that the returned asset from <code>AppearanceAssetEditScope.Start</code> does not contain the desired <code>UnifiedBitmapSchema</code> property. That property is containd only in the <code>RenderingAsset</code>.</p>
+<p>Problem is that the returned asset from <code>AppearanceAssetEditScope.Start</code> does not contain the desired <code>UnifiedBitmapSchema</code> property. That property is contained only in the <code>RenderingAsset</code>.</p>
 <h4><a name="3"></a> Suggestions</h4>
 <p>The only editable asset inside the edit scope is the one returned from <code>AppearanceAssetEditScope.Start</code>, and those connected assets which it directly returns.</p>
 <p>I think if you reverse your code and get the <code>UnifiedBitmapSchema</code> from the returned asset from <code>Start</code>, you will be able to change it.</p>
 <p>I'd recommend starting from the code snippet which shows how to do this, available from the <a href="Http://www.revitapidocs.com/2018.1/3a190829-9269-0e56-8b9b-a53b89de35a6.htm">help documentation on <code>GetSingleConnectedAsset</code></a>.</p>
 <h4><a name="4"></a> Solution and Sample Material</h4>
-<p>Thanks Jeremy. Finally I got it to work. It was quite simple, actually, in the end.</p>
+<p>Thanks Jeremy. Finally, I got it to work. It was quite simple, actually, in the end.</p>
 <p>There is just one small change from the code snippet I posted at first.</p>
 <p>Here is the (MaterialTexturePath.zip archive)[zip/lk_MaterialTexturePath.zip] containing
 the entire sample Visual Studio solution with detailed guide as well as a sample project and texture to demonstrate.</p>
@@ -167,7 +180,7 @@ the entire sample Visual Studio solution with detailed guide as well as a sample
 &nbsp;&nbsp;}
 </pre>
 
-<h4><a name="5"></a> Step by Step Guide</h4>
+<h4><a name="6"></a> Step by Step Guide</h4>
 <p>Here are the steps to reproduce the solution:</p>
 <p>Goal:</p>
 <ul>
@@ -194,30 +207,30 @@ the entire sample Visual Studio solution with detailed guide as well as a sample
 <li>Navigate to the Add-Ins ribbon tab and click the Change texture path button.</li>
 <li>Go to Manage/Materials again and note that the texture path changed.</li>
 </ol>
-<h4><a name="5"></a> Test Run</h4>
+<h4><a name="7"></a> Test Run</h4>
 <p>Here are screen snapshots illustrating some of the steps from my test run:</p>
 <p>Store the sample texture file on desktop:</p>
 <p><center>
-<img src="img/material_texture_path_texture.png" alt="Sample texture file on desktop" width="190">
+<img src="img/material_texture_path_texture.png" alt="Sample texture file on desktop" width="88">
 </center></p>
 <p>Open the sample model and observe the instructions:</p>
 <p><center>
-<img src="img/material_texture_path_instruction.png" alt="Instructions" width="190">
+<img src="img/material_texture_path_instruction.png" alt="Instructions" width="475">
 </center></p>
 <p>The sample model contains one single sample material:</p>
 <p><center>
-<img src="img/material_texture_path_sample.png" alt="Sample material" width="190">
+<img src="img/material_texture_path_sample.png" alt="Sample material" width="500">
 </center></p>
 <p>Click the sample command in its custom ribbon panel:</p>
 <p><center>
-<img src="img/material_texture_path_cmd.png" alt="Ribbon panel and command" width="190">
+<img src="img/material_texture_path_cmd.png" alt="Ribbon panel and command" width="245">
 </center></p>
 <p>The add-in displays a message on completion:</p>
 <p><center>
-<img src="img/material_texture_path_msg.png" alt="Result message" width="190">
+<img src="img/material_texture_path_msg.png" alt="Result message" width="372">
 </center></p>
 <p>The sample material texture is updated:</p>
 <p><center>
-<img src="img/material_texture_path_sample_updated.png" alt="Updated sample material" width="190">
+<img src="img/material_texture_path_sample_updated.png" alt="Updated sample material" width="500">
 </center></p>
 <p>Many thanks to Lukáš for his research, putting together and documenting this sample so well!</p>
