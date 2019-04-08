@@ -30,8 +30,12 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash; 
-...
+Today I discuss (once again) an important performance aspect of Revit element filtering, a Python script for tagging JPEG images with EXIF data, prompted by a recent ski tour, and three other interesting topics that caught my eye
+&ndash; Slow, slower still and faster filtering
+&ndash; Python JPEG EXIT filename tagging
+&ndash; TED talks and population growth
+&ndash; Objective reality does not exist
+&ndash; Artificial intelligence judge...
 
 linkedin:
 
@@ -41,11 +45,11 @@ linkedin:
 
 Today I discuss (once again) an important performance aspect of Revit element filtering, a Python script for tagging JPEG images with EXIF data, prompted by a recent ski tour, and three other interesting topics that caught my eye:
 
-- [Slow, Slower Still and Faster Filtering](#2) 
-- [Python JPEG EXIT Filename Tagging](#3) 
-- [TED Talks and Population Growth](#4) 
-- [Objective Reality Does Not Exist](#5) 
-- [Artificial Intelligence Judge](#6) 
+- [Slow, slower still and faster filtering](#2) 
+- [Python JPEG EXIT filename tagging](#3) 
+- [TED talks and population growth](#4) 
+- [Objective reality does not exist](#5) 
+- [Artificial intelligence judge](#6) 
 
 #### <a name="2"></a> Slow, Slower Still and Faster Filtering
 
