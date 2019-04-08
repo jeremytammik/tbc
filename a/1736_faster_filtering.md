@@ -28,7 +28,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Slow, slower still and faster filtering in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/fasterfilter
 
 Today I discuss (once again) an important performance aspect of Revit element filtering, a Python script for tagging JPEG images with EXIF data, prompted by a recent ski tour, and three other interesting topics that caught my eye
 &ndash; Slow, slower still and faster filtering
@@ -38,6 +38,16 @@ Today I discuss (once again) an important performance aspect of Revit element fi
 &ndash; Artificial intelligence judge...
 
 linkedin:
+
+Slow, slower still and faster filtering in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/fasterfilter
+
+Today I discuss (once again) an important performance aspect of Revit element filtering, a Python script for tagging JPEG images with EXIF data, prompted by a recent ski tour, and three other interesting topics that caught my eye:
+
+- Slow, slower still and faster filtering
+- Python JPEG EXIT filename tagging
+- TED talks and population growth
+- Objective reality does not exist
+- Artificial intelligence judge...
 
 -->
 
