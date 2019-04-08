@@ -9,7 +9,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Setting the material texture path in EditScope in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/texturepath
 
 Lukáš Kohout brought up an interesting and important issue on changing material texture path with <code>EditScope</code>
 &ndash; How to set the material texture path?
@@ -20,6 +20,17 @@ Lukáš Kohout brought up an interesting and important issue on changing materia
 &ndash; Test run...
 
 linkedin:
+
+Setting the material texture path in EditScope in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/texturepath
+
+Lukáš Kohout brought up an interesting and important issue on changing material texture path with EditScope:
+
+- How to set the material texture path?
+- Suggestions
+- Solution and sample material
+- <code>ChangeRenderingTexturePath</code> method
+- Step by step guide
+- Test run...
 
 -->
 
