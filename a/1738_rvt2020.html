@@ -9,24 +9,30 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Revit 2020 has been released, and we go through the same procedure as every year, looking at the DevDays online presentations highlighting the API news, getting the system requirements set up, installing, compiling the Revit SDK samples and setting up RvtSamples to load them
+&ndash; Revit 2020 first customer shipment
+&ndash; Revit 2020 DevDays Online
+&ndash; Setting up Windows 10
+&ndash; Installing Revit 2020 and the new SDK
+&ndash; Visual Studio and .NET 4.7
+&ndash; Compiling the Revit 2020 SDK samples
+&ndash; Setting up RvtSamples...
 
 linkedin:
 
 
 -->
 
-<h3>Set Floor Level and Use IPC for Disentanglement</h3>
+<h3>The Revit 2020 FCS, API and SDK</h3>
 <p>Revit 2020 has been released, and we go through the same procedure as every year, looking at the DevDays online presentation highlighting the API news, getting the system requirements set up, installing, compiling the Revit SDK samples and setting up RvtSamples to load them:</p>
 <ul>
-<li><a href="#2">Revit 2020 First Customer Shipment</a> </li>
-<li><a href="#3">Revit 2020 DevDays Online Presentation</a> </li>
-<li><a href="#4">Setting Up Windows 10</a> </li>
-<li><a href="#5">Installing Revit 2020 and the New SDK</a> </li>
-<li><a href="#6">Development Requirements &ndash; Visual Studio and .NET 4.7</a> </li>
-<li><a href="#7">Compiling the Revit 2020 SDK Samples</a> </li>
-<li><a href="#8">Setting up the RvtSamples Application</a> </li>
+<li><a href="#2">Revit 2020 first customer shipment</a> </li>
+<li><a href="#3">Revit 2020 DevDays Online</a> </li>
+<li><a href="#4">Setting up Windows 10</a> </li>
+<li><a href="#5">Installing Revit 2020 and the new SDK</a> </li>
+<li><a href="#6">Visual Studio and .NET 4.7</a> </li>
+<li><a href="#7">Compiling the Revit 2020 SDK samples</a> </li>
+<li><a href="#8">Setting up RvtSamples</a> </li>
 </ul>
 <p><center>
 <img src="img/rvtsamples2020.png" alt="RvtSamples loaded all Revit 2020 external commands" width="600">
@@ -35,7 +41,7 @@ linkedin:
 <p>Look at the overview by Harlan Brumm
 on <a href="https://blogs.autodesk.com/revit/2019/04/10/youve-got-to-see-whats-new-in-revit-2020">What's New in Revit 2020</a> from
 an end user point of view.</p>
-<h4><a name="3"></a> Revit 2020 DevDays Online Presentation</h4>
+<h4><a name="3"></a> Revit 2020 DevDays Online</h4>
 <p>Turning toward the programming side of things, we held a series of DevDays online presentations presenting previews of new Forge features and desktop API updates in February and March, including one of special interest for us here, covering <em>What's New in the Revit 2020 API</em>. Here are the recordings:</p>
 <p>Forge sessions:</p>
 <ul>
@@ -53,10 +59,10 @@ an end user point of view.</p>
 <p>Oops, I just noticed that the three links above all point to the same place on the restricted ADN web site.</p>
 <p>Here are two publicly accessible Dropbox pointers for non-members to the Revit related topics:</p>
 <ul>
+<li>2019-01-28 &ndash; <a href="https://www.dropbox.com/s/aqqp5mc45ktdt73/Meet_the_Expert_Revit_2020.zip?dl=0">Meet the Expert: Revit 2020</a></li>
 <li>2019-03-07 &ndash; <a href="https://www.dropbox.com/s/5i5txlwzuff64v8/DevDays%202019-Revit-Civil3D-Inforworks.zip?dl=0">DevDays Online 2019: Autodesk Revit API, Civil 3D and InfraWorks updates</a></li>
-<li>2019-03-12 &ndash; <a href="https://www.dropbox.com/s/aqqp5mc45ktdt73/Meet_the_Expert_Revit_2020.zip?dl=0">Meet the Expert: Revit 2020</a></li>
 </ul>
-<h4><a name="4"></a> Setting Up Windows 10</h4>
+<h4><a name="4"></a> Setting up Windows 10</h4>
 <p>With that public stuff out of the way, I now turn to my personal experiences preparing for and setting up Revit 2020 and its SDK.</p>
 <p>I initially tried to install Revit 2020 on the same virtual Windows machine that I used for the past few versions.</p>
 <p>The initial download step produced an executable <em>Revit_2020_G1_Win_64bit_wi_en-US_Setup_webinstall.exe</em>.</p>
@@ -128,28 +134,28 @@ I ran <code>DisableMismatchWarning.exe</code> in the SDK Samples installation fo
 <p><a href="zip/revit_2020_sdk_samples_errors_warnings_6.txt">0 errors,
 21 warnings,
 190 projects succeeded, 0 failed, 0 skipped, cf. <code>revit_2020_sdk_samples_errors_warnings_6.txt</code></a>.</p>
-<p>Later, I found a much simpler solution to the <em>Missing XML comment</em> warning in Custom2DExporter, PathOfTravel, RebarFreeForm and SampleCommandsSteelElements projects: simply uncheck the box in the build setting requestion the generation of an <em>XML documentation file</em>. After that, the <em>Treat warnings as errors</em> setting can be safely turned back on again. That reduce the number further to </p>
+<p>Later, I found a much simpler solution to the <em>Missing XML comment</em> warning in Custom2DExporter, PathOfTravel, RebarFreeForm and SampleCommandsSteelElements projects: simply uncheck the box in the build setting requesting the generation of an <em>XML documentation file</em>. After that, the <em>Treat warnings as errors</em> setting can be safely turned back on again. That reduce the number further to </p>
 <p><a href="zip/revit_2020_sdk_samples_errors_warnings_7.txt">0 errors,
 5 warnings,
 190 projects succeeded, 0 failed, 0 skipped, cf. <code>revit_2020_sdk_samples_errors_warnings_7.txt</code></a>.</p>
 <p>These remaining warnings are due to some weird settings in the project files that I will ignore for now.</p>
-<h4><a name="8"></a> Setting up the RvtSamples Application</h4>
+<h4><a name="8"></a> Setting up RvtSamples</h4>
 <p>Next, I set up RvtSamples to load most of the SDK external commands.</p>
 <p>RvtSamples is an external application that creates a menu and populates it with entries for all the external commands defined by the Revit SDK, making them accessible with one single click and saving me the effort of installing each and every sample command individually with its own add-in manifest.</p>
-<p>In order to do so, RvtSamples reads an input text file, RvtSamples.txt, that defines the location of all the external command assebly DLLs and the names of the .NET classes they contain implementing the external commands.</p>
+<p>In order to do so, RvtSamples reads an input text file, RvtSamples.txt, that defines the location of all the external command assembly DLLs and the names of the .NET classes they contain implementing the external commands.</p>
 <p>First of all, I edit that input text file.</p>
 <p>It is initially set to the default installation location:</p>
 <ul>
 <li>C:\Revit SDK 2020\Software Development Kit\Samples\</li>
 </ul>
-<p>I replace that globally by my local installation folder <i>C:\a\lib\revit\2020\SDK\Samples\</i>... 234 occurences are replaced.</p>
+<p>I replace that globally by my local installation folder <i>C:\a\lib\revit\2020\SDK\Samples\</i>... 234 occurrences are replaced.</p>
 <p>Next, I edit the RvtSamples add-in manifest, RvtSamples.addin, to point to the location of the RvtSamples DLL itself:</p>
 <pre class="code">
 &lt;?xml version="1.0" encoding="utf-8"?&gt;
 &lt;RevitAddIns&gt;
   &lt;AddIn Type="Application"&gt;
     &lt;Name&gt;RvtSamples External Application&lt;/Name&gt;
-    &lt;Assembly&gt;C:\a\lib\revit\2020\SDK\Samples\RvtSamples\CS\bin\Debug\RvtSamples.dll&lt;/Assembly&gt;
+    &lt;Assembly&gt;C:\...\Samples\RvtSamples\CS\bin\Debug\RvtSamples.dll&lt;/Assembly&gt;
     &lt;ClientId&gt;42cb0a70-2ee7-4e64-a42d-87b9cdcc41c8&lt;/ClientId&gt;
     &lt;FullClassName&gt;RvtSamples.Application&lt;/FullClassName&gt;
     &lt;VendorId&gt;ADSK&lt;/VendorId&gt;
@@ -184,7 +190,7 @@ Ah well.
 <ul>
 <li>C:\a\lib\revit\2020\SDK\Samples\PhaseSample\VB.NET\bin\PhaseSample.dll</li>
 </ul>
-<p>As a quick stop-gap fix, I globally replaced all occurences of <em>\VB.NET\bin\Debug* by </em>\VB.NET\bin*. As you will notice later, some of these replacements were erroneous.</p>
+<p>As a quick stop-gap fix, I globally replaced all occurrences of <em>\VB.NET\bin\Debug* by </em>\VB.NET\bin*. As you will notice later, some of these replacements were erroneous.</p>
 <p>Next errors:</p>
 <ul>
 <li>External command class Revit.SDK.Samples.DatumsModification.CS.Command in assembly 'C:\a\lib\revit\2020\SDK\Samples\DatumsModification\CS\bin\Debug\DatumsModification.dll' specified in line 350 of RvtSamples.txt not found</li>
