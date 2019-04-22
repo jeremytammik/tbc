@@ -81,7 +81,7 @@ the <a href="https://www.autodesk.com/developer-network/platform-technologies/re
 <p><center>
 <img src="img/.png" alt="Revit 2020 API help on What's New" width="100"/>
 </center></p>
-<p>For convenient, easy and effective web searching, this blog post provides an online version of that information, both in pure HTML (below) as as a PDF document:</p>
+<p>For convenient, easy and effective web searching, this blog post provides an online version of that information, both in pure HTML (below) and as a PDF document:</p>
 <ul>
 <li><a href="zip/Revit_Platform_API_Changes_and_Additions_2020.pdf">Revit_Platform_API_Changes_and_Additions_2020.pdf</a></li>
 </ul>
@@ -246,7 +246,8 @@ in the <a href="http://help.autodesk.com/view/RVT/2020/ENU">Revit 2020 Help</a>.
 </div>
 </center></p>
 <p><a name="4.1.1"></a><h2>1.1. Revit automatically initializes CEFsharp</h2></p>
-<p>Revit and Autodesk add-ins use the CEFsharp library internally for several features. Some third-party add-ins do so as well. Occasionally, when different versions of the library are used, it leads to instability issues for Revit.In order to avoid version conflicts, we are clarifying what CEFsharp version is being used, and loading it prior to all add-in initialization. </p>
+<p>Revit and Autodesk add-ins use the CEFsharp library internally for several features. Some third-party add-ins do so as well. Occasionally, when different versions of the library are used, it leads to instability issues for Revit.
+In order to avoid version conflicts, we are clarifying what CEFsharp version is being used, and loading it prior to all add-in initialization. </p>
 <ul>
 <li>In this version, Revit uses CEFsharp version 65.0.1.</li>
 <li>In the initialization, legacy JavaScript binding is enabled:
@@ -523,7 +524,10 @@ CefSharpSettings.LegacyJavascriptBindingEnabled = true
 <ul>
 <li>CurveLoop.CreateViaOffset() </li>
 </ul>
-<p>creates a new curve loop that is an offset of the existing curve loop. This method differs from the previously exposed API in that it takes as input a double array of offset distances instead of one double offset distance. The size of this array must match the size of the curve loop. The curve at position i will be offset with the double at position i in the array.</p>
+<p>creates a new curve loop that is an offset of the existing curve loop.
+This method differs from the previously exposed API in that it takes as input a double array of offset distances instead of one double offset distance.
+The size of this array must match the size of the curve loop.
+The curve at position <code>i</code> will be offset with the double at position <code>i</code> in the array.</p>
 <p><a name="4.2.10"></a><h2>2.10. View API additions</h2></p>
 <p><a name="4.2.10.1"></a><h3>2.10.1. View Template API additions</h3></p>
 <p>The new methods:</p>
@@ -536,10 +540,12 @@ CefSharpSettings.LegacyJavascriptBindingEnabled = true
 <p><a name="4.2.10.2"></a><h3>2.10.2. View Filter API additions</h3></p>
 <p>Validation restrictions for the ElementFilter stored by a ParameterFilterElement (the class that represents a View Filter) has been relaxed to enable more flexible creation of OR filters where criteria can reference parameters only associated to specific categories. Currently the ElementFilter must be either an ElementParameterFilter or an ElementLogicalFilter representing a Boolean combination of ElementParameterFilters. In addition, we check that each ElementParameterFilter satisfies the following conditions:</p>
 <ul>
-<li>Its array of FilterRules is not empty and contains:
-    &ndash; Any number of FilterRules of type FilterValueRule, FilterInverseRule, and SharedParameterApplicableRule or 
-    &ndash; Exactly one FilterCategoryRule containing only one category from categories stored by this ParameterFilterElement or
-    &ndash; Exactly two rules: the first one is a FilterCategoryRule containing only one category from categories stored by this ParameterFilterElement and the second one is a FilterRule of type FilterValueRule, FilterInverseRule, or SharedParameterApplicableRule.</li>
+<li>Its array of FilterRules is not empty and contains:<ul>
+<li>Any number of FilterRules of type FilterValueRule, FilterInverseRule, and SharedParameterApplicableRule or </li>
+<li>Exactly one FilterCategoryRule containing only one category from categories stored by this ParameterFilterElement or</li>
+<li>Exactly two rules: the first one is a FilterCategoryRule containing only one category from categories stored by this ParameterFilterElement and the second one is a FilterRule of type FilterValueRule, FilterInverseRule, or SharedParameterApplicableRule.</li>
+</ul>
+</li>
 </ul>
 <p>Note that cases in the second and third bullet are currently allowed only if the parent node of ElementParameterFilter is LogicalOrFilter.</p>
 <p>In addition to the change in validation, the new method:</p>
@@ -744,7 +750,7 @@ CefSharpSettings.LegacyJavascriptBindingEnabled = true
 </ul>
 <p>checks if the reference provided can be used in creating Rebar constraints. </p>
 <p><a name="4.2.20.2"></a><h3>2.20.2. Updating free-form rebar based on shared parameters</h3></p>
-<p>Free-form rebar can now regenerate based on one or more shared parameters. Several methods have been added to support this behavior:</p>
+<p>Free-form rebar can now regenerate based on one or more shared parameters. Several methods have been added to support this behaviour:</p>
 <ul>
 <li>Autodesk.Revit.DB.Structure.RebarFreeFormAccessor.AddUpdatingSharedParameter()</li>
 <li>Autodesk.Revit.DB.Structure.RebarFreeFormAccessor.RemoveUpdatingSharedParameter()</li>
