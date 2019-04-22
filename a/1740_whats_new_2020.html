@@ -25,23 +25,51 @@ linkedin:
 -->
 
 <h3>What's New in the Revit 2020 API</h3>
-<p>The Revit 2020 API includes numerous exciting enhancements for add-in developers. Many relate directly to explicit developer wishes and requests:</p>
+<p>The Revit 2020 API includes numerous exciting enhancements for add-in developers.</p>
+<p>Many relate directly to explicit developer wishes and requests:</p>
 <ul>
 <li><a href="#1">Information sources</a> </li>
 <li><a href="#2">Installation and migration from previous versions</a> </li>
 <li><a href="#3">What's new in previous versions</a> </li>
-<li><a href="#4">What's new in the Revit 2020 API &ndash; detailed ToC</a> </li>
-<li><a href="#4.1">1. API Changes</a> <ul>
-<li><a href="#4.1.1">1.1. .NET 4.7</a> </li>
-<li><a href="#4.1.16">1.16. Obsolete API removal</a> </li>
+<li><a href="#4">Detailed TOC of Major Changes and Renovations</a></li>
 </ul>
-</li>
-<li><a href="#4.2">2. API Additions</a> <ul>
-<li><a href="#4.2.1">2.1. Material API additions</a> </li>
-<li><a href="#4.2.17">2.17. UI API additions</a> </li>
+<p>Short overview &ndash; abbreviated table of contents:</p>
+<ul class="toc">
+<li>1. <a href="#4.1">API Changes</a></li>
+<ul class="toc">
+<li>1.1. <a href="#4.1.1">Revit automatically initializes CEFsharp</a></li>
+<li>1.2. <a href="#4.1.2">MEP Fabrication API deprecation</a></li>
+<li>1.3. <a href="#4.1.3">Structural API deprecation</a></li>
+<li>1.4. <a href="#4.1.4">Export API changes</a></li>
+<li>1.5. <a href="#4.1.5">Image API changes</a></li>
+<li>1.6. <a href="#4.1.6">Obsolete API removal</a></li>
 </ul>
-</li>
+<li>2. <a href="#4.2">API Additions</a></li>
+<ul class="toc">
+<li>2.1. <a href="#4.2.1">Attached detail group API additions</a></li>
+<li>2.2. <a href="#4.2.2">PDF and Image API additions</a></li>
+<li>2.3. <a href="#4.2.3">ElementLogicalFilter API additions</a></li>
+<li>2.4. <a href="#4.2.4">Application API additions</a></li>
+<li>2.5. <a href="#4.2.5">UI API additions</a></li>
+<li>2.6. <a href="#4.2.6">Document additions</a></li>
+<li>2.7. <a href="#4.2.7">Category API additions</a></li>
+<li>2.8. <a href="#4.2.8">Parameter API additions</a></li>
+<li>2.9. <a href="#4.2.9">Geometry API additions</a></li>
+<li>2.10. <a href="#4.2.10">View API additions</a></li>
+<li>2.11. <a href="#4.2.11">Schedule API additions</a></li>
+<li>2.12. <a href="#4.2.12">Site API additions</a></li>
+<li>2.13. <a href="#4.2.13">Shared Coordinates API additions</a></li>
+<li>2.14. <a href="#4.2.14">Part API additions</a></li>
+<li>2.15. <a href="#4.2.15">Railing API additions</a></li>
+<li>2.16. <a href="#4.2.16">Export API additions</a></li>
+<li>2.17. <a href="#4.2.17">Multi-Reference Annotation additions</a></li>
+<li>2.18. <a href="#4.2.18">Material API additions</a></li>
+<li>2.19. <a href="#4.2.19">Analysis API additions</a></li>
+<li>2.20. <a href="#4.2.20">Structural API additions</a></li>
+<li>2.21. <a href="#4.2.21">MEP API additions</a></li>
 </ul>
+</ul>
+
 <h4><a name="1"></a>Information Sources</h4>
 <p>The highlights were pointed out in
 the <a href="http://thebuildingcoder.typepad.com/blog/2018/02/devdays-keynote-manager-and-rex-extensions.html#2">DevDays Online Revit API news video recording</a>.</p>
@@ -94,124 +122,10 @@ in the <a href="http://help.autodesk.com/view/RVT/2020/ENU">Revit 2020 Help</a>.
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/12/whats-new-in-the-revit-20182-api.html">What's New in the Revit 2018.2 API</a></li>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2018/04/whats-new-in-the-revit-2019-api.html">What's New in the Revit 2019 API</a></li>
 </ul>
-<h4><a name="4"></a>What's New in the Revit 2020 API &ndash; Detailed ToC</h4>
-<p>Table of Contents:</p>
+<h4><a name="4"></a>Detailed TOC of Major Changes and Renovations</h4>
+<p>Detailed Table of Contents:</p>
 <ul class="toc">
-<li>1. <a href="#4.1">API changes</a></li>
-<ul class="toc">
-<li>1.1. <a href="#4.1.1">.NET 4.7</a></li>
-<li>1.2. <a href="#4.1.2">View Filters support OR operators and nesting</a></li>
-<ul class="toc">
-<li>1.2.1. <a href="#4.1.2.1">ParameterFilterElement API changes</a></li>
-<li>1.2.2. <a href="#4.1.2.2">ElementLogicalFilter API addition</a></li>
-</ul>
-<li>1.3. <a href="#4.1.3">View.ViewName deprecated</a></li>
-<li>1.4. <a href="#4.1.4">UI API changes</a></li>
-<ul class="toc">
-<li>1.4.1. <a href="#4.1.4.1">Main window handle access</a></li>
-<li>1.4.2. <a href="#4.1.4.2">Changes to PostableCommand enumeration</a></li>
-</ul>
-<li>1.5. <a href="#4.1.5">Existing APIs now support open from cloud paths (Collaboration for Revit)</a></li>
-<ul class="toc">
-<li>1.5.1. <a href="#4.1.5.1">Document Open APIs support cloud paths</a></li>
-<li>1.5.2. <a href="#4.1.5.2">Callback for conflict cases when opening from a cloud path</a></li>
-</ul>
-<li>1.6. <a href="#4.1.6">BasicFileInfo changes</a></li>
-<li>1.7. <a href="#4.1.7">Asset-related API members deprecated</a></li>
-<li>1.8. <a href="#4.1.8">Double Pattern Support</a></li>
-<ul class="toc">
-<li>1.8.1. <a href="#4.1.8.1">Material API support for double patterns</a></li>
-<li>1.8.2. <a href="#4.1.8.2">Support for overriding double patterns</a></li>
-<li>1.8.3. <a href="#4.1.8.3">Support for double patterns for FilledRegion</a></li>
-</ul>
-<li>1.9. <a href="#4.1.9">Document.Title consistency</a></li>
-<li>1.10. <a href="#4.1.10">View printing & exporting &ndash; activation events behavioral change</a></li>
-<li>1.11. <a href="#4.1.11">Structural API change</a></li>
-<li>1.12. <a href="#4.1.12">Rebar API changes</a></li>
-<li>1.13. <a href="#4.1.13">MEP API changes</a></li>
-<li>1.14. <a href="#4.1.14">ProjectLocation changes</a></li>
-<li>1.15. <a href="#4.1.15">Building Site export removed</a></li>
-<li>1.16. <a href="#4.1.16">Obsolete API removal</a></li>
-</ul>
-<li>2. <a href="#4.2">API additions</a></li>
-<ul class="toc">
-<li>2.1. <a href="#4.2.1">Material API additions</a></li>
-<ul class="toc">
-<li>2.1.1. <a href="#4.2.1.1">Editing the properties of an Appearance Asset</a></li>
-<li>2.1.2. <a href="#4.2.1.2">Editing AssetProperty values</a></li>
-<li>2.1.3. <a href="#4.2.1.3">Connected Assets</a></li>
-<li>2.1.4. <a href="#4.2.1.4">Validation</a></li>
-<li>2.1.5. <a href="#4.2.1.5">Schemas & Property names</a></li>
-<li>2.1.6. <a href="#4.2.1.6">Utilities</a></li>
-</ul>
-<li>2.2. <a href="#4.2.2">Railing API additions</a></li>
-<ul class="toc">
-<li>2.2.1. <a href="#4.2.2.1">Non-Continuous Rail Structure</a></li>
-<li>2.2.2. <a href="#4.2.2.2">Baluster Placement</a></li>
-</ul>
-<li>2.3. <a href="#4.2.3">Find Element Dependencies</a></li>
-<li>2.4. <a href="#4.2.4">Dimension API additions</a></li>
-<li>2.5. <a href="#4.2.5">Set vertical alignment for text</a></li>
-<li>2.6. <a href="#4.2.6">BrowserOrganization API additions</a></li>
-<li>2.7. <a href="#4.2.7">Rebar API additions</a></li>
-<ul class="toc">
-<li>2.7.1. <a href="#4.2.7.1">BarTypeDiameterOptions</a></li>
-<li>2.7.2. <a href="#4.2.7.2">GetDistributionPath()</a></li>
-<li>2.7.3. <a href="#4.2.7.3">RebarUpdateCurvesData</a></li>
-<li>2.7.4. <a href="#4.2.7.4">RebarShapes</a></li>
-<li>2.7.5. <a href="#4.2.7.5">Workshop Instructions</a></li>
-<li>2.7.6. <a href="#4.2.7.6">RebarFreeFormAccessor Additions</a></li>
-</ul>
-<li>2.8. <a href="#4.2.8">Steel Fabrication API additions</a></li>
-<ul class="toc">
-<li>2.8.1. <a href="#4.2.8.1">SteelElementProperties &ndash; linking between Revit elements and steel fabrication elements</a></li>
-<li>2.8.2. <a href="#4.2.8.2">Custom steel connections &ndash; API additions</a></li>
-</ul>
-<li>2.9. <a href="#4.2.9">MEP API additions</a></li>
-<ul class="toc">
-<li>2.9.1. <a href="#4.2.9.1">MEPCurveType Shape</a></li>
-<li>2.9.2. <a href="#4.2.9.2">Mechanical Equipment Set API</a></li>
-<li>2.9.3. <a href="#4.2.9.3">Hydraulic Separation API</a></li>
-</ul>
-<li>2.10. <a href="#4.2.10">MEP Fabrication API additions</a></li>
-<ul class="toc">
-<li>2.10.1. <a href="#4.2.10.1">Exporting fabrication job files</a></li>
-<li>2.10.2. <a href="#4.2.10.2">API for load and unload of one-off fabrication parts from loose item files</a></li>
-<li>2.10.3. <a href="#4.2.10.3">API for version history of parts</a></li>
-<li>2.10.4. <a href="#4.2.10.4">API for part swap out information</a></li>
-<li>2.10.5. <a href="#4.2.10.5">Centerline length API</a></li>
-</ul>
-<li>2.11. <a href="#4.2.11">Analysis Visualization Framework API addition</a></li>
-<li>2.12. <a href="#4.2.12">IFC additions</a></li>
-<li>2.13. <a href="#4.2.13">Revit Link Additions</a></li>
-<li>2.14. <a href="#4.2.14">Export Additions</a></li>
-<li>2.15. <a href="#4.2.15">Access to add-in data paths</a></li>
-<li>2.16. <a href="#4.2.16">Site API additions</a></li>
-<li>2.17. <a href="#4.2.17">UI API additions</a></li>
-<ul class="toc">
-<li>2.17.1. <a href="#4.2.17.1">BeforeExecutedEventArgs Cancellation</a></li>
-</ul>
-</ul>
-</ul>
-
-<p><p/></p>
-<p><center>
-<div style="border-style:solid; border-width:2px 0px 2px 0px">
-<a name="4.1"></a><h3 style="font-weight: bold">API Changes</h3>
-</div>
-</center></p>
-<p><p/></p>
-<h4><a name="4.1.1"></a>1.1. .NET 4.7</h4>
-<p><center>
-<div style="border-style:solid; border-width:2px 0px 2px 0px">
-<a name="4.2"></a><h3 style="font-weight: bold">API Additions</h3>
-</div>
-</center></p>
-<h4><a name="4.2.1"></a>2.1. Material API additions</h4>
-<p>MAJOR CHANGES AND RENOVATIONS TO THE REVIT 2020 API</p>
-<p>TOC</p>
-<ul class="toc">
-<li>1. <a href="#4.1">API CHANGES</a></li>
+<li>1. <a href="#4.1">API Changes</a></li>
 <ul class="toc">
 <li>1.1. <a href="#4.1.1">Revit automatically initializes CEFsharp</a></li>
 <li>1.2. <a href="#4.1.2">MEP Fabrication API deprecation</a></li>
@@ -225,7 +139,7 @@ in the <a href="http://help.autodesk.com/view/RVT/2020/ENU">Revit 2020 Help</a>.
 <li>1.6.3. <a href="#4.1.6.3">Properties</a></li>
 </ul>
 </ul>
-<li>2. <a href="#4.2">API ADDITIONS</a></li>
+<li>2. <a href="#4.2">API Additions</a></li>
 <ul class="toc">
 <li>2.1. <a href="#4.2.1">Attached detail group API additions</a></li>
 <li>2.2. <a href="#4.2.2">PDF and Image API additions</a></li>
@@ -325,16 +239,22 @@ in the <a href="http://help.autodesk.com/view/RVT/2020/ENU">Revit 2020 Help</a>.
 </ul>
 </ul>
 
-<h1>Major changes and renovations to the Revit 2020 API</h1>
-
-<p><a name="4.1"></a><h1>1. API changes</h1></p>
+<p><p/></p>
+<p><center>
+<div style="border-style:solid; border-width:2px 0px 2px 0px">
+<a name="4.1"></a><h3 style="font-weight: bold">API Changes</h3>
+</div>
+</center></p>
 <p><a name="4.1.1"></a><h2>1.1. Revit automatically initializes CEFsharp</h2></p>
 <p>Revit and Autodesk add-ins use the CEFsharp library internally for several features. Some third-party add-ins do so as well. Occasionally, when different versions of the library are used, it leads to instability issues for Revit.In order to avoid version conflicts, we are clarifying what CEFsharp version is being used, and loading it prior to all add-in initialization. </p>
 <ul>
 <li>In this version, Revit uses CEFsharp version 65.0.1.</li>
-<li>In the initialization, legacy JavaScript binding is enabled:</li>
+<li>In the initialization, legacy JavaScript binding is enabled:
+<br/>
+<code>
+CefSharpSettings.LegacyJavascriptBindingEnabled = true
+</code></li>
 </ul>
-<p><code>CefSharpSettings.LegacyJavascriptBindingEnabled = true</code></p>
 <p><a name="4.1.2"></a><h2>1.2. MEP Fabrication API deprecation</h2></p>
 <p>The following member has been deprecated and replaced:</p>
 <ul>
@@ -383,7 +303,12 @@ in the <a href="http://help.autodesk.com/view/RVT/2020/ENU">Revit 2020 Help</a>.
 <li>AssetProperty.Item[String]</li>
 <li>Application.Assets[AssetType]</li>
 </ul>
-<p><a name="4.2"></a><h1>2. API additions</h1></p>
+<p><p/></p>
+<p><center>
+<div style="border-style:solid; border-width:2px 0px 2px 0px">
+<a name="4.2"></a><h3 style="font-weight: bold">API Additions</h3>
+</div>
+</center></p>
 <p><a name="4.2.1"></a><h2>2.1. Attached detail group API additions</h2></p>
 <p>The Group and GroupType API now includes API related to attached detail groups.</p>
 <p>The new methods:</p>
