@@ -4,9 +4,11 @@
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script></p>
 <style>
-  ul.toc {
-    list-style-type: none;
-  }
+  ul.toc { list-style-type: none; }
+  h1.new { font-size: 150%; }
+  h2.new { font-size: 150%; }
+  h3.new { font-size: 120%; }
+  h4.new { font-size: 120%; }
 </style>
 
 <p></head></p>
@@ -16,8 +18,13 @@ twitter:
 
  for the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+The Revit 2020 API includes exciting enhancements for add-in developers, including numerous developer wishes and requests that have now been explicitly addressed
+&ndash; Information sources
+&ndash; Installation and migration from previous versions
+&ndash; What's new in previous versions
+&ndash; Detailed TOC of major changes and renovations
+&ndash; API Changes
+&ndash; API Additions...
 
 linkedin:
 
@@ -25,13 +32,12 @@ linkedin:
 -->
 
 <h3>What's New in the Revit 2020 API</h3>
-<p>The Revit 2020 API includes numerous exciting enhancements for add-in developers.</p>
-<p>Many relate directly to explicit developer wishes and requests:</p>
+<p>The Revit 2020 API includes exciting enhancements for add-in developers, including numerous developer wishes and requests that have now been explicitly addressed:</p>
 <ul>
 <li><a href="#1">Information sources</a> </li>
 <li><a href="#2">Installation and migration from previous versions</a> </li>
 <li><a href="#3">What's new in previous versions</a> </li>
-<li><a href="#4">Detailed TOC of Major Changes and Renovations</a></li>
+<li><a href="#4">Detailed TOC of major changes and renovations</a></li>
 </ul>
 <p>Short overview &ndash; abbreviated table of contents:</p>
 <ul class="toc">
@@ -72,14 +78,14 @@ linkedin:
 
 <h4><a name="1"></a>Information Sources</h4>
 <p>The highlights were pointed out in
-the <a href="http://thebuildingcoder.typepad.com/blog/2018/02/devdays-keynote-manager-and-rex-extensions.html#2">DevDays Online Revit API news video recording</a>.</p>
+the <a href="https://thebuildingcoder.typepad.com/blog/2019/04/the-revit-2020-fcs-api-and-sdk.html#3">DevDays Online Revit API news video recording</a>.</p>
 <p>The information below is based on the contents of the <em>Revit Platform API Changes and Additions.docx</em> document included with
-the <a href="http://thebuildingcoder.typepad.com/blog/2018/04/compiling-the-revit-2020-sdk-samples.html#3">Revit 2020 SDK</a>
-&ndash; software developers kit &ndash; available from the Revit installation package and 
-the <a href="https://www.autodesk.com/developer-network/platform-technologies/revit">Revit Developer Centre</a> (not posted yet, but coming soon).</p>
+the <a href="https://thebuildingcoder.typepad.com/blog/2019/04/revitlookup-and-sdk-for-revit-2020.html#3">Revit 2020 SDK</a>, 
+the software developers kit available from the Revit installation package and 
+the <a href="https://www.autodesk.com/developer-network/platform-technologies/revit">Revit Developer Centre</a>.</p>
 <p>It is also provided in the section on <em>What's New</em> in the Revit 2020 API help file <code>RevitAPI.chm</code> included with the SDK:</p>
 <p><center>
-<img src="img/.png" alt="Revit 2020 API help on What's New" width="100"/>
+<img src="img/whats_new_2020.png" alt="Revit 2020 API help on What's New" width="686"/>
 </center></p>
 <p>For convenient, easy and effective web searching, this blog post provides an online version of that information, both in pure HTML (below) and as a PDF document:</p>
 <ul>
@@ -242,10 +248,10 @@ in the <a href="http://help.autodesk.com/view/RVT/2020/ENU">Revit 2020 Help</a>.
 <p><p/></p>
 <p><center>
 <div style="border-style:solid; border-width:2px 0px 2px 0px">
-<a name="4.1"></a><h3 style="font-weight: bold">API Changes</h3>
+<a name="4.1"></a><h1 class="new" style="font-weight: bold">API Changes</h3>
 </div>
 </center></p>
-<p><a name="4.1.1"></a><h2>1.1. Revit automatically initializes CEFsharp</h2></p>
+<p><a name="4.1.1"></a><h2 class="new">1.1. Revit automatically initializes CEFsharp</h2></p>
 <p>Revit and Autodesk add-ins use the CEFsharp library internally for several features. Some third-party add-ins do so as well. Occasionally, when different versions of the library are used, it leads to instability issues for Revit.
 In order to avoid version conflicts, we are clarifying what CEFsharp version is being used, and loading it prior to all add-in initialization. </p>
 <ul>
@@ -256,24 +262,24 @@ In order to avoid version conflicts, we are clarifying what CEFsharp version is 
 CefSharpSettings.LegacyJavascriptBindingEnabled = true
 </code></li>
 </ul>
-<p><a name="4.1.2"></a><h2>1.2. MEP Fabrication API deprecation</h2></p>
+<p><a name="4.1.2"></a><h2 class="new">1.2. MEP Fabrication API deprecation</h2></p>
 <p>The following member has been deprecated and replaced:</p>
 <ul>
 <li>FabricationConfiguration.GetMaterialThickness()   &rarr; FabricationPart.MaterialThickness</li>
 </ul>
-<p><a name="4.1.3"></a><h2>1.3. Structural API deprecation</h2></p>
+<p><a name="4.1.3"></a><h2 class="new">1.3. Structural API deprecation</h2></p>
 <p>The following member has been deprecated:</p>
 <ul>
 <li>Autodesk.Revit.DB.Structure.StructuralConnectionHandler.GetSubPartIds()</li>
 </ul>
 <p>The subpart functionality was previously removed, so there is no replacement method.</p>
-<p><a name="4.1.4"></a><h2>1.4. Export API changes</h2></p>
+<p><a name="4.1.4"></a><h2 class="new">1.4. Export API changes</h2></p>
 <p>The following member has been deprecated and replaced: </p>
 <ul>
 <li>CustomExporter.Export(View3d) &rarr; CustomExporter.Export(View)</li>
 </ul>
 <p>See the API additions section for more details on the new 2D view support for the custom exporter.</p>
-<p><a name="4.1.5"></a><h2>1.5. Image API changes</h2></p>
+<p><a name="4.1.5"></a><h2 class="new">1.5. Image API changes</h2></p>
 <p>With changes made to support PDF import and extensions to the image API, the following members and classes have been deprecated and replaced:</p>
 <ul>
 <li>ImageType.Create(Document, string) &rarr; ImageType.Create(Document, ImageTypeOptions)</li>
@@ -281,10 +287,10 @@ CefSharpSettings.LegacyJavascriptBindingEnabled = true
 <li>Document.Import(string, ImageImportOptions, View, out Element) &rarr; ImageType.Create() followed by ImageInstance.Create()</li>
 <li>class ImageImportOptions &rarr; class ImageTypeOptions</li>
 </ul>
-<p><a name="4.1.6"></a><h2>1.6. Obsolete API removal</h2></p>
+<p><a name="4.1.6"></a><h2 class="new">1.6. Obsolete API removal</h2></p>
 <p>The following API members and classes which had previously been marked Obsolete have been removed in this release. Consult the API documentation from prior releases for information on the replacements to use:</p>
-<p><a name="4.1.6.1"></a><h4>1.6.1. Classes</h4></p>
-<p><a name="4.1.6.2"></a><h4>1.6.2. Methods</h4></p>
+<p><a name="4.1.6.1"></a><h4 class="new">1.6.1. Classes</h4></p>
+<p><a name="4.1.6.2"></a><h4 class="new">1.6.2. Methods</h4></p>
 <ul>
 <li>ProjectLocation.IsProjectLocationNameUnique(Document, String)</li>
 <li>FabricationPart.IsStraightSegment(Document, ElementId)</li>
@@ -298,7 +304,7 @@ CefSharpSettings.LegacyJavascriptBindingEnabled = true
 <li>ParameterFilterElement.GetRuleParameter(FilterRule)</li>
 <li>ParameterFilterElement.GetRuleParameters()</li>
 </ul>
-<p><a name="4.1.6.3"></a><h4>1.6.3. Properties</h4></p>
+<p><a name="4.1.6.3"></a><h4 class="new">1.6.3. Properties</h4></p>
 <ul>
 <li>BasicFileInfo.SavedInVersion</li>
 <li>AssetProperty.Item[String]</li>
@@ -307,10 +313,10 @@ CefSharpSettings.LegacyJavascriptBindingEnabled = true
 <p><p/></p>
 <p><center>
 <div style="border-style:solid; border-width:2px 0px 2px 0px">
-<a name="4.2"></a><h3 style="font-weight: bold">API Additions</h3>
+<a name="4.2"></a><h1 class="new" style="font-weight: bold">API Additions</h3>
 </div>
 </center></p>
-<p><a name="4.2.1"></a><h2>2.1. Attached detail group API additions</h2></p>
+<p><a name="4.2.1"></a><h2 class="new">2.1. Attached detail group API additions</h2></p>
 <p>The Group and GroupType API now includes API related to attached detail groups.</p>
 <p>The new methods:</p>
 <ul>
@@ -337,8 +343,8 @@ CefSharpSettings.LegacyJavascriptBindingEnabled = true
 <li>Group.AttachedParentId</li>
 </ul>
 <p>provide information about whether a group is attached and if so, to what group it is associated.</p>
-<p><a name="4.2.2"></a><h2>2.2. PDF and Image API additions</h2></p>
-<p><a name="4.2.2.1"></a><h3>2.2.1. ImageType API </h3></p>
+<p><a name="4.2.2"></a><h2 class="new">2.2. PDF and Image API additions</h2></p>
+<p><a name="4.2.2.1"></a><h3 class="new">2.2.1. ImageType API </h3></p>
 <p>The new members:</p>
 <ul>
 <li>ImageType.Create(Document, ImageTypeOptions)</li>
@@ -362,7 +368,7 @@ CefSharpSettings.LegacyJavascriptBindingEnabled = true
 <li>ImageTypeOptions.SetExternalResourceReference()</li>
 </ul>
 <p>Resolution is measured in dpi and relates the number of pixels in raster images to their size.</p>
-<p><a name="4.2.2.2"></a><h3>2.2.2. ImageInstance API</h3></p>
+<p><a name="4.2.2.2"></a><h3 class="new">2.2.2. ImageInstance API</h3></p>
 <p>The new class</p>
 <ul>
 <li>ImageInstance</li>
@@ -377,36 +383,36 @@ CefSharpSettings.LegacyJavascriptBindingEnabled = true
 <li>ImageInstance.EnableSnaps </li>
 </ul>
 <p>Snapping capability can be enabled only for PDF-based instances.</p>
-<p><a name="4.2.3"></a><h2>2.3. ElementLogicalFilter API additions</h2></p>
-<p><a name="4.2.3.1"></a><h3>2.3.1. Setting filters</h3></p>
+<p><a name="4.2.3"></a><h2 class="new">2.3. ElementLogicalFilter API additions</h2></p>
+<p><a name="4.2.3.1"></a><h3 class="new">2.3.1. Setting filters</h3></p>
 <p>The new function:</p>
 <ul>
 <li>ElementLogicalFilter.SetFilters()</li>
 </ul>
 <p>allows setting ElementFilters that are combined by the given ElementLogicalFilter. This allows an easier method to modify the filter criteria stored in a View filter.</p>
-<p><a name="4.2.4"></a><h2>2.4. Application API additions</h2></p>
-<p><a name="4.2.4.1"></a><h3>2.4.1. Journal playback</h3></p>
+<p><a name="4.2.4"></a><h2 class="new">2.4. Application API additions</h2></p>
+<p><a name="4.2.4.1"></a><h3 class="new">2.4.1. Journal playback</h3></p>
 <p>The new function:</p>
 <ul>
 <li>Application.IsJournalPlaying()</li>
 </ul>
 <p>determines if Revit is currently in journal playback mode or not. </p>
-<p><a name="4.2.5"></a><h2>2.5. UI API additions</h2></p>
-<p><a name="4.2.5.1"></a><h3>2.5.1. Add Animated Progress Bar to a TaskDialog</h3></p>
+<p><a name="4.2.5"></a><h2 class="new">2.5. UI API additions</h2></p>
+<p><a name="4.2.5.1"></a><h3 class="new">2.5.1. Add Animated Progress Bar to a TaskDialog</h3></p>
 <p>The new property:</p>
 <ul>
 <li>TaskDialog.EnableMarqueeDialogBar</li>
 </ul>
 <p>allows the TaskDialog to include a progress bar that has an indeterminate start and stop. The animation continues until the TaskDialog is closed. </p>
-<p><a name="4.2.5.2"></a><h3>2.5.2. Specify minimum width and height for a DockablePane</h3></p>
+<p><a name="4.2.5.2"></a><h3 class="new">2.5.2. Specify minimum width and height for a DockablePane</h3></p>
 <p>Minimum width and height can now be set for a DockablePane:</p>
 <ul>
 <li>Autodesk.Revit.UI.DockablePaneState.MinimumWidth</li>
 <li>Autodesk.Revit.UI.DockablePaneState.MinimumHeight</li>
 </ul>
 <p>These are specified as part of the InitialState for the registered pane. The default for both properties is 200 pixels.</p>
-<p><a name="4.2.6"></a><h2>2.6. Document additions</h2></p>
-<p><a name="4.2.6.1"></a><h3>2.6.1. Returning cloud model information for cloud workshared models</h3></p>
+<p><a name="4.2.6"></a><h2 class="new">2.6. Document additions</h2></p>
+<p><a name="4.2.6.1"></a><h3 class="new">2.6.1. Returning cloud model information for cloud workshared models</h3></p>
 <p>The new property:</p>
 <ul>
 <li>Document.IsModelInCloud</li>
@@ -421,7 +427,7 @@ CefSharpSettings.LegacyJavascriptBindingEnabled = true
 <li>Document.GetCloudModelPath() </li>
 </ul>
 <p>returns the cloud model path.</p>
-<p><a name="4.2.6.2"></a><h3>2.6.2. Open/Save/Modify cloud models on BIM 360</h3></p>
+<p><a name="4.2.6.2"></a><h3 class="new">2.6.2. Open/Save/Modify cloud models on BIM 360</h3></p>
 <p>The new method:</p>
 <ul>
 <li>Document.SaveAsCloudModel()</li>
@@ -438,7 +444,7 @@ CefSharpSettings.LegacyJavascriptBindingEnabled = true
 </ul>
 <p>converts a cloud model into a workshared cloud model. The method Document.CanEnableCloudWorksharing() can be used to check whether this operation is valid on a given model. </p>
 <p>Revit's existing model open functions (Application.OpenDocumentFile and UIApplication.OpenAndActivateDocument) will now throw RevitServerUnauthorizedException if the user tries to open a cloud model without the right entitlements. </p>
-<p><a name="4.2.6.3"></a><h3>2.6.3. Identifying if background calculations are underway</h3></p>
+<p><a name="4.2.6.3"></a><h3 class="new">2.6.3. Identifying if background calculations are underway</h3></p>
 <p>The new method:</p>
 <ul>
 <li>Document.IsBackgroundCalculationInProgress()</li>
@@ -453,27 +459,27 @@ CefSharpSettings.LegacyJavascriptBindingEnabled = true
 <li>Edit the sketch of plate element.</li>
 <li>Edit a custom connection.</li>
 </ul>
-<p><a name="4.2.7"></a><h2>2.7. Category API additions</h2></p>
-<p><a name="4.2.7.1"></a><h3>2.7.1. Category visibility</h3></p>
+<p><a name="4.2.7"></a><h2 class="new">2.7. Category API additions</h2></p>
+<p><a name="4.2.7.1"></a><h3 class="new">2.7.1. Category visibility</h3></p>
 <p>The new property:</p>
 <ul>
 <li>Category.IsVisibleInUI</li>
 </ul>
 <p>returns true if the category should be visible to the user in lists of categories in the Revit user interface (dialogs such as Visibility Graphics or View Filters).</p>
-<p><a name="4.2.7.2"></a><h3>2.7.2. Get string names of categories</h3></p>
+<p><a name="4.2.7.2"></a><h3 class="new">2.7.2. Get string names of categories</h3></p>
 <p>The new method:</p>
 <ul>
 <li>LabelUtils.GetLabelFor (BuiltInCategory)</li>
 </ul>
 <p>returns the string name of the given BuiltInCategory in the current Revit language.</p>
-<p><a name="4.2.8"></a><h2>2.8. Parameter API additions</h2></p>
-<p><a name="4.2.8.1"></a><h3>2.8.1. Getting localized parameter names</h3></p>
+<p><a name="4.2.8"></a><h2 class="new">2.8. Parameter API additions</h2></p>
+<p><a name="4.2.8.1"></a><h3 class="new">2.8.1. Getting localized parameter names</h3></p>
 <p>The new method:</p>
 <ul>
 <li>LabelUtils.GetLabelFor(BuiltInParameter, Autodesk.Revit.ApplicationServices.LanguageType)</li>
 </ul>
 <p>returns the localized string name representing the built-in parameter in the input language.</p>
-<p><a name="4.2.8.2"></a><h3>2.8.2. Hiding empty parameters</h3></p>
+<p><a name="4.2.8.2"></a><h3 class="new">2.8.2. Hiding empty parameters</h3></p>
 <p>The new property</p>
 <ul>
 <li>ExternalDefinition.HideWhenNoValue</li>
@@ -489,7 +495,7 @@ CefSharpSettings.LegacyJavascriptBindingEnabled = true
 <li>Parameter.ClearValue()</li>
 </ul>
 <p>can reset the value of a shared parameter which has the HideWhenNoValue flag set back to a cleared state. (This method is not applicable to clear the value of any other parameter type).</p>
-<p><a name="4.2.8.3"></a><h3>2.8.3. Filtering by presence or absence of parameter value</h3></p>
+<p><a name="4.2.8.3"></a><h3 class="new">2.8.3. Filtering by presence or absence of parameter value</h3></p>
 <p>The new filter classes:</p>
 <ul>
 <li>ParameterValuePresenceRule</li>
@@ -513,8 +519,8 @@ CefSharpSettings.LegacyJavascriptBindingEnabled = true
 <li>ScheduleDefinition.CanFilterByValuePresence()</li>
 </ul>
 <p>to filter based on the presence or absence of a value assigned to that parameter.</p>
-<p><a name="4.2.9"></a><h2>2.9. Geometry API additions</h2></p>
-<p><a name="4.2.9.1"></a><h3>2.9.1. CurveLoop API</h3></p>
+<p><a name="4.2.9"></a><h2 class="new">2.9. Geometry API additions</h2></p>
+<p><a name="4.2.9.1"></a><h3 class="new">2.9.1. CurveLoop API</h3></p>
 <p>The new property:</p>
 <ul>
 <li>CurveLoop.NumberOfCurves</li>
@@ -528,8 +534,8 @@ CefSharpSettings.LegacyJavascriptBindingEnabled = true
 This method differs from the previously exposed API in that it takes as input a double array of offset distances instead of one double offset distance.
 The size of this array must match the size of the curve loop.
 The curve at position <code>i</code> will be offset with the double at position <code>i</code> in the array.</p>
-<p><a name="4.2.10"></a><h2>2.10. View API additions</h2></p>
-<p><a name="4.2.10.1"></a><h3>2.10.1. View Template API additions</h3></p>
+<p><a name="4.2.10"></a><h2 class="new">2.10. View API additions</h2></p>
+<p><a name="4.2.10.1"></a><h3 class="new">2.10.1. View Template API additions</h3></p>
 <p>The new methods:</p>
 <ul>
 <li>View.CreateViewTemplate() </li>
@@ -537,7 +543,7 @@ The curve at position <code>i</code> will be offset with the double at position 
 </ul>
 <p>allow you to turn an existing view into a view template. The created view template has an automatically generated unique name.</p>
 <p>The Revit API, for a few releases, has featured a fairly fully-featured capability to set up and modify view templates and their properties. These capabilities are now demonstrated in the new sample "ViewTemplateCreation".</p>
-<p><a name="4.2.10.2"></a><h3>2.10.2. View Filter API additions</h3></p>
+<p><a name="4.2.10.2"></a><h3 class="new">2.10.2. View Filter API additions</h3></p>
 <p>Validation restrictions for the ElementFilter stored by a ParameterFilterElement (the class that represents a View Filter) has been relaxed to enable more flexible creation of OR filters where criteria can reference parameters only associated to specific categories. Currently the ElementFilter must be either an ElementParameterFilter or an ElementLogicalFilter representing a Boolean combination of ElementParameterFilters. In addition, we check that each ElementParameterFilter satisfies the following conditions:</p>
 <ul>
 <li>Its array of FilterRules is not empty and contains:<ul>
@@ -553,7 +559,7 @@ The curve at position <code>i</code> will be offset with the double at position 
 <li>ParameterFilterElement.GetElementFilterParametersForCategory() </li>
 </ul>
 <p>retrieves a list of the parameters associated with all rules in the filter that are combined (using logical AND) with a FilterCategoryRule corresponding to single categoryId.</p>
-<p><a name="4.2.11"></a><h2>2.11. Schedule API additions</h2></p>
+<p><a name="4.2.11"></a><h2 class="new">2.11. Schedule API additions</h2></p>
 <p>The new property:</p>
 <ul>
 <li>ScheduleDefinition.ShowGridLines</li>
@@ -564,8 +570,8 @@ The curve at position <code>i</code> will be offset with the double at position 
 <li>TableData.ZoomLevel</li>
 </ul>
 <p>allows the user to set the zoom level of a schedule in a tabular view. This setting will not change the size of text, rows, or columns in a sheet view. Additionally, the setting is temporary and only applies to the current session. </p>
-<p><a name="4.2.12"></a><h2>2.12. Site API additions</h2></p>
-<p><a name="4.2.12.1"></a><h3>2.12.1. TopographySurface additions</h3></p>
+<p><a name="4.2.12"></a><h2 class="new">2.12. Site API additions</h2></p>
+<p><a name="4.2.12.1"></a><h3 class="new">2.12.1. TopographySurface additions</h3></p>
 <p>The new method:</p>
 <ul>
 <li>Autodesk.Revit.DB.Architecture.TopographySurface.Create(Document, IList&lt;XYZ&gt; points, IList&lt; IList&lt;int&gt; &gt; facets, String)</li>
@@ -576,7 +582,7 @@ The curve at position <code>i</code> will be offset with the double at position 
 <li>Autodesk.Revit.DB.Architecture.TopographySurface.IsValidFaceSet()</li>
 </ul>
 <p>checks whether the given set of triangulation data is valid. </p>
-<p><a name="4.2.12.2"></a><h3>2.12.2. TopographyLinkType additions</h3></p>
+<p><a name="4.2.12.2"></a><h3 class="new">2.12.2. TopographyLinkType additions</h3></p>
 <p>The new class:</p>
 <ul>
 <li>Autodesk.Revit.DB.Architecture.TopographyLinkType</li>
@@ -587,14 +593,14 @@ The curve at position <code>i</code> will be offset with the double at position 
 <li>Autodesk.Revit.DB.Architecture.TopographyLinkType.Reload()</li>
 </ul>
 <p>reloads the TopographyLinkType from its current location. </p>
-<p><a name="4.2.13"></a><h2>2.13. Shared Coordinates API additions</h2></p>
-<p><a name="4.2.13.1"></a><h3>2.13.1. SiteLocation addition </h3></p>
+<p><a name="4.2.13"></a><h2 class="new">2.13. Shared Coordinates API additions</h2></p>
+<p><a name="4.2.13.1"></a><h3 class="new">2.13.1. SiteLocation addition </h3></p>
 <p>The new method:</p>
 <ul>
 <li>SiteLocation.SetGeoCoordinateSystem()</li>
 </ul>
 <p>sets the Geo coordinate system for the current document.</p>
-<p><a name="4.2.13.2"></a><h3>2.13.2. BasePoint additions</h3></p>
+<p><a name="4.2.13.2"></a><h3 class="new">2.13.2. BasePoint additions</h3></p>
 <p>The new read-only property:</p>
 <ul>
 <li>BasePoint.Position</li>
@@ -605,15 +611,15 @@ The curve at position <code>i</code> will be offset with the double at position 
 <li>BasePoint.SharedPosition</li>
 </ul>
 <p>gets the XYZ value corresponding to the base point's position in the transformed (shared) coordinates. </p>
-<p><a name="4.2.14"></a><h2>2.14. Part API additions</h2></p>
-<p><a name="4.2.14.1"></a><h3>2.14.1. Part creation from DirectShapes</h3></p>
+<p><a name="4.2.14"></a><h2 class="new">2.14. Part API additions</h2></p>
+<p><a name="4.2.14.1"></a><h3 class="new">2.14.1. Part creation from DirectShapes</h3></p>
 <p>Parts can now be created from DirectShape instances, either in the same host document or in a link. Since various reasons might prevent parts from being created from an element, the new methods</p>
 <ul>
 <li>DirectShape.CanCreateParts()</li>
 <li>DirectShapeType.CanCreateParts()</li>
 </ul>
 <p>indicate whether it is possible to create parts from an instance of one of those classes.</p>
-<p><a name="4.2.14.2"></a><h3>2.14.2. Returning the entities that create a divided Part</h3></p>
+<p><a name="4.2.14.2"></a><h3 class="new">2.14.2. Returning the entities that create a divided Part</h3></p>
 <p>The new methods:</p>
 <ul>
 <li>PartUtils.GetSplittingCurves(Document, ElementId)</li>
@@ -625,16 +631,16 @@ The curve at position <code>i</code> will be offset with the double at position 
 <li>PartUtils.GetSplittingElements(Document, ElementId)</li>
 </ul>
 <p>identifies and returns the elements ( ReferencePlane, Level or Grid ) that were used to create the division.</p>
-<p><a name="4.2.15"></a><h2>2.15. Railing API additions</h2></p>
-<p><a name="4.2.15.1"></a><h3>2.15.1. BalusterInfo reference name</h3></p>
+<p><a name="4.2.15"></a><h2 class="new">2.15. Railing API additions</h2></p>
+<p><a name="4.2.15.1"></a><h3 class="new">2.15.1. BalusterInfo reference name</h3></p>
 <p>The new functions:</p>
 <ul>
 <li>BalusterInfo.GetReferenceNameForHost()</li>
 <li>BalusterInfo.GetReferenceNameForTopRail()</li>
 </ul>
 <p>allow access to the name string to be used as a reference to either the Host or Top Rail in the current Revit language.</p>
-<p><a name="4.2.16"></a><h2>2.16. Export API additions</h2></p>
-<p><a name="4.2.16.1"></a><h3>2.16.1. CustomExporter now supports some 2D views</h3></p>
+<p><a name="4.2.16"></a><h2 class="new">2.16. Export API additions</h2></p>
+<p><a name="4.2.16.1"></a><h3 class="new">2.16.1. CustomExporter now supports some 2D views</h3></p>
 <p>The class CustomExporter can now export 2D views. The only 2D view types supported at this time are plans, sections and elevations. The new method:</p>
 <ul>
 <li>CustomExporter.Export()</li>
@@ -680,7 +686,7 @@ The curve at position <code>i</code> will be offset with the double at position 
 <li>None of these methods are called between the respective pairs of calls OnInstanceBegin/OnInstanceEnd or OnLinkBegin/OnLinkEnd. They are called between OnElementBegin2D/OnElementEnd2D and OnViewBegin/OnViewEnd.</li>
 </ul>
 <p>For an example of the use of the API for custom export of 2D views, see the new sample CustomExporter/Custom2DExporter.</p>
-<p><a name="4.2.16.2"></a><h3>2.16.2. New Navisworks export options</h3></p>
+<p><a name="4.2.16.2"></a><h3 class="new">2.16.2. New Navisworks export options</h3></p>
 <p>Three new options have been added to the class NavisworksExportOptions:</p>
 <ul>
 <li>NavisworksExportOptions.FacetingFactor</li>
@@ -688,8 +694,8 @@ The curve at position <code>i</code> will be offset with the double at position 
 <li>NavisworksExportOptions.ConvertLinkedCADFormats</li>
 </ul>
 <p>Note that you will need to get an updated Navisworks Exporter to successfully use these options. </p>
-<p><a name="4.2.17"></a><h2>2.17. Multi-Reference Annotation additions</h2></p>
-<p><a name="4.2.17.1"></a><h3>2.17.1. Additional References</h3></p>
+<p><a name="4.2.17"></a><h2 class="new">2.17. Multi-Reference Annotation additions</h2></p>
+<p><a name="4.2.17.1"></a><h3 class="new">2.17.1. Additional References</h3></p>
 <p>MultiReferenceAnnotations can now pick additional references from the model. The following new methods support this:</p>
 <ul>
 <li>MultiReferenceAnnotationOptions.SetAdditionalReferencesToDimension()</li>
@@ -700,21 +706,21 @@ The curve at position <code>i</code> will be offset with the double at position 
 <ul>
 <li>MultiReferenceAnnotationOption.ReferencesDontMatchReferenceCategory()</li>
 </ul>
-<p><a name="4.2.17.2"></a><h3>2.17.2. 3D view placement restrictions</h3></p>
+<p><a name="4.2.17.2"></a><h3 class="new">2.17.2. 3D view placement restrictions</h3></p>
 <p>The new method:</p>
 <ul>
 <li>MultiReferenceAnnotation.Is3DViewValidForDimension()</li>
 </ul>
 <p>is used by MultiReferenceAnnotation.Create() to verify that the dimension is valid for the view. LinearFixed dimensions cannot be created in 3D views. Linear dimensions can only be created in 3D views if the view direction is perpendicular to the current work plane normal.</p>
-<p><a name="4.2.18"></a><h2>2.18. Material API additions</h2></p>
-<p><a name="4.2.18.1"></a><h3>2.18.1. Glazing schema API</h3></p>
+<p><a name="4.2.18"></a><h2 class="new">2.18. Material API additions</h2></p>
+<p><a name="4.2.18.1"></a><h3 class="new">2.18.1. Glazing schema API</h3></p>
 <p>To assist in creating code accessing and manipulating the properties of a given schema, predefined properties have been introduced to allow a compile-time reference to a property name without requiring you to transcribe it as a string in your code. New predefined properties are available in the new class:</p>
 <ul>
 <li>Autodesk.Revit.DB.Visual.AdvancedGlazing</li>
 </ul>
 <p>whose contents represent the appearance asset of type "advanced glazing". </p>
-<p><a name="4.2.19"></a><h2>2.19. Analysis API additions</h2></p>
-<p><a name="4.2.19.1"></a><h3>2.19.1. Path of Travel API</h3></p>
+<p><a name="4.2.19"></a><h2 class="new">2.19. Analysis API additions</h2></p>
+<p><a name="4.2.19.1"></a><h3 class="new">2.19.1. Path of Travel API</h3></p>
 <p>The new class:</p>
 <ul>
 <li>Autodesk.Revit.DB.Analysis.PathOfTravel</li>
@@ -742,14 +748,14 @@ The curve at position <code>i</code> will be offset with the double at position 
 <li>RouteAnalysisSettings.AnalysisZoneTopOffset &ndash; the analysis zone top, specified as an offset above the level of the plan view.</li>
 <li>RouteAnalysisSettings.AnalysisZoneBottomOffset &ndash; the analysis zone bottom, specified as an offset above the level of the plan view.</li>
 </ul>
-<p><a name="4.2.20"></a><h2>2.20. Structural API additions</h2></p>
-<p><a name="4.2.20.1"></a><h3>2.20.1. RebarConstraint additions</h3></p>
+<p><a name="4.2.20"></a><h2 class="new">2.20. Structural API additions</h2></p>
+<p><a name="4.2.20.1"></a><h3 class="new">2.20.1. RebarConstraint additions</h3></p>
 <p>The new method:</p>
 <ul>
 <li>RebarConstraint.IsReferenceValidForConstraint()</li>
 </ul>
 <p>checks if the reference provided can be used in creating Rebar constraints. </p>
-<p><a name="4.2.20.2"></a><h3>2.20.2. Updating free-form rebar based on shared parameters</h3></p>
+<p><a name="4.2.20.2"></a><h3 class="new">2.20.2. Updating free-form rebar based on shared parameters</h3></p>
 <p>Free-form rebar can now regenerate based on one or more shared parameters. Several methods have been added to support this behaviour:</p>
 <ul>
 <li>Autodesk.Revit.DB.Structure.RebarFreeFormAccessor.AddUpdatingSharedParameter()</li>
@@ -759,7 +765,7 @@ The curve at position <code>i</code> will be offset with the double at position 
 <li>Autodesk.Revit.DB.Structure.RebarUpdateCurvesData.GetRebarId() &ndash; Returns the ElementId of the rebar being regenerated.</li>
 </ul>
 <p>Note that the shared parameter(s) must already be bound to the Rebar category before setting up the dependency.</p>
-<p><a name="4.2.20.3"></a><h3>2.20.3. StructuralConnectionHandler additions</h3></p>
+<p><a name="4.2.20.3"></a><h3 class="new">2.20.3. StructuralConnectionHandler additions</h3></p>
 <p>The new property:</p>
 <ul>
 <li>Autodesk.Revit.DB.Structure.StructuralConnectionHandler.OverrideTypeParams</li>
@@ -767,20 +773,20 @@ The curve at position <code>i</code> will be offset with the double at position 
 <p>allows or disallows overriding the parameters for a connection type.</p>
 <p>When set to true, a set of instance parameters is created for this connection by copying the type parameter set. The user can change these instance parameters in order to make this connection different from the others of the same type. Any further modification on type parameters will not affect this instance (until the "override" is turned back off).</p>
 <p>When set to false, the connection instance parameters are discarded and the type parameters are used again.</p>
-<p><a name="4.2.21"></a><h2>2.21. MEP API additions</h2></p>
-<p><a name="4.2.21.1"></a><h3>2.21.1. FabricationPart additions</h3></p>
+<p><a name="4.2.21"></a><h2 class="new">2.21. MEP API additions</h2></p>
+<p><a name="4.2.21.1"></a><h3 class="new">2.21.1. FabricationPart additions</h3></p>
 <p>The new method:</p>
 <ul>
 <li>FabricationPart.GetInsulationLiningGeometry()</li>
 </ul>
 <p>returns any insulation or liner geometry for a fabrication part. If there is no insulation or liner applied the return value will be null.</p>
-<p><a name="4.2.21.2"></a><h3>2.21.2. FabricationNetworkChangeService</h3></p>
+<p><a name="4.2.21.2"></a><h3 class="new">2.21.2. FabricationNetworkChangeService</h3></p>
 <p>The new method:</p>
 <ul>
 <li>FabricationNetworkChangeService.ChangeService()</li>
 </ul>
 <p>changes the service of a selection of element identifiers to the passed in service, group identifiers, and the option to restrict the placement of parts that only exist in the group identifier.</p>
-<p><a name="4.2.21.3"></a><h3>2.21.3. ElectricalSystem API additions </h3></p>
+<p><a name="4.2.21.3"></a><h3 class="new">2.21.3. ElectricalSystem API additions </h3></p>
 <p>The new properties: </p>
 <ul>
 <li>ElectricalSystem.CircuitConnectionType</li>
