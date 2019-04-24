@@ -21,6 +21,19 @@ First, however, an interesting adaptation of RvtSamples to run in zero document 
 
 linkedin:
 
+Close document, zero-doc RvtSamples and TBC samples for Revit 2020 and the #RevitAPI #bim #DynamoBim #ForgeDevCon #Revit #API #SDK
+
+http://bit.ly/zerodocsamples
+
+Still getting up to speed with Revit 2020 and my new virtual machine that I set up for it...
+
+First, however, an interesting adaptation of RvtSamples to run in zero document state:
+
+- RvtSamples adapted for zero document state
+- Migrating The Building Coder samples to Revit 2020
+- Installing PowerTools Copy HTML Markup
+- Using <code>PostCommand</code> to close document...
+
 
 -->
 
