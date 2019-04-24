@@ -1,0 +1,124 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script></p>
+<p></head></p>
+<!---
+
+twitter:
+
+ #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+&ndash; 
+...
+
+linkedin:
+
+
+-->
+
+<h3>Close Doc and Zero Doc RvtSamples</h3>
+<p>Still getting up to speed with Revit 2020 and my new virtual machine that I set up for it...</p>
+<p>First, however, an interesting adaptation of RvtSamples to run in zero document state:</p>
+<ul>
+<li><a href="#2">RvtSamples adapted for zero document state</a> </li>
+<li><a href="#3">Migrating The Building Coder samples to Revit 2020</a> </li>
+<li><a href="#4">Installing PowerTools Copy HTML Markup</a> </li>
+<li><a href="#5">Using PostCommand to close document</a> </li>
+</ul>
+<h4><a name="2"></a> RvtSamples adapted for Zero Document State</h4>
+<p>Before the release of Revit 2020, I had an interesting discussion with my French namesake Jérémie on running RvtSamples in zero document state.</p>
+<p>As you may know, R§vtSamples is simply an external application that reads a text file containing information on (a large number of) external commands and their assembly DLL loctions to populate a menu making them all accessible in the Revit user interface without a need to install a separate add-in manifest for each one of them.</p>
+<p>It is used to easily provide debugging and testing access to all the external commands provided by the Revit SDK samples.</p>
+<p>and uses that 
+- /a/doc/revit/tbc/git/a/zip/RvtSamplesEnabledInZeroDocState.zip + 7z</p>
+<p>In his <a href="https://thebuildingcoder.typepad.com/blog/2018/04/rvtsamples-2019.html#comment-4399937612">comment</a>
+on <a href="https://thebuildingcoder.typepad.com/blog/2018/04/rvtsamples-2019.html#comment-4399937612">RvtSamples for Revit 2019</a>,
+Jérémie asks:</p>
+<p><strong>Question:</strong> After several tries on Visual Studio 2017 I finally managed to load RvtSamples to Revit 2019! Thank you for this update!</p>
+<p>However, I have a question about this tool.</p>
+<p>This application makes it possible to use all the examples of the SDK and also to add others.
+The concern is that the manifest seems created by code from the <code>RvtSamples.txt</code> file and I do not find how to modify this code to add <code>VisibilityMode</code> <code>=</code> <code>AlwaysVisible</code>.</p>
+<p>Personally, I need some of my addins (ExternalCommand) to be <code>VisibilityMode</code> <code>=</code> <code>AlwaysVisible</code> to allow their use from the opening of Revit.</p>
+<p>Is it possible to do this simply?</p>
+<p><strong>Answer:</strong> Yes, sure you can simply set <code>VisibilityMode</code> <code>=</code> <code>AlwaysVisible</code> in the add-in manifest for any add-in you like.</p>
+<p>Look at the description
+of <a href="http://help.autodesk.com/view/RVT/2019/ENU/?guid=Revit_API_Revit_API_Developers_Guide_Introduction_Add_In_Integration_Add_in_Registration_html">Add-in Registration settings in the Developer Guide</a>.</p>
+<p>The RvtSamples.txt text input file is not created by the program, but hand edited.</p>
+<p>I implemented it originally in 2008 to <a href="https://thebuildingcoder.typepad.com/blog/2008/09/loading-sdk-sam.html">load the Revit SDK samples</a>.</p>
+<p>At that time, it only held four lines of text per external command to load.</p>
+<p>That number was later expanded to seven, adding support for the tooltip text, small and large icon image.</p>
+<p>The visibility mode could be added to the list of data to be read from that file, but is not currently so.</p>
+<p>You could add that support yourself if you like, by modifying the RvtSamples application yourself.</p>
+<p>It is probably simpler to implement the specific external commands that you wish to equip with this setting in a separate add-in with their own add-in manifest.</p>
+<p><strong>Response:</strong> Yes, I have already split the <code>RvtSamples.txt</code> file to match what I want and it works without any worries.</p>
+<p>Yes, that's exactly what I wanted to do: modify the code to add an 8th line to add this option (or more simply change the default to AlwaysVisible).</p>
+<p>Unfortunately, I have not yet managed to understand the code enough to do that. I will continue to search in this case.</p>
+<p><strong>Answer:</strong> The code is simple. Edit the RvtSamples module <code>Application.cs</code>.</p>
+<p><code>AddSample</code> reads seven lines of text from RvtSamples.txt.</p>
+<p>Modify it to read eight lines instead.</p>
+<p>Or, as you suggest, set the default to <code>AlwaysVisible</code>. Oh no, this all makes no sense at all. AlwaysVisible applies to a standard external command loaded by Revit into the external tools menu. We are not loading anything at all into the external tools menu, but creating our own menu instead. Is the RvtSamples panel visible and active in zero document state?</p>
+<p><strong>Response:</strong> The RvtSamples panel is visible but disabled in zero document state.</p>
+<p>But now it works. I ended up finding what was blocking me in the article
+on <a href="http://thebuildingcoder.typepad.com/blog/2011/02/enable-ribbon-items-in-zero-document-state.html">enabling ribbon items in zero document state</a>.</p>
+<p>To implement this in RvtSamples, it's ultimately relatively simple.</p>
+<ul>
+<li>Implement <em>public class Availability: IExternalCommandAvailability</em> (where <code>IsCommandAvailable</code> returns true) in every external DLL you want active in zero document state.</li>
+<li>In the RvtSamples Application, set the <code>AvailabiltyClassName</code> property of the PushButton object to <em>namespaceOfTheExternalDll.Availability</em>.</li>
+</ul>
+<p>Thank you for your help.</p>
+<p>Here is a <a href="https://www.dropbox.com/s/j0dk8ifvw83l0n6/RvtSamplesMod.7z?dl=0">DropBox link to a <code>7z</code> archive containing the project with this functionality</a>.</p>
+<p>Many thanks to Jérémie for this initiative, discussion, research and project modification!</p>
+<p>For posterity, I copied his <code>7z</code> archive to The Building Coder repository, also converted to a corresponding <code>zip</code> version:</p>
+<ul>
+<li><a href="zip/RvtSamplesEnabledInZeroDocState.7z">RvtSamplesEnabledInZeroDocState.7z</a> (23816 bytes)</li>
+<li><a href="zip/RvtSamplesEnabledInZeroDocState.zip">RvtSamplesEnabledInZeroDocState.zip</a> (45212 bytes)</li>
+</ul>
+<h4><a name="3"></a> Migrating The Building Coder Samples to Revit 2020</h4>
+<p>I migrated <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> to Revit 2020.</p>
+<p>Aftter updating the Revit API assembly DLLs to the new version,
+<a href="zip/tbc_samples_errors_warnings_1.txt">one error occurred</a>:</p>
+<ul>
+<li>Error CS1061 in CmdGetMaterials.cs line 736: <code>Application</code> does not contain a definition for <code>get_Assets</code> and no extension method <code>get_Assets</code> accepting a first argument of type <code>Application</code> could be found.</li>
+</ul>
+<p>The removal of this property is indeed listed
+in <a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html">What's New in the Revit 2020 API</a>
+under <a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html#4.1.6">obsolete API removal</a>.</p>
+<p>It was referenced in the method <code>ListAllAssets</code>, whose only purpose was to test this property.
+I guess it has no particular use.
+Maybe it never did?
+Anyway, since the method is never called, I simply commented it out.</p>
+<p>The current version is <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2020.0.145.0">release 2020.0.145.0</a>.</p>
+<h4><a name="4"></a> Installing PowerTools Copy HTML Markup</h4>
+<p>I prefer to colourise the C# source code I publish here on the blog, cf. below.</p>
+<p>This can be achieved by installing an additional tool in Visual Studio.</p>
+<p>Luckily I researched this topic three years ago
+migrating <a href="http://thebuildingcoder.typepad.com/blog/2016/04/rvtsamples-for-revit-2017.html">RvtSamples for Revit 2017</a> and
+discovered
+the <a href="https://visualstudiogallery.msdn.microsoft.com/34ebc6a2-2777-421d-8914-e29c1dfa7f5d">Productivity Power Tools 2015</a>.</p>
+<p>I installed those and they still work fine:</p>
+<p><center>
+<img src="img/visual_studio_2015_copy_html_markup_2.png" alt="Copy Html Markup menu entry" width="479">
+</center></p>
+<h4><a name="5"></a> Using PostCommand to Close Document</h4>
+<p>A long, long time ago, we discussed <a href="https://thebuildingcoder.typepad.com/blog/2010/10/closing-the-active-document-and-why-not-to.html">closing the active document and why not to</a> do
+so using a Windows message workaround, later followed by another exploration on how
+to <a href="https://thebuildingcoder.typepad.com/blog/2012/12/closing-the-active-document.html">close the last document</a> by
+first opening a dummy document so that the other 'real' document can be closed.</p>
+<p>Bogdan just provided a new effective suggestion for closing the active document using <code>PostCommand</code> in
+his <a href="https://thebuildingcoder.typepad.com/blog/2010/10/closing-the-active-document-and-why-not-to.html#comment-4435756188">comment on the former post</a>:</p>
+<blockquote>
+<p>Maybe someone has already found this solution to close the active document in Revit; I found the following method:</p>
+</blockquote>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">RevitCommandId</span>&nbsp;closeDoc
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:#2b91af;">RevitCommandId</span>.LookupPostableCommandId(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">PostableCommand</span>.Close&nbsp;);
+
+&nbsp;&nbsp;uiapp.PostCommand(&nbsp;closeDoc&nbsp;);
+</pre>
+
+<p>(Voila, my first use of the new Copy HTML Markup menu item &nbsp; :-)</p>
+<p>I added the new method
+to <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2020.0.145.1">The Building Coder samples release 2020.0.145.1</a>.</p>
