@@ -10,7 +10,7 @@
   
 twitter:
 
-Close document, zero-doc RvtSamples and TBC samples for Revit 2020 and the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Close document, zero-doc RvtSamples and TBC samples for Revit 2020 and the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/zerodocsamples
 
 Still getting up to speed with Revit 2020 and my new virtual machine that I set up for it...
 First, however, an interesting adaptation of RvtSamples to run in zero document state
