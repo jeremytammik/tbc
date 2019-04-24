@@ -10,8 +10,12 @@ twitter:
 
  #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Still getting up to speed with Revit 2020 and my new virtual machine that I set up for it...
+First, however, an interesting adaptation of RvtSamples to run in zero document state
+&ndash; RvtSamples adapted for zero document state
+&ndash; Migrating The Building Coder samples to Revit 2020
+&ndash; Installing PowerTools Copy HTML Markup
+&ndash; Using <code>PostCommand</code> to close document...
 
 linkedin:
 
@@ -25,14 +29,12 @@ linkedin:
 <li><a href="#2">RvtSamples adapted for zero document state</a> </li>
 <li><a href="#3">Migrating The Building Coder samples to Revit 2020</a> </li>
 <li><a href="#4">Installing PowerTools Copy HTML Markup</a> </li>
-<li><a href="#5">Using PostCommand to close document</a> </li>
+<li><a href="#5">Using <code>PostCommand</code> to close document</a> </li>
 </ul>
 <h4><a name="2"></a> RvtSamples adapted for Zero Document State</h4>
 <p>Before the release of Revit 2020, I had an interesting discussion with my French namesake Jérémie on running RvtSamples in zero document state.</p>
-<p>As you may know, R§vtSamples is simply an external application that reads a text file containing information on (a large number of) external commands and their assembly DLL loctions to populate a menu making them all accessible in the Revit user interface without a need to install a separate add-in manifest for each one of them.</p>
+<p>As you may know, RvtSamples is simply an external application that reads a text file containing information on (a large number of) external commands and their assembly DLL locations to populate a menu making them all accessible in the Revit user interface without a need to install a separate add-in manifest for each one of them.</p>
 <p>It is used to easily provide debugging and testing access to all the external commands provided by the Revit SDK samples.</p>
-<p>and uses that 
-- /a/doc/revit/tbc/git/a/zip/RvtSamplesEnabledInZeroDocState.zip + 7z</p>
 <p>In his <a href="https://thebuildingcoder.typepad.com/blog/2018/04/rvtsamples-2019.html#comment-4399937612">comment</a>
 on <a href="https://thebuildingcoder.typepad.com/blog/2018/04/rvtsamples-2019.html#comment-4399937612">RvtSamples for Revit 2019</a>,
 Jérémie asks:</p>
@@ -68,7 +70,7 @@ on <a href="http://thebuildingcoder.typepad.com/blog/2011/02/enable-ribbon-items
 <li>In the RvtSamples Application, set the <code>AvailabiltyClassName</code> property of the PushButton object to <em>namespaceOfTheExternalDll.Availability</em>.</li>
 </ul>
 <p>Thank you for your help.</p>
-<p>Here is a <a href="https://www.dropbox.com/s/j0dk8ifvw83l0n6/RvtSamplesMod.7z?dl=0">DropBox link to a <code>7z</code> archive containing the project with this functionality</a>.</p>
+<p>Here is a <a href="https://www.dropbox.com/s/j0dk8ifvw83l0n6/RvtSamplesMod.7z?dl=0">Dropbox link to a <code>7z</code> archive containing the project with this functionality</a>.</p>
 <p>Many thanks to Jérémie for this initiative, discussion, research and project modification!</p>
 <p>For posterity, I copied his <code>7z</code> archive to The Building Coder repository, also converted to a corresponding <code>zip</code> version:</p>
 <ul>
@@ -77,7 +79,7 @@ on <a href="http://thebuildingcoder.typepad.com/blog/2011/02/enable-ribbon-items
 </ul>
 <h4><a name="3"></a> Migrating The Building Coder Samples to Revit 2020</h4>
 <p>I migrated <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> to Revit 2020.</p>
-<p>Aftter updating the Revit API assembly DLLs to the new version,
+<p>After updating the Revit API assembly DLLs to the new version,
 <a href="zip/tbc_samples_errors_warnings_1.txt">one error occurred</a>:</p>
 <ul>
 <li>Error CS1061 in CmdGetMaterials.cs line 736: <code>Application</code> does not contain a definition for <code>get_Assets</code> and no extension method <code>get_Assets</code> accepting a first argument of type <code>Application</code> could be found.</li>
