@@ -160,8 +160,7 @@ to [close the last document](https://thebuildingcoder.typepad.com/blog/2012/12/c
 first opening a dummy document so that the other 'real' document can be closed.
 
 Bogdan just provided a new effective suggestion for closing the active document using `PostCommand` in
-his [comment on the former post](https://thebuildingcoder.typepad.com/blog/2010/10/closing-the-active-document-and-why-not-to.html#comment-4435756188
-):
+his [comment on the former post](https://thebuildingcoder.typepad.com/blog/2010/10/closing-the-active-document-and-why-not-to.html#comment-4435756188):
 
 > Maybe someone has already found this solution to close the active document in Revit; I found the following method:
 
