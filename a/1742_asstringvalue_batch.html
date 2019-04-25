@@ -13,18 +13,21 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+I avoid answering non-confidential questions in private, as I tell everyone who tries to do so.
+However, some non-confidential queries still come in via ADN.
+Here are two that came in today that might be of general interest and therefore seem worth sharing
+&ndash; Batch processing Revit families and documents
+&ndash; <code>AsString</code> and <code>AsValueString</code> results differ...
 
 linkedin:
 
 
 -->
 
-<h3>Batch Processing and AsStringValue Aspects</h3>
+<h3>Batch Processing and Aspects of AsStringValue</h3>
 <p>I avoid answering non-confidential questions in private, as I tell everyone who tries to do so.</p>
 <p>However, some non-confidential queries still come in via ADN, the Autodesk Developer Network.</p>
-<p>Here are two ones that came in today that are might be of general interest and therefore seem worth sharing:</p>
+<p>Here are two that came in today that might be of general interest and therefore seem worth sharing:</p>
 <ul>
 <li><a href="#2">Batch processing Revit families and documents</a> </li>
 <li><a href="#3"><code>AsString</code> and <code>AsValueString</code> results differ</a> </li>
@@ -39,9 +42,9 @@ It is a blocking issue.</p>
 <p>You should not be surprised if you run into problems eventually.</p>
 <p>The standard method to handle such tasks is something like this:</p>
 <ul>
-<li>Keep exact track of processing so you always know what has been processed so far and what still need to be done</li>
-<li>Monitor the process health</li>
-<li>Shut down and restart if the process starts deteriorating or terminates.</li>
+<li>Keep exact track of processing so you always know what has been processed so far and what still need to be done.</li>
+<li>Monitor the process health.</li>
+<li>Shut down, restart and continue where you left off if the process starts deteriorating or terminates.</li>
 </ul>
 <p>Here is more on the topic of using Revit as a server
 for <a href="http://thebuildingcoder.typepad.com/blog/2015/08/batch-processing-dwfx-links-and-future-proofing.html#4">batch processing Revit documents</a>.</p>
@@ -72,8 +75,8 @@ a <a href="https://apidocs.co/apps/revit/2019/3dbebcb8-792b-a3dd-fe63-faaa05704f
 can take one of the following values:</p>
 <ul>
 <li>None &ndash; None represents an invalid storage type. This value should not be used.</li>
-<li>Integer &ndash; The internal data is stored in the form of a signed 32 bit integer.</li>
-<li>Double &ndash; The data will be stored internally in the form of an 8 byte floating point number.</li>
+<li>Integer &ndash; The internal data is stored in the form of a signed 32-bit integer.</li>
+<li>Double &ndash; The data will be stored internally in the form of an 8-byte floating point number.</li>
 <li>String &ndash; The internal data will be stored in the form of a string of characters.</li>
 <li>ElementId &ndash; The data type represents an element and is stored as the id of the element.</li>
 </ul>
