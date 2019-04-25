@@ -1,0 +1,91 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script></p>
+<p></head></p>
+<!---
+
+15302696 [Revit API]
+15302918 [Parameter values are different into method AsValueString() and AsString()]
+
+twitter:
+
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+&ndash; 
+...
+
+linkedin:
+
+
+-->
+
+<h3>Batch Processing and AsStringValue Aspects</h3>
+<p>I avoid answering non-confidential questions in private, as I tell everyone who tries to do so.</p>
+<p>However, some non-confidential queries still come in via ADN, the Autodesk Developer Network.</p>
+<p>Here are two ones that came in today that are might be of general interest and therefore seem worth sharing:</p>
+<ul>
+<li><a href="#2">Batch processing Revit families and documents</a> </li>
+<li><a href="#3"><code>AsString</code> and <code>AsValueString</code> results differ</a> </li>
+</ul>
+<h4><a name="2"></a> Batch Processing Revit Families and Documents</h4>
+<p><strong>Question:</strong> Revit 2019 is leaking memory when importing families.
+We need to do this 1000s of times using automation.
+It is a blocking issue.</p>
+<p>Please can you advise?</p>
+<p><strong>Answer:</strong> Revit on the desktop is an end user product designed for manual use through the manual user interface.</p>
+<p>If you are using it to perform any kind of operation thousands of times, you are using it in an unexpected manner.</p>
+<p>You should not be surprised if you run into problems eventually.</p>
+<p>The standard method to handle such tasks is something like this:</p>
+<ul>
+<li>Keep exact track of processing so you always know what has been processed so far and what still need to be done</li>
+<li>Monitor the process health</li>
+<li>Shut down and restart if the process starts deteriorating or terminates.</li>
+</ul>
+<p>Here is more on the topic of using Revit as a server
+for <a href="http://thebuildingcoder.typepad.com/blog/2015/08/batch-processing-dwfx-links-and-future-proofing.html#4">batch processing Revit documents</a>.</p>
+<p>However, <a href="https://thebuildingcoder.typepad.com/blog/2016/04/fireratingcloud-context-and-architecture.html#3">Revit is not designed to be used as a server</a>, and the EULA actually prohibits such use.</p>
+<p>A better and more robust alternative nowadays that also saves you the maintenance of a local Revit installation and enables integration of your batch processing into other web-based workflows is to perform your batch processing using
+the <a href="https://forge.autodesk.com/en/docs/design-automation/v3/developers_guide/overview">Forge Design Automation API for Revit</a>.</p>
+<p>Here are more articles describing specific aspects
+of <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55">DA4R, or Design Automation for Revit</a></p>
+<h4><a name="3"></a> AsString and AsValueString Results Differ</h4>
+<p><strong>Question:</strong> I am running into a problem using <code>AsValuesString</code> and <code>AsString</code>.</p>
+<p>They return different values.</p>
+<p>For instance, a view has a parameter named "Sheet Number".
+Its storage type is string.
+<code>AsValueString</code> returns a blank value for it, whereas <code>AsString</code> returns "---":</p>
+<p><center>
+<img src="img/asvaluestring_sheet_number.png" alt="Sheet number" width="600">
+</center></p>
+<p>Similarly for the Duct Accessory parameter "Loss Method":</p>
+<p><center>
+<img src="img/asvaluestring_loss_method.png" alt="Loss method" width="600">
+</center></p>
+<p>The same problem occurs with many other element and parameters.</p>
+<p>Is there a way to identify which value is correct and to identify which method to use to always to get the correct value?</p>
+<p>I am running into the issue exporting schedule data to Excel. In some cases, I export a blank value for a non-blank data item.</p>
+<p>When importing back the data, I cannot determine whether the user modified it or it was incorrectly exported.</p>
+<p><strong>Answer:</strong> The Revit Parameter class has
+a <a href="https://apidocs.co/apps/revit/2019/3dbebcb8-792b-a3dd-fe63-faaa05704f3c.htm">storage type</a> that
+can take one of the following values:</p>
+<ul>
+<li>None &ndash; None represents an invalid storage type. This value should not be used.</li>
+<li>Integer &ndash; The internal data is stored in the form of a signed 32 bit integer.</li>
+<li>Double &ndash; The data will be stored internally in the form of an 8 byte floating point number.</li>
+<li>String &ndash; The internal data will be stored in the form of a string of characters.</li>
+<li>ElementId &ndash; The data type represents an element and is stored as the id of the element.</li>
+</ul>
+<p>Corresponding to the four valid storage types, there are four accessors to read the stored value from the database:</p>
+<ul>
+<li><code>AsDouble</code> &ndash; Provides access to the double precision number within the parameter.</li>
+<li><code>AsElementId</code> &ndash; Provides access to the Autodesk::Revit::DB::ElementId^ stored within the parameter.</li>
+<li><code>AsInteger</code> &ndash; Provides access to the integer number within the parameter.</li>
+<li><code>AsString</code> &ndash; Provides access to the string contents of the parameter.</li>
+</ul>
+<p>Use those four, and you will have no problem.</p>
+<p><code>AsValueString</code> is a completely different creature that returns the parameter value as a string with units, like the user would see it.</p>
+<p>It may perform complex conversions while rendering the string.</p>
+<p>Furthermore, a string-valued parameter value can only be retrieved using <code>AsString</code>, and <code>AsValueString</code> returns an empty string for it, as you already noticed.</p>
+<p>I would avoid using <code>AsValueString</code> at all in your situation, and keep track of the parameter storage type as well as its value.</p>
