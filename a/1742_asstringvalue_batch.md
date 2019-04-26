@@ -13,7 +13,7 @@
   
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Batch processing and aspects of AsStringValue in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/asstringvalue
 
 I avoid answering non-confidential questions in private, as I tell everyone who tries to do so.
 However, some non-confidential queries still come in via ADN.
@@ -22,6 +22,19 @@ Here are two that came in today that might be of general interest and therefore 
 &ndash; <code>AsString</code> and <code>AsValueString</code> results differ...
 
 linkedin:
+
+Batch processing and aspects of AsStringValue in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon #Revit #API
+
+http://bit.ly/asstringvalue
+
+I avoid answering non-confidential questions in private, as I tell everyone who tries to do so.
+
+However, some non-confidential queries still come in via ADN.
+
+Here are two that came in today that might be of general interest and therefore seem worth sharing
+
+- Batch processing Revit families and documents
+- AsString and AsValueString results differ...
 
 
 -->

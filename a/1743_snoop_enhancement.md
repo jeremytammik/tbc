@@ -10,7 +10,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Forge DA4R IFC support and RevitLookup snoop enhancements in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/snoop_da4r_ifc
 
 Let's close this eventful week with two important enhancements added to the Forge Design Automation API for Revit and our beloved RevitLookup tool
 &ndash; IFC Support in the Design Automation for Revit API
@@ -18,6 +18,14 @@ Let's close this eventful week with two important enhancements added to the Forg
 
 linkedin:
 
+Forge DA4R IFC support and RevitLookup snoop enhancements in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon #Revit #API #IFC
+
+http://bit.ly/snoop_da4r_ifc
+
+Let's close this eventful week with two important enhancements added to the Forge Design Automation API for Revit and our beloved RevitLookup tool:
+
+- IFC Support in the Design Automation for Revit API
+- RevitLookup Snoop Enhancements...
 
 -->
 
@@ -26,7 +34,7 @@ linkedin:
 Let's close this eventful week with two important enhancements added to the Forge Design Automation API for Revit and our beloved RevitLookup tool:
 
 - [IFC Support in the Design Automation for Revit API](#2) 
-- [RevitLookup Snoop Enhancements](#3) 
+- [RevitLookup Snoop Enhancements](#3)
 
 ####<a name="2"></a> IFC Support in the Design Automation for Revit API
 
@@ -47,7 +55,7 @@ We recently added IFC support to Design Automation for Revit.  The supported fun
     - Export IFC
     - Link IFC
 
-Additional documentation will be added asap.  
+Additional documentation will be added asap.
 
 Revit 2018 does not support link IFC functionality at this time.
 
@@ -61,7 +69,6 @@ Many thanks to Ryan and The Factory for this important step forward!
 
 Please refer to The Building Coder topic group
 for [more information on DA4R](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55).
-
 
 ####<a name="3"></a> RevitLookup Snoop Enhancements
 
