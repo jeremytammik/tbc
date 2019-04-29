@@ -1,0 +1,181 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script></p>
+<p></head></p>
+<!---
+
+twitter:
+
+New Revit 2020 SDK samples in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+&ndash; 
+...
+
+linkedin:
+
+
+#Revit #API #IFC
+
+
+-->
+
+<h3>New Revit 2020 SDK Samples</h3>
+<p>So far, we looked at the following aspects of the Revit 2020 API enhancements:</p>
+<ul>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/the-revit-2020-fcs-api-and-sdk.html#3">Revit 2020 DevDays Online presentation recording</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/the-revit-2020-fcs-api-and-sdk.html#7">Compiling the Revit 2020 SDK samples</a> </li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/the-revit-2020-fcs-api-and-sdk.html#8">Setting up RvtSamples</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/revitlookup-and-sdk-for-revit-2020.html#2">RevitLookup for Revit 2020</a> </li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/revitlookup-and-sdk-for-revit-2020.html#3">Revit 2020 SDK posted to Revit Developer Centre</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html">What's New in the Revit 2020 API</a></li>
+</ul>
+<p>The next obvious question is:</p>
+<p>What can we do with the new features?</p>
+<p>Well, just like most of the existing functionality, the enhancements and some typical yet simple use cases for them are demonstrated by the updated SDK samples.</p>
+<p>Revit 2020 sports five brand new SDK samples:</p>
+<ul>
+<li><a href="#2">AttachedDetailGroup</a></li>
+<li><a href="#3">CreateTrianglesTopography</a></li>
+<li><a href="#4">Custom2DExporter</a></li>
+<li><a href="#5">PathOfTravel</a></li>
+<li><a href="#6">ViewTemplateCreation</a></li>
+</ul>
+<p>This lists also highlights some the most exciting areas of enhancement.</p>
+<p>AttachedDetailGroup implements an external application with a ribbon panel UI providing access to its two commands.</p>
+<p>The other four implement just one external command each.</p>
+<h4><a name="2"></a> AttachedDetailGroup</h4>
+<p>Revit 2020 boasts
+several <a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html#4.2.1">attached detail group API additions</a>.</p>
+<p>The AttachedDetailGroup sample shows how to use these to show and hide the attached detail groups of a model group in the active view.</p>
+<p>In its readme file, it purports to be released with Revit 2019.1, although in fact it did not appear before the Revit 2020 SDK.</p>
+<p>It includes three modules:</p>
+<ul>
+<li>Application.cs defines the Application class that creates the UI ribbon components when Revit starts.</li>
+<li>AttachedDetailGroupShowAllCommand.cs and AttachedDetailGroupHideAllCommand.cs implements its two external commands to show and hide attached detail groups, respectively.</li>
+</ul>
+<p>Demonstration instructions: </p>
+<ul>
+<li>Create two parallel walls with an aligned dimension between them.</li>
+<li>Select the two walls and the dimension and create a group.<ul>
+<li>Expected result: a model group containing the two walls and an attached detail group containing the dimension are created.</li>
+</ul>
+</li>
+<li>Select the model group.</li>
+<li>Select the Addins ribbon menu.</li>
+<li>Execute the Hide All Detail Groups command in the Attached Detail Group ribbon panel.<ul>
+<li>Expected result: The attached detail group is no longer visible.</li>
+</ul>
+</li>
+<li>Execute the Show All Detail Groups command in the Attached Detail Group ribbon panel.<ul>
+<li>Expected result: The attached detail group is now visible.</li>
+</ul>
+</li>
+</ul>
+<h4><a name="3"></a> CreateTrianglesTopography</h4>
+<p>Revit 2020 supports the creation of concave topography surfaces using
+the <a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html#4.2.12.1">new <code>TopographySurface</code> API additions</a>.</p>
+<p>The CreateTrianglesTopography SDK sample creates a new topography surface element from triangle points and triangle facets using the new overload of the <code>TopographySurface</code> <code>Create</code> API method,</p>
+<p>In its readme file, it purports to be released with Revit 2019.2, although in fact it did not appear before the Revit 2020 SDK.</p>
+<p>Command.cs implements the <em>Create Triangles Topography</em> external command.</p>
+<p>TrianglesData.cs defines two classes, <code>TrianglesData</code> and <code>XYZConverter</code>.</p>
+<p>The <code>TrianglesData.json</code> input file contains all the points and facets data to define the topography surface.
+The contents of this file can be deserialized to a <code>TrianglesData</code> object.</p>
+<p><code>TrianglesData</code> parses the triangle points and triangle facets stored in the <code>TrianglesData.json</code> input file.
+These points and facets are passed to Revit API method to create the topography surface.</p>
+<p><code>XYZConverter</code> converts to Revit <code>XYZ</code> instances using a <code>JavaScriptSerializer</code>.</p>
+<p><center>
+<img src="img/CreateTrianglesTopography.png" alt="CreateTrianglesTopography SDK sample" width="252">
+</center></p>
+<h4><a name="4"></a> Custom2DExporter</h4>
+<p>In Revit 2020,
+the <a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html#4.2.16.1"><code>CustomExporter</code> supports some 2D views</a>.</p>
+<p>The Custom2DExporter SK sample demonstrates its use to export 2D views using various exporter options, enabling the user to export and visualise 2D model and annotation geometry. </p>
+<p>This sample lives in the new <code>CustomExporter</code> subfolder.</p>
+<p>In its readme file, it purports to be released with Revit 2019.0, although in fact it did not appear before the Revit 2020 SDK.</p>
+<p>The external command defined by Command.cs displays the dialog defined in Export2DForm.cs enabling you to pick the exporter options and  export the current view.</p>
+<p>TessellatedGeomAndText2DExportContext.cs implements the <code>IExportContext2D</code> used for the 2D export. This particular implementation exports 2D curves tessellated into lines and also does some rudimentary text exporting.</p>
+<p>Notes:</p>
+<ul>
+<li>When exporting, the current view is used.</li>
+<li>All exported geometry is tessellated into lines. </li>
+<li>Exported geometry is then visualized by hiding all elements in the view and displaying all exported lines with detail lines. </li>
+<li>To view your original un-exported 2D view, undo once to remove the drawn export.</li>
+</ul>
+<p>The sample also includes a proof of concept for exporting text. The absolute minimum is exported, with all text notes separated by a newline. However, <code>OnText</code> receives all necessary information about text location, font, size and formatting, so the API user can reconstruct it in its entirety.</p>
+<p>Some important details:</p>
+<ul>
+<li>Only visible geometry is exported.</li>
+<li>Meshes are not supported.</li>
+</ul>
+<p>Known issues:</p>
+<ul>
+<li>Some annotations will not automatically export in this sample. Known examples are: sections, reference planes, scope boxes, plan regions. It is recommended that additional code be written in <code>OnElementBegin</code> to detect these elements and export any necessary geometry by writing custom code.</li>
+</ul>
+<p>Instructions: </p>
+<ul>
+<li>Export model geometry:<ul>
+<li>Create a Revit model which contains both model and annotation elements.</li>
+<li>Execute the 'Export 2D Views with CustomExporter' command on a plan, elevation or section. Before executing, do not pick any extra options (annotations or patterns) in the dialog.</li>
+<li>Expected result: all elements in the view are hidden, and instead of them model geometry is drawn using detail lines; annotations are hidden. Any non-line model curves are tessellated into lines. Dismiss the results dialog and undo once to get to your pre-command model state.</li>
+</ul>
+</li>
+<li>Export model and annotations:<ul>
+<li>Create a Revit model which contains both model and annotation elements..</li>
+<li>Execute the 'Export 2D Views with CustomExporter' command on a plan, elevation or section. Before executing, pick 'Export annotations and text.</li>
+<li>Expected result: all elements in the view are hidden, and instead of them, model and annotation geometry is drawn using detail lines. Any non-line model or annotation curves are tessellated into lines. In the results dialog, you get a dump of all text that was found in the view. Dismiss the results dialog and undo once to get to your pre-command model state.</li>
+</ul>
+</li>
+<li>Export pattern lines:<ul>
+<li>If your model contains elements which have patterns applied on their faces, pick 'Export pattern lines' to export and display those patterns on screen.</li>
+</ul>
+</li>
+</ul>
+<h4><a name="5"></a> PathOfTravel</h4>
+<p>Revit 2020 enhances the Analysis API with support for
+a new <a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html#4.2.19">Path of Travel API</a>.</p>
+<p>The PathOfTravel SDK sample demonstrates how to use it to create <code>PathOfTravel</code> elements from rooms to doors in a plan view and:</p>
+<ul>
+<li>Automatically computes room centre and corner points to use for the start point of the path.</li>
+<li>When the option for path to a single door is selected, lets the user pick which door to use for the end point of the path.</li>
+<li>Automatically creates PathOfTravel elements between the selected combination of room and door elements.</li>
+</ul>
+<p>The external command defined by Command.cs displays the dialog defined in CreateForm.cs.</p>
+<p>It consists of three radio controls selecting one of three different PathOfTravel creation methods.</p>
+<p>Instructions:</p>
+<ul>
+<li>Create some rooms and exit doors.</li>
+<li>Open a plan view in which the created elements are visible.</li>
+<li>Execute the external command. In the dialog, pick an option to create the paths. After clicking OK, the paths will be created and displayed in the view.</li>
+</ul>
+<h4><a name="6"></a> ViewTemplateCreation</h4>
+<p>The Revit 2020 API includes
+some <a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html#4.2.10.1">View Template API additions</a>.</p>
+<p>The ViewTemplateCreation SDK sample shows how to use them to create and configure a new view template from a regular view and a view template settings configuration, including:</p>
+<ul>
+<li>Create new view template based on the selected view</li>
+<li>Set include setting of 'Parts Visibility' parameter</li>
+<li>Set the value of 'Detail Level' parameter</li>
+<li>Change some Visibility/Graphics overrides for a few model categories</li>
+</ul>
+<p>The external command defined in Command.cs creates and shows the view template creation form.</p>
+<p>ViewTemplateCreationForm.cs declares this form, enabling selection of a view for template creation and setting the 'Parts Visibility' and 'Detail Level' parameters. On pressing 'Apply', a new view template will be created based on the selected view and parameter settings. V/G Overrides Model cut patterns settings will be changed for the following categories: Columns, Doors, Walls, Windows.
+V/G Model cut patterns settings will be changed in the following way: 'Foreground Pattern' will be set to 'Solid fill', 'Background color' will be set to 'Black'. Finally, the newly created template will be assigned to the selected view.</p>
+<p>Utils.cs contains several helper methods for showing message boxes and a constant string with the name of the sample.</p>
+<p>Instructions: </p>
+<p>Launch Revit and create a new project from the Architectural template.</p>
+<ul>
+<li>Execute the command.<ul>
+<li>Expected result: View template creation form appears.</li>
+</ul>
+</li>
+<li>Select a view for view template creation.</li>
+<li>Select include setting of 'Parts Visibility' parameter.</li>
+<li>Select value of 'Detail Level' parameter.</li>
+<li>Press 'Apply' button.<ul>
+<li>Expected result: new view template is created based on the selected view, parameter settings are applied to parameters, V/G Overrides Model cut patterns settings are changed for following categories: Columns, Doors, Walls, Windows. V/G Model cut patterns settings are changed in the following way: 'Foreground Pattern' is set to 'Solid fill', 'Background color' is set to 'Black'. The newly created view template is assigned to the selected view.
+.</li>
+</ul>
+</li>
+</ul>
