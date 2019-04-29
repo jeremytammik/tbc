@@ -8,16 +8,21 @@
 
 twitter:
 
-New Revit 2020 SDK samples in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+New Revit 2020 SDK samples in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash; 
-...
+Question: What can we do with the new Revit 2020 API features?
+Well, just like most of the existing functionality, the enhancements and some typical yet simple use cases for them are demonstrated by the updated SDK samples.
+Revit 2020 sports five brand new SDK samples
+&ndash; AttachedDetailGroup
+&ndash; CreateTrianglesTopography
+&ndash; Custom2DExporter
+&ndash; PathOfTravel
+&ndash; ViewTemplateCreation
+This lists also highlights some the most exciting areas of enhancement...
 
 linkedin:
 
-
 #Revit #API #IFC
-
 
 -->
 
@@ -55,7 +60,7 @@ several <a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-
 <li>Application.cs defines the Application class that creates the UI ribbon components when Revit starts.</li>
 <li>AttachedDetailGroupShowAllCommand.cs and AttachedDetailGroupHideAllCommand.cs implements its two external commands to show and hide attached detail groups, respectively.</li>
 </ul>
-<p>Demonstration instructions: </p>
+<p>Demonstration instructions:</p>
 <ul>
 <li>Create two parallel walls with an aligned dimension between them.</li>
 <li>Select the two walls and the dimension and create a group.<ul>
@@ -81,7 +86,7 @@ the <a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-
 <p>Command.cs implements the <em>Create Triangles Topography</em> external command.</p>
 <p>TrianglesData.cs defines two classes, <code>TrianglesData</code> and <code>XYZConverter</code>.</p>
 <p>The <code>TrianglesData.json</code> input file contains all the points and facets data to define the topography surface.
-The contents of this file can be deserialized to a <code>TrianglesData</code> object.</p>
+The contents of this file can be deserialised to a <code>TrianglesData</code> object.</p>
 <p><code>TrianglesData</code> parses the triangle points and triangle facets stored in the <code>TrianglesData.json</code> input file.
 These points and facets are passed to Revit API method to create the topography surface.</p>
 <p><code>XYZConverter</code> converts to Revit <code>XYZ</code> instances using a <code>JavaScriptSerializer</code>.</p>
@@ -91,7 +96,7 @@ These points and facets are passed to Revit API method to create the topography 
 <h4><a name="4"></a> Custom2DExporter</h4>
 <p>In Revit 2020,
 the <a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html#4.2.16.1"><code>CustomExporter</code> supports some 2D views</a>.</p>
-<p>The Custom2DExporter SK sample demonstrates its use to export 2D views using various exporter options, enabling the user to export and visualise 2D model and annotation geometry. </p>
+<p>The Custom2DExporter SK sample demonstrates its use to export 2D views using various exporter options, enabling the user to export and visualise 2D model and annotation geometry.</p>
 <p>This sample lives in the new <code>CustomExporter</code> subfolder.</p>
 <p>In its readme file, it purports to be released with Revit 2019.0, although in fact it did not appear before the Revit 2020 SDK.</p>
 <p>The external command defined by Command.cs displays the dialog defined in Export2DForm.cs enabling you to pick the exporter options and  export the current view.</p>
@@ -100,7 +105,7 @@ the <a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-
 <ul>
 <li>When exporting, the current view is used.</li>
 <li>All exported geometry is tessellated into lines. </li>
-<li>Exported geometry is then visualized by hiding all elements in the view and displaying all exported lines with detail lines. </li>
+<li>Exported geometry is then visualised by hiding all elements in the view and displaying all exported lines with detail lines. </li>
 <li>To view your original un-exported 2D view, undo once to remove the drawn export.</li>
 </ul>
 <p>The sample also includes a proof of concept for exporting text. The absolute minimum is exported, with all text notes separated by a newline. However, <code>OnText</code> receives all necessary information about text location, font, size and formatting, so the API user can reconstruct it in its entirety.</p>
@@ -113,7 +118,7 @@ the <a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-
 <ul>
 <li>Some annotations will not automatically export in this sample. Known examples are: sections, reference planes, scope boxes, plan regions. It is recommended that additional code be written in <code>OnElementBegin</code> to detect these elements and export any necessary geometry by writing custom code.</li>
 </ul>
-<p>Instructions: </p>
+<p>Instructions:</p>
 <ul>
 <li>Export model geometry:<ul>
 <li>Create a Revit model which contains both model and annotation elements.</li>
@@ -163,7 +168,7 @@ some <a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the
 <p>ViewTemplateCreationForm.cs declares this form, enabling selection of a view for template creation and setting the 'Parts Visibility' and 'Detail Level' parameters. On pressing 'Apply', a new view template will be created based on the selected view and parameter settings. V/G Overrides Model cut patterns settings will be changed for the following categories: Columns, Doors, Walls, Windows.
 V/G Model cut patterns settings will be changed in the following way: 'Foreground Pattern' will be set to 'Solid fill', 'Background color' will be set to 'Black'. Finally, the newly created template will be assigned to the selected view.</p>
 <p>Utils.cs contains several helper methods for showing message boxes and a constant string with the name of the sample.</p>
-<p>Instructions: </p>
+<p>Instructions:</p>
 <p>Launch Revit and create a new project from the Architectural template.</p>
 <ul>
 <li>Execute the command.<ul>
@@ -174,8 +179,10 @@ V/G Model cut patterns settings will be changed in the following way: 'Foregroun
 <li>Select include setting of 'Parts Visibility' parameter.</li>
 <li>Select value of 'Detail Level' parameter.</li>
 <li>Press 'Apply' button.<ul>
-<li>Expected result: new view template is created based on the selected view, parameter settings are applied to parameters, V/G Overrides Model cut patterns settings are changed for following categories: Columns, Doors, Walls, Windows. V/G Model cut patterns settings are changed in the following way: 'Foreground Pattern' is set to 'Solid fill', 'Background color' is set to 'Black'. The newly created view template is assigned to the selected view.
-.</li>
+<li>Expected result: new view template is created based on the selected view, parameter settings are applied to parameters, V/G Overrides Model cut patterns settings are changed for following categories: Columns, Doors, Walls, Windows. V/G Model cut patterns settings are changed in the following way: 'Foreground Pattern' is set to 'Solid fill', 'Background color' is set to 'Black'. The newly created view template is assigned to the selected view.</li>
 </ul>
 </li>
 </ul>
+<p>I hope you find these enhancements useful.</p>
+<p>Many of them are driven by developer requests.</p>
+<p>I look forward to hearing about exciting new applications using them.</p>
