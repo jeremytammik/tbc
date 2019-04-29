@@ -10,7 +10,7 @@
 
 twitter:
 
-New Revit 2020 SDK samples in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+AttachedDetailGroup, CreateTrianglesTopography, Custom2DExporter, PathOfTravel, ViewTemplateCreation -- new Revit 2020 SDK samples in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/2020sdksamples
 
 Question: What can we do with the new Revit 2020 API features?
 Well, just like most of the existing functionality, the enhancements and some typical yet simple use cases for them are demonstrated by the updated SDK samples.
@@ -20,11 +20,27 @@ Revit 2020 sports five brand new SDK samples
 &ndash; Custom2DExporter
 &ndash; PathOfTravel
 &ndash; ViewTemplateCreation
-This lists also highlights some the most exciting areas of enhancement...
+&ndash; This list also highlights some the most exciting areas of enhancement...
 
 linkedin:
 
-#Revit #API #IFC
+New Revit 2020 SDK samples in the #RevitAPI #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK
+
+http://bit.ly/2020sdksamples
+
+Question: What can we do with the new Revit 2020 API features?
+
+Well, just like most of the existing functionality, the enhancements and some typical yet simple use cases for them are demonstrated by the updated SDK samples.
+
+Revit 2020 sports five brand new SDK samples:
+
+- AttachedDetailGroup
+- CreateTrianglesTopography
+- Custom2DExporter
+- PathOfTravel
+- ViewTemplateCreation
+
+This list also highlights some the most exciting areas of enhancement...
 
 -->
 
@@ -53,7 +69,7 @@ Revit 2020 sports five brand new SDK samples:
 - [PathOfTravel](#5)
 - [ViewTemplateCreation](#6)
 
-This lists also highlights some the most exciting areas of enhancement.
+This list also highlights some the most exciting areas of enhancement.
 
 AttachedDetailGroup implements an external application with a ribbon panel UI providing access to its two commands.
 
