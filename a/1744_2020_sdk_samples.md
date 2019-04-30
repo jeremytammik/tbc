@@ -54,6 +54,7 @@ So far, we looked at the following aspects of the Revit 2020 API enhancements:
 - [RevitLookup for Revit 2020](https://thebuildingcoder.typepad.com/blog/2019/04/revitlookup-and-sdk-for-revit-2020.html#2) 
 - [Revit 2020 SDK posted to Revit Developer Centre](https://thebuildingcoder.typepad.com/blog/2019/04/revitlookup-and-sdk-for-revit-2020.html#3)
 - [What's New in the Revit 2020 API](https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html)
+- [Migration of The Building Coder samples](https://thebuildingcoder.typepad.com/blog/2019/04/close-doc-and-zero-doc-rvtsamples.html#3)
 
 The next obvious question is:
 
