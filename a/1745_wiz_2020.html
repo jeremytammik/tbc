@@ -1,0 +1,135 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script></p>
+<p></head></p>
+<!---
+
+- how to ask a question
+  15312939 [Section view]
+  https://forums.autodesk.com/t5/revit-api-forum/section-view/m-p/8758078
+
+- AI for All
+  http://www.academy.montreal.ai
+
+twitter:
+
+Revit 2020 C# and VB Visual Studio add-in wizards for the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+Continuing the update of my development environment for Revit 2020, I now turn to the Visual Studio Revit add-in wizards.
+I'll also highlight a couple of recent interesting AEC related job offers, an AI 101 intro, and some rally important suggestions on how to ask a question well
+&ndash; C# and VB Visual Studio add-in wizards for Revit 2020
+&ndash; How to ask a question well
+&ndash; Open Autodesk AEC related positions
+&ndash; AI for all...
+
+linkedin:
+
+ the #RevitAPI #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK
+
+
+-->
+
+<h3>Revit 2020 C# and VB Visual Studio Add-in Wizards</h3>
+<p>Continuing the update of my development environment for Revit 2020, I now turn to the Visual Studio Revit add-in wizards.</p>
+<p>I'll also highlight a couple of recent interesting AEC related job offers, an AI 101 intro, and some really important suggestions on how to ask a question well:</p>
+<ul>
+<li><a href="#2">C# and VB Visual Studio add-in wizards for Revit 2020</a> </li>
+<li><a href="#3">How to ask a question well</a> </li>
+<li><a href="#4">Open Autodesk AEC related positions</a> </li>
+<li><a href="#5">AI for all</a> </li>
+</ul>
+<h4><a name="2"></a> C# and VB Visual Studio Add-in Wizards for Revit 2020</h4>
+<p>So far, for the Revit 2020 API enhancements, I discussed the following aspects and migration steps:</p>
+<ul>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/the-revit-2020-fcs-api-and-sdk.html#3">Revit 2020 DevDays Online presentation recording</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/the-revit-2020-fcs-api-and-sdk.html#7">Compiling the Revit 2020 SDK samples</a> </li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/the-revit-2020-fcs-api-and-sdk.html#8">Setting up RvtSamples</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/revitlookup-and-sdk-for-revit-2020.html#2">RevitLookup for Revit 2020</a> </li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/revitlookup-and-sdk-for-revit-2020.html#3">Revit 2020 SDK posted to Revit Developer Centre</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html">What's New in the Revit 2020 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/close-doc-and-zero-doc-rvtsamples.html#3">Migration of The Building Coder samples</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/new-revit-2020-sdk-samples.html">New Revit 2020 SDK samples</a></li>
+</ul>
+<p>I now turn to the migration of 
+my <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.20">C# and VB Visual Studio Revit add-in wizards</a> to
+Revit 2020, which turned out to be easier than ever before.</p>
+<p>I just cloned the existing repository for Revit 2019, then globally searched and replaced the string '2019' by '2020'.</p>
+<p>I skipped a very few occurrences, e.g., in the copyright notices, tested, committed the changes, and that was that:</p>
+<p><center>
+<img src="img/revit_2020_addin_wizard.png" alt="Visual Studio Add-in Wizard for Revit 2020" width="786">
+</center></p>
+<p>No code changes were required at all, as was to be expected, seeing that
+the <a href="https://thebuildingcoder.typepad.com/blog/2019/04/close-doc-and-zero-doc-rvtsamples.html#3">migration of the much more complex Building Coder samples</a> required
+only one single trivial modification.</p>
+<p>The new version
+is <a href="https://github.com/jeremytammik/VisualStudioRevitAddinWizard/releases/tag/2020.0.0.0">VisualStudioRevitAddinWizard release 2020.0.0.0</a>,
+and you can see the changes I made by perusing
+the <a href="https://github.com/jeremytammik/VisualStudioRevitAddinWizard/compare/2019.0.0.5...2020.0.0.0">diff to the previous release</a>.</p>
+<h4><a name="3"></a> How to Ask a Question Well</h4>
+<p>There seem to be more and more people getting started with the Revit API, so many beginners are asking questions in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>.</p>
+<p>One of them prompted me to explain some important aspects of how to ask a question well and intelligently.</p>
+<p>As we all know, there are no false or stupid questions.</p>
+<p>Still, there is a lot you can do to motivate people to answer you and support them in doing so.</p>
+<p>In fact, this is such a fundamental topic that it has already been discussed hundreds of times in the web, both for life in general and programming in particular.</p>
+<p>This question
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/section-view/m-p/8758078">section view</a> motivated
+me to explain in more detail:</p>
+<p><strong>Question (abbreviated (very slightly)):</strong> Why does my program not work?</p>
+<p>Here is the code... </p>
+<p>Sorry, I am a beginner...</p>
+<p><strong>Answer:</strong> Thank you for your query.</p>
+<p>If you are new to the Revit API, and maybe to programming in general, I first of all welcome you to this topic and forum!</p>
+<p>Before diving any deeper into programming more complex tasks, I would suggest that you work through
+the <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#2">Revit API beginners material</a>,
+especially the video tutorial.</p>
+<p>That will explain all the important basics, deepen your understanding, and clarify many questions up front.</p>
+<p>Also, please be aware of
+the <a href="https://thebuildingcoder.typepad.com/blog/2018/06/extensible-storage-and-renaming-a-family-in-a-project.html#2">importance of understanding Revit and the BIM from an end user point of view</a> before
+trying to achieve anything programmatically.</p>
+<p>Otherwise, you might quickly find yourself in a situation where your add-in is trying to work against the BIM system instead of making proper use of its powerful built-in functionality.</p>
+<p>Once you have a good grasp of the basics of both the Revit API and the end user view of the BIM task you are addressing, it is time
+to <a href="https://thebuildingcoder.typepad.com/blog/2017/01/virtues-of-reproduction-research-mep-settings-ontology.html#3">research how to solve your task programmatically</a>.</p>
+<p>If you run into an issue after you know what you want to achieve, have ensured that it makes sense in the BIM workflow, have ensured that it can be solved programmatically at all and have done research on how to address it, the time has probably come to ask a question about the specific problems you encounter.</p>
+<p>When you ask a question, it is important to do so in an intelligent and intelligible manner.
+For instance, please ask your question in full.</p>
+<p>I have no idea what the code snippet that you share is supposed to achieve.
+You need to tell me.</p>
+<p>Please explain your goal, the context, the workflow, the expected behaviour, the actual real behaviour, and why that is a problem for you.
+Do all that, and at the same time keep it really brief and to the point.</p>
+<p>I cannot guess what you are trying to achieve.</p>
+<p>The Internet will gladly
+provide <a href="https://duckduckgo.com/?q=how+to+ask+a+question">a few thousand good suggestions on asking questions well</a>.</p>
+<p>However, much more specifically, here are several extremely helpful and important recommendations on asking a question about solving a programming task:</p>
+<ul>
+<li><a href="https://stackoverflow.com/help/how-to-ask">StackOverflow guide on how to ask a good question</a></li>
+</ul>
+<p>Please read, understand and follow these recommendations.</p>
+<p>It will help you and the entire community tremendously.</p>
+<p>I hope this helps.</p>
+<p>Please understand that I do not want to criticise your question. I just want to help you get an effective answer.</p>
+<p>I wish you much success getting started with the Revit API and look forward to further questions from you in the near future!</p>
+<h4><a name="4"></a> Open Autodesk AEC Related Positions</h4>
+<p>Autodesk is currently hiring all over the planet.</p>
+<p>If you are interested in joining us, please check out the open position of interest to you
+at <a href="https://www.autodesk.com/careers">www.autodesk.com/careers</a>.</p>
+<p>Here are a couple of recent interesting AEC related ones in my part of the world:</p>
+<ul>
+<li><a href="https://rolp.co/DIBjg">Senior Product Owner of Revit Cloud Worksharing in Romania, 19WD32135</a>
+Do you have a passion for solving customer challenges with technology? Do you want to create better collaboration tools for the Architecture, Engineering, and Construction (AEC) industry?
+If so, we invite you to join the Autodesk Building Design team, the makers of Autodesk Revit, an industry-leading Building Information Modelling (BIM) tool for AEC professionals. We’re seeking an accomplished and highly motivated Product Owner to lead a development team focused on Revit Cloud Work-sharing, a rapidly-growing cloud service that enables easy collaboration on Revit models for AEC project teams.
+To help us create exceptional customer experiences, we’re looking for someone who can act as the focal point of a development team. A team’s product owner is responsible for developing a clear vision of the value that can be created for customers and conveying that vision to the development team. That vision results from a constantly updated understanding of customer needs, stakeholder goals, and the technical aspects of the team’s work. In all these interactions the Product Owner is the representative of the customer, ensuring that the team is delivering the maximum value to AEC professionals.</li>
+<li><a href="https://rolp.co/m9nvg">Principal Engineer in Romania, 19WD32299</a>
+Help Autodesk users imagine and design a better world by contributing to development of Autodesk Revit, the leading building information modelling software. Our software is used by 100,000+ architects, engineers, and other building industry professionals to design everything from the world’s tallest skyscrapers, largest airports, and new landmarks to homes and businesses that you visit every day.
+Revit’s engineering team brings intelligence and efficiency to the building design and development process by solving hard software problems. As a software engineer, you will work collaboratively with a cross-functional team that is responsible for the entire software development process from analysing market needs through the delivery of working software. Autodesk
+Revit is a complex product and we are looking for somebody who is as enthusiastic about re-factoring, optimising, and enhancing existing code and algorithms as they are about designing and developing new code.</li>
+<li><a href="https://rolp.co/2Mdyg">Junior Solution Architect in Germany, 18WD31159</a>:
+Autodesk Consulting is seeking a talented Junior Solutions Architect to work with our key customers in order to design, develop and support customised and configured solutions for their Enterprise Application (EA) integrations with cloud-based technologies. This individual will work directly with customers to understand their EA integration needs and provide custom solutions built on Autodesk cloud and on-premise products.</li>
+</ul>
+<h4><a name="5"></a> AI for All</h4>
+<p>Finally, let's close with this nice, short yet in-depth introduction and overview
+of <a href="http://www.academy.montreal.ai">AI for all</a>,
+also available for local download as
+a <a href="zip/ai4all.pdf">PDF document</a>.</p>
