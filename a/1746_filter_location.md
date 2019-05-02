@@ -23,8 +23,11 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+I am probably doomed to spend the rest of my life telling people not to unnecessarily apply <code>ToList</code> to a filtered element collector.
+It happened several times again today answering questions in the Revit API discussion forum
+&ndash; Don't trust the family instance location point
+&ndash; Searching by name for element type and text note type
+&ndash; Searching using a negated category filter...
 
 linkedin:
 
@@ -209,7 +212,7 @@ For the sake of completeness, I copied their code here as well:
 ####<a name="4"></a> Searching using a Negated Category Filter
 
 Finally, we got a chance to make use of a negated category filter answering this question 
-on [deleting lines that are not assigned to the &lt;Room Separation&gt; subcategory](https://forums.autodesk.com/t5/revit-api-forum/deleting-lines-that-are-not-assigned-to-the-lt-room-separation/m-p/8765491)
+on [deleting lines that are not assigned to the &lt;Room Separation&gt; subcategory](https://forums.autodesk.com/t5/revit-api-forum/deleting-lines-that-are-not-assigned-to-the-lt-room-separation/m-p/8765491):
 
 **Question:** I have code that deletes all lines in the document.
 I only want to delete the lines that are not on the &lt;Room Separation&gt; subcategory.
