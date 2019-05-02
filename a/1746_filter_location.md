@@ -89,7 +89,7 @@ But I am struggling to use anything other than the default `TextNoteType` id.
 I want to be able to create text using the '1/10" Monospace' family type that I already have loaded in:
 
 <center>
-<img src="img/tnt_3_type_properties.png" alt="" width="439">
+<img src="img/tnt_3_type_properties.png" alt="Text note type type properties" width="439">
 </center>
 
 Can anyone please tell me how to easily do that? I think there used to be a `GetFamilyTypeIdByName` function which no longer exists.
@@ -97,13 +97,13 @@ Can anyone please tell me how to easily do that? I think there used to be a `Get
 Here are the creation options I set up:
 
 <center>
-<img src="img/tnt_1_textnoteoptions.png" alt="" width="516">
+<img src="img/tnt_1_textnoteoptions.png" alt="Text note options" width="516">
 </center>
 
 I use them like this:
 
 <center>
-<img src="img/tnt_2_textnote_create.png" alt="" width="639">
+<img src="img/tnt_2_textnote_create.png" alt="Text note create" width="639">
 </center>
 
 Thank you!
