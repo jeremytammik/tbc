@@ -1,0 +1,162 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script></p>
+<p></head></p>
+<!---
+
+- more room boundary segments than expected:
+  boundary segments issue -- https://forums.autodesk.com/t5/revit-api-forum/boundary-segments-issue/m-p/8759586
+  revit room boundary segments question -- https://forums.autodesk.com/t5/revit-api-forum/revit-room-boundary-segments-question/m-p/8771634
+
+- How to get width and Height of curveloop
+  https://forums.autodesk.com/t5/revit-api-forum/how-to-get-width-and-height-of-curveloop/m-p/8686230
+
+twitter:
+
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+
+Yet another eagerly awaited update for the Revit 2020 API, a couple of interesting Revit API discussion forum threads, and some thoughts on how AI might affect and be used in an architectural context
+&ndash; RevitApiDocs updated with the Revit 2020 API
+&ndash; More room boundary segments than expected
+&ndash; How to get width and height of a <code>CurveLoop</code>
+&ndash; AI and architecture...
+
+linkedin:
+
+ the #RevitAPI #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+-->
+
+<h3>AI, Boundaries, Loops and RevitApiDocs 2020</h3>
+<p>Yet another eagerly awaited update for the Revit 2020 API, a couple of interesting Revit API discussion forum threads, and some thoughts on how AI might affect and be used in an architectural context:</p>
+<ul>
+<li><a href="#2">RevitApiDocs updated with the Revit 2020 API</a> </li>
+<li><a href="#3">More room boundary segments than expected</a> </li>
+<li><a href="#4">How to get width and height of a <code>CurveLoop</code></a> </li>
+<li><a href="#5">AI and architecture</a> </li>
+</ul>
+<h4><a name="2"></a> RevitApiDocs Updated with the Revit 2020 API</h4>
+<p><a href="https://twitter.com/RevitApiDocs">@RevitApiDocs</a> announced the update
+of <a href="https://www.revitapidocs.com">RevitApiDocs.com</a> for the Revit 2020 API:</p>
+<blockquote>
+<p>This update also includes:</p>
+<ul>
+<li>2015 removed from navbar &ndash; the old docs are still available through the <code>/2015</code> URL</li>
+<li>Footer reminds ad-block users to whitelist domain (if you get false positives, please let me know)</li>
+</ul>
+<p>Thanks to <a href="https://twitter.com/60secondrevit">@60secondrevit</a> for sending the <code>.chm</code> file
+and <a href="https://twitter.com/yarnchitect">@yarnchitect</a> for nudging me and testing beta release.</p>
+</blockquote>
+<p><center>
+<img src="img/revitapidocs2020.png" alt="RevitApiDocs 2020" width="768">
+</center></p>
+<p>Many thanks to <a href="http://www.gtalarico.com">Gui Talarico</a> for this eagerly awaited update!</p>
+<h4><a name="3"></a> More Room Boundary Segments than Expected</h4>
+<p>Two separate questions were raised in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> asking
+why a rectangular room might return more than the expected four boundary segments:</p>
+<ul>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/boundary-segments-issue/m-p/8759586">Boundary segments issue</a></li>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/revit-room-boundary-segments-question/m-p/8771634">Revit room boundary segments question</a></li>
+</ul>
+<p>The first thread provides an answer for both:</p>
+<p><strong>Question:</strong> A question concerning segments that bound a space:
+In theory, for just a single rectangular room, I should have 4 segments per room;
+however, in most cases, I get more.
+I guess this happens because there are some other elements which divide those segments (like a wall).</p>
+<p><center>
+<img src="img/room_boundary_segments.png" alt="Room boundary segments" width="278">
+</center></p>
+<p>For example, for the case above, I expected 4 segments, but I'm getting 6 instead due the perpendicular wall that divides the segment.</p>
+<p>My question is: is there any way to get only the 4 segments?</p>
+<p>I'm trying to get the four corners of a room.</p>
+<p><strong>Answer:</strong> Your assumption is correct.</p>
+<p>The separate segments stem from different elements.</p>
+<p>Note that you can query each boundary segment for the element that is producing it using
+its <a href="http://www.revitapidocs.com/2020/eaf7d628-d9c2-80a3-2fd7-00013bab1377.htm">ElementId property</a>.</p>
+<blockquote>
+<p>Retrieve the id of the element that produces this boundary segment. If the segment is created from an element in a link, this is the id of the RevitLinkInstance.</p>
+</blockquote>
+<p>To obtain just four segments for your square room, you can perform some geometric analysis to combine collinear segments into longer pieces.</p>
+<p>If all you need are the four corners, you can (much more) easily determine those by stepping through all the segments (optionally tessellated, if they may be curved) and determine their max and min X, Y and Z coordinates.</p>
+<p>The solution is similar to the approach below
+showing <a href="#4">how to get width and height of a <code>CurveLoop</code></a>.</p>
+<h4><a name="4"></a> How to get Width and Height of a CurveLoop</h4>
+<p>I answered a question a couple of weeks ago in 
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+asking <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-get-width-and-height-of-curveloop/m-p/8686230">how to get width and height of <code>Curveloop</code></a>.</p>
+<p>Since the same approach can easily be adapted to obtain the four corners of a room, I'll mention it here also:</p>
+<p><strong>Question:</strong> How to calculate the height and width of a curve loop as shown below?</p>
+<p><center>
+<img src="img/curveloop_width_height.png" alt="Width and height of CurveLoop" width="263">
+</center></p>
+<p><strong>Answer:</strong> One easy way to get a pretty good approximate value would be to iterate over the curve loop curves,
+<a href="http://www.revitapidocs.com/2020/f95f3199-3251-c708-c5a3-a0e9ef95ecfa.htm">tessellate each curve</a> and
+determine the minimum and maximum resulting vertex coordinates:</p>
+<p>I added something similar
+to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> for
+future reference.</p>
+<p>To make it more generic, I implemented an extension method <code>ExpandToContain( IEnumerable&lt;XYZ&gt; )</code> on the bounding box and use it to calculate the bounding box of a curve loop like this:</p>
+<pre class="code">
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;Expand&nbsp;the&nbsp;given&nbsp;bounding&nbsp;box&nbsp;to&nbsp;include&nbsp;</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;and&nbsp;contain&nbsp;the&nbsp;given&nbsp;points.</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+  <span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">void</span>&nbsp;ExpandToContain(
+  &nbsp;&nbsp;<span style="color:blue;">this</span>&nbsp;<span style="color:#2b91af;">BoundingBoxXYZ</span>&nbsp;bb,
+  &nbsp;&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">XYZ</span>&gt;&nbsp;pts&nbsp;)
+  {
+  &nbsp;&nbsp;bb.ExpandToContain(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(
+  &nbsp;&nbsp;&nbsp;&nbsp;pts.Min&lt;<span style="color:#2b91af;">XYZ</span>,&nbsp;<span style="color:blue;">double</span>&gt;(&nbsp;p&nbsp;=&gt;&nbsp;p.X&nbsp;),
+  &nbsp;&nbsp;&nbsp;&nbsp;pts.Min&lt;<span style="color:#2b91af;">XYZ</span>,&nbsp;<span style="color:blue;">double</span>&gt;(&nbsp;p&nbsp;=&gt;&nbsp;p.Y&nbsp;),
+  &nbsp;&nbsp;&nbsp;&nbsp;pts.Min&lt;<span style="color:#2b91af;">XYZ</span>,&nbsp;<span style="color:blue;">double</span>&gt;(&nbsp;p&nbsp;=&gt;&nbsp;p.Z&nbsp;)&nbsp;)&nbsp;);
+
+  &nbsp;&nbsp;bb.ExpandToContain(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(
+  &nbsp;&nbsp;&nbsp;&nbsp;pts.Max&lt;<span style="color:#2b91af;">XYZ</span>,&nbsp;<span style="color:blue;">double</span>&gt;(&nbsp;p&nbsp;=&gt;&nbsp;p.X&nbsp;),
+  &nbsp;&nbsp;&nbsp;&nbsp;pts.Max&lt;<span style="color:#2b91af;">XYZ</span>,&nbsp;<span style="color:blue;">double</span>&gt;(&nbsp;p&nbsp;=&gt;&nbsp;p.Y&nbsp;),
+  &nbsp;&nbsp;&nbsp;&nbsp;pts.Max&lt;<span style="color:#2b91af;">XYZ</span>,&nbsp;<span style="color:blue;">double</span>&gt;(&nbsp;p&nbsp;=&gt;&nbsp;p.Z&nbsp;)&nbsp;)&nbsp;);
+  }
+
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;the&nbsp;bounding&nbsp;box&nbsp;of&nbsp;a&nbsp;curve&nbsp;loop.</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+  <span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">BoundingBoxXYZ</span>&nbsp;GetBoundingBox(
+  &nbsp;&nbsp;<span style="color:#2b91af;">CurveLoop</span>&nbsp;curveLoop&nbsp;)
+  {
+  &nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">XYZ</span>&gt;&nbsp;pts&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">XYZ</span>&gt;();
+  &nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Curve</span>&nbsp;c&nbsp;<span style="color:blue;">in</span>&nbsp;curveLoop&nbsp;)
+  &nbsp;&nbsp;{
+  &nbsp;&nbsp;&nbsp;&nbsp;pts.AddRange(&nbsp;c.Tessellate()&nbsp;);
+  &nbsp;&nbsp;}
+
+  &nbsp;&nbsp;<span style="color:#2b91af;">BoundingBoxXYZ</span>&nbsp;bb&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">BoundingBoxXYZ</span>();
+  &nbsp;&nbsp;bb.Clear();
+  &nbsp;&nbsp;bb.ExpandToContain(&nbsp;pts&nbsp;);
+  &nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;bb;
+  }
+</pre>
+
+<p>Can you confirm that this works for you as well?</p>
+<p>Here are the <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2019.0.145.12...2019.0.145.13">entire diffs</a>
+(unfortunately including lots of superfluous whitespace modifications):</p>
+<p><strong>Response:</strong> I tried your code in my project.
+It is working without any error and returns expected result.
+Thank you.</p>
+<h4><a name="5"></a> AI and Architecture</h4>
+<p>Let's end by mentioning this interesting overview
+of <a href="https://towardsdatascience.com/ai-architecture-f9d78c6958e0">AI and Architecture</a> from
+an experimental perspective by Stanislas Chaillou of Harvard Graduate School of Design.</p>
+<p>Here are a few abbreviated quotes from his conclusion:</p>
+<ul>
+<li>AI will soon massively empower architects in their day to day practice. ...</li>
+<li>Conceptually first, our belief is that a statistical approach to design conception shapes AI’s potential for Architecture...</li>
+<li>Second, we are directionally convinced that our ability to design the right pipeline will condition AI’s success as a new architectural toolset...</li>
+<li>Third, we technically believe that the sequential nature of the application will facilitate its manageability and foster its development...</li>
+<li>Finally, we hope our framework will help address the endless breadth and complexity of the models to be trained and those used in any generation pipeline...</li>
+<li>Far from thinking about AI as the new dogma in Architecture, we conceive this field as a new challenge full of potential and promises. We see here the possibility for rich results that will complement our practice and address some blind spots of our discipline.</li>
+</ul>
+<p><center>
+<img src="img/ai_and_architecture.png" alt="AI and Architecture" width="900"> <!-- 1129 -->
+</center></p>
