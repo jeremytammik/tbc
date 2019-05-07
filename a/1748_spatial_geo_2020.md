@@ -41,8 +41,11 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+New Autodesk show reels, a solution to the lack of an add-in manager in the Revit 2020 SDK, an update for the SpatialElementGeometryCalculator and an interesting observation on English spelling
+&ndash; 2019 Autodesk show reels
+&ndash; The Add-In Manager for Revit 2019 still works
+&ndash; Spatial element geometry calculator update
+&ndash; English spelling...
 
 linkedin:
 
