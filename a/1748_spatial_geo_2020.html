@@ -62,9 +62,9 @@ linkedin:
 <p>The 2019 updates have now been released on YouTube and may come in handy to fill some time waiting for the main show to begin:</p>
 <ul>
 <li><a href="https://youtu.be/KWvPfmjwjOM">Corporate</a></li>
-<li><a href="https://youtu.be/bUwbe7oIMxU">M&amp;E, Media and Entertainment </a></li>
-<li><a href="https://youtu.be/361wG7e8lCg">MFG, Manufacturing </a></li>
-<li><a href="https://youtu.be/Kuqg0OitrSc">AEC, Architecture Engineering and Construction</a></li>
+<li><a href="https://youtu.be/bUwbe7oIMxU">M&amp;E &ndash; Media and Entertainment </a></li>
+<li><a href="https://youtu.be/361wG7e8lCg">MFG &ndash; Manufacturing </a></li>
+<li><a href="https://youtu.be/Kuqg0OitrSc">AEC &ndash; Architecture Engineering and Construction</a></li>
 </ul>
 <h4><a name="3"></a> The Add-In Manager for Revit 2019 Still Works</h4>
 <p>As several people already pointed out, the Add-In Manager used by many developers in their application testing workflow is missing in the Revit 2020 SDK.</p>
@@ -79,7 +79,7 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-2020-addin-mana
 <p>You can try it out yourself.</p>
 <p>The installation path is the same: <em>C:\ProgramData\Autodesk\Revit\Addins\2020</em>.</p>
 <p>Please notify if successful.</p>
-<p><strong>Response:</strong> Thanks for the relpy and pointing in the right direction.</p>
+<p><strong>Response:</strong> Thanks for the reply and pointing in the right direction.</p>
 <p>I copied the <code>.dll</code> and <code>.addin</code> from the 2019.2 SDK into <em>C:\ProgramData\Autodesk\Revit\Addins\2020</em>, and all works as it should.</p>
 <h4><a name="4"></a> Spatial Element Geometry Calculator Update</h4>
 <p>Dan pointed out an inconsistency in
@@ -88,7 +88,7 @@ in <a href="https://thebuildingcoder.typepad.com/blog/2016/04/determining-wall-o
 on <a href="https://thebuildingcoder.typepad.com/blog/2016/04/determining-wall-opening-areas-per-room.html"></a> that led me to migrate the add-in to Revit 2020 and integrate his code fix:</p>
 <p>Dan: If I understand the sample model provided correctly, the room height is taken into account and not the full wall height.
 So, in room 7, even though the wall is 4 m high, only 3 m will be taken into account, since that is the height of the room.
-Fair enough, this would mean 30 m<sup>2</sup> gross for each wall, since they are all 10 m long inside the room.
+Fair enough; this would mean 30 m<sup>2</sup> gross for each wall, since they are all 10 m long inside the room.
 However, for the wall with the opening in room 7, shouldn't the gross area be 30 m<sup>2</sup>, and the net 2 m<sup>2</sup> less (28 m<sup>2</sup>)?</p>
 <p>If so, for the total output, I would expect these values:</p>
 <pre>
@@ -107,7 +107,7 @@ Room 7; Wall3(308817): net 30; opening 2; gross 32
 </pre>
 
 <p>Many thanks to Dan for pointing this out!</p>
-<p>I migrated the sample to Revit 2020 and added his fix
+<p>It prompted me to migrate the sample from Revit 2016 to Revit 2020 and add his fix
 in <a href="https://github.com/jeremytammik/SpatialElementGeometryCalculator/releases/tag/2020.0.0.2">SpatialElementGeometryCalculator release 2020.0.0.2</a>.</p>
 <p>Here are the diffs:</p>
 <ul>
@@ -119,7 +119,7 @@ in <a href="https://github.com/jeremytammik/SpatialElementGeometryCalculator/rel
 <img src="img/SpatialElementGeometryCalculator2Test3d.png" alt="SpatialElementGeometryCalculator test model 3D view" width="400">
 </center></p>
 <h4><a name="5"></a> English Spelling</h4>
-<p>Let's finish off on a completely different topic, the baffling idiosycracies of English spelling.</p>
+<p>Let's finish off on a completely different topic, the baffling idiosyncrasies of English spelling.</p>
 <p>The most extreme example I ever heard was the suggestion that the English word 'fish' could just as well be spelled 'ghoti':</p>
 <ul>
 <li>f = gh from tough</li>

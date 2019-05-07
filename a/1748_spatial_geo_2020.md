@@ -95,7 +95,7 @@ The installation path is the same: *C:\ProgramData\Autodesk\Revit\Addins\2020*.
 
 Please notify if successful.
 
-**Response:** Thanks for the relpy and pointing in the right direction.
+**Response:** Thanks for the reply and pointing in the right direction.
 
 I copied the `.dll` and `.addin` from the 2019.2 SDK into *C:\ProgramData\Autodesk\Revit\Addins\2020*, and all works as it should.
 
@@ -109,7 +109,7 @@ on [](https://thebuildingcoder.typepad.com/blog/2016/04/determining-wall-opening
 
 Dan: If I understand the sample model provided correctly, the room height is taken into account and not the full wall height.
 So, in room 7, even though the wall is 4 m high, only 3 m will be taken into account, since that is the height of the room.
-Fair enough, this would mean 30 m<sup>2</sup> gross for each wall, since they are all 10 m long inside the room.
+Fair enough; this would mean 30 m<sup>2</sup> gross for each wall, since they are all 10 m long inside the room.
 However, for the wall with the opening in room 7, shouldn't the gross area be 30 m<sup>2</sup>, and the net 2 m<sup>2</sup> less (28 m<sup>2</sup>)?
 
 If so, for the total output, I would expect these values:
@@ -133,7 +133,7 @@ I fixed the issue in the following line by subtracting the opening area, since `
 
 Many thanks to Dan for pointing this out!
 
-I migrated the sample to Revit 2020 and added his fix
+It prompted me to migrate the sample from Revit 2016 to Revit 2020 and add his fix
 in [SpatialElementGeometryCalculator release 2020.0.0.2](https://github.com/jeremytammik/SpatialElementGeometryCalculator/releases/tag/2020.0.0.2).
 
 Here are the diffs:
@@ -148,7 +148,7 @@ Here are the diffs:
 
 ####<a name="5"></a> English Spelling
 
-Let's finish off on a completely different topic, the baffling idiosycracies of English spelling.
+Let's finish off on a completely different topic, the baffling idiosyncrasies of English spelling.
 
 The most extreme example I ever heard was the suggestion that the English word 'fish' could just as well be spelled 'ghoti':
 
