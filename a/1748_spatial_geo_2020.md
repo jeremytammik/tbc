@@ -67,9 +67,9 @@ Autodesk produces show reels highlighting exciting uses of the products in vario
 The 2019 updates have now been released on YouTube and may come in handy to fill some time waiting for the main show to begin:
 
 - [Corporate](https://youtu.be/KWvPfmjwjOM)
-- [M&amp;E, Media and Entertainment ](https://youtu.be/bUwbe7oIMxU)
-- [MFG, Manufacturing ](https://youtu.be/361wG7e8lCg)
-- [AEC, Architecture Engineering and Construction](https://youtu.be/Kuqg0OitrSc)
+- [M&amp;E &ndash; Media and Entertainment ](https://youtu.be/bUwbe7oIMxU)
+- [MFG &ndash; Manufacturing ](https://youtu.be/361wG7e8lCg)
+- [AEC &ndash; Architecture Engineering and Construction](https://youtu.be/Kuqg0OitrSc)
 
 ####<a name="3"></a> The Add-In Manager for Revit 2019 Still Works
 
