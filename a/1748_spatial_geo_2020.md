@@ -8,24 +8,19 @@
 
 <!---
 
-- 2019 Autodesk show reels are out.  
+- 2019 Autodesk show reels are out
 
 - Add-In Manager Missing in Revit 2020 SDK
   https://forums.autodesk.com/t5/revit-api-forum/revit-2020-addin-manager-missing/m-p/8774075
 
 - https://thebuildingcoder.typepad.com/blog/2016/04/determining-wall-opening-areas-per-room.html#comment-4452689539
-Håvard Dagsvik <hd@cad-q.no>; Håvard Dagsvik <dagsvik@msn.no>; Håvard Dagsvik <dagsvik@msn.com>; Håvard Dagsvik <havard.dagsvik@symetri.com>
-can you help dan with his question on your SpatialElementGeometryCalculator sample?
- 
-https://thebuildingcoder.typepad.com/blog/2016/04/determining-wall-opening-areas-per-room.html#comment-4452599622
- 
- 
-dan confirmed that he fixed it himself in a subsequent comment
-i migrated the add-in to Revit 2020 and integrated his changes in the github repo
- 
-so, really, all you could help with is to confirm the change that dan suggested, subtracting the opening area:
- 
-https://github.com/jeremytammik/SpatialElementGeometryCalculator/compare/2020.0.0.1...2020.0.0.2
+  Håvard Dagsvik <hd@cad-q.no>; Håvard Dagsvik <dagsvik@msn.no>; Håvard Dagsvik <dagsvik@msn.com>; Håvard Dagsvik <havard.dagsvik@symetri.com>
+  can you help dan with his question on your SpatialElementGeometryCalculator sample?
+  https://thebuildingcoder.typepad.com/blog/2016/04/determining-wall-opening-areas-per-room.html#comment-4452599622
+  dan confirmed that he fixed it himself in a subsequent comment
+  i migrated the add-in to Revit 2020 and integrated his changes in the github repo
+  so, really, all you could help with is to confirm the change that dan suggested, subtracting the opening area:
+  https://github.com/jeremytammik/SpatialElementGeometryCalculator/compare/2020.0.0.1...2020.0.0.2
  
 - english spelling
   the english word 'fish' could theoretically be spelled 'ghoti':
@@ -34,12 +29,9 @@ https://github.com/jeremytammik/SpatialElementGeometryCalculator/compare/2020.0.
   sh = ti from satisfaction
   english spelling is pretty arbitrary sometimes...
 
- 
-  
-
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Autodesk show reels, spatial element geometry calculator and Add-In Manager update for the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/spatialgeo2020
 
 New Autodesk show reels, a solution to the lack of an add-in manager in the Revit 2020 SDK, an update for the SpatialElementGeometryCalculator and an interesting observation on English spelling
 &ndash; 2019 Autodesk show reels
@@ -51,6 +43,18 @@ linkedin:
 
  the #RevitAPI #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
+Autodesk show reels, spatial element geometry calculator and Add-In Manager update for the #RevitAPI
+
+http://bit.ly/spatialgeo2020
+
+New Autodesk show reels, a solution to the lack of an add-in manager in the Revit 2020 SDK, an update for the SpatialElementGeometryCalculator and an interesting observation on English spelling:
+
+- 2019 Autodesk show reels
+- The Add-In Manager for Revit 2019 still works
+- Spatial element geometry calculator update
+- English spelling...
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 -->
 
@@ -160,4 +164,3 @@ The most extreme example I ever heard was the suggestion that the English word '
 - sh = ti from satisfaction
 
 English spelling sure is pretty arbitrary sometimes...
-
