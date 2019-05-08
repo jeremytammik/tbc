@@ -63,7 +63,8 @@ New Autodesk show reels, a solution to the lack of an add-in manager in the Revi
 
 - [2019 Autodesk show reels](#2) 
 - [The Add-In Manager for Revit 2019 still works](#3) 
-- [Spatial element geometry calculator update](#4) 
+- [Spatial element geometry calculator update](#4)
+- [Håvard's new suggestion](#4.1)
 - [English spelling](#5) 
 
 ####<a name="2"></a> 2019 Autodesk Show Reels
@@ -152,38 +153,37 @@ Here are the diffs:
 <img src="img/SpatialElementGeometryCalculator2Test3d.png" alt="SpatialElementGeometryCalculator test model 3D view" width="400">
 </center>
 
-####<a name="4.1"></a> Update from Håvard
+####<a name="4.1"></a> Håvard's New Suggestion
 
-Håvard Leding of [Symetri](https://www.symetri.com)
+Håvard Leding of [Symetri](https://www.symetri.com) {whose last name used to be Dagsvik) very
+kindly [answered Dan's comment](https://thebuildingcoder.typepad.com/blog/2016/04/determining-wall-opening-areas-per-room.html#comment-4454441990),
+pointing out that the current implementation might possibly bear some fundamental improvement:
 
-Hi Dan seems you found a bug there sorry about that :-)
-
-In our final app the openingArea property is applied later on.
-
-But i missed that here in the short version.
-
+> Hi Dan, seems you found a bug there... sorry about that :-) &nbsp;
+In our final app, the `openingArea` property is applied later on.
+I missed that here in the shortened version.
 Glad its still of use to someone.
+Doing this again today, I might use the `GetDependentElements` method more.
+First, get the openings like this:
 
-Doing this again today i might use the GetDependentElements() method more.
+<pre class="code">
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;wall&nbsp;openings&nbsp;using&nbsp;GetDependentElements</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">ElementId</span>&gt;&nbsp;GetOpenings(&nbsp;<span style="color:#2b91af;">Wall</span>&nbsp;wall&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementMulticategoryFilter</span>&nbsp;emcf
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementMulticategoryFilter</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">ElementId</span>&gt;()&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementId</span>(<span style="color:#2b91af;">BuiltInCategory</span>.OST_Windows),
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementId</span>(<span style="color:#2b91af;">BuiltInCategory</span>.OST_Doors)&nbsp;}&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;wall.GetDependentElements(&nbsp;emcf&nbsp;);
+&nbsp;&nbsp;}
+</pre>
 
-First get the openings like this:
-
-  public static IList<elementid> GetOpenings(Wall wall)
-  {
-    ElementMulticategoryFilter emcf = new ElementMulticategoryFilter(
-      new List<elementid>()
-      {
-        new ElementId(BuiltInCategory.OST_Windows),
-        new ElementId(BuiltInCategory.OST_Doors),
-      }
-    );
-
-    return wall.GetDependentElements(emcf);
-  }
-
-Then, for each dependent of interest, use `GetDependentElements` again to get the `openingSolid` as described here:
-
-https://thebuildingcoder.typepad.com/blog/2019/03/determine-exact-opening-by-demolishing.html
+> Then, for each dependent of interest, use `GetDependentElements` again to get the `openingSolid` as described here in the recent suggestion how
+to [determine exact opening by demolishing](https://thebuildingcoder.typepad.com/blog/2019/03/determine-exact-opening-by-demolishing.html).
 
 
 ####<a name="5"></a> English Spelling
