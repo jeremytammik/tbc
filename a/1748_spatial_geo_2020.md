@@ -14,7 +14,6 @@
   https://forums.autodesk.com/t5/revit-api-forum/revit-2020-addin-manager-missing/m-p/8774075
 
 - https://thebuildingcoder.typepad.com/blog/2016/04/determining-wall-opening-areas-per-room.html#comment-4452689539
-  Håvard Dagsvik <hd@cad-q.no>; Håvard Dagsvik <dagsvik@msn.no>; Håvard Dagsvik <dagsvik@msn.com>; Håvard Dagsvik <havard.dagsvik@symetri.com>
   can you help dan with his question on your SpatialElementGeometryCalculator sample?
   https://thebuildingcoder.typepad.com/blog/2016/04/determining-wall-opening-areas-per-room.html#comment-4452599622
   dan confirmed that he fixed it himself in a subsequent comment
@@ -152,6 +151,40 @@ Here are the diffs:
 <center>
 <img src="img/SpatialElementGeometryCalculator2Test3d.png" alt="SpatialElementGeometryCalculator test model 3D view" width="400">
 </center>
+
+####<a name="4.1"></a> Update from Håvard
+
+Håvard Leding of [Symetri](https://www.symetri.com)
+
+Hi Dan seems you found a bug there sorry about that :-)
+
+In our final app the openingArea property is applied later on.
+
+But i missed that here in the short version.
+
+Glad its still of use to someone.
+
+Doing this again today i might use the GetDependentElements() method more.
+
+First get the openings like this:
+
+  public static IList<elementid> GetOpenings(Wall wall)
+  {
+    ElementMulticategoryFilter emcf = new ElementMulticategoryFilter(
+      new List<elementid>()
+      {
+        new ElementId(BuiltInCategory.OST_Windows),
+        new ElementId(BuiltInCategory.OST_Doors),
+      }
+    );
+
+    return wall.GetDependentElements(emcf);
+  }
+
+Then, for each dependent of interest, use `GetDependentElements` again to get the `openingSolid` as described here:
+
+https://thebuildingcoder.typepad.com/blog/2019/03/determine-exact-opening-by-demolishing.html
+
 
 ####<a name="5"></a> English Spelling
 
