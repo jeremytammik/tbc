@@ -190,7 +190,7 @@ to [determine exact opening by demolishing](https://thebuildingcoder.typepad.com
 
 Let's finish off on a completely different topic, the baffling idiosyncrasies of English spelling.
 
-The most extreme example I ever heard was the suggestion that the English word 'fish' could just as well be spelled 'ghoti':
+The most extreme example I know is the suggestion that the English word 'fish' could just as well be spelled 'ghoti':
 
 - f = gh from tough
 - i = o from women
