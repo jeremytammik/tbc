@@ -112,7 +112,7 @@ I copied the `.dll` and `.addin` from the 2019.2 SDK into *C:\ProgramData\Autode
 Dan pointed out an inconsistency in
 the [SpatialElementGeometryCalculator](https://github.com/jeremytammik/SpatialElementGeometryCalculator)
 in [his comment](https://thebuildingcoder.typepad.com/blog/2016/04/determining-wall-opening-areas-per-room.html#comment-4452599622)
-on [](https://thebuildingcoder.typepad.com/blog/2016/04/determining-wall-opening-areas-per-room.html) that led me to migrate the add-in to Revit 2020 and integrate his code fix:
+on [determining wall opening areas per room](https://thebuildingcoder.typepad.com/blog/2016/04/determining-wall-opening-areas-per-room.html) that led me to migrate the add-in to Revit 2020 and integrate his code fix:
 
 Dan: If I understand the sample model provided correctly, the room height is taken into account and not the full wall height.
 So, in room 7, even though the wall is 4 m high, only 3 m will be taken into account, since that is the height of the room.
