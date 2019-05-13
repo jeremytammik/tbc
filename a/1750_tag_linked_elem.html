@@ -1,0 +1,139 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script></p>
+<p></head></p>
+<!---
+
+- 10027136 [highlight and tag linked elements]
+  http://forums.autodesk.com/t5/revit-api/highlight-and-tag-linked-elements/m-p/5294217
+  tagging linked elements can be solved using two different approaches, either via RevitLinkInstance + CreateLinkReference or using the ParseFromStableRepresentation method.
+
+- 15175390 [Tagging Linked Elements using Revit API]
+  https://forums.autodesk.com/t5/revit-api-forum/tagging-linked-elements-using-revit-api/m-p/8669001
+
+twitter:
+
+Autodesk show reels, spatial element geometry calculator and Add-In Manager update for the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/spatialgeo2020
+
+&ndash; 
+...
+
+linkedin:
+
+ the #RevitAPI #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+-->
+
+<h3>Tagging a Linked Element</h3>
+<p><code>CreateLinkReference</code> was introduced in
+the <a href="https://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">Revit 2014 API</a>.</p>
+<p>It is mentioned as one of the major enhancements to the Revit API:</p>
+<h4><a name="2"></a> Enhancements to Interactions with Links &ndash; Conversion of Geometric References</h4>
+<p>The API calls:</p>
+<ul>
+<li><a href="http://www.revitapidocs.com/2020/97813744-6e64-00a7-da5c-b2c6de7919ad.htm">Reference.LinkedElementId</a> &ndash; The id of the top-level element in the linked document that is referred to by this reference.</li>
+<li>
+<p><a href="http://www.revitapidocs.com/2020/919d7d3f-f8c2-eb12-4069-0022c20fa13a.htm">Reference.CreateLinkReference(RevitLinkInstance)</a> &ndash; Creates a <code>Reference</code> from a <code>Reference</code> in an RVT Link.</p>
+</li>
+<li>
+<p><a href="http://www.revitapidocs.com/2020/20a8bee7-2378-c0a6-36f0-07ca42eaedc3.htm">Reference.CreateReferenceInLink()</a> &ndash; Creates a <code>Reference</code> in an RVT Link from a <code>Reference</code> in the RVT host file.</p>
+</li>
+</ul>
+<p>allow conversion between <code>Reference</code> objects which reference only the contents of the link and <code>Reference</code> objects which reference the host.</p>
+<p>This allows an application, for example, to look at the geometry in the link, find the needed face, and convert the reference to that face into a reference in the host suitable for use to place a face-based instance.</p>
+<p>Also, they allow you to obtain a reference in the host (e.g., from a dimension or family) and convert it to a reference in the link, suitable for use in <code>Element.GetGeometryObjectFromReference</code>.</p>
+<p>This enhancement was often overlooked, and several questions were raised on how to tag an element in a linked file.</p>
+<h4><a name="3"></a> Tagging a Linked Element</h4>
+<p>Ilia Ivanov raised the question and provided the answer himself in
+his <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/tagging-linked-elements-using-revit-api/m-p/8669001">tagging linked elements using Revit API</a>:</p>
+<p><strong>Question:</strong> Hello, Is it possibly to tag a linked element?</p>
+<p>And also retrieve the reference of the tagged linked element?</p>
+<p><strong>Answer:</strong> Hello, I have done it:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">RevitLinkInstance</span>&nbsp;link&nbsp;=&nbsp;doc.GetElement(
+&nbsp;&nbsp;&nbsp;&nbsp;tag.TaggedElementId.LinkInstanceId&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">RevitLinkInstance</span>;
+
+&nbsp;&nbsp;<span style="color:#2b91af;">Reference</span>&nbsp;refer&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Reference</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;link.GetLinkDocument()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetElement(&nbsp;tag.TaggedElementId.LinkedElementId&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.CreateLinkReference(&nbsp;link&nbsp;);
+</pre>
+
+<p>Many thanks to Ilia for sharing this!</p>
+<h4><a name="4"></a> Using the Stable Representation to Tag a Linked Element</h4>
+<p>In another extensive thread
+on <a href="http://forums.autodesk.com/t5/revit-api/highlight-and-tag-linked-elements/m-p/5294217">highlighting and tagging linked elements</a>.
+Carolina Machado suggested a alternative approach and less official solution to tag a linked element using the <code>ParseFromStableRepresentation</code> method instead:</p>
+<blockquote>
+<p>Using RevitLookup and a post from your blog, I noticed that the Stable Representation of references in linked instances comform to the following pattern:</p>
+<p><code>  revitLinkInstance.UniqueId
+<br/>    +<span style="color:#a31515;">&quot;:0:RVTLINK/&quot;</span>&nbsp;+&nbsp;revitLinkType.UniqueId
+<br/>    +<span style="color:#a31515;">&quot;:&quot;</span>&nbsp;+&nbsp;element.Id.ToString()</code></p>
+<p>Using this string it is possible to get the <code>Reference</code> through <code>Reference.ParseFromStableRepresentation</code> method, and then use it to tag the element.</p>
+</blockquote>
+<p>Many thanks to Carolina for sharing this!</p>
+<h4><a name="5"></a> List All Untagged Doors</h4>
+<p>On a vaguely related topic, let's share two suggestions by my colleague Naveen Kumar and
+Alexander <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478">@aignatovich</a> Ignatovich, aka Александр Игнатович,
+to retrieve all untagged doors in the model, answering several questions on detercting tagged elements:</p>
+<ul>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/i-want-to-check-whether-tag-is-present-on-door-by-api-how-should/td-p/8532032">I want to check whether tag is present on door by api</a></li>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-gets-relation-of-element-with-its-tag-or-its-label/td-p/8602124">how to gets relation of element with its tag or its label</a></li>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-verify-label-on-element-using-revit-api/td-p/8594801">how to verify label on element using revit api</a></li>
+</ul>
+<p><strong>Question:</strong> Can we determine the relationship between a tag and its tagged element?</p>
+<p>I can retrieve all independent tags of particular category.</p>
+<p>E.g., having 6 doors, I can retrieve the 6 door tags.</p>
+<p>Suppose one of door does not have tag.</p>
+<p>How can I find the particular door lacking a tag?</p>
+<p>In other words, how to find relation between element category and element tag category.</p>
+<p><strong>Answewr:</strong> Try using the below code. It will highlight the elements that are not taggged:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;doors
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfCategory(&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Doors&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">FamilyInstance</span>&nbsp;)&nbsp;);
+
+&nbsp;&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">IndependentTag</span>&gt;&nbsp;tags
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">IndependentTag</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">IndependentTag</span>&gt;();
+
+&nbsp;&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">ElementId</span>&gt;&nbsp;untagged_elements&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">ElementId</span>&gt;();
+
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;<span style="color:blue;">in</span>&nbsp;doors&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;!tags.Any(&nbsp;q&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;q.TaggedLocalElementId&nbsp;==&nbsp;e.Id&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;untagged_elements.Add(&nbsp;e.Id&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+&nbsp;&nbsp;uidoc.Selection.SetElementIds(&nbsp;untagged_elements&nbsp;);
+&nbsp;&nbsp;uidoc.RefreshActiveView();
+</pre>
+
+<p><strong>Answer 2:</strong> To check whether a specific door is untagged, you can find all <code>IndependentTag</code> elements present in the document of <code>OST_DoorTags</code> category and the door elements that they are tagging like this:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;collector&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">IndependentTag</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.OfCategory(&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_DoorTags&nbsp;);
+
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;doorTagsIds
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">HashSet</span>&lt;<span style="color:#2b91af;">ElementId</span>&gt;(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;collector.OfType&lt;<span style="color:#2b91af;">IndependentTag</span>&gt;()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Select(&nbsp;x&nbsp;=&gt;&nbsp;x.GetTaggedLocalElement()?.Id&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Where(&nbsp;x&nbsp;=&gt;&nbsp;x&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)&nbsp;);
+</pre>
+
+<p>Then you can iterate over your doors collection and check if <code>doorTagsIds</code> contains the <code>door.Id</code>.</p>
+<p><center>
+<img src="img/tag_linked_element.png" alt="Tag linked element" width="475">
+</center></p>
