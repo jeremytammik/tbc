@@ -29,27 +29,23 @@ linkedin:
 -->
 
 <h3>Tagging a Linked Element</h3>
-<p><code>CreateLinkReference</code> was introduced in
+<p><code>CreateLinkReference</code> was introduced way back in
 the <a href="https://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">Revit 2014 API</a>.</p>
 <p>It is mentioned as one of the major enhancements to the Revit API:</p>
 <h4><a name="2"></a> Enhancements to Interactions with Links &ndash; Conversion of Geometric References</h4>
 <p>The API calls:</p>
 <ul>
 <li><a href="http://www.revitapidocs.com/2020/97813744-6e64-00a7-da5c-b2c6de7919ad.htm">Reference.LinkedElementId</a> &ndash; The id of the top-level element in the linked document that is referred to by this reference.</li>
-<li>
-<p><a href="http://www.revitapidocs.com/2020/919d7d3f-f8c2-eb12-4069-0022c20fa13a.htm">Reference.CreateLinkReference(RevitLinkInstance)</a> &ndash; Creates a <code>Reference</code> from a <code>Reference</code> in an RVT Link.</p>
-</li>
-<li>
-<p><a href="http://www.revitapidocs.com/2020/20a8bee7-2378-c0a6-36f0-07ca42eaedc3.htm">Reference.CreateReferenceInLink()</a> &ndash; Creates a <code>Reference</code> in an RVT Link from a <code>Reference</code> in the RVT host file.</p>
-</li>
+<li><a href="http://www.revitapidocs.com/2020/919d7d3f-f8c2-eb12-4069-0022c20fa13a.htm">Reference.CreateLinkReference(RevitLinkInstance)</a> &ndash; Creates a <code>Reference</code> from a <code>Reference</code> in an RVT Link.</li>
+<li><a href="http://www.revitapidocs.com/2020/20a8bee7-2378-c0a6-36f0-07ca42eaedc3.htm">Reference.CreateReferenceInLink()</a> &ndash; Creates a <code>Reference</code> in an RVT Link from a <code>Reference</code> in the RVT host file.</li>
 </ul>
 <p>allow conversion between <code>Reference</code> objects which reference only the contents of the link and <code>Reference</code> objects which reference the host.</p>
 <p>This allows an application, for example, to look at the geometry in the link, find the needed face, and convert the reference to that face into a reference in the host suitable for use to place a face-based instance.</p>
 <p>Also, they allow you to obtain a reference in the host (e.g., from a dimension or family) and convert it to a reference in the link, suitable for use in <code>Element.GetGeometryObjectFromReference</code>.</p>
 <p>This enhancement was often overlooked, and several questions were raised on how to tag an element in a linked file.</p>
 <h4><a name="3"></a> Tagging a Linked Element</h4>
-<p>Ilia Ivanov raised the question and provided the answer himself in
-his <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+<p>Ilia Ivanov used these methods to answer his own question in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/tagging-linked-elements-using-revit-api/m-p/8669001">tagging linked elements using Revit API</a>:</p>
 <p><strong>Question:</strong> Hello, Is it possibly to tag a linked element?</p>
 <p>And also retrieve the reference of the tagged linked element?</p>
@@ -69,31 +65,31 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/tagging-linked-elemen
 <h4><a name="4"></a> Using the Stable Representation to Tag a Linked Element</h4>
 <p>In another extensive thread
 on <a href="http://forums.autodesk.com/t5/revit-api/highlight-and-tag-linked-elements/m-p/5294217">highlighting and tagging linked elements</a>.
-Carolina Machado suggested a alternative approach and less official solution to tag a linked element using the <code>ParseFromStableRepresentation</code> method instead:</p>
+Carolina Machado suggested an alternative approach and less official solution to tag a linked element using the <code>ParseFromStableRepresentation</code> method instead:</p>
 <blockquote>
-<p>Using RevitLookup and a post from your blog, I noticed that the Stable Representation of references in linked instances comform to the following pattern:</p>
-<p><code>  revitLinkInstance.UniqueId
-<br/>    +<span style="color:#a31515;">&quot;:0:RVTLINK/&quot;</span>&nbsp;+&nbsp;revitLinkType.UniqueId
-<br/>    +<span style="color:#a31515;">&quot;:&quot;</span>&nbsp;+&nbsp;element.Id.ToString()</code></p>
-<p>Using this string it is possible to get the <code>Reference</code> through <code>Reference.ParseFromStableRepresentation</code> method, and then use it to tag the element.</p>
+<p>Using RevitLookup and a post from your blog, I noticed that the Stable Representation of references in linked instances conform to the following pattern:</p>
+<p><code>&nbsp; revitLinkInstance.UniqueId
+<br/>&nbsp; &nbsp; +<span style="color:#a31515;">&quot;:0:RVTLINK/&quot;</span>&nbsp;+&nbsp;revitLinkType.UniqueId
+<br/>&nbsp; &nbsp; +<span style="color:#a31515;">&quot;:&quot;</span>&nbsp;+&nbsp;element.Id.ToString()</code></p>
+<p>Using this string, it is possible to get the <code>Reference</code> through <code>Reference.ParseFromStableRepresentation</code> method and then use it to tag the element.</p>
 </blockquote>
 <p>Many thanks to Carolina for sharing this!</p>
 <h4><a name="5"></a> List All Untagged Doors</h4>
-<p>On a vaguely related topic, let's share two suggestions by my colleague Naveen Kumar and
+<p>On a vaguely related topic, here are two suggestions by my colleague Naveen Kumar and
 Alexander <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478">@aignatovich</a> Ignatovich, aka Александр Игнатович,
-to retrieve all untagged doors in the model, answering several questions on detercting tagged elements:</p>
+to retrieve all untagged doors in the model, answering a whole slew of questions on detecting tagged elements:</p>
 <ul>
-<li><a href="https://forums.autodesk.com/t5/revit-api-forum/i-want-to-check-whether-tag-is-present-on-door-by-api-how-should/td-p/8532032">I want to check whether tag is present on door by api</a></li>
-<li><a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-gets-relation-of-element-with-its-tag-or-its-label/td-p/8602124">how to gets relation of element with its tag or its label</a></li>
-<li><a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-verify-label-on-element-using-revit-api/td-p/8594801">how to verify label on element using revit api</a></li>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/i-want-to-check-whether-tag-is-present-on-door-by-api-how-should/td-p/8532032">I want to check whether tag is present on door by API</a></li>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-gets-relation-of-element-with-its-tag-or-its-label/td-p/8602124">How to get relation of element with its tag or its label</a></li>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-verify-label-on-element-using-revit-api/td-p/8594801">How to verify label on element using Revit API</a></li>
 </ul>
 <p><strong>Question:</strong> Can we determine the relationship between a tag and its tagged element?</p>
 <p>I can retrieve all independent tags of particular category.</p>
 <p>E.g., having 6 doors, I can retrieve the 6 door tags.</p>
-<p>Suppose one of door does not have tag.</p>
+<p>Suppose one of doors does not have tag.</p>
 <p>How can I find the particular door lacking a tag?</p>
 <p>In other words, how to find relation between element category and element tag category.</p>
-<p><strong>Answewr:</strong> Try using the below code. It will highlight the elements that are not taggged:</p>
+<p><strong>Answer:</strong> Try using the below code. It will highlight the elements that are not tagged:</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;doors
 &nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
@@ -135,5 +131,5 @@ to retrieve all untagged doors in the model, answering several questions on dete
 
 <p>Then you can iterate over your doors collection and check if <code>doorTagsIds</code> contains the <code>door.Id</code>.</p>
 <p><center>
-<img src="img/tag_linked_element.png" alt="Tag linked element" width="475">
+<img src="img/tag_linked_element.jpg" alt="Tag linked element" width="475">
 </center></p>
