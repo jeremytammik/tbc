@@ -17,8 +17,11 @@ twitter:
 
 Autodesk show reels, spatial element geometry calculator and Add-In Manager update for the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/spatialgeo2020
 
-&ndash; 
-...
+The linked file enhancements introduced in the Revit 2014 API obviously need more awareness
+&ndash; Link enhancements &ndash; Conversion of geometric references
+&ndash; Tagging a linked element
+&ndash; Using the stable representation to tag a linked element
+&ndash; List all untagged doors...
 
 linkedin:
 
@@ -29,10 +32,20 @@ linkedin:
 -->
 
 <h3>Tagging a Linked Element</h3>
+<p>The linked file enhancements introduced in the Revit 2014 API obviously need more awareness:</p>
+<ul>
+<li><a href="#2">Link enhancements &ndash; conversion of geometric references</a> </li>
+<li><a href="#3">Tagging a linked element</a> </li>
+<li><a href="#4">Using the stable representation to tag a linked element</a> </li>
+<li><a href="#5">List all untagged doors</a> </li>
+</ul>
+<p><center>
+<img src="img/tag_linked_element.jpg" alt="Tag linked element" width="475">
+</center></p>
+<h4><a name="2"></a> Link Enhancements &ndash; Conversion of Geometric References</h4>
 <p><code>CreateLinkReference</code> was introduced way back in
 the <a href="https://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">Revit 2014 API</a>.</p>
-<p>It is mentioned as one of the major enhancements to the Revit API:</p>
-<h4><a name="2"></a> Enhancements to Interactions with Links &ndash; Conversion of Geometric References</h4>
+<p>Conversion of geometric references in links is mentioned as one of the major enhancements:</p>
 <p>The API calls:</p>
 <ul>
 <li><a href="http://www.revitapidocs.com/2020/97813744-6e64-00a7-da5c-b2c6de7919ad.htm">Reference.LinkedElementId</a> &ndash; The id of the top-level element in the linked document that is referred to by this reference.</li>
@@ -75,9 +88,9 @@ Carolina Machado suggested an alternative approach and less official solution to
 </blockquote>
 <p>Many thanks to Carolina for sharing this!</p>
 <h4><a name="5"></a> List All Untagged Doors</h4>
-<p>On a vaguely related topic, here are two suggestions by my colleague Naveen Kumar and
+<p>On a another tagging topic, however with no links involved, here are two suggestions by my colleague Naveen Kumar and
 Alexander <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478">@aignatovich</a> Ignatovich, aka Александр Игнатович,
-to retrieve all untagged doors in the model, answering a whole slew of questions on detecting tagged elements:</p>
+answering a whole slew of questions on how to retrieve all untagged doors in the model:</p>
 <ul>
 <li><a href="https://forums.autodesk.com/t5/revit-api-forum/i-want-to-check-whether-tag-is-present-on-door-by-api-how-should/td-p/8532032">I want to check whether tag is present on door by API</a></li>
 <li><a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-gets-relation-of-element-with-its-tag-or-its-label/td-p/8602124">How to get relation of element with its tag or its label</a></li>
@@ -130,6 +143,5 @@ to retrieve all untagged doors in the model, answering a whole slew of questions
 </pre>
 
 <p>Then you can iterate over your doors collection and check if <code>doorTagsIds</code> contains the <code>door.Id</code>.</p>
-<p><center>
-<img src="img/tag_linked_element.jpg" alt="Tag linked element" width="475">
-</center></p>
+<p>Both of these suggestions can probably be speeded up by storing the entire relationship between the tags and the tagged elements in a dictionary and inverting that relationship, as I explained in the recent thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/filteredelementcollector-unreferenced-sections-only/m-p/8773472"><code>FilteredElementCollector</code> &ndash; unreferenced sections only</a>.</p>
