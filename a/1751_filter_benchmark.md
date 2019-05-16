@@ -22,7 +22,16 @@ First, however, a quick note on a very useful Forge learning resource
 
 linkedin:
 
- the #RevitAPI #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+Forge learning resource and filtered element collector benchmark for the #RevitAPI
+
+http://bit.ly/filterbenchmark
+
+Today, let's present a benchmark monitoring filtered element collector performance.
+
+First, however, a quick note on a very useful Forge learning resource:
+
+- Forge learning resource
+- Filtered element collector benchmark...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
