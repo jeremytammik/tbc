@@ -13,8 +13,10 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Today, let's present a benchmark monitoring filtered element collector performance.
+First, however, a quick note on a very useful Forge learning resource
+&ndash; Forge learning resource
+&ndash; Filtered element collector benchmark...
 
 linkedin:
 
@@ -25,8 +27,51 @@ linkedin:
 -->
 
 <h3>Filtered Element Collector Benchmark</h3>
-<p>I recently reiterated the differences between <a href="https://thebuildingcoder.typepad.com/blog/2019/04/slow-slower-still-and-faster-filtering.html">slow, slower still and faster filtering</a>.</p>
-<p>In the end, the only way to tell whether your filter is performing well or not is to implement some benchmarking for it.</p>
+<p>Today, let's present a benchmark monitoring filtered element collector performance.</p>
+<p>First, however, a quick note on a very useful Forge learning resource:</p>
+<ul>
+<li><a href="#2">Forge learning resource</a> </li>
+<li><a href="#3">Filtered element collector benchmark</a> </li>
+</ul>
+<p><center>
+<img src="img/stopwatch.png" alt="Stopwatch" width="450">
+</center></p>
+<h4><a name="2"></a> Forge Learning Resource</h4>
+<p>If you are new to Forge or want to dive in deeper, you can find a collection of very cool Forge training material
+at <a href="https://learnforge.autodesk.io">learnforge.autodesk.io</a>, focusing specifically on BIM360 and design automation.</p>
+<p>Here is the table of contents:</p>
+<ul>
+<li>Before you start coding</li>
+<li>Tools</li>
+<li>OAuth</li>
+<li>View your models<ul>
+<li>Create a server</li>
+<li>Authenticate</li>
+<li>Upload file to OSS</li>
+<li>Translate the file</li>
+<li>Show on Viewer</li>
+</ul>
+</li>
+<li>View BIM 360 &amp; Fusion models<ul>
+<li>Create a server</li>
+<li>Authorize</li>
+<li>List hubs &amp; projects</li>
+<li>User information</li>
+<li>Show on Viewer</li>
+</ul>
+</li>
+<li>Modify your models<ul>
+<li>Create a server</li>
+<li>Basic app UI</li>
+<li>Prepare a plugin</li>
+<li>Define an activity</li>
+</ul>
+</li>
+</ul>
+<h4><a name="3"></a> Filtered Element Collector Benchmark</h4>
+<p>Back to the Revit API, I recently reiterated the differences between <a href="https://thebuildingcoder.typepad.com/blog/2019/04/slow-slower-still-and-faster-filtering.html">slow, slower still and faster filtering</a>.</p>
+<p>In the end, the only way to tell whether your filter is performing well or not is to implement
+some <a href="https://en.wikipedia.org/wiki/Benchmark_(computing)">benchmarking</a> for it.</p>
 <p>Jai Hari Hara Sudhan very commendably did so, documenting his progress and sharing his results in
 a <a href="https://thebuildingcoder.typepad.com/blog/2019/04/slow-slower-still-and-faster-filtering.html#comment-4421084673">series of</a>
 <a href="https://thebuildingcoder.typepad.com/blog/2019/04/slow-slower-still-and-faster-filtering.html#comment-4421183783">comments on</a>
@@ -39,164 +84,35 @@ the benchmark running live.</p>
 <p><strong>Question:</strong> The above content is very useful.</p>
 <p>I am using three methods to filter and select the element:</p>
 <ol>
-<li>Using <code>FilterRule</code> method (Filters in Floor by Floor / Level)</li>
+<li>Using <code>FilterRule</code> method (filters in floor by floor / level)</li>
+<li>Using <code>Factory</code> Method (filters in the projects)</li>
+<li>Selection with interface (element by element)</li>
 </ol>
-<pre class="code">
-  if(data[0].Equals(InputData.option.ByFloor))
-  {
-  IEnumerable<element> elems = FilterRule(
-  doc, 
-  uidoc.ActiveView.Id,
-  BuiltInCategory.OST_ElectricalEquipment,
-  ElectricalEquipment);
-
-  foreach(Element ele in elems)
-  {
-  Draw_Section.Draw(doc,ele,Section_Name,
-  LeftOffset,RightOffset,
-  TopOffset,BottomOffset,
-  NearClipOffset,FarClipOffset);
-  }
-  }
-</pre>
-
-<ol>
-<li>Using Factory Method (Filters in the projects)</li>
-</ol>
-<pre class="code">
-  else if(data[0].Equals(InputData.option.ByProject))
-  {
-  IEnumerable<element> elems = Factory(doc,
-  BuiltInCategory.OST_ElectricalEquipment,
-  ElectricalEquipment);
-  foreach(Element ele in elems)
-  {
-  Draw_Section.Draw(doc,ele,
-  Section_Name,LeftOffset,
-  RightOffset,TopOffset,BottomOffset,
-  NearClipOffset,FarClipOffset);
-  }
-  }
-</pre>
-
-<ol>
-<li>Selection with Interface (Element by element)</li>
-</ol>
-<pre class="code">
-  else if(data[0].Equals(InputData.option.BySingle))
-  {
-  TaskDialog td = new TaskDialog("Element By Element");
-  td.Title = "Want to Continue";
-  td.MainInstruction = "Do you want to create a new section";
-  td.CommonButtons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No;
-  td.DefaultButton = TaskDialogResult.Yes;
-  bool next = true;
-  while(next)
-  {
-  ISelectionFilter selFilter = new FamilySelectionFilter(
-  doc,
-  BuiltInCategory.OST_ElectricalEquipment,
-  ElectricalEquipment);
-  Reference refe = sel.PickObject(ObjectType.Element, selFilter, "Select Object");
-  Element ele = doc.GetElement(refe);
-  Draw_Section.Draw(doc,ele,Section_Name,LeftOffset,RightOffset,TopOffset,BottomOffset,NearClipOffset,FarClipOffset);
-  TaskDialogResult tdRes = td.Show();
-  if(tdRes == TaskDialogResult.No)
-  { next = false; }
-  }
-  }
-
-  ///--------------------------
-  // Methods
-
-  // Selection by filter
-  public class FamilySelectionFilter : ISelectionFilter
-  {
-  Document Doc;
-  string FmlyName = "";
-  int BultCatId;
-  public FamilySelectionFilter(Document doc,BuiltInCategory BuiltInCat,string familyTypeName)
-  {
-  Doc = doc;
-  FmlyName = familyTypeName;
-  BultCatId = (int)BuiltInCat;
-
-  }
-
-  public bool AllowElement(Element elem)
-  {
-  //IEnumerable < Element > FtlElem = new FilteredElementCollector(Doc)
-  // .OfCategory(BultCat)
-  // .OfClass(typeof(FamilyInstance))
-  // .WherePasses(
-  // new ElementParameterFilter(
-  // ParameterFilterRuleFactory.CreateEqualsRule(
-  // new ElementId(BuiltInParameter.ELEM_FAMILY_PARAM),FmlyName,true)));
-  if(elem.Category.Id.IntegerValue == BultCatId)
-  {
-  return true;
-  }
-  return false;
-  }
-
-  public bool AllowReference(Reference refer,XYZ point)
-  {
-  Element e = Doc.GetElement(refer);
-  if(e.get_Parameter(BuiltInParameter.ELEM_FAMILY_PARAM).AsValueString().Equals(FmlyName))
-  return true;
-  return false;
-  }
-  }
-
-  // Factory Method
-  static IEnumerable<element> Factory(
-  Document doc,
-  BuiltInCategory BultCat,
-  string familyTypeName)
-  {
-  return new FilteredElementCollector(doc)
-  .OfCategory(BultCat)
-  .OfClass(typeof(FamilyInstance))
-  .WherePasses(
-  new ElementParameterFilter(
-  ParameterFilterRuleFactory.CreateEqualsRule(
-  new ElementId(BuiltInParameter.ELEM_FAMILY_PARAM),familyTypeName,true)));
-  }
-
-  // FilterRule Method
-  static IEnumerable<element> FilterRule(
-  Document doc,
-  ElementId ActiveViewId,
-  BuiltInCategory BultCat,
-  string familyTypeName)
-  {
-  return new FilteredElementCollector(doc,ActiveViewId)
-  .OfCategory(BultCat)
-  .OfClass(typeof(FamilyInstance))
-  .WherePasses(
-  new ElementParameterFilter(
-  new FilterStringRule(
-  new ParameterValueProvider(
-  new ElementId(BuiltInParameter.ELEM_FAMILY_PARAM)),
-  new FilterStringEquals(),familyTypeName,true)));
-  }
-</pre>
-
 <p>Question 1. Which one is the best in performance (quick)? <code>FilterRule</code> or <code>Factory</code> method?</p>
 <p>Question 2. In the FamilySelectionFilter method, is there any better or more performant method to select the elements?</p>
 <p><strong>Answer:</strong> Nobody can tell you beforehand how these different approaches will perform in your specific context.</p>
 <p>I therefore suggest that you benchmark them yourself and let us know the result.</p>
 <p><a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5">The Building Coder topic groups</a> lists
 several benchmarking examples that you can look at to see how.</p>
-<p><strong>Response:</strong> I implemented a benchmark and am unable to determine exact constant performance (time), because the results differ from time to time. </p>
+<p><strong>Response:</strong> I implemented a benchmark.</p>
+<p>It is impossible to determine exact constant performance (time), because the results differ from run to run. </p>
 <p>Please refer to my <a href="https://knowledge.autodesk.com/community/screencast/99858ef7-c4c8-4599-ba6d-0394ff830d62">API speed test screencast</a>. <!-- https://autode.sk/2IwemGr --></p>
 <p>Finally, I rank the different approaches as follows:</p>
+<!--
 <ul style="list-style-type: none">
 <li>1st &ndash; `Factory` method (average time = 766.1 microseconds) 100% </li>
-<li>2nd &ndash; `FilterRule` method (average time = 889.0 microseconds) 116% slower than `Factory`</li>
-<li>3rd &ndash; `Linq2` method (average time = 983.5 microseconds) 128% slower than `Factory`</li>
-<li>4th &ndash; `Linq1` method (average time = 1173.3 microseconds) 153% slower than `Factory`</li>
+<li>2nd &ndash; `FilterRule` method (average time = 889.0 microseconds) &ndash; 116% slower than `Factory`</li>
+<li>3rd &ndash; `Linq2` method (average time = 983.5 microseconds) &ndash; 128% slower than `Factory`</li>
+<li>4th &ndash; `Linq1` method (average time = 1173.3 microseconds) &ndash; 153% slower than `Factory`</li>
 </ul>
+-->
+
+<ol>
+<li>`Factory` method (average time = 766.1 microseconds) <br/>&ndash; 100% </li>
+<li>`FilterRule` method (average time = 889.0 microseconds) <br/>&ndash; 116% slower than `Factory`</li>
+<li>`Linq2` method (average time = 983.5 microseconds) <br/>&ndash; 128% slower than `Factory`</li>
+<li>`Linq1` method (average time = 1173.3 microseconds) <br/>&ndash; 153% slower than `Factory`</li>
+</ol>
 
 <p>The code as follows:</p>
 <pre class="code">
@@ -472,16 +388,10 @@ several benchmarking examples that you can look at to see how.</p>
 </pre>
 
 <p>Many thanks to Sudhan for implementing this benchmark and reporting these useful (and reassuring) results!</p>
+<p>I hope that this encourages you to do some benchmarking as well and helps you optimise your own filtered element collectors.</p>
 <!--
 
-<center>
-<img src="img/" alt="" width="100">
-</center>
-
-
-
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-
 
 **Question:** 
 
@@ -489,7 +399,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 <pre class="code">
 </pre>
-
 
 Dear Sudhan,
 

@@ -15,8 +15,10 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Today, let's present a benchmark monitoring filtered element collector performance.
+First, however, a quick note on a very useful Forge learning resource
+&ndash; Forge learning resource
+&ndash; Filtered element collector benchmark...
 
 linkedin:
 
@@ -28,9 +30,52 @@ linkedin:
 
 ### Filtered Element Collector Benchmark
 
-I recently reiterated the differences between [slow, slower still and faster filtering](https://thebuildingcoder.typepad.com/blog/2019/04/slow-slower-still-and-faster-filtering.html).
+Today, let's present a benchmark monitoring filtered element collector performance.
 
-In the end, the only way to tell whether your filter is performing well or not is to implement some benchmarking for it.
+First, however, a quick note on a very useful Forge learning resource:
+
+- [Forge learning resource](#2) 
+- [Filtered element collector benchmark](#3) 
+
+<center>
+<img src="img/stopwatch.png" alt="Stopwatch" width="450">
+</center>
+
+####<a name="2"></a> Forge Learning Resource
+
+If you are new to Forge or want to dive in deeper, you can find a collection of very cool Forge training material
+at [learnforge.autodesk.io](https://learnforge.autodesk.io), focusing specifically on BIM360 and design automation.
+
+Here is the table of contents:
+
+- Before you start coding
+- Tools
+- OAuth
+- View your models
+    - Create a server
+    - Authenticate
+    - Upload file to OSS
+    - Translate the file
+    - Show on Viewer
+- View BIM 360 & Fusion models
+    - Create a server
+    - Authorize
+    - List hubs & projects
+    - User information
+    - Show on Viewer
+- Modify your models
+    - Create a server
+    - Basic app UI
+    - Prepare a plugin
+    - Define an activity
+
+
+####<a name="3"></a> Filtered Element Collector Benchmark
+
+Back to the Revit API, I recently reiterated the differences between [slow, slower still and faster filtering](https://thebuildingcoder.typepad.com/blog/2019/04/slow-slower-still-and-faster-filtering.html).
+
+In the end, the only way to tell whether your filter is performing well or not is to implement
+some [benchmarking](https://en.wikipedia.org/wiki/Benchmark_(computing)) for it.
 
 Jai Hari Hara Sudhan very commendably did so, documenting his progress and sharing his results in
 a [series of](https://thebuildingcoder.typepad.com/blog/2019/04/slow-slower-still-and-faster-filtering.html#comment-4421084673)
@@ -47,146 +92,9 @@ Here is a summary of our discussion and his final benchmarking code:
 
 I am using three methods to filter and select the element:
 
-1. Using `FilterRule` method (Filters in Floor by Floor / Level)
-
-<pre class="code">
-  if(data[0].Equals(InputData.option.ByFloor))
-  {
-  IEnumerable<element> elems = FilterRule(
-  doc, 
-  uidoc.ActiveView.Id,
-  BuiltInCategory.OST_ElectricalEquipment,
-  ElectricalEquipment);
-  
-  foreach(Element ele in elems)
-  {
-  Draw_Section.Draw(doc,ele,Section_Name,
-  LeftOffset,RightOffset,
-  TopOffset,BottomOffset,
-  NearClipOffset,FarClipOffset);
-  }
-  }
-</pre>
-  
-2.	Using Factory Method (Filters in the projects)
-
-<pre class="code">
-  else if(data[0].Equals(InputData.option.ByProject))
-  {
-  IEnumerable<element> elems = Factory(doc,
-  BuiltInCategory.OST_ElectricalEquipment,
-  ElectricalEquipment);
-  foreach(Element ele in elems)
-  {
-  Draw_Section.Draw(doc,ele,
-  Section_Name,LeftOffset,
-  RightOffset,TopOffset,BottomOffset,
-  NearClipOffset,FarClipOffset);
-  }
-  }
-</pre>
-
-3.	Selection with Interface (Element by element)
-
-<pre class="code">
-  else if(data[0].Equals(InputData.option.BySingle))
-  {
-  TaskDialog td = new TaskDialog("Element By Element");
-  td.Title = "Want to Continue";
-  td.MainInstruction = "Do you want to create a new section";
-  td.CommonButtons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No;
-  td.DefaultButton = TaskDialogResult.Yes;
-  bool next = true;
-  while(next)
-  {
-  ISelectionFilter selFilter = new FamilySelectionFilter(
-  doc,
-  BuiltInCategory.OST_ElectricalEquipment,
-  ElectricalEquipment);
-  Reference refe = sel.PickObject(ObjectType.Element, selFilter, "Select Object");
-  Element ele = doc.GetElement(refe);
-  Draw_Section.Draw(doc,ele,Section_Name,LeftOffset,RightOffset,TopOffset,BottomOffset,NearClipOffset,FarClipOffset);
-  TaskDialogResult tdRes = td.Show();
-  if(tdRes == TaskDialogResult.No)
-  { next = false; }
-  }
-  }
-
-  ///--------------------------
-  // Methods
-  
-  // Selection by filter
-  public class FamilySelectionFilter : ISelectionFilter
-  {
-  Document Doc;
-  string FmlyName = "";
-  int BultCatId;
-  public FamilySelectionFilter(Document doc,BuiltInCategory BuiltInCat,string familyTypeName)
-  {
-  Doc = doc;
-  FmlyName = familyTypeName;
-  BultCatId = (int)BuiltInCat;
-  
-  }
-
-  public bool AllowElement(Element elem)
-  {
-  //IEnumerable < Element > FtlElem = new FilteredElementCollector(Doc)
-  // .OfCategory(BultCat)
-  // .OfClass(typeof(FamilyInstance))
-  // .WherePasses(
-  // new ElementParameterFilter(
-  // ParameterFilterRuleFactory.CreateEqualsRule(
-  // new ElementId(BuiltInParameter.ELEM_FAMILY_PARAM),FmlyName,true)));
-  if(elem.Category.Id.IntegerValue == BultCatId)
-  {
-  return true;
-  }
-  return false;
-  }
-
-  public bool AllowReference(Reference refer,XYZ point)
-  {
-  Element e = Doc.GetElement(refer);
-  if(e.get_Parameter(BuiltInParameter.ELEM_FAMILY_PARAM).AsValueString().Equals(FmlyName))
-  return true;
-  return false;
-  }
-  }
-
-  // Factory Method
-  static IEnumerable<element> Factory(
-  Document doc,
-  BuiltInCategory BultCat,
-  string familyTypeName)
-  {
-  return new FilteredElementCollector(doc)
-  .OfCategory(BultCat)
-  .OfClass(typeof(FamilyInstance))
-  .WherePasses(
-  new ElementParameterFilter(
-  ParameterFilterRuleFactory.CreateEqualsRule(
-  new ElementId(BuiltInParameter.ELEM_FAMILY_PARAM),familyTypeName,true)));
-  }
-
-  // FilterRule Method
-  static IEnumerable<element> FilterRule(
-  Document doc,
-  ElementId ActiveViewId,
-  BuiltInCategory BultCat,
-  string familyTypeName)
-  {
-  return new FilteredElementCollector(doc,ActiveViewId)
-  .OfCategory(BultCat)
-  .OfClass(typeof(FamilyInstance))
-  .WherePasses(
-  new ElementParameterFilter(
-  new FilterStringRule(
-  new ParameterValueProvider(
-  new ElementId(BuiltInParameter.ELEM_FAMILY_PARAM)),
-  new FilterStringEquals(),familyTypeName,true)));
-  }
-</pre>
+1. Using `FilterRule` method (filters in floor by floor / level)
+2. Using `Factory` Method (filters in the projects)
+3. Selection with interface (element by element)
 
 Question 1. Which one is the best in performance (quick)? `FilterRule` or `Factory` method?
 
@@ -200,18 +108,29 @@ I therefore suggest that you benchmark them yourself and let us know the result.
 several benchmarking examples that you can look at to see how.
 
 
-**Response:** I implemented a benchmark and am unable to determine exact constant performance (time), because the results differ from time to time. 
+**Response:** I implemented a benchmark.
+
+It is impossible to determine exact constant performance (time), because the results differ from run to run. 
 
 Please refer to my [API speed test screencast](https://knowledge.autodesk.com/community/screencast/99858ef7-c4c8-4599-ba6d-0394ff830d62). <!-- https://autode.sk/2IwemGr -->
 
 Finally, I rank the different approaches as follows:
 
+<!--
 <ul style="list-style-type: none">
 <li>1st &ndash; `Factory` method (average time = 766.1 microseconds) 100% </li>
-<li>2nd &ndash; `FilterRule` method (average time = 889.0 microseconds) 116% slower than `Factory`</li>
-<li>3rd &ndash; `Linq2` method (average time = 983.5 microseconds) 128% slower than `Factory`</li>
-<li>4th &ndash; `Linq1` method (average time = 1173.3 microseconds) 153% slower than `Factory`</li>
+<li>2nd &ndash; `FilterRule` method (average time = 889.0 microseconds) &ndash; 116% slower than `Factory`</li>
+<li>3rd &ndash; `Linq2` method (average time = 983.5 microseconds) &ndash; 128% slower than `Factory`</li>
+<li>4th &ndash; `Linq1` method (average time = 1173.3 microseconds) &ndash; 153% slower than `Factory`</li>
 </ul>
+-->
+
+<ol>
+<li>`Factory` method (average time = 766.1 microseconds) <br/>&ndash; 100% </li>
+<li>`FilterRule` method (average time = 889.0 microseconds) <br/>&ndash; 116% slower than `Factory`</li>
+<li>`Linq2` method (average time = 983.5 microseconds) <br/>&ndash; 128% slower than `Factory`</li>
+<li>`Linq1` method (average time = 1173.3 microseconds) <br/>&ndash; 153% slower than `Factory`</li>
+</ol>
 
 The code as follows:
 
@@ -489,17 +408,12 @@ The code as follows:
 
 Many thanks to Sudhan for implementing this benchmark and reporting these useful (and reassuring) results!
 
+I hope that this encourages you to do some benchmarking as well and helps you optimise your own filtered element collectors.
+
 
 <!--
 
-<center>
-<img src="img/" alt="" width="100">
-</center>
-
-
-
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-
 
 **Question:** 
 
@@ -507,7 +421,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 <pre class="code">
 </pre>
-
 
 Dear Sudhan,
 
