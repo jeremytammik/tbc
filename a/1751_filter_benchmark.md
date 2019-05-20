@@ -417,6 +417,9 @@ The code as follows:
 
 Many thanks to Sudhan for implementing this benchmark and reporting these useful (and reassuring) results!
 
+I created a complete Visual Studio solution and added the missing bits and pieces to test this live in
+the [FilterBenchmark GitHub repository](https://github.com/jeremytammik/FilterBenchmark).
+
 I hope that this encourages you to do some benchmarking as well and helps you optimise your own filtered element collectors.
 
 
