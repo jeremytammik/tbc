@@ -21,7 +21,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Structural Precast API, cloud open callback interface and default implementation in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/precastapi
 
 As usual, I am over-active in the Revit API discussion forum, so you can see most of what I have been up to right there.
 Here and now, I'll highlight one of those threads and clarify how to access the Revit 2019 Precast API
