@@ -19,10 +19,12 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Structural Precast API, cloud open callback interface and default implementation in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/precastapi
 
-&ndash; 
-...
+As usual, I am over-active in the Revit API discussion forum, so you can see most of what I have been up to right there.
+Here and now, I'll highlight one of those threads and clarify how to access the Revit 2019 Precast API
+&ndash; Structural Precast API
+&ndash; <code>IOpenFromCloudCallback</code> and the <code>DefaultOpenFromCloudCallback</code> class...
 
 linkedin:
 
@@ -30,7 +32,7 @@ linkedin:
 
 -->
 
-<h3>Precast API and Clour Open Callback</h3>
+<h3>Precast API and Cloud Open Callback</h3>
 <p>As usual, I am over-active in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>, so
 you can see most of what I have been up to right there.</p>
@@ -139,7 +141,7 @@ and <a href="https://thebuildingcoder.typepad.com/blog/2018/04/whats-new-in-the-
 <li>Autodesk.Revit.DB.IOpenFromCloudCallback.OnOpenConflict()</li>
 </ul>
 <p>can be passed to the document open methods to gain to handle conflict cases.
-The method is passed an OpenConflictScenario value identifying the reason for the conflict (Rollback, Relinquished or OutOfDate) and should return an <code>OpenConflictResult</code> with the desired response (keep local changes, discard local changes and open the latest version or cancel).</p>
+The method is passed an <code>OpenConflictScenario</code> value identifying the reason for the conflict (Rollback, Relinquished or OutOfDate) and should return an <code>OpenConflictResult</code> with the desired response (keep local changes, discard local changes and open the latest version or cancel).</p>
 <p>The new class:</p>
 <ul>
 <li>DefaultOpenFromCloudCallback</li>
