@@ -21,7 +21,7 @@
   
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Secret reference line faces in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/reflinefaces
 
 The open source space around the Revit API is continuously growing richer, solutions are shared and exciting discoveries are made, both in
 the Revit API discussion forum and elsewhere
@@ -30,6 +30,15 @@ the Revit API discussion forum and elsewhere
 
 linkedin:
 
+Secret reference line faces in the #RevitAPI
+
+http://bit.ly/reflinefaces
+
+The open source space around the Revit API is continuously growing richer, solutions are shared and exciting discoveries are made, both in
+the Revit API discussion forum and elsewhere:
+
+- Debugging, code signing and HOK Mission Control
+- Creating connectors on a reference line...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
