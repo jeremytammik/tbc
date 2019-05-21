@@ -14,9 +14,8 @@
 
   [code signing of your revit plug-ins](http://archi-lab.net/code-signing-of-your-revit-plug-ins)
 
-- edges and faces
-  - create connectors on reference line
-    https://forums.autodesk.com/t5/revit-api-forum/creating-connectors-on-reference-line/m-p/8707761
+- create connectors on reference line
+  https://forums.autodesk.com/t5/revit-api-forum/creating-connectors-on-reference-line/m-p/8707761
 
 twitter:
 
@@ -32,17 +31,40 @@ linkedin:
 
 -->
 
-<h3>Secret Edges and Faces</h3>
-<h4><a name="2"></a></h4>
-<p><strong>Question:</strong> </p>
-<p><strong>Answer:</strong> </p>
+<h3>Secret Edge and Face on Reference Line</h3>
+<p>The open source space around the Revit API is continuously growing richer, solutions are shared and exciting discoveries are made, both in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> and elsewhere:</p>
+<ul>
+<li><a href="#2">Debugging, Code Signing and HOK Mission Control</a> </li>
+<li><a href="#3">Creating Connectors on a Reference Line</a> </li>
+</ul>
+<h4><a name="2"></a> Debugging, Code Signing and HOK Mission Control</h4>
+<p>Yesterday I happened to notice a tweet
+by Konrad Sobon, <a href="https://twitter.com/arch_laboratory">@arch_laboratory</a>, pointing
+out a couple of exciting blog posts
+on <a href="http://archi-lab.net">archi+lab</a>, e.g.:</p>
+<ul>
+<li><a href="http://archi-lab.net/debugging-revit-add-ins">Debugging Revit add-ins</a></li>
+<li><a href="http://archi-lab.net/code-signing-of-your-revit-plug-ins">Code signing of your Revit plug-ins</a></li>
+<li><a href="http://archi-lab.net/playing-with-power-shell-commands-and-post-build-events">Playing with Power Shell commands and Post Build events</a></li>
+</ul>
+<p>The latter one discusses some aspects of
+the <a href="https://github.com/HOKGroup/HOK-Revit-Addins/tree/master/HOK.MissionControl">Mission Control repository</a> and
+making it easier to pull, build, and deploy.</p>
+<p>In fact, it is worth while taking a look at all
+the open source <a href="https://github.com/HOKGroup/HOK-Revit-Addins">HOK Revit Addins</a>.</p>
+<p>This is all very exciting stuff indeed.</p>
+<p>Browsing further, I also discovered the Konrad just started
+the <a href="http://archi-lab.net/next-chapter">next chapter</a> of his career.</p>
+<p>Congratulations, Konrad!</p>
+<p>The best of luck to you, and have fun!</p>
 <h4><a name="3"></a> Creating Connectors on a Reference Line</h4>
 <p><a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3894260">MarryTookMyCoffe</a> points
 out a surprising and useful possibility 
 for <a href="https://forums.autodesk.com/t5/revit-api-forum/creating-connectors-on-reference-line/m-p/8707761">creating connectors on a reference line</a>:</p>
 <p>I made some tests and thought I will share some of my results with the forum:</p>
 <p>The problem with putting connectors on a reference line is that the API doesn’t give us any references to any surfaces, no matter for what view we ask.</p>
-<p>There is however a way to get around this one by by adding a secret suffix to the unique id and calling the <code>ParseFromStableRepresentation</code> method on it:</p>
+<p>There is however a way to get around this one by adding a secret suffix to the unique id and calling the <code>ParseFromStableRepresentation</code> method on it:</p>
 <pre>
   Reference.ParseFromStableRepresentation(
     document, uniqueID );
@@ -58,9 +80,9 @@ for <a href="https://forums.autodesk.com/t5/revit-api-forum/creating-connectors-
   3ded2a48-367f-42c7-83bd-9fd4f659891a-00000fd0:2
 </pre>
 
-<p>Here are the possibile secret suffixes in a table:</p>
+<p>Here is a table summarising the possible secret suffixes:</p>
 <table>
-<tr><td style="text-align: right">3ded2a48-367f-42c7-83bd&nbsp;&nbsp;&nbsp;<br/>-9fd4f659891a-00000fd0&nbsp;&nbsp;&nbsp;</td><td>The Reference Line<br/>itself</td></tr>
+<tr><td style="text-align: right">3ded2a48-367f-42c7-83bd&nbsp;&nbsp;&nbsp;<br/>-9fd4f659891a-00000fd0&nbsp;&nbsp;&nbsp;</td><td>The Reference Line<br/>unique id</td></tr>
 <tr><td style="text-align: right">:0&nbsp;&nbsp;&nbsp;</td><td>ref to line</td></tr>
 <tr><td style="text-align: right">:1&nbsp;&nbsp;&nbsp;</td><td>ref to solid</td></tr>
 <tr><td style="text-align: right">:2&nbsp;&nbsp;&nbsp;</td><td>ref to Face</td></tr>
@@ -84,5 +106,3 @@ for <a href="https://forums.autodesk.com/t5/revit-api-forum/creating-connectors-
 <p><center>
 <i>once downhill, once uphill, but always on foot.</i>
 </center></p>
-<pre class="code">
-</pre>
