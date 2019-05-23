@@ -13,7 +13,14 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; Creating connectors on a reference line...
+I played around creating a new SectionCutGeo add-in to retrieve the geometry resulting from cutting a family instance in a section view.
+This was prompted the Revit API discussion forum thread on getting intersection lines from cut in section view
+&ndash; Intersection of section and family instance task
+&ndash; Solution options, geometry elements and view settings
+&ndash; Retrieving curves in the cut plane
+&ndash; Helper methods and external command mainline
+&ndash; Sample model and results
+&ndash; Caveat...
 
 linkedin:
 
@@ -22,7 +29,7 @@ linkedin:
 
 -->
 
-### Section View Intersection Geometry
+### Retrieving Section View Intersection Cut Geometry
 
 I played around creating a
 new [SectionCutGeo add-in](https://github.com/jeremytammik/SectionCutGeo) to
@@ -97,7 +104,11 @@ I changed it to `1`, 'Clip with line', and then the intersection lines are retur
 
 ####<a name="4"></a> Retrieving Curves in the Cut Plane
 
-I wanted to retrieve the intersection curves of the family instance with the cut plane of the section view and searched for a possibility to do so in the Revit API.
+In the SectionCutGeo add-in, I only want to retrieve the intersection curves of the family instance with the cut plane of the section view.
+
+The geometry returned includes the entire truncated solid.
+
+How to determine which of its curves lie in a specific plane?
 
 Initially, I simply called `NewModelCurve`, specifying the sketch plane in that cut plane, for each of the curves I retrieved from the geometry.
 
@@ -172,7 +183,7 @@ There is an internal function that does so, but it's not exposed via the API.
 
 ####<a name="5"></a> Helper Methods and External Command Mainline
 
-Not throwing an exception for all the curves that do not lie in the cut plane speeds up execution tremendously.
+Using my own curve-in-plane predicate to eliminate all curves not lying in the plane instead of throwing an exception for each one sped up execution tremendously.
 
 It also enabled me to separate the curve collection and the model curve creation from each other.
 
