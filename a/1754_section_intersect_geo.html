@@ -35,6 +35,7 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-receive-inters
 <li><a href="#4">Retrieving curves in the cut plane</a> </li>
 <li><a href="#5">Helper methods and external command mainline</a> </li>
 <li><a href="#6">Sample model and results</a> </li>
+<li><a href="#7">Caveat</a> </li>
 </ul>
 <h4><a name="2"></a> Intersection of Section and Family Instance Task</h4>
 <p><strong>Question:</strong> I am trying to get the Intersection of Section and <code>FamilyInstance</code>.</p>
@@ -61,9 +62,9 @@ of <a href="https://thebuildingcoder.typepad.com/blog/2011/08/section-view-geome
   <span style="color:#2b91af;">GeometryElement</span>&nbsp;gSymbol&nbsp;=&nbsp;gInst.GetInstanceGeometry();
 </pre>
 
-<p>The crucial point, however, if you want to retrieve the intersection lines of the family instance and the section cut plane, is to set the <code>VIEWER_BOUND_FAR_CLIPPING</code> parameter appropiately.</p>
+<p>The crucial point, however, if you want to retrieve the intersection lines of the family instance and the section cut plane, is to set the <code>VIEWER_BOUND_FAR_CLIPPING</code> parameter appropriately.</p>
 <p>The default setting is <code>2</code>, 'Clip without line'.</p>
-<p>I changed it to <code>1</code>, 'Clip with line', and then the interesection lines are returned:</p>
+<p>I changed it to <code>1</code>, 'Clip with line', and then the intersection lines are returned:</p>
 <pre class="code">
   viewSection.get_Parameter(&nbsp;
   &nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.VIEWER_BOUND_FAR_CLIPPING&nbsp;)
@@ -84,14 +85,15 @@ of <a href="https://thebuildingcoder.typepad.com/blog/2011/08/section-view-geome
 Additional information: Curve must be in the plane</li>
 </ul>
 <p>Throwing all those exceptions is a very horrible thing to do and costs a huge amount of time.</p>
-<p>So far, we simply tried to create a model curve in the given plane. This throws an exception if the curve does not lie in the plane. That is bad and costs a huge amount of perfromance. Better would  be to check whether the curve is in the plane programmatically instead of throwing an exception. How can we determine whether a curve lies in a plane?</p>
+<p>It provides a brain-dead simple way to get rid of the off-plane curves, though.</p>
+<p>So far, we simply tried to create a model curve in the given plane. This throws an exception if the curve does not lie in the plane. That is bad and costs a huge amount of performance. Better would be to programmatically check whether the curve lies in the plane beforehand, instead of throwing an exception. How can we determine whether a curve lies in a plane?</p>
 <p>I asked the development team whether they can suggest a method to check beforehand whether a curve lies in a given plane or not:</p>
 <p>Jeremy: Is there a way to check whether a <code>Curve</code> lies in a given <code>Plane</code>? I can simply call <code>NewModelCurve</code> on it. That throws exception if the curve does not lie in the plane. However, it would be much cleaner and more efficient to check that programmatically instead. Does the Revit API offer anything that I could use for that check, or is this a case of DIY?</p>
 <p>Devteam: <code>Face</code> has <code>Intersect(Curve)</code>.
 <code>Plane</code> (or other <code>Surface</code>) does not.
 Could you project the curve end-points (and one intermediate point) with <code>Surface.Project</code> and check the distances?<br />
 Alternatively, can’t you build a plane via 3 points on the curve, confirm matching normal vectors and then check on point on the target plane for intersection with the generated plane? Also, check that the initiating curve is planar (no idea how in Revit API but non-planar 3D splines are a thing that ruins all of the above).</p>
-<p>Jeremy: yes, i could project and test the distance. i think i only have arcs and lines, though, so it may be easier to implement my own is-curve-in-plane predicate, much faster, probably... I think the Revit API once boasted a method on the <code>Curve</code> class to return the plane it was lying in, but that seems to have vanished...</p>
+<p>Jeremy: Yes, I could project and test the distance. I think I only have arcs and lines, though, so it may be easier to implement my own is-curve-in-plane predicate, much faster, probably... I think the Revit API once boasted a method on the <code>Curve</code> class to return the plane it was lying in, but that seems to have vanished...</p>
 <p>I added a counter to track all the different kinds of geometry elements I am handling, and it reported:</p>
 <pre>
     3 Element
@@ -136,9 +138,9 @@ You're also correct in saying that it would be helpful for Revit's API to provid
 There is an internal function that does so, but it's not exposed via the API.</p>
 <h4><a name="5"></a> Helper Methods and External Command Mainline</h4>
 <p>Not throwing an exception for all the curves that do not lie in the cut plane speeds up execution tremendously.</p>
-<p>It also enabled me to separate the curve collection and the model curve creation.</p>
+<p>It also enabled me to separate the curve collection and the model curve creation from each other.</p>
 <p>I implemented a read-only curve collection section followed by a separate, later, transaction for the model curve creation.</p>
-<p>The final code looks like this:</p>
+<p>The code now looks like this:</p>
 <pre class="code">
 <span style="color:blue;">namespace</span>&nbsp;SectionCutGeo
 {
@@ -355,6 +357,9 @@ There is an internal function that does so, but it's not exposed via the API.</p
 }
 </pre>
 
+<p>Note that the code listed above is a momentary snapshot at the time of writing.</p>
+<p>For the full Visual Studio solution and updates to the code, please refer to
+the <a href="https://github.com/jeremytammik/SectionCutGeo">SectionCutGeo GitHub repository</a>.</p>
 <h4><a name="6"></a> Sample Model and Results</h4>
 <p>Sample model 3D view:</p>
 <p><img alt="Sample model 3D view" src="img/section_cut_geo_3d.png" /></p>
@@ -380,3 +385,7 @@ There is an internal function that does so, but it's not exposed via the API.</p
 
   77 cut geometry lines found in section plane.
 </pre>
+
+<h4><a name="7"></a> Caveat</h4>
+<p>This sample currently only handles solid and instance geometry objects.</p>
+<p>There may well be other object types that need to be handled as well to provide full coverage for all situations.</p>

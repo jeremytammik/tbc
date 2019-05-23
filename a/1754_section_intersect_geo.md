@@ -76,11 +76,11 @@ To achieve this, you need to specify the section view in the options passed in t
   <span style="color:#2b91af;">GeometryElement</span>&nbsp;gSymbol&nbsp;=&nbsp;gInst.GetInstanceGeometry();
 </pre>
 
-The crucial point, however, if you want to retrieve the intersection lines of the family instance and the section cut plane, is to set the `VIEWER_BOUND_FAR_CLIPPING` parameter appropiately.
+The crucial point, however, if you want to retrieve the intersection lines of the family instance and the section cut plane, is to set the `VIEWER_BOUND_FAR_CLIPPING` parameter appropriately.
 
 The default setting is `2`, 'Clip without line'.
 
-I changed it to `1`, 'Clip with line', and then the interesection lines are returned:
+I changed it to `1`, 'Clip with line', and then the intersection lines are returned:
 
 <pre class="code">
   viewSection.get_Parameter(&nbsp;
@@ -110,7 +110,7 @@ Throwing all those exceptions is a very horrible thing to do and costs a huge am
 
 It provides a brain-dead simple way to get rid of the off-plane curves, though.
 
-So far, we simply tried to create a model curve in the given plane. This throws an exception if the curve does not lie in the plane. That is bad and costs a huge amount of perfromance. Better would be to programmatically check whether the curve lies in the plane beforehand, instead of throwing an exception. How can we determine whether a curve lies in a plane?
+So far, we simply tried to create a model curve in the given plane. This throws an exception if the curve does not lie in the plane. That is bad and costs a huge amount of performance. Better would be to programmatically check whether the curve lies in the plane beforehand, instead of throwing an exception. How can we determine whether a curve lies in a plane?
 
 I asked the development team whether they can suggest a method to check beforehand whether a curve lies in a given plane or not:
 
@@ -121,7 +121,7 @@ Devteam: `Face` has `Intersect(Curve)`.
 Could you project the curve end-points (and one intermediate point) with `Surface.Project` and check the distances?  
 Alternatively, can’t you build a plane via 3 points on the curve, confirm matching normal vectors and then check on point on the target plane for intersection with the generated plane? Also, check that the initiating curve is planar (no idea how in Revit API but non-planar 3D splines are a thing that ruins all of the above).
 
-Jeremy: yes, i could project and test the distance. I think I only have arcs and lines, though, so it may be easier to implement my own is-curve-in-plane predicate, much faster, probably... I think the Revit API once boasted a method on the `Curve` class to return the plane it was lying in, but that seems to have vanished...
+Jeremy: Yes, I could project and test the distance. I think I only have arcs and lines, though, so it may be easier to implement my own is-curve-in-plane predicate, much faster, probably... I think the Revit API once boasted a method on the `Curve` class to return the plane it was lying in, but that seems to have vanished...
 
 I added a counter to track all the different kinds of geometry elements I am handling, and it reported:
 
