@@ -396,6 +396,12 @@ The code now looks like this:
 }
 </pre>
 
+Note that the code listed above is a momentary snapshot at the time of writing.
+
+For the full Visual Studio solution and updates to the code, please refer to
+the [SectionCutGeo GitHub repository](https://github.com/jeremytammik/SectionCutGeo).
+
+
 ####<a name="6"></a> Sample Model and Results
 
 Sample model 3D view:
