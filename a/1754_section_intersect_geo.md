@@ -11,7 +11,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Retrieving section view intersection cut geometry in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/sectioncutgeo
 
 I played around creating a new SectionCutGeo add-in to retrieve the geometry resulting from cutting a family instance in a section view.
 This was prompted the Revit API discussion forum thread on getting intersection lines from cut in section view
@@ -24,6 +24,20 @@ This was prompted the Revit API discussion forum thread on getting intersection 
 
 linkedin:
 
+Retrieving section view intersection cut geometry in the #RevitAPI 
+
+http://bit.ly/sectioncutgeo
+
+I played around creating a new SectionCutGeo add-in to retrieve the geometry resulting from cutting a family instance in a section view.
+
+This was prompted the Revit API discussion forum thread on getting intersection lines from cut in section view:
+
+- Intersection of section and family instance task
+- Solution options, geometry elements and view settings
+- Retrieving curves in the cut plane
+- Helper methods and external command mainline
+- Sample model and results
+- Caveat...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -438,7 +452,7 @@ Model lines representing the cut geometry of walls, door and window isolated in 
 Listing the number of processed elements, geometry objects and curves actually lying in the cut plane for this sample:
 
 <pre>
-  Object analysed:
+  Objects analysed:
       3 Element
       2 FamilyInstance
       7 GeometryElement
