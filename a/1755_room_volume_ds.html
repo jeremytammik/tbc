@@ -468,7 +468,7 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-get-the-value-
 <p>How can I convert the API GUID value, "3bf616f9-6b98-4a21-80ff-da1120c8f6d6", into the UI value, "Use Definition on Type"?</p>
 <p><strong>Answer:</strong> The loss method can be programmed, so the GUID you see might be something like the add-in identifier, c.f. this discussion on
 the <a href="https://thebuildingcoder.typepad.com/blog/2017/12/pipe-fitting-k-factor-archilab-and-installer.html">pipe fitting K factor</a>.</p>
-<p>**Response: Problem solved. This problem is solved in 2 cases:</p>
+<p><strong>Response:</strong> Problem solved. This problem is solved in 2 cases:</p>
 <ol>
 <li>For Pipe fittings, when Loss Method is "Use definition on Type":
 In this case, the <code>parameter.AsString()</code> value equals the GUID stored in Autodesk.Revit.DB.MEPCalculatationServerInfo.PipeUseDefinitionOnTypeGUID.

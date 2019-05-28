@@ -538,7 +538,7 @@ How can I convert the API GUID value, "3bf616f9-6b98-4a21-80ff-da1120c8f6d6", in
 **Answer:** The loss method can be programmed, so the GUID you see might be something like the add-in identifier, c.f. this discussion on
 the [pipe fitting K factor](https://thebuildingcoder.typepad.com/blog/2017/12/pipe-fitting-k-factor-archilab-and-installer.html).
 
-**Response: Problem solved. This problem is solved in 2 cases:
+**Response:** Problem solved. This problem is solved in 2 cases:
 
 1. For Pipe fittings, when Loss Method is "Use definition on Type":
 In this case, the `parameter.AsString()` value equals the GUID stored in Autodesk.Revit.DB.MEPCalculatationServerInfo.PipeUseDefinitionOnTypeGUID.
