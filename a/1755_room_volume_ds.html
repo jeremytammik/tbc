@@ -73,13 +73,19 @@ Yesterday, I implemented a new add-in, RoomVolumeDirectShape, that creates Direc
 </ul>
 <h4><a name="2"></a> Request to Display Room Volumes in Forge SVF File</h4>
 <p>The <a href="https://github.com/jeremytammik/RoomVolumeDirectShape">RoomVolumeDirectShape add-in</a> was
-inspired by a request 
-from Mustapha Bismi of <a href="https://www.vinci-facilities.com">Vinci Facilities</a>
-for <em>Génération des volumes Revit</em>:</p>
-<p>Aujourd’hui, notre workflow consiste à prendre la géométrie des pièces Revit, générer des fichiers SAT, puis recréer des volumes Revit à partir de cette géométrie.</p>
-<p>Dans le cadre d’une automatisation, c’est pas terrible terrible.</p>
+inspired by the following request:</p>
+<!--
+from Mustapha Bismi of [Vinci Facilities](https://www.vinci-facilities.com)
+for *Génération des volumes Revit*:
+
+Aujourd’hui, notre workflow consiste à prendre la géométrie des pièces Revit, générer des fichiers SAT, puis recréer des volumes Revit à partir de cette géométrie.
+
+Dans le cadre d’une automatisation, c’est pas terrible terrible.
+-->
+
 <p>The context: We are building digital twins out of BIM data. To do so, we use Revit, Dynamo, and Forge.</p>
-<p>You can check out what we are doing with that on our <a href="https://www.twinops.com">twinops website</a>.</p>
+<!-- You can check out what we are doing with that on our [twinops website](https://www.twinops.com). -->
+
 <p>The issue: We rely on the rooms in Revit to perform a bunch of tasks (reassign equipment localization, rebuild a navigation tree, and so on).</p>
 <p>Unfortunately, these rooms are not displayed in the Revit 3D view.</p>
 <p>Therefore, they are nowhere to be found in the Forge SVF file.</p>
@@ -96,7 +102,7 @@ for <em>Génération des volumes Revit</em>:</p>
 <p>The ideal way forward is exactly what you describe: A native C# Revit API that find the rooms, creates a direct shape volume for them, and copy their properties to that.</p>
 <p>No intermediate formats, no UI, just straight automation work.</p>
 <h4><a name="3"></a> RoomVolumeDirectShape Functionality</h4>
-<p>Fulfilling Mustapha's request, I implemented a
+<p>Fulfilling this request, I implemented a
 new <a href="https://github.com/jeremytammik/RoomVolumeDirectShape">RoomVolumeDirectShape add-in</a> that
 performs the following simple steps:</p>
 <ul>

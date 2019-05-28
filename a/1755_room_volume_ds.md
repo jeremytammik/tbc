@@ -77,17 +77,20 @@ I'll also mention some challenges encountered en route, some free add-ins shared
 ####<a name="2"></a> Request to Display Room Volumes in Forge SVF File
 
 The [RoomVolumeDirectShape add-in](https://github.com/jeremytammik/RoomVolumeDirectShape) was
-inspired by a request 
+inspired by the following request:
+
+<!--
 from Mustapha Bismi of [Vinci Facilities](https://www.vinci-facilities.com)
 for *Génération des volumes Revit*:
 
 Aujourd’hui, notre workflow consiste à prendre la géométrie des pièces Revit, générer des fichiers SAT, puis recréer des volumes Revit à partir de cette géométrie.
 
 Dans le cadre d’une automatisation, c’est pas terrible terrible.
+-->
 
 The context: We are building digital twins out of BIM data. To do so, we use Revit, Dynamo, and Forge.
 
-You can check out what we are doing with that on our [twinops website](https://www.twinops.com).
+<!-- You can check out what we are doing with that on our [twinops website](https://www.twinops.com). -->
 
 The issue: We rely on the rooms in Revit to perform a bunch of tasks (reassign equipment localization, rebuild a navigation tree, and so on).
 
@@ -115,7 +118,7 @@ No intermediate formats, no UI, just straight automation work.
 
 ####<a name="3"></a> RoomVolumeDirectShape Functionality
 
-Fulfilling Mustapha's request, I implemented a
+Fulfilling this request, I implemented a
 new [RoomVolumeDirectShape add-in](https://github.com/jeremytammik/RoomVolumeDirectShape) that
 performs the following simple steps:
 
