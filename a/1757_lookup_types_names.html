@@ -5,6 +5,12 @@
 </head></p>
 <!---
 
+- design.automation-nodejs-sketchIt
+  https://github.com/Autodesk-Forge/design.automation-nodejs-sketchIt
+  SketchIt is web application that creates walls and floors in a SVG Canvas to later create & visualize the result RVT file.
+  [demo](https://sketchitapp.herokuapp.com)
+  /a/src/web/forge/da4r/design.automation-nodejs-sketchIt/README.md
+
 twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
@@ -21,8 +27,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>RevitLookup Display Family Types and Parameter Definition Names</h3>
-<h4><a name="2"></a></h4>
+<h3>Lookup Family Types and Parameter Definition Names</h3>
+<p>Today, we present yet another RevitLookup enhancement, a note on an undocumented built-in paramter change and a neat Forge Design Autoation for Revit sample app:</p>
+<ul>
+<li><a href="#2">RevitLookup family types and parameter definition names</a></li>
+<li><a href="#3">Bitmap aspect ratio built-in parameter renamed</a></li>
+<li><a href="#4">DA4R SketchIt demo generates walls</a></li>
+</ul>
+<h4><a name="2"></a> RevitLookup Family Types and Parameter Definition Names</h4>
 <p>Alexander <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478">@aignatovich</a> <a href="https://github.com/CADBIMDeveloper">@CADBIMDeveloper</a> Ignatovich, aka Александр Игнатович,
 submitted yet another useful <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a> enhancement
 in <a href="https://github.com/jeremytammik/RevitLookup/pull/53">pull request #53 &ndash; available values for parameters (<code>ParameterType.FamilyType</code>) and <code>FamilyParameter</code> titles</a>.</p>
@@ -50,12 +62,35 @@ The elements are either of class <code>ElementType</code> or <code>NestedFamilyT
 <p>Yet again many thanks to Alexander for his numerous invaluable contributions!</p>
 <p>This enhancement is captured
 in <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2020.0.0.2">RevitLookup release 2020.0.0.2</a>.</p>
-<pre class="code">
-</pre>
-
-<p>I added this sample code
-to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
-in <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2020.0.146.0">release 2020.0.146.0</a></p>
-<h4><a name="3"></a></h4>
-<pre class="prettyprint">
-</pre>
+<h4><a name="3"></a> Bitmap Aspect Ratio Built-in Parameter Renamed</h4>
+<p>Rudolf <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1103138">@Revitalizer</a> Honke
+and I completed a quick 20-km hilly run together yesterday.</p>
+<p>This morning he pointed out an irritating change between the Revit 2019 and Revit 2020 APIs, an undocumented modification of the name of a built-in parameters defining the locked aspect ratio of a bitmap image, or <em>Seitenverhältnis sperren von eingefügten Rasterbildern</em> in German:</p>
+<ul>
+<li>Revit 2019: <code>BuiltInParameter.RASTER_MAINTAIN_ASPECT_RATIO</code> = -1007752</li>
+<li>Revit 2020: <code>BuiltInParameter.RASTER_LOCK_PROPORTIONS</code> = -1007752</li>
+</ul>
+<p>Useful to know, just in case you happen to run into this yourself.</p>
+<h4><a name="4"></a> DA4R SketchIt Demo Generates Walls</h4>
+<p>I just noticed a neat
+<a href="https://forge.autodesk.com">Forge</a>
+<a href="https://forge.autodesk.com/en/docs/design-automation/v3/developers_guide/overview">Design Automation for Revit</a>
+or <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55">DA4R</a> sample
+application created by my colleague
+Jaime <a href="https://twitter.com/AfroJme">@afrojme</a> Rosales,
+<a href="http://forge.autodesk.com">Forge Partner Development</a>:</p>
+<p><a href="https://github.com/Autodesk-Forge/design.automation-nodejs-sketchIt">SketchIt</a> is
+a web application that enables the user to skatch out walls and floors in a SVG Canvas to later create and visualise them in an automatically generated RVT BIM model:</p>
+<p><center>
+<img src="img/jr_da4r_sketchit_demo.gif" alt="SketchIt demo" width="600">
+</center></p>
+<p>You can try it out live yourself in the <a href="https://sketchitapp.herokuapp.com">demo web page</a>.</p>
+<p>This is a <a href="https://nodejs.org">node.js</a> app demonstrating an end to end use case for external developers using Design Automation for Revit.
+In addition to using Design Automation for Revit REST APIs, this app also leverages other Autodesk Forge services like Data Management API (OSS), the Viewer API and Model Derivative services.</p>
+<p>The sketcher is built using Redux with React and makes extensive use of Flux architecture.</p>
+<p>Main Parts</p>
+<ul>
+<li>Create a Revit Plugin to be used within AppBundle of Design Automation for Revit.</li>
+<li>Create your App, upload the AppBundle, define your Activity and test the workitem.</li>
+<li>Create the Web App to call the workitem.</li>
+</ul>
