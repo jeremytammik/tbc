@@ -14,7 +14,9 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+SketchIt generates walls and BIM from node.js SVG canvas, RevitLookup family types and parameter definition names in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/lookup_types_names
+
+@afrojme shares a neat Forge Design Automation for Revit sample app enabling you to sketch walls on a canvas and generate a live Revit BIM RVT from that -- https://thebuildingcoder.typepad.com/blog/2019/06/lookup-family-types-and-parameter-definition-names.html#4
 
 Today, we present yet another RevitLookup enhancement, a note on an undocumented built-in parameter change and a neat Forge Design Automation for Revit sample app
 &ndash; RevitLookup family types and parameter definition names
@@ -23,6 +25,17 @@ Today, we present yet another RevitLookup enhancement, a note on an undocumented
 
 linkedin:
 
+SketchIt generates walls and BIM from node.js SVG canvas, RevitLookup family types and parameter definition names in the #RevitAPI
+
+http://bit.ly/lookup_types_names
+
+Today, we present yet another RevitLookup enhancement, a note on an undocumented built-in parameter change and a neat Forge Design Automation for Revit sample app:
+
+- RevitLookup family types and parameter definition names
+- Bitmap aspect ratio built-in parameter renamed
+- DA4R SketchIt demo generates walls
+
+@afrojme shares a neat Forge Design Automation for Revit sample app enabling you to sketch walls on a canvas and generate a live Revit BIM RVT from that...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
