@@ -1,0 +1,134 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- Map Forge Viewer Camera back to Revit
+  https://forge.autodesk.com/blog/map-forge-viewer-camera-back-revit
+  by Eason Kang
+  converting camera state of the Viewer back to the Revit via Revit API
+
+- project plasma
+A discussion by AEC Magazine -- https://aecmag.com -- of the past, present, potential future of Revit and the long-term Autodesk vision for BIM:
+
+What comes after Revit? Autodesk aims to reinvent collaborative BIM -- https://aecmag.com/technology-mainmenu-35/1821-beyond-revit-autodesk-seeks-to-reinvent-collaborative-bim
+
+In 2016, Autodesk announced Project Quantum, described as a platform technology for “evolving the way BIM works, in the era of the cloud, by providing a common data environment”. The project then went dark but now it’s back and called Project Plasma
+
+Awe inspiring
+Data Contracts and Escrow
+Quality issues
+Asynchronous vs Synchronous
+Speeding up Revit?
+Revit development
+Replacing Revit
+Typical customers
+Timeframe
+Conclusion
+
+The 'awe inspiring' section is based on an interview with chief software architect Jim Awe.
+
+Data contracts also mention blockchain and other, more lightweight, legally secure and binding technologies.
+
+...
+
+
+A discussion by [AEC Magazine](https://aecmag.com) of the past, present, potential future of Revit and the long-term Autodesk vision for BIM
+[What comes after Revit? Autodesk aims to reinvent collaborative BIM](https://aecmag.com/technology-mainmenu-35/1821-beyond-revit-autodesk-seeks-to-reinvent-collaborative-bim)
+In 2016, Autodesk announced Project Quantum, described as a platform technology for “evolving the way BIM works, in the era of the cloud, by providing a common data environment”. The project then went dark but now it’s back and called Project Plasma
+- Awe inspiring
+- Data Contracts and Escrow
+- Quality issues
+- Asynchronous vs Synchronous
+- Speeding up Revit?
+- Revit development
+- Replacing Revit
+- Typical customers
+- Timeframe
+- Conclusion
+The 'awe inspiring' section is based on an interview with chief software architect Jim Awe.
+Data contracts also mention blockchain and other, more lightweight, legally secure and binding technologies.
+Interestingly, AEC Magazine surmises that 'reading between the lines, Revit’s demise is a long way off, if ever'.
+
+- mikako's da4r overview:
+  [DA for Revit – Learning Materials](https://fieldofviewblog.wordpress.com/2019/05/24/da-for-revit-learning-materials)
+  and [Where to Get Help about Forge])(https://fieldofviewblog.wordpress.com/2016/10/27/where-to-get-help-about-forge)
+
+- AI game strategy
+  very interesting link!
+  fascinating!
+  Read Manny's review of Game Changer: AlphaZero's Groundbreaking Chess Strategies and the Promise of AI by Matthew Sadler
+  https://www.goodreads.com/review/show/2731237101
+
+- AI Speech to gesture.  https://www.youtube.com/watch?time_continue=1&v=xzTE5sobpFY
+  Project website containing paper and 144 hour person-specific video dataset of 10 speakers : http://people.eecs.berkeley.edu/~shiry/speech2gesture/
+  [Learning Individual Styles of Conversational Gesture](https://www.youtube.com/watch?time_continue=1&amp=&v=xzTE5sobpFY)
+
+
+twitter:
+
+ in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+
+&ndash;
+...
+
+linkedin:
+
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+-->
+
+<h3>Revit Camera Settings, Project Plasma, DA4R and AI</h3>
+<h4><a name="2"></a> Map Forge Viewer Camera back to Revit</h4>
+<p>https://forge.autodesk.com/blog/map-forge-viewer-camera-back-revit
+  by Eason Kang
+  converting camera state of the Viewer back to the Revit via Revit API</p>
+<h4><a name="3"></a> Project Plasma</h4>
+<p>I read an interesting discussion by <a href="https://aecmag.com">AEC Magazine</a> of the past, present, potential future of Revit and the long-term Autodesk vision for BIM:
+<a href="https://aecmag.com/technology-mainmenu-35/1821-beyond-revit-autodesk-seeks-to-reinvent-collaborative-bim">What comes after Revit? Autodesk aims to reinvent collaborative BIM</a>.</p>
+<p>In 2016, Autodesk announced Project Quantum, described as a platform technology for “evolving the way BIM works, in the era of the cloud, by providing a common data environment”.</p>
+<p>The project then went dark but now it’s back and called Project Plasma:</p>
+<ul>
+<li>Awe inspiring</li>
+<li>Data Contracts and Escrow</li>
+<li>Quality issues</li>
+<li>Asynchronous vs Synchronous</li>
+<li>Speeding up Revit?</li>
+<li>Revit development</li>
+<li>Replacing Revit</li>
+<li>Typical customers</li>
+<li>Timeframe</li>
+<li>Conclusion</li>
+</ul>
+<p>The 'awe inspiring' section is based on an interview with chief software architect Jim Awe.</p>
+<p>Data contracts also mention blockchain and other, more lightweight, legally secure and binding technologies.</p>
+<p>Interestingly, AEC Magazine surmises that 'reading between the lines, Revit’s demise is a long way off, if ever'.</p>
+<h4><a name="4"></a> mikako's da4r overview</h4>
+<p>I have been rather silent lately on the topic
+of <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55">DA4R, Design Automation for Revit</a>,
+mainly due to the fact that my more Forge-focussed colleagues are dealing with that more than I am.</p>
+<p>Mikako harada now also published her own overview
+of <a href="https://fieldofviewblog.wordpress.com/2019/05/24/da-for-revit-learning-materials">DA for Revit &ndash; Learning Materials</a>
+and <a href="https://fieldofviewblog.wordpress.com/2016/10/27/where-to-get-help-about-forge">Where to Get Help about Forge</a> that
+you might want to check out.</p>
+<h4><a name="4"></a> AI is Affecting Chess Game Strategy</h4>
+<p>very interesting link!
+  fascinating!
+  Read Manny's review of Game Changer: AlphaZero's Groundbreaking Chess Strategies and the Promise of AI by Matthew Sadler
+  https://www.goodreads.com/review/show/2731237101</p>
+<h4><a name="4"></a> AI can Convert Speech to Gesture</h4>
+<p>https://www.youtube.com/watch?time_continue=1&amp;v=xzTE5sobpFY
+  Project website containing paper and 144 hour person-specific video dataset of 10 speakers : http://people.eecs.berkeley.edu/~shiry/speech2gesture/
+  <a href="https://www.youtube.com/watch?time_continue=1&amp;amp=&amp;v=xzTE5sobpFY">Learning Individual Styles of Conversational Gesture</a></p>
+<p><strong>Answer:</strong></p>
+<p><strong>Response:</strong>*</p>
+<p><center>
+<img src="img/.png" alt="" width="100">
+</center></p>
+<h4><a name="3"></a></h4>
+<h4><a name="4"></a></h4>
