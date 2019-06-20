@@ -67,7 +67,6 @@ Interestingly, AEC Magazine surmises that 'reading between the lines, Revit’s 
   Project website containing paper and 144 hour person-specific video dataset of 10 speakers : http://people.eecs.berkeley.edu/~shiry/speech2gesture/
   [Learning Individual Styles of Conversational Gesture](https://www.youtube.com/watch?time_continue=1&amp=&v=xzTE5sobpFY)
 
-
 twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
@@ -90,9 +89,83 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> Map Forge Viewer Camera back to Revit
 
-  https://forge.autodesk.com/blog/map-forge-viewer-camera-back-revit
-  by Eason Kang
-  converting camera state of the Viewer back to the Revit via Revit API
+My colleague Eason Kang invested some research
+in [converting the camera state of the Forge Viewer back to the Revit model via Revit API](https://forge.autodesk.com/blog/map-forge-viewer-camera-back-revit).
+
+<center>
+<img src="img/camera_mapping.jpg" alt="Camera mapping" width="728">
+</center>
+
+Here is the main gist of his solution:
+
+<pre class="code">
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;Create&nbsp;perspective&nbsp;view&nbsp;with&nbsp;camera&nbsp;settings&nbsp;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;matching&nbsp;the&nbsp;Forge&nbsp;Viewer.</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:blue;">void</span>&nbsp;CreatePerspectiveViewMatchingCameera(
+&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;trans&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;trans.Start(&nbsp;<span style="color:#a31515;">&quot;Map&nbsp;Forge&nbsp;Viewer&nbsp;Camera&quot;</span>&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ViewFamilyType</span>&nbsp;typ
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">ViewFamilyType</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">ViewFamilyType</span>&gt;()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.First&lt;<span style="color:#2b91af;">ViewFamilyType</span>&gt;(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x&nbsp;=&gt;&nbsp;x.ViewFamily.Equals(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ViewFamily</span>.ThreeDimensional&nbsp;)&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Create&nbsp;a&nbsp;new&nbsp;perspective&nbsp;3D&nbsp;view</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">View3D</span>&nbsp;view3D&nbsp;=&nbsp;<span style="color:#2b91af;">View3D</span>.CreatePerspective(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;doc,&nbsp;typ.Id&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Random</span>&nbsp;rnd&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Random</span>();
+&nbsp;&nbsp;&nbsp;&nbsp;view3D.Name&nbsp;=&nbsp;<span style="color:blue;">string</span>.Format(&nbsp;<span style="color:#a31515;">&quot;Camera{0}&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rnd.Next()&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;By&nbsp;default,&nbsp;the&nbsp;3D&nbsp;view&nbsp;uses&nbsp;a&nbsp;default&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;orientation.&nbsp;Change&nbsp;that&nbsp;by&nbsp;creating&nbsp;and&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;setting&nbsp;up&nbsp;a&nbsp;suitable&nbsp;ViewOrientation3D.</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;position&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;-15.12436009332275,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-8.984616232971192,&nbsp;4.921260089050291&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;up&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;0,&nbsp;0,&nbsp;1&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;target&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;-15.02436066552734,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-8.984211875061035,&nbsp;4.921260089050291&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;sightDir&nbsp;=&nbsp;target.Subtract(&nbsp;position&nbsp;).Normalize();
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;orientation&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ViewOrientation3D</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;position,&nbsp;up,&nbsp;sightDir&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;view3D.SetOrientation(&nbsp;orientation&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Turn&nbsp;off&nbsp;the&nbsp;far&nbsp;clip&nbsp;plane,&nbsp;etc.</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;view3D.LookupParameter(&nbsp;<span style="color:#a31515;">&quot;Far&nbsp;Clip&nbsp;Active&quot;</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Set(&nbsp;0&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;view3D.LookupParameter(&nbsp;<span style="color:#a31515;">&quot;Crop&nbsp;Region&nbsp;Visible&quot;</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Set(&nbsp;1&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;view3D.LookupParameter(&nbsp;<span style="color:#a31515;">&quot;Crop&nbsp;View&quot;</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Set(&nbsp;1&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;trans.Commit();
+&nbsp;&nbsp;}
+}
+</pre>
+
+I am sure thus will prove very useful for anyone aiming to precisely adjust the camera settings in a Revit perspective view.
+
+Many thanks to Eason for his careful research and documentation!
+
 
 ####<a name="3"></a> Project Plasma
 
@@ -150,9 +223,6 @@ you might want to check out.
 
 **Response:***
 
-<center>
-<img src="img/.png" alt="" width="100">
-</center>
 
 
 
@@ -160,3 +230,36 @@ you might want to check out.
 
 
 ####<a name="4"></a>
+
+
+
+Recruiting now for:
+Director, Named Accounts AEC Sales, EMEA & ANZ
+REQ ID: 19WD33872
+
+Position Overview
+The Director of Named Accounts AEC Sales, EMEA & ANZ leads a sales organization responsible for selling our portfolio of products across Autodesk Named Accounts customers in the EMEA & ANZ region. Success in this role is measured in terms of ACV growth, providing direction on account strategy, effective sales management, and execution to drive business results and meet/exceed financial and business objectives. The incumbent possesses strong sales management skills, international sales experience, and business acumen skills necessary for driving an overall AEC sales strategy in conjunction with Business Strategy & Marketing (BSM) and Product Development (PDG) groups.
+
+Key Responsibilities
+Lead a Sales organization of approximately 35+ employees with ACV (annual contract value) responsibility of approximately $175M+
+Collaborates with Technical Solutions Executives (TSE) and Customer Success Managers (CSM) to implement strategies to improve adoption, expansion and ACV growth
+Accelerate the growth of ACV and market share capture for the AEC industry
+Collaboratively influence the global strategy on product direction and go-to-market in close cooperation with the Business Strategy Marketing Group and the Product Development Groups
+Drive customer satisfaction and adoption of Autodesk technology in the AEC accounts
+Ensure and drive high employee engagement and build a global talent pool for sales and other groups within Autodesk, while ensuring diversity and inclusion
+Hire, lead, coach, develop and mentor sales talent
+Manage and improve sales processes by optimizing the use of Salesforce.com and other tools to provide accurate and timely weekly, monthly, quarterly and annual forecasts
+Optimize the size, structure and division of labour within the AEC Sales organization
+
+Requirements
+Solid sales and/or business development experience with a demonstrable track record of achieving or exceeding sales goals. Deep sales management experience
+Demonstrated success in working with Marketing, Product, BSM and other key internal stakeholders to achieve sales goals
+Superior communication and interpersonal skills; the ability to build relationships at multiple levels and to work cross-organizationally towards solutions
+Strong influencing skills and ability to deliver results in a global and matrixed organization
+Demonstrated ability to grasp the technical aspects of the business (i.e. fully understanding the products and services in order to achieve and maximize sales results
+Proven team leadership skills, managing large teams through a management layer with abilities including a creative and proactive approach to conflict resolution and problem solving, mentoring, coaching, recognition and performance management
+Able to adapt and evolve with changing priorities and business initiatives
+A highly motivated, results-oriented, self-starter with strong analytical skills
+Bachelor's Degree or equivalent experience
+Travel
+Position will require significant travel of more than 50% of the time
