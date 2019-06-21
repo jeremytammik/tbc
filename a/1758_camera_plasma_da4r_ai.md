@@ -114,7 +114,7 @@ in [converting the camera state of the Forge Viewer back to the Revit model via 
 <img src="img/camera_mapping.jpg" alt="Camera mapping" width="728">
 </center>
 
-Here is the main gist of his solution:
+Here is the main gist of the Revit part of his solution:
 
 <pre class="code">
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
