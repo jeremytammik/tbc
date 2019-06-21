@@ -71,8 +71,14 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash;
-...
+Here are this week's interesting items I want to share with you
+&ndash; Map Forge Viewer camera settings back to Revit
+&ndash; Project Quantum becomes Plasma
+&ndash; Mikako's DA4R overview
+&ndash; AI is affecting human game strategies
+&ndash; AI can convert speech to gesture
+&ndash; Barcelona Forge accelerator
+&ndash; Open positions at Autodesk...
 
 linkedin:
 
@@ -85,9 +91,21 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Revit Camera Settings, Project Plasma, DA4R and AI
 
+Once again, I have been spending way too much time answering questions in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
+much too little time writing for The Building Coder.
 
+So, before the end of this week, here are some interesting items I want to share with you:
 
-####<a name="2"></a> Map Forge Viewer Camera back to Revit
+- [Map Forge Viewer camera settings back to Revit](#2)
+- [Project Quantum becomes Plasma](#3)
+- [Mikako's DA4R overview](#4)
+- [AI is affecting human game strategies](#5)
+- [AI can convert speech to gesture](#6)
+- [Barcelona Forge accelerator](#7)
+- [Open positions at Autodesk](#8)
+
+####<a name="2"></a> Map Forge Viewer Camera Settings back to Revit
 
 My colleague Eason Kang invested some research
 in [converting the camera state of the Forge Viewer back to the Revit model via Revit API](https://forge.autodesk.com/blog/map-forge-viewer-camera-back-revit).
@@ -103,7 +121,7 @@ Here is the main gist of his solution:
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;Create&nbsp;perspective&nbsp;view&nbsp;with&nbsp;camera&nbsp;settings&nbsp;</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;matching&nbsp;the&nbsp;Forge&nbsp;Viewer.</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
-<span style="color:blue;">void</span>&nbsp;CreatePerspectiveViewMatchingCameera(
+<span style="color:blue;">void</span>&nbsp;CreatePerspectiveViewMatchingCamera(
 &nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)
 {
 &nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;trans&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)
@@ -162,15 +180,21 @@ Here is the main gist of his solution:
 }
 </pre>
 
-I am sure thus will prove very useful for anyone aiming to precisely adjust the camera settings in a Revit perspective view.
+I am sure this will prove very useful for anyone aiming to precisely adjust the camera settings in a Revit perspective view.
 
 Many thanks to Eason for his careful research and documentation!
 
+I added this
+to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
+in the new method [CreatePerspectiveViewMatchingCamera](https://github.com/jeremytammik/the_building_coder_samples/commit/e332d672ccf4232aee7371a29a08a494dbbf248a).
 
-####<a name="3"></a> Project Plasma
+
+####<a name="3"></a> Project Quantum Becomes Plasma
 
 I read an interesting discussion by [AEC Magazine](https://aecmag.com) of the past, present, potential future of Revit and the long-term Autodesk vision for BIM:
 [What comes after Revit? Autodesk aims to reinvent collaborative BIM](https://aecmag.com/technology-mainmenu-35/1821-beyond-revit-autodesk-seeks-to-reinvent-collaborative-bim).
+
+Here is a quick overview and executive summary of the contents:
 
 In 2016, Autodesk announced Project Quantum, described as a platform technology for “evolving the way BIM works, in the era of the cloud, by providing a common data environment”.
 
@@ -193,73 +217,64 @@ Data contracts also mention blockchain and other, more lightweight, legally secu
 
 Interestingly, AEC Magazine surmises that 'reading between the lines, Revit’s demise is a long way off, if ever'.
 
-####<a name="4"></a> mikako's da4r overview
+I found it a very interesting read.
+
+
+####<a name="4"></a> Mikako's DA4R Overview
 
 I have been rather silent lately on the topic
-of [DA4R, Design Automation for Revit](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55),
-mainly due to the fact that my more Forge-focussed colleagues are dealing with that more than I am.
+of [DA4R, Forge Design Automation for Revit](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55),
+mainly due to the fact that my Forge-focussed colleagues are dealing with that more than I am, focussing on the Revit instead.
 
-Mikako harada now also published her own overview
-of [DA for Revit &ndash; Learning Materials](https://fieldofviewblog.wordpress.com/2019/05/24/da-for-revit-learning-materials)
-and [Where to Get Help about Forge](https://fieldofviewblog.wordpress.com/2016/10/27/where-to-get-help-about-forge) that
+Mikako Harada now published her own overview
+of [DA for Revit learning materials](https://fieldofviewblog.wordpress.com/2019/05/24/da-for-revit-learning-materials)
+and [where to get help about Forge](https://fieldofviewblog.wordpress.com/2016/10/27/where-to-get-help-about-forge) that
 you might want to check out.
 
-####<a name="4"></a> AI is Affecting Chess Game Strategy
 
-  very interesting link!
-  fascinating!
-  Read Manny's review of Game Changer: AlphaZero's Groundbreaking Chess Strategies and the Promise of AI by Matthew Sadler
-  https://www.goodreads.com/review/show/2731237101
+####<a name="5"></a> AI is Affecting Human Game Strategies
 
-####<a name="4"></a> AI can Convert Speech to Gesture
+I enjoyed following the development
+of [AlphaGo](http://thebuildingcoder.typepad.com/blog/2017/10/au-recording-books-education-and-units.html#6)
+and [AlphaZero](https://thebuildingcoder.typepad.com/blog/2019/03/ai-trends-and-yearly-deprecated-api-usage-cleanup.html#2) quite closely in the past.
 
-  https://www.youtube.com/watch?time_continue=1&v=xzTE5sobpFY
-  Project website containing paper and 144 hour person-specific video dataset of 10 speakers : http://people.eecs.berkeley.edu/~shiry/speech2gesture/
-  [Learning Individual Styles of Conversational Gesture](https://www.youtube.com/watch?time_continue=1&amp=&v=xzTE5sobpFY)
+My daughter Marie now pointed out an interesting book review
+on [Game Changer &ndash; AlphaZero's Groundbreaking Chess Strategies and the Promise of AI](https://www.goodreads.com/review/show/2731237101) by
+Matthew Sadler.
 
-
-
-**Answer:**
-
-**Response:***
+Next on my own reading list
+is [Ian McEwan](https://en.wikipedia.org/wiki/Ian_McEwan)'s
+[Machines like me](https://en.wikipedia.org/wiki/Machines_Like_Me_(novel)),
+partially inspired by the recent 'game changing' developments in AI.
 
 
+####<a name="6"></a> AI can Convert Speech to Gesture
+
+Continuing on the topic of AI, here is an quite fascinating two-and-a-half-minute video
+on [learning individual styles of conversational gesture](https://youtu.be/xzte5sobpfy) describing
+an AI system that generates realistic gestures and applies them to synthesise a video from a couple of photographs and an audio recording of a person speaking:
+
+<center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/xzTE5sobpFY" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
 
 
-####<a name="3"></a>
+####<a name="7"></a> Barcelona Forge Accelerator
+
+Where am I?
+
+I just arrived in Barcelona to participate in next week's [Forge accelerator](http://autodeskcloudaccelerator.com/forge-accelerator) here.
+
+Looking forward very much to meeting my colleagues again and working on some inspiring and exciting new projects!
 
 
-####<a name="4"></a>
+####<a name="8"></a> Open Positions at Autodesk
 
+Autodesk is recruiting, with many open positions.
 
+One AEC-related European one is for a [Director of Named Accounts AEC Sales &ndash; #19WD33872](https://rolp.co/ceVeg):
 
-Recruiting now for:
-Director, Named Accounts AEC Sales, EMEA & ANZ
-REQ ID: 19WD33872
+> The Director of Named Accounts AEC Sales, EMEA &amp; ANZ leads a sales organization responsible for selling our portfolio of products across Autodesk Named Accounts customers in the EMEA &amp; ANZ region. Success in this role is measured in terms of ACV growth, providing direction on account strategy, effective sales management, and execution to drive business results and meet/exceed financial and business objectives. The incumbent possesses strong sales management skills, international sales experience, and business acumen skills necessary for driving an overall AEC sales strategy in conjunction with Business Strategy &amp; Marketing (BSM) and Product Development (PDG) groups.
 
-Position Overview
-The Director of Named Accounts AEC Sales, EMEA & ANZ leads a sales organization responsible for selling our portfolio of products across Autodesk Named Accounts customers in the EMEA & ANZ region. Success in this role is measured in terms of ACV growth, providing direction on account strategy, effective sales management, and execution to drive business results and meet/exceed financial and business objectives. The incumbent possesses strong sales management skills, international sales experience, and business acumen skills necessary for driving an overall AEC sales strategy in conjunction with Business Strategy & Marketing (BSM) and Product Development (PDG) groups.
+If that is not up your alley, check out the numerous other positions at [autodesk.com/careers](https://www.autodesk.com/careers).
 
-Key Responsibilities
-Lead a Sales organization of approximately 35+ employees with ACV (annual contract value) responsibility of approximately $175M+
-Collaborates with Technical Solutions Executives (TSE) and Customer Success Managers (CSM) to implement strategies to improve adoption, expansion and ACV growth
-Accelerate the growth of ACV and market share capture for the AEC industry
-Collaboratively influence the global strategy on product direction and go-to-market in close cooperation with the Business Strategy Marketing Group and the Product Development Groups
-Drive customer satisfaction and adoption of Autodesk technology in the AEC accounts
-Ensure and drive high employee engagement and build a global talent pool for sales and other groups within Autodesk, while ensuring diversity and inclusion
-Hire, lead, coach, develop and mentor sales talent
-Manage and improve sales processes by optimizing the use of Salesforce.com and other tools to provide accurate and timely weekly, monthly, quarterly and annual forecasts
-Optimize the size, structure and division of labour within the AEC Sales organization
-
-Requirements
-Solid sales and/or business development experience with a demonstrable track record of achieving or exceeding sales goals. Deep sales management experience
-Demonstrated success in working with Marketing, Product, BSM and other key internal stakeholders to achieve sales goals
-Superior communication and interpersonal skills; the ability to build relationships at multiple levels and to work cross-organizationally towards solutions
-Strong influencing skills and ability to deliver results in a global and matrixed organization
-Demonstrated ability to grasp the technical aspects of the business (i.e. fully understanding the products and services in order to achieve and maximize sales results
-Proven team leadership skills, managing large teams through a management layer with abilities including a creative and proactive approach to conflict resolution and problem solving, mentoring, coaching, recognition and performance management
-Able to adapt and evolve with changing priorities and business initiatives
-A highly motivated, results-oriented, self-starter with strong analytical skills
-Bachelor's Degree or equivalent experience
-Travel
-Position will require significant travel of more than 50% of the time
