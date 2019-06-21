@@ -70,8 +70,14 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash;
-...
+Here are this week's interesting items I want to share with you
+&ndash; Map Forge Viewer camera settings back to Revit
+&ndash; Project Quantum becomes Plasma
+&ndash; Mikako's DA4R overview
+&ndash; AI is affecting human game strategies
+&ndash; AI can convert speech to gesture
+&ndash; Barcelona Forge accelerator
+&ndash; Open positions at Autodesk...
 
 linkedin:
 
@@ -83,7 +89,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Revit Camera Settings, Project Plasma, DA4R and AI</h3>
-<p>Once again I have been spending way too much time answering questions in
+<p>Once again, I have been spending way too much time answering questions in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> and
 much too little time writing for The Building Coder.</p>
 <p>So, before the end of this week, here are some interesting items I want to share with you:</p>
@@ -102,13 +108,13 @@ in <a href="https://forge.autodesk.com/blog/map-forge-viewer-camera-back-revit">
 <p><center>
 <img src="img/camera_mapping.jpg" alt="Camera mapping" width="728">
 </center></p>
-<p>Here is the main gist of his solution:</p>
+<p>Here is the main gist of the Revit part of his solution:</p>
 <pre class="code">
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;Create&nbsp;perspective&nbsp;view&nbsp;with&nbsp;camera&nbsp;settings&nbsp;</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;matching&nbsp;the&nbsp;Forge&nbsp;Viewer.</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
-<span style="color:blue;">void</span>&nbsp;CreatePerspectiveViewMatchingCameera(
+<span style="color:blue;">void</span>&nbsp;CreatePerspectiveViewMatchingCamera(
 &nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)
 {
 &nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;trans&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)
@@ -171,7 +177,7 @@ in <a href="https://forge.autodesk.com/blog/map-forge-viewer-camera-back-revit">
 <p>Many thanks to Eason for his careful research and documentation!</p>
 <p>I added this
 to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
-in the new method <a href="https://github.com/jeremytammik/the_building_coder_samples/commit/e332d672ccf4232aee7371a29a08a494dbbf248a">CreatePerspectiveViewMatchingCameera</a>.</p>
+in the new method <a href="https://github.com/jeremytammik/the_building_coder_samples/commit/e332d672ccf4232aee7371a29a08a494dbbf248a">CreatePerspectiveViewMatchingCamera</a>.</p>
 <h4><a name="3"></a> Project Quantum Becomes Plasma</h4>
 <p>I read an interesting discussion by <a href="https://aecmag.com">AEC Magazine</a> of the past, present, potential future of Revit and the long-term Autodesk vision for BIM:
 <a href="https://aecmag.com/technology-mainmenu-35/1821-beyond-revit-autodesk-seeks-to-reinvent-collaborative-bim">What comes after Revit? Autodesk aims to reinvent collaborative BIM</a>.</p>
