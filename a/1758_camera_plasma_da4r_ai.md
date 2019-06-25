@@ -69,7 +69,7 @@ Interestingly, AEC Magazine surmises that 'reading between the lines, Revit’s 
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Project Quantum becomes Plasma, AI, DA4R and camera settings in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/plasma_camera
 
 Here are this week's interesting items I want to share with you
 &ndash; Map Forge Viewer camera settings back to Revit
@@ -82,6 +82,19 @@ Here are this week's interesting items I want to share with you
 
 linkedin:
 
+Project Quantum becomes Plasma, AI, DA4R and camera settings in the #RevitAPI
+
+http://bit.ly/plasma_camera
+
+Here are this week's interesting items I want to share with you:
+
+- Map Forge Viewer camera settings back to Revit
+- Project Quantum becomes Plasma
+- Mikako's DA4R overview
+- AI is affecting human game strategies
+- AI can convert speech to gesture
+- Barcelona Forge accelerator
+- Open positions at Autodesk...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 

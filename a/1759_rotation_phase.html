@@ -1,0 +1,127 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- two enhancements on AddMaterials, and flat migration to Revit 2020
+  pull request #4 by @ridespirals: handle 0 or negative DashPatterns https://github.com/jeremytammik/AddMaterials/pull/4
+  suggestion by Александр Пекшев: Replace FillPattern = '{Binding CutPattern}' with FillPattern = '{Binding CutPattern, IsAsync=True}' and drawing thumbnails can get even faster
+  add_materials_segments_le_zero.png
+  add_materials_segments_le_zero_fixed.png
+
+- retrieving element rotation:
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1560327374009400
+  Shigekazu Saitou
+  Revit2018:Get rotation angle of element(15426610)
+  If you are rotating an element with the rotation tool, how do you write source code to get the rotation angle?
+  https://www.revitapidocs.com/2020/3968f4e8-759c-f975-6c1f-7de42be633ed.htm
+  RotateElement Method
+  Scott Conover  [12 minutes ago]
+  RotateElement has an angle parameter, but that angle is not necessarily stored in an element.  It depends on how the element's location is stored.   For many elements, Element.Location can be cast to LocationPoint and the rotation property read.  For Elements which inherit from Instance, they inherit a GetTransform() which can be parsed to read the rotation.  For elements that don't align with one or both of those, the rotation is more implicit with other element properties, e.g. a wall which is driven by endpoints and a curve, after rotating, is still driven by endpoints and a curve, just in different locations.
+
+- 15395147 [Changing an Element's Phase Created Parameter]
+  https://forums.autodesk.com/t5/revit-api-forum/changing-an-element-s-phase-created-parameter/m-p/8808894
+  [Setting an elements phase]
+  https://forums.autodesk.com/t5/revit-api-forum/setting-an-elements-phase/m-p/6224664
+  [Q] How can I set the Phase Created or the Phase Demolished of a element?
+  I can retrieve the Phase Created of an element with:
+  phaseCreated = element.Document.GetElement(element.CreatedPhaseId) as Phase;
+  However, I can't figure out how to change it to set the phase.
+  [A] element.get_Parameter(BuiltInParameter.PHASE_CREATED).Set(phaseCrea​ted.Id);
+  and
+  element.get_Parameter(BuiltInParameter.PHASE_DEMOLISHED).Set(phaseC​reated.Id);
+
+twitter:
+
+ in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+
+&ndash;
+...
+
+linkedin:
+
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+-->
+
+<h3>Accelerator, Dash Pattern Fix, Rotation and Phase</h3>
+<p>I am participating in the Forge Accelerator in Barcelona this week.</p>
+<p>We are hosting a large number of participants, split up into separate manufacturing and AEC related groups:</p>
+<p><center>
+<img src="img/2019-06_forge_accelerator_barcelona.jpg" alt="Forge Accelerator in Barcelona" width="500">
+</center></p>
+<p>I arrived good and early, spending the weekend visiting my sister, who moved here last summer:</p>
+<p><center>
+<img src="img/20190623_123615_jt_jeremy_barca_2_612x612.jpg" alt="Barcelona view" width="500">
+</center></p>
+<p>My brother came too, and we went climbing, right in the middle of town,
+in <a href="http://www.rockclimbing.com/routes/Europe/Spain/Catalunya/Las_Foixardas">Las Foixardas</a> in
+the <a href="https://en.wikipedia.org/wiki/Montju%C3%AFc">Parc Montju%C3%AFc</a>:</p>
+<p><center>
+<img src="img/20190622_143629_lissy_climbing_el_tunel_8429_1008x1344.jpg" alt="El tunel de las Foixardas" width="500">
+</center></p>
+<p>Let me mention some pending Revit API issues before diving into any accelerator topics:</p>
+<ul>
+<li><a href="#3">AddMaterials Enhancements</a></li>
+<li><a href="#4">Retrieving Element Rotation</a></li>
+<li><a href="#5">Changing the Phase Created Parameter</a></li>
+</ul>
+<h4><a name="3"></a> AddMaterials Enhancements</h4>
+<p>I recently made a couple of enhancements to the AddMaterials add-in that have not been mentioned here yet:</p>
+<ul>
+<li>Integrated <a href="https://github.com/jeremytammik/AddMaterials/pull/4">pull request #4 by @ridespirals to handle 0 or negative DashPatterns</a></li>
+<li>Flat migration from Revit 2016 to Revit 2020 API</li>
+<li>Acted on
+the <a href="https://thebuildingcoder.typepad.com/blog/2014/04/wpf-fill-pattern-viewer-control-benchmark.html#comment-4497075532">suggestion by Александр Пекшев</a> to
+replace <code>FillPattern</code> = <code>'{Binding CutPattern}'</code> with <code>FillPattern</code> = <code>'{Binding CutPattern, IsAsync=True}'</code> to speed up the drawing of thumbnails</li>
+</ul>
+<p>In the pull request, John <a href="https://github.com/ridespirals">@ridespirals</a> Varga points out an important hint to handle errors caused by real number imprecision in dash or hash pattern definitions:</p>
+<blockquote>
+<p>We are using similar code in a project of ours, and we ran into an issue where some fill patterns had blank preview images.
+Some of the patterns had very small negative values (such as -5.9211894646675012E-16), and DashPatterns must be greater than 0.
+Using <code>float.Epsilon</code> produces previews that actually look correct.</p>
+</blockquote>
+<p>Example preview we got by filtering out segments that were &lt;= 0 (Third Bond - Emporer Brick - partial fix):</p>
+<p><center>
+<img src="img/add_materials_segments_le_zero.png" alt="Segments almost zero" width="256">
+</center></p>
+<p>Example using the fix in this pull request, using <code>float.Epsilon</code> (Third Bond - Emporer Brick - fixed):</p>
+<p><center>
+<img src="img/add_materials_segments_le_zero_fixed.png" alt="Segments fixed using float.Epsilon" width="256">
+</center></p>
+<h4><a name="4"></a> Retrieving Element Rotation</h4>
+<p><strong>Question:</strong> How can I retrieve the rotation angle of an element that has been rotated, e.g., using the rotation tool or
+the <a href="https://www.revitapidocs.com/2020/3968f4e8-759c-f975-6c1f-7de42be633ed.htm"><code>RotateElement</code> method</a>?</p>
+<p><strong>Answer:</strong> <code>RotateElement</code> takes an angle parameter, but that angle is not necessarily stored in an element.</p>
+<p>It depends on how the element's location is stored.</p>
+<p>For many elements, <code>Element.Location</code> can be cast to a <code>LocationPoint</code>, and its <code>Rotation</code> property read.</p>
+<p>Elements that inherit from <code>Instance</code> inherit a <code>GetTransform</code> method whose result can be parsed to read the rotation.</p>
+<p>For elements that don't align with either of these options, the rotation is more implicit with other element properties.</p>
+<p>For instance, a wall that is driven by endpoints and a curve, after rotating, is still driven by endpoints and a curve, just in different locations.</p>
+<h4><a name="5"></a> Changing the Phase Created Parameter</h4>
+<p>From the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/changing-an-element-s-phase-created-parameter/m-p/8808894">changing an element's phase created parameter</a>
+and <a href="https://forums.autodesk.com/t5/revit-api-forum/setting-an-elements-phase/m-p/6224664">setting an element's phase</a>:</p>
+<p><strong>Question:</strong> How can I set the 'Phase Created' or the 'Phase Demolished' of an element?</p>
+<p>I know I can retrieve the 'Phase Created' like this:</p>
+<pre class="code">
+&nbsp;&nbsp;phaseCreated&nbsp;=&nbsp;element.Document.GetElement(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;element.CreatedPhaseId&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Phase</span>;
+</pre>
+
+<p>However, I can't figure out how to change it to set the phase.</p>
+<p><strong>Answer:</strong> You can use two built-in parameters:</p>
+<pre class="code">
+&nbsp;&nbsp;element.get_Parameter(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.PHASE_CREATED&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Set(&nbsp;phaseCrea​ted.Id&nbsp;);
+
+&nbsp;&nbsp;element.get_Parameter(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.PHASE_DEMOLISHED&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Set(&nbsp;phaseC​reated.Id&nbsp;);
+</pre>
