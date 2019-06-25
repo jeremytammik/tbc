@@ -38,8 +38,11 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash;
-...
+I am participating in the Forge Accelerator in Barcelona this week.
+Let me mention some pending Revit API issues before diving into any accelerator topics
+&ndash; AddMaterials enhancements
+&ndash; Retrieving element rotation
+&ndash; Changing the phase created parameter...
 
 linkedin:
 
@@ -76,14 +79,19 @@ the [Parc Montju%C3%AFc](https://en.wikipedia.org/wiki/Montju%C3%AFc):
 
 Let me mention some pending Revit API issues before diving into any accelerator topics:
 
-- [AddMaterials Enhancements](#3)
-- [Retrieving Element Rotation](#4)
-- [Changing the Phase Created Parameter](#5)
+- [AddMaterials enhancements](#3)
+- [Retrieving element rotation](#4)
+- [Changing the phase created parameter](#5)
 
 
 ####<a name="3"></a> AddMaterials Enhancements
 
-I recently made a couple of enhancements to the AddMaterials add-in that have not been mentioned here yet:
+The [AddMaterials add-in](https://github.com/jeremytammik/AddMaterials) originally
+just added materials to the Revit model from a list of properties defined in Excel.
+
+It has since been enhanced to also visualise them in WPF.
+
+I recently added a couple of enhancements to the it that have not been mentioned here yet:
 
 - Integrated [pull request #4 by @ridespirals to handle 0 or negative DashPatterns](https://github.com/jeremytammik/AddMaterials/pull/4)
 - Flat migration from Revit 2016 to Revit 2020 API
