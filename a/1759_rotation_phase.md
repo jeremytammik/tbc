@@ -36,7 +36,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Barcelona accelerator, AddMaterials dash pattern fix, element rotation and phase in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/barca2019
 
 I am participating in the Forge Accelerator in Barcelona this week.
 Let me mention some pending Revit API issues before diving into any accelerator topics
@@ -46,6 +46,17 @@ Let me mention some pending Revit API issues before diving into any accelerator 
 
 linkedin:
 
+Barcelona accelerator, AddMaterials dash pattern fix, element rotation and phase in the #RevitAPI
+
+http://bit.ly/barca2019
+
+I am participating in the Forge Accelerator in Barcelona this week.
+
+Let me mention some pending Revit API issues before diving into any accelerator topics:
+
+- AddMaterials enhancements
+- Retrieving element rotation
+- Changing the phase created parameter...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
