@@ -38,7 +38,7 @@ I explored three main topics here at the Forge accelerator:
 - Rebar simplification: replace rebar elements with simplified solids or model curves
 - [glTF](https://en.wikipedia.org/wiki/GlTF) export
 
-Today, I'll dive deeper into the first of these, and one or two others:
+Today, I'll dive deeper into the first:
 
 - [IFC exporter utility adds new built-in parameter](#2)
 - [Barcelona Forge accelerator](#3)
@@ -50,7 +50,7 @@ Today, I'll dive deeper into the first of these, and one or two others:
 
 ####<a name="2"></a> IFC Exporter Utility Adds New Built-In Parameter
 
-First, however, here is an interesting topic from
+Before that, however, here is an interesting topic from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160).
 
 Quite surprisingly, for me, the IFC exporter utilities enable you to add your own new IFC related built-in parameter to an element.
