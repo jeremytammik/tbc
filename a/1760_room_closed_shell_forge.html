@@ -16,8 +16,19 @@
 
 twitter:
 
-&ndash;
-...
+Generate a DirectShape to represent a room's closed shell volume for the Forge viewer in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+
+I explored three main topics here at the Forge accelerator
+&ndash; Room closed shell solid visibility in the Forge viewer
+&ndash; Rebar simplification: replace rebar elements with simplified solids or model curves
+&ndash; <code>glTF</code> export
+&ndash; Today, I'll dive deeper into the first
+&ndash; IFC exporter utility adds new built-in parameter
+&ndash; Barcelona Forge accelerator
+&ndash; Room closed shell in the Forge viewer
+&ndash; Triangulate the solid face by face
+&ndash; Triangulate entire solid
+&ndash; Tessellation accuracy control documentation error...
 
 linkedin:
 
@@ -106,7 +117,7 @@ the <a href="https://www.aecom.com">AECOM</a> BIM team in Madrid, who say:</p>
 <p><center>
 <img src="img/adam_jeremy_luis_alvaro_petr_manrique_aecom_1200x733.jpg" alt="AECOM at the Forge accelerator" width="600">
 </center></p>
-<p>Posing for us in the background, you can also admire the table-tennis skills of Forge experts Adam and Petr:</p>
+<p>Posing for us in the background, you can also admire the table-tennis skills of Forge experts Adam and Petr.</p>
 <h4><a name="4"></a> Room Closed Shell in the Forge Viewer</h4>
 <p>I recently implemented an external command
 that <a href="https://thebuildingcoder.typepad.com/blog/2019/05/generate-directshape-element-to-represent-room-volume.html">creates <code>DirectShape</code> elements to represent room volumes</a>.
@@ -132,7 +143,7 @@ the <a href="https://github.com/jeremytammik/RoomVolumeDirectShape">RoomVolumeDi
 <p>Most of my efforts are preserved in the source code, enclosed in <code>#if</code> pragmas.</p>
 <h4><a name="5"></a> Triangulate the Solid Face by Face</h4>
 <p>One reliable way to generate a valid solid to replace the flawed one produced by <code>GetClosedShell</code> is to query each face of the solid for its triangulation and use the triangular facets to define the direct shape instead, as described in the discussion
-on <a href="https://thebuildingcoder.typepad.com/blog/2015/09/directshape-from-face-and-sketch-plane-reuse.html">creating a <code>DirectShape</code> element from a face mesh</a></p>
+on <a href="https://thebuildingcoder.typepad.com/blog/2015/09/directshape-from-face-and-sketch-plane-reuse.html">creating a <code>DirectShape</code> element from a face mesh</a>.</p>
 <p>The following code achieves this:</p>
 <pre class="code">
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
@@ -204,8 +215,8 @@ on <a href="https://thebuildingcoder.typepad.com/blog/2015/09/directshape-from-f
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++nFaces;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;builder.CloseConnectedFaceSet();
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;builder.Target&nbsp;=&nbsp;<span style="color:#2b91af;">TessellatedShapeBuilderTarget</span>.AnyGeometry;&nbsp;<span style="color:green;">//&nbsp;Solid&nbsp;failed</span>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;builder.Fallback&nbsp;=&nbsp;<span style="color:#2b91af;">TessellatedShapeBuilderFallback</span>.Mesh;&nbsp;<span style="color:green;">//&nbsp;use&nbsp;Abort&nbsp;if&nbsp;target&nbsp;is&nbsp;Solid</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;builder.Target&nbsp;=&nbsp;<span style="color:#2b91af;">TessellatedShapeBuilderTarget</span>.AnyGeometry;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;builder.Fallback&nbsp;=&nbsp;<span style="color:#2b91af;">TessellatedShapeBuilderFallback</span>.Mesh;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;builder.Build();
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;result&nbsp;=&nbsp;builder.GetBuildResult();
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
@@ -217,7 +228,7 @@ on <a href="https://thebuildingcoder.typepad.com/blog/2015/09/directshape-from-f
 
 <p>Unfortunately, all the triangle edges remain visible in the Revit model, even interior edges lying inside a planar face:</p>
 <p><center>
-<img src="img/room_closed_shell_rvt.png" alt="Direct shape defined using triangles" width="10">
+<img src="img/room_closed_shell_triangulated.png" alt="Direct shape defined using triangles" width="318">
 </center></p>
 <h4><a name="6"></a> Triangulate Entire Solid</h4>
 <p>One serious problem may arise triangulating each face separately as shown above:</p>
@@ -376,8 +387,8 @@ on <a href="https://thebuildingcoder.typepad.com/blog/2015/09/directshape-from-f
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;builder.CloseConnectedFaceSet();
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;builder.Target&nbsp;=&nbsp;<span style="color:#2b91af;">TessellatedShapeBuilderTarget</span>.AnyGeometry;&nbsp;<span style="color:green;">//&nbsp;Solid&nbsp;failed</span>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;builder.Fallback&nbsp;=&nbsp;<span style="color:#2b91af;">TessellatedShapeBuilderFallback</span>.Mesh;&nbsp;<span style="color:green;">//&nbsp;use&nbsp;Abort&nbsp;if&nbsp;target&nbsp;is&nbsp;Solid</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;builder.Target&nbsp;=&nbsp;<span style="color:#2b91af;">TessellatedShapeBuilderTarget</span>.AnyGeometry;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;builder.Fallback&nbsp;=&nbsp;<span style="color:#2b91af;">TessellatedShapeBuilderFallback</span>.Mesh;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;builder.Build();
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;result&nbsp;=&nbsp;builder.GetBuildResult();
 
