@@ -33,6 +33,25 @@ I explored three main topics here at the Forge accelerator
 
 linkedin:
 
+Generate a DirectShape to represent a room's closed shell volume for the Forge viewer in the #RevitAPI
+
+http://bit.ly/forgeroomvolume
+
+I explored three main topics here at the Forge accelerator:
+
+- Room closed shell solid visibility in the Forge viewer
+- Rebar simplification: replace rebar elements with simplified solids or model curves
+- glTF export
+
+Today, I'll dive deeper into the first:
+
+- IFC exporter utility adds new built-in parameter
+- Barcelona Forge accelerator
+- Room closed shell in the Forge viewer
+- Triangulate the solid face by face
+- Triangulate entire solid
+- Tessellation accuracy control documentation error...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
