@@ -10,8 +10,12 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash;
-...
+I travelled home from the Barcelona Forge accelerator and continued working on
+the room volume exporter. I now implemented support
+for glTF, the GL Transmission Format.
+A few more little items to wrap up the Barcelona topic
+&ndash; Kean Walmsley's report on this year's Forge Accelerator in Barcelona
+&ndash; My two favourite restaurants in Poblenou...
 
 linkedin:
 
