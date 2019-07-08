@@ -23,8 +23,12 @@ twitter:
 
  Forge in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/roomvolumegltf
 
-&ndash;
-...
+A recent internal discussion clarifies Revit element identification in Forge, Navisworks and IFC, some new thoughts on consciousness versus AI, and a couple of topics of personal interest
+&ndash; Two Nice summer mountain hikes
+&ndash; Revit element ids in Forge via Navisworks and IFC
+&ndash; Some aspects of consciousness may be beyond reach of ai
+&ndash; Trees might help against global warming
+&ndash; Holidays ahead...
 
 linkedin:
 
@@ -38,19 +42,19 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 A recent internal discussion clarifies Revit element identification in Forge, Navisworks and IFC, some new thoughts on consciousness versus AI, and a couple of topics of personal interest:
 
-- [Two Nice Summer Mountain Hikes](#2)
+- [Two nice summer mountain hikes](#2)
 - [Revit element ids in Forge via Navisworks and IFC](#3)
-- [Some Aspects of Consciousness May be Beyond Reach of AI](#4)
-- [Trees Might Help Against Global Warming](#5)
-- [Holidays Ahead](#6)
+- [Some aspects of consciousness may be beyond reach of AI](#4)
+- [Trees might help against global warming](#5)
+- [Holidays ahead](#6)
 
 ####<a name="2"></a> Two Nice Summer Mountain Hikes
 
 I spent the last two weekends in the mountains north and south of the Gotthard pass.
 
-First, I crossed the ridges between Grossgand, Ruchälplistock and Jakobiger with my friend Nik, and we spent the night in a pleasant, warm, windless bivouac on the latter at 2505 metres before descending for coffee in the Leutschachhütte next morning ([](photo album)).
+First, I crossed the ridges between Grossgand, Ruchälplistock and Jakobiger with my friend Nik, and we spent the night in a pleasant, warm, windless bivouac on the latter at 2505 metres before descending for coffee in the Leutschachhütte next morning ([https://flic.kr/s/aHsmEUnYFd](photo album)).
 
-Last weekend, I hiked with Moni from Mergugno over Brissago up to the Rifugio al Legn overlooking the Lago Maggiore.
+The weekend after, I hiked with Moni from Mergugno over Brissago up to the Rifugio al Legn overlooking the Lago Maggiore.
 I continued alone from there up to Fumadiga and through the upper part of Bocchetta di Valle to Monte Limidario, aka Gridone.
 
 <center>
@@ -58,9 +62,10 @@ I continued alone from there up to Fumadiga and through the upper part of Bocche
 </center>
 
 
-####<a name="3"></a> Revit element ids in Forge via Navisworks and IFC
+####<a name="3"></a> Revit Element Ids in Forge via Navisworks and IFC
 
-This question prompted me to create a new topic group on element identification using `ElementId` and `UniqueId` RVT, IFC, NW and Forge:
+This question prompted me to create a new topic group
+on [element identification using `ElementId` and `UniqueId` RVT, IFC, NW and Forge](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.56):
 
 **Question:** I created a Navisworks file from a Revit file and submitted it to Forge.
 The returning translated JSON looks like this:
