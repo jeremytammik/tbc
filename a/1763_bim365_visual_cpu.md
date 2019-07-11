@@ -35,8 +35,8 @@ twitter:
 I am on vacation right now, enjoying splendid weather camping on the coast of the Atlantic.
 Meanwhile, here are a few items that cropped up in the past few days
 &ndash; Getting started and programming buttons with Revit API
-&ndash; Links to API to Modify Visual Appearance of Materials
-&ndash; Improving Performance by Optimising CPU Voltage...
+&ndash; Links to API to modify visual appearance of materials
+&ndash; Improving performance by optimising CPU voltage...
 
 linkedin:
 
@@ -55,8 +55,8 @@ enjoying splendid weather camping on the coast of the Atlantic.
 Meanwhile, here are a few items that cropped up in the past few days:
 
 - [Getting started and programming buttons with Revit API](#2)
-- [Links to API to Modify Visual Appearance of Materials](#3)
-- [Improving Performance by Optimising CPU Voltage](#4)
+- [Links to API to modify visual appearance of materials](#3)
+- [Improving performance by optimising CPU voltage](#4)
 
 <center>
 <img src="img/737_gentian_700x700.jpg" alt="Gentian on Jakobiger" width="175">
