@@ -21,16 +21,28 @@
 
 twitter:
 
- Forge in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/roomvolumegltf
+Element Identifiers in RVT, IFC, NW and Forge using the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/rvt_nw_ifc_forge_ids
 
 A recent internal discussion clarifies Revit element identification in Forge, Navisworks and IFC, some new thoughts on consciousness versus AI, and a couple of topics of personal interest
 &ndash; Two Nice summer mountain hikes
 &ndash; Revit element ids in Forge via Navisworks and IFC
-&ndash; Some aspects of consciousness may be beyond reach of ai
+&ndash; Some aspects of consciousness may be beyond reach of AI
 &ndash; Trees might help against global warming
 &ndash; Holidays ahead...
 
 linkedin:
+
+Element Identifiers in RVT, IFC, NW and Forge using the #RevitAPI
+
+http://bit.ly/rvt_nw_ifc_forge_ids
+
+A recent internal discussion clarifies Revit element identification in Forge, Navisworks and IFC, some new thoughts on consciousness versus AI, and a couple of topics of personal interest:
+
+- Two Nice summer mountain hikes
+- Revit element ids in Forge via Navisworks and IFC
+- Some aspects of consciousness may be beyond reach of AI
+- Trees might help against global warming
+- Holidays ahead...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -170,4 +182,3 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 the coming weeks.
 
 I wish you a wonderful summer!
-
