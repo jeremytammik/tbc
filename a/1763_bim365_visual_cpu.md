@@ -30,7 +30,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+BIM365 getting started, CPU voltage and materials API the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/bim365cpuvoltage
 
 I am on vacation right now, enjoying splendid weather camping on the coast of the Atlantic.
 Meanwhile, here are a few items that cropped up in the past few days
@@ -40,6 +40,17 @@ Meanwhile, here are a few items that cropped up in the past few days
 
 linkedin:
 
+BIM365 getting started, CPU voltage and materials API the #RevitAPI
+
+http://bit.ly/bim365cpuvoltage
+
+I am on vacation right now, enjoying splendid weather camping on the coast of the Atlantic.
+
+Meanwhile, here are a few items that cropped up in the past few days:
+
+- Getting started and programming buttons with Revit API
+- Links to API to modify visual appearance of materials
+- Improving performance by optimising CPU voltage...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -112,4 +123,3 @@ Basically, I lower the voltage to my CPU to the point it is just stable; with th
 <center>
 <img src="img/dg_cpu_voltage_optimisation.png" alt="Daniel Gijsbers optimising CPU voltage" width="320">
 </center>
-
