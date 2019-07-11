@@ -32,8 +32,11 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash;
-...
+I am on vacation right now, enjoying splendid weather camping on the coast of the Atlantic.
+Meanwhile, here are a few items that cropped up in the past few days
+&ndash; Getting started and programming buttons with Revit API
+&ndash; Links to API to Modify Visual Appearance of Materials
+&ndash; Improving Performance by Optimising CPU Voltage...
 
 linkedin:
 
@@ -44,14 +47,22 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### BIM365 Getting Started, Visual Appearance and CPU Voltage
+### BIM365 Getting Started, Materials API, CPU Voltage
 
-As mentioned, I am on vacation right now, coamping on the coast of the Atlantic, enjoying splendid weather.
+As mentioned, [I am on vacation](https://thebuildingcoder.typepad.com/blog/2019/07/element-identifiers-in-rvt-ifc-nw-and-forge.html#6) right now,
+enjoying splendid weather camping on the coast of the Atlantic.
 
-Here are a few items that cropped up and are worth mentioning anyway:
+Meanwhile, here are a few items that cropped up in the past few days:
 
+- [Getting started and programming buttons with Revit API](#2)
+- [Links to API to Modify Visual Appearance of Materials](#3)
+- [Improving Performance by Optimising CPU Voltage](#4)
 
-####<a name="2"></a> Getting Started with Revit API and Programming Buttons
+<center>
+<img src="img/737_gentian_700x700.jpg" alt="Gentian on Jakobiger" width="175">
+</center>
+
+####<a name="2"></a> Getting Started and Programming Buttons with Revit API
 
 Zach Smith reached out and pointed to his new
 blogging platform [BIM365](https://www.bim365.tech) together
@@ -59,7 +70,7 @@ with collaborators Matt Boltik and Andrell Laniewicz:
 
 > BIM365 is a blog written by BIM users for the BIM industry. With contributors from various backgrounds, focuses, and skills, this blog aims to be a collaboration for BIM minds.
 
-His first two posts are of interest to all:
+His first two posts are of interest to all Revit API aficionados:
 
 - [Getting Started with Revit API](https://www.bim365.tech/blog/programming-buttons-in-revit-b7bjm)
 - [Programming Buttons in Revit](https://www.bim365.tech/blog/programming-buttons-in-revit)
@@ -69,7 +80,7 @@ Welcome to the Revit API blogosphere and thank you for sharing, Zach!
 
 ####<a name="3"></a> Links to API to Modify Visual Appearance of Materials
 
-For the sake of completeness, here is a new link to the information presented by Boris Shafiro at Autodesk University 2017:
+For the sake of completeness, here is the official link to the information presented by Boris Shafiro at Autodesk University 2017:
 
 - [New API to Modify Visual Appearance of Materials in Revit](https://www.autodesk.com/autodesk-university/class/New-API-Modify-Visual-Appearance-Materials-Revit-2017)
 
@@ -86,19 +97,19 @@ This new link includes the full collection of class materials:
 
 ####<a name="4"></a> Improving Performance by Optimising CPU Voltage
 
-Daniel Gijsbers noticed my descriptionand solution to the
-of [MacBook Pro overheating problem](https://thebuildingcoder.typepad.com/blog/2019/06/accessing-bim360-cloud-links-thumbnail-and-dynamo.html#4) and
+Daniel Gijsbers noticed the description and solution to
+my [MacBook Pro overheating problem](https://thebuildingcoder.typepad.com/blog/2019/06/accessing-bim360-cloud-links-thumbnail-and-dynamo.html#4) and
 very kindly responded:
 
 > I read your [blog post](https://thebuildingcoder.typepad.com/blog/2019/06/accessing-bim360-cloud-links-thumbnail-and-dynamo.html#4).
-Regarding your mac book having heat problems. It’s good you cleaned the fans.
+Regarding your mac book having heat problems, it’s good you cleaned the fans.
 
 > What you could also look into is
 whether [improving performance by optimising CPU voltage](https://danielgijsbers.blogspot.com/2018/10/performance.html) is
 also possible for a mac.
-Basically, I lower the voltage to my CPU to the point it is just stable, and with that reduction, I can run the processor at a higher clock speed.
+Basically, I lower the voltage to my CPU to the point it is just stable; with that reduction, I can run the processor at a higher clock speed.
 
 <center>
-<img src="img/" alt="" width="100">
+<img src="img/dg_cpu_voltage_optimisation.png" alt="Daniel Gijsbers optimising CPU voltage" width="320">
 </center>
 
