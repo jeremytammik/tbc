@@ -48,8 +48,14 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash;
-...
+Topics for this week
+&ndash; Revit public roadmap &ndash; July 2019
+&ndash; Rebar curves
+&ndash; Built-in zip utility for add-in wizard
+&ndash; Only detail section views can be used for top view direction
+&ndash; Displaying an RFA family instance in DA4R
+&ndash; Revit 2020 alters the TEMP file system variable
+&ndash; Lattice multiplication...
 
 linkedin:
 
