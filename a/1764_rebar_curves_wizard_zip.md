@@ -60,7 +60,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Rebar Curves, Wizard Zip and More
+### Roadmap, Rebar Curves, Wizard Zip and More
 
 I returned from my vacation and Buddhist retreat in France, on the Atlantic coast and in the countryside around Bordeaux.
 
@@ -274,6 +274,3 @@ three-minute video on [multiplying numbers by drawing lines](https://youtu.be/bb
 <center>
   <iframe width="560" height="315" src="https://www.youtube.com/embed/bbKjXKV9QNA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </center>
-
-
-
