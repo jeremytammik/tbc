@@ -62,14 +62,20 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Rebar Curves, Wizard Zip and More
 
-I returned from my vacation and Buddhist rettreat in France, on the Atlantic coast and in the countryside around Bordeaux.
+I returned from my vacation and Buddhist retreat in France, on the Atlantic coast and in the countryside around Bordeaux.
 
 I am going off on vacation again next week, though, in the French Jura, so this is just a short break in between vacations  :-)
 
+Here are my topics for this week:
 
-<center>
-<img src="img/.jpg" alt="" width="175">
-</center>
+- [Revit public roadmap &ndash; July 2019](#2)
+- [Rebar curves](#3)
+- [Built-in zip utility for add-in wizard](#4)
+- [Only detail section views can be used for top view direction](#5)
+- [Displaying an RFA family instance in DA4R](#6)
+- [Revit 2020 alters the TEMP file system variable](#7)
+- [Lattice multiplication](#8)
+
 
 ####<a name="2"></a> Revit Public Roadmap &ndash; July 2019
 
@@ -90,27 +96,28 @@ in [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 
 It was originally intended to be used to simplify and minimise models for Forge processing.
 
-Howevere, it now seems that might no longer be required, since there are other options as well.
-
-Michael [@@micbeale](https://twitter.com/micbeale) [@wallabyway](https://github.com/wallabyway) Beale lists the folowing suggestions:
+However, it seems that may no longer be required, since
+Michael [@micbeale](https://twitter.com/micbeale) [@wallabyway](https://github.com/wallabyway) Beale lists
+some alternative options as well:
 
 >    - Avoid Revit solids due to 'triangle explosion', i.e., too many triangles in SVF, making downstream processing extremely problematic and expensive.
 >    - Jeremy looked into using the Revit API, prototyping a Revit API plugin solution to be piped through DA4R to extract the Revit primitive information about the rebar centre lines that can avoid the triangle explosion problem.
->    - We are now investigating a new 'rebar-lines' solution that includes enough meta-data information to avoid needing Jerem'y add-in.
+>    - We are now investigating a new 'rebar-lines' solution that includes enough meta-data information to avoid needing Jeremy's add-in.
 
-> The latter is the winning solution, since it avoids the triangle explosion, because rebar-lines use low bytes compared to the heavily tesselated rebar-solids, and we can create 'unit-mesh' cylinder primitives during Forge processing, thus outputting highly optimised rebar solids in a future  updated Forge Viewer.
+> The latter is the winning solution, since it avoids the triangle explosion, because rebar-lines use low bytes compared to the heavily tessellated rebar-solids, and we can create 'unit-mesh' cylinder primitives during Forge processing, thus outputting highly optimised rebar solids in a future  updated Forge Viewer.
 
 Therefore, I see no need to enhance the current `CmdRebarCurves` implementation at this point.
 
 I still hope that it will remain useful in its current state for answering questions such as the following one from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [cannot get rebar centerline curve using `GetCenterlineCurves`](https://forums.autodesk.com/t5/revit-api-forum/cannot-get-rebar-centerline-curve-using-getcenterlinecurves/m-p/8910986):
+on [getting rebar centreline curves using `GetCenterlineCurves`](https://forums.autodesk.com/t5/revit-api-forum/cannot-get-rebar-centerline-curve-using-getcenterlinecurves/m-p/8910986):
 
 **Question:** I am using the Revit 2019 API and I want to get the centre line curve of the first and the last rebars in a rebar set.
 I tried using the following method:
 
 <pre>
-  Rebar.GetCenterlineCurves(bool adjustForSelfIntersection,
+  Rebar.GetCenterlineCurves(
+    bool adjustForSelfIntersection,
     bool suppressHooks,
     bool suppressBendRadius,
     MultiplanarOption multiplanarOption,
@@ -140,29 +147,31 @@ The [Visual Studio Revit add-in wizards](https://thebuildingcoder.typepad.com/bl
 Visual Studio templates for generating C# and VB .NET Revit add-ins.
 They enable the instantaneous automatic generation, installation and debugging of a new Revit add-in skeleton with one single click.
 
-The current version of the wizards now include a built-in zip utility.
+The current version of the wizards now includes a built-in zip utility.
 
 It was added by Brandon [@ProjectBarks](https://github.com/ProjectBarks) Barker
-in his [pull request #9 providing visual studio version support and an integrated zip utility](https://github.com/jeremytammik/VisualStudioRevitAddinWizard/pull/9).
+in his [pull request #9 providing Visual Studio version support and an integrated zip utility](https://github.com/jeremytammik/VisualStudioRevitAddinWizard/pull/9).
 
-The most up-to-date version is
-now [VisualStudioRevitAddinWizard release 2020.0.0.1](https://github.com/jeremytammik/VisualStudioRevitAddinWizard/releases/tag/2020.0.0.1).
+The most up-to-date version today
+is [VisualStudioRevitAddinWizard release 2020.0.0.1](https://github.com/jeremytammik/VisualStudioRevitAddinWizard/releases/tag/2020.0.0.1).
 
 Many thanks to Brandon for this useful contribution!
 
 
 ####<a name="5"></a> Only Detail Section Views can be Used for Top View Direction
 
-In another case, wishes to create a section view with a top view direction:
+In another case, an add-in developer wishes to create a section view with a top view direction:
 
 - 15565451 *试用 SectionView创建俯视图。&ndash; try `SectionView` to create a top view*
 
 **Question:** When passing the `BoundingBoxXYZ` parameter, what is the requirement for the corresponding base(i) vector?
-What is the specific logic? I tried it myself, and it seems that the logic of `BoundingBoxXYZ` is different when generating an inside view and generating a top view.
+What is the specific logic?
+
+I tried it myself, and it seems that the logic of `BoundingBoxXYZ` is different when generating an inside view and generating a top view.
 
 Do any special rules apply when using the `ViewSection` creation methods to generate a top view, i.e., view direction equal to (0,0,-1)?
 
-**Answer:** Just looking at the Revit API documentation, the `ViewSection` class covers sections, details, elevations, and callouts, all in their reference and non-reference variations. Its creation methods can be used to specify the view direction:
+**Answer:** Looking at the Revit API documentation, the `ViewSection` class covers sections, details, elevations, and callouts, all in their reference and non-reference variations. Its creation methods can be used to specify the view direction:
 
 - CreateCallout Creates a new callout view.
 - CreateDetail Returns a new detail ViewSection.
@@ -170,11 +179,17 @@ Do any special rules apply when using the `ViewSection` creation methods to gene
 - CreateReferenceSection Creates a new reference section.
 - CreateSection Returns a new section ViewSection.
 
-Just looking at the last of these,
+In the last of these,
 [CreateSection](https://www.revitapidocs.com/2020/d6228f68-3643-8aaf-72bb-f9a0b4125886.htm),
 the notes explain:
 
-> Create a section whose view volume corresponds geometrically with the specified sectionBox. The view direction of the resulting section will be sectionBox.Transform.BasisZ and the up direction will be sectionBox.Transform.BasisY. The right hand direction will be computed so that (right, up, view direction) form a left handed coordinate system. The resulting view will be cropped, and far clipping will be active. The crop region will correspond to the projections of BoundingBoxXYZ.Min and BoundingBoxXYZ.Max onto the view's cut plane. The far clip distance will be equal to the difference of the z-coordinates of BoundingBoxXYZ.Min and BoundingBoxXYZ.Max. The new section ViewSection will receive a unique view name.
+> Create a section whose view volume corresponds geometrically with the specified sectionBox.
+The view direction of the resulting section will be sectionBox.Transform.BasisZ and the up direction will be sectionBox.Transform.BasisY.
+The right-hand direction will be computed so that (right, up, view direction) form a left handed coordinate system.
+The resulting view will be cropped, and far clipping will be active.
+The crop region will correspond to the projections of BoundingBoxXYZ.Min and BoundingBoxXYZ.Max onto the view's cut plane.
+The far clip distance will be equal to the difference of the z-coordinates of BoundingBoxXYZ.Min and BoundingBoxXYZ.Max.
+The new section ViewSection will receive a unique view name.
 
 The development team clarifies:
 
@@ -191,7 +206,7 @@ So, you should be able to use a detail view to achieve what you require.
 
 ####<a name="6"></a> Displaying an RFA Family Instance in DA4R
 
-[Forge Design Automation for Revit or DA4R](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55) supports RVT file porcessing, but not RFA.
+[Forge Design Automation for Revit or DA4R](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55) supports RVT file processing, but not RFA.
 
 This begs the question:
 
@@ -199,13 +214,13 @@ This begs the question:
 
 One thing it showed was extracting Revit families using Revit IO and displaying them on the web using the Forge derivative service and viewer.
 
-However, I don’t believe the derivative service supports the RFA file type.
-
-Do you know how they managed to show 3D models of Revit families on the web?
-
 <center>
 <img src="img/da4r_rfa_instance.png" alt="Family instance in the Forge viewer" width="660">
 </center>
+
+However, I don’t believe the derivative service supports the RFA file type.
+
+Do you know how they managed to show 3D models of Revit families on the web?
 
 **Answer:** The workaround is to place a family instance in an empty project and have it translated.
 
@@ -215,48 +230,44 @@ So, the source files are actually RVT, not RFA.
 
 Many add-in make use of the Windows `TEMP` system variable to define a path for outputting a temporary file.
 
-Revit 2020 aparently alters the value of that variable, affecting the add-in behaviour as well.
+Revit 2020 apparently alters the value of that variable, affecting the add-in behaviour as well.
 
 I ran into this issue myself, prompting me to discover the StackOverflow discussion
 on [`Path.GetTempPath` method returning `UserTempPath` with GUID added in Revit 2020](https://stackoverflow.com/questions/56984043/path-gettemppath-method-returns-usertemppath-with-guid-in-the-end-when-using-r).
 
 The answers there explain:
 
-- That's probably due to Revit defining its own %TMP/TEMP% Environment Variable.
+- Since Revit 2020, the requested temp path contains an additional GUID at the end of the path that changes after every restart of Revit, i.e.,  *C:\Users\USERNAME\AppData\Local\Temp\84ae8c0d-197b-4b44-b8d3-8823fabbba4f*.
+- That's probably due to Revit defining its own %TMP/TEMP% environment variable
 - [Revit 2020 temp path changes every session](https://forums.autodesk.com/t5/revit-api-forum/revit-2020-temp-path-changes-every-session/td-p/8759058)
-
-Since Revit 2020, the requested temp path contains an additional GUID at the end of the path that changes after every restart of Revit, i.e.,  *C:\Users\USERNAME\AppData\Local\Temp\84ae8c0d-197b-4b44-b8d3-8823fabbba4f*.
 
 Apparently, Revit changes the temp path for the scope of the application.
 
-I chose the easy solution, using a constant `"C:/tmp"` instead.
+I chose the easy solution in my add-in, using a constant `"C:/tmp"` instead.
 
 Other possible solutions include:
 
 - Searching for "Temp" and dropping the GUID sub-folder
 - Using
-
-<pre>
-  Environment.GetFolderPath(
-    Environment.SpecialFolder.ApplicationData )
-      + @"\AppData\Local\Temp\"
-</pre>
-
+    <pre>
+      Environment.GetFolderPath(
+        Environment.SpecialFolder.ApplicationData )
+          + @"\AppData\Local\Temp\"
+    </pre>
 - Using
-
-<pre>
-  Path.Combine(
-    System.Environment.GetEnvironmentVariable(
-      "LOCALAPPDATA" ),
-        "Temp")
-</pre>
+    <pre>
+      Path.Combine(
+        System.Environment.GetEnvironmentVariable(
+          "LOCALAPPDATA" ),
+            "Temp")
+    </pre>
 
 
 ####<a name="8"></a> Lattice Multiplication
 
-Lets round this off with a little non-Refvit-API observation:
+Let us round this off with an interesting little mathematical non-Revit-API observation:
 
-I ran across several neat demonstrations a well-know multiplication method previously unknown to me,
+I ran across several neat demonstrations of an ancient and well-known multiplication method previously unknown to me,
 [lattice multiplication](https://en.wikipedia.org/wiki/Lattice_multiplication), e.g. this
 three-minute video on [multiplying numbers by drawing lines](https://youtu.be/bbKjXKV9QNA):
 
