@@ -45,10 +45,10 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+@AutodeskRevit roadmap, rebar curves, built-in add-in wizard zip utility, top view direction section views, family instances in Forge viewer and more in the #RevitAPI @AutodeskForge  #bim #DynamoBim #ForgeDevCon http://bit.ly/rebarcurves
 
 Topics for this week
-&ndash; Revit public roadmap &ndash; July 2019
+&ndash; Revit public roadmap July 2019
 &ndash; Rebar curves
 &ndash; Built-in zip utility for add-in wizard
 &ndash; Only detail section views can be used for top view direction
@@ -58,6 +58,19 @@ Topics for this week
 
 linkedin:
 
+Revit roadmap, rebar curves, built-in add-in wizard zip utility, top view direction section views, family instances in Forge viewer and more in the #RevitAPI
+
+http://bit.ly/rebarcurves
+
+Topics for this week:
+
+- Revit public roadmap July 2019
+- Rebar curves
+- Built-in zip utility for add-in wizard
+- Only detail section views can be used for top view direction
+- Displaying an RFA family instance in DA4R
+- Revit 2020 alters the TEMP file system variable
+- Lattice multiplication...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -124,6 +137,21 @@ I tried using the following method:</p>
 new <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdRebarCurves.cs">external command <code>CmdRebarCurves</code></a>
 in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>.</p>
 <p>It seems to be using the very same approach you describe.</p>
+<p>Manuel Solís López of <a href="https://www.sofistik.com">SOFiSTiK AG</a> explains:</p>
+<p><code>Rebar.GetCenterlineCurves(... , i )</code> will return the curves of the Rebar at the i-th position.</p>
+<p>However, You must distinguish three different cases, depending on the <code>DistributionType</code>:</p>
+<ul>
+<li><code>Uniform</code> &ndash; The rebar curves will be equal at all valid positions.</li>
+<li><code>VaryingLength</code> &ndash; According to the rebar constraints, the rebar curves may vary along the distribution path. For example, a set of straight rebar in a triangular slab.</li>
+<li><code>IsRebarFreeForm()</code> == <code>true</code> &ndash; The Rebar curves of FreeFormRebar at each position will be defined by the given constraints, but also by the specific RebarUpdateServer to which the Rebar is subscribed, for instance using SurfaceDistribution or AlignedDistribution.</li>
+</ul>
+<p>The Rebar curves at each i-th position could vary or not, but in case of non-FreeFormRebar (Rebar.IsRebarFreeForm() == false), you would have to apply the corresponding Transformation in order to obtain the actual location in 3D Space:</p>
+<pre>
+  Rebar.GetShapeDrivenAccessor()
+    .GetBarPositionTransform(i);
+</pre>
+
+<p>Many thanks to Manuel for his helpful explanation!</p>
 <h4><a name="4"></a> Built-In Zip Utility for Add-In Wizard</h4>
 <p>The <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.20">Visual Studio Revit add-in wizards</a> provide
 Visual Studio templates for generating C# and VB .NET Revit add-ins.

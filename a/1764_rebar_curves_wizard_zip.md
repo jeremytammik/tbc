@@ -46,10 +46,10 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+@AutodeskRevit roadmap, rebar curves, built-in add-in wizard zip utility, top view direction section views, family instances in Forge viewer and more in the #RevitAPI @AutodeskForge  #bim #DynamoBim #ForgeDevCon http://bit.ly/rebarcurves
 
 Topics for this week
-&ndash; Revit public roadmap &ndash; July 2019
+&ndash; Revit public roadmap July 2019
 &ndash; Rebar curves
 &ndash; Built-in zip utility for add-in wizard
 &ndash; Only detail section views can be used for top view direction
@@ -59,6 +59,19 @@ Topics for this week
 
 linkedin:
 
+Revit roadmap, rebar curves, built-in add-in wizard zip utility, top view direction section views, family instances in Forge viewer and more in the #RevitAPI
+
+http://bit.ly/rebarcurves
+
+Topics for this week:
+
+- Revit public roadmap July 2019
+- Rebar curves
+- Built-in zip utility for add-in wizard
+- Only detail section views can be used for top view direction
+- Displaying an RFA family instance in DA4R
+- Revit 2020 alters the TEMP file system variable
+- Lattice multiplication...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -145,6 +158,25 @@ new [external command `CmdRebarCurves`](https://github.com/jeremytammik/the_buil
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples).
 
 It seems to be using the very same approach you describe.
+
+Manuel Solís López of [SOFiSTiK AG](https://www.sofistik.com) explains:
+
+`Rebar.GetCenterlineCurves(... , i )` will return the curves of the Rebar at the i-th position.
+
+However, You must distinguish three different cases, depending on the `DistributionType`:
+
+- `Uniform` &ndash; The rebar curves will be equal at all valid positions.
+- `VaryingLength` &ndash; According to the rebar constraints, the rebar curves may vary along the distribution path. For example, a set of straight rebar in a triangular slab.
+- `IsRebarFreeForm()` == `true` &ndash; The Rebar curves of FreeFormRebar at each position will be defined by the given constraints, but also by the specific RebarUpdateServer to which the Rebar is subscribed, for instance using SurfaceDistribution or AlignedDistribution.
+
+The Rebar curves at each i-th position could vary or not, but in case of non-FreeFormRebar (Rebar.IsRebarFreeForm() == false), you would have to apply the corresponding Transformation in order to obtain the actual location in 3D Space:
+
+<pre>
+  Rebar.GetShapeDrivenAccessor()
+    .GetBarPositionTransform(i);
+</pre>
+
+Many thanks to Manuel for his helpful explanation!
 
 
 ####<a name="4"></a> Built-In Zip Utility for Add-In Wizard
