@@ -11,10 +11,12 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Auto-dimensioning filled region boundaries using the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash;
-...
+I am back from my break and picked up the question about creating dimensions for a filled region boundary
+&ndash; Programmatically creating dimensions for a filled region
+&ndash; Coding suggestion
+&ndash; Final solution...
 
 linkedin:
 
@@ -30,354 +32,311 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 I am back from my break in the French Jura and looking at all the
 interesting [Revit API forum discussions](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) again.
 
-One that stands out and that I'll pick to get back into the blogging rhythm again is
-about [creating dimensions for a filled region boundary](https://forums.autodesk.com/t5/revit-api-forum/create-dimensions-for-filled-region-boundary/m-p/8926301):
+One that stands out and that I'll pick up to get back into the blogging rhythm again is Jorge Villarroel's question
+about [creating dimensions for a filled region boundary](https://forums.autodesk.com/t5/revit-api-forum/create-dimensions-for-filled-region-boundary/m-p/8926301),
+answered by Alexander [@aignatovich](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478) [@CADBIMDeveloper](https://github.com/CADBIMDeveloper) Ignatovich, aka Александр Игнатович:
 
-
-####<a name="2"></a> Revit
-
-####<a name="3"></a>
-
-
-**Question:**
-
-<pre>
-</pre>
-
-
-**Answer:**
-
-####<a name="4"></a>
-
-
-####<a name="5"></a>
+- [Programmatically creating dimensions for a filled region](#2)
+- [Coding suggestion](#3)
+- [Final solution](#4)
 
 <center>
-<img src="img/.png" alt="" width="100">
+<img src="img/filled_region_dimensions_auto.png" alt="Filled regions auto-dimensioned" width="209">
 </center>
 
+####<a name="2"></a> Programmatically Creating Dimensions for a Filled Region
 
-15582252 [Create dimensions for Filled Region Boundary]
+I am working with dimensions for multiple objects.
+The dimension creation method needs a `ReferenceArray` to work.
+Now, I need to create dimensions for a filled region:
 
-Jorge Villarroel, jvillarroel@renelagos.com, RENE LAGOS [GP]
+<center>
+<img src="img/filled_region.png" alt="Filled region" width="300">
+<p style="font-size: 80%; font-style:italic">Filled region</p>
+</center>
 
-https://forums.autodesk.com/t5/revit-api-forum/create-dimensions-for-filled-region-boundary/m-p/8926301
+I can create dimensions manually in the user interface using native commands, no API, just clicking, using "Align Dimension":
 
-jvillaroel  16 Views, 0 Replies 2019-07-23
-‎2019-07-23 09:08 PM
-Create dimensions for Filled Region Boundary
+<center>
+<img src="img/filled_region_dimensions.png" alt="Dimensions for the filled region" width="300">
+<p style="font-size: 80%; font-style:italic">Dimensions for the filled region</p>
+</center>
 
-Hi All,
+However, I can't retrieve the reference for the boundary curves to create them programmatically.
 
-I've been working with dimensions for a while for multiple objects. The method needs a ReferenceArray to work. Now, I need to create dimensions for a filled region and I can't get the reference for the curves contained in the boundary.
+I used RevitLookup to search for some reference in the Filled Region sub-elements with no results.
 
-/a/case/sfdc/15582252/attach/filled_region.png
-
-Filled Region
-
-/a/case/sfdc/15582252/attach/filled_region_dimensions.png
-
-Dimensions for the Filled Region.
-
-Any tip of advice will be very well received.
-
-Thanks in advance!
-
-This topic was escalated to Salesforce Case 15582252 on 2019-07-23 by an automatic escalation. Case status: Open.
-
------------------------------------------------------------------------
-jeremytammik  in reply to:  Rankjvillaroel
-‎2019-07-24 03:04 PM
-Re: Create dimensions for Filled Region Boundary
-
-Dear Jorge,
-
-Thank you for your query.
-
-How did you create the dimensions in your second image?
-
-Hove you used RevitLookup to explore in depth the filled region geometry and the dimension object with their respective references?
-
-I have passed on your question to the development team for advice for you.
-
-Best regards,
-
-Jeremy
-
------------------------------------------------------------------------
-https://autodesk.slack.com/archives/C0SR6NAP8/p1563973390020000
-
-@conoves A developer is trying to create dimensions for a filled region. The method requires a `ReferenceArray` to work. How can the appropriate references be retrieved from the filled region? They don't seem to be included with its boundary curves. The image shows dimensions for the Filled Region, presumably created via UI -- 15582252 -- https://forums.autodesk.com/t5/revit-api-forum/create-dimensions-for-filled-region-boundary/m-p/8926301
-
-/a/case/sfdc/15582252/attach/filled_region_dimensions.png
-
------------------------------------------------------------------------
-jvillaroel  in reply to:  Rankjeremytammik
-‎2019-07-24 05:01 PM
-Re: Create dimensions for Filled Region Boundary
-
-Hi @jeremytammik , Thanks for your reply.
-
-The dimensions in the second image were created using native commands (no API, just clicking using "Align Dimension").
-
-Indeed, I used Revit Lookup searching for some "Reference" in the Filled Region sub-elements with no results. Already tried to get the references from the CUrveLoop curves, but again, with no results. All I get is "Reference = null".
+Also tried to get the references from the `CurveLoop` curves, but again, with no results.
 
 Any tip of advice will be very well received.
 
-Thanks for escalating the query to the development team.
 
-Regards
 
------------------------------------------------------------------------
-aignatovich
-2019-07-24 05:21 PM
-Re: Create dimensions for Filled Region Boundary
+####<a name="3"></a> Coding Suggestion
 
-Hi! Try this code:
+Hi!
 
-[Transaction(TransactionMode.Manual)]
-public class CreateFillledRegionDimensionsCommand : IExternalCommand
+The trick is to retrieve the filled region geometry using the appropriate view and setting `ComputeReferences` to true.
+
+Try this code:
+
+<pre class="code">
+[<span style="color:#2b91af;">Transaction</span>(&nbsp;<span style="color:#2b91af;">TransactionMode</span>.Manual&nbsp;)]
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">CreateFillledRegionDimensionsCommand</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IExternalCommand</span>
 {
-  public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
-  {
-	var uiapp = commandData.Application;
-	var uidoc = uiapp.ActiveUIDocument;
-	var doc = uidoc.Document;
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">Result</span>&nbsp;Execute(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ExternalCommandData</span>&nbsp;commandData,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">ref</span>&nbsp;<span style="color:blue;">string</span>&nbsp;message,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementSet</span>&nbsp;elements&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;uiapp&nbsp;=&nbsp;commandData.Application;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;uidoc&nbsp;=&nbsp;uiapp.ActiveUIDocument;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;doc&nbsp;=&nbsp;uidoc.Document;
 
-	var view = uidoc.ActiveGraphicalView;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;view&nbsp;=&nbsp;uidoc.ActiveGraphicalView;
 
-	var filledRegions = FindFilledRegions(doc, view.Id).ToList();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;filledRegions&nbsp;=&nbsp;FindFilledRegions(&nbsp;doc,&nbsp;view.Id&nbsp;);
 
-	using (var transaction = new Transaction(doc, "filled regions dimensions"))
-	{
-	  transaction.Start();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;transaction&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;filled&nbsp;regions&nbsp;dimensions&quot;</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;transaction.Start();
 
-	  foreach (var filledRegion in filledRegions)
-	  {
-		CreateDimensions(filledRegion, -1*view.RightDirection);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;filledRegion&nbsp;<span style="color:blue;">in</span>&nbsp;filledRegions&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CreateDimensions(&nbsp;filledRegion,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-1&nbsp;*&nbsp;view.RightDirection&nbsp;);
 
-		CreateDimensions(filledRegion, view.UpDirection);
-	  }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CreateDimensions(&nbsp;filledRegion,&nbsp;view.UpDirection&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
 
-	  transaction.Commit();
-	}
-	return Result.Succeeded;
-  }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;transaction.Commit();
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Succeeded;
+&nbsp;&nbsp;}
 
-  private static void CreateDimensions(FilledRegion filledRegion, XYZ dimensionDirection)
-  {
-	var document = filledRegion.Document;
+&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">void</span>&nbsp;CreateDimensions(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FilledRegion</span>&nbsp;filledRegion,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;dimensionDirection&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;document&nbsp;=&nbsp;filledRegion.Document;
 
-	var view = (View) document.GetElement(filledRegion.OwnerViewId);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;view&nbsp;=&nbsp;(<span style="color:#2b91af;">View</span>)&nbsp;document.GetElement(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;filledRegion.OwnerViewId&nbsp;);
 
-	var edgesDirection = dimensionDirection.CrossProduct(view.ViewDirection);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;edgesDirection&nbsp;=&nbsp;dimensionDirection.CrossProduct(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;view.ViewDirection&nbsp;);
 
-	var edges = FindRegionEdges(filledRegion)
-	  .Where(x => IsEdgeDirectionSatisfied(x, edgesDirection))
-	  .ToList();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;edges&nbsp;=&nbsp;FindRegionEdges(&nbsp;filledRegion&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Where(&nbsp;x&nbsp;=&gt;&nbsp;IsEdgeDirectionSatisfied(&nbsp;x,&nbsp;edgesDirection&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.ToList();
 
-	if (edges.Count < 2)
-	  return;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;edges.Count&nbsp;&lt;&nbsp;2&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>;
 
-	var shift = UnitUtils.ConvertToInternalUnits(-10*view.Scale, DisplayUnitType.DUT_MILLIMETERS)*edgesDirection;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;shift&nbsp;=&nbsp;<span style="color:#2b91af;">UnitUtils</span>.ConvertToInternalUnits(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-10&nbsp;*&nbsp;view.Scale,&nbsp;<span style="color:#2b91af;">DisplayUnitType</span>.DUT_MILLIMETERS&nbsp;)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;edgesDirection;
 
-	var dimensionLine = Line.CreateUnbound(filledRegion.get_BoundingBox(view).Min + shift, dimensionDirection);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;dimensionLine&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateUnbound(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;filledRegion.get_BoundingBox(&nbsp;view&nbsp;).Min&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;shift,&nbsp;dimensionDirection&nbsp;);
 
-	var references = new ReferenceArray();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;references&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ReferenceArray</span>();
 
-	foreach (var edge in edges)
-	  references.Append(edge.Reference);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;edge&nbsp;<span style="color:blue;">in</span>&nbsp;edges&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;references.Append(&nbsp;edge.Reference&nbsp;);
 
-	document.Create.NewDimension(view, dimensionLine, references);
-  }
+&nbsp;&nbsp;&nbsp;&nbsp;document.Create.NewDimension(&nbsp;view,&nbsp;dimensionLine,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;references&nbsp;);
+&nbsp;&nbsp;}
 
-  private static bool IsEdgeDirectionSatisfied(Edge edge, XYZ edgeDirection)
-  {
-	var edgeCurve = edge.AsCurve() as Line;
+&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">bool</span>&nbsp;IsEdgeDirectionSatisfied(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Edge</span>&nbsp;edge,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;edgeDirection&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;edgeCurve&nbsp;=&nbsp;edge.AsCurve()&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Line</span>;
 
-	if (edgeCurve == null)
-	  return false;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;edgeCurve&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">false</span>;
 
-	return edgeCurve.Direction.CrossProduct(edgeDirection).IsAlmostEqualTo(XYZ.Zero);
-  }
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;edgeCurve.Direction.CrossProduct(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;edgeDirection&nbsp;).IsAlmostEqualTo(&nbsp;<span style="color:#2b91af;">XYZ</span>.Zero&nbsp;);
+&nbsp;&nbsp;}
 
-  private static IEnumerable<Edge> FindRegionEdges(FilledRegion filledRegion)
-  {
-	var view = (View)filledRegion.Document.GetElement(filledRegion.OwnerViewId);
+&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">Edge</span>&gt;&nbsp;FindRegionEdges(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FilledRegion</span>&nbsp;filledRegion&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;view&nbsp;=&nbsp;(<span style="color:#2b91af;">View</span>)&nbsp;filledRegion.Document.GetElement(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;filledRegion.OwnerViewId&nbsp;);
 
-	var options = new Options
-	  {
-		View = view,
-		ComputeReferences = true
-	  };
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;options&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Options</span>
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;View&nbsp;=&nbsp;view,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ComputeReferences&nbsp;=&nbsp;<span style="color:blue;">true</span>
+&nbsp;&nbsp;&nbsp;&nbsp;};
 
-	return filledRegion
-	  .get_Geometry(options)
-	  .OfType<Solid>()
-	  .SelectMany(x => x.Edges.Cast<Edge>());
-  }
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;filledRegion
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.get_Geometry(&nbsp;options&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfType&lt;<span style="color:#2b91af;">Solid</span>&gt;()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.SelectMany(&nbsp;x&nbsp;=&gt;&nbsp;x.Edges.Cast&lt;<span style="color:#2b91af;">Edge</span>&gt;()&nbsp;);
+&nbsp;&nbsp;}
 
-  private static IEnumerable<FilledRegion> FindFilledRegions(Document document, ElementId viewId)
-  {
-	var collector = new FilteredElementCollector(document, viewId);
+&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">FilledRegion</span>&gt;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;FindFilledRegions(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;document,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementId</span>&nbsp;viewId&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;collector&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;document,&nbsp;viewId&nbsp;);
 
-	return collector
-	  .OfClass(typeof (FilledRegion))
-	  .Cast<FilledRegion>();
-  }
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;collector
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">FilledRegion</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">FilledRegion</span>&gt;();
+&nbsp;&nbsp;}
 }
+</pre>
 
 It produces something like this:
 
-dimensioned-filled-region.PNG
+<center>
+<img src="img/filled_region_dimensioned_by_ai.png" alt="Filled regions dimensioned by Alexander's code" width="422">
+</center>
 
-/a/case/sfdc/15582252/attach/dimensioned-filled-region.png
+Dimensioning in Revit is one of my favorite topics &nbsp; :-)
 
------------------------------------------------------------------------
-jvillaroel
-2019-07-24 06:21 PM
-Re: Create dimensions for Filled Region Boundary
+
+####<a name="4"></a> Final Solution
 
 Thanks, @aignatovich. I really appreciate it.
 
-I'll give it a try with my script and I'll post here how it turned!.
+Your suggestion was the solution to my problem!
 
-Regards
+I extended the approach, so the method asks for the type name (string) of the dimension you want to assign:
 
------------------------------------------------------------------------
-aignatovich
-2019-07-24 06:33 PM
-Re: Create dimensions for Filled Region Boundary
+<pre class="code">
+<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">void</span>&nbsp;CreateDimensions(
+&nbsp;&nbsp;<span style="color:#2b91af;">FilledRegion</span>&nbsp;filledRegion,
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;dimensionDirection,
+&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;typeName&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;document&nbsp;=&nbsp;filledRegion.Document;
 
-Dimensioning in Revit is one of my favorite topics Robot Happy
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;view&nbsp;=&nbsp;(<span style="color:#2b91af;">View</span>)&nbsp;document.GetElement(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;filledRegion.OwnerViewId&nbsp;);
 
------------------------------------------------------------------------
-jvillaroel  in reply to:  Rankaignatovich
-‎2019-07-24 10:48 PM
-Re: Create dimensions for Filled Region Boundary
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;edgesDirection&nbsp;=&nbsp;dimensionDirection.CrossProduct(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;view.ViewDirection&nbsp;);
 
-Glad to hear! Now I know where to focus my questions! 😄
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;edges&nbsp;=&nbsp;FindRegionEdges(&nbsp;filledRegion&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.Where(&nbsp;x&nbsp;=&gt;&nbsp;IsEdgeDirectionSatisfied(&nbsp;x,&nbsp;edgesDirection&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.ToList();
 
------------------------------------------------------------------------
-jvillaroel
-2019-07-26 09:32 PM
-Re: Create dimensions for Filled Region Boundary
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;edges.Count&nbsp;&lt;&nbsp;2&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>;
 
-Hi @aignatovich . Your suggestion was the solution to my problem!. I took (if you don't mind) the liberty to extend the approach, so the method asks for the type name (string) of the dimension you want to assign:
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Se&nbsp;hace&nbsp;este&nbsp;ajuste&nbsp;para&nbsp;que&nbsp;la&nbsp;distancia&nbsp;no&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;depende&nbsp;de&nbsp;la&nbsp;escala.&nbsp;&lt;&lt;&lt;&lt;&lt;&lt;&nbsp;evaluar&nbsp;para&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;información&nbsp;de&nbsp;acotado&nbsp;y&nbsp;etiquetado!!!</span>
 
-  private void CreateDimensions(
-    FilledRegion filledRegion,
-    XYZ dimensionDirection,
-    string typeName)
-  {
-    var document = filledRegion.Document;
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;shift&nbsp;=&nbsp;<span style="color:#2b91af;">UnitUtils</span>.ConvertToInternalUnits(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;5&nbsp;*&nbsp;view.Scale,&nbsp;<span style="color:#2b91af;">DisplayUnitType</span>.DUT_MILLIMETERS&nbsp;)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;edgesDirection;
 
-    var view = (View)document.GetElement(filledRegion.OwnerViewId);
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;dimensionLine&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateUnbound(
+&nbsp;&nbsp;&nbsp;&nbsp;filledRegion.get_BoundingBox(&nbsp;view&nbsp;).Min&nbsp;+&nbsp;shift,
+&nbsp;&nbsp;&nbsp;&nbsp;dimensionDirection&nbsp;);
 
-    var edgesDirection = dimensionDirection.CrossProduct(view.ViewDirection);
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;references&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ReferenceArray</span>();
 
-	var edges = FindRegionEdges(filledRegion)
-	  .Where(x => IsEdgeDirectionSatisfied(x, edgesDirection))
-	  .ToList();
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;edge&nbsp;<span style="color:blue;">in</span>&nbsp;edges&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;references.Append(&nbsp;edge.Reference&nbsp;);
 
-	if (edges.Count < 2)
-	  return;
+&nbsp;&nbsp;<span style="color:#2b91af;">Dimension</span>&nbsp;dim&nbsp;=&nbsp;document.Create.NewDimension(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;view,&nbsp;dimensionLine,&nbsp;references&nbsp;);
 
-	// Se hace este ajuste para que la distancia no depende de la escala. <<<<<< evaluar para información de acotado y etiquetado!!!
-	var shift = UnitUtils.ConvertToInternalUnits(5 * view.Scale, DisplayUnitType.DUT_MILLIMETERS) * edgesDirection;
+&nbsp;&nbsp;<span style="color:#2b91af;">ElementId</span>&nbsp;dr_id&nbsp;=&nbsp;DimensionTypeId(
+&nbsp;&nbsp;&nbsp;&nbsp;document,&nbsp;typeName&nbsp;);
 
-	var dimensionLine = Line.CreateUnbound(
-	  filledRegion.get_BoundingBox(view).Min + shift,
-	  dimensionDirection);
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;dr_id&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;dim.ChangeTypeId(&nbsp;dr_id&nbsp;);
+&nbsp;&nbsp;}
+}
 
-	var references = new ReferenceArray();
+<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">bool</span>&nbsp;IsEdgeDirectionSatisfied(&nbsp;
+&nbsp;&nbsp;<span style="color:#2b91af;">Edge</span>&nbsp;edge,&nbsp;
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;edgeDirection&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;edgeCurve&nbsp;=&nbsp;edge.AsCurve()&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Line</span>;
 
-	foreach (var edge in edges)
-	  references.Append(edge.Reference);
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;edgeCurve&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">false</span>;
 
-	Dimension dim = document.Create.NewDimension(view, dimensionLine, references);
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;edgeCurve.Direction.CrossProduct(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;edgeDirection&nbsp;).IsAlmostEqualTo(&nbsp;<span style="color:#2b91af;">XYZ</span>.Zero&nbsp;);
+}
 
-	ElementId dr_id = DimensionTypeId(
-		document, typeName);
+<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">FilledRegion</span>&gt;&nbsp;
+&nbsp;&nbsp;FindFilledRegions(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;document,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementId</span>&nbsp;viewId&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;collector&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;document,&nbsp;viewId&nbsp;);
 
-	if (dr_id != null)
-	{
-	  dim.ChangeTypeId(dr_id);
-	}
-  }
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;collector
+&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">FilledRegion</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">FilledRegion</span>&gt;();
+}
 
-  private static bool IsEdgeDirectionSatisfied(Edge edge, XYZ edgeDirection)
-  {
-	var edgeCurve = edge.AsCurve() as Line;
+<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">Edge</span>&gt;&nbsp;
+&nbsp;&nbsp;FindRegionEdges(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FilledRegion</span>&nbsp;filledRegion&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;view&nbsp;=&nbsp;(<span style="color:#2b91af;">View</span>)&nbsp;filledRegion.Document.GetElement(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;filledRegion.OwnerViewId&nbsp;);
 
-	if (edgeCurve == null)
-	  return false;
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;options&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Options</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;View&nbsp;=&nbsp;view,
+&nbsp;&nbsp;&nbsp;&nbsp;ComputeReferences&nbsp;=&nbsp;<span style="color:blue;">true</span>
+&nbsp;&nbsp;};
 
-	return edgeCurve.Direction.CrossProduct(edgeDirection).IsAlmostEqualTo(XYZ.Zero);
-  }
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;filledRegion
+&nbsp;&nbsp;&nbsp;&nbsp;.get_Geometry(&nbsp;options&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.OfType&lt;<span style="color:#2b91af;">Solid</span>&gt;()
+&nbsp;&nbsp;&nbsp;&nbsp;.SelectMany(&nbsp;x&nbsp;=&gt;&nbsp;x.Edges.Cast&lt;<span style="color:#2b91af;">Edge</span>&gt;()&nbsp;);
+}
 
-  private static IEnumerable<FilledRegion> FindFilledRegions(Document document, ElementId viewId)
-  {
-	var collector = new FilteredElementCollector(document, viewId);
+<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">ElementId</span>&nbsp;DimensionTypeId(
+&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc,
+&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;typeName&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;mt_coll&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">DimensionType</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsElementType();
 
-	return collector
-	  .OfClass(typeof(FilledRegion))
-	  .Cast<FilledRegion>();
-  }
+&nbsp;&nbsp;<span style="color:#2b91af;">DimensionType</span>&nbsp;dimType&nbsp;=&nbsp;<span style="color:blue;">null</span>;
 
-  private static IEnumerable<Edge> FindRegionEdges(FilledRegion filledRegion)
-  {
-	var view = (View)filledRegion.Document.GetElement(filledRegion.OwnerViewId);
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;type&nbsp;<span style="color:blue;">in</span>&nbsp;mt_coll&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;type&nbsp;<span style="color:blue;">is</span>&nbsp;<span style="color:#2b91af;">DimensionType</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;type.Name&nbsp;==&nbsp;typeName&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dimType&nbsp;=&nbsp;type&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">DimensionType</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;dimType.Id;
+}
+</pre>
 
-	var options = new Options
-	{
-	  View = view,
-	  ComputeReferences = true
-	};
+This code produces dimensioning as shown in the top-most screen snapshot.
 
-	return filledRegion
-	  .get_Geometry(options)
-	  .OfType<Solid>()
-	  .SelectMany(x => x.Edges.Cast<Edge>());
-  }
+Hope this is helpful for others also!
 
-  private static ElementId DimensionTypeId(
-	Document doc,
-	string typeName)
-  {
-	List<Element> mt_coll = new FilteredElementCollector(doc)
-	  .OfClass(typeof(DimensionType))
-	  .WhereElementIsElementType()
-	  .ToList();
-
-	DimensionType dimType = null;
-
-	foreach (Element type in mt_coll)
-	{
-	  if (type is DimensionType)
-	  {
-		if (type.Name == typeName)
-		{
-		  dimType = type as DimensionType;
-		  break;
-		}
-	  }
-	}
-	return dimType.Id;
-  }
-
-image.png
-
-/a/case/sfdc/15582252/attach/filled_region_dimensions_auto.png
-
-Hope this helps someone else!
-
-Regards!
-
------------------------------------------------------------------------
-
-
-img/filled_region.png
-img/filled_region_dimensioned_by_ai.png
-img/filled_region_dimensions.png
-img/filled_region_dimensions_auto.png
+Many thanks to Jorge and Alexander for this nice solution!
