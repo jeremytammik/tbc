@@ -171,13 +171,17 @@ Finally, you can use the built-in Revit macro IDE (integrated development enviro
 
 ####<a name="5"></a> The True Meaning of Pizza
 
+I am writing this in Verbania, Italy.
+
+Hence, this little note in closing:
+
 Did you ever wonder why pizza is called pizza?
 
-Well, it was simply the formula used by a hungry mathematician to determine its volume:
+Well, it was simply the formula used by a hungry mathematician to determine its volume from its radius `z` and thickness `a`:
 
 <pre>
   
-  Volume = &pi; * 
+  Volume = &pi; * z <sup>2</sup> * a = pi 
 </pre>
 
 <center>
