@@ -37,8 +37,14 @@ The README includes a feature list comparing the two snooping tools:
 
 twitter:
 
-&ndash; 
-...
+
+I have been very busy and motivated indeed setting up a new computer this week.
+Nonetheless, I was able to keep going full steam with Revit API related issues as well
+&ndash; Setting up a new MacBook
+&ndash; KLH Engineers RevitDeveloperTools snooping tool
+&ndash; Pulling text from annotation tags
+&ndash; Vertex handling
+&ndash; The true meaning of pizza...
 
 linkedin:
 
@@ -49,7 +55,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### New PC, KLH Snoop, Annotation and Vertex
+### New PC, KLH Snoop, Annotations and Vertex Handling
 
 I have been very busy and motivated indeed setting up a new computer this week.
 
@@ -62,12 +68,12 @@ Nonetheless, I was able to keep going full steam with Revit API related issues a
 - [The true meaning of pizza](#6)
 
 <center>
-<img src="img/baby_lizard_on_macbook_1008.jpg" alt="" width="300"> <!-- 1008 -->
+<img src="img/baby_lizard_on_macbook_1008.jpg" alt="Baby lizard on MacBook" width="300"> <!-- 1008 -->
 </center>
 
 ####<a name="2"></a> Setting up a New MacBook
 
-I picked up my new computer on Monday, a Macbook Pro.
+I picked up my new computer on Monday, a MacBook Pro.
 
 Migration worked very well so far, installation was easier than ever before, and I am already almost completely done moving over.
 
@@ -83,28 +89,28 @@ These components are now up and running:
 - Windows 10
 - Visual Studio 2017
 - Revit 2020
-- Veracrypt and osxfuse
+- VeraCrypt and osxfuse
 - Skype
 - VLC
 - Firefox and downloadhelper
 - git
 - Personal Komodo editor scripts
-- Created and set up new github SSH key
+- Created and set up new GitHub SSH key
 - Migrated personal disk data to new machine
 - Restored bash profile
 - Python 3.7.4 
 - [pip](https://pypi.org/project/pip) &ndash; `pip3 install --upgrade pip`
-- [Python markdown](https://pypi.python.org/pypi/Markdown}: `pip3 install Markdown`
+- [Python markdown](https://pypi.python.org/pypi/Markdown): `pip3 install Markdown`
 - [git-lfs](https://git-lfs.github.com) &ndash; [installation](https://help.github.com/en/articles/installing-git-large-file-storage) 
-
-A few issues remain to do, icluding security related stuff:
-
 - Internet browser bookmarks
+
+A few security related issues remain to do:
+
 - Desktop Duo for VPN access
 - Replacing
 my [obsolete TrueCrypt encryption system](https://www.comparitech.com/blog/information-security/truecrypt-is-discoutinued-try-these-free-alternatives) 
 
-I am writing this blog on the new system, with significant help and inspiration proivided by my baby lizard friend presented in the image above.
+I am writing this blog on the new system, with significant help and inspiration provided by my baby lizard friend presented in the image above.
 
 By chance, now that I almost finished, I also just read this helpful article
 on [how to set up your new MacBook for coding](https://www.freecodecamp.org/news/how-to-set-up-a-brand-new-macbook) by Amber Wilkie
@@ -146,7 +152,7 @@ the public [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-
 worthwhile sharing here:
 
 **Question:** I'm trying to pull the text from the annotation tags on a drawing using the Revit API.
-Is that pssoble?
+Is that possible?
 How? 
 
 **Answer:** Yes, this is definitely possible.
@@ -196,18 +202,18 @@ Another recent recurring question on vertex handling may also be of general inte
 
 **Question:** When processing meshes or other collections of triangles, is there any way to know if one vertex is shared by multiple triangles?
 
-Thus, the final data does not have to contain duplicate vertices, and can reuse the exisiting vertex indices in order to save data size.
+Thus, the final data does not have to contain duplicate vertices and can reuse the existing vertex indices in order to save data size.
 
 **Answer:** I have often used strategies similar to the following when collecting mesh data:
 
-- Implement a comparison operator for the mesh vertex coordinate data
-- Store all mesh vertices in a dedicated dictionary using the mesh vertex coordinates as keys, e.g., `Dictionary<XYZ,int>`.
+- Implement a comparison operator for the mesh vertex coordinate data.
+- Store all mesh vertices in a dedicated dictionary using the mesh vertex coordinates as keys, e.g., <code>Dictionary&lt;XYZ,int&gt;</code>.
 The `int` is not really important, just the keys.
 I often use the `ìnt` value to count the number of vertices encountered at each location.
 - For each new mesh vertex received, check whether it is already listed in the dictionary.
 If so, increment its count; else, add a new entry for it.
 
-The comparison operator needs to accommodate an appropriaste amount of [fuzz](https://thebuildingcoder.typepad.com/blog/2017/12/project-identifier-and-fuzzy-comparison.html#3),
+The comparison operator needs to accommodate an appropriate amount of [fuzz](https://thebuildingcoder.typepad.com/blog/2017/12/project-identifier-and-fuzzy-comparison.html#3),
 cf. this [dimensioning application](https://thebuildingcoder.typepad.com/blog/2018/12/rebars-in-host-net-framework-and-importance-of-fuzz.html#4).
 
 For some examples, look at `GetCanonicVertices`
@@ -237,8 +243,5 @@ Well, pretty obviously, it simply represents the formula used by a hungry mathem
 
 <center>
 <img src="img/pizza.jpg" alt="Pizza volume formula" width="360">
-<p style="font-size: 80%; font-style:italic">Pizza volume formula V = pi.z.z.a</p>
+<p style="font-size: 80%; font-style:italic">Pizza volume formula V = pi&middot;z&middot;z&middot;a</p>
 </center>
-
-<pre class="code">
-</pre>
