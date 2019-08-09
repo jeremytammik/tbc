@@ -6,6 +6,17 @@
 
 <!---
 
+- KHL Snoop
+John D'Alessandro, Software Engineer at [KLH Engineers, PSC](http://www.klhengrs.com)
+We at KLH Engineers decided to roll our own Revit Snoop tool a while ago and we thought we’d show it to you so you can check it out.
+We released it as a class library on our GitHub so that others can use it in their own tools and solutions.
+We’re also accepting issues and PRs, so the more people use the tool the better it’ll get. Let me know if you have any feedback on it or questions.
+The repo is at [KLH Engineers RevitDeveloperTools](https://github.com/klhengineers/RevitDeveloperTools).
+It has some similarities and overlap with  [RevitLookup](), and adds a number of features not available there.
+The README includes a feature list comparing the two snooping tools:
+
+- 15623936 [Revit API, pull text from annotation tags.]
+
 - vertex handling
   [Q] When processing meshes or other collections of triangles, is there any way to know if one vertex is shared by multiple triangles?
   Thus the final data does not have to contain duplicated vertices, and reuse the vertex index only, in order to save data size.
@@ -24,39 +35,6 @@
 
 - img/pizza.jpg 720 px pi.z.z.a
 
-- KHL Snoop
-John D'Alessandro, Software Engineer at [KLH Engineers, PSC](http://www.klhengrs.com)
-We at KLH Engineers decided to roll our own Revit Snoop tool a while ago and we thought we’d show it to you so you can check it out.
-We released it as a class library on our GitHub so that others can use it in their own tools and solutions.
-We’re also accepting issues and PRs, so the more people use the tool the better it’ll get. Let me know if you have any feedback on it or questions.
-The repo is at [KLH Engineers RevitDeveloperTools](https://github.com/klhengineers/RevitDeveloperTools).
-It has some similarities and overlap with  [RevitLookup](), and adds a number of features not available there.
-The README includes a feature list comparing the two snooping tools:
-
-- 15623936 [Revit API, pull text from annotation tags.]
-<span style="color:blue;">#region</span>&nbsp;Pull&nbsp;Text&nbsp;from&nbsp;Annotation&nbsp;Tags
-<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
-<span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;the&nbsp;text&nbsp;from&nbsp;all&nbsp;annotation&nbsp;tags&nbsp;</span>
-<span style="color:gray;">///</span><span style="color:green;">&nbsp;in&nbsp;a&nbsp;list&nbsp;of&nbsp;strings</span>
-<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
-<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">string</span>&gt;&nbsp;PullTextFromAnnotationTags(
-&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)
-{
-&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;tags
-&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">IndependentTag</span>&nbsp;)&nbsp;);
-
-&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">string</span>&gt;(&nbsp;tags
-&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">IndependentTag</span>&gt;()
-&nbsp;&nbsp;&nbsp;&nbsp;.Select&lt;<span style="color:#2b91af;">IndependentTag</span>,&nbsp;<span style="color:blue;">string</span>&gt;(
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t&nbsp;=&gt;&nbsp;t.TagText&nbsp;)&nbsp;);
-}
-<span style="color:blue;">#endregion</span>&nbsp;<span style="color:green;">//Pull&nbsp;Text&nbsp;from&nbsp;Annotation&nbsp;Tags</span>
-
-
- 
-Thanks for the feedback, I’m excited to see this generate some buzz!
-
 twitter:
 
 &ndash; 
@@ -73,7 +51,19 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### KLH Snoop
 
+I have been busy setting up a new computer this week.
 
+Nonetheless, I was able to keep going full steam with Revit API related issues as well:
+
+- [Setting up New MacBook Pro](#2)
+- [KLH Engineers RevitDeveloperTools Snooping Tool](#3)
+- [Pulling Text from Annotation Tags](#4)
+- [Vertex Handling](#5)
+- [The True Meaning of Pizza](#6)
+
+<center>
+<img src="img/baby_lizard_on_macbook_1008.jpg" alt="" width="504">
+</center>
 
 ####<a name="2"></a> Setting up New MacBook Pro
 
@@ -82,10 +72,6 @@ I picked up my new computer on Monday, a Macbook Pro.
 Migration worked very well so far, installation was easier than ever before, and I am already almost completely done moving over, except for a very few security related issues.
 
 I am writing this blog on the new system, with significant help from my baby lizard friend:
-
-<center>
-<img src="img/baby_lizard_on_macbook_1008.jpg" alt="" width="504">
-</center>
 
 By chance, now that I almost finished, I also just read this helpful article
 on [how to set up your new MacBook for coding](https://www.freecodecamp.org/news/how-to-set-up-a-brand-new-macbook) by Amber Wilkie
@@ -120,7 +106,7 @@ More Revit API related, John D'Alessandro, Software Engineer at [KLH Engineers, 
 Many thanks to John and KLH for implementing and generously sharing this powerful new snooping tool!
 
 
-####<a name="5"></a> Pulling Text from Annotation Tags
+####<a name="4"></a> Pulling Text from Annotation Tags
 
 One nice little issue that was not discussed in
 the public [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) might be worth while sharing here:
@@ -168,8 +154,36 @@ the [CmdCollectorPerformance.cs module](https://github.com/jeremytammik/the_buil
 
 Finally, you can use the built-in Revit macro IDE (integrated development environment) to convert this code from C# to Python, if you like.
 
+####<a name="5"></a> Vertex Handling
 
-####<a name="5"></a> The True Meaning of Pizza
+Another recent recurring question on vertex handling may also be of general interest:
+
+**Question:** When processing meshes or other collections of triangles, is there any way to know if one vertex is shared by multiple triangles?
+
+Thus, the final data does not have to contain duplicate vertices, and can reuse the exisiting vertex indices in order to save data size.
+
+**Answer:** I have often used strategies similar to the following when collecting mesh data:
+
+- Implement a comparison operator for the mesh vertex coordinate data
+- Store all mesh vertices in a dedicated dictionary using the mesh vertex coordinates as keys, e.g., `Dictionary<XYZ,int>`.
+The `int` is not really important, just the keys. I often use the ìnt` value to count the number of vertices encpountered at each location.
+- For each new mesh vertex received, check whether it is already listed in the dictionary. If so, increment its count; else, add a new entry for it.
+
+The comparison operator needs to accommodate an appropriaste amount of [fuzz](https://thebuildingcoder.typepad.com/blog/2017/12/project-identifier-and-fuzzy-comparison.html#3),
+cf. this [dimensioning application](https://thebuildingcoder.typepad.com/blog/2018/12/rebars-in-host-net-framework-and-importance-of-fuzz.html#4).
+
+For some examples, look at `GetCanonicVertices`
+for [tracking element modification](https://thebuildingcoder.typepad.com/blog/2016/01/tracking-element-modification.html) and
+this [post on the `XYZ` class](https://thebuildingcoder.typepad.com/blog/2017/08/birthday-post-on-the-xyz-class.html#3).
+
+For more, you can search The Building Coder for
+
+- `XyzEqualityComparer`
+- `XyzComparable`
+- `XyzProximityComparer`
+ 
+
+####<a name="6"></a> The True Meaning of Pizza
 
 I am writing this in Verbania, Italy.
 
