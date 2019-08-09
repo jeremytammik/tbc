@@ -1,0 +1,165 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- KHL Snoop
+John D'Alessandro, Software Engineer at [KLH Engineers, PSC](http://www.klhengrs.com)
+We at KLH Engineers decided to roll our own Revit Snoop tool a while ago and we thought we’d show it to you so you can check it out.
+We released it as a class library on our GitHub so that others can use it in their own tools and solutions.
+We’re also accepting issues and PRs, so the more people use the tool the better it’ll get. Let me know if you have any feedback on it or questions.
+The repo is at [KLH Engineers RevitDeveloperTools](https://github.com/klhengineers/RevitDeveloperTools).
+It has some similarities and overlap with  [RevitLookup](), and adds a number of features not available there.
+The README includes a feature list comparing the two snooping tools:
+
+- 15623936 [Revit API, pull text from annotation tags.]
+
+- vertex handling
+  [Q] When processing meshes or other collections of triangles, is there any way to know if one vertex is shared by multiple triangles?
+  Thus the final data does not have to contain duplicated vertices, and reuse the vertex index only, in order to save data size.
+  [A] I always use the following strategy when collecting mesh data:
+  Implement a comparison operator for the mesh vertices
+  Store all mesh vertices in their own dictionary, e.g., Dictionary<XYZ,int>. The int is just a dummy. I normally count the number of vertices received.
+  Each time I encounter a new mesh vertex, I check whether it is already listed in the dictionary. The comparison operator includes enough fuzz.
+  Look at GetCanonicVertices in
+  https://thebuildingcoder.typepad.com/blog/2016/01/tracking-element-modification.html
+  Here is another related post:
+  https://thebuildingcoder.typepad.com/blog/2017/08/birthday-post-on-the-xyz-class.html#3
+  In general, search The Building Coder for
+  XyzEqualityComparer
+  XyzComparable
+  XyzProximityComparer
+
+- img/pizza.jpg 720 px pi.z.z.a
+
+twitter:
+
+&ndash; 
+...
+
+linkedin:
+
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+-->
+
+<h3>KLH Snoop</h3>
+<p>I have been busy setting up a new computer this week.</p>
+<p>Nonetheless, I was able to keep going full steam with Revit API related issues as well:</p>
+<ul>
+<li><a href="#2">Setting up New MacBook Pro</a></li>
+<li><a href="#3">KLH Engineers RevitDeveloperTools Snooping Tool</a></li>
+<li><a href="#4">Pulling Text from Annotation Tags</a></li>
+<li><a href="#5">Vertex Handling</a></li>
+<li><a href="#6">The True Meaning of Pizza</a></li>
+</ul>
+<p><center>
+<img src="img/baby_lizard_on_macbook_1008.jpg" alt="" width="504">
+</center></p>
+<h4><a name="2"></a> Setting up New MacBook Pro</h4>
+<p>I picked up my new computer on Monday, a Macbook Pro.</p>
+<p>Migration worked very well so far, installation was easier than ever before, and I am already almost completely done moving over, except for a very few security related issues.</p>
+<p>I am writing this blog on the new system, with significant help from my baby lizard friend:</p>
+<p>By chance, now that I almost finished, I also just read this helpful article
+on <a href="https://www.freecodecamp.org/news/how-to-set-up-a-brand-new-macbook">how to set up your new MacBook for coding</a> by Amber Wilkie
+on <a href="https://www.freecodecamp.org">freeCodeCamp.org</a>.
+I have ofready completed many of the steps, but some suggestions are new to me as well.</p>
+<h4><a name="3"></a> KLH Engineers RevitDeveloperTools Snooping Tool</h4>
+<p>More Revit API related, John D'Alessandro, Software Engineer at <a href="http://www.klhengrs.com">KLH Engineers, PSC</a> shared a powerful new Revit database snooping utility, explaining:</p>
+<blockquote>
+<p>We at KLH Engineers decided to roll our own Revit Snoop tool a while ago and we thought we’d show it to you so you can check it out.</p>
+</blockquote>
+<p><center>
+<img src="img/klh_snoop_screenshot.png" alt="KLH Snoop" width="443">
+</center></p>
+<blockquote>
+<p>We released it as a class library on our GitHub so that others can use it in their own tools and solutions.</p>
+<p>We’re also accepting issues and PRs, so the more people use the tool the better it’ll get. Let me know if you have any feedback on it or questions.</p>
+<p>The repo is at <a href="https://github.com/klhengineers/RevitDeveloperTools">KLH Engineers RevitDeveloperTools</a>.</p>
+<p>It has some similarities and overlap with  <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a>, and adds a number of features not available there.</p>
+<p>The README includes a feature list comparing the two snooping tools:</p>
+</blockquote>
+<p><center>
+<img src="img/klh_snoop_feature_list.png" alt="KLH Snoop feature list" width="530">
+</center></p>
+<p>Many thanks to John and KLH for implementing and generously sharing this powerful new snooping tool!</p>
+<h4><a name="4"></a> Pulling Text from Annotation Tags</h4>
+<p>One nice little issue that was not discussed in
+the public <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> might be worth while sharing here:</p>
+<p><strong>Question:</strong> I'm trying to pull the text from the annotation tags on a drawing using the Revit API. How can I do that? </p>
+<p><strong>Answer:</strong> Yes, this is definitely possible.</p>
+<p>You can use a filtered element collector to collect all the annotation tags, and then access their text using their properties.</p>
+<p>To retrieve the tags, you need to determine what class they have. I assume they
+are <a href="https://www.revitapidocs.com/2020/e52073e2-9d98-6fb5-eb43-288cf9ed2e28.htm">IndependentTag class instances</a>.</p>
+<p>The property to access their text is presumably
+the <a href="https://www.revitapidocs.com/2020/8e297dee-920d-f620-6198-0bed494e3f04.htm">TagText property</a>.</p>
+<p>You can install and use <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a> yourself
+to validate these assumptions of mine in your specific model.</p>
+<p>If these assumptions are correct, the final solution might look something like this in  C#:</p>
+<pre class="code">
+<span style="color:blue;">#region</span>&nbsp;Pull&nbsp;Text&nbsp;from&nbsp;Annotation&nbsp;Tags
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;the&nbsp;text&nbsp;from&nbsp;all&nbsp;annotation&nbsp;tags&nbsp;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;in&nbsp;a&nbsp;list&nbsp;of&nbsp;strings</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">string</span>&gt;&nbsp;PullTextFromAnnotationTags(
+&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;tags
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">IndependentTag</span>&nbsp;)&nbsp;);
+
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:blue;">string</span>&gt;(&nbsp;tags
+&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">IndependentTag</span>&gt;()
+&nbsp;&nbsp;&nbsp;&nbsp;.Select&lt;<span style="color:#2b91af;">IndependentTag</span>,&nbsp;<span style="color:blue;">string</span>&gt;(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t&nbsp;=&gt;&nbsp;t.TagText&nbsp;)&nbsp;);
+}
+<span style="color:blue;">#endregion</span>&nbsp;<span style="color:green;">//Pull&nbsp;Text&nbsp;from&nbsp;Annotation&nbsp;Tags</span>
+</pre>
+
+<p>For future reference, I also added this code to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> in
+the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs#L1223-L1240">CmdCollectorPerformance.cs module</a></p>
+<p>Finally, you can use the built-in Revit macro IDE (integrated development environment) to convert this code from C# to Python, if you like.</p>
+<h4><a name="5"></a> Vertex Handling</h4>
+<p>Another recent recurring question on vertex handling may also be of general interest:</p>
+<p><strong>Question:</strong> When processing meshes or other collections of triangles, is there any way to know if one vertex is shared by multiple triangles?</p>
+<p>Thus, the final data does not have to contain duplicate vertices, and can reuse the exisiting vertex indices in order to save data size.</p>
+<p><strong>Answer:</strong> I have often used strategies similar to the following when collecting mesh data:</p>
+<ul>
+<li>Implement a comparison operator for the mesh vertex coordinate data</li>
+<li>Store all mesh vertices in a dedicated dictionary using the mesh vertex coordinates as keys, e.g., <code>Dictionary&lt;XYZ,int&gt;</code>.
+The <code>int</code> is not really important, just the keys. I often use the ìnt` value to count the number of vertices encpountered at each location.</li>
+<li>For each new mesh vertex received, check whether it is already listed in the dictionary. If so, increment its count; else, add a new entry for it.</li>
+</ul>
+<p>The comparison operator needs to accommodate an appropriaste amount of <a href="https://thebuildingcoder.typepad.com/blog/2017/12/project-identifier-and-fuzzy-comparison.html#3">fuzz</a>,
+cf. this <a href="https://thebuildingcoder.typepad.com/blog/2018/12/rebars-in-host-net-framework-and-importance-of-fuzz.html#4">dimensioning application</a>.</p>
+<p>For some examples, look at <code>GetCanonicVertices</code>
+for <a href="https://thebuildingcoder.typepad.com/blog/2016/01/tracking-element-modification.html">tracking element modification</a> and
+this <a href="https://thebuildingcoder.typepad.com/blog/2017/08/birthday-post-on-the-xyz-class.html#3">post on the <code>XYZ</code> class</a>.</p>
+<p>For more, you can search The Building Coder for</p>
+<ul>
+<li><code>XyzEqualityComparer</code></li>
+<li><code>XyzComparable</code></li>
+<li><code>XyzProximityComparer</code></li>
+</ul>
+<h4><a name="6"></a> The True Meaning of Pizza</h4>
+<p>I am writing this in Verbania, Italy.</p>
+<p>Hence, this little note in closing:</p>
+<p>Did you ever wonder why pizza is called pizza?</p>
+<p>Well, it was simply the formula used by a hungry mathematician to determine its volume from its radius <code>z</code> and thickness <code>a</code>:</p>
+<pre>
+
+  Volume = &pi; * z <sup>2</sup> * a = pi 
+</pre>
+
+<p><center>
+<img src="img/pizza.jpg" alt="Pizza volume formula" width="360">
+<p style="font-size: 80%; font-style:italic">Pizza volume formula V = pi.z.z.a</p>
+</center></p>
+<pre class="code">
+</pre>
