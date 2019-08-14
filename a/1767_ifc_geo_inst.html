@@ -49,8 +49,14 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; The
-...
+I completed the move to my new computer, and happily all systems go now.
+Here are some other topics that came up in the past few days
+&ndash; Revit-IFC Release 20.1.0
+&ndash; Community discussion on Revit
+&ndash; Solid or instance, depending
+&ndash; Exporting parameters to Access
+&ndash; Store globals on custom <code>DataStorage</code>, not <code>ProjectInfo</code>
+&ndash; Iranian civil engineering project video...
 
 linkedin:
 
@@ -62,7 +68,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>IFC Update, Instance Geometry, Parameters</h3>
-<p>I completed the move to my new computer, and happily all systems go.</p>
+<p>I completed the move to my new computer, and happily all systems go now.</p>
 <p>Here are some other topics that came up in the past few days:</p>
 <ul>
 <li><a href="#2">Revit-IFC Release 20.1.0</a></li>
@@ -73,7 +79,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li><a href="#7">Iranian civil engineering project video</a></li>
 </ul>
 <p><center>
-<img src="img/mahabghodss_video.png" alt="Mahab Ghodss app" width="450">
+<img src="img/mahabghodss_video.png" alt="Mahab Ghodss civil engineering app" width="450">
+<p style="font-size: 80%; font-style:italic">Iranian civil engineering project</p>
 </center></p>
 <h4><a name="2"></a> Revit-IFC Release 20.1.0</h4>
 <p><a href="https://github.com/Autodesk/revit-ifc/releases/tag/IFC_v20.1.0">Release 20.1.0 for Revit 2020</a> has been released.</p>
@@ -101,9 +108,9 @@ I am sharing this article by Amie Vaccaro to discuss</p>
 <p>We invite anyone to participate in these discussions and look forward to animated conversations! </p>
 </blockquote>
 <h4><a name="4"></a> Solid or Instance, Depending</h4>
-<p>Also in the discussion forum, in the thread
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/solid-element-is-missing/m-p/8950786">Solid element is missing</a>,
-Bobby C Jones points out two really important knowlegedbase articles clarifying how to retrieve geometry from family instances:</p>
+<p>Also in the discussion forum, in the thread asking why
+the <a href="https://forums.autodesk.com/t5/revit-api-forum/solid-element-is-missing/m-p/8950786">solid element is missing</a>,
+Bobby C Jones points out two important basic knowledgebase articles clarifying how to retrieve geometry from family instances:</p>
 <p>First, the article
 on <a href="https://knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhelp/2016/ENU/Revit-API/files/GUID-B4F83374-0DF6-4737-91EB-900E676E862B-htm.html">GeometryInstances</a> explains:</p>
 <blockquote>
@@ -114,10 +121,11 @@ on <a href="https://knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhel
 <blockquote>
 <p>The <code>GeometryElement</code> may contain the desired geometry as a <code>Solid</code> or <code>GeometryInstance</code>, depending on whether a beam is joined or standalone, and this code covers both cases...</p>
 </blockquote>
+<p>If this is unclear to you, please refer to the detailed knowledgebase explanations.</p>
 <h4><a name="5"></a> Exporting Parameters to Access</h4>
 <p>Another short note from the discussion forum
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-export-selected-parameters-to-ms-access-using-my-own/m-p/8960356">how to export selected parameters to MS access using my own ribbon</a>:</p>
-<p><strong>Question:</strong> If I want to create my own ribbon within add-ins menu of revit 2019. And when I click the ribbon, it will show the window that asks me which parameters I want to export to MS access file. (I want to be able to select the required parameters of each element.) Can you suggest any api sample code? Thank you.</p>
+<p><strong>Question:</strong> If I want to create my own ribbon within add-ins menu of Revit 2019. And when I click the ribbon, it will show the window that asks me which parameters I want to export to MS access file. (I want to be able to select the required parameters of each element.) Can you suggest any API sample code? Thank you.</p>
 <p><strong>Answer:</strong> Look at the <a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra">ADN Xtra labs</a>, 
 in the <code>XtraCs</code> project, module Lab4.cs, especially the external
 commands <a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra/blob/master/XtraCs/Labs4.cs#L45-L266">Lab4_1_ElementParameters</a>

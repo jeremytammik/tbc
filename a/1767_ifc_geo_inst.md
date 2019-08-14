@@ -50,8 +50,14 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; The
-...
+I completed the move to my new computer, and happily all systems go now.
+Here are some other topics that came up in the past few days
+&ndash; Revit-IFC Release 20.1.0
+&ndash; Community discussion on Revit
+&ndash; Solid or instance, depending
+&ndash; Exporting parameters to Access
+&ndash; Store globals on custom <code>DataStorage</code>, not <code>ProjectInfo</code>
+&ndash; Iranian civil engineering project video...
 
 linkedin:
 
@@ -64,7 +70,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### IFC Update, Instance Geometry, Parameters
 
-I completed the move to my new computer, and happily all systems go.
+I completed the move to my new computer, and happily all systems go now.
 
 Here are some other topics that came up in the past few days:
 
@@ -76,7 +82,8 @@ Here are some other topics that came up in the past few days:
 - [Iranian civil engineering project video](#7)
 
 <center>
-<img src="img/mahabghodss_video.png" alt="Mahab Ghodss app" width="450">
+<img src="img/mahabghodss_video.png" alt="Mahab Ghodss civil engineering app" width="450">
+<p style="font-size: 80%; font-style:italic">Iranian civil engineering project</p>
 </center>
 
 ####<a name="2"></a> Revit-IFC Release 20.1.0 
@@ -114,9 +121,9 @@ I am sharing this article by Amie Vaccaro to discuss
 
 ####<a name="4"></a> Solid or Instance, Depending
 
-Also in the discussion forum, in the thread
-on [Solid element is missing](https://forums.autodesk.com/t5/revit-api-forum/solid-element-is-missing/m-p/8950786),
-Bobby C Jones points out two really important knowlegedbase articles clarifying how to retrieve geometry from family instances:
+Also in the discussion forum, in the thread asking why
+the [solid element is missing](https://forums.autodesk.com/t5/revit-api-forum/solid-element-is-missing/m-p/8950786),
+Bobby C Jones points out two important basic knowledgebase articles clarifying how to retrieve geometry from family instances:
 
 First, the article
 on [GeometryInstances](https://knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhelp/2016/ENU/Revit-API/files/GUID-B4F83374-0DF6-4737-91EB-900E676E862B-htm.html) explains:
@@ -127,14 +134,16 @@ on [GeometryInstances](https://knowledge.autodesk.com/search-result/caas/CloudHe
   It also points to the helpful [Example: Retrieve Geometry Data from a Beam](https://knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhelp/2016/ENU/Revit-API/files/GUID-F092BCCC-77E9-4DA9-9264-10F0DB354BF5-htm.html), which reiterates:
   
   > The `GeometryElement` may contain the desired geometry as a `Solid` or `GeometryInstance`, depending on whether a beam is joined or standalone, and this code covers both cases...
-  
+
+If this is unclear to you, please refer to the detailed knowledgebase explanations.
+
 ####<a name="5"></a> Exporting Parameters to Access
 
 Another short note from the discussion forum
 on [how to export selected parameters to MS access using my own ribbon](
 https://forums.autodesk.com/t5/revit-api-forum/how-to-export-selected-parameters-to-ms-access-using-my-own/m-p/8960356):
 
-**Question:** If I want to create my own ribbon within add-ins menu of revit 2019. And when I click the ribbon, it will show the window that asks me which parameters I want to export to MS access file. (I want to be able to select the required parameters of each element.) Can you suggest any api sample code? Thank you.
+**Question:** If I want to create my own ribbon within add-ins menu of Revit 2019. And when I click the ribbon, it will show the window that asks me which parameters I want to export to MS access file. (I want to be able to select the required parameters of each element.) Can you suggest any API sample code? Thank you.
 
 **Answer:** Look at the [ADN Xtra labs](https://github.com/jeremytammik/AdnRevitApiLabsXtra), 
 in the `XtraCs` project, module Lab4.cs, especially the external
