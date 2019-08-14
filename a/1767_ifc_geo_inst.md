@@ -140,8 +140,7 @@ If this is unclear to you, please refer to the detailed knowledgebase explanatio
 ####<a name="5"></a> Exporting Parameters to Access
 
 Another short note from the discussion forum
-on [how to export selected parameters to MS access using my own ribbon](
-https://forums.autodesk.com/t5/revit-api-forum/how-to-export-selected-parameters-to-ms-access-using-my-own/m-p/8960356):
+on [how to export selected parameters to MS access using my own ribbon](https://forums.autodesk.com/t5/revit-api-forum/how-to-export-selected-parameters-to-ms-access-using-my-own/m-p/8960356):
 
 **Question:** If I want to create my own ribbon within add-ins menu of Revit 2019. And when I click the ribbon, it will show the window that asks me which parameters I want to export to MS access file. (I want to be able to select the required parameters of each element.) Can you suggest any API sample code? Thank you.
 
@@ -153,7 +152,7 @@ and [Lab4_2_ExportParametersToExcel](https://github.com/jeremytammik/AdnRevitApi
 ####<a name="6"></a> Store Globals on Custom DataStorage, not ProjectInfo
 
 Talking about parameters, I implemented an add-in to round-trip Revit element parameters to Forge and back, enabling
-to [Use Forge or an external spreadsheet to create shared parameters](https://thebuildingcoder.typepad.com/blog/2017/09/use-forge-or-spreadsheet-to-create-shared-parameters.html).
+the [use of Forge or an external spreadsheet to create shared parameters](https://thebuildingcoder.typepad.com/blog/2017/09/use-forge-or-spreadsheet-to-create-shared-parameters.html).
 
 A recent [comment](https://thebuildingcoder.typepad.com/blog/2017/09/use-forge-or-spreadsheet-to-create-shared-parameters.html#comment-4568543582) on that once again brought up the topic of storing global information in the model.
 

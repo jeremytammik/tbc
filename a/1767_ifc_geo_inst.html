@@ -132,7 +132,7 @@ commands <a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra/blob/maste
 and <a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra/blob/master/XtraCs/Labs4.cs#L268-L509">Lab4_2_ExportParametersToExcel</a>.</p>
 <h4><a name="6"></a> Store Globals on Custom DataStorage, not ProjectInfo</h4>
 <p>Talking about parameters, I implemented an add-in to round-trip Revit element parameters to Forge and back, enabling
-to <a href="https://thebuildingcoder.typepad.com/blog/2017/09/use-forge-or-spreadsheet-to-create-shared-parameters.html">Use Forge or an external spreadsheet to create shared parameters</a>.</p>
+the <a href="https://thebuildingcoder.typepad.com/blog/2017/09/use-forge-or-spreadsheet-to-create-shared-parameters.html">use of Forge or an external spreadsheet to create shared parameters</a>.</p>
 <p>A recent <a href="https://thebuildingcoder.typepad.com/blog/2017/09/use-forge-or-spreadsheet-to-create-shared-parameters.html#comment-4568543582">comment</a> on that once again brought up the topic of storing global information in the model.</p>
 <p>If you wish to do so, do not store it on the <code>ProjectInfo</code> singleton element; rather, you can and should create your own <code>DataStorage</code> element for this purpose, as explained in the note
 on <a href="https://thebuildingcoder.typepad.com/blog/2016/11/1500-posts-devday-and-storing-a-dictionary.html#5">storing a dictionary &ndash; use <code>DataStorage</code>, not <code>ProjectInfo</code></a>.</p>
