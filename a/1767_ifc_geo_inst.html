@@ -60,6 +60,19 @@ Here are some other topics that came up in the past few days
 
 linkedin:
 
+IFC update, access to family instance geometry, parameters, global data and Iranian civil engineering app using the #RevitAPI
+
+http://bit.ly/rvtifc201
+
+I completed the move to my new computer, and happily all systems go now.
+Here are some other topics that came up in the past few days:
+
+- Revit-IFC Release 20.1.0
+- Community discussion on Revit
+- Solid or instance, depending
+- Exporting parameters to Access
+- Store globals on custom <code>DataStorage</code>, not <code>ProjectInfo</code>
+- Iranian civil engineering project video...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -76,12 +89,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li><a href="#4">Solid or instance, depending</a></li>
 <li><a href="#5">Exporting parameters to Access</a></li>
 <li><a href="#6">Store globals on custom <code>DataStorage</code>, not <code>ProjectInfo</code></a></li>
-<li><a href="#7">Iranian civil engineering project video</a></li>
 </ul>
+<!-- - [Iranian civil engineering project video](#7) -->
+
 <p><center>
 <img src="img/mahabghodss_video.png" alt="Mahab Ghodss civil engineering app" width="450">
-<p style="font-size: 80%; font-style:italic">Iranian civil engineering project</p>
+<p style="font-size: 80%; font-style:italic">Mahab Ghodss civil engineering project (<a href="https://thebuildingcoder.typepad.com/files/mahabghodss_video.mp4">video</a>)</p> 
 </center></p>
+<ul>
+<li><a href="#7">Iranian civil engineering project video</a></li>
+</ul>
 <h4><a name="2"></a> Revit-IFC Release 20.1.0</h4>
 <p><a href="https://github.com/Autodesk/revit-ifc/releases/tag/IFC_v20.1.0">Release 20.1.0 for Revit 2020</a> has been released.</p>
 <p>It includes 20.0.0.0 plus the out-of-the-box Revit 2020 IFC functionalities, bug fixes and various regression fixes.</p>
@@ -136,11 +153,17 @@ the <a href="https://thebuildingcoder.typepad.com/blog/2017/09/use-forge-or-spre
 <p>A recent <a href="https://thebuildingcoder.typepad.com/blog/2017/09/use-forge-or-spreadsheet-to-create-shared-parameters.html#comment-4568543582">comment</a> on that once again brought up the topic of storing global information in the model.</p>
 <p>If you wish to do so, do not store it on the <code>ProjectInfo</code> singleton element; rather, you can and should create your own <code>DataStorage</code> element for this purpose, as explained in the note
 on <a href="https://thebuildingcoder.typepad.com/blog/2016/11/1500-posts-devday-and-storing-a-dictionary.html#5">storing a dictionary &ndash; use <code>DataStorage</code>, not <code>ProjectInfo</code></a>.</p>
-<h4><a name="7"></a> Iranian Civil Engineering Project Video</h4>
-<p>To close, Ahmad Rouzbehani, Civil Engineer and Software Developer at <a href="http://mahabghodss.net/ExternalSites/new/en/DefaultEN.aspx">Mahab Ghodss</a>,
-shared an impressive <a href="https://dms.licdn.com/playback/C4D05AQGxc2GCtF1W5A/5b63cbd0e027484da68e17ef5504d8ad/feedshare-mp4_3300-captions-thumbnails/1507940147251-drlcss?e=1565766000&amp;v=beta&amp;t=wrjeczTUvfw8Y-oamIE17J3GX_A9DU9iCAgsyHH9-GQ">video</a> (<a href="zip/mahabghodss_video.mp4">local link</a>) on LinkedIn:</p>
-<blockquote>
-<p>This video shows how I automate Revit to produce 3D models by reusing pre-built families in a Revit project after reshaping them by user parameter values &ndash; an intake in this case.</p>
-<p>By programming on the server side to automate Autodesk Revit and Autodesk Civil 3D, as well as a lot of JavaScript coding on the client side, engineers are able to design the irrigation network and belonging structures, get true 3D images of structural models, print shop drawings, as well as have quantities measured for structures or excavation volumes simply through a web browser or a mobile device which is connected to the local network.</p>
-</blockquote>
-<p>Thanks to Ahmad for sharing this, and congratulations on implementing this impressive workflow!</p>
+<!--
+
+####<a name="7"></a> Iranian Civil Engineering Project Video
+
+To close, Ahmad Rouzbehani, Civil Engineer and Software Developer at [Mahab Ghodss](http://mahabghodss.net/ExternalSites/new/en/DefaultEN.aspx),
+shared an impressive [video](https://dms.licdn.com/playback/C4D05AQGxc2GCtF1W5A/5b63cbd0e027484da68e17ef5504d8ad/feedshare-mp4_3300-captions-thumbnails/1507940147251-drlcss?e=1565766000&v=beta&t=wrjeczTUvfw8Y-oamIE17J3GX_A9DU9iCAgsyHH9-GQ) ([local link](zip/mahabghodss_video.mp4)) on LinkedIn:
+
+> This video shows how I automate Revit to produce 3D models by reusing pre-built families in a Revit project after reshaping them by user parameter values &ndash; an intake in this case.
+
+> By programming on the server side to automate Autodesk Revit and Autodesk Civil 3D, as well as a lot of JavaScript coding on the client side, engineers are able to design the irrigation network and belonging structures, get true 3D images of structural models, print shop drawings, as well as have quantities measured for structures or excavation volumes simply through a web browser or a mobile device which is connected to the local network.
+
+Thanks to Ahmad for sharing this, and congratulations on implementing this impressive workflow!
+
+-->
