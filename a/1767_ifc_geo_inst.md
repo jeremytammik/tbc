@@ -61,6 +61,19 @@ Here are some other topics that came up in the past few days
 
 linkedin:
 
+IFC update, access to family instance geometry, parameters, global data and Iranian civil engineering app using the #RevitAPI
+
+http://bit.ly/rvtifc201
+
+I completed the move to my new computer, and happily all systems go now.
+Here are some other topics that came up in the past few days:
+
+- Revit-IFC Release 20.1.0
+- Community discussion on Revit
+- Solid or instance, depending
+- Exporting parameters to Access
+- Store globals on custom <code>DataStorage</code>, not <code>ProjectInfo</code>
+- Iranian civil engineering project video...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -79,12 +92,15 @@ Here are some other topics that came up in the past few days:
 - [Solid or instance, depending](#4)
 - [Exporting parameters to Access](#5)
 - [Store globals on custom `DataStorage`, not `ProjectInfo`](#6)
-- [Iranian civil engineering project video](#7)
+
+<!-- - [Iranian civil engineering project video](#7) --> 
 
 <center>
 <img src="img/mahabghodss_video.png" alt="Mahab Ghodss civil engineering app" width="450">
-<p style="font-size: 80%; font-style:italic">Iranian civil engineering project</p>
+<p style="font-size: 80%; font-style:italic">Mahab Ghodss civil engineering project (<a href="https://thebuildingcoder.typepad.com/files/mahabghodss_video.mp4">video</a>)</p> 
 </center>
+
+- [Iranian civil engineering project video](#7)
 
 ####<a name="2"></a> Revit-IFC Release 20.1.0 
 
@@ -159,6 +175,8 @@ A recent [comment](https://thebuildingcoder.typepad.com/blog/2017/09/use-forge-o
 If you wish to do so, do not store it on the `ProjectInfo` singleton element; rather, you can and should create your own `DataStorage` element for this purpose, as explained in the note
 on [storing a dictionary &ndash; use `DataStorage`, not `ProjectInfo`](https://thebuildingcoder.typepad.com/blog/2016/11/1500-posts-devday-and-storing-a-dictionary.html#5).
 
+<!--
+
 ####<a name="7"></a> Iranian Civil Engineering Project Video
 
 To close, Ahmad Rouzbehani, Civil Engineer and Software Developer at [Mahab Ghodss](http://mahabghodss.net/ExternalSites/new/en/DefaultEN.aspx),
@@ -170,3 +188,4 @@ shared an impressive [video](https://dms.licdn.com/playback/C4D05AQGxc2GCtF1W5A/
 
 Thanks to Ahmad for sharing this, and congratulations on implementing this impressive workflow!
 
+-->
