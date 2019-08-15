@@ -31,11 +31,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Changing Pipe Direction
 
-One of tday's [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
-prompted a couple of MEP duct- and pipework topics:
+One of today's [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
+prompted a discussion of MEP duct- and pipework creation topics:
 
-- [Changing Pipe Direction](#2)
-- [MEP Ductwork Creation Tip](#3)
+- [Changing pipe direction](#2)
+- [MEP ductwork creation tip](#3)
 
 <center>
 <img src="img/tee_connect.png" alt="Tee branch fitting" width="450">
@@ -49,14 +49,14 @@ on [changing pipe direction](https://forums.autodesk.com/t5/revit-api-forum/chan
 
 **Question:** I am trying to place a pipe precisely between two points: intersectionPoint and intersectionPoint + perpendicularDirection. I am using the following statement to move the pipe:
 
- <pre class="code">
+<pre class="code">
   Pipe dummyPipe = doc.GetElement(
     ElementTransformUtils.CopyElement(
       doc, branchPipe.Id, XYZ.Zero).First()) as Pipe;
-      
+
   (dummyPipe.Location as LocationCurve).Curve
     = Line.CreateBound( intersectionPoint,
-      intersectionPoint + 1.0 * perpendicularDirection );
+      intersectionPoint + perpendicularDirection );
 </pre>
 
 With the above placement, I would expect the pipe's curve's direction to be exactly equal to perpendicularDirection, but that's not the case.
@@ -74,7 +74,7 @@ Any idea how to fix this?
 
 Revit will automatically adjust the newly created element appropriately to connect with the existing elements.
 
-Different variantions of this approach are explored and discussed in the research series
+Different variations of this approach are explored and discussed in the research series
 on [creating a rolling offset](http://thebuildingcoder.typepad.com/blog/2014/01/final-rolling-offset-using-pipecreate.html).
 
 Here are some other old articles on the `NewTakeoffFitting` method and tags:
@@ -109,7 +109,7 @@ In my case, I am inserting a T connection, and that API is a horrible mess. Here
 
 - `CreateTeeFitting` works only when the connection is 90 degrees, so you have to use the workaround mentioned in [Tee Fitting with no right angle](https://forums.autodesk.com/t5/revit-api-forum/tee-fitting-with-no-right-angle/m-p/8954339).
 - The above workaround works only when the base pipe is placed in a way that's acceptable to Revit. As an example, adding a Tee connection works if the two pipes are placed along X axis and the branch pipe is along the Y-axis. But, if I rotate the three pipes slightly, for example by 0.1 degrees, the `CreateTeeFitting` function fails.
-- So now I have to use another workaround, creating dummy pipes in a position that Revit likes and a 90 degree T connection. Then delete all the dummy pipes and the fittings that were automatically created, except the T connection. Now rotate the T fitting to what I want, for e.g. by 0.1 degrees. Then change the angle of the branch connector to something other than 90 degrees.
+- So now I have to use another workaround, creating dummy pipes in a position that Revit likes and a 90-degree T connection. Then delete all the dummy pipes and the fittings that were automatically created, except the T connection. Now rotate the T fitting to what I want, for e.g. by 0.1 degrees. Then change the angle of the branch connector to something other than 90 degrees.
 
 This issue along
 with [line based family location don't update origin after change](https://forums.autodesk.com/t5/revit-api-forum/tee-fitting-with-no-right-angle/m-p/8954339) has
@@ -121,11 +121,11 @@ Sorry to hear that the API is so hard to use in this situation.
 
 ####<a name="3"></a> MEP Ductwork Creation Tip 
 
-This seems to be an apropriate time and place to highlight an MEP ductwork creation tip shared by Ollikat in
+A while ago, Ollikat shared a general MEP ductwork creation tip in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [automatic duct between fittings](https://forums.autodesk.com/t5/revit-api-forum/automatic-duct-between-fittings/m-p/8890265), where he summarises:
+on [automatic duct between fittings](https://forums.autodesk.com/t5/revit-api-forum/automatic-duct-between-fittings/m-p/8890265), summarising his extensive experience in this area:
 
 > In summary, I have been co-working several years with my colleague in a feature where different parts of network (duct, pipes, etc.) are being created and connected via API. If we would need to redo everything from scratch today, we definitely would use only low-level methods, like `CreateFamilyInstance` etc., and then explicitly move, rotate and connect each part of the network separately (also meaning that if there's a need for reducer, create it manually). This is the best approach, because using higher level methods like `NewElbowFitting` etc. causes all sort of problems, and it is a very tedious job to implement a reliable solution for every possible scenario. Using low level methods gives you total control over what's happening. It's not convenient, but, in the long run, will save your time. This, of course, depends what kind of add-in you are developing.
 
-> Unfortunately, the main point is that there's no easy way of generate networks via API.
+> Unfortunately, the main point is that there's no easy way of generating networks in the Revit API.
 
