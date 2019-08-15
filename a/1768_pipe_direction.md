@@ -6,69 +6,69 @@
 
 <!---
 
+- 11711167 [Connect/Add Pipe at Specified Angle]
+
+- mep ductwork creation tips from ollikat
+  https://forums.autodesk.com/t5/revit-api-forum/automatic-duct-between-fittings/m-p/8890265
+
 twitter:
 
-IFC update, access to family instance geometry, parameters, global data and Iranian civil engineering app using the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/rvtifc201
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-I completed the move to my new computer, and happily all systems go now.
-Here are some other topics that came up in the past few days
-&ndash; Revit-IFC Release 20.1.0
-&ndash; Community discussion on Revit
-&ndash; Solid or instance, depending
-&ndash; Exporting parameters to Access
-&ndash; Store globals on custom <code>DataStorage</code>, not <code>ProjectInfo</code>
-&ndash; Iranian civil engineering project video...
+&ndash; 
+...
 
 linkedin:
 
-IFC update, access to family instance geometry, parameters, global data and Iranian civil engineering app using the #RevitAPI
-
-http://bit.ly/rvtifc201
-
-I completed the move to my new computer, and happily all systems go now.
-Here are some other topics that came up in the past few days:
-
-- Revit-IFC Release 20.1.0
-- Community discussion on Revit
-- Solid or instance, depending
-- Exporting parameters to Access
-- Store globals on custom <code>DataStorage</code>, not <code>ProjectInfo</code>
-- Iranian civil engineering project video...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 
+<p style="font-size: 80%; font-style:italic"></p>
+
 -->
 
 ### Changing Pipe Direction
 
+One of tday's [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
+prompted a couple of MEP duct- and pipework topics:
+
+- [Changing Pipe Direction](#2)
+- [MEP Ductwork Creation Tip](#3)
+
 <center>
-<img src="img/.png" alt="" width="450">
-<p style="font-size: 80%; font-style:italic"></p>
+<img src="img/tee_connect.png" alt="Tee branch fitting" width="450">
 </center>
 
 ####<a name="2"></a> Changing Pipe Direction
 
-Neerav Mehta shared some important hints on determining precise directions for inserting pipe fittings in
+Neerav Mehta shared some research on determining precise directions for inserting pipe fittings in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [changing pipe direction](https://forums.autodesk.com/t5/revit-api-forum/changing-pipe-direction/m-p/8966993):
 
 **Question:** I am trying to place a pipe precisely between two points: intersectionPoint and intersectionPoint + perpendicularDirection. I am using the following statement to move the pipe:
 
  <pre class="code">
-Pipe dummyPipe = doc.GetElement(ElementTransformUtils.CopyElement(doc, branchPipe.Id, XYZ.Zero).First()) as Pipe;
-(dummyPipe.Location as LocationCurve).Curve = Line.CreateBound(intersectionPoint, intersectionPoint + 1.0 * perpendicularDirection);
+  Pipe dummyPipe = doc.GetElement(
+    ElementTransformUtils.CopyElement(
+      doc, branchPipe.Id, XYZ.Zero).First()) as Pipe;
+      
+  (dummyPipe.Location as LocationCurve).Curve
+    = Line.CreateBound( intersectionPoint,
+      intersectionPoint + 1.0 * perpendicularDirection );
 </pre>
 
-With the above placement, I would expect the pipe's curve's direction to be exactly equal to perpendicularDirection. But that's not the case.
+With the above placement, I would expect the pipe's curve's direction to be exactly equal to perpendicularDirection, but that's not the case.
 
-As an example, if perpendicularDirection is set to {(-0.016831296, 0.968685013, -0.052781984)}, the direction of the pipe comes out to be {(-0.017347059, 0.998368562, -0.054399389)}. Note that there is a slight difference in the direction and as a result, I am not able to connect this pipe to a Tee fitting, as described in the thread
+As an example, if `perpendicularDirection` is set to {(-0.016831296, 0.968685013, -0.052781984)}, the direction of the pipe comes out to be {(-0.017347059, 0.998368562, -0.054399389)}.
+
+Note that there is a slight difference in the direction and, as a result, I am not able to connect this pipe to a Tee fitting, as described in the thread
 on [how to create a tee fitting with a non-90 degree branch angle for pipe](https://forums.autodesk.com/t5/revit-api-forum/how-to-create-a-tee-fitting-of-not-90-degree-branch-angle-for/td-p/8433556).
 
 BTW, the same issue happens even if I create a new pipe between two points.
 
-Any idea how to fix this issue?
+Any idea how to fix this?
 
 **Suggestion:** In some cases, you do not need to specify an exact pipe direction to create a pipe between fittings, nor an exact fitting location to insert a fitting between existing pipes.
 
@@ -77,7 +77,16 @@ Revit will automatically adjust the newly created element appropriately to conne
 Different variantions of this approach are explored and discussed in the research series
 on [creating a rolling offset](http://thebuildingcoder.typepad.com/blog/2014/01/final-rolling-offset-using-pipecreate.html).
 
-**Solution:** The problem in this case, however, was due to inaccuracy in the cross product.
+Here are some other old articles on the `NewTakeoffFitting` method and tags:
+
+- [Use of `NewTakeOffFitting` on a duct](http://thebuildingcoder.typepad.com/blog/2011/02/use-of-newtakeofffitting-on-a-duct.html)
+- [Use of `NewTakeOffFitting` on a pipe](http://thebuildingcoder.typepad.com/blog/2011/04/use-of-newtakeofffitting-on-a-pipe.html)
+- [Adjustable versus perpendicular spud](http://thebuildingcoder.typepad.com/blog/2013/02/adjustable-versus-perpendicular-spud.html)
+- [Splitting a duct or pipe with taps](http://thebuildingcoder.typepad.com/blog/2014/02/daylighting-extension-and-splitting-with-taps.html#3)
+
+**Solution:** I looked at the rolling offset, but it deals only with elbows, not tee fittings.
+
+The problem in this case, however, was due to inaccuracy in the cross product.
 
 I was deriving the pipe direction by doing two cross-products of unit-norm vectors. In other words:
 
@@ -110,10 +119,13 @@ Congratulations and many thanks to Neerav Mehta for this research and solution.
 
 Sorry to hear that the API is so hard to use in this situation. 
 
-####<a name="3"></a> 
+####<a name="3"></a> MEP Ductwork Creation Tip 
 
-####<a name="4"></a> 
+This seems to be an apropriate time and place to highlight an MEP ductwork creation tip shared by Ollikat in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [automatic duct between fittings](https://forums.autodesk.com/t5/revit-api-forum/automatic-duct-between-fittings/m-p/8890265), where he summarises:
 
-####<a name="5"></a> 
+> In summary, I have been co-working several years with my colleague in a feature where different parts of network (duct, pipes, etc.) are being created and connected via API. If we would need to redo everything from scratch today, we definitely would use only low-level methods, like `CreateFamilyInstance` etc., and then explicitly move, rotate and connect each part of the network separately (also meaning that if there's a need for reducer, create it manually). This is the best approach, because using higher level methods like `NewElbowFitting` etc. causes all sort of problems, and it is a very tedious job to implement a reliable solution for every possible scenario. Using low level methods gives you total control over what's happening. It's not convenient, but, in the long run, will save your time. This, of course, depends what kind of add-in you are developing.
 
+> Unfortunately, the main point is that there's no easy way of generate networks via API.
 
