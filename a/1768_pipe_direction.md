@@ -21,6 +21,14 @@ One of today's Revit API discussion forum threads prompted a discussion of MEP d
 
 linkedin:
 
+MEP ductwork and changing pipe direction in the #RevitAPI
+
+http://bit.ly/pipedirection
+
+One of today's Revit API discussion forum threads prompted a discussion of MEP duct- and pipework creation topics:
+
+- Changing pipe direction
+- MEP ductwork creation tip...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
