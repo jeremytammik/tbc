@@ -13,10 +13,11 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+MEP ductwork and changing pipe direction in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+One of today's Revit API discussion forum threads prompted a discussion of MEP duct- and pipework creation topics
+&ndash; Changing pipe direction
+&ndash; MEP ductwork creation tip...
 
 linkedin:
 
@@ -29,7 +30,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Changing Pipe Direction
+### MEP Ductwork and Changing Pipe Direction
 
 One of today's [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
 prompted a discussion of MEP duct- and pipework creation topics:
@@ -77,7 +78,7 @@ Revit will automatically adjust the newly created element appropriately to conne
 Different variations of this approach are explored and discussed in the research series
 on [creating a rolling offset](http://thebuildingcoder.typepad.com/blog/2014/01/final-rolling-offset-using-pipecreate.html).
 
-Here are some other old articles on the `NewTakeoffFitting` method and tags:
+Here are some previous articles on the `NewTakeoffFitting` method and taps:
 
 - [Use of `NewTakeOffFitting` on a duct](http://thebuildingcoder.typepad.com/blog/2011/02/use-of-newtakeofffitting-on-a-duct.html)
 - [Use of `NewTakeOffFitting` on a pipe](http://thebuildingcoder.typepad.com/blog/2011/04/use-of-newtakeofffitting-on-a-pipe.html)
