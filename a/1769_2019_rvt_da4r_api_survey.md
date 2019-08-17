@@ -9,7 +9,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/pipedirection
+Revit API and Design Automation API Survey for the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/rvtapisurvey
 
 The Revit product team is conducting a survey to improve the functionality of the Revit services.
 Please help them prioritise new features and upcoming enhancements to future releases of the Autodesk Revit API and the Forge Design Automation for Revit API by taking a brief survey...
