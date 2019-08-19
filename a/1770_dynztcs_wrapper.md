@@ -71,19 +71,21 @@ Dynamo Zero Touch CS#Node Element Wrapper
 
 ### Zero Touch Node Wrapper and Load from Stream
 
-Let's start the week with
-these [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) topics
-from last week:
+Let's start this week with these topics that came up in the last one:
 
+- [Dynamo Zero Touch Node Revit element wrapper](#2)
+- [Loading a .NET assembly from a memory stream](#3)
+- [How to become a successful freelancer](#4)
 
-
+Talking about memory streams, I hiked up Rio Chillar from Nerja:
 
 <center>
-<img src="img/.png" alt="" width="100">
+<img src="img/rio_chillar.jpg" alt="Rio Chillar" width="400">
+<p style="font-size: 80%; font-style:italic">Natural stream &ndash; Rio Chillar</p>
 </center>
 
 
-####<a name="2"></a> Wrapper Required to Pass an Element from Revit to Dynamo
+####<a name="2"></a> Dynamo Zero Touch Node Revit Element Wrapper
 
 Yet another solution suggested by
 Frank [@Fair59](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/2083518) Aarssen
@@ -138,7 +140,7 @@ Here's the working script:
 
 Many thanks for Alexandra and Frank for clarifying this!
 
-####<a name="3"></a> Load .NET Assembly from Memory Stream
+####<a name="3"></a> Loading a .NET Assembly from a Memory Stream
 
 A little note on how the add-in manager avoids locking the DLLs it loads:
 
