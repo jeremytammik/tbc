@@ -77,7 +77,7 @@ Let's start this week with these topics that came up in the last one:
 - [Loading a .NET assembly from a memory stream](#3)
 - [How to become a successful freelancer](#4)
 
-Talking about memory streams, I hiked up Rio Chillar from Nerja:
+Talking about memory streams, I hiked up Rio Chillar in Nerja, Andalusia:
 
 <center>
 <img src="img/rio_chillar.jpg" alt="Rio Chillar" width="400">
@@ -98,7 +98,7 @@ When I try to return the element id, the id of the dimension type appears, but n
 
 When I tried to return the Revit element itself using the `GetElement` method and changed the return type to `Element` rather than `ElementType`, it still gives me the same output.
 
-**Answer:** You can not directly return a Revit class. You need to wrap it in a Dynamo wrapper class.
+**Answer:** You cannot directly return a Revit class. You need to wrap it in a Dynamo wrapper class.
 
 Please see how to [become a Dynamo Zero Touch C# Node developer in 75 minutes](https://forum.dynamobim.com/t/become-a-dynamo-zero-touch-c-node-developer-in-75-minutes/28007)
 and download the handout.
@@ -156,16 +156,16 @@ Cf. also [how to load assembly from stream](https://stackoverflow.com/questions/
 
 The add-in manager reads the DLL file from disk, converts it to a memory stream, and uses that to load the .NET code into the .NET environment. Therefore, .NET never gets to see or touch (or lock) the DLL file.
 
-This appRoach has also been used to implement frameworks
+This approach has also been used to implement frameworks
 enabling [debug and continue functionality for Revit add-ins](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.49).
 
 
-####<a name="4"></a> How to Become a Successful Freelancer Poscast
+####<a name="4"></a> How to Become a Successful Freelancer
 
 Let\s close with this 90-minute [freeCodeCamp](https://www.freecodecamp.org) interview
 on [how to become a successful freelancer](https://www.freecodecamp.org/news/how-to-become-a-successful-freelancer-podcast):
 
-> Kyle dropped out of school and worked as a jewelry salesman before teaching himself to code.
+> Kyle dropped out of school and worked as a jewellery salesman before teaching himself to code.
 
 > His freelance business grew, and he now runs a profitable software development consultancy...
 
