@@ -62,6 +62,18 @@ Here are some topics that came up last week
 
 linkedin:
 
+Successful freelancing, loading an assembly from a memory stream to prevent DLL locking, and wrapping an element for Dynamo zero-touch node in the #RevitAPI 
+
+http://bit.ly/zerotouchnodewrappeer
+
+Here are some topics that came up last week:
+
+- Dynamo Zero Touch Node Revit element wrapper
+- Loading a .NET assembly from a memory stream
+- How to become a successful freelancer
+
+Talking about memory streams, I hiked up Rio Chillar in Nerja, Andalusia...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
