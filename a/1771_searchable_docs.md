@@ -19,8 +19,9 @@ twitter:
 
  element for Dynamo in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Happy Birthday to The Building Coder!
+The online Revit API documentation now supports full text search.
+Dynamo implements a new <code>ViewCone</code> functionality...
 
 linkedin:
 
