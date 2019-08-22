@@ -109,7 +109,7 @@ This new link includes the full collection of class materials:
 ####<a name="4"></a> Improving Performance by Optimising CPU Voltage
 
 Daniel Gijsbers noticed the description and solution to
-my [MacBook Pro overheating problem](https://thebuildingcoder.typepad.com/blog/2019/06/accessing-bim360-cloud-links-thumbnail-and-dynamo.html#4) and
+my [MacBook Pro overheating problem](https://thebuildingcoder.typepad.com/blog/2019/06/accessing-bim360-cloud-links-thumbnail-and-dynamo.html#5) and
 very kindly responded:
 
 > I read your [blog post](https://thebuildingcoder.typepad.com/blog/2019/06/accessing-bim360-cloud-links-thumbnail-and-dynamo.html#4).
