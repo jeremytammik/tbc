@@ -7,17 +7,14 @@
 <!---
 
 - Gui Talarico
-@gtalarico
-Who doesn't love *Searchbable* Docs?
-Only took me 3 years to catch this
-Thanks guys  🔎🤦‍♂️
-https://twitter.com/gtalarico/status/1163345696038109184
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Who doesn&#39;t love *Searchbable* Docs?<br>Only took me 3 years to catch this<br>Thanks guys 🔎🤦‍♂️ <a href="https://t.co/4wXK3Re2Mw">pic.twitter.com/4wXK3Re2Mw</a></p>&mdash; Gui Talarico (@gtalarico) <a href="https://twitter.com/gtalarico/status/1163345696038109184?ref_src=twsrc%5Etfw">August 19, 2019</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  @gtalarico
+  Who doesn't love *Searchbable* Docs?
+  Only took me 3 years to catch this
+  https://twitter.com/gtalarico/status/1163345696038109184
+  <blockquote class="twitter-tweet"><p lang="en" dir="ltr">Who doesn&#39;t love *Searchbable* Docs?<br>Only took me 3 years to catch this<br>Thanks guys 🔎🤦‍♂️ <a href="https://t.co/4wXK3Re2Mw">pic.twitter.com/4wXK3Re2Mw</a></p>&mdash; Gui Talarico (@gtalarico) <a href="https://twitter.com/gtalarico/status/1163345696038109184?ref_src=twsrc%5Etfw">August 19, 2019</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
   revit_api_docs_full_text_search.jpeg
 
 twitter:
-
-11 Years and Revit API Docs Full Text Search
 
 Happy eleventh birthday to The Building Coder! The online Revit API documentation now supports full text search and Dynamo implements a new ViewCone functionality #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/apidocsearch
 
