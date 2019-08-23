@@ -39,83 +39,79 @@ the [announcement yesterday of The Building Coder's eleventh birthday](https://t
 
 **Answer:** Easy to solve, various approaches possible.
 
-I would suggest starting out by trying to use a journal file as described here:
+I would suggest starting out by trying to use a journal file as described for
+the [IFC import and conversion  script](http://thebuildingcoder.typepad.com/blog/2010/07/ifc-import-and-conversion-journal-script.html).
 
-http://thebuildingcoder.typepad.com/blog/2010/07/ifc-import-and-conversion-journal-script.html
+Another simple approach is to implement an event handler for the `DocumentOpened` event and automatically process the document immediately as soon as it is opened.
 
-Another simple approach is to implement an event handler for the DocumentOpened event and automatically process the document immediately as soon as it is opened.
+Can you provide a short description of the top-level user interaction, the top-level Revit add-in API architecture, and the top-level RVT model context of the functionality you wish to run?
 
-Shall I put together an add-in skeleton that executes automatically as soon as a document is loaded? then you can wire that up with the code you wish to execute.
+- Is it a single external command?
+- Does the user push one single button to run it, and nothing else?
+- Does it need to be run on all RVT files in a given directory?
+- Can you implement a text file listing the RVT models to process?
+- Is any user input at all required?
 
-**Question:** I don't fully understand what " add-in skeleton that executes automatically as soon as a document is loaded" means.
+**Response:** Currently, we just open the model and click our export button.
 
-But I understand the suggested solution. So if it is a step in the right direction - go right ahead
+That launches the code, running on that specific model along with all the links, and writing everything to some external SQLite and JSON files. No user interaction is required besides opening the model and clicking the button.
 
-**Answer:** in order for me to be able to start working on this, i would need a description of the top-level user interaction, the top-level Revit add-in API architecture , and the top-level RVT model context of the functionality you wish to run.
+It is fully synchronized (not async), so it blocks the GUI until it finishes.
 
-Is it a single external command?
-Does the user push one single button to run it, and nothing else?
-Does it need to be run on all RVT files in a given directory?
-Can you implement a text file listing the RVT models to process?
-Is any user input at all required?
-
-[R] Currently, we just open the model, click our export button (similar to RevitLookup) and our code starts running on that specific model along with all the links, and writing everything to some external SQLite and JSON files. No user interaction is required besides opening the model and clicking our button.
-
-It is fully synchronized (not async) so it "blocks" the GUI until it finishes.
-
-I'm not sure what you mean about API, do you mean the interface we implement for Revit? if so, it's this one:
+The interface we implement for Revit looks like this:
 
 <pre class="code">
-  [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.ReadOnly)]
-  internal class Main: IExternalCommand
+  [Transaction(TransactionMode.ReadOnly)]
+  class Main: IExternalCommand
   {
-    public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+    public Result Execute(
+      ExternalCommandData commandData,
+      ref string message,
+      ElementSet elements)
     {
-         using (Document mainDoc = commandData.Application.ActiveUIDocument.Document)
+      using (Document doc = commandData.Application.ActiveUIDocument.Document)
       {
-        using (RevitExport exporter = new RevitExport(mainDoc))
+        using (RevitExport exporter = new RevitExport(doc))
         {
           Stopwatch st = Stopwatch.StartNew();
           exporter.ExportEverything();
           Debug.Print($"Elapsed time: {st.Elapsed.TotalSeconds} seconds");
         }
       }
-     }
+    }
   }
 </pre>
 
-is that enough information?
-
-I don't understand how this method can work on more "complicated" scenarios, e.g. it failed to load some of the links, the configuration file was corrupted (we load some JSON config file) or anything.
-
-Not sure about the text file, since we just take all the links from the first one.
-
-**Answer:** Good. That is what I expected. This can easily be converted to autorun. The easiest solution is to use the manual user interface and the Revit journal file functionality like this:
+**Answer:** Good.
+That is what I expected.
+This can indeed easily be converted to autorun.
+The easiest solution might be to use the manual user interface and the Revit journal file functionality like this:
 
 - Rename your input file `X.rvt` to `input.rvt`.
 - Open Revit.
-- In the Revit user interface, perform the following steps steps:
+- In the Revit user interface, perform the following steps:
     - Open input.rvt.
     - Click your command button.
     - Shut down Revit.
-- Look at the journal file generated by this process. My journal files are generated in the folder `C:\Users\jta\AppData\Local\Autodesk\Revit\Autodesk Revit 2020\Journals`, and the most recent one is named `journal.0019.txt`.
+- Look at the journal file generated by this process.
+For instance, my journal files are generated in the folder *C:\Users\jeremy\AppData\Local\Autodesk\Revit\Autodesk Revit 2020\Journals*, and the most recent one is named *journal.0019.txt*.
 - Rename the newest journal file to `process_input.txt`
 
-Now you have completed the system. You can process a new model `Y.rvt` by executing the following:
+Now you have completed the system setup.
+
+You can process a new model `Y.rvt` by executing the following:
 
 ```
 copy Y.rvt input.rvt
-"C:\Program Files\Autodesk\Revit 2020\Revit.exe" "C:\Users\jta\AppData\Local\Autodesk\Revit\Autodesk Revit 2020\Journals\journal.0019.txt"
+"C:\Program Files\Autodesk\Revit 2020\Revit.exe" "C:\Users\jeremy\AppData\Local\Autodesk\Revit\Autodesk Revit 2020\Journals\process_input.txt"
 ```
 
 These two lines can be placed into a Windows batch or command file, and the original input filename specified as an argument.
 
-Here are two more detailed articles on using journal files to drive Revit:
+Besides the IFC conversion example mentioned above, here is another article on various aspects
+of [journal file replay](https://thebuildingcoder.typepad.com/blog/2009/07/journal-file-replay.html).
 
-- https://thebuildingcoder.typepad.com/blog/2010/07/ifc-import-and-conversion-journal-script.html
-- https://thebuildingcoder.typepad.com/blog/2009/07/journal-file-replay.html
-
-You can add some logging output to your external command, so that you have reliable information on whether the processing completed successfully.
+You should add some logging output to your external command, so that you have reliable information on whether the processing completed successfully.
 
 The advantage of this approach is its simplicity.
 
@@ -123,22 +119,21 @@ The disadvantage is that you start up and close down Revit for each file process
 
 However, since you can drive this automatically for any number of times, this is probably no problem if you have a couple of dozen files to process. If you have thousands, a more efficient approach would be needed.
 
-More efficient approaches can easily be implemented inside your add-in code. For instance, you implement another external command that processes multiple files by reading a text file listing the files to process. It can open them one by one programmatically, and launch your process on each by calling a method taking a `Document` input argument. To prepare for this approach, rewrite your `Execute` method to extract the document from the command data, and pass that into a `Process` method taking the `Document` argument. With these two external command in place, you have the choice of processing either one single file or an entire list of files with one single click. 
+More efficient approaches can easily be implemented inside your add-in code. For instance, you can implement another external command that processes multiple files by reading a text file listing the files to process. It can open them one by one programmatically and launch your process on each by calling a method taking a `Document` input argument. To prepare for this approach, rewrite your `Execute` method to extract the document from the command data, and pass that into a `Process` method taking the `Document` argument. With these two external commands in place, you have the choice of processing either one single file, the current open document, or an entire list of files, with one single click. 
 
-Since Revit is not built for processing hundreds of files in batch mode, this process will certainly fail sooner or later when working on a large number of files. Therefore, logging your progress is important. If you want the process to be fully automatic, you can implement additional functionality to check that it is still working, kill Revit if it has stopped, and restart again to continue processing whatever remains to be done. This kind of approach is documented in several articles:
+Since Revit is not built for processing hundreds of files in batch mode, processing will fail sooner or later when working on a large number of files. Therefore, logging your progress is important. If you want the process to be fully automatic, you can implement additional functionality to check that it is still working, kill Revit if it has stopped, and restart again to continue processing whatever remains to be done. This kind of approach is documented in several articles on batch processing:
 
-- [Batch Rendering Across Several Projects](https://thebuildingcoder.typepad.com/blog/2014/12/au-ends-and-batch-rendering-across-several-projects.html)
-- [Batch Processing Revit Documents](https://thebuildingcoder.typepad.com/blog/2015/08/batch-processing-dwfx-links-and-future-proofing.html#4)
-- [Batch Processing Revit Families and Documents](https://thebuildingcoder.typepad.com/blog/2019/04/batch-processing-and-aspects-of-asstringvalue.html#2)
+- [Batch rendering across several projects](https://thebuildingcoder.typepad.com/blog/2014/12/au-ends-and-batch-rendering-across-several-projects.html)
+- [Batch processing Revit documents](https://thebuildingcoder.typepad.com/blog/2015/08/batch-processing-dwfx-links-and-future-proofing.html#4)
+- [Batch processing Revit families and documents](https://thebuildingcoder.typepad.com/blog/2019/04/batch-processing-and-aspects-of-asstringvalue.html#2)
 
-[R] Sound good, I'll go ahead. A few more questions:
+**Response:** Sounds good, I'll go ahead with this.
+A few more questions:
 
 - Do I have any way to add conditions? E.g., verify that all linked models are loaded?
-- What if the plugin was modified? In that case I usually need to manually press "load plugin" on the popup. Can it be automated
+- What if the plugin was modified? In that case I usually need to manually press "load plugin" on the popup. Can this be automated as well?
 
 **Answer:** Good questions.
-
-Easy answer:
 
 The journal file is totally stupid. It will exactly reproduce what you did manually when it was recorded.
 
@@ -148,17 +143,17 @@ Therefore, the safest (and only possible) approach is to ensure that nothing doe
 
 If anything fails to load, the process will fail.
 
-Therefore the need to log each successful processing and check afterwards that everything worked.
+Therefore the need to log each successful processing and check afterwards that everything worked as expected.
 
-To answer your qeustions:
+To answer your specific questions:
 
-- Add conditions, e.g., verify that linked models are loaded?
+- Can I add conditions, e.g., verify that linked models are loaded?
 
 You can add such a check to your `Process` method and terminate gracefully if something is missing. Add the check to the external command first, ensure that it works and does something sensible in manual mode.
 
 - What if the plugin was modified? In that case I usually need to manually press "load plugin" on the popup. Can it be automated?
 
-The warning message can be eliminated completely by signing the DLL. This issue is discussed extensively in the forum thread
+The warning message can be eliminated completely by digitally signing the DLL. This issue is discussed extensively in the forum thread
 on [code signing of Revit add-ins](http://forums.autodesk.com/t5/revit-api/code-signing-of-revit-addins/m-p/5981560).
 The solution is documented in the Revit online help section
 on [digitally signing your Revit add-in](https://help.autodesk.com/view/RVT/2020/ENU/?guid=Revit_API_Revit_API_Developers_Guide_Introduction_Add_In_Integration_Digitally_Signing_Your_Revit_Add_in_html).
@@ -172,19 +167,19 @@ Thank you very much for the lively response and numerous congratulations on The 
 
 96 LinkedIn reactions, 5 Twitter retweets, 37 likes, 1693 impressions and 82 engagements, whatever those are.
 
-[Adam Sheather on Twitter](https://twitter.com/Gytaco/status/1164728843266957312?s=20)
-
-> Congrats mate! You are still my go-to site for Revit API problems, and the wealth of knowledge and time you put into the blog has provided unimaginable benefit for the community! Thank you!
-
-[Matt Taylor in a comment](https://thebuildingcoder.typepad.com/blog/2019/08/11-years-and-revit-api-docs-full-text-search.html#comment-4588231441)
+[Matt Taylor in a comment](https://thebuildingcoder.typepad.com/blog/2019/08/11-years-and-revit-api-docs-full-text-search.html#comment-4588231441):
 
 > Happy birthday TBC!
 
-[Amedeo Papi on LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:6570246697056780288?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A6570246697056780288%2C6570455407364571136%29)
+[Adam Sheather on Twitter](https://twitter.com/Gytaco/status/1164728843266957312?s=20):
 
-> Thank you Jeremy Tammik for everything you do for the #Autodesk users interested in development and programming!
+> Congrats mate! You are still my go-to site for Revit API problems, and the wealth of knowledge and time you put into the blog has provided unimaginable benefit for the community! Thank you!
 
-[Philippe Leefsma on LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:6570246697056780288?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A6570246697056780288%2C6570335510227632128%29)
+[Amedeo Papi on LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:6570246697056780288?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A6570246697056780288%2C6570455407364571136%29):
+
+> Thank you, Jeremy Tammik, for everything you do for the #Autodesk users interested in development and programming!
+
+[Philippe Leefsma on LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:6570246697056780288?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A6570246697056780288%2C6570335510227632128%29):
 
 > It will remain useful to Revit developers across the entire galaxy for centuries &nbsp; ;)
 
