@@ -7,8 +7,12 @@
 
 twitter:
 
-
 Auto-executing an external command in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+I had an extensive discussion on automatically driving Revit from outside to auto-execute a simple functionality with no user input, originally implemented by an external command.
+Also, a big thank you to all for the numerous congratulations on The Building Coder's eleventh birthday
+&ndash; Auto-executing an external command
+&ndash; Eleventh birthday congratulations...
 
 
 linkedin:
@@ -23,8 +27,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 <h3>Auto-Executing an External Command</h3>
 <p>I had an extensive discussion on automatically driving Revit from outside to auto-execute a simple functionality with no user input, originally implemented by an external command.</p>
-<p>Also, a big thank you to all for the numerous congratulations on
-the <a href="https://thebuildingcoder.typepad.com/blog/2019/08/11-years-and-revit-api-docs-full-text-search.html#2">announcement yesterday of The Building Coder's eleventh birthday</a>:</p>
+<p>Also, a big thank you to all for the numerous congratulations
+on <a href="https://thebuildingcoder.typepad.com/blog/2019/08/11-years-and-revit-api-docs-full-text-search.html#2">The Building Coder's eleventh birthday</a>:</p>
 <ul>
 <li><a href="#2">Auto-executing an external command</a></li>
 <li><a href="#3">Eleventh birthday congratulations</a></li>
@@ -56,7 +60,8 @@ the <a href="http://thebuildingcoder.typepad.com/blog/2010/07/ifc-import-and-con
       ref string message,
       ElementSet elements)
     {
-      using (Document doc = commandData.Application.ActiveUIDocument.Document)
+      using (Document doc
+        = commandData.Application.ActiveUIDocument.Document)
       {
         using (RevitExport exporter = new RevitExport(doc))
         {
@@ -69,8 +74,7 @@ the <a href="http://thebuildingcoder.typepad.com/blog/2010/07/ifc-import-and-con
   }
 </pre>
 
-<p><strong>Answer:</strong> Good.
-That is what I expected.
+<p><strong>Answer:</strong> That sounds good.
 This can indeed easily be converted to autorun.
 The easiest solution might be to use the manual user interface and the Revit journal file functionality like this:</p>
 <ul>
@@ -88,8 +92,11 @@ For instance, my journal files are generated in the folder <em>C:\Users\jeremy\A
 </ul>
 <p>Now you have completed the system setup.</p>
 <p>You can process a new model <code>Y.rvt</code> by executing the following:</p>
-<p><code>copy Y.rvt input.rvt
-"C:\Program Files\Autodesk\Revit 2020\Revit.exe" "C:\Users\jeremy\AppData\Local\Autodesk\Revit\Autodesk Revit 2020\Journals\process_input.txt"</code></p>
+<pre>
+copy Y.rvt input.rvt
+"C:\Program Files\Autodesk\Revit 2020\Revit.exe" "C:\Users\...\Journals\process_input.txt"
+</pre>
+
 <p>These two lines can be placed into a Windows batch or command file, and the original input filename specified as an argument.</p>
 <p>Besides the IFC conversion example mentioned above, here is another article on various aspects
 of <a href="https://thebuildingcoder.typepad.com/blog/2009/07/journal-file-replay.html">journal file replay</a>.</p>
@@ -131,7 +138,7 @@ on <a href="https://help.autodesk.com/view/RVT/2020/ENU/?guid=Revit_API_Revit_AP
 <p>Alternatively, every time the DLL is modified, load it manually once and click 'Always load'. From then on, the message will not appear again, as long as the DLL is not modified.</p>
 <h4><a name="3"></a> Thank you for your Eleventh Birthday Congratulations</h4>
 <p>Thank you very much for the lively response and numerous congratulations on The Building Coder's eleventh birthday!</p>
-<p>96 LinkedIn reactions, 5 Twitter retweets, 37 likes, 1693 impressions and 82 engagements, whatever those are.</p>
+<p>Over a hundred LinkedIn reactions and over 4500 views there, over eighteen hundred Twitter impressions, almost a hundred Twitter 'engagements', and more, via other channels:</p>
 <p><a href="https://thebuildingcoder.typepad.com/blog/2019/08/11-years-and-revit-api-docs-full-text-search.html#comment-4588231441">Matt Taylor in a comment</a>:</p>
 <blockquote>
 <p>Happy birthday TBC!</p>
@@ -148,6 +155,7 @@ on <a href="https://help.autodesk.com/view/RVT/2020/ENU/?guid=Revit_API_Revit_AP
 <blockquote>
 <p>It will remain useful to Revit developers across the entire galaxy for centuries &nbsp; ;)</p>
 </blockquote>
+<p>Thank you ever so much for all the good wishes!</p>
 <p><center>
 <img src="img/tbc_11_twitter_engagements.png" alt="Twitter engagements" width="600">
 </center></p>

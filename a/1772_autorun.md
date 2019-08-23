@@ -9,8 +9,12 @@
 
 twitter:
 
-
 Auto-executing an external command in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+I had an extensive discussion on automatically driving Revit from outside to auto-execute a simple functionality with no user input, originally implemented by an external command.
+Also, a big thank you to all for the numerous congratulations on The Building Coder's eleventh birthday
+&ndash; Auto-executing an external command
+&ndash; Eleventh birthday congratulations...
 
 
 linkedin:
@@ -27,8 +31,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 I had an extensive discussion on automatically driving Revit from outside to auto-execute a simple functionality with no user input, originally implemented by an external command.
 
-Also, a big thank you to all for the numerous congratulations on
-the [announcement yesterday of The Building Coder's eleventh birthday](https://thebuildingcoder.typepad.com/blog/2019/08/11-years-and-revit-api-docs-full-text-search.html#2):
+Also, a big thank you to all for the numerous congratulations
+on [The Building Coder's eleventh birthday](https://thebuildingcoder.typepad.com/blog/2019/08/11-years-and-revit-api-docs-full-text-search.html#2):
 
 - [Auto-executing an external command](#2)
 - [Eleventh birthday congratulations](#3)
@@ -69,7 +73,8 @@ The interface we implement for Revit looks like this:
       ref string message,
       ElementSet elements)
     {
-      using (Document doc = commandData.Application.ActiveUIDocument.Document)
+      using (Document doc
+        = commandData.Application.ActiveUIDocument.Document)
       {
         using (RevitExport exporter = new RevitExport(doc))
         {
@@ -82,8 +87,7 @@ The interface we implement for Revit looks like this:
   }
 </pre>
 
-**Answer:** Good.
-That is what I expected.
+**Answer:** That sounds good.
 This can indeed easily be converted to autorun.
 The easiest solution might be to use the manual user interface and the Revit journal file functionality like this:
 
@@ -101,10 +105,10 @@ Now you have completed the system setup.
 
 You can process a new model `Y.rvt` by executing the following:
 
-```
+<pre>
 copy Y.rvt input.rvt
-"C:\Program Files\Autodesk\Revit 2020\Revit.exe" "C:\Users\jeremy\AppData\Local\Autodesk\Revit\Autodesk Revit 2020\Journals\process_input.txt"
-```
+"C:\Program Files\Autodesk\Revit 2020\Revit.exe" "C:\Users\...\Journals\process_input.txt"
+</pre>
 
 These two lines can be placed into a Windows batch or command file, and the original input filename specified as an argument.
 
@@ -165,7 +169,7 @@ Alternatively, every time the DLL is modified, load it manually once and click '
 
 Thank you very much for the lively response and numerous congratulations on The Building Coder's eleventh birthday!
 
-96 LinkedIn reactions, 5 Twitter retweets, 37 likes, 1693 impressions and 82 engagements, whatever those are.
+Over a hundred LinkedIn reactions and over 4500 views there, over eighteen hundred Twitter impressions, almost a hundred Twitter 'engagements', and more, via other channels:
 
 [Matt Taylor in a comment](https://thebuildingcoder.typepad.com/blog/2019/08/11-years-and-revit-api-docs-full-text-search.html#comment-4588231441):
 
@@ -182,6 +186,8 @@ Thank you very much for the lively response and numerous congratulations on The 
 [Philippe Leefsma on LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:6570246697056780288?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A6570246697056780288%2C6570335510227632128%29):
 
 > It will remain useful to Revit developers across the entire galaxy for centuries &nbsp; ;)
+
+Thank you ever so much for all the good wishes!
 
 <center>
 <img src="img/tbc_11_twitter_engagements.png" alt="Twitter engagements" width="600">
