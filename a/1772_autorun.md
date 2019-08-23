@@ -10,7 +10,7 @@
 twitter:
 
 
- #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Auto-executing an external command in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
 
 linkedin:
@@ -21,22 +21,23 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 <p style="font-size: 80%; font-style:italic"></p>
 
-Dynamo Zero Touch CS#Node Element Wrapper
-
 -->
 
-### Autorun an External Command
+### Auto-Executing an External Command
 
-I had an extensive discussion on automatically driving Revit from outside to execute a simple functionality implemented by an external command with no user input.
+I had an extensive discussion on automatically driving Revit from outside to auto-execute a simple functionality with no user input, originally implemented by an external command.
 
-The Building Coder also received numerous congratulations on its eleventh birthday yesterday:
+Also, a big thank you to all for the numerous congratulations on
+the [announcement yesterday of The Building Coder's eleventh birthday](https://thebuildingcoder.typepad.com/blog/2019/08/11-years-and-revit-api-docs-full-text-search.html#2):
 
-- [Autorun an External Command](#2)
-- [Eleventh Birthday Congratulations](#3)
+- [Auto-executing an external command](#2)
+- [Eleventh birthday congratulations](#3)
 
-####<a name="2"></a> Autorun an External Command 
+####<a name="2"></a> Autorun an External Command
 
-[A] Easy to solve, various approaches possible.
+**Question:** I have an external command that I would prefer to execute automatically to avoid the need to manually start up Revit, open the RVT model, and launch the command. How can this be achieved?
+
+**Answer:** Easy to solve, various approaches possible.
 
 I would suggest starting out by trying to use a journal file as described here:
 
@@ -46,11 +47,11 @@ Another simple approach is to implement an event handler for the DocumentOpened 
 
 Shall I put together an add-in skeleton that executes automatically as soon as a document is loaded? then you can wire that up with the code you wish to execute.
 
-[Q] I don't fully understand what " add-in skeleton that executes automatically as soon as a document is loaded" means.
+**Question:** I don't fully understand what " add-in skeleton that executes automatically as soon as a document is loaded" means.
 
 But I understand the suggested solution. So if it is a step in the right direction - go right ahead
 
-[A] in order for me to be able to start working on this, i would need a description of the top-level user interaction, the top-level Revit add-in API architecture , and the top-level RVT model context of the functionality you wish to run.
+**Answer:** in order for me to be able to start working on this, i would need a description of the top-level user interaction, the top-level Revit add-in API architecture , and the top-level RVT model context of the functionality you wish to run.
 
 Is it a single external command?
 Does the user push one single button to run it, and nothing else?
@@ -89,7 +90,7 @@ I don't understand how this method can work on more "complicated" scenarios, e.g
 
 Not sure about the text file, since we just take all the links from the first one.
 
-[A] Good. That is what I expected. This can easily be converted to autorun. The easiest solution is to use the manual user interface and the Revit journal file functionality like this:
+**Answer:** Good. That is what I expected. This can easily be converted to autorun. The easiest solution is to use the manual user interface and the Revit journal file functionality like this:
 
 - Rename your input file `X.rvt` to `input.rvt`.
 - Open Revit.
@@ -135,7 +136,7 @@ Since Revit is not built for processing hundreds of files in batch mode, this pr
 - Do I have any way to add conditions? E.g., verify that all linked models are loaded?
 - What if the plugin was modified? In that case I usually need to manually press "load plugin" on the popup. Can it be automated
 
-[A] Good questions.
+**Answer:** Good questions.
 
 Easy answer:
 
@@ -169,14 +170,11 @@ Alternatively, every time the DLL is modified, load it manually once and click '
 
 Thank you very much for the lively response and numerous congratulations on The Building Coder's eleventh birthday!
 
-96 reactions on LinkedIn alone.
+96 LinkedIn reactions, 5 Twitter retweets, 37 likes, 1693 impressions and 82 engagements, whatever those are.
 
-5 Retweets 35 Likes, 1517 impressions and 72 engagements, whatever those are on Twitter.
-
- 
 [Adam Sheather on Twitter](https://twitter.com/Gytaco/status/1164728843266957312?s=20)
 
-> Congrats mate! You are still my go to site for Revit API problems, and the wealth of knowledge and time you put into the blog has provided unimaginable benefit for the community! Thank you!
+> Congrats mate! You are still my go-to site for Revit API problems, and the wealth of knowledge and time you put into the blog has provided unimaginable benefit for the community! Thank you!
 
 [Matt Taylor in a comment](https://thebuildingcoder.typepad.com/blog/2019/08/11-years-and-revit-api-docs-full-text-search.html#comment-4588231441)
 
@@ -188,7 +186,7 @@ Thank you very much for the lively response and numerous congratulations on The 
 
 [Philippe Leefsma on LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:6570246697056780288?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A6570246697056780288%2C6570335510227632128%29)
 
-> It will remain useful to Revit developers across the entire galaxy for centuries;)
+> It will remain useful to Revit developers across the entire galaxy for centuries &nbsp; ;)
 
 <center>
 <img src="img/tbc_11_twitter_engagements.png" alt="Twitter engagements" width="600">

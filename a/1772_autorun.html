@@ -8,7 +8,7 @@
 twitter:
 
 
- #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Auto-executing an external command in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
 
 linkedin:
@@ -19,26 +19,26 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 <p style="font-size: 80%; font-style:italic"></p>
 
-Dynamo Zero Touch CS#Node Element Wrapper
-
 -->
 
-<h3>Autorun an External Command</h3>
-<p>I had an extensive discussion on automatically driving Revit from outside to execute a simple functionality implemented by an external command with no user input.</p>
-<p>The Building Coder also received numerous congratulations on its eleventh birthday yesterday:</p>
+<h3>Auto-Executing an External Command</h3>
+<p>I had an extensive discussion on automatically driving Revit from outside to auto-execute a simple functionality with no user input, originally implemented by an external command.</p>
+<p>Also, a big thank you to all for the numerous congratulations on
+the <a href="https://thebuildingcoder.typepad.com/blog/2019/08/11-years-and-revit-api-docs-full-text-search.html#2">announcement yesterday of The Building Coder's eleventh birthday</a>:</p>
 <ul>
-<li><a href="#2">Autorun an External Command</a></li>
-<li><a href="#3">Eleventh Birthday Congratulations</a></li>
+<li><a href="#2">Auto-executing an external command</a></li>
+<li><a href="#3">Eleventh birthday congratulations</a></li>
 </ul>
 <h4><a name="2"></a> Autorun an External Command</h4>
-<p>[A] Easy to solve, various approaches possible.</p>
+<p><strong>Question:</strong> I have an external command that I would prefer to execute automatically to avoid the need to manually start up Revit, open the RVT model, and launch the command. How can this be achieved?</p>
+<p><strong>Answer:</strong> Easy to solve, various approaches possible.</p>
 <p>I would suggest starting out by trying to use a journal file as described here:</p>
 <p>http://thebuildingcoder.typepad.com/blog/2010/07/ifc-import-and-conversion-journal-script.html</p>
 <p>Another simple approach is to implement an event handler for the DocumentOpened event and automatically process the document immediately as soon as it is opened.</p>
 <p>Shall I put together an add-in skeleton that executes automatically as soon as a document is loaded? then you can wire that up with the code you wish to execute.</p>
-<p>[Q] I don't fully understand what " add-in skeleton that executes automatically as soon as a document is loaded" means.</p>
+<p><strong>Question:</strong> I don't fully understand what " add-in skeleton that executes automatically as soon as a document is loaded" means.</p>
 <p>But I understand the suggested solution. So if it is a step in the right direction - go right ahead</p>
-<p>[A] in order for me to be able to start working on this, i would need a description of the top-level user interaction, the top-level Revit add-in API architecture , and the top-level RVT model context of the functionality you wish to run.</p>
+<p><strong>Answer:</strong> in order for me to be able to start working on this, i would need a description of the top-level user interaction, the top-level Revit add-in API architecture , and the top-level RVT model context of the functionality you wish to run.</p>
 <p>Is it a single external command?
 Does the user push one single button to run it, and nothing else?
 Does it need to be run on all RVT files in a given directory?
@@ -69,7 +69,7 @@ Is any user input at all required?</p>
 <p>is that enough information?</p>
 <p>I don't understand how this method can work on more "complicated" scenarios, e.g. it failed to load some of the links, the configuration file was corrupted (we load some JSON config file) or anything.</p>
 <p>Not sure about the text file, since we just take all the links from the first one.</p>
-<p>[A] Good. That is what I expected. This can easily be converted to autorun. The easiest solution is to use the manual user interface and the Revit journal file functionality like this:</p>
+<p><strong>Answer:</strong> Good. That is what I expected. This can easily be converted to autorun. The easiest solution is to use the manual user interface and the Revit journal file functionality like this:</p>
 <ul>
 <li>Rename your input file <code>X.rvt</code> to <code>input.rvt</code>.</li>
 <li>Open Revit.</li>
@@ -107,7 +107,7 @@ Is any user input at all required?</p>
 <li>Do I have any way to add conditions? E.g., verify that all linked models are loaded?</li>
 <li>What if the plugin was modified? In that case I usually need to manually press "load plugin" on the popup. Can it be automated</li>
 </ul>
-<p>[A] Good questions.</p>
+<p><strong>Answer:</strong> Good questions.</p>
 <p>Easy answer:</p>
 <p>The journal file is totally stupid. It will exactly reproduce what you did manually when it was recorded.</p>
 <p>If something goes wrong, it will behave exactly as if you were sitting there manually typing and clicking in the user interface.</p>
@@ -129,11 +129,10 @@ on <a href="https://help.autodesk.com/view/RVT/2020/ENU/?guid=Revit_API_Revit_AP
 <p>Alternatively, every time the DLL is modified, load it manually once and click 'Always load'. From then on, the message will not appear again, as long as the DLL is not modified.</p>
 <h4><a name="3"></a> Thank you for your Eleventh Birthday Congratulations</h4>
 <p>Thank you very much for the lively response and numerous congratulations on The Building Coder's eleventh birthday!</p>
-<p>96 reactions on LinkedIn alone.</p>
-<p>5 Retweets 35 Likes, 1517 impressions and 72 engagements, whatever those are on Twitter.</p>
+<p>96 LinkedIn reactions, 5 Twitter retweets, 37 likes, 1693 impressions and 82 engagements, whatever those are.</p>
 <p><a href="https://twitter.com/Gytaco/status/1164728843266957312?s=20">Adam Sheather on Twitter</a></p>
 <blockquote>
-<p>Congrats mate! You are still my go to site for Revit API problems, and the wealth of knowledge and time you put into the blog has provided unimaginable benefit for the community! Thank you!</p>
+<p>Congrats mate! You are still my go-to site for Revit API problems, and the wealth of knowledge and time you put into the blog has provided unimaginable benefit for the community! Thank you!</p>
 </blockquote>
 <p><a href="https://thebuildingcoder.typepad.com/blog/2019/08/11-years-and-revit-api-docs-full-text-search.html#comment-4588231441">Matt Taylor in a comment</a></p>
 <blockquote>
@@ -145,7 +144,7 @@ on <a href="https://help.autodesk.com/view/RVT/2020/ENU/?guid=Revit_API_Revit_AP
 </blockquote>
 <p><a href="https://www.linkedin.com/feed/update/urn:li:activity:6570246697056780288?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A6570246697056780288%2C6570335510227632128%29">Philippe Leefsma on LinkedIn</a></p>
 <blockquote>
-<p>It will remain useful to Revit developers across the entire galaxy for centuries;)</p>
+<p>It will remain useful to Revit developers across the entire galaxy for centuries &nbsp; ;)</p>
 </blockquote>
 <p><center>
 <img src="img/tbc_11_twitter_engagements.png" alt="Twitter engagements" width="600">
