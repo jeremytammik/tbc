@@ -203,3 +203,15 @@ Thank you ever so much for all the good wishes!
 <center>
 <img src="img/tbc_11_twitter_engagements.png" alt="Twitter engagements" width="600">
 </center>
+
+####<a name="4"></a> LinkedIn Update 2019-08-28
+
+156 LinkedIn reactions and 7 Comments:
+
+Aleksandr Akunets: Happy Birthday !
+Alex Vila Ortega: Happy community to have a helper so dedicated as you are! Happy B’day!
+Guillaume Joubert: Happy Birthday !!!
+Amedeo Papi: Thank you Jeremy Tammik for everything you do for the #Autodesk users interested in development and programming!
+Philippe Leefsma: It will remain useful to Revit developers across the entire galaxy for centuries;) 
+Mehmet Polat Diker: Thank you for opening up the gates of “Revit Api Magic” to all of us!
+Hoss Zamani: Thank you for the consistent support throughout these years Jeremy.
