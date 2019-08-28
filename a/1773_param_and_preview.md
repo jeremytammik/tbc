@@ -37,7 +37,7 @@ the [Face.Intersect  (Face) method](https://www.revitapidocs.com/2020/91f650a2-b
 - [Surprising results from `Face.Intersect(Face)` method](https://forums.autodesk.com/t5/revit-api-forum/surprising-results-from-face-intersect-face-method/m-p/8992586)
 - [Problems with `Intersect` method (`Face`)](https://forums.autodesk.com/t5/revit-api-forum/problems-with-intersect-method-face/m-p/8992566)
 
-####<a name="2"></a> Shared Parameters are for either Types or Instances
+####<a name="3"></a> Shared Parameters are for either Types or Instances
 
 From the StackOverflow question
 on [how to bind a shared parameter to both type and instance elements](https://stackoverflow.com/questions/57653886/how-to-bind-a-shared-parameter-to-elements-of-both-type-and-instance):
@@ -66,16 +66,25 @@ Neither Revit nor the end user will effectively see your extensible storage data
 
 Depending on your exact needs, this may be what you want or not.
 
+####<a name="4"></a> Retrieve Element Parameters
 
+<center>
+<img src="img/pl_directshape_parameters.png" alt="DirectShape parameters">  <!-- width="100" -->
+</center>
 
+####<a name="4"></a> Hiding DirectShape Internal Face Edges
+
+<center>
+<img src="img/pl_volume_directshape.png" alt="DirectShape internal face edges">  <!-- width="100" -->
+</center>
+
+<center>
+<img src="img/pl_volume_dynamo.png" alt="Dynamo volumes">  <!-- width="100" -->
+</center>
 
 <pre class="code">
 </pre>
 
 **Answer:** 
 
-####<a name="3"></a> 
 
-<center>
-<img src="img/.png" alt="" width="100">
-</center>

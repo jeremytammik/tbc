@@ -32,7 +32,7 @@ the <a href="https://www.revitapidocs.com/2020/91f650a2-bb95-650b-7c00-d431fa613
 <li><a href="https://forums.autodesk.com/t5/revit-api-forum/surprising-results-from-face-intersect-face-method/m-p/8992586">Surprising results from <code>Face.Intersect(Face)</code> method</a></li>
 <li><a href="https://forums.autodesk.com/t5/revit-api-forum/problems-with-intersect-method-face/m-p/8992566">Problems with <code>Intersect</code> method (<code>Face</code>)</a></li>
 </ul>
-<h4><a name="2"></a> Shared Parameters are for either Types or Instances</h4>
+<h4><a name="3"></a> Shared Parameters are for either Types or Instances</h4>
 <p>From the StackOverflow question
 on <a href="https://stackoverflow.com/questions/57653886/how-to-bind-a-shared-parameter-to-elements-of-both-type-and-instance">how to bind a shared parameter to both type and instance elements</a>:</p>
 <p><strong>Question:</strong> I create a Shared Parameter programatically. This works well. I can also bind that parameter to different element types (categories) like Windows or Doors. However, once that is done, I struggle to create a new binding to for example a room which is not a family type, and should be bound to instances instead.</p>
@@ -47,11 +47,18 @@ on <a href="https://stackoverflow.com/questions/57653886/how-to-bind-a-shared-pa
 <p>If you do not explicitly need the end user or Revit to see and manipulate your data, e.g., for scheduling or other purposes, you should consider using extensible storage instead.</p>
 <p>Neither Revit nor the end user will effectively see your extensible storage data.</p>
 <p>Depending on your exact needs, this may be what you want or not.</p>
+<h4><a name="4"></a> Retrieve Element Parameters</h4>
+<p><center>
+<img src="img/pl_directshape_parameters.png" alt="DirectShape parameters">  <!-- width="100" -->
+</center></p>
+<h4><a name="4"></a> Hiding DirectShape Internal Face Edges</h4>
+<p><center>
+<img src="img/pl_volume_directshape.png" alt="DirectShape internal face edges">  <!-- width="100" -->
+</center></p>
+<p><center>
+<img src="img/pl_volume_dynamo.png" alt="Dynamo volumes">  <!-- width="100" -->
+</center></p>
 <pre class="code">
 </pre>
 
 <p><strong>Answer:</strong> </p>
-<h4><a name="3"></a></h4>
-<p><center>
-<img src="img/.png" alt="" width="100">
-</center></p>
