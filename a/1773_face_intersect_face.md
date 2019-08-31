@@ -26,8 +26,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Parameters and Preview Images
+### Face Intersect Does Not Intersect Faces 
 
+This was a busy week discussing numerous issues and no blog post so far.
+
+Let's clarify the confusing issue of using 
 
 ####<a name="2"></a> Discussion on the Face.Intersect method
 
