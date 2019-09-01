@@ -25,55 +25,82 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Face Intersect Does Not Intersect Faces</h3>
-<p>This was a busy week discussing numerous issues and no blog post so far.</p>
-<p>Let's clarify the confusing issue of using </p>
+<p>My work on setting up a new PC is nearing completion.</p>
+<p>Let's also try to clarify the confusing issue of using the <code>Face.Intersect</code> method:</p>
 <h4><a name="2"></a> Discussion on the Face.Intersect method</h4>
-<p>Two <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> threads are discussing the stutus of
-the <a href="https://www.revitapidocs.com/2020/91f650a2-bb95-650b-7c00-d431fa613753.htm">Face.Intersect  (Face) method</a>:</p>
+<p>Several <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> threads are discussing the stutus of
+the <a href="https://www.revitapidocs.com/2020/91f650a2-bb95-650b-7c00-d431fa613753.htm">Face.Intersect (Face) method</a>:</p>
 <ul>
 <li><a href="https://forums.autodesk.com/t5/revit-api-forum/surprising-results-from-face-intersect-face-method/m-p/8992586">Surprising results from <code>Face.Intersect(Face)</code> method</a></li>
 <li><a href="https://forums.autodesk.com/t5/revit-api-forum/problems-with-intersect-method-face/m-p/8992566">Problems with <code>Intersect</code> method (<code>Face</code>)</a></li>
 <li><a href="https://forums.autodesk.com/t5/revit-api-forum/get-conection-type-and-geometry-between-two-elements-from-the/m-p/6465671">Get conection type and geometry between two elements from the model</a></li>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/face-class-intersect-method-problem/m-p/7460720"><code>Face</code> class <code>Intersect</code> method problem</a></li>
 </ul>
-<p><strong>Question:</strong> This isuue was mentioned in 2016, in the third thread liste4d above, but maybe it's worth bringing up again, as the issue hasn't resolved yet in 2018.</p>
+<p>Let's try to summarise:</p>
+<p><strong>Question:</strong> This issue was mentioned in 2016, in the third thread listed above, but it is worth bringing up again, as the issue hasn't been resolved yet in 2018.</p>
 <p>As far as I can tell, the <code>Face.Intersect(face)</code> method always returns <code>FaceIntersectionFaceResult.Intersecting</code>.</p>
+<p>When I run the code below in a view with a single wall and single floor, each face to face test returns an intersection:</p>
 <p><center>
-<img src="img/pl_volume_dynamo.png" alt="Dynamo volumes">  <!-- width="100" -->
+<img src="img/face_intersect_face_1.png" alt="Non-intersecting faces" width="100">
 </center></p>
 <pre class="code">
 </pre>
 
+<p><strong>Answer:</strong> Thank you for your report and reproducible case.</p>
+<p>I see the same behaviour in Revit 2019 as well.</p>
+<p>I added some code to The Building Coder samples to test and report in more depth:</p>
+<p>https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/C...</p>
+<p>I created the following disjunct floor and wall:</p>
+<p><center>
+<img src="img/floor_wall_disjunct.png" alt="Disjunct floor and wall" width="100">
+</center></p>
+<p>My sample code reports:</p>
+<p></pre>
+  Floor has 7 faces.
+  Wall has 6 faces.
+  38 face-face intersections.
+ </pre></p>
+<p>So, in fact, not every face-to-face test reports an intersection, because 7*6 equals 42.</p>
+<p>Only the vast majority do &nbsp; :-)</p>
+<p>I logged the issue <em>REVIT-133627 [Face.Intersect returns false positives]</em> with our development team to explore this further and provide an explanation.</p>
+<p>This turned out to be a duplicate of an existing older issue, <em>REVIT-58034 [API Face.Intersect(Face) returns true even if two faces don't intersect with each other]</em>, and was therefore closed again.</p>
+<p>The development team replied:</p>
+<blockquote>
+<p>We are aware of this issue.
+This function does indeed not do what one expects.
+At most, it computes intersections between the underlying (unbounded) surfaces, not the (bounded) faces lying in the surfaces.
+As a first step, the documentation will be updated to reflect this fact.
+Then, we'll see whether resources can be found to fully implement the face intersection functionality, or remove the incomplete functionality.</p>
+</blockquote>
+<p>Frank <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/2083518">@Fair59</a> Aarssen adds:</p>
+<p>I have previously plotted the intersections using the <code>ByRef</code> curve overload and found this to be the case, as explained in the thread 
+on the <a href="https://forums.autodesk.com/t5/revit-api-forum/face-class-intersect-method-problem/m-p/7460720"><code>Face</code> class <code>Intersect</code> method problem</a>:</p>
+<blockquote>
+<p>Apparently, the intersecting faces are considered infinite with therefore many possible intersections beyond the range of the element itself. </p>
+<p>In this image, the green lines are plotted using curves from the overload <code>Face.Intersect(ByVal Face, ByRef Curve)</code>:</p>
+</blockquote>
+<p><center>
+<img src="img/face_intersect_wall_intersects.png" alt="Intinite face intersections between two walls" width="100">
+</center></p>
+<blockquote>
+<p>Hard to understand at first why they all exist, but once you trace along parallel to the faces, you can see all are valid.</p>
+</blockquote>
+<p>In actual fact, an API user may prefer to find this form of intersection, rather than be told no intersection exists (due to the bounds of the face preventing it).</p>
+<p>You can always compare points on the original face to those on the curve intersect result to check if there is an actual intersection.</p>
+<p>However, if no results were given, then that would not be useful at all.</p>
+<p>Probably, there should be a bound versus unbound option, perhaps.</p>
 <p>Here is the current state of things:</p>
-<p>2019-08-28 16:10 16:20 adn_aec REVIT-58034 [API Face.Intersect(Face) returns true even if two faces don't intersect with each other]
-2019-08-28 16:20 16:30 adn_aec REVIT-58034 [Improve documentation for API Face.Intersect(Face) to reflect what the function actually does]
-2019-08-28 16:30 16:40 adn_aec REVIT-133819 Improve API Face.Intersect(Face) to actually intersect faces, not underlying surfaces]
-2019-08-28 16:40 16:50 adn_aec REVIT-133627 [Face.Intersect returns false positives]</p>
-<h4><a name="3"></a> Shared Parameters are for either Types or Instances</h4>
-<p>From the StackOverflow question
-on <a href="https://stackoverflow.com/questions/57653886/how-to-bind-a-shared-parameter-to-elements-of-both-type-and-instance">how to bind a shared parameter to both type and instance elements</a>:</p>
-<p><strong>Question:</strong> I create a Shared Parameter programatically. This works well. I can also bind that parameter to different element types (categories) like Windows or Doors. However, once that is done, I struggle to create a new binding to for example a room which is not a family type, and should be bound to instances instead.</p>
-<p>Is there any way to use ONE single shared parameter and bind that to both types and instances?</p>
-<p><strong>Answer:</strong> I believe not. A shared parameter is bound to either types or instances, not both.</p>
-<p><strong>Response:</strong> Thank you for answering so quickly.</p>
-<p>I now tried to do it manually as well, through the UI, and got the message that it has already been added, so you unfortunately seems to be right. I am probably not the first to say this, but that is just veird behaviour. It forces me to create two parameters which have the completely identical defintion to add them to different categories.</p>
-<p><strong>Answer:</strong> Yes.</p>
-<p>You must take into consideration that the shared parameters functionality was added very early in the Revit lifecycle and was completely oriented toward end user interaction. At the time, the Revit API did not even exist, and was not planned for.</p>
-<p>Possibly your use case is weird, from a BIM point of view. I am not an expert on the user interface side of things, so I cannot say.</p>
-<p>On the other hand, <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.23">extensible storage</a> was explicitly designed for API use.</p>
-<p>If you do not explicitly need the end user or Revit to see and manipulate your data, e.g., for scheduling or other purposes, you should consider using extensible storage instead.</p>
-<p>Neither Revit nor the end user will effectively see your extensible storage data.</p>
-<p>Depending on your exact needs, this may be what you want or not.</p>
-<h4><a name="4"></a> Retrieve Element Parameters</h4>
-<p><center>
-<img src="img/pl_directshape_parameters.png" alt="DirectShape parameters">  <!-- width="100" -->
-</center></p>
-<h4><a name="4"></a> Hiding DirectShape Internal Face Edges</h4>
-<p><center>
-<img src="img/pl_volume_directshape.png" alt="DirectShape internal face edges">  <!-- width="100" -->
-</center></p>
-<p><center>
-<img src="img/pl_volume_dynamo.png" alt="Dynamo volumes">  <!-- width="100" -->
-</center></p>
+<p>REVIT-58034 [API Face.Intersect(Face) returns true even if two faces don't intersect with each other]
+REVIT-58034 [Improve documentation for API Face.Intersect(Face) to reflect what the function actually does] &ndash; closed
+REVIT-133627 [Face.Intersect returns false positives] &ndash; closed
+REVIT-133819 [Improve API Face.Intersect(Face) to actually intersect faces, not underlying surfaces] &ndash; closed</p>
+<p>Calculating the Intersection between to Rectangular Faces</p>
+<p><a href="https://web.stanford.edu/class/cs277/resources/papers/Moller1997b.pdf">A Fast Triangle-Triangle Intersection Test</a></p>
+<p><a href="https://stackoverflow.com/questions/17458562/efficient-aabb-triangle-intersection-in-c-sharp">Efficient AABB/triangle intersection in C#</a></p>
+<h4><a name="3"></a></h4>
+<p><strong>Question:</strong> </p>
+<p><strong>Answer:</strong> </p>
+<p><strong>Response:</strong> </p>
 <pre class="code">
 </pre>
 
