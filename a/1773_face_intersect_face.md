@@ -6,7 +6,6 @@
 
 <!---
 
-
 twitter:
 
 Parameters and preview images in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
@@ -14,9 +13,7 @@ Parameters and preview images in the #RevitAPI @AutodeskForge @AutodeskRevit #bi
 &ndash; 
 ...
 
-
 linkedin:
-
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -32,9 +29,7 @@ My work on setting up a new PC is nearing completion.
 
 Let's also try to clarify the confusing issue of using the `Face.Intersect` method:
 
-
-
-####<a name="2"></a> Discussion on the Face.Intersect method
+####<a name="2"></a> The Unbounded Face.Intersect Method 
 
 Several [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads are discussing the stutus of
 the [Face.Intersect (Face) method](https://www.revitapidocs.com/2020/91f650a2-bb95-650b-7c00-d431fa613753.htm):
@@ -44,7 +39,7 @@ the [Face.Intersect (Face) method](https://www.revitapidocs.com/2020/91f650a2-bb
 - [Get conection type and geometry between two elements from the model](https://forums.autodesk.com/t5/revit-api-forum/get-conection-type-and-geometry-between-two-elements-from-the/m-p/6465671)
 - [`Face` class `Intersect` method problem](https://forums.autodesk.com/t5/revit-api-forum/face-class-intersect-method-problem/m-p/7460720)
 
-Let's try to summarise:
+Let's try to summarise all of these:
 
 **Question:** This issue was mentioned in 2016, in the third thread listed above, but it is worth bringing up again, as the issue hasn't been resolved yet in 2018.
 
@@ -57,25 +52,145 @@ When I run the code below in a view with a single wall and single floor, each fa
 </center>
 
 <pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">Result</span>&nbsp;Execute(
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ExternalCommandData</span>&nbsp;commandData,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">ref</span>&nbsp;<span style="color:blue;">string</span>&nbsp;message,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementSet</span>&nbsp;elements&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;list&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;commandData.Application.ActiveUIDocument.Document,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;commandData.View.Id&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Where(&nbsp;e&nbsp;=&gt;&nbsp;e&nbsp;<span style="color:blue;">is</span>&nbsp;<span style="color:#2b91af;">Wall</span>&nbsp;||&nbsp;e&nbsp;<span style="color:blue;">is</span>&nbsp;<span style="color:#2b91af;">Floor</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;f1&nbsp;<span style="color:blue;">in</span>&nbsp;list.First()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.get_Geometry(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Options</span>()&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfType&lt;<span style="color:#2b91af;">Solid</span>&gt;().First()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Faces.OfType&lt;<span style="color:#2b91af;">Face</span>&gt;()&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;f2&nbsp;<span style="color:blue;">in</span>&nbsp;list.Last()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.get_Geometry(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Options</span>()&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfType&lt;<span style="color:#2b91af;">Solid</span>&gt;().First()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Faces.OfType&lt;<span style="color:#2b91af;">Face</span>&gt;()&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;f1.Intersect(&nbsp;f2&nbsp;)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;==&nbsp;<span style="color:#2b91af;">FaceIntersectionFaceResult</span>.Intersecting&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;System.Windows.Forms.<span style="color:#2b91af;">MessageBox</span>.Show(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Intersects&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;Continue&quot;</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.Windows.Forms.<span style="color:#2b91af;">MessageBoxButtons</span>.OKCancel,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.Windows.Forms.<span style="color:#2b91af;">MessageBoxIcon</span>.Exclamation&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;==&nbsp;System.Windows.Forms.<span style="color:#2b91af;">DialogResult</span>.Cancel&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Succeeded;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Succeeded;
+&nbsp;&nbsp;}
 </pre>
 
 **Answer:** Thank you for your report and reproducible case.
 
- 
-
 I see the same behaviour in Revit 2019 as well.
 
+I added some code to The Building Coder samples
+in [CmdIntersectJunctionBox.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdIntersectJunctionBox.cs#L27-L116) to
+test and report in more depth:
+
+<pre class="code">
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;all&nbsp;faces&nbsp;from&nbsp;first&nbsp;solid&nbsp;&nbsp;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;of&nbsp;the&nbsp;given&nbsp;element.</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">Face</span>&gt;&nbsp;GetFaces(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:#2b91af;">Options</span>&nbsp;opt&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Options</span>();
+&nbsp;&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">Face</span>&gt;&nbsp;faces&nbsp;=&nbsp;e
+&nbsp;&nbsp;&nbsp;&nbsp;.get_Geometry(&nbsp;opt&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.OfType&lt;<span style="color:#2b91af;">Solid</span>&gt;()
+&nbsp;&nbsp;&nbsp;&nbsp;.First()
+&nbsp;&nbsp;&nbsp;&nbsp;.Faces
+&nbsp;&nbsp;&nbsp;&nbsp;.OfType&lt;<span style="color:#2b91af;">Face</span>&gt;();
+&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;n&nbsp;=&nbsp;faces.Count();
+&nbsp;&nbsp;<span style="color:#2b91af;">Debug</span>.Print(&nbsp;<span style="color:#a31515;">&quot;{0}&nbsp;has&nbsp;{1}&nbsp;face{2}.&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;e.GetType().Name,&nbsp;n,&nbsp;<span style="color:#2b91af;">Util</span>.PluralSuffix(&nbsp;n&nbsp;)&nbsp;);
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;faces;
+}
  
-
-I added some code to The Building Coder samples to test and report in more depth:
-
+<span style="color:green;">//&nbsp;This&nbsp;has&nbsp;been&nbsp;mentioned&nbsp;in&nbsp;this&nbsp;post&nbsp;from&nbsp;2016&nbsp;but&nbsp;maybe&nbsp;it&#39;s&nbsp;worth&nbsp;bringing&nbsp;up&nbsp;again&nbsp;as&nbsp;2018&nbsp;hasn&#39;t&nbsp;resolved&nbsp;the&nbsp;issue&nbsp;yet.</span>
+<span style="color:green;">//&nbsp;As&nbsp;far&nbsp;as&nbsp;I&nbsp;can&nbsp;tell,&nbsp;the&nbsp;Face.Intersect(&nbsp;face)&nbsp;method&nbsp;always&nbsp;returns&nbsp;FaceIntersectionFaceResult.Intersecting&nbsp;-&nbsp;or&nbsp;I&nbsp;am&nbsp;not&nbsp;implementing&nbsp;it&nbsp;correctly.When&nbsp;I&nbsp;run&nbsp;the&nbsp;code&nbsp;below&nbsp;in&nbsp;a&nbsp;view&nbsp;with&nbsp;a&nbsp;single&nbsp;wall&nbsp;and&nbsp;single&nbsp;floor,&nbsp;each&nbsp;face&nbsp;to&nbsp;face&nbsp;test&nbsp;returns&nbsp;an&nbsp;intersection.&nbsp;Can&nbsp;someone&nbsp;please&nbsp;verify&nbsp;(maybe&nbsp;2019)?</span>
+<span style="color:green;">//&nbsp;https://forums.autodesk.com/t5/revit-api-forum/get-conection-type-and-geometry-between-two-elements-from-the/m-p/6465671</span>
+<span style="color:green;">//&nbsp;https://forums.autodesk.com/t5/revit-api-forum/surprising-results-from-face-intersect-face-method/m-p/8079881</span>
+<span style="color:green;">//&nbsp;/a/doc/revit/tbc/git/a/img/intersect_strange_result.png</span>
+<span style="color:green;">//&nbsp;/a/doc/revit/tbc/git/a/img/floor_wall_disjunct.png</span>
+<span style="color:blue;">void</span>&nbsp;TestIntersect(&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:#2b91af;">View</span>&nbsp;view&nbsp;=&nbsp;doc.ActiveView;
  
-
-https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/C...
-
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;list&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc,&nbsp;view.Id&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
+&nbsp;&nbsp;&nbsp;&nbsp;.Where(&nbsp;e&nbsp;=&gt;&nbsp;e&nbsp;<span style="color:blue;">is</span>&nbsp;<span style="color:#2b91af;">Wall</span>&nbsp;||&nbsp;e&nbsp;<span style="color:blue;">is</span>&nbsp;<span style="color:#2b91af;">Floor</span>&nbsp;);
  
+&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;n&nbsp;=&nbsp;list.Count();
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;floor&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;wall&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+ 
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;2&nbsp;==&nbsp;n&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;floor&nbsp;=&nbsp;list.First()&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Floor</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">null</span>&nbsp;==&nbsp;floor&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;floor&nbsp;=&nbsp;list.Last()&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Floor</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wall&nbsp;=&nbsp;list.First()&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Wall</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">else</span>
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wall&nbsp;=&nbsp;list.Last()&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Wall</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">null</span>&nbsp;==&nbsp;floor&nbsp;||&nbsp;<span style="color:blue;">null</span>&nbsp;==&nbsp;wall&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Util</span>.ErrorMsg(&nbsp;<span style="color:#a31515;">&quot;Please&nbsp;run&nbsp;this&nbsp;command&nbsp;in&nbsp;a&nbsp;&quot;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;<span style="color:#a31515;">&quot;document&nbsp;with&nbsp;just&nbsp;one&nbsp;floor&nbsp;and&nbsp;one&nbsp;wall&nbsp;&quot;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;<span style="color:#a31515;">&quot;with&nbsp;no&nbsp;mutual&nbsp;intersection&quot;</span>&nbsp;);
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">else</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Options</span>&nbsp;opt&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Options</span>();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">Face</span>&gt;&nbsp;floorFaces&nbsp;=&nbsp;GetFaces(&nbsp;floor&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">Face</span>&gt;&nbsp;wallFaces&nbsp;=&nbsp;GetFaces(&nbsp;wall&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;n&nbsp;=&nbsp;0;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;f1&nbsp;<span style="color:blue;">in</span>&nbsp;floorFaces&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;f2&nbsp;<span style="color:blue;">in</span>&nbsp;wallFaces&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;f1.Intersect(&nbsp;f2&nbsp;)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;==&nbsp;<span style="color:#2b91af;">FaceIntersectionFaceResult</span>.Intersecting&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++n;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;System.Windows.Forms.<span style="color:#2b91af;">MessageBox</span>.Show(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Intersects&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;Continue&quot;</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.Windows.Forms.<span style="color:#2b91af;">MessageBoxButtons</span>.OKCancel,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.Windows.Forms.<span style="color:#2b91af;">MessageBoxIcon</span>.Exclamation&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;==&nbsp;System.Windows.Forms.<span style="color:#2b91af;">DialogResult</span>.Cancel&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Debug</span>.Print(&nbsp;<span style="color:#a31515;">&quot;{0}&nbsp;face-face&nbsp;intersection{1}.&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n,&nbsp;<span style="color:#2b91af;">Util</span>.PluralSuffix(&nbsp;n&nbsp;)&nbsp;);
+&nbsp;&nbsp;}
+}
+</pre>
 
-I created the following disjunct floor and wall:
+Here is a simple test model with a disjunct floor and wall:
 
 <center>
 <img src="img/floor_wall_disjunct.png" alt="Disjunct floor and wall" width="100">
@@ -105,6 +220,14 @@ At most, it computes intersections between the underlying (unbounded) surfaces, 
 As a first step, the documentation will be updated to reflect this fact.
 Then, we'll see whether resources can be found to fully implement the face intersection functionality, or remove the incomplete functionality.
 
+As a result, *REVIT-58034* was initially renamed. Currently, all the following related tickets have al been closed:
+
+- REVIT-58034 [Improve documentation for API Face.Intersect(Face) to reflect what the function actually does] 
+- REVIT-133627 [Face.Intersect returns false positives] 
+- REVIT-133819 [Improve API Face.Intersect(Face) to actually intersect faces, not underlying surfaces] 
+
+####<a name="3"></a> Making Use of the Unbounded Face Intersection
+
 Frank [@Fair59](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/2083518) Aarssen adds:
 
 I have previously plotted the intersections using the `ByRef` curve overload and found this to be the case, as explained in the thread 
@@ -128,49 +251,49 @@ However, if no results were given, then that would not be useful at all.
 
 Probably, there should be a bound versus unbound option, perhaps.
 
-Here is the current state of things:
+####<a name="4"></a> Rectangular Face Intersection Ideas
 
-REVIT-58034 [API Face.Intersect(Face) returns true even if two faces don't intersect with each other]
-REVIT-58034 [Improve documentation for API Face.Intersect(Face) to reflect what the function actually does] &ndash; closed
-REVIT-133627 [Face.Intersect returns false positives] &ndash; closed
-REVIT-133819 [Improve API Face.Intersect(Face) to actually intersect faces, not underlying surfaces] &ndash; closed
+The sample images shown above all include rectangular wall faces.
 
-Calculating the Intersection between to Rectangular Faces
+If the potentially intersecting faces  are rectangular, the problem can presumably be reduced to a pretty simple query.
+
+One apporach would be to retrieve the intersection curves of the unbounded faces and test whether they lie on the bounded faces, as suggested above by Frank.
+
+Alternatively, a DIY apporach may also be feasible and more efficient.
+
+After all, a rectangular face can be seen as two coplanar triangles, and the intersection of 3D triangles is a pretty common requirement.
+
+Here are some useful-looking results that showed up in a couple of quick Internet searches:
+
+- [A Fast Triangle-Triangle Intersection Test](https://web.stanford.edu/class/cs277/resources/papers/Moller1997b.pdf)
+- [Efficient AABB/triangle intersection in C#](https://stackoverflow.com/questions/17458562/efficient-aabb-triangle-intersection-in-c-sharp)
+- [How do I find the Intersection of two 3D triangles?](https://math.stackexchange.com/questions/1220102/how-do-i-find-the-intersection-of-two-3d-triangles)
+- [Algorithms for ray (or segment) and triangle intersection, triangle-plane and triangle-triangle intersection](http://geomalgorithms.com/a06-_intersect-2.html)
+
+If anyone would like to share a reliable, robust, and efficient 3D triangle or rectangle intersection algorithm, please let us know.
+
+Thank you!
 
 
-[A Fast Triangle-Triangle Intersection Test](https://web.stanford.edu/class/cs277/resources/papers/Moller1997b.pdf)
+####<a name="5"></a> Copy as HTML Update
 
-[Efficient AABB/triangle intersection in C#](https://stackoverflow.com/questions/17458562/efficient-aabb-triangle-intersection-in-c-sharp)
+I have implemented and installed a number of 
+of [source code colourizer tools](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.36) in
+the past.
 
+This spring, I set up 
+the [PowerTools 2015 Copy HTML Markup](https://thebuildingcoder.typepad.com/blog/2019/04/close-doc-and-zero-doc-rvtsamples.html#4) functionality.
 
-####<a name="3"></a> 
+On the new computer, I updated to Visual Studio 2017 instead of Visual Studio 2015.
 
-**Question:** 
+Accordingly, I needed to update to
+the [Productivity Power Tools 2017/2019](https://marketplace.visualstudio.com/items?itemName=VisualStudioPlatformTeam.ProductivityPowerPack2017).
 
-**Answer:** 
+####<a name="6"></a> Visual Studio Revit Add-In Wizard Update
 
-**Response:** 
-
-
-
-<pre class="code">
-</pre>
-
-**Answer:** 
-
-####<a name="4"></a> Copy as HTML Update
-
-On the new computer I am now using Visual Studio 2017 innstead of Visual Studio 2015, and I ionce needed to install some kind
-of [source code colourizer](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.36).
-
-as describerd this spring 
-[Installing PowerTools 2015 Copy HTML Markup](https://thebuildingcoder.typepad.com/blog/2019/04/close-doc-and-zero-doc-rvtsamples.html#4)
-
-[Productivity Power Tools 2017/2019](https://marketplace.visualstudio.com/items?itemName=VisualStudioPlatformTeam.ProductivityPowerPack2017)
-
-####<a name="4"></a> Visual Studio Revit Add-In Wizard Update
-
-updated readme and set up for Visual Studio 2017
+In the same vein, I reinstalled
+the [Visual Studio Revit Add-In Wizards](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.20),
+again, slightly updated for Visual Studio 2017, 
 
 
 https://github.com/jeremytammik/VisualStudioRevitAddinWizard/releases/tag/2020.0.0.2
