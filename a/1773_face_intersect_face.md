@@ -23,23 +23,29 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Face Intersect Does Not Intersect Faces 
+### Face Intersect Face is Unbounded
 
 My work on setting up a new PC is nearing completion.
 
-Let's also try to clarify the confusing issue of using the `Face.Intersect` method:
+There is also a need to clarify the use of the `Face.Intersect(Face)` method:
+
+- [The unbounded `Face.Intersect` method](#2)
+- [Making use of the unbounded face intersection](#3)
+- [Rectangular face intersection ideas](#4)
+- [Copy as HTML update](#5)
+- [Visual Studio Revit add-in wizard update](#6)
 
 ####<a name="2"></a> The Unbounded Face.Intersect Method 
 
-Several [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads are discussing the stutus of
+Several [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads are discussing the status of
 the [Face.Intersect (Face) method](https://www.revitapidocs.com/2020/91f650a2-bb95-650b-7c00-d431fa613753.htm):
 
 - [Surprising results from `Face.Intersect(Face)` method](https://forums.autodesk.com/t5/revit-api-forum/surprising-results-from-face-intersect-face-method/m-p/8992586)
 - [Problems with `Intersect` method (`Face`)](https://forums.autodesk.com/t5/revit-api-forum/problems-with-intersect-method-face/m-p/8992566)
-- [Get conection type and geometry between two elements from the model](https://forums.autodesk.com/t5/revit-api-forum/get-conection-type-and-geometry-between-two-elements-from-the/m-p/6465671)
+- [Get connection type and geometry between two elements from the model](https://forums.autodesk.com/t5/revit-api-forum/get-conection-type-and-geometry-between-two-elements-from-the/m-p/6465671)
 - [`Face` class `Intersect` method problem](https://forums.autodesk.com/t5/revit-api-forum/face-class-intersect-method-problem/m-p/7460720)
 
-Let's try to summarise all of these:
+Briefly, the main problem is this:
 
 **Question:** This issue was mentioned in 2016, in the third thread listed above, but it is worth bringing up again, as the issue hasn't been resolved yet in 2018.
 
@@ -48,7 +54,7 @@ As far as I can tell, the `Face.Intersect(face)` method always returns `FaceInte
 When I run the code below in a view with a single wall and single floor, each face to face test returns an intersection:
 
 <center>
-<img src="img/face_intersect_face_1.png" alt="Non-intersecting faces" width="100">
+<img src="img/face_intersect_face_1.png" alt="Non-intersecting faces" width="657">
 </center>
 
 <pre class="code">
@@ -119,12 +125,6 @@ test and report in more depth:
 &nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;faces;
 }
  
-<span style="color:green;">//&nbsp;This&nbsp;has&nbsp;been&nbsp;mentioned&nbsp;in&nbsp;this&nbsp;post&nbsp;from&nbsp;2016&nbsp;but&nbsp;maybe&nbsp;it&#39;s&nbsp;worth&nbsp;bringing&nbsp;up&nbsp;again&nbsp;as&nbsp;2018&nbsp;hasn&#39;t&nbsp;resolved&nbsp;the&nbsp;issue&nbsp;yet.</span>
-<span style="color:green;">//&nbsp;As&nbsp;far&nbsp;as&nbsp;I&nbsp;can&nbsp;tell,&nbsp;the&nbsp;Face.Intersect(&nbsp;face)&nbsp;method&nbsp;always&nbsp;returns&nbsp;FaceIntersectionFaceResult.Intersecting&nbsp;-&nbsp;or&nbsp;I&nbsp;am&nbsp;not&nbsp;implementing&nbsp;it&nbsp;correctly.When&nbsp;I&nbsp;run&nbsp;the&nbsp;code&nbsp;below&nbsp;in&nbsp;a&nbsp;view&nbsp;with&nbsp;a&nbsp;single&nbsp;wall&nbsp;and&nbsp;single&nbsp;floor,&nbsp;each&nbsp;face&nbsp;to&nbsp;face&nbsp;test&nbsp;returns&nbsp;an&nbsp;intersection.&nbsp;Can&nbsp;someone&nbsp;please&nbsp;verify&nbsp;(maybe&nbsp;2019)?</span>
-<span style="color:green;">//&nbsp;https://forums.autodesk.com/t5/revit-api-forum/get-conection-type-and-geometry-between-two-elements-from-the/m-p/6465671</span>
-<span style="color:green;">//&nbsp;https://forums.autodesk.com/t5/revit-api-forum/surprising-results-from-face-intersect-face-method/m-p/8079881</span>
-<span style="color:green;">//&nbsp;/a/doc/revit/tbc/git/a/img/intersect_strange_result.png</span>
-<span style="color:green;">//&nbsp;/a/doc/revit/tbc/git/a/img/floor_wall_disjunct.png</span>
 <span style="color:blue;">void</span>&nbsp;TestIntersect(&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)
 {
 &nbsp;&nbsp;<span style="color:#2b91af;">View</span>&nbsp;view&nbsp;=&nbsp;doc.ActiveView;
@@ -193,12 +193,12 @@ test and report in more depth:
 Here is a simple test model with a disjunct floor and wall:
 
 <center>
-<img src="img/floor_wall_disjunct.png" alt="Disjunct floor and wall" width="100">
+<img src="img/floor_wall_disjunct.png" alt="Disjunct floor and wall" width="388">
 </center>
 
 My sample code reports:
 
-</pre>
+<pre>
   Floor has 7 faces.
   Wall has 6 faces.
   38 face-face intersections.
@@ -210,7 +210,7 @@ Only the vast majority do &nbsp; :-)
 
 I logged the issue *REVIT-133627 [Face.Intersect returns false positives]* with our development team to explore this further and provide an explanation.
 
-This turned out to be a duplicate of an existing older issue, *REVIT-58034 [API Face.Intersect(Face) returns true even if two faces don't intersect with each other]*, and was therefore closed again.
+This turned out to be a duplicate of an existing older issue, *REVIT-58034 [API Face.Intersect(Face) returns true even if two faces don't intersect with each other]* and was therefore closed again.
 
 The development team replied:
 
@@ -220,7 +220,7 @@ At most, it computes intersections between the underlying (unbounded) surfaces, 
 As a first step, the documentation will be updated to reflect this fact.
 Then, we'll see whether resources can be found to fully implement the face intersection functionality, or remove the incomplete functionality.
 
-As a result, *REVIT-58034* was initially renamed. Currently, all the following related tickets have al been closed:
+As a result, *REVIT-58034* was initially renamed. Currently, the following related tickets have all been closed:
 
 - REVIT-58034 [Improve documentation for API Face.Intersect(Face) to reflect what the function actually does] 
 - REVIT-133627 [Face.Intersect returns false positives] 
@@ -238,7 +238,7 @@ on the [`Face` class `Intersect` method problem](https://forums.autodesk.com/t5/
 > In this image, the green lines are plotted using curves from the overload `Face.Intersect(ByVal Face, ByRef Curve)`:
 
 <center>
-<img src="img/face_intersect_wall_intersects.png" alt="Intinite face intersections between two walls" width="100">
+<img src="img/face_intersect_wall_intersects.png" alt="Unbounded face intersections between two walls" width="930">
 </center>
 
 > Hard to understand at first why they all exist, but once you trace along parallel to the faces, you can see all are valid.
@@ -257,9 +257,9 @@ The sample images shown above all include rectangular wall faces.
 
 If the potentially intersecting faces  are rectangular, the problem can presumably be reduced to a pretty simple query.
 
-One apporach would be to retrieve the intersection curves of the unbounded faces and test whether they lie on the bounded faces, as suggested above by Frank.
+One approach would be to retrieve the intersection curves of the unbounded faces and test whether they lie on the bounded faces, as suggested above by Frank.
 
-Alternatively, a DIY apporach may also be feasible and more efficient.
+Alternatively, a DIY solution may also be feasible and more efficient.
 
 After all, a rectangular face can be seen as two coplanar triangles, and the intersection of 3D triangles is a pretty common requirement.
 
@@ -277,8 +277,8 @@ Thank you!
 
 ####<a name="5"></a> Copy as HTML Update
 
-I have implemented and installed a number of 
-of [source code colourizer tools](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.36) in
+I implemented and installed a couple of 
+different [source code colourizer tools](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.36) in
 the past.
 
 This spring, I set up 
@@ -286,14 +286,12 @@ the [PowerTools 2015 Copy HTML Markup](https://thebuildingcoder.typepad.com/blog
 
 On the new computer, I updated to Visual Studio 2017 instead of Visual Studio 2015.
 
-Accordingly, I needed to update to
-the [Productivity Power Tools 2017/2019](https://marketplace.visualstudio.com/items?itemName=VisualStudioPlatformTeam.ProductivityPowerPack2017).
+Accordingly, I update the code colouriser
+to [Productivity Power Tools 2017/2019](https://marketplace.visualstudio.com/items?itemName=VisualStudioPlatformTeam.ProductivityPowerPack2017).
 
 ####<a name="6"></a> Visual Studio Revit Add-In Wizard Update
 
 In the same vein, I reinstalled
 the [Visual Studio Revit Add-In Wizards](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.20),
-again, slightly updated for Visual Studio 2017, 
-
-
-https://github.com/jeremytammik/VisualStudioRevitAddinWizard/releases/tag/2020.0.0.2
+again, slightly updated for Visual Studio 2017, captured
+in [VisualStudioRevitAddinWizard release 2020.0.0.2)](https://github.com/jeremytammik/VisualStudioRevitAddinWizard/releases/tag/2020.0.0.2).
