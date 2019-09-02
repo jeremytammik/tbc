@@ -6,6 +6,12 @@
 
 <!---
 
+- Get Preview Image from Revit API
+  https://forums.autodesk.com/t5/revit-api-forum/get-preview-image-from-revit-api/m-p/8985870
+
+- How to bind a Shared Parameter to elements of both Type and Instance
+  https://stackoverflow.com/questions/57653886/how-to-bind-a-shared-parameter-to-elements-of-both-type-and-instance
+
 
 twitter:
 
@@ -29,38 +35,10 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### Parameters and Preview Images
 
 
-####<a name="2"></a> Discussion on the Face.Intersect method
-
-Two [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads are discussing the stutus of
-the [Face.Intersect  (Face) method](https://www.revitapidocs.com/2020/91f650a2-bb95-650b-7c00-d431fa613753.htm):
-
-- [Surprising results from `Face.Intersect(Face)` method](https://forums.autodesk.com/t5/revit-api-forum/surprising-results-from-face-intersect-face-method/m-p/8992586)
-- [Problems with `Intersect` method (`Face`)](https://forums.autodesk.com/t5/revit-api-forum/problems-with-intersect-method-face/m-p/8992566)
-- [Get conection type and geometry between two elements from the model](https://forums.autodesk.com/t5/revit-api-forum/get-conection-type-and-geometry-between-two-elements-from-the/m-p/6465671)
-
-**Question:** This isuue was mentioned in 2016, in the third thread liste4d above, but maybe it's worth bringing up again, as the issue hasn't resolved yet in 2018.
-
-As far as I can tell, the `Face.Intersect(face)` method always returns `FaceIntersectionFaceResult.Intersecting`.
-
-
-<center>
-<img src="img/pl_volume_dynamo.png" alt="Dynamo volumes">  <!-- width="100" -->
-</center>
-
-<pre class="code">
-</pre>
 
 
 
-Here is the current state of things:
-
-2019-08-28 16:10 16:20 adn_aec REVIT-58034 [API Face.Intersect(Face) returns true even if two faces don't intersect with each other]
-2019-08-28 16:20 16:30 adn_aec REVIT-58034 [Improve documentation for API Face.Intersect(Face) to reflect what the function actually does]
-2019-08-28 16:30 16:40 adn_aec REVIT-133819 Improve API Face.Intersect(Face) to actually intersect faces, not underlying surfaces]
-2019-08-28 16:40 16:50 adn_aec REVIT-133627 [Face.Intersect returns false positives]
-
-
-####<a name="3"></a> Shared Parameters are for either Types or Instances
+####<a name="3"></a> Shared Parameter is Either Type or Instance
 
 From the StackOverflow question
 on [how to bind a shared parameter to both type and instance elements](https://stackoverflow.com/questions/57653886/how-to-bind-a-shared-parameter-to-elements-of-both-type-and-instance):
@@ -107,22 +85,3 @@ Depending on your exact needs, this may be what you want or not.
 
 <pre class="code">
 </pre>
-
-**Answer:** 
-
-####<a name="4"></a> Copy as HTML Update
-
-On the new computer I am now using Visual Studio 2017 innstead of Visual Studio 2015, and I ionce needed to install some kind
-of [source code colourizer](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.36).
-
-as describerd this spring 
-[Installing PowerTools 2015 Copy HTML Markup](https://thebuildingcoder.typepad.com/blog/2019/04/close-doc-and-zero-doc-rvtsamples.html#4)
-
-[Productivity Power Tools 2017/2019](https://marketplace.visualstudio.com/items?itemName=VisualStudioPlatformTeam.ProductivityPowerPack2017)
-
-####<a name="4"></a> Visual Studio Revit Add-In Wizard Update
-
-updated readme and set up for Visual Studio 2017
-
-
-https://github.com/jeremytammik/VisualStudioRevitAddinWizard/releases/tag/2020.0.0.2

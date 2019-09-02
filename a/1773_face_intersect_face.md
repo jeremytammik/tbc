@@ -8,7 +8,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Face.Intersect face treats faces as unbounded; handling that, source code colourisation and updated add-in wizard for the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/faceintersect
 
 My work on setting up a new PC is nearing completion.
 There is also a need to clarify the use of the <code>Face.Intersect(Face)</code> method
@@ -19,6 +19,20 @@ There is also a need to clarify the use of the <code>Face.Intersect(Face)</code>
 &ndash; Visual Studio Revit add-in wizard update...
 
 linkedin:
+
+Face.Intersect face treats faces as unbounded; handling that, source code colourisation and updated add-in wizard for the #RevitAPI
+
+http://bit.ly/faceintersect
+
+My work on setting up a new PC is nearing completion.
+
+There is also a need to clarify the use of the Face.Intersect(Face) method:
+
+- The unbounded Face.Intersect method
+- Making use of the unbounded face intersection
+- Rectangular face intersection ideas
+- Copy as HTML update
+- Visual Studio Revit add-in wizard update...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
