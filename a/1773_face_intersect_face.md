@@ -8,10 +8,15 @@
 
 twitter:
 
-Parameters and preview images in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+ in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+My work on setting up a new PC is nearing completion.
+There is also a need to clarify the use of the <code>Face.Intersect(Face)</code> method
+&ndash; The unbounded <code>Face.Intersect</code> method
+&ndash; Making use of the unbounded face intersection
+&ndash; Rectangular face intersection ideas
+&ndash; Copy as HTML update
+&ndash; Visual Studio Revit add-in wizard update...
 
 linkedin:
 
@@ -202,7 +207,7 @@ My sample code reports:
   Floor has 7 faces.
   Wall has 6 faces.
   38 face-face intersections.
- </pre>
+</pre>
 
 So, in fact, not every face-to-face test reports an intersection, because 7*6 equals 42.
 
@@ -220,7 +225,7 @@ At most, it computes intersections between the underlying (unbounded) surfaces, 
 As a first step, the documentation will be updated to reflect this fact.
 Then, we'll see whether resources can be found to fully implement the face intersection functionality, or remove the incomplete functionality.
 
-As a result, *REVIT-58034* was initially renamed. Currently, the following related tickets have all been closed:
+As a result, *REVIT-58034* was renamed. Currently, the following related tickets have all been closed:
 
 - REVIT-58034 [Improve documentation for API Face.Intersect(Face) to reflect what the function actually does] 
 - REVIT-133627 [Face.Intersect returns false positives] 
