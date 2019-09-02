@@ -32,7 +32,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Parameters and Preview Images
+### Parameters and DirectShape Edges
 
 
 
