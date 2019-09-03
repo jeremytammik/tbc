@@ -17,8 +17,11 @@ twitter:
 
 Parameters and preview images in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+I still have a backlog of questions from last week to process.
+Here are some of the discussions that came up
+&ndash; Shared parameter is either type or instance
+&ndash; Transferring element parameters
+&ndash; Hiding DirectShape internal face edges...
 
 
 linkedin:
@@ -32,18 +35,23 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Parameters and DirectShape Edges
+### Accessing Parameters and Hiding DirectShape Edges
+
+I still have a backlog of questions from last week to process.
+
+Here are some of the discussions that came up:
+
+- [Shared parameter is either type or instance](#2)
+- [Transferring element parameters](#3)
+- [Hiding DirectShape internal face edges](#4)
 
 
-
-
-
-####<a name="3"></a> Shared Parameter is Either Type or Instance
+####<a name="2"></a> Shared Parameter is Either Type or Instance
 
 From the StackOverflow question
 on [how to bind a shared parameter to both type and instance elements](https://stackoverflow.com/questions/57653886/how-to-bind-a-shared-parameter-to-elements-of-both-type-and-instance):
 
-**Question:** I create a Shared Parameter programatically. This works well. I can also bind that parameter to different element types (categories) like Windows or Doors. However, once that is done, I struggle to create a new binding to for example a room which is not a family type, and should be bound to instances instead.
+**Question:** I create a shared parameter programmatically. This works well. I can also bind that parameter to different element types (categories) like Windows or Doors. However, once that is done for a type, I struggle to create a new binding to instances instead.
 
 Is there any way to use ONE single shared parameter and bind that to both types and instances?
 
@@ -51,7 +59,7 @@ Is there any way to use ONE single shared parameter and bind that to both types 
 
 **Response:** Thank you for answering so quickly.
 
-I now tried to do it manually as well, through the UI, and got the message that it has already been added, so you unfortunately seems to be right. I am probably not the first to say this, but that is just veird behaviour. It forces me to create two parameters which have the completely identical defintion to add them to different categories.
+I now tried to do it manually as well, through the UI, and got the message that it has already been added, so, unfortunately, you seem to be right. I am probably not the first to say this, but that is just weird behaviour. It forces me to create two parameters which have the completely identical definition to add them to different categories.
 
 **Answer:** Yes.
 
@@ -67,264 +75,67 @@ Neither Revit nor the end user will effectively see your extensible storage data
 
 Depending on your exact needs, this may be what you want or not.
 
-####<a name="4"></a> Retrieve Element Parameters
+####<a name="3"></a> Transferring Element Parameters
+
+How can one retrieve all parameters from an element?
+
+**Question:** I am working on converting Revit room volumes into DirectShape elements (done already with info from your blog
+on [room closed shell DirectShape for Forge viewer](https://thebuildingcoder.typepad.com/blog/2019/06/improved-room-closed-shell-directshape-for-forge-viewer.html)).
+
+The next step is to copy the room parameters into the DirectShape object, in such a way they appear correctly in the UI.
+ 
+Here is a picture of some DirectShapes (Mass in English, "Volume" in the French version) created with Dynamo:
 
 <center>
 <img src="img/pl_directshape_parameters.png" alt="DirectShape parameters" width="1425">
 </center>
 
+So, I'm able to retrieve the room parameters, and I would like now to create the same in the DS I just created so they show up in that UI.
+
+Note the "Comments" field is already working, I just don't know how to set the others... 
+
+**Answer:** The answer to this is included in the code you already looked at, in
+the [RoomVolumeDirectShape GitHub repository](https://github.com/jeremytammik/RoomVolumeDirectShape).
+ 
+look at the [lines 695-L708 in Command.cs](https://github.com/jeremytammik/RoomVolumeDirectShape/blob/master/RoomVolumeDirectShape/Command.cs#L695-L708),
+especially the lines containing '[Pp]aram'.
+ 
+Step through those in the debugger and you will see.
+
+**Response:** Your code is not doing exactly what I was looking for; it copies all the room parameters into one single JSON string in the "Comment" section, whereas I need to populate specific parameters... but, luckily, I found out that those parameters already exist on the newly created DirectShape, probably created by default as part of the project. So, I don't have to create them, just set their values. I'm off the hook for now...
+
+
 ####<a name="4"></a> Hiding DirectShape Internal Face Edges
+
+**Question:** On the topic of creating DirectShape elements... in the pictures below you can see shapes created by my add-in and others created by Dynamo. My add-in shapes display the internal face tessellation edges:
 
 <center>
 <img src="img/pl_volume_directshape.png" alt="DirectShape internal face edges" width="833">
 </center>
 
+The Dynamo ones do not:
+
 <center>
 <img src="img/pl_volume_dynamo.png" alt="Dynamo volumes" width="890">
 </center>
 
-<pre class="code">
-</pre>
-
-
-Hi philippe,
+ Do you know what the difference is, and whether I can make mine look like the Dynamo ones?
  
-Glad it helps.
+ **Answer:** It looks as if your shapes are created from separate triangular faces.
  
-I would love to hear how it goes if you ever look deeper into it.
- 
-No, currently not planning on attending devcon.
- 
-cheers,
- 
-jeremy
- 
-From: Philippe Leefsma <philippe.leefsma@gmail.com>
-Date: Wednesday, 28 August 2019 at 09:02
-To: Jeremy Tammik <jeremy.tammik@autodesk.com>
-Subject: Re: Revit API help - DirectShape + parameters
- 
-Alright great info thanks! 
- 
-It's not a problem for now, so I will let it like it is for the time being and look at BRepBuilder later on.
- 
-Will you be in DevCon Darmstad? See you there if you do ;)
- 
-Cheers,
-Philippe.
- 
-On Wed, 28 Aug 2019 at 08:58, Jeremy Tammik <jeremy.tammik@autodesk.com> wrote:
-Hi philippe,
- 
-It looks as if your shapes are created from separate triangular faces.
- 
-Would you like to mark some triangle edges so they are not displayed?
+Would you like to mark some triangle edges, so they are not displayed?
  
 Since Dynamo can do this, there must be a way.
  
-You can always debug ghe dynamo code and see for yourself what it is doing.
+You can always debug the Dynamo code and see for yourself what it is doing.
  
 I would assume it is creating a complete polygonal face with all its edges in one single go.
  
-I think this can be achieved using the TessellatedShapeBuilder class:
+I think this can be achieved using
+the [`TessellatedShapeBuilder` class](https://www.revitapidocs.com/2020/a144b0e3-c997-eac1-5c00-51c56d9e66f2.htm).
  
-https://www.revitapidocs.com/2020/a144b0e3-c997-eac1-5c00-51c56d9e66f2.htm
+Oh no, wrong, that one probably does generate triangulated faces just like you have.
  
-No wrong, that one probably does generate triangulated faces like you have.
+I believe the [`BRepBuilder` class](https://www.revitapidocs.com/2020/94c1fef4-2933-ce67-9c2d-361cbf8a42b4.htm) enables
+you to create more complex faces with no edges in the middle:
  
-I believe the BRepBuilder enables you to create more complex faces with no edges in the middle:
- 
-https://www.revitapidocs.com/2020/94c1fef4-2933-ce67-9c2d-361cbf8a42b4.htm
- 
-cheers,
- 
-jeremy
- 
-From: Philippe Leefsma <philippe.leefsma@gmail.com>
-Date: Wednesday, 28 August 2019 at 08:48
-To: Jeremy Tammik <jeremy.tammik@autodesk.com>
-Subject: Re: Revit API help - DirectShape + parameters
- 
-Hi Jeremy,
- 
-Right about the public questions, will do next time ;) Your code is not doing exactly what I was looking for, it copies all room parameters in the "Comment" section while I need to populate specific parameters... but luckily I found out that those parameters already exist on the newly created DirectShape, probably created by default as part of the project. So I dont have to create them, just set their value. I'm off the hook for now but some things in Revit API seem quite convoluted, at least for my BIM-ignorant mind...
- 
-while I have you... in the pictures below you can see Shapes created from dynamo (first pic) and Shapes created from my code (second pic). They look a bit different, can see tesselation on the second, so i'm wondering if you know the difference and if I can make mine look like the dynamo ones?
- 
-Thanks,
-Philippe.
- 
-
- 
-
- 
- 
- 
-On Wed, 28 Aug 2019 at 07:51, Jeremy Tammik <jeremy.tammik@autodesk.com> wrote:
-Hi philippe,
- 
-Nice to hear from you and glad to help.
- 
-Even though, even you can ask such a question in the public forum, so tat others can chip in and help, and the answer is also visible to others.
- 
-In this case, in fact, the answer is already included in the code you presumably already looked at:
- 
-https://github.com/jeremytammik/RoomVolumeDirectShape
- 
-look at these lines:
- 
-https://github.com/jeremytammik/RoomVolumeDirectShape/blob/master/RoomVolumeDirectShape/Command.cs#L695-L708
- 
-Look at the lines containing ‘[Pp]aram’.
- 
-Step through those in the debugger and you will see.
- 
-Cheers,
- 
-Jeremy
- 
-From: Philippe Leefsma <philippe.leefsma@gmail.com>
-Date: Tuesday, 27 August 2019 at 14:52
-To: Jeremy Tammik <jeremy.tammik@autodesk.com>
-Subject: Revit API help - DirectShape + parameters
- 
-Hi Jeremy,
- 
-After stepping in the unknown for a few hours, I thought I could use a bit of your expertise.
- 
-The goal is to convert Revit rooms into DirestShape (done already with info from your blog), the next step is to copy the room parameters into the DirectShape object, in such a way they appear correctyl in the UI.
- 
-Below you can see a picture of some DirectShapes (Mass in english, "Volume" in the french version) created with dynamo. So I'm able to retrieve the room parameters, and I would like now to create the same in the DS I just created so they show up in that UI. Note the "comments" is already working, I just don't know how to set the others... 
- 
-
- 
-Here is my code so far:
- 
- 
-static
-public void
-ConvertToVolume(
- 
-Document
-doc, Room
-room, Boolean
-fixShell)
- 
-{
- 
-try
- 
-{
- 
-var
-roomShell = !fixShell
- 
-? room.ClosedShell.ToArray()
- 
-: GetRoomShell(room);
- 
- 
-
-var
-typeId = new
-ElementId(BuiltInCategory.OST_Mass);
- 
- 
-
-var
-dsLib = DirectShapeLibrary.GetDirectShapeLibrary(doc);
- 
- 
-
-var
-dsType = DirectShapeType.Create(doc,
-"Volume",
-typeId);
- 
-dsType.SetShape(roomShell);
- 
- 
-
-dsLib.AddDefinitionType("Volume",
-dsType.Id);
- 
- 
-
-var
-shape = DirectShape.CreateElementInstance(
- 
-doc,
-dsType.Id,
-dsType.Category.Id,
-"Volume",
- 
-Transform.Identity);
- 
- 
-
-var
-guid = doc.Application.ActiveAddInId.GetGUID();
- 
- 
-
-var
-TwopsParams = room.Parameters.Cast<Parameter>().Where(p
-=> {
- 
-return
-p.Definition.Name.StartsWith("Twops");
- 
-});
- 
- 
-
-shape.ApplicationDataId =
-room.UniqueId;
- 
-shape.Name =
-"Volume for " +
-room.Name;
- 
-shape.ApplicationId =
-guid.ToString();
- 
-shape.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(
- 
-"Volume for " +
-room.Name +
-" (Generated by Twops Addin)");
- 
-shape.SetTypeId(dsType.Id);
- 
- 
-
-foreach (var
-p
-in TwopsParams)
- 
-{
- 
-// goal is to create in the shape,
- 
-// parameters with same value and Name than
- 
-// the ones in that TwopsParams collection ...
- 
-}
- 
-}
- 
-catch (Exception
-ex)
- 
-{
- 
-Console.WriteLine(ex.Message);
- 
-}
- 
-}
- 
- 
-Thanks,
-Philippe.
