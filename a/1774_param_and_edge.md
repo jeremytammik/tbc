@@ -15,7 +15,7 @@
 
 twitter:
 
-Parameters and preview images in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Accessing parameters and hiding DirectShape edges in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/paramsedges
 
 I still have a backlog of questions from last week to process.
 Here are some of the discussions that came up
