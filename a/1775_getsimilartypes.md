@@ -21,7 +21,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+GetSimilarTypes filters for curtain wall door symbols, SnappingService explanation and title block label parameters in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/getsimilartypes
 
 So many interesting discussions and inspiring solutions in the Revit API discussion forum!
 Here are a few, plus one non-forum beginner case
@@ -32,6 +32,17 @@ Here are a few, plus one non-forum beginner case
 
 linkedin:
 
+GetSimilarTypes, SnappingService and Title Labels in the #RevitAPI
+
+http://bit.ly/getsimilartypes
+
+So many interesting discussions and inspiring solutions in the Revit API discussion forum!
+
+Here are two of them, plus one non-forum beginner case:
+
+- GetSimilarTypes filters for curtain wall door symbols
+- SnappingService -- what does it actually do?
+- Get title block label parameters...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -46,7 +57,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 So many interesting discussions and inspiring solutions in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160)!
 
-Here are a few, plus one non-forum beginner case:
+Here are two of them, plus one non-forum beginner case:
 
 - [`GetSimilarTypes` filters for curtain wall door symbols](#2)
 - [`SnappingService` &ndash; what does it actually do?](#3)
