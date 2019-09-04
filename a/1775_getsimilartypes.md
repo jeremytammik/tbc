@@ -43,8 +43,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 So many interesting discussions and inspiring solutions in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160)!
 
-Here are a few, plus one non-forum case:
+Here are a few, plus one non-forum beginner case:
 
+- [`GetSimilarTypes` filters for curtain wall door symbols](#2)
+- [`SnappingService` &ndash; what does it actually do?](#3)
+- [Get title block label parameters](#4)
 
 
 ####<a name="2"></a> GetSimilarTypes Filters for Curtain Wall Door Symbols
@@ -57,7 +60,7 @@ on [`BuiltInCategory` of doors and curtain wall doors](https://forums.autodesk.c
 
 **Question:** I want to build a plugin that changes the curtain wall panel types.
 
-When I select a curtain wall door, how can I filter for only panel doors for curtain walls?
+When I select a curtain wall door, how can I filter for only curtain wall panel door symbols?
 
 Is there any specific value for curtain panel door?
 
@@ -75,9 +78,8 @@ A door in a standard wall looks similar:
   
 Since the category is the same for all doors, that cannot be used to tell them apart.
 
-Another possible criteria might be to query the door for its host using
+Another possible criterion might be to query the door for its host using
 its [`Host` property](https://www.revitapidocs.com/2020/69f30141-bd3b-8bdd-7a63-6353d4d495f9.htm).
-
 Using the host element properties, one ought to be able to differentiate curtain walls from others.
 However, I am looking at family symbols that have not yet been placed, not instances, so the host is not defined yet.
 
@@ -88,11 +90,13 @@ so I also tried checking
   FamilyInstance.Symbol.Family.IsCurtainPanelFamily
 </pre>
 
-Unfortunately,  IsCurtainPanelFamily always returns false, so that does not work either.
+Unfortunately, `IsCurtainPanelFamily` always returns false, so that does not work either.
 
 **Answer:** From the `FamilySymbol`, you can find similar types using `GetSimilarTypes`.
 
-This gives you all curtain wall panels, that can be placed in a curtain wall. Filter that list for the door category:
+This returns all curtain wall panels that can be placed in a curtain wall.
+
+Filter that list for the door category:
 
 <pre class="code">
 &nbsp;&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">FamilySymbol</span>&gt;&nbsp;CW_doors
@@ -102,7 +106,9 @@ This gives you all curtain wall panels, that can be placed in a curtain wall. Fi
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">FamilySymbol</span>&gt;();
 </pre>
 
-I added Frank's suggestion to
+Many thanks to Frank for solving this!
+
+I added his suggestion 
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) in
 a new method `GetDoorSymbolsForCurtainWall`
 in [release 2020.0.147.7](https://github.com/jeremytammik/the_building_coder_samples/compare/2020.0.147.7...2020.0.147.7).
@@ -122,7 +128,7 @@ They also expressed an intent to add some documentation for it, and maybe for a 
 
 ####<a name="4"></a> Get Title Block Label Parameters
 
-Let's wrap up for today with a beginners question:
+Let's wrap up for today with a beginner's question:
 
 **Question:** I am trying to access these title block label parameters marked in yellow through the Revit API:
 
@@ -141,7 +147,7 @@ installing [RevitLookup](https://github.com/jeremytammik/RevitLookup) and
 using that to explore the title block properties.
 
 Are you aware of RevitLookup?
-It really is an invaluable tool for Revit add-in development and understanding the structure and contents of the Revit database.
+It is a really invaluable tool for Revit add-in development and understanding the structure and contents of the Revit database.
 
 You may also find it out easily for yourself by searching the Internet for an existing solution, e.g., by searching for something
 like [revit api title block label parameters](https://duckduckgo.com/?q=revit+api+title+block+label+parameters).

@@ -40,7 +40,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <h3>GetSimilarTypes</h3>
 <p>So many interesting discussions and inspiring solutions in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>!</p>
-<p>Here are a few, plus one non-forum case:</p>
+<p>Here are a few, plus one non-forum beginner case:</p>
+<ul>
+<li><a href="#2"><code>GetSimilarTypes</code> filters for curtain wall door symbols</a></li>
+<li><a href="#3"><code>SnappingService</code> &ndash; what does it actually do?</a></li>
+<li><a href="#4">Get title block label parameters</a></li>
+</ul>
 <h4><a name="2"></a> GetSimilarTypes Filters for Curtain Wall Door Symbols</h4>
 <p>Yet once again,
 Frank <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/2083518">@Fair59</a> Aarssen
@@ -48,7 +53,7 @@ comes to the rescue, answering
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/builtincategory-of-doors-and-curtain-wall-doors/m-p/9002988"><code>BuiltInCategory</code> of doors and curtain wall doors</a>:</p>
 <p><strong>Question:</strong> I want to build a plugin that changes the curtain wall panel types.</p>
-<p>When I select a curtain wall door, how can I filter for only panel doors for curtain walls?</p>
+<p>When I select a curtain wall door, how can I filter for only curtain wall panel door symbols?</p>
 <p>Is there any specific value for curtain panel door?</p>
 <p>Snooping a curtain wall panel door in RevitLookup:</p>
 <p><center>
@@ -59,9 +64,9 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/builtincategory-of-do
 <img src="img/door_category_2.png" alt="Snoop door in standard wall" width="800">
 </center></p>
 <p>Since the category is the same for all doors, that cannot be used to tell them apart.</p>
-<p>Another possible criteria might be to query the door for its host using
-its <a href="https://www.revitapidocs.com/2020/69f30141-bd3b-8bdd-7a63-6353d4d495f9.htm"><code>Host</code> property</a>.</p>
-<p>Using the host element properties, one ought to be able to differentiate curtain walls from others.
+<p>Another possible criterion might be to query the door for its host using
+its <a href="https://www.revitapidocs.com/2020/69f30141-bd3b-8bdd-7a63-6353d4d495f9.htm"><code>Host</code> property</a>.
+Using the host element properties, one ought to be able to differentiate curtain walls from others.
 However, I am looking at family symbols that have not yet been placed, not instances, so the host is not defined yet.</p>
 <p>The <code>Family</code> class provides an <a href="https://www.revitapidocs.com/2020/da0becae-cb65-fffd-1e97-b4aab5533004.htm">IsCurtainPanelFamily property</a>,
 so I also tried checking</p>
@@ -69,9 +74,10 @@ so I also tried checking</p>
   FamilyInstance.Symbol.Family.IsCurtainPanelFamily
 </pre>
 
-<p>Unfortunately,  IsCurtainPanelFamily always returns false, so that does not work either.</p>
+<p>Unfortunately, <code>IsCurtainPanelFamily</code> always returns false, so that does not work either.</p>
 <p><strong>Answer:</strong> From the <code>FamilySymbol</code>, you can find similar types using <code>GetSimilarTypes</code>.</p>
-<p>This gives you all curtain wall panels, that can be placed in a curtain wall. Filter that list for the door category:</p>
+<p>This returns all curtain wall panels that can be placed in a curtain wall.</p>
+<p>Filter that list for the door category:</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">FamilySymbol</span>&gt;&nbsp;CW_doors
 &nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(
@@ -80,7 +86,8 @@ so I also tried checking</p>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">FamilySymbol</span>&gt;();
 </pre>
 
-<p>I added Frank's suggestion to
+<p>Many thanks to Frank for solving this!</p>
+<p>I added his suggestion 
 to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> in
 a new method <code>GetDoorSymbolsForCurtainWall</code>
 in <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2020.0.147.7...2020.0.147.7">release 2020.0.147.7</a>.</p>
@@ -92,7 +99,7 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/snappingservice-what-
 <p><strong>Answer:</strong> According to the development team, <code>SnappingService</code> provides snapping points and lines and is used for point clouds.
 They also expressed an intent to add some documentation for it, and maybe for a couple of other undocumented services as well.</p>
 <h4><a name="4"></a> Get Title Block Label Parameters</h4>
-<p>Let's wrap up for today with a beginners question:</p>
+<p>Let's wrap up for today with a beginner's question:</p>
 <p><strong>Question:</strong> I am trying to access these title block label parameters marked in yellow through the Revit API:</p>
 <p><center>
 <img src="img/title_block_label_parameters.png" alt="Title block label parameters" width="907">
@@ -104,7 +111,7 @@ They also expressed an intent to add some documentation for it, and maybe for a 
 installing <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a> and
 using that to explore the title block properties.</p>
 <p>Are you aware of RevitLookup?
-It really is an invaluable tool for Revit add-in development and understanding the structure and contents of the Revit database.</p>
+It is a really invaluable tool for Revit add-in development and understanding the structure and contents of the Revit database.</p>
 <p>You may also find it out easily for yourself by searching the Internet for an existing solution, e.g., by searching for something
 like <a href="https://duckduckgo.com/?q=revit+api+title+block+label+parameters">revit api title block label parameters</a>.</p>
 <p>The Building Coder took a look at
