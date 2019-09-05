@@ -41,14 +41,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### TLS Requirement, PDF Data and Collada DAE Exporter
 
-An important requirement regarding Transport Layer Security (TLS) settings, a short note on accessing PDF image data from an import instance, and an update of the Collada DAE custom exporter that resolved a problem tryin to use it in Revit 2020:
+An important Revit add-in requirement regarding Transport Layer Security (TLS) settings, a short note on accessing PDF image data from an import instance, and an update of the Collada DAE custom exporter for use in Revit 2020:
 
-- [Required Transport Layer Security (TLS) Settings](#2)
+- [Required Transport Layer Security (TLS) settings](#2)
     - [Background](#2.1)
     - [Requirement](#2.2)
     - [Recommendation](#2.3)
-- [Accessing Imported PDF Image Data in Revit](#3)
-- [Custom Collada Exporter Updated and Fixed](#4)
+- [Accessing imported PDF image data in Revit](#3)
+- [Custom Collada exporter updated and fixed](#4)
 
 <center>
 <img src="img/transport_layer_security.png" alt="Transport Layer Security" width="200">
@@ -70,11 +70,13 @@ The root cause turned out to be in a specific add-on, which exclusively specifie
 
 This setting overrode the TLS configuration in Revit and caused Revit to lose the capability of using TLS 1.2.
 
-Therefore, we suggest developers follow below requirement and recommendation when a specific TLS version is required in an add-in.
+Therefore, we suggest developers follow the requirement and recommendation below when a specific TLS version is required in an add-in.
 
 #####<a name="2.2"></a> Requirement
 
-Do not hard-code any TLS version exclusively, by directly assigning the version to the application-wide property `ServicePointManager.SecurityProtocol`. This will override Revit’s native TLS configuration, which inherits from the targeted .NET Framework, and supports TLS 1.0, 1.1 and 1.2.
+Do not hard-code any TLS version exclusively, by directly assigning the version to the application-wide property `ServicePointManager.SecurityProtocol`.
+
+This will override Revit’s native TLS configuration, which inherits from the targeted .NET Framework, and supports TLS 1.0, 1.1 and 1.2.
 
 The native TLS configuration is critical for Revit to communicate with various Autodesk cloud services.
 
@@ -96,13 +98,15 @@ Here is an example of a correct setting:
 
 #####<a name="2.3"></a> Recommendation
 
-We recommend you don’t specify the desired TLS version in the add-in, but always rely on Revit and the .NET Framework’s TLS support, if:
+We recommend you don’t specify the desired TLS version in the add-in, but always rely on Revit and the .NET Framework’s TLS support, if any of the following conditions is fulfilled:
 
-- The add-in is targeted on Revit 2015 to 2019, and the desired TLS version is 1.0 or 1.1,
-- Or, the add-in is targeted on Revit 2020 (or a future release), and the desired TLS version is 1.0, 1.1, or 1.2.
+- The add-in is targeted on Revit 2015 to 2019 and the desired TLS version is 1.0 or 1.1.
+- The add-in is targeted on Revit 2020 or a future release and the desired TLS version is 1.0, 1.1, or 1.2.
 
 
 ####<a name="3"></a> Accessing Imported PDF Image Data in Revit
+
+Here is a quick note on how to access image data from an imported PDF file:
 
 **Question:** I'm fairly new to the Revit API and was wondering if there's a way to access the image data of an imported PDF in Revit, i.e., the image data contained of an `ImageType` and `ImageInstance`.
 
@@ -117,13 +121,13 @@ We recommend you don’t specify the desired TLS version in the add-in, but alwa
  
 ####<a name="4"></a> Custom Collada Exporter Updated and Fixed
 
-I conducted two conversations with Bernhard Van Renssen in the past few days, in 
+I conversed with Bernhard Van Renssen in the past few days, in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [export to DAE file format](https://forums.autodesk.com/t5/revit-api-forum/export-to-dae-file-format/m-p/9004878) and
 in a [comment](https://thebuildingcoder.typepad.com/blog/2013/07/graphics-pipeline-custom-exporter.html#comment-4598898712) on
 the [article on *Graphics Pipeline Custom Exporter*](https://thebuildingcoder.typepad.com/blog/2013/07/graphics-pipeline-custom-exporter.html).
 
-They prompted me to migrate
+That prompted me to migrate
 the [Collada custom exporter](https://github.com/jeremytammik/CustomExporterCollada) to
 Revit 2020, including some minor enhancements that ended up resolving a larger problem:
 
@@ -134,7 +138,6 @@ I did not manage to get it work on 2019; the plugin is there, but it does nothin
 When debugging, it calls the `exporter.Export` function in the Command.cs file, but that always throws `ExternalApplicationException`.
 
 By the way, is Collada still the best format to export to if you need the materials, uvs and textures?
-
 
 **Answer:** Are you talking about
 the [Custom Exporter to Collada](https://thebuildingcoder.typepad.com/blog/2013/07/graphics-pipeline-custom-exporter.html#5) for
@@ -163,9 +166,10 @@ Its list of releases includes one saying, [added exception handler around call t
 
 Maybe you are already looking at this version including the exception handler wrapping the call to `Export`?
 
-Regarding your question on whether Collada the best format to export to:
+Regarding your question on whether Collada is the best format to export to:
 
-I am anything but an expert on this, but I would probably go for [glTF](https://en.wikipedia.org/wiki/GlTF)  nowadays.
+I am anything but an expert on this, but I would probably go for the
+new [glTF or GL Transmission Format](https://en.wikipedia.org/wiki/GlTF) nowadays.
 
 Afaik, it supports everything that Collada does and more, plus is more modern, streamlined, simple and efficient.
 
@@ -201,32 +205,32 @@ The file thus never goes through the process of writing any geometry data to the
 Would you perhaps know why this is?
 
 <pre>
-    public bool Start()
-    {
-      CurrentPolymeshIndex = 0;
-      polymeshToMaterialId.Clear();
+  public bool Start()
+  {
+    CurrentPolymeshIndex = 0;
+    polymeshToMaterialId.Clear();
 
-      streamWriter = new StreamWriter("W:\\!Work\\Reit 2014\\test.dae"); //default: W:\\!Work\\Reit 2014\\test.dae
+    streamWriter = new StreamWriter(_filepath);
 
-      WriteXmlColladaBegin();
-      WriteXmlAsset();
+    WriteXmlColladaBegin();
+    WriteXmlAsset();
 
-      WriteXmlLibraryGeometriesBegin();
+    WriteXmlLibraryGeometriesBegin();
 
-      return true;
-    }
+    return true;
+  }
 
-    public void Finish()
-    {
-      WriteXmlLibraryGeometriesEnd();
+  public void Finish()
+  {
+    WriteXmlLibraryGeometriesEnd();
 
-      WriteXmlLibraryMaterials();
-      WriteXmlLibraryEffects();
-      WriteXmlLibraryVisualScenes();
-      WriteXmlColladaEnd();
+    WriteXmlLibraryMaterials();
+    WriteXmlLibraryEffects();
+    WriteXmlLibraryVisualScenes();
+    WriteXmlColladaEnd();
 
-      streamWriter.Close();
-    }
+    streamWriter.Close();
+  }
 </pre>
 
 **Answer:** Try creating the `StreamWriter` earlier on, already in the constructor, so that it is already set up and ready to go before beginning the actual export. Maybe there is some strange conflict between the .NET `StreamWriter` creation and the Revit API export context.
