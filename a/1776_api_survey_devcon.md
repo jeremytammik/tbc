@@ -9,7 +9,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+API Survey and Forge DevCon 2019 in Las Vegas and Darmstadt for the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/apisurveydevcon
 
 We repeat the call to participate in the Revit API survey, and heartily invite you to register for the Forge DevCon conferences in Europe and North America
 &ndash; Revit API and Design Automation API Survey
