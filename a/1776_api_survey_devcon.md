@@ -19,6 +19,15 @@ We repeat the call to participate in the Revit API survey, and heartily invite y
 
 linkedin:
 
+API Survey and Forge DevCon 2019 in Las Vegas and Darmstadt for the #RevitAPI
+
+http://bit.ly/apisurveydevcon
+
+We repeat the call to participate in the Revit API survey, and heartily invite you to register for the Forge DevCon conferences in Europe and North America:
+
+- Revit API and Design Automation API Survey
+- Forge DevCon 2019 at AU in Las Vegas
+- Forge DevCon 2019 at AU in Darmstadt...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
