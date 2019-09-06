@@ -94,7 +94,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p><strong>Answer:</strong> Please install <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a> and see what you can find out that way first.</p>
 <p><strong>Response:</strong> I did that. It was super helpful to learn and find the <code>ImageType</code> class. I don't see how to access the image data, though. </p>
 <p><strong>Answer:</strong> Does the import create an <code>ImportInstance</code>? Look at the <a href="https://www.revitapidocs.com/2020/fcedeca0-0e52-6a5f-b716-1d92c0fbac62.htm">ImportInstance members</a>.</p>
-<p><strong>Response:</strong> I found the <code>ImageType.GetImage</code> method thanks to RevitLookup. So I can just call <code>imageType.GetImage().Save(filepath)</code>.</p>
+<p><strong>Response:</strong> I found the <code>ImageType.GetImage</code> method thanks to RevitLookup.
+So, I can just call <code>imageType.GetImage().Save(filepath)</code>.</p>
 <h4><a name="4"></a> Custom Collada Exporter Updated and Fixed</h4>
 <p>I conversed with Bernhard Van Renssen in the past few days, in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
@@ -130,17 +131,17 @@ Revit 2014, published in July 2013?</p>
 new <a href="https://en.wikipedia.org/wiki/GlTF">glTF or GL Transmission Format</a> nowadays.</p>
 <p>Afaik, it supports everything that Collada does and more, plus is more modern, streamlined, simple and efficient.</p>
 <p>In fact, I recently implemented a <a href="https://thebuildingcoder.typepad.com/blog/2019/06/room-volume-gltf-generator.html">room volume exporter that creates data for use in a glTF visualisation</a>.</p>
-<p><strong>Response:</strong> I use the GitHub version, both the one with the exception handler (2017.0.0.1) and the 2018.0.0.0 releases, and both of them for some reason do not work neither on Revit 2018 nor 2019 (it does nothing after I click the custom addin on a 3D view). </p>
+<p><strong>Response:</strong> I use the GitHub version, both the one with the exception handler (2017.0.0.1) and the 2018.0.0.0 releases, and both of them for some reason do not work neither on Revit 2018 nor 2019 (it does nothing after I click the custom add-in in a 3D view). </p>
 <p>Here are the steps that I took to recreate the scenario:</p>
 <ul>
 <li>Downloaded the 2018 zip release file, unzipped and opened the .sln file in Visual Studio 2017.</li>
 <li>Reimported the RevitAPI.dll and RevitAPIUI.dll file from the Revit folder, as they were not found when opening the .sln file initially</li>
 <li>Changed the target framework to .NET Framework 4.7.1 (latest that I have downloaded on this machine)</li>
-<li>Built the project, added the CustomExporterCollada.dll as well as the CustomExporterCollada.addin to the add-in folder of Revit 2019</li>
-<li>Launched Debug for Revit 2019 in Visual studio, opened a demo project and launched the addin from the external tools icon with a breakpoint on the exporter.Export line of Command.cs in Visual Studio</li>
+<li>Built the project, added the CustomExporterCollada.dll as well as the CustomExporterCollada.add-in to the add-in folder of Revit 2019</li>
+<li>Launched Debug for Revit 2019 in Visual studio, opened a demo project and launched the add-in from the external tools icon with a breakpoint on the exporter.Export line of Command.cs in Visual Studio</li>
 <li>Stepped through the code from here until the exception message is called.</li>
 </ul>
-<p>I hope there is something basic that Im missing? Anyway, thank you for your time thus far, I appreciate every bit of your work and help, makes it really accessible for a newcomer to get started with developing plugins!</p>
+<p>I hope there is something basic that I'm missing? Anyway, thank you for your time thus far, I appreciate every bit of your work and help, makes it really accessible for a newcomer to get started with developing plugins!</p>
 <p>Update:</p>
 <p>When debugging the project, in the <code>MyExportContext</code> file, in the <code>Start</code> method, I can step through the code in the debugger up to the line initialising the <code>StreamWriter</code>:</p>
 <pre>

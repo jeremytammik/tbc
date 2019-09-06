@@ -116,7 +116,8 @@ Here is a quick note on how to access image data from an imported PDF file:
 
 **Answer:** Does the import create an `ImportInstance`? Look at the [ImportInstance members](https://www.revitapidocs.com/2020/fcedeca0-0e52-6a5f-b716-1d92c0fbac62.htm).
 
-**Response:** I found the `ImageType.GetImage` method thanks to RevitLookup. So I can just call `imageType.GetImage().Save(filepath)`.
+**Response:** I found the `ImageType.GetImage` method thanks to RevitLookup.
+So, I can just call `imageType.GetImage().Save(filepath)`.
 
  
 ####<a name="4"></a> Custom Collada Exporter Updated and Fixed
@@ -175,18 +176,18 @@ Afaik, it supports everything that Collada does and more, plus is more modern, s
 
 In fact, I recently implemented a [room volume exporter that creates data for use in a glTF visualisation](https://thebuildingcoder.typepad.com/blog/2019/06/room-volume-gltf-generator.html).
 
-**Response:** I use the GitHub version, both the one with the exception handler (2017.0.0.1) and the 2018.0.0.0 releases, and both of them for some reason do not work neither on Revit 2018 nor 2019 (it does nothing after I click the custom addin on a 3D view). 
+**Response:** I use the GitHub version, both the one with the exception handler (2017.0.0.1) and the 2018.0.0.0 releases, and both of them for some reason do not work neither on Revit 2018 nor 2019 (it does nothing after I click the custom add-in in a 3D view). 
 
 Here are the steps that I took to recreate the scenario:
 
 - Downloaded the 2018 zip release file, unzipped and opened the .sln file in Visual Studio 2017.
 - Reimported the RevitAPI.dll and RevitAPIUI.dll file from the Revit folder, as they were not found when opening the .sln file initially
 - Changed the target framework to .NET Framework 4.7.1 (latest that I have downloaded on this machine)
-- Built the project, added the CustomExporterCollada.dll as well as the CustomExporterCollada.addin to the add-in folder of Revit 2019
-- Launched Debug for Revit 2019 in Visual studio, opened a demo project and launched the addin from the external tools icon with a breakpoint on the exporter.Export line of Command.cs in Visual Studio
+- Built the project, added the CustomExporterCollada.dll as well as the CustomExporterCollada.add-in to the add-in folder of Revit 2019
+- Launched Debug for Revit 2019 in Visual studio, opened a demo project and launched the add-in from the external tools icon with a breakpoint on the exporter.Export line of Command.cs in Visual Studio
 - Stepped through the code from here until the exception message is called.
 
-I hope there is something basic that Im missing? Anyway, thank you for your time thus far, I appreciate every bit of your work and help, makes it really accessible for a newcomer to get started with developing plugins!
+I hope there is something basic that I'm missing? Anyway, thank you for your time thus far, I appreciate every bit of your work and help, makes it really accessible for a newcomer to get started with developing plugins!
 
 Update:
 
