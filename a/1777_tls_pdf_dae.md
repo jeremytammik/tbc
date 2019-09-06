@@ -25,8 +25,10 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+An important Revit add-in requirement regarding Transport Layer Security (TLS) settings, a short note on accessing PDF image data from an import instance, and an update of the Collada DAE custom exporter for use in Revit 2020
+&ndash; Required Transport Layer Security (TLS) settings
+&ndash; Accessing imported PDF image data in Revit
+&ndash; Custom Collada exporter updated and fixed...
 
 
 linkedin:
