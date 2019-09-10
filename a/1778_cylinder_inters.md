@@ -14,7 +14,7 @@
 
 twitter:
 
-Cylinder intersection and vision of online assets in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Cylinder intersection requires edges and a vision of online assets in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/cylinderinters
 
 A surprising new aspect of Revit's built-in solid intersection algorithms and a ten-year vision for online assets
 &ndash; No face to face intersection without edges
