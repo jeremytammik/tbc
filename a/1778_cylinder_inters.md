@@ -22,6 +22,15 @@ A surprising new aspect of Revit's built-in solid intersection algorithms and a 
 
 linkedin:
 
+Cylinder intersection requires edges and a vision of online assets in the #RevitAPI 
+
+http://bit.ly/cylinderinters
+
+A surprising new aspect of Revit's built-in solid intersection algorithms and a ten-year vision for online assets:
+
+- No face to face intersection without edges
+- Evolution of media creation - Vision of online assets...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
