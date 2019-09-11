@@ -21,6 +21,14 @@ Two exciting Revit API related news announcements from Ehsan Iran-Nejad and Gui 
 
 linkedin:
 
+pyRevit home page consolidation and ApiDocs code sample collection for the #RevitAPI
+
+http://bit.ly/apidocscode
+
+Two exciting Revit API related news announcements from Ehsan Iran-Nejad and Gui Talarico:
+
+- New comprehensive pyRevit home page
+- ApiDocs.co code search sample collection...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
