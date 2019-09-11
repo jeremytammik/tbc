@@ -13,7 +13,7 @@
 
 twitter:
 
-pyRevit home page consolidation and ApiDocs code sample collection for the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+pyRevit home page consolidation and ApiDocs code sample collection for the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/apidocscode
 
 Two exciting Revit API related news announcements from Ehsan Iran-Nejad and Gui Talarico
 &ndash; New comprehensive pyRevit home page
