@@ -39,7 +39,7 @@ Two exciting Revit API related news announcements from Ehsan Iran-Nejad and Gui 
     - [How does it work?](#3.1)
     - [Limitations](#3.2)
     - [How to contribute](#3.3)
-    - [RevitApiDocs and ApiDocs Comparison](#3.4)
+    - [RevitApiDocs and ApiDocs comparison](#3.4)
 
 
 ####<a name="2"></a> New Comprehensive pyRevit Home Page
