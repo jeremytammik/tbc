@@ -122,6 +122,12 @@ For each of these lines (plus the pipe centre line), use a `ReferenceIntersector
 
 Make sure the `View3D` used for the `ReferenceIntersector` displays the pipe's geometry in a proper way.
 
+**Response:** I think where we've settled with this in the office is using `Curve` objects constructed from `CylindricalFace` and `RevolvedFace` geometric information and checking their intersection with candidate solids.
+
+Because this is a fairly processing-heavy task, we're using it as a "last resort" after checking that the elements in question have certain parameter information, lie within (or intersecting) one another's bounding boxes and are not already flagged by the `ElementIntersectsSolidFilter` before reaching this point. This way, we narrow ourselves down to an extremely small subset of possible intersections to check.
+
+Thanks again for all your help in this matter.
+
 
 ####<a name="3"></a> Evolution of Media Creation &ndash; Vision of Online Assets
 
