@@ -32,29 +32,29 @@ An important question on handling add-in scaling for 4K high resolution screens:
 
 
 
-####<a name="2"></a>
+####<a name="2"></a> How to Adapt a Revit Add-In for 4K Displays?
 
 Wednesday, 21 August 2019 at 15:19
 
 We are in need of your help.  As you know we have been writing commercial Revit add-ins for many, many years (more than 10).  When we first started writing add-ins, we followed all of the examples from Autodesk, which were all done using WinForms.  We even built our add-in template code from these WinForms examples.  If I’m not mistaken, the sample code in the Revit SDK still uses WinForms for their examples.
  
 However, we have been getting more and more complaints from our customers that our add-ins don’t work properly when they run 4K monitors because they have to scale up the monitors just to be able to read text on them (the native resolution is too high for the size of these desktop monitors to allow text to be readable at native scale).  For example, most users change the scale to 150% or even 200% in order to be able to read text.  When this happens, our WinForms user interfaces get kind of jumbled up.  Scrolling doesn’t work right, buttons get pushed off the edge of the window, etc.  At least some of our add-ins essentially become unusable.
- 
+
+####<a name="3"></a> Application Properties
+
 A workaround to this problem for our add-ins is to have whichever monitor is the primary monitor be scaled to 100% zoom, then the add-ins work fine on any screen, but some customers are now balking at that.
  
 In my research on this subject, you can get Winforms applications to work well on 4K monitors by changing some of the application properties.  For example:
- 
-using System.Runtime.InteropServices;
 
-        [DllImport("Shcore.dll")]
- 
-        static extern int SetProcessDpiAwareness(int PROCESS_DPI_AWARENESS);
- 
-        private enum DpiAwareness { None = 0, SystemAware = 1, PerMonitorAware = 2 }
- 
- 
-SetProcessDpiAwareness((int)DpiAwareness.PerMonitorAware);
- 
+<pre class="code">
+using System.Runtime.InteropServices;
+  [DllImport("Shcore.dll")]
+  static extern int SetProcessDpiAwareness(int PROCESS_DPI_AWARENESS);
+  private enum DpiAwareness { None = 0, SystemAware = 1, PerMonitorAware = 2 }
+
+  SetProcessDpiAwareness(
+    (int)DpiAwareness.PerMonitorAware );
+</pre>
 
 While these things work well for standalone executables we write, I believe they must be done at the executable level, and as add-in creators for Revit we do not have control over Revit’s executable environment.  So very sadly, as nearly as I can tell these tricks don’t work for our Revit add-ins.
  
@@ -67,7 +67,7 @@ What have other long-term add-in creators done with their legacy code to solve t
 We really need your help with this!  Thank you very much for any advice you can offer.
 
 
-[A]
+####<a name="4"></a> Application Manifest
 
 Wednesday, 21 August 2019 at 21:11
 
@@ -78,7 +78,7 @@ Application manifests: https://docs.microsoft.com/en-us/windows/win32/sbscs/appl
 DPI awareness (and manifests): https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/mt846517(v%3Dvs.85)
 Registry key (for older Windows?): https://support.microsoft.com/en-us/help/912949/some-third-party-applications-that-use-external-manifest-files-stop-wo
 
-[A]
+####<a name="5"></a> Separate UI Component with IPC
 
 Thursday, 22 August 2019 at 15:30
 
@@ -92,17 +92,15 @@ https://forums.autodesk.com/t5/revit-api-forum/using-a-geometry-viewer-in-a-revi
  
 This assumes, of course, that you have not unnecessarily mixed up your UI code with Revit API stuff.
 
-[R]
-
-That is an EXTREMELY interesting idea!
+**Response:** That is an extremely interesting idea!
  
-I’m sure some of our oldest apps do embed the Revit code in with the UI.  So those would need some work to separate out.  But that would still be better and much faster than a whole rewrite.
+I’m sure some of our oldest apps do embed the Revit code in with the UI.
+So those would need some work to separate out.
+But that would still be better and much faster than a whole rewrite.
  
-Thank you so very much!!!!
+Thank you so very much!
 
-**Solution:**
-
-Wednesday, 28 August 2019 at 08:31
+####<a name="6"></a> Two Simple Solutions
 
 I did some testing, and we only have a few of our add-ins (or reusable components) that are in pretty bad shape as far as Winforms in Revit on 4K goes.  Very fortunately, most of our addins seem to work reasonably well!  Some work but require making their window large, so are awkward but functional, but a few things are downright unusable.  Of course, it’s the more complicated ones that have the worst problems, but I guess that is to be expected.  So the scope of the problem isn’t as big as we feared it might be.
  
