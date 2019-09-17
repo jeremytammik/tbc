@@ -146,67 +146,20 @@ I think the better suggestion might be that, if using Method 2, to have two icon
 Method 1 should obviously not incur any issues at all.
 
 <center>
-<img src="img/4k_default.jpg" alt="4K default" width="">
+<img src="img/4k_default.jpg" alt="4K default" width="620">
 </center>
 
 <center>
-<img src="img/4k_adjusted.jpg" alt="4K adjusted" width="">
+<img src="img/4k_default_cropped.jpg" alt="4K default detail" width="398">
 </center>
-
-
-####<a name="3"></a> ApiDocs.co Code Search Sample Collection
-
-Gui [@gtalarico](https://twitter.com/gtalarico) Talarico, the author of both 
-the [online Revit API documentation revitapidocs.com](https://www.revitapidocs.com) and the more
-general [Apidocs.co](https://apidocs.co) covering Grasshopper, Navisworks and Rhino as well,
-[announced an expanded search functionality](https://twitter.com/gtalarico/status/1170473246275145729?ref_src=twsrc%5Etfw) in
-the latter that provides code samples directly within its pages by searching a whole collection of samples hosted in the
-new [ApiDocs.co code search sample repository](https://github.com/gtalarico/apidocs.samples).
 
 <center>
-<img src="img/apidocs.co.png" alt="ApiDocs.co" width="700">
+<img src="img/4k_adjusted.jpg" alt="4K adjusted" width="620">
 </center>
 
-<!--
 <center>
-<blockquote class="twitter-tweet">
-<p lang="en" dir="ltr">Code samples are fetched this repo<a href="https://t.co/MxgdIuPlX3">https://t.co/MxgdIuPlX3</a><br>includes code from
-<a href="https://twitter.com/jeremytammik?ref_src=twsrc%5Etfw">@jeremytammik</a>
-<a href="https://twitter.com/a_dieckmann?ref_src=twsrc%5Etfw">@a_dieckmann</a>
-<a href="https://twitter.com/arch_laboratory?ref_src=twsrc%5Etfw">@arch_laboratory</a>
-<a href="https://twitter.com/5devene?ref_src=twsrc%5Etfw">@5devene</a>
-<a href="https://twitter.com/teocomi?ref_src=twsrc%5Etfw">@teocomi</a> and others</p>
-&mdash; Gui Talarico (@gtalarico)
-<a href="https://twitter.com/gtalarico/status/1170473246275145729?ref_src=twsrc%5Etfw">September 7, 2019</a>
-</blockquote>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<img src="img/4k_adjusted_cropped.jpg" alt="4K adjusted detail" width="248">
 </center>
--->
 
-#####<a name="3.1"></a> How Does it Work?
 
-[Apidocs.co](https://apidocs.co) uses the GitHub Code Search API against this repo to provide Code Samples directly within pages.
-
-Because the GitHub Code Search API is limited to a single user or repo, this repository aggregates multiple relevant repos so they can all be searchable in a single request.
-
-#####<a name="3.2"></a> Limitations
-
-- It's plain text search &ndash; some generic names like `Application` can trigger many false positives
-- It's limited to certain entity types (e.g., `Class`, `Method`, `Property`, etc.)
-
-#####<a name="3.3"></a> How to Contribute
-
-- Fork this repo
-- Add a relevant repo to `repos.json`
-- Run `python update.py`
-- Send a [Pull Request](https://github.com/gtalarico/apidocs.samples/pulls)
-
-#####<a name="3.4"></a> RevitApiDocs and ApiDocs Comparison
-
-**Question:** Could the new code sample search functionality be added to
-both [apidocs.co](http://apidocs.co)
-and [revitapidocs](https://www.revitapidocs.com)?
-It is tricky to know when to use which...
-
-**Answer:** Users can use whichever they prefer.
-While [revitapidocs](https://www.revitapidocs.com) will likely continue to get new API versions, it will not get new features &ndash; the code base has not aged well and adding new features to it is no fun.
+####<a name="3"></a> 
