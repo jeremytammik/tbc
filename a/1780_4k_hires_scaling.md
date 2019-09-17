@@ -177,19 +177,19 @@ There are 2 approaches which may quickly resolve this:
 Right-click on the desktop and select Display settings:
 
 <center>
-<img src="img/4k_solution_1_1.jpg" alt="Display settings" width="257">
+<img src="img/4k_solution_1_1.png" alt="Display settings" width="257">
 </center>
 
 Click on the representation of the 4K monitor (click the “Identify” button if you’re not sure):
 
 <center>
-<img src="img/4k_solution_1_2.jpg" alt="Display settings" width="410">
+<img src="img/4k_solution_1_2.png" alt="Display settings" width="410">
 </center>
 
 Set the Display resolution you like and, most importantly, set the scaling to 100% --
 
 <center>
-<img src="img/4k_solution_1_3.jpg" alt="Display settings" width="464">
+<img src="img/4k_solution_1_3.png" alt="Display settings" width="464">
 </center>
 
 You must log out and log back in for this change to take effect.
@@ -201,31 +201,31 @@ Adjustments can be made to how Revit is launched that should correct these displ
 With no Revit sessions running, right-click on the icon that launches Revit and select Properties:
 
 <center>
-<img src="img/4k_solution_2_1.jpg" alt="Taskbar icon" width="355">
+<img src="img/4k_solution_2_1.png" alt="Taskbar icon" width="355">
 <p style="font-size: 80%; font-style:italic">Taskbar icon</p>
 </center>
 
 <center>
-<img src="img/4k_solution_2_2.jpg" alt="Desktop icon" width="329">
+<img src="img/4k_solution_2_2.png" alt="Desktop icon" width="329">
 <p style="font-size: 80%; font-style:italic">Desktop icon</p>
 </center>
 
 On the next screen, select the Compatibility tab and click on “Change settings for all users” button at the bottom:
 
 <center>
-<img src="img/4k_solution_2_3.jpg" alt="“Change settings" width="298">
+<img src="img/4k_solution_2_3.png" alt="“Change settings" width="298">
 </center>
 
 Near the bottom of the next screen, click on the “Change high DPI settings” button:
 
 <center>
-<img src="img/4k_solution_2_4.jpg" alt="“Change settings" width="293">
+<img src="img/4k_solution_2_4.png" alt="“Change settings" width="293">
 </center>
   
 On the last screen, check the “Override high DPI scaling behavior. Scaling performed by:” checkbox and select **System**:
 
 <center>
-<img src="img/4k_solution_2_5.jpg" alt="“Change settings" width="274">
+<img src="img/4k_solution_2_5.png" alt="“Change settings" width="274">
 </center>
 
 Click OK on each dialog to save the settings.
