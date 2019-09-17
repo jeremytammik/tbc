@@ -32,7 +32,15 @@ As high-resolution monitors grow ever more common, an important question arises 
 
 Below, CoderBoy shares some questions and answers on this topic:
 
-
+- [Problem Adapting a Revit Add-In for 4K Displays](#2)
+- [Application Properties for Stand-Alone Apps](#3)
+- [Application Manifest Suggestion](#4)
+- [Separate UI Component with IPC Suggestion](#5)
+- [Solutions Documented](#6)
+- [Adjusting Revit for 4K Displays](#7)
+    - [Method 1 &ndash; Run Hires Monitor in Low Resolution](#7.1)
+    - [Method 2 &ndash; Adjust how Revit Handles 4K Displays](#7.2)
+- [Discussion of the Results](#8)
 
 ####<a name="2"></a> Problem Adapting a Revit Add-In for 4K Displays
 
