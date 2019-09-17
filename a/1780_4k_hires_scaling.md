@@ -10,7 +10,7 @@
 
 twitter:
 
- for the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/apidocscode
+Scaling an add-in for a 4K high resolution screen in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/scaleaddin4k
 
 As high-resolution monitors grow ever more common, an important question arises on handling add-in scaling for 4K high resolution screens
 &ndash; Problem adapting a Revit add-in for 4K displays
@@ -33,7 +33,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Scaling Add-In for 4K High Resolution Screen
+### Scaling an Add-In for a 4K High Resolution Screen
 
 As high-resolution monitors grow ever more common, an important question arises on handling add-in scaling for 4K high resolution screens.
 
