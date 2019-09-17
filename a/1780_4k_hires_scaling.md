@@ -24,6 +24,20 @@ As high-resolution monitors grow ever more common, an important question arises 
 
 linkedin:
 
+Scaling an add-in for a 4K high resolution screen in the #RevitAPI 
+
+http://bit.ly/scaleaddin4k
+
+As high-resolution monitors grow ever more common, an important question arises on handling add-in scaling for 4K high resolution screens:
+
+- Problem adapting a Revit add-in for 4K displays
+- Application properties for stand-alone apps
+- Application manifest 
+- Separate UI component with IPC 
+- Two solutions for adjusting Revit for 4K displays
+- Method 1 - Run hires monitor in low resolution
+- Method 2 - Adjust how Revit handles 4k displays
+- Discussion of the results...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
