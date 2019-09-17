@@ -249,7 +249,7 @@ I ran a test, and it’s true, as seen in the following two images.
 “Adjusted” is with the scaling adjustment:
 
 <center>
-<img src="img/4k_adjusted.jpg" alt="4K adjusted" width="620">
+<img src="img/4k_adjusted_pdf.png" alt="4K adjusted" width="522">
 </center>
 
 Much of the text is small.
