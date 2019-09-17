@@ -10,8 +10,15 @@ twitter:
 
  for the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/apidocscode
 
-&ndash; 
-...
+As high-resolution monitors grow ever more common, an important question arises on handling add-in scaling for 4K high resolution screens
+&ndash; Problem adapting a Revit add-in for 4K displays
+&ndash; Application properties for stand-alone apps
+&ndash; Application manifest 
+&ndash; Separate UI component with IPC 
+&ndash; Two solutions for adjusting Revit for 4K displays
+&ndash; Method 1 &ndash; Run hires monitor in low resolution
+&ndash; Method 2 &ndash; Adjust how Revit handles 4k displays
+&ndash; Discussion of the results...
 
 linkedin:
 
@@ -28,17 +35,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>As high-resolution monitors grow ever more common, an important question arises on handling add-in scaling for 4K high resolution screens.</p>
 <p>Below, CoderBoy shares some questions and answers on this topic:</p>
 <ul>
-<li><a href="#2">Problem Adapting a Revit Add-In for 4K Displays</a></li>
-<li><a href="#3">Application Properties for Stand-Alone Apps</a></li>
-<li><a href="#4">Application Manifest Suggestion</a></li>
-<li><a href="#5">Separate UI Component with IPC Suggestion</a></li>
-<li><a href="#6">Solutions Documented</a></li>
-<li><a href="#7">Adjusting Revit for 4K Displays</a><ul>
-<li><a href="#7.1">Method 1 &ndash; Run Hires Monitor in Low Resolution</a></li>
-<li><a href="#7.2">Method 2 &ndash; Adjust how Revit Handles 4K Displays</a></li>
+<li><a href="#2">Problem adapting a Revit add-in for 4K displays</a></li>
+<li><a href="#3">Application properties for stand-alone apps</a></li>
+<li><a href="#4">Application manifest suggestion</a></li>
+<li><a href="#5">Separate UI component with IPC suggestion</a></li>
+<li><a href="#6">Solutions documented</a></li>
+<li><a href="#7">Adjusting Revit for 4K displays</a><ul>
+<li><a href="#7.1">Method 1 &ndash; Run hires monitor in low resolution</a></li>
+<li><a href="#7.2">Method 2 &ndash; Adjust how Revit handles 4k displays</a></li>
 </ul>
 </li>
-<li><a href="#8">Discussion of the Results</a></li>
+<li><a href="#8">Discussion of the results</a></li>
 </ul>
 <h4><a name="2"></a> Problem Adapting a Revit Add-In for 4K Displays</h4>
 <p>We are in need of your help.
