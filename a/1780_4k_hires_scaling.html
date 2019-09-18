@@ -36,7 +36,6 @@ As high-resolution monitors grow ever more common, an important question arises 
 - Method 1 - Run hires monitor in low resolution
 - Method 2 - Adjust how Revit handles 4k displays
 - Discussion of the results...
-- Call to move to WPF
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -61,6 +60,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 </ul>
 </li>
 <li><a href="#8">Discussion of the results</a></li>
+<li><a href="#9">Call to move to WPF</a></li>
+<li><a href="#10">WinForms or WPF?</a></li>
 </ul>
 <h4><a name="2"></a> Problem Adapting a Revit Add-In for 4K Displays</h4>
 <p>We are in need of your help.
@@ -222,11 +223,11 @@ a wish list entry
 to <a href="https://forums.autodesk.com/t5/revit-ideas/update-sdk-developer-documentation-to-wpf/idi-p/9030473">update the SDK and developer documentation to WPF</a> in
 the Revit Idea Station, and 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/winforms-or-wpf/m-p/9030525">WinForms or WPF?</a>:</p>
-<p><strong>Question:</strong> Is Autodesk planning on updating the official developer guides and samples / documentation?</p>
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/winforms-or-wpf/m-p/9030525">WinForms or WPF?</a></p>
+<p><strong>Question:</strong> Is Autodesk planning on updating the official developer guides, samples and documentation?</p>
 <p>Isn't the root issue here that Autodesk's official documentation is recommending a UI Framework that's 17 years old?</p>
 <p>If the documentation recommended and walked you through WPF from the start, no one would have this problem, because WPF scales properly across mixed and high resolution monitors...</p>
-<p>I know that I was burned by the same issue as CoderBoy and was very frustrated when I realized that I never should have bothered with Winforms to begin with.</p>
+<p>I know that I was burned by the same issue as CoderBoy and was very frustrated when I realized that I never should have bothered with WinForms to begin with.</p>
 <p><strong>Answer:</strong> I am very sorry to hear your completely understandable frustration. Unfortunately, the best I can do is suggest that you file a wish list request for a revamped SDK in the Revit Idea Station, and discuss your Revit API plans with your peers in the Revit API discussion forum before investing too much into any obsolete frameworks. Personally, I am not a fan of graphical user interfaces in any shape and form. As far as I am concerned, the only user interface I ever need is an ASCII text editor. I am sure you can very effectively drive Revit
 from <a href="https://en.wikipedia.org/wiki/Emacs">emacs</a> &nbsp; :-)</p>
 <p><strong>Response:</strong> Haha well I agree with you wholeheartedly on that, convincing our users that all they need is a terminal might be a bit more of a challenge though! I have submitted a wish list item to the Revit Idea Station idea requesting
@@ -234,5 +235,5 @@ to <a href="https://forums.autodesk.com/t5/revit-ideas/update-sdk-developer-docu
 <h4><a name="10"></a> WinForms or WPF?</h4>
 <p>This is an old thread, but it's still highly ranked on Google, so I just wanted to chime in that I went down the WinForms path for about a year and I really regretted it. I would highly recommend that everyone go down the WPF route instead.</p>
 <p>For one, WinForms often have some serious and practically unsolvable scaling issues on high resolution monitors, as discussed above. While Inter-Process Communication (IPC) is a good option for fixing this user's existing code base, implementing IPC is way more work than just using WPF to begin with, since WPF apps don't have scaling issues.</p>
-<p>Additionally, WPF UIs are built in a much more modern way, with XML layout documents, separate style documents, and separate code / logic documents. This is much more similar to how UIs are built on other frameworks (like Android / iOS / macOS  / web development) and will better prepare you for expanding your development knowledge. This separation also tends to produce much cleaner, more flexible, and more reuseable code.</p>
-<p>And lastly, because WPF is a more modern framework, I find that it's just far easier to produce apps that actually look good, and that my users actually enjoy opening up. As developers it's easy to focus on the back end data, but if you want to make a tool that people actually use, it needs to have a pleasing UI, and the styling / dynamic binding nature of WPF makes it far far far easier to produce at least halfway modern UXs.</p>
+<p>Additionally, WPF UIs are built in a much more modern way, with XML layout documents, separate style documents, and separate code / logic documents. This is much more similar to how UIs are built on other frameworks (like Android / iOS / macOS  / web development) and will better prepare you for expanding your development knowledge. This separation also tends to produce much cleaner, more flexible, and more reusable code.</p>
+<p>And lastly, because WPF is a more modern framework, I find that it's just far easier to produce apps that actually look good, and that my users actually enjoy opening up. As developers it's easy to focus on the back end data, but if you want to make a tool that people actually use, it needs to have a pleasing UI, and the styling / dynamic binding nature of WPF makes it far, far, far easier to produce at least halfway modern UXs.</p>
