@@ -1,0 +1,299 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</head></p>
+<!---
+
+twitter:
+
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+Revit 2020.1 was released and an updated Revit SDK has now been published for it
+&ndash; Additions to the Revit 2020.1 API
+&ndash; Systems analysis API additions
+&ndash; Mechanical analytical systems
+&ndash; Zone equipment
+&ndash; System zones
+&ndash; Systems analysis and analysis reports
+&ndash; Export to gbXML
+&ndash; View API additions
+&ndash; Temporary view mode API
+&ndash; Schedule API additions
+&ndash; Striped rows
+&ndash; Path of travel API additions
+&ndash; Reveal obstacles mode for path of travel
+&ndash; Options API additions
+&ndash; Color options
+&ndash; Rebar API additions
+&ndash; Rebar constraints
+&ndash; Installation and compilation
+&ndash; RvtSamples Setup...
+
+linkedin:
+
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<p style="font-size: 80%; font-style:italic"></p>
+
+-->
+
+<h3>What's New in the Revit 2020.1 API</h3>
+<p>Revit 2020.1 was released a month ago.</p>
+<p>Harlan Brumm provides an overview of the new features in his article
+on <a href="https://blogs.autodesk.com/revit/2019/08/21/whats-new-in-revit-2020-1">What’s New in Revit 2020.1</a>.</p>
+<p>An updated Revit SDK for it has now been published in
+the <a href="https://www.autodesk.com/developer-network/platform-technologies/revit">Revit Developer Center</a>.</p>
+<p>I just recently created
+the <a href="https://github.com/jeremytammik/RevitSdkSamples">RevitSdkSamples GitHub repository for the Revit SDK samples</a>,
+to support the sample code text search
+in <a href="https://apidocs.co">Gui Talarico's apidocs.co online .NET API documentation</a>.</p>
+<p>Thanks to that, you can accompany me step by step as I install and adapt the SDK update for my system.</p>
+<p>Before getting to that, however, let's look at what's new in the Revit 2020.1 API:</p>
+<ul>
+<li><a href="#2">Major Additions to the Revit 2020.1 API</a><ul>
+<li><a href="#2.1">Systems Analysis API additions</a><ul>
+<li><a href="#2.1.1">Mechanical Analytical Systems</a></li>
+<li><a href="#2.1.2">Zone Equipment</a></li>
+<li><a href="#2.1.3">System Zones</a></li>
+<li><a href="#2.1.4">Systems Analysis and Analysis Reports</a></li>
+<li><a href="#2.1.5">Export to gbXML</a></li>
+</ul>
+</li>
+<li><a href="#2.2">View API additions</a><ul>
+<li><a href="#2.2.1">Temporary View Mode API</a></li>
+</ul>
+</li>
+<li><a href="#2.3">Schedule API additions</a><ul>
+<li><a href="#2.3.1">Striped rows</a></li>
+</ul>
+</li>
+<li><a href="#2.4">Path of Travel API additions</a><ul>
+<li><a href="#2.4.1">Reveal Obstacles Mode for Path of Travel</a></li>
+</ul>
+</li>
+<li><a href="#2.5">Options API additions</a><ul>
+<li><a href="#2.5.1">Color options</a></li>
+</ul>
+</li>
+<li><a href="#2.6">Rebar API additions</a><ul>
+<li><a href="#2.6.1">Rebar constraints</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#3">Installation and Compilation</a></li>
+<li><a href="#4">RvtSamples Setup</a></li>
+</ul>
+<h4><a name="2"></a> Major Additions to the Revit 2020.1 API</h4>
+<h5><a name="2.1"></a> Systems Analysis API additions</h5>
+<h6><a name="2.1.1"></a> Mechanical Analytical Systems</h6>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.Mechanical.MEPAnalyticalSystem</li>
+</ul>
+<p>represents an HVAC analytical system element where the air or water is circulated to satisfy building energy requirements.
+Its AnalyticalSystemDomain property indicates whether the element represents a water loop or air system.  </p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.Mechanical.WaterLoopData</li>
+</ul>
+<p>contains the data for a water loop system. It can be obtained from the MEPAnalyticalSystem.GetWaterLoopData() method. It offers the following properties:</p>
+<ul>
+<li>WaterLoopData.WaterLoopType</li>
+<li>WaterLoopData.ChillerType</li>
+<li>WaterLoopData.CondenserWaterLoopId</li>
+</ul>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.Mechanical.AirSystemData</li>
+</ul>
+<p>contains the data for an air system. It can be obtained from the MEPAnalyticalSystem.GetAirSystemData() method. It offers the following properties:</p>
+<ul>
+<li>AirSystemData.HeatExchangerType</li>
+<li>AirSystemData.PreheatCoilType</li>
+<li>AirSystemData.HeatingCoilType</li>
+<li>AirSystemData.AirSystemCoolingCoilType</li>
+<li>AirSystemData.AirFanType</li>
+</ul>
+<h6><a name="2.1.2"></a> Zone Equipment</h6>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.Mechanical.ZoneEquipment</li>
+</ul>
+<p>represents a zone equipment element used for Mechanical Systems Analysis. Zone equipment is an early-stage equipment placeholder that provides heating or cooling to part of the air system or water loop. One zone equipment element may be mapped to multiple pieces of physical equipment depending on the zoning behavior type.</p>
+<p>Analytical spaces may be associated to one or more zone equipment elements. The method:</p>
+<ul>
+<li>ZoneEquipment.MoveSpaceToEquipment() </li>
+</ul>
+<p>moves a set of spaces from the original zone equipment to the targeted zone equipment. Either zone equipment id may be InvalidElementId. If the original is InvalidElementId, the association is copied to the target zone equipment. If the target is InvalidElementId, the original association is removed.  The method:</p>
+<ul>
+<li>ZoneEquipment.GetAssociatedZoneEquipment() </li>
+</ul>
+<p>returns the set of zone equipment that is associated with the specified analytical space or spaces. </p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.Mechanical.ZoneEquipmentData </li>
+</ul>
+<p>represents the data associated with a zone equipment. It can be obtained from the ZoneEquipment.GetZoneEquipmentData() method. It offers the following properties:</p>
+<ul>
+<li>ZoneEquipmentData.EquipmentType</li>
+<li>ZoneEquipmentData.EquipmentBehavior</li>
+<li>ZoneEquipmentData.HotWaterLoopId</li>
+<li>ZoneEquipmentData.ChilledWaterLoopId</li>
+<li>ZoneEquipmentData.AirSystemId</li>
+</ul>
+<h6><a name="2.1.3"></a> System Zones</h6>
+<p>A system zone in Revit is used to specify what parts of a building are served by specific equipment, air systems and water loops, without having to physically model them.  In the Revit API, a system-zone is represented as a GenericZone element with a domain data of type SystemZoneData.</p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.GenericZone</li>
+</ul>
+<p>provides for a method of selecting elements that somehow come in contact with the zone object. A zone is a non-hierarchical structure of geometric information, area or volume definitions for the purpose of analysis.   A generic zone will contain specific domain requirements provided at creation of the element.  In Revit 2020.1, all GenericZones will represent system-zone elements used for MEP design.  Some relevant new members of GenericZones include:</p>
+<ul>
+<li>GenericZone.Create(Document doc, String name, GenericZoneDomainData domainData, ElementId levelId, IList&lt;CurveLoop&gt; curves) &ndash; supports creation of a zone using the specified domain data, level and curves to represent the intersection/outline of the related spaces.</li>
+<li>GenericZone.GetBoundaries() &ndash; Gets the boundaries for the given GenericZone.</li>
+<li>GenericZone.GetDomainData() &ndash; Returns the domain data for the given GenericZone.</li>
+</ul>
+<p>For system-zone elements, the domain data will be an instance of the new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.SystemZoneData</li>
+</ul>
+<p>This data includes a reference to the zone equipment for the spaces in this system-zone:</p>
+<ul>
+<li>SystemZoneData.ZoneEquipmentId</li>
+</ul>
+<h6><a name="2.1.4"></a> Systems Analysis and Analysis Reports</h6>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.Analysis.ViewSystemsAnalysisReport</li>
+</ul>
+<p>represents a view instance of the systems analysis report. In a typical API workflow, to run a systems analysis against a Revit project, create (via ViewSystemsAnalysisReport.Create()) a new view instance and request (via ViewSystemsAnalysisReport.RequestSystemsAnalysis()) the systems analysis from that view. The analysis will run in the background, and when the analysis is completed, the related views are automatically updated. The method RequestSystemsAnalysis.IsAnalysisCompleted indicates if the background systems analysis has completed or not.</p>
+<p>It is possible for a project to contain multiple systems analysis reports. The method:</p>
+<ul>
+<li>ViewSystemsAnalysisReport.GetLatestSystemsAnalysisReport()</li>
+</ul>
+<p>returns the latest report of systems analysis. The peak heating/cooling loads of all EnergyAnalysisSpace elements should be consistent with this latest report.</p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.Analysis.SystemsAnalysisOptions</li>
+</ul>
+<p>contains some properties (e.g., WeatherFile, WorkflowFile, and OutputFolder) that affect the systems analysis. It is okay to leave some parameters empty. In those cases, the analysis will take the default value from the ViewSystemsAnalysisReport element. The weather file affects the results of energy simulation. The systems analysis will use the weather file at the current site location if SystemsAnalysisOptions.WeatherFile is empty. </p>
+<p>Three new Application methods allow access to name and path information for systems analysis workflows:</p>
+<ul>
+<li>Application.getSystemsAnalysisWorkflowNames() &ndash; Returns names for systems analysis workflows. The array that is returned contains the names of the systems analysis workflows, in the order they are specified in Options.</li>
+<li>Application.getSystemsAnalysisWorkflows() &ndash; Returns name and path information identifying systems analysis workflow files. The map that is returned contains a key that is the name of the systems analysis workflow, and the value is the path to the workflow file.</li>
+<li>Application.setSystemsAnalysisWorkflows() &ndash; Sets name and path information identifying systems analysis workflow files. The input map should be specified as a key that is the name of the systems analysis workflow, and a value that is the path to the workflow file.</li>
+</ul>
+<h6><a name="2.1.5"></a> Export to gbXML</h6>
+<p>The new property:</p>
+<ul>
+<li>GBXMLExportOptions.ExportAnalyticalSystems </li>
+</ul>
+<p>should be set to true to export the analytical system related items when exporting to gbXML. </p>
+<h6><a name="2.2"></a> View API additions</h6>
+<h6><a name="2.2.1"></a> Temporary View Mode API</h6>
+<p>The Revit API now allows customization to create "custom temporary view modes" applied to a view as a temporary view property.</p>
+<p>For this release, the "Reveal Obstacles for Path of Travel" temporary mode is implemented this way. It uses the Analysis Visualization Framework (AVF) to display additional graphics on top of the view contents.</p>
+<p>The new properties:</p>
+<ul>
+<li>TemporaryViewModes.CustomTitle</li>
+<li>TemporaryViewModes.CustomColor</li>
+<li>TemporaryViewModes.ResetCustomization()</li>
+<li>TemporaryViewModes.IsCustomized()</li>
+</ul>
+<p>provide access to read and modify a custom temporary view mode.  CustomTitle should be set to cause the view to display the customized frame. The application is responsible to adjust the appearance of elements in the view related to the mode.</p>
+<h6><a name="2.3"></a> Schedule API additions</h6>
+<h6><a name="2.3.1"></a> Striped rows</h6>
+<p>The new property:</p>
+<ul>
+<li>ViewSchedule.HasStripedRows</li>
+</ul>
+<p>provides access to read or set if a given schedule is using a striped row display.</p>
+<h6><a name="2.4"></a> Path of Travel API additions</h6>
+<h6><a name="2.4.1"></a> Reveal Obstacles Mode for Path of Travel</h6>
+<p>The Reveal Obstacles view mode highlights elements in the plan view when those elements will act as obstacles for the current Path of Travel calculation settings. The new methods:</p>
+<ul>
+<li>
+<p>PathOfTravel.IsInRevealObstaclesMode()</p>
+</li>
+<li>
+<p>PathOfTravel.SetRevealObstaclesMode()</p>
+</li>
+</ul>
+<p>provide access to read or set if a view is displaying this mode.</p>
+<h6><a name="2.5"></a> Options API additions</h6>
+<h6><a name="2.5.1"></a> Color options</h6>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.ColorOptions</li>
+</ul>
+<p>provides access to color settings which affect the colors applied to specific views. </p>
+<p>The ColorOptions for the current session of Revit can be accessed via:</p>
+<ul>
+<li>static  ColorOptions.GetColorOptions()</li>
+</ul>
+<p>It has the following properties: </p>
+<ul>
+<li>BackgroundColor &ndash; The background color applied to views. </li>
+<li>SelectionColor &ndash; The color used to highlight selected elements. </li>
+<li>SelectionSemitransparent &ndash; Indicates whether or not selections will be shown in a semi-transparent manner. </li>
+<li>PreselectionColor &ndash; The color used to highlight candidates for selection before they are selected. </li>
+<li>AlertColor &ndash; The color used to highlight elements when a special alert is required. </li>
+<li>CalculatingColor &ndash; The color used to render elements when some aspect of their properties is currently being recalculated. </li>
+<li>EditingColor &ndash; The color used to render elements when editing. </li>
+</ul>
+<h6><a name="2.6"></a> Rebar API additions</h6>
+<h6><a name="2.6.1"></a> Rebar constraints</h6>
+<p>Several new RebarConstraint methods allow control over distances and spacing:</p>
+<ul>
+<li>RebarConstraint.GetDistanceToTargetRebar()</li>
+<li>RebarConstraint.SetDistanceToTargetRebar() </li>
+<li>RebarConstraint.IsBindingHandleWithTarget() </li>
+<li>RebarConstraint.SetToBindHandleWithTarget() </li>
+<li>RebarConstraint.IsUsingClearBarSpacing()</li>
+<li>RebarConstraint.SetToUseClearBarSpacing() </li>
+<li>RebarConstraint.FlipHandleOverTarget() </li>
+</ul>
+<p>Two new methods have been added to RebarConstraintsManager:</p>
+<ul>
+<li>RebarConstraintsManager.GetConstraintCandidatesForHandle(RebarConstrainedHandle, ElementId)</li>
+<li>RebarConstraintsManager.GetConstraintCandidatesForHandle(RebarConstrainedHandle, Reference) </li>
+</ul>
+<p>these methods return all possible RebarConstraints that could be used for a RebarConstrainedHandle related to the additional input. For free form rebar these will return an empty list. </p>
+<h4><a name="3"></a> Installation and Compilation</h4>
+<p>The initial state after installing the SDK is captured
+in <a href="https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2020.1.0.0">RevitSdkSamples release 2020.1.0.0</a>.</p>
+<p>Next, I opened <code>SDKSamples.sln</code> in Visual Studio and rebuilt all.</p>
+<p>That generated <a href="zip/revit_2020_1_sdk_samples_errors_warnings_1.txt">5 errors and 38 warnings</a>,
+because some projects were lacking documentation comments on certain methods, generating a warning, triggering an error.</p>
+<p>Turning off the XML documentation file toggle for the RebarFreeForm and SampleCommandsSteelElements projects improved things and reduced the count
+to <a href="zip/revit_2020_1_sdk_samples_errors_warnings_1.txt">1 error and 39 warnings</a>.</p>
+<p>I set up the missing reference to <em>Massing/PointCurveCreation/CS/Microsoft.Office.Interop.Excel.dll</em>, reducing the error count to zero.</p>
+<p>Most of the remaining 37 warnings are caused by the architecture mismatch and can be fixed by one single call
+to <a href="https://github.com/jeremytammik/DisableMismatchWarning">run <code>DisableMismatchWarning.exe</code> recursively</a> in
+the main <code>Samples</code> folder.</p>
+<p>Zero errors and five warnings remained.</p>
+<p>I turned off XML documentation file toggle for AppearanceAssetEditing project, reducing them
+to <a href="zip/revit_2020_1_sdk_samples_errors_warnings_1.txt">zero errors and four warnings</a>.</p>
+<p>This state is captured
+in in <a href="https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2020.1.0.1">RevitSdkSamples release 2020.1.0.1</a>.</p>
+<h4><a name="4"></a> RvtSamples Setup</h4>
+<p>A more daunting task is setting up RvtSamples to load all the external commands implemented by the SDK samples.</p>
+<p>This mainly involves editing <code>RvtSamples.txt</code> and setting correct paths to the sample DLLs.</p>
+<p>Some of the VB.NET samples place their DLLs in the <code>bin</code> directory, not in <code>bin/Debug</code>.</p>
+<p>Furthermore, the DatumsModification sample does not implement an external command named <code>Command</code>, as specified in the original version of RvtSamples.txt.</p>
+<p>Instead, it implements three, named DatumStyleModification, DatumAlignment and DatumPropagation.</p>
+<p>After <a href="zip/revit_2020_1_sdk_samples_errors_warnings_1.txt">fixing those issues</a>,
+all samples listed in RvtSamples.txt load successfully.</p>
+<p>This state is captured
+in in <a href="https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2020.1.0.2">RevitSdkSamples release 2020.1.0.2</a>.</p>
+<p>I hope this saves you some time setting things up yourself.</p>
+<p>For other examples of setting up RvtSamples, please refer to similar descriptions for previous releases.</p>
+<p><center>
+<img src="img/rvt_2020_1_systems_analysis-01-1024x977.png" alt="Revit 2020.1 systems analysis" width="512">
+</center></p>
