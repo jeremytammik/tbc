@@ -201,6 +201,8 @@ The list covers various domains and classifies the courses into the following gr
 - Engineering (5)
 - Language Learning (5)
 
+
 <center>
-<img src="img/.png" alt="" width="100">
+<img src="img/subpanel.png" alt="" width="626">
 </center>
+ 
