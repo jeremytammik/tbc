@@ -228,5 +228,6 @@ The list covers various domains and classifies the courses into the following gr
 - Engineering (5)
 - Language Learning (5)
 
-
- 
+<center>
+<img src="img/online-course.png" alt="Online course" width="240">
+</center>
