@@ -19,8 +19,15 @@
 
 twitter:
 
-&ndash; 
-...
+ the Revit 2020.1 #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+Please note that the European Forge DevCon in Darmstadt is looming imminent.
+Furthermore, here are some notes on two recent Revit programming discussions and a pointer to some of the top-rated online classes
+&ndash; DevCon Darmstadt
+&ndash; Personal DevCon invitation from Jim Quanci
+&ndash; Sun direction adjusted for project true north
+&ndash; Reading an RVT file without Revit
+&ndash; The top 100 free online courses...
 
 linkedin:
 
@@ -33,7 +40,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### DevCon Darmstadt, UI, Buttons and Forms
+### DevCon, Sun with True North and RVT without Revit
 
 Please note that the European Forge DevCon in Darmstadt is looming imminent.
 
