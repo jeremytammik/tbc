@@ -7,43 +7,6 @@
 
 <!---
 
-- Modeless dialog - stays on top
-  https://forums.autodesk.com/t5/revit-api-forum/modeless-dialog-stays-on-top/m-p/9042359
-
-- buttons
-  https://forums.autodesk.com/t5/revit-api-forum/how-to-modify-revit-button-picture/m-p/9034300#M41389
-  https://thebuildingcoder.typepad.com/blog/2017/12/pipe-fitting-k-factor-archilab-and-installer.html#7
-  https://archi-lab.net/create-your-own-tab-and-buttons-in-revit/
-  https://thebuildingcoder.typepad.com/blog/2019/07/bim365-getting-started-visual-appearance-and-cpu-voltage.html#2
-  https://www.bim365.tech/blog/programming-buttons-in-revit
-  
-- https://forums.autodesk.com/t5/revit-api-forum/external-application-with-web-ui/m-p/9036614
-
-- Re: ExternalEvent
-  https://forums.autodesk.com/t5/revit-api-forum/externalevent/m-p/9029731
-  [Q] Hi! I want to create ExternalEvent on button click. But I get exception: "Attempting to create an ExternalEvent outside of a standard API execution". When I checked the thread of the main window and the Command class, they were the same thread. What's the magic? I created the class for reseting event in Command class.
-  [A] Look at the Revit SDK sample ModelessDialog/ModelessForm_ExternalEvent.
-  The Building Coder also shares lots of samples implementing external events:
-  https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28
-  Sean Page adds a helpful pointer, saying:
-  I found this site to be exceptionally helpful when creating external event handlers.
-  https://knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhelp/2016/ENU/Revit-API/files/GUID-0A0D656E-5C44-49E8-A891-6C29F88E35C0-htm.html
-  https://knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhelp/2016/ENU/Revit-API/files/GUID-0A0D656E-5C44-49E8-A891-6C29F88E35C0-htm.html
-  Very strangely, I can no longer find the Revit 2016 knowledgebase article Sean points out in the Revit 2020 knowledgebase.
-  Unless someone can tell me where an up-to-date link for the current product version can be found, it might make sense to copy this to the blog or somewhere to preserve it for posterity.
-  BobbyC.Jones adds:
-  You cannot call ExternalEvent.Create() outside of a valid Revit API context, and a callback from a button click is most definitely not a valid context.
-  What i do is create an instance of the IExternalEventHandler and call ExternalEvent.Create() from the IExternalCommand, or other valid context, and pass them to the viewmodel (or create them in the ViewModel contstructor if you're newing up the ViewModel in the IExternalCommand.  I prefer MVVM, if you do not then pass them to or create them where you're UI logic resides, a Controller, or directly in the Form, or wherever.  Then in your button click callback you pass necessary state info to your IExternalEventHandler and then call Raise().
-
-- System.Data.Sqlite cannot be loaded
-  https://forums.autodesk.com/t5/revit-api-forum/syste-data-sqlite-can-not-loaded/m-p/9039972
-  [Q] I am writing an app that use sqlite to write to db and I make a refrence to System.Data.Sqlite but when I run the app inside Revit I got the error message "Could not load file or assembly or one of its dependencies"
-  What can be the cause of that error? Thank you
-  [A by Revitalizer] Autodesk itself uses a bunch of .NET DLL files in its own add-ins that are shipped with Revit.
-  Since they are loaded before your add-in, there may be conflicts if different versions are used.
-  So, make sure you use the same dll versions as Autodesk uses.
-  This applies to all the DLLs you see in the Revit.exe directory, e.g., Sqlite, Log4Net, ...
-
 - Get Sun Direction Adjusted for Project True North `GetSunDirection` by Mohsen Assaqqaf
   https://thebuildingcoder.typepad.com/blog/2013/06/sun-direction-shadow-calculation-and-wizard-update.html#comment-4614771756
   https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2020.0.147.8
@@ -70,14 +33,71 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### UI Buttons and Forms
+### DevCon Darmstadt, UI, Buttons and Forms
 
+Please note that the European Forge DevCon in Darmstadt is looming imminent.
 
-####<a name="2"></a> 
+Furthermore, here are some notes on two recent Revit programming discussions and a pointer to some of the top-rated online classes:
+
+- [DevCon Darmstadt](#2)
+- [Personal DevCon invitation from Jim Quanci](#3)
+- [Sun direction adjusted for project true north](#4)
+- [Reading an RVT file without Revit](#5)
+- [The top 100 free online courses](#6)
+
+####<a name="2"></a> DevCon Darmstadt
+
+Are you interested in streamlining and future-proofing your application workflow?
+
+Integrating with the web, providing access from mobile devices, automating steps, freeing your application workflow from the desktop limitations, embracing mobile access and flexible interaction?
+
+You can achieve all this and still make use of the full power of Revit and its API via the Forge Design Automation API.
+
+To find out more about all aspects of Forge, hear the latest news, meet and discuss with the experts driving it, join us at the European Forge DevCon on Monday, October 14, in Darmstadt, Germany.
+
+Check out the [agenda and all other information](https://forge.autodesk.com/devcon-2019),
+including a broader program offering sessions in both AEC and Manufacturing.
+
+You can [register here and now](https://www.rayseven.com/r7/runtime/autodesk/devcon2019/registration.visitor.php?l=en&x=1099c3252688305da2cc88dac21208ccbe8e53f5&s=input) if
+you like.
+
+DevCon Germany is an English language event taking place on the Monday directly preceding AU Germany.
+The modest fee of &euro;160 per person covers sessions, lunch, gourmet dinner, beer, wine, and juices at the evening reception.
+
+####<a name="3"></a> Personal DevCon Invitation from Jim Quanci
+
+Here is a personal invitation to the event from Jim Quanci, Senior Director, Forge Platform Development and Autodesk Developer Network:
+
+This is the third European Forge DevCon. The Forge DevCon is a 'pre-conference' to Autodesk University Germany. But don't let the 'pre-conference' bit fool you. Forge DevCon is a full-fledged conference in its own right and delivered in English (unlike AU Germany THAT is mostly in German). Of course, MANY attendees will be staying ON for AU Germany, but Forge DevCon is well worth the trip on its own.
+ 
+The theme for this year’s Forge DevCon is *Digital Transformation*.  Whether you are taking your own business through a digital transformation or  helping your customers through their digital transformation.  We've lined up 15 classes for you and ensured there's something for everyone. They include deep technical classes for coders; roadmap, case study and business-oriented classes for business decision makers; and even a series of ‘Academia’ presentations to see how researchers are using Forge in their research efforts. See the [full agenda here](https://www.rayseven.com/r7/runtime/autodesk/devcon2019/registration.visitor.php?l=en&x=8a134f3d57581d2a5ff10fd83e2020b23c390d20&s=agenda).
+ 
+What’s new to learn at the DevCon that shouldn’t be missed?
+
+Forge Design Automation with the release of Revit, Inventor and 3ds Max _engines in the cloud_ (along with AutoCAD that is already released).  What are Autodesk partners and customers doing with design automation?  Automate. Automate. Automate.  From automating design to automating model checking and more. Forge Model Derivative and Viewer using next generation “OTG” format.  This is all about an order of magnitude increase in model size and performance. Work with your largest models in the browser at high speed and on hardware limited mobile devices (phone, tablet, AR/VR and more). New BIM 360 APIs. Model Coordination (clash), Cost, Submittals, and more. 
+ 
+The Forge team will be present at the conference and at your disposal to answer any of your questions, up close and personal help with your challenges. Face to face time is important when you are climbing the learning curve and driving change in your organization &ndash; so come and get face time with Autodesk decision makers and engineers &ndash; and share learnings with other developers just like you.
+ 
+Convince your manager today that he needs to send you to the Forge DevCon &ndash; and then [register for the conference now](https://www.rayseven.com/r7/runtime/autodesk/devcon2019/registration.visitor.php?l=en&x=8a134f3d57581d2a5ff10fd83e2020b23c390d20&s=input).
+It's only three weeks away!
+ 
+Can't come to Darmstadt? Maybe we will catch in at [another great Forge DevCon venue in Las Vegas, USA](https://forge.autodesk.com/devcon-2019) on November 18th, the day before Autodesk University Las Vegas.
+ 
+Questions (of any sort)? Unsure? Want to have a one-on-one meeting while I am in Darmstadt and AU?
+Please do feel free to reach out to me directly.
+Just [drop me an email](mailto:jim.quanci@autodesk.com),
+[tweet @jimquanci](https://twitter.com/jimquanci),
+call or text me. 
+Really.
+
+<center>
+<img src="img/jimq.png" alt="Jim Quanci, sailor" width="367">
+</center>
+
 
 ####<a name="4"></a> Sun Direction Adjusted for Project True North
 
-Mohsen Assaqqaf shared a method `GetSunDirection` for obtaining the vector of the sun taking the project True North angle into account
+Back to the Revit API, Mohsen Assaqqaf shared a method `GetSunDirection` for obtaining the vector of the sun taking the project True North angle into account
 in [his comment](https://thebuildingcoder.typepad.com/blog/2013/06/sun-direction-shadow-calculation-and-wizard-update.html#comment-4614771756) on
 the [Sun Direction and Shadow Calculation](https://thebuildingcoder.typepad.com/blog/2013/06/sun-direction-shadow-calculation-and-wizard-update.html#comment-4614771756) discussion.
 
@@ -86,7 +106,7 @@ to [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 in [release 2020.0.147.8](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2020.0.147.8), cf.
 the [diff to the previous version](https://github.com/jeremytammik/the_building_coder_samples/compare/2020.0.147.7...2020.0.147.8):
 
-<pre style="font-family:Consolas;font-size:13px;color:black;background:white;">{
+<pre class="code">
 &nbsp;&nbsp;<span style="color:gray;">#region</span>&nbsp;Get&nbsp;Sun&nbsp;Direction&nbsp;Adjusted&nbsp;for&nbsp;Project&nbsp;True&nbsp;North
 &nbsp;&nbsp;<span style="color:green;">//&nbsp;Shared&nbsp;by&nbsp;Mohsen&nbsp;Assaqqaf&nbsp;in&nbsp;a&nbsp;comment&nbsp;on&nbsp;The&nbsp;Building&nbsp;Coder:</span>
 &nbsp;&nbsp;<span style="color:green;">//&nbsp;https://thebuildingcoder.typepad.com/blog/2013/06/sun-direction-shadow-calculation-and-wizard-update.html#comment-4614771756</span>
@@ -160,7 +180,7 @@ Many thanks to Mohsen for sharing this!
 
 ####<a name="5"></a> Reading an RVT File without Revit
 
-This topic reappears regularly, and now surfaced again the the StackOverflow question 
+This recurring topic now surfaced again in the StackOverflow question 
 on [reading RVT file](https://stackoverflow.com/questions/57936246/reading-rvt-file):
 
 **Question:** When I open any .RVT file in notepad, I can search and find 'R E V I T', I tried everything to find the same text in C#, but no success to encode the .RVT file, any solution?
@@ -185,7 +205,7 @@ Several different approaches are discussed in the following articles:
 You should never stop learning.
 
 A good place to browse for fresh material and inspiration is the overview of 
-the [100 Top Free Online Courses Of All Time](https://www.freecodecamp.org/news/best-online-courses):
+the [100 top free online courses of all time](https://www.freecodecamp.org/news/best-online-courses):
 
 > Every year, Class Central releases a list of the Top Free Online Courses Of All Time, based on tens of thousands of user reviews.
 This year, thanks to a growing number of reviews, the list is expanded from 50 to 100 courses.
@@ -202,7 +222,4 @@ The list covers various domains and classifies the courses into the following gr
 - Language Learning (5)
 
 
-<center>
-<img src="img/subpanel.png" alt="" width="626">
-</center>
  
