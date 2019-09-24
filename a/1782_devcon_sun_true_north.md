@@ -52,6 +52,10 @@ Furthermore, here are some notes on two recent Revit programming discussions and
 - [Reading an RVT file without Revit](#5)
 - [The top 100 free online courses](#6)
 
+<center>
+<img src="img/online-course.png" alt="Online course" width="240">
+</center>
+
 ####<a name="2"></a> DevCon Darmstadt
 
 Are you interested in streamlining and future-proofing your application workflow?
@@ -228,6 +232,3 @@ The list covers various domains and classifies the courses into the following gr
 - Engineering (5)
 - Language Learning (5)
 
-<center>
-<img src="img/online-course.png" alt="Online course" width="240">
-</center>
