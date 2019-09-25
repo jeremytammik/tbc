@@ -23,8 +23,10 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Several user interface related topics are being discussed in the Revit API discussion forum
+&ndash; Keep my form on top of Revit!
+&ndash; Creating buttons and getting started with an add-in UI
+&ndash; Integrating a web-based UI...
 
 linkedin:
 
@@ -127,10 +129,10 @@ Another thread was misunderstood and brought up a bunch of answers on how to get
 
 Here are the answers, once again, anyway:
 
-- Good explanation by [archi+lab](http://archi-lab.net) on how
-to [create your own tab and buttons in Revit](http://archi-lab.net/create-your-own-tab-and-buttons-in-revit)
 - [BIM365](https://www.bim365.tech)
 on [programming buttons in Revit](https://www.bim365.tech/blog/programming-buttons-in-revit)
+- Good explanation by [archi+lab](http://archi-lab.net) on how
+to [create your own tab and buttons in Revit](http://archi-lab.net/create-your-own-tab-and-buttons-in-revit)
 
 
 ####<a name="4"></a> Integrating a Web-Based UI
