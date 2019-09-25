@@ -21,7 +21,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+UI window handles, top-most forms, add-in buttons, web interface, etc. in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/topmostform
 
 Several user interface related topics are being discussed in the Revit API discussion forum
 &ndash; Keep my form on top of Revit!
@@ -29,6 +29,16 @@ Several user interface related topics are being discussed in the Revit API discu
 &ndash; Integrating a web-based UI...
 
 linkedin:
+
+UI window handles, top-most forms, add-in buttons, web interface, etc. in the #RevitAPI
+
+http://bit.ly/topmostform
+
+Several user interface related topics are being discussed in the Revit API discussion forum:
+
+- Keep my form on top of Revit!
+- Creating buttons and getting started with an add-in UI
+- Integrating a web-based UI...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
