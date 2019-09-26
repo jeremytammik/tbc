@@ -21,8 +21,11 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Preserving another couple of interesting recent threads from the Revit API discussion forum on various extensible and external topics
+&ndash; Extensible storage reading trouble
+&ndash; External event implementation
+&ndash; External DLL loading
+&ndash; External side face of a pipe...
 
 linkedin:
 
@@ -34,15 +37,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Extensible Storage, External Event, DLL and Pipe Face</h3>
+<h3>Extensible Storage, External Event, DLL, Pipe Face</h3>
 <p>Preserving another couple of interesting recent threads from
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> on
 various extensible and external topics:</p>
 <ul>
-<li><a href="#2">Extensible Storage Reading Trouble</a></li>
-<li><a href="#3">External Event Implementation</a></li>
-<li><a href="#4">External DLL Loading</a></li>
-<li><a href="#5">External Side Face of a Pipe</a></li>
+<li><a href="#2">Extensible storage reading trouble</a></li>
+<li><a href="#3">External event implementation</a></li>
+<li><a href="#4">External DLL loading</a></li>
+<li><a href="#5">External side face of a pipe</a></li>
 </ul>
 <p><center>
 <img src="img/herbstbild.jpg" alt="Autumn leaves" width="605">
@@ -53,14 +56,14 @@ various extensible and external topics:</p>
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/trouble-reading-entity-schema/m-p/9046186">trouble reading entity schema</a>:</p>
 <p><strong>Question:</strong> I seem to be having some trouble getting access to the entity schema I created.</p>
-<p>About 7 years ago, I created an app that reads &amp; writes a schema to the project info element. A year later I created another app that only reads this schema. Now I am updating the second app and I find with Revit 2019 it can no longer read the schema. I keep getting the error "Schema not available to this application" but in the schema builder the read\write access is set to vendor. The name, GUID and vendor id are set the same in both apps. I can still get the schema with the latest version of the app that created it, it's just the second app that can't.</p>
+<p>About 7 years ago, I created an app that reads &amp; writes a schema to the project info element. A year later I created another app that only reads this schema. Now I am updating the second app and I find with Revit 2019 it can no longer read the schema. I keep getting the error "Schema not available to this application" but in the schema builder the read/write access is set to vendor. The name, GUID and vendor id are set the same in both apps. I can still get the schema with the latest version of the app that created it, it's just the second app that can't.</p>
 <p>Is this a bug in the most recent API's?</p>
 <p>Later: Never mind. I figured it out.
 I had loaded my app through the wonderful add-in manager you created.
 So, the schema thought it was the add-in manager that was trying to access my schema.
 Everything works properly if I load my app with the manifest file without ever having loaded the app through the manager.</p>
 <p><strong>Answer by Christian @cwaluga Waluga:</strong> Glad to hear you figured it out!</p>
-<p>You can also try to change the vendor and add-in identification in the AddInManager .addin manifest file to yours.</p>
+<p>You can also try to change the vendor and add-in identification in the AddInManager <code>.addin</code> manifest file to yours.</p>
 <p>I do the same with RevitLookup to snoop my own extensible storage.</p>
 <p>Many thanks to Christian for this useful hint!</p>
 <h4><a name="3"></a> External Event Implementation</h4>
@@ -128,5 +131,3 @@ But haven't yet yielded any consistent results due to the variably of the instan
 <img src="img/pipe_cylinder_sides_positive.png" alt="Positive sides of an elbow" width="191">
 </center></p>
 <p>Please excuse my poor digital drawing skills.</p>
-<pre class="code">
-</pre>
