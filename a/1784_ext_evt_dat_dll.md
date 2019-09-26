@@ -22,8 +22,11 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Preserving another couple of interesting recent threads from the Revit API discussion forum on various extensible and external topics
+&ndash; Extensible storage reading trouble
+&ndash; External event implementation
+&ndash; External DLL loading
+&ndash; External side face of a pipe...
 
 linkedin:
 
@@ -35,16 +38,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Extensible Storage, External Event, DLL and Pipe Face
+### Extensible Storage, External Event, DLL, Pipe Face
 
 Preserving another couple of interesting recent threads from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) on
 various extensible and external topics:
 
-- [Extensible Storage Reading Trouble](#2)
-- [External Event Implementation](#3)
-- [External DLL Loading](#4)
-- [External Side Face of a Pipe](#5)
+- [Extensible storage reading trouble](#2)
+- [External event implementation](#3)
+- [External DLL loading](#4)
+- [External side face of a pipe](#5)
 
 <center>
 <img src="img/herbstbild.jpg" alt="Autumn leaves" width="605">
@@ -59,7 +62,7 @@ on [trouble reading entity schema](https://forums.autodesk.com/t5/revit-api-foru
 
 **Question:** I seem to be having some trouble getting access to the entity schema I created.
 
-About 7 years ago, I created an app that reads & writes a schema to the project info element. A year later I created another app that only reads this schema. Now I am updating the second app and I find with Revit 2019 it can no longer read the schema. I keep getting the error "Schema not available to this application" but in the schema builder the read\write access is set to vendor. The name, GUID and vendor id are set the same in both apps. I can still get the schema with the latest version of the app that created it, it's just the second app that can't.
+About 7 years ago, I created an app that reads & writes a schema to the project info element. A year later I created another app that only reads this schema. Now I am updating the second app and I find with Revit 2019 it can no longer read the schema. I keep getting the error "Schema not available to this application" but in the schema builder the read/write access is set to vendor. The name, GUID and vendor id are set the same in both apps. I can still get the schema with the latest version of the app that created it, it's just the second app that can't.
 
 Is this a bug in the most recent API's?
 
@@ -70,7 +73,7 @@ Everything works properly if I load my app with the manifest file without ever h
 
 **Answer by Christian @cwaluga Waluga:** Glad to hear you figured it out!
 
-You can also try to change the vendor and add-in identification in the AddInManager .addin manifest file to yours.
+You can also try to change the vendor and add-in identification in the AddInManager `.addin` manifest file to yours.
 
 I do the same with RevitLookup to snoop my own extensible storage.
 
@@ -175,7 +178,3 @@ I hope you get the idea. Here is a sketch to clarify:
 </center>
 
 Please excuse my poor digital drawing skills.
-
-<pre class="code">
-</pre>
-
