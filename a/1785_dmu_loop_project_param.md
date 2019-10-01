@@ -21,7 +21,7 @@ and a [Design Automation for Revit sample demonstrating parameter export and imp
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+New Forge Design Automation samples, getting project parameter id and preventing an updater loop in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/dmu_loop_project_param
 
 Let me once again highlight two helpful answers in the Revit API discussion forum and the newest pair of Forge Design Automation samples
 &ndash; Get project parameter id from its name
