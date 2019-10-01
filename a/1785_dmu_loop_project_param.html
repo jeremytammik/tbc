@@ -79,10 +79,11 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/iupdater-get-family-i
 <p>What works: <code>IUpdater</code> class that fires off my custom code when a user manipulates the shape handles on a family.</p>
 <p>What doesn't work: updating the family parameters.</p>
 <p>I have an <code>IUpdater</code> class that is fired only when family instances are changed.</p>
-<p>My problem is that it doesnt seem to update the parameter, and it loops infinitely (until revit crashes it) My guess is the reasoning is because im not filtering the modified collection enough. My end goal here is to get the family thats shape handle has been pulled, loop through each of its parameters (or find them, as I have the names stored in a list), and then set a value. (in this example just setting "4" but I have more advanced match being applied that is currently disabled while I figure this out)</p>
-<p><strong>Answer:</strong> When you say 'Revit is looping', it might be that the modification you apply in the updater Execute method triggers the same updater again, starting an infinite loop.</p>
+<p>My problem is that it doesn't seem to update the parameter, and it loops infinitely (until Revit crashes).
+My end goal here is to get the family whose shape handle has been pulled, loop through each of its parameters and set a value, in this example just setting "4", but I have more advanced match being applied that is currently disabled while I figure this out.</p>
+<p><strong>Answer:</strong> When you say, 'Revit is looping', it might be that the modification you apply in the updater Execute method triggers the same updater again, starting an infinite loop.</p>
 <p>There are different levels of triggers and updaters. You may want to modify those so that the changes you make do not re-trigger your updater.</p>
-<p>Alternatively, you might be able to add a switch to your updater Execute so that it is only active once, and deactivated when it gets called a second time in the same transaction, to step out of the infinite loop.</p>
+<p>Alternatively, you might be able to add a switch to your updater Execute so that it is only active once and deactivated when it gets called a second time in the same transaction, to step out of the infinite loop.</p>
 <p>Maybe some of
 the <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.31">other DMU samples</a> will
 help resolve the problem.</p>
@@ -98,11 +99,12 @@ help resolve the problem.</p>
 
 <p>Ever so many thanks to Frank for his endless flow of extremely insightful answers!</p>
 <h4><a name="4"></a> New Forge and Design Automation Samples</h4>
-<p>I do not discuss Forge Design Automation for Revit or DA4R as much as I would like, since there are still more than enough issues to be handled dealing with the pure Revit desktop API, and my other Forge Platform Development colleagues are more specialised on the web-based issues.</p>
-<p>I would still like to highlight the continuous flow
+<p>I do not discuss <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55">Forge Design Automation for Revit</a> or
+DA4R as much as I would like, since there are still more than enough issues to be handled dealing with the pure Revit desktop API, and my other Forge Platform Development colleagues are more specialised on the web-based issues.</p>
+<p>I would still like to highlight the continuous succession
 of <a href="https://forge.autodesk.com/categories/code-samples">new Forge samples</a>,
 recently including <a href="https://forge.autodesk.com/blog/communicate-servers-inside-design-automation">communication with servers from inside Design Automation</a>
 and a <a href="https://forge.autodesk.com/blog/design-automation-revit-parameters-export-import-sample-excel">Design Automation for Revit sample demonstrating parameter export and import with Excel</a>.</p>
 <p><center>
-<img src="img/" alt="" width="100">
+<img src="img/user_da_http.png" alt="Design Automation server communication" width="600">
 </center></p>

@@ -93,13 +93,14 @@ What doesn't work: updating the family parameters.
 
 I have an `IUpdater` class that is fired only when family instances are changed.
 
-My problem is that it doesnt seem to update the parameter, and it loops infinitely (until revit crashes it) My guess is the reasoning is because im not filtering the modified collection enough. My end goal here is to get the family thats shape handle has been pulled, loop through each of its parameters (or find them, as I have the names stored in a list), and then set a value. (in this example just setting "4" but I have more advanced match being applied that is currently disabled while I figure this out)
+My problem is that it doesn't seem to update the parameter, and it loops infinitely (until Revit crashes).
+My end goal here is to get the family whose shape handle has been pulled, loop through each of its parameters and set a value, in this example just setting "4", but I have more advanced match being applied that is currently disabled while I figure this out.
 
-**Answer:** When you say 'Revit is looping', it might be that the modification you apply in the updater Execute method triggers the same updater again, starting an infinite loop.
+**Answer:** When you say, 'Revit is looping', it might be that the modification you apply in the updater Execute method triggers the same updater again, starting an infinite loop.
 
 There are different levels of triggers and updaters. You may want to modify those so that the changes you make do not re-trigger your updater.
 
-Alternatively, you might be able to add a switch to your updater Execute so that it is only active once, and deactivated when it gets called a second time in the same transaction, to step out of the infinite loop.
+Alternatively, you might be able to add a switch to your updater Execute so that it is only active once and deactivated when it gets called a second time in the same transaction, to step out of the infinite loop.
 
 Maybe some of
 the [other DMU samples](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.31) will
@@ -121,14 +122,15 @@ Ever so many thanks to Frank for his endless flow of extremely insightful answer
 
 ####<a name="4"></a> New Forge and Design Automation Samples
 
-I do not discuss Forge Design Automation for Revit or DA4R as much as I would like, since there are still more than enough issues to be handled dealing with the pure Revit desktop API, and my other Forge Platform Development colleagues are more specialised on the web-based issues.
+I do not discuss [Forge Design Automation for Revit](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55) or
+DA4R as much as I would like, since there are still more than enough issues to be handled dealing with the pure Revit desktop API, and my other Forge Platform Development colleagues are more specialised on the web-based issues.
 
-I would still like to highlight the continuous flow
+I would still like to highlight the continuous succession
 of [new Forge samples](https://forge.autodesk.com/categories/code-samples),
 recently including [communication with servers from inside Design Automation](https://forge.autodesk.com/blog/communicate-servers-inside-design-automation)
 and a [Design Automation for Revit sample demonstrating parameter export and import with Excel](https://forge.autodesk.com/blog/design-automation-revit-parameters-export-import-sample-excel).
 
 <center>
-<img src="img/" alt="" width="100">
+<img src="img/user_da_http.png" alt="Design Automation server communication" width="600">
 </center>
 
