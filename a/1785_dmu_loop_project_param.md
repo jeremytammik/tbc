@@ -23,8 +23,10 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Let me once again highlight two helpful answers in the Revit API discussion forum and the newest pair of Forge Design Automation samples
+&ndash; Get project parameter id from its name
+&ndash; Preventing an updater loop
+&ndash; New Forge and Design Automation samples...
 
 linkedin:
 
