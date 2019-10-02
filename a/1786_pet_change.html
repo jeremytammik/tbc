@@ -28,6 +28,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 worked hard at solving the task of swapping nested families using Python and Dynamo and very kindly shares his solution here with us today, including
 his <a href="zip/ps_pet_change_python_scripts.txt">four Python scripts</a>.</p>
 <p>Parts of code can be used for several different purposes, so they might be helpful for others as well.</p>
+<ul>
+<li><a href="#2">Task at hand</a></li>
+<li><a href="#3">Problems faced</a></li>
+<li><a href="#4">Solution and detailed implementation</a></li>
+<li><a href="#4.1">Code 1 &ndash; all family instances in document</a></li>
+<li><a href="#4.2">Code 2 &ndash; save family as</a></li>
+<li><a href="#4.3">Code 3 &ndash; insert families in docs</a></li>
+<li><a href="#4.4">Code 4 &ndash; load families</a></li>
+<li><a href="#5">Initial conversation, questions and answers</a></li>
+</ul>
 <h4><a name="2"></a> Task at Hand</h4>
 <p>Swap out and overwrite a nested family instance to a different one with the same name, in one single background workflow.</p>
 <p>I have a family instance placed in my current project. It contains a nested family instance. The nested family instance needs to be replaced by a different one of the same name. I would like this modification to be performed in the background, with only my current project open.</p>

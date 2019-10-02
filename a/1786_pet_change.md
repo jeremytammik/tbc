@@ -31,7 +31,17 @@ worked hard at solving the task of swapping nested families using Python and Dyn
 his [four Python scripts](zip/ps_pet_change_python_scripts.txt).
 
 Parts of code can be used for several different purposes, so they might be helpful for others as well.
- 
+
+- [Task at hand](#2)
+- [Problems faced](#3)
+- [Solution and detailed implementation](#4)
+- [Code 1 &ndash; all family instances in document](#4.1)
+- [Code 2 &ndash; save family as](#4.2)
+- [Code 3 &ndash; insert families in docs](#4.3)
+- [Code 4 &ndash; load families](#4.4)
+- [Initial conversation, questions and answers](#5)
+
+
 ####<a name="2"></a> Task at Hand
 
 Swap out and overwrite a nested family instance to a different one with the same name, in one single background workflow.
