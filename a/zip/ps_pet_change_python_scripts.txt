@@ -1,0 +1,179 @@
+CODE_01_AL FAMILY INSTANCES IN DOCUMENT
+
+import clr
+import System
+clr.AddReference("RevitServices")
+import RevitServices
+from RevitServices.Persistence import DocumentManager
+doc = IN[0]
+
+clr.AddReference("RevitAPI")
+from Autodesk.Revit.DB import *
+
+clr.AddReference("RevitNodes")
+import Revit
+clr.ImportExtensions(Revit.Elements)
+
+
+familieCollector = FilteredElementCollector(doc).OfClass(FamilyInstance).ToElements()
+
+families = list()
+		
+for d in familieCollector:
+	#if d.IsTemplate != True:
+		families.append(d)
+
+#Assign your output to the OUT variable.
+OUT = families
+
+
+
+
+CODE_02_SAVE FAMILY AS
+
+import clr
+clr.AddReference('ProtoGeometry')
+from Autodesk.DesignScript.Geometry import *
+
+clr.AddReference('RevitAPI')
+import Autodesk
+
+clr.AddReference('RevitServices')
+import RevitServices
+from RevitServices.Persistence import DocumentManager
+from RevitServices.Transactions import TransactionManager
+doc = DocumentManager.Instance.CurrentDBDocument
+
+#Close all transactions
+
+trans = TransactionManager.Instance
+trans.ForceCloseTransaction()
+
+
+fams = IN[0]
+paths = IN[1]
+
+#unwrap the Dynamo elements
+
+fams = map(UnwrapElement, fams)
+for i in xrange(len(fams)):
+
+    famDoc = doc.EditFamily(fams[i])
+    famDoc.SaveAs(paths[i])
+    famDoc.Close(False)
+
+OUT = 0
+
+
+CODE_03_INSERT FAMILIES IN DOCS
+
+import clr
+clr.AddReference('RevitAPI')
+from Autodesk.Revit.DB import *
+clr.AddReference('RevitServices')
+
+# Revit and Dynamo modules
+from Autodesk.Revit.DB import Document, FamilySource, IFamilyLoadOptions
+from RevitServices.Persistence import DocumentManager
+from RevitServices.Transactions import TransactionManager
+
+uiapp = DocumentManager.Instance.CurrentUIApplication
+app = uiapp.Application
+
+#input assigned to IN variable
+paths = IN[0]
+docpaths = IN[1]
+
+#wrap input inside a list if not a list.
+if not isinstance(paths, list): 
+	paths = [paths]
+if not isinstance(docpaths, list): 
+	docpaths = [docpaths]
+	
+#ensure loaded families can overwrite existing families.
+class FamilyOption(IFamilyLoadOptions):
+	def OnFamilyFound(self, familyInUse, overwriteParameterValues):
+		overwriteParameterValues = True
+		return True
+		
+	def OnSharedFamilyFound(self, sharedFamily, familyInUse, source, overwriteParameterValues):
+		source = FamilySource.Family
+		overwriteParameterValues = True
+		return True		
+		
+#core data processing
+documents = []
+families = []
+for docpath in docpaths:
+	doc=app.OpenDocumentFile(docpath)
+	documents.append(doc)
+for path in paths:
+	family_doc = app.OpenDocumentFile(path)
+	families.append(family_doc)
+	
+for document in documents:
+	map(lambda family: family.LoadFamily(document, FamilyOption()),
+	families)
+
+map(lambda x: x.Close(False), families)
+map(lambda x: x.Close(True), documents)
+
+# output assigned to the OUT variable
+OUT = [paths, docpaths]
+	
+#core data processing
+for path in paths:
+	try:
+		famDoc = app.OpenDocumentFile(path)
+		famDoc.LoadFamily(doc, FamilyOption())
+		famDoc.Close(False)
+	except:
+		pass
+
+#output assigned the OUT variable
+OUT = paths
+
+
+
+CODE_04_LOAD FAMILIES
+
+import clr
+clr.AddReference('RevitAPI')
+from Autodesk.Revit.DB import *
+
+clr.AddReference('RevitServices')
+import RevitServices
+from RevitServices.Persistence import DocumentManager
+from RevitServices.Transactions import TransactionManager
+doc = DocumentManager.Instance.CurrentDBDocument
+uiapp = DocumentManager.Instance.CurrentUIApplication
+app = uiapp.Application
+
+#input assigned the IN variable
+paths = IN[0]
+
+#wrap input inside a list (if not a list)
+if not isinstance(paths, list): paths = [paths]
+
+#ensure loaded families can overwrite existing families.
+class FamilyOption(IFamilyLoadOptions):
+	def OnFamilyFound(self, familyInUse, overwriteParameterValues):
+		overwriteParameterValues = True
+		return True
+
+	def OnSharedFamilyFound(self, sharedFamily, familyInUse, source, overwriteParameterValues):
+		source = FamilySource.Family
+		overwriteParameterValues = True
+		return True
+
+#core data processing
+for path in paths:
+	try:
+		famDoc = app.OpenDocumentFile(path)
+		famDoc.LoadFamily(doc, FamilyOption())
+		famDoc.Close(False)
+	except:
+		pass
+
+#output assigned the OUT variable
+OUT = paths

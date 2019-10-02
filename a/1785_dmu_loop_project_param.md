@@ -30,6 +30,16 @@ Let me once again highlight two helpful answers in the Revit API discussion foru
 
 linkedin:
 
+New Forge Design Automation samples, getting project parameter id and preventing an updater loop in the #RevitAPI 
+
+http://bit.ly/dmu_loop_project_param
+
+Let me once again highlight two helpful answers in the Revit API discussion forum and the newest pair of Forge Design Automation samples:
+
+- Get project parameter id from its name
+- Preventing an updater loop
+- New Forge and Design Automation samples...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
