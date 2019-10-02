@@ -16,7 +16,6 @@ twitter:
 
 linkedin:
 
-
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -72,7 +71,7 @@ This code I used in Dynamo nodes:
 - Code_3 &ndash; Load families into each other
 - Code_4 &ndash; Load families from folder into project
  
-####<a name="5"></a> Code 1 &ndash; All Family Instances in Document
+####<a name="4.1"></a> Code 1 &ndash; All Family Instances in Document
 
 <pre class="prettyprint">
 import clr
@@ -101,8 +100,7 @@ for d in familieCollector:
 OUT = families
 </pre>
 
-
-####<a name="6"></a> CODE_02_SAVE FAMILY AS
+####<a name="4.2"></a> Code 2 &ndash; Save Family As
 
 <pre class="prettyprint">
 import clr
@@ -123,7 +121,6 @@ doc = DocumentManager.Instance.CurrentDBDocument
 trans = TransactionManager.Instance
 trans.ForceCloseTransaction()
 
-
 fams = IN[0]
 paths = IN[1]
 
@@ -139,7 +136,7 @@ for i in xrange(len(fams)):
 OUT = 0
 </pre>
 
-####<a name="7"></a> CODE_03_INSERT FAMILIES IN DOCS
+####<a name="4.3"></a> Code 3 &ndash; Insert Families in Docs
 
 <pre class="prettyprint">
 import clr
@@ -209,7 +206,7 @@ for path in paths:
 OUT = paths
 </pre>
 
-####<a name="8"></a> CODE_04_LOAD FAMILIES
+####<a name="4.4"></a> Code 4 &ndash; Load Families
 
 <pre class="prettyprint">
 import clr
@@ -254,7 +251,7 @@ for path in paths:
 OUT = paths
 </pre>
  
-####<a name="9"></a> Initial Questions and Answers
+####<a name="5"></a> Initial Conversation, Questions and Answers
 
 The text above describes the final working solution.
 

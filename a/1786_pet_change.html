@@ -15,7 +15,6 @@ twitter:
 
 linkedin:
 
-
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -59,7 +58,7 @@ This code I used in Dynamo nodes:</p>
 <li>Code_3 &ndash; Load families into each other</li>
 <li>Code_4 &ndash; Load families from folder into project</li>
 </ul>
-<h4><a name="5"></a> Code 1 &ndash; All Family Instances in Document</h4>
+<h4><a name="4.1"></a> Code 1 &ndash; All Family Instances in Document</h4>
 <pre class="prettyprint">
 import clr
 import System
@@ -87,7 +86,7 @@ for d in familieCollector:
 OUT = families
 </pre>
 
-<h4><a name="6"></a> CODE_02_SAVE FAMILY AS</h4>
+<h4><a name="4.2"></a> Code 2 &ndash; Save Family As</h4>
 <pre class="prettyprint">
 import clr
 clr.AddReference('ProtoGeometry')
@@ -107,7 +106,6 @@ doc = DocumentManager.Instance.CurrentDBDocument
 trans = TransactionManager.Instance
 trans.ForceCloseTransaction()
 
-
 fams = IN[0]
 paths = IN[1]
 
@@ -123,7 +121,7 @@ for i in xrange(len(fams)):
 OUT = 0
 </pre>
 
-<h4><a name="7"></a> CODE_03_INSERT FAMILIES IN DOCS</h4>
+<h4><a name="4.3"></a> Code 3 &ndash; Insert Families in Docs</h4>
 <pre class="prettyprint">
 import clr
 clr.AddReference('RevitAPI')
@@ -192,7 +190,7 @@ for path in paths:
 OUT = paths
 </pre>
 
-<h4><a name="8"></a> CODE_04_LOAD FAMILIES</h4>
+<h4><a name="4.4"></a> Code 4 &ndash; Load Families</h4>
 <pre class="prettyprint">
 import clr
 clr.AddReference('RevitAPI')
@@ -236,7 +234,7 @@ for path in paths:
 OUT = paths
 </pre>
 
-<h4><a name="9"></a> Initial Questions and Answers</h4>
+<h4><a name="5"></a> Initial Conversation, Questions and Answers</h4>
 <p>The text above describes the final working solution.</p>
 <p>Here is a summary of the preceding discussions clarifying the task before completing the solution.</p>
 <p><strong>Question:</strong> I want to overwrite one family with another.</p>
