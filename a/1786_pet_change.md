@@ -35,10 +35,10 @@ Parts of code can be used for several different purposes, so they might be helpf
 - [Task at hand](#2)
 - [Problems faced](#3)
 - [Solution and detailed implementation](#4)
-- [Code 1 &ndash; all family instances in document](#4.1)
-- [Code 2 &ndash; save family as](#4.2)
-- [Code 3 &ndash; insert families in docs](#4.3)
-- [Code 4 &ndash; load families](#4.4)
+- [Code 1 &ndash; All family instances in document](#4.1)
+- [Code 2 &ndash; Save family as](#4.2)
+- [Code 3 &ndash; Insert families in docs](#4.3)
+- [Code 4 &ndash; Load families](#4.4)
 - [Initial conversation, questions and answers](#5)
 
 
@@ -52,7 +52,7 @@ Below, I discuss this simplified example for illustration purposes.
 We use the same approach for more complex things in our professional workflow:
 
 <center>
-<img src="img/pet_change_1.jpg" alt="Pet change task description" width="782">
+<img src="img/pet_change_3.jpg" alt="Pet change task description" width="800">
 <p style="font-size: 80%; font-style:italic">Pet change task description</p>
 </center>
 
@@ -269,11 +269,7 @@ Here is a summary of the preceding discussions clarifying the task before comple
 
 **Question:** I want to overwrite one family with another.
 
-I want to do this behind the screens with only one project open, as indicated in this overview image:
-
-<center>
-<img src="img/pet_change_3.jpg" alt="Initial pet change task description" width="1325">
-</center>
+I want to do this behind the screens with only one project open, as indicated in the overview image above describing the task.
 
 I can’t solve it with my very basic Python knowledge.
 
