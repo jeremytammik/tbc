@@ -9,7 +9,7 @@
 
 twitter:
 
-Pet Change - using Python and Dynamo to swap nested families in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/petchange_py_dyn
+Pet Change using Python and Dynamo to swap nested families in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/petchange_py_dyn
 
 Pieter Schipper worked hard at solving the task of swapping nested families using Python and Dynamo and very kindly shares his solution here with us today, including
 his four Python scripts
@@ -22,6 +22,21 @@ his four Python scripts
 &ndash; Reload updated families...
 
 linkedin:
+
+Pet Change using Python and Dynamo to swap nested families in the #RevitAPI
+
+http://bit.ly/petchange_py_dyn
+
+Pieter Schipper worked hard at solving the task of swapping nested families using Python and Dynamo and very kindly shares his solution here with us today, including
+his four Python scripts:
+
+- Task at hand
+- Problems faced
+- Solution and detailed implementation
+- Collect all family instances in document
+- Export families via <code>SaveAs</code>
+- Update Nested Family Definitions
+- Reload updated families...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
