@@ -1,4 +1,4 @@
-# Revit APi Starter Kit
+# Revit API Starter Kit
 
 by David Raynor, Application Specialist (BIM Manager) for Revit MEPS at Dewberry
 
