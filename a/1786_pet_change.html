@@ -23,19 +23,19 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Pet Change &ndash; Python Swapping Nested Families</h3>
-<p>Pieter Schipper of <a href="">RoosRos Architecten</a> in The Netherlands
+<h3>Pet Change &ndash; Python + Dynamo Swap Nested Family</h3>
+<p>Pieter Schipper of <a href="https://www.roosros.nl">RoosRos Architecten</a> in The Netherlands
 worked hard at solving the task of swapping nested families using Python and Dynamo and very kindly shares his solution here with us today, including
 his <a href="zip/ps_pet_change_python_scripts.txt">four Python scripts</a>.</p>
-<p>Parts of code can be used for several different purposes, so they might be helpful for others as well.</p>
+<p>Parts of the code can be used for several different purposes, so they might be helpful for others as well.</p>
 <ul>
 <li><a href="#2">Task at hand</a></li>
 <li><a href="#3">Problems faced</a></li>
 <li><a href="#4">Solution and detailed implementation</a></li>
-<li><a href="#4.1">Code 1 &ndash; All family instances in document</a></li>
-<li><a href="#4.2">Code 2 &ndash; Save family as</a></li>
-<li><a href="#4.3">Code 3 &ndash; Insert families in docs</a></li>
-<li><a href="#4.4">Code 4 &ndash; Load families</a></li>
+<li><a href="#4.1">Code 1 &ndash; Collect all family instances in document</a></li>
+<li><a href="#4.2">Code 2 &ndash; Export families via <code>SaveAs</code></a></li>
+<li><a href="#4.3">Code 3 &ndash; Update Nested Family Definitions</a></li>
+<li><a href="#4.4">Code 4 &ndash; Reload updated families</a></li>
 <li><a href="#5">Initial conversation, questions and answers</a></li>
 </ul>
 <h4><a name="2"></a> Task at Hand</h4>
@@ -54,21 +54,21 @@ We use the same approach for more complex things in our professional workflow:</
 <h4><a name="3"></a> Problems Faced</h4>
 <p>The main problem I encountered initially was that it didn’t work out correctly to copy one family into another family all in the background.</p>
 <h4><a name="4"></a> Solution and Detailed Implementation</h4>
-<p>The solution I found was to introduce an extra step (also all at the background):</p>
+<p>The solution I found was to introduce an extra step (also all in the background):</p>
 <ul>
-<li>First: I let Dynamo make two directories (folders); in one, I copied the families to change; in the other, the nested not shared family placed into package project.</li>
-<li>Second: I copied the families from the second folder, over the familines in the first folder.</li>
-<li>Third: I load the families from the fist folder into my current project.</li>
+<li>First: Create two directories (folders), one containing the families to modify, the other the nested not shared family placed into the package project.</li>
+<li>Second: Copy the families from the second folder into the first, overwriting the original families.</li>
+<li>Third: Load the families from the first folder into the current project.</li>
 </ul>
 <p>I found some Python code on the Internet and adapted it for my needs.
-This code I used in Dynamo nodes:</p>
+This is the code I used in my Dynamo nodes:</p>
 <ul>
-<li>Code_1 &ndash; Collect all family instances in a document</li>
-<li>Code_2 &ndash; Save families to a folder</li>
-<li>Code_3 &ndash; Load families into each other</li>
-<li>Code_4 &ndash; Load families from folder into project</li>
+<li><a href="#4.1">Code 1 &ndash; Collect all family instances in document</a></li>
+<li><a href="#4.2">Code 2 &ndash; Export families via <code>SaveAs</code></a></li>
+<li><a href="#4.3">Code 3 &ndash; Update Nested Family Definitions</a></li>
+<li><a href="#4.4">Code 4 &ndash; Reload updated families</a></li>
 </ul>
-<h4><a name="4.1"></a> Code 1 &ndash; All Family Instances in Document</h4>
+<h4><a name="4.1"></a> Code 1 &ndash; Collect all Family Instances in Document</h4>
 <pre class="prettyprint">
 import clr
 import System
@@ -96,7 +96,7 @@ for d in familieCollector:
 OUT = families
 </pre>
 
-<h4><a name="4.2"></a> Code 2 &ndash; Save Family As</h4>
+<h4><a name="4.2"></a> Code 2 &ndash; Export Families via SaveAs</h4>
 <pre class="prettyprint">
 import clr
 clr.AddReference('ProtoGeometry')
@@ -131,7 +131,7 @@ for i in xrange(len(fams)):
 OUT = 0
 </pre>
 
-<h4><a name="4.3"></a> Code 3 &ndash; Insert Families in Docs</h4>
+<h4><a name="4.3"></a> Code 3 &ndash; Update Nested Family Definitions</h4>
 <pre class="prettyprint">
 import clr
 clr.AddReference('RevitAPI')
@@ -200,7 +200,7 @@ for path in paths:
 OUT = paths
 </pre>
 
-<h4><a name="4.4"></a> Code 4 &ndash; Load Families</h4>
+<h4><a name="4.4"></a> Code 4 &ndash; Load Updated Families</h4>
 <pre class="prettyprint">
 import clr
 clr.AddReference('RevitAPI')
@@ -252,7 +252,7 @@ OUT = paths
 <p>I can’t solve it with my very basic Python knowledge.</p>
 <p>I have solved 90% of the problem and hope you can help me out with the remaining most difficult 10%.</p>
 <p><strong>Answer:</strong> Your question is not yet clear to me.</p>
-<p>You say 'keeping the green cage'.</p>
+<p>You say, 'keeping the green cage'.</p>
 <p>Keeping which green cage?</p>
 <p>The green cage containing the mouse?</p>
 <p>Or the green cage containing the pig?</p>
@@ -265,7 +265,12 @@ OUT = paths
 <p>Then, there is a node that gets the family document from the family type that allows me to use the python script again to get the families one step deeper.</p>
 <p>I think that this all will be possible in Python itself, but Dynamo works easy for non-programmers like me.</p>
 <p>Background information:</p>
-<p>In our company, we made our own window generator. The generators on the market are mostly not the ones we need at an architectural office. We need the freedom to change windows in a late stage, without taking a lot of time. Therefore, we made our own window generator. This is a flexible window family which can change into aluminium, wood and plastic, and also includes possibilities to store a lot of other information. I want to make it easy for our draftsman to change all windows of an project to another material. That’s the reason behind the question.</p>
+<p>In our company, we made our own window generator. The generators on the market are mostly not the ones we need at an architectural office.
+We need the freedom to change windows in a late stage, without taking a lot of time.
+Therefore, we made our own window generator.
+This is a flexible window family which can change into aluminium, wood and plastic, and also includes possibilities to store a lot of other information.
+I want to make it easy for our draftsman to change all windows of a project to another material.
+That’s the reason behind the question.</p>
 <p><strong>Answer:</strong> If it is possible in Python, it is possible in Dynamo.</p>
 <p>They are the same, under the hood.</p>
 <p>If it is possible in C#, it is possible in Python.</p>
@@ -276,11 +281,11 @@ OUT = paths
 <p>I thought maybe you would have the solution in one minute, but I know that it takes often more time.</p>
 <p><strong>Answer:</strong> Yes, that may be possible. Unfortunately, I have done hardly any work at all in Python, and none whatsoever in Dynamo, yet.</p>
 <p><strong>Response:</strong> I just want to let you know that I found a solution.</p>
-<p>The way I was able to solved this issue, was with a few extra actions.</p>
+<p>I was able to solve this issue with a few extra actions.</p>
 <p>I first let Dynamo create two temporary directories</p>
 <p>Then Save with the first Python script family “1” and “2” (see picture) to the directories.</p>
 <p>With the second python script I saved family “1” in family “2”.</p>
 <p>With the third python script I Load the family “2” into current document.</p>
-<p>So it worked with only Project <em>aunt Anna</em> opened. I could not solve this without saving first the families to an actual directory.</p>
+<p>So, it worked with only Project <em>aunt Anna</em> opened. I could not solve this without saving first the families to an actual directory.</p>
 <p>With my knowledge I just search the Internet and copy/paste parts of code till it works. It can probably be done more efficiently, but I’m happy.</p>
 <p>The only thing is that when I want to use run the script twice, I have to restart Revit. But that is not a big problem.</p>

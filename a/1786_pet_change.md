@@ -24,21 +24,21 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Pet Change &ndash; Python Swapping Nested Families
+### Pet Change &ndash; Python + Dynamo Swap Nested Family
 
-Pieter Schipper of [RoosRos Architecten]() in The Netherlands
+Pieter Schipper of [RoosRos Architecten](https://www.roosros.nl) in The Netherlands
 worked hard at solving the task of swapping nested families using Python and Dynamo and very kindly shares his solution here with us today, including
 his [four Python scripts](zip/ps_pet_change_python_scripts.txt).
 
-Parts of code can be used for several different purposes, so they might be helpful for others as well.
+Parts of the code can be used for several different purposes, so they might be helpful for others as well.
 
 - [Task at hand](#2)
 - [Problems faced](#3)
 - [Solution and detailed implementation](#4)
-- [Code 1 &ndash; All family instances in document](#4.1)
-- [Code 2 &ndash; Save family as](#4.2)
-- [Code 3 &ndash; Insert families in docs](#4.3)
-- [Code 4 &ndash; Load families](#4.4)
+- [Code 1 &ndash; Collect all family instances in document](#4.1)
+- [Code 2 &ndash; Export families via `SaveAs`](#4.2)
+- [Code 3 &ndash; Update Nested Family Definitions](#4.3)
+- [Code 4 &ndash; Reload updated families](#4.4)
 - [Initial conversation, questions and answers](#5)
 
 
@@ -67,21 +67,21 @@ The main problem I encountered initially was that it didn’t work out correctly
  
 ####<a name="4"></a> Solution and Detailed Implementation
 
-The solution I found was to introduce an extra step (also all at the background):
+The solution I found was to introduce an extra step (also all in the background):
 
-- First: I let Dynamo make two directories (folders); in one, I copied the families to change; in the other, the nested not shared family placed into package project.
-- Second: I copied the families from the second folder, over the familines in the first folder.
-- Third: I load the families from the fist folder into my current project.
+- First: Create two directories (folders), one containing the families to modify, the other the nested not shared family placed into the package project.
+- Second: Copy the families from the second folder into the first, overwriting the original families.
+- Third: Load the families from the first folder into the current project.
  
 I found some Python code on the Internet and adapted it for my needs.
-This code I used in Dynamo nodes:
+This is the code I used in my Dynamo nodes:
 
-- Code_1 &ndash; Collect all family instances in a document
-- Code_2 &ndash; Save families to a folder
-- Code_3 &ndash; Load families into each other
-- Code_4 &ndash; Load families from folder into project
+- [Code 1 &ndash; Collect all family instances in document](#4.1)
+- [Code 2 &ndash; Export families via `SaveAs`](#4.2)
+- [Code 3 &ndash; Update Nested Family Definitions](#4.3)
+- [Code 4 &ndash; Reload updated families](#4.4)
  
-####<a name="4.1"></a> Code 1 &ndash; All Family Instances in Document
+####<a name="4.1"></a> Code 1 &ndash; Collect all Family Instances in Document
 
 <pre class="prettyprint">
 import clr
@@ -110,7 +110,7 @@ for d in familieCollector:
 OUT = families
 </pre>
 
-####<a name="4.2"></a> Code 2 &ndash; Save Family As
+####<a name="4.2"></a> Code 2 &ndash; Export Families via SaveAs
 
 <pre class="prettyprint">
 import clr
@@ -146,7 +146,7 @@ for i in xrange(len(fams)):
 OUT = 0
 </pre>
 
-####<a name="4.3"></a> Code 3 &ndash; Insert Families in Docs
+####<a name="4.3"></a> Code 3 &ndash; Update Nested Family Definitions
 
 <pre class="prettyprint">
 import clr
@@ -216,7 +216,7 @@ for path in paths:
 OUT = paths
 </pre>
 
-####<a name="4.4"></a> Code 4 &ndash; Load Families
+####<a name="4.4"></a> Code 4 &ndash; Load Updated Families
 
 <pre class="prettyprint">
 import clr
@@ -277,7 +277,7 @@ I have solved 90% of the problem and hope you can help me out with the remaining
  
 **Answer:** Your question is not yet clear to me.
  
-You say 'keeping the green cage'.
+You say, 'keeping the green cage'.
  
 Keeping which green cage?
  
@@ -303,7 +303,12 @@ I think that this all will be possible in Python itself, but Dynamo works easy f
  
 Background information:
 
-In our company, we made our own window generator. The generators on the market are mostly not the ones we need at an architectural office. We need the freedom to change windows in a late stage, without taking a lot of time. Therefore, we made our own window generator. This is a flexible window family which can change into aluminium, wood and plastic, and also includes possibilities to store a lot of other information. I want to make it easy for our draftsman to change all windows of an project to another material. That’s the reason behind the question.
+In our company, we made our own window generator. The generators on the market are mostly not the ones we need at an architectural office.
+We need the freedom to change windows in a late stage, without taking a lot of time.
+Therefore, we made our own window generator.
+This is a flexible window family which can change into aluminium, wood and plastic, and also includes possibilities to store a lot of other information.
+I want to make it easy for our draftsman to change all windows of a project to another material.
+That’s the reason behind the question.
  
 **Answer:** If it is possible in Python, it is possible in Dynamo.
  
@@ -325,7 +330,7 @@ I thought maybe you would have the solution in one minute, but I know that it ta
 
 **Response:** I just want to let you know that I found a solution.
 
-The way I was able to solved this issue, was with a few extra actions.
+I was able to solve this issue with a few extra actions.
  
 I first let Dynamo create two temporary directories
 
@@ -335,7 +340,7 @@ With the second python script I saved family “1” in family “2”.
 
 With the third python script I Load the family “2” into current document.
  
-So it worked with only Project *aunt Anna* opened. I could not solve this without saving first the families to an actual directory.
+So, it worked with only Project *aunt Anna* opened. I could not solve this without saving first the families to an actual directory.
 
 With my knowledge I just search the Internet and copy/paste parts of code till it works. It can probably be done more efficiently, but I’m happy.
  
