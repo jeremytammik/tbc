@@ -18,7 +18,7 @@ One awesome resource in the Dynamo realm is John Pierson, aka sixtysecondrevit. 
 
 There are a lot of free tutorials on Dynamo. If you are looking for a video training package, BIM After Dark by the The Revit Kid offers a Dynamo class titled DIY Dynamo. It costs around $250.
 
-- http://diydynamo.com/
+- [diydynamo.com](http://diydynamo.com/)
 
 Figure 1
 
@@ -32,9 +32,9 @@ Macros are a good gateway into learning to program before diving into a class on
 
 Another great resource is Michael Kilkelly at ArchSmarter. He has a great seven-step starter for writing macros.
 
-- https://archsmarter.com/first-revit-macro/
-- https://www.udemy.com/
-- https://boostyourbim.wordpress.com/
+- [archsmarter.com/first-revit-macro](https://archsmarter.com/first-revit-macro/)
+- [www.udemy.com](https://www.udemy.com/)
+- [boostyourbim.wordpress.com](https://boostyourbim.wordpress.com/)
 
 ## ADD-INS
 
@@ -44,9 +44,11 @@ Add-ins are a bit more work upfront. They are just as powerful as Dynamo and Mac
 
 There are just two elements required for Revit to acknowledge and implement an add-in. First, it needs to read a “.add-in” manifest file. This file must be stored in one of two places.
 
-C:\ProgramData\Autodesk\Revit\Addins\2019
+- C:\ProgramData\Autodesk\Revit\Addins\2019
 
-or C:\Users\userName\AppData\Roaming\Autodesk\Revit\Addins\2019
+or
+
+- C:\Users\userName\AppData\Roaming\Autodesk\Revit\Addins\2019
 
 This file tells Revit that an add-in exists and where to find the second requirement, a “.dll” file. This .dll file is the output of compiling your code in Visual Studio. When you run your code via Visual Studio, it is compiling it and creating this .dll file in the“bin” folder of your project. Compiling is the process of converting the written code from C# into machine language the computer understands.
 
@@ -60,9 +62,8 @@ This course gave me a good understanding of the functions and grammar of C#. It 
 
 Visual Studio comes in various flavors ranging from free to several hundred dollars. I recommend the use of the Visual Studio Community Edition, free for individuals for both free or paid apps. If your company has more than 250 PCs or generates over $1 million in revenue, then you’ll need to be honest and pay the $500 for the Professional version or the Enterprise Edition.
 
-https://docs.microsoft.com/en-us/visualstudio/get-started/ csharp/?view=vs-2019
-
-https://visualstudio.microsoft.com/vs/community/
+- [docs.microsoft.com/en-us/visualstudio/get-started/csharp/?view=vs-2019](https://docs.microsoft.com/en-us/visualstudio/get-started/csharp/?view=vs-2019)
+- [visualstudio.microsoft.com/vs/community](https://visualstudio.microsoft.com/vs/community/)
 
 If you are creating your own add-in using Visual Studio I’d highly advise you to download and install the Revit Add-in Project template for Visual Studio. Just like Revit has project templates for new projects, Visual Studio has templates for programming new projects.
 
@@ -70,23 +71,22 @@ This template is stored on Github. Let me explain what Github is. When multiple 
 
 Github is one of many similar services that use a form of version control called Git, thus the name Github. Many users will make their work public on these sites, giving you access to their master branches. This is called an open source project. You can choose to contribute to these projects with your own branches, or download versions for yourself. Be sure to read and honor the terms of use.
 
-https://github.com/jeremytammik/VisualStudioRevitAddinWizard
+- [github.com/jeremytammik/VisualStudioRevitAddinWizard](https://github.com/jeremytammik/VisualStudioRevitAddinWizard)
 
 While you are hanging out on Github, be sure to download Revit Lookup, a must have add-in for peeking under the hood at the database that is driving Revit. It allows you to select an item in Revit and explore the properties of that element, hidden from the users’ view, but exposed in the API. You can view items such as the x,y,z coordinate, or to find out if a parameter is an integer value or a string acting like an integer. If you want to see what the compiler sees, this is the tool you need.
 
-https://github.com/jeremytammik/RevitLookup
+- [github.com/jeremytammik/RevitLookup](https://github.com/jeremytammik/RevitLookup)
 
 There is a huge programming community outside of Revit API work and many are very active on a blog called Stack Overflow. You can find answers to all kinds of programming questions there.
 
-https://stackoverflow.com/
+- [stackoverflow.com](https://stackoverflow.com/)
 
 That covers the basic tools you’ll need in your programming toolkit. Now we get started focusing on the tools for working with Revit. You’ll need to download the Revit Software Developers Kit, aka the Revit SDK. This kit contains many shiny gems, including the documentation for the Automated Programmable Interface, or API. Don’t be intimidated by all the acronyms. Just as the buttons and icons on the screen are the Graphical User Interface or GUI, the computer can send the same commands to Revit without going through the GUI. For almost any command you have access to with the GUI, there is a counterpart for the API. The Documentation just tells you how to use it and what information it’s expecting.
 
 Another great resource for the documentation is the website Revit API Docs. One advantage to this website is it searches all versions of the API, whereas the documentation only covers one specific version. Just as a new version of Revit is released every year, so a version of the API is also released. Some years they change how the tools in the API work to be more concise, optimize performance, or enable new features. This means one year’s command may not work, or at least not the same way as in previous years. The older commands will have been depreciated over a year, allowing you to transition to the new command, and then finally unsupported the next year. Just like Microsoft offers free training on learning a programming language, Autodesk offers a few free training examples, also accessed via the Revit SDK website. Then there is the community that supports users just like you, learning to use and write code. Jeremy Tammik, aka The Building Coder, maintains an incredible blog with tons of sample code.
 
-https://thebuildingcoder.typepad.com/
-
-https://www.revitapidocs.com/
+- [thebuildingcoder.typepad.com](https://thebuildingcoder.typepad.com/)
+- [www.revitapidocs.com](https://www.revitapidocs.com/)
 
 ## PROGRAMMING SPECIAL TOPICS
 
@@ -94,31 +94,31 @@ https://www.revitapidocs.com/
 
 This topic alone could drive you mad. Visual Studio supports and works with countless programs and not all have the same requirements. Therefore, there are some specific settings you have to get right for everything to work.
 
-https://forums.autodesk.com/t5/revit-api-forum/advice-on-debugging-c-in-visual-studio/td-p/6496811
+- [forums.autodesk.com/t5/revit-api-forum/advice-on-debugging-c-in-visual-studio/td-p/6496811](https://forums.autodesk.com/t5/revit-api-forum/advice-on-debugging-c-in-visual-studio/td-p/6496811)
 
 ### Breakpoints
 
 As you start your program it is invaluable to peek at what is happening and step through the program, watching how variables are read and manipulated. Setting specific points at which to stop is done using a Breakpoint.
 
-https://docs.microsoft.com/en-us/visualstudio/debugger/using- breakpoints?view=vs-2019
+- [docs.microsoft.com/en-us/visualstudio/debugger/using-breakpoints?view=vs-2019](https://docs.microsoft.com/en-us/visualstudio/debugger/using-breakpoints?view=vs-2019)
 
 ### Transactions
 
 Through the API you can query and gather all the information you need, display it, or export it any way you like. If you plan to make a change to the Revit file in any way it must be done within a transaction block. A block is just code contained within a set of brackets. Transaction blocks not only enable the document to be modified, but also show up as an undo-able action from the user interface. Transactions can be grouped together while others can happen in quick succession. Sometimes it’s necessary to perform a transaction to determine some piece of information, save that information to a variable in your code, and then undo the transaction. Whatever the task may be, you’ll need to be familiar with transactions.
 
-https://knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhelp/2016/ENU/Revit-API/files/GUID- BECA30DB-23B4-4E71-BE24-DC4DD176E52D-htm.html
+- [knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhelp/2016/ENU/Revit-API/files/GUID-BECA30DB-23B4-4E71-BE24-DC4DD176E52D-htm.html](https://knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhelp/2016/ENU/Revit-API/files/GUID-BECA30DB-23B4-4E71-BE24-DC4DD176E52D-htm.html)
 
 ### Try/Catch Blocks
 
 Think of this as a safety net. You are trying to do something, but if it fails, catch it, and tell me why it failed. This is just good practice and will save you time troubleshooting. Also, if one part of a program fails, it can swallow the error and proceed, allowing you to skip over some problematic situations.
 
-https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/try-catch
+- [docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/try-catch](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/try-catch)
 
 ### Multi-Version Support
 
 Every version of Revit has a corresponding API.dll file that must be included in the Visual Studio References. Also, every tool you create will compile to create a “.dll” file. To keep from going mad with all the different versions, you’ll want to follow Konrad Sobon’s guide on setting up Multi-Version Targeting. This will likely be a topic to investigate after you have developed your first add-in. With next year’s release of Revit, you realize you may need to copy all that work into a new Visual Studio project for the next year’s Revit version. This technique allows you to keep all your source code in one project, and build to multiple versions.
 
-https://archi-lab.net/how-to-maintain-revit-plug-ins-for- multiple-versions/
+- [archi-lab.net/how-to-maintain-revit-plug-ins-for-multiple-versions](https://archi-lab.net/how-to-maintain-revit-plug-ins-for-multiple-versions/)
 
 ### Keep With it
 
