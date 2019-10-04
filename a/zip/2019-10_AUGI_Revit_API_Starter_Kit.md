@@ -130,7 +130,11 @@ I didn’t succeed initially. The first successful run was months after I starte
 
 David Raynor, Application Specialist (BIM Manager) for Revit MEPS at Dewberry.
 
-Currently, David Raynor works at Dewberry as an Application Specialist (BIM Manager) for Revit MEPS. He develops content for all trades and fre- quently travels to various offices teach- ing staff the Dewberry way of working in Revit. To help with consistency and efficiency, he maintains and supports all Revit API coding efforts. When not working, he can be found wandering the mountains, camping, kayaking, or skiing. He lives just south of Raleigh, North Carolina, with his family of three amazing kids and a supportive, understanding, wonderful wife.
+*Currently, David Raynor works at Dewberry as an Application Specialist (BIM Manager) for Revit MEPS.
+He develops content for all trades and fre- quently travels to various offices teach-ing staff the Dewberry way of working in Revit.
+To help with consistency and efficiency, he maintains and supports all Revit API coding efforts.
+When not working, he can be found wandering the mountains, camping, kayaking, or skiing.
+He lives just south of Raleigh, North Carolina, with his family of three amazing kids and a supportive, understanding, wonderful wife.*
 
 ### Attribution
 
