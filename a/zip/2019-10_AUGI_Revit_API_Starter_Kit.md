@@ -138,9 +138,7 @@ He lives just south of Raleigh, North Carolina, with his family of three amazing
 
 ### Attribution
 
-- 2019-10_AUGI_Revit_API_Starter_Kit.txt
-
 Text copied from
 the [AUGIWorld October 2019 issue](https://issuu.com/augi/docs/aw201910hr),
-page 20, Revit MEP, Revit API Starter Kit,
-[AUGI](https://www.augi.com), the Autodesk User Group International.
+page 20: [Revit MEP &ndash; Revit API Starter Kit](https://issuu.com/augi/docs/aw201910hr/20),
+(C) 2019 by [AUGI](https://www.augi.com), the Autodesk User Group International.
