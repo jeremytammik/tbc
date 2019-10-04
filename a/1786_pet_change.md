@@ -11,8 +11,15 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Pieter Schipper worked hard at solving the task of swapping nested families using Python and Dynamo and very kindly shares his solution here with us today, including
+his four Python scripts
+&ndash; Task at hand
+&ndash; Problems faced
+&ndash; Solution and detailed implementation
+&ndash; Collect all family instances in document
+&ndash; Export families via <code>SaveAs</code>
+&ndash; Update Nested Family Definitions
+&ndash; Reload updated families...
 
 linkedin:
 
@@ -346,3 +353,4 @@ With my knowledge I just search the Internet and copy/paste parts of code till i
  
 The only thing is that when I want to use run the script twice, I have to restart Revit. But that is not a big problem.
  
+Many thanks to Pieter for documenting and sharing this!
