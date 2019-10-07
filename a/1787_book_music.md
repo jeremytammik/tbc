@@ -90,6 +90,14 @@ The API documentation is provided in the *RevitAPI.chm* help file in the Revit S
 
 For more information, you can work through the [Revit API getting started material](https://thebuildingcoder.typepad.com/blog/about-the-author.html#2).
 
+If you wish to start with programming from zero, you may want to first learn some 
+
+- Basic programming in general &ndash; take a [Python tutorial](https://duckduckgo.com/?q=python+tutorial)
+- Basic C# and .NET in general &ndash; take a [C# .NET tutorial](https://duckduckgo.com/?q=C%23+.NET+tutorial)
+- Basic Revit API interaction &ndash; take a [Revit macro tutorial](https://duckduckgo.com/?q=Revit+macro+tutorial)
+
+All three of those steps can be very quickly and simply achieved and will immensely improve your understanding and simplify things for you if and when you decide to start creating your own full-blown Revit add-in.
+
 Finally, some very good advice on getting started programming Revit is provided
 by [David Raynor's Revit API Starter Kit described below](#3).
 
