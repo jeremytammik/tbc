@@ -62,7 +62,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 I would like to share a couple of quick notes on books and music to end this week.
 
-Simple Revit API related books, a complex AI-related one, and a quick bottleneck steel guitar blues recording not related with any technical topic whatsoever:
+Simple Revit API related books with a very nice new Revit API starter kit, a richer and much more complex literary AI-related one, and a quick bottleneck steel guitar blues recording not related with any technical topic whatsoever:
 
 
 
@@ -97,22 +97,44 @@ page 20: [Revit API Starter Kit](https://issuu.com/augi/docs/aw201910hr/20).
 
 Here are the topics he covers:
 
-Dynamo
-Macros
-Add-Ins
-Minimum requirements
-Programming
-2019-10_AUGI_Revit_API_Starter_Kit.txt
+- Dynamo
+- Macros
+- Add-Ins
+    - Minimum Requirements
+    - Programming
+- Programming Special Topics
+    - Visual Studio Settings
+    - Breakpoints
+    - Transactions
+    - Try/Catch Blocks
+    - Multi-Version Support
+    - Keep With it
 
-####<a name="3"></a> Machines Like Me
+Many thanks to David for putting together and sharing this helpful kit!
 
-I just finished reading *Machines like me and People like you* by Ian McEwan.
+####<a name="4"></a> Machines Like Me
+
+On a different topic, a literary work, exploring philosophical aspects of AI interaction.
+
+As [planned](https://thebuildingcoder.typepad.com/blog/2019/06/revit-camera-settings-project-plasma-da4r-and-ai.html#5),
+I just finished reading [*Machines like me and People like you*](https://en.wikipedia.org/wiki/Machines_Like_Me)
+by [Ian McEwan](https://en.wikipedia.org/wiki/Ian_McEwan).
+
+He is one of my favourite authors.
+Very loving, caring amd compassionate with his characters and humanity in general, deeply interested in scientific and technical detail.
+
+His new book is inspired by recent advances in deep learning, such
+as [AlphaGo](http://thebuildingcoder.typepad.com/blog/2017/10/au-recording-books-education-and-units.html#6),
+[AlphaZero](https://thebuildingcoder.typepad.com/blog/2019/03/ai-trends-and-yearly-deprecated-api-usage-cleanup.html#2) and
+how they are affecting human game strategy, 
+cf. [Game Changer &ndash; AlphaZero's Groundbreaking Chess Strategies and the Promise of AI](https://www.goodreads.com/review/show/2731237101) by
+Matthew Sadler, among many other things.
 
 A very deep and loving analysis and pondering on human intelligence, emotions and failings versus AI and machines, and possible future aspects we face in their interaction.
 
-McEwan also takes a great number of very entertaining liberties with history and historical persons, e.g., Alan Turing, Margaret Thatcher, the Falkland war, AlphaGo, and dozens if not hundreds of other events.
+McEwan also takes a great number of very entertaining liberties with history and historical persons, e.g., Alan Turing, Margaret Thatcher, the Falkland war and dozens if not hundreds of other events.
 
-This quote towards the end of the book sums up some of it:
+This quote towards the end of the book sums up part of it:
 
 > hope you'll listen to... to one last seventeen-syllable poem... it's not about leaves and trees.
 It's about machines like me and people like you and our future together... the sadness that's to come.
@@ -130,9 +152,12 @@ Our leaves are falling.
 <p style="font-size: 80%; font-style:italic">Machines Like Me</p>
 </center>
 
+
 ####<a name="4"></a> Bottleneck Blues Guitar
 
-Might you be interested in an 80-second recording of an old man playing bottleneck blues on a steel string guitar?
+Might you be interested in an 80-second recording of an old man
+playing [bottleneck](https://en.wikipedia.org/wiki/Slide_guitar) blues
+on a steel string guitar?
 
 Check out Andy Milburn's [What Can I Say](https://youtu.be/QrI3hvv-_Ws):
 
@@ -145,5 +170,5 @@ Thinking out loud.
 <iframe width="480" height="270" src="https://www.youtube.com/embed/QrI3hvv-_Ws" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </center>
 
-Andy's clip has 56 views and 39 subscribers so far... I predict these numbers will grow.
+Andy's clip has 63 views and 39 subscribers so far... I predict these numbers will grow.
 
