@@ -60,11 +60,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Books and Music
 
-I would like to share a couple of quick notes on books and music to end this week.
+I would like to share a couple of quick notes on books and music to start this week.
 
-Simple Revit API related books with a very nice new Revit API starter kit, a richer and much more complex literary AI-related one, and a quick bottleneck steel guitar blues recording not related with any technical topic whatsoever:
+A search for Revit API related books, a very nice new Revit API starter kit, a richer and much more complex literary AI-related book, and a quick bottleneck steel guitar blues recording not related with any technical topic whatsoever:
 
-
+- [A very basic book on Revit API](#2)
+- [Revit API starter kit](#3)
+- [Machines like me](#4)
+- [Bottleneck blues guitar](#5)
 
 
 ####<a name="2"></a> A Very Basic Book on Revit API
@@ -153,7 +156,7 @@ Our leaves are falling.
 </center>
 
 
-####<a name="4"></a> Bottleneck Blues Guitar
+####<a name="5"></a> Bottleneck Blues Guitar
 
 Might you be interested in an 80-second recording of an old man
 playing [bottleneck](https://en.wikipedia.org/wiki/Slide_guitar) blues
