@@ -69,6 +69,7 @@ A search for Revit API related books, a very nice new Revit API starter kit, a r
 
 - [A very basic book on Revit API](#2)
 - [Revit API starter kit](#3)
+- [Revit programming for beginners](#3.1)
 - [Machines like me](#4)
 - [Bottleneck blues guitar](#5)
 
@@ -125,6 +126,29 @@ Here are the topics he covers:
     - Keep With it
 
 Many thanks to David for putting together and sharing this helpful kit!
+
+####<a name="3.1"></a> Addendum &ndash; Revit Programming for Beginners
+
+After publishing the above, I happened upon yet another useful guide for getting started with the Revit API, Dan Mapes' instructional demo *BES219848 &ndash; Revit Programming for Beginners: Easily Access the Revit API Using Free Tools* at Autodesk University 2018.
+
+> **Description**
+
+> Ever wanted to learn to use the Revit application programming interface? Programming in Revit software seems like a scary thing, but it doesn’t have to be. We will present on how to start using the Revit API using free tools. This class will guide attendees who use Revit but have never tried to access the API to accomplish simple tasks. Using element filters, transactions, and user interface will be the main focus. This will give each attendee a basic understanding and road map to creating their own scripts for Revit. We will use the following software: Revit, RevitPythonShell, RevitLookup, and pyRevit. Attendees will need basic understanding of Revit and entry-level understanding of Python.
+
+Material included:
+
+- Overview
+- Video &ndash; 1 hour 1 min
+- Handout &ndash; 12 pages
+- Presentation &ndash; 17 slides
+- Downloads &ndash; 3 files
+
+Link:
+
+<center>
+<p><a href="https://www.autodesk.com/autodesk-university/class/Revit-Programming-Beginners-Easily-Access-Revit-API-Using-Free-Tools-2018">Revit Programming for Beginners: Easily Access the Revit API Using Free Tools</a></p>
+</center>
+  
 
 ####<a name="4"></a> Machines Like Me
 
