@@ -78,14 +78,14 @@ Mehsan is [looking for a very basic book on Revit API](https://forums.autodesk.c
 
 I know CAD API but now I am looking for a very basic book for Revit 2019 or 2018 API programming.
 
-**Answer:** I am not aware of any such book, but you can check out good tutorials on youtube by Danny Bentley and another paid tutorial by Jeremy Graham.
+**Answer:** I am not aware of any such book, but you can check out good tutorials on YouTube by Danny Bentley and another paid tutorial by Jeremy Graham.
 
 To get started with the Revit API, I suggest that you first take a look at the step-by-step instructions provided
 by [My First Revit Plugin](https://knowledge.autodesk.com/support/revit-products/learn-explore/caas/simplecontent/content/my-first-revit-plug-overview.html).
 
 The API documentation is provided in the *RevitAPI.chm* help file in the Revit SDK and also available online at  [revitapidocs](https://www.revitapidocs.com).
 
-For more information, you an work through the [Revit API getting started material](https://thebuildingcoder.typepad.com/blog/about-the-author.html#2).
+For more information, you can work through the [Revit API getting started material](https://thebuildingcoder.typepad.com/blog/about-the-author.html#2).
 
 Finally, some very good advice on getting started programming Revit is provided
 by [David Raynor's Revit API Starter Kit described below](#3).
@@ -124,13 +124,13 @@ I just finished reading [*Machines like me and People like you*](https://en.wiki
 by [Ian McEwan](https://en.wikipedia.org/wiki/Ian_McEwan).
 
 He is one of my favourite authors.
-Very loving, caring amd compassionate with his characters and humanity in general, deeply interested in scientific and technical detail.
+Very loving, caring and compassionate with his characters and humanity in general, deeply interested in scientific and technical detail.
 
 His new book is inspired by recent advances in deep learning, such
 as [AlphaGo](http://thebuildingcoder.typepad.com/blog/2017/10/au-recording-books-education-and-units.html#6),
 [AlphaZero](https://thebuildingcoder.typepad.com/blog/2019/03/ai-trends-and-yearly-deprecated-api-usage-cleanup.html#2) and
 how they are affecting human game strategy, 
-cf. [Game Changer &ndash; AlphaZero's Groundbreaking Chess Strategies and the Promise of AI](https://www.goodreads.com/review/show/2731237101) by
+cf. [Game Changer &ndash; AlphaZero's ground-breaking chess strategies and the promise of AI](https://www.goodreads.com/review/show/2731237101) by
 Matthew Sadler, among many other things.
 
 A very deep and loving analysis and pondering on human intelligence, emotions and failings versus AI and machines, and possible future aspects we face in their interaction.
