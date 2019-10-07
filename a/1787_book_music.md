@@ -44,8 +44,11 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+A search for Revit API related books, a very nice new Revit API starter kit, a richer and much more complex literary AI-related book, and a quick bottleneck steel guitar blues recording not related with any technical topic whatsoever
+&ndash; A very basic book on Revit API
+&ndash; Revit API starter kit
+&ndash; Machines like me
+&ndash; Bottleneck blues guitar...
 
 linkedin:
 
@@ -58,7 +61,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Books and Music
+### Starter Kit, Books and Music
 
 I would like to share a couple of quick notes on books and music to start this week.
 
@@ -145,14 +148,17 @@ It will happen. With improvements over time... we'll surpass you... and outlive 
 Believe me, these lines express no triumph... Only regret...
 
 <center>
-Our leaves are falling.
+<p>
+<br/>Our leaves are falling.
 <br/>Come spring we will renew.
 <br/>But you, alas, fall once.
-</center>
+</p>
 
-<center>
+<br/>
+
 <img src="img/machines_like_me.jpg" alt="Machines Like Me" width="180">
 <p style="font-size: 80%; font-style:italic">Machines Like Me</p>
+
 </center>
 
 
