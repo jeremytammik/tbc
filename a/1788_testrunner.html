@@ -10,10 +10,21 @@
   https://forums.autodesk.com/t5/revit-api-forum/revit-testrunner-run-unittests-in-revit/m-p/9070621
   https://github.com/geberit/Revit.TestRunner
 
+- Confusing assembly location when use one assembly for two Revit-Addin projects
+  https://forums.autodesk.com/t5/revit-api-forum/confusing-assembly-location-when-use-one-assembly-for-two-revit/m-p/9070282
+
+- importing PDFs made easy
+  https://archi-lab.net/importing-pdfs-made-easy
+
 twitter:
 
-&ndash; 
-...
+A search for Revit API related books, a very nice new Revit API starter kit, a richer and much more complex literary AI-related book, and a quick bottleneck steel guitar blues recording not related with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/books_music
+
+A new Revit add-in unit testing framework, a short note on support assembly locations, and an article on importing PDF files
+&ndash; <code>Revit.TestRunner</code> &ndash; run unit tests in Revit
+&ndash; Getting started with <code>TestRunner</code>
+&ndash; Unconfusing support assemblies
+&ndash; Importing PDFs made easy...
 
 linkedin:
 
@@ -26,13 +37,22 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>TestRunner &ndash; Run Unit Tests in Revit</h3>
-<p>We have mentioned a couple
-of <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.16">Revit add-in unit testing frameworks</a> in
-the past.</p>
-<p>Tobias Flöscher of <a href="https://www.geberit.com">Geberit</a> now shares one that looks very promising indeed in
-the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-testrunner-run-unittests-in-revit/m-p/9070621"><code>Revit.TestRunner</code> &ndash; run unit tests in Revit</a>, saying:</p>
+<p>A new Revit add-in unit testing framework, a short note on support assembly locations, and an article on importing PDF files:</p>
+<ul>
+<li><a href="#2"><code>Revit.TestRunner</code> &ndash; run unit tests in Revit</a></li>
+<li><a href="#3">Getting started with <code>TestRunner</code></a></li>
+<li><a href="#4">Unconfusing support assemblies</a></li>
+<li><a href="#5">Importing PDFs made easy</a></li>
+</ul>
 <h4><a name="2"></a> Revit.TestRunner &ndash; Run Unit Tests in Revit</h4>
+<p>We mentioned several
+different <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.16">Revit add-in unit testing frameworks</a> in
+the past.</p>
+<p>Tobias Flöscher of <a href="https://www.geberit.com">Geberit</a> now
+shares a new implementation based on <a href="https://nunit.org">NUnit 3</a> that looks very promising indeed,
+in the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-testrunner-run-unittests-in-revit/m-p/9070621"><code>Revit.TestRunner</code> &ndash; run unit tests in Revit</a>,
+saying:</p>
 <p>Hello Developers,</p>
 <p>In 2018, I started to program in the Revit API environment.
 It was completely new to me, so I had to get familiar with the API and its peculiarities.
@@ -40,28 +60,64 @@ I found The Building Coder blog, which helped me a lot.</p>
 <p>We insourced an add-in that was originally developed by an external company.
 The whole code lives in an assembly which references the Revit API.
 Then I realized, testing is hard.
-I refactured the code so that it was as much as possible independent from the Revit API.
+I refactored the code so that it was as much as possible independent from the Revit API.
 This code was testable as I knew it, using tests run
-on <a href="https://en.wikipedia.org/wiki/Continuous_integration">Contiguous Integration</a>.
+on <a href="https://en.wikipedia.org/wiki/Continuous_integration">continuous integration</a>.
 But a lot of code remained in the project referencing the Revit API.</p>
 <p>I asked Google what to do, but apparently there is not THE way to solve this problem.</p>
-<p>There is some stuff around that seems cool, e.g.,  <a href="https://thebuildingcoder.typepad.com/blog/2018/08/revit-unit-test-framework-improvements.html">RevitTestFramework</a>),
-but I was not happy with it.
+<p>There is some stuff around that seems cool, e.g.,  <a href="https://thebuildingcoder.typepad.com/blog/2018/08/revit-unit-test-framework-improvements.html">RevitTestFramework</a>,
+but I was not happy with that.
 Furthermore, all I found uses NUnit 2.6, whereas all my Revit independent code is tested by the NUnit 3.x.
-The build server doesn’t like the mix.</p>
+The build server doesn't like the mix.</p>
 <p>As a result, I started to write my own TestRunner using NUnit 3.
 It is far from perfect; nevertheless, I would like to share it with the community.</p>
 <p>Please have a look at it in 
 the <a href="https://github.com/geberit/Revit.TestRunner">Revit.TestRunner GitHub repository</a>.</p>
+<p>tf_testrunner_start.png</p>
 <p>Features so far:</p>
 <ul>
 <li>Using NUnit 3</li>
 <li>No reference to Revit.TestRunner needed in test assembly</li>
 <li>Support of NUnit attributes SetUp and TearDown</li>
 <li>Injection of API objects in test method</li>
-<li>Works as an addin with GUI</li>
+<li>Works as an add-in with GUI</li>
 <li>Installation script for libraries</li>
-<li>Post build event in VS project to place addin file</li>
+<li>Post build event in VS project to place add-in manifest</li>
 </ul>
 <p>Feedback welcome!</p>
+<h4><a name="3"></a> Getting Started with TestRunner</h4>
+<p>Get the code from GitHub and compile it.
+The <em>Revit.TestRunner.addin</em> file will be automatically placed in the <em>ProgramData</em> add-in folder of the selected Revit version,</p>
+<p>It is also possible to download the precompiled binaries.
+Start the <em>InstallAddin v20xx.cmd</em> of your favourite Revit version and run Revit. </p>
+<p>The add-in hooks into the Revit 'Add-Ins' ribbon. </p>
+<p><center>
+<img src="img/tf_testrunner_start.png" alt="TestRunner ribbon tab" width="347">
+</center></p>
+<p>By pressing the button, a dialogue will appear.
+By choosing your testing assembly, the view will show all your tests:</p>
+<p><center>
+<img src="img/tf_testrunner_ui.png" alt="TestRunner user interface" width="802">
+</center></p>
+<p>Select the node you want to test and press the 'Run'. All tests below the selected node will be executed.</p>
+<p><center>
+<img src="img/tf_testrunner_ui_executed.png" alt="TestRunner results" width="802">
+</center></p>
 <p>Very many thanks to Tobias for implementing, documenting and sharing this very important new tool!</p>
+<h4><a name="4"></a> Unconfusing Support Assemblies</h4>
+<p>A quick note on 
+a <a href="https://forums.autodesk.com/t5/revit-api-forum/confusing-assembly-location-when-use-one-assembly-for-two-revit/m-p/9070282">confusing assembly location when using one assembly for two Revit add-in projects</a>:</p>
+<p><strong>Question:</strong> I created a support library project implement custom classes and functions and then used this library reference in two Revit add-in projects.</p>
+<p>I want to install each project separately, so each project should contain their own library assembly in their setup folder.
+In this way, I can easily manage every single project without caring about others.</p>
+<p>I use the method <code>Assembly.GetExecutingAssembly</code> to check where the library.dll is referring to.
+When I first run the project 1, I get the correct assembly path &ndash; the project 1 folder.
+Then, I run project 2 and get the unexpected result: the path is in the project 1 folder again.
+This should return project 2 folder as my expectation.
+A similar problem occurs if I run the project 2 first.</p>
+<p><strong>Answer:</strong> If you load an assembly <code>A</code> into the .NET framework from directory <code>Da</code> and then load another version of assembly <code>A</code> from a different location <code>Db</code>, the .NET framework will determine that <code>A</code> has already been loaded and reuse the existing instance from <code>Da</code>, ignoring your request to load a second instance from <code>Db</code>. There are ways to work around this, presumably, but I will not even try to dive into that. I suggest that you design your two add-ins so that they do not rely on the location of the assembly <code>A</code> that you load in any way. You can easily move your assembly location determination code out of <code>A</code> into the main two add-ins instead.</p>
+<h4><a name="5"></a> Importing PDFs Made Easy</h4>
+<p>Konrad Sobon of <a href="https://twitter.com/arch_laboratory">@arch_laboratory</a> shared a new Dynamo solution
+on <a href="http://archi-lab.net">archi+lab</a>
+for <a href="https://archi-lab.net/importing-pdfs-made-easy">importing PDFs made easy</a>,
+using and expanding on the Revit 2020 ability to import PDF files and making it a little bit easier to place multi-page documents.</p>
