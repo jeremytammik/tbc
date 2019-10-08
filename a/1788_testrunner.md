@@ -22,7 +22,7 @@ twitter:
 A search for Revit API related books, a very nice new Revit API starter kit, a richer and much more complex literary AI-related book, and a quick bottleneck steel guitar blues recording not related with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/books_music
 
 A new Revit add-in unit testing framework, a short note on support assembly locations, and an article on importing PDF files
-&ndash; <code>Revit.TestRunner</code> &ndash; run unit tests in Revit
+&ndash; <code>Revit.TestRunner</code> runs unit tests in Revit
 &ndash; Getting started with <code>TestRunner</code>
 &ndash; Unconfusing support assemblies
 &ndash; Importing PDFs made easy...
