@@ -29,6 +29,17 @@ A new Revit add-in unit testing framework, a short note on support assembly loca
 
 linkedin:
 
+TestRunner for add-in unit testing, support assembly locations and importing PDF files in the #RevitAPI
+
+http://bit.ly/nunittestrunner
+
+A new Revit add-in unit testing framework, a short note on support assembly locations, and an article on importing PDF files:
+
+- Revit.TestRunner runs unit tests in Revit
+- Getting started with TestRunner
+- Unconfusing support assemblies
+- Importing PDFs made easy...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
