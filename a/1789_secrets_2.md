@@ -14,6 +14,7 @@
   https://forums.autodesk.com/t5/revit-api-forum/how-to-get-the-status-of-the-revit-link/td-p/9072787
   
 - https://forums.autodesk.com/t5/revit-api-forum/how-change-the-color-a-element/m-p/5651177
+  already pointed out in 1615 and tbc topic group 5.24
 
 twitter:
 
@@ -75,29 +76,17 @@ Joshua Lumley's video #2 in the Secret Series,
 Many thanks to Joshua for his great work and sharing!
 
 
-####<a name="3"></a> Getting
+####<a name="4"></a> Getting CAD Link Status
 
-- CAD link status
-  https://forums.autodesk.com/t5/revit-api-forum/cad-link-status/m-p/9075576
-  https://forums.autodesk.com/t5/revit-api-forum/cad-link-status/td-p/9073926
-  How to get the Status of the Revit Link? 
-  https://forums.autodesk.com/t5/revit-api-forum/how-to-get-the-status-of-the-revit-link/td-p/9072787
+CAD link status
+https://forums.autodesk.com/t5/revit-api-forum/cad-link-status/m-p/9075576
+https://forums.autodesk.com/t5/revit-api-forum/cad-link-status/td-p/9073926
+
+How to get the Status of the Revit Link? 
+https://forums.autodesk.com/t5/revit-api-forum/how-to-get-the-status-of-the-revit-link/td-p/9072787
   
 
 
-<center>
-<img src="img/.png" alt="" width="347">
-</center>
-
-####<a name="4"></a> 
-
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-
-[How to change the color a element](https://forums.autodesk.com/t5/revit-api-forum/how-change-the-color-a-element/m-p/5651177)
-
-**Question:**
-
-**Answer:** 
 
 
 ####<a name="5"></a> Revit DWG Export
@@ -166,7 +155,9 @@ I don’t know of a way to get the ID of the family instance and tie it to all t
 Tim Burnham  16 days ago
 This is great, thank you Stefan.  One other easy'ish question. What are other xdata index values indicate?
 
-/a/doc/revit/tbc/git/a/img/rvt_dwg_export_xdata.png
+<center>
+<img src="img/rvt_dwg_export_xdata.png" alt="Revit DWG export xdata" width="600">
+</center>
 
 Stefan Dobre  15 days ago
 Here are the codes that we use:
