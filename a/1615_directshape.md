@@ -235,8 +235,7 @@ If you prefer setting the colour explicitly, you can look at
 - [How to change the colour of an element](https://forums.autodesk.com/t5/revit-api-forum/how-change-the-color-a-element/td-p/5651177)
  
 Here is some code for that using `OverrideGraphicSettings`
-to [change the colour of an extrusion object](https://forums.autodesk.com/t5/revit-api-forum/change-colour-of-extrusion-object/m-p/7060824
-):
+to [change the colour of an extrusion object](https://forums.autodesk.com/t5/revit-api-forum/change-colour-of-extrusion-object/m-p/7060824):
  
 <pre class="code">
 &nbsp;&nbsp;<span style="color:#2b91af;">Color</span>&nbsp;color&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Color</span>(&nbsp;0,&nbsp;0,&nbsp;0&nbsp;);&nbsp;<span style="color:green;">//&nbsp;RGB&nbsp;(0,&nbsp;255,&nbsp;255)</span>

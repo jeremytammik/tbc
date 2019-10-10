@@ -77,11 +77,23 @@ Many thanks to Joshua for his great work and sharing!
 
 ####<a name="3"></a> Getting
 
+- CAD link status
+  https://forums.autodesk.com/t5/revit-api-forum/cad-link-status/m-p/9075576
+  https://forums.autodesk.com/t5/revit-api-forum/cad-link-status/td-p/9073926
+  How to get the Status of the Revit Link? 
+  https://forums.autodesk.com/t5/revit-api-forum/how-to-get-the-status-of-the-revit-link/td-p/9072787
+  
+
+
 <center>
 <img src="img/.png" alt="" width="347">
 </center>
 
 ####<a name="4"></a> 
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+[How to change the color a element](https://forums.autodesk.com/t5/revit-api-forum/how-change-the-color-a-element/m-p/5651177)
 
 **Question:**
 
