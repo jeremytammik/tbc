@@ -20,8 +20,11 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Joshua Lumley shares video #2 in his secret series, access to the CAD link status string and block in DWG export
+&ndash; Secrets of Revit API coding part 2
+&ndash; Video 2 in the secret series
+&ndash; Getting CAD link status
+&ndash; Making blocks in Revit DWG export...
 
 linkedin:
 
@@ -33,9 +36,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Secret Series 2
+### Secret Series 2, CAD Link Status and DWG Blocks
 
-Joshua Lumley shares video #2 in his secret series,
+Joshua Lumley shares video #2 in his secret series, access to the CAD link status string and block in DWG export:
+
+- [Secrets of Revit API coding part 2](#2)
+- [Video 2 in the secret series](#3)
+- [Getting CAD link status](#4)
+- [Making blocks in Revit DWG export](#5)
+
 
 ####<a name="2"></a> Secrets of Revit API Coding Part 2
 
@@ -46,7 +55,7 @@ In his [comment](https://thebuildingcoder.typepad.com/blog/2019/08/zero-touch-no
 on [Loading a .NET assembly from a memory stream](https://thebuildingcoder.typepad.com/blog/2019/08/zero-touch-node-element-wrapper-and-load-from-stream.html#3),
 he points out part two, for this year's event:
 
-> What really gets really tricky is when your addin references another DLL not provided by Microsoft's .net framework.
+> What really gets really tricky is when your add-in references another DLL not provided by Microsoft's .net framework.
 
 > I made a 43-minute video on how to do it with the Xceed Extended.Wpf.Toolkit, [cf. below](#3).
 
@@ -61,9 +70,9 @@ Joshua Lumley's video #2 in the Secret Series,
 <iframe width="480" height="270" src="https://www.youtube.com/embed/S0MPxBRL7c0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </center>
 
-> In Support of BILT ANZ 2019 150 minute Lab by Joshua Lumley from Christchurch, New Zealand.
+> In Support of BILT ANZ 2019 150-minute Lab by Joshua Lumley from Christchurch, New Zealand.
 
-> Turn your Revit macro that was initiated from macro manager into a proper plugin installer (an MSI files) you can distribute to other computers with no fuss.
+> Turn your Revit macro that was initiated from macro manager into a proper plugin installer (an MSI file) you can distribute to other computers with no fuss.
 
 > Includes use of Nuget packages: Extended WPF Toolkit & Ookii Dialogues.
 
@@ -73,20 +82,23 @@ Many thanks to Joshua for his useful work and kind sharing!
 
 ####<a name="4"></a> Getting CAD Link Status
 
-Several recent threads in
+Two different threads in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) ask
-how to determine the loaded versus unloaded status of a CAD link:
+how to determine the loaded versus unloaded status of a CAD link, so let's summarise the answer here:
 
 - [CAD link status](https://forums.autodesk.com/t5/revit-api-forum/cad-link-status/m-p/9075576)
-- [How to get the status of the Revit Link?](https://forums.autodesk.com/t5/revit-api-forum/how-to-get-the-status-of-the-revit-link/td-p/9072787)
+- [How to get the status of the Revit link?](https://forums.autodesk.com/t5/revit-api-forum/how-to-get-the-status-of-the-revit-link/td-p/9072787)
   
 **Question:** I'm trying to get the status of my linked CAD files through Revit API; more specifically, I want to list all the CAD links that were not found.
 
-I know that I'm dealing with ImportInstance, I know that I can use .IsLinked to determine if it was linked or imported. I can't find any way to get the status info, and even finding a path to the original file seems impossible.
+I know that I'm dealing with `ImportInstance`, I know that I can use `.IsLinked` to determine if it was linked or imported.
+
+I can't find any way to get the status info, and even finding a path to the original file seems impossible.
 
 Has any of you dealt with this before? Is it even possible? 
 
-By using the method RevitLinkType.IsLoaded() I can only tell whether or not the link is loaded (True or False). But is there a way to get the Status string?
+By using the method `RevitLinkType.IsLoaded`, I can only tell whether or not the link is loaded (True or False).
+Is there a way to get the Status string?
 
 <center>
 <img src="img/cad_links_not_loaded.png" alt="CAD links not loaded" width="271">
@@ -122,6 +134,8 @@ Try using this code:
 **Response:** Fantastic! Thank you both for constructive replies!
 
 ####<a name="5"></a> Making Blocks in Revit DWG Export
+
+A recent discussion on how to ensure that family instances in Revit are exported to DWG blocks, or, alternatively, how to reassemble together block from them after the export:
 
 **Question:** I have a Revit plugin that exports to DWG and an AutoCAD plugin that imports the newly created DWG.
 For Revit exports, some Revit family instances are exported as 1-1 Fam Instance->Blocks, while other Revit family instances with similar geo complexity are exported as a collection of individual lines, arcs, squares, etc. &ndash; not a block.
@@ -167,15 +181,13 @@ For families exported as blocks, you should run this command on the block refere
 Can you give me an example where this rule doesn’t apply? I remember that there were some issues for elements that comes from linked files (they have ids but from a different document).
 Why do you group AutoCAD entities same as the Revit entities? What are you trying to achieve?
 
+<!--- 
 **Response:**
 
-<!--- 
 We don't have a list of families, we're just starting with one to keep a controlled environment.  I've simplified an example with the attached ZIP.  It includes a single RVT to export a single sheet, outputted DWG of that single sheet and two image files for commentary.  You can dismiss any links that cannot be found.  The category I believe is electrical fixtures.  This is 2019 but its probably the same behavior in 2020.  The images will state the problem probably best.  Maybe nested families behave differently?  What could we do to either programmatically change it on AutoCAD or prep the RVT pre-export?
---->
 
-We are creating a "super exporter" where we want to leverage the export to dwg feature via API but also we want to export (separately) a lot of param data and change layers outside the settings feature.  If you look at my ZIP, there is one specific example where a family instance comes over as individual primitives on ANNO layer, whereas I would expect one block on Geo layer. Because its broken up into many primitives I can't retrace it back to the original fam instance nor know how to group them into a new block since the xdata for at least one of the prims doesn't have original fam instance revit ID.   Could you look at the attache?  The two images provided paint the problem best.
+We are creating a "super exporter" where we want to leverage the export to dwg feature via API but also we want to export (separately) a lot of param data and change layers outside the settings feature.  If you look at my ZIP, there is one specific example where a family instance comes over as individual primitives on ANNO layer, whereas I would expect one block on Geo layer. Because its broken up into many primitives I can't retrace it back to the original fam instance nor know how to group them into a new block since the xdata for at least one of the prims doesn't have original fam instance Revit id. Could you look at the attached?  The two images provided paint the problem best.
 
-<!---
 Angel Velez:squirrel:  17 days ago
 Have you looked at IFC?  Is DWG the base point you want for geometry + data?
 
@@ -185,9 +197,10 @@ Stantec wants a fully automated DWG deliverable to their customers where the mod
 Tim Burnham  17 days ago
 The attached zip above is really asking how I can either prep the fam instance on Revit's side so that it exports as a block, or is there something i can do on the autocad side to discover and group all these primitives into a block.  Hoping the former has a workflow I can do.
 
+**Answer:** 
 --->
 
-**Answer:** I looked at your sample files and I understood the issue.
+I looked at your sample files and I understood the issue.
 
 It’s about nested families in certain conditions &ndash; the nested Family is 'shared' and the nested family is an annotation family while the main one isn't.
 
@@ -205,7 +218,8 @@ One other easy'ish question: What do the other xdata index values indicate?
 <img src="img/rvt_dwg_export_xdata.png" alt="Revit DWG export xdata" width="600">
 </center>
 
-**Answer:** Here are the codes that we use:
+**Answer:** Here are the codes that we use, cf.
+the [DWG and DXF export `Xdata` specification](https://thebuildingcoder.typepad.com/blog/2010/08/dwg-and-dxf-export-xdata-specification.html):
 
 <pre class="code">
   // XData Identifiers
