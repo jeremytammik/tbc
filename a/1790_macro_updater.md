@@ -12,7 +12,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+DMU or Dynamic Model Updater macro in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/dmumacro
 
 Let's take a quick look at implementing a dynamic model updater in a macro
 &ndash; Task
@@ -20,6 +20,16 @@ Let's take a quick look at implementing a dynamic model updater in a macro
 &ndash; Drill up the filter...
 
 linkedin:
+
+DMU or Dynamic Model Updater macro in the #RevitAPI
+
+http://bit.ly/dmumacro
+
+Let's take a quick look at implementing a dynamic model updater in a macro:
+
+- Task
+- Solution
+- Drill up the filter...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
