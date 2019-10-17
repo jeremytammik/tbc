@@ -53,7 +53,7 @@ I had a really good break, although I spent the last ten days being ill and comi
 serious [sinusitis](https://en.wikipedia.org/wiki/Sinusitis).
 
 <center>
-<img src="/p/2015/2016-01-03_wildhaus/791_jeremy_reading_cropped.jpg" alt="Reading in the Swiss winter sun" width="500">
+<img src="/p/2016/2016-01-03_wildhaus/791_jeremy_reading_cropped.jpg" alt="Reading in the Swiss winter sun" width="500">
 </center>
 
 I am getting better again now, though.
@@ -128,3 +128,17 @@ accessible [Public Revit Models Dropbox folder](https://www.dropbox.com/sh/51bey
 you to use for your own testing as well.
 
 Enjoy!
+
+#### <a name="5"></a> Public Revit Models Updated Link
+
+In October 2019, Viktor Balaban pointed out:
+
+> Do you have new location for big Revit model to test performance?
+Dropbox seems has closed access there.
+
+Indeed, so it has. Thank you for pointing that out.
+
+I created a new link for you to
+a [new Public Revit Models Dropbox folder](https://www.dropbox.com/sh/ovqdg8nm8ov66cg/AACtfGDq1WqDGu3T84ZFq64Ia?dl=0).
+
+Enjoy further!
