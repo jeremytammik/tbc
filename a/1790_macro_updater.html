@@ -27,137 +27,142 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Dynamic Model Updater Macro</h3>
-<h4><a name="2"></a></h4>
-<p>Dave raised and solved an interesting issue in an area that we have not discussed much here yet in
+<p>Let's take a quick look at implementing a dynamic model updater in a macro:</p>
+<ul>
+<li><a href="#2">Task</a></li>
+<li><a href="#3">Solution</a></li>
+<li><a href="#4">Drill up the filter</a></li>
+</ul>
+<h4><a name="2"></a> Task</h4>
+<p>Dave raised and solved an interesting issue concerning macros, an area that we have not discussed much here yet, in
 his <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/iupdater-in-a-project-macro-on-startup/m-p/9087481">IUpdater in a project macro on startup</a>:</p>
-<p><strong>Question:</strong></p>
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/iupdater-in-a-project-macro-on-startup/m-p/9087481"><code>IUpdater</code> in a project macro on startup</a>:</p>
 <p>I'm trying to use <code>IUpdater</code> in a macro that automatically starts when a project opens.
 Is this possible?</p>
-<p>So far, I used Macro Manager / Create to set up some boilerplate.
-Then I pasted in Autodesk's <code>WallUpdater</code> example code from the knowledge article
+<p>So far, I used Macro Manager / Create to set up some boilerplate.</p>
+<p>Then, I pasted in Autodesk's <code>WallUpdater</code> example code from the knowledge article
 on <a href="https://knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhelp/2015/ENU/Revit-API/files/GUID-6D434229-0A2E-41FE-B29D-1BB2E6471F50-htm.html">Implementing IUpdater</a>
 into my <code>public partial class ThisDocument</code>.</p>
-<p>I figured out how to run code on project startup by calling it from the boilerplate's <code>private void Module_Startup</code>.</p>
+<p>I figured out how to run the code on project startup by calling it from the boilerplate's <code>private void Module_Startup</code>.</p>
 <p>But I haven't had any luck calling <code>WallUpdater</code>.</p>
 <p>Here is my code:</p>
 <pre class="code">
-using System;
-using Autodesk.Revit;
-using Autodesk.Revit.DB;
-using Autodesk.Revit.UI.Selection;
-using Autodesk.Revit.UI;
-using Autodesk.Revit.Attributes;
-using System.Collections.Generic;
-using System.Linq;
+<span style="color:blue;">using</span>&nbsp;System;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.DB;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.UI.Selection;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.UI;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.Attributes;
+<span style="color:blue;">using</span>&nbsp;System.Collections.Generic;
+<span style="color:blue;">using</span>&nbsp;System.Linq;
 
-namespace test
+<span style="color:blue;">namespace</span>&nbsp;test
 {
-  [Transaction(TransactionMode.Manual)]
-  [Autodesk.Revit.DB.Macros.AddInId("redacted")]
-    public partial class ThisDocument
-    {
-        private void Module_Startup(object sender, EventArgs e)
-        {
-            TaskDialog.Show("hello","this pops up when you open the project");
-        }
+&nbsp;&nbsp;[<span style="color:#2b91af;">Transaction</span>(&nbsp;<span style="color:#2b91af;">TransactionMode</span>.Manual&nbsp;)]
+&nbsp;&nbsp;[Autodesk.Revit.DB.Macros.<span style="color:#2b91af;">AddInId</span>(&nbsp;<span style="color:#a31515;">&quot;redacted&quot;</span>&nbsp;)]
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">partial</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">ThisDocument</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">void</span>&nbsp;Module_Startup(&nbsp;<span style="color:blue;">object</span>&nbsp;sender,&nbsp;<span style="color:#2b91af;">EventArgs</span>&nbsp;e&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;hello&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;this&nbsp;pops&nbsp;up&nbsp;when&nbsp;you&nbsp;open&nbsp;the&nbsp;project&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
 
-        private void Module_Shutdown(object sender, EventArgs e)
-        {
-        }
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">void</span>&nbsp;Module_Shutdown(&nbsp;<span style="color:blue;">object</span>&nbsp;sender,&nbsp;<span style="color:#2b91af;">EventArgs</span>&nbsp;e&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;}
 
-        #region Revit Macros generated code
-        private void InternalStartup()
-        {
-            this.Startup += new System.EventHandler(Module_Startup);
-            this.Shutdown += new System.EventHandler(Module_Shutdown);
-        }
-        #endregion
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">#region</span>&nbsp;Revit&nbsp;Macros&nbsp;generated&nbsp;code
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">void</span>&nbsp;InternalStartup()
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">this</span>.Startup&nbsp;+=&nbsp;<span style="color:blue;">new</span>&nbsp;System.<span style="color:#2b91af;">EventHandler</span>(&nbsp;Module_Startup&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">this</span>.Shutdown&nbsp;+=&nbsp;<span style="color:blue;">new</span>&nbsp;System.<span style="color:#2b91af;">EventHandler</span>(&nbsp;Module_Shutdown&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">#endregion</span>
 
-        public class WallUpdaterApplication : IExternalApplication
-        {
-            public Result OnStartup(UIControlledApplication a)
-            {
-                // Register wall updater with Revit
-                WallUpdater updater = new WallUpdater(
-          a.ActiveAddInId);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">WallUpdaterApplication</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IExternalApplication</span>
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">Result</span>&nbsp;OnStartup(&nbsp;<span style="color:#2b91af;">UIControlledApplication</span>&nbsp;a&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Register&nbsp;wall&nbsp;updater&nbsp;with&nbsp;Revit</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">WallUpdater</span>&nbsp;updater&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">WallUpdater</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a.ActiveAddInId&nbsp;);
 
-                UpdaterRegistry.RegisterUpdater(updater);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UpdaterRegistry</span>.RegisterUpdater(&nbsp;updater&nbsp;);
 
-                // Change Scope = any Wall element
-                ElementClassFilter wallFilter
-          = new ElementClassFilter(
-            typeof(Wall));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Change&nbsp;Scope&nbsp;=&nbsp;any&nbsp;Wall&nbsp;element</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementClassFilter</span>&nbsp;wallFilter
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementClassFilter</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">Wall</span>&nbsp;)&nbsp;);
 
-                // Change type = element addition
-                UpdaterRegistry.AddTrigger(
-          updater.GetUpdaterId(), wallFilter,
-          Element.GetChangeTypeElementAddition());
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Change&nbsp;type&nbsp;=&nbsp;element&nbsp;addition</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UpdaterRegistry</span>.AddTrigger(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;updater.GetUpdaterId(),&nbsp;wallFilter,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>.GetChangeTypeElementAddition()&nbsp;);
 
-                return Result.Succeeded;
-            }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Succeeded;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
 
-            public Result OnShutdown(UIControlledApplication a)
-            {
-                WallUpdater updater = new WallUpdater(a.ActiveAddInId);
-                UpdaterRegistry.UnregisterUpdater(updater.GetUpdaterId());
-                return Result.Succeeded;
-            }
-        }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">Result</span>&nbsp;OnShutdown(&nbsp;<span style="color:#2b91af;">UIControlledApplication</span>&nbsp;a&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">WallUpdater</span>&nbsp;updater&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">WallUpdater</span>(&nbsp;a.ActiveAddInId&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UpdaterRegistry</span>.UnregisterUpdater(&nbsp;updater.GetUpdaterId()&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Succeeded;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
 
-        public class WallUpdater : IUpdater
-        {
-            static AddInId m_appId;
-            static UpdaterId m_updaterId;
-            WallType m_wallType = null;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">WallUpdater</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IUpdater</span>
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">AddInId</span>&nbsp;m_appId;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">UpdaterId</span>&nbsp;m_updaterId;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">WallType</span>&nbsp;m_wallType&nbsp;=&nbsp;<span style="color:blue;">null</span>;
 
-            // constructor takes the AddInId for the add-in
-      // associated with this updater
-            public WallUpdater(AddInId id)
-            {
-                m_appId = id;
-                m_updaterId = new UpdaterId(m_appId, new Guid(
-          "FBFBF6B2-4C06-42d4-97C1-D1B4EB593EFF"));
-            }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;constructor&nbsp;takes&nbsp;the&nbsp;AddInId&nbsp;for&nbsp;the&nbsp;add-in</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;associated&nbsp;with&nbsp;this&nbsp;updater</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;WallUpdater(&nbsp;<span style="color:#2b91af;">AddInId</span>&nbsp;id&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m_appId&nbsp;=&nbsp;id;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m_updaterId&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">UpdaterId</span>(&nbsp;m_appId,&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Guid</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;FBFBF6B2-4C06-42d4-97C1-D1B4EB593EFF&quot;</span>&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
 
-            public void Execute(UpdaterData data)
-            {
-                Document doc = data.GetDocument();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;Execute(&nbsp;<span style="color:#2b91af;">UpdaterData</span>&nbsp;data&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;data.GetDocument();
 
-                // Cache the wall type
-                if (m_wallType == null)
-                {
-                    TaskDialog.Show("hello", "world");
-                }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Cache&nbsp;the&nbsp;wall&nbsp;type</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;m_wallType&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;hello&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;world&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
 
-                if (m_wallType != null)
-                {
-                    TaskDialog.Show("hello", "world");
-                }
-            }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;m_wallType&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;hello&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;world&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
 
-            public string GetAdditionalInformation()
-            {
-                return "Wall type updater example: updates all "
-          + "newly created walls to a special wall";
-            }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">string</span>&nbsp;GetAdditionalInformation()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#a31515;">&quot;Wall&nbsp;type&nbsp;updater&nbsp;example:&nbsp;updates&nbsp;all&nbsp;&quot;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;<span style="color:#a31515;">&quot;newly&nbsp;created&nbsp;walls&nbsp;to&nbsp;a&nbsp;special&nbsp;wall&quot;</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
 
-            public ChangePriority GetChangePriority()
-            {
-                return ChangePriority.FloorsRoofsStructuralWalls;
-            }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">ChangePriority</span>&nbsp;GetChangePriority()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">ChangePriority</span>.FloorsRoofsStructuralWalls;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
 
-            public UpdaterId GetUpdaterId()
-            {
-                return m_updaterId;
-            }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">UpdaterId</span>&nbsp;GetUpdaterId()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;m_updaterId;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
 
-            public string GetUpdaterName()
-            {
-                return "Wall Type Updater";
-            }
-        }
-    }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">string</span>&nbsp;GetUpdaterName()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#a31515;">&quot;Wall&nbsp;Type&nbsp;Updater&quot;</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
 }
 </pre>
 
@@ -166,10 +171,11 @@ namespace test
 for <a href="https://thebuildingcoder.typepad.com/blog/2014/02/wrangling-revisions-with-ruby.html">wrangling revisions with Ruby</a>.
 Unfortunately, that's a bit too complex for me to follow at this point, especially in Ruby.</p>
 <p>I was hoping to find an RVT with a vanilla C# <code>IUpdater</code> macro embedded, similar to the SDK <em>Revit_Macro_Samples.rvt</em>.</p>
-<p>Later: The Boost your BIM article
+<h4><a name="3"></a> Solution</h4>
+<p>The Boost your BIM article
 on <a href="https://boostyourbim.wordpress.com/2012/12/17/automatically-run-api-code-when-your-model-changes">automatically running API code when your model changes</a> looks
-promising.</p>
-<p>Later still: Yes, I got it working!</p>
+promising...</p>
+<p>Yes, I got it working!</p>
 <p>Here are the steps I followed:</p>
 <ul>
 <li>Use MacroManager to create a new C# module.</li>
@@ -177,10 +183,10 @@ promising.</p>
 <li>Add <code>RegisterUpdater</code> to <code>Module_Startup</code> as follows:</li>
 </ul>
 <pre class="code">
-  private void Module_Startup(object sender, EventArgs e)
-  {
-    RegisterUpdater();
-  }
+&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">void</span>&nbsp;Module_Startup(&nbsp;<span style="color:blue;">object</span>&nbsp;sender,&nbsp;<span style="color:#2b91af;">EventArgs</span>&nbsp;e&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;RegisterUpdater();
+&nbsp;&nbsp;}
 </pre>
 
 <ul>
@@ -192,22 +198,22 @@ promising.</p>
 </li>
 </ul>
 <pre class="code">
-  public class FamilyInstanceUpdater : IUpdater
-  { ... }
-  public void RegisterUpdater()
-  { ... }
-  public void UnregisterUpdater()
-  { ... }
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">FamilyInstanceUpdater</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IUpdater</span>
+&nbsp;&nbsp;{&nbsp;...&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;RegisterUpdater()
+&nbsp;&nbsp;{&nbsp;...&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;UnregisterUpdater()
+&nbsp;&nbsp;{&nbsp;...&nbsp;}
 </pre>
 
 <p>Make sure <code>FamilyInstanceUpdater</code>, <code>RegisterUpdater</code>, and <code>UnregisterUpdater</code> are inside the scope of <code>ThisDocument</code>.</p>
 <p>For testing, I found it handy to replace boostyourbim's <code>Execute</code> code with this:</p>
 <pre class="code">
-  public void Execute(UpdaterData data)
-  {
-    Document doc = data.GetDocument();
-    TaskDialog.Show("Revit","hello");
-  }
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;Execute(&nbsp;<span style="color:#2b91af;">UpdaterData</span>&nbsp;data&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;data.GetDocument();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;Revit&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;hello&quot;</span>&nbsp;);
+&nbsp;&nbsp;}
 </pre>
 
 <ul>
@@ -226,13 +232,19 @@ And my version currently works for columns and beams, but not for walls.
 Any input would be appreciated.</p>
 <p>Meanwhile, thanks very much to Jeremy for taking a look and to boostyourbim for their code.
 Hope this helps someone.</p>
-<p><strong>Answer:</strong> You say, my version currently works for columns and beams, but not for walls.</p>
-<p>Well, you have implemented something called a <code>FamilyInstanceUpdater</code>, you say.</p>
+<p>Many thanks to Dave for his research and sharing the solution!</p>
+<h4><a name="4"></a> Drill Up the Filter</h4>
+<p>The initial version works for columns and beams, but not for walls.</p>
+<p>This is due to the <code>FamilyInstanceUpdater</code>.</p>
+<p>It defines a <code>familyInstanceFilter</code> variable as <code>new ElementClassFilter( typeof( FamilyInstance ) )</code>.</p>
 <p>Beams and columns are family instances, and walls are not.</p>
-<p>That sounds like a probable cause to me.</p>
-<p>You can probably expend your <code>FamilyInstanceUpdater</code> to include <code>Wall</code> objects as well as <code>FamilyInstance</code> objects.</p>
-<p>If you do so, please rename it appropriately, for your own sanity's sake.</p>
+<p>To expand the filter to include <code>Wall</code> objects as well as <code>FamilyInstance</code> objects, you can change its name and definition to something like this:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:#2b91af;">ElementFilter</span>&nbsp;f&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">LogicalOrFilter</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementClassFilter</span>(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">FamilyInstance</span>&nbsp;)&nbsp;),
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementClassFilter</span>(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">Wall</span>&nbsp;)&nbsp;);
+</pre>
+
 <p><center>
-<img src="img/.png" alt="" width="271">
+<img src="img/macro_photography.png" alt="Macro photography" width="500">
 </center></p>
-<h4><a name="5"></a></h4>
