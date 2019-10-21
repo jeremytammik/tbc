@@ -117,7 +117,8 @@ Resources available now:
 - [Developers Guide](https://forge.autodesk.com/en/docs/design-automation/v3/developers_guide/overview)
 - Attend these classes at Forge DevCon on November 18 in Las Vegas:
     - [FDC324038 &ndash; Automation Workflows with the Forge Design Automation API for Revit](https://autodeskuniversity.smarteventscloud.com/connect/sessionDetail.ww?SESSION_ID=324038) with Sasha Crotty
-    - [SD323658 &ndash; Getting Started on Design Automation for Revit on Forge] with Jason Kunkel from CADD Microsystems and Rahul Bhobe from Autodesk
+    - [SD323658 &ndash; Getting Started on Design Automation for Revit on Forge](https://autodeskuniversity.smarteventscloud.com/connect/sessionDetail.ww?SESSION_ID=323658) with
+    Jason Kunkel from CADD Microsystems and Rahul Bhobe from Autodesk
 
 <center>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/eTZcr-Erzew" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
