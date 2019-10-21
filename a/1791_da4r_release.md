@@ -51,8 +51,12 @@ The hugely popular Design Automation APIs for Revit, Inventor, and 3ds Max will 
 
 In a completely different vein, I found a very simple solution to download photos from an Android phone to the Mac:
 
+- [Public Forge Design Automation APIs](#2)
+- [What can you do with Design Automation API for Revit?](#3)
+- [Easy solution to transfer photos from Android to Mac](#4)
+- [Gadgets in 1990 vs. 2018](#5)
 
-####<a name="2"></a> Public Design Automation APIs
+####<a name="2"></a> Public Forge Design Automation APIs
 
 The [Forge Design Automation API](https://forge.autodesk.com/en/docs/design-automation/v3/developers_guide/overview) gives
 you access to Autodesk core product engines in the cloud.
@@ -105,7 +109,7 @@ Resources available now:
 Please refer to the [DA4R topic group for more information and previous discussions on this](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55).
 
 
-####<a name="4"></a> Easy Solution to transfer Photos from Android to Mac
+####<a name="4"></a> Easy Solution to Transfer Photos from Android to Mac
 
 Are you running into [problems transferring photos from an Android phone to MacOS](https://duckduckgo.com/?q=problem+transferring+photos+from+an+android+phone+to+macos&atb=v180-1&ia=images)?
 
@@ -125,7 +129,7 @@ Just go to the [Send Anywhere web page](https://send-anywhere.com), click receiv
 It worked like a charm within minutes and with no hiccups or complications whatsoever.
 
 
-####<a name="4"></a> 1990 vs. 2018
+####<a name="5"></a> Gadgets in 1990 vs. 2018
 
 By the way, talking about smartphones, here is a funny picture comparing the gadget situation in 1990 (ca.) with today:
 
