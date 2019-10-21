@@ -21,6 +21,11 @@
   Just go to the web page, click receive, and enter the share code.
   It worked like a charm with no hiccups or complications whatsoever.
 
+- 1990 vs. 2018
+  https://pbs.twimg.com/media/EFzasMcXUAAVbIO.jpg
+  https://pbs.twimg.com/media/EFzasMcXUAAVbIO.jpg
+  img/smartphone_replaces_gadgets.jpg
+
 twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
@@ -80,7 +85,7 @@ Build cloud-native apps and services that create, extract, and modify Revit data
 - Extract and modify Revit data
 - Automate and customize workflows like:
     - Creating custom Revit Families (RFAs)
-    - Explore and analyze model data
+    - Explore and analyse model data
     - Extract and produce automated reports from RVTs
     - Automatically create documentation
 
@@ -109,12 +114,23 @@ cf. [how to import photos from a Pixel phone with OS X Mojave](https://macintosh
 
 That article suggests using PocketShare. 
 
-I found a very simple alternative solution that seems pretty foolproof and works on almost any device, not bound to Androind, nor to phones:
+I found a very simple alternative solution that seems pretty foolproof and works on almost any device, not bound to Android, nor even to phones in general:
 
-Simply set up [Send Anywhere](https://send-anywhere.com) on the phone and and use that to create a temporary share of the pictures.
+Simply set up [Send Anywhere](https://send-anywhere.com) on the phone and use that to create a temporary share of the pictures.
 
 No need to set up anything at all on the PC.
 
 Just go to the [Send Anywhere web page](https://send-anywhere.com), click receive, and enter the share code.
 
 It worked like a charm within minutes and with no hiccups or complications whatsoever.
+
+
+####<a name="4"></a> 1990 vs. 2018
+
+By the way, talking about smartphones, here is a funny picture comparing the gadget situation in 1990 (ca.) with today:
+
+<center>
+<img src="img/smartphone_replaces_gadgets.jpg" alt="Smartphone replaces gadgets" width="600">
+<p style="font-size: 80%; font-style:italic">Copied from [pbs.twimg.com](https://pbs.twimg.com/media/EFzasMcXUAAVbIO.jpg)</p>
+</center>
+
