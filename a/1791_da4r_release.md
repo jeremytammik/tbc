@@ -30,8 +30,12 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+The hugely popular Design Automation APIs for Revit, Inventor, and 3ds Max will be officially released to the public on October 28.
+In a completely different vein, I found a very simple solution to download photos from an Android phone to the Mac
+&ndash; Public Forge Design Automation APIs
+&ndash; What can you do with Design Automation API for Revit?
+&ndash; Easy solution to transfer photos from Android to Mac
+&ndash; Gadgets in 1990 vs. 2018...
 
 linkedin:
 
@@ -45,7 +49,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Design Automation API for Revit Going Public
 
-The log-awaited announcement was finally made at Forge DevCon in Darmstadt:
+A long-awaited announcement was finally made at Forge DevCon in Darmstadt:
 
 The hugely popular Design Automation APIs for Revit, Inventor, and 3ds Max will be officially released to the public on October 28.
 
@@ -68,7 +72,7 @@ Manual, repetitive and error-prone tasks can be automated, freeing people to wor
 If you want to learn about this API directly from the beta testers and experts, grab a ticket to Forge DevCon at Autodesk University to attend classes on November 18 in Las Vegas. Tickets are only $150 and you can register or add it to your AU pass today.
 
 <center>
-[Register for Forge DevCon](https://autodeskuniversity.smarteventscloud.com/portal/contactInfo.ww?timedOut=true&pass=forgeDevCon)
+[Register here for Forge DevCon](https://autodeskuniversity.smarteventscloud.com/portal/contactInfo.ww?timedOut=true&pass=forgeDevCon)
 </center>
 
 Please refer to the full announcement
@@ -115,7 +119,6 @@ Are you running into [problems transferring photos from an Android phone to MacO
 
 Some of the previously used methods stopped working in MacOS Mojave, 
 cf. [how to import photos from a Pixel phone with OS X Mojave](https://macintoshhowto.com/phone/how-to-import-photos-from-a-pixel-phone-with-os-x-mojave.html).
-
 That article suggests using PocketShare. 
 
 I found a very simple alternative solution that seems pretty foolproof and works on almost any device, not bound to Android, nor even to phones in general:
@@ -135,6 +138,6 @@ By the way, talking about smartphones, here is a funny picture comparing the gad
 
 <center>
 <img src="img/smartphone_replaces_gadgets.jpg" alt="Smartphone replaces gadgets" width="600">
-<p style="font-size: 80%; font-style:italic">Copied from [pbs.twimg.com](https://pbs.twimg.com/media/EFzasMcXUAAVbIO.jpg)</p>
+<p style="font-size: 80%; font-style:italic">Copied from <a href="https://pbs.twimg.com/media/EFzasMcXUAAVbIO.jpg">pbs.twimg.com</a></p>
 </center>
 
