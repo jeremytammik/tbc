@@ -21,7 +21,7 @@
 
 twitter:
 
- Invitation to Forge DevCon in Las Vegas and visual programming in infrastructure with Dynamo and the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/dynamoinfrastructure
+Invitation to Forge DevCon in Las Vegas and visual programming in infrastructure with Dynamo and the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/dynamoinfrastructure
 
 Let's highlight another class from BILTNZ and a personal invitation to the upcoming DevCon in Las Vegas
 &ndash; Invitation to Forge DevCon in Las Vegas
@@ -33,6 +33,18 @@ Let's highlight another class from BILTNZ and a personal invitation to the upcom
 
 linkedin:
 
+Invitation to Forge DevCon in Las Vegas and visual programming in infrastructure with Dynamo and the #RevitAPI
+
+http://bit.ly/dynamoinfrastructure
+
+Let's highlight another class from BILTNZ and a personal invitation to the upcoming DevCon in Las Vegas:
+
+- Invitation to Forge DevCon in Las Vegas
+- Visual Programming in Infrastructure
+- Class description
+- Table of contents
+- Placing an instance along an edge
+- Most popular programming languages 1965-2019...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
