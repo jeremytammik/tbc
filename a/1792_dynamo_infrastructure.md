@@ -43,8 +43,13 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Let's highlight another class from BILTNZ and a personal invitation to the upcoming DevCon in Las Vegas
+&ndash; Invitation to Forge DevCon in Las Vegas
+&ndash; Visual Programming in Infrastructure
+&ndash; Class description
+&ndash; Table of contents
+&ndash; Placing an instance along an edge
+&ndash; Most popular programming languages 1965-2019...
 
 linkedin:
 
@@ -57,12 +62,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Visual Programming in Infrastructure
+### Invitation to DevCon Visual Programming in Infrastructure
 
 Let's highlight another class from BILTNZ and a personal invitation to the upcoming DevCon in Las Vegas:
 
 - [Invitation to Forge DevCon in Las Vegas](#2)
-- [Visual Programming in Infrastructure: gung-ho tactics for getting stuff done](#3)
+- [Visual Programming in Infrastructure](#3)
     - [Class description](#3.1)
     - [Table of contents](#3.2)
 - [Placing an instance along an edge](#4)
@@ -77,13 +82,13 @@ On November 18th we'll be holding our 4th global [Forge DevCon](https://forge.au
 
 The Forge DevCon is a 'pre-conference' to Autodesk University.
 But don't let the 'pre-conference' bit fool you.
-Forge DevCon is a fully fledged conference in its own right.
+Forge DevCon is a fully-fledged conference in its own right.
 Of course, a lot of attendees will be staying on in Vegas all week to get the full AU experience, but Forge DevCon is well worth the trip on its own &ndash; and around 20% of our attendees do just that.
 We're expecting over 1500 attendees just at Forge DevCon, and we're continuing our collaboration with the Connect & Construct Summit so that attendees at either conference can attend any class or keynote &ndash; that adds another 2500 attendees into the mix.
 
 The theme for this year’s Forge DevCon is Digital Transformation.
 Whether you are taking your business thru a Digital transformation &ndash; or you are helping your customers thru their Digital Transformation.
-We've lined up 30 classes for you at Forge DevCon, and have ensured there's something for everyone.
+We've lined up 30 classes for you at Forge DevCon and have ensured there's something for everyone.
 There will be deep technical classes for coders, Forge roadmap, case studies delivered by partners, business-oriented classes, panel sessions by industry leaders, “Meet the Experts” where the Autodesk expert panel will answer all of your questions, and even a series
 of [Learning Lab classes](https://autodeskuniversity.smarteventscloud.com/connect/search.ww?searchType=session&searchPhrase=FDC320314+FDC320976+FDC322917+FDC331632#loadSearch-searchPhrase=FDC322542%20FDC322546%20FDC322554%20FDC323665%20FDC322552&searchType=session&tc=0&sortBy=dayTime&i(72466)=&p=) to
 help those of you who are new to Forge to get up and running quickly.
@@ -159,11 +164,11 @@ So, if you're an Infrastructure BIM'mer come attend this lab, and learn how thin
 
 ####<a name="3.2"></a> Table of Contents
 
-1. Introduction<br/>&ndash; A Little Note on Software &ndash; How Do We Learn? &ndash; What’s the Deal with These Curves &ndash; Curves ain’t curves
-2. Points (Along curves)<br/>&ndash; Points along curves &ndash; Points Projected &ndash; Points Analysed
-3. Vectors and Angles<br/>&ndash; Setting an Elements Rotation
-4. Data<br/>&ndash; Renumber Elements &ndash; Parsing Text Data
-5. Coordinate Systems<br/>&ndash; Placing Utility poles again &ndash; Building Solids using CS &ndash; CS and Discrete Geometry
+1. Introduction &mdash; A Little Note on Software &ndash; How Do We Learn? &ndash; What’s the Deal with These Curves &ndash; Curves ain’t curves
+2. Points (Along curves) &mdash; Points along curves &ndash; Points Projected &ndash; Points Analysed
+3. Vectors and Angles &mdash; Setting an Elements Rotation
+4. Data &mdash; Renumber Elements &ndash; Parsing Text Data
+5. Coordinate Systems &mdash; Placing Utility poles again &ndash; Building Solids using CS &ndash; CS and Discrete Geometry
 6. Closing Remarks
 
 <center>
@@ -177,7 +182,7 @@ Among many other things, Jostein shows how to place family instances along curve
 
 Here is another discussion on that at a lower level, from the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [placing a family instance along a selected edge of another family instance](https://forums.autodesk.com/t5/revit-api-forum/place-a-family-instance-along-selected-another-family-instance/m-p/9096037),
-once again showing the use of simple snooping to discover what is up:
+once again showing the use of simple snooping to discover what is going on under the hood:
 
 **Question:** I have two families in a project.
 I bring in one family instance based on the selected model line.
@@ -197,12 +202,12 @@ I used RevitLookup to check, and it seems the orientation of the instances diffe
 
 <center>
 <img src="img/place_inst_along_edge_2.jpg" alt="Placing an instance along an edge" width="600"> <!--1366-->
-<p style="font-size: 80%; font-style:italic"><(0,1,0) and (1,0,0)/p>
+<p style="font-size: 80%; font-style:italic">(0,1,0) and (1,0,0)</p>
 </center>
 
 <center>
 <img src="img/place_inst_along_edge_3.jpg" alt="Placing an instance along an edge" width="600"> <!--1366-->
-<p style="font-size: 80%; font-style:italic"><(0,-1,0) and (-1,0,0)/p>
+<p style="font-size: 80%; font-style:italic">(0,-1,0) and (-1,0,0)</p>
 </center>
 
 **Answer:** Here is the solution I found:
@@ -214,20 +219,21 @@ I used RevitLookup to check, and it seems the orientation of the instances diffe
   Curve refcurve = selEdge.AsCurve().CreateReversed();
 </pre>
 
-After extracting the curve I reversed it. I still don't understand why the family placement works fine while manually, whereas using the API I need to reverse it.
+After extracting the curve, I reversed it.
+I still don't understand why the family placement works fine while manually, whereas using the API I need to reverse it.
 
 Many thanks to Pandian Srinivasan for sharing this!
 
 
-####<a name="5"></a> Most Popular Programming Languages 1965 - 2019
+####<a name="5"></a> Most Popular Programming Languages 1965-2019
 
-A very nice animatio based on historical data on the relative populatity of programming languages in the past six decades, 
-the [Most Popular Programming Languages 1965 - 2019](https://youtu.be/Og847HVwRSI):
+I'll close with this very nice animation based on historical data on the relative popularity of programming languages in the past six decades, 
+the [most popular programming languages 1965-2019](https://youtu.be/Og847HVwRSI):
 
 > Timeline of the most popular programming languages since 1965 to 2019.
-So far the most intense ranking I've ever done :)
+So far, the most intense ranking I've ever done :)
 For recent years, I've used multiple programming languages popularity indexes with adjustments thanks to the data from GitHub repositories access frequency.
-For historical ranking, I've used aggregation of multiple national surveys to establish several data points, plus a world wide publications rate of occurrence.
+For historical ranking, I've used aggregation of multiple national surveys to establish several data points, plus a world-wide publications rate of occurrence.
 In this, ranking popularity is defined by percentage of programmers with either proficiency in specific language or currently learning/mastering one.
 `Y` axis a relative value to define ranking popularity between all other items.
 Have fun!
