@@ -115,7 +115,7 @@ call or text me.
 Really.
 
 <center>
-<img src="img/jimq.png" alt="Jim Quanci, sailor" width="367">
+<img src="img/jim_quanci_sailor.png" alt="Jim Quanci, sailor" width="367">
 </center>
 
 
