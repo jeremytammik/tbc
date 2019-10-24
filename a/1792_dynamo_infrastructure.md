@@ -62,7 +62,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Invitation to DevCon Visual Programming in Infrastructure
+### DevCon Invitation and Dynamo for Infrastructure
 
 Let's highlight another class from BILTNZ and a personal invitation to the upcoming DevCon in Las Vegas:
 
