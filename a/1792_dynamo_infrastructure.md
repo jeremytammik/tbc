@@ -227,7 +227,7 @@ Many thanks to Pandian Srinivasan for sharing this!
 
 ####<a name="5"></a> Most Popular Programming Languages 1965-2019
 
-I'll close with this very nice animation based on historical data on the relative popularity of programming languages in the past six decades, 
+I'll close with this very nice five-minute animation based on historical data on the relative popularity of programming languages in the past six decades, 
 the [most popular programming languages 1965-2019](https://youtu.be/Og847HVwRSI):
 
 > Timeline of the most popular programming languages since 1965 to 2019.
