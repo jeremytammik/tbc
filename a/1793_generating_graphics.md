@@ -15,7 +15,8 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+Avoid generating graphics, thermal and physical assets, old add-in managers and compiling without Revit installed for the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/graphicsassets
 
 Here are some relevant topics for today
 &ndash; Can you avoid generating graphics?
