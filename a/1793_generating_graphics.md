@@ -28,6 +28,19 @@ Here are some relevant topics for today
 
 linkedin:
 
+Avoid generating graphics, thermal and physical assets, old add-in managers and compiling without Revit installed for the #RevitAPI
+
+http://bit.ly/graphicsassets
+
+Here are some relevant topics for today:
+
+- Can you avoid generating graphics?
+- Read all thermal and physical assets
+- Collection of old add-in managers
+- Compiling an add-in without Revit installed
+- Xeokit 3D BIM and CAD viewer
+- Software development manager job opportunity...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
