@@ -16,8 +16,13 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Here are some relevant topics for today
+&ndash; Can you avoid generating graphics?
+&ndash; Read all thermal and physical assets
+&ndash; Collection of old add-in managers
+&ndash; Compiling an add-in without Revit installed
+&ndash; Xeokit 3D BIM and CAD viewer
+&ndash; Software development manager job opportunity...
 
 linkedin:
 
@@ -29,10 +34,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Generating Graphics</h3>
+<h3>Generating Graphics and Collecting Assets</h3>
 <p>As always, many important ongoing issues are being presented and resolved in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>.</p>
-<p>I continue struggling to create time to pick out and highlight a couple of relevant topics here:</p>
+<p>I continue struggling to create time to pick out and highlight the most relevant topics here.</p>
+<p>I ended up with quite a number today:</p>
 <ul>
 <li><a href="#2">Can you avoid generating graphics?</a></li>
 <li><a href="#3">Read all thermal and physical assets</a></li>
@@ -62,7 +68,6 @@ This code is causing it:</p>
 &nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
 &nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">ViewSheet</span>&nbsp;)&nbsp;);
 }
-
 </pre>
 
 <p><strong>Answer:</strong> I do not think there is currently a known generic solution for that problem.</p>
@@ -98,7 +103,7 @@ I can't think of a workaround to get a precise answer.
 You might be able to skip sheets which don't have model views in their viewport list to save a bit of time.
 Some sheets may only have drafting views and schedules and annotations.</p>
 <p>The development team provided a very helpful suggestion which helped work around the <code>generating graphics</code> call by avoiding that specific filtering operation completely in another case,
-to <a href="https://forums.autodesk.com/t5/revit-api-forum/loop-through-sheets-generating-graphics/m-p/8719256">Loop through sheets - generating graphics</a>.</p>
+to <a href="https://forums.autodesk.com/t5/revit-api-forum/loop-through-sheets-generating-graphics/m-p/8719256">loop through sheets generating graphics</a>.</p>
 <p>The solution there consisted in analysing exactly what relationship you are trying to retrieve.
 In that specific case, the Revit API provided direct support for the inverse relationship, so you can retrieve that and invert it to access the required elements.</p>
 <p>Maybe you can optimise in a similar manner for your needs?</p>
@@ -115,17 +120,23 @@ We can successfully do this for the appearance assets, but for the other assets 
 This approach will omit assets that are not assigned to materials.</p>
 <p>Please see C# code below for reference. Any insight into how this can be achieved will be much appreciated.</p>
 <pre class="code">
-&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector&nbsp;
+    =&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;);
 &nbsp;&nbsp;<span style="color:green;">//code&nbsp;works&nbsp;for&nbsp;appearance&nbsp;assets</span>
-&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;appearanceAssets&nbsp;=&nbsp;collector.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">AppearanceAssetElement</span>&nbsp;)&nbsp;).ToElements();
+&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;appearanceAssets&nbsp;
+    =&nbsp;collector.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">AppearanceAssetElement</span>&nbsp;)&nbsp;).ToElements();
 &nbsp;&nbsp;<span style="color:green;">//code&nbsp;throws&nbsp;an&nbsp;error</span>
-&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;physicalAssets&nbsp;=&nbsp;collector.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">StructuralAssetClass</span>&nbsp;)&nbsp;).ToElements();
+&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;physicalAssets&nbsp;
+    =&nbsp;collector.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">StructuralAssetClass</span>&nbsp;)&nbsp;).ToElements();
 &nbsp;&nbsp;<span style="color:green;">//code&nbsp;throws&nbsp;an&nbsp;error</span>
-&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;physicalAssets2&nbsp;=&nbsp;collector.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">StructuralAsset</span>&nbsp;)&nbsp;).ToElements();
+&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;physicalAssets2&nbsp;
+    =&nbsp;collector.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">StructuralAsset</span>&nbsp;)&nbsp;).ToElements();
 &nbsp;&nbsp;<span style="color:green;">//code&nbsp;returns&nbsp;zero&nbsp;elements</span>
-&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;propertySet&nbsp;=&nbsp;collector.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">PropertySetElement</span>&nbsp;)&nbsp;).ToElements();
+&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;propertySet&nbsp;
+    =&nbsp;collector.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">PropertySetElement</span>&nbsp;)&nbsp;).ToElements();
 &nbsp;&nbsp;<span style="color:green;">//code&nbsp;throws&nbsp;an&nbsp;error</span>
-&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;thermalAssets&nbsp;=&nbsp;collector.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">ThermalAsset</span>&nbsp;)&nbsp;).ToElements();
+&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;thermalAssets&nbsp;
+    =&nbsp;collector.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">ThermalAsset</span>&nbsp;)&nbsp;).ToElements();
 </pre>
 
 <p>Error:</p>
