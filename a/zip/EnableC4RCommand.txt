@@ -1,0 +1,58 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using Autodesk.Revit.ApplicationServices;
+using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
+
+namespace adsk.c4r
+{
+    [Transaction(TransactionMode.Manual)]
+    public class Command : IExternalCommand
+    {
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        {
+            UIApplication uiapp = commandData.Application;
+            UIDocument uidoc = uiapp.ActiveUIDocument;
+            Application app = uiapp.Application;
+
+
+            string template = app.DefaultProjectTemplate;
+            string filename = @"D:\DevZone\ADN\t5021\revit_api_c4r_test_6.rvt";
+            string name = System.IO.Path.GetFileName(filename);
+
+            Document NewDoc = app.NewProjectDocument(template);
+            NewDoc.SaveAs(filename);
+
+            
+            try
+            {
+                NewDoc.SaveAsCloudModel("urn:adsk.wipprod:fs.folder:co.aCd1tMmrTxucmJcmtYTLBQ", name);
+                var cloudPath = NewDoc.GetCloudModelPath();
+                var newdocCanC4R = NewDoc.CanEnableCloudWorksharing();
+
+                if(newdocCanC4R)
+                {
+                    NewDoc.EnableCloudWorksharing();
+                }
+
+                TaskDialog.Show("Revit", string.Format("{0} is a C4R model now", name));
+                NewDoc.Close();
+
+                uiapp.OpenAndActivateDocument(cloudPath, new OpenOptions(), false);
+            }
+            catch(Exception ex)
+            {
+                System.Diagnostics.Trace.WriteLine(ex.Message);
+                return Result.Cancelled;
+            }
+
+            return Result.Succeeded;
+        }
+    }
+}
