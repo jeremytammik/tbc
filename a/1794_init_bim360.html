@@ -42,8 +42,13 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Today, we look at a couple of BIJM360 and cloud related issues
+&ndash; Programmatically initiating BIM360 collaboration
+&ndash; Setting up external references in BIM360 Docs
+&ndash; Jay Zallan the text terminator
+&ndash; Free for developers
+&ndash; Tracks on the Internet
+&ndash; Quantum computers explained...
 
 linkedin:
 
@@ -56,15 +61,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Programmatically Initiating BIM360 Collaboration</h3>
+<h3>Initiating BIM360 Collaboration and Linking</h3>
 <p>Today, we look at a couple of BIJM360 and cloud related issues:</p>
 <ul>
-<li><a href="#2">Programmatically Initiating BIM360 Collaboration</a></li>
-<li><a href="#3">Setting up External References in BIM360 Docs</a></li>
-<li><a href="#4">Jay Zallan the Text Terminator</a></li>
-<li><a href="#5">Free for Developers</a></li>
+<li><a href="#2">Programmatically initiating BIM360 collaboration</a></li>
+<li><a href="#3">Setting up external references in BIM360 Docs</a></li>
+<li><a href="#4">Jay Zallan, the text terminator</a></li>
+<li><a href="#5">Free for developers</a></li>
 <li><a href="#6">Tracks on the Internet</a></li>
-<li><a href="#7">Quantum Computers Explained</a></li>
+<li><a href="#7">Quantum computers explained</a></li>
 </ul>
 <p>Additional motivation is provided by this quote of the day:</p>
 <p><center>
@@ -128,67 +133,68 @@ It is part of the Revit and Revit LT subscription. </p>
 <p>I set up my Revit subscription as required, followed the steps shared above by Jeremy and confirmed that it works!</p>
 <p>Here is my test code implementing this:</p>
 <pre class="code">
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+<span style="color:blue;">using</span>&nbsp;System;
+<span style="color:blue;">using</span>&nbsp;System.Collections.Generic;
+<span style="color:blue;">using</span>&nbsp;System.Linq;
+<span style="color:blue;">using</span>&nbsp;System.Text;
+<span style="color:blue;">using</span>&nbsp;System.Threading.Tasks;
 
-using Autodesk.Revit.ApplicationServices;
-using Autodesk.Revit.Attributes;
-using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.ApplicationServices;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.Attributes;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.DB;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.UI;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.UI.Selection;
 
-namespace adsk.c4r
+<span style="color:blue;">namespace</span>&nbsp;adsk.c4r
 {
-  [Transaction(TransactionMode.Manual)]
-  public class Command : IExternalCommand
-  {
-    public Result Execute(
-      ExternalCommandData commandData,
-      ref string message,
-      ElementSet elements)
-    {
-      UIApplication uiapp = commandData.Application;
-      UIDocument uidoc = uiapp.ActiveUIDocument;
-      Application app = uiapp.Application;
+&nbsp;&nbsp;[<span style="color:#2b91af;">Transaction</span>(&nbsp;<span style="color:#2b91af;">TransactionMode</span>.Manual&nbsp;)]
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">Command</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IExternalCommand</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">Result</span>&nbsp;Execute(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ExternalCommandData</span>&nbsp;commandData,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">ref</span>&nbsp;<span style="color:blue;">string</span>&nbsp;message,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementSet</span>&nbsp;elements&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UIApplication</span>&nbsp;uiapp&nbsp;=&nbsp;commandData.Application;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UIDocument</span>&nbsp;uidoc&nbsp;=&nbsp;uiapp.ActiveUIDocument;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Application</span>&nbsp;app&nbsp;=&nbsp;uiapp.Application;
 
-      string template = app.DefaultProjectTemplate;
-      string filename = @"D:\DevZone\ADN\t5021\revit_api_c4r_test_6.rvt";
-      string name = System.IO.Path.GetFileName(filename);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;template&nbsp;=&nbsp;app.DefaultProjectTemplate;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;filename&nbsp;=&nbsp;<span style="color:maroon;">@&quot;D:\DevZone\ADN\t5021\revit_api_c4r_test_6.rvt&quot;</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;name&nbsp;=&nbsp;System.IO.<span style="color:#2b91af;">Path</span>.GetFileName(&nbsp;filename&nbsp;);
 
-      Document doc = app.NewProjectDocument(template);
-      doc.SaveAs(filename);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;app.NewProjectDocument(&nbsp;template&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;doc.SaveAs(&nbsp;filename&nbsp;);
 
-      try
-      {
-        doc.SaveAsCloudModel(
-          "urn:adsk.wipprod:fs.folder:co.aCd1tMmrTxucmJcmtYTLBQ",
-          name);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">try</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;doc.SaveAsCloudModel(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;urn:adsk.wipprod:fs.folder:co.aCd1tMmrTxucmJcmtYTLBQ&quot;</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;);
 
-        var cloudPath = doc.GetCloudModelPath();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;cloudPath&nbsp;=&nbsp;doc.GetCloudModelPath();
 
-        if(doc.CanEnableCloudWorksharing())
-        {
-          doc.EnableCloudWorksharing();
-        }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;doc.CanEnableCloudWorksharing()&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;doc.EnableCloudWorksharing();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
 
-        TaskDialog.Show("Revit",
-          string.Format("{0} is a C4R model now", name));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;Revit&quot;</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>.Format(&nbsp;<span style="color:#a31515;">&quot;{0}&nbsp;is&nbsp;a&nbsp;C4R&nbsp;model&nbsp;now&quot;</span>,&nbsp;name&nbsp;)&nbsp;);
 
-        doc.Close();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;doc.Close();
 
-        uiapp.OpenAndActivateDocument(cloudPath, new OpenOptions(), false);
-      }
-      catch(Exception ex)
-      {
-        System.Diagnostics.Trace.WriteLine(ex.Message);
-        return Result.Cancelled;
-      }
-      return Result.Succeeded;
-    }
-  }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uiapp.OpenAndActivateDocument(&nbsp;cloudPath,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  <span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">OpenOptions</span>(),&nbsp;<span style="color:blue;">false</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">catch</span>(&nbsp;<span style="color:#2b91af;">Exception</span>&nbsp;ex&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.Diagnostics.<span style="color:#2b91af;">Trace</span>.WriteLine(&nbsp;ex.Message&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Cancelled;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Succeeded;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
 }
 </pre>
 
@@ -207,9 +213,9 @@ BIM360 Docs currently doesn't support the ZIP file format translation.</p>
 </blockquote>
 <p>For the full story, please refer to <a href="https://forge.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files">Eason's clear explanation on the blog</a>.</p>
 <p><center>
-<img src="img/bim360_docs_xrefs.jpg" alt="" width="800"> <!--2466-->
+<img src="img/bim360_docs_xrefs.jpg" alt="BIM360 Docs linking" width="800"> <!--2466-->
 </center></p>
-<h4><a name="4"></a> Jay Zallan the Text Terminator</h4>
+<h4><a name="4"></a> Jay Zallan, the Text Terminator</h4>
 <p>Looking at something related to the end user aspects of BIM for a change, instead of just focussing at the Revit API, I read an informative, provocative and amusing recommendation by Jay B Zallan
 <a href="https://www.augi.com/articles/detail/on-putting-the-i-into-revit-bim-01-getting-rid-of-text">On Putting the ‘I’ Into Revit, BIM | 01: getting rid of text</a>:</p>
 <blockquote>
