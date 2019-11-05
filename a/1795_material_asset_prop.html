@@ -1,10 +1,9 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="bc.css">
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-</head>
-
+</head></p>
 <!---
 
 - create material
@@ -29,7 +28,7 @@
   [Render Material Texture Image](https://forums.autodesk.com/t5/revit-api-forum/render-material-texture-image/m-p/8080636)
 
   [setting material texture path in `EditScope`](https://thebuildingcoder.typepad.com/blog/2019/04/set-material-texture-path-in-editscope.html)
-  
+
 - material and asset access
 Liz Fortune Oct 31st at 7:33 PM
 @conoves @t_arunb Balaji and I have been able to access each and every parameter of the material, appearance asset, thermal asset, and physical asset EXCEPT for one....one lonely parameter...I was wondering if you knew how to connect to the keywords parameter which lives on the Identity tab of the Material UI in Revit.  We can connect to the keywords for all of the assets above but would like to also connect to the keywords that live on the material itself.  Any help would be appreciated
@@ -81,31 +80,25 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Material, Physical and Thermal Assets
-
-Today, we concentrate fully on material, physical and thermal assets:
-
-- [Issues accessing and creating material assets](#2)
-- [Access to all material asset properties](#3)
-- [No access to material keywords](#4)
-- [Access to environment and render settings](#5)
-- [Determine full path to texture bitmap](#6)
-
-
-####<a name="2"></a> Issues Accessing and Creating Material Assets
-
-Quite a number of issues were discussed in the past few months involving issues accessing and creating material assets.
-
-As far as I know, they can all be solved, [cf. below](#3).
-
-Sometimes, though, the access is slightly convoluted and confusing.
-
-Here is an overview over some recent issues:
-
-- [Create new material and add texture from filepath](https://stackoverflow.com/questions/58414284/revit-api-material-with-texture-from-filepath)
-- [Create new material and add new physical and thermal assets with values](https://forums.autodesk.com/t5/revit-api-forum/create-new-material-and-add-new-physical-and-thermal-assets-with/m-p/7311468)
-- [Setting material texture path in `EditScope`](https://thebuildingcoder.typepad.com/blog/2019/04/set-material-texture-path-in-editscope.html) &ndash; ([discussion forum thread](https://forums.autodesk.com/t5/revit-api-forum/changing-material-texture-path-with-editscope/m-p/8017578), case 14254618)
-
+<h3>Material, Physical and Thermal Assets</h3>
+<p>Today, we concentrate fully on material, physical and thermal assets:</p>
+<ul>
+<li><a href="#2">Issues accessing and creating material assets</a></li>
+<li><a href="#3">Access to all material asset properties</a></li>
+<li><a href="#4">No access to material keywords</a></li>
+<li><a href="#5">Access to environment and render settings</a></li>
+<li><a href="#6">Determine full path to texture bitmap</a></li>
+</ul>
+<h4><a name="2"></a> Issues Accessing and Creating Material Assets</h4>
+<p>Quite a number of issues were discussed in the past few months involving issues accessing and creating material assets.</p>
+<p>As far as I know, they can all be solved, <a href="#3">cf. below</a>.</p>
+<p>Sometimes, though, the access is slightly convoluted and confusing.</p>
+<p>Here is an overview over some recent issues:</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/58414284/revit-api-material-with-texture-from-filepath">Create new material and add texture from filepath</a></li>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/create-new-material-and-add-new-physical-and-thermal-assets-with/m-p/7311468">Create new material and add new physical and thermal assets with values</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/set-material-texture-path-in-editscope.html">Setting material texture path in <code>EditScope</code></a> &ndash; (<a href="https://forums.autodesk.com/t5/revit-api-forum/changing-material-texture-path-with-editscope/m-p/8017578">discussion forum thread</a>, case 14254618)</li>
+</ul>
 <!--
 
 15089722 [Revit Material Library] implemented CreateMaterialAsset sample add-in 
@@ -118,19 +111,13 @@ Here is an overview over some recent issues:
 
 -->
 
-Older discussions are listed in the topic groups
-on [material management and libraries](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.5)
-and [Texture Bitmap and UV Coordinate Access](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.42).
-
-
-####<a name="3"></a> Access to All Material Asset Properties
-
-I am very glad to announce that my colleagues Liz Fortune and Balaji Arunachalam confirm that they can access each and every parameter of the materials, appearance assets, thermal assets, and physical assets (with one single exception, [cf. below](4)):
-
-Balaji and I have been able to access each and every parameter of the material, appearance asset, thermal asset, and physical asset EXCEPT for the keywords parameter that lives on the Identity tab of the Material UI in Revit.  We can connect to the keywords for all of the assets above but would like to also connect to the keywords that live on the material itself. 
-
-To access this data, we used the code snippets shared on The Building Coder blog to implement the following:
-
+<p>Older discussions are listed in the topic groups
+on <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.5">material management and libraries</a>
+and <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.42">Texture Bitmap and UV Coordinate Access</a>.</p>
+<h4><a name="3"></a> Access to All Material Asset Properties</h4>
+<p>I am very glad to announce that my colleagues Liz Fortune and Balaji Arunachalam confirm that they can access each and every parameter of the materials, appearance assets, thermal assets, and physical assets (with one single exception, <a href="4">cf. below</a>):</p>
+<p>Balaji and I have been able to access each and every parameter of the material, appearance asset, thermal asset, and physical asset EXCEPT for the keywords parameter that lives on the Identity tab of the Material UI in Revit.  We can connect to the keywords for all of the assets above but would like to also connect to the keywords that live on the material itself. </p>
+<p>To access this data, we used the code snippets shared on The Building Coder blog to implement the following:</p>
 <pre class="code">
 <span style="color:blue;">void</span>&nbsp;GetElementMaterialInfo(&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)
 {
@@ -138,7 +125,7 @@ To access this data, we used the code snippets shared on The Building Coder blog
 &nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">Material</span>&nbsp;)&nbsp;);
- 
+
 &nbsp;&nbsp;<span style="color:blue;">try</span>
 &nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Material</span>&nbsp;material&nbsp;<span style="color:blue;">in</span>&nbsp;collector&nbsp;)
@@ -148,35 +135,35 @@ To access this data, we used the code snippets shared on The Building Coder blog
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">AppearanceAssetElement</span>&nbsp;appearanceElement
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;doc.GetElement(&nbsp;material.AppearanceAssetId&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">AppearanceAssetElement</span>;
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Asset</span>&nbsp;appearanceAsset&nbsp;=&nbsp;appearanceElement
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetRenderingAsset();
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">AssetProperty</span>&gt;&nbsp;assetProperties
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">AssetProperty</span>&gt;();
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">PropertySetElement</span>&nbsp;physicalPropSet
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;doc.GetElement(&nbsp;material.StructuralAssetId&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">PropertySetElement</span>;
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">PropertySetElement</span>&nbsp;thermalPropSet
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;doc.GetElement(&nbsp;material.ThermalAssetId&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">PropertySetElement</span>;
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ThermalAsset</span>&nbsp;thermalAsset&nbsp;=&nbsp;thermalPropSet
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetThermalAsset();
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">StructuralAsset</span>&nbsp;physicalAsset&nbsp;=&nbsp;physicalPropSet
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetStructuralAsset();
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Parameter</span>&gt;&nbsp;physicalParameters
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;physicalPropSet.GetOrderedParameters();
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Parameter</span>&gt;&nbsp;thermalParameters
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;thermalPropSet.GetOrderedParameters();
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Appearance&nbsp;Asset</span>
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">for</span>(&nbsp;<span style="color:blue;">int</span>&nbsp;i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;appearanceAsset.Size;&nbsp;i++&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">AssetProperty</span>&nbsp;property&nbsp;=&nbsp;appearanceAsset[&nbsp;i&nbsp;];
@@ -193,9 +180,9 @@ To access this data, we used the code snippets shared on The Building Coder blog
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assetPropValue&nbsp;=&nbsp;prop.GetValue(&nbsp;assetProp&nbsp;);
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Physical&nbsp;(Structural)&nbsp;Asset</span>
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Parameter</span>&nbsp;p&nbsp;<span style="color:blue;">in</span>&nbsp;physicalParameters&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Work&nbsp;with&nbsp;parameters&nbsp;here</span>
@@ -203,9 +190,9 @@ To access this data, we used the code snippets shared on The Building Coder blog
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;that&nbsp;is&nbsp;needed&nbsp;is&nbsp;the&nbsp;Asset&nbsp;name,&nbsp;which&nbsp;you&nbsp;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;can&nbsp;get&nbsp;by&nbsp;&#39;physicalAsset.Name&#39;.</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Thermal&nbsp;Asset</span>
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Parameter</span>&nbsp;p&nbsp;<span style="color:blue;">in</span>&nbsp;thermalParameters&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Work&nbsp;with&nbsp;parameters&nbsp;here</span>
@@ -223,59 +210,36 @@ To access this data, we used the code snippets shared on The Building Coder blog
 }
 </pre>
 
-This code will get you everything for the thermal and structural assets and almost everything for the appearance asset.
-
-The pdf on your blog was crucial in figuring out how to touch all the aspects of the appearance asset!
-
-Here is an image I put together showing mappings for the appearance asset:
-
-<center>
+<p>This code will get you everything for the thermal and structural assets and almost everything for the appearance asset.</p>
+<p>The pdf on your blog was crucial in figuring out how to touch all the aspects of the appearance asset!</p>
+<p>Here is an image I put together showing mappings for the appearance asset:</p>
+<p><center>
 <img src="img/assets_air_appearance_properties.png" alt="Air appearance properties" width="800"> <!--2152-->
-</center>
-
-The spreadsheet in this image was created from output of my code into a CSV.  Hope this helps.
-
-Many thanks to Liz and Balaji for their research and sharing the results!
-
-
-####<a name="4"></a> No Access to Material Keywords
-
-As mentioned above, one single property are apparently still not accessible: the keywords parameter that lives on the Identity tab of the Material UI in Revit.
-
-Apparently, the internal property `Material.getKeywords` is not exposed to the official Revit API, and there is no built-in parameter for it either.
-
-
-####<a name="5"></a> Access to Environment and Render Settings
-
-We also searched for the Environment and Render Settings values. They are common for all the Assets:
-
-<center>
+</center></p>
+<p>The spreadsheet in this image was created from output of my code into a CSV.  Hope this helps.</p>
+<p>Many thanks to Liz and Balaji for their research and sharing the results!</p>
+<h4><a name="4"></a> No Access to Material Keywords</h4>
+<p>As mentioned above, one single property are apparently still not accessible: the keywords parameter that lives on the Identity tab of the Material UI in Revit.</p>
+<p>Apparently, the internal property <code>Material.getKeywords</code> is not exposed to the official Revit API, and there is no built-in parameter for it either.</p>
+<h4><a name="5"></a> Access to Environment and Render Settings</h4>
+<p>We also searched for the Environment and Render Settings values. They are common for all the Assets:</p>
+<p><center>
 <img src="img/assets_environment.png" alt="Environment assets" width="559"> <!--559-->
 <p style="font-size: 80%; font-style:italic">Environment assets</p>
-</center>
-
-<center>
+</center></p>
+<p><center>
 <img src="img/assets_render_settings.png" alt="Render settings" width="296"> <!---->
 <p style="font-size: 80%; font-style:italic">Render settings</p>
-</center>
-
-They are common for all assets, so they look like the other properties or parameters, but are in fact part of the UI config and saved into `MaterialUIConfig.xml`.
-
-
-####<a name="6"></a> Determine Full Path to Texture Bitmap
-
-Finally, to round off this colection of material asset property access methods, here is a results from
-a [comment](https://thebuildingcoder.typepad.com/blog/2016/10/list-material-asset-texture-and-forge-webinar-recordings.html#comment-4442686784)
-on [material asset textures](https://thebuildingcoder.typepad.com/blog/2016/10/list-material-asset-texture-and-forge-webinar-recordings.html):
-
-**Question:** Great tip, but how can we create the full path to the `unifiedbitmap_Bitmap` texture?
-I tried using the `Application` `GetLibraryPaths` method, but the material library is not listed in the dictionnary. &nbsp; :(
-
-**Answer:** If all else fails, you can try to use the operating system functionality to search globally for the given filename.
+</center></p>
+<p>They are common for all assets, so they look like the other properties or parameters, but are in fact part of the UI config and saved into <code>MaterialUIConfig.xml</code>.</p>
+<h4><a name="6"></a> Determine Full Path to Texture Bitmap</h4>
+<p>Finally, to round off this colection of material asset property access methods, here is a results from
+a <a href="https://thebuildingcoder.typepad.com/blog/2016/10/list-material-asset-texture-and-forge-webinar-recordings.html#comment-4442686784">comment</a>
+on <a href="https://thebuildingcoder.typepad.com/blog/2016/10/list-material-asset-texture-and-forge-webinar-recordings.html">material asset textures</a>:</p>
+<p><strong>Question:</strong> Great tip, but how can we create the full path to the <code>unifiedbitmap_Bitmap</code> texture?
+I tried using the <code>Application</code> <code>GetLibraryPaths</code> method, but the material library is not listed in the dictionnary. &nbsp; :(</p>
+<p><strong>Answer:</strong> If all else fails, you can try to use the operating system functionality to search globally for the given filename.
 You should cache the folders in which you find it.
-If the system is sensibly set up, you will only need to search for it globally once, or a very few times, since there should not be many different locations in which these files are stored.
-
-**Response:** Thank you for this tip, especially for the cache recommandation.
-
-Works like a charm. &nbsp; :)
-
+If the system is sensibly set up, you will only need to search for it globally once, or a very few times, since there should not be many different locations in which these files are stored.</p>
+<p><strong>Response:</strong> Thank you for this tip, especially for the cache recommandation.</p>
+<p>Works like a charm. &nbsp; :)</p>
