@@ -120,7 +120,7 @@ Here is an overview over some recent issues:
 
 Older discussions are listed in the topic groups
 on [material management and libraries](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.5)
-and [Texture Bitmap and UV Coordinate Access](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.42).
+and [texture bitmap and UV coordinate access](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.42).
 
 
 ####<a name="3"></a> Access to All Material Asset Properties
@@ -129,7 +129,7 @@ I am very glad to announce that my colleagues Liz Fortune and Balaji Arunachalam
 
 Balaji and I have been able to access each and every parameter of the material, appearance asset, thermal asset, and physical asset EXCEPT for the keywords parameter that lives on the Identity tab of the Material UI in Revit.  We can connect to the keywords for all of the assets above but would like to also connect to the keywords that live on the material itself. 
 
-To access this data, we used the code snippets shared on The Building Coder blog to implement the following:
+To access this data, we used code snippets shared on The Building Coder blog to implement the following:
 
 <pre class="code">
 <span style="color:blue;">void</span>&nbsp;GetElementMaterialInfo(&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)
@@ -225,7 +225,7 @@ To access this data, we used the code snippets shared on The Building Coder blog
 
 This code will get you everything for the thermal and structural assets and almost everything for the appearance asset.
 
-The pdf on your blog was crucial in figuring out how to touch all the aspects of the appearance asset!
+The PDF on the blog was crucial in figuring out how to touch all the aspects of the appearance asset!
 
 Here is an image I put together showing mappings for the appearance asset:
 
@@ -264,7 +264,7 @@ They are common for all assets, so they look like the other properties or parame
 
 ####<a name="6"></a> Determine Full Path to Texture Bitmap
 
-Finally, to round off this colection of material asset property access methods, here is a results from
+Finally, to round off this collection, here is a result from
 a [comment](https://thebuildingcoder.typepad.com/blog/2016/10/list-material-asset-texture-and-forge-webinar-recordings.html#comment-4442686784)
 on [material asset textures](https://thebuildingcoder.typepad.com/blog/2016/10/list-material-asset-texture-and-forge-webinar-recordings.html):
 
