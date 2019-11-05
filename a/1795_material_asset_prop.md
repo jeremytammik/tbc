@@ -224,7 +224,7 @@ To access this data, we used code snippets shared on The Building Coder blog to 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Parameter</span>&nbsp;p&nbsp;<span style="color:blue;">in</span>&nbsp;thermalParameters&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">// Work&nbsp;with&nbsp;parameters&nbsp;here</span>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//The&nbsp;only&nbsp;parameter&nbsp;not&nbsp;in&nbsp;the&nbsp;orderedParameters&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">// The&nbsp;only&nbsp;parameter&nbsp;not&nbsp;in&nbsp;the&nbsp;orderedParameters&nbsp;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;that&nbsp;is&nbsp;needed&nbsp;is&nbsp;the&nbsp;Asset&nbsp;name,&nbsp;shich&nbsp;you&nbsp;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;can&nbsp;get&nbsp;by&nbsp;&#39;thermalAsset.Name&#39;.</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
