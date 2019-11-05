@@ -67,8 +67,12 @@ twitter:
 
 in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Today, we concentrate fully on material, physical and thermal assets
+&ndash; Issues accessing and creating material assets
+&ndash; Access to all material asset properties
+&ndash; No access to material keywords
+&ndash; Access to environment and render settings
+&ndash; Determine full path to texture bitmap...
 
 linkedin:
 
@@ -102,7 +106,7 @@ Sometimes, though, the access is slightly convoluted and confusing.
 
 Here is an overview over some recent issues:
 
-- [Create new material and add texture from filepath](https://stackoverflow.com/questions/58414284/revit-api-material-with-texture-from-filepath)
+- [Create new material and add texture from file path](https://stackoverflow.com/questions/58414284/revit-api-material-with-texture-from-filepath)
 - [Create new material and add new physical and thermal assets with values](https://forums.autodesk.com/t5/revit-api-forum/create-new-material-and-add-new-physical-and-thermal-assets-with/m-p/7311468)
 - [Setting material texture path in `EditScope`](https://thebuildingcoder.typepad.com/blog/2019/04/set-material-texture-path-in-editscope.html) &ndash; ([discussion forum thread](https://forums.autodesk.com/t5/revit-api-forum/changing-material-texture-path-with-editscope/m-p/8017578), case 14254618)
 
@@ -208,7 +212,7 @@ To access this data, we used code snippets shared on The Building Coder blog to 
  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Parameter</span>&nbsp;p&nbsp;<span style="color:blue;">in</span>&nbsp;thermalParameters&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Work&nbsp;with&nbsp;parameters&nbsp;here</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">// Work&nbsp;with&nbsp;parameters&nbsp;here</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//The&nbsp;only&nbsp;parameter&nbsp;not&nbsp;in&nbsp;the&nbsp;orderedParameters&nbsp;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;that&nbsp;is&nbsp;needed&nbsp;is&nbsp;the&nbsp;Asset&nbsp;name,&nbsp;shich&nbsp;you&nbsp;</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;can&nbsp;get&nbsp;by&nbsp;&#39;thermalAsset.Name&#39;.</span>
@@ -227,7 +231,7 @@ This code will get you everything for the thermal and structural assets and almo
 
 The PDF on the blog was crucial in figuring out how to touch all the aspects of the appearance asset!
 
-Here is an image I put together showing mappings for the appearance asset:
+Here is an image I put together [showing mappings for the appearance asset](zip/assets_air_appearance_properties.png):
 
 <center>
 <img src="img/assets_air_appearance_properties.png" alt="Air appearance properties" width="800"> <!--2152-->
@@ -240,7 +244,7 @@ Many thanks to Liz and Balaji for their research and sharing the results!
 
 ####<a name="4"></a> No Access to Material Keywords
 
-As mentioned above, one single property are apparently still not accessible: the keywords parameter that lives on the Identity tab of the Material UI in Revit.
+As mentioned above, one single property is apparently still not accessible: the keywords parameter that lives on the Identity tab of the Material UI in Revit.
 
 Apparently, the internal property `Material.getKeywords` is not exposed to the official Revit API, and there is no built-in parameter for it either.
 
@@ -269,13 +273,13 @@ a [comment](https://thebuildingcoder.typepad.com/blog/2016/10/list-material-asse
 on [material asset textures](https://thebuildingcoder.typepad.com/blog/2016/10/list-material-asset-texture-and-forge-webinar-recordings.html):
 
 **Question:** Great tip, but how can we create the full path to the `unifiedbitmap_Bitmap` texture?
-I tried using the `Application` `GetLibraryPaths` method, but the material library is not listed in the dictionnary. &nbsp; :(
+I tried using the `Application` `GetLibraryPaths` method, but the material library is not listed in the dictionary. &nbsp; :(
 
 **Answer:** If all else fails, you can try to use the operating system functionality to search globally for the given filename.
 You should cache the folders in which you find it.
 If the system is sensibly set up, you will only need to search for it globally once, or a very few times, since there should not be many different locations in which these files are stored.
 
-**Response:** Thank you for this tip, especially for the cache recommandation.
+**Response:** Thank you for this tip, especially for the cache recommendation.
 
 Works like a charm. &nbsp; :)
 
