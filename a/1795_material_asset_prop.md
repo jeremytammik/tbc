@@ -63,6 +63,20 @@ Balaji @t_arunb  has been heads down working with the appearance assets but the 
 Guofeng Zhang  22 hours ago
 @t_arunb Nope. As you said, they are common for all assets, so they are think as property or parameters, but UI config and saved into MaterialUIConfig.xml.
 
+Jeremy Tammik  24 hours ago
+@t_fortl @t_arunb thank you very much for the images and sample code accessing all the material and asset properties. have you made any attempts at modifying them, and creating new materials and assets? a number of external add-in developers are struggling a bit with this...
+
+Jeremy Tammik  21 hours ago
+@t_fortl you say, The pdf on your blog was crucial... what PDF is that, please? I would like to highlight it for others to find, and cannot find it myself.
+
+i published what you shared so far; it would be great if you can also confirm that you can create new materials and successfully populate all these properties as well!
+
+https://thebuildingcoder.typepad.com/blog/2019/11/material-physical-and-thermal-assets.html
+
+Liz Fortune  10 hours ago
+@tammikj Awesome!  Glad my work helped. :slightly_smiling_face:
+I have successfully modified the values for the parameters. I attempted a handful. The trick I found was that I needed to identify the storage type of each so I could set the parameter accordingly. The pdf I was referring to is: https://thebuildingcoder.typepad.com/files/sd124625_visual_appearance_of_materials_api_boris_shafiro_handout.pdf
+
 twitter:
 
 Accessing and creating all material, physical and thermal assets, full path to texture bitmap, environment and render settings in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/material_assets
@@ -240,7 +254,11 @@ To access this data, we used code snippets shared on The Building Coder blog to 
 
 This code will get you everything for the thermal and structural assets and almost everything for the appearance asset.
 
-The PDF on the blog was crucial in figuring out how to touch all the aspects of the appearance asset!
+The PDF from
+
+The pdf I was referring to is: https://thebuildingcoder.typepad.com/files/sd124625_visual_appearance_of_materials_api_boris_shafiro_handout.pdf
+
+on the blog was crucial in figuring out how to touch all the aspects of the appearance asset!
 
 Here is an image I put together [showing mappings for the appearance asset](zip/assets_air_appearance_properties.png):
 
@@ -294,3 +312,15 @@ If the system is sensibly set up, you will only need to search for it globally o
 
 Works like a charm. &nbsp; :)
 
+
+####<a name="7"></a> Addendum &ndash; Modifying Material Assets
+
+**Question:** Can you also confirm that you can create new materials and successfully populate all these properties as well?
+
+**Answer:** I have successfully modified the values for the parameters.
+
+I attempted a handful.
+
+The trick I found was that I needed to identify the storage type of each so I could set the parameter accordingly.
+
+The pdf I was referring to is: https://thebuildingcoder.typepad.com/files/sd124625_visual_appearance_of_materials_api_boris_shafiro_handout.pdf
