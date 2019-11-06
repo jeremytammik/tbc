@@ -254,11 +254,9 @@ To access this data, we used code snippets shared on The Building Coder blog to 
 
 This code will get you everything for the thermal and structural assets and almost everything for the appearance asset.
 
-The PDF from
-
-The pdf I was referring to is: https://thebuildingcoder.typepad.com/files/sd124625_visual_appearance_of_materials_api_boris_shafiro_handout.pdf
-
-on the blog was crucial in figuring out how to touch all the aspects of the appearance asset!
+[Boris Shafiro's PDF](zip/sd124625_visual_appearance_of_materials_api_boris_shafiro_handout.pdf) from his AU presentation
+on [modifying material visual appearance](https://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html)
+was crucial in figuring out how to touch all the aspects of the appearance asset!
 
 Here is an image I put together [showing mappings for the appearance asset](zip/assets_air_appearance_properties.png):
 
