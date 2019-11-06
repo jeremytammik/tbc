@@ -142,6 +142,7 @@ Here is an overview over some recent issues:
 15041727 [Unable to get correct texture path from Revit API]
 14887363 [Obtain Uv-coordinates from texture]
 
+- [Units on the elements, that conform the assets of materials](https://forums.autodesk.com/t5/revit-api-forum/units-on-the-elements-that-conform-the-assets-of-materials/m-p/8593252)
 - [Material asset textures](https://thebuildingcoder.typepad.com/blog/2016/10/list-material-asset-texture-and-forge-webinar-recordings.html)
 - [Render material texture image](https://forums.autodesk.com/t5/revit-api-forum/render-material-texture-image/m-p/8080636), case 14348365
 - [AddMaterials GitHub repository](https://github.com/jeremytammik/AddMaterials) &ndash; add materials from a list of properties defined in Excel
