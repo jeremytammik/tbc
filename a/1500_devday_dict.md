@@ -183,7 +183,7 @@ I used to recommend that earlier as well, and have stopped since learning better
  
 This is extremely important due to issues with worksharing.
  
-Scott Conovoer explains that very explicitly in his AU class on [add-ins that cooperate with worksharing](http://thebuildingcoder.typepad.com/blog/2014/10/worksharing-and-duplicating-element-geometry.html#2).
+Scott Conover explains that very explicitly in his AU class on [add-ins that cooperate with worksharing](http://thebuildingcoder.typepad.com/blog/2014/10/worksharing-and-duplicating-element-geometry.html#2).
  
 At the same time as the introduction of extensible storage, the `DataStorage` element was introduced.
  
