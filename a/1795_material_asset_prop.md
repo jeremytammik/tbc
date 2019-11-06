@@ -119,6 +119,7 @@ Today, we concentrate fully on material, physical and thermal assets:
 - [No access to material keywords](#4)
 - [Access to environment and render settings](#5)
 - [Determine full path to texture bitmap](#6)
+- [Addendum &ndash; Modifying Material Assets](#7)
 
 
 ####<a name="2"></a> Issues Accessing and Creating Material Assets
@@ -320,5 +321,3 @@ Works like a charm. &nbsp; :)
 I attempted a handful.
 
 The trick I found was that I needed to identify the storage type of each so I could set the parameter accordingly.
-
-The pdf I was referring to is: https://thebuildingcoder.typepad.com/files/sd124625_visual_appearance_of_materials_api_boris_shafiro_handout.pdf
