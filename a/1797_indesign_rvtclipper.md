@@ -62,6 +62,15 @@ Today, we highlight two contributions by Håvard Leding and Oliver Green
 
 linkedin:
 
+Automated PDF report via InDesign COM API, view and create real-time interactive 2D sketch Booleans in the #RevitAPI
+
+http://bit.ly/autosketchpdf
+
+Today, we highlight two contributions by Håvard Leding and Oliver Green:
+
+- 2D Boolean interactive real-time sketch viewer
+- Single-click automated PDF report via InDesign
+- Abbreviated table of technical contents...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
