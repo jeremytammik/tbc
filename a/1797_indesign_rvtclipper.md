@@ -107,6 +107,11 @@ I see in the video that RvtClipper can even generate new Revit geometry and data
 
 Many thanks to Håvard for this impressive utility, showing how easily you can grab an external library to add really powerful functionality to your Revit add-in!
 
+<center>
+<img src="img/RvtClipper.png" alt="RvtClipper" width="719">
+</center>
+
+
 
 ####<a name="3"></a> Single-Click Automated PDF Report via InDesign
 
