@@ -53,7 +53,7 @@ Many thanks to Ollie for documenting and sharing this!
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Automated PDF report via InDesign COM API, view and create real-time interactive 2D sketch Booleans in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/autosketchpdf
 
 Today, we highlight two contributions by Håvard Leding and Oliver Green
 &ndash; 2D Boolean interactive real-time sketch viewer
@@ -71,7 +71,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Real-Time Automated PDF Report and 2D Sketch Booleans
+### Automated PDF Report and 2D Sketch Booleans
 
 Today, we highlight two contributions by Håvard Leding and Oliver Green:
 
