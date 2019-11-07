@@ -55,8 +55,10 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Today, we highlight two contributions by Håvard Leding and Oliver Green
+&ndash; 2D Boolean interactive real-time sketch viewer
+&ndash; Single-click automated PDF report via InDesign
+&ndash; Abbreviated table of technical contents...
 
 linkedin:
 
@@ -69,10 +71,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### InDesign PDF Reports and Real-Time Sketch Viewer 
+### Real-Time Automated PDF Report and 2D Sketch Booleans
 
+Today, we highlight two contributions by Håvard Leding and Oliver Green:
 
-####<a name="2"></a> RvtClipper
+- [2D Boolean interactive real-time sketch viewer](#2)
+- [Single-click automated PDF report via InDesign](#3)
+- [Abbreviated table of technical contents](#3.1)
+
+####<a name="2"></a> 2D Boolean Interactive Real-Time Sketch Viewer
 
 Håvard Leding of [Symetri](https://www.symetri.com) shares a new cool 2D Boolean geometry analysis tool, RvtClipper, saying:
 
@@ -96,24 +103,24 @@ Source code and short video attached:
 - [RvtClipper.zip](zip/hl_RvtClipper.zip)
 - [RvtClipper_UI.mp4](zip/hl_RvtClipper_UI.mp4)
 
-Many thanks to Håvard for this great little utility, showing how easily you can grab an external library to add real powerful functionality to your Revit add-in!
+I see in the video that RvtClipper can even generate new Revit geometry and database elements based on the 2D Boolean results!
+
+Many thanks to Håvard for this impressive utility, showing how easily you can grab an external library to add really powerful functionality to your Revit add-in!
 
 
-####<a name="3"></a> Single-Click PDF Report via InDesign
+####<a name="3"></a> Single-Click Automated PDF Report via InDesign
 
 Oliver Green shares the presentation and some utility code from his industry talk *AULON484 &ndash; One-Click PDF Model Reports: Connect Revit to the InDesign API* at Autodesk University 2019 in London, saying:
 
-I develop for the Revit API, love The Building Coder blog, and I wondered if you might find the following talk we gave at AU of interest?
+I develop for the Revit API, love The Building Coder blog, and wondered if you might find the following talk we gave at AU of interest?
 
 It's about automated publishing from Revit using a bridge we built to [Adobe InDesign](https://www.adobe.com/products/indesign.html).
 
-It's pitched at the level of tech understanding that your blog covers (C#, OOP and some .NET), so I think it might be a good match for your readers. 
+The talk is aimed at beginners and pitched at the level of tech understanding that your blog covers (C#, OOP and some .NET), so I think it might be a good match for your readers:
 
 - [AULON484 &ndash; One-Click PDF Model Reports: Connect Revit to the InDesign API](https://www.autodesk.com/autodesk-university/class/One-Click-PDF-Model-Reports-Connect-Revit-InDesign-API-2019)
 
-**Question:** Can you describe some of the more interesting Revit API programming challenges your faced and how you solved or worked around them? The hand-out is rather light on the technical details and solutions.
-
-**Answer:** We have a [AhmmTools/AU2019 Github repository](https://github.com/AhmmTools/AU2019) with some useful starter code on it, e.g.:
+We also shared a [AhmmTools/AU2019 GitHub repository](https://github.com/AhmmTools/AU2019) with some useful starter code on it, e.g.:
 
 - [InDesignSampleAU2019.cs](https://github.com/AhmmTools/AU2019/blob/master/InDesignSampleAU2019.cs)
 
@@ -129,7 +136,7 @@ It might make for a nice case study in learning how to connect Revit to other so
 Many thanks to Ollie for documenting and sharing this!
 
 <center>
-<img src="img/og_indesign.png" alt="InDesign COM API connection" width="1184">
+<img src="img/og_indesign.png" alt="InDesign COM API connection" width="592"> <!--1184-->
 </center>
 
 I copied his handout [AU2019OneClickModelReports.pdf](zip/AU2019OneClickModelReports.pdf) and extracted the following abbreviated table of technical contents from it, in case you would like to quickly get an idea before diving into the real thing:
@@ -144,7 +151,7 @@ I copied his handout [AU2019OneClickModelReports.pdf](zip/AU2019OneClickModelRep
 - Simple Proof of Concept Workflow
 - Ribbon Buttons in Revit
 - Intro to External Commands
-- ExternalCommands & ExternalApplications
+- ExternalCommands and ExternalApplications
 - Visual Studio Overview
 - ExternalCommands
 - ExternalApplications
@@ -159,14 +166,14 @@ I copied his handout [AU2019OneClickModelReports.pdf](zip/AU2019OneClickModelRep
 - Fixing COM Error
 - Use InDesign's API 
 - Back to Proof of Concept
-- Preparing The Model Report Process
+- Preparing the Model Report Process
 - What Can We Automate?
 - Full Proposed Process Diagram
 - Pop-Up Dialog for Input Info
 - Create New File from Template
-- Find & Replace Text
+- Find and Replace Text
 - Update Text Variables
-- Target Tables & Input Data
+- Target Tables and Input Data
 - Normal .NET Operations
 - Launch UI Menu Commands
 - Live Demonstration
