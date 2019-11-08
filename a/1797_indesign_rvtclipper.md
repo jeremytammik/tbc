@@ -203,7 +203,7 @@ Mark Ackerley added a [comment on this](https://thebuildingcoder.typepad.com/blo
 
 Re. the Indesign report, here's another link that is mentioned in the presentation and I found very useful:
 
-- [Create an Adobe InDesign Document with c#](https://www.codeproject.com/Tips/124998/Create-an-Adobe-InDesign-Document-with-c)
+- [Create an Adobe InDesign Document with C#](https://www.codeproject.com/Tips/124998/Create-an-Adobe-InDesign-Document-with-c)
 
 It demonstrates some functionality which isn't included in the presented project.
 
