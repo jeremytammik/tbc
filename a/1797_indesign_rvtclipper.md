@@ -87,6 +87,7 @@ Today, we highlight two contributions by Håvard Leding and Oliver Green:
 - [2D Boolean interactive real-time sketch viewer](#2)
 - [Single-click automated PDF report via InDesign](#3)
 - [Abbreviated table of technical contents](#3.1)
+- [Addendum &ndash; CodeProject on InDesign](#3.2)
 
 ####<a name="2"></a> 2D Boolean Interactive Real-Time Sketch Viewer
 
@@ -195,3 +196,16 @@ I copied his handout [AU2019OneClickModelReports.pdf](zip/AU2019OneClickModelRep
 - Further Possibilities
 - Now It's Your Turn
 - Resources
+
+####<a name="3.2"></a> Addendum &ndash; CodeProject on InDesign
+
+Mark Ackerley added a [comment on this](https://thebuildingcoder.typepad.com/blog/2019/11/automated-pdf-report-and-2d-sketch-booleans.html#comment-4682012920):
+
+Re. the Indesign report, here's another link that is mentioned in the presentation and I found very useful:
+
+- [Create an Adobe InDesign Document with c#](https://www.codeproject.com/Tips/124998/Create-an-Adobe-InDesign-Document-with-c)
+
+It demonstrates some functionality which isn't included in the presented project.
+
+Thank you Mark, for pointing that out.
+
