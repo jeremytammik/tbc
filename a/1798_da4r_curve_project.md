@@ -16,7 +16,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Curve projection, detaching model and exporting FBX in DA4R and the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/curveproject
 
 Two little hints on Forge Design Automation for Revit or DA4R issues, projecting a curve onto a planar surface and an impressive list of add-in video samples
 &ndash; DA4R supports FBX and IFC
@@ -38,7 +38,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### Curve Projection, Detach and FBX in DA4R
 
 Two little hints on [Forge Design Automation for Revit or DA4R](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55) issues, 
-projecting a curve onto a planar surface and an impressive list of add-in video samples:
+projecting a curve onto a planar surface and an impressive list of add-in sample videos:
 
 - [DA4R supports FBX and IFC](#2)
 - [DA4R wrong user](#3)
