@@ -1,0 +1,234 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</head></p>
+<!---
+
+- [Projection Transformation]
+  https://forums.autodesk.com/t5/revit-api-forum/projection-transformation/m-p/9119247
+  to project arbitrary curves onto a horizontal or vertical plane, you can use the suggestion by 
+
+- sample zero touch videos
+  https://forums.autodesk.com/t5/revit-api-forum/reivt-add-in-amp-dynamo-zero-touch-node/m-p/9137621
+
+twitter:
+
+ in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+&ndash; 
+...
+
+linkedin:
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<p style="font-size: 80%; font-style:italic"></p>
+
+-->
+
+<h3>DA4R Hints, Curve Projection and Add-In Videos</h3>
+<p>Two little hints on DA4R issues, projecting a curve onto a planar surface and an impressive list of add-in video samples:</p>
+<h4><a name="2"></a> DA4R Supports FBX and IFC</h4>
+<p><strong>Question:</strong> A quick question: does Revit IO support exporting FBX? 
+I would like to integrate Revit I/O into my AR automation pipeline.
+I saw it's listed in the DB level API, but I'm not sure if it's something like the IFC format (not supported). </p>
+<p><strong>Answer:</strong> Yes, we support FBX using the standard <a href="https://www.revitapidocs.com/2020/02b2efba-9d7c-88bc-b43e-a541e169d832.htm">Document.Export method</a>.</p>
+<p>By the way, we also <a href="https://forge.autodesk.com/en/docs/design-automation/v3/change_history/revit_release_notes/#april-2019">added support for IFC in April</a>.</p>
+<p>So, both are now supported.</p>
+<h4><a name="3"></a> DA4R Wrong User</h4>
+<p><strong>Question:</strong> We are trying to open a central model file in DA4R.</p>
+<p>When testing it locally it all runs ok (of course), as we can open the file with worksets, read-only, and run our plugin script.</p>
+<p>Optionally, we can "detach from central" with <code>openOptions.DetachFromCentralOption</code> being set in the Revit API.
+Unfortunately, we do not have this option in DA4R, as DA4R handles the <code>OpenDocumentFile</code> itself.</p>
+<p>That causes this error:</p>
+<pre>
+  Autodesk.Revit.Exceptions.WrongUserException:
+  The local file is not owned by the current user, who therefore is not allowed to modify it.
+  at Autodesk.Revit.ApplicationServices.Application.OpenDocumentFile(String fileName)
+  at DesignAutomationFramework.DesignAutomationData..ctor(Application revitApp, String mainModelPath)
+</pre>
+
+<p><strong>Answer:</strong> We recently updated the documentation for this specific case.</p>
+<p>Please look at
+the <a href="https://forge.autodesk.com/en/docs/design-automation/v3/developers_guide/troubleshooting/#revit">troubleshooting section in the developer's guide</a> and
+let us know if you run into any issues with implementing the fix.</p>
+<h4><a name="4"></a> Projecting Curves onto a Plane</h4>
+<p>Two very differing approaches for projecting curves onto a plane are suggested in 
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/projection-transformation/m-p/9119247">projection transformation</a>:</p>
+<p><strong>Question:</strong> I am relatively new to the Revit API and was looking into transformations, trying to use them to project geometry (a curve) onto a plane.
+This should come out of the box, or so I thought.</p>
+<p>I am applying the following transformation to a curve:</p>
+<pre>
+  1,0,0,0
+  0,1,0,0
+  0,0,0,0
+  0,0,0,1 // for completeness
+</pre>
+
+<p>However, that causes a "transform is not conformal" error. </p>
+<p>Is there any way to do this in Revit, or do I need to reinvent the wheel and write the transformations for each curve type myself?</p>
+<p><strong>Answer:</strong> I guess I said most of what I have to say on this in my answers
+to <a href="https://thebuildingcoder.typepad.com/blog/2008/12/polygon-transformation.html#comment-4669997409">your</a>
+<a href="https://thebuildingcoder.typepad.com/blog/2008/12/polygon-transformation.html#comment-4670106610">comments</a> on The Building Coder:</p>
+<p>Using such a projection is obviously a good idea, in principle.</p>
+<p>However, Revit transformations are built for BIM purposes.</p>
+<p>You cannot apply a non-conformal transformation to a door or window and still expect it to comply with the building codes and standards.</p>
+<p>So, how to project your 3D curve to 2D depends on what you want to achieve and do with it.</p>
+<p>If you can live with an approximation, I would suggest you tessellate the curve.</p>
+<p>That produces a series of line segments, and those are easy to project any way you like.</p>
+<p>If that is not an option and you need precise curve results, I am indeed afraid you might have to write the transformations for each curve type yourself.</p>
+<p>Alternatively, you might be able to hook up with some external geometric library that can support you in that transformation.</p>
+<p>I have researched that topic briefly multiple times, and all the 3D libraries that I looked at were rather large and complex for my immediate needs.</p>
+<p>However, I think any good reliable powerful library that you can connect will do the job.</p>
+<p>So, I have no specific preference in that area. There are a huge number of them out there, some are immensely powerful, some are good and relatively unknown. Several CAD vendors have open-sourced significant libraries.</p>
+<p><strong>Response:</strong> Well, I went the long way and wrote projection methods for all curve types (except CylindricalHelix).</p>
+<p>For lines, it is straight forward, but I am not so sure with Hermite splines and nurbs splines; maybe there are problems I have missed...</p>
+<p>I have tested it for some occasions, and two things that happened were:</p>
+<ul>
+<li>Projected curves where longer than edges of faces from which they were generated.</li>
+<li>Projected Hermite splines didn't rebuild correctly, which might be because you can only define start and end tangents, and not the complete list, when creating a curve.</li>
+<li><code>Ellipse.Create</code> is a little too clever, since it will create an arc if the two radii are equal, which resulted in an endless loop.</li>
+</ul>
+<pre class="code">
+  private static Curve Project(
+    Autodesk.Revit.DB.NurbSpline nurbsSpline,
+    Autodesk.Revit.DB.Plane plane)
+  {
+    XYZ[] controlPoints = GeometryHelper.ProjectPoint(
+      nurbsSpline.CtrlPoints, plane);
+
+    double[] knots = new double[nurbsSpline.Knots.Size];
+    for(int i = 0; i < knots.Length;i++)
+    {
+      knots[i] = nurbsSpline.Knots.get_Item(i);
+    }
+    double[] weights = new double[nurbsSpline.Weights.Size];
+    for (int i = 0; i < weights.Length; i++)
+    {
+      weights[i] = nurbsSpline.Weights.get_Item(i);
+    }
+    return NurbSpline.CreateCurve( nurbsSpline.Degree,
+      knots,  controlPoints, weights );
+   }
+
+  private static Curve Project(
+    Autodesk.Revit.DB.HermiteSpline hermiteSpline,
+    Autodesk.Revit.DB.Plane plane)
+  { 
+    XYZ[] tangents= GeometryHelper.ProjectVector(
+      hermiteSpline.Tangents,plane);
+
+    XYZ[] controlPoints = GeometryHelper.ProjectPoint(
+      hermiteSpline.ControlPoints, plane);
+
+    HermiteSplineTangents hermiteSplineTangents
+      = new HermiteSplineTangents() {
+        StartTangent = tangents[0].Normalize(),
+        EndTangent = tangents[tangents.Length - 1].Normalize()
+      };
+
+    return HermiteSpline.Create( controlPoints,
+      hermiteSpline.IsPeriodic, hermiteSplineTangents );
+  }
+</pre>
+
+<p><strong>Answer:</strong> Well done! Sounds like pretty good progress.</p>
+<p>Feedback so far from the development team:</p>
+<p>Note that there are various complications &ndash; the curve may project to a self-intersecting curve, or one with singularities such as cusps, or to a degenerate curve (a point), and such curves may cause downstream problems.
+For projecting a curve onto a surface, part of the curve may miss the surface when projected, and one might want to distinguish between projecting orthogonal to the surface and projecting along a given direction.</p>
+<p>If Revit's public API does not include a function to project a curve to a plane (or more generally, to a surface), and it looks like it doesn't, you can request that such a function be added.</p>
+<p>You could file a wish list item for this in the Revit Idea Station and ensure it gets many votes. However, it would take time to plan and implement, of course.</p>
+<p><strong>Response:</strong> Thanks for the effort; don't get me wrong when saying this, I doubt that anything is going to happen...  but I had a little conversation including a wish for Inventor a while ago.
+It wasn't accepting surface generated from another program  (Rhino3d) for unrolling them, even though I got the feedback that the surface was perfectly developable.</p>
+<p>So that didn't change...</p>
+<p><strong>Answer:</strong> Revitalizer suggests a workaround for the projection of curves to a plane:</p>
+<p>From your curves, create ModelCurves.</p>
+<p>Depending on context (project or family), you can create DetailCurves or SymbolicCurves in a given view.</p>
+<ul>
+<li>Document.ConvertModelToDetailCurves or</li>
+<li>Document.ConvertModelToSymbolicCurves</li>
+</ul>
+<p>In the RevitAPI.chm, it says in the text:</p>
+<blockquote>
+<p>The lines are projected on the view plane.
+If the lines are not parallel to the view plane, lines are foreshortened and arcs are converted to ellipses.
+Splines are modified.</p>
+</blockquote>
+<p>Get the <code>DetailCurve.GeometryCurve</code> from the resulting elements and you are done.</p>
+<p>Since you cannot create (2D) views for arbitrary planes, but only for vertical or horizontal ones, this workaround is limited.</p>
+<p>If you really want to work around the restriction to horizontal and vertical planes, you can add another twist (plus reverse twist) to the process as follows:</p>
+<ul>
+<li>Apply a suitable transformation to the curve before converting it to a model line</li>
+<li>Project the model line onto a horizontal or vertical plane</li>
+<li>Apply the reverse transformation to the horizontal or vertical planar result to get it positioned where you want it</li>
+</ul>
+<p>Simple task, surprising workaround &ndash; that's Revit API at its best.</p>
+<p><strong>Response:</strong> Definitely a thing to try out.
+I had some issues with precision and further Boolean operations with my projection algorithm, I am wondering if this is a more precise way to do so?</p>
+<p>I might stick to my implementation; at least there, I know were the imprecision is...</p>
+<p><strong>Answer:</strong> As for precision, I think that there may be inaccuracies, due to the fact that we create elements (which react to other elements, views etc.).</p>
+<p>Revit's built-in rules may adjust elements according to its will.</p>
+<p>Also, further limitations are apparent.</p>
+<p>There is a ShortCurveTolerance constant, "the enforced minimum length for any curve created by Revit", as the documentation says.</p>
+<p>So, the conversion methods will fail if a projected result would contain such a curve.</p>
+<p>Imagine a line in the plane's normal direction &ndash; it would result in a point on the plane.</p>
+<p>You could project some control points to the plane (start point, end point) and check the projected curves' related points to get a tolerance value.</p>
+<p>Here is a comment from the development team on your projection implementation:</p>
+<p>In the second function, which projects a Hermite spline curve onto a plane, the user should not normalise the tangent vectors.
+The lengths of the start and end tangent vectors (i.e., first derivatives) affect the shape of the spline curve.
+The first function, which projects Nurbs spline curves onto a plane, looks correct.
+The fact that the Ellipse constructor will create an Arc if the ellipse happens to be circular is intentional, because Revit expects curves and surfaces to be represented in the simplest possible form, with an arc being considered simpler than an ellipse.</p>
+<p>More feedback from the development team on the other ideas discussed above:</p>
+<p>Regarding <code>ConvertModelToDetailCurves</code> and <code>ConvertModelToSymbolicCurves</code>: the user should be aware that if they produce curves that Revit considers invalid, such as self-intersecting curves or zero-length curves, they may cause problems if they're used in creating Revit geometry (or in other contexts for that matter).
+However, a quick look at the internal function those API functions call indicates that it does check if the projection curve (i.e., the result) would have singularities or self-intersections and does not return a result in such cases.
+So, I would guess that the same is true for the two API functions.</p>
+<p>Note, too, that there are cases when users might want to allow the projection curve to be self-intersecting.
+For example, if a full circle lying in a vertical plane is projected to a horizontal plane, some users might want that operation to succeed and to return a line segment representing the "shadow" of the circle (as if the sun were directly overhead).
+I don't believe the Revit API provides such a function.</p>
+<h4><a name="5"></a> Revit Add-In versus Dynamo Zero-Touch Node</h4>
+<p>Eric Luo, Documentation Project Leader at <a href="https://www.marchesepartners.com">marchesepartners</a> asked a question
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/reivt-add-in-amp-dynamo-zero-touch-node/m-p/9137621">Revit add-in and dynamo zero-touch node</a> that
+he later completed with the <a href="#6">impressive list of samples videos below</a>:</p>
+<p><strong>Question:</strong> Should I build a Revit Add-in or a Dynamo Zero-Touch Node?</p>
+<p>I am an architect.
+I just started using Dynamo last year, then learned Python and C#.
+I’ve been working on Dynamo Zero-Touch Node a lot now.
+The reason I create Dynamo Zero-Touch Node is that it allows me to use C# to drive the Revit API, and the way I create Dynamo Zero-Touch Node is very similar to Revit add-in, combine all the methods, not like the normal way using Dynamo having a lot of nodes connecting one by one.
+For instance, I built a Dynamo Zero-Touch Node to create window schedule; it’s not a simple task, a lot of things need to happen, but all inside one single node.</p>
+<!--
+<center>
+<iframe width="640" height="590" src="https://screencast.autodesk.com/Embed/Timeline/25d71b9d-1f7f-4b2b-be6e-07b8af5d66f0" frameborder="0" scrolling="no" allowfullscreen="allowfullscreen" webkitallowfullscreen="webkitallowfullscreen"></iframe> 
+</center>
+-->
+
+<p><strong>Answer:</strong> Congratulations on getting to grips so well with both environments.</p>
+<p>I would say it is a matter of taste.</p>
+<p>As you may have noticed from The Building Coder blog, I build Revit add-ins only and am perfectly happy with that.</p>
+<p>People say that Dynamo is easier for non-programmers.</p>
+<p>If you know Python and C# and are happy with pure non-visual programming, the add-in path may be the cleaner approach.</p>
+<p>I hope this helps.</p>
+<p>Have you made any decision yet?</p>
+<p>Would you like to share your further insights with us?</p>
+<p>Well, see below: </p>
+<h4><a name="6"></a> Revit Add-In Sample Videos</h4>
+<p>Lately, I spent some time with Revit add-ins.</p>
+<p>I would like to share some videos with you:</p>
+<ul>
+<li><a href="https://marchesepartner-my.sharepoint.com/:v:/g/personal/eluo_marchesepartners_com_au/EZ9--IrT4zZGg0vRvuklqlABVe7XwgaFGCWV_KimT-r9-w?e=0dLJJX">Apartment type setup</a> </li>
+<li><a href="https://marchesepartner-my.sharepoint.com/:v:/g/personal/eluo_marchesepartners_com_au/EW3WPGkf_GtPlI4QMWUQ1KABSrkIs9DuVsbggLF2sk928g?e=dDggiW">Bathroom type setup</a> </li>
+<li><a href="https://marchesepartner-my.sharepoint.com/:v:/g/personal/eluo_marchesepartners_com_au/ETbK_LvL6bVFlFO3RZWDXCcBgIdyKkoyXz6oNYmPwuB0ng?e=RdJhLx">Tag doors</a> </li>
+<li><a href="https://marchesepartner-my.sharepoint.com/:v:/g/personal/eluo_marchesepartners_com_au/EVRbV3JVmpBOvnttsx0BhU8BKjquWaxrEDsvuJKCSQShBg?e=Jo2JLa">Create floor by room + nice threshold detail</a> </li>
+<li><a href="https://marchesepartner-my.sharepoint.com/:v:/g/personal/eluo_marchesepartners_com_au/EVpKF3GKvLhHpjUGYQsORpcBsUd0qoDJQv4rASdvhtFNLw?e=iMvwsd">Dimension column to closest grid</a> </li>
+<li><a href="https://marchesepartner-my.sharepoint.com/:v:/g/personal/eluo_marchesepartners_com_au/EeWUAKQi8ARDkmSk0PnsqKsBu94mhqohrxYEFbts5z7Uyw?e=QVGbfh">Check material name &amp; mark</a> </li>
+<li><a href="https://marchesepartner-my.sharepoint.com/:v:/g/personal/eluo_marchesepartners_com_au/EV847MDEzItJl1tGDKOIkaYBdg1Adnm1P7oBGDns0Yj47A?e=Bl2lgd">Batch print</a> </li>
+</ul>
+<p>All credit to The Building Coder!</p>
+<p>Many thanks to Eric for sharing these impressive results!</p>
+<p><center>
+<img src="img/axonometric_projection.png" alt="Projection" width="467">
+</center></p>
