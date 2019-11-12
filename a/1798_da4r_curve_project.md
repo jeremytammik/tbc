@@ -18,8 +18,12 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Two little hints on Forge Design Automation for Revit or DA4R issues, projecting a curve onto a planar surface and an impressive list of add-in video samples
+&ndash; DA4R supports FBX and IFC
+&ndash; DA4R wrong user
+&ndash; Projecting curves onto a plane
+&ndash; Revit add-in versus Dynamo zero-touch node
+&ndash; Revit add-in sample videos...
 
 linkedin:
 
@@ -31,9 +35,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### DA4R Hints, Curve Projection and Add-In Videos
+### Curve Projection, Detach and FBX in DA4R
 
-Two little hints on DA4R issues, projecting a curve onto a planar surface and an impressive list of add-in video samples:
+Two little hints on [Forge Design Automation for Revit or DA4R](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55) issues, 
+projecting a curve onto a planar surface and an impressive list of add-in video samples:
+
+- [DA4R supports FBX and IFC](#2)
+- [DA4R wrong user](#3)
+- [Projecting curves onto a plane](#4)
+- [Revit add-in versus Dynamo zero-touch node](#5)
+- [Revit add-in sample videos](#6)
 
 ####<a name="2"></a> DA4R Supports FBX and IFC
 
@@ -132,46 +143,47 @@ I have tested it for some occasions, and two things that happened were:
 - `Ellipse.Create` is a little too clever, since it will create an arc if the two radii are equal, which resulted in an endless loop.
 
 <pre class="code">
-  private static Curve Project(
-    Autodesk.Revit.DB.NurbSpline nurbsSpline,
-    Autodesk.Revit.DB.Plane plane)
-  {
-    XYZ[] controlPoints = GeometryHelper.ProjectPoint(
-      nurbsSpline.CtrlPoints, plane);
-      
-    double[] knots = new double[nurbsSpline.Knots.Size];
-    for(int i = 0; i < knots.Length;i++)
-    {
-      knots[i] = nurbsSpline.Knots.get_Item(i);
-    }
-    double[] weights = new double[nurbsSpline.Weights.Size];
-    for (int i = 0; i < weights.Length; i++)
-    {
-      weights[i] = nurbsSpline.Weights.get_Item(i);
-    }
-    return NurbSpline.CreateCurve( nurbsSpline.Degree,
-      knots,  controlPoints, weights );
-   }
-
-  private static Curve Project(
-    Autodesk.Revit.DB.HermiteSpline hermiteSpline,
-    Autodesk.Revit.DB.Plane plane)
-  { 
-    XYZ[] tangents= GeometryHelper.ProjectVector(
-      hermiteSpline.Tangents,plane);
-      
-    XYZ[] controlPoints = GeometryHelper.ProjectPoint(
-      hermiteSpline.ControlPoints, plane);
-      
-    HermiteSplineTangents hermiteSplineTangents
-      = new HermiteSplineTangents() {
-        StartTangent = tangents[0].Normalize(),
-        EndTangent = tangents[tangents.Length - 1].Normalize()
-      };
-      
-    return HermiteSpline.Create( controlPoints,
-      hermiteSpline.IsPeriodic, hermiteSplineTangents );
-  }
+&nbsp;&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">Curve</span>&nbsp;Project(
+&nbsp;&nbsp;&nbsp;&nbsp;Autodesk.Revit.DB.<span style="color:#2b91af;">NurbSpline</span>&nbsp;nurbsSpline,
+&nbsp;&nbsp;&nbsp;&nbsp;Autodesk.Revit.DB.<span style="color:#2b91af;">Plane</span>&nbsp;plane&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>[]&nbsp;controlPoints&nbsp;=&nbsp;GeometryHelper.ProjectPoint(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nurbsSpline.CtrlPoints,&nbsp;plane&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>[]&nbsp;knots&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:blue;">double</span>[&nbsp;nurbsSpline.Knots.Size&nbsp;];
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">for</span>(&nbsp;<span style="color:blue;">int</span>&nbsp;i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;knots.Length;&nbsp;i++&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;knots[&nbsp;i&nbsp;]&nbsp;=&nbsp;nurbsSpline.Knots.get_Item(&nbsp;i&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>[]&nbsp;weights&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:blue;">double</span>[&nbsp;nurbsSpline.Weights.Size&nbsp;];
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">for</span>(&nbsp;<span style="color:blue;">int</span>&nbsp;i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;weights.Length;&nbsp;i++&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;weights[&nbsp;i&nbsp;]&nbsp;=&nbsp;nurbsSpline.Weights.get_Item(&nbsp;i&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">NurbSpline</span>.CreateCurve(&nbsp;nurbsSpline.Degree,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;knots,&nbsp;controlPoints,&nbsp;weights&nbsp;);
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">Curve</span>&nbsp;Project(
+&nbsp;&nbsp;&nbsp;&nbsp;Autodesk.Revit.DB.<span style="color:#2b91af;">HermiteSpline</span>&nbsp;hermiteSpline,
+&nbsp;&nbsp;&nbsp;&nbsp;Autodesk.Revit.DB.<span style="color:#2b91af;">Plane</span>&nbsp;plane&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>[]&nbsp;tangents&nbsp;=&nbsp;GeometryHelper.ProjectVector(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hermiteSpline.Tangents,&nbsp;plane&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>[]&nbsp;controlPoints&nbsp;=&nbsp;GeometryHelper.ProjectPoint(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hermiteSpline.ControlPoints,&nbsp;plane&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">HermiteSplineTangents</span>&nbsp;hermiteSplineTangents
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">HermiteSplineTangents</span>()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;StartTangent&nbsp;=&nbsp;tangents[&nbsp;0&nbsp;].Normalize(),
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EndTangent&nbsp;=&nbsp;tangents[&nbsp;tangents.Length&nbsp;-&nbsp;1&nbsp;].Normalize()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;};
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">HermiteSpline</span>.Create(&nbsp;controlPoints,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hermiteSpline.IsPeriodic,&nbsp;hermiteSplineTangents&nbsp;);
+&nbsp;&nbsp;}
 </pre>
 
 **Answer:** Well done! Sounds like pretty good progress.
@@ -303,7 +315,7 @@ I would like to share some videos with you:
 - [Tag doors](https://marchesepartner-my.sharepoint.com/:v:/g/personal/eluo_marchesepartners_com_au/ETbK_LvL6bVFlFO3RZWDXCcBgIdyKkoyXz6oNYmPwuB0ng?e=RdJhLx) 
 - [Create floor by room + nice threshold detail](https://marchesepartner-my.sharepoint.com/:v:/g/personal/eluo_marchesepartners_com_au/EVRbV3JVmpBOvnttsx0BhU8BKjquWaxrEDsvuJKCSQShBg?e=Jo2JLa) 
 - [Dimension column to closest grid](https://marchesepartner-my.sharepoint.com/:v:/g/personal/eluo_marchesepartners_com_au/EVpKF3GKvLhHpjUGYQsORpcBsUd0qoDJQv4rASdvhtFNLw?e=iMvwsd) 
-- [Check material name & mark](https://marchesepartner-my.sharepoint.com/:v:/g/personal/eluo_marchesepartners_com_au/EeWUAKQi8ARDkmSk0PnsqKsBu94mhqohrxYEFbts5z7Uyw?e=QVGbfh) 
+- [Check material name and mark](https://marchesepartner-my.sharepoint.com/:v:/g/personal/eluo_marchesepartners_com_au/EeWUAKQi8ARDkmSk0PnsqKsBu94mhqohrxYEFbts5z7Uyw?e=QVGbfh) 
 - [Batch print](https://marchesepartner-my.sharepoint.com/:v:/g/personal/eluo_marchesepartners_com_au/EV847MDEzItJl1tGDKOIkaYBdg1Adnm1P7oBGDns0Yj47A?e=Bl2lgd) 
 
 All credit to The Building Coder!
