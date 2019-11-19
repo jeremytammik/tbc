@@ -22,15 +22,22 @@ twitter:
 
 Resolving third-party DLL library conflicts and replicating the schedule sort order the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/schedulesortorder
 
-As always, I remain busy in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160).
-
 Today I highlight the following topics
 &ndash; I caved in to smartphone
 &ndash; Handling third party library DLL conflicts
 &ndash; Replicating schedule sort order...
 
 linkedin:
+
+Resolving third-party DLL library conflicts and replicating the schedule sort order the #RevitAPI
+
+http://bit.ly/schedulesortorder
+
+Today I highlight the following topics:
+
+- I caved in to smartphone
+- Handling third party library DLL conflicts
+- Replicating schedule sort order...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
