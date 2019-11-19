@@ -22,8 +22,13 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+As always, I remain busy in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160).
+
+Today I highlight the following topics
+&ndash; I caved in to smartphone
+&ndash; Handling third party library DLL conflicts
+&ndash; Replicating schedule sort order...
 
 linkedin:
 
@@ -35,9 +40,18 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### DLL Conflicts and Schedule Sort Order
+### DLL Conflicts and Replicating Schedule Sort Order
 
-####<a name="2"></a> I Finally Caved In
+As always, I remain busy in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160).
+
+Here, today, I highlight the following topics:
+
+- [I caved in to smartphone](#2)
+- [Handling third party library DLL conflicts](#3)
+- [Replicating schedule sort order](#4)
+
+####<a name="2"></a> I Caved in to SmartPhone
 
 After several decades of hard resistance, I finally caved in.
 
@@ -97,7 +111,7 @@ In that case, I suggest you modify your add-in to work with whatever version of 
 
 Alternatively, wrap the support DLL functionality into something that you have control over, so that you can do whatever you like with it.
 
-####<a name="3"></a> Schedule Sort Order
+####<a name="4"></a> Replicating Schedule Sort Order
 
 Frank [@Fair59](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/2083518) Aarssen comes to the rescue once again, presenting a very comprehensive and well explained solution
 to [replicate graphical column schedule sort order with C#](https://forums.autodesk.com/t5/revit-api-forum/replicate-graphical-column-schedule-sort-order-with-c/m-p/9105470) by

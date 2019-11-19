@@ -21,8 +21,13 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+As always, I remain busy in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160).
+
+Today I highlight the following topics
+&ndash; I caved in to smartphone
+&ndash; Handling third party library DLL conflicts
+&ndash; Replicating schedule sort order...
 
 linkedin:
 
@@ -34,8 +39,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>DLL Conflicts and Schedule Sort Order</h3>
-<h4><a name="2"></a> I Finally Caved In</h4>
+<h3>DLL Conflicts and Replicating Schedule Sort Order</h3>
+<p>As always, I remain busy in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>.</p>
+<p>Here, today, I highlight the following topics:</p>
+<ul>
+<li><a href="#2">I caved in to smartphone</a></li>
+<li><a href="#3">Handling third party library DLL conflicts</a></li>
+<li><a href="#4">Replicating schedule sort order</a></li>
+</ul>
+<h4><a name="2"></a> I Caved in to SmartPhone</h4>
 <p>After several decades of hard resistance, I finally caved in.</p>
 <p>Both my bank and my VPN network managers forced me to set up a smartphone.</p>
 <p>I got an old Android S5, reset it to factory settings, installed the updates, and <a href="https://www.guidingtech.com/29921/remove-samsung-galaxy-s5">removed all possible Samsung ballast</a>.</p>
@@ -75,7 +88,7 @@ the <a href="https://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API 
 <p>In this specific case, it sounds to me as if you are the creator of one add-in, and another add-in uses the same support DLL as you do.</p>
 <p>In that case, I suggest you modify your add-in to work with whatever version of the support DLL happens to be loaded.</p>
 <p>Alternatively, wrap the support DLL functionality into something that you have control over, so that you can do whatever you like with it.</p>
-<h4><a name="3"></a> Schedule Sort Order</h4>
+<h4><a name="4"></a> Replicating Schedule Sort Order</h4>
 <p>Frank <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/2083518">@Fair59</a> Aarssen comes to the rescue once again, presenting a very comprehensive and well explained solution
 to <a href="https://forums.autodesk.com/t5/revit-api-forum/replicate-graphical-column-schedule-sort-order-with-c/m-p/9105470">replicate graphical column schedule sort order with C#</a> by
 implementing a custom <code>ColumnMarkComparer</code> class implementing <code>IComparer&lt;FamilyInstance&gt;</code>:</p>
