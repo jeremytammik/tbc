@@ -17,6 +17,10 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
+This is The Building Coder post number 1800, in its eleventh year of existence.
+We celebrate by highlighting the integration of a 3D geometry and model viewer in a Revit add-in with a solution making use of several of the interesting techniques, including the use of IPC for add-in disentanglement from third-party library dependencies and a new custom exporter implementation for OBJ.
+This issue was raised in two discussions, on a <i>plug-in that displays Revit's 3D window content</i> and <i>using a geometry viewer in a Revit add-in to preview results</i>...
+
 &ndash; 
 ...
 
@@ -31,17 +35,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Integrate Helix 3D Viewer in Add-In</h3>
-<p>This is The Building Coder post number 1800, in the eleventh year of its existence.</p>
+<h3>Integrating the Helix 3D Viewer with a WPF Add-In</h3>
+<p>This is The Building Coder post number 1800, in its eleventh year of existence.</p>
 <p>We celebrate by highlighting the integration of a 3D geometry and model viewer in a Revit add-in with a solution shared
 by Jesse Mom of <a href="https://www.bam.com">Koninklijke BAM Group N.V.</a>.</p>
-<p>In his implementation, he makes use of most of the interesting aspects of the Revit add-ins and API:</p>
-<ul>
-<li>Using IPC for add-in disentangelment</li>
-<li>Implementing a custom exporter for OBJ</li>
-</ul>
+<p>In his implementation, he makes use of several of the interesting possibilities offered by the Revit API and add-in architecture, including the use of IPC for add-in disentanglement from third-party library dependencies and a new custom exporter implementation for OBJ.</p>
 <p>This issue was raised in
-the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> threads
+two <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> threads,
 on a <a href="https://forums.autodesk.com/t5/revit-api-forum/plug-in-that-displays-revit-s-3d-window-content/td-p/9062201">plug-in that displays Revit's 3D window content</a>
 and <a href="https://forums.autodesk.com/t5/revit-api-forum/using-a-geometry-viewer-in-a-revit-addin-to-preview-results/m-p/8868232">using a geometry viewer in a Revit add-in to preview results</a>:</p>
 <p><strong>Question:</strong> Similar to how Forge or Dynamo can display Revit content in their own window:</p>
@@ -51,7 +51,7 @@ and <a href="https://forums.autodesk.com/t5/revit-api-forum/using-a-geometry-vie
 </ul>
 </li>
 <li>Could a plug-in display a 3d view from the 3d views in a project?</li>
-<li>What kind of viewer would be required, or is mit ore of a Forge thing?<ul>
+<li>What kind of viewer would be required, or is it more of a Forge thing?<ul>
 <li>Could I use Helix toolkit as a viewer, or another 3rd party, or am I way off base here?</li>
 </ul>
 </li>
@@ -65,11 +65,11 @@ and <a href="https://forums.autodesk.com/t5/revit-api-forum/using-a-geometry-vie
 <p>By the way, it looks like Dynamo itself uses Helix and could be a source of sample code.</p>
 <p><strong>Question:</strong> I'm trying to build a Revit add-in that will generate geometry in Revit.</p>
 <p>In my add-in, I would like to integrate an interactive 3D viewer that shows a preview of the geometry that will be generated.
-Basically, I'm looking for functionality such as the Revit extensions offered by Autodesk, specifcally the "Wood Framing Walls" extension. In this extension, you can configure something, and see a preview of what will be generated in Revit:</p>
+Basically, I'm looking for functionality such as the Revit extensions offered by Autodesk, specifically the "Wood Framing Walls" extension. In this extension, you can configure something, and see a preview of what will be generated in Revit:</p>
 <p><center>
 <img src="img/autodesk_geometry_viewer_example.png" alt="Wood framing walls extension geometry viewer" width="800"> <!--1292-->
 </center></p>
-<p>My question: does anyone have suggestions for open source or free 3D geometry viewers that can be included in a revit addin to preview geometry that has not yet been created in revit? Specifcally, does anyone know whether the viewer used for the revit extensions has some kind of API or is publically available somewhere( since I like the look and feel of it)?  Or is this something Autodesk can make available? The geometry to preview are simple beam shaped elements and lines, just like the example in the picture.</p>
+<p>My question: does anyone have suggestions for open source or free 3D geometry viewers that can be included in a Revit addin to preview geometry that has not yet been created in Revit? Specifically, does anyone know whether the viewer used for the Revit extensions has some kind of API or is publicly available somewhere( since I like the look and feel of it)?  Or is this something Autodesk can make available? The geometry to preview is simple beam shaped elements and lines, just like the example in the picture.</p>
 <p><strong>Answer:</strong> Thank you for your very pertinent query.</p>
 <p>Implementing a decent interactive 3D viewer is certainly doable, though not completely trivial.</p>
 <p>Depending on how much interaction you need with it and how closely you want to tie it in to your add-in specific workflows, a stand-alone viewer might provide an easier way to go?</p>
@@ -105,7 +105,7 @@ the <a href="https://docs.microsoft.com/de-de/dotnet/api/system.windows.forms.we
 <p>I first tried to get the viewer to work standalone, as described in the link you've attached.
 This worked perfect and it displayed the sample model nicely and with smooth rotation, panning etc.</p>
 <p>Then I tried to create a really simple Revit WPF addin with the same functionality (display a simple stl file).
-It works, but interacting with the viewer in my addin is really slow and laggy, while the stand alone viewer works perfectly, even with multiple Revit sessions open.</p>
+It works, but interacting with the viewer in my addin is really slow and laggy, while the stand-alone viewer works perfectly, even with multiple Revit sessions open.</p>
 <p>My question: Any suggestions on how to get the same viewer performance in a Revit addin as in a standalone WPF application?</p>
 <p>A more general question : Where do these performance differences come from? Does Revit somehow throttle the resources available to the addin?</p>
 <p>I've attached both the VS projects and the sample model.stl file
@@ -122,13 +122,13 @@ on <a href="https://thebuildingcoder.typepad.com/blog/2019/04/set-floor-level-an
 <p>How important is it for you to have the viewer tightly integrated with Revit?</p>
 <p>Does it have to be an add-in?</p>
 <p>Could you use IPC as described above to hook up the stand-alone viewer sufficiently closely with Revit to satisfy your needs?</p>
-<p><strong>Response:</strong> I wanted to let you know I succesfully implemented the helix toolkit wpf viewer using the suggested decoupling of processes:</p>
+<p><strong>Response:</strong> I wanted to let you know I successfully implemented the Helix toolkit WPF viewer using the suggested decoupling of processes:</p>
 <p><center>
 <img src="img/helix_viewer_in_wpf_window_in_revit_addin.png" alt="Helix viewer in WPF add-in" width="800"> <!--1899-->
 </center></p>
 <p>The example of IPC for disentanglement of CEFSharp was based on a Windows Forms application, so I had to make some changes to make it work with a WPF Window.</p>
-<p>Now that I can launch a viewer from within the Revit context, and can communicate with it from my Revit command/application, the next step is to get geometry from revit to the viewer.
-I already succesfully tested to generate an OBJ file using
+<p>Now that I can launch a viewer from within the Revit context, and can communicate with it from my Revit command/application, the next step is to get geometry from Revit to the viewer.
+I already successfully tested to generate an OBJ file using
 your <a href="https://thebuildingcoder.typepad.com/blog/2013/07/revit-2014-obj-exporter-and-new-sdk-samples.html">OBJ exporter for Revit 2014</a> (upgraded
 to 2018) and display it in the viewer.
 However, as I was reading, I found your ideas on creating an improved version of your exporter using the custom exporter framework.
@@ -136,10 +136,10 @@ Is this something you already implemented, or have planned to do?</p>
 <p>I will continue to make my addin work with the existing pieces of the puzzle I have so far.
 An improvement on the OBJ exporter would be a nice-to-have feature, but your existing exporter does the trick.
 Once I have cooked something up, I'm happy to share my efforts if you're interested.</p>
-<p>Again briefly my use-case: I want to create an add-in that lets the user generate some Revit ceiling geometry, and adjust the position and composition of this ceiling interactively with some sliders and input fields in my addin.
+<p>Again, briefly, my use-case: I want to create an add-in that lets the user generate some Revit ceiling geometry, and adjust the position and composition of this ceiling interactively with some sliders and input fields in my addin.
 This to-be-created geometry depends on existing wall and room geometry in the Revit project.
 As such, in my add-in, I want to preview the to-be-created- ceiling geometry, in the context of the relevant Revit geometry.
-For this I want to import some relevant revit elements into my viewer to display the context, and then display the the to-be-created geometry in that viewer as well.
+For this I want to import some relevant Revit elements into my viewer to display the context, and then display the to-be-created geometry in that viewer as well.
 When the user is satisfied, he can click ok, the preview will close, and the add-in will generate Revit objects according to the layout and settings chosen in the viewer.</p>
 <p><strong>Answer:</strong> I am very glad to hear that you are able to use the OBJ viewer.</p>
 <p>Here are some examples of <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.1">implementing custom exporters</a>.</p>
@@ -149,24 +149,24 @@ I've attached a zip file <a href="zip/RevitExternalModelViewer.zip">RevitExterna
 a working solution.
 The solution contains 3 projects.</p>
 <p>First, it contains a model viewer, which is a very basic implementation of the Helix toolkit viewer, and it has the ability to view OBJ files.
-This model viewer can be used stand alone (it compiles as an exe file),  or used by a Revit plugin via the Inter Process Communication route you suggested.
-When used stand alone, there is a hardcoded filepath in the project; change this to the obj file path of the file you want to view, debug/compile and you're good to go.</p>
+This model viewer can be used stand-alone (it compiles as an exe file), or used by a Revit plugin via the Inter Process Communication route you suggested.
+When used stand-alone, there is a hardcoded filepath in the project; change this to the obj file path of the file you want to view, debug/compile and you're good to go.</p>
 <p>Second, I implemented a very basic Revit OBJ exporter using the custom exporter framework.
 It's a combination of the XML exporter example by Arnold, and the OBJ exporter by Jeremy.
 It doesn't export materials or whatsoever, just meshes.
-This obj can both be used as a Revit add-in on it's own (it contains a controller class that implements the <code>IExternalCommand</code>) or as a library in one of your own Revit plugins.</p>
+This obj can both be used as a Revit add-in on its own (it contains a controller class that implements the <code>IExternalCommand</code>) or as a library in one of your own Revit plugins.</p>
 <p>Third, it contains a Revit plugin the brings it all together.
 This plugin exports the active 3D view to an obj file using the obj exporter (it references the obj exporter project).
 This obj file is saved to a hardcoded directory, and this same directory is hardcoded into the viewer project.
 Once the obj file is created, it modelessly starts the viewer, completely disentangled using the IPC disentanglement magic as demonstrated and implemented by Kim Sivonen.
-To make this work, you have to make sure that the Revit plugin points to the build-location of the exe file of you're viewer, and that it has been built.</p>
-<p>To test the solution, make sure the Revit plugin controller.cs file (line 98) points to the build-location of the model viewer, compile all projects, make sure the included ADDIN file for the revit plugin ends up in the right folder and points to the build-location of your project and start the plugin from a 3D view in revit 2018.</p>
+To make this work, you have to make sure that the Revit plugin points to the build-location of the exe file of your viewer, and that it has been built.</p>
+<p>To test the solution, make sure the Revit plugin controller.cs file (line 98) points to the build-location of the model viewer, compile all projects, make sure the included ADDIN file for the Revit plugin ends up in the right folder and points to the build-location of your project and start the plugin from a 3D view in Revit 2018.</p>
 <p>It now looks like this:</p>
 <p><center>
 <img src="img/helix_viewer_example.png" alt="Helix viewer example" width="800"> <!--1750-->
 </center></p>
 <p>Feel free to share or use this solution as a starting point for your own viewer project.</p>
-<p>Next steps (feel free to implement and share):</p>
+<p>Next steps:</p>
 <ul>
 <li>Support for materials.</li>
 <li>Improve viewer controls (zoom towards current location of the mouse (as in Revit)).</li>
