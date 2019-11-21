@@ -32,6 +32,18 @@ There are so many truly wonderful pieces of software sitting around there that I
 
 linkedin:
 
+The Revit Batch Processor RBP drives mass execution of #RevitAPI add-ins and #DynamoBim scripts!
+
+http://bit.ly/batchprocessor
+
+There are so many truly wonderful pieces of software sitting around there that I am unaware of, real works of art, pinnacles of perfection, that I only happen upon by chance:
+
+- Revit Batch Processor (RBP)
+- Latest version
+- FAQ
+- Use cases
+- Features
+- Unlimited power...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
