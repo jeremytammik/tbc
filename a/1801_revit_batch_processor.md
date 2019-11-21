@@ -17,7 +17,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+The Revit Batch Processor RBP drives mass execution of #RevitAPI add-ins and #DynamoBim scripts! @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/batchprocessor
 
 There are so many truly wonderful pieces of software sitting around there that I am unaware of, real works of art, pinnacles of perfection, that I only happen upon by chance
 &ndash; Revit Batch Processor (RBP)
