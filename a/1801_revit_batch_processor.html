@@ -1,0 +1,103 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</head></p>
+<!---
+
+- Revit Batch Processor (RBP)
+  https://github.com/bvn-architecture/RevitBatchProcessor
+  pointed out by
+  Automatic Heating and cooling load analysis with Revit API
+  https://forums.autodesk.com/t5/revit-api-forum/automatic-heating-and-cooling-load-analysis-with-revit-api/m-p/9149375
+  There are so many truly wonderful pieces of software sitting around there that I am anaware of, real works of art, pinnacles of perfection, that I only happen upon by chance.
+  In this case, the ... thread on ... pointed out the ...
+
+twitter:
+
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+There are so many truly wonderful pieces of software sitting around there that I am unaware of, real works of art, pinnacles of perfection, that I only happen upon by chance
+&ndash; Revit Batch Processor (RBP)
+&ndash; Latest version
+&ndash; FAQ
+&ndash; Use cases
+&ndash; Features
+&ndash; Unlimited power...
+
+&ndash; 
+...
+
+linkedin:
+
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<p style="font-size: 80%; font-style:italic"></p>
+
+-->
+
+<h3>The Revit Batch Processor RBP</h3>
+<p>There are so many truly wonderful pieces of software sitting around there that I am unaware of, real works of art, pinnacles of perfection, that I only happen upon by chance.</p>
+<p>In this case, <em>@alexandrecafarofr</em> happens to mention a powerful utility in 
+his <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/automatic-heating-and-cooling-load-analysis-with-revit-api/m-p/9149375">automatic heating and cooling load analysis</a>:</p>
+<p>The <a href="https://github.com/bvn-architecture/RevitBatchProcessor">Revit Batch Processor (RBP)</a> a project maintained
+by <a href="https://github.com/DanRumery">Daniel Rumery</a>, ex-<a href="http://www.bvn.com.au">BVN</a>:</p>
+<ul>
+<li><a href="#2">Revit Batch Processor (RBP)</a></li>
+<li><a href="#3">Latest version</a></li>
+<li><a href="#4">FAQ</a></li>
+<li><a href="#5">Use cases</a></li>
+<li><a href="#6">Features</a></li>
+<li><a href="#7">Unlimited power</a></li>
+</ul>
+<p><center>
+<img src="img/captain_dan.jpg" alt="Captain Dan" width="180"> <!--460-->
+</center></p>
+<p>Here is an excerpt of the GitHub project readme to make your mouth water:</p>
+<h4><a name="2"></a> Revit Batch Processor (RBP)</h4>
+<p>Fully automated batch processing of Revit files with your own Python or Dynamo task scripts!</p>
+<h4><a name="3"></a> Latest version</h4>
+<p><a href="https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.5.3/RevitBatchProcessorSetup.exe">Installer for Revit Batch Processor v1.5.3</a></p>
+<p>See the <a href="https://github.com/bvn-architecture/RevitBatchProcessor/releases">Releases</a> page for more information.</p>
+<h4><a name="4"></a> FAQ</h4>
+<p>See the <a href="https://github.com/bvn-architecture/RevitBatchProcessor/wiki/Revit-Batch-Processor-FAQ">Revit Batch Processor FAQ</a>.</p>
+<h4><a name="5"></a> Use Cases</h4>
+<p>This tool doesn't <em>do</em> any of these things, but it <em>allows</em> you to do them:</p>
+<ul>
+<li>Open all the Revit files across your Revit projects and run a health-check script against them. Keeping an eye on the health and performance of many Revit files is time-consuming. You could use this to check in on all your files daily and react to problems before they get too gnarly.</li>
+<li>Perform project and family audits across your Revit projects.</li>
+<li>Run large scale queries against many Revit files.</li>
+<li>Mine data from your Revit projects for analytics or machine learning projects.</li>
+<li>Automated milestoning of Revit projects.</li>
+<li>Automated housekeeping tasks (e.g. place elements on appropriate worksets)</li>
+<li>Batch upgrading of Revit projects and family files.</li>
+<li>Testing your own Revit API scripts and Revit addins against a variety of Revit models and families in an automated manner.</li>
+<li>Essentially anything you can do to one Revit file with the Revit API or a Dynamo script, you can now do to many!</li>
+</ul>
+<p><center>
+<img src="img/BatchRvt_Screenshot.png" alt="Revit batch processor user interface" width="800"> <!--1010-->
+</center></p>
+<h4><a name="6"></a> Features</h4>
+<ul>
+<li>Batch processing of Revit files (.rvt and .rfa files) using either a specific version of Revit or a version that matches the version of Revit the file was saved in. Currently supports processing files in Revit versions 2015 through 2020. (Of course, the required version of Revit must be installed!)</li>
+<li>Custom task scripts written in Python or Dynamo! Python scripts have full access to the Revit API. Dynamo scripts can of course do whatever Dynamo can do :)</li>
+<li>Option to create a new Python task script at the click of a button that contains the minimal amount of code required for the custom task script to operate on an opened Revit file. The new task script can then easily be extended to do some useful work. It can even load and execute your existing functions in a C# DLL (see <a href="#executing-functions-in-a-c-dll">Executing functions in a C# DLL</a>).</li>
+<li>Option for custom pre- and post-processing task scripts. Useful if the overall batch processing task requires some additional setup / tear down work to be done.</li>
+<li>Central file processing options (Create a new local file, Detach from central).</li>
+<li>Option to process files (of the same Revit version) in the same Revit session, or to process each file in its own Revit session. The latter is useful if Revit happens to crash during processing, since this won't block further processing.</li>
+<li>Automatic Revit dialog / message box handling. These, in addition to Revit error messages are handled and logged to the GUI console. This makes the batch processor very likely to complete its tasks without any user intervention required!</li>
+<li>Ability to import and export settings. This feature combined with the simple <a href="#command-line-interface">command-line interface</a> allows for batch processing tasks to be setup to run automatically on a schedule (using the Windows Task Scheduler) without the GUI.</li>
+<li>Generate a .txt-based list of Revit model file paths compatible with RBP. The <em>New List</em> button in the GUI will prompt for a folder path to scan for Revit files. Optionally you can specify the type of Revit files to scan for and also whether to include subfolders in the scan.</li>
+</ul>
+<h4><a name="7"></a> Unlimited Power</h4>
+<blockquote>
+<p>"With great power come great responsibility"
+<a href="https://quoteinvestigator.com/2015/07/23/great-power/">-- Spiderman</a></p>
+</blockquote>
+<p>This tool enables you to do things with Revit files on a very large scale. Because of this ability, Python or Dynamo scripts that make modifications to Revit files (esp. workshared files) should be developed with the utmost care! You will need to be confident in your ability to write Python or Dynamo scripts that won't ruin your files en-masse. The Revit Batch Processor's 'Detach from Central' option should be used both while testing and for scripts that do not explicitly depend on working with a live workshared Central file.</p>
+<p>Ever so many thanks to Dan for implementing, sharing, and, above all, so wonderfully documenting and maintaining this very impressive and powerful application!</p>
