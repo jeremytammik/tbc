@@ -70,6 +70,7 @@ by [Daniel Rumery](https://github.com/DanRumery), ex-[BVN](http://www.bvn.com.au
 - [Use cases](#5)
 - [Features](#6)
 - [Unlimited power](#7)
+- [Addendum &ndash; questions](#8)
 
 <center>
 <img src="img/captain_dan.jpg" alt="Captain Dan" width="180"> <!--460-->
@@ -130,3 +131,28 @@ This tool doesn't _do_ any of these things, but it _allows_ you to do them:
 This tool enables you to do things with Revit files on a very large scale. Because of this ability, Python or Dynamo scripts that make modifications to Revit files (esp. workshared files) should be developed with the utmost care! You will need to be confident in your ability to write Python or Dynamo scripts that won't ruin your files en-masse. The Revit Batch Processor's 'Detach from Central' option should be used both while testing and for scripts that do not explicitly depend on working with a live workshared Central file.
 
 Ever so many thanks to Dan for implementing, sharing, and, above all, so wonderfully documenting and maintaining this very impressive and powerful application!
+
+####<a name="8"></a> Addendum &ndash; Questions
+
+We have discussed similar batch processing topics here in the past, e.g.:
+
+- [Batch processing Revit documents](https://thebuildingcoder.typepad.com/blog/2015/08/batch-processing-dwfx-links-and-future-proofing.html#4)
+- [Batch processing Revit families and documents](https://thebuildingcoder.typepad.com/blog/2019/04/batch-processing-and-aspects-of-asstringvalue.html#2)
+
+Based on that, I raised [issue #51](https://github.com/bvn-architecture/RevitBatchProcessor/issues/51) to
+ask some important questions on failure handling and recovery:
+
+1. Are the actions taken automatically logged?
+&ndash; Why? In case of a problem, it might be handy to know how far you got successfully before the problem appeared, so that you know where to pick up again.
+2. Is the Revit.exe health monitored?
+&ndash; Why? Well, Revit is not built for batch processing, so one might expect it to crash and die if it is force fed too many files in a single session.
+3. Is Revit restarted for each new document? That would reduce the risk of the aforementioned point.
+
+Dan very kindly responds:
+ 
+1. There is a log file that records the console output seen in the GUI. By default, log files by default are written to the folder %APPDATA%\BatchRvt. It logs stuff like process Revit startup and monitoring, files processed, file actions (open, closing, detach, file type, path, etc.). Any custom actions performed by a script would be left up to the script to record action-specific progress. If using a Python script, there is a utility function `Output` for logging to RBP's console. Dynamo scripts need their own mechanism for logging.
+2. The Revit process(es) are monitored to detect process exit and process busy events. This info is logged to the console. If a Revit session crashes, RBP starts up a fresh Revit session for any files that remain to be processed (so only the Revit file that lead to the crash will be skipped). Indeed, I found this can happen when processing a large amount of Revit files, hence the recovery mechanism. You'll see in the UI there is an option to process the files in the same Revit session (when possible) or process every file in its own session; as far as crash recovery is concerned, however, the behaviour is the same. Note that Dynamo scripts are always made to run in a separate Revit session per file due to some limitations I encountered when closing an active UI document. Python scripts don't have this limitation and hence will process a lot faster!
+3. See 2) :)
+
+There is also a per-file time-out feature that can be used to terminate processing of a file if the time limit is reached.
+In that scenario, the Revit process is forcibly terminated and a fresh session started up to process the remaining files.
