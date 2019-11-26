@@ -10,7 +10,7 @@
 
 twitter:
 
- #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+Retrieving the electrical load from a fixture using the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/electricalload
 
 Today is my birthday, so I am trying hard to work less.
 Very kindly, Alexander Ignatovich provided a gift for the day in the form of a new external command CmdElectricalLoad in The Building Coder samples.
