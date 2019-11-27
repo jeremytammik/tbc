@@ -19,11 +19,16 @@ showing how to retrieve the value of the `Load` column in the electrical system 
 &ndash; 
 ...
 
-&ndash; 
-...
-
 linkedin:
 
+Retrieving the electrical load from a fixture using the #RevitAPI
+
+http://bit.ly/electricalload
+
+Today is my birthday, so I am trying hard to work less.
+
+Very kindly, Alexander Ignatovich provided a gift for the day in the form of a new external command CmdElectricalLoad in The Building Coder samples.
+showing how to retrieve the value of the `Load` column in the electrical system browser for a specific fixture family instance...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
