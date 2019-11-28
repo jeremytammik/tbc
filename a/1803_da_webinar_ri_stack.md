@@ -24,8 +24,11 @@ twitter:
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+The ultimatively painless introduction to the Forge Design Automation API, a solution for creating two stacked ribbon items, reinitialising filtered element collectors and picking a face in a linked file
+&ndash; Forge Design Automation API webinars
+&ndash; Stacking two 24x24 ribbon items
+&ndash; Reinitialising the filtered element collector
+&ndash; Use `CreateReferenceInLink` to select a face in a linked file...
 
 linkedin:
 
@@ -38,11 +41,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Design Automation Webinars
+### Design Automation API, Stacks, Collectors and Links
 
 If you are looking for the ultimatively painless introduction to the Forge Design Automation API, you are in luck: the Design Automation webinars are coming up soon.
 
-If you are more interested in the desktop Revit API, the solution for creating two stacked ribbon items instead of three might be more to your tase.
+If you are more interested in the desktop Revit API, the solution for creating two stacked ribbon items instead of three might be more to your taste.
 
 In either case, the tip on reinitialising a filtered element collector before reusing it is importantissimo in both contexts:
 
@@ -59,7 +62,7 @@ In either case, the tip on reinitialising a filtered element collector before re
 </pre>
 
 
-####<a name="2"></a> Forge Desing Automation API Webinars
+####<a name="2"></a> Forge Design Automation API Webinars
 
 A new series of webinars on
 the [Forge Design Automation APIs for AutoCAD, Inventor, Revit and 3DS Max](https://forge.autodesk.com/en/docs/design-automation/v3/developers_guide/overview/) is
@@ -73,33 +76,29 @@ The recordings will be posted after so be sure to register to take advantage.
 
 All webinars begin at 8:00 AM Pacific Standard Time.
 
-- AutoCAD &ndash; December 5
-<br/>Design Automation API for AutoCAD on Forge
-<br/>**Albert Szilvasy**, software Architect will share details about the new and updated API.
+- <u>AutoCAD</u> &ndash; December 5
+<br/>Design Automation API for AutoCAD on Forge &ndash; <u>Albert Szilvasy</u>, software Architect will share details about the new and updated API.
 <br/>This webinar discusses how the Design Automation for AutoCAD empowers customers and partners to get more work done more quickly, reliably and collaboratively using cloud-based web services.
 We will demonstrate the ability to run scripts on your design files, leveraging the scale of the Forge Platform to automate repetitive tasks.
-<br/>[Register](https://autodesk.zoom.us/webinar/register/WN_n-yZWaSNSW-OIMJRDdJBZw)
-- Revit &ndash; December 10
-<br/>Design Automation API for REVIT on Forge
-<br/>**Sasha Crotty**, Senior Product Manager, Revit Platform & Services to share updates on this API.
+&ndash; [Register](https://autodesk.zoom.us/webinar/register/WN_n-yZWaSNSW-OIMJRDdJBZw)
+- <u>Revit</u> &ndash; December 10
+<br/>Design Automation API for REVIT on Forge &ndash; <u>Sasha Crotty</u>, Senior Product Manager, Revit Platform & Services to share updates on this API.
 <br/>This webinar discusses how the Design Automation for Revit empowers customers and partners to get more work done more quickly, reliably and collaboratively using cloud-based web services.
-We will demonstrate how you can automate your most common, manual, and error-prone work to improve responsiveness and free up your time so you can focus on more valuable work.
-<br/>[Register](https://autodesk.zoom.us/webinar/register/WN_50PU3thnSfC8m-Rh2PE2Ag)
-- Inventor &ndash; December 11
-<br/>Design Automation API for Inventor on Forge
-<br/>**Andrew Akenson**, software Architect will shares details about the new and updated APIs added to the Design Automation for Inventor on Forge.
+We will demonstrate how you can automate your most common, manual, and error-prone work to improve responsiveness and free up your time so you can focus on more valuable work. 
+&ndash; [Register](https://autodesk.zoom.us/webinar/register/WN_50PU3thnSfC8m-Rh2PE2Ag)
+- <u>Inventor</u> &ndash; December 11
+<br/>Design Automation API for Inventor on Forge &ndash; <u>Andrew Akenson</u>, software Architect will shares details about the new and updated APIs added to the Design Automation for Inventor on Forge.
 <br/>This webinar discusses how the Design Automation for Inventor empowers customers and partners to get more work done more quickly, reliably and collaboratively using cloud-based web services.
 We will demonstrate how you can automate your most common, manual, and error-prone work to improve responsiveness and free up your time so you can focus on more valuable work.
-<br/>[Register](https://autodesk.zoom.us/webinar/register/WN_8poFofy4QWCfq0ciL0AYjg)
-- 3DS Max &ndash; December 12
-<br/>Design Automation API for 3ds Max on Forge
-<br/>**Kevin Vandecar**, Developer Advocate on the Forge Partner Development team will share details about the newly launched Design Automation API for 3ds Max on Forge.
+&ndash; [Register](https://autodesk.zoom.us/webinar/register/WN_8poFofy4QWCfq0ciL0AYjg)
+- <u>3DS Max</u> &ndash; December 12
+<br/>Design Automation API for 3ds Max on Forge &ndash; <u>Kevin Vandecar</u>, Developer Advocate on the Forge Partner Development team will share details about the newly launched Design Automation API for 3ds Max on Forge.
 <br/>In this webinar, we will discuss how the Design Automation for 3ds Max empowers customers and partners to get more work done more quickly, reliably and collaboratively using cloud-based web services.
 Using automation routines, you can build custom solutions using 3ds Max in the cloud.
 No local resources are needed, so it could be a commercial website/configurator type webapp, or it could be a pipeline automation that run from your in-house tools.
 The sky (or rather the cloud) is the limit.
 We will demonstrate how you can easily automate common workflows in 3ds Max.
-<br/>[Register](https://autodesk.zoom.us/webinar/register/WN_7jTFtqz3Tte76LswrUACvw)
+&ndash; [Register](https://autodesk.zoom.us/webinar/register/WN_7jTFtqz3Tte76LswrUACvw)
 
 
 ####<a name="3"></a> Stacking Two 24x24 Ribbon Items 
@@ -108,7 +107,7 @@ Jameson Nyp, BIM Manager and IS Director at [Telios Engineering](https://teliosp
 his [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [24x24 StackedItems](https://forums.autodesk.com/t5/revit-api-forum/24x24-stackeditems/m-p/9168470):
 
-**Qutestion:** This may be an easy one, but so far I am struggling to find anything specific about it.
+**Question:** This may be an easy one, but so far I am struggling to find anything specific about it.
 
 How do you make a `StackedItem` where the icons are 24x24 when there are only 2 in the stack?
 
@@ -118,7 +117,7 @@ It seems like it should be possible, as it is used multiple times in the modify 
 <img src="img/modify_tab_icon_sizes.png" alt="Modify tab icon sizes" width="246"> <!--246-->
 </center>
 
-I have been able to set the `ShowText` property to false to get the 3 stacked icons, but when I use the same methodology with the 2 icon stack, it remains 16x16, regardless of the icon resolution.
+I have been able to set the `ShowText` property to false to get the 3 stacked icons, but when I use the same methodology with the 2-icon stack, it remains 16x16, regardless of the icon resolution.
 
 I tried to obtain and change the button's height and width, minWidth and minHeight through the Autodesk.Window.RibbonItem object to no avail.
 
@@ -128,7 +127,7 @@ Has anyone had any success in creating these icons?
 
 In order to display the button at the 24x24 size, the Autodesk.Windows.RibbonItem.Size needs to be manually set to Autodesk.Windows.RibbonItemSize.Large enum and a 24x24 icon needs to be set to the button's `LargeImage` property.
 
-Here is a code samnple:
+Here is a code sample:
 
 <pre class="code">
 <span style="color:blue;">using</span>&nbsp;Autodesk.Revit.UI;
@@ -309,7 +308,7 @@ Solution: reinitialize the collector in every pass:
 &nbsp;&nbsp;}
 </pre>
 
-Many thanks to Fair59 for yet another valuable solution.
+Many thanks to Fair59 for yet another invaluable hint.
 
 By the way, you might also want
 to [simplify your transaction handling by wrapping it in a `using` statement](https://thebuildingcoder.typepad.com/blog/2012/04/using-using-automagically-disposes-and-rolls-back.html).
@@ -321,7 +320,7 @@ a [material assets collector for appearance, structural (physical) and thermal](
 ####<a name="5"></a> Use CreateReferenceInLink to Select a Face in a Linked File
 
 Back in 2012, we discussed a pretty convoluted solution 
-for [Selecting a Face in a Linked File](https://thebuildingcoder.typepad.com/blog/2012/05/selecting-a-face-in-a-linked-file.html#comment-4704876157}.
+for [selecting a face in a linked file](https://thebuildingcoder.typepad.com/blog/2012/05/selecting-a-face-in-a-linked-file.html#comment-4704876157).
 
 Joshua Lumley added a [comment](https://thebuildingcoder.typepad.com/blog/2012/05/selecting-a-face-in-a-linked-file.html#comment-4704877758) to
 that old po0st, pointing out that:
