@@ -274,3 +274,55 @@ However, I also wonder whether you need any transaction at all for this read-onl
 This misunderstanding caused a similar initial problem in another recent case involving 
 a [material assets collector for appearance, structural (physical) and thermal](https://forums.autodesk.com/t5/revit-api-forum/material-assets-collector-appearance-structural-physical-amp/m-p/7256944).
 
+####<a name="5"></a> CreateReferenceInLink Simplifies Selecting a Face in a Linked File
+
+Back in 2012, we discussed a pretty convoluted solution 
+for [Selecting a Face in a Linked File](https://thebuildingcoder.typepad.com/blog/2012/05/selecting-a-face-in-a-linked-file.html#comment-4704876157}.
+
+Joshua Lumley added a [comment](https://thebuildingcoder.typepad.com/blog/2012/05/selecting-a-face-in-a-linked-file.html#comment-4704877758) to
+that old po0st, pointing out that:
+
+> The `CreateReferenceInLink` was added after that discussion, in Revit 2014.
+
+> To select any face anywhere, all you need is this:
+
+<pre class="code">
+public static Face SelectFace(UIApplication uiapp)
+{
+Document doc = uiapp.ActiveUIDocument.Document;
+
+IEnumerable<document> doc2 = GetLinkedDocuments(doc);
+
+Autodesk.Revit.UI.Selection.Selection sel = uiapp.ActiveUIDocument.Selection;
+
+Reference pickedRef = sel.PickObject(Autodesk.Revit.UI.Selection.ObjectType.PointOnElement, "Please select a Face");
+
+Element elem = doc.GetElement(pickedRef.ElementId);
+
+Type et = elem.GetType();
+
+if (typeof(RevitLinkType) == et || typeof(RevitLinkInstance) == et || typeof(Instance) == et)
+{
+foreach (Document d in doc2)
+{
+if (elem.Name.Contains(d. Title))
+{
+Reference pickedRefInLink = pickedRef.CreateReferenceInLink();
+
+Element myElement = d.GetElement(pickedRefInLink.ElementId);
+
+Face myGeometryObject = myElement.GetGeometryObjectFromReference(pickedRefInLink) as Face;
+return myGeometryObject;
+}
+}
+} else
+{
+Element myElement = doc.GetElement(pickedRef.ElementId);
+
+Face myGeometryObject = myElement.GetGeometryObjectFromReference(pickedRef) as Face;
+
+return myGeometryObject;
+}
+return null;
+}
+</pre>
