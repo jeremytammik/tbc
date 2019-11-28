@@ -323,7 +323,7 @@ Back in 2012, we discussed a pretty convoluted solution
 for [selecting a face in a linked file](https://thebuildingcoder.typepad.com/blog/2012/05/selecting-a-face-in-a-linked-file.html#comment-4704876157).
 
 Joshua Lumley added a [comment](https://thebuildingcoder.typepad.com/blog/2012/05/selecting-a-face-in-a-linked-file.html#comment-4704877758) to
-that old po0st, pointing out that:
+that old post, pointing out that:
 
 > The `CreateReferenceInLink` was added after that discussion, in Revit 2014.
 
