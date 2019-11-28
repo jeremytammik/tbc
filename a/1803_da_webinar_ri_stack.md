@@ -22,7 +22,7 @@ twitter:
   https://forums.autodesk.com/t5/revit-api-forum/collection-of-elements-created-using-elementworksetfilter-giving/m-p/9164018
   This misunderstanding caused a similar problem in another recent case...
 
-The ultimatively painless introduction to the Forge Design Automation API, a solution for creating two stacked ribbon items, reinitialising filtered element collectors and picking a face in a linked file using the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/pickfaceinlink
+Painless introduction to Forge Design Automation API, creating two stacked ribbon items, reinitialising filtered element collectors and picking a face in a linked file using the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/pickfaceinlink
 
 The ultimatively painless introduction to the Forge Design Automation API, a solution for creating two stacked ribbon items, reinitialising filtered element collectors and picking a face in a linked file
 &ndash; Forge Design Automation API webinars
@@ -32,6 +32,14 @@ The ultimatively painless introduction to the Forge Design Automation API, a sol
 
 linkedin:
 
+Painless introduction to Forge Design Automation API, creating two stacked ribbon items, reinitialising filtered element collectors and picking a face in a linked file using the #RevitAPI
+
+http://bit.ly/pickfaceinlink
+ 
+- Forge Design Automation API webinars
+- Stacking two 24x24 ribbon items
+- Reinitialising the filtered element collector
+- Use CreateReferenceInLink to select a face in a linked file...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
