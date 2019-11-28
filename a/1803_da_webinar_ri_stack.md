@@ -49,6 +49,7 @@ In either case, the tip on reinitialising a filtered element collector before re
 - [Forge Design Automation API webinars](#2)
 - [Stacking two 24x24 ribbon items](#3)
 - [Reinitialising the filtered element collector](#4)
+- [Use `CreateReferenceInLink` to select a face in a linked file](#5)
 
 <center>
 <img src="img/da_for_air3.png" alt="Forge Design Automation API for AutoCAD, Inventor, Revit and 3DS Max" width="400"> <!--800-->
@@ -130,65 +131,88 @@ In order to display the button at the 24x24 size, the Autodesk.Windows.RibbonIte
 Here is a code samnple:
 
 <pre class="code">
-using Autodesk.Revit.UI;
-using Autodesk.Windows;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Windows.Media.Imaging;
-using YourCustomUtilityLibrary;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Revit.UI;
+<span style="color:blue;">using</span>&nbsp;Autodesk.Windows;
+<span style="color:blue;">using</span>&nbsp;System.Collections.Generic;
+<span style="color:blue;">using</span>&nbsp;System.IO;
+<span style="color:blue;">using</span>&nbsp;System.Reflection;
+<span style="color:blue;">using</span>&nbsp;System.Windows.Media.Imaging;
+<span style="color:blue;">using</span>&nbsp;YourCustomUtilityLibrary;
  
-namespace ReallyCoolAddin
+<span style="color:blue;">namespace</span>&nbsp;ReallyCoolAddin
 {
-  public class StackedButton
-  {
-    public IList<Autodesk.Revit.RibbonItem> Create(RibbonPanel ribbonPanel)
-    {
-      // Get Assembly
-      Assembly assembly = Assembly.GetExecutingAssembly();
-      string assemblyLocation = assembly.Location;
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">StackedButton</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">IList</span>&lt;Autodesk.Revit.RibbonItem&gt;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create(&nbsp;<span style="color:#2b91af;">RibbonPanel</span>&nbsp;ribbonPanel&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Get&nbsp;Assembly</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Assembly</span>&nbsp;assembly&nbsp;=&nbsp;<span style="color:#2b91af;">Assembly</span>.GetExecutingAssembly();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;assemblyLocation&nbsp;=&nbsp;assembly.Location;
  
-      // Get DLL Location
-      string executableLocation = Path.GetDirectoryName(assemblyLocation);
-      string dllLocationTest = Path.Combine(executableLocation, "TestDLLName.dll");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Get&nbsp;DLL&nbsp;Location</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;executableLocation&nbsp;=&nbsp;<span style="color:#2b91af;">Path</span>.GetDirectoryName(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assemblyLocation&nbsp;);
  
-      // Set Image
-      BitmapSource pb1Image = UTILImage.GetEmbeddedImage(assembly, "Resources.16x16_Button1.ico");
-      BitmapSource pb2Image = UTILImage.GetEmbeddedImage(assembly, "Resources.16x16_Button2.ico");
-      BitmapSource pb1LargeImage = UTILImage.GetEmbeddedImage(assembly, "Resources.24x24_Button1.ico");
-      BitmapSource pb2LargeImage = UTILImage.GetEmbeddedImage(assembly, "Resources.24x24_Button2.ico");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;dllLocationTest&nbsp;=&nbsp;<span style="color:#2b91af;">Path</span>.Combine(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;executableLocation,&nbsp;<span style="color:#a31515;">&quot;TestDLLName.dll&quot;</span>&nbsp;);
  
-      // Set Button Name
-      string buttonName1 = "ButtonTest1";
-      string buttonName2 = "ButtonTest2";
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Set&nbsp;Image</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BitmapSource</span>&nbsp;pb1Image&nbsp;=&nbsp;UTILImage.GetEmbeddedImage(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assembly,&nbsp;<span style="color:#a31515;">&quot;Resources.16x16_Button1.ico&quot;</span>&nbsp;);
  
-      // Create push buttons
-      PushButtonData buttondata1 = new PushButtonData(buttonName1, buttonTextTest, dllLocationTest, "Command1");
-      buttondata1.Image = pb1Image;
-      buttondata1.LargeImage = pb1LargeImage;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BitmapSource</span>&nbsp;pb2Image&nbsp;=&nbsp;UTILImage.GetEmbeddedImage(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assembly,&nbsp;<span style="color:#a31515;">&quot;Resources.16x16_Button2.ico&quot;</span>&nbsp;);
  
-      PushButtonData buttondata2 = new PushButtonData(buttonName2, buttonTextTest, dllLocationTest, "Command2");
-      buttondata2.Image = pb2Image;
-      buttondata2.LargeImage = pb2LargeImage;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BitmapSource</span>&nbsp;pb1LargeImage&nbsp;=&nbsp;UTILImage.GetEmbeddedImage(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assembly,&nbsp;<span style="color:#a31515;">&quot;Resources.24x24_Button1.ico&quot;</span>&nbsp;);
  
-      // Create StackedItem
-      IList<Autodesk.Revit.RibbonItem> ribbonItem = ribbonPanel.AddStackedItems(buttondata1, buttondata2);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BitmapSource</span>&nbsp;pb2LargeImage&nbsp;=&nbsp;UTILImage.GetEmbeddedImage(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assembly,&nbsp;<span style="color:#a31515;">&quot;Resources.24x24_Button2.ico&quot;</span>&nbsp;);
  
-      // Find Autodes.Windows.RibbonItems
-      UTILRibbonItem utilRibbon = new UTILRibbonItem();
-      var btnTest1 = utilRibbon.getButton("Tab", "Panel", buttonName1);
-      var btnTest2 = utilRibbon.getButton("Tab", "Panel", buttonName2);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Set&nbsp;Button&nbsp;Name</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;buttonName1&nbsp;=&nbsp;<span style="color:#a31515;">&quot;ButtonTest1&quot;</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;buttonName2&nbsp;=&nbsp;<span style="color:#a31515;">&quot;ButtonTest2&quot;</span>;
  
-      // Set Size and Text Visibility
-      btnTest1.Size = RibbonItemSize.Large;
-      btnTest1.ShowText = false;
-      btnTest2.Size = RibbonItemSize.Large;
-      btnTest2.ShowText = false;
-      
-      // Return StackedItem
-      return ribbonItem;
-    }
-  }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Create&nbsp;push&nbsp;buttons</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">PushButtonData</span>&nbsp;buttondata1&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">PushButtonData</span>(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;buttonName1,&nbsp;buttonTextTest,&nbsp;dllLocationTest,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Command1&quot;</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;buttondata1.Image&nbsp;=&nbsp;pb1Image;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;buttondata1.LargeImage&nbsp;=&nbsp;pb1LargeImage;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">PushButtonData</span>&nbsp;buttondata2&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">PushButtonData</span>(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;buttonName2,&nbsp;buttonTextTest,&nbsp;dllLocationTest,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Command2&quot;</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;buttondata2.Image&nbsp;=&nbsp;pb2Image;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;buttondata2.LargeImage&nbsp;=&nbsp;pb2LargeImage;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Create&nbsp;StackedItem</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">IList</span>&lt;Autodesk.Revit.RibbonItem&gt;&nbsp;ribbonItem&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;ribbonPanel.AddStackedItems(&nbsp;buttondata1,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;buttondata2&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Find&nbsp;Autodes.Windows.RibbonItems</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UTILRibbonItem&nbsp;utilRibbon&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;UTILRibbonItem();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;btnTest1&nbsp;=&nbsp;utilRibbon.getButton(&nbsp;<span style="color:#a31515;">&quot;Tab&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Panel&quot;</span>,&nbsp;buttonName1&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;btnTest2&nbsp;=&nbsp;utilRibbon.getButton(&nbsp;<span style="color:#a31515;">&quot;Tab&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Panel&quot;</span>,&nbsp;buttonName2&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Set&nbsp;Size&nbsp;and&nbsp;Text&nbsp;Visibility</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;btnTest1.Size&nbsp;=&nbsp;<span style="color:#2b91af;">RibbonItemSize</span>.Large;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;btnTest1.ShowText&nbsp;=&nbsp;<span style="color:blue;">false</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;btnTest2.Size&nbsp;=&nbsp;<span style="color:#2b91af;">RibbonItemSize</span>.Large;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;btnTest2.ShowText&nbsp;=&nbsp;<span style="color:blue;">false</span>;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Return&nbsp;StackedItem</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;ribbonItem;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
 }
 </pre>
 
@@ -210,38 +234,50 @@ If they are mutually exclusive, you will get zero results.
 Here is my code:
 
 <pre class="code">
-  FilteredElementCollector fec = new FilteredElementCollector(doc);
-  FilteredWorksetCollector fwc = new FilteredWorksetCollector(doc);
-  fwc.OfKind(WorksetKind.UserWorkset);
-
-  try
-  { 
-    string msg = "";
-    int count = 0;
-    Transaction t = new Transaction(doc);
-    t.Start("Check Empty Worksets");
-    foreach (Workset w in fwc)
-    {
-      ElementWorksetFilter ewf = new ElementWorksetFilter(w.Id, false);
-      ICollection<ElementId> elemIds = fec.WherePasses(ewf).ToElementIds();
-      int foundElems = elemIds.Count;
-      TaskDialog.Show("Elements:", w.Name + ": " + foundElems.ToString());
-      if(foundElems == 0)
-      {
-        count++;
-        msg += count.ToString() + ". " + w.Name + "\n";
-      }
-    }
-    if (count == 0) msg = "None";
-    TaskDialog.Show("Empty Worksets: ", msg);
-
-    t.Commit();
-    t.Dispose();
-  }
-  catch(Exception e)
-  {
-    TaskDialog.Show("Error", e.ToString());
-  }
+&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;fec&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">FilteredWorksetCollector</span>&nbsp;fwc&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredWorksetCollector</span>(&nbsp;doc&nbsp;);
+ 
+&nbsp;&nbsp;fwc.OfKind(&nbsp;<span style="color:#2b91af;">WorksetKind</span>.UserWorkset&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:blue;">try</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;msg&nbsp;=&nbsp;<span style="color:#a31515;">&quot;&quot;</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;count&nbsp;=&nbsp;0;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;t&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;t.Start(&nbsp;<span style="color:#a31515;">&quot;Check&nbsp;Empty&nbsp;Worksets&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Workset</span>&nbsp;w&nbsp;<span style="color:blue;">in</span>&nbsp;fwc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementWorksetFilter</span>&nbsp;ewf&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementWorksetFilter</span>(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;w.Id,&nbsp;<span style="color:blue;">false</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">ElementId</span>&gt;&nbsp;elemIds&nbsp;=&nbsp;fec.WherePasses(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ewf&nbsp;).ToElementIds();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;foundElems&nbsp;=&nbsp;elemIds.Count;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;Elements:&quot;</span>,&nbsp;w.Name&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;<span style="color:#a31515;">&quot;:&nbsp;&quot;</span>&nbsp;+&nbsp;foundElems.ToString()&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;foundElems&nbsp;==&nbsp;0&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count++;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;msg&nbsp;+=&nbsp;count.ToString()&nbsp;+&nbsp;<span style="color:#a31515;">&quot;.&nbsp;&quot;</span>&nbsp;+&nbsp;w.Name&nbsp;+&nbsp;<span style="color:#a31515;">&quot;\n&quot;</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;count&nbsp;==&nbsp;0&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;msg&nbsp;=&nbsp;<span style="color:#a31515;">&quot;None&quot;</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;Empty&nbsp;Worksets:&nbsp;&quot;</span>,&nbsp;msg&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;t.Commit();
+&nbsp;&nbsp;&nbsp;&nbsp;t.Dispose();
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">catch</span>(&nbsp;<span style="color:#2b91af;">Exception</span>&nbsp;e&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;Error&quot;</span>,&nbsp;e.ToString()&nbsp;);
+&nbsp;&nbsp;}
 </pre>
 
 **Answer:** A `FilteredElementCollector` isn't a static variable, but a dynamic collection.
@@ -255,14 +291,22 @@ All those elements aren't part of the second workset (2nd pass) and therefore th
 Solution: reinitialize the collector in every pass:
 
 <pre class="code">
-foreach (Workset w in fwc)
-{
-	ElementWorksetFilter ewf = new ElementWorksetFilter(w.Id, false);
-	ICollection<ElementId> elemIds = new FilteredElementCollector(doc).WherePasses(ewf).ToElementIds();
-	int foundElems = elemIds.Count;
-	count++;
-	msg += foundElems.ToString() + ". " + w.Name + "\n";
-}
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Workset</span>&nbsp;w&nbsp;<span style="color:blue;">in</span>&nbsp;fwc&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementWorksetFilter</span>&nbsp;ewf&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementWorksetFilter</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;w.Id,&nbsp;<span style="color:blue;">false</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">ElementId</span>&gt;&nbsp;elemIds&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WherePasses(&nbsp;ewf&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.ToElementIds();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;foundElems&nbsp;=&nbsp;elemIds.Count;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;count++;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;msg&nbsp;+=&nbsp;foundElems.ToString()&nbsp;+&nbsp;<span style="color:#a31515;">&quot;.&nbsp;&quot;</span>&nbsp;+&nbsp;w.Name&nbsp;+&nbsp;<span style="color:#a31515;">&quot;\n&quot;</span>;
+&nbsp;&nbsp;}
 </pre>
 
 Many thanks to Fair59 for yet another valuable solution.
@@ -274,7 +318,7 @@ However, I also wonder whether you need any transaction at all for this read-onl
 This misunderstanding caused a similar initial problem in another recent case involving 
 a [material assets collector for appearance, structural (physical) and thermal](https://forums.autodesk.com/t5/revit-api-forum/material-assets-collector-appearance-structural-physical-amp/m-p/7256944).
 
-####<a name="5"></a> CreateReferenceInLink Simplifies Selecting a Face in a Linked File
+####<a name="5"></a> Use CreateReferenceInLink to Select a Face in a Linked File
 
 Back in 2012, we discussed a pretty convoluted solution 
 for [Selecting a Face in a Linked File](https://thebuildingcoder.typepad.com/blog/2012/05/selecting-a-face-in-a-linked-file.html#comment-4704876157}.
@@ -287,42 +331,59 @@ that old po0st, pointing out that:
 > To select any face anywhere, all you need is this:
 
 <pre class="code">
-public static Face SelectFace(UIApplication uiapp)
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">Face</span>&nbsp;SelectFace(&nbsp;<span style="color:#2b91af;">UIApplication</span>&nbsp;uiapp&nbsp;)
 {
-Document doc = uiapp.ActiveUIDocument.Document;
-
-IEnumerable<document> doc2 = GetLinkedDocuments(doc);
-
-Autodesk.Revit.UI.Selection.Selection sel = uiapp.ActiveUIDocument.Selection;
-
-Reference pickedRef = sel.PickObject(Autodesk.Revit.UI.Selection.ObjectType.PointOnElement, "Please select a Face");
-
-Element elem = doc.GetElement(pickedRef.ElementId);
-
-Type et = elem.GetType();
-
-if (typeof(RevitLinkType) == et || typeof(RevitLinkInstance) == et || typeof(Instance) == et)
-{
-foreach (Document d in doc2)
-{
-if (elem.Name.Contains(d. Title))
-{
-Reference pickedRefInLink = pickedRef.CreateReferenceInLink();
-
-Element myElement = d.GetElement(pickedRefInLink.ElementId);
-
-Face myGeometryObject = myElement.GetGeometryObjectFromReference(pickedRefInLink) as Face;
-return myGeometryObject;
-}
-}
-} else
-{
-Element myElement = doc.GetElement(pickedRef.ElementId);
-
-Face myGeometryObject = myElement.GetGeometryObjectFromReference(pickedRef) as Face;
-
-return myGeometryObject;
-}
-return null;
+&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;uiapp.ActiveUIDocument.Document;
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">Document</span>&gt;&nbsp;doc2&nbsp;=&nbsp;GetLinkedDocuments(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;doc&nbsp;);
+ 
+&nbsp;&nbsp;Autodesk.Revit.UI.Selection.<span style="color:#2b91af;">Selection</span>&nbsp;sel&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;uiapp.ActiveUIDocument.Selection;
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">Reference</span>&nbsp;pickedRef&nbsp;=&nbsp;sel.PickObject(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;Autodesk.Revit.UI.Selection.<span style="color:#2b91af;">ObjectType</span>.PointOnElement,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Please&nbsp;select&nbsp;a&nbsp;Face&quot;</span>&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;elem&nbsp;=&nbsp;doc.GetElement(&nbsp;pickedRef.ElementId&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">Type</span>&nbsp;et&nbsp;=&nbsp;elem.GetType();
+ 
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">RevitLinkType</span>&nbsp;)&nbsp;==&nbsp;et&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;||&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">RevitLinkInstance</span>&nbsp;)&nbsp;==&nbsp;et&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;||&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">Instance</span>&nbsp;)&nbsp;==&nbsp;et&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;d&nbsp;<span style="color:blue;">in</span>&nbsp;doc2&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;elem.Name.Contains(&nbsp;d.Title&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Reference</span>&nbsp;pickedRefInLink&nbsp;=&nbsp;pickedRef
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.CreateReferenceInLink();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;myElement&nbsp;=&nbsp;d.GetElement(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pickedRefInLink.ElementId&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Face</span>&nbsp;myGeometryObject&nbsp;=&nbsp;myElement
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetGeometryObjectFromReference(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pickedRefInLink&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Face</span>;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;myGeometryObject;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">else</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;myElement&nbsp;=&nbsp;doc.GetElement(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pickedRef.ElementId&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Face</span>&nbsp;myGeometryObject&nbsp;=&nbsp;myElement
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetGeometryObjectFromReference(&nbsp;pickedRef&nbsp;)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Face</span>;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;myGeometryObject;
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">null</span>;
 }
 </pre>
+
+Many thanks to Joshua for this important update.
