@@ -66,10 +66,6 @@ In either case, the tip on reinitialising a filtered element collector before re
 <img src="img/da_for_air3.png" alt="Forge Design Automation API for AutoCAD, Inventor, Revit and 3DS Max" width="400"> <!--800-->
 </center>
 
-<pre class="code">
-</pre>
-
-
 ####<a name="2"></a> Forge Design Automation API Webinars
 
 A new series of webinars on
