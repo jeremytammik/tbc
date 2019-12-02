@@ -72,7 +72,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 There seem to be some issues handling Cyrillic characters in lookup tables, as pointed out in the thread 
 on [Russian letters doesn't export in lookup tables](https://forums.autodesk.com/t5/revit-api-forum/russian-letters-doesn-t-export-in-lookup-tables/m-p/9116678).
-However, hasppily, at least a partial solution can be found:
+Happily, however, at least a partial solution can be found:
 
 > ... it works. Now, when he switches to the Russian keyboard, he can insert a CSV to a family with Cyrillic text with no loss.
 
@@ -99,8 +99,8 @@ to [combine connected edge segments into one continuous line](https://forums.aut
 When I do so, depending on the original geometry that created the solids, these loop segments can be composed of 2 or more subsegments to form an edge, cf., the orange and red semi-segments below:
 
 <center>
-<img src="img/edgesegment.png" alt="Two semi segments forming a edge" width="500"> <!--680-->
-<p style="font-size: 80%; font-style:italic">Two semi segments forming a edge</p>
+<img src="img/edgesegment.png" alt="Two semi segments forming an edge" width="500"> <!--680-->
+<p style="font-size: 80%; font-style:italic">Two semi segments forming an edge</p>
 </center>
 
 How can I identify and retrieve a continuous line for each edge?
@@ -171,46 +171,44 @@ def endPoint(curve):
     return curve.GetEndPoint(1)
 #Groups lines to be joined in sublists with the curves that have to be joined    
 def joinCurves(list):
-	comp=[]
-	re=[]
-	unjoined = []
-	for c in curves:
-		c = c.ToRevitType()
-		match = False
-		for co in comp:
-			if startPoint(c).IsAlmostEqualTo(startPoint(co)) and endPoint(c).IsAlmostEqualTo(endPoint(co)):
-				match = True
-		if match:
-			continue
-		else:
-			comp.append(c)			
-			joined = []
-			for c2 in curves:
-				
-				match = False
-				c2 = c2.ToRevitType()
-				for co in comp:
-					if startPoint(c2).IsAlmostEqualTo(startPoint(co)) and endPoint(c2).IsAlmostEqualTo(endPoint(co)):
-						match = True
-				if match:
-					continue
-				else:
-					if c2.Intersect(c) == SetComparisonResult.Disjoint:
-						continue
-					elif c2.Intersect(c) ==  SetComparisonResult.Equal:
-						continue
-					elif c2.Intersect(c) == SetComparisonResult.Subset:
-						comp.append(c2)
-						joined.append(c2.ToProtoType())
-		joined.append(c.ToProtoType())
-		re.append(joined)
-		
-	return re
-		
+  comp=[]
+  re=[]
+  unjoined = []
+  for c in curves:
+    c = c.ToRevitType()
+    match = False
+    for co in comp:
+      if startPoint(c).IsAlmostEqualTo(startPoint(co)) and endPoint(c).IsAlmostEqualTo(endPoint(co)):
+        match = True
+    if match:
+      continue
+    else:
+      comp.append(c)      
+      joined = []
+      for c2 in curves:
+        
+        match = False
+        c2 = c2.ToRevitType()
+        for co in comp:
+          if startPoint(c2).IsAlmostEqualTo(startPoint(co)) and endPoint(c2).IsAlmostEqualTo(endPoint(co)):
+            match = True
+        if match:
+          continue
+        else:
+          if c2.Intersect(c) == SetComparisonResult.Disjoint:
+            continue
+          elif c2.Intersect(c) ==  SetComparisonResult.Equal:
+            continue
+          elif c2.Intersect(c) == SetComparisonResult.Subset:
+            comp.append(c2)
+            joined.append(c2.ToProtoType())
+    joined.append(c.ToProtoType())
+    re.append(joined)
+
+  return re
+
 result = joinCurves(curves)
 OUT = result
 </pre>
 
 Many thanks to Lucas for raising and solving this interesting task.
-
-
