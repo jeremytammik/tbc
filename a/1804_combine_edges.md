@@ -29,8 +29,13 @@ twitter:
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+Topics to start this week
+&ndash; Why SVG?
+&ndash; Internet privacy
+&ndash; Pointless meetings research
+&ndash; Cyrillic characters in lookup tables
+&ndash; Moving a grid
+&ndash; Combining edges...
 
 linkedin:
 
@@ -56,11 +61,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> SVG, Internet Privacy and Research on Pointless Meetings
 
-Here are a couple of recent articles I found interesting pointed out in
+Here are a couple of recent articles I found interesting, pointed out in
 the [freecodecamp](https://www.freecodecamp.org) newsletter:
 
 - [Why you should use SVG images: how to animate your SVGs and make them lightning fast](https://www.freecodecamp.org/news/a-fresh-perspective-at-why-when-and-how-to-use-svg/)
-- [The Best Personal Privacy and Security Tools for 2019](https://www.freecodecamp.org/news/privacy-tools)
+- [The best personal privacy and security tools for 2019](https://www.freecodecamp.org/news/privacy-tools)
 - [Pointless work meetings are really a form of therapy](https://www.bbc.com/news/education-50418317)
 
 > "To err is human. But to really foul things up, you need a computer." &ndash; Paul Ehrlich
@@ -78,7 +83,7 @@ Happily, however, at least a partial solution can be found:
 
 ####<a name="4"></a> Moving a Grid
 
-Matt Taylor very kindly pointed out the solution in an old thread
+Matt Taylor very kindly pointed out the solution to another old thread
 on [moving a grid](https://forums.autodesk.com/t5/revit-api-forum/moving-a-grid/m-p/9115841):
 
 > I would guess that the grid cannot be moved because it doesn't have a leader.
@@ -91,7 +96,7 @@ Seeing the code, I can confirm that my guess was correct.
 
 ####<a name="5"></a> Combining Edges
 
-Lucas Moreira shared a more complex solution
+To wrap it up, Lucas Moreira shared a more complex solution
 to [combine connected edge segments into one continuous line](https://forums.autodesk.com/t5/revit-api-forum/combine-connected-edge-segments-into-one-continuous-line/m-p/9126098):
 
 **Question:** I am fetching the edge loops of a face.

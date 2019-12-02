@@ -28,8 +28,13 @@ twitter:
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+Topics to start this week
+&ndash; Why SVG?
+&ndash; Internet privacy
+&ndash; Pointless meetings research
+&ndash; Cyrillic characters in lookup tables
+&ndash; Moving a grid
+&ndash; Combining edges...
 
 linkedin:
 
@@ -53,11 +58,11 @@ the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API d
 <li><a href="#5">Combining edges</a></li>
 </ul>
 <h4><a name="2"></a> SVG, Internet Privacy and Research on Pointless Meetings</h4>
-<p>Here are a couple of recent articles I found interesting pointed out in
+<p>Here are a couple of recent articles I found interesting, pointed out in
 the <a href="https://www.freecodecamp.org">freecodecamp</a> newsletter:</p>
 <ul>
 <li><a href="https://www.freecodecamp.org/news/a-fresh-perspective-at-why-when-and-how-to-use-svg/">Why you should use SVG images: how to animate your SVGs and make them lightning fast</a></li>
-<li><a href="https://www.freecodecamp.org/news/privacy-tools">The Best Personal Privacy and Security Tools for 2019</a></li>
+<li><a href="https://www.freecodecamp.org/news/privacy-tools">The best personal privacy and security tools for 2019</a></li>
 <li><a href="https://www.bbc.com/news/education-50418317">Pointless work meetings are really a form of therapy</a></li>
 </ul>
 <blockquote>
@@ -68,12 +73,12 @@ the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API d
 <h4><a name="3"></a> Cyrillic Characters in Lookup Tables</h4>
 <p>There seem to be some issues handling Cyrillic characters in lookup tables, as pointed out in the thread 
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/russian-letters-doesn-t-export-in-lookup-tables/m-p/9116678">Russian letters doesn't export in lookup tables</a>.
-However, hasppily, at least a partial solution can be found:</p>
+Happily, however, at least a partial solution can be found:</p>
 <blockquote>
 <p>... it works. Now, when he switches to the Russian keyboard, he can insert a CSV to a family with Cyrillic text with no loss.</p>
 </blockquote>
 <h4><a name="4"></a> Moving a Grid</h4>
-<p>Matt Taylor very kindly pointed out the solution in an old thread
+<p>Matt Taylor very kindly pointed out the solution to another old thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/moving-a-grid/m-p/9115841">moving a grid</a>:</p>
 <blockquote>
 <p>I would guess that the grid cannot be moved because it doesn't have a leader.
@@ -83,13 +88,13 @@ You'll also probably need to do a <code>document.Regenerate</code> afterwards, b
 Seeing the code, I can confirm that my guess was correct.</p>
 </blockquote>
 <h4><a name="5"></a> Combining Edges</h4>
-<p>Lucas Moreira shared a more complex solution
+<p>To wrap it up, Lucas Moreira shared a more complex solution
 to <a href="https://forums.autodesk.com/t5/revit-api-forum/combine-connected-edge-segments-into-one-continuous-line/m-p/9126098">combine connected edge segments into one continuous line</a>:</p>
 <p><strong>Question:</strong> I am fetching the edge loops of a face.</p>
 <p>When I do so, depending on the original geometry that created the solids, these loop segments can be composed of 2 or more subsegments to form an edge, cf., the orange and red semi-segments below:</p>
 <p><center>
-<img src="img/edgesegment.png" alt="Two semi segments forming a edge" width="500"> <!--680-->
-<p style="font-size: 80%; font-style:italic">Two semi segments forming a edge</p>
+<img src="img/edgesegment.png" alt="Two semi segments forming an edge" width="500"> <!--680-->
+<p style="font-size: 80%; font-style:italic">Two semi segments forming an edge</p>
 </center></p>
 <p>How can I identify and retrieve a continuous line for each edge?</p>
 <p>Is there a way I can do that recursively regardless of the number of segments forming the edge?</p>
@@ -150,41 +155,41 @@ def endPoint(curve):
     return curve.GetEndPoint(1)
 #Groups lines to be joined in sublists with the curves that have to be joined    
 def joinCurves(list):
-    comp=[]
-    re=[]
-    unjoined = []
-    for c in curves:
-        c = c.ToRevitType()
+  comp=[]
+  re=[]
+  unjoined = []
+  for c in curves:
+    c = c.ToRevitType()
+    match = False
+    for co in comp:
+      if startPoint(c).IsAlmostEqualTo(startPoint(co)) and endPoint(c).IsAlmostEqualTo(endPoint(co)):
+        match = True
+    if match:
+      continue
+    else:
+      comp.append(c)      
+      joined = []
+      for c2 in curves:
+
         match = False
+        c2 = c2.ToRevitType()
         for co in comp:
-            if startPoint(c).IsAlmostEqualTo(startPoint(co)) and endPoint(c).IsAlmostEqualTo(endPoint(co)):
-                match = True
+          if startPoint(c2).IsAlmostEqualTo(startPoint(co)) and endPoint(c2).IsAlmostEqualTo(endPoint(co)):
+            match = True
         if match:
-            continue
+          continue
         else:
-            comp.append(c)          
-            joined = []
-            for c2 in curves:
+          if c2.Intersect(c) == SetComparisonResult.Disjoint:
+            continue
+          elif c2.Intersect(c) ==  SetComparisonResult.Equal:
+            continue
+          elif c2.Intersect(c) == SetComparisonResult.Subset:
+            comp.append(c2)
+            joined.append(c2.ToProtoType())
+    joined.append(c.ToProtoType())
+    re.append(joined)
 
-                match = False
-                c2 = c2.ToRevitType()
-                for co in comp:
-                    if startPoint(c2).IsAlmostEqualTo(startPoint(co)) and endPoint(c2).IsAlmostEqualTo(endPoint(co)):
-                        match = True
-                if match:
-                    continue
-                else:
-                    if c2.Intersect(c) == SetComparisonResult.Disjoint:
-                        continue
-                    elif c2.Intersect(c) ==  SetComparisonResult.Equal:
-                        continue
-                    elif c2.Intersect(c) == SetComparisonResult.Subset:
-                        comp.append(c2)
-                        joined.append(c2.ToProtoType())
-        joined.append(c.ToProtoType())
-        re.append(joined)
-
-    return re
+  return re
 
 result = joinCurves(curves)
 OUT = result
