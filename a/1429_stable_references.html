@@ -403,3 +403,40 @@ his <a href="http://thebuildingcoder.typepad.com/blog/2016/04/stable-reference-s
 </pre>
 
 <p>Many thanks to Joshua for pointing it out!</p>
+<h4><a name="7"></a>Handle Element Category Override</h4>
+<p>Mustafa Khalil invested some research in this and added
+another <a href="https://thebuildingcoder.typepad.com/blog/2016/04/stable-reference-string-magic-voodoo.html#comment-4710182554">comment below</a>,
+explaining:</p>
+<p>I played with this for a while and was impressed with this detailed study.
+For some reason, however, it sometimes did not work for me.</p>
+<p>While cracking on every angle to find out why, I realized I should consider how the element is actually displayed in the current view.
+Meaning, I should not only rely on the <code>ViewDetail</code> of the current view, but I should also check if there is any ViewDetail category overridden as well.
+If there is no override to an element category, it will report <code>ViewDetailLevel.Undefined</code>.
+Then, it is trustworthy to select the ViewDetail of the current view.</p>
+<p>So, I considered the following resolution:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;view&nbsp;=&nbsp;doc.ActiveView;
+
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;overriddenCatView&nbsp;=&nbsp;view.GetCategoryOverrides(
+&nbsp;&nbsp;&nbsp;&nbsp;elem.Category.Id&nbsp;);
+
+&nbsp;&nbsp;op&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Options</span>()
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;DetailLevel&nbsp;=&nbsp;overriddenCatView.DetailLevel&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;==&nbsp;<span style="color:#2b91af;">ViewDetailLevel</span>.Undefined
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;?&nbsp;view.DetailLevel
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;overriddenCatView.DetailLevel,
+&nbsp;&nbsp;&nbsp;&nbsp;IncludeNonVisibleObjects&nbsp;=&nbsp;<span style="color:blue;">true</span>
+&nbsp;&nbsp;};
+</pre>
+
+<p>Instead of this:</p>
+<pre class="code">
+&nbsp;&nbsp;op&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Options</span>()
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;DetailLevel&nbsp;=&nbsp;m_doc.ActiveView.DetailLevel,
+&nbsp;&nbsp;&nbsp;&nbsp;IncludeNonVisibleObjects&nbsp;=&nbsp;<span style="color:blue;">true</span>
+&nbsp;&nbsp;};
+</pre>
+
+<p>Many thanks to Mustafa for his research and explanation!</p>
