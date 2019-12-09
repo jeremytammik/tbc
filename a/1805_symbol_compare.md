@@ -9,7 +9,7 @@
 
 twitter:
 
- in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/combiningedges
+Comparing Symbols and Comparison Operators in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/comparesymbol
 
 Family symbols, aka family types, should normally be relied on to be constant.
 However, since families and types can actually be edited at will, they are sometimes not.
