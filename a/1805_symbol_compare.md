@@ -11,6 +11,10 @@ twitter:
 
  in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/combiningedges
 
+Family symbols, aka family types, should normally be relied on to be constant.
+However, since families and types can actually be edited at will, they are sometimes not.
+Hence, the need to check and compare may arise...
+
 &ndash; 
 ...
 
@@ -25,35 +29,57 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Comparing Symbols
+### Comparing Symbols and Comparison Operators
+
+I am writing this in the train station, waiting for a train to Paris, to join the Forge accelerator there this week.
+
+Unfortunately, my originally booked train was cancelled due to the strikes currently taking place in France, and I am stranded here.
+
+Luckily, I was able to get a ticket for the single remaining train today, two hours later.
+
+Now I hope I will make it over there today.
+
+Once I arrive, if I arrive, I will probably start worrying about whether I will be able to get back at all...
+
+Anyway, returning to the Revit API:
+
+####<a name="2"></a> Comparing Family Types
 
 Family symbols, aka family types, should normally be relied on to be constant.
 
-However, since familes and types can actually be edited at will, they are sometimes not.
+However, since families and types can actually be edited at will, they are sometimes not.
 
-Hence, the need to check and compare.
+Hence, the need to check and compare may arise.
 
 **Question:** I have two different models for two different projects.
 
 How can I detect that a specific `FamilySymbol` is the same in both of them?
 
-Currently, I just compare the three `Name` properties of the `FamilySymbol` `Family` and `FamilyCategory`.
+Currently, I just compare the three `Name` properties of the `FamilySymbol`, `Family` and `FamilyCategory`.
 
-Is there a more reasonable way?
+Is there a better way?
 
-Apparently, as expected, the `FamilySymbol` has a different `UniqueId` and `Id` in the two projects.
+As one would expect, the `FamilySymbol` has different values for `UniqueId` and `Id` in the two projects.
 
-**Answer:** If you are doing this programmatically, the cleanest, easiest and most effective method is to implement a comparison operator, or, in .NET, a comparison class.
-
-In the comparison operator, you can compare absolutely anything you like.
-
-For instance, it definitely makes sense to compare the three properties you mention.
+**Answer:** In a perfect world, it would indeed be sufficient to compare the three properties you mention and nothing else.
 
 I would say category first, then family, then family symbol name.
 
-However, as you say, there may be differences between symbols, even if these three properties are identical.
+If they match, the symbols should be identical.
+
+However, in each project, it is theoretically possible for the user to edit and modify the underlying symbol.
+
+In that case, even if the names match, the underlying symbols may still differ.
+
+I assume this is what you would like to detect and rectify.
 
 To test that, you need to drill further down into other, more specific properties: everything that is of interest to you.
+
+####<a name="3"></a> Comparison Operators
+
+If you are doing this programmatically, the cleanest, easiest and most effective method is to implement a comparison operator or a .NET comparison class.
+
+In the comparison operator, you can compare absolutely anything you like.
 
 One important aspect of comparing objects is that you need to define a canonical form for them.
 
@@ -83,6 +109,8 @@ If you are only interested in solid geometry, you might compare simple incomplet
 
 Long ago, I
 suggested [defining your own key for comparison purposes](https://thebuildingcoder.typepad.com/blog/2012/03/great-ocean-road-and-creating-your-own-key.html#2).
+
+Furthermore, when comparing objects, .NET differentiates between equality operators and sorting comparison operators.
 
 Here is a simple `XyzEqualityComparer` that shows a pretty trivial equality comparison class for 3D points and vectors:
 
@@ -152,14 +180,14 @@ for [tracking element modification](https://thebuildingcoder.typepad.com/blog/20
 
 As you see, you start from the most basic property data types, e.g., int, double, string, and then build up further and further to achieve all you need.
 
-We recently discussed a more complex `IComparer` implementation for comparing column marks, `ColumnMarkComparer`, 
+We recently discussed a more complex `IComparer` implementation to compare column marks, `ColumnMarkComparer`, 
 for [replicating schedule sort order](https://thebuildingcoder.typepad.com/blog/2019/11/dll-conflicts-and-replicating-schedule-sort-order.html#4).
 
 That shows how you can concatenate any number of different comparisons for all the different properties of interest to get a finer and finer distinguishing capability.
 
-You need to decide exactly what differences may occur between the potentiaslly different family instances.
+You need to decide exactly what differences may occur between the potentially different family instances.
 
-With that in hand, you can implement a nice clean comparison operator for them and run that over all occurrernces in all projects to ensure that all the symbols really are identical if their category name, family name and type name match.
+With that in hand, you can implement a nice clean comparison operator for them and run that over all occurrences in all projects to ensure that all the symbols really are identical if their category name, family name and type name match.
 
 <center>
 <img src="img/cartographic_symbols.jpg" alt="Cartographic symbols" width="300"> <!--598-->
