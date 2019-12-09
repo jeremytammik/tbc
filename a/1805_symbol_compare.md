@@ -27,9 +27,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Comparing Symbols
 
-
-####<a name="2"></a> Comparing Family Symbols and Other Stuff
-
 Family symbols, aka family types, should normally be relied on to be constant.
 
 However, since familes and types can actually be edited at will, they are sometimes not.
@@ -162,26 +159,9 @@ That shows how you can concatenate any number of different comparisons for all t
 
 You need to decide exactly what differences may occur between the potentiaslly different family instances.
 
-With thast in hand, you can implement a nice clean comparison operator for them and run that over all occurrernces in all projects to ensure that all the symbols really are identical if their category name, family name and type name match.
-
-
-
-####<a name="3"></a> 
-
-####<a name="4"></a> 
-
-####<a name="5"></a> 
+With that in hand, you can implement a nice clean comparison operator for them and run that over all occurrernces in all projects to ensure that all the symbols really are identical if their category name, family name and type name match.
 
 <center>
-<img src="img/.png" alt="" width="100"> <!--680-->
-<p style="font-size: 80%; font-style:italic"></p>
+<img src="img/cartographic_symbols.jpg" alt="Cartographic symbols" width="300"> <!--598-->
+<p style="font-size: 80%; font-style:italic">Cartographic symbols</p>
 </center>
-
-**Answer:** Two steps:
-
-**Response:** 
-
-<pre class="code">
-</pre>
-
-Many thanks to  for raising and solving this interesting task.
