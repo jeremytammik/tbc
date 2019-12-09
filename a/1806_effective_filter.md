@@ -84,11 +84,11 @@ Stopping the collector at the first element:
       .FirstElement();
 </pre>
 
-Possible Speed improvement:
+Possible further speed improvement:
 
-- Select all ImportInstances
-- If it is not a DWG: exclude from collector in view-loop &rarr; no need for `category.Name` check in loop
-- Else: if DWG is ViewSpecific, i.e., is "2D annotation" in view &rarr; owner view contains DWG, can be added to `viewsWithCAD`, and can be excluded from view-loop
+- Select all `ImportInstance` elements
+- If it is not a DWG: exclude from collector in view-loop &rarr; no need for `category.Name` check
+- Else: if DWG is ViewSpecific, i.e., is "2D annotation" in view &rarr; `ownerview` contains DWG, can be added to `viewsWithCAD`, and can be excluded from view-loop
  
 <pre class="code">
   IEnumerable<ImportInstance> instances

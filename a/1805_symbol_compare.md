@@ -20,7 +20,7 @@ Hence, the need to check and compare may arise...
 
 linkedin:
 
-Comparing Symbols and Comparison Operators in the #RevitAPI
+Comparison operators and comparing symbols in the #RevitAPI
 
 http://bit.ly/comparesymbol
 
