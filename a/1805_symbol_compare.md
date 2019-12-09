@@ -20,6 +20,13 @@ Hence, the need to check and compare may arise...
 
 linkedin:
 
+Comparing Symbols and Comparison Operators in the #RevitAPI
+
+http://bit.ly/comparesymbol
+
+Family symbols, aka family types, should normally be relied on to be constant.
+However, since families and types can actually be edited at will, they are sometimes not.
+Hence, the need to check and compare may arise...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
