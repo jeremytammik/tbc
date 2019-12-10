@@ -7,6 +7,26 @@
 
 <!---
 
+- DA4R
+  New RVT->SVF Model Derivative parameter generates additional content, including rooms and spaces
+  https://forge.autodesk.com/blog/new-rvt-svf-model-derivative-parameter-generates-additional-content-including-rooms-and-spaces
+
+Run additional programs inside a WorkItem
+Get number of BIM 360 projects per user
+Working with 2D and 3D scenes and geometry in Forge Viewer
+Fast track your cross-platform React native Forge app with the Expo SDK
+How to convert your plugin to work with Design Automation API for AutoCAD
+Go semantic with Viewer-custom web component for Forge Viewer
+New RVT->SVF Model Derivative parameter generates additional content, including rooms and spaces
+Combining PointClouds and Revit models in Forge Viewer
+Switch to orthographic corner view
+Custom BIM 360 search with Elasticsearch
+Get volume and surface area in the Viewer
+Run command from an AutoCAD AppBundle
+Run iLogic Rule without AppBundle
+
+[View all samples](https://forge.autodesk.com/categories/code-samples)
+
 twitter:
 
  in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/combiningedges
@@ -25,45 +45,89 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Effective Filtered Element Collector
+### DA4R Rooms and Effective Filtered Element Collectors
+
+I successfully made it from Switzerland to Paris by train yesterday, in spite of the strikes here.
+
+Now I am happily occupied with the Forge accelerator in the Autodesk office.
+
+My only worry is how to get back again tomorrow.
+This time again, the train I had originally booked has been cancelled.
+
+We'll see how it goes.
+
+Meanwhile, let's take a look at:
+
+- [DA4R room support and new samples](#2)
+- [Effective filtered element collection](#3)
 
 
-####<a name="2"></a> Effective Filtered Element Collector
+####<a name="2"></a> DA4R Room Support and New Samples
 
-Efficient way to check if an element exists in a view
+Some recent [Forge Design Automation for Revit or DA4R](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55) news
+and samples:
+
+Most importantly,
+a [new RVT to SVF model derivative parameter generates additional content, including rooms and spaces](https://forge.autodesk.com/blog/new-rvt-svf-model-derivative-parameter-generates-additional-content-including-rooms-and-spaces).
+
+Lots of other exciting [new samples](https://forge.autodesk.com/categories/code-samples) are available, including:
+
+- Run additional programs inside a WorkItem
+- Get number of BIM 360 projects per user
+- Working with 2D and 3D scenes and geometry in Forge Viewer
+- Fast track your cross-platform React native Forge app with the Expo SDK
+- How to convert your plugin to work with Design Automation API for AutoCAD
+- Go semantic with Viewer-custom web component for Forge Viewer
+- New RVT->SVF Model Derivative parameter generates additional content, including rooms and spaces
+- Combining PointClouds and Revit models in Forge Viewer
+- Switch to orthographic corner view
+- Custom BIM 360 search with Elasticsearch
+- Get volume and surface area in the Viewer
+- Run command from an AutoCAD AppBundle
+- Run iLogic Rule without AppBundle
+
+Here is a [link to view all samples](https://forge.autodesk.com/categories/code-samples).
+
+
+####<a name="3"></a> Effective Filtered Element Collection
+
+Back to the desktop Revit API, one issue that almost every Revit add-in developer faces is the efficiency of filtered element collectors.
+
+Several interesting aspects are pointed out (and repeated) in the thread on 
+an [efficient way to check if an element exists in a view](https://forums.autodesk.com/t5/revit-api-forum/efficient-way-to-check-if-an-element-exists-in-a-view/m-p/9187613):
 
 **Question:** I'm creating a list of views that contain .dwg ImportInstance(s).
 For each view in the document, I'm using a `FilteredElementCollector` to get a list of elements meeting the criteria; if this list is not empty, the view is added to the list:
 
 <pre class="code">
-  foreach (Element e in viewElements)
-  {
-    View view = (View) e;
-  
-    var stopwatch = new Stopwatch();
-    stopwatch.Start();
-    
-    List<Element> elementsInView
-      = new FilteredElementCollector(doc, view.Id)
-        .OfClass(typeof(ImportInstance))
-        .Where(e => e.Category.Name.EndsWith(".dwg"))
-        .OfType<Element>()
-        .ToList();
-        
-    stopwatch.Stop();
-    
-    Debug.WriteLine(view.Name + ": "
-      + stopwatch.ElapsedMilliseconds + "ms");
-  
-    // if the current view contains at least 1 DWG
-    // ImportInstance, add the view to the list
-    
-    if(elementsInView.Count > 0) 
-    {
-      viewsWithCAD.Add(view);
-      continue;
-    }
-  }
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;<span style="color:blue;">in</span>&nbsp;viewElements&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">View</span>&nbsp;view&nbsp;=&nbsp;(<span style="color:#2b91af;">View</span>)&nbsp;e;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;stopwatch&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Stopwatch</span>();
+&nbsp;&nbsp;&nbsp;&nbsp;stopwatch.Start();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;elementsInView
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc,&nbsp;view.Id&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">ImportInstance</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Where(&nbsp;e&nbsp;=&gt;&nbsp;e.Category.Name.EndsWith(&nbsp;<span style="color:#a31515;">&quot;.dwg&quot;</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfType&lt;<span style="color:#2b91af;">Element</span>&gt;()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.ToList();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;stopwatch.Stop();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Debug</span>.WriteLine(&nbsp;view.Name&nbsp;+&nbsp;<span style="color:#a31515;">&quot;:&nbsp;&quot;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;stopwatch.ElapsedMilliseconds&nbsp;+&nbsp;<span style="color:#a31515;">&quot;ms&quot;</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;if&nbsp;the&nbsp;current&nbsp;view&nbsp;contains&nbsp;at&nbsp;least&nbsp;1&nbsp;DWG</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;ImportInstance,&nbsp;add&nbsp;the&nbsp;view&nbsp;to&nbsp;the&nbsp;list</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;elementsInView.Count&nbsp;&gt;&nbsp;0&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;viewsWithCAD.Add(&nbsp;view&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">continue</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
 </pre>
 
 The FilteredElementCollector can understandably take more than 4000 ms to collect elements from a view containing many elements.
@@ -78,10 +142,10 @@ Thank you.
 Stopping the collector at the first element:
 
 <pre class="code">
-  Element e1
-    = new FilteredElementCollector(doc, view.Id)
-      .OfClass(typeof(ImportInstance))
-      .FirstElement();
+&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e1
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc,&nbsp;view.Id&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">ImportInstance</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.FirstElement();
 </pre>
 
 Possible further speed improvement:
@@ -91,62 +155,64 @@ Possible further speed improvement:
 - Else: if DWG is ViewSpecific, i.e., is "2D annotation" in view &rarr; `ownerview` contains DWG, can be added to `viewsWithCAD`, and can be excluded from view-loop
  
 <pre class="code">
-  IEnumerable<ImportInstance> instances
-    = new FilteredElementCollector(doc)
-      .OfClass(typeof(ImportInstance))
-      .Cast<ImportInstance>();
-
-  List<ElementId> toExclude = new List<ElementId>();
-  foreach(ImportInstance instance in instances)
-  {
-    if ( !instance.Category.Name.EndsWith(".dwg"))
-    {
-      toExclude.Add(instance.Id);
-      continue;
-    }
-    if( instance.ViewSpecific) // dwg only exists in ownerview
-    {
-      View ownerview = doc.GetElement(instance.OwnerViewId) as View;
-      viewsWithCAD.Add(ownerview);
-      if( viewElements.Contains(ownerview))
-        viewElements.Remove(ownerview);
-    }
-  }
-  
-  foreach (Element e in viewElements)
-  {
-    View view = (View) e;
-    var stopwatch = new Stopwatch();
-    stopwatch.Start();
-    Element e1 = null;
-    if (toExclude.Count>0)
-    {
-      e1 = new FilteredElementCollector(doc, view.Id)
-        .Excluding(toExclude)
-        .OfClass(typeof(ImportInstance))
-        .FirstElement();
-    } else{
-      e1 = new FilteredElementCollector(doc, view.Id)
-        .OfClass(typeof(ImportInstance))
-        .FirstElement();
-    }
-    stopwatch.Stop();
-    Debug.WriteLine(view.Name + ": "
-      + stopwatch.ElapsedMilliseconds + "ms");
-
-    // if the current view contains at least 1 DWG
-    // ImportInstance, add the view to the list
-
-    if(e1!=null)
-    {
-      viewsWithCAD.Add(view);
-    }
-  }
+&nbsp;&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">ImportInstance</span>&gt;&nbsp;instances
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">ImportInstance</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">ImportInstance</span>&gt;();
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">ElementId</span>&gt;&nbsp;toExclude&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">ElementId</span>&gt;();
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">ImportInstance</span>&nbsp;instance&nbsp;<span style="color:blue;">in</span>&nbsp;instances&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;!instance.Category.Name.EndsWith(&nbsp;<span style="color:#a31515;">&quot;.dwg&quot;</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;toExclude.Add(&nbsp;instance.Id&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">continue</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;instance.ViewSpecific&nbsp;)&nbsp;<span style="color:green;">//&nbsp;dwg&nbsp;only&nbsp;exists&nbsp;in&nbsp;ownerview</span>
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">View</span>&nbsp;ownerview&nbsp;=&nbsp;doc.GetElement(&nbsp;instance.OwnerViewId&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">View</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;viewsWithCAD.Add(&nbsp;ownerview&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;viewElements.Contains(&nbsp;ownerview&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;viewElements.Remove(&nbsp;ownerview&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;<span style="color:blue;">in</span>&nbsp;viewElements&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">View</span>&nbsp;view&nbsp;=&nbsp;(<span style="color:#2b91af;">View</span>)&nbsp;e;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;stopwatch&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Stopwatch</span>();
+&nbsp;&nbsp;&nbsp;&nbsp;stopwatch.Start();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e1&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;toExclude.Count&nbsp;&gt;&nbsp;0&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e1&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc,&nbsp;view.Id&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Excluding(&nbsp;toExclude&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">ImportInstance</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.FirstElement();
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">else</span>
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e1&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc,&nbsp;view.Id&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">ImportInstance</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.FirstElement();
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;stopwatch.Stop();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Debug</span>.WriteLine(&nbsp;view.Name&nbsp;+&nbsp;<span style="color:#a31515;">&quot;:&nbsp;&quot;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;stopwatch.ElapsedMilliseconds&nbsp;+&nbsp;<span style="color:#a31515;">&quot;ms&quot;</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;if&nbsp;the&nbsp;current&nbsp;view&nbsp;contains&nbsp;at&nbsp;least&nbsp;1&nbsp;DWG</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;ImportInstance,&nbsp;add&nbsp;the&nbsp;view&nbsp;to&nbsp;the&nbsp;list</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;e1&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;viewsWithCAD.Add(&nbsp;view&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
 </pre>
 
-**Notes:** Many thanks for the interesting question, and many thanks to Fair59 for yet another extremely knowledgeable and helpful solution!
+Many thanks for the interesting question, and many thanks to Fair59 for yet another extremely knowledgeable and helpful solution!
 
-I do keep pointing out that converting a filtered element collector to a List is an inefficient thing to do, if you can avoid it.
+**Notes:** I do keep pointing out that converting a filtered element collector to a List is an inefficient thing to do, if you can avoid it.
 
 It forces the collector to retrieve all the data, convert it to the .NET memory space, duplicate it, costing time and space.
 
@@ -156,50 +222,32 @@ In this case, you can test the parameter values using a parameter filter instead
 
 As Fair59 points out and we have discussed in the past, you can cancel a collector as soon as your target has been reached:
 
-- [Aborting Filtered Element Collection ](https://thebuildingcoder.typepad.com/blog/2019/02/cancelling-filtered-element-collection.html)
+- [Aborting filtered element collection](https://thebuildingcoder.typepad.com/blog/2019/02/cancelling-filtered-element-collection.html)
 
 So, you can save time and space in several ways:
 
-Use a parameter filter instead of LINQ post-processing
-
-Do not convert to a List
+- Use a parameter filter instead of LINQ or .NET post-processing
+- Do not convert to a `List`
 
 Both of these force the filtered element collector to retrieve and return all results.
 
 Here is an explanation of the various types of filters versus post-processing in .NET:
 
-- [Slow, Slower Still and Faster Filtering](https://thebuildingcoder.typepad.com/blog/2019/04/slow-slower-still-and-faster-filtering.html)
+- [Slow, slower still and faster filtering](https://thebuildingcoder.typepad.com/blog/2019/04/slow-slower-still-and-faster-filtering.html)
 
-Here are some discussions and a benchmark of the results of using a parameter filter versus LINQ post-processing:
+Here are some discussions and a benchmark of the results of using a parameter filter versus LINQ and .NET post-processing:
 
-- [Filtering for a Specific Parameter Value](https://thebuildingcoder.typepad.com/blog/2018/06/forge-tutorials-and-filtering-for-a-parameter-value.html#3)
-- [Filtered Element Collector Benchmark](https://thebuildingcoder.typepad.com/blog/2019/05/filtered-element-collector-benchmark.html#3)
+- [Filtering for a specific parameter value](https://thebuildingcoder.typepad.com/blog/2018/06/forge-tutorials-and-filtering-for-a-parameter-value.html#3)
+- [Filtered element collector benchmark](https://thebuildingcoder.typepad.com/blog/2019/05/filtered-element-collector-benchmark.html#3)
 
 We also discussed the issue of finding all views displaying an element a couple of times in the past:
 
-- [Views Displaying Given Element](https://thebuildingcoder.typepad.com/blog/2014/05/views-displaying-given-element-svg-and-nosql.html#6)
-- [Determining Views Showing an Element](https://thebuildingcoder.typepad.com/blog/2016/12/determining-views-showing-an-element.html)
-- [Retrieving Elements Visible in View](https://thebuildingcoder.typepad.com/blog/2017/05/retrieving-elements-visible-in-view.html)
-- [Can You Avoid Generating Graphics?](https://thebuildingcoder.typepad.com/blog/2019/10/generating-graphics-and-collecting-assets.html#2)
-
-
-
-####<a name="3"></a> 
-
-####<a name="4"></a> 
-
-####<a name="5"></a> 
+- [Views displaying given element](https://thebuildingcoder.typepad.com/blog/2014/05/views-displaying-given-element-svg-and-nosql.html#6)
+- [Determining views showing an element](https://thebuildingcoder.typepad.com/blog/2016/12/determining-views-showing-an-element.html)
+- [Retrieving elements visible in view](https://thebuildingcoder.typepad.com/blog/2017/05/retrieving-elements-visible-in-view.html)
+- [Can you avoid generating graphics?](https://thebuildingcoder.typepad.com/blog/2019/10/generating-graphics-and-collecting-assets.html#2)
 
 <center>
-<img src="img/.png" alt="" width="100"> <!--680-->
-<p style="font-size: 80%; font-style:italic"></p>
+<img src="img/harvester.png" alt="Harvester" width="321"> <!--642-->
 </center>
 
-**Answer:** Two steps:
-
-**Response:** 
-
-<pre class="code">
-</pre>
-
-Many thanks to  for raising and solving this interesting task.
