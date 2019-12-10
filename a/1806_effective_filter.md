@@ -40,6 +40,20 @@ Meanwhile, let's take a look at
 
 linkedin:
 
+Support for rooms and spaces in the Forge model derivative API and effective filtered element collectors in the #RevitAPI
+
+http://bit.ly/effectivecollector
+
+I successfully made it from Switzerland to Paris and the Forge accelerator in spite of the French strikes.
+
+My only worry is how to get back again tomorrow.
+
+Again, the train I have booked has been cancelled.
+
+Meanwhile, let's take a look at:
+
+- DA4R room support and new samples
+- Effective filtered element collection...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
