@@ -72,6 +72,7 @@ This time again, the train I had originally booked has been cancelled.</p>
 <ul>
 <li><a href="#2">DA4R room support and new samples</a></li>
 <li><a href="#3">Effective filtered element collection</a></li>
+<li><a href="#4">Don't waste time optimising prematurely</a></li>
 </ul>
 <h4><a name="2"></a> DA4R Room Support and New Samples</h4>
 <p>Some recent <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55">Forge Design Automation for Revit or DA4R</a> news
@@ -241,3 +242,14 @@ Stopping the collector at the first element:</p>
 <p><center>
 <img src="img/harvester.png" alt="Harvester" width="321"> <!--642-->
 </center></p>
+<h4><a name="4"></a> Don't Waste Time Optimising Prematurely</h4>
+<p><a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1058186">Mastjaso</a> adds
+some important professional advice in
+his <a href="https://thebuildingcoder.typepad.com/blog/2019/12/forge-rooms-effective-filtered-element-collectors.html#comment-4719321388">comment below</a>:</p>
+<blockquote>
+<p>Interesting discussion on filtered element collectors, though I have to say that I have personally spend far too much time worrying about the efficiencies of those collectors when it has turned out to be inconsequential.</p>
+<p>For new developers starting out, or ones tackling a new project for the first time, I'd remember the adage that premature optimization is the death of software.
+I start basically all my projects with super basic <code>OfClass</code> filtered element collectors and then cast and convert them to the .NET memory space so that I can use LINQ which produces shorter, more readable, and easier to debug code than the filtered element collection API.
+It's only near the end of a project, once features are settled that I'll start swapping out LINQ for more nuanced uses of the FEC, but even then I'll only do it <em>if</em> I need the performance boost somewhere.</p>
+</blockquote>
+<p>Before optimising anything at all, benchmark or profile to find out where and whether there are any serious performance issues at all.</p>

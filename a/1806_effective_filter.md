@@ -78,6 +78,7 @@ Meanwhile, let's take a look at:
 
 - [DA4R room support and new samples](#2)
 - [Effective filtered element collection](#3)
+- [Don't waste time optimising prematurely](#4)
 
 
 ####<a name="2"></a> DA4R Room Support and New Samples
@@ -268,4 +269,18 @@ We also discussed the issue of finding all views displaying an element a couple 
 <center>
 <img src="img/harvester.png" alt="Harvester" width="321"> <!--642-->
 </center>
+
+####<a name="4"></a> Don't Waste Time Optimising Prematurely
+
+[Mastjaso](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1058186) adds
+some important professional advice in
+his [comment below](https://thebuildingcoder.typepad.com/blog/2019/12/forge-rooms-effective-filtered-element-collectors.html#comment-4719321388):
+
+> Interesting discussion on filtered element collectors, though I have to say that I have personally spend far too much time worrying about the efficiencies of those collectors when it has turned out to be inconsequential.
+
+> For new developers starting out, or ones tackling a new project for the first time, I'd remember the adage that premature optimization is the death of software.
+I start basically all my projects with super basic `OfClass` filtered element collectors and then cast and convert them to the .NET memory space so that I can use LINQ which produces shorter, more readable, and easier to debug code than the filtered element collection API.
+It's only near the end of a project, once features are settled that I'll start swapping out LINQ for more nuanced uses of the FEC, but even then I'll only do it *if* I need the performance boost somewhere.
+
+Before optimising anything at all, benchmark or profile to find out where and whether there are any serious performance issues at all.
 
