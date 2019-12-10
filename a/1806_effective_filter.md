@@ -29,7 +29,7 @@ Run iLogic Rule without AppBundle
 
 twitter:
 
- in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/combiningedges
+Support for rooms and spaces in the Forge model derivative API and effective filtered element collectors in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/effectivecollector
 
 I successfully made it from Switzerland to Paris and the Forge accelerator in spite of the French strikes.
 My only worry is how to get back again tomorrow.
@@ -49,7 +49,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### DA4R Rooms and Effective Filtered Element Collectors
+### Forge Rooms, Effective Filtered Element Collectors
 
 I successfully made it from Switzerland to Paris by train yesterday, in spite of the strikes here.
 
