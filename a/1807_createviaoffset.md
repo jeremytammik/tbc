@@ -74,6 +74,67 @@ Here is a [link to view all samples](https://forge.autodesk.com/categories/code-
 
 ####<a name="3"></a>
 
+https://autodesk.slack.com/archives/C0SR6NAP8/p1576232650000100?thread_ts=1576185616.111700&cid=C0SR6NAP8
+
+
+- Room boundary polygons
+  https://forums.autodesk.com/t5/revit-api-forum/room-boundary-polygons/m-p/9157379
+  CreateViaOffset to offset room boundary inwards or outwards
+  https://forums.autodesk.com/t5/revit-api-forum/createviaoffset/m-p/9159500
+  CreateViaOffset(CurveLoop original,IList<double> offsetDists,XYZ normal)
+  https://forums.autodesk.com/t5/revit-api-forum/createviaoffset-curveloop-original-ilist-lt-double-gt/m-p/9196659  
+
+Scott Conover  13 hours ago
+There's a code snippet using it in structure.  private void ModifyBentFabricSheet(Document document, FabricSheet bentFabricSheet)        {            CurveLoop newBendingProfile = CurveLoop.CreateViaOffset(bentFabricSheet.GetBendProfile(), 0.5, new XYZ(0, 0, -1));            bentFabricSheet.SetBendProfile(newBendingProfile);
+            // Give the user some information            TaskDialog.Show("Revit", string.Format("Bent Fabric Sheet ID='{0}' modified successfully.", bentFabricSheet.Id.IntegerValue));        }
+
+
+Scott Conover  13 hours ago
+But that sample might not be too helpful.  In the customer's example, it looks like one of the walls is split in two and meet in the middle.  Perhaps the curves he has are not colinear to start?  That, it would seem, could easily result in a disconnected loop.
+
+Dragos Turmac  3 hours ago
+This is a sample from our add-in code:
+         // previously filled list with simple double values that represent the distance to offset; that distance is calculated as the length of a segment that is perpendicular on the curve to be offset
+         List<double> offsetArray;
+         IList<Curve> polyCurves = new List<Curve>();
+         foreach (var curve in contour3D.curves)
+         {
+            polyCurves.Add(curve.asRevitCurve(doc.Application));
+         }
+         if (polyCurves.none())
+            return false;
+         CurveLoop curveLoop = CurveLoop.Create(polyCurves);
+            if (curveLoop != null)
+            {
+               XYZ normal = XYZ.BasisZ;
+               if (curveLoop.HasPlane())
+                  normal = curveLoop.GetPlane().Normal;
+               curveLoop = CurveLoop.CreateViaOffset(curveLoop, offsetArray, normal);
+               if (curveLoop != null)
+               {
+// do stuff with curve
+               }
+            }
+It's nothing special. BUT... (edited) 
+
+Dragos Turmac  3 hours ago
+I suspect the problem is with the little vertical segment where the different width walls meet. We had problems with this method treating small segments from a structural contour, so the code above is put in a big try/catch and if it fails, we go to another offset algorithm that is far worse in general but treats small segments/self-intersections slightly better (revit's offset seems more skeptical to prolong segments when it's the case and I couldn't find code for self-intersections).
+L.E. Edited testing assumptions that are invalid since offset is positive, not negative (edited) 
+
+Dragos Turmac  1 hour ago
+I have tested on our code the drawing provided as follows: the contour line is based on the exterior contour of the wall; the first curve in loop is the small one, contour being parsed clockwise; based on your/their code, the offset array is
+		[0]	0.75616799999999995	double
+		[1]	0.42808400000000002	double
+		[2]	0.42808400000000002	double
+		[3]	1.0842520000000000	double
+		[4]	1.0842520000000000	double
+		[5]	0.75616799999999995	double
+I tried both positive and negative offsets, and the result is attached.
+No exceptions, everything worked. I don't have anymore time to look into this, but I still stand on my original assumption that it has to do with the small segment, depending on the epsilon set by  add-on; instead of using wall thickness + 0.1 (which is feet, if unconverted), you may try with a fixed % from wall thickness instead (5-10%?) - it may reduce peculiar situations like teeny tiny segments after offset that can't be handled properly (edited) 
+image.png
+/a/doc/revit/tbc/git/a/img/createviaoffset_success.png
+
+
 
 **Question:** 
 
