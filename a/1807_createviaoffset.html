@@ -63,7 +63,7 @@ string <a href="https://www.google.com/search?q=dashboard+site%3Aforge.autodesk.
 <h4><a name="3"></a> Specifying a List of Offsets to CreateViaOffset</h4>
 <p>Stephen Harrison has been valiantly and persistantly working on a solution to crop views to rooms, as discussed in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> threads
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/room-boundary-polygons/m-p/9157379">Room boundary polygons</a>,
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/room-boundary-polygons/m-p/9157379">room boundary polygons</a>,
 <a href="https://forums.autodesk.com/t5/revit-api-forum/createviaoffset/m-p/9159500">CreateViaOffset to offset room boundary inwards or outwards</a> and
 <a href="https://forums.autodesk.com/t5/revit-api-forum/createviaoffset-curveloop-original-ilist-lt-double-gt/m-p/9196659">CreateViaOffset taking a list of offset distances</a>.</p>
 <p>I set up
@@ -140,8 +140,8 @@ the <a href="https://www.revitapidocs.com/2020/3097f423-9b0e-5496-bae2-3a82b6875
   and 5 thicknesses 1.08,.43,.43,.76,1.08
 </pre></p>
 <p>This call throws an <code>Autodesk.Revit.Exceptions.InvalidOperationException</code> saying 'Curve loop couldn't be properly trimmed.'</p>
-<p><strong>Answer from the development team:</strong></p>
-<p>In the customer's example, it looks like one of the walls is split in two and meet in the middle.
+<p><strong>Answer from the development team:</strong> 
+In the customer's example, it looks like one of the walls is split in two and meet in the middle.
 Perhaps the curves he has are not colinear to start?
 That, it would seem, could easily result in a disconnected loop.</p>
 <p>This is a sample from our add-in code:</p>
@@ -185,7 +185,7 @@ That, it would seem, could easily result in a disconnected loop.</p>
 </pre>
 
 <p>It's nothing special. BUT... </p>
-<p>I suspect the problem is with the little vertical segment where the different width walls meet.
+<p>I suspect the problem stems from the little vertical segment where the different width walls meet.
 We had problems with this method treating small segments from a structural contour, so the code above is put in a big try/catch and if it fails, we go to another offset algorithm that is far worse in general but treats small segments/self-intersections slightly better (Revit's offset seems more skeptical to prolong segments when it's the case, and I couldn't find code for self-intersections).
 L.E. Edited testing assumptions that are invalid since offset is positive, not negative.</p>
 <p>I tested on our code the drawing provided as follows: the contour line is based on the exterior contour of the wall; the first curve in loop is the small one, contour being parsed clockwise; based on your/their code, the offset array is:</p>

@@ -91,7 +91,7 @@ string [dashboard site:forge.autodesk.com/blog](https://www.google.com/search?q=
 
 Stephen Harrison has been valiantly and persistantly working on a solution to crop views to rooms, as discussed in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
-on [Room boundary polygons](https://forums.autodesk.com/t5/revit-api-forum/room-boundary-polygons/m-p/9157379),
+on [room boundary polygons](https://forums.autodesk.com/t5/revit-api-forum/room-boundary-polygons/m-p/9157379),
 [CreateViaOffset to offset room boundary inwards or outwards](https://forums.autodesk.com/t5/revit-api-forum/createviaoffset/m-p/9159500) and
 [CreateViaOffset taking a list of offset distances](https://forums.autodesk.com/t5/revit-api-forum/createviaoffset-curveloop-original-ilist-lt-double-gt/m-p/9196659).
 
@@ -199,8 +199,7 @@ Starting with the bottom horizontal wall and moving counterclockwise to the righ
 
 This call throws an `Autodesk.Revit.Exceptions.InvalidOperationException` saying 'Curve loop couldn't be properly trimmed.'
 
-**Answer from the development team:**
-
+**Answer from the development team:** 
 In the customer's example, it looks like one of the walls is split in two and meet in the middle.
 Perhaps the curves he has are not colinear to start?
 That, it would seem, could easily result in a disconnected loop.
@@ -248,7 +247,7 @@ This is a sample from our add-in code:
 
 It's nothing special. BUT... 
 
-I suspect the problem is with the little vertical segment where the different width walls meet.
+I suspect the problem stems from the little vertical segment where the different width walls meet.
 We had problems with this method treating small segments from a structural contour, so the code above is put in a big try/catch and if it fails, we go to another offset algorithm that is far worse in general but treats small segments/self-intersections slightly better (Revit's offset seems more skeptical to prolong segments when it's the case, and I couldn't find code for self-intersections).
 L.E. Edited testing assumptions that are invalid since offset is positive, not negative.
 
