@@ -33,17 +33,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Dashboards and CreateViaOffset
+### Dashboard, CreateViaOffset and Room Outer Outline
 
 An inconclusive struggle to use CurveLoop.CreateViaOffset leads us once again to thank the powers that be for the integer-based 2D Boolean Clipper library, and some thoughts on project dashboards:
 
-
+- [Extracting data for project dashboard](#2)
+- [Specifying a list of offsets to `CreateViaOffset`](#3)
+- [Alternatives to determine room outline including surrounding walls](#4)
 
 ####<a name="2"></a> Extracting Data for Project Dashboard
 
-**Question:**
-
-We are investigating whether some parts of our project management procedures can be automated. Today, we create an overview using PowerBI on project progression by combining data from financials, project controlling (hours, job packages etc.) and the likes. However, progress on the content and completion of design tasks is done manually with input from the project manager, making it difficult to track progress directly.
+**Question:** We are investigating whether some parts of our project management procedures can be automated. Today, we create an overview using PowerBI on project progression by combining data from financials, project controlling (hours, job packages etc.) and the likes. However, progress on the content and completion of design tasks is done manually with input from the project manager, making it difficult to track progress directly.
  
 The assumption is that many of our graphic files such as .dwg contain data that describes how many documents that have been created and how many tasks have been completed. If can to extract this data, it could be built into some tool to provide an overview. 
  
@@ -55,9 +55,7 @@ We tried to investigate whether or not information/lists/drawing overviews from 
  
 Could you somehow simplify this for me? Is it at all possible to generally export overview of the content of a dwg file in a simple format readable for other applications?
  
-**Answer:**
-
-I am not currently very involved with AutoCAD and DWG development, more with Revit RVT.
+**Answer:** I am not currently very involved with AutoCAD and DWG development, more with Revit RVT.
  
  However, I can certainly confirm that it is definitely both possible and easy to extract all the data you can possibly want from both of them.
  
@@ -69,16 +67,13 @@ In fact, several people have already done so to create a number of different so-
  
 Here are two in-depth demonstrations of such technology from Autodesk University 2018, a year ago:
  
-Using Forge to Revolutionize Coordinated Project Information
-https://www.autodesk.com/autodesk-university/class/Using-Forge-Revolutionize-Coordinated-Project-Information-2018
-
-How to Use Forge and BIM 360 to Get Insight and Improve the BIM Management of Your Project
-https://www.autodesk.com/autodesk-university/class/How-Use-Forge-and-BIM-360-Get-Insight-and-Improve-BIM-Management-Your-Project-2018
+- [Using Forge to revolutionise coordinated project information](https://www.autodesk.com/autodesk-university/class/Using-Forge-Revolutionize-Coordinated-Project-Information-2018)
+- [How to Use Forge and BIM 360 to get insight and improve the BIM management of your project](https://www.autodesk.com/autodesk-university/class/How-Use-Forge-and-BIM-360-Get-Insight-and-Improve-BIM-Management-Your-Project-2018)
  
 By the way, the latter also mentions PowerBI.
  
 These are just two random hits that popped up in my first quick Internet search
-for [autodesk forge project overview](https://duckduckgo.com/?q=autodesk+forge+project+overview).
+for [Autodesk Forge project overview](https://duckduckgo.com/?q=autodesk+forge+project+overview).
 
 Maybe you should try it yourself with 'dashboard' and other such terms.
 
@@ -110,8 +105,8 @@ The problem I now face is how to follow the outer face of the wall where the wal
 When the walls step back like this, there is an error “Curve loop couldn't be properly trimmed”:
 
 <center>
-<img src="img/createviaoffset_with_list_1.png" alt="Walls with differing thicknesses" width="300"> <!--458-->
-<p style="font-size: 80%; font-style:italic">Walls with differing thicknesses</p>
+<img src="img/createviaoffset_with_list_1.png" alt="Walls with varying thicknesses" width="300"> <!--458-->
+<p style="font-size: 80%; font-style:italic">Walls with varying thicknesses</p>
 </center>
 
 Regarding room separators, another problem occurs with a separator like this, Error “Curve loop couldn't be properly trimmed”:
@@ -125,7 +120,7 @@ There have been no errors so far in situations like this:
 
 <center>
 <img src="img/createviaoffset_with_list_3.png" alt="Walls with room separator offset" width="300"> <!--342-->
-<p style="font-size: 80%; font-style:italic">Walls with room separator</p>
+<p style="font-size: 80%; font-style:italic">Walls with room separator offset</p>
 </center>
 
 I am working in C# with Revit 2020 and utilising the following to create the offset:
@@ -285,7 +280,7 @@ I have tried exaggerated the wall thickness difference substantially and still r
 
 If I have understood the response from the development team correctly, the solution they have proposed needs to be placed in a try catch as it may still fail and a therefore a more complex solution is required in this instance ? Is this alternative solution available through the API and if so, how may it be implemented?
 
-*Answer:** Yes, they suggest using a moderate percentage of the wall thickness, I believe, e.g., 10-20%.
+**Answer:** Yes, they suggest using a moderate percentage of the wall thickness, I believe, e.g., 10-20%.
 I guess that for your needs, 110-120% is required.
 They also say that they tested it that way, and it worked well, offsetting both inwards and outwards.
 The sample code that they provided was extracted from some internal Revit module and is thus not present in the SDK nor restricted to using the public API.
@@ -301,9 +296,13 @@ Maybe they tested on a more recent development version of Revit.
 
 So, I think it might be time to step away from `CreateViaOffset` for the time being.
 
-On the other hand, your goal is almost reached: you have the room boundary, the boundary element and the thickness, if it is a wall. From those, it is possible to create a curve loop tracing the outsides of the walls.
+On the other hand, your goal is almost reached: you have the room boundary, its boundary elements and their thicknesses.
+From those, it is possible to create a curve loop tracing the outside edges of the walls.
 
-**Response:** I started to look at the possibility of tracing the outside of the walls several weeks ago when I was at a loss utilising `CreateViaOffset`.
+
+####<a name="4"></a> How to Determine Room Outline Including Surrounding Walls
+
+**Question:** I started to look at the possibility of tracing the outside of the walls several weeks ago, when I was at a loss utilising `CreateViaOffset`.
 
 I was finding it difficult to create the closed loop necessary, and particularly how I would achieve this were the wall thickness changes across its length.
 
@@ -311,10 +310,7 @@ Could you point me in the right direction, possibly some sample code that I coul
 
 Hope you have a good festive season.
 
-
-####<a name="4"></a> Alternative Approaches
-
-I see several possible approaches, based on:
+**Answer:** I see several possible alternative approaches avoiding the use of `CreateViaOffset`, based on:
 
 - Room boundary curves and wall thicknesses
 - Room boundary curves and wall bottom face edges
