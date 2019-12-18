@@ -335,7 +335,7 @@ I mentioned it here in two previous threads:
 - [Question regarding SVG data](https://forums.autodesk.com/t5/revit-api-forum/question-regarding-svg-data-from-revit/m-p/9106146)
 - [How do I get the outline and stakeout path of a built-in loft family](https://forums.autodesk.com/t5/revit-api-forum/how-do-i-get-the-outline-and-stakeout-path-of-a-built-in-loft/m-p/9148138)
 
-Probably all the pure Revit API approaches will run into various problematic exceptions cases, whereas the 2D Booleans seem very fast, reliable and robust and may well be able to handle all the exceptional cases that can possibly occur, so I would recommend trying that out first.
+Probably all the pure Revit API approaches will run into various problematic exceptional cases, whereas the 2D Booleans seem very fast, reliable and robust and may well be able to handle all the exceptional cases that can possibly occur, so I would recommend trying that out first.
 
 I hope this suggestion makes for a nice gift to you in this festive season.
 
