@@ -27,6 +27,16 @@ An inconclusive struggle to use <code>CurveLoop.CreateViaOffset</code> leads us 
 
 linkedin:
 
+BIM project dashboard, the CreateViaOffset method and the outer footprint of a room including its surrounding walls in the #RevitAPI
+
+http://bit.ly/outerroomoutline
+
+An inconclusive struggle to use CurveLoop.CreateViaOffset leads us once again to thank the powers that be for the integer-based 2D Boolean Clipper library, and some thoughts on project dashboards:
+
+- Extracting data for project dashboard
+- Specifying a list of offsets to CreateViaOffset
+- Alternatives to determine room outline including surrounding walls...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
