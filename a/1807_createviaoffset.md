@@ -35,7 +35,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Dashboards and CreateViaOffset
 
-An inconclusive struggle to use CurveLoop.CreateViaOffset leads us once again to thank the powers that be for the integer-based 2D Boolean Clipper library, and some thoughs on project dashboards:
+An inconclusive struggle to use CurveLoop.CreateViaOffset leads us once again to thank the powers that be for the integer-based 2D Boolean Clipper library, and some thoughts on project dashboards:
 
 
 
@@ -250,7 +250,7 @@ This is a sample from our add-in code:
 It's nothing special. BUT... 
 
 I suspect the problem stems from the little vertical segment where the different width walls meet.
-We had problems with this method treating small segments from a structural contour, so the code above is put in a big try/catch and if it fails, we go to another offset algorithm that is far worse in general but treats small segments/self-intersections slightly better (Revit's offset seems more skeptical to prolong segments when it's the case, and I couldn't find code for self-intersections).
+We had problems with this method treating small segments from a structural contour, so the code above is put in a big try/catch and if it fails, we go to another offset algorithm that is far worse in general but treats small segments/self-intersections slightly better (Revit's offset seems more sceptical to prolong segments when it's the case, and I couldn't find code for self-intersections).
 L.E. Edited testing assumptions that are invalid since offset is positive, not negative.
 
 I tested on our code the drawing provided as follows: the contour line is based on the exterior contour of the wall; the first curve in loop is the small one, contour being parsed clockwise; based on your/their code, the offset array is:
@@ -275,9 +275,7 @@ No exceptions, everything worked.
 
 I still stand on my original assumption that it has to do with the small segment, depending on the epsilon set by the add-in; instead of using wall thickness + 0.1 (which is in imperial feet, if not converted), you may try with a fixed percentage based on the wall thickness instead, e.g., 5-10%? &ndash; that may reduce problems with peculiar situations like teeny weeny tiny segments after offset that can't be handled properly.
 
-**Response:**
-
-Thank you again for your time and you patience in helping me resolve this issue. It is much appreciated.
+**Response:** Thank you again for your time and patience in helping me resolve this issue. It is much appreciated.
 
 All my tests would suggest that the suspected short vertical were the walls meet is the problem. However, I make the following observations.
 
@@ -295,9 +293,9 @@ It just shows an example of using the method, regardless of where the input come
 
 I'll try out this percentage thingy on your sample models and see how I fare.
 
-Later: I tried to followed the devteam suggestion of using a percentage instead of a fixed additional offset, and it did not work for me at all.
+Later: I tried to follow the devteam suggestion of using a percentage instead of a fixed additional offset, and it did not work for me at all.
 I tried both 110%, which would suit your needs, and 10%.
-In both cases, it still trows the `InvalidOperationException` saying 'loop couldn't be properly trimmed.'
+In both cases, it still throws the `InvalidOperationException` saying 'loop couldn't be properly trimmed.'
 
 Maybe they tested on a more recent development version of Revit.
 

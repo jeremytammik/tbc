@@ -33,7 +33,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Dashboards and CreateViaOffset</h3>
-<p>An inconclusive struggle to use CurveLoop.CreateViaOffset leads us once again to thank the powers that be for the integer-based 2D Boolean Clipper library, and some thoughs on project dashboards:</p>
+<p>An inconclusive struggle to use CurveLoop.CreateViaOffset leads us once again to thank the powers that be for the integer-based 2D Boolean Clipper library, and some thoughts on project dashboards:</p>
 <h4><a name="2"></a> Extracting Data for Project Dashboard</h4>
 <p><strong>Question:</strong></p>
 <p>We are investigating whether some parts of our project management procedures can be automated. Today, we create an overview using PowerBI on project progression by combining data from financials, project controlling (hours, job packages etc.) and the likes. However, progress on the content and completion of design tasks is done manually with input from the project manager, making it difficult to track progress directly.</p>
@@ -187,7 +187,7 @@ That, it would seem, could easily result in a disconnected loop.</p>
 
 <p>It's nothing special. BUT... </p>
 <p>I suspect the problem stems from the little vertical segment where the different width walls meet.
-We had problems with this method treating small segments from a structural contour, so the code above is put in a big try/catch and if it fails, we go to another offset algorithm that is far worse in general but treats small segments/self-intersections slightly better (Revit's offset seems more skeptical to prolong segments when it's the case, and I couldn't find code for self-intersections).
+We had problems with this method treating small segments from a structural contour, so the code above is put in a big try/catch and if it fails, we go to another offset algorithm that is far worse in general but treats small segments/self-intersections slightly better (Revit's offset seems more sceptical to prolong segments when it's the case, and I couldn't find code for self-intersections).
 L.E. Edited testing assumptions that are invalid since offset is positive, not negative.</p>
 <p>I tested on our code the drawing provided as follows: the contour line is based on the exterior contour of the wall; the first curve in loop is the small one, contour being parsed clockwise; based on your/their code, the offset array is:</p>
 <pre>
@@ -206,8 +206,7 @@ L.E. Edited testing assumptions that are invalid since offset is positive, not n
 </center></p>
 <p>No exceptions, everything worked.</p>
 <p>I still stand on my original assumption that it has to do with the small segment, depending on the epsilon set by the add-in; instead of using wall thickness + 0.1 (which is in imperial feet, if not converted), you may try with a fixed percentage based on the wall thickness instead, e.g., 5-10%? &ndash; that may reduce problems with peculiar situations like teeny weeny tiny segments after offset that can't be handled properly.</p>
-<p><strong>Response:</strong></p>
-<p>Thank you again for your time and you patience in helping me resolve this issue. It is much appreciated.</p>
+<p><strong>Response:</strong> Thank you again for your time and patience in helping me resolve this issue. It is much appreciated.</p>
 <p>All my tests would suggest that the suspected short vertical were the walls meet is the problem. However, I make the following observations.</p>
 <p>I have previously tried a fixed percentage based on the wall thickness instead of +0.1 but received the same error.</p>
 <p>I have tried exaggerated the wall thickness difference substantially and still received the same error.</p>
@@ -218,9 +217,9 @@ They also say that they tested it that way, and it worked well, offsetting both 
 The sample code that they provided was extracted from some internal Revit module and is thus not present in the SDK nor restricted to using the public API.
 It just shows an example of using the method, regardless of where the input comes from.</p>
 <p>I'll try out this percentage thingy on your sample models and see how I fare.</p>
-<p>Later: I tried to followed the devteam suggestion of using a percentage instead of a fixed additional offset, and it did not work for me at all.
+<p>Later: I tried to follow the devteam suggestion of using a percentage instead of a fixed additional offset, and it did not work for me at all.
 I tried both 110%, which would suit your needs, and 10%.
-In both cases, it still trows the <code>InvalidOperationException</code> saying 'loop couldn't be properly trimmed.'</p>
+In both cases, it still throws the <code>InvalidOperationException</code> saying 'loop couldn't be properly trimmed.'</p>
 <p>Maybe they tested on a more recent development version of Revit.</p>
 <p>So, I think it might be time to step away from <code>CreateViaOffset</code> for the time being.</p>
 <p>On the other hand, your goal is almost reached: you have the room boundary, the boundary element and the thickness, if it is a wall. From those, it is possible to create a curve loop tracing the outsides of the walls.</p>
