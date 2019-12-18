@@ -20,8 +20,10 @@ twitter:
 
  in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+An inconclusive struggle to use <code>CurveLoop.CreateViaOffset</code> leads us once again to thank the powers that be for the integer-based 2D Boolean Clipper library, and some thoughts on project dashboards
+&ndash; Extracting data for project dashboard
+&ndash; Specifying a list of offsets to <code>CreateViaOffset</code>
+&ndash; Alternatives to determine room outline including surrounding walls...
 
 linkedin:
 
@@ -35,7 +37,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Dashboard, CreateViaOffset and Room Outer Outline
 
-An inconclusive struggle to use CurveLoop.CreateViaOffset leads us once again to thank the powers that be for the integer-based 2D Boolean Clipper library, and some thoughts on project dashboards:
+An inconclusive struggle to use `CurveLoop.CreateViaOffset` leads us once again to thank the powers that be for the integer-based 2D Boolean Clipper library, and some thoughts on project dashboards:
 
 - [Extracting data for project dashboard](#2)
 - [Specifying a list of offsets to `CreateViaOffset`](#3)
@@ -189,7 +191,7 @@ I tested it passing in five curves representing the following five walls:
 
 Starting with the bottom horizontal wall and moving counterclockwise to the right, top two and left, I pass in five straight line segment curves and curves and the corresponding five offset distances:
 
-</pre>
+<pre>
   5 curves with lengths 9.19,9.51,3.61,5.58,9.51
   and 5 thicknesses 1.08,.43,.43,.76,1.08
 </pre>
