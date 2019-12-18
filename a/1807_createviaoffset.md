@@ -18,7 +18,7 @@
 
 twitter:
 
- in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+BIM project dashboard, the CreateViaOffset method and the outer footprint of a room including its surrounding walls in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/outerroomoutline
 
 An inconclusive struggle to use <code>CurveLoop.CreateViaOffset</code> leads us once again to thank the powers that be for the integer-based 2D Boolean Clipper library, and some thoughts on project dashboards
 &ndash; Extracting data for project dashboard
