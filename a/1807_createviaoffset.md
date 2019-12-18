@@ -35,21 +35,23 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Dashboards and CreateViaOffset
 
+An inconclusive struggle to use CurveLoop.CreateViaOffset leads us once again to thank the powers that be for the integer-based 2D Boolean Clipper library, and some thoughs on project dashboards:
+
 
 
 ####<a name="2"></a> Extracting Data for Project Dashboard
 
 **Question:**
 
-We are having a few discussions with an engineering firm who are investigating whether or not some parts of their project management procedures can be automated. Today they provide an overview using PowerBI on project progression by combining data from financials, project controlling (hours, job packages etc.) and the likes. However, progress on the content and completion of design tasks is done manually with input  from the project manager, making it difficult to track progress directly.
+We are investigating whether some parts of our project management procedures can be automated. Today, we create an overview using PowerBI on project progression by combining data from financials, project controlling (hours, job packages etc.) and the likes. However, progress on the content and completion of design tasks is done manually with input from the project manager, making it difficult to track progress directly.
  
-The assumption is that many of their graphic files such as .dwg contains data that describes how many documents that have been created or how many tasks have been completed. If they are able to extract these data somehow it could be build into some tool that could provide a overview. 
+The assumption is that many of our graphic files such as .dwg contain data that describes how many documents that have been created and how many tasks have been completed. If can to extract this data, it could be built into some tool to provide an overview. 
  
-Let’s imagine they are preparing a renovation of a building and they know they have to complete a set number of PI diagrams, as part of the overall design, if they can easily extract this information from the .dwg files they are able to add this to the PowerBi datasets to be included in the overall reporting.
+Let’s imagine we are preparing a renovation of a building and know that we have to complete a set number of PI diagrams as part of the overall design. If this information can easily be extracted from the .dwg files, we could add this to the PowerBI datasets to be included in the overall reporting.
  
-Today many projects are running smoothly due to experienced project leaders. They would like to create smooth systems to support the process as well as mitigate the risk of being able to attract senior or skilled enough people to handle the project.
+Today, many projects are running smoothly due to experienced project leaders. We would like to create smooth systems to support the process as well as mitigate the risk of not being able to attract senior or skilled enough people to handle the project.
  
-Me and my colleagues have tried to investigate whether or not information/lists/drawing overviews from Revit and AutoCad can be exported into something like .csv .xlsx or similar user/human friendly format. Until now we have not been able to answer the questions. We have talked with 3 different people from AutoDesk chat support and read several of your blog post answers.
+We tried to investigate whether or not information/lists/drawing overviews from Revit and AutoCAD can be exported into something like .csv, .xlsx and similar user/human friendly formats. Until now, we have not been able to answer this question. We have talked with different people from Autodesk chat support and read several of your blog post answers.
  
 Could you somehow simplify this for me? Is it at all possible to generally export overview of the content of a dwg file in a simple format readable for other applications?
  
@@ -57,7 +59,7 @@ Could you somehow simplify this for me? Is it at all possible to generally expor
 
 I am not currently very involved with AutoCAD and DWG development, more with Revit RVT.
  
-It is certainly both possible and easy to extract all the data you can possibly want from both of them.
+ However, I can certainly confirm that it is definitely both possible and easy to extract all the data you can possibly want from both of them.
  
 You can do that using AutoCAD and Revit add-ins making use of the desktop .NET APIs.
  
@@ -89,7 +91,7 @@ string [dashboard site:forge.autodesk.com/blog](https://www.google.com/search?q=
 
 ####<a name="3"></a> Specifying a List of Offsets to CreateViaOffset
 
-Stephen Harrison has been valiantly and persistantly working on a solution to crop views to rooms, as discussed in
+Stephen Harrison has been valiantly and persistently working on a solution to crop views to rooms, as discussed in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
 on [room boundary polygons](https://forums.autodesk.com/t5/revit-api-forum/room-boundary-polygons/m-p/9157379),
 [CreateViaOffset to offset room boundary inwards or outwards](https://forums.autodesk.com/t5/revit-api-forum/createviaoffset/m-p/9159500) and
@@ -97,7 +99,7 @@ on [room boundary polygons](https://forums.autodesk.com/t5/revit-api-forum/room-
 
 I set up
 the [CropViewToRoom GitHub repository](https://github.com/jeremytammik/CropViewToRoom) to
-play around with vartious approaches.
+play around with various approaches.
 
 I now received some useful guidance from the development on the latest question in this series:
 
@@ -273,3 +275,72 @@ No exceptions, everything worked.
 
 I still stand on my original assumption that it has to do with the small segment, depending on the epsilon set by the add-in; instead of using wall thickness + 0.1 (which is in imperial feet, if not converted), you may try with a fixed percentage based on the wall thickness instead, e.g., 5-10%? &ndash; that may reduce problems with peculiar situations like teeny weeny tiny segments after offset that can't be handled properly.
 
+**Response:**
+
+Thank you again for your time and you patience in helping me resolve this issue. It is much appreciated.
+
+All my tests would suggest that the suspected short vertical were the walls meet is the problem. However, I make the following observations.
+
+I have previously tried a fixed percentage based on the wall thickness instead of +0.1 but received the same error.
+
+I have tried exaggerated the wall thickness difference substantially and still received the same error.
+
+If I have understood the response from the development team correctly, the solution they have proposed needs to be placed in a try catch as it may still fail and a therefore a more complex solution is required in this instance ? Is this alternative solution available through the API and if so, how may it be implemented?
+
+*Answer:** Yes, they suggest using a moderate percentage of the wall thickness, I believe, e.g., 10-20%.
+I guess that for your needs, 110-120% is required.
+They also say that they tested it that way, and it worked well, offsetting both inwards and outwards.
+The sample code that they provided was extracted from some internal Revit module and is thus not present in the SDK nor restricted to using the public API.
+It just shows an example of using the method, regardless of where the input comes from.
+
+I'll try out this percentage thingy on your sample models and see how I fare.
+
+Later: I tried to followed the devteam suggestion of using a percentage instead of a fixed additional offset, and it did not work for me at all.
+I tried both 110%, which would suit your needs, and 10%.
+In both cases, it still trows the `InvalidOperationException` saying 'loop couldn't be properly trimmed.'
+
+Maybe they tested on a more recent development version of Revit.
+
+So, I think it might be time to step away from `CreateViaOffset` for the time being.
+
+On the other hand, your goal is almost reached: you have the room boundary, the boundary element and the thickness, if it is a wall. From those, it is possible to create a curve loop tracing the outsides of the walls.
+
+**Response:** I started to look at the possibility of tracing the outside of the walls several weeks ago when I was at a loss utilising `CreateViaOffset`.
+
+I was finding it difficult to create the closed loop necessary, and particularly how I would achieve this were the wall thickness changes across its length.
+
+Could you point me in the right direction, possibly some sample code that I could examine and see if I could get it to work to my requirements.
+
+Hope you have a good festive season.
+
+
+####<a name="4"></a> Alternative Approaches
+
+I see several possible approaches, based on:
+
+- Room boundary curves and wall thicknesses
+- Room boundary curves and wall bottom face edges
+- Projection of 3D union of room and wall solids
+- 2D union of room and wall footprints
+
+The most immediate and pure Revit API approach would be to get the curves representing the room boundaries, determine the wall thicknesses, offset the wall boundary curves outwards by wall thickness plus minimum offset, and ensure that everything is well connected by adding small connecting segments in the gaps where the offset jumps.
+
+Several slightly more complex pure Revit API approaches could be designed by using the wall solids instead of just offsetting the room boundary curves based on the wall thickness. For instance, we could query the wall bottom face for its edges, determine and patch together all the bits of edge segments required to go around the outside of the wall instead of the inside.
+
+Slightly more complex still, and still pure Revit API: determine the room closed shell solid, unite it with all the wall solids, and make use of the extrusion analyser to project this union vertically onto the XY plane and grab its outside edge.
+
+Finally, making use of a minimalistic yet powerful 2D Boolean operation library, perform the projection onto the XY plane first, and unite the room footprint with all its surrounding wall footprints in 2D instead. Note that the 2D Booleans are integer based. To make use of those, I convert the geometry from imperial feet units using real numbers to integer-based millimetres.
+
+The two latter approaches are both implemented in
+my [ElementOutline add-in](https://github.com/jeremytammik/ElementOutline).
+
+I mentioned it here in two previous threads:
+
+- [Question regarding SVG data](https://forums.autodesk.com/t5/revit-api-forum/question-regarding-svg-data-from-revit/m-p/9106146)
+- [How do I get the outline and stakeout path of a built-in loft family](https://forums.autodesk.com/t5/revit-api-forum/how-do-i-get-the-outline-and-stakeout-path-of-a-built-in-loft/m-p/9148138)
+
+Probably all the pure Revit API approaches will run into various problematic exceptions cases, whereas the 2D Booleans seem very fast, reliable and robust and may well be able to handle all the exceptional cases that can possibly occur, so I would recommend trying that out first.
+
+I hope this suggestion makes for a nice gift to you in this festive season.
+
+Happy advent!
