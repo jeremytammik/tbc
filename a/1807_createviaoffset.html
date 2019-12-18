@@ -19,8 +19,10 @@ twitter:
 
  in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+An inconclusive struggle to use <code>CurveLoop.CreateViaOffset</code> leads us once again to thank the powers that be for the integer-based 2D Boolean Clipper library, and some thoughts on project dashboards
+&ndash; Extracting data for project dashboard
+&ndash; Specifying a list of offsets to <code>CreateViaOffset</code>
+&ndash; Alternatives to determine room outline including surrounding walls...
 
 linkedin:
 
@@ -33,7 +35,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Dashboard, CreateViaOffset and Room Outer Outline</h3>
-<p>An inconclusive struggle to use CurveLoop.CreateViaOffset leads us once again to thank the powers that be for the integer-based 2D Boolean Clipper library, and some thoughts on project dashboards:</p>
+<p>An inconclusive struggle to use <code>CurveLoop.CreateViaOffset</code> leads us once again to thank the powers that be for the integer-based 2D Boolean Clipper library, and some thoughts on project dashboards:</p>
 <ul>
 <li><a href="#2">Extracting data for project dashboard</a></li>
 <li><a href="#3">Specifying a list of offsets to <code>CreateViaOffset</code></a></li>
@@ -139,10 +141,11 @@ the <a href="https://www.revitapidocs.com/2020/3097f423-9b0e-5496-bae2-3a82b6875
 <p style="font-size: 80%; font-style:italic">Rectangular room with five walls</p>
 </center></p>
 <p>Starting with the bottom horizontal wall and moving counterclockwise to the right, top two and left, I pass in five straight line segment curves and curves and the corresponding five offset distances:</p>
-<p></pre>
+<pre>
   5 curves with lengths 9.19,9.51,3.61,5.58,9.51
   and 5 thicknesses 1.08,.43,.43,.76,1.08
-</pre></p>
+</pre>
+
 <p>This call throws an <code>Autodesk.Revit.Exceptions.InvalidOperationException</code> saying 'Curve loop couldn't be properly trimmed.'</p>
 <p><strong>Answer from the development team:</strong> 
 In the customer's example, it looks like one of the walls is split in two and meet in the middle.
