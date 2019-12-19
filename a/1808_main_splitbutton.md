@@ -63,7 +63,8 @@ the [Design Automation API for Revit on Forge](https://youtu.be/PkdBM0cFrN4):
 </center>
 
 To learn more on this topic, visit 
-the [Forge Design Automation API docs](https://forge.autodesk.com/en/docs/design-automation/v3/developers_guide/overview).
+the [Forge Design Automation API docs](https://forge.autodesk.com/en/docs/design-automation/v3/developers_guide/overview)
+and [The Building Coder DA4R topic group](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55).
 
 
 ####<a name="3"></a> Design Automation for Revit Supports IFC
@@ -93,10 +94,10 @@ A quick clarification prompted by
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [FindInserts and what does includeShadows flag do](https://forums.autodesk.com/t5/revit-api-forum/findinserts-what-does-includeshadows-flag-do/m-p/9206586):
 
-**Question:** Curious what does the includeShadows flag do in FindInserts method of the HostObject class.
+**Question:** Curious what does the `includeShadows` flag do in THE `FindInserts` method of the `HostObject` class.
 
 <center>
-<img src="img/FindInserts.jpg" alt="FindInserts" width="204"> <!--408-->
+<img src="img/FindInserts.jpg" alt="FindInserts" width="400"> <!--408-->
 </center>
 
 The documentation says "True if shadows should be included in the return." But this doesn't make any sense to me.
