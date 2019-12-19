@@ -311,6 +311,9 @@ So, I think it might be time to step away from `CreateViaOffset` for the time be
 On the other hand, your goal is almost reached: you have the room boundary, its boundary elements and their thicknesses.
 From those, it is possible to create a curve loop tracing the outside edges of the walls.
 
+**Addendum from the development team:** 
+Yes, I did test it with unpublished development code; however, we use `CreateViaOffset` in our add-in starting with 2019.1, methinks, and 100% certain in 2020 &ndash; it was fairly ok.
+The only thing that comes to mind is that we might not be taking the same curves (maybe external curve vs. wall center line, or... dunno). IDEA: instead of taking the contours/whatever from walls, take the bounding box and offset that with the thickest wall... it's not ideal nor pretty, but if its urgent, it should get the job done, best for square rooms, bad and very bad for anything else...
 
 ####<a name="4"></a> How to Determine Room Outline Including Surrounding Walls
 
