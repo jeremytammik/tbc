@@ -34,7 +34,7 @@
 
 twitter:
 
- in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+DA4R recording, FindInserts shadows, add-in deployment and main SplitButton in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/shadowandsplit
 
 So many interesting things going on in the Revit API discussion forum.
 Also, the newest DA4R recording is now available online
@@ -134,7 +134,9 @@ In that case, Revit will cut an opening on the other joined wall, as you can see
 <img src="img/findinserts_wall_shadow_cutout.png" alt="Wall shadow cutout" width="490"> <!--980-->
 </center>
 
-For this API &ndash; `FindInserts`, here is a short demo &ndash; I try to find the Inserts on the joined wall but not the wall with the window:
+For this API &ndash; `FindInserts`, here is
+a [short demo recording](https://thebuildingcoder.typepad.com/files/findinserts_include_shadow.gif) &ndash;
+i try to find the inserts on the joined wall but not the wall with the window:
 
 <center>
 <img src="img/findinserts_include_shadow.gif" alt="FindInserts demo" width="640"> <!--1279-->
