@@ -52,6 +52,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### DA4R Recording, Main SplitButton, Curve Parametrisation
 
+As usual, I am all too busy on the Revit API discussion forum.
+So many interesting things going on there.
+Also, the newest DA4R recording is now available online:
+
+- [Forge Design Automation API for Revit Recording](#2)
+- [Design Automation for Revit Supports IFC](#3)
+- [What Does the FindInserts IncludeShadows Flag Do?](#4)
+- [Easiest Solution to Deploy Add-In](#5)
+- [Always Show the same Button in SplitButton](#6)
 
 ####<a name="2"></a> Forge Design Automation API for Revit Recording
 
