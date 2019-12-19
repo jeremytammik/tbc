@@ -55,7 +55,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### DA4R Recording, FindInserts, Deployment and SplitButton
+### DA4R, FindInserts, Deployment and SplitButton
 
 As usual, I am all too busy on the Revit API discussion forum.
 So many interesting things going on there.
