@@ -88,7 +88,7 @@ You can check it out for yourself in
 the [design automation tutorial task 7, submit a workitem](https://forge.autodesk.com/en/docs/design-automation/v3/tutorials/revit/step7-post-workitem),
 towards the bottom of the page.
 
-####<a name="3"></a> What Does the FindInserts IncludeShadows Flag Do?
+####<a name="4"></a> What Does the FindInserts IncludeShadows Flag Do?
 
 A quick clarification prompted by
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -135,7 +135,7 @@ Many thanks to Phil Xia for this detailed explanation!
 Makes much sense now.
  
 
-####<a name="4"></a> Easiest Solution to Deploy Add-In
+####<a name="5"></a> Easiest Solution to Deploy Add-In
 
 A simple deployment of Revit add-ins is sought in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -214,8 +214,7 @@ I will have a chat with the IT managers and ask them to do this.
 Thanks!
 
 
-
-####<a name="5"></a> Always Show the same Button in SplitButton
+####<a name="6"></a> Always Show the same Button in SplitButton
 
 Rikard Nilsson, Solution Architect at [Cadcraft](https://www.cadcraft.com), read the manuals more carefully than I did and suggests a much simpler and better solution in his thread on how
 to [always show the same button on `SplitButton`](https://forums.autodesk.com/t5/revit-api-forum/always-show-the-same-button-on-splitbutton/m-p/9206967):
