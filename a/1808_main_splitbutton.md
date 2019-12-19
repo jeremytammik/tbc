@@ -46,6 +46,19 @@ Also, the newest DA4R recording is now available online
 
 linkedin:
 
+DA4R recording, FindInserts shadows, add-in deployment and main SplitButton in the #RevitAPI
+
+http://bit.ly/shadowandsplit
+
+So many interesting things going on in the Revit API discussion forum.
+
+Also, the newest DA4R recording is now available online:
+
+- Forge Design Automation API for Revit recording
+- Design Automation for Revit supports IFC
+- What does the <code>FindInserts</code> <code>includeShadows</code> flag do?
+- Easiest solution to deploy add-in
+- Always show the same button in <code>SplitButton</code>...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
