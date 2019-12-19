@@ -36,8 +36,13 @@ twitter:
 
  in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+So many interesting things going on in the Revit API discussion forum.
+Also, the newest DA4R recording is now available online
+&ndash; Forge Design Automation API for Revit recording
+&ndash; Design Automation for Revit supports IFC
+&ndash; What does the <code>FindInserts</code> <code>includeShadows</code> flag do?
+&ndash; Easiest solution to deploy add-in
+&ndash; Always show the same button in <code>SplitButton</code>...
 
 linkedin:
 
@@ -50,17 +55,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### DA4R Recording, Main SplitButton, Curve Parametrisation
+### DA4R Recording, FindInserts, Deployment and SplitButton
 
 As usual, I am all too busy on the Revit API discussion forum.
 So many interesting things going on there.
 Also, the newest DA4R recording is now available online:
 
-- [Forge Design Automation API for Revit Recording](#2)
-- [Design Automation for Revit Supports IFC](#3)
-- [What Does the FindInserts IncludeShadows Flag Do?](#4)
-- [Easiest Solution to Deploy Add-In](#5)
-- [Always Show the same Button in SplitButton](#6)
+- [Forge Design Automation API for Revit recording](#2)
+- [Design Automation for Revit supports IFC](#3)
+- [What does the `FindInserts` `includeShadows` flag do?](#4)
+- [Easiest solution to deploy add-in](#5)
+- [Always show the same button in `SplitButton`](#6)
 
 ####<a name="2"></a> Forge Design Automation API for Revit Recording
 
@@ -266,5 +271,5 @@ the [SplitButton.IsSynchronizedWithCurrentItem property](https://www.revitapidoc
   splitButtonClearLoads.IsSynchronizedWithCurrentItem = false;
 </pre>
 
-Happy thanks to Rikard for pointing out this obvious solution, and happy advent to all!
+Many thanks to Rikard for pointing out this obvious solution, and happy advent to all!
 
