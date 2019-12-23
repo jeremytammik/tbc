@@ -110,3 +110,24 @@ Here is a snippet of sample code to achieve these steps:</p>
 
 <p>Many thanks to Mikako for providing this explanation!</p>
 
+<h4><a name="2"></a>Addendum &ndash; Cast Built-In Parameter to Integer</h4>
+
+<p>In his
+<a href="">comments</a>
+<a href="">below</a>,
+Matthias Schneider points out that the built-in parameter needs to be converted to <code>int</code>:</p>
+
+<p>In Revit 2017 and later versions, this doesn't work any more:
+
+<pre>
+  param.Set(SlantedOrVerticalColumnType.CT_EndPoint)
+</pre>
+
+<p>Instead, you have to use:</p>
+
+<pre>
+  param.Set((int)SlantedOrVerticalColumnType.CT_EndPoint)
+</pre>
+
+<p>Many thanks to Matthias this observation!</p>
+
