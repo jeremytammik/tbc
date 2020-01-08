@@ -12,8 +12,12 @@ twitter:
 
  in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+Happy New Year to the Revit add-in developer community!
+My main holiday project was the implementation of an external command to determine the 2D plan view outer boundary of a room in the XY plane, including all its bounding elements' geometry
+&ndash; How to generate a 2D polygon representing the birds-eye view of an element
+&ndash; <code>CmdExtrusionAnalyzer</code> element outline using <code>ExtrusionAnalyzer</code>
+&ndash; <code>Cmd2dBoolean</code> element outline using 2D Booleans
+&ndash; <code>CmdRoomOuterOutline</code> outer room outline using 2D Booleans...
 
 linkedin:
 
@@ -25,7 +29,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Element Outline with 2D Booleans
+### Extrusion Analyser and 2D Boolean Element Outline
 
 Happy New Year to the Revit add-in developer community!
 
@@ -332,5 +336,5 @@ the [ElementOutline GitHub repository](https://github.com/jeremytammik/ElementOu
 
 Thank you!
 
-Happy continuation of 2020!
+Happy continuation of 2020 to all!
 
