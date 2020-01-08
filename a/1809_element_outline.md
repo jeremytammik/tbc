@@ -29,6 +29,22 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Happy New Year to the Revit add-in developer community!
 
+My main holiday project was the addition of a new external command `CmdRoomOuterOutline` to
+the [ElementOutline add-in](https://github.com/jeremytammik/ElementOutline).
+
+`CmdRoomOuterOutline` determines the 2D plan view outer boundary of a room in the XY plane, including all its bounding elements' geometry.
+
+The idea for this was prompted by
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
+on [room boundary polygons](https://forums.autodesk.com/t5/revit-api-forum/room-boundary-polygons/m-p/9157379),
+[CreateViaOffset to offset room boundary inwards or outwards](https://forums.autodesk.com/t5/revit-api-forum/createviaoffset/m-p/9159500) and
+[CreateViaOffset taking a list of offset distances](https://forums.autodesk.com/t5/revit-api-forum/createviaoffset-curveloop-original-ilist-lt-double-gt/m-p/9196659).
+
+Before we get to the new command, though, let's discuss some other more basic aspects and functionality of this add-in:
+
+
+
+
 ####<a name="2"></a> 
 
 ####<a name="3"></a> 
