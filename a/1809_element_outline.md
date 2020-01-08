@@ -1,5 +1,5 @@
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http<code>equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="bc.css">
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
@@ -22,6 +22,21 @@ My main holiday project was the implementation of an external command to determi
 &ndash; <code>CmdRoomOuterOutline</code> outer room outline using 2D Booleans...
 
 linkedin:
+
+Happy New Year to the Revit add-in developer community! 
+
+Determine 2D plan view outer boundary of a room in XY  including all bounding element geometry.
+
+ExtrusionAnalyzer versus Clipper 2D Booleans for birds-eye element view polygons in the #RevitAPI
+
+http://bit.ly/elementoutline
+
+My main holiday project was the implementation of an external command to determine the 2D plan view outer boundary of a room in the XY plane, including all its bounding elements' geometry
+
+- How to generate a 2D polygon representing the birds-eye view of an element
+- CmdExtrusionAnalyzer element outline using ExtrusionAnalyzer
+- Cmd2dBoolean element outline using 2D Booleans
+- CmdRoomOuterOutline outer room outline using 2D Booleans...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
