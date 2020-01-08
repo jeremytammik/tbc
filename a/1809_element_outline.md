@@ -47,8 +47,6 @@ Before we get to the new command, though, let's discuss some other more basic as
 - [Alternative approaches to determine 2D element outline](#4)
 - [Cmd2dBoolean](#5)
 - [CmdRoomOuterOutline](#6)
-- [Author](#7)
-- [License](#8)
 
 The add-in implements three external commands:
 
@@ -67,7 +65,7 @@ the [Clipper integer coordinate based 2D Boolean operations library](http://angu
 The add-in also implements a bunch of utilities for converting Revit coordinates to 2D data in millimetre units and displaying the resulting element outlines in a Windows form.
 
 
-## <a name="2"></a>Task &ndash; 2D Polygon Representing Birds-Eye View of an Element
+#### <a name="2"></a>Task &ndash; 2D Polygon Representing Birds-Eye View of an Element
 
 The goal is to export the 2D outlines of Revit `Element` instances, i.e., for each element, associate its element id or unique id with the list of X,Y coordinates describing a polygon representing the visual birds-eye view look of its outline.
 
@@ -104,7 +102,7 @@ Toilets:
 In end effect, we generate a dictionary mapping an element id or unique id to a list of space delimited pairs of X Y vertex coordinates in millimetres.
 
 
-## <a name="3"></a>CmdExtrusionAnalyzer
+#### <a name="3"></a>CmdExtrusionAnalyzer
 
 This code was originally implemented as part of (and later extracted from)
 the [RoomEditorApp project](https://github.com/jeremytammik/RoomEditorApp).
@@ -116,7 +114,7 @@ This approach is described in detail in the discussion on
 the [extrusion analyser and plan view boundaries](https://thebuildingcoder.typepad.com/blog/2013/04/extrusion-analyser-and-plan-view-boundaries.html).
 
 The [GeoSnoop .NET boundary curve loop visualisation](https://thebuildingcoder.typepad.com/blog/2013/04/geosnoop-net-boundary-curve-loop-visualisation.html) provides
-some example images of the resulting putlines.
+some example images of the resulting outlines.
 
 As you can see there, the outline generated is more precise and detailed than the standard 2D Revit representation.
 
@@ -134,15 +132,15 @@ The loops exported by the RoomEditorApp add-in for the same desk and chair look 
 
 E.g., for the desk, you notice the little bulges for the desk drawer handles sticking out a little bit beyond the desktop surface.
 
-For the chair, the arm rests are missing, because the solids used to model them do not make it through the extruson analyser, or maybe because the code ignores multiple disjust loops.
+For the chair, the arm rests are missing, because the solids used to model them do not make it through the extrusion analyser, or maybe because the code ignores multiple disjunct loops.
 
-Here is an sample model with four elements highlighted in blue:
+Here is a sample model with four elements highlighted in blue:
 
 <center>
 <img src="img/element_outline_four_selected_extrusion_analyser_svg_path.png" alt="Four elements selected" title="Four elements selected" width="300"/>
 </center>
 
-For them, the CmdExtrusionAnalyzer command generates the following JSON file defeining their outline polygon in SVG format:
+For them, the CmdExtrusionAnalyzer command generates the following JSON file defining their outline polygon in SVG format:
 
 <pre>
 {"name":"pt2+20+7", "id":"576786", "uid":"bc43ed2e-7e23-4f0e-9588-ab3c43f3d388-0008cd12", "svg_path":"M-56862 -9150 L-56572 -9150 -56572 -14186 -56862 -14186Z"}
@@ -153,9 +151,9 @@ For them, the CmdExtrusionAnalyzer command generates the following JSON file def
 
 `M`, `L` and `Z` stand for `moveto`, `lineto` and `close`, respectively. Repetitions of `L` can be omitted. Nice and succinct.
 
-However, the extrusion analyzer approach abviously fails for all elements that do not define any solids, e.g., 2D elements represented only by curves and meshes.
+However, the extrusion analyser approach obviously fails for all elements that do not define any solids, e.g., 2D elements represented only by curves and meshes.
 
-Hence the continued research to find an alternative approach and the implementation of `Cmd2dBoolean` dewscribed below making use of the Clipper library and 2D Booleans instead.
+Hence the continued research to find an alternative approach and the implementation of `Cmd2dBoolean` described below making use of the Clipper library and 2D Booleans instead.
 
 In July 2019, I checked with the development team and asked whether they could suggest a better way to retrieve the 2D outline of an element.
 
@@ -164,7 +162,7 @@ They responded that my `ExtrusionAnalyzer` approach seems like the best (and may
 Considering Cmd2dBoolean, I might add the caveat 'using the Revit API' to the last statement.
 
 
-## <a name="4"></a>Alternative Approaches to Determine 2D Element Outline
+#### <a name="4"></a>Alternative Approaches to Determine 2D Element Outline
 
 The `ExtrusionAnalyzer` approach based on element solids does not successfully address the task of generating the 2D birds-eye view outline for all Revit elements.
 
@@ -198,7 +196,7 @@ Alpha shape:
 - https://pypi.org/project/alphashape/
 - https://alphashape.readthedocs.io/
 
-I determined that some elements have no solids, just meshes, hence the extrusion anayser approach cannot be used.
+I determined that some elements have no solids, just meshes, hence the extrusion analyser approach cannot be used.
 
 Looked at the [alpha shape implementation here](https://pypi.org/project/alphashape).
 
@@ -209,10 +207,10 @@ I had another idea for a much simpler approach using 2D Boolean operations, unit
 - Join all line segments into closed polygons
 - Union all the polygons using Clipper
 
-Thast seems to return robust results.
+That seems to return robust results.
 
 
-## <a name="5"></a>Cmd2dBoolean
+#### <a name="5"></a>Cmd2dBoolean
 
 I completed a new poly2d implementation using 2D Booleans instead of the solids and extrusion analyser.
 I expect it is significantly faster.
@@ -221,7 +219,7 @@ The ElementOutline release 2020.0.0.10 exports outlines from both solids and 2D 
 
 Maybe meshes and solids cover all requirements.
 I am still experimenting and testing.
-What is missing besided meshes and solids?
+What is missing besides meshes and solids?
 
 I tested successfully on an intercom element.
 It is not a mesh, just a circle, represented by a full closed arc.
@@ -243,14 +241,14 @@ My target is to continue enhancing the 2D Booleans until they include all the so
 
 Maybe all I need to do is to use LevelOfDetail = Fine?
 
-```
+<pre class="code">
   Options opt = new Options
   {
     IncludeNonVisibleObjects = true,
     DetailLevel = ViewDetailLevel.Fine
   };
   GeometryElement geomElem = element.get_Geometry(opt);
-```
+</pre>
 
 I might try again with fine detail level.
 However, the circle already looks pretty good to me.
@@ -268,13 +266,13 @@ manipulation and analysis of geometric objects to `union()` the triangles.
 Since it is slower, it would be better to switch to Clipper.
 
 
-## <a name="6"></a>CmdRoomOuterOutline
+#### <a name="6"></a>CmdRoomOuterOutline
 
-I implemented the third command `CmdRoomOuterOutline` after an unsuccesful attempt at generating the outer outline of a room including its bounding elements
+I implemented the third command `CmdRoomOuterOutline` after an unsuccessful attempt at generating the outer outline of a room including its bounding elements
 by [specifying a list of offsets to `CreateViaOffset`](https://thebuildingcoder.typepad.com/blog/2019/12/dashboards-createviaoffset-and-room-outline-algorithms.html#3).
 
 After that failure, I suggested a number of alternative approaches 
-to [determine th room outline including surrounding walls](https://thebuildingcoder.typepad.com/blog/2019/12/dashboards-createviaoffset-and-room-outline-algorithms.html#4).
+to [determine the room outline including surrounding walls](https://thebuildingcoder.typepad.com/blog/2019/12/dashboards-createviaoffset-and-room-outline-algorithms.html#4).
 
 **Question:** I started to look at the possibility of tracing the outside of the walls several weeks ago, when I was at a loss utilising `CreateViaOffset`.
 
@@ -309,7 +307,7 @@ Probably all the pure Revit API approaches will run into various problematic exc
 
 I ended up implementing my suggestion in the new external command `CmdRoomOuterOutline`.
 
-It makes use of the 2D Boolean outline generation functionality implemented for Cmd2dBoolean, adding code to generate a polygon for the room boundary and unite it wityh all the bounding elements.
+It makes use of the 2D Boolean outline generation functionality implemented for Cmd2dBoolean, adding code to generate a polygon for the room boundary and unite it with all the bounding elements.
 
 It successfully handles the wall width sample model:
 
@@ -323,5 +321,16 @@ It also gracefully handles the room separator situation:
 <img src="img/room_separator_using_2d_booleans.png" alt="Room separator sample loop" title="Room separator sample loop" width="500"/>
 </center>
 
+#### <a name="7"></a>Conclusion
 
+As you can see, the 2D Boolean approach provides a highly robust and flexible method to solve almost any kind of element outlining task.
+
+I look forward to hearing your feedback and suggestions for improvements.
+
+Please submit them as pull requests to 
+the [ElementOutline GitHub repository](https://github.com/jeremytammik/ElementOutline).
+
+Thank you!
+
+Happy continuation of 2020!
 
