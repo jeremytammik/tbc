@@ -85,15 +85,21 @@ For instance, here are three sample images highlighting the bathtubs, doors and 
 
 Bathtubs:
 
+<center>
 <img src="img/birdseye_view_bathtubs.png" alt="Bathtubs" title="Bathtubs" width="300"/>
+</center>
 
 Doors:
 
+<center>
 <img src="img/birdseye_view_internal_doors.png" alt="Doors" title="Doors" width="300"/>
+</center>
 
 Toilets:
 
+<center>
 <img src="img/birdseye_view_toilets.png" alt="Toilets" title="Toilets" width="300"/>
+</center>
 
 In end effect, we generate a dictionary mapping an element id or unique id to a list of space delimited pairs of X Y vertex coordinates in millimetres.
 
@@ -116,11 +122,15 @@ As you can see there, the outline generated is more precise and detailed than th
 
 The standard plan view of the default desk and chair components look like this in Revit:
 
+<center>
 <img src="img/desk_and_chair_plan.png" alt="Plan view of desk and chair in Revit" title="Plan view of desk and chair in Revit" width="318"/>
+</center>
 
 The loops exported by the RoomEditorApp add-in for the same desk and chair look like this instead:
 
+<center>
 <img src="img/desk_and_chair_loops.png" alt="Desk and chair loops in GeoSnoop" title="Desk and chair loops in GeoSnoop" width="318"/>
+</center>
 
 E.g., for the desk, you notice the little bulges for the desk drawer handles sticking out a little bit beyond the desktop surface.
 
@@ -128,7 +138,9 @@ For the chair, the arm rests are missing, because the solids used to model them 
 
 Here is an sample model with four elements highlighted in blue:
 
+<center>
 <img src="img/element_outline_four_selected_extrusion_analyser_svg_path.png" alt="Four elements selected" title="Four elements selected" width="300"/>
+</center>
 
 For them, the CmdExtrusionAnalyzer command generates the following JSON file defeining their outline polygon in SVG format:
 
@@ -219,7 +231,9 @@ I also implemented a utility `GeoSnoop` to display the loops generated in a temp
 
 Here is an image showing part of a sample Revit model in the middle including a wall, bathtub and intercom element and two GeoSnoop windows:
 
+<center>
 <img src="img/geosnoop_solids_versus_booleans.png" alt="GeoSnoop outlines generated from solids versus 2D Booleans" title="GeoSnoop outlines generated from solids versus 2D Booleans" width="800"/>
+</center>
 
 The left GeoSnoop window shows the outline loops retrieved from the solids using the extrusion analyser.
 The right one shows the loops retrieved from the 2D Booleans, including closed arcs.
@@ -299,17 +313,15 @@ It makes use of the 2D Boolean outline generation functionality implemented for 
 
 It successfully handles the wall width sample model:
 
+<center>
 <img src="img/wall_width_loop_using_2d_booleans.png" alt="Wall width sample loop" title="Wall width sample loop" width="500"/>
+</center>
 
 It also gracefully handles the room separator situation:
 
-<img src="img/room_separator_using_2d_booleans.png" alt="Room separator sample loop" title="Room separator sample loop" width="500"/>
-
-
 <center>
-<img src="img/" alt="" width="100"> <!--408-->
+<img src="img/room_separator_using_2d_booleans.png" alt="Room separator sample loop" title="Room separator sample loop" width="500"/>
 </center>
 
-<pre class="code">
-</pre>
+
 
