@@ -163,6 +163,37 @@ Many thanks to Phil Xia for this detailed explanation!
 
 Makes much sense now.
  
+####<a name="4.1"></a> Addendum &ndash; Meaning of includeSharedEmbeddedInserts
+
+**Question:** What's the meaning of the fourth argument, `includeSharedEmbeddedInserts`?
+
+I tried to create window, door, embeded walls, curtain walls, but couldn't find its effect on models.
+
+**Answer:** From the code, it looks as if `includeSharedEmbededInserts` finds the inserts whose host is a `HostObj` that is embedded in the current wall.
+
+For instance, given a wall A with an embedded wall B, a door instance D hosted by B will be found in A if `includeSharedEmbededInsertsz is set.
+
+<!---
+Here is an example: In this model (see attached below), the wall (id=143992) has a wall (id=141718) embeded, and the door instance (id=226688) on it will be found by 
+
+Shengxi Zhang  3 days ago
+Attached a model with a macro in it.
+Binary 
+findInsertsSample.rvt
+5 MB Binary— Click to download
+
+/a/rvt/embedded_wall_instance.rvt
+
+```
+    [Window Title]
+    Revit
+    
+    [Main Instruction]
+    The file embedded_wall_instance.rvt was saved in a later version of Revit and cannot be retrieved in this version.
+    
+    [Close]
+```
+--->
 
 ####<a name="5"></a> Easiest Solution to Deploy Add-In
 
