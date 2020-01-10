@@ -98,6 +98,9 @@ Imperial decimal to imperial fractional? Just like before.
 
 The add-in requires a source file (like a template) from which to read the units; then, it will write those units to all Revit files inside a selected folder.
 
+Grab the add-in source code from
+the [UnitMigration GitHub repository](https://github.com/jeremytammik/UnitMigration).
+
 Many thanks to Dragos Turmac, Principal Engineer, Autodesk and Bogdan Teodorescu, Team Manager, Autodesk for implementing and sharing this!
 
 #### <a name="4"></a>Elements of AI &ndash; Crash Course for Everyone
