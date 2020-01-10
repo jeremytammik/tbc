@@ -20,8 +20,6 @@ https://en.wikipedia.org/wiki/Zhonghu
 https://en.wikipedia.org/wiki/Gaohu
 https://en.wikipedia.org/wiki/Erhu
 
-
-
 twitter:
 
 &ndash; 
@@ -47,6 +45,8 @@ I also started taking a course on AI, designed for absolutely everybody:
 - [Single-click imperial and metric project unit toggle](#2)
     - [Solution](#3)
 - [Elements of AI &ndash; crash course for everyone](#4)
+- [Zhonghu solo music](#5)
+
 
 #### <a name="2"></a>Single-Click Imperial and Metric Project Unit Toggle
 
@@ -144,3 +144,24 @@ Here is a table of contents:
     - III. Summary
 
 I already signed up, myself, and completed Chapter 1 in a bit over an hour.
+
+#### <a name="5"></a>Zhonghu Solo Music
+
+To round this off, some beautiful relaxing music,
+a [Zhonghu solo titled 草原上, 田再励中胡独奏, On the Grassland](https://youtu.be/_IHXGXh_wsg):
+
+<center>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/_IHXGXh_wsg" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
+
+> The mellow and thick sound of the zhonghu sings a melody of the Inner Mongolian style.
+The listener is brought to the vast Mongolian prairie where the white clouds float in the blue sky and cattle are grazing on the green grasslands.
+
+Wikipedia teaches me
+that [Zhonghu](https://en.wikipedia.org/wiki/Zhonghu)
+and [gaohu](https://en.wikipedia.org/wiki/Gaohu) are
+modern instrumens, developed in the last century, based on the original Mongolian instrument
+called [erhu](https://en.wikipedia.org/wiki/Erhu).
+
+
+
