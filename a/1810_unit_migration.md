@@ -158,7 +158,7 @@ a [Zhonghu solo titled 草原上, 田再励中胡独奏, On the Grassland](https
 The listener is brought to the vast Mongolian prairie where the white clouds float in the blue sky and cattle are grazing on the green grasslands.
 
 Wikipedia teaches me
-that [Zhonghu](https://en.wikipedia.org/wiki/Zhonghu)
+that [zhonghu](https://en.wikipedia.org/wiki/Zhonghu)
 and [gaohu](https://en.wikipedia.org/wiki/Gaohu) are
 modern instrumens, developed in the last century, based on the original Mongolian instrument
 called [erhu](https://en.wikipedia.org/wiki/Erhu).
