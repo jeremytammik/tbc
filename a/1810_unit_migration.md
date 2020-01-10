@@ -22,6 +22,10 @@ https://en.wikipedia.org/wiki/Erhu
 
 twitter:
 
+Determine 2D plan view outer boundary of a room in XY including all bounding element geometry, ExtrusionAnalyzer versus Clipper 2D Booleans for birds-eye element view polygons in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/elementoutline
+
+http://bit.ly/unitmigration
+
 I just helped address a wish in the Revit Idea Station.
 I also started taking a course on AI, designed for absolutely everybody
 &ndash; Single-click imperial and metric project unit toggle
