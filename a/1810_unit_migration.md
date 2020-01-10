@@ -72,7 +72,7 @@ That makes 14 clicks and changes for each instance.
 What often happens then, is that users just change the `Length` category, leaving the family mixed, part imperial, part metric, for instance like this:
 
 <center>
-<img src="img/project_units_part_imperial_part_metric.png" alt="Project units part imperial part metric" title="Project units part imperial part metric" width="368"/>
+<img src="img/project_units_part_imperial_part_metric.png" alt="Mixed project units part imperial part metric" title="Mixed project units part imperial part metric" width="368"/>
 </center>
 
 #### <a name="3"></a>Solution
@@ -151,7 +151,7 @@ To round this off, some beautiful relaxing music,
 a [Zhonghu solo titled 草原上, 田再励中胡独奏, On the Grassland](https://youtu.be/_IHXGXh_wsg):
 
 <center>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/_IHXGXh_wsg" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/_IHXGXh_wsg" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </center>
 
 > The mellow and thick sound of the zhonghu sings a melody of the Inner Mongolian style.
