@@ -54,7 +54,7 @@ I also started taking a course on AI, designed for absolutely everybody:
 
 #### <a name="2"></a>Single-Click Imperial and Metric Project Unit Toggle
 
-The new [UnitMigration add-in](https://github.com/jeremytammik/UnitMigration) migrate
+The new [UnitMigration add-in](https://github.com/jeremytammik/UnitMigration) migrates
 all unit settings from a source RVT to a folder full of target RVT models.
 
 This add-in has been created and published in response to the Revit Idea Station request by Kasper Miller
