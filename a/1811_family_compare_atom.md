@@ -9,7 +9,7 @@
 
 twitter:
 
-the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon
+I will be attending Swissbau Basel on Wednesday, comparing families using part atoms and determining the maximum area rectangle inscribed in a polygon in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/familycompare
 
 Here is a last-minute announcement that I will be attending the Swissbau Basel on Wednesday, a quick hint to answer a support case that just came in today, a forum thread issue, and a pointer to a drum solo:
 &ndash; Attending Swissbau Basel on Wednesday
