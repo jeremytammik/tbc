@@ -61,6 +61,17 @@ Here are some recent getting started tips on various areas: programming in gener
 
 linkedin:
 
+The C# Yellow Book, a Chinese Revit API tutorial and insight into Insight with the #RevitAPI
+
+http://bit.ly/csbookrvtapitutor
+
+I very much enjoyed my quick visit to Swissbau Basel yesterday and meeting so many wonderful people there.
+
+Here are some recent getting started tips on various areas: programming in general, C#, the Revit API and Insight:
+
+- The C# Yellow Book
+- Chinese Revit API tutorial
+- Insight into Insight...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
