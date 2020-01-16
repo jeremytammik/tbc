@@ -51,6 +51,8 @@ https://www.autodesk.com/autodesk-university/class/Revit-Systems-Analysis-Featur
 
 twitter:
 
+The C# Yellow Book, a Chinese Revit API tutorial and insight into Insight in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/csbookrvtapitutor
+
 I very much enjoyed my quick visit to Swissbau Basel yesterday and meeting so many wonderful people there.
 Here are some recent getting started tips on various areas: programming in general, C#, the Revit API and Insight
 &ndash; The C&#35; Yellow Book
@@ -72,6 +74,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 I very much enjoyed my quick visit
 to [Swissbau Basel](https://www.swissbau.ch) yesterday and meeting so many wonderful people there.
+Kean shares details and photos of the event in his post
+on [Swissbau 2020](https://www.keanw.com/2020/01/swissbau-2020.html).
+Thanks to Kean for animating me to go!
 
 Meanwhile, exciting topics keep piling in from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
