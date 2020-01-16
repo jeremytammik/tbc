@@ -174,3 +174,8 @@ Regarding the API, is it possible to customize it according to our preferences?
 [Webinar &ndash; An Introduction to Revit Systems Analysis with Revit 2020.1](https://www.youtube.com/watch?v=8kvSB5abVH4)
 - [AU Class Recording &ndash; Revit Systems Analysis Features and Framework Introduction](https://www.autodesk.com/autodesk-university/class/Revit-Systems-Analysis-Features-and-Framework-Introduction-2019)
 
+
+<center>
+<img src="img/swissbau_2020.jpg" alt="Dr. Wissam Wahbeh of FHNW showing his digital and physical twin model at Swissbau 2020" title="Dr. Wissam Wahbeh of FHNW showing his digital and physical twin model at Swissbau 2020" width="500"/> <!-- 500 -->
+<p style="font-size: 80%; font-style:italic">Dr. Wissam Wahbeh of FHNW showing Kean and me his digital and physical twin model at Swissbau 2020</p>
+</center>
