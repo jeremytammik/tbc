@@ -18,7 +18,7 @@
   worth browsing even for experienced programmers
 
 - insight
-Links to learning materials, including 2020.1 added features, to get an odea aboout shat is going on in this area
+Links to learning materials, including 2020.1 added features, to get an idea about shat is going on in this area
 No officially supported API for Insight 360.
 [Q] Our MEP design team is really interested in the Insight.
 Can you provide a demonstration about it?
@@ -51,8 +51,11 @@ https://www.autodesk.com/autodesk-university/class/Revit-Systems-Analysis-Featur
 
 twitter:
 
-&ndash; 
-...
+I very much enjoyed my quick visit to Swissbau Basel yesterday and meeting so many wonderful people there.
+Here are some recent getting started tips on various areas: programming in general, C#, the Revit API and Insight
+&ndash; The C&#35; Yellow Book
+&ndash; Chinese Revit API tutorial
+&ndash; Insight into Insight...
 
 linkedin:
 
@@ -65,18 +68,20 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Tutorial, C# Book and Insight 
+### C&#35; Book, Chinese Revit API Tutorial and Insight
 
 I very much enjoyed my quick visit
 to [Swissbau Basel](https://www.swissbau.ch) yesterday and meeting so many wonderful people there.
 
-Meanwhile, the exciting topics keep piling in from
+Meanwhile, exciting topics keep piling in from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
 elsewhere.
 
-Here are some recent getting started tips on various topics: programming in general, C#, the Revit API and Insight:
+Here are some recent getting started tips on various areas: programming in general, C#, the Revit API and Insight:
 
-
+- [The C&#35; Yellow Book](#2)
+- [Chinese Revit API tutorial](#3)
+- [Insight into Insight](#4)
 
 #### <a name="2"></a>The C&#35; Yellow Book
 
@@ -87,12 +92,12 @@ The [C# Programming Yellow Book](https://www.robmiles.com/c-yellow-book)
 ([^](/j/doc/book/cs_programming_yellow_book/csharp_book_2019_refresh.pdf))
 by [Rob Miles](https://www.robmiles.com).
 
-It addresses just about everything you will ever need to know about C#, including questions such as 'what is a computer?' and 'what is a programmer?', includes a huge amount of very good advice, and is well worth browsing even for experienced programmers.
+It addresses just about everything you will ever need to know about C#, including questions such as 'what is a computer?' and 'what is a programmer?', a huge amount of other very good general programming advice, and is well worth browsing even for experienced programmers.
 
 Many thanks to Steve for this nice pointer!
 
 <center>
-<img src="img/cs_yellow_book_2019.png" alt="" title="" width="302"/> <!-- 604 -->
+<img src="img/cs_yellow_book_2019.png" alt="The C&#35; Yellow Book" title="The C&#35; Yellow Book" width="302"/> <!-- 604 -->
 </center>
 
 
@@ -112,13 +117,14 @@ contact me: 1056291511@qq.com
 </center>
 
 
-#### <a name="4"></a>
+#### <a name="4"></a>Insight into Insight
 
-An email conversation with a colleague of mine provides some insight on Insight, including links to learning materials and new features added in 2020.1 to get an odea aboout shat is going on in this area:
+An email conversation with a colleague of mine provides some insight on Insight, including links to learning materials and new features added in 2020.1 to get an idea about shat is going on in this area:
 
 **Question:** Our MEP design team is really interested in Insight.
 Can you provide a demonstration of it?
-**Answer:**  Which Insight?
+
+**Answer:** Which Insight?
 
 The [one in BIM 360](http://help.autodesk.com/view/BIM360D/ENU/?guid=GUID-EC46253E-130E-4CE9-B0C1-2FB8333E1116)?
 
@@ -136,35 +142,19 @@ Yes, I was asking about the product feature demo.
 
 Later, we would also like to know about the API and customization.
 
-As the basic preference, we would like to know the capability of Insight 360 on Revit like the lighting calculation/simulation, and Mechanical Load calculation/Analysis.
+Mostly we would like to know the capability of Insight 360 on Revit, like lighting and mechanical load calculation, simulation and analysis.
 
 Our engineers are mainly using Revit, so we have basic knowledge of that.
 
 Regarding the API, is it possible to customize it according to our preferences?
 
-**Answer:**  I would suggest the following webinar recordings:
+**Answer:**  I would suggest looking at the following webinar recordings:
 
 - For Insight (Energy and Lighting, mostly about the Energy side): 
 [Learn everything about Autodesk Insight – Episodes 1-3](http://blogs.autodesk.com/revit/2018/07/06/autodesk-insight-webinar-series)
-- For Insight Lighting – This is a little old but a good introduction esp under the hood
-Lighting Analysis in Revit
-https://www.youtube.com/watch?v=mtZXEAYNd00
-- For Mechanical / Load Analysis check see the following about new features in Revit 2020.1+
-Webinar - An Introduction to Revit Systems Analysis with Revit 2020.1
-https://www.youtube.com/watch?v=8kvSB5abVH4
-- AU Class Recording - Revit Systems Analysis Features and Framework - An Introduction
-https://www.autodesk.com/autodesk-university/class/Revit-Systems-Analysis-Features-and-Framework-Introduction-2019
-
-No officially supported API for Insight 360.
-
-
-**Question:** 
-
-
-
-
-
-<pre class="code">
-</pre>
-
+- For Insight Lighting, this is a little old but a good introduction, especially under the hood: 
+[Lighting Analysis in Revit](https://www.youtube.com/watch?v=mtZXEAYNd00)
+- For Mechanical and Load Analysis, check out the following about new features in Revit 2020.1+:
+[Webinar &ndash; An Introduction to Revit Systems Analysis with Revit 2020.1](https://www.youtube.com/watch?v=8kvSB5abVH4)
+- [AU Class Recording &ndash; Revit Systems Analysis Features and Framework Introduction](https://www.autodesk.com/autodesk-university/class/Revit-Systems-Analysis-Features-and-Framework-Introduction-2019)
 
