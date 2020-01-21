@@ -26,8 +26,12 @@ twitter:
 
  in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon
 
-&ndash; 
-...
+As always, interesting topics keep pouring in from the Revit API discussion forum and elsewhere
+&ndash; Torsion Tools GitHub launch and solution overview
+&ndash; Detect command launch
+&ndash; SelectableInViewFilter
+&ndash; Access project location in Forge
+&ndash; Distinguish structural elements and access volume information in Forge...
 
 linkedin:
 
@@ -40,7 +44,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Torsion Tools and Command Event
+### Torsion Tools, Command Event and Info in DA4R
+
+As always, interesting topics keep pouring in from
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
+elsewhere:
+
+- [Torsion Tools GitHub launch and solution overview](#2)
+- [Detect command launch](#3)
+- [SelectableInViewFilter](#4)
+- [Access project location in Forge](#5)
+- [Distinguish structural elements and access volume information in Forge](#6)
 
 
 #### <a name="2"></a>Torsion Tools GitHub Launch and Solution Overview
@@ -50,7 +64,7 @@ announces the [Torsion Tools GitHub launch and basic solution overview](https://
 
 > I wanted to share my Autodesk Revit 2020 API Visual Studio Solution Template with Code Examples for Common Tools.
 
-> The intent of the repository is to help provide Revit API support and to share code examples and solutions for common issues or time consuming tasks in Revit.
+> The intent of the repository is to help provide Revit API support and to share code examples and solutions for common issues or time-consuming tasks in Revit.
 I will provide examples and tools of items as I have created and use them, and then other are free to manipulate them to fit how they need them to work, but without any expressed or implied warranty and/or guarantee of functionality or errors.
 I think this will be the best way to share some of the work I have done without having to create installers for every single tool or publishing everything to the Autodesk App Store.
 
@@ -67,7 +81,7 @@ Many thanks to Torsion Tools for sharing and documenting this!
 #### <a name="3"></a>Detect Command Launch
 
 In the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [Group Edit Event](https://forums.autodesk.com/t5/revit-api-forum/group-edit-event/m-p/8169237),
+on a [group edit event](https://forums.autodesk.com/t5/revit-api-forum/group-edit-event/m-p/8169237),
 [Ahmed Nabil](https://www.linkedin.com/in/anabil1) suggested
 a neat method to detect when a specific command is launched by checking for its name in the `DocumentChanged` event:
 
@@ -97,7 +111,7 @@ a neat method to detect when a specific command is launched by checking for its 
 &nbsp;&nbsp;}
 </pre>
 
-This event is fired both on entering the Edit Mode (under the transaction name "Edit Group") and on exiting (under the transaction name "Finish Edit Group").
+This event is fired both on entering the Edit Group (under the transaction name "Edit Group") and on exiting it (under the transaction name "Finish Edit Group").
 
 Thank you, Ahmed, for the nice solution!
 
@@ -112,24 +126,24 @@ I never before noticed, much less used, the [SelectableInViewFilter](https://www
 
 Sounds pretty interesting, and useful...
 
-Do you happen to have any interwsting examples?
+Do you happen to have any interesting examples?
 
 #### <a name="5"></a>Access Project Location in Forge
 
 **Question:** I am working with Forge and I have a JSON file of the model, but there is no Location information inside that file.
-I can only access the project information’s address, but that isn’t what I want. 
+I can only access the project information address, but that isn’t what I want. 
 Is there a way to get the Location info inside the JSON file during the conversion?
 I mean, the location info you have in Revit at:
 
 -  Manage &rarr; Project location section &rarr; Location
 
 **Answer:** I can only suggest that you explore the Forge JSON and SVF data further and search deeper.
-If the project information is not present there, I would suggest that you export it from the RVT using the Revit API.
+If the project information is not present there, I would suggest that you export it from the RVT using the Revit API and store it somewhere else in your own data.
 You can do so either on the desktop in an installed Revit session, or in the Forge environment using the Design Automation API.
 
-#### <a name="6"></a>Distinguish Structural and Access Element Volume Information in Forge
+#### <a name="6"></a>Distinguish Structural Elements and Access Volume Information in Forge
 
-**Question:** I heard that one way of being able to distinguish structural elements in a model authored by Revit was that they would possess a volume property.
+**Question:** I heard that one way to distinguish structural elements in a model authored by Revit was that they would possess a volume property.
  
 However, I have encountered Revit models that do not contain a volume property on elements that should have one.
 They are indeed structural elements. Have you encountered this problem? Could it be caused by a problem in Revit, or is it more likely to be an error when the client enters the data for the model? Is there any other way we could determine a structural element?
@@ -159,9 +173,7 @@ Several discussions by The Building Coder deal with determining areas and volume
  
 The same processing can also be performed in [Forge Design Automation for Revit (DA4R)](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55).
 
-
-
 <center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 604 -->
+<img src="img/steel_frame.jpg" alt="Steel frame" title="Steel frame" width="400"/> <!-- 800 -->
 </center>
 
