@@ -45,7 +45,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 #### <a name="2"></a>Torsion Tools GitHub Launch and Solution Overview
 
-An exciting [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+A recent [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 announces the [Torsion Tools GitHub launch and basic solution overview](https://forums.autodesk.com/t5/revit-api-forum/torsion-tools-github-launch-and-basic-solution-overview/m-p/9254509):
 
 > I wanted to share my Autodesk Revit 2020 API Visual Studio Solution Template with Code Examples for Common Tools.
@@ -55,19 +55,21 @@ I will provide examples and tools of items as I have created and use them, and t
 I think this will be the best way to share some of the work I have done without having to create installers for every single tool or publishing everything to the Autodesk App Store.
 
 - [TorsionTools GitHub repository](https://github.com/TorsionTools/R20)
-- [Six-minute video recording on YouTube](https://youtu.be/3EVx9SzKJbk)
+- [Six-minute video recording on YouTube](https://youtu.be/3EVx9SzKJbk):
 
+<center>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/3EVx9SzKJbk" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
 
 Many thanks to Torsion Tools for sharing and documenting this!
 
 
 #### <a name="3"></a>Detect Command Launch
 
+In the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [Group Edit Event](https://forums.autodesk.com/t5/revit-api-forum/group-edit-event/m-p/8169237),
 [Ahmed Nabil](https://www.linkedin.com/in/anabil1) suggested
-a neat method to detect when a specific command is launched by checking for its name in the `DocumentChanged` event, in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [Group Edit Event](https://forums.autodesk.com/t5/revit-api-forum/group-edit-event/m-p/8169237):
+a neat method to detect when a specific command is launched by checking for its name in the `DocumentChanged` event:
 
 **Question:** Is it possible somehow to know when a user enters the group edit mode? 
 
