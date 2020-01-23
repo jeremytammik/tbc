@@ -32,6 +32,14 @@ Quick notes on two recent interesting Revit API discussion forum threads
 
 linkedin:
 
+Unit testing add-ins and the UsesInstanceGeometry IFC utility method in the #RevitAPI
+
+http://bit.ly/rvtunittesting
+
+Quick notes on two recent interesting Revit API discussion forum threads:
+
+- Unit testing
+- UsesInstanceGeometry IFC utility method...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
