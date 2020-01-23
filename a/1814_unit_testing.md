@@ -24,8 +24,7 @@
 
 twitter:
 
-
- in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon
+Unit testing add-ins and the UsesInstanceGeometry IFC utility method in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/rvtunittesting
 
 Quick notes on two recent interesting Revit API discussion forum threads
 &ndash; Unit testing
