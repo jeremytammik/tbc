@@ -27,8 +27,9 @@ twitter:
 
  in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon
 
-&ndash; 
-...
+Quick notes on two recent interesting Revit API discussion forum threads
+&ndash; Unit testing
+&ndash; <code>UsesInstanceGeometry</code> IFC utility method...
 
 linkedin:
 
