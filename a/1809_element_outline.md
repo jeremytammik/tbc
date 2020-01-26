@@ -100,6 +100,7 @@ There is no need for a rendered view, just coordinates defining a 2D polygon aro
 
 The goal is: given an element id, retrieve a list of X,Y coordinates describing the birds-eye view look of an element.
 
+<!--
 For instance, here are three sample images highlighting the bathtubs, doors and toilets, respectively, in a given floor of a building:
 
 Bathtubs:
@@ -118,6 +119,13 @@ Toilets:
 
 <center>
 <img src="img/birdseye_view_toilets.png" alt="Toilets" title="Toilets" width="300"/>
+</center>
+-->
+
+For instance, here is an apartment layout showing a birdseye view of bathtubs, doors, toilets and other accessories:
+
+<center>
+<img src="img/apartment_layout.png" alt="Apartment layout showing birdseye view of accessories" title="Apartment layout showing birdseye view of accessories" width="400"/> <!-- 1100 -->
 </center>
 
 In end effect, we generate a dictionary mapping an element id or unique id to a list of space delimited pairs of X Y vertex coordinates in millimetres.
