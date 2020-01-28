@@ -13,7 +13,7 @@
 
 twitter:
 
- in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+Add-in migration i.e. updating API references and invitation to join the upcoming yearly DevDays Online webinars for the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/devdaysmigration
 
 I share a contribution from fellow blogger Eric Boehlke and the announcement of the upcoming yearly DevDays Online presentations
 &ndash; Add-in migration &ndash; Update API references
