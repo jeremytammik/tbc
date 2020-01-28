@@ -21,7 +21,15 @@ I share a contribution from fellow blogger Eric Boehlke and the announcement of 
 
 linkedin:
 
+Add-in migration, i.e., updating API references and invitation to join the upcoming yearly DevDays Online webinars for the #RevitAPI
 
+http://bit.ly/devdaysmigration
+
+I share a contribution from fellow blogger Eric Boehlke and the announcement of the upcoming yearly DevDays Online presentations:
+
+- Add-in migration
+- Update API references
+- Join us for our DevDays Online webinars...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
