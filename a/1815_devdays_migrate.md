@@ -44,6 +44,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 I share a contribution from fellow blogger Eric Boehlke and the announcement of the upcoming yearly DevDays Online presentations:
 
 - [Add-in migration &ndash; update API references](#2)
+- [Addendum &ndash; NuGet package and .NET framework version](#2.1)
 - [Join us for our DevDays Online webinars](#3)
 
 #### <a name="2"></a>Add-In Migration &ndash; Update API references
@@ -82,6 +83,25 @@ They say: "We automatically create Instant Videos for you based on your RSS feed
 Here's another one of Eric's videos,
 on [how to get coordinates of an existing Revit View, then use them for placing other Views in Dynamo](https://youtu.be/UZl9gpFgxy0).
 
+#### <a name="2.1"></a>Addendum &ndash; NuGet Package and .NET Framework Version
+
+Jason Masters adds some important notes to this in
+his [comment below](https://thebuildingcoder.typepad.com/blog/2020/01/devdays-online-and-add-in-migration.html#comment-4774664575):
+
+In terms of upgrading Revit API versions, I'd highly recommend switching from references to the SDK to referencing
+the [NuGet package published by Matthew Taylor (Revit_All_Main_Versions_API_x64)](https://www.nuget.org/packages/Revit_All_Main_Versions_API_x64):
+
+<center>
+<img src="img/revit_all_main_versions_api.jpg" alt="NuGet package Revit all main versions API" title="NuGet package Revit all main versions API" width="512"/> <!-- 2365 -->
+</center>
+
+This package contains all the Revit API references across all versions.
+Using NuGet means that any other developer opening your repo won't necessarily need the SDK to build it, it will integrate more easily into CI/CD pipelines, and checking against different API versions is as simple as changing which version of the NuGet package you're using.
+
+Also, if you need to migrate to 2020, you're going to need to first change the .NET target framework version of your project to 4.7, then update your references to the 2020 API.
+
+Many thanks to Jason for these important notes!
+
 #### <a name="3"></a>Join us for our DevDays Online Webinars
 
 We welcome you to join us for our special series of webinars where we’ll be going over the current important development topics.
@@ -101,13 +121,14 @@ Registration is open to all except where noted below:
 &ndash; Augusto Goncalves will discuss in detail the updated and new APIs added to the Forge platform during the last year.
 <br/>[Register](https://autodesk.zoom.us/webinar/register/WN_MlyzAqW8TF-oC7XPFcC7FA)
 - <b>Thursday 2020-02-27 &ndash; Revit, Civil 3D and InfraWorks API Updates</b> (for ADN members only)
-&ndash; Join Mikako Harada and Augusto Goncalves to discover the product and API changes and enhancements coming in the next releases of Revit, Civil 3D and InfraWorks.
+&ndash; Join Sasha Crotty and Augusto Goncalves to discover the product and API changes and enhancements coming in the next releases of Revit, Civil 3D and InfraWorks.
 <br/>[Register](https://autodesk.zoom.us/webinar/register/WN_jLl0gXjxTnK3PWHsGyzARg)
 - <b>Tuesday 2020-03-03 &ndash; Inventor, Vault and Fusion API Update</b> (for ADN members only)
 &ndash; We will review upcoming changes in the next release of Inventor as well as recent updates in Vault and Fusion 360 API.
 <br/>[Register](https://autodesk.zoom.us/webinar/register/WN_XlRo7ADySLGofmc7M9cdkQ)
 - <b>Wednesday 2020-03-04 &ndash; BIM 360 API Update</b>
-&ndash; Learn about the new APIs for the BIM 360 family. We’ll talk about what’s in the pipeline for API enhancements.
+&ndash; Learn about new APIs in the BIM 360 family products.
+We’ll talk about new Model Coordination and Cost Management APIs and other API enhancements.
 <br/>[Register](https://autodesk.zoom.us/webinar/register/WN_TIxv3ZpPS1228DYy_-i7HA)
 - <b>Thursday 2020-03-05 &ndash; The next Release of AutoCAD APIs</b> (for ADN members only)
 &ndash; Discover API changes coming in the upcoming release of AutoCAD Rogue.
