@@ -11,9 +11,9 @@
 
 twitter:
 
- the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+WPF versus WinForms in Revit add-ins and a WPF template for the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/wpftemplate
 
-The long-standing topic of WinForms versus WPF for Revit add-in user interface seems to be reaching a resolution
+The long-standing topic of WinForms versus WPF for Revit add-in user interface seems to be nearing a conclusion
 &ndash; WinForms or WPF?
 &ndash; Revit WPF template
 &ndash; Readme
@@ -34,7 +34,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Revit WPF Add-Ins and Template
 
-The long-standing topic of WinForms versus WPF for Revit add-in user interface seems to be reaching a resolution:
+The long-standing topic of WinForms versus WPF for Revit add-in user interface seems to be nearing a conclusion:
 
 - [WinForms or WPF?](#2)
 - [Revit WPF template](#3)
@@ -45,7 +45,8 @@ The long-standing topic of WinForms versus WPF for Revit add-in user interface s
 
 #### <a name="2"></a>WinForms or WPF?
 
-An extensive discussion on the question of
+An extensive discussion in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) on the question of
 using [WinForms or WPF](https://forums.autodesk.com/t5/revit-api-forum/winforms-or-wpf/m-p/9284061) in
 Revit add-ins is pretty clearly recommending WPF as the better choice, for various reasons:
 
