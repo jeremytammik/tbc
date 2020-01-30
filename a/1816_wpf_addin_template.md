@@ -13,8 +13,13 @@ twitter:
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+The long-standing topic of WinForms versus WPF for Revit add-in user interface seems to be reaching a resolution
+&ndash; WinForms or WPF?
+&ndash; Revit WPF template
+&ndash; Readme
+&ndash; Build
+&ndash; Customize
+&ndash; Documentation...
 
 linkedin:
 
