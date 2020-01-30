@@ -23,6 +23,18 @@ The long-standing topic of WinForms versus WPF for Revit add-in user interface s
 
 linkedin:
 
+WPF versus WinForms in Revit add-ins and a WPF template for the #RevitAPI 
+
+http://bit.ly/wpftemplate
+
+The long-standing topic of WinForms versus WPF for Revit add-in user interface seems to be nearing a conclusion:
+
+- WinForms or WPF?
+- Revit WPF template
+- Readme
+- Build
+- Customize
+- Documentation...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
