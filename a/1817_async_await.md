@@ -9,13 +9,13 @@
 
 twitter:
 
- the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+Autodesk open positions, communicating from outside with Revit and an async/await external event wrapper for the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/asyncawaitexternal
 
-<code>async</code> and <code>/await<code> external event wrapper!
+<code>async</code> and <code>await</code> external event wrapper!
 Communicating from outside with Revit is often better replaced by the Forge Design Automation API for Revit.
 However, it is also possible to make use of Revit as a server in a limited way via an external event
 &ndash; Communicating with another process
-&ndash; Jobs...
+&ndash; Autodesk open positions...
 
 linkedin:
 
@@ -47,9 +47,9 @@ However, people sometimes prefer not to read and research, not to fish, but rath
 
 Furthermore, our new hero Igor shared a cool wrapper for external events that makes the process easier than ever before:
 
-- [Async and Await External Event Wrapper](#2)
-- [Communicating with Another Process](#3)
-- [Jobs](#4)
+- [`async` and `await` external event wrapper](#2)
+- [Communicating with another process](#3)
+- [Autodesk open positions](#4)
 
 <center>
 <img src="img/communication.png" alt="Communication" title="Communication" width="400"/>
@@ -61,7 +61,7 @@ A Revit add-in can accept requests from an external source that executes outside
 
 This functionality can obviously also be wrapped in an `async` and `await` structure.
 
-Igor Serdyukov, also known as Игорь Сердюков or [WhiteSharq]() has implemented such a wrapper, saying:
+Igor Serdyukov, also known as Игорь Сердюков or [WhiteSharq](https://github.com/WhiteSharq) has implemented such a wrapper, saying:
 
 > I thought you might be interested in my small humble invention for Revit coders.
 I call it `RevitTask`.
@@ -146,7 +146,7 @@ For that purpose,
 a [DA4R application](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55) may
 be a more appropriate choice:
 
-#### <a name="4"></a>Jobs
+#### <a name="4"></a>Autodesk Open Positions
 
 Autodesk is offering a number of exciting jobs in engineering positions in various parts of the world.
 
