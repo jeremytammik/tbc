@@ -1,0 +1,137 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</head></p>
+<!---
+
+twitter:
+
+ the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+
+<code>async</code> and <code>/await<code> external event wrapper!
+Communicating from outside with Revit is often better replaced by the Forge Design Automation API for Revit.
+However, it is also possible to make use of Revit as a server in a limited way via an external event
+&ndash; Communicating with another process
+&ndash; Jobs...
+
+linkedin:
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<p style="font-size: 80%; font-style:italic"></p>
+
+-->
+
+<h3>External Communication and Async Await Event</h3>
+<p>The question of communicating from outside with Revit is popping up with increasing frequency.</p>
+<p>Since Revit is designed as an interactive end user tool, misusing it as a server may fail and may also violate the license agreement.</p>
+<p>Therefore, in many cases, the cleanest (or only clean) solution will involve use of
+the <a href="https://forge.autodesk.com/en/docs/design-automation/v3/developers_guide/overview">Forge Design Automation API for Revit</a>
+or <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55">DA4R</a>.</p>
+<p>However, it is also possible to make use of Revit as a server in a limited way via
+an <a href="https://www.revitapidocs.com/2020/05089477-4612-35b2-81a2-89c4f44370ea.htm">external event</a>.</p>
+<p>Many aspects of this have been discussed numerous times in the past in the topic group
+on <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">external events for modeless access and driving Revit from outside</a>.</p>
+<p>However, people sometimes prefer not to read and research, not to fish, but rather ask repeated questions and be fed, so we return to this topic again (and again).</p>
+<p>Furthermore, our new hero Igor shared a cool wrapper for external events that makes the process easier than ever before:</p>
+<ul>
+<li><a href="#2">Async and Await External Event Wrapper</a></li>
+<li><a href="#3">Communicating with Another Process</a></li>
+<li><a href="#4">Jobs</a></li>
+</ul>
+<p><center>
+<img src="img/communication.png" alt="Communication" title="Communication" width="400"/>
+</center></p>
+<h4><a name="2"></a>Async and Await External Event Wrapper</h4>
+<p>A Revit add-in can accept requests from an external source that executes outside the valid Revit API context by implementing an external event and providing a method for the external client to raise it.</p>
+<p>This functionality can obviously also be wrapped in an <code>async</code> and <code>await</code> structure.</p>
+<p>Igor Serdyukov, also known as Игорь Сердюков or <a href="">WhiteSharq</a> has implemented such a wrapper, saying:</p>
+<blockquote>
+<p>I thought you might be interested in my small humble invention for Revit coders.
+I call it <code>RevitTask</code>.
+You can find details in the <a href="https://github.com/WhiteSharq/RevitTask">RevitTask project GitHub page</a>.
+It is also available as a <a href="https://www.nuget.org/packages/RevitTask">nuget package</a>.
+It includes two samples, a minimal test and a little more interesting example project using Revit as a server and handling requests from the browser.</p>
+</blockquote>
+<h4><a name="3"></a>Communicating with Another Process</h4>
+<p>The issue of communicating with another process was also discussed back and forth a couple of times in the past few days in 
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-addin-communicating-with-other-process/m-p/9275981">Revit add-in communicating with other process</a>:</p>
+<p><strong>Question:</strong> I need to write a Revit add-in (the external command) which listens to messages from other process (not from Revit itself).
+In other words, the Revit add-in would be the server, another process would be a client.</p>
+<p>I tried to use async pipe to communicate with other process but the Revit add-in doesn't listen to any messages.</p>
+<p>I think it's because of my server-side pipe in Revit is closed as soon as the <code>Execute</code> method returns and terminates.</p>
+<p>Is there any way to keep the server pipe still alive, even after the add-in's <code>Execute</code> finishes?</p>
+<p>I think I should create a thread in Execute to resolve this issue. Is this approach feasible?</p>
+<p>I would really appreciate any example code.</p>
+<p><strong>Answer:</strong> Yes. Thank you for the relevant and interesting question.</p>
+<p>The recommended approach is to implement and use an external event for this.</p>
+<p>The external event SDK sample illustrates:</p>
+<ul>
+<li>SDK/Samples/ModelessDialog/ModelessForm_ExternalEvent/</li>
+</ul>
+<p>Many related discussions and solutions are listed by The Building Coder
+on <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">External Events for Modeless Access and Driving Revit from Outside</a>.</p>
+<p>Also check out some more recent discussions on using IPC:</p>
+<ul>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/set-floor-level-and-use-ipc-for-disentanglement.html">Set Floor Level and Use IPC for Disentanglement</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/09/scaling-an-add-in-for-a-4k-high-resolution-screen.html">Scaling an Add-In for a 4K High Resolution Screen</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/09/ui-top-forms-buttons-web-etc.html#4">Integrating a Web-Based UI</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/11/integrating-the-helix-3d-viewer-with-a-wpf-add-in.html">Integrating the Helix 3D Viewer with a WPF Add-In</a></li>
+</ul>
+<p><strong>Response:</strong> I really appreciate your prompt answer.</p>
+<p>I'm curious about the entry point.
+The only way I know in order to load my customized code is by implementing an external command,
+You said to forget about external command.
+Does Revit have any other interfaces to import customised code?</p>
+<p><strong>Answer:</strong> Yes.</p>
+<p>The Revit API is completely event driven.</p>
+<p>Many (or most? or all?) of the Revit events provide a valid Revit API context.</p>
+<p>Look at the <a href="https://www.revitapidocs.com/2020/b86712d6-83b3-e044-8016-f9881ecd3800.htm">Autodesk.Revit.DB.Events namespace</a>.</p>
+<p><strong>Response:</strong> I have one more question.</p>
+<p>From the first link you gave me on using IPC for disentanglement, I found an example code <em>IPC_test_revit_plugin.zip</em>.</p>
+<p>It includes a browser project and a Revit add-in project.
+Is this add-in (external command) able to listen for messages from other applications until Revit is terminated?</p>
+<p><strong>Answer:</strong> An external command listens to one message only, and nothing else.</p>
+<p>The only message an external command is ever interested in is the <code>Execute</code> message that it implements a handler for.</p>
+<p>The only instance that can send that message is Revit.exe.</p>
+<p>The only time the message is sent is when Revit.exe wishes the external command to be executed.</p>
+<p><strong>Response:</strong> I want to develop an add-in that can be loaded in Revit that listens to messages from another process (application) as long as Revit is running. Is it possible to implement?</p>
+<p><strong>Answewr:</strong> Yes, using an <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28">external event</a>.</p>
+<p>However, Revit is not designed for that purpose and you may violate the license agreement by doing so.</p>
+<p>For that purpose,
+a <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55">DA4R application</a> may
+be a more appropriate choice:</p>
+<h4><a name="4"></a>Jobs</h4>
+<p>Autodesk is offering a number of exciting jobs in engineering positions in various parts of the world.</p>
+<p>Two open positions in Europe right now are for software engineers in Cambridge, UK, with the following job ids:</p>
+<ul>
+<li><a href="https://rolp.co/Fzo7i">19WD36914</a></li>
+<li><a href="https://rolp.co/IEBFh">19WD36916</a></li>
+</ul>
+<p>Here are the details on those two:</p>
+<ul>
+<li>Position Overview &ndash; 
+Do you want to be part of Autodesk’s digital transformation of manufacturing and construction? Do you want to help create a platform company by building cloud services, applications and components? Are you passionate about engaging with colleagues across the globe and working in an Agile development environment? If this sounds like you, read on! In this position, you will play an important role in the definition and development of core technologies that make up Autodesk’s manufacturing and construction products. You will use your knowledge and enthusiasm on projects covering all aspects of the software development process. You will join a Scrum team and actively contribute to the team’s success by reviewing and assessing customer problems, architecting and implementing solutions and presenting the results. You will work within a small and supportive group in Cambridge, alongside more than 1000 developers across the company, in an environment that is both challenging and rewarding.</li>
+<li>Responsibilities<ul>
+<li>Prototype, implement, and maintain production cloud services and software components</li>
+<li>Collaborate with teams of talented engineers to design, plan, develop, refactor, test, deliver and maintain complex features within cloud-based, web and desktop components</li>
+<li>Interact with the product owner and product management teams to review and implement proposed designs</li>
+<li>Being Agile and using LEAN methodology as an active member of a Scrum team</li>
+<li>Collaborate using tools such as Git, JIRA, Slack and wiki pages</li>
+</ul>
+</li>
+<li>Minimum Qualifications<ul>
+<li>Knowledge of Software Engineering Processes and Practices</li>
+<li>A flexible and fast learner and keen to expand your skills in the world of Desktop and cloud technologies</li>
+<li>First or upper-second class degree in Computer Science, Mathematics, Engineering or a related technical field</li>
+<li>BREP modelling, mesh modelling, JavaScript, C++ 17, Node, Docker, Python, AWS, Artifactory, CMake, Jenkins, Ansible</li>
+</ul>
+</li>
+</ul>
+<p>Good luck applying for these or other opportunities that you can find in the <a href="https://www.autodesk.com/careers">Autodesk career site</a>!</p>
+<p>You can ask me for a personal referral link if you find something that you are interested in.</p>

@@ -11,8 +11,11 @@ twitter:
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+<code>async</code> and <code>/await<code> external event wrapper!
+Communicating from outside with Revit is often better replaced by the Forge Design Automation API for Revit.
+However, it is also possible to make use of Revit as a server in a limited way via an external event
+&ndash; Communicating with another process
+&ndash; Jobs...
 
 linkedin:
 
@@ -24,7 +27,33 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Async and Await External Event Wrapper
+### External Communication and Async Await Event
+
+The question of communicating from outside with Revit is popping up with increasing frequency.
+
+Since Revit is designed as an interactive end user tool, misusing it as a server may fail and may also violate the license agreement.
+
+Therefore, in many cases, the cleanest (or only clean) solution will involve use of
+the [Forge Design Automation API for Revit](https://forge.autodesk.com/en/docs/design-automation/v3/developers_guide/overview)
+or [DA4R](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55).
+
+However, it is also possible to make use of Revit as a server in a limited way via
+an [external event](https://www.revitapidocs.com/2020/05089477-4612-35b2-81a2-89c4f44370ea.htm).
+
+Many aspects of this have been discussed numerous times in the past in the topic group
+on [external events for modeless access and driving Revit from outside](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28).
+
+However, people sometimes prefer not to read and research, not to fish, but rather ask repeated questions and be fed, so we return to this topic again (and again).
+
+Furthermore, our new hero Igor shared a cool wrapper for external events that makes the process easier than ever before:
+
+- [Async and Await External Event Wrapper](#2)
+- [Communicating with Another Process](#3)
+- [Jobs](#4)
+
+<center>
+<img src="img/communication.png" alt="Communication" title="Communication" width="400"/>
+</center>
 
 #### <a name="2"></a>Async and Await External Event Wrapper
 
@@ -42,7 +71,7 @@ It includes two samples, a minimal test and a little more interesting example pr
 
 #### <a name="3"></a>Communicating with Another Process
 
-The issue of communicating with another process was also discussed in the past few days in 
+The issue of communicating with another process was also discussed back and forth a couple of times in the past few days in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [Revit add-in communicating with other process](https://forums.autodesk.com/t5/revit-api-forum/revit-addin-communicating-with-other-process/m-p/9275981):
 
@@ -51,7 +80,7 @@ In other words, the Revit add-in would be the server, another process would be a
 
 I tried to use async pipe to communicate with other process but the Revit add-in doesn't listen to any messages.
 
-I think it's because of my server side pipe in Revit is closed as soon as the `Execute` method returns and terminates.
+I think it's because of my server-side pipe in Revit is closed as soon as the `Execute` method returns and terminates.
 
 Is there any way to keep the server pipe still alive, even after the add-in's `Execute` finishes?
 
@@ -59,7 +88,7 @@ I think I should create a thread in Execute to resolve this issue. Is this appro
 
 I would really appreciate any example code.
 
-**Answewr:** Yes. Thank you for the relevant and interesting question.
+**Answer:** Yes. Thank you for the relevant and interesting question.
 
 The recommended approach is to implement and use an external event for this.
 
@@ -77,10 +106,12 @@ Also check out some more recent discussions on using IPC:
 - [Integrating a Web-Based UI](https://thebuildingcoder.typepad.com/blog/2019/09/ui-top-forms-buttons-web-etc.html#4)
 - [Integrating the Helix 3D Viewer with a WPF Add-In](https://thebuildingcoder.typepad.com/blog/2019/11/integrating-the-helix-3d-viewer-with-a-wpf-add-in.html)
 
-**Response:** I really appreciate for your prompt answer.
+**Response:** I really appreciate your prompt answer.
 
-I'm curious about the entry point. The only way I know in order to load my customized code is by implementing an external command,
-You said to forget about external command. Does Revit have another interfaces to import customized code?
+I'm curious about the entry point.
+The only way I know in order to load my customized code is by implementing an external command,
+You said to forget about external command.
+Does Revit have any other interfaces to import customised code?
 
 **Answer:** Yes.
 
@@ -115,10 +146,6 @@ For that purpose,
 a [DA4R application](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55) may
 be a more appropriate choice:
 
-<center>
-<img src="img/communication.png" alt="Communication" title="Communication" width="400"/>
-</center>
-
 #### <a name="4"></a>Jobs
 
 Autodesk is offering a number of exciting jobs in engineering positions in various parts of the world.
@@ -127,6 +154,8 @@ Two open positions in Europe right now are for software engineers in Cambridge, 
 
 - [19WD36914](https://rolp.co/Fzo7i)
 - [19WD36916](https://rolp.co/IEBFh)
+
+Here are the details on those two:
 
 - Position Overview &ndash; 
 Do you want to be part of Autodesk’s digital transformation of manufacturing and construction? Do you want to help create a platform company by building cloud services, applications and components? Are you passionate about engaging with colleagues across the globe and working in an Agile development environment? If this sounds like you, read on! In this position, you will play an important role in the definition and development of core technologies that make up Autodesk’s manufacturing and construction products. You will use your knowledge and enthusiasm on projects covering all aspects of the software development process. You will join a Scrum team and actively contribute to the team’s success by reviewing and assessing customer problems, architecting and implementing solutions and presenting the results. You will work within a small and supportive group in Cambridge, alongside more than 1000 developers across the company, in an environment that is both challenging and rewarding.
