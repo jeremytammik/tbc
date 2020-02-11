@@ -30,8 +30,15 @@ twitter:
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/asyncawaitexternal
 
-&ndash; 
-...
+Getting started material and questions galore.
+Please search before asking, and work through the available material before trying to shoot yourself in your feet, knees, and elsewhere
+&ndash; Marko's plugin development playlist
+&ndash; overview
+&ndash; table of contents
+&ndash; Getting started with an API script
+&ndash; Getting started with a macro
+&ndash; OBJ mesh import with materials
+&ndash; 2D Booleans in the Revit API...
 
 linkedin:
 
@@ -43,7 +50,19 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Getting Started Videos, Macros
+### Search for Getting Started Videos and Tutorials!
+
+Getting started material and questions galore.
+
+Please, newbies, <u>search before asking</u>, and work through the available material before trying to shoot yourself in your feet, knees, and elsewhere:
+
+- [Marko's plugin development playlist](#2)
+- [Plugin development playlist &ndash; overview](#3)
+- [Plugin development playlist &ndash; table of contents](#4)
+- [Getting started with an API script](#5)
+- [Getting started with a macro](#6)
+- [OBJ mesh import with materials](#7)
+- [2D Booleans in the Revit API](#8)
 
 #### <a name="2"></a>Marko's Plugin Development Playlist
 
@@ -53,16 +72,16 @@ published a series of tutorial videos on Revit add-in development
 in [Circle's Bim Blog](https://bitbucket.org/cbb_team/circles-bim-blog/src/master) and the
 YouTube channel [Revit API - Plugin Development](https://www.youtube.com/playlist?list=PL7mg6Q0pUAfn8Pa7cyfRxTERRML964bUE):
 
-> In this video series we discus how to develop your own C# .NET plugin for Autodesk Revit.
+> In this video series, we discuss how to develop your own C# .NET plugin for Autodesk Revit.
 Based on simple examples, I present essential concepts of programming additional functionality for Revit.
 On [my LinkedIn profile](https://www.linkedin.com/in/marko87), you can find articles for this series.
 
 Thanks to Micah [@kraftwerk_15](https://twitter.com/kraftwerk_15) Gray for bringing it to my attention:
 
-> Oh BTW to all in this thread and in the future and @jeremytammik.
+> Oh, BTW, to all in this thread and in the future and @jeremytammik.
 Another good resource I've been tearing apart while looking at MVVM Navigation in the Revit context.
-Again not mine. :)
-But also there are videos on YouTube.
+Again, not mine. :)
+But also, there are videos on YouTube.
 
 Here is Marko's description of his playlist:
 
@@ -84,7 +103,7 @@ The idea behind this series is to start involving more community into using WPF,
 I covered a lot of topics for styling, animations for hovering effects, animated transitions between pages in DockablePane, for example fading and sliding animation, things like that.
 I followed the MVVM pattern completely in this series (from my best understanding): data bindings, value conversions, ViewModel classes, etc.
 
-Theb majority of the videos are covered with links in the description to written articles on my LinkedIn page.
+The majority of the videos are covered with links in the description to written articles on my LinkedIn page.
 Some things are easier to write than record.
 Here is one example of such an article:
 
@@ -131,7 +150,7 @@ on [my first basic script](https://forums.autodesk.com/t5/revit-api-forum/my-fir
 
 **Question:** I have a probably simple problem.
 I want to select many elements and add to the parameter "Comments" the value "Something".
-I dont know where the problem is ;/.
+I don't know where the problem is ;/.
 
 **Answer:** Welcome to the Revit API!
 
@@ -188,7 +207,8 @@ I challenge you to come up with any beginners question that has not already been
 My friend Eric Boehlke is not a programmer and still created a Revit add-in selling in the AppStore,
 [Mesh Import from OBJ files](https://apps.autodesk.com/RVT/en/Detail/Index?id=7847254631022872970&appLang=en&os=Win64).
 
-Here is a [3-minute demonstration of version 2.0] that makes Revit Materials available for the imported meshes:
+Here is a [3-minute demonstration of version 2.0](https://youtu.be/mBPskauS86o) that
+makes Revit Materials available for the imported meshes:
 
 <center>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/mBPskauS86o" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -196,7 +216,7 @@ Here is a [3-minute demonstration of version 2.0] that makes Revit Materials ava
 
 #### <a name="8"></a>2D Booleans in the Revit API
 
-Finally, let's end this b eginner's business with one more interesting and geometrical question from
+Finally, let's end this beginner's business with one final more interesting and geometrical question from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on how to [retrieve common geometry of all participants](https://forums.autodesk.com/t5/revit-api-forum/retrieve-common-geometry-of-all-participants/m-p/9306367):
 
@@ -230,5 +250,5 @@ I have repeatedly made use of the [Clipper library](http://angusj.com/delphi/cli
 The last pointer highlights the most interesting and up-to-date sample using it so far,
 the [ElementOutline add-in](https://github.com/jeremytammik/ElementOutline).
 
-You should also check out the discussion in the topic group
+You should also check out the discussions in the topic group
 on [2D Booleans and Adjacent Areas](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.2).

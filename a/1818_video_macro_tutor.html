@@ -29,8 +29,15 @@ twitter:
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/asyncawaitexternal
 
-&ndash; 
-...
+Getting started material and questions galore.
+Please search before asking, and work through the available material before trying to shoot yourself in your feet, knees, and elsewhere
+&ndash; Marko's plugin development playlist
+&ndash; overview
+&ndash; table of contents
+&ndash; Getting started with an API script
+&ndash; Getting started with a macro
+&ndash; OBJ mesh import with materials
+&ndash; 2D Booleans in the Revit API...
 
 linkedin:
 
@@ -42,7 +49,18 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Getting Started Videos, Macros</h3>
+<h3>Search for Getting Started Videos and Tutorials!</h3>
+<p>Getting started material and questions galore.</p>
+<p>Please, newbies, <u>search before asking</u>, and work through the available material before trying to shoot yourself in your feet, knees, and elsewhere:</p>
+<ul>
+<li><a href="#2">Marko's plugin development playlist</a></li>
+<li><a href="#3">Plugin development playlist &ndash; overview</a></li>
+<li><a href="#4">Plugin development playlist &ndash; table of contents</a></li>
+<li><a href="#5">Getting started with an API script</a></li>
+<li><a href="#6">Getting started with a macro</a></li>
+<li><a href="#7">OBJ mesh import with materials</a></li>
+<li><a href="#8">2D Booleans in the Revit API</a></li>
+</ul>
 <h4><a name="2"></a>Marko's Plugin Development Playlist</h4>
 <p><a href="https://www.linkedin.com/in/marko87">Marko Koljancic</a>,
 Digital Technology Manager at <a href="https://diroots.com">DiRoots</a>,
@@ -50,16 +68,16 @@ published a series of tutorial videos on Revit add-in development
 in <a href="https://bitbucket.org/cbb_team/circles-bim-blog/src/master">Circle's Bim Blog</a> and the
 YouTube channel <a href="https://www.youtube.com/playlist?list=PL7mg6Q0pUAfn8Pa7cyfRxTERRML964bUE">Revit API - Plugin Development</a>:</p>
 <blockquote>
-<p>In this video series we discus how to develop your own C# .NET plugin for Autodesk Revit.
+<p>In this video series, we discuss how to develop your own C# .NET plugin for Autodesk Revit.
 Based on simple examples, I present essential concepts of programming additional functionality for Revit.
 On <a href="https://www.linkedin.com/in/marko87">my LinkedIn profile</a>, you can find articles for this series.</p>
 </blockquote>
 <p>Thanks to Micah <a href="https://twitter.com/kraftwerk_15">@kraftwerk_15</a> Gray for bringing it to my attention:</p>
 <blockquote>
-<p>Oh BTW to all in this thread and in the future and @jeremytammik.
+<p>Oh, BTW, to all in this thread and in the future and @jeremytammik.
 Another good resource I've been tearing apart while looking at MVVM Navigation in the Revit context.
-Again not mine. :)
-But also there are videos on YouTube.</p>
+Again, not mine. :)
+But also, there are videos on YouTube.</p>
 </blockquote>
 <p>Here is Marko's description of his playlist:</p>
 <h4><a name="3"></a>Plugin Development Playlist &ndash; Overview</h4>
@@ -75,7 +93,7 @@ The idea is to have a dockable pane type of add-in that is used to show family f
 <p>The idea behind this series is to start involving more community into using WPF, XAML and MVVM pattern of programming.
 I covered a lot of topics for styling, animations for hovering effects, animated transitions between pages in DockablePane, for example fading and sliding animation, things like that.
 I followed the MVVM pattern completely in this series (from my best understanding): data bindings, value conversions, ViewModel classes, etc.</p>
-<p>Theb majority of the videos are covered with links in the description to written articles on my LinkedIn page.
+<p>The majority of the videos are covered with links in the description to written articles on my LinkedIn page.
 Some things are easier to write than record.
 Here is one example of such an article:</p>
 <ul>
@@ -116,7 +134,7 @@ the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API d
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/my-first-basic-script/m-p/9292581">my first basic script</a>:</p>
 <p><strong>Question:</strong> I have a probably simple problem.
 I want to select many elements and add to the parameter "Comments" the value "Something".
-I dont know where the problem is ;/.</p>
+I don't know where the problem is ;/.</p>
 <p><strong>Answer:</strong> Welcome to the Revit API!</p>
 <p>Looking at your code, I would suggest that you simplify it significantly.</p>
 <p>Then the error will probably go away by itself.</p>
@@ -152,12 +170,13 @@ on the <a href="https://thebuildingcoder.typepad.com/blog/2018/09/five-secrets-o
 <h4><a name="7"></a>OBJ Mesh Import with Materials</h4>
 <p>My friend Eric Boehlke is not a programmer and still created a Revit add-in selling in the AppStore,
 <a href="https://apps.autodesk.com/RVT/en/Detail/Index?id=7847254631022872970&amp;appLang=en&amp;os=Win64">Mesh Import from OBJ files</a>.</p>
-<p>Here is a [3-minute demonstration of version 2.0] that makes Revit Materials available for the imported meshes:</p>
+<p>Here is a <a href="https://youtu.be/mBPskauS86o">3-minute demonstration of version 2.0</a> that
+makes Revit Materials available for the imported meshes:</p>
 <p><center>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/mBPskauS86o" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </center></p>
 <h4><a name="8"></a>2D Booleans in the Revit API</h4>
-<p>Finally, let's end this b eginner's business with one more interesting and geometrical question from
+<p>Finally, let's end this beginner's business with one final more interesting and geometrical question from
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on how to <a href="https://forums.autodesk.com/t5/revit-api-forum/retrieve-common-geometry-of-all-participants/m-p/9306367">retrieve common geometry of all participants</a>:</p>
 <p><strong>Question:</strong> I have faces intersecting.
@@ -184,5 +203,5 @@ How can I solve this?</p>
 </ul>
 <p>The last pointer highlights the most interesting and up-to-date sample using it so far,
 the <a href="https://github.com/jeremytammik/ElementOutline">ElementOutline add-in</a>.</p>
-<p>You should also check out the discussion in the topic group
+<p>You should also check out the discussions in the topic group
 on <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.2">2D Booleans and Adjacent Areas</a>.</p>
