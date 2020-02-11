@@ -28,7 +28,7 @@ A demonstration of Version 2.0, which has Revit Materials available for the impo
 
 twitter:
 
- the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/asyncawaitexternal
+Marko's plugin development playlist and other getting started videos and tutorials for the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/apitutorialvideos
 
 Getting started material and questions galore.
 Please search before asking, and work through the available material before trying to shoot yourself in your feet, knees, and elsewhere
