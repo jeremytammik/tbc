@@ -45,10 +45,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Getting Started Videos, Macros
 
-<center>
-<img src="img/.png" alt="" title="" width="100"/>
-</center>
-
 #### <a name="2"></a>Marko's Plugin Development Playlist
 
 [Marko Koljancic](https://www.linkedin.com/in/marko87),
@@ -102,7 +98,6 @@ I struggled in the beginning to figure out all these concepts on my own, still l
 This video series is my humble contribution to the wonderful Revit API community.
 
 Ever so many thanks to Marko for all his hard work and kind sharing!
-
 
 #### <a name="4"></a>Plugin Development Playlist &ndash; Table of Contents
 
@@ -199,7 +194,41 @@ Here is a [3-minute demonstration of version 2.0] that makes Revit Materials ava
 <iframe width="480" height="270" src="https://www.youtube.com/embed/mBPskauS86o" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </center>
 
+#### <a name="8"></a>2D Booleans in the Revit API
 
-- 2D Booleans in Revit
-[Retrieve common geometry of all participants](
-https://forums.autodesk.com/t5/revit-api-forum/retrieve-common-geometry-of-all-participants/m-p/9306367/highlight/false#M44496
+Finally, let's end this b eginner's business with one more interesting and geometrical question from
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on how to [retrieve common geometry of all participants](https://forums.autodesk.com/t5/revit-api-forum/retrieve-common-geometry-of-all-participants/m-p/9306367):
+
+**Question:** I have faces intersecting.
+I want to retrieve the common geometry of all participants.
+How can I solve this?
+
+<center>
+<img src="img/rectangle_intersection.jpg" alt="Rectangle intersection" title="Rectangle intersection" width="360"/>
+</center>
+
+**Answer:** It sounds as if you are looking for a 2D Boolean intersection operation.
+
+Revit does not provide this functionality.
+
+However, you can easily make use of other .NET libraries implementing it and reference those in your Revit add-in.
+
+I have repeatedly made use of the [Clipper library](http://angusj.com/delphi/clipper.php) for such purposes:
+
+- [Room and Wall Adjacent Area](http://thebuildingcoder.typepad.com/blog/2009/01/room-and-wall-adjacent-area.html)
+- [Boolean Operations for 2D Polygons](http://thebuildingcoder.typepad.com/blog/2009/02/boolean-operations-for-2d-polygons.html)
+- [GetPolygon Extension Methods](http://thebuildingcoder.typepad.com/blog/2010/02/getpolygon-extension-methods.html)
+- [Boolean Operations for 2D Polygons](http://thebuildingcoder.typepad.com/blog/2013/09/boolean-operations-for-2d-polygons.html)
+- [Saving a Solid to a SAT File Implementation](http://thebuildingcoder.typepad.com/blog/2013/09/saving-a-solid-to-a-sat-file-implementation.html)
+- [Creating Topography Contours and Building Masses](http://thebuildingcoder.typepad.com/blog/2014/11/creating-topography-contours-and-building-masses.html)
+- [More on Wall Opening Areas per Room](http://thebuildingcoder.typepad.com/blog/2016/04/more-on-wall-opening-areas-per-room.html)
+- [Fire Rating Zone Intersection](https://thebuildingcoder.typepad.com/blog/2018/12/fire-rating-zone-intersection.html)
+- [Automated PDF Report and 2D Sketch Booleans](https://thebuildingcoder.typepad.com/blog/2019/11/automated-pdf-report-and-2d-sketch-booleans.html)
+- [Extrusion Analyser and 2D Boolean Element Outline](https://thebuildingcoder.typepad.com/blog/2020/01/extrusion-analyser-and-2d-boolean-element-outline.html)
+
+The last pointer highlights the most interesting and up-to-date sample using it so far,
+the [ElementOutline add-in](https://github.com/jeremytammik/ElementOutline).
+
+You should also check out the discussion in the topic group
+on [2D Booleans and Adjacent Areas](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.2).
