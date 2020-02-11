@@ -67,7 +67,7 @@ Revit add-ins is pretty clearly recommending WPF as the better choice, for vario
 - WinForms has [serious scaling issues on high resolution monitors](https://thebuildingcoder.typepad.com/blog/2019/09/scaling-an-add-in-for-a-4k-high-resolution-screen.html)
 - WPF apps don't have scaling issues
 - WPF UIs are built in a modern way with separate style, XML layout, and code / logic documents
-    - Similar to how UIs are built on other frameworks like Android / iOS / macOS  / web development
+    - Similar to how UIs are built on other frameworks like Android / iOS / macOS / web development
     - Better preparation for expanding development knowledge
     - Separation produces cleaner, more flexible, and more reusable code
 - WPF looks good, pleasing UI, users enjoy it
@@ -82,7 +82,7 @@ That said, the Revit IFC open source UI does use WPF, so you could grab all the 
 Here is a pretty fine 56-minute guide for getting started, the [C# WPF UI Tutorial](https://youtu.be/Vjldip84CXQ):
 
 <center>
-<iframe width="480" height="270"  src="https://www.youtube.com/embed/Vjldip84CXQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/Vjldip84CXQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </center>
 
 #### <a name="3"></a>Revit WPF Template
