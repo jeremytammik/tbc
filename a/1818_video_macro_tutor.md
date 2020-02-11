@@ -42,6 +42,22 @@ Please search before asking, and work through the available material before tryi
 
 linkedin:
 
+Marko's plugin development playlist and other getting started videos and tutorials for the #RevitAPI
+
+http://bit.ly/apitutorialvideos
+
+Getting started material and questions galore.
+
+Please search before asking, and work through the available material before trying to shoot yourself in your feet, knees, and elsewhere:
+
+- Marko's plugin development playlist
+- Overview
+- Table of contents
+- Getting started with an API script
+- Getting started with a macro
+- OBJ mesh import with materials
+- 2D Booleans in the Revit API...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
