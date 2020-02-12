@@ -31,7 +31,7 @@ Susan Renna pointed out the new location for the Autodesk NeXLT localization web
 
 twitter:
 
-the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+Revit.ini file path, NeXLT localization URL and Torsion Tools two for the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/torsiontoolstwo
 
 More Revit API tutorial material and tools, plus a couple of hints from the Revit API discussion forum and the Forge blog
  &ndash; Torsion Tools two
