@@ -7,15 +7,6 @@
 
 <!---
 
-- in 15056740 [Adding Project Template to 'New Project' via API]
-https://forums.autodesk.com/t5/revit-api-forum/adding-project-template-to-new-project-via-api/m-p/8585348
-Peter @cig_ad Ciganek just discovered:
-> Autodesk.Revit.ApplicationServices.Application.CurrentUsersDataFolderPath returns the path where Revit.ini is located.
-
-- in [localization website](https://forums.autodesk.com/t5/revit-api-forum/localization-website/m-p/8500166),
-Susan Renna pointed out the new location for the Autodesk NeXLT localization website:
-> You can find it here:  https://ls-wst.autodesk.com/app/nexlt-plus/app/home/search
-
 - Torsion Tools Update #2 - Copy Linked Legends, Schedules and Reference Views
   https://youtu.be/C2dBRqXl9UA
   <iframe width="560" height="315" src="https://www.youtube.com/embed/C2dBRqXl9UA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -25,6 +16,18 @@ Susan Renna pointed out the new location for the Autodesk NeXLT localization web
   The Copy Legends and Schedules tools allow you to select the Link to copy them from, and then select the Legends or Schedules you would like to copy. It will check to see if they already exist in the project and prompt you if they do. 
   The Linked Views tool will allow you to select a Linked Model, Title Block, Viewport Type and then the Views you would like from the Linked Model. It will create a drafting view in the current Document with the Name, Detail Number and Sheet of the Linked Model.
 
+- in 15056740 [Adding Project Template to 'New Project' via API]
+https://forums.autodesk.com/t5/revit-api-forum/adding-project-template-to-new-project-via-api/m-p/8585348
+Peter @cig_ad Ciganek just discovered:
+> Autodesk.Revit.ApplicationServices.Application.CurrentUsersDataFolderPath returns the path where Revit.ini is located.
+
+- in [localization website](https://forums.autodesk.com/t5/revit-api-forum/localization-website/m-p/8500166),
+Susan Renna pointed out the new location for the Autodesk NeXLT localization website:
+> You can find it here:  https://ls-wst.autodesk.com/app/nexlt-plus/app/home/search
+
+- calculate volume and area of triangulated solid
+  https://stackoverflow.com/questions/1406029/how-to-calculate-the-volume-of-a-3d-mesh-object-the-surface-of-which-is-made-up
+  https://forge.autodesk.com/blog/get-volume-and-surface-area-viewer
 
 twitter:
 
@@ -97,20 +100,46 @@ Susan Renna points out the new Autodesk NeXLT localization website URL:
 
 > You can find it here: [ls-wst.autodesk.com/app/nexlt-plus/app/home/search](https://ls-wst.autodesk.com/app/nexlt-plus/app/home/search)
 
+#### <a name="5"></a>Calculate Volume and Area of Triangulated Solid
 
+Finally, a very useful and generic pure geometry note that might come in handy in the Revit envirnment as well,
+on [How to calculate the volume of a 3D mesh object, the surface of which is made up triangles](https://stackoverflow.com/questions/1406029/how-to-calculate-the-volume-of-a-3d-mesh-object-the-surface-of-which-is-made-up):
 
+[Reading this paper](http://chenlab.ece.cornell.edu/Publication/Cha/icip01_Cha.pdf),
+it is actually a pretty simple calculation.
 
-**Question:** 
+The trick is to calculate the **signed volume** of a tetrahedron &ndash; based on your triangle and topped off at the origin.
+The sign of the volume comes from whether your triangle is pointing in the direction of the origin
+(The normal of the triangle is itself dependent upon the order of your vertices, which is why you don't see it explicitly referenced below).
 
-**Answer:** 
-
+This all boils down to the following simple function:
 
 <pre class="code">
+  public float SignedVolumeOfTriangle(Vector p1, Vector p2, Vector p3) {
+    var v321 = p3.X*p2.Y*p1.Z;
+    var v231 = p2.X*p3.Y*p1.Z;
+    var v312 = p3.X*p1.Y*p2.Z;
+    var v132 = p1.X*p3.Y*p2.Z;
+    var v213 = p2.X*p1.Y*p3.Z;
+    var v123 = p1.X*p2.Y*p3.Z;
+    return (1.0f/6.0f)*(-v321 + v231 + v312 - v132 - v213 + v123);
+  }
 </pre>
 
+A driver uses it to calculate the volume of the mesh:
+
+<pre class="code">
+  public float VolumeOfMesh(Mesh mesh) {
+    var vols = from t in mesh.Triangles
+      select SignedVolumeOfTriangle(t.P1, t.P2, t.P3);
+    return Math.Abs(vols.Sum());
+  }
+</pre>
+
+Adam Nagy picked this up and used it
+to [calculate volume and surface area in the Forge viewer](https://forge.autodesk.com/blog/get-volume-and-surface-area-viewer),
+verifying that the resulting values match the corresponding properties provided by Inventor:
 
 <center>
-<img src="img/" alt="" title="" width="100"/>
+<img src="img/forge_viewer_volume_surface_area.png" alt="" title="" width="400"/> <!-- 800 -->
 </center>
-
-
