@@ -34,13 +34,23 @@ twitter:
 Revit.ini file path, NeXLT localization URL and Torsion Tools two for the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/torsiontoolstwo
 
 More Revit API tutorial material and tools, plus a couple of hints from the Revit API discussion forum and the Forge blog
- &ndash; Torsion Tools two
- &ndash; Retrieve path to Revit.ini
- &ndash; Updated NeXLT localization URL
- &ndash; Volume and area of triangulated solid...
+&ndash; Torsion Tools two
+&ndash; Retrieve path to Revit.ini
+&ndash; Updated NeXLT localization URL
+&ndash; Volume and area of triangulated solid...
 
 linkedin:
 
+Revit.ini file path, NeXLT localization URL and Torsion Tools two for the #RevitAPI
+
+http://bit.ly/torsiontoolstwo
+
+More Revit API tutorial material and tools, plus a couple of hints from the Revit API discussion forum and the Forge blog:
+
+- Torsion Tools two
+- Retrieve path to Revit.ini
+- Updated NeXLT localization URL
+- Volume and area of triangulated solid...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
