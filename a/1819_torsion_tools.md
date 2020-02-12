@@ -33,9 +33,11 @@ twitter:
 
 the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-
-&ndash; 
-...
+More Revit API tutorial material and tools, plus a couple of hints from the Revit API discussion forum and the Forge blog
+ &ndash; Torsion Tools two
+ &ndash; Retrieve path to Revit.ini
+ &ndash; Updated NeXLT localization URL
+ &ndash; Volume and area of triangulated solid...
 
 linkedin:
 
@@ -53,7 +55,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Ini File, Localisation and Torsion Tools Two
 
+More Revit API tutorial material and tools plus a couple of hints from the Revit API discussion forum and the Forge blog:
 
+- [Torsion Tools two](#2)
+- [Retrieve path to Revit.ini](#3)
+- [Updated NeXLT localization URL](#4)
+- [Volume and area of triangulated solid](#5)
 
 
 #### <a name="2"></a>Torsion Tools Two
@@ -63,7 +70,7 @@ fruitful [collection of videos and tutorials](https://thebuildingcoder.typepad.c
 yesterday, an update to
 the [Torsion Tools add-in template with code examples for common tools](https://thebuildingcoder.typepad.com/blog/2020/01/torsion-tools-command-event-and-info-in-da4r.html) introduced last week:
 
-[Torsion Tools Update #2 &ndash; Copy Linked Legends, Schedules and Reference Views](https://youtu.be/C2dBRqXl9UA):
+- [Torsion Tools Update #2 &ndash; Copy Linked Legends, Schedules and Reference Views](https://youtu.be/C2dBRqXl9UA):
 
 > Autodesk Revit 2020 API Visual Studio Solution Template with Code Examples for Common Tools.
 Update #2 walks through the added tools to copy legends, schedules, and reference views from a linked model.
@@ -82,16 +89,16 @@ It creates a drafting view in the current document with the name, detail number 
 
 Many thanks to Torsion Tools for creating and sharing this powerful resource!
 
-#### <a name="3"></a>Retrieve the Path to Revit.ini
+#### <a name="3"></a>Retrieve Path to Revit.ini
 
 A small note from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [adding project template to 'New Project' via API](https://forums.autodesk.com/t5/revit-api-forum/adding-project-template-to-new-project-via-api/m-p/8585348) by 
 Peter @cig_ad Ciganek:
 
-> *Autodesk.Revit.ApplicationServices.Application.CurrentUsersDataFolderPath* returns the path where Revit.ini is located.
+> The *Autodesk.Revit.ApplicationServices.Application* property `CurrentUsersDataFolderPath` returns the path where Revit.ini is located.
 
-#### <a name="4"></a>Updated NeXLT Localization Website
+#### <a name="4"></a>Updated NeXLT Localization URL
 
 In another small not from 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -101,7 +108,7 @@ Susan Renna points out the new URL:
 > You can find the Autodesk NeXLT localization website here:
 [ls-wst.autodesk.com/app/nexlt-plus/app/home/search](https://ls-wst.autodesk.com/app/nexlt-plus/app/home/search)
 
-#### <a name="5"></a>Calculate Volume and Area of Triangulated Solid
+#### <a name="5"></a>Volume and Area of Triangulated Solid
 
 Finally, a useful generic pure geometry utility that might come in handy in the Revit environment as well
 [to calculate the volume of a 3D mesh object, the surface of which is made up triangles](https://stackoverflow.com/questions/1406029/how-to-calculate-the-volume-of-a-3d-mesh-object-the-surface-of-which-is-made-up):
@@ -142,5 +149,5 @@ to [calculate volume and surface area in the Forge viewer](https://forge.autodes
 verifying that the resulting values match the corresponding properties provided by Inventor:
 
 <center>
-<img src="img/forge_viewer_volume_surface_area.png" alt="" title="" width="600"/> <!-- 800 -->
+<img src="img/forge_viewer_volume_surface_area.png" alt="Volume and surface area in the Forge viewer" title="Volume and surface area in the Forge viewer" width="600"/> <!-- 800 -->
 </center>
