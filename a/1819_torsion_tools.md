@@ -77,7 +77,7 @@ It creates a drafting view in the current document with the name, detail number 
 > [TorsionTools GitHub repo](https://github.com/TorsionTools/R20)
 
 <center>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/C2dBRqXl9UA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/C2dBRqXl9UA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </center>
 
 Many thanks to Torsion Tools for creating and sharing this powerful resource!
@@ -96,14 +96,15 @@ Peter @cig_ad Ciganek:
 In another small not from 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on the [localization website](https://forums.autodesk.com/t5/revit-api-forum/localization-website/m-p/8500166),
-Susan Renna points out the new Autodesk NeXLT localization website URL:
+Susan Renna points out the new URL:
 
-> You can find it here: [ls-wst.autodesk.com/app/nexlt-plus/app/home/search](https://ls-wst.autodesk.com/app/nexlt-plus/app/home/search)
+> You can find the Autodesk NeXLT localization website here:
+[ls-wst.autodesk.com/app/nexlt-plus/app/home/search](https://ls-wst.autodesk.com/app/nexlt-plus/app/home/search)
 
 #### <a name="5"></a>Calculate Volume and Area of Triangulated Solid
 
-Finally, a very useful and generic pure geometry note that might come in handy in the Revit envirnment as well,
-on [How to calculate the volume of a 3D mesh object, the surface of which is made up triangles](https://stackoverflow.com/questions/1406029/how-to-calculate-the-volume-of-a-3d-mesh-object-the-surface-of-which-is-made-up):
+Finally, a useful generic pure geometry utility that might come in handy in the Revit environment as well
+[to calculate the volume of a 3D mesh object, the surface of which is made up triangles](https://stackoverflow.com/questions/1406029/how-to-calculate-the-volume-of-a-3d-mesh-object-the-surface-of-which-is-made-up):
 
 [Reading this paper](http://chenlab.ece.cornell.edu/Publication/Cha/icip01_Cha.pdf),
 it is actually a pretty simple calculation.
@@ -141,5 +142,5 @@ to [calculate volume and surface area in the Forge viewer](https://forge.autodes
 verifying that the resulting values match the corresponding properties provided by Inventor:
 
 <center>
-<img src="img/forge_viewer_volume_surface_area.png" alt="" title="" width="400"/> <!-- 800 -->
+<img src="img/forge_viewer_volume_surface_area.png" alt="" title="" width="600"/> <!-- 800 -->
 </center>
