@@ -21,6 +21,14 @@ Today, let's highlight two view related data access topics
 
 linkedin:
 
+Getting title block data and ViewSheet from View in the #RevitAPI
+
+http://bit.ly/titleblockdata
+
+Today, let's highlight two view related data access topics:
+
+- Get ViewSheet from View
+- Title block data access...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
