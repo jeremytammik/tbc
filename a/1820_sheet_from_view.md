@@ -13,7 +13,7 @@
 
 twitter:
 
- the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+Getting title block data and ViewSheet from View in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/titleblockdata
 
 Today, let's highlight two view related data access topics
 &ndash; Get ViewSheet from View
