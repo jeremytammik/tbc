@@ -35,11 +35,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### Get Sheet from View and Title Block
 
 
-#### <a name="2"></a>
+#### <a name="2"></a>Get Sheet from View
 
-- get sheet from view 
-  12966349 [Get ViewSheet from View]
-  https://forums.autodesk.com/t5/revit-api-forum/get-viewsheet-from-view/m-p/7075550
+- [Get ViewSheet from View](https://forums.autodesk.com/t5/revit-api-forum/get-viewsheet-from-view/m-p/7075550)
 
 
 
