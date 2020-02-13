@@ -43,14 +43,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 
 
-<center>
-<iframe width="480" height="270" src="https://www.youtube.com/embed/C2dBRqXl9UA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</center>
-
-Many thanks to Naveen 
-
-
-
 #### <a name="3"></a>Title Block Data Access
 
 **Question:** I am searching for some sample code for use in a Design Automation API project.
@@ -114,4 +106,5 @@ You can loop through these elements and retrieve the required data from their bu
   }
 </pre>
 
-Als always, you can use [RevitLookup](https://github.com/jeremytammik/RevitLookup) to explore this data interactively yourself in your own model to see which properties are available where.
+Als always, you can use [RevitLookup](https://github.com/jeremytammik/RevitLookup) to explore this data interactively yourself in your own model to see which properties are available where and what other title block information may be of interest to your application.
+
