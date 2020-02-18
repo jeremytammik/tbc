@@ -31,10 +31,28 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 <h3>Duplicate Legend Component and Lat Long to Metres in Python</h3>
 <h4><a name="2"></a>Duplicate Legend Component in Python</h4>
-<p>https://thebuildingcoder.typepad.com/blog/2010/05/duplicate-legend-component.html#comment-4752201924</p>
-<p>Oliwer Kulpa --&gt; jeremy tammik</p>
-<p>Hi Jeremy,</p>
-<p>Since it is a part of a Python Script in Dynamo, I'm attaching a code fragment which works on a legend view with one legend component.</p>
+<p>In a <a href="https://thebuildingcoder.typepad.com/blog/2010/05/duplicate-legend-component.html#comment-4752201924">comment</a> on
+the workaround to <a href="https://thebuildingcoder.typepad.com/blog/2010/05/duplicate-legend-component.html">duplicate a legend component</a>,
+Oliwer Kulpa demonstrates how to set the <code>LEGEND_COMPONENT</code> built-in parameter after copying a legend component:</p>
+<p><strong>Question:</strong> Any news about this Legend Component API?
+Is there any way I can at least do a Symbol Swap inside the Legend View?</p>
+<p>I'm trying the following code:</p>
+<pre class="code">
+  element1.get_Parameter(
+    BuiltInParameter.LEGEND_COMPONENT)
+      .Set(element2.Id);
+</pre>
+
+<p>However, that produces an error saying, <em>The component you have selected is not visible in the selected view.</em></p>
+<p><strong>Solution:</strong> I found out that you need to feed <code>FamilyType.Id</code> when setting up a copied legend component:</p>
+<pre class="code">
+  CopiedLegendComponent.get_Parameter(
+    BuiltInParameter.LEGEND_COMPONENT)
+      .Set(FamilyType.Id)
+</pre>
+
+<p>It worked for me!</p>
+<p>Since it is a part of a larger Python Script in Dynamo, I've extracted the following code fragment which works on a legend view with one single legend component.</p>
 <p>I hope it is readable enough for everyone:</p>
 <pre class="prettyprint">
   doc = DocumentManager.Instance.CurrentDBDocument
@@ -55,15 +73,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
     .FirstElement()
 
   # Start Transaction
+
   TransactionManager.Instance.EnsureInTransaction(doc)
 
   # Copy legend and set new Id to represent new element
+
   new_legend_component = ElementTransformUtils
     .CopyElement(doc, existing_legend_component.Id,
       XYZ(10, 0,0))
 
-  # Since result of CopyElement is a list of Ids,
-  # I need to fetch first element from copied elements
+  # The result of CopyElement is a list of Ids,
+  # so fetch the first element from copied elements
 
   doc.GetElement(new_legend_component[0])
     .get_Parameter(BuiltInParameter.LEGEND_COMPONENT)
@@ -76,13 +96,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
   TransactionManager.Instance.TransactionTaskDone()
 </pre>
 
-<p>Here is a picture with the result:</p>
+<p>Here is a picture of the result of copying a window legend component and setting it to a door family type:</p>
 <p><center>
-<img src="img/duplicate_legend_component_window.png" alt="Duplicate legend component" title="Duplicate legend component" width="450"/> <!-- 900 -->
+<img src="img/duplicate_legend_component.png" alt="Duplicate legend component" title="Duplicate legend component" width="450"/> <!-- 900 -->
 </center></p>
+<p>Many thanks to Oliwer for sharing this useful discovery.</p>
 <pre class="code">
 </pre>
 
-<p><strong>Response:</strong> You must have misunderstood my question.  I don't have the ViewSheet in order to use the method to get its placed views.  I have a view, that I know is on a sheet (because its sheet number parameter is not null), but I want to get a direct reference to that sheet that it is placed on.  It seems to me that you are still suggesting that I must loop through all ViewSheets to get the View that I'm concerned with.  Thanks.</p>
-<p><strong>Answer:</strong> Yes, indeed, that is exactly what I am suggesting.</p>
+<p><strong>Response:</strong> </p>
+<p><strong>Answer:</strong> </p>
 <h4><a name="3"></a>Convert Latitude and Longitude to Metres in Python</h4>

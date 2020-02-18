@@ -34,14 +34,34 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 #### <a name="2"></a>Duplicate Legend Component in Python
 
+In a [comment](https://thebuildingcoder.typepad.com/blog/2010/05/duplicate-legend-component.html#comment-4752201924) on
+the workaround to [duplicate a legend component](https://thebuildingcoder.typepad.com/blog/2010/05/duplicate-legend-component.html),
+Oliwer Kulpa demonstrates how to set the `LEGEND_COMPONENT` built-in parameter after copying a legend component:
 
-https://thebuildingcoder.typepad.com/blog/2010/05/duplicate-legend-component.html#comment-4752201924
+**Question:** Any news about this Legend Component API?
+Is there any way I can at least do a Symbol Swap inside the Legend View?
 
-Oliwer Kulpa --> jeremy tammik
+I'm trying the following code:
 
-Hi Jeremy,
+<pre class="code">
+  element1.get_Parameter(
+    BuiltInParameter.LEGEND_COMPONENT)
+      .Set(element2.Id);
+</pre>
 
-Since it is a part of a Python Script in Dynamo, I'm attaching a code fragment which works on a legend view with one legend component.
+However, that produces an error saying, *The component you have selected is not visible in the selected view.*
+
+**Solution:** I found out that you need to feed `FamilyType.Id` when setting up a copied legend component:
+
+<pre class="code">
+  CopiedLegendComponent.get_Parameter(
+    BuiltInParameter.LEGEND_COMPONENT)
+      .Set(FamilyType.Id)
+</pre>
+
+It worked for me!
+
+Since it is a part of a larger Python Script in Dynamo, I've extracted the following code fragment which works on a legend view with one single legend component.
 
 I hope it is readable enough for everyone:
 
@@ -64,15 +84,17 @@ I hope it is readable enough for everyone:
     .FirstElement()
   
   # Start Transaction
+  
   TransactionManager.Instance.EnsureInTransaction(doc)
   
   # Copy legend and set new Id to represent new element
+  
   new_legend_component = ElementTransformUtils
     .CopyElement(doc, existing_legend_component.Id,
       XYZ(10, 0,0))
   
-  # Since result of CopyElement is a list of Ids,
-  # I need to fetch first element from copied elements
+  # The result of CopyElement is a list of Ids,
+  # so fetch the first element from copied elements
   
   doc.GetElement(new_legend_component[0])
     .get_Parameter(BuiltInParameter.LEGEND_COMPONENT)
@@ -85,13 +107,13 @@ I hope it is readable enough for everyone:
   TransactionManager.Instance.TransactionTaskDone()
 </pre>
 
-Here is a picture with the result:
+Here is a picture of the result of copying a window legend component and setting it to a door family type:
 
 <center>
-<img src="img/duplicate_legend_component_window.png" alt="Duplicate legend component" title="Duplicate legend component" width="450"/> <!-- 900 -->
+<img src="img/duplicate_legend_component.png" alt="Duplicate legend component" title="Duplicate legend component" width="450"/> <!-- 900 -->
 </center>
 
-
+Many thanks to Oliwer for sharing this useful discovery.
 
 
 
@@ -102,9 +124,9 @@ Here is a picture with the result:
 <pre class="code">
 </pre>
 
-**Response:** You must have misunderstood my question.  I don't have the ViewSheet in order to use the method to get its placed views.  I have a view, that I know is on a sheet (because its sheet number parameter is not null), but I want to get a direct reference to that sheet that it is placed on.  It seems to me that you are still suggesting that I must loop through all ViewSheets to get the View that I'm concerned with.  Thanks.
+**Response:** 
 
-**Answer:** Yes, indeed, that is exactly what I am suggesting.
+**Answer:** 
 
 
 
