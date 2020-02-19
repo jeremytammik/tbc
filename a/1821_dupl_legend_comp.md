@@ -13,7 +13,7 @@
 
 twitter:
 
- in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+Converting latitude and longitude to metres, UIFrameworkService utility methods and duplicating legend components in Python in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/latlongtometres
 
 Today, we discuss duplicating legend components in Python, my own non-API Python work and some undocumented utility methods
 &ndash; Duplicate legend component in Python
@@ -34,7 +34,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Duplicate Legend Component and Lat Long to Metres
+### Lat Long to Metres and Duplicate Legend Component
 
 Today, we discuss duplicating legend components in Python, my own non-API Python work and some undocumented utility methods:
 
