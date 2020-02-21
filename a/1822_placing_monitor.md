@@ -11,6 +11,8 @@
 
 twitter:
 
+Multi-threading family instance placement monitor elegantly combining .NET timer and multi-threading functionality with the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/placementmonitor
+
 Kennan Chen perfected his family instance placement monitor by elegantly combining the Revit API with additional .NET timer and multi-threading functionality in a novel fashion seldom seen in a Revit add-in...
 
 &ndash; 
