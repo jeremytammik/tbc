@@ -10,6 +10,8 @@
 
 twitter:
 
+Kennan Chen perfected his family instance placement monitor by elegantly combining the Revit API with additional .NET timer and multi-threading functionality in a novel fashion seldom seen in a Revit add-in...
+
 &ndash; 
 ...
 
@@ -26,15 +28,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Family Instance Placement Monitor</h3>
-<h4><a name="2"></a>Family Instance Placement Monitor Take Two</h4>
-<p>Yesterday, I mentioned
+<h3>Multi-Threading Family Instance Placement Monitor</h3>
+<p>In the last post, I mentioned
 some <a href="https://thebuildingcoder.typepad.com/blog/2020/02/lat-long-to-metres-and-duplicate-legend-component.html#4">undocumented UIFrameworkService utility methods</a>
 pointed out by Kennan Chen of Shanghai in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/get-notified-when-a-family-type-is-about-to-place/m-p/9327282">getting notified when a family type is about to be placed</a>.</p>
 <p>He made use of them to implement a family instance placement monitor that could not be achieved using the pure documented Revit API alone.</p>
-<p>After publication, he perfected it by elegantly combining the Revit API with additional .NET timer and multi-threading functionality in a novel fashion seldom seen in a Revit add-in.</p>
+<p>After the initial publication, he perfected it by elegantly combining the Revit API with additional .NET timer and multi-threading functionality in a novel fashion seldom seen in a Revit add-in.</p>
 <p>Let's return to the original question and start fresh from there:</p>
 <p><strong>Question:</strong> Is there an event which can notify when Revit is about to place a family type?</p>
 <p>There are events like <code>Application</code> <code>FamilyLoadedIntoDocument</code> and <code>FamilyLoadingIntoDocument</code>.</p>
@@ -202,3 +203,6 @@ The trick is to queue the Timer callback to the main UI thread using Dispatcher.
 </pre>
 
 <p>Very great thanks to Kennan Chen for this extremely knowledgeable, clear and illuminating explanation and elegant juggling of the different threads and contexts!</p>
+<p><center>
+<img src="img/surveillance.jpg" alt="Surveillance" title="Surveillance" width="400"/>
+</center></p>
