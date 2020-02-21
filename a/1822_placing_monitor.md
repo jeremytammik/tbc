@@ -11,6 +11,8 @@
 
 twitter:
 
+Kennan Chen perfected his family instance placement monitor by elegantly combining the Revit API with additional .NET timer and multi-threading functionality in a novel fashion seldom seen in a Revit add-in...
+
 &ndash; 
 ...
 
@@ -27,12 +29,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Family Instance Placement Monitor
+### Multi-Threading Family Instance Placement Monitor
 
-
-#### <a name="2"></a>Family Instance Placement Monitor Take Two
-
-Yesterday, I mentioned
+In the last post, I mentioned
 some [undocumented UIFrameworkService utility methods](https://thebuildingcoder.typepad.com/blog/2020/02/lat-long-to-metres-and-duplicate-legend-component.html#4)
 pointed out by Kennan Chen of Shanghai in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -40,7 +39,7 @@ on [getting notified when a family type is about to be placed](https://forums.au
 
 He made use of them to implement a family instance placement monitor that could not be achieved using the pure documented Revit API alone.
 
-After publication, he perfected it by elegantly combining the Revit API with additional .NET timer and multi-threading functionality in a novel fashion seldom seen in a Revit add-in.
+After the initial publication, he perfected it by elegantly combining the Revit API with additional .NET timer and multi-threading functionality in a novel fashion seldom seen in a Revit add-in.
 
 Let's return to the original question and start fresh from there:
 
@@ -230,3 +229,6 @@ I added some comments to the code to explain it more clearly:
 
 Very great thanks to Kennan Chen for this extremely knowledgeable, clear and illuminating explanation and elegant juggling of the different threads and contexts!
 
+<center>
+<img src="img/surveillance.jpg" alt="Surveillance" title="Surveillance" width="400"/>
+</center>
