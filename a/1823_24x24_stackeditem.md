@@ -25,8 +25,10 @@ twitter:
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon
 
-&ndash; 
-...
+Let's start the week with some ribbon button item and encoding topics
+&ndash; How to create 24x24 stacked ribbon items
+&ndash; Update on moving a ribbon button between panels
+&ndash; Revit journal file character encoding...
 
 linkedin:
 
@@ -41,7 +43,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### 24x24 StackedItem and RibbonItem Utils
+### 24x24 StackedItem, Ribbon Utils, Journal Encoding
 
 Let's start the week with some ribbon button item and encoding topics:
 
