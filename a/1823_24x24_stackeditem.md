@@ -12,16 +12,17 @@
 - 10549372 [Add a new custom Ribbon Panel to a Revit built-in tab]
   https://forums.autodesk.com/t5/revit-api-forum/add-a-new-custom-ribbon-panel-to-a-revit-built-in-tab/td-p/5538772
 
+- Adjusting Wall.LocationCurve.Curve results in unexpected behaviour
+  https://forums.autodesk.com/t5/revit-api-forum/adjusting-wall-locationcurve-curve-results-in-unexpected/m-p/9328145
+
 twitter:
 
- the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
-
+ the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon
 
 &ndash; 
 ...
 
 linkedin:
-
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -35,8 +36,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 ### 24x24 StackedItem and RibbonItem Utils
-
-
 
 #### <a name="2"></a>How to Create 24x24 Stacked Ribbon Items
 
@@ -173,3 +172,169 @@ Above all, the link to the sample code provided back then is no longer valid, so
 a [local copy of it in RibbonMoveExample.zip](zip/RibbonMoveExample.zip).
 
 Thanks again to Scott for sharing this back then.
+
+<!---
+
+#### <a name="4"></a>Adjusting versus Recreating Wall Location Curve
+
+Harald Schmidt pointed out an interesting aspect and important enhancement to the old discussion of how
+to [edit wall length](https://thebuildingcoder.typepad.com/blog/2010/08/edit-wall-length.html) in
+his [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [adjusting Wall.LocationCurve.Curve results in unexpected behaviour](https://forums.autodesk.com/t5/revit-api-forum/adjusting-wall-locationcurve-curve-results-in-unexpected/m-p/9328145):
+
+**Question:** My add-in adjusts walls lines slightly (moves and rotates them a bit, and also slightly adjusts their length).
+
+Using `wall.Location.Move` and `wall.Location.Rotate` enables adjusting the location and rotation of the walls, but not their length.
+
+So, we decided to follow the approach suggested 10 years ago by The Building Coder to [
+to [edit wall length](https://thebuildingcoder.typepad.com/blog/2010/08/edit-wall-length.html) by
+creating a completely new wall location line from scratch like this:
+
+<pre class="code">
+  // get the current wall location
+  LocationCurve wallLocation = myWall.Location 
+    as LocationCurve;
+ 
+  // get the points
+  XYZ pt1 = wallLocation.Curve.get_EndPoint( 0 );
+  XYZ pt2 = wallLocation.Curve.get_EndPoint( 1 );
+ 
+  // change one point, e.g. move 1000 mm on X axis
+ 
+  pt2 = pt2.Add( new XYZ( 0.01 ), 0, 0 ) );
+ 
+  // create a new LineBound
+  Line newWallLine = app.Create.NewLineBound( 
+    pt1, pt2 );
+ 
+  // update the wall curve
+  wallLocation.Curve = newWallLine;
+</pre>
+
+This works fine for single walls, but fails in many cases where the wall has hosted elements like windows, and even in complex scenarios with multiple walls.
+
+Note: the movement is always less than about some mm!
+
+To show you what I mean, I wrote a short macro embedded in the RVT attached.
+
+The macro `LocationLineReset` just moves the wall inside the RVT by approx. 3 mm using the method suggested by The Building Coder:
+
+<center>
+<img src="img/adjust_wall_locationcurve_curve_macros.png" alt="Adjust wall LocationCurve curve macros" title="Adjust wall LocationCurve curve macros" width="600"/> <!-- 1104 -->
+</center>
+
+The result is the following:
+
+<center>
+<img src="img/adjust_wall_locationcurve_curve_error.png" alt="Adjust wall LocationCurve curve error" title="Adjust wall LocationCurve curve error" width="600"/> <!-- 840 -->
+</center>
+
+This seem like an unexpected behavior.
+The window is now located outside the wall, although the wall has moved only about 3mm.
+Is this a bug?
+
+If I use the second macro `ShiftWall`, which just calls `wall.LocationCurve.Move` to create an equivalent translation comparable to the former marco, the result is fine.
+
+Is there any method to adjust the length of the wall except resetting the `wall.LocationCurve.Curve` by creating a new curve using `Line.CreateBound`? That would solve our issue as well.
+
+**Answer:** Thank you for your interesting observation and careful analysis.
+
+I looked at your macros and can reproduce what you say.
+
+Besides the macro you list, `LocationLineReset`, there is another one that slightly moves the existing location line instead of creating a new one, `ShiftWall`.
+
+That latter macro completes successfully:
+
+<pre class="code">
+  public void LocationLineReset()
+  {
+    doc = this.Application.ActiveUIDocument.Document;
+    Wall wall = doc.GetElement( new ElementId( 305891 ) ) as Wall;
+    TransactionStatus status;
+    using ( Transaction trans = new Transaction( doc, "bla" ) )
+    {
+      trans.Start();
+      LocationCurve locationCurve = wall.Location as LocationCurve;
+      Line wallLine = locationCurve.Curve as Line;
+      
+      XYZ startPoint = wallLine.GetEndPoint(0);
+      XYZ endPoint = wallLine.GetEndPoint(1);
+
+      XYZ minimalMoveVector = new XYZ( 0.01 /* =~ 3mm*/, 0.01, 0.0);
+      startPoint += minimalMoveVector;
+      endPoint += minimalMoveVector;
+      
+      locationCurve.Curve = Line.CreateBound( startPoint, endPoint );
+      status = trans.Commit();
+    }
+    
+    if( status != TransactionStatus.Committed ) 
+      MessageBox.Show( "Commit failed" );
+  }
+  
+  public void ShiftWall()
+  {
+    doc = this.Application.ActiveUIDocument.Document;
+    Wall wall = doc.GetElement( new ElementId( 305891 ) ) as Wall;
+    TransactionStatus status;
+    bool bSuccess = false;
+    using ( Transaction trans = new Transaction( doc, "bla" ) )
+    {
+      trans.Start();
+
+      XYZ minimalMoveVector = new XYZ( 0.01 /* =~ 3mm*/, 0.01, 0.0);				
+      bSuccess = wall.Location.Move( minimalMoveVector );
+      
+      status = trans.Commit();
+    }
+    
+    if( status == TransactionStatus.Committed && bSuccess) 
+      MessageBox.Show( "Shift succeeded" );
+  }
+</pre>
+
+I would assume that during the process of resetting the wall location line from scratch, the window position gets completely lost.
+
+When you simply perform a small adjustment to the existing location line, the window position is retained and adjusted accordingly.
+
+Therefore, I would suggest using the latter approach whenever possible.
+
+You could even make use of the latter approach in several steps, adjust first one and then the other location line endpoint.
+
+I hope this enables you to handle all required situations.
+
+
+SetEndPoint method
+
+
+  public void ShortenWall()
+  {
+    Document doc = this.Application.ActiveUIDocument.Document;
+    Wall wall = doc.GetElement( new ElementId( 305891 ) ) as Wall;
+    TransactionStatus status;
+    using ( Transaction trans = new Transaction( doc ) )
+    {
+      trans.Start( "Shorten Wall");
+      
+      LocationCurve lc = wall.Location as LocationCurve;
+      Line ll = lc.Curve as Line;
+      
+      double pstart = ll.GetEndParameter(0);
+      double pend = ll.GetEndParameter(1);
+      double pdelta = 0.05 * (pend - pstart);
+      
+      lc.Curve.MakeBound(pstart + pdelta, pend - pdelta); // no observable change to wall
+      
+      (wall.Location as LocationCurve).Curve.MakeUnbound();
+      
+      (wall.Location as LocationCurve).Curve.MakeBound( // no observable change to wall
+        pstart + pdelta, pend - pdelta);
+  
+      status = trans.Commit();
+    }
+    
+    if( status == TransactionStatus.Committed) 
+      MessageBox.Show( "Shorten Wall succeeded" );
+  }
+  
+--->
