@@ -297,6 +297,6 @@ The result was astonishing and intriguing:
 
 The audience that enjoyed the visual presentation:
 
-- Remembers **twice** as many strategy elements
-- Understands complex elements **better**
-- Feels **less** secure discussing the content with others
+- Remembers <b><u>twice</u></b> as many strategy elements
+- Understands complex elements <b><u>better</u></b>
+- Feels <b><u>less</u></b> secure discussing the content with others
