@@ -38,7 +38,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Adjusting the Wall Location Curve
+### Adjusting Wall Location Curve and Visual Presentation
+
+An exciting discussion on applying minimal adjustments to the model, and yet another research result on the effectivity of visual presentation:
+
+- [Adjusting versus recreating wall location curve](#2)
+- [Multimedia communication versus bullet points](#3)
 
 #### <a name="2"></a>Adjusting versus Recreating Wall Location Curve
 
@@ -58,24 +63,24 @@ to [edit wall length](https://thebuildingcoder.typepad.com/blog/2010/08/edit-wal
 creating a completely new wall location line from scratch like this:
 
 <pre class="code">
-  // get the current wall location
-  LocationCurve wallLocation = myWall.Location 
-    as LocationCurve;
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;get&nbsp;the&nbsp;current&nbsp;wall&nbsp;location</span>
+&nbsp;&nbsp;<span style="color:#2b91af;">LocationCurve</span>&nbsp;wallLocation&nbsp;=&nbsp;myWall.Location
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">LocationCurve</span>;
  
-  // get the points
-  XYZ pt1 = wallLocation.Curve.get_EndPoint( 0 );
-  XYZ pt2 = wallLocation.Curve.get_EndPoint( 1 );
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;get&nbsp;the&nbsp;points</span>
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;pt1&nbsp;=&nbsp;wallLocation.Curve.get_EndPoint(&nbsp;0&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;pt2&nbsp;=&nbsp;wallLocation.Curve.get_EndPoint(&nbsp;1&nbsp;);
  
-  // change one point, e.g. move 1000 mm on X axis
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;change&nbsp;one&nbsp;point,&nbsp;e.g.&nbsp;move&nbsp;1000&nbsp;mm&nbsp;on&nbsp;X&nbsp;axis</span>
  
-  pt2 = pt2.Add( new XYZ( 0.01 ), 0, 0 ) );
+&nbsp;&nbsp;pt2&nbsp;=&nbsp;pt2.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;0.01&nbsp;),&nbsp;0,&nbsp;0&nbsp;)&nbsp;);
  
-  // create a new LineBound
-  Line newWallLine = app.Create.NewLineBound( 
-    pt1, pt2 );
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;create&nbsp;a&nbsp;new&nbsp;LineBound</span>
+&nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;newWallLine&nbsp;=&nbsp;app.Create.NewLineBound(
+&nbsp;&nbsp;&nbsp;&nbsp;pt1,&nbsp;pt2&nbsp;);
  
-  // update the wall curve
-  wallLocation.Curve = newWallLine;
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;update&nbsp;the&nbsp;wall&nbsp;curve</span>
+&nbsp;&nbsp;wallLocation.Curve&nbsp;=&nbsp;newWallLine;
 </pre>
 
 This works fine for single walls, but fails in many cases where the wall has hosted elements like windows, and even in complex scenarios with multiple walls.
@@ -113,51 +118,51 @@ Besides the macro you list, `LocationLineReset`, there is another one that sligh
 That latter macro completes successfully:
 
 <pre class="code">
-  public void LocationLineReset()
-  {
-    doc = this.Application.ActiveUIDocument.Document;
-    Wall wall = doc.GetElement( new ElementId( 305891 ) ) as Wall;
-    TransactionStatus status;
-    using ( Transaction trans = new Transaction( doc, "bla" ) )
-    {
-      trans.Start();
-      LocationCurve locationCurve = wall.Location as LocationCurve;
-      Line wallLine = locationCurve.Curve as Line;
-      
-      XYZ startPoint = wallLine.GetEndPoint(0);
-      XYZ endPoint = wallLine.GetEndPoint(1);
-
-      XYZ minimalMoveVector = new XYZ( 0.01 /* =~ 3mm*/, 0.01, 0.0);
-      startPoint += minimalMoveVector;
-      endPoint += minimalMoveVector;
-      
-      locationCurve.Curve = Line.CreateBound( startPoint, endPoint );
-      status = trans.Commit();
-    }
-    
-    if( status != TransactionStatus.Committed ) 
-      MessageBox.Show( "Commit failed" );
-  }
-  
-  public void ShiftWall()
-  {
-    doc = this.Application.ActiveUIDocument.Document;
-    Wall wall = doc.GetElement( new ElementId( 305891 ) ) as Wall;
-    TransactionStatus status;
-    bool bSuccess = false;
-    using ( Transaction trans = new Transaction( doc, "bla" ) )
-    {
-      trans.Start();
-
-      XYZ minimalMoveVector = new XYZ( 0.01 /* =~ 3mm*/, 0.01, 0.0);				
-      bSuccess = wall.Location.Move( minimalMoveVector );
-      
-      status = trans.Commit();
-    }
-    
-    if( status == TransactionStatus.Committed && bSuccess) 
-      MessageBox.Show( "Shift succeeded" );
-  }
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;LocationLineReset()
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;doc&nbsp;=&nbsp;<span style="color:blue;">this</span>.Application.ActiveUIDocument.Document;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Wall</span>&nbsp;wall&nbsp;=&nbsp;doc.GetElement(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementId</span>(&nbsp;305891&nbsp;)&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Wall</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TransactionStatus</span>&nbsp;status;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;trans&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc,&nbsp;<span style="color:#a31515;">&quot;bla&quot;</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Start();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">LocationCurve</span>&nbsp;locationCurve&nbsp;=&nbsp;wall.Location&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">LocationCurve</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;wallLine&nbsp;=&nbsp;locationCurve.Curve&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Line</span>;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;startPoint&nbsp;=&nbsp;wallLine.GetEndPoint(&nbsp;0&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;endPoint&nbsp;=&nbsp;wallLine.GetEndPoint(&nbsp;1&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;minimalMoveVector&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;0.01&nbsp;<span style="color:green;">/*&nbsp;=~&nbsp;3mm*/</span>,&nbsp;0.01,&nbsp;0.0&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;startPoint&nbsp;+=&nbsp;minimalMoveVector;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;endPoint&nbsp;+=&nbsp;minimalMoveVector;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;locationCurve.Curve&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(&nbsp;startPoint,&nbsp;endPoint&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;status&nbsp;=&nbsp;trans.Commit();
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;status&nbsp;!=&nbsp;<span style="color:#2b91af;">TransactionStatus</span>.Committed&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MessageBox.Show(&nbsp;<span style="color:#a31515;">&quot;Commit&nbsp;failed&quot;</span>&nbsp;);
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;ShiftWall()
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;doc&nbsp;=&nbsp;<span style="color:blue;">this</span>.Application.ActiveUIDocument.Document;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Wall</span>&nbsp;wall&nbsp;=&nbsp;doc.GetElement(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementId</span>(&nbsp;305891&nbsp;)&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Wall</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TransactionStatus</span>&nbsp;status;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">bool</span>&nbsp;bSuccess&nbsp;=&nbsp;<span style="color:blue;">false</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;trans&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc,&nbsp;<span style="color:#a31515;">&quot;bla&quot;</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Start();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;minimalMoveVector&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;0.01&nbsp;<span style="color:green;">/*&nbsp;=~&nbsp;3mm*/</span>,&nbsp;0.01,&nbsp;0.0&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bSuccess&nbsp;=&nbsp;wall.Location.Move(&nbsp;minimalMoveVector&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;status&nbsp;=&nbsp;trans.Commit();
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;status&nbsp;==&nbsp;<span style="color:#2b91af;">TransactionStatus</span>.Committed&nbsp;&amp;&amp;&nbsp;bSuccess&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MessageBox.Show(&nbsp;<span style="color:#a31515;">&quot;Shift&nbsp;succeeded&quot;</span>&nbsp;);
+&nbsp;&nbsp;}
 </pre>
 
 I would assume that during the process of resetting the wall location line from scratch, the window position gets completely lost.
@@ -185,35 +190,35 @@ The only other way I could think of to try to modify an existing curve's length 
 In theory, this can be achieved by calling MakeBound. However, all my attempts to use that method to modify the wall length had no result. Here is the final attempt:
 
 <pre class="code">
-  public void ShortenWall()
-  {
-    Document doc = this.Application.ActiveUIDocument.Document;
-    Wall wall = doc.GetElement( new ElementId( 305891 ) ) as Wall;
-    TransactionStatus status;
-    using ( Transaction trans = new Transaction( doc ) )
-    {
-      trans.Start( "Shorten Wall");
-      
-      LocationCurve lc = wall.Location as LocationCurve;
-      Line ll = lc.Curve as Line;
-      
-      double pstart = ll.GetEndParameter(0);
-      double pend = ll.GetEndParameter(1);
-      double pdelta = 0.05 * (pend - pstart);
-      
-      lc.Curve.MakeBound(pstart + pdelta, pend - pdelta); // no observable change to wall
-      
-      (wall.Location as LocationCurve).Curve.MakeUnbound();
-      
-      (wall.Location as LocationCurve).Curve.MakeBound( // no observable change to wall
-        pstart + pdelta, pend - pdelta);
-  
-      status = trans.Commit();
-    }
-    
-    if( status == TransactionStatus.Committed) 
-      MessageBox.Show( "Shorten Wall succeeded" );
-  }
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;ShortenWall()
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;<span style="color:blue;">this</span>.Application.ActiveUIDocument.Document;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Wall</span>&nbsp;wall&nbsp;=&nbsp;doc.GetElement(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementId</span>(&nbsp;305891&nbsp;)&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Wall</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TransactionStatus</span>&nbsp;status;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;trans&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Start(&nbsp;<span style="color:#a31515;">&quot;Shorten&nbsp;Wall&quot;</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">LocationCurve</span>&nbsp;lc&nbsp;=&nbsp;wall.Location&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">LocationCurve</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;ll&nbsp;=&nbsp;lc.Curve&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Line</span>;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;pstart&nbsp;=&nbsp;ll.GetEndParameter(&nbsp;0&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;pend&nbsp;=&nbsp;ll.GetEndParameter(&nbsp;1&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;pdelta&nbsp;=&nbsp;0.05&nbsp;*&nbsp;(pend&nbsp;-&nbsp;pstart);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lc.Curve.MakeBound(&nbsp;pstart&nbsp;+&nbsp;pdelta,&nbsp;pend&nbsp;-&nbsp;pdelta&nbsp;);&nbsp;<span style="color:green;">//&nbsp;no&nbsp;observable&nbsp;change&nbsp;to&nbsp;wall</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(wall.Location&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">LocationCurve</span>).Curve.MakeUnbound();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(wall.Location&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">LocationCurve</span>).Curve.MakeBound(&nbsp;<span style="color:green;">//&nbsp;no&nbsp;observable&nbsp;change&nbsp;to&nbsp;wall</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pstart&nbsp;+&nbsp;pdelta,&nbsp;pend&nbsp;-&nbsp;pdelta&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;status&nbsp;=&nbsp;trans.Commit();
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;status&nbsp;==&nbsp;<span style="color:#2b91af;">TransactionStatus</span>.Committed&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MessageBox.Show(&nbsp;<span style="color:#a31515;">&quot;Shorten&nbsp;Wall&nbsp;succeeded&quot;</span>&nbsp;);
+&nbsp;&nbsp;}
 </pre>
 
 At this point, Fair59 comes to the rescue and adds:
@@ -221,17 +226,17 @@ At this point, Fair59 comes to the rescue and adds:
 You can adjust the curve of a wall with hosted elements, if the "curve definition" stays the same, i.e. just changing the start- and end parameters.
 
 <pre class="code">
-	LocationCurve lc = wall.Location as LocationCurve;
-	Curve ll = lc.Curve;
-      
-	double pstart = ll.GetEndParameter(0);
-	double pend = ll.GetEndParameter(1);
-	double pdelta = 0.001 * (pend - pstart);
-      
-	ll.MakeUnbound();
-	ll.MakeBound(pstart + pdelta, pend - pdelta);
-      
-	lc.Curve = ll;
+&nbsp;&nbsp;<span style="color:#2b91af;">LocationCurve</span>&nbsp;lc&nbsp;=&nbsp;wall.Location&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">LocationCurve</span>;
+&nbsp;&nbsp;<span style="color:#2b91af;">Curve</span>&nbsp;ll&nbsp;=&nbsp;lc.Curve;
+ 
+&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;pstart&nbsp;=&nbsp;ll.GetEndParameter(&nbsp;0&nbsp;);
+&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;pend&nbsp;=&nbsp;ll.GetEndParameter(&nbsp;1&nbsp;);
+&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;pdelta&nbsp;=&nbsp;0.001&nbsp;*&nbsp;(pend&nbsp;-&nbsp;pstart);
+ 
+&nbsp;&nbsp;ll.MakeUnbound();
+&nbsp;&nbsp;ll.MakeBound(&nbsp;pstart&nbsp;+&nbsp;pdelta,&nbsp;pend&nbsp;-&nbsp;pdelta&nbsp;);
+ 
+&nbsp;&nbsp;lc.Curve&nbsp;=&nbsp;ll;
 </pre>
 
 **Response:** Thank you both for solving the issue!
@@ -240,12 +245,12 @@ Just a minor question: can we expect that the wall line parameter scales the pos
 E.g., if we want to adjust the length of the wall by 0.1 feet, can we always do the following:
 
 <pre class="code">
-  double pstart = ll.GetEndParameter(0);
-  double pend = ll.GetEndParameter(1);
-  
-  ll.MakeUnbound();
-  ll.MakeBound( pstart, pend + 0.1 ); // move end point by 0.1 feet
-  lc.Curve = ll;
+&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;pstart&nbsp;=&nbsp;ll.GetEndParameter(&nbsp;0&nbsp;);
+&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;pend&nbsp;=&nbsp;ll.GetEndParameter(&nbsp;1&nbsp;);
+ 
+&nbsp;&nbsp;ll.MakeUnbound();
+&nbsp;&nbsp;ll.MakeBound(&nbsp;pstart,&nbsp;pend&nbsp;+&nbsp;0.1&nbsp;);&nbsp;<span style="color:green;">//&nbsp;move&nbsp;end&nbsp;point&nbsp;by&nbsp;0.1&nbsp;feet</span>
+&nbsp;&nbsp;lc.Curve&nbsp;=&nbsp;ll;
 </pre>
 
 In my example it did, but I am not sure if this is an invariant we can rely on?
@@ -284,7 +289,7 @@ the [TIM Lecture Series &ndash; Communicating Strategy: How Drawing Can Create B
 An even shorter summary by Krogerus and Tschaeppeler in [Das Magazin](https://www.dasmagazin.ch).
 They resume:
 
-The presentation explaind a strategy proposal.
+The presentation explained a strategy proposal.
 Afterwards, participants were asked to summarise the main elements of the strategy and assess how secure they would feel discussing it with others.
 
 Most importantly: half of them were shown slides with text; the other half received the explanation including illustrations.
