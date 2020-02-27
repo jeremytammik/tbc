@@ -286,8 +286,7 @@ The results show the learning benefits to students of multimedia presentations o
 A summary and discussion of the results is also provided in
 the [TIM Lecture Series &ndash; Communicating Strategy: How Drawing Can Create Better Engagement](https://timreview.ca/article/922) by Stephen Cummings.
 
-An even shorter summary by Krogerus and Tschaeppeler in [Das Magazin](https://www.dasmagazin.ch).
-They resume:
+An even shorter summary was published by Krogerus and Tschaeppeler in [Das Magazin](https://www.dasmagazin.ch), who resume:
 
 The presentation explained a strategy proposal.
 Afterwards, participants were asked to summarise the main elements of the strategy and assess how secure they would feel discussing it with others.
