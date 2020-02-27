@@ -1,0 +1,250 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</head></p>
+<!---
+
+- Adjusting Wall.LocationCurve.Curve results in unexpected behaviour
+  https://forums.autodesk.com/t5/revit-api-forum/adjusting-wall-locationcurve-curve-results-in-unexpected/m-p/9328145
+
+- How can I get the center point of the part of wall which inside the room?
+  https://forums.autodesk.com/t5/revit-api-forum/how-can-i-get-the-center-point-of-the-part-of-wall-which-inside/m-p/9331417#M44758
+  beautiful solution by fair59
+
+- Advice From The CIA: How To Sabotage Your Workplace
+  https://corporate-rebels.com/cia-field-manual
+  if you want to work effectively in a team, here are some very valid hints on what to avoid.
+
+twitter:
+
+ in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+
+&ndash; 
+...
+
+linkedin:
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="100"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>Adjusting the Wall Location Curve</h3>
+<h4><a name="2"></a>Adjusting versus Recreating Wall Location Curve</h4>
+<p>Harald Schmidt pointed out an interesting and important aspect of the old discussion of how
+to <a href="https://thebuildingcoder.typepad.com/blog/2010/08/edit-wall-length.html">edit wall length</a> in
+his <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread,
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/adjusting-wall-locationcurve-curve-results-in-unexpected/m-p/9328145">adjusting Wall.LocationCurve.Curve results in unexpected behaviour</a>,
+and once again Frank <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/2083518">@Fair59</a> Aarssen
+came to the rescue with the final solution:</p>
+<p><strong>Question:</strong> My add-in adjusts walls lines slightly; it moves and rotates them a bit, and also slightly adjusts their length.</p>
+<p>Using <code>wall.Location.Move</code> and <code>wall.Location.Rotate</code> enables adjusting the location and rotation of the walls, but not their length.</p>
+<p>So, we decided to follow the approach suggested 10 years ago by The Building Coder to [
+to <a href="https://thebuildingcoder.typepad.com/blog/2010/08/edit-wall-length.html">edit wall length</a> by
+creating a completely new wall location line from scratch like this:</p>
+<pre class="code">
+  // get the current wall location
+  LocationCurve wallLocation = myWall.Location 
+    as LocationCurve;
+
+  // get the points
+  XYZ pt1 = wallLocation.Curve.get_EndPoint( 0 );
+  XYZ pt2 = wallLocation.Curve.get_EndPoint( 1 );
+
+  // change one point, e.g. move 1000 mm on X axis
+
+  pt2 = pt2.Add( new XYZ( 0.01 ), 0, 0 ) );
+
+  // create a new LineBound
+  Line newWallLine = app.Create.NewLineBound( 
+    pt1, pt2 );
+
+  // update the wall curve
+  wallLocation.Curve = newWallLine;
+</pre>
+
+<p>This works fine for single walls, but fails in many cases where the wall has hosted elements like windows, and even in complex scenarios with multiple walls.</p>
+<p>Note: the movement is always less than a very few millimetres!</p>
+<p>To show you what I mean, I wrote a short macro embedded in the RVT attached.</p>
+<p>The macro <code>LocationLineReset</code> just moves the wall inside the RVT by approx. 3 mm using the method suggested by The Building Coder:</p>
+<p><center>
+<img src="img/adjust_wall_locationcurve_curve_macros.png" alt="Adjust wall LocationCurve curve macros" title="Adjust wall LocationCurve curve macros" width="600"/> <!-- 1104 -->
+</center></p>
+<p>The result is the following:</p>
+<p><center>
+<img src="img/adjust_wall_locationcurve_curve_error.png" alt="Adjust wall LocationCurve curve error" title="Adjust wall LocationCurve curve error" width="600"/> <!-- 840 -->
+</center></p>
+<p>This seems like an unexpected behavior.
+The window is now located outside the wall, although the wall has moved only about 3 mm.
+Is this a bug?</p>
+<p>If I use the second macro <code>ShiftWall</code>, which just calls <code>wall.LocationCurve.Move</code> to create an equivalent translation comparable to the former marco, the result is fine.</p>
+<p>Is there any method to adjust the length of the wall except resetting the <code>wall.LocationCurve.Curve</code> by creating a new curve using <code>Line.CreateBound</code>? That would solve our issue as well.</p>
+<p><strong>Answer:</strong> Thank you for your interesting observation and careful analysis.</p>
+<p>I looked at your macros and can reproduce what you say.</p>
+<p>Besides the macro you list, <code>LocationLineReset</code>, there is another one that slightly moves the existing location line instead of creating a new one, <code>ShiftWall</code>.</p>
+<p>That latter macro completes successfully:</p>
+<pre class="code">
+  public void LocationLineReset()
+  {
+    doc = this.Application.ActiveUIDocument.Document;
+    Wall wall = doc.GetElement( new ElementId( 305891 ) ) as Wall;
+    TransactionStatus status;
+    using ( Transaction trans = new Transaction( doc, "bla" ) )
+    {
+      trans.Start();
+      LocationCurve locationCurve = wall.Location as LocationCurve;
+      Line wallLine = locationCurve.Curve as Line;
+
+      XYZ startPoint = wallLine.GetEndPoint(0);
+      XYZ endPoint = wallLine.GetEndPoint(1);
+
+      XYZ minimalMoveVector = new XYZ( 0.01 /* =~ 3mm*/, 0.01, 0.0);
+      startPoint += minimalMoveVector;
+      endPoint += minimalMoveVector;
+
+      locationCurve.Curve = Line.CreateBound( startPoint, endPoint );
+      status = trans.Commit();
+    }
+
+    if( status != TransactionStatus.Committed ) 
+      MessageBox.Show( "Commit failed" );
+  }
+
+  public void ShiftWall()
+  {
+    doc = this.Application.ActiveUIDocument.Document;
+    Wall wall = doc.GetElement( new ElementId( 305891 ) ) as Wall;
+    TransactionStatus status;
+    bool bSuccess = false;
+    using ( Transaction trans = new Transaction( doc, "bla" ) )
+    {
+      trans.Start();
+
+      XYZ minimalMoveVector = new XYZ( 0.01 /* =~ 3mm*/, 0.01, 0.0);                
+      bSuccess = wall.Location.Move( minimalMoveVector );
+
+      status = trans.Commit();
+    }
+
+    if( status == TransactionStatus.Committed && bSuccess) 
+      MessageBox.Show( "Shift succeeded" );
+  }
+</pre>
+
+<p>I would assume that during the process of resetting the wall location line from scratch, the window position gets completely lost.</p>
+<p>When you simply perform a small adjustment to the existing location line, the window position is retained and adjusted accordingly.</p>
+<p>Therefore, I would suggest using the latter approach whenever possible.</p>
+<p>You could even make use of the latter approach in several steps, adjust first one and then the other location line endpoint.</p>
+<p>That should enable you to handle all required situations.</p>
+<p>You can modify just one of the line endpoints without changing the other one, and you can also change both endpoints at the same time by moving them by different translation vectors...</p>
+<p>... or so I thought, until this very moment.</p>
+<p>Now I looked a the Revit API documentation Line and <a href="https://www.revitapidocs.com/2020/92a388f3-4949-465c-b938-2906ff6bdf5b.htm">Curve member methods</a>, expecting to point out the <code>SetEndPoint</code> methods to you, only to discover they do not exist.</p>
+<p>Oh dear.</p>
+<p>In that case, you really do have to create a new curve from scratch, and the problem you describe arises.</p>
+<p>The only other way I could think of to try to modify an existing curve's length is to change its start and end parameters.</p>
+<p>In theory, this can be achieved by calling MakeBound. However, all my attempts to use that method to modify the wall length had no result. Here is the final attempt:</p>
+<pre class="code">
+  public void ShortenWall()
+  {
+    Document doc = this.Application.ActiveUIDocument.Document;
+    Wall wall = doc.GetElement( new ElementId( 305891 ) ) as Wall;
+    TransactionStatus status;
+    using ( Transaction trans = new Transaction( doc ) )
+    {
+      trans.Start( "Shorten Wall");
+
+      LocationCurve lc = wall.Location as LocationCurve;
+      Line ll = lc.Curve as Line;
+
+      double pstart = ll.GetEndParameter(0);
+      double pend = ll.GetEndParameter(1);
+      double pdelta = 0.05 * (pend - pstart);
+
+      lc.Curve.MakeBound(pstart + pdelta, pend - pdelta); // no observable change to wall
+
+      (wall.Location as LocationCurve).Curve.MakeUnbound();
+
+      (wall.Location as LocationCurve).Curve.MakeBound( // no observable change to wall
+        pstart + pdelta, pend - pdelta);
+
+      status = trans.Commit();
+    }
+
+    if( status == TransactionStatus.Committed) 
+      MessageBox.Show( "Shorten Wall succeeded" );
+  }
+</pre>
+
+<p>At this point, Fair59 comes to the rescue and adds:</p>
+<p>You can adjust the curve of a wall with hosted elements, if the "curve definition" stays the same, i.e. just changing the start- and end parameters.</p>
+<pre class="code">
+    LocationCurve lc = wall.Location as LocationCurve;
+    Curve ll = lc.Curve;
+
+    double pstart = ll.GetEndParameter(0);
+    double pend = ll.GetEndParameter(1);
+    double pdelta = 0.001 * (pend - pstart);
+
+    ll.MakeUnbound();
+    ll.MakeBound(pstart + pdelta, pend - pdelta);
+
+    lc.Curve = ll;
+</pre>
+
+<p><strong>Response:</strong> Thank you both for solving the issue!</p>
+<p>Just a minor question: can we expect that the wall line parameter scales the position of the start/end point uniformly to feet?
+E.g., if we want to adjust the length of the wall by 0.1 feet, can we always do the following:</p>
+<pre class="code">
+  double pstart = ll.GetEndParameter(0);
+  double pend = ll.GetEndParameter(1);
+
+  ll.MakeUnbound();
+  ll.MakeBound( pstart, pend + 0.1 ); // move end point by 0.1 feet
+  lc.Curve = ll;
+</pre>
+
+<p>In my example it did, but I am not sure if this is an invariant we can rely on?</p>
+<p><strong>Answer:</strong> See the remarks in
+the <a href="https://www.revitapidocs.com/2016/0f4b2c25-35f8-4e3c-c71a-0d41fb6935ce.htm">online documentation of the GetEndParameter method</a>:</p>
+<blockquote>
+<p>Returns the raw parameter value at the start or end of this curve.</p>
+<p>The start and end value of the parameter can be any value (as it is determined by the system based on the inputs).
+For curves with regular curvature like lines and arcs, the raw parameter can be used to measure along the curve in Revit's default units (feet).
+Raw parameters are also the only way to evaluate points along unbound curves.</p>
+</blockquote>
+<p>Many thanks to Harald for raising this important issue and for Fair59 for his help in solving it.</p>
+<h4><a name="3"></a>Multimedia Communication versus Bullet Points</h4>
+<p>Moving onto a more generic non-Revit-API topic, how many times have we heard
+of <a href="https://duckduckgo.com/?q=death+by+PowerPoint">death by PowerPoint</a> and
+bullet list slide decks?</p>
+<p>Still, they persist.</p>
+<p>Now three researchers conducted another experiment, with over a thousand participants in eight countries:
+<a href="https://journals.aom.org/doi/10.5465/amle.2018.0066">How the Multimedia Communication of Strategy Can Enable More Effective Recall and Learning</a> by
+Duncan N. Angwin, Stephen Cummings and Urs Daellenbach.</p>
+<p>They conducted</p>
+<blockquote>
+<p>a multicountry experiment that tests the effects of different modes of strategy communication on student learning.
+The results show the learning benefits to students of multimedia presentations of strategy and suggests how strategy professors should further encourage students to draw strategies in class.</p>
+</blockquote>
+<p>A summary and discussion of the results is also provided in
+the <a href="https://timreview.ca/article/922">TIM Lecture Series &ndash; Communicating Strategy: How Drawing Can Create Better Engagement</a> by Stephen Cummings.</p>
+<p>An even shorter summary by Krogerus and Tschaeppeler in <a href="https://www.dasmagazin.ch">Das Magazin</a>.
+They resume:</p>
+<p>A business strategy was preented.
+Afterwards, participants were asked to summarise the main elements of the strategy and assess how secure they would feel discussing it with others.</p>
+<p>Most importantly: half of them were shown slides with text; the other half received the explanation including illustrations.</p>
+<p>The result was astonishing and intriguing:</p>
+<p>The audience that enjoyed the visual presentation:</p>
+<ul>
+<li>Remembers <strong>twice</strong> as many strategy elements</li>
+<li>Understands complex elements <strong>better</strong></li>
+<li>Feels <strong>less</strong> secure discussing the content with others</li>
+</ul>
