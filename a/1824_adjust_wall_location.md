@@ -96,11 +96,11 @@ The result is the following:
 <img src="img/adjust_wall_locationcurve_curve_error.png" alt="Adjust wall LocationCurve curve error" title="Adjust wall LocationCurve curve error" width="600"/> <!-- 840 -->
 </center>
 
-This seems like an unexpected behavior.
+This seems like an unexpected behaviour.
 The window is now located outside the wall, although the wall has moved only about 3 mm.
 Is this a bug?
 
-If I use the second macro `ShiftWall`, which just calls `wall.LocationCurve.Move` to create an equivalent translation comparable to the former marco, the result is fine.
+If I use the second macro `ShiftWall`, which just calls `wall.LocationCurve.Move` to create an equivalent translation comparable to the former macro, the result is fine.
 
 Is there any method to adjust the length of the wall except resetting the `wall.LocationCurve.Curve` by creating a new curve using `Line.CreateBound`? That would solve our issue as well.
 
@@ -174,7 +174,7 @@ You can modify just one of the line endpoints without changing the other one, an
 
 ... or so I thought, until this very moment.
 
-Now I looked a the Revit API documentation Line and [Curve member methods](https://www.revitapidocs.com/2020/92a388f3-4949-465c-b938-2906ff6bdf5b.htm), expecting to point out the `SetEndPoint` methods to you, only to discover they do not exist.
+Now I looked at the Revit API documentation of the Line and [Curve member methods](https://www.revitapidocs.com/2020/92a388f3-4949-465c-b938-2906ff6bdf5b.htm), expecting to point out the `SetEndPoint` methods to you, only to discover they do not exist.
 
 Oh dear.
 
@@ -275,7 +275,7 @@ Duncan N. Angwin, Stephen Cummings and Urs Daellenbach.
 
 They conducted
 
-> a multicountry experiment that tests the effects of different modes of strategy communication on student learning.
+> a multi-country experiment that tests the effects of different modes of strategy communication on student learning.
 The results show the learning benefits to students of multimedia presentations of strategy and suggests how strategy professors should further encourage students to draw strategies in class.
 
 A summary and discussion of the results is also provided in
@@ -284,7 +284,7 @@ the [TIM Lecture Series &ndash; Communicating Strategy: How Drawing Can Create B
 An even shorter summary by Krogerus and Tschaeppeler in [Das Magazin](https://www.dasmagazin.ch).
 They resume:
 
-A business strategy was preented.
+The presentation explaind a strategy proposal.
 Afterwards, participants were asked to summarise the main elements of the strategy and assess how secure they would feel discussing it with others.
 
 Most importantly: half of them were shown slides with text; the other half received the explanation including illustrations.
