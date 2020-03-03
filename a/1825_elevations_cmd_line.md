@@ -106,7 +106,7 @@ the switches and parameters for the current versions for both full Revit and for
 
 > Autodesk Revit (and Revit LT) is launched using the executable Revit.exe.
 
-> In its parameters &ndash; from the desktop icon or on the command line &ndash; you can use a number of optional runstring parameters (switches):
+> In its parameters &ndash; from the desktop icon or on the command line &ndash; you can use a number of optional runstring parameters (switch, option):
 
 >   - fully qualified name of a RVT/RTE/RFA file - opens a given project or template or family
 - fully qualified name of a journal file - executes (repeats) commands stored in the journal log file (.txt)
