@@ -18,47 +18,17 @@
 
 - https://thebuildingcoder.typepad.com/blog/2020/02/external-communication-and-async-await-event-wrapper.html#comment-4813648335
 
-Kennan Chen wrote:
-
-What a coincidence.
-I also implemented my own async/await external event wrapper these days.
-After some comparison with the one WhiteSharq provided, I found my implementation contains more useful functionality including wrapping async delegates and exposing core ability to define enhanced external events.
-It internally adopts an `ExternalEvent` creator, so the developers won't accidentally experience the context problems.
-Hope it can be helpful to the community.
-Github:
-
-https://github.com/KennanChan/Revit.Async
-
-Also available via nuget.
-
-/a/src/rvt/Revit.Async/
-
-- headless revit
-https://forums.autodesk.com/t5/revit-api-forum/family-related-memory-leaks/m-p/8738515
-
-Kennan.Chen in reply to: Explorergeorge.aggreySNQ7D
-‎2020-03-02 02:16 PM 
-Re: Family related memory leaks 
-A possible alternative is to run Revit in headless mode. Totally contrary to the documented approach to create an add-in, you can start an application which hosts a Revit runtime within the same process which enables you to do what you want with the top-level Application object. Just like Navisworks.
-
-In your case, for each project, start a headless Revit to finish your process, then close the application.
-
-The problem is, for each project, there is a waste of boot time.
-
-Since headless Revit don't start the renderer and anything about the UI, less memory will be consumed to make it possible to run serveral tasks in parallel on your machine. Moreover you can even set up a cluster to handle tons of projects in parallel which I believe is the key to enable Forge to resolve Revit files in cloud.
-
-As to how to set up a headless Revit, find a file named lcldrevit.dll or lcrvtutil.dll(newer version of Navisworks) under {Navisworks root folder}\Loaders\Rx folder. By decompiling that file,  LcRevitLoad.DoInit() contains all you need to start your own headless Revit.
-
-To make things easy enough, I created a library called Revit.Headless to do all that loading logic for you. Visit https://github.com/KennanChan/Revit.Headless for more details. Also it's available via nuget.
-
-https://github.com/KennanChan/Revit.Headless
 
 twitter:
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+Here are two important utilities, one eagerly awaited, the other a nice surprise: the updated REX and Structural analysis SDKs and a powerful <code>async</code> and <code>await</code> wrapper for the Revit API external event
+&ndash; REX SDK and Structural Analysis SDK 2020
+&ndash; Revit.Async
+&ndash; Background
+&ndash; Standard approach
+&ndash; Revit.Async approach...
 
 linkedin:
 
@@ -73,12 +43,22 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Another Async Await, REX and Structural Analysis SDK</h3>
+<h3>Another Async Await, REX + Structural Analysis SDK</h3>
+<p>Here are two important utilities, one eagerly awaited, the other a nice surprise: the updated REX and Structural analysis SDKs and a powerful <code>async</code> and <code>await</code> wrapper for the Revit API external event:</p>
+<ul>
+<li><a href="#2">REX SDK and Structural Analysis SDK 2020</a></li>
+<li><a href="#3">Revit.Async</a><ul>
+<li><a href="#3.2">Revit.Async background</a></li>
+<li><a href="#3.3">Example &ndash; standard approach</a></li>
+<li><a href="#3.4">Example &ndash; Revit.Async approach</a></li>
+</ul>
+</li>
+</ul>
 <h4><a name="2"></a> REX SDK and Structural Analysis SDK 2020</h4>
 <p>Last year,
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on an <a href="https://forums.autodesk.com/t5/revit-api-forum/issue-with-sdk-and-visual-studio/td-p/8052988">issue with SDK and Visual Studio</a>
-poinbted out that the Visual Studio templates provided with the REX SDK to make use of the Revit Structure Extensions had not yet been updated for Revit 2019.</p>
+pointed out that the Visual Studio templates provided with the REX SDK to make use of the Revit Structure Extensions had not yet been updated for Revit 2019.</p>
 <p>That was fixed by the development team and
 an <a href="https://thebuildingcoder.typepad.com/blog/2018/06/rex-sdk-visual-studio-templates-for-revit-structure-2019.html#2">updated set of REX SDK Visual Studio templates for Revit Structure 2019</a> was
 shared in the forum and here on the blog.</p>
@@ -103,15 +83,16 @@ saying:</p>
 I also implemented my own async/await external event wrapper these days.
 After some comparison with the one WhiteSharq provided, I found my implementation contains more useful functionality including wrapping async delegates and exposing core ability to define enhanced external events.
 It internally adopts an <code>ExternalEvent</code> creator, so the developers won't accidentally experience the context problems.
-Hope it can be helpful to the community.
-<a href="https://github.com/KennanChan/Revit.Async">Revit.Async Github repositroy</a> showing
+Hope it can be helpful to the community.</p>
+<p>Please look at
+the <a href="https://github.com/KennanChan/Revit.Async">Revit.Async GitHub repository</a> showing
 how to use the task-based asynchronous pattern (TAP) to run Revit API code from any execution context.
 Also available via nuget.</p>
 </blockquote>
 <p>Kennan's implementation does indeed look very complete and impressive with extensive documentation in both English
 and <a href="https://github.com/KennanChan/Revit.Async/blob/master/%E8%AF%B4%E6%98%8E.md">Chinese</a>:</p>
 <h4><a name="3.2"></a> Revit.Async Background</h4>
-<p>If you have ever encountered a Revit API exception saying "Cannot execute Revit API outside of Revit API context",
+<p>If you have ever encountered a Revit API exception saying, "Cannot execute Revit API outside of Revit API context",
 typically when you want to execute Revit API code from a modeless window, you may need this library to save your life.</p>
 <p>A common solution for this exception is to wrap the Revit API code using <code>IExternalEventHandler</code> and register the handler instance to Revit ahead of time to get a trigger (<code>ExternalEvent</code>).
 To execute the handler, just raise the trigger from anywhere to queue the handler to the Revit command loop.
@@ -119,7 +100,7 @@ But there comes another problem.
 After raising the trigger, within the same context, you have no idea when the handler will be executed and it's not easy to get some result generated from that handler.
 If you do want to make this happen, you have to manually yield the control back to the calling context.</p>
 <p>This solution looks quite similar to the mechanism of "Promise" if you are familiar with JavaScript ES6.
-Actually we can achieve all the above logic by making use of task-based asynchronous pattern (TAP) which is generally known as <code>Task&lt;T&gt;</code> in .NET.
+Actually, we can achieve all the above logic by making use of task-based asynchronous pattern (TAP) which is generally known as <code>Task&lt;T&gt;</code> in .NET.
 By adopting Revit.Async, it is possible to run Revit API code from any context, because internally Revit.Async wraps your code automatically with <code>IExternalEventHandler</code> and yields the return value to the calling context to make your invocation more natural.</p>
 <p>If you are unfamiliar with the task-based asynchronous pattern (TAP), here is some useful material on it provided by Microsoft:</p>
 <ul>
@@ -127,81 +108,86 @@ By adopting Revit.Async, it is possible to run Revit API code from any context, 
 </a></li>
 <li><a href="https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/async/task-asynchronous-programming-model">Task asynchronous programming model</a></li>
 </ul>
-<p>Here is a <a href="https://drive.google.com/file/d/1sb6Yrlt6zjkE9XBh4UB5sWV_i8nTpkmG/view?usp=sharing">diagram comparing the Revit API external event mechnism with Revit.Async</a> and screenshots of the two main parts:</p>
+<p>Here is a <a href="https://drive.google.com/file/d/1sb6Yrlt6zjkE9XBh4UB5sWV_i8nTpkmG/view?usp=sharing">diagram comparing the Revit API external event mechanism with Revit.Async</a> and
+screenshots of the two main parts:</p>
 <p><center>
-<img src="img/revit_async_external_event.png" alt="Revit API external event" title="Revit API external event" width="100"/>
+<img src="img/revit_async_external_event.png" alt="Revit API external event" title="Revit API external event" width="800"/>
 <p style="font-size: 80%; font-style:italic">Revit API external event</p></p>
-<p><img src="img/revit_async_external_event.png" alt="Revit.Async" title="Revit.Async" width="100"/>
+<p><img src="img/revit_async_external_event.png" alt="Revit.Async" title="Revit.Async" width="800"/>
 <p style="font-size: 80%; font-style:italic">Revit.Async</p>
 </center></p>
-<h4><a name="3.3"></a> Example &ndash; Standard Approach without Revit.Async</h4>
+<h4><a name="3.3"></a> Example &ndash; Standard Approach</h4>
 <pre class="code">
 [Transaction(TransactionMode.Manual)]
 public class MyRevitCommand : IExternalCommand
 {
-    public static ExternalEvent SomeEvent { get; set; }
-    public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
-    {
-        //Register MyExternalEventHandler ahead of time
-        SomeEvent = ExternalEvent.Create(new MyExternalEventHandler());
-        var window = new MyWindow();
-        //Show modeless window
-        window.Show();
-        return Result.Succeeded;
-    }
+  public static ExternalEvent SomeEvent { get; set; }
+  public Result Execute(ExternalCommandData commandData,
+    ref string message, ElementSet elements)
+  {
+    //Register MyExternalEventHandler ahead of time
+    SomeEvent = ExternalEvent.Create(new MyExternalEventHandler());
+    var window = new MyWindow();
+    //Show modeless window
+    window.Show();
+    return Result.Succeeded;
+  }
 }
 
 public class MyExternalEventHandler : IExternalEventHandler
 {
-    public void Execute(UIApplication app)
-    {
-        //Running some Revit API code here to handle the button click
-        //It's complicated to accept argument from the calling context and return value to the calling context
-        var families = new FilteredElementCollector(app.ActiveUIDocument.Document)
-                            .OfType(typeof(Family))
-                            .ToList();
-        //ignore some code
-    }
+  public void Execute(UIApplication app)
+  {
+    //Running some Revit API code here to handle the button click
+    //It's complicated to accept argument from the calling context
+    //and return value to the calling context
+    var families = new FilteredElementCollector(
+      app.ActiveUIDocument.Document)
+        .OfType(typeof(Family))
+        .ToList();
+    //ignore some code
+  }
 }
 
 public class MyWindow : Window
 {
-    public MyWindow()
-    {
-        InitializeComponents();
-    }
+  public MyWindow()
+  {
+    InitializeComponents();
+  }
 
-    private void InitializeComponents()
+  private void InitializeComponents()
+  {
+    Width = 200;
+    Height = 100;
+    WindowStartupLocation = WindowStartupLocation.CenterScreen;
+    var button = new Button
     {
-        Width                 = 200;
-        Height                = 100;
-        WindowStartupLocation = WindowStartupLocation.CenterScreen;
-        var button = new Button
-        {
-            Content             = "Button",
-            Command             = new ButtonCommand(),
-            VerticalAlignment   = VerticalAlignment.Center,
-            HorizontalAlignment = HorizontalAlignment.Center
-        };
-        Content = button;
-    }
+      Content = "Button",
+      Command = new ButtonCommand(),
+      VerticalAlignment = VerticalAlignment.Center,
+      HorizontalAlignment = HorizontalAlignment.Center
+    };
+    Content = button;
+  }
 }
 
 public class ButtonCommand : ICommand
-{    
-    public bool CanExecute(object parameter)
-    {
-        return true;
-    }
+{  
+  public bool CanExecute(object parameter)
+  {
+    return true;
+  }
 
-    public event EventHandler CanExecuteChanged;
+  public event EventHandler CanExecuteChanged;
 
-    public void Execute(object parameter)
-    {
-        //Running Revit API code directly here will result in a "Running Revit API outside of Revit API context" exception
-        //Raise a predefined ExternalEvent instead
-        MyRevitCommand.SomeEvent.Raise();
-    }
+  public void Execute(object parameter)
+  {
+    //Running Revit API code directly here will result in a
+    //"Running Revit API outside of Revit API context" exception
+    //Raise a predefined ExternalEvent instead
+    MyRevitCommand.SomeEvent.Raise();
+  }
 }
 </pre>
 
@@ -210,75 +196,79 @@ public class ButtonCommand : ICommand
 [Transaction(TransactionMode.Manual)]
 public class MyRevitCommand : IExternalCommand
 {
-    public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
-    {
-        //Always initialize RevitTask ahead of time within Revit API context
-        RevitTask.Initialze();
-        var window = new MyWindow();
-        //Show modeless window
-        window.Show();
-        return Result.Succeeded;
-    }
+  public Result Execute(ExternalCommandData commandData,
+    ref string message, ElementSet elements)
+  {
+    //Always initialize RevitTask ahead of time within Revit API context
+    RevitTask.Initialze();
+    var window = new MyWindow();
+    //Show modeless window
+    window.Show();
+    return Result.Succeeded;
+  }
 }
 
 public class MyWindow : Window
 {
-    public MyWindow()
-    {
-        InitializeComponents();
-    }
+  public MyWindow()
+  {
+    InitializeComponents();
+  }
 
-    private void InitializeComponents()
+  private void InitializeComponents()
+  {
+    Width = 200;
+    Height = 100;
+    WindowStartupLocation = WindowStartupLocation.CenterScreen;
+    var button = new Button
     {
-        Width                 = 200;
-        Height                = 100;
-        WindowStartupLocation = WindowStartupLocation.CenterScreen;
-        var button = new Button
-        {
-            Content             = "Button",
-            Command             = new ButtonCommand(),
-            CommandParameter    = true,
-            VerticalAlignment   = VerticalAlignment.Center,
-            HorizontalAlignment = HorizontalAlignment.Center
-        };
-        Content = button;
-    }
+      Content = "Button",
+      Command = new ButtonCommand(),
+      CommandParameter = true,
+      VerticalAlignment = VerticalAlignment.Center,
+      HorizontalAlignment = HorizontalAlignment.Center
+    };
+    Content = button;
+  }
 }
 
 public class ButtonCommand : ICommand
-{    
-    public bool CanExecute(object parameter)
-    {
-        return true;
-    }
+{  
+  public bool CanExecute(object parameter)
+  {
+    return true;
+  }
 
-    public event EventHandler CanExecuteChanged;
+  public event EventHandler CanExecuteChanged;
 
-    public async void Execute(object parameter)
-    {
-        //.NET 4.5 supported keyword, use ContinueWith if using .NET 4.0
-        var families = await RevitTask.RunAsync(
-            app => 
-            {
-                //Run Revit API code here
+  public async void Execute(object parameter)
+  {
+    //.NET 4.5 supported keyword, use ContinueWith if using .NET 4.0
+    var families = await RevitTask.RunAsync(
+      app => 
+      {
+        //Run Revit API code here
 
-                //Taking advantage of the closure created by the lambda expression,
-                //we can make use of the argument passed into the Execute method.
-                //Let's assume it's a boolean indicating whether to filter families that is editable
-                if(parameter is bool editable)
-                {
-                    return new FilteredElementCollector(app.ActiveUIDocument.Document)
-                        .OfType(typeof(Family))
-                        .Cast<Family>()
-                        .Where(family => editable ? family.IsEditable : true)
-                        .ToList();
-                }
+        //Taking advantage of the closure created by the
+        //lambda expression, we can make use of the argument
+        //passed into the Execute method.
+        //Let's assume it's a boolean indicating whether to
+        // filter families that is editable
+        if(parameter is bool editable)
+        {
+          return new FilteredElementCollector(
+            app.ActiveUIDocument.Document)
+              .OfType(typeof(Family))
+              .Cast<Family>()
+              .Where(family => editable ? family.IsEditable : true)
+              .ToList();
+        }
 
-                return null;
-            });
+        return null;
+      });
 
-        MessageBox.Show($"Family count: {families?.Count ?? 0}");
-    }
+    MessageBox.Show($"Family count: {families?.Count ?? 0}");
+  }
 }
 </pre>
 
@@ -286,117 +276,126 @@ public class ButtonCommand : ICommand
 <p>Fed up with the weak <code>IExternalEventHandler</code> interface?
 Use the <code>IGenericExternalEventHandler&lt;TParameter,TResult&gt;</code> interface instead.
 It provides you with the ability to pass argument to a handler and receive result on complete.</p>
-<p>It's always recommended to derive from the predefined abstract classes; they are designed to handle the argument passing and result returning part.</p>
-<p>| Class                                                   | Description                       |
-| ------------------------------------------------------- | --------------------------------- |
-| <code>AsyncGenericExternalEventHandler&lt;TParameter, TResult&gt;</code> | Use to execute asynchronous logic |
-| <code>SyncGenericExternalEventHandler&lt;TParameter, TResult&gt;</code>  | Use to execute synchronize logic  |</p>
+<p>It's always recommended to derive from the predefined abstract classes; they are designed to handle the argument passing and result returning part:</p>
+<ul>
+<li><code>AsyncGenericExternalEventHandler&lt;TParameter, TResult&gt;</code> &rarr; use to execute asynchronous logic</li>
+<li><code>SyncGenericExternalEventHandler&lt;TParameter, TResult&gt;</code> &rarr; use to execute synchronize logic</li>
+</ul>
 <pre class="code">
 [Transaction(TransactionMode.Manual)]
 public class MyRevitCommand : IExternalCommand
 {
-    public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
-    {
-        RevitTask.Initialize();
-        //Register SaveFamilyToDesktopExternalEventHandler ahead of time
-        RevitTask.RegisterGlobal(new SaveFamilyToDesktopExternalEventHandler());
-        var window = new MyWindow();
-        //Show modeless window
-        window.Show();
-        return Result.Succeeded;
-    }
+  public Result Execute(ExternalCommandData commandData,
+    ref string message, ElementSet elements)
+  {
+    RevitTask.Initialize();
+    //Register SaveFamilyToDesktopExternalEventHandler ahead of time
+    RevitTask.RegisterGlobal(
+      new SaveFamilyToDesktopExternalEventHandler());
+    var window = new MyWindow();
+    //Show modeless window
+    window.Show();
+    return Result.Succeeded;
+  }
 }
 
 public class MyWindow : Window
 {
-    public MyWindow()
-    {
-        InitializeComponents();
-    }
+  public MyWindow()
+  {
+    InitializeComponents();
+  }
 
-    private void InitializeComponents()
+  private void InitializeComponents()
+  {
+    Width = 200;
+    Height = 100;
+    WindowStartupLocation = WindowStartupLocation.CenterScreen;
+    var button = new Button
     {
-        Width                 = 200;
-        Height                = 100;
-        WindowStartupLocation = WindowStartupLocation.CenterScreen;
-        var button = new Button
-        {
-            Content             = "Save Random Family",
-            Command             = new ButtonCommand(),
-            CommandParameter    = true,
-            VerticalAlignment   = VerticalAlignment.Center,
-            HorizontalAlignment = HorizontalAlignment.Center
-        };
-        Content = button;
-    }
+      Content = "Save Random Family",
+      Command = new ButtonCommand(),
+      CommandParameter = true,
+      VerticalAlignment = VerticalAlignment.Center,
+      HorizontalAlignment = HorizontalAlignment.Center
+    };
+    Content = button;
+  }
 }
 
 public class ButtonCommand : ICommand
-{    
-    public bool CanExecute(object parameter)
-    {
-        return true;
-    }
+{  
+  public bool CanExecute(object parameter)
+  {
+    return true;
+  }
 
-    public event EventHandler CanExecuteChanged;
+  public event EventHandler CanExecuteChanged;
 
-    public async void Execute(object parameter)
-    {
-        var savePath = await RevitTask.RunAsync(
-            async app =>
-            {
-                try
-                {
-                    var document = app.ActiveUIDocument.Document;
-                    var randomFamily = await RevitTask.RunAsync(
-                        () =>
-                        {
-                            var families = new FilteredElementCollector(document)
-                                .OfClass(typeof(Family))
-                                .Cast<Family>()
-                                .Where(family => family.IsEditable)
-                                .ToArray();
-                            var random = new Random(Environment.TickCount);
-                            return families[random.Next(0, families.Length)];
-                        });
-
-                    //Raise your own handler
-                    return await RevitTask.RaiseGlobal<SaveFamilyToDesktopExternalEventHandler, Family, string>(randomFamily);
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
-            });
-        var saveResult = !string.IsNullOrWhiteSpace(savePath);
-        MessageBox.Show($"Family {(saveResult ? "" : "not ")}saved:\n{savePath}");
-        if (saveResult)
+  public async void Execute(object parameter)
+  {
+    var savePath = await RevitTask.RunAsync(
+      async app =>
+      {
+        try
         {
-            Process.Start(Path.GetDirectoryName(savePath));
+          var document = app.ActiveUIDocument.Document;
+          var randomFamily = await RevitTask.RunAsync(
+            () =>
+            {
+              var families = new FilteredElementCollector(document)
+                .OfClass(typeof(Family))
+                .Cast<Family>()
+                .Where(family => family.IsEditable)
+                .ToArray();
+              var random = new Random(Environment.TickCount);
+              return families[random.Next(0, families.Length)];
+            });
+
+          //Raise your own handler
+          return await RevitTask.RaiseGlobal<
+            SaveFamilyToDesktopExternalEventHandler,
+            Family, string>(randomFamily);
         }
+        catch (Exception)
+        {
+          return null;
+        }
+      });
+    var saveResult = !string.IsNullOrWhiteSpace(savePath);
+
+    MessageBox.Show(
+      $"Family {(saveResult ? "" : "not ")}saved:\n{savePath}");
+
+    if (saveResult)
+    {
+      Process.Start(Path.GetDirectoryName(savePath));
     }
+  }
 }
 
 public class SaveFamilyToDesktopExternalEventHandler :          
     SyncGenericExternalEventHandler<Family, string>
 {
-    public override string GetName()
-    {
-        return "SaveFamilyToDesktopExternalEventHandler";
-    }
+  public override string GetName()
+  {
+    return "SaveFamilyToDesktopExternalEventHandler";
+  }
 
-    protected override string Handle(UIApplication app, Family parameter)
-    {
-        //write sync logic here
-        var document       = parameter.Document;
-        var familyDocument = document.EditFamily(parameter);
-        var desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-        var path = Path.Combine(desktop, $"{parameter.Name}.rfa");
-        familyDocument.SaveAs(path, new SaveAsOptions {OverwriteExistingFile = true});
-        return path;
-    }
+  protected override string Handle(UIApplication app, Family parameter)
+  {
+    //write sync logic here
+    var document = parameter.Document;
+    var familyDocument = document.EditFamily(parameter);
+    var desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+    var path = Path.Combine(desktop, $"{parameter.Name}.rfa");
+    familyDocument.SaveAs(path, new SaveAsOptions {OverwriteExistingFile = true});
+    return path;
+  }
 }
 </pre>
 
 <p>Impressive, isn't it?</p>
 <p>Very many thanks to Kennan for this great implementation and explanation!</p>
+<p>More details and full source in
+Kennan's <a href="https://github.com/KennanChan/Revit.Async">Revit.Async GitHub repository</a>.</p>
