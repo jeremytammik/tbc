@@ -33,6 +33,16 @@ Here are two important utilities, one eagerly awaited, the other a nice surprise
 
 linkedin:
 
+Two important utilities, one eagerly awaited, the other a nice surprise: the updated REX and Structural analysis SDKs and Revit.Async, a powerful async and await wrapper for the Revit API external event in the #RevitAPI 
+
+http://bit.ly/rex2020asyncawait
+
+- REX SDK and Structural Analysis SDK 2020
+- Revit.Async
+- Background
+- Standard approach
+- Revit.Async approach...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
