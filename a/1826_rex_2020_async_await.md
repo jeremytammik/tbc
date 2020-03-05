@@ -22,7 +22,7 @@
 
 twitter:
 
- the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+Two important utilities, one eagerly awaited, the other a nice surprise: the updated REX and Structural analysis SDKs and Revit.Async, a powerful async and await wrapper for the Revit API external event in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/rex2020asyncawait
 
 Here are two important utilities, one eagerly awaited, the other a nice surprise: the updated REX and Structural analysis SDKs and a powerful <code>async</code> and <code>await</code> wrapper for the Revit API external event
 &ndash; REX SDK and Structural Analysis SDK 2020
