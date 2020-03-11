@@ -19,6 +19,10 @@ Two short notes on splitting pipes retaining connections and headless Revit, lau
 
 linkedin:
 
+Two short notes on splitting pipes retaining connections and headless Revit, launching it with no user interface with the #RevitAPI
+
+http://bit.ly/rvtheadless
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
