@@ -10,7 +10,7 @@
 
 twitter:
 
-Two short notes on splitting pipes retaining connections and headless Revit, launching it with no user interface with the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+Two short notes on splitting pipes retaining connections and headless Revit, launching it with no user interface with the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/rvtheadless
 
 Two short notes on splitting pipes retaining connections and headless Revit, launching it with no user interface...
 
