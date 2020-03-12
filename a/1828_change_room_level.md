@@ -42,7 +42,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 
-<iframe width="640" height="620" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" src="https://screencast.autodesk.com/Embed/Timeline/b427c037-3b56-415e-a2b9-55e17ef23475" frameborder="0" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no"></iframe>
+[20-second screen recording](zip/change_room_level.webm)
+
+<center>
+<!-- <iframe width="640" height="620" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" src="https://screencast.autodesk.com/Embed/Timeline/b427c037-3b56-415e-a2b9-55e17ef23475" frameborder="0" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no"></iframe> -->
+<iframe width="480" height="270" src="https://screencast.autodesk.com/Embed/Timeline/b427c037-3b56-415e-a2b9-55e17ef23475" frameborder="0" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no"></iframe>
+<center>
 
 Many thanks to Kennan for researching and sharing this exciting possibility!
 
