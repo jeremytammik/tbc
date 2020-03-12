@@ -39,8 +39,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Change Room Level
 
+An amazing solution to move existing rooms between levels while retaining all their information, some thoughts on managing slots in panel schedules, and a couple of useful JavaScript debugging console hints:
 
-#### <a name="2"></a> 
+- [Moving rooms to other levels](#2)
+- [Slots in panel schedules](#3)
+- [JavaScript debugging console commands](#4)
+
+#### <a name="2"></a>Moving Rooms to Other Levels
 
 After a year of discussion in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -220,7 +225,6 @@ namespace MyApp.Testing
 
 The simple Win Form layout:
 
-
 <center>
 <img src="img/select_placed_rooms.png" alt="Select placed rooms" title="Select placed rooms" width="400"/>
 </center>
@@ -377,7 +381,7 @@ To see how this works live, here is a [20-second screen recording](zip/change_ro
 <center>
 <!-- <iframe width="640" height="620" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" src="https://screencast.autodesk.com/Embed/Timeline/b427c037-3b56-415e-a2b9-55e17ef23475" frameborder="0" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no"></iframe> -->
 <iframe width="480" height="270" src="https://screencast.autodesk.com/Embed/Timeline/b427c037-3b56-415e-a2b9-55e17ef23475" frameborder="0" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no"></iframe>
-<center>
+</center>
 
 Many thanks to Sean for the great idea and simple solution!
 
