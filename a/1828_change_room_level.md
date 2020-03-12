@@ -13,12 +13,12 @@
 
 twitter:
 
-Two short notes on splitting pipes retaining connections and headless Revit, launching it with no user interface with the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/rvtheadless
+ the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-Two short notes on splitting pipes retaining connections and headless Revit, launching it with no user interface...
-
-&ndash; 
-...
+An amazing solution to move existing rooms between levels while retaining all their information, some thoughts on managing slots in panel schedules, and a couple of useful JavaScript debugging console hints
+&ndash; Moving rooms to other levels
+&ndash; Slots in panel schedules
+&ndash; JavaScript debugging console commands...
 
 linkedin:
 
@@ -37,7 +37,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Change Room Level
+### Panel Schedule Slots and Changing Room Level
 
 An amazing solution to move existing rooms between levels while retaining all their information, some thoughts on managing slots in panel schedules, and a couple of useful JavaScript debugging console hints:
 
@@ -55,7 +55,7 @@ Sean Page now shares an amazing solution, to quote Mahshid Motie, who raised it 
 **Question:** I want to change the associated level of rooms to have them on the right building story.
 Both using C# and in the user interface, the level parameter of the rooms is read-only and cannot be modified.
 
-So far, I can only solve this by by copying, pasting, and deleting.
+So far, I can only solve this by copying, pasting, and deleting.
 
 **Answer:** The concept of this intrigued me, so I set off on a way to make this happen.
 I think I have an OK solution that does not involve groups or really any work around at all.
@@ -67,7 +67,7 @@ However, if you delete a room, you get a warning that it is deleted and still ex
 Now when you place a new room at the correct level, don't place an entirely new room, but pick the correct unplaced room:
 
 <center>
-<img src="img/new_unplaced_room.png" alt="" title="" width="800"/> <!-- 1264 -->
+<img src="img/new_unplaced_room.png" alt="New unplaced room" title="New unplaced room" width="800"/> <!-- 1264 -->
 </center>
 
 It will retain all the properties of the deleted one, including the room number!
@@ -387,14 +387,14 @@ Many thanks to Sean for the great idea and simple solution!
 
 #### <a name="3"></a>Slots in Panel Schedules
 
-**Question:** I would like to propgrammatically assign slots in a panel schedule as Spaces or Spares.
+**Question:** I would like to programmatically assign slots in a panel schedule as Spaces or Spares.
 I would also like to Lock and Unlock slots.
 Can this be done with the Revit API?
 
 If there is no way via that API, is there any other way we can achieve it?
 
 <center>
-<img src="img/panel_boards_api_pole_breaker_count.jpg" alt="" title="" width="490"/>
+<img src="img/panel_boards_api_pole_breaker_count.jpg" alt="Panel properties" title="Panel properties" width="490"/>
 </center>
 
 **Answer:** The *Autodesk.Revit.DB.Electrical* [`PanelScheduleView` member methods](https://www.revitapidocs.com/2020/05d89377-2e7d-9e8f-7f57-192ecb2f23e8.htm) include: `IsSpace`, `IsSpare`, `IsSlotLocked`, `AddSpace`, `AddSpare`, `RemoveSpace`, `RemoveSpare`, etc.

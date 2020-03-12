@@ -12,12 +12,12 @@
 
 twitter:
 
-Two short notes on splitting pipes retaining connections and headless Revit, launching it with no user interface with the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/rvtheadless
+ the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-Two short notes on splitting pipes retaining connections and headless Revit, launching it with no user interface...
-
-&ndash; 
-...
+An amazing solution to move existing rooms between levels while retaining all their information, some thoughts on managing slots in panel schedules, and a couple of useful JavaScript debugging console hints
+&ndash; Moving rooms to other levels
+&ndash; Slots in panel schedules
+&ndash; JavaScript debugging console commands...
 
 linkedin:
 
@@ -36,7 +36,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Change Room Level</h3>
+<h3>Panel Schedule Slots and Changing Room Level</h3>
 <p>An amazing solution to move existing rooms between levels while retaining all their information, some thoughts on managing slots in panel schedules, and a couple of useful JavaScript debugging console hints:</p>
 <ul>
 <li><a href="#2">Moving rooms to other levels</a></li>
@@ -50,14 +50,14 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-change-the-ass
 Sean Page now shares an amazing solution, to quote Mahshid Motie, who raised it in the first place:</p>
 <p><strong>Question:</strong> I want to change the associated level of rooms to have them on the right building story.
 Both using C# and in the user interface, the level parameter of the rooms is read-only and cannot be modified.</p>
-<p>So far, I can only solve this by by copying, pasting, and deleting.</p>
+<p>So far, I can only solve this by copying, pasting, and deleting.</p>
 <p><strong>Answer:</strong> The concept of this intrigued me, so I set off on a way to make this happen.
 I think I have an OK solution that does not involve groups or really any work around at all.</p>
 <p>I don't know of any way to change the level directly.</p>
 <p>However, if you delete a room, you get a warning that it is deleted and still exists in the project &ndash; the 'not placed' message in room schedule.</p>
 <p>Now when you place a new room at the correct level, don't place an entirely new room, but pick the correct unplaced room:</p>
 <p><center>
-<img src="img/new_unplaced_room.png" alt="" title="" width="800"/> <!-- 1264 -->
+<img src="img/new_unplaced_room.png" alt="New unplaced room" title="New unplaced room" width="800"/> <!-- 1264 -->
 </center></p>
 <p>It will retain all the properties of the deleted one, including the room number!</p>
 <p>Concept:</p>
@@ -367,12 +367,12 @@ namespace MyApp.Testing
 </center></p>
 <p>Many thanks to Sean for the great idea and simple solution!</p>
 <h4><a name="3"></a>Slots in Panel Schedules</h4>
-<p><strong>Question:</strong> I would like to propgrammatically assign slots in a panel schedule as Spaces or Spares.
+<p><strong>Question:</strong> I would like to programmatically assign slots in a panel schedule as Spaces or Spares.
 I would also like to Lock and Unlock slots.
 Can this be done with the Revit API?</p>
 <p>If there is no way via that API, is there any other way we can achieve it?</p>
 <p><center>
-<img src="img/panel_boards_api_pole_breaker_count.jpg" alt="" title="" width="490"/>
+<img src="img/panel_boards_api_pole_breaker_count.jpg" alt="Panel properties" title="Panel properties" width="490"/>
 </center></p>
 <p><strong>Answer:</strong> The <em>Autodesk.Revit.DB.Electrical</em> <a href="https://www.revitapidocs.com/2020/05d89377-2e7d-9e8f-7f57-192ecb2f23e8.htm"><code>PanelScheduleView</code> member methods</a> include: <code>IsSpace</code>, <code>IsSpare</code>, <code>IsSlotLocked</code>, <code>AddSpace</code>, <code>AddSpare</code>, <code>RemoveSpace</code>, <code>RemoveSpare</code>, etc.</p>
 <p>There is currently no public API for lock and unlock.</p>
