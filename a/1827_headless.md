@@ -34,7 +34,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Split Pipe and Headless Revit
+### Split Pipe <!-- and Headless Revit -->
+
+<!--
 
 Two short notes on splitting pipes and headless Revit:
 
@@ -67,6 +69,11 @@ Many thanks to Kennan for researching and sharing this exciting possibility!
 #### <a name="3"></a> Split Pipe Retaining Connections
 
 A pretty standard functionality in the Revit MEP user interface can be a bit tricky to find in the API:
+
+-->
+
+A short note on splitting pipes.
+This pretty standard functionality in the Revit MEP user interface can be a bit tricky to find in the API:
 
 **Question:** The UI provides the split command (SL) to split a pipe into two without losing other connected elements.
 How can I achieve the same in API?

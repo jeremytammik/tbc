@@ -32,33 +32,45 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Split Pipe and Headless Revit</h3>
-<p>Two short notes on splitting pipes and headless Revit:</p>
-<ul>
-<li><a href="#2">Headless Revit</a></li>
-<li><a href="#3">Split pipe retaining connections</a></li>
-</ul>
-<h4><a name="2"></a> Headless Revit</h4>
-<p>Kennan Chen has made several exciting contributions recently and mentions yet another one in his answer to
-the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/family-related-memory-leaks/m-p/8738515">family related memory leaks</a>:</p>
-<blockquote>
-<p>A possible alternative to handle memory leaks is to run Revit in headless mode.
-Contrary to the documented approach to create an add-in, you can start an application which hosts a Revit runtime within the same process which enables you to do what you want with the top-level <code>Application</code> object.
-Just like Navisworks.</p>
-<p>In your case, for each project, start a headless Revit to finish your process, then close the application.
+<h3>Split Pipe <!-- and Headless Revit --></h3>
+<!--
+
+Two short notes on splitting pipes and headless Revit:
+
+- [Headless Revit](#2)
+- [Split pipe retaining connections](#3)
+
+#### <a name="2"></a> Headless Revit
+
+Kennan Chen has made several exciting contributions recently and mentions yet another one in his answer to
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [family related memory leaks](https://forums.autodesk.com/t5/revit-api-forum/family-related-memory-leaks/m-p/8738515):
+
+> A possible alternative to handle memory leaks is to run Revit in headless mode.
+Contrary to the documented approach to create an add-in, you can start an application which hosts a Revit runtime within the same process which enables you to do what you want with the top-level `Application` object.
+Just like Navisworks.
+
+> In your case, for each project, start a headless Revit to finish your process, then close the application.
 The problem is, for each project, there is a waste of boot time.
 Since headless Revit don't start the renderer and anything about the UI, less memory will be consumed to make it possible to run several tasks in parallel on your machine.
 Moreover, you can even set up a cluster to handle tons of projects in parallel which I believe is the key to enable Forge to resolve Revit files in cloud.
-As to how to set up a headless Revit, find a file named <code>lcldrevit.dll</code> or <code>lcrvtutil.dll</code> (newer version of Navisworks) under {Navisworks root folder}\Loaders\Rx folder.
-<code>LcRevitLoad.DoInit</code> contains all you need to start your own headless Revit.
-To make things easier still, I created a library called Revit.Headless to do all that loading logic for you.</p>
-<p>Visit the <a href="https://github.com/KennanChan/Revit.Headless">Revit.Headless GitHub repository</a> for more details.
-Also available via NuGet.</p>
-</blockquote>
-<p>Many thanks to Kennan for researching and sharing this exciting possibility!</p>
-<h4><a name="3"></a> Split Pipe Retaining Connections</h4>
-<p>A pretty standard functionality in the Revit MEP user interface can be a bit tricky to find in the API:</p>
+As to how to set up a headless Revit, find a file named `lcldrevit.dll` or `lcrvtutil.dll` (newer version of Navisworks) under {Navisworks root folder}\Loaders\Rx folder.
+`LcRevitLoad.DoInit` contains all you need to start your own headless Revit.
+To make things easier still, I created a library called Revit.Headless to do all that loading logic for you.
+
+> Visit the [Revit.Headless GitHub repository](https://github.com/KennanChan/Revit.Headless) for more details.
+Also available via NuGet.
+
+Many thanks to Kennan for researching and sharing this exciting possibility!
+
+#### <a name="3"></a> Split Pipe Retaining Connections
+
+A pretty standard functionality in the Revit MEP user interface can be a bit tricky to find in the API:
+
+-->
+
+<p>A short note on splitting pipes.
+This pretty standard functionality in the Revit MEP user interface can be a bit tricky to find in the API:</p>
 <p><strong>Question:</strong> The UI provides the split command (SL) to split a pipe into two without losing other connected elements.
 How can I achieve the same in API?</p>
 <p><strong>Answer:</strong> You can use the <code>PlumbingUtils</code> <code>BreakCurve</code> method.
