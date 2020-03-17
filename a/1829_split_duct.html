@@ -16,6 +16,10 @@ twitter:
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
+We recently shared a brief note on using the <code>BreakCurve</code> API for splitting a pipe.
+Matt Taylor now pointed out a much more comprehensive discussion asking, is there any API available to split a duct programmatically?
+That is not just an example, but an entire tutorial, so I think it is very useful to share here as well for all to enjoy..
+
 &ndash; 
 ...
 
@@ -86,7 +90,7 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/duct-splitting/m-p/67
 </pre>
 
 <p><strong>Response:</strong> It worked pleasantly.  Smiley Happy</p>
-<p>Normally, if I split a duct in the UI, it adds an family instance, e.g., a fitting, between the two separated elements. </p>
+<p>Normally, if I split a duct in the UI, it adds a family instance, e.g., a fitting, between the two separated elements. </p>
 <p><code>BreakCurve</code> just breaks the element into two parts at the specified length, which is really good, but I also need a specific family instance to be added between the two elements, just like in the UI.</p>
 <p><center>
 <img src="img/split_duct_2.jpg" alt="Splitting duct" title="Splitting duct" width="600"/> <!-- 1264 -->
@@ -95,13 +99,12 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/duct-splitting/m-p/67
 <p>You have the elementIds of the two ducts after one break; you just need to use one of those in your second break.</p>
 <p>The second break would have to be enclosed in a second transaction.</p>
 <p>Once you have the third elementId, you can get its duct element and use <code>duct.ChangeTypeId</code> to change the type should you desire it.</p>
-<p><strong>Response:</strong> My requirement is different.</p>
-<p>The screenshot which i sent in the previous reply was what i need to achieve as final output. that was done manually from Revit Application.</p>
-<p>This is what the BreakCurve method generates:</p>
+<p><strong>Response:</strong> My requirement is different.
+This is what the <code>BreakCurve</code> method generates:</p>
 <p><center>
 <img src="img/split_duct_AfterUsingBreakCurve.jpg" alt="After using BreakCurve" title="After using BreakCurve" width="600"/> <!-- 1264 -->
 </center></p>
-<p>Can I add a fitting between the two duct elements, which will act as a separation point?</p>
+<p>Can I add a fitting between the two duct elements that will act as a separation point?</p>
 <p>Here are screenshots showing the situation before and after splitting an element via the UI and API:</p>
 <p>Before:</p>
 <p><center>
@@ -124,7 +127,8 @@ The third one is the fitting that separates the two.</p>
 </center></p>
 <p>So, here the fitting needs to be added between the two duct elements, just like it was using the manual split command.</p>
 <p><strong>Answer:</strong> Riiiiiiiight. You need to add a union fitting. That is a duct fitting, and a family instance.</p>
-<p>When in doubt about the nwording, you can describe the elements using the Revit descriptions or the RevitLookup (API) names. That reduces thr potential for confusion.</p>
+<p>When in doubt about the wording, you can describe the elements using the Revit descriptions or the RevitLookup (API) names.
+That reduces the potential for confusion.</p>
 <p>I originally used two transactions, but it appears a regen will do the trick:</p>
 <pre class="code">
 &lt;<span style="color:#2b91af;">Transaction</span>(<span style="color:#2b91af;">TransactionMode</span>.Manual)&gt;
@@ -194,16 +198,17 @@ The third one is the fitting that separates the two.</p>
 <p><strong>Answer:</strong> The family instance needs rotating in the same orientation as the duct curve.</p>
 <p>I'm sure there are plenty of examples of how to rotate family instances on this forum. Report back with how you get on!</p>
 <p><strong>Response:</strong> I searched but haven't found much on how to adjust (rotate) the duct fitting as per the element direction and shape.</p>
-<p>I tried the rotate method, but that just rotates the new instance (duct fitting) to a 180 degree angle.
-So, this only works for a 180 degree rotated element.</p>
+<p>I tried the rotate method, but that just rotates the new instance (duct fitting) to a 180-degree angle.
+So, this only works for a 180-degree rotated element.</p>
 <p><center>
 <img src="img/split_duct_issue.jpg" alt="Split issue" title="Split issue" width="600"/> <!-- 1264 -->
 </center></p>
 <p><strong>Answer:</strong> You can find an example showing how to achieve what you ask by @aksaks in
 his <a href="https://github.com/akseidel/WTA_FireP/blob/feb6cff675a2143fffb55e65dd95eb9a73b9c553/WTA_FireP/PlunkOClass.cs">GitHub repository</a></p>
-<p><strong>Rersponse:</strong> I checked the link.</p>
-<p>There are lots of methods.</p>
-<p>Not sure which one to choose. I tried implementing a few of them but there are many undefined and unknown classes.</p>
+<p><strong>Response:</strong> I checked the link.
+It provides lots of methods.</p>
+<p>Not sure which one to choose.
+I tried implementing a few of them but there are many undefined and unknown classes.</p>
 <p>Can you please show me a precise way to get the resolution ?</p>
 <p><strong>Answer:</strong> There is in fact no need for the rotation.</p>
 <p>You can place the duct fitting with the right direction.</p>
@@ -217,4 +222,4 @@ his <a href="https://github.com/akseidel/WTA_FireP/blob/feb6cff675a2143fffb55e65
 <p>Of course, it can't hurt to learn how to rotate an element.</p>
 <p><strong>Response:</strong> Thank you so much.
 It worked pleasantly</p>
-<p>Very many thanks to Matt and Fair59 for their kind help and great patience helping out in such detail and depth!</p>
+<p>Very many thanks to Matt and Fair59 for their kind support and great patience helping out in such detail and depth!</p>

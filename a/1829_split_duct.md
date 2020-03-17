@@ -17,6 +17,10 @@ twitter:
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
+We recently shared a brief note on using the <code>BreakCurve</code> API for splitting a pipe.
+Matt Taylor now pointed out a much more comprehensive discussion asking, is there any API available to split a duct programmatically?
+That is not just an example, but an entire tutorial, so I think it is very useful to share here as well for all to enjoy..
+
 &ndash; 
 ...
 
@@ -100,7 +104,7 @@ Here's a simple example that breaks a duct 2 feet along its length.
 
 **Response:** It worked pleasantly.  Smiley Happy
 
-Normally, if I split a duct in the UI, it adds an family instance, e.g., a fitting, between the two separated elements. 
+Normally, if I split a duct in the UI, it adds a family instance, e.g., a fitting, between the two separated elements. 
 
 `BreakCurve` just breaks the element into two parts at the specified length, which is really good, but I also need a specific family instance to be added between the two elements, just like in the UI.
 
@@ -117,16 +121,13 @@ The second break would have to be enclosed in a second transaction.
 Once you have the third elementId, you can get its duct element and use `duct.ChangeTypeId` to change the type should you desire it.
 
 **Response:** My requirement is different.
-
-The screenshot which i sent in the previous reply was what i need to achieve as final output. that was done manually from Revit Application.
-
-This is what the BreakCurve method generates:
+This is what the `BreakCurve` method generates:
 
 <center>
 <img src="img/split_duct_AfterUsingBreakCurve.jpg" alt="After using BreakCurve" title="After using BreakCurve" width="600"/> <!-- 1264 -->
 </center>
 
-Can I add a fitting between the two duct elements, which will act as a separation point?
+Can I add a fitting between the two duct elements that will act as a separation point?
 
 Here are screenshots showing the situation before and after splitting an element via the UI and API:
 
@@ -162,7 +163,8 @@ So, here the fitting needs to be added between the two duct elements, just like 
 
 **Answer:** Riiiiiiiight. You need to add a union fitting. That is a duct fitting, and a family instance.
 
-When in doubt about the nwording, you can describe the elements using the Revit descriptions or the RevitLookup (API) names. That reduces thr potential for confusion.
+When in doubt about the wording, you can describe the elements using the Revit descriptions or the RevitLookup (API) names.
+That reduces the potential for confusion.
 
 I originally used two transactions, but it appears a regen will do the trick:
 
@@ -244,8 +246,8 @@ I'm sure there are plenty of examples of how to rotate family instances on this 
 
 **Response:** I searched but haven't found much on how to adjust (rotate) the duct fitting as per the element direction and shape.
 
-I tried the rotate method, but that just rotates the new instance (duct fitting) to a 180 degree angle.
-So, this only works for a 180 degree rotated element.
+I tried the rotate method, but that just rotates the new instance (duct fitting) to a 180-degree angle.
+So, this only works for a 180-degree rotated element.
 
 <center>
 <img src="img/split_duct_issue.jpg" alt="Split issue" title="Split issue" width="600"/> <!-- 1264 -->
@@ -254,7 +256,7 @@ So, this only works for a 180 degree rotated element.
 **Answer:** You can find an example showing how to achieve what you ask by @aksaks in
 his [GitHub repository](https://github.com/akseidel/WTA_FireP/blob/feb6cff675a2143fffb55e65dd95eb9a73b9c553/WTA_FireP/PlunkOClass.cs)
 
-**Rersponse:** I checked the link.
+**Response:** I checked the link.
 It provides lots of methods.
 
 Not sure which one to choose.
