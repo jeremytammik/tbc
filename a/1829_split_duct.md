@@ -7,18 +7,18 @@
 
 <!---
 
-- /a/doc/revit/tbc/git/a/img/panel_boards_api_pole_breaker_count.jpg
-  
-- [A Guide to Console Commands](https://css-tricks.com/a-guide-to-console-commands)
+- Is there any api available to split a duct programmatically?
+  https://forums.autodesk.com/t5/revit-api-forum/is-there-any-api-available-to-split-a-duct-programmatically/td-p/6926621
+
+- https://thebuildingcoder.typepad.com/blog/2020/03/split-pipe-and-headless-revit.html#comment-4835671086
+  Matt Taylor
 
 twitter:
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-An amazing solution to move existing rooms between levels while retaining all their information, some thoughts on managing slots in panel schedules, and a couple of useful JavaScript debugging console hints
-&ndash; Moving rooms to other levels
-&ndash; Slots in panel schedules
-&ndash; JavaScript debugging console commands...
+&ndash; 
+...
 
 linkedin:
 
@@ -34,7 +34,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Panel Schedule Slots and Changing Room Level
+### Splitting a Duct in More Depth
+
+We recently shared a brief note on [splitting a pipe](https://thebuildingcoder.typepad.com/blog/2020/03/split-pipe-and-headless-revit.html)
 
 An amazing solution to move existing rooms between levels while retaining all their information, some thoughts on managing slots in panel schedules, and a couple of useful JavaScript debugging console hints:
 
