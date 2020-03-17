@@ -27,7 +27,7 @@ linkedin:
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 
 <center>
-<img src="img/" alt="" title="" width="100"/>
+<img src="img/" alt="" title="" width="600"/>
 <p style="font-size: 80%; font-style:italic"></p>
 </center>
 
@@ -35,29 +35,26 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Splitting a Duct in More Depth
 
-We recently shared a brief note on [splitting a pipe](https://thebuildingcoder.typepad.com/blog/2020/03/split-pipe-and-headless-revit.html).
+We recently shared a brief note on using the `BreakCurve` API for [splitting a pipe](https://thebuildingcoder.typepad.com/blog/2020/03/split-pipe-and-headless-revit.html).
 
 In a [comment](https://thebuildingcoder.typepad.com/blog/2020/03/split-pipe-and-headless-revit.html#comment-4835671086) on that,
 Matt Taylor pointed out a much more comprehensive discussion in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 asking [is there any API available to split a duct programmatically?](https://forums.autodesk.com/t5/revit-api-forum/is-there-any-api-available-to-split-a-duct-programmatically/td-p/6926621).
 
-That is not just an example, but an entire tutorial.
-
-Is there any api available to split a duct programmatically?
+That is not just an example, but an entire tutorial, so I think it is very useful to share here as well for all to enjoy:
 
 **Question:** I need to split a duct programmatically ? Is there any API available to do so?
 
-**Answer:** See my comment in this post:
-
-https://forums.autodesk.com/t5/revit-api-forum/duct-splitting/m-p/6784012
+**Answer:** I explained how this can be achieved using the `BreakCurve` method in my comments
+on [duct splitting](https://forums.autodesk.com/t5/revit-api-forum/duct-splitting/m-p/6784012)
 
 **Response:** I tried using the `BreakCurve` method for splitting a duct, but it throws an exception at the time of execution.
 
 Can you please guide me on how to pass the third parameter, `XYZ` `ptBreak`?
 
 <center>
-<img src="img/split_duct_BreakCurveIssue.jpg" alt="BreakCurve issue" title="BreakCurve issue" width="100"/> <!-- 1264 -->
+<img src="img/split_duct_BreakCurveIssue.jpg" alt="BreakCurve issue" title="BreakCurve issue" width="800"/> <!-- 1264 -->
 </center>
 
 
@@ -66,33 +63,39 @@ Can you please guide me on how to pass the third parameter, `XYZ` `ptBreak`?
 Here's a simple example that breaks a duct 2 feet along its length.
 
 <pre class="code">
-<Transaction(TransactionMode.Manual)> _
-<Regeneration(RegenerationOption.Manual)> _
-<Journaling(JournalingMode.UsingCommandData)> _
-Public Class TransactionCommand
-    Implements UI.IExternalCommand
-    Public Function Execute(ByVal commandData As UI.ExternalCommandData, ByRef message As String, ByVal elements As DB.ElementSet) As UI.Result Implements UI.IExternalCommand.Execute
-        Dim app As ApplicationServices.Application = commandData.Application.Application
-        Dim doc As DB.Document = commandData.Application.ActiveUIDocument.Document
-        Dim docUi As UI.UIDocument = commandData.Application.ActiveUIDocument
-
-        Execute = UI.Result.Failed
-        Using transaction As New DB.Transaction(doc, "Break Duct")
-            transaction.Start()
-            Dim duct As DB.Mechanical.Duct = TryCast(doc.GetElement(New DB.ElementId(1789723)), DB.Mechanical.Duct)
-            Dim curve As DB.Curve = TryCast(duct.Location, DB.LocationCurve).Curve
-            Dim pt0 As DB.XYZ = curve.GetEndPoint(0)
-            Dim pt1 As DB.XYZ = curve.GetEndPoint(1)
-            Dim vector As DB.XYZ = pt1.Subtract(pt0).Normalize
-            Dim breakPt As DB.XYZ = pt0.Add(vector.Multiply(2.0))
-            Dim newDuctId As DB.ElementId = DB.Mechanical.MechanicalUtils.BreakCurve(doc, duct.Id, breakPt)
-            transaction.Commit()
-            ' change our result to successful
-            Execute = UI.Result.Succeeded
-        End Using
-        Return Execute
-    End Function
-End Class
+&lt;<span style="color:#2b91af;">Transaction</span>(<span style="color:#2b91af;">TransactionMode</span>.Manual)&gt;
+&lt;<span style="color:#2b91af;">Regeneration</span>(<span style="color:#2b91af;">RegenerationOption</span>.Manual)&gt;
+&lt;<span style="color:#2b91af;">Journaling</span>(<span style="color:#2b91af;">JournalingMode</span>.UsingCommandData)&gt;
+<span style="color:blue;">Public</span>&nbsp;<span style="color:blue;">Class</span>&nbsp;<span style="color:#2b91af;">TransactionCommand</span>
+&nbsp;&nbsp;<span style="color:blue;">Implements</span>&nbsp;UI.IExternalCommand
+&nbsp;&nbsp;<span style="color:blue;">Public</span>&nbsp;<span style="color:blue;">Function</span>&nbsp;Execute(
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">ByVal</span>&nbsp;commandData&nbsp;<span style="color:blue;">As</span>&nbsp;UI.ExternalCommandData,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">ByRef</span>&nbsp;message&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">String</span>,&nbsp;<span style="color:blue;">ByVal</span>&nbsp;elements&nbsp;<span style="color:blue;">As</span>&nbsp;DB.ElementSet)&nbsp;_
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">As</span>&nbsp;UI.Result&nbsp;<span style="color:blue;">Implements</span>&nbsp;UI.IExternalCommand.Execute
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;app&nbsp;<span style="color:blue;">As</span>&nbsp;ApplicationServices.Application&nbsp;=&nbsp;commandData.Application.Application
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;doc&nbsp;<span style="color:blue;">As</span>&nbsp;DB.Document&nbsp;=&nbsp;commandData.Application.ActiveUIDocument.Document
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;docUi&nbsp;<span style="color:blue;">As</span>&nbsp;UI.UIDocument&nbsp;=&nbsp;commandData.Application.ActiveUIDocument
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;Execute&nbsp;=&nbsp;UI.Result.Failed
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Using</span>&nbsp;transaction&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;DB.Transaction(doc,&nbsp;<span style="color:#a31515;">&quot;Break&nbsp;Duct&quot;</span>)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;transaction.Start()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;duct&nbsp;<span style="color:blue;">As</span>&nbsp;DB.Mechanical.Duct&nbsp;=&nbsp;<span style="color:blue;">TryCast</span>(doc.GetElement(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">New</span>&nbsp;DB.ElementId(1789723)),&nbsp;DB.Mechanical.Duct)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;curve&nbsp;<span style="color:blue;">As</span>&nbsp;DB.Curve&nbsp;=&nbsp;<span style="color:blue;">TryCast</span>(duct.Location,&nbsp;DB.LocationCurve).Curve
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;pt0&nbsp;<span style="color:blue;">As</span>&nbsp;DB.XYZ&nbsp;=&nbsp;curve.GetEndPoint(0)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;pt1&nbsp;<span style="color:blue;">As</span>&nbsp;DB.XYZ&nbsp;=&nbsp;curve.GetEndPoint(1)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;vector&nbsp;<span style="color:blue;">As</span>&nbsp;DB.XYZ&nbsp;=&nbsp;pt1.Subtract(pt0).Normalize
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;breakPt&nbsp;<span style="color:blue;">As</span>&nbsp;DB.XYZ&nbsp;=&nbsp;pt0.Add(vector.Multiply(2.0))
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;newDuctId&nbsp;<span style="color:blue;">As</span>&nbsp;DB.ElementId&nbsp;=&nbsp;DB.Mechanical.MechanicalUtils.BreakCurve(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;doc,&nbsp;duct.Id,&nbsp;breakPt)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;transaction.Commit()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;change&nbsp;our&nbsp;result&nbsp;to&nbsp;successful</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Execute&nbsp;=&nbsp;UI.Result.Succeeded
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Using</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Return</span>&nbsp;Execute
+&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Function</span>
+<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Class</span>
 </pre>
 
 **Response:** It worked pleasantly.  Smiley Happy
@@ -102,7 +105,7 @@ Normally, if I split a duct in the UI, it adds an family instance, e.g., a fitti
 `BreakCurve` just breaks the element into two parts at the specified length, which is really good, but I also need a specific family instance to be added between the two elements, just like in the UI.
 
 <center>
-<img src="img/split_duct_2.jpg" alt="Splitting duct" title="Splitting duct" width="100"/> <!-- 1264 -->
+<img src="img/split_duct_2.jpg" alt="Splitting duct" title="Splitting duct" width="600"/> <!-- 1264 -->
 </center>
 
 **Answer:** Well, you probably need to break the duct in two places.
@@ -120,7 +123,7 @@ The screenshot which i sent in the previous reply was what i need to achieve as 
 This is what the BreakCurve method generates:
 
 <center>
-<img src="img/split_duct_AfterUsingBreakCurve.jpg" alt="After using BreakCurve" title="After using BreakCurve" width="100"/> <!-- 1264 -->
+<img src="img/split_duct_AfterUsingBreakCurve.jpg" alt="After using BreakCurve" title="After using BreakCurve" width="600"/> <!-- 1264 -->
 </center>
 
 Can I add a fitting between the two duct elements, which will act as a separation point?
@@ -130,13 +133,13 @@ Here are screenshots showing the situation before and after splitting an element
 Before:
 
 <center>
-<img src="img/split_duct_BeforeFromUI.jpg" alt="Before" title="Before" width="100"/> <!-- 1264 -->
+<img src="img/split_duct_BeforeFromUI.jpg" alt="Before" title="Before" width="600"/> <!-- 1264 -->
 </center>
 
 After, when splitting manually via UI:
 
 <center>
-<img src="img/split_duct_AfterUsingSplitFromUI.jpg" alt="After UI split" title="After UI split" width="100"/> <!-- 1264 -->
+<img src="img/split_duct_AfterUsingSplitFromUI.jpg" alt="After UI split" title="After UI split" width="600"/> <!-- 1264 -->
 </center>
 
 Here, you can see 3 elements.
@@ -146,13 +149,13 @@ The third one is the fitting that separates the two.
 This is the fitting that was added:
 
 <center>
-<img src="img/split_duct_ManualSplit.jpg" alt="Fitting" title="Fitting" width="100"/> <!-- 1264 -->
+<img src="img/split_duct_ManualSplit.jpg" alt="Fitting" title="Fitting" width="600"/> <!-- 1264 -->
 </center>
 
 After, when splitting using the `BreakCurve` API:
 
 <center>
-<img src="img/split_duct_after_using_BreakCurve_2.jpg" alt="BreakCurve result" title="BreakCurve result" width="100"/> <!-- 1264 -->
+<img src="img/split_duct_after_using_BreakCurve_2.jpg" alt="BreakCurve result" title="BreakCurve result" width="600"/> <!-- 1264 -->
 </center>
 
 So, here the fitting needs to be added between the two duct elements, just like it was using the manual split command.
@@ -164,49 +167,55 @@ When in doubt about the nwording, you can describe the elements using the Revit 
 I originally used two transactions, but it appears a regen will do the trick:
 
 <pre class="code">
-<Transaction(TransactionMode.Manual)> _
-<Regeneration(RegenerationOption.Manual)> _
-<Journaling(JournalingMode.UsingCommandData)> _
-Public Class TransactionCommand
-    Implements UI.IExternalCommand
-    Public Function Execute(ByVal commandData As UI.ExternalCommandData, ByRef message As String, ByVal elements As DB.ElementSet) As UI.Result Implements UI.IExternalCommand.Execute
-        Dim app As ApplicationServices.Application = commandData.Application.Application
-        Dim doc As DB.Document = commandData.Application.ActiveUIDocument.Document
-        Dim docUi As UI.UIDocument = commandData.Application.ActiveUIDocument
-
-        Execute = UI.Result.Failed
-        Dim newDuctId As DB.ElementId = Nothing
-        Dim ductOrig As DB.Mechanical.Duct = Nothing
-        Dim duct2 As DB.Mechanical.Duct = Nothing
-        Dim breakPt As DB.XYZ = Nothing
-        Using transaction As New DB.Transaction(doc, "Break Duct + Add Fitting")
-            transaction.Start()
-            ductOrig = TryCast(doc.GetElement(New DB.ElementId(1789660)), DB.Mechanical.Duct)
-            Dim curve As DB.Curve = TryCast(ductOrig.Location, DB.LocationCurve).Curve
-            Dim pt0 As DB.XYZ = curve.GetEndPoint(0)
-            Dim pt1 As DB.XYZ = curve.GetEndPoint(1)
-            Dim vector As DB.XYZ = pt1.Subtract(pt0).Normalize
-            breakPt = pt0.Add(vector.Multiply(2.0))
-            newDuctId = DB.Mechanical.MechanicalUtils.BreakCurve(doc, ductOrig.Id, breakPt)
-            duct2 = TryCast(doc.GetElement(newDuctId), DB.Mechanical.Duct)
-            doc.Regenerate()
-            Dim connectorOrig As DB.Connector = ductOrig.ConnectorManager.Lookup(0)
-            Dim connector1 As DB.Connector = duct2.ConnectorManager.Lookup(1)
-            Dim familySymbol As DB.FamilySymbol = TryCast(doc.GetElement(New DB.ElementId(755396)), DB.FamilySymbol)
-            Dim famInstance As DB.FamilyInstance = doc.Create.NewFamilyInstance(breakPt, familySymbol, DB.Structure.StructuralType.NonStructural)
-            Dim fitting As DB.MEPModel = famInstance.MEPModel
-            Dim fittingConnector0 As DB.Connector = fitting.ConnectorManager.Lookup(0)
-            Dim fittingConnector1 As DB.Connector = fitting.ConnectorManager.Lookup(1)
-
-            connectorOrig.ConnectTo(fittingConnector1)
-            connector1.ConnectTo(fittingConnector0)
-            transaction.Commit()
-            ' change our result to successful
-            Return UI.Result.Succeeded
-        End Using
-        Return Execute
-    End Function
-End Class
+&lt;<span style="color:#2b91af;">Transaction</span>(<span style="color:#2b91af;">TransactionMode</span>.Manual)&gt;
+&lt;<span style="color:#2b91af;">Regeneration</span>(<span style="color:#2b91af;">RegenerationOption</span>.Manual)&gt;
+&lt;<span style="color:#2b91af;">Journaling</span>(<span style="color:#2b91af;">JournalingMode</span>.UsingCommandData)&gt;
+<span style="color:blue;">Public</span>&nbsp;<span style="color:blue;">Class</span>&nbsp;<span style="color:#2b91af;">TransactionCommand</span>
+&nbsp;&nbsp;<span style="color:blue;">Implements</span>&nbsp;UI.IExternalCommand
+&nbsp;&nbsp;<span style="color:blue;">Public</span>&nbsp;<span style="color:blue;">Function</span>&nbsp;Execute(
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">ByVal</span>&nbsp;commandData&nbsp;<span style="color:blue;">As</span>&nbsp;UI.ExternalCommandData,&nbsp;<span style="color:blue;">ByRef</span>&nbsp;message&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">String</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">ByVal</span>&nbsp;elements&nbsp;<span style="color:blue;">As</span>&nbsp;DB.ElementSet)&nbsp;_
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">As</span>&nbsp;UI.Result&nbsp;<span style="color:blue;">Implements</span>&nbsp;UI.IExternalCommand.Execute
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;app&nbsp;<span style="color:blue;">As</span>&nbsp;ApplicationServices.Application&nbsp;=&nbsp;commandData.Application.Application
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;doc&nbsp;<span style="color:blue;">As</span>&nbsp;DB.Document&nbsp;=&nbsp;commandData.Application.ActiveUIDocument.Document
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;docUi&nbsp;<span style="color:blue;">As</span>&nbsp;UI.UIDocument&nbsp;=&nbsp;commandData.Application.ActiveUIDocument
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;Execute&nbsp;=&nbsp;UI.Result.Failed
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;newDuctId&nbsp;<span style="color:blue;">As</span>&nbsp;DB.ElementId&nbsp;=&nbsp;<span style="color:blue;">Nothing</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;ductOrig&nbsp;<span style="color:blue;">As</span>&nbsp;DB.Mechanical.Duct&nbsp;=&nbsp;<span style="color:blue;">Nothing</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;duct2&nbsp;<span style="color:blue;">As</span>&nbsp;DB.Mechanical.Duct&nbsp;=&nbsp;<span style="color:blue;">Nothing</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;breakPt&nbsp;<span style="color:blue;">As</span>&nbsp;DB.XYZ&nbsp;=&nbsp;<span style="color:blue;">Nothing</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Using</span>&nbsp;transaction&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;DB.Transaction(doc,&nbsp;<span style="color:#a31515;">&quot;Break&nbsp;Duct&nbsp;+&nbsp;Add&nbsp;Fitting&quot;</span>)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;transaction.Start()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ductOrig&nbsp;=&nbsp;<span style="color:blue;">TryCast</span>(doc.GetElement(<span style="color:blue;">New</span>&nbsp;DB.ElementId(1789660)),&nbsp;DB.Mechanical.Duct)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;curve&nbsp;<span style="color:blue;">As</span>&nbsp;DB.Curve&nbsp;=&nbsp;<span style="color:blue;">TryCast</span>(ductOrig.Location,&nbsp;DB.LocationCurve).Curve
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;pt0&nbsp;<span style="color:blue;">As</span>&nbsp;DB.XYZ&nbsp;=&nbsp;curve.GetEndPoint(0)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;pt1&nbsp;<span style="color:blue;">As</span>&nbsp;DB.XYZ&nbsp;=&nbsp;curve.GetEndPoint(1)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;vector&nbsp;<span style="color:blue;">As</span>&nbsp;DB.XYZ&nbsp;=&nbsp;pt1.Subtract(pt0).Normalize
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;breakPt&nbsp;=&nbsp;pt0.Add(vector.Multiply(2.0))
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;newDuctId&nbsp;=&nbsp;DB.Mechanical.MechanicalUtils.BreakCurve(doc,&nbsp;ductOrig.Id,&nbsp;breakPt)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;duct2&nbsp;=&nbsp;<span style="color:blue;">TryCast</span>(doc.GetElement(newDuctId),&nbsp;DB.Mechanical.Duct)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;doc.Regenerate()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;connectorOrig&nbsp;<span style="color:blue;">As</span>&nbsp;DB.Connector&nbsp;=&nbsp;ductOrig.ConnectorManager.Lookup(0)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;connector1&nbsp;<span style="color:blue;">As</span>&nbsp;DB.Connector&nbsp;=&nbsp;duct2.ConnectorManager.Lookup(1)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;familySymbol&nbsp;<span style="color:blue;">As</span>&nbsp;DB.FamilySymbol&nbsp;=&nbsp;<span style="color:blue;">TryCast</span>(doc.GetElement(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">New</span>&nbsp;DB.ElementId(755396)),&nbsp;DB.FamilySymbol)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;famInstance&nbsp;<span style="color:blue;">As</span>&nbsp;DB.FamilyInstance&nbsp;=&nbsp;doc.Create.NewFamilyInstance(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;breakPt,&nbsp;familySymbol,&nbsp;DB.Structure.StructuralType.NonStructural)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;fitting&nbsp;<span style="color:blue;">As</span>&nbsp;DB.MEPModel&nbsp;=&nbsp;famInstance.MEPModel
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;fittingConnector0&nbsp;<span style="color:blue;">As</span>&nbsp;DB.Connector&nbsp;=&nbsp;fitting.ConnectorManager.Lookup(0)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;fittingConnector1&nbsp;<span style="color:blue;">As</span>&nbsp;DB.Connector&nbsp;=&nbsp;fitting.ConnectorManager.Lookup(1)
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;connectorOrig.ConnectTo(fittingConnector1)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;connector1.ConnectTo(fittingConnector0)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;transaction.Commit()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;&nbsp;change&nbsp;our&nbsp;result&nbsp;to&nbsp;successful</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Return</span>&nbsp;UI.Result.Succeeded
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Using</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Return</span>&nbsp;Execute
+&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Function</span>
+<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Class</span>
 </pre>
 
 **Response:** It works great.
@@ -222,11 +231,11 @@ Do you have any idea how to resolve these?
 Here are the instructions to reproduce the issue:
 
 <center>
-<img src="img/split_duct_step_1_AddedDuct.jpg" alt="Added duct" title="Added duct" width="100"/> <!-- 1264 -->
+<img src="img/split_duct_step_1_AddedDuct.jpg" alt="Added duct" title="Added duct" width="600"/> <!-- 1264 -->
 <br/>
-<img src="img/split_duct_step_1_RotateDuct.jpg" alt="Rotated duct" title="Rotated duct" width="100"/> <!-- 1264 -->
+<img src="img/split_duct_step_2_RotateDuct.jpg" alt="Rotated duct" title="Rotated duct" width="600"/> <!-- 1264 -->
 <br/>
-<img src="img/split_duct_issue.jpg" alt="Split error" title="Split error" width="100"/> <!-- 1264 -->
+<img src="img/split_duct_step_3_SplitError.jpg" alt="Split error" title="Split error" width="600"/> <!-- 1264 -->
 </center>
 
 **Answer:** The family instance needs rotating in the same orientation as the duct curve.
@@ -239,17 +248,17 @@ I tried the rotate method, but that just rotates the new instance (duct fitting)
 So, this only works for a 180 degree rotated element.
 
 <center>
-<img src="img/split_duct_issue.jpg" alt="Split issue" title="Split issue" width="100"/> <!-- 1264 -->
+<img src="img/split_duct_issue.jpg" alt="Split issue" title="Split issue" width="600"/> <!-- 1264 -->
 </center>
 
 **Answer:** You can find an example showing how to achieve what you ask by @aksaks in
 his [GitHub repository](https://github.com/akseidel/WTA_FireP/blob/feb6cff675a2143fffb55e65dd95eb9a73b9c553/WTA_FireP/PlunkOClass.cs)
 
 **Rersponse:** I checked the link.
+It provides lots of methods.
 
-There are lots of methods.
-
-Not sure which one to choose. I tried implementing a few of them but there are many undefined and unknown classes.
+Not sure which one to choose.
+I tried implementing a few of them but there are many undefined and unknown classes.
 
 Can you please show me a precise way to get the resolution ?
 
@@ -258,10 +267,10 @@ Can you please show me a precise way to get the resolution ?
 You can place the duct fitting with the right direction.
 
 <pre class="code">
-  Dim famInstance As DB.FamilyInstance _
-    = doc.Create.NewFamilyInstance( _
-      breakPt, familySymbol, vector, null, _
-      DB.Structure.StructuralType.NonStructural)
+  <span style="color:blue;">Dim</span>&nbsp;famInstance&nbsp;<span style="color:blue;">As</span>&nbsp;DB.FamilyInstance&nbsp;_
+  =&nbsp;doc.Create.NewFamilyInstance(
+  &nbsp;&nbsp;breakPt,&nbsp;FamilySymbol,&nbsp;vector,&nbsp;null,
+  &nbsp;&nbsp;DB.Structure.StructuralType.NonStructural)
 </pre>
 
 Of course, it can't hurt to learn how to rotate an element.
@@ -269,5 +278,5 @@ Of course, it can't hurt to learn how to rotate an element.
 **Response:** Thank you so much.
 It worked pleasantly
 
-Very many thanks to Matt and Fair59 for their kind help and great patience helping out in such detail and depth!
+Very many thanks to Matt and Fair59 for their kind support and great patience helping out in such detail and depth!
 
