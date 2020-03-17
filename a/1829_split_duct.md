@@ -56,10 +56,8 @@ https://forums.autodesk.com/t5/revit-api-forum/duct-splitting/m-p/6784012
 
 Can you please guide me on how to pass the third parameter, `XYZ` `ptBreak`?
 
-BreakCurveIssue.jpg
-
 <center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 1264 -->
+<img src="img/split_duct_BreakCurveIssue.jpg" alt="BreakCurve issue" title="BreakCurve issue" width="100"/> <!-- 1264 -->
 </center>
 
 
@@ -104,10 +102,8 @@ Normally, if I split a duct in the UI, it adds an family instance, e.g., a fitti
 `BreakCurve` just breaks the element into two parts at the specified length, which is really good, but I also need a specific family instance to be added between the two elements, just like in the UI.
 
 <center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 1264 -->
+<img src="img/split_duct_2.jpg" alt="Splitting duct" title="Splitting duct" width="100"/> <!-- 1264 -->
 </center>
-
-splittingDuct.jpg
 
 **Answer:** Well, you probably need to break the duct in two places.
 
@@ -123,37 +119,43 @@ The screenshot which i sent in the previous reply was what i need to achieve as 
 
 This is what the BreakCurve method generates:
 
-AfterUsingBreakCurve.jpg
-
 <center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 1264 -->
+<img src="img/split_duct_AfterUsingBreakCurve.jpg" alt="After using BreakCurve" title="After using BreakCurve" width="100"/> <!-- 1264 -->
 </center>
 
 Can I add a fitting between the two duct elements, which will act as a separation point?
 
 Here are screenshots showing the situation before and after splitting an element via the UI and API:
 
-BEFORE:
+Before:
 
-BeforeFromUI.jpg
+<center>
+<img src="img/split_duct_BeforeFromUI.jpg" alt="Before" title="Before" width="100"/> <!-- 1264 -->
+</center>
 
-AFTER
+After, when splitting manually via UI:
 
-1. WHEN SPLITTING MANUALLY VIA APPLICATION UI:
+<center>
+<img src="img/split_duct_AfterUsingSplitFromUI.jpg" alt="After UI split" title="After UI split" width="100"/> <!-- 1264 -->
+</center>
 
-a. Here you can see 3 elements. two are child elements that was created after splitting the parent element and 3rd one is the duct which act as a separation point between those two.
+Here, you can see 3 elements.
+Two are child elements created by splitting the parent element.
+The third one is the fitting that separates the two.
 
-AfterUsingSplitFromUI.jpg
+This is the fitting that was added:
 
-b. Here you can see the duct which was added when split occurred:
+<center>
+<img src="img/split_duct_ManualSplit.jpg" alt="Fitting" title="Fitting" width="100"/> <!-- 1264 -->
+</center>
 
-ManualSplit.jpg
+After, when splitting using the `BreakCurve` API:
 
-2. WHEN SPLITTING USING API (Via BreakCurve() method):
+<center>
+<img src="img/split_duct_after_using_BreakCurve_2.jpg" alt="BreakCurve result" title="BreakCurve result" width="100"/> <!-- 1264 -->
+</center>
 
-AfterUsingBreakCurve (2).jpg
-
-So, here i need a fitting to be added between those two elements, just like i did using the split button from application.
+So, here the fitting needs to be added between the two duct elements, just like it was using the manual split command.
 
 **Answer:** Riiiiiiiight. You need to add a union fitting. That is a duct fitting, and a family instance.
 
@@ -219,9 +221,13 @@ Do you have any idea how to resolve these?
 
 Here are the instructions to reproduce the issue:
 
-Step-1-AddedDuct.jpg
-Step-2-RotateDuct.jpg
-SplitError.jpg
+<center>
+<img src="img/split_duct_step_1_AddedDuct.jpg" alt="Added duct" title="Added duct" width="100"/> <!-- 1264 -->
+<br/>
+<img src="img/split_duct_step_1_RotateDuct.jpg" alt="Rotated duct" title="Rotated duct" width="100"/> <!-- 1264 -->
+<br/>
+<img src="img/split_duct_issue.jpg" alt="Split error" title="Split error" width="100"/> <!-- 1264 -->
+</center>
 
 **Answer:** The family instance needs rotating in the same orientation as the duct curve.
 
@@ -232,11 +238,12 @@ I'm sure there are plenty of examples of how to rotate family instances on this 
 I tried the rotate method, but that just rotates the new instance (duct fitting) to a 180 degree angle.
 So, this only works for a 180 degree rotated element.
 
-splitissue.jpg
+<center>
+<img src="img/split_duct_issue.jpg" alt="Split issue" title="Split issue" width="100"/> <!-- 1264 -->
+</center>
 
-**Answer:** You can find an example showing how to achieve what you ask by @aksaks in his repo:
-
-https://github.com/akseidel/WTA_FireP/blob/feb6cff675a2143fffb55e65dd95eb9a73b9c553/WTA_FireP/PlunkO...
+**Answer:** You can find an example showing how to achieve what you ask by @aksaks in
+his [GitHub repository](https://github.com/akseidel/WTA_FireP/blob/feb6cff675a2143fffb55e65dd95eb9a73b9c553/WTA_FireP/PlunkOClass.cs)
 
 **Rersponse:** I checked the link.
 
@@ -257,23 +264,10 @@ You can place the duct fitting with the right direction.
       DB.Structure.StructuralType.NonStructural)
 </pre>
 
-Of course, it can't hurt to learn how to rotate an element.         
+Of course, it can't hurt to learn how to rotate an element.
 
 **Response:** Thank you so much.
 It worked pleasantly
 
 Very many thanks to Matt and Fair59 for their kind help and great patience helping out in such detail and depth!
-
-#### <a name="2"></a>
-
-**Question:** 
-
-**Answer:** 
-
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 1264 -->
-</center>
-
-<pre class="prettyprint">
-</pre>
 
