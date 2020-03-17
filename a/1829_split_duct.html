@@ -1,0 +1,209 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</head></p>
+<!---
+
+- Is there any api available to split a duct programmatically?
+  https://forums.autodesk.com/t5/revit-api-forum/is-there-any-api-available-to-split-a-duct-programmatically/td-p/6926621
+
+- https://thebuildingcoder.typepad.com/blog/2020/03/split-pipe-and-headless-revit.html#comment-4835671086
+  Matt Taylor
+
+twitter:
+
+ the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+
+&ndash; 
+...
+
+linkedin:
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="100"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>Splitting a Duct in More Depth</h3>
+<p>We recently shared a brief note on <a href="https://thebuildingcoder.typepad.com/blog/2020/03/split-pipe-and-headless-revit.html">splitting a pipe</a>.</p>
+<p>In a <a href="https://thebuildingcoder.typepad.com/blog/2020/03/split-pipe-and-headless-revit.html#comment-4835671086">comment</a> on that,
+Matt Taylor pointed out a much more comprehensive discussion in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+asking <a href="https://forums.autodesk.com/t5/revit-api-forum/is-there-any-api-available-to-split-a-duct-programmatically/td-p/6926621">is there any API available to split a duct programmatically?</a>.</p>
+<p>That is not just an example, but an entire tutorial.</p>
+<p>Is there any api available to split a duct programmatically?</p>
+<p><strong>Question:</strong> I need to split a duct programmatically ? Is there any API available to do so?</p>
+<p><strong>Answer:</strong> See my comment in this post:</p>
+<p>https://forums.autodesk.com/t5/revit-api-forum/duct-splitting/m-p/6784012</p>
+<p><strong>Response:</strong> I tried using the <code>BreakCurve</code> method for splitting a duct, but it throws an exception at the time of execution.</p>
+<p>Can you please guide me on how to pass the third parameter, <code>XYZ</code> <code>ptBreak</code>?</p>
+<p>BreakCurveIssue.jpg</p>
+<p><center>
+<img src="img/.png" alt="" title="" width="100"/> <!-- 1264 -->
+</center></p>
+<p><strong>Answer:</strong> Well, I think the error says it all! The point isn't on the duct curve.</p>
+<p>Here's a simple example that breaks a duct 2 feet along its length.</p>
+<pre class="code">
+<Transaction(TransactionMode.Manual)> _
+<Regeneration(RegenerationOption.Manual)> _
+<Journaling(JournalingMode.UsingCommandData)> _
+Public Class TransactionCommand
+    Implements UI.IExternalCommand
+    Public Function Execute(ByVal commandData As UI.ExternalCommandData, ByRef message As String, ByVal elements As DB.ElementSet) As UI.Result Implements UI.IExternalCommand.Execute
+        Dim app As ApplicationServices.Application = commandData.Application.Application
+        Dim doc As DB.Document = commandData.Application.ActiveUIDocument.Document
+        Dim docUi As UI.UIDocument = commandData.Application.ActiveUIDocument
+
+        Execute = UI.Result.Failed
+        Using transaction As New DB.Transaction(doc, "Break Duct")
+            transaction.Start()
+            Dim duct As DB.Mechanical.Duct = TryCast(doc.GetElement(New DB.ElementId(1789723)), DB.Mechanical.Duct)
+            Dim curve As DB.Curve = TryCast(duct.Location, DB.LocationCurve).Curve
+            Dim pt0 As DB.XYZ = curve.GetEndPoint(0)
+            Dim pt1 As DB.XYZ = curve.GetEndPoint(1)
+            Dim vector As DB.XYZ = pt1.Subtract(pt0).Normalize
+            Dim breakPt As DB.XYZ = pt0.Add(vector.Multiply(2.0))
+            Dim newDuctId As DB.ElementId = DB.Mechanical.MechanicalUtils.BreakCurve(doc, duct.Id, breakPt)
+            transaction.Commit()
+            ' change our result to successful
+            Execute = UI.Result.Succeeded
+        End Using
+        Return Execute
+    End Function
+End Class
+</pre>
+
+<p><strong>Response:</strong> It worked pleasantly.  Smiley Happy</p>
+<p>Normally, if I split a duct in the UI, it adds an family instance, e.g., a fitting, between the two separated elements. </p>
+<p><code>BreakCurve</code> just breaks the element into two parts at the specified length, which is really good, but I also need a specific family instance to be added between the two elements, just like in the UI.</p>
+<p><center>
+<img src="img/.png" alt="" title="" width="100"/> <!-- 1264 -->
+</center></p>
+<p>splittingDuct.jpg</p>
+<p><strong>Answer:</strong> Well, you probably need to break the duct in two places.</p>
+<p>You have the elementIds of the two ducts after one break; you just need to use one of those in your second break.</p>
+<p>The second break would have to be enclosed in a second transaction.</p>
+<p>Once you have the third elementId, you can get its duct element and use <code>duct.ChangeTypeId</code> to change the type should you desire it.</p>
+<p><strong>Response:</strong> My requirement is different.</p>
+<p>The screenshot which i sent in the previous reply was what i need to achieve as final output. that was done manually from Revit Application.</p>
+<p>This is what the BreakCurve method generates:</p>
+<p>AfterUsingBreakCurve.jpg</p>
+<p><center>
+<img src="img/.png" alt="" title="" width="100"/> <!-- 1264 -->
+</center></p>
+<p>Can I add a fitting between the two duct elements, which will act as a separation point?</p>
+<p>Here are screenshots showing the situation before and after splitting an element via the UI and API:</p>
+<p>BEFORE:</p>
+<p>BeforeFromUI.jpg</p>
+<p>AFTER</p>
+<ol>
+<li>WHEN SPLITTING MANUALLY VIA APPLICATION UI:</li>
+</ol>
+<p>a. Here you can see 3 elements. two are child elements that was created after splitting the parent element and 3rd one is the duct which act as a separation point between those two.</p>
+<p>AfterUsingSplitFromUI.jpg</p>
+<p>b. Here you can see the duct which was added when split occurred:</p>
+<p>ManualSplit.jpg</p>
+<ol>
+<li>WHEN SPLITTING USING API (Via BreakCurve() method):</li>
+</ol>
+<p>AfterUsingBreakCurve (2).jpg</p>
+<p>So, here i need a fitting to be added between those two elements, just like i did using the split button from application.</p>
+<p><strong>Answer:</strong> Riiiiiiiight. You need to add a union fitting. That is a duct fitting, and a family instance.</p>
+<p>When in doubt about the nwording, you can describe the elements using the Revit descriptions or the RevitLookup (API) names. That reduces thr potential for confusion.</p>
+<p>I originally used two transactions, but it appears a regen will do the trick:</p>
+<pre class="code">
+<Transaction(TransactionMode.Manual)> _
+<Regeneration(RegenerationOption.Manual)> _
+<Journaling(JournalingMode.UsingCommandData)> _
+Public Class TransactionCommand
+    Implements UI.IExternalCommand
+    Public Function Execute(ByVal commandData As UI.ExternalCommandData, ByRef message As String, ByVal elements As DB.ElementSet) As UI.Result Implements UI.IExternalCommand.Execute
+        Dim app As ApplicationServices.Application = commandData.Application.Application
+        Dim doc As DB.Document = commandData.Application.ActiveUIDocument.Document
+        Dim docUi As UI.UIDocument = commandData.Application.ActiveUIDocument
+
+        Execute = UI.Result.Failed
+        Dim newDuctId As DB.ElementId = Nothing
+        Dim ductOrig As DB.Mechanical.Duct = Nothing
+        Dim duct2 As DB.Mechanical.Duct = Nothing
+        Dim breakPt As DB.XYZ = Nothing
+        Using transaction As New DB.Transaction(doc, "Break Duct + Add Fitting")
+            transaction.Start()
+            ductOrig = TryCast(doc.GetElement(New DB.ElementId(1789660)), DB.Mechanical.Duct)
+            Dim curve As DB.Curve = TryCast(ductOrig.Location, DB.LocationCurve).Curve
+            Dim pt0 As DB.XYZ = curve.GetEndPoint(0)
+            Dim pt1 As DB.XYZ = curve.GetEndPoint(1)
+            Dim vector As DB.XYZ = pt1.Subtract(pt0).Normalize
+            breakPt = pt0.Add(vector.Multiply(2.0))
+            newDuctId = DB.Mechanical.MechanicalUtils.BreakCurve(doc, ductOrig.Id, breakPt)
+            duct2 = TryCast(doc.GetElement(newDuctId), DB.Mechanical.Duct)
+            doc.Regenerate()
+            Dim connectorOrig As DB.Connector = ductOrig.ConnectorManager.Lookup(0)
+            Dim connector1 As DB.Connector = duct2.ConnectorManager.Lookup(1)
+            Dim familySymbol As DB.FamilySymbol = TryCast(doc.GetElement(New DB.ElementId(755396)), DB.FamilySymbol)
+            Dim famInstance As DB.FamilyInstance = doc.Create.NewFamilyInstance(breakPt, familySymbol, DB.Structure.StructuralType.NonStructural)
+            Dim fitting As DB.MEPModel = famInstance.MEPModel
+            Dim fittingConnector0 As DB.Connector = fitting.ConnectorManager.Lookup(0)
+            Dim fittingConnector1 As DB.Connector = fitting.ConnectorManager.Lookup(1)
+
+            connectorOrig.ConnectTo(fittingConnector1)
+            connector1.ConnectTo(fittingConnector0)
+            transaction.Commit()
+            ' change our result to successful
+            Return UI.Result.Succeeded
+        End Using
+        Return Execute
+    End Function
+End Class
+</pre>
+
+<p><strong>Response:</strong> It works great.</p>
+<p>Yet, I have another issue. This method only works well if we are not modifying the element's orientation. </p>
+<p>I tested this on a duct. I first added a duct and implemented the method just after placing an instance of that duct and it worked great.</p>
+<p>But, If I rotate the element to its opposite direction and then implementing that methods throws multiple errors. </p>
+<p>Do you have any idea how to resolve these?</p>
+<p>Here are the instructions to reproduce the issue:</p>
+<p>Step-1-AddedDuct.jpg
+Step-2-RotateDuct.jpg
+SplitError.jpg</p>
+<p><strong>Answer:</strong> The family instance needs rotating in the same orientation as the duct curve.</p>
+<p>I'm sure there are plenty of examples of how to rotate family instances on this forum. Report back with how you get on!</p>
+<p><strong>Response:</strong> I searched but haven't found much on how to adjust (rotate) the duct fitting as per the element direction and shape.</p>
+<p>I tried the rotate method, but that just rotates the new instance (duct fitting) to a 180 degree angle.
+So, this only works for a 180 degree rotated element.</p>
+<p>splitissue.jpg</p>
+<p><strong>Answer:</strong> You can find an example showing how to achieve what you ask by @aksaks in his repo:</p>
+<p>https://github.com/akseidel/WTA_FireP/blob/feb6cff675a2143fffb55e65dd95eb9a73b9c553/WTA_FireP/PlunkO...</p>
+<p><strong>Rersponse:</strong> I checked the link.</p>
+<p>There are lots of methods.</p>
+<p>Not sure which one to choose. I tried implementing a few of them but there are many undefined and unknown classes.</p>
+<p>Can you please show me a precise way to get the resolution ?</p>
+<p><strong>Answer:</strong> There is in fact no need for the rotation.</p>
+<p>You can place the duct fitting with the right direction.</p>
+<pre class="code">
+  Dim famInstance As DB.FamilyInstance _
+    = doc.Create.NewFamilyInstance( _
+      breakPt, familySymbol, vector, null, _
+      DB.Structure.StructuralType.NonStructural)
+</pre>
+
+<p>Of course, it can't hurt to learn how to rotate an element.         </p>
+<p><strong>Response:</strong> Thank you so much.
+It worked pleasantly</p>
+<p>Very many thanks to Matt and Fair59 for their kind help and great patience helping out in such detail and depth!</p>
+<h4><a name="2"></a></h4>
+<p><strong>Question:</strong> </p>
+<p><strong>Answer:</strong> </p>
+<p><center>
+<img src="img/.png" alt="" title="" width="100"/> <!-- 1264 -->
+</center></p>
+<pre class="prettyprint">
+</pre>
