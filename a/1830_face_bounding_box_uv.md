@@ -29,23 +29,20 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Understanding the Face BoundingBoxUV
 
-A short summary of 
+Today, let's look at a short summary of 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [how to understand the `BoundingBoxUV` of face](https://forums.autodesk.com/t5/revit-api-forum/how-to-understand-the-boundingboxuv-of-face/m-p/9374555):
 
 **Question:** I am doing something with AVF, and have some problems with the `BoundingBoxUV` of face.
 
-I use the following code to achieve the feature points of the bottom-left corner area of the face:
+I use the following code to find the feature points in the bottom-left corner area of the face:
 
 <pre class="code">
-  BoundingBoxUV boundingBoxUV = face.GetBoundingBox();
-  UV min = boundingBoxUV.Min;
-  double midU = (boundingBoxUV.Max.U + boundingBoxUV.Min.U) / 2;
-  double midV = (boundingBoxUV.Max.V + boundingBoxUV.Min.V) / 2;
-  UV mid = new UV(midU, midV);
+&nbsp;&nbsp;<span style="color:#2b91af;">BoundingBoxUV</span>&nbsp;bb&nbsp;=&nbsp;face.GetBoundingBox();
+&nbsp;&nbsp;<span style="color:#2b91af;">UV</span>&nbsp;pmid&nbsp;=&nbsp;0.5&nbsp;*&nbsp;(bb.Min&nbsp;+&nbsp;bb.Max);
 </pre>
 
-However, the result shows that the feature points refer to the upper-right corner area:
+However, the result shows that these points refer to the upper-right corner area:
 
 <center>
 <img src="img/face_bounding_box_ll.png" alt="Face bounding box lower left" title="Face bounding box lower left" width="500"/> <!-- 1142 -->
