@@ -11,8 +11,9 @@ twitter:
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+Today, let's pick up two recent discussions on the <code>UV</code> coordinate space on a face and the replacement of add-in command bindings
+&ndash; Understanding the Face <code>BoundingBoxUV</code>
+&ndash; Handling add-in command binding conflicts...
 
 linkedin:
 
@@ -27,14 +28,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Understanding the Face BoundingBoxUV
+### Command Binding Conflicts and Face UV Coords
 
-Today, let's look at a short summary two recent discussions on
+Today, let's pick up two recent discussions on the `UV` coordinate space on a face and the replacement of add-in command bindings:
 
+- [Understanding the Face `BoundingBoxUV`](#2)
+- [Handling add-in command binding conflicts](#3)
 
 #### <a name="2"></a>Understanding the Face BoundingBoxUV
 
-of 
+This question was raised in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [how to understand the `BoundingBoxUV` of face](https://forums.autodesk.com/t5/revit-api-forum/how-to-understand-the-boundingboxuv-of-face/m-p/9374555):
 
@@ -74,7 +77,7 @@ I use Dynamo to query the U and V directions of the face, and I am glad to share
 Many thanks to Bing Yongcao for sharing this solution!
 
 
-#### <a name="2"></a>Handling Add-In Command Binding Conflicts
+#### <a name="3"></a>Handling Add-In Command Binding Conflicts
 
 An interesting question was raised by Smcoder and addressed by Autodesk developer Phil Xia in
 a [series](https://thebuildingcoder.typepad.com/blog/2012/06/replacing-built-in-commands-and-their-ids.html#comment-4837624436)
@@ -82,10 +85,10 @@ a [series](https://thebuildingcoder.typepad.com/blog/2012/06/replacing-built-in-
 [comments](https://thebuildingcoder.typepad.com/blog/2012/06/replacing-built-in-commands-and-their-ids.html#comment-4838966941)
 on [replacing built-in commands and obtaining their ids](https://thebuildingcoder.typepad.com/blog/2012/06/replacing-built-in-commands-and-their-ids.html):
 
-**Question: I haven't found any documentation so I'm thinking of testing it myself to see what happens.
-Do you know how it is handled if two different external applications bind to the same Revit Built-In Command?
+**Question:** Do you know how it is handled if two different external applications bind to the same Revit Built-In Command?
+I haven't found any documentation, so I'm thinking of testing it myself to see what happens.
 In the case of a commercial product, you don't want your external application to conflict with any other product that may be running.
-Ss, how does Revit handle precedence when multiple add-ins subscribe to the same events or commands?
+So, how does Revit handle precedence when multiple add-ins subscribe to the same events or commands?
 
 Update: From conducting my own testing, it appears that `AddInCommandBinding` is first come, first served.
 On Revit startup, the various addins load alphabetically based on the name of the manifest file.

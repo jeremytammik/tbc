@@ -10,8 +10,9 @@ twitter:
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+Today, let's pick up two recent discussions on the <code>UV</code> coordinate space on a face and the replacement of add-in command bindings
+&ndash; Understanding the Face <code>BoundingBoxUV</code>
+&ndash; Handling add-in command binding conflicts...
 
 linkedin:
 
@@ -26,10 +27,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Understanding the Face BoundingBoxUV</h3>
-<p>Today, let's look at a short summary two recent discussions on</p>
+<h3>Command Binding Conflicts and Face UV Coords</h3>
+<p>Today, let's pick up two recent discussions on the <code>UV</code> coordinate space on a face and the replacement of add-in command bindings:</p>
+<ul>
+<li><a href="#2">Understanding the Face <code>BoundingBoxUV</code></a></li>
+<li><a href="#3">Handling add-in command binding conflicts</a></li>
+</ul>
 <h4><a name="2"></a>Understanding the Face BoundingBoxUV</h4>
-<p>of 
+<p>This question was raised in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-understand-the-boundingboxuv-of-face/m-p/9374555">how to understand the <code>BoundingBoxUV</code> of face</a>:</p>
 <p><strong>Question:</strong> I am doing something with AVF, and have some problems with the <code>BoundingBoxUV</code> of face.</p>
@@ -55,16 +60,16 @@ project a <code>XYZ</code> point onto the face surface and seeing where it ends 
 <img src="img/face_bounding_box_uv_dyn.png" alt="Dynamo query for face U and V" title="Dynamo query for face U and V" width="800"/> <!-- 1506 -->
 </center></p>
 <p>Many thanks to Bing Yongcao for sharing this solution!</p>
-<h4><a name="2"></a>Handling Add-In Command Binding Conflicts</h4>
+<h4><a name="3"></a>Handling Add-In Command Binding Conflicts</h4>
 <p>An interesting question was raised by Smcoder and addressed by Autodesk developer Phil Xia in
 a <a href="https://thebuildingcoder.typepad.com/blog/2012/06/replacing-built-in-commands-and-their-ids.html#comment-4837624436">series</a>
 <a href="https://thebuildingcoder.typepad.com/blog/2012/06/replacing-built-in-commands-and-their-ids.html#comment-4837714095">of</a>
 <a href="https://thebuildingcoder.typepad.com/blog/2012/06/replacing-built-in-commands-and-their-ids.html#comment-4838966941">comments</a>
 on <a href="https://thebuildingcoder.typepad.com/blog/2012/06/replacing-built-in-commands-and-their-ids.html">replacing built-in commands and obtaining their ids</a>:</p>
-<p>**Question: I haven't found any documentation so I'm thinking of testing it myself to see what happens.
-Do you know how it is handled if two different external applications bind to the same Revit Built-In Command?
+<p><strong>Question:</strong> Do you know how it is handled if two different external applications bind to the same Revit Built-In Command?
+I haven't found any documentation, so I'm thinking of testing it myself to see what happens.
 In the case of a commercial product, you don't want your external application to conflict with any other product that may be running.
-Ss, how does Revit handle precedence when multiple add-ins subscribe to the same events or commands?</p>
+So, how does Revit handle precedence when multiple add-ins subscribe to the same events or commands?</p>
 <p>Update: From conducting my own testing, it appears that <code>AddInCommandBinding</code> is first come, first served.
 On Revit startup, the various addins load alphabetically based on the name of the manifest file.
 It appears to me that when multiple external apps all attempt to bind the same built-in command, only the first app to load gets it.
