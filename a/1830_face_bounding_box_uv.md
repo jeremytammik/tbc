@@ -29,7 +29,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Understanding the Face BoundingBoxUV
 
-Today, let's look at a short summary of 
+Today, let's look at a short summary two recent discussions on
+
+
+#### <a name="2"></a>Understanding the Face BoundingBoxUV
+
+of 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [how to understand the `BoundingBoxUV` of face](https://forums.autodesk.com/t5/revit-api-forum/how-to-understand-the-boundingboxuv-of-face/m-p/9374555):
 
@@ -67,3 +72,47 @@ I use Dynamo to query the U and V directions of the face, and I am glad to share
 </center>
 
 Many thanks to Bing Yongcao for sharing this solution!
+
+
+#### <a name="2"></a>Handling Add-In Command Binding Conflicts
+
+An interesting question was raised by Smcoder and addressed by Autodesk developer Phil Xia in
+a [series](https://thebuildingcoder.typepad.com/blog/2012/06/replacing-built-in-commands-and-their-ids.html#comment-4837624436)
+[of](https://thebuildingcoder.typepad.com/blog/2012/06/replacing-built-in-commands-and-their-ids.html#comment-4837714095)
+[comments](https://thebuildingcoder.typepad.com/blog/2012/06/replacing-built-in-commands-and-their-ids.html#comment-4838966941)
+on [replacing built-in commands and obtaining their ids](https://thebuildingcoder.typepad.com/blog/2012/06/replacing-built-in-commands-and-their-ids.html):
+
+**Question: I haven't found any documentation so I'm thinking of testing it myself to see what happens.
+Do you know how it is handled if two different external applications bind to the same Revit Built-In Command?
+In the case of a commercial product, you don't want your external application to conflict with any other product that may be running.
+Ss, how does Revit handle precedence when multiple add-ins subscribe to the same events or commands?
+
+Update: From conducting my own testing, it appears that `AddInCommandBinding` is first come, first served.
+On Revit startup, the various addins load alphabetically based on the name of the manifest file.
+It appears to me that when multiple external apps all attempt to bind the same built-in command, only the first app to load gets it.
+That being the case, one and only one of the applications responds when the desired BuiltInCommand is detected.
+If this is true, then any reliance on `AddInCommandBinding` would be extremely risky business if you're producing commercial software.
+If you had the bad fortune of the user installing another addin that ties up the same command and happens to alphabetize before your app, then you could have core features that will not fire.
+
+Can anyone confirm this finding?
+
+**Answer:** I am Phil from development team.
+Yes, you are right, and the `AddInCommandBinding` is indeed first come, first served, based on the name of manifest file alphabetically.
+
+I would suggest that use a `try` `catch` handler to wrap the code to create the addincommand binding so it will throw an exception to say "The command xxx has already been replaced by xxx addin" in this case.
+You can build your UI experience based on this exception to help customer to make the decision to choose which addin they want to use or not.
+It is not an elegant solution because the customer has to unload one addin and restart Revit.
+
+<center>
+<img src="img/AddInCommandBinding_already_replaced.png" alt="AddInCommandBinding already replaced" title="AddInCommandBinding already replaced" width="362"/> <!-- 362 -->
+</center>
+
+**Response:** Thank you for following up on this.
+It's great to know exactly how the binding works so that I can plan accordingly.
+In my case, I may opt for an altogether different solution that does not require binding to the built-in command.
+
+On closer inspection, I now see the mistake that prevented me from highlighting this issue earlier.
+I had over-constrained my external application's `OnStartup` routine with an overall `try` `catch` wrapper that simply returned "Result.Failed" on exception.
+So, the routine was being stopped and the error was being caught, but no actionable information was returned in the form of exception text, etc.
+
+Many thanks to Phil and Smcoder for raising and clarifying this question.
