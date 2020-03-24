@@ -1,0 +1,132 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</head></p>
+<!---
+
+- https://forums.autodesk.com/t5/revit-api-forum/createpipeconnector-from-referenceplane/m-p/9396013
+
+- https://forums.autodesk.com/t5/revit-api-forum/auto-route-a-pipe-system-between-plumbing-fixtures/m-p/9387502
+
+twitter:
+
+ the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+
+&ndash; 
+...
+
+linkedin:
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>ReferencePlane for CreatePipeConnector</h3>
+<p>Today, let's pick up two recent MEP related discussions, on creating a new pipe connector for a hydraulic fitting family and on automatic pipe system routing</p>
+<h4><a name="2"></a>Getting a ReferencePlane for CreatePipeConnector</h4>
+<p>I had an intereseting and fruitful conversation with Edouard Vnuk in 
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/createpipeconnector-from-referenceplane/m-p/9396013">CreatePipeConnector from ReferencePlane</a>:</p>
+<p><strong>Question:</strong> I would like to create a connector from a reference plane.
+The <code>CreatePipeConnector</code> function requires a <code>PlanarFace</code>.
+Is there another function, or how can I transform a <code>ReferencePlane</code> into <code>PlanarFace</code>?</p>
+<p><strong>Answer:</strong> The <a href="https://www.revitapidocs.com/2020/e7003ec7-1dbe-50a2-fb3d-a83a5a3b5b9f.htm">ReferencePlane documentation sample code</a> shows
+how to call GetPlane to retrieve the DB Plane.</p>
+<p>More to the point, the the CreateAirHandler SDK sample to how to use the <code>CreatePipeConnector</code> method.</p>
+<p>When in doubt about how to call a Revit API method, one of the first places to always consult is the collection of Revit SDK samples.
+That step often helps and may save time and effort for you and others.</p>
+<p><strong>Response:</strong> I tried several codes without success.</p>
+<p>1st code:</p>
+<pre class="code">
+Autodesk.Revit.DB.Plane plane = Reference_plane.GetPlane();
+ConnectorElement connector = ConnectorElement.CreatePipeConnector(family_document, PipeSystemType.Global, plane);
+</pre>
+
+<p>However, I can't compile this code, because the parameter must be a reference of planar face, and I don't know how to get it from the plane.</p>
+<p>2nd code:</p>
+<pre class="code">
+ConnectorElement connector = ConnectorElement.CreatePipeConnector(family_document, PipeSystemType.Global, Reference_plane.GetReference());
+</pre>
+
+<p>This throws an exception during execution: The reference is not a planar face. Parameter name: planarFace.</p>
+<p>These are the user interface steps I would like to complete programmatically:</p>
+<p><center>
+<img src="img/pipe_connector_ui_1.jpg" alt="Pipe connector placement user interface" title="Pipe connector placement user interface" width="100"/> <!-- 1142 -->
+<br/>
+<img src="img/pipe_connector_ui_2.jpg" alt="Pipe connector placement user interface" title="Pipe connector placement user interface" width="100"/> <!-- 1142 -->
+<br/>
+<img src="img/pipe_connector_ui_3.jpg" alt="Pipe connector placement user interface" title="Pipe connector placement user interface" width="100"/> <!-- 1142 -->
+<br/>
+<img src="img/pipe_connector_ui_4.jpg" alt="Pipe connector placement user interface" title="Pipe connector placement user interface" width="100"/> <!-- 1142 -->
+</center></p>
+<p>I looked the CreateAirHandler SDK sample example.
+However, if I understood correctly, it creates the connectors from an extruded volume that provides the required planar faces.</p>
+<p><strong>Answer:</strong> Good. I see your point.
+Such situations arise regularly.
+You do have a real existing surface somewhere in the model that you can mount your connector on, don't you?
+Otherwise, you are modelling something that cannot be built.
+The existing surface is part of some BIM element geometry.
+You can identify the appropriate element and retrieve its geometry from the document by calling its Geometry property and providing an Options object with ComputeReferences set to true.
+Then, iterate through all its surfaces to identify the one you need.
+Et voila, that surface is equipped with a reference that you can use to create the connector.</p>
+<p><strong>Response:</strong> What you told me inspired me to think about it.
+I am creating a converter.
+And so, I create automaticly families from basic geometric shapes.
+To add my connectors that do not rest on an existing face, I artificially added a cylinder that I masked where I wanted a connector.
+Here's what I get :</p>
+<p><center>
+<img src="img/pipe_connector_in_family.jpg" alt="Pipe connector in family" title="Pipe connector in family" width="100"/> <!-- 1142 -->
+<p style="font-size: 80%; font-style:italic">Pipe connector in family</p>
+<img src="img/pipe_connector_in_project.jpg" alt="Pipe connector in project" title="Pipe connector in project" width="100"/> <!-- 1142 -->
+<p style="font-size: 80%; font-style:italic">Pipe connector in project</p>
+</center></p>
+<p>Thank you so much.</p>
+<p>Edouard</p>
+<p>Many thanks to Edouard for raising this, the in-depth discussion and sharing his clean solution!</p>
+<h4><a name="2"></a>Auto-routing a Pipe System Between Plumbing Fixtures</h4>
+<p>The other item I would like to pick up here is
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/auto-route-a-pipe-system-between-plumbing-fixtures/m-p/9387502">auto routing a pipe system between plumbing fixtures</a>:</p>
+<p><strong>Question:</strong> I'm wondering if there is something within the API that will allow me to place plumbing fixture families and then generate a plumbing layout like you can in Revit by using the "Create Plumbing System --&gt; Generate Layout" or is this something I have to do one pipe, one connector at a time?</p>
+<p>auto_route_pipe_system_1.png</p>
+<p>Create Pipe System.png</p>
+<p>Selected Elements and Click Create System</p>
+<p>auto_route_pipe_system_generate_layout.png</p>
+<p>Generate Layout Button</p>
+<p>auto_route_pipe_system_auto_layout.png</p>
+<p>Auto Generated Pipes</p>
+<p>jeremytammik</p>
+<p>You can create a placeholder piping system programmatically as well:</p>
+<p>https://thebuildingcoder.typepad.com/blog/2011/07/mep-placeholders.html</p>
+<p>Or you can create a piping system right away. Here is a series of samples that create a minimal bunch of pipes for a rolling offset in lots of different ways:</p>
+<p>http://thebuildingcoder.typepad.com/blog/2014/01/final-rolling-offset-using-pipecreate.html</p>
+<p>tknappEUVP8</p>
+<p>I am assuming from your response that if I want to connect from say, a water closet to a water heater, with pipes, I will have to explicitly call PipeCreate for each pipe, find connectors, insert each fitting... and then that process over and over until they connect? Is there a better work flow for what I'm trying to accomplish? Something similar to what is in the Revit user interface?</p>
+<p>jeremytammik</p>
+<p>Please read the discussions I pointed out. They explain everything and cover your question in full. Why do you think I publish them?</p>
+<p>Actually, here are some additional relevant discussions of this topic:</p>
+<p>https://thebuildingcoder.typepad.com/blog/2018/03/connector-neighbour-conduit-transition.html
+https://thebuildingcoder.typepad.com/blog/2019/08/mep-ductwork-and-changing-pipe-direction.html</p>
+<p>tknappEUVP8</p>
+<p>Apologies, I seem to have frustrated you. I did look through the previous sent links, however I didn't find a direct answer to my question, therefor I tried to clarify. I'm still not completely clear on your answer, so I will try to solve it myself. Thanks anyway.</p>
+<p>jeremytammik</p>
+<p>Well, I am not an expert on this, but I think the answer is:</p>
+<p>You can go any way you like.
+You can just insert the pipes, no fittings. Then, if you connect the pipe connectors, Revit will automatically select and place and connect the appropriate fittings according to your routing preferences and adjust the pipe endpoints so they fit.
+You can just insert all the fittings, no pipes. Then, if you connect the fitting connectors, Revit will automatically place and connect the appropriate pipes between them.</p>
+<p>That is the gist of what I learned researching for and implementing the rolling offset.</p>
+<pre class="code">
+</pre>
+
+<p><strong>Answer:</strong> </p>
+<p><strong>Response:</strong> </p>
+<h4><a name="3"></a></h4>
