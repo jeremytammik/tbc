@@ -9,6 +9,8 @@
 
 - https://forums.autodesk.com/t5/revit-api-forum/createpipeconnector-from-referenceplane/m-p/9396013
 
+- https://forums.autodesk.com/t5/revit-api-forum/auto-route-a-pipe-system-between-plumbing-fixtures/m-p/9387502
+
 twitter:
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
@@ -31,7 +33,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### ReferencePlane for CreatePipeConnector
 
-Today, let's pick up a recent discussion creating a new pipe connector for a hydraulic fitting family:
+Today, let's pick up two recent MEP related discussions, on creating a new pipe connector for a hydraulic fitting family and on automatic pipe system routing
 
 #### <a name="2"></a>Getting a ReferencePlane for CreatePipeConnector
 
@@ -113,6 +115,65 @@ Edouard
 
 Many thanks to Edouard for raising this, the in-depth discussion and sharing his clean solution!
 
+#### <a name="2"></a>Auto-routing a Pipe System Between Plumbing Fixtures
+
+The other item I would like to pick up here is
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [auto routing a pipe system between plumbing fixtures](https://forums.autodesk.com/t5/revit-api-forum/auto-route-a-pipe-system-between-plumbing-fixtures/m-p/9387502):
+
+**Question:** I'm wondering if there is something within the API that will allow me to place plumbing fixture families and then generate a plumbing layout like you can in Revit by using the "Create Plumbing System --> Generate Layout" or is this something I have to do one pipe, one connector at a time?
+
+auto_route_pipe_system_1.png
+
+Create Pipe System.png
+
+Selected Elements and Click Create System
+
+auto_route_pipe_system_generate_layout.png
+
+Generate Layout Button
+
+auto_route_pipe_system_auto_layout.png
+
+Auto Generated Pipes
+
+
+jeremytammik
+
+You can create a placeholder piping system programmatically as well:
+
+https://thebuildingcoder.typepad.com/blog/2011/07/mep-placeholders.html
+
+Or you can create a piping system right away. Here is a series of samples that create a minimal bunch of pipes for a rolling offset in lots of different ways:
+
+http://thebuildingcoder.typepad.com/blog/2014/01/final-rolling-offset-using-pipecreate.html
+
+tknappEUVP8
+
+I am assuming from your response that if I want to connect from say, a water closet to a water heater, with pipes, I will have to explicitly call PipeCreate for each pipe, find connectors, insert each fitting... and then that process over and over until they connect? Is there a better work flow for what I'm trying to accomplish? Something similar to what is in the Revit user interface?
+
+jeremytammik
+
+Please read the discussions I pointed out. They explain everything and cover your question in full. Why do you think I publish them?
+
+Actually, here are some additional relevant discussions of this topic:
+
+https://thebuildingcoder.typepad.com/blog/2018/03/connector-neighbour-conduit-transition.html
+https://thebuildingcoder.typepad.com/blog/2019/08/mep-ductwork-and-changing-pipe-direction.html
+
+tknappEUVP8
+
+Apologies, I seem to have frustrated you. I did look through the previous sent links, however I didn't find a direct answer to my question, therefor I tried to clarify. I'm still not completely clear on your answer, so I will try to solve it myself. Thanks anyway.
+
+jeremytammik
+
+Well, I am not an expert on this, but I think the answer is:
+
+You can go any way you like.
+You can just insert the pipes, no fittings. Then, if you connect the pipe connectors, Revit will automatically select and place and connect the appropriate fittings according to your routing preferences and adjust the pipe endpoints so they fit.
+You can just insert all the fittings, no pipes. Then, if you connect the fitting connectors, Revit will automatically place and connect the appropriate pipes between them.
+
+That is the gist of what I learned researching for and implementing the rolling offset.
 
 <pre class="code">
 </pre>
