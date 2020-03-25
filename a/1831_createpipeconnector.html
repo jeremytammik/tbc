@@ -32,7 +32,19 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 <h3>ReferencePlane for CreatePipeConnector</h3>
 <p>Today, let's pick up two recent MEP related discussions, on creating a new pipe connector for a hydraulic fitting family and on automatic pipe system routing</p>
-<h4><a name="2"></a>Getting a ReferencePlane for CreatePipeConnector</h4>
+<h4><a name="2"></a>The Names They are A-Changin</h4>
+<p>In these times of accelerating change, the name of my team has changed as well.</p>
+<p>From now on, I now work in the Autodesk DAS team:</p>
+<ul>
+<li>RDP Registered Developer Program 1987-1995</li>
+<li>ADN Autodesk Developer Network 1995-2015</li>
+<li>FPD Forge Partner Development 2015-2020</li>
+<li>DAS Developer Advocacy and Support 2020+</li>
+</ul>
+<p><center>
+<img src="img/fpd_das.png" alt="Developer Advocacy and Support" title="Developer Advocacy and Support" width="600"/> <!-- 1169 -->
+</center></p>
+<h4><a name="3"></a>Getting a ReferencePlane for CreatePipeConnector</h4>
 <p>I had an intereseting and fruitful conversation with Edouard Vnuk in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/createpipeconnector-from-referenceplane/m-p/9396013">CreatePipeConnector from ReferencePlane</a>:</p>
@@ -92,7 +104,7 @@ Here's what I get :</p>
 <p>Thank you so much.</p>
 <p>Edouard</p>
 <p>Many thanks to Edouard for raising this, the in-depth discussion and sharing his clean solution!</p>
-<h4><a name="2"></a>Auto-routing a Pipe System Between Plumbing Fixtures</h4>
+<h4><a name="4"></a>Auto-routing a Pipe System Between Plumbing Fixtures</h4>
 <p>The other item I would like to pick up here is
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/auto-route-a-pipe-system-between-plumbing-fixtures/m-p/9387502">auto routing a pipe system between plumbing fixtures</a>:</p>
@@ -124,9 +136,24 @@ https://thebuildingcoder.typepad.com/blog/2019/08/mep-ductwork-and-changing-pipe
 You can just insert the pipes, no fittings. Then, if you connect the pipe connectors, Revit will automatically select and place and connect the appropriate fittings according to your routing preferences and adjust the pipe endpoints so they fit.
 You can just insert all the fittings, no pipes. Then, if you connect the fitting connectors, Revit will automatically place and connect the appropriate pipes between them.</p>
 <p>That is the gist of what I learned researching for and implementing the rolling offset.</p>
+<h4><a name="5"></a>Handling Dialogue and Failure Messages</h4>
+<p>A recurring question how to handle dialogue and failure messages popping up when driving Revit programmatically, e.g.,
+on <a href="https://stackoverflow.com/questions/60831658/saving-families-out-vie-revit-api">saving families out via Revit API</a>:</p>
+<p><strong>Question:</strong> I am collecting all the families in a project and saving them out via the API using </p>
 <pre class="code">
+  familyDocument.SaveAs(fileName);
 </pre>
 
-<p><strong>Answer:</strong> </p>
-<p><strong>Response:</strong> </p>
-<h4><a name="3"></a></h4>
+<p>Is there a way to catch the following dialogue box and perform an action?</p>
+<p><center>
+<img src="img/failure_message.png" alt="Failure message" title="Failure message" width="479"/> <!-- 479 -->
+</center></p>
+<p>For instance, record the warning and close the dialogue box?</p>
+<p><strong>Answer:</strong> The Revit API offers two different mechanisms to react to and handle dialogue and failure messages:</p>
+<ul>
+<li>the <a href="https://www.revitapidocs.com/2020/cb46ea4c-2b80-0ec2-063f-dda6f662948a.htm">DialogBoxShowing event</a> and</li>
+<li>the <a href="https://www.revitapidocs.com/2020/d0795bd6-f092-90f2-5c2c-3876e616454c.htm">Failure API</a>.</li>
+</ul>
+<p>If all of these fail, a third mechanism is provided by the Windows API, which enables hooking into and reacting to almost any system event, including a dialogue showing.</p>
+<p>All three approaches are discussed and compared by The Building Coder in the topic group
+on <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32">detecting and handling dialogues and failures</a>.</p>

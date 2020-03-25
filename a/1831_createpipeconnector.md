@@ -35,7 +35,22 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Today, let's pick up two recent MEP related discussions, on creating a new pipe connector for a hydraulic fitting family and on automatic pipe system routing
 
-#### <a name="2"></a>Getting a ReferencePlane for CreatePipeConnector
+#### <a name="2"></a>The Names They are A-Changin
+
+In these times of accelerating change, the name of my team has changed as well.
+
+From now on, I now work in the Autodesk DAS team:
+
+- RDP Registered Developer Program 1987-1995
+- ADN Autodesk Developer Network 1995-2015
+- FPD Forge Partner Development 2015-2020
+- DAS Developer Advocacy and Support 2020+
+
+<center>
+<img src="img/fpd_das.png" alt="Developer Advocacy and Support" title="Developer Advocacy and Support" width="600"/> <!-- 1169 -->
+</center>
+
+#### <a name="3"></a>Getting a ReferencePlane for CreatePipeConnector
 
 I had an intereseting and fruitful conversation with Edouard Vnuk in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -115,7 +130,7 @@ Edouard
 
 Many thanks to Edouard for raising this, the in-depth discussion and sharing his clean solution!
 
-#### <a name="2"></a>Auto-routing a Pipe System Between Plumbing Fixtures
+#### <a name="4"></a>Auto-routing a Pipe System Between Plumbing Fixtures
 
 The other item I would like to pick up here is
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -175,12 +190,33 @@ You can just insert all the fittings, no pipes. Then, if you connect the fitting
 
 That is the gist of what I learned researching for and implementing the rolling offset.
 
+
+#### <a name="5"></a>Handling Dialogue and Failure Messages
+
+A recurring question how to handle dialogue and failure messages popping up when driving Revit programmatically, e.g.,
+on [saving families out via Revit API](https://stackoverflow.com/questions/60831658/saving-families-out-vie-revit-api):
+
+**Question:** I am collecting all the families in a project and saving them out via the API using 
+
 <pre class="code">
+  familyDocument.SaveAs(fileName);
 </pre>
 
-**Answer:** 
+Is there a way to catch the following dialogue box and perform an action?
 
-**Response:** 
+<center>
+<img src="img/failure_message.png" alt="Failure message" title="Failure message" width="479"/> <!-- 479 -->
+</center>
 
-#### <a name="3"></a>
+For instance, record the warning and close the dialogue box?
+
+**Answer:** The Revit API offers two different mechanisms to react to and handle dialogue and failure messages:
+
+- the [DialogBoxShowing event](https://www.revitapidocs.com/2020/cb46ea4c-2b80-0ec2-063f-dda6f662948a.htm) and
+- the [Failure API](https://www.revitapidocs.com/2020/d0795bd6-f092-90f2-5c2c-3876e616454c.htm).
+
+If all of these fail, a third mechanism is provided by the Windows API, which enables hooking into and reacting to almost any system event, including a dialogue showing.
+
+All three approaches are discussed and compared by The Building Coder in the topic group
+on [detecting and handling dialogues and failures](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32).
 
