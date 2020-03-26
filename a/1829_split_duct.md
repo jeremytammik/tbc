@@ -27,6 +27,18 @@ That is not just an example, but an entire tutorial, so I think it is very usefu
 
 linkedin:
 
+We discussed the BreakCurve API for splitting a pipe.
+
+Here comes a much more comprehensive discussion on splitting a duct, not just an example, an entire tutorial in the #RevitAPI
+
+https://bit.ly/splitduct
+
+We recently shared a brief note on using the BreakCurve API for splitting a pipe.
+
+Matt Taylor now pointed out a much more comprehensive discussion asking, is there any API available to split a duct programmatically?
+
+That is not just an example, but an entire tutorial, so I think it is very useful to share here as well for all to enjoy...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
