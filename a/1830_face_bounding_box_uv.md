@@ -17,6 +17,15 @@ Today, let's pick up two recent discussions on the <code>UV</code> coordinate sp
 
 linkedin:
 
+Understanding the Face UV coordinate space and handling add-in command binding replacement conflicts in the #RevitAPI
+
+https://bit.ly/cmdbindfacebb
+
+Today, we pick up two recent discussions on the UV coordinate space on a face and the replacement of add-in command bindings:
+
+- Understanding the Face BoundingBoxUV
+- Handling add-in command binding conflicts...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
