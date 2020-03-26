@@ -9,7 +9,7 @@
 
 twitter:
 
- the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+Understanding the Face UV coordinate space and handling add-in command binding replacement conflicts in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon https://bit.ly/cmdbindfacebb
 
 Today, let's pick up two recent discussions on the <code>UV</code> coordinate space on a face and the replacement of add-in command bindings
 &ndash; Understanding the Face <code>BoundingBoxUV</code>
