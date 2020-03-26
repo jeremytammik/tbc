@@ -13,7 +13,7 @@
 
 twitter:
 
- the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+Move existing rooms between levels while retaining their information, thoughts on managing slots in panel schedules, and useful JavaScript debugging console hints for the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon https://bit.ly/panelslotroomlevel
 
 An amazing solution to move existing rooms between levels while retaining all their information, some thoughts on managing slots in panel schedules, and a couple of useful JavaScript debugging console hints
 &ndash; Moving rooms to other levels
