@@ -31,9 +31,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### ReferencePlane for CreatePipeConnector
+### Autorouting and Reference for CreatePipeConnector
 
-Today, let's pick up two recent MEP related discussions, on creating a new pipe connector for a hydraulic fitting family and on automatic pipe system routing
+Today, let's pick up two recent MEP related discussions, on creating a new pipe connector for a hydraulic fitting family and on automatic pipe system routing, and a couple of other odd items of interest:
+
+- [The names they are a-changin](#2)
+- [Getting a `ReferencePlane` for `CreatePipeConnector`](#3)
+- [Auto-routing a pipe system between plumbing fixtures](#4)
+- [Handling dialogue and failure messages](#5)
+- [Retrieving a geometry reference](#6)
 
 #### <a name="2"></a>The Names They are A-Changin
 

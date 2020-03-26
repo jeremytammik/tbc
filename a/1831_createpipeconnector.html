@@ -30,8 +30,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>ReferencePlane for CreatePipeConnector</h3>
-<p>Today, let's pick up two recent MEP related discussions, on creating a new pipe connector for a hydraulic fitting family and on automatic pipe system routing</p>
+<h3>Autorouting and Reference for CreatePipeConnector</h3>
+<p>Today, let's pick up two recent MEP related discussions, on creating a new pipe connector for a hydraulic fitting family and on automatic pipe system routing, and a couple of other odd items of interest:</p>
+<ul>
+<li><a href="#2">The names they are a-changin</a></li>
+<li><a href="#3">Getting a <code>ReferencePlane</code> for <code>CreatePipeConnector</code></a></li>
+<li><a href="#4">Auto-routing a pipe system between plumbing fixtures</a></li>
+<li><a href="#5">Handling dialogue and failure messages</a></li>
+<li><a href="#6">Retrieving a geometry reference</a></li>
+</ul>
 <h4><a name="2"></a>The Names They are A-Changin</h4>
 <p>In these times of accelerating change, the name of my team has changed as well.</p>
 <p>From now on, I now work in the Autodesk DAS team:</p>
@@ -45,7 +52,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <img src="img/fpd_das.png" alt="Developer Advocacy and Support" title="Developer Advocacy and Support" width="600"/> <!-- 1169 -->
 </center></p>
 <h4><a name="3"></a>Getting a ReferencePlane for CreatePipeConnector</h4>
-<p>I had an intereseting and fruitful conversation with Edouard Vnuk in 
+<p>I had an interesting and fruitful conversation with Edouard Vnuk in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/createpipeconnector-from-referenceplane/m-p/9396013">CreatePipeConnector from ReferencePlane</a>:</p>
 <p><strong>Question:</strong> I would like to create a connector from a reference plane.
@@ -53,7 +60,7 @@ The <code>CreatePipeConnector</code> function requires a <code>PlanarFace</code>
 Is there another function, or how can I transform a <code>ReferencePlane</code> into <code>PlanarFace</code>?</p>
 <p><strong>Answer:</strong> The <a href="https://www.revitapidocs.com/2020/e7003ec7-1dbe-50a2-fb3d-a83a5a3b5b9f.htm">ReferencePlane documentation sample code</a> shows
 how to call GetPlane to retrieve the DB Plane.</p>
-<p>More to the point, the the CreateAirHandler SDK sample to how to use the <code>CreatePipeConnector</code> method.</p>
+<p>More to the point, the CreateAirHandler SDK sample to how to use the <code>CreatePipeConnector</code> method.</p>
 <p>When in doubt about how to call a Revit API method, one of the first places to always consult is the collection of Revit SDK samples.
 That step often helps and may save time and effort for you and others.</p>
 <p><strong>Response:</strong> I tried several codes without success.</p>
@@ -99,7 +106,7 @@ Then, iterate through all its surfaces to identify the one you need.
 Et voila, that surface is equipped with a reference that you can use to create the connector.</p>
 <p><strong>Response:</strong> What you told me inspired me to think about it.
 I am creating a converter.
-And so, I create automaticly families from basic geometric shapes.
+And so, I create automatically families from basic geometric shapes.
 To add my connectors that do not rest on an existing face, I artificially added a cylinder that I masked where I wanted a connector.
 Here's what I get :</p>
 <p><center>
@@ -168,7 +175,7 @@ on <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32
 <h4><a name="6"></a>Retrieving a Geometry Reference</h4>
 <p>Let's round off with a quick question 
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/get-reference-upper-on-rebar-51/m-p/9396627">getting a reference to the upper face on rebar 51</a>:</p>
-<p><strong>Question:</strong> This line of code works on some rebar '51' to retreive a reference to the upper face, but not all:</p>
+<p><strong>Question:</strong> This line of code works on some rebar '51' to retrieve a reference to the upper face, but not all:</p>
 <pre class="prettyprint">
 var srep = $"{rebar51.UniqueId}:2000000:{1002000+typ}:LINEAR";
 
