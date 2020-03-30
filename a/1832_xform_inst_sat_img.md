@@ -179,6 +179,10 @@ by Quincy Larson and [freecodecamp.org](https://www.freecodecamp.org).
 In case you happen to have more time on your hands than usual these days, you might want to see it as an opportunity
 to [learn to code from home with the Coronavirus quarantine developer skill handbook](https://www.freecodecamp.org/news/coronavirus-academy).
 
-<pre class="code">
-</pre>
+I've collected and very much enjoyed some of Quincy's recent quotes of the week:
 
+- *A computer once beat me at chess, but it was no match for me at kickboxing.* &ndash; Emo Philips
+- *The greatest obstacle to discovery is not ignorance, but the illusion of knowledge.* &ndash; Daniel Boorstin
+- *Good judgment comes from experience. Experience comes from bad judgment.* &ndash; unknown
+- *Optimism is an occupational hazard of programming. Testing is the treatment.* &ndash; Kent Beck
+- *Act in haste and repent at leisure. Code too soon and debug forever.* &ndash; Dr. Raymond Kennington
