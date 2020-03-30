@@ -37,6 +37,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Satellite Images and Instance Transforms
 
+Things have slowed down a bit in the discussion forum recently, like in many other parts of the world; still we are chugging along quite happily anyway.
+I am very glad I have a garden to sit in, and springtime and sunshine to enjoy.
+I hope you are doing well also!
+Topics for today:
+
+- [Transforming symbol geometry to instance placement](#2)
+- [Importing and displaying satellite images](#3)
+- [Free time? Learn! Free code camp!](#4)
+
 #### <a name="2"></a>Transforming Symbol Geometry to Instance Placement
 
 A fundamental question reappeared in a new form in
@@ -179,10 +188,10 @@ by Quincy Larson and [freecodecamp.org](https://www.freecodecamp.org).
 In case you happen to have more time on your hands than usual these days, you might want to see it as an opportunity
 to [learn to code from home with the Coronavirus quarantine developer skill handbook](https://www.freecodecamp.org/news/coronavirus-academy).
 
-I've collected and very much enjoyed some of Quincy's recent quotes of the week:
+By the way, I very much enjoyed some of Quincy's recent quotes of the week:
 
-- *A computer once beat me at chess, but it was no match for me at kickboxing.* &ndash; Emo Philips
-- *The greatest obstacle to discovery is not ignorance, but the illusion of knowledge.* &ndash; Daniel Boorstin
-- *Good judgment comes from experience. Experience comes from bad judgment.* &ndash; unknown
-- *Optimism is an occupational hazard of programming. Testing is the treatment.* &ndash; Kent Beck
-- *Act in haste and repent at leisure. Code too soon and debug forever.* &ndash; Dr. Raymond Kennington
+- A computer once beat me at chess, but it was no match for me at kickboxing &ndash; *Emo Philips*
+- The greatest obstacle to discovery is not ignorance, but the illusion of knowledge &ndash; *Daniel Boorstin*
+- Good judgment comes from experience. Experience comes from bad judgment &ndash; *unknown*
+- Optimism is an occupational hazard of programming. Testing is the treatment &ndash; *Kent Beck*
+- Act in haste and repent at leisure. Code too soon and debug forever &ndash; *Dr. Raymond Kennington*
