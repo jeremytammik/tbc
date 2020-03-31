@@ -18,8 +18,11 @@
 
 twitter:
 
-&ndash; 
-...
+I hope you are doing well and remaining healthy!
+Topics for today
+&ndash; Transforming symbol geometry to instance placement
+&ndash; Importing and displaying satellite images
+&ndash; Free time? Learn! Free code camp! ...
 
 linkedin:
 
@@ -51,7 +54,9 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/using-planarface-gete
 easily resolved by applying the instance placement transformation to transform the symbol geometry from the family definition coordinate system to the real-world instance placement in the project space:</p>
 <p><strong>Question:</strong> I'm trying to create a plugin that will allow me to create filled regions just by selecting a face.</p>
 <p>I use <em>Selection.PickObject( ObjectType.Face )</em>, convert that reference to a <code>PlanarFace</code> type, and then use <code>GetEdgesAsCurveLoops</code> to get the collection of <code>CurveLoops</code> and pass that to <code>FilledRegion</code> <code>Create</code> to create my filled region.</p>
-<p>However, it's resulting in unexpected behavior. If I click on the face of a roof surface, it creates the filled region exactly over the face like I want it to. When I click the face of a family instance, it still creates the filled region &ndash; but instead of creating it over the face of the family instance, it creates the instance at the project origin of the document.</p>
+<p>However, it's resulting in unexpected behaviour.
+If I click on the face of a roof surface, it creates the filled region exactly over the face like I want it to.
+When I click the face of a family instance, it still creates the filled region &ndash; but instead of creating it over the face of the family instance, it creates the instance at the project origin of the document.</p>
 <p>Here are images illustrating the two scenarios:</p>
 <p>Highlighting the roof face and selecting it applies the FilledRegion like expected:</p>
 <p><center>
@@ -112,6 +117,7 @@ easily resolved by applying the instance placement transformation to transform t
 &nbsp;&nbsp;&nbsp;&nbsp;stringFillType.Id,&nbsp;currentView.Id,&nbsp;faceEdges&nbsp;);
 </pre>
 
+<p>Many thanks to Chris for raising the issue and confirming the solution!</p>
 <h4><a name="3"></a>Importing and Displaying Satellite Images</h4>
 <p>Revitalizer came up with a very nice suggestion
 for <a href="https://forums.autodesk.com/t5/revit-api-forum/importing-and-displaying-satellite-images/m-p/9406063">importing and displaying satellite images</a>:</p>
@@ -138,7 +144,7 @@ Is my use case just not supported in current Revit?
 I'm new to programming for Revit, so it's very possible I've missed something.</p>
 <p>I'm running / programming for Revit 2019 on Windows 10.</p>
 <p><strong>Answer:</strong> What about creating a new material, setting its texture path, then making a <code>TopoSurface</code> and assigning the material to it, cf. <a href="https://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html">modifying material visual appearance</a>?</p>
-<p>I don't know how to adjust the <code>UV</code> mapping for the <code>TopoSurface</code>, but it it worked, you would see your satellite image in 3D.</p>
+<p>I don't know how to adjust the <code>UV</code> mapping for the <code>TopoSurface</code>, but if it worked, you would see your satellite image in 3D.</p>
 <p><strong>Response:</strong> Thanks to all for the replies!
 It took some time to try out the proposed solution (accessing AppearanceElements is convoluted!), so that's why it took me this long to reply.</p>
 <p>In the end, though I had to work around some weird quirks with the API, adding the image as a texture to a topography through a material works great.</p>
