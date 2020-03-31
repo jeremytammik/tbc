@@ -19,8 +19,11 @@
 
 twitter:
 
-&ndash; 
-...
+I hope you are doing well and remaining healthy!
+Topics for today
+&ndash; Transforming symbol geometry to instance placement
+&ndash; Importing and displaying satellite images
+&ndash; Free time? Learn! Free code camp! ...
 
 linkedin:
 
@@ -37,9 +40,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Satellite Images and Instance Transforms
 
-Things have slowed down a bit in the discussion forum recently, like in many other parts of the world; still we are chugging along quite happily anyway.
-I am very glad I have a garden to sit in, and springtime and sunshine to enjoy.
-I hope you are doing well also!
+Things have slowed down a bit in the discussion forum recently, like in many other parts of the world.
+I am very glad I have a garden to go out and sit in, and springtime and sunshine to enjoy.
+I hope you are doing well and remaining healthy also!
 Topics for today:
 
 - [Transforming symbol geometry to instance placement](#2)
@@ -57,7 +60,9 @@ easily resolved by applying the instance placement transformation to transform t
 
 I use *Selection.PickObject( ObjectType.Face )*, convert that reference to a `PlanarFace` type, and then use `GetEdgesAsCurveLoops` to get the collection of `CurveLoops` and pass that to `FilledRegion` `Create` to create my filled region.
 
-However, it's resulting in unexpected behavior. If I click on the face of a roof surface, it creates the filled region exactly over the face like I want it to. When I click the face of a family instance, it still creates the filled region &ndash; but instead of creating it over the face of the family instance, it creates the instance at the project origin of the document.
+However, it's resulting in unexpected behaviour.
+If I click on the face of a roof surface, it creates the filled region exactly over the face like I want it to.
+When I click the face of a family instance, it still creates the filled region &ndash; but instead of creating it over the face of the family instance, it creates the instance at the project origin of the document.
 
 Here are images illustrating the two scenarios:
 
@@ -134,6 +139,8 @@ For anyone interested, here is how I edited the code based on Jeremy's suggestio
 &nbsp;&nbsp;&nbsp;&nbsp;stringFillType.Id,&nbsp;currentView.Id,&nbsp;faceEdges&nbsp;);
 </pre>
 
+Many thanks to Chris for raising the issue and confirming the solution!
+
 #### <a name="3"></a>Importing and Displaying Satellite Images
 
 Revitalizer came up with a very nice suggestion
@@ -168,7 +175,7 @@ I'm running / programming for Revit 2019 on Windows 10.
 
 **Answer:** What about creating a new material, setting its texture path, then making a `TopoSurface` and assigning the material to it, cf. [modifying material visual appearance](https://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html)?
 
-I don't know how to adjust the `UV` mapping for the `TopoSurface`, but it it worked, you would see your satellite image in 3D.
+I don't know how to adjust the `UV` mapping for the `TopoSurface`, but if it worked, you would see your satellite image in 3D.
 
 **Response:** Thanks to all for the replies!
 It took some time to try out the proposed solution (accessing AppearanceElements is convoluted!), so that's why it took me this long to reply.
