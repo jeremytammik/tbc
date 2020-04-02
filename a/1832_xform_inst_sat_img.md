@@ -19,8 +19,9 @@
 
 twitter:
 
-Transforming symbol geometry to instance placement, importing and displaying satellite images in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon bit.ly/satimginstxform
-
+Transforming symbol geometry to instance placement, importing and displaying satellite images in the #RevitAPI #DynamoBim 
+@AutodeskForge @AutodeskRevit #bim #ForgeDevCon http://bit.ly/satimginstxform
+ 
 I hope you are doing well and remaining healthy!
 Topics for today
 &ndash; Transforming symbol geometry to instance placement
@@ -28,6 +29,18 @@ Topics for today
 &ndash; Free time? Learn! Free code camp! ...
 
 linkedin:
+
+Transforming symbol geometry to instance placement, importing and displaying satellite images in the #RevitAPI
+
+http://bit.ly/satimginstxform
+
+I hope you are doing well and remaining healthy!
+
+Topics for today:
+
+- Transforming symbol geometry to instance placement
+- Importing and displaying satellite images
+- Free time? Learn! Free code camp! ...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
