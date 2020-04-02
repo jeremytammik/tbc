@@ -7,14 +7,9 @@
 
 <!---
 
-
 twitter:
 
-I hope you are doing well and remaining healthy!
-Topics for today
-&ndash; Transforming symbol geometry to instance placement
-&ndash; Importing and displaying satellite images
-&ndash; Free time? Learn! Free code camp! ...
+ in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon
 
 linkedin:
 
@@ -29,167 +24,129 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Satellite Images and Instance Transforms
+###
 
-Things have slowed down a bit in the discussion forum recently, like in many other parts of the world.
-I am very glad I have a garden to go out and sit in, and springtime and sunshine to enjoy.
-I hope you are doing well and remaining healthy also!
-Topics for today:
+#### <a name="2"></a>
 
-- [Transforming symbol geometry to instance placement](#2)
-- [Importing and displaying satellite images](#3)
-- [Free time? Learn! Free code camp!](#4)
-
-#### <a name="2"></a>Transforming Symbol Geometry to Instance Placement
-
-A fundamental question reappeared in a new form in
+Kyle Faulkner raised and solved an interesting issue involving references to points in multistory stairs in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [using `PlanarFace` `GetEdgesAsCurveLoops` and `FilledRegion` `Create` together](https://forums.autodesk.com/t5/revit-api-forum/using-planarface-getedgesascurveloops-and-filledregion-create/m-p/9405257),
-easily resolved by applying the instance placement transformation to transform the symbol geometry from the family definition coordinate system to the real-world instance placement in the project space:
+on [Point element and its Reference are in different locations in Multistory Stair](https://forums.autodesk.com/t5/revit-api-forum/point-element-and-its-reference-are-in-different-locations-in/m-p/9415962):
 
-**Question:** I'm trying to create a plugin that will allow me to create filled regions just by selecting a face.
+**Question:** I'm writing a script in Dynamo to dimension stairs and I'm having a problem with reference points in multistory stairs.
 
-I use *Selection.PickObject( ObjectType.Face )*, convert that reference to a `PlanarFace` type, and then use `GetEdgesAsCurveLoops` to get the collection of `CurveLoops` and pass that to `FilledRegion` `Create` to create my filled region.
+The points from `get_Geometry` are returned correctly, but the references for the points that belong to the 'copied' stairs are referencing the points of the original stair.
 
-However, it's resulting in unexpected behaviour.
-If I click on the face of a roof surface, it creates the filled region exactly over the face like I want it to.
-When I click the face of a family instance, it still creates the filled region &ndash; but instead of creating it over the face of the family instance, it creates the instance at the project origin of the document.
-
-Here are images illustrating the two scenarios:
-
-Highlighting the roof face and selecting it applies the FilledRegion like expected:
+Here is a little script that illustrates this:
 
 <center>
-<img src="img/xform_inst_1.png" alt="Roof face and filled region" title="Roof face and filled region" width="400"/> <!-- 423 -->
+<img src="img/multistair_geom_pts_dyn.png" alt="Multistory stair points" title="Multistory stair points" width="800"/> <!-- 1054 -->
 </center>
 
-However, when I click this electrical equipment face...
+The script is simply taking the point, finding its reference, and grabbing the geometry from that reference.
+For the 'copied' stairs, this returned point is not the input point, as I would expect, but rather the corresponding point on the original stair.
 
-<center>
-<img src="img/xform_inst_2.png" alt="Electrical equipment face" title="Electrical equipment face" width="800"/> <!-- 1081 -->
-</center>
+Is this a bug? The point is the best reference for me for the dimension, but if there is an alternative I could use I am looking for suggestions.
+Otherwise, my fall back is to draw a detail line and dimension to that.
 
-It creates the filled region over at the project origin:
+**Answer:** Glad to hear that you have a viable fallback.
 
-<center>
-<img src="img/xform_inst_3.png" alt="Filled region at project origin" title="Filled region at project origin" width="800"/> <!-- 1156 -->
-</center>
+In addition, I hope that you can glean some useful further ideas from
+the [extensive discussion on multistory stairs and its challenges](https://forums.autodesk.com/t5/revit-api-forum/multistorey-stair-subements/m-p/8349447) that
+sound partially related to the one you are facing.
 
-Here is the relevant code snippet:
+**Response:** Thank you this is great info.
+Don't know how I missed it in my searching.
 
-<pre class="code">
-&nbsp;&nbsp;<span style="color:#2b91af;">Reference</span>&nbsp;faceRef&nbsp;=&nbsp;sel.PickObject(&nbsp;<span style="color:#2b91af;">ObjectType</span>.Face&nbsp;);
- 
-&nbsp;&nbsp;<span style="color:#2b91af;">GeometryObject</span>&nbsp;geoObj&nbsp;=&nbsp;doc.GetElement(&nbsp;faceRef&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;.GetGeometryObjectFromReference(&nbsp;faceRef&nbsp;);
- 
-&nbsp;&nbsp;<span style="color:#2b91af;">PlanarFace</span>&nbsp;moduleFace&nbsp;=&nbsp;geoObj&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">PlanarFace</span>;
-&nbsp;&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">CurveLoop</span>&gt;&nbsp;faceEdges&nbsp;=&nbsp;moduleFace.GetEdgesAsCurveLoops();
- 
-&nbsp;&nbsp;<span style="color:#2b91af;">FilledRegion</span>&nbsp;fillRegion&nbsp;=&nbsp;<span style="color:#2b91af;">FilledRegion</span>.Create(&nbsp;doc,&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;stringFillType.Id,&nbsp;currentView.Id,&nbsp;faceEdges&nbsp;);
-</pre>
+While it doesn't help to figure out what is happening with the points, it gives me an idea to use that point data to find a face in the geometry at the same elevation (which would be top of landing) and use that as a reference instead of using a detail line.
 
-Does anyone know how to get around this? Thanks!
+On a related note, when I get the top face of a landing by this path: Stairs &gt; StairsLanding &gt; Geometry &gt; Face &gt; Reference, the resulting dimension is invisible.
 
-**Answer:** The family instance reuses the geometry defined for the family symbol by applying a transform to it.
+But if I use this path: Stairs &gt; Geometry &gt; Face &gt; Reference, the created dimension is visible as expected.
 
-The symbol geometry is generally close to the origin.
+Not sure why this is the case.
+I tried some of the previous solutions, such as creating a new dimension with using the references of the invisible dimension, but that didn't work.
 
-Every instance needs a different transformation, depending on where the instance is placed in the model.
+Later:
 
-You need to apply the family instance transformation to the geometry to transform it from the family symbol definition coordinates to the project model coordinates where the instance has been placed:
+AH HA!!  I think I have found the problem.
 
-- [GetTransform](https://www.revitapidocs.com/2020/50aa275d-031e-ce19-9cfd-18a7a341ed19.htm)
-- [GetTotalTransform](https://www.revitapidocs.com/2020/8c8aff2b-5ff9-e43a-3b5c-308cd0174f1f.htm)
+My script was set up to take a multistair and get the unique stairs within that multistair via GetAllStairsIds().
+(This is important, because the multistair can have unpinned stairs in it and I need all the unique stairs within that multistair so that I can get the proper info I need).
+From there, I would get the geometry from each stair (and its copies if they exist) and attempt to get the references from the points that define the run, as shown in my original post.
+This is where the reference from the 'copied' stairs would wrongly return the reference to the corresponding point on the original stair.
 
-The roof element is different, since it is modelled in place using a sketch.
+BUT...
 
-**Response:** Awesome! This worked! Thank you much Jeremy!
+If I get the geometry from the multistair element directly, and acquire the references from the points from that geometry, all the references are in the correct position in relation to the point. SUCCESS!
 
-For anyone interested, here is how I edited the code based on Jeremy's suggestion:
+Only problem is now I have to query the geometry twice: once from the individual stairs, so that I can maintain a relationship between the points of the runs and the information pulled from that run, and then once from the multistory stair, so that I can match the points from the first query to the points from this second query to get the correct references.
 
-<pre class="code">
-&nbsp;&nbsp;<span style="color:#2b91af;">Reference</span>&nbsp;faceRef&nbsp;=&nbsp;sel.PickObject(&nbsp;<span style="color:#2b91af;">ObjectType</span>.Face&nbsp;);
- 
-&nbsp;&nbsp;<span style="color:#2b91af;">GeometryObject</span>&nbsp;geoObj&nbsp;=&nbsp;doc.GetElement(&nbsp;faceRef&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;.GetGeometryObjectFromReference(&nbsp;faceRef&nbsp;);
- 
-&nbsp;&nbsp;<span style="color:#2b91af;">Instance</span>&nbsp;moduleInstance&nbsp;=&nbsp;doc.GetElement(&nbsp;faceRef&nbsp;)&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Instance</span>;
-&nbsp;&nbsp;<span style="color:#2b91af;">Transform</span>&nbsp;moduleTransform&nbsp;=&nbsp;moduleInstance.GetTotalTransform();
- 
-&nbsp;&nbsp;<span style="color:#2b91af;">PlanarFace</span>&nbsp;moduleFace&nbsp;=&nbsp;geoObj&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">PlanarFace</span>;
-&nbsp;&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">CurveLoop</span>&gt;&nbsp;faceEdges&nbsp;=&nbsp;moduleFace.GetEdgesAsCurveLoops();
- 
-&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">CurveLoop</span>&nbsp;loop&nbsp;<span style="color:blue;">in</span>&nbsp;faceEdges&nbsp;)
-&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;loop.Transform(&nbsp;moduleTransform&nbsp;);
-&nbsp;&nbsp;}
- 
-&nbsp;&nbsp;<span style="color:#2b91af;">FilledRegion</span>&nbsp;fillRegion&nbsp;=&nbsp;<span style="color:#2b91af;">FilledRegion</span>.Create(&nbsp;doc,&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;stringFillType.Id,&nbsp;currentView.Id,&nbsp;faceEdges&nbsp;);
-</pre>
+Hopefully this makes sense.
 
-Many thanks to Chris for raising the issue and confirming the solution!
+Many thanks to Kyle for this tricky solution and helpful explanation!
 
-#### <a name="3"></a>Importing and Displaying Satellite Images
+#### <a name="3"></a>BIM 360 `GET` Project Users API
 
-Revitalizer came up with a very nice suggestion
-for [importing and displaying satellite images](https://forums.autodesk.com/t5/revit-api-forum/importing-and-displaying-satellite-images/m-p/9406063):
-
-**Question:** I'm building an add-in for Revit and I would like to be able to import and display third-party satellite imagery in order to place buildings in their 'real' position.
-I would like to be able to do this in a 3D view, but I don't know how.
-
-The user workflow for my add-in is this:
-
-- A user opens the add-in and is prompted to input a location through a WPF window.
-- Once a location is confirmed, a number of things are created/imported into the active project to make it look as close as possible to its actual real-life location. One of these things is the satellite image I'm seeking to import here.
-
-Essentially, my question is exactly the same
-as [Google maps image in 3D view](https://forums.autodesk.com/t5/revit-architecture-forum/google-maps-image-in-3d-view/m-p/8100681),
-but instead doing that programmatically/automatically through an add-in.
-In that thread, a suggestion is made to create a decal with the desired image, but this does not seem to be supported through the API.
-
-Another approach I found is
-to [use `PostCommand`](https://thebuildingcoder.typepad.com/blog/2013/10/programmatic-custom-add-in-external-command-launch.html) to
-create and place decals, but these commands are apparently
-only [executed after exiting the API context](https://knowledge.autodesk.com/support/revit-products/learn-explore/caas/CloudHelp/cloudhelp/2014/ENU/Revit/files/GUID-1C7289DE-8D10-47B5-B6DB-EA1310851C8F-htm.html) and
-only one at a time.
-As my add-in aims to perform a whole bunch of functionalities in one go, this seems ill-suited for my use case.
-It seems to be possible to chain a bunch of PostCommands, but this is a little 'hacky' and not recommended, especially for commercial use.
-
-Am I overlooking some existing functionality?
-Is my use case just not supported in current Revit?
-I'm new to programming for Revit, so it's very possible I've missed something.
-
-I'm running / programming for Revit 2019 on Windows 10.
-
-**Answer:** What about creating a new material, setting its texture path, then making a `TopoSurface` and assigning the material to it, cf. [modifying material visual appearance](https://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html)?
-
-I don't know how to adjust the `UV` mapping for the `TopoSurface`, but if it worked, you would see your satellite image in 3D.
-
-**Response:** Thanks to all for the replies!
-It took some time to try out the proposed solution (accessing AppearanceElements is convoluted!), so that's why it took me this long to reply.
-
-In the end, though I had to work around some weird quirks with the API, adding the image as a texture to a topography through a material works great.
-
-Thanks again for the suggestion, I couldn't have made it work without it.
-
-Many thanks to Harm for raising this and to Revitalizer for the good suggestion.
+Just a quick pointer to Mikako's blog post to let you know that
+the long-awaited [BIM 360 `GET` project users API is now available](https://forge.autodesk.com/blog/get-project-users-bim-360-finally-here).
 
 
-#### <a name="4"></a>Free Time? Learn Things! Free Code Camp!
+#### <a name="4"></a>Zoom Tips
 
-I have repeatedly pointed out the incredible programming training resources offered
-by Quincy Larson and [freecodecamp.org](https://www.freecodecamp.org).
+Staying at home and still keeping in touh with others... 
+everybody seems to be using [Zoom](https://zoom.us) nowadays.
 
-In case you happen to have more time on your hands than usual these days, you might want to see it as an opportunity
-to [learn to code from home with the Coronavirus quarantine developer skill handbook](https://www.freecodecamp.org/news/coronavirus-academy).
+Here are some neat [tips](zip/zoom_tips.pdf) to make it more fun and effective:
 
-By the way, I very much enjoyed some of Quincy's recent quotes of the week:
+- Add fun with a virtual background:
+Need to hide a messy background, or just add some fun?
+Try the virtual background option! 
+Click the gear icon by your profile picture to access your settings and click Virtual Background in the left navigation.
+Choose from the default background images or upload your own. 
+- How to use whiteboarding and annotations:
+It is often useful to show a visual representation of what you are discussing.
+You can access the whiteboard via Share Screen &gt; Whiteboard.
+Use the toolbar to write, stamp, erase, and more.
+You can also annotate a shared screen using the Annotate option on your meeting controls.
+- Unmute Zoom with the spacebar:
+Have you ever started speaking in an online meeting and then realised that no one can hear you because you're on mute?
+Then, there's the frantic mouseing to try to unmute yourself.
+Next time just quickly unmute by holding down your keyboard spacebar while you talk;
+when you release itn you're automatically muted again.  
+- Access Zoom chats after the meeting: Chats for Zoom meetings without a cloud recording are automatically saved on your computer in a Documents &gt; Zoom subfolder. You can also set things up to save chats in a cloud recording.
+- Two ways to invite people quickly: use 'Copy URL' in the invitation dialogue, or automatically copy the invite URL when starting a meeting.
+​​​There is an option to have the meeting URL automatically copied to your clipboard whenever a meeting starts via
+General settings  &gt; Automatically copy Invitation URL to Clipboard after meeting starts.
 
-- A computer once beat me at chess, but it was no match for me at kickboxing &ndash; *Emo Philips*
-- The greatest obstacle to discovery is not ignorance, but the illusion of knowledge &ndash; *Daniel Boorstin*
-- Good judgment comes from experience. Experience comes from bad judgment &ndash; *unknown*
-- Optimism is an occupational hazard of programming. Testing is the treatment &ndash; *Kent Beck*
-- Act in haste and repent at leisure. Code too soon and debug forever &ndash; *Dr. Raymond Kennington*
+#### <a name="5"></a>Jobs at Autodesk
+
+As we continue chugging along inspite of the pandemic, Autodesk is also searching for new talent.
+
+For instance, we currently have two job offers for senior software engineers in Switzerland:
+
+[Senior Software Engineer, Switzerland, Job ID 20WD38612](https://rolp.co/AC5Ih):
+
+The Autodesk Construction Solutions group is seeking a talented and highly motivated individual to develop a world-class commercial cloud service that is used by construction companies to increase efficiency and reduce the high amount of waste produced during construction. If you are a software developer proficient in cloud web services with large database back-ends and enjoy working in a dynamic, fast-paced team with state-of-the-art technologies, we would love to hear from you!
+
+Responsibilities:
+
+- Involved with all aspects of software development. Developing with quality and working to create and maintain the most reliable, secure, performant and high throughput service for our customers by leveraging cutting-edge technology
+- Partner closely with product managers, product owners, software architects and other stakeholders to iteratively turn high level requirements into product enhancements that are delivered to customers incrementally and continually
+- Contribute to software design and architecture by leveraging cloud design patterns and injecting your cloud expertise into the entire development lifecycle
+- Contribute to improvements in processes and deliverables that increase the effectiveness and efficiency of the team in responding to customer and business needs
+- Document and present your ideas and solutions accurately and thoroughly
+
+[Senior Software Engineer, Switzerland, Job ID 20WD38613](https://rolp.co/VuEgi):
+
+The Autodesk Construction Solutions group is seeking a talented and highly motivated individual to develop a world-class commercial cloud service that is used by construction companies to increase efficiency and reduce the high amount of waste produced during construction. If you are a fast learning software developer, keen to work with cloud web services with large database back-ends and enjoy working in a dynamic, fast-paced team with state-of-the- art technologies, we would love to hear from you!
+
+Responsibilities:
+
+- Involved with all aspects of software development
+- Developing with quality and working to create and maintain the most reliable, secure, performant and high throughput service for our customers by leveraging cutting-edge technology
+- Partner closely with senior engineers, product management and stakeholders to iteratively turn high level requirements into product enhancements that are delivered to customers incrementally and continually
+- Contribute to improvements in processes and deliverables that increase the effectiveness and efficiency of the team in responding to customer and business needs
+- Document and present your ideas and solutions accurately and thoroughly
+
+Good luck applying for one of these or the mnany other opportunities that you can find all over the world in
+the [Autodesk career site](https://www.autodesk.com/careers)!
