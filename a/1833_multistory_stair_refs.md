@@ -7,19 +7,8 @@
 
 <!---
 
-- using PlanarFace.GetEdgesAsCurveLoops and FilledRegion.Create together
-  https://forums.autodesk.com/t5/revit-api-forum/using-planarface-getedgesascurveloops-and-filledregion-create/m-p/9405257
-  instance transform from symbol to instance placement in project
-
-- Importing and Displaying Satellite Images
-  https://forums.autodesk.com/t5/revit-api-forum/importing-and-displaying-satellite-images/m-p/9406063
-
-- https://www.freecodecamp.org/news/coronavirus-academy/
-  Learn to Code From Home: The Coronavirus Quarantine Developer Skill Handbook
 
 twitter:
-
-Transforming symbol geometry to instance placement, importing and displaying satellite images in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon bit.ly/satimginstxform
 
 I hope you are doing well and remaining healthy!
 Topics for today
