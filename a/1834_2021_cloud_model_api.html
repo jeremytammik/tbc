@@ -48,7 +48,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li><a href="#2">Revit 2021</a></li>
 <li><a href="#3">BIM 360 Docs folder permission API</a></li>
 <li><a href="#4">Revit 2021 multi-region cloud model API</a><ul>
-<li><a href="#4.1">Background &ndash; Revit multi-region cloud model</a></li>
 <li><a href="#4.2">Identifying the region</a></li>
 <li><a href="#4.3">Revit 2021 cloud model API changes</a></li>
 <li><a href="#4.4">How to open a cloud model</a></li>
@@ -72,9 +71,10 @@ the <a href="https://www.autodesk.com/developer-network/platform-technologies/re
 the <a href="https://forge.autodesk.com/blog/folder-permission-api-bim-360-released">BIM 360 Docs Folder Permission API has been released</a>.</p>
 <h4><a name="4"></a>Revit 2021 Multi-Region Cloud Model API</h4>
 <p>I am honoured and grateful to present the following explanation of how to use the updated Revit 2021 Cloud Model API with multi-region projects and models by Phil Xia, Team Manager, Autodesk.</p>
-<h4><a name="4.1"></a>Background &ndash; Revit Multi-Region Cloud Model</h4>
-<p>In Revit 2021, we released the Revit Cloud Model for Multi-Region feature.</p>
-<p>Autodesk provides two different BIM 360 web portals and regions with different URLs:</p>
+<!-- #### <a name="4.1"></a>Background &ndash; Revit Multi-Region Cloud Model -->
+
+<p>Revit 2021 includes support for multi-region cloud models.</p>
+<p>Autodesk provides two different BIM 360 web portals and regions with different URLs for that:</p>
 <ul>
 <li><a href="https://insight.b360.autodesk.com">BIM 360 US, at insight.b360.autodesk.com</a></li>
 <li><a href="https://insight.b360.eu.autodesk.com">BIM 360 EU, at insight.b360.eu.autodesk.com</a></li>
@@ -228,7 +228,7 @@ the project Guid and model Guid information is provided in the <em>included.attr
 <p><center>
 <img src="img/cloud_model_api_5.png" alt="Cloud Model API" title="Cloud Model API" width="900"/> <!-- 1274 -->
 </center></p>
-<p>With this information, you can save a local file which is opened in Revit to BIM 360 Document management as a cloud modellike this:</p>
+<p>With this information, you can save a local file which is opened in Revit to BIM 360 document management as a cloud model with a call like this:</p>
 <pre class="prettyprint">
   Guid account = new Guid("a8d3b76e-cf23-4dd7-a090-9e893efcf949");
   Guid project = new Guid("bf46f5e3-285e-496f-be03-b5b1f8b1e154");
@@ -251,4 +251,4 @@ the project Guid and model Guid information is provided in the <em>included.attr
 <li>List the top folders with the <a href="https://forge.autodesk.com/en/docs/data/v2/reference/http/hubs-hub_id-projects-project_id-topFolders-GET">GET top folders API</a> to get all accessible top folders (depending on permission) and you their valid folder ids, or continue to get the nested folders with the <a href="https://forge.autodesk.com/en/docs/data/v2/reference/http/projects-project_id-folders-folder_id-contents-GET">list folder content API</a> until the target folder and its folder id is found and can be stored for later use.</li>
 </ul>
 <p>With this information, you can save a local file opened in Revit to BIM 360 document management as a cloud model using the same Revit API call as above.</p>
-<p>Many thanks to the BIM 360 and Revit development teams for all their work on this and to Phil for putting together this valuable overview!</p>
+<p>Many thanks to the BIM 360 and Revit development teams for all their work on this and to Phil for putting together the valuable overview!</p>
