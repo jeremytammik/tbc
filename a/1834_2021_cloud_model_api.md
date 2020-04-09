@@ -64,7 +64,7 @@ A nice big egg has been laid just in time for Easter, with the beautiful springt
 Revit 2021 has now been released
 with [numerous powerful new features](https://www.autodesk.com/products/revit/new-features).
 
-The Revit 2021 SDK is available from
+The corresponding Revit 2021 SDK is available from
 the [Revit Developer Centre](https://www.autodesk.com/developer-network/platform-technologies/revit):
 
 - Revit 2021 SDK (Update April 6, 2020)
@@ -96,7 +96,7 @@ Now you can save your Revit cloud models to either of these two.
 <img src="img/cloud_model_api_1.png" alt="Cloud Model API" title="Cloud Model API" width="800"/> <!-- 1342 -->
 </center>
 
-Revit 2021 combines the BIM 360 accounts of the current login user, from different regions together in all cloud models entrances:
+Revit 2021 combines the BIM 360 accounts of the current login user from different regions together in all cloud models entrances:
 
 - Revit Home
 - Save as Cloud Model dialog
@@ -107,8 +107,8 @@ So, Revit users can create (upload and saveas) cloud models, authoring models fr
 
 #### <a name="4.2"></a>Identifying the Region
 
-There is no access to determine which region the BIM 360 accounts/projects/models belongs to.
-This was determined based on USer research, interviews and analytic data.
+No access is provided to determine which region the BIM 360 accounts/projects/models belongs to.
+This decision was taken based on user research, interviews and analytic data.
 
 - BIM managers can set up naming conventions for their BIM 360 accounts and projects to indicate the region.
 - Only a small percentage of BIM 360 users have both EU and US region BIM 360 accounts.
