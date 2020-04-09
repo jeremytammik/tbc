@@ -25,7 +25,7 @@ https://wiki.autodesk.com/pages/viewpage.action?pageId=629756479
 
 twitter:
 
- in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon
+Happy Easter with Revit 2021 and its SDK, an new BIM 360 Docs folder permissions API and powerful new cloud model API functionality in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon https://bit.ly/cloudmodelapi
 
 A nice big egg has been laid just in time for Easter, with the beautiful springtime in full bloom
 &ndash; Revit 2021
