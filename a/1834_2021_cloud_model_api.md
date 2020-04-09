@@ -27,8 +27,14 @@ twitter:
 
  in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon
 
-&ndash; 
-...
+A nice big egg has been laid just in time for Easter, with the beautiful springtime in full bloom
+&ndash; Revit 2021
+&ndash; BIM 360 Docs folder permission API
+&ndash; Revit 2021 multi-region cloud model API
+&ndash; Cloud model API changes
+&ndash; How to open a cloud model
+&ndash; How to save a local file to a non-workshared cloud model
+&ndash; <code>SaveAsCloudModel</code> information in web browser and via the Forge DM API...
 
 linkedin:
 
@@ -50,7 +56,7 @@ A nice big egg has been laid just in time for Easter, with the beautiful springt
 - [Revit 2021](#2)
 - [BIM 360 Docs folder permission API](#3)
 - [Revit 2021 multi-region cloud model API](#4)
-    - [Revit 2021 cloud model API changes](#4.3)
+    - [Cloud model API changes](#4.3)
     - [How to open a cloud model](#4.4)
     - [How to save a local file to a non-workshared cloud model](#4.5)
     - [`SaveAsCloudModel` information in web browser](#4.6)
@@ -115,7 +121,7 @@ This decision was taken based on user research, interviews and analytic data.
 
 -->
 
-#### <a name="4.3"></a>Revit 2021 Cloud Model API Changes
+#### <a name="4.3"></a>Cloud Model API Changes
 
 The new `ModelPath` property `Region` returns the region of the BIM 360 account and project which contains this model.
 
@@ -295,3 +301,7 @@ With your Forge application, you can:
 With this information, you can save a local file opened in Revit to BIM 360 document management as a cloud model using the same Revit API call as above.
 
 Many thanks to the BIM 360 and Revit development teams for all their work on this and to Phil for putting together the valuable overview!
+
+<center>
+<img src="img/easter_bunny_postcard_1907.jpg" alt="Easter bunny" title="Easter bunny" width="336"/> <!-- 336 -->
+</center>
