@@ -254,7 +254,7 @@ They can be extracted from the URL like this:
 <img src="img/cloud_model_api_3.png" alt="Cloud Model API" title="Cloud Model API" width="900"/> <!-- 1202 -->
 </center>
 
-Navigate to your target BIM 360 Docs folder in web browser and copy the highlighted URL:
+Navigate to your target BIM 360 Docs folder in the web browser and copy the highlighted URL:
 
 <center>
 <img src="img/cloud_model_api_4.png" alt="Cloud Model API" title="Cloud Model API" width="900"/> <!-- 1104 -->
