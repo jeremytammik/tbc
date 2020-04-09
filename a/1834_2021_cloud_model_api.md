@@ -50,7 +50,6 @@ A nice big egg has been laid just in time for Easter, with the beautiful springt
 - [Revit 2021](#2)
 - [BIM 360 Docs folder permission API](#3)
 - [Revit 2021 multi-region cloud model API](#4)
-    - [Identifying the region](#4.2)
     - [Revit 2021 cloud model API changes](#4.3)
     - [How to open a cloud model](#4.4)
     - [How to save a local file to a non-workshared cloud model](#4.5)
@@ -104,6 +103,8 @@ Revit 2021 combines the BIM 360 accounts of the current login user from differen
 
 So, Revit users can create (upload and saveas) cloud models, authoring models from different regions in one Revit session.
 
+<!--
+
 #### <a name="4.2"></a>Identifying the Region
 
 No access is provided to determine which region the BIM 360 accounts/projects/models belongs to.
@@ -111,6 +112,8 @@ This decision was taken based on user research, interviews and analytic data.
 
 - BIM managers can set up naming conventions for their BIM 360 accounts and projects to indicate the region.
 - Only a small percentage of BIM 360 users have both EU and US region BIM 360 accounts.
+
+-->
 
 #### <a name="4.3"></a>Revit 2021 Cloud Model API Changes
 
