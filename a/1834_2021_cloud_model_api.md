@@ -93,7 +93,7 @@ Autodesk provides two different BIM 360 web portals and regions with different U
 Now you can save your Revit cloud models to either of these two.
 
 <center>
-<img src="img/cloud_model_api_1.png" alt="Cloud Model API" title="Cloud Model API" width="600"/> <!-- 1342>
+<img src="img/cloud_model_api_1.png" alt="Cloud Model API" title="Cloud Model API" width="800"/> <!-- 1342 -->
 </center>
 
 Revit 2021 combines the BIM 360 accounts of the current login user, from different regions together in all cloud models entrances:
@@ -243,7 +243,7 @@ To save a local Revit file to the cloud as a non-workshared cloud model, you nee
 Open a web browser, navigate to your BIM 360 project home page and copy the highlighted URL:
 
 <center>
-<img src="img/cloud_model_api_2.png" alt="Cloud Model API" title="Cloud Model API" width="600"/> <!-- 1079 -->
+<img src="img/cloud_model_api_2.png" alt="Cloud Model API" title="Cloud Model API" width="900"/> <!-- 1079 -->
 </center>
 
 The BIM 360 account id and project id are both GUID strings.
@@ -251,19 +251,19 @@ The BIM 360 account id and project id are both GUID strings.
 They can be extracted from the URL like this:
 
 <center>
-<img src="img/cloud_model_api_3.png" alt="Cloud Model API" title="Cloud Model API" width="600"/> <!-- 1202 -->
+<img src="img/cloud_model_api_3.png" alt="Cloud Model API" title="Cloud Model API" width="900"/> <!-- 1202 -->
 </center>
 
 Navigate to your target BIM 360 Docs folder in web browser and copy the highlighted URL:
 
 <center>
-<img src="img/cloud_model_api_4.png" alt="Cloud Model API" title="Cloud Model API" width="600"/> <!-- 1104 -->
+<img src="img/cloud_model_api_4.png" alt="Cloud Model API" title="Cloud Model API" width="900"/> <!-- 1104 -->
 </center>
 
 The BIM 360 folder id is embedded in this URL; in this example, it is "urn:adsk.wipemea:fs.folder:co.Jo68ieLRRcKvQr4fI2Q8uQ":
 
 <center>
-<img src="img/cloud_model_api_5.png" alt="Cloud Model API" title="Cloud Model API" width="100"/> <!-- 1274 -->
+<img src="img/cloud_model_api_5.png" alt="Cloud Model API" title="Cloud Model API" width="900"/> <!-- 1274 -->
 </center>
 
 With this information, you can save a local file which is opened in Revit to BIM 360 Document management as a cloud modellike this:
