@@ -69,7 +69,7 @@ Autodesk provides two different BIM 360 web portals and regions with different U
 Now you can save your Revit cloud models to either of these two.
 
 <center>
-<img src="img/cloud_model_api_1.png" alt="Cloud Model API" title="Cloud Model API" width="100"/> <!-- 1342>
+<img src="img/cloud_model_api_1.png" alt="Cloud Model API" title="Cloud Model API" width="600"/> <!-- 1342>
 </center>
 
 Revit 2021 combines the BIM 360 accounts of the current login user, from different regions together in all cloud models entrances:
@@ -89,38 +89,39 @@ This was determined based on USer research, interviews and analytic data.
 - BIM managers can set up naming conventions for their BIM 360 accounts and projects to indicate the region.
 - Only a small percentage of BIM 360 users have both EU and US region BIM 360 accounts.
 
-#### <a name="4.3"></a>Revit Cloud Model API Changes in Revit 2021
+#### <a name="4.3"></a>Revit 2021 Cloud Model API Changes
 
-ModelPath
+The new `ModelPath` property `Region` returns the region of the BIM 360 account and project which contains this model.
 
-The new property
+Cloud Model API changes:
 
-Region
-returns the region of the BIM 360 account and project which contains this model.
+- ModelPathUtils.ConvertCloudGUIDsToCloudPath( Guid projectGuid, Guid modelGuid ) is replaced
+  by ModelPathUtils.ConvertCloudGUIDsToCloudPath( string region, Guid projectGuid, Guid modelGuid )
+  &ndash; The new method provides an extra argument to indicate the region of the model to open.
+- Document.SaveAsCloudModel( string folderId, string modelName ) is replaced
+  by Document.SaveAsCloudModel( Guid accountId, Guid projectId, string folderId, string modelName )
+  &ndash; The new method provides two extra arguments to identify the cloud location more efficient and reliable.
+  
+#### <a name="4.4"></a>How to Open a Cloud Model
 
-Cloud Model API changes
+The region argument for ConvertCloudGUIDsToCloudPath is a string type and should be either "US" or "EMEA", depending on which BIM 360 region  account and project the model is stored in.
 
-ModelPathUtils.ConvertCloudGUIDsToCloudPath(Guid projectGuid, Guid modelGuid)
+- US &ndash; [insight.b360.autodesk.com](https://insight.b360.autodesk.com) &ndash; ModelPathUtils.CloudRegionUS
+- EU &ndash; [insight.b360.eu.autodesk.com](https://insight.b360.eu.autodesk.com) &ndash; ModelPathUtils.CloudRegionEMEA
 
-ModelPathUtils.ConvertCloudGUIDsToCloudPath(string region, Guid projectGuid, Guid modelGuid)
-The new method provides an extra argument to indicate the region of the model to open.
-Document.SaveAsCloudModel(string folderId, string modelName)	Document.SaveAsCloudModel(Guid accountId, Guid projectId, string folderId, string modelName)	The new method provides two extra arguments to identify the cloud location more efficient and reliable.
-How to open a cloud model
-The region argument for ConvertCloudGUIDsToCloudPath is a string type, it should be either "US" or "EMEA", which depend on what's the region of BIM 360 account and project this model stored in.
+Depending on where the cloud model is stored, provide the appropriate region argument "US" or "EMEA", respectively.
 
-US	https://insight.b360.autodesk.com	ModelPathUtils.CloudRegionUS
-EU	https://insight.b360.eu.autodesk.com	ModelPathUtils.CloudRegionEMEA
-So if you know where does the cloud model store, BIM 360 US or EU, and you can give the region argument as "US" or "EMEA" respectively.
-
-Note: Why not provide the region as an ENUM type, like Region {US, EMEA}?
+<!--
+Question: Why not provide the region as an ENUM type, like `Region` {`US`, `EMEA`}?
 
 We may on-board a new region in the middle of Revit release cycle, this is one AC for Revit Cloud Model Multi-Region Support Project. Revit since 2021 has the ability to fetch the supported region from cloud and automatically supports new region when the cloud infrastructure was ready.
+-->
 
-To convert a valid CloudPath with Revit API ModelPathUtils.ConvertCloudGUIDsToCloudPath, you need to register a Forge application and use Forge Data management API to get the project Guid and model Guid as the other 2 arguments.
+To convert a valid CloudPath with the Revit API call *ModelPathUtils.ConvertCloudGUIDsToCloudPath*, you need to register a Forge application and use the Forge Data Management API to get the project Guid and model Guid as the two other arguments.
 
-Please check out the Forge DM API reference - https://forge.autodesk.com/en/docs/data/v2/reference/http/hubs-GET/ - which list the hubs your Forge application can access.
+The [Forge DM API reference on `GET` hubs](https://forge.autodesk.com/en/docs/data/v2/reference/http/hubs-GET) shows how to list the hubs your Forge application can access.
 
-Here is the response body of this list hubs API, and you can filter out your interested BIM 360 account by data.attributes.name field, and also you can get the region information here, it is "EMEA" in this case.  
+Here is the response body of the list hubs API:
 
 <pre class="prettyprint">
   {
@@ -155,9 +156,12 @@ Here is the response body of this list hubs API, and you can filter out your int
   }
 </pre>
 
-Please check out the Forge DM API reference - https://forge.autodesk.com/en/docs/data/v2/reference/http/projects-project_id-folders-folder_id-contents-GET/ - which list the folder contents you plan to open.
+You can filter out the BIM 360 accounts of interest using the *data.attributes.name* field.
+You can also get the region information here; "EMEA" in this case.  
 
-Here is the response body of this list folder content API, and you can filter out your interested cloud model by included.attributes.name field, and also you can get the project Guid and model Guid information in included.attributes.extension.data field.
+The [Forge DM API reference on `GET` project folder contents](https://forge.autodesk.com/en/docs/data/v2/reference/http/projects-project_id-folders-folder_id-contents-GET) shows how to list the folder contents you plan to open.
+
+The response body looks like this:
 
 <pre class="prettyprint">
   "included": [
@@ -198,54 +202,70 @@ Here is the response body of this list folder content API, and you can filter ou
       },
 </pre>
 
-With these three pieces of information &ndash; region, project guid and model guid &ndash; you can convert a valid cloud path with the new ModelPathUtils.ConvertCloudGUIDsToCloudPath method and then open this model with OpenDocument or OpenAndActivateDocument methods.
+You can filter out the relevant cloud model using the *included.attributes.name* field;
+the project Guid and model Guid information is provided in the *included.attributes.extension.data* field.
 
-How to save a local file to cloud as Non-workshared Cloud Model
+With these three pieces of information &ndash; region, project guid and model guid &ndash; you can convert a valid cloud path with the new ModelPathUtils.ConvertCloudGUIDsToCloudPath method and then open the model with the OpenDocument or OpenAndActivateDocument methods.
 
-To save a local Revit file to cloud as Non-workshared cloud model, you need to get the BIM 360 account id, BIM 360 project id, BIM 360 folder id, and a model name. There are 2 ways to get these information.
+#### <a name="4.5"></a>How to Save a Local File to a Non-Workshared Cloud Model
 
-1 . Get these information in web browser.
+To save a local Revit file to the cloud as a non-workshared cloud model, you need to get the BIM 360 account id, BIM 360 project id, BIM 360 folder id, and a model name. There are two ways to retrieve this information:
 
-Open a web browser and go to your BIM 360 project home page as the picture below, and you can copy the url highlight.
+1. From the web browser
+2. Using the Forge DM API
+
+#### <a name="4.6"></a>SaveAsCloudModel Information in Web Browser
+
+Open a web browser, navigate to your BIM 360 project home page and copy the highlighted URL:
 
 <center>
-<img src="img/cloud_model_api_2.png" alt="Cloud Model API" title="Cloud Model API" width="100"/> <!-- 1079 -->
+<img src="img/cloud_model_api_2.png" alt="Cloud Model API" title="Cloud Model API" width="600"/> <!-- 1079 -->
 </center>
 
-Here is the mapping, and you can get the BIM 360 account id and project id in this way, both of them are guid strings.
+The BIM 360 account id and project id are both GUID strings.
+
+They can be extracted from the URL like this:
 
 <center>
-<img src="img/cloud_model_api_3.png" alt="Cloud Model API" title="Cloud Model API" width="100"/> <!-- 1202 -->
+<img src="img/cloud_model_api_3.png" alt="Cloud Model API" title="Cloud Model API" width="600"/> <!-- 1202 -->
 </center>
 
-Then go to your target BIM 360 Docs folder in web browser, like the picture below, and copy the URL highlight.
+Navigate to your target BIM 360 Docs folder in web browser and copy the highlighted URL:
+
 <center>
-<img src="img/cloud_model_api_4.png" alt="Cloud Model API" title="Cloud Model API" width="100"/> <!-- 1104 -->
+<img src="img/cloud_model_api_4.png" alt="Cloud Model API" title="Cloud Model API" width="600"/> <!-- 1104 -->
 </center>
 
-Here is the mapping, and you can get the BIM 360 folder id in this way, and it is "urn:adsk.wipemea:fs.folder:co.Jo68ieLRRcKvQr4fI2Q8uQ" in this case.
+The BIM 360 folder id is embedded in this URL; in this example, it is "urn:adsk.wipemea:fs.folder:co.Jo68ieLRRcKvQr4fI2Q8uQ":
 
 <center>
 <img src="img/cloud_model_api_5.png" alt="Cloud Model API" title="Cloud Model API" width="100"/> <!-- 1274 -->
 </center>
 
-With this information, you can save a local file which opened in Revit to BIM 360 Document management as a cloud model.
+With this information, you can save a local file which is opened in Revit to BIM 360 Document management as a cloud modellike this:
 
 <pre class="prettyprint">
-currentDocument.SaveAsCloudModel(
-	new Guid("a8d3b76e-cf23-4dd7-a090-9e893efcf949"), 			// BIM 360 account id.
-	new Guid("bf46f5e3-285e-496f-be03-b5b1f8b1e154"), 			// BIM 360 project id.
-	"urn:adsk.wipemea:fs.folder:co.Jo68ieLRRcKvQr4fI2Q8uQ",  	// BIM 360 folder id.
-	"rac_advanced_sample_project.rvt"							// model name.
+  Guid account = new Guid("a8d3b76e-cf23-4dd7-a090-9e893efcf949");
+  Guid project = new Guid("bf46f5e3-285e-496f-be03-b5b1f8b1e154");
+  string folder_id = "urn:adsk.wipemea:fs.folder:co.Jo68ieLRRcKvQr4fI2Q8uQ";
+  string model_name = "rac_advanced_sample_project.rvt";
+  
+  currentDocument.SaveAsCloudModel(
+    account, // BIM 360 account id
+    project, // BIM 360 project id
+    folder_id, // BIM 360 folder id
+    model_name // model name
 );
 </pre>
 
-2 . Get these information with Forge DM API
+#### <a name="4.6"></a>SaveAsCloudModel Information with Forge DM API
 
-With your Forge application, you can 
+With your Forge application, you can:
 
-List hubs with https://forge.autodesk.com/en/docs/data/v2/reference/http/hubs-GET/ api, and you can get region and you BIM 360 account Id.
-List projects  with https://forge.autodesk.com/en/docs/data/v2/reference/http/hubs-hub_id-projects-GET/ api, and you can get all the projects of the given hub, and you can get BIM 360 project Id.
-List top folders with https://forge.autodesk.com/en/docs/data/v2/reference/http/hubs-hub_id-projects-project_id-topFolders-GET/ api, and you can get all the top folders you have the permissions, and you can get a valid folder Id here.
-or continue to get the nested folders with list folder content https://forge.autodesk.com/en/docs/data/v2/reference/http/projects-project_id-folders-folder_id-contents-GET/ api, until you find your target folder and keep the folder Id for later use.
-With these information, you can save a local file which opened in Revit to BIM 360 Document management as cloud model as method #1 code snippet.
+- List hubs with the [GET hubs API](https://forge.autodesk.com/en/docs/data/v2/reference/http/hubs-GET) to retrieve the region and account ids.
+- List projects the [GET projects API](https://forge.autodesk.com/en/docs/data/v2/reference/http/hubs-hub_id-projects-GET) to get all the projects of the given hub and their project ids.
+- List the top folders with the [GET top folders API](https://forge.autodesk.com/en/docs/data/v2/reference/http/hubs-hub_id-projects-project_id-topFolders-GET) to get all accessible top folders (depending on permission) and you their valid folder ids, or continue to get the nested folders with the [list folder content API](https://forge.autodesk.com/en/docs/data/v2/reference/http/projects-project_id-folders-folder_id-contents-GET) until the target folder and its folder id is found and can be stored for later use.
+
+With this information, you can save a local file opened in Revit to BIM 360 document management as a cloud model using the same Revit API call as above.
+
+Many thanks to the BIM 360 and Revit development teams for all their work on this and to Phil for putting together this valuable overview!
