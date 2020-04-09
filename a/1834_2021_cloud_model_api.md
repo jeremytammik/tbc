@@ -12,6 +12,17 @@ In Revit 2021, our team updated the Revit API to support multi-region, including
 I wrote one here, and maybe we can refine it to fit the public standard.
 https://wiki.autodesk.com/pages/viewpage.action?pageId=629756479
 
+- BIM 360 Docs - Folder Permission API 
+  The blog is published. Tiny tuning and a table is for those six permissions.
+  https://forge.autodesk.com/blog/folder-permission-api-bim-360-released
+
+- version 2021 is now available for Design Automation for Revit as well.
+ 
+- Revit 2021 SDK (Update April 6, 2020)
+  https://www.autodesk.com/developer-network/platform-technologies/revit
+  REVIT_2021_SDK.msi (369348608 bytes)
+
+
 twitter:
 
  in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon
@@ -34,30 +45,43 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Revit 2021 Cloud Model API
 
-Revit 2021 has now been released.
+A nice big egg has been laid just in time for Easter, with the beautiful springtime in full bloom:
 
-The Revit 20201 SDK is available from the [Revit Developer Centre]()
+- [Revit 2021](#2)
+- [BIM 360 Docs folder permission API](#3)
+- [Revit 2021 multi-region cloud model API](#4)
+    - [Background &ndash; Revit multi-region cloud model](#4.1)
+    - [Identifying the region](#4.2)
+    - [Revit 2021 cloud model API changes](#4.3)
+    - [How to open a cloud model](#4.4)
+    - [How to save a local file to a non-workshared cloud model](#4.5)
+    - [`SaveAsCloudModel` information in web browser](#4.6)
+    - [`SaveAsCloudModel` information with Forge DM API](#4.7)
 
-#### <a name="2"></a>
 
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+#### <a name="2"></a>Revit 2021
 
-**Question:**
+Revit 2021 has now been released
+with [numerous powerful new features](https://www.autodesk.com/products/revit/new-features).
 
-**Answer:** 
+The Revit 2021 SDK is available from
+the [Revit Developer Centre](https://www.autodesk.com/developer-network/platform-technologies/revit):
 
-**Response:** 
+- Revit 2021 SDK (Update April 6, 2020)
+  <br/>REVIT_2021_SDK.msi (369348608 bytes)
 
-#### <a name="3"></a>BIM 360 
 
-Very briefly, just a quick pointer to Mikako's blog post to let you know that
-the long-awaited [BIM 360 `GET` project users API is now available](https://forge.autodesk.com/blog/get-project-users-bim-360-finally-here).
+#### <a name="3"></a>BIM 360 Docs Folder Permission API
+
+Before we dive into one of the important Revit 2021 API enhancements, here is a brief note to point out that
+the [BIM 360 Docs Folder Permission API has been released](https://forge.autodesk.com/blog/folder-permission-api-bim-360-released).
+
 
 #### <a name="4"></a>Revit 2021 Multi-Region Cloud Model API
 
-How to use the updated Revit 2021 Cloud Model API with multi-region projects and models, by Phil Xia, Team Manager, Autodesk.
+I am honoured and grateful to present the following explanation of how to use the updated Revit 2021 Cloud Model API with multi-region projects and models by Phil Xia, Team Manager, Autodesk.
 
-#### <a name="4.1"></a>Background &ndash; Revit Cloud Model Multi-Region
+#### <a name="4.1"></a>Background &ndash; Revit Multi-Region Cloud Model
 
 In Revit 2021, we released the Revit Cloud Model for Multi-Region feature.
 
