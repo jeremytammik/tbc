@@ -119,7 +119,7 @@ Modify the Visual Studio solution to use macro variables to ease the process of 
 All you need to do now is create a new configuration and the output direction, DLL references, and other items will automatically update.
 It is designed to be very generic and not at all specific to me or anyone else.
 The `sign.bat` line for signing the installed is commented out with a `REM` statement, so it won't affect anyone in its current state.
-I left it there as a guide for other people to see a nice way to do the signing in a post-build event
+I left it there as a guide for other people to see a nice way to do the signing in a post-build event.
 
 Many thanks to Harry for this useful contribution!
 
