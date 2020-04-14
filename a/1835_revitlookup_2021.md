@@ -149,3 +149,8 @@ The current release of RevitLookup including Harry enhancements is
 as [2021.0.0.2](https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.2).
 
 I look forward to receiving your pull request to cover new aspects of the new Revit API functionality!
+
+<center>
+<img src="img/pandemic_influence_on_relative_importance.png" alt="Pandemic influence on relative importance" title="Pandemic influence on relative importance" width="360"/>
+<p style="font-size: 80%; font-style:italic">Pandemic influence on relative importance</p>
+</center>
