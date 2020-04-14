@@ -28,8 +28,11 @@ twitter:
 
  in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+I hope you are happy and healthy and enjoyed your Easter eggs!
+During the holiday, I updated RevitLookup for Revit 2021, and Harry Mattison added his multi-release building enhancements into the main solution as well
+&ndash; Revit 2021 add-ins require .NET 4.8
+&ndash; RevitLookup flat migration to Revit 2021
+&ndash; Support for multi-release building...
 
 linkedin:
 
@@ -45,10 +48,10 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>RevitLookup 2021</h3>
+<h3>RevitLookup 2021 with Multi-Release Support</h3>
 <p>I hope you are happy and healthy and enjoyed your Easter eggs!</p>
 <p><a href="https://thebuildingcoder.typepad.com/blog/2020/04/revit-2021-cloud-model-api.html#2">Revit 2021</a> was
-released Last week with
+released last week with
 its <a href="https://thebuildingcoder.typepad.com/blog/2020/04/revit-2021-cloud-model-api.html#4">multi-region cloud model API</a> and
 numerous other enhancements.</p>
 <p>During the holiday, I updated RevitLookup for Revit 2021, and Harry Mattison added his multi-release building enhancements into the main solution as well:</p>
@@ -58,7 +61,10 @@ numerous other enhancements.</p>
 <li><a href="#4">Support for multi-release building</a></li>
 </ul>
 <h4><a name="2"></a>Revit 2021 Add-Ins Require .NET 4.8</h4>
-<p>I installed the Revit SK to read about the new Revit add-in system requirements.</p>
+<p>I installed the Revit SDK to read about the new Revit add-in system requirements in the <em>What's New</em> section of the help file:</p>
+<p><center>
+<img src="img/revit_2021_addin_requirements.png" alt="Add-in requirements" title="Add-in requirements" width="493"/> <!-- 493 -->
+</center></p>
 <p>The Revit 2021 API assemblies are built using .NET 4.8.</p>
 <p>At a minimum, add-ins need to target .NET 4.8 for Revit 2021. </p>
 <p>Accordingly, I set up the .NET framework 4.8 and developer pack on my system from the <a href="https://dotnet.microsoft.com">Microsoft .NET</a> website:</p>
@@ -74,11 +80,11 @@ numerous other enhancements.</p>
 <p>With the .NET 4.8 developer pack installed, I was ready for the flat migration of RevitLookup to the new version.</p>
 <p>I incremented the RevitLookup .NET framework target version and pointed to the new location for the Revit API references.</p>
 <p>It compiled right away with zero errors.</p>
-<p>The compilation does cause <a href="zip/revitlookup_2021_warnings_01.txt">three warnings</a>, though, associated with the Units API changes documented in the help file:</p>
+<p>The compilation does cause <a href="zip/revitlookup_2021_warnings_01.txt">three warnings</a>, though, associated with deprecated enumerations, properties and methods due to the Units API changes documented in the help file:</p>
 <ul>
-<li>Warning   CS0618 <code>DisplayUnitType</code> is obsolete: This enumeration is deprecated in Revit 2021 and may be removed in a future version of Revit. Please use the <code>ForgeTypeId</code> class instead. Use constant members of the <code>UnitTypeId</code> class to replace uses of specific values of this enumeration.</li>
-<li>Warning   CS0618 <code>UnitUtils.GetValidDisplayUnits(UnitType)</code> is obsolete: This method is deprecated in Revit 2021 and may be removed in a future version of Revit. Please use the <code>GetValidUnits(ForgeTypeId)</code> method instead.</li>
-<li>Warning   CS0618 <code>Field.UnitType</code> is obsolete: This property is deprecated in Revit 2021 and may be removed in a future version of Revit. Please use the <code>GetSpecTypeId()</code> method instead.</li>
+<li>Warning   CS0618 <code>DisplayUnitType</code> is obsolete: Please use the <code>ForgeTypeId</code> class instead. Use constant members of the <code>UnitTypeId</code> class to replace uses of specific values of this enumeration.</li>
+<li>Warning   CS0618 <code>UnitUtils.GetValidDisplayUnits(UnitType)</code> is obsolete: Please use the <code>GetValidUnits(ForgeTypeId)</code> method instead.</li>
+<li>Warning   CS0618 <code>Field.UnitType</code> is obsolete: Please use the <code>GetSpecTypeId()</code> method instead.</li>
 </ul>
 <p>We'll take a closer look at these later.</p>
 <p>The result of this initial flat migration is available
@@ -95,7 +101,7 @@ It is designed to be very generic and not at all specific to me or anyone else.
 The <code>sign.bat</code> line for signing the installed is commented out with a <code>REM</code> statement, so it won't affect anyone in its current state.
 I left it there as a guide for other people to see a nice way to do the signing in a post-build event</p>
 </blockquote>
-<p>Many thanks to Harry for this useful contribuiton!</p>
+<p>Many thanks to Harry for this useful contribution!</p>
 <p>After integrating his changes, all I had to do was set the configuration to Revit 2021.</p>
 <p>It had defaulted to 2019, which I do not have installed, so the Revit API assemblies were not found initially.</p>
 <p><center>
@@ -103,3 +109,6 @@ I left it there as a guide for other people to see a nice way to do the signing 
 </center></p>
 <p>Once I set the configuration to Revit 20201, it compiled as before, obviously still with the
 same <a href="zip/revitlookup_2021_warnings_01.txt">three warnings</a> listed above.</p>
+<p>The current release of RevitLookup including Harry enhancements is 
+as <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.2">2021.0.0.2</a>.</p>
+<p>I look forward to receiving your pull request to cover new aspects of the new Revit API functionality!</p>

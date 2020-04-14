@@ -29,8 +29,11 @@ twitter:
 
  in the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+I hope you are happy and healthy and enjoyed your Easter eggs!
+During the holiday, I updated RevitLookup for Revit 2021, and Harry Mattison added his multi-release building enhancements into the main solution as well
+&ndash; Revit 2021 add-ins require .NET 4.8
+&ndash; RevitLookup flat migration to Revit 2021
+&ndash; Support for multi-release building...
 
 linkedin:
 
@@ -46,12 +49,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### RevitLookup 2021
+### RevitLookup 2021 with Multi-Release Support
 
 I hope you are happy and healthy and enjoyed your Easter eggs!
 
 [Revit 2021](https://thebuildingcoder.typepad.com/blog/2020/04/revit-2021-cloud-model-api.html#2) was
-released Last week with
+released last week with
 its [multi-region cloud model API](https://thebuildingcoder.typepad.com/blog/2020/04/revit-2021-cloud-model-api.html#4) and
 numerous other enhancements.
 
@@ -63,7 +66,11 @@ During the holiday, I updated RevitLookup for Revit 2021, and Harry Mattison add
 
 #### <a name="2"></a>Revit 2021 Add-Ins Require .NET 4.8
 
-I installed the Revit SK to read about the new Revit add-in system requirements.
+I installed the Revit SDK to read about the new Revit add-in system requirements in the *What's New* section of the help file:
+
+<center>
+<img src="img/revit_2021_addin_requirements.png" alt="Add-in requirements" title="Add-in requirements" width="493"/> <!-- 493 -->
+</center>
 
 The Revit 2021 API assemblies are built using .NET 4.8.
 
@@ -90,11 +97,11 @@ I incremented the RevitLookup .NET framework target version and pointed to the n
 
 It compiled right away with zero errors.
 
-The compilation does cause [three warnings](zip/revitlookup_2021_warnings_01.txt), though, associated with the Units API changes documented in the help file:
+The compilation does cause [three warnings](zip/revitlookup_2021_warnings_01.txt), though, associated with deprecated enumerations, properties and methods due to the Units API changes documented in the help file:
 
-- Warning	CS0618 `DisplayUnitType` is obsolete: This enumeration is deprecated in Revit 2021 and may be removed in a future version of Revit. Please use the `ForgeTypeId` class instead. Use constant members of the `UnitTypeId` class to replace uses of specific values of this enumeration.
-- Warning	CS0618 `UnitUtils.GetValidDisplayUnits(UnitType)` is obsolete: This method is deprecated in Revit 2021 and may be removed in a future version of Revit. Please use the `GetValidUnits(ForgeTypeId)` method instead.
-- Warning	CS0618 `Field.UnitType` is obsolete: This property is deprecated in Revit 2021 and may be removed in a future version of Revit. Please use the `GetSpecTypeId()` method instead.
+- Warning	CS0618 `DisplayUnitType` is obsolete: Please use the `ForgeTypeId` class instead. Use constant members of the `UnitTypeId` class to replace uses of specific values of this enumeration.
+- Warning	CS0618 `UnitUtils.GetValidDisplayUnits(UnitType)` is obsolete: Please use the `GetValidUnits(ForgeTypeId)` method instead.
+- Warning	CS0618 `Field.UnitType` is obsolete: Please use the `GetSpecTypeId()` method instead.
 
 We'll take a closer look at these later.
 
@@ -114,7 +121,7 @@ It is designed to be very generic and not at all specific to me or anyone else.
 The `sign.bat` line for signing the installed is commented out with a `REM` statement, so it won't affect anyone in its current state.
 I left it there as a guide for other people to see a nice way to do the signing in a post-build event
 
-Many thanks to Harry for this useful contribuiton!
+Many thanks to Harry for this useful contribution!
 
 After integrating his changes, all I had to do was set the configuration to Revit 2021.
 
@@ -126,3 +133,8 @@ It had defaulted to 2019, which I do not have installed, so the Revit API assemb
 
 Once I set the configuration to Revit 20201, it compiled as before, obviously still with the
 same [three warnings](zip/revitlookup_2021_warnings_01.txt) listed above.
+
+The current release of RevitLookup including Harry enhancements is 
+as [2021.0.0.2](https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.2).
+
+I look forward to receiving your pull request to cover new aspects of the new Revit API functionality!
