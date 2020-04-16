@@ -1,7 +1,8 @@
-<p><head>
+<head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="bc.css">
-<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script></p>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+
 <style>
   ul.toc { list-style-type: none; }
   h1.new { font-size: 150%; }
@@ -10,199 +11,8 @@
   h4.new { font-size: 120%; }
 </style>
 
-<p></head></p>
-<!---
+</head>
 
-twitter:
-
-What's New in the Revit 2021 API #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/rvt2021apinews
-
-The Revit 2021 API includes exciting enhancements for add-in developers, including numerous developer wishes and requests that have now been explicitly addressed
-&ndash; Information sources
-&ndash; Installation and migration from previous versions
-&ndash; What's new in previous versions
-&ndash; Detailed TOC of major changes and renovations
-&ndash; API Changes
-&ndash; API Additions...
-
-linkedin:
-
--->
-
-<h3>What's New in the Revit 2021 API</h3>
-<p>The Revit 2021 API includes exciting enhancements for add-in developers, including numerous developer wishes and requests that have now been explicitly addressed:</p>
-<ul>
-<li><a href="#1">Information sources</a> </li>
-<li><a href="#2">What's new in previous versions</a> </li>
-<li><a href="#4">Detailed TOC of major changes and renovations</a></li>
-</ul>
-<h4><a name="1"></a>Information Sources</h4>
-<p>The information below is based on the contents of the <em>Revit Platform API Changes and Additions.docx</em> document included with
-the Revit 2021 SDK, the software developers kit available from 
-the <a href="https://www.autodesk.com/developer-network/platform-technologies/revit">Revit Developer Centre</a>.</p>
-<p>It is also provided in the section on <em>What's New</em> in the Revit 2021 API help file <code>RevitAPI.chm</code> included with the SDK:</p>
-<p><center>
-<img src="img/whats_new_2021.png" alt="Revit 2021 API help on What's New" width="688"/>
-</center></p>
-<p>For convenient, easy and effective web searching, this blog post provides an online version of that information, both in pure HTML (below) and as a PDF document:</p>
-<ul>
-<li><a href="zip/Revit_Platform_API_Changes_and_Additions_2021.pdf">Revit_Platform_API_Changes_and_Additions_2021.pdf</a></li>
-</ul>
-<p>The <em>What's New</em> section and the <em>Changes and Additions</em> document provide important information, both for discovering and exploring the newly added API functionality and for later reference.</p>
-<p>If you encounter any issues migrating your existing add-ins between different versions, this is one of the first places to look.</p>
-<p>For detailed information on all other aspects of the Revit API, please refer to the rest of the API documentation and samples provided in the SDK.</p>
-<p>The most important things to install and always keep at hand are:</p>
-<ul>
-<li>The Revit API help file <code>RevitAPI.chm</code></li>
-<li>The Visual Studio solution containing all the SDK samples, <code>Samples\SDKSamples.sln</code></li>
-</ul>
-<p>You will need both of these regularly for research on how to solve specific Revit API programming tasks.</p>
-<p>More in-depth official explanations and background information is provided by the
-online <a href="http://help.autodesk.com/view/RVT/2021/ENU/?guid=Revit_API_Revit_API_Developers_Guide_html">Revit API Developers Guide</a> included 
-in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online help</a>.</p>
-<h4><a name="2"></a>What's New in Previous Versions</h4>
-<p>Here are links to previous discussions of <em>What's New in the Revit API</em>:</p>
-<ul>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2010-api.html">What's New in the Revit 2010 API</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2011-api.html">What's New in the Revit 2011 API</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2012-api.html">What's New in the Revit 2012 API</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/whats-new-in-the-revit-2013-api.html">What's New in the Revit 2013 API</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">What's New in the Revit 2014 API</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html">What's New in the Revit 2015 API</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html">What's New in the Revit 2016 API</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2016/04/whats-new-in-the-revit-2017-api.html">What's New in the Revit 2017 API</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2016/11/whats-new-in-the-revit-20171-api.html">What's New in the Revit 2017.1 API</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-revit-2018-api.html">What's New in the Revit 2018 API</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2017/08/revit-20181-and-the-visual-materials-api.html">Revit 2018.1 and the Visual Materials API</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2017/09/revit-201811-fixes-cropbox-setting.html">Revit 2018.1.1 and 2018.1 API Docs Online</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html">Revit 2018.1 Visual Materials API</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2017/12/whats-new-in-the-revit-20182-api.html">What's New in the Revit 2018.2 API</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2018/04/whats-new-in-the-revit-2019-api.html">What's New in the Revit 2019 API</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html">What's New in the Revit 2020 API</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2019/09/whats-new-in-the-revit-20201-api.html">What's New in the Revit 2020.1 API</a></li>
-</ul>
-<h4><a name="4"></a>Detailed TOC of Major Changes and Renovations</h4>
-<ul class="toc">
-<li>1 <a href="#4.1">API changes</a></li>
-<ul class="toc">
-<li>1.1 <a href="#4.1.1">.NET 4.8</a></li>
-<li>1.2 <a href="#4.1.2">Requirement for Transport Layer Security (TLS) Setting in Revit Add-ons</a></li>
-<li>1.3 <a href="#4.1.3">Units API changes</a></li>
-<ul class="toc">
-<li>1.3.1 <a href="#4.1.3.1">List of deprecated and replaced APIs related to units</a></li>
-</ul>
-<li>1.4 <a href="#4.1.4">Structural Connections API changes</a></li>
-<li>1.5 <a href="#4.1.5">Electrical API changes</a></li>
-<li>1.6 <a href="#4.1.6">Cloud Model API changes</a></li>
-<li>1.7 <a href="#4.1.7">Raytrace view mode removed</a></li>
-<li>1.8 <a href="#4.1.8">Schedule API change</a></li>
-<li>1.9 <a href="#4.1.9">Slanted Walls</a></li>
-<li>1.10 <a href="#4.1.10">Path of Travel API change</a></li>
-<li>1.11 <a href="#4.1.11">Geometry API changes</a></li>
-<li>1.12 <a href="#4.1.12">Extensible Storage API change</a></li>
-<li>1.13 <a href="#4.1.13">BuiltInParameter names corrected</a></li>
-<li>1.14 <a href="#4.1.14">SpaceType names corrected</a></li>
-<li>1.15 <a href="#4.1.15">Image API changes</a></li>
-<li>1.16 <a href="#4.1.16">Obsolete API removal</a></li>
-<ul class="toc">
-<li>1.16.1.1 <a href="#4.1.16.1.1">Classes</a></li>
-<li>1.16.1.2 <a href="#4.1.16.1.2">Methods</a></li>
-</ul>
-</ul>
-
-<li>2 <a href="#4.2">API additions</a></li>
-<ul class="toc">
-<li>2.1 <a href="#4.2.1">Systems Analysis API additions</a></li>
-<ul class="toc">
-<li>2.1.1 <a href="#4.2.1.1">Mechanical Analytical Systems</a></li>
-<li>2.1.2 <a href="#4.2.1.2">Zone equipment</a></li>
-<li>2.1.3 <a href="#4.2.1.3">System-Zones</a></li>
-<li>2.1.4 <a href="#4.2.1.4">Systems Analysis and Analysis Reports</a></li>
-<li>2.1.5 <a href="#4.2.1.5">Export to gbXML</a></li>
-<li>2.1.6 <a href="#4.2.1.6">Application settings</a></li>
-</ul>
-<li>2.2 <a href="#4.2.2">Electrical API additions</a></li>
-<ul class="toc">
-<li>2.2.1 <a href="#4.2.2.1">Circuit naming</a></li>
-<li>2.2.2 <a href="#4.2.2.2">Access to circuit naming, switchboards and other properties</a></li>
-</ul>
-<li>2.3 <a href="#4.2.3">Element and ElementFilter additions</a></li>
-<ul class="toc">
-<li>2.3.1 <a href="#4.2.3.1">Element History</a></li>
-<li>2.3.2 <a href="#4.2.3.2">Element Filters</a></li>
-</ul>
-<li>2.4 <a href="#4.2.4">Document API additions</a></li>
-<li>2.5 <a href="#4.2.5">View API additions</a></li>
-<ul class="toc">
-<li>2.5.1 <a href="#4.2.5.1">Split sections</a></li>
-<li>2.5.2 <a href="#4.2.5.2">Temporary View Modes</a></li>
-<li>2.5.3 <a href="#4.2.5.3">Filters</a></li>
-</ul>
-<li>2.6 <a href="#4.2.6">Schedule API additions</a></li>
-<ul class="toc">
-<li>2.6.1 <a href="#4.2.6.1">Striped rows</a></li>
-<li>2.6.2 <a href="#4.2.6.2">Frozen header</a></li>
-</ul>
-<li>2.7 <a href="#4.2.7">Path of Travel API</a></li>
-<ul class="toc">
-<li>2.7.1 <a href="#4.2.7.1">Reveal Obstacles mode for Path of Travel</a></li>
-<li>2.7.2 <a href="#4.2.7.2">Path finding analysis for Path of Travel</a></li>
-<li>2.7.3 <a href="#4.2.7.3">Waypoints</a></li>
-</ul>
-<li>2.8 <a href="#4.2.8">Export API additions</a></li>
-<ul class="toc">
-<li>2.8.1 <a href="#4.2.8.1">CustomExporter events</a></li>
-</ul>
-<li>2.9 <a href="#4.2.9">Options API additions</a></li>
-<ul class="toc">
-<li>2.9.1 <a href="#4.2.9.1">Color options</a></li>
-</ul>
-<li>2.10 <a href="#4.2.10">Geometry API additions</a></li>
-<ul class="toc">
-<li>2.10.1 <a href="#4.2.10.1">Surfaces</a></li>
-<li>2.10.2 <a href="#4.2.10.2">Edges</a></li>
-<li>2.10.3 <a href="#4.2.10.3">Meshes</a></li>
-<li>2.10.4 <a href="#4.2.10.4">Geometry utilities</a></li>
-</ul>
-<li>2.11 <a href="#4.2.11">Image API additions</a></li>
-<ul class="toc">
-<li>2.11.1 <a href="#4.2.11.1">Image properties</a></li>
-<li>2.11.2 <a href="#4.2.11.2">Converting images between links and imports</a></li>
-</ul>
-<li>2.12 <a href="#4.2.12">Cloud Model API additions</a></li>
-<ul class="toc">
-<li>2.12.1 <a href="#4.2.12.1">Regions</a></li>
-<li>2.12.2 <a href="#4.2.12.2">Opening Cloud Models</a></li>
-</ul>
-<li>2.13 <a href="#4.2.13">Structural Connection API addition</a></li>
-<ul class="toc">
-<li>2.13.1 <a href="#4.2.13.1">Connections requiring additional points</a></li>
-</ul>
-<li>2.14 <a href="#4.2.14">Reinforcement API additions</a></li>
-<ul class="toc">
-<li>2.14.1 <a href="#4.2.14.1">Rebar constraints</a></li>
-<li>2.14.2 <a href="#4.2.14.2">Rebar end treatment</a></li>
-<li>2.14.3 <a href="#4.2.14.3">Fabric Sheet visibility</a></li>
-<li>2.14.4 <a href="#4.2.14.4">Out of plane hook rotation angles</a></li>
-<li>2.14.5 <a href="#4.2.14.5">Hook length overrides</a></li>
-</ul>
-<li>2.15 <a href="#4.2.15">Material API addition</a></li>
-<li>2.16 <a href="#4.2.16">Analysis Visualization Framework API addition</a></li>
-<li>2.17 <a href="#4.2.17">Shared Coordinates API additions</a></li>
-<ul class="toc">
-<li>2.17.1 <a href="#4.2.17.1">Internal Origin</a></li>
-<li>2.17.2 <a href="#4.2.17.2">BasePoint</a></li>
-</ul>
-</ul>
-</ul>
-
-<p/>
-
-<center>
-<div style="border-style:solid; border-width:2px 0px 2px 0px">
-<a name="4.1"></a><h1 class="new" style="font-weight: bold">API Changes</h3>
-</div>
-</center>
 
 <a name="4.1.1"></a><h2 class="new">1.1. .NET 4.8</h2>
 
@@ -1205,4 +1015,5 @@ It has the following members:
 Two new methods provide access to the base and survey point:
 
 - static BasePoint.GetProjectBasePoint() 
-- static BasePoint.GetSurveyPoint()
+- static BasePoint.GetSurveyPoint() 
+
