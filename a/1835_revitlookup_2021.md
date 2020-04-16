@@ -132,6 +132,9 @@ It is designed to be very generic and not at all specific to me or anyone else.
 The `sign.bat` line for signing the installed is commented out with a `REM` statement, so it won't affect anyone in its current state.
 I left it there as a guide for other people to see a nice way to do the signing in a post-build event.
 
+You can read more about the Advanced Installer that Harry used in his own article
+on [RevitLookup install for Revit 2021 and using Advanced Installer for easy MSI generation](https://boostyourbim.wordpress.com/2020/04/15/revit-lookup-install-for-revit-2021).
+
 Many thanks to Harry for this useful contribution!
 
 After integrating his changes, all I had to do was set the configuration to Revit 2021.
@@ -145,8 +148,8 @@ It had defaulted to 2019, which I do not have installed, so the Revit API assemb
 Once I set the configuration to Revit 20201, it compiled as before, obviously still with the
 same [three warnings](zip/revitlookup_2021_warnings_01.txt) listed above.
 
-The current release of RevitLookup including Harry enhancements is 
-as [2021.0.0.2](https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.2).
+The current release of RevitLookup including Harry's enhancements
+is [2021.0.0.2](https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.2).
 
 I look forward to receiving your pull request to cover new aspects of the new Revit API functionality!
 
