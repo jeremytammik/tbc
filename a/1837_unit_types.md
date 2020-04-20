@@ -85,6 +85,15 @@ Unfortunately, the new unit type name functionality can cause a problem loading 
 
 linkedin:
 
+Revit 2021 unit types in family type catalogues, Python training courses and padlocking in the #RevitAPI
+
+https://bit.ly/unit_type_catalog
+
+Unfortunately, the new unit type name functionality can cause a problem loading a family with a type catalogue:
+
+- Unit type update affects family type catalogue loading
+- New FreeCodeCamp courses
+- Padlocking The Building Coder...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
