@@ -94,10 +94,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Unit Types in Revit 2021
+### Revit 2021 Unit Types in Family Type Catalogues 
 
+Unfortunately, the new unit type name functionality can cause a problem loading a family with a type catalogue:
 
-####<a name="2"></a> Unit Type Name Change Affects Families
+- [Unit type update affects family type catalogue loading](#2)
+- [New FreeCodeCamp courses](#3)
+- [Padlocking The Building Coder](#4)
+
+####<a name="2"></a> Unit Type Update Affects Family Type Catalogue Loading
 
 **Question:** We have some families that fail to load in Revit 2021.
 
@@ -133,9 +138,9 @@ on [Introduction &gt; Application and Document &gt; Document Functions &gt; Unit
 
 ####<a name="3"></a> New FreeCodeCamp Courses
 
-I always enjoy browsing through the FreeCodeCamp courses recommended in Quincy Larson's weeekly newsletter.
+I always enjoy browsing through the FreeCodeCamp courses recommended in Quincy Larson's newsletter.
 
-Last weeks bunch looked especially sueful to me, for instance these:
+Last week's bunch looked especially useful to me, for instance these:
 
 - [The Ultimate Python Beginner's Handbook](https://www.freecodecamp.org/news/the-python-guide-for-beginners/)
 - [Learn Data Analysis with Python &ndash; A Free 4-Hour Course](https://www.freecodecamp.org/news/learn-data-analysis-with-python-course/)
@@ -144,7 +149,7 @@ Last weeks bunch looked especially sueful to me, for instance these:
 
 ####<a name="4"></a> Padlocking The Building Coder
 
-Last week, some colleagues noticed that some of the Autodesk developer blogs were displaying a message saying 'Not secure' in the browser address bar:
+Last week, colleagues pointed out that some of the Autodesk developer blogs were displaying a message saying 'Not secure' in the browser address bar:
 
 <center>
 <img src="img/why_no_padlock_blog_url_not_secure.png" alt="Address bar warning 'not secure'" title="Address bar warning 'not secure'" width="504"/>
@@ -167,15 +172,15 @@ Soft Failure An image with an insecure url of "http://thebuildingcoder.typepad.c
 This URL will need to be updated to use a secure URL for your padlock to return.
 </pre>
 
-In The Building Coder, it was only the banner image, and it can be simply fixed by adding `https` to the image reference in the css.
+In The Building Coder, it was only the banner image, and it can be simply fixed by adding `https` to the image reference in the CSS.
 
 <center>
 <img src="img/why_no_padlock_banner_lacks_https.png" alt="Adding https to banner image in CSS" title="Adding https to banner image in CSS" width="742"/>
 </center>
 
-Now all is well:
+Now all is well and the site is padlocked again:
 
 <center>
-<img src="img/why_no_padlock_fixed.png" alt="" title="" width="636"/>
+<img src="img/why_no_padlock_fixed.png" alt="Padlocked URL" title="Padlocked URL" width="636"/>
 </center>
 

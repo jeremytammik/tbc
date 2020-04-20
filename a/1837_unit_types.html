@@ -93,11 +93,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Unit Types in Revit 2021</h3>
-<h4><a name="2"></a> Unit Type Name Change Affects Families</h4>
+<h3>Revit 2021 Unit Types in Family Type Catalogues</h3>
+<p>Unfortunately, the new unit type name functionality can cause a problem loading a family with a type catalogue:</p>
+<ul>
+<li><a href="#2">Unit type update affects family type catalogue loading</a></li>
+<li><a href="#3">New FreeCodeCamp courses</a></li>
+<li><a href="#4">Padlocking The Building Coder</a></li>
+</ul>
+<h4><a name="2"></a> Unit Type Update Affects Family Type Catalogue Loading</h4>
 <p><strong>Question:</strong> We have some families that fail to load in Revit 2021.</p>
 <p>We have narrowed it down to a Revit change.</p>
-<p>Is there a published list of changes for parameters that we can review?</p>
 <p>When you export PIPING__FLOW (GPM) data to a type 'Family Types' in previous versions of Revit, you get something like this:</p>
 <pre>
 Cold Water Flow##PIPING_FLOW##GALLONS_US_PER_MINUTE
@@ -111,13 +116,16 @@ Cold Water Flow##PIPING_FLOW##US_GALLONS_PER_MINUTE
 <p>The bad news for us being that Revit 2021 does not accept GALLONS_US_PER_MINUTE anymore.
 Instead, it expects (and does not ‘upconvert’) the new US_GALLONS_PER_MINUTE.</p>
 <p>This is a breaking change for our existing type catalogues.</p>
-<p><strong>Answer:</strong> Yes, indeed, this is an intentional change. Sorry that it is affecting you so hard. Just as you say, no automatic upgrade from the previous version’s DB strings has been implemented.</p>
+<p>Is there a published list of changes for parameters that we can review?</p>
+<p><strong>Answer:</strong> Yes, indeed, this is an intentional change.
+Sorry that it is affecting you so hard.
+Just as you say, no automatic upgrade from the previous version’s DB strings has been implemented.</p>
 <p>We documented these changes in the <a href="https://help.autodesk.com/view/RVT/2021/ENU/?guid=Revit_API_Revit_API_Developers_Guide_html">developer guide</a>.</p>
 <p>The table of changes to database identifiers can be found at the bottom of the page
 on <a href="http://help.autodesk.com/view/RVT/2021/ENU/?guid=Revit_API_Revit_API_Developers_Guide_Introduction_Application_and_Document_Units_html">Introduction &gt; Application and Document &gt; Document Functions &gt; Units</a>.</p>
 <h4><a name="3"></a> New FreeCodeCamp Courses</h4>
-<p>I always enjoy browsing through the FreeCodeCamp courses recommended in Quincy Larson's weeekly newsletter.</p>
-<p>Last weeks bunch looked especially sueful to me, for instance these:</p>
+<p>I always enjoy browsing through the FreeCodeCamp courses recommended in Quincy Larson's newsletter.</p>
+<p>Last week's bunch looked especially useful to me, for instance these:</p>
 <ul>
 <li><a href="https://www.freecodecamp.org/news/the-python-guide-for-beginners/">The Ultimate Python Beginner's Handbook</a></li>
 <li><a href="https://www.freecodecamp.org/news/learn-data-analysis-with-python-course/">Learn Data Analysis with Python &ndash; A Free 4-Hour Course</a></li>
@@ -125,7 +133,7 @@ on <a href="http://help.autodesk.com/view/RVT/2021/ENU/?guid=Revit_API_Revit_API
 <li><a href="https://www.freecodecamp.org/news/how-to-style-your-react-apps-with-less-code-using-tailwind-css-and-styled-components/">How to Style Your React Apps with Less Code Using Tailwind CSS and Styled Components</a></li>
 </ul>
 <h4><a name="4"></a> Padlocking The Building Coder</h4>
-<p>Last week, some colleagues noticed that some of the Autodesk developer blogs were displaying a message saying 'Not secure' in the browser address bar:</p>
+<p>Last week, colleagues pointed out that some of the Autodesk developer blogs were displaying a message saying 'Not secure' in the browser address bar:</p>
 <p><center>
 <img src="img/why_no_padlock_blog_url_not_secure.png" alt="Address bar warning 'not secure'" title="Address bar warning 'not secure'" width="504"/>
 </center></p>
@@ -143,11 +151,11 @@ Soft Failure An image with an insecure url of "http://thebuildingcoder.typepad.c
 This URL will need to be updated to use a secure URL for your padlock to return.
 </pre>
 
-<p>In The Building Coder, it was only the banner image, and it can be simply fixed by adding <code>https</code> to the image reference in the css.</p>
+<p>In The Building Coder, it was only the banner image, and it can be simply fixed by adding <code>https</code> to the image reference in the CSS.</p>
 <p><center>
 <img src="img/why_no_padlock_banner_lacks_https.png" alt="Adding https to banner image in CSS" title="Adding https to banner image in CSS" width="742"/>
 </center></p>
-<p>Now all is well:</p>
+<p>Now all is well and the site is padlocked again:</p>
 <p><center>
-<img src="img/why_no_padlock_fixed.png" alt="" title="" width="636"/>
+<img src="img/why_no_padlock_fixed.png" alt="Padlocked URL" title="Padlocked URL" width="636"/>
 </center></p>
