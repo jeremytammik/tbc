@@ -76,6 +76,8 @@ why_no_padlock_banner_lacks_https.png
 
 twitter:
 
+Revit 2021 unit types in family type catalogues, Python training courses and padlocking in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/unit_type_catalog
+
 Unfortunately, the new unit type name functionality can cause a problem loading a family with a type catalogue
 &ndash; Unit type update affects family type catalogue loading
 &ndash; New FreeCodeCamp courses
