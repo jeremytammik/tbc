@@ -28,6 +28,10 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Add-In Language and BIM360 Login
 
+- [BIM360 Question? Join Accelerator!](#2)
+- [What language to choose for a Revit Add-In?](#3)
+- [The Building Coder samples 2021 migration](#4)
+
 ####<a name="2"></a> BIM360 Question? Join Accelerator!
 
 A queick question on logging in to BIM360 from Håvard Vasshaug and Dimitar Venkov of
@@ -110,3 +114,15 @@ By the way, you can also start off by writing macros instead of stand-alone add-
 
 The Revit macro environment supports both C# and Python right out of the box.
 
+####<a name="4"></a> The Building Coder Samples 2021 Migration
+
+I quickly completed the flat migration
+of [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) to Revit 2021,
+producing [release 2021.0.148.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2021.0.148.0).
+
+The only changes involve the .NET target framework and the Revit API assembly references, cf.
+the [diff to the previous version](https://github.com/jeremytammik/the_building_coder_samples/compare/2020.0.148.5...2021.0.148.0).
+
+The result of this flat migration generates [162 warnings](zip/tbc_samples_2021_migr_01.txt),
+all associated with obsolete and deprecated methods and enumeration caused by 
+the [Units API changes](https://thebuildingcoder.typepad.com/blog/2020/04/whats-new-in-the-revit-2021-api.html#4.1.3).
