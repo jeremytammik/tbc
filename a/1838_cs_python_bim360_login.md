@@ -10,8 +10,10 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+I am too busy! Ouch! Here are just a few of today's topics
+&ndash; BIM360 Question? Join Accelerator!
+&ndash; What language to choose for a Revit Add-In?
+&ndash; The Building Coder samples 2021 migration...
 
 linkedin:
 
@@ -26,7 +28,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Add-In Language and BIM360 Login
+### 2021 Migration, Add-In Language, BIM360 Research
+
+I am too busy! Ouch! Here are just a few of today's topics:
 
 - [BIM360 Question? Join Accelerator!](#2)
 - [What language to choose for a Revit Add-In?](#3)
@@ -34,10 +38,10 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> BIM360 Question? Join Accelerator!
 
-A queick question on logging in to BIM360 from Håvard Vasshaug and Dimitar Venkov of
+A quick question on logging in to BIM360 from Håvard Vasshaug and Dimitar Venkov of
 the [Bad Monkeys](https://www.badmonkeys.net) (not to be confused with the [thriller of the same name](https://en.wikipedia.org/wiki/Bad_Monkeys) &ndash; featuring Jane, who claims that she works for a secret organization devoted to fighting evil and that she is the operative for the Department for the Final Disposition of Irredeemable Persons, also known as Bad Monkeys):
 
-**Question:** We are using Revit Batch Processor to open multiple Revit models and run a selection of Python scripts on each in order to standardize their content and settings.
+**Question:** We are using Revit Batch Processor to open multiple Revit models and run a selection of Python scripts on each in order to standardise their content and settings.
 
 One client is asking if we can build it to support BIM360.
 
@@ -77,7 +81,7 @@ Thank you!
 ####<a name="3"></a> What Language to choose for a Revit Add-In?
 
 **Question:** What language would you recommend me to start learning to program with Revit API?
-Is [Python](https://www.python.org) fully functional by itself or does it needs [pyRevit](https://github.com/eirannejad/pyRevit) installed to work?
+Is [Python](https://www.python.org) fully functional by itself or does it need [pyRevit](https://github.com/eirannejad/pyRevit) installed to work?
 Can you program independent Applications with Python?
 
 **Answer:** Here are my off-hand answers:
@@ -90,7 +94,7 @@ Pick the one you like best. It must support .NET.
 
 No, because it does not support .NET out of the box. Therefore, you need some kind of .NET support for it to interact with Revit API.
 
-&gt; Does it needs pyRevit installed to work?
+&gt; Does it need pyRevit installed to work?
 
 No, not necessarily. That is one possible way to go. Another is the RevitPythonShell. Another is IronPython.
 
@@ -124,5 +128,5 @@ The only changes involve the .NET target framework and the Revit API assembly re
 the [diff to the previous version](https://github.com/jeremytammik/the_building_coder_samples/compare/2020.0.148.5...2021.0.148.0).
 
 The result of this flat migration generates [162 warnings](zip/tbc_samples_2021_migr_01.txt),
-all associated with obsolete and deprecated methods and enumeration caused by 
+all associated with obsolete and deprecated methods and enumerations caused by 
 the [Units API changes](https://thebuildingcoder.typepad.com/blog/2020/04/whats-new-in-the-revit-2021-api.html#4.1.3).
