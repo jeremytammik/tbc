@@ -31,7 +31,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>I am too busy! Ouch! Here are just a few of today's topics:</p>
 <ul>
 <li><a href="#2">BIM360 Question? Join Accelerator!</a></li>
-<li><a href="#3">What language to choose for a Revit Add-In?</a></li>
+<li><a href="#3">What language to choose for a Revit Add-In?</a><ul>
+<li><a href="#3.1">Addendum &ndash; C&#35; versus Python</a></li>
+<li><a href="#3.2">Python and .NET</a></li>
+</ul>
+</li>
 <li><a href="#4">The Building Coder samples 2021 migration</a></li>
 </ul>
 <h4><a name="2"></a> BIM360 Question? Join Accelerator!</h4>
@@ -78,6 +82,29 @@ Can you program independent Applications with Python?</p>
 <p>The RevitPythonShell gives me that when I really need to dig deeper interactively.</p>
 <p>By the way, you can also start off by writing macros instead of stand-alone add-ins.</p>
 <p>The Revit macro environment supports both C# and Python right out of the box.</p>
+<h4><a name="3.1"></a> Addendum &ndash; C&#35; versus Python</h4>
+<p><strong>Sean Page adds:</strong> I would second what Jeremy stated. I myself am exclusively C# when it comes to add-in or ZT nodes for Dynamo. I just prefer the ease of it just working, and the vast resources openly available for it. I would also say in terms of the Revit API, forcing yourself to use C# and explicitly define everything is a great way to learn, but may be a little slow at first because some things are a little more convoluted than they need to be.</p>
+<p><strong>Steve R adds:</strong> I would also recommend C#, just because you will find the most examples in C#, and probably the most help from others if you use C#. </p>
+<p>I'm still a beginner at this programming stuff, but the comment about Python needing another program to work with .NET confuses me.  Both the SharpDevelop built-in macro editor and Microsoft Visual Studio provide the options for either C# or Python. I was under the impression that using either would basically create the same DLL file.</p>
+<p>Am I completely misunderstanding, or maybe things have changed and Python no longer has the same limitations it once had?</p>
+<p><strong>Richard Thomas adds:</strong> Also worth mentioning that Python can be used to extend Dynamo and that is interesting given the possibilities that Dynamo is now offering to those starting out their path to automation, e.g., generative design, rapid generation of geometry, linking different programs etc. Although you can also develop custom nodes in Dynamo with C# but inherently Dynamo is extended with Python code blocks.</p>
+<p>Having said that I would choose C# over Python since it is one of the languages explicitly written for .NET.
+IronPython is a .NET implementation of Python.</p>
+<p>If you choose Python at an earlier stage in life then IronPython is how you would write a .NET application with it.</p>
+<p>If you choose C at an earlier stage of life then C# would be your choice.</p>
+<p>If you are only just making the choice you would choose either C# or VB.Net since they have the best IDE support in VS. Your Tab and BackSpace keys will also thank you, less work for them.</p>
+<p>Many thanks for your contributions and clarifications!</p>
+<h4><a name="3.2"></a> Python and .NET</h4>
+<p>Some ruminations in response to Steve's question above:</p>
+<p>Hmm. I am not aware of any possibility to reference .NET assemblies in Python in Visual Studio out of the box.</p>
+<p>Yes, Revit's SharpDevelop built-in macro IDE includes support for Python.
+I believe that uses IronPython internally to hook up the Python code with .NET.</p>
+<p>I looked at the <a href="https://docs.microsoft.com/en-us/visualstudio/python/overview-of-python-tools-for-visual-studio?view=vs-2019">overview of Python tools for Visual Studio</a> and found a note saying, <em>Visual Studio also supports IPython/Jupyter in the REPL, including inline plots, .NET, and Windows Presentation Foundation (WPF)</em>, but nothing else hinting at .NET support for Python in that environment.</p>
+<p>Maybe Visual Studio can be combined with IronPython, as hinted at in the discussion
+on <a href="https://stackoverflow.com/questions/2851898/ironpython-visual-studio-2010-or-sharpdevelop">IronPython &ndash; Visual Studio 2010 or SharpDevelop?</a>.</p>
+<p>However, I also see this unanswered StackOverflow question
+on <a href="https://stackoverflow.com/questions/54474775/using-python-for-net-for-python3-4-in-visual-studio">using Python for .NET for Python 3.4 in Visual Studio</a> that seems to indicate it is not supported out of the box.</p>
+<p>Actually, if you look directly at the <a href="https://ironpython.net">IronPython</a> site and its <a href="https://ironpython.net/documentation/dotnet/">.NET integration documentation</a>, it seems to be pretty straightforward in any context.</p>
 <h4><a name="4"></a> The Building Coder Samples 2021 Migration</h4>
 <p>I quickly completed the flat migration
 of <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> to Revit 2021,

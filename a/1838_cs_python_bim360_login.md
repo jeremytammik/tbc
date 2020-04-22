@@ -34,6 +34,8 @@ I am too busy! Ouch! Here are just a few of today's topics:
 
 - [BIM360 Question? Join Accelerator!](#2)
 - [What language to choose for a Revit Add-In?](#3)
+    - [Addendum &ndash; C&#35; versus Python](#3.1)
+    - [Python and .NET](#3.2)
 - [The Building Coder samples 2021 migration](#4)
 
 ####<a name="2"></a> BIM360 Question? Join Accelerator!
@@ -117,6 +119,50 @@ The RevitPythonShell gives me that when I really need to dig deeper interactivel
 By the way, you can also start off by writing macros instead of stand-alone add-ins.
 
 The Revit macro environment supports both C# and Python right out of the box.
+
+####<a name="3.1"></a> Addendum &ndash; C&#35; versus Python
+
+**Sean Page adds:** I would second what Jeremy stated. I myself am exclusively C# when it comes to add-in or ZT nodes for Dynamo. I just prefer the ease of it just working, and the vast resources openly available for it. I would also say in terms of the Revit API, forcing yourself to use C# and explicitly define everything is a great way to learn, but may be a little slow at first because some things are a little more convoluted than they need to be.
+
+**Steve R adds:** I would also recommend C#, just because you will find the most examples in C#, and probably the most help from others if you use C#. 
+
+I'm still a beginner at this programming stuff, but the comment about Python needing another program to work with .NET confuses me.  Both the SharpDevelop built-in macro editor and Microsoft Visual Studio provide the options for either C# or Python. I was under the impression that using either would basically create the same DLL file.
+
+Am I completely misunderstanding, or maybe things have changed and Python no longer has the same limitations it once had?
+ 
+**Richard Thomas adds:** Also worth mentioning that Python can be used to extend Dynamo and that is interesting given the possibilities that Dynamo is now offering to those starting out their path to automation, e.g., generative design, rapid generation of geometry, linking different programs etc. Although you can also develop custom nodes in Dynamo with C# but inherently Dynamo is extended with Python code blocks.
+
+Having said that I would choose C# over Python since it is one of the languages explicitly written for .NET.
+IronPython is a .NET implementation of Python.
+
+If you choose Python at an earlier stage in life then IronPython is how you would write a .NET application with it.
+
+If you choose C at an earlier stage of life then C# would be your choice.
+
+If you are only just making the choice you would choose either C# or VB.Net since they have the best IDE support in VS. Your Tab and BackSpace keys will also thank you, less work for them.
+
+Many thanks for your contributions and clarifications!
+
+
+####<a name="3.2"></a> Python and .NET
+
+Some ruminations in response to Steve's question above:
+
+Hmm. I am not aware of any possibility to reference .NET assemblies in Python in Visual Studio out of the box.
+
+Yes, Revit's SharpDevelop built-in macro IDE includes support for Python.
+I believe that uses IronPython internally to hook up the Python code with .NET.
+
+I looked at the [overview of Python tools for Visual Studio](https://docs.microsoft.com/en-us/visualstudio/python/overview-of-python-tools-for-visual-studio?view=vs-2019) and found a note saying, *Visual Studio also supports IPython/Jupyter in the REPL, including inline plots, .NET, and Windows Presentation Foundation (WPF)*, but nothing else hinting at .NET support for Python in that environment.
+
+Maybe Visual Studio can be combined with IronPython, as hinted at in the discussion
+on [IronPython &ndash; Visual Studio 2010 or SharpDevelop?](https://stackoverflow.com/questions/2851898/ironpython-visual-studio-2010-or-sharpdevelop).
+
+However, I also see this unanswered StackOverflow question
+on [using Python for .NET for Python 3.4 in Visual Studio](https://stackoverflow.com/questions/54474775/using-python-for-net-for-python3-4-in-visual-studio) that seems to indicate it is not supported out of the box.
+
+Actually, if you look directly at the [IronPython](https://ironpython.net) site and its [.NET integration documentation](https://ironpython.net/documentation/dotnet/), it seems to be pretty straightforward in any context.
+
 
 ####<a name="4"></a> The Building Coder Samples 2021 Migration
 
