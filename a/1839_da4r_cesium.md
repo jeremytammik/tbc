@@ -129,7 +129,7 @@ Rahul Bhobe clarifies that all the add-in's `SystemConsole.WriteLine` output is 
 Another StackOverflow question asks
 [how to pass a text file as input to DA4R](https://stackoverflow.com/questions/61395452/autodesk-design-automation-revit-text-file-as-input):
 
-**Question:** The Revit API I developed takes 3D point data from a text file as input and creates <!-- adaptive components --> RVT family files and eventually complex geometry by placing them on the right point coordinates.
+**Question:** I developed a Revit add-in that takes 3D point data from a text file as input and creates <!-- adaptive components --> RVT family files and eventually complex geometry by placing them at the appropriate point coordinates.
 
 The text file looks like this:
 
