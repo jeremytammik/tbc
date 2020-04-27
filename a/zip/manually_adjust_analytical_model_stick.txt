@@ -1,0 +1,42 @@
+def getGeometry (element):
+    opt = Options()
+    opt.ComputeReferences = True
+    geometry = element.get_Geometry(opt)
+    for elem in geometry.GetEnumerator():
+        if type(elem) is  GeometryInstance:
+            geomInstance = elem.GetInstanceGeometry()
+        else:
+            geomInstance = geometry
+    return geomInstance
+
+from Autodesk.Revit.DB.Structure import AnalyticalCurveSelector,AnalyticalModelSelector
+trans = Transaction(doc, "testing")
+trans.Start()
+model = doc.GetElement(ElementId(3283822)) # AnalyticalModelStick
+aCurve = model.GetCurve()
+aSelector = AnalyticalModelSelector(aCurve)
+aSelector.CurveSelector = AnalyticalCurveSelector.StartPoint
+refSource = model.GetReference(aSelector)
+point = doc.GetElement(ElementId(3898177))  # ReferencePoint
+pointGeo = getGeometry(point)
+for i in pointGeo:
+    refTarget = i.Reference
+model.ManuallyAdjust(refSource, refTarget)
+trans.Commit()
+
+trans = Transaction(doc, "testing")
+trans.Start()
+point = doc.GetElement(ElementId(3898177))  # single ReferencePoint
+pointGeo = getGeometry(point)
+for i in pointGeo:
+    refTarget = i.Reference
+point = doc.GetElement(ElementId(3574684))  # ReferencePoint at the end of AnalyticalModelStick
+pointGeo = getGeometry(point)
+for i in pointGeo:
+    refSource = i.Reference
+res = doc.Create.NewAlignment(doc.ActiveView, refTarget,refSource)
+print(res)
+trans.Commit()
+
+
+
