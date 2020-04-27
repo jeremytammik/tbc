@@ -33,8 +33,14 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Forge Design Automation for Revit or DA4R is really starting to take off
+&ndash; Display custom properties
+&ndash; Upgrade Revit file version
+&ndash; Logging 
+&ndash; Input and output files
+&ndash; CesiumJS open source 3D mapping
+&ndash; Banksy's wife hates home office
+&ndash; Virtual Forge accelerator...
 
 linkedin:
 
