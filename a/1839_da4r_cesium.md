@@ -49,7 +49,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### DA4R 
+### DA4R I/O, Logging, Updater and Custom Properties
 
 Forge Design Automation for Revit or DA4R is really starting to take off.
 
@@ -95,7 +95,7 @@ Another recent Forge sample by Zhong [@johnonsoftware](https://twitter.com/johno
 demonstrates how to upgrade Revit project, family and template files to the latest version using Design Automation for Revit, including support for either individual files or entire folder.
 
 <center>
-<img src="img/zw_forge_upgradefiles_revit.png" alt="Custom properties displaying RVT data using DA4R" title="Custom properties displaying RVT data using DA4R" width="800"/>
+<img src="img/zw_forge_upgradefiles_revit.png" alt="DA4R file upgrader" title="DA4R file upgrader" width="800"/>
 </center>
 
 ####<a name="4"></a> Logging in a Revit Design Automation Add-In
@@ -184,5 +184,9 @@ Take a look at the [getting started introduction](https://www.cesium.com/docs/tu
 ####<a name="7"></a> Banksy's Wife Hates Home Office
 
 Let's round off with something non-technical, a new contribution
-from [Banksy, saying, My wife hates it when I work from home](https://www.instagram.com/p/B_Aqdh4Jd5x/?utm_source=ig_web_button_share_sheet
+from [Banksy](https://en.wikipedia.org/wiki/Banksy), saying,
+[My wife hates it when I work from home](https://www.instagram.com/p/B_Aqdh4Jd5x):
 
+<center>
+<img src="img/banksy_working_at_home.png" alt="Banksy working from home" title="Banksy working from home" width="800"/>
+</center>
