@@ -31,7 +31,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+ Virtual Forge accelerators, Design Automation for Revit input and output files, logging, RVT file version updater and custom properties in the viewer with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/da4rcustomprops
 
 Forge Design Automation for Revit or DA4R is really starting to take off
 &ndash; Display custom properties
