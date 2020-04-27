@@ -53,14 +53,31 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Forge Design Automation for Revit or DA4R is really starting to take off.
 
-Let's take a look at some recent topicw that came up:
+Let's take a look at some recent topics:
+
+- [Display custom properties using DA4R](#2)
+- [Upgrade Revit file version with DA4R](#3)
+- [Logging in a Revit Design Automation add-in](#4)
+- [DA4R input and output files](#5)
+- [CesiumJS open source 3D mapping](#6)
+- [Banksy's wife hates home office](#7)
+
+By the way, if you are interested in diving in deeper into DA4R yourself, one of the easiest and most effective way to do so is 
+to [join a Forge accelerator](https://forge.autodesk.com/accelerator-program).
+Since they are virtual nowadays, a larger number of developers can participate.
+Participating actively will guarantee you answers to any questions you may encounter and ensure you have ongoing support for the proof of concept.
+You might even get your whole application completed right away during the accelerator.
+
+I wish you good luck and lots of fun diving into DA4R!
 
 
-####<a name="2"></a> Display Custom Properties using Design Automation
+####<a name="2"></a> Display Custom Properties using DA4R
 
 Augusto [@augustomaia](https://twitter.com/augustomaia) Goncalves published a nice article
 on [custom properties using Design Automation](https://forge.autodesk.com/blog/custom-properties-using-design-automation) showing
 how to implement a Forge viewer extension that displays standard Revit data already available in the RVT model but not handled by the standard Forge translation using DA4R to extract the Revit properties from BIM360 and add them as custom properties to the Forge viewer.
+
+He picked the compound layer structure of walls as an example of pre-existing BIM data to display in Forge.
 
 The sample code is provided in
 the [forge-customproperty-revit GitHub repository](https://github.com/augustogoncalves/forge-customproperty-revit).
@@ -71,11 +88,11 @@ the [forge-customproperty-revit GitHub repository](https://github.com/augustogon
 
 
 
-####<a name="3"></a> Upgrade Revit File Version with Design Automation
+####<a name="3"></a> Upgrade Revit File Version with DA4R
 
 Another recent Forge sample by Zhong [@johnonsoftware](https://twitter.com/johnonsoftware) Wu,
 [forge-upgradefiles-revit](https://github.com/Autodesk-Forge/forge-upgradefiles-revit),
-demostrates how to upgrade Revit project, family and template files to the latest version using Design Automation for Revit, including support for either individual files or entire folder.
+demonstrates how to upgrade Revit project, family and template files to the latest version using Design Automation for Revit, including support for either individual files or entire folder.
 
 <center>
 <img src="img/zw_forge_upgradefiles_revit.png" alt="Custom properties displaying RVT data using DA4R" title="Custom properties displaying RVT data using DA4R" width="800"/>
@@ -87,7 +104,7 @@ In the StackOverflow discussion
 on [logging in Revit Design Automation add-in](https://stackoverflow.com/questions/61384581/logging-in-revit-design-automation-add-in),
 Rahul Bhobe clarifies that all the add-in's `SystemConsole.WriteLine` output is captured in the running workitem's `report.txt`.
 
-####<a name="5"></a> DA4R input and Output Files
+####<a name="5"></a> DA4R Input and Output Files
 
 Another StackOverflow question asks
 [how to pass a text file as input to DA4R](https://stackoverflow.com/questions/61395452/autodesk-design-automation-revit-text-file-as-input):
@@ -105,7 +122,7 @@ The text file looks like this:
 
 I am basically reading the text data as input for creating the adaptive component family and then creating complex geometry by placing the adaptive components. Now, if I want to convert the add-in to use the Design automation API, I guess I will not be able to use text file as input.
 
-My question is, what type of input file should I use to pass theb 3D point coordinates described above? Should it be JSON? If it needs to be JSON, then how I should write it to represent these point coordinates? 
+My question is, what type of input file should I use to pass the 3D point coordinates described above? Should it be JSON? If it needs to be JSON, then how I should write it to represent these point coordinates? 
 
 **Answer:** The slightly more complex question is how to generate multiple output files.
 
@@ -164,36 +181,8 @@ Moving away from the Revit API and DA4R, I stumbled across this very powerful an
 
 Take a look at the [getting started introduction](https://www.cesium.com/docs/tutorials/getting-started/) to get a feel for it.
 
-####<a name="7"></a> banksy: My wife hates it when I work from home.
+####<a name="7"></a> Banksy's Wife Hates Home Office
 
 Let's round off with something non-technical, a new contribution
 from [Banksy, saying, My wife hates it when I work from home](https://www.instagram.com/p/B_Aqdh4Jd5x/?utm_source=ig_web_button_share_sheet
 
-
-
-####<a name="2"></a> DA4R Question? Join Accelerator!
-
-
-**Question:** 
-
-**Answer:** 
-
-Your best bet for getting a reliable answer is to ask through
-the [regular Forge help channels](https://forge.autodesk.com/en/support/get-help).
-
-Better still, another approach yet more effective would be
-to [join a Forge accelerator](https://forge.autodesk.com/accelerator-program) and ask there.
-
-Since they are virtual nowadays, more people can participate.
-
-That will guarantee you both an answer to your question and ensure you have ongoing support for the proof of concept.
-
-You might even get your whole application completed right away during the accelerator.
-
-How does that sound to you?
-
-**Response:** 
-
-
-
-####<a name="3"></a> 
