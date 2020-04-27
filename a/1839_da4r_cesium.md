@@ -129,7 +129,7 @@ Rahul Bhobe clarifies that all the add-in's `SystemConsole.WriteLine` output is 
 Another StackOverflow question asks
 [how to pass a text file as input to DA4R](https://stackoverflow.com/questions/61395452/autodesk-design-automation-revit-text-file-as-input):
 
-**Question:** The Revit API I developed takes 3D point data from a text file as input and creates adaptive components RVT family files and eventually complex geometry by placing them on the right point coordinates.
+**Question:** The Revit API I developed takes 3D point data from a text file as input and creates <!-- adaptive components --> RVT family files and eventually complex geometry by placing them on the right point coordinates.
 
 The text file looks like this:
 
@@ -140,7 +140,9 @@ The text file looks like this:
   ...
 </pre>
 
-I am basically reading the text data as input for creating the adaptive component family and then creating complex geometry by placing the adaptive components. Now, if I want to convert the add-in to use the Design automation API, I guess I will not be able to use text file as input.
+I am basically reading the text data as input for creating the <!-- adaptive component --> family definition.
+<!-- and then creating complex geometry by placing the adaptive components. -->
+Now, when converting the add-in to use the Design Automation API, I guess I will not be able to continue using this simple text file as input.
 
 My question is, what type of input file should I use to pass the 3D point coordinates described above? Should it be JSON? If it needs to be JSON, then how I should write it to represent these point coordinates? 
 
