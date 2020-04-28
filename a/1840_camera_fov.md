@@ -36,8 +36,10 @@ twitter:
 
 the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash; 
-...
+Today we resuscitate a five-year old Revit API answer, still as fresh and useful as ever, followed by Forge and job opportunities truly fresh off the presses
+&ndash; Determining the Revit Camera FOV
+&ndash; Forge Partner Talks
+&ndash; Jobs at Autodesk...
 
 linkedin:
 
