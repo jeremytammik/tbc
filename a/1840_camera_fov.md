@@ -34,7 +34,7 @@ Here are a few roles highlighted in April and May:
 
 twitter:
 
-the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Forge partner talks, jobs at Autodesk and determining the Revit camera field of view in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/rvtcamerafov
 
 Today we resuscitate a five-year old Revit API answer, still as fresh and useful as ever, followed by Forge and job opportunities truly fresh off the presses
 &ndash; Determining the Revit Camera FOV
