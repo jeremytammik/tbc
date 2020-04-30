@@ -1,0 +1,268 @@
+﻿Imports Autodesk.Revit.DB
+Imports Autodesk.Revit.UI
+
+<Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)> _
+<Autodesk.Revit.Attributes.Journaling(Autodesk.Revit.Attributes.JournalingMode.NoCommandData)> _
+<Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)> _
+Public Class MinRepCase
+    Implements IExternalCommand
+
+    Private IntApp As Autodesk.Revit.UI.UIApplication
+    Private IntUIDoc As Autodesk.Revit.UI.UIDocument
+    Private IntDoc As Autodesk.Revit.DB.Document
+
+    Private Class ISelectionFilterOfCategory
+        Implements Selection.ISelectionFilter
+        Private IntCat As BuiltInCategory = BuiltInCategory.INVALID
+        Public Sub New(Cat As BuiltInCategory)
+            IntCat = Cat
+        End Sub
+        Public Function AllowElement(elem As Element) As Boolean Implements Selection.ISelectionFilter.AllowElement
+            Return elem.Category.Id.IntegerValue = CInt(IntCat)
+        End Function
+        Public Function AllowReference(reference As Reference, position As XYZ) As Boolean Implements Selection.ISelectionFilter.AllowReference
+            Return False
+        End Function
+    End Class
+
+
+    Public Function Execute(commandData As ExternalCommandData, ByRef message As String, elements As ElementSet) As Result Implements IExternalCommand.Execute
+        IntApp = commandData.Application
+        IntUIDoc = IntApp.ActiveUIDocument
+        If IntUIDoc Is Nothing Then Return Result.Cancelled Else 
+        IntDoc = IntApp.ActiveUIDocument.Document
+
+        Dim R_Flr As Reference = Nothing
+        Dim R_Fra As Reference = Nothing
+        Try
+            R_Flr = IntUIDoc.Selection.PickObject(Selection.ObjectType.Element, New ISelectionFilterOfCategory(BuiltInCategory.OST_Floors), "Pick floor")
+            R_Fra = IntUIDoc.Selection.PickObject(Selection.ObjectType.Element, New ISelectionFilterOfCategory(BuiltInCategory.OST_StructuralFraming), "Pick structural framing")
+        Catch ex As Exception
+        End Try
+        If R_Flr Is Nothing OrElse R_Fra Is Nothing Then Return Result.Cancelled Else 
+
+        Dim Ops As New Options With {.ComputeReferences = True, .DetailLevel = ViewDetailLevel.Fine, .IncludeNonVisibleObjects = False}
+
+
+        Dim SF_Fs As List(Of PlanarFace) = GetPlanarFacesFromElement_SymbolGeom(IntDoc.GetElement(R_Fra), Ops)
+        Dim FL_Fs As List(Of PlanarFace) = GetPlanarFacesFromElement_SymbolGeom(IntDoc.GetElement(R_Flr), Ops)
+
+        'For convenience use bottom face
+        Dim FL_BtmF = From x As PlanarFace In FL_Fs
+                    Where x.FaceNormal.Z < -0.9
+                    Select x
+
+        'For convenience use face with largest area
+        Dim SF_F As PlanarFace = SF_Fs.Find(Function(Y) Y.Area = SF_Fs.Max(Function(x) x.Area))
+        If SF_F Is Nothing Then Return Result.Cancelled Else 
+
+        Dim FL_BtmFLst As List(Of PlanarFace) = FL_BtmF.ToList
+        If FL_BtmFLst.Count = 0 Then Return Result.Cancelled Else
+
+        ' To do the Face/Face intersection, you need the instance face
+        ' Use this routine to find a match
+        Dim SF_FInst As PlanarFace = SF_F
+
+        Dim SF_FI As FamilyInstance = IntDoc.GetElement(R_Fra)
+        'No instances, nothing to transform
+        If (SF_FI IsNot Nothing And Not SF_FI.HasModifiedGeometry()) Then
+            Dim InstT As Transform = GetInstanceTransform(IntDoc.GetElement(R_Fra), Ops)
+            SF_FInst = FindPlanarFaceMatching(IntDoc.GetElement(R_Fra), SF_F, InstT)
+        End If
+
+        Dim Crv As Curve = Nothing
+        Dim Res As FaceIntersectionFaceResult = FL_BtmFLst(0).Intersect(SF_FInst, Crv)
+
+        Dim Pln As Plane = Plane.CreateByNormalAndOrigin(FL_BtmFLst(0).FaceNormal, FL_BtmFLst(0).Origin)
+
+
+        'Can see from plotting this line that the curve Crv resulting from the Intersect function is in instance space
+        'By comparison of Crv end points we can see that the line does coincide with the face plane (in instance space)
+        'Curve (crv) has Y direction, face normal is in X direction
+        'Each endpoint has x ord that matches x ord of face origin (so is coincident with the face plane)
+        Dim Xords As Double() = New Double(2) {Crv.GetEndPoint(0).X, Crv.GetEndPoint(1).X, SF_F.Origin.X}
+
+
+
+        Using Tx As New Transaction(IntDoc, "Test")
+            If Tx.Start = TransactionStatus.Started Then
+
+                Dim SKP As SketchPlane = SketchPlane.Create(IntDoc, Pln)
+                IntDoc.Create.NewModelCurve(Crv, SKP)
+
+                Dim FS As FamilySymbol = GetTestFamilySymbol(IntDoc)
+
+                Dim Fi As FamilyInstance
+
+                Try
+                    'For the uncut beam this function fails with ArgumentInconsistentException
+                    '...line as it does not coincide with the input face (but it does)
+                    'For the cut beam this function passes since all coords are instance space
+                    Fi = IntDoc.Create.NewFamilyInstance(SF_F.Reference, Crv, FS)
+                Catch ex As Exception
+                End Try
+
+
+
+                'If InstT Is Nothing = False Then
+                '    'We transform curve (crv) from instance into symbol space in order to pass the coincident with face test
+                '    'but this creates an element in the wrong place
+                '    'review workplane of placed family and you'll see the host is the side of the beam but 
+                '    'the element is positioned in the symbol space of the host beam and therefore is remote from the host face
+                '    Dim Pt1_t As XYZ = Crv.GetEndPoint(0)
+                '    Dim Pt2_t As XYZ = Crv.GetEndPoint(1)
+
+                '    Pt1_t = InstT.Inverse.OfPoint(Pt1_t)
+                '    Pt2_t = InstT.Inverse.OfPoint(Pt2_t)
+                '    Crv = Line.CreateBound(Pt1_t, Pt2_t)
+                'End If
+
+                'Try
+                '    'For the uncut beam this function works (if we transform the line coordinates to SymbolSpace
+                '    'However the resulting position (in symbol space) is not what we want
+                '    'For the cut beam this function fails (as would be expected with unnecessary coord transformation)
+                '    Fi = IntDoc.Create.NewFamilyInstance(SF_F.Reference, Crv, FS)
+                'Catch ex As Exception
+                'End Try
+
+                'From the above it seems that the API method is comparing an instance space curve position with a symbol space face position
+                'and returning a face not coincident with curve error which in reality doesn't exist.
+                'Furthermore if we trick the API method by supplying a curve transformed into symbol space for comparison with the face
+                'it will allow the creation of an element in a position that should not be possible (and is not possible using the UI)
+
+
+                Tx.Commit()
+            End If
+        End Using
+
+
+
+
+
+        Return Result.Succeeded
+    End Function
+
+    Private Shared Function GetTestFamilySymbol(D As Document) As FamilySymbol
+
+        Dim FEC As New FilteredElementCollector(D)
+        Dim ECF As New ElementCategoryFilter(BuiltInCategory.OST_StructuralFraming)
+        Dim Els As List(Of Element) = FEC.WherePasses(ECF).WhereElementIsElementType.ToElements
+
+        Dim Out = From x As Element In Els
+                  Where x.Name = "TestFamily"
+                  Select x
+
+        Dim FS As FamilySymbol = Out(0)
+        If FS.IsActive = False Then
+            FS.Activate()
+        End If
+
+        Return FS
+    End Function
+
+
+    Public Shared Function GetInstanceTransform(El As Autodesk.Revit.DB.Element, Options As Options) As Transform
+
+        Dim ElInst As Instance = El
+
+        Return ElInst.GetTransform()
+        'Dim geomElem As Autodesk.Revit.DB.GeometryElement = El.Geometry(Options)
+
+        'Dim S_L2 As IEnumerable(Of GeometryInstance)
+        'S_L2 = From J As GeometryObject In geomElem
+        '       Where J.GetType = GetType(GeometryInstance)
+        '       Let GI As GeometryInstance = J
+        '       Select GI
+
+        'Dim GeomInstLst As List(Of GeometryInstance) = S_L2.ToList
+        'If GeomInstLst.Count = 0 Then Return Nothing Else 
+
+        'Return GeomInstLst(0).Transform
+    End Function
+    Public Shared Function GetPlanarFacesFromElement_SymbolGeom(El As Autodesk.Revit.DB.Element, options As Autodesk.Revit.DB.Options) As List(Of PlanarFace)
+        Dim S As List(Of Solid) = GetSolidsFromElement_SymbolGeom(El, options)
+
+        Dim J As IEnumerable(Of Face)
+        J = From sl As Solid In S
+            From slf As Face In sl.Faces
+            Where slf.GetType = GetType(PlanarFace)
+            Select slf
+
+        Return J.Cast(Of PlanarFace).ToList
+    End Function
+
+    Public Shared Function GetPlanarFacesFromElement_InstGeom(El As Autodesk.Revit.DB.Element, options As Autodesk.Revit.DB.Options) As List(Of PlanarFace)
+        Dim S As List(Of Solid) = GetSolidsFromElement_InstGeom(El, options)
+
+        Dim J As IEnumerable(Of Face)
+        J = From sl As Solid In S
+            From slf As Face In sl.Faces
+            Where slf.GetType = GetType(PlanarFace)
+            Select slf
+
+        Return J.Cast(Of PlanarFace).ToList
+    End Function
+    Public Shared Function GetSolidsFromElement_SymbolGeom(El As Autodesk.Revit.DB.Element, options As Autodesk.Revit.DB.Options) As List(Of Solid)
+        Dim geomElem As Autodesk.Revit.DB.GeometryElement = El.Geometry(options)
+        Return GetSolids_SymbolGeom(geomElem)
+    End Function
+
+    Public Shared Function GetSolidsFromElement_InstGeom(El As Autodesk.Revit.DB.Element, options As Autodesk.Revit.DB.Options) As List(Of Solid)
+        Dim geomElem As Autodesk.Revit.DB.GeometryElement = El.Geometry(options)
+        Return GetSolids_InstGeom(geomElem)
+    End Function
+
+    Private Shared Function GetSolids_InstGeom(geomElem As Autodesk.Revit.DB.GeometryElement) As List(Of Solid)
+        Return GetSolids(geomElem, True)
+    End Function
+
+    Private Shared Function GetSolids_SymbolGeom(geomElem As Autodesk.Revit.DB.GeometryElement) As List(Of Solid)
+        Return GetSolids(geomElem, False)
+    End Function
+
+    Private Shared Function GetSolids(geomElem As Autodesk.Revit.DB.GeometryElement, instGeom As Boolean) As List(Of Solid)
+
+        Dim S_L1 As IEnumerable(Of Solid)
+        S_L1 = From J As GeometryObject In geomElem
+               Where J.GetType = GetType(Solid)
+               Let S As Solid = J
+               Select S
+
+        Dim S_L2 As IEnumerable(Of GeometryInstance)
+        S_L2 = From J As GeometryObject In geomElem
+               Where J.GetType = GetType(GeometryInstance)
+               Let GI As GeometryInstance = J
+               Select GI
+
+        Dim SolidsFromThis As List(Of Solid) = S_L1.ToList
+        Dim SolidsFromNested As New List(Of Solid)
+
+        For Each item As GeometryInstance In S_L2
+            '            Dim transformedGeomElem As Autodesk.Revit.DB.GeometryElement = item.GetInstanceGeometry()
+            Dim transformedGeomElem As Autodesk.Revit.DB.GeometryElement = Nothing
+            If (instGeom) Then
+                transformedGeomElem = item.GetInstanceGeometry()
+            Else
+                transformedGeomElem = item.GetSymbolGeometry()
+            End If
+
+            Dim SOLs As List(Of Solid) = GetSolids_SymbolGeom(transformedGeomElem)
+            If SOLs.Count > 0 Then
+                SolidsFromThis.AddRange(SOLs)
+            End If
+        Next
+
+        Return SolidsFromThis
+    End Function
+
+    Private Shared Function FindPlanarFaceMatching(elem As Element, symbolFace As PlanarFace, transform As Transform) As PlanarFace
+        Dim Ops As New Options With {.ComputeReferences = False, .DetailLevel = ViewDetailLevel.Fine, .IncludeNonVisibleObjects = False}
+        Dim SF_FsInst As List(Of PlanarFace) = GetPlanarFacesFromElement_InstGeom(elem, Ops)
+        Dim area = symbolFace.Area
+        Dim faceNormal = transform.OfVector(symbolFace.FaceNormal)
+
+        Dim SF_FInst As PlanarFace = SF_FsInst.Find(Function(Y) Y.Area = area And Y.FaceNormal.IsAlmostEqualTo(faceNormal))
+        Return SF_FInst
+    End Function
+
+End Class

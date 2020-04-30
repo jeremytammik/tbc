@@ -43,6 +43,16 @@ Today we resuscitate a five-year old Revit API answer, still as fresh and useful
 
 linkedin:
 
+Forge partner talks, jobs at Autodesk and determining the Revit camera field of view in the #RevitAPI
+
+https://bit.ly/rvtcamerafov
+
+Today we resuscitate a five-year old Revit API answer, still as fresh and useful as ever, followed by Forge and job opportunities truly fresh off the presses:
+
+- Determining the Revit Camera FOV
+- Forge Partner Talks
+- Jobs at Autodesk...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -140,4 +150,3 @@ Here are a few roles highlighted in April and May:
 - [20WD39627 &ndash; Senior Vendor Manager &ndash; San Francisco](https://rolp.co/RUAfi)
 - [20WD38632 &ndash; Engineering Manager &ndash; Portland](https://rolp.co/Dmtei)
 - [20WD38618 &ndash; Software Development Manager &ndash; Novi](https://rolp.co/SrG6i)
-
