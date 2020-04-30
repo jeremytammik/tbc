@@ -29,9 +29,14 @@
 twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+
+Sooner or later, every serious Revit add-in developer will be scratching her head a bit over symbol versus instance geometry.
+Here is a nice juicy challenge...
+Wrap you head around this one in depth and future challenges in this area will seem trivial.
+Retrieving references from symbol versus instance geometry when placing an instance on a line throws an <code>ArgumentsInconsistentException</code>...
  
- &ndash; 
- ...
+&ndash; 
+...
 
 linkedin:
 
@@ -46,9 +51,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Symbol versus Instance Geometry with References
+### References to Symbol versus Instance Geometry
 
-Sooner or later, ever serious Revit add-in developer will be scratching her head a bit over symbol verus instance geometry.
+Sooner or later, every serious Revit add-in developer will be scratching her head a bit over symbol versus instance geometry.
 
 Here is a nice juicy challenge faced by Richard Thomas, one of the most knowledgeable and prolific solution authors in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160),
@@ -85,19 +90,23 @@ I don’t know if it has been concluded by the development team that this is acc
 
 I think it seems straightforward in the sense that I get the curve by intersecting two faces. If I then supply one of those faces and the curve to the family instance constructor it shouldn’t tell me they don’t coincide. It’s a bit confusing otherwise and leads to contradictions in approach between elements with top-level solids and those with solids within the top-level geometry instance.
 
-In the attached image `fi_placement.png` I've drawn in red lines in paintbrush to show where the instance is placed compared to where it should be placed (when we supply the curve transformed to symbol space). As can be seen the element is hosted to the face of the beam. You would be hard pressed to achieve this using the UI (so as a minimum I should not be able to do this).
+In the image below, I've drawn red lines in paintbrush to show where the instance is placed compared to where it should be placed (when we supply the curve transformed to symbol space). As can be seen, the element is hosted to the face of the beam. You would be hard pressed to achieve this using the UI (so as a minimum I should not be able to do this).
 
 <center>
 <img src="img/fi_placement.png" alt="Family instance placement" title="Family instance placement" width="800"/> <!-- 1150 -->
 </center>
 
-I note the view cube which shows that the orientation of the hosted family matches how the host family would be located in it's family document (symbol space). I mention this because I've often used a transform from instance space to symbol space to identify the top face of the family (or other faces etc.). Regardless of the slope of the beam represented by the instance (where face normal is not 0,0,1) we can always transform it to symbol space where it will be. I note this because I believe it is a useful trick in identifying faces of instances with any orientation.
+I note the view cube which shows that the orientation of the hosted family matches how the host family would be located in its family document (symbol space). I mention this because I've often used a transform from instance space to symbol space to identify the top face of the family (or other faces etc.). Regardless of the slope of the beam represented by the instance (where face normal is not 0,0,1) we can always transform it to symbol space where it will be. I note this because I believe it is a useful trick in identifying faces of instances with any orientation.
 
 **Answer:** The problem with the original code provided is the use of GeometryInstance.GetInstanceGeometry() when extracting solids from family instances.
 
 What’s wrong with that?
 
-Since this face will be used as a Reference for another instance placement, it is required to take the Reference from the faces/edges of that Solid.  GetInstanceGeometry() (as well as GetSymbolGeometry(Transform) and GetInstanceGeometry(Transform) ) have remarks that say:
+Since this face will be used as a Reference for another instance placement, it is required to take the Reference from the faces/edges of that Solid.
+[GetInstanceGeometry()](https://www.revitapidocs.com/2020/22d4a5d4-dfc2-7227-2cae-b989729696ec.htm) (as well as
+[GetSymbolGeometry(Transform)](https://www.revitapidocs.com/2020/6de9b5fd-682f-ffa0-5e49-84b1d227d606.htm) and
+[GetInstanceGeometry(Transform)](https://www.revitapidocs.com/2020/d5aad2b5-3211-3800-9f1e-1af921e73902.htm))
+have remarks that say:
 
 > The geometry will be in the coordinate system of the model that owns this instance. The context of the instance object (such as effective material) will be applied to the symbol. Note that this method involves extensive parsing or Revit's data structures, so try to minimise calls if performance is critical. Geometry will be parsed with the same options as those used when this object was retrieved. This method returns a copy of the Revit geometry. It is suitable for use in a tool which extracts geometry to another format or carries out a geometric analysis; however, because it returns a copy the references found in the geometry objects contained in this element are not suitable for creating new Revit elements referencing the original element (for example, dimensioning). Only the geometry returned by GetSymbolGeometry() with no transform can be used for that purpose.
 
@@ -119,4 +128,4 @@ I've adjusted slightly to aid my understanding and updated to include non-family
 
 - [MinRepCase_modified2.vb](zip/rpt_MinRepCase_modified2_vb.txt)
 
-Many thanks to Richard and Scott for raising and solving this illuminating issue.
+Many thanks to Richard for raising this tricky issue and to Scott for the illuminating solution!
