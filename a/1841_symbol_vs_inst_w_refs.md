@@ -28,7 +28,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+In-depth analysis of retrieving references from symbol versus instance geometry when placing an instance on a line in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/refstosymbolinstance
 
 Sooner or later, every serious Revit add-in developer will be scratching her head a bit over symbol versus instance geometry.
 Here is a nice juicy challenge...
