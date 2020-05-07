@@ -1,0 +1,149 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- Why does my add-in still work?
+  Updating Plugins to Revit 2021
+  https://forums.autodesk.com/t5/revit-api-forum/updating-plugins-to-revit-2021/m-p/9494369
+  ramoon.bandeira 
+  I'm trying to update a revit plugin for Revit 2021.
+  The code of the plugin were designed for Revit 2019, but it also works in Revit 2020.
+  I Followed the guide described here: https://bit.ly/2za2t6i
+  and it worked for revit 2021 too. 
+  I've seen that revit 2021 API had several changes, one of then regarding the UnitUtils.ConvertFromInternalUnits() method. Now it uses a ForgeUnitID instead of a DisplayUnitType enum member.
+  My question is: Why the code that's been originally written in the 2019 version works seemlessly in Revit 2021 ?
+  A: Good question.
+  The answer is simple: the methods provided by the Revit API assemblies to serve the Revit API calls made by your add-in remain unchanged.
+  New methods have been added, for instance, the new unit API ones that you mention. However, you are not using them, so that makes no difference for your add-in.
+  Other methods may have been changed or even removed. However, luckily for you, you have not been using them, so that makes no difference for your add-in.
+
+- get outer loop of points
+  https://thebuildingcoder.typepad.com/blog/2017/10/disjunct-outer-loops-from-planar-face-with-separate-parts.html#comment-4898621997
+  Francisco Contreras
+
+twitter:
+
+ in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+&ndash; 
+...
+
+linkedin:
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>Convex Outer Loop, Non-Migration and 15-Year Stint</h3>
+<p><strong>Question:</strong> </p>
+<pre>
+</pre>
+
+<p><strong>Answer:</strong> </p>
+<p><strong>Response:</strong> </p>
+<p>Many thanks to Richard for raising this tricky issue and to Scott for the illuminating solution!</p>
+<h4><a name="2"></a> The Second Stint of 15 Years</h4>
+<h4><a name="3"></a> Forge Trainee Career Launched</h4>
+<p>Philipp Mueller, Project and Program Manager dealing with Universities and Education, pointed out another happy Forge story:</p>
+<blockquote>
+<p>TU Darmstadt was one of the first Universities in Germany working with Forge.
+Thanks to the support of Peter Schlipf and Cyrille Fauvel, Jeremy Tammik hosted
+a <a href="https://www.iib.tu-darmstadt.de/willkommen/news_archiv_iib/iib_archiv_114240.en.jsp">hands-on Forge Workshop for Construction Computing Students</a> back in 2016.</p>
+<p>Just recently, the PhD student who helped to host the workshop graduated and immediately landed a job at NA Max Bögl as Program Leader for Lean Construction.
+A major element factor in achieving this was his Phd Thesis
+a <a href="zip/2019_tu_darmstadt_phd_thesis_christian_leifgen.pdf">Contribution for the Digital Transformation of Lean Construction</a>  leaning strongly on Autodesk Forge and Dynamo.
+The thesis is in German; here is an English Excerpt:</p>
+<p>In the construction industry there, is a high demand and considerable potential for transforming current ways of thinking and working in order to improve cooperation in projects, increase productivity and added value and compensate for decreasing manpower. One prerequisite for this is a transformation towards holistic, process-oriented and digital value chains based on an open-minded, collaborative mentality of all participants. The Building Information Modeling (BIM) methodology and Lean Construction (LC) are two approaches that can facilitate this. In this context, the Work Cycle based approach is examined regarding possibilities for its digital implementation &ndash; in particular, by applying and integrating the BIM methodology. For this purpose, scientific work and software solutions used in practice are analysed. Based on this, a concept of a software system is presented that comprises a holistic approach for the digital transformation of Work Cycle Based Time Planning and Control. The software concept consists of a visual programming based application for planning as well as a modular, web-based application based on the central control tool, Work Cycle Control Panels. Underlying these two software applications, the use of a central database and a digital LC model also introduced in this paper ensures a continuous data flow. Finally, demonstration applications are implemented to demonstrate the realisation of a software implementation with usage examples.</p>
+</blockquote>
+<h4><a name="4"></a> Why Does My Add-In Still Run?</h4>
+<p>Michel Alofs provided a detailed explanation about how the Revit API updates handle the steps of signalling deprecated code and removing it a year later after it has become obsolete, raised in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/updating-plugins-to-revit-2021/m-p/9494369">updating plugins to Revit 2021</a>:</p>
+<p><strong>Question:</strong> I'm trying to update a Revit plugin for Revit 2021.</p>
+<p>The code of the plugin was designed for Revit 2019, but it also works in Revit 2020.</p>
+<p>I Followed the guide 
+on <a href="https://archi-lab.net/how-to-maintain-revit-plug-ins-for-multiple-versions/">how to maintain Revit plug-ins for multiple versions</a> and
+it works for Revit 2021 too. </p>
+<p>I've seen that the Revit 2021 API had several changes, one of then regarding the <code>UnitUtils.ConvertFromInternalUnits</code> method.
+Now it uses a <code>ForgeUnitID</code> instead of a <code>DisplayUnitType</code> enum member.</p>
+<p>My question is: Why does the code that's been originally written in the 2019 version works seemlessly in Revit 2021?</p>
+<p><strong>Answer:</strong> Good question.</p>
+<p>The answer is simple: the methods provided by the Revit API assemblies to serve the Revit API calls made by your add-in remain unchanged.</p>
+<p>New methods have been added, for instance, the new unit API ones that you mention. However, you are not using them, so that makes no difference for your add-in.</p>
+<p>Other methods may have been changed or even removed. However, luckily for you, you have not been using them, so that makes no difference for your add-in.</p>
+<p>In the code for R2019, you haven't used any of the removed 'obsolete' code in R2020/R2021.</p>
+<p>For instance, the rules for filters changed in R2019 and the old style was removed in R2020.</p>
+<p>So, if you had used a command with these methods, the add-in wouldn't run or crash (attempting to use the same assembly for R2020/R2021); also the .NET Framework version could be a issue.</p>
+<p>See the post on <a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html">What's New in the Revit 2020 API</a>.</p>
+<p><strong>Response:</strong> I actually have used a lot of methods that have been replaced in the 2021 version of the Revit API.</p>
+<p>I use some of the methods of the <code>UnitUtils</code> class... some of then were replaced.</p>
+<p>When Visual Studio compiles my code, does it adapt, or recognize the old methods and somehow translate them to the new ones?</p>
+<p>Thats the only thing I can think of.</p>
+<p><strong>Answer:</strong> <code>UnitUtils</code> hasn't been removed in R2021, it will be gone in R2022 (if it follows the same route as always).</p>
+<p>See <a href="https://thebuildingcoder.typepad.com/blog/2020/04/whats-new-in-the-revit-2021-api.html">Obsolete API removal</a>.</p>
+<p>Only the <em>Autodesk.Revit.DB.ImageImportOptions</em> and methods relating to it have now been removed (and would return a error).</p>
+<p>Once a function is replaced or obsolete (deprecated), it will be removed in the next Revit version.</p>
+<p>For instance, <code>ParameterFilterElement.GetRules</code> is marked as deprecated in the Revit 2019 API and was removed completely in Revit 2020.</p>
+<p>That gives you one year's time to update your code to remove all dependencies on deprecated API.</p>
+<p>Ensure that your add-in compiles with zero warnings, and you will be ready to compile it for the next major release of Revit as well.</p>
+<p>If your code generates warnings about using deprecated code now, it will no longer run unmodified in the next major release of Revit.</p>
+<p>Many thanks to Michel for the detailed explanation!</p>
+<p>Many thanks to Michel for the detailed explanation!</p>
+<p>To summarise and point out the gist of this:</p>
+<p>This procedure gives you one year's time to update your code to remove all dependencies on deprecated API.</p>
+<p>Ensure that your add-in compiles with zero warnings, and you will be ready to compile it for the next major release of Revit as well.</p>
+<p>If your code generates warnings about using deprecated code now, it will no longer run unmodified in the next major release of Revit.</p>
+<h4><a name="5"></a> Determine Outer Loop Around Points</h4>
+<p>I had a nice discussion with Francisco Contreras on determine an outer loop around given points in
+a <a href="https://thebuildingcoder.typepad.com/blog/2017/10/disjunct-outer-loops-from-planar-face-with-separate-parts.html#comment-4898621997">series</a>
+of <a href="https://thebuildingcoder.typepad.com/blog/2017/10/disjunct-outer-loops-from-planar-face-with-separate-parts.html#comment-4900661008">comments</a> on the article
+on <a href="https://thebuildingcoder.typepad.com/blog/2017/10/disjunct-outer-loops-from-planar-face-with-separate-parts.html">disjunct planar face outer loops</a>:</p>
+<p><strong>Question:</strong> I have a <code>List&amp;lt;xyz&amp;gt;</code> with elements that allways are circumscribed to a quad.</p>
+<p>I need to get the outer loop of it and store it like a face.</p>
+<p>I know you cannot create faces, but the outer loop is good enough; I created a class that store it.</p>
+<p>Do you know how can I do it?</p>
+<p><center>
+<img src="img/outer_loop_of_points_1.png" alt="Outer loop around points" title="Outer loop around points" width="332"/>
+</center></p>
+<p><strong>Answer:</strong> This is either very simple or just plain simple.</p>
+<p>The very simple solution is to determine the concave hull of your points.</p>
+<p>The less simple task would be to retrieve the (non-concave, convex) outer loop.</p>
+<p>Very much less simple, actually.</p>
+<p>What <em>IS</em> the outer loop unless you have a convex hull?</p>
+<p>Take another look at your points:</p>
+<p><center>
+<img src="img/outer_loop_of_points_2.png" alt="Outer loop around points" title="Outer loop around points" width="332"/>
+</center></p>
+<p>Is the outer loop A-B-C-E-G-H?</p>
+<p>Why is it not A-B-C-D-E-G-H?</p>
+<p>Or A-B-C-D-E-F-G-H?</p>
+<p>Or A-B-C-E-G-H-F-D-A?</p>
+<p>I recommend you just go for
+the <a href="https://www.google.com/search?q=convex+hull&amp;as_sitesearch=thebuildingcoder.typepad.com">convex hull</a>,
+e.g., with this <a href="https://thebuildingcoder.typepad.com/blog/2016/08/online-revit-api-docs-and-convex-hull.html#3">algorithm</a>.</p>
+<p>Oh, I see now that you mention it is a quad... so it is convex in any case.</p>
+<p>Problem solved.</p>
+<p><strong>Response:</strong> Many thanks for your help, I´m trying to implement it.</p>
+<p>Question, this should work for any set of points on a given plane?</p>
+<p>Or, should I change something if the plane is vertical or horizontal?</p>
+<p>Because the code Written by Maxence is giving me an infinite loop, the program does not go beyond the third point.</p>
+<p><strong>Answer:</strong> For a 2D convex hull computation, you would normally expect to be working with 2D points.</p>
+<p>If your points are in a horizontal plane, discard all Z coordinates.</p>
+<p>In a vertical plane aligned with the X axis, discard Y; aligned with Y axis, discard X. Else rotate the coordinates appropriately.</p>
+<p>In a slanted plane, transform your coordinates into the XY plane.</p>
+<p>I implemented
+a <a href="https://thebuildingcoder.typepad.com/blog/2016/08/online-revit-api-docs-and-convex-hull.html">2D convex hull calculation</a>
+in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>.</p>
+<p>I implemented <a href="http://thebuildingcoder.typepad.com/blog/2008/12/3d-polygon-areas.html">transformation of 3D points into a 2D plane</a> in
+order to make use of
+the <a href="http://thebuildingcoder.typepad.com/blog/2008/12/2d-polygon-areas-and-outer-loop.html">2D polygon area calculation for 3D planar polygons</a>.</p>
