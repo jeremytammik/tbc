@@ -21,8 +21,9 @@ twitter:
 
  with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Let's start the week with two pretty fundamental topics
+&ndash; Compiling the Revit 2021 SDK samples
+&ndash; Reading the value of a parameter...
 
 linkedin:
 
@@ -40,30 +41,33 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Compiling the Revit 2021 SDK Samples
 
-Getting started with two basic issues: reading a parameter, compiling the updated SDK samples, 
+Let's start the week with two pretty fundamental topics:
 
-- Compiling the Revit SDK samples updated for Revit 2021
+- [Compiling the Revit 2021 SDK samples](#2)
+- [Reading the value of a parameter](#3)
 
 
 ####<a name="2"></a> Compiling the Revit 2021 SDK Samples
 
-In the previous year or two, compiling the Revit SDK Samples updated for the new major release was a piece of cake.
+A long time ago, compiling the Revit SDK Samples updated for each new major release was major undertaking due to hundreds of compiler errors.
 
-This time around, it was a lot tricker again, like back in the bad old days five or more years ago.
+In the last couple of years, happily, it became a piece of cake.
 
-The source of the problem is pretty basic and not hard to rectify: the references to the Revit API assemblies were set up for different developers specific environments.
+This time around, unfortunately, it was a lot trickier again.
 
-I just needed to hunt them down and point them all to the official Revit installation location *C:\Program Files\Autodesk\Revit 2021*.
+The source of the problem is pretty basic and not really hard to fix: the references to the Revit API assemblies in each of the 190 sample projects is set up for different developers' specific environments.
 
-Hey, development team, can't you please do that before releasing the SDK to the general unsuspecting public?
+All you need to do is to hunt them all down and point them all to the official Revit installation location *C:\Program Files\Autodesk\Revit 2021*.
 
-It would just save a couple of hour's work for every single developer that inadvertenly runs into this issue.
+Hey, development team, can't you please do that for us yourself, before releasing the SDK to the general unsuspecting public?
+
+It would just save a couple of hour's work for every single developer that inadvertently runs into this issue.
 
 Anyway, this time around, I copied the original state of the Revit SDK to
 the [RevitSdkSamples GitHub repository](https://github.com/jeremytammik/RevitSdkSamples) before
-analysing the problem and applying the fixes, so you can easily retrace my steps or download the results of my fixes and save yourself the effort of re3inventing this particular wheel.
+analysing the problem and applying the fixes, so you can easily retrace my steps or download the final results of my fixes and save yourself the effort of reinventing this particular wheel.
 
-Here is a list of my commits, releases, and error logs:
+Here is a list of some of my commits, releases, and error logs:
 
 - [Release 2021.0.0.0](https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2021.0.0.0)
   &ndash; replaced Revit 2020 SDK by Revit 2021 SDK
@@ -75,9 +79,9 @@ I performed the following steps to locate the API assemblies and fix these error
 - Updated RevitAPI and RevitAPIUI `HintPath` settings in individual project files
 - Fixed `HintPath` in SDKSamples.VB.targets
 - Fixed `HintPath` in SDKSamples.Steel.targets
-- Added reference to Microsoft.Office.Interop.Excel.dll in Massing/PointCurveCreation
+- Added local reference to Microsoft.Office.Interop.Excel.dll in Massing/PointCurveCreation
 
-That enabled the first successful compilation, still producing a bunch of errors, though:
+That enabled the first successful compilation, still producing a bunch of warnings, though:
 
 - [Release 2021.0.0.1](https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2021.0.0.1)
   &ndash; [190 projects succeeded, 0 errors and 36 warnings](zip/revit_2021_sdk_samples_errors_warnings_5.txt)
@@ -88,19 +92,19 @@ and can be resolved using
 my [DisableMismatchWarning.exe utility](http://thebuildingcoder.typepad.com/blog/2013/07/recursively-disable-architecture-mismatch-warning.html)
 implemented back in 2013 and available from
 the [DisableMismatchWarning GitHub repository](https://github.com/jeremytammik/DisableMismatchWarning).
-I ran it on all the projects causing the warning. The result is
+I ran it individually on each of the projects causing the warning. The result is
 
 - [Release 2021.0.0.2](https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2021.0.0.2)
   &ndash; [190 projects succeeded, 0 errors and 5 warnings](zip/revit_2021_sdk_samples_errors_warnings_6.txt)
 
-I will leave those five warnings in there for now.
+I will leave the remaining five warnings in there for now.
 
 I hope that I can persuade the development team to clean up the SDK before their next release of it to save us having to repeat these steps again next time around.
 
 
-####<a name="2"></a> Reading the Value of a Parameter
+####<a name="3"></a> Reading the Value of a Parameter
 
-Talking about the Revit SDK samples, let's address another beginner's question, on reading the value of a parameter, raised in
+Talking about the Revit SDK samples, let's address another (even more) beginner's question, on reading the value of a parameter, raised in
 a [comment](https://thebuildingcoder.typepad.com/blog/2011/09/unofficial-parameters-and-bipchecker.html#comment-4905987898)
 on [unofficial parameters and BipChecker](https://thebuildingcoder.typepad.com/blog/2011/09/unofficial-parameters-and-bipchecker.html):
 
@@ -108,7 +112,7 @@ on [unofficial parameters and BipChecker](https://thebuildingcoder.typepad.com/b
 
 I have been using `getparameter`, `get_parameter` and `lookupparameter`, but the return value is always empty.
 
-Is there any tutorials, examples or links where I may get the answer?
+Are there any tutorials, examples or links where I may get the answer?
 
 **Answer:** Reading the value of a parameter is a very basic and fundamental task in the Revit API, so it is covered in depth by
 the [getting started material](https://thebuildingcoder.typepad.com/blog/about-the-author.html#2).
@@ -121,7 +125,7 @@ The main steps are:
 - Determine what parameter you wish to read
 - Built-in parameters are easiest; I assume that volume and area are indeed built-in
 
-Exploring the element properties and determining the parameters to use is vastly supported
+Exploring the element properties and determining exactly which parameters to use to retrieve the desired information is vastly simplified
 by [RevitLookup](https://github.com/jeremytammik/RevitLookup),
 an interactive Revit BIM database exploration tool to view and navigate element properties and relationships.
 
@@ -141,6 +145,6 @@ a practical example of retrieving those two values.
 
 <center>
 <img src="img/jeremy_with_face_mask.jpg" alt="Jeremy with a face mask" title="Jeremy with a face mask" width="300"/>
-<p style="font-size: 80%; font-style:italic">Be more scary than the virus</p>
+<p style="font-size: 80%; font-style:italic">Be scarier than the virus</p>
 </center>
 
