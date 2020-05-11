@@ -19,7 +19,7 @@
 
 twitter:
 
- with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Compiling the Revit 2021 SDK samples, reading the value of a parameter and scaring the virus with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/rvt2021sdk
 
 Let's start the week with two pretty fundamental topics
 &ndash; Compiling the Revit 2021 SDK samples
