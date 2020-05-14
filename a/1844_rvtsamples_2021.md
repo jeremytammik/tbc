@@ -38,6 +38,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Setting up RvtSamples for Revit 2021
 
+Another overly busy week so far:
+
+- [Loading all Revit 2021 SDK samples](#2)
+- [Loading The Building Coder samples and labs](#3)
+- [What database is best for Revit data?](#4)
+
 ####<a name="2"></a> Loading all Revit 2021 SDK Samples
 
 On Monday, I discussed my struggles
