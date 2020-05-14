@@ -58,7 +58,7 @@ the [RevitSdkSamples list of releases](https://github.com/jeremytammik/RevitSdkS
 
 ####<a name="3"></a> Loading The Building Coder Samples and Labs
 
-Once I have the official SDK samples installed, I also migrate and add a number of additional samples to the collection of external commands added by RvtSamples:
+Once I have the official SDK samples installed, I also migrate and add a number of additional samples to the collection of external commands loaded by RvtSamples:
 
 - The [ADN Revit API training material](https://github.com/ADN-DevTech/RevitTrainingMaterial) (nowadays DAS, by the way)
 - The [Xtra labs](https://github.com/jeremytammik/AdnRevitApiLabsXtra) (comprising the former plus their older incarnation)
@@ -72,7 +72,7 @@ The migration was straightforward, and the installation as well.
 
 You can examine the exact required steps by analysing the GitHub commits and diffs.
 
-I thank Naveen T Kumar for his support migrating the official DAS Revit training material.
+I thank Naveen T Kumar for his support migrating the official DAS Revit API training material.
 
 <center>
 <img src="img/rvtsamples_2021.png" alt="RvtSamples 2021" title="RvtSamples 2021" width="903"/> <!-- 903 -->
@@ -122,7 +122,7 @@ Instead:
 
 Go for the much more modern, scalable, minimalistic, low-cost, simple to use, web-adapted NoSQL options instead.
 
-This personal opinion of mine in mainly based on my experience developing
+This personal opinion of mine in based on my experience developing
 several samples to [connect the desktop and cloud](https://github.com/jeremytammik/FireRatingCloud)
 using Revit and its API on the desktop and JavaScript, Node.js web servers, CouchDB and MongoDB databases in the cloud.
 
@@ -130,7 +130,9 @@ using Revit and its API on the desktop and JavaScript, Node.js web servers, Couc
 
 The internal databases are MySQL, so is it possible to link a NoSQL database to a MySQL database?
 
-**Answer:** Poor you, you will not be learning anything new...
+**Answer:** To me, that sounds like a good reason to choose MySQL after all.
+
+Poor you, you will not be learning anything new...
 
 <center>
 <img src="img/friends_use_nosql.jpg" alt="Friends use NoSQL" title="Friends use NoSQL" width="500"/> <!-- 1400 -->
