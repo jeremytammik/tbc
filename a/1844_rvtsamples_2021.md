@@ -18,7 +18,7 @@
 
 twitter:
 
- Revit 2021 SDK  with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Choosing a database and loading all the Revit 2021 SDK, TBC samples and labs with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/rvtsamples2021
 
 Another busy week so far
 &ndash; Loading all Revit 2021 SDK samples
