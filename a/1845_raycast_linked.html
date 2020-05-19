@@ -14,46 +14,16 @@
   email Pawel Czepiec <Pawel.Czepiec@autodesk.com> RE: 16540602 : Robot Structural Analysis Professional 2020 Generic
 
 - open RVT file managed by BIM360
-Jan Liska(opens in new tab) Yesterday at 4:20 PM
-Hello experts, I got following question from customer (COWI):
-Is there way how we can open RVT file managed by BIM360 locally using Revit API (i.e. using application.OpenAndActivateDocument(file))?
-Thank you
-
-Stone (Lei) Shi(opens in new tab)  1 day ago
-@liskaj, coud you explain a little bit on “rvt file managed by BIM 360 locally”?
-It is the file in %localappdata%\autodesk\revit\CollboarationCache, which comes from RCM? (edited) 
-
-Jan Liska(opens in new tab)  1 day ago
-The customer uses BIM360 to manage RVT file. However they would run like to do some processing locally using full Revit+their custom add-in. Of course they could use Forge DM API to download file but they that that maybe there is another way to do it directly using Revit API.
-
-Stone (Lei) Shi(opens in new tab)  1 day ago
-Ok, then I guess it is not feasible. currently Revit only supports opening RCM-based cloud models. Revit doesn’t have a solution yet to open the files users directly uploaded to BIM 360.
-
-Jan Liska(opens in new tab)  24 hours ago
-What if file was uploaded to BIM360 via RCW? Do we have solution for this via API, pls?
-
-Stone (Lei) Shi(opens in new tab)  23 hours ago
-If the file was uploaded to BIM 360 via RCW (which is officially termed as Initiate, and can only be conducted through Revit UI/API), then yes,  it can be opened by  application.OpenAndActivateDocument (edited) 
-
-Jan Liska(opens in new tab)  23 hours ago
-In this case how do I find input for method assuming that I know location of item/file in BIM360, pls?
-
-Rahul Bhobe(opens in new tab)  23 hours ago
-The solution mentioned here is for opening a BIM 360 file in DA:
-https://stackoverflow.com/questions/61098804/autodesk-forge-design-automation-error-opening-a-model-how-to-bypass-dialog/61101203#61101203
-(thing to note that this file is eTransmitted Workshared file) (edited) 
-
-Stone (Lei) Shi(opens in new tab)  20 hours ago
-thanks @bhober for linking the solution in DA.
-@liskaj, if DA is not an option here, the right overload of that API to use is UIApplication.OpenAndActivateDocument(ModelPath, OpenOptions, Boolean, IOpenFromCloudCallback) . And you will have to call ModelPathUtils.ConvertCloudGUIDsToCloudPath(String, Guid, Guid) firstly. The two guids are the project id and model id used by RCM to identify the project and model.
-https://stackoverflow.com/questions/51370445/how-to-get-project-guid-and-model-guid-from-pathname is a post that includes an example. (edited)
 
 twitter:
 
  with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Here are our topics for today
+&ndash; What is Forge in 90 seconds
+&ndash; Locally opening RVT file managed by BIM360
+&ndash; Programming tools for Robobat
+&ndash; Using <code>ReferenceIntersector</code> in linked files...
 
 linkedin:
 
@@ -68,7 +38,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>ReferenceIntersector with Linked File</h3>
+<h3>Using ReferenceIntersector with a Linked File</h3>
 <p>Here are our topics for today:</p>
 <ul>
 <li><a href="#2">What is Forge in 90 seconds</a></li>
@@ -117,7 +87,8 @@ The current version of Visual Studio is 2020.</p>
 <li>RSA 2021 uses the .NET Framework 4.8</li>
 </ul>
 <h4><a name="5"></a> Using ReferenceIntersector in Linked Files</h4>
-<p>Diving in a bit deeper into the Revit API, Ilia Ivanov shares a nice example
+<p>Diving in a bit deeper into the Revit API,
+<a href="https://www.linkedin.com/in/ilya-ivanov-298997161/?locale=en_US">Ilia Ivanov</a> shares a nice example
 of <a href="https://forums.autodesk.com/t5/revit-api-forum/using-referenceintersector-in-linked-files/m-p/9516302">using <code>ReferenceIntersector</code> in linked files</a>:</p>
 <p>I faced the problem of how to use a <code>ReferenceIntersector</code> with <code>RevitLinkInstance</code> elements.</p>
 <p>I achieved a solution using filters etc. that works rather well and I would like to share with the community.</p>
@@ -226,7 +197,10 @@ a sample project with a macro to test.</p>
 <li>Architectural link.rvt</li>
 <li>CountOfLinkedWalls.rvt</li>
 </ul>
-<p>The latter hosts the former as a linked file and contains a macro module named <code>CountOfIntersectedWalls</code> defining the method <code>GetWalls</code> listed above.</p>
+<p>The latter hosts the former as a linked file and contains a macro module named <code>CountOfIntersectedWalls</code> defining the method <code>GetWalls</code> listed above:</p>
+<p><center>
+<img src="img/reference_intersector_in_linked_files.png" alt="ReferenceIntersector in linked files" title="ReferenceIntersector in linked files" width="327"/>
+</center></p>
 <p>In case of need, here is also a code snippet to get a <code>StableRepresentation</code> for a linked wall's exterior face:</p>
 <pre class="code">
 <span style="color:blue;">public</span>&nbsp;<span style="color:blue;">string</span>&nbsp;GetFaceRefRepresentation(&nbsp;
@@ -245,6 +219,3 @@ a sample project with a macro to test.</p>
 <p>Many thanks to Ilia for this nice solution and very helpful explanation!</p>
 <p>Added to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> 
 <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2021.0.148.2">release 2021.0.148.2</a>.</p>
-<p><center>
-<img src="img/achitectural_2d_plans_3d_model.jpg" alt="Plans and model" title="Plans and model" width="400"/> <!-- 567 -->
-</center></p>
