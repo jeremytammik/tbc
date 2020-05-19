@@ -28,6 +28,17 @@ Here are our topics for today
 
 linkedin:
 
+Forge in 90 seconds, locally opening an RVT file managed by BIM360, programming tools for Robobat and using ReferenceIntersector in linked files in the #RevitAPI 
+
+https://bit.ly/raytracelinked
+
+Here are our topics for today:
+
+- What is Forge in 90 seconds
+- Locally opening RVT file managed by BIM360
+- Programming tools for Robobat
+- Using <code>ReferenceIntersector</code> in linked files...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -260,5 +271,3 @@ Many thanks to Ilia for this nice solution and very helpful explanation!
 
 Added to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) 
 [release 2021.0.148.2](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2021.0.148.2).
- 
-
