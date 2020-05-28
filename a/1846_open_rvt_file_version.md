@@ -15,38 +15,17 @@
   You should also read The numerous Building Coder descriptions of all the various problems encountered installing them for previous versions. Please refer to the blog!
 
 - RvtVerFileOpen
-  From a running Revit session, you can easily determine its version number via the [application `VersionNumber` property](https://www.revitapidocs.com/2020/35b18b73-4c47-fee3-d2f9-21298f029f7f.htm), cf., e.g., 
-  [How to get the current build of an open project file?](https://stackoverflow.com/questions/61936125/revit-python-how-to-get-the-current-build-of-an-open-project-file)
-  Determining the Revit version that saved a non-open RVT file stored ino the OS file system and not currently opened in Revit, however, is a different matter, e.g., making use of the basic file info, as explained in several places, e.g.,
-  the discussion on [Basic File Info and RVT File Version](https://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html).
-  Vin Gallo now shared a new utility making use of that finctionality in his [recent comment](https://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html#comment-4927991760) on that article:
-  https://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html#comment-4927991760
-  I've written a small app that opens any RVT file in the correct Revit version, simply by double-clicking the file in Windows Explorer.
-  I have used some of the logic in this thread, which works for all versions of Revit up to 2021.
-  I can share the source code here, but it's probably better to just share the Visual Studio Source, if anybody is interested.
-  Here's a short video:
-  https://www.dropbox.com/s/eqwwk0zb4s9hee1/RvtFileOpen.mp4?dl=0
-  Source Code:
-  https://www.dropbox.com/s/1zvfnwxmju8z1z1/RvtVer.zip?dl=0
-  To make it work, you'll have to associate RVT files with this app.
-  Local copies:
-  vg_RvtVerFileOpen.mp4
-  vg_RvtVerFileOpen.zip
-  Many thanks to Vin for implementing and sharing this!
 
 - a pretty impressive little app tutorial
-How To Create An Optical Character Reader Using Angular And Azure Computer Vision
-https://www.freecodecamp.org/news/how-to-create-an-optical-character-reader-using-angular-and-azure-computer-vision/
-
-How to Get Started with React — A Modern Project-based Guide for Beginners (Including Hooks)
-https://www.freecodecamp.org/news/getting-started-with-react-a-modern-project-based-guide-for-beginners-including-hooks-2/
+  How To Create An Optical Character Reader Using Angular And Azure Computer Vision
+  https://www.freecodecamp.org/news/how-to-create-an-optical-character-reader-using-angular-and-azure-computer-vision/
+  How to Get Started with React — A Modern Project-based Guide for Beginners (Including Hooks)
+  https://www.freecodecamp.org/news/getting-started-with-react-a-modern-project-based-guide-for-beginners-including-hooks-2/
 
 - The most successful developers share more than they take
   https://stackoverflow.blog/2020/05/14/the-most-successful-developers-share-more-than-they-take
   It doesn't just apply to developers, but to BIM experts as well, e.g., [Vasshaug]()
   <li><a href="http://thebuildingcoder.typepad.com/blog/2015/09/sharing-dynamo-and-a-chinese-book.html">Sharing, Dynamo and a Chinese Book</a></li>
-
-
 
 twitter:
 
@@ -73,9 +52,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Today, let's address a couple of quick questions and share a useful utility:
 
+- [How to determine Revit export image coordinates](#2)
+- [Problems compiling and installing the Revit SDK samples](#3)
+- [RvtVerFileOpen &ndash; open correct RVT file version](#4)
+- [Angular and react tutorials](#5)
+- [Give and take](#6)
+
 ####<a name="2"></a> How to Determine Revit Export Image Coordinates
 
-Raised in the StackOverflow qustion
+Raised in the StackOverflow question
 on [how to get Revit export image coordinates or reference point](https://stackoverflow.com/questions/62004785/how-to-get-revit-export-image-coordinates-or-reference-point):
 
 **Question:** I want to have a reference point or know the coordinates of any point on an exported Image (from any view) from Revit.
