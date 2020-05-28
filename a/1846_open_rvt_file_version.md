@@ -6,11 +6,6 @@
 
 <!---
 
-- William Felipe
-Q: I'm trying to compile the SDK Revit 2019.2 Samples, but the buttons are disabled. Do you have any suspicion of what may be happening?
-A: yes: https://thebuildingcoder.typepad.com/blog/2020/05/compiling-the-revit-2021-sdk-samples.html
-You should also read The numerous Building Coder descriptions of all the various problems encountered installing them for previous versions. Please refer to the blog!
-
 - RvtVerFileOpen
 From a running Revit session, you can easily determine its version number via the [application `VersionNumber` property](https://www.revitapidocs.com/2020/35b18b73-4c47-fee3-d2f9-21298f029f7f.htm), cf., e.g., 
 [How to get the current build of an open project file?](https://stackoverflow.com/questions/61936125/revit-python-how-to-get-the-current-build-of-an-open-project-file)
@@ -33,14 +28,11 @@ Many thanks to Vin for implementing and sharing this!
 
 - How to get Revit export image coordinates or reference point?
   https://stackoverflow.com/questions/62004785/how-to-get-revit-export-image-coordinates-or-reference-point
-  Q: I want to have a reference point or to know the coordinates of any point on an exported Image (from any view) from Revit.
-For example in the attached image exported from Revit, I'd like to know the bounding box of the picture or the middle point of the picture (in X,Y coordinates) or any other reference point.
-  img/floor_plan.jpg
-Is there a way to extract the bounding box coordinates of the picture?
-A: I would suggest defining two diagonally opposite points in your image file that you can identify precisely in your Revit model. Determine their image pixel coordinates, export their Revit model coordinates, and use this information to determine the appropriate scaling and translation.
-The [RoomEditorApp Revit add-in](https://github.com/jeremytammik/RoomEditorApp) and its corresponding [roomedit CouchDb](https://github.com/jeremytammik/roomedit) web interface demonstrate exporting an SVG image from Revit, scaling it for display in a web browser, and transformation and calculation of exact coordinates back and forth between two environments.
-R: Thank you for your reply Jeremy, I'm looking into that. I've notice the BoundingBoxUV in the view Im exporting changing based on the elements on the edges of the view, is this boundingbox can help me determine the exported image bounding box? The units are different than the "specify coordinates at point" so Im not sure. – Razyo 23 hours ago
-A: They might certainly be useful, and almost equally certainly they will not enable any precise transformation. Therefore I would still stick with my suggestion. – Jeremy Tammik just now   Edit
+
+- William Felipe
+  Q: I'm trying to compile the SDK Revit 2019.2 Samples, but the buttons are disabled. Do you have any suspicion of what may be happening?
+  A: yes: https://thebuildingcoder.typepad.com/blog/2020/05/compiling-the-revit-2021-sdk-samples.html
+  You should also read The numerous Building Coder descriptions of all the various problems encountered installing them for previous versions. Please refer to the blog!
 
 - a pretty impressive little app tutorial
 How To Create An Optical Character Reader Using Angular And Azure Computer Vision
@@ -79,11 +71,67 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Automatically Open Currect RVT File Version
 
+Today, let's address a couple of quick questions and share a useful utility:
 
-####<a name="2"></a> 
+####<a name="2"></a> How to Determine Revit Export Image Coordinates
+
+Raised in the StackOverflow qustion
+on [how to get Revit export image coordinates or reference point](https://stackoverflow.com/questions/62004785/how-to-get-revit-export-image-coordinates-or-reference-point):
+
+**Question:** I want to have a reference point or know the coordinates of any point on an exported Image (from any view) from Revit.
+
+For example, in this Revit floor plan export, I'd like to know the bounding box of the picture, its middle point, or any other reliable reference point:
+
+<center>
+<img src="img/floor_plan.jpg" alt="Floor plan" title="Floor plan" width="500"/> <!-- 3093 -->
+</center>
+
+Is there a way to extract the bounding box coordinates of the picture?
+
+**Answer:** I would suggest defining two diagonally opposite points in your image file that you can identify precisely in your Revit model.
+
+Determine their image pixel coordinates, export their Revit model coordinates, and use this information to determine the appropriate scaling and translation.
+
+The [RoomEditorApp Revit add-in](https://github.com/jeremytammik/RoomEditorApp) and its
+corresponding [roomedit CouchDb](https://github.com/jeremytammik/roomedit) web interface
+demonstrate exporting an SVG image from Revit, scaling it for display in a web browser, and transformation and calculation of exact coordinates back and forth between two environments.
+
+**Response:** Thank you for your reply Jeremy, I'm looking into that.
+
+I've noticed the `BoundingBoxUV` in the view im exporting changing based on the elements on the edges of the view; can this bounding box help me determine the exported image bounding box?
+
+The units are different than the "specify coordinates at point", so I'm not sure.
+
+**Answer:** They might certainly be useful, and almost equally certainly they will not enable any totally reliable and precise transformation.
+
+Therefore, I would still stick with my initial suggestion.
 
 
-####<a name="3"></a> 
+####<a name="3"></a> Compiling the Revit SDK Samples
+
+**Question:** I'm trying to compile the SDK Revit 2019.2 Samples, but the buttons are disabled:
+
+<center>
+<img src="img/rvtsamples_greyed_out.png" alt="RvtSamples greyed out" title="RvtSamples greyed out" width="500"/> <!-- 1035 -->
+</center>
+
+Do you have any suspicion of what may be happening?
+
+**Answer:** Yes, certainly.
+
+Actually, what you show in the screen snapshot is the external application RvtSamples that creates a user interface to load and launch all the Revit SDK sample external commands.
+
+The problem is probably caused by incorrect paths to the samples.
+
+I have run into similar issues many times over in the past, e.g., most lately,
+[compiling the Revit 2021 SDK samples](https://thebuildingcoder.typepad.com/blog/2020/05/compiling-the-revit-2021-sdk-samples.html) and
+[setting up RvtSamples for Revit 2021](https://thebuildingcoder.typepad.com/blog/2020/05/setting-up-rvtsamples-for-revit-2021.html).
+
+You should check out both those posts and 
+the [numerous descriptions of various problems encountered compiling the Revit SDK](https://www.google.com/search?q=compiling+sdk+samples&as_sitesearch=thebuildingcoder.typepad.com)
+and [installing RvtSamples](https://www.google.com/search?q=installing+rvtsamples&as_sitesearch=thebuildingcoder.typepad.com) for
+previous versions.
+
 
 
 **Question:** 
@@ -99,10 +147,5 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 <pre class="code">
 </pre>
-
-
-<center>
-<img src="img/" alt="" title="" width="327"/>
-</center>
 
 
