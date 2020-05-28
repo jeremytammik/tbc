@@ -6,26 +6,6 @@
 
 <!---
 
-- RvtVerFileOpen
-From a running Revit session, you can easily determine its version number via the [application `VersionNumber` property](https://www.revitapidocs.com/2020/35b18b73-4c47-fee3-d2f9-21298f029f7f.htm), cf., e.g., 
-[How to get the current build of an open project file?](https://stackoverflow.com/questions/61936125/revit-python-how-to-get-the-current-build-of-an-open-project-file)
-Determining the Revit version that saved a non-open RVT file stored ino the OS file system and not currently opened in Revit, however, is a different matter, e.g., making use of the basic file info, as explained in several places, e.g.,
-the discussion on [Basic File Info and RVT File Version](https://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html).
-Vin Gallo now shared a new utility making use of that finctionality in his [recent comment](https://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html#comment-4927991760) on that article:
-https://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html#comment-4927991760
-I've written a small app that opens any RVT file in the correct Revit version, simply by double-clicking the file in Windows Explorer.
-I have used some of the logic in this thread, which works for all versions of Revit up to 2021.
-I can share the source code here, but it's probably better to just share the Visual Studio Source, if anybody is interested.
-Here's a short video:
-https://www.dropbox.com/s/eqwwk0zb4s9hee1/RvtFileOpen.mp4?dl=0
-Source Code:
-https://www.dropbox.com/s/1zvfnwxmju8z1z1/RvtVer.zip?dl=0
-To make it work, you'll have to associate RVT files with this app.
-Local copies:
-vg_RvtVerFileOpen.mp4
-vg_RvtVerFileOpen.zip
-Many thanks to Vin for implementing and sharing this!
-
 - How to get Revit export image coordinates or reference point?
   https://stackoverflow.com/questions/62004785/how-to-get-revit-export-image-coordinates-or-reference-point
 
@@ -33,6 +13,26 @@ Many thanks to Vin for implementing and sharing this!
   Q: I'm trying to compile the SDK Revit 2019.2 Samples, but the buttons are disabled. Do you have any suspicion of what may be happening?
   A: yes: https://thebuildingcoder.typepad.com/blog/2020/05/compiling-the-revit-2021-sdk-samples.html
   You should also read The numerous Building Coder descriptions of all the various problems encountered installing them for previous versions. Please refer to the blog!
+
+- RvtVerFileOpen
+  From a running Revit session, you can easily determine its version number via the [application `VersionNumber` property](https://www.revitapidocs.com/2020/35b18b73-4c47-fee3-d2f9-21298f029f7f.htm), cf., e.g., 
+  [How to get the current build of an open project file?](https://stackoverflow.com/questions/61936125/revit-python-how-to-get-the-current-build-of-an-open-project-file)
+  Determining the Revit version that saved a non-open RVT file stored ino the OS file system and not currently opened in Revit, however, is a different matter, e.g., making use of the basic file info, as explained in several places, e.g.,
+  the discussion on [Basic File Info and RVT File Version](https://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html).
+  Vin Gallo now shared a new utility making use of that finctionality in his [recent comment](https://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html#comment-4927991760) on that article:
+  https://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html#comment-4927991760
+  I've written a small app that opens any RVT file in the correct Revit version, simply by double-clicking the file in Windows Explorer.
+  I have used some of the logic in this thread, which works for all versions of Revit up to 2021.
+  I can share the source code here, but it's probably better to just share the Visual Studio Source, if anybody is interested.
+  Here's a short video:
+  https://www.dropbox.com/s/eqwwk0zb4s9hee1/RvtFileOpen.mp4?dl=0
+  Source Code:
+  https://www.dropbox.com/s/1zvfnwxmju8z1z1/RvtVer.zip?dl=0
+  To make it work, you'll have to associate RVT files with this app.
+  Local copies:
+  vg_RvtVerFileOpen.mp4
+  vg_RvtVerFileOpen.zip
+  Many thanks to Vin for implementing and sharing this!
 
 - a pretty impressive little app tutorial
 How To Create An Optical Character Reader Using Angular And Azure Computer Vision
@@ -69,7 +69,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Automatically Open Currect RVT File Version
+### Automatically Open Correct RVT File Version
 
 Today, let's address a couple of quick questions and share a useful utility:
 
@@ -107,7 +107,7 @@ The units are different than the "specify coordinates at point", so I'm not sure
 Therefore, I would still stick with my initial suggestion.
 
 
-####<a name="3"></a> Compiling the Revit SDK Samples
+####<a name="3"></a> Problems Compiling and Installing the Revit SDK Samples
 
 **Question:** I'm trying to compile the SDK Revit 2019.2 Samples, but the buttons are disabled:
 
@@ -133,19 +133,57 @@ and [installing RvtSamples](https://www.google.com/search?q=installing+rvtsample
 previous versions.
 
 
+####<a name="4"></a> RvtVerFileOpen &ndash; Open Correct RVT File Version
 
-**Question:** 
+From a running Revit session, you can easily determine its version number via
+the [application `VersionNumber` property](https://www.revitapidocs.com/2020/35b18b73-4c47-fee3-d2f9-21298f029f7f.htm), cf., e.g., 
+[how to get the current build of an open project file?](https://stackoverflow.com/questions/61936125/revit-python-how-to-get-the-current-build-of-an-open-project-file).
 
-**Answer:** 
+Determining the Revit version that saved an RVT file stored ino the OS file system and not currently opened in Revit, however, is a different matter.
 
+It can be handled using the [BasicFileInfo class](https://www.revitapidocs.com/2020/475edc09-cee7-6ff1-a0fa-4e427a56262a.htm),
+as explained in several places, e.g., the discussion
+on [basic file info and RVT file version](https://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html).
 
+Vin Gallo now shared a new utility making use of that functionality in
+his [recent comment](https://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html#comment-4927991760) on
+that article:
 
-**Response:** 
+> I've written a small app that opens any RVT file in the correct Revit version, simply by double-clicking the file in Windows Explorer.
 
+> I have used some of the logic in this thread, which works for all versions of Revit up to 2021.
 
-####<a name="5"></a> 
+> I can share the source code here, but it's probably better to just share the Visual Studio Source, if anybody is interested.
 
-<pre class="code">
-</pre>
+> Here's a [short video](https://www.dropbox.com/s/eqwwk0zb4s9hee1/RvtFileOpen.mp4?dl=0).
 
+> [Source Code](https://www.dropbox.com/s/1zvfnwxmju8z1z1/RvtVer.zip?dl=0).
 
+> To make it work, you'll have to associate RVT files with this app.
+
+Many thanks to Vin for implementing and sharing this!
+
+For safety's sake, I made local copies of his video and source code here:
+
+- [Demo video](zip/vg_RvtVerFileOpen.mp4)
+- [Source code](zip/vg_RvtVerFileOpen.zip)
+
+####<a name="5"></a> Angular and React Tutorials
+
+Let's round off with some pretty impressive and pretty basic web related stuff, respectively:
+
+- [How To Create An Optical Character Reader Using Angular And Azure Computer Vision](https://www.freecodecamp.org/news/how-to-create-an-optical-character-reader-using-angular-and-azure-computer-vision)
+- [How to Get Started with React &ndash A Modern Project-based Guide for Beginners (Including Hooks)](https://www.freecodecamp.org/news/getting-started-with-react-a-modern-project-based-guide-for-beginners-including-hooks-2)
+
+####<a name="6"></a> Give and Take
+
+Finally, a short note on giving and taking:
+
+[The most successful developers share more than they take](https://stackoverflow.blog/2020/05/14/the-most-successful-developers-share-more-than-they-take).
+
+This doesn't just apply to developers, by the way, but to BIM experts as well,
+cf. [Håvard Vasshaug on Learning Dynamo and Sharing Content
+](https://thebuildingcoder.typepad.com/blog/2015/09/sharing-dynamo-and-a-chinese-book.html#2).
+
+I love and believe in sharing and open source, cf. my
+old [Book Recommendation: *The Cathedral and the Bazaar*](https://thebuildingcoder.typepad.com/blog/2011/09/revit-ifc-exporter-released-as-open-source.html#4).
