@@ -40,6 +40,17 @@ Today, let's address a couple of quick questions and share a useful utility
 
 linkedin:
 
+Automatically determine and open correct RVT file version, exact export image coordinates and scaling and compiling and installing the Revit SDK samples for the #RevitAPI
+
+https://bit.ly/rvtfileveropen
+
+Today, let's address a couple of quick questions and share a useful utility:
+
+- How to determine Revit export image coordinates
+- Problems compiling and installing the Revit SDK samples
+- RvtVerFileOpen utility opens correct RVT file version
+- Angular and react tutorials
+- Give and take...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
