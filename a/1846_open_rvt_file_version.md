@@ -31,8 +31,12 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Today, let's address a couple of quick questions and share a useful utility
+&ndash; How to determine Revit export image coordinates
+&ndash; Problems compiling and installing the Revit SDK samples
+&ndash; RvtVerFileOpen utility opens correct RVT file version
+&ndash; Angular and react tutorials
+&ndash; Give and take...
 
 linkedin:
 
@@ -83,7 +87,7 @@ demonstrate exporting an SVG image from Revit, scaling it for display in a web b
 
 **Response:** Thank you for your reply Jeremy, I'm looking into that.
 
-I've noticed the `BoundingBoxUV` in the view im exporting changing based on the elements on the edges of the view; can this bounding box help me determine the exported image bounding box?
+I've noticed the `BoundingBoxUV` in the view I'm exporting changing based on the elements on the edges of the view; can this bounding box help me determine the exported image bounding box?
 
 The units are different than the "specify coordinates at point", so I'm not sure.
 
@@ -106,13 +110,13 @@ Do you have any suspicion of what may be happening?
 
 Actually, what you show in the screen snapshot is the external application RvtSamples that creates a user interface to load and launch all the Revit SDK sample external commands.
 
-The problem is probably caused by incorrect paths to the samples.
+The problem is probably caused by incorrect paths to the samples being specified in `RvtSamples.txt`.
 
 I have run into similar issues many times over in the past, e.g., most lately,
 [compiling the Revit 2021 SDK samples](https://thebuildingcoder.typepad.com/blog/2020/05/compiling-the-revit-2021-sdk-samples.html) and
 [setting up RvtSamples for Revit 2021](https://thebuildingcoder.typepad.com/blog/2020/05/setting-up-rvtsamples-for-revit-2021.html).
 
-You should check out both those posts and 
+You can check out those two posts and 
 the [numerous descriptions of various problems encountered compiling the Revit SDK](https://www.google.com/search?q=compiling+sdk+samples&as_sitesearch=thebuildingcoder.typepad.com)
 and [installing RvtSamples](https://www.google.com/search?q=installing+rvtsamples&as_sitesearch=thebuildingcoder.typepad.com) for
 previous versions.
@@ -124,7 +128,7 @@ From a running Revit session, you can easily determine its version number via
 the [application `VersionNumber` property](https://www.revitapidocs.com/2020/35b18b73-4c47-fee3-d2f9-21298f029f7f.htm), cf., e.g., 
 [how to get the current build of an open project file?](https://stackoverflow.com/questions/61936125/revit-python-how-to-get-the-current-build-of-an-open-project-file).
 
-Determining the Revit version that saved an RVT file stored ino the OS file system and not currently opened in Revit, however, is a different matter.
+Determining the Revit version that saved an RVT file stored in the OS file system and not currently opened in Revit, however, is a different matter.
 
 It can be handled using the [BasicFileInfo class](https://www.revitapidocs.com/2020/475edc09-cee7-6ff1-a0fa-4e427a56262a.htm),
 as explained in several places, e.g., the discussion
@@ -157,8 +161,8 @@ For safety's sake, I made local copies of his video and source code here:
 
 Let's round off with some pretty impressive and pretty basic web related stuff, respectively:
 
-- [How To Create An Optical Character Reader Using Angular And Azure Computer Vision](https://www.freecodecamp.org/news/how-to-create-an-optical-character-reader-using-angular-and-azure-computer-vision)
-- [How to Get Started with React &ndash A Modern Project-based Guide for Beginners (Including Hooks)](https://www.freecodecamp.org/news/getting-started-with-react-a-modern-project-based-guide-for-beginners-including-hooks-2)
+- [How to create an optical character reader using Angular And Azure Computer Vision](https://www.freecodecamp.org/news/how-to-create-an-optical-character-reader-using-angular-and-azure-computer-vision)
+- [How to get started with React &ndash; a modern project-based guide for beginners (including hooks)](https://www.freecodecamp.org/news/getting-started-with-react-a-modern-project-based-guide-for-beginners-including-hooks-2)
 
 ####<a name="6"></a> Give and Take
 

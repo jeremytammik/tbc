@@ -14,45 +14,28 @@
   You should also read The numerous Building Coder descriptions of all the various problems encountered installing them for previous versions. Please refer to the blog!
 
 - RvtVerFileOpen
-  From a running Revit session, you can easily determine its version number via the [application `VersionNumber` property](https://www.revitapidocs.com/2020/35b18b73-4c47-fee3-d2f9-21298f029f7f.htm), cf., e.g., 
-  [How to get the current build of an open project file?](https://stackoverflow.com/questions/61936125/revit-python-how-to-get-the-current-build-of-an-open-project-file)
-  Determining the Revit version that saved a non-open RVT file stored ino the OS file system and not currently opened in Revit, however, is a different matter, e.g., making use of the basic file info, as explained in several places, e.g.,
-  the discussion on [Basic File Info and RVT File Version](https://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html).
-  Vin Gallo now shared a new utility making use of that finctionality in his [recent comment](https://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html#comment-4927991760) on that article:
-  https://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html#comment-4927991760
-  I've written a small app that opens any RVT file in the correct Revit version, simply by double-clicking the file in Windows Explorer.
-  I have used some of the logic in this thread, which works for all versions of Revit up to 2021.
-  I can share the source code here, but it's probably better to just share the Visual Studio Source, if anybody is interested.
-  Here's a short video:
-  https://www.dropbox.com/s/eqwwk0zb4s9hee1/RvtFileOpen.mp4?dl=0
-  Source Code:
-  https://www.dropbox.com/s/1zvfnwxmju8z1z1/RvtVer.zip?dl=0
-  To make it work, you'll have to associate RVT files with this app.
-  Local copies:
-  vg_RvtVerFileOpen.mp4
-  vg_RvtVerFileOpen.zip
-  Many thanks to Vin for implementing and sharing this!
 
 - a pretty impressive little app tutorial
-How To Create An Optical Character Reader Using Angular And Azure Computer Vision
-https://www.freecodecamp.org/news/how-to-create-an-optical-character-reader-using-angular-and-azure-computer-vision/
-
-How to Get Started with React — A Modern Project-based Guide for Beginners (Including Hooks)
-https://www.freecodecamp.org/news/getting-started-with-react-a-modern-project-based-guide-for-beginners-including-hooks-2/
+  How To Create An Optical Character Reader Using Angular And Azure Computer Vision
+  https://www.freecodecamp.org/news/how-to-create-an-optical-character-reader-using-angular-and-azure-computer-vision/
+  How to Get Started with React — A Modern Project-based Guide for Beginners (Including Hooks)
+  https://www.freecodecamp.org/news/getting-started-with-react-a-modern-project-based-guide-for-beginners-including-hooks-2/
 
 - The most successful developers share more than they take
   https://stackoverflow.blog/2020/05/14/the-most-successful-developers-share-more-than-they-take
   It doesn't just apply to developers, but to BIM experts as well, e.g., [Vasshaug]()
   <li><a href="http://thebuildingcoder.typepad.com/blog/2015/09/sharing-dynamo-and-a-chinese-book.html">Sharing, Dynamo and a Chinese Book</a></li>
 
-
-
 twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Today, let's address a couple of quick questions and share a useful utility
+&ndash; How to determine Revit export image coordinates
+&ndash; Problems compiling and installing the Revit SDK samples
+&ndash; RvtVerFileOpen utility opens correct RVT file version
+&ndash; Angular and react tutorials
+&ndash; Give and take...
 
 linkedin:
 
@@ -70,8 +53,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 <h3>Automatically Open Correct RVT File Version</h3>
 <p>Today, let's address a couple of quick questions and share a useful utility:</p>
+<ul>
+<li><a href="#2">How to determine Revit export image coordinates</a></li>
+<li><a href="#3">Problems compiling and installing the Revit SDK samples</a></li>
+<li><a href="#4">RvtVerFileOpen &ndash; open correct RVT file version</a></li>
+<li><a href="#5">Angular and react tutorials</a></li>
+<li><a href="#6">Give and take</a></li>
+</ul>
 <h4><a name="2"></a> How to Determine Revit Export Image Coordinates</h4>
-<p>Raised in the StackOverflow qustion
+<p>Raised in the StackOverflow question
 on <a href="https://stackoverflow.com/questions/62004785/how-to-get-revit-export-image-coordinates-or-reference-point">how to get Revit export image coordinates or reference point</a>:</p>
 <p><strong>Question:</strong> I want to have a reference point or know the coordinates of any point on an exported Image (from any view) from Revit.</p>
 <p>For example, in this Revit floor plan export, I'd like to know the bounding box of the picture, its middle point, or any other reliable reference point:</p>
@@ -85,7 +75,7 @@ on <a href="https://stackoverflow.com/questions/62004785/how-to-get-revit-export
 corresponding <a href="https://github.com/jeremytammik/roomedit">roomedit CouchDb</a> web interface
 demonstrate exporting an SVG image from Revit, scaling it for display in a web browser, and transformation and calculation of exact coordinates back and forth between two environments.</p>
 <p><strong>Response:</strong> Thank you for your reply Jeremy, I'm looking into that.</p>
-<p>I've noticed the <code>BoundingBoxUV</code> in the view im exporting changing based on the elements on the edges of the view; can this bounding box help me determine the exported image bounding box?</p>
+<p>I've noticed the <code>BoundingBoxUV</code> in the view I'm exporting changing based on the elements on the edges of the view; can this bounding box help me determine the exported image bounding box?</p>
 <p>The units are different than the "specify coordinates at point", so I'm not sure.</p>
 <p><strong>Answer:</strong> They might certainly be useful, and almost equally certainly they will not enable any totally reliable and precise transformation.</p>
 <p>Therefore, I would still stick with my initial suggestion.</p>
@@ -97,11 +87,11 @@ demonstrate exporting an SVG image from Revit, scaling it for display in a web b
 <p>Do you have any suspicion of what may be happening?</p>
 <p><strong>Answer:</strong> Yes, certainly.</p>
 <p>Actually, what you show in the screen snapshot is the external application RvtSamples that creates a user interface to load and launch all the Revit SDK sample external commands.</p>
-<p>The problem is probably caused by incorrect paths to the samples.</p>
+<p>The problem is probably caused by incorrect paths to the samples being specified in <code>RvtSamples.txt</code>.</p>
 <p>I have run into similar issues many times over in the past, e.g., most lately,
 <a href="https://thebuildingcoder.typepad.com/blog/2020/05/compiling-the-revit-2021-sdk-samples.html">compiling the Revit 2021 SDK samples</a> and
 <a href="https://thebuildingcoder.typepad.com/blog/2020/05/setting-up-rvtsamples-for-revit-2021.html">setting up RvtSamples for Revit 2021</a>.</p>
-<p>You should check out both those posts and 
+<p>You can check out those two posts and 
 the <a href="https://www.google.com/search?q=compiling+sdk+samples&amp;as_sitesearch=thebuildingcoder.typepad.com">numerous descriptions of various problems encountered compiling the Revit SDK</a>
 and <a href="https://www.google.com/search?q=installing+rvtsamples&amp;as_sitesearch=thebuildingcoder.typepad.com">installing RvtSamples</a> for
 previous versions.</p>
@@ -109,7 +99,7 @@ previous versions.</p>
 <p>From a running Revit session, you can easily determine its version number via
 the <a href="https://www.revitapidocs.com/2020/35b18b73-4c47-fee3-d2f9-21298f029f7f.htm">application <code>VersionNumber</code> property</a>, cf., e.g., 
 <a href="https://stackoverflow.com/questions/61936125/revit-python-how-to-get-the-current-build-of-an-open-project-file">how to get the current build of an open project file?</a>.</p>
-<p>Determining the Revit version that saved an RVT file stored ino the OS file system and not currently opened in Revit, however, is a different matter.</p>
+<p>Determining the Revit version that saved an RVT file stored in the OS file system and not currently opened in Revit, however, is a different matter.</p>
 <p>It can be handled using the <a href="https://www.revitapidocs.com/2020/475edc09-cee7-6ff1-a0fa-4e427a56262a.htm">BasicFileInfo class</a>,
 as explained in several places, e.g., the discussion
 on <a href="https://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html">basic file info and RVT file version</a>.</p>
@@ -133,8 +123,8 @@ that article:</p>
 <h4><a name="5"></a> Angular and React Tutorials</h4>
 <p>Let's round off with some pretty impressive and pretty basic web related stuff, respectively:</p>
 <ul>
-<li><a href="https://www.freecodecamp.org/news/how-to-create-an-optical-character-reader-using-angular-and-azure-computer-vision">How To Create An Optical Character Reader Using Angular And Azure Computer Vision</a></li>
-<li><a href="https://www.freecodecamp.org/news/getting-started-with-react-a-modern-project-based-guide-for-beginners-including-hooks-2">How to Get Started with React &amp;ndash A Modern Project-based Guide for Beginners (Including Hooks)</a></li>
+<li><a href="https://www.freecodecamp.org/news/how-to-create-an-optical-character-reader-using-angular-and-azure-computer-vision">How to create an optical character reader using Angular And Azure Computer Vision</a></li>
+<li><a href="https://www.freecodecamp.org/news/getting-started-with-react-a-modern-project-based-guide-for-beginners-including-hooks-2">How to get started with React &ndash; a modern project-based guide for beginners (including hooks)</a></li>
 </ul>
 <h4><a name="6"></a> Give and Take</h4>
 <p>Finally, a short note on giving and taking:</p>
