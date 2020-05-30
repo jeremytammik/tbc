@@ -50,6 +50,7 @@ As there is no explicit SDK sample for splitting pipe instances into standard le
 
 1-	Establish a new transaction: As this is going to modify the Revit document, then we need to have it done within a transaction context.
 
+<pre class="code">
   Transaction tx = new Transaction(activeDoc.Document);
 
   tx.Start("split pipe");
@@ -59,9 +60,11 @@ As there is no explicit SDK sample for splitting pipe instances into standard le
   SplitPipe(pipes[0], system, activeDoc, systemtype, pipeType);
 
   tx.Commit();
+</pre>
 
 2-	We then obtain the selected pipe basic data including its length, associated level Id and system Id.
 
+<pre class="code">
   ElementId levelId = segment.get_Parameter(BuiltInParameter.RBS_START_LEVEL_PARAM).AsElementId();
   // system.LevelId;
   ElementId systemtype = _system.GetTypeId();
@@ -70,9 +73,11 @@ As there is no explicit SDK sample for splitting pipe instances into standard le
   
   //Pipe diameter
   double pipeDia = UnitUtils.ConvertFromInternalUnits(segment.get_Parameter(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM).AsDouble(), DisplayUnitType.DUT_MILLIMETERS);
+</pre>
 
 3-	We then compare the obtained length, including the fitting length, with the standard length that we want to assign (for instance 6m here). If it is longer than that, then we proceed. 
 
+<pre class="code">
   //Standard length
   double l = 6000;
 
@@ -84,9 +89,11 @@ As there is no explicit SDK sample for splitting pipe instances into standard le
 
   if (len <= l)
     return;
+</pre>
 
 4-	We then determine the splitting point by taking the fracture between the required length to the total length.
 
+<pre class="code">
   var startPoint = c1.GetEndPoint(0);
   var endPoint = c1.GetEndPoint(1);
   
@@ -103,9 +110,11 @@ As there is no explicit SDK sample for splitting pipe instances into standard le
   // Find two connectors which pipe's two ends connector connected to. 
   Connector startConn = FindConnectedTo(pp, startPoint);
   Connector endConn = FindConnectedTo(pp, endPoint);
+</pre>
 
 5-	We are then able to create the first and second pipe segments using the command create:
 
+<pre class="code">
   // creating first pipe 
   Pipe pipe = null;
   if (null != _pipeType)
@@ -141,18 +150,19 @@ As there is no explicit SDK sample for splitting pipe instances into standard le
   {
     Connector pipeEndConn = FindConnector(pipe1, endPoint);
     pipeEndConn.ConnectTo(endConn);
-  
-  
   }
+</pre>
 
 6-	Once this is done successfully, we can then delete the original pipe segment
 
+<pre class="code">
   ICollection<Autodesk.Revit.DB.ElementId> deletedIdSet = _activeDoc.Document.Delete(segment.Id);
   
   if (0 == deletedIdSet.Count)
   {
     throw new Exception("Deleting the selected elements in Revit failed.");
   }
+</pre>
 
 Link to the full code is accessible here:
 
