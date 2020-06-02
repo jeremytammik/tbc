@@ -21,8 +21,10 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Today, let's focus on splitting pipes and other things, starting with a nicely structured tutorialfasdoub
+&ndash; Abdelaziz' split pipe tutorial
+&ndash; Calling the SL split element command
+&ndash; Splitting a conduit...
 
 linkedin:
 
@@ -39,7 +41,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Split Pipe Tutorial and Related Cases
 
-Today, let's focus on splitting pipes and other things, starting with a nicely structured tutorial on splitting pipes shared
+Today, let's focus on splitting pipes and other things, starting with a nicely structured tutorial shared
 by Abdelaziz [Zizobiko25](https://github.com/Zizobiko25) Fadoul:
 
 - [Abdelaziz' split pipe tutorial](#3)
@@ -81,7 +83,7 @@ As there is no explicit SDK sample for splitting pipe instances into standard le
  
 &nbsp;&nbsp;<span style="color:green;">//Pipe&nbsp;diameter</span>
 &nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;pipeDia&nbsp;=&nbsp;<span style="color:#2b91af;">UnitUtils</span>.ConvertFromInternalUnits(&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;segment.get_Parameter(&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.RBS_PIPE_DIAMETER_PARAM&nbsp;).AsDouble(),&nbsp;\
+&nbsp;&nbsp;&nbsp;&nbsp;segment.get_Parameter(&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.RBS_PIPE_DIAMETER_PARAM&nbsp;).AsDouble(),
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">DisplayUnitType</span>.DUT_MILLIMETERS&nbsp;);  
 </pre>
 
