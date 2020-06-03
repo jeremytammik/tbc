@@ -28,6 +28,16 @@ Today, let's focus on splitting pipes and other things, starting with a nicely s
 
 linkedin:
 
+Tutorial on splitting a pipe, calling the SL split element command and splitting a conduit in the #RevitAPI 
+
+https://bit.ly/splitpipetutor
+
+Today, let's focus on splitting pipes and other things, starting with a nicely structured tutorial:
+
+- Abdelaziz' split pipe tutorial
+- Calling the SL split element command
+- Splitting a conduit...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
