@@ -47,6 +47,7 @@ by Abdelaziz [Zizobiko25](https://github.com/Zizobiko25) Fadoul:
 - [Abdelaziz' split pipe tutorial](#3)
 - [Calling the SL split element command](#4)
 - [Splitting a conduit](#5)
+- [George Floyd in Memoriam](#6)
 
 ####<a name="3"></a> Abdelaziz' Split Pipe Tutorial
 
@@ -266,3 +267,52 @@ To be sure, we did research this thoroughly but as noted above our implementatio
 
 I'm afraid I have nothing constructive to add to that, and, as you say, Revit probably does something similar internally as well.
 
+####<a name="6"></a> George Floyd in Memoriam
+
+"It's my face man
+<br/>I didn't do nothing serious man
+<br/>please
+<br/>please
+<br/>please I can't breathe
+<br/>please man
+<br/>please somebod
+<br/>please man
+<br/>I can't breathe
+<br/>I can't breathe
+<br/>please
+<br/>(inaudible)
+<br/>man can't breathe, my face
+<br/>just get u
+<br/>I can't breathe
+<br/>please (inaudible)
+<br/>I can't breathe sh*t
+<br/>I will
+<br/>I can't move
+<br/>mama
+<br/>mama
+<br/>I can't
+<br/>my knee
+<br/>my nuts
+<br/>I'm through
+<br/>I'm through
+<br/>I'm claustrophobic
+<br/>my stomach hurt
+<br/>my neck hurts
+<br/>everything hurts
+<br/>some water or something
+<br/>please
+<br/>please
+<br/>I can't breathe officer
+<br/>don't kill me
+<br/>they gon' kill me man
+<br/>come on man
+<br/>I cannot breathe
+<br/>I cannot breathe
+<br/>they gon' kill me
+<br/>they gon kill me
+<br/>I can't breathe
+<br/>I can't breathe
+<br/>please sir
+<br/>please
+<br/>please
+<br/>please I can't breathe"
