@@ -19,9 +19,9 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Tutorial on splitting a pipe, calling the SL split element command and splitting a conduit in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/splitpipetutor
 
-Today, let's focus on splitting pipes and other things, starting with a nicely structured tutorialfasdoub
+Today, let's focus on splitting pipes and other things, starting with a nicely structured tutorial
 &ndash; Abdelaziz' split pipe tutorial
 &ndash; Calling the SL split element command
 &ndash; Splitting a conduit...
