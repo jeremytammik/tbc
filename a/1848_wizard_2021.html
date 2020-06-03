@@ -19,25 +19,15 @@
   https://www.freecodecamp.org/news/4-design-patterns-to-use-in-web-development/
 
 - invisible Revit properties in Forge viewer
-Eason Kang Today at 11:29 AM
-Hi again team, I got a question from a Revit user. He said one of his family parameters is missing after translation. While opening the family document inside the RVT, I found the missing parameter has a Visible: false in its definition with Revit Lookup tool. Does this mean that Revit extractor will ignore invisible parameters while exporting PropertyDB? Thank you in advance! (edited) 
-Invisilbe shared parameter.jpg 
-Invisilbe shared parameter.jpg
-invisilbe_shared_parameter.jpg
-A: Yes indeed, Revit Extractor only handles visible parameters          InternalDefinition^ idef = dynamic_cast<InternalDefinition^>(paramDef);
-         if (idef)
-         {
-            if (!idef->Visible)
-            {
-               continue;
-            }
 
 twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Our tidbits for today
+&ndash; Revit 2021 Visual Studio add-in templates
+&ndash; Four important design patterns
+&ndash; Invisible shared parameters don't make it into Forge...
 
 linkedin:
 
@@ -52,7 +42,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3></h3>
+<h3>Revit 2021 Visual Studio Add-in Templates</h3>
+<p>Our tidbits for today:</p>
+<ul>
+<li><a href="#2">Revit 2021 Visual Studio add-in templates</a></li>
+<li><a href="#3">Four important design patterns</a></li>
+<li><a href="#4">Invisible shared parameters don't make it into Forge</a></li>
+</ul>
 <h4><a name="2"></a> Revit 2021 Visual Studio Add-in Templates</h4>
 <p>Wizard migration &ndash; <a href="https://github.com/jeremytammik/VisualStudioRevitAddinWizard">VisualStudioRevitAddinWizard</a> is
 now <a href="https://github.com/jeremytammik/VisualStudioRevitAddinWizard/releases/tag/2021.0.0.0">available for Revit 2021</a>,
@@ -78,6 +74,7 @@ submitting <a href="https://github.com/jeremytammik/VisualStudioRevitAddinWizard
 on <a href="https://www.freecodecamp.org/news/4-design-patterns-to-use-in-web-development">4 design patterns you should know for web development: observer, singleton, strategy, and decorator</a>.</p>
 <p>In fact, they are just as important and useful in the context of the Revit API as well!</p>
 <h4><a name="4"></a> Invisible Shared Parameters don't make it into Forge</h4>
+<p>By the way, talking about wizards above quickly leads to the topic of magic and the question invisible objects...</p>
 <p>In general, all Revit element properties are translated and available in the Forge viewer environment.</p>
 <p>However, unfortunately for some, that is not always true.</p>
 <p>This question just came up and was confirmed again as follows:</p>
