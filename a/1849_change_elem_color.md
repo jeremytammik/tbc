@@ -29,27 +29,28 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Change Element Colour and Material
+### Changing Element Colour and Material
 
-People keep asking how to change the colour and material of individual elements.
+The question of how to change the colour and material of individual elements has come up repeatedly over time
 
 We discussed
 how to [change element colour](https://thebuildingcoder.typepad.com/blog/2011/03/change-element-colour.html) way
-back in 2011, but some API details have changed quite a bit since then.
+back in 2011.
+The principle remains unchanged, but some API details have changed a bit since then.
 
 Various solutions to change colour have been provided in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160),
-e.g., [how to change the color a element](https://forums.autodesk.com/t5/revit-api-forum/how-change-the-color-a-element/m-p/5651177)
-and [changing color by element id + color palette](https://forums.autodesk.com/t5/revit-api-forum/change-color-by-element-id-color-palette/m-p/4768209),
+e.g., [how to change the colour of an element](https://forums.autodesk.com/t5/revit-api-forum/how-change-the-color-a-element/m-p/5651177)
+and [changing colour by element id + colour palette](https://forums.autodesk.com/t5/revit-api-forum/change-color-by-element-id-color-palette/m-p/4768209),
 but most of them are also out of date.
 
 So, to pick this up once again, I added a new sample external command `CmdChangeElementColor`
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples).
 
 
-####<a name="2"></a> Changinge Element Colour in a View
+####<a name="2"></a> Change Element Colour in a View
 
-**Question:** How can I change the element display colour ina given view?
+**Question:** How can I change the element display colour in a given view?
 
 **Answer:** You can use
 the [OverrideGraphicSettings class](https://www.revitapidocs.com/2020/eb2bd6b6-b7b2-5452-2070-2dbadb9e068a.htm) and
@@ -108,11 +109,11 @@ This code now lives in the
 new [sample command `CmdChangeElementColor`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdChangeElementColor.cs)
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples).
 
-####<a name="3"></a> Assign New material to an Element
+####<a name="3"></a> Assign new Material to an Element
 
-A slightly more tricky question is how to assign a new material:
+A slightly trickier question is how to assign a new material:
 
-**Question:** I would like to assign a material to a selected element. The material assigned will come from spreadsheet data. I already know how to create a material from the data, and now I would like to assign it to selected elements in Revit. How can this be achieved?
+**Question:** I would like to assign a material to a selected element. The material assigned will come from spreadsheet data. I already know how to create a material object from the data, and now I would like to assign it to selected elements in Revit. How can this be achieved?
 
 **Answer:** Regarding the assignment of a material to a BIM element:
 
@@ -136,9 +137,9 @@ The category does in fact provide
 a [`Material` property](https://www.revitapidocs.com/2020/00aa768a-fca2-172f-e5d4-a4d787803983.htm) that
 can be read and written.
 
-So, one way to control the material of a wall is to set its category's material:
+So, one way to control the material of a wall is to set its category's material.
 
-However, this wall affect other walls sharing the same category.
+However, this will affect other walls sharing the same category.
 
 You may be better served manipulating a sub-category instead.
 
