@@ -31,7 +31,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Changing Element Colour and Material
 
-The question of how to change the colour and material of individual elements has come up repeatedly over time
+The question of how to change the colour and material of individual elements has come up repeatedly over time:
+
+- [Change element colour in a view](#2)
+- [Assign new material to an element](#3)
+
+####<a name="2"></a> Change Element Colour in a View
 
 We discussed
 how to [change element colour](https://thebuildingcoder.typepad.com/blog/2011/03/change-element-colour.html) way
@@ -46,9 +51,6 @@ but most of them are also out of date.
 
 So, to pick this up once again, I added a new sample external command `CmdChangeElementColor`
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples).
-
-
-####<a name="2"></a> Change Element Colour in a View
 
 **Question:** How can I change the element display colour in a given view?
 
