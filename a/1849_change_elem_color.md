@@ -14,10 +14,10 @@ twitter:
 
 The question of how to change the colour and material of individual elements has come up repeatedly over time
 &ndash; Change element colour in a view
-&ndash; Assign new material to an element...
+&ndash; Assign new material to an element
+&ndash; Replace a material in a wall or floor...
 
 linkedin:
-
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -36,6 +36,7 @@ The question of how to change the colour and material of individual elements has
 
 - [Change element colour in a view](#2)
 - [Assign new material to an element](#3)
+- [Replace a material in a wall or floor](#4)
 
 ####<a name="2"></a> Change Element Colour in a View
 
@@ -190,3 +191,25 @@ new [release 2021.0.149.1](https://github.com/jeremytammik/the_building_coder_sa
 <center>
 <img src="img/concrete_steel_wood_bamboo.jpg" alt="Materials" title="Materials" width="400"/> <!-- 800 -->
 </center>
+
+####<a name="4"></a> Addendum &ndash; Replace a Material in a Wall or Floor
+
+Please refer to
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on how to [replace material](https://forums.autodesk.com/t5/revit-api-forum/replace-material/m-p/9570625) for
+a more realistic and professional discussion on replacing materials in walls and floor in real-life BIMs.
+
+I'll skip all the trivial technical details and jump right to the end, to the real-world experience
+of Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+and [Lukas Kohout](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/767846):
+
+> The reality is that if you are an AEC consultant then the wall types you use are based on the company specification for such you have developed over numerous projects. It would be unusual or inefficient not to have all the wall types you commonly use already defined in a Revit file for import (made up of the materials your specification covers).
+
+> On the other hand, say you’ve developed those types and due to project development (contractor/employer proposals) etc. the materials need to change (for acoustic/sustainability etc.). Do you manually remake the wall types with the new material, or do you create new types from existing types changing the one material that has changed? Probably you don't want to make new types due to the instance assignment of type-based sweeps/reveals etc. So instead should swap the material in the existing types. In theory you could redefine the material itself, but it may be used in elements where the change isn’t required. I'm not surprised people would turn to the API for this kind of task. 
+
+> I would also add, from my experience that sometimes you want to create new wall types and materials and you need API to do that.
+
+> In my previous job, we developed a Revit add-in that was connected to building material manufacturers product database. From that data, it created new wall, floor and ceiling types in project. New types had different compound structures, materials assigned and parameters filled. Doing that manually is really tedious, never mind that you would have to find the data from product lists and put them into project yourself.
+
+> At that time, you had to duplicate an existing type in project and then add the new compound structure to it.
+Maybe that changed now.
