@@ -36,10 +36,12 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-The question of how to change the colour and material of individual elements has come up repeatedly over time
-&ndash; Change element colour in a view
-&ndash; Assign new material to an element
-&ndash; Replace a material in a wall or floor...
+A bunch of interesting discussions on creating material with texture, modifying element level, cutting off image pixels and other things
+&ndash; Creating a material with texture in Revit and Forge
+&ndash; Export image cutting off pixels
+&ndash; Change level of existing element
+&ndash; Physics is cool
+&ndash; Forge job openings...
 
 linkedin:
 
