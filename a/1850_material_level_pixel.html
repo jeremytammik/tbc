@@ -108,13 +108,14 @@ where <a href="https://stackoverflow.com/users/12469767/maleficca">maleficca</a>
 
 <p>Which is basically the working folder for the Workitem instance. This path is useless, because a material with texture path like this needs to be manually re-linked in Revit. </p>
 <p>The perfect outcome for me would be if I could somehow map the material texture path to some user-friendly directory like <code>C:\Textures\texture.png</code> and it seems that the Forge instance has a <code>C:\</code> drive present (being probably a Windows instance of some sorts), but my code runs on low privileges, so it cannot create any kind of directories or files outside the working directory.</p>
-<p>Does somebody has any idea how this could be resolved? Any help would be greatly appreciated!</p>
+<p>Does somebody have any idea how this could be resolved?
+Any help would be greatly appreciated!</p>
 <p><strong>Answer:</strong> Congratulations on getting to this point.
 Would you like to share the code you use to create the material and attach the texture for the Revit API add-in developer community to enjoy, either here or in a new thread in the Revit API discussion forum?
 People keep asking for such samples... Thank you!</p>
 <p><strong>Response:</strong> Here is my own answer and code sample:</p>
-<p>After a whole day of research I pretty much arrived at a satisfying solution. Just for clarity &ndash; I am going to reference to <strong>Autodesk Forge Design Automation API for Revit</strong>, simply as <strong>"Forge"</strong>.</p>
-<p>Basically the code provided above is correct.
+<p>After a whole day of research, I pretty much arrived at a satisfying solution. Just for clarity &ndash; I am going to reference to <strong>Autodesk Forge Design Automation API for Revit</strong>, simply as <strong>"Forge"</strong>.</p>
+<p>Basically, the code provided above is correct.
 I did not find any possible way to create a file on Forge instance, in a directory different than the Workitem working directory which is:</p>
 <pre class="code">
   T:\Aces\Jobs\<workitem_id>\texture.png
@@ -129,7 +130,7 @@ I did not find any possible way to create a file on Forge instance, in a directo
 <li>Any sub-process will also be executed with low privileges.</li>
 </ul>
 </blockquote>
-<p>So after trying to save the "dummy" texture file somewhere on the Forge <code>C:\</code> drive, I've found another solution &ndash; <strong>the texture path for your texture actually does not matter.</strong></p>
+<p>So, after trying to save the "dummy" texture file somewhere on the Forge <code>C:\</code> drive, I've found another solution &ndash; <strong>the texture path for your texture actually does not matter.</strong></p>
 <p>This is because Revit offers an alternative for re-linking your textures.
 If you fire up Revit, you can go to File &gt; Options &gt; Rendering, and under "Additional render appearance paths" field, you can specify the directories on your local machine, that Revit can use to look for missing textures.
 With these, you can do the following operations in order to have full control on creating materials on Forge:</p>
@@ -139,7 +140,7 @@ With these, you can do the following operations in order to have full control on
 <li>Attach the dummy texture file to the material.</li>
 <li>Output the resulting file (.rvt or .rfa, depending on what you're creating on Forge).</li>
 <li>Place all textures into one folder (or multiple, this doesn't matter that much).</li>
-<li>Add the directories with the textures to the Additional render apperance paths.</li>
+<li>Add the directories with the textures to the Additional render appearance paths.</li>
 <li>Revit will successfully re-link all the textures to new paths.</li>
 </ol>
 <p>I hope someone will find this useful!</p>
@@ -308,7 +309,7 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/export-image-cutting-
 <p>A solution was provided by <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/7761409">alexpaduroiu</a> in a previous conversation
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/export-image-is-cutting-few-pixels-from-image-corners/m-p/9346019">export image is cutting few pixels from image corners</a>:</p>
 <p><strong>Question:</strong> I have a small problem regarding <code>Decoument.ExportImage(ImageExportOptions options)</code>.</p>
-<p>I am trying to export a set of drafting views, but somehow the generated images cuts the views edges.</p>
+<p>I am trying to export a set of drafting views, but somehow the generated images cut the views edges.</p>
 <p>the Images:</p>
 <p><center>
 <img src="img/image_export_cutting_pixels_incomplete.png" alt="Incomplete image" title="Incomplete image" width="400"/> <!-- 500 -->
