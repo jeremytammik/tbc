@@ -10,7 +10,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+How to change the colour and material of individual elements, change element colour in a view, assign new material to an element, replace a material in a wall or floor in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/elemcolormaterial
 
 The question of how to change the colour and material of individual elements has come up repeatedly over time
 &ndash; Change element colour in a view
@@ -18,6 +18,16 @@ The question of how to change the colour and material of individual elements has
 &ndash; Replace a material in a wall or floor...
 
 linkedin:
+
+How to change the colour and material of individual elements, change element colour in a view, assign new material to an element and replace a material in a wall or floor in the #RevitAPI
+
+https://bit.ly/elemcolormaterial
+
+The question of how to change the colour and material of individual elements has come up repeatedly over time:
+
+- Change element colour in a view
+- Assign new material to an element
+- Replace a material in a wall or floor...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
