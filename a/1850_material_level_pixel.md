@@ -340,13 +340,13 @@ This is what I currently have for my export image options
 </pre>
 
 A solution was provided by [alexpaduroiu](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/7761409) in a previous conversation
-on [export image is cutting few pixels from image corners](https://forums.autodesk.com/t5/revit-api-forum/export-image-is-cutting-few-pixels-from-image-corners/m-p/9346019):
+on why [export image is cutting a few pixels from image corners](https://forums.autodesk.com/t5/revit-api-forum/export-image-is-cutting-few-pixels-from-image-corners/m-p/9346019):
 
 **Question:** I have a small problem regarding `Decoument.ExportImage(ImageExportOptions options)`.
 
 I am trying to export a set of drafting views, but somehow the generated images cut the views edges.
 
-the Images:
+A sample image:
 
 <center>
 <img src="img/image_export_cutting_pixels_incomplete.png" alt="Incomplete image" title="Incomplete image" width="400"/> <!-- 500 -->
