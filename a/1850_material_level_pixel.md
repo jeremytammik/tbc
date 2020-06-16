@@ -79,6 +79,12 @@ I have been quiet now for a while in shock and grieving about continued racism.
 
 Meanwhile, a bunch of interesting discussions on creating material, modifying element level, cutting off image pixels, enhancing the BipChecker and other things:
 
+- [Creating a material with texture in Revit and Forge](#2)
+- [Export image cutting off pixels](#3)
+- [Change level of existing element](#4)
+- [Physics is cool](#5)
+- [Forge job openings](#6)
+
 ####<a name="2"></a> Creating a Material with Texture in Revit and Forge
 
 This topic has been very much en vogue lately.
@@ -243,7 +249,7 @@ Hopefully it will come in handy to someone in the future!
 
 Also, a huge thanks for The Building Coder; it has saved me a lot of hassle in my work with Revit API and enabled to create a lot of cool stuff!
 
-####<a name="3"></a> Export Image Curring off Pixels
+####<a name="3"></a> Export Image Cutting off Pixels
 
 This query just came up again in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
