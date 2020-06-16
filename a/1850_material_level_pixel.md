@@ -34,7 +34,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Creating a material with texture in Revit and Forge, exporting image without cutting off pixels, changing level of existing element and Forge job openings with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/creatematerialtexture
 
 A bunch of interesting discussions on creating material with texture, modifying element level, cutting off image pixels and other things
 &ndash; Creating a material with texture in Revit and Forge
