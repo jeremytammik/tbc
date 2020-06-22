@@ -26,8 +26,11 @@ twitter:
 
  with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+I begin this week with a rather mixed bag of interesting issues from the last
+&ndash; Get MEP duct shape update
+&ndash; Determining differences between DLL versions
+&ndash; BipChecker facelift
+&ndash; Fonts with '@' prefix...
 
 linkedin:
 
@@ -42,7 +45,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>BipChecker Facelift and DuctType Shape</h3>
+<h3>Duct Shape, BipChecker Facelift and @ Fonts</h3>
 <p>I begin this week with a rather mixed bag of interesting issues from the last:</p>
 <ul>
 <li><a href="#2">Get MEP duct shape update</a></li>
@@ -110,8 +113,8 @@ On Revit 2018, I found that if I create a new project file using the Architectur
 <p>Later: I have not found any solution for 2018. We decide to use the sample routine (see above) you created but it works only if all three duct types (oval, rectangular and round) have real duct type in them. The workaround on 2018:</p>
 <p>If none of the three parameters in the sample routine return a valid element id, it means the drawing does not have any real duct types except the ones called “Default”; then it displays a warning to the user, asks her to transfer duct types from some other model and delete the ones called “Default”.</p>
 <p><strong>Answer:</strong> I am sure the workaround can be improved, and that a reliable algorithm to distinguish MEP element shapes can be devised. For instance, you could look at the number, geometrical location and direction of the connectors. That will provide a lot of information. You can look at the geometry.</p>
-<p>Later: did you ever resolve this?</p>
-<p><strong>Response:</strong> for Revit 2019 and newer, there is a new <code>DuctType</code> property for this, <code>DuctType.Shape</code>.</p>
+<p>Later: Did you ever resolve this?</p>
+<p><strong>Response:</strong> For Revit 2019 and newer, there is a new <code>DuctType</code> property for this, <code>DuctType.Shape</code>.</p>
 <p>For Revit 2018 and older, we get the value from the RoutingPreferenceRuleGroupType enumeration values
 TransitionsRectangularToRound, TransitionsRectangularToOval and TransitionsOvalToRound, then check whether the returned list has count 0.</p>
 <h4><a name="3"></a> Determining Differences Between DLL Versions</h4>
@@ -126,7 +129,7 @@ the venerable <a href="https://thebuildingcoder.typepad.com/blog/about-the-autho
 in his <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/i-gave-jeremys-bip-checker-a-facelift/m-p/9566362">I gave Jeremys BIP checker a facelift</a>,
 explaining:</p>
-<p>I really enjoy the nifty tools that Jeremy has created/maintain, like
+<p>I really enjoy the nifty tools that Jeremy has created or maintains, like
 the <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.34">BipChecker</a>
 and <a href="https://github.com/jeremytammik/Revitlookup">RevitLookup</a>.
 Truly useful tools that I use more or less daily when I develop for Revit.</p>
