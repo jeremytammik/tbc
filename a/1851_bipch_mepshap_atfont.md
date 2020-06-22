@@ -27,8 +27,11 @@ twitter:
 
  with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+I begin this week with a rather mixed bag of interesting issues from the last
+&ndash; Get MEP duct shape update
+&ndash; Determining differences between DLL versions
+&ndash; BipChecker facelift
+&ndash; Fonts with '@' prefix...
 
 linkedin:
 
@@ -43,7 +46,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### BipChecker Facelift and DuctType Shape
+### Duct Shape, BipChecker Facelift and @ Fonts
 
 I begin this week with a rather mixed bag of interesting issues from the last:
 
@@ -131,9 +134,9 @@ If none of the three parameters in the sample routine return a valid element id,
 
 **Answer:** I am sure the workaround can be improved, and that a reliable algorithm to distinguish MEP element shapes can be devised. For instance, you could look at the number, geometrical location and direction of the connectors. That will provide a lot of information. You can look at the geometry.
 
-Later: did you ever resolve this?
+Later: Did you ever resolve this?
 
-**Response:** for Revit 2019 and newer, there is a new `DuctType` property for this, `DuctType.Shape`.
+**Response:** For Revit 2019 and newer, there is a new `DuctType` property for this, `DuctType.Shape`.
 
 For Revit 2018 and older, we get the value from the RoutingPreferenceRuleGroupType enumeration values
 TransitionsRectangularToRound, TransitionsRectangularToOval and TransitionsOvalToRound, then check whether the returned list has count 0.
@@ -157,7 +160,7 @@ in his [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-foru
 on [I gave Jeremys BIP checker a facelift](https://forums.autodesk.com/t5/revit-api-forum/i-gave-jeremys-bip-checker-a-facelift/m-p/9566362),
 explaining:
 
-I really enjoy the nifty tools that Jeremy has created/maintain, like
+I really enjoy the nifty tools that Jeremy has created or maintains, like
 the [BipChecker](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.34)
 and [RevitLookup](https://github.com/jeremytammik/Revitlookup).
 Truly useful tools that I use more or less daily when I develop for Revit.
