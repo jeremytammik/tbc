@@ -113,81 +113,108 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### BipChecker Facelift and DuctType Shape
 
-####<a name="2"></a> MEP Get Duct Shape Update
+I begin this week with a rather mixed bag of interesting issues from the last:
 
-Q: Hi, does anyone know how can I figure out the duct shape (oval, rectangular or round) from DuctType and not depending on its FamilyName? The FamilyName is a localized string so cannot get the shape info out from it.
-A: You can get the shape based on the connectors. Let me see if i can dig some code out.
-R: does DuctType have connector?
-A: I'm not sure..... are you using FabricationParts or generics? Check to see if your element has a connector manager, then check the shape property on your connectors.
-A:
-var fabPart = myElement as FabricationPart;
-foreach (Connector conn in fabPart.ConnectorManager.Connectors)
-{
+- [Get MEP duct shape update](#2)
+- [Determining differences between DLL versions](#3)
+- [BipChecker facelift](#4)
+- [Fonts with '@' prefix](#5)
+
+####<a name="2"></a> Get MEP Duct Shape Update
+
+We have looked at how to determine the MEP duct shape repeatedly in the past, e.g., in the articles on:
+
+- [Distinguishing MEP element shape](http://thebuildingcoder.typepad.com/blog/2011/03/distinguishing-mep-element-shape.html)
+- [Improved MEP Element Shape](http://thebuildingcoder.typepad.com/blog/2011/05/improved-mep-element-shape-and-mount-ararat.html)
+- [IFC Import Levels and MEP Element Shapes](http://thebuildingcoder.typepad.com/blog/2016/02/ifc-import-levels-and-mep-element-shapes.html)
+
+The question came up again in the following discussion, and the solution is now &ndash; and has been for some time now &ndash; at hand:
+
+**Question:** How can I figure out the duct shape (oval, rectangular or round) from `DuctType` independently of its `FamilyName`? The FamilyName is a localized string, so cannot get the shape info out from it.
+
+**Answer:** You can get the shape based on the connectors. 
+
+**Response:** Does `DuctType` have connector?
+
+**Answer:** I'm not sure..... are you using FabricationParts or generics? Check to see if your element has a connector manager, then check the shape property on your connectors.
+
+<pre class="code">
+  var fabPart = myElement as FabricationPart;
+  foreach (Connector conn in fabPart.ConnectorManager.Connectors)
+  {
     var shape = conn.Shape;
-}
-R: I am using generics duct, not FabricationParts, in this case
-I found this link (by @tammikj) has sample to get shape from DuctType. But, if I open a projet file using construction template then that function failed.
-https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdMepElementShape.cs
-A: perhaps you could take some of the code found in here?
-DuctType dt = doc.GetElement( tid )
-            as DuctType;
+  }
+</pre>
 
-          if( null != dt )
-          {
-            if( HasInvalidElementIdValue( e, BuiltInParameter
-              .RBS_CURVETYPE_MULTISHAPE_TRANSITION_OVALROUND_PARAM ) )
-            {
-              shape = "rectangular";
-            }
-            else if( HasInvalidElementIdValue( e, BuiltInParameter
-              .RBS_CURVETYPE_MULTISHAPE_TRANSITION_RECTOVAL_PARAM ) )
-            {
-              shape = "round";
-            }
-            else if( HasInvalidElementIdValue( e, BuiltInParameter
-              .RBS_CURVETYPE_MULTISHAPE_TRANSITION_PARAM ) )
-            {
-              shape = "oval";
-            }
-R: this is the same code I found on the link above, it failed when open a new project not using mechanical template
-A: You should be able to call getProfileType that is defined in the base class from the type to get the shape. If for some reason that doesn't work you can use Jaz's example if you replace the FabricationPart with Duct  or FamilyInstance  (for fittings) you can get the profile shape from the connectors.
-The profile type is an enum so there should be no string related issues.
-R: old version of revit api
-- cannot find getProfileType in base class of DuctType.
-- the example code above only works when opening a new project using mechanical template
-A: It should be defined in the MEPCurveType class, it was exposed to the API in 2019.
-R: Thanks, we are switching to 2019 soon, I will use it after that, finding a workaround for now.
-on Revit 2018, I found that if I create a new project file using Architectural Template, its three DuctType only have "Default" on each. In this case the sample code above does not work. Which API function can create duct types just as like I create new project using Mechanical Template? (edited) 
-A: I don't think using the duct type will work for what you are trying to do (unless you are using 2019). If you access the duct or duct fitting (familyInstance) and get the connectors from the connector manager from the element you should be able to get the shape. That shape is the same for both.
-R: our plugin is trying to recreate duct type from the data stored in hfdm before draw duct instance. for example if plugin stores an oval duct type in hfdm called newDuctType1, for plugin to insert this duct instance into drawing, it needs to create this duct type in Oval Duct first. The plugin can hard code "Oval" string to find FamilyName "Oval Duct" In English version Revit, but our client in French using other language Revit shows localized FamilyName "Oval Duct" string so hard code "Oval" in English will not work. This is why I am looking for a solution/workaround in 2018 to determine the shape from duct type.
-I have not found any solution for 2018. We decide to use the sample routine (see above) you created but it works only if all three duct types (oval, rectangular and round) have real duct type in them. The workaround on 2018,
-1. When the all three parameters in sample routine does not return valid element id which means the drawing does not have real duct type except the one called “Default”, then it prompts warning to the user.
-2. Ask the user to transfer duct type from other drawing and delete the one called “Default”.
-A: i am sure the workaround can be improved, and i am sure that a reliable algorithm to distinguish mep element shapes can be devised. for instance, you could look at the number, geometrical location and direction of the connectors. that will provide a lot of information. you can look at the geometry.
-Here are the three methods implemented so far by The Building Coder; however, I am sure they can be improved!
-- https://thebuildingcoder.typepad.com/blog/2011/03/distinguishing-mep-element-shape.html
-- https://thebuildingcoder.typepad.com/blog/2011/05/improved-mep-element-shape-and-mount-ararat.html
-- https://thebuildingcoder.typepad.com/blog/2016/02/ifc-import-levels-and-mep-element-shapes.html#3
+**Response:** I am using generic ducts, not `FabricationParts`.
 
-<!-- 0554 0578 1406 -->
-<ul>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2011/03/distinguishing-mep-element-shape.html">Distinguishing MEP Element Shape</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2011/05/improved-mep-element-shape-and-mount-ararat.html">Improved MEP Element Shape and Mount Ararat</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2016/02/ifc-import-levels-and-mep-element-shapes.html">IFC Import Levels and MEP Element Shapes</a></li>
-</ul>
+I looked at The Building Coder posts listed above, but they don't work.
 
-<!-- 0554 0578 1406 --> <ul> - [Distinguishing MEP Element Shape](http://thebuildingcoder.typepad.com/blog/2011/03/distinguishing-mep-element-shape.html) == - [Improved MEP Element Shape and Mount Ararat](http://thebuildingcoder.typepad.com/blog/2011/05/improved-mep-element-shape-and-mount-ararat.html) == - [IFC Import Levels and MEP Element Shapes](http://thebuildingcoder.typepad.com/blog/2016/02/ifc-import-levels-and-mep-element-shapes.html) == </ul>
+**Answer:** Perhaps you could take some of the code found in here?
+
+<pre class="code">
+  DuctType dt = doc.GetElement( tid )
+  as DuctType;
+  
+  if( null != dt )
+  {
+  if( HasInvalidElementIdValue( e, BuiltInParameter
+    .RBS_CURVETYPE_MULTISHAPE_TRANSITION_OVALROUND_PARAM ) )
+  {
+    shape = "rectangular";
+  }
+  else if( HasInvalidElementIdValue( e, BuiltInParameter
+    .RBS_CURVETYPE_MULTISHAPE_TRANSITION_RECTOVAL_PARAM ) )
+  {
+    shape = "round";
+  }
+  else if( HasInvalidElementIdValue( e, BuiltInParameter
+    .RBS_CURVETYPE_MULTISHAPE_TRANSITION_PARAM ) )
+  {
+    shape = "oval";
+  }
+</pre>
+
+**Response:** this is the same code I found in the link above; it fails when opening a new project not using the mechanical template.
+
+**Answer:** You should be able to call `getProfileType` that is defined in the base class of the type to get the shape. If that doesn't work, you can use firdst code snippet above; if you replace the `FabricationPart` with `Duct` or `FamilyInstance` (for fittings), you can get the profile shape from the connectors.
+The profile type is an enum, so there should be no string related issues.
+
+**Response:** The old version of the Revit API that I am using cannot find `getProfileType` in the `DuctType` base class. The example code above only works when opening a new project using the mechanical template.
+
+**Answer:** It should be defined in the `MEPCurveType` class; it was exposed to the API in 2019.
+
+**Response:** Thanks, we are switching to 2019 soon, I will use it after that, finding a workaround for now.
+On Revit 2018, I found that if I create a new project file using the Architectural Template, its three `DuctType` elements only have `Default` on each. In this case, the sample code above does not work. Which API function can create duct types just as when I create a new project using the Mechanical Template? 
+
+**Answer:** I don't think using the duct type will work for what you are trying to do unless you are using 2019 or later. If you access the duct or duct fitting (family instance) and get the connectors from the connector manager from the element you should be able to get the shape. That shape is the same for both.
+
+**Response:** Our plugin is trying to recreate duct type from the data stored externally before drawing a duct instance. For example, if the plugin stores an oval duct type externally called `newDuctType1`, in order to insert this duct instance intothe model, it needs to create this duct type in Oval Duct first. The plugin can hard code the "Oval" string to find FamilyName "Oval Duct" in the English version of Revit, but it will not workin other languages. This is why I am looking for a solution or workaround in 2018 to determine the shape from duct type.
+
+Later: I have not found any solution for 2018. We decide to use the sample routine (see above) you created but it works only if all three duct types (oval, rectangular and round) have real duct type in them. The workaround on 2018:
+
+If none of the three parameters in the sample routine return a valid element id, it means the drawing does not have any real duct types except the ones called “Default”; then it displays a warning to the user, asks her to transfer duct types from some other model and delete the ones called “Default”.
+
+**Answer:** I am sure the workaround can be improved, and that a reliable algorithm to distinguish MEP element shapes can be devised. For instance, you could look at the number, geometrical location and direction of the connectors. That will provide a lot of information. You can look at the geometry.
 
 Later: did you ever resolve this?
-R: for Revit 2019 and newer, there is a new DuctType property for it, DuctType.Shape,
-for Revit 2018 and older, we get the value from RoutingPreferenceRuleGroupType.TransitionsOvalToRound, RoutingPreferenceRuleGroupType.TransitionsRectangularToOval and RoutingPreferenceRuleGroupType.TransitionsRectangularToRound, then check if returned list has count 0 (the solution from internet search)
 
-- find out changes between version of .NET assembly DLL
-  Q: How can I identify recent additions to the public API? Is there a better way than manually looking at changed files in the commit history?
-  A: You can compare the public interfaces in two different versions of the DLL:
-  [Free tools to compare .net assemblies](http://patelshailesh.com/index.php/free-tools-to-compare-net-assemblies)
+**Response:** for Revit 2019 and newer, there is a new `DuctType` property for this, `DuctType.Shape`.
 
-####<a name="2"></a> BipChecker Facelift
+For Revit 2018 and older, we get the value from the RoutingPreferenceRuleGroupType enumeration values
+TransitionsRectangularToRound, TransitionsRectangularToOval and TransitionsOvalToRound, then check whether the returned list has count 0.
+
+####<a name="3"></a> Determining Differences Between DLL Versions
+
+**Question:** How can I find out changes between different versions of a .NET assembly DLL?
+
+For instance, how can I identify recent additions to the public API?
+
+Is there a better way than manually looking at changed files in the commit history?
+  
+**Answer:** You can easily automate the comparison of public interfaces in two different versions of the DLL, e.g., using [free tools to compare .NET assemblies](http://patelshailesh.com/index.php/free-tools-to-compare-net-assemblies).
+
+####<a name="4"></a> BipChecker Facelift
 
 [Mathias Ottosson](https://github.com/ottosson)
 of [WSP](https://www.wsp.com) very kindly shares an important UI enhancement of
@@ -234,7 +261,7 @@ Ever so many thanks to Mathias for this useful enhancement!
 
 Now I just need to figure out how to also get it into the main master codestream...
 
-####<a name="3"></a> Fonts with '@' Prefix
+####<a name="5"></a> Fonts with '@' Prefix
 
 Another question from 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
