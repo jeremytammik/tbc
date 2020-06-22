@@ -25,8 +25,6 @@
 
 twitter:
 
-jeremy dot tammik at autodesk dot com
-
 Get MEP duct shape, determining differences between DLL versions, BipChecker facelift and retrieving fonts with '@' prefix in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/bicheckerfacelift
 
 I begin this week with a rather mixed bag of interesting issues from the last
@@ -36,6 +34,17 @@ I begin this week with a rather mixed bag of interesting issues from the last
 &ndash; Fonts with '@' prefix...
 
 linkedin:
+
+Get MEP duct shape, determining differences between DLL versions, BipChecker facelift and retrieving fonts with '@' prefix in the #RevitAPI
+
+https://bit.ly/bicheckerfacelift
+
+I begin this week with a rather mixed bag of interesting issues from the last:
+
+- Get MEP duct shape update
+- Determining differences between DLL versions
+- BipChecker facelift
+- Fonts with '@' prefix...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
