@@ -53,126 +53,140 @@ You need to know the missing corners; then you can transform all of the eight co
 You then find the max/min `XYZ` from those and set crop box to green rectangle:
 
 <center>
-<img src="img/rpt_set_view_crop_to_section_box_1.png" alt="" title="" width="761"/> <!-- 761 -->
+<img src="img/rpt_set_view_crop_to_section_box_1.png" alt="Set view crop to section box" title="Set view crop to section box" width="761"/> <!-- 761 -->
 </center>
 
-I wrote this extension method:
+I wrote this extension method for that:
 
 <pre class="code">
-
- <Extension()>
-    Public Sub AdjustCropToSectionBox(View3D As View3D)
-        'View3D crop can't have a shape assigned and can't be split
-        If View3D.CropBoxActive = False Then
-            View3D.CropBoxActive = True
-        End If
-        If View3D.IsSectionBoxActive = False Then
-            Exit Sub
-        End If
-
-        Dim CropBox As BoundingBoxXYZ = View3D.CropBox
-        Dim SectionBox As BoundingBoxXYZ = View3D.GetSectionBox
-
-        Dim T As Transform = CropBox.Transform
-        Dim Corners As XYZ() = BBCorners(SectionBox, T)
-
-        Dim MinX As Double = Corners.Min(Function(j) j.X)
-        Dim MinY As Double = Corners.Min(Function(j) j.Y)
-        Dim MinZ As Double = Corners.Min(Function(j) j.Z)
-        Dim MaxX As Double = Corners.Max(Function(j) j.X)
-        Dim MaxY As Double = Corners.Max(Function(j) j.Y)
-        Dim MaxZ As Double = Corners.Max(Function(j) j.Z)
-
-        CropBox.Min = New XYZ(MinX, MinY, MinZ)
-        CropBox.Max = New XYZ(MaxX, MaxY, MaxZ)
-
-        View3D.CropBox = CropBox
-    End Sub
-    Private Function BBCorners(SectionBox As BoundingBoxXYZ, T As Transform) As XYZ()
-        Dim Btm_LL As XYZ = SectionBox.Min 'Lower Left
-        Dim Btm_LR As New XYZ(SectionBox.Max.X, SectionBox.Min.Y, SectionBox.Min.Z) 'Lower Right
-        Dim Btm_UL As New XYZ(SectionBox.Min.X, SectionBox.Max.Y, SectionBox.Min.Z) 'Upper Left
-        Dim Btm_UR As New XYZ(SectionBox.Max.X, SectionBox.Max.Y, SectionBox.Min.Z) 'Upper Right
-
-        Dim Top_UR As XYZ = SectionBox.Max 'Upper Right
-        Dim Top_UL As New XYZ(SectionBox.Min.X, SectionBox.Max.Y, SectionBox.Max.Z) 'Upper Left
-        Dim Top_LR As New XYZ(SectionBox.Max.X, SectionBox.Min.Y, SectionBox.Max.Z) 'Lower Right
-        Dim Top_LL As New XYZ(SectionBox.Min.X, SectionBox.Min.Y, SectionBox.Max.Z) 'Lower Left
-
-        Dim Out As XYZ() = New XYZ(7) {Btm_LL, Btm_LR, Btm_UL, Btm_UR, Top_UR, Top_UL, Top_LR, Top_LL}
-
-        For i = 0 To Out.Length - 1
-            'Transform bounding box corords to model coords
-            Out(i) = SectionBox.Transform.OfPoint(Out(i))
-            'Transform bounding box coords to view coords
-            Out(i) = T.Inverse.OfPoint(Out(i))
-        Next
-        Return Out
-    End Function
+&lt;Extension()&gt;
+<span style="color:blue;">Public</span>&nbsp;<span style="color:blue;">Sub</span>&nbsp;AdjustCropToSectionBox(View3D&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">View3D</span>)
+&nbsp;&nbsp;<span style="color:green;">&#39;View3D&nbsp;crop&nbsp;can&#39;t&nbsp;have&nbsp;a&nbsp;shape&nbsp;assigned&nbsp;and&nbsp;can&#39;t&nbsp;be&nbsp;split</span>
+&nbsp;&nbsp;<span style="color:blue;">If</span>&nbsp;View3D.CropBoxActive&nbsp;=&nbsp;<span style="color:blue;">False</span>&nbsp;<span style="color:blue;">Then</span>
+&nbsp;&nbsp;&nbsp;&nbsp;View3D.CropBoxActive&nbsp;=&nbsp;<span style="color:blue;">True</span>
+&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">If</span>
+&nbsp;&nbsp;<span style="color:blue;">If</span>&nbsp;View3D.IsSectionBoxActive&nbsp;=&nbsp;<span style="color:blue;">False</span>&nbsp;<span style="color:blue;">Then</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Exit</span>&nbsp;<span style="color:blue;">Sub</span>
+&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">If</span>
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;CropBox&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">BoundingBoxXYZ</span>&nbsp;=&nbsp;View3D.CropBox
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;SectionBox&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">BoundingBoxXYZ</span>&nbsp;=&nbsp;View3D.GetSectionBox
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;T&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Transform</span>&nbsp;=&nbsp;CropBox.Transform
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;Corners&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">XYZ</span>()&nbsp;=&nbsp;BBCorners(SectionBox,&nbsp;T)
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;MinX&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">Double</span>&nbsp;=&nbsp;Corners.Min(<span style="color:blue;">Function</span>(j)&nbsp;j.X)
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;MinY&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">Double</span>&nbsp;=&nbsp;Corners.Min(<span style="color:blue;">Function</span>(j)&nbsp;j.Y)
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;MinZ&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">Double</span>&nbsp;=&nbsp;Corners.Min(<span style="color:blue;">Function</span>(j)&nbsp;j.Z)
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;MaxX&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">Double</span>&nbsp;=&nbsp;Corners.Max(<span style="color:blue;">Function</span>(j)&nbsp;j.X)
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;MaxY&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">Double</span>&nbsp;=&nbsp;Corners.Max(<span style="color:blue;">Function</span>(j)&nbsp;j.Y)
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;MaxZ&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">Double</span>&nbsp;=&nbsp;Corners.Max(<span style="color:blue;">Function</span>(j)&nbsp;j.Z)
+ 
+&nbsp;&nbsp;CropBox.Min&nbsp;=&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(MinX,&nbsp;MinY,&nbsp;MinZ)
+&nbsp;&nbsp;CropBox.Max&nbsp;=&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(MaxX,&nbsp;MaxY,&nbsp;MaxZ)
+ 
+&nbsp;&nbsp;View3D.CropBox&nbsp;=&nbsp;CropBox
+<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Sub</span>
+ 
+<span style="color:blue;">Private</span>&nbsp;<span style="color:blue;">Function</span>&nbsp;BBCorners(
+&nbsp;&nbsp;SectionBox&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">BoundingBoxXYZ</span>,
+&nbsp;&nbsp;T&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Transform</span>)&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">XYZ</span>()
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;SBMx&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;=&nbsp;SectionBox.Max
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;SBMn&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;=&nbsp;SectionBox.Min
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;Btm_LL&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;=&nbsp;SBMn&nbsp;<span style="color:green;">&#39;Lower&nbsp;Left</span>
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;Btm_LR&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(SBMx.X,&nbsp;SBMn.Y,&nbsp;SBMn.Z)&nbsp;<span style="color:green;">&#39;Lower&nbsp;Right</span>
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;Btm_UL&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(SBMn.X,&nbsp;SBMx.Y,&nbsp;SBMn.Z)&nbsp;<span style="color:green;">&#39;Upper&nbsp;Left</span>
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;Btm_UR&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(SBMx.X,&nbsp;SBMx.Y,&nbsp;SBMn.Z)&nbsp;<span style="color:green;">&#39;Upper&nbsp;Right</span>
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;Top_UR&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;=&nbsp;SBMx&nbsp;<span style="color:green;">&#39;Upper&nbsp;Right</span>
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;Top_UL&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(SBMn.X,&nbsp;SBMx.Y,&nbsp;SBMx.Z)&nbsp;<span style="color:green;">&#39;Upper&nbsp;Left</span>
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;Top_LR&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(SBMx.X,&nbsp;SBMn.Y,&nbsp;SBMx.Z)&nbsp;<span style="color:green;">&#39;Lower&nbsp;Right</span>
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;Top_LL&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(SBMn.X,&nbsp;SBMn.Y,&nbsp;SectionBox.Max.Z)&nbsp;<span style="color:green;">&#39;Lower&nbsp;Left</span>
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;Out&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">XYZ</span>()&nbsp;=&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(7)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;Btm_LL,&nbsp;Btm_LR,&nbsp;Btm_UL,&nbsp;Btm_UR,
+&nbsp;&nbsp;&nbsp;&nbsp;Top_UR,&nbsp;Top_UL,&nbsp;Top_LR,&nbsp;Top_LL}
+ 
+&nbsp;&nbsp;<span style="color:blue;">For</span>&nbsp;i&nbsp;=&nbsp;0&nbsp;<span style="color:blue;">To</span>&nbsp;Out.Length&nbsp;-&nbsp;1
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;Transform&nbsp;bounding&nbsp;box&nbsp;corords&nbsp;to&nbsp;model&nbsp;coords</span>
+&nbsp;&nbsp;&nbsp;&nbsp;Out(i)&nbsp;=&nbsp;SectionBox.Transform.OfPoint(Out(i))
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">&#39;Transform&nbsp;bounding&nbsp;box&nbsp;coords&nbsp;to&nbsp;view&nbsp;coords</span>
+&nbsp;&nbsp;&nbsp;&nbsp;Out(i)&nbsp;=&nbsp;T.Inverse.OfPoint(Out(i))
+&nbsp;&nbsp;<span style="color:blue;">Next</span>
+&nbsp;&nbsp;<span style="color:blue;">Return</span>&nbsp;Out
+<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Function</span>
 </pre>
 
-It is also worth considering that the extents of the section box may not be appropriate for how you wish to crop the view. The section box below is relatively tight on the wall elements but due to the viewing angle there is a lot of spare space to the right. When you print that on a sheet it will not be evident why the view content is off centre and what the extra space is for:
+It is also worth considering that the extents of the section box may not be appropriate for how you wish to crop the view.
+The section box below is relatively tight on the wall elements but due to the viewing angle there is a lot of spare space to the right.
+When you print that on a sheet it will not be evident why the view content is off centre and what the extra space is for:
 
 <center>
-<img src="img/rpt_set_view_crop_to_section_box_2.png" alt="" title="" width="593"/> <!-- 593 -->
+<img src="img/rpt_set_view_crop_to_section_box_2.png" alt="Set view crop to section box" title="Set view crop to section box" width="593"/> <!-- 593 -->
 </center>
 
 **Response:** This solution worked great; I translated to C# and have posted it here for C# coders:
  
 <pre class="code">
-
-public static void AdjustCropToSectionBox(this View3D View3D)
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">void</span>&nbsp;AdjustViewCropToSectionBox(&nbsp;
+&nbsp;&nbsp;<span style="color:green;">/*this*/</span>&nbsp;<span style="color:#2b91af;">View3D</span>&nbsp;view&nbsp;)
 {
-if (View3D.CropBoxActive == false)
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;!view.IsSectionBoxActive&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>;
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;!view.CropBoxActive&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;view.CropBoxActive&nbsp;=&nbsp;<span style="color:blue;">true</span>;
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:#2b91af;">BoundingBoxXYZ</span>&nbsp;CropBox&nbsp;=&nbsp;view.CropBox;
+&nbsp;&nbsp;<span style="color:#2b91af;">BoundingBoxXYZ</span>&nbsp;SectionBox&nbsp;=&nbsp;view.GetSectionBox();
+&nbsp;&nbsp;<span style="color:#2b91af;">Transform</span>&nbsp;T&nbsp;=&nbsp;CropBox.Transform;
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;Corners&nbsp;=&nbsp;BBCorners(&nbsp;SectionBox,&nbsp;T&nbsp;);
+&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;MinX&nbsp;=&nbsp;Corners.Min(&nbsp;j&nbsp;=&gt;&nbsp;j.X&nbsp;);
+&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;MinY&nbsp;=&nbsp;Corners.Min(&nbsp;j&nbsp;=&gt;&nbsp;j.Y&nbsp;);
+&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;MinZ&nbsp;=&nbsp;Corners.Min(&nbsp;j&nbsp;=&gt;&nbsp;j.Z&nbsp;);
+&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;MaxX&nbsp;=&nbsp;Corners.Max(&nbsp;j&nbsp;=&gt;&nbsp;j.X&nbsp;);
+&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;MaxY&nbsp;=&nbsp;Corners.Max(&nbsp;j&nbsp;=&gt;&nbsp;j.Y&nbsp;);
+&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;MaxZ&nbsp;=&nbsp;Corners.Max(&nbsp;j&nbsp;=&gt;&nbsp;j.Z&nbsp;);
+&nbsp;&nbsp;CropBox.Min&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;MinX,&nbsp;MinY,&nbsp;MinZ&nbsp;);
+&nbsp;&nbsp;CropBox.Max&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;MaxX,&nbsp;MaxY,&nbsp;MaxZ&nbsp;);
+&nbsp;&nbsp;view.CropBox&nbsp;=&nbsp;CropBox;
+}
+ 
+<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:#2b91af;">XYZ</span>[]&nbsp;BBCorners(&nbsp;<span style="color:#2b91af;">BoundingBoxXYZ</span>&nbsp;SectionBox,&nbsp;<span style="color:#2b91af;">Transform</span>&nbsp;T&nbsp;)
 {
-View3D.CropBoxActive = true;
-}
-
-if (View3D.IsSectionBoxActive == false)
-{
-return;
-}
-
-BoundingBoxXYZ CropBox = View3D.CropBox;
-BoundingBoxXYZ SectionBox = View3D.GetSectionBox();
-Transform T = CropBox.Transform;
-var Corners = BBCorners(SectionBox, T);
-double MinX = Corners.Min(j => j.X);
-double MinY = Corners.Min(j => j.Y);
-double MinZ = Corners.Min(j => j.Z);
-double MaxX = Corners.Max(j => j.X);
-double MaxY = Corners.Max(j => j.Y);
-double MaxZ = Corners.Max(j => j.Z);
-CropBox.Min = new XYZ(MinX, MinY, MinZ);
-CropBox.Max = new XYZ(MaxX, MaxY, MaxZ);
-View3D.CropBox = CropBox;
-}
-
-private static XYZ[] BBCorners(BoundingBoxXYZ SectionBox, Transform T)
-{
-XYZ Btm_LL = SectionBox.Min; // Lower Left
-var Btm_LR = new XYZ(SectionBox.Max.X, SectionBox.Min.Y, SectionBox.Min.Z); // Lower Right
-var Btm_UL = new XYZ(SectionBox.Min.X, SectionBox.Max.Y, SectionBox.Min.Z); // Upper Left
-var Btm_UR = new XYZ(SectionBox.Max.X, SectionBox.Max.Y, SectionBox.Min.Z); // Upper Right
-XYZ Top_UR = SectionBox.Max; // Upper Right
-var Top_UL = new XYZ(SectionBox.Min.X, SectionBox.Max.Y, SectionBox.Max.Z); // Upper Left
-var Top_LR = new XYZ(SectionBox.Max.X, SectionBox.Min.Y, SectionBox.Max.Z); // Lower Right
-var Top_LL = new XYZ(SectionBox.Min.X, SectionBox.Min.Y, SectionBox.Max.Z); // Lower Left
-var Out = new XYZ[8] { Btm_LL, Btm_LR, Btm_UL, Btm_UR, Top_UR, Top_UL, Top_LR, Top_LL };
-for (int i = 0, loopTo = Out.Length - 1; i <= loopTo; i++)
-{
-// Transform bounding box corords to model coords
-Out[i] = SectionBox.Transform.OfPoint(Out[i]);
-// Transform bounding box coords to view coords
-Out[i] = T.Inverse.OfPoint(Out[i]);
-}
-
-return Out;
-}
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;sbmn&nbsp;=&nbsp;SectionBox.Min;
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;sbmx&nbsp;=&nbsp;SectionBox.Max;
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;Btm_LL&nbsp;=&nbsp;sbmn;&nbsp;<span style="color:green;">//&nbsp;Lower&nbsp;Left</span>
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;Btm_LR&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;sbmx.X,&nbsp;sbmn.Y,&nbsp;sbmn.Z&nbsp;);&nbsp;<span style="color:green;">//&nbsp;Lower&nbsp;Right</span>
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;Btm_UL&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;sbmn.X,&nbsp;sbmx.Y,&nbsp;sbmn.Z&nbsp;);&nbsp;<span style="color:green;">//&nbsp;Upper&nbsp;Left</span>
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;Btm_UR&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;sbmx.X,&nbsp;sbmx.Y,&nbsp;sbmn.Z&nbsp;);&nbsp;<span style="color:green;">//&nbsp;Upper&nbsp;Right</span>
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;Top_UR&nbsp;=&nbsp;sbmx;&nbsp;<span style="color:green;">//&nbsp;Upper&nbsp;Right</span>
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;Top_UL&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;sbmn.X,&nbsp;sbmx.Y,&nbsp;sbmx.Z&nbsp;);&nbsp;<span style="color:green;">//&nbsp;Upper&nbsp;Left</span>
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;Top_LR&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;sbmx.X,&nbsp;sbmn.Y,&nbsp;sbmx.Z&nbsp;);&nbsp;<span style="color:green;">//&nbsp;Lower&nbsp;Right</span>
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;Top_LL&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;sbmn.X,&nbsp;sbmn.Y,&nbsp;sbmx.Z&nbsp;);&nbsp;<span style="color:green;">//&nbsp;Lower&nbsp;Left</span>
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;Out&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>[&nbsp;8&nbsp;]&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;Btm_LL,&nbsp;Btm_LR,&nbsp;Btm_UL,&nbsp;Btm_UR,
+&nbsp;&nbsp;&nbsp;&nbsp;Top_UR,&nbsp;Top_UL,&nbsp;Top_LR,&nbsp;Top_LL&nbsp;};
+&nbsp;&nbsp;<span style="color:blue;">for</span>(&nbsp;<span style="color:blue;">int</span>&nbsp;i&nbsp;=&nbsp;0,&nbsp;loopTo&nbsp;=&nbsp;Out.Length&nbsp;-&nbsp;1;&nbsp;i&nbsp;&lt;=&nbsp;loopTo;&nbsp;i++&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Transform&nbsp;bounding&nbsp;box&nbsp;coords&nbsp;to&nbsp;model&nbsp;coords</span>
+&nbsp;&nbsp;&nbsp;&nbsp;Out[&nbsp;i&nbsp;]&nbsp;=&nbsp;SectionBox.Transform.OfPoint(&nbsp;Out[&nbsp;i&nbsp;]&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Transform&nbsp;bounding&nbsp;box&nbsp;coords&nbsp;to&nbsp;view&nbsp;coords</span>
+&nbsp;&nbsp;&nbsp;&nbsp;Out[&nbsp;i&nbsp;]&nbsp;=&nbsp;T.Inverse.OfPoint(&nbsp;Out[&nbsp;i&nbsp;]&nbsp;);
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;Out;
 }
 </pre>
 
 Many thanks to Richard and Frank for the solution and the C# translation.
+
+I added the new method zAdjustViewCropToSectionBox`
+to [release 2021.0.149.2](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2021.0.149.2)
+of [The Building Coder Samples](https://github.com/jeremytammik/the_building_coder_samples).
+
 
 ####<a name="3"></a> 
 
