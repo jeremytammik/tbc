@@ -11,7 +11,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Two beautiful Revit API solutions to set view crop to section box and access room boundaries and intersections in linked models in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/crop2sectionbox
 
 Two beautiful Revit API solutions to 
 &ndash; Set view crop to section box and 
