@@ -13,8 +13,9 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Two beautiful Revit API solutions to 
+&ndash; Set view crop to section box and 
+&ndash; Room boundaries and intersections in linked models...
 
 linkedin:
 
@@ -29,9 +30,10 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Set View Crop to Section Box
+### Section to Crop, Linked Boundary and Intersection
 
-Today, we highlight two beautiful solutions by 
+Let's wrap up this week by highlighting two beautiful 
+[Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) solutions by 
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas,
 who continues sharing new ones at an impressive pace:
 
@@ -40,8 +42,8 @@ who continues sharing new ones at an impressive pace:
 
 Before diving into those, here is a very nice [freecodecamp](https://www.freecodecamp.org/) quote of the week:
 
-<i>People worry that computers will get too smart and take over the world.
-But, the real problem is that computers are too stupid and they already have taken over the world. &ndash; Pedro Domingos</i>
+> <i>People worry that computers will get too smart and take over the world.
+The real problem is that computers are too stupid and they already have taken over the world &ndash; Pedro Domingos</i>
 
 ####<a name="2"></a> Set View Crop to Section Box
 
@@ -55,7 +57,7 @@ originally asked six years ago, in 2014, and now finally resolved:
 **Answer:** The Building Coder discussed how
 to [set view section box to match scope box](http://thebuildingcoder.typepad.com/blog/2012/08/set-view-section-box-to-match-scope-box.html).
 
-In this differrnt situation, the two boxes have different coordinate systems, so one has to transformed into the other.
+In this different situation, the two boxes have different coordinate systems, so one has to transformed into the other.
 Also consider below that the maximum and minimum points of the section box are not enough alone to properly frame the section box with a crop box.
 If you transform P1 and P2 below from the coordinate space of the section box into the coordinate space of the view, you would end up with the red box.
 You need to know the missing corners; then you can transform all of the eight corner points into the coordinate space of the view.
@@ -194,7 +196,8 @@ Many thanks to Richard and Frank for the solution and the C# translation.
 
 I added the new method `AdjustViewCropToSectionBox`
 to [release 2021.0.149.2](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2021.0.149.2)
-of [The Building Coder Samples](https://github.com/jeremytammik/the_building_coder_samples).
+of [The Building Coder Samples](https://github.com/jeremytammik/the_building_coder_samples),
+cf. the [diff to the previous version](https://github.com/jeremytammik/the_building_coder_samples/compare/2021.0.149.1...2021.0.149.2).
 
 
 ####<a name="3"></a> Room Boundaries and Intersections in Linked Models
@@ -240,7 +243,7 @@ Use `SpatialElementBoundaryOptions` `SpatialElementBoundaryLocation` `=` `Finish
 
 Alternatively, if you get the lines only to the centre of the wall, you can get the wall thickness and subtract one half of it from the line length.
 
-**Response:** We are trying to follow that approach to get the columns, but from the column edges we are not able to calcuylate the exact overlapping part with the room interior for the column part inside the room.
+**Response:** We are trying to follow that approach to get the columns, but from the column edges we are not able to calculate the exact overlapping part with the room interior for the column part inside the room.
 
 In our case, we don't know exactly how large a portion of the column is inside and how much is outside.
 Also, the room is present in the active document and the column is in a linked document. 
@@ -349,3 +352,7 @@ By the way, this solution simultaneously answers a number of other recent forum 
 on [how to find the rooms geometry adjacent to walls](https://forums.autodesk.com/t5/revit-api-forum/how-to-find-the-rooms-geometry-adjacent-to-walls-in-revit-api/m-p/9576146),
 where an analogous approach can be applied.
 
+It also shows once again how important and useful it is to fully develop and optimise a solution manually in the user interface before beginning to address it programmatically.
+
+Many thanks again to Richard for these nice solutions.
+You are helping elevate to Revit developer community to a new level!
