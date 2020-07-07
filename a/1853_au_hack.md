@@ -138,33 +138,54 @@ Ready, steady, hack!
 AEC professionals are joining up for the first world-wide virtual AEC hackathon July 10-23.
 
 It includes Forge Prep Workshops, Autodesk and third-party developers as speakers and two Forge challenges for best projects using Design Automation and the BIM 360 API.
- 
-If you have customers people you know who would like to join  
- 
-à Please share engagement via your Network (Social Media / Blogs)
- 
+
+<!--
 Linkedin: https://www.linkedin.com/posts/autodesk-bim-360_bim-360-users-join-us-for-a-virtual-aec-activity-6685969052873187328-Ph9D
 Twitter: https://twitter.com/BIM360/status/1280203161165332480?s=19
+-->
 
 
 <center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 761 -->
+<img src="img/aec_bim360_hackathon_2020-07.jpg" alt="Virtual AEC and BIM360 Hackathon" title="Virtual AEC and BIM360 Hackathon" width="400"/> <!-- 861 -->
 </center>
 
+####<a name="5"></a> Do Not Print by Category
 
-<pre class="code">
-</pre>
+[Boost Your BIM](https://boostyourbim.wordpress.com) shares
+a [new free tool and open source initiative &ndash do not print by category/subcategory](https://boostyourbim.wordpress.com/2020/07/06/new-free-tool-do-not-print-by-category-subcategory):
 
+Here is a [3-minute video description and demo](https://youtu.be/Ehas54IxCNo):
 
-####<a name="3"></a> 
+<center>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Ehas54IxCNo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
 
+####<a name="6"></a> Using the New Unit API to Display Length of Multiple Lines
 
- 
+Another recent posts by Boost Your BIM discusses how to handle
+the [Revit 2021 API Unit API changes](https://boostyourbim.wordpress.com/2020/06/10/2021-changes-units)
+by modifying an existing external command that calculates and displays 
+the [total length of multiple lines](https://boostyourbim.wordpress.com/2016/06/21/total-length-of-multiple-lines):
 
-- job opening
-  https://autodesk.wd1.myworkdayjobs.com/Ext/job/Montreal-QC-CAN/Developer-Tech-Consultant---Construction-API_20WD41507-1, Anne-Emmanuelle Coudiere
+> Autodesk made a bunch of changes to the Revit API for Units in 2021.
+  Many frequently-used methods are now marked as obsolete.
+  They still work fine in 2021 but will probably be removed in 2022.
+  For one example of how to update your code, this old sample computes the total length of all selected objects and shows the result as a formatted string.
+  Here is the new code that uses the `UnitFormatUtils` method `Format` taking `Units`, `ForgeTypeId`, `Double` and `Boolean` input arguments...
 
+####<a name="7"></a> Job Opening in Developer Advocacy and Support
 
-- very nice explanation of synchronous versus async programming:
-  [How Do I Think About Async Code?!](https://devblogs.microsoft.com/visualstudio/how-do-i-think-about-async-code/)
+A very exciting job opening to join me and my colleagues in the DAS Developer Advocacy and Support team.
+
+> Autodesk is seeking to hire a passionate Developer Advocate to join our team in Montreal-Quebec, Canada. As a member of a high-impact team, you will play an important role in the definition and development of web and cloud technologies that make up Autodesk’s new cloud infrastructure.
+
+Here is [my personal referral link](https://rolp.co/c0hMi) to this rare opportunity.
+
+####<a name="8"></a> Intro to Synchronous versus Async Programming
+
+Let's end for today with this very nice explanation of synchronous versus async programming:
+[how do I think about async code?!](https://devblogs.microsoft.com/visualstudio/how-do-i-think-about-async-code).
+
+Take care.
+
 
