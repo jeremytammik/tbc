@@ -58,3 +58,12 @@ I have no official solution to suggest for this, just these discussion threads a
 <center>
 <img src="img/darvasa_gas_crater_panorama.jpg" alt="DLL hell?" width="300"> 
 </center>
+
+#### Addendum &ndash; Updated ILMerge Link
+
+As noted by Micah Gray in
+his [comment below](https://thebuildingcoder.typepad.com/blog/2017/06/handling-third-party-library-dll-conflicts.html#comment-4983002843):
+
+> The ILMerge link above no longer works.
+It appears to have moved over to
+the [GitHub ILMerge repository](https://github.com/dotnet/ILMerge).
