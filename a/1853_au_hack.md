@@ -134,8 +134,14 @@ Linkedin: https://www.linkedin.com/posts/autodesk-bim-360_bim-360-users-join-us-
 Twitter: https://twitter.com/BIM360/status/1280203161165332480?s=19
 -->
 
+Here is a [succinct live one-minute description of the process and contents](https://youtu.be/57R8DIOqZw0):
+
 <center>
-<img src="img/aec_bim360_hackathon_2020-07.jpg" alt="Virtual AEC and BIM360 Hackathon" title="Virtual AEC and BIM360 Hackathon" width="400"/> <!-- 861 -->
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/57R8DIOqZw0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<!-- <img src="img/aec_bim360_hackathon_2020-07.jpg" alt="Virtual AEC and BIM360 Hackathon" title="Virtual AEC and BIM360 Hackathon" width="400"/> <!-- 861 --> 
+
 </center>
 
 ####<a name="5"></a> Do Not Print by Category
