@@ -134,9 +134,9 @@ Here are what I’ve tried and the downsides:
 - *PickObject( ObjectType.LinkedElement, roomSelectionFilter_linkedRoom)* &ndash; This is the opposite of above: it works great for rooms in linked models, but won’t allow user to select rooms from current model.
 - *PickObject(ObjectType.PointOnElement)* &ndash; This one allows user to select elements in both current and linked models. However, it’s not limited to rooms &ndash; or at least I haven’t come up with a proper `ISelectionFilter` to achieve so.
 
-So, any ideas? I’m thinking if there’s a way to combine 1. and 2. in one pick, or maybe there can be a `ISelectionFilter` to filter out anything that is not a room for 3.? Appreciate your help!
+So, any ideas? I’m thinking if there’s a way to combine 1. and 2. in one pick, or maybe there can be an `ISelectionFilter` to filter out anything that is not a room for 3.? Appreciate your help!
 
-**Answer:** To cut a long story short, we ended up implementing the latter suggstion, asking `PickObject` to pick a point and limiting the valid selection to room elements, either directly in the current model or in two steps in one of the linked models.
+**Answer:** To cut a long story short, we ended up implementing the latter suggestion, asking `PickObject` to pick a point and limiting the valid selection to room elements, either directly in the current model or in two steps in one of the linked models.
 
 I cleaned up the solution originally implemented by Richard and added it to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples).
 Here is the [diff to the previous version](https://github.com/jeremytammik/the_building_coder_samples/compare/2021.0.149.2.../2021.0.150.0).
@@ -238,7 +238,7 @@ Richard confirms that it still works for him as well.
 ####<a name="4"></a> Determine Whether Custom Export was Cancelled
 
 A quickie from the StackOverflow question
-on [how to get info that Revit custom export of a view is canceled](https://stackoverflow.com/questions/62794859/how-to-get-info-that-revit-custom-export-of-a-view-is-canceled):
+on [how to get info that Revit custom export of a view is cancelled](https://stackoverflow.com/questions/62794859/how-to-get-info-that-revit-custom-export-of-a-view-is-canceled):
 
 **Question:** I used Revit custom export of a model for exporting a 3D view based on `IExportContext`.
 It works fine.
@@ -256,14 +256,14 @@ If the custom export is cancelled, a dialog box is shown:
 
 I have 2 questions:
 
-1. How to get info that exporting was canceled?
+1. How to get info that exporting was cancelled?
 2. Why is the name of the operation *Printing*?
 
 **Answers:**
 
 1. Implement and handle the [`IExportContext`
 `IsCanceled` method](https://www.revitapidocs.com/2020/31f0b662-81a1-89b8-ab2a-0de99af3b753.htm).
-2. Because the custom export is in fact a printing or exporting context, cf. the [`CustomExporter` documentation](https://www.revitapidocs.com/2020/d2437433-9183-cbb1-1c67-dedd86db5b5a.htm): *The Export method of this class triggers standard rendering or exporting process in Revit, but instead of displaying the result on screen or printer, the output is channeled through the given custom context that handles processing of the geometric as well as non-geometric information*.
+2. Because the custom export is in fact a printing or exporting context, cf. the [`CustomExporter` documentation](https://www.revitapidocs.com/2020/d2437433-9183-cbb1-1c67-dedd86db5b5a.htm): *The Export method of this class triggers standard rendering or exporting process in Revit, but instead of displaying the result on screen or printer, the output is channelled through the given custom context that handles processing of the geometric as well as non-geometric information*.
 
 
 ####<a name="5"></a> Multi-Threading with the Single-Threaded Revit API
@@ -282,7 +282,7 @@ To quote: "You have to be careful to keep execution of API from the addin code o
 Weird corruptions and crashes; it's totally against the way Revit runs.
 It can be quite easy to accidentally let some code call Revit API from a non-main thread.
 I think it can happen when you have timers and UI containers that update asynchronously and need to update something in Revit.
-Here is an expalantion of
+Here is an explantion of
 why [the Revit API is never ever thread safe](https://thebuildingcoder.typepad.com/blog/2014/11/the-revit-api-is-never-ever-thread-safe.html).
 
 **Response:** Okay, I understand the thread-safety and critical section ideas.
@@ -341,7 +341,7 @@ There are a lot of things the code can make happen in these threads, including e
 We end this week with a beautiful [Beginner’s Guide To Abstraction](https://jesseduffield.com/beginners-guide-to-abstraction)
 presented by Jesse Duffield in a [Pursuit of Laziness](https://jesseduffield.com).
 
-Nothing new for an experienced programmer, but beatifully put for less experienced coders.
+Nothing new for an experienced programmer, but beautifully put for less experienced coders.
 
 The nice name of Jesse's blog may or may not be inspired by Larry Wall's [three virtues](http://threevirtues.com).
 
