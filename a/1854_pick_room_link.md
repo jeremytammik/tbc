@@ -6,6 +6,10 @@
 
 <!---
 
+- Seeking feedback from developers regarding Revit API (Derived Analytical Model)
+  https://forums.autodesk.com/t5/revit-api-forum/seeking-feedback-from-developers-regarding-revit-api-derived/m-p/9615258
+  Are you a developer who interacts with the Revit API regarding the Derived Analytical Model? If so, please take 5 minutes to provide your input. We would like to hear from you. Our goal is to get a better understanding what functions developers are using and how they are using them. Please feel free to forward this on to a developer you work with. Please click here to provide input: https://autodeskfeedback.az1.qualtrics.com/jfe/form/SV_9Xe2uafQg3X9xXf
+
 - pick room in either
   https://forums.autodesk.com/t5/revit-api-forum/pickobject-to-select-room-in-current-model-or-linked-models/m-p/9624169
 
@@ -20,10 +24,6 @@ A:
 1. Implement and handle the [`IExportContext`
 `IsCanceled` method](https://www.revitapidocs.com/2020/31f0b662-81a1-89b8-ab2a-0de99af3b753.htm).
 2. Because the custom export is in fact a printing or exporting context, cf. the [`CustomExporter` documentation](https://www.revitapidocs.com/2020/d2437433-9183-cbb1-1c67-dedd86db5b5a.htm): *The Export method of this class triggers standard rendering or exporting process in Revit, but instead of displaying the result on screen or printer, the output is channeled through the given custom context that handles processing of the geometric as well as non-geometric information*.
-
-- Seeking feedback from developers regarding Revit API (Derived Analytical Model)
-  https://forums.autodesk.com/t5/revit-api-forum/seeking-feedback-from-developers-regarding-revit-api-derived/m-p/9615258
-  Are you a developer who interacts with the Revit API regarding the Derived Analytical Model? If so, please take 5 minutes to provide your input. We would like to hear from you. Our goal is to get a better understanding what functions developers are using and how they are using them. Please feel free to forward this on to a developer you work with. Please click here to provide input: https://autodeskfeedback.az1.qualtrics.com/jfe/form/SV_9Xe2uafQg3X9xXf
 
 - Revit API is single threaded; add-in can use multiple threads
 Q: I have a quick question here: does Revit addin run as a child process of Revit or the addins run in the same process of Revit?
@@ -70,8 +70,6 @@ Managed code running within an Addin is permitted to create managed side threads
   by Jesse Duffield in a [Pursuit of Laziness](https://jesseduffield.com)
   Experienced programmers know it all, but beatifully put for a less experienced coder.
 
-
-
 twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
@@ -98,22 +96,167 @@ Ending this hot and exciting  week
 
 ####<a name="2"></a> Are You Using the Derived Analytical Model?
 
-If so, please provide feedback to 
+If so, please provide feedback on your experiences to Charlene Portante, Building Engineering User Experience Research Coordinator at Autodesk.
 
-- Seeking feedback from developers regarding Revit API (Derived Analytical Model)
-  https://forums.autodesk.com/t5/revit-api-forum/seeking-feedback-from-developers-regarding-revit-api-derived/m-p/9615258
-  Are you a developer who interacts with the Revit API regarding the Derived Analytical Model? If so, please take 5 minutes to provide your input. We would like to hear from you. Our goal is to get a better understanding what functions developers are using and how they are using them. Please feel free to forward this on to a developer you work with. Please click here to provide input: https://autodeskfeedback.az1.qualtrics.com/jfe/form/SV_9Xe2uafQg3X9xXf
+She is [seeking feedback from developers regarding the Derived Analytical Model Revit API](https://forums.autodesk.com/t5/revit-api-forum/seeking-feedback-from-developers-regarding-revit-api-derived/m-p/9615258):
+
+> Are you a developer who interacts with the Revit API regarding the Derived Analytical Model?
+
+> If so, please take 5 minutes to provide your input. We would like to hear from you.
+
+> Our goal is to get a better understanding what functions developers are using and how they are using them.
+
+> Please feel free to forward this on to a developer you work with.
+
+> [Please click here to provide input: https://autodeskfeedback.az1.qualtrics.com/jfe/form/SV_9Xe2uafQg3X9xXf](https://autodeskfeedback.az1.qualtrics.com/jfe/form/SV_9Xe2uafQg3X9xXf)
+
+Thank you!
+
+####<a name="3"></a> pick room in either
+
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas and I cooperated nicely and enjoyably to develop a novel solution
+for [`PickObject` to select a room in current model or linked models](https://forums.autodesk.com/t5/revit-api-forum/pickobject-to-select-room-in-current-model-or-linked-models/m-p/9624169):
+
+**Question:** I’m working on a Revit add-in and would like to prompt the user to select a room in the model.
+The room can be from either the current project or the linked models.
+With the help from previous posts in the forum I’m able  to make some progress so far, but still none of the approaches is ideal.
+Here are what I’ve tried and the downsides:
+
+- *PickObject( ObjectType.Element, roomSelectionFilter)* &ndash; This works great for rooms in current model, but won’t allow user to select rooms from linked models.
+- *PickObject( ObjectType.LinkedElement, roomSelectionFilter_linkedRoom)* &ndash; This is the opposite of above: it works great for rooms in linked models, but won’t allow user to select rooms from current model.
+- *PickObject(ObjectType.PointOnElement)* &ndash; This one allows user to select elements in both current and linked models. However, it’s not limited to rooms &ndash; or at least I haven’t come up with a proper `ISelectionFilter` to achieve so.
+
+So, any ideas? I’m thinking if there’s a way to combine 1. and 2. in one pick, or maybe there can be a `ISelectionFilter` to filter out anything that is not a room for 3.? Appreciate your help!
+
+**Answer:** To cut a long story short, we ended up implementing the latter suggstion, asking `PickObject` to pick a point and limiting the valid selection to room elements, either directly in the current model or in two steps in one of the linked models.
+
+I cleaned up the solution originally implemented by Richard and added it to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples).
+Here is the [diff to the previous version](https://github.com/jeremytammik/the_building_coder_samples/compare/2021.0.149.2.../2021.0.150.0).
+
+The selection filter looks like this:
+
+<pre class="code">
+public class ElementInLinkSelectionFilter<T> : ISelectionFilter where T : Element
+{
+  private Document _doc;
+
+  public ElementInLinkSelectionFilter( Document doc )
+  {
+    _doc = doc;
+  }
+
+  public Document LinkedDocument { get; private set; } = null;
+
+  public bool LastCheckedWasFromLink
+  {
+    get { return null != LinkedDocument; }
+  }
+
+  public bool AllowElement( Element e )
+  {
+    return true;
+  }
+
+  public bool AllowReference( Reference r, XYZ p )
+  {
+    LinkedDocument = null;
+
+    Element e = _doc.GetElement( r );
+
+    if( e is RevitLinkInstance )
+    { 
+      RevitLinkInstance li = e as RevitLinkInstance;
+
+      LinkedDocument = li.GetLinkDocument();
+
+      e = LinkedDocument.GetElement( r.LinkedElementId );
+    }
+    return e is T;
+  }
+}
+</pre>
+
+Here is the resulting external command for testing it:
+
+<pre class="code">
+public Result Execute(
+  ExternalCommandData commandData,
+  ref string message,
+  ElementSet elements )
+{
+  UIApplication uiapp = commandData.Application;
+  UIDocument uidoc = uiapp.ActiveUIDocument;
+  Document doc = uidoc.Document;
+  Reference r;
+
+  ElementInLinkSelectionFilter<Room> filter
+    = new ElementInLinkSelectionFilter<Room>(
+      doc );
+
+  try
+  {
+    r = uidoc.Selection.PickObject( 
+      ObjectType.PointOnElement, 
+      filter,
+      "Please pick a room in current project or linked model" );
+  }
+  catch( Autodesk.Revit.Exceptions.OperationCanceledException )
+  {
+    return Result.Cancelled;
+  }
+
+  Element e;
+
+  if( filter.LastCheckedWasFromLink )
+  {
+    e = filter.LinkedDocument.GetElement( 
+      r.LinkedElementId );
+  }
+  else
+  {
+    e = doc.GetElement( r );
+  }
+
+  TaskDialog.Show( "Picked", e.Name );
+
+  return Result.Succeeded;
+}
+</pre>
+
+Richard confirms that it still works for him as well.
 
 
-####<a name="3"></a> 
+####<a name="4"></a> Determine Whether Custom Export was Cancelled
 
+A quickie from the StackOverflow question
+on [how to get info that Revit custom export of a view is canceled](https://stackoverflow.com/questions/62794859/how-to-get-info-that-revit-custom-export-of-a-view-is-canceled):
 
-####<a name="4"></a> 
+**Question:** I used Revit custom export of a model for exporting a 3D view based on `IExportContext`.
+It works fine.
+But I found that the export process can be cancelled:
 
 <center>
-<img src="img/" alt="" title="" width="100"/>
+<img src="img/custom_export_cancel_button.png" alt="Custom export cancel" title="Custom export cancel" width="100"/>
 </center>
 
-####<a name="5"></a> 
+If the custom export is cancelled, a dialog box is shown:
 
+<center>
+<img src="img/custom_export_cancel_printing.png" alt="Custom export cancel printing" title="Custom export cancel printing" width="100"/>
+</center>
+
+I have 2 questions:
+
+1. How to get info that exporting was canceled?
+2. Why is the name of the operation *Printing*?
+
+**Answers:**
+
+1. Implement and handle the [`IExportContext`
+`IsCanceled` method](https://www.revitapidocs.com/2020/31f0b662-81a1-89b8-ab2a-0de99af3b753.htm).
+2. Because the custom export is in fact a printing or exporting context, cf. the [`CustomExporter` documentation](https://www.revitapidocs.com/2020/d2437433-9183-cbb1-1c67-dedd86db5b5a.htm): *The Export method of this class triggers standard rendering or exporting process in Revit, but instead of displaying the result on screen or printer, the output is channeled through the given custom context that handles processing of the geometric as well as non-geometric information*.
+
+
+
+####<a name="5"></a>
 
