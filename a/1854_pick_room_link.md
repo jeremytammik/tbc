@@ -44,6 +44,18 @@ Cool topics to wrap up this hot and exciting week
 
 linkedin:
 
+Selection filter to pick room in current project or linked model, determining whether custom export was cancelled and multi-threading with the single-threaded #RevitAPI
+
+https://bit.ly/pickroominlink
+
+Cool topics to wrap up this hot and exciting week:
+
+- Are you using the derived analytical model?
+- Pick room in current project or linked model
+- Determine whether custom export was cancelled
+- Multi-threading with the single-threaded Revit API
+- Beginner’s guide to abstraction...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
