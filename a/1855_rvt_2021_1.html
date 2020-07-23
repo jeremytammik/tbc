@@ -19,8 +19,10 @@ twitter:
 
  #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+The Revit update release is now available, and some insights on normalising UVs in the custom exporter
+&ndash; The Revit 2021.1 update
+&ndash; Normalising UVs in custom exporter
+&ndash; Set up your own free VPN server...
 
 linkedin:
 
@@ -35,16 +37,22 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Revit 2021.1 and AEC Hackathon</h3>
-<p>The hottest news for today is the Revit update release; let's season it with other tidbits of interest:</p>
-<p>Before we get to those, another nice quote of the week, courtesy of <a href="https://www.freecodecamp.org/news/author/quincylarson:">Quincy</a></p>
+<h3>Revit 2021.1 and Normalising Custom Export UV</h3>
+<p>The hottest news for today is the Revit update release, seasoned with other titbits of interest:</p>
+<ul>
+<li><a href="#2">The Revit 2021.1 update</a></li>
+<li><a href="#3">Normalising UVs in custom exporter</a></li>
+<li><a href="#4">Set up your own free VPN server</a></li>
+</ul>
+<p>Before we get to those, another nice quote of the week, courtesy of <a href="https://www.freecodecamp.org/news/author/quincylarson">Quincy Larson</a>:</p>
 <blockquote>
-<p><em>Programming is the only job I can think of where I get to be both an engineer and an artist.
+<p><i>Programming is the only job I can think of where I get to be both an engineer and an artist.
 There's an incredible, rigorous, technical element to it, which I like because you have to do very precise thinking.
-On the other hand, it has a wildly creative side where the boundaries of imagination are the only real limitation.</em>
-<p style="text-align: right; font-style: italic">&ndash; Andy Hertzfeld</p></p>
+On the other hand, it has a wildly creative side where the boundaries of imagination are the only real limitation.</i></p>
+<p style="text-align: right; font-style: italic">&ndash; Andy Hertzfeld</p>
 </blockquote>
-<h4><a name="2"></a> Revit 2021.1 Update</h4>
+
+<h4><a name="2"></a> The Revit 2021.1 Update</h4>
 <p>The long-awaited Revit 2021.1 update release is now available.</p>
 <p>Check out the top experts' and product managers' detailed report
 on <a href="https://blogs.autodesk.com/revit/2020/07/22/whats-new-in-revit-2021-1">what’s new in Revit 2021.1</a>.</p>
@@ -98,23 +106,23 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-api-iexportcont
 <p><strong>Answer:</strong> Maybe this background information
 on <a href="https://thebuildingcoder.typepad.com/blog/2010/01/faces.html">faces and their coordinates in the Revit API</a> will
 help?</p>
-<p><strong>Response:</strong> That post explains UV as two variables that parameterize a face, but as far as I can see they are related to the structure of the face in 3d space, not how each vertex of the face are mapped to the bitmap.</p>
-<p>How can I convert the UV coordiantes returned by <code>PolymeshTopology.GetUV</code> to pixel coordinates on the image or in the range (0,1).</p>
+<p><strong>Response:</strong> That post explains UV as two variables that parametrise a face, but as far as I can see they are related to the structure of the face in 3d space, not how each vertex of the face are mapped to the bitmap.</p>
+<p>How can I convert the UV coordinates returned by <code>PolymeshTopology.GetUV</code> to pixel coordinates on the image or in the range (0,1).</p>
 <p>I found the discussion
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/polymeshtopology-uvs/td-p/8641007">PolymeshTopology UVs</a> to
 be relevant, but the answer given is not detailed enough for me to actually solve the problem.</p>
 <p><strong>Later:</strong> Okay, I think I've figured it out and I'll list the solution found just in case someone else also has this problem...</p>
-<p>The <code>PolymeshTopology.GetUV</code> method returns a <code>UV</code> coordiante, which corresponds to the parameters of a face.</p>
+<p>The <code>PolymeshTopology.GetUV</code> method returns a <code>UV</code> coordinate, which corresponds to the parameters of a face.</p>
 <p>Therefore, I guess they are related to the dimension of the face that they parameterize.</p>
-<p>These UV coordiantes can be converted to display units via <code>UnitUtils.ConvertFromInternalUnits</code> (which is probably deprecated now, but anyway...). 
-My add-in uses centimeters.
-So far, we have the UV in centimeters.</p>
+<p>These UV coordinates can be converted to display units via <code>UnitUtils.ConvertFromInternalUnits</code> (which is probably deprecated now, but anyway...). 
+My add-in uses centimetres.
+So far, we have the UV in centimetres.</p>
 <p>The next step is to obtain the size of the bitmap.
 This is given by the properties with name <code>UnifiedBitmap.TextureRealWorldScaleX/Y</code>.
 These values are actually given in inches, so you can call <code>UnitUtils.Convert</code> from  <code>DisplayUnitType.DUT_DECIMAL_INCHES</code> to <code>DisplayUnitType.DUT_CENTIMETERS</code> to convert them.
 In fact, I've found <code>DisplayUnitType.DUT_FRACTIONAL_INCHES</code> gives the same result.
 I don't know what the difference is... maybe someone could elaborate on that.</p>
-<p>After that, the UV coordiantes can be scaled to the range [0,1] or whatever.</p>
+<p>After that, the UV coordinates can be scaled to the range [0,1] or whatever.</p>
 <p><strong>Correction:</strong> the <code>AssetPropertyDistance</code> class actually has a <code>DisplayUnitType</code> property, which should be used instead of the <code>DUT_DECIMAL_INCHES</code>.</p>
 <p>Many thanks to Sunsflower for this useful research and helpful documentation!</p>
 <p><center>
