@@ -6,18 +6,6 @@
 
 <!---
 
-- Revit 2021.1 is released!
-
-- Quote of the Week: “Programming is the only job I can think of where I get to be both an engineer and an artist. There's an incredible, rigorous, technical element to it, which I like because you have to do very precise thinking. On the other hand, it has a wildly creative side where the boundaries of imagination are the only real limitation.” – Andy Hertzfeld
-
-- Re: Revit API: IExportContext converting UV to the range (0,1)
-  https://forums.autodesk.com/t5/revit-api-forum/revit-api-iexportcontext-converting-uv-to-the-range-0-1/m-p/9638219
-  solution provided
-
-- How to set up your own VPN server at home for free using Linux and WireGuard.
-  This is a great way to boost your own privacy and security without needing to share your data with a paid VPN service. (5 minute read): 
-  https://www.freecodecamp.org/news/how-to-set-up-a-vpn-server-at-home/
-
 twitter:
 
  #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
@@ -38,57 +26,85 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Revit 2021.1 and AEC Hackathon
-
-The hottest news for today is the Revit update release; let's season it with other tidbits of interest:
-
-####<a name="2"></a> Revit 2021.1 Update
-
-The long-awaited Revit 2021.1 update release is now available.
-
-Check out the top experts' and product managers' detailed report
-on [what’s new in Revit 2021.1](https://blogs.autodesk.com/revit/2020/07/22/whats-new-in-revit-2021-1).
-
-Here are the top highlights from their release run-down, grouping features into four benefit categories: Automation and Computation, Interoperability and Data Exchange, Productivity and Ease of Use, and Coordination and Collaboration.
-
-- Automation and Computation
-    - Dynamo 2.6 for Revit and many new nodes
-    - New sample studies for Generative Design in Revit
-- Interoperability and Data Exchange
-    - FormIt Converter in Revit Enhancements
-    - Import and export enhancements
-    - Civil structures alignment in Revit*
-- Productivity and Ease of Use
-    - Faster Revit install and deployment
-    - Improved view switching
-    - Improved panel schedule properties
-    - Quickly identify the rebar host
-    - User profile improvements
-    - New units
-    - Resizable shared parameters dialogue
-- Collaboration and Coordination
-    - Shared 3D views
-    - Cloud model upgrade
-    - Cloud worksharing improvements
-    - Reset shared coordinates
-    - Acquire Coordinates Notification
-    - EU Region support for Piping and Instrumentation Diagram (P&ID) modeler
+### AEC Hackathon
 
 
+####<a name="2"></a> Questions on Revit 2021.1 
 
+Yesterday, I mentioned [the Revit 2021.1 update](https://thebuildingcoder.typepad.com/blog/2020/07/revit-20211-update-and-normalising-custom-export-uv.html#2).
 
-####<a name="3"></a> 
+Two questions arose on that:
 
-**Question:** 
+Vincent Cadoret [@vincentcadoret](https://twitter.com/vincentcadoret)
+[asks](https://twitter.com/vincentcadoret/status/1286292927573090305):
 
-**Answer:** 
+Q: Any changes in the Revit API in this 2021.1 update vs 2021.0?
 
-<pre class="code">
-</pre>
+A: Please read
+the [Revit 2021.1 release notes](https://help.autodesk.com/view/RVT/2021/ENU/?guid=RevitReleaseNotes_2021updates_2021_1_Resolved_Issues_2021_1_html) and
+let us know what you find out &ndash; I see some API enhancements and fixes, so there is a slight change, indeed.
 
-####<a name="4"></a> 
+E B [@truevis](https://twitter.com/truevis)
+[asks](https://twitter.com/truevis/status/1286301553096179712):
+
+Q: Any API access to Shared Views available?
+
+A: Again, check out the release notes and let us know what you find out.
+For example, I do see an entry saying 'Shared View: Provided an easy way to share 3D views in Revit.'
+
+####<a name="3"></a> IFC 21.1 Released
+
+Also on Twiter, Angel Velez [@avelezsosa](https://twitter.com/avelezsosa)
+[announced](https://twitter.com/avelezsosa/status/1281601656828960769) that IFC 21.1 came out:
+
+[#Autodesk #Revit #IFC v21.1 is now available in the Autodesk App Store](https://apps.autodesk.com/RVT/en/Detail/Index?id=7265544480016320144&appLang=en&os=Win64)
+
+Working on getting v20.2 and v19.4 out next.
+
+Also works with #Navisworks!  
+
+####<a name="4"></a> AEC Hackathon Final Presentations
+
+The [AEC Hackathon online](https://www.hackaec.com) is in full swing, nearing its final stages now
+
+The dreaded hacking deadline is looming near, however: hacking ends today, July 24, at 23:59 EST (UTC-4).
+
+Some presentations are already live:
+
+Timo Hartmann Professor from TU Berlin and CEO of Startup Contecht presenting "Hacking cloud exchanges - Finally BIM Collaboration", their Journey as a Startup and their Forge BIM 360 API Applications
+&ndash; [Recording](https://us02web.zoom.us/webinar/register/WN_UGoFqfUhSymhDNd7IodC7g)
 
 <center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 753 -->
+<img src="img/aec_hackathon_01.png" alt="AEC Hackathon" title="AEC Hackathon" width="100"/> <!-- 753 -->
 </center>
+
+Moicon Presentation
+&ndash; [Recording](https://us02web.zoom.us/webinar/register/WN_Kn4dGTcWTr2ivQcnliWpdw )
+
+Xinaps Presentation
+&ndash; [Recording](https://us02web.zoom.us/webinar/register/WN_DSAec3V0Q_G6l0gBovhdrg)
+
+<center>
+<img src="img/aec_hackathon_02.png" alt="AEC Hackathon" title="AEC Hackathon" width="100"/> <!-- 753 -->
+</center>
+
+Challenge Deep Dive with Jim and Jaime
+&ndash; [Recording](https://us02web.zoom.us/webinar/register/WN__Ivnm-diRJm-3llL--mWxQ)
+
+<center>
+<img src="img/aec_hackathon_03.png" alt="AEC Hackathon" title="AEC Hackathon" width="100"/> <!-- 753 -->
+</center>
+
+The final presentations are taking place tomorrow, Saturday, July 25th, 19:00-20:00 CET.
+
+The judges are:
+
+- Abdulrahman Mohamad Aarabi (Abed) of [MOE](https://www.moe.dk) Artelia Group
+- [Jaime Rosales](https://forge.autodesk.com/author/jaime-rosales), Autodesk
+- Jakob Hirn, [Build Informed GmbH](https://www.buildinformed.com)
+- Martin Loučka, [ioLabs](https://iolabs.ch)
+
+Good luck in the end spurt and much success completing and presenting!
+
+Or, in case yu are not actively participating, prepare for being astounded seeing what the hackers created in this short space of time.
 
