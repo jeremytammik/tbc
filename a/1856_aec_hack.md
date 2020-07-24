@@ -10,8 +10,10 @@ twitter:
 
  #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+More on Revit 2021.1, IFC 21.1, and nearing the end of the AEC Hackathon
+&ndash; Revit 2021.1 questions
+&ndash; IFC 21.1 released
+&ndash; AEC Hackathon final presentations...
 
 linkedin:
 
@@ -26,10 +28,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### AEC Hackathon
+### IFC 21.1 and AEC Hackathon Presentations
+
+More on Revit 2021.1, IFC 21.1, and nearing the end of the AEC Hackathon:
+
+- [Revit 2021.1 questions](#2)
+- [IFC 21.1 released](#3)
+- [AEC Hackathon final presentations](#4)
 
 
-####<a name="2"></a> Questions on Revit 2021.1 
+####<a name="2"></a> Revit 2021.1 Questions
 
 Yesterday, I mentioned [the Revit 2021.1 update](https://thebuildingcoder.typepad.com/blog/2020/07/revit-20211-update-and-normalising-custom-export-uv.html#2).
 
@@ -94,7 +102,7 @@ Some presentations are already live:
 <img src="img/aec_hackathon_03.png" alt="AEC Hackathon" title="AEC Hackathon" width="400"/> <!-- 1200 -->
 </center>
 
-The final presentations are taking place tomorrow, Saturday, July 25th, 19:00-20:00 CET.
+The final presentations are taking place tomorrow, Saturday, July 25th, 13:00 EST (UTC-4), 19:00 CET.
 
 The judges are:
 
@@ -105,7 +113,7 @@ The judges are:
 
 Good luck in the end spurt and much success completing and presenting!
 
-Or, in case you are not actively participating yourself, take a look, enjoy, prepare for being astounded seeing what the hackers created in this short space of time.
+Or, in case you are not actively participating yourself, take a look, enjoy, and prepare for being astounded seeing what the hackers created in this short space of time.
 
 There is a lot to learn and profit from here.
 
