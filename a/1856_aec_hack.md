@@ -50,11 +50,11 @@ E B [@truevis](https://twitter.com/truevis)
 Q: Any API access to Shared Views available?
 
 A: Again, check out the release notes and let us know what you find out.
-For example, I do see an entry saying 'Shared View: Provided an easy way to share 3D views in Revit.'
+For example, I do see an entry saying, *Shared View: Provided an easy way to share 3D views in Revit*.
 
 ####<a name="3"></a> IFC 21.1 Released
 
-Also on Twiter, Angel Velez [@avelezsosa](https://twitter.com/avelezsosa)
+Also on Twitter, Angel Velez [@avelezsosa](https://twitter.com/avelezsosa)
 [announced](https://twitter.com/avelezsosa/status/1281601656828960769) that IFC 21.1 came out:
 
 [#Autodesk #Revit #IFC v21.1 is now available in the Autodesk App Store](https://apps.autodesk.com/RVT/en/Detail/Index?id=7265544480016320144&appLang=en&os=Win64)
@@ -71,24 +71,23 @@ The dreaded hacking deadline is looming near, however: hacking ends today, July 
 
 Some presentations are already live:
 
-Timo Hartmann Professor from TU Berlin and CEO of Startup Contecht presenting "Hacking cloud exchanges - Finally BIM Collaboration", their Journey as a Startup and their Forge BIM 360 API Applications
+- Timo Hartmann Professor from TU Berlin and CEO of Startup Contecht presenting "Hacking cloud exchanges - Finally BIM Collaboration", their Journey as a Startup and their Forge BIM 360 API Applications
 &ndash; [Recording](https://us02web.zoom.us/webinar/register/WN_UGoFqfUhSymhDNd7IodC7g)
 
 <center>
 <img src="img/aec_hackathon_01.png" alt="AEC Hackathon" title="AEC Hackathon" width="400"/> <!-- 1200 -->
 </center>
 
-Moicon Presentation
+- Moicon Presentation
 &ndash; [Recording](https://us02web.zoom.us/webinar/register/WN_Kn4dGTcWTr2ivQcnliWpdw )
-
-Xinaps Presentation
+- Xinaps Presentation
 &ndash; [Recording](https://us02web.zoom.us/webinar/register/WN_DSAec3V0Q_G6l0gBovhdrg)
 
 <center>
 <img src="img/aec_hackathon_02.png" alt="AEC Hackathon" title="AEC Hackathon" width="400"/> <!-- 1200 -->
 </center>
 
-Challenge Deep Dive with Jim and Jaime
+- Challenge Deep Dive with Jim and Jaime
 &ndash; [Recording](https://us02web.zoom.us/webinar/register/WN__Ivnm-diRJm-3llL--mWxQ)
 
 <center>
@@ -106,5 +105,7 @@ The judges are:
 
 Good luck in the end spurt and much success completing and presenting!
 
-Or, in case yu are not actively participating, prepare for being astounded seeing what the hackers created in this short space of time.
+Or, in case you are not actively participating yourself, take a look, enjoy, prepare for being astounded seeing what the hackers created in this short space of time.
+
+There is a lot to learn and profit from here.
 
