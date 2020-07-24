@@ -75,7 +75,7 @@ Timo Hartmann Professor from TU Berlin and CEO of Startup Contecht presenting "H
 &ndash; [Recording](https://us02web.zoom.us/webinar/register/WN_UGoFqfUhSymhDNd7IodC7g)
 
 <center>
-<img src="img/aec_hackathon_01.png" alt="AEC Hackathon" title="AEC Hackathon" width="100"/> <!-- 753 -->
+<img src="img/aec_hackathon_01.png" alt="AEC Hackathon" title="AEC Hackathon" width="400"/> <!-- 1200 -->
 </center>
 
 Moicon Presentation
@@ -85,14 +85,14 @@ Xinaps Presentation
 &ndash; [Recording](https://us02web.zoom.us/webinar/register/WN_DSAec3V0Q_G6l0gBovhdrg)
 
 <center>
-<img src="img/aec_hackathon_02.png" alt="AEC Hackathon" title="AEC Hackathon" width="100"/> <!-- 753 -->
+<img src="img/aec_hackathon_02.png" alt="AEC Hackathon" title="AEC Hackathon" width="400"/> <!-- 1200 -->
 </center>
 
 Challenge Deep Dive with Jim and Jaime
 &ndash; [Recording](https://us02web.zoom.us/webinar/register/WN__Ivnm-diRJm-3llL--mWxQ)
 
 <center>
-<img src="img/aec_hackathon_03.png" alt="AEC Hackathon" title="AEC Hackathon" width="100"/> <!-- 753 -->
+<img src="img/aec_hackathon_03.png" alt="AEC Hackathon" title="AEC Hackathon" width="400"/> <!-- 1200 -->
 </center>
 
 The final presentations are taking place tomorrow, Saturday, July 25th, 19:00-20:00 CET.
