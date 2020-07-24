@@ -106,7 +106,8 @@ The final presentations are taking place tomorrow, Saturday, July 25th, 13:00 ES
 
 The judges are:
 
-- Abdulrahman Mohamad Aarabi (Abed) of [MOE](https://www.moe.dk) Artelia Group
+- Abdulrahman Mohamad Aarabi (Abed), [MOE](https://www.moe.dk), Artelia Group
+- Hugh Geoghegan, [Xinaps](https://www.xinaps.com)
 - [Jaime Rosales](https://forge.autodesk.com/author/jaime-rosales), Autodesk
 - Jakob Hirn, [Build Informed GmbH](https://www.buildinformed.com)
 - Martin Loučka, [ioLabs](https://iolabs.ch)
