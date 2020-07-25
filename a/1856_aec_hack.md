@@ -17,6 +17,14 @@ More on Revit 2021.1, IFC 21.1, and nearing the end of the AEC Hackathon
 
 linkedin:
 
+More on Revit 2021.1, IFC 21.1, and AEC Hackathon final presentations coming up with the #RevitAPI
+
+https://bit.ly/aechackpres
+
+- Revit 2021.1 questions
+- IFC 21.1 released
+- AEC Hackathon final presentations...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -83,7 +91,7 @@ Some presentations are already live:
 &ndash; [Recording](https://us02web.zoom.us/webinar/register/WN_UGoFqfUhSymhDNd7IodC7g)
 
 <center>
-<img src="img/aec_hackathon_01.png" alt="AEC Hackathon" title="AEC Hackathon" width="400"/> <!-- 1200 -->
+<img src="img/aec_hackathon_01.png" alt="AEC Hackathon" title="AEC Hackathon" width="400"/>
 </center>
 
 - Moicon Presentation
@@ -92,11 +100,10 @@ Some presentations are already live:
 &ndash; [Recording](https://us02web.zoom.us/webinar/register/WN_DSAec3V0Q_G6l0gBovhdrg)
 
 <center>
-<img src="img/aec_hackathon_02.png" alt="AEC Hackathon" title="AEC Hackathon" width="400"/> <!-- 1200 -->
+<img src="img/aec_hackathon_02.png" alt="AEC Hackathon" title="AEC Hackathon" width="400"/>
 </center>
 
-- Challenge Deep Dive with Jim and Jaime
-&ndash; [Recording](https://us02web.zoom.us/webinar/register/WN__Ivnm-diRJm-3llL--mWxQ)
+Here is the [Deep Dive Challenge with Jim and Jaime](https://us02web.zoom.us/webinar/register/WN__Ivnm-diRJm-3llL--mWxQ)
 
 <center>
 <img src="img/aec_hackathon_03.png" alt="AEC Hackathon" title="AEC Hackathon" width="400"/> <!-- 1200 -->
