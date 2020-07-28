@@ -1,0 +1,116 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- Categories that can create legend components
+  https://forums.autodesk.com/t5/revit-api-forum/categories-that-can-create-legend-components/m-p/9659069
+
+- 15738224 [Encoding issues when reading data from size lookup tables with cyrillic characters]
+  https://forums.autodesk.com/t5/revit-api-forum/russian-letters-doesn-t-export-in-lookup-tables/m-p/9056270
+
+- Autodesk AEC customers demand better value
+  https://www.aecmag.com/comment-mainmenu-36/2046-autodesk-aec-customers-demand-better-value
+  AEC Magazine 
+
+twitter:
+
+ with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+&ndash; 
+...
+
+linkedin:
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>Cyrillic Encoding and Categories for Legends</h3>
+<p>Solutions, criticism, opportunities:</p>
+<ul>
+<li><a href="#2">Categories for legend components</a></li>
+<li><a href="#3">Encoding issue with Cyrillic characters fixed</a></li>
+<li><a href="#4">AEC customers demand better value</a></li>
+<li><a href="#5">Construction executive job</a></li>
+</ul>
+<h4><a name="2"></a> Categories for Legend Components</h4>
+<p>Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas and
+Juan Jesús <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3486289">jjesusdelpino</a> Del Pino Campos
+collaborated nicely to determine
+which <a href="https://forums.autodesk.com/t5/revit-api-forum/categories-that-can-create-legend-components/m-p/9659069">categories that can create legend components</a>:</p>
+<p><strong>Question:</strong> Is there a way to know if a legend component can be created from a determined category?
+E.g., I can create legend components from cable trays, but I can't do it with railings.
+I haven't seen any specific rule o parameter that specifies this property.
+Any ideas?
+Thanks.</p>
+<p><strong>Answer:</strong> I've found no obvious solution to this via the API, i.e., a Boolean property on the category class.</p>
+<p>I believe also that Legend views don't have a specific class.</p>
+<p>So, there is no static methods available on such for checking category suitability of placed elements that way either.</p>
+<p>You'll find sketch based system families (floors/Railings/Stairs...) are not applicable since Legend views don't have a sketch plane.</p>
+<p>If you think about it, apart from annotation objects, Legend views contain types not instances (since you usually drag the types onto the Legend from the project browser).</p>
+<p>However, there is also no property for this indicated on <code>ElementType</code> class.</p>
+<p><strong>Response:</strong> I also have not found any solution for this through API, so I have ended up checking and making the list manually.</p>
+<p>I put it here in case someone looking for the same thing comes:</p>
+<pre class="code">
+FamilyInstances = [“OST_DuctAccessory”, “OST_PipeAccessory”, “OST_PlumbingFixtures”, “OST_StructuralFraming”, “OST_StructuralFoundation”, “OST_ElectricalEquipment”, “OST_SpecialityEquipment”, “OST_MechanicalEquipment”, “OST_LightingFixtures”, “OST_Furniture”, “OST_Casework”, “OST_Columns”, “OST_StructuralColumns”, ”OST_Doors”, ”OST_Sprinklers”, “OST_DuctTerminal”, “OST_DuctFitting”, “OST_PipeFitting”, “OST_Planting”, “OST_Windows”];
+
+SystemFamilies = [“OST_CableTray”, ”OST_RoofSoffit”, “OST_Ceilings”, “OST_DuctCurves”, “OST_Roofs”, “OST_Walls”, “OST_StackedWalls”, ”OST_CurtainWallPanels”, “OST_Floors”, ”OST_PipeCurves”, ”OST_FlexPipeCurves”,” OST_Conduit”];
+</pre>
+
+<h4><a name="3"></a> Encoding Issue with Cyrillic Characters Fixed</h4>
+<p>The <a href="https://forums.autodesk.com/t5/revit-api-forum/russian-letters-doesn-t-export-in-lookup-tables/m-p/9056270">encoding issues when reading data from size lookup tables with cyrillic characters</a>
+is resolved in the Revit 2021.1 update release.</p>
+<p>The development team resolved the issue <em>REVIT-153006 &ndash; Encoding issue reading data from size lookup table with Cyrillic characters -- 15738224</em> and report the good news:</p>
+<p>We have now fixed and closed this issue in the development release.</p>
+<p>It has been addressed in work done for <em>REVIT-161509</em>.</p>
+<p>That fix is present in Revit 2021.1 and any version of Revit after that.</p>
+<p>For previous versions, one option to try is to see if generating the CSV files as UTF-16 (i.e., 2 byte Unicode) will cause them to be read properly, even in older versions of Revit that do not contain the fix.</p>
+<p>Please note that our support for loading UTF-8 and UTF-16 requires that the files contain the proper UTF signature BOM at the beginning of the file.
+The UTF-8 files provided as samples DO NOT, but you can re-save them as UTF-8 in almost any text editor and force generation of this signature.
+Then Revit knows how to properly load and encode them with the fix. Revit is not a full blown text processor, so it relies on the presence of that BOM to properly handle files.
+Without it, Revit assume they are 'normal' ANSI encoded files and thus will not process them correctly.</p>
+<p><center>
+<img src="img/cyrillic_characters.png" alt="Cyrillic characters" title="Cyrillic characters" width="316"/>
+</center></p>
+<h4><a name="4"></a> AEC Customers Demand Better Value</h4>
+<p>An interesting critical article in AEC Magazine discusses
+how <a href="https://www.aecmag.com/comment-mainmenu-36/2046-autodesk-aec-customers-demand-better-value">Autodesk AEC customers demand better value</a>.</p>
+<h4><a name="5"></a> Construction Executive Job</h4>
+<p>Are you interested and motivated to contribute to reimagining the construction business for the digital age?</p>
+<p>Autodesk is active in that area, enabling companies to address the most important challenges they face today while preparing for new ways of working in the future. The Autodesk Construction Cloud portfolio connects the office, trailer and field so customers can move seamlessly through each phase of a building’s lifecycle - from design and preconstruction to construction, turnover and operations - with best-in-class solutions that include Assemble Systems, BIM360, BuildingConnected and PlanGrid. General contractors, subcontractors, and owners around the world rely on ACS to win more work, enhance collaboration, speed decision-making, reduce risk, and improve overall project outcomes. We are looking for top Sales Professionals to join Autodesk Construction Solutions (ACS) team and work with clients in EMEA to uncover pain in their current processes and find value in leveraging the Autodesk Construction Cloud. Our Account Executives (AEs) represent ACS for their assigned geography in a fast paced and exciting industry! With a regional approach to selling into the construction industry, we are looking for someone to be the go-to resource and expert in their territory as we look to build net-new business and expand our existing account base across EMEA. </p>
+<p>If so, would you like to consider applying for a job as Construction Account Executive?</p>
+<ul>
+<li><a href="https://rolp.co/GrWoi">20WD39376 &ndash; Construction Account Executive working Home Office in Germany</a></li>
+</ul>
+<p>Responsibilities:</p>
+<ul>
+<li>Manage the sales cycle from prospect to close with a consistent track record of meeting or exceeding quotas</li>
+<li>Show potential customers the value of the Autodesk Construction Cloud portfolio, conducting both in-person and virtual demos (with the help of technical experts when required)</li>
+<li>Understand the competitive landscape and customer needs to effectively position the right Autodesk Construction Cloud products</li>
+<li>Manage and qualify inbound leads and pipeline, with accurate and timely responses</li>
+<li>Work with and mentor Business Development Reps (BDRs) to drive leads in territory</li>
+<li>Own and deliver on a territory plan and forecast</li>
+<li>Be ready to expand your sales career in the exciting &amp; growing Construction Tech space!</li>
+</ul>
+<p>Minimum qualifications:</p>
+<ul>
+<li>Three or more years of experience in selling SaaS/Cloud-based solutions in the field</li>
+<li>Results-driven and a consistent track record of exceeding quota</li>
+<li>Analytical, detail-driven and a master multitasker</li>
+<li>Experience demoing software and are comfortable selling to all audiences</li>
+<li>Entrepreneurial and thrive in a dynamic, growth-oriented environment</li>
+<li>Construction experience or familiarity is a plus, but not required (We can teach you!)</li>
+<li>Travel is expected, but AEs are trusted to manage their schedules appropriately based on territory and accounts</li>
+</ul>
+<p>Good luck applying for that or the many other opportunities that you can find all over the world in
+the <a href="https://www.autodesk.com/careers">Autodesk career site</a>!</p>
