@@ -20,8 +20,11 @@ twitter:
 
  with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Solutions, criticism, opportunities
+&ndash; Categories for legend components
+&ndash; Encoding issue with Cyrillic characters fixed
+&ndash; AEC customers demand better value
+&ndash; Construction executive job...
 
 linkedin:
 
@@ -80,9 +83,56 @@ FamilyInstances = [“OST_DuctAccessory”, “OST_PipeAccessory”, “OST_Plum
 SystemFamilies = [“OST_CableTray”, ”OST_RoofSoffit”, “OST_Ceilings”, “OST_DuctCurves”, “OST_Roofs”, “OST_Walls”, “OST_StackedWalls”, ”OST_CurtainWallPanels”, “OST_Floors”, ”OST_PipeCurves”, ”OST_FlexPipeCurves”,” OST_Conduit”];
 </pre>
 
+Many thanks to Juan Jesús and Richard for sharing this result.
+
+I cleaned it up and added it
+to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) for
+posterity like this:
+
+<pre class="code">
+<span style="color:#2b91af;">BuiltInCategory</span>&nbsp;[]&nbsp;_bics_for_legend_component_with_FamilyInstance&nbsp;
+&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>[]&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Casework,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Columns,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Doors,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_DuctAccessory,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_DuctFitting,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_DuctTerminal,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_ElectricalEquipment,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Furniture,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_LightingFixtures,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_MechanicalEquipment,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_PipeAccessory,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_PipeFitting,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Planting,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_PlumbingFixtures,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_SpecialityEquipment,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Sprinklers,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_StructuralColumns,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_StructuralFoundation,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_StructuralFraming,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Windows&nbsp;};
+ 
+<span style="color:#2b91af;">BuiltInCategory</span>[]&nbsp;_bics_for_legend_component_with_SystemFamily&nbsp;
+&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>[]&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_CableTray,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Ceilings,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Conduit,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_CurtainWallPanels,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_DuctCurves,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_FlexPipeCurves,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Floors,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_PipeCurves,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_RoofSoffit,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Roofs,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_StackedWalls,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Walls&nbsp;};
+</pre>
+
+
 ####<a name="3"></a> Encoding Issue with Cyrillic Characters Fixed
 
-The [encoding issues when reading data from size lookup tables with cyrillic characters](https://forums.autodesk.com/t5/revit-api-forum/russian-letters-doesn-t-export-in-lookup-tables/m-p/9056270)
+The [encoding issues when reading data from size lookup tables with Cyrillic characters](https://forums.autodesk.com/t5/revit-api-forum/russian-letters-doesn-t-export-in-lookup-tables/m-p/9056270)
 is resolved in the Revit 2021.1 update release.
 
 The development team resolved the issue *REVIT-153006 &ndash; Encoding issue reading data from size lookup table with Cyrillic characters -- 15738224* and report the good news:
@@ -99,6 +149,12 @@ Please note that our support for loading UTF-8 and UTF-16 requires that the file
 The UTF-8 files provided as samples DO NOT, but you can re-save them as UTF-8 in almost any text editor and force generation of this signature.
 Then Revit knows how to properly load and encode them with the fix. Revit is not a full blown text processor, so it relies on the presence of that BOM to properly handle files.
 Without it, Revit assume they are 'normal' ANSI encoded files and thus will not process them correctly.
+
+Correction after another, deeper, look at the code prior to this fix, in older versions of Revit:
+Unfortunately, upon further investigation, that code assumes the file is a set of single byte characters to load.
+Not even a proper ANSI code page encoding is being applied, although the workarounds look like that is possibly going on as part of the internal file read…
+Anyway, I do not think using any sort of Unicode encoding on the files in question for previous versions of Revit will work after all.
+It does in the current version, though.
 
 <center>
 <img src="img/cyrillic_characters.png" alt="Cyrillic characters" title="Cyrillic characters" width="316"/>
