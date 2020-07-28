@@ -129,6 +129,27 @@ posterity like this:
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Walls&nbsp;};
 </pre>
 
+Slightly [&ast;&ast;&ast;&ast;](https://en.wikipedia.org/wiki/Anal_retentiveness), I know.
+
+**Response:** In the end I have had to use that list with `BuiltInCategory` entries in my code so your &ast;&ast;&ast;&ast; retentiveness has already been proven necessary haha.
+
+**Answer:** Glad to hear it was useful for you!
+
+I am in discussion with friends on the topic of perfection versus
+the [Pareto 80-20 principle](https://en.wikipedia.org/wiki/Pareto_principle).
+
+I try to favour both.
+
+I see this as an  effective demonstration that both can be achieved simultaneously.
+
+In simple cases only, of course.
+
+Luckily, all programming issues are simple, always.
+
+Unless someone seriously messed them up.
+
+Unfortunately, the most common case...
+
 
 ####<a name="3"></a> Encoding Issue with Cyrillic Characters Fixed
 
