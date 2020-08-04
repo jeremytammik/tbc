@@ -1,0 +1,168 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- Revit 2021.1 API; 2021.1 SDK is here:
+  \\usmanpdaec003\Data\Revit\SDK\2021
+  https://myshare.autodesk.com/:u:/g/personal/mikako_harada_autodesk_com/EVc-ZcHTOgxJlatpdPsCnM8BBCzFDBgnki7EpRATudZryw?e=ehdzlL
+  https://www.autodesk.com/developer-network/platform-technologies/revit
+  ~/downloads/REVIT_2021_1_SDK.msi
+  REVIT_2021_1_SDK.msi 378,425,344 bytes
+
+- deprecated versus obsolete
+  Q: What does the below statement “deprecation/replacement” mean? 
+  We should keep the compatibility for API, right?? 
+  Is this just a update to the SDK/documentation?
+  A: Deprecated means 'it now has less value'.
+  Wikipedia explains [Deprecation](https://en.wikipedia.org/wiki/Deprecation) like this:
+  > In several fields, deprecation is the discouragement of use of some terminology, feature, design, or practice, typically because it has been superseded or is no longer considered efficient or safe, without completely removing it or prohibiting its use.
+  > It can also imply that a feature, design, or practice will be removed or discontinued entirely in the future.
+  It is not gone, not worthless.
+  Using it may produce a warning message during compilation, but it wil still work.
+  R: But note says 'replaced'. If so, the same code won’t work. Then, it’s a breaking change.  
+  A: It does not say 'replaced', but 'replacement'.
+  There is a subtle and significant difference between these two terms.
+  The former 'replaced' means that is has been replaced and is hence no longer available.
+  In that case, the method would not be marked as deprecated, but as obsolete.
+  The latter, 'replacement', means that a replacement is available in case you wish to stop using the deprecated method, but nobody forces you to do so.
+  'Deprecated' and 'replaced' has always been the terminology used by the Revit API team to mean, 'We have deprecated some functions. Here are the new ones we would like you to use as replacements. The deprecated functions will be removed in the next release.'
+
+twitter:
+
+ with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+&ndash; 
+...
+
+linkedin:
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>The Revit 2021.1 SDK</h3>
+<h4><a name="2"></a> The Revit 2021.1 SDK</h4>
+<p>Today, just a quick note to point out that an updated SDK (Software Developer's Kit) for
+the <a href="https://thebuildingcoder.typepad.com/blog/2020/07/revit-20211-update-and-normalising-custom-export-uv.html#2">Revit 2021.1 update release</a>
+is now available from
+the <a href="https://www.autodesk.com/developer-network/platform-technologies/revit">Revit developer centre</a>.</p>
+<h4><a name="3"></a> Numerous Issues Resolved</h4>
+<p>The Revit 2021.1 update release resolves a number of reported issues.</p>
+<p>Here is a microscopic random selection of a handful that I encountered myself:</p>
+<ul>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/issue-on-revit-2021-with-assembly-protections-and-addin-loading/m-p/9433973">Obfuscation problem</a>
+  &ndash; <em>REVIT-160709 RVTPR-00662: AddinManager Error for Obfuscated Add-ins</em></li>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/russian-letters-doesn-t-export-in-lookup-tables/m-p/9056270">Cyrillic characters in lookup tables</a>
+  &ndash; <em>REVIT-153006 Encoding issue reading data from size lookup table with Cyrillic characters -- 15738224</em></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2020/04/whats-new-in-the-revit-2021-api.html#comment-4883962120">Extensible storage schema with <code>UT_Custom</code></a>
+  &ndash; <em>REVIT-161725 R2021 Schema with UT_Custom causes internal error</em></li>
+<li>Documentation errors and an invalid error reporting email address in the SDK itself
+  &ndash; <em>REVIT-163108 incorrect email and year in Revit API docs -- 16587872</em></li>
+</ul>
+<p><strong>Question:</strong></p>
+<p><strong>Answer:</strong> </p>
+<p><strong>Response:</strong> </p>
+<pre class="code">
+</pre>
+
+<p><center>
+<img src="img/rvt_2021_1_sdk_chm_whats_new_empty.png" alt="Revit 2021.1 API help file What's New is empty" title="Revit 2021.1 API help file What's New is empty" width="100"/>
+</center></p>
+<h4><a name="4"></a> Major additions to the Revit 2021.1 API</h4>
+<h4><a name="5"></a> API changes</h4>
+<h4><a name="5.1"></a> ConnectorType API change</h4>
+<p>The following function has been deprecated and replaced:</p>
+<ul>
+<li>ConnectorType.MasterSurface() &rarr; ConnectorType.MainSurface()</li>
+</ul>
+<h4><a name="5.2"></a> Export API change</h4>
+<p>The following property has been deprecated and replaced:</p>
+<ul>
+<li>DGNExportOptions.MasterUnits &rarr; DGNExportOptions.WorkingUnits</li>
+</ul>
+<h4><a name="5.2"></a> Save As API change</h4>
+<p>The following properties have been deprecated and replaced:</p>
+<ul>
+<li>DocumentSavingAsEventArgs.IsSavingAsMasterFile &rarr; DocumentSavingAsEventArgs.IsSavingAsCentralFile</li>
+<li>DocumentSavedAsEventArgs.IsSavingAsMasterFile &rarr; DocumentSavedAsEventArgs.IsSavingAsCentralFile</li>
+</ul>
+<h4><a name="6"></a> API additions</h4>
+<h4><a name="6.1"></a> Civil Alignments API</h4>
+<p>Revit now provides support for Civil Alignments and their associated annotations.
+Alignments are imported from InfraWorks as a part of the workflow to transfer Civil Structures.
+The API supports read of alignment properties and geometric information, along with read/write and create of associated annotations.
+All new classes for the Alignments API are exposed through a different assembly in the Revit installation, located at:</p>
+<ul>
+<li>Addins\CivilAlignments\Autodesk.CivilAlignments.DBApplication.dll </li>
+</ul>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.Infrastructure.Alignment</li>
+</ul>
+<p>represents an alignment and can be used to find alignments in a document, and to query a particular alignment's properties and to analyze alignment geometry. This object is not an Element, but the underlying Element can be obtained from this object if needed.</p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.Infrastructure.AlignmentStationLabel</li>
+</ul>
+<p>represents an alignment station label annotation and can be used to find such labels in a document as well as to create and modify such labels. This object is not an Element, but the underlying Element (which is a SpotDimension instance) can be obtained from this object if needed.</p>
+<p>The new classes:</p>
+<ul>
+<li>Autodesk.Revit.DB.Infrastructure.AlignmentStationLabelOptions</li>
+<li>Autodesk.Revit.DB.Infrastructure.AlignmentStationLabelSetOptions</li>
+</ul>
+<p>provide options for creating a single alignment label or for creating a set of alignment labels.</p>
+<h4><a name="6.2"></a> Dimension API additions</h4>
+<p>Several new properties allow access to positioning for various parts of a dimension:</p>
+<ul>
+<li>Dimension.TextPosition</li>
+<li>Dimension.LeaderEndPosition</li>
+<li>Dimension.HasLeader</li>
+<li>SpotDimension.LeaderElbowPosition</li>
+<li>SpotDimension.LeaderHasElbow</li>
+</ul>
+<h4><a name="6.3"></a> Shared Coordinates API additions</h4>
+<h4><a name="6.3.1"></a> Reset Shared Coordinates</h4>
+<p>The new method:</p>
+<ul>
+<li>Document.ResetSharedCoordinates()</li>
+</ul>
+<p>resets the shared coordinates for the host model. It provides the same functionality as the UI Command "Reset Shared Coordinates". </p>
+<p>After resetting coordinates, the following changes will take place:</p>
+<ol>
+<li>GIS coordinate system will be erased</li>
+<li>Shared coordinates relationships with other linked models will be eliminated.</li>
+<li>The Survey Point will be moved back to the startup location, where it coincides with the Internal Origin.</li>
+<li>The angle between Project North and True North will be reset to 0.</li>
+</ol>
+<p>Note: There will be no changes to linked models.</p>
+<h4><a name="6.3.2"></a> Clipped state of BasePoint</h4>
+<p>The new property: </p>
+<ul>
+<li>bool BasePoint.Clipped</li>
+</ul>
+<p>will get or set the clipped state of the survey point BasePoint based on the active ProjectLocation of its Document. For the project base point, the get method will always return false, and the set method will throw an exception.</p>
+<h4><a name="6.4"></a> MEP API Additions</h4>
+<h4><a name="6.4.1"></a> Building and Space Type additions</h4>
+<p>Several new properties have been added for Building and Space Types:</p>
+<ul>
+<li>HVACLoadType.HeatingSetPoint &ndash; The heating temperature set point in unit Kelvin (K).</li>
+<li>HVACLoadType.CoolingSetPoint &ndash; The cooling temperature set point in unit Kelvin (K).</li>
+<li>HVACLoadType.HumidificationSetPoint &ndash; The humidification set point as a number between 0 and 1.</li>
+<li>HVACLoadType.DehumidificationSetPoint &ndash; The dehumidification set point as a number between 0 and 1.</li>
+</ul>
+<h4><a name="6.4.2"></a> Zone additions</h4>
+<p>The new property:</p>
+<ul>
+<li>GenericZone.LevelOffset</li>
+</ul>
+<p>gets or sets the offset distance from this zone to the associated level.</p>
