@@ -51,34 +51,87 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>The Revit 2021.1 SDK</h3>
-<h4><a name="2"></a> The Revit 2021.1 SDK</h4>
-<p>Today, just a quick note to point out that an updated SDK (Software Developer's Kit) for
-the <a href="https://thebuildingcoder.typepad.com/blog/2020/07/revit-20211-update-and-normalising-custom-export-uv.html#2">Revit 2021.1 update release</a>
-is now available from
-the <a href="https://www.autodesk.com/developer-network/platform-technologies/revit">Revit developer centre</a>.</p>
-<h4><a name="3"></a> Numerous Issues Resolved</h4>
-<p>The Revit 2021.1 update release resolves a number of reported issues.</p>
-<p>Here is a microscopic random selection of a handful that I encountered myself:</p>
+<p>Two weeks ago, we mentioned
+the <a href="https://thebuildingcoder.typepad.com/blog/2020/07/revit-20211-update-and-normalising-custom-export-uv.html#2">Revit 2021.1 update release</a>.</p>
+<p>Now, the corresponding updated SDK (Software Developer's Kit) is also available.</p>
+<p>Here are some notes on that, together with an online copy of the information from its <em>What's New</em> section:</p>
 <ul>
-<li><a href="https://forums.autodesk.com/t5/revit-api-forum/issue-on-revit-2021-with-assembly-protections-and-addin-loading/m-p/9433973">Obfuscation problem</a>
-  &ndash; <em>REVIT-160709 RVTPR-00662: AddinManager Error for Obfuscated Add-ins</em></li>
-<li><a href="https://forums.autodesk.com/t5/revit-api-forum/russian-letters-doesn-t-export-in-lookup-tables/m-p/9056270">Cyrillic characters in lookup tables</a>
-  &ndash; <em>REVIT-153006 Encoding issue reading data from size lookup table with Cyrillic characters -- 15738224</em></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2020/04/whats-new-in-the-revit-2021-api.html#comment-4883962120">Extensible storage schema with <code>UT_Custom</code></a>
-  &ndash; <em>REVIT-161725 R2021 Schema with UT_Custom causes internal error</em></li>
-<li>Documentation errors and an invalid error reporting email address in the SDK itself
-  &ndash; <em>REVIT-163108 incorrect email and year in Revit API docs -- 16587872</em></li>
+<li><a href="#2">The Revit 2021.1 SDK</a></li>
+<li><a href="#3">What's New in Previous Versions</a></li>
+<li><a href="#5">API changes</a><ul>
+<li><a href="#5.1">ConnectorType API change</a></li>
+<li><a href="#5.2">Export API change</a></li>
+<li><a href="#5.2">Save As API change</a></li>
 </ul>
-<p><strong>Question:</strong></p>
-<p><strong>Answer:</strong> </p>
-<p><strong>Response:</strong> </p>
-<pre class="code">
-</pre>
-
+</li>
+<li><a href="#6">API additions</a><ul>
+<li><a href="#6.1">Civil Alignments API</a></li>
+<li><a href="#6.2">Dimension API additions</a></li>
+<li><a href="#6.3">Shared Coordinates API additions</a><ul>
+<li><a href="#6.3.1">Reset Shared Coordinates</a></li>
+<li><a href="#6.3.2">Clipped state of BasePoint</a></li>
+</ul>
+</li>
+<li><a href="#6.4">MEP API Additions</a><ul>
+<li><a href="#6.4.1">Building and Space Type additions</a></li>
+<li><a href="#6.4.2">Zone additions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#7">Random Selection of Issues Resolved</a></li>
+</ul>
+<h4><a name="2"></a> The Revit 2021.1 SDK</h4>
+<p>Please note that the updated SDK (Software Developer's Kit) for
+the <a href="https://thebuildingcoder.typepad.com/blog/2020/07/revit-20211-update-and-normalising-custom-export-uv.html#2">Revit 2021.1 update release</a>
+is now available for download from
+the <a href="https://www.autodesk.com/developer-network/platform-technologies/revit">Revit developer centre</a>.</p>
+<ul>
+<li>REVIT_2021_1_SDK.msi (378,425,344 bytes)</li>
+</ul>
+<p>The information below is based on the contents of the <em>Revit Platform API Changes and Additions.docx</em> document included with
+the Revit 2021.1 SDK.
+It is also provided in the section on <em>What's New</em> in the Revit 2021.1 API help file <code>RevitAPI.chm</code> included with the SDK:</p>
 <p><center>
-<img src="img/rvt_2021_1_sdk_chm_whats_new_empty.png" alt="Revit 2021.1 API help file What's New is empty" title="Revit 2021.1 API help file What's New is empty" width="100"/>
+<img src="img/rvt_2021_1_sdk_chm_whats_new.png" alt="Revit 2021.1 API help file section on What's New" title="Revit 2021.1 API help file section on What's New" width="600"/> <!-- 1508 -->
 </center></p>
-<h4><a name="4"></a> Major additions to the Revit 2021.1 API</h4>
+<p>For convenient, easy and effective web searching, this blog post provides an online version of that information.</p>
+<p>The <em>What's New</em> section and the <em>Changes and Additions</em> document provide important information, both for discovering and exploring the newly added API functionality and for later reference.</p>
+<p>If you encounter any issues migrating your existing add-ins between different versions, this is one of the first places to look.</p>
+<p>For detailed information on all other aspects of the Revit API, please refer to the rest of the API documentation and samples provided in the SDK.</p>
+<p>The most important things to install and always keep at hand are:</p>
+<ul>
+<li>The Revit API help file <code>RevitAPI.chm</code></li>
+<li>The Visual Studio solution containing all the SDK samples, <code>Samples\SDKSamples.sln</code></li>
+</ul>
+<p>You will need both of these regularly for research on how to solve specific Revit API programming tasks.</p>
+<p>More in-depth official explanations and background information is provided by the
+online <a href="http://help.autodesk.com/view/RVT/2021/ENU/?guid=Revit_API_Revit_API_Developers_Guide_html">Revit API Developers Guide</a> included 
+in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online help</a>.</p>
+<h4><a name="3"></a>What's New in Previous Versions</h4>
+<p>Here are links to previous discussions of <em>What's New in the Revit API</em>:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2010-api.html">What's New in the Revit 2010 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2011-api.html">What's New in the Revit 2011 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2012-api.html">What's New in the Revit 2012 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/whats-new-in-the-revit-2013-api.html">What's New in the Revit 2013 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">What's New in the Revit 2014 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html">What's New in the Revit 2015 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html">What's New in the Revit 2016 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/04/whats-new-in-the-revit-2017-api.html">What's New in the Revit 2017 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/11/whats-new-in-the-revit-20171-api.html">What's New in the Revit 2017.1 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-revit-2018-api.html">What's New in the Revit 2018 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/08/revit-20181-and-the-visual-materials-api.html">Revit 2018.1 and the Visual Materials API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/09/revit-201811-fixes-cropbox-setting.html">Revit 2018.1.1 and 2018.1 API Docs Online</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html">Revit 2018.1 Visual Materials API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/12/whats-new-in-the-revit-20182-api.html">What's New in the Revit 2018.2 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2018/04/whats-new-in-the-revit-2019-api.html">What's New in the Revit 2019 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html">What's New in the Revit 2020 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/09/whats-new-in-the-revit-20201-api.html">What's New in the Revit 2020.1 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2020/04/whats-new-in-the-revit-2021-api.html">What's New in the Revit 2021 API</a></li>
+</ul>
+<p>Here is an overview of the major additions to the Revit 2021.1 API, split into separate sections
+on <a href="#5">API changes</a> and <a href="#6">API additions</a>:</p>
 <h4><a name="5"></a> API changes</h4>
 <h4><a name="5.1"></a> ConnectorType API change</h4>
 <p>The following function has been deprecated and replaced:</p>
@@ -166,3 +219,16 @@ All new classes for the Alignments API are exposed through a different assembly 
 <li>GenericZone.LevelOffset</li>
 </ul>
 <p>gets or sets the offset distance from this zone to the associated level.</p>
+<h4><a name="7"></a> Random Selection of Issues Resolved</h4>
+<p>The Revit 2021.1 update release resolves a number of reported issues.</p>
+<p>This is mainly a note to self on the following microscopic and totally random selection of a handful of development tickets that I encountered myself:</p>
+<ul>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/issue-on-revit-2021-with-assembly-protections-and-addin-loading/m-p/9433973">Obfuscation problem</a>
+  &ndash; <em>REVIT-160709 RVTPR-00662: AddinManager Error for Obfuscated Add-ins</em></li>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/russian-letters-doesn-t-export-in-lookup-tables/m-p/9056270">Cyrillic characters in lookup tables</a>
+  &ndash; <em>REVIT-153006 Encoding issue reading data from size lookup table with Cyrillic characters -- 15738224</em></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2020/04/whats-new-in-the-revit-2021-api.html#comment-4883962120">Extensible storage schema with <code>UT_Custom</code></a>
+  &ndash; <em>REVIT-161725 R2021 Schema with UT_Custom causes internal error</em></li>
+<li>Documentation errors and an invalid error reporting email address in the SDK itself
+  &ndash; <em>REVIT-163108 incorrect email and year in Revit API docs -- 16587872</em></li>
+</ul>
