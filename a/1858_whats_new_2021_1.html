@@ -32,7 +32,7 @@
 
 twitter:
 
- with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+The updated SDK (Software Developer's Kit) for the Revit 2021.1 update release is now available from the Revit developer centre iwth new and enhanced #RevitAPI functionality @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/rvt_2021_1_apinews
 
 The updated SDK (Software Developer's Kit) for the Revit 2021.1 update release is now available from the Revit developer centre
 &ndash; The Revit 2021.1 SDK
@@ -70,6 +70,7 @@ the <a href="https://thebuildingcoder.typepad.com/blog/2020/07/revit-20211-updat
 <ul>
 <li><a href="#2">The Revit 2021.1 SDK</a></li>
 <li><a href="#3">What's New in Previous Versions</a></li>
+<li><a href="#4">Deprecated versus obsolete</a></li>
 <li><a href="#5">API changes</a><ul>
 <li><a href="#5.1">ConnectorType API change</a></li>
 <li><a href="#5.2">Export API change</a></li>
@@ -143,10 +144,10 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <li><a href="https://thebuildingcoder.typepad.com/blog/2020/04/whats-new-in-the-revit-2021-api.html">What's New in the Revit 2021 API</a></li>
 </ul>
 <h4><a name="4"></a> Deprecated versus Obsolete</h4>
-<p>Before we get deeper into the API changes and additions, a short clrification on the terminology used.</p>
+<p>Before we get deeper into the API changes and additions, a short clarification on the terminology used.</p>
 <p><strong>Question:</strong> What does the below statement “deprecation/replacement” mean?</p>
 <p>We should keep the compatibility for API, right?? </p>
-<p>Is this just a update to the SDK/documentation?</p>
+<p>Is this just an update to the SDK/documentation?</p>
 <p><strong>Answer:</strong> Deprecated means 'it now has less value'.</p>
 <p>Wikipedia explains <a href="https://en.wikipedia.org/wiki/Deprecation">Deprecation</a> like this:</p>
 <blockquote>
@@ -154,14 +155,14 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <p>It can also imply that a feature, design, or practice will be removed or discontinued entirely in the future.</p>
 </blockquote>
 <p>It is not gone, not worthless.</p>
-<p>Using it may produce a warning message during compilation, but it wil still work.</p>
+<p>Using it may produce a warning message during compilation, but it will still work.</p>
 <p><strong>Response:</strong> But note says 'replaced'. If so, the same code won’t work. Then, it’s a breaking change.</p>
 <p><strong>Answer:</strong> It does not say 'replaced', but 'replacement'.</p>
 <p>There is a subtle and significant difference between these two terms.</p>
 <p>The former 'replaced' means that is has been replaced and is hence no longer available.</p>
 <p>In that case, the method would not be marked as deprecated, but as obsolete.</p>
 <p>The latter, 'replacement', means that a replacement is available in case you wish to stop using the deprecated method, but nobody forces you to do so.</p>
-<p>'Deprecated' and 'replaced' has always been the terminology used by the Revit API team to mean, 'We have deprecated some functions.Here are the new ones we would like you to use as replacements. The deprecated functions will be removed in the next release.'</p>
+<p>'Deprecated' and 'replaced' has always been the terminology used by the Revit API team to mean, 'We have deprecated some functions. Here are the new ones we would like you to use as replacements. The deprecated functions will be removed in the next release.'</p>
 <p>With that potential misunderstanding out of the way, here is an overview of the major additions to the Revit 2021.1 API, split into separate sections
 on <a href="#5">API changes</a> and <a href="#6">API additions</a>:</p>
 <h4><a name="5"></a> API changes</h4>
