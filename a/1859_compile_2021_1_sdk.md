@@ -27,9 +27,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Compile and Install Revit 2021.1 SDK Samples
+### Compile and Compare the Revit 2021.1 SDK Samples
 
-Once again, I document my compilation, adaptation and installation o the Revit SDK samples and the RvtSamples external application loading them all:
+Once again, I document my compilation, adaptation and installation of the Revit SDK samples and the RvtSamples external application loading them all:
 
 - [Compiling the Revit 2021.1 SDK samples](#2)
 - [Architecture mismatch warning and `RvtSamples.txt`](#3)
