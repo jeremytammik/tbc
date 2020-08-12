@@ -113,8 +113,8 @@ One new SDK sample was added in the Revit 2021.1 SDK.
 
 CivilAlignments implements an external command and an external application demonstrating the use of the API for finding, property querying and annotating of infrastructure alignment elements:
 
--	Places major and minor alignment station label sets along an alignment
--	Displays a summary of properties of the alignment element and its attached alignment station label elements
+- Place major and minor alignment station label sets along an alignment
+- Display a summary of properties of the alignment element and its attached alignment station label elements
 
 Instructions:
 
