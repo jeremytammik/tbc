@@ -96,3 +96,30 @@ I will leave the remaining five warnings in there for now.
 One great advantage of the GitHub repository management is that you can very easily analyse the differences between the different releases to determine the exact changes that I applied, e.g.,
 [between 2021.1.0.0 and 2021.1.0.2](https://github.com/jeremytammik/RevitSdkSamples/compare/2021.1.0.0...2021.1.0.2).
 
+<center>
+<img src="img/rvt_2021_1_sdk_samples.png" alt="Revit 2021.1 SDK samples" title="Revit 2021.1 SDK samples" width="277"/>
+</center>
+
+####<a name="4"></a> New SDK Sample &ndash; CivilAlignments
+
+One new SDK sample was added in the Revit 2021.1 SDK.
+
+CivilAlignments implements an external command and an external application demonstrating the use of the API for finding, property querying and annotating of infrastructure alignment elements:
+
+-	Places major and minor alignment station label sets along an alignment
+-	Displays a summary of properties of the alignment element and its attached alignment station label elements
+
+Instructions:
+
+Open *CivilAlignments_BridgeSample.rvt*.
+It is a metric project, to demonstrate necessary unit conversions to feet.
+The project contains an alignment.
+The project also contains two special Arrowhead styles, Major Station Arrowhead and Minor Station Arrowhead, which are necessary for proper setup of the major and minor alignment station label set types.
+Other projects can be used, as long as they contain an alignment and have the aforementioned arrowhead styles defined.
+
+- In the Add-ins Tab, launch the *Create Station Labels* command and pick an alignment; result: 
+    - Major and minor alignment station set tags are created. The major stations are placed starting at the alignment’s displayed start station, every 100m. The minor stations are placed every 10m for the first 100m.
+    - In plan views, single alignment station labels are created at every start and end of the alignment’s horizontal curve geometry. 
+- In the Add-ins Tab, launch the *Show Properties* command and pick the alignment; result:
+    - A task dialog displays, listing the properties of the alignment, its horizontal curves and all of its associated station labels. 
+
