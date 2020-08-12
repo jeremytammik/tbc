@@ -8,10 +8,12 @@
 
 twitter:
 
-Compiling the Revit 2021.1 SDK samples with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/rvt2021sdk
-
-&ndash; 
-...
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+ 
+I document my compilation, adaptation and installation of the Revit SDK samples and the RvtSamples external application loading them all
+&ndash; Compiling the Revit 2021.1 SDK samples
+&ndash; Architecture mismatch warning and <code>RvtSamples.txt</code>
+&ndash; New SDK sample CivilAlignments...
 
 linkedin:
 
