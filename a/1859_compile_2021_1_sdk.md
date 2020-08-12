@@ -90,49 +90,17 @@ I will leave the remaining five warnings in there for now.
 I hope that I can persuade the development team to clean up the SDK before their next release of it to save us having to repeat these steps again next time around.
 
 
-####<a name="3"></a> Reading the Value of a Parameter
+####<a name="3"></a>
 
-Talking about the Revit SDK samples, let's address another (even more) beginner's question, on reading the value of a parameter, raised in
-a [comment](https://thebuildingcoder.typepad.com/blog/2011/09/unofficial-parameters-and-bipchecker.html#comment-4905987898)
-on [unofficial parameters and BipChecker](https://thebuildingcoder.typepad.com/blog/2011/09/unofficial-parameters-and-bipchecker.html):
+**Question:**
 
-**Question:** I am trying to read the following parameters of a wall: volume and area.
-
-I have been using `getparameter`, `get_parameter` and `lookupparameter`, but the return value is always empty.
-
-Are there any tutorials, examples or links where I may get the answer?
-
-**Answer:** Reading the value of a parameter is a very basic and fundamental task in the Revit API, so it is covered in depth by
-the [getting started material](https://thebuildingcoder.typepad.com/blog/about-the-author.html#2).
-
-Please work through that before doing anything else, if you have not done so already.
-
-The main steps are:
-
-- Retrieve the building element
-- Determine what parameter you wish to read
-- Built-in parameters are easiest; I assume that volume and area are indeed built-in
-
-Exploring the element properties and determining exactly which parameters to use to retrieve the desired information is vastly simplified
-by [RevitLookup](https://github.com/jeremytammik/RevitLookup),
-an interactive Revit BIM database exploration tool to view and navigate element properties and relationships.
-
-If you have not already installed and started using that, you should do so right away!
-
-Once you have completed those preparations, reading those two parameter values can be accomplished like this in code:
+**Answer:** 
 
 <pre class="code">
-  Element e = null; // get the BIM element
-  double a = e.get_Parameter( BuiltInParameter.HOST_AREA_COMPUTED );
-  double v = e.get_Parameter( BuiltInParameter.HOST_VOLUME_COMPUTED );
 </pre>
 
-The age-old article
-discussing [compound wall layer volumes](https://thebuildingcoder.typepad.com/blog/2009/02/compound-wall-layer-volumes.html) shows
-a practical example of retrieving those two values.
 
 <center>
-<img src="img/jeremy_with_face_mask.jpg" alt="Jeremy with a face mask" title="Jeremy with a face mask" width="300"/>
-<p style="font-size: 80%; font-style:italic">Be scarier than the virus</p>
+<img src="img/.jpg" alt="" title="" width="100"/>
 </center>
 
