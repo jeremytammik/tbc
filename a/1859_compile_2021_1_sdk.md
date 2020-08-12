@@ -29,6 +29,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Compile and Install Revit 2021.1 SDK Samples
 
+Once again, I document my compilation, adaptation and installation o the Revit SDK samples and the RvtSamples external application loading them all:
+
+- [Compiling the Revit 2021.1 SDK samples](#2)
+- [Architecture mismatch warning and `RvtSamples.txt`](#3)
+- [New SDK sample &ndash; CivilAlignments](#4)
 
 ####<a name="2"></a> Compiling the Revit 2021.1 SDK Samples
 
@@ -79,7 +84,7 @@ my [DisableMismatchWarning.exe utility](http://thebuildingcoder.typepad.com/blog
 implemented back in 2013 and available from
 the [DisableMismatchWarning GitHub repository](https://github.com/jeremytammik/DisableMismatchWarning).
 
-After that, I set up the RvtSamples external application to locae and load all the Revit SDK sample external commands:
+After that, I set up the RvtSamples external application to locate and load all the Revit SDK sample external commands:
 
 - Fixed the architecture mismatch warning
 - Added references to civil alignments and steel connections API assemblies
