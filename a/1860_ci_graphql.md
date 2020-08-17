@@ -8,12 +8,13 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+New RevitLookup CI system using GitLab YAML and a GraphQL interface for Revit and the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/revitlookupci
 
 Let's start the week with a look at the new RevitLookup CI system and a GraphQL interface for Revit
 &ndash; RevitLookup CI on GitLab
 &ndash; GitLab CI YAML
-&ndash; GraphQL for Revit...
+&ndash; GraphQL for Revit
+&ndash; The Tamm Tree...
 
 linkedin:
 
