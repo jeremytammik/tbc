@@ -69,7 +69,8 @@ at [gitlab.com/buildinformed-public/revitlookup/-/pipelines](https://gitlab.com/
 
 > Once you accept this merge request, the build should be triggered after max. 30 (?) minutes.
 
-> As you can see in the build stage, I'm still building against Revit 2019 API and force the framework version to v4.7.2. If there is a problem developers can try to fix it by editing this file or contact us
+> As you can see in the build stage, I'm still building against Revit 2019 API and force the framework version to v4.7.2.
+If there is a problem, developers can try to fix it by editing this file or contact us
 via [email to info@buildinformed.com](mailto:info@buildinformed.com).
 
 The first release built using the new pipeline
@@ -79,7 +80,7 @@ Ever so many thanks to Peter for this great solution!
 
 #### <a name="3"></a>GitLab CI YAML
 
-I was previosuly not aware of GitLab. Its blurb states:
+The GitLab blurb states:
 
 > GitLab is a complete DevOps platform
 
@@ -258,7 +259,7 @@ A: Yes, we’ll have to shoot some YouTube vids. Hopefully soon.
 ... did I mention there are `TammTreeNodes` in there?
 To traverse mechanical systems using some of the building coders fine demo code.
 That’s waiting for a good round of MEP refactoring.
-But for now duct tape will have to do.
+But for now, duct tape will have to do.
  
 Many thanks to Gregor for implementing, sharing and explaining this powerful tool.
 
@@ -269,4 +270,4 @@ Tamm is also the most common Estonian surname.
 My surname Tammik means 'oak grove'.
 It exists as a German surname as well, Eichenhain, and is also quite common in Sweden, as Eklund.
 
-So the TammTree makes perfect sense in another dimension as well.
+So, the TammTree makes perfect sense in another dimension as well.
