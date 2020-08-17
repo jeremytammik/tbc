@@ -9,9 +9,11 @@
 twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
- 
-&ndash; 
-...
+
+Let's start the week with a look at the new RevitLookup CI system and a GraphQL interface for Revit
+&ndash; RevitLookup CI on GitLab
+&ndash; GitLab CI YAML
+&ndash; GraphQL for Revit...
 
 linkedin:
 
@@ -34,6 +36,7 @@ Let's start the week with a look at the new RevitLookup CI system and a GraphQL 
 - [RevitLookup CI on GitLab](#2)
 - [GitLab CI YAML](#3)
 - [GraphQL for Revit](#4)
+- [The Tamm Tree](#5)
 
 Before that, here is another version of
 the [Pareto 80-20 principle](https://en.wikipedia.org/wiki/Pareto_principle),
@@ -56,9 +59,9 @@ raised [issue #59 &ndash; continuous integration no longer working](https://gith
 caused by Harry Mattison's preceding [pull request #58 &ndash; solution changes for multi-release building](https://github.com/jeremytammik/RevitLookup/pull/58),
 detailed in the discussion on [support for multi-release building](https://thebuildingcoder.typepad.com/blog/2020/04/revitlookup-2021-with-multi-release-support.html#4).
 
-After some discussion on different approaches to address that issue, not much happened until last week.
+After some attempts to address that issue, not much happened until last week.
 
-Now, Peter solved the issue cleanly and radically by moving the CI pipeline to a different platform
+Now, Peter solved it cleanly and radically by moving the CI pipeline to a different platform
 in [pull request #61 &ndash; move CI to `gitlab.com`](https://github.com/jeremytammik/RevitLookup/pull/61):
 
 > I moved the CI to [gitlab.com](https://about.gitlab.com).
@@ -263,9 +266,11 @@ But for now, duct tape will have to do.
  
 Many thanks to Gregor for implementing, sharing and explaining this powerful tool.
 
+####<a name="5"></a> The Tamm Tree
+
 Tamm really is a tree, in fact, an oak, in Estonian.
 
-Tamm is also the most common Estonian surname.
+[Tamm is also a common Estonian surname](https://en.wikipedia.org/wiki/Tamm_(surname)).
 
 My surname Tammik means 'oak grove'.
 It exists as a German surname as well, Eichenhain, and is also quite common in Sweden, as Eklund.
