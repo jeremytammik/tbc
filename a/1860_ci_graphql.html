@@ -26,8 +26,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>RevitLookup Continuous Integration on GitLab</h3>
-<p>Another version of the <a href="https://en.wikipedia.org/wiki/Pareto_principle">Pareto 80-20 principle</a>,
+<h3>RevitLookup Continuous Integration and GraphQL</h3>
+<p>Let's start the week with a look at the new RevitLookup CI system and a GraphQL interface for Revit:</p>
+<ul>
+<li><a href="#2">RevitLookup CI on GitLab</a></li>
+<li><a href="#3">GitLab CI YAML</a></li>
+<li><a href="#4">GraphQL for Revit</a></li>
+</ul>
+<p>Before that, here is another version of
+the <a href="https://en.wikipedia.org/wiki/Pareto_principle">Pareto 80-20 principle</a>,
 especially targeted at coding:</p>
 <blockquote>
 <p><i>The first 90% of the code accounts for the first 90% of the development time.
@@ -35,16 +42,16 @@ The remaining 10% of the code accounts for the other 90% of the development time
 <p style="text-align: right; font-style: italic">&ndash; Cargill's Rule</p>
 </blockquote>
 
-<h4><a name="2"></a>RevitLookup CI</h4>
-<p>Three years ago, Peter Hirn of <a href="https://www.buildinformed.com">Build Informed GmbH</a> very kindly set up a
+<h4><a name="2"></a>RevitLookup CI on GitLab</h4>
+<p>Three years back, Peter Hirn of <a href="https://www.buildinformed.com">Build Informed GmbH</a> very kindly set up a
 public <a href="https://en.wikipedia.org/wiki/Continuous_integration">CI system</a> for RevitLookup automatically
-creating <a href="https://thebuildingcoder.typepad.com/blog/2017/04/forgefader-ui-lookup-builds-purge-and-room-instances.html#3">RevitLookup Builds</a>.</p>
-<p>Recently, however, Matt <a href="https://github.com/WspDev">@WspDev</a> Taylor
-raised <a href="https://github.com/jeremytammik/RevitLookup/issues/59">issue #59 &ndash; Continuous Integration no longer working</a>,
-caused by Harry Matison's preceding <a href="https://github.com/jeremytammik/RevitLookup/pull/58">pull request #58 &ndash; solution changes for multi-release building</a>,
-discussed on the blog <a href="https://thebuildingcoder.typepad.com/blog/2020/04/revitlookup-2021-with-multi-release-support.html#4">support for multi-release building</a>.</p>
-<p>After some discussion on that issue on different approaches to address it, we took a lengthy break.</p>
-<p>Now Peter solved the issue cleanly and radically by moving the CI pipeline to a different platform
+creating <a href="https://thebuildingcoder.typepad.com/blog/2017/04/forgefader-ui-lookup-builds-purge-and-room-instances.html#3">RevitLookup builds</a>.</p>
+<p>In April this year, however, Matt <a href="https://github.com/WspDev">@WspDev</a> Taylor
+raised <a href="https://github.com/jeremytammik/RevitLookup/issues/59">issue #59 &ndash; continuous integration no longer working</a>,
+caused by Harry Mattison's preceding <a href="https://github.com/jeremytammik/RevitLookup/pull/58">pull request #58 &ndash; solution changes for multi-release building</a>,
+detailed in the discussion on <a href="https://thebuildingcoder.typepad.com/blog/2020/04/revitlookup-2021-with-multi-release-support.html#4">support for multi-release building</a>.</p>
+<p>After some discussion on different approaches to address that issue, not much happened until last week.</p>
+<p>Now, Peter solved the issue cleanly and radically by moving the CI pipeline to a different platform
 in <a href="https://github.com/jeremytammik/RevitLookup/pull/61">pull request #61 &ndash; move CI to <code>gitlab.com</code></a>:</p>
 <blockquote>
 <p>I moved the CI to <a href="https://about.gitlab.com">gitlab.com</a>.
