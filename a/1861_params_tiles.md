@@ -250,7 +250,7 @@ on [optimal peanut butter and banana sandwiches](https://www.ethanrosenthal.com/
 </video>
 </center>
 
-It uses a pretrained torchvision deep learning model for image recognition and labelling to find the banana and slice of bread in a photo,  geometrically analyses and virtually slices the banana to produce the packing polygons, and finally packs the banana slices onto the sandwich
+It uses a pretrained torchvision deep learning model for image recognition and labelling to find the banana and slice of bread in a photo, geometrically analyses and virtually slices the banana to produce the packing polygons, and finally packs the banana slices onto the sandwich
 using [Nest2D, a C++ 2D bin packaging tool for Python](https://github.com/markfink/nest2D).
 
 
