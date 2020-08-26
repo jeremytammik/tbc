@@ -62,6 +62,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Custom Parameters
 
+Parameter changes and tile packing using the Revit API and AI, plus some other notes on Forge and general stuff:
+
 - [Parameter type changes to `Custom`](#2)
 - [Determining cut tiles in room](#3)
 - [Optimal banana sandwich slice packing with AI](#4)
@@ -143,7 +145,7 @@ The API hardly ever provides functionality that is not available in the end user
 
 If not, you can definitely implement something yourself to retrieve the exact area that you wish to cover with tiles and run some kind of partitioning and optimisation algorithm on it to achieve the task you describe.
 
-First, some rather abstract theoretial research in this area:
+First, some rather abstract theoretical research in this area:
 
 - [Euclidean tilings by convex regular polygons](https://en.wikipedia.org/wiki/Euclidean_tilings_by_convex_regular_polygons)
 - [Tiling with rectangles](https://en.wikipedia.org/wiki/Tiling_with_rectangles)
@@ -184,20 +186,23 @@ You can then get the volume inside the room by deducting Vol2 from Vol1.
 
 Separate out the disjoined solids in Vol2 (I believe there is a function for that).
 
-Then you can also identify the cut tiles around the perimeter of the room in Vol2 because each of those have a volume less than a tile. This is the inverse volume so you deduct each of these from the tile size to give you each partial tile size and it's location. I speak in terms of volumes because volume are easy to determine from solids and then you can divide by tile thickness.
+Then you can also identify the cut tiles around the perimeter of the room in Vol2 because each of those have a volume less than a tile. This is the inverse volume so you deduct each of these from the tile size to give you each partial tile size and its location.
+I speak in terms of volumes because volume is easy to determine from solids and then you can divide by tile thickness.
 
 Also, I'm using the inverse because I know the boundary of the room to use for deducting from the overall set. I could do it the other way around (deduct the excess from around the room) but I would have to allow a border around the room to ensure all the excess tiles are deducted and this seems slightly more complicated in determining that border width (probably a tile size plus an allowance).
 
 I think where you start the tiling becomes arbitrary in a sense because rarely in reality are tiles set out on site to such precision. I imagine you usually start from the centre and work your way out to the edges so it gives the impression of symmetry.  I'm wondering how many variations you'd get by changing the tile offset i.e. if all the tiles are the same size do you cover the variations by offsetting through the tile unit dimensions? Do you then discount arrangements that lead to impractical tile sizes?
 
-In the end, what area of tiles do you need to fill a room of 10m2? Workmanship will play a large part in how many tiles you need so costs are usually not that specific. It'll likely be 10m2 worth of tiles + tolerance because I can't sell you half tiles (you cut them). Also I'll sell you boxes of 20 tiles not individual ones. Then there is colour variations in tiles perhaps you have a pettern and you want to know how many of each colour?
+In the end, what area of tiles do you need to fill a room of 10m2? Workmanship will play a large part in how many tiles you need so costs are usually not that specific. It'll likely be 10m2 worth of tiles + tolerance because I can't sell you half tiles (you cut them).
+Also, I'll sell you boxes of 20 tiles not individual ones.
+Then, there is colour variations in tiles; perhaps you have a pattern and you want to know how many of each colour?
 
 **Response:** Thank you for reply.
 We are not considering tolerance part or the colour of different tiles as of now.
 
 I am thinking to do some different way.
 
-Assming room is rectanular:
+Assuming room is rectangular:
 
 I will get centre of rectangle.
 
@@ -255,8 +260,8 @@ The Forge Fund team receives these notifications as well, so if there is an oppo
 
 ####<a name="6"></a>Effect of Home Office on Meeting Culture
 
-Some interestng aspects of meeting culture working at home were discovered and discussed 
-as [Microsoft analyzed data on its newly remote workforce](https://hbr.org/2020/07/microsoft-analyzed-data-on-its-newly-remote-workforce).
+Some interesting aspects of meeting culture working at home were discovered and discussed 
+as [Microsoft analysed data on its newly remote workforce](https://hbr.org/2020/07/microsoft-analyzed-data-on-its-newly-remote-workforce).
 
 ####<a name="7"></a>Motivating Kids can be Harder than Business Success
 
@@ -283,7 +288,8 @@ with [Steve Jobs on the role of product and marketing](https://youtu.be/P4VBqTVi
 2. If you as an architect are locked in by Autodesk, you have locked yourself in. No one is forcing you to buy Revit. If you did it old school and trained your entire staff in just one platform, you painted yourself into a corner with help from the Autodesk sales force.
 
 3. Unlike 15 years ago, there’s now a massive amount of AEC startups that solve both small and large issues on a multitude of platforms. I’m exited about what this can lead to long term. Kudos to the Dynamo and Grasshopper founders & communities for contributing to this change.
--->
 
 <pre class="code">
 </pre>
+-->
+
