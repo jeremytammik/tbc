@@ -38,7 +38,7 @@ Is that intentional?
   https://hbr.org/2020/07/microsoft-analyzed-data-on-its-newly-remote-workforce
 
 - How to get number of cut tiles in a room using revit api
-  https://forums.autodesk.com/t5/revit-api-forum/parameter-type-changes-to-custom-in-revit-2021-1/m-p/9693021
+  https://forums.autodesk.com/t5/revit-api-forum/how-to-get-number-of-cut-tiles-in-a-room-using-revit-api/m-p/9696586
 
 twitter:
 
@@ -132,7 +132,7 @@ has been extremely active and helpful lately in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160).
 
 Here is some very down-to-earth (or -floor) advice of his on 
-[how to get the number of cut tiles in a room using the Revit API](https://forums.autodesk.com/t5/revit-api-forum/parameter-type-changes-to-custom-in-revit-2021-1/m-p/9693021):
+[how to get the number of cut tiles in a room using the Revit API](https://forums.autodesk.com/t5/revit-api-forum/how-to-get-number-of-cut-tiles-in-a-room-using-revit-api/m-p/9696586):
 
 **Question:** I want to get number of tiles in a room.
 
@@ -272,8 +272,7 @@ as [Microsoft analysed data on its newly remote workforce](https://hbr.org/2020/
 
 ####<a name="7"></a>Motivating Kids can be Harder than Business Success
 
-An interesting motivational article by Jesse Hall on semi-unintentionally starting a successful YouTube channel and ending up earning money with it, all just to prove a point to his two teenage kids:
-
+An inspiring motivational article by Jesse Hall on semi-unintentionally starting a successful YouTube channel and ending up earning money with it, all just to prove a point to his two teenage kids:
 [How I Went From 0 to 70k Subscribers on YouTube in 1 Year &ndash; And How Much Money I Made](https://www.freecodecamp.org/news/how-to-grow-your-youtube-channel):
 
 > In conclusion, I just want to say that anyone can do anything.
