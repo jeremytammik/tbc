@@ -70,7 +70,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Parameter changes and tile packing using the Revit API and AI, plus some other notes on Forge and general stuff:
 
 - [Parameter type changes to `Custom`](#2)
-- [Determining cut tiles in room](#3)
+- [Tile packing and determining cut tiles in room](#3)
 - [Optimal banana sandwich slice packing with AI](#4)
 - [Forge solution showcase](#5)
 - [Effect of home office on meeting culture](#6)
@@ -125,7 +125,7 @@ That support will come in a future major release of Revit.
 
 It is in fact also already available in the current preview release.
 
-#### <a name="3"></a>Determining Cut Tiles in Room
+#### <a name="3"></a>Tile Packing and Determining Cut Tiles in Room
 
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
 has been extremely active and helpful lately in
