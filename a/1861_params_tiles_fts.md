@@ -113,26 +113,20 @@ It is in fact also already available in the current preview release.
 
 #### <a name="3"></a>Determining Cut Tiles in Room
 
-[How to get the number of cut tiles in a room using the Revit API](https://forums.autodesk.com/t5/revit-api-forum/parameter-type-changes-to-custom-in-revit-2021-1/m-p/9693021)
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+has been extremely active and helpful lately in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160).
 
-prasannamurumkar 129 Views, 8 Replies
-‎2020-08-18 08:00 AM 
-How to get number of cut tiles in a room using revit api?
- want to get number of tiles in a room using api.
+Here is some very down-to-earth (or -floor) advice of his on 
+[how to get the number of cut tiles in a room using the Revit API](https://forums.autodesk.com/t5/revit-api-forum/parameter-type-changes-to-custom-in-revit-2021-1/m-p/9693021):
 
-After getting number of tiles want to get the cut tiles in percentage of tiles.
+**Question:** I want to get number of tiles in a room.
 
-collected rooms in floor plan is their any way to get the tiles?
+After getting the number of tiles I also want to get the cut tiles in percentage of tiles.
 
-Tags (0)
-Add tags
-Report
-Back to Topic Listing Previous Next 
-MESSAGE 2 OF 9
-jeremytammik
- Employee jeremytammik in reply to: prasannamurumkar
-‎2020-08-18 10:54 AM 
-This is an interesting task.
+Having collected rooms in floor plan, is there any way to get the tiles?
+
+**Answer:** This is an interesting task.
 
 I am not aware of any support for this in the Revit API right out of the box.
 
@@ -142,85 +136,37 @@ The API hardly ever provides functionality that is not available in the end user
 
 If not, you can definitely implement something yourself to retrieve the exact area that you wish to cover with tiles and run some kind of partitioning and optimisation algorithm on it to achieve the task you describe.
 
-Here are some interesting links regarding this topic:
+First, some rather abstract theoretial research in this area:
 
-https://en.wikipedia.org/wiki/Euclidean_tilings_by_convex_regular_polygons
-https://en.wikipedia.org/wiki/Tiling_with_rectangles
-https://cs.stackexchange.com/questions/16661/tiling-an-orthogonal-polygon-with-squares
-https://github.com/datagovsg/hextile
+- [Euclidean tilings by convex regular polygons](https://en.wikipedia.org/wiki/Euclidean_tilings_by_convex_regular_polygons)
+- [Tiling with rectangles](https://en.wikipedia.org/wiki/Tiling_with_rectangles)
+- [Tiling an orthogonal polygon with squares](https://cs.stackexchange.com/questions/16661/tiling-an-orthogonal-polygon-with-squares)
+- [hextile &ndash; Generate tile representations of polygon objects on map](https://github.com/datagovsg/hextile)
 
-Please do let us know how you end up solving this.
-
-Thank you!
-
-Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder
-
-Add tags
-Report
-MESSAGE 3 OF 9
-jeremytammik
- Employee jeremytammik in reply to: prasannamurumkar
-‎2020-08-18 11:15 AM 
 Another idea:
 
 Implement a family instance representing one tile.
 Use the Revit 2021 generative design functionality to place a maximum number of tiles on the desired surface.
 
-Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder
-
-Add tags
-Report
-MESSAGE 4 OF 9
-jeremytammik
- Employee jeremytammik in reply to: prasannamurumkar
-‎2020-08-18 11:33 AM 
 Continued researching this:
 
-https://stackoverflow.com/questions/2675123/nesting-maximum-amount-of-shapes-on-a-surface
+- [Nesting maximum amount of shapes on a surface](https://stackoverflow.com/questions/2675123/nesting-maximum-amount-of-shapes-on-a-surface)
 
 The proper term to search for is 'packing':
 
-https://en.wikipedia.org/wiki/Packing_problems
+- [Packing problems](https://en.wikipedia.org/wiki/Packing_problems)
+- [Packing algorithms](https://github.com/topics/packing-algorithm)
+- [What algorithm can be used for packing rectangles of different sizes into the smallest rectangle possible in a fairly optimal way?](https://stackoverflow.com/questions/1213394/what-algorithm-can-be-used-for-packing-rectangles-of-different-sizes-into-the-sm)
 
-https://github.com/topics/packing-algorithm
+In any case, do remember to appropriately align the polygon surface you wish to fill (or tile).
 
-https://stackoverflow.com/questions/1213394/what-algorithm-can-be-used-for-packing-rectangles-of-dif...
+Now for the more down-to-earth aspects:
 
-Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder
-
-Add tags
-Report
-MESSAGE 5 OF 9
-jeremytammik
- Employee jeremytammik in reply to: prasannamurumkar
-‎2020-08-18 11:34 AM 
-Do remember to appropriately align the polygon surface you wish to fill (or tile).
-
-Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder
-
-Add tags
-Report
-MESSAGE 6 OF 9
-RPTHOMAS108
- Advisor RPTHOMAS108 in reply to: prasannamurumkar
-‎2020-08-20 01:38 AM 
 Not to complicate the issue but is this tiles with grout tolerance allowance between the tiles?
 
-If I were thinking of how I would do it then I'd place the tiles as solids in a given grid arrangement overlapping the room boundary, get the total volume of this grid arrangement = Vol1
+If I were thinking of how I would do it then I'd place the tiles as solids in a given grid arrangement overlapping the room boundary, get the total volume of this grid arrangement = Vol1.
 
-Cut the room shape out of this tile arrangement to get the volume again = Vol2
+Cut the room shape out of this tile arrangement to get the volume again = Vol2.
 
 You can then get the volume inside the room by deducting Vol2 from Vol1.
 
@@ -228,62 +174,57 @@ Separate out the disjoined solids in Vol2 (I believe there is a function for tha
 
 Then you can also identify the cut tiles around the perimeter of the room in Vol2 because each of those have a volume less than a tile. This is the inverse volume so you deduct each of these from the tile size to give you each partial tile size and it's location. I speak in terms of volumes because volume are easy to determine from solids and then you can divide by tile thickness.
 
-Also I'm using the inverse because I know the boundary of the room to use for deducting from the overall set. I could do it the other way around (deduct the excess from around the room) but I would have to allow a border around the room to ensure all the excess tiles are deducted and this seems slightly more complicated in determining that border width (probably a tile size plus an allowance).
+Also, I'm using the inverse because I know the boundary of the room to use for deducting from the overall set. I could do it the other way around (deduct the excess from around the room) but I would have to allow a border around the room to ensure all the excess tiles are deducted and this seems slightly more complicated in determining that border width (probably a tile size plus an allowance).
 
 I think where you start the tiling becomes arbitrary in a sense because rarely in reality are tiles set out on site to such precision. I imagine you usually start from the centre and work your way out to the edges so it gives the impression of symmetry.  I'm wondering how many variations you'd get by changing the tile offset i.e. if all the tiles are the same size do you cover the variations by offsetting through the tile unit dimensions? Do you then discount arrangements that lead to impractical tile sizes?
 
-In the end what area of tiles do you need to fill a room of 10m2? Workmanship will play a large part in how many tiles you need so costs are usually not that specific. It'll likely be 10m2 worth of tiles + tolerance because I can't sell you half tiles (you cut them). Also I'll sell you boxes of 20 tiles not individual ones. Then there is colour variations in tiles perhaps you have a pettern and you want to know how many of each colour?
+In the end, what area of tiles do you need to fill a room of 10m2? Workmanship will play a large part in how many tiles you need so costs are usually not that specific. It'll likely be 10m2 worth of tiles + tolerance because I can't sell you half tiles (you cut them). Also I'll sell you boxes of 20 tiles not individual ones. Then there is colour variations in tiles perhaps you have a pettern and you want to know how many of each colour?
 
-Add tags
-Report
-MESSAGE 7 OF 9
-prasannamurumkar
- Advocate prasannamurumkar in reply to: jeremytammik
-‎2020-08-20 06:15 AM 
-Thank you for reply.will let you know once done.
+**Response:** Thank you for reply.
+We are not considering tolerance part or the colour of different tiles as of now.
 
-Add tags
-Report
-MESSAGE 8 OF 9
-prasannamurumkar
- Advocate prasannamurumkar in reply to: RPTHOMAS108
-‎2020-08-20 07:00 AM 
-Thank you for reply.we are notconsidering tolerance part,colour of diiferent tiles as of now
+I am thinking to do some different way.
 
-i am thinking to do some different way.
-
-(Assming room is rectanular in our task) for this POC. for current work
+Assming room is rectanular:
 
 I will get centre of rectangle.
 
-then i will fire ref.intersector to both direction(x,y).
+Then I fire a reference intersector in both directions (x,y).
 
-i know size of tiles(width,height).divide reference intersector by length.i will get no of tiles in that line.
+I know the size of the tiles (width,height).
+Divide reference intersector by length.
+That returns the no of tiles in that line.
 
-if multiply by room dimension get total tiles.
+Multiply by room dimension get total tiles.
 
-If reference intersector is not divide equally then last tiles are cut tiles i will get total cut tiles by multiplying with length of room.
+If reference intersector is not divide equally, then last tiles are cut tiles; I will get total cut tiles by multiplying with length of room.
 
-Add tags
-Report
-MESSAGE 9 OF 9
-RPTHOMAS108
- Advisor RPTHOMAS108 in reply to: prasannamurumkar
-‎2020-08-20 12:38 PM 
-Sounds like an approach but I'm not sure you need a ReferenceIntersector for a rectangular room?
+**Answer:** Sounds like an approach but I'm not sure you need a `ReferenceIntersector` for a rectangular room.
 
-If room is rectangular then you just need to find the room boundaries with opposite or same vector direction and measure the distance between them to get your room size. Then it's just as you say dividing room dimension into tile dimension to give you a count. The remainder is then the portion of cut tile at either end:
+If the room is rectangular then you just need to find the room boundaries with opposite or same vector direction and measure the distance between them to get your room size.
 
-5000 / 300 = 16.6666 recurring (16 full units)
+Then, it's just as you say, dividing room dimension into tile dimension to give you a count.
+The remainder is then the portion of cut tile at either end:
+
+5000 / 300 = 16.6666 recurring (16 full units).
 
 0.6666 * 300 = 200 (rounded) so a strip of 100mm at each end to close the gap.
 
 That kind of thing?
 
-Grout tolerance likely means to artificially increase the tile size dimensions by the grout width. We do similar with reinforcement bars to get maximum spacing but we are then counting the gaps.
+Grout tolerance is likely means to artificially increase the tile size dimensions by the grout width.
+We do similar with reinforcement bars to get maximum spacing but we are then counting the gaps.
 
-<pre class="code">
-</pre>
+
+####<a name="4"></a>Forge Solution Showcase
+
+The new [Forge Solution Showcase web page](https://forge.autodesk.com/solution-showcase) is now live.
+
+The goal of this page is to showcase what you can do with Forge.
+It features solutions created by the community for things like Digital Twins, Visual Insights, and Design Automation.
+ 
+It includes a call to action for others to submit their stories as well. 
+The Forge Fund team receives these notifications as well, so if there is an opportunity for the Forge Fund, they can reach out.
 
 ####<a name="4"></a>Effect of Home Office on Meeting Culture
 
@@ -298,3 +239,24 @@ An interesting motivational article by Jesse Hall on semi-unintentionally starti
 > In conclusion, I just want to say that anyone can do anything.
 If you have (1) the proper motivation, (2) realistic expectations, and (3) you don't overwork yourself, you can be successful.
 
+
+
+<!--
+Håvard Vasshaug
+@vasshaug
+Co-founder at Bad Monkeys
+
+https://twitter.com/vasshaug/status/1296803377985269761?s=20
+
+It's been interesting to follow the Autodesk & Architects dynamics this summer. My thoughts are:
+
+1. The Autodesk Board of Directors is at fault for developing sales and acquisition strategies and not products. Watch this two-and-a-half-minute excerpt of an interview 
+with [Steve Jobs on the role of product and marketing](https://youtu.be/P4VBqTViEx4).
+
+2. If you as an architect are locked in by Autodesk, you have locked yourself in. No one is forcing you to buy Revit. If you did it old school and trained your entire staff in just one platform, you painted yourself into a corner with help from the Autodesk sales force.
+
+3. Unlike 15 years ago, there’s now a massive amount of AEC startups that solve both small and large issues on a multitude of platforms. I’m exited about what this can lead to long term. Kudos to the Dynamo and Grasshopper founders & communities for contributing to this change.
+-->
+
+<pre class="code">
+</pre>
