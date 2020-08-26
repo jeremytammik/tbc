@@ -62,6 +62,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Custom Parameters
 
+- [Parameter type changes to `Custom`](#2)
+- [Determining cut tiles in room](#3)
+- [Optimal banana sandwich slice packing with AI](#4)
+- [Forge solution showcase](#5)
+- [Effect of home office on meeting culture](#6)
+- [Motivating kids can be harder than business success](#7)
+
 #### <a name="2"></a>Parameter Type Changes to Custom
 
 A question came up on why a number of parameter types can no longer be created programmatically, in 
@@ -224,17 +231,19 @@ We do similar with reinforcement bars to get maximum spacing but we are then cou
 On the topic of optimal packing, a full-fledged solution with a modern and thorough approach for solving a complex real-wrold problem is addressed in the article
 on [optimal peanut butter and banana sandwiches](https://www.ethanrosenthal.com/2020/08/25/optimal-peanut-butter-and-banana-sandwiches):
 
-<video style="display:block; width:100%; height:auto;" autoplay="" muted="" loop="loop">
-  <source src="img/banana_small.mp4" type="video/mp4">
+<center>
+<video style="display:block; width:600px; height:auto;" autoplay="" muted="" loop="loop">
+<source src="img/banana_small.mp4" type="video/mp4">
 </video>
+</center>
 
 It uses a pretrained torchvision deep learning model for image recognition and labelling to find the banana and slice of bread in a photo,  virtually slices the banana, and finally packs the banana slices onto the sandwich
 using [Nest2D, a C++ 2D bin packaging tool for Python](https://github.com/markfink/nest2D).
 
 
-####<a name="4"></a>Forge Solution Showcase
+####<a name="5"></a>Forge Solution Showcase
 
-The new [Forge Solution Showcase web page](https://forge.autodesk.com/solution-showcase) is now live.
+The new [Forge solution showcase web page](https://forge.autodesk.com/solution-showcase) is now live.
 
 The goal of this page is to showcase what you can do with Forge.
 It features solutions created by the community for things like Digital Twins, Visual Insights, and Design Automation.
@@ -243,11 +252,11 @@ It includes a call to action for others to submit their stories as well.
 The Forge Fund team receives these notifications as well, so if there is an opportunity for the Forge Fund, they can reach out.
 
 
-####<a name="4"></a>Effect of Home Office on Meeting Culture
+####<a name="6"></a>Effect of Home Office on Meeting Culture
 
 [Microsoft analyzed data on its newly remote workforce](https://hbr.org/2020/07/microsoft-analyzed-data-on-its-newly-remote-workforce)
 
-####<a name="5"></a>Motivating Kids is Harder than Being Successful
+####<a name="7"></a>Motivating Kids can be Harder than Business Success
 
 An interesting motivational article by Jesse Hall on semi-unintentionally starting a successful YouTube channel and ending up earning money with it, all just to prove a point to his two teenage kids:
 
@@ -255,7 +264,6 @@ An interesting motivational article by Jesse Hall on semi-unintentionally starti
 
 > In conclusion, I just want to say that anyone can do anything.
 If you have (1) the proper motivation, (2) realistic expectations, and (3) you don't overwork yourself, you can be successful.
-
 
 
 <!--
