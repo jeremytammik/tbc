@@ -44,8 +44,13 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Parameter changes and tile packing using the Revit API and AI, plus some other notes on Forge and general stuff
+&ndash; Parameter type changes to <code>Custom</code>
+&ndash; Determining cut tiles in room
+&ndash; Optimal banana sandwich slice packing with AI
+&ndash; Forge solution showcase
+&ndash; Effect of home office on meeting culture
+&ndash; Motivating kids can be harder than business success...
 
 linkedin:
 
@@ -60,7 +65,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Custom Parameters
+### Custom Parameters and Tile Packing
 
 Parameter changes and tile packing using the Revit API and AI, plus some other notes on Forge and general stuff:
 
@@ -240,6 +245,8 @@ on [optimal peanut butter and banana sandwiches](https://www.ethanrosenthal.com/
 <center>
 <video style="display:block; width:600px; height:auto;" autoplay="" muted="" loop="loop">
 <source src="img/banana_small.mp4" type="video/mp4">
+<source src="https://thebuildingcoder.typepad.com/2020/banana_small.mp4" type="video/mp4">
+<img src="" alt="Parameter type Custom in 2021.1" title="Parameter type Custom in 2021.1" width="80%"/> <!-- 1166 -->
 </video>
 </center>
 

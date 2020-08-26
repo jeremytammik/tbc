@@ -43,8 +43,13 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Parameter changes and tile packing using the Revit API and AI, plus some other notes on Forge and general stuff
+&ndash; Parameter type changes to <code>Custom</code>
+&ndash; Determining cut tiles in room
+&ndash; Optimal banana sandwich slice packing with AI
+&ndash; Forge solution showcase
+&ndash; Effect of home office on meeting culture
+&ndash; Motivating kids can be harder than business success...
 
 linkedin:
 
@@ -59,7 +64,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Custom Parameters</h3>
+<h3>Custom Parameters and Tile Packing</h3>
 <p>Parameter changes and tile packing using the Revit API and AI, plus some other notes on Forge and general stuff:</p>
 <ul>
 <li><a href="#2">Parameter type changes to <code>Custom</code></a></li>
@@ -182,6 +187,8 @@ on <a href="https://www.ethanrosenthal.com/2020/08/25/optimal-peanut-butter-and-
 <p><center>
 <video style="display:block; width:600px; height:auto;" autoplay="" muted="" loop="loop">
 <source src="img/banana_small.mp4" type="video/mp4">
+<source src="https://thebuildingcoder.typepad.com/2020/banana_small.mp4" type="video/mp4">
+<img src="" alt="Parameter type Custom in 2021.1" title="Parameter type Custom in 2021.1" width="80%"/> <!-- 1166 -->
 </video>
 </center></p>
 <p>It uses a pretrained torchvision deep learning model for image recognition and labelling to find the banana and slice of bread in a photo,  geometrically analyses and virtually slices the banana to produce the packing polygons, and finally packs the banana slices onto the sandwich
