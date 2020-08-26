@@ -158,6 +158,10 @@ The proper term to search for is 'packing':
 - [Packing algorithms](https://github.com/topics/packing-algorithm)
 - [What algorithm can be used for packing rectangles of different sizes into the smallest rectangle possible in a fairly optimal way?](https://stackoverflow.com/questions/1213394/what-algorithm-can-be-used-for-packing-rectangles-of-different-sizes-into-the-sm)
 
+Addendum while editing the blog post: check
+out [Nest2D, a C++ 2D bin packaging tool for Python](https://github.com/markfink/nest2D),
+mentioned below for optimised banana slice packing.
+
 In any case, do remember to appropriately align the polygon surface you wish to fill (or tile).
 
 Now for the more down-to-earth aspects:
@@ -215,6 +219,18 @@ That kind of thing?
 Grout tolerance is likely means to artificially increase the tile size dimensions by the grout width.
 We do similar with reinforcement bars to get maximum spacing but we are then counting the gaps.
 
+####<a name="4"></a>Optimal Banana Sandwich Slice Packing with AI
+
+On the topic of optimal packing, a full-fledged solution with a modern and thorough approach for solving a complex real-wrold problem is addressed in the article
+on [optimal peanut butter and banana sandwiches](https://www.ethanrosenthal.com/2020/08/25/optimal-peanut-butter-and-banana-sandwiches):
+
+<video style="display:block; width:100%; height:auto;" autoplay="" muted="" loop="loop">
+  <source src="img/banana_small.mp4" type="video/mp4">
+</video>
+
+It uses a pretrained torchvision deep learning model for image recognition and labelling to find the banana and slice of bread in a photo,  virtually slices the banana, and finally packs the banana slices onto the sandwich
+using [Nest2D, a C++ 2D bin packaging tool for Python](https://github.com/markfink/nest2D).
+
 
 ####<a name="4"></a>Forge Solution Showcase
 
@@ -225,6 +241,7 @@ It features solutions created by the community for things like Digital Twins, Vi
  
 It includes a call to action for others to submit their stories as well. 
 The Forge Fund team receives these notifications as well, so if there is an opportunity for the Forge Fund, they can reach out.
+
 
 ####<a name="4"></a>Effect of Home Office on Meeting Culture
 

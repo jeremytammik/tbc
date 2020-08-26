@@ -129,6 +129,9 @@ Use the Revit 2021 generative design functionality to place a maximum number of 
 <li><a href="https://github.com/topics/packing-algorithm">Packing algorithms</a></li>
 <li><a href="https://stackoverflow.com/questions/1213394/what-algorithm-can-be-used-for-packing-rectangles-of-different-sizes-into-the-sm">What algorithm can be used for packing rectangles of different sizes into the smallest rectangle possible in a fairly optimal way?</a></li>
 </ul>
+<p>Addendum while editing the blog post: check
+out <a href="https://github.com/markfink/nest2D">Nest2D, a C++ 2D bin packaging tool for Python</a>,
+mentioned below for optimised banana slice packing.</p>
 <p>In any case, do remember to appropriately align the polygon surface you wish to fill (or tile).</p>
 <p>Now for the more down-to-earth aspects:</p>
 <p>Not to complicate the issue but is this tiles with grout tolerance allowance between the tiles?</p>
@@ -160,6 +163,15 @@ The remainder is then the portion of cut tile at either end:</p>
 <p>That kind of thing?</p>
 <p>Grout tolerance is likely means to artificially increase the tile size dimensions by the grout width.
 We do similar with reinforcement bars to get maximum spacing but we are then counting the gaps.</p>
+<h4><a name="4"></a>Optimal Banana Sandwich Slice Packing with AI</h4>
+<p>On the topic of optimal packing, a full-fledged solution with a modern and thorough approach for solving a complex real-wrold problem is addressed in the article
+on <a href="https://www.ethanrosenthal.com/2020/08/25/optimal-peanut-butter-and-banana-sandwiches">optimal peanut butter and banana sandwiches</a>:</p>
+<video style="display:block; width:100%; height:auto;" autoplay="" muted="" loop="loop">
+  <source src="img/banana_small.mp4" type="video/mp4">
+</video>
+
+<p>It uses a pretrained torchvision deep learning model for image recognition and labelling to find the banana and slice of bread in a photo,  virtually slices the banana, and finally packs the banana slices onto the sandwich
+using <a href="https://github.com/markfink/nest2D">Nest2D, a C++ 2D bin packaging tool for Python</a>.</p>
 <h4><a name="4"></a>Forge Solution Showcase</h4>
 <p>The new <a href="https://forge.autodesk.com/solution-showcase">Forge Solution Showcase web page</a> is now live.</p>
 <p>The goal of this page is to showcase what you can do with Forge.
