@@ -168,6 +168,7 @@ The proper term to search for is 'packing':
 Addendum while editing the blog post: check
 out [Nest2D, a C++ 2D bin packaging tool for Python](https://github.com/markfink/nest2D),
 mentioned below for optimised banana slice packing.
+That looks as if it will solve the problem for you right out of the box.
 
 In any case, do remember to appropriately align the polygon surface you wish to fill (or tile).
 
@@ -228,7 +229,7 @@ We do similar with reinforcement bars to get maximum spacing but we are then cou
 
 ####<a name="4"></a>Optimal Banana Sandwich Slice Packing with AI
 
-On the topic of optimal packing, a full-fledged solution with a modern and thorough approach for solving a complex real-wrold problem is addressed in the article
+On the topic of optimal packing, a full-fledged solution with a modern and thorough approach for solving a challenging real-world problem is addressed in the article
 on [optimal peanut butter and banana sandwiches](https://www.ethanrosenthal.com/2020/08/25/optimal-peanut-butter-and-banana-sandwiches):
 
 <center>
@@ -237,7 +238,7 @@ on [optimal peanut butter and banana sandwiches](https://www.ethanrosenthal.com/
 </video>
 </center>
 
-It uses a pretrained torchvision deep learning model for image recognition and labelling to find the banana and slice of bread in a photo,  virtually slices the banana, and finally packs the banana slices onto the sandwich
+It uses a pretrained torchvision deep learning model for image recognition and labelling to find the banana and slice of bread in a photo,  geometrically analyses and virtually slices the banana to produce the packing polygons, and finally packs the banana slices onto the sandwich
 using [Nest2D, a C++ 2D bin packaging tool for Python](https://github.com/markfink/nest2D).
 
 
@@ -254,7 +255,8 @@ The Forge Fund team receives these notifications as well, so if there is an oppo
 
 ####<a name="6"></a>Effect of Home Office on Meeting Culture
 
-[Microsoft analyzed data on its newly remote workforce](https://hbr.org/2020/07/microsoft-analyzed-data-on-its-newly-remote-workforce)
+Some interestng aspects of meeting culture working at home were discovered and discussed 
+as [Microsoft analyzed data on its newly remote workforce](https://hbr.org/2020/07/microsoft-analyzed-data-on-its-newly-remote-workforce).
 
 ####<a name="7"></a>Motivating Kids can be Harder than Business Success
 
