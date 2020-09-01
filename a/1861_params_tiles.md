@@ -284,7 +284,6 @@ on [optimal peanut butter and banana sandwiches](https://www.ethanrosenthal.com/
 <video style="display:block; width:600px; height:auto;" autoplay="" muted="" loop="loop">
 <source src="img/banana_small.mp4" type="video/mp4">
 <source src="https://thebuildingcoder.typepad.com/2020/banana_small.mp4" type="video/mp4">
-<img src="" alt="Parameter type Custom in 2021.1" title="Parameter type Custom in 2021.1" width="80%"/> <!-- 1166 -->
 </video>
 </center>
 
