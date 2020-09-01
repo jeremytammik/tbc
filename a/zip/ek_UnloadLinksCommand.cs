@@ -11,7 +11,7 @@ using System.Windows.Forms;
 namespace UnloadRevitLinks
 {
     [Transaction(TransactionMode.Manual)]
-    public class Command : IExternalCommand
+    public class UnloadLinksCommand : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -28,13 +28,21 @@ namespace UnloadRevitLinks
                 return Result.Cancelled;
 
             var uiApp = commandData.Application;
+            var app = uiApp.Application;
             var modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(@filename);
-            this.UnloadRevitLinks(modelPath, uiApp);
+            var doc = this.UnloadRevitLinks(modelPath, app);
+
+            string name = System.IO.Path.GetFileNameWithoutExtension(@filename);
+            string ext = System.IO.Path.GetExtension(@filename);
+            string path = System.IO.Path.GetDirectoryName(@filename);
+            string newName = System.IO.Path.Combine(path, $"{name}_unloadLinks{ext}");
+            doc.SaveAs(newName);
+            doc.Close(false);
 
             return Result.Succeeded;
         }
 
-        private void UnloadRevitLinks(ModelPath location, UIApplication uiApplication)
+        private Document UnloadRevitLinks(ModelPath location, Autodesk.Revit.ApplicationServices.Application app)
         ///  This method will set all Revit links to be unloaded the next time the document at the given location is opened. 
         ///  The TransmissionData for a given document only contains top-level Revit links, not nested links.
         ///  However, nested links will be unloaded if their parent links are unloaded, so this function only needs to look at the document's immediate links. 
@@ -67,12 +75,13 @@ namespace UnloadRevitLinks
                 TransmissionData.WriteTransmissionData(location, transData);
 
                 OpenOptions openOptions = new OpenOptions();
-                uiApplication.OpenAndActivateDocument(location, openOptions, false);
+                return app.OpenDocumentFile(location, openOptions);
             }
             else
             {
                 Autodesk.Revit.UI.TaskDialog.Show("Unload Links", "The document does not have any transmission data");
             }
+            return null;
         }
     }
 }

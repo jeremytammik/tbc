@@ -8,10 +8,10 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using System.Windows.Forms;
 
-namespace CloseWorksets
+namespace UnloadRevitLinks
 {
     [Transaction(TransactionMode.Manual)]
-    public class Command : IExternalCommand
+    public class CloseWorksetsCommand : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -28,13 +28,25 @@ namespace CloseWorksets
                 return Result.Cancelled;
 
             var uiApp = commandData.Application;
+            var app = uiApp.Application;
             var modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(@filename);
-            this.CloseAllWorkSets(modelPath, uiApp);
+            var doc = this.CloseAllWorkSets(modelPath, app);
+
+            string name = System.IO.Path.GetFileNameWithoutExtension(@filename);
+            string ext = System.IO.Path.GetExtension(@filename);
+            string path = System.IO.Path.GetDirectoryName(@filename);
+            string newName = System.IO.Path.Combine(path, $"{name}_detached{ext}");
+            var saveAsOptions = new SaveAsOptions();
+            var worksharingOptions = new WorksharingSaveAsOptions();
+            worksharingOptions.SaveAsCentral = true;
+            saveAsOptions.SetWorksharingOptions(worksharingOptions);
+            doc.SaveAs(newName, saveAsOptions);
+            doc.Close(false);
 
             return Result.Succeeded;
         }
 
-        private void CloseAllWorkSets(ModelPath location, UIApplication uiApplication)
+        private Document CloseAllWorkSets(ModelPath location, Autodesk.Revit.ApplicationServices.Application app)
         {
             var openConfig = new WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets);
 
@@ -42,7 +54,7 @@ namespace CloseWorksets
             openOptions.Audit = false;
             openOptions.SetOpenWorksetsConfiguration(openConfig);
             openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndPreserveWorksets;
-            uiApplication.OpenAndActivateDocument(location, openOptions, false);
+            return app.OpenDocumentFile(location, openOptions);
         }
     }
 }
