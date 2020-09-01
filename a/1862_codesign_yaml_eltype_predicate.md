@@ -46,7 +46,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### Preview, Code Signing and Element Type Predicates
 
 Picking up a few interesting threads from
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and AI:
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and AI news:
 
 - [Revit add-in code signing YAML](#2)
 - [Preview control rotates model](#3)
