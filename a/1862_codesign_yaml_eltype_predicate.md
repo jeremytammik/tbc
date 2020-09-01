@@ -24,8 +24,11 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+A few interesting threads from the Revit API discussion forum and AI news
+&ndash; Revit add-in code signing YAML
+&ndash; Preview control rotates model
+&ndash; Element type predicates
+&ndash; AI ethics...
 
 linkedin:
 
@@ -40,7 +43,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Add-In Code Signing and Element Type Predicates
+### Preview, Code Signing and Element Type Predicates
 
 Picking up a few interesting threads from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and AI:
@@ -50,14 +53,21 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 - [Element type predicates](#4)
 - [AI ethics](#5)
 
+<center>
+<img src="img/scale_weight_heart_versus_feather_of_truth_in_book_of_the_dead.jpg" alt="Weight of a heart versus feather of truth in Book of the Dead" title="Weight of a heart versus feather of truth in Book of the Dead" width="600"/>
+<p style="font-size: 80%; font-style:italic">Weight of a heart versus feather of truth in Book of the Dead</p>
+</center>
+
+
+
 ####<a name="2"></a>Revit Add-In Code Signing YAML
 
 Peter Hirn's [YAML file for automating the code signing](https://thebuildingcoder.typepad.com/blog/2020/08/revitlookup-continuous-integration-and-graphql.html#3) of
-the [continuous integration build of RevitLookup}(https://thebuildingcoder.typepad.com/blog/2020/08/revitlookup-continuous-integration-and-graphql.html#2) helps solve
+the [continuous integration build of RevitLookup](https://thebuildingcoder.typepad.com/blog/2020/08/revitlookup-continuous-integration-and-graphql.html#2) helps solve
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [Revit 2018 Code Signing](https://forums.autodesk.com/t5/revit-api-forum/revit-2018-code-signing/m-p/9715700):
 
-**Question:** I am attempting to code sign my Revit add-in and I cannot seem to get Revit to recognize it.
+**Question:** I am attempting to code sign my Revit add-in and I cannot seem to get Revit to recognise it.
 I have a self-signed certificate which I have manually installed into my trusted root authorities, I have built out the add-in in Visual Studio and copied all DLL's and addin file to the addins folder. I have then run the sign tool command:
 
 <pre class="code">
@@ -164,30 +174,30 @@ The PreviewControl class is full of Event Handlers, so maybe this is the case?
 Here's the very basic sample of the external command I used to test this for 3D views.
 
 <pre class="code">
-  [Transaction(TransactionMode.Manual)]
-  class PreviewControlTest : IExternalCommand
-  {
-    public Result Execute(
-      ExternalCommandData commandData,
-      ref string message,
-      ElementSet elements)
-    {
-      UIApplication uiapp = commandData.Application;
-      UIDocument uidoc = uiapp.ActiveUIDocument;
-      Document doc = uidoc.Document;
-
-      WPF_GridContainer newGrid = new WPF_GridContainer();
-      
-      newGrid.theGrid.Children.Add( new PreviewControl( doc,
-        new FilteredElementCollector(doc)
-          .OfClass(typeof(View3D))
-          .FirstElementId()));
-          
-      newGrid.ShowDialog();
-
-      return Result.Succeeded;
-    }
-  }
+&nbsp;&nbsp;[<span style="color:#2b91af;">Transaction</span>(&nbsp;<span style="color:#2b91af;">TransactionMode</span>.Manual&nbsp;)]
+&nbsp;&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">PreviewControlTest</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IExternalCommand</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">Result</span>&nbsp;Execute(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ExternalCommandData</span>&nbsp;commandData,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">ref</span>&nbsp;<span style="color:blue;">string</span>&nbsp;message,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementSet</span>&nbsp;elements&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UIApplication</span>&nbsp;uiapp&nbsp;=&nbsp;commandData.Application;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UIDocument</span>&nbsp;uidoc&nbsp;=&nbsp;uiapp.ActiveUIDocument;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;uidoc.Document;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WPF_GridContainer&nbsp;newGrid&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;WPF_GridContainer();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;newGrid.theGrid.Children.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">PreviewControl</span>(&nbsp;doc,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">View3D</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.FirstElementId()&nbsp;)&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;newGrid.ShowDialog();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Succeeded;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
 </pre>
 
 I assume it will refuse to run in read-only transaction mode, then...
@@ -212,18 +222,18 @@ to [determine if element is `ElementType`](https://forums.autodesk.com/t5/revit-
 I'm currently doing the following but it doesn't quite satisfy all the conditions:
 
 <pre class="code">
-static bool IsElementType(Element element)
-{
-    var typeId = element?.GetTypeId();
-    if (typeId == null || typeId == ElementId.InvalidElementId)
-    {
-        if (!(element is Room) && !(element is PipeSegment))
-        {
-            return true;
-        }
-    }    
-    return false;
-}
+&nbsp;&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">bool</span>&nbsp;IsElementType(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;element&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;typeId&nbsp;=&nbsp;element?.GetTypeId();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;typeId&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;||&nbsp;typeId&nbsp;==&nbsp;<span style="color:#2b91af;">ElementId</span>.InvalidElementId&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;!(element&nbsp;<span style="color:blue;">is</span>&nbsp;Room)&nbsp;&amp;&amp;&nbsp;!(element&nbsp;<span style="color:blue;">is</span>&nbsp;PipeSegment)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">true</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">false</span>;
+&nbsp;&nbsp;}
 </pre>
 
 I'm not native to Revit sorry if my terminology is off.
@@ -232,13 +242,13 @@ How does the `FilterCollector.WhereElementIsElementType()` determine it's an Ele
 **Answer:** This will return false if type is `ElementType` but true if is derived from `ElementType`:
 
 <pre class="code">
-  bool Bl = element.GetType().IsSubclassOf(typeof(ElementType));
+&nbsp;&nbsp;<span style="color:blue;">bool</span>&nbsp;Bl&nbsp;=&nbsp;element.GetType().IsSubclassOf(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">ElementType</span>&nbsp;)&nbsp;);
 </pre>
 
 This will return true if type is ElementType or is derived from ElementType:
 
 <pre class="code">
-  bool B2 = typeof(ElementType).IsAssignableFrom(element.GetType());
+&nbsp;&nbsp;<span style="color:blue;">bool</span>&nbsp;B2&nbsp;=&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">ElementType</span>&nbsp;).IsAssignableFrom(&nbsp;element.GetType()&nbsp;);
 </pre>
 
 Here's a more Revit orientated approach in VB: you asked how a collector determines an ElementType, but you can always pass a list of a single element into a collector and filter that:
@@ -253,10 +263,10 @@ You can't do it in C# in this abbreviated fashion due to the need to use `IColle
 **Answer 2:** Here's a simpler way of putting it:
 
 <pre class="code">
-  static bool IsElementType(Element element)
-  {
-    return element is ElementType;
-  }
+&nbsp;&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">bool</span>&nbsp;IsElementType(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;element&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;element&nbsp;<span style="color:blue;">is</span>&nbsp;<span style="color:#2b91af;">ElementType</span>;
+&nbsp;&nbsp;}
 </pre>
 
 I'd suggest not even making a method for this and just using the `is` expression.
@@ -266,10 +276,10 @@ I'd suggest not even making a method for this and just using the `is` expression
 Here is an online method which will use a [type pattern](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/is#type-pattern) to give you the `EType` as a variable:
 
 <pre class="code">
-  if(element is ElementType EType)
-  {
-    TaskDialog.Show("Type Name",EType.Name);
-  }
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;element&nbsp;<span style="color:blue;">is</span>&nbsp;<span style="color:#2b91af;">ElementType</span>&nbsp;EType&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;Type&nbsp;Name&quot;</span>,&nbsp;EType.Name&nbsp;);
+&nbsp;&nbsp;}
 </pre>
 
 Interesting to note that in VB the `is` statement only returns true if the exact same type is compared.
