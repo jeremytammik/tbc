@@ -42,7 +42,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Add-In Code Signing and Element Type Predicates
 
-#### <a name="2"></a>Revit Add-In Code Signing YAML
+Picking up a few interesting threads from
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and AI:
+
+- [Revit add-in code signing YAML](#2)
+- [Preview control rotates model](#3)
+- [Element type predicates](#4)
+- [AI ethics](#5)
+
+####<a name="2"></a>Revit Add-In Code Signing YAML
 
 Peter Hirn's [YAML file for automating the code signing](https://thebuildingcoder.typepad.com/blog/2020/08/revitlookup-continuous-integration-and-graphql.html#3) of
 the [continuous integration build of RevitLookup}(https://thebuildingcoder.typepad.com/blog/2020/08/revitlookup-continuous-integration-and-graphql.html#2) helps solve
@@ -134,9 +142,9 @@ Scott Ehrenworth of [Microdesk Inc.](https://www.microdesk.com) poited out a few
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [Using PreviewControl ElementHost and PickPoint]( https://forums.autodesk.com/t5/revit-api-forum/used-previewcontrol-elementhost-amp-pickpoint/m-p/9715680):
 
-- The `PreviewControl` is not a pure preview control, providing read-only access and no user interaction with the model.
-Proof:
-When changing the orientation or rotation of a 3D view inside of a `PreviewControl` window, the model's 3D view will rotate as well:
+Firstly, The `PreviewControl` is <u>not</u> a pure preview control, providing read-only access and no user interaction with the model.
+
+Proof: When changing the orientation or rotation of a 3D view inside of a `PreviewControl` window, the model's 3D view will rotate as well:
 
 <center>
 <video style="display:block; width:600px; height:auto;" autoplay="" muted="" loop="loop">
@@ -147,19 +155,57 @@ When changing the orientation or rotation of a 3D view inside of a `PreviewContr
 
 Zoom and Pan do not have this effect.
 
- 
+Secodnly, even though the preview control modifies the model's current view settings, it does not require a transaction to do so.
+However, it does require the manual transaction option, presumably so that it can start and commit its own transaction internally.
 
- 
+This could be like the `PromptForFamilyInstancePlacement` method that has a transaction control built in.
+The PreviewControl class is full of Event Handlers, so maybe this is the case?
 
+Here's the very basic sample of the external command I used to test this for 3D views.
+
+<pre class="code">
+  [Transaction(TransactionMode.Manual)]
+  class PreviewControlTest : IExternalCommand
+  {
+    public Result Execute(
+      ExternalCommandData commandData,
+      ref string message,
+      ElementSet elements)
+    {
+      UIApplication uiapp = commandData.Application;
+      UIDocument uidoc = uiapp.ActiveUIDocument;
+      Document doc = uidoc.Document;
+
+      WPF_GridContainer newGrid = new WPF_GridContainer();
+      
+      newGrid.theGrid.Children.Add( new PreviewControl( doc,
+        new FilteredElementCollector(doc)
+          .OfClass(typeof(View3D))
+          .FirstElementId()));
+          
+      newGrid.ShowDialog();
+
+      return Result.Succeeded;
+    }
+  }
+</pre>
+
+I assume it will refuse to run in read-only transaction mode, then...
+
+Yes, I can confirm:
+
+Switching the `TransactionMode` to `ReadOnly` is now just hanging the command (never opens the window for the PreviewControl).
+
+Funky stuff, but good to know!
+
+Many thanks to Scott for this useful information and research.
 
 For pointers to several previous discussions of various aspects of the `PreviewControl`, check out the post
 on [zooming in a preview control](https://thebuildingcoder.typepad.com/blog/2013/09/appstore-advice-and-zooming-in-a-preview-control.html#4).
 
-- preview_control_rotates_model.mp4
+####<a name="4"></a>Element Type Predicates
 
-####<a name="3"></a>Element Type Predicates
-
-Here are a bunch of ways to check and filter for Revit element types making clever use of both .NET generics and the Revit API filtering functionality brought up in the question on how 
+Here are a bunch of ways to check and filter for Revit element types making use of both .NET generics and the Revit API filtering functionality suggested in the question on how 
 to [determine if element is `ElementType`](https://forums.autodesk.com/t5/revit-api-forum/determine-if-element-is-elementtype/m-p/9713330):
 
 **Question:** I'm listening to the `Application` `DocumentChanged` event and would like to see if the element modified is an Instance or an ElementType.
@@ -234,31 +280,8 @@ The equivalent to the way it is used in C# seems to be:
   Dim B1 As Boolean = TypeOf Element Is ElementType
 </pre>
 
-
-#### <a name="2"></a>AI Ethics
+####<a name="5"></a>AI Ethics
 
 A very interesting and promising first stab at creating 'good' AI and NLP that conforms with common human ethical judgement and behaviour is presented in the research paper 
 on [Aligning AI With Shared Human Values](https://arxiv.org/pdf/2008.02275v1.pdf).
-
-- preview_control_rotates_model.mp4
-Used PreviewControl(ElementHost & PickPoint
-https://forums.autodesk.com/t5/revit-api-forum/used-previewcontrol-elementhost-amp-pickpoint/m-p/9715680
-
-- super cool checks for element type
-
-**Question:** 
-
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 1166 -->
-</center>
-
-**Answer:**
-
-####<a name="5"></a>
-
-<!--
-
-<pre class="code">
-</pre>
--->
 
