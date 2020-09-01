@@ -80,6 +80,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <ul>
 <li><a href="#2">Parameter type changes to <code>Custom</code></a></li>
 <li><a href="#3">Tile packing and determining cut tiles in room</a></li>
+<li><a href="#3.1">Bin packing and container loading in Dynamo and Excel</a></li>
 <li><a href="#4">Optimal banana sandwich slice packing with AI</a></li>
 <li><a href="#5">Forge solution showcase</a></li>
 <li><a href="#6">Effect of home office on meeting culture</a></li>
@@ -192,6 +193,25 @@ The remainder is then the portion of cut tile at either end:</p>
 <p>That kind of thing?</p>
 <p>Grout tolerance is likely means to artificially increase the tile size dimensions by the grout width.
 We do similar with reinforcement bars to get maximum spacing but we are then counting the gaps.</p>
+<h4><a name="3.1"></a>Bin Packing and Container Loading in Dynamo and Excel</h4>
+<p>Kostya added some further useful suggestions
+in <a href="https://thebuildingcoder.typepad.com/blog/2020/08/custom-parameters-and-tile-packing.html#comment-5053479490">his comment below</a>:</p>
+<p>I have recently been looking for 1D/2D/3D bin packaging algorithms as well. Reference links helped me a lot.</p>
+<p>In addition to them I think it worth mentioning
+the <a href="https://github.com/thomascorrie/Miscellany">Dynamo package Miscellany</a>, based on
+the <a href="https://github.com/davidmchapman/3DContainerPacking">C# library 3DContainerPacking</a>.</p>
+<p>I also came across two free Excel workbooks by Güneş Erdoğan for representing, solving, and visualising the results of Bin Packing Problems (BPPs) and Container Loading Problems (CLPs), also known as 3D Bin Packing Problems:</p>
+<ul>
+<li><a href="https://people.bath.ac.uk/ge277/bpp-spreadsheet-solver">BPP Spreadsheet Solver (2D)</a> </li>
+<li><a href="https://people.bath.ac.uk/ge277/clp-spreadsheet-solver">CLP Spreadsheet Solver (3D)</a></li>
+</ul>
+<p>They implement Large Neighborhood Search:</p>
+<p>Step 1 (Initialization): Sort the items with respect to their priority, size, and profit. Sort bins with respect to their size and cost.
+Step 2 (Constructive step): Use the First-Fit-Decreasing heuristic to pack the items into the bins.
+Step 3 (Perturbation): Randomly remove items from bins, and randomly empty a number of bins. Sort the bins with respect to the area packed into them and their cost per unit area.
+Step 4 (Reoptimization): Use the First-Fit-Decreasing heuristic to repack the removed items.
+Step 5 (Solution update): If the new solution is better than the best known solution, update the best known solution. Otherwise, revert back to the best known solution. If the time limit is not exceeded, go to Step 3.</p>
+<p>Many thanks to Kostya for these helpful links!</p>
 <h4><a name="4"></a>Optimal Banana Sandwich Slice Packing with AI</h4>
 <p>On the topic of optimal packing, a full-fledged solution with a modern and thorough approach for solving a challenging real-world problem is addressed in the article
 on <a href="https://www.ethanrosenthal.com/2020/08/25/optimal-peanut-butter-and-banana-sandwiches">optimal peanut butter and banana sandwiches</a>:</p>
