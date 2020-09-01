@@ -57,7 +57,7 @@ the [continuous integration build of RevitLookup}(https://thebuildingcoder.typep
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [Revit 2018 Code Signing](https://forums.autodesk.com/t5/revit-api-forum/revit-2018-code-signing/m-p/9715700):
 
-**Question:** I am attempting to code sign my Revit add-in and I can not seem to get Revit to recognize it.
+**Question:** I am attempting to code sign my Revit add-in and I cannot seem to get Revit to recognize it.
 I have a self-signed certificate which I have manually installed into my trusted root authorities, I have built out the add-in in Visual Studio and copied all DLL's and addin file to the addins folder. I have then run the sign tool command:
 
 <pre class="code">
@@ -66,7 +66,7 @@ I have a self-signed certificate which I have manually installed into my trusted
     /p "MyPassword" "Path/To/Addins//2018/AppName.dll"
 </pre>
 
-This command executes successfully and I can see a digital signatures tab containing the information I added for my self signed certificate in the DLL properties.
+This command executes successfully and I can see a digital signatures tab containing the information I added for my self-signed certificate in the DLL properties.
 Yet, When I start Revit, it still says it is unsigned...
 Where did I go wrong?
 
@@ -111,7 +111,7 @@ MakeCert.exe -r -sv AVT_CodeSign.pvk -n "CN=AVT" AVTCodeSign.cer -b 01/01/2020 -
 </pre>
 
 NOTE: MakeCert is deprecated according to official Microsoft sources, but at the time of this writing that command still works.
-They have an alternative Powershell commandlet that does the same thing though I did not try that since MakeCert worked for me.
+They have an alternative PowerShell commandlet that does the same thing though I did not try that since MakeCert worked for me.
 
 <pre class="code">
 pvk2pfx.exe -pvk codesign.pvk -pi MySecurePassword -spc codesign.cer -pfx codesign.pfx -po MyOtherSecurePassword
@@ -131,14 +131,14 @@ I'm unsure if this way is better than simply right clicking and hitting "install
 signtool sign /f "Path\To\codesign.pfx" /t http://timestamp.verisign.com/scripts/timstamp.dll /p "MySecurePassword" "Path\To\RevitAddin.dll"
 </pre>
 
-Following this process I was able to get a valid digital signature.
+Following this process, I was able to get a valid digital signature.
 I'm not sure why generating it using `openssl` on linux was causing an issue but there may be something to this method that works better.
 
 Many thanks to ShinyKey for testing and confirming this, and thanks again to Peter Hirn for the smooth RevitLookup CI and code signing workflow.
 
 ####<a name="3"></a>Preview Control Rotates Model
 
-Scott Ehrenworth of [Microdesk Inc.](https://www.microdesk.com) poited out a few interesting aspects of using and interacting with the Revit API [PreviewControl class](https://www.revitapidocs.com/2020/50112279-5c9d-0351-bbd1-698e76be9e36.htm) in
+Scott Ehrenworth of [Microdesk Inc.](https://www.microdesk.com) pointed out a few interesting aspects of using and interacting with the Revit API [PreviewControl class](https://www.revitapidocs.com/2020/50112279-5c9d-0351-bbd1-698e76be9e36.htm) in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [Using PreviewControl ElementHost and PickPoint]( https://forums.autodesk.com/t5/revit-api-forum/used-previewcontrol-elementhost-amp-pickpoint/m-p/9715680):
 
@@ -155,7 +155,7 @@ Proof: When changing the orientation or rotation of a 3D view inside of a `Previ
 
 Zoom and Pan do not have this effect.
 
-Secodnly, even though the preview control modifies the model's current view settings, it does not require a transaction to do so.
+Secondly, even though the preview control modifies the model's current view settings, it does not require a transaction to do so.
 However, it does require the manual transaction option, presumably so that it can start and commit its own transaction internally.
 
 This could be like the `PromptForFamilyInstancePlacement` method that has a transaction control built in.
@@ -248,7 +248,7 @@ Here's a more Revit orientated approach in VB: you asked how a collector determi
   Dim B3 As Boolean = FEC.WhereElementIsElementType.ToElementIds.Count > 0
 </pre>
 
-You can't do it in C# in this abbreviated fashion due to the need to use `ICollection&lt;T&gt;` directly (option `Strict` `off` in VB), but you can do similar.
+You can't do it in C# in this abbreviated fashion due to the need to use `ICollection<T>` directly (option `Strict` `off` in VB), but you can do similar.
 
 **Answer 2:** Here's a simpler way of putting it:
 
