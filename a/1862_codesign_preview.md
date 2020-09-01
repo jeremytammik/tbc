@@ -150,7 +150,7 @@ Many thanks to ShinyKey for testing and confirming this, and thanks again to Pet
 
 Scott Ehrenworth of [Microdesk Inc.](https://www.microdesk.com) pointed out a few interesting aspects of using and interacting with the Revit API [PreviewControl class](https://www.revitapidocs.com/2020/50112279-5c9d-0351-bbd1-698e76be9e36.htm) in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [Using PreviewControl ElementHost and PickPoint]( https://forums.autodesk.com/t5/revit-api-forum/used-previewcontrol-elementhost-amp-pickpoint/m-p/9715680):
+on [using PreviewControl ElementHost and PickPoint]( https://forums.autodesk.com/t5/revit-api-forum/used-previewcontrol-elementhost-amp-pickpoint/m-p/9715680):
 
 Firstly, The `PreviewControl` is <u>not</u> a pure preview control, providing read-only access and no user interaction with the model.
 
