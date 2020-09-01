@@ -53,7 +53,7 @@ the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API d
 the [continuous integration build of RevitLookup}(https://thebuildingcoder.typepad.com/blog/2020/08/revitlookup-continuous-integration-and-graphql.html#2) helps solve
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-2018-code-signing/m-p/9715700">Revit 2018 Code Signing</a>:</p>
-<p><strong>Question:</strong> I am attempting to code sign my Revit add-in and I can not seem to get Revit to recognize it.
+<p><strong>Question:</strong> I am attempting to code sign my Revit add-in and I cannot seem to get Revit to recognize it.
 I have a self-signed certificate which I have manually installed into my trusted root authorities, I have built out the add-in in Visual Studio and copied all DLL's and addin file to the addins folder. I have then run the sign tool command:</p>
 <pre class="code">
   signtool sign /f "Path/To/codesign.pfx" /t \
@@ -61,7 +61,7 @@ I have a self-signed certificate which I have manually installed into my trusted
     /p "MyPassword" "Path/To/Addins//2018/AppName.dll"
 </pre>
 
-<p>This command executes successfully and I can see a digital signatures tab containing the information I added for my self signed certificate in the DLL properties.
+<p>This command executes successfully and I can see a digital signatures tab containing the information I added for my self-signed certificate in the DLL properties.
 Yet, When I start Revit, it still says it is unsigned...
 Where did I go wrong?</p>
 <p>I have tried various other combinations of this command including passing in the .addin file which errors out saying unrecognized file and signing all dlls in my addins folder.</p>
@@ -96,7 +96,7 @@ MakeCert.exe -r -sv AVT_CodeSign.pvk -n "CN=AVT" AVTCodeSign.cer -b 01/01/2020 -
 </pre>
 
 <p>NOTE: MakeCert is deprecated according to official Microsoft sources, but at the time of this writing that command still works.
-They have an alternative Powershell commandlet that does the same thing though I did not try that since MakeCert worked for me.</p>
+They have an alternative PowerShell commandlet that does the same thing though I did not try that since MakeCert worked for me.</p>
 <pre class="code">
 pvk2pfx.exe -pvk codesign.pvk -pi MySecurePassword -spc codesign.cer -pfx codesign.pfx -po MyOtherSecurePassword
 </pre>
@@ -112,11 +112,11 @@ I'm unsure if this way is better than simply right clicking and hitting "install
 signtool sign /f "Path\To\codesign.pfx" /t http://timestamp.verisign.com/scripts/timstamp.dll /p "MySecurePassword" "Path\To\RevitAddin.dll"
 </pre>
 
-<p>Following this process I was able to get a valid digital signature.
+<p>Following this process, I was able to get a valid digital signature.
 I'm not sure why generating it using <code>openssl</code> on linux was causing an issue but there may be something to this method that works better.</p>
 <p>Many thanks to ShinyKey for testing and confirming this, and thanks again to Peter Hirn for the smooth RevitLookup CI and code signing workflow.</p>
 <h4><a name="3"></a>Preview Control Rotates Model</h4>
-<p>Scott Ehrenworth of <a href="https://www.microdesk.com">Microdesk Inc.</a> poited out a few interesting aspects of using and interacting with the Revit API <a href="https://www.revitapidocs.com/2020/50112279-5c9d-0351-bbd1-698e76be9e36.htm">PreviewControl class</a> in
+<p>Scott Ehrenworth of <a href="https://www.microdesk.com">Microdesk Inc.</a> pointed out a few interesting aspects of using and interacting with the Revit API <a href="https://www.revitapidocs.com/2020/50112279-5c9d-0351-bbd1-698e76be9e36.htm">PreviewControl class</a> in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/used-previewcontrol-elementhost-amp-pickpoint/m-p/9715680">Using PreviewControl ElementHost and PickPoint</a>:</p>
 <p>Firstly, The <code>PreviewControl</code> is <u>not</u> a pure preview control, providing read-only access and no user interaction with the model.</p>
@@ -128,7 +128,7 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/used-previewcontrol-e
 </video>
 </center></p>
 <p>Zoom and Pan do not have this effect.</p>
-<p>Secodnly, even though the preview control modifies the model's current view settings, it does not require a transaction to do so.
+<p>Secondly, even though the preview control modifies the model's current view settings, it does not require a transaction to do so.
 However, it does require the manual transaction option, presumably so that it can start and commit its own transaction internally.</p>
 <p>This could be like the <code>PromptForFamilyInstancePlacement</code> method that has a transaction control built in.
 The PreviewControl class is full of Event Handlers, so maybe this is the case?</p>
@@ -205,7 +205,7 @@ How does the <code>FilterCollector.WhereElementIsElementType()</code> determine 
   Dim B3 As Boolean = FEC.WhereElementIsElementType.ToElementIds.Count > 0
 </pre>
 
-<p>You can't do it in C# in this abbreviated fashion due to the need to use <code>ICollection&amp;lt;T&amp;gt;</code> directly (option <code>Strict</code> <code>off</code> in VB), but you can do similar.</p>
+<p>You can't do it in C# in this abbreviated fashion due to the need to use <code>ICollection&lt;T&gt;</code> directly (option <code>Strict</code> <code>off</code> in VB), but you can do similar.</p>
 <p><strong>Answer 2:</strong> Here's a simpler way of putting it:</p>
 <pre class="code">
   static bool IsElementType(Element element)
