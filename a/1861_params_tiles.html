@@ -206,11 +206,13 @@ the <a href="https://github.com/davidmchapman/3DContainerPacking">C# library 3DC
 <li><a href="https://people.bath.ac.uk/ge277/clp-spreadsheet-solver">CLP Spreadsheet Solver (3D)</a></li>
 </ul>
 <p>They implement Large Neighborhood Search:</p>
-<p>Step 1 (Initialization): Sort the items with respect to their priority, size, and profit. Sort bins with respect to their size and cost.
-Step 2 (Constructive step): Use the First-Fit-Decreasing heuristic to pack the items into the bins.
-Step 3 (Perturbation): Randomly remove items from bins, and randomly empty a number of bins. Sort the bins with respect to the area packed into them and their cost per unit area.
-Step 4 (Reoptimization): Use the First-Fit-Decreasing heuristic to repack the removed items.
-Step 5 (Solution update): If the new solution is better than the best known solution, update the best known solution. Otherwise, revert back to the best known solution. If the time limit is not exceeded, go to Step 3.</p>
+<ul>
+<li>Step 1 (Initialization): Sort the items with respect to their priority, size, and profit. Sort bins with respect to their size and cost.</li>
+<li>Step 2 (Constructive step): Use the First-Fit-Decreasing heuristic to pack the items into the bins.</li>
+<li>Step 3 (Perturbation): Randomly remove items from bins, and randomly empty a number of bins. Sort the bins with respect to the area packed into them and their cost per unit area.</li>
+<li>Step 4 (Reoptimization): Use the First-Fit-Decreasing heuristic to repack the removed items.</li>
+<li>Step 5 (Solution update): If the new solution is better than the best known solution, update the best known solution. Otherwise, revert back to the best known solution. If the time limit is not exceeded, go to Step 3.</li>
+</ul>
 <p>Many thanks to Kostya for these helpful links!</p>
 <h4><a name="4"></a>Optimal Banana Sandwich Slice Packing with AI</h4>
 <p>On the topic of optimal packing, a full-fledged solution with a modern and thorough approach for solving a challenging real-world problem is addressed in the article

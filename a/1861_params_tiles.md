@@ -267,11 +267,11 @@ I also came across two free Excel workbooks by Güneş Erdoğan for representing
 
 They implement Large Neighborhood Search:
 
-Step 1 (Initialization): Sort the items with respect to their priority, size, and profit. Sort bins with respect to their size and cost.
-Step 2 (Constructive step): Use the First-Fit-Decreasing heuristic to pack the items into the bins.
-Step 3 (Perturbation): Randomly remove items from bins, and randomly empty a number of bins. Sort the bins with respect to the area packed into them and their cost per unit area.
-Step 4 (Reoptimization): Use the First-Fit-Decreasing heuristic to repack the removed items.
-Step 5 (Solution update): If the new solution is better than the best known solution, update the best known solution. Otherwise, revert back to the best known solution. If the time limit is not exceeded, go to Step 3.
+- Step 1 (Initialization): Sort the items with respect to their priority, size, and profit. Sort bins with respect to their size and cost.
+- Step 2 (Constructive step): Use the First-Fit-Decreasing heuristic to pack the items into the bins.
+- Step 3 (Perturbation): Randomly remove items from bins, and randomly empty a number of bins. Sort the bins with respect to the area packed into them and their cost per unit area.
+- Step 4 (Reoptimization): Use the First-Fit-Decreasing heuristic to repack the removed items.
+- Step 5 (Solution update): If the new solution is better than the best known solution, update the best known solution. Otherwise, revert back to the best known solution. If the time limit is not exceeded, go to Step 3.
 
 Many thanks to Kostya for these helpful links!
 
