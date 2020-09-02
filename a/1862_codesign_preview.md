@@ -22,7 +22,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Revit add-in code signing, preview control rotates model and element type predicates for the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/previewcodesign
 
 A few interesting threads from the Revit API discussion forum and AI news
 &ndash; Revit add-in code signing YAML
