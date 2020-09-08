@@ -103,4 +103,31 @@ We can get it from the element category property, however:</p>
 <p>Unfortunately, since we cannot obtain the document category for the RVT link element, it is not possible to hide this category via the View.SetVisibility method like we do for the DWG link element.
 Also, unlike the DWG link elements, all the RVT ones return the same category OST_RvtLinks, so we cannot control the visibility for them individually using this method, even if we were able to obtain the appropriate document category.</p>
 
+<!--
+
+<p>We cannot hide the RVT link element via the View.SetVisibility method like we do for the DWG link element.
+All the RVT link elements return the same category OST_Rvtlinks, so we cannot control the visibility for individual ones using this method.</p>
+
+<p>In theory, there is a another possible approach:
+We have added some methods to hide and unhide individual elements in the Revit 2009 web update 2:</p>
+
+<ul>
+<li>void View.Hide( ElementSet );</li>
+<li>void View.Unhide( ElementSet );</li>
+<li>bool Element.IsHidden( View );</li>
+<li>bool Element.CanBeHidden( View );</li>
+</ul>
+
+<p>But these still do not hide the Revit link instances, which may be a problem in the API. 
+They can be hidden through the user interface.</p>
+
+<pre>
+Instance rvtLinkInst = . . . // retrieve revit link instance
+bool canHidden = rvtLInkInst.CanBeHidden( view ); // this always returns false
+elems.Insert( rvtLinkInst ); // insert instance into element set
+view.Hide( elems ); // this throws an exception
+</pre>
+
+-->
+
 <p>I hope these various hints are of some use and will be interested in hearing whether they help resolve your issue, Rod.</p>
