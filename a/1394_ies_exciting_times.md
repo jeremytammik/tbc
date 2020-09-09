@@ -184,3 +184,32 @@ Good luck!
 </pre>
 
 Note that reading and writing the `FBX_LIGHT_PHOTOMETRIC_FILE_CACHE` directly is a bit tricky since it is encoded and not simply a string representing the IES file contents.
+
+
+**Addendum 2 by Joshua Lumley**
+in [his comment below](https://thebuildingcoder.typepad.com/blog/2016/01/loading-an-ies-photometric-web-and-exciting-times.html#comment-5063406227):
+
+Here is the tricky part; the encoding directive is `using System.Text`:
+
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;myFamilySymbol.LookupParameter(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Photometric&nbsp;Web&nbsp;File&quot;</span>&nbsp;)&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;myString_Filename&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;myFamilySymbol.get_Parameter(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.FBX_LIGHT_PHOTOMETRIC_FILE&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.AsString();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;myString_IESCache&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;myFamilySymbol.get_Parameter(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.FBX_LIGHT_PHOTOMETRIC_FILE_CACHE&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.AsString();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">byte</span>[]&nbsp;data&nbsp;=&nbsp;System.Text.<span style="color:#2b91af;">UnicodeEncoding</span>.Unicode
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetBytes(&nbsp;myString_IESCache&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">File</span>.WriteAllBytes(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myString_YourDirectory&nbsp;+&nbsp;myString_Filename,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data&nbsp;);
+&nbsp;&nbsp;}
+</pre>
