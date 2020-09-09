@@ -42,9 +42,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Optimising Parameters and Full-Text Search</h3>
-<p><center>
-<img src="img/" alt="" title="" width="100"/>
-</center></p>
 <h4><a name="2"></a>Optimising Setting Shared Parameters</h4>
 <p>I took a successful stab at optimising the setting of a large number of shared parameters in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
@@ -146,7 +143,7 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/modify-shared-paramet
 
 &nbsp;&nbsp;&nbsp;&nbsp;tr.Start(&nbsp;<span style="color:#a31515;">&quot;synchro&quot;</span>&nbsp;);
 
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">IdForSynchro</span>&nbsp;d&nbsp;<span style="color:blue;">in</span>&nbsp;data&nbsp;)&nbsp;<span style="color:green;">//&nbsp;Main.idForSynchro&nbsp;is&nbsp;the&nbsp;collection&nbsp;of&nbsp;data</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">IdForSynchro</span>&nbsp;d&nbsp;<span style="color:blue;">in</span>&nbsp;data&nbsp;)
 &nbsp;&nbsp;&nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;=&nbsp;doc.GetElement(&nbsp;d.RevitId&nbsp;);
 
@@ -170,8 +167,8 @@ to <a href="https://github.com/jeremytammik/the_building_coder_samples">The Buil
 <p>Here is the <a href="https://github.com/jeremytammik/the_building_coder_samples/commit/fea7381f51b660fc9b5660c2e64f548623b11d8b">diff between the two</a>.
 and the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCreateSharedParams.cs#L547-L584">current implementation code</a>.</p>
 <p>Please equip your code with a little benchmark timer stopwatch and let us know whether this helps and how it affects the processing time required before and after making this modification.</p>
-<p><strong>Response:</strong> I apply the solution and the execution time improved.</p>
-<p>Here is some results before and after the modification, correlating the number of family instances with the execution time required before and after the enhancement:</p>
+<p><strong>Response:</strong> I applied the solution and the execution time improved.</p>
+<p>Here are some results before and after the modification, correlating the number of family instances with the execution time required in milliseconds before and after the enhancement:</p>
 <table>
 <tr><th class="r">Instances</th><th class="r">&nbsp;&nbsp;ms before</th><th class="r">&nbsp;&nbsp;ms after</th></tr>
 <tr><td class="r">58</td><td class="r">896</td><td class="r">794</td></tr>
@@ -191,23 +188,49 @@ with an accompanying <a href="https://github.com/akrylysov/simplefts">simplefts 
 <p>That prompted me to dabble a bit with Go and use it to implement full text search functionality for The Building coder blog posts as well.</p>
 <p>The work in progress is available from my <a href="https://github.com/jeremytammik/tbcfts">tbcfts GitHub repository</a>.</p>
 <p><a href="https://github.com/jeremytammik/tbc">The Building Coder blog source <code>tbc</code></a> is available from GitHub as well, so you have all you need to play with it yourself, if you please.</p>
-<p>Here is a sample run searching for the word 'dabble':</p>
+<p>Here is a sample run searching for the word 'dabble', which includes today's draft post, still lacking the public URL:</p>
 <pre>
-$ ./tbcfts -q dabble
-2020/09/09 10:02:29 Starting tbcfts, p=/a/doc/revit/tbc/git/a, q=dabble
-2020/09/09 10:02:29 Loaded 1862 documents in 499.553904ms
-2020/09/09 10:02:32 Indexed 1862 documents in 2.870910143s
-2020/09/09 10:02:32 Search for 'dabble' found 4 documents in 12.582µs
-2020/09/09 10:02:32 582 [Wiki API Help, View Event and Structural Material Type](http://thebuildingcoder.typepad.com/blog/2011/05/wiki-api-help-view-event-and-structural-material-type.html)
-2020/09/09 10:02:32 906 [Export Wall Parts Individually to DXF](http://thebuildingcoder.typepad.com/blog/2013/03/export-wall-parts-individually-to-dxf.html)
-2020/09/09 10:02:32 961 [Super Insane MP3 and Songbird Playlist Exporter](http://thebuildingcoder.typepad.com/blog/2013/06/super-insane-mp3-and-songbird-playlist-exporter.html)
-2020/09/09 10:02:32 1008 [Open MEP Connector Warning](http://thebuildingcoder.typepad.com/blog/2013/08/open-mep-connector-warning.html)
+/a/src/go/tbcfts $ ./tbcfts -q "dabble"
+2020/09/09 10:31:40 Starting tbcfts, p=/a/doc/revit/tbc/git/a, q=dabble
+2020/09/09 10:31:41 Loaded 1863 documents in 377.397917ms
+2020/09/09 10:31:44 Indexed 1863 documents in 2.876775333s
+2020/09/09 10:31:44 Search for 'dabble' found 5 documents in 9.703µs
+2020/09/09 10:31:44 582 [Wiki API Help, View Event and Structural Material Type](http://thebuildingcoder.typepad.com/blog/2011/05/wiki-api-help-view-event-and-structural-material-type.html)
+2020/09/09 10:31:44 906 [Export Wall Parts Individually to DXF](http://thebuildingcoder.typepad.com/blog/2013/03/export-wall-parts-individually-to-dxf.html)
+2020/09/09 10:31:44 961 [Super Insane MP3 and Songbird Playlist Exporter](http://thebuildingcoder.typepad.com/blog/2013/06/super-insane-mp3-and-songbird-playlist-exporter.html)
+2020/09/09 10:31:44 1008 [Open MEP Connector Warning](http://thebuildingcoder.typepad.com/blog/2013/08/open-mep-connector-warning.html)
+2020/09/09 10:31:44 1863 [Optimising Parameters and Full-Text Search](http thebuildingcoder.typepad.com not yet published)
 </pre>
 
+<p>The current blog post HTML source consists of 355233 lines, 2230690 words and 20676311 characters, including markup.</p>
+<p>As you can see, loading the documents and storing their body text in memory costs ca. 400 ms.</p>
+<p>The indexing is costly, clocking in at ca. 3 seconds.</p>
+<p>Once indexing is complete, the lookup is very fast, consuming just 10 microseconds.</p>
+<p>Obviously, the next feature to address would be caching the index.</p>
+<p>Another important enhancement would be to split the documents into smaller sections.</p>
+<p>For instance, I could create much smaller and more targeted documents to index by using the <code>h4</code> tags that delimit individual sections of text within each blog post instead of retaining each blog post in its entirety as a single document.</p>
 <h4><a name="4"></a>Decimal Point Woe</h4>
-<p>troubleshooting the OBJ importer</p>
-<p>https://truevis.com/troubleshoot-revit-mesh-import/</p>
-<p>Re: Addin broken on Czech language OS</p>
-<p>Eric Boehlke <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#100;&#101;&#115;&#105;&#103;&#110;&#64;&#116;&#114;&#117;&#101;&#118;&#105;&#115;&#46;&#99;&#111;&#109;">&#100;&#101;&#115;&#105;&#103;&#110;&#64;&#116;&#114;&#117;&#101;&#118;&#105;&#115;&#46;&#99;&#111;&#109;</a></p>
-<pre class="code">
-</pre>
+<p>A few of my Revit sample add-ins have been promoted to full-fledged commercial applications.</p>
+<p>One of them is the OBJ importer, which Eric Boehlke has published to the AppStore and continuously enhanced.</p>
+<p>A new little issue arose with it that is useful to be aware of, since it applies to many other contexts as well:</p>
+<p><strong>Question:</strong> I had a strange phenomenon happen.
+I have a OBJ Import app customer using Czech language on Windows.
+His Revit is English 2020.</p>
+<p>The problem is that with the same OBJ file, and the same Revit version, on my computer it works fine, and on his the app runs but fails and imports 0 faces.</p>
+<p>Have you ever seen an addin fail because the OS was a language that had non-English characters?</p>
+<p>I really don't know what is causing the problem.</p>
+<p><strong>Answer:</strong> Yes, often!</p>
+<p>Some language cultures use comma instead of decimal point and then crash when trying to read floating point numbers.</p>
+<p><strong>Response:</strong> Aha!</p>
+<p>Yes, I see, e.g., in a different OBJ software,
+<a href="https://github.com/keenanwoodall/Deform/issues/17">OBJ export is broken on locales with comma instead of dot</a>.</p>
+<p>That was the problem.</p>
+<p>I told the client and updated
+the <a href="https://truevis.com/troubleshoot-revit-mesh-import">Troubleshooting <em>Mesh Import from OBJ Files</em> for Revit</a> with the workaround:</p>
+<p><strong>Region Number Format</strong></p>
+<p>Some regions use commas instead of dots for the decimal place.
+That may cause the import to fail.
+A workaround is to set Window’s Region to United States before importing the OBJ.</p>
+<p><center>
+<img src="img/windows_regional_number_format.png" alt="Windows regional number format" title="Windows regional number format" width="400"/> <!-- 511 -->
+</center></p>
