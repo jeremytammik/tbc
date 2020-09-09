@@ -83,7 +83,7 @@ the <a href="http://autodeskcloudaccelerator.com">Autodesk Cloud Accelerator</a>
 <p>Registration is easy.  Simply visit the event website at <a href="http://www.autodeskdevdays.com">autodeskdevdays.com</a> &gt; <a href="http://autodeskdevdays.com/munich-3">Munich</a> for full information and click
 on <a href="https://www.eventbrite.com/e/devdays-20152016-tickets-18549596342">Register Now</a>.</p>
 <p>If you have any questions about this event, please don't hesitate to contact us
-at <a href="mailto:devdaysinfo@autodesk.com">devdaysinfo@autodesk.com</a>.</p>
+at (mailto:devdaysinfo@autodesk.com).</p>
 <p>Please keep in mind that part of material at Developer Days is forward-looking and confidential, so you will be required to sign a non-disclosure agreement to attend.</p>
 <h4><a name="5"></a>Accelerator Workshop</h4>
 <p>As said, you can extend your and deepen your exploration of the Autodesk web services by staying on after the DevDay conference and participating in all or part of a four day abbreviated form of
@@ -121,3 +121,36 @@ visit <b><a href="http://www.bimprogramming.com">bimprogramming.com</a></b>.</p>
 <li>Set the IES file name to parameter FBX_LIGHT_PHOTOMETRIC_FILE.</li>
 </ul>
 <p>Good luck!</p>
+<p><strong>Addendum by Joel Spahn:</strong> Setting the <code>FBX_LIGHT_PHOTOMETRIC_FILE</code> parameter to the full file path (not just the file name) will update both the <code>FILE</code> and <code>CACHE</code> parameters:</p>
+<pre class="code">
+&nbsp; Symbol.Parameter(
+&nbsp; &nbsp; <span class="teal">BuiltInParameter</span>.FBX_LIGHT_PHOTOMETRIC_FILE )
+&nbsp; &nbsp; .Set( filepath );
+</pre>
+
+<p>Note that reading and writing the <code>FBX_LIGHT_PHOTOMETRIC_FILE_CACHE</code> directly is a bit tricky since it is encoded and not simply a string representing the IES file contents.</p>
+<p><strong>Addendum 2 by Joshua Lumley</strong>
+in <a href="https://thebuildingcoder.typepad.com/blog/2016/01/loading-an-ies-photometric-web-and-exciting-times.html#comment-5063406227">his comment below</a>:</p>
+<p>Here is the tricky part; the encoding directive is <code>using System.Text</code>:</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;myFamilySymbol.LookupParameter(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Photometric&nbsp;Web&nbsp;File&quot;</span>&nbsp;)&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;myString_Filename&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;myFamilySymbol.get_Parameter(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.FBX_LIGHT_PHOTOMETRIC_FILE&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.AsString();
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;myString_IESCache&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;myFamilySymbol.get_Parameter(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.FBX_LIGHT_PHOTOMETRIC_FILE_CACHE&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.AsString();
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">byte</span>[]&nbsp;data&nbsp;=&nbsp;System.Text.<span style="color:#2b91af;">UnicodeEncoding</span>.Unicode
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetBytes(&nbsp;myString_IESCache&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">File</span>.WriteAllBytes(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myString_YourDirectory&nbsp;+&nbsp;myString_Filename,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data&nbsp;);
+&nbsp;&nbsp;}
+</pre>
