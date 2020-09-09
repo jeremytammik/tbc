@@ -44,6 +44,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Optimising Parameters and Full-Text Search
 
+I have been dabbling with the Go programming language in the past week, besides optimising and answering Revit API questions:
+
+- [Optimising setting shared parameters](#2)
+- [Full-text search for The Building Coder posts](#3)
+- [Decimal point woe](#4)
 
 ####<a name="2"></a>Optimising Setting Shared Parameters
 
@@ -253,12 +258,12 @@ One of them is the OBJ importer, which Eric Boehlke has published to the AppStor
 A new little issue arose with it that is useful to be aware of, since it applies to many other contexts as well:
 
 **Question:** I had a strange phenomenon happen.
-I have a OBJ Import app customer using Czech language on Windows.
+I have an OBJ Import app customer using Czech language on Windows.
 His Revit is English 2020.
 
 The problem is that with the same OBJ file, and the same Revit version, on my computer it works fine, and on his the app runs but fails and imports 0 faces.
 
-Have you ever seen an addin fail because the OS was a language that had non-English characters?
+Have you ever seen an add-in fail because the OS was a language that had non-English characters?
 
 I really don't know what is causing the problem.
 
