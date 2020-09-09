@@ -245,7 +245,7 @@ Here is a sample run searching for the word 'dabble', which includes today's dra
 2020/09/09 10:31:44 1863 [Optimising Parameters and Full-Text Search](http thebuildingcoder.typepad.com not yet published)
 </pre>
 
-The current blog post HTML source consists of 355233 lines, 2230690 words and 20676311 characters, including markup.
+According to `wc`, the current blog post HTML source consists of 355233 lines, 2230690 words and 20676311 characters, including markup.
 
 As you can see, loading the documents and storing their body text in memory costs ca. 400 ms.
 
