@@ -2,6 +2,12 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="bc.css">
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+
+<style type="text/css">
+  .jt { background-color:#eee;border-collapse:collapse; }
+  .jt th { background-color:#000;color:white; }
+  .jt td, .jt th { padding:5px;border:1px solid #000; }
+</style>
 </head>
 
 <!---
@@ -26,8 +32,10 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+I have been dabbling with the Go programming language in the past week, besides optimising and answering Revit API questions
+&ndash; Optimising setting shared parameters
+&ndash; Full-text search for The Building Coder posts
+&ndash; Decimal point woe...
 
 linkedin:
 
@@ -193,12 +201,14 @@ Please equip your code with a little benchmark timer stopwatch and let us know w
 
 Here are some results before and after the modification, correlating the number of family instances with the execution time required in milliseconds before and after the enhancement:
 
-<table>
+<center>
+<table class="jt">
 <tr><th class="r">Instances</th><th class="r">&nbsp;&nbsp;ms before</th><th class="r">&nbsp;&nbsp;ms after</th></tr>
 <tr><td class="r">58</td><td class="r">896</td><td class="r">794</td></tr>
 <tr><td class="r">375</td><td class="r">1958</td><td class="r">1549</td></tr>
 <tr><td class="r">1052</td><td class="r">16777</td><td class="r">8152</td></tr>
 </table>
+</center>
 
 But there are still times when changes are not applied to the document.
 
