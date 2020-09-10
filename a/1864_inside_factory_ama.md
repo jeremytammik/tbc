@@ -9,9 +9,8 @@
 twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
- 
-&ndash; 
-...
+
+Here is a last-minute heads-up for the first online Inside the Factory live AMA (Ask me Anything) style session today, Thursday, September 10, with Aaron Vorwerk, Senior Technical Marketing Manager, Harlan Brumm, Senior Product Manager of Architecture and Sasha Crotty, Senior Product Manager, Revit Platform & Services...
 
 linkedin:
 
@@ -41,9 +40,13 @@ Today, in just a few hours' time, you can join the Revit Product Managers and de
 </div>
 </center>
 
-Harlan Brumm announces:
+Here is a last-minute heads-up for the live AMA (Ask me Anything) style session on YouTube today, Thursday, September 10.
 
-Just wanted to provide a heads up here that Sasha Crotty, Senior Product Manager, Revit Platform & Services, Aaron Vorwerk, Senior Technical Marketing Manager, and myself Harlan Brumm, Senior Product Manager of Architecture at Autodesk, will be doing a Live AMA (Ask me Anything) style session on YouTube Live on Thursday this week, September 10.
+Panel participants:
+
+- Aaron Vorwerk, Senior Technical Marketing Manager
+- Harlan Brumm, Senior Product Manager of Architecture
+- Sasha Crotty, Senior Product Manager, Revit Platform & Services
 
 The idea is to take questions from the broad Revit community about Revit &ndash; a "stump the chumps" session.
 
@@ -64,6 +67,7 @@ For more information, you can also check out
 the [Autodesk Building Solutions YouTube channel](https://www.youtube.com/autodeskbuildingsolutions).
 
 <center>
+
 <img src="img/inside_the_factory.png" alt="Inside the factory" title="Inside the factory" width="400"/> <!-- 400 -->
 </center>
 
