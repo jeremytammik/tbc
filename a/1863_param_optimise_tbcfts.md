@@ -39,6 +39,16 @@ I have been dabbling with the Go programming language in the past week, besides 
 
 linkedin:
 
+Dabbling with the Go programming language, optimising setting shared parameters and full-text search for The Building Coder posts for the #RevitAPI
+
+http://bit.ly/optimiseparams
+
+I have been dabbling with the Go programming language in the past week, besides optimising and answering Revit API questions:
+
+- Optimising setting shared parameters
+- Full-text search for The Building Coder posts
+- Decimal point woe...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
