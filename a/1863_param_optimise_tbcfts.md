@@ -30,7 +30,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Dabbling with the Go programming language, optimising setting shared parameters and full-text search for The Building Coder posts for the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/optimiseparams
 
 I have been dabbling with the Go programming language in the past week, besides optimising and answering Revit API questions
 &ndash; Optimising setting shared parameters
