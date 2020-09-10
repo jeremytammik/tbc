@@ -14,6 +14,30 @@ Here is a last-minute heads-up for the first online Inside the Factory live AMA 
 
 linkedin:
 
+Here is a last-minute heads-up for the online Inside the Factory live AMA (Ask me Anything) style session today, Thursday, September 10, with Aaron Vorwerk, Harlan Brumm and Sasha Crotty, senior managers of Revit and and the #RevitAPI
+
+http://bit.ly/insidefactoryama
+
+Panel participants:
+
+- Aaron Vorwerk, Senior Technical Marketing Manager
+- Harlan Brumm, Senior Product Manager of Architecture
+- Sasha Crotty, Senior Product Manager, Revit Platform & Services
+
+The idea is to take questions from the broad Revit community about Revit &ndash; a "stump the chumps" session.
+
+It is not intended to be a 'give us your wishes' session, although, likely enough, there will be some of that too.
+
+Hopefully, we can shed some light on other inquiries folks might have about Revit's development or answer technical questions.
+
+If you've been to one of these at a conference (like BILT), you are familiar with how it will go.
+
+We are doing two sessions to try and accommodate different time zones. So, on Thursday, book your calendars for:
+
+- 12pm EST, 2020-09-10 17:00 BST, UK, 18:00 CEST, Central Europe -- https://youtu.be/H60Y2e9xf5c
+- 6pm EST, 23:00 BST, UK, midnight in Central Europe -- https://youtu.be/Uk2l4rKomtM
+
+We hope to see you there.
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
