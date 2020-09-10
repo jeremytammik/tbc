@@ -8,7 +8,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Here is a last-minute heads-up for the online Inside the Factory live AMA (Ask me Anything) style session today, Thursday, with Aaron Vorwerk, Harlan Brumm and Sasha Crotty on the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/insidefactoryama
 
 Here is a last-minute heads-up for the first online Inside the Factory live AMA (Ask me Anything) style session today, Thursday, September 10, with Aaron Vorwerk, Senior Technical Marketing Manager, Harlan Brumm, Senior Product Manager of Architecture and Sasha Crotty, Senior Product Manager, Revit Platform & Services...
 
