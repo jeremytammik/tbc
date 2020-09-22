@@ -10,7 +10,13 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/insidefactoryama
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+I am busy as ever in the Revit API discussion forum.
+Today, let's highlight a couple of items that were not discussed there
+&ndash; ContextualHelp with space
+&ndash; On renaming a shared parameter
+&ndash; Build a minimal neural network from scratch...
 
 
 linkedin:
@@ -26,9 +32,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Rename Shared Param</h3>
-<h4><a name="2"></a> ContextualHelp Issue</h4>
-<p>A colleague lookd into an issue with <code>ContextualHelp</code> and wrote the following based on own tests and the info in the development ticket:</p>
+<h3>On Spaces in Help and Renaming a Parameter</h3>
+<p>I am busy as ever in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>.
+Today, let's highlight a couple fo items that were not discussed there:</p>
+<ul>
+<li><a href="#2">ContextualHelp with space</a></li>
+<li><a href="#3">On renaming a shared parameter</a></li>
+<li><a href="#4">Build a minimal neural network from scratch</a></li>
+</ul>
+<h4><a name="2"></a> ContextualHelp With Space</h4>
+<p>A colleague looked into an issue with <code>ContextualHelp</code> and wrote the following based on own tests and the info in the development ticket:</p>
 <p>Using <code>ContextualHelp</code> you can provide a URL for any button that should be shown when the user clicks <code>F1</code> while a ribbon button tooltip is displayed.</p>
 <p>If the URL has a space character in the path, you usually encode it either as <code>%20</code> or <code>+</code>.</p>
 <p>That may cause an issue for <code>ContextualHelp</code>.</p>
@@ -62,7 +76,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 </pre>
 
 <p>Both of the above-mentioned problems can be avoided by passing the link as <code>http</code> instead of <code>https</code>.</p>
-<p>If the given website redirects from <code>http</code> to <code>https</code> that won’t cause a problem.</p>
+<p>If the given website redirects from <code>http</code> to <code>https</code>, that won’t cause a problem:</p>
 <pre class="code">
   <span style="color:#2b91af;">ContextualHelp</span>&nbsp;contextualHelp&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ContextualHelp</span>(
   &nbsp;&nbsp;<span style="color:#2b91af;">ContextualHelpType</span>.Url,
@@ -73,9 +87,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 <p>I hope you find this useful as well.</p>
 <h4><a name="3"></a> On Renaming a Shared Parameter</h4>
-<p>Jay Merlan very kindly shared some insights on renameing shared parameters in his recent article
+<p>Jay Merlan very kindly shared some insights on renaming shared parameters in his recent article
 on <a href="https://opendefinery.com/blog/revit-shared-parameters-can-be-renamed">True or False: Shared Parameters Can Be Renamed</a>.</p>
-<p>As I pointed out in <a href="https://opendefinery.com/blog/revit-shared-parameters-can-be-renamed/#comment-5072357426">my comment</a> on that post, the Revit development team discussed Jay;s suggestions internally and say:</p>
+<p>As I pointed out in <a href="https://opendefinery.com/blog/revit-shared-parameters-can-be-renamed/#comment-5072357426">my comment</a> on that post, the Revit development team discussed Jay's suggestions internally and say:</p>
 <p>My perception is that we don't support renaming a shared parameter after loading into a project or a family.</p>
 <p>We are discussing support for such a feature of 'unified parameters' in a future release of Revit.</p>
 <p>Jay's article above explains very well why Revit customers want to rename them, and that is really helpful.</p>

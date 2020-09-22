@@ -11,7 +11,13 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/insidefactoryama
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+I am busy as ever in the Revit API discussion forum.
+Today, let's highlight a couple of items that were not discussed there
+&ndash; ContextualHelp with space
+&ndash; On renaming a shared parameter
+&ndash; Build a minimal neural network from scratch...
 
 
 linkedin:
@@ -27,9 +33,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Rename Shared Param 
+### On Spaces in Help and Renaming a Parameter
 
-I am busy as wever in
+I am busy as ever in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160).
 Today, let's highlight a couple fo items that were not discussed there:
 
@@ -83,7 +89,7 @@ You can reproduce this issue with any sample using the following code:
 
 Both of the above-mentioned problems can be avoided by passing the link as `http` instead of `https`.
 
-If the given website redirects from `http` to `https` that won’t cause a problem.
+If the given website redirects from `http` to `https`, that won’t cause a problem:
 
 <pre class="code">
   <span style="color:#2b91af;">ContextualHelp</span>&nbsp;contextualHelp&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ContextualHelp</span>(
