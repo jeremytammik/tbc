@@ -1,0 +1,101 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- rename shared param:
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1600103203033700
+
+twitter:
+
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/insidefactoryama
+
+
+linkedin:
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>Rename Shared Param</h3>
+<h4><a name="2"></a> ContextualHelp Issue</h4>
+<p>A colleague lookd into an issue with <code>ContextualHelp</code> and wrote the following based on own tests and the info in the development ticket:</p>
+<p>Using <code>ContextualHelp</code> you can provide a URL for any button that should be shown when the user clicks <code>F1</code> while a ribbon button tooltip is displayed.</p>
+<p>If the URL has a space character in the path, you usually encode it either as <code>%20</code> or <code>+</code>.</p>
+<p>That may cause an issue for <code>ContextualHelp</code>.</p>
+<p>Let’s use this URL as an example:</p>
+<ul>
+<li><code>postman-echo.com/get?text%20with%20space</code></li>
+</ul>
+<p><center>
+<img src="img/an_f1_help_1.png" alt="Contextual help test URL" title="Contextual help test URL" width="600"/> <!-- 896 -->
+</center></p>
+<p>First problem: if you use <code>https</code>, then <em>https://accounts.autodesk.com/oAuth/OAuthRedirect</em> will be called with a redirect to the actual URL you specified for <code>F1</code> using the <code>ContextualHelp</code> object.</p>
+<p>This will confuse and stall users.</p>
+<p>Secondly: if, on top of that, the URL also contains a space (<code>%20</code> or <code>+</code>), then you’ll get stuck on that webpage:</p>
+<ul>
+<li>https://accounts.autodesk.com/oAuth/OAuthRedirect?oauth_consumer_key=1c27193f-af5e-4e7c-9847-06cd5c3c30ae&amp;oauth_nonce=cd819e65f0ac476099e9c795a22c05a7&amp;oauth_redirect_url=https%3A%2F%2Fpostman-echo.com%2Fget%3Ftext%2520with%2520space&amp;oauth_signature=xl7aBEcj5lI%2FX28ozkvQ%2Ba163qg%3D&amp;oauth_signature_method=HMAC-SHA1&amp;oauth_timestamp=1600289858&amp;oauth_token=bskZ8nJbcvBt%2FTyQvS%2FeImjP6pc%3D&amp;oauth_version=1.0</li>
+</ul>
+<p>It displays the following error message:</p>
+<ul>
+<li>xoauth_problem=parameter_rejected&amp;xoauth_parameters_absent=oauth_redirect_url&amp;oauth_error_message=Invalid%20value%20for%20parameter%3Aoauth_redirect_url</li>
+</ul>
+<p><center>
+<img src="img/an_f1_help_1.png" alt="Contextual help test redirect" title="Contextual help test redirect" width="1200"/> <!-- 2424 -->
+</center></p>
+<p>You can reproduce this issue with any sample using the following code:</p>
+<pre class="code">
+  ContextualHelp contextualHelp = new ContextualHelp(
+    ContextualHelpType.Url,
+    "https://postman-echo.com/get?text%20with%20space" );
+
+  pushButton.SetContextualHelp(contextualHelp);
+</pre>
+
+<p>Both of the above-mentioned problems can be avoided by passing the link as <code>http</code> instead of <code>https</code>.</p>
+<p>If the given website redirects from <code>http</code> to <code>https</code> that won’t cause a problem.</p>
+<pre class="code">
+  ContextualHelp contextualHelp = new ContextualHelp(
+    ContextualHelpType.Url,
+    "http://postman-echo.com/get?text%20with%20space" );
+
+  pushButton.SetContextualHelp(contextualHelp);
+</pre>
+
+<p>I hope you find this useful as well.</p>
+<h4><a name="3"></a> On Renaming a Shared Parameter</h4>
+<p>Jay Merlan very kindly shared some insights on renameing shared parameters in his recent article
+on <a href="https://opendefinery.com/blog/revit-shared-parameters-can-be-renamed">True or False: Shared Parameters Can Be Renamed</a>.</p>
+<p>As I pointed out in <a href="https://opendefinery.com/blog/revit-shared-parameters-can-be-renamed/#comment-5072357426">my comment</a> on that post, the Revit development team discussed Jay;s suggestions internally and say:</p>
+<p>My perception is that we don't support renaming a shared parameter after loading into a project or a family.</p>
+<p>We are discussing support for such a feature of 'unified parameters' in a future release of Revit.</p>
+<p>Jay's article above explains very well why Revit customers want to rename them, and that is really helpful.</p>
+<p>The steps above work well to generate a new family with the new name, and the references, like formulas within the family, are updated to the new name. But, when I try to load it to an existing project with old name parameters, it will be renamed back. That makes sense and that is how this workaround works. So, it only works for the projects and models without using the old parameters.</p>
+<p>The fundamental problem with the current Revit implementation of shared params is the fundamental question: what does it mean to 'rename' a parameter?</p>
+<p>Once the parameter definition <code>.txt</code> file has been consumed by Revit, you can rename a parameter in the <code>.txt</code> file all you like, regardless of what Revit considers correct. But, all docs where this file has already been consumed will have no idea of the new name. Which will clearly result in a mess, as the same parameter will appear under different names spread all over various projects and families.</p>
+<p>In cases when two incarnations of the same parameter need to be merged (because it is the same parameter, after all), one incarnation will magically change its name &ndash; like in the Load Family case.</p>
+<p>As far as we can tell, a problem like this can only be solved via some 'central source of truth', like a cloud-something.</p>
+<h4><a name="4"></a> Build a Minimal Neural Network from Scratch</h4>
+<p>I browsed through this tutorial
+on <a href="https://www.freecodecamp.org/news/how-to-build-a-neural-network-with-pytorch">how to build a neural network from scratch with PyTorch</a> and
+found it quite illuminating and inspiring.
+I wish I had more time to dabble with this kind of stuff!</p>
+<blockquote>
+<p>Going under the hood of neural networks to learn how to build one from the ground up.
+The MNIST data set contains handwritten digits from zero to nine with their corresponding labels...
+Simply feed the neural network the images of the digits and their corresponding labels which tell the neural network that this is a three or seven.
+We just write the code to index out only the images with a label of three or seven. Thus, we get a data set of threes and sevens.</p>
+<ul>
+<li><a href="https://github.com/bipinKrishnan/ML_from_scratch/blob/master/neural_network_pytorch.ipynb">Code on GiutHub</a></li>
+<li><a href="https://colab.research.google.com/github/bipinKrishnan/ML_from_scratch/blob/master/neural_network_pytorch.ipynb">Play with it on Colab</a></li>
+</ul>
+</blockquote>

@@ -6,6 +6,9 @@
 
 <!---
 
+- rename shared param:
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1600103203033700
+
 twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/insidefactoryama
@@ -42,7 +45,7 @@ Let’s use this URL as an example:
 - `postman-echo.com/get?text%20with%20space`
 
 <center>
-<img src="img/an_f1_help_1.png" alt="Contextual help test URL" title="Contextual help test URL" width="600"/> <!-- 896 -->
+<img src="img/an_f1_help_1.png" alt="Contextual help test URL" title="Contextual help test URL" width="400"/> <!-- 896 -->
 </center>
 
 First problem: if you use `https`, then *https://accounts.autodesk.com/oAuth/OAuthRedirect* will be called with a redirect to the actual URL you specified for `F1` using the `ContextualHelp` object.
@@ -84,4 +87,42 @@ If the given website redirects from `http` to `https` that won’t cause a probl
 </pre>
 
 I hope you find this useful as well.
+
+####<a name="3"></a> On Renaming a Shared Parameter
+
+Jay Merlan very kindly shared some insights on renameing shared parameters in his recent article
+on [True or False: Shared Parameters Can Be Renamed](https://opendefinery.com/blog/revit-shared-parameters-can-be-renamed).
+
+As I pointed out in [my comment](https://opendefinery.com/blog/revit-shared-parameters-can-be-renamed/#comment-5072357426) on that post, the Revit development team discussed Jay;s suggestions internally and say:
+
+My perception is that we don't support renaming a shared parameter after loading into a project or a family.
+
+We are discussing support for such a feature of 'unified parameters' in a future release of Revit.
+
+Jay's article above explains very well why Revit customers want to rename them, and that is really helpful.
+
+The steps above work well to generate a new family with the new name, and the references, like formulas within the family, are updated to the new name. But, when I try to load it to an existing project with old name parameters, it will be renamed back. That makes sense and that is how this workaround works. So, it only works for the projects and models without using the old parameters.
+
+The fundamental problem with the current Revit implementation of shared params is the fundamental question: what does it mean to 'rename' a parameter?
+
+Once the parameter definition `.txt` file has been consumed by Revit, you can rename a parameter in the `.txt` file all you like, regardless of what Revit considers correct. But, all docs where this file has already been consumed will have no idea of the new name. Which will clearly result in a mess, as the same parameter will appear under different names spread all over various projects and families.
+
+In cases when two incarnations of the same parameter need to be merged (because it is the same parameter, after all), one incarnation will magically change its name &ndash; like in the Load Family case.
+
+As far as we can tell, a problem like this can only be solved via some 'central source of truth', like a cloud-something.
+
+####<a name="4"></a> Build a Minimal Neural Network from Scratch
+
+I browsed through this tutorial
+on [how to build a neural network from scratch with PyTorch](https://www.freecodecamp.org/news/how-to-build-a-neural-network-with-pytorch) and
+found it quite illuminating and inspiring.
+I wish I had more time to dabble with this kind of stuff!
+
+> Going under the hood of neural networks to learn how to build one from the ground up.
+The MNIST data set contains handwritten digits from zero to nine with their corresponding labels...
+Simply feed the neural network the images of the digits and their corresponding labels which tell the neural network that this is a three or seven.
+We just write the code to index out only the images with a label of three or seven. Thus, we get a data set of threes and sevens.
+
+> - [Code on GiutHub](https://github.com/bipinKrishnan/ML_from_scratch/blob/master/neural_network_pytorch.ipynb)
+- [Play with it on Colab](https://colab.research.google.com/github/bipinKrishnan/ML_from_scratch/blob/master/neural_network_pytorch.ipynb)
 
