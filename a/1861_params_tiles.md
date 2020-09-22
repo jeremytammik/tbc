@@ -315,24 +315,3 @@ An inspiring motivational article by Jesse Hall on semi-unintentionally starting
 > In conclusion, I just want to say that anyone can do anything.
 If you have (1) the proper motivation, (2) realistic expectations, and (3) you don't overwork yourself, you can be successful.
 
-
-<!--
-Håvard Vasshaug
-@vasshaug
-Co-founder at Bad Monkeys
-
-https://twitter.com/vasshaug/status/1296803377985269761?s=20
-
-It's been interesting to follow the Autodesk & Architects dynamics this summer. My thoughts are:
-
-1. The Autodesk Board of Directors is at fault for developing sales and acquisition strategies and not products. Watch this two-and-a-half-minute excerpt of an interview 
-with [Steve Jobs on the role of product and marketing](https://youtu.be/P4VBqTViEx4).
-
-2. If you as an architect are locked in by Autodesk, you have locked yourself in. No one is forcing you to buy Revit. If you did it old school and trained your entire staff in just one platform, you painted yourself into a corner with help from the Autodesk sales force.
-
-3. Unlike 15 years ago, there’s now a massive amount of AEC startups that solve both small and large issues on a multitude of platforms. I’m exited about what this can lead to long term. Kudos to the Dynamo and Grasshopper founders & communities for contributing to this change.
-
-<pre class="code">
-</pre>
--->
-
