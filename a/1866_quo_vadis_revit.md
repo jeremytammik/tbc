@@ -35,6 +35,17 @@ I add pointers to two preceding recent news items that may or may not be related
 
 linkedin:
 
+Autodesk joins the Open Design Alliance, discussion of the past and future of Revit, and some Bad Monkey reactions to the open letter with the #RevitAPI
+
+http://bit.ly/quovadisrevit
+
+An exciting announcement was made today;
+I add pointers to two preceding recent news items that may or may not be related:
+
+- Autodesk joins Open Design Alliance
+- Martyn Day on the past and future of Revit
+- Håvard Vasshaug on the open letter...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
