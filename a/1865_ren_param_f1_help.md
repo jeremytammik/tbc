@@ -29,10 +29,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Rename Shared Param 
 
+I am busy as wever in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160).
+Today, let's highlight a couple fo items that were not discussed there:
 
-####<a name="2"></a> ContextualHelp Issue
+- [ContextualHelp with space](#2)
+- [On renaming a shared parameter](#3)
+- [Build a minimal neural network from scratch](#4)
 
-A colleague lookd into an issue with `ContextualHelp` and wrote the following based on own tests and the info in the development ticket:
+####<a name="2"></a> ContextualHelp With Space
+
+A colleague looked into an issue with `ContextualHelp` and wrote the following based on own tests and the info in the development ticket:
 
 Using `ContextualHelp` you can provide a URL for any button that should be shown when the user clicks `F1` while a ribbon button tooltip is displayed.
 
@@ -90,10 +97,10 @@ I hope you find this useful as well.
 
 ####<a name="3"></a> On Renaming a Shared Parameter
 
-Jay Merlan very kindly shared some insights on renameing shared parameters in his recent article
+Jay Merlan very kindly shared some insights on renaming shared parameters in his recent article
 on [True or False: Shared Parameters Can Be Renamed](https://opendefinery.com/blog/revit-shared-parameters-can-be-renamed).
 
-As I pointed out in [my comment](https://opendefinery.com/blog/revit-shared-parameters-can-be-renamed/#comment-5072357426) on that post, the Revit development team discussed Jay;s suggestions internally and say:
+As I pointed out in [my comment](https://opendefinery.com/blog/revit-shared-parameters-can-be-renamed/#comment-5072357426) on that post, the Revit development team discussed Jay's suggestions internally and say:
 
 My perception is that we don't support renaming a shared parameter after loading into a project or a family.
 
@@ -118,11 +125,11 @@ on [how to build a neural network from scratch with PyTorch](https://www.freecod
 found it quite illuminating and inspiring.
 I wish I had more time to dabble with this kind of stuff!
 
-> Going under the hood of neural networks to learn how to build one from the ground up.
+> Going under the hood of neural networks to learn how to build one from the ground up...
 The MNIST data set contains handwritten digits from zero to nine with their corresponding labels...
-Simply feed the neural network the images of the digits and their corresponding labels which tell the neural network that this is a three or seven.
-We just write the code to index out only the images with a label of three or seven. Thus, we get a data set of threes and sevens.
+Simply feed the neural network the images of the digits and their corresponding labels which tell the neural network that this is a three or seven...
+We just write the code to index out only the images with a label of three or seven. Thus, we get a data set of threes and sevens...
 
-> - [Code on GiutHub](https://github.com/bipinKrishnan/ML_from_scratch/blob/master/neural_network_pytorch.ipynb)
+> - [Code on GitHub](https://github.com/bipinKrishnan/ML_from_scratch/blob/master/neural_network_pytorch.ipynb)
 - [Play with it on Colab](https://colab.research.google.com/github/bipinKrishnan/ML_from_scratch/blob/master/neural_network_pytorch.ipynb)
 

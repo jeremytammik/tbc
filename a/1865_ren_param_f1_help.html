@@ -54,19 +54,19 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 </center></p>
 <p>You can reproduce this issue with any sample using the following code:</p>
 <pre class="code">
-  ContextualHelp contextualHelp = new ContextualHelp(
-    ContextualHelpType.Url,
-    "https://postman-echo.com/get?text%20with%20space" );
+&nbsp;&nbsp;<span style="color:#2b91af;">ContextualHelp</span>&nbsp;contextualHelp&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ContextualHelp</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ContextualHelpType</span>.Url,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;https://postman-echo.com/get?text%20with%20space&quot;</span>&nbsp;);
 
-  pushButton.SetContextualHelp(contextualHelp);
+&nbsp;&nbsp;pushButton.SetContextualHelp(contextualHelp);
 </pre>
 
 <p>Both of the above-mentioned problems can be avoided by passing the link as <code>http</code> instead of <code>https</code>.</p>
 <p>If the given website redirects from <code>http</code> to <code>https</code> that won’t cause a problem.</p>
 <pre class="code">
-  ContextualHelp contextualHelp = new ContextualHelp(
-    ContextualHelpType.Url,
-    "http://postman-echo.com/get?text%20with%20space" );
+  <span style="color:#2b91af;">ContextualHelp</span>&nbsp;contextualHelp&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ContextualHelp</span>(
+  &nbsp;&nbsp;<span style="color:#2b91af;">ContextualHelpType</span>.Url,
+  &nbsp;&nbsp;<span style="color:#a31515;">&quot;http://postman-echo.com/get?text%20with%20space&quot;</span>&nbsp;);
 
   pushButton.SetContextualHelp(contextualHelp);
 </pre>
@@ -90,12 +90,12 @@ on <a href="https://www.freecodecamp.org/news/how-to-build-a-neural-network-with
 found it quite illuminating and inspiring.
 I wish I had more time to dabble with this kind of stuff!</p>
 <blockquote>
-<p>Going under the hood of neural networks to learn how to build one from the ground up.
+<p>Going under the hood of neural networks to learn how to build one from the ground up...
 The MNIST data set contains handwritten digits from zero to nine with their corresponding labels...
-Simply feed the neural network the images of the digits and their corresponding labels which tell the neural network that this is a three or seven.
-We just write the code to index out only the images with a label of three or seven. Thus, we get a data set of threes and sevens.</p>
+Simply feed the neural network the images of the digits and their corresponding labels which tell the neural network that this is a three or seven...
+We just write the code to index out only the images with a label of three or seven. Thus, we get a data set of threes and sevens...</p>
 <ul>
-<li><a href="https://github.com/bipinKrishnan/ML_from_scratch/blob/master/neural_network_pytorch.ipynb">Code on GiutHub</a></li>
+<li><a href="https://github.com/bipinKrishnan/ML_from_scratch/blob/master/neural_network_pytorch.ipynb">Code on GitHub</a></li>
 <li><a href="https://colab.research.google.com/github/bipinKrishnan/ML_from_scratch/blob/master/neural_network_pytorch.ipynb">Play with it on Colab</a></li>
 </ul>
 </blockquote>
