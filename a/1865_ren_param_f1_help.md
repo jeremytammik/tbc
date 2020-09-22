@@ -11,7 +11,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Today, let's highlight a couple of items not discussed the Revit API forum: building a minimal neural network from scratch, ContextualHelp with space and renaming a shared parameter with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/helpwithspace
 
 I am busy as ever in the Revit API discussion forum.
 Today, let's highlight a couple of items that were not discussed there
