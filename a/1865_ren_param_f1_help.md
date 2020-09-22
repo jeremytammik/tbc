@@ -11,7 +11,9 @@
 
 twitter:
 
-Today, let's highlight a couple of items not discussed the Revit API forum: building a minimal neural network from scratch, ContextualHelp with space and renaming a shared parameter with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/helpwithspace
+Today, let's highlight a couple of items not discussed the Revit API forum: building a minimal neural network from scratch, ContextualHelp with space and renaming a shared parameter with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/helpwithspaces
+
+http://bit.ly/helpwithspaces
 
 I am busy as ever in the Revit API discussion forum.
 Today, let's highlight a couple of items that were not discussed there
@@ -19,8 +21,18 @@ Today, let's highlight a couple of items that were not discussed there
 &ndash; On renaming a shared parameter
 &ndash; Build a minimal neural network from scratch...
 
-
 linkedin:
+
+Today, let's highlight a couple of items not discussed the Revit API forum: building a minimal neural network from scratch, ContextualHelp with space and renaming a shared parameter with the #RevitAPI
+
+http://bit.ly/helpwithspaces
+
+I am busy as ever in the Revit API discussion forum.
+Today, let's highlight a couple of items that were not discussed there:
+
+- ContextualHelp with space
+- On renaming a shared parameter
+- Build a minimal neural network from scratch...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
