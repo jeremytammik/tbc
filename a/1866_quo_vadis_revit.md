@@ -25,7 +25,7 @@ with [Steve Jobs on the role of product and marketing](https://youtu.be/P4VBqTVi
 
 twitter:
 
- with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Autodesk joins the Open Design Alliance, discussion of the past and future of Revit, and some Bad Monkey reactions to the open letter with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/quovadisrevit
 
 An exciting announcement was made today;
 I add pointers to two preceding recent news items that may or may not be related
