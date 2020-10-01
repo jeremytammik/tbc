@@ -47,7 +47,7 @@ Today, I'll mainly pick up some non-desktop issues:
 A question in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [DesignScript](https://forums.autodesk.com/t5/revit-api-forum/design-script/m-p/9741288) led
-to an interesting conversation and clarification with some colleagues from the Revit development team:
+to an interesting conversation and clarification with the Revit development team:
 
 **Question:** Is it correct to assume that you can access Design Script in the Revit API environment by using Dynamo?
 Is it also correct to assume that we have no plans to make Design Script accessible in the Revit API environment without Dynamo?
@@ -156,7 +156,7 @@ In the anecdote on [technology and me](http://www.logicalpoetry.com/tech/vonnegu
 
 <blockquote>
 “Oh, she says, well, you're not a poor man. You know, why don't you go online and buy a hundred envelopes and put them in the closet?"
-So ,I pretend not to hear her.
+So, I pretend not to hear her.
 And go out to get an envelope because I'm going to have a hell of a good time in the process of buying one envelope.
 I meet a lot of people.
 And see some great looking babies.
