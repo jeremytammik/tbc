@@ -24,6 +24,19 @@ Today, I'll mainly pick up some non-desktop issues
 
 linkedin:
 
+Vonnegut on technology, AI vision model images, Forge Design Automation for Revit and DesignScript with the #RevitAPI
+
+http://bit.ly/designscript
+
+Today, I'll mainly pick up some non-desktop issues:
+
+- DesignScript with Dynamo and Revit
+- Forge getting started material
+- Getting started with DA4R
+- DA4R local debug tool
+- AI vision model images
+- Vonnegut on technology...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
