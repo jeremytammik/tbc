@@ -12,7 +12,7 @@
 
 twitter:
 
-Forge Design Automation and DesignScript with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Vonnegut on technology, AI vision model images, Forge Design Automation for Revit and DesignScript with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/designscript
 
 Today, I'll mainly pick up some non-desktop issues
 &ndash; DesignScript with Dynamo and Revit
