@@ -73,7 +73,7 @@ We get requests for access to Dynamo on the Cloud or access to a Geometry kernel
 
 Licensing might be akin to the way we provide ASM to Dynamo customers today &ndash; via their subscription to other ADSK software, in this case, Revit.
 
-As with everything, if the need is there, and high enough, we can investigate, but it would need to be stacked up against all other development effort (i.e Cost/Benefit analysis). Our current efforts are focused around Lowering the Barrier to Entry inside of Dynamo and an Ecosystem play where you can get Dynamo in more places and/or access it more easily.
+As with everything, if the need is there, and high enough, we can investigate, but it would need to be stacked up against all other development effort (i.e., Cost/Benefit analysis). Our current efforts are focused around Lowering the Barrier to Entry inside of Dynamo and an Ecosystem play where you can get Dynamo in more places and/or access it more easily.
 Adding DesignScript support to Revit sans Dynamo is not currently in our sights.
 
 ####<a name="3"></a> Forge Getting Started Material
@@ -87,7 +87,7 @@ the [Forge Accelerators](https://forge.autodesk.com/accelerator-program):
 - [Postman Collection of API calls](https://gist.github.com/petrbroz/5d28d996738bb0da4f7838ca43d53765)
 - [Design Automation Postman Tutorial](https://github.com/Autodesk-Forge/forge-tutorial-postman)
 - [Sample repositories](https://github.com/Autodesk-Forge?tabs=repositories)
-- [StackOverflow for existing Q&amp;A &ndash;
+- StackOverflow for existing Q&amp;A &ndash;
   [General](https://stackoverflow.com/questions/tagged/autodesk-forge) /
   [Viewer](https://stackoverflow.com/questions/tagged/autodesk-viewer) /
   [Data Management](https://stackoverflow.com/questions/tagged/autodesk-data-management) /
@@ -95,7 +95,7 @@ the [Forge Accelerators](https://forge.autodesk.com/accelerator-program):
   [Design Automation](https://stackoverflow.com/questions/tagged/autodesk-designautomation) /
   [BIM360](https://stackoverflow.com/questions/tagged/autodesk-bim360) /
   [Reality Capture](https://stackoverflow.com/questions/tagged/autodesk-realitycapture) /
-  [WebHook](https://stackoverflow.com/questions/tagged/autodesk-webhooks)
+  [Webhooks](https://stackoverflow.com/questions/tagged/autodesk-webhooks)
 
 Tools:
 
@@ -106,16 +106,18 @@ Tools:
 
 ####<a name="4"></a> Getting Started with DA4R
 
-From an internal conversation with a colleague on how to get styarted with DA4R, or [Design Automation fro Revit]():
+From an internal conversation with a colleague on how to get started with DA4R,
+or [Design Automation for Revit](https://forge.autodesk.com/api/design-automation-cover-page/):
 
 **Question:** I am currently developing a pipeline to extract features from Revit models.
-I am new to Revit and its api, but I have followed Forge Design Automation for Revit and successfully created a add-in and run it in the cloud.
+I am new to Revit and its API; I have followed the Forge Design Automation for Revit tutorial, successfully created an add-in and run it in the cloud.
 What I want to do is to have the features extracted from Revit model and write out to a JSON file upon add-inn completion.
 Do you have any sample code to share that serves a similar purpose?
 Right now, I am in the process of learning the Revit API by reading
 the [developer guide](http://help.autodesk.com/view/RVT/2021/ENU/?guid=Revit_API_Revit_API_Developers_Guide_html).
 
-**Answer:** You might begin by checking out the pointers to [further advice and Revit API getting started material](https://thebuildingcoder.typepad.com/blog/about-the-author.html#2).
+**Answer:** You might begin by checking out the pointers
+to [further advice and Revit API getting started material](https://thebuildingcoder.typepad.com/blog/about-the-author.html#2).
 
 To implement your extraction, I would suggest installing Revit desktop and using that as a basis for research and implementation.
 
@@ -163,7 +165,7 @@ And see some great looking babies.
 And a fire engine goes by. And I give them the thumbs up.
 And I'll ask a woman what kind of dog that is.
 And, and I don't know.
-The moral of the story is &ndahs; we're here on Earth to fart around.
+The moral of the story is &ndash; we're here on Earth to fart around.
 And, of course, the computers will do us out of that.
 And what the computer people don't realize, or they don't care, is we're dancing animals.
 You know, we love to move around.
