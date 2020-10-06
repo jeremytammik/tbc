@@ -510,11 +510,11 @@ cf. [Clipped state of BasePoint](https://thebuildingcoder.typepad.com/blog/2020/
 in [What's New in the Revit 2021.1 API](https://thebuildingcoder.typepad.com/blog/2020/08/revit-20211-sdk-and-whats-new.html).
 
 So, starting from this version, you have the ability to get and set the clipped state for the Survey Point.
-For Project Base Point, the property is read-only and will always return false, since the clipped state has been removed from that.
+For Project Base Point, the property is read-only and will always return false, since the PBP clipped state has been removed.
 
 ####<a name="5"></a> Two German Uni BIM360 Construction Cloud Startups
 
-Moving away from the Revit API to othyer AEC topics, two innovative BIM360 apps from German Forge developer university startups
+Moving away from the Revit API to other AEC topics, two innovative BIM360 apps from German Forge developer university startups
 are now live, [says](https://twitter.com/ADSK_Construct/status/1311699100312666113)
 Phil [@contech101](https://twitter.com/contech101) Mueller, cf.
 the [15 new integrations with Autodesk construction cloud](https://constructionblog.autodesk.com/15-integrations-autodesk-construction):
