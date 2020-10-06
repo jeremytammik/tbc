@@ -59,7 +59,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### High Performance Outline for many Elements
 
-####<a name="2"></a> High-Performance Optimisation using Revit API for Outline for many Elements 
+Today let's talk mainly about geometric analysis and performance:
+
+- [High-performance outline optimisation](#2)
+    - [Solution](#2.1)
+- [Simple line-plane intersection](#3)
+- [Set base and survey clipped and unclipped](#4)
+- [Two German uni BIM360 construction cloud startups](#5)
+- [AI-based face streaming hits mainstream](#6)
+
+####<a name="2"></a> High-Performance Outline Optimisation
 
 If you are interested in high-performance use of the Revit API, you may be able to learn a trick or two from the StackOverflow discussion
 on [how to get the bounding box for several elements](https://stackoverflow.com/questions/63083938/revit-api-how-can-i-get-bounding-box-for-several-elements).
@@ -522,7 +531,7 @@ the [15 new integrations with Autodesk construction cloud](https://constructionb
 - [Gamma AR](https://construction.autodesk.com/integrations/gamma-ar) &ndash; RWTH Aachen 
 - [4D-Planner](https://construction.autodesk.com/integrations/4d-planner) &ndash; TU Berlin
 
-####<a name="6"></a> AI-Based Face Streaming hits the Mainstream
+####<a name="6"></a> AI-Based Face Streaming hits Mainstream
 
 Moving further away from pure AEC related topics, 
 AI-based face recognition and reconstruction is entering the mainstream through
