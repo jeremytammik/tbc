@@ -41,8 +41,14 @@ twitter:
 
 with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+### High Performance Outline, Line-Plane Intersection
+
+Today let's talk mainly about geometric analysis and performance
+&ndash; High-performance outline optimisation
+&ndash; Simple line-plane intersection
+&ndash; Set base and survey clipped and unclipped
+&ndash; Two German uni BIM360 construction cloud startups
+&ndash; AI-based face streaming hits mainstream...
 
 linkedin:
 
