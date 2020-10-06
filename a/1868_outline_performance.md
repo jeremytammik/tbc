@@ -399,16 +399,16 @@ The `GetBoundaries` method returns two `XYZ` points: lower and upper, which chan
   }
 </pre>
 
-Many thanks to [Alexey Ovchinnikov](https://stackoverflow.com/users/9958255/alexey-ovchinnikov) for his impressive analysis and research and sharing the useful result.
+Many thanks to [Alexey Ovchinnikov](https://stackoverflow.com/users/9958255/alexey-ovchinnikov) for his impressive analysis and research and sharing this powerful and useful result.
 
 ####<a name="3"></a> Simple Line-Plane Intersection
 
-Talking about geometric calculations and performance, I just took a quick look at a Simple Line-Plane Intersection algorithm this morning to answer 
+Talking about geometric calculations and performance, I just took a quick look at a simple line-plane intersection algorithm this morning to answer 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [How to calculate the intersection between a plane and a penetrating line](https://forums.autodesk.com/t5/revit-api-forum/how-can-we-calculate-the-intersection-between-the-plane-and-the/m-p/9785834):
+on [how to calculate the intersection between a plane and a penetrating line](https://forums.autodesk.com/t5/revit-api-forum/how-can-we-calculate-the-intersection-between-the-plane-and-the/m-p/9785834):
 
 **Question:** I have a question about the way to calculate intersection point.
-We have four points which we know its coordinates.
+We have four points and their coordinates.
 Let's assume we can create plane with these points.
 When there is a line penetrating the plane, I guess there is an intersection point which the plane and the line meet:
 
@@ -418,7 +418,7 @@ When there is a line penetrating the plane, I guess there is an intersection poi
 
 How can we calculate the coordinates of the intersection point?
 
-**Answer:** You will only need three points to uniquely define the face, so the fourth point can actually be used to verify that all four are co-planar.
+**Answer:** You will only need three points to uniquely define the face, so the fourth point can actually be used to verify that all four are coplanar.
 
 Calculating the intersection between a straight line and a plane is pretty easy, so the most efficient method to achieve this may possibly be to do it yourself:
 
@@ -441,7 +441,7 @@ you in The Building Coder samples.
 Here is the code:
 
 <pre class="code">
-<pre style="font-family:Consolas;font-size:13px;color:black;background:white;"><span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;the&nbsp;3D&nbsp;intersection&nbsp;point&nbsp;between</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;a&nbsp;line&nbsp;and&nbsp;a&nbsp;plane.</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;https://forums.autodesk.com/t5/revit-api-forum/how-can-we-calculate-the-intersection-between-the-plane-and-the/m-p/9785834</span>

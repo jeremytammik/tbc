@@ -371,20 +371,20 @@ For my case, for example 500 meters, and create <code>min</code> and <code>max</
   }
 </pre>
 
-<p>Many thanks to <a href="https://stackoverflow.com/users/9958255/alexey-ovchinnikov">Alexey Ovchinnikov</a> for his impressive analysis and research and sharing the useful result.</p>
+<p>Many thanks to <a href="https://stackoverflow.com/users/9958255/alexey-ovchinnikov">Alexey Ovchinnikov</a> for his impressive analysis and research and sharing this powerful and useful result.</p>
 <h4><a name="3"></a> Simple Line-Plane Intersection</h4>
-<p>Talking about geometric calculations and performance, I just took a quick look at a Simple Line-Plane Intersection algorithm this morning to answer 
+<p>Talking about geometric calculations and performance, I just took a quick look at a simple line-plane intersection algorithm this morning to answer 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-can-we-calculate-the-intersection-between-the-plane-and-the/m-p/9785834">How to calculate the intersection between a plane and a penetrating line</a>:</p>
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-can-we-calculate-the-intersection-between-the-plane-and-the/m-p/9785834">how to calculate the intersection between a plane and a penetrating line</a>:</p>
 <p><strong>Question:</strong> I have a question about the way to calculate intersection point.
-We have four points which we know its coordinates.
+We have four points and their coordinates.
 Let's assume we can create plane with these points.
 When there is a line penetrating the plane, I guess there is an intersection point which the plane and the line meet:</p>
 <p><center>
 <img src="img/line_plane_intersection.png" alt="Line-plane intersection" title="Line-plane intersection" width="350"/> <!-- 700 -->
 </center></p>
 <p>How can we calculate the coordinates of the intersection point?</p>
-<p><strong>Answer:</strong> You will only need three points to uniquely define the face, so the fourth point can actually be used to verify that all four are co-planar.</p>
+<p><strong>Answer:</strong> You will only need three points to uniquely define the face, so the fourth point can actually be used to verify that all four are coplanar.</p>
 <p>Calculating the intersection between a straight line and a plane is pretty easy, so the most efficient method to achieve this may possibly be to do it yourself:</p>
 <ul>
 <li><a href="https://duckduckgo.com/?q=line+plane+intersect">Search the Internet for 'line plane intersect'</a></li>
@@ -401,7 +401,7 @@ the <a href="https://www.revitapidocs.com/2020/3513f5e2-a274-4f60-4d8f-78145930a
 you in The Building Coder samples.</p>
 <p>Here is the code:</p>
 <pre class="code">
-<pre style="font-family:Consolas;font-size:13px;color:black;background:white;"><span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;the&nbsp;3D&nbsp;intersection&nbsp;point&nbsp;between</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;a&nbsp;line&nbsp;and&nbsp;a&nbsp;plane.</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;https://forums.autodesk.com/t5/revit-api-forum/how-can-we-calculate-the-intersection-between-the-plane-and-the/m-p/9785834</span>
@@ -447,53 +447,41 @@ you in The Building Coder samples.</p>
 }
 </pre>
 
-**Response:** Thank you for offering sample code. Actually, I intended to find the solution only with Revit Official API.
-
-Ah well.
-
-By the way, for many other high performance intersection and clipping algorithms, you may want to check
-out [Wykobi](https://www.wykobi.com), an
-
-> extremly efficient, robust and simple to use C++ 2D/3D oriented computational geometry library.
-
-<center>
+<p><strong>Response:</strong> Thank you for offering sample code. Actually, I intended to find the solution only with Revit Official API.</p>
+<p>Ah well.</p>
+<p>By the way, for many other high performance intersection and clipping algorithms, you may want to check
+out <a href="https://www.wykobi.com">Wykobi</a>, an</p>
+<blockquote>
+<p>extremly efficient, robust and simple to use C++ 2D/3D oriented computational geometry library.</p>
+</blockquote>
+<p><center>
 <img src="img/wykobi_segmentint.png" alt="Wykobi segment intersection" title="Wykobi segment intersection" width="568"/> <!-- 568 -->
-</center>
-
-
-####<a name="4"></a> Set Base and Survey Clipped and Unclipped
-
-As we pointed out in the discussion on [survey and project base points](https://thebuildingcoder.typepad.com/blog/2012/11/survey-and-project-base-point.html) in 2012, *the clipped/unclipped state of the base and survey points could not be set via the API. You could pin them using the Element.Pinned property*... back then.
-
-Happily and finally, Revit 2021.1 exposed a new property `Clipped` for the base point,
-cf. [Clipped state of BasePoint](https://thebuildingcoder.typepad.com/blog/2020/08/revit-20211-sdk-and-whats-new.html#6.3.2)
-in [What's New in the Revit 2021.1 API](https://thebuildingcoder.typepad.com/blog/2020/08/revit-20211-sdk-and-whats-new.html).
-
-So, starting from this version, you have the ability to get and set the clipped state for the Survey Point.
-For Project Base Point, the property is read-only and will always return false, since the clipped state has been removed from that.
-
-####<a name="5"></a> Two German Uni BIM360 Construction Cloud Startups
-
-Moving away from the Revit API to othyer AEC topics, two innovative BIM360 apps from German Forge developer university startups
-are now live, [says](https://twitter.com/ADSK_Construct/status/1311699100312666113)
-Phil [@contech101](https://twitter.com/contech101) Mueller, cf.
-the [15 new integrations with Autodesk construction cloud](https://constructionblog.autodesk.com/15-integrations-autodesk-construction):
-
-- [Gamma AR](https://construction.autodesk.com/integrations/gamma-ar) &ndash; RWTH Aachen 
-- [4D-Planner](https://construction.autodesk.com/integrations/4d-planner) &ndash; TU Berlin
-
-####<a name="6"></a> AI-Based Face Streaming hits the Mainstream
-
-Moving further away from pure AEC related topics, 
+</center></p>
+<h4><a name="4"></a> Set Base and Survey Clipped and Unclipped</h4>
+<p>As we pointed out in the discussion on <a href="https://thebuildingcoder.typepad.com/blog/2012/11/survey-and-project-base-point.html">survey and project base points</a> in 2012, <em>the clipped/unclipped state of the base and survey points could not be set via the API. You could pin them using the Element.Pinned property</em>... back then.</p>
+<p>Happily and finally, Revit 2021.1 exposed a new property <code>Clipped</code> for the base point,
+cf. <a href="https://thebuildingcoder.typepad.com/blog/2020/08/revit-20211-sdk-and-whats-new.html#6.3.2">Clipped state of BasePoint</a>
+in <a href="https://thebuildingcoder.typepad.com/blog/2020/08/revit-20211-sdk-and-whats-new.html">What's New in the Revit 2021.1 API</a>.</p>
+<p>So, starting from this version, you have the ability to get and set the clipped state for the Survey Point.
+For Project Base Point, the property is read-only and will always return false, since the clipped state has been removed from that.</p>
+<h4><a name="5"></a> Two German Uni BIM360 Construction Cloud Startups</h4>
+<p>Moving away from the Revit API to othyer AEC topics, two innovative BIM360 apps from German Forge developer university startups
+are now live, <a href="https://twitter.com/ADSK_Construct/status/1311699100312666113">says</a>
+Phil <a href="https://twitter.com/contech101">@contech101</a> Mueller, cf.
+the <a href="https://constructionblog.autodesk.com/15-integrations-autodesk-construction">15 new integrations with Autodesk construction cloud</a>:</p>
+<ul>
+<li><a href="https://construction.autodesk.com/integrations/gamma-ar">Gamma AR</a> &ndash; RWTH Aachen </li>
+<li><a href="https://construction.autodesk.com/integrations/4d-planner">4D-Planner</a> &ndash; TU Berlin</li>
+</ul>
+<h4><a name="6"></a> AI-Based Face Streaming hits the Mainstream</h4>
+<p>Moving further away from pure AEC related topics, 
 AI-based face recognition and reconstruction is entering the mainstream through
-the [Nvidia Maxine Cloud-AI Video-Streaming Platform](https://developer.nvidia.com/maxine).
-
-It aims to drastically reduce video conferencing bandwidth requirements by transmitting only animated face keypoint data instead of the entire video keyframe information, and reconstructing the animated current presenters face based on some initial video data and the face keypoint data.
-
-Check out the two-and-a-half-minute video on [inventing virtual meetings of tomorrow with Nvidia AI research](https://youtu.be/NqmMnjJ6GEg):
-
-<center>
+the <a href="https://developer.nvidia.com/maxine">Nvidia Maxine Cloud-AI Video-Streaming Platform</a>.</p>
+<p>It aims to drastically reduce video conferencing bandwidth requirements by transmitting only animated face keypoint data instead of the entire video keyframe information, and reconstructing the animated current presenters face based on some initial video data and the face keypoint data.</p>
+<p>Check out the two-and-a-half-minute video on <a href="https://youtu.be/NqmMnjJ6GEg">inventing virtual meetings of tomorrow with Nvidia AI research</a>:</p>
+<p><center>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/NqmMnjJ6GEg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-<center>
-
-> New AI breakthroughs in NVIDIA Maxine, cloud-native video streaming AI SDK, slash bandwidth use while making it possible to re-animate faces, correct gaze and animate characters for immersive and engaging meetings.
+<center></p>
+<blockquote>
+<p>New AI breakthroughs in NVIDIA Maxine, cloud-native video streaming AI SDK, slash bandwidth use while making it possible to re-animate faces, correct gaze and animate characters for immersive and engaging meetings.</p>
+</blockquote>
