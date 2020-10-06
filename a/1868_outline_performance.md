@@ -57,7 +57,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### High Performance Outline for many Elements
+### High Performance Outline, Line-Plane Intersection
 
 Today let's talk mainly about geometric analysis and performance:
 
