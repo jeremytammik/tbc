@@ -82,7 +82,7 @@ It works pretty accurately but takes too much time.
 
 The problem described above is a part of a bigger one:
 
-I need to find all the intersections of ducts, pipes and other curve-based elements from a link model with walls, ceilings, columns, etc. in the general model and then place openings in a intersection.
+I need to find all the intersections of ducts, pipes and other curve-based elements from a linked model with walls, ceilings, columns, etc. in the general model and then place openings in the intersections.
 
 I tried to use a combination of `ElementIntersectElement` filter and ` IntersectSolidAndCurve` method to find a part of curve inside element.
 
@@ -97,7 +97,8 @@ I decided to reduce the number of elements by dividing the search areas by level
 This works well for high-rise buildings, but is still bad for extended low structures.
 I decided to divide the building by length, but I did not find a method that finds boundaries for several elements (the whole building).
 
-I seem to go in a wrong way. Is there are right way to make it with revit api instrument
+I seem to be going in a wrong direction.
+Is there are right way to achieve this with the Revit API?
 
 **Answer:** In principle, what you describe is the proper approach and the only way to do it.
 
@@ -396,7 +397,7 @@ The `GetBoundaries` method returns two `XYZ` points: lower and upper, which chan
 }
 </pre>
 
-`Projection` is an extention method for vector to determine the length of projection of one vector onto another:
+`Projection` is an extension method for the vector class to determine the length of projection of one vector onto another:
 
 <pre class="code">
   <span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">PointExt</span>
@@ -433,7 +434,7 @@ Calculating the intersection between a straight line and a plane is pretty easy,
 
 - [Search the Internet for 'line plane intersect'](https://duckduckgo.com/?q=line+plane+intersect)
 - [Read about line-plane intersection on Wikipedia](https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection)
-- [Watch a YouTube video explaning the concepts](https://youtu.be/_W3aVWsMp14)
+- [Watch a YouTube video explaining the concepts](https://youtu.be/_W3aVWsMp14)
 - Many algorithms in different languages to [find the intersection of a line with a plane](https://rosettacode.org/wiki/Find_the_intersection_of_a_line_with_a_plane)
 - A StackOverflow discussion on [3D line-plane intersection](https://stackoverflow.com/questions/5666222/3d-line-plane-intersection)
 
@@ -503,7 +504,7 @@ Ah well.
 By the way, for many other high performance intersection and clipping algorithms, you may want to check
 out [Wykobi](https://www.wykobi.com), an
 
-> extremly efficient, robust and simple to use C++ 2D/3D oriented computational geometry library.
+> extremely efficient, robust and simple to use C++ 2D/3D oriented computational geometry library.
 
 <center>
 <img src="img/wykobi_segmentint.png" alt="Wykobi segment intersection" title="Wykobi segment intersection" width="568"/> <!-- 568 -->
