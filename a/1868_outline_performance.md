@@ -16,14 +16,14 @@
 - set the clipped/unclipped state of the base and survey points in 2021.1
   https://autodesk.slack.com/archives/C0SR6NAP8/p1600379512087800
   Jacob Small:mega-thinking: 17 Sep at 23:51
-Can anyone in Dev confirm this statement is still true?
-The clipped/unclipped state of the base and survey points cannot be set via the API. You can pin them using the Element.Pinned property.
-https://thebuildingcoder.typepad.com/blog/2012/11/survey-and-project-base-point.html
-Jennifer (Xue) Li  5 days ago
-We exposed a new property Clipped for Base Point in R2021.1. So starting from this version, you will have the ability to get/set clipped state for Survey Point. And for Project Base Point, the property is readonly and will always return false because we’ve removed the clipped state fro PBP.
-:celebrate:
-Jacob Small:mega-thinking:  5 days ago
-Yay!!!!! Huge help thanks!
+  Can anyone in Dev confirm this statement is still true?
+  The clipped/unclipped state of the base and survey points cannot be set via the API. You can pin them using the Element.Pinned property.
+  https://thebuildingcoder.typepad.com/blog/2012/11/survey-and-project-base-point.html
+  Jennifer (Xue) Li  5 days ago
+  We exposed a new property Clipped for Base Point in R2021.1. So starting from this version, you will have the ability to get/set clipped state for Survey Point. And for Project Base Point, the property is readonly and will always return false because we’ve removed the clipped state fro PBP.
+  :celebrate:
+  Jacob Small:mega-thinking:  5 days ago
+  Yay!!!!! Huge help thanks!
 
 - BIM360 apps from German university startups now live
   [15 New Integrations with Autodesk Construction Cloud ](https://constructionblog.autodesk.com/15-integrations-autodesk-construction)
@@ -34,12 +34,12 @@ Yay!!!!! Huge help thanks!
 
 - [Inventing Virtual Meetings of Tomorrow with NVIDIA AI Research](https://youtu.be/NqmMnjJ6GEg)
   [Nvidia Maxine Cloud-AI Video-Streaming Platform](https://developer.nvidia.com/maxine)
-New AI breakthroughs in NVIDIA Maxine, cloud-native video streaming AI SDK, slash bandwidth use while make it possible to re-animate faces, correct gaze and animate characters for immersive and engaging meetings. Learn more: https://nvda.ws/3l9foIn
-AI-based face recognition and reconstruction is used, enabling bandwidth reduction by transmitting only animated face keypoint data instead of the entire video keyframe information.
+  New AI breakthroughs in NVIDIA Maxine, cloud-native video streaming AI SDK, slash bandwidth use while make it possible to re-animate faces, correct gaze and animate characters for immersive and engaging meetings. Learn more: https://nvda.ws/3l9foIn
+  AI-based face recognition and reconstruction is used, enabling bandwidth reduction by transmitting only animated face keypoint data instead of the entire video keyframe information.
 
 twitter:
 
-with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+AI-based face keypoint streaming hits mainstream, German university BIM360 construction cloud startups, clipped and unclipped base and survey points, line-plane intersection and high-performance outline calculation and optimisation for a huge model with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/highperfoutline
 
 ### High Performance Outline, Line-Plane Intersection
 
@@ -550,7 +550,7 @@ Check out the two-and-a-half-minute video on [inventing virtual meetings of tomo
 
 <center>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/NqmMnjJ6GEg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-<center>
+</center>
 
 > New AI breakthroughs in NVIDIA Maxine, cloud-native video streaming AI SDK, slash bandwidth use while making it possible to re-animate faces, correct gaze and animate characters for immersive and engaging meetings.
 
