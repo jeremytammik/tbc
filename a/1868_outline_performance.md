@@ -41,8 +41,6 @@ twitter:
 
 AI-based face keypoint streaming hits mainstream, German university BIM360 construction cloud startups, clipped and unclipped base and survey points, line-plane intersection and high-performance outline calculation and optimisation for a huge model with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/highperfoutline
 
-### High Performance Outline, Line-Plane Intersection
-
 Today let's talk mainly about geometric analysis and performance
 &ndash; High-performance outline optimisation
 &ndash; Simple line-plane intersection
@@ -51,6 +49,18 @@ Today let's talk mainly about geometric analysis and performance
 &ndash; AI-based face streaming hits mainstream...
 
 linkedin:
+
+AI-based face keypoint streaming hits mainstream, German university BIM360 construction cloud startups, clipped and unclipped base and survey points, line-plane intersection and high-performance outline calculation and optimisation for a huge model with the #RevitAPI
+
+http://bit.ly/highperfoutline
+
+Today let's talk mainly about geometric analysis and performance:
+
+- High-performance outline optimisation
+- Simple line-plane intersection
+- Set base and survey clipped and unclipped
+- Two German uni BIM360 construction cloud startups
+- AI-based face streaming hits mainstream...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
