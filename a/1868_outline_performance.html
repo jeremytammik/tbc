@@ -1,0 +1,378 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- high-performance optimisation using Revit API for outline for many elements (>100'000 items)
+  e.g., for 54000 walls (after filtering) and 18000 pipes, leading to 972'000'000 operation.
+  How can I get bounding box for several elements?
+  https://stackoverflow.com/questions/63083938/revit-api-how-can-i-get-bounding-box-for-several-elements
+  how to get element nearby specific element using bounding box if it is just outside(some distance apart) bounding box?
+  https://forums.autodesk.com/t5/revit-api-forum/how-to-get-element-nearby-specific-element-using-bounding-box-if/m-p/9741883
+
+- set the clipped/unclipped state of the base and survey points in 2021.1
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1600379512087800
+  Jacob Small:mega-thinking: 17 Sep at 23:51
+Can anyone in Dev confirm this statement is still true?
+The clipped/unclipped state of the base and survey points cannot be set via the API. You can pin them using the Element.Pinned property.
+https://thebuildingcoder.typepad.com/blog/2012/11/survey-and-project-base-point.html
+Jennifer (Xue) Li  5 days ago
+We exposed a new property Clipped for Base Point in R2021.1. So starting from this version, you will have the ability to get/set clipped state for Survey Point. And for Project Base Point, the property is readonly and will always return false because we’ve removed the clipped state fro PBP.
+:celebrate:
+Jacob Small:mega-thinking:  5 days ago
+Yay!!!!! Huge help thanks!
+
+- BIM360 apps from German university startups now live
+  [15 New Integrations with Autodesk Construction Cloud ](https://constructionblog.autodesk.com/15-integrations-autodesk-construction)
+  two Startups from the Forge developer Universities:
+  Gamma AR &ndash; RWTH Aachen 
+  4d planner &ndash; TU Berlin 
+  https://twitter.com/ADSK_Construct/status/1311699100312666113
+
+- [Inventing Virtual Meetings of Tomorrow with NVIDIA AI Research](https://youtu.be/NqmMnjJ6GEg)
+  [Nvidia Maxine Cloud-AI Video-Streaming Platform](https://developer.nvidia.com/maxine)
+New AI breakthroughs in NVIDIA Maxine, cloud-native video streaming AI SDK, slash bandwidth use while make it possible to re-animate faces, correct gaze and animate characters for immersive and engaging meetings. Learn more: https://nvda.ws/3l9foIn
+AI-based face recognition and reconstruction is used, enabling bandwidth reduction by transmitting only animated face keypoint data instead of the entire video keyframe information.
+
+twitter:
+
+with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+&ndash; 
+...
+
+linkedin:
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>High Performance Outline for many Elements</h3>
+<h4><a name="2"></a> High-Performance Optimisation using Revit API for Outline for many Elements</h4>
+<p>If you are interested in using the Revit AAPI in the most performant manner, you ought to check out the StackOverflow discussion
+on <a href="https://stackoverflow.com/questions/63083938/revit-api-how-can-i-get-bounding-box-for-several-elements">How to get the bounding box for several elements</a>.</p>
+<p><strong>Question:</strong> I need to find an outline for many elements (&gt;100'000 items).
+Target elements come from a <code>FilteredElementCollector</code>.
+As usual, I'm looking for the fastest possible way. </p>
+<p>For now, I tried to iterate over all elements to get its <code>BoudingBox.Min</code> and <code>BoudingBox.Max</code> and find out <code>minX</code>, <code>minY</code>, <code>minZ</code>, <code>maxX</code>, <code>maxY</code>, <code>maxZ</code>.
+It works pretty accurately but takes too much time.</p>
+<p>The problem described above is a part of a bigger one:</p>
+<p>I need to find all the intersections of ducts, pipes and other curve-based elements from a link model with walls, ceilings, columns, etc. in the general model and then place openings in a intersection.</p>
+<p>I tried to use a combination of <code>ElementIntersectElement</code> filter and <code>IntersectSolidAndCurve</code> method to find a part of curve inside element.</p>
+<p>First, with an <code>ElementIntersectElement</code>, I tried to reduce a collection for further use of <code>IntersectSolidAndCurve</code>.</p>
+<p><code>IntersectSolidAndCurve</code> takes two arguments, solid and curve, and has to work in two nested one in the other loops.
+So, it takes for 54000 walls (after filtering) and 18000 pipes, in my case, 972'000'000 operations.</p>
+<p>With the number of operations 10 ^ 5, the algorithm shows an acceptable time.</p>
+<p>I decided to reduce the number of elements by dividing the search areas by levels.
+This works well for high-rise buildings, but is still bad for extended low structures.
+I decided to divide the building by length, but I did not find a method that finds boundaries for several elements (the whole building).</p>
+<p>I seem to go in a wrong way. Is there are right way to make it with revit api instrument</p>
+<p><strong>Answer:</strong> In principle, what you describe is the proper approach and the only way to do it.</p>
+<p>However, there may be many possibilities to optimise your code.
+The Building Coder provides various utility functions that may help.
+For instance, to <a href="https://thebuildingcoder.typepad.com/blog/2017/03/family-bounding-box-and-aec-hackathon-munich.html#3">determine the bounding box of an entire family</a>.
+Many more in <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs">The Building Coder samples <code>Util</code> module</a>.
+Search there for "bounding box".
+I am sure they can be further optimised as well for your case.
+For instance, you may be able to extract all the <code>X</code> coordinates from all the individual elements' bounding box <code>Max</code> values and use a generic <code>Max</code> function to determine their maximum in one single call instead of comparing them one by one.
+<a href="https://thebuildingcoder.typepad.com/blog/2012/01/timer-code-for-benchmarking.html">Benchmark your code</a> to discover optimisation possibilities and analyse their effect on the performance. </p>
+<p><strong>Response:</strong> Thanks to Jeremy for advice and input on this issue.
+I published my final result below and did some research on performance and accuracy.
+The code in my answer processed in 3-5 seconds / 100'000 elements and works accurate in most cases.
+However, there are cases where the <code>BoundingBoxIntersectsFilter</code> filters the item when it does not cross the <code>Outline</code>.
+This happens if there is invisible geometry in the family.
+There are other possible reasons that I have not yet found. More tests need to be done anyway.</p>
+<p><strong>Answer:</strong> Thank you very much for your appreciation and sharing your interesting code.
+Using the built-in Revit filtering mechanisms will definitely be a lot faster than anything you can achieve in .NET, outside Revit memory.
+However, I do not yet understand how you can use this to achieve the goal you describe above.
+I thought you needed the collective bounding box of all elements.
+You, however, seem to have an input variable of 500 meters and o be checking whether that contains all the elements.
+Can you please explain the exact use of this algorithm, and the exact input and output data?</p>
+<p><strong>Response:</strong> Jeremy, you're absolutely right.
+The minimum and maximum points in 3d-space are fed to the input to the method, so that all the elements are inside the outline built on that points, then we find the extreme points along <code>x</code> <code>y</code> <code>z</code>.
+The output is 2 outline points. </p>
+<h4><a name="2.1"></a> Solution</h4>
+<p>To find boundaries, we can take advantage of the binary search idea. </p>
+<p>The difference from the classic binary search algorithm is there is not an array, and we should find two numbers instead of one.</p>
+<p>Elements in Geometry space could be presented as a 3-dimensional sorted array of <code>XYZ</code> points. </p>
+<p>The Revit API provides an excellent <code>Quick Filter</code>, the <code>BoundingBoxIntersectsFilter</code>, that takes an instance of an <code>Outline</code>.</p>
+<p>So, let’s define an area that includes all the elements for which we want to find the boundaries.
+For my case, for example 500 meters, and create <code>min</code> and <code>max</code> point for the initial outline:</p>
+<p><code>double b = 500000 / 304.8;
+  XYZ min = new XYZ(-b, -b, -b);
+  XYZ max = new XYZ(b, b, b);</code></p>
+<p>Below is an implementation for one direction; you can easily use it for three directions by calling and feeding the result of the previous iteration to the input:</p>
+<p>```
+  double precision = 10e-6 / 304.8;
+  var bb = new BinaryUpperLowerBoundsSearch(doc, precision);</p>
+<p>XYZ[] rx = bb.GetBoundaries(min, max, elems, BinaryUpperLowerBoundsSearch.Direction.X);
+  rx = bb.GetBoundaries(rx[0], rx[1], elems, BinaryUpperLowerBoundsSearch.Direction.Y);
+  rx = bb.GetBoundaries(rx[0], rx[1], elems, BinaryUpperLowerBoundsSearch.Direction.Z);
+```</p>
+<p>The <code>GetBoundaries</code> method returns two <code>XYZ</code> points: lower and upper, which change only in the target direction; the other two dimensions remain unchanged:</p>
+<p>```
+  public class BinaryUpperLowerBoundsSearch
+  {
+    private Document doc;</p>
+<pre><code>private double tolerance;
+private XYZ min;
+private XYZ max;
+private XYZ direction;
+
+public BinaryUpperLowerBoundsSearch(Document document, double precision)
+{
+  doc = document;
+  this.tolerance = precision;
+}
+
+public enum Direction
+{
+  X,
+  Y,
+  Z
+}
+
+/// &lt;summary&gt;
+/// Searches for an area that completely includes all elements within a given precision.
+/// The minimum and maximum points are used for the initial assessment. 
+/// The outline must contain all elements.
+/// &lt;/summary&gt;
+/// &lt;param name="minPoint"&gt;The minimum point of the BoundBox used for the first approximation.&lt;/param&gt;
+/// &lt;param name="maxPoint"&gt;The maximum point of the BoundBox used for the first approximation.&lt;/param&gt;
+/// &lt;param name="elements"&gt;Set of elements&lt;/param&gt;
+/// &lt;param name="axe"&gt;The direction along which the boundaries will be searched&lt;/param&gt;
+/// &lt;returns&gt;Returns two points: first is the lower bound, second is the upper bound&lt;/returns&gt;
+public XYZ[] GetBoundaries( XYZ minPoint, XYZ maxPoint,
+  ICollection&lt;ElementId&gt; elements, Direction axe )
+{
+  // Since Outline is not derived from an Element class there 
+  // is no possibility to apply transformation, so
+  // we have use as a possible directions only three vectors of basis
+
+  switch (axe)
+  {
+    case Direction.X:
+      direction = XYZ.BasisX;
+      break;
+    case Direction.Y:
+      direction = XYZ.BasisY;
+      break;
+    case Direction.Z:
+      direction = XYZ.BasisZ;
+      break;
+    default:
+      break;
+  }
+
+  // Get the lower and upper bounds as a projection on a direction vector
+  // Projection is an extention method
+
+  double lowerBound = minPoint.Projection(direction);
+  double upperBound = maxPoint.Projection(direction);
+
+  // Set the boundary points in the plane perpendicular to the direction vector. 
+  // These points are needed to create BoundingBoxIntersectsFilter when IsContainsElements calls.
+
+  min = minPoint - lowerBound * direction;
+  max = maxPoint - upperBound * direction;
+
+  double[] res = UpperLower(lowerBound, upperBound, elements);
+  return new XYZ[2]
+  {
+    res[0] * direction + min,
+    res[1] * direction + max,
+  };
+}
+
+/// &lt;summary&gt;
+/// Check if there are any elements contains in the segment [lower, upper]
+/// &lt;/summary&gt;
+/// &lt;returns&gt;True if any elements are in the segment&lt;/returns&gt;
+private ICollection&lt;ElementId&gt; IsContainsElements( double lower,
+  double upper, ICollection&lt;ElementId&gt; ids )
+{
+  var outline = new Outline(min + direction * lower, max + direction * upper);
+  return new FilteredElementCollector(doc, ids)
+    .WhereElementIsNotElementType()
+    .WherePasses(new BoundingBoxIntersectsFilter(outline))
+    .ToElementIds();
+}
+
+private double[] UpperLower( double lower,
+  double upper, ICollection&lt;ElementId&gt; ids )
+{
+  // Get the Midpoint for segment mid = lower + 0.5 * (upper - lower)
+
+  var mid = Midpoint(lower, upper);
+
+  // Сheck if the first segment contains elements
+
+  ICollection&lt;ElementId&gt; idsFirst = IsContainsElements(lower, mid, ids);
+  bool first = idsFirst.Any();
+
+  // Сheck if the second segment contains elements
+
+  ICollection&lt;ElementId&gt; idsSecond = IsContainsElements(mid, upper, ids);
+  bool second = idsSecond.Any();
+
+  // If elements are in both segments 
+  // then the first segment contains the lower border 
+  // and the second contains the upper
+  // ---------**|***--------
+
+  if (first &amp;&amp; second)
+  {
+    return new double[2]
+    {
+      Lower(lower, mid, idsFirst),
+      Upper(mid, upper, idsSecond),
+    };
+  }
+
+  // If elements are only in the first segment it contains both borders. 
+  // We recursively call the method UpperLower until 
+  // the lower border turn out in the first segment and 
+  // the upper border is in the second
+  // ---*****---|-----------
+
+  else if (first &amp;&amp; !second)
+    return UpperLower(lower, mid, idsFirst);
+
+  // Do the same with the second segment
+  // -----------|---*****---
+
+  else if (!first &amp;&amp; second)
+    return UpperLower(mid, upper, idsSecond);
+
+  // Elements are out of the segment
+  // ** -----------|----------- **
+
+  else
+    throw new ArgumentException(
+      "Segment does not contains elements. Try to make initial boundaries wider",
+      "lower, upper" );
+}
+
+/// &lt;summary&gt;
+/// Search the lower boundary of a segment containing elements
+/// &lt;/summary&gt;
+/// &lt;returns&gt;Lower boundary&lt;/returns&gt;
+private double Lower( double lower, double upper,
+  ICollection&lt;ElementId&gt; ids)
+{
+  // If the boundaries are within tolerance return lower bound
+
+  if (IsInTolerance(lower, upper))
+    return lower;
+
+  // Get the Midpoint for segment mid = lower + 0.5 * (upper - lower)
+
+  var mid = Midpoint(lower, upper);
+
+  // Сheck if the segment contains elements
+
+  ICollection&lt;ElementId&gt; idsFirst = IsContainsElements(lower, mid, ids);
+  bool first = idsFirst.Any();
+
+  // ---*****---|-----------
+
+  if (first)
+    return Lower(lower, mid, idsFirst);
+
+  // -----------|-----***---
+
+  else
+    return Lower(mid, upper, ids);
+}
+
+/// &lt;summary&gt;
+/// Search the upper boundary of a segment containing elements
+/// &lt;/summary&gt;
+/// &lt;returns&gt;Upper boundary&lt;/returns&gt;
+private double Upper( double lower, double upper,
+  ICollection&lt;ElementId&gt; ids )
+{
+  // If the boundaries are within tolerance return upper bound
+
+  if (IsInTolerance(lower, upper))
+    return upper;
+
+  // Get the Midpoint for segment mid = lower + 0.5 * (upper - lower)
+
+  var mid = Midpoint(lower, upper);
+
+  // Сheck if the segment contains elements
+
+  ICollection&lt;ElementId&gt; idsSecond = IsContainsElements(mid, upper, ids);
+  bool second = idsSecond.Any();
+
+  // -----------|----*****--
+
+  if (second)
+    return Upper(mid, upper, idsSecond);
+
+  // ---*****---|-----------
+
+  else
+    return Upper(lower, mid, ids);
+}
+
+private double Midpoint(double lower, double upper)
+  =&gt; lower + 0.5 * (upper - lower);
+
+private bool IsInTolerance(double lower, double upper)
+  =&gt; upper - lower &lt;= tolerance;
+</code></pre>
+<p>}
+```</p>
+<p><code>Projection</code> is an extention method for vector to determine the length of projection of one vector onto another:</p>
+<p><code>public static class PointExt
+  {
+    public static double Projection( this XYZ vector, XYZ other) =&gt;
+      vector.DotProduct(other) / other.GetLength();
+  }</code></p>
+<p>Many thanks to <a href="https://stackoverflow.com/users/9958255/alexey-ovchinnikov">Alexey Ovchinnikov</a> for his impressive analysis and research and sharing the useful result.</p>
+<p>By the way, for high performance intersection and clipping algorithms, you may want to check
+out <a href="https://www.wykobi.com">Wykobi</a>, an</p>
+<blockquote>
+<p>extremly efficient, robust and simple to use C++ 2D/3D oriented computational geometry library.</p>
+</blockquote>
+<p><center>
+<img src="img/wykobi_segmentint.png" alt="Wykobi segment intersection" title="Wykobi segment intersection" width="568"/> <!-- 568 -->
+</center></p>
+<h4><a name="3"></a> Set Base and Survey Clipped and Unclipped</h4>
+<p>As we pointed out in the discussion on <a href="https://thebuildingcoder.typepad.com/blog/2012/11/survey-and-project-base-point.html">survey and project base points</a> in 2012, <em>the clipped/unclipped state of the base and survey points could not be set via the API. You could pin them using the Element.Pinned property</em>... back then.</p>
+<p>Happily and finally, Revit 2021.1 exposed a new property <code>Clipped</code> for the base point,
+cf. <a href="https://thebuildingcoder.typepad.com/blog/2020/08/revit-20211-sdk-and-whats-new.html#6.3.2">Clipped state of BasePoint</a>
+in <a href="https://thebuildingcoder.typepad.com/blog/2020/08/revit-20211-sdk-and-whats-new.html">What's New in the Revit 2021.1 API</a>.</p>
+<p>So, starting from this version, you have the ability to get and set the clipped state for the Survey Point.
+For Project Base Point, the property is read-only and will always return false, since the clipped state has been removed from that.</p>
+<h4><a name="4"></a> Two German Uni BIM360 Construction Cloud Startups</h4>
+<p>Two innovative BIM360 apps from German Forge developer university startups
+are now live, <a href="https://twitter.com/ADSK_Construct/status/1311699100312666113">says</a>
+Phil <a href="https://twitter.com/contech101">@contech101</a> Mueller, cf.
+the <a href="https://constructionblog.autodesk.com/15-integrations-autodesk-construction">15 new integrations with Autodesk construction cloud</a>:</p>
+<ul>
+<li><a href="https://construction.autodesk.com/integrations/gamma-ar">Gamma AR</a> &ndash; RWTH Aachen </li>
+<li><a href="https://construction.autodesk.com/integrations/4d-planner">4D-Planner</a> &ndash; TU Berlin </li>
+</ul>
+<h4><a name="5"></a> AI-Based Face Streaming hits the Mainstream</h4>
+<p>AI-based face recognition and reconstruction is entering the mainstream through
+the <a href="https://developer.nvidia.com/maxine">Nvidia Maxine Cloud-AI Video-Streaming Platform</a>.</p>
+<p>It aims to drastically reduce video conferencing bandwidth requirements by transmitting only animated face keypoint data instead of the entire video keyframe information, and reconstructing the animated current presenters face based on some initial video data and the face keypoint data.</p>
+<p>Check out the two-and-a-half-minute video on <a href="https://youtu.be/NqmMnjJ6GEg">inventing virtual meetings of tomorrow with Nvidia AI research</a>:</p>
+<p><center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/NqmMnjJ6GEg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<center></p>
+<blockquote>
+<p>New AI breakthroughs in NVIDIA Maxine, cloud-native video streaming AI SDK, slash bandwidth use while making it possible to re-animate faces, correct gaze and animate characters for immersive and engaging meetings.</p>
+</blockquote>
