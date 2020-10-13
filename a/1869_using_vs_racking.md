@@ -175,7 +175,7 @@ I just restart VS or even reboot Windows (under Parallels on Mac) and all is wel
 ####<a name="4"></a> Native Sons
 
 John Candela pays tribute to Native Americans for Monday,
-[Indigenous People's Day](https://en.wikipedia.org/wiki/Indigenous_Peoples%27_Day) with
+[Indigenous People's Day](https://en.wikipedia.org/wiki/Indigenous_Peoples%27_Day), with
 his track [Native Sons](https://soundcloud.com/jdcandela/native-sons):
 
 <center>
