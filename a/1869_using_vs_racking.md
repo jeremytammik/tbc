@@ -140,7 +140,7 @@ I don’t have any interesting code snippet to share.
 It’s basically a `TransactionGroup` with an `Assimilate` call in an `IF` statement and a forgotten `Rollback` in the `ELSE`.
 
 <center>
-<img src="img/brain-rack.png" alt="Brain rack" title="Brain rack" width="519"/> <!-- 519 -->
+<img src="img/brain-rack.png" alt="Brain rack" title="Brain rack" width="300"/> <!-- 519 -->
 </center>
 
 ####<a name="3"></a> On the VS Operation Unspecified Error 
@@ -162,11 +162,11 @@ Anyway, without being clear the exact steps, when I do see the error, I found on
 
 Could it have something to do with switching header files, or switching from debug to release?
 
-It may, but I have seen it just simple closing one solution and and loading another.
+It may, but I have seen it just simple closing one solution and loading another.
 
 I also got it in a standalone C# solution with some C++ projects.
 It usually appears while trying to compile the C++ projects, which are a interop dependency for the C# projects &ndash; one theory is that somehow the C# binary locks the C++ one and doesn’t let msbuild query it for… god knows what, since interop is done at runtime afaik (never seen this error on rebuild, only build ).
-And yes, only VS restart cures it; fortunately we rarely touch the C++ projects, so I just ignored this error so far. 
+And yes, only VS restart cures it; fortunately, we rarely touch the C++ projects, so I just ignored this error so far. 
 
 Jeremy adds: I never touch C++ code, only C# Revit add-ins, and I see this message now and then as well.
 I just restart VS or even reboot Windows (under Parallels on Mac) and all is well.
@@ -179,6 +179,6 @@ John Candela pays tribute to Native Americans for Monday,
 his track [Native Sons](https://soundcloud.com/jdcandela/native-sons):
 
 <center>
-<iframe width="80%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/908029177&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/jdcandela" title="JC" target="_blank" style="color: #cccccc; text-decoration: none;">JC</a> · <a href="https://soundcloud.com/jdcandela/native-sons" title="Native Sons" target="_blank" style="color: #cccccc; text-decoration: none;">Native Sons</a></div>
-<.center>
+<iframe width="500" height="100" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/908029177&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/jdcandela" title="JC" target="_blank" style="color: #cccccc; text-decoration: none;">JC</a> · <a href="https://soundcloud.com/jdcandela/native-sons" title="Native Sons" target="_blank" style="color: #cccccc; text-decoration: none;">Native Sons</a></div>
+</center>
 
