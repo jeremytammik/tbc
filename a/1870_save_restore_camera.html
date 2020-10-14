@@ -1,0 +1,182 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- restore 3D view camera orientation
+  https://thebuildingcoder.typepad.com/blog/2020/04/revit-camera-fov-forge-partner-talks-and-jobs.html#comment-5106250525
+
+- Ehsan [@eirannejad](https://github.com/eirannejad) Iran-Nejad's [Revit cheatsheets](https://github.com/eirannejad/revit-cheatsheets)
+  eirannejad_cheatsheet_keynote_file.png
+  > Here is all the Revit cheat sheets I made in the past years to make life easier working with Revit. Want to add yours as well?!
+  https://twitter.com/eirannejad/status/1313890807368228864
+
+twitter:
+
+ in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+
+&ndash; 
+...
+
+linkedin:
+
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>Save and Restore Camera Orientation</h3>
+<h4><a name="2"></a> Serialising 3D View Camera Settings</h4>
+<p>Valerii Nozdrenkov shared a powerful solution for serialising the 3D view camera settings
+<a href="https://thebuildingcoder.typepad.com/blog/2020/04/revit-camera-fov-forge-partner-talks-and-jobs.html#comment-4929308181">in</a>
+<a href="https://thebuildingcoder.typepad.com/blog/2020/04/revit-camera-fov-forge-partner-talks-and-jobs.html#comment-5106250525">a</a>
+<a href="https://thebuildingcoder.typepad.com/blog/2020/04/revit-camera-fov-forge-partner-talks-and-jobs.html#comment-5107042312">series</a>
+<a href="https://thebuildingcoder.typepad.com/blog/2020/04/revit-camera-fov-forge-partner-talks-and-jobs.html#comment-5107053457">of</a>
+<a href="https://thebuildingcoder.typepad.com/blog/2020/04/revit-camera-fov-forge-partner-talks-and-jobs.html#comment-5107690269">comments</a>, 
+nicely complementing previous explorations on:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/setting-up-your-vieworientation3d.html">Setting up your <code>ViewOrientation3D</code></a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/setting-a-default-3d-view-orientation.html">Exporting Image and setting a default 3D view orientation</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/06/revit-camera-settings-project-plasma-da4r-and-ai.html#2">Mapping Forge viewer camera settings back to Revit</a></li>
+</ul>
+<p><strong>Question:</strong> I have a question about <code>View3D</code> camera settings.
+I want to serialize view 3D camera orientation.
+It works fine if a projection mode is perspective.
+When I zoom in or out, the method <code>GetOrientation</code> gives correct values for perspective camera (the position of the camera is changed), but in orthographic projection mode, <code>GetOrientation</code> always returns the same value regardless of zoom in/out (position of the camera is changed), so I can't recreate saved camera orientation in orthographic mode. There must be another transformation to apply, but I don't know where to take it from.</p>
+<p>Currently, I need to change position manually in order to apply changes made by zooming in or out.</p>
+<p>I found, there is a method <code>GetZoomCorners</code> of class <code>UIView</code>; this is a bounding box.
+Its values change after zoom in/out, but how can I move the <code>EyePosition</code> accordingly?</p>
+<p>Any suggestions?</p>
+<p><strong>Answer:</strong> I investigated the problem of saving and restoring the current Revit View 3D.
+For a perspective projection mode, it was very simple: just save camera parameters and then restore them.
+But for orthographic projection mode, I found that the camera parameters are not changed after zooming or panning the model; compare the following two figures.</p>
+<p>Before:</p>
+<p><center>
+<img src="img/vn_3d_camera_orientation_1_before.png" alt="Camera parameters before zooming and panning" title="Camera parameters before zooming and panning" width="600"/> <!-- 1468 -->
+<p style="font-size: 80%; font-style:italic">Camera parameters before zooming and panning</p>
+</center></p>
+<p>After:</p>
+<p><center>
+<img src="img/vn_3d_camera_orientation_2_after.png" alt="Camera parameters after zooming and panning" title="Camera parameters after zooming and panning" width="600"/> <!-- 1478 -->
+<p style="font-size: 80%; font-style:italic">Camera parameters after zooming and panning</p>
+</center></p>
+<p>After desperate Googling, I found the solution of this task in GitHub, in the 
+<a href="https://github.com/teocomi/BCFier/blob/master/Bcfier.Revit/Data/RevitView.cs">RevitView.cs module</a> of
+the <a href="https://github.com/teocomi/BCFier">BCFier project</a>
+by <a href="https://github.com/mgrzelak">@mgrzelak</a>.</p>
+<p>The idea is:</p>
+<p>Saving:</p>
+<ol>
+<li>
+<p>Get corners of the active UI view Corner1 {x1,y1,z1} and Corner2 {x2,y2,z2}</p>
+<p><pre class="code">
+IList<uiview> views = uidoc.GetOpenUIViews();
+UIView currentView = views.Where(t =&gt; t.ViewId == view3D.Id).FirstOrDefault();
+//Corners of the active UI view
+IList<xyz> corners = currentView.GetZoomCorners();
+XYZ corner1 = corners[0];
+XYZ corner2 = corners[1];
+</pre></p>
+</li>
+<li>
+<p>Calculate center point {0.5(x1+x2),0.5(y1+y2),0.5(z1+z2)}</p>
+<p><pre class="code">
+double x = (corner1.X + corner2.X) / 2;
+double y = (corner1.Y + corner2.Y) / 2;
+double z = (corner1.Z + corner2.Z) / 2;
+//center of the UI view
+XYZ viewCenter = new XYZ(x, y, z);
+</pre></p>
+</li>
+<li>
+<p>Calculate diagonal vector</p>
+<p><pre class="code">
+diagVector = Corner1-Corner2={x1-x2,y1-y2,z1-z2}
+XYZ diagVector = corner1 - corner2;
+</pre></p>
+</li>
+<li>
+<p>Get up and right vectors</p>
+<p><pre class="code">
+ViewOrientation3D viewOrientation3D = view3D.GetOrientation();
+XYZ upDirection = viewOrientation3D.UpDirection;
+XYZ rightDirection = forwardDirection.CrossProduct(upDirection);
+</pre></p>
+</li>
+<li>
+<p>Calculate height=abs(diagVector*upVector);</p>
+<p><pre class="code">
+double height = Math.Abs(diagVector.DotProduct(upDirection));
+</pre></p>
+</li>
+<li>
+<p>Find scale = 0.5 * height</p>
+<p>But, the provided solution doesn’t work correctly if the height &gt; width.</p>
+<p>So, we need to take into account both height and width:</p>
+<p><pre class="code">
+double height = Math.Abs(diagVector.DotProduct(upDirection));
+double width = Math.Abs(diagVector.DotProduct(rightDirection));
+</pre></p>
+<p>Then we have to find the minimal minside = min(height,width)</p>
+<p><pre class="code">
+double minside = Math.Min(height, width);
+</pre></p>
+</li>
+<li>
+<p>scale = 0.5 * minside</p>
+</li>
+<li>
+<p>Save center point (eyePosition=viewCenter), upDirection, forwardDirection and scale.</p>
+</li>
+</ol>
+<p>Restoring is the same as in provided above link to GitHub project:</p>
+<ol>
+<li>Get prevously saved eyePosition, upDirection, forwardDirection and scale.</li>
+<li>
+<p>Move the camera to preciously saved eyePosition</p>
+<p><pre class="code">
+var orientation = new ViewOrientation3D(eyePosition, upDirection, forwardDirection);
+view3D.SetOrientation(orientation);
+</pre></p>
+</li>
+<li>
+<p>Calculate corners of square</p>
+<p>Upper left:</p>
+<p><pre class="code">
+Corner1 = eyePosition+scale<em>upVector-scale</em>rightVector
+</pre></p>
+<p>Lower right:</p>
+<p><pre class="code">
+Corner2 = eyePosition-scale<em>upVector+scale</em>rightVector</p>
+<p>XYZ Corner1 = position + upDirection<em> scale - uidoc.ActiveView.RightDirection * scale;
+XYZ Corner2 = position - upDirection</em> scale + uidoc.ActiveView.RightDirection * scale;
+</pre></p>
+</li>
+<li>
+<p>ZoomCorners</p>
+<p><pre class="code">
+ZoomAndCenterRectangle(Corner1, Corner2);
+uidoc.GetOpenUIViews().FirstOrDefault(t =&gt; t.ViewId == view3D.Id).ZoomAndCenterRectangle(Corner1, Corner2);
+</pre></p>
+</li>
+</ol>
+<p>Here are two more figures illustrating the scale calculation and zooming corners:</p>
+<p><center>
+<img src="img/vn_3d_camera_orientation_3_scale_calc.png" alt="Scale calculation" title="Scale calculation" width="500"/> <!-- 1081 -->
+<p style="font-size: 80%; font-style:italic">Scale calculation</p> 
+<img src="img/vn_3d_camera_orientation_4_zoom_corners.png" alt="Zooming corners" title="Zooming corners" width="430"/> <!-- 899 -->
+<p style="font-size: 80%; font-style:italic">Zooming corners</p>
+</center></p>
+<p>I prepared a sample project to share fully implementing this task in
+the <a href="https://github.com/Valerii-Nozdrenkov/RevitOrthoCamera">RevitOrthoCamera GitHub repository</a>.</p>
+<p>Very many thanks indeed to Valerii for all his valuable work researching and documenting this!</p>
+<h4><a name="3"></a></h4>

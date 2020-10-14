@@ -35,9 +35,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-
 ### Save and Restore Camera Orientation
 
+Today, Valerii Nozdrenkov shares a powerful solution to Save and Restore the 3D view Camera Orientation, and Ehsan Iran-Nejad publishes his set of Revit cheat sheets:
+
+- [Serialising 3D view camera settings](#2)
+- [Revit cheat sheets](#3)
 
 ####<a name="2"></a> Serialising 3D View Camera Settings
 
@@ -72,14 +75,14 @@ But for orthographic projection mode, I found that the camera parameters are not
 Before:
 
 <center>
-<img src="img/vn_3d_camera_orientation_1.png" alt="Camera parameters before zooming and panning" title="Camera parameters before zooming and panning" width="600"/>
+<img src="img/vn_3d_camera_orientation_1_before.png" alt="Camera parameters before zooming and panning" title="Camera parameters before zooming and panning" width="600"/> <!-- 1468 -->
 <p style="font-size: 80%; font-style:italic">Camera parameters before zooming and panning</p>
 </center>
 
 After:
 
 <center>
-<img src="img/vn_3d_camera_orientation_1.png" alt="Camera parameters after zooming and panning" title="Camera parameters after zooming and panning" width="600"/>
+<img src="img/vn_3d_camera_orientation_2_after.png" alt="Camera parameters after zooming and panning" title="Camera parameters after zooming and panning" width="600"/> <!-- 1478 -->
 <p style="font-size: 80%; font-style:italic">Camera parameters after zooming and panning</p>
 </center>
 
@@ -105,103 +108,114 @@ Saving:
 
 2. Calculate center point {0.5(x1+x2),0.5(y1+y2),0.5(z1+z2)}
 
-  <pre class="code">
-  double x = (corner1.X + corner2.X) / 2;
-  double y = (corner1.Y + corner2.Y) / 2;
-  double z = (corner1.Z + corner2.Z) / 2;
-  //center of the UI view
-  XYZ viewCenter = new XYZ(x, y, z);
-  </pre>
+    <pre class="code">
+    double x = (corner1.X + corner2.X) / 2;
+    double y = (corner1.Y + corner2.Y) / 2;
+    double z = (corner1.Z + corner2.Z) / 2;
+    //center of the UI view
+    XYZ viewCenter = new XYZ(x, y, z);
+    </pre>
 
 3. Calculate diagonal vector
 
-  <pre class="code">
-  diagVector = Corner1-Corner2={x1-x2,y1-y2,z1-z2}
-  XYZ diagVector = corner1 - corner2;
-  </pre>
+    <pre class="code">
+    diagVector = Corner1-Corner2={x1-x2,y1-y2,z1-z2}
+    XYZ diagVector = corner1 - corner2;
+    </pre>
 
 4. Get up and right vectors
 
-  <pre class="code">
-  ViewOrientation3D viewOrientation3D = view3D.GetOrientation();
-  XYZ upDirection = viewOrientation3D.UpDirection;
-  XYZ rightDirection = forwardDirection.CrossProduct(upDirection);
-  </pre>
+    <pre class="code">
+    ViewOrientation3D viewOrientation3D = view3D.GetOrientation();
+    XYZ upDirection = viewOrientation3D.UpDirection;
+    XYZ rightDirection = forwardDirection.CrossProduct(upDirection);
+    </pre>
 
 5. Calculate height=abs(diagVector*upVector);
 
-  <pre class="code">
-  double height = Math.Abs(diagVector.DotProduct(upDirection));
-  </pre>
+    <pre class="code">
+    double height = Math.Abs(diagVector.DotProduct(upDirection));
+    </pre>
 
 6. Find scale = 0.5 * height
 
-But, the provided solution doesn’t work correctly if the height > width.
+    But, the provided solution doesn’t work correctly if the height &gt; width.
 
-So, we need to take into account both height and width:
+    So, we need to take into account both height and width:
 
-  <pre class="code">
-  double height = Math.Abs(diagVector.DotProduct(upDirection));
-  double width = Math.Abs(diagVector.DotProduct(rightDirection));
-  </pre>
+    <pre class="code">
+    double height = Math.Abs(diagVector.DotProduct(upDirection));
+    double width = Math.Abs(diagVector.DotProduct(rightDirection));
+    </pre>
 
-Then we have to find the minimal minside = min(height,width)
+    Then we have to find the minimal minside = min(height,width)
 
-  <pre class="code">
-  double minside = Math.Min(height, width);
-  </pre>
+    <pre class="code">
+    double minside = Math.Min(height, width);
+    </pre>
 
-6. scale = 0.5 * minside
+7. scale = 0.5 * minside
 
-7. Save center point (eyePosition=viewCenter), upDirection, forwardDirection and scale.
+8. Save center point (eyePosition=viewCenter), upDirection, forwardDirection and scale.
 
 Restoring is the same as in provided above link to GitHub project:
 
 1. Get prevously saved eyePosition, upDirection, forwardDirection and scale.
 2. Move the camera to preciously saved eyePosition
 
-  <pre class="code">
-  var orientation = new ViewOrientation3D(eyePosition, upDirection, forwardDirection);
-  view3D.SetOrientation(orientation);
-  </pre>
+    <pre class="code">
+    var orientation = new ViewOrientation3D(eyePosition, upDirection, forwardDirection);
+    view3D.SetOrientation(orientation);
+    </pre>
 
 3. Calculate corners of square
 
-Up_Left:
+    Upper left:
 
-  <pre class="code">
-  Corner1 = eyePosition+scale*upVector-scale*rightVector
-  </pre>
+    <pre class="code">
+    Corner1 = eyePosition+scale*upVector-scale*rightVector
+    </pre>
 
-Down_Right:
+    Lower right:
 
-  <pre class="code">
-  Corner2 = eyePosition-scale*upVector+scale*rightVector
-
-  XYZ Corner1 = position + upDirection* scale - uidoc.ActiveView.RightDirection * scale;
-  XYZ Corner2 = position - upDirection* scale + uidoc.ActiveView.RightDirection * scale;
-  </pre>
+    <pre class="code">
+    Corner2 = eyePosition-scale*upVector+scale*rightVector
+  
+    XYZ Corner1 = position + upDirection* scale - uidoc.ActiveView.RightDirection * scale;
+    XYZ Corner2 = position - upDirection* scale + uidoc.ActiveView.RightDirection * scale;
+    </pre>
 
 4. ZoomCorners
 
-  <pre class="code">
-  ZoomAndCenterRectangle(Corner1, Corner2);
-  uidoc.GetOpenUIViews().FirstOrDefault(t => t.ViewId == view3D.Id).ZoomAndCenterRectangle(Corner1, Corner2);
-  </pre>
+    <pre class="code">
+    ZoomAndCenterRectangle(Corner1, Corner2);
+    uidoc.GetOpenUIViews().FirstOrDefault(t => t.ViewId == view3D.Id).ZoomAndCenterRectangle(Corner1, Corner2);
+    </pre>
 
 Here are two more figures illustrating the scale calculation and zooming corners:
 
 <center>
-<img src="img/vn_3d_camera_orientation_3_scale_calc.png" alt="Scale calculation" title="Scale calculation" width="600"/>
-<p style="font-size: 80%; font-style:italic">Scale calculation</p>
-<img src="img/vn_3d_camera_orientation_3_scale_calc.png" alt="Zooming corners" title="Zooming corners" width="600"/>
+<img src="img/vn_3d_camera_orientation_3_scale_calc.png" alt="Scale calculation" title="Scale calculation" width="500"/> <!-- 1081 -->
+<p style="font-size: 80%; font-style:italic">Scale calculation</p> 
+<img src="img/vn_3d_camera_orientation_4_zoom_corners.png" alt="Zooming corners" title="Zooming corners" width="430"/> <!-- 899 -->
 <p style="font-size: 80%; font-style:italic">Zooming corners</p>
 </center>
 
-I prepared and sahre a sample project to fully implement this task in
+I prepared and share a sample project fully implementing this task in
 the [RevitOrthoCamera GitHub repository](https://github.com/Valerii-Nozdrenkov/RevitOrthoCamera).
 
 Very many thanks indeed to Valerii for all his valuable work researching and documenting this!
 
 
-####<a name="3"></a> 
+####<a name="3"></a> Revit Cheat Sheets
+
+Ehsan [@eirannejad](https://github.com/eirannejad) Iran-Nejad [shares](https://twitter.com/eirannejad/status/1313890807368228864)
+his [Revit cheatsheets](https://github.com/eirannejad/revit-cheatsheets) for
+all to enjoy:
+
+> Here are all the Revit cheat sheets I made in the past years to make life easier working with Revit.
+Want to add yours as well?!
+
+<center>
+<img src="img/eirannejad_cheatsheet_keynote_file.png" alt="Keynote file cheat sheet" title="Keynote file cheat sheet" width="500"/> <!-- 1539 -->
+</center>
