@@ -18,8 +18,9 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash; 
-...
+Valerii Nozdrenkov shares a powerful solution to save and restore the complete 3D view camera settings and Ehsan Iran-Nejad publishes his set of Revit cheat sheets
+&ndash; Serialising 3D view camera settings
+&ndash; Revit cheat sheets...
 
 linkedin:
 
@@ -201,7 +202,7 @@ Here are two more figures illustrating the scale calculation and zooming corners
 <p style="font-size: 80%; font-style:italic">Zooming corners</p>
 </center>
 
-I prepared and share a sample project fully implementing this task in
+I prepared a sample project fully implementing this task to share in
 the [RevitOrthoCamera GitHub repository](https://github.com/Valerii-Nozdrenkov/RevitOrthoCamera).
 
 Very many thanks indeed to Valerii for all his valuable work researching and documenting this!
