@@ -35,9 +35,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Save and Restore Camera Orientation
+### Save and Restore 3D View Camera Settings
 
-Today, Valerii Nozdrenkov shares a powerful solution to Save and Restore the 3D view Camera Orientation, and Ehsan Iran-Nejad publishes his set of Revit cheat sheets:
+Today, Valerii Nozdrenkov shares a powerful solution to save and restore the complete 3D view camera settings, and Ehsan Iran-Nejad publishes his set of Revit cheat sheets:
 
 - [Serialising 3D view camera settings](#2)
 - [Revit cheat sheets](#3)
@@ -53,7 +53,7 @@ Valerii Nozdrenkov shared a powerful solution for serialising the 3D view camera
 nicely complementing previous explorations on:
 
 - [Setting up your `ViewOrientation3D`](http://thebuildingcoder.typepad.com/blog/2013/04/setting-up-your-vieworientation3d.html)
-- [Exporting Image and setting a default 3D view orientation](http://thebuildingcoder.typepad.com/blog/2013/08/setting-a-default-3d-view-orientation.html)
+- [Exporting image and setting a default 3D view orientation](http://thebuildingcoder.typepad.com/blog/2013/08/setting-a-default-3d-view-orientation.html)
 - [Mapping Forge viewer camera settings back to Revit](https://thebuildingcoder.typepad.com/blog/2019/06/revit-camera-settings-project-plasma-da4r-and-ai.html#2)
 
 **Question:** I have a question about `View3D` camera settings.
@@ -64,7 +64,7 @@ When I zoom in or out, the method `GetOrientation` gives correct values for pers
 Currently, I need to change position manually in order to apply changes made by zooming in or out.
 
 I found, there is a method `GetZoomCorners` of class `UIView`; this is a bounding box.
-Its values change after zoom in/out, but how can I move the `EyePosition` accordingly?
+Its values change after zooming in/out, but how can I move the `EyePosition` accordingly?
 
 Any suggestions?
 
@@ -210,7 +210,7 @@ Very many thanks indeed to Valerii for all his valuable work researching and doc
 ####<a name="3"></a> Revit Cheat Sheets
 
 Ehsan [@eirannejad](https://github.com/eirannejad) Iran-Nejad [shares](https://twitter.com/eirannejad/status/1313890807368228864)
-his [Revit cheatsheets](https://github.com/eirannejad/revit-cheatsheets) for
+his [Revit cheat sheets](https://github.com/eirannejad/revit-cheatsheets) for
 all to enjoy:
 
 > Here are all the Revit cheat sheets I made in the past years to make life easier working with Revit.

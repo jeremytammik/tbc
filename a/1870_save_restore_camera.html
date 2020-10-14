@@ -34,7 +34,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Save and Restore Camera Orientation</h3>
+<h3>Save and Restore 3D View Camera Settings</h3>
+<p>Today, Valerii Nozdrenkov shares a powerful solution to save and restore the complete 3D view camera settings, and Ehsan Iran-Nejad publishes his set of Revit cheat sheets:</p>
+<ul>
+<li><a href="#2">Serialising 3D view camera settings</a></li>
+<li><a href="#3">Revit cheat sheets</a></li>
+</ul>
 <h4><a name="2"></a> Serialising 3D View Camera Settings</h4>
 <p>Valerii Nozdrenkov shared a powerful solution for serialising the 3D view camera settings
 <a href="https://thebuildingcoder.typepad.com/blog/2020/04/revit-camera-fov-forge-partner-talks-and-jobs.html#comment-4929308181">in</a>
@@ -45,7 +50,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 nicely complementing previous explorations on:</p>
 <ul>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/setting-up-your-vieworientation3d.html">Setting up your <code>ViewOrientation3D</code></a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/setting-a-default-3d-view-orientation.html">Exporting Image and setting a default 3D view orientation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/08/setting-a-default-3d-view-orientation.html">Exporting image and setting a default 3D view orientation</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2019/06/revit-camera-settings-project-plasma-da4r-and-ai.html#2">Mapping Forge viewer camera settings back to Revit</a></li>
 </ul>
 <p><strong>Question:</strong> I have a question about <code>View3D</code> camera settings.
@@ -54,7 +59,7 @@ It works fine if a projection mode is perspective.
 When I zoom in or out, the method <code>GetOrientation</code> gives correct values for perspective camera (the position of the camera is changed), but in orthographic projection mode, <code>GetOrientation</code> always returns the same value regardless of zoom in/out (position of the camera is changed), so I can't recreate saved camera orientation in orthographic mode. There must be another transformation to apply, but I don't know where to take it from.</p>
 <p>Currently, I need to change position manually in order to apply changes made by zooming in or out.</p>
 <p>I found, there is a method <code>GetZoomCorners</code> of class <code>UIView</code>; this is a bounding box.
-Its values change after zoom in/out, but how can I move the <code>EyePosition</code> accordingly?</p>
+Its values change after zooming in/out, but how can I move the <code>EyePosition</code> accordingly?</p>
 <p>Any suggestions?</p>
 <p><strong>Answer:</strong> I investigated the problem of saving and restoring the current Revit View 3D.
 For a perspective projection mode, it was very simple: just save camera parameters and then restore them.
@@ -176,7 +181,17 @@ uidoc.GetOpenUIViews().FirstOrDefault(t =&gt; t.ViewId == view3D.Id).ZoomAndCent
 <img src="img/vn_3d_camera_orientation_4_zoom_corners.png" alt="Zooming corners" title="Zooming corners" width="430"/> <!-- 899 -->
 <p style="font-size: 80%; font-style:italic">Zooming corners</p>
 </center></p>
-<p>I prepared a sample project to share fully implementing this task in
+<p>I prepared and share a sample project fully implementing this task in
 the <a href="https://github.com/Valerii-Nozdrenkov/RevitOrthoCamera">RevitOrthoCamera GitHub repository</a>.</p>
 <p>Very many thanks indeed to Valerii for all his valuable work researching and documenting this!</p>
-<h4><a name="3"></a></h4>
+<h4><a name="3"></a> Revit Cheat Sheets</h4>
+<p>Ehsan <a href="https://github.com/eirannejad">@eirannejad</a> Iran-Nejad <a href="https://twitter.com/eirannejad/status/1313890807368228864">shares</a>
+his <a href="https://github.com/eirannejad/revit-cheatsheets">Revit cheat sheets</a> for
+all to enjoy:</p>
+<blockquote>
+<p>Here are all the Revit cheat sheets I made in the past years to make life easier working with Revit.
+Want to add yours as well?!</p>
+</blockquote>
+<p><center>
+<img src="img/eirannejad_cheatsheet_keynote_file.png" alt="Keynote file cheat sheet" title="Keynote file cheat sheet" width="500"/> <!-- 1539 -->
+</center></p>
