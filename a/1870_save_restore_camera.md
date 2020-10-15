@@ -25,6 +25,15 @@ Valerii Nozdrenkov shares a powerful solution to save and restore the complete 3
 linkedin:
 
 
+Revit cheat sheets, saving and restoring 3D view camera settings in the #RevitAPI 
+
+http://bit.ly/3dviewcamera
+
+Valerii Nozdrenkov shares a powerful solution to save and restore the complete 3D view camera settings and Ehsan Iran-Nejad publishes his set of Revit cheat sheets:
+
+- Serialising 3D view camera settings
+- Revit cheat sheets...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
