@@ -16,7 +16,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Revit cheat sheets, saving and restoring 3D view camera settings in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/3dviewcamera
 
 Valerii Nozdrenkov shares a powerful solution to save and restore the complete 3D view camera settings and Ehsan Iran-Nejad publishes his set of Revit cheat sheets
 &ndash; Serialising 3D view camera settings
