@@ -33,6 +33,17 @@ Topics for today
 
 linkedin:
 
+Revit 2021 DisplayUnitType, deprecated API usage, calculating the elbow centre and FireRevit app to identify room locations for fire escape routes  in the #RevitAPI
+
+http://bit.ly/elbowcentre
+
+Topics for today:
+
+- Revit 2021 DisplayUnitType
+- Eliminated TBC samples deprecated API usage
+- Calculating the elbow centre
+- FireRevit identifies room location for fire escape routes...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
