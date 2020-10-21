@@ -24,8 +24,11 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Topics for today
+&ndash; Revit 2021 <code>DisplayUnitType</code>
+&ndash; Eliminated TBC samples deprecated API usage
+&ndash; Calculating the elbow centre
+&ndash; FireRevit identifies room location for fire escape routes...
 
 linkedin:
 
@@ -40,7 +43,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Calculating Elbow Centre Point</h3>
+<h3>FireRevit, Deprecated API and Elbow Centre Point</h3>
 <p>Struggling to find time to blog between cases, here is today's ration:</p>
 <ul>
 <li><a href="#2">Revit 2021 <code>DisplayUnitType</code></a></li>
@@ -99,18 +102,18 @@ the <a href="https://thebuildingcoder.typepad.com/blog/2020/04/whats-new-in-the-
 <p>The resolution was actually quite simple.</p>
 <p>I removed some sections of code completely that dealt exclusively with the Revit Unit API functionality, since they ought to be rewritten from scratch for the new unit handling methods. It would make little sense to migrate them step by step. That left a handful of trivial issues to fix.</p>
 <p>The new <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2021.0.150.6">release 2021.0.150.6</a> compiles with zero errors and warnings.</p>
-<p>You can see exactly how that was achieved by analusing
+<p>You can see exactly how that was achieved by analysing
 the <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2021.0.150.5...2021.0.150.6">differences to the previous release</a>.</p>
 <h4><a name="4"></a> Calculating the Elbow Centre</h4>
-<ul>
-<li>How to calculate the center point of elbow?
-  https://forums.autodesk.com/t5/revit-api-forum/how-to-calculate-the-center-point-of-elbow/m-p/9804339
-  elbow_arc_centre_point_1.png + 2</li>
-</ul>
-<p><strong>Question:</strong> How to calculate the center point of elbow?</p>
-<p>I am trying to get to center point of an elbow. I have check all the data of the elbow from Revit Lookup tool but did not find anything. So is there anyway I can get that information ?</p>
+<p>From
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-calculate-the-center-point-of-elbow/m-p/9804339">How to calculate the centre point of an elbow</a>:</p>
+<p><strong>Question:</strong> How to calculate the centre point of elbow?</p>
+<p>I am trying to get to centre point of an elbow.
+I have checked all the data of the elbow in RevitLookup but did not find anything.
+So, is there any way I can get that information?</p>
 <p><center>
-<img src="img/elbow_arc_centre_point_1.png" alt="Elbow arc centre point" title="Elbow arc centre point" width="100"/> <!-- 1539 -->
+<img src="img/elbow_arc_centre_point_1.png" alt="Elbow arc centre point" title="Elbow arc centre point" width="400"/> <!-- 790 -->
 </center></p>
 <p><strong>Answer:</strong> Yes.</p>
 <p>This is a pretty simple geometrical exercise.</p>
@@ -118,11 +121,11 @@ the <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/
 <p>The start and end point directions are not parallel. Therefore, they define a 2D plane. The centre point will normally lie in that plane, so you just have a (simpler) 2D task to solve, not 3D.</p>
 <p>In the 2D plane, you can determine the normal vector to the start and end directions. Extend those two normal vectors to define infinite lines and determine their intersection. That is your centre point.</p>
 <p><strong>Response:</strong> Thank you for your answer.
-I just found out that actually the elbow already has the center point information under its Geometry information:</p>
+I just found out that actually the elbow already has the centre point information under its Geometry information:</p>
 <p><center>
-<img src="img/elbow_arc_centre_point_2.png" alt="Snooping elbow arc centre point" title="Snooping elbow arc centre point" width="100"/> <!-- 1539 -->
+<img src="img/elbow_arc_centre_point_2.png" alt="Snooping elbow arc centre point" title="Snooping elbow arc centre point" width="800"/> <!-- 1194 -->
 </center></p>
-<p>So my working code is:</p>
+<p>So, my working code is:</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;GetCenterofElbow(&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FamilyInstance</span>&nbsp;selectedDuct&nbsp;)
@@ -168,7 +171,7 @@ I just found out that actually the elbow already has the center point informatio
 <ul>
 <li><a href="https://www.revitapidocs.com/2020/28a9cf5e-9191-f9ce-74c8-622a681201f6.htm">Connector Origin</a></li>
 <li><a href="https://www.revitapidocs.com/2020/cb6d725d-654a-f6f3-fed0-96cc618a42f1.htm">CoordinateSystem property returning a Transform object</a></li>
-<li><a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdRectDuctCorners.cs#L240-L319">ew <code>GetElbowConnectors</code> and <code>GetElbowCentre</code> methods in The Building Coder samples</a> </li>
+<li><a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdRectDuctCorners.cs#L240-L319">New <code>GetElbowConnectors</code> and <code>GetElbowCentre</code> methods in The Building Coder samples</a> </li>
 </ul>
 <pre class="code">
   <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
@@ -253,10 +256,10 @@ I just found out that actually the elbow already has the center point informatio
 <p>Would you like to test my code and see whether it returns the same result?</p>
 <p>By the way, some elbow families have no arc segment at all.</p>
 <p>For example, some can consist of two 45-degree segments, connected by a cylindrical part in between.</p>
-<p>In this case, there would be two arcs with different center points, so the connector based approach seems more flexible for different family content.</p>
+<p>In this case, there would be two arcs with different centre points, so the connector based approach seems more flexible for different family content.</p>
 <p>For example, here is a typical <a href="https://www.ofenseite.com/1020147-pelletofenrohr-90-bogen-mit-kesselanschluss-muffe">German chimney exhaust elbow</a></p>
 <p><center>
-<img src="img/elbow_arc_centre_point_3.jpg" alt="Chimney 90 degree elbow" title="Chimney 90 degree elbow" width="100"/> <!-- 1539 -->
+<img src="img/elbow_arc_centre_point_3.jpg" alt="Chimney 90 degree elbow" title="Chimney 90 degree elbow" width="250"/> <!-- 600 -->
 </center></p>
 <p>In this case, there isn't any arc at all.</p>
 <p>The connector-based code should solve the task for that as well.</p>
