@@ -67,14 +67,15 @@ Use constant members of the `UnitTypeId` class to replace uses of specific value
 My code snippet is:
 
 <pre class="code">
-case StorageType.Double:
-double? nullable = t.AsDouble(fp);
-if (nullable.HasValue)
-{
-DisplayUnitType displayUnitType = fp.DisplayUnitType;
-value = UnitUtils.ConvertFromInternalUnits(nullable.Value, displayUnitType).ToString();
-break;
-} 
+  <span style="color:blue;">case</span>&nbsp;<span style="color:#2b91af;">StorageType</span>.Double:
+  &nbsp;&nbsp;<span style="color:blue;">double</span>?&nbsp;nullable&nbsp;=&nbsp;t.AsDouble(&nbsp;fp&nbsp;);
+  &nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;nullable.HasValue&nbsp;)
+  &nbsp;&nbsp;{
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">DisplayUnitType</span>&nbsp;displayUnitType&nbsp;=&nbsp;fp.DisplayUnitType;
+  &nbsp;&nbsp;&nbsp;&nbsp;value&nbsp;=&nbsp;<span style="color:#2b91af;">UnitUtils</span>.ConvertFromInternalUnits(&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nullable.Value,&nbsp;displayUnitType&nbsp;).ToString();
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">break</span>;
+  &nbsp;&nbsp;}
 </pre>
 
 Note: `t` is a `FamilyType` and `fp` is a `FamilyParameter` object.
@@ -82,14 +83,17 @@ Note: `t` is a `FamilyType` and `fp` is a `FamilyParameter` object.
 **Answer:** Embarrassing how simple the solution was:
 
 <pre class="code">
-//Pre 2021
-                        DisplayUnitType displayUnitType = fp.DisplayUnitType;
-                        value = UnitUtils.ConvertFromInternalUnits(nullable.Value, displayUnitType).ToString();
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Pre&nbsp;2021</span>
 
-                        //2021
-
-                        ForgeTypeId forgeTypeId = fp.GetUnitTypeId();
-                        value = UnitUtils.ConvertFromInternalUnits(nullable.Value, forgeTypeId).ToString();
+&nbsp;&nbsp;<span style="color:#2b91af;">DisplayUnitType</span>&nbsp;displayUnitType&nbsp;=&nbsp;fp.DisplayUnitType;
+&nbsp;&nbsp;value&nbsp;=&nbsp;<span style="color:#2b91af;">UnitUtils</span>.ConvertFromInternalUnits(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;nullable.Value,&nbsp;displayUnitType&nbsp;).ToString();
+ 
+&nbsp;&nbsp;<span style="color:green;">//2021</span>
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">ForgeTypeId</span>&nbsp;forgeTypeId&nbsp;=&nbsp;fp.GetUnitTypeId();
+&nbsp;&nbsp;value&nbsp;=&nbsp;<span style="color:#2b91af;">UnitUtils</span>.ConvertFromInternalUnits(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;nullable.Value,&nbsp;forgeTypeId&nbsp;).ToString();
 </pre>
 
 Many thanks to Stephen for sharing this!
@@ -146,36 +150,42 @@ I just found out that actually the elbow already has the center point informatio
 So my working code is:
 
 <pre class="code">
-  static public XYZ GetCenterofElbow (FamilyInstance selectedDuct)
-        {
-            XYZ output = null; 
-            List<Connector> allConnectors = selectedDuct.MEPModel.ConnectorManager.Connectors.Cast<Connector>().ToList();
-            
-            Connector connectorA = allConnectors[0]; 
-            Connector connectorB = allConnectors[0];
-
-            GeometryElement geometryElement = selectedDuct.get_Geometry(new Options());
-            List<GeometryInstance> ginsList = selectedDuct.get_Geometry(new Options()).Where(o => o is GeometryInstance).Cast<GeometryInstance>().ToList();
-
-            foreach (GeometryInstance gins in ginsList)
-            {
-                foreach (GeometryObject ge in gins.GetInstanceGeometry())
-                {
-                    try
-                    {
-                        Arc centerArc = ge as Arc;
-                        output = centerArc.Center; 
-                    }
-                    catch (Exception)
-                    {
-                       
-                    }
-                }
-            }
-
-            return output;
-
-        }
+&nbsp;&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;GetCenterofElbow(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FamilyInstance</span>&nbsp;selectedDuct&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;output&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;List&lt;<span style="color:#2b91af;">Connector</span>&gt;&nbsp;allConnectors&nbsp;=&nbsp;selectedDuct.MEPModel
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.ConnectorManager.Connectors
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">Connector</span>&gt;().ToList();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Connector</span>&nbsp;connectorA&nbsp;=&nbsp;allConnectors[&nbsp;0&nbsp;];
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Connector</span>&nbsp;connectorB&nbsp;=&nbsp;allConnectors[&nbsp;0&nbsp;];
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">GeometryElement</span>&nbsp;geometryElement&nbsp;=&nbsp;selectedDuct
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.get_Geometry(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Options</span>()&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;List&lt;<span style="color:#2b91af;">GeometryInstance</span>&gt;&nbsp;ginsList&nbsp;=&nbsp;selectedDuct
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.get_Geometry(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Options</span>()&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Where(&nbsp;o&nbsp;=&gt;&nbsp;o&nbsp;<span style="color:blue;">is</span>&nbsp;<span style="color:#2b91af;">GeometryInstance</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">GeometryInstance</span>&gt;()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.ToList();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">GeometryInstance</span>&nbsp;gins&nbsp;<span style="color:blue;">in</span>&nbsp;ginsList&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">GeometryObject</span>&nbsp;ge&nbsp;<span style="color:blue;">in</span>&nbsp;gins.GetInstanceGeometry()&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">try</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Arc</span>&nbsp;centerArc&nbsp;=&nbsp;ge&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">Arc</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;output&nbsp;=&nbsp;centerArc.Center;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">catch</span>(&nbsp;<span style="color:#2b91af;">Exception</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;output;
+&nbsp;&nbsp;}
 </pre>
 
 **Answer:** Thank you for letting us know that simple solution!
@@ -189,83 +199,83 @@ I implemented a geometrical solution for you based on the elbow connectors and t
 - [ew `GetElbowConnectors` and `GetElbowCentre` methods in The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdRectDuctCorners.cs#L240-L319) 
 
 <pre class="code">
-    /// <summary>
-    /// Return elbow connectors.
-    /// Return null if the given element is not a 
-    /// family instance with exactly two connectors.
-    /// </summary>
-    List<Transform> GetElbowConnectors( Element e )
-    {
-      List<Transform> xs = null;
-      FamilyInstance fi = e as FamilyInstance;
-      if( null != fi )
-      {
-        MEPModel m = fi.MEPModel;
-        if( null != m )
-        {
-          ConnectorManager cm = m.ConnectorManager;
-          if( null != cm )
-          {
-            ConnectorSet cs = cm.Connectors;
-            if( 2 == cs.Size )
-            {
-              xs = new List<Transform>( 2 );
-              bool first = true;
-              foreach( Connector c in cs )
-              {
-                if( first )
-                {
-                  xs[0] = c.CoordinateSystem;
-                }
-                else
-                {
-                  xs[1] = c.CoordinateSystem;
-                }
-              }
-            }
-          }
-        }
-      }
-      return xs;
-    }
-    
-    /// <summary>
-    /// Return elbow centre point.
-    /// Return null if the start and end points 
-    /// and direction vectors are not all coplanar.
-    /// </summary>
-    XYZ GetElbowCentre( Element e )
-    {
-      XYZ pc = null;
-      List<Transform> xs = GetElbowConnectors( e );
-      if( null != xs )
-      {
-        // Get start and end point and direction
-
-        XYZ ps = xs[ 0 ].Origin;
-        XYZ vs = xs[ 0 ].BasisZ;
-
-        XYZ pe = xs[ 1 ].Origin;
-        XYZ ve = xs[ 1 ].BasisZ;
-
-        XYZ vd = pe - ps;
-
-        // For a regular elbow, Z vector is normal 
-        // of the 2D plane spanned by the coplanar
-        // start and end points and direction vectors.
-
-        XYZ vz = vs.CrossProduct( vd );
-
-        if( !vz.IsZeroLength() )
-        {
-          XYZ vxs = vs.CrossProduct( vz );
-          XYZ vxe = ve.CrossProduct( vz );
-          pc = Util.LineLineIntersection( 
-            ps, vxs, pe, vxe );
-        }
-      }
-      return pc;
-    }
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;elbow&nbsp;connector&nbsp;transforms.</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;null&nbsp;if&nbsp;the&nbsp;given&nbsp;element&nbsp;is&nbsp;not&nbsp;a&nbsp;</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;family&nbsp;instance&nbsp;with&nbsp;exactly&nbsp;two&nbsp;connectors.</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+  <span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Transform</span>&gt;&nbsp;GetElbowConnectorTransforms(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;)
+  {
+  &nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Transform</span>&gt;&nbsp;xs&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+  &nbsp;&nbsp;<span style="color:#2b91af;">FamilyInstance</span>&nbsp;fi&nbsp;=&nbsp;e&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">FamilyInstance</span>;
+  &nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;fi&nbsp;)
+  &nbsp;&nbsp;{
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">MEPModel</span>&nbsp;m&nbsp;=&nbsp;fi.MEPModel;
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;m&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;{
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ConnectorManager</span>&nbsp;cm&nbsp;=&nbsp;m.ConnectorManager;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;cm&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ConnectorSet</span>&nbsp;cs&nbsp;=&nbsp;cm.Connectors;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;2&nbsp;==&nbsp;cs.Size&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xs&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Transform</span>&gt;(&nbsp;2&nbsp;);
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">bool</span>&nbsp;first&nbsp;=&nbsp;<span style="color:blue;">true</span>;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Connector</span>&nbsp;c&nbsp;<span style="color:blue;">in</span>&nbsp;cs&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;first&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xs[0]&nbsp;=&nbsp;c.CoordinateSystem;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">else</span>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xs[1]&nbsp;=&nbsp;c.CoordinateSystem;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+  &nbsp;&nbsp;&nbsp;&nbsp;}
+  &nbsp;&nbsp;}
+  &nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;xs;
+  }
+   
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;elbow&nbsp;centre&nbsp;point.</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;null&nbsp;if&nbsp;the&nbsp;start&nbsp;and&nbsp;end&nbsp;points&nbsp;</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;and&nbsp;direction&nbsp;vectors&nbsp;are&nbsp;not&nbsp;all&nbsp;coplanar.</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+  <span style="color:#2b91af;">XYZ</span>&nbsp;GetElbowCentre(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;)
+  {
+  &nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;pc&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+  &nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Transform</span>&gt;&nbsp;xs&nbsp;=&nbsp;GetElbowConnectorTransforms(&nbsp;e&nbsp;);
+  &nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;xs&nbsp;)
+  &nbsp;&nbsp;{
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Get&nbsp;start&nbsp;and&nbsp;end&nbsp;point&nbsp;and&nbsp;direction</span>
+   
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;ps&nbsp;=&nbsp;xs[&nbsp;0&nbsp;].Origin;
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;vs&nbsp;=&nbsp;xs[&nbsp;0&nbsp;].BasisZ;
+   
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;pe&nbsp;=&nbsp;xs[&nbsp;1&nbsp;].Origin;
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;ve&nbsp;=&nbsp;xs[&nbsp;1&nbsp;].BasisZ;
+   
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;vd&nbsp;=&nbsp;pe&nbsp;-&nbsp;ps;
+   
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;For&nbsp;a&nbsp;regular&nbsp;elbow,&nbsp;Z&nbsp;vector&nbsp;is&nbsp;normal&nbsp;</span>
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;of&nbsp;the&nbsp;2D&nbsp;plane&nbsp;spanned&nbsp;by&nbsp;the&nbsp;coplanar</span>
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;start&nbsp;and&nbsp;end&nbsp;points&nbsp;and&nbsp;direction&nbsp;vectors.</span>
+   
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;vz&nbsp;=&nbsp;vs.CrossProduct(&nbsp;vd&nbsp;);
+   
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;!vz.IsZeroLength()&nbsp;)
+  &nbsp;&nbsp;&nbsp;&nbsp;{
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;vxs&nbsp;=&nbsp;vs.CrossProduct(&nbsp;vz&nbsp;);
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;vxe&nbsp;=&nbsp;ve.CrossProduct(&nbsp;vz&nbsp;);
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pc&nbsp;=&nbsp;<span style="color:#2b91af;">Util</span>.LineLineIntersection(&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ps,&nbsp;vxs,&nbsp;pe,&nbsp;vxe&nbsp;);
+  &nbsp;&nbsp;&nbsp;&nbsp;}
+  &nbsp;&nbsp;}
+  &nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;pc;
+  }
 </pre>
 
 Would you like to test my code and see whether it returns the same result?
