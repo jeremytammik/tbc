@@ -43,6 +43,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Calculating Elbow Centre Point
 
+Struggling to find time to blog between cases, here is today's ration:
+
+- [Revit 2021 `DisplayUnitType`](#2)
+- [Eliminated TBC samples deprecated API usage](#3)
+- [Calculating the elbow centre](#4)
+- [FireRevit identifies room location for fire escape routes](#5)
+
 ####<a name="2"></a> Revit 2021 DisplayUnitType
 
 Stephen Harrison raised and solved an issue on handling 
@@ -297,7 +304,8 @@ Our application use case is firefighting where drones identify the locations of 
 
 We believe this could be useful in general for Revit users.
 
-Here is [our technical report RevitToDatabase.pdf](https://cs.nyu.edu/media/publications/RevitToDatabase.pdf) and 
+Here is [our technical report RevitToDatabase.pdf](https://cs.nyu.edu/media/publications/RevitToDatabase.pdf)
+([local copy](zip/firerevit_room_location.pdf)) and 
 the source code in the [LuhanSheng Revit_To_Database GitHub repository](https://github.com/LuhanSheng/Revit_To_Database).
 
 Noteworthy related topics:

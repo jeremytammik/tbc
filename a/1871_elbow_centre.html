@@ -1,0 +1,271 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- eliminated deprecated API usage warnings by removing calls to pre-ForgeTypeId unit functionality
+  https://github.com/jeremytammik/the_building_coder_samples/compare/2021.0.150.5...2021.0.150.6
+
+- How to calculate the center point of elbow?
+  https://forums.autodesk.com/t5/revit-api-forum/how-to-calculate-the-center-point-of-elbow/m-p/9804339
+  elbow_arc_centre_point_1.png + 2
+
+- Neo Sheng <wc36170565@gmail.com>
+  FireRevit: Using Revit files to identify the room locations of fires and escape routes
+  https://forums.autodesk.com/t5/revit-api-forum/firerevit-using-revit-files-to-identify-the-room-locations-of/td-p/9809450
+  FireRevit GitHub repository https://github.com/LuhanSheng/Revit_To_Database
+  FireRevit: Using Revit Files to Identify the Room Locations of Fires and Escape Routes.
+  https://cs.nyu.edu/media/publications/RevitToDatabase.pdf
+  1468_hololens_exitpath.md
+
+twitter:
+
+ in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+&ndash; 
+...
+
+linkedin:
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>Calculating Elbow Centre Point</h3>
+<p>Struggling to find time to blog between cases, here is today's ration:</p>
+<ul>
+<li><a href="#2">Revit 2021 <code>DisplayUnitType</code></a></li>
+<li><a href="#3">Eliminated TBC samples deprecated API usage</a></li>
+<li><a href="#4">Calculating the elbow centre</a></li>
+<li><a href="#5">FireRevit identifies room location for fire escape routes</a></li>
+</ul>
+<h4><a name="2"></a> Revit 2021 DisplayUnitType</h4>
+<p>Stephen Harrison raised and solved an issue on handling 
+<a href="https://forums.autodesk.com/t5/revit-api-forum/revit-2021-displayunittype/m-p/9810626">Revit 2021 <code>DisplayUnitType</code></a>:</p>
+<p><strong>Question:</strong> I am struggling to update a section of my code I have been utilising for a few years now.</p>
+<p>In Revit 2021, it is causing a deprecated API usage warning, so I need to update it:</p>
+<ul>
+<li>warning CS0618: <code>DisplayUnitType</code> is obsolete:
+This enumeration is deprecated in Revit 2021 and may be removed in a future version of Revit.
+Please use the <code>ForgeTypeId</code> class instead.
+Use constant members of the <code>UnitTypeId</code> class to replace uses of specific values of this enumeration.</li>
+</ul>
+<p>My code snippet is:</p>
+<pre class="code">
+case StorageType.Double:
+double? nullable = t.AsDouble(fp);
+if (nullable.HasValue)
+{
+DisplayUnitType displayUnitType = fp.DisplayUnitType;
+value = UnitUtils.ConvertFromInternalUnits(nullable.Value, displayUnitType).ToString();
+break;
+} 
+</pre>
+
+<p>Note: <code>t</code> is a <code>FamilyType</code> and <code>fp</code> is a <code>FamilyParameter</code> object.</p>
+<p><strong>Answer:</strong> Embarrassing how simple the solution was:</p>
+<pre class="code">
+//Pre 2021
+                        DisplayUnitType displayUnitType = fp.DisplayUnitType;
+                        value = UnitUtils.ConvertFromInternalUnits(nullable.Value, displayUnitType).ToString();
+
+                        //2021
+
+                        ForgeTypeId forgeTypeId = fp.GetUnitTypeId();
+                        value = UnitUtils.ConvertFromInternalUnits(nullable.Value, forgeTypeId).ToString();
+</pre>
+
+<p>Many thanks to Stephen for sharing this!</p>
+<h4><a name="3"></a> Eliminated TBC Samples Deprecated API Usage</h4>
+<p>Stephen's question and answer prompted me to take another look at and try to eliminate the deprecated API usage warnings
+in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>.
+After the initial <a href="https://thebuildingcoder.typepad.com/blog/2020/04/2021-migration-add-in-language-and-bim360-login.html#4">flat migration to Revit 2021</a>,
+the compilation still generates <a href="zip/tbc_samples_2021_migr_01.txt">162 warnings</a>,
+all associated with deprecated methods and enumerations caused by 
+the <a href="https://thebuildingcoder.typepad.com/blog/2020/04/whats-new-in-the-revit-2021-api.html#4.1.3">Units API changes</a>.</p>
+<p>The resolution was actually quite simple.</p>
+<p>I removed some sections of code completely that dealt exclusively with the Revit Unit API functionality, since they ought to be rewritten from scratch for the new unit handling methods. It would make little sense to migrate them step by step. That left a handful of trivial issues to fix.</p>
+<p>The new <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2021.0.150.6">release 2021.0.150.6</a> compiles with zero errors and warnings.</p>
+<p>You can see exactly how that was achieved by analusing
+the <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2021.0.150.5...2021.0.150.6">differences to the previous release</a>.</p>
+<h4><a name="4"></a> Calculating the Elbow Centre</h4>
+<ul>
+<li>How to calculate the center point of elbow?
+  https://forums.autodesk.com/t5/revit-api-forum/how-to-calculate-the-center-point-of-elbow/m-p/9804339
+  elbow_arc_centre_point_1.png + 2</li>
+</ul>
+<p><strong>Question:</strong> How to calculate the center point of elbow?</p>
+<p>I am trying to get to center point of an elbow. I have check all the data of the elbow from Revit Lookup tool but did not find anything. So is there anyway I can get that information ?</p>
+<p><center>
+<img src="img/elbow_arc_centre_point_1.png" alt="Elbow arc centre point" title="Elbow arc centre point" width="100"/> <!-- 1539 -->
+</center></p>
+<p><strong>Answer:</strong> Yes.</p>
+<p>This is a pretty simple geometrical exercise.</p>
+<p>You have the full information about the start and end point, specifically including location and direction == face normal.</p>
+<p>The start and end point directions are not parallel. Therefore, they define a 2D plane. The centre point will normally lie in that plane, so you just have a (simpler) 2D task to solve, not 3D.</p>
+<p>In the 2D plane, you can determine the normal vector to the start and end directions. Extend those two normal vectors to define infinite lines and determine their intersection. That is your centre point.</p>
+<p><strong>Response:</strong> Thank you for your answer.
+I just found out that actually the elbow already has the center point information under its Geometry information:</p>
+<p><center>
+<img src="img/elbow_arc_centre_point_2.png" alt="Snooping elbow arc centre point" title="Snooping elbow arc centre point" width="100"/> <!-- 1539 -->
+</center></p>
+<p>So my working code is:</p>
+<pre class="code">
+  static public XYZ GetCenterofElbow (FamilyInstance selectedDuct)
+        {
+            XYZ output = null; 
+            List<Connector> allConnectors = selectedDuct.MEPModel.ConnectorManager.Connectors.Cast<Connector>().ToList();
+
+            Connector connectorA = allConnectors[0]; 
+            Connector connectorB = allConnectors[0];
+
+            GeometryElement geometryElement = selectedDuct.get_Geometry(new Options());
+            List<GeometryInstance> ginsList = selectedDuct.get_Geometry(new Options()).Where(o => o is GeometryInstance).Cast<GeometryInstance>().ToList();
+
+            foreach (GeometryInstance gins in ginsList)
+            {
+                foreach (GeometryObject ge in gins.GetInstanceGeometry())
+                {
+                    try
+                    {
+                        Arc centerArc = ge as Arc;
+                        output = centerArc.Center; 
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                }
+            }
+
+            return output;
+
+        }
+</pre>
+
+<p><strong>Answer:</strong> Thank you for letting us know that simple solution!</p>
+<p>Oh dear. I wasted some effort, then.</p>
+<p>I implemented a geometrical solution for you based on the elbow connectors and their coordinate systems:</p>
+<ul>
+<li><a href="https://www.revitapidocs.com/2020/28a9cf5e-9191-f9ce-74c8-622a681201f6.htm">Connector Origin</a></li>
+<li><a href="https://www.revitapidocs.com/2020/cb6d725d-654a-f6f3-fed0-96cc618a42f1.htm">CoordinateSystem property returning a Transform object</a></li>
+<li><a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdRectDuctCorners.cs#L240-L319">ew <code>GetElbowConnectors</code> and <code>GetElbowCentre</code> methods in The Building Coder samples</a> </li>
+</ul>
+<pre class="code">
+    /// <summary>
+    /// Return elbow connectors.
+    /// Return null if the given element is not a 
+    /// family instance with exactly two connectors.
+    /// </summary>
+    List<Transform> GetElbowConnectors( Element e )
+    {
+      List<Transform> xs = null;
+      FamilyInstance fi = e as FamilyInstance;
+      if( null != fi )
+      {
+        MEPModel m = fi.MEPModel;
+        if( null != m )
+        {
+          ConnectorManager cm = m.ConnectorManager;
+          if( null != cm )
+          {
+            ConnectorSet cs = cm.Connectors;
+            if( 2 == cs.Size )
+            {
+              xs = new List<Transform>( 2 );
+              bool first = true;
+              foreach( Connector c in cs )
+              {
+                if( first )
+                {
+                  xs[0] = c.CoordinateSystem;
+                }
+                else
+                {
+                  xs[1] = c.CoordinateSystem;
+                }
+              }
+            }
+          }
+        }
+      }
+      return xs;
+    }
+
+    /// <summary>
+    /// Return elbow centre point.
+    /// Return null if the start and end points 
+    /// and direction vectors are not all coplanar.
+    /// </summary>
+    XYZ GetElbowCentre( Element e )
+    {
+      XYZ pc = null;
+      List<Transform> xs = GetElbowConnectors( e );
+      if( null != xs )
+      {
+        // Get start and end point and direction
+
+        XYZ ps = xs[ 0 ].Origin;
+        XYZ vs = xs[ 0 ].BasisZ;
+
+        XYZ pe = xs[ 1 ].Origin;
+        XYZ ve = xs[ 1 ].BasisZ;
+
+        XYZ vd = pe - ps;
+
+        // For a regular elbow, Z vector is normal 
+        // of the 2D plane spanned by the coplanar
+        // start and end points and direction vectors.
+
+        XYZ vz = vs.CrossProduct( vd );
+
+        if( !vz.IsZeroLength() )
+        {
+          XYZ vxs = vs.CrossProduct( vz );
+          XYZ vxe = ve.CrossProduct( vz );
+          pc = Util.LineLineIntersection( 
+            ps, vxs, pe, vxe );
+        }
+      }
+      return pc;
+    }
+</pre>
+
+<p>Would you like to test my code and see whether it returns the same result?</p>
+<p>By the way, some elbow families have no arc segment at all.</p>
+<p>For example, some can consist of two 45-degree segments, connected by a cylindrical part in between.</p>
+<p>In this case, there would be two arcs with different center points, so the connector based approach seems more flexible for different family content.</p>
+<p>For example, here is a typical <a href="https://www.ofenseite.com/1020147-pelletofenrohr-90-bogen-mit-kesselanschluss-muffe">German chimney exhaust elbow</a></p>
+<p><center>
+<img src="img/elbow_arc_centre_point_3.jpg" alt="Chimney 90 degree elbow" title="Chimney 90 degree elbow" width="100"/> <!-- 1539 -->
+</center></p>
+<p>In this case, there isn't any arc at all.</p>
+<p>The connector-based code should solve the task for that as well.</p>
+<p>Please confirm that it works.</p>
+<p>The code is untested.</p>
+<h4><a name="5"></a> FireRevit Identifies Room Location for Fire Escape Routes</h4>
+<p><a href="mailto:Neo Sheng &lt;wc36170565@gmail.com&gt;">Luhan Neo Sheng</a> shared a research project with potential practical applications in
+his <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/firerevit-using-revit-files-to-identify-the-room-locations-of/td-p/9809450">FireRevit: Using Revit files to identify the room locations of fires and escape routes</a>:</p>
+<p>FireRevit is software that parses Revit files in order to map from a location given as (latitude, longitude, height) to a Revit room identifier.</p>
+<p>FireRevit also combines the Revit file and information about which rooms are inaccessible in an emergency to guide residents to the nearest exit by giving a route map.</p>
+<p>Our application use case is firefighting where drones identify the locations of rooms having fires both to direct firefighters to rooms on fire and to help residents escape. </p>
+<p>We believe this could be useful in general for Revit users.</p>
+<p>Here is <a href="https://cs.nyu.edu/media/publications/RevitToDatabase.pdf">our technical report RevitToDatabase.pdf</a>
+(<a href="zip/firerevit_room_location.pdf">local copy</a>) and 
+the source code in the <a href="https://github.com/LuhanSheng/Revit_To_Database">LuhanSheng Revit_To_Database GitHub repository</a>.</p>
+<p>Noteworthy related topics:</p>
+<ul>
+<li>Kean Walmsley implemented a <a href="https://thebuildingcoder.typepad.com/blog/2016/09/hololens-escape-path-waypoint-json-exporter.html">HoloLens-based tool for navigating low visibility environments and following an exit path</a></li>
+<li>Revit 2020 enhanced the Analysis API with support for a <a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html#4.2.19">Path of Travel API</a></li>
+<li>The Revit SDK includes a <a href="https://thebuildingcoder.typepad.com/blog/2019/04/new-revit-2020-sdk-samples.html#5">PathOfTravel SDK sample</a></li>
+</ul>
