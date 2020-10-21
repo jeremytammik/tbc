@@ -283,4 +283,26 @@ Please confirm that it works.
 
 The code is untested.
 
+####<a name="5"></a> FireRevit Identifies Room Location for Fire Escape Routes
+
+[Luhan Neo Sheng](mailto:Neo Sheng <wc36170565@gmail.com>) shared a research project with potential practical applications in
+his [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [FireRevit: Using Revit files to identify the room locations of fires and escape routes](https://forums.autodesk.com/t5/revit-api-forum/firerevit-using-revit-files-to-identify-the-room-locations-of/td-p/9809450):
+
+FireRevit is software that parses Revit files in order to map from a location given as (latitude, longitude, height) to a Revit room identifier.
+
+FireRevit also combines the Revit file and information about which rooms are inaccessible in an emergency to guide residents to the nearest exit by giving a route map.
+
+Our application use case is firefighting where drones identify the locations of rooms having fires both to direct firefighters to rooms on fire and to help residents escape. 
+
+We believe this could be useful in general for Revit users.
+
+Here is [our technical report RevitToDatabase.pdf](https://cs.nyu.edu/media/publications/RevitToDatabase.pdf) and 
+the source code in the [LuhanSheng Revit_To_Database GitHub repository](https://github.com/LuhanSheng/Revit_To_Database).
+
+Noteworthy related topics:
+
+- Kean Walmsley implemented a [HoloLens-based tool for navigating low visibility environments and following an exit path](https://thebuildingcoder.typepad.com/blog/2016/09/hololens-escape-path-waypoint-json-exporter.html)
+- Revit 2020 enhanced the Analysis API with support for a [Path of Travel API](https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html#4.2.19)
+- The Revit SDK includes a [PathOfTravel SDK sample](https://thebuildingcoder.typepad.com/blog/2019/04/new-revit-2020-sdk-samples.html#5)
 
