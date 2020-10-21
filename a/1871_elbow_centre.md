@@ -23,7 +23,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Revit 2021 DisplayUnitType, deprecated API usage, calculating the elbow centre and FireRevit app to identify room locations for fire escape routes  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/elbowcentre
 
 Topics for today
 &ndash; Revit 2021 <code>DisplayUnitType</code>
@@ -123,7 +123,7 @@ the [differences to the previous release](https://github.com/jeremytammik/the_bu
 
 From
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [How to calculate the centre point of an elbow](https://forums.autodesk.com/t5/revit-api-forum/how-to-calculate-the-center-point-of-elbow/m-p/9804339):
+on [how to calculate the centre point of an elbow](https://forums.autodesk.com/t5/revit-api-forum/how-to-calculate-the-center-point-of-elbow/m-p/9804339):
 
 **Question:** How to calculate the centre point of elbow?
 
@@ -205,13 +205,13 @@ I implemented a geometrical solution for you based on the elbow connectors and t
 
 <pre class="code">
   <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
-  <span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;elbow&nbsp;connector&nbsp;transforms.</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;elbow&nbsp;connectors.</span>
   <span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;null&nbsp;if&nbsp;the&nbsp;given&nbsp;element&nbsp;is&nbsp;not&nbsp;a&nbsp;</span>
   <span style="color:gray;">///</span><span style="color:green;">&nbsp;family&nbsp;instance&nbsp;with&nbsp;exactly&nbsp;two&nbsp;connectors.</span>
   <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
-  <span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Transform</span>&gt;&nbsp;GetElbowConnectorTransforms(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;)
+  <span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Connector</span>&gt;&nbsp;GetElbowConnectors(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;)
   {
-  &nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Transform</span>&gt;&nbsp;xs&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+  &nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Connector</span>&gt;&nbsp;cons&nbsp;=&nbsp;<span style="color:blue;">null</span>;
   &nbsp;&nbsp;<span style="color:#2b91af;">FamilyInstance</span>&nbsp;fi&nbsp;=&nbsp;e&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">FamilyInstance</span>;
   &nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;fi&nbsp;)
   &nbsp;&nbsp;{
@@ -224,24 +224,24 @@ I implemented a geometrical solution for you based on the elbow connectors and t
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ConnectorSet</span>&nbsp;cs&nbsp;=&nbsp;cm.Connectors;
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;2&nbsp;==&nbsp;cs.Size&nbsp;)
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xs&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Transform</span>&gt;(&nbsp;2&nbsp;);
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cons&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Connector</span>&gt;(&nbsp;2&nbsp;);
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">bool</span>&nbsp;first&nbsp;=&nbsp;<span style="color:blue;">true</span>;
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Connector</span>&nbsp;c&nbsp;<span style="color:blue;">in</span>&nbsp;cs&nbsp;)
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;first&nbsp;)
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xs[0]&nbsp;=&nbsp;c.CoordinateSystem;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cons[0]&nbsp;=&nbsp;c;
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">else</span>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xs[1]&nbsp;=&nbsp;c.CoordinateSystem;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cons[1]&nbsp;=&nbsp;c;
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
   &nbsp;&nbsp;&nbsp;&nbsp;}
   &nbsp;&nbsp;}
-  &nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;xs;
+  &nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;cons;
   }
    
   <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
@@ -252,16 +252,16 @@ I implemented a geometrical solution for you based on the elbow connectors and t
   <span style="color:#2b91af;">XYZ</span>&nbsp;GetElbowCentre(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;)
   {
   &nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;pc&nbsp;=&nbsp;<span style="color:blue;">null</span>;
-  &nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Transform</span>&gt;&nbsp;xs&nbsp;=&nbsp;GetElbowConnectorTransforms(&nbsp;e&nbsp;);
-  &nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;xs&nbsp;)
+  &nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Connector</span>&gt;&nbsp;cons&nbsp;=&nbsp;GetElbowConnectors(&nbsp;e&nbsp;);
+  &nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;cons&nbsp;)
   &nbsp;&nbsp;{
   &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Get&nbsp;start&nbsp;and&nbsp;end&nbsp;point&nbsp;and&nbsp;direction</span>
    
-  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;ps&nbsp;=&nbsp;xs[&nbsp;0&nbsp;].Origin;
-  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;vs&nbsp;=&nbsp;xs[&nbsp;0&nbsp;].BasisZ;
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;ps&nbsp;=&nbsp;cons[&nbsp;0&nbsp;].CoordinateSystem.Origin;
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;vs&nbsp;=&nbsp;cons[&nbsp;0&nbsp;].CoordinateSystem.BasisZ;
    
-  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;pe&nbsp;=&nbsp;xs[&nbsp;1&nbsp;].Origin;
-  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;ve&nbsp;=&nbsp;xs[&nbsp;1&nbsp;].BasisZ;
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;pe&nbsp;=&nbsp;cons[&nbsp;1&nbsp;].CoordinateSystem.Origin;
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;ve&nbsp;=&nbsp;cons[&nbsp;1&nbsp;].CoordinateSystem.BasisZ;
    
   &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;vd&nbsp;=&nbsp;pe&nbsp;-&nbsp;ps;
    
