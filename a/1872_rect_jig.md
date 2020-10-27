@@ -144,7 +144,7 @@ var q = a
 + dy * v.Y * XYZ.BasisY;
 return q;
 }
-</code>
+</pre>
 
 **Answer:**
 To handle the 3D view projection, you will have to apply the appropriate 3D view orientation transform to the mouse input coordinates.
