@@ -1,9 +1,8 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="bc.css">
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
-</head>
-
+</head></p>
 <!---
 
 - Onbox Framework
@@ -42,90 +41,70 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### DirectContext Jig
-
-####<a name="2"></a> The Onbox Cross-Platform Revit API Framework
-
-Thiago Almeida of [Blackbird Industries](https://blackbirdindustries.com.au) shares some exciting news in 
-his [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-[introducing a Revit API framework](https://forums.autodesk.com/t5/revit-api-forum/introducing-a-revit-api-framework/m-p/9816804), saying:
-
-I have been programming Revit API for at least 8 years now and always tried to find ways to make my work easier.
+<h3>DirectContext Jig</h3>
+<h4><a name="2"></a> The Onbox Cross-Platform Revit API Framework</h4>
+<p>Thiago Almeida of <a href="https://blackbirdindustries.com.au">Blackbird Industries</a> shares some exciting news in 
+his <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+<a href="https://forums.autodesk.com/t5/revit-api-forum/introducing-a-revit-api-framework/m-p/9816804">introducing a Revit API framework</a>, saying:</p>
+<p>I have been programming Revit API for at least 8 years now and always tried to find ways to make my work easier.
 I have always wanted to have data-rich apps that communicate with the cloud.
-With the introduction of Autodesk Forge a few years back, I had the need to share even more code between various projects and assemblies.
-
-Today, I'm thrilled to introduce the [Onbox Framework](https://github.com/engthiago/Onboxframework),
+With the introduction of Autodesk Forge a few years back, I had the need to share even more code between various projects and assemblies.</p>
+<p>Today, I'm thrilled to introduce the <a href="https://github.com/engthiago/Onboxframework">Onbox Framework</a>,
 a free and open-source (MIT) to help us build cross-platform Revit Apps in a similar fashion
-to [Angular](https://angular.io) and [ASP.Net Core](https://dotnet.microsoft.com/learn/aspnet/what-is-aspnet-core).
+to <a href="https://angular.io">Angular</a> and <a href="https://dotnet.microsoft.com/learn/aspnet/what-is-aspnet-core">ASP.Net Core</a>.
 It is designed to make it easier to create a jump between these environments without workflow disruptions.
-It introduces several features out-of-the-box, like dependency injection (IOC Container), state management, asynchronous Revit calls, a component-based MVC library made on top of WPF, and much more!
-
-Here is the reference of the libraries that compose the framework and their NuGet packages, notice that most of the libraries are targeting .Net Standard to be used both on .NetFramework and .Net Core:
-
-- Onbox.Abstractions &ndash; Interfaces of all generic usage on the framework
-- Onbox.Core &ndash; Core implementations for all generic services
-- Onbox.Di &ndash; IOC container system
-- Onbox.Mvc.Abstractions &ndash; Interfaces for interacting with Views
-- Onbox.Mvc &ndash; Implementation of WPF MVC Views and Components
-- Onbox.Mvc.Revit.Abstractions &ndash; Interfaces for interacting with Revit and Views
-- Onbox.Mvc.Revit &ndash; Implementation of WPF MVC specific to Revit
-- Onbox.Revit.Abstractions &ndash; Interfaces for interacting with Revit
-- Onbox.Revit &ndash; Revit External Applications and Commands
-- Onbox.Store &ndash; State management for Revit MVC / WPF
-
-We have built parts of several applications using some of these libraries.
-Our current working project, [Shedmate app](https://construction.autodesk.com/integrations/shedmate), is the one that relies on it the most.
+It introduces several features out-of-the-box, like dependency injection (IOC Container), state management, asynchronous Revit calls, a component-based MVC library made on top of WPF, and much more!</p>
+<p>Here is the reference of the libraries that compose the framework and their NuGet packages, notice that most of the libraries are targeting .Net Standard to be used both on .NetFramework and .Net Core:</p>
+<ul>
+<li>Onbox.Abstractions &ndash; Interfaces of all generic usage on the framework</li>
+<li>Onbox.Core &ndash; Core implementations for all generic services</li>
+<li>Onbox.Di &ndash; IOC container system</li>
+<li>Onbox.Mvc.Abstractions &ndash; Interfaces for interacting with Views</li>
+<li>Onbox.Mvc &ndash; Implementation of WPF MVC Views and Components</li>
+<li>Onbox.Mvc.Revit.Abstractions &ndash; Interfaces for interacting with Revit and Views</li>
+<li>Onbox.Mvc.Revit &ndash; Implementation of WPF MVC specific to Revit</li>
+<li>Onbox.Revit.Abstractions &ndash; Interfaces for interacting with Revit</li>
+<li>Onbox.Revit &ndash; Revit External Applications and Commands</li>
+<li>Onbox.Store &ndash; State management for Revit MVC / WPF</li>
+</ul>
+<p>We have built parts of several applications using some of these libraries.
+Our current working project, <a href="https://construction.autodesk.com/integrations/shedmate">Shedmate app</a>, is the one that relies on it the most.
 I would say parts of it because only some libraries existed when we started coding the app.
 Shedmate is a web-based 3d configurator that needs to process the same data models in different places: Revit, our ASPNet Cloud server, and our front end Angular app.
-The cool thing here is that we can share services between the Revit and ASP and even run a script to generate our data models in typescript for Angular!
-
-**Simplicity:**
-None of the features that Onbox provides out of the box are really trying to be the best ones in the industry. The framework is made with simplicity in mind, we tried to simplify the implementations as much as we could, even when we wanted to provide more functionality, we tried to make it easy to consume simpler versions of the APIs.
-
-**Modularity:**
-The framework aims for modularity, so the idea here is that you can introduce new functionality by yourself. Our libraries, e.g. Container, Mapper, State Management, Async are tiny and are not trying to solve every single problem or implement every single feature, also they can always be replaced by more mature ones out there.
-
-**Flexible:**
-The framework also aims to be flexible, if you have an existing Revit plugin and want to give Onbox a try, you would just swap the implementation for your ExternalApplication and then for the ExternalCommand(s) you want the container to be injected on. You are good to go!
-
-**Testability:**
-With the loosely coupled architecture that the framework helps you to build, you can then use any testing frameworks like Dynamo's Revit Tester Framework or Geberit's Revit Test Runner. We are even using Design Automation on Forge to unit test our Revit Apps, that way, everything can be integrated into a CI/CD pipeline.
-
-**Documentation:**
-Documentation is in its early stages, (yeah I know.. documentation is important). We have a simple Getting Started Guide here and the complete API documentation here. The written tutorials explaining the main concepts are still of the libraries are still in the works, and we will be doing constant updates on it from now on. (now that AU recordings are finally over).
-
-**Usage and Collaboration:**
-Everyone is welcome to use it and collaborate! Being MIT licensed, you can take any parts of the framework and modify it to your usage, this is simple, because the libraries are tiny. The same thing for eventual bugs, you can step in and fix them yourself or log an issue on Github. We would appreciate any code pull requests, contributions to the documentation, and publications you make for it. The idea is to have a mature Framework so everyone can collect the benefits.
-
-**AU 2020:**
+The cool thing here is that we can share services between the Revit and ASP and even run a script to generate our data models in typescript for Angular!</p>
+<p><strong>Simplicity:</strong>
+None of the features that Onbox provides out of the box are really trying to be the best ones in the industry. The framework is made with simplicity in mind, we tried to simplify the implementations as much as we could, even when we wanted to provide more functionality, we tried to make it easy to consume simpler versions of the APIs.</p>
+<p><strong>Modularity:</strong>
+The framework aims for modularity, so the idea here is that you can introduce new functionality by yourself. Our libraries, e.g. Container, Mapper, State Management, Async are tiny and are not trying to solve every single problem or implement every single feature, also they can always be replaced by more mature ones out there.</p>
+<p><strong>Flexible:</strong>
+The framework also aims to be flexible, if you have an existing Revit plugin and want to give Onbox a try, you would just swap the implementation for your ExternalApplication and then for the ExternalCommand(s) you want the container to be injected on. You are good to go!</p>
+<p><strong>Testability:</strong>
+With the loosely coupled architecture that the framework helps you to build, you can then use any testing frameworks like Dynamo's Revit Tester Framework or Geberit's Revit Test Runner. We are even using Design Automation on Forge to unit test our Revit Apps, that way, everything can be integrated into a CI/CD pipeline.</p>
+<p><strong>Documentation:</strong>
+Documentation is in its early stages, (yeah I know.. documentation is important). We have a simple Getting Started Guide here and the complete API documentation here. The written tutorials explaining the main concepts are still of the libraries are still in the works, and we will be doing constant updates on it from now on. (now that AU recordings are finally over).</p>
+<p><strong>Usage and Collaboration:</strong>
+Everyone is welcome to use it and collaborate! Being MIT licensed, you can take any parts of the framework and modify it to your usage, this is simple, because the libraries are tiny. The same thing for eventual bugs, you can step in and fix them yourself or log an issue on Github. We would appreciate any code pull requests, contributions to the documentation, and publications you make for it. The idea is to have a mature Framework so everyone can collect the benefits.</p>
+<p><strong>AU 2020:</strong>
 I'm teaching two classes on AU this year.
 One is an industry talk (Lessons Learned in Three Years of Forge Dev &ndash; SD468705) that talks about our 3 years of Experience using Forge, the issues and problems we faced, and some tips and tricks for you do not waste so much time as we did try to solve them.
 During the class we explain the benefits of using a loosely coupled architecture for building Revit applications.
 The other one is a lab (The Cross-Platform Revit &ndash; SD468797-L).
 This one goes through an overview process of building multi-platform Revit apps, we show how to share base code for Revit plugins, Dynamo (Zero touch) nodes, and Design Automation for Revit, and we use the framework do help us to do so.
-If you are interested in the framework, please attend these classes next month on AU.
-
-<center>
+If you are interested in the framework, please attend these classes next month on AU.</p>
+<p><center>
 <img src="img/ta_onbox_framework.jpg" alt="Onbox framework" title="Onbox framework" width="600"/> <!-- 1919 -->
-</center>
-
-Many thanks to Thiago for sharing and documenting this powerful framework!
-
-####<a name="3"></a> DirectContext Rectangle Jig
-
-Kailas Dhage shared a very useful example making use of
-the [`IDirectContext3DServer` interface](https://www.revitapidocs.com/2020/7709521d-9954-ef80-1f13-3bc6ee660d5d.htm) to
-implement a plan view rectangle input jig, initially saying:
-
-I am working with a feature in which user would like to pick two corner points of rectangle and would like to see jig of rectangle while picking points. 
-It works correctly in structural plan views like Level 1 and Level 2, but does not work correctly in a 3D view.
-
-<center>
+</center></p>
+<p>Many thanks to Thiago for sharing and documenting this powerful framework!</p>
+<h4><a name="3"></a> DirectContext Rectangle Jig</h4>
+<p>Kailas Dhage shared a very useful example making use of
+the <a href="https://www.revitapidocs.com/2020/7709521d-9954-ef80-1f13-3bc6ee660d5d.htm"><code>IDirectContext3DServer</code> interface</a> to
+implement a plan view rectangle input jig, initially saying:</p>
+<p>I am working with a feature in which user would like to pick two corner points of rectangle and would like to see jig of rectangle while picking points. 
+It works correctly in structural plan views like Level 1 and Level 2, but does not work correctly in a 3D view.</p>
+<p><center>
 <img src="img/plan_view_rectangle_jig.gif" alt="Jig" title="Jig" width="600"/> <!-- 1919 -->
-</center>
-
-Can you please suggest changes to the following function, so that it returns correct mouse position in Revit model coordinates in a 3D view?
-
+</center></p>
+<p>Can you please suggest changes to the following function, so that it returns correct mouse position in Revit model coordinates in a 3D view?</p>
 <pre class="code">
 protected XYZ GetMousePoint()
 {
