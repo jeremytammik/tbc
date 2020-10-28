@@ -44,14 +44,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### DirectContext Jig
 
-It is rainy, grey and dreary... autumn is here for real. 
+Today is rainy, grey and dreary... autumn is here for real. 
 Here are some autumnal topics for this week to cheer us all up:
 
 - [The Onbox cross-platform Revit API framework](#2)
 - [DirectContext rectangle jig](#3)
 - [Creating reports from AutoCAD and Revit](#4)
 - [RevitApiDocs statistics](#5)
-- [Stop using Javascript CDN](#6)
+- [Stop using JavaScript CDN](#6)
 
 ####<a name="2"></a> The Onbox Cross-Platform Revit API Framework
 
@@ -69,7 +69,7 @@ to [Angular](https://angular.io) and [ASP.Net Core](https://dotnet.microsoft.com
 It is designed to make it easier to create a jump between these environments without workflow disruptions.
 It introduces several features out-of-the-box, like dependency injection (IOC Container), state management, asynchronous Revit calls, a component-based MVC library made on top of WPF, and much more!
 
-Here is the reference of the libraries that compose the framework and their NuGet packages, notice that most of the libraries are targeting .Net Standard to be used both on .NetFramework and .Net Core:
+Here is the reference of the libraries that compose the framework and their NuGet packages, notice that most of the libraries are targeting .Net Standard to be used both on .Net Framework and .Net Core:
 
 - Onbox.Abstractions &ndash; Interfaces of all generic usage on the framework
 - Onbox.Core &ndash; Core implementations for all generic services
@@ -95,16 +95,26 @@ None of the features that Onbox provides out of the box are really trying to be 
 The framework aims for modularity, so the idea here is that you can introduce new functionality by yourself. Our libraries, e.g. Container, Mapper, State Management, Async are tiny and are not trying to solve every single problem or implement every single feature, also they can always be replaced by more mature ones out there.
 
 **Flexible:**
-The framework also aims to be flexible, if you have an existing Revit plugin and want to give Onbox a try, you would just swap the implementation for your ExternalApplication and then for the ExternalCommand(s) you want the container to be injected on. You are good to go!
+The framework also aims to be flexible, if you have an existing Revit plugin and want to give Onbox a try, you would just swap the implementation for your external application and then for the external command implementations you want the container to be injected on. You are good to go!
 
 **Testability:**
-With the loosely coupled architecture that the framework helps you to build, you can then use any testing frameworks like Dynamo's Revit Tester Framework or Geberit's Revit Test Runner. We are even using Design Automation on Forge to unit test our Revit Apps, that way, everything can be integrated into a CI/CD pipeline.
+With the loosely coupled architecture that the framework helps you to build, you can then use any unit testing frameworks
+like [Dynamo's Revit Tester Framework](https://github.com/DynamoDS/RevitTestFramework)
+or [Geberit's Revit Test Runner](https://github.com/geberit/Revit.TestRunner).
+We are even using Design Automation on Forge to unit test our Revit Apps.
+That way, everything can be integrated into a CI/CD pipeline.
 
 **Documentation:**
-Documentation is in its early stages, (yeah I know.. documentation is important). We have a simple Getting Started Guide here and the complete API documentation here. The written tutorials explaining the main concepts are still of the libraries are still in the works, and we will be doing constant updates on it from now on. (now that AU recordings are finally over).
+Documentation is in its early stages, (yeah I know.. documentation is important).
+We have a simple Getting Started Guide here and the complete API documentation here.
+The written tutorials explaining the main concepts are still of the libraries are still in the works, and we will be doing constant updates on it from now on (now that AU recordings are finally over).
 
 **Usage and Collaboration:**
-Everyone is welcome to use it and collaborate! Being MIT licensed, you can take any parts of the framework and modify it to your usage, this is simple, because the libraries are tiny. The same thing for eventual bugs, you can step in and fix them yourself or log an issue on Github. We would appreciate any code pull requests, contributions to the documentation, and publications you make for it. The idea is to have a mature Framework so everyone can collect the benefits.
+Everyone is welcome to use it and collaborate!
+Being MIT licensed, you can take any parts of the framework and modify it to your usage, this is simple, because the libraries are tiny.
+The same thing for eventual bugs, you can step in and fix them yourself or log an issue on GitHub.
+We would appreciate any code pull requests, contributions to the documentation, and publications you make for it.
+The idea is to have a mature Framework so everyone can collect the benefits.
 
 **AU 2020:**
 I'm teaching two classes on AU this year.
@@ -122,20 +132,16 @@ Many thanks to Thiago for sharing and documenting this powerful framework!
 
 ####<a name="3"></a> DirectContext Rectangle Jig
 
-https://thebuildingcoder.typepad.com/blog/2012/06/uiview-and-windows-device-coordinates.html#comment-5115824205
+The [DuplicateGraphics SDK sample](https://thebuildingcoder.typepad.com/blog/2017/05/revit-2017-and-2018-sdk-samples.html#4.2) demonstrates
+basic usage of
+the [`IDirectContext3DServer` interface](https://www.revitapidocs.com/2020/7709521d-9954-ef80-1f13-3bc6ee660d5d.htm) for
+displaying arbitrary 3D graphics in Revit [introduced in Revit 2018](https://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-revit-2018-api.html#3.26), also discussed in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on how to [draw or render over the active view](https://forums.autodesk.com/t5/revit-api-forum/draw-render-over-the-activeview/m-p/7074503).
 
-https://forums.autodesk.com/t5/revit-api-forum/draw-render-over-the-activeview/m-p/7074503
-
-https://thebuildingcoder.typepad.com/blog/2017/05/revit-2017-and-2018-sdk-samples.html
-
-https://thebuildingcoder.typepad.com/blog/2017/05/revit-2017-and-2018-sdk-samples.html#4.2
-
- 
-
-
-Kailas Dhage shared a very useful example making use of
-the [`IDirectContext3DServer` interface](https://www.revitapidocs.com/2020/7709521d-9954-ef80-1f13-3bc6ee660d5d.htm) to
-implement a plan view rectangle input jig, initially saying:
+So far, I have not seen any other examples making use of this, so I was very glad to see Kailas Dhage's sample to
+implement a plan view rectangle input jig in
+his recent [comment](https://thebuildingcoder.typepad.com/blog/2012/06/uiview-and-windows-device-coordinates.html#comment-5115824205), saying:
 
 I am working with a feature in which user would like to pick two corner points of rectangle and would like to see jig of rectangle while picking points. 
 It works correctly in structural plan views like Level 1 and Level 2, but does not work correctly in a 3D view.
@@ -147,23 +153,23 @@ It works correctly in structural plan views like Level 1 and Level 2, but does n
 Can you please suggest changes to the following function, so that it returns correct mouse position in Revit model coordinates in a 3D view?
 
 <pre class="code">
-protected XYZ GetMousePoint()
-{
-var view = this.HostApplication.ActiveUIDocument.ActiveView;
-var uiView = GetActiveUiView(this.HostApplication.ActiveUIDocument);
-var corners = uiView.GetZoomCorners();
-var rect = uiView.GetWindowRectangle();
-var p = Cursor.Position;
-var dx = (double)(p.X - rect.Left) / (rect.Right - rect.Left);
-var dy = (double)(p.Y - rect.Bottom) / (rect.Top - rect.Bottom);
-var a = corners[0];
-var b = corners[1];
-var v = b - a;
-var q = a
-+ dx * v.X * XYZ.BasisX
-+ dy * v.Y * XYZ.BasisY;
-return q;
-}
+&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>&nbsp;GetMousePoint()
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;view&nbsp;=&nbsp;<span style="color:blue;">this</span>.HostApplication.ActiveUIDocument.ActiveView;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;uiView&nbsp;=&nbsp;GetActiveUiView(&nbsp;<span style="color:blue;">this</span>.HostApplication.ActiveUIDocument&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;corners&nbsp;=&nbsp;uiView.GetZoomCorners();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;rect&nbsp;=&nbsp;uiView.GetWindowRectangle();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;p&nbsp;=&nbsp;Cursor.Position;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;dx&nbsp;=&nbsp;(<span style="color:blue;">double</span>)&nbsp;(p.X&nbsp;-&nbsp;rect.Left)&nbsp;/&nbsp;(rect.Right&nbsp;-&nbsp;rect.Left);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;dy&nbsp;=&nbsp;(<span style="color:blue;">double</span>)&nbsp;(p.Y&nbsp;-&nbsp;rect.Bottom)&nbsp;/&nbsp;(rect.Top&nbsp;-&nbsp;rect.Bottom);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;a&nbsp;=&nbsp;corners[&nbsp;0&nbsp;];
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;b&nbsp;=&nbsp;corners[&nbsp;1&nbsp;];
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;v&nbsp;=&nbsp;b&nbsp;-&nbsp;a;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;q&nbsp;=&nbsp;a
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;dx&nbsp;*&nbsp;v.X&nbsp;*&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;dy&nbsp;*&nbsp;v.Y&nbsp;*&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisY;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;q;
+&nbsp;&nbsp;}
 </pre>
 
 **Answer:**
@@ -209,9 +215,9 @@ In the process, he shared some usage statistics from the [revitapidocs web site]
 
 Many thanks to Gui for all his work providing us with these invaluable online API docs!
 
-####<a name="6"></a> Stop Using Javascript CDN
+####<a name="6"></a> Stop Using JavaScript CDN
 
 [Terence Eden](https://edent.tel) presents some very valid reasons against using
 a third party [Content Delivery Network](https://en.wikipedia.org/wiki/Content_delivery_network) in
 his encouragement
-to [please stop using CDNs for external Javascript libraries](https://shkspr.mobi/blog/2020/10/please-stop-using-cdns-for-external-javascript-libraries).
+to [please stop using CDNs for external JavaScript libraries](https://shkspr.mobi/blog/2020/10/please-stop-using-cdns-for-external-javascript-libraries).
