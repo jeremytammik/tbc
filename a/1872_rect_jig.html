@@ -85,29 +85,29 @@ Our current working project, <a href="https://construction.autodesk.com/integrat
 I would say parts of it because only some libraries existed when we started coding the app.
 Shedmate is a web-based 3d configurator that needs to process the same data models in different places: Revit, our ASPNet Cloud server, and our front end Angular app.
 The cool thing here is that we can share services between the Revit and ASP and even run a script to generate our data models in typescript for Angular!</p>
-<p><em><strong>Simplicity:</strong></em>
+<p><u><b>Simplicity:</b></u>
 None of the features that Onbox provides out of the box are really trying to be the best ones in the industry. The framework is made with simplicity in mind, we tried to simplify the implementations as much as we could, even when we wanted to provide more functionality, we tried to make it easy to consume simpler versions of the APIs.</p>
-<p><strong>Modularity:</strong>
+<p><u><b>Modularity:</b></u>
 The framework aims for modularity, so the idea here is that you can introduce new functionality by yourself. Our libraries, e.g. Container, Mapper, State Management, Async are tiny and are not trying to solve every single problem or implement every single feature, also they can always be replaced by more mature ones out there.</p>
-<p><strong>Flexible:</strong>
+<p><u><b>Flexible:</b></u>
 The framework also aims to be flexible, if you have an existing Revit plugin and want to give Onbox a try, you would just swap the implementation for your external application and then for the external command implementations you want the container to be injected on. You are good to go!</p>
-<p><strong>Testability:</strong>
+<p><u><b>Testability:</b></u>
 With the loosely coupled architecture that the framework helps you to build, you can then use any unit testing frameworks
 like <a href="https://github.com/DynamoDS/RevitTestFramework">Dynamo's Revit Tester Framework</a>
 or <a href="https://github.com/geberit/Revit.TestRunner">Geberit's Revit Test Runner</a>.
 We are even using Design Automation on Forge to unit test our Revit Apps.
 That way, everything can be integrated into a CI/CD pipeline.</p>
-<p><strong>Documentation:</strong>
+<p><u><b>Documentation:</b></u>
 Documentation is in its early stages, (yeah I know.. documentation is important).
 We have a simple Getting Started Guide here and the complete API documentation here.
 The written tutorials explaining the main concepts are still of the libraries are still in the works, and we will be doing constant updates on it from now on (now that AU recordings are finally over).</p>
-<p><strong>Usage and Collaboration:</strong>
+<p><u><b>Usage and Collaboration:</b></u>
 Everyone is welcome to use it and collaborate!
 Being MIT licensed, you can take any parts of the framework and modify it to your usage, this is simple, because the libraries are tiny.
 The same thing for eventual bugs, you can step in and fix them yourself or log an issue on GitHub.
 We would appreciate any code pull requests, contributions to the documentation, and publications you make for it.
 The idea is to have a mature Framework so everyone can collect the benefits.</p>
-<p><strong>AU 2020:</strong>
+<p><u><b>AU 2020:</b></u>
 I'm teaching two classes on AU this year.
 One is an industry talk (Lessons Learned in Three Years of Forge Dev &ndash; SD468705) that talks about our 3 years of Experience using Forge, the issues and problems we faced, and some tips and tricks for you do not waste so much time as we did try to solve them.
 During the class we explain the benefits of using a loosely coupled architecture for building Revit applications.
