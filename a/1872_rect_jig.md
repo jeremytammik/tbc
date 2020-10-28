@@ -44,6 +44,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### DirectContext Jig
 
+It is rainy, grey and dreary... autumn is here for real. 
+Here are some autumnal topics for this week to cheer us all up:
+
+- [The Onbox cross-platform Revit API framework](#2)
+- [DirectContext rectangle jig](#3)
+- [Creating reports from AutoCAD and Revit](#4)
+- [RevitApiDocs statistics](#5)
+- [Stop using Javascript CDN](#6)
+
 ####<a name="2"></a> The Onbox Cross-Platform Revit API Framework
 
 Thiago Almeida of [Blackbird Industries](https://blackbirdindustries.com.au) shares some exciting news in 
@@ -121,6 +130,8 @@ https://thebuildingcoder.typepad.com/blog/2017/05/revit-2017-and-2018-sdk-sample
 
 https://thebuildingcoder.typepad.com/blog/2017/05/revit-2017-and-2018-sdk-samples.html#4.2
 
+ 
+
 
 Kailas Dhage shared a very useful example making use of
 the [`IDirectContext3DServer` interface](https://www.revitapidocs.com/2020/7709521d-9954-ef80-1f13-3bc6ee660d5d.htm) to
@@ -197,3 +208,10 @@ In the process, he shared some usage statistics from the [revitapidocs web site]
 </center>
 
 Many thanks to Gui for all his work providing us with these invaluable online API docs!
+
+####<a name="6"></a> Stop Using Javascript CDN
+
+[Terence Eden](https://edent.tel) presents some very valid reasons against using
+a third party [Content Delivery Network](https://en.wikipedia.org/wiki/Content_delivery_network) in
+his encouragement
+to [please stop using CDNs for external Javascript libraries](https://shkspr.mobi/blog/2020/10/please-stop-using-cdns-for-external-javascript-libraries).
