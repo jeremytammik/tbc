@@ -1,0 +1,281 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head>
+
+<!---
+
+- retrieve the BIM 360 Document Management Project Id of the active Revit model
+  BIM 360 Document Management Project Id of Revit cloud model
+  https://forums.autodesk.com/t5/revit-api-forum/bim-360-document-management-project-id-of-revit-cloud-model/m-p/9830419
+
+- custom export precision
+  CustomExporter Export Very Jagged Mesh for Curved Surfaces?
+  https://forums.autodesk.com/t5/revit-api-forum/customexporter-export-very-jagged-mesh-for-curved-surfaces/td-p/9820131
+
+- JtClicker to dismiss a dialogue:
+  Q: Here in this below link
+  https://thebuildingcoder.typepad.com/blog/2009/10/dismiss-dialogue-using-windows-api.html
+  you mentioned how to use the native window API hook.
+  But what the customer wants is a complete sample project/solution to understand the native windows API hook to dismiss the dialogue box in Revit.
+  Do we have any sample project/solution to understand how the windows hook function is used in Revit?
+  A: Whenever searching for such information, on of the first places to go are The Building Coder topic groups:
+  https://thebuildingcoder.typepad.com/blog/about-the-author.html#5
+  In this case, Detecting and Handling Dialogues and Failures:
+  https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32
+  The Windows hook functionality is not really used "in Revit", as far as I can remember.
+  It is independent functionality that can possibly interact with a Revit add-in.
+  Here is the complete project on GitHub:
+  https://github.com/jeremytammik/JtClicker
+
+- AU is coming up. Are you possibly thinking about recording a video?
+  Check our Descript before you do.
+  [Descript](https://www.descript.com) is a collaborative audio and video editor that works like a doc.
+  It includes transcription, a screen recorder, publishing, full multitrack editing, and some mind-bendingly useful AI tools.
+  https://youtu.be/Bl9wqNe5J8U
+  [blog post](https://medium.com/descript/introducing-descript-fa37eb193819)
+
+- hackathon -- https://www.keanw.com/2020/10/aec-and-forge-hackathons.html
+
+- AU classes for construction customers
+  https://forge.autodesk.com/blog/forge-au-classes-construction
+
+- retrieve identity data in Forge Viewer
+  https://autodesk.slack.com/archives/C0LP63082/p1602524162022900
+  Namit Ranjan Yesterday at 19:36
+  Hi team, a customer is trying to retrieve the "Identity Data" of a sheet in a Revit model using Model Derivative but is unsuccessful. I tried as well but could not find this info anywhere in the properties. Can someone confirm if it's possible or should we recommend them to use Design Automation for this? Thanks!
+  image.png 
+  image.png
+  /a/doc/revit/tbc/git/a/img/sheet_identity_data.png 1107
+  Traian Stanev  13 hours ago
+  It should be possible to get sheet properties by navigating the hierarchy of the object tree. The root node (id=1) is the document, and the sheets will be listed as children of that root. One would need to iterate through the children of the root to get the properties of the sheets and views.
+  Namit Ranjan  12 hours ago
+  Hi @Traian Stanev: Thanks. I do see the model as id=1 but I can't find sheets as children of that root. I also do not see "Sheet" in model browser in the Forge viewer in any example (which certainly contain Revit models having sheets). Am I overlooking something?
+  Traian Stanev  12 hours ago
+  The model browser will not show sheets because they do not have physical geometry associated with them. However, there will be sheet objects as children of the root.
+  Traian Stanev  12 hours ago
+  I don't know whether it's true for 100% of RVTs that sheets will appear in the property database though and it probably depends on which API you use to get properties. I'm referring to the full property database available to the Forge viewer. (edited) 
+  Namit Ranjan  12 hours ago
+  This is an export of the tree for my Revit model
+  Untitled 
+  {
+      "data": {
+          "type": "objects",
+          "objects": [
+              {
+  Click to expand in-line (2,059 lines)
+  Namit Ranjan  12 hours ago
+  ^ this is /metadata
+  Namit Ranjan  12 hours ago
+  ..and this is /properties
+  Untitled 
+  {
+      "data": {
+          "type": "properties",
+          "collection": [
+              {
+  Click to expand in-line (20,859 lines)
+  Namit Ranjan  12 hours ago
+  @Traian Stanev: and just FYI with the above snippets from /metadata and /properties, the sheet I'm looking is called "A102 - Plans". Thanks for the help btw :slightly_smiling_face: (edited) 
+  Traian Stanev  12 hours ago
+  I can't really comment about what subset of element properties are returned by the Forge properties API.
+  Traian Stanev  12 hours ago
+  I just know that the Forge viewer will show sheet properties in some cases, like in BIM360 Docs when you open the sheet.
+  Namit Ranjan  12 hours ago
+  @Traian Stanev: I don't think BIM 360 Docs shows properties of sheets. It does show properties of elements in that sheet, but since there's no way to "select" a sheet, we do not get the properties of the sheet. Let me do a quick check and confirm (edited) 
+  Namit Ranjan  12 hours ago
+  @Traian Stanev: nope, I stand corrected. BIM 360 does show those properties. I am just wondering now how does it get those properties. :open_mouth:
+  Traian Stanev  12 hours ago
+  It does it like I said -- it loops through the children of the root node and find the sheet element with the matching name.
+  Traian Stanev  12 hours ago
+  However, it's not using the Forge properties API.
+  Traian Stanev  12 hours ago
+  It uses the raw property data, available to the Forge Viewer, and it does it like this: https://git.autodesk.com/A360/firefly.js/blob/develop/src/gui/ViewerPropertyPanel.js#L377
+  Namit Ranjan  12 hours ago
+  @Traian Stanev: I perhaps do not have the entitlement to access the above but I kind of understand what you're trying to say. I understand that the properties are being retrieved by the raw property data. However, to first select the element id, the hierarchy (from /metadata endpoint) should retrieve sheets, right? I don't see sheets in that response; or is it that there's also another raw data which is different than Forge metadata  API?
+  Traian Stanev  12 hours ago
+  The forge metadata endpoint is not raw, it's processed data. From the above, it looks like it's missing the child properties that will let you easily find the sheets from the root element.
+  Namit Ranjan  11 hours ago
+  @Traian Stanev: Thanks, this is very helpful. Final question is - can this raw data be accessed by a customer?
+  Traian Stanev  11 hours ago
+  Yes, using Forge Viewer.
+  Traian Stanev  11 hours ago
+  I think you could ask #forge-modelderivative for more details though. It's possible there is a way to get this information via metadata that I am not aware of.
+  Namit Ranjan  11 hours ago
+  okay, the customer probably wants to query and fetch attribute values (maybe plug those values in a DB, just thinking) and that won't be possible using Forge viewer, right?
+  Jim Quanci  20 days ago
+  The MD service does let you perform queries to get the metadata you want... with two choices of data format... yes the MD slack channel or @Augusto Goncalves can help.  Some small chance you will run into data MD doesnt collect and Revit Design Automation would be your fallback.
+  Namit Ranjan  20 days ago
+  Thanks @Jim Quanci, I'll put this up shortly on the MD channel. Also, @Augusto Goncalves, would be great if you could provide your input. Thanks :slightly_smiling_face:
+  Augusto Goncalves  20 days ago
+  sure, with Design Automation you can definitely extract additional data, see this sample: https://github.com/augustogoncalves/forge-customproperty-revit
+  augustogoncalves/forge-customproperty-revit
+  Extract Compound Structure Layer for RVT files using Design Automation for Revit
+  <https://github.com/augustogoncalves/forge-customproperty-revit|augustogoncalves/forge-customproperty-revit>augustogoncalves/forge-customproperty-revit | 27 Mar | Added by GitHub
+  Namit Ranjan  20 days ago
+  @Augusto Goncalves: Thanks a lot. I'll share this useful example with the customer. Thanks
+  Augusto Goncalves  20 days ago
+  this will also be useful: https://forge.autodesk.com/blog/forge-au-2020-pre-event-online-bootcamp
+
+twitter:
+
+The Onbox cross-platform #RevitAPI framework, a DirectContext rectangle jig, reports from AutoCAD and Revit, RevitApiDocs statistics and deprecating JavaScript CDN with @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://bit.ly/directcontextjig
+
+Autumnal topics for this week
+&ndash; The Onbox cross-platform Revit API framework
+&ndash; DirectContext rectangle jig
+&ndash; Creating reports from AutoCAD and Revit
+&ndash; RevitApiDocs statistics
+&ndash; Stop using JavaScript CDN...
+
+linkedin:
+
+The Onbox cross-platform #RevitAPI framework, a DirectContext rectangle jig, reports from AutoCAD and Revit, RevitApiDocs statistics and deprecating JavaScript CDN:
+
+http://bit.ly/directcontextjig
+
+Autumnal topics for this week:
+
+- The Onbox cross-platform Revit API framework
+- DirectContext rectangle jig
+- Creating reports from AutoCAD and Revit
+- RevitApiDocs statistics
+- Stop using JavaScript CDN...
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+### AU Hackathon, Custom Export Precision, Dialogue Handler
+
+
+####<a name="2"></a> 
+
+####<a name="3"></a> 
+
+
+<pre class="code">
+</pre>
+
+####<a name="4"></a> 
+
+
+**Question:** 
+
+**Answer:**
+
+
+
+Many thanks to Gui for all his work providing us with these invaluable online API docs!
+
+####<a name="6"></a> Retrieve Sheet Metadata in Forge Viewer
+
+<!-- https://autodesk.slack.com/archives/C0LP63082/p1602524162022900 -->
+
+**Question:** I am trying to retrieve the 'Identity Data' of a sheet in a Revit model using the Model Derivative API:
+
+<center>
+<img src="img/sheet_identity_data.png" alt="Sheet identity data" title="Sheet identity data" width="553"/> <!-- 1107 -->
+</center>
+
+Unfortunately, I was unable to find this info anywhere in the properties.
+Is it possible, or do I have to use Design Automation for this?
+Thanks!
+
+**Answer:**  It should be possible to get sheet properties by navigating the hierarchy of the object tree.
+The root node (`id` = `1`) is the document, and the sheets will be listed as children of that root.
+One would need to iterate through the children of the root to get the properties of the sheets and views.
+
+**Response:** I do see the model as `id` = `1`, but I can't find sheets as children of that root.
+I also do not see `Sheet` in the model browser in the Forge viewer in any example (which certainly contain Revit models having sheets).
+Am I overlooking something?
+
+**Answer:** The model browser will not show sheets, because they do not have physical geometry associated with them.
+However, there will be sheet objects as children of the root.
+
+Maybe, in some RVTs, sheets do not appear in the property database, though.
+It probably depends on which API you use to get properties.
+I'm referring to the full property database available to the Forge viewer.
+
+**Response:** This is an export of the tree of `/metadata` for my Revit model:
+
+<pre class="code">
+Untitled 
+{
+"data": {
+  "type": "objects",
+  "objects": [
+      {
+      // ... (2,059 lines)
+</pre>
+
+Here are the `/properties`:
+
+<pre class="code">
+Untitled 
+{
+"data": {
+  "type": "properties",
+  "collection": [
+      {
+      // ... (20,859 lines)
+</pre>
+
+These come from a sheet called "A102 - Plans".
+
+**Answer:** I don't know what subset of element properties are returned by the Forge properties API.
+I do know that the Forge viewer will show sheet properties in some cases, e.g., in BIM360 Docs when you open the sheet.
+
+**Response:** Yes indeed, BIM 360 Docs does show properties of sheets.
+I checked and confirmed.
+Now I wonder how it gets those properties.
+
+**Answer:** Just like I said &ndash; it loops through the children of the root node and finds the sheet element with the matching name.
+However, it's not using the Forge properties API.
+It uses the raw property data, available to the Forge Viewer
+
+**Response:** I kind of understand what you say.
+I understand that the properties are being retrieved by the raw property data.
+However, to first select the element id, the hierarchy (from the `/metadata` endpoint) should retrieve sheets, right?
+I don't see sheets in that response; or is it that there's also other raw data which is different from the Forge metadata API?
+
+**Answer:** The Forge metadata endpoint is not raw, it's processed data.
+From the above, it looks like it's missing the child properties that will let you easily find the sheets from the root element.
+
+**Response:** Thanks, this is very helpful.
+Final question: can this raw data be accessed by a customer?
+
+**Answer:** Yes, using Forge Viewer.
+It may be possible to get this information via metadata somehow that I am not aware of.
+
+**Response:** Hmm... so, if I want to query and fetch attribute values, that won't be possible using Forge viewer, right?
+
+**Answer:** The MD service does let you perform queries to get the metadata you want, with two choices of data format.
+If you run into data that MD does not collect, and Revit Design Automation would be your fallback.
+
+Here is an example accessing additional metadata,
+to [extract compound structure layer from RVT files using Design Automation for Revit](https://github.com/augustogoncalves/forge-customproperty-revit).
+The resources listed for the [Forge at AU 2020 pre-event online bootcamp](https://forge.autodesk.com/blog/forge-au-2020-pre-event-online-bootcamp) will also be useful.
+
+
+####<a name="6"></a> AI Helps Solve Partial Differential Equations
+
+[AI has cracked a key mathematical puzzle for understanding our world](https://www.technologyreview.com/2020/10/30/1011435/ai-fourier-neural-network-cracks-navier-stokes-and-partial-differential-equations):
+
+> Partial differential equations can describe everything from planetary motion to plate tectonics, but they’re notoriously hard to solve...
+
+> They can be used to model everything from planetary orbits to plate tectonics to the air turbulence that disturbs a flight, which in turn allows us to do practical things like predict seismic activity and design safe planes...
+
+> PDEs are notoriously hard to solve...
+
+> Researchers at Caltech have introduced a new deep-learning technique for solving PDEs,
+a [Fourier Neural Operator for Parametric
+Partial Differential Equations](https://arxiv.org/pdf/2010.08895.pdf), ... dramatically more accurate... much more generalizable, ... 1,000 times faster ...
