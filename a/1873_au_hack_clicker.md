@@ -154,7 +154,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### AU Hackathon, Custom Export Precision, Dialogue Handler
 
-I lit upon quite a number of interesting pure Revit API, Forge, BIM360 and AI topics in the past few days:
+I lit upon many interesting topics in the past few days, on pure Revit API, Forge, BIM360 and AI:
 
 - [Custom export precision](#2)
 - [Dismissing a Windows dialogue with JtClicker](#3)

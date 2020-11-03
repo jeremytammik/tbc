@@ -151,69 +151,18 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>AU Hackathon, Custom Export Precision, Dialogue Handler ####<a name="2"></a></h3>
-<h4><a name="3"></a> <pre class="code"></h4>
-</pre>
-
-<h4><a name="4"></a></h4>
-<p>Kevin Augustino very kindly shared his current approach
-to <a href="https://forums.autodesk.com/t5/revit-api-forum/bim-360-document-management-project-id-of-revit-cloud-model/m-p/9830419">retrieve the BIM 360 Document Management Project Id of the active Revit cloud model</a>:</p>
-<p><strong>Question:</strong> How can I retrieve the BIM 360 Document Management Project Id of the active Revit model?
-I'm aware of <em>Document.GetCloudModelPath().GetProjectGUID()</em>, but this seems to be a C4R Project Id.
-I need the Document Management Id to interface with
-the [Forge BIM 360 and Data Management APIs]((https://forge.autodesk.com/en/docs/bim360/v1/reference/http/).</p>
-<p>So far, I've found that the Document Management file has an attribute that matches the C4R Project Guid: <em>attributes.extension.data.projectGuid</em>.</p>
-<p>So, I need to find the Docs project that contains a file such that:</p>
-<pre>
-  attributes.extension.data.projectGuid
-    = <ActiveRevitDocument>.GetCloudModelPath().GetProjectGUID().
-</pre>
-
-<p>But surely there's a better approach than doing a <a href="https://forge.autodesk.com/en/docs/data/v2/reference/http/projects-project_id-folders-folder_id-search-GET/">folder search</a> using a filter matching <em>filter[attributes.extension.data.projectGuid]</em> with <code>ValueFromCloudModelPath</code> on every Docs Project that my Forge App has access to?</p>
-<p><strong>Answer:</strong> I asked the development team for you whether they can suggest a better way.
-They are currently discussing the implementation of a directl method to retrieve the BIM 360 project id of the document via a property such as <code>Document.ProjectId</code>, now as we speak. It will hopefully be available in a future release of Revit.</p>
-<p>Meanwhile, the convoluted approach you describe sounds significantly better than nothing at all to me, so well done finding a way through the maze.</p>
-<p><strong>Response:</strong> For anyone else who runs into this same need, here are some of my other findings:</p>
-<p><code>Document.PathName</code> seems to be a string in this form when opening a cloud model:</p>
-<pre>
-  BIM 360://<DocsProjectName>/<ModelName>.rvt
-</pre>
-
-<p>So, another option is to try parsing <code>Document.PathName</code> to get the Document Management Project name:</p>
-<pre class="code">
-  string regexPattern =
-    @"^BIM 360:\/\/(?<ProjectName>.*)\/(?<ModelName>.*)$";
-
-  if (Regex.IsMatch(doc.PathName, regexPattern))
-  {
-    Match match = Regex.Match( doc.PathName, regexPattern );
-    string projectName = match.Groups["ProjectName"].Value;
-  }
-</pre>
-
-<p>Then look for a project with that name by iterating each hub returned
-from <em>https://forge.autodesk.com/en/docs/data/v2/reference/http/hubs-GET/</em>,
-and, on each one, try
-to <a href="https://forge.autodesk.com/en/docs/data/v2/reference/http/hubs-hub_id-projects-GET/">get a project using a name filter</a>,
-using a filter such as</p>
-<pre>
-  string.format( "?filter[attributes.name]={0}",
-    HttpUtility.UrlEncode(projectName))
-</pre>
-
-<p>If this project name isn't unique, then this approach might not get the correct one.
-But additional processing can be applied to use a folder search looking for</p>
-<pre>
-  attributes.extension.data.projectGuid
-    =<ActiveRevitDocument>.GetCloudModelPath().GetProjectGUID()
-</pre>
-
-<p>So at least this way, the folder search is only done on potential matches, rather than every single project.</p>
-<p>If the Document Management project name changes, then <code>Document.PathName</code> won't refresh to the new project name until you re-save the model.
-So, as a fallback, if I still haven't found the project Id, I resort to the folder search on every project regardless of name.</p>
-<p>Not ideal, but hopefully a direct method will be added to the Revit API in the future!</p>
-<p>Many thanks to Kevin for all his research and documentation work on this!</p>
-<h4><a name="6"></a> Custom Export Precision</h4>
+<h3>AU Hackathon, Custom Export Precision, Dialogue Handler</h3>
+<p>I lit upon many interesting topics in the past few days, on pure Revit API, Forge, BIM360 and AI:</p>
+<ul>
+<li><a href="#2">Custom export precision</a></li>
+<li><a href="#3">Dismissing a Windows dialogue with JtClicker</a></li>
+<li><a href="#4">AU classes for construction customers</a></li>
+<li><a href="#5">Retrieve sheet metadata in Forge viewer</a></li>
+<li><a href="#6">Determining the BIM 360 project id</a></li>
+<li><a href="#7">AI Helps solve partial differential equations</a></li>
+<li><a href="#8">AI-enhanced video editing</a></li>
+</ul>
+<h4><a name="2"></a> Custom Export Precision</h4>
 <p><a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3074901">Sunsflower</a> took<br />
 another look at improving the precision of a custom exporter in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
@@ -234,7 +183,7 @@ This way, I can input a <code>LevelOfDetail</code> parameter.
 However, I lose all <code>UV</code> data at the same time.
 Currently, I use <code>Face.Project</code> to approximate a set of <code>UV</code>, which is quite unstable.</p>
 <p>I also tried to set the <code>LevelOfDetail</code> property on <code>ViewNode</code>, and it also works.</p>
-<h4><a name="6"></a> Dismissing a Windows Dialogue with JtClicker</h4>
+<h4><a name="3"></a> Dismissing a Windows Dialogue with JtClicker</h4>
 <p>Another topi groups is dedicated
 to <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32">Detecting and Handling Dialogues and Failures</a>.</p>
 <p>It started out before the <a href="https://www.revitapidocs.com/2020/cb46ea4c-2b80-0ec2-063f-dda6f662948a.htm">DialogBoxShowing event</a> and
@@ -249,18 +198,11 @@ The Windows hook functionality is not really used "in Revit", as far as I can re
 It is independent functionality that can possibly interact with a Revit add-in.
 The complete project is available in
 the <a href="https://github.com/jeremytammik/JtClicker">JtClicker repository on GitHub</a>.</p>
-<h4><a name="6"></a> AI Enhances Video Recording</h4>
-<p>AU is coming up. Are you possibly thinking about recording a video?
-Check our Descript before you do.
-<a href="https://www.descript.com">Descript</a> is a collaborative audio and video editor that works like a doc.
-It includes transcription, a screen recorder, publishing, full multitrack editing, and some mind-bendingly useful AI tools.
-https://youtu.be/Bl9wqNe5J8U
-<a href="https://medium.com/descript/introducing-descript-fa37eb193819">blog post</a></p>
-<h4><a name="6"></a> AU Classes for Construction Customers</h4>
+<h4><a name="4"></a> AU Classes for Construction Customers</h4>
 <p>Are you specifically interested in construction?
 Check out the overview
 of <a href="https://forge.autodesk.com/blog/forge-au-classes-construction">AU classes for construction customers</a>.</p>
-<h4><a name="6"></a> Retrieve Sheet Metadata in Forge Viewer</h4>
+<h4><a name="5"></a> Retrieve Sheet Metadata in Forge Viewer</h4>
 <!-- https://autodesk.slack.com/archives/C0LP63082/p1602524162022900 -->
 
 <p><strong>Question:</strong> I am trying to retrieve the 'Identity Data' of a sheet in a Revit model using the Model Derivative API:</p>
@@ -328,7 +270,65 @@ If you run into data that MD does not collect, and Revit Design Automation would
 <p>Here is an example accessing additional metadata,
 to <a href="https://github.com/augustogoncalves/forge-customproperty-revit">extract compound structure layer from RVT files using Design Automation for Revit</a>.
 The resources listed for the <a href="https://forge.autodesk.com/blog/forge-au-2020-pre-event-online-bootcamp">Forge at AU 2020 pre-event online bootcamp</a> will also be useful.</p>
-<h4><a name="6"></a> AI Helps Solve Partial Differential Equations</h4>
+<h4><a name="6"></a> Determining the BIM 360 Project Id</h4>
+<p>Kevin Augustino very kindly shared his current approach
+to <a href="https://forums.autodesk.com/t5/revit-api-forum/bim-360-document-management-project-id-of-revit-cloud-model/m-p/9830419">retrieve the BIM 360 Document Management Project Id of the active Revit cloud model</a>:</p>
+<p><strong>Question:</strong> How can I retrieve the BIM 360 Document Management Project Id of the active Revit model?
+I'm aware of <em>Document.GetCloudModelPath().GetProjectGUID()</em>, but this seems to be a C4R Project Id.
+I need the Document Management Id to interface with
+the [Forge BIM 360 and Data Management APIs]((https://forge.autodesk.com/en/docs/bim360/v1/reference/http/).</p>
+<p>So far, I've found that the Document Management file has an attribute that matches the C4R Project Guid: <em>attributes.extension.data.projectGuid</em>.</p>
+<p>So, I need to find the Docs project that contains a file such that:</p>
+<pre>
+  attributes.extension.data.projectGuid
+    = <ActiveRevitDocument>.GetCloudModelPath().GetProjectGUID().
+</pre>
+
+<p>But surely there's a better approach than doing a <a href="https://forge.autodesk.com/en/docs/data/v2/reference/http/projects-project_id-folders-folder_id-search-GET/">folder search</a> using a filter matching <em>filter[attributes.extension.data.projectGuid]</em> with <code>ValueFromCloudModelPath</code> on every Docs Project that my Forge App has access to?</p>
+<p><strong>Answer:</strong> I asked the development team for you whether they can suggest a better way.
+They are currently discussing the implementation of a directl method to retrieve the BIM 360 project id of the document via a property such as <code>Document.ProjectId</code>, now as we speak. It will hopefully be available in a future release of Revit.</p>
+<p>Meanwhile, the convoluted approach you describe sounds significantly better than nothing at all to me, so well done finding a way through the maze.</p>
+<p><strong>Response:</strong> For anyone else who runs into this same need, here are some of my other findings:</p>
+<p><code>Document.PathName</code> seems to be a string in this form when opening a cloud model:</p>
+<pre>
+  BIM 360://<DocsProjectName>/<ModelName>.rvt
+</pre>
+
+<p>So, another option is to try parsing <code>Document.PathName</code> to get the Document Management Project name:</p>
+<pre class="code">
+  string regexPattern =
+    @"^BIM 360:\/\/(?<ProjectName>.*)\/(?<ModelName>.*)$";
+
+  if (Regex.IsMatch(doc.PathName, regexPattern))
+  {
+    Match match = Regex.Match( doc.PathName, regexPattern );
+    string projectName = match.Groups["ProjectName"].Value;
+  }
+</pre>
+
+<p>Then look for a project with that name by iterating each hub returned
+from <em>https://forge.autodesk.com/en/docs/data/v2/reference/http/hubs-GET/</em>,
+and, on each one, try
+to <a href="https://forge.autodesk.com/en/docs/data/v2/reference/http/hubs-hub_id-projects-GET/">get a project using a name filter</a>, 
+using a filter such as</p>
+<pre>
+  string.format( "?filter[attributes.name]={0}",
+    HttpUtility.UrlEncode(projectName))
+</pre>
+
+<p>If this project name isn't unique, then this approach might not get the correct one.
+But additional processing can be applied to use a folder search looking for</p>
+<pre>
+  attributes.extension.data.projectGuid
+    =<ActiveRevitDocument>.GetCloudModelPath().GetProjectGUID()
+</pre>
+
+<p>So at least this way, the folder search is only done on potential matches, rather than every single project.</p>
+<p>If the Document Management project name changes, then <code>Document.PathName</code> won't refresh to the new project name until you re-save the model.
+So, as a fallback, if I still haven't found the project Id, I resort to the folder search on every project regardless of name.</p>
+<p>Not ideal, but hopefully a direct method will be added to the Revit API in the future!</p>
+<p>Many thanks to Kevin for all his research and documentation work on this!</p>
+<h4><a name="7"></a> AI Helps Solve Partial Differential Equations</h4>
 <p><a href="https://www.technologyreview.com/2020/10/30/1011435/ai-fourier-neural-network-cracks-navier-stokes-and-partial-differential-equations">AI has cracked a key mathematical puzzle for understanding our world</a>:</p>
 <blockquote>
 <p>Partial differential equations can describe everything from planetary motion to plate tectonics, but they’re notoriously hard to solve...</p>
@@ -338,3 +338,12 @@ The resources listed for the <a href="https://forge.autodesk.com/blog/forge-au-2
 a <a href="https://arxiv.org/pdf/2010.08895.pdf">Fourier Neural Operator for Parametric
 Partial Differential Equations</a>, ... dramatically more accurate... much more generalizable, ... 1,000 times faster ...</p>
 </blockquote>
+<h4><a name="8"></a> AI-Enhanced Video Editing</h4>
+<p>Here is another example of AI usage that may come in more handy to you right away than solving differential equations:</p>
+<p>AU is coming up. Are you possibly thinking about recording a video?
+Check out <a href="https://www.descript.com">Descript</a> before you do.
+It is a collaborative audio and video editor that includes transcription, a screen recorder, publishing, full multitrack editing, and some mind-bendingly useful AI tools:</p>
+<ul>
+<li><a href="https://youtu.be/Bl9wqNe5J8U">Video</a></li>
+<li><a href="https://medium.com/descript/introducing-descript-fa37eb193819">Blog post</a></li>
+</ul>
