@@ -163,12 +163,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li><a href="#8">AI-enhanced video editing</a></li>
 </ul>
 <h4><a name="2"></a> Custom Export Precision</h4>
-<p><a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3074901">Sunsflower</a> took<br />
+<p><a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3074901">Sunsflower</a> took
 another look at improving the precision of a custom exporter in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/customexporter-export-very-jagged-mesh-for-curved-surfaces/td-p/9820131">CustomExporter Export Very Jagged Mesh for Curved Surfaces</a>:</p>
-<p><strong>Question:</strong> As shown in the screenshots below, when I tried to export a curved surface, the <code>OnPolyMesh</code> method in <code>IExportContext</code> gives very jagged edges.
-Is there a way to improve this?</p>
+<p><strong>Question:</strong> As shown in the screenshots below, when I tried to export a curved surface, the <code>OnPolyMesh</code> method in <code>IExportContext</code> produces very jagged edges:</p>
+<p><center>
+<img src="img/custom_export_precision_1.png" alt="Jagged edges" title="Jagged edges" width="500"/> <!-- 837 -->
+<img src="img/custom_export_precision_2.png" alt="Smooth edges" title="Smooth edges" width="500"/> <!-- 605 -->
+</center></p>
+<p>Is there a way to improve this?</p>
 <p><strong>Answer:</strong> Check out The Building Coder topic group on
 the <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.1">custom exporter</a>.</p>
 <p>Especially, please read these two posts:</p>
@@ -184,18 +188,18 @@ However, I lose all <code>UV</code> data at the same time.
 Currently, I use <code>Face.Project</code> to approximate a set of <code>UV</code>, which is quite unstable.</p>
 <p>I also tried to set the <code>LevelOfDetail</code> property on <code>ViewNode</code>, and it also works.</p>
 <h4><a name="3"></a> Dismissing a Windows Dialogue with JtClicker</h4>
-<p>Another topi groups is dedicated
-to <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32">Detecting and Handling Dialogues and Failures</a>.</p>
+<p>Another topic group is dedicated
+to <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32">detecting and handling dialogues and failures</a>.</p>
 <p>It started out before the <a href="https://www.revitapidocs.com/2020/cb46ea4c-2b80-0ec2-063f-dda6f662948a.htm">DialogBoxShowing event</a> and
-<a href="https://www.revitapidocs.com/2020/c03bb2e5-f679-bf24-4e87-08b3c3a08385.htm">failure handling APIs</a> were implemented, using a Windows hook to determine that a dialogue was being shown:</p>
-<p><strong>Question:</strong> You mentioned how to use the native Windows API hook
+<a href="https://www.revitapidocs.com/2020/c03bb2e5-f679-bf24-4e87-08b3c3a08385.htm">Failure handling APIs</a> were implemented, using a Windows hook to determine that a dialogue was being shown:</p>
+<p><strong>Question:</strong> You explained how to use the native Windows API hook
 to <a href="https://thebuildingcoder.typepad.com/blog/2009/10/dismiss-dialogue-using-windows-api.html">dismiss a dialogue</a>.
-Is there a complete sample project and solution available to understand how tio use it to dismiss the dialogue box in Revit?</p>
+Is there a complete sample project and solution available to understand how to use it to dismiss the dialogue box in Revit?</p>
 <p><strong>Answer:</strong> Whenever searching for such information, one of the first places to go
 are <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5">The Building Coder topic groups</a>.
 In this case, you can look at <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32">detecting and handling dialogues and failures</a>.
-The Windows hook functionality is not really used "in Revit", as far as I can remember.
-It is independent functionality that can possibly interact with a Revit add-in.
+The Windows hook functionality is not really used 'in Revit', as far as I can remember.
+It is independent functionality that can interact with a Revit add-in, if you like.
 The complete project is available in
 the <a href="https://github.com/jeremytammik/JtClicker">JtClicker repository on GitHub</a>.</p>
 <h4><a name="4"></a> AU Classes for Construction Customers</h4>
@@ -203,6 +207,8 @@ the <a href="https://github.com/jeremytammik/JtClicker">JtClicker repository on 
 Check out the overview
 of <a href="https://forge.autodesk.com/blog/forge-au-classes-construction">AU classes for construction customers</a>.</p>
 <h4><a name="5"></a> Retrieve Sheet Metadata in Forge Viewer</h4>
+<p>Now, let's turn to Forge.
+Here is a pretty illuminating exploration on accessing Revit sheet metadata in that environment:</p>
 <!-- https://autodesk.slack.com/archives/C0LP63082/p1602524162022900 -->
 
 <p><strong>Question:</strong> I am trying to retrieve the 'Identity Data' of a sheet in a Revit model using the Model Derivative API:</p>
@@ -268,36 +274,36 @@ It may be possible to get this information via metadata somehow that I am not aw
 <p><strong>Answer:</strong> The MD service does let you perform queries to get the metadata you want, with two choices of data format.
 If you run into data that MD does not collect, and Revit Design Automation would be your fallback.</p>
 <p>Here is an example accessing additional metadata,
-to <a href="https://github.com/augustogoncalves/forge-customproperty-revit">extract compound structure layer from RVT files using Design Automation for Revit</a>.
-The resources listed for the <a href="https://forge.autodesk.com/blog/forge-au-2020-pre-event-online-bootcamp">Forge at AU 2020 pre-event online bootcamp</a> will also be useful.</p>
+to <a href="https://github.com/augustogoncalves/forge-customproperty-revit">extract compound structure layer from RVT files using Design Automation for Revit</a>.</p>
+<p>The resources listed for the <a href="https://forge.autodesk.com/blog/forge-au-2020-pre-event-online-bootcamp">Forge at AU 2020 pre-event online bootcamp</a> will probably also be useful for you.</p>
 <h4><a name="6"></a> Determining the BIM 360 Project Id</h4>
 <p>Kevin Augustino very kindly shared his current approach
 to <a href="https://forums.autodesk.com/t5/revit-api-forum/bim-360-document-management-project-id-of-revit-cloud-model/m-p/9830419">retrieve the BIM 360 Document Management Project Id of the active Revit cloud model</a>:</p>
 <p><strong>Question:</strong> How can I retrieve the BIM 360 Document Management Project Id of the active Revit model?
 I'm aware of <em>Document.GetCloudModelPath().GetProjectGUID()</em>, but this seems to be a C4R Project Id.
 I need the Document Management Id to interface with
-the [Forge BIM 360 and Data Management APIs]((https://forge.autodesk.com/en/docs/bim360/v1/reference/http/).</p>
+the <a href="https://forge.autodesk.com/en/docs/bim360/v1/reference/http/">Forge BIM 360 and Data Management APIs</a>.</p>
 <p>So far, I've found that the Document Management file has an attribute that matches the C4R Project Guid: <em>attributes.extension.data.projectGuid</em>.</p>
 <p>So, I need to find the Docs project that contains a file such that:</p>
 <pre>
   attributes.extension.data.projectGuid
-    = <ActiveRevitDocument>.GetCloudModelPath().GetProjectGUID().
+    = &lt;ActiveRevitDocument&gt;.GetCloudModelPath().GetProjectGUID().
 </pre>
 
 <p>But surely there's a better approach than doing a <a href="https://forge.autodesk.com/en/docs/data/v2/reference/http/projects-project_id-folders-folder_id-search-GET/">folder search</a> using a filter matching <em>filter[attributes.extension.data.projectGuid]</em> with <code>ValueFromCloudModelPath</code> on every Docs Project that my Forge App has access to?</p>
 <p><strong>Answer:</strong> I asked the development team for you whether they can suggest a better way.
-They are currently discussing the implementation of a directl method to retrieve the BIM 360 project id of the document via a property such as <code>Document.ProjectId</code>, now as we speak. It will hopefully be available in a future release of Revit.</p>
+They are currently discussing the implementation of a direct method to retrieve the BIM 360 project id of the document via a property such as <code>Document.ProjectId</code>, now as we speak. It will hopefully be available in a future release of Revit.</p>
 <p>Meanwhile, the convoluted approach you describe sounds significantly better than nothing at all to me, so well done finding a way through the maze.</p>
 <p><strong>Response:</strong> For anyone else who runs into this same need, here are some of my other findings:</p>
 <p><code>Document.PathName</code> seems to be a string in this form when opening a cloud model:</p>
 <pre>
-  BIM 360://<DocsProjectName>/<ModelName>.rvt
+  BIM 360://&lt;DocsProjectName&gt;/&lt;ModelName&gt;.rvt
 </pre>
 
 <p>So, another option is to try parsing <code>Document.PathName</code> to get the Document Management Project name:</p>
 <pre class="code">
   string regexPattern =
-    @"^BIM 360:\/\/(?<ProjectName>.*)\/(?<ModelName>.*)$";
+    @"^BIM 360:\/\/(?&lt;ProjectName&gt;.*)\/(?&lt;ModelName&gt;.*)$";
 
   if (Regex.IsMatch(doc.PathName, regexPattern))
   {
@@ -320,7 +326,7 @@ using a filter such as</p>
 But additional processing can be applied to use a folder search looking for</p>
 <pre>
   attributes.extension.data.projectGuid
-    =<ActiveRevitDocument>.GetCloudModelPath().GetProjectGUID()
+    = &lt;ActiveRevitDocument&gt;.GetCloudModelPath().GetProjectGUID()
 </pre>
 
 <p>So at least this way, the folder search is only done on potential matches, rather than every single project.</p>
@@ -336,7 +342,8 @@ So, as a fallback, if I still haven't found the project Id, I resort to the fold
 <p>PDEs are notoriously hard to solve...</p>
 <p>Researchers at Caltech have introduced a new deep-learning technique for solving PDEs,
 a <a href="https://arxiv.org/pdf/2010.08895.pdf">Fourier Neural Operator for Parametric
-Partial Differential Equations</a>, ... dramatically more accurate... much more generalizable, ... 1,000 times faster ...</p>
+Partial Differential Equations</a>
+... dramatically more accurate... much more generalizable ... 1'000 times faster ...</p>
 </blockquote>
 <h4><a name="8"></a> AI-Enhanced Video Editing</h4>
 <p>Here is another example of AI usage that may come in more handy to you right away than solving differential equations:</p>
@@ -344,6 +351,9 @@ Partial Differential Equations</a>, ... dramatically more accurate... much more 
 Check out <a href="https://www.descript.com">Descript</a> before you do.
 It is a collaborative audio and video editor that includes transcription, a screen recorder, publishing, full multitrack editing, and some mind-bendingly useful AI tools:</p>
 <ul>
-<li><a href="https://youtu.be/Bl9wqNe5J8U">Video</a></li>
 <li><a href="https://medium.com/descript/introducing-descript-fa37eb193819">Blog post</a></li>
+<li><a href="https://youtu.be/Bl9wqNe5J8U">Video</a>:</li>
 </ul>
+<p><center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/Bl9wqNe5J8U" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center></p>
