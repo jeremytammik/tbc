@@ -8,19 +8,9 @@
 
 - Jailbreak Revit: GraphQL & ServiceBus
   https://youtu.be/7LnbP4n4RYM
-
-
-
-Taught by Gregor Vilkner, Microdesk at the AEC Tech Hackathon 2020
-
-Gregor Vilkner, Ph.D.  12:24 AM
-👏
-👍
-👎
-😊
-😞
-Got a shout out for you... 🎃
-19:30min mark...
+  Gregor Vilkner, Ph.D.  12:24 AM
+  Got a shout out for you... 🎃
+  19:30min mark...
 
 - Document Session ID
   https://forums.autodesk.com/t5/revit-api-forum/document-session-id/m-p/9844775#M50895
@@ -60,10 +50,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-###
+### Document Session Id, API Context and External Events
 
+Some new topics, and, as always, some recurring:
 
-####<a name="3"></a> Document Session Id
+- [Document session id](#2)
+- [Valid Revit API context and external events](#3)
+- [Determining RVT file version for DA4R workitem](#4)
+- [Revit API via HTTP](#5)
+- [Parable of the polygons](#6)
+
+####<a name="2"></a> Document Session Id
 
 An interesting question that I have dabbled with in the past came up in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -120,7 +117,7 @@ Mainly, I use this in a static variable to see if the current document has switc
 
 
 <!--
-####<a name="4"></a> Vendor Id
+####<a name="X"></a> Vendor Id
 
   Where do I register a Vendor ID for use in Revit .addin files?
 Q: For what seems like a looong time ago (> 15 years) I registered a Vendor ID for my previous employer Cad Quality AB in Sweden. Now I am trying to do the same for my new employer Tribia AB, but I cannot find any page on ADN or Autodesk websites for doing so.
@@ -136,7 +133,7 @@ already discussed in full here:
 https://thebuildingcoder.typepad.com/blog/2018/06/add-in-registration-vendorid-and-signature.html#2
 -->
 
-####<a name="4"></a> Valid Revit API Context and External Events
+####<a name="3"></a> Valid Revit API Context and External Events
 
 Developers keep attempting to acccess the Revit API from outside of Revit itself, e.g., in the questions
 on [how to open different version revit files](https://forums.autodesk.com/t5/revit-api-forum/how-to-open-different-version-revit-files/m-p/9861186)
@@ -157,7 +154,7 @@ Once defined, though, the external event can be raised from outside.
 The event handler, again, must reside and execute within.
 
 
-####<a name="5"></a> Determining RVT File Version for DA4R Workitem
+####<a name="4"></a> Determining RVT File Version for DA4R Workitem
 
 That said, some operations can be performed on an RVT BIM from outside Revit, without use of the Revit API or such a context.
 
@@ -203,7 +200,7 @@ Furthermore, this recent discussion on StackOverflow addresses your exact requir
 
 Thank you so much!
 
-####<a name="2"></a> Revit API via HTTP
+####<a name="5"></a> Revit API via HTTP
 
 The implementation and use of external events can be perfected and simplified, as proven by Igor Serdyukov, aka Игорь Сердюков or WhiteSharq, and Kennan Chen:
 
@@ -219,10 +216,11 @@ the [AEC Tech Hackathon 2020](https://www.aectech.us) in October:
 <iframe width="480" height="270" src="https://www.youtube.com/embed/7LnbP4n4RYM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </center>
 
+Says Greg: Got a shout out for you... 19:30 min mark...
 
-####<a name="5"></a> Parable of the Polygons
+####<a name="6"></a> Parable of the Polygons
 
-For a nice little demonstration of the subtle influence various individual preferences and prejudice can have on collective behaviour, check out
+For something completely different, here is a nice little demonstration of the subtle influence various individual preferences and prejudice can have on collective behaviour; check out
 the [Parable of the Polygons](https://ncase.me/polygons), a segregation simulation that clearly proves certain points:
 
 1. Small individual bias &rarr; Large collective bias.
@@ -231,19 +229,3 @@ the [Parable of the Polygons](https://ncase.me/polygons), a segregation simulati
 <br/>Your bedroom floor doesn't stop being dirty just coz you stopped dropping food all over the carpet. Creating equality is like staying clean: it takes work. And it's always a work in progress.
 3. Demand diversity near you.
 <br/>If small biases created the mess we're in, small anti-biases might fix it. Look around you. Your friends, your colleagues, that conference you're attending. If you're all triangles, you're missing out on some amazing squares in your life - that's unfair to everyone. Reach out, beyond your immediate neighbors.
-
-
-<pre class="code">
-</pre>
-
-
-
-**Question:** 
-
-<center>
-<img src="img/.png" alt=" title="" width="100"/> <!-- 837 -->
-</center>
-
-**Answer:** 
-
-**Response:** 
