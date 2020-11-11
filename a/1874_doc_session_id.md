@@ -6,9 +6,10 @@
 
 <!---
 
-https://youtu.be/7LnbP4n4RYM
+- Jailbreak Revit: GraphQL & ServiceBus
+  https://youtu.be/7LnbP4n4RYM
 
-Jailbreak Revit: GraphQL & ServiceBus
+
 
 Taught by Gregor Vilkner, Microdesk at the AEC Tech Hackathon 2020
 
@@ -20,12 +21,6 @@ Gregor Vilkner, Ph.D.  12:24 AM
 😞
 Got a shout out for you... 🎃
 19:30min mark...
-
-- au
-  Autodesk University 2020 will be a digital, global conference. This November 17-20 join us and innovators from around the world to reimagine what’s possible. Learn more: https://www.autodesk.com/autodesk-university/conference/overview
-  Catch the latest from @Autodesk and #Forge at #AU2020 on Nov 17-20. Featuring roadmap classes, case studies, API overviews, bootcamp, accelerator, and so much more. Register today at https://autodeskuniversity.smarteventscloud.com/portal/contactInfo.ww
-  Classes are posted for this November’s #AU2020 check them out here [https://www.autodesk.com/autodesk-university/conference/schedule] and register today for free at [https://autodeskuniversity.smarteventscloud.com/portal/contactInfo.ww]
-  Not sure which Forge classes to attend at #AU2020? Check out @_stephenpreston’s 10 classes you don’t want to miss. [https://forge.autodesk.com/blog/10-forge-classes-you-dont-want-miss-au]
 
 - Document Session ID
   https://forums.autodesk.com/t5/revit-api-forum/document-session-id/m-p/9844775#M50895
@@ -40,6 +35,8 @@ Got a shout out for you... 🎃
   <VendorId>com.typepad.thebuildingcoder</VendorId>
   <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
   https://thebuildingcoder.typepad.com/blog/2018/06/add-in-registration-vendorid-and-signature.html#2
+
+- 7848 [How to detect Revit File Version before DA4R]
 
 - Parable of the Polygons -- https://ncase.me/polygons/
 
@@ -65,17 +62,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ###
 
-####<a name="2"></a> 
-
-**Question:** 
-
-<center>
-<img src="img/.png" alt=" title="" width="100"/> <!-- 837 -->
-</center>
-
-**Answer:** 
-
-**Response:** 
 
 ####<a name="3"></a> Document Session Id
 
@@ -150,6 +136,90 @@ already discussed in full here:
 https://thebuildingcoder.typepad.com/blog/2018/06/add-in-registration-vendorid-and-signature.html#2
 -->
 
+####<a name="4"></a> Valid Revit API Context and External Events
+
+Developers keep attempting to acccess the Revit API from outside of Revit itself, e.g., in the questions
+on [how to open different version revit files](https://forums.autodesk.com/t5/revit-api-forum/how-to-open-different-version-revit-files/m-p/9861186)
+and [how to raise an external event from a WPF app](https://stackoverflow.com/questions/64683308/how-do-i-raise-an-external-event-in-the-revit-api-from-a-wpf-app):
+
+The Revit API cannot be used outside a valid Revit API context:
+
+- [Use of the Revit API Requires a Valid Context](http://thebuildingcoder.typepad.com/blog/2015/12/external-event-and-10-year-forum-anniversary.html#2)
+- [Revit API Context Summary](http://thebuildingcoder.typepad.com/blog/2015/08/revit-api-context-and-form-creation-errors.html#2)
+
+You can work around this limitation, though:
+the Revit API enables you to define an external event that can be triggered from outside a valid Revit API context.
+
+The implementation and definition of the external event happens within a Revit add-in and requires a valid Revit API context.
+
+Once defined, though, the external event can be raised from outside.
+
+The event handler, again, must reside and execute within.
+
+
+####<a name="5"></a> Determining RVT File Version for DA4R Workitem
+
+That said, some operations can be performed on an RVT BIM from outside Revit, without use of the Revit API or such a context.
+
+Another question that came up repeatedly in the past few weeks is how to detect the Revit file version before passing it to a DA4R or Forge Design Automation for Revit workflow. In DA4R, you can specify what version of the Revit engine to launch. Picking the appropriate one for the given RVT file avoids the time-consuming upgrade process:
+
+**Question:** When I specify `Autodesk.Revit+2021` for the design automation AppBundle and Activity engine, the Revit 2020 version RVT file that I pass in is upgraded to 2021.
+
+I would like to avoid the RVT file version upgrading.
+
+Is it necessary to prepare a separate AppBundle and Activity for each Revit version, detect the Revit file version up front, and select which Activity to use?
+
+If so, how can I determine the Revit file version?
+
+I saw the article on how
+to [check the version of a Revit file hosted on the cloud](https://forge.autodesk.com/blog/check-version-revit-file-hosted-cloud).
+
+I would like to know more detailed info for the accurate detection.
+
+It says that the RVT file contains the file `BasicFileInfo` with the following data snippets:
+
+- 0-14 bytes = Unknown.
+- 15-18 bytes = the length(int32) of the subsequent field value.
+- 19-(19+length*2) bytes = the Revit File Version (UTF16LE)
+
+Is it true?
+Can I use this data to determine the Revit file version before passing it to DA?
+
+<center>
+<img src="img/basicfileinfo_for_da4r.png" alt="BasicFileInfo for DA4R" title="BasicFileInfo for DA4R" width="400"/> <!-- 666 -->
+</center>
+
+**Answer:** This question is answered in full in the following blog posts:
+
+- [Check the version of a Revit file hosted on the cloud](https://forge.autodesk.com/blog/check-version-revit-file-hosted-cloud)
+- [Basic File Info and RVT File Version](https://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html)
+- [Automatically Open Correct RVT File Version](https://thebuildingcoder.typepad.com/blog/2020/05/automatically-open-correct-rvt-file-version.html)
+
+Furthermore, this recent discussion on StackOverflow addresses your exact requirements more precicely still:
+
+- [Reliably Determine Revit Version of BIM 360 Project](https://stackoverflow.com/questions/63135095/reliably-determine-revit-version-of-bim-360-project)
+
+**Response:** I found the implementation of Python in the blog article that you introduced really helpful.
+
+Thank you so much!
+
+####<a name="2"></a> Revit API via HTTP
+
+The implementation and use of external events can be perfected and simplified, as proven by Igor Serdyukov, aka Игорь Сердюков or WhiteSharq, and Kennan Chen:
+
+- [External Communication and Async Await Event](https://thebuildingcoder.typepad.com/blog/2020/02/external-communication-and-async-await-event-wrapper.html)
+- [Revit.Async](https://thebuildingcoder.typepad.com/blog/2020/03/another-async-await-rex-and-structural-analysis-sdk.html#3)
+
+Gregor Vilkner of [Microdesk](https://www.microdesk.com) makes use of that in his exciting class at
+the [AEC Tech Hackathon 2020](https://www.aectech.us) in October:
+
+- [Jailbreak Revit: GraphQL & ServiceBus](https://youtu.be/7LnbP4n4RYM)
+
+<center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/7LnbP4n4RYM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
+
+
 ####<a name="5"></a> Parable of the Polygons
 
 For a nice little demonstration of the subtle influence various individual preferences and prejudice can have on collective behaviour, check out
@@ -162,11 +232,18 @@ the [Parable of the Polygons](https://ncase.me/polygons), a segregation simulati
 3. Demand diversity near you.
 <br/>If small biases created the mess we're in, small anti-biases might fix it. Look around you. Your friends, your colleagues, that conference you're attending. If you're all triangles, you're missing out on some amazing squares in your life - that's unfair to everyone. Reach out, beyond your immediate neighbors.
 
-**Question:** 
-
-<center>
-<img src="img/.png" alt="" title="" width="553"/> <!-- 1107 -->
-</center>
 
 <pre class="code">
 </pre>
+
+
+
+**Question:** 
+
+<center>
+<img src="img/.png" alt=" title="" width="100"/> <!-- 837 -->
+</center>
+
+**Answer:** 
+
+**Response:** 
