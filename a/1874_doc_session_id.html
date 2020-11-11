@@ -1,0 +1,188 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- Jailbreak Revit: GraphQL & ServiceBus
+  https://youtu.be/7LnbP4n4RYM
+  Gregor Vilkner, Ph.D.  12:24 AM
+  Got a shout out for you... 🎃
+  19:30min mark...
+
+- Document Session ID
+  https://forums.autodesk.com/t5/revit-api-forum/document-session-id/m-p/9844775#M50895
+
+- vendor id
+  Where do I register a Vendor ID for use in Revit .addin files?
+  Q: For what seems like a looong time ago (> 15 years) I registered a Vendor ID for my previous employer Cad Quality AB in Sweden. Now I am trying to do the same for my new employer Tribia AB, but I cannot find any page on ADN or Autodesk websites for doing so.
+  Are the Vendor ID:s still in use, and if so – where can I register a new ID?
+  A: This vendor id is no longer in use.
+  The recommended vendor id to use in a Revit add-in manifest file is your reversed internet url, afaik.
+  For example, i use:
+  <VendorId>com.typepad.thebuildingcoder</VendorId>
+  <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+  https://thebuildingcoder.typepad.com/blog/2018/06/add-in-registration-vendorid-and-signature.html#2
+
+- 7848 [How to detect Revit File Version before DA4R]
+
+- Parable of the Polygons -- https://ncase.me/polygons/
+
+twitter:
+
+#RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+
+Some new topics, and, as always, some recurring
+&ndash; Document session id
+&ndash; Valid Revit API context and external events
+&ndash; Determining RVT file version for DA4R workitem
+&ndash; Revit API via HTTP
+&ndash; Parable of the polygons...
+
+linkedin:
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>Doc Session Id, API Context and External Events</h3>
+<p>Some new topics, and, as always, some recurring:</p>
+<ul>
+<li><a href="#2">Document session id</a></li>
+<li><a href="#3">Valid Revit API context and external events</a></li>
+<li><a href="#4">Determining RVT file version for DA4R workitem</a></li>
+<li><a href="#5">Revit API via HTTP</a></li>
+<li><a href="#6">Parable of the polygons</a></li>
+</ul>
+<h4><a name="2"></a> Document Session Id</h4>
+<p>An interesting question that I have dabbled with in the past came up in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/document-session-id/m-p/9844775">document session id</a>.</p>
+<p>My dabbling has to do with a permanent document identifier;
+Tobias, asking the question, and Richard, providing a more satisfying and useful answer for this specific case, highlight the use of <code>Document.GetHashCode</code> to identify document instances in the current session only:</p>
+<p><strong>Question:</strong> Is there something like a session id for open documents?</p>
+<p>I would like to uniquely identify a Autodesk.Revit.DB.Document object, for example in the ViewActivated Event. This is needed while more than one document can be open at the same time in Revit. Because I hold some stuff in memory, I need to know to which document it belongs.</p>
+<p>The DocumentPath as Id is not an option, because newly created documents have a zero string (could be occur more than one as well in a session)</p>
+<p><strong>Answer 1:</strong> Every Revit project includes a singleton <code>ProjectInformation</code> database element.
+Every database element has a unique identifier.
+So, theoretically, you could use the <code>ProjectInformation</code> unique identifier to uniquely identify a project.</p>
+<p>Unfortunately, if I create a project A, and then copy it for reuse in project B, the two ProjectInformation elements will have the same unique id, so this solution only works if you can guarantee that no such copy will ever be created,
+cf. <a href="https://thebuildingcoder.typepad.com/blog/2017/12/project-identifier-and-fuzzy-comparison.html#2">project identifier</a>.</p>
+<p>Here is some further analysis of the task
+to <a href="https://the3dwebcoder.typepad.com/blog/2015/07/implementing-mongo-database-relationships.html#2">identify a project</a>.</p>
+<p>To address this, I suggested a different and safer solution using an extensible storage schema and a named GUID storage for project identification instead
+using <a href="https://thebuildingcoder.typepad.com/blog/2016/04/named-guid-storage-for-project-identification.html">named guid storage for project identification</a>.</p>
+<p><strong>Response:</strong> Indeed, I searched before without a satisfying result.</p>
+<p>I came to the same conclusion as your solutions.
+I was hoping there was something else &nbsp; :-)</p>
+<p>Possibly use the combination of unique identifier and the file path, but this is not very elegant.
+I think I will end up using the extensible storage solution.
+Maybe a second schema, not the same as my plugin uses for storing its data.</p>
+<p><strong>Answer 2:</strong> Some documents don't contain a path (yet to be saved ones).</p>
+<p><a href="https://www.revitapidocs.com/2020/006a71c2-4393-e036-9987-14467342a7d3.htm">Document.GetHashCode</a> has
+served me well over the years:</p>
+<blockquote>
+<p>The hash code is the same for document instances that represent the same document currently opened in the Revit session.
+The hash code is generated when a Revit file is opened or created in session.
+If the same Revit file is opened later (in the same session or a different session), the hash code will not be the same.</p>
+</blockquote>
+<p>Mainly, I use this in a static variable to see if the current document has switched via the <code>ViewActivatedEvent</code>.</p>
+<p><strong>Response:</strong> Ah, very nice. Thank you for that.</p>
+<!--
+####<a name="X"></a> Vendor Id
+
+  Where do I register a Vendor ID for use in Revit .addin files?
+Q: For what seems like a looong time ago (> 15 years) I registered a Vendor ID for my previous employer Cad Quality AB in Sweden. Now I am trying to do the same for my new employer Tribia AB, but I cannot find any page on ADN or Autodesk websites for doing so.
+Are the Vendor ID:s still in use, and if so – where can I register a new ID?
+A: This vendor id is no longer in use.
+The recommended vendor id to use in a Revit add-in manifest file is your reversed internet url, afaik.
+For example, i use:
+    <VendorId>com.typepad.thebuildingcoder</VendorId>
+    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+
+already discussed in full here:
+
+https://thebuildingcoder.typepad.com/blog/2018/06/add-in-registration-vendorid-and-signature.html#2
+-->
+
+<h4><a name="3"></a> Valid Revit API Context and External Events</h4>
+<p>Developers keep attempting to access the Revit API from outside of Revit itself, e.g., in the questions
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-open-different-version-revit-files/m-p/9861186">how to open different version Revit files</a>
+and <a href="https://stackoverflow.com/questions/64683308/how-do-i-raise-an-external-event-in-the-revit-api-from-a-wpf-app">how to raise an external event from a WPF app</a>:</p>
+<p>The Revit API cannot be used outside a valid Revit API context:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/12/external-event-and-10-year-forum-anniversary.html#2">Use of the Revit API Requires a Valid Context</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/08/revit-api-context-and-form-creation-errors.html#2">Revit API Context Summary</a></li>
+</ul>
+<p>You can work around this limitation, though:
+the Revit API enables you to define an external event that can be triggered from outside a valid Revit API context.</p>
+<p>The implementation and definition of the external event happens within a Revit add-in and requires a valid Revit API context.</p>
+<p>Once defined, though, the external event can be raised from outside.</p>
+<p>The event handler, again, must reside and execute within.</p>
+<h4><a name="4"></a> Determining RVT File Version for DA4R Workitem</h4>
+<p>That said, some operations can be performed on an RVT BIM from outside Revit, without use of the Revit API or such a context.</p>
+<p>Another question that came up repeatedly in the past few weeks is how to detect the Revit file version before passing it to a DA4R or Forge Design Automation for Revit workflow. In DA4R, you can specify what version of the Revit engine to launch. Picking the appropriate one for the given RVT file avoids the time-consuming upgrade process:</p>
+<p><strong>Question:</strong> When I specify <code>Autodesk.Revit+2021</code> for the design automation AppBundle and Activity engine, the Revit 2020 version RVT file that I pass in is upgraded to 2021.</p>
+<p>I would like to avoid the RVT file version upgrading.</p>
+<p>Is it necessary to prepare a separate AppBundle and Activity for each Revit version, detect the Revit file version up front, and select which Activity to use?</p>
+<p>If so, how can I determine the Revit file version?</p>
+<p>I saw the article on how
+to <a href="https://forge.autodesk.com/blog/check-version-revit-file-hosted-cloud">check the version of a Revit file hosted on the cloud</a>.</p>
+<p>I would like to know more detailed info for the accurate detection.</p>
+<p>It says that the RVT file contains the file <code>BasicFileInfo</code> with the following data snippets:</p>
+<ul>
+<li>0-14 bytes = unknown</li>
+<li>15-18 bytes = the length(int32) of the subsequent field value</li>
+<li>19-(19+length*2) bytes = the Revit file version (UTF16LE)</li>
+</ul>
+<p>Is it true?
+Can I use this data to determine the Revit file version before passing it to DA?</p>
+<p><center>
+<img src="img/basicfileinfo_for_da4r.png" alt="BasicFileInfo for DA4R" title="BasicFileInfo for DA4R" width="500"/> <!-- 666 -->
+</center></p>
+<p><strong>Answer:</strong> This question is answered in full in the following blog posts:</p>
+<ul>
+<li><a href="https://forge.autodesk.com/blog/check-version-revit-file-hosted-cloud">Check the version of a Revit file hosted on the cloud</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html">Basic File Info and RVT File Version</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2020/05/automatically-open-correct-rvt-file-version.html">Automatically Open Correct RVT File Version</a></li>
+</ul>
+<p>Furthermore, this recent discussion on StackOverflow addresses your exact requirements more precisely still:</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/63135095/reliably-determine-revit-version-of-bim-360-project">Reliably Determine Revit Version of BIM 360 Project</a></li>
+</ul>
+<p><strong>Response:</strong> I found the implementation of Python in the blog article that you pointed out really helpful.</p>
+<p>Thank you so much!</p>
+<h4><a name="5"></a> Revit API via HTTP</h4>
+<p>The implementation and use of external events can be perfected and simplified, as proven by Igor Serdyukov, aka Игорь Сердюков or WhiteSharq, and Kennan Chen:</p>
+<ul>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2020/02/external-communication-and-async-await-event-wrapper.html">External Communication and Async Await Event</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2020/03/another-async-await-rex-and-structural-analysis-sdk.html#3">Revit.Async</a></li>
+</ul>
+<p>Gregor Vilkner of <a href="https://www.microdesk.com">Microdesk</a> makes use of that in his exciting class at
+the <a href="https://www.aectech.us">AEC Tech Hackathon 2020</a> in October:</p>
+<ul>
+<li><a href="https://youtu.be/7LnbP4n4RYM">Jailbreak Revit: GraphQL and ServiceBus</a></li>
+</ul>
+<p><center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/7LnbP4n4RYM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center></p>
+<p>Says Greg: Got a shout out for you... 19:30 min mark...</p>
+<h4><a name="6"></a> Parable of the Polygons</h4>
+<p>For something completely different, here is a nice little demonstration of the subtle influence various individual preferences and prejudice can have on collective behaviour; check out
+the <a href="https://ncase.me/polygons">Parable of the Polygons</a>, a segregation and diversity simulation that clearly proves certain points:</p>
+<ol>
+<li>Small individual bias &rarr; Large collective bias.
+<br/>When someone says a culture is shapist, they're not saying the individuals in it are shapist. They're not attacking you personally.</li>
+<li>The past haunts the present.
+<br/>Your bedroom floor doesn't stop being dirty just coz you stopped dropping food all over the carpet. Creating equality is like staying clean: it takes work. And it's always a work in progress.</li>
+<li>Demand diversity near you.
+<br/>If small biases created the mess we're in, small anti-biases might fix it. Look around you. Your friends, your colleagues, that conference you're attending. If you're all triangles, you're missing out on some amazing squares in your life &ndash; that's unfair to everyone. Reach out, beyond your immediate neighbours.</li>
+</ol>

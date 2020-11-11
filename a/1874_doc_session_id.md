@@ -34,8 +34,12 @@ twitter:
 
 #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash; 
-...
+Some new topics, and, as always, some recurring
+&ndash; Document session id
+&ndash; Valid Revit API context and external events
+&ndash; Determining RVT file version for DA4R workitem
+&ndash; Revit API via HTTP
+&ndash; Parable of the polygons...
 
 linkedin:
 
@@ -50,7 +54,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Document Session Id, API Context and External Events
+### Doc Session Id, API Context and External Events
 
 Some new topics, and, as always, some recurring:
 
@@ -67,7 +71,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 on [document session id](https://forums.autodesk.com/t5/revit-api-forum/document-session-id/m-p/9844775).
 
 My dabbling has to do with a permanent document identifier;
-Tobias asking the question and Richard providing a more satisfying and useful answer for this specific case highlight the use of `Document.GetHashCode` to identify document instances in the current session only:
+Tobias, asking the question, and Richard, providing a more satisfying and useful answer for this specific case, highlight the use of `Document.GetHashCode` to identify document instances in the current session only:
 
 **Question:** Is there something like a session id for open documents?
 
@@ -75,23 +79,18 @@ I would like to uniquely identify a Autodesk.Revit.DB.Document object, for examp
 
 The DocumentPath as Id is not an option, because newly created documents have a zero string (could be occur more than one as well in a session)
 
-**Answer 1:** As we all know, there are no stupid questions.
+**Answer 1:** Every Revit project includes a singleton `ProjectInformation` database element.
+Every database element has a unique identifier.
+So, theoretically, you could use the `ProjectInformation` unique identifier to uniquely identify a project.
 
-Sometimes people would be better served searching for an answer themselves before asking others. It seems to me you have already searched, with no fruitful results. Thank you for that. However, there is some information on this already out there, waiting to be found:
+Unfortunately, if I create a project A, and then copy it for reuse in project B, the two ProjectInformation elements will have the same unique id, so this solution only works if you can guarantee that no such copy will ever be created,
+cf. [project identifier](https://thebuildingcoder.typepad.com/blog/2017/12/project-identifier-and-fuzzy-comparison.html#2).
 
-Every Revit project includes a singleton ProjectInformation database element. Every database element has a unique identifier. So, theoretically, you could use that to uniquely identify a project.
+Here is some further analysis of the task
+to [identify a project](https://the3dwebcoder.typepad.com/blog/2015/07/implementing-mongo-database-relationships.html#2).
 
-Unfortunately, if I create a project A, and then copy it for reuse in project B, the two ProjectInformation elements will have the same unique id, so this solution only works if you can guarantee that no such copy will ever be created:
-
-https://thebuildingcoder.typepad.com/blog/2017/12/project-identifier-and-fuzzy-comparison.html#2
-
-Here is a some further analysis of this situation:
-
-https://the3dwebcoder.typepad.com/blog/2015/07/implementing-mongo-database-relationships.html#2
-
-To address this, I suggested a different and safer solution using an extensible storage schema and a named GUID storage for project identification instead:
-
-https://thebuildingcoder.typepad.com/blog/2016/04/named-guid-storage-for-project-identification.html
+To address this, I suggested a different and safer solution using an extensible storage schema and a named GUID storage for project identification instead
+using [named guid storage for project identification](https://thebuildingcoder.typepad.com/blog/2016/04/named-guid-storage-for-project-identification.html).
 
 **Response:** Indeed, I searched before without a satisfying result.
 
@@ -135,8 +134,8 @@ https://thebuildingcoder.typepad.com/blog/2018/06/add-in-registration-vendorid-a
 
 ####<a name="3"></a> Valid Revit API Context and External Events
 
-Developers keep attempting to acccess the Revit API from outside of Revit itself, e.g., in the questions
-on [how to open different version revit files](https://forums.autodesk.com/t5/revit-api-forum/how-to-open-different-version-revit-files/m-p/9861186)
+Developers keep attempting to access the Revit API from outside of Revit itself, e.g., in the questions
+on [how to open different version Revit files](https://forums.autodesk.com/t5/revit-api-forum/how-to-open-different-version-revit-files/m-p/9861186)
 and [how to raise an external event from a WPF app](https://stackoverflow.com/questions/64683308/how-do-i-raise-an-external-event-in-the-revit-api-from-a-wpf-app):
 
 The Revit API cannot be used outside a valid Revit API context:
@@ -175,15 +174,15 @@ I would like to know more detailed info for the accurate detection.
 
 It says that the RVT file contains the file `BasicFileInfo` with the following data snippets:
 
-- 0-14 bytes = Unknown.
-- 15-18 bytes = the length(int32) of the subsequent field value.
-- 19-(19+length*2) bytes = the Revit File Version (UTF16LE)
+- 0-14 bytes = unknown
+- 15-18 bytes = the length(int32) of the subsequent field value
+- 19-(19+length*2) bytes = the Revit file version (UTF16LE)
 
 Is it true?
 Can I use this data to determine the Revit file version before passing it to DA?
 
 <center>
-<img src="img/basicfileinfo_for_da4r.png" alt="BasicFileInfo for DA4R" title="BasicFileInfo for DA4R" width="400"/> <!-- 666 -->
+<img src="img/basicfileinfo_for_da4r.png" alt="BasicFileInfo for DA4R" title="BasicFileInfo for DA4R" width="500"/> <!-- 666 -->
 </center>
 
 **Answer:** This question is answered in full in the following blog posts:
@@ -192,11 +191,11 @@ Can I use this data to determine the Revit file version before passing it to DA?
 - [Basic File Info and RVT File Version](https://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html)
 - [Automatically Open Correct RVT File Version](https://thebuildingcoder.typepad.com/blog/2020/05/automatically-open-correct-rvt-file-version.html)
 
-Furthermore, this recent discussion on StackOverflow addresses your exact requirements more precicely still:
+Furthermore, this recent discussion on StackOverflow addresses your exact requirements more precisely still:
 
 - [Reliably Determine Revit Version of BIM 360 Project](https://stackoverflow.com/questions/63135095/reliably-determine-revit-version-of-bim-360-project)
 
-**Response:** I found the implementation of Python in the blog article that you introduced really helpful.
+**Response:** I found the implementation of Python in the blog article that you pointed out really helpful.
 
 Thank you so much!
 
@@ -210,7 +209,7 @@ The implementation and use of external events can be perfected and simplified, a
 Gregor Vilkner of [Microdesk](https://www.microdesk.com) makes use of that in his exciting class at
 the [AEC Tech Hackathon 2020](https://www.aectech.us) in October:
 
-- [Jailbreak Revit: GraphQL & ServiceBus](https://youtu.be/7LnbP4n4RYM)
+- [Jailbreak Revit: GraphQL and ServiceBus](https://youtu.be/7LnbP4n4RYM)
 
 <center>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/7LnbP4n4RYM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -221,11 +220,11 @@ Says Greg: Got a shout out for you... 19:30 min mark...
 ####<a name="6"></a> Parable of the Polygons
 
 For something completely different, here is a nice little demonstration of the subtle influence various individual preferences and prejudice can have on collective behaviour; check out
-the [Parable of the Polygons](https://ncase.me/polygons), a segregation simulation that clearly proves certain points:
+the [Parable of the Polygons](https://ncase.me/polygons), a segregation and diversity simulation that clearly proves certain points:
 
 1. Small individual bias &rarr; Large collective bias.
 <br/>When someone says a culture is shapist, they're not saying the individuals in it are shapist. They're not attacking you personally.
 2. The past haunts the present.
 <br/>Your bedroom floor doesn't stop being dirty just coz you stopped dropping food all over the carpet. Creating equality is like staying clean: it takes work. And it's always a work in progress.
 3. Demand diversity near you.
-<br/>If small biases created the mess we're in, small anti-biases might fix it. Look around you. Your friends, your colleagues, that conference you're attending. If you're all triangles, you're missing out on some amazing squares in your life - that's unfair to everyone. Reach out, beyond your immediate neighbors.
+<br/>If small biases created the mess we're in, small anti-biases might fix it. Look around you. Your friends, your colleagues, that conference you're attending. If you're all triangles, you're missing out on some amazing squares in your life &ndash; that's unfair to everyone. Reach out, beyond your immediate neighbours.
