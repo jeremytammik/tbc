@@ -32,7 +32,7 @@
 
 twitter:
 
-#RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+Document session id, valid #RevitAPI context, external events, determining RVT file version for Design Automation workitem and Revit API via HTTP with @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/docsessionid
 
 Some new topics, and, as always, some recurring
 &ndash; Document session id
