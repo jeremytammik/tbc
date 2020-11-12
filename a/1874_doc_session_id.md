@@ -43,6 +43,18 @@ Some new topics, and, as always, some recurring
 
 linkedin:
 
+Document session id, valid #RevitAPI context, external events, determining RVT file version for Design Automation workitem and Revit API via HTTP:
+
+https://bit.ly/docsessionid
+
+Some new topics, and, as always, some recurring:
+
+- Document session id
+- Valid Revit API context and external events
+- Determining RVT file version for DA4R workitem
+- Revit API via HTTP
+- Parable of the polygons...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
