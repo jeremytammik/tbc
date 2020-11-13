@@ -6,7 +6,7 @@
 
 <!---
 
-- bim360 user manangement
+- bim360 user management
 batch create folders, assign permissions to folders, create companies, assign users to a project, assign roles to a user and upload files to BIM 360 using a single Excel spreadsheet
 https://autodesk.slack.com/archives/C0PLC20PP/p1605039372138100
 Philipp Mueller  21:16
@@ -23,8 +23,10 @@ twitter:
 
  #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash; 
-...
+Philipp Mueller highlights a set of BIM360 user management scripts and Diego Rossi shares two useful GitHub repositories
+&ndash; BIM360 user management scripts
+&ndash; External application with Prism goodies
+&ndash; Revit add-in dotnet template...
 
 linkedin:
 
@@ -42,7 +44,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### BIM360 Management, Dotnet Template and Prism Goodies
 
-Today, Philipp Mueller highlights out a BIM360 user management script and Diego Rossi shares with us two useful GitHub repositories:
+Today, Philipp Mueller highlights a set of BIM360 user management scripts and Diego Rossi shares two useful GitHub repositories with us:
 
 - [BIM360 user management scripts](#2)
 - [External application with Prism goodies](#3)
@@ -50,7 +52,7 @@ Today, Philipp Mueller highlights out a BIM360 user management script and Diego 
 
 ####<a name="2"></a> BIM360 User Management Scripts
 
-Autodesk consulting implemented a set of BIM360 user manangement scripts.
+Autodesk Consulting implemented a set of BIM360 user management scripts.
 
 [TU Munich](https://www.tum.de) extended them to support batch create folders, assign permissions to folders, create companies, assign users to a project, assign roles to a user and upload files to BIM 360 using a single Excel spreadsheet.
 
@@ -71,7 +73,7 @@ In my spare time, I do R &amp; D projects for Revit-related things when the comp
 Recently I really had to rely on [Prism](https://prismlibrary.com),
 a common library among WPF developers which aids in the development of modular XAML/WPF apps following the MVVM paradigm to modularize C# ViewModels and XAML Views.
 
-Since Revit does not rely on the concept of an always-running application instance for an add-in but rather on the custom-made `IExternalApplication` interface, it does not allow Prism to work without porting its features over.
+Since Revit does not rely on the concept of an always-running application instance for an add-in, but rather on the custom-made `IExternalApplication` interface, it does not allow Prism to work without porting its features over.
 
 I open sourced a project I worked on,
 [HellPie.Revit.PrismDemo](https://github.com/HellPie/HellPie.Revit.PrismDemo),
@@ -83,7 +85,7 @@ Today, I further delved into how to make my job easier; after having to develop 
 trying [DotNet Templates](https://docs.microsoft.com/en-us/dotnet/core/tools/custom-templates),
 a new feature introduced in the dotnet tooling released with .NET Core and now available also with .NET 5.0.
 
-The [HellPie/HellPie.RevitTemplates GitHub repository](https://github.com/HellPie/HellPie.RevitTemplates) showcases
+The [HellPie.RevitTemplates GitHub repository](https://github.com/HellPie/HellPie.RevitTemplates) showcases
 a Template Package which gets compiled to a NuGet package via `dotnet pack` and then installed as a Template Package using `dotnet new --install path/to/package.nuget`.
 There is a prebuilt NuGet package in the Releases of the repository.
 
@@ -113,8 +115,8 @@ dotnet new revit-api --name Custom.Namespace --AddInName "Demo AddIn" --AddInDes
 dotnet new revit-api -n Custom.Namespace -A "Demo AddIn" -Ad "AddIn Description for .addin File" -Ve "Vendor (vendor@email)" -V "example.vendor"
 </pre>
 
-PLease mention these two projects in one of your blog posts, not for the clout, but first and foremost to let people know about them, so that they can hopefully contribute improvements and changes (more templates and maybe better templates too).
+Please mention these two projects in one of your blog posts, not for the clout, but first and foremost to let people know about them, so that they can hopefully contribute improvements and changes (more templates and maybe better templates too).
 
-Many thanks to Diego for sharing his work, and good luck to all making use of and contributing to it!
+Many thanks to Diego for sharing his work, and good luck to all of us making use of and contributing to it!
 
 Have a nice day and a relaxing healthy weekend!
