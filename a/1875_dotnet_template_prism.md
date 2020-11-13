@@ -6,6 +6,18 @@
 
 <!---
 
+- bim360 user manangement
+batch create folders, assign permissions to folders, create companies, assign users to a project, assign roles to a user and upload files to BIM 360 using a single Excel spreadsheet
+https://autodesk.slack.com/archives/C0PLC20PP/p1605039372138100
+Philipp Mueller  21:16
+BIM 360 User Management Open Source Script - New Iteration released
+TU Munich´s @Deian Stoitchkov has extended @Oliver Scharpf  User Management Script which allows to batch create Folders, assign Permission to Folders, creation of Companies, batch assign Users to a Project, assign Roles to a User and finally upload Files to BIM 360 using a single excel Spreadsheet. The Use case for the Solution was the handling of large amount of Students and setting up an Account from Scratch.
+Kudos to @Heiko Meyerdirks and @Sebastian Esser for your support in making this collaboration between TUM and Autodesk possible
+Thanks to @Peter Schlipf @Mikako Harada and @Zhong Wu for your  great help and Guidance.
+Below is a quick Tutorial Series which walks through all steps.
+https://www.youtube.com/watch?v=46DBcyQ7PJY&list=PL_ph56WaRJ7IsN7nXa6K5NUO-nNJegiYd (edited) 
+YouTubeYouTube | contech101
+Step 0 - Introduction - BIM 360 Open Source User Management Script
 
 twitter:
 
@@ -30,11 +42,27 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Revit Add-in Dotnet Template and Prism Goodies
 
-Today, Diego Rossi shares with us two useful GitHub repositories, saying:
+Today, Philipp Mueller highlights out a BIM360 user management script nd Diego Rossi shares with us two useful GitHub repositories:
+
+####<a name="2"></a> BIM360 User Management Scripts
+
+Autodesk consulting implemented a set of BIM360 user manangement scripts.
+
+[TU Munich](https://www.tum.de) extended them to support batch create folders, assign permissions to folders, create companies, assign users to a project, assign roles to a user and upload files to BIM 360 using a single Excel spreadsheet.
+
+Their use case is the handling of a large number of students and setting up an account for each from scratch.
+
+Here is a quick two-minute tutorial,
+[Step 0 &ndash; Introduction &ndash; BIM 360 Open Source User Management Script](https://youtu.be/46DBcyQ7PJY),
+introducing a series that walks through all the steps.
+
+Thanks to Philipp for sharing this!
+
+####<a name="3"></a> External Application Accessing {rism Goodies
+
+Diego says:
 
 In my spare time, I do R &amp; D projects for Revit-related things when the company I work for doesn't have me push through new features or just during weekends without pending hobby projects.
-
-####<a name="2"></a> External Application Accessing {rism Goodies
 
 Recently I really had to rely on [Prism](https://prismlibrary.com),
 a common library among WPF developers which aids in the development of modular XAML/WPF apps following the MVVM paradigm to modularize C# ViewModels and XAML Views.
@@ -45,8 +73,7 @@ I open sourced a project I worked on,
 [HellPie.Revit.PrismDemo](https://github.com/HellPie/HellPie.Revit.PrismDemo),
 to showcase how to include Prism in a Revit external application add-in that allows access to the full range of goodies and features that come with using Prism, MVVM and the Inversion of Control paradigms.
 
-
-####<a name="3"></a> Revit Add-in Dotnet Template
+####<a name="4"></a> Revit Add-in Dotnet Template
 
 Today, I further delved into how to make my job easier; after having to develop sort of per-project new add-ins for the past 2 years, I got around to
 trying [DotNet Templates](https://docs.microsoft.com/en-us/dotnet/core/tools/custom-templates),
@@ -84,10 +111,6 @@ dotnet new revit-api -n Custom.Namespace -A "Demo AddIn" -Ad "AddIn Description 
 
 PLease mention these two projects in one of your blog posts, not for the clout, but first and foremost to let people know about them, so that they can hopefully contribute improvements and changes (more templates and maybe better templates too).
 
-Have a nice day,
-
-Diego Rossi
-
 Many thanks to Diego for sharing his work, and good luck to all making use of and contributing to it!
 
-Happy weekend!
+Have a nice day and a relaxing healthy weekend!
