@@ -40,9 +40,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Revit Add-in Dotnet Template and Prism Goodies
+### BIM360 Management, Dotnet Template and Prism Goodies
 
-Today, Philipp Mueller highlights out a BIM360 user management script nd Diego Rossi shares with us two useful GitHub repositories:
+Today, Philipp Mueller highlights out a BIM360 user management script and Diego Rossi shares with us two useful GitHub repositories:
+
+- [BIM360 user management scripts](#2)
+- [External application with Prism goodies](#3)
+- [Revit add-in dotnet template](#4)
 
 ####<a name="2"></a> BIM360 User Management Scripts
 
@@ -58,7 +62,7 @@ introducing a series that walks through all the steps.
 
 Thanks to Philipp for sharing this!
 
-####<a name="3"></a> External Application Accessing {rism Goodies
+####<a name="3"></a> External Application with Prism Goodies
 
 Diego says:
 
@@ -73,7 +77,7 @@ I open sourced a project I worked on,
 [HellPie.Revit.PrismDemo](https://github.com/HellPie/HellPie.Revit.PrismDemo),
 to showcase how to include Prism in a Revit external application add-in that allows access to the full range of goodies and features that come with using Prism, MVVM and the Inversion of Control paradigms.
 
-####<a name="4"></a> Revit Add-in Dotnet Template
+####<a name="4"></a> Revit Add-In Dotnet Template
 
 Today, I further delved into how to make my job easier; after having to develop sort of per-project new add-ins for the past 2 years, I got around to
 trying [DotNet Templates](https://docs.microsoft.com/en-us/dotnet/core/tools/custom-templates),
