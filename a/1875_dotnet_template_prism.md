@@ -63,7 +63,7 @@ It allows to configure a Visual Studio Solution with and without NUnit test proj
 This project also uses the latest SDK-style Project files, which were also introduced with .NET Core but do allow specifying any kind of valid Target Framework, including any old (and new) version of .NET Framework.
 The template even shows some documentation for which .NET Framework version should be used based on the desired target Revit version (defaults to Revit 2021 and .NET Framework 4.8, can be customized with the flags shown in `dotnet new revit-api --help`).
 
-Here is a screenshot of what PowerShell shows for the help command and a couple example commands to run below:
+Here is a screenshot showing the PowerShell help command output and a couple of example commands to run below:
 
 <center>
 <img src="img/dotnet_new_help.png" alt="Dotnet new help" title="Dotnet new help" width="600"/> <!-- 1160 -->
@@ -88,4 +88,6 @@ Have a nice day,
 
 Diego Rossi
 
-Many thanks to Diego for sharing this work, and good luck to all making use of and contributing to it.
+Many thanks to Diego for sharing his work, and good luck to all making use of and contributing to it!
+
+Happy weekend!
