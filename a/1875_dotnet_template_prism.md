@@ -7,17 +7,12 @@
 <!---
 
 - bim360 user management
-batch create folders, assign permissions to folders, create companies, assign users to a project, assign roles to a user and upload files to BIM 360 using a single Excel spreadsheet
-https://autodesk.slack.com/archives/C0PLC20PP/p1605039372138100
-Philipp Mueller  21:16
-BIM 360 User Management Open Source Script - New Iteration released
-TU Munich´s @Deian Stoitchkov has extended @Oliver Scharpf  User Management Script which allows to batch create Folders, assign Permission to Folders, creation of Companies, batch assign Users to a Project, assign Roles to a User and finally upload Files to BIM 360 using a single excel Spreadsheet. The Use case for the Solution was the handling of large amount of Students and setting up an Account from Scratch.
-Kudos to @Heiko Meyerdirks and @Sebastian Esser for your support in making this collaboration between TUM and Autodesk possible
-Thanks to @Peter Schlipf @Mikako Harada and @Zhong Wu for your  great help and Guidance.
-Below is a quick Tutorial Series which walks through all steps.
-https://www.youtube.com/watch?v=46DBcyQ7PJY&list=PL_ph56WaRJ7IsN7nXa6K5NUO-nNJegiYd (edited) 
-YouTubeYouTube | contech101
-Step 0 - Introduction - BIM 360 Open Source User Management Script
+  https://autodesk.slack.com/archives/C0PLC20PP/p1605039372138100
+  Philipp Mueller  21:16
+  TU Munich´s @Deian Stoitchkov has extended @Oliver Scharpf  User Management Script which allows to batch create Folders, assign Permission to Folders, creation of Companies, batch assign Users to a Project, assign Roles to a User and finally upload Files to BIM 360 using a single excel Spreadsheet. The Use case for the Solution was the handling of large amount of Students and setting up an Account from Scratch.
+  Kudos to @Heiko Meyerdirks and @Sebastian Esser for your support in making this collaboration between TUM and Autodesk possible
+  Thanks to @Peter Schlipf @Mikako Harada and @Zhong Wu for your  great help and Guidance.
+  Step 0 - Introduction - BIM 360 Open Source User Management Script
 
 twitter:
 
