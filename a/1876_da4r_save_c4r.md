@@ -20,7 +20,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Addressing a question in the Forge Design Automation for Revit context, DA4R cannot save RVT as a cloud model with the #RevitAPI, and an analysis of security and privacy noting that every program launch may be logged @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/da4rsavetocloud
 
 Today, let's address a resurfacing question in the Forge Design Automation for Revit or DA4R context
 &ndash; DA4R cannot save RVT as a cloud model
