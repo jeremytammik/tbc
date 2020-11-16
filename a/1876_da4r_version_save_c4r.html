@@ -1,0 +1,178 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+- 7580 [Error on Saving a RVT as the C4R model]
+  save as cloud model does not work in DA
+
+- How to save Revit file in BIM 360 as cloud model using Forge Design Automation API?
+  https://stackoverflow.com/questions/62307069/how-to-save-revit-file-in-bim-360-as-cloud-model-using-forge-design-automation-a
+  Q: Thank you. I thought the only limitations of Design Automation API is using Revit UI. The method `SaveAsCloudModel()` has nothing to do with Revit UI. So, is there a place where I can see all the methods that are not supported by Design Automation API?
+  A: Known restrictions are documented here:
+  Restrictions for the Forge Design Automation API
+  https://forge.autodesk.com/en/docs/design-automation/v3/developers_guide/restrictions
+  Design Automation API for Revit
+  https://forge.autodesk.com/en/docs/design-automation/v3/developers_guide/restrictions/#design-automation-api-for-revit
+
+twitter:
+
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+&ndash; 
+...
+
+linkedin:
+
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>DA4R Cannot Save Directly to Cloud</h3>
+<p>Today, let's pick up a resurfacing question in the Forge Design Automation for Revit or DA4R context:</p>
+<ul>
+<li><a href="#2">DA4R Cannot Save RVT as a Cloud Model</a></li>
+<li><a href="#3">Every program Launch is Logged</a></li>
+</ul>
+<h4><a name="2"></a> DA4R Cannot Save RVT as a Cloud Model</h4>
+<p>As is well known and clearly documented,
+<a href="https://forge.autodesk.com/api/design-automation-cover-page">Forge Design Automation for Revit</a> or
+DA4R currently does not enable any Internet access whatsoever to the running workitem.</p>
+<p>This obviously also prevents the ability to store an RVT BIM straight to BIM360 or C4R, Collaboration for Revit, or anywhere else in the cloud.</p>
+<!-- 
+This issue came up quite a number of times already:
+
+- [Do we have API access to C4R functionalities in Forge or Revit API?](https://stackoverflow.com/questions/58483626/do-we-have-api-access-to-c4rcollaboration-for-revit-functionalities-in-forge-a)
+-->
+
+<p>We discussed it again in the following ticket:</p>
+<p><strong>Question:</strong> I am trying DA4R (Design Automation v3 for Revit) and would like to save a Revit file as the C4R model on BIM 360 docs.</p>
+<p>But my DA addin raises an Exception when executing <code>doc.SaveAsCloudModel()</code>.</p>
+<pre class="code">
+  LogTrace($"params.AccountGuid: {params.AccountGuid}");
+  LogTrace($"params.ProjectGuid: {params.ProjectGuid}");
+  LogTrace($"params.FolderId: {params.FolderId}");
+  LogTrace($"params.FileName: {params.FileName}");
+
+  Guid accountId = new Guid(params.AccountGuid);
+  Guid projectId = new Guid(params.ProjectGuid);
+
+  // Save as a RVT file as the C4R model on BIM360 docs
+
+  doc.SaveAsCloudModel( accountId, projectId, params.FolderId, params.FileName );
+</pre>
+
+<p>Would you tell me how to make this operation work properly?</p>
+<p><strong>Answer:</strong> Thank you for your query.</p>
+<p>You are creating and passing in new, arbitrary GUIDs for the BIM 360 account id and project id as the first two arguments to the SaveAsCloudModel method.</p>
+<p>This will not work. The GUIDs are pre-defined by the system.</p>
+<p>They can be obtained as described
+in <a href="https://thebuildingcoder.typepad.com/blog/2020/04/revit-2021-cloud-model-api.html#4.5">how to save a local file to a non-workshared cloud model</a>.</p>
+<p>Here are some further, related discussions that I have been collecting and that may also be of interest:</p>
+<ul>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/doc-saveas-on-active-cloudmodel/m-p/9059906">Save RVT from cloud to local file</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2018/12/forge-devcon-keynote-and-bim360-model-access.html#3">Accessing BIM360 Models</a></li>
+<li><a href="https://stackoverflow.com/questions/53538382/how-to-create-urn-for-revit-file-from-revit-plugin-or-using-forge-apis">How to create URN for Revit file from Revit plugin or using Forge APIs</a></li>
+<li>Forge blog post on <a href="https://forge.autodesk.com/blog/accessing-bim-360-design-models-revit">accessing BIM 360 design models on Revit</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/05/precast-api-and-cloud-open-callback.html#3 ... using the Revit 2019 API to detach a model from BIM360 with the following code..."><code>IOpenFromCloudCallback</code> and the <code>DefaultOpenFromCloudCallback</code> class</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/06/accessing-bim360-cloud-links-thumbnail-and-dynamo.html#2">Accessing BIM360 cloud links</a></li>
+<li><a href="https://stackoverflow.com/questions/54788232/update-revit-custom-properties-by-web-api">Update Revit custom properties by web API</a></li>
+<li><a href="https://stackoverflow.com/questions/57806330/open-revit-bim360-model-via-command-line">Open Revit BIM360 Model via command line</a></li>
+<li><a href="https://stackoverflow.com/questions/58483626/do-we-have-api-access-to-c4rcollaboration-for-revit-functionalities-in-forge-a">Do we have API access to C4R (Collaboration for Revit) functionalities in Forge API/Revit API?</a></li>
+</ul>
+<p>The last one pretty exactly matches the question you have as well.</p>
+<p><strong>Response:</strong> In my DA add-in, <code>SaveAsCloudCloudModel</code> was called with the following parameters:</p>
+<pre class="code">
+  doc.SaveAsCloudModel(
+    new Guid("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"), // BIM360 docs AccountGUID
+    new Guid("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"), // BIM360 docs ProjectGUID
+    "urn:adsk.wipprod:fs.folder:XXXXX...XXX%22, // BIM360 docs FolderID
+    "test-floor-model.rvt" // FileName to save
+  );
+</pre>
+
+<p>These GUIDs and IDs were determined as described
+in <a href="https://thebuildingcoder.typepad.com/blog/2020/04/revit-2021-cloud-model-api.html#4.5">how to save a local file to a non-workshared cloud model</a>.</p>
+<p>However, the result was the same (log of DA WorkItem):</p>
+<pre>
+  [10/08/2020 23:20:40] Autodesk.Revit.Exceptions.InvalidOperationException: Could not obtain entitlement server.
+  [10/08/2020 23:20:40]    at Autodesk.Revit.DB.Document.SaveAsCloudModel(Guid accountId, Guid projectId, String folderId, String modelName)
+  [10/08/2020 23:20:40]    at IfcToRvt.Commands.ImportIFC(Document doc)
+  [10/08/2020 23:20:40]    at IfcToRvt.Commands.DesignAutomationBridge_DesignAutomationReadyEvent(Object sender, DesignAutomationReadyEventArgs e)
+  [10/08/2020 23:20:40]    at DesignAutomationFramework.DesignAutomationBridge.RaiseDesignAutomationReadyEvent(DesignAutomationReadyEventArgs e)
+  [10/08/2020 23:20:40]    at RevitCoreEngineTest.RceConsoleApplication.Program.UserMain(CommandLineArgs cl)
+</pre>
+
+<p>Is there a mistake or misunderstanding in my code above?</p>
+<p><a href="https://forge.autodesk.com/blog/worksharing-model-support-revit-design-automation-0">Worksharing model support by Revit Design Automation</a> clearly
+states that DA can open a Worksharing model from C4R on BIM 360 docs.</p>
+<p>Is it possible for DA to save a RVT file as the C4R model on BIM360 docs?</p>
+<p><strong>Answer:</strong> No, unfortunately that is currently not possible, as explained in <a href="https://stackoverflow.com/questions/62307069/how-to-save-revit-file-in-bim-360-as-cloud-model-using-forge-design-automation-a">how to save Revit file in BIM 360 as cloud model using Forge Design Automation API</a>:</p>
+<blockquote>
+<p>It is a current limitation of Design Automation that model saves can only be done into the current working directory of the cloud machine.
+This is because user apps are forbidden from accessing the network.</p>
+<p>As such, <code>doc.SaveAsCloudModel</code> is not currently supported on Design Automation.
+That said, we have noted your request for BIM 360 functionality in Design Automation!</p>
+</blockquote>
+<p>I checked with my colleagues whether this is still the case.</p>
+<p>They answered: There is no alternative to save to RCW.
+Open/Save operations on RCW are on the priority (no ETA).</p>
+<p>Thank you for clarifying!
+Some further Q &amp; A on this:</p>
+<p>[Q] What exactly does RCW stand for, please?
+Is that equivalent to BIM360?
+If not, what is the exact relationship between RCW, BIM360 and Forge, please? </p>
+<p>[A] Revit Cloud Worksharing (RCW) consists of the cloud service which sends and receives streams of element data from the cloud to your local model.
+BIM360 is the Cloud service which hosts the streams of element data and enables RCW workflow.
+BTW, it is suggested to use Revit Cloud Models rather than RCW.</p>
+<p>[Q] Thank you for clarifying RCW.
+Thank you also for surprising me with a new acronym, RCM.
+You say that RCM is recommended over RCW.
+What is RCM? Is that part of Forge, or BIM360, or yet something else?
+How can we save to, or use, in general, RCM instead of RCW?
+Can <code>SaveAsCloudModel</code> save to both RCM and RCW?
+How can that be controlled?
+This sounds to me as if a whitepaper on the whole topic and all these acronyms would be more useful than answers to individual random question.
+Does such a whitepaper exist, or some source of information, or overview?</p>
+<p>[A] Let me give it a shot, I believe this is an accurate overview:</p>
+<ul>
+<li>BIM 360 = Unified platform which hosts a number of services (such as BIM 360 Document Management)</li>
+<li>Revit Cloud Worksharing (RCW) = Service for Revit that supports multi-user collaboration, hosted on BIM 360 Document Management</li>
+<li>Cloud Models for Revit (RCM) = Use Cloud Models for Revit to save your non-workshared, local model, hosted on BIM 360 Document Management</li>
+</ul>
+<p>Of these three, Design Automation for Revit can only access or save models on BIM 360.</p>
+<p>Design Automation for Revit does not have access to and cannot sync, save, or open Revit cloud worksharing models, including Cloud Models for Revit.
+These are considered the "live" versions of the model customers are actively working in.</p>
+<p>When a customer publishes a version of the "live" model, it ends up on BIM 360, and that is the version Design Automation for Revit can access. </p>
+<p>[Q] Then, I assume that the answer to the main question above is a clear und succinct ‘currently no’?</p>
+<p>[A] Correct.</p>
+<p>So, all in all, there is currently no alternative to save to the Revit Cloud Worksharing (RCW).</p>
+<p>Open/Save operations on RCW are high priority, but no ETA defined yet.</p>
+<h4><a name="3"></a> Every program Launch is Logged</h4>
+<p>So, whereas DA4R is isolated from Internet access, you computer very probably is not, whether you wish it to be or not.</p>
+<p>Jeffrey Paul of <a href="https://eeqj.com">EEQJ</a> published an interesting analysis of computer privacy, or the lack of it, hitting a new record with the launch of the new MacOS, in his analysis and documentation on how and 
+why <a href="https://sneak.berlin/20201112/your-computer-isnt-yours">Your Computer Isn't Yours</a>:</p>
+<blockquote>
+<p>... in the current version of the macOS, the OS sends to Apple a hash of each and every program you run, when you run it
+... using the internet, the server sees your IP, of course, and knows what time the request came in.
+An IP address allows for coarse, city-level and ISP-level geolocation, and allows for a table that has the following headings:
+<pre>
+  Date, Time, Computer, ISP, City, State, Application Hash
+</pre>
+Apple (or anyone else) can, of course, calculate these hashes for common programs: everything in the App Store, the Creative Cloud, Tor Browser, cracking or reverse engineering tools, whatever.
+This means that Apple knows when you’re at home. When you’re at work. What apps you open there, and how often. They know when you open Premiere over at a friend’s house on their Wi-Fi, and they know when you open Tor Browser in a hotel on a trip to another city...</p>
+<p>... you can have a fast and efficient machine, or you can have a private one.</p>
+</blockquote>
+<p><center>
+<img src="img/transparent_tiny_house.jpg" alt="Transparent" title="Transparent" width="300"/> <!-- 600 -->
+</center></p>

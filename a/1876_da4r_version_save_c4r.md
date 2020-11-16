@@ -48,7 +48,9 @@ Today, let's pick up a resurfacing question in the Forge Design Automation for R
 
 ####<a name="2"></a> DA4R Cannot Save RVT as a Cloud Model
 
-As is well known and clearly documented, Forge Design Automation for Revit or DA4R currently does not enable any Internet access whatsoever to the running workitem.
+As is well known and clearly documented,
+[Forge Design Automation for Revit](https://forge.autodesk.com/api/design-automation-cover-page) or
+DA4R currently does not enable any Internet access whatsoever to the running workitem.
 
 This obviously also prevents the ability to store an RVT BIM straight to BIM360 or C4R, Collaboration for Revit, or anywhere else in the cloud.
 
@@ -128,7 +130,7 @@ However, the result was the same (log of DA WorkItem):
   [10/08/2020 23:20:40]    at RevitCoreEngineTest.RceConsoleApplication.Program.UserMain(CommandLineArgs cl)
 </pre>
 
-Is there a mistake or misunderstanding on the above add-in code?
+Is there a mistake or misunderstanding in my code above?
 
 [Worksharing model support by Revit Design Automation](https://forge.autodesk.com/blog/worksharing-model-support-revit-design-automation-0) clearly
 states that DA can open a Worksharing model from C4R on BIM 360 docs.
@@ -140,14 +142,16 @@ Is it possible for DA to save a RVT file as the C4R model on BIM360 docs?
 > It is a current limitation of Design Automation that model saves can only be done into the current working directory of the cloud machine.
 This is because user apps are forbidden from accessing the network.
 
-> As such, `doc.SaveAsCloudModel()` is not currently supported on Design Automation.
+> As such, `doc.SaveAsCloudModel` is not currently supported on Design Automation.
 That said, we have noted your request for BIM 360 functionality in Design Automation!
 
 I checked with my colleagues whether this is still the case.
 
-They answered: There is no alternative to save to RCW. Open/Save operations on RCW are on the priority (no ETA).
+They answered: There is no alternative to save to RCW.
+Open/Save operations on RCW are on the priority (no ETA).
 
 Thank you for clarifying!
+Some further Q &amp; A on this:
 
 [Q] What exactly does RCW stand for, please?
 Is that equivalent to BIM360?
@@ -167,15 +171,15 @@ How can that be controlled?
 This sounds to me as if a whitepaper on the whole topic and all these acronyms would be more useful than answers to individual random question.
 Does such a whitepaper exist, or some source of information, or overview?
 
-[A] Let me give it a shot, I believe this is an accurate overivew:
+[A] Let me give it a shot, I believe this is an accurate overview:
 
 - BIM 360 = Unified platform which hosts a number of services (such as BIM 360 Document Management)
 - Revit Cloud Worksharing (RCW) = Service for Revit that supports multi-user collaboration, hosted on BIM 360 Document Management
-- Cloud Models for Revit (RCM)= Use Cloud Models for Revit to save your non-workshared, local model, hosted on BIM 360 Document Management
+- Cloud Models for Revit (RCM) = Use Cloud Models for Revit to save your non-workshared, local model, hosted on BIM 360 Document Management
 
 Of these three, Design Automation for Revit can only access or save models on BIM 360.
 
-Design Automation for Revit does not have access to and cannot sync, save, or open Revit cloud worksaring models, including Cloud Models for Revit.
+Design Automation for Revit does not have access to and cannot sync, save, or open Revit cloud worksharing models, including Cloud Models for Revit.
 These are considered the "live" versions of the model customers are actively working in.
 
 When a customer publishes a version of the "live" model, it ends up on BIM 360, and that is the version Design Automation for Revit can access. 
@@ -190,21 +194,21 @@ Open/Save operations on RCW are high priority, but no ETA defined yet.
 
 ####<a name="3"></a> Every program Launch is Logged
 
-So, whereas DA4R is isolated from Internet access, you compouter very probably is not, whether you wish it to be or not.
+So, whereas DA4R is isolated from Internet access, you computer very probably is not, whether you wish it to be or not.
 
 Jeffrey Paul of [EEQJ](https://eeqj.com) published an interesting analysis of computer privacy, or the lack of it, hitting a new record with the launch of the new MacOS, in his analysis and documentation on how and 
 why [Your Computer Isn't Yours](https://sneak.berlin/20201112/your-computer-isnt-yours):
 
-> in the current version of the macOS, the OS sends to Apple a hash of each and every program you run, when you run it... 
+> ... in the current version of the macOS, the OS sends to Apple a hash of each and every program you run, when you run it
 > ... using the internet, the server sees your IP, of course, and knows what time the request came in.
 An IP address allows for coarse, city-level and ISP-level geolocation, and allows for a table that has the following headings:
 <pre>
-Date, Time, Computer, ISP, City, State, Application Hash
+  Date, Time, Computer, ISP, City, State, Application Hash
 </pre>
 Apple (or anyone else) can, of course, calculate these hashes for common programs: everything in the App Store, the Creative Cloud, Tor Browser, cracking or reverse engineering tools, whatever.
 This means that Apple knows when you’re at home. When you’re at work. What apps you open there, and how often. They know when you open Premiere over at a friend’s house on their Wi-Fi, and they know when you open Tor Browser in a hotel on a trip to another city...
 
-> you can have a fast and efficient machine, or you can have a private one.
+> ... you can have a fast and efficient machine, or you can have a private one.
 
 <center>
 <img src="img/transparent_tiny_house.jpg" alt="Transparent" title="Transparent" width="300"/> <!-- 600 -->
