@@ -79,7 +79,8 @@ But my DA addin raises an Exception when executing `doc.SaveAsCloudModel()`.
   
   // Save as a RVT file as the C4R model on BIM360 docs
   
-  doc.SaveAsCloudModel( accountId, projectId, params.FolderId, params.FileName );
+  doc.SaveAsCloudModel( accountId, projectId, params.FolderId,
+    params.FileName );
 </pre>
 
 Would you tell me how to make this operation work properly?
@@ -99,7 +100,7 @@ Here are some further, related discussions that I have been collecting and that 
 - [Accessing BIM360 Models](https://thebuildingcoder.typepad.com/blog/2018/12/forge-devcon-keynote-and-bim360-model-access.html#3)
 - [How to create URN for Revit file from Revit plugin or using Forge APIs](https://stackoverflow.com/questions/53538382/how-to-create-urn-for-revit-file-from-revit-plugin-or-using-forge-apis)
 - Forge blog post on [accessing BIM 360 design models on Revit](https://forge.autodesk.com/blog/accessing-bim-360-design-models-revit)
-- [`IOpenFromCloudCallback` and the `DefaultOpenFromCloudCallback` class](https://thebuildingcoder.typepad.com/blog/2019/05/precast-api-and-cloud-open-callback.html#3) ... using the Revit 2019 API to detach a model from BIM360 with the following code...)
+- [`IOpenFromCloudCallback` and the `DefaultOpenFromCloudCallback` class](https://thebuildingcoder.typepad.com/blog/2019/05/precast-api-and-cloud-open-callback.html#3) &ndash; using the Revit 2019 API to detach a model from BIM360
 - [Accessing BIM360 cloud links](https://thebuildingcoder.typepad.com/blog/2019/06/accessing-bim360-cloud-links-thumbnail-and-dynamo.html#2)
 - [Update Revit custom properties by web API](https://stackoverflow.com/questions/54788232/update-revit-custom-properties-by-web-api)
 - [Open Revit BIM360 Model via command line](https://stackoverflow.com/questions/57806330/open-revit-bim360-model-via-command-line)
@@ -111,8 +112,8 @@ The last one pretty exactly matches the question you have as well.
 
 <pre class="code">
   doc.SaveAsCloudModel(
-    new Guid("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"), // BIM360 docs AccountGUID
-    new Guid("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"), // BIM360 docs ProjectGUID
+    new Guid("xxxxxxxx-xxxx-xxxx-xxxx-x...x"), // BIM360 docs AccountGUID
+    new Guid("xxxxxxxx-xxxx-xxxx-xxxx-x...x"), // BIM360 docs ProjectGUID
     "urn:adsk.wipprod:fs.folder:XXXXX...XXX%22, // BIM360 docs FolderID
     "test-floor-model.rvt" // FileName to save
   );
@@ -204,12 +205,10 @@ why [Your Computer Isn't Yours](https://sneak.berlin/20201112/your-computer-isnt
 > ... in the current version of the macOS, the OS sends to Apple a hash of each and every program you run, when you run it
 > ... using the internet, the server sees your IP, of course, and knows what time the request came in.
 An IP address allows for coarse, city-level and ISP-level geolocation, and allows for a table that has the following headings:
-<pre>
-  Date, Time, Computer, ISP, City, State, Application Hash
-</pre>
-Apple (or anyone else) can, of course, calculate these hashes for common programs: everything in the App Store, the Creative Cloud, Tor Browser, cracking or reverse engineering tools, whatever.
+    <pre>
+    Date, Time, Computer, ISP, City, State, App_Hash</pre>
+> Apple (or anyone else) can, of course, calculate these hashes for common programs: everything in the App Store, the Creative Cloud, Tor Browser, cracking or reverse engineering tools, whatever.
 This means that Apple knows when you’re at home. When you’re at work. What apps you open there, and how often. They know when you open Premiere over at a friend’s house on their Wi-Fi, and they know when you open Tor Browser in a hotel on a trip to another city...
-
 > ... you can have a fast and efficient machine, or you can have a private one.
 
 <center>

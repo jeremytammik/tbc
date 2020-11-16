@@ -71,7 +71,8 @@ This issue came up quite a number of times already:
 
   // Save as a RVT file as the C4R model on BIM360 docs
 
-  doc.SaveAsCloudModel( accountId, projectId, params.FolderId, params.FileName );
+  doc.SaveAsCloudModel( accountId, projectId, params.FolderId,
+    params.FileName );
 </pre>
 
 <p>Would you tell me how to make this operation work properly?</p>
@@ -86,7 +87,7 @@ in <a href="https://thebuildingcoder.typepad.com/blog/2020/04/revit-2021-cloud-m
 <li><a href="https://thebuildingcoder.typepad.com/blog/2018/12/forge-devcon-keynote-and-bim360-model-access.html#3">Accessing BIM360 Models</a></li>
 <li><a href="https://stackoverflow.com/questions/53538382/how-to-create-urn-for-revit-file-from-revit-plugin-or-using-forge-apis">How to create URN for Revit file from Revit plugin or using Forge APIs</a></li>
 <li>Forge blog post on <a href="https://forge.autodesk.com/blog/accessing-bim-360-design-models-revit">accessing BIM 360 design models on Revit</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2019/05/precast-api-and-cloud-open-callback.html#3"><code>IOpenFromCloudCallback</code> and the <code>DefaultOpenFromCloudCallback</code> class</a> ... using the Revit 2019 API to detach a model from BIM360 with the following code...)</li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/05/precast-api-and-cloud-open-callback.html#3"><code>IOpenFromCloudCallback</code> and the <code>DefaultOpenFromCloudCallback</code> class</a> &ndash; using the Revit 2019 API to detach a model from BIM360</li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2019/06/accessing-bim360-cloud-links-thumbnail-and-dynamo.html#2">Accessing BIM360 cloud links</a></li>
 <li><a href="https://stackoverflow.com/questions/54788232/update-revit-custom-properties-by-web-api">Update Revit custom properties by web API</a></li>
 <li><a href="https://stackoverflow.com/questions/57806330/open-revit-bim360-model-via-command-line">Open Revit BIM360 Model via command line</a></li>
@@ -96,8 +97,8 @@ in <a href="https://thebuildingcoder.typepad.com/blog/2020/04/revit-2021-cloud-m
 <p><strong>Response:</strong> In my DA add-in, <code>SaveAsCloudCloudModel</code> was called with the following parameters:</p>
 <pre class="code">
   doc.SaveAsCloudModel(
-    new Guid("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"), // BIM360 docs AccountGUID
-    new Guid("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"), // BIM360 docs ProjectGUID
+    new Guid("xxxxxxxx-xxxx-xxxx-xxxx-x...x"), // BIM360 docs AccountGUID
+    new Guid("xxxxxxxx-xxxx-xxxx-xxxx-x...x"), // BIM360 docs ProjectGUID
     "urn:adsk.wipprod:fs.folder:XXXXX...XXX%22, // BIM360 docs FolderID
     "test-floor-model.rvt" // FileName to save
   );
@@ -168,12 +169,11 @@ why <a href="https://sneak.berlin/20201112/your-computer-isnt-yours">Your Comput
 <p>... in the current version of the macOS, the OS sends to Apple a hash of each and every program you run, when you run it
 ... using the internet, the server sees your IP, of course, and knows what time the request came in.
 An IP address allows for coarse, city-level and ISP-level geolocation, and allows for a table that has the following headings:
-<pre>
-  Date, Time, Computer, ISP, City, State, Application Hash
-</pre>
+    <pre>
+    Date, Time, Computer, ISP, City, State, App_Hash</pre>
 Apple (or anyone else) can, of course, calculate these hashes for common programs: everything in the App Store, the Creative Cloud, Tor Browser, cracking or reverse engineering tools, whatever.
-This means that Apple knows when you’re at home. When you’re at work. What apps you open there, and how often. They know when you open Premiere over at a friend’s house on their Wi-Fi, and they know when you open Tor Browser in a hotel on a trip to another city...</p>
-<p>... you can have a fast and efficient machine, or you can have a private one.</p>
+This means that Apple knows when you’re at home. When you’re at work. What apps you open there, and how often. They know when you open Premiere over at a friend’s house on their Wi-Fi, and they know when you open Tor Browser in a hotel on a trip to another city...
+... you can have a fast and efficient machine, or you can have a private one.</p>
 </blockquote>
 <p><center>
 <img src="img/transparent_tiny_house.jpg" alt="Transparent" title="Transparent" width="300"/> <!-- 600 -->
