@@ -25,6 +25,15 @@ Philipp Mueller highlights a set of BIM360 user management scripts and Diego Ros
 
 linkedin:
 
+@BIM360 user management scripts, external application with @prismlib goodies and add-in @dotnet template for the #RevitAPI
+
+https://bit.ly/dotnettemplate
+
+Philipp Mueller highlights a set of BIM360 user management scripts and Diego Rossi shares two useful GitHub repositories:
+
+- BIM360 user management scripts
+- External application with Prism goodies
+- Revit add-in dotnet template...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
