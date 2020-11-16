@@ -42,7 +42,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### DA4R Cannot Save Directly to Cloud
 
-Today, let's address a resurfacing question in the Forge Design Automation for Revit or DA4R context:
+Today, let's address a resurfacing question in the Forge Design Automation for Revit or DA4R context and an interesting security aspect that probably applies to all PC users, more or less:
 
 - [DA4R cannot save RVT as a cloud model](#2)
 - [Every program launch is logged](#3)
