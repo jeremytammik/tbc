@@ -22,8 +22,9 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Today, let's address a resurfacing question in the Forge Design Automation for Revit or DA4R context
+&ndash; DA4R cannot save RVT as a cloud model
+&ndash; Every program launch is logged...
 
 linkedin:
 
@@ -41,16 +42,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### DA4R Cannot Save Directly to Cloud
 
-Today, let's pick up a resurfacing question in the Forge Design Automation for Revit or DA4R context:
+Today, let's address a resurfacing question in the Forge Design Automation for Revit or DA4R context:
 
-- [DA4R Cannot Save RVT as a Cloud Model](#2)
-- [Every program Launch is Logged](#3)
+- [DA4R cannot save RVT as a cloud model](#2)
+- [Every program launch is logged](#3)
 
 ####<a name="2"></a> DA4R Cannot Save RVT as a Cloud Model
 
 As is well known and clearly documented,
 [Forge Design Automation for Revit](https://forge.autodesk.com/api/design-automation-cover-page) or
-DA4R currently does not enable any Internet access whatsoever to the running workitem.
+[DA4R](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.55) currently
+does not enable any Internet access whatsoever to the running workitem.
 
 This obviously also prevents the ability to store an RVT BIM straight to BIM360 or C4R, Collaboration for Revit, or anywhere else in the cloud.
 
@@ -97,8 +99,8 @@ Here are some further, related discussions that I have been collecting and that 
 - [Accessing BIM360 Models](https://thebuildingcoder.typepad.com/blog/2018/12/forge-devcon-keynote-and-bim360-model-access.html#3)
 - [How to create URN for Revit file from Revit plugin or using Forge APIs](https://stackoverflow.com/questions/53538382/how-to-create-urn-for-revit-file-from-revit-plugin-or-using-forge-apis)
 - Forge blog post on [accessing BIM 360 design models on Revit](https://forge.autodesk.com/blog/accessing-bim-360-design-models-revit)
-- [`IOpenFromCloudCallback` and the `DefaultOpenFromCloudCallback` class](https://thebuildingcoder.typepad.com/blog/2019/05/precast-api-and-cloud-open-callback.html#3 ... using the Revit 2019 API to detach a model from BIM360 with the following code...)
-- [Accessing BIM360 cloud links](https://thebuildingcoder.typepad.com/blog/2019/06/accessing-bim360-cloud-links-thumbnail-and-dynamo.html#2 )
+- [`IOpenFromCloudCallback` and the `DefaultOpenFromCloudCallback` class](https://thebuildingcoder.typepad.com/blog/2019/05/precast-api-and-cloud-open-callback.html#3) ... using the Revit 2019 API to detach a model from BIM360 with the following code...)
+- [Accessing BIM360 cloud links](https://thebuildingcoder.typepad.com/blog/2019/06/accessing-bim360-cloud-links-thumbnail-and-dynamo.html#2)
 - [Update Revit custom properties by web API](https://stackoverflow.com/questions/54788232/update-revit-custom-properties-by-web-api)
 - [Open Revit BIM360 Model via command line](https://stackoverflow.com/questions/57806330/open-revit-bim360-model-via-command-line)
 - [Do we have API access to C4R (Collaboration for Revit) functionalities in Forge API/Revit API?](https://stackoverflow.com/questions/58483626/do-we-have-api-access-to-c4rcollaboration-for-revit-functionalities-in-forge-a)
