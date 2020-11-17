@@ -11,6 +11,8 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
+I encourage all developers interested in the Revit API to join me and the Revit development team in the Revit API expert roundtable and feedback session at Autodesk University this week, on Thursday, 19 November 2020, 15:00-16:00 o'clock Central European Time, CET...
+
 &ndash; 
 ...
 
@@ -27,9 +29,51 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Revit API Expert Roundtable and Feedback
+### Join the Revit API Expert and Feedback Roundtable
 
-Join the 
+I encourage all developers interested in the Revit API to join me and the Revit development team in the Revit API expert roundtable and feedback session at Autodesk University this week,
+on [Thursday, 19 November 2020, 15:00-16:00 o'clock Central European Time, CET](https://www.timeanddate.com/worldclock/converter.html?iso=20201119T140000&p1=268).
+
+To do so, please register for AU and navigate to the Idea Exchange feedback workshop #61:
+
+- [Explore everything AU 2020 has to offer](https://www.autodesk.com/autodesk-university/conference/schedule)
+<br/>&rarr; [Idea Exchange](https://www.autodesk.com/autodesk-university/conference/idea-exchange)
+<br/>&rarr; Feedback workshop #61
+<br/>&ndash; Revit API Feedback Session and Revit API Expert Roundtable
+
+> Interact with a panel of Revit API experts who will answer your questions and discuss all relevant topics of your choice.
+
+> Share feedback on using Revit API:
+what's working and not, what's missing;
+(a) major painpoints and inefficiencies;
+(b) missing coverage/functionality;
+(c) priorities/wishes for future development.
+
+> Please note that prior .NET programming and Revit add-in development experience is required.
+This class is not suitable for beginners.
+Space is limited.
+
+Duration: 60 minutes
+
+The following Revit API experts will be participating: 
+
+- Sasha Crotty &ndash; Senior Product Manager, Revit Platform and Services
+- Scott Conover &ndash; Revit Engineering Director
+- Jeremy Tammik &ndash; Forge Principal Developer Consultant
+- Mikako harada &ndash; Forge Developer Tech Consultant Manager
+- Arkady Gilman &ndash; Sr. SW Architect
+- Diane Christoforo, Stone Shi, Phil Xia, Romeo Belciug &ndash; Developers and Revit API Guild Members
+
+I'm looking forward to seeing you there!
+
+<center>
+<img src="img/slice_pendragon_knights_round_table.jpg" alt="Round table" title="Round table" width="600"/>
+<p style="font-size: 80%; font-style:italic">[Things my grandfather taught me ... about meetings](https://mygrandfathertaughtme.wordpress.com/2010/10/12/about-meetings)
+“Anything that lasts longer than thirty minutes is not a meeting anymore. It’s people wasting time so they don’t have to do any real work.”</p>
+</center>
+
+
+<!--
 
 ####<a name="2"></a> 
 
@@ -40,55 +84,16 @@ Join the
 
 **Answer:** 
 
-
 **Response:** 
-
 
 ####<a name="3"></a> 
 
 <center>
-<img src="img/.jpg" alt="" title="" width="100"/> <!-- 600 -->
+<img src="img/.jpg" alt="" title="" width="100"/> <!-- 600 
 </center>
 
 [AU 2020 Revit API Feedback Session Survey](https://autodeskfeedback.az1.qualtrics.com/jfe/form/SV_1RY2upXezPAwicB)
 
+-->
 
 <!-- &#35; hash # -->
-
-[Explore everything AU 2020 has to offer](https://www.autodesk.com/autodesk-university/conference/schedule)
-&rarr; [Idea Exchange](https://www.autodesk.com/autodesk-university/conference/idea-exchange)
-&rarr; Feedback workshop #61 &ndash; Revit API Feedback Session and Revit API Expert Roundtable
-
-Share feedback on using Revit API: what's working and not, what's missing. Please note that .NET and Revit add-in development experience is required.
-
-Who it's for: You have .NET coding and Revit add-in development experience
-
-REVIT
-
-EXPRESS INTEREST View more
-Revit Team
-
-
-Share feedback on using Revit API for: (a) major painpoints and inefficiencies; (b) missing coverage/functionality; (c) priorities/wishes for future development.  Interact with a panel of Revit API experts who will answer your questions and discuss all relevant topics of your choice! Please note that prior .NET programming and Revit add-in development experience is required. This class is not suitable for beginners. Space is limited.
-
-Who it's for: You have .NET coding and Revit add-in development experience
-
-Products: Revit
-
-Industry: Architecture | Building Engineering | Construction
-
-Duration: 60 minutes
-
-Revit API Experts
-
-Sasha Crotty &ndash; Senior Product Manager, Revit Platform and Services
-Scott Conover &ndash; Revit Engineering Director
-Jeremy Tammik &ndash; Forge Principal Developer Consultant
-Mikako harada &ndash; Forge Developer Tech Consultant Manager
-ARKADY GILMAN &ndash; Sr. SW Architect
-Diane Christoforo, Stone Shi, Phil Xia, Romeo Belciug &ndash; Developers and Revit API Guild Members
-
-
-
-
-
