@@ -9,7 +9,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+I encourage all developers interested in the #RevitAPI to join me and the Revit development team in the Revit API expert roundtable and feedback session at Autodesk University tomorrow, Thursday, 19 November 2020 @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/au2020roundtable
 
 I encourage all developers interested in the Revit API to join me and the Revit development team in the Revit API expert roundtable and feedback session at Autodesk University this week, on Thursday, 19 November 2020, 15:00-16:00 o'clock Central European Time, CET...
 
