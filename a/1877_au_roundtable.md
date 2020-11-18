@@ -18,6 +18,10 @@ I encourage all developers interested in the Revit API to join me and the Revit 
 
 linkedin:
 
+I encourage all developers interested in the #RevitAPI to join me and the Revit development team in the Revit API expert roundtable and feedback session at Autodesk University tomorrow, Thursday, 19 November 2020:
+
+https://bit.ly/au2020roundtable
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
