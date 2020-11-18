@@ -31,7 +31,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Join the Revit API Expert and Feedback Roundtable
 
-I encourage all developers interested in the Revit API to join me and the Revit development team in the Revit API expert roundtable and feedback session at Autodesk University this week,
+I encourage all developers interested in the Revit API to join Boris Shafiro, me and the Revit development team in the Revit API expert roundtable and feedback session at Autodesk University this week,
 on [Thursday, 19 November 2020, 15:00-16:00 o'clock Central European Time, CET](https://www.timeanddate.com/worldclock/converter.html?iso=20201119T140000&p1=268).
 
 To do so, please register for AU and navigate to the Idea Exchange feedback workshop #61:
@@ -55,7 +55,7 @@ Space is limited.
 
 Duration: 60 minutes
 
-The following Revit API experts will be participating: 
+Boris Shafiro, Revit Software Development Manager, is leading this session, and the following other Revit API experts will be participating: 
 
 - Sasha Crotty &ndash; Senior Product Manager, Revit Platform and Services
 - Scott Conover &ndash; Revit Engineering Director
