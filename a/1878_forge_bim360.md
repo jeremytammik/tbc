@@ -11,6 +11,9 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
+Expand the value and reach of your Revit add-in.
+Join our webinar and learn how to quickly add cloud powered capabilities to your application and business offering by leveraging Forge and BIM 360...
+
 &ndash; 
 ...
 
@@ -30,7 +33,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Expand, Integrate and Leverage your Revit Add-In with BIM360 and Leverage Forge
+### Expand your App &ndash; Integrate and Leverage Cloud
 
 The value of an existing Revit add-in can often be vastly increased with little effort.
 
@@ -46,14 +49,14 @@ It’s time.
 It’s past time.
 Come join us and learn how &ndash; now.
 
-Join our webinar and learn from Jim Quanci, The Building Coder Jeremy Tammik, and the BIM 360 team at Autodesk about your business growth opportunities and how to quickly add cloud powered capabilities to your Revit app and business offering by leveraging Forge and BIM 360.
+[Join our webinar](https://autodesk.zoom.us/webinar/register/WN_lllxsRscRUab8xROn9Anfg) and
+learn from Jim Quanci, The Building Coder Jeremy Tammik, and the BIM 360 team at Autodesk about your business growth opportunities and how to quickly add cloud powered capabilities to your Revit app and business offering by leveraging Forge and BIM 360.
 
 - Date: Wednesday, December 2, 2020
 - Time: [7am PST &ndash; 10am EST &ndash; 3pm GMT &ndash; 4pm CET](https://www.timeanddate.com/worldclock/converter.html?iso=20201202T150000&p1=268)
 - [Click here to register](https://autodesk.zoom.us/webinar/register/WN_lllxsRscRUab8xROn9Anfg)
 
-
 <center>
-<img src="img/.jpg" alt="" title="" width="100"/> <!-- 600 
+<a title="Antonio Ciccolella, CC BY-SA 4.0 &lt;https://creativecommons.org/licenses/by-sa/4.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Typical_Lifecycle_of_a_Single_Cell_Thunderstorm.png"><img width="512" alt="Typical Lifecycle of a Single Cell Thunderstorm" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Typical_Lifecycle_of_a_Single_Cell_Thunderstorm.png/512px-Typical_Lifecycle_of_a_Single_Cell_Thunderstorm.png"></a>
 </center>
 
