@@ -41,10 +41,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <a href="https://thebuildingcoder.typepad.com/blog/2020/11/join-the-revit-api-expert-roundtable-and-feedback.html">Revit API expert and feedback roundtable</a>
 on Thursday, 19 November 2020, as part of the Autodesk University Idea Exchange.</p>
 <p>Over 20 participants attended from all around the world.</p>
-<p>I took some notes.</p>
-<p>Although the session was covered by a non-disclosure agreement
+<p>I took the following notes.</p>
+<p>The session was covered by a non-disclosure agreement
 or <a href="https://en.wikipedia.org/wiki/Non-disclosure_agreement">NDA</a> covering
-forward-looking statements, nothing critically confidential was discussed, so I feel free to share them here with you as well.</p>
+forward-looking and confidential statements.</p>
+<p>Nothing critical was actually discussed, so I feel free to share them here with you as well.</p>
 <h4><a name="2"></a> Revit API Expert Roundtable and Feedback Session</h4>
 <p><center>
 <p style="font-size: 80%; font-style:italic">Autodesk University 2020, November 19, 2020
@@ -61,8 +62,11 @@ forward-looking statements, nothing critically confidential was discussed, so I 
 <li>Diane Christoforo, Stone Shi, Phil Xia, Romeo Belciug &ndash; Developers and Revit API Guild Members</li>
 </ul>
 <p>Notes:</p>
-<p>Q Jorge Villaroel detailing vs. solution update for new Revit API copy sln reference new DLLs update deprecated calls.</p>
-<p>A Has been discussed repeatedly in the Revit API discussion forum and The Building Coder. Look into conditional compiles. You can setup different VS configuration profiles for different Revit versions and then edit your CSPROJ file to selective load Revit DLLs based on values set the respective config.</p>
+<p>Q Jorge Villaroel maintains a detailing add-in. Updating the solution for each new release of the Revit API requirtes some work, e.g., copy solution, update references to new DLLs, update deprecated calls, etc. Could this be simplified? Do you have a recommendation on how to handle this? How do you do it yourselcves?</p>
+<p>A This topic has been discussed repeatedly in the Revit API discussion forum and The Building Coder, e.g.,
+the <a href="https://thebuildingcoder.typepad.com/blog/2020/11/bim360-management-dotnet-template-and-prism-goodies.html#4">Revit add-in <code>dotnet</code> template</a> just last week.
+Look into conditional compiles.
+You can set up different VS configuration profiles for different Revit versions and then edit your <code>CSPROJ</code> file to selective load Revit DLLs based on values set the respective config.</p>
 <p>Q Olli Kattelus on the new unit API; we started migration work; large code base, significant work; optimization possible using enum instead of strings? Used for hash codes etc.; significant performance effect, even inside Revit?</p>
 <p>A Scott: we are making this change for later extensibility and being less fixed in definitions of units and later parameters as well. Ability to extend and make changes more easily, less restrictions, more connectivity; hopefully straightforward one-time change; 2021.1 includes new units, which would have been impossible previously; changes also in native code as well as add-ins; no performance hit noticeable so far; please provide examples if you discover anything and we can see whether it can be improved. Sasha: please let us know!</p>
 <p>Q Noam Ronen: How to implement QA testing for add-ins?</p>
