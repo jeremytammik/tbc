@@ -136,13 +136,13 @@ A You can use multiple threads; the Revit API is single threaded. Certain touch 
 
 Q Check whether elements touch?
 
-A Follow up, check Revit Ideas.
+A We will follow up on this; please also check Revit Ideas.
 
-Q Collection classes are often IEnumerable, not IEnumerable&lt;T&gt;?
+Q Collection classes are often `IEnumerable`, not <code>IEnumerable&lt;T&gt;</code>?
 
 A That has historical reasons. They were introduced earlier on. We are gradually migrating away from that. We’ll get to it.
 
-Q Plans to support .NET 6?
+Q Plans to support .NET 5?
 
 A Discussed just yesterday. We have to get there. This is more than just an API decision, it affects internals as well. More than just a version increment. Not in next release. Everything will have to move at once.
 

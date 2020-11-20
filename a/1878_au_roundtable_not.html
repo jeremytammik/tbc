@@ -103,10 +103,10 @@ One quick note: I managed to export from Revit to SQL on my local machine using 
 <p>Q Matthew Hannon: I have a few questions. Geometric calculations on multiple threads?</p>
 <p>A You can use multiple threads; the Revit API is single threaded. Certain touch points enforce the main thread, e.g., transactions; some utility classes might allow multithreading, but none of them are guaranteed to be thread safe; they may seem immutable and not be so.</p>
 <p>Q Check whether elements touch?</p>
-<p>A Follow up, check Revit Ideas.</p>
-<p>Q Collection classes are often IEnumerable, not IEnumerable&lt;T&gt;?</p>
+<p>A We will follow up on this; please also check Revit Ideas.</p>
+<p>Q Collection classes are often <code>IEnumerable</code>, not <code>IEnumerable&lt;T&gt;</code>?</p>
 <p>A That has historical reasons. They were introduced earlier on. We are gradually migrating away from that. We’ll get to it.</p>
-<p>Q Plans to support .NET 6?</p>
+<p>Q Plans to support .NET 5?</p>
 <p>A Discussed just yesterday. We have to get there. This is more than just an API decision, it affects internals as well. More than just a version increment. Not in next release. Everything will have to move at once.</p>
 <p>Q Bettina: Will Export PDF be available in the next major release? I see export pdf in the preview API, in the October beta preview, but there is no Export PDF button as described in the help.</p>
 <p>A It should be there in both API and UI. Ask in the preview forum.</p>
