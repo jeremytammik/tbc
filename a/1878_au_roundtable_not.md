@@ -45,11 +45,13 @@ on Thursday, 19 November 2020, as part of the Autodesk University Idea Exchange.
 
 Over 20 participants attended from all around the world.
 
-I took some notes.
+I took the following notes.
 
-Although the session was covered by a non-disclosure agreement
+The session was covered by a non-disclosure agreement
 or [NDA](https://en.wikipedia.org/wiki/Non-disclosure_agreement) covering
-forward-looking statements, nothing critically confidential was discussed, so I feel free to share them here with you as well.
+forward-looking and confidential statements.
+
+Nothing critical was actually discussed, so I feel free to share them here with you as well.
 
 ####<a name="2"></a> Revit API Expert Roundtable and Feedback Session
 
@@ -70,9 +72,12 @@ Panel members:
 
 Notes:
 
-Q Jorge Villaroel detailing vs. solution update for new Revit API copy sln reference new DLLs update deprecated calls.
+Q Jorge Villaroel maintains a detailing add-in. Updating the solution for each new release of the Revit API requirtes some work, e.g., copy solution, update references to new DLLs, update deprecated calls, etc. Could this be simplified? Do you have a recommendation on how to handle this? How do you do it yourselcves?
 
-A Has been discussed repeatedly in the Revit API discussion forum and The Building Coder. Look into conditional compiles. You can setup different VS configuration profiles for different Revit versions and then edit your CSPROJ file to selective load Revit DLLs based on values set the respective config.
+A This topic has been discussed repeatedly in the Revit API discussion forum and The Building Coder, e.g.,
+the [Revit add-in `dotnet` template](https://thebuildingcoder.typepad.com/blog/2020/11/bim360-management-dotnet-template-and-prism-goodies.html#4) just last week.
+Look into conditional compiles.
+You can set up different VS configuration profiles for different Revit versions and then edit your `CSPROJ` file to selective load Revit DLLs based on values set the respective config.
 
 Q Olli Kattelus on the new unit API; we started migration work; large code base, significant work; optimization possible using enum instead of strings? Used for hash codes etc.; significant performance effect, even inside Revit?
 
