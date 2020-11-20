@@ -12,6 +12,7 @@ slack https://autodesk.slack.com/archives/C0SR6NAP8/p1605809338152500
 downloaded https://wiki.autodesk.com/pages/viewpage.action?spaceKey=aeceng&title=2020-11-19+AU%3A+Revit+API+Feedback+Session+and+Revit+API+Expert+Roundtable
 edited /a/doc/au/2020/doc/boris_shafiro_revit_api_roundtable_notes_2.txt
 edited /a/doc/revit/tbc/git/a/1878_forge_bim360.md
+http://jeremytammik.github.io/tbc/a/1878_au_roundtable_not.html
 
 twitter:
 
@@ -145,7 +146,7 @@ Q Check whether elements touch?
 
 A Follow up, check Revit Ideas.
 
-Q Collection classes are often IEnumerable, not IEnumerable<T>?
+Q Collection classes are often IEnumerable, not IEnumerable&lt;T&gt;?
 
 A That has historical reasons. They were introduced earlier on. We are gradually migrating away from that. We’ll get to it.
 

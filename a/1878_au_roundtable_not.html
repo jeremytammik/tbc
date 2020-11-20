@@ -11,6 +11,7 @@ slack https://autodesk.slack.com/archives/C0SR6NAP8/p1605809338152500
 downloaded https://wiki.autodesk.com/pages/viewpage.action?spaceKey=aeceng&title=2020-11-19+AU%3A+Revit+API+Feedback+Session+and+Revit+API+Expert+Roundtable
 edited /a/doc/au/2020/doc/boris_shafiro_revit_api_roundtable_notes_2.txt
 edited /a/doc/revit/tbc/git/a/1878_forge_bim360.md
+http://jeremytammik.github.io/tbc/a/1878_au_roundtable_not.html
 
 twitter:
 
@@ -99,7 +100,7 @@ on <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.16
 <p>A You can use multiple threads; the Revit API is single threaded. Certain touch points enforce the main thread, e.g., transactions; some utility classes might allow multithreading, but none of them are guaranteed to be thread safe; they may seem immutable and not be so.</p>
 <p>Q Check whether elements touch?</p>
 <p>A Follow up, check Revit Ideas.</p>
-<p>Q Collection classes are often IEnumerable, not IEnumerable<T>?</p>
+<p>Q Collection classes are often IEnumerable, not IEnumerable&lt;T&gt;?</p>
 <p>A That has historical reasons. They were introduced earlier on. We are gradually migrating away from that. We’ll get to it.</p>
 <p>Q Plans to support .NET 6?</p>
 <p>A Discussed just yesterday. We have to get there. This is more than just an API decision, it affects internals as well. More than just a version increment. Not in next release. Everything will have to move at once.</p>
