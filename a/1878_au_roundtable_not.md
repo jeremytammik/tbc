@@ -87,9 +87,7 @@ Q Noam Ronen: How to implement QA testing for add-ins?
 
 A The Building Coder provides a topic group
 on [Unit Testing](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.16).
-
 Scott: Internally, the Revit team uses journal files for testing.
-
 Diane: Design Automation might help simplify this.
 
 Q Kailas Dhage: An assembly cannot propagate changes to other instances. Are there any plans for this in near future? API-specific solution?
@@ -99,7 +97,6 @@ A Sasha: long-standing topic; assemblies are a post-processing documentation fea
 Q Kailas Dhage: Possibility to read / write formula in schedules? Can we expect this API in near future?
 
 A Please submit all requests for new functionality to the Revit Idea Station and ensure it gets many votes.
-
 Here is a wish list entry for this in the Revit Idea Station:
 [API &ndash; create a calculated value field in schedule](https://forums.autodesk.com/t5/revit-ideas/api-create-a-calculated-value-field-in-schedule/idi-p/8065079).
 
@@ -116,25 +113,15 @@ Q Question #2, Olli Kattelus: AFAIK a tap element cannot be re-connected to desi
 A Unfortunately no MEP expert here… we would like to change this, if required.
 
 Q Mustafa Salaheldin: I'm facing one challenge here and I hope I can find answer with you.
-
 We need a way to export all data from Revit (like family parameters, design options, worksets, etc.) to make them ready for ETL process.
-
 Till now I couldn't find any way faster than Revit Export to SQL via ODBC.
-
 The drawback here it is not automated, so my questions are:
-
 Is there any way to do the same database conversion from Revit db to any other format via ODBC without opening Revit?
-
 If answer is no, can it be implemented? I.e., can we implement a tool that can parse native Revit file db and export it to ODBC even if Revit is not installed on the machine?
-
 If also this is not applicable, can we drive this from Revit in a silent mode? I.e., can I run a command that can export from Revit to ODBC as add-in but without any interactive UI need?
-
 Regarding Design Automation API: is there any intention to produce v4?
-
 Is there still limitation on accessing external networks, so is there any mean to serialize the db from Revit.io to Azure SQL DB for example?
-
 Or can I export from BIM360 for example to any cloud db server like Azure SQL DB in the same manner ODBC does?
-
 One quick note: I managed to export from Revit to SQL on my local machine using the normal way, but what pulled my attention that I couldn't see a table for "warnings", so my question is, can we add warnings to the exported db via ODBC? are there any other entities that could be not exported to external databases via ODBC?
 
 A Use design automation and the standard Revit API. You cannot use the Revit API on the desktop without Revit installed; No network access in DA; you have to create an output file. Maybe we can open up access to cloud worksharing; might consider for certain clients access to certain databases etc. Some network connection can be established up-front; check out the docs on 'on-demand'. Re v4: there is no need for a new version for this; we are already considering support for Dynamo scripting and access to cloud models and BIM360 docs.
