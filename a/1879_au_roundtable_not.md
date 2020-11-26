@@ -77,7 +77,7 @@ Q Jorge Villaroel maintains a detailing add-in. Updating the solution for each n
 A This topic has been discussed repeatedly in the Revit API discussion forum and The Building Coder, e.g.,
 the [Revit add-in `dotnet` template](https://thebuildingcoder.typepad.com/blog/2020/11/bim360-management-dotnet-template-and-prism-goodies.html#4) just last week.
 Look into conditional compiles.
-You can set up different VS configuration profiles for different Revit versions and then edit your `CSPROJ` file to selective load Revit DLLs based on values set the respective config.
+You can set up different VS configuration profiles for different Revit versions and then edit your `CSPROJ` file to selective load Revit DLLs based on values set in the respective config.
 
 Q Olli Kattelus on the new unit API; we started migration work; large code base, significant work; optimization possible using enum instead of strings? Used for hash codes etc.; significant performance effect, even inside Revit?
 
@@ -87,8 +87,8 @@ Q Noam Ronen: How to implement QA testing for add-ins?
 
 A The Building Coder provides a topic group
 on [Unit Testing](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.16).
-Scott: Internally, the Revit team uses journal files for testing.
-Diane: Design Automation might help simplify this.
+Internally, the Revit team uses journal files for testing.
+Forge Design Automation for Revit might help make regular tests possible via automation of running the tests.
 
 Q Kailas Dhage: An assembly cannot propagate changes to other instances. Are there any plans for this in near future? API-specific solution?
 
@@ -104,9 +104,9 @@ Q Karol Jedruszek: Will it ever be possible to import/export Materials from .ads
 
 A We exposed full read-write access to material properties; the material components come from another team and are shared across products; we had plans to change this, they did not happen; maybe take another look now? Sorry for these decisions ging back and forth...
 
-Q Ivo Lafeber: there are several workarounds for the selection changed event; will this event be added in the Revit API?
+Q Ivo Lafeber: there are several workarounds for the selection changed event; will this event be added to the Revit API?
 
-A Sasha: We were actually working on such an event, but it produced far too many false positive calls. We may take another look.
+A Sasha: Revit produces many false positive calls; we were actually working on an event a while, but considered the output to be unacceptable. It may be time to review this again.
 
 Q Question #2, Olli Kattelus: AFAIK a tap element cannot be re-connected to design duct etc. once disconnected. You must create a new instance to re-connect. True? Possible to improve? I tried, and I couldn't figure out a anyway... Workarounds?
 
@@ -122,17 +122,17 @@ If also this is not applicable, can we drive this from Revit in a silent mode? I
 Regarding Design Automation API: is there any intention to produce v4?
 Is there still limitation on accessing external networks, so is there any mean to serialize the db from Revit.io to Azure SQL DB for example?
 Or can I export from BIM360 for example to any cloud db server like Azure SQL DB in the same manner ODBC does?
-One quick note: I managed to export from Revit to SQL on my local machine using the normal way, but what pulled my attention that I couldn't see a table for "warnings", so my question is, can we add warnings to the exported db via ODBC? are there any other entities that could be not exported to external databases via ODBC?
+One quick note: I managed to export from Revit to SQL on my local machine using the normal way, but what pulled my attention that I couldn't see a table for "warnings"; so, my question is, can we add warnings to the exported db via ODBC? Are there any other entities that might be not exported to external databases via ODBC?
 
 A Use design automation and the standard Revit API. You cannot use the Revit API on the desktop without Revit installed; No network access in DA; you have to create an output file. Maybe we can open up access to cloud worksharing; might consider for certain clients access to certain databases etc. Some network connection can be established up-front; check out the docs on 'on-demand'. Re v4: there is no need for a new version for this; we are already considering support for Dynamo scripting and access to cloud models and BIM360 docs.
 
-Q: Karol Jedruszek: A question about Design Automation API. It's an amazing tool, but we've noticed that sometimes the Workitems are stuck on 'pending' for quite some time. Could you explain why it's happening? Other requests sent later sometimes process faster. Could an improved status message be sent, not just ‘pending’, e.g., ‘sorry for slower processing right now’? We are sometimes unsure whether there is an error on our side… one thing takes seconds, another time the same thing takes several minutes…
+Q: Karol Jedruszek: A question about Design Automation API. It's an amazing tool, but we've noticed that sometimes the Workitems are stuck on 'pending' for quite some time. Could you explain why it's happening? Other requests sent later sometimes process faster. Could an improved status message be sent, not just ‘pending’, e.g., ‘sorry for slower processing right now’? We are sometimes unsure whether there is an error on our side… one thing takes seconds, another time the same thing takes several minutes.
 
 A Maybe you are stuck in the queue. Maybe new machines are being spun up; that could take up to ten minutes; ask on StackOverflow. I’ll check whether we can improve the status message. We do not guarantee any time. A minute is pretty snappy. What time would you expect? Be aware that this is batch processing, and nobody should ever be sitting around waiting for it. We might be able to expose a current average queue time.
 
 Q Matthew Hannon: I have a few questions. Geometric calculations on multiple threads?
 
-A You can use multiple threads; the Revit API is single threaded. Certain touch points enforce the main thread, e.g., transactions; some utility classes might allow multithreading, but none of them are guaranteed to be thread safe; they may seem immutable and not be so.
+A You can use multiple threads in your own code; the Revit API is single threaded. Certain touch points enforce the main thread, e.g., transactions; some utility classes might allow multithreading, but none of them are guaranteed to be thread safe; they may seem immutable and not really be so.
 
 Q Check whether elements touch?
 
@@ -144,11 +144,15 @@ A That has historical reasons. They were introduced earlier on. We are gradually
 
 Q Plans to support .NET 5?
 
-A Discussed just yesterday. We have to get there. This is more than just an API decision, it affects internals as well. More than just a version increment. Not in next release. Everything will have to move at once.
+A We discussed this internally just yesterday. We have to get there. This is more than just an API decision, it affects internals as well. More than just a version increment. Not in next release. Everything will have to move at once.
+
+<!--
+Removed because confidential, preview release:
 
 Q Bettina: Will Export PDF be available in the next major release? I see export pdf in the preview API, in the October beta preview, but there is no Export PDF button as described in the help.
 
 A It should be there in both API and UI. Ask in the preview forum.
+-->
 
 Q Mustafa: Is there any way through API to control which categories I want to export to external db? Also, why warnings are not coming to SQL when exporting from ODBC?
 
@@ -156,7 +160,7 @@ A The API does not expose anything ODBC related. Check out DBLink, but that has 
 
 Q Ivo: a shared parameter can be visible or invisible, in the Revit API it's read-only, the value can be changed with a workaround, but can we expect this parameter not to be read-only in the future?
 
-A ?
+A By definition, the `Invisible` shared parameter option makes the parameter not accessible/applicable in the project settings. Therefore, it would not make sense to make these parameters independently editable in the project.
 
 <center>
 <img src="img/slice_pendragon_knights_round_table.jpg" alt="Round table" title="Round table" width="600"/>
