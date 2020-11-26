@@ -72,7 +72,7 @@ Panel members:
 
 Notes:
 
-Q Jorge Villaroel maintains a detailing add-in. Updating the solution for each new release of the Revit API requirtes some work, e.g., copy solution, update references to new DLLs, update deprecated calls, etc. Could this be simplified? Do you have a recommendation on how to handle this? How do you do it yourselcves?
+Q Jorge Villaroel maintains a detailing add-in. Updating the solution for each new release of the Revit API requires some work, e.g., copy solution, update references to new DLLs, update deprecated calls, etc. Could this be simplified? Do you have a recommendation on how to handle this? How do you do it yourselves?
 
 A This topic has been discussed repeatedly in the Revit API discussion forum and The Building Coder, e.g.,
 the [Revit add-in `dotnet` template](https://thebuildingcoder.typepad.com/blog/2020/11/bim360-management-dotnet-template-and-prism-goodies.html#4) just last week.
