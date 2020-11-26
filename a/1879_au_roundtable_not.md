@@ -52,7 +52,7 @@ I took the following notes.
 
 The session was covered by a non-disclosure agreement
 or [NDA](https://en.wikipedia.org/wiki/Non-disclosure_agreement) covering
-forward-looking and confidential statements, so I had to remove a few minor items and get aproval before being able to share it with you here today.
+forward-looking and confidential statements, so I had to remove a few items and get approval before being able to share it with you here today.
 
 ####<a name="2"></a> Revit API Expert Roundtable and Feedback Session
 
