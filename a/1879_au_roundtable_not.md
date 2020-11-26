@@ -18,6 +18,9 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
+Boris Shafiro hosted the virtual Revit API expert and feedback roundtable on Thursday last week as part of the Autodesk University Idea Exchange.
+I took the following notes...
+
 &ndash; 
 ...
 
@@ -41,7 +44,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Boris Shafiro hosted the virtual 
 [Revit API expert and feedback roundtable](https://thebuildingcoder.typepad.com/blog/2020/11/join-the-revit-api-expert-roundtable-and-feedback.html)
-on Thursday, 19 November 2020, as part of the Autodesk University Idea Exchange.
+on Thursday last week, 19 November 2020, as part of the Autodesk University Idea Exchange.
 
 Over 20 participants attended from all around the world.
 
@@ -49,16 +52,12 @@ I took the following notes.
 
 The session was covered by a non-disclosure agreement
 or [NDA](https://en.wikipedia.org/wiki/Non-disclosure_agreement) covering
-forward-looking and confidential statements.
-
-Nothing critical was actually discussed, so I feel free to share them here with you as well.
+forward-looking and confidential statements, so I had to remove a few minor items and get aproval before being able to share it with you here today.
 
 ####<a name="2"></a> Revit API Expert Roundtable and Feedback Session
 
-<center>
 <p style="font-size: 80%; font-style:italic">Autodesk University 2020, November 19, 2020
 <br/>Notes by Jeremy Tammik</p>
-</center>
 
 Panel members:
 
