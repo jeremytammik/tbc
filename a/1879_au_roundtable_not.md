@@ -163,10 +163,6 @@ Q Ivo: a shared parameter can be visible or invisible, in the Revit API it's rea
 A By definition, the `Invisible` shared parameter option makes the parameter not accessible/applicable in the project settings. Therefore, it would not make sense to make these parameters independently editable in the project.
 
 <center>
-<img src="img/slice_pendragon_knights_round_table.jpg" alt="Round table" title="Round table" width="600"/>
-<p style="font-size: 80%; font-style:italic">
-<a href="https://mygrandfathertaughtme.wordpress.com/2010/10/12/about-meetings">Things my grandfather taught me ... about meetings</a>
-&ndash;
-“Anything that lasts longer than thirty minutes is not a meeting anymore. It’s people wasting time so they don’t have to do any real work.”</p>
+<img src="img/stenography_eclectic_shorthand_by_cross.png" alt="Eclectic shorthand" title="Eclectic shorthand" width="533"/>
 </center>
 
