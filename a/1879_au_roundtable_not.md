@@ -16,6 +16,8 @@ http://jeremytammik.github.io/tbc/a/1878_au_roundtable_not.html
 
 twitter:
 
+Here are my notes from the virtual Revit API expert and feedback roundtable on Thursday last week as part of the Autodesk University Idea Exchange on #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/au2020roundtablenotes
+
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
 Boris Shafiro hosted the virtual Revit API expert and feedback roundtable on Thursday last week as part of the Autodesk University Idea Exchange.
@@ -26,7 +28,7 @@ I took the following notes...
 
 linkedin:
 
-#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk https://bit.ly/au2020roundtablenotes
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 
