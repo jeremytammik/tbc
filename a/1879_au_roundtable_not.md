@@ -28,7 +28,11 @@ I took the following notes...
 
 linkedin:
 
-#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk https://bit.ly/au2020roundtablenotes
+Here are my notes from the virtual Revit API expert and feedback roundtable as part of the Autodesk University Idea Exchange on #RevitAPI 
+
+https://bit.ly/au2020roundtablenotes
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk 
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 
