@@ -19,6 +19,10 @@ Join our webinar and learn how to quickly add cloud powered capabilities to your
 
 linkedin:
 
+Expand your Revit add-in value and reach. Join webinar to quickly learn how to add cloud powered capabilities to your app and business offering by leveraging Forge and BIM 360 with the #RevitAPI
+
+https://bit.ly/expandleverage
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
