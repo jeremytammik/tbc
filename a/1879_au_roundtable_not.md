@@ -6,6 +6,9 @@
 
 <!---
 
+- roundtable feedback notes
+  /a/doc/au/2020/doc $ diff boris_shafiro_revit_api_roundtable_notes_2.txt boris_shafiro_revit_api_roundtable_notes_3.txt
+
 - notes
   edit
   https://docs.google.com/document/d/1jDVSyVU5ZB6OAcLpGnKnXxTGOFQNC-bb2q-TbEiJQnE/edit

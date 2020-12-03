@@ -6,6 +6,17 @@
 
 <!---
 
+- bim360 presentation with jim
+  motivate
+  doing add-ins
+  expand business
+  create more value
+  take advantage of da4r
+  integrate with bim360
+  bim and revit is hard
+  revit api easier!
+  web stuff is easier still!
+  http://learnforge.autodesk.io/#/tutorials/modifymodels
 
 twitter:
 
