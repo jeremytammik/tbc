@@ -149,7 +149,7 @@ jasonworks
 ‎2020-12-02 02:35 AM 
 I'm a bit confused because UVs are generally a relative spatial coordinate system.  "Relative" is the key word as they do not correspond to measurable distances.  So I don't understand why there would be a need to convert TextureRealWorldScaleX/Y to another unit if normalization is ultimately x/y or y/x.
 
-Of course I'm pretty sure I don't understand how Revit is calculating it's UVs.  It seems crazy that when we ask for UVs it gives us UVs that are not usable UVs (unless the texture dimensions are 1:1) - the whole purpose of UVs is to allow us to ignore texture dimensions.  But I understand it may make the Revit developers lives easier as it allows for interesting tiling dynamics when interchanging textures.
+Of course I'm pretty sure I don't understand how Revit is calculating it's UVs.  It seems crazy that when we ask for UVs it gives us UVs that are not usable UVs (unless the texture dimensions are 1:1) &ndash; the whole purpose of UVs is to allow us to ignore texture dimensions.  But I understand it may make the Revit developers lives easier as it allows for interesting tiling dynamics when interchanging textures.
 
 In any case, I attempted what I thought was a way to normalize given texture dimensions:
 
@@ -159,7 +159,7 @@ If scaleX was 14 and scaleY was 10 (inch, cm, it shouldn't really matter), then 
 
 But, unfortunately, that doesn't always work and I see erroneous UVs elsewhere.  So I need more information:
 
-What are the UVs we are getting from Revit - they are not classic UVs so what do they really represent?
+What are the UVs we are getting from Revit &ndash; they are not classic UVs so what do they really represent?
 What is the appropriate algorithm to convert or normalize the UVs based on texture dimensions? 
 Is there a function that already does this conversion?
 How does TextureRealWorldOffsetX/Y affect the UVs?
@@ -244,33 +244,55 @@ provided some hints, and, above all,
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas once again
 jumped in with a crucial and powerful solution to both answer the question and show how you can use the Analysis Visualisation Framework or AVF functionality for `UV` debugging to research and resolve this question yourself.
 
-**Question:**  I'm writing an exporter for Revit and encountered with a problem when exporting UV. When I call PolymeshTopology.GetUV, the coordinates given are often larger than 1. My Questions are:
+**Question:**  I'm writing an exporter for Revit and encountered with a problem when exporting `UV`.
+When I call `PolymeshTopology.GetUV`, the coordinates given are often larger than 1.
+My questions are:
+
 1. How can I convert them to the desired range (0,1)? Or how should I understand these UV values?
-2. Are they coordinates on the image? And If they are indeed coordinate on the image, how can I access the size of the image in IExportContext?
-To give a concrete example:
-say I have a texture of size 4096x4096, the corresponding UV data I read in IExportContext is around 25, and the RealWorldScale from the UnifiedBitmapAsset is about 141. I cannot seem to be able to discern a formula or something...
-The Building Coder article on Faces helps somewhat:
-https://thebuildingcoder.typepad.com/blog/2010/01/faces.html
-However, it explains UV as two variables that parameterize a face, but they are related to the structure of the face in 3d space, not how each vertex of the face is mapped to the bitmap. I'd appreciate it very much if you can elaborate on this, that is, how can I convert the UV coordiantes returned by PolymeshTopology.GetUV to pixel coordinate on the image or in the range (0,1).
-This post is relevant:
-https://forums.autodesk.com/t5/revit-api-forum/polymeshtopology-uvs/td-p/8641007
-However, the answer given is not detailed enough to actually solve the problem.
-Here is my current approach:
-The PolymeshTopology.GetUV method return a UV coordiante, which is, as The Building Coder points out, the parameters of a face. Therefore I guess they are related to the dimension of the face that they parameterize. These UV coordiantes can be converted to display units via UnitUtils.ConvertFromInternalUnits (deprecated, but anyway...) and in my addin centimeter is used. So, we have the UV in centimeters.
-The next step is to obtain the size of the bitmap. That is given by the properties with name UnifiedBitmap.TextureRealWorldScaleX/Y. These values are actually given in inches, so you can call UnitUtils.Convert(value, DisplayUnitType.DUT_DECIMAL_INCHES, DisplayUnitType.DUT_CENTIMETERS) to convert them. In fact, I've found DisplayUnitType.DUT_FRACTIONAL_INCHES gives the same result, I don't know what's the difference... maybe someone could elaborate on it.
-The AssetPropertyDistance class actually has a DisplayUnitType property, which should be used instead of  DUT_DECIMAL_INCHES
-After that the UV coordiantes can be scaled to the range [0,1] or whatever.
-This approach is logged by The Building Coder here:
-https://thebuildingcoder.typepad.com/blog/2020/07/revit-20211-update-and-normalising-custom-export-uv.html#3
-This is all a bit confusing, because UVs are generally a relative spatial coordinate system.  "Relative" is the key word as they do not correspond to measurable distances.  So, why would there be a need to convert TextureRealWorldScaleX/Y to another unit if normalization is ultimately x/y or y/x.
+2. Are they coordinates on the image? If so, how can I access the size of the image in IExportContext?
+
+To give a concrete example: say I have a texture of size 4096x4096, the corresponding UV data I read in IExportContext is around 25, and the RealWorldScale from the UnifiedBitmapAsset is about 141.
+I cannot seem to be able to discern a formula or something...
+
+The Building Coder article on [Faces](https://thebuildingcoder.typepad.com/blog/2010/01/faces.html) helps somewhat.
+
+However, it explains UV as two variables that parameterize a face, but they are related to the structure of the face in 3D space, not how each vertex of the face is mapped to the bitmap.
+I'd appreciate it very much if you can elaborate on this, that is, how can I convert the UV coordiantes returned by PolymeshTopology.GetUV to pixel coordinate on the image or in the range (0,1).
+
+The article on [PolymeshTopology UVs](https://forums.autodesk.com/t5/revit-api-forum/polymeshtopology-uvs/td-p/8641007) is relevant;
+however, the answer given is not detailed enough to actually solve the problem.
+
+**Answer:** Here is my current approach:
+
+The PolymeshTopology.GetUV method returns a UV coordiante that represents the parameters of a face.
+Therefore, I guess they are related to the dimension of the face that they parameterize.
+These UV coordiantes can be converted to display units via UnitUtils.ConvertFromInternalUnits (deprecated, but anyway...), and, in my add-in, centimeters are used.
+So, we have the UV in centimeters.
+
+The next step is to obtain the size of the bitmap.
+That is given by the properties with name UnifiedBitmap.TextureRealWorldScaleX/Y.
+These values are actually given in inches, so you can call `UnitUtils.Convert` to convert them from `DisplayUnitType.DUT_DECIMAL_INCHES` to  `DisplayUnitType.DUT_CENTIMETERS`.
+In fact, I found DisplayUnitType.DUT_FRACTIONAL_INCHES gives the same result; I don't know what's the difference.
+The AssetPropertyDistance class actually has a DisplayUnitType property, which should be used instead of DUT_DECIMAL_INCHES.
+
+After that, the UV coordiantes can be scaled to the range [0,1] or whatever.
+
+This approach was preserved by The Building Coder in the note  on [normalising UVs in custom exporter](https://thebuildingcoder.typepad.com/blog/2020/07/revit-20211-update-and-normalising-custom-export-uv.html#3).
+
+**Question:** Now Jason followed up with a more detailed request that Richard helped resolve:
+
+This is all a bit confusing, because UVs are generally a relative spatial coordinate system.
+"Relative" is the key word as they do not correspond to measurable distances.
+So, why would there be a need to convert TextureRealWorldScaleX/Y to another unit, if normalization is ultimately x/y or y/x?
 How is Revit calculating its UVs?
-It seems crazy that the UVs provided are not usable UVs (unless the texture dimensions are 1:1) - the whole purpose of UVs is to allow us to ignore texture dimensions. All I understand is that it may make the Revit developers' lives easier, as it allows for interesting tiling dynamics when interchanging textures.
+
+It seems crazy that the UVs provided are not usable UVs (unless the texture dimensions are 1:1) &ndash; the whole purpose of UVs is to allow us to ignore texture dimensions. All I understand is that it may make the Revit developers' lives easier, as it allows for interesting tiling dynamics when interchanging textures.
 In any case, I attempted what I thought was a way to normalize given texture dimensions:
   normailze_multiplier = scaleX / (scaleY + ((scaleX - scaleY) / 2))
 If scaleX was 14 and scaleY was 10 (inch, cm, it shouldn't really matter), then I see UVs that go from (0, 0) to (1.167, 0.833).  normalize_multiplier then comes out to be 1.167.  So (/, *) results in (1, 1).
 But, unfortunately, that doesn't always work, and I see erroneous UVs elsewhere.
 So, I need more information:
-1. What are the UVs we are getting from Revit - they are not classic UVs so what do they really represent?
+1. What are the UVs we are getting from Revit &ndash; they are not classic UVs so what do they really represent?
 2. What is the appropriate algorithm to convert or normalize the UVs based on texture dimensions?
 3. Is there a function that already does this conversion?
 4. How does TextureRealWorldOffsetX/Y affect the UVs?
