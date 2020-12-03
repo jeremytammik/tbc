@@ -41,13 +41,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ####<a name="2"></a>
 
 Revit API: IExportContext converting UV to the range (0,1)
-12 REPLIES Back to Revit Products Category
-Back to Topic Listing Previous Next 
-MESSAGE 1 OF 13
+
 sunsflower
- Contributor sunsflower 392 Views, 12 Replies
-‎2020-07-15 11:41 AM 
-Revit API: IExportContext converting UV to the range (0,1)
+
 Hello, I'm writing an exporter for Revit and encountered with a problem when exporting UV. When I call PolymeshTopology.GetUV, the coordinates given are often larger than 1. My Questions are:
 
 1. How can I convert them to the desired range (0,1)? Or how should I understand these UV values?
@@ -234,9 +230,18 @@ At the same time other types of faces such as cylindrical face / planar face may
 
 I always prefer normalised curve parameters they inherently tell you more and tell you everything when combined with a length and start point. I know what my preference would be but I think we just get the leftovers of the internal geometry system.
 
-Jeremy Tammik Yesterday at 07:57
-A developer question on UV values:
-I'm writing an exporter for Revit and encountered with a problem when exporting UV. When I call PolymeshTopology.GetUV, the coordinates given are often larger than 1. My Questions are:
+A question was raised and partially discussed in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [`IExportContext` converting `UV` to the range (0,1)](https://forums.autodesk.com/t5/revit-api-forum/revit-api-iexportcontext-converting-uv-to-the-range-0-1/m-p/9908386).
+
+I summarised and preserved part of it in the blog post discussion
+on [normalising UVs in custom exporter](https://thebuildingcoder.typepad.com/blog/2020/07/revit-20211-update-and-normalising-custom-export-uv.html#3).
+
+Now Jason expanded on the question,
+and Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+and the Revit development team provided some really helpful `UV` debugging tips and fuerther explanation:
+
+**Question:**  I'm writing an exporter for Revit and encountered with a problem when exporting UV. When I call PolymeshTopology.GetUV, the coordinates given are often larger than 1. My Questions are:
 1. How can I convert them to the desired range (0,1)? Or how should I understand these UV values?
 2. Are they coordinates on the image? And If they are indeed coordinate on the image, how can I access the size of the image in IExportContext?
 To give a concrete example:
@@ -324,3 +329,9 @@ John Mitchell  20 hours ago
 <img src="img/.png" alt="" title="" width="100"/>
 </center>
 
+rt_avf_uv_cylinder_face_u.png	684
+rt_avf_uv_cylinder_face_v.png 701
+rt_avf_uv_planar_face_u.png	763
+rt_avf_uv_planar_face_v.png 779
+rt_avf_uv_ruled_face_u.png 809
+rt_avf_uv_ruled_face_v.png 772
