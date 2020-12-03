@@ -230,16 +230,19 @@ At the same time other types of faces such as cylindrical face / planar face may
 
 I always prefer normalised curve parameters they inherently tell you more and tell you everything when combined with a length and start point. I know what my preference would be but I think we just get the leftovers of the internal geometry system.
 
+------
+
 A question was raised and partially discussed in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [`IExportContext` converting `UV` to the range (0,1)](https://forums.autodesk.com/t5/revit-api-forum/revit-api-iexportcontext-converting-uv-to-the-range-0-1/m-p/9908386).
 
-I summarised and preserved part of it in the blog post discussion
+I summarised and preserved the initial part of this discussion in the blog post discussion
 on [normalising UVs in custom exporter](https://thebuildingcoder.typepad.com/blog/2020/07/revit-20211-update-and-normalising-custom-export-uv.html#3).
 
-Now Jason expanded on the question,
-and Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
-and the Revit development team provided some really helpful `UV` debugging tips and fuerther explanation:
+Now Jason expanded on the question, the Revit development team admitted to the dearth of information in this area,
+provided some hints, and, above all,
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas once again
+jumped in with a crucial and powerful solution to both answer the question and show how you can use the Analysis Visualisation Framework or AVF functionality for `UV` debugging to research and resolve this question yourself.
 
 **Question:**  I'm writing an exporter for Revit and encountered with a problem when exporting UV. When I call PolymeshTopology.GetUV, the coordinates given are often larger than 1. My Questions are:
 1. How can I convert them to the desired range (0,1)? Or how should I understand these UV values?
