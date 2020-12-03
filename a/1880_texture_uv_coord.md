@@ -335,3 +335,24 @@ rt_avf_uv_planar_face_u.png	763
 rt_avf_uv_planar_face_v.png 779
 rt_avf_uv_ruled_face_u.png 809
 rt_avf_uv_ruled_face_v.png 772
+
+####<a name="3"></a> Más Allá de Dynamo &ndash; Spanish-Language Book
+
+Kevin Himmelreich published a Spanish-language book *Beyond Dynamo*,
+the first Python manual focused on Dynamo and the Revit API, and currently the only publication in Spanish on this subject.
+
+> Ya se encuentra disponible mi manual *Más allá de Dynamo*.
+
+> Adjunto el link de Amazon España:
+[Más allá de Dynamo: Manual de Python para Revit](https://www.amazon.es/dp/B08P1FCBZY/ref=cm_sw_r_cp_api_fabc_JwrYFbTE394ZR)
+
+> También, en LinkedIn, os dejo el índice de contenidos por si queréis saber el alcance de este manual.
+
+Kevin's [post on LinkedIn](https://www.linkedin.com/posts/kevinhimmelreich_%C3%ADndice-m%C3%A1s-all%C3%A1-de-dynamo-activity-6738089981346160640-kjoj) includes
+the table of contents to show the scope of his manual.
+
+<!-- 
+<li class="carousel-slide carousel-slide-active" data-ssplayer-slide-index="3" style="width: 549px; height: 714px;">
+<img class="carousel-lazy-element carousel-slide-is-portrait carousel-element-loaded carousel-element-load-success" data-src="https://media-exp1.licdn.com/dms/image/C4E1FAQFHa_Qe3xWsjg/feedshare-document-images_800/4/1606485815490?e=1607097600&amp;v=beta&amp;t=G9uShg4FGk9f-bRUFpB4EuYqNtH923PUF0qzz1rTeMk" alt="4" src="https://media-exp1.licdn.com/dms/image/C4E1FAQFHa_Qe3xWsjg/feedshare-document-images_800/4/1606485815490?e=1607097600&amp;v=beta&amp;t=G9uShg4FGk9f-bRUFpB4EuYqNtH923PUF0qzz1rTeMk">
+</li>
+--> 
