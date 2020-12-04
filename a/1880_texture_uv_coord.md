@@ -190,3 +190,14 @@ the table of contents to show the scope of his manual.
 <img class="carousel-lazy-element carousel-slide-is-portrait carousel-element-loaded carousel-element-load-success" data-src="https://media-exp1.licdn.com/dms/image/C4E1FAQFHa_Qe3xWsjg/feedshare-document-images_800/4/1606485815490?e=1607097600&amp;v=beta&amp;t=G9uShg4FGk9f-bRUFpB4EuYqNtH923PUF0qzz1rTeMk" alt="4" src="https://media-exp1.licdn.com/dms/image/C4E1FAQFHa_Qe3xWsjg/feedshare-document-images_800/4/1606485815490?e=1607097600&amp;v=beta&amp;t=G9uShg4FGk9f-bRUFpB4EuYqNtH923PUF0qzz1rTeMk">
 </li>
 --> 
+
+####<a name="4"></a> A Detailed 3D Model of a Human Cell
+
+Moving on from the Revit API, Python and Dynamo to science and modelling in general, here is a very impressive example of the latter in a non-architectural and even non-technological context, [a detailed 3D model of a human cell](https://gaelmcgill.artstation.com/projects/Pm0JL1):
+
+> ... inspired by the stunning art of David Goodsell, this 3D rendering of a eukaryotic cell is modeled using X-ray, nuclear magnetic resonance (NMR), and cryo-electron microscopy datasets for all of its molecular actors. It is an attempt to recapitulate the myriad pathways involved in signal transduction, protein synthesis, endocytosis, vesicular transport, cell-cell adhesion, apoptosis, and other processes. Although dilute in its concentration relative to a real cell, this rendering is also an attempt to visualize the great complexity and beauty of the cell’s molecular choreography. Interactive versions of parts of this landscape can be explored at [www.digizyme.com/cst_landscapes.html](http://www.digizyme.com/cst_landscapes.html).
+
+<center>
+<img src="img/gael_mcgill_cellularlandscape_digizyme.jpg" alt="Human cell" title="Human cell" width="500"/>
+<p style="font-size: 80%; font-style:italic">Cellular landscape cross-section through a eukaryotic cell, by Evan Ingersoll & Gael McGill &ndash; Digizyme’s Molecular Maya custom software, Autodesk Maya, and Foundry Modo used to import, model, rig, populate, and render all structural datasets</p>
+</center>
