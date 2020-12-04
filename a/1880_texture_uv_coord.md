@@ -95,53 +95,32 @@ So, why would there be a need to convert TextureRealWorldScaleX/Y to another uni
 How is Revit calculating its UVs?
 
 It seems crazy that the UVs provided are not usable UVs (unless the texture dimensions are 1:1) &ndash; the whole purpose of UVs is to allow us to ignore texture dimensions. All I understand is that it may make the Revit developers' lives easier, as it allows for interesting tiling dynamics when interchanging textures.
+
 In any case, I attempted what I thought was a way to normalize given texture dimensions:
-  normailze_multiplier = scaleX / (scaleY + ((scaleX - scaleY) / 2))
-If scaleX was 14 and scaleY was 10 (inch, cm, it shouldn't really matter), then I see UVs that go from (0, 0) to (1.167, 0.833).  normalize_multiplier then comes out to be 1.167.  So (/, *) results in (1, 1).
+
+<pre class="code">
+  normalize_multiplier = scaleX / (scaleY + ((scaleX - scaleY) / 2))
+</pre>
+  
+If `scaleX` was 14 and `scaleY` was 10 (inch, cm, it shouldn't really matter), then I see UVs that go from (0, 0) to (1.167, 0.833).
+`normalize_multiplier` then comes out to be 1.167.
+So, (/, *) results in (1, 1).
+
 But, unfortunately, that doesn't always work, and I see erroneous UVs elsewhere.
+
 So, I need more information:
+
 1. What are the UVs we are getting from Revit &ndash; they are not classic UVs so what do they really represent?
 2. What is the appropriate algorithm to convert or normalize the UVs based on texture dimensions?
 3. Is there a function that already does this conversion?
 4. How does TextureRealWorldOffsetX/Y affect the UVs?
 5. How does TextureWAngle affect the UVs?
-Thanks in advance!
--- https://forums.autodesk.com/t5/revit-api-forum/revit-api-iexportcontext-converting-uv-to-the-range-0-1/m-p/9908386
 
+**Answer:** I think this depends on the type of face; I find they are not always normalised from 0 to 1.
 
-jasonworks
-2020-12-02 02:35 AM 
+You can plot the `UV` co-ords on the surface using AVF; I believe the `UV` tends to follow the parameter of the curves around the edges of the face.
 
-I'm a bit confused because UVs are generally a relative spatial coordinate system.  "Relative" is the key word as they do not correspond to measurable distances.  So I don't understand why there would be a need to convert TextureRealWorldScaleX/Y to another unit if normalization is ultimately x/y or y/x.
-
-Of course I'm pretty sure I don't understand how Revit is calculating it's UVs.  It seems crazy that when we ask for UVs it gives us UVs that are not usable UVs (unless the texture dimensions are 1:1) &ndash; the whole purpose of UVs is to allow us to ignore texture dimensions.  But I understand it may make the Revit developers lives easier as it allows for interesting tiling dynamics when interchanging textures.
-
-In any case, I attempted what I thought was a way to normalize given texture dimensions:
-
-normailze_multiplier = scaleX / (scaleY + ((scaleX - scaleY) / 2))
-
-If scaleX was 14 and scaleY was 10 (inch, cm, it shouldn't really matter), then I see UVs that go from (0, 0) to (1.167, 0.833).  normalize_multiplier then comes out to be 1.167.  So (/, *) results in (1, 1).
-
-But, unfortunately, that doesn't always work and I see erroneous UVs elsewhere.  So I need more information:
-
-What are the UVs we are getting from Revit &ndash; they are not classic UVs so what do they really represent?
-What is the appropriate algorithm to convert or normalize the UVs based on texture dimensions? 
-Is there a function that already does this conversion?
-How does TextureRealWorldOffsetX/Y affect the UVs?
-How does TextureWAngle affect the UVs?
-Thanks,
-
-Jason
-
-
-RPTHOMAS108
-2020-12-02 01:29 PM 
-
-I think this depends on the type of face, I find they are not always normalised from 0 to 1.
-
-You can plot the UV co-ords on the surface using AVF, I believe the UV tends to follow the parameter of the curves around the edges of the face.
-
-So I believe last time I checked a cylindrical face the straight edges have ord related to raw parameter of curve (line), the curved edges had normalised parameter of the arc i.e. for the face on a vertical curved wall the V was raw and the U was normalised (or the other way around). Sometimes especially with cylindrical faces the system is not orientated with v increasing in the same direction as Basis.Z (depends on face orientation). If you have a complete circle with two cylindrical faces one will have V pointing downwards and the other pointing up to maintain face normal outwards.
+So, I believe, last time I checked, in a cylindrical face, the straight edges have ord related to raw parameter of curve (line), and the curved edges have normalised parameter of the arc, i.e., for the face on a vertical curved wall, the `V` was raw and the U was normalised (or the other way around). Sometimes especially with cylindrical faces the system is not orientated with v increasing in the same direction as Basis.Z (depends on face orientation). If you have a complete circle with two cylindrical faces one will have V pointing downwards and the other pointing up to maintain face normal outwards.
 
 Anyway my suggestion is to use AVF to understand how UV is applied to different types of faces.
 
