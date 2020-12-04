@@ -122,77 +122,53 @@ You can plot the `UV` co-ords on the surface using AVF; I believe the `UV` tends
 
 So, I believe, last time I checked, in a cylindrical face, the straight edges have ord related to raw parameter of curve (line), and the curved edges have normalised parameter of the arc, i.e., for the face on a vertical curved wall, the `V` was raw and the U was normalised (or the other way around). Sometimes especially with cylindrical faces the system is not orientated with v increasing in the same direction as Basis.Z (depends on face orientation). If you have a complete circle with two cylindrical faces one will have V pointing downwards and the other pointing up to maintain face normal outwards.
 
-Anyway my suggestion is to use AVF to understand how UV is applied to different types of faces.
+Anyway, my suggestion is to use AVF to understand how `UV` is applied to different types of faces.
 
-RPTHOMAS108
-2020-12-02 02:14 PM 
-
-Actually I recalled wrong, results as below:
+Actually, I recalled wrong, results as below:
 
 Generally the UV is based on raw parameter of curved edges but for some faces i.e. ruled face it is normalised. Below are some examples (note the direction of increase in all cases). The below is based on difference between Face BoundingBoxUV Max/Min (dividing into 10 segments and adding the UV values to the ValueAtPoint collection). Many of the walls below are 9.8ft high with base at 0.
 
-pfaceu.PNG
-PlanarFace U
-pfacev.PNG
-PlanarFace V
-rulefacev.PNG
-RuledFace V
-rulefaceu.PNG
-RuledFace U
-CylinFaceU.PNG
-CylindricalFace U
-CylinFaceV.PNG
-CylindricalFace V
-
-RPTHOMAS108
-2020-12-02 07:10 PM 
-
-This seems logical to me in that a Ruled face has to transition from one curve to another (opposite edges) so it makes sense for those two opposite curves to be normalised so the points along it can be mapped to one another. Imagine otherwise you would have an arc at one edge opposing a line at the other (both with different lengths) you would have to normalise at some stage.
-
-At the same time other types of faces such as cylindrical face / planar face may be constructed with a curve projected in a given direction by a length, so raw parameters also seem more appropriate for that form of construction. Regarding cylindrical face you can also see the U-Value are related to the parameter of the curve i.e. that curved wall is obviously longer that 1.5ft if it is 9.8ft high (so needs to be multiplied by it's radius).
-
-I always prefer normalised curve parameters they inherently tell you more and tell you everything when combined with a length and start point. I know what my preference would be but I think we just get the leftovers of the internal geometry system.
-
-
-7 replies
-
-Alex Pytel:shell:  23 hours ago
-It seems to me that one of the included links (https://forums.autodesk.com/t5/revit-api-forum/revit-api-iexportcontext-converting-uv-to-the-range-0-1/m-p/9908386) provides a great explanation by using AVF. When the UVs are in real world units, normalizing them can be accomplished on a per-object basis. (If the wall is 9.8 feet high, divide by 9.8.) However, ruled surface is already normalized. It seems to me that the two cases can only be reconciled by taking into account vertex position. I wonder if normalization is the right approach here, since it would scale any texture to the size of the object, when in Revit the intention is to keep the detail in the texture (e.g., bricks) at a realistic scale relative to the object.
-forums.autodesk.comforums.autodesk.com
-Re: Revit API: IExportContext converting UV to the range (0,1)
-I'm a bit confused because UVs are generally a relative spatial coordinate system.  "Relative" is the key word as they do not correspond to measurable distances.  So I don't understand why there would be a need to convert TextureRealWorldScaleX/Y to another unit if normalization is ultimately x/y or...
-Yesterday at 02:35
-
-Jeremy Tammik  22 hours ago
-yes, that is a great explanation!  RPTHOMAS108 is the king! he provided that after i asked here... thx for taking a look.
-
-Jeremy Tammik  22 hours ago
-@Alex Pytel can anyone answer the five questions raised by Jason above?
-
-Alex Pytel:shell:  22 hours ago
-I think that the owners of MaterialDB might be able to shed some light on the intended use of TextureRealWorldOffsetX and TextureWAngle:
-$CODE_OWNER Ruoqian-Ivy_Lu
-$SECONDARY_OWNERS Andrew_Zeng, Guofeng_Zhang
-
-Alex Pytel:shell:  22 hours ago
-As for general texturing, the AVF illustration already provides the answer, which is that most of the coordinates are in real units. The rest depends on what kind of texture mapping is needed. It is possible to use the UVs of most Revit objects directly by normalizing them if needed (and by paying attention to the special case of ruled surfaces). More complex texturing may be possible for some imported objects. If this is not enough, then the answer is to compute UV coordinates from vertex positions.
-
-Jeremy Tammik  21 hours ago
-thank you for spelling it out, much appreciated!
-
-John Mitchell  20 hours ago
-@Jeremy Tammik: For what it's worth, the PolymeshTopology code and the internal code it uses have no description whatsoever of what the "UVs" are, never mind how they're supposed to be used. It seems that anything related to texture mapping is sorely lacking in documentation.
-
 <center>
-<img src="img/.png" alt="" title="" width="100"/>
+
+<img src="img/rt_avf_uv_planar_face_u.png" alt="planar_face_u.png" title="planar_face_u.png" width="600"/> <!-- 763 --> <p style="font-size: 80%; font-style:italic">Planar face U</p>
+
+<img src="img/rt_avf_uv_planar_face_v.png" alt="planar_face_v.png" title="planar_face_v.png" width="600"/> <!-- 779 --> <p style="font-size: 80%; font-style:italic">Planar face V</p>
+
+<img src="img/rt_avf_uv_ruled_face_u.png" alt="ruled_face_u.png" title="ruled_face_u.png" width="600"/> <!-- 809 --> <p style="font-size: 80%; font-style:italic">Ruled face U</p>
+
+<img src="img/rt_avf_uv_ruled_face_v.png" alt="ruled_face_v.png" title="ruled_face_v.png" width="600"/> <!-- 772 --> <p style="font-size: 80%; font-style:italic">Ruled face V</p>
+
+<img src="img/rt_avf_uv_cylinder_face_u.png" alt="cylinder_face_u.png" title="cylinder_face_u.png" width="600"/> <!-- 684 --> <p style="font-size: 80%; font-style:italic">Cylinder face U</p>
+
+<img src="img/rt_avf_uv_cylinder_face_v.png" alt="cylinder_face_v.png" title="cylinder_face_v.png" width="600"/> <!-- 701 --> <p style="font-size: 80%; font-style:italic">Cylinder face V</p>
+
 </center>
 
-rt_avf_uv_cylinder_face_u.png	684
-rt_avf_uv_cylinder_face_v.png 701
-rt_avf_uv_planar_face_u.png	763
-rt_avf_uv_planar_face_v.png 779
-rt_avf_uv_ruled_face_u.png 809
-rt_avf_uv_ruled_face_v.png 772
+This seems logical to me, in that a Ruled face has to transition from one curve to another (opposite edges), so it makes sense for those two opposite curves to be normalised, so the points along it can be mapped to one another.
+Imagine, otherwise you would have an arc at one edge opposing a line at the other (both with different lengths); you would have to normalise at some stage.
+
+At the same time, other types of faces, such as cylindrical or planar, may be constructed with a curve projected in a given direction by a length, so raw parameters also seem more appropriate for that form of construction.
+Regarding cylindrical face, you can also see the U-Value are related to the parameter of the curve, i.e., that curved wall is obviously longer that 1.5ft if it is 9.8ft high (so, needs to be multiplied by its radius).
+
+I always prefer normalised curve parameters; they inherently tell you more and tell you everything when combined with a length and start point. I know what my preference would be, but I think we just get the leftovers of the internal geometry system.
+
+The development team comments:
+
+Richard provides a great explanation by using AVF.
+When the UVs are in real world units, normalizing them can be accomplished on a per-object basis (if the wall is 9.8 feet high, divide by 9.8).
+However, ruled surface is already normalized.
+It seems to me that the two cases can only be reconciled by taking into account vertex position.
+I wonder if normalization is the right approach here, since it would scale any texture to the size of the object, when in Revit the intention is to keep the detail in the texture (e.g., bricks) at a realistic scale relative to the object.
+
+So, for general texturing, the AVF illustration provides all the answers, which is that most of the coordinates are in real units. The rest depends on what kind of texture mapping is needed.
+It is possible to use the UVs of most Revit objects directly by normalizing them if needed (and paying attention to the special case of ruled surfaces).
+More complex texturing may be possible for some imported objects.
+If this is not enough, then the answer is to compute `UV` coordinates from vertex positions.
+
+For what it's worth, the `PolymeshTopology` code and the internal code it uses have no description whatsoever of what the UVs are, never mind how they're supposed to be used.
+It seems that anything related to texture mapping is sorely lacking in documentation.
+
+Very many thanks to Richard for his great `UV` debugging idea using AVF and the obvious conclusions he so clearly draws from that.
 
 ####<a name="3"></a> Más Allá de Dynamo &ndash; Spanish-Language Book
 
