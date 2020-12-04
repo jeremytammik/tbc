@@ -38,7 +38,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Texture Bitmap UV Coordinates
 
-The week is coming to an end all too quickly... here are some compelling topics before we enter the weeken:
+The week is coming to an end all too quickly... here are some compelling topics before we enter the weekend:
 
 - [Explaining texture `UV` mapping using AVF](#2)
 - [Más Allá de Dynamo &ndash; Spanish-language book](#3)
@@ -47,11 +47,11 @@ The week is coming to an end all too quickly... here are some compelling topics 
 
 ####<a name="2"></a> Explaining Texture UV Mapping Using AVF
 
-A question was raised and partially discussed in
+A question was raised and partially discussed a while ago in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [`IExportContext` converting `UV` to the range (0,1)](https://forums.autodesk.com/t5/revit-api-forum/revit-api-iexportcontext-converting-uv-to-the-range-0-1/m-p/9908386).
 
-I summarised and preserved the initial part of this discussion in the blog post discussion
+Back then, I summarised and preserved the initial part of this discussion in the blog post discussion
 on [normalising UVs in custom exporter](https://thebuildingcoder.typepad.com/blog/2020/07/revit-20211-update-and-normalising-custom-export-uv.html#3).
 
 Now Jason expanded on the question, the Revit development team admitted to the dearth of information in this area,
@@ -72,16 +72,16 @@ I cannot seem to be able to discern a formula or something...
 The Building Coder article on [Faces](https://thebuildingcoder.typepad.com/blog/2010/01/faces.html) helps somewhat.
 
 However, it explains UV as two variables that parameterize a face, but they are related to the structure of the face in 3D space, not how each vertex of the face is mapped to the bitmap.
-I'd appreciate it very much if you can elaborate on this, that is, how can I convert the UV coordiantes returned by PolymeshTopology.GetUV to pixel coordinate on the image or in the range (0,1).
+I'd appreciate it very much if you can elaborate on this, that is, how can I convert the `UV` coordinates returned by `PolymeshTopology.GetUV` to pixel coordinate on the image or in the range (0,1).
 
 The article on [PolymeshTopology UVs](https://forums.autodesk.com/t5/revit-api-forum/polymeshtopology-uvs/td-p/8641007) is relevant;
 however, the answer given is not detailed enough to actually solve the problem.
 
 **Answer:** Here is my current approach:
 
-The PolymeshTopology.GetUV method returns a UV coordiante that represents the parameters of a face.
+The PolymeshTopology.GetUV method returns a UV coordinate that represents the parameters of a face.
 Therefore, I guess they are related to the dimension of the face that they parameterize.
-These UV coordiantes can be converted to display units via UnitUtils.ConvertFromInternalUnits (deprecated, but anyway...), and, in my add-in, centimeters are used.
+These UV coordinates can be converted to display units via UnitUtils.ConvertFromInternalUnits (deprecated, but anyway...), and, in my add-in, centimeters are used.
 So, we have the UV in centimeters.
 
 The next step is to obtain the size of the bitmap.
@@ -90,11 +90,11 @@ These values are actually given in inches, so you can call `UnitUtils.Convert` t
 In fact, I found DisplayUnitType.DUT_FRACTIONAL_INCHES gives the same result; I don't know what's the difference.
 The AssetPropertyDistance class actually has a DisplayUnitType property, which should be used instead of DUT_DECIMAL_INCHES.
 
-After that, the UV coordiantes can be scaled to the range [0,1] or whatever.
+After that, the UV coordinates can be scaled to the range [0,1] or whatever.
 
 This approach was preserved by The Building Coder in the note  on [normalising UVs in custom exporter](https://thebuildingcoder.typepad.com/blog/2020/07/revit-20211-update-and-normalising-custom-export-uv.html#3).
 
-**Question:** Now Jason followed up with a more detailed request that Richard helped resolve:
+**Question:** Jason's follow-up request for more details that Richard helps resolve:
 
 This is all a bit confusing, because UVs are generally a relative spatial coordinate system.
 "Relative" is the key word as they do not correspond to measurable distances.
@@ -109,8 +109,7 @@ In any case, I attempted what I thought was a way to normalize given texture dim
   normalize_multiplier = scaleX / (scaleY + ((scaleX - scaleY) / 2))
 </pre>
   
-If `scaleX` was 14 and `scaleY` was 10 (inch, cm, it shouldn't really matter), then I see UVs that go from (0, 0) to (1.167, 0.833).
-`normalize_multiplier` then comes out to be 1.167.
+If `scaleX` is 14 and `scaleY` 10 (inch, cm, it shouldn't really matter), then I see UVs that go from (0, 0) to (1.167, 0.833) and `normalize_multiplier` comes out to be 1.167.
 So, (/, *) results in (1, 1).
 
 But, unfortunately, that doesn't always work, and I see erroneous UVs elsewhere.
@@ -125,29 +124,32 @@ So, I need more information:
 
 **Answer:** I think this depends on the type of face; I find they are not always normalised from 0 to 1.
 
-You can plot the `UV` co-ords on the surface using AVF; I believe the `UV` tends to follow the parameter of the curves around the edges of the face.
+You can plot the `UV` coords on the surface using AVF; I believe the `UV` tends to follow the parameter of the curves around the edges of the face.
 
-So, I believe, last time I checked, in a cylindrical face, the straight edges have ord related to raw parameter of curve (line), and the curved edges have normalised parameter of the arc, i.e., for the face on a vertical curved wall, the `V` was raw and the U was normalised (or the other way around). Sometimes especially with cylindrical faces the system is not orientated with v increasing in the same direction as Basis.Z (depends on face orientation). If you have a complete circle with two cylindrical faces one will have V pointing downwards and the other pointing up to maintain face normal outwards.
+So, I believe, last time I checked, in a cylindrical face, the straight edges have ord related to raw parameter of curve (line), and the curved edges have normalised parameter of the arc, i.e., for the face on a vertical curved wall, the `V` was raw and the U was normalised (or the other way around). Sometimes, especially with cylindrical faces, the system is not oriented with `V` increasing in the same direction as `Basis.Z` (depends on face orientation). If you have a complete circle with two cylindrical faces, one will have `V` pointing downwards and the other pointing up to maintain face normal outwards.
 
 Anyway, my suggestion is to use AVF to understand how `UV` is applied to different types of faces.
 
 Actually, I recalled wrong, results as below:
 
-Generally the UV is based on raw parameter of curved edges but for some faces i.e. ruled face it is normalised. Below are some examples (note the direction of increase in all cases). The below is based on difference between Face BoundingBoxUV Max/Min (dividing into 10 segments and adding the UV values to the ValueAtPoint collection). Many of the walls below are 9.8ft high with base at 0.
+Generally, the `UV` is based on raw parameter of curved edges, but, for some faces, i.e., ruled face, it is normalised.
+Below are some examples (note the direction of increase in all cases).
+The below is based on difference between Face `BoundingBoxUV` `Max`/`Min`, dividing into 10 segments and adding the UV values to the `ValueAtPoint` collection.
+Many of the walls below are 9.8 feet high with base at 0.
 
 <center>
 
-<img src="img/rt_avf_uv_planar_face_u.png" alt="planar_face_u.png" title="planar_face_u.png" width="600"/> <!-- 763 --> <p style="font-size: 80%; font-style:italic">Planar face U</p>
+<img src="img/rt_avf_uv_planar_face_u.png" alt="planar_face_u.png" title="planar_face_u.png" width="400"/> <!-- 763 --> <p style="font-size: 80%; font-style:italic">Planar face U</p>
 
-<img src="img/rt_avf_uv_planar_face_v.png" alt="planar_face_v.png" title="planar_face_v.png" width="600"/> <!-- 779 --> <p style="font-size: 80%; font-style:italic">Planar face V</p>
+<img src="img/rt_avf_uv_planar_face_v.png" alt="planar_face_v.png" title="planar_face_v.png" width="400"/> <!-- 779 --> <p style="font-size: 80%; font-style:italic">Planar face V</p>
 
-<img src="img/rt_avf_uv_ruled_face_u.png" alt="ruled_face_u.png" title="ruled_face_u.png" width="600"/> <!-- 809 --> <p style="font-size: 80%; font-style:italic">Ruled face U</p>
+<img src="img/rt_avf_uv_ruled_face_u.png" alt="ruled_face_u.png" title="ruled_face_u.png" width="400"/> <!-- 809 --> <p style="font-size: 80%; font-style:italic">Ruled face U</p>
 
-<img src="img/rt_avf_uv_ruled_face_v.png" alt="ruled_face_v.png" title="ruled_face_v.png" width="600"/> <!-- 772 --> <p style="font-size: 80%; font-style:italic">Ruled face V</p>
+<img src="img/rt_avf_uv_ruled_face_v.png" alt="ruled_face_v.png" title="ruled_face_v.png" width="400"/> <!-- 772 --> <p style="font-size: 80%; font-style:italic">Ruled face V</p>
 
-<img src="img/rt_avf_uv_cylinder_face_u.png" alt="cylinder_face_u.png" title="cylinder_face_u.png" width="600"/> <!-- 684 --> <p style="font-size: 80%; font-style:italic">Cylinder face U</p>
+<img src="img/rt_avf_uv_cylinder_face_u.png" alt="cylinder_face_u.png" title="cylinder_face_u.png" width="400"/> <!-- 684 --> <p style="font-size: 80%; font-style:italic">Cylinder face U</p>
 
-<img src="img/rt_avf_uv_cylinder_face_v.png" alt="cylinder_face_v.png" title="cylinder_face_v.png" width="600"/> <!-- 701 --> <p style="font-size: 80%; font-style:italic">Cylinder face V</p>
+<img src="img/rt_avf_uv_cylinder_face_v.png" alt="cylinder_face_v.png" title="cylinder_face_v.png" width="400"/> <!-- 701 --> <p style="font-size: 80%; font-style:italic">Cylinder face V</p>
 
 </center>
 
@@ -202,9 +204,9 @@ the table of contents to show the scope of his manual.
 
 Moving on from the Revit API, Python and Dynamo to science and modelling in general, here is a very impressive example of the latter in a non-architectural and even non-technological context, [a detailed 3D model of a human cell](https://gaelmcgill.artstation.com/projects/Pm0JL1):
 
-> ... inspired by the stunning art of David Goodsell, this 3D rendering of a eukaryotic cell is modeled using X-ray, nuclear magnetic resonance (NMR), and cryo-electron microscopy datasets for all of its molecular actors. It is an attempt to recapitulate the myriad pathways involved in signal transduction, protein synthesis, endocytosis, vesicular transport, cell-cell adhesion, apoptosis, and other processes. Although dilute in its concentration relative to a real cell, this rendering is also an attempt to visualize the great complexity and beauty of the cell’s molecular choreography. Interactive versions of parts of this landscape can be explored at [www.digizyme.com/cst_landscapes.html](http://www.digizyme.com/cst_landscapes.html).
+> ... inspired by the stunning art of David Goodsell, this 3D rendering of a eukaryotic cell is modelled using X-ray, nuclear magnetic resonance (NMR), and cryo-electron microscopy datasets for all of its molecular actors. It is an attempt to recapitulate the myriad pathways involved in signal transduction, protein synthesis, endocytosis, vesicular transport, cell-cell adhesion, apoptosis, and other processes. Although dilute in its concentration relative to a real cell, this rendering is also an attempt to visualize the great complexity and beauty of the cell’s molecular choreography. Interactive versions of parts of this landscape can be explored at [www.digizyme.com/cst_landscapes.html](http://www.digizyme.com/cst_landscapes.html).
 
 <center>
-<img src="img/gael_mcgill_cellularlandscape_digizyme.jpg" alt="Human cell" title="Human cell" width="500"/>
+<img src="img/gael_mcgill_cellularlandscape_digizyme.jpg" alt="Human cell" title="Human cell" width="400"/>
 <p style="font-size: 80%; font-style:italic">Cellular landscape cross-section through a eukaryotic cell, by Evan Ingersoll & Gael McGill &ndash; Digizyme’s Molecular Maya custom software, Autodesk Maya, and Foundry Modo used to import, model, rig, populate, and render all structural datasets</p>
 </center>
