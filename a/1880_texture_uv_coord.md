@@ -38,7 +38,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Texture Bitmap UV Coordinates
 
-####<a name="2"></a>
+The week is coming to an end all too quickly... here are some compelling topics before we enter the weeken:
+
+- [Explaining texture `UV` mapping using AVF](#2)
+- [Más Allá de Dynamo &ndash; Spanish-language book](#3)
+- [A detailed 3D model of a human cell](#4)
+
+
+####<a name="2"></a> Explaining Texture UV Mapping Using AVF
 
 A question was raised and partially discussed in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
