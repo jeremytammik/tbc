@@ -16,8 +16,10 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+The week is coming to an end all too quickly... here are some compelling topics before we enter the weekend
+&ndash; Explaining texture <code>UV</code> mapping using AVF
+&ndash; Más Allá de Dynamo Spanish-language book
+&ndash; A detailed 3D model of a human cell...
 
 linkedin:
 
@@ -35,7 +37,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Texture Bitmap UV Coordinates</h3>
+<h3>Dynamo Book and Texture Bitmap UV Coordinates</h3>
 <p>The week is coming to an end all too quickly... here are some compelling topics before we enter the weekend:</p>
 <ul>
 <li><a href="#2">Explaining texture <code>UV</code> mapping using AVF</a></li>
@@ -110,12 +112,18 @@ Below are some examples (note the direction of increase in all cases).
 The below is based on difference between Face <code>BoundingBoxUV</code> <code>Max</code>/<code>Min</code>, dividing into 10 segments and adding the UV values to the <code>ValueAtPoint</code> collection.
 Many of the walls below are 9.8 feet high with base at 0.</p>
 <p><center></p>
-<p><img src="img/rt_avf_uv_planar_face_u.png" alt="planar_face_u.png" title="planar_face_u.png" width="400"/> <!-- 763 --> <p style="font-size: 80%; font-style:italic">Planar face U</p></p>
-<p><img src="img/rt_avf_uv_planar_face_v.png" alt="planar_face_v.png" title="planar_face_v.png" width="400"/> <!-- 779 --> <p style="font-size: 80%; font-style:italic">Planar face V</p></p>
-<p><img src="img/rt_avf_uv_ruled_face_u.png" alt="ruled_face_u.png" title="ruled_face_u.png" width="400"/> <!-- 809 --> <p style="font-size: 80%; font-style:italic">Ruled face U</p></p>
-<p><img src="img/rt_avf_uv_ruled_face_v.png" alt="ruled_face_v.png" title="ruled_face_v.png" width="400"/> <!-- 772 --> <p style="font-size: 80%; font-style:italic">Ruled face V</p></p>
-<p><img src="img/rt_avf_uv_cylinder_face_u.png" alt="cylinder_face_u.png" title="cylinder_face_u.png" width="400"/> <!-- 684 --> <p style="font-size: 80%; font-style:italic">Cylinder face U</p></p>
-<p><img src="img/rt_avf_uv_cylinder_face_v.png" alt="cylinder_face_v.png" title="cylinder_face_v.png" width="400"/> <!-- 701 --> <p style="font-size: 80%; font-style:italic">Cylinder face V</p></p>
+<p><img src="img/rt_avf_uv_planar_face_u.png" alt="Planar face U" title="Planar face U" width="400"/> <!-- 763 -->
+<p style="font-size: 80%; font-style:italic">Planar face U</p></p>
+<p><img src="img/rt_avf_uv_planar_face_v.png" alt="Planar face V" title="Planar face V" width="400"/> <!-- 779 -->
+<p style="font-size: 80%; font-style:italic">Planar face V</p></p>
+<p><img src="img/rt_avf_uv_ruled_face_u.png" alt="Ruled face U" title="Ruled face U" width="400"/> <!-- 809 -->
+<p style="font-size: 80%; font-style:italic">Ruled face U</p></p>
+<p><img src="img/rt_avf_uv_ruled_face_v.png" alt="Ruled face V" title="Ruled face V" width="400"/> <!-- 772 -->
+<p style="font-size: 80%; font-style:italic">Ruled face V</p></p>
+<p><img src="img/rt_avf_uv_cylinder_face_u.png" alt="Cylinder face U" title="Cylinder face U" width="400"/> <!-- 684 -->
+<p style="font-size: 80%; font-style:italic">Cylinder face U</p></p>
+<p><img src="img/rt_avf_uv_cylinder_face_v.png" alt="Cylinder face V" title="Cylinder face V" width="400"/> <!-- 701 -->
+<p style="font-size: 80%; font-style:italic">Cylinder face V</p></p>
 <p></center></p>
 <p>This seems logical to me, in that a Ruled face has to transition from one curve to another (opposite edges), so it makes sense for those two opposite curves to be normalised, so the points along it can be mapped to one another.
 Imagine, otherwise you would have an arc at one edge opposing a line at the other (both with different lengths); you would have to normalise at some stage.</p>

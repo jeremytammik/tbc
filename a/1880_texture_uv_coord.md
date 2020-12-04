@@ -17,8 +17,10 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+The week is coming to an end all too quickly... here are some compelling topics before we enter the weekend
+&ndash; Explaining texture <code>UV</code> mapping using AVF
+&ndash; Más Allá de Dynamo Spanish-language book
+&ndash; A detailed 3D model of a human cell...
 
 linkedin:
 
