@@ -138,17 +138,23 @@ Many of the walls below are 9.8 feet high with base at 0.
 
 <center>
 
-<img src="img/rt_avf_uv_planar_face_u.png" alt="Planar face U" title="Planar face U" width="400"/> <!-- 763 --> <p style="font-size: 80%; font-style:italic">Planar face U</p>
+<img src="img/rt_avf_uv_planar_face_u.png" alt="Planar face U" title="Planar face U" width="400"/> <!-- 763 -->
+<p style="font-size: 80%; font-style:italic">Planar face U</p>
 
-<img src="img/rt_avf_uv_planar_face_v.png" alt="Planar face V" title="Planar face V" width="400"/> <!-- 779 --> <p style="font-size: 80%; font-style:italic">Planar face V</p>
+<img src="img/rt_avf_uv_planar_face_v.png" alt="Planar face V" title="Planar face V" width="400"/> <!-- 779 -->
+<p style="font-size: 80%; font-style:italic">Planar face V</p>
 
-<img src="img/rt_avf_uv_ruled_face_u.png" alt="Ruled face U" title="Ruled face U" width="400"/> <!-- 809 --> <p style="font-size: 80%; font-style:italic">Ruled face U</p>
+<img src="img/rt_avf_uv_ruled_face_u.png" alt="Ruled face U" title="Ruled face U" width="400"/> <!-- 809 -->
+<p style="font-size: 80%; font-style:italic">Ruled face U</p>
 
-<img src="img/rt_avf_uv_ruled_face_v.png" alt="Ruled face V" title="Ruled face V" width="400"/> <!-- 772 --> <p style="font-size: 80%; font-style:italic">Ruled face V</p>
+<img src="img/rt_avf_uv_ruled_face_v.png" alt="Ruled face V" title="Ruled face V" width="400"/> <!-- 772 -->
+<p style="font-size: 80%; font-style:italic">Ruled face V</p>
 
-<img src="img/rt_avf_uv_cylinder_face_u.png" alt="Cylinder face U" title="Cylinder face U" width="400"/> <!-- 684 --> <p style="font-size: 80%; font-style:italic">Cylinder face U</p>
+<img src="img/rt_avf_uv_cylinder_face_u.png" alt="Cylinder face U" title="Cylinder face U" width="400"/> <!-- 684 -->
+<p style="font-size: 80%; font-style:italic">Cylinder face U</p>
 
-<img src="img/rt_avf_uv_cylinder_face_v.png" alt="Cylinder face V" title="Cylinder face V" width="400"/> <!-- 701 --> <p style="font-size: 80%; font-style:italic">Cylinder face V</p>
+<img src="img/rt_avf_uv_cylinder_face_v.png" alt="Cylinder face V" title="Cylinder face V" width="400"/> <!-- 701 -->
+<p style="font-size: 80%; font-style:italic">Cylinder face V</p>
 
 </center>
 
