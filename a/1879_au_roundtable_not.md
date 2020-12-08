@@ -17,6 +17,9 @@
   https://docs.google.com/document/d/1jDVSyVU5ZB6OAcLpGnKnXxTGOFQNC-bb2q-TbEiJQnE/edit?usp=sharing
   https://nam03.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwiki.autodesk.com%2Fdisplay%2Faeceng%2F2020-11-19%2BAU%253A%2BRevit%2BAPI%2BFeedback%2BSession%2Band%2BRevit%2BAPI%2BExpert%2BRoundtable&data=04%7C01%7Cjeremy.tammik%40autodesk.com%7Cb8333da6f47b4191574908d88cb87ccf%7C67bff79e7f914433a8e5c9252d2ddc1d%7C0%7C0%7C637414071300653300%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&sdata=lPnvKYVE8Dksz9GrcuAqvfs%2FbIO%2FtHuViJjSlbvHs6g%3D&reserved=0
 
+- roundtable feedback notes
+  /a/doc/au/2020/doc $ diff boris_shafiro_revit_api_roundtable_notes_2.txt boris_shafiro_revit_api_roundtable_notes_3.txt
+
 2020-11-19
 autodesk_uni revit api roundtable boris
 slack https://autodesk.slack.com/archives/C0SR6NAP8/p1605809338152500
