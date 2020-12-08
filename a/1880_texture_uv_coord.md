@@ -24,6 +24,14 @@ The week is coming to an end all too quickly... here are some compelling topics 
 
 linkedin:
 
+A Spanish-language Dynamo book, detailed 3D model of a human cell and explaining texture UV mapping using AVF in the #RevitAPI
+
+https://bit.ly/textureuv
+
+- Explaining texture <code>UV</code> mapping using AVF
+- Más Allá de Dynamo Spanish-language book
+- A detailed 3D model of a human cell...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk 
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
