@@ -22,7 +22,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+A nice new minimal simple dynamic model updater DMU example, ExportCncFab SortMark enhancement and handling RevitLookup exception on view GetTemplateParameterIds with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/dmucncfab
 
 A nice new minimal DMU example and updates and enhancements to several other important sample applications
 &ndash; Simple dynamic model updater example
@@ -45,7 +45,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Simple IUpdater and other TBC Updates  
+### Simple IUpdater and other TBC Updates
 
 A nice new minimal DMU example, updates and enhancements to other important sample applications:
 
