@@ -6,6 +6,9 @@
 
 <!---
 
+- simple updater example added to The Building Coder samples
+  https://forums.autodesk.com/t5/revit-api-forum/iupdater-simple-example-needed/m-p/9893248
+
 - CncFab updated and in use
 
 - RevitLookup update and how to submit a pull request
@@ -17,17 +20,14 @@
   integrated pull request #66 by @RevitArkitek adding handlers for `View` methods `GetTemplateParameterIds` and `GetNonControlledTemplateParameterIds`
   https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.8
 
-- simple updater example added to The Building Coder samples
-  https://forums.autodesk.com/t5/revit-api-forum/iupdater-simple-example-needed/m-p/9893248
-
 twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-The week is coming to an end all too quickly... here are some compelling topics before we enter the weekend
-&ndash; Explaining texture <code>UV</code> mapping using AVF
-&ndash; Más Allá de Dynamo Spanish-language book
-&ndash; A detailed 3D model of a human cell...
+A nice new minimal DMU example and updates and enhancements to several other important sample applications
+&ndash; Simple dynamic model updater example
+&ndash; ExportCncFab <code>SortMark</code> update
+&ndash; RevitLookup exception on view <code>GetTemplateParameterIds</code>...
 
 linkedin:
 
@@ -45,181 +45,253 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Simple IUpdater, TBC Samples, RevitLookup
+### Simple IUpdater and other TBC Updates
 
-Several sample applications have been recently updated or expanded:
+A nice new minimal DMU example and updates and enhancements to several other important sample applications:
 
+- [Simple dynamic model updater example](#2)
+- [ExportCncFab `SortMark` update](#3)
+- [RevitLookup exception on view `GetTemplateParameterIds`](#4)
 
+####<a name="2"></a> Simple Dynamic Model Updater Example
 
-
-####<a name="2"></a> Explaining Texture UV Mapping Using AVF
-
-A question was raised and partially discussed a while ago in
+Alan Clarke shared a nice new simple Dynamic Model Updater or DMU sample in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [`IExportContext` converting `UV` to the range (0,1)](https://forums.autodesk.com/t5/revit-api-forum/revit-api-iexportcontext-converting-uv-to-the-range-0-1/m-p/9908386).
+on [`IUpdater`, simple example needed](https://forums.autodesk.com/t5/revit-api-forum/iupdater-simple-example-needed/m-p/9893248),
+saying:
 
-Back then, I summarised and preserved the initial part of this discussion in the blog post discussion
-on [normalising UVs in custom exporter](https://thebuildingcoder.typepad.com/blog/2020/07/revit-20211-update-and-normalising-custom-export-uv.html#3).
+> Hi Jeremy, I just want to share my solution, with help from a friend.
+I hope this is simple enough of an example and helpful for others.
+This is an `IExternalCommand` example.
 
-Now Jason expanded on the question, the Revit development team admitted to the dearth of information in this area,
-provided some hints, and, above all,
-Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas once again
-jumped in with a crucial and powerful solution to both answer the question and show how you can use the Analysis Visualisation Framework or AVF functionality for `UV` debugging to research and resolve this question yourself.
+I like it and integrated it
+into [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
+[release 2021.0.150.10](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2021.0.150.10).
 
-**Question:**  I'm writing an exporter for Revit and encountered with a problem when exporting `UV`.
-When I call `PolymeshTopology.GetUV`, the coordinates given are often larger than 1.
-My questions are:
+Here is the [diff to the previous release](https://github.com/jeremytammik/the_building_coder_samples/compare/2021.0.150.9...2021.0.150.10).
 
-1. How can I convert them to the desired range (0,1)? Or how should I understand these UV values?
-2. Are they coordinates on the image? If so, how can I access the size of the image in IExportContext?
+In doing so, I noticed they already did include a nice simple DMU sample in the module `CmdElevationWatcher` that reacts to elevation view creation and compares using the `DocumentChanged` event versus DMU to track that happening, discussed in the article
+on [`DocumentChanged` versus Dynamic Model Updater](https://thebuildingcoder.typepad.com/blog/2012/06/documentchanged-versus-dynamic-model-updater.html).
 
-To give a concrete example: say I have a texture of size 4096x4096, the corresponding UV data I read in IExportContext is around 25, and the RealWorldScale from the UnifiedBitmapAsset is about 141.
-I cannot seem to be able to discern a formula or something...
-
-The Building Coder article on [Faces](https://thebuildingcoder.typepad.com/blog/2010/01/faces.html) helps somewhat.
-
-However, it explains UV as two variables that parameterize a face, but they are related to the structure of the face in 3D space, not how each vertex of the face is mapped to the bitmap.
-I'd appreciate it very much if you can elaborate on this, that is, how can I convert the `UV` coordinates returned by `PolymeshTopology.GetUV` to pixel coordinate on the image or in the range (0,1).
-
-The article on [PolymeshTopology UVs](https://forums.autodesk.com/t5/revit-api-forum/polymeshtopology-uvs/td-p/8641007) is relevant;
-however, the answer given is not detailed enough to actually solve the problem.
-
-**Answer:** Here is my current approach:
-
-The PolymeshTopology.GetUV method returns a UV coordinate that represents the parameters of a face.
-Therefore, I guess they are related to the dimension of the face that they parameterize.
-These UV coordinates can be converted to display units via UnitUtils.ConvertFromInternalUnits (deprecated, but anyway...), and, in my add-in, centimeters are used.
-So, we have the UV in centimeters.
-
-The next step is to obtain the size of the bitmap.
-That is given by the properties with name UnifiedBitmap.TextureRealWorldScaleX/Y.
-These values are actually given in inches, so you can call `UnitUtils.Convert` to convert them from `DisplayUnitType.DUT_DECIMAL_INCHES` to  `DisplayUnitType.DUT_CENTIMETERS`.
-In fact, I found DisplayUnitType.DUT_FRACTIONAL_INCHES gives the same result; I don't know what's the difference.
-The AssetPropertyDistance class actually has a DisplayUnitType property, which should be used instead of DUT_DECIMAL_INCHES.
-
-After that, the UV coordinates can be scaled to the range [0,1] or whatever.
-
-This approach was preserved by The Building Coder in the note  on [normalising UVs in custom exporter](https://thebuildingcoder.typepad.com/blog/2020/07/revit-20211-update-and-normalising-custom-export-uv.html#3).
-
-**Question:** Jason's follow-up request for more details that Richard helps resolve:
-
-This is all a bit confusing, because UVs are generally a relative spatial coordinate system.
-"Relative" is the key word as they do not correspond to measurable distances.
-So, why would there be a need to convert TextureRealWorldScaleX/Y to another unit, if normalization is ultimately x/y or y/x?
-How is Revit calculating its UVs?
-
-It seems crazy that the UVs provided are not usable UVs (unless the texture dimensions are 1:1) &ndash; the whole purpose of UVs is to allow us to ignore texture dimensions. All I understand is that it may make the Revit developers' lives easier, as it allows for interesting tiling dynamics when interchanging textures.
-
-In any case, I attempted what I thought was a way to normalize given texture dimensions:
+Here is my slightly modified version of your code:
 
 <pre class="code">
-  normalize_multiplier = scaleX / (scaleY + ((scaleX - scaleY) / 2))
+[<span style="color:#2b91af;">Transaction</span>(&nbsp;<span style="color:#2b91af;">TransactionMode</span>.Manual&nbsp;)]
+<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">CmdSimpleUpdaterExample</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IExternalCommand</span>
+{
+&nbsp;&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">SimpleUpdater</span>&nbsp;:&nbsp;<span style="color:#2b91af;">IUpdater</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">const</span>&nbsp;<span style="color:blue;">string</span>&nbsp;Id&nbsp;=&nbsp;<span style="color:#a31515;">&quot;d42d28af-d2cd-4f07-8873-e7cfb61903d8&quot;</span>;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UpdaterId</span>&nbsp;_updater_id&nbsp;{&nbsp;<span style="color:blue;">get</span>;&nbsp;<span style="color:blue;">set</span>;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;SimpleUpdater(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">AddInId</span>&nbsp;addInId&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_updater_id&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">UpdaterId</span>(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;addInId,&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Guid</span>(&nbsp;Id&nbsp;)&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RegisterUpdater(&nbsp;doc&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RegisterTriggers();
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;RegisterUpdater(&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:#2b91af;">UpdaterRegistry</span>.IsUpdaterRegistered(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_updater_id,&nbsp;doc&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UpdaterRegistry</span>.RemoveAllTriggers(&nbsp;_updater_id&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UpdaterRegistry</span>.UnregisterUpdater(&nbsp;_updater_id,&nbsp;doc&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UpdaterRegistry</span>.RegisterUpdater(&nbsp;<span style="color:blue;">this</span>,&nbsp;doc&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;RegisterTriggers()
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">null</span>&nbsp;!=&nbsp;_updater_id&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;<span style="color:#2b91af;">UpdaterRegistry</span>.IsUpdaterRegistered(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_updater_id&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UpdaterRegistry</span>.RemoveAllTriggers(&nbsp;_updater_id&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UpdaterRegistry</span>.AddTrigger(&nbsp;_updater_id,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementCategoryFilter</span>(&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Walls&nbsp;),&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>.GetChangeTypeAny()&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;Execute(&nbsp;<span style="color:#2b91af;">UpdaterData</span>&nbsp;data&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;data.GetDocument();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">ElementId</span>&gt;&nbsp;ids&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;data.GetModifiedElementIds();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:blue;">string</span>&gt;&nbsp;names&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;ids.Select&lt;<span style="color:#2b91af;">ElementId</span>,&nbsp;<span style="color:blue;">string</span>&gt;(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id&nbsp;=&gt;&nbsp;doc.GetElement(&nbsp;id&nbsp;).Name&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;Simple&nbsp;Updater&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>.Join&lt;<span style="color:blue;">string</span>&gt;(&nbsp;<span style="color:#a31515;">&quot;,&quot;</span>,&nbsp;names&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">string</span>&nbsp;GetAdditionalInformation()
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#a31515;">&quot;NA&quot;</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">ChangePriority</span>&nbsp;GetChangePriority()
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">ChangePriority</span>.MEPFixtures;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">UpdaterId</span>&nbsp;GetUpdaterId()
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;_updater_id;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">string</span>&nbsp;GetUpdaterName()
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#a31515;">&quot;SimpleUpdater&quot;</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">Result</span>&nbsp;Execute(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ExternalCommandData</span>&nbsp;commandData,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">ref</span>&nbsp;<span style="color:blue;">string</span>&nbsp;message,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">ElementSet</span>&nbsp;elements&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">UIApplication</span>&nbsp;uiapp&nbsp;=&nbsp;commandData.Application;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;=&nbsp;uiapp.ActiveUIDocument.Document;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">AddInId</span>&nbsp;addInId&nbsp;=&nbsp;uiapp.ActiveAddInId;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">SimpleUpdater</span>&nbsp;su&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">SimpleUpdater</span>(&nbsp;doc,&nbsp;addInId&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:#2b91af;">Result</span>.Succeeded;
+&nbsp;&nbsp;}
+}
 </pre>
-  
-If `scaleX` is 14 and `scaleY` 10 (inch, cm, it shouldn't really matter), then I see UVs that go from (0, 0) to (1.167, 0.833) and `normalize_multiplier` comes out to be 1.167.
-So, (/, *) results in (1, 1).
 
-But, unfortunately, that doesn't always work, and I see erroneous UVs elsewhere.
+Many thanks to Alan for putting together and sharing this.
 
-So, I need more information:
+####<a name="3"></a> ExportCncFab SortMark Update
 
-1. What are the UVs we are getting from Revit &ndash; they are not classic UVs so what do they really represent?
-2. What is the appropriate algorithm to convert or normalize the UVs based on texture dimensions?
-3. Is there a function that already does this conversion?
-4. How does TextureRealWorldOffsetX/Y affect the UVs?
-5. How does TextureWAngle affect the UVs?
+Another nice sample was also enhanced, prompted
+by [SteelcoreSystems](https://github.com/SteelcoreSystems)'
+[issue #1 &ndash; Add Instance Shared Parameter Value in Exported Filename](https://github.com/jeremytammik/ExportCncFab/issues/1) on
+the ExportCncFab add-in to to export Revit wall parts to DXF or SAT for CNC fabrication:
 
-**Answer:** I think this depends on the type of face; I find they are not always normalised from 0 to 1.
+> I would like to know how to add an additional shared parameter instance value to the exported SAT/DXF filenames. The current SAT/DXF filename method only exports the "host level name_parentId_partId"
 
-You can plot the `UV` coords on the surface using AVF; I believe the `UV` tends to follow the parameter of the curves around the edges of the face.
+> Only exporting the Revit element id makes it difficult and time consuming to determine what part was exported after exporting many elements. I have added an instance shared parameter to my Revit models and assigned it to parts. The goal is to have this instance shared parameter value included within each exported filename.
 
-So, I believe, last time I checked, in a cylindrical face, the straight edges have ord related to raw parameter of curve (line), and the curved edges have normalised parameter of the arc, i.e., for the face on a vertical curved wall, the `V` was raw and the U was normalised (or the other way around). Sometimes, especially with cylindrical faces, the system is not oriented with `V` increasing in the same direction as `Basis.Z` (depends on face orientation). If you have a complete circle with two cylindrical faces, one will have `V` pointing downwards and the other pointing up to maintain face normal outwards.
+> When exporting, I get the following default file name:
+    <pre class="code">
+      [Level Name]_136667_136683.sat
+    </pre>
 
-Anyway, my suggestion is to use AVF to understand how `UV` is applied to different types of faces.
+> I would like for the file name to be exported with the "SortMark" instance value:
+    <pre class="code">
+      [Level Name]_[SortMark]_136667_136683.sat
+      Level 0_3SB-10_13667_136683.sat
+    </pre>
 
-Actually, I recalled wrong, results as below:
+Before buckling down to this, I migrated ExportCncFab from Revit 2019 to Revit 2020 and Revit 2021.
+That was trivial.
 
-Generally, the `UV` is based on raw parameter of curved edges, but, for some faces, i.e., ruled face, it is normalised.
-Below are some examples (note the direction of increase in all cases).
-The below is based on difference between Face `BoundingBoxUV` `Max`/`Min`, dividing into 10 segments and adding the UV values to the `ValueAtPoint` collection.
-Many of the walls below are 9.8 feet high with base at 0.
+Then I implemented the required enhancement that you can see in
+the [diff for adding the sort mark](https://github.com/jeremytammik/ExportCncFab/compare/2021.0.0.0...2021.0.0.1).
+
+**Response:** Great Work! I made the adjustments and on the first try everything exported perfectly.
+I greatly appreciate you making it easy to assign any parameter name for value exporting.
+
+Under the ExportCncFab/ExportParameters.cs file at line 32, I was able to change
+const string `_sort_mark` = `"CncFabSortMark"` to my desired parameter.
+
+Also, I have been able to customize the code for exporting floor parts, wall parts, and structural steel framing elements.
+So far, it has worked perfectly with every `OST` family I have tested.
+It is a great app!
+
+Many thanks to SteelcoreSystems for raising this issue and your nice appreciation.
+
+####<a name="4"></a> RevitLookup Exception on View GetTemplateParameterIds
+
+Another update was implemented in RevitLookup, to handle
+the [issue #65 &ndash; Unhandled exception on View.GetTemplateParameterIds](https://github.com/jeremytammik/RevitLookup/issues/65),
+raised by [RevitArkitek](https://github.com/RevitArkitek).
+
+I suggested submitting a pull request for this functionality, which involved talking RevitArkitek through the basic steps required for this fundamental GitHub collaboration operation: fork, clone, modify, commit, pull.
+
+**Question:** In a view (whether it's a view template or not), I click on `GetTemplateParameterIds`, a `NullReferenceException` is thrown.
+
+**Answer:** Thank you for pointing it out.
+Are you a programmer?
+Do you have Visual Studio or something similar installed?
+Can you run RevitLookup and Revit.exe in the debugger and see where this happens?
+In that case, can you please wrap the offending line of code in a try/catch handler to handle the exception?
+And submit a pull request with the fixed code?
+That would be great!
+Thank you!
+
+Later: I searched the RevitLookup source code globally to try to understand how this can occur.
+I searched, found and analysed all occurrences of SnoopableObjectWrapper and GetUnderlyingType, and they all make perfect sense and look perfectly all right to me.
+GetTemplateParameterIds is a member on the View class.
+It is called dynamically, and I cannot tell from your report how to trigger such a call.
+Therefore, it would be helpful if you could do so.
+The problem is probably trivial to fix and faster done than writing this long message.
+Looking forward to your pull request!
+Thank you!
+
+**Response:** When I debugged, Object in public Type GetUnderlyingType() => Object.GetType(); was null.
+I changed to public Type GetUnderlyingType() => Object?.GetType();
+Then, in the Objects.AddObjectsToTree I had to handle the null being returned.
+After that, it would open the next dialog.
+
+**Answer:** Thank you! That helps narrow it down tremendously.
+Could you share the handling code in `AddObjectsToTree`, or submit a pull request for the changes?
+Have you made any other modifications and improvements? Cheers!
+
+**Response:** I'm going to do a little testing, and then try to do a Pull request.
+I've never done that before. Thanks!
+
+Later: I figured out that the main issue was further up the code and had to add a couple of handlers for these objects.
+Unfortunately, it won't let me push my commit.
+Github desktop doesn't recognize my username/password.
+Not sure how to proceed.
+
+**Answer:** Wow, that sounds very good!
+Looking forward very much to see your approach.
+Yes, that is completely normal.
+You cannot commit straight to my repository, since you might wreck the project for me.
+That is obvious and expected.
+The solution is easy: (i) fork my repository to your own copy of it. (ii) clone your repository, make changes, and commit as you please. (iii) in your forked directory, submit a pull request. that enables me to see the changes you made and merge them back into my main original source repo. it all makes total sense and is utterly powerful and convenient. you have learned something very valuable.
+Search for something like [github fork commit pull merge](https://duckduckgo.com/?q=github+fork+commit+pull+merge).
+That gives many hits.
+One is [How to Fork Github Repository, Create Pull Request and Merge?](https://crunchify.com/how-to-fork-github-repository-create-pull-request-and-merge)
+
+That interaction promptly resulted
+in [pull request #66 &ndash; Adds handlers for GetTemplateParameterIds and GetNonControlledTemplateParameterIds](https://github.com/jeremytammik/RevitLookup/pull/66) that
+I integrated into [RevitLookup release 2021.0.0.8](https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.8).
+
+Since then I created another [release 2021.0.0.9](https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.9) to
+locally disable warning CS0618, `DisplayUnitType` is obsolete, for one specific use case.
+
+Very many thanks to RevitArkitek for their valuable contribution!
+
+
+**Question:**
+
+**Answer:**
+
 
 <center>
 
 <img src="img/rt_avf_uv_planar_face_u.png" alt="Planar face U" title="Planar face U" width="400"/> <!-- 763 -->
 <p style="font-size: 80%; font-style:italic">Planar face U</p>
 
-<img src="img/rt_avf_uv_planar_face_v.png" alt="Planar face V" title="Planar face V" width="400"/> <!-- 779 -->
-<p style="font-size: 80%; font-style:italic">Planar face V</p>
-
-<img src="img/rt_avf_uv_ruled_face_u.png" alt="Ruled face U" title="Ruled face U" width="400"/> <!-- 809 -->
-<p style="font-size: 80%; font-style:italic">Ruled face U</p>
-
-<img src="img/rt_avf_uv_ruled_face_v.png" alt="Ruled face V" title="Ruled face V" width="400"/> <!-- 772 -->
-<p style="font-size: 80%; font-style:italic">Ruled face V</p>
-
-<img src="img/rt_avf_uv_cylinder_face_u.png" alt="Cylinder face U" title="Cylinder face U" width="400"/> <!-- 684 -->
-<p style="font-size: 80%; font-style:italic">Cylinder face U</p>
-
-<img src="img/rt_avf_uv_cylinder_face_v.png" alt="Cylinder face V" title="Cylinder face V" width="400"/> <!-- 701 -->
-<p style="font-size: 80%; font-style:italic">Cylinder face V</p>
-
 </center>
 
-This seems logical to me, in that a Ruled face has to transition from one curve to another (opposite edges), so it makes sense for those two opposite curves to be normalised, so the points along it can be mapped to one another.
-Imagine, otherwise you would have an arc at one edge opposing a line at the other (both with different lengths); you would have to normalise at some stage.
 
-At the same time, other types of faces, such as cylindrical or planar, may be constructed with a curve projected in a given direction by a length, so raw parameters also seem more appropriate for that form of construction.
-Regarding cylindrical face, you can also see the U-Value are related to the parameter of the curve, i.e., that curved wall is obviously longer that 1.5ft if it is 9.8ft high (so, needs to be multiplied by its radius).
 
-I always prefer normalised curve parameters; they inherently tell you more and tell you everything when combined with a length and start point. I know what my preference would be, but I think we just get the leftovers of the internal geometry system.
 
-The development team comments:
 
-Richard provides a great explanation by using AVF.
-When the UVs are in real world units, normalizing them can be accomplished on a per-object basis (if the wall is 9.8 feet high, divide by 9.8).
-However, ruled surface is already normalized.
-It seems to me that the two cases can only be reconciled by taking into account vertex position.
-I wonder if normalization is the right approach here, since it would scale any texture to the size of the object, when in Revit the intention is to keep the detail in the texture (e.g., bricks) at a realistic scale relative to the object.
-
-So, for general texturing, the AVF illustration provides all the answers, which is that most of the coordinates are in real units. The rest depends on what kind of texture mapping is needed.
-It is possible to use the UVs of most Revit objects directly by normalizing them if needed (and paying attention to the special case of ruled surfaces).
-More complex texturing may be possible for some imported objects.
-If this is not enough, then the answer is to compute `UV` coordinates from vertex positions.
-
-For what it's worth, the `PolymeshTopology` code and the internal code it uses have no description whatsoever of what the UVs are, never mind how they're supposed to be used.
-It seems that anything related to texture mapping is sorely lacking in documentation.
-
-Very many thanks to Richard for his great `UV` debugging idea using AVF and the obvious conclusions he so clearly draws from that.
-
-####<a name="3"></a> Más Allá de Dynamo &ndash; Spanish-Language Book
-
-Kevin Himmelreich published a Spanish-language book *Beyond Dynamo*,
-the first Python manual focused on Dynamo and the Revit API, and currently the only publication in Spanish on this subject.
-
-> Ya se encuentra disponible mi manual *Más allá de Dynamo*.
-
-> Adjunto el link de Amazon España:
-[Más allá de Dynamo: Manual de Python para Revit](https://www.amazon.es/dp/B08P1FCBZY/ref=cm_sw_r_cp_api_fabc_JwrYFbTE394ZR)
-
-> También, en LinkedIn, os dejo el índice de contenidos por si queréis saber el alcance de este manual.
-
-Kevin's [post on LinkedIn](https://www.linkedin.com/posts/kevinhimmelreich_%C3%ADndice-m%C3%A1s-all%C3%A1-de-dynamo-activity-6738089981346160640-kjoj) includes
-the table of contents to show the scope of his manual.
-
-<!-- 
-<li class="carousel-slide carousel-slide-active" data-ssplayer-slide-index="3" style="width: 549px; height: 714px;">
-<img class="carousel-lazy-element carousel-slide-is-portrait carousel-element-loaded carousel-element-load-success" data-src="https://media-exp1.licdn.com/dms/image/C4E1FAQFHa_Qe3xWsjg/feedshare-document-images_800/4/1606485815490?e=1607097600&amp;v=beta&amp;t=G9uShg4FGk9f-bRUFpB4EuYqNtH923PUF0qzz1rTeMk" alt="4" src="https://media-exp1.licdn.com/dms/image/C4E1FAQFHa_Qe3xWsjg/feedshare-document-images_800/4/1606485815490?e=1607097600&amp;v=beta&amp;t=G9uShg4FGk9f-bRUFpB4EuYqNtH923PUF0qzz1rTeMk">
-</li>
---> 
-
-####<a name="4"></a> A Detailed 3D Model of a Human Cell
-
-Moving on from the Revit API, Python and Dynamo to science and modelling in general, here is a very impressive example of the latter in a non-architectural and even non-technological context, [a detailed 3D model of a human cell](https://gaelmcgill.artstation.com/projects/Pm0JL1):
-
-> ... inspired by the stunning art of David Goodsell, this 3D rendering of a eukaryotic cell is modelled using X-ray, nuclear magnetic resonance (NMR), and cryo-electron microscopy datasets for all of its molecular actors. It is an attempt to recapitulate the myriad pathways involved in signal transduction, protein synthesis, endocytosis, vesicular transport, cell-cell adhesion, apoptosis, and other processes. Although dilute in its concentration relative to a real cell, this rendering is also an attempt to visualize the great complexity and beauty of the cell’s molecular choreography. Interactive versions of parts of this landscape can be explored at [www.digizyme.com/cst_landscapes.html](http://www.digizyme.com/cst_landscapes.html).
-
-<center>
-<img src="img/gael_mcgill_cellularlandscape_digizyme.jpg" alt="Human cell" title="Human cell" width="400"/>
-<p style="font-size: 80%; font-style:italic">Cellular landscape cross-section through a eukaryotic cell, by Evan Ingersoll & Gael McGill &ndash; Digizyme’s Molecular Maya custom software, Autodesk Maya, and Foundry Modo used to import, model, rig, populate, and render all structural datasets</p>
-</center>
