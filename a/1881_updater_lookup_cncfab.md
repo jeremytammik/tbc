@@ -196,6 +196,12 @@ the ExportCncFab add-in to to export Revit wall parts to DXF or SAT for CNC fabr
       Level 0_3SB-10_13667_136683.sat
     </pre>
 
+> Here is an image of the modified code:
+
+<center>
+<img src="img/cncfab_sortmark.png" alt="ExportCncFab SortMark" title="ExportCncFab SortMark" width="400"/> <!-- 604 -->
+</center>
+
 Before buckling down to this, I migrated ExportCncFab from Revit 2019 to Revit 2020 and Revit 2021.
 That was trivial.
 
@@ -283,13 +289,6 @@ Very many thanks to RevitArkitek for their valuable contribution!
 
 **Answer:**
 
-
-<center>
-
-<img src="img/rt_avf_uv_planar_face_u.png" alt="Planar face U" title="Planar face U" width="400"/> <!-- 763 -->
-<p style="font-size: 80%; font-style:italic">Planar face U</p>
-
-</center>
 
 
 
