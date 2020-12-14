@@ -68,7 +68,7 @@ on Thursday last week, 19 November 2020, as part of the Autodesk University Idea
 
 Over 20 participants attended from all around the world.
 
-I took the following notes.
+I took the following notes, and later published the [recording below](#3) as well.
 
 The session was covered by a non-disclosure agreement
 or [NDA](https://en.wikipedia.org/wiki/Non-disclosure_agreement) covering
@@ -185,3 +185,12 @@ A By definition, the `Invisible` shared parameter option makes the parameter not
 <img src="img/stenography_eclectic_shorthand_by_cross.png" alt="Eclectic shorthand" title="Eclectic shorthand" width="533"/>
 </center>
 
+####<a name="3"></a> Addendum &ndash; Full Recording
+
+The [complete one-hour recording](https://youtu.be/vDC_4Pwt6WM) is now available as well.
+
+Note that it includes a sentence or two that was censored above for NDA reasons  :-)
+
+<center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/vDC_4Pwt6WM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
