@@ -54,20 +54,32 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>As always, there is lots going on in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>,
 where Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
-is providing tremendous help on all the realy hard questions requiring both Revit API understanding and
+is providing tremendous help on all the really hard questions requiring both Revit API understanding and
 in-depth product usage experience.</p>
 <p>I played around a bit with the NavisWorks API in the week of rest and the peaceful time until 
 the <a href="https://en.wikipedia.org/wiki/Twelfth_Night_(holiday)">twelfth night</a>,
 and discovered a very nice Revit project modification tracking tool in Dynamo:</p>
+<ul>
+<li><a href="#2">Filter for Detail Lines Subcategory</a></li>
+<li><a href="#3">Revit Project Modification Tracking</a></li>
+<li><a href="#4">Retrieving all NavisWorks Model Properties</a></li>
+<li><a href="#5">Node.js Best Practices</a></li>
+<li><a href="#6">Early History of Programming and C</a></li>
+</ul>
 <h4><a name="2"></a> Filter for Detail Lines Subcategory</h4>
 <p>One of the threads addressed by Richard is on filtering for detail lines,
 to <a href="https://forums.autodesk.com/t5/revit-api-forum/collect-all-detail-lines-of-a-particular-subcategory/td-p/9956260">collect all detail lines of a particular subcategory</a>:</p>
-<p><strong>Question:</strong> From reading The Building Coder's post about Retrieving All Available Line Styles (https://thebuildingcoder.typepad.com/blog/2013/08/retrieving-all-available-line-styles.html) it is my understanding that detail line elements can be collected via FilteredElementCollector once a subcategory is selected? I have a line style subcategory and would like to collect all the detail lines of that style. How do I do that?</p>
-<p>For context from the link above (bold added by me for emphasis):
-"</p>
-<p>While the Revit API does not provide a true 'Line style' element, the line styles are actually subcategories of the Lines category. Therefore, the FilteredElementCollector cannot easily be used for this in a single statement, like in your examples above.</p>
+<p><strong>Question:</strong> From reading The Building Coder's post 
+on <a href="https://thebuildingcoder.typepad.com/blog/2013/08/retrieving-all-available-line-styles.html">retrieving all available line styles</a>,
+it is my understanding that detail line elements can be collected via FilteredElementCollector once a subcategory is selected.</p>
+<p>I have a line style subcategory and would like to collect all the detail lines of that style.</p>
+<p>How do I do that?</p>
+<p>For context, I quote from the link above:</p>
+<blockquote>
+<p>While the Revit API does not provide a true 'Line style' element, the line styles are actually subcategories of the Lines category. Therefore, the FilteredElementCollector cannot easily be used for this in a single statement, like in your examples above. </p>
 <p>It should be possible to retrieve the line styles without a line instance, though.</p>
 <p>Here’s a macro that lists all subcategories of the Lines category:</p>
+</blockquote>
 <pre class="code">
 <span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;GetListOfLinestyles(&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)
 {
@@ -85,23 +97,26 @@ to <a href="https://forums.autodesk.com/t5/revit-api-forum/collect-all-detail-li
 }
 </pre>
 
+<blockquote>
 <p>Note that some line styles like 'Room Boundary' cannot actually be assigned to arbitrary lines in the UI, but this should be good enough to find a usable one.</p>
 <p>Once you have a collection of the line style subcategories of interest, you can create a filtered element collector retrieving all ElementType elements belonging to any one of them.</p>
-<p>"</p>
-<p><strong>Answer:</strong> For example, changing OST_Lines to OST_LightFixtures will find all the line subcategories of the light fixtures.</p>
-<p>(As you type in BuiltInCategory, you should get a list of all the subcatagories you can use.)</p>
-<p>See the attached image:</p>
+</blockquote>
+<p><strong>Answer:</strong> For example, changing <code>OST_Lines</code> to <code>OST_LightFixtures</code> will find all the line subcategories of the light fixtures.</p>
+<p>As you type in <code>BuiltInCategory</code>, you should get a list of all the subcategories you can use.</p>
+<p>For instance, given the following object styles:</p>
 <p><center>
-<img src="img/filter_detail_lines_object_styles.png" alt="" title="" width="783"/>
+<img src="img/filter_detail_lines_object_styles.png" alt="" title="" width="600"/> <!-- 783 -->
 </center></p>
-<p>Using the OST_LightFixtures will return "Hidden Lines", "light Source", "test_lightfixturelines", and "test_lightfixturelines2".</p>
+<p>Using <code>OST_LightFixtures</code> will return "Hidden Lines", "light Source", "test_lightfixturelines", and "testlightfixturelines2".</p>
 <p><strong>Response:</strong> Thanks for your reply. I don't quite understand your meaning.</p>
-<p>I should clarify, I'm looking for the right way to use a Line Style subcategory in a FilteredElementCollector to grab all the detail lines in the project that are of that style. I don't actually use C#, that code is just from the The Building Coder's website, but I have gotten to the point in my code that I have the Line Style I want to filter with and now I would like to create a filtered element collector retrieving all ElementType elements belonging to that Line Style, using the Revit API.</p>
+<p>I should clarify; I'm looking for the right way to use a Line Style subcategory in a FilteredElementCollector to grab all the detail lines in the project that are of that style. I don't actually use C#, that code is just from The Building Coder website, but I have gotten to the point in my code that I have the Line Style I want to filter with and now I would like to create a filtered element collector retrieving all ElementType elements belonging to that Line Style, using the Revit API.</p>
 <p><strong>Answer:</strong> If you aren't using C#, then what are you using?  Python?  Dynamo?  </p>
 <p><strong>Response:</strong> I can translate from anything to anything. Maybe what I'm asking to do isn't possible, I'm not sure.</p>
-<p>Actually, I may have found something. I looked up this older forum post: https://forums.autodesk.com/t5/revit-api-forum/filteredelementcollector-gt-get-all-instances-except-... </p>
+<p>Actually, I may have found something.</p>
+<p>I looked up this older forum post
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/filteredelementcollector-gt-get-all-instances-except-of-category/m-p/8571199">FilteredElementCollector -&gt; get all instances except of category X</a>:</p>
 <pre class="code">
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector&nbsp;
+&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;);
 
 &nbsp;&nbsp;<span style="color:#2b91af;">ElementCategoryFilter</span>&nbsp;fi&nbsp;
@@ -114,8 +129,8 @@ to <a href="https://forums.autodesk.com/t5/revit-api-forum/collect-all-detail-li
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.ToElements();
 </pre>
 
-<p>I used the ElementCategoryFilter but replaced the built-in category with my category (not built-in) and I removed the .OfClass filter.... although it is collecting 23,000+ lines which doesn't seem right either, so maybe I need to apply another filter 😕</p>
-<p><strong>Answer:</strong> I believe its a 3 step process.
+<p>I used the ElementCategoryFilter but replaced the built-in category with my category (not built-in) and removed the .OfClass filter... although, it is collecting 23,000+ lines which doesn't seem right either, so maybe I need to apply another filter...</p>
+<p><strong>Answer:</strong> I believe it's a 3 step process.
 You find all lines, then narrow those down to the Detail Lines, and then narrow those down to get the line style you want.</p>
 <p>Add a new line style called "MyNewLineStyle" (match the caps exactly) and try something like this:</p>
 <pre class="code">
@@ -161,10 +176,12 @@ You find all lines, then narrow those down to the Detail Lines, and then narrow 
 &nbsp;&nbsp;&nbsp;&nbsp;some_detail_lines.Count.ToString()&nbsp;);
 </pre>
 
-<p><strong>Answer:</strong> Usually easier to filter for objects of GraphicsStyle using ElementClassFilter rather than subcategories of OST_Lines.</p>
-<p>GraphicsStyle has a property GraphicsStyle.GraphicsStyleCategory. When this is a subcategory of OST_Lines then it relates to either ModelCurves or DetailCurves (Note that GraphicsStyle.Category is null).</p>
-<p>You can't use a class filter for DetailCurves and ModelCurves (which inherit from CurveElement). This base class has the property LineStyle which will be one of the GraphicsStyle elements found above.</p>
-<p>When you have items of CurveElement you can distinguish between ModelCurves and DetailCurves as follows:</p>
+<p><strong>Answer:</strong> Usually, it is easier to filter for objects of <code>GraphicsStyle</code> using <code>ElementClassFilter</code>, rather than subcategories of <code>OST_Lines</code>.</p>
+<p>GraphicsStyle has a property GraphicsStyle.GraphicsStyleCategory.
+When this is a subcategory of <code>OST_Lines</code>, then it relates to either ModelCurves or DetailCurves (note that GraphicsStyle.Category is null).</p>
+<p>You can't use a class filter for DetailCurves and ModelCurves (which inherit from CurveElement).
+This base class has the property LineStyle which will be one of the GraphicsStyle elements found above.</p>
+<p>When you have items of <code>CurveElement</code>, you can distinguish between ModelCurves and DetailCurves as follows:</p>
 <ul>
 <li>DetailCurves have OwnerViewId &lt;&gt; ElementId.InvalidElementId</li>
 <li>ModelCurves have OwnerViewId = ElementId.InvalidElementId</li>
@@ -172,8 +189,9 @@ You find all lines, then narrow those down to the Detail Lines, and then narrow 
 <p>So, you see one potential route is to filter for GraphicsStyles.</p>
 <p>Filter again to find GraphicsStyle.GraphicsStyleCategory that is equal to your subcategory of lines.</p>
 <p>Then, use this to find CurveElements that have such a CurveElement.LineStyle.</p>
-<p>Finally, use CurveElement.OwnerViewId to list either ModelCurves or DetailCurves</p>
-<p>One simple way of getting valid GraphicsStyles for DetailCurves/ModelCurves is via CurveElement.GetLineStyleIds (there are many graphics styles that don't relate to lines). Otherwise check GraphicsStyle.GraphicsStyleCategory is a subcategory of OST_Lines.</p>
+<p>Finally, use CurveElement.OwnerViewId to list either ModelCurves or DetailCurves.</p>
+<p>One simple way of getting valid GraphicsStyles for DetailCurves/ModelCurves is via CurveElement.GetLineStyleIds (there are many graphics styles that don't relate to lines).
+Otherwise, check that GraphicsStyle.GraphicsStyleCategory is a subcategory of OST_Lines.</p>
 <p>Example extension methods for getting CurveElements of a given subcategory of lines or matching a GraphicsStyle:</p>
 <pre class="code">
  <Extension()>
@@ -211,8 +229,8 @@ You find all lines, then narrow those down to the Detail Lines, and then narrow 
 <ul>
 <li>FilteredElementCollector.WhereElementIsViewIndependent</li>
 </ul>
-<p>In combination with .Excluding to find ModelCurves and Exclude them from your DetailCurves.</p>
-<p>I.e., filtering this way first will be quicker since it happens at lower level prior to Linq but you don't have millions of these elements to sort through anyway.</p>
+<p>In combination with <code>.Excluding</code> to find ModelCurves and exclude them from your DetailCurves.</p>
+<p>I.e., filtering this way first will be quicker, since it happens at lower level prior to Linq, but you don't have millions of these elements to sort through anyway.</p>
 <p>Also, there is a standard filter for detail/model lines: the <code>CurveElementFilter</code>:</p>
 <pre class="code">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Category</span>&nbsp;targetLineStyle;
@@ -343,7 +361,7 @@ And, yes, some objects are duplicates of others, but optimising for that probabl
 <p>Talking about new non-Revit programming environments, one of the most important topics nowadays is of course <a href="https://nodejs.org">node.js</a>.</p>
 <p>For that, I happened upon a really great collection of <a href="https://github.com/goldbergyoni/nodebestpractices">Node.js Best Practices</a>.</p>
 <p>This constitutes an invaluable collection of information, and also shows an exemplary solution to present it optimally.</p>
-<h4><a name="6"></a> Node.js Best Practices</h4>
+<h4><a name="6"></a> Early History of Programming and C</h4>
 <p>Talking about the other and the new, lets not forget to old, either;
 for instance, by taking a look
 at <a href="https://arstechnica.com/features/2020/12/a-damn-stupid-thing-to-do-the-origins-of-c">the early history of programming and the C language</a>.</p>
