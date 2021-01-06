@@ -54,7 +54,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Line Subcategory Filter, NW and Modification Tracker
+### Line Subcategory Filter, Modification Tracker and NW
 
 Happy New Year!
 
