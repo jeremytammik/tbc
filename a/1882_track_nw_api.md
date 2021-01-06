@@ -31,8 +31,12 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+I played around a bit with the NavisWorks API and discovered a nice Revit project modification tracking tool in Dynamo
+&ndash; Filter for detail lines subcategory
+&ndash; Revit project modification tracking
+&ndash; Retrieving all NavisWorks model properties
+&ndash; Node.js best practices
+&ndash; Early history of programming and C...
 
 linkedin:
 
@@ -50,7 +54,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Happy New Year, NavisWorks and Modification Tracking
+### Line Subcategory Filter, NW and Modification Tracker
 
 Happy New Year!
 
@@ -64,11 +68,11 @@ I played around a bit with the NavisWorks API in the week of rest and the peacef
 the [twelfth night](https://en.wikipedia.org/wiki/Twelfth_Night_(holiday)),
 and discovered a very nice Revit project modification tracking tool in Dynamo:
 
-- [Filter for Detail Lines Subcategory](#2)
-- [Revit Project Modification Tracking](#3)
-- [Retrieving all NavisWorks Model Properties](#4)
-- [Node.js Best Practices](#5)
-- [Early History of Programming and C](#6)
+- [Filter for detail lines subcategory](#2)
+- [Revit project modification tracking](#3)
+- [Retrieving all NavisWorks model properties](#4)
+- [Node.js best practices](#5)
+- [Early history of programming and C](#6)
 
 ####<a name="2"></a> Filter for Detail Lines Subcategory
 
@@ -120,7 +124,7 @@ As you type in `BuiltInCategory`, you should get a list of all the subcategories
 For instance, given the following object styles:
 
 <center>
-<img src="img/filter_detail_lines_object_styles.png" alt="" title="" width="600"/> <!-- 783 -->
+<img src="img/filter_detail_lines_object_styles.png" alt="Object styles" title="Object styles" width="600"/> <!-- 783 -->
 </center>
 
 Using `OST_LightFixtures` will return "Hidden Lines", "light Source", "test_lightfixturelines", and "testlightfixturelines2".
@@ -160,7 +164,7 @@ You find all lines, then narrow those down to the Detail Lines, and then narrow 
 Add a new line style called "MyNewLineStyle" (match the caps exactly) and try something like this:
 
 <pre class="code">
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector
+&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector
 &nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;);
  
 &nbsp;&nbsp;<span style="color:#2b91af;">ElementCategoryFilter</span>&nbsp;fi&nbsp;
@@ -229,35 +233,35 @@ Otherwise, check that GraphicsStyle.GraphicsStyleCategory is a subcategory of OS
 Example extension methods for getting CurveElements of a given subcategory of lines or matching a GraphicsStyle:
 
 <pre class="code">
- <Extension()>
-    Public Function GetLinesOfCategory(Doc As Document, GraphicsStyle As GraphicsStyle, DetailLines As Boolean, Optional FromView As View = Nothing) As List(Of CurveElement)
-        Dim FEC As FilteredElementCollector = Nothing
-        If FromView Is Nothing Then
-            FEC = New FilteredElementCollector(Doc)
-        Else
-            FEC = New FilteredElementCollector(Doc, FromView)
-        End If
+&lt;Extension()&gt;
+  Public Function GetLinesOfCategory(Doc As Document, GraphicsStyle As GraphicsStyle, DetailLines As Boolean, Optional FromView As View = Nothing) As List(Of CurveElement)
+    Dim FEC As FilteredElementCollector = Nothing
+    If FromView Is Nothing Then
+      FEC = New FilteredElementCollector(Doc)
+    Else
+      FEC = New FilteredElementCollector(Doc, FromView)
+    End If
 
-        Dim ECF As New ElementCategoryFilter(BuiltInCategory.OST_Lines)
-        Dim Els As List(Of CurveElement) = FEC.WherePasses(ECF).WhereElementIsNotElementType.ToElements _
-            .Cast(Of CurveElement).Where(Function(x) x.LineStyle.Id = GraphicsStyle.Id _
-            AndAlso (x.OwnerViewId <> ElementId.InvalidElementId) = DetailLines).ToList
+    Dim ECF As New ElementCategoryFilter(BuiltInCategory.OST_Lines)
+    Dim Els As List(Of CurveElement) = FEC.WherePasses(ECF).WhereElementIsNotElementType.ToElements _
+      .Cast(Of CurveElement).Where(Function(x) x.LineStyle.Id = GraphicsStyle.Id _
+      AndAlso (x.OwnerViewId <> ElementId.InvalidElementId) = DetailLines).ToList
 
-        Return Els
-    End Function
+    Return Els
+  End Function
 
-    <Extension()>
-    Public Function GetLinesOfCategory(Doc As Document, Category As Category, DetailLines As Boolean, Optional FromView As View = Nothing) As List(Of CurveElement)
+&lt;Extension()&gt;
+  Public Function GetLinesOfCategory(Doc As Document, Category As Category, DetailLines As Boolean, Optional FromView As View = Nothing) As List(Of CurveElement)
 
-        Dim FECgs As New FilteredElementCollector(Doc)
-        Dim ECFgs As New ElementClassFilter(GetType(GraphicsStyle))
-        Dim Gs As List(Of GraphicsStyle) = FECgs.WherePasses(ECFgs).ToElements _
-            .Cast(Of GraphicsStyle).Where(Function(x) x.GraphicsStyleCategory.Id = Category.Id).ToList
+    Dim FECgs As New FilteredElementCollector(Doc)
+    Dim ECFgs As New ElementClassFilter(GetType(GraphicsStyle))
+    Dim Gs As List(Of GraphicsStyle) = FECgs.WherePasses(ECFgs).ToElements _
+      .Cast(Of GraphicsStyle).Where(Function(x) x.GraphicsStyleCategory.Id = Category.Id).ToList
 
-        If Gs.Count = 0 Then Return New List(Of CurveElement) Else
+    If Gs.Count = 0 Then Return New List(Of CurveElement) Else
 
-        Return GetLinesOfCategory(Doc, Gs(0), DetailLines, FromView)
-    End Function
+    Return GetLinesOfCategory(Doc, Gs(0), DetailLines, FromView)
+  End Function
 </pre>
 
 I should also say you could probably use:
@@ -271,7 +275,7 @@ I.e., filtering this way first will be quicker, since it happens at lower level 
 Also, there is a standard filter for detail/model lines: the `CurveElementFilter`:
 
 <pre class="code">
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Category</span>&nbsp;targetLineStyle;
+&nbsp;&nbsp;<span style="color:#2b91af;">Category</span>&nbsp;targetLineStyle;
  
 &nbsp;&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">GraphicsStyle</span>&gt;&nbsp;gstyles&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
