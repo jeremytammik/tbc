@@ -81,20 +81,22 @@ It should be possible to retrieve the line styles without a line instance, thoug
 Here’s a macro that lists all subcategories of the Lines category:
 
 <pre class="code">
-  public void GetListOfLinestyles( Document doc )
-  {
-    Category c = doc.Settings.Categories.get_Item(
-      BuiltInCategory.OST_Lines );
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;GetListOfLinestyles(&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:#2b91af;">Category</span>&nbsp;c&nbsp;=&nbsp;doc.Settings.Categories.get_Item(
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Lines&nbsp;);
  
-    CategoryNameMap subcats = c.SubCategories;
+&nbsp;&nbsp;<span style="color:#2b91af;">CategoryNameMap</span>&nbsp;subcats&nbsp;=&nbsp;c.SubCategories;
  
-    foreach( Category lineStyle in subcats )
-    {
-      TaskDialog.Show( "Line style", string.Format(
-        "Linestyle {0} id {1}", lineStyle.Name,
-        lineStyle.Id.ToString() ) );
-    }
-  }
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Category</span>&nbsp;lineStyle&nbsp;<span style="color:blue;">in</span>&nbsp;subcats&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;Line&nbsp;style&quot;</span>,&nbsp;<span style="color:blue;">string</span>.Format(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Linestyle&nbsp;{0}&nbsp;id&nbsp;{1}&quot;</span>,&nbsp;lineStyle.Name,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lineStyle.Id.ToString()&nbsp;)&nbsp;);
+&nbsp;&nbsp;}
+}
+</pre>
+
 Note that some line styles like 'Room Boundary' cannot actually be assigned to arbitrary lines in the UI, but this should be good enough to find a usable one.
 
 Once you have a collection of the line style subcategories of interest, you can create a filtered element collector retrieving all ElementType elements belonging to any one of them.
@@ -107,7 +109,9 @@ Once you have a collection of the line style subcategories of interest, you can 
 
 See the attached image:
 
-filter_detail_lines_object_styles.png 783
+<center>
+<img src="img/filter_detail_lines_object_styles.png" alt="" title="" width="783"/>
+</center>
 
 Using the OST_LightFixtures will return "Hidden Lines", "light Source", "test_lightfixturelines", and "test_lightfixturelines2".
 
@@ -122,59 +126,67 @@ I should clarify, I'm looking for the right way to use a Line Style subcategory 
 Actually, I may have found something. I looked up this older forum post: https://forums.autodesk.com/t5/revit-api-forum/filteredelementcollector-gt-get-all-instances-except-... 
 
 <pre class="code">
-FilteredElementCollector collector = new FilteredElementCollector(doc);
-ElementCategoryFilter fi = new ElementCategoryFilter(BuiltInCategory.OST_TitleBlocks, true);
-ICollection<Element> collection 
-  = collector.OfClass(typeof(FamilyInstance)).WherePasses(fi)
-                .ToElements();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">ElementCategoryFilter</span>&nbsp;fi&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementCategoryFilter</span>(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_TitleBlocks,&nbsp;<span style="color:blue;">true</span>&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;collection
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;collector.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">FamilyInstance</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WherePasses(&nbsp;fi&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.ToElements();
 </pre>
 
 I used the ElementCategoryFilter but replaced the built-in category with my category (not built-in) and I removed the .OfClass filter.... although it is collecting 23,000+ lines which doesn't seem right either, so maybe I need to apply another filter 😕
 
-**Answer:** I believe its a 3 step process.  You find all lines, then narrow those down to the Detail Lines, and then narrow those down to get the line style you want.
+**Answer:** I believe its a 3 step process.
+You find all lines, then narrow those down to the Detail Lines, and then narrow those down to get the line style you want.
 
-Add a new line style called "MyNewLineStyle"  (match the caps exactly) and try something like
+Add a new line style called "MyNewLineStyle" (match the caps exactly) and try something like this:
 
 <pre class="code">
-FilteredElementCollector collector = new FilteredElementCollector(doc); 
-			ElementCategoryFilter fi = new ElementCategoryFilter(BuiltInCategory.OST_GenericLines, true); 
-			ICollection<Element> collection = collector.OfClass(typeof(CurveElement)).WherePasses(fi) .ToElements();
-			
-			
-			TaskDialog.Show("Number of curves", collection.Count.ToString ());
-			List<Element> detail_lines = new List<Element>();
-			
-			
-			foreach (Element e in collection)
-			{
-				if (e as DetailLine != null)
-					
-				{
-					detail_lines.Add (e);
-				
-				}
-			}
-		
-			
-			
-			TaskDialog.Show("Number of Detail Lines", detail_lines.Count.ToString ());
-    		
-    		
-    		List<Element> some_detail_lines = new List<Element>();
-    		foreach (DetailLine dl in detail_lines)
-			{
-    			if (dl.LineStyle.Name == "MyNewLineStyle")
-    		
-    			{
-    			
-    				some_detail_lines.Add(dl);
-    				
-    			}
-
-	    			    
-			}
-    		TaskDialog.Show("Number of Detail Lines of MyNewLineStyle", some_detail_lines.Count.ToString ());
-this;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">ElementCategoryFilter</span>&nbsp;fi&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementCategoryFilter</span>(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_GenericLines,&nbsp;<span style="color:blue;">true</span>&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;collection&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;collector.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">CurveElement</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WherePasses(&nbsp;fi&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.ToElements();
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;Number&nbsp;of&nbsp;curves&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;collection.Count.ToString()&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;detail_lines&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Element</span>&gt;();
+ 
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;e&nbsp;<span style="color:blue;">in</span>&nbsp;collection&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;e&nbsp;<span style="color:blue;">is</span>&nbsp;<span style="color:#2b91af;">DetailLine</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;detail_lines.Add(&nbsp;e&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;Number&nbsp;of&nbsp;Detail&nbsp;Lines&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;detail_lines.Count.ToString()&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;some_detail_lines&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">Element</span>&gt;();
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">DetailLine</span>&nbsp;dl&nbsp;<span style="color:blue;">in</span>&nbsp;detail_lines&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;dl.LineStyle.Name&nbsp;==&nbsp;<span style="color:#a31515;">&quot;MyNewLineStyle&quot;</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;some_detail_lines.Add(&nbsp;dl&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Number&nbsp;of&nbsp;Detail&nbsp;Lines&nbsp;of&nbsp;MyNewLineStyle&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;some_detail_lines.Count.ToString()&nbsp;);
 </pre>
 
 **Answer:** Usually easier to filter for objects of GraphicsStyle using ElementClassFilter rather than subcategories of OST_Lines.
@@ -243,20 +255,38 @@ I.e., filtering this way first will be quicker since it happens at lower level p
 Also, there is a standard filter for detail/model lines: the `CurveElementFilter`:
 
 <pre class="code">
-			Category targetLineStyle ;
-			IEnumerable<GraphicsStyle>  gstyles = new FilteredElementCollector(doc)
-				.OfClass(typeof(GraphicsStyle))
-				.Cast<GraphicsStyle>()
-				.Where(gs=> gs.GraphicsStyleCategory.Id.IntegerValue == targetLineStyle.Id.IntegerValue);
-			ElementId  targetGraphicsStyleId = gstyles.FirstOrDefault().Id;
-			CurveElementFilter filter_detail = new CurveElementFilter(CurveElementType.DetailCurve);
-			FilterRule frule_typeId = ParameterFilterRuleFactory.CreateEqualsRule(new ElementId(BuiltInParameter.BUILDING_CURVE_GSTYLE),targetGraphicsStyleId);
-			ElementParameterFilter filter_type = new ElementParameterFilter(new List<FilterRule>(){ frule_typeId});
-			IEnumerable<Element> lines = new FilteredElementCollector(doc)
-				.WhereElementIsNotElementType()
-				.WhereElementIsCurveDriven()
-				.WherePasses(filter_detail)
-				.WherePasses(filter_type);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Category</span>&nbsp;targetLineStyle;
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">GraphicsStyle</span>&gt;&nbsp;gstyles&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">GraphicsStyle</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;<span style="color:#2b91af;">GraphicsStyle</span>&gt;()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Where(&nbsp;gs&nbsp;=&gt;&nbsp;gs.GraphicsStyleCategory.Id.IntegerValue&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;==&nbsp;targetLineStyle.Id.IntegerValue&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">ElementId</span>&nbsp;targetGraphicsStyleId&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;gstyles.FirstOrDefault().Id;
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">CurveElementFilter</span>&nbsp;filter_detail&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">CurveElementFilter</span>(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">CurveElementType</span>.DetailCurve&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">FilterRule</span>&nbsp;frule_typeId&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:#2b91af;">ParameterFilterRuleFactory</span>.CreateEqualsRule(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementId</span>(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BuiltInParameter</span>.BUILDING_CURVE_GSTYLE&nbsp;),&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;targetGraphicsStyleId&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">ElementParameterFilter</span>&nbsp;filter_type&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">ElementParameterFilter</span>(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">FilterRule</span>&gt;()&nbsp;{&nbsp;frule_typeId&nbsp;}&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">IEnumerable</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;lines&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsCurveDriven()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WherePasses(&nbsp;filter_detail&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WherePasses(&nbsp;filter_type&nbsp;);
 </pre>
 
 **Response:** Great solutions here, thank you so much!
@@ -309,40 +339,49 @@ Only difference is, it reports progress as well.
 There isn’t anything special or confidential about this code, so, as far as I’m concerned, you’re welcome to share it with the customer:
 
 <pre class="code">
-  public bool Update()
-  {
-    if (Nw.Application.MainDocument != null)
-    {
-      Nw.Search s = new Nw.Search();
-      s.SearchConditions.Add(Nw.SearchCondition.HasCategoryByName(Nw.PropertyCategoryNames.Item));
-      s.Selection.SelectAll();
-      s.Locations = Nw.SearchLocations.DescendantsAndSelf;
-      s.PruneBelowMatch = false;
-      Nw.ModelItemCollection allItems = s.FindAll(Nw.Application.MainDocument, true);
-      Nw.Progress prog = Nw.Application.BeginProgress("Building Property Cache");
-      int done = 0;
-      int total = allItems.Count;
-      foreach (Nw.ModelItem item in allItems)
-      {
-        foreach (Nw.PropertyCategory cat in item.PropertyCategories)
-        {
-          foreach (Nw.DataProperty data in cat.Properties)
-          {
-            m_props.Add(new PropertyDefinition(cat.Name, data.Name, cat.DisplayName, data.DisplayName));
-          }
-        }
-        ++done;
-        double percent = (double)done / (double)total;
-        if (prog.Update(percent) == false)
-        {
-          break;
-        }
-      }
-      Nw.Application.EndProgress();
-    }
-    m_cacheValid = true;
-    return true;
-  }
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;Update()
+{
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;Nw.<span style="color:#2b91af;">Application</span>.MainDocument&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;Nw.<span style="color:#2b91af;">Search</span>&nbsp;s&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Nw.<span style="color:#2b91af;">Search</span>();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;s.SearchConditions.Add(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nw.<span style="color:#2b91af;">SearchCondition</span>.HasCategoryByName(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nw.<span style="color:#2b91af;">PropertyCategoryNames</span>.Item&nbsp;)&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;s.Selection.SelectAll();
+&nbsp;&nbsp;&nbsp;&nbsp;s.Locations&nbsp;=&nbsp;Nw.<span style="color:#2b91af;">SearchLocations</span>.DescendantsAndSelf;
+&nbsp;&nbsp;&nbsp;&nbsp;s.PruneBelowMatch&nbsp;=&nbsp;<span style="color:blue;">false</span>;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;Nw.<span style="color:#2b91af;">ModelItemCollection</span>&nbsp;allItems&nbsp;=&nbsp;s.FindAll(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nw.<span style="color:#2b91af;">Application</span>.MainDocument,&nbsp;<span style="color:blue;">true</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;Nw.<span style="color:#2b91af;">Progress</span>&nbsp;prog&nbsp;=&nbsp;Nw.<span style="color:#2b91af;">Application</span>.BeginProgress(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Building&nbsp;Property&nbsp;Cache&quot;</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;done&nbsp;=&nbsp;0;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;total&nbsp;=&nbsp;allItems.Count;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;Nw.<span style="color:#2b91af;">ModelItem</span>&nbsp;item&nbsp;<span style="color:blue;">in</span>&nbsp;allItems&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;Nw.<span style="color:#2b91af;">PropertyCategory</span>&nbsp;cat&nbsp;<span style="color:blue;">in</span>&nbsp;item.PropertyCategories&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;Nw.<span style="color:#2b91af;">DataProperty</span>&nbsp;data&nbsp;<span style="color:blue;">in</span>&nbsp;cat.Properties&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m_props.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;PropertyDefinition(&nbsp;cat.Name,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data.Name,&nbsp;cat.DisplayName,&nbsp;data.DisplayName&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++done;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;percent&nbsp;=&nbsp;(<span style="color:blue;">double</span>)&nbsp;done&nbsp;/&nbsp;(<span style="color:blue;">double</span>)&nbsp;total;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;prog.Update(&nbsp;percent&nbsp;)&nbsp;==&nbsp;<span style="color:blue;">false</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;Nw.<span style="color:#2b91af;">Application</span>.EndProgress();
+&nbsp;&nbsp;}
+&nbsp;&nbsp;m_cacheValid&nbsp;=&nbsp;<span style="color:blue;">true</span>;
+}
 </pre>
 
 **Question:** I see that it stores a `PropertyDefinition` for each property encountered, encapsulating the `Name` and `DisplayName` of the category and data items. So, it does not care about the data value.
