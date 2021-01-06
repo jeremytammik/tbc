@@ -343,7 +343,7 @@ Is this information cached somewhere? If so, is there a way to access it instead
 
 Would it be better to use the COM API for performance?
 
-[A] Sadly, there isn't any faster way of reading all the properties using the .NET API.
+**Answer:** Sadly, there isn't any faster way of reading all the properties using the .NET API.
 My little Properties+ tool has to spend a long time searching for properties, but at least it does pop up a progress bar, so that is something the customer could consider doing as well.
 
 We did think about overhauling how we handle properties for NW 2022, but that didn't make the cut. It's possible we might do something for 2023, but no firm plans as of right now.
@@ -404,7 +404,7 @@ There isn’t anything special or confidential about this code, so, as far as I�
 
 In a different vein, don’t some objects in the model duplicate others, and their properties as well? Wouldn’t it make sense to identify such objects and reuse the existing data for those? Or is that hard, or impossible?
 
-[A] That code only wants a list of properties, so it doesn't care about the actual values.
+**Answer:** That code only wants a list of properties, so it doesn't care about the actual values.
 And, yes, some objects are duplicates of others, but optimising for that probably won't make much difference.
 
 Summary:
@@ -422,7 +422,7 @@ This constitutes an invaluable collection of information, and also shows an exem
 
 ####<a name="6"></a> Early History of Programming and C
 
-Talking about the other and the new, lets not forget to old, either;
+Talking about the other and the new, let's not ignore the old, either;
 for instance, by taking a look
 at [the early history of programming and the C language](https://arstechnica.com/features/2020/12/a-damn-stupid-thing-to-do-the-origins-of-c).
 
