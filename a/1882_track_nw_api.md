@@ -29,7 +29,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Node.js best practices, retrieving NavisWorks model properties, filtering for detail lines subcategory and Revit project modification tracking with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://autode.sk/subcatfilter
 
 I played around a bit with the NavisWorks API and discovered a nice Revit project modification tracking tool in Dynamo
 &ndash; Filter for detail lines subcategory
