@@ -6,27 +6,6 @@
 
 <!---
 
-- week of rest until the twelfth night
-  https://en.wikipedia.org/wiki/Twelfth_Night_(holiday)
-
-- filter for detail lines
-  Collect All Detail Lines of a Particular SubCategory
-  https://forums.autodesk.com/t5/revit-api-forum/collect-all-detail-lines-of-a-particular-subcategory/td-p/9956260
-  
-- modification tracking
-  https://data-shapes.io/2016/12/31/modification-tracking-with-dynamo-and-data-shapes
-  Modification Tracking with Dynamo
-
-- 17292711 [Most optimized way of getting a complete set of property categories and properties in a model.]
-  
-- new
-  Node.js Best Practices
-  https://github.com/goldbergyoni/nodebestpractices
-
--  old
-  The early history of programming and the C language
-  https://arstechnica.com/features/2020/12/a-damn-stupid-thing-to-do-the-origins-of-c/
-
 twitter:
 
 Node.js best practices, retrieving NavisWorks model properties, filtering for detail lines subcategory and Revit project modification tracking with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://autode.sk/subcatfilter
