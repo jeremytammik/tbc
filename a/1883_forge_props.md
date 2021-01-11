@@ -18,7 +18,7 @@ twitter:
 
  with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-Today we take a look at a fix for the RvtVa3c custom exporter and a Forge issue related to Revit property access
+Today, we take a look at a fix for the RvtVa3c custom exporter and a Forge issue related to Revit property access
 &ndash; Pull metadata from RVT in BIM 360
 &ndash; Forge at AU class recordings 
 &ndash; RvtVa3c updated and issues fixed...
