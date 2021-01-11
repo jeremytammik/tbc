@@ -18,7 +18,10 @@ twitter:
 
  with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; ...
+Today we take a look at a fix for the RvtVa3c custom exporter and a Forge issue related to Revit property access
+&ndash; Pull metadata from RVT in BIM 360
+&ndash; Forge at AU class recordings 
+&ndash; RvtVa3c updated and issues fixed...
 
 linkedin:
 
@@ -44,11 +47,11 @@ above all, during the past weeks,
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas,
 continuing to provide tremendous help on the hard questions requiring both Revit API understanding and in-depth product usage experience.
 
-Meanwhile, for today, let's take a quick look at a Forge issue related to Revit property access:
+Meanwhile, for today, let's take a quick look at a fix for the RvtVa3c custom exporter and a Forge issue related to Revit property access:
 
-
-
-
+- [Pull metadata from RVT in BIM 360](#2)
+- [Forge at AU class recordings](#3)
+- [RvtVa3c updated and issues fixed](#4)
 
 ####<a name="2"></a> Pull Metadata from RVT in BIM 360
 
@@ -136,8 +139,6 @@ here are links to the Forge community blog articles and YouTube recordings:
 - [Forge for Civil Infrastructure](https://forge.autodesk.com/blog/forge-civil-infrastructure-au-continuous-learning) &ndash; [recording](https://youtu.be/bKlgSl60m_0)
 - [Forge Hackathon Showcase](https://forge.autodesk.com/blog/congrats-winners-forge-hackathon) &ndash; [recording](https://youtu.be/szsBtcYULuU)
 - [Forge Fire Faceoff](https://forge.autodesk.com/blog/forge-fire-faceoff-exclusively-autodesk-university) &ndash; [recording](https://youtu.be/ma1ImLjtrJ0)
-
-
 
 
 ####<a name="4"></a> RvtVa3c Updated and Issues Fixed
