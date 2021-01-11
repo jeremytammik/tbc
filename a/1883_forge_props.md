@@ -11,7 +11,9 @@
 - Forge at AU video links
   Sanjana Chand <sanjana.chand@autodesk.com>
 
-  
+- https://github.com/va3c/RvtVa3c/issues/18#issuecomment-748546481
+
+ 
 twitter:
 
  with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
@@ -34,15 +36,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Open Source Access All Forge Properties
+### Forge at AU and Open Source Property Access
 
 Many thanks to all the numerous brilliant contributors to
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160),
 above all, during the past weeks,
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas,
-continueing to provide tremendous help on the hard questions requiring both Revit API understanding and in-depth product usage experience.
+continuing to provide tremendous help on the hard questions requiring both Revit API understanding and in-depth product usage experience.
 
-Today, let's take a quick look at a Forge issue related to Revit property access:
+Meanwhile, for today, let's take a quick look at a Forge issue related to Revit property access:
 
 
 
@@ -59,117 +61,68 @@ However, I can see the required data with the model viewer API. I was informed t
 The data lives in Revit with in the sheet properties, in the section labeled identity data:
 
 <center>
-<img src="img/rvt_sheet_property_identity_data.png" alt="Revit sheet property identity data" title="Revit sheet property identity data" width="600"/> <!-- 783 -->
+<img src="img/rvt_sheet_property_identity_data.png" alt="Revit sheet property identity data" title="Revit sheet property identity data" width="405"/> <!-- 405 -->
 </center>
 
-.png
+**Answer:** Two quick comments off-hand:
 
-I have also CC’d my colleague Anna Roig because we are working together to get this done.
+First, I find it hard to believe that the Design Automation API requires `ngrok`. At least, I have never heard of such a requirement.
 
-Thank you,
+Secondly, and more to the point: the Forge viewer is basically open source.
+Everything that you can see in the viewer is available in the browser JavaScript environment.
+If you can see something in the viewer, you can access it yourself via JavaScript.
 
-Rene
+Conclusion: You can solve your task using JavaScript in the viewer.
+There is no need for the Design Automation API.
 
-Rene Chicas
-Project Data Specialist
-D +1 (973) 912 2458     
-rene.chicas@mottmac.com
+**Response:** Correct, the Design Automation API doesn’t need ngrok.
+I meant to say that it was needed for the example in the link that I included that Forge Support suggested using as a starting point.
+Sorry for the confusion.
 
------------------------------------------------------------------------
-Rene Chicas
- 
-Hi Jeremy,
+As for the Viewer API, I previously asked someone from a Forge program and they informed me that I would be able to see it but not extract it because that isn’t built into the API.
 
-Correct, the Design Automation API doesn’t need ngrok. I meant to say that it was needed for the example in the link that I included that Forge Support suggested using as a starting point. Sorry for the confusion.
+So, you’re saying if I manipulate the JavaScript in the Viewer API I would be able to automate and extract the fields I need within every Revit file on the project?
 
-As for the Viewer API, I previously asked someone from a Forge program and they informed me that I would be able to see it but not extract it because that isn’t built into the API. So you’re saying if I manipulate the JavaScript in the Viewer API I would be able to automate and extract the fields I need within every Revit file on the project?
+**Answer:** Yes indeed, afaik, you can use JavaScript in the Viewer API to access and manipulate all the model data, with no restriction, obviously also covering the fields within the Revit model you are interested in.
 
-Thank you for this information.
+For safety's sake, I asked my more knowledgeable colleagues to confirm.
+The development team confirmed my original statement:
 
-Rene
+**Question:** Can you please confirm (or not) one basic statement that I like making on JavaScript access to model data in the Forge Viewer: afaik, *you can use JavaScript in the Viewer API to access and manipulate all the model data, with no restriction*, obviously also covering the Revit sheet property identity data fields within the Revit model you are interested in. True or False?
 
-Rene Chicas
-Project Data Specialist
-D +1 (973) 912 2458     
-rene.chicas@mottmac.com
-
------------------------------------------------------------------------
-https://autodesk.slack.com/archives/C0LP63082/p1609944058268200
-
-Dear Team, can you please confirm (or not) one basic statement that I like making on JavaScript access to model data in the Forge Viewer: afaik, *you can use JavaScript in the Viewer API to access and manipulate all the model data, with no restriction*, obviously also covering the fields within the Revit model you are interested in. True or False? Thank you! -- zen ticket nr. 8252
-
------------------------------------------------------------------------
-Jeremy Tammik
-
-Hi Rene,
-
-Thank you for your clarification.
-
-As said, I am more focussed on working with the Revit .NET API, so I am not the perfect choice to address this person.
-
-And yes indeed, afaik, you can use JavaScript in the Viewer API to access and manipulate all the model data, with no restriction, obviously also covering the fields within the Revit model you are interested in.
-
-For safety's sake, I am asking my more knowledgeable colleagues to confirm.
-
-Best regards,
-
-Jeremy Tammik
-
------------------------------------------------------------------------
-https://autodesk.slack.com/archives/C0LP63082/p1609944058268200
-
-Augusto Goncalves
-
-they can find the correct statement inside the `viewer3d.js` source file:
+**Answer:** You can find the correct statement inside the `viewer3d.js` source file:
 
 > Autodesk Forge Viewer Usage Limitations:
 
-> The Autodesk Forge viewer can only be used to view files generated by Autodesk Forge services. The Autodesk Forge Viewer JavaScript must be delivered from an Autodesk hosted URL.
+> The Autodesk Forge viewer can only be used to view files generated by Autodesk Forge services.
+The Autodesk Forge Viewer JavaScript must be delivered from an Autodesk hosted URL.
 
-Stephen Preston
+The same text is available in the documentation, at the bottom of the [developer guide overview](https://forge.autodesk.com/en/docs/viewer/v7/developers_guide/overview).
 
-Its better to point them to the same text in the documentation, at the bottom of this page:
+**Response:** Thank you for that clarification.
 
-https://forge.autodesk.com/en/docs/viewer/v7/developers_guide/overview/
+However, it does not answer my question.
 
-Jeremy Tammik
+My question is: are all model properties that can be seen in the viewer also accessible via JavaScript?
+My assumption is YES.
+Is that correct?
 
-Thank you for the clarification @Augusto Goncalves and @Stephen Preston, and Happy New Year to you too, by the way.
+**Answer:** Yes, using
+the [`GET Properties` endpoint](https://forge.autodesk.com/en/docs/model-derivative/v2/reference/http/urn-metadata-guid-properties-GET).
 
-My question is: are all model properties that can be seen in the viewer also accessible via JavaScript? My assumption is YES. Is that correct?
-
-Augusto Goncalves
-
-yes, using the GET Properties endpoint:
-
-https://forge.autodesk.com/en/docs/model-derivative/v2/reference/http/urn-metadata-guid-properties-GET/
-
-Traian Stanev
-
-All properties can be accessed via JavaScript using `model.getProperties(elementID)`
+Furthermore, all properties can be accessed directly via JavaScript using `model.getProperties(elementID)`.
 
 They cannot be modified, the viewer (being a viewer) is read-only.
 
-If the model is already loaded, it's better to use the JS API, rather than the Forge REST API, because all properties are automatically downloaded by the viewer and available locally to the JS context.
+If the model is already loaded, it is better to use the JS API directly, rather than the Forge REST API, because all properties are automatically downloaded by the viewer and available locally to the JS context.
 
-Jeremy Tammik
+Conclusion, yet again, expanded and reinforced: you can use JavaScvript to access all properties visible in the Forge viewer.
 
-brilliant! mille grazie a tutti!
+Doing so will save you time, effort  and money:
 
------------------------------------------------------------------------
-
-**Question:** 
-
-<pre class="code">
-</pre>
-
-
-**Answer:** 
-
-
-
-
-**Response:** 
+- The properties are all already loaded
+- There is no need for additional Forge REST API programming effort
+- There are no Forge DA4R workitem costs associated
 
 
 ####<a name="3"></a> Forge at AU
@@ -187,5 +140,15 @@ here are links to the Forge community blog articles and YouTube recordings:
 
 
 
-####<a name="5"></a> 
+####<a name="4"></a> RvtVa3c Updated and Issues Fixed
 
+[Jake Staub](https://github.com/jpstaub) raised an issue
+with [RvtVa3c](https://github.com/va3c/RvtVa3c), 
+a Revit custom exporter add-in generating JSON output for the vA3C three.js AEC viewer:
+[Issue #18 &ndash; Filter parameters error in Revit 2020](https://github.com/va3c/RvtVa3c/issues/18).
+
+The error was easy to fix, presumably also
+resolving [Issue #17 &ndash; Error In Revit 2019](https://github.com/va3c/RvtVa3c/issues/17),
+and also prompting me to update the project to Revit 2021.
+
+Many thanks to Jake for raising the issue and confirming the fix.
