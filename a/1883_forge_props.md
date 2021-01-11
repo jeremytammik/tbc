@@ -16,7 +16,7 @@
  
 twitter:
 
- with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Forge at AU and open source property access with #JavaScript and the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://autode.sk/forgeopensourceproperty
 
 Today, we take a look at a fix for the RvtVa3c custom exporter and a Forge issue related to Revit property access
 &ndash; Pull metadata from RVT in BIM 360
@@ -24,6 +24,16 @@ Today, we take a look at a fix for the RvtVa3c custom exporter and a Forge issue
 &ndash; RvtVa3c updated and issues fixed...
 
 linkedin:
+
+Forge at AU and open source property access with #JavaScript and the #RevitAPI 
+
+http://autode.sk/forgeopensourceproperty
+
+Today, we take a look at a fix for the RvtVa3c custom exporter and a Forge issue related to Revit property access:
+
+- Pull metadata from RVT in BIM 360
+- Forge at AU class recordings 
+- RvtVa3c updated and issues fixed...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk 
 
