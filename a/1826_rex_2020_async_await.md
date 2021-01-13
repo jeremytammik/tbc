@@ -78,8 +78,8 @@ shared in the forum and here on the blog.
 
 The same situation arose again with Revit 2020, and here are the updated templates, samples and documentation for Revit 2020:
 
-- [REX SDK2020.ZIP](zip/REX SDK2020.ZIP)
-- [Structural Analysis SDK2020.zip](Structural Analysis SDK2020.zip)
+- [REX_SDK2020.ZIP](zip/REX_SDK2020.ZIP)
+- [Structural_Analysis_SDK2020.zip](Structural_Analysis_SDK2020.zip)
 
 **Response:** The REX SDK installed and is now working!
 
