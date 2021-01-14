@@ -25,8 +25,11 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+A quick look at various methods to integrate transient graphics into Revit and pointers to articles of interest on other current non-API-related topics such as chess AI, basic income and the effectiveness of lockdowns
+&ndash; Transient graphics
+&ndash; AI learns to emulate human-style chess
+&ndash; Basic income as fault-tolerant engineering
+&ndash; Lockdown effectivity...
 
 linkedin:
 
@@ -44,8 +47,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Title Block Geometry and Text</h3>
-<p>Today, I take a quick look at various methods to integrate transient graphics into Revit and point to articles of interest on other current non-API-related topics such as AI + chess, basic income and the effectiveness lockdowns:</p>
+<h3>Transient Graphics, Humane AI, BI and Lockdown</h3>
+<p>Today, I take a quick look at various methods to integrate transient graphics into Revit and point to articles of interest on other current non-API-related topics such as chess AI, basic income and the effectiveness of lockdowns:</p>
 <ul>
 <li><a href="#2">Transient graphics</a></li>
 <li><a href="#3">AI learns to emulate human-style chess</a></li>
@@ -58,7 +61,7 @@ the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API d
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-draw-transient-graphics-in-revit/m-p/10000065">how to draw transient graphics in Revit</a>:</p>
 <p><strong>Question:</strong> I want to draw 2D texts in a view, like Transient Graphics in AutoCAD.
 These texts draw upon all model elements and will not adapt their size when scaling the view.
-This can be applied to a situation such as when the grid names are outside of the view, the texts representing the grids display at the edge of view, so the user can easily know the current position while modeling.</p>
+This can be applied to a situation such as when the grid names are outside of the view, the texts representing the grids display at the edge of view, so the user can easily know the current position while modelling.</p>
 <p><strong>Answer:</strong> Two pieces of Revit API functionality come to mind: the older <a href="https://thebuildingcoder.typepad.com/blog/avf">Analysis Visualisation Framework or AVF</a> and the more recent DirectContext3D.</p>
 <p>AVF is designed for displaying structural and other analysis results on the BIM element faces.
 The Building Coder has presented numerous examples in the past, starting with the decade-old <a href="https://thebuildingcoder.typepad.com/blog/2012/02/revit-webcam-2012.html">Revit webcam</a>.</p>
@@ -75,6 +78,9 @@ basic usage</li>
 <p>For your use case, however, I can well imagine that a simpler and more effective solution can be implemented independently of Revit and its API, by making use of the native Windows API or .NET libraries.
 However, that lies outside my area of expertise, so I have no specific advice to offer in that area.
 Except: maybe you can simply use the <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-drawtext"><code>DrawText</code> function from <code>winuser.h</code></a>.</p>
+<p><center>
+<img src="img/andy_goldsworthy_leaves.jpg" alt="Transient nature art by Andy Goldsworthy" title="Transient nature art by Andy Goldsworthy" width="400"/> <!-- 800 -->
+</center></p>
 <h4><a name="3"></a> AI Learns to Emulate Human-Style Chess</h4>
 <p>The Microsoft Research Blog published an article
 on <a href="https://www.microsoft.com/en-us/research/blog/the-human-side-of-ai-for-chess">the human side of AI for chess</a> demonstrating
