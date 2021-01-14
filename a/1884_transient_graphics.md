@@ -76,8 +76,8 @@ basic usage
 - [IDirectContext3DServer and scene size](https://forums.autodesk.com/t5/revit-api-forum/idirectcontext3dserver-and-scene-size/m-p/9939322)
 
 For your use case, however, I can well imagine that a simpler and more effective solution can be implemented independently of Revit and its API, by making use of the native Windows API or .NET libraries.
-However, that lies outside my area of extertise, so I have no specific advice to offer in that area.
-Maybe you can simply use the [`DrawText` function from `winuser.h`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-drawtext).
+However, that lies outside my area of expertise, so I have no specific advice to offer in that area.
+Except: maybe you can simply use the [`DrawText` function from `winuser.h`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-drawtext).
 
 
 ####<a name="3"></a> Extracting Title Block Geometry and Text
