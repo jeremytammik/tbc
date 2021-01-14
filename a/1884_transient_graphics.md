@@ -34,6 +34,17 @@ A quick look at various methods to integrate transient graphics into Revit and p
 
 linkedin:
 
+AI emulating human-style chess, basic income as fault-tolerant engineering, lockdown effectivity and transient graphics with the #RevitAPI
+
+http://autode.sk/transientgfx
+
+A quick look at various methods to integrate transient graphics into Revit and pointers to articles of interest on other current non-API-related topics such as chess AI, basic income and the effectiveness of lockdowns:
+
+- Transient graphics
+- AI learns to emulate human-style chess
+- Basic income as fault-tolerant engineering
+- Lockdown effectivity...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk 
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
