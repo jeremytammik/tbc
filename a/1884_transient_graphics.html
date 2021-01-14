@@ -5,10 +5,8 @@
 </head></p>
 <!---
 
-- how to extract the geometry and the texts of the title block in a sheetview?
-  https://forums.autodesk.com/t5/revit-api-forum/how-to-extract-the-geometry-and-the-texts-of-the-title-block-in/m-p/9998687
-  /a/doc/revit/tbc/git/a/img/pm_sheet_view_text_geom.jpg
-  [XPS or the Open XML Paper Specification] https://en.wikipedia.org/wiki/Open_XML_Paper_Specification
+- How to draw transient graphics in Revit
+  https://forums.autodesk.com/t5/revit-api-forum/how-to-draw-transient-graphics-in-revit/td-p/10000065/jump-to/first-unread-message
 
 - The human side of AI for chess
   https://www.microsoft.com/en-us/research/blog/the-human-side-of-ai-for-chess/
@@ -17,12 +15,11 @@
   https://scottsantens.com/engineering-argument-for-unconditional-universal-basic-income-ubi-fault-tolerance-graceful-failure-redundancy
   Utilizing fault-tolerant design in critical life support systems
 
-- Assessing Mandatory Stay‐at‐Home and Business Closure Effects on the Spread of COVID‐19
+- Assessing Mandatory Stay-at-Home and Business Closure Effects on the Spread of COVID-19
   https://onlinelibrary.wiley.com/doi/10.1111/eci.13484
 
 - Stanford Studie mit Top Medizin-Wissenschaftler Ioannidis zeigt keinen Nutzen von Lockdowns
   https://tkp.at/2021/01/11/stanford-studie-mit-top-medizin-wissenschaftler-ioannidis-zeigt-keinen-nutzen-von-lockdowns/
-
 
 twitter:
 
@@ -48,6 +45,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Title Block Geometry and Text</h3>
+<p>Today, I take a quick look at various methods to integrate transient graphics into Revit and point to articles of interest on other current non-API-related topics such as AI + chess, basic income and the effectiveness lockdowns:</p>
+<ul>
+<li><a href="#2">Transient graphics</a></li>
+<li><a href="#3">AI learns to emulate human-style chess</a></li>
+<li><a href="#4">Basic income as fault-tolerant engineering</a></li>
+<li><a href="#5">Lockdown effectivity</a></li>
+</ul>
 <h4><a name="2"></a> Transient Graphics</h4>
 <p>Here is an answer I put together to address 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
@@ -71,60 +75,24 @@ basic usage</li>
 <p>For your use case, however, I can well imagine that a simpler and more effective solution can be implemented independently of Revit and its API, by making use of the native Windows API or .NET libraries.
 However, that lies outside my area of expertise, so I have no specific advice to offer in that area.
 Except: maybe you can simply use the <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-drawtext"><code>DrawText</code> function from <code>winuser.h</code></a>.</p>
-<h4><a name="3"></a> Extracting Title Block Geometry and Text</h4>
-<p>Here is an in-depth look at accessing, extracting and exporting title block geometry and text from 
-the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-extract-the-geometry-and-the-texts-of-the-title-block-in/m-p/9998687">how to extract the geometry and the texts of the title block in a sheetview</a>,
-with several very interesting insights provided once again by 
-Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas,
-e.g., an interesting possibility of programmatically exploiting the Revit print to <code>XPS</code> functionality:</p>
-<p><strong>Question:</strong> I want to extract all visible text and geometry in this image of a sheet view with its title block, including correct placement of all attributes:</p>
-<p><center>
-<img src="img/pm_sheet_view_text_geom.jpg" alt="Sheet view title block geometry and text" title="Sheet view title block geometry and text" width="500"/> <!-- 1154 -->
-</center></p>
-<p>To be more precise, I want to recreate an identical representation of the sheet view in my own exportable non-Revit document.</p>
-<p><strong>Answer:</strong> If you want to access the text and visible geometry to recreate a facsimile outside of Revit, you might be able to access text and geometry separately, e.g., using a filtered element collector for real data and a screen snapshot for the appearance.</p>
-<p>Most of the the text data can be accessed using built-in parameters.</p>
-<p>The Title Block is a Revit family, so its geometry can be accessed by reading it from the family definition.</p>
-<p>You can Filter for specific elements and retrieve their parameters, e.g., using:</p>
-<pre class="code">
-FilteredElementCollector collector = new FilteredElementCollector(document);
-ICollection<Element> lines = collector.OfClass(typeof(FamilyInstance)).OfCategory(BuiltInCategory.OST_Lines).ToElements();
-ICollection<Element> texts = collector.OfClass(typeof(FamilyInstance)).OfCategory(BuiltInCategory.OST_TextNotes).ToElements();
-ICollection<Element> filledRegions = collector.OfClass(typeof(FamilyInstance)).OfCategory(BuiltInCategory.OST_FilledRegion).ToElements();
-//etc.
-</pre>
-
-<p><strong>Response:</strong> Yes, I want to create a facsimile outside of Revit.</p>
-<p>I managed to extract the content of the views that compose it but at real size and not yet find how to extract the cartridge and its content.</p>
-<p>The solution you suggest above does not work, the filtered element collector result lists are empty.</p>
-<p><strong>Answer:</strong> As always, you can use RevitLookup to analyse the properties and other attributes of the Revit elements you are trying to retrieve with the filtered element collector.
-That will show you which filters you need to apply to extract the desired elements.
-If the filter returns no elements, you are applying too restrictive or downright erroneous filters.</p>
-<p><strong>Response:</strong> On the FamilyInstance of my ViewSheet, it finds neither <code>OST_Lines</code> nor <code>OST_TextNodes</code> (for the extract the Title Block).</p>
-<p>Do you have a filter syntax that could find them ?</p>
-<p><strong>Answer:</strong> The most efficient way to define such a filter is for you to pick the elements you are filtering for and explore their properties using RevitLookup, cf., <a href="https://thebuildingcoder.typepad.com/blog/2017/01/virtues-of-reproduction-research-mep-settings-ontology.html#3">how to research to find a Revit API solution</a>.</p>
-<p><strong>Response:</strong> I have already explored the viewsheet and the associated family instance as well as the symbol and the family.
-None has geometry.</p>
-<p><strong>Answer:</strong> The family definition document of the title block will contain the geometry.
-You have to open the family for editing.
-It may have various nested annotation symbols that also need to be traversed.</p>
-<p>Besides that, there is the issue of items such as images and schedules.</p>
-<p>It would probably be easier to read the fixed document sequence of a printed <code>xps</code> file, cf.,
-<a href="https://en.wikipedia.org/wiki/Open_XML_Paper_Specification">XPS or the Open XML Paper Specification</a>.</p>
-<p>This is an XML file containing path data represented in a mini language similar to what you get in <code>Xaml</code> and 'Glyphs' entries for text objects with render transforms to give their positions.
-It takes a while to print an XPS, but if it is only the title block, it may be quicker.
-You would still have to interpret the xml, but, as difficult to impossible tasks go, it is slightly less impossible.</p>
-<p><code>XPS</code> is a <code>zip</code> file; change the extension to <code>Zip</code> and unpack it, or, alternatively, there are namespaces for reading packages for such directly (System.IO.Packaging).</p>
-<p>I don't envy your task, I usually just print a <code>pdf</code> when I want a copy of something.</p>
-<p><code>HPGL</code> is another historic plotter vector format that could be easily interpreted.</p>
-<p><strong>Response:</strong> My project is to export a viewsheet in <code>svg</code> format.
-Currently, my code correctly exports all viewports, but I still have the title block (drawing and data) to export.
-If I understand correctly, there is no way to export the title block (curve and position of the data)?</p>
-<p><strong>Answer:</strong> As you've noted, <code>Element.Geometry</code> is null for title blocks.</p>
-<p>The only approach I know of with the Revit API would be to open the title block family using <code>Document.EditFamily</code> and extract such lines from the plan view within that. As noted above, however, this family could also contain revision schedule that you can't extract lines from and other nested generic annotation families and images. The parameter text values would not be correct, but from the text strings used in Labels and parameter names you can sometimes infer such a relationship (between text locations in your title block family and positions on your ViewSheet in the project). If label has a preview parameter value (which is often the case), then this can't be done. Also, the placement of multiple parameters with line breaks etc. in the same label add to complexity. You don't get a description of these with the API (which parameters used in which label).</p>
-<p>Ideally, this task would be suited to <code>CustomExporter</code>, but I believe from previous discussions that this doesn't support ViewSheets.</p>
-<p><code>XLST</code> could potentially be used to convert the <code>XPS</code> path data previously noted to <code>SVG</code>, although I know of no existing templates for such.</p>
-<p>Another potential long winded option would be to export the sheet with only the title block showing to <code>DWG</code> and import that on a drafting view to analyse the geometry. Not sure it is a good option, but could be done. DWG links favour polylines: any lines of the same layer joined together will be grouped into polylines. Text object positions could only be found by exploding the dwg (not sure if there is API function for that).</p>
-<h4><a name="3"></a></h4>
-<h4><a name="4"></a></h4>
+<h4><a name="3"></a> AI Learns to Emulate Human-Style Chess</h4>
+<p>The Microsoft Research Blog published an article
+on <a href="https://www.microsoft.com/en-us/research/blog/the-human-side-of-ai-for-chess">the human side of AI for chess</a> demonstrating
+how AI can be taught to emulate human moves rather than the 'non-human' style developed by pure self-learning AI implementations.</p>
+<h4><a name="4"></a> Basic Income as Fault-Tolerant Engineering</h4>
+<p>Scott Santens
+presents <a href="https://scottsantens.com/engineering-argument-for-unconditional-universal-basic-income-ubi-fault-tolerance-graceful-failure-redundancy">an engineering argument for basic income</a> based
+on the fundamental engineering principle of utilising fault-tolerant design in critical life support systems.</p>
+<h4><a name="5"></a> Lockdown Effectivity</h4>
+<p>Lockdown effectivity is scientifically analysed in a peer-reviewed article in
+the European Journal of Clinical Investigation (EJCI)
+on <a href="https://onlinelibrary.wiley.com/doi/10.1111/eci.13484">Assessing Mandatory Stay-at-Home and Business Closure Effects on the Spread of COVID-19</a>,
+concluding that:</p>
+<blockquote>
+<p>While small benefits cannot be excluded, we do not find significant benefits on case growth of more restrictive NPIs.
+Similar reductions in case growth may be achievable with less restrictive interventions.</p>
+</blockquote>
+<!--
+Stanford Studie mit Top Medizin-Wissenschaftler Ioannidis zeigt keinen Nutzen von Lockdowns
+https://tkp.at/2021/01/11/stanford-studie-mit-top-medizin-wissenschaftler-ioannidis-zeigt-keinen-nutzen-von-lockdowns/
+-->
