@@ -45,7 +45,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Title Block Geometry and Text
+### Transient Graphics, Humane AI, BI and Lockdown
 
 Today, I take a quick look at various methods to integrate transient graphics into Revit and point to articles of interest on other current non-API-related topics such as AI + chess, basic income and the effectiveness lockdowns:
 
@@ -62,7 +62,7 @@ on [how to draw transient graphics in Revit](https://forums.autodesk.com/t5/revi
 
 **Question:** I want to draw 2D texts in a view, like Transient Graphics in AutoCAD.
 These texts draw upon all model elements and will not adapt their size when scaling the view.
-This can be applied to a situation such as when the grid names are outside of the view, the texts representing the grids display at the edge of view, so the user can easily know the current position while modeling.
+This can be applied to a situation such as when the grid names are outside of the view, the texts representing the grids display at the edge of view, so the user can easily know the current position while modelling.
 
 **Answer:** Two pieces of Revit API functionality come to mind: the older [Analysis Visualisation Framework or AVF](https://thebuildingcoder.typepad.com/blog/avf) and the more recent DirectContext3D.
 
@@ -82,6 +82,10 @@ basic usage
 For your use case, however, I can well imagine that a simpler and more effective solution can be implemented independently of Revit and its API, by making use of the native Windows API or .NET libraries.
 However, that lies outside my area of expertise, so I have no specific advice to offer in that area.
 Except: maybe you can simply use the [`DrawText` function from `winuser.h`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-drawtext).
+
+<center>
+<img src="img/andy_goldsworthy_leaves.jpg" alt="Transient nature art by Andy Goldsworthy" title="Transient nature art by Andy Goldsworthy" width="400"/> <!-- 800 -->
+</center>
 
 ####<a name="3"></a> AI Learns to Emulate Human-Style Chess
 
