@@ -11,6 +11,12 @@
   /a/doc/revit/tbc/git/a/img/pm_sheet_view_text_geom.jpg
   [XPS or the Open XML Paper Specification] https://en.wikipedia.org/wiki/Open_XML_Paper_Specification
 
+- Getting element coordiantes on sheet 
+  https://forums.autodesk.com/t5/revit-api-forum/getting-element-coordiantes-on-sheet/m-p/9989539#M52411
+
+- Export 2d sheets as images with high quality
+  https://forums.autodesk.com/t5/revit-api-forum/export-2d-sheets-as-images-with-high-quality/m-p/9989471#M52410
+
 twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
