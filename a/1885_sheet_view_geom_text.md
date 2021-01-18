@@ -36,8 +36,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Title Block Geometry and Text
 
-
-
 ####<a name="3"></a> Extracting Title Block Geometry and Text
 
 Here is an in-depth look at accessing, extracting and exporting title block geometry and text from 
@@ -123,6 +121,109 @@ Ideally, this task would be suited to `CustomExporter`, but I believe from previ
 
 Another potential long winded option would be to export the sheet with only the title block showing to `DWG` and import that on a drafting view to analyse the geometry. Not sure it is a good option, but could be done. DWG links favour polylines: any lines of the same layer joined together will be grouped into polylines. Text object positions could only be found by exploding the dwg (not sure if there is API function for that).
 
+**Response:** I confirm that `CustomExporter2D` does not work on ViewSheets.
+
+I tested the other approach:
+
+<pre class="code">
+// vs = current view (Viewsheet)
+
+Element El = Doc.GetElement(vs.Id);
+FamilyInstance FI = null;
+foreach (ElementId ElI in El.GetDependentElements(null))
+{
+Element El1 = El.Document.GetElement(ElI);
+FI = El1 as FamilyInstance;
+if (FI != null)
+break;
+}
+FamilySymbol FS = FI.Symbol;
+Document DocFamily = Doc.EditFamily(FS.Family);
+FamilyManager famManager = DocFamily.FamilyManager;
+FamilyTypeSet famTypes = famManager.Types;
+int nb = famTypes.Size;
+
+FilteredElementCollector collector = new FilteredElementCollector(DocFamily);
+ICollection<Element> Elems = collector.ToElements();
+
+foreach (Element ElF in Elems)
+{
+DetailLine line = ElF as DetailLine;
+
+if (line != null)
+{
+Curve curve = line.GeometryCurve;
+Line LI = (Line)curve;
+
+if (LI != null)
+{
+double XD = (LI.GetEndPoint(0).X * 25.4 * 12);
+double YD = (LI.GetEndPoint(0).Y * 25.4 * 12);
+double XF = (LI.GetEndPoint(1).X * 25.4 * 12);
+double YF = (LI.GetEndPoint(1).Y * 25.4 * 12);
+Deb.Write(" <line x1=\"{0}\" y1=\"{1}\" x2=\"{2}\" y2=\"{3}\" style=\"stroke-width:{4}; stroke:rgb({5}, {6}, {7})\" {8}/>\n",
+XD, V - YD, XF, V - YF, 1, 0, 0, 0, "");
+}
+}
+else
+TaskDialog.Show("Test", "No Line");
+}
+</pre>
+
+This code extract only 33 lines and nothing else.
+
+How to have access to the text positions?
+
+
+<center>
+<img src="img/pm_sheet_view_text_geom_2.jpg" alt="Sheet view title block geometry and text" title="Sheet view title block geometry and text" width="500"/> <!-- 1154 -->
+</center>
+
+**Answer:** Your code extracts nothing but lines, because that is exactly what you have instructed it to do.
+
+You can expand you code to analyse other elements besides lines.
+
+Alternatively, and probably more effectively, you can analyse your family definition document interactively using RevitLookup to discover what other elements it contains.
+
+**Response:** This family is internal (A0 metric).
+
+How can I use RevitLookup to explore this family?
+
+<center>
+<img src="img/pm_sheet_view_text_geom_3.jpg" alt="Snoop title block family" title="Snoop title block family" width="500"/> <!-- 1154 -->
+</center>
+
+**Answer:** Application &gt; Documents &gt; select the family definition document.
+
+**Response:** Ok, i found some `TextNode`, `TextElement` and `ImageInstance` elements.
+
+But, my filters are not working.
+
+Is there any documentation of element filtering?
+
+My code:
+
+<pre class="code">
+FilteredElementCollector collector = new FilteredElementCollector(DocFamily);
+ICollection<Element> lines = collector.OfCategory(BuiltInCategory.OST_Lines).ToElements();
+ICollection<Element> texts = collector.OfClass(typeof(TextNote)).ToElements();
+</pre>
+
+They return no elements.
+
+Where is the error?
+
+**Answer:** You really do need to learn to search the Internet.
+
+In this case, for instance, you can just search
+for [Revit API filtered element collector](https://duckduckgo.com/?q=revit+api+filtered+element+collector).
+
+Please practice this for a bit before asking the next question.
+
+The specific problem that you ran into was discussed in the note
+on [reinitialising the filtered element collector](https://thebuildingcoder.typepad.com/blog/2019/11/design-automation-api-stacks-collectors-and-links.html#4).
+
+Happily, that seems to have resolved the problem.
 
 ####<a name="3"></a>
 
