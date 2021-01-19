@@ -20,7 +20,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+An especially interesting AEC focused Forge accelerator is coming up named Waldspirale, and how to handle #RevitAPI add-in language resources via internationalisation using .NET language resources @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://autode.sk/aecforgeaccelerator
 
 An especially interesting Forge accelerator is coming up, and how to handle Revit add-in language resources
 &ndash; Upcoming Forge accelerators
