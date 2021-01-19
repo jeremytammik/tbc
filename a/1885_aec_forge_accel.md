@@ -22,8 +22,10 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+An especially interesting Forge accelerator is coming up, and how to handle Revit add-in language resources
+&ndash; Upcoming Forge accelerators
+&ndash; AEC focused Forge accelerator Waldspirale
+&ndash; Internationalisation using .NET language resources...
 
 linkedin:
 
@@ -43,7 +45,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### I18n, Forge Accelerators, AEC and BIM360 Focus
 
-An especially intresting Forge accelerator is coming up, and how to handle Revit add-in language resources:
+An especially interesting Forge accelerator is coming up, and how to handle Revit add-in language resources:
 
 - [Upcoming Forge accelerators](#2)
 - [AEC focused Forge accelerator Waldspirale](#3)
