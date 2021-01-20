@@ -47,7 +47,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Here is an in-depth look at accessing, extracting and exporting title block geometry and text from 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [how to extract the geometry and the texts of the title block in a sheetview](https://forums.autodesk.com/t5/revit-api-forum/how-to-extract-the-geometry-and-the-texts-of-the-title-block-in/m-p/9998687),
-with several very interesting insights provided once again by 
+with several interesting new insights provided once again by 
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas,
 e.g., an interesting possibility of programmatically exploiting the Revit print to `XPS` functionality:
 
@@ -229,7 +229,8 @@ Please practice this for a bit before asking the next question.
 The specific problem that you ran into was discussed in the note
 on [reinitialising the filtered element collector](https://thebuildingcoder.typepad.com/blog/2019/11/design-automation-api-stacks-collectors-and-links.html#4).
 
-Happily, that seems to have resolved the problem.
+Happily, that seems to have resolved the problem for the moment, with no further response so far.
+
 
 ####<a name="3"></a> Element Coordinates on Sheet
 
@@ -240,11 +241,9 @@ on [Getting element coordinates on sheet](https://forums.autodesk.com/t5/revit-a
 
 To cut a long story short, here is his final answer:
 
-I think you have just wrongly assumed the other two points of the bounding box i.e. two points represent more than one unique rectangle. If you get all four points of the bounding box corners on plan without transformation and then transform them you can draw lines between them as below. I think what confused me when I looked at this originally was the double door families. Note however that in the case of the sample file all doors were parallel with the internal coordinate system. If your door instances were rotated (hosted on a non vertical or horizontal directional wall) the bounding box would still be orientated to the internal system not rotated with the door. So that aspect may add a layer of confusion, you would have to orientate the bounding box using the door instance transform first. This may not be possible actually since original two points circumscribe door with a box parallel to internal system, so when rotated this would be meaningless. In such a circumstance you likely need to build your own bounding box within the new orientation by looking at max/mins you get for the geometry in the new system.
+> I think you have just wrongly assumed the other two points of the bounding box i.e. two points represent more than one unique rectangle. If you get all four points of the bounding box corners on plan without transformation and then transform them you can draw lines between them as below. I think what confused me when I looked at this originally was the double door families. Note however that in the case of the sample file all doors were parallel with the internal coordinate system. If your door instances were rotated (hosted on a non vertical or horizontal directional wall) the bounding box would still be orientated to the internal system not rotated with the door. So that aspect may add a layer of confusion, you would have to orientate the bounding box using the door instance transform first. This may not be possible actually since original two points circumscribe door with a box parallel to internal system, so when rotated this would be meaningless. In such a circumstance you likely need to build your own bounding box within the new orientation by looking at max/mins you get for the geometry in the new system.
 
- 
-
-You can't get the rotation of a scope box but if you set a view to one then you can compare 1,0,0 to the right direction of the view to get scope box rotation. This should not be required here because the view right direction is used so transform should already incorporate it. Useful to know however that the orientation of a scope box can be found this way (using one of those transaction rollback workflows). The alternative may be to interrogate the geometry of the scope box to find direction of lines around the scope box bounding box centre (for the top or bottom rectangle of the cube). Although you likely couldn't get a full roation between 0 and 2Pi for this due to symmetry. Depends on how geometry of cube is constructed in terms of line directions there may be some non symmetrical patterm of this (looking at all 12 lines etc.).
+> You can't get the rotation of a scope box but if you set a view to one then you can compare 1,0,0 to the right direction of the view to get scope box rotation. This should not be required here because the view right direction is used so transform should already incorporate it. Useful to know however that the orientation of a scope box can be found this way (using one of those transaction rollback workflows). The alternative may be to interrogate the geometry of the scope box to find direction of lines around the scope box bounding box centre (for the top or bottom rectangle of the cube). Although you likely couldn't get a full roation between 0 and 2Pi for this due to symmetry. Depends on how geometry of cube is constructed in terms of line directions there may be some non symmetrical patterm of this (looking at all 12 lines etc.).
 
 <center>
 <img src="img/element_coordinates_on_sheet.png" alt="Element coordinates on sheet" title="Element coordinates on sheet" width="600"/> <!-- 1013 -->
@@ -277,13 +276,12 @@ Doc.Create.NewDetailCurve(AcView, LN_L)
 ####<a name="4"></a> Export 2D Sheet as High Quality Image
 
 Another interested thread addressed by Richard is on how
-to [export 2D sheets as images with high quality](https://forums.autodesk.com/t5/revit-api-forum/export-2d-sheets-as-images-with-high-quality/m-p/9989471).
-
-Wraping up with
+to [export 2D sheets as images with high quality](https://forums.autodesk.com/t5/revit-api-forum/export-2d-sheets-as-images-with-high-quality/m-p/9989471),
+wrapping up with
 
 > Without the annotation objects visible here are two images of the same view (not from exports); the top is set to 1:1000 and the bottom 1:200.
 
-The line weights are scaled in relation to paper space units, so if you set to 1:1 etc., then your lines end up thinner, which may carry through to images exported if you can temporarily set this before export:
+> The line weights are scaled in relation to paper space units, so if you set to 1:1 etc., then your lines end up thinner, which may carry through to images exported if you can temporarily set this before export:
 
 <center>
 <img src="img/export_sheet_as_image_1.png" alt="Sheet as image" title="Sheet as image" width="600"/> <!-- 769 -->
