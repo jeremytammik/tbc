@@ -29,7 +29,15 @@ An especially interesting Forge accelerator is coming up, and how to handle Revi
 
 linkedin:
 
-#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk 
+An especially interesting AEC focused Forge accelerator is coming up named Waldspirale, and how to handle #RevitAPI add-in language resources via internationalisation using .NET language resources
+
+http://autode.sk/aecforgeaccelerator
+
+- Upcoming Forge accelerators
+- AEC focused Forge accelerator Waldspirale
+- Internationalisation using .NET language resources...
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 
