@@ -10,8 +10,10 @@ twitter:
 
  #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
+The wish to be able to programmatically access and modify sketch-based elements is long-standing, e.g., for editing an existing slab boundary.
+Here is an invitation to take a look at the Revit Preview (aka beta), offering a chance to provide feedback on several new sketch-based element creation and editing APIs...
+
 &ndash; 
-...
 
 linkedin:
 
@@ -36,7 +38,7 @@ The wish to be able to programmatically access and modify sketch-based elements 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [editing an existing slab boundary](https://forums.autodesk.com/t5/revit-api-forum/edit-existing-slab-boundary/m-p/10014819).
 
-Oleg Sheydvasser, Software Architect in the Revit development team, just joined that conversation to announce an invitation to take a look at the preview of the upcoming next release of Revit, which offers several new sketch-based element creation and editing APIs:
+Oleg Sheydvasser, Software Architect in the Revit development team, just joined that conversation to announce an invitation to take a look at the Revit Preview (aka beta), offering a chance to provide feedback on several new sketch-based element creation and editing APIs:
 
 - <a href="https://feedback.autodesk.com/project/forum/thread.html?cap=cb0fd5af18bb49b791dfa3f5efc47a72&amp;forid=%7b057e532f-e478-43d9-affc-01b3deb82a76%7d&amp;topid=%7b41E11E18-938F-4260-8190-3C3227B9C5FA%7d">Ceiling creation API</a>
 - <a href="https://feedback.autodesk.com/project/forum/thread.html?cap=cb0fd5af18bb49b791dfa3f5efc47a72&amp;forid=%7b057e532f-e478-43d9-affc-01b3deb82a76%7d&amp;topid=%7b2B45F2E2-F58F-4FC3-9518-50D8E34C4394%7d">Sloped Ceiling creation API</a>
@@ -46,32 +48,15 @@ Oleg Sheydvasser, Software Architect in the Revit development team, just joined 
 - <a href="https://feedback.autodesk.com/project/forum/thread.html?cap=cb0fd5af18bb49b791dfa3f5efc47a72&amp;forid=%7b057e532f-e478-43d9-affc-01b3deb82a76%7d&amp;topid=%7bBD054C86-FFAA-442F-88D0-CAEFA1D89221%7d">Floor Sketch editing API</a>
 - <a href="https://feedback.autodesk.com/project/forum/thread.html?cap=cb0fd5af18bb49b791dfa3f5efc47a72&amp;forid=%7b057e532f-e478-43d9-affc-01b3deb82a76%7d&amp;topid=%7bF15302E9-CC66-4BB3-8168-23D615E94558%7d">Wall and Shaft Opening Sketch editing API</a>
 
-To join the Revit Preview program, please [email revit.preview.access@autodesk.com](mailto:revit.preview.access@autodesk.com).
+The Revit Preview is part of the Autodesk Feedback Community, offering opportunities to provide feedback on future development features.
 
-I am looking forward to seeing you there, and the Revit development team is looking forward to your feedback on these new powerful programming possibilities.
+To join the Revit Preview program, please
 
+<p style="text-align: center"><a href="mailto:revit.preview.access@autodesk.com">email revit.preview.access@autodesk.com</a>.</p>
 
-Oleg Sheydvasser, Software Architect in the Revit development team, just joined that conversation to announce an invitation to take a look at the Revit Preview (aka beta), which offers a chance to provide feedback on several new sketch-based element creation and editing APIs:
+If you are an ADN member, you can also access it through the ADN member portal via the link Software &rarr; Beta Portal.
 
-- Ceiling creation API
-- Sloped Ceiling creation API
-- Floor creation API
-- Get Sketch elements API
-- Sketch Edit Mode API
-- Floor Sketch editing API
-- Wall and Shaft Opening Sketch editing API
-
-If you are not already a member, the Revit Preview is an opportunity to provide feedback on features in development.
-
-To join the Revit Preview program, please email revit.preview.access@autodesk.com 
-
-If you are an ADN member, you can also access it through the ADN member portal via the link Software &rarr; Beta Portal
-
-I am looking forward to seeing you there, and the Revit development team is looking forward to your feedback on these new powerful programming possibilities.
-
-
-
-
+I am looking forward to seeing you there, and the Revit development team is looking forward to your feedback on these new powerful Revit programming possibilities.
 
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas already shared a first reaction: 
 
@@ -85,5 +70,5 @@ Those items seem like a great step forward towards that aim.
 > Now we just need to find out how to create and edit a scope box...
 
 <center>
-<img src="img/feedback_community_preview_release.png" alt="Feedback Community Previe Release" title="Feedback Community Previe Release" width="600"/> <!-- 2516 -->
+<img src="img/feedback_community_preview_release.png" alt="Feedback Community Preview Release" title="Feedback Community Preview Release" width="600"/> <!-- 2516 -->
 </center>
