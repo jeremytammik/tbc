@@ -28,7 +28,17 @@ Today, we look at accessing and exporting sheet view coordinates, transforms, im
 
 linkedin:
 
-#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk 
+Accessing and exporting sheet view coordinates, transforms, images and title block data, including the title block geometry and text values with the #RevitAPI
+
+http://autode.sk/exportsheetview
+
+Today, we look at accessing and exporting sheet view coordinates, transforms, images and title block data, including the title block geometry and text values:
+
+- Extracting title block geometry and text
+- Element coordinates on sheet
+- Export 2D sheet as high quality image...
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 
