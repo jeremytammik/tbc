@@ -50,6 +50,29 @@ To join the Revit Preview program, please [email revit.preview.access@autodesk.c
 
 I am looking forward to seeing you there, and the Revit development team is looking forward to your feedback on these new powerful programming possibilities.
 
+
+Oleg Sheydvasser, Software Architect in the Revit development team, just joined that conversation to announce an invitation to take a look at the Revit Preview (aka beta), which offers a chance to provide feedback on several new sketch-based element creation and editing APIs:
+
+- Ceiling creation API
+- Sloped Ceiling creation API
+- Floor creation API
+- Get Sketch elements API
+- Sketch Edit Mode API
+- Floor Sketch editing API
+- Wall and Shaft Opening Sketch editing API
+
+If you are not already a member, the Revit Preview is an opportunity to provide feedback on features in development.
+
+To join the Revit Preview program, please email revit.preview.access@autodesk.com 
+
+If you are an ADN member, you can also access it through the ADN member portal via the link Software &rarr; Beta Portal
+
+I am looking forward to seeing you there, and the Revit development team is looking forward to your feedback on these new powerful programming possibilities.
+
+
+
+
+
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas already shared a first reaction: 
 
 > Those titles look like exciting additions to the API.
