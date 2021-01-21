@@ -21,8 +21,10 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Today, we look at accessing and exporting sheet view coordinates, transforms, images and title block data, including the title block geometry and text values
+&ndash; Extracting title block geometry and text
+&ndash; Element coordinates on sheet
+&ndash; Export 2D sheet as high quality image...
 
 linkedin:
 
@@ -40,9 +42,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Sheet Xform, Coords, Export and Title Block
+### Sheet View Xform, Coords, Img Export and Title Block
 
-Today, let's take a look at some conversations on accessing and exporting sheet view and title block data, including the geometry and the text values:
+Today, we look at accessing and exporting sheet view coordinates, transforms, images and title block data, including the title block geometry and text values:
 
 - [Extracting title block geometry and text](#2)
 - [Element coordinates on sheet](#3)
