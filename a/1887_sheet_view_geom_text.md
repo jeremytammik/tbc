@@ -40,16 +40,22 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Sheet Export, Coords and Title Block Data
+### Sheet Xform, Coords, Export and Title Block
+
+Today, let's take a look at some conversations on accessing and exporting sheet view and title block data, including the geometry and the text values:
+
+- [Extracting title block geometry and text](#2)
+- [Element coordinates on sheet](#3)
+- [Export 2D sheet as high quality image](#4)
 
 ####<a name="2"></a> Extracting Title Block Geometry and Text
 
-Here is an in-depth look at accessing, extracting and exporting title block geometry and text from 
+Here is a lengthy in-depth look at accessing, extracting and exporting title block geometry and text from 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [how to extract the geometry and the texts of the title block in a sheetview](https://forums.autodesk.com/t5/revit-api-forum/how-to-extract-the-geometry-and-the-texts-of-the-title-block-in/m-p/9998687),
 with several interesting new insights provided once again by 
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas,
-e.g., an interesting possibility of programmatically exploiting the Revit print to `XPS` functionality:
+e.g., the possibility of programmatically exploiting the Revit print to `XPS` functionality:
 
 **Question:** I want to extract all visible text and geometry in this image of a sheet view with its title block, including correct placement of all attributes:
 
@@ -68,11 +74,25 @@ The Title Block is a Revit family, so its geometry can be accessed by reading it
 You can Filter for specific elements and retrieve their parameters, e.g., using:
 
 <pre class="code">
-FilteredElementCollector collector = new FilteredElementCollector(document);
-ICollection<Element> lines = collector.OfClass(typeof(FamilyInstance)).OfCategory(BuiltInCategory.OST_Lines).ToElements();
-ICollection<Element> texts = collector.OfClass(typeof(FamilyInstance)).OfCategory(BuiltInCategory.OST_TextNotes).ToElements();
-ICollection<Element> filledRegions = collector.OfClass(typeof(FamilyInstance)).OfCategory(BuiltInCategory.OST_FilledRegion).ToElements();
-//etc.
+&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;document&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;lines&nbsp;=&nbsp;collector
+&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">FamilyInstance</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.OfCategory(&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Lines&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.ToElements();
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;texts&nbsp;=&nbsp;collector
+&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">FamilyInstance</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.OfCategory(&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_TextNotes&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.ToElements();
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;filledRegions&nbsp;=&nbsp;collector
+&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">FamilyInstance</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.OfCategory(&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_FilledRegion&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.ToElements();
+ 
+&nbsp;&nbsp;<span style="color:green;">//etc.</span>
 </pre>
 
 **Response:** Yes, I want to create a facsimile outside of Revit.
@@ -132,48 +152,49 @@ Another potential long winded option would be to export the sheet with only the 
 I tested the other approach:
 
 <pre class="code">
-// vs = current view (Viewsheet)
-
-Element El = Doc.GetElement(vs.Id);
-FamilyInstance FI = null;
-foreach (ElementId ElI in El.GetDependentElements(null))
-{
-Element El1 = El.Document.GetElement(ElI);
-FI = El1 as FamilyInstance;
-if (FI != null)
-break;
-}
-FamilySymbol FS = FI.Symbol;
-Document DocFamily = Doc.EditFamily(FS.Family);
-FamilyManager famManager = DocFamily.FamilyManager;
-FamilyTypeSet famTypes = famManager.Types;
-int nb = famTypes.Size;
-
-FilteredElementCollector collector = new FilteredElementCollector(DocFamily);
-ICollection<Element> Elems = collector.ToElements();
-
-foreach (Element ElF in Elems)
-{
-DetailLine line = ElF as DetailLine;
-
-if (line != null)
-{
-Curve curve = line.GeometryCurve;
-Line LI = (Line)curve;
-
-if (LI != null)
-{
-double XD = (LI.GetEndPoint(0).X * 25.4 * 12);
-double YD = (LI.GetEndPoint(0).Y * 25.4 * 12);
-double XF = (LI.GetEndPoint(1).X * 25.4 * 12);
-double YF = (LI.GetEndPoint(1).Y * 25.4 * 12);
-Deb.Write(" <line x1=\"{0}\" y1=\"{1}\" x2=\"{2}\" y2=\"{3}\" style=\"stroke-width:{4}; stroke:rgb({5}, {6}, {7})\" {8}/>\n",
-XD, V - YD, XF, V - YF, 1, 0, 0, 0, "");
-}
-}
-else
-TaskDialog.Show("Test", "No Line");
-}
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;vs&nbsp;=&nbsp;current&nbsp;view&nbsp;(Viewsheet)</span>
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;El&nbsp;=&nbsp;doc.GetElement(&nbsp;vs.Id&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">FamilyInstance</span>&nbsp;FI&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">ElementId</span>&nbsp;ElI&nbsp;<span style="color:blue;">in</span>&nbsp;El.GetDependentElements(&nbsp;<span style="color:blue;">null</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;El1&nbsp;=&nbsp;El.Document.GetElement(&nbsp;ElI&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;FI&nbsp;=&nbsp;El1&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">FamilyInstance</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;FI&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">break</span>;
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:#2b91af;">FamilySymbol</span>&nbsp;FS&nbsp;=&nbsp;FI.Symbol;
+&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;DocFamily&nbsp;=&nbsp;doc.EditFamily(&nbsp;FS.Family&nbsp;);
+&nbsp;&nbsp;<span style="color:#2b91af;">FamilyManager</span>&nbsp;famManager&nbsp;=&nbsp;DocFamily.FamilyManager;
+&nbsp;&nbsp;<span style="color:#2b91af;">FamilyTypeSet</span>&nbsp;famTypes&nbsp;=&nbsp;famManager.Types;
+&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;nb&nbsp;=&nbsp;famTypes.Size;
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;docFamily&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;ElF&nbsp;<span style="color:blue;">in</span>&nbsp;collector&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">DetailLine</span>&nbsp;line&nbsp;=&nbsp;ElF&nbsp;<span style="color:blue;">as</span>&nbsp;<span style="color:#2b91af;">DetailLine</span>;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;line&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Curve</span>&nbsp;curve&nbsp;=&nbsp;line.GeometryCurve;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;LI&nbsp;=&nbsp;(<span style="color:#2b91af;">Line</span>)&nbsp;curve;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;LI&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;XD&nbsp;=&nbsp;(LI.GetEndPoint(&nbsp;0&nbsp;).X&nbsp;*&nbsp;25.4&nbsp;*&nbsp;12);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;YD&nbsp;=&nbsp;(LI.GetEndPoint(&nbsp;0&nbsp;).Y&nbsp;*&nbsp;25.4&nbsp;*&nbsp;12);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;XF&nbsp;=&nbsp;(LI.GetEndPoint(&nbsp;1&nbsp;).X&nbsp;*&nbsp;25.4&nbsp;*&nbsp;12);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;YF&nbsp;=&nbsp;(LI.GetEndPoint(&nbsp;1&nbsp;).Y&nbsp;*&nbsp;25.4&nbsp;*&nbsp;12);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Deb.Write(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;&nbsp;&lt;line&nbsp;x1=\&quot;{0}\&quot;&nbsp;y1=\&quot;{1}\&quot;&nbsp;x2=\&quot;{2}\&quot;&nbsp;y2=\&quot;{3}\&quot;&nbsp;style=\&quot;stroke-width:{4};&nbsp;stroke:rgb({5},&nbsp;{6},&nbsp;{7})\&quot;&nbsp;{8}/&gt;\n&quot;</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XD,&nbsp;V&nbsp;-&nbsp;YD,&nbsp;XF,&nbsp;V&nbsp;-&nbsp;YF,&nbsp;1,&nbsp;0,&nbsp;0,&nbsp;0,&nbsp;<span style="color:#a31515;">&quot;&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">else</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">TaskDialog</span>.Show(&nbsp;<span style="color:#a31515;">&quot;Test&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;No&nbsp;Line&quot;</span>&nbsp;);
+&nbsp;&nbsp;}
 </pre>
 
 This code extract only 33 lines and nothing else.
@@ -210,9 +231,16 @@ Is there any documentation of element filtering?
 My code:
 
 <pre class="code">
-FilteredElementCollector collector = new FilteredElementCollector(DocFamily);
-ICollection<Element> lines = collector.OfCategory(BuiltInCategory.OST_Lines).ToElements();
-ICollection<Element> texts = collector.OfClass(typeof(TextNote)).ToElements();
+&nbsp;&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>&nbsp;collector&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">FilteredElementCollector</span>(&nbsp;DocFamily&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;lines&nbsp;=&nbsp;collector
+&nbsp;&nbsp;&nbsp;&nbsp;.OfCategory(&nbsp;<span style="color:#2b91af;">BuiltInCategory</span>.OST_Lines&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.ToElements();
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">ICollection</span>&lt;<span style="color:#2b91af;">Element</span>&gt;&nbsp;texts&nbsp;=&nbsp;collector
+&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">TextNote</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.ToElements();
 </pre>
 
 They return no elements.
@@ -250,26 +278,26 @@ To cut a long story short, here is his final answer:
 </center>
 
 <pre class="code">
-Dim Dr As Element = Doors(DRi)
-Dim BB As BoundingBoxXYZ = Dr.BoundingBox(V)
-Dim BL As New XYZ(BB.Min.X, BB.Min.Y, 0)
-Dim BR As New XYZ(BB.Max.X, BB.Min.Y, 0)
-Dim TL As New XYZ(BB.Min.X, BB.Max.Y, 0)
-Dim TR As New XYZ(BB.Max.X, BB.Max.Y, 0)
-BL = T.Inverse.OfPoint(BL).Multiply(1 / Scale) + Offset
-BR = T.Inverse.OfPoint(BR).Multiply(1 / Scale) + Offset
-TL = T.Inverse.OfPoint(TL).Multiply(1 / Scale) + Offset
-TR = T.Inverse.OfPoint(TR).Multiply(1 / Scale) + Offset
-
-Dim LN_B As Line = Line.CreateBound(BL, BR)
-Dim LN_R As Line = Line.CreateBound(BR, TR)
-Dim LN_T As Line = Line.CreateBound(TR, TL)
-Dim LN_L As Line = Line.CreateBound(TL, BL)
-
-Doc.Create.NewDetailCurve(AcView, LN_B)
-Doc.Create.NewDetailCurve(AcView, LN_R)
-Doc.Create.NewDetailCurve(AcView, LN_T)
-Doc.Create.NewDetailCurve(AcView, LN_L)
+  Dim Dr As Element = Doors(DRi)
+  Dim BB As BoundingBoxXYZ = Dr.BoundingBox(V)
+  Dim BL As New XYZ(BB.Min.X, BB.Min.Y, 0)
+  Dim BR As New XYZ(BB.Max.X, BB.Min.Y, 0)
+  Dim TL As New XYZ(BB.Min.X, BB.Max.Y, 0)
+  Dim TR As New XYZ(BB.Max.X, BB.Max.Y, 0)
+  BL = T.Inverse.OfPoint(BL).Multiply(1 / Scale) + Offset
+  BR = T.Inverse.OfPoint(BR).Multiply(1 / Scale) + Offset
+  TL = T.Inverse.OfPoint(TL).Multiply(1 / Scale) + Offset
+  TR = T.Inverse.OfPoint(TR).Multiply(1 / Scale) + Offset
+  
+  Dim LN_B As Line = Line.CreateBound(BL, BR)
+  Dim LN_R As Line = Line.CreateBound(BR, TR)
+  Dim LN_T As Line = Line.CreateBound(TR, TL)
+  Dim LN_L As Line = Line.CreateBound(TL, BL)
+  
+  Doc.Create.NewDetailCurve(AcView, LN_B)
+  Doc.Create.NewDetailCurve(AcView, LN_R)
+  Doc.Create.NewDetailCurve(AcView, LN_T)
+  Doc.Create.NewDetailCurve(AcView, LN_L)
 </pre>
 
 
@@ -277,7 +305,7 @@ Doc.Create.NewDetailCurve(AcView, LN_L)
 
 Another interested thread addressed by Richard is on how
 to [export 2D sheets as images with high quality](https://forums.autodesk.com/t5/revit-api-forum/export-2d-sheets-as-images-with-high-quality/m-p/9989471),
-wrapping up with
+wrapping up with:
 
 > Without the annotation objects visible here are two images of the same view (not from exports); the top is set to 1:1000 and the bottom 1:200.
 
