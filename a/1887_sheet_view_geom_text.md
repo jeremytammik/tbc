@@ -67,7 +67,7 @@ To be more precise, I want to recreate an identical representation of the sheet 
 
 **Answer:** If you want to access the text and visible geometry to recreate a facsimile outside of Revit, you might be able to access text and geometry separately, e.g., using a filtered element collector for real data and a screen snapshot for the appearance.
 
-Most of the the text data can be accessed using built-in parameters.
+Most of the text data can be accessed using built-in parameters.
 
 The Title Block is a Revit family, so its geometry can be accessed by reading it from the family definition.
 
@@ -94,6 +94,9 @@ You can Filter for specific elements and retrieve their parameters, e.g., using:
  
 &nbsp;&nbsp;<span style="color:green;">//etc.</span>
 </pre>
+
+Please note that the call to `ToElements` is very often a waste of performance time and memory space.
+Avoid it when you can, i.e., mostly.
 
 **Response:** Yes, I want to create a facsimile outside of Revit.
 
@@ -197,7 +200,7 @@ I tested the other approach:
 &nbsp;&nbsp;}
 </pre>
 
-This code extract only 33 lines and nothing else.
+This code extracts only 33 lines and nothing else.
 
 How to have access to the text positions?
 
@@ -222,9 +225,9 @@ How can I use RevitLookup to explore this family?
 
 **Answer:** Application &gt; Documents &gt; select the family definition document.
 
-**Response:** Ok, i found some `TextNode`, `TextElement` and `ImageInstance` elements.
+**Response:** Ok, I found some `TextNode`, `TextElement` and `ImageInstance` elements.
 
-But, my filters are not working.
+But my filters are not working.
 
 Is there any documentation of element filtering?
 
@@ -269,35 +272,35 @@ on [Getting element coordinates on sheet](https://forums.autodesk.com/t5/revit-a
 
 To cut a long story short, here is his final answer:
 
-> I think you have just wrongly assumed the other two points of the bounding box i.e. two points represent more than one unique rectangle. If you get all four points of the bounding box corners on plan without transformation and then transform them you can draw lines between them as below. I think what confused me when I looked at this originally was the double door families. Note however that in the case of the sample file all doors were parallel with the internal coordinate system. If your door instances were rotated (hosted on a non vertical or horizontal directional wall) the bounding box would still be orientated to the internal system not rotated with the door. So that aspect may add a layer of confusion, you would have to orientate the bounding box using the door instance transform first. This may not be possible actually since original two points circumscribe door with a box parallel to internal system, so when rotated this would be meaningless. In such a circumstance you likely need to build your own bounding box within the new orientation by looking at max/mins you get for the geometry in the new system.
+> I think you have just wrongly assumed the other two points of the bounding box, i.e., two points represent more than one unique rectangle. If you get all four points of the bounding box corners on plan without transformation and then transform them you can draw lines between them as below. I think what confused me when I looked at this originally was the double door families. Note however that in the case of the sample file all doors were parallel with the internal coordinate system. If your door instances were rotated (hosted on a non-vertical or non-horizontal directional wall) the bounding box would still be orientated to the internal system not rotated with the door. So, that aspect may add a layer of confusion, you would have to orientate the bounding box using the door instance transform first. This may not be possible actually since original two points circumscribe door with a box parallel to internal system, so when rotated this would be meaningless. In such a circumstance you likely need to build your own bounding box within the new orientation by looking at max/mins you get for the geometry in the new system.
 
-> You can't get the rotation of a scope box but if you set a view to one then you can compare 1,0,0 to the right direction of the view to get scope box rotation. This should not be required here because the view right direction is used so transform should already incorporate it. Useful to know however that the orientation of a scope box can be found this way (using one of those transaction rollback workflows). The alternative may be to interrogate the geometry of the scope box to find direction of lines around the scope box bounding box centre (for the top or bottom rectangle of the cube). Although you likely couldn't get a full roation between 0 and 2Pi for this due to symmetry. Depends on how geometry of cube is constructed in terms of line directions there may be some non symmetrical patterm of this (looking at all 12 lines etc.).
+> You can't get the rotation of a scope box but if you set a view to one then you can compare 1,0,0 to the right direction of the view to get scope box rotation. This should not be required here because the view right direction is used so transform should already incorporate it. Useful to know however that the orientation of a scope box can be found this way (using one of those transaction rollback workflows). The alternative may be to interrogate the geometry of the scope box to find direction of lines around the scope box bounding box centre (for the top or bottom rectangle of the cube). Although you likely couldn't get a full rotation between 0 and 2Pi for this due to symmetry. Depends on how geometry of cube is constructed in terms of line directions there may be some non-symmetrical pattern of this (looking at all 12 lines etc.).
 
 <center>
 <img src="img/element_coordinates_on_sheet.png" alt="Element coordinates on sheet" title="Element coordinates on sheet" width="600"/> <!-- 1013 -->
 </center>
 
 <pre class="code">
-  Dim Dr As Element = Doors(DRi)
-  Dim BB As BoundingBoxXYZ = Dr.BoundingBox(V)
-  Dim BL As New XYZ(BB.Min.X, BB.Min.Y, 0)
-  Dim BR As New XYZ(BB.Max.X, BB.Min.Y, 0)
-  Dim TL As New XYZ(BB.Min.X, BB.Max.Y, 0)
-  Dim TR As New XYZ(BB.Max.X, BB.Max.Y, 0)
-  BL = T.Inverse.OfPoint(BL).Multiply(1 / Scale) + Offset
-  BR = T.Inverse.OfPoint(BR).Multiply(1 / Scale) + Offset
-  TL = T.Inverse.OfPoint(TL).Multiply(1 / Scale) + Offset
-  TR = T.Inverse.OfPoint(TR).Multiply(1 / Scale) + Offset
-  
-  Dim LN_B As Line = Line.CreateBound(BL, BR)
-  Dim LN_R As Line = Line.CreateBound(BR, TR)
-  Dim LN_T As Line = Line.CreateBound(TR, TL)
-  Dim LN_L As Line = Line.CreateBound(TL, BL)
-  
-  Doc.Create.NewDetailCurve(AcView, LN_B)
-  Doc.Create.NewDetailCurve(AcView, LN_R)
-  Doc.Create.NewDetailCurve(AcView, LN_T)
-  Doc.Create.NewDetailCurve(AcView, LN_L)
+  <span style="color:blue;">Dim</span>&nbsp;Dr&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Element</span>&nbsp;=&nbsp;Doors(DRi)
+  <span style="color:blue;">Dim</span>&nbsp;BB&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">BoundingBoxXYZ</span>&nbsp;=&nbsp;Dr.BoundingBox(V)
+  <span style="color:blue;">Dim</span>&nbsp;BL&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(BB.Min.X,&nbsp;BB.Min.Y,&nbsp;0)
+  <span style="color:blue;">Dim</span>&nbsp;BR&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(BB.Max.X,&nbsp;BB.Min.Y,&nbsp;0)
+  <span style="color:blue;">Dim</span>&nbsp;TL&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(BB.Min.X,&nbsp;BB.Max.Y,&nbsp;0)
+  <span style="color:blue;">Dim</span>&nbsp;TR&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(BB.Max.X,&nbsp;BB.Max.Y,&nbsp;0)
+  BL&nbsp;=&nbsp;T.Inverse.OfPoint(BL).Multiply(1&nbsp;/&nbsp;Scale)&nbsp;+&nbsp;Offset
+  BR&nbsp;=&nbsp;T.Inverse.OfPoint(BR).Multiply(1&nbsp;/&nbsp;Scale)&nbsp;+&nbsp;Offset
+  TL&nbsp;=&nbsp;T.Inverse.OfPoint(TL).Multiply(1&nbsp;/&nbsp;Scale)&nbsp;+&nbsp;Offset
+  TR&nbsp;=&nbsp;T.Inverse.OfPoint(TR).Multiply(1&nbsp;/&nbsp;Scale)&nbsp;+&nbsp;Offset
+   
+  <span style="color:blue;">Dim</span>&nbsp;LN_B&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(BL,&nbsp;BR)
+  <span style="color:blue;">Dim</span>&nbsp;LN_R&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(BR,&nbsp;TR)
+  <span style="color:blue;">Dim</span>&nbsp;LN_T&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(TR,&nbsp;TL)
+  <span style="color:blue;">Dim</span>&nbsp;LN_L&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:#2b91af;">Line</span>&nbsp;=&nbsp;<span style="color:#2b91af;">Line</span>.CreateBound(TL,&nbsp;BL)
+   
+  doc.Create.NewDetailCurve(AcView,&nbsp;LN_B)
+  doc.Create.NewDetailCurve(AcView,&nbsp;LN_R)
+  doc.Create.NewDetailCurve(AcView,&nbsp;LN_T)
+  doc.Create.NewDetailCurve(AcView,&nbsp;LN_L)
 </pre>
 
 
