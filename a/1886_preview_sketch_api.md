@@ -8,7 +8,7 @@
 
 twitter:
 
- #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+The wish to programmatically modify sketch-based elements - edit existing slab boundary - may soon be fulfilled! Join Revit Preview aka beta for feedback on sketch-based #RevitAPI element editing @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://autode.sk/sketchapipreview
 
 The wish to be able to programmatically access and modify sketch-based elements is long-standing, e.g., for editing an existing slab boundary.
 Here is an invitation to take a look at the Revit Preview (aka beta), offering a chance to provide feedback on several new sketch-based element creation and editing APIs...
