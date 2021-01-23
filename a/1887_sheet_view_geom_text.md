@@ -336,4 +336,4 @@ wrapping up with:
 
 > This works fine if you are exporting from a normal view, as changing the scale is not an issue.
 
-> However, you can’t change the scale in tha case of Sheets, because that will affect the viewport size and location.
+> However, you can’t change the scale in the case of Sheets, because that will affect the viewport size and location.
