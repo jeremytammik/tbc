@@ -24,7 +24,7 @@ Accessing and exporting sheet view coordinates, transforms, images and title blo
 Today, we look at accessing and exporting sheet view coordinates, transforms, images and title block data, including the title block geometry and text values
 &ndash; Extracting title block geometry and text
 &ndash; Element coordinates on sheet
-&ndash; Export 2D sheet as high quality image...
+&ndash; Export view as high quality image...
 
 linkedin:
 
@@ -36,7 +36,7 @@ Today, we look at accessing and exporting sheet view coordinates, transforms, im
 
 - Extracting title block geometry and text
 - Element coordinates on sheet
-- Export 2D sheet as high quality image...
+- Export view as high quality image...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -58,7 +58,7 @@ Today, we look at accessing and exporting sheet view coordinates, transforms, im
 
 - [Extracting title block geometry and text](#2)
 - [Element coordinates on sheet](#3)
-- [Export 2D sheet as high quality image](#4)
+- [Export view as high quality image](#4)
 
 ####<a name="2"></a> Extracting Title Block Geometry and Text
 
@@ -316,7 +316,7 @@ To cut a long story short, here is his final answer:
 </pre>
 
 
-####<a name="4"></a> Export 2D Sheet as High Quality Image
+####<a name="4"></a> Export View as High Quality Image
 
 Another interested thread addressed by Richard is on how
 to [export 2D sheets as images with high quality](https://forums.autodesk.com/t5/revit-api-forum/export-2d-sheets-as-images-with-high-quality/m-p/9989471),
