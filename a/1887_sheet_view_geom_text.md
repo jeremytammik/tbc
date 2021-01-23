@@ -331,3 +331,9 @@ wrapping up with:
 <br/>
 <img src="img/export_sheet_as_image_2.png" alt="Sheet as image" title="Sheet as image" width="600"/> <!-- 761 -->
 </center>
+
+####<a name="4.1"></a> Mustafa Salaheldin Ali adds:
+
+> This works fine if you are exporting from a normal view, as changing the scale is not an issue.
+
+> However, you can’t change the scale in tha case of Sheets, because that will affect the viewport size and location.
