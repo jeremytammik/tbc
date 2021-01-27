@@ -36,8 +36,10 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Today, we discuss cores, splinters and data
+&ndash; Using .NET 5 and Core
+&ndash; Controlling face triangulation LOD
+&ndash; SQL versus NoSQL...
 
 linkedin:
 
