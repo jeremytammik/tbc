@@ -55,7 +55,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Triangulation LOD, .NET 5 and Core
+### Face Triangulation LOD, .NET 5 and Core
 
 Today, we discuss cores, splinters and data:
 
