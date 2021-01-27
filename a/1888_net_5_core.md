@@ -6,10 +6,6 @@
 
 <!---
 
-- Jaime - Forge Team/Organizer  11:17 PM
-  Important things to read/watch before the event starts:
-  <div class="c-message_kit__gutter__right" data-qa="message_content"><span class="c-message__sender c-message_kit__sender" data-qa="message_sender" data-stringify-type="replace" data-stringify-text="Jaime - Forge Team/Organizer"><a target="_blank" rel="noopener noreferrer" data-message-sender="U01K1LNUUGP" data-qa="message_sender_name" aria-haspopup="menu" aria-expanded="false" class="c-link c-message__sender_link " href="/team/U01K1LNUUGP">Jaime - Forge Team/Organizer<span aria-label="(opens in new tab)"></span></a></span>&nbsp;&nbsp;<a data-stringify-type="replace" data-stringify-text="[11:17 PM]" data-stringify-requires-siblings="true" data-ts="1611267434.000300" delay="300" data-sk="tooltip_parent" class="c-link c-timestamp" href="https://machupicchufo-qj68703.slack.com/archives/C01KNUJB5NG/p1611267434000300"><span class="c-timestamp__label">11:17 PM</span></a><br><span class="c-message_kit__text" dir="auto" data-qa="message-text">Important things to read/watch before the event starts:<span class="c-mrkdwn__br" data-stringify-type="paragraph-break"></span>- Start with this video which will explain you how to interact with us as well as how to use Slack and Zoom during this virtual event.<br>- Get more familiar with the Forge API -&nbsp;<a target="_blank" class="c-link" data-stringify-link="https://learnforge.autodesk.io/#/" delay="150" data-sk="tooltip_parent" href="https://learnforge.autodesk.io/#/" rel="noopener noreferrer">https://learnforge.autodesk.io/#/</a><br>- The Forge Blog -&nbsp;<a target="_blank" class="c-link" data-stringify-link="https://forge.autodesk.com/blog" delay="150" data-sk="tooltip_parent" href="https://forge.autodesk.com/blog" rel="noopener noreferrer">https://forge.autodesk.com/blog</a><br>- StackOverflow for existing Q/A -&nbsp;General&nbsp;/&nbsp;Viewer&nbsp;/&nbsp;Data Management&nbsp;/&nbsp;Model Derivative&nbsp;/&nbsp;Design Automation&nbsp;/&nbsp;BIM360&nbsp;/&nbsp;Reality Capture&nbsp;/&nbsp;WebHooks&nbsp;<br>- Samples -&nbsp;<a target="_blank" class="c-link" data-stringify-link="https://github.com/Autodesk-Forge?tabs=repositories" delay="150" data-sk="tooltip_parent" href="https://github.com/Autodesk-Forge?tabs=repositories" rel="noopener noreferrer">https://github.com/Autodesk-Forge?tabs=repositories</a><span class="c-mrkdwn__br" data-stringify-type="paragraph-break"></span>Ping individuals using @name from any channel, or call any of us using <span class="c-mrkdwn__broadcast c-mrkdwn__broadcast--link c-mrkdwn__broadcast--mention" data-broadcast-id="BKhere" data-stringify-text="@here">@here</span> from any channel.<span class="c-mrkdwn__br" data-stringify-type="paragraph-break"></span><span class="c-mrkdwn__br" data-stringify-type="paragraph-break"></span>Useful Links:<br>- Tutorial: <a target="_blank" class="c-link" data-stringify-link="https://learnforge.autodesk.io/#/" delay="150" data-sk="tooltip_parent" href="https://learnforge.autodesk.io/#/" rel="noopener noreferrer">https://learnforge.autodesk.io/#/</a><br>- Blogs: <a target="_blank" class="c-link" data-stringify-link="https://forge.autodesk.com/blog" delay="150" data-sk="tooltip_parent" href="https://forge.autodesk.com/blog" rel="noopener noreferrer">https://forge.autodesk.com/blog</a><br>- Documentation: <a target="_blank" class="c-link" data-stringify-link="https://forge.autodesk.com/developer/documentation" delay="150" data-sk="tooltip_parent" href="https://forge.autodesk.com/developer/documentation" rel="noopener noreferrer">https://forge.autodesk.com/developer/documentation</a><br>- Postman Collection of API calls: <a target="_blank" class="c-link" data-stringify-link="https://gist.github.com/petrbroz/5d28d996738bb0da4f7838ca43d53765" delay="150" data-sk="tooltip_parent" href="https://gist.github.com/petrbroz/5d28d996738bb0da4f7838ca43d53765" rel="noopener noreferrer">https://gist.github.com/petrbroz/5d28d996738bb0da4f7838ca43d53765</a><br>- Design Automation Postman Tutorial: <a target="_blank" class="c-link" data-stringify-link="https://github.com/Autodesk-Forge/forge-tutorial-postman" delay="150" data-sk="tooltip_parent" href="https://github.com/Autodesk-Forge/forge-tutorial-postman" rel="noopener noreferrer">https://github.com/Autodesk-Forge/forge-tutorial-postman</a><br>- Repos: <a target="_blank" class="c-link" data-stringify-link="https://github.com/Autodesk-Forge" delay="150" data-sk="tooltip_parent" href="https://github.com/Autodesk-Forge" rel="noopener noreferrer">https://github.com/Autodesk-Forge</a><span class="c-mrkdwn__br" data-stringify-type="paragraph-break"></span>Tools:<br>- VS Code Plugin: <a target="_blank" class="c-link" data-stringify-link="https://forge.autodesk.com/blog/beginners-guide-design-automation-visual-studio-code" delay="150" data-sk="tooltip_parent" href="https://forge.autodesk.com/blog/beginners-guide-design-automation-visual-studio-code" rel="noopener noreferrer">https://forge.autodesk.com/blog/beginners-guide-design-automation-visual-studio-code</a><br>- OSS Manager: <a target="_blank" class="c-link" data-stringify-link="https://oss-manager.autodesk.io/" delay="150" data-sk="tooltip_parent" href="https://oss-manager.autodesk.io/" rel="noopener noreferrer">https://oss-manager.autodesk.io/</a><br>- DA Manager: <a target="_blank" class="c-link" data-stringify-link="https://da-manager.autodesk.io/" delay="150" data-sk="tooltip_parent" href="https://da-manager.autodesk.io/" rel="noopener noreferrer">https://da-manager.autodesk.io/</a><br>- Node-Red: <a target="_blank" class="c-link" data-stringify-link="https://forge.autodesk.com/blog/forge-node-red-visual-programming-forge" delay="150" data-sk="tooltip_parent" href="https://forge.autodesk.com/blog/forge-node-red-visual-programming-forge" rel="noopener noreferrer">https://forge.autodesk.com/blog/forge-node-red-visual-programming-forge</a></span></div>
-
 - .NET Core
   https://autodesk.slack.com/archives/C0SR6NAP8/p1605727684149900
   [Q] Rahul Bhobe 18 Nov 2020 at 20:28
@@ -24,6 +20,10 @@
   [A] The factory should try to be prepared to answer. So far, there are complications. Revit consumes Autodesk-wide .NET components. We'd need to ensure that those are .NET 5 compatible before we switch our runtime. Revit API also runs in-process using Revit's runtime, so I'm not sure it would be possible to preserve Revit's 4.8 runtime and allow add-in code to run .NET 5.0. We have not tested either scenario yet.
   Basically, developers will be able to reference Revit's dlls (.NET 4.8) in their .NET 5 projects, but there is no guarantee that everything will work. Some (if not most) things might, but I would not recommend going that way. The problem is that .NET 5 is based on .NET Core, not on the big .NET framework, and there are some incompatibilities.
   As for switching Revit to .NET 5, that's something we will definitely need to do as .NET 4.8 is the last version of the big .NET. However, the switch is not as trivial as changing the version dropdown (like it was from 4.7 to 4.8). We will have to convert to a new project format, fix some code and possibly find replacement for some frameworks that were present in .NET 4.8, but are not anymore in .NET 5.
+
+- Controlling triangulation LOD
+  8307 [Level of detail in Revit addin in design automation]
+  https://forge.zendesk.com/agent/tickets/8307
 
 - I was and still remain a fan of NoSQl, even after being intrigued by and reading an article by John Biggs and Ryan Donovan asking,
   [Have the tables turned on NoSQL?](https://stackoverflow.blog/2021/01/14/have-the-tables-turned-on-nosql) and concluding that
@@ -57,7 +57,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### .NET 5 and Core
 
-
 ####<a name="2"></a> 
 
 [Olli Kattelus](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/774564), MEP Software Engineer of the Finnish MagiCAD Group,
@@ -69,56 +68,158 @@ include coverage of .NET 5:
 From my understanding of .NET, if Revit targets a specific .NET standard, I will be able use any implementation of .NET (.NET Core, or .NET Framework) that conforms to that standard.
 Does Revit target versions of .NET standards or does it just target versions of .NET Framework?
 
-**Answer:**
+**Answer:** This is clearly defined in
+the [Revit 2021 API development requirements](https://help.autodesk.com/view/RVT/2021/ENU/?guid=Revit_API_Revit_API_Developers_Guide_Introduction_Getting_Started_Welcome_to_the_Revit_Platform_API_Development_Requirements_html)
+and [getting started page](https://help.autodesk.com/view/RVT/2021/ENU/?guid=Revit_API_Revit_API_Developers_Guide_Introduction_Getting_Started_html):
 
-This is clearly defined in the system requirements:
+> The Revit Platform API is fully accessible by any language compatible with the Microsoft .NET Framework 4.8, such as Visual C# or Visual Basic .NET (VB.NET). Both Visual C# and VB.NET are commonly used to develop Revit Platform API applications. However, the focus of this manual is developing applications using Visual C#.
 
- 
-
-For Revit 2021:
-
- 
-
-
-https://help.autodesk.com/view/RVT/2021/ENU/?guid=Revit_API_Revit_API_Developers_Guide_Introduction_Getting_Started_html
-
-The Revit Platform API is fully accessible by any language compatible with the Microsoft .NET Framework 4.8, such as Visual C# or Visual Basic .NET (VB.NET). Both Visual C# and VB.NET are commonly used to develop Revit Platform API applications.
-
-  
 If your .NET core is compatible with the Microsoft .NET Framework 4.8, all should be fine.
- 
-Please try it out and let us know the result!
 
+**Question:** Will we be able to use the Revit API with .NET 5?
 
+**Answer:** The factory should try to be prepared to answer.
+So far, there are complications. Revit consumes Autodesk-wide .NET components.
+We'd need to ensure that those are .NET 5 compatible before we switch our runtime.
+Revit API also runs in-process using Revit's runtime, so I'm not sure it would be possible to preserve Revit's 4.8 runtime and allow add-in code to run .NET 5.0.
+We have not tested either scenario yet.
 
-  [Q] Will we be able to use the Revit API with .NET 5?
-  [A] The factory should try to be prepared to answer. So far, there are complications. Revit consumes Autodesk-wide .NET components. We'd need to ensure that those are .NET 5 compatible before we switch our runtime. Revit API also runs in-process using Revit's runtime, so I'm not sure it would be possible to preserve Revit's 4.8 runtime and allow add-in code to run .NET 5.0. We have not tested either scenario yet.
-  Basically, developers will be able to reference Revit's dlls (.NET 4.8) in their .NET 5 projects, but there is no guarantee that everything will work. Some (if not most) things might, but I would not recommend going that way. The problem is that .NET 5 is based on .NET Core, not on the big .NET framework, and there are some incompatibilities.
-  As for switching Revit to .NET 5, that's something we will definitely need to do as .NET 4.8 is the last version of the big .NET. However, the switch is not as trivial as changing the version dropdown (like it was from 4.7 to 4.8). We will have to convert to a new project format, fix some code and possibly find replacement for some frameworks that were present in .NET 4.8, but are not anymore in .NET 5.
+Basically, developers will be able to reference Revit's dlls (.NET 4.8) in their .NET 5 projects, but there is no guarantee that everything will work.
+Some (if not most) things might, but I would not recommend going that way.
+The problem is that .NET 5 is based on .NET Core, not on the big .NET framework, and there are some incompatibilities.
 
+As for switching Revit to .NET 5, that's something we will definitely need to do as .NET 4.8 is the last version of the big .NET.
+However, the switch is not as trivial as changing the version dropdown (like it was from 4.7 to 4.8).
+We will have to convert to a new project format, fix some code and possibly find replacement for some frameworks that were present in .NET 4.8, and are not anymore in .NET 5.
 
-
-I found the official Microsoft overview
+To understand more about .NET 5 Core and Framework enhancements, I found the official Microsoft overview
 of [What's new in .NET 5](https://docs.microsoft.com/en-us/dotnet/core/dotnet-five) pretty illuminating.
 
-
-
-**Question:** 
-
 <center>
-<img src="img/" alt="" title="" width="100"/> <!-- 1154 -->
+<img src="img/apple_core.png" alt="Apple core" title="Apple core" width="250"/> <!-- 376 -->
 </center>
 
-**Answer:** 
 
 <pre class="code">
 </pre>
 
+**Response:**
 
-**Response:** 
+####<a name="3"></a> Controlling Triangulation LOD
+
+This query arose after observing a significantly different level of detail triangulating a face in a Revit add-in running in Forge design automation:
+
+**Question:** I am working on a Revit add-in that I modified to run in the Forge design automation environment.
+I am using a `CustomExporter` to export a Revit model to an `obj` file.
+It uses the `Triangulate` method on the `Autodesk.Revit.DB.Face` class to triangulate some of the faces in the model at a certain level of detail (LOD).
+The LOD value is passed to the `Face.Triangulate` method.
+I noticed that when running the add-in in design automation on Forge, the triangle count of the exported model is much higher, compared to when it is run locally in the desktop on my computer.
+I would like the detail of the model to be the same when exported on Forge as when it is exported on a desktop PC. 
+Why this might be happening and how could it be fixed?
 
 
-####<a name="3"></a> 
+My suspicion is that the LOD is affected by the graphics screen properties.
+In the Forge environment, no real screen is attached, and that causes a much higher resolution to be assumed.
+This is obviously an error in a DB-only environment.
 
 
-####<a name="4"></a> 
+If this is an obvious error in a DB-only environment, then it seems not Design Automation specific issue though.
+
+
+I discussed this with the design automation group.
+
+They asked for more details, e.g., Revit version.
+
+I strongly suspect that the Revit version will make no difference, though.
+
+My suspicion is that the LOD is affected by the graphics screen properties. In the Forge environment, no real screen is attached, and that causes a much higher resolution to be assumed. This is obviously an error in a DB-only environment.
+
+If this is an obvious error in a DB-only environment, then it seems not Design Automation specific issue though.
+
+They say:
+
+In our CustomExporter, we set the value of ViewNode.LevelOfDetail in OnViewBegin.
+
+However, we don't know what this does in comparison to Face.Triangulate.
+
+Later, I received more information from the development team:
+
+In the version of `Face.Triangulate` that takes a `levelOfDetail` input of type `double`, that input controls the granularity of the triangulation.
+`levelOfDetail` should lie in the range [0.0, 1.0], with 0.0 being the coarsest and 1.0 the finest.
+The internal code uses an integer "level of detail" in the range [0, 15], and the input to Face.Triangulate is mapped to an integer by dividing the range [0.0, 1.0] into sixteen equal segments (i.e., multiply by 16, round down, and restrict to the range [0.0, 1.0]).
+
+This ends up at the internal function `GFace::updateCachedFacets`, which also takes various other things into account (whether there's view-specific data, properties of the face in question, etc.). 
+
+There's also a version of `Face.Triangulate` that takes no input and uses a different apporach to choose a triangulation granularity.
+
+By design of CustomExporter 3D, the main (only?) factor controlling the quality should be the view node's level of detail, as mentioned above.
+However, what happens inside Face.Triangulate is separate from CustomExporter.
+The scale of the view might have something do with any discrepancy between different export workflows.
+On the other hand, Revit version and the presence of UI should not have an impact, although we cannot completely rule those factors out.
+
+The Revit version can certainly play a role in principle.
+For example, improvements to face triangulation are made from time to time, and that changes the way certain objects are triangulated in some cases.
+
+We had thought presence or absence of UI would not have an impact for other things, and been proven wrong, e.g., garbage collection and image export.
+
+If it's reproducible, in particular it might be reproducible without Custom Exporter and just running the same small routines on Revit UI and DA of going to one reasonably complex element, finding a target face, and Triangulating, we should look at it as a Problem Report.
+
+Can you provide
+a [minimal reproducible case](https://thebuildingcoder.typepad.com/blog/about-the-author.html#1b) for
+the development team to analyse?
+
+**Response:** I am using the 2020 version of Revit, both on desktop and in DA.
+
+We have now solved our problem.
+
+The solution was simply to set `ViewNode.LevelOfDetail` to the desired level of detail in `IExportContext.OnViewBegin` and then collect all the geometry in the `IExportContext.OnPolymesh` callback instead of the `OnFaceBegin` callback.
+
+Before this, we were collecting some geometry by getting faces in `IExportContext.OnFaceBegin` and then triangulating those faces with `Face.Triangulate(LOD)`.
+
+For some reason, the resulting geometry had much higher triangle count when the add-in was run in design automation.
+
+We do not need any more assistance on this.
+
+If the development team wants to reproduce it, here are the basic steps to do so:
+
+- Create a Revit add-in containing a class that implements `IExportContext` and a `CustomExporter` that uses it.
+Make sure to set the `IncludeGeometricObjects` property on the `CustomExporter` object to `true`.
+- In the `OnFaceBegin` callback of the `IExportContext` class, add the following code:
+
+<pre class="code>"
+  public RenderNodeAction OnFaceBegin(FaceNode node)
+  {
+    Autodesk.Revit.DB.Face face = node.GetFace();
+    Autodesk.Revit.DB.Mesh m = face.Triangulate(0.1);
+    int vertCount = m.Vertices.Count;
+    return RenderNodeAction.Proceed;
+  }
+</pre>
+
+- Run this in Revit on a desktop computer and also in design automation on Forge.
+The add-in will need to be modified to run in design automation.
+Modify the code so the value of `vertCount` can be verified both in the desktop version and DA version.
+I was expecting the value to be the same both on desktop and in DA, however in my experience the model was much more detailed when exporting in DA.
+
+
+####<a name="4"></a> SQL Versus NoSQL
+
+I became a great fan on NoSQL while working on
+the [FireRatingCloud](https://github.com/jeremytammik/FireRatingCloud) project,
+a multi-RVT-project reimplementation of the FireRating SDK sample.
+
+It forms part of my research connecting desktop and cloud prior to the emergence of Forge and uses a REST API to access a cloud-based NoSQL MongoDB database managed by a node.js web server.
+
+I still remain a fan of NoSQl, even after being intrigued by and reading an article by John Biggs and Ryan Donovan asking,
+[Have the tables turned on NoSQL?](https://stackoverflow.blog/2021/01/14/have-the-tables-turned-on-nosql)
+ 
+ They conclude that NoSQL is "not so great for your side hustle" and that 
+ 
+ > a consensus has emerged in conferences and blogs that SQL is the gold standard 
+ &ndash; with a lot of emphasis on PostgeSQL &ndash; and you should use it by default,
+ only deviating if you have good reasons to use NoSQL."
+ 
+ I assume they know a lot more than I do in that area, so I guess I should trust their judgement more than mine in this case.
+ 
+ But I continue to prefer NoSQL anyway :-)
+
