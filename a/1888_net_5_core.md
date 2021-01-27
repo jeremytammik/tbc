@@ -55,9 +55,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### .NET 5 and Core
+### Triangulation LOD, .NET 5 and Core
 
-####<a name="2"></a> 
+Today, we discuss cores, splinters and data:
+
+- [Using .NET 5 and Core](#2)
+- [Controlling face triangulation LOD](#3)
+- [SQL versus NoSQL](#4)
+
+####<a name="2"></a> Using .NET 5 and Core
 
 [Olli Kattelus](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/774564), MEP Software Engineer of the Finnish MagiCAD Group,
 updated the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) 
@@ -96,18 +102,12 @@ To understand more about .NET 5 Core and Framework enhancements, I found the off
 of [What's new in .NET 5](https://docs.microsoft.com/en-us/dotnet/core/dotnet-five) pretty illuminating.
 
 <center>
-<img src="img/apple_core.png" alt="Apple core" title="Apple core" width="250"/> <!-- 376 -->
+<img src="img/apple_core.png" alt="Apple core" title="Apple core" width="188"/> <!-- 376 -->
 </center>
 
+####<a name="3"></a> Controlling Face Triangulation LOD
 
-<pre class="code">
-</pre>
-
-**Response:**
-
-####<a name="3"></a> Controlling Triangulation LOD
-
-This query arose after observing a significantly different level of detail triangulating a face in a Revit add-in running in Forge design automation:
+A very useful solution for the desktop Revit API came about after observing a significantly different level of detail triangulating a face in a Revit add-in running in Forge design automation:
 
 **Question:** I am working on a Revit add-in that I modified to run in the Forge design automation environment.
 I am using a `CustomExporter` to export a Revit model to an `obj` file.
@@ -118,31 +118,13 @@ I would like the detail of the model to be the same when exported on Forge as wh
 Why this might be happening and how could it be fixed?
 
 
-My suspicion is that the LOD is affected by the graphics screen properties.
+**Answer:** My first suspicion was that the LOD is affected by the graphics screen properties.
 In the Forge environment, no real screen is attached, and that causes a much higher resolution to be assumed.
-This is obviously an error in a DB-only environment.
 
+The development team respond:
 
-If this is an obvious error in a DB-only environment, then it seems not Design Automation specific issue though.
-
-
-I discussed this with the design automation group.
-
-They asked for more details, e.g., Revit version.
-
-I strongly suspect that the Revit version will make no difference, though.
-
-My suspicion is that the LOD is affected by the graphics screen properties. In the Forge environment, no real screen is attached, and that causes a much higher resolution to be assumed. This is obviously an error in a DB-only environment.
-
-If this is an obvious error in a DB-only environment, then it seems not Design Automation specific issue though.
-
-They say:
-
-In our CustomExporter, we set the value of ViewNode.LevelOfDetail in OnViewBegin.
-
-However, we don't know what this does in comparison to Face.Triangulate.
-
-Later, I received more information from the development team:
+In our CustomExporter, we set the value of `ViewNode.LevelOfDetail` in `OnViewBegin`.
+However, we don't know what this does in comparison to `Face.Triangulate`.
 
 In the version of `Face.Triangulate` that takes a `levelOfDetail` input of type `double`, that input controls the granularity of the triangulation.
 `levelOfDetail` should lie in the range [0.0, 1.0], with 0.0 being the coarsest and 1.0 the finest.
@@ -150,7 +132,7 @@ The internal code uses an integer "level of detail" in the range [0, 15], and th
 
 This ends up at the internal function `GFace::updateCachedFacets`, which also takes various other things into account (whether there's view-specific data, properties of the face in question, etc.). 
 
-There's also a version of `Face.Triangulate` that takes no input and uses a different apporach to choose a triangulation granularity.
+There's also a version of `Face.Triangulate` that takes no input and uses a different approach to choose a triangulation granularity.
 
 By design of CustomExporter 3D, the main (only?) factor controlling the quality should be the view node's level of detail, as mentioned above.
 However, what happens inside Face.Triangulate is separate from CustomExporter.
@@ -183,10 +165,9 @@ We do not need any more assistance on this.
 If the development team wants to reproduce it, here are the basic steps to do so:
 
 - Create a Revit add-in containing a class that implements `IExportContext` and a `CustomExporter` that uses it.
-Make sure to set the `IncludeGeometricObjects` property on the `CustomExporter` object to `true`.
+- Make sure to set the `IncludeGeometricObjects` property on the `CustomExporter` object to `true`.
 - In the `OnFaceBegin` callback of the `IExportContext` class, add the following code:
-
-<pre class="code>"
+<pre class="code">
   public RenderNodeAction OnFaceBegin(FaceNode node)
   {
     Autodesk.Revit.DB.Face face = node.GetFace();
@@ -195,31 +176,30 @@ Make sure to set the `IncludeGeometricObjects` property on the `CustomExporter` 
     return RenderNodeAction.Proceed;
   }
 </pre>
-
 - Run this in Revit on a desktop computer and also in design automation on Forge.
+
 The add-in will need to be modified to run in design automation.
 Modify the code so the value of `vertCount` can be verified both in the desktop version and DA version.
-I was expecting the value to be the same both on desktop and in DA, however in my experience the model was much more detailed when exporting in DA.
-
+I was expecting the value to be the same both on desktop and in DA, however, in my experience, the model was much more detailed when exporting in DA.
 
 ####<a name="4"></a> SQL Versus NoSQL
 
-I became a great fan on NoSQL while working on
+I became a fan of NoSQL while working on
 the [FireRatingCloud](https://github.com/jeremytammik/FireRatingCloud) project,
 a multi-RVT-project reimplementation of the FireRating SDK sample.
 
 It forms part of my research connecting desktop and cloud prior to the emergence of Forge and uses a REST API to access a cloud-based NoSQL MongoDB database managed by a node.js web server.
 
-I still remain a fan of NoSQl, even after being intrigued by and reading an article by John Biggs and Ryan Donovan asking,
+I still remain a fan of NoSQL, even after being intrigued by an article by John Biggs and Ryan Donovan asking,
 [Have the tables turned on NoSQL?](https://stackoverflow.blog/2021/01/14/have-the-tables-turned-on-nosql)
- 
- They conclude that NoSQL is "not so great for your side hustle" and that 
- 
- > a consensus has emerged in conferences and blogs that SQL is the gold standard 
- &ndash; with a lot of emphasis on PostgeSQL &ndash; and you should use it by default,
- only deviating if you have good reasons to use NoSQL."
- 
- I assume they know a lot more than I do in that area, so I guess I should trust their judgement more than mine in this case.
- 
- But I continue to prefer NoSQL anyway :-)
+
+They conclude that NoSQL is "not so great for your side hustle" and that 
+
+> a consensus has emerged in conferences and blogs that SQL is the gold standard 
+&ndash; with a lot of emphasis on PostgeSQL &ndash; and you should use it by default,
+only deviating if you have good reasons to use NoSQL.
+
+I assume they know a lot more than I do in this area, so I guess I should trust their judgement more than mine in this case.
+
+But I naively continue to prefer NoSQL anyway :-)
 
