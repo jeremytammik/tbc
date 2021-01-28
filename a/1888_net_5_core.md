@@ -70,6 +70,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Today, we discuss cores, splinters and data:
 
 - [Using .NET 5 and Core](#2)
+- [Using .NET Standard 2.0 for Revit Add-Ins](#2.1)
 - [Controlling face triangulation LOD](#3)
 - [SQL versus NoSQL](#4)
 
@@ -110,6 +111,21 @@ We will have to convert to a new project format, fix some code and possibly find
 
 To understand more about .NET 5 Core and Framework enhancements, I found the official Microsoft overview
 of [What's new in .NET 5](https://docs.microsoft.com/en-us/dotnet/core/dotnet-five) pretty illuminating.
+
+####<a name="2.1"></a> Using .NET Standard 2.0 for Revit Add-Ins
+
+Thiago Almeida added a [helpful comment clarifying how to proceed](https://thebuildingcoder.typepad.com/blog/2021/01/face-triangulation-lod-net-5-and-core.html#comment-5244565338):
+
+It is possible to target projects with .Net Standard to compile shared code between .Net Core and .Net Framework.
+
+.Net Framework 4.6.1 is compatible with .Net Standard 2.0, which covers most of the common used APIs across the board.
+The actual recommendation is to start from .Net Framework 4.7.2 as for consideration (2) on Microsoft's compatibility sheet (search
+for "[.NET implementation support](https://duckduckgo.com/?q=.NET+implementation+support)").
+
+Translating to Revit API add-ins:
+You should be able to share code between Core platforms (.Net Core 3.1 or .Net 5) with Revit 2019 and above (.Net Framework 4.7.2) using .Net Standard 2.0.
+
+Thank you very much for that, Thiago!
 
 <center>
 <img src="img/apple_core.png" alt="Apple core" title="Apple core" width="188"/> <!-- 376 -->
