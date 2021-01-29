@@ -25,7 +25,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+A handy open source OCR tool, and filtered element collector with parameter filter also checks element type in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://autode.sk/paramfilter_etype
 
 An important insight in using a filtered element collector with a parameter filter, a handy open source OCR tool and a few productivity tips
 &ndash; Parameter filter also checks element type
