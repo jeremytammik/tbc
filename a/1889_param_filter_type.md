@@ -49,6 +49,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Parameter Filter Also Checks Type
 
+Getting rerady for a rainy weekend, here is an important insight in using a filtered element collector with a parameter filter, a handy open source OCR tool and a few productifvity tips:
+
+- [Parameter filter also checks type](#2)
+- [Capture2Text, a handy OCR tool](#3)
+- [Productivity tips](#4)
 
 ####<a name="2"></a> Parameter Filter Also Checks Type
 
@@ -211,7 +216,7 @@ Many thanks to Ameer and Richard for this very fruitful and illuminating discuss
 
 ####<a name="3"></a> Capture2Text, a Handy OCR Tool
 
-I happened upon a very handy OCR tool that I like a lot:
+I happened upon a very handy OCR tool that looks pretty good:
 
 [Capture2Text](http://capture2text.sourceforge.net) is
 a free open source Windows desktop OCR application, licensed under the terms of the GNU General Public License.
