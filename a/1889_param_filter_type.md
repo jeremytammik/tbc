@@ -34,6 +34,15 @@ An important insight in using a filtered element collector with a parameter filt
 
 linkedin:
 
+A handy open source OCR tool, and filtered element collector with parameter filter also checks element type in the #RevitAPI
+
+http://autode.sk/paramfilter_etype
+
+An important insight in using a filtered element collector with a parameter filter, a handy open source OCR tool and a few productivity tips:
+
+- Parameter filter also checks element type
+- Capture2Text, a handy OCR tool
+- Productivity tips...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
