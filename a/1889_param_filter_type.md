@@ -49,7 +49,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Parameter Filter Also Checks Type
 
-Getting rerady for a rainy weekend, here is an important insight in using a filtered element collector with a parameter filter, a handy open source OCR tool and a few productifvity tips:
+Getting ready for a rainy weekend, here is an important insight in using a filtered element collector with a parameter filter, a handy open source OCR tool and a few productifvity tips:
 
 - [Parameter filter also checks type](#2)
 - [Capture2Text, a handy OCR tool](#3)
