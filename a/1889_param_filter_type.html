@@ -47,7 +47,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Parameter Filter Also Checks Type</h3>
-<p>Getting ready for a rainy weekend, here is an important insight in using a filtered element collector with a parameter filter, a handy open source OCR tool and a few productifvity tips:</p>
+<p>Getting ready for a rainy weekend, here is an important insight in using a filtered element collector with a parameter filter, a handy open source OCR tool and a few productivity tips:</p>
 <ul>
 <li><a href="#2">Parameter filter also checks type</a></li>
 <li><a href="#3">Capture2Text, a handy OCR tool</a></li>
@@ -151,7 +151,7 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/string-parameter-filt
 <li>I think this behaviour is not acceptable logically, even though it was in effect for a long time.
 At least it should return the wall type itself rather than returning all walls under that type.</li>
 <li>Can it be modified to have a Boolean to search through the element's type or not?
-Or, like the iltered element collector, e.g., <code>WhereElementIsElementType</code> and <code>WhereElementIsNotElementType</code>?</li>
+Or, like the filtered element collector, e.g., <code>WhereElementIsElementType</code> and <code>WhereElementIsNotElementType</code>?</li>
 </ul>
 <p><strong>Answer:</strong> I agree that this behaviour defeats part of the purpose of the parameter filter.</p>
 <p>If I were you, I would choose the simple solution of filtering for parameters that are guaranteed not to be present on the type.</p>
@@ -161,7 +161,7 @@ Or, like the iltered element collector, e.g., <code>WhereElementIsElementType</c
 <ul>
 <li>ParameterElementFilter and ElementIsElementTypeFilter(Inverted = True)</li>
 </ul>
-<p>ElementParmeterFilter is a slow filter, so you should first use other quick filter before it.</p>
+<p>ElementParameterFilter is a slow filter, so you should first use another quick filter before it.</p>
 <p>It works like in the UI when you set up visibility filters, i.e., there is no distinction between type and instance parameters there. I imagine this is the internal system that this filter class leverages.</p>
 <p>Later: When I consider further there is a bit of a hole in functionality there.</p>
 <p>Since you are forced to get a list of elements and then rule out those that have a type parameter match not an instance parameter match, i.e., there are four cases:</p>
@@ -184,7 +184,7 @@ a free open source Windows desktop OCR application, licensed under the terms of 
 <p>Besides that, Capture2Text supports:</p>
 <ul>
 <li>Almost a hundred target languages</li>
-<li>Multiple simultanaeous target languages</li>
+<li>Multiple simultaneous target languages</li>
 <li>Immediate translation via Google translate</li>
 <li>Text-to-speech voice</li>
 </ul>

@@ -49,7 +49,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Parameter Filter Also Checks Type
 
-Getting ready for a rainy weekend, here is an important insight in using a filtered element collector with a parameter filter, a handy open source OCR tool and a few productifvity tips:
+Getting ready for a rainy weekend, here is an important insight in using a filtered element collector with a parameter filter, a handy open source OCR tool and a few productivity tips:
 
 - [Parameter filter also checks type](#2)
 - [Capture2Text, a handy OCR tool](#3)
@@ -175,7 +175,7 @@ A new issue *REVIT-173253 &ndash; Parameter filter with FilterStringContains ret
 - I think this behaviour is not acceptable logically, even though it was in effect for a long time.
 At least it should return the wall type itself rather than returning all walls under that type.
 - Can it be modified to have a Boolean to search through the element's type or not?
-Or, like the iltered element collector, e.g., `WhereElementIsElementType` and `WhereElementIsNotElementType`?
+Or, like the filtered element collector, e.g., `WhereElementIsElementType` and `WhereElementIsNotElementType`?
 
 **Answer:** I agree that this behaviour defeats part of the purpose of the parameter filter.
 
@@ -189,7 +189,7 @@ I thought it just saved a lot of work really, I see no need for a change. If you
 
 - ParameterElementFilter and ElementIsElementTypeFilter(Inverted = True)
 
-ElementParmeterFilter is a slow filter, so you should first use other quick filter before it.
+ElementParameterFilter is a slow filter, so you should first use another quick filter before it.
 
 It works like in the UI when you set up visibility filters, i.e., there is no distinction between type and instance parameters there. I imagine this is the internal system that this filter class leverages.
 
@@ -230,7 +230,7 @@ It can't get much more minimal or efficient than that, can it?
 Besides that, Capture2Text supports:
 
 - Almost a hundred target languages
-- Multiple simultanaeous target languages
+- Multiple simultaneous target languages
 - Immediate translation via Google translate
 - Text-to-speech voice
 
