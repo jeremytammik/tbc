@@ -27,8 +27,10 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+An important insight in using a filtered element collector with a parameter filter, a handy open source OCR tool and a few productivity tips
+&ndash; Parameter filter also checks element type
+&ndash; Capture2Text, a handy OCR tool
+&ndash; Productivity tips...
 
 linkedin:
 
@@ -47,15 +49,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Parameter Filter Also Checks Type
+### Parameter Filter Checking Element Type and OCR
 
 Getting ready for a rainy weekend, here is an important insight in using a filtered element collector with a parameter filter, a handy open source OCR tool and a few productivity tips:
 
-- [Parameter filter also checks type](#2)
+- [Parameter filter also checks element type](#2)
 - [Capture2Text, a handy OCR tool](#3)
 - [Productivity tips](#4)
 
-####<a name="2"></a> Parameter Filter Also Checks Type
+####<a name="2"></a> Parameter Filter Also Checks Element Type
 
 We made an interesting discovery in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -187,7 +189,8 @@ Imagine you want to find all instances that have a certain type parameter, you w
 
 I thought it just saved a lot of work really, I see no need for a change. If you want to know the parameter is on the instance then put the results through a further filter. You can supply a list of ids to a further element filter at any time. If you want to know parameter is on the type, filter first for types. In general, I don’t see much use of Logical AND/OR Filters sometimes I wonder if their existence is known of? People seem to have other methods but again use: LogicalAndFilter with
 
-- ParameterElementFilter and ElementIsElementTypeFilter(Inverted = True)
+- ParameterElementFilter and
+<br/>ElementIsElementTypeFilter(Inverted = True)
 
 ElementParameterFilter is a slow filter, so you should first use another quick filter before it.
 
