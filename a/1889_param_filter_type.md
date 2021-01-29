@@ -50,13 +50,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### Parameter Filter Also Checks Type
 
 
-####<a name="2"></a>
+####<a name="2"></a> Parameter Filter Also Checks Type
 
 We made an interesting discovery in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [string parameter filtering retrieving false data](https://forums.autodesk.com/t5/revit-api-forum/string-parameter-filtering-is-retrieving-false-data/m-p/10034687):
 
-If the internal `ParameterValueProvider` class does not find the requested parameter from the element itself, will also try to get it from the element's type.
+If the internal `ParameterValueProvider` class does not find the requested parameter from the element itself, will also try to read it from the element's type.
 
 This undocumented behaviour can lead to some confusion and is difficult to fix perfectly in an efficient manner.
 
@@ -111,7 +111,6 @@ Here is a [sample project with a macro](zip/TestFilterStringContains.rvt) provid
 </pre>
 
 This displays a message like this in the sample model, listing walls that are not even equipped with the target parameter, let alone have a value for it:
-
 
 <center>
 <img src="img/TestFilterStringContains_result_message.png" alt="Parameter filter returns false positives" title="Parameter filter returns false positives" width="442"/> <!-- 884 -->
@@ -183,21 +182,24 @@ Imagine you want to find all instances that have a certain type parameter, you w
 
 I thought it just saved a lot of work really, I see no need for a change. If you want to know the parameter is on the instance then put the results through a further filter. You can supply a list of ids to a further element filter at any time. If you want to know parameter is on the type, filter first for types. In general, I don’t see much use of Logical AND/OR Filters sometimes I wonder if their existence is known of? People seem to have other methods but again use: LogicalAndFilter with
 
-ParameterElementFilter & ElementIsElementTypeFilter(Inverted = True)
+- ParameterElementFilter and ElementIsElementTypeFilter(Inverted = True)
 
-ElementParmeterFilter is a slow filter so first should use other quick filter before it.
+ElementParmeterFilter is a slow filter, so you should first use other quick filter before it.
 
-How it is working is how it works in the UI when you set up visibility filters i.e. there is no distinction between type and instance parameters there. I imagine this is the internal system that this filter class leverages.
+It works like in the UI when you set up visibility filters, i.e., there is no distinction between type and instance parameters there. I imagine this is the internal system that this filter class leverages.
 
 Later: When I consider further there is a bit of a hole in functionality there.
 
-Since you are forced to get a list of elements and then rule out those that have a type parameter match not an instance parameter match i.e. there are four cases:
+Since you are forced to get a list of elements and then rule out those that have a type parameter match not an instance parameter match, i.e., there are four cases:
 
 Parameter with matching name and value is on: Type, Instance, Both, Neither.
 
-We can only find with filter that it is on: Either or Neither
+We can only find with filter that it is on: Either or Neither.
 
-So how would we find Elements with only a matching parameter on the Instance is the question? After filtering with ElementParameterFilter we would have to manually check via Linq perhaps. We only care that it is or isn't on the instance so that could simplify things.
+So, the question is, how would we find Elements with a matching parameter on the Instance only?
+
+After filtering with ElementParameterFilter, we would have to manually check via Linq perhaps.
+We only care that it is or isn't on the instance, so that could simplify things.
 
 **Answer 3:** Exactly what I meant by saying, defeats part of the purpose.
 
@@ -207,20 +209,33 @@ Linq is super slow compared to the built-in parameter filter, and I see no other
 
 Many thanks to Ameer and Richard for this very fruitful and illuminating discussion!
 
-####<a name="3"></a> 
+####<a name="3"></a> Capture2Text, a Handy OCR Tool
 
-####<a name="4"></a> 
+I happened upon a very handy OCR tool that I like a lot:
 
+[Capture2Text](http://capture2text.sourceforge.net) is
+a free open source Windows desktop OCR application, licensed under the terms of the GNU General Public License.
 
-- OCR
-  http://capture2text.sourceforge.net/
-  open source Windows hotkey app: Windows + Q, mouse rectasgle, resulting text in clipboard
-  Capture2Text is free and licensed under the terms of the GNU General Public License.
-  supports almost a hundred target languages,
-  multiple simultanaeous target languages, 
-  immediate translation via Google translate and
-  text-to-speech voice
-  Capture2Text_conceptual_illustration.png 810
+It is implemented as a hotkey app, making it very minimalistic and efficient to use:
 
-- [How to Be Productive, Feel Less Overwhelmed, and Get Things Done](https://www.freecodecamp.org/news/how-to-get-things-done-lessons-in-productivity) by Endy Austin
+Click the Windows button + Q, mouse the source pixel rectangle to capture, and the resulting text is placed in the clipboard.
+
+It can't get much more minimal or efficient than that, can it?
+
+Besides that, Capture2Text supports:
+
+- Almost a hundred target languages
+- Multiple simultanaeous target languages
+- Immediate translation via Google translate
+- Text-to-speech voice
+
+<center>
+<img src="img/Capture2Text_conceptual_illustration.png" alt="Capture2Text" title="Capture2Text" width="600"/> <!-- 810 -->
+</center>
+
+####<a name="4"></a> Productivity Tips
+
+For more efficiency in personal and profession life in general, here are a couple of tips by
+Endy Austin
+on [how to be productive, feel less overwhelmed, and get things done](https://www.freecodecamp.org/news/how-to-get-things-done-lessons-in-productivity).
 

@@ -47,11 +47,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Parameter Filter Also Checks Type</h3>
-<h4><a name="2"></a></h4>
+<h4><a name="2"></a> Parameter Filter Also Checks Type</h4>
 <p>We made an interesting discovery in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/string-parameter-filtering-is-retrieving-false-data/m-p/10034687">string parameter filtering retrieving false data</a>:</p>
-<p>If the internal <code>ParameterValueProvider</code> class does not find the requested parameter from the element itself, will also try to get it from the element's type.</p>
+<p>If the internal <code>ParameterValueProvider</code> class does not find the requested parameter from the element itself, will also try to read it from the element's type.</p>
 <p>This undocumented behaviour can lead to some confusion and is difficult to fix perfectly in an efficient manner.</p>
 <p><strong>Question:</strong> I am trying to filter walls based on their "Fire Rating" parameter using the <code>FilterStringContains</code> evaluator.</p>
 <p>However, this filter retrieves both walls satisfying the rule plus other walls that don't even contain that parameter!</p>
