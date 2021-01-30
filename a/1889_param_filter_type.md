@@ -226,6 +226,22 @@ Linq is super slow compared to the built-in parameter filter, and I see no other
 
 Many thanks to Ameer and Richard for this very fruitful and illuminating discussion!
 
+####<a name="2.1"></a> Parameter Property Also Checks Element Type
+
+Our learning is never-ending.
+
+I response to the above,
+Frank [@Fair59](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/2083518) Aarssen added:
+
+> I noticed the same behaviour for the Parameter properties of an Element.
+Getting a parameter on (family) instances by GUID or Definition also returns the type-parameter:
+
+<center>
+<img src="img/param_by_guid_includes_type.png" alt="Parameter property by GUID and Definition" title="Parameter property by GUID and Definition" width="368"/> <!-- 368 -->
+</center>
+
+> Please update the documentation for these properties as well.
+
 ####<a name="3"></a> Capture2Text, a Handy OCR Tool
 
 I happened upon a very handy OCR tool that looks pretty good:
