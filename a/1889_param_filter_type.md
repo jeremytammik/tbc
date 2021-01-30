@@ -63,6 +63,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Getting ready for a rainy weekend, here is an important insight in using a filtered element collector with a parameter filter, a handy open source OCR tool and a few productivity tips:
 
 - [Parameter filter also checks element type](#2)
+- [Parameter property also checks element type](#2.1)
 - [Capture2Text, a handy OCR tool](#3)
 - [Productivity tips](#4)
 
