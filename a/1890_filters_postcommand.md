@@ -29,6 +29,9 @@
   TwinMotion Dynamic Link Export Fbx Automatically
   https://forums.autodesk.com/t5/revit-api-forum/twinmotion-dynamic-link-export-fbx-automatically/m-p/10028748
 
+- top_solutioon_authors_two_jeremys_2.png
+  top_solutioon_authors_two_jeremys.png
+
 twitter:
 
 in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
@@ -54,29 +57,64 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Applying Multiple Filters and PostCommand + SendKeys
 
+####<a name="2"></a> Multiple Collectors versus Multiple Filters
 
-####<a name="2"></a> 
-
+This question arose repeatedly in the past few weeks, so let's reiterate it in detail, prompted by 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [multiple collectors](https://forums.autodesk.com/t5/revit-api-forum/multiple-collectors/m-p/10046666)
 
+**Question:** I noticed that if I create multiple collectors in the same script, they don't work properly and most likely end up empty.
+I've tried to use `Dispose` before creating the second collector to see if it can sort of "reset" the collector, but I always get this error:
 
-**Question:** 
+- Exception : Autodesk.Revit.Exceptions.InvalidObjectException: The managed object is not valid.
+
+What am I missing?
+
+Here is a simple example where I collect all shared parameters in a project first so I can use their GUIDs to collect data from them in families.
 
 <pre class="code">
+  collector = FilteredElementCollector(doc)
 
+  # Find GUID of desired shared parameters
+  
+  sharedPars = collector.OfClass(SharedParameterElement)
+
+  # Collect data from families based on parameter GUID.
+  
+  families = collector.OfClass(FamilyInstance)
+    .WhereElementIsViewIndependent()
 </pre>
+
+**Answer:** Applying several different filters to one single collector does exactly what it should:
+
+Every single filter is applied to the collector results.
+
+If the filters are mutually exclusive, you end up with an empty result.
+
+For a more detailed explanation, please read the discussion
+on [Reinitialising the Filtered Element Collector](https://thebuildingcoder.typepad.com/blog/2019/11/design-automation-api-stacks-collectors-and-links.html#4).
+
+The same question also came up in sereral other recent threads, e.g.,
+
+how to extract the geometry and the texts of the title block in a sheetview? 
+https://forums.autodesk.com/t5/revit-api-forum/how-to-extract-the-geometry-and-the-texts-of-the-title-block-in/m-p/9943738?search-action-id=611712522336&search-result-uid=9943738
+
+
+https://thebuildingcoder.typepad.com/blog/2021/01/sheet-view-xform-coords-img-export-and-title-block...
+
+In your sample below, simply create two separate collectors for shared parameters and family instances.
+
+**Question:** 
 
 
 <center>
 <img src="img/.png" alt="" title="" width="100"/> <!-- 884 -->
 </center>
 
-
 **Answer:** 
 
 **Response:** 
 
-####<a name="3"></a> 
-
+####<a name="3"></a>
 
 ####<a name="4"></a> 
