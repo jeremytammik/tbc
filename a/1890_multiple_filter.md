@@ -61,11 +61,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 elsewhere in the world:
 
 - [Two Jeremys](#2)
-- [Multiple Collectors versus Multiple Filters](#3)
-- [RevitLookup Handles Split Region Offsets](#4)
-- [Python and Dynamo Autotag Without Overlap](#5)
-- [Custom Errors and Preventing Changes](#6)
-- [Ecological Cost of Crypto Currency and Art](#7)
+- [Multiple collectors versus multiple filters](#3)
+- [RevitLookup handles split region offsets](#4)
+- [Python and Dynamo autotag without overlap](#5)
+- [Custom errors and preventing changes](#6)
+- [Ecological cost of crypto currency and art](#7)
 
 ####<a name="2"></a> Two Jeremys
 
