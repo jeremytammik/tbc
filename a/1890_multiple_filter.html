@@ -122,15 +122,81 @@ A list of XYZs can be returned, named by the index that was used.</p>
 <p>This enhancement is captured
 in <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.12">RevitLookup release 2021.0.0.12</a>.</p>
 <p>Many thanks to Michael for implementing and sharing this!</p>
-<h4><a name="5"></a> Autotag Without Overlap</h4>
-<p>https://forums.autodesk.com/t5/revit-api-forum/auto-tagging-without-overlap/m-p/10036344/highlight/false#M52915</p>
-<h4><a name="6"></a> Element Tagging with Dynamo</h4>
+<h4><a name="5"></a> Python and Dynamo Autotag Without Overlap</h4>
+<p>Christopher Kepner shared a nice brute force Python solution
+implementing <a href="https://forums.autodesk.com/t5/revit-api-forum/auto-tagging-without-overlap/m-p/10036344">Auto Tagging without overlap</a>,
+explaining the algorithm like this:</p>
+<p>A python script to auto-tag all doors and place them without clashing with other tags or doors, using a custom smart tag that is much bigger than typical door tag.</p>
+<p>It starts with a list of doors in the variable <code>doorFiltered</code>. </p>
+<p>The location point of the first door in the list is fed into the function below to provide a test point to see if it overlaps any location points in the list of doors:</p>
+<pre class="prettyprint">
+  def move_right(x,y,z):
+    n = scaleFactor
+    return x+n, y, z
+
+  def move_down(x,y,z):
+    n = scaleFactor
+    return x,y-n,z
+
+  def move_left(x,y,z):
+    n = scaleFactor
+    return x-n,y,z
+
+  def move_up(x,y,z):
+    n = scaleFactor
+    return x,y+n,z
+
+  moves = [move_right, move_down, move_left, move_up]
+
+  def shift(end, point):
+    from itertools import cycle
+    _moves = cycle(moves)
+    n = 1
+    pos = point
+    times_to_move = 1
+
+    yield pos
+
+    while True:
+      for _ in range(2):
+        move = next(_moves)
+        for _ in range(times_to_move):
+          if n >= end:
+            return
+          pos = move(*pos)
+          n+=1
+          yield pos
+
+      times_to_move+=1
+</pre>
+
+<p>If the point lands too close to any door locations in the list, the code adds a integer to the function and runs again to provide the next test point. Each time the function is re-run, the next point follows a spiral pattern from the origin (location point of the first door):</p>
+<p><center>
+<img src="img/autotagging_spiral.png" alt="Autotagging spiral" title="Autotagging spiral" width="200"/> <!-- 394 -->
+</center></p>
+<p>Once a point is found that is far enough from the list of door locations, a tag is placed and the tag location is added to the list of door locations.</p>
+<p>The process loops to the next door, checking against the list of door location plus the new tag location.</p>
+<p>It's a working concept, but the output is inconsistant.</p>
+<p>Issues include:</p>
 <ul>
-<li>https://archi-lab.net/element-tagging-with-dynamo/
-  https://forums.autodesk.com/t5/revit-api-forum/tags-without-overlapping/m-p/10040873
-  https://forums.autodesk.com/t5/revit-api-forum/auto-tagging-without-overlap/m-p/10036344</li>
+<li>Tags occasionally overlap with eachother.</li>
+<li>The process takes a while. there's tons of points it tests that fail.</li>
+<li>Tag location it finds does not work well with leaders. the tags land in every direction from the door creating overlap of leaders. It might work better with smaller tags.</li>
 </ul>
-<h4><a name="7"></a> Custom Errors and Preventing Changes</h4>
+<p><strong>Answer:</strong> LOL. If you make the tags small enough, the problem will disappear entirely, along with the tags.</p>
+<p>Thank you very much for the explanation. Brute force and effective, given time. I love that straightforward approach!</p>
+<p>Another tagging conversation
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/tags-without-overlapping/m-p/7750631">tags without Overlapping</a>
+also mentions a couple of useful possibilities.</p>
+<p>More complex approaches are discussed on the Internet under the
+term '<a href="https://duckduckgo.com/?q=map+labelling+algorithm">map labelling algorithms</a>'.</p>
+<p>Finally, Konrad Sobon of <a href="https://archi-lab.net">archi+lab</a>
+discussed <a href="https://archi-lab.net/element-tagging-with-dynamo">element tagging with dynamo</a>
+to create roof plans for a glass canopy system and tag each panel with its unique <code>Mark</code> value:</p>
+<blockquote>
+<p>basically it's a Revit’s Tag All tool, but with extra control over where the tag actually gets placed.</p>
+</blockquote>
+<h4><a name="6"></a> Custom Errors and Preventing Changes</h4>
 <p>Harry Mattison presents a nice solution
 implementing <a href="https://boostyourbim.wordpress.com/2021/01/28/custom-errors-preventing-specific-changes-to-the-revit-model">custom errors &ndash; preventing specific changes to the Revit model</a>,
 explaining:</p>
@@ -143,10 +209,10 @@ Or something else like that where you'd like to automate the process of checking
 <img src="img/hm_custom_error.png" alt="Custom error" title="Custom error" width="600"/> <!-- 705 -->
 </center></p>
 <blockquote>
-<p>This can be achieved with two pieces of Revit API functionality &ndash; Updater and Custom Failures.
-You can find all the code here and an explanation in the video below.</p>
+<p>This can be achieved with two pieces of Revit API functionality &ndash; Updater and Custom Failures...</p>
 </blockquote>
-<h4><a name="8"></a> Ecological Cost of Crypto Currency and Art</h4>
+<p>Many thanks to Harry for sharing this nice explanation and implementation!</p>
+<h4><a name="7"></a> Ecological Cost of Crypto Currency and Art</h4>
 <p>I was intrigued and astounded at some of the information shared by Memo Akten in the analysis
 of <a href="https://memoakten.medium.com/the-unreasonable-ecological-cost-of-cryptoart-2221d3eb2053">the unreasonable ecological cost of #CryptoArt</a>,
 and crypto-currencies as well.</p>
