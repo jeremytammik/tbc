@@ -247,7 +247,7 @@ Issues include:
 
 Thank you very much for the explanation. Brute force and effective, given time. I love that straightforward approach!
 
-Another tagging conversation
+Another recent tagging conversation
 on [tags without overlapping](https://forums.autodesk.com/t5/revit-api-forum/tags-without-overlapping/m-p/7750631)
 mentions a couple of other useful possibilities.
 
