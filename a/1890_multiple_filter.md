@@ -53,10 +53,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Applying Multiple Filters and PostCommand + SendKeys
+### Splits Applying Multiple Filters
 
-I need to come to terms with my split personality.
-Meanwhile, lots going on in
+I need to come to terms with the split personality recently foisted upon me.
+Thank God, RevitLookup now handles split regions.
+
+Meanwhile, lots more going on in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
 elsewhere in the world:
 
@@ -127,7 +129,7 @@ For a previous explanation, please read the discussion
 on [reinitialising the filtered element collector](https://thebuildingcoder.typepad.com/blog/2019/11/design-automation-api-stacks-collectors-and-links.html#4).
 
 The same question also came up in a few other recent threads, e.g.,
-on [how to extract the geometry and the texts of the title block in a sheetview](https://forums.autodesk.com/t5/revit-api-forum/how-to-extract-the-geometry-and-the-texts-of-the-title-block-in/m-p/9943738),
+on [how to extract the geometry and the texts of the title block in a sheet view](https://forums.autodesk.com/t5/revit-api-forum/how-to-extract-the-geometry-and-the-texts-of-the-title-block-in/m-p/9943738),
 summarised in the blog post 
 on [extracting title block geometry and text](https://thebuildingcoder.typepad.com/blog/2021/01/sheet-view-xform-coords-img-export-and-title-block.html#2).
 
@@ -229,11 +231,11 @@ Once a point is found that is far enough from the list of door locations, a tag 
 
 The process loops to the next door, checking against the list of door location plus the new tag location.
 
-It's a working concept, but the output is inconsistant.
+It's a working concept, but the output is inconsistent.
 
 Issues include:
 
-- Tags occasionally overlap with eachother.
+- Tags occasionally overlap with each other.
 - The process takes a while. there's tons of points it tests that fail.
 - Tag location it finds does not work well with leaders. the tags land in every direction from the door creating overlap of leaders. It might work better with smaller tags.
 
@@ -252,7 +254,7 @@ Finally, Konrad Sobon of [archi+lab](https://archi-lab.net)
 discussed [element tagging with dynamo](https://archi-lab.net/element-tagging-with-dynamo)
 to create roof plans for a glass canopy system and tag each panel with its unique `Mark` value:
 
-> basically it's a Revit’s Tag All tool, but with extra control over where the tag actually gets placed.
+> basically, it's a Revit’s Tag All tool, but with extra control over where the tag actually gets placed.
 
 ####<a name="6"></a> Custom Errors and Preventing Changes
 

@@ -52,9 +52,10 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Applying Multiple Filters and PostCommand + SendKeys</h3>
-<p>I need to come to terms with my split personality.
-Meanwhile, lots going on in
+<h3>Splits Applying Multiple Filters</h3>
+<p>I need to come to terms with the split personality recently foisted upon me.
+Thank God, RevitLookup now handles split regions.</p>
+<p>Meanwhile, lots more going on in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> and
 elsewhere in the world:</p>
 <ul>
@@ -108,7 +109,7 @@ I've tried to use <code>Dispose</code> before creating the second collector to s
 <p>For a previous explanation, please read the discussion
 on <a href="https://thebuildingcoder.typepad.com/blog/2019/11/design-automation-api-stacks-collectors-and-links.html#4">reinitialising the filtered element collector</a>.</p>
 <p>The same question also came up in a few other recent threads, e.g.,
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-extract-the-geometry-and-the-texts-of-the-title-block-in/m-p/9943738">how to extract the geometry and the texts of the title block in a sheetview</a>,
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-extract-the-geometry-and-the-texts-of-the-title-block-in/m-p/9943738">how to extract the geometry and the texts of the title block in a sheet view</a>,
 summarised in the blog post 
 on <a href="https://thebuildingcoder.typepad.com/blog/2021/01/sheet-view-xform-coords-img-export-and-title-block.html#2">extracting title block geometry and text</a>.</p>
 <p>In your sample code snippet, simply create two separate collectors for shared parameters and family instances.</p>
@@ -188,10 +189,10 @@ explaining the algorithm like this:</p>
 </center></p>
 <p>Once a point is found that is far enough from the list of door locations, a tag is placed and the tag location is added to the list of door locations.</p>
 <p>The process loops to the next door, checking against the list of door location plus the new tag location.</p>
-<p>It's a working concept, but the output is inconsistant.</p>
+<p>It's a working concept, but the output is inconsistent.</p>
 <p>Issues include:</p>
 <ul>
-<li>Tags occasionally overlap with eachother.</li>
+<li>Tags occasionally overlap with each other.</li>
 <li>The process takes a while. there's tons of points it tests that fail.</li>
 <li>Tag location it finds does not work well with leaders. the tags land in every direction from the door creating overlap of leaders. It might work better with smaller tags.</li>
 </ul>
@@ -206,7 +207,7 @@ term '<a href="https://duckduckgo.com/?q=map+labelling+algorithm">map labelling 
 discussed <a href="https://archi-lab.net/element-tagging-with-dynamo">element tagging with dynamo</a>
 to create roof plans for a glass canopy system and tag each panel with its unique <code>Mark</code> value:</p>
 <blockquote>
-<p>basically it's a Revit’s Tag All tool, but with extra control over where the tag actually gets placed.</p>
+<p>basically, it's a Revit’s Tag All tool, but with extra control over where the tag actually gets placed.</p>
 </blockquote>
 <h4><a name="6"></a> Custom Errors and Preventing Changes</h4>
 <p>Harry Mattison presents a nice solution
