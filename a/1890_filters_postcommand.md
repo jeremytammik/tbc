@@ -22,15 +22,17 @@
 - autotag without overlap
   https://forums.autodesk.com/t5/revit-api-forum/auto-tagging-without-overlap/m-p/10036344/highlight/false#M52915
 
-- The Unreasonable Ecological Cost of #CryptoArt (and crypto-currencies as well)
-  https://memoakten.medium.com/the-unreasonable-ecological-cost-of-cryptoart-2221d3eb2053
-
 - PostCommand + SendKeys to launch command and accept default UI input
   TwinMotion Dynamic Link Export Fbx Automatically
   https://forums.autodesk.com/t5/revit-api-forum/twinmotion-dynamic-link-export-fbx-automatically/m-p/10028748
 
 - top_solutioon_authors_two_jeremys_2.png
   top_solutioon_authors_two_jeremys.png
+
+- https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.12
+
+- The Unreasonable Ecological Cost of #CryptoArt (and crypto-currencies as well)
+  https://memoakten.medium.com/the-unreasonable-ecological-cost-of-cryptoart-2221d3eb2053
 
 twitter:
 
@@ -56,6 +58,22 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 ### Applying Multiple Filters and PostCommand + SendKeys
+
+####<a name="2"></a> Two Jeremys
+
+Apparently, the user account handling for
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+recently changed.
+
+I can no longer log in with the non-standard Autodesk `jeremytammik` account that I have been using all these years, and am forced to use my standard Autodesk `jeremy.tammik` account with a dot `.` instead.
+
+As a result, we now have two active Jeremys in the forum:
+
+<center>
+<img src="img/rain_water_collector_sheet.jpg" alt="Rain water collector" title="Rain water collector" width="330"/> <!-- 330 -->
+</center>
+
+top_solutioon_authors_two_jeremys_2.png 964
 
 ####<a name="2"></a> Multiple Collectors versus Multiple Filters
 
