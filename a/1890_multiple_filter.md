@@ -12,6 +12,11 @@
 - Multiple Collectors -- multiple filters
   https://forums.autodesk.com/t5/revit-api-forum/multiple-collectors/m-p/10046666
 
+- https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.12
+
+- autotag without overlap
+  https://forums.autodesk.com/t5/revit-api-forum/auto-tagging-without-overlap/m-p/10036344/highlight/false#M52915
+
 - https://archi-lab.net/element-tagging-with-dynamo/
   https://forums.autodesk.com/t5/revit-api-forum/tags-without-overlapping/m-p/10040873
   https://forums.autodesk.com/t5/revit-api-forum/auto-tagging-without-overlap/m-p/10036344
@@ -21,11 +26,6 @@
   by harrymattison
   Let's say there is a specific list of View Scales that you want allowed in your Revit projects. Or certain naming conventions that should be used. Or something else like that where you'd like to automate the process of checking a user's change and determining if it should be allowed, prevented, or trigger a warning.
   This can be done with two pieces of Revit API functionality - Updater & Custom Failures. You can find all the code here and an explanation in the video below.
-
-- autotag without overlap
-  https://forums.autodesk.com/t5/revit-api-forum/auto-tagging-without-overlap/m-p/10036344/highlight/false#M52915
-
-- https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.12
 
 - The Unreasonable Ecological Cost of #CryptoArt (and crypto-currencies as well)
   https://memoakten.medium.com/the-unreasonable-ecological-cost-of-cryptoart-2221d3eb2053
@@ -73,7 +73,7 @@ I guess the previous one will fade away as time goes on.
 
 I wish I could meet him in person before he disappears.
 
-####<a name="2"></a> Multiple Collectors versus Multiple Filters
+####<a name="3"></a> Multiple Collectors versus Multiple Filters
 
 This question arose repeatedly in the past few weeks, so let's reiterate it in detail, prompted by 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -135,7 +135,56 @@ I'll spell it out in the blog again and hope that will be easier to find in case
 <img src="img/rain_water_collector_sheet.jpg" alt="Rain water collector" title="Rain water collector" width="330"/> <!-- 330 -->
 </center>
 
-####<a name="3"></a>
+####<a name="4"></a> RevitLookup Handles Split Region Offsets
 
-####<a name="4"></a>
+Thanks to Michael [@RevitArkitek](https://github.com/RevitArkitek) Coffey, RevitLookup can now handle split region offsets.
 
+He submitted the [issue #68 &ndash; split region offsets (2021)](https://github.com/jeremytammik/RevitLookup/issues/68) and a
+subsequent [pull request &ndash; adds handler for `GetSplitRegionOffsets`](https://github.com/jeremytammik/RevitLookup/pull/69),
+explaining:
+
+> The `ViewCropRegionShapeManager` method `GetSplitRegionOffset` was added in 2021.
+This returns an `XYZ` but requires an integer index parameter.
+A list of XYZs can be returned, named by the index that was used.
+
+> I have this working and can submit a pull request.
+
+This enhancement is captured
+in [RevitLookup release 2021.0.0.12](https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.12).
+
+Many thanks to Michael for implementing and sharing this!
+
+
+####<a name="5"></a> Autotag Without Overlap
+
+  https://forums.autodesk.com/t5/revit-api-forum/auto-tagging-without-overlap/m-p/10036344/highlight/false#M52915
+
+####<a name="6"></a> Element Tagging with Dynamo
+
+- https://archi-lab.net/element-tagging-with-dynamo/
+  https://forums.autodesk.com/t5/revit-api-forum/tags-without-overlapping/m-p/10040873
+  https://forums.autodesk.com/t5/revit-api-forum/auto-tagging-without-overlap/m-p/10036344
+
+####<a name="7"></a> Custom Errors and Preventing Changes
+
+Harry Mattison presents a nice solution
+implementing [custom errors &ndash; preventing specific changes to the Revit model](https://boostyourbim.wordpress.com/2021/01/28/custom-errors-preventing-specific-changes-to-the-revit-model),
+explaining:
+
+> Let's say there is a specific list of View Scales that you want allowed in your Revit projects.
+Or certain naming conventions that should be used.
+Or something else like that where you'd like to automate the process of checking a user's change and determining if it should be allowed, prevented, or trigger a warning.
+
+<center>
+<img src="img/hm_custom_error.png" alt="Custom error" title="Custom error" width="600"/> <!-- 705 -->
+</center>
+
+> This can be achieved with two pieces of Revit API functionality &ndash; Updater and Custom Failures.
+You can find all the code here and an explanation in the video below.
+
+####<a name="8"></a> Ecological Cost of Crypto Currency and Art
+
+I was intrigued and astounded at some of the information shared by Memo Akten in the analysis
+of [the unreasonable ecological cost of #CryptoArt](https://memoakten.medium.com/the-unreasonable-ecological-cost-of-cryptoart-2221d3eb2053),
+and crypto-currencies as well.
+  
