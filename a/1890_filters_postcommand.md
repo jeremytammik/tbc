@@ -99,22 +99,25 @@ The same question also came up in sereral other recent threads, e.g.,
 how to extract the geometry and the texts of the title block in a sheetview? 
 https://forums.autodesk.com/t5/revit-api-forum/how-to-extract-the-geometry-and-the-texts-of-the-title-block-in/m-p/9943738?search-action-id=611712522336&search-result-uid=9943738
 
-
 https://thebuildingcoder.typepad.com/blog/2021/01/sheet-view-xform-coords-img-export-and-title-block...
 
 In your sample below, simply create two separate collectors for shared parameters and family instances.
 
-**Question:** 
+**Response:** I appreciate the reply and support.
 
+I definitely understand what I did wrong now; I can't reuse the same collector variable as the filters just pile up, which obviously causes the collector to be empty, so simple.
+
+It does worry me that after so much research I couldn't find the answer anywhere.
+
+**Answer:** Thank you for your appreciation. Happy to hear that the problem is solved and the solution clear and simple.
+
+I'll spell it out in the blog again and hope that will be easier to find in case anyone runs into this again in the future.
 
 <center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 884 -->
+<img src="img/rain_water_collector_sheet.jpg" alt="Rain water collector" title="Rain water collector" width="330"/> <!-- 330 -->
 </center>
-
-**Answer:** 
-
-**Response:** 
 
 ####<a name="3"></a>
 
-####<a name="4"></a> 
+####<a name="4"></a>
+
