@@ -65,15 +65,17 @@ Apparently, the user account handling for
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 recently changed.
 
-I can no longer log in with the non-standard Autodesk `jeremytammik` account that I have been using all these years, and am forced to use my standard Autodesk `jeremy.tammik` account with a dot `.` instead.
+I can no longer log in with the non-standard Autodesk `jeremytammik` account that I have been using all these years; the login automatically switches that over to my standard Autodesk `jeremy.tammik` account with a dot `.` instead.
 
 As a result, we now have two active Jeremys in the forum:
 
 <center>
-<img src="img/rain_water_collector_sheet.jpg" alt="Rain water collector" title="Rain water collector" width="330"/> <!-- 330 -->
+<img src="img/top_solution_authors_two_jeremys_2.png" alt="Two Jeremys" title="Two Jeremys" width="330"/> <!-- 964 -->
 </center>
 
-top_solutioon_authors_two_jeremys_2.png 964
+I guess the previous one will fade away as time goes on.
+
+I wish I could meet him in person before he disappears.
 
 ####<a name="2"></a> Multiple Collectors versus Multiple Filters
 
