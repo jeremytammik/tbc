@@ -70,7 +70,7 @@ I've tried to use `Dispose` before creating the second collector to see if it ca
 
 What am I missing?
 
-Here is a simple example where I collect all shared parameters in a project first so I can use their GUIDs to collect data from them in families.
+Here is a simple example where I collect all shared parameters in a project first, so I can use their GUIDs to collect data from them in families.
 
 <pre class="code">
   collector = FilteredElementCollector(doc)
@@ -85,23 +85,25 @@ Here is a simple example where I collect all shared parameters in a project firs
     .WhereElementIsViewIndependent()
 </pre>
 
-**Answer:** Applying several different filters to one single collector does exactly what it should:
+**Answer:** You are not in fact creating multiple collectors.
+
+You are creating one single collector and applying multiple filters to that.
+
+Applying several different filters to one single collector does exactly what it should:
 
 Every single filter is applied to the collector results.
 
 If the filters are mutually exclusive, you end up with an empty result.
 
-For a more detailed explanation, please read the discussion
-on [Reinitialising the Filtered Element Collector](https://thebuildingcoder.typepad.com/blog/2019/11/design-automation-api-stacks-collectors-and-links.html#4).
+For a previous explanation, please read the discussion
+on [reinitialising the filtered element collector](https://thebuildingcoder.typepad.com/blog/2019/11/design-automation-api-stacks-collectors-and-links.html#4).
 
-The same question also came up in sereral other recent threads, e.g.,
+The same question also came up in a few other recent threads, e.g.,
+on [how to extract the geometry and the texts of the title block in a sheetview](https://forums.autodesk.com/t5/revit-api-forum/how-to-extract-the-geometry-and-the-texts-of-the-title-block-in/m-p/9943738),
+summarised in the blog post 
+on [extracting title block geometry and text](https://thebuildingcoder.typepad.com/blog/2021/01/sheet-view-xform-coords-img-export-and-title-block.html#2).
 
-how to extract the geometry and the texts of the title block in a sheetview? 
-https://forums.autodesk.com/t5/revit-api-forum/how-to-extract-the-geometry-and-the-texts-of-the-title-block-in/m-p/9943738?search-action-id=611712522336&search-result-uid=9943738
-
-https://thebuildingcoder.typepad.com/blog/2021/01/sheet-view-xform-coords-img-export-and-title-block...
-
-In your sample below, simply create two separate collectors for shared parameters and family instances.
+In your sample code snippet, simply create two separate collectors for shared parameters and family instances.
 
 **Response:** I appreciate the reply and support.
 
