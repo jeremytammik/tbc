@@ -55,6 +55,18 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Applying Multiple Filters and PostCommand + SendKeys
 
+I need to come to terms with my split personality.
+Meanwhile, lots going on in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
+elsewhere in the world:
+
+- [Two Jeremys](#2)
+- [Multiple Collectors versus Multiple Filters](#3)
+- [RevitLookup Handles Split Region Offsets](#4)
+- [Python and Dynamo Autotag Without Overlap](#5)
+- [Custom Errors and Preventing Changes](#6)
+- [Ecological Cost of Crypto Currency and Art](#7)
+
 ####<a name="2"></a> Two Jeremys
 
 Apparently, the user account handling for
@@ -230,8 +242,8 @@ Issues include:
 Thank you very much for the explanation. Brute force and effective, given time. I love that straightforward approach!
 
 Another tagging conversation
-on [tags without Overlapping](https://forums.autodesk.com/t5/revit-api-forum/tags-without-overlapping/m-p/7750631)
-also mentions a couple of useful possibilities.
+on [tags without overlapping](https://forums.autodesk.com/t5/revit-api-forum/tags-without-overlapping/m-p/7750631)
+mentions a couple of other useful possibilities.
 
 More complex approaches are discussed on the Internet under the
 term '[map labelling algorithms](https://duckduckgo.com/?q=map+labelling+algorithm)'.
