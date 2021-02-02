@@ -34,8 +34,14 @@ twitter:
 
 in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+I need to come to terms with a split personality.
+Meanwhile, lots more going on in the Revit API discussion forum
+&ndash; Two Jeremys
+&ndash; Multiple collectors versus multiple filters
+&ndash; RevitLookup handles split region offsets
+&ndash; Python and Dynamo autotag without overlap
+&ndash; Custom errors and preventing changes
+&ndash; Ecological cost of crypto currency and art...
 
 linkedin:
 
@@ -53,7 +59,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Splits Applying Multiple Filters
+### Splits: Persona, Collector, Region, Tag, Modification
 
 I need to come to terms with the split personality recently foisted upon me.
 Thank God, RevitLookup now handles split regions.
@@ -102,7 +108,7 @@ What am I missing?
 
 Here is a simple example where I collect all shared parameters in a project first, so I can use their GUIDs to collect data from them in families.
 
-<pre class="code">
+<pre class="prettyprint">
   collector = FilteredElementCollector(doc)
 
   # Find GUID of desired shared parameters
@@ -160,8 +166,6 @@ explaining:
 > The `ViewCropRegionShapeManager` method `GetSplitRegionOffset` was added in 2021.
 This returns an `XYZ` but requires an integer index parameter.
 A list of XYZs can be returned, named by the index that was used.
-
-> I have this working and can submit a pull request.
 
 This enhancement is captured
 in [RevitLookup release 2021.0.0.12](https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.12).

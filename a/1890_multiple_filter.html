@@ -33,8 +33,14 @@ twitter:
 
 in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+I need to come to terms with a split personality.
+Meanwhile, lots more going on in the Revit API discussion forum
+&ndash; Two Jeremys
+&ndash; Multiple collectors versus multiple filters
+&ndash; RevitLookup handles split region offsets
+&ndash; Python and Dynamo autotag without overlap
+&ndash; Custom errors and preventing changes
+&ndash; Ecological cost of crypto currency and art...
 
 linkedin:
 
@@ -52,7 +58,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Splits Applying Multiple Filters</h3>
+<h3>Splits: Persona, Collector, Region, Tag, Modification</h3>
 <p>I need to come to terms with the split personality recently foisted upon me.
 Thank God, RevitLookup now handles split regions.</p>
 <p>Meanwhile, lots more going on in
@@ -88,7 +94,7 @@ I've tried to use <code>Dispose</code> before creating the second collector to s
 </ul>
 <p>What am I missing?</p>
 <p>Here is a simple example where I collect all shared parameters in a project first, so I can use their GUIDs to collect data from them in families.</p>
-<pre class="code">
+<pre class="prettyprint">
   collector = FilteredElementCollector(doc)
 
   # Find GUID of desired shared parameters
@@ -130,7 +136,6 @@ explaining:</p>
 <p>The <code>ViewCropRegionShapeManager</code> method <code>GetSplitRegionOffset</code> was added in 2021.
 This returns an <code>XYZ</code> but requires an integer index parameter.
 A list of XYZs can be returned, named by the index that was used.</p>
-<p>I have this working and can submit a pull request.</p>
 </blockquote>
 <p>This enhancement is captured
 in <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.12">RevitLookup release 2021.0.0.12</a>.</p>
