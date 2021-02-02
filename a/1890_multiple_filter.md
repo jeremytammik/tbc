@@ -6,6 +6,9 @@
 
 <!---
 
+- top_solutioon_authors_two_jeremys_2.png
+  top_solutioon_authors_two_jeremys.png
+
 - Multiple Collectors -- multiple filters
   https://forums.autodesk.com/t5/revit-api-forum/multiple-collectors/m-p/10046666
 
@@ -21,13 +24,6 @@
 
 - autotag without overlap
   https://forums.autodesk.com/t5/revit-api-forum/auto-tagging-without-overlap/m-p/10036344/highlight/false#M52915
-
-- PostCommand + SendKeys to launch command and accept default UI input
-  TwinMotion Dynamic Link Export Fbx Automatically
-  https://forums.autodesk.com/t5/revit-api-forum/twinmotion-dynamic-link-export-fbx-automatically/m-p/10028748
-
-- top_solutioon_authors_two_jeremys_2.png
-  top_solutioon_authors_two_jeremys.png
 
 - https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.12
 
