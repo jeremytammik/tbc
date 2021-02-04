@@ -78,7 +78,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### PostCommand + SendKeys
+### Birthday, DevDays, PostCommand + SendKeys
 
 ####<a name="2"></a> Happy Birthday, Autodesk!
 
@@ -86,7 +86,7 @@ As Shaan Hurley pointed out,
 [Autodesk turned 39 years old](https://autodesk.blogs.com/between_the_lines/2021/01/autodesk-turns-39-years-old.html) on
 January 30, last Saturday.
 
-Enjoy this snapshot of fhe flying Autodesk founders:
+Enjoy this snapshot of the flying Autodesk founders:
 
 <center>
 <img src="img/autodesk_founders.png" alt="Autodesk founders" title="Autodesk founders" width="600"/> <!-- 636 -->
@@ -152,11 +152,11 @@ I tried to use `SendKeys` but I couldn't make it.
 Here are the forms I need to step through:
 
 <center>
-<img src="img/twinmotion_fbx_export_1.png" alt="TwinMotion FBX export" title="TwinMotion FBX export" width="254"/> <!-- 254 -->
+<img src="img/twinmotion_fbx_export_1.png" alt="TwinMotion FBX export" title="TwinMotion FBX export" width="200"/> <!-- 254 -->
 <br/>
-<img src="img/twinmotion_fbx_export_2.png" alt="TwinMotion FBX export" title="TwinMotion FBX export" width="254"/> <!-- 254 -->
+<img src="img/twinmotion_fbx_export_2.png" alt="TwinMotion FBX export" title="TwinMotion FBX export" width="400"/> <!-- 610 -->
 <br/>
-<img src="img/twinmotion_fbx_export_3.png" alt="TwinMotion FBX export" title="TwinMotion FBX export" width="254"/> <!-- 254 -->
+<img src="img/twinmotion_fbx_export_3.png" alt="TwinMotion FBX export" title="TwinMotion FBX export" width="400"/> <!-- 610 -->
 </center>
 
 I am a very new on Revit API forum. Any advice would be greatly appreciated! &nbsp; :-) 
