@@ -89,16 +89,19 @@ January 30, last Saturday.
 Enjoy this snapshot of fhe flying Autodesk founders:
 
 <center>
-<img src="img/autodesk_founders.png" alt="Autodesk founders" title="Autodesk founders" width="600"/> <!-- 644 -->
+<img src="img/autodesk_founders.png" alt="Autodesk founders" title="Autodesk founders" width="600"/> <!-- 636 -->
 </center>
 
-From left to right: Rudolf Künzli, Mike Ford, Dan Drake, Mauri Laitinen, Greg Lutz, David Kalish, Lars Moureau, Richard Handyside,Kern Sibbald, Hal Royaltey, Duff Kurland, John Walker, Keith Marcelius.
+From left to right: Rudolf Künzli, Mike Ford, Dan Drake, Mauri Laitinen, Greg Lutz, David Kalish, Lars Moureau, Richard Handyside, Kern Sibbald, Hal Royaltey, Duff Kurland, John Walker, Keith Marcelius.
 
-Rudolf Künzli was still actively leading the Swiss office in Basel when I first joined Autodesk in 1988.
+Rudolf Künzli was still actively leading the Swiss office in Gundeldingen, Basel, when I first joined Autodesk in 1988.
+
+Kern Sibbald was my direct manager when he started leading the European Technical Centre in Neuch&acirc;tel, and he didn't even realise so for over half a year, until I happened to mention the fact while chatting together on a ferry in Gothenburg &nbsp; :-)
 
 ####<a name="3"></a> DevDays Online 2021
 
-Back in modern times, just as usual, the annual DevDays Online events are taking place in the beginning of March, presented by my team, the Autodesk DAS or Developer Advocacy and Support, formerly ADN, Autodesk Developer Network.
+Back to modern times...
+just as usual, the annual DevDays Online events are taking place in the beginning of March, presented by my team, the Autodesk DAS or Developer Advocacy and Support, formerly ADN, Autodesk Developer Network.
 
 The first week will focus on public information, mainly news related to
 the [Forge platform](https://forge.autodesk.com).
