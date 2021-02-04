@@ -1,0 +1,235 @@
+Matt Mason       05:13 PM
+Will there be an update to the GBXML export API to include the new export options?
+
+This question has been answered live
+
+Ian Molloy       05:15 PM
+Hi Matt, yes the API supports all the export options ; )
+
+j s       05:13 PM
+Is parameter shearch available in the family authoring environment as well?
+
+Mike Engel       05:17 PM
+Yes, the search ability is also available in the family enviroment
+
+Lance Coffey       05:13 PM
+Would the “Room or Space Based” Mode change affect Insight workflows, or only export to gbXML?
+
+Ian Molloy       05:18 PM
+Hi Lance yes the room and space based option can now be used in Insight, as well as Systems Analysis
+
+j s       05:14 PM
+Harlan did you say all the new categories cuttable?
+
+Harlan Brumm       05:24 PM
+you can choose if they are cuttable or not.  they support an option in the family to be cut.
+
+j s       05:17 PM
+will load autodesk family be somethign that can be disabled via INI still?
+
+Harlan Brumm       05:23 PM
+Yes, no changes to that.
+
+Zsolt Varga       05:18 PM
+Are there plans to support "all" default parameters in schedules - a request we see often in support, when one or another parameter is not listed.
+
+Sasha Crotty       05:19 PM
+Unfortunately "all" is pretty much impossible because there are specific reasons for individual parameters why they can't appear. E.g. in some cases parameters have data but are not used and are filtered out by the UI. Therefore, this is better approached on a parameter by parameter basis, so let us know which parameters you want to be schedulable.
+
+Daniel Stine       05:18 PM
+will there still be some random OOTB content installed on the hard drive?
+
+Harlan Brumm       05:25 PM
+some things required for functionality will be - steel connections and a few families for path of travel mainly.  Otherwise, just templates and sample projects.
+
+Daniel Moral Trigueros       05:18 PM
+Load Autodesk Family is just working for Autodesk families, or would it be possible to add company developped families?
+
+Sasha Crotty       05:20 PM
+At this point, this is only for Autodesk provided content.
+
+j s       05:20 PM
+Can the split in split and place schedules be parametrically driven (ie: know when to split exterior doors form interior doors when splitting a door schedule)
+
+Harlan Brumm       05:25 PM
+not right now.  its is only splitable via the height right now.
+
+Matt Mason       05:21 PM
+The Export to STL - is this available via API? not seeing in release notes.
+
+Harlan Brumm       05:28 PM
+good question Matt, we will have to get back to you about this one.
+
+j s       05:23 PM
+Can generative design studies be saved/run off BIM 360 directories?
+
+Harlan Brumm       05:38 PM
+Good question, we will need to get back to you about this.
+
+j s       05:28 PM
+Can walls taper in and then back out, or just a single slant? That is could you build a "K" shaped form with one wall?
+
+Harlan Brumm       05:30 PM
+a single wall can only have a single taper.  you could do this with two walls however, but not a single wall with this tool now.
+
+j s       05:29 PM
+Does the move project to cloud have a similar 'move project between BIM 360 projects' capability?
+
+Sasha Crotty       05:32 PM
+Clarification: the new API makes it possible to build an API add-in that initiates a project. This is not out of the box functionality.
+
+To move a project, you'll have to download and re-upload the project. No way to move directly.
+
+Daniel Stine       05:31 PM
+Ian, for this group, worth point out the report data is saved locally, right?
+
+Ian Molloy       05:34 PM
+Thanks Dan, yes thats right, the loads report is ultimately a html thats stored locally, the thinking being that reports like this are ususally used to inform design, not really a part of design documents themselves, we're open to storing it with the model in the future but didnt want to delay releasing it for that
+
+Rusty Gesner       05:35 PM
+Is Autodesk in communication with Enscape developers to get them to support FormIt. (lack thereof is the biggest impediment in getting users to switch from SketchUp)
+
+Harlan Brumm       05:37 PM
+We have had conversations with them about this.  We are planning to work more on our own APIs so that it can empower all partners to work better with FormIt.
+
+j s       05:45 PM
+Love the PDF exporter - Will it be available in Design Automaton API?
+
+Sasha Crotty       05:48 PM
+I am triple checking with the DA team to make sure there's not something odd that would prevent it, but yes, it should be available as it's part of the Revit API.
+
+William Song       05:45 PM
+Is PDF export available via API?
+
+Sasha Crotty       05:46 PM
+Yes
+
+Andreas Luka       05:50 PM
+Aretheir improvments for Revit Civil 3D connections
+
+Harlan Brumm       06:43 PM
+only for stations and alignments really.
+
+Christian Riley       05:50 PM
+Does this mean that systems will have an option to define them by Fab Configs?
+
+Martin Schmid       05:52 PM
+There is no change to the relationship between systems and services.  You still select what service you want to use when converting a system in the Design to Fabrication feature.  Hopefully I understood your question properly.
+
+David Kessler       05:52 PM
+Looks like the text on the Open Cloud Revit model needs to say Open instead of Save.
+
+Sasha Crotty       06:21 PM
+Nice catch. Just double checked - that's an outdated PowerPoint issue, not in product. Will fix the slide.
+
+Daniel Stine       05:52 PM
+So, BIM 360 Design = BIM Collaborate Pro? Is there a non-pro version?
+
+Mikako Harada       05:58 PM
+yes. non pro version will be without cloud worksharing feature.
+
+j s       05:56 PM
+Does the Recap API access require recap to be installed?
+
+Mikako Harada       06:13 PM
+No, I believe. (but we will confirm.)
+
+Mikako Harada       06:15 PM
+Update:  the colleague confirms as No.
+
+Daniel Stine       06:00 PM
+Love the 'varies' functionality! Does it always print in schedules?
+
+Harlan Brumm       06:04 PM
+Yes, it will print in schedules - the default is the project setting
+
+Christian Riley       06:05 PM
+Thank you, Martin. With the elements being placed automatically in the canvas during connection, what is driving that assignment? Is that the system? IE: When a standard system is created you select the parts that are going to be used to make those connections. How is Fabrication deciding those components? Are those also assigned in the system?
+
+Martin Schmid       06:10 PM
+During connection: uses the parts defined in the service template in the Fabricaiton Database... which user defines within CADmep, ESTmep,or CAMduct.  Applies the same logic that is used if I were routing from point A to Point B.
+
+Daniel Stine       06:05 PM
+Would be helpful to show the ability to tag content from key schedules via shared parmaeters in your demo! As this is huge:)
+
+Harlan Brumm       06:06 PM
+Thanks Dan - good suggestion for sure.
+
+Christian Riley       06:11 PM
+Awesome, thank you.
+
+Martin Schmid       06:16 PM
+no problem!
+
+Daniel Stine       06:20 PM
+3d grids are nice, we can now select almost everything in a 3d view. Just need 3d rooms:)
+
+Harlan Brumm       06:22 PM
+Always more to do :)
+
+Lance Coffey       06:20 PM
+For modeling Roads, what tools would we use to model these, and would these support the geometry desired for roads (banks, curves, slope…)?
+
+Harlan Brumm       06:21 PM
+No, we only support generic modeling tools - like a generic model for roads today.
+
+William Song       06:21 PM
+Is there any improvement on Multi-Core support?
+
+Sasha Crotty       06:27 PM
+I recommend watching this ITF Session for the full answer on our plans around scalability & performance:
+https://www.youtube.com/watch?v=zZP3SJJOZkk
+
+Daniel Stine       06:33 PM
+Most inportant question for us authors... can you speak to UI lock for Revit 2022?
+
+Harlan Brumm       06:43 PM
+Our February preview release will be our "release candidate” - this is the one that we would recommend using.
+
+Zsolt Varga       06:39 PM
+Lot's of great improvements this year! Thank you so much for all the good work! Please, make the Q&A thread above available for later review as well - Thanks!
+
+Mikako Harada       06:43 PM
+Thank you!  Re.  Q&A - will do.
+
+David Kessler       06:41 PM
+Can you share the Modify tools settings for different users
+
+Harlan Brumm       06:43 PM
+Yes, you can, with a Revit.ini
+
+David Kessler       06:42 PM
+So copy the ini entrys for other users.
+
+Harlan Brumm       06:43 PM
+yup.
+
+Daniel Stine       06:43 PM
+Nice line up of new features. Great job presenting! Thanks.
+
+Mikako Harada       06:45 PM
+Thank you!
+
+David Kessler       06:43 PM
+thanks
+
+Mikako Harada       06:45 PM
+Thank you!
+
+Tim Calnan       06:44 PM
+Thanks All... good run through
+
+Mikako Harada       06:44 PM
+Thank you!
+
+David Kessler       06:44 PM
+will they reorganize the sketch in api
+
+Mikako Harada       06:47 PM
+This is create sketch based elements, such as ceilings
+
+Markus Hiermer       06:45 PM
+some really nice points! Thanks for your efforts.
+
+Mikako Harada       06:48 PM
+Thank you!
