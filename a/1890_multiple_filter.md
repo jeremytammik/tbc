@@ -86,7 +86,7 @@ I can no longer log in with the non-standard Autodesk `jeremytammik` account tha
 As a result, we now have two active Jeremys in the forum:
 
 <center>
-<img src="img/top_solution_authors_two_jeremys_2.png" alt="Two Jeremys" title="Two Jeremys" width="482"/> <!-- 964 -->
+<img src="img/top_solution_authors_two_jeremys_3.png" alt="Two Jeremys" title="Two Jeremys" width="482"/> <!-- 964 -->
 </center>
 
 I guess the previous one will fade away as time goes on.

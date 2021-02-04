@@ -6,27 +6,9 @@
 
 <!---
 
-- https://archi-lab.net/element-tagging-with-dynamo/
-  https://forums.autodesk.com/t5/revit-api-forum/tags-without-overlapping/m-p/10040873
-  https://forums.autodesk.com/t5/revit-api-forum/auto-tagging-without-overlap/m-p/10036344
-
-- Custom Errors – Preventing Specific Changes to the Revit model
-  https://boostyourbim.wordpress.com/2021/01/28/custom-errors-preventing-specific-changes-to-the-revit-model/
-  by harrymattison
-  Let's say there is a specific list of View Scales that you want allowed in your Revit projects. Or certain naming conventions that should be used. Or something else like that where you'd like to automate the process of checking a user's change and determining if it should be allowed, prevented, or trigger a warning.
-  This can be done with two pieces of Revit API functionality - Updater & Custom Failures. You can find all the code here and an explanation in the video below.
-
-- autotag without overlap
-  https://forums.autodesk.com/t5/revit-api-forum/auto-tagging-without-overlap/m-p/10036344/highlight/false#M52915
-
 - PostCommand + SendKeys to launch command and accept default UI input
   TwinMotion Dynamic Link Export Fbx Automatically
   https://forums.autodesk.com/t5/revit-api-forum/twinmotion-dynamic-link-export-fbx-automatically/m-p/10028748
-
-- https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.12
-
-- The Unreasonable Ecological Cost of #CryptoArt (and crypto-currencies as well)
-  https://memoakten.medium.com/the-unreasonable-ecological-cost-of-cryptoart-2221d3eb2053
 
 twitter:
 
@@ -51,7 +33,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Applying Multiple Filters and PostCommand + SendKeys
+### PostCommand + SendKeys
 
 ####<a name="2"></a> 
 
