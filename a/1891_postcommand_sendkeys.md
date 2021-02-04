@@ -80,9 +80,25 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### PostCommand + SendKeys
 
-####<a name="2"></a> DevDays Online 2021
+####<a name="2"></a> Happy Birthday, Autodesk!
 
-Just as ususal, the annual DevDays Online events are taking place in the beginning of March, presented by my team, the Autodesk DAS or Developer Advocacy and Support, formerly ADN, Autodesk Developer Network.
+As Shaan Hurley pointed out,
+[Autodesk turned 39 years old](https://autodesk.blogs.com/between_the_lines/2021/01/autodesk-turns-39-years-old.html) on
+January 30, last Saturday.
+
+Enjoy this snapshot of fhe flying Autodesk founders:
+
+<center>
+<img src="img/autodesk_founders.png" alt="Autodesk founders" title="Autodesk founders" width="600"/> <!-- 644 -->
+</center>
+
+From left to right: Rudolf Künzli, Mike Ford, Dan Drake, Mauri Laitinen, Greg Lutz, David Kalish, Lars Moureau, Richard Handyside,Kern Sibbald, Hal Royaltey, Duff Kurland, John Walker, Keith Marcelius.
+
+Rudolf Künzli was still actively leading the Swiss office in Basel when I first joined Autodesk in 1988.
+
+####<a name="3"></a> DevDays Online 2021
+
+Back in modern times, just as usual, the annual DevDays Online events are taking place in the beginning of March, presented by my team, the Autodesk DAS or Developer Advocacy and Support, formerly ADN, Autodesk Developer Network.
 
 The first week will focus on public information, mainly news related to
 the [Forge platform](https://forge.autodesk.com).
@@ -136,6 +152,7 @@ Here is the schedule overview including links to register to each session:
 </center>
 
 
+
 **Question:** 
 
 <pre class="code">
@@ -146,16 +163,8 @@ Here is the schedule overview including links to register to each session:
 
 **Response:**
 
-####<a name="3"></a>
 
 ####<a name="4"></a>
-
-
-- Autodesk Turns 39 Years Old
-  https://autodesk.blogs.com/between_the_lines/2021/01/autodesk-turns-39-years-old.html
-  autodesk_founders.png
-  The Autodesk flying founders from left to right:
-Rudolf Künzli, Mike Ford, Dan Drake, Mauri Laitinen, Greg Lutz, David Kalish, Lars Moureau, Richard Handyside,Kern Sibbald, Hal Royaltey, Duff Kurland, John Walker, Keith Marcelius”
 
 - PostCommand + SendKeys to launch command and accept default UI input
   TwinMotion Dynamic Link Export Fbx Automatically
