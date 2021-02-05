@@ -69,6 +69,19 @@ Birthday in the past, DevDays in the future, and running a Revit command in the 
 
 linkedin:
 
+Birthday in the past, DevDays in the future, and running a Revit command in the present moment using PostCommand + SendKeys in the #RevitAPI
+
+http://autode.sk/postcmd_sendkeys
+
+Birthday in the past, DevDays in the future, and running a Revit command in the present moment:
+
+- Happy Birthday, Autodesk!
+- DevDays online 2021
+- For everyone
+- For ADN members
+- PostCommand + SendKeys
+- SVG tutorial...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -93,7 +106,6 @@ Birthday in the past, DevDays in the future, and running a Revit command in the 
 - [For ADN members](#2.2)
 - [`PostCommand` + `SendKeys`](#4)
 - [SVG tutorial](#5)
-
 
 ####<a name="2"></a> Happy Birthday, Autodesk!
 
@@ -266,7 +278,6 @@ I am able to export automatically by Windows API as you showed me the example!
 </pre>
 
 Many thanks to Yuko for sharing this nice clean solution, and congratulations for getting up to speed with the Revit API so fast!
-
 
 ####<a name="5"></a> SVG Tutorial
 
