@@ -57,7 +57,7 @@ Rudolf Künzli, Mike Ford, Dan Drake, Mauri Laitinen, Greg Lutz, David Kalish, L
 
 twitter:
 
-in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Birthday in the past, DevDays in the future, and running a Revit command in the present moment using PostCommand + SendKeys in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://autode.sk/postcmd_sendkeys
 
 Birthday in the past, DevDays in the future, and running a Revit command in the present moment
 &ndash; Happy Birthday, Autodesk!
