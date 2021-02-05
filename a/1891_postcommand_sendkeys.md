@@ -59,8 +59,13 @@ twitter:
 
 in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Birthday in the past, DevDays in the future, and running a Revit command in the present moment
+&ndash; Happy Birthday, Autodesk!
+&ndash; DevDays online 2021
+&ndash; For everyone
+&ndash; For ADN members
+&ndash; <code>PostCommand</code> + <code>SendKeys</code>
+&ndash; SVG tutorial...
 
 linkedin:
 
