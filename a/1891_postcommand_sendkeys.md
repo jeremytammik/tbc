@@ -80,6 +80,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Birthday, DevDays, PostCommand + SendKeys
 
+Birthday in the past, DevDays in the future, and running a Revit command in the present moment:
+
+- [Happy Birthday, Autodesk!](#2)
+- [DevDays online 2021](#3)
+- [For everyone](#2.1)
+- [For ADN members](#2.2)
+- [`PostCommand` + `SendKeys`](#4)
+- [SVG tutorial](#5)
+
+
 ####<a name="2"></a> Happy Birthday, Autodesk!
 
 As Shaan Hurley pointed out,
@@ -136,7 +146,7 @@ Here is the schedule overview including links to register to each session:
 <img src="img/devdays_2021.jpg" alt="Forge developers" title="Forge developers" width="460"/> <!-- 920 -->
 </center>
 
-####<a name="4"></a>
+####<a name="4"></a> PostCommand + SendKeys
 
 Diving back into the Revit API, Yuko of shared a very nice solution in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
