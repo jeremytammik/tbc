@@ -32,7 +32,7 @@
 
 twitter:
 
-in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Split personality, auto-tagging without overlap, RevitLookup enhancement for split region offsets and multiple collectors in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://autode.sk/multiplecollectors
 
 I need to come to terms with a split personality.
 Meanwhile, lots more going on in the Revit API discussion forum
@@ -44,6 +44,20 @@ Meanwhile, lots more going on in the Revit API discussion forum
 &ndash; Ecological cost of crypto currency and art...
 
 linkedin:
+
+Split personality, auto-tagging without overlap, RevitLookup enhancement for split region offsets and multiple collectors in the #RevitAPI
+
+http://autode.sk/multiplecollectors
+
+I need to come to terms with a split personality.
+Meanwhile, lots more going on in the Revit API discussion forum:
+
+- Two Jeremys
+- Multiple collectors versus multiple filters
+- RevitLookup handles split region offsets
+- Python and Dynamo autotag without overlap
+- Custom errors and preventing changes
+- Ecological cost of crypto currency and art...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
