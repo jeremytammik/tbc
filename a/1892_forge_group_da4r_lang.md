@@ -18,6 +18,15 @@
   > the dialect helps with group solidarity and connection
   > In any social group, including our own, having a rapid way of identifying who belongs to the group and who is excluded is useful for many practical reasons
 
+- van Gogh 360
+  https://static.kuula.io/share/79QMS
+  https://kuula.co/profile/Mathy147
+  https://kuula.co/share/79QMS?fs=1&vr=0&sd=1&thumbs=1&info=1&logo=0
+  <script src="https://static.kuula.io/embed.js" data-kuula="https://kuula.co/share/79QMS?fs=1&vr=0&sd=1&thumbs=1&info=1&logo=0" data-width="100%" data-height="640px"></script>
+  <iframe width="100%" height="640" style="width: 100%; height: 640px; border: none; max-width: 100%;" frameborder="0" allowfullscreen allow="xr-spatial-tracking; gyroscope; accelerometer" scrolling="no" src="https://kuula.co/share/79QMS?fs=1&vr=0&sd=1&thumbs=1&info=1&logo=0"></iframe>
+  https://kuula.co/post/79QMS?fs=1&vr=0&sd=1&thumbs=1&info=1&logo=0
+
+
 twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
@@ -95,6 +104,20 @@ The new functionality is captured
 in [RevitLookup release 2021.0.0.13](https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.13).
 
 
+- RevitLookup supports ScheduleDefinition.GetField
+  https://github.com/jeremytammik/RevitLookup/releases/tag/2021.0.0.13
+  [Q] The method ScheduleDefinition.GetField does not show because it requires an integer index parameter. A list of ScheduleFields can be returned, named by the index that was used.
+  I have this working and can submit a pull request. I have an issue though, in that there are two GetField methods, the other taking in an id. I have not found a way to filter out the second method, so when viewing the ScheduleDefinition properties there will be two GetField entries. If you know of a way to filter out that second method you can let me know or you could add it. Otherwise it could be left as is or put on hold.
+  [A] That sounds great, very useful!
+  Thank you very much for the offer!
+  That would require analysing the complete GetField method signature.
+  The two overloads GetField(Int32) and GetField(ScheduleFieldId) have different method signatures:
+  https://www.c-sharpcorner.com/UploadFile/puranindia/method-signatures-in-C-Sharp/
+  They can be distinguished using by checking their parameter types using Reflection, as explained in how to get only methods with a specific signature out of Type.GetMethods:
+  https://stackoverflow.com/questions/5152346/get-only-methods-with-specific-signature-out-of-type-getmethods
+
+
+
 ####<a name="5"></a> Naked Mole-Rats Speak in Community Dialects
 
 A surprising scientific analysis of their vocalisations demonstrates
@@ -105,3 +128,23 @@ that [naked mole-rats speak in community dialects](https://www.treehugger.com/na
 > ... helps with group solidarity and connection
 
 > In any social group, including our own, having a rapid way of identifying who belongs to the group and who is excluded is useful for many practical reasons.
+
+
+####<a name="6"></a> Van Gogh 360
+
+For something not related to programming or science, let's take a moment to simply savour and
+enjoy [van Gogh 360](https://static.kuula.io/share/79QMS):
+
+js
+
+<center>
+  <script src="https://static.kuula.io/embed.js" data-kuula="https://kuula.co/share/79QMS?fs=1&vr=0&sd=1&thumbs=1&info=1&logo=0" data-width="100%" data-height="640px"></script>
+<center>
+
+iframe
+
+<center>
+<iframe width="100%" height="640" style="width: 100%; height: 640px; border: none; max-width: 100%;" frameborder="0" allowfullscreen allow="xr-spatial-tracking; gyroscope; accelerometer" scrolling="no" src="https://kuula.co/share/79QMS?fs=1&vr=0&sd=1&thumbs=1&info=1&logo=0"></iframe>
+</center>
+
+
