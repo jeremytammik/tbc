@@ -43,6 +43,18 @@ Today, let's look at two Japanese Forge questions, on model groups and the Revit
 
 linkedin:
 
+Two Japanese Forge questions on model groups, the Revit engine language and another RevitLookup enhancement for the #RevitAPI
+
+http://autode.sk/forgemodelgroup
+
+Today, let's look at two Japanese Forge questions, on model groups and the Revit engine language, another RevitLookup enhancement, and, while we're talking about languages, a surprising scientific discovery on naked mole-rat dialects:
+
+- Retrieving Revit model group in Forge
+- Specifying the Revit UI language in DA4R
+- RevitLookup supports ScheduleDefinition GetField
+- Naked mole-rats speak in community dialects
+- Van Gogh 360...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
