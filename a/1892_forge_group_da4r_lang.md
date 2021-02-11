@@ -7,6 +7,8 @@
 <!---
 
 - 8473 [Question about model group for Forge] retrieve and select model group in Forge viewer, cf. select MEP system
+  https://autodesk.slack.com/archives/C0LP63082/p1612715834044900
+  https://forge.zendesk.com/agent/tickets/8473
 
 - 8492 [Language Settings of DA4R Engine]
 
@@ -60,11 +62,29 @@ Today, let's look at two Forge questions on model groups and the Revit engine la
 
 ####<a name="2"></a> Retrieving Revit Model Group in Forge
 
+**Question:** I have a question about Revit model groups.
+
+Is it possible to get the group information in Forge?
+
+For example, if I select Group 1 in the UI, I would like to select all the objects in it, determine the group name and other information about group member elements.
+
+So, does the Forge viewer support selecting a Revit model group? Is there any way to retrieve the model group information in Forge, or is it 'lost in translation'?
+
+**Answewr:** The viewer doesn't support it out of the box, but the information is still preserved in the Forge translation of the RVT model, not lost in translation.
+
+You can navigate Groups and their Members by descending down the non-graphical property hierarchy, starting at the root/model element. Then, it is also possible to programmatically simulate group selection by selecting group members.
+
+Here is an example of a group (ID=50) with one member (ID=389), which is a chair element in the Revit sample project rac_basic_sample_project.rvt:
 
 <center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 636 -->
+<img src="img/forge_viewer_group_properties.png" alt="Forge viewer group properties" title="Forge viewer group properties" width="670"/> <!-- 2680 -->
 </center>
 
+The StackOverflow discussion
+on [grouping elements cannot find in Forge viewer](https://stackoverflow.com/a/61998004) shows 
+a pretty neat code snippet by Eason Kang implementing this functionality.
+
+Many thanks to Traian Stanev and Eason for their valuable help in addressing this.
 
 
 ####<a name="3"></a> Specifying the Revit UI Language in DA4R
@@ -135,6 +155,7 @@ that [naked mole-rats speak in community dialects](https://www.treehugger.com/na
 For something not related to programming or science, let's take a moment to simply savour and
 enjoy [van Gogh 360](https://static.kuula.io/share/79QMS):
 
+<!--
 js
 
 <center>
@@ -142,6 +163,8 @@ js
 <center>
 
 iframe
+
+-->
 
 <center>
 <iframe width="100%" height="640" style="width: 100%; height: 640px; border: none; max-width: 100%;" frameborder="0" allowfullscreen allow="xr-spatial-tracking; gyroscope; accelerometer" scrolling="no" src="https://kuula.co/share/79QMS?fs=1&vr=0&sd=1&thumbs=1&info=1&logo=0"></iframe>
