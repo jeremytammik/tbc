@@ -32,9 +32,9 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Two Japanese Forge questions on model groups and the Revit engine language and another RevitLookup enhancement for the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-Today, let's look at two Japanese Forge questions, on model groups and the Revit engine language, another RevitLookup enhancement, and, while we're talking about languages, a surprising scientific discovery on naked mole-rat dialects:
+Today, let's look at two Japanese Forge questions, on model groups and the Revit engine language, another RevitLookup enhancement, and, while we're talking about languages, a surprising scientific discovery on naked mole-rat dialects
 &ndash; Retrieving Revit model group in Forge
 &ndash; Specifying the Revit UI language in DA4R
 &ndash; RevitLookup supports <code>ScheduleDefinition</code> <code>GetField</code>
