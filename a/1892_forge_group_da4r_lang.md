@@ -81,6 +81,8 @@ Today, let's look at two Japanese Forge questions, on model groups and the Revit
 
 ####<a name="2"></a> Retrieving Revit Model Group in Forge
 
+Let's start with the query *8473 &ndash; question about model group for Forge*:
+
 **Question:** I have a question about Revit model groups.
 
 Is it possible to get the group information in Forge?
