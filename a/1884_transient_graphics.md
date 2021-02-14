@@ -120,7 +120,7 @@ the European Journal of Clinical Investigation (EJCI)
 on [Assessing Mandatory Stay-at-Home and Business Closure Effects on the Spread of COVID-19](https://onlinelibrary.wiley.com/doi/10.1111/eci.13484),
 concluding that:
 
-> While small benefits cannot be excluded, we do not find significant benefits on case growth of more restrictive NPIs.
+> While small benefits cannot be excluded, we do not find significant benefits on case growth of more restrictive NPIs (nonpharmaceutical interventions).
 Similar reductions in case growth may be achievable with less restrictive interventions.
 
 <!--
