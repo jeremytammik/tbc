@@ -64,28 +64,29 @@ Is there a way?
 This is what I tried but isn't working:
 
 <pre>
-<?xml version="1.0" encoding="utf-8"?>
-<RevitAddIns>
- <AddIn Type="Application">
-       <Name>Wb.ModelEstablishment.Revit</Name>
-       <FullClassName>Wb.ModelEstablishment.Revit.Ribbon</FullClassName>
-       <Text>Wb.ModelEstablishment.Revit</Text>
-       <Description>Model Establishment</Description>
-       <VisibilityMode>AlwaysVisible</VisibilityMode>
-       <Assembly>%appdata%\folder\subfolder\Wb.ModelEstablishment.Revit.dll</Assembly>
-       <AddInId>d06838e1-44e3-4c05-b9f1-f79ca101075c</AddInId>
-    <VendorId>WB</VendorId>
-    <VendorDescription>Woods Bagot</VendorDescription>
- </AddIn>
-</RevitAddIns>
+<span style="color:blue;">&lt;?</span><span style="color:#a31515;">xml</span><span style="color:blue;">&nbsp;</span><span style="color:red;">version</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">1.0</span>&quot;<span style="color:blue;">&nbsp;</span><span style="color:red;">encoding</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">utf-8</span>&quot;<span style="color:blue;">?&gt;</span>
+<span style="color:blue;">&lt;</span><span style="color:#a31515;">RevitAddIns</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&lt;</span><span style="color:#a31515;">AddIn</span><span style="color:blue;">&nbsp;</span><span style="color:red;">Type</span><span style="color:blue;">=</span>&quot;<span style="color:blue;">Application</span>&quot;<span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">Name</span><span style="color:blue;">&gt;</span>Wb.ModelEstablishment.Revit<span style="color:blue;">&lt;/</span><span style="color:#a31515;">Name</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">FullClassName</span><span style="color:blue;">&gt;</span>Wb.ModelEstablishment.Revit.Ribbon<span style="color:blue;">&lt;/</span><span style="color:#a31515;">FullClassName</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">Text</span><span style="color:blue;">&gt;</span>Wb.ModelEstablishment.Revit<span style="color:blue;">&lt;/</span><span style="color:#a31515;">Text</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">Description</span><span style="color:blue;">&gt;</span>Model&nbsp;Establishment<span style="color:blue;">&lt;/</span><span style="color:#a31515;">Description</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">VisibilityMode</span><span style="color:blue;">&gt;</span>AlwaysVisible<span style="color:blue;">&lt;/</span><span style="color:#a31515;">VisibilityMode</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">Assembly</span><span style="color:blue;">&gt;</span>%appdata%\folder\subfolder\Wb.ModelEstablishment.Revit.dll<span style="color:blue;">&lt;/</span><span style="color:#a31515;">Assembly</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">AddInId</span><span style="color:blue;">&gt;</span>d06838e1-44e3-4c05-b9f1-f79ca101075c<span style="color:blue;">&lt;/</span><span style="color:#a31515;">AddInId</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">VendorId</span><span style="color:blue;">&gt;</span>WB<span style="color:blue;">&lt;/</span><span style="color:#a31515;">VendorId</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color:#a31515;">VendorDescription</span><span style="color:blue;">&gt;</span>Woods&nbsp;Bagot<span style="color:blue;">&lt;/</span><span style="color:#a31515;">VendorDescription</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&nbsp;&lt;/</span><span style="color:#a31515;">AddIn</span><span style="color:blue;">&gt;</span>
+<span style="color:blue;">&lt;/</span><span style="color:#a31515;">RevitAddIns</span><span style="color:blue;">&gt;</span>
 </pre>
 
 But if I use:
 
 <pre>
-<Assembly>C:\Users\sydata\AppData\Roaming\folder\subfolder\Wb.ModelEstablishment.Revit.dll</Assembly>
-it works fine.
+  <span style="color:blue;">&lt;</span><span style="color:#a31515;">Assembly</span><span style="color:blue;">&gt;</span>C:\Users\sydata\AppData\Roaming\folder\subfolder\Wb.ModelEstablishment.Revit.dll<span style="color:blue;">&lt;/</span><span style="color:#a31515;">Assembly</span><span style="color:blue;">&gt;</span>
 </pre>
+
+it works fine.
 
 **Answer:** Yes, it is definitely possible to use relative paths in the add-in manifest.
 
@@ -275,7 +276,8 @@ described by [Antonio González Viegas on aechive.net](https://www.aechive.net/a
 It is fully built on JavaScript and Three.js, and everything is done client-side...
 anyone with a browser can navigate IFC files (geometry and information) without depending on native applications...
 advantages...
-    - The scalability of the solution. The non-dependence of connection with a remote service to process an IFC means that there could be thousands of users visualizing IFCs simultaneously with no processing cost, since each user would be the one putting the computational power to visualize his model.
-    - The flexibility / ease of use of the library: allows developers who want to use this library to operate without having to mount an API with HTTP calls. A clear example of this flexibility is having been able to deploy the entire application on github pages, creating a basic IFC viewer compatible with any modern device.
-    - No internet connection necessary. As it is purely Javascript code, it would be possible to create desktop or mobile apps with React Native or Electron that would allow the viewing of IFC files offline.
+
+>    - Scalability: the non-dependence of connection with a remote service to process an IFC means that there could be thousands of users visualising IFCs simultaneously with no processing cost, since each user supplies her own computational power to visualize her model.
+- Flexibility and ease of use: the library enables developers to operate without having to mount an API with HTTP calls. A clear example of this flexibility is having been able to deploy the entire application on github pages, creating a basic IFC viewer compatible with any modern device.
+- No internet connection necessary: as pure JavaScript, you can create desktop or mobile apps with React Native or Electron that enable offline IFC viewing
 
