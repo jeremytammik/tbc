@@ -247,5 +247,35 @@ I have a (growing) list of features or solutions I need in Revit and will try to
 <pre class="code">
 </pre>
 
-####<a name="4"></a> 
+####<a name="4"></a> Quo Vadis, RevitPythonShell?
+
+I just happened to hear
+that [RevitPythonShell](https://github.com/architecture-building-systems/revitpythonshell) is
+no longer actively supported by its creator and hitherto maintainer Daren Thomas, cf. our conversation
+on [issue #111](https://github.com/architecture-building-systems/revitpythonshell/issues/111).
+
+Says Daren:
+
+> As of next month, I will not have access to Revit anymore, and the project will need a new maintainer.
+
+I am very sorry to hear that, and ever so grateful to Daren for creating RPS in the first place and maintaining it for so long.
+
+RevitPythonShell was the first interactive REPL for Revit, followed by the sexier but less
+long-lived [RevitRubyShell](https://github.com/hakonhc/RevitRubyShell).
+
+In case of interest, please vote for [pyRevit issue #1161 &ndash; pyRevit Python Shell?](https://github.com/eirannejad/pyRevit/issues/1161)
+
+####<a name="5"></a> IFC.js
+
+From Python, let's turn to JavaScript and note the very interesting
+project [IFC.js](https://github.com/agviegas/IFC.js),
+described by [Antonio González Viegas on aechive.net](https://www.aechive.net/agviegas/ifc-js-em4).
+
+> an open source IFC web viewer.
+It is fully built on JavaScript and Three.js, and everything is done client-side...
+anyone with a browser can navigate IFC files (geometry and information) without depending on native applications...
+advantages...
+    - The scalability of the solution. The non-dependence of connection with a remote service to process an IFC means that there could be thousands of users visualizing IFCs simultaneously with no processing cost, since each user would be the one putting the computational power to visualize his model.
+    - The flexibility / ease of use of the library: allows developers who want to use this library to operate without having to mount an API with HTTP calls. A clear example of this flexibility is having been able to deploy the entire application on github pages, creating a basic IFC viewer compatible with any modern device.
+    - No internet connection necessary. As it is purely Javascript code, it would be possible to create desktop or mobile apps with React Native or Electron that would allow the viewing of IFC files offline.
 
