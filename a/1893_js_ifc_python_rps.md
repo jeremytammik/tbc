@@ -45,9 +45,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### IFC.js, Learning Python Books and Hints
 
-####<a name="2"></a> Persnalised Add-In Manifest
-
-Andrea Tassera
+####<a name="2"></a> Personalised Add-In Manifest
 
 Andrea Tassera of [Woods Bagot](https://www.woodsbagot.com) raised an interesting question in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
