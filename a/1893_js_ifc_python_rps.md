@@ -45,7 +45,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### IFC.js, Learning Python Books and Hints
 
-Today, we look at the add-in manifest, learning Python and Dynamo, the statis of the Revit Python shell and a stand-alone useful IFC viewer:
+Today, we look at the add-in manifest, learning Python and Dynamo, the status of the Revit Python shell and a stand-alone useful IFC viewer:
 
 - [Personalised add-in manifest](#2)
 - [Learning Python and Dynamo](#3)
