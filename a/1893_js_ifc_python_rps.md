@@ -274,7 +274,7 @@ In case of interest, please vote for [pyRevit issue #1161 &ndash; pyRevit Python
 
 From Python, let's turn to JavaScript and note the very interesting
 project [IFC.js](https://github.com/agviegas/IFC.js),
-described by [Antonio González Viegas on aechive.net](https://www.aechive.net/agviegas/ifc-js-em4).
+described by [Antonio González Viegas on aechive.net](https://www.aechive.net/agviegas/ifc-js-em4):
 
 > an open source IFC web viewer.
 It is fully built on JavaScript and Three.js, and everything is done client-side...
