@@ -187,8 +187,8 @@ I saw some videos of how one can do some useful things in Revit.
 **Answer:** The best and most up to date sources tend to be online these days.
 The second source is for RPS as you mentioned but would probably be my starting point for something specific to Revit.
 
-- [IntroductoryBooks - Python Wiki](https://wiki.python.org/moin/IntroductoryBooks)
-- [Introduction · Scripting Autodesk Revit with RevitPythonShell (gitbooks.io)](https://daren-thomas.gitbooks.io/scripting-autodesk-revit-with-revitpythonshell/content)
+- [IntroductoryBooks &ndash; Python Wiki](https://wiki.python.org/moin/IntroductoryBooks)
+- [Introduction &ndash; Scripting Autodesk Revit with RevitPythonShell (gitbooks.io)](https://daren-thomas.gitbooks.io/scripting-autodesk-revit-with-revitpythonshell/content)
 
 People seem really passionate about Python, don't they.
 I'm no expert on this so maybe people have good book suggestions, but I prefer online for all aspects of learning generally.
@@ -251,9 +251,6 @@ In any case, the simplest way forward for you would be to use what you have and 
 **Response:** Thanks for the advice. I'll look into that.
 
 I have a (growing) list of features or solutions I need in Revit and will try to work on solutions. Some will require some general Revit trickery, some dynamo, some macros etc. that way I will learn to sue the tools inc. Python. 
-
-<pre class="code">
-</pre>
 
 ####<a name="4"></a> Quo Vadis, RevitPythonShell?
 
