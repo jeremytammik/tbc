@@ -50,6 +50,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>Today, we look at the add-in manifest, learning Python and Dynamo, the status of the Revit Python shell and a useful stand-alone IFC viewer:</p>
 <ul>
 <li><a href="#2">Personalised add-in manifest</a></li>
+<li><a href="#2.1">Addin manifest using a relative path</a></li>
 <li><a href="#3">Learning Python and Dynamo</a></li>
 <li><a href="#4">Quo vadis, RevitPythonShell?</a></li>
 <li><a href="#5">IFC.js</a></li>
@@ -95,12 +96,12 @@ on <a href="https://help.autodesk.com/view/RVT/2021/ENU/?guid=Revit_API_Revit_AP
 <p><strong>Response:</strong> I have read the page you sent, but the whole 'user-specific' or 'non-user specific "application data"' talks about where to save the <code>.addin</code> file, not how to point to dlls placed in the <code>%appdata%</code> folder through the <code>Assembly</code> XML tag inside the <code>.addin</code> file.</p>
 <p>The .addin file can be in the user folder:</p>
 <ul>
-<li>C:\Users\<user>\AppData\Roaming\Autodesk\Revit\Addins...</li>
+<li>C:\Users\&lt;user&gt;\AppData\Roaming\Autodesk\Revit\Addins...</li>
 </ul>
 <p>That's not a problem.
 The problem is that the <code>Assembly</code> tag needs to point to a roaming folder:</p>
 <ul>
-<li>C:\Users\<user>\AppData\Roaming...</li>
+<li>C:\Users\&lt;user&gt;\AppData\Roaming...</li>
 </ul>
 <p>I don't know how to achieve that without using the absolute path.</p>
 <p>I can't write one specific addin file for every user in the office.</p>
@@ -128,6 +129,27 @@ Does that mean something like a PowerShell script?</p>
 <p><strong>Answer:</strong> You mean the RevitAddInUtility.dll?</p>
 <p>The answer is Yes, cf. The Building Coder article
 on <a href="https://thebuildingcoder.typepad.com/blog/2010/04/revitaddinutility.html">RevitAddInUtility</a>.</p>
+<h4><a name="2.1"></a> Addin Manifest Using a Relative Path</h4>
+<p>Jason Masters added a more direct and down-to-earth solution:</p>
+<p>I believe the answer you're looking for is to just use the relative path modifier for moving up a folder level <code>..\</code>.
+There's no need to run a script at install just to get to a user's <code>appdata</code> folder. </p>
+<p>For instance, if I put my add-in DLLs under a different roaming folder like so:</p>
+<p><center>
+<img src="img/addin_manifest_relative_path_1.png" alt="Add-in manifest relative path" title="Add-in manifest relative path" width="600"/> <!-- 839 -->
+</center></p>
+<p>Then, to access those DLL files from my add-in, I can simply use <code>..\</code> to navigate up to my roaming folder;
+in this case, I'm navigating up 4 levels:</p>
+<p><center>
+<img src="img/addin_manifest_relative_path_2.png" alt="Add-in manifest relative path" title="Add-in manifest relative path" width="600"/> <!-- 675 -->
+</center></p>
+<p>When I launch Revit, you'll see that it's parsed the path correctly and will load the add-in:</p>
+<p><center>
+<img src="img/addin_manifest_relative_path_3.png" alt="Add-in manifest relative path" title="Add-in manifest relative path" width="600"/> <!-- 1480 -->
+<br/>
+<img src="img/addin_manifest_relative_path_4.png" alt="Add-in manifest relative path" title="Add-in manifest relative path" width="600"/> <!-- 1279 -->
+</center></p>
+<p>Also, <code>%appdata%</code> is the specific notation that <code>cmd.exe</code> and other Windows utilities use to refer to the <code>appdata</code> environment variable, but environment variables are in no way Windows specific and are commonly used on all operating systems.
+Revit really should support the use of environment variables in these addin files.</p>
 <h4><a name="3"></a> Learning Python and Dynamo</h4>
 <p>Next, let's look at the recurring question of beginners materials for Revit API using Python from 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread

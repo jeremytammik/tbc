@@ -52,6 +52,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Today, we look at the add-in manifest, learning Python and Dynamo, the status of the Revit Python shell and a useful stand-alone IFC viewer:
 
 - [Personalised add-in manifest](#2)
+- [Addin manifest using a relative path](#2.1)
 - [Learning Python and Dynamo](#3)
 - [Quo vadis, RevitPythonShell?](#4)
 - [IFC.js](#5)
@@ -112,12 +113,12 @@ Look there for 'In a non-user-specific location in "application data"'.
 
 The .addin file can be in the user folder:
 
-- C:\Users\<user>\AppData\Roaming\Autodesk\Revit\Addins\...
+- C:\Users\&lt;user&gt;\AppData\Roaming\Autodesk\Revit\Addins\...
 
 That's not a problem.
 The problem is that the `Assembly` tag needs to point to a roaming folder:
 
-- C:\Users\<user>\AppData\Roaming\...
+- C:\Users\&lt;user&gt;\AppData\Roaming\...
 
 I don't know how to achieve that without using the absolute path.
 
@@ -161,6 +162,37 @@ Does that mean something like a PowerShell script?
 
 The answer is Yes, cf. The Building Coder article
 on [RevitAddInUtility](https://thebuildingcoder.typepad.com/blog/2010/04/revitaddinutility.html).
+
+####<a name="2.1"></a> Addin Manifest Using a Relative Path
+
+Jason Masters added a more direct and down-to-earth solution:
+
+I believe the answer you're looking for is to just use the relative path modifier for moving up a folder level `..\`.
+There's no need to run a script at install just to get to a user's `appdata` folder. 
+
+For instance, if I put my add-in DLLs under a different roaming folder like so:
+
+<center>
+<img src="img/addin_manifest_relative_path_1.png" alt="Add-in manifest relative path" title="Add-in manifest relative path" width="600"/> <!-- 839 -->
+</center>
+
+Then, to access those DLL files from my add-in, I can simply use `..\` to navigate up to my roaming folder;
+in this case, I'm navigating up 4 levels:
+
+<center>
+<img src="img/addin_manifest_relative_path_2.png" alt="Add-in manifest relative path" title="Add-in manifest relative path" width="600"/> <!-- 675 -->
+</center>
+
+When I launch Revit, you'll see that it's parsed the path correctly and will load the add-in:
+
+<center>
+<img src="img/addin_manifest_relative_path_3.png" alt="Add-in manifest relative path" title="Add-in manifest relative path" width="600"/> <!-- 1480 -->
+<br/>
+<img src="img/addin_manifest_relative_path_4.png" alt="Add-in manifest relative path" title="Add-in manifest relative path" width="600"/> <!-- 1279 -->
+</center>
+
+Also, `%appdata%` is the specific notation that `cmd.exe` and other Windows utilities use to refer to the `appdata` environment variable, but environment variables are in no way Windows specific and are commonly used on all operating systems.
+Revit really should support the use of environment variables in these addin files.
 
 
 ####<a name="3"></a> Learning Python and Dynamo
@@ -231,7 +263,6 @@ Until then I have to limit myself to the Python in dynamo nodes.
 
 I haven't done anything with that yet.
 So, if that does what the Python shell does, I use what I already have.
-
 
 <center>
 <img src="img/macro_manager_python.png" alt="Macro manager for Python" title="Macro manager for Python" width="603"/> <!-- 603 -->
