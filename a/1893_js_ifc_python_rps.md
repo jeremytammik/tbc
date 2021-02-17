@@ -43,9 +43,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### IFC.js, Learning Python Books and Hints
+### Addin File, Learning Python and IFC.js
 
-Today, we look at the add-in manifest, learning Python and Dynamo, the status of the Revit Python shell and a stand-alone useful IFC viewer:
+Today, we look at the add-in manifest, learning Python and Dynamo, the status of the Revit Python shell and a useful stand-alone IFC viewer:
 
 - [Personalised add-in manifest](#2)
 - [Learning Python and Dynamo](#3)
@@ -58,11 +58,9 @@ Andrea Tassera of [Woods Bagot](https://www.woodsbagot.com) raised an interestin
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [using relative paths (`%appdata%`) in `.addin` file](https://forums.autodesk.com/t5/revit-api-forum/use-relative-paths-appdata-in-addin-file/m-p/10074984):
 
-**Question:**
+**Question:** Is it possible to use a relative path, such as `%appdata%` in the `Assembly` section of the addin file?
 
-Is it possible to use a relative path, such as %appdata% in the Assembly section of the addin file?
-
-I am developing this plugin that will be deployed to other people in the company, and the DLLs will live somewhere in C:\Users\<USERNAME>\AppData\Roaming\NameOfFolder\... so writing the explicit path with the user name is not a real option. Normally in Windows you would use %appdata% but it doesn't seem to be working in the .addin.
+I am developing this plugin that will be deployed to other people in the company, and the DLLs will live somewhere in C:\Users\<USERNAME>\AppData\Roaming\NameOfFolder\... so writing the explicit path with the user name is not a real option. Normally, in Windows, you would use `%appdata%`, but it doesn't seem to be working in the .addin.
 
 Is there a way?
 
@@ -85,13 +83,13 @@ This is what I tried but isn't working:
 <span style="color:blue;">&lt;/</span><span style="color:#a31515;">RevitAddIns</span><span style="color:blue;">&gt;</span>
 </pre>
 
-But if I use:
+But, if I use the explicit path:
 
 <pre>
   <span style="color:blue;">&lt;</span><span style="color:#a31515;">Assembly</span><span style="color:blue;">&gt;</span>C:\Users\sydata\AppData\Roaming\folder\subfolder\Wb.ModelEstablishment.Revit.dll<span style="color:blue;">&lt;/</span><span style="color:#a31515;">Assembly</span><span style="color:blue;">&gt;</span>
 </pre>
 
-it works fine.
+... it works fine.
 
 **Answer:** Yes, it is definitely possible to use relative paths in the add-in manifest.
 
@@ -163,7 +161,7 @@ on [RevitAddInUtility](https://thebuildingcoder.typepad.com/blog/2010/04/revitad
 
 ####<a name="3"></a> Learning Python and Dynamo
 
-Next, let's loom at the recurring question of beginners materials for Revit API using Python from 
+Next, let's look at the recurring question of beginners materials for Revit API using Python from 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on a [best book for Python for Revit and Dynamo](https://forums.autodesk.com/t5/revit-api-forum/books-or-other-sources-to-learn-python-to-be-used-in-revit/m-p/10063424):
 
@@ -203,14 +201,14 @@ If you have some basis but you don´t know how to move on, a good way to learn P
 
 Have a good understanding of <b>Object-oriented programming</b> will help you on this and is a key aspect to understand how to use the Revit API with Python.
 
-About the resources, as is mentioned in the previous posts, I would take a look on Linkedin learning and also at [thinkparametric.com](https://thinkparametric.com).
+About the resources, as is mentioned in the previous posts, I would take a look on LinkedIn learning and also at [thinkparametric.com](https://thinkparametric.com).
 There are good courses there.
 
 Good luck!
 
 **Answer:** RevitPythonShell for Revit 2020 works just fine in Revit 2021 as well, cf. [issue #106](https://github.com/architecture-building-systems/revitpythonshell/issues/106).
 
-**Respknse:** Thanks all.
+**Response:** Thanks all.
 I'll digest what was offered. 
 
 So far the *Automate the Boring Stuff with Python* book seems to be the best I could find in the library.
@@ -225,10 +223,10 @@ Until then I have to limit myself to the Python in dynamo nodes.
 
 **Answer:** If you have Revit installed, Python is included: it is supported by the built-in Revit macro IDE (integrated development environment).
 
-**Response:** You mean the Macromanager? 
+**Response:** You mean the macro manager? 
 
 I haven't done anything with that yet.
-So, if that does what the Pythonshell does, I use what I already have.
+So, if that does what the Python shell does, I use what I already have.
 
 
 <center>
@@ -248,7 +246,7 @@ In any case, the simplest way forward for you would be to use what you have and 
 
 **Response:** Thanks for the advice. I'll look into that.
 
-I have a (growing) list of features or solutions I need in Revit and will try to work on solutions. Some will require some general Revit trickery, some dynamo, some macros etc. that way i will learn to sue the tools inc. Python. 
+I have a (growing) list of features or solutions I need in Revit and will try to work on solutions. Some will require some general Revit trickery, some dynamo, some macros etc. that way I will learn to sue the tools inc. Python. 
 
 <pre class="code">
 </pre>

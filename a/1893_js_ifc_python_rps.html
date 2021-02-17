@@ -43,7 +43,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>IFC.js, Learning Python Books and Hints</h3>
-<p>Today, we look at the add-in manifest, learning Python and Dynamo, the statis of the Revit Python shell and a stand-alone useful IFC viewer:</p>
+<p>Today, we look at the add-in manifest, learning Python and Dynamo, the status of the Revit Python shell and a useful stand-alone IFC viewer:</p>
 <ul>
 <li><a href="#2">Personalised add-in manifest</a></li>
 <li><a href="#3">Learning Python and Dynamo</a></li>
@@ -54,9 +54,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>Andrea Tassera of <a href="https://www.woodsbagot.com">Woods Bagot</a> raised an interesting question in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/use-relative-paths-appdata-in-addin-file/m-p/10074984">using relative paths (<code>%appdata%</code>) in <code>.addin</code> file</a>:</p>
-<p><strong>Question:</strong></p>
-<p>Is it possible to use a relative path, such as %appdata% in the Assembly section of the addin file?</p>
-<p>I am developing this plugin that will be deployed to other people in the company, and the DLLs will live somewhere in C:\Users\<USERNAME>\AppData\Roaming\NameOfFolder... so writing the explicit path with the user name is not a real option. Normally in Windows you would use %appdata% but it doesn't seem to be working in the .addin.</p>
+<p><strong>Question:</strong> Is it possible to use a relative path, such as <code>%appdata%</code> in the <code>Assembly</code> section of the addin file?</p>
+<p>I am developing this plugin that will be deployed to other people in the company, and the DLLs will live somewhere in C:\Users\<USERNAME>\AppData\Roaming\NameOfFolder... so writing the explicit path with the user name is not a real option. Normally, in Windows, you would use <code>%appdata%</code>, but it doesn't seem to be working in the .addin.</p>
 <p>Is there a way?</p>
 <p>This is what I tried but isn't working:</p>
 <pre>
@@ -76,12 +75,12 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/use-relative-paths-ap
 <span style="color:blue;">&lt;/</span><span style="color:#a31515;">RevitAddIns</span><span style="color:blue;">&gt;</span>
 </pre>
 
-<p>But if I use:</p>
+<p>But, if I use the explicit path:</p>
 <pre>
   <span style="color:blue;">&lt;</span><span style="color:#a31515;">Assembly</span><span style="color:blue;">&gt;</span>C:\Users\sydata\AppData\Roaming\folder\subfolder\Wb.ModelEstablishment.Revit.dll<span style="color:blue;">&lt;/</span><span style="color:#a31515;">Assembly</span><span style="color:blue;">&gt;</span>
 </pre>
 
-<p>it works fine.</p>
+<p>... it works fine.</p>
 <p><strong>Answer:</strong> Yes, it is definitely possible to use relative paths in the add-in manifest.</p>
 <p>However, <code>%appdata%</code> is not a relative path.</p>
 <p>That is a variable in an MS-DOS or Windows batch file, or possibly nowadays in a PowerShell script or something suchlike.</p>
