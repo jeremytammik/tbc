@@ -283,6 +283,12 @@ In any case, the simplest way forward for you would be to use what you have and 
 
 I have a (growing) list of features or solutions I need in Revit and will try to work on solutions. Some will require some general Revit trickery, some dynamo, some macros etc. that way I will learn to sue the tools inc. Python. 
 
+**Answer:** Oh yes, we mentioned another book just two months ago,
+[Más Allá de Dynamo &ndash; Beyond Dynamo](),
+a Spanish-Language book by Kevin Himmelreich and the first Python manual focused on Dynamo and the Revit API.
+Even though it is in Spanish, you can understand most.
+It includes a bunch of examples and pretty much everything about the Revit API is covered in Python.
+
 ####<a name="4"></a> Quo Vadis, RevitPythonShell?
 
 I just happened to hear
