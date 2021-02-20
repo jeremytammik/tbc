@@ -23,9 +23,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
-
-
+A complete self-contained open source IFC viewer in JavaScript, learning Python and Dynamo, and a personalised add-in manifest using relative paths for the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://autode.sk/learningpython
 
 Today, we look at the add-in manifest, learning Python and Dynamo, the status of the Revit Python shell and a useful stand-alone IFC viewer
 &ndash; Personalised add-in manifest
