@@ -54,6 +54,7 @@ Today, we look at the add-in manifest, learning Python and Dynamo, the status of
 - [Personalised add-in manifest](#2)
 - [Addin manifest using a relative path](#2.1)
 - [Learning Python and Dynamo](#3)
+- [Jacob's Dynamo Learning Resources](#3.1)
 - [Quo vadis, RevitPythonShell?](#4)
 - [IFC.js](#5)
 
@@ -288,6 +289,41 @@ I have a (growing) list of features or solutions I need in Revit and will try to
 a Spanish-Language book by Kevin Himmelreich and the first Python manual focused on Dynamo and the Revit API.
 Even though it is in Spanish, you can understand most.
 It includes a bunch of examples and pretty much everything about the Revit API is covered in Python.
+
+####<a name="3.1"></a> Jacob's Dynamo Learning Resources
+
+My colleague Jacob Small reacted to the above and adds:
+
+> Just saw your latest blog post, and thought I'd share a few
+more [Dynamo and Dynamo Python educational resources (PDF)](zip/Dynamo_Learning_Resources.pdf),
+in case they help. Feel free to share around as needed... Thanks as always for the great content on the blog &ndash; they're on my 'always read' list as, even if it's not a need today, they usually come up eventually.  &nbsp; :-)
+
+- Dynamo Info / News
+    - Main: [http://dynamobim.org](http://dynamobim.org/)
+    - Blog: [https://dynamobim.org/blog](https://dynamobim.org/blog/)
+    - Dynamo Builds: [http://dynamobuilds.com](http://dynamobuilds.com/)
+    - Dynamo GitHub: [https://github.com/DynamoDS/Dynamo](https://github.com/DynamoDS/Dynamo)
+- Dynamo Learning
+    - Dynamo Primer: [http://primer.dynamobim.org](http://primer.dynamobim.org)
+    - Dynamo Forums: [https://forum.dynamobim.com](https://forum.dynamobim.com/)
+    - Dynamo Dictionary: [https://dictionary.dynamobim.com](https://dictionary.dynamobim.com)
+    - Dynamo Nodes: [https://dynamonodes.com](https://dynamonodes.com/)
+- Design Script:
+    - Design Script Language Summary: [http://designscript.io/DesignScript_user_manual_0.1.pdf](http://designscript.io/DesignScript_user_manual_0.1.pdf)
+    - Design Script Language Guide: [https://dynamobim.org/wp- content/links/DesignScriptGuide.pdf](https://dynamobim.org/wp- content/links/DesignScriptGuide.pdf)
+    - Design Script Presentation: [https://github.com/Amoursol/dynamoDesignScript](https://github.com/Amoursol/dynamoDesignScript)
+- Dynamo Python:
+    - Python for Dyanmo AU Lab Handout: [https://github.com/Amoursol/dynamoPython/blob/master/im ages/DivingDeeper_ABeginnersLookAtPythonInDynamo_A U_London2018.pdf](https://github.com/Amoursol/dynamoPython/blob/master/im ages/DivingDeeper_ABeginnersLookAtPythonInDynamo_A U_London2018.pdf)
+    - Python for Dynamo examples: [https://github.com/Amoursol/dynamoPython](https://github.com/Amoursol/dynamoPython)
+    - Dynamo Python Primer: [https://dynamopythonprimer.gitbook.io/dynamo-python- primer](https://dynamopythonprimer.gitbook.io/dynamo-python- primer/)
+- Revit API
+    - Revit API Docs: [https://www.revitapidocs.com](https://www.revitapidocs.com/)
+    - Building Coder: [https://thebuildingcoder.typepad.com/ Generative Design:](https://thebuildingcoder.typepad.com/ Generative Design:)
+    - Info: [https://www.autodesk.com/campaigns/refinery-beta](https://www.autodesk.com/campaigns/refinery-beta)
+    - Primer: [https://www.generativedesign.org](https://www.generativedesign.org/)
+    - Beta Site: [https://feedback.autodesk.com/key/RefineryLanding](https://feedback.autodesk.com/key/RefineryLanding)
+
+Many thanks to Jacob for this useful collection!
 
 ####<a name="4"></a> Quo Vadis, RevitPythonShell?
 
