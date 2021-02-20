@@ -310,15 +310,16 @@ in case they help. Feel free to share around as needed... Thanks as always for t
     - Dynamo Nodes: [https://dynamonodes.com](https://dynamonodes.com/)
 - Design Script:
     - Design Script Language Summary: [http://designscript.io/DesignScript_user_manual_0.1.pdf](http://designscript.io/DesignScript_user_manual_0.1.pdf)
-    - Design Script Language Guide: [https://dynamobim.org/wp- content/links/DesignScriptGuide.pdf](https://dynamobim.org/wp- content/links/DesignScriptGuide.pdf)
+    - Design Script Language Guide: [https://dynamobim.org/wp-content/links/DesignScriptGuide.pdf](https://dynamobim.org/wp-content/links/DesignScriptGuide.pdf)
     - Design Script Presentation: [https://github.com/Amoursol/dynamoDesignScript](https://github.com/Amoursol/dynamoDesignScript)
 - Dynamo Python:
-    - Python for Dyanmo AU Lab Handout: [https://github.com/Amoursol/dynamoPython/blob/master/im ages/DivingDeeper_ABeginnersLookAtPythonInDynamo_A U_London2018.pdf](https://github.com/Amoursol/dynamoPython/blob/master/im ages/DivingDeeper_ABeginnersLookAtPythonInDynamo_A U_London2018.pdf)
+    - Python for Dyanmo AU Lab Handout: [https://github.com/Amoursol/dynamoPython/blob/master/images/DivingDeeper_ABeginnersLookAtPythonInDynamo_AU_London2018.pdf](https://github.com/Amoursol/dynamoPython/blob/master/images/DivingDeeper_ABeginnersLookAtPythonInDynamo_AU_London2018.pdf)
     - Python for Dynamo examples: [https://github.com/Amoursol/dynamoPython](https://github.com/Amoursol/dynamoPython)
-    - Dynamo Python Primer: [https://dynamopythonprimer.gitbook.io/dynamo-python- primer](https://dynamopythonprimer.gitbook.io/dynamo-python- primer/)
+    - Dynamo Python Primer: [https://dynamopythonprimer.gitbook.io/dynamo-python-primer](https://dynamopythonprimer.gitbook.io/dynamo-python-primer/)
 - Revit API
     - Revit API Docs: [https://www.revitapidocs.com](https://www.revitapidocs.com/)
-    - Building Coder: [https://thebuildingcoder.typepad.com/ Generative Design:](https://thebuildingcoder.typepad.com/ Generative Design:)
+    - Building Coder: [https://thebuildingcoder.typepad.com/](https://thebuildingcoder.typepad.com)
+- Generative Design:
     - Info: [https://www.autodesk.com/campaigns/refinery-beta](https://www.autodesk.com/campaigns/refinery-beta)
     - Primer: [https://www.generativedesign.org](https://www.generativedesign.org/)
     - Beta Site: [https://feedback.autodesk.com/key/RefineryLanding](https://feedback.autodesk.com/key/RefineryLanding)
