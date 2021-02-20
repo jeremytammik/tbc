@@ -25,6 +25,8 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
+
+
 Today, we look at the add-in manifest, learning Python and Dynamo, the status of the Revit Python shell and a useful stand-alone IFC viewer
 &ndash; Personalised add-in manifest
 &ndash; Learning Python and Dynamo
