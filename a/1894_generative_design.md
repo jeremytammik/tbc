@@ -55,7 +55,7 @@ Any advice here?
 
 **Answer:** It does sound like a good use of GD.
  
-That said, the GD feature doesn’t have an automation API: you use Dynamo to define the parametric models that it uses. The Dynamo graph can use C# “zero-touch” nodes, if you want it to – and people more commonly integrate Python code, when they need to – but that’s just helping flesh out the logic of the graph, it’s not to automate the overall process.
+That said, the GD feature doesn’t have an automation API: you use Dynamo to define the parametric models that it uses. The Dynamo graph can use C# “zero-touch” nodes, if you want it to &ndash; and people more commonly integrate Python code, when they need to &ndash; but that’s just helping flesh out the logic of the graph, it’s not to automate the overall process.
  
 In case it helps, I made a first pass (which is not at all optimal) at doing a floor tiling graph for use with Refinery: https://autode.sk/tiling-graph
 
