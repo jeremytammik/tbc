@@ -54,7 +54,7 @@ Today, we look at the add-in manifest, learning Python and Dynamo, the status of
 - [Personalised add-in manifest](#2)
 - [Addin manifest using a relative path](#2.1)
 - [Learning Python and Dynamo](#3)
-- [Jacob's Dynamo Learning Resources](#3.1)
+- [Jacob's Dynamo learning resources](#3.1)
 - [Quo vadis, RevitPythonShell?](#4)
 - [IFC.js](#5)
 
