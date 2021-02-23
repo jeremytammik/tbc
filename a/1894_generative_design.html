@@ -39,14 +39,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>I know we could pursue the creation of an SGAII or III algorithm in pure C# but Revit/Forge would give us those extremely helpful tools to visualize design options, parameter graphs, etc.</p>
 <p>Any advice here?</p>
 <p><strong>Answer:</strong> It does sound like a good use of GD.</p>
-<p>That said, the GD feature doesn’t have an automation API: you use Dynamo to define the parametric models that it uses. The Dynamo graph can use C# “zero-touch” nodes, if you want it to – and people more commonly integrate Python code, when they need to – but that’s just helping flesh out the logic of the graph, it’s not to automate the overall process.</p>
-<p>In case it helps, I made a first pass (which is not at all optimal) at doing a floor tiling graph for use with Refinery: https://autode.sk/tiling-graph</p>
+<p>That said, the GD feature doesn’t have an automation API: you use Dynamo to define the parametric models that it uses. The Dynamo graph can use C# “zero-touch” nodes, if you want it to &ndash; and people more commonly integrate Python code, when they need to &ndash; but that’s just helping flesh out the logic of the graph, it’s not to automate the overall process.</p>
+<p>In case it helps, I made a first pass (which is not at all optimal) at doing
+a <a href="https://autode.sk/tiling-graph">floor tiling graph for use with Refinery</a> (<a href="zip/RefineryTiling.zip">^</a>).</p>
 <p><strong>Response:</strong> Interesting.</p>
 <p>Is it possible to trigger the Dynamo graph from Revit and have it running in the background? </p>
 <p>Maybe we could create the manager app in C# and call the graph as we need without exposing Dynamo UI to the end user.</p>
 <p>I just want to avoid any complexity to the user.</p>
 <p>Thanks!</p>
-<p><strong>Answer:</strong> The user doesn’t see Dynamo at all: the GD feature does exactly what you’ve described (actually that’s it’s whole point 😊).</p>
+<p><strong>Answer:</strong> The user doesn’t see Dynamo at all: the GD feature does exactly what you’ve described (actually that’s it’s whole point :-)).</p>
 <p><strong>Response:</strong> It seems your sample graph loads ok but it shows a missing PolyCurve custom node:</p>
 <p><center>
 <img src="img/fm_generative_design_1.jpg" alt="Generative design in C#" title="Generative design in C#" width="800"/> <!-- 1920 -->
