@@ -70,7 +70,7 @@ I just want to avoid any complexity to the user.
  
 Thanks!
 
-**Answer:** The user doesn’t see Dynamo at all: the GD feature does exactly what you’ve described (actually that’s it’s whole point 😊).
+**Answer:** The user doesn’t see Dynamo at all: the GD feature does exactly what you’ve described (actually that’s it’s whole point :-)).
 
 **Response:** It seems your sample graph loads ok but it shows a missing PolyCurve custom node:
 
