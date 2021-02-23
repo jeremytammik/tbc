@@ -35,7 +35,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 
 
-####<a name="2"></a> 
+####<a name="2"></a> Generative Design in C&#35;
 
 Fernando Malard, CTO at [ofcdesk](http://ofcdesk.com), brought up an intersting question that Kean Walmsley kindly clarified:
 
@@ -90,7 +90,7 @@ Any additional package I need to install?
 </center>
 
 
-
+<!--
 
 
 **Question:** 
@@ -106,3 +106,4 @@ Any additional package I need to install?
 
 ####<a name="3"></a> 
 
+-->
