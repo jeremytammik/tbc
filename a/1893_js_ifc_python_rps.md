@@ -54,7 +54,8 @@ Today, we look at the add-in manifest, learning Python and Dynamo, the status of
 - [Personalised add-in manifest](#2)
 - [Addin manifest using a relative path](#2.1)
 - [Learning Python and Dynamo](#3)
-- [Jacob's Dynamo learning resources](#3.1)
+    - [Jacob's Dynamo learning resources](#3.1)
+    - [Take Dynamo further using Python](#3.2)
 - [Quo vadis, RevitPythonShell?](#4)
 - [IFC.js](#5)
 
@@ -325,6 +326,22 @@ in case they help. Feel free to share around as needed... Thanks as always for t
     - Beta Site: [https://feedback.autodesk.com/key/RefineryLanding](https://feedback.autodesk.com/key/RefineryLanding)
 
 Many thanks to Jacob for this useful collection!
+
+####<a name="3.2"></a> Take Dynamo Further Using Python
+
+Wayne Patrick [@waynepdalton](https://twitter.com/waynepdalton) Dalton adds:
+
+> Hello Jeremy, not sure if this was mentioned in the section on Dynamo and Python (don't think it was?)
+
+> [@Oliver_E_Green](https://twitter.com/Oliver_E_Green) put
+together a great resource for [@DynamoBIM](https://twitter.com/DynamoBIM)
+and [#Python](https://twitter.com/hashtag/Python)...
+thought it might be helpful to flag it for those wanting to learn:
+
+> [Take Dynamo Further](https://dynamopythonprimer.gitbook.io) &ndash;
+using Python will take your Dynamo definitions to the next level
+
+Thank you, Wayne, for the helpful pointer!
 
 ####<a name="4"></a> Quo Vadis, RevitPythonShell?
 
