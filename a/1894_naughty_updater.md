@@ -6,6 +6,35 @@
 
 <!---
 
+- addin manifest diy
+  https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html#comment-5276653852
+
+- No redemption for naughty updater
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1614361528035100
+  Notify when IUpdater is disabled by Revit error and re-enable
+  https://forums.autodesk.com/t5/revit-api-forum/notify-when-iupdater-is-disabled-by-revit-error-amp-re-enable/m-p/10114949
+
+- Mohamed Adel, BIM Coordinator at SEPCO Electric Power Construction Corporation, Egypt
+  https://www.linkedin.com/posts/mohamed-adel-a3b26160_autodesk-revit-modeling-activity-6769520499216158720-AFS7
+  Using machine learning in modeling is quiet an approach which definitely will save hours of work.
+I developed an application that can automatically model from linked AutoCAD file in Revit. Using machine learning concept which guide the Revit API to model the proper element.
+In the following video This CAD contains only polylines with nothing to distinguish from each other. Either by layer or block name…etc.
+The user will provide some initial information in the UI like which family to use in the loadable families, type of system families and the working levels
+For any element it will automatically duplicate the family to a new type with right dimension that fits the linked polyline. This except the depth of the floors the user will choose which type.
+This a beta version of the app a future development shall be done for better features and workflow.
+
+- Why did IBM's OS/2 project lose to Microsoft, given that IBM had much more resources than Microsoft at that time?
+  https://www.quora.com/Why-did-IBMs-OS-2-project-lose-to-Microsoft-given-that-IBM-had-much-more-resources-than-Microsoft-at-that-time/answers/12576993
+
+- How to Turn Google Sheets into a REST API and Use it with a React Application
+  https://www.freecodecamp.org/news/react-and-googlesheets/
+
+- JavaScript Array Methods Tutorial – The Most Useful Methods Explained with Examples
+  https://www.freecodecamp.org/news/complete-introduction-to-the-most-useful-javascript-array-methods/
+
+- Allserver
+  https://github.com/flash-oss/allserver
+  Multi-transport and multi-protocol simple RPC server and (optional) client. Boilerplate-less. Opinionated. Minimalistic. DX-first.
 
 twitter:
 
@@ -30,14 +59,165 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Generative Design Add-In
+### No Redemption for Naughty Updaters, GD and More <!-- Generative Design Add-In -->
+
+####<a name="2"></a> No Redemption for Naughty Updaters
+
+No redemption for naughty updater
+https://autodesk.slack.com/archives/C0SR6NAP8/p1614361528035100
+
+An interesting aspect of the DMU dynamic model updater framework was raised in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [notifying when `IUpdater` is disabled by Revit error and re-enabling](https://forums.autodesk.com/t5/revit-api-forum/notify-when-iupdater-is-disabled-by-revit-error-amp-re-enable/m-p/10114949) and
+clarified for us by Scott Conover:
+
+**Question:** Is there any way to be notified when an IUpdater is disabled by Revit error and re-enable it?
+
+I have a several IUpdaters in my add-in of which a user can disable or enable by clicking an associated button. For example, there is a pushbutton A for IUpdaterA, which the Push Button image shows the status of the IUpdater.
+
+On PushButton Click:
+
+<pre class="code">
+  if (UpdaterRegistry.IsUpdaterRegistered(updater.GetUpdaterId()))
+  {
+    UpdaterRegistry.UnregisterUpdater(updater.GetUpdaterId());
+    pushButtonA.LargeImage = Off;
+  }
+  else
+  {
+    UpdaterRegistry.RegisterUpdater(updater);
+    UpdaterRegistry.EnableUpdater(updater.GetUpdaterId());
+    // ... Add Triggers, etc. (omitted here for conciseness)
+    pushButtonA.LargeImage = On;
+  }
+</pre>
+
+This works fine when the user manually clicks and turns on or off the IUpdater.
+However, when something during the session or project environment causes the IUpdater execution to fail throwing an error, the button does not respond to re-enabling the IUpdater after it has been disabled:
+
+<center>
+<img src="img/updater_experienced_a_problem.jpg" alt="Updater experienced a problem" title="Updater experienced a problem" width="445"/> <!-- 445 -->
+</center>
+
+So, two questions:
+
+- When this error is thrown and disable Updater is clicked, is there a way to tie this back to change the pushButtonA img to OFF?
+- As seen in the code, `UpdaterRegistry.EnableUpdater` is used but it doesn't seem to enable the `IUpdater` back up after it has been disabled through the error dialog. How can one re-enable it?
+
+This is not to say one should always want to re-enable a disabled IUpdater as there was a reason it was disabled, but in some cases under discretion it may be due to something resolvable like loading in a missing family that was needed, etc. In those situations it would be ideal to resolve the missing item, and re-enable the IUpdater back up.
+
+Thank you.
+
+**Answer:** Thank you for the interesting question.
+
+If all else fails, have you tried to unregister the updater and reinitialise it completely from scratch?
+
+Or, even more extremely, maybe even change its GUID, so that every failed updater GUID is discarded, and a new one issued on every failure?
+
+Anyway, I have asked the development team whether they have any constructive suggestions for you.
+
+They respond: this is asking the question in the wrong way.
+
+If it's critical to keep the Updater functional, it's on the implementer to ensure that exceptions are not passed back to Revit.
+
+Of course, there are runtime things (System exceptions) that they may not want to catch and deal with, but if the exceptions are thrown from Revit API calls when the updater tries to do it's work, I'd suggest the updater catch and deal with them.
+
+It may be that once a callback or interface class starts throwing exceptions, it goes put on the "naughty list".
+
+There may be no way to recover from that in the current session.
+
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas added an explanation of how the current 'naughty list' approach disabling the updater may lead to (the most knowledgeable) people not using DMU at all:
+
+> The only possible approach perhaps, since that is a failure, would be to deal with the failure:
+
+- Autodesk.Revit.DB.BuiltInFailures.DocumentFailures.DUMisbehavingUpdater
+
+If you are able to cancel, rather than user doing it (not sure), you are then able to the disable your updater yourself and know about it.
+
+I've long found this approach to 'suspending' rather than disabling DMU's very problematic.
+For example, people have asked me 'why can't you make it so pile coordinates are updated automatically when they are moved?'
+In theory, I know I could use a DMU for this, but what happens if it gets disabled halfway through an alteration and the user assumes something is being updated when it is not?
+I then potentially have a pile schedule with incorrect coordinates being sent out and the distinct possibility of very expensive work being done in the wrong place (I hope some sanity check would prevent that but you never know).
+These are the users that say "I'm just the guy pressing the button (your button)!"
+
+You need some fail-safe approach, really.
+So, I prefer press a button at a certain point to do a task, then check the results against previous before issue.
+Even for the most simplistic code DMU's have the potential to be disabled due to complex interactions, i.e. you can account for your own code, but not that of other DMU's by others and the timings of such (the impacts for the states of elements these have between your interactions).
+
+Thanks to Scott and Richard for their input on this.
+
+####<a name="3"></a> Add-In Manifest DIY
+
+Joshua Lumley added
+a [comment](https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html#comment-5276653852) on the discussion
+on [](https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html#2.1) showing
+how to generate your own add-in manifest XML `addin` file on the fly:
+
+> This is the code I use to make the manifest from the CustomMethods of the Deployment Project. string myAddinDLL = "yourProject_Ribbon";
+
+<pre class="code">
+<span style="color:blue;">void</span>&nbsp;GenerateAddInManifest(
+&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;dll_folder,
+&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;dll_name&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;sDir&nbsp;=&nbsp;<span style="color:#2b91af;">Environment</span>.GetFolderPath(
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Environment</span>.<span style="color:#2b91af;">SpecialFolder</span>.CommonApplicationData&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;<span style="color:#a31515;">&quot;\\Autodesk\\Revit\\Addins&quot;</span>;
+ 
+&nbsp;&nbsp;<span style="color:blue;">bool</span>&nbsp;exists&nbsp;=&nbsp;<span style="color:#2b91af;">Directory</span>.Exists(&nbsp;sDir&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;!exists&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Directory</span>.CreateDirectory(&nbsp;sDir&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">XElement</span>&nbsp;XElementAddIn&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XElement</span>(&nbsp;<span style="color:#a31515;">&quot;AddIn&quot;</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XAttribute</span>(&nbsp;<span style="color:#a31515;">&quot;Type&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;Application&quot;</span>&nbsp;)&nbsp;);
+ 
+&nbsp;&nbsp;XElementAddIn.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XElement</span>(&nbsp;<span style="color:#a31515;">&quot;Name&quot;</span>,&nbsp;dll_name&nbsp;)&nbsp;);
+&nbsp;&nbsp;XElementAddIn.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XElement</span>(&nbsp;<span style="color:#a31515;">&quot;Assembly&quot;</span>,&nbsp;dll_folder&nbsp;+&nbsp;dll_name&nbsp;+&nbsp;<span style="color:#a31515;">&quot;.dll&quot;</span>&nbsp;)&nbsp;);
+&nbsp;&nbsp;XElementAddIn.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XElement</span>(&nbsp;<span style="color:#a31515;">&quot;AddInId&quot;</span>,&nbsp;<span style="color:#2b91af;">Guid</span>.NewGuid().ToString()&nbsp;)&nbsp;);
+&nbsp;&nbsp;XElementAddIn.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XElement</span>(&nbsp;<span style="color:#a31515;">&quot;FullClassName&quot;</span>,&nbsp;dll_name&nbsp;+&nbsp;<span style="color:#a31515;">&quot;.SettingUpRibbon&quot;</span>&nbsp;)&nbsp;);
+&nbsp;&nbsp;XElementAddIn.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XElement</span>(&nbsp;<span style="color:#a31515;">&quot;VendorId&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;01&quot;</span>&nbsp;)&nbsp;);
+&nbsp;&nbsp;XElementAddIn.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XElement</span>(&nbsp;<span style="color:#a31515;">&quot;VendorDescription&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;Joshua&nbsp;Lumley&nbsp;Secrets,&nbsp;twitter&nbsp;@joshnewzealand&quot;</span>&nbsp;)&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">XElement</span>&nbsp;XElementRevitAddIns&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XElement</span>(&nbsp;<span style="color:#a31515;">&quot;RevitAddIns&quot;</span>&nbsp;);
+&nbsp;&nbsp;XElementRevitAddIns.Add(&nbsp;XElementAddIn&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:blue;">string</span>&nbsp;d&nbsp;<span style="color:blue;">in</span>&nbsp;<span style="color:#2b91af;">Directory</span>.GetDirectories(&nbsp;sDir&nbsp;)&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;myString_ManifestPath&nbsp;=&nbsp;d&nbsp;+&nbsp;<span style="color:#a31515;">&quot;\\&quot;</span>&nbsp;+&nbsp;dll_name&nbsp;+&nbsp;<span style="color:#a31515;">&quot;.addin&quot;</span>;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>[]&nbsp;directories&nbsp;=&nbsp;d.Split(&nbsp;<span style="color:#2b91af;">Path</span>.DirectorySeparatorChar&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">int</span>.TryParse(&nbsp;directories[&nbsp;directories.Count()&nbsp;-&nbsp;1&nbsp;],
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">out</span>&nbsp;<span style="color:blue;">int</span>&nbsp;myInt_FromTextBox&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Install&nbsp;on&nbsp;version&nbsp;2017&nbsp;and&nbsp;above</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;myInt_FromTextBox&nbsp;&gt;=&nbsp;2017&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XDocument</span>(&nbsp;XElementRevitAddIns&nbsp;).Save(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myString_ManifestPath&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">else</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:#2b91af;">File</span>.Exists(&nbsp;myString_ManifestPath&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">File</span>.Delete(&nbsp;myString_ManifestPath&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}
+</pre>
+
+Many thanks to Joshua for sharing this DIY approach.
+I added it to The Building Coder samples, cf.
+the [diff to the previous version](https://github.com/jeremytammik/the_building_coder_samples/compare/2021.0.150.19...2021.0.150.20).
 
 
+####<a name="4"></a> Generative Design in C&#35;
 
-
-####<a name="2"></a> Generative Design in C&#35;
-
-Fernando Malard, CTO at [ofcdesk](http://ofcdesk.com), brought up an intersting question that Kean Walmsley kindly clarified:
+Fernando Malard, CTO at [ofcdesk](http://ofcdesk.com), brought up an interesting question that an unnamed colleague of mine <!-- Kean Walmsley --> kindly clarified:
 
 **Question:** Looking for a suggestion about what route to pursue...
  
@@ -90,20 +270,16 @@ Any additional package I need to install?
 <img src="img/fm_generative_design_2.jpg" alt="Generative design in C#" title="Generative design in C#" width="800"/> <!-- 1719 -->
 </center>
 
-
 <!--
-
 
 **Question:** 
 
 <pre>
 </pre>
 
-
 **Answer:** 
 
-**Response:** 
-
+**Response:**
 
 ####<a name="3"></a> 
 
