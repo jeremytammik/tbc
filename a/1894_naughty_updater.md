@@ -270,41 +270,25 @@ Any additional package I need to install?
 
 ####<a name="5"></a> AI Identifies and Classifies BIM Elements in 2D Sketch
 
-- Mohamed Adel, BIM Coordinator at SEPCO Electric Power Construction Corporation, Egypt
-  https://www.linkedin.com/posts/mohamed-adel-a3b26160_autodesk-revit-modeling-activity-6769520499216158720-AFS7
-  Using machine learning in modeling is quiet an approach which definitely will save hours of work.
-I developed an application that can automatically model from linked AutoCAD file in Revit. Using machine learning concept which guide the Revit API to model the proper element.
-In the following video This CAD contains only polylines with nothing to distinguish from each other. Either by layer or block name…etc.
-The user will provide some initial information in the UI like which family to use in the loadable families, type of system families and the working levels
-For any element it will automatically duplicate the family to a new type with right dimension that fits the linked polyline. This except the depth of the floors the user will choose which type.
-This a beta version of the app a future development shall be done for better features and workflow.
+Before closing, I'd like to pick up a couple of interesting miscellaneous items I happened to run into, starting with
+a [LinkedIn post](https://www.linkedin.com/posts/mohamed-adel-a3b26160_autodesk-revit-modeling-activity-6769520499216158720-AFS7)
+by Mohamed Adel, BIM Coordinator at SEPCO Electric Power Construction Corporation, Egypt:
 
-- Why did IBM's OS/2 project lose to Microsoft, given that IBM had much more resources than Microsoft at that time?
-  https://www.quora.com/Why-did-IBMs-OS-2-project-lose-to-Microsoft-given-that-IBM-had-much-more-resources-than-Microsoft-at-that-time/answers/12576993
+> Using machine learning in modeling is quite an approach which definitely will save hours of work.
+I developed an application that can automatically model from linked AutoCAD file in Revit.
+Using machine learning concept which guide the Revit API to model the proper element.
+In his video, a CAD contains only polylines with nothing to distinguish them from each other. 
+The user provides some initial information in the UI like which family to use in the loadable families, type of system families and working levels.
+For any element it will automatically duplicate the family to a new type with the right dimension that fits the linked polyline.
+For the depth of the floors, the user will choose which type.
 
-- How to Turn Google Sheets into a REST API and Use it with a React Application
-  https://www.freecodecamp.org/news/react-and-googlesheets/
+It looks pretty neat!
 
-- JavaScript Array Methods Tutorial – The Most Useful Methods Explained with Examples
-  https://www.freecodecamp.org/news/complete-introduction-to-the-most-useful-javascript-array-methods/
+Here are a few more:
 
-- Allserver
-  https://github.com/flash-oss/allserver
-  Multi-transport and multi-protocol simple RPC server and (optional) client. Boilerplate-less. Opinionated. Minimalistic. DX-first.
-
-
-
-<!--
-
-**Question:** 
-
-<pre>
-</pre>
-
-**Answer:** 
-
-**Response:**
-
-####<a name="3"></a> 
-
--->
+- Why did OS/2 Lose to Windows 3?
+  <br/>[Why did IBM's OS/2 project lose to Microsoft, given that IBM had much more resources than Microsoft at that time?](https://www.quora.com/Why-did-IBMs-OS-2-project-lose-to-Microsoft-given-that-IBM-had-much-more-resources-than-Microsoft-at-that-time/answers/12576993)
+- Google Sheets as a REST API and React App
+  <br/>[How to turn Google sheets into a REST API and use it with a React application](https://www.freecodecamp.org/news/react-and-googlesheets)
+- [JavaScript array methods tutorial &ndash; the most useful methods explained with examples](https://www.freecodecamp.org/news/complete-introduction-to-the-most-useful-javascript-array-methods)
+- [Allserver](https://github.com/flash-oss/allserver), a minimalist multi-transport and multi-protocol simple RPC server and (optional) client
