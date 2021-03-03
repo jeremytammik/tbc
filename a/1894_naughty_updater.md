@@ -40,8 +40,11 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Lots of exciting discussion going on in the Revit API discussion forum and elsewhere
+&ndash; No redemption for naughty updaters
+&ndash; DIY Add-in manifest DIY
+&ndash; Generative design in C&#35;
+&ndash; AI identifies and classifies BIM elements in 2D sketch...
 
 linkedin:
 
@@ -59,7 +62,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### No Redemption for Naughty Updaters, DIY Add-In Manifest, GD and More <!-- Generative Design Add-In -->
+### Naughty Updaters, DIY Add-In Manifest, GD, AI, etc.
+
+Lots of exciting discussion going on in the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and elsewhere:
+
+- [No redemption for naughty updaters](#2)
+- [DIY Add-in manifest DIY](#3)
+- [Generative design in C&#35;](#4)
+- [AI identifies and classifies BIM elements in 2D sketch](#5)
+
 
 ####<a name="2"></a> No Redemption for Naughty Updaters
 
@@ -126,7 +137,7 @@ There may be no way to recover from that in the current session.
 
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas added an explanation of how the current 'naughty list' approach disabling the updater may lead to (the most knowledgeable) people not using DMU at all:
 
-> The only possible approach perhaps, since that is a failure, would be to deal with the failure:
+The only possible approach perhaps, since that is a failure, would be to deal with the failure:
 
 - Autodesk.Revit.DB.BuiltInFailures.DocumentFailures.DUMisbehavingUpdater
 
@@ -144,7 +155,7 @@ Even for the most simplistic code DMU's have the potential to be disabled due to
 
 Thanks to Scott and Richard for their input on this.
 
-####<a name="3"></a> Add-In Manifest DIY
+####<a name="3"></a> DIY Add-In Manifest
 
 Joshua Lumley added
 a [comment](https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html#comment-5276653852) on the discussion

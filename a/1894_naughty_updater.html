@@ -39,8 +39,11 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Lots of exciting discussion going on in the Revit API discussion forum and elsewhere
+&ndash; No redemption for naughty updaters
+&ndash; DIY Add-in manifest DIY
+&ndash; Generative design in C&#35;
+&ndash; AI identifies and classifies BIM elements in 2D sketch...
 
 linkedin:
 
@@ -58,7 +61,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>No Redemption for Naughty Updaters, DIY Add-In Manifest, GD and More <!-- Generative Design Add-In --></h3>
+<h3>Naughty Updaters, DIY Add-In Manifest, GD, AI, etc.</h3>
+<p>Lots of exciting discussion going on in the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> and elsewhere:</p>
+<ul>
+<li><a href="#2">No redemption for naughty updaters</a></li>
+<li><a href="#3">DIY Add-in manifest DIY</a></li>
+<li><a href="#4">Generative design in C&#35;</a></li>
+<li><a href="#5">AI identifies and classifies BIM elements in 2D sketch</a></li>
+</ul>
 <h4><a name="2"></a> No Redemption for Naughty Updaters</h4>
 <p>An interesting aspect of the DMU dynamic model updater framework was raised in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
@@ -105,9 +115,7 @@ In those situations, it would be ideal to resolve the missing item, and re-enabl
 <p>It may be that once a call-back or interface class starts throwing exceptions, it goes put on the "naughty list".</p>
 <p>There may be no way to recover from that in the current session.</p>
 <p>Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas added an explanation of how the current 'naughty list' approach disabling the updater may lead to (the most knowledgeable) people not using DMU at all:</p>
-<blockquote>
 <p>The only possible approach perhaps, since that is a failure, would be to deal with the failure:</p>
-</blockquote>
 <ul>
 <li>Autodesk.Revit.DB.BuiltInFailures.DocumentFailures.DUMisbehavingUpdater</li>
 </ul>
@@ -121,7 +129,7 @@ These are the users that say, "I'm just the guy pressing the button (your button
 So, I prefer to press a button at a certain point to do a task, then check the results against previous before issue.
 Even for the most simplistic code DMU's have the potential to be disabled due to complex interactions, i.e., you can account for your own code, but not that of other DMU's by others and the timings of such (the impacts for the states of elements these have between your interactions).</p>
 <p>Thanks to Scott and Richard for their input on this.</p>
-<h4><a name="3"></a> Add-In Manifest DIY</h4>
+<h4><a name="3"></a> DIY Add-In Manifest</h4>
 <p>Joshua Lumley added
 a <a href="https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html#comment-5276653852">comment</a> on the discussion
 on <a href="https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html#2.1"></a> showing
