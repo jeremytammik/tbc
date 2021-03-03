@@ -71,7 +71,6 @@ Lots of exciting discussion going on in the [Revit API discussion forum](http://
 - [Generative design in C&#35;](#4)
 - [AI identifies and classifies BIM elements in 2D sketch](#5)
 
-
 ####<a name="2"></a> No Redemption for Naughty Updaters
 
 An interesting aspect of the DMU dynamic model updater framework was raised in
@@ -223,7 +222,6 @@ Many thanks to Joshua for sharing this DIY approach.
 I added it to The Building Coder samples, cf.
 the [diff to the previous version](https://github.com/jeremytammik/the_building_coder_samples/compare/2021.0.150.19...2021.0.150.20).
 
-
 ####<a name="4"></a> Generative Design in C&#35;
 
 Fernando Malard, CTO at [ofcdesk](http://ofcdesk.com), brought up an interesting question that an unnamed colleague of mine <!-- Kean Walmsley --> kindly clarified:
@@ -279,7 +277,6 @@ Any additional package I need to install?
 <img src="img/fm_generative_design_2.jpg" alt="Generative design in C#" title="Generative design in C#" width="800"/> <!-- 1719 -->
 </center>
 
-
 ####<a name="5"></a> AI Identifies and Classifies BIM Elements in 2D Sketch
 
 Before closing, I'd like to pick up a couple of interesting miscellaneous items I happened to run into, starting with
@@ -304,3 +301,4 @@ Here are a few more:
   <br/>[How to turn Google sheets into a REST API and use it with a React application](https://www.freecodecamp.org/news/react-and-googlesheets)
 - [JavaScript array methods tutorial &ndash; the most useful methods explained with examples](https://www.freecodecamp.org/news/complete-introduction-to-the-most-useful-javascript-array-methods)
 - [Allserver](https://github.com/flash-oss/allserver), a minimalist multi-transport and multi-protocol simple RPC server and (optional) client
+
