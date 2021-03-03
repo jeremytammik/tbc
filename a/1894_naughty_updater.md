@@ -59,17 +59,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### No Redemption for Naughty Updaters, GD and More <!-- Generative Design Add-In -->
+### No Redemption for Naughty Updaters, DIY Add-In Manifest, GD and More <!-- Generative Design Add-In -->
 
 ####<a name="2"></a> No Redemption for Naughty Updaters
 
-No redemption for naughty updater
-https://autodesk.slack.com/archives/C0SR6NAP8/p1614361528035100
-
 An interesting aspect of the DMU dynamic model updater framework was raised in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [notifying when `IUpdater` is disabled by Revit error and re-enabling](https://forums.autodesk.com/t5/revit-api-forum/notify-when-iupdater-is-disabled-by-revit-error-amp-re-enable/m-p/10114949) and
-clarified for us by Scott Conover:
+on [notifying when `IUpdater` is disabled by Revit error and re-enabling](https://forums.autodesk.com/t5/revit-api-forum/notify-when-iupdater-is-disabled-by-revit-error-amp-re-enable/m-p/10114949),
+and clarified for us by Scott Conover:
 
 **Question:** Is there any way to be notified when an IUpdater is disabled by Revit error and re-enable it?
 
@@ -269,6 +266,33 @@ Any additional package I need to install?
 <center>
 <img src="img/fm_generative_design_2.jpg" alt="Generative design in C#" title="Generative design in C#" width="800"/> <!-- 1719 -->
 </center>
+
+
+####<a name="5"></a> AI Identifies and Classifies BIM Elements in 2D Sketch
+
+- Mohamed Adel, BIM Coordinator at SEPCO Electric Power Construction Corporation, Egypt
+  https://www.linkedin.com/posts/mohamed-adel-a3b26160_autodesk-revit-modeling-activity-6769520499216158720-AFS7
+  Using machine learning in modeling is quiet an approach which definitely will save hours of work.
+I developed an application that can automatically model from linked AutoCAD file in Revit. Using machine learning concept which guide the Revit API to model the proper element.
+In the following video This CAD contains only polylines with nothing to distinguish from each other. Either by layer or block name…etc.
+The user will provide some initial information in the UI like which family to use in the loadable families, type of system families and the working levels
+For any element it will automatically duplicate the family to a new type with right dimension that fits the linked polyline. This except the depth of the floors the user will choose which type.
+This a beta version of the app a future development shall be done for better features and workflow.
+
+- Why did IBM's OS/2 project lose to Microsoft, given that IBM had much more resources than Microsoft at that time?
+  https://www.quora.com/Why-did-IBMs-OS-2-project-lose-to-Microsoft-given-that-IBM-had-much-more-resources-than-Microsoft-at-that-time/answers/12576993
+
+- How to Turn Google Sheets into a REST API and Use it with a React Application
+  https://www.freecodecamp.org/news/react-and-googlesheets/
+
+- JavaScript Array Methods Tutorial – The Most Useful Methods Explained with Examples
+  https://www.freecodecamp.org/news/complete-introduction-to-the-most-useful-javascript-array-methods/
+
+- Allserver
+  https://github.com/flash-oss/allserver
+  Multi-transport and multi-protocol simple RPC server and (optional) client. Boilerplate-less. Opinionated. Minimalistic. DX-first.
+
+
 
 <!--
 
