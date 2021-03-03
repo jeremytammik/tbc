@@ -101,7 +101,8 @@ So, two questions:
 - When this error is thrown and disable Updater is clicked, is there a way to tie this back to change the pushButtonA img to OFF?
 - As seen in the code, `UpdaterRegistry.EnableUpdater` is used but it doesn't seem to enable the `IUpdater` back up after it has been disabled through the error dialog. How can one re-enable it?
 
-This is not to say one should always want to re-enable a disabled IUpdater as there was a reason it was disabled, but in some cases under discretion it may be due to something resolvable like loading in a missing family that was needed, etc. In those situations it would be ideal to resolve the missing item, and re-enable the IUpdater back up.
+This is not to say one should always want to re-enable a disabled IUpdater as there was a reason it was disabled, but in some cases under discretion it may be due to something resolvable like loading in a missing family that was needed, etc.
+In those situations, it would be ideal to resolve the missing item, and re-enable the IUpdater back up.
 
 Thank you.
 
@@ -117,9 +118,9 @@ They respond: this is asking the question in the wrong way.
 
 If it's critical to keep the Updater functional, it's on the implementer to ensure that exceptions are not passed back to Revit.
 
-Of course, there are runtime things (System exceptions) that they may not want to catch and deal with, but if the exceptions are thrown from Revit API calls when the updater tries to do it's work, I'd suggest the updater catch and deal with them.
+Of course, there are runtime things (System exceptions) that they may not want to catch and deal with, but if the exceptions are thrown from Revit API calls when the updater tries to do its work, I'd suggest the updater catch and deal with them.
 
-It may be that once a callback or interface class starts throwing exceptions, it goes put on the "naughty list".
+It may be that once a call-back or interface class starts throwing exceptions, it goes put on the "naughty list".
 
 There may be no way to recover from that in the current session.
 
@@ -135,11 +136,11 @@ I've long found this approach to 'suspending' rather than disabling DMU's very p
 For example, people have asked me 'why can't you make it so pile coordinates are updated automatically when they are moved?'
 In theory, I know I could use a DMU for this, but what happens if it gets disabled halfway through an alteration and the user assumes something is being updated when it is not?
 I then potentially have a pile schedule with incorrect coordinates being sent out and the distinct possibility of very expensive work being done in the wrong place (I hope some sanity check would prevent that but you never know).
-These are the users that say "I'm just the guy pressing the button (your button)!"
+These are the users that say, "I'm just the guy pressing the button (your button)!"
 
 You need some fail-safe approach, really.
-So, I prefer press a button at a certain point to do a task, then check the results against previous before issue.
-Even for the most simplistic code DMU's have the potential to be disabled due to complex interactions, i.e. you can account for your own code, but not that of other DMU's by others and the timings of such (the impacts for the states of elements these have between your interactions).
+So, I prefer to press a button at a certain point to do a task, then check the results against previous before issue.
+Even for the most simplistic code DMU's have the potential to be disabled due to complex interactions, i.e., you can account for your own code, but not that of other DMU's by others and the timings of such (the impacts for the states of elements these have between your interactions).
 
 Thanks to Scott and Richard for their input on this.
 
@@ -150,7 +151,7 @@ a [comment](https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learnin
 on [](https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html#2.1) showing
 how to generate your own add-in manifest XML `addin` file on the fly:
 
-> This is the code I use to make the manifest from the CustomMethods of the Deployment Project. string myAddinDLL = "yourProject_Ribbon";
+> This is the code I use to make the manifest from the CustomMethods of the Deployment Project.
 
 <pre class="code">
 <span style="color:blue;">void</span>&nbsp;GenerateAddInManifest(
@@ -274,7 +275,7 @@ Before closing, I'd like to pick up a couple of interesting miscellaneous items 
 a [LinkedIn post](https://www.linkedin.com/posts/mohamed-adel-a3b26160_autodesk-revit-modeling-activity-6769520499216158720-AFS7)
 by Mohamed Adel, BIM Coordinator at SEPCO Electric Power Construction Corporation, Egypt:
 
-> Using machine learning in modeling is quite an approach which definitely will save hours of work.
+> Using machine learning in modelling is quite an approach which definitely will save hours of work.
 I developed an application that can automatically model from linked AutoCAD file in Revit.
 Using machine learning concept which guide the Revit API to model the proper element.
 In his video, a CAD contains only polylines with nothing to distinguish them from each other. 
