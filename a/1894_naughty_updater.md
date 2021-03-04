@@ -39,7 +39,7 @@ This a beta version of the app a future development shall be done for better fea
 twitter:
 
 No redemption for naughty updaters
-DIY Add-in manifest DIY
+DIY Add-in manifest
 Generative design in C&#35;
 AI identifies and classifies BIM elements in 2D sketch...
 
@@ -72,7 +72,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Lots of exciting discussion going on in the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and elsewhere:
 
 - [No redemption for naughty updaters](#2)
-- [DIY Add-in manifest DIY](#3)
+- [DIY Add-in manifest](#3)
 - [Generative design in C&#35;](#4)
 - [AI identifies and classifies BIM elements in 2D sketch](#5)
 
