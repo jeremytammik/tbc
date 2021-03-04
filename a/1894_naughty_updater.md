@@ -48,6 +48,15 @@ Lots of exciting discussion going on in the Revit API discussion forum and elsew
 
 linkedin:
 
+DIY add-in manifest, generative design in C#, AI identifies and classifies BIM elements in 2D sketch, and no redemption for naughty updaters in the #RevitAPI
+
+http://autode.sk/naughtyupdater
+
+- No redemption for naughty updaters
+- DIY Add-in manifest
+- Generative design in C&#35;
+- AI identifies and classifies BIM elements in 2D sketch...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
