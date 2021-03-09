@@ -6,56 +6,39 @@
 
 <!---
 
-- addin manifest diy
-  https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html#comment-5276653852
+- /a/src/rvt/RevitFindExteriorWalls/
+  https://thebuildingcoder.typepad.com/blog/2018/05/filterrule-use-and-retrieving-exterior-walls.html#comment-5289806219
 
-- No redemption for naughty updater
-  https://autodesk.slack.com/archives/C0SR6NAP8/p1614361528035100
-  Notify when IUpdater is disabled by Revit error and re-enable
-  https://forums.autodesk.com/t5/revit-api-forum/notify-when-iupdater-is-disabled-by-revit-error-amp-re-enable/m-p/10114949
+  First round at [Retrieving All Exterior Walls](https://thebuildingcoder.typepad.com/blog/2018/05/drive-revit-via-a-wcf-service-wall-directions-and-parameters.html#8)
+  - using the built-in wall function parameter `FUNCTION_PARAM` to filter for exterior walls, `IsExterior( w.WallType )` returns true
+  The Revit API also provides a BuildingEnvelopeAnalyzer class that should help with this, but there seem to be problems using it, cf.:
+  - Finding exterior walls by BuildingEnvelopeAnalyzer
+  - Filtering exterior walls
+  Yet another workaround was suggested: Place some room separation lines outside the building envelope and create a huge room around the entire building. Then, it’s just a matter of getting room boundaries, filtering out the RSLs, appending the remaining elements to your list, deleting the room and RSLs, and moving up to the next level. It may not work for some bad modelling cases, but catches most.
+  After further discussion with the development team, they asked: Is the building model enclosed? It needs to be in order for the analyzer to work. In other words, do you have Roof and Floor elements to form enclosed spaces in the model?
+  Ten days later:
+  Several possible approaches to [retrieve all exterior walls](https://thebuildingcoder.typepad.com/blog/2018/05/filterrule-use-and-retrieving-exterior-walls.html#2)
+  Now a discussion between ...
 
-- Mohamed Adel, BIM Coordinator at SEPCO Electric Power Construction Corporation, Egypt
-  https://www.linkedin.com/posts/mohamed-adel-a3b26160_autodesk-revit-modeling-activity-6769520499216158720-AFS7
-  Using machine learning in modeling is quiet an approach which definitely will save hours of work.
-I developed an application that can automatically model from linked AutoCAD file in Revit. Using machine learning concept which guide the Revit API to model the proper element.
-In the following video This CAD contains only polylines with nothing to distinguish from each other. Either by layer or block name…etc.
-The user will provide some initial information in the UI like which family to use in the loadable families, type of system families and the working levels
-For any element it will automatically duplicate the family to a new type with right dimension that fits the linked polyline. This except the depth of the floors the user will choose which type.
-This a beta version of the app a future development shall be done for better features and workflow.
+- Get the walls, ceiling and floor of a room?
+  https://forums.autodesk.com/t5/revit-api-forum/get-the-walls-ceiling-and-floor-of-a-room/m-p/9915923
 
-- Why did IBM's OS/2 project lose to Microsoft, given that IBM had much more resources than Microsoft at that time?
-  https://www.quora.com/Why-did-IBMs-OS-2-project-lose-to-Microsoft-given-that-IBM-had-much-more-resources-than-Microsoft-at-that-time/answers/12576993
-
-- How to Turn Google Sheets into a REST API and Use it with a React Application
-  https://www.freecodecamp.org/news/react-and-googlesheets/
-
-- JavaScript Array Methods Tutorial – The Most Useful Methods Explained with Examples
-  https://www.freecodecamp.org/news/complete-introduction-to-the-most-useful-javascript-array-methods/
-
-- Allserver
-  https://github.com/flash-oss/allserver
-  Multi-transport and multi-protocol simple RPC server and (optional) client. Boilerplate-less. Opinionated. Minimalistic. DX-first.
+- typography:
+  The Reason Comic Sans Is a Public Good
+  https://www.thecut.com/2020/08/the-reason-comic-sans-is-a-public-good.html
+  I am a bit of a typography junkie and pay far too much fanatic attention to that aspect of a text.
+  I sometimes fell forced to reformat a text just to make it more readable before I even start to take it in.
+  Until now, I have always gone for pretty standard fonts and avoided Comic Sans.
+  I am surprised to learn that there are good reasons not to continue doing so:
 
 twitter:
 
-DIY add-in manifest, generative design in C#, AI identifies and classifies BIM elements in 2D sketch, and no redemption for naughty updaters in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://autode.sk/naughtyupdater
+ in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-Lots of exciting discussion going on in the Revit API discussion forum and elsewhere
-&ndash; No redemption for naughty updaters
-&ndash; DIY Add-in manifest
-&ndash; Generative design in C&#35;
-&ndash; AI identifies and classifies BIM elements in 2D sketch...
+&ndash; 
+...
 
 linkedin:
-
-DIY add-in manifest, generative design in C#, AI identifies and classifies BIM elements in 2D sketch, and no redemption for naughty updaters in the #RevitAPI
-
-http://autode.sk/naughtyupdater
-
-- No redemption for naughty updaters
-- DIY Add-in manifest
-- Generative design in C&#35;
-- AI identifies and classifies BIM elements in 2D sketch...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -71,247 +54,202 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Naughty Updaters, DIY Add-In Manifest, GD, AI, etc.
+###
 
-Lots of exciting discussion going on in the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and elsewhere:
+####<a name="2"></a>
 
-- [No redemption for naughty updaters](#2)
-- [DIY Add-in manifest](#3)
-- [Generative design in C&#35;](#4)
-- [AI identifies and classifies BIM elements in 2D sketch](#5)
-
-####<a name="2"></a> No Redemption for Naughty Updaters
-
-An interesting aspect of the DMU dynamic model updater framework was raised in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [notifying when `IUpdater` is disabled by Revit error and re-enabling](https://forums.autodesk.com/t5/revit-api-forum/notify-when-iupdater-is-disabled-by-revit-error-amp-re-enable/m-p/10114949),
-and clarified for us by Scott Conover:
-
-**Question:** Is there any way to be notified when an IUpdater is disabled by Revit error and re-enable it?
-
-I have a several IUpdaters in my add-in of which a user can disable or enable by clicking an associated button. For example, there is a pushbutton A for IUpdaterA, which the Push Button image shows the status of the IUpdater.
-
-On PushButton Click:
+**Question:**
 
 <pre class="code">
-  if (UpdaterRegistry.IsUpdaterRegistered(updater.GetUpdaterId()))
-  {
-    UpdaterRegistry.UnregisterUpdater(updater.GetUpdaterId());
-    pushButtonA.LargeImage = Off;
-  }
-  else
-  {
-    UpdaterRegistry.RegisterUpdater(updater);
-    UpdaterRegistry.EnableUpdater(updater.GetUpdaterId());
-    // ... Add Triggers, etc. (omitted here for conciseness)
-    pushButtonA.LargeImage = On;
-  }
 </pre>
 
-This works fine when the user manually clicks and turns on or off the IUpdater.
-However, when something during the session or project environment causes the IUpdater execution to fail throwing an error, the button does not respond to re-enabling the IUpdater after it has been disabled:
-
 <center>
-<img src="img/updater_experienced_a_problem.jpg" alt="Updater experienced a problem" title="Updater experienced a problem" width="445"/> <!-- 445 -->
+<img src="img/.jpg" alt="" title="" width="445"/> <!-- 445 -->
 </center>
 
-So, two questions:
+**Answer:** 
 
-- When this error is thrown and disable Updater is clicked, is there a way to tie this back to change the pushButtonA img to OFF?
-- As seen in the code, `UpdaterRegistry.EnableUpdater` is used but it doesn't seem to enable the `IUpdater` back up after it has been disabled through the error dialog. How can one re-enable it?
+**Response:** 
 
-This is not to say one should always want to re-enable a disabled IUpdater as there was a reason it was disabled, but in some cases under discretion it may be due to something resolvable like loading in a missing family that was needed, etc.
-In those situations, it would be ideal to resolve the missing item, and re-enable the IUpdater back up.
+Thanks to 
+for their input on this.
 
-Thank you.
+####<a name="3"></a> 
 
-**Answer:** Thank you for the interesting question.
+- Get the walls, ceiling and floor of a room?
+  https://forums.autodesk.com/t5/revit-api-forum/get-the-walls-ceiling-and-floor-of-a-room/m-p/9915923
 
-If all else fails, have you tried to unregister the updater and reinitialise it completely from scratch?
+raised by Samuel Arsenault-Brassard and resolved by Yien Chao, Architect, BIM Director and Computational BIM Manager at 
+[MSDL architectes](https://www.msdl.ca).
 
-Or, even more extremely, maybe even change its GUID, so that every failed updater GUID is discarded, and a new one issued on every failure?
+   Samuel.Arsenault-Brassard 276 Views, 12 Replies
+‎12-04-2020 09:27 AM 
+Get the walls, ceiling and floor of a room?
+I've been able to get a list of all the elements that are in a room, but I am not able to figure out how to automatically obtain the walls, ceiling and floor that are associated with these rooms.
 
-Anyway, I have asked the development team whether they have any constructive suggestions for you.
+Is this information possible through the API?
 
-They respond: this is asking the question in the wrong way.
+And yes, I do understand that a wall, floor and ceiling may have a relationship with multiple rooms, not just one
 
-If it's critical to keep the Updater functional, it's on the implementer to ensure that exceptions are not passed back to Revit.
+ Solved by Yien_Chao. Go to Solution.
 
-Of course, there are runtime things (System exceptions) that they may not want to catch and deal with, but if the exceptions are thrown from Revit API calls when the updater tries to do its work, I'd suggest the updater catch and deal with them.
+Tags (0)
+Add tags
+Report
+12 REPLIES 
+Sort: 
+MESSAGE 2 OF 13
+Yien_Chao
+ Collaborator Yien_Chao in reply to: Samuel.Arsenault-Brassard
+‎12-04-2020 11:40 AM 
+hi Samuel,
 
-It may be that once a call-back or interface class starts throwing exceptions, it goes put on the "naughty list".
+try this maybe?
 
-There may be no way to recover from that in the current session.
+https://www.revitapidocs.com/2020/1fbe1cff-ed94-4815-564b-05fd9e8f61fe.htm
 
-Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas added an explanation of how the current 'naughty list' approach disabling the updater may lead to (the most knowledgeable) people not using DMU at all:
+Tags (0)
+Add tags
+Report
+MESSAGE 3 OF 13
+Yien_Chao
+ Collaborator Yien_Chao in reply to: Samuel.Arsenault-Brassard
+‎12-04-2020 12:58 PM 
+a simple boundingbox filter and a multicategory filter.. and voila!
 
-The only possible approach perhaps, since that is a failure, would be to deal with the failure:
+2020-12-04_15-57-11.jpg
 
-- Autodesk.Revit.DB.BuiltInFailures.DocumentFailures.DUMisbehavingUpdater
+Tags (0)
+Add tags
+Report
+MESSAGE 4 OF 13
+Samuel.Arsenault-Brassard
+ Contributor Samuel.Arsenault-Brassard in reply to: Yien_Chao
+‎12-10-2020 05:17 AM 
+One last question, is the bounding box actually a square box? I am wondering if it will capture rogue elements if the room is not square, for example a serpentine corridor.
 
-If you are able to cancel, rather than user doing it (not sure), you are then able to the disable your updater yourself and know about it.
+BoundingBox.jpg
 
-I've long found this approach to 'suspending' rather than disabling DMU's very problematic.
-For example, people have asked me 'why can't you make it so pile coordinates are updated automatically when they are moved?'
-In theory, I know I could use a DMU for this, but what happens if it gets disabled halfway through an alteration and the user assumes something is being updated when it is not?
-I then potentially have a pile schedule with incorrect coordinates being sent out and the distinct possibility of very expensive work being done in the wrong place (I hope some sanity check would prevent that but you never know).
-These are the users that say, "I'm just the guy pressing the button (your button)!"
+Tags (0)
+Add tags
+Report
+MESSAGE 5 OF 13
+jeremytammik
+ Employee jeremytammik in reply to: Samuel.Arsenault-Brassard
+‎12-10-2020 06:20 AM 
+The bounding box is always a rectangular box, or, more precisely, a rectangular cuboid, with X, Y and Z axis-aligned faces.
 
-You need some fail-safe approach, really.
-So, I prefer to press a button at a certain point to do a task, then check the results against previous before issue.
-Even for the most simplistic code DMU's have the potential to be disabled due to complex interactions, i.e., you can account for your own code, but not that of other DMU's by others and the timings of such (the impacts for the states of elements these have between your interactions).
+Jeremy Tammik
+Developer Technical Services
+Autodesk Developer Network, ADN Open
+The Building Coder
 
-Thanks to Scott and Richard for their input on this.
+Tags (0)
+Add tags
+Report
+MESSAGE 6 OF 13
+Yien_Chao
+ Collaborator Yien_Chao in reply to: Samuel.Arsenault-Brassard
+‎12-10-2020 06:21 AM 
+i dont think so...
 
-####<a name="3"></a> DIY Add-In Manifest
+https://www.revitapidocs.com/2020/3c452286-57b1-40e2-2795-c90bff1fcec2.htm
 
-Joshua Lumley added
-a [comment](https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html#comment-5276653852) on the discussion
-on [](https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html#2.1) showing
-how to generate your own add-in manifest XML `addin` file on the fly:
+A three-dimensional rectangular box at ...
 
-> This is the code I use to make the manifest from the CustomMethods of the Deployment Project.
+Tags (0)
+Add tags
+Report
+MESSAGE 7 OF 13
+Samuel.Arsenault-Brassard
+ Contributor Samuel.Arsenault-Brassard in reply to: jeremytammik
+‎12-10-2020 06:22 AM 
+So, it would create a problem for a non-rectangular room right? (trying to detect related walls, floors and ceilings of a room)
 
-<pre class="code">
-<span style="color:blue;">void</span>&nbsp;GenerateAddInManifest(
-&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;dll_folder,
-&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;dll_name&nbsp;)
-{
-&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;sDir&nbsp;=&nbsp;<span style="color:#2b91af;">Environment</span>.GetFolderPath(
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Environment</span>.<span style="color:#2b91af;">SpecialFolder</span>.CommonApplicationData&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;<span style="color:#a31515;">&quot;\\Autodesk\\Revit\\Addins&quot;</span>;
- 
-&nbsp;&nbsp;<span style="color:blue;">bool</span>&nbsp;exists&nbsp;=&nbsp;<span style="color:#2b91af;">Directory</span>.Exists(&nbsp;sDir&nbsp;);
- 
-&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;!exists&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Directory</span>.CreateDirectory(&nbsp;sDir&nbsp;);
- 
-&nbsp;&nbsp;<span style="color:#2b91af;">XElement</span>&nbsp;XElementAddIn&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XElement</span>(&nbsp;<span style="color:#a31515;">&quot;AddIn&quot;</span>,
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XAttribute</span>(&nbsp;<span style="color:#a31515;">&quot;Type&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;Application&quot;</span>&nbsp;)&nbsp;);
- 
-&nbsp;&nbsp;XElementAddIn.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XElement</span>(&nbsp;<span style="color:#a31515;">&quot;Name&quot;</span>,&nbsp;dll_name&nbsp;)&nbsp;);
-&nbsp;&nbsp;XElementAddIn.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XElement</span>(&nbsp;<span style="color:#a31515;">&quot;Assembly&quot;</span>,&nbsp;dll_folder&nbsp;+&nbsp;dll_name&nbsp;+&nbsp;<span style="color:#a31515;">&quot;.dll&quot;</span>&nbsp;)&nbsp;);
-&nbsp;&nbsp;XElementAddIn.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XElement</span>(&nbsp;<span style="color:#a31515;">&quot;AddInId&quot;</span>,&nbsp;<span style="color:#2b91af;">Guid</span>.NewGuid().ToString()&nbsp;)&nbsp;);
-&nbsp;&nbsp;XElementAddIn.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XElement</span>(&nbsp;<span style="color:#a31515;">&quot;FullClassName&quot;</span>,&nbsp;dll_name&nbsp;+&nbsp;<span style="color:#a31515;">&quot;.SettingUpRibbon&quot;</span>&nbsp;)&nbsp;);
-&nbsp;&nbsp;XElementAddIn.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XElement</span>(&nbsp;<span style="color:#a31515;">&quot;VendorId&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;01&quot;</span>&nbsp;)&nbsp;);
-&nbsp;&nbsp;XElementAddIn.Add(&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XElement</span>(&nbsp;<span style="color:#a31515;">&quot;VendorDescription&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;Joshua&nbsp;Lumley&nbsp;Secrets,&nbsp;twitter&nbsp;@joshnewzealand&quot;</span>&nbsp;)&nbsp;);
- 
-&nbsp;&nbsp;<span style="color:#2b91af;">XElement</span>&nbsp;XElementRevitAddIns&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XElement</span>(&nbsp;<span style="color:#a31515;">&quot;RevitAddIns&quot;</span>&nbsp;);
-&nbsp;&nbsp;XElementRevitAddIns.Add(&nbsp;XElementAddIn&nbsp;);
- 
-&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:blue;">string</span>&nbsp;d&nbsp;<span style="color:blue;">in</span>&nbsp;<span style="color:#2b91af;">Directory</span>.GetDirectories(&nbsp;sDir&nbsp;)&nbsp;)
-&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;myString_ManifestPath&nbsp;=&nbsp;d&nbsp;+&nbsp;<span style="color:#a31515;">&quot;\\&quot;</span>&nbsp;+&nbsp;dll_name&nbsp;+&nbsp;<span style="color:#a31515;">&quot;.addin&quot;</span>;
- 
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>[]&nbsp;directories&nbsp;=&nbsp;d.Split(&nbsp;<span style="color:#2b91af;">Path</span>.DirectorySeparatorChar&nbsp;);
- 
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">int</span>.TryParse(&nbsp;directories[&nbsp;directories.Count()&nbsp;-&nbsp;1&nbsp;],
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">out</span>&nbsp;<span style="color:blue;">int</span>&nbsp;myInt_FromTextBox&nbsp;)&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Install&nbsp;on&nbsp;version&nbsp;2017&nbsp;and&nbsp;above</span>
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;myInt_FromTextBox&nbsp;&gt;=&nbsp;2017&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XDocument</span>(&nbsp;XElementRevitAddIns&nbsp;).Save(
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myString_ManifestPath&nbsp;);
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">else</span>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:#2b91af;">File</span>.Exists(&nbsp;myString_ManifestPath&nbsp;)&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">File</span>.Delete(&nbsp;myString_ManifestPath&nbsp;);
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;}
-}
-</pre>
+Tags (0)
+Add tags
+Report
+MESSAGE 8 OF 13
+Yien_Chao
+ Collaborator Yien_Chao in reply to: Samuel.Arsenault-Brassard
+‎12-10-2020 06:39 AM 
+i would try different approach to that.
 
-Many thanks to Joshua for sharing this DIY approach.
-I added it to The Building Coder samples, cf.
-the [diff to the previous version](https://github.com/jeremytammik/the_building_coder_samples/compare/2021.0.150.19...2021.0.150.20).
+try to use IsPointInRoom() instead? https://www.revitapidocs.com/2020/96e29ddf-d6dc-0c40-b036-035c5001b996.htm
 
-####<a name="4"></a> Generative Design in C&#35;
+for ceiling , wall and floor, you can just take the center points and project the points to room.
 
-Fernando Malard, CTO at [ofcdesk](http://ofcdesk.com), brought up an interesting question that an unnamed colleague of mine <!-- Kean Walmsley --> kindly clarified:
+hope that may help.
 
-**Question:** Looking for a suggestion about what route to pursue...
- 
-We are creating a Revit plugin for a customer that requires a wall panel tiling system in Revit.
+Tags (0)
+Add tags
+Report
+MESSAGE 9 OF 13
+Samuel.Arsenault-Brassard
+ Contributor Samuel.Arsenault-Brassard in reply to: Yien_Chao
+‎12-10-2020 07:03 AM 
+"project the points to room." I'm not sure I understand this part. I guess you can draw a line from the centroid of the room to the centroid of the walls?
 
-The tiling problem involves lots of optimization variables and it would be perfect to be addressed by a Generative algorithm.
- 
-Basically, the plugin would walk through the project walls (inside and outside), perform panel tiling, evaluate, do the genetic operations, repeat, etc.
- 
-Is it possible to use Revit GD tools via C# API or is it mandatory to use Dynamo?
- 
-I know we could pursue the creation of an SGAII or III algorithm in pure C# but Revit/Forge would give us those extremely helpful tools to visualize design options, parameter graphs, etc.
- 
-Any advice here?
+The inherent problem I see is that the centroid of each wall/floor/ceiling is going to be outside each room since it is its shell. It's almost like we need to offset each room's volume to encompass the centroids of its shells.
 
-**Answer:** It does sound like a good use of GD.
- 
-That said, the GD feature doesn’t have an automation API: you use Dynamo to define the parametric models that it uses. The Dynamo graph can use C# “zero-touch” nodes, if you want it to &ndash; and people more commonly integrate Python code, when they need to &ndash; but that’s just helping flesh out the logic of the graph, it’s not to automate the overall process.
- 
-In case it helps, I made a first pass (which is not at all optimal) at doing
-a [floor tiling graph for use with Refinery](https://autode.sk/tiling-graph) ([^](zip/RefineryTiling.zip)).
+WallMiddle.jpg
 
-**Response:** Interesting.
- 
-Is it possible to trigger the Dynamo graph from Revit and have it running in the background? 
- 
-Maybe we could create the manager app in C# and call the graph as we need without exposing Dynamo UI to the end user.
+Tags (0)
+Add tags
+Report
+MESSAGE 10 OF 13
+Samuel.Arsenault-Brassard
+ Contributor Samuel.Arsenault-Brassard in reply to: Samuel.Arsenault-Brassard
+‎12-10-2020 07:03 AM 
+Typo:
 
-I just want to avoid any complexity to the user.
- 
-Thanks!
+blue line = extent of *room*
 
-**Answer:** The user doesn’t see Dynamo at all: the GD feature does exactly what you’ve described (actually that’s it’s whole point &nbsp; :-)).
+Tags (0)
+Add tags
+Report
+MESSAGE 11 OF 13
+Yien_Chao
+ Collaborator Yien_Chao in reply to: Samuel.Arsenault-Brassard
+‎12-10-2020 08:25 AM 
+example : choose center face of wall, then project the point according to normal by . Then use the isinroom() for each point, you should have 2 rooms for a single wall.
 
-**Response:** It seems your sample graph loads ok but it shows a missing PolyCurve custom node:
+easier with ceilings and floor finishes.
 
-<center>
-<img src="img/fm_generative_design_1.jpg" alt="Generative design in C#" title="Generative design in C#" width="800"/> <!-- 1920 -->
-</center>
- 
-I’m running Revit 2021.1.2, Dynamo Core 2.6.1.8786 and Dynamo Revit 2.6.1.8850.
+Tags (0)
+Add tags
+Report
+MESSAGE 12 OF 13
+Samuel.Arsenault-Brassard
+ Contributor Samuel.Arsenault-Brassard in reply to: Yien_Chao
+‎12-10-2020 09:03 AM 
+Interesting.
 
-Any additional package I need to install?
+I can imagine lots of problems with this approach like a corridor that borders 20 rooms will only detect one room on each sides.
 
-**Answer:** Ampersand, I believe.
+Same with a floor or ceiling being shared by multiple rooms. Especially if the designers were lazy and modeled the floors/ceilings to go through walls.
 
-**Response:** Exactly, thanks!
+It's a very interesting problem, I will keep pondering on it. I'm actually surprised there's no direct way to do this directly in the API or in Revit schedules. Feels like every walls should know what rooms acost them and all rooms should know what surfaces bound them.
 
-<center>
-<img src="img/fm_generative_design_2.jpg" alt="Generative design in C#" title="Generative design in C#" width="800"/> <!-- 1719 -->
-</center>
+Tags (0)
+Add tags
+Report
+MESSAGE 13 OF 13
+Yien_Chao
+ Collaborator Yien_Chao in reply to: Samuel.Arsenault-Brassard
+‎12-11-2020 06:16 AM 
+i think you can start another thread on the particuliar topic.
 
-####<a name="5"></a> AI Identifies and Classifies BIM Elements in 2D Sketch
+In the meantime, , i think the first question has been resolve.
 
-Before closing, I'd like to pick up a couple of interesting miscellaneous items I happened to run into, starting with
-a [LinkedIn post](https://www.linkedin.com/posts/mohamed-adel-a3b26160_autodesk-revit-modeling-activity-6769520499216158720-AFS7)
-by Mohamed Adel, BIM Coordinator at SEPCO Electric Power Construction Corporation, Egypt:
+####<a name="4"></a> Comic Sans is a Public Good
 
-> Using machine learning in modelling is quite an approach which definitely will save hours of work.
-I developed an application that can automatically model from linked AutoCAD file in Revit.
-Using machine learning concept which guide the Revit API to model the proper element.
-In his video, a CAD contains only polylines with nothing to distinguish them from each other. 
-The user provides some initial information in the UI like which family to use in the loadable families, type of system families and working levels.
-For any element it will automatically duplicate the family to a new type with the right dimension that fits the linked polyline.
-For the depth of the floors, the user will choose which type.
+I am a bit of a typography junkie and pay far too much fanatic attention to that aspect of a text.
 
-<center>
-<video width="480" height="270" preload="metadata" muted="muted" src="https://dms.licdn.com/playlist/C4D05AQGre2tKOAOL2w/mp4-720p-30fp-crf28/0/1613979455733?e=1614873600&amp;v=beta&amp;t=q2FZMnMx01AELeo7dzDOJm7L553O4Dj3cxRS4a3uUEQ" autoplay="autoplay"></video>
-</center>
+I sometimes even feel compelled to reformat a text more nicely to suit my taste just to make it more readable before I even start to take it in.
 
-It looks pretty neat!
+Until now, I have always gone for pretty traditional fonts and avoided Comic Sans.
 
-Here are a few more:
-
-- Why did OS/2 Lose to Windows 3?
-  <br/>[Why did IBM's OS/2 project lose to Microsoft, given that IBM had much more resources than Microsoft at that time?](https://www.quora.com/Why-did-IBMs-OS-2-project-lose-to-Microsoft-given-that-IBM-had-much-more-resources-than-Microsoft-at-that-time/answers/12576993)
-- Google Sheets as a REST API and React App &ndash;
-  <br/>[How to turn Google sheets into a REST API and use it with a React application](https://www.freecodecamp.org/news/react-and-googlesheets)
-- [JavaScript array methods tutorial &ndash; the most useful methods explained with examples](https://www.freecodecamp.org/news/complete-introduction-to-the-most-useful-javascript-array-methods)
-- [Allserver](https://github.com/flash-oss/allserver), a minimalist multi-transport and multi-protocol simple RPC server and (optional) client
+I was surprised to learn that there are good reasons not to continue doing so, reading
+about [the reason Comic Sans is a public good](https://www.thecut.com/2020/08/the-reason-comic-sans-is-a-public-good.html).
 
