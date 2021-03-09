@@ -74,31 +74,22 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Thanks to 
 for their input on this.
 
-####<a name="3"></a> 
+####<a name="3"></a> Retrieve Room Bounding Elements
 
-- Get the walls, ceiling and floor of a room?
-  https://forums.autodesk.com/t5/revit-api-forum/get-the-walls-ceiling-and-floor-of-a-room/m-p/9915923
+Moving inwards from the exterior walls into the building interior, an interesting discussion between
+Samuel Arsenault-Brassard and Yien Chao, Architect, BIM Director and Computational BIM Manager
+at [MSDL architectes](https://www.msdl.ca) on how
+to [get the walls, ceiling and floor of a room](https://forums.autodesk.com/t5/revit-api-forum/get-the-walls-ceiling-and-floor-of-a-room/m-p/9915923):
 
-raised by Samuel Arsenault-Brassard and resolved by Yien Chao, Architect, BIM Director and Computational BIM Manager at 
-[MSDL architectes](https://www.msdl.ca).
+**Question:**
 
-   Samuel.Arsenault-Brassard 276 Views, 12 Replies
-‎12-04-2020 09:27 AM 
-Get the walls, ceiling and floor of a room?
 I've been able to get a list of all the elements that are in a room, but I am not able to figure out how to automatically obtain the walls, ceiling and floor that are associated with these rooms.
 
 Is this information possible through the API?
 
 And yes, I do understand that a wall, floor and ceiling may have a relationship with multiple rooms, not just one
 
- Solved by Yien_Chao. Go to Solution.
 
-Tags (0)
-Add tags
-Report
-12 REPLIES 
-Sort: 
-MESSAGE 2 OF 13
 Yien_Chao
  Collaborator Yien_Chao in reply to: Samuel.Arsenault-Brassard
 ‎12-04-2020 11:40 AM 
@@ -108,118 +99,59 @@ try this maybe?
 
 https://www.revitapidocs.com/2020/1fbe1cff-ed94-4815-564b-05fd9e8f61fe.htm
 
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 13
-Yien_Chao
- Collaborator Yien_Chao in reply to: Samuel.Arsenault-Brassard
-‎12-04-2020 12:58 PM 
+
 a simple boundingbox filter and a multicategory filter.. and voila!
 
 2020-12-04_15-57-11.jpg
 
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 13
-Samuel.Arsenault-Brassard
- Contributor Samuel.Arsenault-Brassard in reply to: Yien_Chao
-‎12-10-2020 05:17 AM 
-One last question, is the bounding box actually a square box? I am wondering if it will capture rogue elements if the room is not square, for example a serpentine corridor.
+**Response:** One last question, is the bounding box actually a square box? I am wondering if it will capture rogue elements if the room is not square, for example a serpentine corridor.
 
 BoundingBox.jpg
 
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 13
-jeremytammik
- Employee jeremytammik in reply to: Samuel.Arsenault-Brassard
-‎12-10-2020 06:20 AM 
-The bounding box is always a rectangular box, or, more precisely, a rectangular cuboid, with X, Y and Z axis-aligned faces.
+**Answer:** The bounding box is always a rectangular box, or, more precisely, a rectangular cuboid, with X, Y and Z axis-aligned faces.
 
-Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder
-
-Tags (0)
-Add tags
-Report
-MESSAGE 6 OF 13
-Yien_Chao
- Collaborator Yien_Chao in reply to: Samuel.Arsenault-Brassard
-‎12-10-2020 06:21 AM 
-i dont think so...
+**Answer 2:** i dont think so...
 
 https://www.revitapidocs.com/2020/3c452286-57b1-40e2-2795-c90bff1fcec2.htm
 
 A three-dimensional rectangular box at ...
 
-Tags (0)
-Add tags
-Report
-MESSAGE 7 OF 13
+
 Samuel.Arsenault-Brassard
- Contributor Samuel.Arsenault-Brassard in reply to: jeremytammik
-‎12-10-2020 06:22 AM 
+
 So, it would create a problem for a non-rectangular room right? (trying to detect related walls, floors and ceilings of a room)
 
-Tags (0)
-Add tags
-Report
-MESSAGE 8 OF 13
-Yien_Chao
- Collaborator Yien_Chao in reply to: Samuel.Arsenault-Brassard
-‎12-10-2020 06:39 AM 
-i would try different approach to that.
+**Answer:** i would try different approach to that.
 
-try to use IsPointInRoom() instead? https://www.revitapidocs.com/2020/96e29ddf-d6dc-0c40-b036-035c5001b996.htm
+try to use [`IsPointInRoom`](https://www.revitapidocs.com/2020/96e29ddf-d6dc-0c40-b036-035c5001b996.htm) instead? 
 
 for ceiling , wall and floor, you can just take the center points and project the points to room.
 
 hope that may help.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 9 OF 13
+
 Samuel.Arsenault-Brassard
- Contributor Samuel.Arsenault-Brassard in reply to: Yien_Chao
-‎12-10-2020 07:03 AM 
+
 "project the points to room." I'm not sure I understand this part. I guess you can draw a line from the centroid of the room to the centroid of the walls?
 
 The inherent problem I see is that the centroid of each wall/floor/ceiling is going to be outside each room since it is its shell. It's almost like we need to offset each room's volume to encompass the centroids of its shells.
 
 WallMiddle.jpg
 
-Tags (0)
-Add tags
-Report
-MESSAGE 10 OF 13
+
 Samuel.Arsenault-Brassard
  Contributor Samuel.Arsenault-Brassard in reply to: Samuel.Arsenault-Brassard
 ‎12-10-2020 07:03 AM 
+
 Typo:
 
 blue line = extent of *room*
 
-Tags (0)
-Add tags
-Report
-MESSAGE 11 OF 13
-Yien_Chao
- Collaborator Yien_Chao in reply to: Samuel.Arsenault-Brassard
-‎12-10-2020 08:25 AM 
-example : choose center face of wall, then project the point according to normal by . Then use the isinroom() for each point, you should have 2 rooms for a single wall.
+**Answer:** example : choose center face of wall, then project the point according to normal by . Then use the isinroom() for each point, you should have 2 rooms for a single wall.
 
 easier with ceilings and floor finishes.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 12 OF 13
+
 Samuel.Arsenault-Brassard
  Contributor Samuel.Arsenault-Brassard in reply to: Yien_Chao
 ‎12-10-2020 09:03 AM 
@@ -231,16 +163,12 @@ Same with a floor or ceiling being shared by multiple rooms. Especially if the d
 
 It's a very interesting problem, I will keep pondering on it. I'm actually surprised there's no direct way to do this directly in the API or in Revit schedules. Feels like every walls should know what rooms acost them and all rooms should know what surfaces bound them.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 13 OF 13
-Yien_Chao
- Collaborator Yien_Chao in reply to: Samuel.Arsenault-Brassard
-‎12-11-2020 06:16 AM 
-i think you can start another thread on the particuliar topic.
+**Answer:** i think you can start another thread on the particuliar topic.
 
-In the meantime, , i think the first question has been resolve.
+In the meantime, i think the first question has been resolved.
+
+Many thanks to Yien Chao for all his good advice!
+
 
 ####<a name="4"></a> Comic Sans is a Public Good
 
