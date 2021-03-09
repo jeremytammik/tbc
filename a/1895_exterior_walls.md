@@ -56,7 +56,21 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ###
 
-####<a name="2"></a>
+####<a name="2"></a> Finding Exterior Walls Continued
+
+- /a/src/rvt/RevitFindExteriorWalls/
+  https://thebuildingcoder.typepad.com/blog/2018/05/filterrule-use-and-retrieving-exterior-walls.html#comment-5289806219
+
+  First round at [Retrieving All Exterior Walls](https://thebuildingcoder.typepad.com/blog/2018/05/drive-revit-via-a-wcf-service-wall-directions-and-parameters.html#8)
+  - using the built-in wall function parameter `FUNCTION_PARAM` to filter for exterior walls, `IsExterior( w.WallType )` returns true
+  The Revit API also provides a BuildingEnvelopeAnalyzer class that should help with this, but there seem to be problems using it, cf.:
+  - Finding exterior walls by BuildingEnvelopeAnalyzer
+  - Filtering exterior walls
+  Yet another workaround was suggested: Place some room separation lines outside the building envelope and create a huge room around the entire building. Then, it’s just a matter of getting room boundaries, filtering out the RSLs, appending the remaining elements to your list, deleting the room and RSLs, and moving up to the next level. It may not work for some bad modelling cases, but catches most.
+  After further discussion with the development team, they asked: Is the building model enclosed? It needs to be in order for the analyzer to work. In other words, do you have Roof and Floor elements to form enclosed spaces in the model?
+  Ten days later:
+  Several possible approaches to [retrieve all exterior walls](https://thebuildingcoder.typepad.com/blog/2018/05/filterrule-use-and-retrieving-exterior-walls.html#2)
+  Now a discussion between ...
 
 **Question:**
 
@@ -74,7 +88,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Thanks to 
 for their input on this.
 
-####<a name="3"></a> Retrieve Room Bounding Elements
+####<a name="3"></a> Retrieving Room Bounding Elements
 
 Moving inwards from the exterior walls into the building interior, an interesting discussion between
 Samuel Arsenault-Brassard and Yien Chao, Architect, BIM Director and Computational BIM Manager
