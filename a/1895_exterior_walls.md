@@ -152,73 +152,55 @@ Samuel Arsenault-Brassard and Yien Chao, Architect, BIM Director and Computation
 at [MSDL architectes](https://www.msdl.ca) on how
 to [get the walls, ceiling and floor of a room](https://forums.autodesk.com/t5/revit-api-forum/get-the-walls-ceiling-and-floor-of-a-room/m-p/9915923):
 
-**Question:**
-
-I've been able to get a list of all the elements that are in a room, but I am not able to figure out how to automatically obtain the walls, ceiling and floor that are associated with these rooms.
+**Question:** I've been able to get a list of all the elements that are in a room, but I am not able to figure out how to automatically obtain the walls, ceiling and floor that are associated with these rooms.
 
 Is this information possible through the API?
 
-And yes, I do understand that a wall, floor and ceiling may have a relationship with multiple rooms, not just one
+And yes, I do understand that a wall, floor and ceiling may have a relationship with multiple rooms, not just one.
 
+**Answer:** Try
+the [BoundingBoxIntersectsFilter](https://www.revitapidocs.com/2020/1fbe1cff-ed94-4815-564b-05fd9e8f61fe.htm), maybe?
 
-Yien_Chao
- Collaborator Yien_Chao in reply to: Samuel.Arsenault-Brassard
-‎12-04-2020 11:40 AM 
-hi Samuel,
+A simple bounding box filter and a multi-category filter... and voila!
 
-try this maybe?
+<center>
+<img src="img/room_bounding_elements_1.jpg" alt="Room bounding elements code" title="Room bounding elements code" width="800"/> <!-- 1829 -->
+</center>
 
-https://www.revitapidocs.com/2020/1fbe1cff-ed94-4815-564b-05fd9e8f61fe.htm
+**Response:** One last question, is the bounding box actually a square box?
+I am wondering if it will capture rogue elements if the room is not square, for example a serpentine corridor.
 
+<center>
+<img src="img/room_bounding_elements_2_bb.jpg" alt="Room bounding elements bb" title="Room bounding elements bb" width="400"/> <!-- 2257 -->
+</center>
 
-a simple boundingbox filter and a multicategory filter.. and voila!
+**Answer:** The [`BoundingBoxXYZ` class](https://www.revitapidocs.com/2020/3c452286-57b1-40e2-2795-c90bff1fcec2.htm)
+is a three-dimensional rectangular box at an arbitrary location and orientation within the Revit model.
 
-2020-12-04_15-57-11.jpg
+However, the bounding box returned by the BIM element property is always a rectangular box, or, more precisely, a rectangular cuboid, with X, Y and Z axis-aligned faces.
 
-**Response:** One last question, is the bounding box actually a square box? I am wondering if it will capture rogue elements if the room is not square, for example a serpentine corridor.
+**Response:** So, it would create a problem for a non-rectangular room right? (trying to detect related walls, floors and ceilings of a room).
 
-BoundingBox.jpg
+**Answer:** I would try different approach for that.
+You could try to use the [`IsPointInRoom` method](https://www.revitapidocs.com/2020/96e29ddf-d6dc-0c40-b036-035c5001b996.htm) instead? 
 
-**Answer:** The bounding box is always a rectangular box, or, more precisely, a rectangular cuboid, with X, Y and Z axis-aligned faces.
+For ceiling, wall and floor, you can just take the center points and project the points to the room.
 
-**Answer 2:** i dont think so...
-
-https://www.revitapidocs.com/2020/3c452286-57b1-40e2-2795-c90bff1fcec2.htm
-
-A three-dimensional rectangular box at ...
-
-
-Samuel.Arsenault-Brassard
-
-So, it would create a problem for a non-rectangular room right? (trying to detect related walls, floors and ceilings of a room)
-
-**Answer:** i would try different approach to that.
-
-try to use [`IsPointInRoom`](https://www.revitapidocs.com/2020/96e29ddf-d6dc-0c40-b036-035c5001b996.htm) instead? 
-
-for ceiling , wall and floor, you can just take the center points and project the points to room.
-
-hope that may help.
-
-
-Samuel.Arsenault-Brassard
-
-"project the points to room." I'm not sure I understand this part. I guess you can draw a line from the centroid of the room to the centroid of the walls?
+**Response:** You say 'project the points to room.'
+I'm not sure I understand this part.
+I guess you can draw a line from the centroid of the room to the centroid of the walls?
 
 The inherent problem I see is that the centroid of each wall/floor/ceiling is going to be outside each room since it is its shell. It's almost like we need to offset each room's volume to encompass the centroids of its shells.
 
-WallMiddle.jpg
-
-
-Samuel.Arsenault-Brassard
- Contributor Samuel.Arsenault-Brassard in reply to: Samuel.Arsenault-Brassard
-‎12-10-2020 07:03 AM 
+<center>
+<img src="img/room_bounding_elements_3_wall_middle.jpg" alt="Wall middle" title="Wall middle" width="400"/> <!-- 1794 -->
+</center>
 
 Typo:
 
-blue line = extent of *room*
+- blue line = extent of *room*
 
-**Answer:** example : choose center face of wall, then project the point according to normal by . Then use the isinroom() for each point, you should have 2 rooms for a single wall.
+**Answer:** Example: choose center face of wall, then project the point according to normal by . Then use the isinroom() for each point, you should have 2 rooms for a single wall.
 
 easier with ceilings and floor finishes.
 
