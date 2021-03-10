@@ -54,19 +54,27 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-###
+### Exterior Walls and Room Bounding Elements
+
+Let's look at building and room boundaries today:
+
+- [Finding exterior walls continued](#2)
+- [Retrieving room bounding elements](#3)
+- [Comic Sans is a public good](#4)
 
 ####<a name="2"></a> Finding Exterior Walls Continued
 
-We took a look
-at [retrieving all exterior walls](https://thebuildingcoder.typepad.com/blog/2018/05/drive-revit-via-a-wcf-service-wall-directions-and-parameters.html#8) three years ago,
-using the built-in wall function parameter `FUNCTION_PARAM` to filter for exterior walls, tested by the `IsExterior` API method.
-and also using the `BuildingEnvelopeAnalyzer` class.
-A workaround was suggested, placing room separation lines outside the building envelope and creating a huge room around the entire building.
-Further aspects were added a week later in a second round
-on [retrieving all exterior walls](https://thebuildingcoder.typepad.com/blog/2018/05/filterrule-use-and-retrieving-exterior-walls.html#2).
+We discussed some approaches
+to [retrieve all exterior walls](https://thebuildingcoder.typepad.com/blog/2018/05/drive-revit-via-a-wcf-service-wall-directions-and-parameters.html#8) three years ago using different approaches:
 
-Here is a new discussion between Александр Пекшев or Alexander Pekshev of [ModPlus](https://modplus.org/en) and
+- The built-in wall function parameter `FUNCTION_PARAM`, tested by the `IsExterior` API method
+- Using the `BuildingEnvelopeAnalyzer` class
+- Placing room separation lines outside the building envelope and creating a huge room around the entire building
+
+Further aspects were added a week later in a second round
+on [retrieving all exterior walls revisited](https://thebuildingcoder.typepad.com/blog/2018/05/filterrule-use-and-retrieving-exterior-walls.html#2).
+
+The discussion now continued between Александр Пекшев or Alexander Pekshev of [ModPlus](https://modplus.org/en) and
 Lucas Moreira in a series of [comments](https://thebuildingcoder.typepad.com/blog/2018/05/filterrule-use-and-retrieving-exterior-walls.html#comment-5289806219)
 on that post:
 
@@ -74,7 +82,7 @@ on that post:
 The algorithm consists of two parts:
 
 1. The main part &ndash; 
-From the center of the LocationCurve of the wall, two perpendicular rays (long lines) are shot on either side of the LocationCurve.
+From the centre of the LocationCurve of the wall, two perpendicular rays (long lines) are shot on either side of the LocationCurve.
 Determine the number of intersections of these rays with other walls.
 If the number of intersections on one side is zero, this is an outer wall.
 2. An additional part &ndash; 
@@ -107,7 +115,7 @@ In this case, it is necessary to improve the second part of the check and introd
 There will always be special cases.
 The screenshot shows that three walls are connected there in one place &ndash; this needs to be taken into account, as it seems to me.
 
-In the 'main part' of thre algorithm, if there are intersections on both sides of the wall, then it is internal.
+In the 'main part' of the algorithm, if there are intersections on both sides of the wall, then it is internal.
 And the connections at the ends of the wall are no longer important.
 
 Lucas: Thanks for your response.
@@ -147,7 +155,7 @@ Many thanks to Alexander and Lucas for the interesting discussion.
 
 ####<a name="3"></a> Retrieving Room Bounding Elements
 
-Moving inwards from the exterior walls into the building interior, an interesting discussion between
+Moving inwards from the exterior walls into the building interior, I summarise the interesting discussion between
 Samuel Arsenault-Brassard and Yien Chao, Architect, BIM Director and Computational BIM Manager
 at [MSDL architectes](https://www.msdl.ca) on how
 to [get the walls, ceiling and floor of a room](https://forums.autodesk.com/t5/revit-api-forum/get-the-walls-ceiling-and-floor-of-a-room/m-p/9915923):
@@ -184,9 +192,9 @@ However, the bounding box returned by the BIM element property is always a recta
 **Answer:** I would try different approach for that.
 You could try to use the [`IsPointInRoom` method](https://www.revitapidocs.com/2020/96e29ddf-d6dc-0c40-b036-035c5001b996.htm) instead? 
 
-For ceiling, wall and floor, you can just take the center points and project the points to the room.
+For ceiling, wall and floor, you can just take the centre points and project the points to the room.
 
-**Response:** You say 'project the points to room.'
+**Response:** You say, 'project the points to room.'
 I'm not sure I understand this part.
 I guess you can draw a line from the centroid of the room to the centroid of the walls?
 
@@ -200,37 +208,36 @@ Typo:
 
 - blue line = extent of *room*
 
-**Answer:** Example: choose center face of wall, then project the point according to normal by . Then use the isinroom() for each point, you should have 2 rooms for a single wall.
+**Answer:** Example: choose centre face of wall, then project the point according to normal by .
+Then, use the `IsPointInRoom` method for each point; you should have 2 rooms for a single wall.
+It is easier with ceilings and floor finishes.
 
-easier with ceilings and floor finishes.
+**Response:** Interesting.
 
+I can imagine lots of problems with this approach; for instance, a corridor that borders 20 rooms will only detect one room on each side.
 
-Samuel.Arsenault-Brassard
- Contributor Samuel.Arsenault-Brassard in reply to: Yien_Chao
-‎12-10-2020 09:03 AM 
-Interesting.
+Same with a floor or ceiling being shared by multiple rooms.
+Especially if the designers were lazy and modelled the floors/ceilings to go through walls.
 
-I can imagine lots of problems with this approach like a corridor that borders 20 rooms will only detect one room on each sides.
+It's a very interesting problem, I will keep pondering it.
+I'm actually surprised there's no direct way to do this directly in the API or in Revit schedules.
+Feels like every walls should know what rooms accost them and all rooms should know what surfaces bound them.
 
-Same with a floor or ceiling being shared by multiple rooms. Especially if the designers were lazy and modeled the floors/ceilings to go through walls.
+**Answer:** I think you can start another thread on that particular topic.
 
-It's a very interesting problem, I will keep pondering on it. I'm actually surprised there's no direct way to do this directly in the API or in Revit schedules. Feels like every walls should know what rooms acost them and all rooms should know what surfaces bound them.
+In the meantime, I think the first question has been resolved.
 
-**Answer:** i think you can start another thread on the particuliar topic.
-
-In the meantime, i think the first question has been resolved.
-
-Many thanks to Yien Chao for all his good advice!
+Many thanks to Samuel and Yien for the interesting discussion, and to Yien for all his good suggestions!
 
 
 ####<a name="4"></a> Comic Sans is a Public Good
 
-I am a bit of a typography junkie and pay far too much fanatic attention to that aspect of a text.
+Moving away for the Revit API for a moment, I am a bit of a typography junkie and pay far too much fanatic attention to that aspect of a text.
 
 I sometimes even feel compelled to reformat a text more nicely to suit my taste just to make it more readable before I even start to take it in.
 
 Until now, I have always gone for pretty traditional fonts and avoided Comic Sans.
 
-I was surprised to learn that there are good reasons not to continue doing so, reading
+I was interested and surprised to learn that there are good reasons not to do so, though, reading
 about [the reason Comic Sans is a public good](https://www.thecut.com/2020/08/the-reason-comic-sans-is-a-public-good.html).
 
