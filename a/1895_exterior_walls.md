@@ -33,7 +33,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Retrieving outer boundaries of buildings and rooms, exterior walls and room bounding elements with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://autode.sk/exteriorwalls
 
 Let's look at the outer boundaries of both buildings and rooms today
 &ndash; Finding exterior walls continued
