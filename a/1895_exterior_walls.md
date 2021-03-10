@@ -58,35 +58,92 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> Finding Exterior Walls Continued
 
-- /a/src/rvt/RevitFindExteriorWalls/
-  https://thebuildingcoder.typepad.com/blog/2018/05/filterrule-use-and-retrieving-exterior-walls.html#comment-5289806219
+We took a look
+at [retrieving all exterior walls](https://thebuildingcoder.typepad.com/blog/2018/05/drive-revit-via-a-wcf-service-wall-directions-and-parameters.html#8) three years ago,
+using the built-in wall function parameter `FUNCTION_PARAM` to filter for exterior walls, tested by the `IsExterior` API method.
+and also using the `BuildingEnvelopeAnalyzer` class.
+A workaround was suggested, placing room separation lines outside the building envelope and creating a huge room around the entire building.
+Further aspects were added a week later in a second round
+on [retrieving all exterior walls](https://thebuildingcoder.typepad.com/blog/2018/05/filterrule-use-and-retrieving-exterior-walls.html#2).
 
-  First round at [Retrieving All Exterior Walls](https://thebuildingcoder.typepad.com/blog/2018/05/drive-revit-via-a-wcf-service-wall-directions-and-parameters.html#8)
-  - using the built-in wall function parameter `FUNCTION_PARAM` to filter for exterior walls, `IsExterior( w.WallType )` returns true
-  The Revit API also provides a BuildingEnvelopeAnalyzer class that should help with this, but there seem to be problems using it, cf.:
-  - Finding exterior walls by BuildingEnvelopeAnalyzer
-  - Filtering exterior walls
-  Yet another workaround was suggested: Place some room separation lines outside the building envelope and create a huge room around the entire building. Then, it’s just a matter of getting room boundaries, filtering out the RSLs, appending the remaining elements to your list, deleting the room and RSLs, and moving up to the next level. It may not work for some bad modelling cases, but catches most.
-  After further discussion with the development team, they asked: Is the building model enclosed? It needs to be in order for the analyzer to work. In other words, do you have Roof and Floor elements to form enclosed spaces in the model?
-  Ten days later:
-  Several possible approaches to [retrieve all exterior walls](https://thebuildingcoder.typepad.com/blog/2018/05/filterrule-use-and-retrieving-exterior-walls.html#2)
-  Now a discussion between ...
+Here is a new discussion between Александр Пекшев or Alexander Pekshev of [ModPlus](https://modplus.org/en) and
+Lucas Moreira in a series of [comments](https://thebuildingcoder.typepad.com/blog/2018/05/filterrule-use-and-retrieving-exterior-walls.html#comment-5289806219)
+on that post:
 
-**Question:**
+Александр: There is one simple enough algorithm that allows you to find the exterior walls, even in an open loop.
+The algorithm consists of two parts:
 
-<pre class="code">
-</pre>
+1. The main part &ndash; 
+From the center of the LocationCurve of the wall, two perpendicular rays (long lines) are shot on either side of the LocationCurve.
+Determine the number of intersections of these rays with other walls.
+If the number of intersections on one side is zero, this is an outer wall.
+2. An additional part &ndash; 
+The first part will not find all the walls, so the second pass should check the remaining walls at the intersections with the found exterior walls: if the wall with its ends connects to the two outer walls, it means it is also external
+
+The working capacity of this algorithm is almost ideal.
+
+Here are the results of my algorithm:
 
 <center>
-<img src="img/.jpg" alt="" title="" width="445"/> <!-- 445 -->
+<img src="img/ap_exterior_walls_1.png" alt="Exterior walls" title="Exterior walls" width="400"/> <!-- 493 -->
+<br/>
+<img src="img/ap_exterior_walls_2.png" alt="Exterior walls" title="Exterior walls" width="400"/> <!-- 591 -->
 </center>
 
-**Answer:** 
+I describe the algorithm in more detail in my article
+on [Revit: Exterior Wall Search Algorithm](https://blog.modplus.org/index.php/11-revitapi/10-revit-find-external-walls-algorithm).
 
-**Response:** 
+The code is provided in
+the [RevitFindExteriorWalls GitHub repository](https://github.com/Pekshev/RevitFindExteriorWalls).
 
-Thanks to 
-for their input on this.
+Lucas: how do you solve the problem of having an interior wall that touches 2 exterior walls?
+
+<center>
+<img src="img/ap_exterior_walls_3.png" alt="Exterior walls" title="Exterior walls" width="600"/> <!-- 857 -->
+</center>
+
+Александр: Today, I figured out the problem in your example.
+In this case, it is necessary to improve the second part of the check and introduce some additional checks.
+There will always be special cases.
+The screenshot shows that three walls are connected there in one place &ndash; this needs to be taken into account, as it seems to me.
+
+In the 'main part' of thre algorithm, if there are intersections on both sides of the wall, then it is internal.
+And the connections at the ends of the wall are no longer important.
+
+Lucas: Thanks for your response.
+What I did is use 3 rays at different angles from each side: 45, 90 and 135 degrees.
+If at least one of the rays doesn't hit anything, it's an exterior wall.
+This took care of the special cases I had so far.
+I believe shallower angles might be best.
+So, maybe something like (5, 90, 175) will probably yield better, more correct results.
+Another thing is I am not levelling the location lines.
+Meaning that walls have to be on the same level to intersect each other.
+
+<center>
+<img src="img/ap_exterior_walls_4.png" alt="Exterior walls" title="Exterior walls" width="400"/> <!-- 454 -->
+</center>
+
+All blue walls are exterior, and the garage in the top right is on a different level of the rest.
+
+Another approach that worked is using a convex hull to find at least one exterior wall (any location line that intersects the hull is an outermost wall).
+Then, from the selected exterior wall, move counterclockwise, always trying to find a right turn; this is a bit slower, but needs no special cases to work with all the projects I've tested.
+
+Александр: Convex hull is suitable if the outer walls form a precise chain of connections.
+But it is not always the case.
+In addition, there it will be necessary to collect these very connections, which is also not an easy task (there are many nuances).
+
+While writing the message, another idea came to mind:
+
+1. Determine the overall contour of all selected walls and find the midpoint
+2. Around the contour with an indent from the contour, throw the rays towards the midpoint. Throw the rays through a certain step.
+
+The first wall that intersects with the ray is the outer one.
+
+Interesting idea! Need to try it out.
+
+So, it is necessary to clarify that this is not a 100% solution and some special cases turn out to be expensive.
+
+Many thanks to Alexander and Lucas for the interesting discussion.
 
 ####<a name="3"></a> Retrieving Room Bounding Elements
 
