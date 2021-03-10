@@ -35,8 +35,10 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Let's look at the outer boundaries of both buildings and rooms today
+&ndash; Finding exterior walls continued
+&ndash; Retrieving room bounding elements
+&ndash; Comic Sans is a public good...
 
 linkedin:
 
@@ -56,7 +58,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Exterior Walls and Room Bounding Elements
 
-Let's look at building and room boundaries today:
+Let's look at the outer boundaries of both buildings and rooms today:
 
 - [Finding exterior walls continued](#2)
 - [Retrieving room bounding elements](#3)
@@ -113,7 +115,7 @@ Lucas: how do you solve the problem of having an interior wall that touches 2 ex
 Александр: Today, I figured out the problem in your example.
 In this case, it is necessary to improve the second part of the check and introduce some additional checks.
 There will always be special cases.
-The screenshot shows that three walls are connected there in one place &ndash; this needs to be taken into account, as it seems to me.
+The screenshot shows that three walls are connected there in one place &ndash; it seems to me that this needs to be taken into account.
 
 In the 'main part' of the algorithm, if there are intersections on both sides of the wall, then it is internal.
 And the connections at the ends of the wall are no longer important.
