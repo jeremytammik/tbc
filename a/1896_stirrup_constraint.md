@@ -9,6 +9,12 @@
 - Problem with Constraining Stirrups to the Cover of the Host Element
   https://forums.autodesk.com/t5/revit-api-forum/problem-with-constraining-stirrups-to-the-cover-of-the-host/m-p/10111388
 
+- getting started
+  Revit add-in style guide
+  email [Revit add-in style guide] John Callen
+
+
+
 twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
@@ -278,7 +284,41 @@ In the end, I can successfully get the correct result!
 Thank you.
 
 
-####<a name="3"></a> 
+####<a name="3"></a> Revit API and UX Style Guide
 
+**Question:** I am exploring developing Revit add-ins making use of our proprietary lighting controls expertise.
+I was wondering if Autodesk has a style guide for Revit add-ins, or Revit itself, that we could access to ensure consistency of the user experience?
+ 
+**Answer:** Have you seen the Philips Lighting design app built by one of our partners, Xinaps?
+Web based... automates lighting selection and design and inserts directly into Revit models.
+If not, a YouTube search on Philips Xinapps Revit should get you there.
+
+Style guide for Revit add-ins...
+Sorry but no we don't.
+Best your UX people can do is plaigarize as much of the Revit look and feel as they can, possibly with some subtle additional signature effects, like subtle use of your specific brand colour.
+
+The Revit API supports some UI functionality.
+Everything that you create using that official API will fit in with the standard Revit style.
+However, it is pretty limited, so many developers end up adding some of their own WPF and other UI on top of that.
+If you refrain from that, you are guaranteed style compatibility.
+
+**Response:** From my (novice) vantage, there are a couple of areas that our add-in would need to integrate with:
+
+- Ribbon definition and navigation
+- Interaction with application elements: picking elements, locating objects, etc.
+- Database read/write at both the project and object levels
+- Specific dialogues to support our add-in
+ 
+Can you suggest some reference materials which would help us better understand programming Revit?
+
+**Answer:** Sure:
+ 
+1. [Getting started with the Revit API](https://thebuildingcoder.typepad.com/blog/about-the-author.html#2), including
+the [My First Revit Plug-In video tutorial](https://www.autodesk.com/developer-network/platform-technologies/revit)
+2. Ribbon definition is discussed in the [Revit API training labs](https://github.com/ADN-DevTech/RevitTrainingMaterial), specifically part 2, Revit UI API
+3. Db read-write is included in the getting started material
+4. WPF or WinForms or whatever you are already using... anything that works with .NET
+In addition, all your questions are amply covered in the Revit API discussion forum
+ 
 
 ####<a name="4"></a> 
