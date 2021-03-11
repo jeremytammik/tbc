@@ -40,21 +40,15 @@ Summarising a nice conversation leading to a satisfactory conclusion in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [problem with constraining stirrups to the cover of the host element](https://forums.autodesk.com/t5/revit-api-forum/problem-with-constraining-stirrups-to-the-cover-of-the-host/m-p/10111388):
 
-Problem with Constraining Stirrups to the Cover of the Host Element
-12 REPLIES  SOLVED Back to Revit Products Category
- 
-Back to Topic Listing Previous Next 
-MESSAGE 1 OF 13
-kevin.anggrek
- Enthusiast kevin.anggrek 213 Views, 12 Replies
-‎01-31-2021 08:26 AM 
-Problem with Constraining Stirrups to the Cover of the Host Element
-Hi all,
+**Question:** I have been working on an add-in to automatically place stirrups inside a host element (Structural Column, in this case).
+I use the `Rebar.CreateFromRebarShape` method in order to create the stirrup inside the column.
+However, the RebarShape came with its own dimensions and thus didn't fit inside the concrete cover.
 
-I have been working on an add-in to automatically place stirrups inside a host element (Structural Column in this case). I use the Rebar.CreateFromRebarShape() Method in order to create the stirrup inside the column. However, the RebarShape came with its own dimensions and thus didn't fit inside the concrete's cover.
+Through the Revit user interface, every time the stirrup is placed manually inside a host element in the plan view, Revit can automatically constrain the stirrup edges to be inside the cover.
+How to do the same thing through the Revit API?
+I have tried getting the RebarConstraintManager of the newly created stirrup, iterating through all of its handles and changing the preferred RebarConstraint to `ToCover` as illustrated in the code snippet shown below:
 
-Through the Revit user interface, every time the stirrup is placed manually inside a host element in the plan view, Revit can automatically constrains the stirrup edges to be inside the cover, How to do the same thing through the Revit API? I have tried getting the RebarConstraintManager of the newly created stirrup, iterating through all of its handles and then changing the preferred RebarConstraint to ToCover as illustrated in the code snippet shown below:
-
+<pre class="code">
 Rebar stirrup = Rebar.CreateFromRebarShape(doc, rebarShape, barType, column, bottomLeftXYZ1, XYZ.BasisX, XYZ.BasisY);
 
 // Modify the RebarConstraint
@@ -71,92 +65,45 @@ foreach (RebarConstrainedHandle handle in rebarConstrainedHandles)
         rebarConstraintsManager.SetPreferredConstraintForHandle(handle, toCoverConstraint);
     }
 }
+</pre>
 
-After running the program, nothing changed at all to the stirrup (still didn't fit inside the concrete cover of the column host). After doing some debugging, I discovered that the GetAllConstrainedHandles() method returned 0 handles, that is why the rest of the program didn't work. Why did the method return zero handles even though the handles are visible in the user interface (both the dot and triangle handles)? Are there other methods to snap the stirrup inside the concrete cover?
+After running the program, nothing changed at all to the stirrup and it still didn't fit inside the concrete cover of the column host.
+By debugging, I discovered that the `GetAllConstrainedHandles` method returns 0 handles, which is why the rest of the program didn't work.
+Why did the method return zero handles even though the handles are visible in the user interface (both the dot and triangle handles)?
+Are there other methods to snap the stirrup inside the concrete cover?
 
-Thanks in advance
+**Answer 1:** Rebar is quite a complex area of the API due to the various objects involved:
 
- Solved by jeremy.tammik. Go to Solution.
+`RebarShapeDrivenAccessor` `ScaleToBox` purportedly uses the same algorithm as when you place shape in section view for example.
 
- Solved by jeremy.tammik. Go to Solution.
+From this, you probably have to work out the size of the rectangle by looking at cross section deducting covers, not sure there is a faster method. You probably have to size to get it somewhere near and then constrain (historically I've noticed similar in UI).
 
- Solved by RPTHOMAS108. Go to Solution.
-
-Tags (0)
-Add tags
-Report
-12 REPLIES 
-Sort: 
-MESSAGE 2 OF 13
-jeremy.tammik
- Employee jeremy.tammik in reply to: kevin.anggrek
-‎02-01-2021 03:43 AM 
-Tricky question, at least for me.
-
-I have passed it on to the development team for you and hope that they can advise.
-
-Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 13
-RPTHOMAS108
- Advisor RPTHOMAS108 in reply to: kevin.anggrek
-‎02-01-2021 04:53 AM 
-Rebar is quite a complex area of the API due to the various objects involved:
-
-RebarShapeDrivenAccessor.ScaleToBox:
-
-This purportedly uses the same algorithm as when you place shape in section view for example.
-
-From this you probably have to work out the size of the rectangle by looking at cross section deducting covers, not sure there is a faster method. You probably have to size tto get it somewhere near and then constrain (historically I've noticed similar in UI).
-
-There is a related method:
-RebarShapeDrivenAccessor.ScaleToBoxFor3D
-
+There is a related method `RebarShapeDrivenAccessor` `ScaleToBoxFor3D`.
 RebarShapeDrivenAccessor comes from Rebar.GetShapeDrivenAccessor and is specific to shape driven rebar.
 
-I'm not sure this algorithm always gets it right (from UI experience with it) and there is an element of rationalisation of free end dimensions that need to be applied afterwards. Perhaps sometimes it can't be placed at all and perhaps sometimes when you increse bar diameter the shape can't be made (after placing a smaller bar diameter size) i.e. due to incresing bending diameter reducing distance between straights.
+I'm not sure this algorithm always gets it right (from UI experience with it) and there is an element of rationalisation of free end dimensions that need to be applied afterwards.
+Perhaps sometimes it can't be placed at all and perhaps sometimes when you increse bar diameter the shape can't be made (after placing a smaller bar diameter size), i.e., due to incresing bending diameter reducing distance between straights.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 13
-jeremy.tammik
- Employee jeremy.tammik in reply to: kevin.anggrek
-‎02-01-2021 07:35 AM 
-The development team replied:
+**Answer 2:** You should use:
 
-You should use:
+<pre class="code">
+  public IList<RebarConstrainedHandle> GetAllHandles();
+</pre>
 
- public IList<RebarConstrainedHandle> GetAllHandles();
+which returns all RebarConstrainedHandles of this bar.
+All RebarConstrainedHandle objects will be returned, regardless of whether there are constraints associated to them.
 
-which gets all RebarConstrainedHandles of this bar. All RebarConstrainedHandle objects will be returned, regardless of whether there are constraints associated to them.
+The `GetAllConstrainedHandles` function returns all handles that are already constrained to external references.
 
-The GetAllConstrainedHandles() function returns all handles that are already constrained to external references.
+**Response:** I tried the method that the development team suggested and indeed it works! I can now get the handles in the rebar. However, after setting a new RebarConstraint to each handle in order to snap them to the concrete cover of the host element, the stirrup didn't change to be inside the cover.
 
-Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 13
-kevin.anggrek
- Enthusiast kevin.anggrek in reply to: kevin.anggrek
-‎02-02-2021 08:35 AM 
-Dear Mr. @jeremy.tammik ,
+Let me provide more details to my case. In the beginning, I tried to create a stirrup inside the column by using `CreateFromRebarShape` as shown below:
 
-Thank you for taking your time to contact the development team. I have tried the method that the development team has suggested and indeed it works! I can now get the handles in the rebar. However, after setting a new RebarConstraint to each handle in order to snap them to the concrete cover of the host element, the stirrup didn't change to be inside the cover.
-
-Let me provide more details to my case. In the beginning, I tried to create a stirrup inside the column by using CreateFromRebarShape() Method as shown below:
-
+<pre class="code">
 Rebar stirrup = Rebar.CreateFromRebarShape(doc, rebarShape, barType, column, bottomLeftXYZ1, XYZ.BasisX, XYZ.BasisY);
-I used the default RebarShape called T1 which is provided as a template by Revit, and the result of the above code is a stirrup. However the sizes of the stirrup doesn't match my current column (each rebar shape should have their own default dimensions) as shown below:
+</pre>
+
+I used the default RebarShape called `T1` which is provided as a template by Revit, and the result of the above code is a stirrup. However, the sizes of the stirrup don't match my current column (each rebar shape should have their own default dimensions) as shown below:
 
 1.png
 
