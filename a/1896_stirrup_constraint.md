@@ -84,6 +84,17 @@ RebarShapeDrivenAccessor comes from Rebar.GetShapeDrivenAccessor and is specific
 I'm not sure this algorithm always gets it right (from UI experience with it) and there is an element of rationalisation of free end dimensions that need to be applied afterwards.
 Perhaps sometimes it can't be placed at all and perhaps sometimes when you increse bar diameter the shape can't be made (after placing a smaller bar diameter size), i.e., due to incresing bending diameter reducing distance between straights.
 
+**Response:** I tried the `ScaleToBox` method that you suggested as shown in the code snippet below:
+
+<pre class="code">
+Rebar stirrup = Rebar.CreateFromRebarShape(doc, rebarShape, barType, column, bottomLeftXYZ1, XYZ.BasisX, XYZ.BasisY);
+stirrup.GetShapeDrivenAccessor().ScaleToBox(bottomLeftXYZ1, new XYZ(horDist, 0, 0), new XYZ(0, vertDist, 0));
+</pre>
+
+
+It seems to work well, the stirrup indeed got resized according to the rectangle that is specified by the ScaleToBox() method, I will double check whether all the parameters are correct after the scaling.
+
+
 **Answer 2:** You should use:
 
 <pre class="code">
@@ -95,9 +106,12 @@ All RebarConstrainedHandle objects will be returned, regardless of whether there
 
 The `GetAllConstrainedHandles` function returns all handles that are already constrained to external references.
 
-**Response:** I tried the method that the development team suggested and indeed it works! I can now get the handles in the rebar. However, after setting a new RebarConstraint to each handle in order to snap them to the concrete cover of the host element, the stirrup didn't change to be inside the cover.
+**Response:** I tried the method that the development team suggested and indeed it works!
+I can now get the handles in the rebar.
+However, after setting a new RebarConstraint to each handle in order to snap them to the concrete cover of the host element, the stirrup didn't change to be inside the cover.
 
-Let me provide more details to my case. In the beginning, I tried to create a stirrup inside the column by using `CreateFromRebarShape` as shown below:
+Let me provide more details to my case.
+In the beginning, I tried to create a stirrup inside the column by using `CreateFromRebarShape` as shown below:
 
 <pre class="code">
 Rebar stirrup = Rebar.CreateFromRebarShape(doc, rebarShape, barType, column, bottomLeftXYZ1, XYZ.BasisX, XYZ.BasisY);
@@ -105,15 +119,21 @@ Rebar stirrup = Rebar.CreateFromRebarShape(doc, rebarShape, barType, column, bot
 
 I used the default RebarShape called `T1` which is provided as a template by Revit, and the result of the above code is a stirrup. However, the sizes of the stirrup don't match my current column (each rebar shape should have their own default dimensions) as shown below:
 
-1.png
+<center>
+<img src="img/stirrup_constraint_01.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
+</center>
 
 That is why I am trying to fit the stirrup inside my column as what the Revit can do through the user interface as shown below:
 
-rebar.png
+<center>
+<img src="img/stirrup_constraint_02_rebar.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
+</center>
+
 Placing a stirrup through the user interface (the selected rebar shape T1 automatically got constrained inside the cover)
 
 I fixed my C# code to the following based on your suggestion in order to change the RebarConstraints to be inside the cover:
 
+<pre class="code">
 Rebar stirrup = Rebar.CreateFromRebarShape(doc, rebarShape, barType, column, bottomLeftXYZ1, XYZ.BasisX, XYZ.BasisY);
 
 #region // Modify the RebarConstraint (Trying to snap the stirrup to the rebar)
@@ -129,88 +149,43 @@ foreach (RebarConstrainedHandle handle in rebarConstrainedHandles)
         rebarConstraintsManager.SetPreferredConstraintForHandle(handle, toCoverConstraint);
     }
 }
+</pre>
+
 and indeed, the RebarConstraint did change to be constrained to the cover as shown in the images below:
 
 Before implementing the code (the handles are constrained to the Host face as shown by the orange line at the host face)
 
-3.png
-Before Implementing the Code (The Handles are constrained to the Host Face)
+<center>
+<img src="img/stirrup_constraint_03.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
+<p style="font-size: 80%; font-style:italic">Before implementing the code (the handles are constrained to the host face)</p>
+</center>
+
+
 
 After Implementing the code (the handles are now constrained to the cover as shown by the blue logo under the triangle handles)
 
-4.png
-After implementing the Code snippet (The handles are indeed constrained to the cover as shown by the blue Toggle Rebar Cover Constraint logo)
+<center>
+<img src="img/stirrup_constraint_04.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
+<p style="font-size: 80%; font-style:italic">After implementing the code snippet (the handles are indeed constrained to the cover as shown by the blue toggle rebar cover constraint logo)</p>
+</center>
+
 
 Even though the stirrup indeed got constrained to the cover, but it didn't automatically resize just like in the user interface. Any suggestion on how I can achieve similar result as through the user interface?
 
-Thank you
 
-Tags (0)
-Add tags
-Report
-MESSAGE 6 OF 13
-jeremy.tammik
- Employee jeremy.tammik in reply to: kevin.anggrek
-‎02-02-2021 08:58 AM 
-Thank you for the appreciation, and very glad to hear it helped one step further.
 
-Now, your question is getting harder and harder.
-
-I passed it on to the development team again and hope that they have further good suggestions lined up for you.
-
-Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder
-Tags (0)
-Add tags
-Report
-MESSAGE 7 OF 13
-kevin.anggrek
- Enthusiast kevin.anggrek in reply to: kevin.anggrek
-‎02-02-2021 09:16 AM 
-Dear Mr. @RPTHOMAS108
-
-Thank you for taking your time to answer my question,
-
-I tried the ScaleToBox() method that you suggested as shown in the code snippet below:
-
-Rebar stirrup = Rebar.CreateFromRebarShape(doc, rebarShape, barType, column, bottomLeftXYZ1, XYZ.BasisX, XYZ.BasisY);
-
-stirrup.GetShapeDrivenAccessor().ScaleToBox(bottomLeftXYZ1, new XYZ(horDist, 0, 0), new XYZ(0, vertDist, 0));
-
-It seems to work well, the stirrup indeed got resized according to the rectangle that is specified by the ScaleToBox() method, I will double check whether all the parameters are correct after the scaling. I will mark your answer as the solution after I did the checking and there's no other issues left! Thanks!
-
-Tags (0)
-Add tags
-Report
-MESSAGE 8 OF 13
-jeremy.tammik
- Employee jeremy.tammik in reply to: kevin.anggrek
-‎02-02-2021 11:21 AM 
-Devteam reply:
-
-You should set the distance between bar segment and the cover to zero, i.e., `constraint.SetDistanceToTargetCover(0.0)`.
+**Answer:** You should set the distance between bar segment and the cover to zero, i.e., `constraint.SetDistanceToTargetCover(0.0)`.
 
 Another thing I observe in the last picture: the highlighted segment is constrained to the bottom cover; however, it should be constrained to the upper one.
 
-In this case, for each segment, there are two constraint candidates that are to cover. You should choose the one that is closer to the segment. `constraint.GetDistanceToTargetCover` can be used to obtain the distance between bar segment and the cover candidate.
+In this case, for each segment, there are two constraint candidates that are to cover.
+You should choose the one that is closer to the segment.
+`constraint.GetDistanceToTargetCover` can be used to obtain the distance between bar segment and the cover candidate.
 
-Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder
-Tags (0)
-Add tags
-Report
-MESSAGE 9 OF 13
-kevin.anggrek
- Enthusiast kevin.anggrek in reply to: jeremy.tammik
-‎02-03-2021 07:44 AM 
-Dear Mr. @jeremy.tammik ,
+**Response:** I believe I am pretty close in cracking the case down.
+I implemented the suggestions into the following code snippet:
 
-Thank you for the quick responses. I believe I am pretty close in cracking the case down. I implemented both the development team's and your suggestion into the following code snippet:
-
+<pre class="code">
 Rebar stirrup = Rebar.CreateFromRebarShape(doc, rebarShape, barType, column, bottomLeftXYZ1, XYZ.BasisX, XYZ.BasisY);
 
 RebarConstraintsManager rebarConstraintsManager = stirrup.GetRebarConstraintsManager();
@@ -241,94 +216,69 @@ foreach (RebarConstrainedHandle handle in rebarConstrainedHandles)
     }
     RebarConstraint constraintTest = rebarConstraintsManager.GetPreferredConstraintOnHandle(handle);
 }
+</pre>
 
-Compared to the previous code snippet, I now store all of the possible ToCover constraints inside the toCoverConstraints List, and precisely as you have mentioned, there are 2 possible ToCover constraints detected and I need to find the closest one to the handle. I then implemented the GetDistanceToTargetCover() Method as you have suggested in order to find the constraint that is closest to the handle. Afterwards, I set the distance to 0 and then I set the modified constraint to the handle. However, an error occurred (Rebar Shape Failure) inside Revit when running the add-in:
+Compared to the previous code snippet, I now store all of the possible `ToCover` constraints inside the toCoverConstraints List, and precisely as you have mentioned, there are 2 possible ToCover constraints detected and I need to find the closest one to the handle.
+I then implemented the `GetDistanceToTargetCover` method as you suggested in order to find the constraint that is closest to the handle.
+Afterwards, I set the distance to 0 and then I set the modified constraint to the handle.
+However, an error occurred (Rebar Shape Failure) inside Revit when running the add-in:
 
-7.png
+<center>
+<img src="img/stirrup_constraint_07.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
+</center>
 
-First thing that I did trying to solve this issue was checking the Handle Types of each of the Rebar handles obtained from the RebarConstraintsManager.GetAllHandles(). There are 7 Handles in total, 1 handle has the RebarHandleType of RebarPlane, 4 handles have the RebarHandleType of Edge, the last two Handles are of the type StartOfBar and EndOfBar respectively. I tried setting the ToCover constraint only to specific handle types (to Edge type only, to StartOfBar and EndOfBar handles only, etc) but the same Rebar Shape Failure still appear.
+
+First thing that I did trying to solve this issue was checking the Handle Types of each of the Rebar handles obtained from  `RebarConstraintsManager` `GetAllHandles`.
+There are 7 Handles in total, 1 handle has the RebarHandleType of RebarPlane, 4 handles have the RebarHandleType of Edge, the last two Handles are of the type StartOfBar and EndOfBar respectively.
+I tried setting the ToCover constraint only to specific handle types (to Edge type only, to StartOfBar and EndOfBar handles only, etc) but the same Rebar Shape Failure still appear.
 
 If I try to model the stirrups manually using the Revit User Interface (using the same Rebar Shape that I used in the Add-in) and then checking each of the Rebar Constraint, I got the following set up in the User Interface:
 
-8.png
-One of the Edge Handle, Constrained to Cover at Zero Distance)
-9.png
-StartOfBar Handle, Constrained to Cover at Zero Distance)
-10.png
-EndOfBar Handle, Constrained to Cover at Zero Distance)
+<center>
+<img src="img/stirrup_constraint_08.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
+<p style="font-size: 80%; font-style:italic">One of the Edge handle, constrained to cover at zero distance</p>
+<br/>
+<img src="img/stirrup_constraint_09.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
+<p style="font-size: 80%; font-style:italic">StartOfBar handle, constrained to cover at zero distance</p>
+<br/>
+<img src="img/stirrup_constraint_10.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
+<p style="font-size: 80%; font-style:italic">EndOfBar handle, constrained to cover at zero distance</p>
+</center>
 
-Looking at these handle constraints of the manually created stirrups in the User Interface, they are all constrained to Cover, and have their distance set at zero. The suggestions that you have provided to me should have lead to the correct approach (The code snippet already implemented approaches to find the correct cover and then setting the distance to zero). However, I couldn't get the same result as the stirrup created through the User Interface even though the approaches in the code snippet seems to lead to the correct result already. Instead, I am getting the Rebar Shape Failure Error that forces me to delete the rebar. Is there something that I am missing here that I am still unaware of?
 
-Thanks in advance and sorry for my lengthy reply
+Looking at these handle constraints of the manually created stirrups in the User Interface, they are all constrained to Cover, and have their distance set at zero.
+The suggestions you provided should lead to the correct approach (The code snippet already implemented approaches to find the correct cover and then setting the distance to zero).
+However, I still couldn't get the same result as the stirrup created through the User Interface.
+Instead, I am getting the Rebar Shape Failure Error that forces me to delete the rebar.
+Is there something that I am missing here that I am still unaware of?
 
-Tags (0)
-Add tags
-Report
-MESSAGE 10 OF 13
-jeremy.tammik
- Employee jeremy.tammik in reply to: kevin.anggrek
-‎02-22-2021 01:05 PM 
-Thank you for your update and sorry to hear about the new challenge. I passed it on to the development team and hope they can pick it up with you directly.
+**Answer:** It looks like the constraints that were set were not good.
+You should debug more to understand what is happening.
+For example, the API can set the constraints but without setting the distance zero to cover.
+Then, look in Edit Constraints and check if each handle is constrained to the expected cover.
+Here, I'm expecting to see that the constraints were not set to the correct cover and should be investigated.
 
-Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder
-Tags (0)
-Add tags
-Report
-MESSAGE 11 OF 13
-jeremy.tammik
- Employee jeremy.tammik in reply to: kevin.anggrek
-‎02-25-2021 02:23 AM 
-The devteam replied:
-
-It looks like the constraints that were set were not good. There should be done some debugging to understand what is happening. This can also be done on customer's side. For example, from API there can be set the constraints but without  setting the distance zero to cover. Then look in Edit Constraints and check if each handle is constrained to the expected cover. Here I'm expecting to see that the constraints were not set to the correct cover and should be investigated.
-
-There can be done something else. Create the bar without setting any constraints from API, from Revit UI - Edit Constraints go and set constrains manually for each segment, then, with an API command, for each constraint set the distance to 0. There should be no error. I'm expecting this to work without any problems.
+More can be done.
+Create the bar without setting any constraints from API: from Revit UI, Edit Constraints, go and set constrains manually for each segment.
+Then, with an API command, for each constraint, set the distance to 0.
+There should be no error.
+I'm expecting this to work without any problems.
 
 To debug it, you need the sample model and the entire code, not just the part with constraints, but also the code that calculates the rebar curves.
 
-Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder
-Tags (0)
-Add tags
-Report
-MESSAGE 12 OF 13
-kevin.anggrek
- Enthusiast kevin.anggrek in reply to: jeremy.tammik
-‎02-25-2021 07:21 AM 
-Dear Mr. @jeremy.tammik
+**Response:** Once again, thank you so much for taking your time in answering my queries.
 
-Once again, thank you so much for taking your time in answering my queries.
+You are right!
+After debugging in the manner suggested, I found out that the handles are constrained to the wrong side of the Rebar Cover, thus setting the distance to zero will result in an error.
+After checking my code again, I figured out that `RebarConstraint` `GetDistanceToTargetCover will return distance with the plus/minus sign.
+Thus, in order to find the nearest constraint to the cover, I need to compare the absolute value.
 
-You are right! after debugging in the same manner as suggested by the devteam, I found out that the handles are constrained to the wrong side of the Rebar Cover, thus setting the distance to zero will result in an error. After checking my code again, I figured out that the RebarConstraint.GetDistanceToTargetCover() will return distance with the plus/minus sign and thus in order to find the nearest constraint to the cover, I need to compare the absolute value of the RebarConstraint.GetDistanceToTargetCover().
+In the end, I can successfully get the correct result!
 
-Thus in the end, I can successfully get the correct result!
+Thank you.
 
-Thank you
-
-Tags (0)
-Add tags
-Report
-MESSAGE 13 OF 13
-jeremy.tammik
- Employee jeremy.tammik in reply to: kevin.anggrek
-‎02-25-2021 07:34 AM 
-Wow, fantastic! Congratulations on getting this to work. Thank you very much for letting us know and your kind appreciation.
-
-<center>
-<img src="img/.png" alt="" title="" width="400"/> <!-- 493 -->
-</center>
 
 ####<a name="3"></a> 
 
-**Question:** 
-
-**Answer:**
-
-**Response:**
 
 ####<a name="4"></a> 
