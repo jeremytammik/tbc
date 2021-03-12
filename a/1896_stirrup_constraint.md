@@ -42,13 +42,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 I had a lengthy and fruitful conversation on implementing valid stirrup constraints, and several experienced developers added more advice on determining boundary elements for the entire building and individual rooms:
 
-- [Rebar Stirrup Constraints](#2)
-- [Jason and Matt on Bounding Elements](#3)
-    - [Just Exterior Bounding Walls](#3.1)
-    - [All Walls Including Non Bounding Interior Walls](#3.2)
-    - [Floors And Ceilings](#3.3)
-    - [Matt's Approach](#3.4)
-- [Revit API and UX Style Guide](#4)
+- [Rebar stirrup constraints](#2)
+- [Jason and Matt on bounding elements](#3)
+    - [Just exterior bounding walls](#3.1)
+    - [All walls including non bounding interior walls](#3.2)
+    - [Floors and ceilings](#3.3)
+    - [Matt's approach](#3.4)
+- [Revit API and UX style guide](#4)
 
 
 ####<a name="2"></a> Rebar Stirrup Constraints
