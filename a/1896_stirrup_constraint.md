@@ -284,31 +284,71 @@ In the end, I can successfully get the correct result!
 Thank you.
 
 
-####<a name="3"></a> Jason's Take on Exterior Walls and Room Bounding Elements
+####<a name="3"></a> Jason and Matt on Bounding Elements
 
 Jason [@mastjaso](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1058186) Masters
 very kindly jumped in with some experieced advice
-on [exterior walls and room bounding elements](https://thebuildingcoder.typepad.com/blog/2021/03/exterior-walls-and-room-bounding-elements.html), saying,
+on [exterior walls and room bounding elements](https://thebuildingcoder.typepad.com/blog/2021/03/exterior-walls-and-room-bounding-elements.html) in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on how to [get the walls, ceiling and floor of a room](https://forums.autodesk.com/t5/revit-api-forum/get-the-walls-ceiling-and-floor-of-a-room/m-p/9915923), saying:
 
 I've been down this road before and it depends on what precisely you're trying to do with the walls, and whether you need interior walls etc.
 
 ####<a name="3.1"></a> Just Exterior Bounding Walls
 
-If you just need the exterior walls of the room, then the simplest method is to use the GetBoundarySegments method. Every room, space, and area in Revit inherits from the SpatialElement class which has this method, and will return a list of RoomBoundarySegments, each one containing the curve segment, and what element is creating it (wall, room boundary line, etc.). This will solve that whole wall centroid being outside of the room problem.
+If you just need the exterior walls of the room, then the simplest method is to use
+the [`GetBoundarySegments` method](https://www.revitapidocs.com/2015/8e0919af-6172-9d16-26d2-268e42f7e936.htm).
+Every room, space, and area in Revit inherits from the `SpatialElement` class which has this method, and will return a list of RoomBoundarySegments, each one containing the curve segment, and what element is creating it (wall, room boundary line, etc.).
+This will solve that whole wall centroid being outside of the room problem.
 
-It's probably worth noting that this method will not work in precise situations with linked files, a bug I documented here. I haven't tested it since then but I would be very surprised if Revit actually fixed it since so it's worth watching out for. 
+It's probably worth noting that this method will not work in precise situations with linked files,
+a bug I documented [here](https://forums.autodesk.com/t5/revit-api-forum/select-room-edges/m-p/9086794).
+I haven't tested it since then, but I would be very surprised if Revit actually fixed it since, so it's worth watching out for. 
 
 ####<a name="3.2"></a> All Walls Including Non Bounding Interior Walls
 
-Otherwise if you need walls that are non bounding and interior to the room, I found that in general, all of Revit's projection methods are somewhat slow (and algorithms using them often have edge cases that might be missed), but like others have said, I found both the BoundingBoxIntersector and the isPointInRoom methods to be very fast and performative. To get *all* of the walls associated with a room, including interior ones, I would first use the boundary segments method to get the bounding walls / walls that won't be *inside* the room. Then, use the bounding box intersector filter to get all the walls in the model that intersect your room (like you said, bounding boxes are rectangular and don't rotate so this will be rough and pick up walls from other rooms). Set aside the walls that you already know are the boundaries, then for the rest, check the coordinates of the end point and midpoint of each wall segment, to see if any of those points are in the room with the isPointInRoom method. If one of them is then that wall cuts through the interior of the room. 
+Otherwise, if you need walls that are non bounding and interior to the room, I found that, in general, all of Revit's projection methods are somewhat slow (and algorithms using them often have edge cases that might be missed), but, like others have said, I found both the `BoundingBoxIntersector` and the `IsPointInRoom` methods to be very fast and performant.
+To get *all* of the walls associated with a room, including interior ones, I would first use the boundary segments method to get the bounding walls / walls that won't be *inside* the room.
+Then, use the bounding box intersector filter to get all the walls in the model that intersect your room (as said, bounding boxes are rectangular and don't rotate, so this will be rough and pick up walls from other rooms).
+Set aside the walls that you already know are the boundaries; then, for the rest, check the coordinates of the end point and midpoint of each wall segment to see if any of those points are in the room with the `IsPointInRoom` method.
+If one of them is, then that wall cuts through the interior of the room. 
 
-I believe the only situation that this might miss, is if you had a room that was bounded by room boundary lines, and a super long non-bounding wall cut entirely through the room without any end points or midpoints landing within the room. 
+I believe the only situation that this might miss is if you had a room that is bounded by room boundary lines, and a super long non-bounding wall cut entirely through the room without any end points or midpoints landing within the room. 
 
-####<a name="3.2"></a> Floors And Ceilings
+####<a name="3.3"></a> Floors And Ceilings
 
-Getting the floors and ceiling are somewhat more complicated and I believe will likely necessitate projection if you want to be able to capture every bulk head / potential split level etc. What I would do is start with your room's bounding box. Then generate a grid of points with even spacing inside this box (maybe 0.5 - 1ft apart), halfway between the top and bottom. Test each point with the isPointInRoom method, and discard the ones that aren't. You'll now have an irregular grid of points all located within the bounds of your room. Now for each point project a ray upwards and one downwards and capture any floors or ceilings that they intersect before leaving your room bounds. This should reliably capture every single floor and ceiling associated with a room, and if it is missing any, you can just increase the resolution of your point grid.
+Getting the floors and ceiling is somewhat more complicated and I believe will likely necessitate projection if you want to be able to capture every bulk head / potential split level etc.
+What I would do is start with your room's bounding box.
+Then, generate a grid of points with even spacing inside this box (maybe 0.5 - 1ft apart), halfway between the top and bottom. Test each point with the `IsPointInRoom` method and discard the ones that aren't.
+You'll now have an irregular grid of points, all located within the bounds of your room.
+For each point, project a ray upwards and one downwards and capture any floors or ceilings that they intersect before leaving your room bounds.
+This should reliably capture every single floor and ceiling associated with a room. 
+If it is missing any, you can just increase the resolution of your point grid.
 
-Many thanks to Jason for the additonal advice.
+####<a name="3.4"></a> Matt's Approach
+
+Matt Kincaid of [Lighting Analysts](https://lightinganalysts.com) adds in
+a [comment on LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:6775405665461551104?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A6775405665461551104%2C6775552577707761664%29):
+ 
+We've grappled with different approaches for finding exterior walls for some time.
+Ultimately, settled on using the `IsExterior` API method.
+But that relies on the user to set the function parameter properly, which isn’t always easy (e.g. if it’s in a linked model).
+Will have to give this approach a try.
+ 
+For getting the Room Bounding elements, we use this algorithm:
+
+1. Buffer the room footprint by offsetting the boundary by 1/16" outward (to include walls) using NetTopologySuite.
+2. Create a vertical extrusion using the buffered foot print using the `GeometryCreationUtilities` API.
+Also buffered by 1/16" to include the floor and ceiling.
+3. Use the `ElementIntersectsSolidFilter` to find all elements intersecting the extrusion.
+
+This fails if the Room can't be represented as a simple extrusion (e.g., multiple/sloped ceilings or floors).
+But works well for many cases.
+Ultimately, it would be handy if the Revit API exposed a way to just get all the room bounding elements which are constraining the room geometry.
+Something for Revit Ideas, perhaps.
+
+Many thanks to Jason and Matt for their good advice and experience!
+
 
 
 ####<a name="4"></a> Revit API and UX Style Guide
