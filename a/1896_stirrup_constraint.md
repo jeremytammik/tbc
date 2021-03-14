@@ -397,5 +397,15 @@ the [My First Revit Plug-In video tutorial](https://www.autodesk.com/developer-n
 3. Db read-write is included in the getting started material
 4. WPF or WinForms or whatever you are already using... anything that works with .NET
 In addition, all your questions are amply covered in the Revit API discussion forum
- 
 
+####<a name="5"></a> Today's Collective Action Problem
+
+Mancur Olson published *The Logic of Collective Action* in 1965, analysing situations in which human beings motivated by individual gain behave in a desctructive manner for the common good, calling it a *tragedy of the commons*.
+In 1990, in her 1990 book *Governing the Commons*, Elinor Ostrom named examples of communities that deal rationally with their limited shared resources.
+This may sound simple and banale, but was a revolutionary thought: people can maintain shared goods rationally and sustainably without privatisation or laws imposed from outside.
+To discover this, we must loom at the local level, e.g., towns, villages and cooperatives.
+In fact, locally managed forests are often better protected thatn state parks, sine many people do not identify with the rules imposed from 'above'.
+Based on this, Ostrom recommends a 'polycentric' apporach to deal with the climate change challenge, the greatest *collective action problem* of our time and maybe all times, ever.
+We all need to feel our collective responsibility.
+We cannot just sit around and wait for a single global solution.
+For this insight, in 2009, Ostrom became the first woman to be honoured with a Nobel prize in economy.
