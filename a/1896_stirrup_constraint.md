@@ -413,7 +413,7 @@ examples of communities that deal rationally with their limited shared resources
 This may sound simple and banale, but was a revolutionary thought: people can maintain shared goods rationally and sustainably without privatisation or laws imposed from outside.
 To discover this, we must look at the local level, e.g., small towns, villages and cooperatives.
 For instance, locally managed forests are often better protected than state parks, since many people do not identify with the rules imposed from 'above'.
-Based on this, Ostrom recommends a 'polycentric' apporach to deal with the climate change challenge, the greatest collective action problem of our time and maybe all times, ever.
+Based on this, Ostrom recommends a 'polycentric' approach to deal with the climate change challenge, the greatest collective action problem of our time and maybe all times.
 We all need to feel our collective responsibility.
 We cannot just sit around and wait for a single global solution.
 For this insight, in 2009, Ostrom became the first woman to be honoured with a Nobel prize in economy.
