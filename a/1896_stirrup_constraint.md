@@ -49,6 +49,7 @@ I had a lengthy and fruitful conversation on implementing valid stirrup constrai
     - [Floors and ceilings](#3.3)
     - [Matt's approach](#3.4)
 - [Revit API and UX style guide](#4)
+- [Today's collective action problem](#5)
 
 
 ####<a name="2"></a> Rebar Stirrup Constraints
