@@ -161,13 +161,13 @@ In the beginning, I tried to create a stirrup inside the column by using `Create
 I used the default RebarShape called `T1` which is provided as a template by Revit, and the result of the above code is a stirrup. However, the sizes of the stirrup don't match my current column (each rebar shape should have their own default dimensions) as shown below:
 
 <center>
-<img src="img/stirrup_constraint_01.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
+<img src="img/stirrup_constraint_01.png" alt="Stirrup constraint" title="Stirrup constraint" width="300"/> <!-- 493 -->
 </center>
 
 That is why I am trying to fit the stirrup inside my column as what the Revit can do through the user interface as shown below:
 
 <center>
-<img src="img/stirrup_constraint_02_rebar.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
+<img src="img/stirrup_constraint_02_rebar.png" alt="Stirrup constraint" title="Stirrup constraint" width="200"/> <!-- 493 -->
 </center>
 
 Placing a stirrup through the user interface (the selected rebar shape T1 automatically got constrained inside the cover)
@@ -316,13 +316,13 @@ I tried setting the ToCover constraint only to specific handle types (to Edge ty
 If I try to model the stirrups manually using the Revit User Interface (using the same Rebar Shape that I used in the Add-in) and then checking each of the Rebar Constraint, I got the following set up in the User Interface:
 
 <center>
-<img src="img/stirrup_constraint_08.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
+<img src="img/stirrup_constraint_08.png" alt="Stirrup constraint" title="Stirrup constraint" width="200"/> <!-- 493 -->
 <p style="font-size: 80%; font-style:italic">One of the Edge handle, constrained to cover at zero distance</p>
 <br/>
-<img src="img/stirrup_constraint_09.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
+<img src="img/stirrup_constraint_09.png" alt="Stirrup constraint" title="Stirrup constraint" width="200"/> <!-- 493 -->
 <p style="font-size: 80%; font-style:italic">StartOfBar handle, constrained to cover at zero distance</p>
 <br/>
-<img src="img/stirrup_constraint_10.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
+<img src="img/stirrup_constraint_10.png" alt="Stirrup constraint" title="Stirrup constraint" width="200"/> <!-- 493 -->
 <p style="font-size: 80%; font-style:italic">EndOfBar handle, constrained to cover at zero distance</p>
 </center>
 
@@ -438,7 +438,7 @@ get you there.
 
 Style guide for Revit add-ins...
 Sorry, but no we don't.
-Best your UX people can do is plaigarize as much of the Revit look and feel as they can, possibly with some subtle additional signature effects, like subtle use of your specific brand colour.
+Best your UX people can do is plagiarize as much of the Revit look and feel as they can, possibly with some subtle additional signature effects, like subtle use of your specific brand colour.
 
 The Revit API supports some UI functionality.
 Everything that you create using that official API will fit in with the standard Revit style.
@@ -474,7 +474,7 @@ calling it a *tragedy of the commons*.
 In 1990, in her 1990 book *Governing the Commons*,
 [Elinor Ostrom](https://en.wikipedia.org/wiki/Elinor_Ostrom) named
 examples of communities that deal rationally with their limited shared resources.
-This may sound simple and banale, but was a revolutionary thought: people can maintain shared goods rationally and sustainably without privatisation or laws imposed from outside.
+This may sound simple and banal, but was a revolutionary thought: people can maintain shared goods rationally and sustainably without privatisation or laws imposed from outside.
 To discover this, we must look at the local level, e.g., small towns, villages and cooperatives.
 For instance, locally managed forests are often better protected than state parks, since many people do not identify with the rules imposed from 'above'.
 Based on this, Ostrom recommends a 'polycentric' approach to deal with the climate change challenge, the greatest collective action problem of our time and maybe all times.
