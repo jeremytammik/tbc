@@ -67,22 +67,40 @@ How to do the same thing through the Revit API?
 I have tried getting the RebarConstraintManager of the newly created stirrup, iterating through all of its handles and changing the preferred RebarConstraint to `ToCover` as illustrated in the code snippet shown below:
 
 <pre class="code">
-Rebar stirrup = Rebar.CreateFromRebarShape(doc, rebarShape, barType, column, bottomLeftXYZ1, XYZ.BasisX, XYZ.BasisY);
-
-// Modify the RebarConstraint
-RebarConstraintsManager rebarConstraintsManager = stirrup.GetRebarConstraintsManager();
-IList<RebarConstrainedHandle> rebarConstrainedHandles = rebarConstraintsManager.GetAllConstrainedHandles();
-foreach (RebarConstrainedHandle handle in rebarConstrainedHandles)
-{
-    List<RebarConstraint> constraintCandidates = rebarConstraintsManager.GetConstraintCandidatesForHandle(handle).ToList();
-    RebarConstraint toCoverConstraint = constraintCandidates.Find(c => c.IsToCover() == true);
-
-    RebarConstraint constraint = rebarConstraintsManager.GetCurrentConstraintOnHandle(handle);
-    if (!constraint.IsToCover())
-    {
-        rebarConstraintsManager.SetPreferredConstraintForHandle(handle, toCoverConstraint);
-    }
-}
+&nbsp;&nbsp;<span style="color:#2b91af;">Rebar</span>&nbsp;stirrup&nbsp;=&nbsp;<span style="color:#2b91af;">Rebar</span>.CreateFromRebarShape(&nbsp;doc,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;rebarShape,&nbsp;barType,&nbsp;column,&nbsp;bottomLeftXYZ1,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisX,&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisY&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Modify&nbsp;the&nbsp;RebarConstraint</span>
+&nbsp;&nbsp;<span style="color:#2b91af;">RebarConstraintsManager</span>&nbsp;rebarConstraintsManager&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;stirrup.GetRebarConstraintsManager();
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">RebarConstrainedHandle</span>&gt;&nbsp;rebarConstrainedHandles&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;rebarConstraintsManager.GetAllConstrainedHandles();
+ 
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">RebarConstrainedHandle</span>&nbsp;handle&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">in</span>&nbsp;rebarConstrainedHandles&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">RebarConstraint</span>&gt;&nbsp;constraintCandidates&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;rebarConstraintsManager
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetConstraintCandidatesForHandle(&nbsp;handle&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.ToList();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">RebarConstraint</span>&nbsp;toCoverConstraint&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;constraintCandidates.Find(&nbsp;c&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;c.IsToCover()&nbsp;==&nbsp;<span style="color:blue;">true</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">RebarConstraint</span>&nbsp;constraint&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;rebarConstraintsManager
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetCurrentConstraintOnHandle(&nbsp;handle&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;!constraint.IsToCover()&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rebarConstraintsManager
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.SetPreferredConstraintForHandle(&nbsp;handle,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;toCoverConstraint&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
 </pre>
 
 After running the program, nothing changed at all to the stirrup and it still didn't fit inside the concrete cover of the column host.
@@ -105,8 +123,13 @@ Perhaps sometimes it can't be placed at all and perhaps sometimes when you incre
 **Response:** I tried the `ScaleToBox` method that you suggested as shown in the code snippet below:
 
 <pre class="code">
-Rebar stirrup = Rebar.CreateFromRebarShape(doc, rebarShape, barType, column, bottomLeftXYZ1, XYZ.BasisX, XYZ.BasisY);
-stirrup.GetShapeDrivenAccessor().ScaleToBox(bottomLeftXYZ1, new XYZ(horDist, 0, 0), new XYZ(0, vertDist, 0));
+&nbsp;&nbsp;<span style="color:#2b91af;">Rebar</span>&nbsp;stirrup&nbsp;=&nbsp;<span style="color:#2b91af;">Rebar</span>.CreateFromRebarShape(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;doc,&nbsp;rebarShape,&nbsp;barType,&nbsp;column,&nbsp;bottomLeftXYZ1,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisX,&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisY&nbsp;);
+ 
+&nbsp;&nbsp;stirrup.GetShapeDrivenAccessor().ScaleToBox(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;bottomLeftXYZ1,&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;horDist,&nbsp;0,&nbsp;0&nbsp;),&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;0,&nbsp;vertDist,&nbsp;0&nbsp;)&nbsp;);
 </pre>
 
 
@@ -129,10 +152,12 @@ I can now get the handles in the rebar.
 However, after setting a new RebarConstraint to each handle in order to snap them to the concrete cover of the host element, the stirrup didn't change to be inside the cover.
 
 Let me provide more details to my case.
-In the beginning, I tried to create a stirrup inside the column by using `CreateFromRebarShape` as shown below:
+In the beginning, I tried to create a stirrup inside the column by using `CreateFromRebarShape` like this:
 
 <pre class="code">
-Rebar stirrup = Rebar.CreateFromRebarShape(doc, rebarShape, barType, column, bottomLeftXYZ1, XYZ.BasisX, XYZ.BasisY);
+&nbsp;&nbsp;<span style="color:#2b91af;">Rebar</span>&nbsp;stirrup&nbsp;=&nbsp;<span style="color:#2b91af;">Rebar</span>.CreateFromRebarShape(&nbsp;doc,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;rebarShape,&nbsp;barType,&nbsp;column,&nbsp;bottomLeftXYZ1,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisX,&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisY&nbsp;);
 </pre>
 
 I used the default RebarShape called `T1` which is provided as a template by Revit, and the result of the above code is a stirrup. However, the sizes of the stirrup don't match my current column (each rebar shape should have their own default dimensions) as shown below:
@@ -152,45 +177,54 @@ Placing a stirrup through the user interface (the selected rebar shape T1 automa
 I fixed my C# code to the following based on your suggestion in order to change the RebarConstraints to be inside the cover:
 
 <pre class="code">
-Rebar stirrup = Rebar.CreateFromRebarShape(doc, rebarShape, barType, column, bottomLeftXYZ1, XYZ.BasisX, XYZ.BasisY);
-
-#region // Modify the RebarConstraint (Trying to snap the stirrup to the rebar)
-RebarConstraintsManager rebarConstraintsManager = stirrup.GetRebarConstraintsManager();
-IList<RebarConstrainedHandle> rebarConstrainedHandles = rebarConstraintsManager.GetAllHandles();
-foreach (RebarConstrainedHandle handle in rebarConstrainedHandles)
-{
-    List<RebarConstraint> constraintCandidates = rebarConstraintsManager.GetConstraintCandidatesForHandle(handle).ToList();
-    RebarConstraint toCoverConstraint = constraintCandidates.Find(c => c.IsToCover() == true);
-    RebarConstraint constraint = rebarConstraintsManager.GetCurrentConstraintOnHandle(handle);
-    if (constraint == null || !constraint.IsToCover())
-    {
-        rebarConstraintsManager.SetPreferredConstraintForHandle(handle, toCoverConstraint);
-    }
-}
+&nbsp;&nbsp;<span style="color:#2b91af;">Rebar</span>&nbsp;stirrup&nbsp;=&nbsp;<span style="color:#2b91af;">Rebar</span>.CreateFromRebarShape(&nbsp;doc,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;rebarShape,&nbsp;barType,&nbsp;column,&nbsp;bottomLeftXYZ1,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisX,&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisY&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:gray;">#region</span>&nbsp;//&nbsp;Modify&nbsp;the&nbsp;RebarConstraint&nbsp;
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;(Trying&nbsp;to&nbsp;snap&nbsp;the&nbsp;stirrup&nbsp;to&nbsp;the&nbsp;rebar)</span>
+&nbsp;&nbsp;<span style="color:#2b91af;">RebarConstraintsManager</span>&nbsp;rebarConstraintsManager&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;stirrup.GetRebarConstraintsManager();
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">RebarConstrainedHandle</span>&gt;&nbsp;rebarConstrainedHandles&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;rebarConstraintsManager.GetAllHandles();
+ 
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">RebarConstrainedHandle</span>&nbsp;handle&nbsp;<span style="color:blue;">in</span>&nbsp;rebarConstrainedHandles&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">RebarConstraint</span>&gt;&nbsp;constraintCandidates&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;rebarConstraintsManager
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetConstraintCandidatesForHandle(&nbsp;handle&nbsp;).ToList();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">RebarConstraint</span>&nbsp;toCoverConstraint&nbsp;=&nbsp;constraintCandidates.Find(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c&nbsp;=&gt;&nbsp;c.IsToCover()&nbsp;==&nbsp;<span style="color:blue;">true</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">RebarConstraint</span>&nbsp;constraint&nbsp;=&nbsp;rebarConstraintsManager
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetCurrentConstraintOnHandle(&nbsp;handle&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;constraint&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;||&nbsp;!constraint.IsToCover()&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rebarConstraintsManager.SetPreferredConstraintForHandle(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;handle,&nbsp;toCoverConstraint&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
 </pre>
 
 and indeed, the RebarConstraint did change to be constrained to the cover as shown in the images below:
 
-Before implementing the code (the handles are constrained to the Host face as shown by the orange line at the host face)
+Before implementing the code (the handles are constrained to the Host face as shown by the orange line at the host face):
 
 <center>
 <img src="img/stirrup_constraint_03.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
 <p style="font-size: 80%; font-style:italic">Before implementing the code (the handles are constrained to the host face)</p>
 </center>
 
-
-
-After Implementing the code (the handles are now constrained to the cover as shown by the blue logo under the triangle handles)
+After implementing the code (the handles are now constrained to the cover as shown by the blue logo under the triangle handles):
 
 <center>
 <img src="img/stirrup_constraint_04.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
 <p style="font-size: 80%; font-style:italic">After implementing the code snippet (the handles are indeed constrained to the cover as shown by the blue toggle rebar cover constraint logo)</p>
 </center>
 
-
 Even though the stirrup indeed got constrained to the cover, but it didn't automatically resize just like in the user interface. Any suggestion on how I can achieve similar result as through the user interface?
-
-
 
 **Answer:** You should set the distance between bar segment and the cover to zero, i.e., `constraint.SetDistanceToTargetCover(0.0)`.
 
@@ -204,36 +238,68 @@ You should choose the one that is closer to the segment.
 I implemented the suggestions into the following code snippet:
 
 <pre class="code">
-Rebar stirrup = Rebar.CreateFromRebarShape(doc, rebarShape, barType, column, bottomLeftXYZ1, XYZ.BasisX, XYZ.BasisY);
-
-RebarConstraintsManager rebarConstraintsManager = stirrup.GetRebarConstraintsManager();
-IList<RebarConstrainedHandle> rebarConstrainedHandles = rebarConstraintsManager.GetAllHandles();
-foreach (RebarConstrainedHandle handle in rebarConstrainedHandles)
-{
-    List<RebarConstraint> constraintCandidates = rebarConstraintsManager.GetConstraintCandidatesForHandle(handle).ToList();
-    List<RebarConstraint> toCoverConstraints = constraintCandidates.FindAll(c => c.IsToCover() == true);
-
-    // Find the nearest cover constraint to the handle
-    RebarConstraint nearestToCoverConstraint = toCoverConstraints[0]; // Temporarily set the variable to the first RebarConstraint element
-    foreach (RebarConstraint constraint in toCoverConstraints) // Loop through the RebarConstraint list to find the nearest cover constraint
-    {
-        if (constraint.GetDistanceToTargetCover() < nearestToCoverConstraint.GetDistanceToTargetCover())
-        {
-            nearestToCoverConstraint = constraint;
-        }
-    }
-
-    // Setting distance of the handle to the Host cover
-    nearestToCoverConstraint.SetDistanceToTargetCover(0.0);
-
-    // Setting the RebarConstraint as the preferred constraint to the handle
-    RebarConstraint currentConstraint = rebarConstraintsManager.GetCurrentConstraintOnHandle(handle);
-    if (currentConstraint == null || !currentConstraint.IsToCover())
-    {
-        rebarConstraintsManager.SetPreferredConstraintForHandle(handle, nearestToCoverConstraint);
-    }
-    RebarConstraint constraintTest = rebarConstraintsManager.GetPreferredConstraintOnHandle(handle);
-}
+&nbsp;&nbsp;<span style="color:#2b91af;">Rebar</span>&nbsp;stirrup&nbsp;=&nbsp;<span style="color:#2b91af;">Rebar</span>.CreateFromRebarShape(&nbsp;doc,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;rebarShape,&nbsp;barType,&nbsp;column,&nbsp;bottomLeftXYZ1,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisX,&nbsp;<span style="color:#2b91af;">XYZ</span>.BasisY&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">RebarConstraintsManager</span>&nbsp;rebarConstraintsManager&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;stirrup.GetRebarConstraintsManager();
+ 
+&nbsp;&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">RebarConstrainedHandle</span>&gt;&nbsp;rebarConstrainedHandles
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;rebarConstraintsManager.GetAllHandles();
+ 
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">RebarConstrainedHandle</span>&nbsp;handle&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">in</span>&nbsp;rebarConstrainedHandles&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">RebarConstraint</span>&gt;&nbsp;constraintCandidates&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;rebarConstraintsManager
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetConstraintCandidatesForHandle(&nbsp;handle&nbsp;).ToList();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">List</span>&lt;<span style="color:#2b91af;">RebarConstraint</span>&gt;&nbsp;toCoverConstraints&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;constraintCandidates.FindAll(&nbsp;c&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&gt;&nbsp;c.IsToCover()&nbsp;==&nbsp;<span style="color:blue;">true</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Find&nbsp;the&nbsp;nearest&nbsp;cover&nbsp;constraint&nbsp;to&nbsp;the&nbsp;handle</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Temporarily&nbsp;set&nbsp;the&nbsp;variable&nbsp;to&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;the&nbsp;first&nbsp;RebarConstraint&nbsp;element</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">RebarConstraint</span>&nbsp;nearestToCoverConstraint&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;toCoverConstraints[&nbsp;0&nbsp;];
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Loop&nbsp;through&nbsp;the&nbsp;RebarConstraint&nbsp;list&nbsp;to&nbsp;find&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;the&nbsp;nearest&nbsp;cover&nbsp;constraint</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;<span style="color:#2b91af;">RebarConstraint</span>&nbsp;constraint&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">in</span>&nbsp;toCoverConstraints&nbsp;)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;constraint.GetDistanceToTargetCover()&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;&nbsp;nearestToCoverConstraint.GetDistanceToTargetCover()&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nearestToCoverConstraint&nbsp;=&nbsp;constraint;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Setting&nbsp;distance&nbsp;of&nbsp;the&nbsp;handle&nbsp;to&nbsp;the&nbsp;Host&nbsp;cover</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;nearestToCoverConstraint.SetDistanceToTargetCover(&nbsp;0.0&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Setting&nbsp;the&nbsp;RebarConstraint&nbsp;as&nbsp;the&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;preferred&nbsp;constraint&nbsp;to&nbsp;the&nbsp;handle</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">RebarConstraint</span>&nbsp;currentConstraint&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;rebarConstraintsManager.GetCurrentConstraintOnHandle(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;handle&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;currentConstraint&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;||&nbsp;!currentConstraint.IsToCover()&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rebarConstraintsManager.SetPreferredConstraintForHandle(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;handle,&nbsp;nearestToCoverConstraint&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">RebarConstraint</span>&nbsp;constraintTest&nbsp;=&nbsp;rebarConstraintsManager
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetPreferredConstraintOnHandle(&nbsp;handle&nbsp;);
+&nbsp;&nbsp;}
 </pre>
 
 Compared to the previous code snippet, I now store all of the possible `ToCover` constraints inside the toCoverConstraints List, and precisely as you have mentioned, there are 2 possible ToCover constraints detected and I need to find the closest one to the handle.
@@ -244,7 +310,6 @@ However, an error occurred (Rebar Shape Failure) inside Revit when running the a
 <center>
 <img src="img/stirrup_constraint_07.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
 </center>
-
 
 First thing that I did trying to solve this issue was checking the Handle Types of each of the Rebar handles obtained from  `RebarConstraintsManager` `GetAllHandles`.
 There are 7 Handles in total, 1 handle has the RebarHandleType of RebarPlane, 4 handles have the RebarHandleType of Edge, the last two Handles are of the type StartOfBar and EndOfBar respectively.
@@ -262,7 +327,6 @@ If I try to model the stirrups manually using the Revit User Interface (using th
 <img src="img/stirrup_constraint_10.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
 <p style="font-size: 80%; font-style:italic">EndOfBar handle, constrained to cover at zero distance</p>
 </center>
-
 
 Looking at these handle constraints of the manually created stirrups in the User Interface, they are all constrained to Cover, and have their distance set at zero.
 The suggestions you provided should lead to the correct approach (The code snippet already implemented approaches to find the correct cover and then setting the distance to zero).
