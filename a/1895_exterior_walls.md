@@ -68,7 +68,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Exterior Walls and Room Bounding Elements
 
-Let's look at the outer boundaries of both buildings and rooms today:
+Let's look at the outer boundaries of both buildings and rooms today;
+note that both of these topics are continued in the subsequent follow-up post
+on [boundary elements](https://thebuildingcoder.typepad.com/blog/2021/03/boundary-elements-and-stirrup-constraints.html):
 
 - [Finding exterior walls continued](#2)
 - [Retrieving room bounding elements](#3)
