@@ -19,8 +19,13 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+A lengthy and fruitful conversation on implementing valid rebar stirrup constraints and more advice on determining boundary elements for the entire building and individual rooms
+&ndash; Rebar stirrup constraints
+&ndash; Exterior bounding walls
+&ndash; All walls including non-bounding interior walls
+&ndash; Floors and ceilings
+&ndash; Revit API and UX style guide
+&ndash; Today's collective action problem...
 
 linkedin:
 
