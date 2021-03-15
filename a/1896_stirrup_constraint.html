@@ -142,11 +142,11 @@ In the beginning, I tried to create a stirrup inside the column by using <code>C
 
 <p>I used the default RebarShape called <code>T1</code> which is provided as a template by Revit, and the result of the above code is a stirrup. However, the sizes of the stirrup don't match my current column (each rebar shape should have their own default dimensions) as shown below:</p>
 <p><center>
-<img src="img/stirrup_constraint_01.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
+<img src="img/stirrup_constraint_01.png" alt="Stirrup constraint" title="Stirrup constraint" width="300"/> <!-- 493 -->
 </center></p>
 <p>That is why I am trying to fit the stirrup inside my column as what the Revit can do through the user interface as shown below:</p>
 <p><center>
-<img src="img/stirrup_constraint_02_rebar.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
+<img src="img/stirrup_constraint_02_rebar.png" alt="Stirrup constraint" title="Stirrup constraint" width="200"/> <!-- 493 -->
 </center></p>
 <p>Placing a stirrup through the user interface (the selected rebar shape T1 automatically got constrained inside the cover)</p>
 <p>I fixed my C# code to the following based on your suggestion in order to change the RebarConstraints to be inside the cover:</p>
@@ -278,13 +278,13 @@ There are 7 Handles in total, 1 handle has the RebarHandleType of RebarPlane, 4 
 I tried setting the ToCover constraint only to specific handle types (to Edge type only, to StartOfBar and EndOfBar handles only, etc) but the same Rebar Shape Failure still appear.</p>
 <p>If I try to model the stirrups manually using the Revit User Interface (using the same Rebar Shape that I used in the Add-in) and then checking each of the Rebar Constraint, I got the following set up in the User Interface:</p>
 <p><center>
-<img src="img/stirrup_constraint_08.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
+<img src="img/stirrup_constraint_08.png" alt="Stirrup constraint" title="Stirrup constraint" width="200"/> <!-- 493 -->
 <p style="font-size: 80%; font-style:italic">One of the Edge handle, constrained to cover at zero distance</p>
 <br/>
-<img src="img/stirrup_constraint_09.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
+<img src="img/stirrup_constraint_09.png" alt="Stirrup constraint" title="Stirrup constraint" width="200"/> <!-- 493 -->
 <p style="font-size: 80%; font-style:italic">StartOfBar handle, constrained to cover at zero distance</p>
 <br/>
-<img src="img/stirrup_constraint_10.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
+<img src="img/stirrup_constraint_10.png" alt="Stirrup constraint" title="Stirrup constraint" width="200"/> <!-- 493 -->
 <p style="font-size: 80%; font-style:italic">EndOfBar handle, constrained to cover at zero distance</p>
 </center></p>
 <p>Looking at these handle constraints of the manually created stirrups in the User Interface, they are all constrained to Cover, and have their distance set at zero.
