@@ -38,7 +38,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Stirrup Constraints and Boundaries
+### Boundary Elements and Stirrup Constraints
 
 I had a lengthy and fruitful conversation on implementing valid stirrup constraints, and several experienced developers added more advice on determining boundary elements for the entire building and individual rooms:
 
