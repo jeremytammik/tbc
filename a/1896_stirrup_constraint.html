@@ -43,7 +43,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li><a href="#2">Rebar stirrup constraints</a></li>
 <li><a href="#3">Jason and Matt on bounding elements</a><ul>
 <li><a href="#3.1">Just exterior bounding walls</a></li>
-<li><a href="#3.2">All walls including non bounding interior walls</a></li>
+<li><a href="#3.2">All walls including non-bounding interior walls</a></li>
 <li><a href="#3.3">Floors and ceilings</a></li>
 <li><a href="#3.4">Matt's approach</a></li>
 </ul>
@@ -108,7 +108,7 @@ Are there other methods to snap the stirrup inside the concrete cover?</p>
 <p>There is a related method <code>RebarShapeDrivenAccessor</code> <code>ScaleToBoxFor3D</code>.
 RebarShapeDrivenAccessor comes from Rebar.GetShapeDrivenAccessor and is specific to shape driven rebar.</p>
 <p>I'm not sure this algorithm always gets it right (from UI experience with it) and there is an element of rationalisation of free end dimensions that need to be applied afterwards.
-Perhaps sometimes it can't be placed at all and perhaps sometimes when you increse bar diameter the shape can't be made (after placing a smaller bar diameter size), i.e., due to incresing bending diameter reducing distance between straights.</p>
+Perhaps sometimes it can't be placed at all, and perhaps sometimes when you increase the bar diameter the shape can't be made (after placing a smaller bar diameter size), i.e., due to the larger bending diameter reducing the distance between straights.</p>
 <p><strong>Response:</strong> I tried the <code>ScaleToBox</code> method that you suggested as shown in the code snippet below:</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:#2b91af;">Rebar</span>&nbsp;stirrup&nbsp;=&nbsp;<span style="color:#2b91af;">Rebar</span>.CreateFromRebarShape(&nbsp;
@@ -123,11 +123,11 @@ Perhaps sometimes it can't be placed at all and perhaps sometimes when you incre
 <p>It seems to work well, the stirrup indeed got resized according to the rectangle that is specified by the ScaleToBox() method, I will double check whether all the parameters are correct after the scaling.</p>
 <p><strong>Answer 2:</strong> You should use:</p>
 <pre class="code">
-  public IList<RebarConstrainedHandle> GetAllHandles();
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">RebarConstrainedHandle</span>&gt;&nbsp;GetAllHandles();
 </pre>
 
-<p>which returns all RebarConstrainedHandles of this bar.
-All RebarConstrainedHandle objects will be returned, regardless of whether there are constraints associated to them.</p>
+<p>That returns all RebarConstrainedHandles of this bar.
+All <code>RebarConstrainedHandle</code> objects will be returned, regardless of whether there are constraints associated to them.</p>
 <p>The <code>GetAllConstrainedHandles</code> function returns all handles that are already constrained to external references.</p>
 <p><strong>Response:</strong> I tried the method that the development team suggested and indeed it works!
 I can now get the handles in the rebar.
@@ -182,7 +182,7 @@ In the beginning, I tried to create a stirrup inside the column by using <code>C
 &nbsp;&nbsp;}
 </pre>
 
-<p>and indeed, the RebarConstraint did change to be constrained to the cover as shown in the images below:</p>
+<p>Indeed, the RebarConstraint did change to be constrained to the cover as shown in the following images:</p>
 <p>Before implementing the code (the handles are constrained to the Host face as shown by the orange line at the host face):</p>
 <p><center>
 <img src="img/stirrup_constraint_03.png" alt="Stirrup constraint" title="Stirrup constraint" width="400"/> <!-- 493 -->
@@ -312,7 +312,7 @@ Thus, in order to find the nearest constraint to the cover, I need to compare th
 <p>Thank you.</p>
 <h4><a name="3"></a> Jason and Matt on Bounding Elements</h4>
 <p>Jason <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1058186">@mastjaso</a> Masters
-very kindly jumped in with some experieced advice
+very kindly jumped in with some experienced advice
 on <a href="https://thebuildingcoder.typepad.com/blog/2021/03/exterior-walls-and-room-bounding-elements.html">exterior walls and room bounding elements</a> in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on how to <a href="https://forums.autodesk.com/t5/revit-api-forum/get-the-walls-ceiling-and-floor-of-a-room/m-p/9915923">get the walls, ceiling and floor of a room</a>, saying:</p>
@@ -325,8 +325,8 @@ This will solve that whole wall centroid being outside of the room problem.</p>
 <p>It's probably worth noting that this method will not work in precise situations with linked files,
 a bug I documented <a href="https://forums.autodesk.com/t5/revit-api-forum/select-room-edges/m-p/9086794">here</a>.
 I haven't tested it since then, but I would be very surprised if Revit actually fixed it since, so it's worth watching out for. </p>
-<h4><a name="3.2"></a> All Walls Including Non Bounding Interior Walls</h4>
-<p>Otherwise, if you need walls that are non bounding and interior to the room, I found that, in general, all of Revit's projection methods are somewhat slow (and algorithms using them often have edge cases that might be missed), but, like others have said, I found both the <code>BoundingBoxIntersector</code> and the <code>IsPointInRoom</code> methods to be very fast and performant.
+<h4><a name="3.2"></a> All Walls Including Non-Bounding Interior Walls</h4>
+<p>Otherwise, if you need walls that are non-bounding and interior to the room, I found that, in general, all of Revit's projection methods are somewhat slow (and algorithms using them often have edge cases that might be missed), but, like others have said, I found both the <code>BoundingBoxIntersector</code> and the <code>IsPointInRoom</code> methods to be very fast and performant.
 To get <em>all</em> of the walls associated with a room, including interior ones, I would first use the boundary segments method to get the bounding walls / walls that won't be <em>inside</em> the room.
 Then, use the bounding box intersector filter to get all the walls in the model that intersect your room (as said, bounding boxes are rectangular and don't rotate, so this will be rough and pick up walls from other rooms).
 Set aside the walls that you already know are the boundaries; then, for the rest, check the coordinates of the end point and midpoint of each wall segment to see if any of those points are in the room with the <code>IsPointInRoom</code> method.
@@ -345,7 +345,7 @@ If it is missing any, you can just increase the resolution of your point grid.</
 a <a href="https://www.linkedin.com/feed/update/urn:li:activity:6775405665461551104?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A6775405665461551104%2C6775552577707761664%29">comment on LinkedIn</a>:</p>
 <p>We've grappled with different approaches for finding exterior walls for some time.
 Ultimately, settled on using the <code>IsExterior</code> API method.
-But that relies on the user to set the function parameter properly, which isn’t always easy (e.g. if it’s in a linked model).
+But that relies on the user to set the function parameter properly, which isn’t always easy (e.g., if it’s in a linked model).
 Will have to give this approach a try.</p>
 <p>For getting the Room Bounding elements, we use this algorithm:</p>
 <ol>
@@ -364,7 +364,9 @@ Something for Revit Ideas, perhaps.</p>
 I was wondering if Autodesk has a style guide for Revit add-ins, or Revit itself, that we could access to ensure consistency of the user experience?</p>
 <p><strong>Answer:</strong> Have you seen the Philips Lighting design app built by one of our partners, Xinaps?
 Web based... automates lighting selection and design and inserts directly into Revit models.
-If not, a YouTube search on Philips Xinapps Revit should get you there.</p>
+If not,
+a <a href="https://www.youtube.com/results?search_query=Philips+Xinaps+Revit">YouTube search on Philips Xinaps Revit</a> should
+get you there.</p>
 <p>Style guide for Revit add-ins...
 Sorry, but no we don't.
 Best your UX people can do is plaigarize as much of the Revit look and feel as they can, possibly with some subtle additional signature effects, like subtle use of your specific brand colour.</p>

@@ -45,7 +45,7 @@ I had a lengthy and fruitful conversation on implementing valid stirrup constrai
 - [Rebar stirrup constraints](#2)
 - [Jason and Matt on bounding elements](#3)
     - [Just exterior bounding walls](#3.1)
-    - [All walls including non bounding interior walls](#3.2)
+    - [All walls including non-bounding interior walls](#3.2)
     - [Floors and ceilings](#3.3)
     - [Matt's approach](#3.4)
 - [Revit API and UX style guide](#4)
@@ -118,7 +118,7 @@ There is a related method `RebarShapeDrivenAccessor` `ScaleToBoxFor3D`.
 RebarShapeDrivenAccessor comes from Rebar.GetShapeDrivenAccessor and is specific to shape driven rebar.
 
 I'm not sure this algorithm always gets it right (from UI experience with it) and there is an element of rationalisation of free end dimensions that need to be applied afterwards.
-Perhaps sometimes it can't be placed at all and perhaps sometimes when you increse bar diameter the shape can't be made (after placing a smaller bar diameter size), i.e., due to incresing bending diameter reducing distance between straights.
+Perhaps sometimes it can't be placed at all, and perhaps sometimes when you increase the bar diameter the shape can't be made (after placing a smaller bar diameter size), i.e., due to the larger bending diameter reducing the distance between straights.
 
 **Response:** I tried the `ScaleToBox` method that you suggested as shown in the code snippet below:
 
@@ -132,18 +132,16 @@ Perhaps sometimes it can't be placed at all and perhaps sometimes when you incre
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">XYZ</span>(&nbsp;0,&nbsp;vertDist,&nbsp;0&nbsp;)&nbsp;);
 </pre>
 
-
 It seems to work well, the stirrup indeed got resized according to the rectangle that is specified by the ScaleToBox() method, I will double check whether all the parameters are correct after the scaling.
-
 
 **Answer 2:** You should use:
 
 <pre class="code">
-  public IList<RebarConstrainedHandle> GetAllHandles();
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">IList</span>&lt;<span style="color:#2b91af;">RebarConstrainedHandle</span>&gt;&nbsp;GetAllHandles();
 </pre>
 
-which returns all RebarConstrainedHandles of this bar.
-All RebarConstrainedHandle objects will be returned, regardless of whether there are constraints associated to them.
+That returns all RebarConstrainedHandles of this bar.
+All `RebarConstrainedHandle` objects will be returned, regardless of whether there are constraints associated to them.
 
 The `GetAllConstrainedHandles` function returns all handles that are already constrained to external references.
 
@@ -208,7 +206,7 @@ I fixed my C# code to the following based on your suggestion in order to change 
 &nbsp;&nbsp;}
 </pre>
 
-and indeed, the RebarConstraint did change to be constrained to the cover as shown in the images below:
+Indeed, the RebarConstraint did change to be constrained to the cover as shown in the following images:
 
 Before implementing the code (the handles are constrained to the Host face as shown by the orange line at the host face):
 
@@ -363,7 +361,7 @@ Thank you.
 ####<a name="3"></a> Jason and Matt on Bounding Elements
 
 Jason [@mastjaso](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1058186) Masters
-very kindly jumped in with some experieced advice
+very kindly jumped in with some experienced advice
 on [exterior walls and room bounding elements](https://thebuildingcoder.typepad.com/blog/2021/03/exterior-walls-and-room-bounding-elements.html) in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on how to [get the walls, ceiling and floor of a room](https://forums.autodesk.com/t5/revit-api-forum/get-the-walls-ceiling-and-floor-of-a-room/m-p/9915923), saying:
@@ -381,9 +379,9 @@ It's probably worth noting that this method will not work in precise situations 
 a bug I documented [here](https://forums.autodesk.com/t5/revit-api-forum/select-room-edges/m-p/9086794).
 I haven't tested it since then, but I would be very surprised if Revit actually fixed it since, so it's worth watching out for. 
 
-####<a name="3.2"></a> All Walls Including Non Bounding Interior Walls
+####<a name="3.2"></a> All Walls Including Non-Bounding Interior Walls
 
-Otherwise, if you need walls that are non bounding and interior to the room, I found that, in general, all of Revit's projection methods are somewhat slow (and algorithms using them often have edge cases that might be missed), but, like others have said, I found both the `BoundingBoxIntersector` and the `IsPointInRoom` methods to be very fast and performant.
+Otherwise, if you need walls that are non-bounding and interior to the room, I found that, in general, all of Revit's projection methods are somewhat slow (and algorithms using them often have edge cases that might be missed), but, like others have said, I found both the `BoundingBoxIntersector` and the `IsPointInRoom` methods to be very fast and performant.
 To get *all* of the walls associated with a room, including interior ones, I would first use the boundary segments method to get the bounding walls / walls that won't be *inside* the room.
 Then, use the bounding box intersector filter to get all the walls in the model that intersect your room (as said, bounding boxes are rectangular and don't rotate, so this will be rough and pick up walls from other rooms).
 Set aside the walls that you already know are the boundaries; then, for the rest, check the coordinates of the end point and midpoint of each wall segment to see if any of those points are in the room with the `IsPointInRoom` method.
@@ -408,7 +406,7 @@ a [comment on LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:677
  
 We've grappled with different approaches for finding exterior walls for some time.
 Ultimately, settled on using the `IsExterior` API method.
-But that relies on the user to set the function parameter properly, which isn’t always easy (e.g. if it’s in a linked model).
+But that relies on the user to set the function parameter properly, which isn’t always easy (e.g., if it’s in a linked model).
 Will have to give this approach a try.
  
 For getting the Room Bounding elements, we use this algorithm:
@@ -434,7 +432,9 @@ I was wondering if Autodesk has a style guide for Revit add-ins, or Revit itself
  
 **Answer:** Have you seen the Philips Lighting design app built by one of our partners, Xinaps?
 Web based... automates lighting selection and design and inserts directly into Revit models.
-If not, a YouTube search on Philips Xinapps Revit should get you there.
+If not,
+a [YouTube search on Philips Xinaps Revit](https://www.youtube.com/results?search_query=Philips+Xinaps+Revit) should
+get you there.
 
 Style guide for Revit add-ins...
 Sorry, but no we don't.
