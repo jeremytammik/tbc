@@ -13,11 +13,9 @@
   Revit add-in style guide
   email [Revit add-in style guide] John Callen
 
-
-
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Rebar stirrup constraints, boundary elements for the entire building and individual rooms, exterior bounding walls, non-bounding interior walls, floors and ceilings with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://autode.sk/boundaryelements
 
 A lengthy and fruitful conversation on implementing valid rebar stirrup constraints and more advice on determining boundary elements for the entire building and individual rooms
 &ndash; Rebar stirrup constraints
