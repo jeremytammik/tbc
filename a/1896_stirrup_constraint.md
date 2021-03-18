@@ -8,6 +8,7 @@
 
 - Problem with Constraining Stirrups to the Cover of the Host Element
   https://forums.autodesk.com/t5/revit-api-forum/problem-with-constraining-stirrups-to-the-cover-of-the-host/m-p/10111388
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1612179673038400
 
 - getting started
   Revit add-in style guide
@@ -26,6 +27,19 @@ A lengthy and fruitful conversation on implementing valid rebar stirrup constrai
 &ndash; Today's collective action problem...
 
 linkedin:
+
+Rebar stirrup constraints, boundary elements for the entire building and individual rooms, exterior bounding walls, non-bounding interior walls, floors and ceilings with the #RevitAPI
+
+http://autode.sk/boundaryelements
+
+A lengthy and fruitful conversation on implementing valid rebar stirrup constraints and more advice on determining boundary elements for the entire building and individual rooms:
+
+- Rebar stirrup constraints
+- Exterior bounding walls
+- All walls including non-bounding interior walls
+- Floors and ceilings
+- Revit API and UX style guide
+- Today's collective action problem...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
