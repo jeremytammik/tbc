@@ -118,7 +118,7 @@ The material appearance asset property mapping image at the end is especially us
 
 ####<a name="6"></a> 24x24 StackedItems
 
-Diving deeper into a practical code snippet, let's look at 
+Diving deeper into some practical coding, let's look at 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [24x24 StackedItems](https://forums.autodesk.com/t5/revit-api-forum/24x24-stackeditems/m-p/10169950):
 
