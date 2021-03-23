@@ -77,18 +77,34 @@ Very many thanks to Gui for the great news and all his work on this invaluable r
 We hope to reduce the turn-around time for the next release &nbsp; :-)
 
 <center>
-<img src="img/revitapidocs_2021.png" alt="" title="" width="500"/> <!-- 1354 -->
+<img src="img/revitapidocs_2021.png" alt="RevitApiDocs for Revit 2021" title="RevitApiDocs for Revit 2021" width="500"/> <!-- 1354 -->
+</center>
+
+####<a name="3"></a> Welcome, AEC BIM Tools
+
+Simon Jones was one of the first and foremost AEC oriented people at Autodesk for a couple of decades in the previous millennium.
+Simon recently left Autodesk after over 35 years with us and launched [AEC BIM Tools](https://www.aecbimtools.com).
+He now published his first own Revit add-in, a [Shared Parameter Inspector for Revit](https://www.aecbimtools.com/sharedparameterinspector).
+You can download and test run a trial version.
+If you find it useful, you can donate what you think it is worth to you.
+
+Good luck and much success in your new adventure, Simon!
+
+####<a name="4"></a> Visual Materials API in Dynamo
+
+Konrad K Sobon published
+a [few more comments about materials in Revit, Dynamo, APIs etc.](https://archi-lab.net/few-more-comments-about-materials-in-revit-dynamo-apis-etc).
+
+It explores the use of Dynamo to create materials in Revit from something like an Excel spreadsheet, comes up with a number of very useful solutions and also highlights weaknesses in the current API functionality.
+
+The image at the end is especially useful and valuable:
+
+<center>
+<img src="img/archi_lab_material_appearance_asset_properties.jpg" alt="Material appearance asset properties" title="Material appearance asset properties" width="800"/> <!-- 2560 -->
 </center>
 
 
-
-####<a name="3"></a> 
-
-
-####<a name="4"></a> 
-
-
-####<a name="5"></a> Innovative Drone Fly-Through Film\
+####<a name="5"></a> Innovative Drone Fly-Through Film
 
 One and a half-minute drone video [Right Up Our Alley](https://youtu.be/VgS54fqKxf0) is driving film making to new heights, lengths, curves and other experiences
 &ndash; [Hollywood bigwigs shower praise on creators of Minnesota bowling alley drone video](https://www.abc.net.au/news/2021-03-12/hollywood-drone-video-minnesota-bowling-alley/13241718):
