@@ -6,6 +6,10 @@
 
 <!---
 
+- https://twitter.com/ipetrbroz/status/1370652255662309377?s=20
+  Forge Online Training: April 2021
+  https://forge.autodesk.com/blog/forge-online-training-april-2021
+
 - ApiDocs.co was updated last month and ReviApiDocs.com was updated today! Gui Talarico
   revitapidocs_2021.png
 
@@ -13,9 +17,6 @@
   simon recently left autodesk after over 35 years with us and launched [AEC BIM TOOLS](https://www.aecbimtools.com)
   since then, he published his first own Revit add-in, a [Shared Parameter Inspector for Revit](https://www.aecbimtools.com/sharedparameterinspector).
   you can download and test run a trial version. if you find it useful, you can donate what you think it is worth to you.
-
-- 24x24 StackedItems
-  https://forums.autodesk.com/t5/revit-api-forum/24x24-stackeditems/m-p/10169950
 
 - feedback on Visual Materials API -- https://autodesk.slack.com/archives/C0SR6NAP8/p1615391423002700
   Scott Conover 10 Mar at 16:50
@@ -31,10 +32,8 @@
   Alex Zhang  8 days ago
   add @Joe Qiao to this thread.
 
-
--  https://twitter.com/ipetrbroz/status/1370652255662309377?s=20
-  Forge Online Training: April 2021
-  https://forge.autodesk.com/blog/forge-online-training-april-2021
+- 24x24 StackedItems
+  https://forums.autodesk.com/t5/revit-api-forum/24x24-stackeditems/m-p/10169950
 
 - drone driving film making to new heights, lengths, curves and other experiences
   https://www.abc.net.au/news/2021-03-12/hollywood-drone-video-minnesota-bowling-alley/13241718
@@ -66,9 +65,22 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### RevitApiDocs Update
 
 
-####<a name="2"></a> RevitApiDocs Support for Revit 2021
+####<a name="2"></a> Forge Online Training  in April 2021
 
-Gui Talarico just announced an update to the online Revit API documentation for Revit 2021.1:
+Are you interested in getting started with the Autodesk Forge platform development, perhaps in a more interactive, guided way?
+Or maybe you already have experience with our platform, and are just interested in honing your skills?
+If so, come and join us for another series of Forge Training webinars from April 13th until April 16th.
+During these days, our dev advocates will guide your through the development of sample applications (using Node.js or .NET) leveraging different parts of Forge, and answer your questions along the way as you develop these applications yourself.
+You can [register here](https://www.eventbrite.com/e/forge-online-training-april-13-16-2021-registration-145580133097) and
+refer to Petr Broz's blog post for full details:
+
+<center>
+<a href="https://forge.autodesk.com/blog/forge-online-training-april-2021">Forge Online Training: April 2021</a>
+</center>
+
+####<a name="3"></a> RevitApiDocs Support for Revit 2021
+
+Back to the Revit API, Gui Talarico just announced an update to the online Revit API documentation for Revit 2021.1:
 
 > [ApiDocs.co](https://apidocs.co) was updated last month and [RevitApiDocs.com](https://www.revitapidocs.com) last Friday!
 
@@ -80,7 +92,7 @@ We hope to reduce the turn-around time for the next release &nbsp; :-)
 <img src="img/revitapidocs_2021.png" alt="RevitApiDocs for Revit 2021" title="RevitApiDocs for Revit 2021" width="500"/> <!-- 1354 -->
 </center>
 
-####<a name="3"></a> Welcome, AEC BIM Tools
+####<a name="4"></a> Welcome, AEC BIM Tools
 
 Simon Jones was one of the first and foremost AEC oriented people at Autodesk for a couple of decades in the previous millennium.
 Simon recently left Autodesk after over 35 years with us and launched [AEC BIM Tools](https://www.aecbimtools.com).
@@ -90,7 +102,7 @@ If you find it useful, you can donate what you think it is worth to you.
 
 Good luck and much success in your new adventure, Simon!
 
-####<a name="4"></a> Visual Materials API in Dynamo
+####<a name="5"></a> Visual Materials API in Dynamo
 
 Konrad K Sobon published
 a [few more comments about materials in Revit, Dynamo, APIs etc](https://archi-lab.net/few-more-comments-about-materials-in-revit-dynamo-apis-etc).
@@ -104,7 +116,84 @@ The material appearance asset property mapping image at the end is especially us
 </center>
 
 
-####<a name="5"></a> Innovative Drone Fly-Through Film
+####<a name="6"></a> 24x24 StackedItems
+
+Diving deeper into a practical code snippet, let's look at 
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [24x24 StackedItems](https://forums.autodesk.com/t5/revit-api-forum/24x24-stackeditems/m-p/10169950):
+
+**Question:** This may be an easy one, but so far I am struggling to find anything specific about it.
+How do you make a `StackedItem` where the icons are 24x24 when there are only 2 in the stack?
+It seems like it should be possible as it is used multiple times in the modify tab, cf. this example:
+
+<center>
+<img src="img/24x24_icon_sizes_1.png" alt="2-stack 24x24 icons" title="2-stack 24x24 icons" width="246"/> <!-- 246 -->
+</center>
+
+I have been able to set the `ShowText` property to `false` to get the 3 stacked icons, but, when I use the same method with the 2 icon stack, it remains 16x16, regardless of the icon resolution.
+I have tried to obtain and change the button's height and width, minWidth and minHeight through the Autodesk.Window.RibbonItem object to no avail.
+Has anyone had any success in creating these icons?
+
+Alexander [@aignatovich](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478) [@CADBIMDeveloper](https://github.com/CADBIMDeveloper) Ignatovich, aka Александр Игнатович, presents an elegant solution with some very pretty code indeed:
+ 
+**Answer:** I succeeded &nbsp; :-) 
+
+With text:
+
+<center>
+<img src="img/ai_24x24_icon_sizes_2.png" alt="2-stack 24x24 icons" title="2-stack 24x24 icons" width="144"/> <!-- 144 -->
+</center>
+
+Without text:
+
+<center>
+<img src="img/ai_24x24_icon_sizes_3.png" alt="2-stack 24x24 icons" title="2-stack 24x24 icons" width="144"/> <!-- 144 -->
+</center>
+
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;revitRibbonItem&nbsp;=&nbsp;UIFramework.RevitRibbonControl
+&nbsp;&nbsp;&nbsp;&nbsp;.RibbonControl.findRibbonItemById(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ribbonItem.GetId()&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;useMediumIconSize&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;revitRibbonItem.Size&nbsp;=&nbsp;<span style="color:#2b91af;">RibbonItemSize</span>.Large;
+ 
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;hideButtonCaption&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;revitRibbonItem.ShowText&nbsp;=&nbsp;<span style="color:blue;">false</span>;
+</pre>
+
+`GetId` is an extension method:
+
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">internal</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">RibbonItemExtensions</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">string</span>&nbsp;GetId(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">this</span>&nbsp;<span style="color:#2b91af;">RibbonItem</span>&nbsp;ribbonItem&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;type&nbsp;=&nbsp;<span style="color:blue;">typeof</span>(&nbsp;<span style="color:#2b91af;">RibbonItem</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;parentId&nbsp;=&nbsp;type
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetField(&nbsp;<span style="color:#a31515;">&quot;m_parentId&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BindingFlags</span>.Instance&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;<span style="color:#2b91af;">BindingFlags</span>.NonPublic&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;?.GetValue(&nbsp;ribbonItem&nbsp;)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;??&nbsp;<span style="color:blue;">string</span>.Empty;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;generateIdMethod&nbsp;=&nbsp;type
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetMethod(&nbsp;<span style="color:#a31515;">&quot;generateId&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">BindingFlags</span>.Static&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;<span style="color:#2b91af;">BindingFlags</span>.NonPublic&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;(<span style="color:blue;">string</span>)&nbsp;generateIdMethod?.Invoke(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ribbonItem,&nbsp;<span style="color:blue;">new</span>[]&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parentId,&nbsp;ribbonItem.Name&nbsp;}&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+</pre>
+
+Many thanks to Alexander for the nice solution and the instructive and inspiring coding.
+
+####<a name="7"></a> Innovative Drone Fly-Through Film
 
 The one-and-a-half-minute drone video [Right Up Our Alley](https://youtu.be/VgS54fqKxf0) may
 help drive film making to new heights, lengths, curves and other experiences
