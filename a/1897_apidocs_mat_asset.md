@@ -42,8 +42,13 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Here are some exciting Forge, Revit API and other topics for today
+&ndash; Forge online training in April 2021
+&ndash; RevitApiDocs support for Revit 2021
+&ndash; Welcome, AEC BIM Tools
+&ndash; Visual materials API in Dynamo
+&ndash; 24x24 stacked ribbon items
+&ndash; Innovative drone fly-through film...
 
 linkedin:
 
@@ -61,7 +66,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### RevitApiDocs Update
+### Forge, RevitApiDocs, Materials and Stacked Items
 
 Here are some exciting Forge, Revit API and other topics for this week:
 
