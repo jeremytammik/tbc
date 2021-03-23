@@ -97,16 +97,17 @@ a [few more comments about materials in Revit, Dynamo, APIs etc](https://archi-l
 
 It explores the use of Dynamo to create materials in Revit from something like an Excel spreadsheet, comes up with a number of very useful solutions and also highlights weaknesses in the current API functionality.
 
-The image at the end is especially useful and valuable:
+The material appearance asset property mapping image at the end is especially useful and valuable:
 
 <center>
-<img src="img/archi_lab_material_appearance_asset_properties.jpg" alt="Material appearance asset properties" title="Material appearance asset properties" width="800"/> <!-- 2560 -->
+<img src="img/archi_lab_material_appearance_asset_properties.jpg" alt="Material appearance asset property mapping" title="Material appearance asset property mapping" width="800"/> <!-- 2560 -->
 </center>
 
 
 ####<a name="5"></a> Innovative Drone Fly-Through Film
 
-One and a half-minute drone video [Right Up Our Alley](https://youtu.be/VgS54fqKxf0) is driving film making to new heights, lengths, curves and other experiences
+The one-and-a-half-minute drone video [Right Up Our Alley](https://youtu.be/VgS54fqKxf0) may
+help drive film making to new heights, lengths, curves and other experiences
 &ndash; [Hollywood bigwigs shower praise on creators of Minnesota bowling alley drone video](https://www.abc.net.au/news/2021-03-12/hollywood-drone-video-minnesota-bowling-alley/13241718):
 
 > A single-take video shot with a drone flying through a Minnesota bowling alley has been hailed as "stupendous" by a string of celebrities and big-name film-makers.
@@ -120,6 +121,9 @@ Key points:
 - The filmmakers are trying to encourage people to return to bars, restaurants and bowling alleys
 - The near 90-second video titled [Right Up Our Alley](https://youtu.be/VgS54fqKxf0) begins outside, the drone swoops in from across the street, through the doors, all around the bowling alley, bar, between people, next to the rolling bowling ball, ...
 
+<center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/VgS54fqKxf0" title="Right Up Our Alley" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
 
 
 
