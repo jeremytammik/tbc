@@ -6,10 +6,7 @@
 
 <!---
 
--
-Thanks again Caroline and Jeremy.
-ApiDocs.co was updated last month and ReviApiDocs.com was updated today!
-Gui Talarico
+- ApiDocs.co was updated last month and ReviApiDocs.com was updated today! Gui Talarico
   revitapidocs_2021.png
 
 - simon jones was one of the first and foremost aec oriented people at autodesk fr a couple of decades in the previous millennium.
@@ -66,10 +63,50 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### 
+### RevitApiDocs Update
 
 
-####<a name="2"></a> 
+####<a name="2"></a> RevitApiDocs Support for Revit 2021
+
+Gui Talarico just announced an update to the online Revit API documentation for Revit 2021.1:
+
+> [ApiDocs.co](https://apidocs.co) was updated last month and [RevitApiDocs.com](https://www.revitapidocs.com) last Friday!
+
+Very many thanks to Gui for the great news and all his work on this invaluable resource.
+
+We hope to reduce the turn-around time for the next release &nbsp; :-)
+
+<center>
+<img src="img/revitapidocs_2021.png" alt="" title="" width="500"/> <!-- 1354 -->
+</center>
+
+
+
+####<a name="3"></a> 
+
+
+####<a name="4"></a> 
+
+
+####<a name="5"></a> Innovative Drone Fly-Through Film\
+
+One and a half-minute drone video [Right Up Our Alley](https://youtu.be/VgS54fqKxf0) is driving film making to new heights, lengths, curves and other experiences
+&ndash; [Hollywood bigwigs shower praise on creators of Minnesota bowling alley drone video](https://www.abc.net.au/news/2021-03-12/hollywood-drone-video-minnesota-bowling-alley/13241718):
+
+> A single-take video shot with a drone flying through a Minnesota bowling alley has been hailed as "stupendous" by a string of celebrities and big-name film-makers.
+From there, the drone flies in and around bowlers in the lanes and drinkers at the bar, going in between legs and into the back compartment where the bowling pins are swept up and set up and all around &ndash; all in one shot.
+It finishes with something of a cliffhanger (SPOILER: No drones were seriously harmed in the making of the video).
+Key points:
+
+> - The video is all one-take
+- It took about 10 to 12 attempts
+- The only thing added in post-production is the audio
+- The filmmakers are trying to encourage people to return to bars, restaurants and bowling alleys
+- The near 90-second video titled [Right Up Our Alley](https://youtu.be/VgS54fqKxf0) begins outside, the drone swoops in from across the street, through the doors, all around the bowling alley, bar, between people, next to the rolling bowling ball, ...
+
+
+
+
 
 **Question:** 
 
@@ -88,28 +125,4 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 
 
-<center>
-<img src="img/.png" alt="" title="" width="400"/> <!-- 493 -->
-</center>
 
-
-
-####<a name="3"></a> 
-
-
-####<a name="4"></a> 
-
-
-####<a name="5"></a> Innovative Drone Fly-Through Film\
-
-Drone driving film making to new heights, lengths, curves and other experiences
-&ndash; [Hollywood bigwigs shower praise on creators of Minnesota bowling alley drone video](https://www.abc.net.au/news/2021-03-12/hollywood-drone-video-minnesota-bowling-alley/13241718):
-
-> A single-take video shot with a drone flying through a Minnesota bowling alley has been hailed as "stupendous" by a string of celebrities and big-name film-makers.
-> From there, the drone flies in and around bowlers in the lanes and drinkers at the bar, going in between legs and into the back compartment where the bowling pins are swept up and set up and all around — all in one shot.
-> It finishes with something of a cliffhanger (SPOILER: No drones were seriously harmed in the making of the video).
-> Key points:
-> - The video is all one-take and the only thing added in post-production was the audio
-> - It took about 10 to 12 attempts
-> - The filmmakers were trying to encourage people to return to bars, restaurants and bowling alleys
-> - The near 90-second video titled Right Up Our Alley — filmed and produced at night on March 2 by Rally Studios — begins outside where the drone swoops in from across the street and through the doors of Bryant Lake Bowl in Minneapolis.
