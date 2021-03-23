@@ -93,7 +93,7 @@ Good luck and much success in your new adventure, Simon!
 ####<a name="4"></a> Visual Materials API in Dynamo
 
 Konrad K Sobon published
-a [few more comments about materials in Revit, Dynamo, APIs etc.](https://archi-lab.net/few-more-comments-about-materials-in-revit-dynamo-apis-etc).
+a [few more comments about materials in Revit, Dynamo, APIs etc](https://archi-lab.net/few-more-comments-about-materials-in-revit-dynamo-apis-etc).
 
 It explores the use of Dynamo to create materials in Revit from something like an Excel spreadsheet, comes up with a number of very useful solutions and also highlights weaknesses in the current API functionality.
 
