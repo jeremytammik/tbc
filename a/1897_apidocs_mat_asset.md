@@ -64,8 +64,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### RevitApiDocs Update
 
+Here are some exciting Forge, Revit API and other topics for this week:
 
-####<a name="2"></a> Forge Online Training  in April 2021
+- [Forge online training in April 2021](#2)
+- [RevitApiDocs support for Revit 2021](#3)
+- [Welcome, AEC BIM Tools](#4)
+- [Visual materials API in Dynamo](#5)
+- [24x24 stacked ribbon items](#6)
+- [Innovative drone fly-through film](#7)
+
+####<a name="2"></a> Forge Online Training in April 2021
 
 Are you interested in getting started with the Autodesk Forge platform development, perhaps in a more interactive, guided way?
 Or maybe you already have experience with our platform, and are just interested in honing your skills?
@@ -117,7 +125,7 @@ The material appearance asset property mapping image at the end is especially us
 </center>
 
 
-####<a name="6"></a> 24x24 StackedItems
+####<a name="6"></a> 24x24 Stacked Ribbon Items
 
 Diving deeper into some practical coding, let's look at 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -192,7 +200,7 @@ Without text:
 &nbsp;&nbsp;}
 </pre>
 
-Many thanks to Alexander for the nice solution and the instructive and inspiring coding.
+Many thanks to Alexander for the nice solution and the succinct, instructive and inspiring coding.
 
 ####<a name="7"></a> Innovative Drone Fly-Through Film
 
@@ -214,25 +222,4 @@ Key points:
 <center>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/VgS54fqKxf0" title="Right Up Our Alley" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </center>
-
-
-
-
-**Question:** 
-
-<pre class="code">
-
-
-</pre>
-
-**Answer:** 
-
-**Response:** 
-
-<pre class="code">
-
-</pre>
-
-
-
 
