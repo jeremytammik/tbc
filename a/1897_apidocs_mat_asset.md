@@ -116,7 +116,7 @@ Good luck and much success in your new adventure, Simon!
 Konrad K Sobon published
 a [few more comments about materials in Revit, Dynamo, APIs etc](https://archi-lab.net/few-more-comments-about-materials-in-revit-dynamo-apis-etc).
 
-It explores the use of Dynamo to create materials in Revit from something like an Excel spreadsheet, comes up with a number of very useful solutions and also highlights weaknesses in the current API functionality.
+It explores the use of Dynamo to create materials in Revit from something like an Excel spreadsheet, presents several useful solutions and also points out weaknesses in the current API functionality.
 
 The material appearance asset property mapping image at the end is especially useful and valuable:
 
