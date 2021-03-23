@@ -71,8 +71,9 @@ Are you interested in getting started with the Autodesk Forge platform developme
 Or maybe you already have experience with our platform, and are just interested in honing your skills?
 If so, come and join us for another series of Forge Training webinars from April 13th until April 16th.
 During these days, our dev advocates will guide your through the development of sample applications (using Node.js or .NET) leveraging different parts of Forge, and answer your questions along the way as you develop these applications yourself.
-You can [register here](https://www.eventbrite.com/e/forge-online-training-april-13-16-2021-registration-145580133097) and
-refer to Petr Broz's blog post for full details:
+You can refer to Petr Broz's blog post for full details and register
+either [here](https://www.eventbrite.com/e/forge-online-training-april-13-16-2021-registration-145580133097) or
+there:
 
 <center>
 <a href="https://forge.autodesk.com/blog/forge-online-training-april-2021">Forge Online Training: April 2021</a>
