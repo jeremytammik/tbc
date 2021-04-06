@@ -53,6 +53,16 @@ A new version of Revit coming soon, solutions for automatic column type creation
 
 linkedin:
 
+A sneak peek at the new version of Revit coming soon, career opportunities, a sustainable economic model, handling arc angles, solutions for automatic column type creation and instance placement in the #RevitAPI 
+
+http://autode.sk/sneakpeek2022
+
+- What's new in Revit 2022 sneak peek
+- Creating column types from list
+- Normalising arc start and end angle
+- Many exciting opportunities at Autodesk
+- The sustainable doughnut economic model...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -82,13 +92,22 @@ A new version of Revit coming soon, solutions for automatic column type creation
 
 Are you interested in the new features and enhancements coming in the upcoming next release of Revit?
 
-Take the opportunity to join the sneak peek webinar on What's New in Revit 2022 next week, on April 13, 2021, at 10am PT or 1pm ET.
+Take the opportunity to join the sneak peek on What's New in Revit 2022 later today,
+on [April 6, 2021, at 21:30 CET](https://www.timeanddate.com/worldclock/converter.html?iso=20210406T193000&p1=268):
 
 - [What's New in Revit 2022 Sneak Peek](https://youtu.be/FjSbv6W6tcg)
 
-> Join Senior Revit Product Manager's Sasha Crotty and Harlan Brumm for a Live Preview of What's New in Revit 2022, including their favourite new features.
+Then, register to join the Autodesk product experts for the full *What's New in Revit 2022* webinar next week,
+[April 13, 2021, at 10:00am PT, 1:00pm ET](https://www.timeanddate.com/worldclock/converter.html?iso=20210413T170000&p1=268&p2=tz_pt&p3=tz_et).
+You can register here:
 
-> [Link to registration page](https://autode.sk/31xUn2g)
+- [Link to register for the full *What's New in Revit 2022* webinar on April 13](https://autode.sk/31xUn2g)
+
+Here are some other forward-looking Revit resources:
+
+- [Revit Public Roadmap](https://trello.com/b/ldRXK9Gw/revit-public-roadmap)
+- [Application to the Revit Community and the Revit Preview to try new features in advance](https://feedback.autodesk.com/key/LHMJFVHGJK085G2M)
+- [Join the Autodesk Product Research Community](https://www.autodeskproductresearch.com/hub)
 
 <center>
 <img src="img/2021-04-06_rvt_2022_sneak_peek.png" alt="Revit 2022 sneak peek" title="Revit 2022 sneak peek" width="524"/> <!-- 524 -->
