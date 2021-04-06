@@ -90,9 +90,9 @@ A new version of Revit coming soon, solutions for automatic column type creation
 
 ####<a name="2"></a> What's New in Revit 2022 Sneak Peek
 
-Are you interested in the new features and enhancements coming in the upcoming next release of Revit?
+Are you interested in the new features and enhancements in the upcoming next release of Revit?
 
-Take the opportunity to join the sneak peek on What's New in Revit 2022 later today,
+Take the opportunity to join the *sneak peek on What's New in Revit 2022* later today,
 on [April 6, 2021, at 21:30 CET](https://www.timeanddate.com/worldclock/converter.html?iso=20210406T193000&p1=268):
 
 - [What's New in Revit 2022 Sneak Peek](https://youtu.be/FjSbv6W6tcg)
