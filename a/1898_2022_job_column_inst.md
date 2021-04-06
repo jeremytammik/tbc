@@ -44,8 +44,12 @@ twitter:
 
 in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+A new version of Revit coming soon, solutions for automatic column type creation and instance placement, handling arc angles, career opportunities and a sustainable economic model
+&ndash; What's new in Revit 2022 sneak peek
+&ndash; Creating column types from list
+&ndash; Normalising arc start and end angle
+&ndash; Many exciting opportunities at Autodesk
+&ndash; The sustainable doughnut economic model...
 
 linkedin:
 
