@@ -63,9 +63,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Sneak Peek, Jobs and Placing Column Instances
+### Sneak Peek, Automatic Columns, Arcs Angles and Careers
 
-Today we point out the new version of Revit coming soon, solutions for automatic column type creation and instance placement, handling arc angles, career opportunities and a sustainable economic model:
+A new version of Revit coming soon, solutions for automatic column type creation and instance placement, handling arc angles, career opportunities and a sustainable economic model:
 
 - [What's new in Revit 2022 sneak peek](#2)
 - [Creating column types from list](#3)
