@@ -22,13 +22,8 @@
   Revit 2022 PDF Export Fails with Paper Format set as Default with Other Parameters
   https://forums.autodesk.com/t5/revit-api-forum/revit-2022-pdf-export-fails-with-paper-format-set-as-default/m-p/10223281
 
-- 
+- 2022 PDF exporter cant use "sheet number" parameter
 https://forums.autodesk.com/t5/revit-api-forum/2022-pdf-exporter-cant-use-quot-sheet-number-quot-parameter/m-p/10220287
-
-- VisualStudioRevitAddinWizard 2022
-  https://forums.autodesk.com/t5/revit-api-forum/visualstudiorevitaddinwizard-2022/m-p/10233833
-
-- RevitLookup 2022
 
 - https://www.freecodecamp.org/news/common-mistakes-beginning-web-development-students-make/
   5 Mistakes Beginner Web Developers Make – And How to Fix Them
@@ -352,23 +347,34 @@ We should either silently set PaperPlacement to Center during export, or throw  
 
 Currently, in this case, nothing happens and no warning or eror is raised.
 
+####<a name="5"></a> PDF Export Output File Naming
 
+Another thread question
+why [2022 PDF exporter can't use the "sheet number" parameter](https://forums.autodesk.com/t5/revit-api-forum/2022-pdf-exporter-cant-use-quot-sheet-number-quot-parameter/m-p/10220287).
 
+Apparently, you have to be sure that the Sheet Number parameter from the "Parameter Type" drop down menu is selected from the Sheet type fields.
 
-Some other important areas do not appear in this list:
+Also, if the sheet has no revision the filename, the words 'Current revision' may be inserted into the filename instead.
 
-- Built-in PDF exporter
-- Deprecation of `ParameterType` and migration to `ForgeTypeId`
+The development team confirm this fallback behaviour; if the parameter you selected is empty, it will fill the parameter name (Sample Value) in the filename.
+ 
+The sheet number in the parameter set is confusing due to the parameter type.
+The designed scenario is: the customer will use this parameter only in either sheet or view, not in both of them.
+If you select a mixed type of both view and sheet with this parameter, one parameter will fallback to its name due to its absence in the view type.
 
-####<a name="5"></a> Enhancements
+####<a name="6"></a> Five Beginner Mistakes
 
-Ceiling and Floor creation
-Revit Cloud Model (workshared)
-Parameters
-Sketch API:  SketchEditScope API, Sketch.GetAllElements, Sketch.OwnerId, Ceiling.SketchId, Opening.SketchId, Wall.SketchId,
+Taing a quick look beyond Revit and .NET development for the desktop, the article
+on [5 mistakes beginner web developers make &ndash; and how to fix them](https://www.freecodecamp.org/news/common-mistakes-beginning-web-development-students-make) addresses
+topics that are of use in a non-web environment as well, and that I actually adhere to pretty strictly myself on all platforms
+&ndash; possibly excepting the last &ndash; I am still practicing that:
 
-####<a name="6"></a> 
+- Avoid spaces in file names
+- Respect case sensitivity
+- Understand file paths
+- Name the default page `index`
+- Take a break
 
 <center>
-<img src="img/.png" alt="" title="" width="1200"/> <!-- 600 -->
+<img src="/p/2016/2016-01-03_wildhaus/791_jeremy_reading_cropped.jpg" alt="Taking a break and reading in the Swiss winter sun" width="500">
 </center>
