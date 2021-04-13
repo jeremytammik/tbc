@@ -1,9 +1,8 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="bc.css">
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
-</head>
-
+</head></p>
 <!---
 
 - revit 2022 migrate ParameterType
@@ -56,43 +55,28 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Replace Deprecated ParameterType with ForgeTypeId
-
-Revit 2022 has been released and the time has come to migrate to the new version.
+<h3>Replace Deprecated ParameterType with ForgeTypeId</h3>
+<p>Revit 2022 has been released and the time has come to migrate to the new version.
 Two important new features are changes to the parameter API and a new built-in PDF export functionality.
-Some initiual issues with these two have already been discussed:
-
-- [Replace deprecated `ParameterType` with `ForgeTypeId`](#2)
-- [Multi-target 2021 and 2022 using MSBuild](#3)
-- [PDF export default paper format can fail](#4)
-- [PDF export output file naming](#5)
-- [Five beginner mistakes](#6)
-
-####<a name="2"></a> Replace Deprecated ParameterType with ForgeTypeId
-
-David Becroft of Autodesk 
-and Maxim Stepannikov of BIM Planet, aka Максим Степанников or [architect.bim](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/4552025),
+Some initiual issues with these two have already been discussed:</p>
+<h4><a name="2"></a> Replace Deprecated ParameterType with ForgeTypeId</h4>
+<p>David Becroft of Autodesk 
+and Maxim Stepannikov of BIM Planet, aka Максим Степанников or <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/4552025">architect.bim</a>,
 helped address 
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) question
-on [Revit 2022 ParameterType.Text to ForgeTypeId](https://forums.autodesk.com/t5/revit-api-forum/revit-2022-parametertype-text-to-forgetypeid/m-p/10225741):
-
-**Question:** Could somebody please help me out with this conversion from the deprecated `ParameterType` to `ForgeTypeId` for the Revit 2022 API?
-
-The 'old' code has a line like this:
-
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> question
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-2022-parametertype-text-to-forgetypeid/m-p/10225741">Revit 2022 ParameterType.Text to ForgeTypeId</a>:</p>
+<p><strong>Question:</strong> Could somebody please help me out with this conversion from the deprecated <code>ParameterType</code> to <code>ForgeTypeId</code> for the Revit 2022 API?</p>
+<p>The 'old' code has a line like this:</p>
 <pre class="code">
 if (parameter.Definition.ParameterType == ParameterType.Text)  ....
 </pre>
 
-What would be the 2022 equivalent for it?
-
-It seems that the left side may be:
-
+<p>What would be the 2022 equivalent for it?</p>
+<p>It seems that the left side may be:</p>
 <pre class="code">
 if (parameter.Definition.GetDataType() == ????)  ....
-</pre>
 
-But, for some reason, I cannot find what do I have to use on right side of the operation 😞 There must be something I am overlooking.
+but for some reason I cannot find what do I have to use on right side of the operation 😞 There must be something I am overlooking.
 
 **Answer:** To perform this check you need to create instance of ForgeTypeId class. Use one of the SpecTypeId's properties to get value to compare with. In your case (for text parameter) you need Number property:
 
@@ -103,7 +87,7 @@ True
 
  Also take a look at the conversation
  on [how to use `ForgeTypeId`](https://forums.autodesk.com/t5/revit-api-forum/forgetypeid-how-to-use/td-p/9439210).
- 
+
 **Response:** Oh dear!
 This is super confusing.
 I've just checked and parameter definitions that store TEXT have a `SpecTypeId` = `SpecTypeId.Number`.
@@ -364,7 +348,7 @@ Apparently, you have to be sure that the Sheet Number parameter from the "Parame
 Also, if the sheet has no revision the filename, the words 'Current revision' may be inserted into the filename instead.
 
 The development team confirm this fallback behaviour; if the parameter you selected is empty, it will fill the parameter name (Sample Value) in the filename.
- 
+
 The sheet number in the parameter set is confusing due to the parameter type.
 The designed scenario is: the customer will use this parameter only in either sheet or view, not in both of them.
 If you select a mixed type of both view and sheet with this parameter, one parameter will fallback to its name due to its absence in the view type.
