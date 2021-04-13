@@ -378,3 +378,5 @@ topics that are of use in a non-web environment as well, and that I actually adh
 <center>
 <img src="/p/2016/2016-01-03_wildhaus/791_jeremy_reading_cropped.jpg" alt="Taking a break and reading in the Swiss winter sun" width="500">
 </center>
+
+<!-- mexico siesta  sombrero -->
