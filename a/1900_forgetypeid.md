@@ -18,6 +18,10 @@
   Multi-Target 2021 and 2022 Using MSBuild
   https://forums.autodesk.com/t5/revit-api-forum/multi-target-2021-and-2022-using-msbuild/m-p/10235037
 
+- PDF Export fails with Paper Format set as Default with other parameters
+  Revit 2022 PDF Export Fails with Paper Format set as Default with Other Parameters
+  https://forums.autodesk.com/t5/revit-api-forum/revit-2022-pdf-export-fails-with-paper-format-set-as-default/m-p/10223281
+
 - 
 https://forums.autodesk.com/t5/revit-api-forum/2022-pdf-exporter-cant-use-quot-sheet-number-quot-parameter/m-p/10220287
 
@@ -333,7 +337,23 @@ Hope this helps.
 
 Thank you very much, Josiah, for this important and timely advice!
 
-####<a name="4"></a>
+####<a name="4"></a> PDF Export Default Paper Format Can Fail
+
+The new built-in PDF export is a certainly a very useful feature in Revit 2022 and has gathered a lot of interest.
+
+Unfortunately, it also caused some misunderstandings, and a first problem was discovered and described in the thread 
+on [Revit 2022 PDF export fails with paper format set as default with other parameters](https://forums.autodesk.com/t5/revit-api-forum/revit-2022-pdf-export-fails-with-paper-format-set-as-default/m-p/10223281).
+
+The title says it all, and the development team explain:
+
+By design, if PaperFormat is default, then PaperPlacement should always be Center.
+However, there is no restriction ensuring this on the API side.
+We should either silently set PaperPlacement to Center during export, or throw  an exception notifying the add-in about this.
+
+Currently, in this case, nothing happens and no warning or eror is raised.
+
+
+
 
 Some other important areas do not appear in this list:
 
