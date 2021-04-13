@@ -59,6 +59,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>Revit 2022 has been released and the time has come to migrate to the new version.
 Two important new features are changes to the parameter API and a new built-in PDF export functionality.
 Some initiual issues with these two have already been discussed:</p>
+<ul>
+<li><a href="#2">Replace deprecated <code>ParameterType</code> with <code>ForgeTypeId</code></a></li>
+<li><a href="#3">Multi-target 2021 and 2022 using MSBuild</a></li>
+<li><a href="#4">PDF export default paper format can fail</a></li>
+<li><a href="#5">PDF export output file naming</a></li>
+<li><a href="#6">Five beginner mistakes</a></li>
+</ul>
 <h4><a name="2"></a> Replace Deprecated ParameterType with ForgeTypeId</h4>
 <p>David Becroft of Autodesk 
 and Maxim Stepannikov of BIM Planet, aka Максим Степанников or <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/4552025">architect.bim</a>,
@@ -75,93 +82,72 @@ if (parameter.Definition.ParameterType == ParameterType.Text)  ....
 <p>It seems that the left side may be:</p>
 <pre class="code">
 if (parameter.Definition.GetDataType() == ????)  ....
+</pre>
 
-but for some reason I cannot find what do I have to use on right side of the operation 😞 There must be something I am overlooking.
-
-**Answer:** To perform this check you need to create instance of ForgeTypeId class. Use one of the SpecTypeId's properties to get value to compare with. In your case (for text parameter) you need Number property:
-
+<p>But, for some reason, I cannot find what do I have to use on right side of the operation 😞 There must be something I am overlooking.</p>
+<p><strong>Answer:</strong> To perform this check you need to create instance of ForgeTypeId class. Use one of the SpecTypeId's properties to get value to compare with. In your case (for text parameter) you need Number property:</p>
 <pre class="code">
 >>> element.Parameter[BuiltInParameter.ALL_MODEL_MARK].Definition.GetSpecTypeId() == SpecTypeId.Number
 True
 </pre>
 
- Also take a look at the conversation
- on [how to use `ForgeTypeId`](https://forums.autodesk.com/t5/revit-api-forum/forgetypeid-how-to-use/td-p/9439210).
-
-**Response:** Oh dear!
+<p>Also take a look at the conversation
+ on <a href="https://forums.autodesk.com/t5/revit-api-forum/forgetypeid-how-to-use/td-p/9439210">how to use <code>ForgeTypeId</code></a>.</p>
+<p><strong>Response:</strong> Oh dear!
 This is super confusing.
-I've just checked and parameter definitions that store TEXT have a `SpecTypeId` = `SpecTypeId.Number`.
-
-Now how do you distinguish between actual Numbers and Text?
-
-It looks like the problem is this:
-
-The `Autodesk.Revit.DB.InternalDefinition` class has:
-
-- `ParameterType` &ndash; this can be: Invalid | Text | Integer | Number
-- `UnitType` &ndash; seemingly, for Text type parameters, this is `UT_Number`
-
-Now with `ParameterType` becoming obsolete, we have to use `Parameter.GetSpecTypeId` that SEEMINGLY coresponds to the `UnitType` member above, and for Text parameters like `Comment`, it has a value of `SpecTypeId.Number`!
-
-The question is: How can I know if a Parameter is Text or not in Revit 2022 &ndash; without using Definition.ParameterType ?
-
-Same would apply to `YesNo` type parameters... `SpecTypeId` cannot be used to determine if a `ParameterDefinition` is for a `YesNo` type parameter...  
-
-And even more: The ONLY place where I can see if a parameter is a YesNo parameter is in the Parameter.Definition.ParameterType !! If ParameterType is obsolete... how to determine if a parameter is YesNo or something else?
-
-**Answer:** It is a well-known fact that unit type of text is number.
+I've just checked and parameter definitions that store TEXT have a <code>SpecTypeId</code> = <code>SpecTypeId.Number</code>.</p>
+<p>Now how do you distinguish between actual Numbers and Text?</p>
+<p>It looks like the problem is this:</p>
+<p>The <code>Autodesk.Revit.DB.InternalDefinition</code> class has:</p>
+<ul>
+<li><code>ParameterType</code> &ndash; this can be: Invalid | Text | Integer | Number</li>
+<li><code>UnitType</code> &ndash; seemingly, for Text type parameters, this is <code>UT_Number</code></li>
+</ul>
+<p>Now with <code>ParameterType</code> becoming obsolete, we have to use <code>Parameter.GetSpecTypeId</code> that SEEMINGLY coresponds to the <code>UnitType</code> member above, and for Text parameters like <code>Comment</code>, it has a value of <code>SpecTypeId.Number</code>!</p>
+<p>The question is: How can I know if a Parameter is Text or not in Revit 2022 &ndash; without using Definition.ParameterType ?</p>
+<p>Same would apply to <code>YesNo</code> type parameters... <code>SpecTypeId</code> cannot be used to determine if a <code>ParameterDefinition</code> is for a <code>YesNo</code> type parameter...  </p>
+<p>And even more: The ONLY place where I can see if a parameter is a YesNo parameter is in the Parameter.Definition.ParameterType !! If ParameterType is obsolete... how to determine if a parameter is YesNo or something else?</p>
+<p><strong>Answer:</strong> It is a well-known fact that unit type of text is number.
 Actually I don't know why &nbsp; :-)
-But you definnitely should use the `Number` property.
-Each Parameter object also has a `StorageType` property.
-In case of a Yes/No parameter, its value is `Integer`.
-In case of Text parameter, `String`.
-I hope this solves your problem.
-
-**Response:** Well, sorry for my ignorance but seemingly there is still one 'minor' issue left for me to be answered:
-
+But you definnitely should use the <code>Number</code> property.
+Each Parameter object also has a <code>StorageType</code> property.
+In case of a Yes/No parameter, its value is <code>Integer</code>.
+In case of Text parameter, <code>String</code>.
+I hope this solves your problem.</p>
+<p><strong>Response:</strong> Well, sorry for my ignorance but seemingly there is still one 'minor' issue left for me to be answered:</p>
 <pre class="code">
 var option = new ExternalDefinitionCreationOptions("ExampleParamForge", SpecTypeId.XXX???);
 var definition = definitionGroup.Definitions.Create(option);
 </pre>
 
-Using SpecTypeId.Number creates a Parameter that has the "Type of Parameter" set to Number (obviously!, right?)
-
-How do I create a simple TEXT Parameter definition using the Revit 2022 API?
-
-There must be something here that I am missing.
-
-**Answer:** To create a text parameter, please use `SpecTypeId.String.Text`.
-
-For context, the `ForgeTypeId` properties directly in the `SpecTypeId` class identify the measurable data types, like `SpecTypeId.Length` or `SpecTypeId.Mass`.
-The non-measurable data types are organized into nested classes within `SpecTypeId`, like `SpecTypeId.String.Text`, `SpecTypeId.Boolean.YesNo`, `SpecTypeId.Int.Integer`, or `SpecTypeId.Reference.Material`.
-
-Regarding text parameters that report their type as "Number", here's the history:
-
-- Prior to Revit 2021, a `Definition` had a `UnitType` and a `ParameterType`.
-  The `UnitType` property was only meaningful for parameters with measurable `ParameterType` values, and a parameter with `ParameterType.Text` would report a meaningless `UnitType.Number` value.
-- Revit 2021 deprecated the `UnitType` property and replaced it with the `GetSpecTypeId` method.
-  But the behavior remained the same &ndash; a parameter with `ParameterType.Text` would have `GetSpecTypeId` == `SpecTypeId.Number`.
-- Revit 2022 deprecated the `ParameterType` property and the `GetSpecTypeId` method, replacing them both with the `GetDataType` method.
-  A parameter with `ParameterType.Text` will report `GetDataType()` == `SpecTypeId.String.Text`.
-  Side note: The `GetDataType` method can also return a category identifier, indicating a Family Type parameter of that category.
-
-Many thanks to Maxim and David for their clarification!
-
-####<a name="3"></a> Multi-Target 2021 and 2022 Using MSBuild
-
-Josiah Offord very kindly shared hiw solution to implement a multi-target add-in for several releases of Revit
-using [the Microsoft Build Engine MSBuild](https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild) in both
-a [comment](https://thebuildingcoder.typepad.com/blog/2018/06/multi-targeting-revit-versions-cad-terms-texture-maps.html#comment-5339799009)
-on [multi-targeting Revit Versions using `TargetFrameworks`](https://thebuildingcoder.typepad.com/blog/2018/06/multi-targeting-revit-versions-cad-terms-texture-maps.html#2) and in a dedicated [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [multi-targeting 2021 and 2022 using `MSBuild`](https://forums.autodesk.com/t5/revit-api-forum/multi-target-2021-and-2022-using-msbuild/m-p/10235037):
-
-For those interested, you can configure a `.csproj` to multi-target both 2021 and 2022 on .NET Framework 4.8 using MSBuild.
-I posted this on a comment in The Building Codeer blog and figured it'd be useful here too.
-
-The first task is to choose what .NET 4.8 add-in you want to actively program against.
+<p>Using SpecTypeId.Number creates a Parameter that has the "Type of Parameter" set to Number (obviously!, right?)</p>
+<p>How do I create a simple TEXT Parameter definition using the Revit 2022 API?</p>
+<p>There must be something here that I am missing.</p>
+<p><strong>Answer:</strong> To create a text parameter, please use <code>SpecTypeId.String.Text</code>.</p>
+<p>For context, the <code>ForgeTypeId</code> properties directly in the <code>SpecTypeId</code> class identify the measurable data types, like <code>SpecTypeId.Length</code> or <code>SpecTypeId.Mass</code>.
+The non-measurable data types are organized into nested classes within <code>SpecTypeId</code>, like <code>SpecTypeId.String.Text</code>, <code>SpecTypeId.Boolean.YesNo</code>, <code>SpecTypeId.Int.Integer</code>, or <code>SpecTypeId.Reference.Material</code>.</p>
+<p>Regarding text parameters that report their type as "Number", here's the history:</p>
+<ul>
+<li>Prior to Revit 2021, a <code>Definition</code> had a <code>UnitType</code> and a <code>ParameterType</code>.
+  The <code>UnitType</code> property was only meaningful for parameters with measurable <code>ParameterType</code> values, and a parameter with <code>ParameterType.Text</code> would report a meaningless <code>UnitType.Number</code> value.</li>
+<li>Revit 2021 deprecated the <code>UnitType</code> property and replaced it with the <code>GetSpecTypeId</code> method.
+  But the behavior remained the same &ndash; a parameter with <code>ParameterType.Text</code> would have <code>GetSpecTypeId</code> == <code>SpecTypeId.Number</code>.</li>
+<li>Revit 2022 deprecated the <code>ParameterType</code> property and the <code>GetSpecTypeId</code> method, replacing them both with the <code>GetDataType</code> method.
+  A parameter with <code>ParameterType.Text</code> will report <code>GetDataType()</code> == <code>SpecTypeId.String.Text</code>.
+  Side note: The <code>GetDataType</code> method can also return a category identifier, indicating a Family Type parameter of that category.</li>
+</ul>
+<p>Many thanks to Maxim and David for their clarification!</p>
+<h4><a name="3"></a> Multi-Target 2021 and 2022 Using MSBuild</h4>
+<p>Josiah Offord very kindly shared hiw solution to implement a multi-target add-in for several releases of Revit
+using <a href="https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild">the Microsoft Build Engine MSBuild</a> in both
+a <a href="https://thebuildingcoder.typepad.com/blog/2018/06/multi-targeting-revit-versions-cad-terms-texture-maps.html#comment-5339799009">comment</a>
+on <a href="https://thebuildingcoder.typepad.com/blog/2018/06/multi-targeting-revit-versions-cad-terms-texture-maps.html#2">multi-targeting Revit Versions using <code>TargetFrameworks</code></a> and in a dedicated <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/multi-target-2021-and-2022-using-msbuild/m-p/10235037">multi-targeting 2021 and 2022 using <code>MSBuild</code></a>:</p>
+<p>For those interested, you can configure a <code>.csproj</code> to multi-target both 2021 and 2022 on .NET Framework 4.8 using MSBuild.
+I posted this on a comment in The Building Codeer blog and figured it'd be useful here too.</p>
+<p>The first task is to choose what .NET 4.8 add-in you want to actively program against.
 There can only be one active add-in per .NET framework as far as I know.
-In this example, I'm setting my default to Revit 2022 using the custom `RevitVersion` property if it hasn't been configured yet.
-
+In this example, I'm setting my default to Revit 2022 using the custom <code>RevitVersion</code> property if it hasn't been configured yet.</p>
 <pre class="code">
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop" InitialTargets="Test">
   ...
@@ -175,8 +161,7 @@ In this example, I'm setting my default to Revit 2022 using the custom `RevitVer
   </PropertyGroup>
 </pre>
 
- Next, define configurations changes per each version.
-
+<p>Next, define configurations changes per each version.</p>
 <pre class="code">
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -209,8 +194,7 @@ In this example, I'm setting my default to Revit 2022 using the custom `RevitVer
   </PropertyGroup>
 </pre>
 
-Next, load the proper dll references for each version.
-
+<p>Next, load the proper dll references for each version.</p>
 <pre class="code">
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="AdWindows">
@@ -303,8 +287,7 @@ Next, load the proper dll references for each version.
   </ItemGroup>
 </pre>
 
-At the end, you need to configure an additional build for whatever .NET 4.8 Revit add-in you didn't set as the default above. This is nice because it will catch build errors even though the active .NET 4.8 version is something else.
-
+<p>At the end, you need to configure an additional build for whatever .NET 4.8 Revit add-in you didn't set as the default above. This is nice because it will catch build errors even though the active .NET 4.8 version is something else.</p>
 <pre class="code">
   <Target Name="Test">
     <Message Importance="high" Text="-- Building $(MSBuildProjectFile), TF = $(TargetFramework), Config = $(Configuration), Revit Version = $(RevitVersion) --" />
@@ -315,59 +298,42 @@ At the end, you need to configure an additional build for whatever .NET 4.8 Revi
   </Target>
 </pre>
 
-Side note:
+<p>Side note:
 Using a multi-target solution means you need to keep references to all the old versions of Revit.
-Be sure to copy out the needed dlls before removing that Revit version from your machine.
-
-Hope this helps.
-
-Thank you very much, Josiah, for this important and timely advice!
-
-####<a name="4"></a> PDF Export Default Paper Format Can Fail
-
-The new built-in PDF export is a certainly a very useful feature in Revit 2022 and has gathered a lot of interest.
-
-Unfortunately, it also caused some misunderstandings, and a first problem was discovered and described in the thread 
-on [Revit 2022 PDF export fails with paper format set as default with other parameters](https://forums.autodesk.com/t5/revit-api-forum/revit-2022-pdf-export-fails-with-paper-format-set-as-default/m-p/10223281).
-
-The title says it all, and the development team explain:
-
-By design, if PaperFormat is default, then PaperPlacement should always be Center.
+Be sure to copy out the needed dlls before removing that Revit version from your machine.</p>
+<p>Hope this helps.</p>
+<p>Thank you very much, Josiah, for this important and timely advice!</p>
+<h4><a name="4"></a> PDF Export Default Paper Format Can Fail</h4>
+<p>The new built-in PDF export is a certainly a very useful feature in Revit 2022 and has gathered a lot of interest.</p>
+<p>Unfortunately, it also caused some misunderstandings, and a first problem was discovered and described in the thread 
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-2022-pdf-export-fails-with-paper-format-set-as-default/m-p/10223281">Revit 2022 PDF export fails with paper format set as default with other parameters</a>.</p>
+<p>The title says it all, and the development team explain:</p>
+<p>By design, if PaperFormat is default, then PaperPlacement should always be Center.
 However, there is no restriction ensuring this on the API side.
-We should either silently set PaperPlacement to Center during export, or throw  an exception notifying the add-in about this.
-
-Currently, in this case, nothing happens and no warning or eror is raised.
-
-####<a name="5"></a> PDF Export Output File Naming
-
-Another thread question
-why [2022 PDF exporter can't use the "sheet number" parameter](https://forums.autodesk.com/t5/revit-api-forum/2022-pdf-exporter-cant-use-quot-sheet-number-quot-parameter/m-p/10220287).
-
-Apparently, you have to be sure that the Sheet Number parameter from the "Parameter Type" drop down menu is selected from the Sheet type fields.
-
-Also, if the sheet has no revision the filename, the words 'Current revision' may be inserted into the filename instead.
-
-The development team confirm this fallback behaviour; if the parameter you selected is empty, it will fill the parameter name (Sample Value) in the filename.
-
-The sheet number in the parameter set is confusing due to the parameter type.
+We should either silently set PaperPlacement to Center during export, or throw  an exception notifying the add-in about this.</p>
+<p>Currently, in this case, nothing happens and no warning or eror is raised.</p>
+<h4><a name="5"></a> PDF Export Output File Naming</h4>
+<p>Another thread question
+why <a href="https://forums.autodesk.com/t5/revit-api-forum/2022-pdf-exporter-cant-use-quot-sheet-number-quot-parameter/m-p/10220287">2022 PDF exporter can't use the "sheet number" parameter</a>.</p>
+<p>Apparently, you have to be sure that the Sheet Number parameter from the "Parameter Type" drop down menu is selected from the Sheet type fields.</p>
+<p>Also, if the sheet has no revision the filename, the words 'Current revision' may be inserted into the filename instead.</p>
+<p>The development team confirm this fallback behaviour; if the parameter you selected is empty, it will fill the parameter name (Sample Value) in the filename.</p>
+<p>The sheet number in the parameter set is confusing due to the parameter type.
 The designed scenario is: the customer will use this parameter only in either sheet or view, not in both of them.
-If you select a mixed type of both view and sheet with this parameter, one parameter will fallback to its name due to its absence in the view type.
-
-####<a name="6"></a> Five Beginner Mistakes
-
-Taing a quick look beyond Revit and .NET development for the desktop, the article
-on [5 mistakes beginner web developers make &ndash; and how to fix them](https://www.freecodecamp.org/news/common-mistakes-beginning-web-development-students-make) addresses
+If you select a mixed type of both view and sheet with this parameter, one parameter will fallback to its name due to its absence in the view type.</p>
+<h4><a name="6"></a> Five Beginner Mistakes</h4>
+<p>Taing a quick look beyond Revit and .NET development for the desktop, the article
+on <a href="https://www.freecodecamp.org/news/common-mistakes-beginning-web-development-students-make">5 mistakes beginner web developers make &ndash; and how to fix them</a> addresses
 topics that are of use in a non-web environment as well, and that I actually adhere to pretty strictly myself on all platforms
-&ndash; possibly excepting the last &ndash; I am still practicing that:
-
-- Avoid spaces in file names
-- Respect case sensitivity
-- Understand file paths
-- Name the default page `index`
-- Take a break
-
-<center>
+&ndash; possibly excepting the last &ndash; I am still practicing that:</p>
+<ul>
+<li>Avoid spaces in file names</li>
+<li>Respect case sensitivity</li>
+<li>Understand file paths</li>
+<li>Name the default page <code>index</code></li>
+<li>Take a break</li>
+</ul>
+<p><center>
 <img src="/p/2016/2016-01-03_wildhaus/791_jeremy_reading_cropped.jpg" alt="Taking a break and reading in the Swiss winter sun" width="500">
-</center>
-
+</center></p>
 <!-- mexico siesta  sombrero -->
