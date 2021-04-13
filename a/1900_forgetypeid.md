@@ -81,7 +81,8 @@ on [Revit 2022 ParameterType.Text to ForgeTypeId](https://forums.autodesk.com/t5
 The 'old' code has a line like this:
 
 <pre class="code">
-if (parameter.Definition.ParameterType == ParameterType.Text)  ....
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;parameter.Definition.ParameterType&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;==&nbsp;ParameterType.Text&nbsp;)&nbsp;&nbsp;...
 </pre>
 
 What would be the 2022 equivalent for it?
@@ -89,14 +90,14 @@ What would be the 2022 equivalent for it?
 It seems that the left side may be:
 
 <pre class="code">
-if (parameter.Definition.GetDataType() == ????)  ....
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;parameter.Definition.GetDataType()&nbsp;==&nbsp;????)&nbsp;&nbsp;....
 </pre>
 
 But, for some reason, I cannot find what do I have to use on right side of the operation 😞 There must be something I am overlooking.
 
 **Answer:** To perform this check you need to create instance of ForgeTypeId class. Use one of the SpecTypeId's properties to get value to compare with. In your case (for text parameter) you need Number property:
 
-<pre class="code">
+<pre class="prettyprint">
 >>> element.Parameter[BuiltInParameter.ALL_MODEL_MARK].Definition.GetSpecTypeId() == SpecTypeId.Number
 True
 </pre>
@@ -136,8 +137,11 @@ I hope this solves your problem.
 **Response:** Well, sorry for my ignorance but seemingly there is still one 'minor' issue left for me to be answered:
 
 <pre class="code">
-var option = new ExternalDefinitionCreationOptions("ExampleParamForge", SpecTypeId.XXX???);
-var definition = definitionGroup.Definitions.Create(option);
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;option&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;ExternalDefinitionCreationOptions(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;ExampleParamForge&quot;</span>,&nbsp;SpecTypeId.XXX&nbsp;???);
+ 
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;definition&nbsp;=&nbsp;definitionGroup.Definitions.Create(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;option&nbsp;);
 </pre>
 
 Using SpecTypeId.Number creates a Parameter that has the "Type of Parameter" set to Number (obviously!, right?)
