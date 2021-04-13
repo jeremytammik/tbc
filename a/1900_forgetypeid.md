@@ -9,15 +9,17 @@
 - revit 2022 migrate ParameterType
   https://autodesk.slack.com/archives/C0SR6NAP8/p1615984937008800
   https://wiki.autodesk.com/pages/viewpage.action?spaceKey=aeceng&title=Revit+API+Changes+2022
-ForgeTypeId how to use https://forums.autodesk.com/t5/revit-api-forum/forgetypeid-how-to-use/td-p/9439210
-Revit 2022: ParameterType.Text to ForgeTypeId https://forums.autodesk.com/t5/revit-api-forum/revit-2022-parametertype-text-to-forgetypeid/m-p/10225741
-https://forums.autodesk.com/t5/revit-api-forum/revit-2022-parametertype-text-to-forgetypeid/m-p/10227398
-
-- 
-https://forums.autodesk.com/t5/revit-api-forum/2022-pdf-exporter-cant-use-quot-sheet-number-quot-parameter/m-p/10220287
+  ForgeTypeId how to use https://forums.autodesk.com/t5/revit-api-forum/forgetypeid-how-to-use/td-p/9439210
+  Revit 2022: ParameterType.Text to ForgeTypeId https://forums.autodesk.com/t5/revit-api-forum/revit-2022-parametertype-text-to-forgetypeid/m-p/10225741
+  https://forums.autodesk.com/t5/revit-api-forum/revit-2022-parametertype-text-to-forgetypeid/m-p/10227398
 
 - josiah comment
   https://thebuildingcoder.typepad.com/blog/2018/06/multi-targeting-revit-versions-cad-terms-texture-maps.html#comment-5339799009
+  Multi-Target 2021 and 2022 Using MSBuild
+  https://forums.autodesk.com/t5/revit-api-forum/multi-target-2021-and-2022-using-msbuild/m-p/10235037
+
+- 
+https://forums.autodesk.com/t5/revit-api-forum/2022-pdf-exporter-cant-use-quot-sheet-number-quot-parameter/m-p/10220287
 
 - VisualStudioRevitAddinWizard 2022
   https://forums.autodesk.com/t5/revit-api-forum/visualstudiorevitaddinwizard-2022/m-p/10233833
@@ -155,7 +157,181 @@ Regarding text parameters that report their type as "Number", here's the history
 
 Many thanks to Maxim and David for their clarification!
 
-####<a name="3"></a> 
+####<a name="3"></a> Multi-Target 2021 and 2022 Using MSBuild
+
+Josiah Offord very kindly shared hiw solution to implement a multi-target add-in for several releases of Revit
+using [the Microsoft Build Engine MSBuild](https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild) in both
+a [comment](https://thebuildingcoder.typepad.com/blog/2018/06/multi-targeting-revit-versions-cad-terms-texture-maps.html#comment-5339799009)
+on [multi-targeting Revit Versions using `TargetFrameworks`](https://thebuildingcoder.typepad.com/blog/2018/06/multi-targeting-revit-versions-cad-terms-texture-maps.html#2) and in a dedicated [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [multi-targeting 2021 and 2022 using `MSBuild`](https://forums.autodesk.com/t5/revit-api-forum/multi-target-2021-and-2022-using-msbuild/m-p/10235037):
+
+For those interested, you can configure a `.csproj` to multi-target both 2021 and 2022 on .NET Framework 4.8 using MSBuild.
+I posted this on a comment in The Building Codeer blog and figured it'd be useful here too.
+
+The first task is to choose what .NET 4.8 add-in you want to actively program against.
+There can only be one active add-in per .NET framework as far as I know.
+In this example, I'm setting my default to Revit 2022 using the custom `RevitVersion` property if it hasn't been configured yet.
+
+<pre class="code">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop" InitialTargets="Test">
+  ...
+  <PropertyGroup>
+    <TargetFrameworks>net461;net47;net472;net48</TargetFrameworks>
+    <Configurations>Debug;Release</Configurations>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RevitVersion Condition=" '$(RevitVersion)' == '' ">2022</RevitVersion>
+    ...
+  </PropertyGroup>
+</pre>
+
+ Next, define configurations changes per each version.
+
+<pre class="code">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DefineConstants>DEBUG;REVIT2018</DefineConstants>
+    <OutputPath>bin\$(Configuration)\2018\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net47' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DefineConstants>$(DefineConstants);REVIT2019</DefineConstants>
+    <OutputPath>bin\$(Configuration)\2019</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net472' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DefineConstants>$(DefineConstants);REVIT2020</DefineConstants>
+    <OutputPath>bin\$(Configuration)\2020\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net48' And '$(RevitVersion)' == '2021' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DefineConstants>$(DefineConstants);REVIT2021</DefineConstants>
+    <OutputPath>bin\$(Configuration)\2021</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net48' And '$(RevitVersion)' == '2022' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DefineConstants>$(DefineConstants);REVIT2022</DefineConstants>
+    <OutputPath>bin\$(Configuration)\2022</OutputPath>
+  </PropertyGroup>
+</pre>
+
+Next, load the proper dll references for each version.
+
+<pre class="code">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <Reference Include="AdWindows">
+      <HintPath>C:\Program Files\Autodesk\Revit 2018\AdWindows.dll</HintPath>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="RevitAPI">
+      <HintPath>C:\Program Files\Autodesk\Revit 2018\RevitAPI.dll</HintPath>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>C:\Program Files\Autodesk\Revit 2018\RevitAPIUI.dll</HintPath>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net47' ">
+    <Reference Include="AdWindows">
+      <HintPath>C:\Program Files\Autodesk\Revit 2019\AdWindows.dll</HintPath>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="RevitAPI">
+      <HintPath>C:\Program Files\Autodesk\Revit 2019\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>C:\Program Files\Autodesk\Revit 2019\RevitAPIUI.dll</HintPath>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
+    <Reference Include="AdWindows">
+      <HintPath>C:\Program Files\Autodesk\Revit 2020\AdWindows.dll</HintPath>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="RevitAPI">
+      <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' And '$(RevitVersion)' == '2021' ">
+    <Reference Include="AdWindows">
+      <HintPath>C:\Program Files\Autodesk\Revit 2021\AdWindows.dll</HintPath>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="RevitAPI">
+      <HintPath>C:\Program Files\Autodesk\Revit 2021\RevitAPI.dll</HintPath>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>C:\Program Files\Autodesk\Revit 2021\RevitAPIUI.dll</HintPath>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' And '$(RevitVersion)' == '2022' ">
+    <Reference Include="AdWindows">
+      <HintPath>C:\Program Files\Autodesk\Revit 2022\AdWindows.dll</HintPath>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="RevitAPI">
+      <HintPath>C:\Program Files\Autodesk\Revit 2022\RevitAPI.dll</HintPath>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>C:\Program Files\Autodesk\Revit 2022\RevitAPIUI.dll</HintPath>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</pre>
+
+At the end, you need to configure an additional build for whatever .NET 4.8 Revit add-in you didn't set as the default above. This is nice because it will catch build errors even though the active .NET 4.8 version is something else.
+
+<pre class="code">
+  <Target Name="Test">
+    <Message Importance="high" Text="-- Building $(MSBuildProjectFile), TF = $(TargetFramework), Config = $(Configuration), Revit Version = $(RevitVersion) --" />
+  </Target>
+  <Target Name="Build2021" BeforeTargets="DispatchToInnerBuilds">
+    <Message Importance="high" Text="*** running pre-dispatch builds ***" />
+    <MSBuild Projects="myProject.csproj" Properties="Configuration=$(Configuration);TargetFramework=net48;RevitVersion=2021"></MSBuild>
+  </Target>
+</pre>
+
+Side note:
+Using a multi-target solution means you need to keep references to all the old versions of Revit.
+Be sure to copy out the needed dlls before removing that Revit version from your machine.
+
+Hope this helps.
+
+Thank you very much, Josiah, for this important and timely advice!
 
 ####<a name="4"></a>
 
