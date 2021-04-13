@@ -31,69 +31,23 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### ParameterType
+### ParameterType to ForgeTypeId
 
-Revit 2022 has been released:
 
-- [Revit 2022 released](#2)
-- [Revit 2022 SDK coming soon](#3)
-- [What's new](#4)
-- [Enhancements](#5)
-- [Bimsmith take](#6)
-- [Microservices and serverless architecture](#7)
-- [Questioning the standard model theory](#8)
+####<a name="2"></a> 
 
-####<a name="2"></a> Revit 2022 Released
 
-Revit 2022 and Revit LT 2022 have now been released.
+Revit 2022 has been released and the time has come to migrate to the new version.
 
-Along with these products, the following addons are also available:
 
-- Revit DB Link 2022
-- Roombook Areabook Buildingbook for Revit 2022
-- Lighting Analysis for Revit 2022
-- Solar Analysis for Revit 2022
-- Robot Structural Analysis Extension for Revit 2022
-- BIM Interoperability Tools v8.0.7744.0 for Revit 2022
-- Revit InfraWorks Updater 2022
+https://forums.autodesk.com/t5/revit-api-forum/2022-pdf-exporter-cant-use-quot-sheet-number-quot-parameter/m-p/10220287
 
-Additional Addons, Content Packs and Revit Server are continuing to go live.
 
-Let's take a look at some of the enhancements.
 
-First, a quick note on the SDK.
+####<a name="3"></a> 
 
-####<a name="3"></a> Revit 2022 SDK Coming Soon
+####<a name="4"></a> 
 
-The official Revit 2022 SDK has not yet been released.
-
-Interestingly enough, though, I just noticed that
-an unofficial [NuGet package of the Autodesk.Revit.SDK](https://www.nuget.org/packages/Autodesk.Revit.SDK) version 2022.0.0.2001
-&ndash; that I would assume is for Revit 2022 &ndash; was made available already a month ago, cf.
-the [comment by Maxence](https://thebuildingcoder.typepad.com/blog/2021/04/revit-2022-released.html#comment-5335162103) below.
-
-I haven't looked at that myself, though.
-
-Back to the official material on the product itself, first:
-
-####<a name="4"></a> What's New
-
-The official blog post
-on [What’s New in Revit 2022](https://blogs.autodesk.com/revit/2021/04/06/whats-new-in-revit-2022) lists
-the following main areas of enhancement:
-
-- Interoperability
-- Documentation efficiency
-- Design productivity
-- Developer tools
-
-The latter include:
-
-- Dynamo 2.10.1 with new nodes for Revit Documentation
-- Point Cloud API
-- Sketch API
-- Viewport Label on Sheet API
-- API for Mapping Cloud Model with Docs URNS
 
 Some other important areas do not appear in this list:
 
@@ -102,107 +56,15 @@ Some other important areas do not appear in this list:
 
 ####<a name="5"></a> Enhancements
 
-The official [release notes list of enhancements](https://knowledge.autodesk.com/support/revit-products/learn-explore/caas/CloudHelp/cloudhelp/2022/ENU/RevitReleaseNotes/files/2022release/RevitReleaseNotes-2022release-Enhancements-html-html.html) is
-too long to include here in its entirety.
-I just picked out the main API-related ones.
-Most UI-related enhancements that are not listed below are also reflected in the API, of course:
+Ceiling and Floor creation
+Revit Cloud Model (workshared)
+Parameters
+Sketch API:  SketchEditScope API, Sketch.GetAllElements, Sketch.OwnerId, Ceiling.SketchId, Opening.SketchId, Wall.SketchId,
 
-- Added new API method Sketch.GetAllElements() to access ElementId of all elements owned by Sketch (ModelCurve, ReferencePlane, Dimension).
-- Ceiling: Implemented SketchEditScope API to modify sketch-based elements, exposed Ceiling.SketchId property to get the Ceiling Sketch ID, and implemented Ceiling.Create() method to create a new ceiling.
-- Foundation: Added IsClosed method to API Mesh class.
-- Macros: Removed the Ruby Macro for Revit.
-- Point Clouds: Expose single entry point from Revit API for ReCap SDK so that Revit API user can access ReCap managed API.
-- Sketching: Exposed Sketch.OwnerId property to public API.
-- View: Exposed new View Title API: Viewport.LabelOffset and Viewport.LabelLineLength.
-- Wall: Exposed Wall.SketchId property to public API and new methods: to create wall profile Wall.CreateProfileSketch(); method to reset wall profile Wall.RemoveProfileSketch(); method to check whether wall can have a profile Wall.CanHaveProfileSketch().
-- DirectShape Elements
-    - Added new API to provide user-defined identifiers for geometry in DirectShapes via ExternallyTaggedGeometry.
-    - Added new API to provide user-defined identifiers for faces and edges created while using a BRepBuilder.
-    - Improved import of 3DM to handle more complex models which use repeated geometry.
-    - Added API to support adding nameable reference geometry to DirectShapes.
-    - Changed the default Family name for DirectShapes to "Direct Shape" and enabled a custom Family name to be specified for DirectShapeType via API.
-- Dynamo
-    - Dynamo Player: Updated npm dependency to address security protocol.
-    - Upgraded Dynamo for Revit to Dynamo core 2.10.1 with new functionalities at [https://github.com/DynamoDS/Dynamo/wiki/Release-Notes#2101].
-    - Enhanced the ability of working with annotations in Dynamo for Revit.
-    - Enhanced the ability of working with views in Dynamo for Revit.
-    - Enhanced the ability of working with sheets in Dynamo for Revit.
-    - Fixed a tooltip issue for ExportOptions in the ScheduleView.Export node.
-- Floor
-    - Exposed Opening.SketchId property to the public API. Allowed editing of Shaft openings (opening between two Levels) by SketchEditScope.
-    - New API Level.GetNearestLevelId() methods to get closest Level at specified elevation.
-    - Implement new Floor.Create() methods. Marked floor creation methods in Document.Create as obsoleted. Implemented Floor.GetDefaultFloorType() and Level.GetNearestLevelId() API methods.
-- Parameters
-    - Renamed the following values in the Autodesk.Revit.DB.BuiltInParameterGroup enumeration:   PG_TERMINTATION to PG_TERMINATION, PG_AELECTRICAL to PG_ELECTRICAL, and PG_ELECTRICAL to PG_ELECTRICAL_ENGINEERING. PG_ELECTRICAL now identifies the parameter group "Electrical", so applications which do not adjust will find their parameters moved from "Electrical Engineering" to "Electrical".
-    - Deprecated the ParameterType enumeration. Added static methods to the Parameter class to retrieve all parameter, group, and spec identifiers.
-    - LabelUtils.GetLabelForSpec(ForgeTypeId) has been changed to support non-measurable specs. Definition.GetSpecTypeId() has been deprecated in favor of Definition.GetDataType().
-    - Added three static methods for accessing ForgeTypeId identifiers for built-in categories in the Revit API class Category: static ForgeTypeId GetBuiltInCategoryTypeId(BuiltInCategory), static BuiltInCategory GetBuiltInCategory(ForgeTypeId), and static bool IsBuiltInCategory(ForgeTypeId).
-    - In class Category, added three static methods for accessing ForgeTypeId identifiers for built-in categories:
-        - static ForgeTypeId GetBuiltInCategoryTypeId(BuiltInCategory)
-        - static BuiltInCategory GetBuiltInCategory(ForgeTypeId)
-        - static bool IsBuiltInCategory(ForgeTypeId)
-    - Deprecated UnitGroup enumeration. Use ForgeTypeId instead. References to specific values of the UnitGroup enumeration may be replaced with references to the properties of new class DisciplineTypeId. Deprecated method UnitUtils.GetUnitGroup(ForgeTypeId). Use new method UnitUtils.GetDiscipline(ForgeTypeId) instead. Added new method LabelUtils.GetLabelForDiscipline(ForgeTypeId). Added new method UnitUtils.GetAllDisciplines().
-    - Deprecated UnitGroup enumeration. Use ForgeTypeId instead. References to specific values of the UnitGroup enumeration may be replaced with references to the properties of new class DisciplineTypeId.
-    - Deprecated method UnitUtils.GetUnitGroup(ForgeTypeId). Use new method UnitUtils.GetDiscipline(ForgeTypeId) instead.
-    - Added new method LabelUtils.GetLabelForDiscipline(ForgeTypeId).
-    - Added new method UnitUtils.GetAllDisciplines().
-    - Deprecated Revit API functions based on the ParameterType enumeration in favor of new functions based on the ForgeTypeId class.
-    - Improved Revit API functionality related to Family Type shared parameters.
-    - Added ForgeTypeId constants to nested classes Boolean, Int, Reference, and String within the SpecTypeId class identifying non-floating-point parameter data types.
-- Revit Cloud Model (workshared)
-    - Improved the API WorksharingUtils.GetUserWorksetInfo() efficiency in Revit cloud models.
-    - Improved clarity of exceptions potentially raised when using the cloud model link API.
-    - Provided exceptions for cloud model initiate API.
-    - Updated the PostableCommand enum API to reflect the latest status of Revit commands.
-    - Provided API to initiate workshared cloud models.
-    - Removed 2 obsolete API: ModelPathUtils.ConvertCloudGUIDsToCloudPath(Guid projectId, Guid modelId) and Document.SaveAsCloudModel(String folderId, String modelName).
-    - Extended existing API Document.SaveAsCloudModel() to initiate workshared cloud models.
-    - Provided Revit API for linking cloud models.
+    
 
-####<a name="6"></a> Bimsmith Take
-
-Bimsmith picks a different set of top features in the overview
-of [What's New in Revit 2022 &ndash; top new features in Autodesk Revit 2022](https://blog.bimsmith.com/Whats-New-in-Revit-2022-Top-New-Features-in-Autodesk-Revit-2022):
-
-- Revit built-in PDF exporter
-- Show wall core only
-- Tapered walls
-- Filter by family and type in schedule view
-- Split schedule across sheets
-- Remember last used tab in material browser
-- Load Autodesk family navigation tools
-- Revision numbering enhancements
-- Multiple value indication
-- Grids as reference in 3D views
-
-####<a name="7"></a> Microservices and Serverless Architecture
-
-Now for some non-Revit stuff:
-
-Are you interested in microservices and serverless architecture?
-
-MongoDB provides a whitepaper on the topic,
-[The Object Oriented Guide to Microservices and Serverless Architecture](https://www.mongodb.com/collateral/download-the-oo-guide-to-microservices-and-serverless-architecture)
-
-> Serverless application architecture is a logical extension of the microservices trend toward smaller and smaller services.
-
-> We look at how web application architecture is changing, by looking through an Object Oriented Design lens at the principles driving change in today’s market.
-
-####<a name="8"></a> Questioning the Standard Model Theory
-
-An [intriguing new result from the LHCb experiment at CERN](https://home.cern/news/news/physics/intriguing-new-result-lhcb-experiment-cern)
-strengthens hints of a violation of lepton flavour universality.
-LHCb, the *Large Hadron Collider beauty* collaboration experiment at CERN, announced new results which, if confirmed, would suggest hints of a violation of the Standard Model of particle physics.
-  
-The [Standard Model](https://home.cern/science/physics/standard-model) explains
-how the basic building blocks of matter interact, governed by four fundamental forces.
-
-> The theories and discoveries of thousands of physicists since the 1930s have resulted in a remarkable insight into the fundamental structure of matter:
-everything in the universe is found to be made from a few basic building blocks called fundamental particles, governed by four fundamental forces.
-Our best understanding of how these particles and three of the forces are related to each other is encapsulated in the Standard Model of particle physics.
-Developed in the early 1970s, it has successfully explained almost all experimental results and precisely predicted a wide variety of phenomena.
-Over time and through many experiments, the Standard Model has become established as a well-tested physics theory.
+####<a name="6"></a> 
 
 <center>
-<img src="img/standard_model.png" alt="Standard model" title="Standard model" width="600"/> <!-- 600 -->
+<img src="img/.png" alt="" title="" width="1200"/> <!-- 600 -->
 </center>
