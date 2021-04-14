@@ -36,8 +36,13 @@ twitter:
 
  #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Revit 2022 has been released.
+Two important features are parameter API enhancements and built-in PDF export functionality
+&ndash; Replace deprecated <code>ParameterType</code> with <code>ForgeTypeId</code>
+&ndash; Multi-target 2021 and 2022 using MSBuild
+&ndash; PDF export default paper format can fail
+&ndash; PDF export output file naming
+&ndash; Five beginner mistakes...
 
 linkedin:
 
@@ -55,17 +60,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Replace Deprecated ParameterType with ForgeTypeId</h3>
+<h3>PDF Export, ForgeTypeId and Multi-Target Add-In</h3>
 <p>This is blog post number 1900, just fyi,
 cf. <a href="http://jeremytammik.github.io/tbc/a/#7">The Building Coder index and table of contents</a>.</p>
 <p><a href="https://thebuildingcoder.typepad.com/blog/2021/04/revit-2022-released.html">Revit 2022 has been released</a> and
 the time has come to migrate to the new version.</p>
-<p><a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a>,
+<p>Updates for <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a>,
 the <a href="https://github.com/jeremytammik/VisualStudioRevitAddinWizard">Visual Studio Revit add-in wizards</a>
 and <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> are
 in the works and not done yet... one-man-band lagging...
 all Revit 2021 add-ins should work just fine in Revit 2022 as well, though.</p>
-<p>Two important new features are the parameter API enhancements and a new built-in PDF export functionality.
+<p>Two important features are the parameter API enhancements and built-in PDF export functionality.
 Initial issues with these two have already been discussed:</p>
 <ul>
 <li><a href="#2">Replace deprecated <code>ParameterType</code> with <code>ForgeTypeId</code></a></li>
@@ -117,7 +122,7 @@ I've just checked and parameter definitions that store TEXT have a <code>SpecTyp
 <p>Same would apply to <code>YesNo</code> type parameters... <code>SpecTypeId</code> cannot be used to determine if a <code>ParameterDefinition</code> is for a <code>YesNo</code> type parameter...  </p>
 <p>And even more: The ONLY place where I can see if a parameter is a YesNo parameter is in the Parameter.Definition.ParameterType !! If ParameterType is obsolete... how to determine if a parameter is YesNo or something else?</p>
 <p><strong>Answer:</strong> It is a well-known fact that unit type of text is number.
-Actually, I don't know why &nbsp; :-)
+Actually, I don't know why &nbsp; :-) &nbsp;
 But you definitely should use the <code>Number</code> property.
 Each Parameter object also has a <code>StorageType</code> property.
 In case of a Yes/No parameter, its value is <code>Integer</code>.
