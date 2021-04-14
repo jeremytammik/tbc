@@ -104,7 +104,7 @@ It seems that the left side may be:
 &nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;parameter.Definition.GetDataType()&nbsp;==&nbsp;????)&nbsp;&nbsp;....
 </pre>
 
-But, for some reason, I cannot find what do I have to use on right side of the operation 😞 There must be something I am overlooking.
+But, for some reason, I cannot find what I have to use on right side of the operation... there must be something I am overlooking.
 
 **Answer:** To perform this check you need to create instance of ForgeTypeId class. Use one of the SpecTypeId's properties to get value to compare with. In your case (for text parameter) you need Number property:
 
@@ -129,7 +129,7 @@ The `Autodesk.Revit.DB.InternalDefinition` class has:
 - `ParameterType` &ndash; this can be: Invalid | Text | Integer | Number
 - `UnitType` &ndash; seemingly, for Text type parameters, this is `UT_Number`
 
-Now with `ParameterType` becoming obsolete, we have to use `Parameter.GetSpecTypeId` that SEEMINGLY coresponds to the `UnitType` member above, and for Text parameters like `Comment`, it has a value of `SpecTypeId.Number`!
+Now with `ParameterType` becoming obsolete, we have to use `Parameter.GetSpecTypeId` that SEEMINGLY corresponds to the `UnitType` member above, and for Text parameters like `Comment`, it has a value of `SpecTypeId.Number`!
 
 The question is: How can I know if a Parameter is Text or not in Revit 2022 &ndash; without using Definition.ParameterType ?
 
@@ -138,8 +138,8 @@ Same would apply to `YesNo` type parameters... `SpecTypeId` cannot be used to de
 And even more: The ONLY place where I can see if a parameter is a YesNo parameter is in the Parameter.Definition.ParameterType !! If ParameterType is obsolete... how to determine if a parameter is YesNo or something else?
 
 **Answer:** It is a well-known fact that unit type of text is number.
-Actually I don't know why &nbsp; :-)
-But you definnitely should use the `Number` property.
+Actually, I don't know why &nbsp; :-)
+But you definitely should use the `Number` property.
 Each Parameter object also has a `StorageType` property.
 In case of a Yes/No parameter, its value is `Integer`.
 In case of Text parameter, `String`.
@@ -171,7 +171,7 @@ Regarding text parameters that report their type as "Number", here's the history
 - Prior to Revit 2021, a `Definition` had a `UnitType` and a `ParameterType`.
   The `UnitType` property was only meaningful for parameters with measurable `ParameterType` values, and a parameter with `ParameterType.Text` would report a meaningless `UnitType.Number` value.
 - Revit 2021 deprecated the `UnitType` property and replaced it with the `GetSpecTypeId` method.
-  But the behavior remained the same &ndash; a parameter with `ParameterType.Text` would have `GetSpecTypeId` == `SpecTypeId.Number`.
+  But the behaviour remained the same &ndash; a parameter with `ParameterType.Text` would have `GetSpecTypeId` == `SpecTypeId.Number`.
 - Revit 2022 deprecated the `ParameterType` property and the `GetSpecTypeId` method, replacing them both with the `GetDataType` method.
   A parameter with `ParameterType.Text` will report `GetDataType()` == `SpecTypeId.String.Text`.
   Side note: The `GetDataType` method can also return a category identifier, indicating a Family Type parameter of that category.
@@ -180,14 +180,14 @@ Many thanks to Maxim and David for their clarification!
 
 ####<a name="3"></a> Multi-Target 2021 and 2022 Using MSBuild
 
-Josiah Offord very kindly shared hiw solution to implement a multi-target add-in for several releases of Revit
+Josiah Offord very kindly shared his solution to implement a multi-target add-in for several releases of Revit
 using [the Microsoft Build Engine MSBuild](https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild) in both
 a [comment](https://thebuildingcoder.typepad.com/blog/2018/06/multi-targeting-revit-versions-cad-terms-texture-maps.html#comment-5339799009)
 on [multi-targeting Revit Versions using `TargetFrameworks`](https://thebuildingcoder.typepad.com/blog/2018/06/multi-targeting-revit-versions-cad-terms-texture-maps.html#2) and in a dedicated [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [multi-targeting 2021 and 2022 using `MSBuild`](https://forums.autodesk.com/t5/revit-api-forum/multi-target-2021-and-2022-using-msbuild/m-p/10235037):
 
 For those interested, you can configure a `.csproj` to multi-target both 2021 and 2022 on .NET Framework 4.8 using MSBuild.
-I posted this on a comment in The Building Codeer blog and figured it'd be useful here too.
+I posted this on a comment in The Building Coder blog and figured it'd be useful here too.
 
 The first task is to choose what .NET 4.8 add-in you want to actively program against.
 There can only be one active add-in per .NET framework as far as I know.
@@ -367,7 +367,7 @@ By design, if PaperFormat is default, then PaperPlacement should always be Cente
 However, there is no restriction ensuring this on the API side.
 We should either silently set PaperPlacement to Center during export, or throw  an exception notifying the add-in about this.
 
-Currently, in this case, nothing happens and no warning or eror is raised.
+Currently, in this case, nothing happens and no warning or error is raised.
 
 ####<a name="5"></a> PDF Export Output File Naming
 
@@ -386,7 +386,7 @@ If you select a mixed type of both view and sheet with this parameter, one param
 
 ####<a name="6"></a> Five Beginner Mistakes
 
-Taing a quick look beyond Revit and .NET development for the desktop, the article
+Taking a quick look beyond Revit and .NET development for the desktop, the article
 on [5 mistakes beginner web developers make &ndash; and how to fix them](https://www.freecodecamp.org/news/common-mistakes-beginning-web-development-students-make) addresses
 topics that are of use in a non-web environment as well, and that I actually adhere to pretty strictly myself on all platforms
 &ndash; possibly excepting the last &ndash; I am still practicing that:
