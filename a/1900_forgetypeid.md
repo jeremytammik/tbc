@@ -58,9 +58,20 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Replace Deprecated ParameterType with ForgeTypeId
 
-Revit 2022 has been released and the time has come to migrate to the new version.
-Two important new features are changes to the parameter API and a new built-in PDF export functionality.
-Some initiual issues with these two have already been discussed:
+This is blog post number 1900, just fyi,
+cf. [The Building Coder index and table of contents](http://jeremytammik.github.io/tbc/a/#7).
+
+[Revit 2022 has been released](https://thebuildingcoder.typepad.com/blog/2021/04/revit-2022-released.html) and
+the time has come to migrate to the new version.
+
+[RevitLookup](https://github.com/jeremytammik/RevitLookup),
+the [Visual Studio Revit add-in wizards](https://github.com/jeremytammik/VisualStudioRevitAddinWizard)
+and [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) are
+in the works and not done yet... one-man-band lagging...
+all Revit 2021 add-ins should work just fine in Revit 2022 as well, though.
+
+Two important new features are the parameter API enhancements and a new built-in PDF export functionality.
+Initial issues with these two have already been discussed:
 
 - [Replace deprecated `ParameterType` with `ForgeTypeId`](#2)
 - [Multi-target 2021 and 2022 using MSBuild](#3)
