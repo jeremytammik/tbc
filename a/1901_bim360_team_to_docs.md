@@ -1,0 +1,120 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head>
+
+<!---
+
+- zhong
+  I have a Revit Addon sample, which demostrate migrating Revit cloud worksharing models from BIM 360 Team to BIM 360 Docs using the latest Revit API(2022). It’s a Revit plugin with integration of Forge DM, mainly target for Revit developer. Currently I put it under my personal repo at https://github.com/JohnOnSoftware/forge-rcw.file.migration-revit.addon, but I am thinking to move it to https://github.com/ADN-DevTech or https://github.com/autodesk-Forge, I think https://github.com/ADN-DevTech is better place, but your ideas?
+  Here is the blog of this sample: https://forge.autodesk.com/blog/migrate-revit-worksharing-models-bim-360-team-bim-360-docs-powered-revit-2022-cloud
+  Yes, the goal of this sample is to demonstrate the process to migrate Revit cloud worksharing models from BIM 360 Team to BIM 360 Docs, Forge related, but the core API is within Revit. Will make it clear if we put under Autodesk-Forge.
+  And for your question, normally, our tools use the process environment variable, set the environments within the command line before running the application.
+  But for the Revit plugin, since this should be running within Revit, it’s not user-friendly to running Revit every time from the command line with process environment variables setup, using user environment variable could solve this problem to make it easy, and only the user can get the environment variables…
+  The instruction for the 3 different environment variable type is: https://docs.microsoft.com/en-us/dotnet/api/system.environmentvariabletarget?view=netframework-4.8
+  zw_bim360docs_migration.png
+
+twitter:
+
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+&ndash; 
+...
+
+linkedin:
+
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+<p style="font-size: 80%; font-style:italic">
+<a href=""></a>
+</p>
+</center>
+
+-->
+
+### Revit 2022 Migrates BIM360 Team to Docs
+
+A quick note to point out one of the important new Revit 202 SDK samples and an enhancement:
+
+
+
+####<a name="2"></a>
+
+Zhong Wu published an enhancement to the Revit 2022 SDK sample
+
+[Migrate Revit Worksharing models from BIM 360 Team to BIM 360 Docs &ndash; powered by Revit 2022 Cloud Worksharing API](https://forge.autodesk.com/blog/migrate-revit-worksharing-models-bim-360-team-bim-360-docs-powered-revit-2022-cloud)
+
+I have a Revit Addon sample, which demostrate migrating Revit cloud worksharing models from BIM 360 Team to BIM 360 Docs using the latest Revit API(2022). It’s a Revit plugin with integration of Forge DM, mainly target for Revit developer. Currently I put it under my personal repo at https://github.com/JohnOnSoftware/forge-rcw.file.migration-revit.addon, but I am thinking to move it to https://github.com/ADN-DevTech or https://github.com/autodesk-Forge, I think https://github.com/ADN-DevTech is better place, but your ideas?
+
+Here is the blog of this sample: 
+
+Yes, the goal of this sample is to demonstrate the process to migrate Revit cloud worksharing models from BIM 360 Team to BIM 360 Docs, Forge related, but the core API is within Revit. Will make it clear if we put under Autodesk-Forge.
+
+And for your question, normally, our tools use the process environment variable, set the environments within the command line before running the application.
+
+But for the Revit plugin, since this should be running within Revit, it’s not user-friendly to running Revit every time from the command line with process environment variables setup, using user environment variable could solve this problem to make it easy, and only the user can get the environment variables…
+
+The instruction for the 3 different environment variable type is:
+
+https://docs.microsoft.com/en-us/dotnet/api/system.environmentvariabletarget?view=netframework-4.8
+
+In his own words:
+
+Revit 2022 was officially released on April 8th, 2021
+with [a host of new features](https://thebuildingcoder.typepad.com/blog/2021/04/revit-2022-released.html).
+
+Support for saving a Revit worksharing central model to the cloud is one important enhancement in the Revit 2022 API, using the method
+
+<pre class="code">
+  Document.SaveAsCloudModel(Guid, Guid, String, String)
+</pre>
+
+I enhanced it to support uploading a local workshared file into BIM 360 Design as a Revit Cloud Worksharing central model.
+
+The Revit 2022 SDK also includes a sample add-in *CloudAPISample* demonstrating how to use this API.
+
+I made some improvements to make it easy to use and demonstrate how to migrate your Revit cloud worksharing model from BIM 360 Team to BIM 360 Docs.
+
+It includes the following features:
+
+- Access all the contents within BIM 360 Team and Docs by logging in with your Autodesk Account
+- Download the Revit models from BIM 360 Team to a specified local folder
+- Select a target folder by navigating from BIM 360 Docs
+- Upload the Revit models from the local folder to the target folder on BIM 360 Docs
+- Reload the links to the correct model in the cloud
+
+<center>
+<img src="img/zw_bim360docs_migration.png" alt="Migrating from BIM360 Team to BIM360 Docs" title="Migrating from BIM360 Team to BIM360 Docs" width="300">
+<p style="font-size: 80%; font-style:italic">Revit Cloud Worksharing Model Migration Sample from BIM 360 Team to BIM 360 Docs</p>
+</center>
+
+The sample tool source code, full documentation and demo is hosted in
+the [forge-rcw.file.migration-revit.addon GitHub repository](https://github.com/JohnOnSoftware/forge-rcw.file.migration-revit.addon).
+
+Enjoy coding with Revit & Forge & BIM360, and please feel free to enhance the sample based on your needs. 
+
+Ever so many thanks to Zhong for implementing and sharing this useful and important utility!
+
+
+
+**Question:** 
+
+
+<pre class="code">
+</pre>
+
+
+**Answer:**
+
+**Response:** 
+
+
+####<a name="3"></a> 
+
