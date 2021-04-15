@@ -41,7 +41,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Revit 2022 Migrates BIM360 Team to Docs
 
-We continue the foray into Revit 2022 enhancements with a real-world migration tool using the new SaveAsCloudModel functionality and the flat migration of RevitLookup:
+We continue the foray into Revit 2022 enhancements with a real-world migration tool using the new `SaveAsCloudModel` functionality and the flat migration of RevitLookup:
 
 - [Save as cloud model from BIM360 Team to Docs](#2)
 - [RevitLookup 2022](#3)
@@ -86,7 +86,8 @@ It includes the following features:
 The sample tool source code, full documentation and demo is hosted in
 the [forge-rcw.file.migration-revit.addon GitHub repository](https://github.com/JohnOnSoftware/forge-rcw.file.migration-revit.addon).
 
-Enjoy coding with Revit & Forge & BIM360, and please feel free to enhance the sample based on your needs. 
+Enjoy coding with Revit, Forge and BIM360, and please feel free to enhance the sample based on your needs.
+Pull requests are always welcome.
 
 Ever so many thanks to Zhong for implementing and sharing this useful and important utility!
 
