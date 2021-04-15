@@ -130,5 +130,5 @@ I wish you easy sailing and much success in your own migration work.
 A quite poetic librarian's recommendation to stay healthy:
 
 <center>
-<img src="img/corona_librarian.jpg" alt="Librarian's take on Corona" title="Librarian's take on Corona" width="600"> <!-- 728 -->
+<img src="img/corona_librarian.jpg" alt="A librarian's take on Corona" title="A librarian's take on Corona" width="600"> <!-- 728 -->
 </center>
