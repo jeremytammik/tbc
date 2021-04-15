@@ -47,23 +47,8 @@ A quick note to point out one of the important new Revit 202 SDK samples and an 
 
 ####<a name="2"></a>
 
-Zhong Wu published an enhancement to the Revit 2022 SDK sample
-
-[Migrate Revit Worksharing models from BIM 360 Team to BIM 360 Docs &ndash; powered by Revit 2022 Cloud Worksharing API](https://forge.autodesk.com/blog/migrate-revit-worksharing-models-bim-360-team-bim-360-docs-powered-revit-2022-cloud)
-
-I have a Revit Addon sample, which demostrate migrating Revit cloud worksharing models from BIM 360 Team to BIM 360 Docs using the latest Revit API(2022). It’s a Revit plugin with integration of Forge DM, mainly target for Revit developer. Currently I put it under my personal repo at https://github.com/JohnOnSoftware/forge-rcw.file.migration-revit.addon, but I am thinking to move it to https://github.com/ADN-DevTech or https://github.com/autodesk-Forge, I think https://github.com/ADN-DevTech is better place, but your ideas?
-
-Here is the blog of this sample: 
-
-Yes, the goal of this sample is to demonstrate the process to migrate Revit cloud worksharing models from BIM 360 Team to BIM 360 Docs, Forge related, but the core API is within Revit. Will make it clear if we put under Autodesk-Forge.
-
-And for your question, normally, our tools use the process environment variable, set the environments within the command line before running the application.
-
-But for the Revit plugin, since this should be running within Revit, it’s not user-friendly to running Revit every time from the command line with process environment variables setup, using user environment variable could solve this problem to make it easy, and only the user can get the environment variables…
-
-The instruction for the 3 different environment variable type is:
-
-https://docs.microsoft.com/en-us/dotnet/api/system.environmentvariabletarget?view=netframework-4.8
+My colleague Zhong Wu published an enhancement to the Revit 2022 SDK sample *CloudAPISample*
+to [migrate Revit Worksharing models from BIM 360 Team to BIM 360 Docs &ndash; powered by Revit 2022 Cloud Worksharing API](https://forge.autodesk.com/blog/migrate-revit-worksharing-models-bim-360-team-bim-360-docs-powered-revit-2022-cloud).
 
 In his own words:
 
@@ -102,19 +87,36 @@ Enjoy coding with Revit & Forge & BIM360, and please feel free to enhance the sa
 
 Ever so many thanks to Zhong for implementing and sharing this useful and important utility!
 
+####<a name="3"></a> RevitLookup 2022
 
+I performed a quick flat migration of RevitLookup to the Revit 2022 API.
 
-**Question:** 
+I just encountered one error and two warnings.
 
+The error is caused by code checking the `DisplayUnitType`, which was deprecated in Revit 2021:
 
 <pre class="code">
+<span style="color:gray;">#pragma</span>&nbsp;<span style="color:gray;">warning</span>&nbsp;<span style="color:gray;">disable</span>&nbsp;CS0618
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;warning&nbsp;CS0618:&nbsp;`DisplayUnitType`&nbsp;is&nbsp;obsolete:&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;This&nbsp;enumeration&nbsp;is&nbsp;deprecated&nbsp;in&nbsp;Revit&nbsp;2021&nbsp;and&nbsp;may&nbsp;be&nbsp;removed&nbsp;in&nbsp;a&nbsp;future&nbsp;version&nbsp;of&nbsp;Revit.&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Please&nbsp;use&nbsp;the&nbsp;`ForgeTypeId`&nbsp;class&nbsp;instead.&nbsp;</span>
+&nbsp;&nbsp;<span style="color:green;">//&nbsp;Use&nbsp;constant&nbsp;members&nbsp;of&nbsp;the&nbsp;`UnitTypeId`&nbsp;class&nbsp;to&nbsp;replace&nbsp;uses&nbsp;of&nbsp;specific&nbsp;values&nbsp;of&nbsp;this&nbsp;enumeration.</span>
+ 
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;2&nbsp;==&nbsp;parameters.Length&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;ParameterInfo&nbsp;p1&nbsp;=&nbsp;parameters.First();
+&nbsp;&nbsp;&nbsp;&nbsp;ParameterInfo&nbsp;p2&nbsp;=&nbsp;parameters.Last();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;p1.ParameterType&nbsp;==&nbsp;<span style="color:blue;">typeof</span>(&nbsp;Field&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;(p2.ParameterType&nbsp;==&nbsp;<span style="color:blue;">typeof</span>(&nbsp;DisplayUnitType&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;||&nbsp;p2.ParameterType&nbsp;==&nbsp;<span style="color:blue;">typeof</span>(&nbsp;ForgeTypeId&nbsp;));
+&nbsp;&nbsp;}
+<span style="color:gray;">#pragma</span>&nbsp;<span style="color:gray;">warning</span>&nbsp;<span style="color:gray;">restore</span>&nbsp;CS0618
 </pre>
 
+Since `DisplayUnitType` is obsolete in Revit 2022, we have no choice but to remove it.
 
-**Answer:**
+The two warnings are related to the deprecated `ParameterType` and can be left for the moment.
 
-**Response:** 
+Here is the complete [error and warning log so far](zip/revit_2022_revitlookup_errors_warnings_0.txt).
 
-
-####<a name="3"></a> 
-
+I wish you easy sailing and much success in your own migration work.

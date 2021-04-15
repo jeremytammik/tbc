@@ -1,0 +1,75 @@
+Rebuilding RevitLookup for Revit 2022
+
+/a/doc/revit/tbc/git/a/zip/revit_2022_revitlookup_errors_warnings_0.txt
+
+Step 1: replaced Revit API assembly DLL references
+
+0 succeeded
+1 failed
+0 skipped
+1 error
+2 warnings
+
+Severity	Code	Description	Project	File	Line	Suppression State
+Error	CS0122	'DisplayUnitType' is inaccessible due to its protection level	RevitLookup	Z:\a\src\rvt\RevitLookup\CS\Snoop\CollectorExts\ExtensibleStorageEntityContentStream.cs	155	Active
+Warning	CS0618	'Definition.ParameterType' is obsolete: 'This property is deprecated in Revit 2022 and may be removed in a future version of Revit. Please use the GetDataType() method instead.'	RevitLookup	Z:\a\src\rvt\RevitLookup\CS\Snoop\CollectorExts\FamilyTypeParameterValuesStream.cs	28	Active
+Warning	CS0618	'ParameterType' is obsolete: 'This enumeration is deprecated in Revit 2022 and may be removed in a future version of Revit. Please use the `ForgeTypeId` class instead. Use properties of the `SpecTypeId` class and its nested classes to replace uses of specific values of this enumeration.'	RevitLookup	Z:\a\src\rvt\RevitLookup\CS\Snoop\CollectorExts\FamilyTypeParameterValuesStream.cs	28	Active
+
+1>------ Rebuild All started: Project: RevitLookup, Configuration: 2021 Any CPU ------
+1>Z:\a\src\rvt\RevitLookup\CS\Snoop\CollectorExts\FamilyTypeParameterValuesStream.cs(28,17,28,51): warning CS0618: 'Definition.ParameterType' is obsolete: 'This property is deprecated in Revit 2022 and may be removed in a future version of Revit. Please use the GetDataType() method instead.'
+1>Z:\a\src\rvt\RevitLookup\CS\Snoop\CollectorExts\FamilyTypeParameterValuesStream.cs(28,55,28,68): warning CS0618: 'ParameterType' is obsolete: 'This enumeration is deprecated in Revit 2022 and may be removed in a future version of Revit. Please use the `ForgeTypeId` class instead. Use properties of the `SpecTypeId` class and its nested classes to replace uses of specific values of this enumeration.'
+1>Z:\a\src\rvt\RevitLookup\CS\Snoop\CollectorExts\ExtensibleStorageEntityContentStream.cs(155,45,155,60): error CS0122: 'DisplayUnitType' is inaccessible due to its protection level
+========== Rebuild All: 0 succeeded, 1 failed, 0 skipped ==========
+
+
+The one and only error is caused by code handling the DisplayUnitType, which was deprecated in Revit 2021:
+
+#pragma warning disable CS0618
+        // warning CS0618: `DisplayUnitType` is obsolete: 
+        // This enumeration is deprecated in Revit 2021 and may be removed in a future version of Revit. 
+        // Please use the `ForgeTypeId` class instead. 
+        // Use constant members of the `UnitTypeId` class to replace uses of specific values of this enumeration.
+
+        if( 2 == parameters.Length )
+        {
+          ParameterInfo p1 = parameters.First();
+          ParameterInfo p2 = parameters.Last();
+          return p1.ParameterType == typeof( Field )
+            && (p2.ParameterType == typeof( DisplayUnitType )
+              || p2.ParameterType == typeof( ForgeTypeId ));
+        }
+#pragma warning restore CS0618
+
+Step 2: removed reference to obsolete DisplayUnitType
+
+1 succeeded
+0 failed
+0 skipped
+0 errors
+2 warnings
+
+Severity	Code	Description	Project	File	Line	Suppression State
+Warning	CS0618	'Definition.ParameterType' is obsolete: 'This property is deprecated in Revit 2022 and may be removed in a future version of Revit. Please use the GetDataType() method instead.'	RevitLookup	Z:\a\src\rvt\RevitLookup\CS\Snoop\CollectorExts\FamilyTypeParameterValuesStream.cs	28	Active
+Warning	CS0618	'ParameterType' is obsolete: 'This enumeration is deprecated in Revit 2022 and may be removed in a future version of Revit. Please use the `ForgeTypeId` class instead. Use properties of the `SpecTypeId` class and its nested classes to replace uses of specific values of this enumeration.'	RevitLookup	Z:\a\src\rvt\RevitLookup\CS\Snoop\CollectorExts\FamilyTypeParameterValuesStream.cs	28	Active
+
+1>------ Rebuild All started: Project: RevitLookup, Configuration: 2022 Any CPU ------
+1>Z:\a\src\rvt\RevitLookup\CS\Snoop\CollectorExts\FamilyTypeParameterValuesStream.cs(28,17,28,51): warning CS0618: 'Definition.ParameterType' is obsolete: 'This property is deprecated in Revit 2022 and may be removed in a future version of Revit. Please use the GetDataType() method instead.'
+1>Z:\a\src\rvt\RevitLookup\CS\Snoop\CollectorExts\FamilyTypeParameterValuesStream.cs(28,55,28,68): warning CS0618: 'ParameterType' is obsolete: 'This enumeration is deprecated in Revit 2022 and may be removed in a future version of Revit. Please use the `ForgeTypeId` class instead. Use properties of the `SpecTypeId` class and its nested classes to replace uses of specific values of this enumeration.'
+1>  RevitLookup -> Z:\a\src\rvt\RevitLookup\CS\bin\2022\RevitLookup.dll
+1>          1 file(s) copied.
+1>          1 file(s) copied.
+========== Rebuild All: 1 succeeded, 0 failed, 0 skipped ==========
+
+Another question that I ran into myself in RevitLookup: in Revit 2021, I use:
+
+```
+  if (parameter.Definition.ParameterType != ParameterType.FamilyType) ...
+```
+
+I can easily replace the former expression by `parameter.Definition.GetDataType()`.
+
+However, I cannot find the appropriate replacement for `ParameterType.FamilyType`.
+
+More importantly and of general interest, I don't know how or where to search for it.
+
+Thank you!
