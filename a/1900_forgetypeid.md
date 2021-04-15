@@ -47,6 +47,19 @@ Two important features are parameter API enhancements and built-in PDF export fu
 
 linkedin:
 
+Using built-in PDF export and ForgeTypeId in Revit 2022, multi-target 2021 and 2022 using MSBuild for the #RevitAPI
+
+http://autode.sk/forgetypeid
+
+Revit 2022 has been released.
+Two important features are parameter API enhancements and built-in PDF export functionality:
+
+- Replace deprecated ParameterType with ForgeTypeId
+- Multi-target 2021 and 2022 using MSBuild
+- PDF export default paper format can fail
+- PDF export output file naming
+- Five beginner mistakes...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
