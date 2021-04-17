@@ -19,6 +19,8 @@ twitter:
 
 Revit 2022 migrates BIM360 Team to Docs using the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://autode.sk/rvt2022migratedocs
 
+RevitLookup migrated to Revit 2022. Ever so many thanks to @PeterHirn for his great support with this and all the work on perfecting the CI!
+
 We continue the foray into Revit 2022 enhancements with a real-world migration tool using the new <code>SaveAsCloudModel</code> functionality and the flat migration of RevitLookup
 &ndash; Save as cloud model from BIM360 Team to Docs
 &ndash; RevitLookup 2022
@@ -26,8 +28,19 @@ We continue the foray into Revit 2022 enhancements with a real-world migration t
 
 linkedin:
 
+Revit 2022 migrates BIM360 Team to Docs using the #RevitAPI
+
+http://autode.sk/rvt2022migratedocs
+
+We continue the foray into Revit 2022 enhancements with a real-world migration tool using the new SaveAsCloudModel functionality and the flat migration of RevitLookup:
+
+- Save as cloud model from BIM360 Team to Docs
+- RevitLookup 2022
+- A librarian's take on corona...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+RevitLookup migrated to Revit 2022. Ever so many thanks to Peter Hirn for his great support with this and all his work on perfecting the CI!
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 
