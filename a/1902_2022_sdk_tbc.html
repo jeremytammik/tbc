@@ -5,17 +5,11 @@
 </head></p>
 <!---
 
-https://forums.autodesk.com/t5/revit-api-forum/revit-2022-parametertype-text-to-forgetypeid/m-p/10247574
+- https://forums.autodesk.com/t5/revit-api-forum/revit-2022-parametertype-text-to-forgetypeid/m-p/10247574
 
-https://www.oreilly.com/online-learning/feature-answers.html
-
-> Need a quick solution you can put to work fast? Just ask O’Reilly Answers. It’s an advanced natural language processing engine that instantly scans thousands of O’Reilly titles to find the snippet that can save the day. Just ask and you shall find. Highlighted, even.
-
-Need a quick solution you can put to work fast? Just ask O’Reilly Answers. It’s an advanced natural language processing engine that instantly scans thousands of O’Reilly titles to find the snippet that can save the day. Just ask and you shall find. Highlighted, even.
-
-To use O’Reilly Answers in Slack, type `/oreilly-answers` followed by a question to scan the O'Reilly content and get the answer.
-
-https://autodesk.slack.com/archives/C0KBT3859/p1618938930051100
+- https://autodesk.slack.com/archives/C0KBT3859/p1618938930051100
+  https://www.oreilly.com/online-learning/feature-answers.html
+  To use O’Reilly Answers in Slack, type `/oreilly-answers` followed by a question to scan the O'Reilly content and get the answer.
 
 twitter:
 
@@ -53,7 +47,7 @@ Here are my log files of error, warnings and WIP notes in that order:</p>
 <li><a href="zip/revit_2022_sdk_samples_errors_warnings_1.txt">Revit 2022 SDK and RvtSamples</a></li>
 </ul>
 <p>Let's look at the SDK installation first, though:</p>
-<h4><a name="2"></a> Revit 2022 SDK Warnings</h4>
+<h4><a name="3"></a> Revit 2022 SDK Warnings</h4>
 <p>The first thing I did was update
 my <a href="https://github.com/jeremytammik/RevitSdkSamples">RevitSdkSamples GitHub repository</a> to
 the new release, enabling me (and you) to easily track all the changes I made,
@@ -78,7 +72,7 @@ actually, I don't even know what is casuing them or how they could be fixed:</p>
 <li>AppearanceAssetEditing: <code>Microsoft.Csharp.targets</code> cannot be imported again. It was already imported... This is most likely a build authoring error. This subsequent import will be ignored.</li>
 <li>SampleCommandsSteelElements: ditto</li>
 </ul>
-<h4><a name="3"></a> Setting up RvtSamples</h4>
+<h4><a name="4"></a> Setting up RvtSamples</h4>
 <p>To set up RvtSamples, I need to do two things:</p>
 <p>The first is trivial &ndash; adapt its <code>*.addin</code> file appropriately and copy it to the Revit <code>AddIns</code> folder.</p>
 <p>The second is mostly a lot more work, fixing up the <code>RvtSamples.txt</code> file to correctly list all the external commands defined by the SDK, specifically the pathname of their assembly DLL and their correct .NET class name.</p>
@@ -94,11 +88,11 @@ actually, I don't even know what is casuing them or how they could be fixed:</p>
 </center></p>
 <p>You can track the changes I made in
 the <a href="https://github.com/jeremytammik/RevitSdkSamples/compare/2022.0.0.2...2022.0.0.4">GitHub diffs</a>.</p>
-<h4><a name="4"></a> The Building Coder Samples Migration</h4>
+<h4><a name="5"></a> The Building Coder Samples Migration</h4>
 <p>After referencin the new Revit 2022 API assemblies, the compilation
 produced <a href="zip/tbc_samples_2022_migr_01.txt">35 warnings</a>.</p>
 <p>Many were related to the obsolete <code>ParameterType</code> class and the <code>FilterStringRule</code> constructor that looses its <code>caseSensitive</code> argument.</p>
-<h4><a name="5"></a> ParameterType and ForgeTypeId</h4>
+<h4><a name="6"></a> ParameterType and ForgeTypeId</h4>
 <p>We discussed some aspects of the former issue in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-2022-parametertype-text-to-forgetypeid/m-p/10247574">Revit 2022: <code>ParameterType.Text</code> to <code>ForgeTypeId</code></a>.</p>
@@ -149,3 +143,13 @@ That requires the conversion of ghe edge loop container data type, so it is not 
 <p>The changes I made are clearly listed in
 the <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2022.0.150.0...2022.0.150.4">GitHub diffs</a>.</p>
 <p>I wish you the best of luck and smooth sailing with your own migration efforts.</p>
+<h4><a name="7"></a> O'Reilly Answers</h4>
+<p>A nice new little AI application provided by the main professional technical literature publisher,
+<a href="https://www.oreilly.com/online-learning/feature-answers.html">O’Reilly Answers</a> responds
+to technical questions of all kinds by scanning the go-to books on the subject at hand:</p>
+<blockquote>
+<p>Need a quick solution you can put to work fast? Just ask O’Reilly Answers. It’s an advanced natural language processing engine that instantly scans thousands of O’Reilly titles to find the snippet that can save the day. Just ask and you shall find. Highlighted, even.</p>
+<p>Need a quick solution you can put to work fast? Just ask O’Reilly Answers. It’s an advanced natural language processing engine that instantly scans thousands of O’Reilly titles to find the snippet that can save the day. Just ask and you shall find. Highlighted, even.</p>
+</blockquote>
+<p>At Autodesk, we also use <a href="https://slack.com">Slack</a> quite a bit.
+To use O’Reilly Answers in Slack, type <code>/oreilly-answers</code> followed by a question to scan the O'Reilly content and get the answer.</p>
