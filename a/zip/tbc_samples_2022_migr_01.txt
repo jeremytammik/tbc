@@ -150,7 +150,7 @@ Warning	CS0618	'ParameterType' is obsolete: 'This enumeration is deprecated in R
 1>  BuildingCoder -> Y:\a\src\rvt\the_building_coder_samples\BuildingCoder\BuildingCoder\bin\Debug\BuildingCoder.dll
 ========== Rebuild All: 1 succeeded, 0 failed, 0 skipped ==========
 
-release 2022.0.150.1
+--> release 2022.0.150.1.
 
 eliminated warnings about:
 
@@ -180,3 +180,27 @@ Warning	CS0618	'ParameterType' is obsolete: 'This enumeration is deprecated in R
 1>  BuildingCoder -> Y:\a\src\rvt\the_building_coder_samples\BuildingCoder\BuildingCoder\bin\Debug\BuildingCoder.dll
 ========== Rebuild All: 1 succeeded, 0 failed, 0 skipped ==========
 
+--> release 2022.0.150.2.
+
+eliminated warnings about:
+
+Warning	CS0618	'FamilyManager.AddParameter(string, BuiltInParameterGroup, ParameterType, bool)' is obsolete: 'This property is deprecated in Revit 2022 and may be removed in a future version of Revit. Please use the AddParameter(string, ForgeTypeId, ForgeTypeId, bool) overload instead.'	BuildingCoder	Y:\a\src\rvt\the_building_coder_samples\BuildingCoder\BuildingCoder\CmdNewDimensionLabel.cs	134	Active
+Warning	CS0618	'ParameterType' is obsolete: 'This enumeration is deprecated in Revit 2022 and may be removed in a future version of Revit. Please use the `ForgeTypeId` class instead. Use properties of the `SpecTypeId` class and its nested classes to replace uses of specific values of this enumeration.'	BuildingCoder	Y:\a\src\rvt\the_building_coder_samples\BuildingCoder\BuildingCoder\CmdNewDimensionLabel.cs	137	Active
+
+BuiltInParameterGroup.PG_IDENTITY_DATA --> GroupTypeId.IdentityData
+ParameterType.Length --> SpecTypeId.Length --> 4 warnings
+BuiltInParameterGroup.PG_CONSTRAINTS --> GroupTypeId.Constraints
+
+1 succeeded, 0 failed, 0 skipped, 0 errors, 2 warnings:
+
+Severity	Code	Description	Project	File	Line	Suppression State
+Warning	CS0618	'Document.NewFloor(CurveArray, bool)' is obsolete: 'This method is deprecated in Revit 2022 and may be removed in the future version of Revit. To create new instance of Floor, call Floor.Create().'	BuildingCoder	Y:\a\src\rvt\the_building_coder_samples\BuildingCoder\BuildingCoder\CmdEditFloor.cs	62	Active
+Warning	CS0618	'Document.NewSlab(CurveArray, Level, Line, double, bool)' is obsolete: 'This method is deprecated in Revit 2022 and may be removed in the future version of Revit. To create new instance of Floor, call Floor.Create().'	BuildingCoder	Y:\a\src\rvt\the_building_coder_samples\BuildingCoder\BuildingCoder\CmdCreateSlopedSlab.cs	88	Active
+
+1>------ Rebuild All started: Project: BuildingCoder, Configuration: Debug Any CPU ------
+1>Y:\a\src\rvt\the_building_coder_samples\BuildingCoder\BuildingCoder\CmdCreateSlopedSlab.cs(88,23,89,44): warning CS0618: 'Document.NewSlab(CurveArray, Level, Line, double, bool)' is obsolete: 'This method is deprecated in Revit 2022 and may be removed in the future version of Revit. To create new instance of Floor, call Floor.Create().'
+1>Y:\a\src\rvt\the_building_coder_samples\BuildingCoder\BuildingCoder\CmdEditFloor.cs(62,9,62,43): warning CS0618: 'Document.NewFloor(CurveArray, bool)' is obsolete: 'This method is deprecated in Revit 2022 and may be removed in the future version of Revit. To create new instance of Floor, call Floor.Create().'
+1>  BuildingCoder -> Y:\a\src\rvt\the_building_coder_samples\BuildingCoder\BuildingCoder\bin\Debug\BuildingCoder.dll
+========== Rebuild All: 1 succeeded, 0 failed, 0 skipped ==========
+
+--> release 2022.0.150.3.
