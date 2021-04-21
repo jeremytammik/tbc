@@ -1,0 +1,151 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head></p>
+<!---
+
+https://forums.autodesk.com/t5/revit-api-forum/revit-2022-parametertype-text-to-forgetypeid/m-p/10247574
+
+https://www.oreilly.com/online-learning/feature-answers.html
+
+> Need a quick solution you can put to work fast? Just ask O’Reilly Answers. It’s an advanced natural language processing engine that instantly scans thousands of O’Reilly titles to find the snippet that can save the day. Just ask and you shall find. Highlighted, even.
+
+Need a quick solution you can put to work fast? Just ask O’Reilly Answers. It’s an advanced natural language processing engine that instantly scans thousands of O’Reilly titles to find the snippet that can save the day. Just ask and you shall find. Highlighted, even.
+
+To use O’Reilly Answers in Slack, type `/oreilly-answers` followed by a question to scan the O'Reilly content and get the answer.
+
+https://autodesk.slack.com/archives/C0KBT3859/p1618938930051100
+
+twitter:
+
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+
+&ndash;
+...
+
+linkedin:
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+<p style="font-size: 80%; font-style:italic">
+<a href=""></a>
+</p>
+</center>
+
+-->
+
+<h3>Revit 2022 SDK and The Building Coder Samples</h3>
+<p>The Revit 2022 SDK is now available for download from
+the <a href="https://www.autodesk.com/developer-network/platform-technologies/revit">Revit Developer Centre, autodesk.com/developrevit</a>.</p>
+<p>I logged my experiences installing and compiling it, setting up the RvtSamples application to load all the SDK external commands, and migrating The Building Coder samples to the new release:</p>
+<h4><a name="2"></a> First the Logs</h4>
+<p>In reality, I migrated RevitLookup first, then The Building Coder samples, and last I installed the SDK and set up RvtSamples.
+Here are my log files of error, warnings and WIP notes in that order:</p>
+<ul>
+<li><a href="zip/revit_2022_revitlookup_errors_warnings_0.txt">RevitLookup</a></li>
+<li><a href="zip/tbc_samples_2022_migr_01.txt">The Building Coder samples</a></li>
+<li><a href="zip/revit_2022_sdk_samples_errors_warnings_1.txt">Revit 2022 SDK and RvtSamples</a></li>
+</ul>
+<p>Let's look at the SDK installation first, though:</p>
+<h4><a name="2"></a> Revit 2022 SDK Warnings</h4>
+<p>The first thing I did was update
+my <a href="https://github.com/jeremytammik/RevitSdkSamples">RevitSdkSamples GitHub repository</a> to
+the new release, enabling me (and you) to easily track all the changes I made,
+cf. <a href="https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2022.0.0.0">release 2022.0.0.0</a> and subsequent ones.</p>
+<p>I loaded the <code>SDKSamples.sln</code> solution file and was glad to note that the Reevit API assembly references were all set up and ready to go.
+The compilation succeeded out of the box and all 196 projects completed.
+The compilation generated <a href="zip/revit_2022_sdk_samples_errors_warnings_1.txt">49 warnings</a>.</p>
+<p>Most of the warnings concern the
+ever-recurring <a href="http://thebuildingcoder.typepad.com/blog/2013/06/processor-architecture-mismatch-warning.html">architecture mismatch issue</a>
+and can be resolved using
+my <a href="http://thebuildingcoder.typepad.com/blog/2013/07/recursively-disable-architecture-mismatch-warning.html">DisableMismatchWarning.exe utility</a>
+implemented back in 2013 and available from
+the <a href="https://github.com/jeremytammik/DisableMismatchWarning">DisableMismatchWarning GitHub repository</a>.</p>
+<p>After fixing those, only seven warnings remain;
+two were due to missing XML documentation comments, and three missing rule sets. 
+I added two trivial documentation comments and deleted a reference to one of the rule sets.</p>
+<p>In the end, four warnings remain that I will ignore for now;
+actually, I don't even know what is casuing them or how they could be fixed:</p>
+<ul>
+<li>GeometryCreation_BooleanOperation: Could not find rule set file "GeometryCreation_BooleanOperation.ruleset".    </li>
+<li>ProximityDetection_WallJoinControl: Could not find rule set file "ProximityDetection_WallJoinControl.ruleset".    </li>
+<li>AppearanceAssetEditing: <code>Microsoft.Csharp.targets</code> cannot be imported again. It was already imported... This is most likely a build authoring error. This subsequent import will be ignored.</li>
+<li>SampleCommandsSteelElements: ditto</li>
+</ul>
+<h4><a name="3"></a> Setting up RvtSamples</h4>
+<p>To set up RvtSamples, I need to do two things:</p>
+<p>The first is trivial &ndash; adapt its <code>*.addin</code> file appropriately and copy it to the Revit <code>AddIns</code> folder.</p>
+<p>The second is mostly a lot more work, fixing up the <code>RvtSamples.txt</code> file to correctly list all the external commands defined by the SDK, specifically the pathname of their assembly DLL and their correct .NET class name.</p>
+<p>To help with that, I temporaily turn on a debugging flag that tests the validity of that data by attempting to load and thus test the existence of each external command.</p>
+<p>That turned up a few errors, e.g.:</p>
+<ul>
+<li>Erroneous <code>bin</code> path in several VB.NET samples, <code>VB.NET/bin/Debug/</code> instead of <code>/VB.NET/bin/</code></li>
+<li>Duplicate menu item name <code>Infrastructure alignments</code></li>
+</ul>
+<p>In the end, all loaded fine:</p>
+<p><center>
+<img src="img/rvtsamples_2022.png" alt="RvtSamples 2022" title="RvtSamples 2022" width="100"> <!-- 788 -->
+</center></p>
+<p>You can track the changes I made in
+the <a href="https://github.com/jeremytammik/RevitSdkSamples/compare/2022.0.0.2...2022.0.0.4">GitHub diffs</a>.</p>
+<h4><a name="4"></a> The Building Coder Samples Migration</h4>
+<p>After referencin the new Revit 2022 API assemblies, the compilation
+produced <a href="zip/tbc_samples_2022_migr_01.txt">35 warnings</a>.</p>
+<p>Many were related to the obsolete <code>ParameterType</code> class and the <code>FilterStringRule</code> constructor that looses its <code>caseSensitive</code> argument.</p>
+<h4><a name="5"></a> ParameterType and ForgeTypeId</h4>
+<p>We discussed some aspects of the former issue in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-2022-parametertype-text-to-forgetypeid/m-p/10247574">Revit 2022: <code>ParameterType.Text</code> to <code>ForgeTypeId</code></a>.</p>
+<p>David Becroft summarises the gist of the matter like this:</p>
+<p>To create a text parameter, please use <code>SpecTypeId.String.Text</code>.</p>
+<p>For context, the <code>ForgeTypeId</code> properties directly in the <code>SpecTypeId</code> class identify the measurable data types, like <code>SpecTypeId.Length</code> or <code>SpecTypeId.Mass</code>.
+The non-measurable data types are organized into nested classes within <code>SpecTypeId</code>, like <code>SpecTypeId.String.Text</code>, <code>SpecTypeId.Boolean.YesNo</code>, <code>SpecTypeId.Int.Integer</code>, or <code>SpecTypeId.Reference.Material</code>.</p>
+<p>Regarding text parameters that report their type as <code>Number</code>, here's the history:</p>
+<ul>
+<li>Prior to Revit 2021, a <code>Definition</code> had a <code>UnitType</code> and a <code>ParameterType</code>.
+  The <code>UnitType</code> property was only meaningful for parameters with measurable <code>ParameterType</code> values, and a parameter with <code>ParameterType.Text</code> would report a meaningless <code>UnitType.Number</code> value.</li>
+<li>Revit 2021 deprecated the <code>UnitType</code> property and replaced it with the <code>GetSpecTypeId</code> method.
+  But the behavior remained the same &ndash; a parameter with <code>ParameterType.Text</code> would have <code>GetSpecTypeId()</code> == <code>SpecTypeId.Number</code>.</li>
+<li>Revit 2022 deprecated the <code>ParameterType</code> property and the <code>GetSpecTypeId</code> method, replacing them both with the <code>GetDataType</code> method.
+  A parameter with <code>ParameterType.Text</code> will report <code>GetDataType()</code> == <code>SpecTypeId.String.Text</code>.
+  Side note: The <code>GetDataType</code> method can also return a category identifier, indicating a Family Type parameter of that category.</li>
+</ul>
+<p>In The Building Coder samples, I masde the following replacements:</p>
+<ul>
+<li>ParameterType.Text &rarr; SpecTypeId.String.Text </li>
+<li>ParameterType.Number &rarr; SpecTypeId.Number </li>
+<li>Definition.ParameterType &rarr; Definition.GetDataType()</li>
+<li>ParameterType.Material &rarr; SpecTypeId.Reference.Material </li>
+<li>ParameterType.Text &rarr; SpecTypeId.String.Text </li>
+<li>removed Util.SpellingErrorCorrector </li>
+<li>removed CompatibilityMethods.Creaste2( this Definitions ) </li>
+<li>UnitUtils.GetAllSpecs() &rarr; UnitUtils.GetAllMeasurableSpecs() </li>
+<li>ParameterType.Length &rarr; SpecTypeId.Length</li>
+<li>BuiltInParameterGroup.PG_IDENTITY_DATA &rarr; GroupTypeId.IdentityData</li>
+<li>ParameterType.Length &rarr; SpecTypeId.Length</li>
+<li>BuiltInParameterGroup.PG_CONSTRAINTS &rarr; GroupTypeId.Constraints</li>
+<li>tag.GetTaggedLocalElement() &rarr; tag.GetTaggedLocalElements()</li>
+<li>newTag.TaggedElementId &rarr; newTag.GetTaggedElementIds()</li>
+<li>removed the <code>FilterStringRule</code> constructor last argument</li>
+</ul>
+<p>I replaced one call to the <code>NewFloor</code> method by <code>Floor.Create</code>.
+That requires the conversion of ghe edge loop container data type, so it is not completely trivial.</p>
+<p>That left two warnings aboiut siumilar deprecated methods that I chose to leave for the time being:</p>
+<ul>
+<li>Warning CS0618 'Document.NewFloor(CurveArray, bool)' is obsolete: This method is deprecated in Revit 2022 and may be removed in the future version of Revit. To create new instance of Floor, call Floor.Create()</li>
+<li>Warning CS0618 'Document.NewSlab(CurveArray, Level, Line, double, bool)' is obsolete: This method is deprecated in Revit 2022 and may be removed in the future version of Revit. To create new instance of Floor, call Floor.Create().</li>
+</ul>
+<p>Loading The Building Coder samples via RvtSamples with the external command checking flag turned on revealed that two external commands were no longer defined, since I commented them out due to excessive use of deprecated un it handling functionality that is of little interest any more: <code>CmdParameterUnitConverter</code> and <code>CmdDutAbbreviation</code>. I simply commented them out in <code>BcSaples.txt</code>.</p>
+<p>Now RvtSamples loads The Building Coder samples as well:</p>
+<p><center>
+<img src="img/tbc_samples_2022.png" alt="The Building Coder samples 2022" title="The Building Coder samples 2022" width="100"> <!-- 788 -->
+</center></p>
+<p>The changes I made are clearly listed in
+the <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2022.0.150.0...2022.0.150.4">GitHub diffs</a>.</p>
+<p>I wish you the best of luck and smooth sailing with your own migration efforts.</p>
