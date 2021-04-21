@@ -60,7 +60,7 @@ Here are my log files of error, warnings and WIP notes in that order:</p>
 my <a href="https://github.com/jeremytammik/RevitSdkSamples">RevitSdkSamples GitHub repository</a> to
 the new release, enabling me (and you) to easily track all the changes I made,
 cf. <a href="https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2022.0.0.0">release 2022.0.0.0</a> and subsequent ones.</p>
-<p>I loaded the <code>SDKSamples.sln</code> solution file and was glad to note that the Reevit API assembly references were all set up and ready to go.
+<p>I loaded the <code>SDKSamples.sln</code> solution file and was glad to note that the Revit API assembly references were all set up and ready to go.
 The compilation succeeded out of the box and all 196 projects completed.
 The compilation generated <a href="zip/revit_2022_sdk_samples_errors_warnings_1.txt">49 warnings</a>.</p>
 <p>Most of the warnings concern the
@@ -73,7 +73,7 @@ the <a href="https://github.com/jeremytammik/DisableMismatchWarning">DisableMism
 two were due to missing XML documentation comments, and three missing rule sets. 
 I added two trivial documentation comments and deleted a reference to one of the rule sets.</p>
 <p>In the end, four warnings remain that I will ignore for now;
-actually, I don't even know what is casuing them or how they could be fixed:</p>
+actually, I don't even know what is causing them or how they could be fixed:</p>
 <ul>
 <li>GeometryCreation_BooleanOperation: Could not find rule set file "GeometryCreation_BooleanOperation.ruleset".    </li>
 <li>ProximityDetection_WallJoinControl: Could not find rule set file "ProximityDetection_WallJoinControl.ruleset".    </li>
@@ -84,7 +84,7 @@ actually, I don't even know what is casuing them or how they could be fixed:</p>
 <p>To set up RvtSamples, I need to do two things:</p>
 <p>The first is trivial &ndash; adapt its <code>*.addin</code> file appropriately and copy it to the Revit <code>AddIns</code> folder.</p>
 <p>The second is mostly a lot more work, fixing up the <code>RvtSamples.txt</code> file to correctly list all the external commands defined by the SDK, specifically the pathname of their assembly DLL and their correct .NET class name.</p>
-<p>To help with that, I temporaily turn on a debugging flag that tests the validity of that data by attempting to load and thus test the existence of each external command.</p>
+<p>To help with that, I temporarily turn on a debugging flag that tests the validity of that data by attempting to load and thus test the existence of each external command.</p>
 <p>That turned up a few errors, e.g.:</p>
 <ul>
 <li>Erroneous <code>bin</code> path in several VB.NET samples, <code>VB.NET/bin/Debug/</code> instead of <code>/VB.NET/bin/</code></li>
@@ -97,9 +97,9 @@ actually, I don't even know what is casuing them or how they could be fixed:</p>
 <p>You can track the changes I made in
 the <a href="https://github.com/jeremytammik/RevitSdkSamples/compare/2022.0.0.2...2022.0.0.4">GitHub diffs</a>.</p>
 <h4><a name="5"></a> The Building Coder Samples Migration</h4>
-<p>After referencin the new Revit 2022 API assemblies, the compilation
+<p>After referencing the new Revit 2022 API assemblies, the compilation succeeded,
 produced <a href="zip/tbc_samples_2022_migr_01.txt">35 warnings</a>.</p>
-<p>Many were related to the obsolete <code>ParameterType</code> class and the <code>FilterStringRule</code> constructor that looses its <code>caseSensitive</code> argument.</p>
+<p>Many were related to the obsolete <code>ParameterType</code> class and the <code>FilterStringRule</code> constructor that loses its <code>caseSensitive</code> argument.</p>
 <h4><a name="6"></a> ParameterType and ForgeTypeId</h4>
 <p>We discussed some aspects of the former issue in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
@@ -113,12 +113,12 @@ The non-measurable data types are organized into nested classes within <code>Spe
 <li>Prior to Revit 2021, a <code>Definition</code> had a <code>UnitType</code> and a <code>ParameterType</code>.
   The <code>UnitType</code> property was only meaningful for parameters with measurable <code>ParameterType</code> values, and a parameter with <code>ParameterType.Text</code> would report a meaningless <code>UnitType.Number</code> value.</li>
 <li>Revit 2021 deprecated the <code>UnitType</code> property and replaced it with the <code>GetSpecTypeId</code> method.
-  But the behavior remained the same &ndash; a parameter with <code>ParameterType.Text</code> would have <code>GetSpecTypeId()</code> == <code>SpecTypeId.Number</code>.</li>
+  The behaviour remained the same &ndash; a parameter with <code>ParameterType.Text</code> would have <code>GetSpecTypeId()</code> == <code>SpecTypeId.Number</code>.</li>
 <li>Revit 2022 deprecated the <code>ParameterType</code> property and the <code>GetSpecTypeId</code> method, replacing them both with the <code>GetDataType</code> method.
   A parameter with <code>ParameterType.Text</code> will report <code>GetDataType()</code> == <code>SpecTypeId.String.Text</code>.
   Side note: The <code>GetDataType</code> method can also return a category identifier, indicating a Family Type parameter of that category.</li>
 </ul>
-<p>In The Building Coder samples, I masde the following replacements:</p>
+<p>In The Building Coder samples, I made the following replacements:</p>
 <ul>
 <li>ParameterType.Text &rarr; SpecTypeId.String.Text </li>
 <li>ParameterType.Number &rarr; SpecTypeId.Number </li>
@@ -137,13 +137,13 @@ The non-measurable data types are organized into nested classes within <code>Spe
 <li>removed the <code>FilterStringRule</code> constructor last argument</li>
 </ul>
 <p>I replaced one call to the <code>NewFloor</code> method by <code>Floor.Create</code>.
-That requires the conversion of ghe edge loop container data type, so it is not completely trivial.</p>
-<p>That left two warnings aboiut siumilar deprecated methods that I chose to leave for the time being:</p>
+That requires the conversion of the edge loop container data type, so it is not completely trivial.</p>
+<p>That left two warnings about similar deprecated methods that I chose to leave for the time being:</p>
 <ul>
 <li>Warning CS0618 'Document.NewFloor(CurveArray, bool)' is obsolete: This method is deprecated in Revit 2022 and may be removed in the future version of Revit. To create new instance of Floor, call Floor.Create()</li>
 <li>Warning CS0618 'Document.NewSlab(CurveArray, Level, Line, double, bool)' is obsolete: This method is deprecated in Revit 2022 and may be removed in the future version of Revit. To create new instance of Floor, call Floor.Create().</li>
 </ul>
-<p>Loading The Building Coder samples via RvtSamples with the external command checking flag turned on revealed that two external commands were no longer defined, since I commented them out due to excessive use of deprecated un it handling functionality that is of little interest any more: <code>CmdParameterUnitConverter</code> and <code>CmdDutAbbreviation</code>. I simply commented them out in <code>BcSaples.txt</code>.</p>
+<p>Loading The Building Coder samples via RvtSamples with the external command checking flag turned on revealed that two external commands were no longer defined, since I commented them out due to excessive use of deprecated unit handling functionality that is of little interest any more: <code>CmdParameterUnitConverter</code> and <code>CmdDutAbbreviation</code>. I simply commented them out in <code>BcSamples.txt</code>.</p>
 <p>Now RvtSamples loads The Building Coder samples as well:</p>
 <p><center>
 <img src="img/tbc_samples_2022.png" alt="The Building Coder samples 2022" title="The Building Coder samples 2022" width="100"> <!-- 788 -->
