@@ -253,16 +253,15 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <li>Autodesk.Revit.DB.ParameterTypeId</li>
 </ul>
 <p>contain properties of type ForgeTypeId, following the pattern established in Revit 2021 with the UnitTypeId, SymbolTypeId, and SpecTypeId classes. Values from the DisciplineTypeId class can be used in code to replace values of the deprecated UnitGroup enumeration. For example, where you previously used UnitGroup.Structural, you would now use DisciplineTypeId.Structural. Values from the GroupTypeId and ParameterTypeId classes can be used to replace values of the BuiltInParameter and BuiltInParameterGroup enumerations, respectively, which have not yet been deprecated.</p>
-<p>The SpecTypeId class contains several new nested classes containing ForgeTypeId properties identifying non-floating-point data types, such as integers and strings. ForgeTypeId properties in SpecTypeId and its nested classes can be used to replace values of the deprecated ParameterType enumeration.  These tables list the deprecated types and their replacements, as well as some migrated types where the original enumeration is not yet fully deprecated:</p>
+<p>The SpecTypeId class contains several new nested classes containing ForgeTypeId properties identifying non-floating-point data types, such as integers and strings. ForgeTypeId properties in SpecTypeId and its nested classes can be used to replace values of the deprecated ParameterType enumeration.  This table lists the deprecated types and their replacements:</p>
 <ul>
 <li>Deprecated enumeration &rarr; Replacement</li>
 <li>UnitGroup &rarr; DisciplineTypeId</li>
-<li>
-<p>ParameterType &rarr; SpecTypeId, SpecTypeId.Boolean, SpecTypeId.Int, SpecTypeId.Reference, SpecTypeId.String</p>
-</li>
-<li>
-<p>Original enumeration &rarr; Preferred replacements as ForgeTypeId</p>
-</li>
+<li>ParameterType &rarr; SpecTypeId, SpecTypeId.Boolean, SpecTypeId.Int, SpecTypeId.Reference, SpecTypeId.String</li>
+</ul>
+<p>Here are some further migrated types where the original enumeration is not yet fully deprecated:</p>
+<ul>
+<li>Original enumeration &rarr; Preferred replacements as ForgeTypeId</li>
 <li>BuiltInParameterGroup &rarr; GroupTypeId</li>
 <li>BuiltInParameter &rarr; ParameterTypeId</li>
 </ul>
@@ -281,15 +280,14 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <li>For Family Type parameters, GetDataType() returns a category identifier. Use Category.IsBuiltInCategory(ForgeTypeId) to detect a category identifier.</li>
 <li>For all other parameters, GetDataType() returns a spec identifier. Use Parameter.IsSpec(ForgeTypeId) to detect a spec identifier, including measurable specs.</li>
 </ul>
-<p>Use Parameter.IsValidDataType(ForgeTypeId) to detect any parameter data type identifier – i.e., any measurable or non-measurable spec or category.</p>
+<p>Use Parameter.IsValidDataType(ForgeTypeId) to detect any parameter data type identifier &ndash; i.e., any measurable or non-measurable spec or category.</p>
 <ul>
 <li>Deprecated member &rarr; Replacement member</li>
-<li>
-<p>Definition.GetSpecTypeId(), Definition.ParameterType &rarr; Definition.GetDataType()</p>
-</li>
-<li>
-<p>Original member &rarr; Preferred replacement</p>
-</li>
+<li>Definition.GetSpecTypeId(), Definition.ParameterType &rarr; Definition.GetDataType()</li>
+</ul>
+<p>Preferred replacements for non-deprecated members:</p>
+<ul>
+<li>Original member &rarr; Preferred replacement</li>
 <li>Definition.ParameterGroup &rarr; Definition.GetGroupTypeId()</li>
 <li>InternalDefinition.BuiltInParameter &rarr; InternalDefinition.GetParameterTypeId()</li>
 <li>InternalDefinition.ParameterGroup &rarr; InternalDefinition.GetGroupTypeId()</li>
@@ -300,29 +298,26 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <p>In the ExternalDefinitionCreationOptions class, used to create shared parameters, the implementation now offers better input validation and new capabilities.</p>
 <p>The deprecated class constructor and Type property setter taking ParameterType values now throw an exception for input values ParameterType.Invalid or ParameterType.FamilyType. It was not possible to use this interface to create Family Type shared parameters.</p>
 <p>However, it is now possible to create Family Type shared parameters using the replacement functions based on ForgeTypeId. The class constructor taking ForgeTypeId and the SetDataType(ForgeTypeId) method accept any spec or category identifier. Using a category identifier produces a Family Type shared parameter of the given category. Use Category.GetBuiltInCategoryTypeId(BuiltInCategory) to obtain the ForgeTypeId identifier for a given category.</p>
-<p>Use Parameter.IsValidDataType(ForgeTypeId) to detect any parameter data type identifier – i.e., any measurable or non-measurable spec or category.</p>
+<p>Use Parameter.IsValidDataType(ForgeTypeId) to detect any parameter data type identifier &ndash; i.e., any measurable or non-measurable spec or category.</p>
 <ul>
 <li>Deprecated member &rarr; Replacement member</li>
 <li>ExternalDefinitionCreationOptions(string, ParameterType) &rarr; ExternalDefinitionCreationOptions(string, ForgeTypeId)</li>
-<li>
-<p>ExternalDefinitionCreationOptions.Type &rarr; ExternalDefinitionCreationOptions.GetDataType()
-ExternalDefinitionCreationOptions.SetDataType(ForgeTypeId)</p>
-</li>
-<li>
-<p>Original member &rarr; Preferred replacement</p>
-</li>
+<li>ExternalDefinitionCreationOptions.Type &rarr; ExternalDefinitionCreationOptions.GetDataType(), ExternalDefinitionCreationOptions.SetDataType(ForgeTypeId)</li>
+</ul>
+<p>Preferred replacements for non-deprecated members:</p>
+<ul>
+<li>Original member &rarr; Preferred replacement</li>
 <li>BindingMap.Insert(Definition, Binding, BuiltInParameterGroup) &rarr; BindingMap.Insert(Definition, Binding, ForgeTypeId)</li>
 <li>BindingMap.ReInsert(Definition, Binding, BuiltInParameterGroup) &rarr; BindingMap.ReInsert(Definition, Binding, ForgeTypeId)</li>
 </ul>
 <p>Shared parameters can also be created and leveraged in families using members of the FamilyManager class.</p>
 <ul>
 <li>Deprecated member &rarr; Replacement member</li>
-<li>
-<p>FamilyManager.AddParameter(string, BuiltInParameterGroup, ParameterType, bool) &rarr; FamilyManager.AddParameter(string, ForgeTypeId, ForgeTypeId, bool)</p>
-</li>
-<li>
-<p>Original member &rarr; Preferred replacement</p>
-</li>
+<li>FamilyManager.AddParameter(string, BuiltInParameterGroup, ParameterType, bool) &rarr; FamilyManager.AddParameter(string, ForgeTypeId, ForgeTypeId, bool)</li>
+</ul>
+<p>Preferred replacements for non-deprecated members:</p>
+<ul>
+<li>Original member &rarr; Preferred replacement</li>
 <li>FamilyManager.AddParameter(ExternalDefinition, BuiltInParameterGroup, bool) &rarr; FamilyManager.AddParameter(ExternalDefinition, ForgeTypeId, bool)</li>
 <li>FamilyManager.AddParameter(string, BuiltInParameterGroup, Category, bool) &rarr; FamilyManager.AddParameter(string, ForgeTypeId, Category, bool)</li>
 <li>FamilyManager.IsUserAssignableParameterGroup(BuiltInParameterGroup) &rarr; FamilyManager.IsUserAssignableParameterGroup(ForgeTypeId)</li>
@@ -348,12 +343,11 @@ ExternalDefinitionCreationOptions.SetDataType(ForgeTypeId)</p>
 <p>has been expanded to accept a ForgeTypeId argument identifying any parameter data type. For a category identifier input, GetLabelForSpec(ForgeTypeId) returns the label of the Family Type spec for that category, e.g. "Family Type: Wall Tags".</p>
 <ul>
 <li>Deprecated member &rarr; Replacement member</li>
-<li>
-<p>LabelUtils.GetLabelFor(ParameterType) &rarr; LabelUtils.GetLabelForSpec(ForgeTypeId)</p>
-</li>
-<li>
-<p>Original member &rarr; Preferred replacement</p>
-</li>
+<li>LabelUtils.GetLabelFor(ParameterType) &rarr; LabelUtils.GetLabelForSpec(ForgeTypeId)</li>
+</ul>
+<p>Preferred replacements for non-deprecated members:</p>
+<ul>
+<li>Original member &rarr; Preferred replacement</li>
 <li>LabelUtils.GetLabelFor(BuiltInParameter) &rarr; LabelUtils.GetLabelForBuiltInParameter(ForgeTypeId)</li>
 <li>LabelUtils.GetLabelFor(BuiltInParameter, LanguageType) &rarr; LabelUtils.GetLabelForBuiltInParameter(ForgeTypeId, LanguageType)</li>
 <li>LabelUtils.GetLabelFor(BuiltInParameterGroup) &rarr; LabelUtils.GetLabelForGroup(ForgeTypeId)</li>
@@ -381,8 +375,10 @@ ExternalDefinitionCreationOptions.SetDataType(ForgeTypeId)</p>
 </ul>
 <p>The SpecUtils class contains two methods that are new in this release but also deprecated. They are offered only to assist clients in migrating code from the ParameterType enumeration to the ForgeTypeId class.</p>
 <p>Introduced for porting assistance but deprecated</p>
-<p>SpecUtils.GetParameterType(ForgeTypeId)</p>
-<p>SpecUtils.GetSpecTypeId(ParameterType)</p>
+<ul>
+<li>SpecUtils.GetParameterType(ForgeTypeId)</li>
+<li>SpecUtils.GetSpecTypeId(ParameterType)</li>
+</ul>
 <p>Changes were made to UnitUtils to clarify the meaning of some operations and to offer functions related to disciplines.</p>
 <p>The methods GetAllSpecs() and IsSpec(ForgeTypeId) are renamed to GetAllMeasurableSpecs() and IsMeasurableSpec(ForgeTypeId) to clarify that they apply only to measurable specs, describing floating-point values associated with units of measurement, and to avoid confusion with the new Parameter class static methods GetAllSpecs() and IsSpec(ForgeTypeId), which apply to specs of all value types.</p>
 <p>The new method:</p>
@@ -431,110 +427,58 @@ ExternalDefinitionCreationOptions.SetDataType(ForgeTypeId)</p>
 <p><a name="4.1.3.3"></a><h3 class="new">1.3.3. Worksharing API exception changes</h3></p>
 <p>Several exceptions have changed from existing worksharing API.   For the method Document.SaveAsCloudModel():</p>
 <ul>
-<li>
-<p>Situation &rarr; Previous exception &rarr; Current exception</p>
-</li>
-<li>
-<p>User doesn't sign in &rarr; ArgumentException &rarr; RevitServerUnauthenticatedUserException</p>
-</li>
-<li>
-<p>Duplicated model name &rarr; RevitServerInternalException &rarr; RevitServerModelAlreadyExistsException</p>
-</li>
-<li>
-<p>Hub/Project/Folder doesn't exist &rarr; ArgumentException &rarr; RevitServerUnauthorizedException</p>
-</li>
-<li>
-<p>Folder is Plans folder or its sub folder &rarr; ArgumentException &rarr; RevitServerUnauthorizedException</p>
-</li>
-<li>
-<p>Folder doesn't have "Edit" permission &rarr; ArgumentException &rarr; RevitServerUnauthorizedException</p>
-</li>
+<li>Situation &rarr; Previous exception &rarr; Current exception</li>
+<li>User doesn't sign in &rarr; ArgumentException &rarr; RevitServerUnauthenticatedUserException</li>
+<li>Duplicated model name &rarr; RevitServerInternalException &rarr; RevitServerModelAlreadyExistsException</li>
+<li>Hub/Project/Folder doesn't exist &rarr; ArgumentException &rarr; RevitServerUnauthorizedException</li>
+<li>Folder is Plans folder or its sub folder &rarr; ArgumentException &rarr; RevitServerUnauthorizedException</li>
+<li>Folder doesn't have "Edit" permission &rarr; ArgumentException &rarr; RevitServerUnauthorizedException</li>
 </ul>
 <p>In addition, the function will now throw RevitServerModelNameBreaksConventionException when the model name breaks the project naming convention.</p>
 <p>For the method ModelPathUtils.ConvertCloudGUIDsToCloudPath():</p>
 <ul>
-<li>
-<p>Situation &rarr; Previous exception &rarr; Current exception</p>
-</li>
-<li>
-<p>Region doesn't exist &rarr; RevitServerCommunicationException &rarr; RevitServerUnauthorizedException</p>
-</li>
-<li>
-<p>Project doesn't exist &rarr; CentralModelMissingException &rarr; RevitServerUnauthorizedException</p>
-</li>
-<li>
-<p>Model doesn't exist &rarr; No exception &rarr; RevitServerUnauthorizedException</p>
-</li>
-<li>
-<p>Model exists in a folder that doesn't have the "Edit" permission, but has View above permission &rarr; RevitServerUnauthorizedException &rarr; No exception</p>
-</li>
+<li>Situation &rarr; Previous exception &rarr; Current exception</li>
+<li>Region doesn't exist &rarr; RevitServerCommunicationException &rarr; RevitServerUnauthorizedException</li>
+<li>Project doesn't exist &rarr; CentralModelMissingException &rarr; RevitServerUnauthorizedException</li>
+<li>Model doesn't exist &rarr; No exception &rarr; RevitServerUnauthorizedException</li>
+<li>Model exists in a folder that doesn't have the "Edit" permission, but has View above permission &rarr; RevitServerUnauthorizedException &rarr; No exception</li>
 </ul>
 <p><a name="4.1.3.4"></a><h3 class="new">1.3.4. Worksharing API replacements</h3></p>
 <p>Some properties have been removed and replaced in this release. Because these were an immediate replacement, applications referencing the replaced properties will need to be updated immediately for this release.</p>
 <ul>
-<li>
-<p>Removed member &rarr; Replaced member</p>
-</li>
-<li>
-<p>DocumentSavingAsEventArgs.IsSavingAsMasterFile &rarr; DocumentSavingAsEventArgs.IsSavingAsCentralFile</p>
-</li>
-<li>
-<p>DocumentSavedAsEventArgs.IsSavingAsMasterFile &rarr; DocumentSavedAsEventArgs.IsSavingAsCentralFile</p>
-</li>
+<li>Removed member &rarr; Replaced member</li>
+<li>DocumentSavingAsEventArgs.IsSavingAsMasterFile &rarr; DocumentSavingAsEventArgs.IsSavingAsCentralFile</li>
+<li>DocumentSavedAsEventArgs.IsSavingAsMasterFile &rarr; DocumentSavedAsEventArgs.IsSavingAsCentralFile</li>
 </ul>
 <p><a name="4.1.4"></a><h2 class="new">1.4. Sketched element API changes</h2></p>
 <p><a name="4.1.4.1"></a><h3 class="new">1.4.1. Floor creation API replacements</h3></p>
 <p>The following members have been replaced:</p>
 <ul>
-<li>
-<p>Deprecated member &rarr; Replacement member</p>
-</li>
-<li>
-<p>Autodesk.Revit.Creation.Document.NewFloor() (all overloads) &rarr; Floor.Create(Document document, IList<CurveLoop> profile, ElementId floorTypeId, ElementId levelId)</p>
-</li>
-<li>
-<p>Autodesk.Revit.Creation.Document.NewSlab() &rarr; Floor.Create(Document document, IList<CurveLoop> profile, ElementId floorTypeId, ElementId levelId, bool isStructural, Line slopeArrow, double slope)</p>
-</li>
-<li>
-<p>Autodesk.Revit.Creation.Document.NewFoundationSlab() &rarr; Floor.Create(Document document, IList<CurveLoop> profile, ElementId floorTypeId, ElementId levelId)</p>
-</li>
+<li>Deprecated member &rarr; Replacement member</li>
+<li>Autodesk.Revit.Creation.Document.NewFloor() (all overloads) &rarr; Floor.Create(Document document, IList&lt;CurveLoop&gt; profile, ElementId floorTypeId, ElementId levelId)</li>
+<li>Autodesk.Revit.Creation.Document.NewSlab() &rarr; Floor.Create(Document document, IList&lt;CurveLoop&gt; profile, ElementId floorTypeId, ElementId levelId, bool isStructural, Line slopeArrow, double slope)</li>
+<li>Autodesk.Revit.Creation.Document.NewFoundationSlab() &rarr; Floor.Create(Document document, IList&lt;CurveLoop&gt; profile, ElementId floorTypeId, ElementId levelId)</li>
 </ul>
 <p><a name="4.1.5"></a><h2 class="new">1.5. IndependentTag API Changes</h2></p>
 <p><a name="4.1.5.1"></a><h3 class="new">1.5.1. Rotation</h3></p>
-<p>The new property
-- RotationAngle</p>
+<p>The new property</p>
+<ul>
+<li>RotationAngle</li>
+</ul>
 <p>can be used to get or set the rotation of the tag relative to its view.</p>
 <p><a name="4.1.5.2"></a><h3 class="new">1.5.2. Multiple References </h3></p>
 <p>IndependentTag now supports multiple references to various elements or sub-elements.</p>
 <p>A number of properties were deprecated. The users can now access the desired leader or tagged element using their References.</p>
 <ul>
-<li>
-<p>Deprecated Member &rarr; Replacement Members</p>
-</li>
-<li>
-<p>IndependentTag.TaggedLocalElementId &rarr; IndependentTag.GetTaggedLocalElementIds()</p>
-</li>
-<li>
-<p>IndependentTag.TaggedElementId &rarr; IndependentTag.GetTaggedElementIds()</p>
-</li>
-<li>
-<p>IndependentTag.GetTaggedLocalElement() &rarr; IndependentTag.GetTaggedLocalElements()</p>
-</li>
-<li>
-<p>IndependentTag.GetTaggedReference() &rarr; IndependentTag.GetTaggedReferences()</p>
-</li>
-<li>
-<p>IndependentTag.HasElbow &rarr; IndependentTag.HasLeaderElbow()</p>
-</li>
-<li>
-<p>IndependentTag.LeaderElbow &rarr; IndependentTag.GetLeaderElbow()</p>
-</li>
+<li>Deprecated Member &rarr; Replacement Members</li>
+<li>IndependentTag.TaggedLocalElementId &rarr; IndependentTag.GetTaggedLocalElementIds()</li>
+<li>IndependentTag.TaggedElementId &rarr; IndependentTag.GetTaggedElementIds()</li>
+<li>IndependentTag.GetTaggedLocalElement() &rarr; IndependentTag.GetTaggedLocalElements()</li>
+<li>IndependentTag.GetTaggedReference() &rarr; IndependentTag.GetTaggedReferences()</li>
+<li>IndependentTag.HasElbow &rarr; IndependentTag.HasLeaderElbow()</li>
+<li>IndependentTag.LeaderElbow &rarr; IndependentTag.GetLeaderElbow(), IndependentTag.SetLeaderElbow()</li>
+<li>IndependentTag.LeaderEnd &rarr; IndependentTag.GetLeaderEnd(), IndependentTag.SetLeaderEnd()</li>
 </ul>
-<p>IndependentTag.SetLeaderElbow()</p>
-<ul>
-<li>IndependentTag.LeaderEnd &rarr; IndependentTag.GetLeaderEnd()</li>
-</ul>
-<p>IndependentTag.SetLeaderEnd()</p>
 <p>All deprecated members still work in multi leader scenario by using only the first tagged reference.</p>
 <p>The new members:</p>
 <ul>
@@ -547,21 +491,11 @@ ExternalDefinitionCreationOptions.SetDataType(ForgeTypeId)</p>
 <p>RevisionSettings API replacements</p>
 <p>The following methods have been deprecated and replaced due to terminology changes in the Revisions user interface:</p>
 <ul>
-<li>
-<p>Deprecated API &rarr; Replacement</p>
-</li>
-<li>
-<p>RevisionSettings.GetNumericRevisionSettings() &rarr; RevisionNumberingSequence.GetAllRevisionNumberingSequences()</p>
-</li>
-<li>
-<p>RevisionSettings.SetNumericRevisionSettings() &rarr; RevisionNumberingSequence.SetNumericRevisionSettings()</p>
-</li>
-<li>
-<p>RevisionSettings.GetAlphanumericRevisionSettings() &rarr; RevisionNumberingSequence.GetAllRevisionNumberingSequences()</p>
-</li>
-<li>
-<p>RevisionSettings.SetAlphanumericRevisionSettings() &rarr; RevisionNumberingSequence.SetAlphanumericRevisionSettings()</p>
-</li>
+<li>Deprecated API &rarr; Replacement</li>
+<li>RevisionSettings.GetNumericRevisionSettings() &rarr; RevisionNumberingSequence.GetAllRevisionNumberingSequences()</li>
+<li>RevisionSettings.SetNumericRevisionSettings() &rarr; RevisionNumberingSequence.SetNumericRevisionSettings()</li>
+<li>RevisionSettings.GetAlphanumericRevisionSettings() &rarr; RevisionNumberingSequence.GetAllRevisionNumberingSequences()</li>
+<li>RevisionSettings.SetAlphanumericRevisionSettings() &rarr; RevisionNumberingSequence.SetAlphanumericRevisionSettings()</li>
 </ul>
 <p><a name="4.1.7"></a><h2 class="new">1.7. Structural reinforcement API changes</h2></p>
 <p>Reinforcement bars now uses two diameter values instead of just one:</p>
@@ -783,7 +717,7 @@ ExternalDefinitionCreationOptions.SetDataType(ForgeTypeId)</p>
 <li>Document.SaveAsCloudModel(String folderId, String modelName)</li>
 <li>MEPModel.ElectricalSystems</li>
 <li>MEPModel.AssignedElectricalSystems</li>
-<li>StructuralConnectionHandler.Create(Document doc, List<ElementId> idsToConnect)</li>
+<li>StructuralConnectionHandler.Create(Document doc, List&lt;ElementId&gt; idsToConnect)</li>
 </ul>
 <p><center>
 <div style="border-style:solid; border-width:2px 0px 2px 0px">
@@ -794,8 +728,8 @@ ExternalDefinitionCreationOptions.SetDataType(ForgeTypeId)</p>
 <p><a name="4.2.1.1"></a><h3 class="new">2.1.1. Ceiling creation</h3></p>
 <p>The new methods:</p>
 <ul>
-<li>Ceiling.Create(Document document, IList<CurveLoop> curveLoops, ElementId ceilingTypeId, ElementId level)</li>
-<li>Ceiling.Create(Document document, IList<CurveLoop> curveLoops, ElementId ceilingTypeId, ElementId levelId, Line slopeArrow, double slope)</li>
+<li>Ceiling.Create(Document document, IList&lt;CurveLoop&gt; curveLoops, ElementId ceilingTypeId, ElementId level)</li>
+<li>Ceiling.Create(Document document, IList&lt;CurveLoop&gt; curveLoops, ElementId ceilingTypeId, ElementId levelId, Line slopeArrow, double slope)</li>
 </ul>
 <p>create a new instance of a ceiling in a Revit project, with one overload supporting a sloped ceiling.fac</p>
 <p><a name="4.2.1.2"></a><h3 class="new">2.1.2. Floor APIs</h3></p>
@@ -956,7 +890,7 @@ Key new members of this class include:</p>
 <p><a name="4.2.3.1"></a><h3 class="new">2.3.1. Export to PDF</h3></p>
 <p>The new method:</p>
 <ul>
-<li>Document.Export(String, IList<ElementId>, PDFExportOptions)</li>
+<li>Document.Export(String, IList&lt;ElementId&gt;, PDFExportOptions)</li>
 </ul>
 <p>exports one or more views and sheets in PDF format.</p>
 <p>The options provided, in the new class:</p>
