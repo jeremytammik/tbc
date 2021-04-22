@@ -506,21 +506,11 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <p>The following members were deprecated and replaced.  Note that the deprecated members always reference the bar's "model diameter".</p>
 <ul>
 <li>Deprecated member &rarr; Replacement members</li>
-<li>BarTypeDiameterOptions.BarDiameter &rarr; BarTypeDiameterOptions.BarModelDiameter</li>
+<li>BarTypeDiameterOptions.BarDiameter &rarr; BarTypeDiameterOptions.BarModelDiameter, BarTypeDiameterOptions.BarNominalDiameter</li>
+<li>RebarBarType.BarDiameter &rarr; RebarBarType.BarModelDiameter, RebarBarType.BarNominalDiameter</li>
+<li>RebarBendData.BarDiameter &rarr; RebarBendData.BarModelDiameter, RebarBendData.BarNominalDiameter</li>
+<li>RebarUpdateCurvesData.GetBarDiameter &rarr; RebarUpdateCurvesData.GetBarModelDiameter, RebarUpdateCurvesData.GetBarNominalDiameter</li>
 </ul>
-<p>BarTypeDiameterOptions.BarNominalDiameter</p>
-<ul>
-<li>RebarBarType.BarDiameter &rarr; RebarBarType.BarModelDiameter</li>
-</ul>
-<p>RebarBarType.BarNominalDiameter</p>
-<ul>
-<li>RebarBendData.BarDiameter &rarr; RebarBendData.BarModelDiameter</li>
-</ul>
-<p>RebarBendData.BarNominalDiameter</p>
-<ul>
-<li>RebarUpdateCurvesData.GetBarDiameter &rarr; RebarUpdateCurvesData.GetBarModelDiameter</li>
-</ul>
-<p>RebarUpdateCurvesData.GetBarNominalDiameter</p>
 <p><a name="4.1.8"></a><h2 class="new">1.8. Import/Export API changes</h2></p>
 <p><a name="4.1.8.1"></a><h3 class="new">1.8.1. Import() and Link() methods now treat View as optional</h3></p>
 <p>The methods:</p>
@@ -539,15 +529,9 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <p><a name="4.1.9.1"></a><h3 class="new">1.9.1. Electrical API changes</h3></p>
 <p>The following method and property have been deprecated;  the old methods referred to temperature in terms on "long", which did not match the capabilities in the UI, and had an error when referring to non-Fahrenheit temperature values.</p>
 <ul>
-<li>
-<p>Deprecated API &rarr; Replacement</p>
-</li>
-<li>
-<p>TemperatureRatingType.AddCorrectionFactor(long temperature, double factor) &rarr; TemperatureRatingType.AddCorrectionFactor(double temperature, double factor)</p>
-</li>
-<li>
-<p>CorrectionFactor.Temperature &rarr; CorrectionFactor.GetTemperature()</p>
-</li>
+<li>Deprecated API &rarr; Replacement</li>
+<li>TemperatureRatingType.AddCorrectionFactor(long temperature, double factor) &rarr; TemperatureRatingType.AddCorrectionFactor(double temperature, double factor)</li>
+<li>CorrectionFactor.Temperature &rarr; CorrectionFactor.GetTemperature()</li>
 </ul>
 <p><a name="4.1.9.2"></a><h3 class="new">1.9.2. Fabrication API changes</h3></p>
 <p>In a terminology change, the fabrication service "group" was renamed as a "palette" in order to align with changes made in the Revit user interface.  This affected the following members:</p>
@@ -646,64 +630,40 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 </ul>
 <p>Some enumeration values were renamed to match the current naming of the commands in the Revit UI.  There is no way to preserve the old name as obsoleted so code referring to these values will need to be updated:</p>
 <ul>
-<li>
-<p>Removed &rarr; Replacement</p>
-</li>
-<li>
-<p>ExportMassModelGBXML &rarr; ExportGBXML</p>
-</li>
-<li>
-<p>ModelBrowserContainer &rarr; ToggleHome</p>
-</li>
-<li>
-<p>PlaceOnHost &rarr; PlaceOnStairOrRamp</p>
-</li>
-<li>
-<p>Playlist &rarr; DynamoPlayer</p>
-</li>
-<li>
-<p>RunEnergySimulation &rarr; Generate</p>
-</li>
-<li>
-<p>ShowEnergyModel &rarr; CreateEnergyModel</p>
-</li>
-<li>
-<p>UseCurrentProject &rarr; CoordinationReviewUseCurrentProject</p>
-</li>
+<li>Removed &rarr; Replacement</li>
+<li>ExportMassModelGBXML &rarr; ExportGBXML</li>
+<li>ModelBrowserContainer &rarr; ToggleHome</li>
+<li>PlaceOnHost &rarr; PlaceOnStairOrRamp</li>
+<li>Playlist &rarr; DynamoPlayer</li>
+<li>RunEnergySimulation &rarr; Generate</li>
+<li>ShowEnergyModel &rarr; CreateEnergyModel</li>
+<li>UseCurrentProject &rarr; CoordinationReviewUseCurrentProject</li>
 </ul>
 <p>Finally, some commands have been removed from the Revit UI. These commands can no longer be posted, so the values have been removed from the enumeration:</p>
-<p>ExportBuildingSite</p>
-<p>PublishDGNToAutodeskBuzzsaw</p>
-<p>PublishDWFToAutodeskBuzzsaw</p>
-<p>PublishDWGToAutodeskBuzzsaw</p>
-<p>PublishDXFToAutodeskBuzzsaw</p>
-<p>PublishSATToAutodeskBuzzsaw</p>
-<p>RecentFiles</p>
-<p>ResultsAndCompare</p>
-<p>StairBySketch</p>
-<p>ViewRange</p>
+<ul>
+<li>ExportBuildingSite</li>
+<li>PublishDGNToAutodeskBuzzsaw</li>
+<li>PublishDWFToAutodeskBuzzsaw</li>
+<li>PublishDWGToAutodeskBuzzsaw</li>
+<li>PublishDXFToAutodeskBuzzsaw</li>
+<li>PublishSATToAutodeskBuzzsaw</li>
+<li>RecentFiles</li>
+<li>ResultsAndCompare</li>
+<li>StairBySketch</li>
+<li>ViewRange</li>
+</ul>
 <p><a name="4.1.11"></a><h2 class="new">1.11. BuiltInFailures changes</h2></p>
 <p>Some changes have been made to existing BuiltInFailure definitions.  Code that looks for or handles specific failures may need updating, as it is not possible to obsolete the replaced members, so they have been removed in this release.</p>
 <ul>
-<li>
-<p>Failure submodule &rarr; Removed FailureDefinition &rarr; Replacement FailureDefinition</p>
-</li>
-<li>
-<p>WallFailures &rarr; ExtrudedWallMustBeVertical &rarr; ExtrudedWallDisallowedForCrossSectionType</p>
-</li>
-<li>
-<p>GroupFailures &rarr; FailedToSetMasterGroupId &rarr; FailedToSetLeaderGroupId</p>
-</li>
+<li>Failure submodule &rarr; Removed FailureDefinition &rarr; Replacement FailureDefinition</li>
+<li>WallFailures &rarr; ExtrudedWallMustBeVertical &rarr; ExtrudedWallDisallowedForCrossSectionType</li>
+<li>GroupFailures &rarr; FailedToSetMasterGroupId &rarr; FailedToSetLeaderGroupId</li>
 </ul>
 <p><a name="4.1.12"></a><h2 class="new">1.12. Filter API change</h2></p>
 <p>The constructor for the class FilterStringRule has been obsoleted and replaced.  The previous constructor has a Boolean argument for case sensitivity that was not used in View Filters and could not be used properly from the API, as all string comparisons in filters are case-insensitive:</p>
 <ul>
-<li>
-<p>Obsoleted member &rarr; Replacement member</p>
-</li>
-<li>
-<p>FilterStringRule(FilterableValueProvider, FilterStringRuleEvaluator, String, boolean) &rarr; FilterStringRule(FilterableValueProvider, FilterStringRuleEvaluator, String)</p>
-</li>
+<li>Obsoleted member &rarr; Replacement member</li>
+<li>FilterStringRule(FilterableValueProvider, FilterStringRuleEvaluator, String, boolean) &rarr; FilterStringRule(FilterableValueProvider, FilterStringRuleEvaluator, String)</li>
 </ul>
 <p>The method FilterStringRuleEvaluator.Evaluate() still has an argument "caseSensitive", but it's never called by filter code with this argument set to true.</p>
 <p><a name="4.1.13"></a><h2 class="new">1.13. Ruby macros no longer supported</h2></p>
@@ -1333,7 +1293,7 @@ Use:</p>
 <li>RebarInSystem.GetTransformedCenterlineCurves()</li>
 </ul>
 <p>return the centerline curves for a given bar, where the geometry of the curves are in the actual transformed position. The BarPositionTransform (representing the relative position of any individual bar in the set &ndash; a translation along the distribution path) and MovedBarTransform (representing the movement of the bar relative to its default position along the distribution path) will be applied to the returned curves.</p>
-<p><a name="4.2.20.7"></a><h3 class="new">2.20.7. Freeform Rebar </h3></p>
+<p><a name="4.2.20.7"></a><h3 class="new">2.20.7. Freeform Rebar</h3></p>
 <p>The new properties:</p>
 <ul>
 <li>RebarFreeFormAccessor.RebarStyle</li>
