@@ -15,7 +15,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
 &ndash;
 ...
@@ -36,19 +36,19 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <h3>What's New in the Revit 2022 API</h3>
 <p>The Revit 2022 API includes exciting enhancements for add-in developers, including numerous developer wishes and requests that have now been explicitly addressed:</p>
 <ul>
-<li><a href="#1">Information sources</a> </li>
-<li><a href="#2">What's new in previous versions</a> </li>
+<li><a href="#1">Information sources</a></li>
+<li><a href="#2">What's new in previous versions</a></li>
 <li><a href="#4">Detailed TOC of major changes and renovations</a></li>
 </ul>
 <h4><a name="1"></a>Information Sources</h4>
 <p>The information below is based on the contents of the <em>Revit Platform API Changes and Additions.docx</em> document included with
-the Revit 2022 SDK, the software developers kit available from 
+the Revit 2022 SDK, the software developers kit available from
 the <a href="https://www.autodesk.com/developer-network/platform-technologies/revit">Revit Developer Centre</a>.</p>
 <p>It is also provided in the section on <em>What's New</em> in the Revit 2022 API help file <code>RevitAPI.chm</code> included with the SDK:</p>
 <p><center>
 <img src="img/whats_new_2022.png" alt="Revit 2022 API help on What's New" title="Revit 2022 API help on What's New" width="100"/>
 </center></p>
-<p>For convenient, easy and effective web searching, this blog post provides an cleaned-up online HTML version of that information with numbering and table of contents added, as well as the following PDF printout of the original document included in the SDK:</p>
+<p>For convenient, easy, and effective web searching, this blog post provides a cleaned-up online HTML version of that information with numbering and table of contents added, as well as the following PDF printout of the original document included in the SDK:</p>
 <ul>
 <li><a href="zip/Revit_Platform_API_Changes_and_Additions_2022.pdf">Revit_Platform_API_Changes_and_Additions_2022.pdf</a></li>
 </ul>
@@ -60,9 +60,9 @@ the <a href="https://www.autodesk.com/developer-network/platform-technologies/re
 <li>The Revit API help file <code>RevitAPI.chm</code></li>
 <li>The Visual Studio solution containing all the SDK samples, <code>Samples\SDKSamples.sln</code></li>
 </ul>
-<p>You will need both of these regularly for research on how to solve specific Revit API programming tasks.</p>
+<p>You will regularly need both for research on how to solve specific Revit API programming tasks.</p>
 <p>More in-depth official explanations and background information is provided by the
-online <a href="http://help.autodesk.com/view/RVT/2021/ENU/?guid=Revit_API_Revit_API_Developers_Guide_html">Revit API Developers Guide</a> included 
+online <a href="http://help.autodesk.com/view/RVT/2021/ENU/?guid=Revit_API_Revit_API_Developers_Guide_html">Revit API Developers Guide</a> included
 in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online help</a>.</p>
 <h4><a name="2"></a>What's New in Previous Versions</h4>
 <p>Here are links to previous discussions of <em>What's New in the Revit API</em>:</p>
@@ -266,7 +266,7 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <li>BuiltInParameterGroup &rarr; GroupTypeId</li>
 <li>BuiltInParameter &rarr; ParameterTypeId</li>
 </ul>
-<p>The mapping of enumerations to different ForgeTypeId members has implications for previously existing APIs related to parameter access, parameter definitions, shared parameter creation and binding, global parameters and other utilities.  </p>
+<p>The mapping of enumerations to different ForgeTypeId members has implications for previously existing APIs related to parameter access, parameter definitions, shared parameter creation and binding, global parameters and other utilities.</p>
 <p><a name="4.1.1.1"></a><h3 class="new">1.1.1. Changes to Parameter Access APIs</h3></p>
 <ul>
 <li>Original member &rarr; Preferred replacement</li>
@@ -302,69 +302,39 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <p>However, it is now possible to create Family Type shared parameters using the replacement functions based on ForgeTypeId. The class constructor taking ForgeTypeId and the SetDataType(ForgeTypeId) method accept any spec or category identifier. Using a category identifier produces a Family Type shared parameter of the given category. Use Category.GetBuiltInCategoryTypeId(BuiltInCategory) to obtain the ForgeTypeId identifier for a given category.</p>
 <p>Use Parameter.IsValidDataType(ForgeTypeId) to detect any parameter data type identifier – i.e., any measurable or non-measurable spec or category.</p>
 <ul>
+<li>Deprecated member &rarr; Replacement member</li>
+<li>ExternalDefinitionCreationOptions(string, ParameterType) &rarr; ExternalDefinitionCreationOptions(string, ForgeTypeId)</li>
 <li>
-<p>Deprecated member &rarr; Replacement member</p>
+<p>ExternalDefinitionCreationOptions.Type &rarr; ExternalDefinitionCreationOptions.GetDataType()
+ExternalDefinitionCreationOptions.SetDataType(ForgeTypeId)</p>
 </li>
-<li>
-<p>ExternalDefinitionCreationOptions(string, ParameterType) &rarr; ExternalDefinitionCreationOptions(string, ForgeTypeId)</p>
-</li>
-<li>
-<p>ExternalDefinitionCreationOptions.Type &rarr; ExternalDefinitionCreationOptions.GetDataType()</p>
-</li>
-</ul>
-<p>ExternalDefinitionCreationOptions.SetDataType(ForgeTypeId)</p>
-<ul>
 <li>
 <p>Original member &rarr; Preferred replacement</p>
 </li>
-<li>
-<p>BindingMap.Insert(Definition, Binding, BuiltInParameterGroup) &rarr; BindingMap.Insert(Definition, Binding, ForgeTypeId)</p>
-</li>
-<li>
-<p>BindingMap.ReInsert(Definition, Binding, BuiltInParameterGroup) &rarr; BindingMap.ReInsert(Definition, Binding, ForgeTypeId)</p>
-</li>
+<li>BindingMap.Insert(Definition, Binding, BuiltInParameterGroup) &rarr; BindingMap.Insert(Definition, Binding, ForgeTypeId)</li>
+<li>BindingMap.ReInsert(Definition, Binding, BuiltInParameterGroup) &rarr; BindingMap.ReInsert(Definition, Binding, ForgeTypeId)</li>
 </ul>
-<p>Shared parameters can also be created and leveraged in families using members of the FamilyManager class.  </p>
+<p>Shared parameters can also be created and leveraged in families using members of the FamilyManager class.</p>
 <ul>
-<li>
-<p>Deprecated member &rarr; Replacement member</p>
-</li>
+<li>Deprecated member &rarr; Replacement member</li>
 <li>
 <p>FamilyManager.AddParameter(string, BuiltInParameterGroup, ParameterType, bool) &rarr; FamilyManager.AddParameter(string, ForgeTypeId, ForgeTypeId, bool)</p>
 </li>
 <li>
 <p>Original member &rarr; Preferred replacement</p>
 </li>
-<li>
-<p>FamilyManager.AddParameter(ExternalDefinition, BuiltInParameterGroup, bool) &rarr; FamilyManager.AddParameter(ExternalDefinition, ForgeTypeId, bool)</p>
-</li>
-<li>
-<p>FamilyManager.AddParameter(string, BuiltInParameterGroup, Category, bool) &rarr; FamilyManager.AddParameter(string, ForgeTypeId, Category, bool)</p>
-</li>
-<li>
-<p>FamilyManager.IsUserAssignableParameterGroup(BuiltInParameterGroup) &rarr; FamilyManager.IsUserAssignableParameterGroup(ForgeTypeId)</p>
-</li>
-<li>
-<p>FamilyManager.Parameter[BuiltInParameter] &rarr; FamilyManager.GetParameter(ForgeTypeId)</p>
-</li>
-<li>
-<p>FamilyManager.ReplaceParameter(FamilyParameter, ExternalDefinition, BuiltInParameterGroup, bool) &rarr; FamilyManager.ReplaceParameter(FamilyParameter, ExternalDefinition, ForgeTypeId, bool)</p>
-</li>
-<li>
-<p>FamilyManager.ReplaceParameter(FamilyParameter, string, BuiltInParameterGroup, bool) &rarr; FamilyManager.ReplaceParameter(FamilyParameter, string, ForgeTypeId, bool)</p>
-</li>
+<li>FamilyManager.AddParameter(ExternalDefinition, BuiltInParameterGroup, bool) &rarr; FamilyManager.AddParameter(ExternalDefinition, ForgeTypeId, bool)</li>
+<li>FamilyManager.AddParameter(string, BuiltInParameterGroup, Category, bool) &rarr; FamilyManager.AddParameter(string, ForgeTypeId, Category, bool)</li>
+<li>FamilyManager.IsUserAssignableParameterGroup(BuiltInParameterGroup) &rarr; FamilyManager.IsUserAssignableParameterGroup(ForgeTypeId)</li>
+<li>FamilyManager.Parameter[BuiltInParameter] &rarr; FamilyManager.GetParameter(ForgeTypeId)</li>
+<li>FamilyManager.ReplaceParameter(FamilyParameter, ExternalDefinition, BuiltInParameterGroup, bool) &rarr; FamilyManager.ReplaceParameter(FamilyParameter, ExternalDefinition, ForgeTypeId, bool)</li>
+<li>FamilyManager.ReplaceParameter(FamilyParameter, string, BuiltInParameterGroup, bool) &rarr; FamilyManager.ReplaceParameter(FamilyParameter, string, ForgeTypeId, bool)</li>
 </ul>
 <p><a name="4.1.1.4"></a><h3 class="new">1.1.4. Changes to GlobalParameter APIs </h3></p>
 <ul>
-<li>
-<p>Deprecated member &rarr; Replacement member</p>
-</li>
-<li>
-<p>GlobalParameter.Create(Document, string, ParameterType) &rarr; GlobalParameter.Create(Document, string, ForgeTypeId)</p>
-</li>
-<li>
-<p>GlobalParameter.IsValidDataType(ParameterType) &rarr; Parameter.IsSpec(ForgeTypeId)</p>
-</li>
+<li>Deprecated member &rarr; Replacement member</li>
+<li>GlobalParameter.Create(Document, string, ParameterType) &rarr; GlobalParameter.Create(Document, string, ForgeTypeId)</li>
+<li>GlobalParameter.IsValidDataType(ParameterType) &rarr; Parameter.IsSpec(ForgeTypeId)</li>
 </ul>
 <p><a name="4.1.1.5"></a><h3 class="new">1.1.5. New and changed utility APIs</h3></p>
 <p>The LabelUtils class, used to obtain user-visible names for enumerations, has several changes according to the mapping from enumerations to ForgeTypeId. In addition to the replacements listed below, a new method:</p>
@@ -373,28 +343,20 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 </ul>
 <p>returns the user visible name corresponding to a Revit discipline in the current Revit language. The implementation of the method:</p>
 <ul>
-<li>LabelUtils.GetLabelForSpec(ForgeTypeId) </li>
+<li>LabelUtils.GetLabelForSpec(ForgeTypeId)</li>
 </ul>
 <p>has been expanded to accept a ForgeTypeId argument identifying any parameter data type. For a category identifier input, GetLabelForSpec(ForgeTypeId) returns the label of the Family Type spec for that category, e.g. "Family Type: Wall Tags".</p>
 <ul>
-<li>
-<p>Deprecated member &rarr; Replacement member</p>
-</li>
+<li>Deprecated member &rarr; Replacement member</li>
 <li>
 <p>LabelUtils.GetLabelFor(ParameterType) &rarr; LabelUtils.GetLabelForSpec(ForgeTypeId)</p>
 </li>
 <li>
 <p>Original member &rarr; Preferred replacement</p>
 </li>
-<li>
-<p>LabelUtils.GetLabelFor(BuiltInParameter) &rarr; LabelUtils.GetLabelForBuiltInParameter(ForgeTypeId)</p>
-</li>
-<li>
-<p>LabelUtils.GetLabelFor(BuiltInParameter, LanguageType) &rarr; LabelUtils.GetLabelForBuiltInParameter(ForgeTypeId, LanguageType)</p>
-</li>
-<li>
-<p>LabelUtils.GetLabelFor(BuiltInParameterGroup) &rarr; LabelUtils.GetLabelForGroup(ForgeTypeId)</p>
-</li>
+<li>LabelUtils.GetLabelFor(BuiltInParameter) &rarr; LabelUtils.GetLabelForBuiltInParameter(ForgeTypeId)</li>
+<li>LabelUtils.GetLabelFor(BuiltInParameter, LanguageType) &rarr; LabelUtils.GetLabelForBuiltInParameter(ForgeTypeId, LanguageType)</li>
+<li>LabelUtils.GetLabelFor(BuiltInParameterGroup) &rarr; LabelUtils.GetLabelForGroup(ForgeTypeId)</li>
 </ul>
 <p>ParameterUtils is a new class with static utility functions related to ForgeTypeId parameter identifiers:</p>
 <ul>
@@ -405,10 +367,12 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 </ul>
 <p>The ParameterUtils class contains several methods that are new in this release but also deprecated. They are offered only to assist clients in migrating code from the BuiltInParameter and BuiltInParameterGroup enumerations to the ForgeTypeId class.</p>
 <p>Introduced for porting assistance but deprecated</p>
-<p>ParameterUtils.GetBuiltInParameter(ForgeTypeId)</p>
-<p>ParameterUtils.GetBuiltInParameterGroup(ForgeTypeId)</p>
-<p>ParameterUtils.GetParameterGroupTypeId(BuiltInParameterGroup)</p>
-<p>ParameterUtils.GetParameterTypeId(BuiltInParameter)</p>
+<ul>
+<li>ParameterUtils.GetBuiltInParameter(ForgeTypeId)</li>
+<li>ParameterUtils.GetBuiltInParameterGroup(ForgeTypeId)</li>
+<li>ParameterUtils.GetParameterGroupTypeId(BuiltInParameterGroup)</li>
+<li>ParameterUtils.GetParameterTypeId(BuiltInParameter)</li>
+</ul>
 <p>SpecUtils is a new class with static utility functions related to ForgeTypeId spec identifiers:</p>
 <ul>
 <li>SpecUtils.GetAllSpecs()</li>
@@ -419,42 +383,26 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <p>Introduced for porting assistance but deprecated</p>
 <p>SpecUtils.GetParameterType(ForgeTypeId)</p>
 <p>SpecUtils.GetSpecTypeId(ParameterType)</p>
-<p>Changes were made to UnitUtils to clarify the meaning of some operations and to offer functions related to disciplines. </p>
-<p>The methods GetAllSpecs() and IsSpec(ForgeTypeId) are renamed to GetAllMeasurableSpecs() and IsMeasurableSpec(ForgeTypeId) to clarify that they apply only to measurable specs, describing floating-point values associated with units of measurement, and to avoid confusion with the new Parameter class static methods GetAllSpecs() and IsSpec(ForgeTypeId), which apply to specs of all value types. </p>
+<p>Changes were made to UnitUtils to clarify the meaning of some operations and to offer functions related to disciplines.</p>
+<p>The methods GetAllSpecs() and IsSpec(ForgeTypeId) are renamed to GetAllMeasurableSpecs() and IsMeasurableSpec(ForgeTypeId) to clarify that they apply only to measurable specs, describing floating-point values associated with units of measurement, and to avoid confusion with the new Parameter class static methods GetAllSpecs() and IsSpec(ForgeTypeId), which apply to specs of all value types.</p>
 <p>The new method:</p>
 <ul>
 <li>UnitUtils.GetAllDisciplines()</li>
 </ul>
 <p>provides a list of all available Revit disciplines, suitable for iteration. Previously iteration would have used the members of the UnitGroup enumeration.</p>
 <ul>
-<li>
-<p>Deprecated &rarr; Replacement</p>
-</li>
-<li>
-<p>UnitUtils.GetAllSpecs() &rarr; UnitUtils.GetAllMeasurableSpecs()</p>
-</li>
-<li>
-<p>UnitUtils.GetUnitGroup(ForgeTypeId) &rarr; UnitUtils.GetDiscipline(ForgeTypeId)</p>
-</li>
-<li>
-<p>UnitUtils.IsSpec(ForgeTypeId) &rarr; UnitUtils.IsMeasurableSpec(ForgeTypeId)</p>
-</li>
+<li>Deprecated &rarr; Replacement</li>
+<li>UnitUtils.GetAllSpecs() &rarr; UnitUtils.GetAllMeasurableSpecs()</li>
+<li>UnitUtils.GetUnitGroup(ForgeTypeId) &rarr; UnitUtils.GetDiscipline(ForgeTypeId)</li>
+<li>UnitUtils.IsSpec(ForgeTypeId) &rarr; UnitUtils.IsMeasurableSpec(ForgeTypeId)</li>
 </ul>
 <p><a name="4.1.2"></a><h2 class="new">1.2. Renamed/replaced Parameter Group members</h2></p>
 <p>As a part of changes made to support externalized parameter groups, three BuiltInParameterGroup enumeration values were renamed:</p>
 <ul>
-<li>
-<p>Original &rarr; Replacement</p>
-</li>
-<li>
-<p>PG_ELECTRICAL &rarr; PG_ELECTRICAL_ENGINEERING</p>
-</li>
-<li>
-<p>PG_AELECTRICAL &rarr; PG_ELECTRICAL</p>
-</li>
-<li>
-<p>PG_TERMINTATION &rarr; PG_TERMINATION</p>
-</li>
+<li>Original &rarr; Replacement</li>
+<li>PG_ELECTRICAL &rarr; PG_ELECTRICAL_ENGINEERING</li>
+<li>PG_AELECTRICAL &rarr; PG_ELECTRICAL</li>
+<li>PG_TERMINTATION &rarr; PG_TERMINATION</li>
 </ul>
 <p>Note that because the name PG_ELECTRICAL now identifies a different group, client applications which do not adjust will find parameters they create now in "Electrical" instead of "Electrical Engineering".</p>
 <p><a name="4.1.3"></a><h2 class="new">1.3. Document &amp; Worksharing API changes</h2></p>
@@ -502,7 +450,7 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <p>Folder doesn't have "Edit" permission &rarr; ArgumentException &rarr; RevitServerUnauthorizedException</p>
 </li>
 </ul>
-<p>In addition, the function will now throw RevitServerModelNameBreaksConventionException when the model name breaks the project naming convention. </p>
+<p>In addition, the function will now throw RevitServerModelNameBreaksConventionException when the model name breaks the project naming convention.</p>
 <p>For the method ModelPathUtils.ConvertCloudGUIDsToCloudPath():</p>
 <ul>
 <li>
@@ -557,46 +505,46 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 - RotationAngle</p>
 <p>can be used to get or set the rotation of the tag relative to its view.</p>
 <p><a name="4.1.5.2"></a><h3 class="new">1.5.2. Multiple References </h3></p>
-<p>IndependentTag now supports multiple references to various elements or sub-elements. </p>
-<p>A number of properties were deprecated. The users can now access the desired leader or tagged element using their References. </p>
+<p>IndependentTag now supports multiple references to various elements or sub-elements.</p>
+<p>A number of properties were deprecated. The users can now access the desired leader or tagged element using their References.</p>
 <ul>
 <li>
-<p>Deprecated Member &rarr; Replacement Members </p>
+<p>Deprecated Member &rarr; Replacement Members</p>
 </li>
 <li>
-<p>IndependentTag.TaggedLocalElementId &rarr; IndependentTag.GetTaggedLocalElementIds() </p>
+<p>IndependentTag.TaggedLocalElementId &rarr; IndependentTag.GetTaggedLocalElementIds()</p>
 </li>
 <li>
-<p>IndependentTag.TaggedElementId &rarr; IndependentTag.GetTaggedElementIds() </p>
+<p>IndependentTag.TaggedElementId &rarr; IndependentTag.GetTaggedElementIds()</p>
 </li>
 <li>
-<p>IndependentTag.GetTaggedLocalElement() &rarr; IndependentTag.GetTaggedLocalElements() </p>
+<p>IndependentTag.GetTaggedLocalElement() &rarr; IndependentTag.GetTaggedLocalElements()</p>
 </li>
 <li>
-<p>IndependentTag.GetTaggedReference() &rarr; IndependentTag.GetTaggedReferences() </p>
+<p>IndependentTag.GetTaggedReference() &rarr; IndependentTag.GetTaggedReferences()</p>
 </li>
 <li>
-<p>IndependentTag.HasElbow &rarr; IndependentTag.HasLeaderElbow() </p>
+<p>IndependentTag.HasElbow &rarr; IndependentTag.HasLeaderElbow()</p>
 </li>
 <li>
-<p>IndependentTag.LeaderElbow &rarr; IndependentTag.GetLeaderElbow() </p>
+<p>IndependentTag.LeaderElbow &rarr; IndependentTag.GetLeaderElbow()</p>
 </li>
 </ul>
-<p>IndependentTag.SetLeaderElbow() </p>
+<p>IndependentTag.SetLeaderElbow()</p>
 <ul>
-<li>IndependentTag.LeaderEnd &rarr; IndependentTag.GetLeaderEnd() </li>
+<li>IndependentTag.LeaderEnd &rarr; IndependentTag.GetLeaderEnd()</li>
 </ul>
-<p>IndependentTag.SetLeaderEnd() </p>
-<p>All deprecated members still work in multi leader scenario by using only the first tagged reference. </p>
+<p>IndependentTag.SetLeaderEnd()</p>
+<p>All deprecated members still work in multi leader scenario by using only the first tagged reference.</p>
 <p>The new members:</p>
 <ul>
-<li>IndependentTag.AddReferences() </li>
-<li>IndependentTag.RemoveReferences() </li>
-<li>IndependentTag. MultiLeader </li>
+<li>IndependentTag.AddReferences()</li>
+<li>IndependentTag.RemoveReferences()</li>
+<li>IndependentTag. MultiLeader</li>
 </ul>
-<p>are used to bulk add or remove references from a tag, and to  query if the tag references multiple elements. </p>
+<p>are used to bulk add or remove references from a tag, and to  query if the tag references multiple elements.</p>
 <p><a name="4.1.6"></a><h2 class="new">1.6. Revision API changes</h2></p>
-<p>RevisionSettings API replacements </p>
+<p>RevisionSettings API replacements</p>
 <p>The following methods have been deprecated and replaced due to terminology changes in the Revisions user interface:</p>
 <ul>
 <li>
@@ -623,26 +571,22 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 </ul>
 <p>The following members were deprecated and replaced.  Note that the deprecated members always reference the bar's "model diameter".</p>
 <ul>
-<li>
-<p>Deprecated member &rarr; Replacement members</p>
-</li>
-<li>
-<p>BarTypeDiameterOptions.BarDiameter &rarr; BarTypeDiameterOptions.BarModelDiameter </p>
-</li>
+<li>Deprecated member &rarr; Replacement members</li>
+<li>BarTypeDiameterOptions.BarDiameter &rarr; BarTypeDiameterOptions.BarModelDiameter</li>
 </ul>
-<p>BarTypeDiameterOptions.BarNominalDiameter </p>
+<p>BarTypeDiameterOptions.BarNominalDiameter</p>
 <ul>
-<li>RebarBarType.BarDiameter &rarr; RebarBarType.BarModelDiameter </li>
+<li>RebarBarType.BarDiameter &rarr; RebarBarType.BarModelDiameter</li>
 </ul>
-<p>RebarBarType.BarNominalDiameter </p>
+<p>RebarBarType.BarNominalDiameter</p>
 <ul>
 <li>RebarBendData.BarDiameter &rarr; RebarBendData.BarModelDiameter</li>
 </ul>
-<p>RebarBendData.BarNominalDiameter </p>
+<p>RebarBendData.BarNominalDiameter</p>
 <ul>
-<li>RebarUpdateCurvesData.GetBarDiameter &rarr; RebarUpdateCurvesData.GetBarModelDiameter </li>
+<li>RebarUpdateCurvesData.GetBarDiameter &rarr; RebarUpdateCurvesData.GetBarModelDiameter</li>
 </ul>
-<p>RebarUpdateCurvesData.GetBarNominalDiameter </p>
+<p>RebarUpdateCurvesData.GetBarNominalDiameter</p>
 <p><a name="4.1.8"></a><h2 class="new">1.8. Import/Export API changes</h2></p>
 <p><a name="4.1.8.1"></a><h3 class="new">1.8.1. Import() and Link() methods now treat View as optional</h3></p>
 <p>The methods:</p>
@@ -654,16 +598,12 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <p><a name="4.1.8.2"></a><h3 class="new">1.8.2. Export API replacements</h3></p>
 <p>The following property has been removed and replaced in this release. Because these were an immediate replacement, applications referencing the replaced property will need to be updated immediately for this release.</p>
 <ul>
-<li>
-<p>Removed member &rarr; Replaced member</p>
-</li>
-<li>
-<p>DGNExportOptions.MasterUnits &rarr; DGNExportOptions.WorkingUnits</p>
-</li>
+<li>Removed member &rarr; Replaced member</li>
+<li>DGNExportOptions.MasterUnits &rarr; DGNExportOptions.WorkingUnits</li>
 </ul>
 <p><a name="4.1.9"></a><h2 class="new">1.9. MEP API changes</h2></p>
 <p><a name="4.1.9.1"></a><h3 class="new">1.9.1. Electrical API changes</h3></p>
-<p>The following method and property have been deprecated;  the old methods referred to temperature in terms on "long", which did not match the capabilities in the UI, and had an error when referring to non-Fahrenheit temperature values.   </p>
+<p>The following method and property have been deprecated;  the old methods referred to temperature in terms on "long", which did not match the capabilities in the UI, and had an error when referring to non-Fahrenheit temperature values.</p>
 <ul>
 <li>
 <p>Deprecated API &rarr; Replacement</p>
@@ -678,160 +618,136 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <p><a name="4.1.9.2"></a><h3 class="new">1.9.2. Fabrication API changes</h3></p>
 <p>In a terminology change, the fabrication service "group" was renamed as a "palette" in order to align with changes made in the Revit user interface.  This affected the following members:</p>
 <ul>
-<li>
-<p>Deprecated API &rarr; Replacement</p>
-</li>
-<li>
-<p>FabricationNetworkChangeService.SetGroupId() &rarr; FabricationNetworkChangeService.SetPaletteId()</p>
-</li>
-<li>
-<p>FabricationNetworkChangeService.SetRestrictGroup() &rarr; FabricationNetworkChangeService.SetRestrictPalette()</p>
-</li>
-<li>
-<p>FabricationService.GroupCount &rarr; FabricationService.PaletteCount</p>
-</li>
-<li>
-<p>FabricationService.IsValidGroupIndex() &rarr; FabricationService.IsValidPaletteIndex()</p>
-</li>
-<li>
-<p>FabricationService.GetGroupName() &rarr; FabricationService.GetPaletteName()</p>
-</li>
-<li>
-<p>FabricationService.IsGroupExcluded() &rarr; FabricationService.IsPaletteExcluded()</p>
-</li>
-<li>
-<p>FabricationService.SetServiceGroupExclusions() &rarr; FabricationService.SetServicePaletteExclusions()</p>
-</li>
-<li>
-<p>FabricationServiceButton.GroupIndex &rarr; FabricationServiceButton.PaletteIndex</p>
-</li>
-<li>
-<p>FabricationPartSizeMap.GroupId &rarr; FabricationPartSizeMap.PaletteId</p>
-</li>
+<li>Deprecated API &rarr; Replacement</li>
+<li>FabricationNetworkChangeService.SetGroupId() &rarr; FabricationNetworkChangeService.SetPaletteId()</li>
+<li>FabricationNetworkChangeService.SetRestrictGroup() &rarr; FabricationNetworkChangeService.SetRestrictPalette()</li>
+<li>FabricationService.GroupCount &rarr; FabricationService.PaletteCount</li>
+<li>FabricationService.IsValidGroupIndex() &rarr; FabricationService.IsValidPaletteIndex()</li>
+<li>FabricationService.GetGroupName() &rarr; FabricationService.GetPaletteName()</li>
+<li>FabricationService.IsGroupExcluded() &rarr; FabricationService.IsPaletteExcluded()</li>
+<li>FabricationService.SetServiceGroupExclusions() &rarr; FabricationService.SetServicePaletteExclusions()</li>
+<li>FabricationServiceButton.GroupIndex &rarr; FabricationServiceButton.PaletteIndex</li>
+<li>FabricationPartSizeMap.GroupId &rarr; FabricationPartSizeMap.PaletteId</li>
 </ul>
 <p>The following properties have been deprecated.  Because they are not currently used and relate to not yet available capabilities, there is no replacement for these members.</p>
 <ul>
-<li>
-<p>Deprecated API &rarr; Replacement</p>
-</li>
-<li>
-<p>FabricationConfigurationInfo.CloudVersion &rarr; None</p>
-</li>
-<li>
-<p>FabricationConfigurationInfo.IsConnected &rarr; None</p>
-</li>
+<li>Deprecated API &rarr; Replacement</li>
+<li>FabricationConfigurationInfo.CloudVersion &rarr; None</li>
+<li>FabricationConfigurationInfo.IsConnected &rarr; None</li>
 </ul>
 <p><a name="4.1.10"></a><h2 class="new">1.10. PostableCommand enumeration update</h2></p>
-<p>Many updates have been made to the PostableCommand enumeration to match the current set of Revit commands. </p>
+<p>Many updates have been made to the PostableCommand enumeration to match the current set of Revit commands.</p>
 <p>A good number of commands were newly added to the enumeration:</p>
-<p>Anchors </p>
-<p>BatchPrint </p>
-<p>Bolts </p>
-<p>Collaborate </p>
-<p>CollaborateInCloud </p>
-<p>ConnectionSettings </p>
-<p>ContourCut </p>
-<p>CoordinationModel </p>
-<p>CoordinationSelectLink </p>
-<p>Cope </p>
-<p>CopeSkewed  </p>
-<p>CopyMonitorSelectLink </p>
-<p>CopyMonitorUseCurrentProject </p>
-<p>CornerCut  </p>
-<p>CutBy  </p>
-<p>CutThrough  </p>
-<p>DeleteEnergyModel </p>
-<p>Dynamo </p>
-<p>GetAutodeskContent </p>
-<p>GlobalParameters </p>
-<p>Holes </p>
-<p>ImportImage </p>
-<p>ImportPDF </p>
-<p>LinkImage </p>
-<p>LinkPDF </p>
-<p>LinkTopography </p>
-<p>LoadAsGroupIntoOpenProjects </p>
-<p>LoadFamilyIntoProjectAndClose </p>
-<p>LoadIntoProject  </p>
-<p>LoadRebarShapeIntoProjectAndClose </p>
-<p>ManageCloudModels </p>
-<p>Miter  </p>
-<p>Multiplanar </p>
-<p>MultiPointRouting </p>
-<p>NewFamily </p>
-<p>NewProject </p>
-<p>OpenFamily </p>
-<p>OpenIFC </p>
-<p>OpenIFCOptions </p>
-<p>OpenProject </p>
-<p>Optimize </p>
-<p>PAndIDModeler </p>
-<p>PAndIDSettings</p>
-<p>PathOfTravel </p>
-<p>Plate </p>
-<p>PublishSettings  </p>
-<p>RepairCentralModel </p>
-<p>ResetSharedCoordinates </p>
-<p>RevealObstacles </p>
-<p>SaveAsCloudModel </p>
-<p>SaveAsFamily </p>
-<p>SawCutFlange  </p>
-<p>SawCutWeb  </p>
-<p>ShapeStatus </p>
-<p>SharedViews </p>
-<p>ShearStuds </p>
-<p>Shorten </p>
-<p>ShowWarningsInViews </p>
-<p>SpaceNaming </p>
-<p>StructuralConnection  </p>
-<p>StructuralRebarCoupler </p>
-<p>SystemsAnalysis </p>
-<p>SystemZone </p>
-<p>TitleBlock </p>
-<p>ToggleHome </p>
-<p>TogglePAndIDModelerBrowser </p>
-<p>ToggleRevealHiddenElementsMode </p>
-<p>Walkthrough </p>
-<p>Welds  </p>
-<p>WorksharingMonitor </p>
+<ul>
+<li>Anchors</li>
+<li>BatchPrint</li>
+<li>Bolts</li>
+<li>Collaborate</li>
+<li>CollaborateInCloud</li>
+<li>ConnectionSettings</li>
+<li>ContourCut</li>
+<li>CoordinationModel</li>
+<li>CoordinationSelectLink</li>
+<li>Cope</li>
+<li>CopeSkewed</li>
+<li>CopyMonitorSelectLink</li>
+<li>CopyMonitorUseCurrentProject</li>
+<li>CornerCut</li>
+<li>CutBy</li>
+<li>CutThrough</li>
+<li>DeleteEnergyModel</li>
+<li>Dynamo</li>
+<li>GetAutodeskContent</li>
+<li>GlobalParameters</li>
+<li>Holes</li>
+<li>ImportImage</li>
+<li>ImportPDF</li>
+<li>LinkImage</li>
+<li>LinkPDF</li>
+<li>LinkTopography</li>
+<li>LoadAsGroupIntoOpenProjects</li>
+<li>LoadFamilyIntoProjectAndClose</li>
+<li>LoadIntoProject</li>
+<li>LoadRebarShapeIntoProjectAndClose</li>
+<li>ManageCloudModels</li>
+<li>Miter</li>
+<li>Multiplanar</li>
+<li>MultiPointRouting</li>
+<li>NewFamily</li>
+<li>NewProject</li>
+<li>OpenFamily</li>
+<li>OpenIFC</li>
+<li>OpenIFCOptions</li>
+<li>OpenProject</li>
+<li>Optimize</li>
+<li>PAndIDModeler</li>
+<li>PAndIDSettings</li>
+<li>PathOfTravel</li>
+<li>Plate</li>
+<li>PublishSettings</li>
+<li>RepairCentralModel</li>
+<li>ResetSharedCoordinates</li>
+<li>RevealObstacles</li>
+<li>SaveAsCloudModel</li>
+<li>SaveAsFamily</li>
+<li>SawCutFlange</li>
+<li>SawCutWeb</li>
+<li>ShapeStatus</li>
+<li>SharedViews</li>
+<li>ShearStuds</li>
+<li>Shorten</li>
+<li>ShowWarningsInViews</li>
+<li>SpaceNaming</li>
+<li>StructuralConnection</li>
+<li>StructuralRebarCoupler</li>
+<li>SystemsAnalysis</li>
+<li>SystemZone</li>
+<li>TitleBlock</li>
+<li>ToggleHome</li>
+<li>TogglePAndIDModelerBrowser</li>
+<li>ToggleRevealHiddenElementsMode</li>
+<li>Walkthrough</li>
+<li>Welds</li>
+<li>WorksharingMonitor</li>
+</ul>
 <p>Some enumeration values were renamed to match the current naming of the commands in the Revit UI.  There is no way to preserve the old name as obsoleted so code referring to these values will need to be updated:</p>
 <ul>
 <li>
-<p>Removed &rarr; Replacement </p>
+<p>Removed &rarr; Replacement</p>
 </li>
 <li>
-<p>ExportMassModelGBXML &rarr; ExportGBXML  </p>
+<p>ExportMassModelGBXML &rarr; ExportGBXML</p>
 </li>
 <li>
-<p>ModelBrowserContainer &rarr; ToggleHome  </p>
+<p>ModelBrowserContainer &rarr; ToggleHome</p>
 </li>
 <li>
-<p>PlaceOnHost &rarr; PlaceOnStairOrRamp </p>
+<p>PlaceOnHost &rarr; PlaceOnStairOrRamp</p>
 </li>
 <li>
-<p>Playlist &rarr; DynamoPlayer  </p>
+<p>Playlist &rarr; DynamoPlayer</p>
 </li>
 <li>
-<p>RunEnergySimulation &rarr; Generate  </p>
+<p>RunEnergySimulation &rarr; Generate</p>
 </li>
 <li>
-<p>ShowEnergyModel &rarr; CreateEnergyModel  </p>
+<p>ShowEnergyModel &rarr; CreateEnergyModel</p>
 </li>
 <li>
-<p>UseCurrentProject &rarr; CoordinationReviewUseCurrentProject </p>
+<p>UseCurrentProject &rarr; CoordinationReviewUseCurrentProject</p>
 </li>
 </ul>
 <p>Finally, some commands have been removed from the Revit UI. These commands can no longer be posted, so the values have been removed from the enumeration:</p>
-<p>ExportBuildingSite  </p>
-<p>PublishDGNToAutodeskBuzzsaw </p>
-<p>PublishDWFToAutodeskBuzzsaw  </p>
-<p>PublishDWGToAutodeskBuzzsaw  </p>
-<p>PublishDXFToAutodeskBuzzsaw  </p>
-<p>PublishSATToAutodeskBuzzsaw  </p>
-<p>RecentFiles  </p>
-<p>ResultsAndCompare  </p>
-<p>StairBySketch  </p>
-<p>ViewRange  </p>
+<p>ExportBuildingSite</p>
+<p>PublishDGNToAutodeskBuzzsaw</p>
+<p>PublishDWFToAutodeskBuzzsaw</p>
+<p>PublishDWGToAutodeskBuzzsaw</p>
+<p>PublishDXFToAutodeskBuzzsaw</p>
+<p>PublishSATToAutodeskBuzzsaw</p>
+<p>RecentFiles</p>
+<p>ResultsAndCompare</p>
+<p>StairBySketch</p>
+<p>ViewRange</p>
 <p><a name="4.1.11"></a><h2 class="new">1.11. BuiltInFailures changes</h2></p>
 <p>Some changes have been made to existing BuiltInFailure definitions.  Code that looks for or handles specific failures may need updating, as it is not possible to obsolete the replaced members, so they have been removed in this release.</p>
 <ul>
@@ -852,7 +768,7 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <p>Obsoleted member &rarr; Replacement member</p>
 </li>
 <li>
-<p>FilterStringRule(FilterableValueProvider, FilterStringRuleEvaluator, String, boolean) &rarr; FilterStringRule(FilterableValueProvider, FilterStringRuleEvaluator, String) </p>
+<p>FilterStringRule(FilterableValueProvider, FilterStringRuleEvaluator, String, boolean) &rarr; FilterStringRule(FilterableValueProvider, FilterStringRuleEvaluator, String)</p>
 </li>
 </ul>
 <p>The method FilterStringRuleEvaluator.Evaluate() still has an argument "caseSensitive", but it's never called by filter code with this argument set to true.</p>
@@ -902,14 +818,14 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <li>Wall.CrossSection</li>
 <li>Wall.IsWallCrossSectionValid()</li>
 </ul>
-<p>allow assignment of a cross section type to a given wall, and determine if that type can be assigned.  </p>
+<p>allow assignment of a cross section type to a given wall, and determine if that type can be assigned.</p>
 <p>The new enumerations:</p>
 <ul>
 <li>Autodesk.Revit.DB.WallCrossSection</li>
 <li>Autodesk.Revit.DB.WidthMeasuredAt</li>
 <li>Autodesk.Revit.DB.InsertOrientation</li>
 </ul>
-<p>enumerate the values for options related to alternate wall cross section values, especially the options available for Tapered walls.  </p>
+<p>enumerate the values for options related to alternate wall cross section values, especially the options available for Tapered walls.</p>
 <p><a name="4.2.1.5"></a><h3 class="new">2.1.5. Sketch APIs</h3></p>
 <p>The new methods:</p>
 <ul>
@@ -934,7 +850,7 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <li>Autodesk.Revit.DB.ReferencePlane</li>
 <li>Autodesk.Revit.DB.Dimension</li>
 </ul>
-<p>This method works for any Sketch you can obtain from a Sketch-based element (Ceiling, Extrusion, etc.). It is available both in and outside of a SketchEditScope. </p>
+<p>This method works for any Sketch you can obtain from a Sketch-based element (Ceiling, Extrusion, etc.). It is available both in and outside of a SketchEditScope.</p>
 <p><a name="4.2.1.6"></a><h3 class="new">2.1.6. Editing Sketches with SketchEditScope</h3></p>
 <p>Using the new class:</p>
 <ul>
@@ -956,17 +872,17 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <p><a name="4.2.1.7"></a><h3 class="new">2.1.7. Boundary validation for sketched elements</h3></p>
 <p>The new method:</p>
 <ul>
-<li>BoundaryValidation.IsValidHorizontalBoundary() </li>
+<li>BoundaryValidation.IsValidHorizontalBoundary()</li>
 </ul>
 <p>validates input curves form a valid horizontal boundary for Ceiling or Floor creation.</p>
 <p><a name="4.2.1.8"></a><h3 class="new">2.1.8. CompoundStructure API</h3></p>
 <p>The new method:</p>
 <ul>
-<li>CompoundStructure.CanSplitAndMergeRegionsBeUsed() </li>
+<li>CompoundStructure.CanSplitAndMergeRegionsBeUsed()</li>
 </ul>
-<p>checks whether split and merge regions operations can be used for this compound structure.  This validator is associated with the use of the existing MergeRegionsAdjacentToSegment() and SplitRegion() methods. </p>
+<p>checks whether split and merge regions operations can be used for this compound structure.  This validator is associated with the use of the existing MergeRegionsAdjacentToSegment() and SplitRegion() methods.</p>
 <p><a name="4.2.2"></a><h2 class="new">2.2. Color Fill API</h2></p>
-<p>Multiple new classes provide access to color fills.  These classes expose  color   fill schemes, entries and color   fill legends.  You can also also a ccess  the color  fill scheme applied to a particular view. </p>
+<p>Multiple new classes provide access to color fills.  These classes expose  color   fill schemes, entries and color   fill legends.  You can also also a ccess  the color  fill scheme applied to a particular view.</p>
 <p><a name="4.2.2.1"></a><h3 class="new">2.2.1. Color Fill Schemes</h3></p>
 <p>The new class:</p>
 <ul>
@@ -992,7 +908,7 @@ Key new members of this class include:</p>
 <li>ColorFillScheme.GetSupportedParameterIds()</li>
 </ul>
 <p><a name="4.2.2.2"></a><h3 class="new">2.2.2. Color Fill Scheme Entries</h3></p>
-<p>The new class: </p>
+<p>The new class:</p>
 <ul>
 <li>Autodesk.Revit.DB.ColorFillSchemeEntry</li>
 </ul>
@@ -1017,7 +933,7 @@ Key new members of this class include:</p>
 <p><a name="4.2.2.3"></a><h3 class="new">2.2.3. View access to Color Fills</h3></p>
 <p>The new members:</p>
 <ul>
-<li>View.GetColorFillSchemeId() </li>
+<li>View.GetColorFillSchemeId()</li>
 <li>View.SetColorFillSchemeId()</li>
 </ul>
 <p>provide access to read and apply the color fill scheme associated with a particular category in the view.</p>
@@ -1042,7 +958,7 @@ Key new members of this class include:</p>
 <ul>
 <li>Document.Export(String, IList<ElementId>, PDFExportOptions)</li>
 </ul>
-<p>exports one or more views and sheets in PDF format.  </p>
+<p>exports one or more views and sheets in PDF format.</p>
 <p>The options provided, in the new class:</p>
 <ul>
 <li>Autodesk.Revit.DB.PDFExportOptions</li>
@@ -1053,11 +969,11 @@ Key new members of this class include:</p>
 <ul>
 <li>Autodesk.Revit.DB.ExportPDFSettings</li>
 </ul>
-<p>represents a named stored PDF export option available in a document.    You can use this class to extract the options from this element to use for exporting to PDF, or modify or create new stored settings with different options.  </p>
+<p>represents a named stored PDF export option available in a document.    You can use this class to extract the options from this element to use for exporting to PDF, or modify or create new stored settings with different options.</p>
 <p><a name="4.2.4"></a><h2 class="new">2.4. Civil Alignments API</h2></p>
 <p>Revit now provides support for Civil Alignments and their associated annotations. Alignments are imported from InfraWorks as a part of the workflow to transfer Civil Structures. The API supports read of alignment properties and geometric information, along with read/write and create of associated annotations. All new classes for the Alignments API are exposed through a different assembly in the Revit installation, located at</p>
 <ul>
-<li>Addins\CivilAlignments\Autodesk.CivilAlignments.DBApplication.dll </li>
+<li>Addins\CivilAlignments\Autodesk.CivilAlignments.DBApplication.dll</li>
 </ul>
 <p>The new class:</p>
 <ul>
@@ -1111,7 +1027,7 @@ Use:</p>
 <ul>
 <li>ExternalGeometryId</li>
 </ul>
-<p>represents an identifier for geometry from external sources. </p>
+<p>represents an identifier for geometry from external sources.</p>
 <p>The new members:</p>
 <ul>
 <li>ExternalGeometryId.IsValidExternalGeometryId()</li>
@@ -1122,7 +1038,7 @@ Use:</p>
 <ul>
 <li>ExternallyTaggedGeometryObject</li>
 </ul>
-<p>serves as a base class for externally tagged geometry. </p>
+<p>serves as a base class for externally tagged geometry.</p>
 <p>The new members:</p>
 <ul>
 <li>ExternallyTaggedGeometryObject.ExternalId</li>
@@ -1132,7 +1048,7 @@ Use:</p>
 <ul>
 <li>ExternallyTaggedNonBRep</li>
 </ul>
-<p>represents non-BRep geometry with an external identifier. </p>
+<p>represents non-BRep geometry with an external identifier.</p>
 <p>The new class:</p>
 <ul>
 <li>ExternallyTaggedBRep</li>
@@ -1199,12 +1115,12 @@ Use:</p>
 <p><a name="4.2.6.1"></a><h3 class="new">2.6.1. Cloud Model API additions</h3></p>
 <p>Four new methods allow access to identifying forge IDs for Cloud Models:</p>
 <ul>
-<li>Document.GetHubId(): ForgeDM hub id where the model locates. </li>
-<li>Document.GetProjectId(): ForgeDM project id where the model locates. </li>
-<li>Document.GetCloudFolderId(bool forceRefresh): ForgeDM folder id where the model locates.  </li>
-<li>Document.GetCloudModelUrn(): A ForgeDM Urn identifying the model. </li>
+<li>Document.GetHubId(): ForgeDM hub id where the model locates.</li>
+<li>Document.GetProjectId(): ForgeDM project id where the model locates.</li>
+<li>Document.GetCloudFolderId(bool forceRefresh): ForgeDM folder id where the model locates.</li>
+<li>Document.GetCloudModelUrn(): A ForgeDM Urn identifying the model.</li>
 </ul>
-<p>These methods all return strings, which will be empty for a document which is not a cloud model. </p>
+<p>These methods all return strings, which will be empty for a document which is not a cloud model.</p>
 <p><a name="4.2.6.2"></a><h3 class="new">2.6.2. OpenOptions API</h3></p>
 <p>The new property:</p>
 <ul>
@@ -1217,7 +1133,7 @@ Use:</p>
 <ul>
 <li>Viewport.LabelOffset</li>
 </ul>
-<p>controls the two-dimensional label offset from left bottom corner of the viewport (as established with Rotation set to None) to the left end of the viewport label line. </p>
+<p>controls the two-dimensional label offset from left bottom corner of the viewport (as established with Rotation set to None) to the left end of the viewport label line.</p>
 <p>The new property:</p>
 <ul>
 <li>Viewport.LabelLineLength</li>
@@ -1248,25 +1164,25 @@ Use:</p>
 <ul>
 <li>TemporaryGraphicsManager</li>
 </ul>
-<p>allows the creation of temporary graphics in the canvas and can be used to create in-canvas controls. </p>
+<p>allows the creation of temporary graphics in the canvas and can be used to create in-canvas controls.</p>
 <p>It has the following members:</p>
 <ul>
-<li>TemporaryGraphicsManager.GetTemporaryGraphicsManager() </li>
-<li>TemporaryGraphicsManager.AddControl() </li>
-<li>TemporaryGraphicsManager.UpdateControl() </li>
-<li>TemporaryGraphicsManager.RemoveControl() </li>
-<li>TemporaryGraphicsManager.SetVisibility() </li>
-<li>TemporaryGraphicsManager.GetAll() </li>
-<li>TemporaryGraphicsManager.Clear() </li>
+<li>TemporaryGraphicsManager.GetTemporaryGraphicsManager()</li>
+<li>TemporaryGraphicsManager.AddControl()</li>
+<li>TemporaryGraphicsManager.UpdateControl()</li>
+<li>TemporaryGraphicsManager.RemoveControl()</li>
+<li>TemporaryGraphicsManager.SetVisibility()</li>
+<li>TemporaryGraphicsManager.GetAll()</li>
+<li>TemporaryGraphicsManager.Clear()</li>
 </ul>
 <p>The new class:</p>
 <ul>
-<li>InCanvasControlData </li>
+<li>InCanvasControlData</li>
 </ul>
-<p>stores a reference to the image used in the temporary graphics. It has the following properties: </p>
+<p>stores a reference to the image used in the temporary graphics. It has the following properties:</p>
 <ul>
-<li>InCanvasControlData.ImagePath </li>
-<li>InCanvasControlData.Position </li>
+<li>InCanvasControlData.ImagePath</li>
+<li>InCanvasControlData.Position</li>
 </ul>
 <p><a name="4.2.9"></a><h2 class="new">2.9. Label API additions</h2></p>
 <p>The new methods:</p>
@@ -1274,7 +1190,7 @@ Use:</p>
 <li>Level.GetNearestLevelId(Document document, double elevation)</li>
 <li>Level.GetNearestLevelId(Document document, double elevation, out double offset)</li>
 </ul>
-<p>return the id of the Level which is closest to the specified elevation. The level can be at, above or below the target elevation. If there is more than one Level at the same distance from the elevation, the Level with the lowest id will be returned. </p>
+<p>return the id of the Level which is closest to the specified elevation. The level can be at, above or below the target elevation. If there is more than one Level at the same distance from the elevation, the Level with the lowest id will be returned.</p>
 <p><a name="4.2.10"></a><h2 class="new">2.10. Parameter API additions</h2></p>
 <p>The new class:</p>
 <ul>
@@ -1314,14 +1230,14 @@ Use:</p>
 <li>Category.GetBuiltInCategory(ForgeTypeId)</li>
 <li>Category.IsBuiltInCategory(ForgeTypeId)</li>
 </ul>
-<p>allow access to BuiltInCategories. </p>
+<p>allow access to BuiltInCategories.</p>
 <p><a name="4.2.13"></a><h2 class="new">2.13. Shared Coordinates API additions</h2></p>
 <p><a name="4.2.13.1"></a><h3 class="new">2.13.1. Reset Shared Coordinates</h3></p>
 <p>The new method:</p>
 <ul>
 <li>Document.ResetSharedCoordinates()</li>
 </ul>
-<p>resets the shared coordinates for the host model. It provides the same functionality as the UI Command "Reset Shared Coordinates". </p>
+<p>resets the shared coordinates for the host model. It provides the same functionality as the UI Command "Reset Shared Coordinates".</p>
 <p>After resetting coordinates, the following changes will take place:</p>
 <ol>
 <li>GIS coordinate system will be erased</li>
@@ -1331,13 +1247,13 @@ Use:</p>
 </ol>
 <p>Note: There will be no changes to linked models.</p>
 <p><a name="4.2.13.2"></a><h3 class="new">2.13.2. Clipped state of BasePoint</h3></p>
-<p>The new property: </p>
+<p>The new property:</p>
 <ul>
 <li>bool BasePoint.Clipped</li>
 </ul>
-<p>will get or set the clipped state of the survey point BasePoint based on the active ProjectLocation of its Document. For the project base point, the get method will always return false, and the set method will throw an exception. </p>
+<p>will get or set the clipped state of the survey point BasePoint based on the active ProjectLocation of its Document. For the project base point, the get method will always return false, and the set method will throw an exception.</p>
 <p><a name="4.2.14"></a><h2 class="new">2.14. Revision API additions</h2></p>
-<p>Revision sequences and API additions </p>
+<p>Revision sequences and API additions</p>
 <p>The new class:</p>
 <ul>
 <li>Autodesk.Revit.DB.RevisionNumberingSequence</li>
@@ -1378,19 +1294,19 @@ Use:</p>
 <li>Element.IsDemolishedPhaseOrderValid()</li>
 <li>Element.IsCreatedPhaseOrderValid()</li>
 </ul>
-<p>validate the order of phases on a given element with respect to the input phase id, ensuring that an object is not assigned a phase where it is demolished before it was created. </p>
+<p>validate the order of phases on a given element with respect to the input phase id, ensuring that an object is not assigned a phase where it is demolished before it was created.</p>
 <p><a name="4.2.16"></a><h2 class="new">2.16. Geometry API additions</h2></p>
 <p>The new property:</p>
 <ul>
-<li>Mesh.IsClosed </li>
+<li>Mesh.IsClosed</li>
 </ul>
-<p>checks if each edge in the mesh belongs to at least two faces.  </p>
+<p>checks if each edge in the mesh belongs to at least two faces.</p>
 <p><a name="4.2.17"></a><h2 class="new">2.17. Point Cloud API additions</h2></p>
 <p>The new method:</p>
 <ul>
 <li>PointCloudType.GetReCapProject()</li>
 </ul>
-<p>provides a direct entry point to get access to an object from the ReCap SDK (ReCapWrapper.RCProject) from Revit. This object represents the point cloud from the RC file path stored in PointCloudType. The ReCap assembly ReCapWrapper.dll will need to be included into code using this method.  </p>
+<p>provides a direct entry point to get access to an object from the ReCap SDK (ReCapWrapper.RCProject) from Revit. This object represents the point cloud from the RC file path stored in PointCloudType. The ReCap assembly ReCapWrapper.dll will need to be included into code using this method.</p>
 <p>The coordinate system in RCProject is defined by the Point Cloud. Please refer to ReCap SDK documentation for RCProject.getCoordinateSystem(). If you need points converted to the modeling coordinate system in Revit, you can obtain the transformation matrix from PointCloudInstance.GetTransform().</p>
 <p><a name="4.2.18"></a><h2 class="new">2.18. Schedule API additions</h2></p>
 <p><a name="4.2.18.1"></a><h3 class="new">2.18.1. Multiple Value Indication &ndash; schedule customization</h3></p>
@@ -1419,70 +1335,70 @@ Use:</p>
 <p>import or link a 3DM file into the document.</p>
 <p><a name="4.2.20"></a><h2 class="new">2.20. Structural API additions</h2></p>
 <p><a name="4.2.20.1"></a><h3 class="new">2.20.1. Moving individual rebar in a Rebar Set</h3></p>
-<p>The new methods: </p>
+<p>The new methods:</p>
 <ul>
-<li>Rebar.MoveBarInSet() </li>
-<li>Rebar.GetBarIndexFromReference() </li>
-<li>Rebar.GetMovedBarTransform() </li>
-<li>Rebar.ResetMovedBarTransform() </li>
+<li>Rebar.MoveBarInSet()</li>
+<li>Rebar.GetBarIndexFromReference()</li>
+<li>Rebar.GetMovedBarTransform()</li>
+<li>Rebar.ResetMovedBarTransform()</li>
 </ul>
-<p>allow an application to move an individual bar, and to read and reset the transform of the individual bar in a Rebar Set. </p>
+<p>allow an application to move an individual bar, and to read and reset the transform of the individual bar in a Rebar Set.</p>
 <p><a name="4.2.20.2"></a><h3 class="new">2.20.2. Removing individual bars from a Rebar Set</h3></p>
-<p>The new function: </p>
+<p>The new function:</p>
 <ul>
-<li>Rebar.SetBarIncluded() </li>
+<li>Rebar.SetBarIncluded()</li>
 </ul>
-<p>allows you to designate a particular bar at a given index to be included or not. </p>
-<p>The existing properties: </p>
+<p>allows you to designate a particular bar at a given index to be included or not.</p>
+<p>The existing properties:</p>
 <ul>
-<li>Rebar.IncludeFirstBar </li>
-<li>Rebar.IncludeFirstBar </li>
+<li>Rebar.IncludeFirstBar</li>
+<li>Rebar.IncludeFirstBar</li>
 </ul>
-<p>continue to function as before, and setting these to true are equivalent to removing the bar at the first or last position index. </p>
-<p>The existing function: </p>
+<p>continue to function as before, and setting these to true are equivalent to removing the bar at the first or last position index.</p>
+<p>The existing function:</p>
 <ul>
-<li>Rebar.DoesBarExistAtPosition() </li>
+<li>Rebar.DoesBarExistAtPosition()</li>
 </ul>
-<p>now supports returning false for any bar position index and not just the first or last bar. </p>
+<p>now supports returning false for any bar position index and not just the first or last bar.</p>
 <p><a name="4.2.20.3"></a><h3 class="new">2.20.3. Moving and Removing bars owned by PathReinforcement</h3></p>
-<p>The new methods: </p>
+<p>The new methods:</p>
 <ul>
-<li>RebarInSystem.SetBarIncluded() </li>
-<li>RebarInSystem.MoveBarInSet() </li>
-<li>RebarInSystem.GetMovedBarTransform() </li>
-<li>RebarInSystem.ResetMovedBarTransform() </li>
-<li>RebarInSystem.CanEditIndividualBars() </li>
+<li>RebarInSystem.SetBarIncluded()</li>
+<li>RebarInSystem.MoveBarInSet()</li>
+<li>RebarInSystem.GetMovedBarTransform()</li>
+<li>RebarInSystem.ResetMovedBarTransform()</li>
+<li>RebarInSystem.CanEditIndividualBars()</li>
 </ul>
-<p>provide access to move, include or remove individual bars only for RebarInSystem elements that are owned by PathReinforcement.  (This is not supported for RebarInSystem owned by AreaReinforcement). </p>
+<p>provide access to move, include or remove individual bars only for RebarInSystem elements that are owned by PathReinforcement.  (This is not supported for RebarInSystem owned by AreaReinforcement).</p>
 <p><a name="4.2.20.4"></a><h3 class="new">2.20.4. Area Reinforcement Layers</h3></p>
-<p>The new methods: </p>
+<p>The new methods:</p>
 <ul>
-<li>AreaReinforcement.GetNumberOfLines() </li>
+<li>AreaReinforcement.GetNumberOfLines()</li>
 <li>AreaReinforcement.GetLineFromLayerAtIndex()</li>
 <li>AreaReinforcement.SetLineIncluded()</li>
 <li>AreaReinforcement.IsLineIncluded()</li>
 <li>AreaReinforcement.MoveLine()</li>
 <li>AreaReinforcement.GetMovedLineTransform()</li>
-<li>AreaReinforcement.ResetMovedLineTransform() </li>
-<li>AreaReinforcement.SetLayerActive() </li>
-<li>AreaReinforcement.IsLayerActive() </li>
-<li>AreaReinforcement.GetLayerDirection() </li>
+<li>AreaReinforcement.ResetMovedLineTransform()</li>
+<li>AreaReinforcement.SetLayerActive()</li>
+<li>AreaReinforcement.IsLayerActive()</li>
+<li>AreaReinforcement.GetLayerDirection()</li>
 </ul>
-<p>provide access to the layers of Area Reinforcement elements, and to manipulate (move and remove) the individual lines exposed through those layers. </p>
+<p>provide access to the layers of Area Reinforcement elements, and to manipulate (move and remove) the individual lines exposed through those layers.</p>
 <p><a name="4.2.20.5"></a><h3 class="new">2.20.5. Rebar conversion</h3></p>
 <p>The new methods:</p>
 <ul>
-<li>AreaReinforcement.ConvertRebarInSystemToRebars() </li>
-<li>PathReinforcement.ConvertRebarInSystemToRebars() </li>
+<li>AreaReinforcement.ConvertRebarInSystemToRebars()</li>
+<li>PathReinforcement.ConvertRebarInSystemToRebars()</li>
 </ul>
 <p>convert all of the RebarInSystem elements owned by the input element into equivalent Rebar elements.</p>
 <p><a name="4.2.20.6"></a><h3 class="new">2.20.6. Rebar geometry</h3></p>
 <p>The new methods:</p>
 <ul>
-<li>Rebar.GetTransformedCenterlineCurves() </li>
-<li>RebarInSystem.GetTransformedCenterlineCurves() </li>
+<li>Rebar.GetTransformedCenterlineCurves()</li>
+<li>RebarInSystem.GetTransformedCenterlineCurves()</li>
 </ul>
-<p>return the centerline curves for a given bar, where the geometry of the curves are in the actual transformed position. The BarPositionTransform (representing the relative position of any individual bar in the set &ndash; a translation along the distribution path) and MovedBarTransform (representing the movement of the bar relative to its default position along the distribution path) will be applied to the returned curves. </p>
+<p>return the centerline curves for a given bar, where the geometry of the curves are in the actual transformed position. The BarPositionTransform (representing the relative position of any individual bar in the set &ndash; a translation along the distribution path) and MovedBarTransform (representing the movement of the bar relative to its default position along the distribution path) will be applied to the returned curves.</p>
 <p><a name="4.2.20.7"></a><h3 class="new">2.20.7. Freeform Rebar </h3></p>
 <p>The new properties:</p>
 <ul>
@@ -1511,20 +1427,20 @@ Use:</p>
 </ul>
 <p>gets or sets the offset distance from this zone to the associated level.</p>
 <p><a name="4.2.21.3"></a><h3 class="new">2.21.3. Mechanical Systems Analysis Set Points</h3></p>
-<p>The new properties: </p>
+<p>The new properties:</p>
 <ul>
 <li>HVACLoadType.HeatingSetPoint</li>
-<li>HVACLoadType.CoolingSetPoint </li>
-<li>HVACLoadType.HumidificationSetPoint </li>
-<li>HVACLoadType.DehumidificationSetPoint </li>
+<li>HVACLoadType.CoolingSetPoint</li>
+<li>HVACLoadType.HumidificationSetPoint</li>
+<li>HVACLoadType.DehumidificationSetPoint</li>
 </ul>
-<p>provide access to the heating temperature, cooling temperature, humidification and dehumidifcation set point values.  Temperature set points are in Kelvin, while humidity set points are percentages ranging from 0 to 1. </p>
+<p>provide access to the heating temperature, cooling temperature, humidification and dehumidifcation set point values.  Temperature set points are in Kelvin, while humidity set points are percentages ranging from 0 to 1.</p>
 <p><a name="4.2.21.4"></a><h3 class="new">2.21.4. Analysis Report Style</h3></p>
-<p>The new property: </p>
+<p>The new property:</p>
 <ul>
-<li>ViewSystemsAnalysisReport.ReportStyle </li>
+<li>ViewSystemsAnalysisReport.ReportStyle</li>
 </ul>
-<p>accesses the report style used in a particular analysis report view.  </p>
+<p>accesses the report style used in a particular analysis report view.</p>
 <p><a name="4.2.21.5"></a><h3 class="new">2.21.5. MEP Hidden Line Settings</h3></p>
 <p>The new class:</p>
 <ul>
@@ -1537,7 +1453,7 @@ Use:</p>
 <p>It offers the following properties:</p>
 <ul>
 <li>MEPHiddenLineSettings.DrawHiddenLine</li>
-<li>MEPHiddenLineSettings.LineStyle </li>
+<li>MEPHiddenLineSettings.LineStyle</li>
 <li>MEPHiddenLineSettings.InsideGap</li>
 <li>MEPHiddenLineSettings.OutsideGap</li>
 <li>MEPHiddenLineSettings.SingleLineGap</li>
@@ -1553,17 +1469,17 @@ Use:</p>
 <ul>
 <li>DesignToFabricationConverter.SetMapForFamilySymbolToFabricationPartType()</li>
 </ul>
-<p>The method will set a map used when the design to fabrication tool is running.  The map relationships will be used to replace any family instance that is based upon the family symbols found in the map with the corresponding fabrication part for the fabrication part type set in the mapping. </p>
+<p>The method will set a map used when the design to fabrication tool is running.  The map relationships will be used to replace any family instance that is based upon the family symbols found in the map with the corresponding fabrication part for the fabrication part type set in the mapping.</p>
 <p><a name="4.2.22"></a><h2 class="new">2.22. Energy Analysis API additions</h2></p>
-<p>The options used to produce an energy model or export to gbXML have been unified. </p>
-<p>The new enumeration value: </p>
+<p>The options used to produce an energy model or export to gbXML have been unified.</p>
+<p>The new enumeration value:</p>
 <ul>
-<li>AnalysisMode.RoomsOrSpaces </li>
+<li>AnalysisMode.RoomsOrSpaces</li>
 </ul>
-<p>indicates that the energy analysis model should be based on volumes from rooms or spaces defined in the building model. </p>
-<p>The new enumeration values: </p>
+<p>indicates that the energy analysis model should be based on volumes from rooms or spaces defined in the building model.</p>
+<p>The new enumeration values:</p>
 <ul>
-<li>EnergyModelType.AnalysisMode </li>
+<li>EnergyModelType.AnalysisMode</li>
 <li>ExportEnergyModelType.AnalysisMode</li>
 </ul>
 <p>allow specification of the energy model production based on the given analysis type.</p>
