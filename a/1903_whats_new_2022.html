@@ -34,19 +34,66 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>What's New in the Revit 2022 API</h3>
-<p>The Revit 2022 API includes exciting enhancements for add-in developers, including numerous developer wishes and requests that have now been explicitly addressed:</p>
+<p>The Revit 2022 API includes an exceptional list of exciting enhancements for add-in developers, including numerous developer wishes and requests that have now been explicitly addressed:</p>
 <ul>
 <li><a href="#1">Information sources</a></li>
 <li><a href="#2">What's new in previous versions</a></li>
-<li><a href="#4">Detailed TOC of major changes and renovations</a></li>
+<li><a href="#4">Detailed table of contents</a></li>
 </ul>
+<p>Table of contents top level:</p>
+<ul class="toc">
+<li>1 <a href="#4.1">API Changes</a></li>
+<ul class="toc">
+<li>1.1 <a href="#4.1.1">Parameter API changes (migration to ForgeTypeId)</a></li>
+<li>1.2 <a href="#4.1.2">Renamed/replaced Parameter Group members</a></li>
+<li>1.3 <a href="#4.1.3">Document & Worksharing API changes</a></li>
+<li>1.4 <a href="#4.1.4">Sketched element API changes</a></li>
+<li>1.5 <a href="#4.1.5">IndependentTag API Changes</a></li>
+<li>1.6 <a href="#4.1.6">Revision API changes</a></li>
+<li>1.7 <a href="#4.1.7">Structural reinforcement API changes</a></li>
+<li>1.8 <a href="#4.1.8">Import/Export API changes</a></li>
+<li>1.9 <a href="#4.1.9">MEP API changes</a></li>
+<li>1.10 <a href="#4.1.10">PostableCommand enumeration update</a></li>
+<li>1.11 <a href="#4.1.11">BuiltInFailures changes</a></li>
+<li>1.12 <a href="#4.1.12">Filter API change</a></li>
+<li>1.13 <a href="#4.1.13">Ruby macros no longer supported</a></li>
+<li>1.14 <a href="#4.1.14">TransmissionData API change</a></li>
+<li>1.15 <a href="#4.1.15">Removal of obsoleted APIs</a></li>
+</ul>
+<li>2 <a href="#4.2">API Additions</a></li>
+<ul class="toc">
+<li>2.1 <a href="#4.2.1">Sketched Elements API</a></li>
+<li>2.2 <a href="#4.2.2">Color Fill API</a></li>
+<li>2.3 <a href="#4.2.3">Export API additions</a></li>
+<li>2.4 <a href="#4.2.4">Civil Alignments API</a></li>
+<li>2.5 <a href="#4.2.5">DirectShape API Additions</a></li>
+<li>2.6 <a href="#4.2.6">Document & Worksharing API additions</a></li>
+<li>2.7 <a href="#4.2.7">View API additions</a></li>
+<li>2.8 <a href="#4.2.8">Graphics API additions</a></li>
+<li>2.9 <a href="#4.2.9">Label API additions</a></li>
+<li>2.10 <a href="#4.2.10">Parameter API additions</a></li>
+<li>2.11 <a href="#4.2.11">Dimension API additions</a></li>
+<li>2.12 <a href="#4.2.12">Category API additions</a></li>
+<li>2.13 <a href="#4.2.13">Shared Coordinates API additions</a></li>
+<li>2.14 <a href="#4.2.14">Revision API additions</a></li>
+<li>2.15 <a href="#4.2.15">Phasing API additions</a></li>
+<li>2.16 <a href="#4.2.16">Geometry API additions</a></li>
+<li>2.17 <a href="#4.2.17">Point Cloud API additions</a></li>
+<li>2.18 <a href="#4.2.18">Schedule API additions</a></li>
+<li>2.19 <a href="#4.2.19">Import API additions</a></li>
+<li>2.20 <a href="#4.2.20">Structural API additions</a></li>
+<li>2.21 <a href="#4.2.21">MEP API additions</a></li>
+<li>2.22 <a href="#4.2.22">Energy Analysis API additions</a></li>
+</ul>
+</ul>
+
 <h4><a name="1"></a>Information Sources</h4>
 <p>The information below is based on the contents of the <em>Revit Platform API Changes and Additions.docx</em> document included with
 the Revit 2022 SDK, the software developers kit available from
 the <a href="https://www.autodesk.com/developer-network/platform-technologies/revit">Revit Developer Centre</a>.</p>
 <p>It is also provided in the section on <em>What's New</em> in the Revit 2022 API help file <code>RevitAPI.chm</code> included with the SDK:</p>
 <p><center>
-<img src="img/whats_new_2022.png" alt="Revit 2022 API help on What's New" title="Revit 2022 API help on What's New" width="100"/>
+<img src="img/whats_new_2022.png" alt="Revit 2022 API help on What's New" title="Revit 2022 API help on What's New" width="567"/> <!-- 1134 -->
 </center></p>
 <p>For convenient, easy, and effective web searching, this blog post provides a cleaned-up online HTML version of that information with numbering and table of contents added, as well as the following PDF printout of the original document included in the SDK:</p>
 <ul>
@@ -87,11 +134,11 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <li><a href="https://thebuildingcoder.typepad.com/blog/2020/04/whats-new-in-the-revit-2021-api.html">What's New in the Revit 2021 API</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2020/08/revit-20211-sdk-and-whats-new.html">What's New in the Revit 2021.1 API</a></li>
 </ul>
-<h4><a name="4"></a>Detailed TOC of Major Changes and Renovations</h4>
+<h4><a name="4"></a>Detailed Table of Contents</h4>
 <!-- <h1>Major changes and renovations to the Revit API -->
 
 <ul class="toc">
-<li>1 <a href="#4.1">API CHANGES</a></li>
+<li>1 <a href="#4.1">API Changes</a></li>
 <ul class="toc">
 <li>1.1 <a href="#4.1.1">Parameter API changes (migration to ForgeTypeId)</a></li>
 <ul class="toc">
@@ -137,7 +184,7 @@ in the <a href="http://help.autodesk.com/view/RVT/2021/ENU">Revit 2021 online he
 <li>1.14 <a href="#4.1.14">TransmissionData API change</a></li>
 <li>1.15 <a href="#4.1.15">Removal of obsoleted APIs</a></li>
 </ul>
-<li>2 <a href="#4.2">API ADDITIONS</a></li>
+<li>2 <a href="#4.2">API Additions</a></li>
 <ul class="toc">
 <li>2.1 <a href="#4.2.1">Sketched Elements API</a></li>
 <ul class="toc">
