@@ -10,6 +10,8 @@
   Revit 2022: ParameterType.Text to ForgeTypeId
 
 - edge loops
+  13179537 [Is the first Edgeloop still the outer loop?]
+  https://forums.autodesk.com/t5/revit-api-forum/is-the-first-edgeloop-still-the-outer-loop/m-p/7225379
   Is the first Edgeloop still the outer loop?
   https://forums.autodesk.com/t5/revit-api-forum/is-the-first-edgeloop-still-the-outer-loop/m-p/10242847
   /a/rvt/sort_multiple_edge_loops.rvt
@@ -44,9 +46,21 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Sorting Curve Loops
+### Sorting Non-Planar Curve Loops
 
-####<a name="2"></a>
+####<a name="2"></a> Sorting Non-Planar Curve Loops
+
+Stefano Menci picked up an old solution for sorting curve loops and expanded it to handle non-planar faces by transforming the 3D loop coordinates from the curved face XYZ space to its 2D UV parametrisation space.
+
+The original question was raised in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [is the first Edgeloop still the outer loop?](https://forums.autodesk.com/t5/revit-api-forum/is-the-first-edgeloop-still-the-outer-loop/m-p/10242847),
+solved by Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+and edited by The Building Coder in two posts:
+
+- [Determining the outer-most EdgeLoop](https://thebuildingcoder.typepad.com/blog/2017/08/edge-loop-point-reference-plane-and-column-line.html#3)
+- [Disjunct planar face outer loops](http://thebuildingcoder.typepad.com/blog/2017/10/disjunct-outer-loops-from-planar-face-with-separate-parts.html) 
+
 
 <center>
 <img src="img/.png" alt="" title="" width="100"/> <!-- 1134 -->
