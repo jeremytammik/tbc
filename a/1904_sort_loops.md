@@ -26,6 +26,13 @@ Very short notice on the Ask Me Anything session taking place later today, and a
 
 linkedin:
 
+Very short notice on the Ask Me Anything session taking place today, right now, from Inside the Factory, and a vastly enhanced method for sorting non-planar curve loops with the #RevitAPI 
+
+http://autode.sk/uvcurveloops
+
+- Today: Inside the Factory, Ask Me Anything
+- Sorting non-planar curve loops...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
