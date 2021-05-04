@@ -47,7 +47,7 @@ Before getting technical, a personal note:
 I celebrated my covid coronation last week.
 
 I suffered very mildly.
-My parter had a strong headache and took a positive test.
+My partner had a strong headache and took a positive test.
 Next day, felt slightly dizzy, my bones and eyes felt tired and hurt in the evening,
 followed by a scratchy throat, slight fever, ache in the legs and back, exhaustion, higher pulse.
 I slept more, stopped drinking coffee for five days and otherwise kept to my normal everyday routines and work.
@@ -55,7 +55,7 @@ So, I was lucky.
 
 ####<a name="2"></a> Today: Inside the Factory, Ask Me Anything
 
-The annual Revit Inside the Factory *Ask Me Anything* session is talking place later today, May the Fourth,
+The annual Revit Inside the Factory *Ask Me Anything* session is taking place later today, May the Fourth,
 at [11:30am PT / 14:30pm ET / 19:30 CET](https://www.timeanddate.com/worldclock/converter.html?iso=20210504T183000&p1=tz_pt&p2=tz_et&p3=tz_cet).
 
 Questions about the future of Revit?
@@ -75,7 +75,7 @@ Stefano Menci picked up an old solution for sorting curve loops and expanded it 
 
 The original question was raised in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [is the first Edgeloop still the outer loop?](https://forums.autodesk.com/t5/revit-api-forum/is-the-first-edgeloop-still-the-outer-loop/m-p/10242847),
+on [is the first edge loop still the outer loop?](https://forums.autodesk.com/t5/revit-api-forum/is-the-first-edgeloop-still-the-outer-loop/m-p/10242847),
 solved by Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
 and edited by The Building Coder in two posts:
 
@@ -84,7 +84,7 @@ and edited by The Building Coder in two posts:
 
 Here is a summary of the new conversation with Stefano and Richard:
 
-**Question:** I tried using `SortCurveLoops` on the the face shown below, expecting to get one list with the outer loop and one list with the 3 inner loops, but I got one list containing one list containing two loops.
+**Question:** I tried using `SortCurveLoops` on the face shown below, expecting to get one list with the outer loop and one list with the 3 inner loops, but I got one list containing one list containing two loops.
 
 <center>
 <img src="img/sort_curve_loops_sm_curved_face_1.png" alt="Curved face loops" title="Curved face loops" width="181"/> <!-- 181 -->
