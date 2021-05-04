@@ -20,7 +20,9 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; ...
+Very short notice on the Ask Me Anything session taking place later today, and a vastly enhanced method for sorting curve loops
+&ndash; Today: Inside the Factory, Ask Me Anything
+&ndash; Sorting non-planar curve loops...
 
 linkedin:
 
@@ -35,7 +37,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Sorting Non-Planar Curve Loops
+### Roadmap Today and Sorting Non-Planar Curve Loops
 
 Very short notice on the *Ask Me Anything* session taking place later today, and a vastly enhanced method for sorting curve loops:
 
@@ -48,10 +50,10 @@ I celebrated my covid coronation last week.
 
 I suffered very mildly.
 My partner had a strong headache and took a positive test.
-Next day, felt slightly dizzy, my bones and eyes felt tired and hurt in the evening,
+Next day, I felt slightly dizzy with tired and hurting bones and eyes in the evening,
 followed by a scratchy throat, slight fever, ache in the legs and back, exhaustion, higher pulse.
 I slept more, stopped drinking coffee for five days and otherwise kept to my normal everyday routines and work.
-So, I was lucky.
+Now, all is well and I count myself lucky.
 
 ####<a name="2"></a> Today: Inside the Factory, Ask Me Anything
 
