@@ -55,7 +55,7 @@ So, I was lucky.
 
 ####<a name="2"></a> Today: Inside the Factory, Ask Me Anything
 
-The annual Revit Inside the Factory *Ask Me Anything* session is talking place later today, May the Fourth
+The annual Revit Inside the Factory *Ask Me Anything* session is talking place later today, May the Fourth,
 at [11:30am PT / 14:30pm ET / 19:30 CET](https://www.timeanddate.com/worldclock/converter.html?iso=20210504T183000&p1=tz_pt&p2=tz_et&p3=tz_cet).
 
 Questions about the future of Revit?
@@ -65,7 +65,7 @@ Join for the Public Roadmap and to ask me anything.
 - [AMA YouTube Livestream](https://youtu.be/KNG4PPpKgzM)
 
 <center>
-<img src="img/2021-05-04_revit_ama.jpg" alt="Ask me anything" title="Ask me anything" width="300"/> <!-- 900 -->
+<img src="img/2021-05-04_revit_ama.jpg" alt="Ask me anything" title="Ask me anything" width="450"/> <!-- 900 -->
 </center>
 
 
@@ -186,7 +186,7 @@ The correct approach would be to work on the UV coordinates.
 
 Here is the code I used:
 
-<re class="code">
+<pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;loops&nbsp;=&nbsp;face.GetEdgesAsCurveLoops();
 &nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;sortedLoops&nbsp;=&nbsp;ExporterIFCUtils.SortCurveLoops(&nbsp;loops&nbsp;);
 &nbsp;&nbsp;<span style="color:blue;">for</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;sortedLoops.Count;&nbsp;i++&nbsp;)
@@ -253,10 +253,10 @@ Thank you also for your [pull request to The Building Coder Samples](https://git
 I integrated it into [release 2021.0.150.25](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2021.0.150.25).
 Here is the [diff to the previous release](https://github.com/jeremytammik/the_building_coder_samples/compare/2021.0.150.24...2021.0.150.25).
 
-Here is ther code, for the sake of completeness:
+Here is the code:
 
 <pre class="code">
-<pre style="font-family:Consolas;font-size:13px;color:black;background:white;">&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">static</span>&nbsp;List&lt;List&lt;CurveLoop&gt;&gt;&nbsp;SortCurveLoops(&nbsp;Face&nbsp;face&nbsp;)
+&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">static</span>&nbsp;List&lt;List&lt;CurveLoop&gt;&gt;&nbsp;SortCurveLoops(&nbsp;Face&nbsp;face&nbsp;)
 &nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;allLoops&nbsp;=&nbsp;face.GetEdgesAsCurveLoops().Select(&nbsp;loop&nbsp;=&gt;&nbsp;<span style="color:blue;">new</span>&nbsp;CurveLoopUV(&nbsp;loop,&nbsp;face&nbsp;)&nbsp;).ToList();
  
@@ -303,7 +303,6 @@ Here is ther code, for the sake of completeness:
  
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;result;
 &nbsp;&nbsp;}
-}
 </pre>
 
 This is the class CurveLoopUV that converts the curves from 3D XYZ to UV, then to planar XYZ. 
@@ -397,6 +396,7 @@ This is the class CurveLoopUV that converts the curves from 3D XYZ to UV, then t
 }
 </pre>
 
+Very many thanks to Stefano for his careful research and brilliant solution!
 
 <!--
 

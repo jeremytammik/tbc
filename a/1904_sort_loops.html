@@ -49,7 +49,7 @@ followed by a scratchy throat, slight fever, ache in the legs and back, exhausti
 I slept more, stopped drinking coffee for five days and otherwise kept to my normal everyday routines and work.
 So, I was lucky.</p>
 <h4><a name="2"></a> Today: Inside the Factory, Ask Me Anything</h4>
-<p>The annual Revit Inside the Factory <em>Ask Me Anything</em> session is talking place later today, May the Fourth
+<p>The annual Revit Inside the Factory <em>Ask Me Anything</em> session is talking place later today, May the Fourth,
 at <a href="https://www.timeanddate.com/worldclock/converter.html?iso=20210504T183000&amp;p1=tz_pt&amp;p2=tz_et&amp;p3=tz_cet">11:30am PT / 14:30pm ET / 19:30 CET</a>.</p>
 <p>Questions about the future of Revit?
 Join for the Public Roadmap and to ask me anything.</p>
@@ -58,7 +58,7 @@ Join for the Public Roadmap and to ask me anything.</p>
 <li><a href="https://youtu.be/KNG4PPpKgzM">AMA YouTube Livestream</a></li>
 </ul>
 <p><center>
-<img src="img/2021-05-04_revit_ama.jpg" alt="Ask me anything" title="Ask me anything" width="300"/> <!-- 900 -->
+<img src="img/2021-05-04_revit_ama.jpg" alt="Ask me anything" title="Ask me anything" width="450"/> <!-- 900 -->
 </center></p>
 <h4><a name="3"></a> Sorting Non-Planar Curve Loops</h4>
 <p>Stefano Menci picked up an old solution for sorting curve loops and expanded it to handle non-planar faces by transforming the 3D loop coordinates from the curved face XYZ space to its 2D UV parametrisation space.</p>
@@ -147,7 +147,7 @@ Just looking at the texts you immediately understand which loops are clockwise a
 If this is the case, then it will never be reliable on curved faces.
 The correct approach would be to work on the UV coordinates.</p>
 <p>Here is the code I used:</p>
-<p><re class="code">
+<pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;loops&nbsp;=&nbsp;face.GetEdgesAsCurveLoops();
 &nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;sortedLoops&nbsp;=&nbsp;ExporterIFCUtils.SortCurveLoops(&nbsp;loops&nbsp;);
 &nbsp;&nbsp;<span style="color:blue;">for</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;sortedLoops.Count;&nbsp;i++&nbsp;)
@@ -158,8 +158,9 @@ The correct approach would be to work on the UV coordinates.</p>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sortedLoops[&nbsp;i&nbsp;][&nbsp;j&nbsp;].First().Evaluate(&nbsp;0.33,&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">true</span>&nbsp;),&nbsp;doc&nbsp;);
 &nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;}</p>
-<p>&nbsp;&nbsp;TextNote&nbsp;CreateTextNote(&nbsp;<span style="color:blue;">string</span>&nbsp;text,&nbsp;XYZ&nbsp;origin,&nbsp;Document&nbsp;doc&nbsp;)
+&nbsp;&nbsp;}
+
+&nbsp;&nbsp;TextNote&nbsp;CreateTextNote(&nbsp;<span style="color:blue;">string</span>&nbsp;text,&nbsp;XYZ&nbsp;origin,&nbsp;Document&nbsp;doc&nbsp;)
 &nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;options&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;TextNoteOptions
 &nbsp;&nbsp;&nbsp;&nbsp;{
@@ -167,11 +168,13 @@ The correct approach would be to work on the UV coordinates.</p>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VerticalAlignment&nbsp;=&nbsp;VerticalTextAlignment.Middle,
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TypeId&nbsp;=&nbsp;doc.GetDefaultElementTypeId(&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ElementTypeGroup.TextNoteType&nbsp;)
-&nbsp;&nbsp;&nbsp;&nbsp;};</p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;TextNote.Create(&nbsp;doc,&nbsp;doc.ActiveView.Id,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;};
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;TextNote.Create(&nbsp;doc,&nbsp;doc.ActiveView.Id,&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;origin,&nbsp;text,&nbsp;options&nbsp;);
 &nbsp;&nbsp;}
-</pre></p>
+</pre>
+
 <p><strong>Answewr:</strong> Below is another issue I now recall that you might want to consider:</p>
 <p><center>
 <img src="img/sort_curve_loops_rt_disjunct.png" alt="Disjunct loops" title="Disjunct loops" width="300"/> <!-- 871 -->
@@ -199,9 +202,9 @@ I love it. Thank you very much for your work and important results.</p>
 <p>Thank you also for your <a href="https://github.com/jeremytammik/the_building_coder_samples/pull/16">pull request to The Building Coder Samples</a>.</p>
 <p>I integrated it into <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2021.0.150.25">release 2021.0.150.25</a>.
 Here is the <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2021.0.150.24...2021.0.150.25">diff to the previous release</a>.</p>
-<p>Here is ther code, for the sake of completeness:</p>
+<p>Here is the code:</p>
 <pre class="code">
-<pre style="font-family:Consolas;font-size:13px;color:black;background:white;">&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">static</span>&nbsp;List&lt;List&lt;CurveLoop&gt;&gt;&nbsp;SortCurveLoops(&nbsp;Face&nbsp;face&nbsp;)
+&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">static</span>&nbsp;List&lt;List&lt;CurveLoop&gt;&gt;&nbsp;SortCurveLoops(&nbsp;Face&nbsp;face&nbsp;)
 &nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;allLoops&nbsp;=&nbsp;face.GetEdgesAsCurveLoops().Select(&nbsp;loop&nbsp;=&gt;&nbsp;<span style="color:blue;">new</span>&nbsp;CurveLoopUV(&nbsp;loop,&nbsp;face&nbsp;)&nbsp;).ToList();
 
@@ -248,11 +251,9 @@ Here is the <a href="https://github.com/jeremytammik/the_building_coder_samples/
 
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;result;
 &nbsp;&nbsp;}
-}
 </pre>
 
-This is the class CurveLoopUV that converts the curves from 3D XYZ to UV, then to planar XYZ. 
-
+<p>This is the class CurveLoopUV that converts the curves from 3D XYZ to UV, then to planar XYZ. </p>
 <pre class="code">
 <span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">CurveLoopUV</span>&nbsp;:&nbsp;IEnumerable&lt;Curve&gt;
 {
@@ -342,7 +343,7 @@ This is the class CurveLoopUV that converts the curves from 3D XYZ to UV, then t
 }
 </pre>
 
-
+<p>Very many thanks to Stefano for his careful research and brilliant solution!</p>
 <!--
 
 Revit native project identifier
