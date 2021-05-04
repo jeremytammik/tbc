@@ -43,13 +43,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>Before getting technical, a personal note:</p>
 <p>I celebrated my covid coronation last week.</p>
 <p>I suffered very mildly.
-My parter had a strong headache and took a positive test.
+My partner had a strong headache and took a positive test.
 Next day, felt slightly dizzy, my bones and eyes felt tired and hurt in the evening,
 followed by a scratchy throat, slight fever, ache in the legs and back, exhaustion, higher pulse.
 I slept more, stopped drinking coffee for five days and otherwise kept to my normal everyday routines and work.
 So, I was lucky.</p>
 <h4><a name="2"></a> Today: Inside the Factory, Ask Me Anything</h4>
-<p>The annual Revit Inside the Factory <em>Ask Me Anything</em> session is talking place later today, May the Fourth,
+<p>The annual Revit Inside the Factory <em>Ask Me Anything</em> session is taking place later today, May the Fourth,
 at <a href="https://www.timeanddate.com/worldclock/converter.html?iso=20210504T183000&amp;p1=tz_pt&amp;p2=tz_et&amp;p3=tz_cet">11:30am PT / 14:30pm ET / 19:30 CET</a>.</p>
 <p>Questions about the future of Revit?
 Join for the Public Roadmap and to ask me anything.</p>
@@ -64,7 +64,7 @@ Join for the Public Roadmap and to ask me anything.</p>
 <p>Stefano Menci picked up an old solution for sorting curve loops and expanded it to handle non-planar faces by transforming the 3D loop coordinates from the curved face XYZ space to its 2D UV parametrisation space.</p>
 <p>The original question was raised in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/is-the-first-edgeloop-still-the-outer-loop/m-p/10242847">is the first Edgeloop still the outer loop?</a>,
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/is-the-first-edgeloop-still-the-outer-loop/m-p/10242847">is the first edge loop still the outer loop?</a>,
 solved by Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
 and edited by The Building Coder in two posts:</p>
 <ul>
@@ -72,7 +72,7 @@ and edited by The Building Coder in two posts:</p>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/10/disjunct-outer-loops-from-planar-face-with-separate-parts.html">Disjunct planar face outer loops</a> </li>
 </ul>
 <p>Here is a summary of the new conversation with Stefano and Richard:</p>
-<p><strong>Question:</strong> I tried using <code>SortCurveLoops</code> on the the face shown below, expecting to get one list with the outer loop and one list with the 3 inner loops, but I got one list containing one list containing two loops.</p>
+<p><strong>Question:</strong> I tried using <code>SortCurveLoops</code> on the face shown below, expecting to get one list with the outer loop and one list with the 3 inner loops, but I got one list containing one list containing two loops.</p>
 <p><center>
 <img src="img/sort_curve_loops_sm_curved_face_1.png" alt="Curved face loops" title="Curved face loops" width="181"/> <!-- 181 -->
 </center></p>
@@ -82,7 +82,7 @@ mentions co-planar loops in the description of <code>ValidateCurveLoops</code>.
 Perhaps the problem I had is caused by the fact that also <code>SortCurveLoops</code> only works with co-planar loops?</p>
 <p>Here implemented code to find the outer loop and all the inner loops.
 It finds the outer loop by cycling through all the tessellated points of all the loop edges and finding the one with the lowest U.</p>
-<p>I did a few tests and it seems to work well.
+<p>I did a few tests, and it seems to work well.
 I am surprised to see that my short function does the same job as other long functions shown in the previous posts.
 I am learning LINQ, so I spent some time to get this to work with LINQ, but my previous version using 3 nested <code>foreach</code> was very simple to do.</p>
 <p>Am I doing something wrong?</p>
@@ -95,7 +95,7 @@ Here is an exaggerated example of what I mean by that:</p>
 <p><center>
 <img src="img/sort_curve_loops_rt_tessellation_resolution.png" alt="Tessellation resolution" title="Tessellation resolution" width="237"/> <!-- 474 -->
 </center></p>
-<p>For the most part I don't think such a thing would cause issues unless you set out to prove it didn't work, i.e., in a real world scenario, there is no arrangement you would likely have that would be affected by such things. So it's a question of comfort level through testing, really.</p>
+<p>For the most part I don't think such a thing would cause issues unless you set out to prove it didn't work, i.e., in a real-world scenario, there is no arrangement you would likely have that would be affected by such things. So it's a question of comfort level through testing, really.</p>
 <p>I think it has also since been noted that there are patterns in how the faces are constructed that gives away the actual outer loop of a face.</p>
 <p>Was also at the time dealing with PlanarFaces only so also should note that for those you can use Face.IsInside with solid creation utils, this makes things far more straightforward than my original above code and perhaps more reliable i.e. extrude each loop and check points from each within faces of one another to find other loop.</p>
 <p><strong>Response:</strong> The documentation of <code>Curve.Tessellate</code> says both the tolerance is slightly larger than 1/16" and is defined internally by Revit to be adequate for display purposes.</p>
@@ -175,7 +175,7 @@ The correct approach would be to work on the UV coordinates.</p>
 &nbsp;&nbsp;}
 </pre>
 
-<p><strong>Answewr:</strong> Below is another issue I now recall that you might want to consider:</p>
+<p><strong>Answer:</strong> Below is another issue I now recall that you might want to consider:</p>
 <p><center>
 <img src="img/sort_curve_loops_rt_disjunct.png" alt="Disjunct loops" title="Disjunct loops" width="300"/> <!-- 871 -->
 </center></p>

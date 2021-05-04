@@ -98,7 +98,7 @@ Perhaps the problem I had is caused by the fact that also `SortCurveLoops` only 
 Here implemented code to find the outer loop and all the inner loops.
 It finds the outer loop by cycling through all the tessellated points of all the loop edges and finding the one with the lowest U.
 
-I did a few tests and it seems to work well.
+I did a few tests, and it seems to work well.
 I am surprised to see that my short function does the same job as other long functions shown in the previous posts.
 I am learning LINQ, so I spent some time to get this to work with LINQ, but my previous version using 3 nested `foreach` was very simple to do.
 
@@ -118,7 +118,7 @@ Depends also on rotation of UV axis on face in comparison to those points.
 <img src="img/sort_curve_loops_rt_tessellation_resolution.png" alt="Tessellation resolution" title="Tessellation resolution" width="237"/> <!-- 474 -->
 </center>
 
-For the most part I don't think such a thing would cause issues unless you set out to prove it didn't work, i.e., in a real world scenario, there is no arrangement you would likely have that would be affected by such things. So it's a question of comfort level through testing, really.
+For the most part I don't think such a thing would cause issues unless you set out to prove it didn't work, i.e., in a real-world scenario, there is no arrangement you would likely have that would be affected by such things. So it's a question of comfort level through testing, really.
 
 I think it has also since been noted that there are patterns in how the faces are constructed that gives away the actual outer loop of a face.
 
@@ -214,7 +214,7 @@ Here is the code I used:
 &nbsp;&nbsp;}
 </pre>
 
-**Answewr:** Below is another issue I now recall that you might want to consider:
+**Answer:** Below is another issue I now recall that you might want to consider:
 
 <center>
 <img src="img/sort_curve_loops_rt_disjunct.png" alt="Disjunct loops" title="Disjunct loops" width="300"/> <!-- 871 -->
