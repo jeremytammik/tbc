@@ -6,6 +6,22 @@
 
 <!---
 
+- C++/C# Frontend Engineer
+  https://www.comeet.com/jobs/knauf/56.004/cc-frontend-engineer-mfd/9F.D1F
+  /a/doc/revit/tbc/git/a/zip/2021-04-30_knauf_job_frontend_engineer.pdf
+  to develop and deliver solutions for CAD programs (e.g., Revit, ArchiCAD) mixing native SDK technologies in C++ and .NET and web views
+
+- need for regen
+  committing the transaction is the next level up after regeneration
+  Why does GroupType.Groups contain ungrouped groups?
+  https://forums.autodesk.com/t5/revit-api-forum/why-does-grouptype-groups-contain-ungrouped-groups/m-p/10291256/highlight/false#M55705  
+
+- /a/doc/revit/tbc/git/a/zip/line_based_detail_item_direction_arrow_jig.mp4
+  How can I draw the Detail Line to let the information of direction and angle emerge before finishing the command?
+  https://forums.autodesk.com/t5/revit-api-forum/how-can-i-draw-the-detail-line-to-let-the-information-of/m-p/10291715
+  jig
+
+
   
 twitter:
 
@@ -29,7 +45,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Line Angle and Direction Jig
 
-
+The Revit API does not provide much support for real-time feedback on graphical user input, so this original idea on using Prompt
 
 
 ####<a name="2"></a> Line Angle and Direction Jig
