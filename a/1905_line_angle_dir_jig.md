@@ -56,26 +56,130 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 The Revit API does not provide much support for real-time feedback on graphical user input, so this original idea on using Prompt
 
+- [Line angle and direction jig](#2)
+- [Determine cloud model local file path](#3)
+- [How to refresh GroupType.Groups](#4)
+- [Online access to RevitAPI.chm help files](#5)
+- [C++/C&#35; frontend engineer](#6)
+
+
 
 ####<a name="2"></a> Line Angle and Direction Jig
 
-The Revit API does not provide much support for real-time feedback on graphical user input, so this original idea on using Prompt
+The Revit API does not provide much support for real-time feedback on graphical user input, so this original idea
+by Maarten van der Linden of [Wagemaker](https://www.wagemaker.nl) on
+using `PromptForFamilyInstancePlacement` to mimic that kind of behavior might come in pretty useful, in answering 
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [how to draw the detail line to let the information of direction and angle emerge before finishing the command](https://forums.autodesk.com/t5/revit-api-forum/how-can-i-draw-the-detail-line-to-let-the-information-of/m-p/10291715):
+
+**Question:** How can I draw the Detail Line to let the information of direction and angle emerge before finishing the command?
+
+
+UIDocument uidoc = commandData.Application.ActiveUIDocument;
+Document doc = uidoc.Document;
+View view = doc.ActiveView;
+
+List<XYZ> listPoint = new List<XYZ>();
+int i = 0;
+while (true)
+{
+try
+{
+ObjectSnapTypes snapTypeA = ObjectSnapTypes.Endpoints | ObjectSnapTypes.Intersections;
+XYZ A = uidoc.Selection.PickPoint(snapTypeA, "Select an end point or intersection");
+listPoint.Add(A);
+}
+catch (Exception)
+
+{
+break;
+}
+
+i++;
+}
+using (Transaction tx = new Transaction(doc))
+{
+tx.Start("Create Detail Line");
+
+for (int a = 0; a < listPoint.Count-1; a++)
+{
+Line geomLine = Line.CreateBound(listPoint[a], listPoint[a+1]);
+DetailLine line = doc.Create.NewDetailCurve(view, geomLine) as DetailLine;
+}
+
+tx.Commit();
+}
+return Result.Succeeded;
+
+
+Capture.PNGCapture2.PNG
+
+Tags (0)
+Add tags
+Report
+3 REPLIES 
+Sort: 
+MESSAGE 2 OF 4
+jeremy.tammik
+ Employee jeremy.tammik in reply to: doanvanquyet5120
+‎05-04-2021 11:59 PM 
+You could try to launch the built-in Revit command together with the built-in user interface by using PostCommand.
+
+ 
+
+Another option might be to implement some kind of own jig, e.g., using the IDirectContext3DServer:
+
+ 
+
+https://thebuildingcoder.typepad.com/blog/2020/10/onbox-directcontext-jig-and-no-cdn.html#3
+
+ 
+
+Maybe you could also use some kind of Windows tooltip to display the required real-time information.
+
+ 
+
+Unfortunately, since this functionality is not supported by the Revit API out of the box, I'm afraid it will be very hard indeed to implement anything that is both useful and nice to use.
+
+  
+
+
+
+Jeremy Tammik
+Developer Technical Services
+Autodesk Developer Network, ADN Open
+The Building Coder
+Tags (0)
+Add tags
+Report
+MESSAGE 3 OF 4
+doanvanquyet5120
+ Community Visitor doanvanquyet5120 in reply to: jeremy.tammik
+‎05-05-2021 12:10 AM 
+Thank you so much for your quick response
+
+Tags (0)
+Add tags
+Report
+MESSAGE 4 OF 4
+MvL_WAG
+ Contributor MvL_WAG in reply to: doanvanquyet5120
+‎05-05-2021 01:51 AM 
+In one of my command I actually use a linebased detail item in combination with PromptForFamilyInstancePlacement() to mimic that kind of behavior. 
+
+ 
+
+The command is used to rotate a the cropregion of planview.
+
+I have added a video of the functionality.
+
+ 
+
+DirectionArrow.mp4
+971 KB
 
 
 /a/doc/revit/tbc/git/a/zip/line_based_detail_item_direction_arrow_jig.mp4
-How can I draw the Detail Line to let the information of direction and angle emerge before finishing the command?
-https://forums.autodesk.com/t5/revit-api-forum/how-can-i-draw-the-detail-line-to-let-the-information-of/m-p/10291715
-jig
-
-
-
-https://github.com/ADN-DevTech/revit-api-chms
-https://github.com/gtalarico/revit-api-chms/pull/4
-
-C++/C# Frontend Engineer
-https://www.comeet.com/jobs/knauf/56.004/cc-frontend-engineer-mfd/9F.D1F
-/a/doc/revit/tbc/git/a/zip/2021-04-30_knauf_job_frontend_engineer.pdf
-to develop and deliver solutions for CAD programs (e.g., Revit, ArchiCAD) mixing native SDK technologies in C++ and .NET and web views
 
 
 
@@ -264,9 +368,26 @@ Adding these two lines before closing the transaction to my code, still return t
 </pre>
 
 
-####<a name="5"></a>
+####<a name="5"></a> Online Access to RevitAPI.chm Help Files
 
-####<a name="6"></a>
+Guy Talarico set up a repository sharing the RevitAPI.chm Windows help file provided by the Revit SDK for all Revit API releases reaching back to Revit 2012.
+
+These files are used to generate the online Revit API documentation
+resources [revitapidocs.com](https://www.revitapidocs.com/)
+and [apidocs.co](https://apidocs.co/) that
+provide web presentations of the same content.
+
+Due to the growing size of the CHM files, we were forced to turn on
+the [Git Large File Storage (LFS)](https://git-lfs.github.com/) and move the repository to a new location in the ADN-DevTech organisation
+at [github.com/ADN-DevTech/revit-api-chms](https://github.com/ADN-DevTech/revit-api-chms).
+
+
+####<a name="6"></a> C++/C&#35; Frontend Engineer
+
+Friend and colleague Carlo asked me to point out
+a [career opportunity for a C++/C&#35; frontend engineer](https://www.comeet.com/jobs/knauf/56.004/cc-frontend-engineer-mfd/9F.D1F) with
+Knauf in Germany to develop and deliver solutions for CAD programs, e.g., Revit and ArchiCAD, mixing native SDK technologies in C++, .NET and web views. 
+
 
 
 **Question:** 
