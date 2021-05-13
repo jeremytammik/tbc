@@ -40,7 +40,6 @@ twitter:
 
 linkedin:
 
-
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -54,15 +53,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Line Angle and Direction Jig
 
-The Revit API does not provide much support for real-time feedback on graphical user input, so this original idea on using Prompt
+An example of real-time live graphical user input feedback, cloud model functionality, the ever-important need to regenerate and other important topics for this holiday day:
 
 - [Line angle and direction jig](#2)
 - [Determine cloud model local file path](#3)
 - [How to refresh GroupType.Groups](#4)
 - [Online access to RevitAPI.chm help files](#5)
 - [C++/C&#35; frontend engineer](#6)
-
-
 
 ####<a name="2"></a> Line Angle and Direction Jig
 
@@ -74,119 +71,38 @@ on [how to draw the detail line to let the information of direction and angle em
 
 **Question:** How can I draw the Detail Line to let the information of direction and angle emerge before finishing the command?
 
+Currently, I am using `PickPoint` to prompt the use to select line endpoints and creating a detail curve from that infomration.
 
-UIDocument uidoc = commandData.Application.ActiveUIDocument;
-Document doc = uidoc.Document;
-View view = doc.ActiveView;
+However, I see no way to display any useful graphical feedback while picking these points like Revit itself does internally:
 
-List<XYZ> listPoint = new List<XYZ>();
-int i = 0;
-while (true)
-{
-try
-{
-ObjectSnapTypes snapTypeA = ObjectSnapTypes.Endpoints | ObjectSnapTypes.Intersections;
-XYZ A = uidoc.Selection.PickPoint(snapTypeA, "Select an end point or intersection");
-listPoint.Add(A);
-}
-catch (Exception)
+<center>
+<img src="img/line_based_detail_item_angle_direction_1.png" alt="Feedback on pick point angle and direction" title="Feedback on pick point angle and direction" width="312"/> <!-- 624 -->
+<img src="img/line_based_detail_item_angle_direction_2.png" alt="Feedback on pick point angle and direction" title="Feedback on pick point angle and direction" width="179"/> <!-- 358 -->
+</center>
 
-{
-break;
-}
+**Answer:** You could try to launch the built-in Revit command together with the built-in user interface by using `PostCommand`.
 
-i++;
-}
-using (Transaction tx = new Transaction(doc))
-{
-tx.Start("Create Detail Line");
-
-for (int a = 0; a < listPoint.Count-1; a++)
-{
-Line geomLine = Line.CreateBound(listPoint[a], listPoint[a+1]);
-DetailLine line = doc.Create.NewDetailCurve(view, geomLine) as DetailLine;
-}
-
-tx.Commit();
-}
-return Result.Succeeded;
-
-
-Capture.PNGCapture2.PNG
-
-Tags (0)
-Add tags
-Report
-3 REPLIES 
-Sort: 
-MESSAGE 2 OF 4
-jeremy.tammik
- Employee jeremy.tammik in reply to: doanvanquyet5120
-‎05-04-2021 11:59 PM 
-You could try to launch the built-in Revit command together with the built-in user interface by using PostCommand.
-
- 
-
-Another option might be to implement some kind of own jig, e.g., using the IDirectContext3DServer:
-
- 
-
-https://thebuildingcoder.typepad.com/blog/2020/10/onbox-directcontext-jig-and-no-cdn.html#3
-
- 
+Another option might be to implement some kind of
+own [jig, e.g., using the `IDirectContext3DServer`](https://thebuildingcoder.typepad.com/blog/2020/10/onbox-directcontext-jig-and-no-cdn.html#3).,
 
 Maybe you could also use some kind of Windows tooltip to display the required real-time information.
 
- 
+Unfortunately, since this functionality is not supported by the Revit API out of the box, I'm afraid it may be hard to implement anything that is both useful and nice to use.
 
-Unfortunately, since this functionality is not supported by the Revit API out of the box, I'm afraid it will be very hard indeed to implement anything that is both useful and nice to use.
+Maarten adds: in my command, I use a line-based detail item in combination with `PromptForFamilyInstancePlacement` to mimic that kind of behavior.
 
-  
+The command is used to rotate a the crop region of plan view.
 
-
-
-Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 4
-doanvanquyet5120
- Community Visitor doanvanquyet5120 in reply to: jeremy.tammik
-‎05-05-2021 12:10 AM 
-Thank you so much for your quick response
-
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 4
-MvL_WAG
- Contributor MvL_WAG in reply to: doanvanquyet5120
-‎05-05-2021 01:51 AM 
-In one of my command I actually use a linebased detail item in combination with PromptForFamilyInstancePlacement() to mimic that kind of behavior. 
-
- 
-
-The command is used to rotate a the cropregion of planview.
-
-I have added a video of the functionality.
-
- 
-
-DirectionArrow.mp4
-971 KB
-
-
-/a/doc/revit/tbc/git/a/zip/line_based_detail_item_direction_arrow_jig.mp4
-
-
+Here is a video of the functionality:
 
 <center>
-<img src="img/" alt="" title="" width="100"/> <!-- 900 -->
+<video style="display:block; width:600px; height:auto;" autoplay="" muted="" loop="loop">
+<source src="img/line_based_detail_item_direction_arrow_jig.mp4" type="video/mp4"> <!-- 1629 -->
+<source src="https://thebuildingcoder.typepad.com/2020/banana_small.mp4" type="video/mp4">
+</video>
 </center>
 
+Many thanks to Maarten for the great suggestion.
 
 ####<a name="3"></a> Determine Cloud Model Local File Path
 
@@ -196,11 +112,11 @@ However, I found it only worked for WorkShared Cloud models.
 this is the revision to work also with non-workshared cloud models:
 17787640 [How to determine local path of non-workshared cloud model]
 
-We discussed the question 
+We recently discussed the question 
 of [determining a BIM 360 model's local "absolute" path](https://forums.autodesk.com/t5/revit-api-forum/get-bim-360-model-s-quot-absolute-quot-path/m-p/10292538).
 Unfortunately, the initial solution was limited to workshared cloud models.
 
-Now Simon Jones shared a more general method that work also with non-workshared cloud models, saying:
+Now Simon Jones shared a more general method that works with non-workshared cloud models as well, saying:
 
 > Thanks for the original code to determine the file in the local cache for cloud models.
 
@@ -260,17 +176,13 @@ to [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 make it easy to keep track of, cf.
 the [diff to the previous release](https://github.com/jeremytammik/the_building_coder_samples/compare/2022.0.150.5...2022.0.150.6).
 
-
-
-
-
 ####<a name="4"></a> How to Refresh GroupType.Groups
 
 The [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-asking [why does `GroupType.Groups` contain ungrouped groups?](https://forums.autodesk.com/t5/revit-api-forum/why-does-grouptype-groups-contain-ungrouped-groups/m-p/10291256) demonstrates
+asking [why `GroupType.Groups` contains ungrouped groups](https://forums.autodesk.com/t5/revit-api-forum/why-does-grouptype-groups-contain-ungrouped-groups/m-p/10291256) demonstrates
 another example of
 the [need to regenerate](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33)
-and shows that it may not be enough to just regenerate the model to avoid accessing stale data.
+and shows that sometimes more than just regenerating the model is required to avoid accessing stale data.
 Committing the transaction is the next level up after regeneration:
 
 *Question:** The following code prints the same number twice:
@@ -338,7 +250,6 @@ At this point I do have a workaround, but I don't like to create transactions on
 
 Any advice?
 
-
 **Answer:** Just firing off the top of my head here but... instead of transactions and subtransactions, you might try a transaction group with transactions within it... works just a little differently and perhaps that difference will be a little cleaner in the end...
 
 **Response:** Using a transaction group seem to be the best workaround. Here are the steps:
@@ -367,7 +278,6 @@ Adding these two lines before closing the transaction to my code, still return t
 &nbsp;&nbsp;Debug.Print(&nbsp;groupType.Groups.Size.ToString()&nbsp;);
 </pre>
 
-
 ####<a name="5"></a> Online Access to RevitAPI.chm Help Files
 
 Guy Talarico set up a repository sharing the RevitAPI.chm Windows help file provided by the Revit SDK for all Revit API releases reaching back to Revit 2012.
@@ -381,24 +291,9 @@ Due to the growing size of the CHM files, we were forced to turn on
 the [Git Large File Storage (LFS)](https://git-lfs.github.com/) and move the repository to a new location in the ADN-DevTech organisation
 at [github.com/ADN-DevTech/revit-api-chms](https://github.com/ADN-DevTech/revit-api-chms).
 
-
 ####<a name="6"></a> C++/C&#35; Frontend Engineer
 
 Friend and colleague Carlo asked me to point out
 a [career opportunity for a C++/C&#35; frontend engineer](https://www.comeet.com/jobs/knauf/56.004/cc-frontend-engineer-mfd/9F.D1F) with
-Knauf in Germany to develop and deliver solutions for CAD programs, e.g., Revit and ArchiCAD, mixing native SDK technologies in C++, .NET and web views. 
-
-
-
-**Question:** 
-
-**Answer:** 
-
-**Response:** 
-
-
-
-
-</pre>
-
+Knauf in Germany to develop and deliver solutions for CAD programs, e.g., Revit and ArchiCAD, mixing native SDK technologies in C++, .NET and web views.
 
