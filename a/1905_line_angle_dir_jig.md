@@ -45,6 +45,16 @@ An example of real-time live graphical user input feedback, cloud model function
 
 linkedin:
 
+An example of a line angle and direction jig for real-time live graphical user input feedback, cloud model local file path access and the ever important need to regenerate in the #RevitAPI
+
+http://autode.sk/angledirectionjig
+
+- Line angle and direction jig
+- Determine cloud model local file path
+- How to refresh GroupType.Groups
+- Online access to RevitAPI.chm help files
+- C++/C&#35; frontend engineer...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
