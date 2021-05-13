@@ -111,12 +111,6 @@ Many thanks to Maarten for the great suggestion.
 
 ####<a name="3"></a> Determine Cloud Model Local File Path
 
-get file paths in BIM 360 regardless of
-Thanks for the original code to determine the file in the local cache for cloud models.
-However, I found it only worked for WorkShared Cloud models.
-this is the revision to work also with non-workshared cloud models:
-17787640 [How to determine local path of non-workshared cloud model]
-
 We recently discussed the question 
 of [determining a BIM 360 model's local "absolute" path](https://forums.autodesk.com/t5/revit-api-forum/get-bim-360-model-s-quot-absolute-quot-path/m-p/10292538).
 Unfortunately, the initial solution was limited to workshared cloud models.
