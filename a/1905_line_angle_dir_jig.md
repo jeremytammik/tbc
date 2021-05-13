@@ -36,7 +36,12 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; ...
+An example of real-time live graphical user input feedback, cloud model functionality, the ever important need to regenerate and other important topics for this holiday day
+&ndash; Line angle and direction jig
+&ndash; Determine cloud model local file path
+&ndash; How to refresh GroupType.Groups
+&ndash; Online access to RevitAPI.chm help files
+&ndash; C++/C&#35; frontend engineer...
 
 linkedin:
 
@@ -51,7 +56,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Line Angle and Direction Jig
+### Refreshment, Cloud Model Path, Angle and Direction
 
 An example of real-time live graphical user input feedback, cloud model functionality, the ever important need to regenerate and other important topics for this holiday day:
 
@@ -97,6 +102,7 @@ Here is a video of the functionality:
 <center>
 <video style="display:block; width:600px; height:auto;" autoplay="" muted="" loop="loop">
 <source src="img/line_based_detail_item_direction_arrow_jig.mp4" type="video/mp4"> <!-- 1629 -->
+<!-- https://thebuildingcoder.typepad.com/img/line_based_detail_item_direction_arrow_jig.mp4 -->
 <source src="https://thebuildingcoder.typepad.com/2020/banana_small.mp4" type="video/mp4">
 </video>
 </center>
