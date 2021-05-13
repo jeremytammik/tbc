@@ -193,7 +193,7 @@ Committing the transaction is the next level up after regeneration:
 &nbsp;&nbsp;Debug.Print(&nbsp;groupType.Groups.Size.ToString()&nbsp;);
 </pre> 
 
-Is this the correct behavior?
+Is this the correct behaviour?
 
 What do I need to do to make sure groupType.Groups always returns the correct GroupSet?
 
