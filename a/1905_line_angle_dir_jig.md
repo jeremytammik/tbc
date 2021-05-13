@@ -91,11 +91,8 @@ Unfortunately, since this functionality is not supported by the Revit API out of
 
 However, here Maarten comes to the rescue, saying:
 
-> In my command, I use a line-based detail item in combination with `PromptForFamilyInstancePlacement` to mimic that kind of behaviour.
-
-> The command is used to rotate a the crop region of plan view.
-
-> Here is a video of the functionality:
+> In my command to rotate a the crop region of plan view, I use a line-based detail item in combination with `PromptForFamilyInstancePlacement` to mimic that kind of behaviour.
+Here is a video of the functionality:
 
 <center>
 <video style="display:block; width:600px; height:auto;" autoplay="" muted="" loop="loop">
