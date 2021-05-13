@@ -91,7 +91,7 @@ Unfortunately, since this functionality is not supported by the Revit API out of
 
 However, here Maarten comes to the rescue, saying:
 
-> In my command to rotate a the crop region of plan view, I use a line-based detail item in combination with `PromptForFamilyInstancePlacement` to mimic that kind of behaviour.
+> In my command to rotate the crop region of plan view, I use a line-based detail item in combination with `PromptForFamilyInstancePlacement` to mimic that kind of behaviour.
 Here is a video of the functionality:
 
 <center>
@@ -184,7 +184,7 @@ the [need to regenerate](https://thebuildingcoder.typepad.com/blog/about-the-aut
 and shows that sometimes more than just regenerating the model is required to avoid accessing stale data.
 Committing the transaction is the next level up after regeneration:
 
-*Question:** The following code prints the same number twice:
+**Question:** The following code prints the same number twice:
 
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;groupType&nbsp;=&nbsp;group.GroupType;
@@ -243,7 +243,7 @@ This code shows that GroupType.Groups still reports the ungrouped group after do
 &nbsp;&nbsp;tx.Commit();
 </pre>
 
-I tried using a SubTransaction, but didn't help.
+I tried using a subtransaction, but that didn't help.
 
 At this point I do have a workaround, but I don't like to create transactions only because I can't rely on GroupType.Groups not reporting ungrouped groups.
 
@@ -263,7 +263,7 @@ Any advice?
 Unfortunately, such a workaround cannot be used in a generic case.
 Wrapping the call to `UngroupMembers` inside its own transaction only because any following `groupType.Groups` would return the wrong result is ugly, because it forces the caller to use a transaction group rather than a transaction.
 
-**Answer:** I recently had a somewhat similar problem (working w/ completely different objects though). It seems like in some cases the value returned by a Revit API object's property or method is always the same as when it was first obtained from the API, even after regenerating the model. To resolve this in my case I had to obtain a new copy of the object from the API after regenerating the model (e.g., myElement = myDocument.GetElement(myElementId);). I don't know if this will help in your situation but I hope it does.
+**Answer:** I recently had a somewhat similar problem (working w/ completely different objects though). It seems like in some cases the value returned by a Revit API object's property or method is always the same as when it was first obtained from the API, even after regenerating the model. To resolve this in my case I had to obtain a new copy of the object from the API after regenerating the model (e.g., myElement = myDocument.GetElement(myElementId);). I don't know if this will help in your situation, but I hope it does.
 
 **Response:** Thanks for the advice.
 I just tried and in this stale case the cached info sticks around even after getting a new element.

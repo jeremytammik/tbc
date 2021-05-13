@@ -79,7 +79,7 @@ own <a href="https://thebuildingcoder.typepad.com/blog/2020/10/onbox-directconte
 <p>Unfortunately, since this functionality is not supported by the Revit API out of the box, I'm afraid it may be hard to implement anything that is both useful and nice to use.</p>
 <p>However, here Maarten comes to the rescue, saying:</p>
 <blockquote>
-<p>In my command to rotate a the crop region of plan view, I use a line-based detail item in combination with <code>PromptForFamilyInstancePlacement</code> to mimic that kind of behaviour.
+<p>In my command to rotate the crop region of plan view, I use a line-based detail item in combination with <code>PromptForFamilyInstancePlacement</code> to mimic that kind of behaviour.
 Here is a video of the functionality:</p>
 </blockquote>
 <p><center>
@@ -162,7 +162,7 @@ another example of
 the <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33">need to regenerate</a>
 and shows that sometimes more than just regenerating the model is required to avoid accessing stale data.
 Committing the transaction is the next level up after regeneration:</p>
-<p><em>Question:</em>* The following code prints the same number twice:</p>
+<p><strong>Question:</strong> The following code prints the same number twice:</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;groupType&nbsp;=&nbsp;group.GroupType;
 &nbsp;&nbsp;Debug.Print(&nbsp;groupType.Groups.Size.ToString()&nbsp;);
@@ -215,7 +215,7 @@ Committing the transaction is the next level up after regeneration:</p>
 &nbsp;&nbsp;tx.Commit();
 </pre>
 
-<p>I tried using a SubTransaction, but didn't help.</p>
+<p>I tried using a subtransaction, but that didn't help.</p>
 <p>At this point I do have a workaround, but I don't like to create transactions only because I can't rely on GroupType.Groups not reporting ungrouped groups.</p>
 <p>Any advice?</p>
 <p><strong>Answer:</strong> Just firing off the top of my head here but... instead of transactions and subtransactions, you might try a transaction group with transactions within it... works just a little differently and perhaps that difference will be a little cleaner in the end...</p>
@@ -230,7 +230,7 @@ Committing the transaction is the next level up after regeneration:</p>
 </ul>
 <p>Unfortunately, such a workaround cannot be used in a generic case.
 Wrapping the call to <code>UngroupMembers</code> inside its own transaction only because any following <code>groupType.Groups</code> would return the wrong result is ugly, because it forces the caller to use a transaction group rather than a transaction.</p>
-<p><strong>Answer:</strong> I recently had a somewhat similar problem (working w/ completely different objects though). It seems like in some cases the value returned by a Revit API object's property or method is always the same as when it was first obtained from the API, even after regenerating the model. To resolve this in my case I had to obtain a new copy of the object from the API after regenerating the model (e.g., myElement = myDocument.GetElement(myElementId);). I don't know if this will help in your situation but I hope it does.</p>
+<p><strong>Answer:</strong> I recently had a somewhat similar problem (working w/ completely different objects though). It seems like in some cases the value returned by a Revit API object's property or method is always the same as when it was first obtained from the API, even after regenerating the model. To resolve this in my case I had to obtain a new copy of the object from the API after regenerating the model (e.g., myElement = myDocument.GetElement(myElementId);). I don't know if this will help in your situation, but I hope it does.</p>
 <p><strong>Response:</strong> Thanks for the advice.
 I just tried and in this stale case the cached info sticks around even after getting a new element.
 Adding these two lines before closing the transaction to my code, still return the wrong value:</p>
