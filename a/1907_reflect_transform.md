@@ -58,7 +58,13 @@ Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-i
 provided numerous useful solutions and explanation in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
 
-Before diving in, a nice quote of the week from Quincy Larson's [freecodecamp](https://www.freecodecamp.org) newsletter:
+- [Flip, mirror and transform](#2)
+- [Transient elements hack](#3)
+- [Temporary incanvas graphics API video](#4)
+- [Shared versus non-shared parameter creation](#5)
+- [Direct PDF export and DA4R](#6)
+
+Before diving into these topics, a nice quote of the week from Quincy Larson's [freecodecamp](https://www.freecodecamp.org) newsletter:
 
 <blockquote>
 <p><i>There are only two kinds of programming languages: the ones people complain about and the ones nobody uses.</i></p>
