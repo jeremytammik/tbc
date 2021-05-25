@@ -205,8 +205,7 @@ on [creating project parameter (not shared parameter)](https://forums.autodesk.c
 
 ####<a name="6"></a> Direct PDF Export and DA4R
 
-The Revit 2022 API provides built-in direct support
-to [export to PDF](https://thebuildingcoder.typepad.com/blog/2021/04/whats-new-in-the-revit-2022-api.html#4.2.3).
+The Revit 2022 API provides [built-in direct export to PDF functionality](https://thebuildingcoder.typepad.com/blog/2021/04/whats-new-in-the-revit-2022-api.html#4.2.3).
 
 This new functionality obviously enables
 the [Forge Design Automation API for Revit 2022 now to support exporting to PDF directly](https://forge.autodesk.com/blog/design-automation-revit-2022-now-support-exporting-pdf-directly),
