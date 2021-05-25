@@ -187,23 +187,20 @@ What are the rules the images, and colours, we can use in this feature?
 
 Unfortunately, the question on the colour mapping currently still remains unresolved.
 
-####<a name="4"></a>
+####<a name="5"></a> Shared versus Non-Shared Parameter Creation
 
-####<a name="5"></a> 
-  
-- shared versus non-shared parameter creation
-  Create Project Parameter (not shared parameter)
-  https://forums.autodesk.com/t5/revit-api-forum/create-project-parameter-not-shared-parameter/m-p/10335503
-  12125641 [Create Project Parameter(not shared parameter)]
-  http://forums.autodesk.com/t5/revit-api/create-project-parameter-not-shared-parameter/m-p/5150182
+Finally, some further useful clarification by Richard on shared versus non-shared parameter, their use and creration in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [creating project parameter (not shared parameter)](https://forums.autodesk.com/t5/revit-api-forum/create-project-parameter-not-shared-parameter/m-p/10335503).
 
-- Design Automation for Revit 2022 now support exporting to PDF directly
-  https://forge.autodesk.com/blog/design-automation-revit-2022-now-support-exporting-pdf-directly
-  by Zhong Wu
+####<a name="6"></a> Direct PDF Export and DA4R
 
-<pre class="code">
+The Revit 2022 API provides built-in direct support
+to [export to PDF](https://thebuildingcoder.typepad.com/blog/2021/04/whats-new-in-the-revit-2022-api.html#4.2.3).
 
-</pre>
+This new functionality obviously enables
+the [Forge Design Automation API for Revit 2022 now to support exporting to PDF directly](https://forge.autodesk.com/blog/design-automation-revit-2022-now-support-exporting-pdf-directly),
+as documented by my colleague Zhong Wu.
 
-Thank you, , for pointing this out!
+Thanks to Zhong for testing anbd poiunting this out.
 
