@@ -159,7 +159,9 @@ the [temporary incanvas graphics API](#4) (below).
 Here are some AVF samples:
  
 <ul>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2010/12/%D0%B4%D0%BE%D0%BF%D0%BE%D0%BB%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F-%D0%B4%D0%BB%D1%8F-%D1%80%D0%B5%D0%B2%D0%B8%D1%82-add-ins-for-revit.html">Russian Add-ins for Revit</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/12/using-avf-to-display-intersections-and-highlight-rooms.html">AVF Displays Intersections and Highlights Rooms</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/09/sphere-creation-for-avf-and-filtering.html">Sphere Creation for AVF and Filtering</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/09/apollonian-packing-of-spheres-via-web-service-and-avf.html">Apollonian Sphere Packing via Web Service and AVF</a></li>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/03/rvtfader-avf-ray-tracing-and-signal-attenuation.html">RvtFader, AVF, Ray Tracing and Signal Attenuation</a></li>
 </ul>
 
