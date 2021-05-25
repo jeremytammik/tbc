@@ -49,12 +49,19 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-###
+### Flip, Mirror and Transform
 
-####<a name="2"></a>
+As so often in the past,
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+provided numerous useful solutions and explanation in 
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
 
-####<a name="3"></a>
-`GetTransform` does not include reflection into the transformation
+
+####<a name="2"></a> Flip, Mirror and Transform
+
+A careful analysis by Richard in the thread 
+on [`GetTransform` does not include reflection into the transformation](https://forums.autodesk.com/t5/revit-api-forum/gettransform-does-not-include-reflection-into-the-transformation/m-p/10334547) clarifies
+the effects of rotation and reflection achieved by mirroring and flipping on the BIM element transform:
 
 **Question:** The 
 [`Instance.GetTransform` method](https://www.revitapidocs.com/2015/50aa275d-031e-ce19-9cfd-18a7a341ed19.htm)
@@ -119,12 +126,18 @@ As they started being used for other things, the ambiguities crept in, i.e., dou
 
 Many thanks to Richard for the helpful explanation!
 
+####<a name="3"></a>
+
 ####<a name="4"></a>
 
-####<a name="5"></a> The SetGeometryCurve OverrideJoins Argument
+####<a name="5"></a> 
 
 <pre class="code">
 
 </pre>
 
 Thank you, , for pointing this out!
+
+
+
+
