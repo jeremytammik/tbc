@@ -193,7 +193,9 @@ What are the rules the images, and colours, we can use in this feature?
 <iframe width="480" height="270" src="https://www.youtube.com/embed/ekLz54hLcHc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </center>
 
-Unfortunately, the question on the colour mapping currently still remains unresolved.
+Many thanks to Bobby for this nice introduction!
+
+Unfortunately, his question on the colour mapping currently still remains unresolved.
 
 ####<a name="5"></a> Shared versus Non-Shared Parameter Creation
 
@@ -210,5 +212,5 @@ This new functionality obviously enables
 the [Forge Design Automation API for Revit 2022 now to support exporting to PDF directly](https://forge.autodesk.com/blog/design-automation-revit-2022-now-support-exporting-pdf-directly),
 as documented by my colleague Zhong Wu.
 
-Thanks to Zhong for testing anbd poiunting this out.
+Thanks to Zhong for testing and pointing this out.
 
