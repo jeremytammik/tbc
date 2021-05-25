@@ -56,6 +56,13 @@ Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-i
 provided numerous useful solutions and explanation in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
 
+Before diving in, a nice quote of the week from Quincy Larson's [freecodecamp](https://www.freecodecamp.org) newsletter:
+
+<blockquote>
+<p><i>There are only two kinds of programming languages: the ones people complain about and the ones nobody uses.</i></p>
+<p style="text-align: right; font-style: italic">&ndash; Bjarne Stroustrup, creator of the C++ programming language</p>
+</blockquote>
+
 
 ####<a name="2"></a> Flip, Mirror and Transform
 
@@ -126,11 +133,27 @@ As they started being used for other things, the ambiguities crept in, i.e., dou
 
 Many thanks to Richard for the helpful explanation!
 
-####<a name="3"></a>
+####<a name="3"></a> Transient Elements Hack
+
+
 
 ####<a name="4"></a>
 
 ####<a name="5"></a> 
+
+- Document.MakeTransientElements
+  https://forums.autodesk.com/t5/revit-api-forum/document-maketransientelements/m-p/10333812
+  hacky and unsupported but fun to hack
+  
+- shared versus non-shared parameter creation
+  Create Project Parameter (not shared parameter)
+  https://forums.autodesk.com/t5/revit-api-forum/create-project-parameter-not-shared-parameter/m-p/10335503
+  12125641 [Create Project Parameter(not shared parameter)]
+  http://forums.autodesk.com/t5/revit-api/create-project-parameter-not-shared-parameter/m-p/5150182
+
+- Design Automation for Revit 2022 now support exporting to PDF directly
+  https://forge.autodesk.com/blog/design-automation-revit-2022-now-support-exporting-pdf-directly
+  by Zhong Wu
 
 <pre class="code">
 
