@@ -140,13 +140,15 @@ Back in 2018, the development team clearly stated that the
 interesting-looking [`Document.MakeTransientElements` method](https://www.revitapidocs.com/2021.1/0decdddc-ae4a-d46d-d141-9d37e7973e05.htm)
 is 'half-finished' work that should not have been exposed to the public API and will probably be removed again.
 
-It has not been removed yet, though, and Moustafa Khalil and Richard discuss a hacky approach to make it do something at all in
+It has not been removed yet, though, so Moustafa Khalil and Richard discussed a hacky approach to make it do something at all in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [`Document.MakeTransientElements`](https://forums.autodesk.com/t5/revit-api-forum/document-maketransientelements/m-p/7774471),
 in case you are interested in taking a further look yourself.
 
-Just for the sake of completeness, some other officially supported approaches to display non-BIM-geometry include
-AVF, DirectContext3D and, new in Revit 2022, see below, the [temporary incanvas graphics API](#4).
+Just for the sake of completeness, some other officially supported approaches to display non-BIM-geometry
+include [AVF](https://thebuildingcoder.typepad.com/blog/avf),
+DirectContext3D and, new in Revit 2022, 
+the [temporary incanvas graphics API](#4) (below).
 
 Here are some AVF samples:
  
@@ -155,13 +157,15 @@ Here are some AVF samples:
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/03/rvtfader-avf-ray-tracing-and-signal-attenuation.html">RvtFader, AVF, Ray Tracing and Signal Attenuation</a></li>
 </ul>
 
-I have not explored the direct context 3D functionality myself yet, but here are some bits on that:
+I have not explored the direct context 3D functionality myself yet, but here are some bits and pieces on that:
  
 <ul>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/03/revitlookup-enhancements-future-revit-and-other-api-news.html">RevitLookup and DevDays Online API News</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-revit-2018-api.html">What's New in the Revit 2018 API</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2017/05/revit-2017-and-2018-sdk-samples.html">Revit 2017 and 2018 SDK Samples</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2021/01/transient-graphics-humane-ai-basic-income-and-lockdown.html">Transient Graphics, Humane AI, BI and Lockdown</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-revit-2018-api.html">What's New in the Revit 2018 API</a>
+&rarr; <a href="https://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-revit-2018-api.html#3.26">DirectContext3D for display of externally managed 3D graphics in Revit</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/05/revit-2017-and-2018-sdk-samples.html">Revit 2017 and 2018 SDK Samples</a>
+&rarr; <a href="https://thebuildingcoder.typepad.com/blog/2017/05/revit-2017-and-2018-sdk-samples.html#4.2">DuplicateGraphics</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2021/01/transient-graphics-humane-ai-basic-income-and-lockdown.html#2">Transient Graphics</a></li>
 </ul>
 
 ####<a name="4"></a> Temporary InCanvas Graphics API Video
@@ -186,10 +190,6 @@ Unfortunately, the question on the colour mapping currently still remains unreso
 ####<a name="4"></a>
 
 ####<a name="5"></a> 
-
-- Document.MakeTransientElements
-  https://forums.autodesk.com/t5/revit-api-forum/document-maketransientelements/m-p/10333812
-  hacky and unsupported but fun to hack
   
 - shared versus non-shared parameter creation
   Create Project Parameter (not shared parameter)
