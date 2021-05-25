@@ -18,7 +18,9 @@
 - Document.MakeTransientElements
   https://forums.autodesk.com/t5/revit-api-forum/document-maketransientelements/m-p/10333812
   hacky and unsupported but fun to hack
-  
+  13903607 [Document.MakeTransientElements]
+  https://forums.autodesk.com/t5/revit-api-forum/document-maketransientelements/m-p/7774471
+
 - shared versus non-shared parameter creation
   Create Project Parameter (not shared parameter)
   https://forums.autodesk.com/t5/revit-api-forum/create-project-parameter-not-shared-parameter/m-p/10335503
@@ -62,7 +64,6 @@ Before diving in, a nice quote of the week from Quincy Larson's [freecodecamp](h
 <p><i>There are only two kinds of programming languages: the ones people complain about and the ones nobody uses.</i></p>
 <p style="text-align: right; font-style: italic">&ndash; Bjarne Stroustrup, creator of the C++ programming language</p>
 </blockquote>
-
 
 ####<a name="2"></a> Flip, Mirror and Transform
 
@@ -135,7 +136,52 @@ Many thanks to Richard for the helpful explanation!
 
 ####<a name="3"></a> Transient Elements Hack
 
+Back in 2018, the development team clearly stated that the
+interesting-looking [`Document.MakeTransientElements` method](https://www.revitapidocs.com/2021.1/0decdddc-ae4a-d46d-d141-9d37e7973e05.htm)
+is 'half-finished' work that should not have been exposed to the public API and will probably be removed again.
 
+It has not been removed yet, though, and Moustafa Khalil and Richard discuss a hacky approach to make it do something at all in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [`Document.MakeTransientElements`](https://forums.autodesk.com/t5/revit-api-forum/document-maketransientelements/m-p/7774471),
+in case you are interested in taking a further look yourself.
+
+Just for the sake of completeness, some other officially supported approaches to display non-BIM-geometry include
+AVF, DirectContext3D and, new in Revit 2022, see below, the [temporary incanvas graphics API](#4).
+
+Here are some AVF samples:
+ 
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/12/%D0%B4%D0%BE%D0%BF%D0%BE%D0%BB%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F-%D0%B4%D0%BB%D1%8F-%D1%80%D0%B5%D0%B2%D0%B8%D1%82-add-ins-for-revit.html">Russian Add-ins for Revit</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/03/rvtfader-avf-ray-tracing-and-signal-attenuation.html">RvtFader, AVF, Ray Tracing and Signal Attenuation</a></li>
+</ul>
+
+I have not explored the direct context 3D functionality myself yet, but here are some bits on that:
+ 
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/03/revitlookup-enhancements-future-revit-and-other-api-news.html">RevitLookup and DevDays Online API News</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-revit-2018-api.html">What's New in the Revit 2018 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/05/revit-2017-and-2018-sdk-samples.html">Revit 2017 and 2018 SDK Samples</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2021/01/transient-graphics-humane-ai-basic-income-and-lockdown.html">Transient Graphics, Humane AI, BI and Lockdown</a></li>
+</ul>
+
+####<a name="4"></a> Temporary InCanvas Graphics API Video
+
+Bobby the [3rd Dimension Developer](https://www.youtube.com/channel/UCPCZ59KhJ4XrdkHgzmhZXKA/about) shared a video tutorial on
+making use of
+the new Revit 2022 [temporary in-canvas graphics](https://thebuildingcoder.typepad.com/blog/2021/04/whats-new-in-the-revit-2022-api.html#4.2.8.1) functionality in his thread
+on [temporary incanvas graphics image colors](https://forums.autodesk.com/t5/revit-api-forum/temporary-incanvas-graphics-image-colors/m-p/10318210)
+
+> I created a [video on the awesome new Temporary InCanvas Graphics API](https://youtu.be/ekLz54hLcHc).
+That raises a question on the image colours.
+As you can see, they are... off...
+What are the rules the images, and colours, we can use in this feature?
+...
+
+<center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/ekLz54hLcHc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
+
+Unfortunately, the question on the colour mapping currently still remains unresolved.
 
 ####<a name="4"></a>
 
@@ -160,7 +206,4 @@ Many thanks to Richard for the helpful explanation!
 </pre>
 
 Thank you, , for pointing this out!
-
-
-
 
