@@ -6,6 +6,29 @@
 
 <!---
 
+- Quote of the Week: “There are only two kinds of programming languages: the ones people complain about and the ones nobody uses.” ― Bjarne Stroustrup, creator of the C++ programming language
+
+- a careful analysis by rpthomnas to clarify the effects of rotation and reflection achieved by mirroring and flipping on BIM element transform
+  GetTransform() does not include reflection into the transformation
+  https://forums.autodesk.com/t5/revit-api-forum/gettransform-does-not-include-reflection-into-the-transformation/m-p/10334547
+  GetTransform_ignores_mirror_1.png 1401
+  GetTransform_ignores_mirror_2.png 216
+  GetTransform_ignores_mirror_3.png 1144
+  
+- Document.MakeTransientElements
+  https://forums.autodesk.com/t5/revit-api-forum/document-maketransientelements/m-p/10333812
+  hacky and unsupported but fun to hack
+  
+- shared versus non-shared parameter creation
+  Create Project Parameter (not shared parameter)
+  https://forums.autodesk.com/t5/revit-api-forum/create-project-parameter-not-shared-parameter/m-p/10335503
+  12125641 [Create Project Parameter(not shared parameter)]
+  http://forums.autodesk.com/t5/revit-api/create-project-parameter-not-shared-parameter/m-p/5150182
+
+- Design Automation for Revit 2022 now support exporting to PDF directly
+  https://forge.autodesk.com/blog/design-automation-revit-2022-now-support-exporting-pdf-directly
+  by Zhong Wu
+
 twitter:
 
  #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
@@ -30,26 +53,23 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a>
 
-<center>
-<img src="img/.png" alt="" title="" width="401"/> <!-- 802 -->
-</center>
-
 ####<a name="3"></a>
+`GetTransform` does not include reflection into the transformation
 
- ABertzouanis9F98Y 71 Views, 3 Replies
-‎05-21-2021 09:17 AM 
-GetTransform() does not include reflection into the transformation
- 
-Instance.GetTransform() method..
+**Question:** The 
+[`Instance.GetTransform` method](https://www.revitapidocs.com/2015/50aa275d-031e-ce19-9cfd-18a7a341ed19.htm)
+does not include reflection, e.g.,
+the [family mirrored property](https://www.revitapidocs.com/2015/20ab2f32-e3ca-8173-aac3-a03e998fd0ab.htm) into
+its transformation.
+Below a family instance which is mirrored and outputs the equivalent `GetTansform` values:
 
-https://www.revitapidocs.com/2015/50aa275d-031e-ce19-9cfd-18a7a341ed19.htm
-
-..does not include reflection (the family mirrored property https://www.revitapidocs.com/2015/20ab2f32-e3ca-8173-aac3-a03e998fd0ab.htm) into its transformation. Below a family instance which is mirrored and outputs the equivalent GetTansform() values..
-
-Transformation Matrix2.PNG
+<center>
+<img src="img/GetTransform_ignores_mirror_1.png" alt="GetTransform ignores reflection" title="GetTransform ignores reflection" width="800"/> <!-- 1401 -->
+</center>
 
 Here is the python code:
 
+<pre class="prettyprint">
 import sys
 import clr
 clr.AddReference('ProtoGeometry')
@@ -64,60 +84,40 @@ for i in data:
 	output.append(i.GetTransform().BasisZ)
 	output.append("")
 OUT = output
+</pre>
 
-Tags (0)
-Add tags
-Report
-3 REPLIES 
-Sort: 
-MESSAGE 2 OF 4
-jeremy.tammik
- Employee jeremy.tammik in reply to: ABertzouanis9F98Y
-‎05-22-2021 09:10 AM 
-Yes, true. Afaik, that is expected and intentional.
+That is expected and intentional in Revit.
 
-Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 4
-ABertzouanis9F98Y
- Observer ABertzouanis9F98Y in reply to: jeremy.tammik
-‎05-24-2021 01:20 AM 
- 
-@jeremy.tammik many thanks for your answer.
+However, from a mathematical perspective, it should not be expected.
+The [Wikipedia article on Transformation matrix](https://en.wikipedia.org/wiki/Transformation_matrix) shows
+clearly that an element that is reflected around the `X` axis should have a different transformation matrix:
 
-However, from a mathematical perspective it should not be expected. Below wikipedia's article that very clearly shows that element which is reflected on the x axis should have a different transformation matrix.
+<center>
+<img src="img/GetTransform_ignores_mirror_2.png" alt="Transformation with reflection" title="Transformation with reflection" width="216"/> <!-- 216 -->
+</center>
 
-Transformation matrix - Wikipedia 
+Can you please share any explanation and why this intentional for Revit? 
 
-transformation Matrix3.PNG
+**Answer:** I found results that indicate Revit uses a combination of reflection and rotation for the various mirror and flip operations:
 
-Can you please share any explanation and why this intentional for Revit? Any link or further documentation would be much appreciated.
+<center>
+<img src="img/GetTransform_ignores_mirror_3.png" alt="Flip and mirror" title="Flip and mirror" width="800"/> <!-- 1144 -->
+</center>
 
-Regards,
+One thing that stands out is the difference between horizontal double flip control and mirror command about same axis (noted red).
+These operations are almost identical apart from the horizontal one that results in opposite facing and handed state.
+Graphically, it appears the same, but not according to facing/handed orientation.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 4
-RPTHOMAS108
- Advisor RPTHOMAS108 in reply to: ABertzouanis9F98Y
-‎05-24-2021 04:29 AM 
-I found results that indicate Revit uses a combination of reflection and rotation for the various operations.
+It has been noted previously that single flip control is more like rotating rather than mirroring (it doesn't result in reflected geometry).
+We see by transform that it is reflected but facing/handed state is also set to true.
 
-210524a.PNG
+Generally, I think of the facing/handed state as being an internal to the family state, i.e., the internal geometry may be reflected but the family itself isn't (unless it is by transform).
 
-One thing that stands out is the difference between horizontal double flip control and mirror command about same axis (noted red). These operations are almost identical apart from the horizontal one that results in opposite facing and handed state. Graphically it appears the same but not according to facing/handed orientation.
+You probably need to look at flip state/rotation and transform to get a definitive idea of the situation.
+These controls long ago I believe were introduced for doors, which side they are hung and swing direction.
+As they started being used for other things, the ambiguities crept in, i.e., double negative (same ultimate representation but two definitions for it).
 
-It has been noted previously that single flip control is more like rotating rather than mirroring (it doesn't result in reflected geometry). We see by transform that it is reflected but facing/handed state is also set to true.
-
-Generally I think of the facing/handed state as being an internal to the family state i.e. the internal geometry may be reflected but the family itself isn't (unless it is by transform).
-
-You probably need to look at flip state/rotation and transform to get a definitive idea of the situation. These controls long ago I believe were introduced for doors, which side they are hung and swing direction. As they started being used for other things the ambiguities crept in i.e. double negative (same ultimate representation but two definitions for it).
+Many thanks to Richard for the helpful explanation!
 
 ####<a name="4"></a>
 
