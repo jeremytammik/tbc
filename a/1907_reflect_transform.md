@@ -31,7 +31,7 @@
 
 twitter:
 
- #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Flip and mirror reflected in the element transform, transient elements, temporary incanvas graphics, shared versus non-shared parameter creation and direct PDF export in DA4R and the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://autode.sk/reflectiontransform
 
 How are reflections like flip and mirror reflected in the BIM element transform?
 &ndash; Transient elements hack
