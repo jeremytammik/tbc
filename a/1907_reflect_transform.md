@@ -69,6 +69,7 @@ continues providing numerous invaluable solutions and explanations in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
 
 - [Flip, mirror and transform](#2)
+    - [Motivation and chilling example](#2.1)
 - [Transient elements hack](#3)
 - [Temporary incanvas graphics API video](#4)
 - [Shared versus non-shared parameter creation](#5)
@@ -148,7 +149,7 @@ You probably need to look at flip state/rotation and transform to get a definiti
 These controls long ago I believe were introduced for doors, which side they are hung and swing direction.
 As they started being used for other things, the ambiguities crept in, i.e., double negative (same ultimate representation but two definitions for it).
 
-##### Motivation and Example
+#####<a name="2.1"></a> Motivation and Chilling Example
 
 I think everyone has probably fallen foul of these geometric aspects at some point.
 I recall we had a pile cap with four piles and we marked one of the corners so that we could identify the edges numerically in a clockwise order around this square cap (which had double symmetry).
@@ -161,7 +162,7 @@ The answer was that this cap was one of many and there was a line of symmetry ac
 Therefore, they had filled half the site with pile caps and mirrored them for completion (perfectly acceptable).
 An important lesson from this is that the flip state of the symmetrical object was a hidden feature with subtle implications (when identifying parametric relationships).
 
-Many thanks to Richard for the helpful explanation and chilling example!
+Many thanks to Richard for this very helpful explanation!
 
 ####<a name="3"></a> Transient Elements Hack
 
