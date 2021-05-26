@@ -199,7 +199,7 @@ Unfortunately, his question on the colour mapping currently still remains unreso
 
 ####<a name="5"></a> Shared versus Non-Shared Parameter Creation
 
-Finally, some further useful clarification by Richard on shared versus non-shared parameter, their use and creration in
+Finally, some further useful clarification by Richard on shared versus non-shared parameter, their use and creation in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [creating project parameter (not shared parameter)](https://forums.autodesk.com/t5/revit-api-forum/create-project-parameter-not-shared-parameter/m-p/10335503).
 
