@@ -33,8 +33,11 @@ twitter:
 
  #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+How are reflections like flip and mirror reflected in the BIM element transform?
+&ndash; Transient elements hack
+&ndash; Temporary incanvas graphics API video
+&ndash; Shared versus non-shared parameter creation
+&ndash; Direct PDF export and DA4R...
 
 linkedin:
 
@@ -65,7 +68,7 @@ Before diving into these topics, a nice quote of the week from Quincy Larson's [
 
 <blockquote>
 <p><i>There are only two kinds of programming languages: the ones people complain about and the ones nobody uses.</i></p>
-<p style="text-align: right; font-style: italic">&ndash; Bjarne Stroustrup, creator of the C++ programming language</p>
+<p style="text-align: right; font-style: italic">&ndash; Bjarne Stroustrup, creator of C++</p>
 </blockquote>
 
 ####<a name="2"></a> Flip, Mirror and Transform
@@ -196,7 +199,7 @@ Unfortunately, his question on the colour mapping currently still remains unreso
 
 ####<a name="5"></a> Shared versus Non-Shared Parameter Creation
 
-Finally, some further useful clarification by Richard on shared versus non-shared parameter, their use and creation in
+Finally, some further useful clarification by Richard on shared versus non-shared parameters, their use and creation in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [creating project parameter (not shared parameter)](https://forums.autodesk.com/t5/revit-api-forum/create-project-parameter-not-shared-parameter/m-p/10335503).
 
