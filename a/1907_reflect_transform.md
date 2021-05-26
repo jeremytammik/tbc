@@ -6,8 +6,6 @@
 
 <!---
 
-- Quote of the Week: “There are only two kinds of programming languages: the ones people complain about and the ones nobody uses.” ― Bjarne Stroustrup, creator of the C++ programming language
-
 - a careful analysis by rpthomnas to clarify the effects of rotation and reflection achieved by mirroring and flipping on BIM element transform
   GetTransform() does not include reflection into the transformation
   https://forums.autodesk.com/t5/revit-api-forum/gettransform-does-not-include-reflection-into-the-transformation/m-p/10334547
@@ -51,11 +49,10 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Flip, Mirror and Transform
+### Flip, Mirror, Transform and Transient Graphics
 
-As so often in the past,
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
-provided numerous useful solutions and explanation in 
+continues providing numerous invaluable solutions and explanations in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
 
 - [Flip, mirror and transform](#2)
