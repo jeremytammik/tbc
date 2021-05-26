@@ -148,7 +148,20 @@ You probably need to look at flip state/rotation and transform to get a definiti
 These controls long ago I believe were introduced for doors, which side they are hung and swing direction.
 As they started being used for other things, the ambiguities crept in, i.e., double negative (same ultimate representation but two definitions for it).
 
-Many thanks to Richard for the helpful explanation!
+##### Motivation and Example
+
+I think everyone has probably fallen foul of these geometric aspects at some point.
+I recall we had a pile cap with four piles and we marked one of the corners so that we could identify the edges numerically in a clockwise order around this square cap (which had double symmetry).
+The idea was that we would have a table of parameters which noted the edge distances (edge of cap to edge of pile).
+What we didn't count on was the fact sometimes people mirrored these caps, so although the corner marker flipped from one side to the other as expected the numbering of edges was no longer clockwise.
+So, numbered edge distances in table didn't correspond with what was counted clockwise from corner marker.
+ 
+The question is why would someone mirror a symmetrical object?
+The answer was that this cap was one of many and there was a line of symmetry across the site.
+Therefore, they had filled half the site with pile caps and mirrored them for completion (perfectly acceptable).
+An important lesson from this is that the flip state of the symmetrical object was a hidden feature with subtle implications (when identifying parametric relationships).
+
+Many thanks to Richard for the helpful explanation and chilling example!
 
 ####<a name="3"></a> Transient Elements Hack
 
