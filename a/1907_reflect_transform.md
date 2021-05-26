@@ -41,6 +41,16 @@ How are reflections like flip and mirror reflected in the BIM element transform?
 
 linkedin:
 
+Flip and mirror reflected in the element transform, transient elements, temporary incanvas graphics, shared versus non-shared parameter creation and direct PDF export in DA4R and the #RevitAPI 
+
+http://autode.sk/reflectiontransform
+
+- How are reflections like flip and mirror reflected in the BIM element transform?
+- Transient elements hack
+- Temporary incanvas graphics API video
+- Shared versus non-shared parameter creation
+- Direct PDF export and DA4R...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
