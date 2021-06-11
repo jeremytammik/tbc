@@ -1,9 +1,8 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="bc.css">
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
-</head>
-
+</head></p>
 <!---
 
 - ForgeTypeId
@@ -72,22 +71,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p style="font-size: 80%; font-style:italic"></p>
 </center>
 
-
-**Question:** 
-
-**Answer:** 
-
-Many thanks to  for this very helpful explanation!
-
 -->
 
-### ForgeTypeId
-
-####<a name="2"></a> More on the Revit 2022 Unit Handling API
-
-We already discussed quite a few aspects of the Revit 2022 unit handling API and  `ForgeTypeId` usage:
-
+<h3>ForgeTypeId</h3>
+<h4><a name="2"></a></h4>
 <!-- 1835 1836 1853 1861 1871 1899 1900 1901 1902 1903 -->
+
 <ul>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2020/04/revitlookup-2021-with-multi-release-support.html">RevitLookup 2021 with Multi-Release Support</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2020/04/whats-new-in-the-revit-2021-api.html">What's New in the Revit 2021 API</a></li>
@@ -101,60 +90,69 @@ We already discussed quite a few aspects of the Revit 2022 unit handling API and
 <li><a href="https://thebuildingcoder.typepad.com/blog/2021/04/whats-new-in-the-revit-2022-api.html">What's New in the Revit 2022 API</a></li>
 </ul>
 
-In addition to that, Konrad Sobon does a great job at explaining how to deal with this in Dyname and Python in his discussion
-of [handling the Revit 2022 unit changes](https://archi-lab.net/handling-the-revit-2022-unit-changes).
+<p>ForgeTypeId</p>
+<p>Jacob Small, Autodesk</p>
+<p>https://forum.dynamobim.com/t/wall-finish-by-room/13215/34</p>
+<p>This is the unit type change associated to the forge type ID.</p>
 
-Meanwhile, some more related questions came up in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
+<p><a class="mention" href="/u/konrad_k_sobon">@Konrad_K_Sobon</a>  did a good job highlighting some of that here: <a href="https://archi-lab.net/handling-the-revit-2022-unit-changes/">https://archi-lab.net/handling-the-revit-2022-unit-changes/</a>.</p>
 
-- [Revit 2021 DisplayUnitType](https://forums.autodesk.com/t5/revit-api-forum/revit-2021-displayunittype/m-p/9793861)
-- [`ForgeTypeId` how to use?](https://forums.autodesk.com/t5/revit-api-forum/forgetypeid-how-to-use/m-p/9455305)
-- [Convert `ParameterType.FixtureUnit` to `ForgeTypeId`](https://forums.autodesk.com/t5/revit-api-forum/convert-parametertype-fixtureunit-to-forgetypeid/m-p/10268488)
-- [Revit 2022: `ParameterType.Text` to `ForgeTypeId`](https://forums.autodesk.com/t5/revit-api-forum/revit-2022-parametertype-text-to-forgetypeid/m-p/10225741)
+<p>There is also some good summary discussion on this building coder post from <a class="mention" href="/u/jeremytammik">@jeremytammik</a>: <a href="https://thebuildingcoder.typepad.com/blog/2021/04/pdf-export-forgetypeid-and-multi-target-add-in.html" class="inline-onebox">The Building Coder: PDF Export, ForgeTypeId and Multi-Target Add-In <span class="badge badge-notification clicks" title="1 click">1</span></a></p>
 
-The unit handling changes also affected some Forge apps:
+<p>And finally, there is the API documentation includes the new class here: <a href="https://www.revitapidocs.com/2022/d9fcf276-9566-de83-2b0b-d89b65ccc8af.htm" class="inline-onebox">ForgeTypeId Class</a></p>
 
-<center>
-<img src="img/forge_type_id_schema_id.jpg" alt="RVT ForgeTypeId in Forge" title="RVT ForgeTypeId in Forge" width="800"/> <!-- 1038 -->
-</center>
+<p>This isn’t intended to be a ‘fix’, but more giving you the opportunity to fix the issue yourself first - it’s not super easy, but it’s also not so difficult to do that you shouldn’t be able to make some headway and get better with Python. Should you give it a shot and still be stuck, post the DYN and a really small sample Revit model and the larger community will likely help out. <img src="https://emoji.discourse-cdn.com/twitter/slight_smile.png?v=9" title=":slight_smile:" class="emoji" alt=":slight_smile:"></p>
 
-his was discussed and resolved in the StackOverflow question
-on [Autodesk Forge returning odd measurement data](https://stackoverflow.com/questions/63992151/autodesk-forge-is-returning-odd-measurement-data)
+</div>
 
-I ended up implementing
-the [method `ListForgeTypeIds` in The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs#L1306-L1367) to help resolve the issue.
+<p>Convert ParameterType.FixtureUnit to ForgeTypeId
+Revit 2022: ParameterType.Text to ForgeTypeId</p>
+<p>forge_type_id_schema_id.jpg
+Autodesk Forge is returning odd measurement data
+https://stackoverflow.com/questions/63992151/autodesk-forge-is-returning-odd-measurement-data
+email with cyrille</p>
+<p>7876 [Autodesk Forge measurement units]
+2021.0.150.9 implemented ListForgeTypeIds</p>
+<p>DisplayUnitType
+forgetypeid
+Revit 2021 DisplayUnitType
+https://forums.autodesk.com/t5/revit-api-forum/revit-2021-displayunittype/m-p/9793861
+ForgeTypeId how to use?
+https://forums.autodesk.com/t5/revit-api-forum/forgetypeid-how-to-use/m-p/9455305
+UnitTypeId
+SpecTypeId
+https://autodesk.slack.com/archives/C0U4RCJ1M/p1610539323105400?thread_ts=1610484540.104000&amp;cid=C0U4RCJ1M</p>
+<p><strong>Question:</strong> </p>
+<p><center>
+<img src="img/.png" alt="" title="" width="800"/> <!-- 1401 -->
+</center></p>
+<pre class="code">
 
-####<a name="3"></a> Unit Conversion Without Knowing
+</pre>
 
-In a related vein, how can you impolement a unit conversion without knowing the internal Revit unit?
-
-This question has been around since the beginnings of The Building Coder and was first addressed in blog post #11
-on [units](https://thebuildingcoder.typepad.com/blog/2008/09/units.html) in September 2008.
-
-It came up again in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on a [unit conversion question](https://forums.autodesk.com/t5/revit-api-forum/unit-conversion-question/m-p/9840917):
-
-Simply set the value that you are analysing to 1.0 manually through the user interface using your current display units.
-
-Then, use RevitLookup to analyse what value `V` actually gets stored.
-
-The ratio between those two values, i.e., `V`/1.0 == `V`, immediately provides the conversion factor from display unit to internal database unit (or v.v.).
-
-
-####<a name="4"></a> How Will We Live Together?
-
-Moving from Revit to the topic of architecture in general, 
-at [La Biennale di Venezia](https://www.labiennale.org),
-the [17th International Architecture Exhibition](https://www.labiennale.org/en/architecture/2021)
-is focussed on the theme of *How will we live together?*
-
-> We need a new spatial contract.
-In the context of widening political divides and growing economic inequalities, we call on architects to imagine spaces in which we can generously live together.
-
-At the biennale,
-the [German pavilion looks back from the future](https://www.floornature.com/blog/biennale-di-venezia-german-pavilion-looks-back-future-16269):
-
-> [2038](https://2038.xyz) is the name of the German Pavilion in the 17th International Architecture Exhibition at Biennale di Venezia.
+<p><strong>Answer:</strong> </p>
+<p>Many thanks to  for this very helpful explanation!</p>
+<h4><a name="3"></a></h4>
+<h4><a name="4"></a></h4>
+<p>In a related vein, how can you impolement a unit conversion without knowing the internal Revit unit?</p>
+<p>This question has been around since the beginnings of The Buiulding Coder and was first addressed in blog post #11
+on <a href="https://thebuildingcoder.typepad.com/blog/2008/09/units.html">units</a> in September 2008.</p>
+<p>It came up again in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on a <a href="https://forums.autodesk.com/t5/revit-api-forum/unit-conversion-question/m-p/9840917">unit conversion question</a>:</p>
+<h4><a name="4"></a> How Will We Live Together?</h4>
+<p>Moving from Revit to the topic of architecture in general, 
+at <a href="https://www.labiennale.org">La Biennale di Venezia</a>,
+the <a href="https://www.labiennale.org/en/architecture/2021">17th International Architecture Exhibition</a>
+is focussed on the theme of <em>How will we live together?</em></p>
+<blockquote>
+<p>We need a new spatial contract.
+In the context of widening political divides and growing economic inequalities, we call on architects to imagine spaces in which we can generously live together.</p>
+</blockquote>
+<p>At the biennale,
+the <a href="https://www.floornature.com/blog/biennale-di-venezia-german-pavilion-looks-back-future-16269">German pavilion looks back from the future</a>:</p>
+<blockquote>
+<p><a href="https://2038.xyz">2038</a> is the name of the German Pavilion in the 17th International Architecture Exhibition at Biennale di Venezia.
 A look back from the future, which the curators envision as a world where many of today’s problems have been overcome.
-Digital technology makes it possible to visit the pavilion from anywhere in the world: [2038.xyz](https://2038.xyz)
+Digital technology makes it possible to visit the pavilion from anywhere in the world: <a href="https://2038.xyz">2038.xyz</a></p>
+</blockquote>
