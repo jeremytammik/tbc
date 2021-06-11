@@ -118,7 +118,7 @@ The unit handling changes also affected some Forge apps:
 <img src="img/forge_type_id_schema_id.jpg" alt="RVT ForgeTypeId in Forge" title="RVT ForgeTypeId in Forge" width="800"/> <!-- 1038 -->
 </center>
 
-his was discussed and resolved in the StackOverflow question
+This was discussed and resolved in the StackOverflow question
 on [Autodesk Forge returning odd measurement data](https://stackoverflow.com/questions/63992151/autodesk-forge-is-returning-odd-measurement-data)
 
 I ended up implementing
