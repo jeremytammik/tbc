@@ -102,7 +102,13 @@ We already discussed quite a few aspects of the Revit 2022 unit handling API and
 
 Here are some more related questions that came up since then:
 
-####<a name="2"></a> ParameterType.FixtureUnit and Invalid
+- [`FixtureUnit` ParameterType](#2)
+- [Revit 2022 unit handling API in Dynamo](#3)
+- [String values for Forge units](#4)
+- [Unit conversion without knowing](#5)
+- [How will we live together?](#6)
+
+####<a name="2"></a> FixtureUnit ParameterType
 
 David Becroft comes to the rescue again answering 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -124,7 +130,7 @@ In place of `ParameterType.FixtureUnit`, you can use `SpecTypeId.Number`.
 
 `ParameterType.Invalid` is equivalent to an empty, default-constructed `ForgeTypeId`, i.e. `new ForgeTypeId()`.
 
-####<a name="3"></a> Revit 2022 Unit Handling API in Dynamo and Python
+####<a name="3"></a> Revit 2022 Unit Handling API in Dynamo
 
 Konrad Sobon does a great job explaining how to deal with this in Dyname and Python in his discussion
 of [handling the Revit 2022 unit changes](https://archi-lab.net/handling-the-revit-2022-unit-changes).
