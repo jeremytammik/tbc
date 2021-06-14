@@ -112,7 +112,16 @@ Here are some more related questions that came up since then:
 <img src="img/yardstick.jpg" alt="Yardstick" title="Yardstick" width="480"/> <!-- 960 -->
 </center>
 
+Before diving into this topic, let us congratulate the China team in their celebration of the [Dragon Boat festival](https://en.wikipedia.org/wiki/Dragon_Boat_Festival) today.
 
+- Traditional sport : dragon boating race
+- Customary food: Zongzi, a kind of rice dumpling, packaged in bamboo or reed leaves, sweet or salty, even in ice cream (by Starbucks &nbsp; :-)
+- Memorials on the sage [Qu Yuan](https://en.wikipedia.org/wiki/Qu_Yuan), poet and politician, known for his patriotism
+- Prayer for health and peace by hanging calamus or mugwort on the door
+ 
+<center>
+<img src="img/dragon_boat_festival.png" alt="Dragon Boat festival" title="Dragon Boat festival" width="600"/> <!-- 1920 -->
+</center>
 
 
 ####<a name="2"></a> FixtureUnit ParameterType
