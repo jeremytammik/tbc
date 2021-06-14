@@ -92,11 +92,11 @@ We already discussed quite a few aspects of the Revit 2022 unit handling API and
 <li><a href="https://thebuildingcoder.typepad.com/blog/2020/08/custom-parameters-and-tile-packing.html">Custom Parameters and Tile Packing</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2020/10/firerevit-deprecated-api-and-elbow-centre-point.html">FireRevit, Deprecated API and Elbow Centre Point</a></li>
 -->
-<li><a href="https://thebuildingcoder.typepad.com/blog/2021/04/revit-2022-released.html">Revit 2022 Released</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2021/04/pdf-export-forgetypeid-and-multi-target-add-in.html#2">Replacing Deprecated `ParameterType` with `ForgeTypeId`
+<li><a href="https://thebuildingcoder.typepad.com/blog/2021/04/revit-2022-released.html">Revit 2022 released</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2021/04/pdf-export-forgetypeid-and-multi-target-add-in.html#2">Replacing deprecated ParameterType with ForgeTypeId
 </a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2021/04/revit-2022-migrates-bim360-team-to-docs.html">Removal of `DisplayUnitType` in RevitLookup 2022</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2021/04/revit-2022-sdk-and-the-building-coder-samples.html">`ParameterType` and `ForgeTypeId` in the Revit 2022 SDK and The Building Coder Samples</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2021/04/revit-2022-migrates-bim360-team-to-docs.html">Removal of DisplayUnitType in RevitLookup 2022</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2021/04/revit-2022-sdk-and-the-building-coder-samples.html">ParameterType and ForgeTypeId in the Revit 2022 SDK and The Building Coder samples</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2021/04/whats-new-in-the-revit-2022-api.html">What's New in the Revit 2022 API</a></li>
 </ul>
 
