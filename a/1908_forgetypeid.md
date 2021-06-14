@@ -79,7 +79,7 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### ForgeTypeId Revisited
+### ForgeTypeId and Units Revisited
 
 We already discussed quite a few aspects of the Revit 2022 unit handling API and  `ForgeTypeId` usage:
 
@@ -107,6 +107,13 @@ Here are some more related questions that came up since then:
 - [String values for Forge units](#4)
 - [Unit conversion without knowing](#5)
 - [How will we live together?](#6)
+
+<center>
+<img src="img/yardstick.jpg" alt="Yardstick" title="Yardstick" width="480"/> <!-- 960 -->
+</center>
+
+
+
 
 ####<a name="2"></a> FixtureUnit ParameterType
 
