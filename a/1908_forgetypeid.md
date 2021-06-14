@@ -66,6 +66,18 @@ A few new aspects of the Revit 2022 unit handling API and <code>ForgeTypeId</cod
 
 linkedin:
 
+The Revit 2022 unit handling API and unit conversion, ForgeTypeId and FixtureUnit ParameterType in the #RevitAPI
+
+http://autode.sk/rvt2022unitapi
+
+A few new aspects of the Revit 2022 unit handling API and ForgeTypeId usage:
+
+- FixtureUnit ParameterType
+- Revit 2022 unit handling API in Dynamo
+- String values for Forge units
+- Unit conversion without knowing
+- How will we live together?...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
