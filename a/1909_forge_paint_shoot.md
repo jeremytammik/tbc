@@ -69,11 +69,27 @@ Many thanks to  for this very helpful explanation!
 
 
 
-####<a name="2"></a> 
+####<a name="2"></a> Join Forge Accelerator Now or Wait
 
-**Question:** 
+Have you been thinking about joining
+a [Forge accelerator](https://forge.autodesk.com/accelerator-program) sometime soon to get an efficient start
+with [Autodesk Forge](https://forge.autodesk.com/) to access design and engineering data in the cloud?
 
-**Answer:** 
+Now's the time!
+
+The next one coming up
+is [Thuvaraiyam Pathi, June 21-25, 2021 &ndash; registration](https://www.eventbrite.com/e/autodesk-virtual-forge-accelerator-thuvaraiyam-pathi-june-21-25-2021-registration-138643130335)
+
+It is followed by a break during July, August and possibly September.
+
+In the Forge accelerator, you can benefit from dedicated time to develop your Forge application with direct help and training from Forge engineering experts.
+Real time expert help can dramatically shorten your learning and dev time and create trusting relationships with Forge experts at Autodesk.
+
+Submit your proposal today!
+
+You can also check further invitations
+from [Jaime](https://twitter.com/AfroJme/status/1402684098687143942)
+and [Kean](https://www.keanw.com/2021/06/enjoying-an-early-summer-quiet-period-attend-next-weeks-forge-accelerator.html)
 
 ####<a name="3"></a> 
 
@@ -84,18 +100,12 @@ Many thanks to  for this very helpful explanation!
 ####<a name="6"></a>
 
 
-Forge accelerators: join now or wait for longer
-break during july august september
-have you been thinking about joining to get started efficiently?
-now's the time!
-Upcoming Forge Virtual Accelerator - Thuvaraiyam Pathi - June 21-25, 2021
-https://www.eventbrite.com/e/autodesk-virtual-forge-accelerator-thuvaraiyam-pathi-june-21-25-2021-registration-138643130335
-Benefit from dedicated time to develop your Forge application – with direct help and training from Forge engineering experts.
-Real time expert help dramatically shortening your learning and dev time – and create trusting relationships with Forge experts at Autodesk.
-Submit your proposal today!
-https://twitter.com/AfroJme/status/1402684098687143942?s=20
-[Enjoying an early summer quiet period? Attend next week’s Forge Accelerator!](https://www.keanw.com/2021/06/enjoying-an-early-summer-quiet-period-attend-next-weeks-forge-accelerator.html)
-https://autodesk.slack.com/archives/C0PLC20PP/p1623259873052400
+**Question:** 
+
+**Answer:** 
+
+
+
 
 paint stairs
 [Paint Stair Faces](https://forums.autodesk.com/t5/revit-api-forum/paint-stair-faces/m-p/10388359)
