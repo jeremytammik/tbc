@@ -91,7 +91,68 @@ You can also check further invitations
 from [Jaime](https://twitter.com/AfroJme/status/1402684098687143942)
 and [Kean](https://www.keanw.com/2021/06/enjoying-an-early-summer-quiet-period-attend-next-weeks-forge-accelerator.html)
 
-####<a name="3"></a> 
+####<a name="3"></a> Painting Stairs
+
+A very long-standing [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread on how
+to [Paint Stair Faces](https://forums.autodesk.com/t5/revit-api-forum/paint-stair-faces/m-p/10388359) was finally answered
+by Bruce [@canyon.des[(https://forums.autodesk.com/t5/user/viewprofilepage/user-id/10032309) Hans:
+
+**Question:** Is there any reason why stair faces can be painted in the UI, and not in the API?
+The question was raised in 2015 and apparently still exists:
+
+I'm trying to paint some of the faces of a stair (a monolithic stair) through the Revit API.
+It appears that it cannot be done programmatically &ndash; I get an error message saying that "the element faces cannot be painted" &ndash; even if I can acieve this stair face painting manually in the Revit UI.
+Is there a way to automatically paint these faces?
+
+**Answer:** For stairs, you need to use `GetStairsLandings` and `GetStairsRuns` to get the `ElementId` to paint landings or runs.
+It's not intuitive but works.
+Use the same to find out whether the landing or run faces are painted or not.
+
+<pre class="code">
+Material Mat;
+Selection sel = UIDoc.Selection;
+Reference pickedRef = null;
+Face fc = null;
+SurfaceSelectionFilter filter = new SurfaceSelectionFilter();
+pickedRef = sel.PickObject(Autodesk.Revit.UI.Selection.ObjectType.PointOnElement, filter, "please select a Face");
+GeometryObject geoObject = doc.GetElement(pickedRef).GetGeometryObjectFromReference(pickedRef);
+Element elem = doc.GetElement(pickedRef);
+fc = geoObject as Face;
+if (elem.Category.Id.IntegerValue == -2000120)//Stairs;
+{
+bool flag =false;
+ Stairs str = elem as Stairs;
+ List<ElementId> StarLands =str.GetStairsLandings().ToList();
+ List<ElementId> StarRuns = = str.GetStairsLandings().ToList();
+ using (Transaction transaction = new Transaction(doc, "Paint Material"))
+{
+transaction.Start();
+  foreach (ElementId Lid in StarLands)
+{
+try
+{
+  doc.Paint(Lid, fc, Mat.Id);
+flag=true;
+break;
+}
+catch{}
+}
+if(!flag)
+  foreach (ElementId Lid in StarRuns)
+{
+try
+{
+  doc.Paint(Lid, fc, Mat.Id);
+break;
+}
+catch{}
+}
+  transaction.Commit();
+}
+</pre>
+
+Many thanks to Bruce for this simple and effective solution.
+
 
 ####<a name="4"></a> 
 
