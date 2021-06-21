@@ -413,106 +413,125 @@ I'd love to see an example of multiple rays per element if you ever decided to d
 
 In your code above, you shoot a ray upwards parallel to the Z axis from the element location point:
 
-  // ray direction for raybounce
-  XYZ newPP = new XYZ(elemLoc.X, elemLoc.Y, elemLoc.Z + 1);
-  XYZ rayd = new XYZ(0, 0, 1);
+<pre class="code">
+  <span style="color:green;">//&nbsp;ray&nbsp;direction&nbsp;for&nbsp;raybounce</span>
+  XYZ&nbsp;newPP&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;XYZ(&nbsp;elemLoc.X,&nbsp;elemLoc.Y,&nbsp;elemLoc.Z&nbsp;+&nbsp;1&nbsp;);
+  XYZ&nbsp;rayd&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;XYZ(&nbsp;0,&nbsp;0,&nbsp;1&nbsp;);
+</pre>
 
-You can define any other source point you like, e.g., each of the four bottom corner points in turn, and also any other direction you like, and simply repeat the same process using the same reference intersector in the same view by repeatedly calling its Find method with the new source point and direction vector:
-
-https://www.revitapidocs.com/2021.1/6abd0586-5d7e-68c6-2e64-46199f457499.htm
+You can define any other source point you like, e.g., each of the four bottom corner points in turn, and also any other direction you like, and simply repeat the same process using the same reference intersector in the same view by repeatedly calling
+its [Find method with the new source point and direction vector](https://www.revitapidocs.com/2021.1/6abd0586-5d7e-68c6-2e64-46199f457499.htm).
 
 **Response:**  I finally figured it out using the ray projection method as well.
-Thanks to all your responses i realized i was super over complicating it in my head.
-Thank you again for all your help
+Thanks to all your responses; I was super over-complicating it.
+Thank you again for all your help.
 
 Here is the working code with ray projection as well:
 
 <pre class="code">
-using (Transaction tx = new Transaction(doc))
-                {
-                    tx.Start("Attach Columns Tops");
-
-                    foreach (ElementId elemId in selectedIds)
-                    {
-
-                        Element elem = uidoc.Document.GetElement(elemId);
-                        if ((BuiltInCategory)elem.Category.Id.IntegerValue == BuiltInCategory.OST_StructuralColumns)
-                        {
-                            allColumns++;
-
-                            //collect beams and slabs
-                            List<BuiltInCategory> builtInCats = new List<BuiltInCategory>();
-                            builtInCats.Add(BuiltInCategory.OST_Floors);
-                            builtInCats.Add(BuiltInCategory.OST_StructuralFraming);
-                            ElementMulticategoryFilter filter = new ElementMulticategoryFilter(builtInCats);
-
-                            if (ColumnAttachment.GetColumnAttachment(elem as FamilyInstance, 1) != null)
-                            {
-                                //removes old column attachement
-                                ColumnAttachment.RemoveColumnAttachment(elem as FamilyInstance, 1);
-                            }
-
-                            ReferenceIntersector refI = new ReferenceIntersector(filter, FindReferenceTarget.All, (View3D)doc.ActiveView);
-
-                            BoundingBoxXYZ elemBB = elem.get_BoundingBox(doc.ActiveView);
-
-                            //create ray
-                            XYZ rayd = new XYZ(0, 0, 1);
-
-                            List<XYZ> points = new List<XYZ>();
-                            //get column location
-                            XYZ elemLoc = (elem.Location as LocationPoint).Point;
-                            XYZ elemCenter = new XYZ(elemLoc.X, elemLoc.Y, elemLoc.Z + 0.1);
-                            XYZ b1 = new XYZ(elemBB.Min.X, elemBB.Min.Y, elemBB.Min.Z + 0.1);
-                            XYZ b2 = new XYZ(elemBB.Max.X, elemBB.Max.Y, elemBB.Min.Z + 0.1);
-                            XYZ b3 = new XYZ(elemBB.Min.X, elemBB.Max.Y, elemBB.Min.Z + 0.1);
-                            XYZ b4 = new XYZ(elemBB.Max.X, elemBB.Min.Y, elemBB.Min.Z + 0.1);
-
-                            points.Add(b1);
-                            points.Add(b2);
-                            points.Add(b3);
-                            points.Add(b4);
-                            points.Add(elemCenter);
-
-                            ReferenceWithContext refC = null;
-                            foreach (XYZ pt in points)
-                            {
-                                refC = refI.FindNearest(pt, rayd);
-                                if (refC != null)
-                                {
-                                    break;
-                                }
-
-                            }
-
-                            if (refC != null)
-                            {
-                                Reference reference = refC.GetReference();
-
-                                //gets reference element id & Element
-                                ElementId refEle = reference.ElementId;
-                                Element refElem = uidoc.Document.GetElement(refEle);
-
-                                ColumnAttachment.AddColumnAttachment(doc, elem as FamilyInstance, refElem, 1, ColumnAttachmentCutStyle.None, ColumnAttachmentJustification.Minimum, 0);
-
-                                successColumns++;
-                            }
-
-                            else
-                            {
-                                //change color of columns to red
-                                Color color = new Color((byte)255, (byte)0, (byte)0);
-                                OverrideGraphicSettings ogs = new OverrideGraphicSettings();
-                                ogs.SetProjectionLineColor(color);
-                                uidoc.ActiveView.SetElementOverrides(elem.Id, ogs);
-                            }
-
-                        }
-
-                    }
-
-                    tx.Commit();
-                }
+<span style="color:blue;">void</span>&nbsp;AdjustColumnHeightsUsingReferenceIntersector(
+&nbsp;&nbsp;Document&nbsp;doc,
+&nbsp;&nbsp;IList&lt;ElementId&gt;&nbsp;ids&nbsp;)
+{
+&nbsp;&nbsp;View3D&nbsp;view&nbsp;=&nbsp;doc.ActiveView&nbsp;<span style="color:blue;">as</span>&nbsp;View3D;
+ 
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">null</span>&nbsp;==&nbsp;view&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">throw</span>&nbsp;<span style="color:blue;">new</span>&nbsp;Exception(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Please&nbsp;run&nbsp;this&nbsp;command&nbsp;in&nbsp;a&nbsp;3D&nbsp;view.&quot;</span>&nbsp;);
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;allColumns&nbsp;=&nbsp;0;
+&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;successColumns&nbsp;=&nbsp;0;
+ 
+&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;Transaction&nbsp;tx&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Transaction(&nbsp;doc&nbsp;)&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;tx.Start(&nbsp;<span style="color:#a31515;">&quot;Attach&nbsp;Columns&nbsp;Tops&quot;</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;ElementId&nbsp;elemId&nbsp;<span style="color:blue;">in</span>&nbsp;ids&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Element&nbsp;elem&nbsp;=&nbsp;doc.GetElement(&nbsp;elemId&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;(BuiltInCategory)&nbsp;elem.Category.Id.IntegerValue
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;==&nbsp;BuiltInCategory.OST_StructuralColumns&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allColumns++;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FamilyInstance&nbsp;column&nbsp;=&nbsp;elem&nbsp;<span style="color:blue;">as</span>&nbsp;FamilyInstance;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Collect&nbsp;beams&nbsp;and&nbsp;slabs</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;List&lt;BuiltInCategory&gt;&nbsp;builtInCats&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;List&lt;BuiltInCategory&gt;();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;builtInCats.Add(&nbsp;BuiltInCategory.OST_Floors&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;builtInCats.Add(&nbsp;BuiltInCategory.OST_StructuralFraming&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ElementMulticategoryFilter&nbsp;filter
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;ElementMulticategoryFilter(&nbsp;builtInCats&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Remove&nbsp;old&nbsp;column&nbsp;attachement</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;ColumnAttachment.GetColumnAttachment(&nbsp;column,&nbsp;1&nbsp;)&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ColumnAttachment.RemoveColumnAttachment(&nbsp;column,&nbsp;1&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BoundingBoxXYZ&nbsp;elemBB&nbsp;=&nbsp;elem.get_BoundingBox(&nbsp;view&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;elemLoc&nbsp;=&nbsp;(elem.Location&nbsp;<span style="color:blue;">as</span>&nbsp;LocationPoint).Point;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;elemCenter&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;XYZ(&nbsp;elemLoc.X,&nbsp;elemLoc.Y,&nbsp;elemLoc.Z&nbsp;+&nbsp;0.1&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;b1&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;XYZ(&nbsp;elemBB.Min.X,&nbsp;elemBB.Min.Y,&nbsp;elemBB.Min.Z&nbsp;+&nbsp;0.1&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;b2&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;XYZ(&nbsp;elemBB.Max.X,&nbsp;elemBB.Max.Y,&nbsp;elemBB.Min.Z&nbsp;+&nbsp;0.1&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;b3&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;XYZ(&nbsp;elemBB.Min.X,&nbsp;elemBB.Max.Y,&nbsp;elemBB.Min.Z&nbsp;+&nbsp;0.1&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;b4&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;XYZ(&nbsp;elemBB.Max.X,&nbsp;elemBB.Min.Y,&nbsp;elemBB.Min.Z&nbsp;+&nbsp;0.1&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;List&lt;XYZ&gt;&nbsp;points&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;List&lt;XYZ&gt;(&nbsp;5&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;points.Add(&nbsp;b1&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;points.Add(&nbsp;b2&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;points.Add(&nbsp;b3&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;points.Add(&nbsp;b4&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;points.Add(&nbsp;elemCenter&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ReferenceIntersector&nbsp;refI&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;ReferenceIntersector(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;filter,&nbsp;FindReferenceTarget.All,&nbsp;view&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;rayd&nbsp;=&nbsp;XYZ.BasisZ;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ReferenceWithContext&nbsp;refC&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;XYZ&nbsp;pt&nbsp;<span style="color:blue;">in</span>&nbsp;points&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;refC&nbsp;=&nbsp;refI.FindNearest(&nbsp;pt,&nbsp;rayd&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;refC&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;refC&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reference&nbsp;reference&nbsp;=&nbsp;refC.GetReference();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ElementId&nbsp;id&nbsp;=&nbsp;reference.ElementId;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Element&nbsp;e&nbsp;=&nbsp;doc.GetElement(&nbsp;id&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ColumnAttachment.AddColumnAttachment(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;doc,&nbsp;column,&nbsp;e,&nbsp;1,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ColumnAttachmentCutStyle.None,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ColumnAttachmentJustification.Minimum,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;successColumns++;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">else</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Change&nbsp;color&nbsp;of&nbsp;columns&nbsp;to&nbsp;red</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Color&nbsp;color&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Color(&nbsp;(<span style="color:blue;">byte</span>)&nbsp;255,&nbsp;(<span style="color:blue;">byte</span>)&nbsp;0,&nbsp;(<span style="color:blue;">byte</span>)&nbsp;0&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OverrideGraphicSettings&nbsp;ogs&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;OverrideGraphicSettings();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ogs.SetProjectionLineColor(&nbsp;color&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;view.SetElementOverrides(&nbsp;elem.Id,&nbsp;ogs&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;tx.Commit();
+&nbsp;&nbsp;}
+}
 </pre>
 
 **Answer:** Congratulations on simplifying and solving this.
