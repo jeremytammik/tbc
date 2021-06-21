@@ -272,126 +272,139 @@ It seems to be working for me.
 Here's what worked for me:
 
 <pre class="code">
-using (Transaction tx = new Transaction(doc))
-                    {
-                        tx.Start("Adjust Column Heights");
-
-                        if (doc.ActiveView is View3D)
-                        {
-                            
-                            foreach (ElementId elemId in selectedIds)
-                            {
-                                Element elem = uidoc.Document.GetElement(elemId);
-
-                                //checks if element is column
-                                if ((BuiltInCategory)elem.Category.Id.IntegerValue == BuiltInCategory.OST_StructuralColumns)
-                                {
-                                    allColumns++;
-
-                                    //get column location
-                                    XYZ elemLoc = (elem.Location as LocationPoint).Point;
-
-                                    //ray direction for raybounce
-                                    XYZ newPP = new XYZ(elemLoc.X, elemLoc.Y, elemLoc.Z + 1);
-                                    XYZ rayd = new XYZ(0, 0, 1);
-
-                                    //collect beams and slabs
-                                    List<BuiltInCategory> builtInCats = new List<BuiltInCategory>();
-                                    builtInCats.Add(BuiltInCategory.OST_Floors);
-                                    builtInCats.Add(BuiltInCategory.OST_StructuralFraming);
-                                    ElementMulticategoryFilter filter = new ElementMulticategoryFilter(builtInCats);
-
-                                    BoundingBoxXYZ elemBB = elem.get_BoundingBox(doc.ActiveView);
-
-                                    XYZ max = elemBB.Max;
-                                    XYZ min = elemBB.Min;
-
-                                    Outline myOutLn = new Outline(min, new XYZ(max.X,max.Y,max.Z+100));
-
-                                    BoundingBoxIntersectsFilter invertFilter = new BoundingBoxIntersectsFilter(myOutLn);
-                                    FilteredElementCollector collector = new FilteredElementCollector(doc);
-                                    IList<Element> el = collector.WherePasses(filter).WherePasses(invertFilter).ToElements();
-
-                                    //new lists for beams and slabs
-                                    List<Element> intersectingBeams = new List<Element>();
-                                    List<Element> intersectingSlabs = new List<Element>();
-
-                                    if (ColumnAttachment.GetColumnAttachment(elem as FamilyInstance, 1) != null)
-                                    {
-                                        //change color of columns to green
-                                        Color color = new Color((byte)0, (byte)255, (byte)0);
-                                        OverrideGraphicSettings ogs = new OverrideGraphicSettings();
-                                        ogs.SetProjectionLineColor(color);
-                                        doc.ActiveView.SetElementOverrides(elem.Id, ogs);
-                                    }
-                                    else
-                                    {
-                                        //add elements to list
-                                        foreach (Element e in el)
-                                        {
-                                            BoundingBoxXYZ eBB = e.get_BoundingBox(uidoc.Document.ActiveView);
-                                            if (e.Category.Name == "Structural Framing")
-                                            {
-                                                intersectingBeams.Add(e);
-                                            }
-                                            else if (e.Category.Name == "Floors")
-                                            {
-                                                intersectingSlabs.Add(e);
-                                            }
-                                        }
-                                        if (intersectingBeams.Any())
-                                        {
-                                            Element lowestBottomElem = intersectingBeams.First();
-                                            foreach (Element beam in intersectingBeams)
-                                            {
-                                                BoundingBoxXYZ thisBeamBB = beam.get_BoundingBox(uidoc.Document.ActiveView);
-                                                BoundingBoxXYZ currentLowestBB = lowestBottomElem.get_BoundingBox(uidoc.Document.ActiveView);
-                                                if (thisBeamBB.Min.Z < currentLowestBB.Min.Z)
-                                                {
-                                                    lowestBottomElem = beam;
-                                                }
-                                            }
-                                            ColumnAttachment.AddColumnAttachment(doc, elem as FamilyInstance, lowestBottomElem, 1, ColumnAttachmentCutStyle.None, ColumnAttachmentJustification.Minimum, 0);
-                                            successColumns++;
-                                        }
-                                        else if (intersectingSlabs.Any())
-                                        {
-                                            Element lowestBottomElem = intersectingSlabs.First();
-                                            foreach (Element slab in intersectingSlabs)
-                                            {
-                                                BoundingBoxXYZ thisSlabBB = slab.get_BoundingBox(uidoc.Document.ActiveView);
-                                                BoundingBoxXYZ currentLowestBB = lowestBottomElem.get_BoundingBox(uidoc.Document.ActiveView);
-                                                if (thisSlabBB.Min.Z < currentLowestBB.Min.Z)
-                                                {
-                                                    lowestBottomElem = slab;
-                                                }
-                                            }
-                                            ColumnAttachment.AddColumnAttachment(doc, elem as FamilyInstance, lowestBottomElem, 1, ColumnAttachmentCutStyle.None, ColumnAttachmentJustification.Minimum, 0);
-                                            successColumns++;
-                                        }
-                                        else
-                                        {
-                                            //change color of columns to red
-                                            Color color = new Color((byte)255, (byte)0, (byte)0);
-                                            OverrideGraphicSettings ogs = new OverrideGraphicSettings();
-                                            ogs.SetProjectionLineColor(color);
-                                            doc.ActiveView.SetElementOverrides(elem.Id, ogs);
-
-                                        }
-
-                                    }
-
-                                }
-                            }
-                        }
-                        else
-                        {
-                            TaskDialog.Show("Revit", "Run Script in 3D View.");
-                        }
-
-                        TaskDialog.Show("Columns Changed", string.Format("{0} of {1} Columns Changed", successColumns, allColumns));
-                        tx.Commit();
-                    }
+<span style="color:blue;">void</span>&nbsp;AdjustColumnHeightsUsingBoundingBox(
+&nbsp;&nbsp;Document&nbsp;doc,
+&nbsp;&nbsp;IList&lt;ElementId&gt;&nbsp;ids&nbsp;)
+{
+&nbsp;&nbsp;View&nbsp;view&nbsp;=&nbsp;doc.ActiveView;
+ 
+&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;allColumns&nbsp;=&nbsp;0;
+&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;successColumns&nbsp;=&nbsp;0;
+ 
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;view&nbsp;<span style="color:blue;">is</span>&nbsp;View3D&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;Transaction&nbsp;tx&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Transaction(&nbsp;doc&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tx.Start(&nbsp;<span style="color:#a31515;">&quot;Adjust&nbsp;Column&nbsp;Heights&quot;</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;ElementId&nbsp;elemId&nbsp;<span style="color:blue;">in</span>&nbsp;ids&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Element&nbsp;elem&nbsp;=&nbsp;doc.GetElement(&nbsp;elemId&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Check&nbsp;if&nbsp;element&nbsp;is&nbsp;column</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;(BuiltInCategory)&nbsp;elem.Category.Id.IntegerValue&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;==&nbsp;BuiltInCategory.OST_StructuralColumns&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allColumns++;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FamilyInstance&nbsp;column&nbsp;=&nbsp;elem&nbsp;<span style="color:blue;">as</span>&nbsp;FamilyInstance;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Collect&nbsp;beams&nbsp;and&nbsp;slabs&nbsp;within&nbsp;bounding&nbsp;box</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;List&lt;BuiltInCategory&gt;&nbsp;builtInCats&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;List&lt;BuiltInCategory&gt;();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;builtInCats.Add(&nbsp;BuiltInCategory.OST_Floors&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;builtInCats.Add(&nbsp;BuiltInCategory.OST_StructuralFraming&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ElementMulticategoryFilter&nbsp;beamSlabFilter&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;ElementMulticategoryFilter(&nbsp;builtInCats&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BoundingBoxXYZ&nbsp;bb&nbsp;=&nbsp;elem.get_BoundingBox(&nbsp;view&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Outline&nbsp;myOutLn&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Outline(&nbsp;bb.Min,&nbsp;bb.Max&nbsp;+&nbsp;100&nbsp;*&nbsp;XYZ.BasisZ&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BoundingBoxIntersectsFilter&nbsp;bbFilter&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;BoundingBoxIntersectsFilter(&nbsp;myOutLn&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FilteredElementCollector&nbsp;collector&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;FilteredElementCollector(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WherePasses(&nbsp;beamSlabFilter&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WherePasses(&nbsp;bbFilter&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;List&lt;Element&gt;&nbsp;intersectingBeams&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;List&lt;Element&gt;();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;List&lt;Element&gt;&nbsp;intersectingSlabs&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;List&lt;Element&gt;();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;ColumnAttachment.GetColumnAttachment(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;column,&nbsp;1&nbsp;)&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Change&nbsp;color&nbsp;of&nbsp;columns&nbsp;to&nbsp;green</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Color&nbsp;color&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Color(&nbsp;(<span style="color:blue;">byte</span>)&nbsp;0,&nbsp;(<span style="color:blue;">byte</span>)&nbsp;255,&nbsp;(<span style="color:blue;">byte</span>)&nbsp;0&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OverrideGraphicSettings&nbsp;ogs&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;OverrideGraphicSettings();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ogs.SetProjectionLineColor(&nbsp;color&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;view.SetElementOverrides(&nbsp;elem.Id,&nbsp;ogs&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">else</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;Element&nbsp;e&nbsp;<span style="color:blue;">in</span>&nbsp;collector&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;e.Category.Name&nbsp;==&nbsp;<span style="color:#a31515;">&quot;Structural&nbsp;Framing&quot;</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;intersectingBeams.Add(&nbsp;e&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">else</span>&nbsp;<span style="color:blue;">if</span>(&nbsp;e.Category.Name&nbsp;==&nbsp;<span style="color:#a31515;">&quot;Floors&quot;</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;intersectingSlabs.Add(&nbsp;e&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;intersectingBeams.Any()&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Element&nbsp;lowestBottomElem&nbsp;=&nbsp;intersectingBeams.First();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;Element&nbsp;beam&nbsp;<span style="color:blue;">in</span>&nbsp;intersectingBeams&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BoundingBoxXYZ&nbsp;thisBeamBB&nbsp;=&nbsp;beam.get_BoundingBox(&nbsp;view&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BoundingBoxXYZ&nbsp;currentLowestBB&nbsp;=&nbsp;lowestBottomElem.get_BoundingBox(&nbsp;view&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;thisBeamBB.Min.Z&nbsp;&lt;&nbsp;currentLowestBB.Min.Z&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lowestBottomElem&nbsp;=&nbsp;beam;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ColumnAttachment.AddColumnAttachment(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;doc,&nbsp;column,&nbsp;lowestBottomElem,&nbsp;1,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ColumnAttachmentCutStyle.None,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ColumnAttachmentJustification.Minimum,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;successColumns++;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">else</span>&nbsp;<span style="color:blue;">if</span>(&nbsp;intersectingSlabs.Any()&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Element&nbsp;lowestBottomElem&nbsp;=&nbsp;intersectingSlabs.First();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;Element&nbsp;slab&nbsp;<span style="color:blue;">in</span>&nbsp;intersectingSlabs&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BoundingBoxXYZ&nbsp;thisSlabBB&nbsp;=&nbsp;slab.get_BoundingBox(&nbsp;view&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BoundingBoxXYZ&nbsp;currentLowestBB&nbsp;=&nbsp;lowestBottomElem.get_BoundingBox(&nbsp;view&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;thisSlabBB.Min.Z&nbsp;&lt;&nbsp;currentLowestBB.Min.Z&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lowestBottomElem&nbsp;=&nbsp;slab;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ColumnAttachment.AddColumnAttachment(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;doc,&nbsp;column,&nbsp;lowestBottomElem,&nbsp;1,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ColumnAttachmentCutStyle.None,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ColumnAttachmentJustification.Minimum,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;successColumns++;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">else</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Change&nbsp;color&nbsp;of&nbsp;columns&nbsp;to&nbsp;red</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Color&nbsp;color&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Color(&nbsp;(<span style="color:blue;">byte</span>)&nbsp;255,&nbsp;(<span style="color:blue;">byte</span>)&nbsp;0,&nbsp;(<span style="color:blue;">byte</span>)&nbsp;0&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OverrideGraphicSettings&nbsp;ogs&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;OverrideGraphicSettings();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ogs.SetProjectionLineColor(&nbsp;color&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;view.SetElementOverrides(&nbsp;elem.Id,&nbsp;ogs&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tx.Commit();
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;TaskDialog.Show(&nbsp;<span style="color:#a31515;">&quot;Columns&nbsp;Changed&quot;</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>.Format(&nbsp;<span style="color:#a31515;">&quot;{0}&nbsp;of&nbsp;{1}&nbsp;Columns&nbsp;Changed&quot;</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;successColumns,&nbsp;allColumns&nbsp;)&nbsp;);
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:blue;">else</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;TaskDialog.Show(&nbsp;<span style="color:#a31515;">&quot;Revit&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;Run&nbsp;Script&nbsp;in&nbsp;3D&nbsp;View.&quot;</span>&nbsp;);
+&nbsp;&nbsp;}
+}
 </pre>
 
 I'd love to see an example of multiple rays per element if you ever decided to do a blog post about it.
