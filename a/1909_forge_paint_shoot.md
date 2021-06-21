@@ -37,7 +37,6 @@ add #thebuildingcoder
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://autode.sk/rvt2022unitapi
 
-
 &ndash; ...
 
 linkedin:
@@ -61,12 +60,9 @@ Many thanks to  for this very helpful explanation!
 
 ### Accelerate Forge, Paint Stairs, Shoot Beams
 
-
 <center>
 <img src="img/" alt="" title="" width="100"/> <!-- 960 -->
 </center>
-
-
 
 <!--
 
@@ -114,58 +110,404 @@ It's not intuitive but works.
 Use the same to find out whether the landing or run faces are painted or not.
 
 <pre class="code">
-Material Mat;
-Selection sel = UIDoc.Selection;
-Reference pickedRef = null;
-Face fc = null;
-SurfaceSelectionFilter filter = new SurfaceSelectionFilter();
-pickedRef = sel.PickObject(Autodesk.Revit.UI.Selection.ObjectType.PointOnElement, filter, "please select a Face");
-GeometryObject geoObject = doc.GetElement(pickedRef).GetGeometryObjectFromReference(pickedRef);
-Element elem = doc.GetElement(pickedRef);
-fc = geoObject as Face;
-if (elem.Category.Id.IntegerValue == -2000120)//Stairs;
+<span style="color:blue;">void</span>&nbsp;PaintStairs(&nbsp;UIDocument&nbsp;uidoc,&nbsp;Material&nbsp;mat&nbsp;)
 {
-bool flag =false;
- Stairs str = elem as Stairs;
- List<ElementId> StarLands =str.GetStairsLandings().ToList();
- List<ElementId> StarRuns = = str.GetStairsLandings().ToList();
- using (Transaction transaction = new Transaction(doc, "Paint Material"))
-{
-transaction.Start();
-  foreach (ElementId Lid in StarLands)
-{
-try
-{
-  doc.Paint(Lid, fc, Mat.Id);
-flag=true;
-break;
-}
-catch{}
-}
-if(!flag)
-  foreach (ElementId Lid in StarRuns)
-{
-try
-{
-  doc.Paint(Lid, fc, Mat.Id);
-break;
-}
-catch{}
-}
-  transaction.Commit();
+&nbsp;&nbsp;Document&nbsp;doc&nbsp;=&nbsp;uidoc.Document;
+&nbsp;&nbsp;Selection&nbsp;sel&nbsp;=&nbsp;uidoc.Selection;
+ 
+&nbsp;&nbsp;<span style="color:green;">//FaceSelectionFilter&nbsp;filter&nbsp;=&nbsp;new&nbsp;FaceSelectionFilter();</span>
+&nbsp;&nbsp;Reference&nbsp;pickedRef&nbsp;=&nbsp;sel.PickObject(
+&nbsp;&nbsp;&nbsp;&nbsp;ObjectType.PointOnElement,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//filter,&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Please&nbsp;select&nbsp;a&nbsp;Face&quot;</span>&nbsp;);
+ 
+&nbsp;&nbsp;Element&nbsp;elem&nbsp;=&nbsp;doc.GetElement(&nbsp;pickedRef&nbsp;);
+ 
+&nbsp;&nbsp;GeometryObject&nbsp;geoObject&nbsp;=&nbsp;elem
+&nbsp;&nbsp;&nbsp;&nbsp;.GetGeometryObjectFromReference(&nbsp;pickedRef&nbsp;);
+ 
+&nbsp;&nbsp;Face&nbsp;fc&nbsp;=&nbsp;geoObject&nbsp;<span style="color:blue;">as</span>&nbsp;Face;
+ 
+&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;elem.Category.Id.IntegerValue&nbsp;==&nbsp;-2000120&nbsp;)&nbsp;<span style="color:green;">//&nbsp;Stairs</span>
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">bool</span>&nbsp;flag&nbsp;=&nbsp;<span style="color:blue;">false</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;Stairs&nbsp;str&nbsp;=&nbsp;elem&nbsp;<span style="color:blue;">as</span>&nbsp;Stairs;
+&nbsp;&nbsp;&nbsp;&nbsp;ICollection&lt;ElementId&gt;&nbsp;landings&nbsp;=&nbsp;str.GetStairsLandings();
+&nbsp;&nbsp;&nbsp;&nbsp;ICollection&lt;ElementId&gt;&nbsp;runs&nbsp;=&nbsp;str.GetStairsLandings();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;Transaction&nbsp;transaction&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Transaction(&nbsp;doc&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;transaction.Start(&nbsp;<span style="color:#a31515;">&quot;Paint&nbsp;Material&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;ElementId&nbsp;id&nbsp;<span style="color:blue;">in</span>&nbsp;landings&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;doc.Paint(&nbsp;id,&nbsp;fc,&nbsp;mat.Id&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;flag&nbsp;=&nbsp;<span style="color:blue;">true</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;!flag&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;ElementId&nbsp;id&nbsp;<span style="color:blue;">in</span>&nbsp;runs&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;doc.Paint(&nbsp;id,&nbsp;fc,&nbsp;mat.Id&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">break</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;transaction.Commit();
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
 }
 </pre>
 
 Many thanks to Bruce for this simple and effective solution.
-
+We have not finished discussing this issue yet, so please refer to the discussion thread for more updates.
 
 ####<a name="4"></a> Ray Tracing vs Location to Find Beams Intersecting Columns
 
+Another recurring topic is how to find intersecting elements.
 
-find beams intersecting columns using ray tracing versus the column location line, Face.IsInside and bounding box intersection
-Ray Projection Not Picking Up Beams
-https://forums.autodesk.com/t5/revit-api-forum/ray-projection-not-picking-up-beams/m-p/10388868
+The thread
+on [ray projection not picking up beams](https://forums.autodesk.com/t5/revit-api-forum/ray-projection-not-picking-up-beams/m-p/10388868) ends
+up solved with two different approaches demonstrating possible ways to find beams intersecting columns using ray tracing versus the column location line, `Face.IsInside` and bounding box intersection:
 
+**Question:** I'm trying to create a ray projection that finds the closest beam or slab from a column and attach it to the top to beam/slab found by the ray projection.
+For some reason, I cant get it to find the beams I want it to attach too.
+It only finds the slab.
+Any Ideas?
+
+This it what it looks Like Before I run my current code:
+
+zrodgersTSSSU_0-1623322675932.png
+
+/a/doc/revit/tbc/git/a/img/find_beams_intersecting_column_01.png
+
+This is what it looks like afterwards; it only finds the slabs:
+
+zrodgersTSSSU_1-1623322750589.png
+
+/a/doc/revit/tbc/git/a/img/find_beams_intersecting_column_02.png
+
+I want it to stop at the bottom of both beams and slabs.
+
+Sooo... i tried to change the code to just pick up the beams:
+
+This is what I have after that; circled in blue is what didn't attach to the beam above.
+Some did attach:
+
+zrodgersTSSSU_2-1623323049470.png
+
+/a/doc/revit/tbc/git/a/img/find_beams_intersecting_column_03.png
+
+So, why is this?
+And, is there anything I can do to fix it.
+
+Thanks ahead of time for any responses!
+
+I think it has something to do with whether the column is centered under the beam, but I didnt think that would matter, because I'm using `FindReferenceTarget.All` in my ray projection.
+
+Example of off center column not attaching:
+
+zrodgersTSSSU_0-1623325059940.png
+
+/a/doc/revit/tbc/git/a/img/find_beams_intersecting_column_04.png
+
+**Answer:** It absolutely matters. The ray you shoot is an infinitely thin line, so you can easily miss something. You could try using five rays per pillar, e.g., one in the centre and one in each corner. I would suggest that you add some visual debugging code that represents part of your infinite shooting ray with a model line to visualise what is going on and whether a beam is hit or missed.
+
+**Question:: I dont really understand, if the center of my column (which is where the ray is generated from) is within the bounds of the beam how does it not pick up the face of the beam? It seems to only pick up the centerline of the beam... Does "FindReferenceTarget.All" not find the face of beam? and if I added rays to the corners of the column i dont see how that would help if it only finds the beam when you hit the beam centerline straight on. I hope that made sense.  Any ideas?
+
+**Answer:** Normally, the reference intersector is set up so that an infinitely thin ray is shot and all intersections with faces or edges are reported. Just as you say, hitting an edge or a centerline or any other infinitely thin object is infinitely improbable.
+
+**Question:** Whats a good way to do multiple rays for a single object?
+
+I also just figured out why the ray bounce isnt working. It wasnt working on columns that extended past the beam already. Thats becuase revit already cuts out the column from the beam. so there is no face for it to hit. It works if the columns are below the beam.
+
+zrodgersTSSSU_0-1623336363049.png
+
+/a/doc/revit/tbc/git/a/img/find_beams_intersecting_column_05.png
+
+When I hide the column:
+
+zrodgersTSSSU_1-1623336398558.png
+
+/a/doc/revit/tbc/git/a/img/find_beams_intersecting_column_06.png
+
+So, I think that your method of doing rays on the corners of the columns would help possibly pick up the intersecting edge.
+I just don't know of a way to assign 5 rays to the column.
+Can you point me in the correct direction?
+I haven't seen anything on multiple rays per single object.
+
+**Answer:** Simply calculate the four column bottom face corner points and the column centre line direction vector and use that data to define the four rays.
+
+**Question:** lol... I wish it was "simply". Haha!
+I have been trying to figure out how to get the bottom column corners with little success...
+I have seen your blog about finding the bottom of walls and top of sloped walls but cant find anything on bottom of columns.
+Also, once i get the points, where do i place them so it generates multiple rays?
+
+**Answer:** There are ever so many different ways.
+
+Maybe easier to iterate over the faces rather than the edges.
+Either way is fine, though.
+
+If you know that the cross section is rectangular and the column is vertical, you know that you have four bottom corners, and you can differentiate them from all other vertices simply by picking the four ones with minimal Z coordinates.
+
+**Answer 2:** This task can actually be done without `ReferenceIntersector`
+
+1) You can extract the Z extents of slabs/beams and columns from bounding box to compare level proximity.
+
+2) You can use `Face.IsInside` to determine if a column location line is within the limits of the bottom face of slab or beam matching (1).
+For slanted columns, you'll have to follow a point at base up the vector of the slant to see where point ends up at slab/beam underside.
+Multiply `XY` components of vector by height difference between point at column base and underside of beam/slab, then add them to point at base.
+
+Likely however that the `IsInside` will be affected by joins, as the `ReferenceIntersector` is.
+
+You can probably identify a second capture group via bounding box intersection filters, i.e., the cases where the ray missing the faces due to join will be a cases where there is a bounding box intersection between such elements.
+
+Could also use `JoinGeometry.UnjoinGeometry` between columns and slabs/beams prior to investigation.
+
+Note that occasionally attaching column to underside will fail if column profile is not completely covered.
+Often, you can partially cover a column and still get it to attach, but there is a limit on that.
+
+**Response:**  Thank you both for the responses.
+I changed my approach to use bounding boxes like you suggest in Answer 2.
+It seems to be working for me.
+
+Here's what worked for me:
+
+<pre class="code">
+using (Transaction tx = new Transaction(doc))
+                    {
+                        tx.Start("Adjust Column Heights");
+
+                        if (doc.ActiveView is View3D)
+                        {
+                            
+                            foreach (ElementId elemId in selectedIds)
+                            {
+                                Element elem = uidoc.Document.GetElement(elemId);
+
+                                //checks if element is column
+                                if ((BuiltInCategory)elem.Category.Id.IntegerValue == BuiltInCategory.OST_StructuralColumns)
+                                {
+                                    allColumns++;
+
+                                    //get column location
+                                    XYZ elemLoc = (elem.Location as LocationPoint).Point;
+
+                                    //ray direction for raybounce
+                                    XYZ newPP = new XYZ(elemLoc.X, elemLoc.Y, elemLoc.Z + 1);
+                                    XYZ rayd = new XYZ(0, 0, 1);
+
+                                    //collect beams and slabs
+                                    List<BuiltInCategory> builtInCats = new List<BuiltInCategory>();
+                                    builtInCats.Add(BuiltInCategory.OST_Floors);
+                                    builtInCats.Add(BuiltInCategory.OST_StructuralFraming);
+                                    ElementMulticategoryFilter filter = new ElementMulticategoryFilter(builtInCats);
+
+                                    BoundingBoxXYZ elemBB = elem.get_BoundingBox(doc.ActiveView);
+
+                                    XYZ max = elemBB.Max;
+                                    XYZ min = elemBB.Min;
+
+                                    Outline myOutLn = new Outline(min, new XYZ(max.X,max.Y,max.Z+100));
+
+                                    BoundingBoxIntersectsFilter invertFilter = new BoundingBoxIntersectsFilter(myOutLn);
+                                    FilteredElementCollector collector = new FilteredElementCollector(doc);
+                                    IList<Element> el = collector.WherePasses(filter).WherePasses(invertFilter).ToElements();
+
+                                    //new lists for beams and slabs
+                                    List<Element> intersectingBeams = new List<Element>();
+                                    List<Element> intersectingSlabs = new List<Element>();
+
+                                    if (ColumnAttachment.GetColumnAttachment(elem as FamilyInstance, 1) != null)
+                                    {
+                                        //change color of columns to green
+                                        Color color = new Color((byte)0, (byte)255, (byte)0);
+                                        OverrideGraphicSettings ogs = new OverrideGraphicSettings();
+                                        ogs.SetProjectionLineColor(color);
+                                        doc.ActiveView.SetElementOverrides(elem.Id, ogs);
+                                    }
+                                    else
+                                    {
+                                        //add elements to list
+                                        foreach (Element e in el)
+                                        {
+                                            BoundingBoxXYZ eBB = e.get_BoundingBox(uidoc.Document.ActiveView);
+                                            if (e.Category.Name == "Structural Framing")
+                                            {
+                                                intersectingBeams.Add(e);
+                                            }
+                                            else if (e.Category.Name == "Floors")
+                                            {
+                                                intersectingSlabs.Add(e);
+                                            }
+                                        }
+                                        if (intersectingBeams.Any())
+                                        {
+                                            Element lowestBottomElem = intersectingBeams.First();
+                                            foreach (Element beam in intersectingBeams)
+                                            {
+                                                BoundingBoxXYZ thisBeamBB = beam.get_BoundingBox(uidoc.Document.ActiveView);
+                                                BoundingBoxXYZ currentLowestBB = lowestBottomElem.get_BoundingBox(uidoc.Document.ActiveView);
+                                                if (thisBeamBB.Min.Z < currentLowestBB.Min.Z)
+                                                {
+                                                    lowestBottomElem = beam;
+                                                }
+                                            }
+                                            ColumnAttachment.AddColumnAttachment(doc, elem as FamilyInstance, lowestBottomElem, 1, ColumnAttachmentCutStyle.None, ColumnAttachmentJustification.Minimum, 0);
+                                            successColumns++;
+                                        }
+                                        else if (intersectingSlabs.Any())
+                                        {
+                                            Element lowestBottomElem = intersectingSlabs.First();
+                                            foreach (Element slab in intersectingSlabs)
+                                            {
+                                                BoundingBoxXYZ thisSlabBB = slab.get_BoundingBox(uidoc.Document.ActiveView);
+                                                BoundingBoxXYZ currentLowestBB = lowestBottomElem.get_BoundingBox(uidoc.Document.ActiveView);
+                                                if (thisSlabBB.Min.Z < currentLowestBB.Min.Z)
+                                                {
+                                                    lowestBottomElem = slab;
+                                                }
+                                            }
+                                            ColumnAttachment.AddColumnAttachment(doc, elem as FamilyInstance, lowestBottomElem, 1, ColumnAttachmentCutStyle.None, ColumnAttachmentJustification.Minimum, 0);
+                                            successColumns++;
+                                        }
+                                        else
+                                        {
+                                            //change color of columns to red
+                                            Color color = new Color((byte)255, (byte)0, (byte)0);
+                                            OverrideGraphicSettings ogs = new OverrideGraphicSettings();
+                                            ogs.SetProjectionLineColor(color);
+                                            doc.ActiveView.SetElementOverrides(elem.Id, ogs);
+
+                                        }
+
+                                    }
+
+                                }
+                            }
+                        }
+                        else
+                        {
+                            TaskDialog.Show("Revit", "Run Script in 3D View.");
+                        }
+
+                        TaskDialog.Show("Columns Changed", string.Format("{0} of {1} Columns Changed", successColumns, allColumns));
+                        tx.Commit();
+                    }
+</pre>
+
+I'd love to see an example of multiple rays per element if you ever decided to do a blog post about it.
+
+**Answer:** There is nothing special about multiple rays per element at all.
+
+In your code above, you shoot a ray upwards parallel to the Z axis from the element location point:
+
+  // ray direction for raybounce
+  XYZ newPP = new XYZ(elemLoc.X, elemLoc.Y, elemLoc.Z + 1);
+  XYZ rayd = new XYZ(0, 0, 1);
+
+You can define any other source point you like, e.g., each of the four bottom corner points in turn, and also any other direction you like, and simply repeat the same process using the same reference intersector in the same view by repeatedly calling its Find method with the new source point and direction vector:
+
+https://www.revitapidocs.com/2021.1/6abd0586-5d7e-68c6-2e64-46199f457499.htm
+
+**Response:**  I finally figured it out using the ray projection method as well.
+Thanks to all your responses i realized i was super over complicating it in my head.
+Thank you again for all your help
+
+Here is the working code with ray projection as well:
+
+<pre class="code">
+using (Transaction tx = new Transaction(doc))
+                {
+                    tx.Start("Attach Columns Tops");
+
+                    foreach (ElementId elemId in selectedIds)
+                    {
+
+                        Element elem = uidoc.Document.GetElement(elemId);
+                        if ((BuiltInCategory)elem.Category.Id.IntegerValue == BuiltInCategory.OST_StructuralColumns)
+                        {
+                            allColumns++;
+
+                            //collect beams and slabs
+                            List<BuiltInCategory> builtInCats = new List<BuiltInCategory>();
+                            builtInCats.Add(BuiltInCategory.OST_Floors);
+                            builtInCats.Add(BuiltInCategory.OST_StructuralFraming);
+                            ElementMulticategoryFilter filter = new ElementMulticategoryFilter(builtInCats);
+
+                            if (ColumnAttachment.GetColumnAttachment(elem as FamilyInstance, 1) != null)
+                            {
+                                //removes old column attachement
+                                ColumnAttachment.RemoveColumnAttachment(elem as FamilyInstance, 1);
+                            }
+
+                            ReferenceIntersector refI = new ReferenceIntersector(filter, FindReferenceTarget.All, (View3D)doc.ActiveView);
+
+                            BoundingBoxXYZ elemBB = elem.get_BoundingBox(doc.ActiveView);
+
+                            //create ray
+                            XYZ rayd = new XYZ(0, 0, 1);
+
+                            List<XYZ> points = new List<XYZ>();
+                            //get column location
+                            XYZ elemLoc = (elem.Location as LocationPoint).Point;
+                            XYZ elemCenter = new XYZ(elemLoc.X, elemLoc.Y, elemLoc.Z + 0.1);
+                            XYZ b1 = new XYZ(elemBB.Min.X, elemBB.Min.Y, elemBB.Min.Z + 0.1);
+                            XYZ b2 = new XYZ(elemBB.Max.X, elemBB.Max.Y, elemBB.Min.Z + 0.1);
+                            XYZ b3 = new XYZ(elemBB.Min.X, elemBB.Max.Y, elemBB.Min.Z + 0.1);
+                            XYZ b4 = new XYZ(elemBB.Max.X, elemBB.Min.Y, elemBB.Min.Z + 0.1);
+
+                            points.Add(b1);
+                            points.Add(b2);
+                            points.Add(b3);
+                            points.Add(b4);
+                            points.Add(elemCenter);
+
+                            ReferenceWithContext refC = null;
+                            foreach (XYZ pt in points)
+                            {
+                                refC = refI.FindNearest(pt, rayd);
+                                if (refC != null)
+                                {
+                                    break;
+                                }
+
+                            }
+
+                            if (refC != null)
+                            {
+                                Reference reference = refC.GetReference();
+
+                                //gets reference element id & Element
+                                ElementId refEle = reference.ElementId;
+                                Element refElem = uidoc.Document.GetElement(refEle);
+
+                                ColumnAttachment.AddColumnAttachment(doc, elem as FamilyInstance, refElem, 1, ColumnAttachmentCutStyle.None, ColumnAttachmentJustification.Minimum, 0);
+
+                                successColumns++;
+                            }
+
+                            else
+                            {
+                                //change color of columns to red
+                                Color color = new Color((byte)255, (byte)0, (byte)0);
+                                OverrideGraphicSettings ogs = new OverrideGraphicSettings();
+                                ogs.SetProjectionLineColor(color);
+                                uidoc.ActiveView.SetElementOverrides(elem.Id, ogs);
+                            }
+
+                        }
+
+                    }
+
+                    tx.Commit();
+                }
+</pre>
+
+**Answer:** Congratulations on simplifying and solving this.
+[Keeping it simple](https://en.wikipedia.org/wiki/KISS_principle) works wonders, doesn't it?
+
+Thank you for sharing the two approaches, and thanks
+to Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+for the non-raytracing syggestion!
 
 <!---
 
