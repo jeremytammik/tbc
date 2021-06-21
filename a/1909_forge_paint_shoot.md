@@ -58,10 +58,16 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### Accelerate Forge, Paint Stairs, Shoot Beams
+### Painting Stairs and Shooting for the Beam
+
+I am quite heavily involved in
+two [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads:
+
+- [Painting stairs](#2)
+- [Ray tracing vs bounding box to find beams intersecting columns](#3)
 
 <center>
-<img src="img/" alt="" title="" width="100"/> <!-- 960 -->
+<img src="img/painted_stair_in_seoul_south_korea.jpg" alt="Painted stair" title="Painted stair" width="430"/> <!-- 860 -->
 </center>
 
 <!--
