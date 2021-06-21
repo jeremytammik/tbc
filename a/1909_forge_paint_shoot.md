@@ -175,11 +175,11 @@ on [ray projection not picking up beams](https://forums.autodesk.com/t5/revit-ap
 up solved with two different approaches demonstrating possible ways to find beams intersecting columns using ray tracing versus the column location line, `Face.IsInside` and bounding box intersection:
 
 **Question:** I'm trying to create a ray projection that finds the closest beam or slab from a column and attach it to the top to beam/slab found by the ray projection.
-For some reason, I cant get it to find the beams I want it to attach too.
+For some reason, I can't get it to find the beams I want it to attach too.
 It only finds the slab.
 Any Ideas?
 
-This it what it looks Like Before I run my current code:
+This is what it looks like before I run my current code:
 
 <center>
 <img src="img/find_beams_intersecting_column_01.png" alt="Beams intersecting columns" title="Beams intersecting columns" width="600"/> <!-- 1346 -->
@@ -193,7 +193,7 @@ This is what it looks like afterwards; it only finds the slabs:
 
 I want it to stop at the bottom of both beams and slabs.
 
-Sooo... i tried to change the code to just pick up the beams:
+Sooo... I tried to change the code to just pick up the beams:
 
 This is what I have after that; circled in blue is what didn't attach to the beam above.
 Some did attach:
@@ -207,9 +207,9 @@ And, is there anything I can do to fix it.
 
 Thanks ahead of time for any responses!
 
-I think it has something to do with whether the column is centered under the beam, but I didnt think that would matter, because I'm using `FindReferenceTarget.All` in my ray projection.
+I think it has something to do with whether the column is centred under the beam, but I didn't think that would matter, because I'm using `FindReferenceTarget.All` in my ray projection.
 
-Example of off center column not attaching:
+Example of off-centre column not attaching:
 
 <center>
 <img src="img/find_beams_intersecting_column_04.png" alt="Beams intersecting columns" title="Beams intersecting columns" width="600"/> <!-- 2560 -->
@@ -217,13 +217,17 @@ Example of off center column not attaching:
 
 **Answer:** It absolutely matters. The ray you shoot is an infinitely thin line, so you can easily miss something. You could try using five rays per pillar, e.g., one in the centre and one in each corner. I would suggest that you add some visual debugging code that represents part of your infinite shooting ray with a model line to visualise what is going on and whether a beam is hit or missed.
 
-**Question:: I dont really understand, if the center of my column (which is where the ray is generated from) is within the bounds of the beam how does it not pick up the face of the beam? It seems to only pick up the centerline of the beam... Does "FindReferenceTarget.All" not find the face of beam? and if I added rays to the corners of the column i dont see how that would help if it only finds the beam when you hit the beam centerline straight on. I hope that made sense.  Any ideas?
+**Question:** I don't really understand, if the center of my column (which is where the ray is generated from) is within the bounds of the beam how does it not pick up the face of the beam? It seems to only pick up the centreline of the beam... Does `FindReferenceTarget.All` not find the face of beam? And if I add rays to the corners of the column I don't see how that would help if it only finds the beam when you hit the beam centreline straight on. I hope that makes sense.  Any ideas?
 
-**Answer:** Normally, the reference intersector is set up so that an infinitely thin ray is shot and all intersections with faces or edges are reported. Just as you say, hitting an edge or a centerline or any other infinitely thin object is infinitely improbable.
+**Answer:** Normally, the reference intersector is set up so that an infinitely thin ray is shot and all intersections with faces or edges are reported. Just as you say, hitting an edge or a centreline or any other infinitely thin object is infinitely improbable.
 
-**Question:** Whats a good way to do multiple rays for a single object?
+**Question:** What's a good way to do multiple rays for a single object?
 
-I also just figured out why the ray bounce isnt working. It wasnt working on columns that extended past the beam already. Thats becuase revit already cuts out the column from the beam. so there is no face for it to hit. It works if the columns are below the beam.
+I also just figured out why the ray bounce isn't working.
+It wasn't working on columns that extended past the beam already.
+That's because Revit already cuts out the column from the beam.
+So, there is no face for it to hit.
+It works if the columns are below the beam.
 
 <center>
 <img src="img/find_beams_intersecting_column_05.png" alt="Beams intersecting columns" title="Beams intersecting columns" width="350"/> <!-- 729 -->
@@ -244,8 +248,8 @@ I haven't seen anything on multiple rays per single object.
 
 **Question:** lol... I wish it was "simply". Haha!
 I have been trying to figure out how to get the bottom column corners with little success...
-I have seen your blog about finding the bottom of walls and top of sloped walls but cant find anything on bottom of columns.
-Also, once i get the points, where do i place them so it generates multiple rays?
+I have seen your blog about finding the bottom of walls and top of sloped walls but can't find anything on bottom of columns.
+Also, once I get the points, where do I place them so it generates multiple rays?
 
 **Answer:** There are ever so many different ways.
 
@@ -545,7 +549,7 @@ Here is the working code with ray projection as well:
 
 Thank you for sharing the two approaches, and thanks
 to Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
-for the non-raytracing syggestion!
+for the non-raytracing suggestion!
 
 <!---
 

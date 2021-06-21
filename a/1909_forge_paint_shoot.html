@@ -58,7 +58,7 @@ Many thanks to  for this very helpful explanation!
 -->
 
 <h3>Painting Stairs and Shooting for the Beam</h3>
-<p>I am quite heavily involved in
+<p>I am currently quite involved in
 two <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> threads:</p>
 <ul>
 <li><a href="#2">Painting stairs</a></li>
@@ -97,12 +97,12 @@ and [Kean](https://www.keanw.com/2021/06/enjoying-an-early-summer-quiet-period-a
 
 <h4><a name="2"></a> Painting Stairs</h4>
 <p>A long-standing <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread on how
-to <a href="https://forums.autodesk.com/t5/revit-api-forum/paint-stair-faces/m-p/10388359">Paint Stair Faces</a> was finally answered
-by Bruce [@canyon.des[(https://forums.autodesk.com/t5/user/viewprofilepage/user-id/10032309) Hans:</p>
+to <a href="https://forums.autodesk.com/t5/revit-api-forum/paint-stair-faces/m-p/10388359">paint stair faces</a> was finally answered quite simply
+by Bruce <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/10032309">@canyon.des</a> Hans:</p>
 <p><strong>Question:</strong> Is there any reason why stair faces can be painted in the UI, and not in the API?
 The question was raised in 2015 and apparently still exists:</p>
 <p>I'm trying to paint some of the faces of a stair (a monolithic stair) through the Revit API.
-It appears that it cannot be done programmatically &ndash; I get an error message saying that "the element faces cannot be painted" &ndash; even if I can acieve this stair face painting manually in the Revit UI.
+It appears that it cannot be done programmatically &ndash; I get an error message saying that "the element faces cannot be painted" &ndash; even if I can achieve this stair face painting manually in the Revit UI.
 Is there a way to automatically paint these faces?</p>
 <p><strong>Answer:</strong> For stairs, you need to use <code>GetStairsLandings</code> and <code>GetStairsRuns</code> to get the <code>ElementId</code> to paint landings or runs.
 It's not intuitive but works.
@@ -167,34 +167,40 @@ For some reason, I cant get it to find the beams I want it to attach too.
 It only finds the slab.
 Any Ideas?</p>
 <p>This it what it looks Like Before I run my current code:</p>
-<p>zrodgersTSSSU_0-1623322675932.png</p>
-<p>/a/doc/revit/tbc/git/a/img/find_beams_intersecting_column_01.png</p>
+<p><center>
+<img src="img/find_beams_intersecting_column_01.png" alt="Beams intersecting columns" title="Beams intersecting columns" width="600"/> <!-- 1346 -->
+</center></p>
 <p>This is what it looks like afterwards; it only finds the slabs:</p>
-<p>zrodgersTSSSU_1-1623322750589.png</p>
-<p>/a/doc/revit/tbc/git/a/img/find_beams_intersecting_column_02.png</p>
+<p><center>
+<img src="img/find_beams_intersecting_column_02.png" alt="Beams intersecting columns" title="Beams intersecting columns" width="600"/> <!-- 1170 -->
+</center></p>
 <p>I want it to stop at the bottom of both beams and slabs.</p>
 <p>Sooo... i tried to change the code to just pick up the beams:</p>
 <p>This is what I have after that; circled in blue is what didn't attach to the beam above.
 Some did attach:</p>
-<p>zrodgersTSSSU_2-1623323049470.png</p>
-<p>/a/doc/revit/tbc/git/a/img/find_beams_intersecting_column_03.png</p>
+<p><center>
+<img src="img/find_beams_intersecting_column_03.png" alt="Beams intersecting columns" title="Beams intersecting columns" width="600"/> <!-- 1294 -->
+</center></p>
 <p>So, why is this?
 And, is there anything I can do to fix it.</p>
 <p>Thanks ahead of time for any responses!</p>
 <p>I think it has something to do with whether the column is centered under the beam, but I didnt think that would matter, because I'm using <code>FindReferenceTarget.All</code> in my ray projection.</p>
 <p>Example of off center column not attaching:</p>
-<p>zrodgersTSSSU_0-1623325059940.png</p>
-<p>/a/doc/revit/tbc/git/a/img/find_beams_intersecting_column_04.png</p>
+<p><center>
+<img src="img/find_beams_intersecting_column_04.png" alt="Beams intersecting columns" title="Beams intersecting columns" width="600"/> <!-- 2560 -->
+</center></p>
 <p><strong>Answer:</strong> It absolutely matters. The ray you shoot is an infinitely thin line, so you can easily miss something. You could try using five rays per pillar, e.g., one in the centre and one in each corner. I would suggest that you add some visual debugging code that represents part of your infinite shooting ray with a model line to visualise what is going on and whether a beam is hit or missed.</p>
 <p>**Question:: I dont really understand, if the center of my column (which is where the ray is generated from) is within the bounds of the beam how does it not pick up the face of the beam? It seems to only pick up the centerline of the beam... Does "FindReferenceTarget.All" not find the face of beam? and if I added rays to the corners of the column i dont see how that would help if it only finds the beam when you hit the beam centerline straight on. I hope that made sense.  Any ideas?</p>
 <p><strong>Answer:</strong> Normally, the reference intersector is set up so that an infinitely thin ray is shot and all intersections with faces or edges are reported. Just as you say, hitting an edge or a centerline or any other infinitely thin object is infinitely improbable.</p>
 <p><strong>Question:</strong> Whats a good way to do multiple rays for a single object?</p>
 <p>I also just figured out why the ray bounce isnt working. It wasnt working on columns that extended past the beam already. Thats becuase revit already cuts out the column from the beam. so there is no face for it to hit. It works if the columns are below the beam.</p>
-<p>zrodgersTSSSU_0-1623336363049.png</p>
-<p>/a/doc/revit/tbc/git/a/img/find_beams_intersecting_column_05.png</p>
+<p><center>
+<img src="img/find_beams_intersecting_column_05.png" alt="Beams intersecting columns" title="Beams intersecting columns" width="350"/> <!-- 729 -->
+</center></p>
 <p>When I hide the column:</p>
-<p>zrodgersTSSSU_1-1623336398558.png</p>
-<p>/a/doc/revit/tbc/git/a/img/find_beams_intersecting_column_06.png</p>
+<p><center>
+<img src="img/find_beams_intersecting_column_06.png" alt="Beams intersecting columns" title="Beams intersecting columns" width="350"/> <!-- 1014 -->
+</center></p>
 <p>So, I think that your method of doing rays on the corners of the columns would help possibly pick up the intersecting edge.
 I just don't know of a way to assign 5 rays to the column.
 Can you point me in the correct direction?
