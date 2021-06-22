@@ -60,8 +60,9 @@ Many thanks to  for this very helpful explanation!
 
 ### Painting Stairs and Shooting for the Beam
 
-I am currently quite involved in
-two [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads:
+Here are 
+two [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
+that I am currently quite involved in:
 
 - [Painting stairs](#2)
 - [Ray tracing vs bounding box to find beams intersecting columns](#3)
