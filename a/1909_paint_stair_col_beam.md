@@ -568,3 +568,4 @@ The module has only 1 MB of internal flash, therefore we added an external SPI f
 The display is a cheap and widespread 160x128 16bpp, 1.8" TFT.
 
 -->
+
