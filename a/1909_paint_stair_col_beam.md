@@ -37,7 +37,10 @@ add #thebuildingcoder
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon http://autode.sk/rvt2022unitapi
 
-&ndash; ...
+Painting stairs and shooting for the beam;
+two Revit API discussion forum threads that I am currently involved in
+&ndash; Painting stairs
+&ndash; Ray tracing vs bounding box to find beams intersecting columns...
 
 linkedin:
 
