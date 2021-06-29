@@ -10,6 +10,21 @@
   https://app.slack.com/client/T02NW42JD/C0SR6NAP8
   Ryuji Ogasawara, RuoQian Lu and Joe Qiao 
 
+- need to regen:
+  Set Different Materials to Parts of a Wall
+  https://forums.autodesk.com/t5/revit-api-forum/set-different-materials-to-parts-of-a-wall/m-p/10427403
+
+- need to regen:
+  Modifying group in api results in duplicate group
+  https://forums.autodesk.com/t5/revit-api-forum/modifying-group-in-api-results-in-duplicate-group/m-p/10374430
+
+- New post on Boost Your BIM
+  Topo From Lines now in the free Revit tool set
+  by harrymattison
+  This tool is an"oldie but goodie" that lets you create and update a toposurface from a set of model lines. A new version for 2022 was recently requested, so I added it to the Terrific Tool project and created a 2022 build. You can download the current installer here and if you like code, that is here
+  https://bitbucket.org/BoostYourBIM/boostyourbimterrifictools/src/master/BoostYourBIMTerrificTools/TopoFromLines.cs
+  https://bitbucket.org/BoostYourBIM/boostyourbimterrifictools/raw/cd5589e83a158f283774d7a5e9590f07d85c904a/Boost+Your+BIM+Terrific+Tools-SetupFiles/Boost+Your+BIM+Terrific+Tools.msi&data=04%7C01%7Cjeremy.tammik%40autodesk.com%7Ce709df334bc34c20e06f08d9371557e6%7C67bff79e7f914433a8e5c9252d2ddc1d%7C0%7C0%7C637601387077658469%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&sdata=HBFqPbGzz8Js990PpjCS5UuexeYytjlaxnU/EIDMFTw%3D&reserved=0
+
 twitter:
 
 add #thebuildingcoder
@@ -42,7 +57,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 **Question:** 
 
-**Answer:** 
+**Answer:**
+
+**Response:**  
 
 Many thanks to  for this very helpful explanation!
 
@@ -50,12 +67,17 @@ Many thanks to  for this very helpful explanation!
 
 ### Asset Keyword
 
+Two [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
+reinforce the ever-present [need to regenerate](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33),
+the development team clarifies access to various asset keyword properties, and Harry Mattison shares a free tool to create and update a toposurface from a set of model lines:
+
+
+
 
 
 <center>
 <img src="img/keyword_clustering.png" alt="Keyword clustering" title="Keyword clustering" width="425"/> <!-- 850 -->
 </center>
-
 
 ####<a name="2"></a> Asset Keyword Access
 
@@ -136,16 +158,40 @@ Here is our understanding of the current situation accessing the keyword propert
 in [](https://thebuildingcoder.typepad.com/blog/2019/11/material-physical-and-thermal-assets.html).
 `Set` is currently not supported for history reasons (cf. internal tickets *REVIT-171312* and *REVIT-170824*).
 
+####<a name="3"></a> Modifying Group Requires Regen
+
+Forgetting or not realising
+the [need to regenerate](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33) and
+accessing stale data can lead to pretty confusing and challenging problems.
+
+As already noted in some previous examples, certain operations require more than just a call to `Regenerate`, e.g., starting and committing two or more separate transactions in a row.
+Happily, in such cases, they can be assimilated into one single `TransactionGroup`, cf. the additional discussion
+on [handling transactions and transaction Groups](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.50).
+
+It took a lengthy discussion with input from several experienced add-in developers to clarify this need in the thread
+on [modifying group in API results in duplicate group]( https://forums.autodesk.com/t5/revit-api-forum/modifying-group-in-api-results-in-duplicate-group/m-p/10374430).
+
+####<a name="4"></a> Modifying Part Material Requires Regen
+
+- need to regen:
+  Set Different Materials to Parts of a Wall
+  https://forums.autodesk.com/t5/revit-api-forum/set-different-materials-to-parts-of-a-wall/m-p/10427403
 
 
 
-####<a name="4"></a> 
 
-**Response:**  
+####<a name="5"></a> Topo From Lines
 
+[Harry Mattison](https://twitter.com/BoostYourBIM)'s new post
+on [Boost Your BIM](https://boostyourbim.wordpress.com) presents
+[Topo From Lines now in the free Revit tool set](https://boostyourbim.wordpress.com/2021/06/24/topo-from-lines-now-in-the-free-revit-tool-set):
 
-####<a name="5"></a> 
+> This tool is an "oldie but goodie" that lets you create and update a toposurface from a set of model lines.
+A new version for 2022 was recently requested, so I added it to the Terrific Tool project and created a 2022 build.
+You can download the current installer here and if you like code, that is [here](https://bitbucket.org/BoostYourBIM/boostyourbimterrifictools/src/master/BoostYourBIMTerrificTools/TopoFromLines.cs).
 
+<center>
+<img src="img/topofromlinesscreenshot.jpg" alt="Topo from lines" title="Topo from lines" width="327"/> <!-- 654 -->
+</center>
 
-
-
+Many thanks to Harry for implementing and sharing this and so many other useful tools!
