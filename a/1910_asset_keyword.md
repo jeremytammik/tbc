@@ -56,15 +56,12 @@ Many thanks to  for this very helpful explanation!
 
 ####<a name="2"></a> 
 
-**Question:**
-
-I have an issue setting a string value to the material appearance asset keyword property.
+**Question:** I have an issue setting a string value to the material appearance asset keyword property.
 In one material, it can be set as expected, but another material returns an error saying, "The input value is invalid for this AssetPropertyString property.\r\nParameter name: value".
-I found the blog article and JIRA ticket REVIT-170824 which explains that the keyword property on the Identity tab is not exposed yet.
-https://thebuildingcoder.typepad.com/blog/2019/11/material-physical-and-thermal-assets.html#4
-https://jira.autodesk.com/browse/REVIT-170824
-I expect the "keyword" property on the appearance tab to accept a string value.
-In addition, I can see some error message in the journal file.
+I found the blog article
+on [Material, Physical and Thermal Assets](https://thebuildingcoder.typepad.com/blog/2019/11/material-physical-and-thermal-assets.html) and the internal development ticket *REVIT-170824* which explains that the keyword property on the `Identity` tab is not exposed yet.
+However, I still expect the "keyword" property on the appearance tab to accept a string value.
+In addition, I can see some error message in the journal file when I try to run the code below.
 Is it possible to set the "keyword" property of the appearance asset?
 
 <pre class="code">
@@ -120,37 +117,22 @@ Is it possible to set the "keyword" property of the appearance asset?
 </pre>
 
 
-**Answer:**
+**Answer:** Yes, indeed, we already have a request *REVIT-171312* for this improvement.
 
-is it possible to get more custom user cases for this API? Or more comments/quotes from users? Looks like this is a valuable requirement and I would like to get more custom inputs to help us prioritize it. Thanks! (edited) 
+The API does support modification of the `Keyword` property on an appearance asset.
+You can set keyword under the `Appearance` tab in the material dialog through API.
+You currently cannot set the `Keyword` property for `Structural` and `Thermal` through the API. 
 
-RuoQian Lu  4 days ago
-We have already had a jira https://jira.autodesk.com/browse/REVIT-171312 for this improvement.
+After testing, I can reproduce this issue in Revit 2022.
+It works in my internal development version, however.
+I created an issue *REVIT-179045* to track why this fails in Revit 2022 and will evaluate it for an upcoming point release fix.
+Here is our understanding of the current situation accessing the keyword property in the various tabs:
 
-Ryuji Ogasawara  3 days ago
-Hi @RuoQian Lu,
-Do you mean that modifying Keyword property on Appearance Asset through api is not supported yet?
-If so, I will ask the customer to provide use case for the api.
-BTW, I received the reproducible sample project from the customer.
-I uploaded it and  Visual Studio project to the shared folder.
-The Revit project created in Japanese, so material name has some Japanese text.
-https://myshare.autodesk.com/:f:/g/personal/ryuji_ogasawara_autodesk_com/Eo2_QtCpI19Fv10JSKtzBzABtLS_jI3eI6fp1Ms4_EzruQ?e=x9tkcO (edited) 
-
-RuoQian Lu  1 day ago
-hi @Ryuji Ogasawara, thanks for the case. It is still upgrading on my machine so I need to take more time for it.
-For modifying Keyword property on Appearance Asset through api, it is supported. Users can set keyword under Appearance tab in material dialog through API.
-The Keyword property for Structural and Thermal have problems to set through API. Sorry for misleading you.
-I will do more test and try then let you know later.
-
-Jeremy Tammik  20 hours ago
-I would also be interested in the final result. Especially two clear Yes/No answers: (i) Can the keyword property be set manually through the UI?  (ii) Can the keyword property be set programmatically through the API? Preferably with exact steps and/or sample code demonstrating both procedures in a fool-proof manner. Thank you!
-
-RuoQian Lu  2 hours ago
-hi @Ryuji Ogasawara, I can reproduce this issue on 2022. But on 2023 it works. I've created a jira https://jira.autodesk.com/browse/REVIT-179045 to track why this fails on 2022 and will evaluate it for 2022 point release fix.
-Hi @Jeremy Tammik, I worked with @Joe Qiao for your question and here is our understanding after checking code.
-For Keywords under Identity tab, which is the keyword for Material, it is not able to Get nor Set. There is no API exposed for it yet.
-For Keywords under Appearance, it can be Get and Set. You can refer to the code Ryuji post here.
-For Keywords under Thermal and Structural, we didn't test but it should be able to Get (you've confirmed that in your blog) but not able to Set (as there are some history reasons). Refer to https://jira.autodesk.com/browse/REVIT-171312 and https://jira.autodesk.com/browse/REVIT-170824
+- For keywords under the `Identity` tab, which is the keyword for `Material`, there is currently no API exposed for either `get` or `set`.
+- Keywords under `Appearance` can be both `get` and `set` using the code above.
+- Keywords under `Thermal` and `Structural` can be read using `get`, as discriben
+in [](https://thebuildingcoder.typepad.com/blog/2019/11/material-physical-and-thermal-assets.html).
+`Set` is currently not supported for history reasons (cf. internal tickets *REVIT-171312* and *REVIT-170824*).
 
 
 
