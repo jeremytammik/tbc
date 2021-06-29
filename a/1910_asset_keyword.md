@@ -53,7 +53,7 @@ Many thanks to  for this very helpful explanation!
 
 
 <center>
-<img src="img/" alt="" title="" width="100"/> <!-- 860 -->
+<img src="img/keyword_clustering.png" alt="Keyword clustering" title="Keyword clustering" width="425"/> <!-- 850 -->
 </center>
 
 
