@@ -6,6 +6,9 @@
 
 <!---
 
+- Asset Keyword Access
+  https://app.slack.com/client/T02NW42JD/C0SR6NAP8
+  Ryuji Ogasawara, RuoQian Lu and Joe Qiao 
 
 twitter:
 
@@ -54,7 +57,7 @@ Many thanks to  for this very helpful explanation!
 </center>
 
 
-####<a name="2"></a> 
+####<a name="2"></a> Asset Keyword Access
 
 **Question:** I have an issue setting a string value to the material appearance asset keyword property.
 In one material, it can be set as expected, but another material returns an error saying, "The input value is invalid for this AssetPropertyString property.\r\nParameter name: value".
@@ -115,7 +118,6 @@ Is it possible to set the "keyword" property of the appearance asset?
 &nbsp;&nbsp;}
 }
 </pre>
-
 
 **Answer:** Yes, indeed, we already have a request *REVIT-171312* for this improvement.
 
