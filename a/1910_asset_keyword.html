@@ -224,8 +224,10 @@ I'm not sure if the concept of instance parameter vs type parameter vs family pa
 <p>I've seen this thing be done before, so I know it's possible.</p>
 <p><strong>Answer:</strong> First, thoughts that have little to do with your question:</p>
 <ul>
-<li>I mostly recommend to avoid using AsValueString. I prefer the methods that return the raw parameter value: <code>AsInteger</code>, <code>AsDouble</code>, <code>AsElementId</code>, <code>AsString</code>.</li>
-<li>Why do you start a new transaction for each part in the loop? Can't you just use one single large transaction and run the loop within that?</li>
+<li>I mostly recommend avoiding use of <code>AsValueString</code>.
+I prefer the methods that return the raw parameter value: <code>AsInteger</code>, <code>AsDouble</code>, <code>AsElementId</code>, <code>AsString</code>.</li>
+<li>Why do you start a new transaction for each part in the loop?
+Can't you just use one single large transaction and run the loop within that?</li>
 </ul>
 <p><strong>Response:</strong> I figured it out.
 It had to do with my transactions.</p>
@@ -269,10 +271,10 @@ It looks like all other parameters get set to read only when you change 1 parame
 </pre>
 
 <p><strong>Answer:</strong> Yes.
-That makes sense, since the second parameter would also be greyed out in UI if the first is not set to false, i.e., the ability to set thew second parameter is dependant on the value of first.</p>
+That makes sense, since the second parameter would also be greyed out in UI if the first is not set to false, i.e., the ability to set thew second parameter is dependent on the value of first.</p>
 <p>This also highlights the importance of order when batch processing built-in parameter values.
 There are a few add-ins out there that populate parameter values, but they probably are not considering such relationships between parameters.</p>
-<p>In that case, you can probably increase performance by using only one transaction after all and replacing the multiple mini-transactions by calls to <code>doc.Regenerate</code> after each cll to set <code>DPART_MATERIAL_BY_ORIGINAL</code>.</p>
+<p>In that case, you can probably increase performance by using only one transaction after all and replacing the multiple mini-transactions by calls to <code>doc.Regenerate</code> after each call to set <code>DPART_MATERIAL_BY_ORIGINAL</code>.</p>
 <p>Many thanks to Joseph and Richard for sharing and explaining this!</p>
 <h4><a name="5"></a> Topo From Lines</h4>
 <p><a href="https://twitter.com/BoostYourBIM">Harry Mattison</a>'s new post
