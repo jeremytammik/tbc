@@ -164,8 +164,9 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/modifying-group-in-ap
 <h4><a name="4"></a> Modifying Part Material Requires Regen</h4>
 <p>Another example of 
 the <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33">need to regenerate</a> was
-raised and solved by
-Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas in
+raised and solved
+by Joseph <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/7726218">@jrtlatta</a> Latta
+and Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">@RPThomas108</a> Thomas in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread on how
 to <a href="https://forums.autodesk.com/t5/revit-api-forum/set-different-materials-to-parts-of-a-wall/m-p/10427403">set different materials to parts of a wall</a>.</p>
 <p>In this case, careful observation and thorough understanding of the user interface helps significantly to resolve the problem, since the property to modify is greyed out &ndash; disabled or enabled &ndash; depending on the setting of another value:</p>
@@ -183,31 +184,40 @@ to <a href="https://forums.autodesk.com/t5/revit-api-forum/set-different-materia
 <p>The issue is, once I set the material parameter for a given part, then it changes the material parameters for all the other parts.
 I'm not sure if the concept of instance parameter vs type parameter vs family parameter holds for Parts, but from the object browser in Revit, the material parameter seems to be an instance parameter.</p>
 <pre class="code">
-IEnumerable<Part> facadePanels2 = new FilteredElementCollector(doc).OfClass(typeof(Part)).Cast<Part>();
-                foreach (Part p in facadePanels2)
-                { 
-                    using (var trans = new Transaction(doc, "Modify1"))
-                    {
-                        trans.Start();                        
-                        Parameter pMat = p.get_Parameter(BuiltInParameter.DPART_MATERIAL_ID_PARAM);                        
-                        System.Diagnostics.Debug.Print(pMat.AsValueString());
-                        if (pMat.AsValueString() == "Facade Material")
-                        {
-                            System.Diagnostics.Debug.Print("Facade Material Found");
-                            Parameter pOrig = p.get_Parameter(BuiltInParameter.DPART_MATERIAL_BY_ORIGINAL);
-                            if (pOrig.IsReadOnly == false)
-                            {
-                                pOrig.Set(0);
-                            }
-                            if (pMat.IsReadOnly == false)
-                            {
-                                ElementId matId = materialIds[getMaterialOfPart(p, panels, viewDefault3D)];
+&nbsp;&nbsp;IEnumerable&lt;Part&gt;&nbsp;facadePanels2&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;FilteredElementCollector(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;Part&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;Part&gt;();
 
-                                pMat.Set(matId);
-                            }                            
-                        }
-                        trans.Commit();
-                    }
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;Part&nbsp;p&nbsp;<span style="color:blue;">in</span>&nbsp;facadePanels2&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;trans&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Transaction(&nbsp;doc&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Start(&nbsp;<span style="color:#a31515;">&quot;Modify1&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Parameter&nbsp;pMat&nbsp;=&nbsp;p.get_Parameter(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BuiltInParameter.DPART_MATERIAL_ID_PARAM&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.Diagnostics.Debug.Print(&nbsp;pMat.AsValueString()&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;pMat.AsValueString()&nbsp;==&nbsp;<span style="color:#a31515;">&quot;Facade&nbsp;Material&quot;</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.Diagnostics.Debug.Print(&nbsp;<span style="color:#a31515;">&quot;Facade&nbsp;Material&nbsp;Found&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Parameter&nbsp;pOrig&nbsp;=&nbsp;p.get_Parameter(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BuiltInParameter.DPART_MATERIAL_BY_ORIGINAL&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;pOrig.IsReadOnly&nbsp;==&nbsp;<span style="color:blue;">false</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pOrig.Set(&nbsp;0&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;pMat.IsReadOnly&nbsp;==&nbsp;<span style="color:blue;">false</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ElementId&nbsp;matId&nbsp;=&nbsp;materialIds[&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;getMaterialOfPart(&nbsp;p,&nbsp;panels,&nbsp;viewDefault3D&nbsp;)&nbsp;];
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pMat.Set(&nbsp;matId&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Commit();
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
 </pre>
 
 <p>Any thoughts?</p>
@@ -223,35 +233,39 @@ It had to do with my transactions.</p>
 It looks like all other parameters get set to read only when you change 1 parameter for a part in a single transaction?</p>
 <p>Here's the code that's working, for those who care:</p>
 <pre class="code">
-IEnumerable<Part> facadePanels2 = new FilteredElementCollector(doc).OfClass(typeof(Part)).Cast<Part>();
-                foreach (Part p in facadePanels2)
-                {
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;Part&nbsp;p&nbsp;<span style="color:blue;">in</span>&nbsp;facadePanels2&nbsp;)
+&nbsp;&nbsp;{
 
-                    Parameter pMat = p.get_Parameter(BuiltInParameter.DPART_MATERIAL_ID_PARAM);
-                    if (pMat.AsElementId().IntegerValue == 309859) //("Facade Material")
-                    {
-                        System.Diagnostics.Debug.Print("Facade Material Found");
-                        Parameter pOrig = p.get_Parameter(BuiltInParameter.DPART_MATERIAL_BY_ORIGINAL);
-                        if (pOrig.IsReadOnly == false)
-                        {
-                            using (var trans = new Transaction(doc, "Modify1"))
-                            {
-                                trans.Start();
-                                pOrig.Set(0);
-                                trans.Commit();
-                            }
-                        }
-                        if (pMat.IsReadOnly == false)
-                        {
-                            ElementId matId = materialIds[getMaterialOfPart(p, panels, viewDefault3D)];
-                            using (var trans = new Transaction(doc, "Modify1"))
-                            {
-                                trans.Start();
-                                pMat.Set(matId);
-                                trans.Commit();
-                            }
-                        } 
-                    }
+&nbsp;&nbsp;&nbsp;&nbsp;Parameter&nbsp;pMat&nbsp;=&nbsp;p.get_Parameter(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BuiltInParameter.DPART_MATERIAL_ID_PARAM&nbsp;);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;pMat.AsElementId().IntegerValue&nbsp;==&nbsp;309859&nbsp;)&nbsp;<span style="color:green;">//&nbsp;&quot;Facade&nbsp;Material&quot;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.Diagnostics.Debug.Print(&nbsp;<span style="color:#a31515;">&quot;Facade&nbsp;Material&nbsp;Found&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Parameter&nbsp;pOrig&nbsp;=&nbsp;p.get_Parameter(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BuiltInParameter.DPART_MATERIAL_BY_ORIGINAL&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;pOrig.IsReadOnly&nbsp;==&nbsp;<span style="color:blue;">false</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;trans&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Transaction(&nbsp;doc&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Start(&nbsp;<span style="color:#a31515;">&quot;Modify1&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pOrig.Set(&nbsp;0&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Commit();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;pMat.IsReadOnly&nbsp;==&nbsp;<span style="color:blue;">false</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ElementId&nbsp;matId&nbsp;=&nbsp;materialIds[&nbsp;getMaterialOfPart(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p,&nbsp;panels,&nbsp;viewDefault3D&nbsp;)&nbsp;];
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;<span style="color:blue;">var</span>&nbsp;trans&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Transaction(&nbsp;doc&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Start(&nbsp;<span style="color:#a31515;">&quot;Modify1&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pMat.Set(&nbsp;matId&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Commit();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
 </pre>
 
 <p><strong>Answer:</strong> Yes.
@@ -259,6 +273,7 @@ That makes sense, since the second parameter would also be greyed out in UI if t
 <p>This also highlights the importance of order when batch processing built-in parameter values.
 There are a few add-ins out there that populate parameter values, but they probably are not considering such relationships between parameters.</p>
 <p>In that case, you can probably increase performance by using only one transaction after all and replacing the multiple mini-transactions by calls to <code>doc.Regenerate</code> after each cll to set <code>DPART_MATERIAL_BY_ORIGINAL</code>.</p>
+<p>Many thanks to Joseph and Richard for sharing and explaining this!</p>
 <h4><a name="5"></a> Topo From Lines</h4>
 <p><a href="https://twitter.com/BoostYourBIM">Harry Mattison</a>'s new post
 on <a href="https://boostyourbim.wordpress.com">Boost Your BIM</a> presents
