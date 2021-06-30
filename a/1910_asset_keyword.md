@@ -148,16 +148,16 @@ The API does support modification of the `Keyword` property on an appearance ass
 You can set keyword under the `Appearance` tab in the material dialog through API.
 You currently cannot set the `Keyword` property for `Structural` and `Thermal` through the API. 
 
-After testing, I can reproduce this issue in Revit 2022.
+After testing, I can reproduce this issue in the public release Revit 2022.
 It works in my internal development version, however.
 I created an issue *REVIT-179045* to track why this fails in Revit 2022 and will evaluate it for an upcoming point release fix.
 Here is our understanding of the current situation accessing the keyword property in the various tabs:
 
 - For keywords under the `Identity` tab, which is the keyword for `Material`, there is currently no API exposed for either `get` or `set`.
 - Keywords under `Appearance` can be both `get` and `set` using the code above.
-- Keywords under `Thermal` and `Structural` can be read using `get`, as discriben
-in [](https://thebuildingcoder.typepad.com/blog/2019/11/material-physical-and-thermal-assets.html).
-`Set` is currently not supported for history reasons (cf. internal tickets *REVIT-171312* and *REVIT-170824*).
+- Keywords under `Thermal` and `Structural` can be read using `get`, as described in the article
+on [material, physical and thermal assets](https://thebuildingcoder.typepad.com/blog/2019/11/material-physical-and-thermal-assets.html).
+`Set` is currently not supported for historical reasons (cf. internal tickets *REVIT-171312* and *REVIT-170824*).
 
 ####<a name="3"></a> Modifying Group Requires Regen
 

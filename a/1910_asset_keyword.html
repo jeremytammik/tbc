@@ -141,16 +141,16 @@ Is it possible to set the "keyword" property of the appearance asset?</p>
 <p>The API does support modification of the <code>Keyword</code> property on an appearance asset.
 You can set keyword under the <code>Appearance</code> tab in the material dialog through API.
 You currently cannot set the <code>Keyword</code> property for <code>Structural</code> and <code>Thermal</code> through the API. </p>
-<p>After testing, I can reproduce this issue in Revit 2022.
+<p>After testing, I can reproduce this issue in the public release Revit 2022.
 It works in my internal development version, however.
 I created an issue <em>REVIT-179045</em> to track why this fails in Revit 2022 and will evaluate it for an upcoming point release fix.
 Here is our understanding of the current situation accessing the keyword property in the various tabs:</p>
 <ul>
 <li>For keywords under the <code>Identity</code> tab, which is the keyword for <code>Material</code>, there is currently no API exposed for either <code>get</code> or <code>set</code>.</li>
 <li>Keywords under <code>Appearance</code> can be both <code>get</code> and <code>set</code> using the code above.</li>
-<li>Keywords under <code>Thermal</code> and <code>Structural</code> can be read using <code>get</code>, as discriben
-in <a href="https://thebuildingcoder.typepad.com/blog/2019/11/material-physical-and-thermal-assets.html"></a>.
-<code>Set</code> is currently not supported for history reasons (cf. internal tickets <em>REVIT-171312</em> and <em>REVIT-170824</em>).</li>
+<li>Keywords under <code>Thermal</code> and <code>Structural</code> can be read using <code>get</code>, as described in the article
+on <a href="https://thebuildingcoder.typepad.com/blog/2019/11/material-physical-and-thermal-assets.html">material, physical and thermal assets</a>.
+<code>Set</code> is currently not supported for historical reasons (cf. internal tickets <em>REVIT-171312</em> and <em>REVIT-170824</em>).</li>
 </ul>
 <h4><a name="3"></a> Modifying Group Requires Regen</h4>
 <p>Forgetting or not realising
