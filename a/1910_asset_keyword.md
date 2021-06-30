@@ -29,22 +29,15 @@ twitter:
 
 add #thebuildingcoder
 
-Painting stairs and shooting for the beams with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/paintstair
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-Two Revit API discussion forum threads that I am currently involved in
-&ndash; Painting stairs
-&ndash; Ray tracing vs bounding box to find beams intersecting columns...
+Two Revit API discussion forum threads reinforce the ever-present need to regenerate, the development team clarifies access to various asset keyword properties, and Harry Mattison shares a free tool to create and update a toposurface from a set of model lines
+&ndash; Asset keyword access
+&ndash; Modifying group requires regen
+&ndash; Modifying part material requires regen
+&ndash; Topo from lines...
 
 linkedin:
-
-Painting stairs and shooting for the beams with the #RevitAPI
-
-https://autode.sk/paintstair
-
-Two Revit API discussion forum threads that I am currently involved in:
-
-- Painting stairs
-- Ray tracing vs bounding box to find beams intersecting columns...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -65,7 +58,7 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### Asset Keyword
+### Topo from Lines, Asset Keyword and Regeneration
 
 Two [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
 reinforce the ever-present [need to regenerate](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33),
