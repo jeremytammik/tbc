@@ -76,7 +76,7 @@ the development team clarifies access to various asset keyword properties, and H
 ####<a name="2"></a> Asset Keyword Access
 
 **Question:** I have an issue setting a string value to the material appearance asset keyword property.
-In one material, it can be set as expected, but another material returns an error saying, "The input value is invalid for this AssetPropertyString property.\r\nParameter name: value".
+In one material, it can be set as expected, but another material returns an error saying, "The input value is invalid for this AssetPropertyString property; Parameter name: value".
 I found the blog article
 on [Material, Physical and Thermal Assets](https://thebuildingcoder.typepad.com/blog/2019/11/material-physical-and-thermal-assets.html) and the internal development ticket *REVIT-170824* which explains that the keyword property on the `Identity` tab is not exposed yet.
 However, I still expect the "keyword" property on the appearance tab to accept a string value.
@@ -232,7 +232,7 @@ I'm not sure if the concept of instance parameter vs type parameter vs family pa
 
 Any thoughts?
 
-I've seen this thing be done before, so I know it's possible.
+I've seen this thing done before, so I know it's possible.
 
 **Answer:** First, thoughts that have little to do with your question:
 
@@ -251,8 +251,7 @@ Here's the code that's working, for those who care:
 
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;Part&nbsp;p&nbsp;<span style="color:blue;">in</span>&nbsp;facadePanels2&nbsp;)
-&nbsp;&nbsp;{
- 
+&nbsp;&nbsp;{ 
 &nbsp;&nbsp;&nbsp;&nbsp;Parameter&nbsp;pMat&nbsp;=&nbsp;p.get_Parameter(
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BuiltInParameter.DPART_MATERIAL_ID_PARAM&nbsp;);
  
