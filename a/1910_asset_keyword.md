@@ -243,8 +243,10 @@ I've seen this thing be done before, so I know it's possible.
 
 **Answer:** First, thoughts that have little to do with your question:
 
-- I mostly recommend to avoid using AsValueString. I prefer the methods that return the raw parameter value: `AsInteger`, `AsDouble`, `AsElementId`, `AsString`.
-- Why do you start a new transaction for each part in the loop? Can't you just use one single large transaction and run the loop within that?
+- I mostly recommend avoiding use of `AsValueString`.
+I prefer the methods that return the raw parameter value: `AsInteger`, `AsDouble`, `AsElementId`, `AsString`.
+- Why do you start a new transaction for each part in the loop?
+Can't you just use one single large transaction and run the loop within that?
 
 **Response:** I figured it out.
 It had to do with my transactions.
@@ -291,12 +293,12 @@ Here's the code that's working, for those who care:
 </pre>
 
 **Answer:** Yes.
-That makes sense, since the second parameter would also be greyed out in UI if the first is not set to false, i.e., the ability to set thew second parameter is dependant on the value of first.
+That makes sense, since the second parameter would also be greyed out in UI if the first is not set to false, i.e., the ability to set thew second parameter is dependent on the value of first.
 
 This also highlights the importance of order when batch processing built-in parameter values.
 There are a few add-ins out there that populate parameter values, but they probably are not considering such relationships between parameters.
 
-In that case, you can probably increase performance by using only one transaction after all and replacing the multiple mini-transactions by calls to `doc.Regenerate` after each cll to set `DPART_MATERIAL_BY_ORIGINAL`.
+In that case, you can probably increase performance by using only one transaction after all and replacing the multiple mini-transactions by calls to `doc.Regenerate` after each call to set `DPART_MATERIAL_BY_ORIGINAL`.
 
 Many thanks to Joseph and Richard for sharing and explaining this!
 
