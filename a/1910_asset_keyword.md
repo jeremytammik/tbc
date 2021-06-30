@@ -166,10 +166,10 @@ accessing stale data can lead to pretty confusing and challenging problems.
 
 As already noted in some previous examples, certain operations require more than just a call to `Regenerate`, e.g., starting and committing two or more separate transactions in a row.
 Happily, in such cases, they can be assimilated into one single `TransactionGroup`, cf. the additional discussion
-on [handling transactions and transaction Groups](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.50).
+on [handling transactions and transaction groups](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.50).
 
-It took a lengthy discussion with input from several experienced add-in developers to clarify this need in the thread
-on [modifying group in API results in duplicate group]( https://forums.autodesk.com/t5/revit-api-forum/modifying-group-in-api-results-in-duplicate-group/m-p/10374430).
+It took a lengthy discussion with input from a couple of experienced add-in developers to clarify this need in the thread
+on [modifying group in API results in duplicate group](https://forums.autodesk.com/t5/revit-api-forum/modifying-group-in-api-results-in-duplicate-group/m-p/10374430).
 
 ####<a name="4"></a> Modifying Part Material Requires Regen
 
