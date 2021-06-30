@@ -71,10 +71,6 @@ Two [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 reinforce the ever-present [need to regenerate](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33),
 the development team clarifies access to various asset keyword properties, and Harry Mattison shares a free tool to create and update a toposurface from a set of model lines:
 
-
-
-
-
 <center>
 <img src="img/keyword_clustering.png" alt="Keyword clustering" title="Keyword clustering" width="425"/> <!-- 850 -->
 </center>
@@ -173,12 +169,115 @@ on [modifying group in API results in duplicate group](https://forums.autodesk.c
 
 ####<a name="4"></a> Modifying Part Material Requires Regen
 
-- need to regen:
-  Set Different Materials to Parts of a Wall
-  https://forums.autodesk.com/t5/revit-api-forum/set-different-materials-to-parts-of-a-wall/m-p/10427403
+Another example of 
+the [need to regenerate](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33) was
+raised and solved by
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread on how
+to [set different materials to parts of a wall](https://forums.autodesk.com/t5/revit-api-forum/set-different-materials-to-parts-of-a-wall/m-p/10427403).
 
+In this case, careful observation and thorough understanding of the user interface helps significantly to resolve the problem, since the property to modify is greyed out &ndash; disabled or enabled &ndash; depending on the setting of another value:
 
+**Question:** I am trying to set different materials to different parts of a wall as shown in the picture below:
 
+<center>
+<img src="img/different_materials_to_parts.png" alt="Different materials to parts" title="Different materials to parts" width="500"/> <!-- 1328 -->
+</center>
+
+My current method allows me to set all the parts to have the same material, but doesn't let me assign each part its own material. Here is my current approach:
+
+- Get all the parts in the file (this is a controlled file where I know exactly what parts are there)
+- Check whether a part is currently set to material "Facade Material" &ndash; this is how I've organized my wall ahead of time and I only want to change the material of parts of the wall that have material "Facade Material"
+- Set each part's built-in parameter "Material by original" to false
+- Set each part's built-in material parameter to my desired one
+
+The issue is, once I set the material parameter for a given part, then it changes the material parameters for all the other parts.
+I'm not sure if the concept of instance parameter vs type parameter vs family parameter holds for Parts, but from the object browser in Revit, the material parameter seems to be an instance parameter.
+
+<pre class="code">
+IEnumerable<Part> facadePanels2 = new FilteredElementCollector(doc).OfClass(typeof(Part)).Cast<Part>();
+                foreach (Part p in facadePanels2)
+                { 
+                    using (var trans = new Transaction(doc, "Modify1"))
+                    {
+                        trans.Start();                        
+                        Parameter pMat = p.get_Parameter(BuiltInParameter.DPART_MATERIAL_ID_PARAM);                        
+                        System.Diagnostics.Debug.Print(pMat.AsValueString());
+                        if (pMat.AsValueString() == "Facade Material")
+                        {
+                            System.Diagnostics.Debug.Print("Facade Material Found");
+                            Parameter pOrig = p.get_Parameter(BuiltInParameter.DPART_MATERIAL_BY_ORIGINAL);
+                            if (pOrig.IsReadOnly == false)
+                            {
+                                pOrig.Set(0);
+                            }
+                            if (pMat.IsReadOnly == false)
+                            {
+                                ElementId matId = materialIds[getMaterialOfPart(p, panels, viewDefault3D)];
+                                
+                                pMat.Set(matId);
+                            }                            
+                        }
+                        trans.Commit();
+                    }
+</pre>
+
+Any thoughts?
+
+I've seen this thing be done before, so I know it's possible.
+
+**Answer:** First, thoughts that have little to do with your question:
+
+- I mostly recommend to avoid using AsValueString. I prefer the methods that return the raw parameter value: `AsInteger`, `AsDouble`, `AsElementId`, `AsString`.
+- Why do you start a new transaction for each part in the loop? Can't you just use one single large transaction and run the loop within that?
+
+**Response:** I figured it out.
+It had to do with my transactions.
+
+Once I wrapped the setting of the two parameters (`pOrig` and `pMat`) in their own transactions for each part, it now works properly.
+It looks like all other parameters get set to read only when you change 1 parameter for a part in a single transaction?
+
+Here's the code that's working, for those who care:
+
+<pre class="code">
+IEnumerable<Part> facadePanels2 = new FilteredElementCollector(doc).OfClass(typeof(Part)).Cast<Part>();
+                foreach (Part p in facadePanels2)
+                {
+                        
+                    Parameter pMat = p.get_Parameter(BuiltInParameter.DPART_MATERIAL_ID_PARAM);
+                    if (pMat.AsElementId().IntegerValue == 309859) //("Facade Material")
+                    {
+                        System.Diagnostics.Debug.Print("Facade Material Found");
+                        Parameter pOrig = p.get_Parameter(BuiltInParameter.DPART_MATERIAL_BY_ORIGINAL);
+                        if (pOrig.IsReadOnly == false)
+                        {
+                            using (var trans = new Transaction(doc, "Modify1"))
+                            {
+                                trans.Start();
+                                pOrig.Set(0);
+                                trans.Commit();
+                            }
+                        }
+                        if (pMat.IsReadOnly == false)
+                        {
+                            ElementId matId = materialIds[getMaterialOfPart(p, panels, viewDefault3D)];
+                            using (var trans = new Transaction(doc, "Modify1"))
+                            {
+                                trans.Start();
+                                pMat.Set(matId);
+                                trans.Commit();
+                            }
+                        } 
+                    }
+</pre>
+
+**Answer:** Yes.
+That makes sense, since the second parameter would also be greyed out in UI if the first is not set to false, i.e., the ability to set thew second parameter is dependant on the value of first.
+
+This also highlights the importance of order when batch processing built-in parameter values.
+There are a few add-ins out there that populate parameter values, but they probably are not considering such relationships between parameters.
+
+In that case, you can probably increase performance by using only one transaction after all and replacing the multiple mini-transactions by calls to `doc.Regenerate` after each cll to set `DPART_MATERIAL_BY_ORIGINAL`.
 
 ####<a name="5"></a> Topo From Lines
 
