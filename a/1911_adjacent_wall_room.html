@@ -176,9 +176,6 @@ End Function
 </ul>
 <p>I ported the VB.NET code to C# and <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2022.0.150.14...2022.0.150.15">The Building Coder samples</a>:</p>
 <pre class="code">
-<span style="color:green;">//&nbsp;Originally&nbsp;implemented&nbsp;by&nbsp;Richard&nbsp;@RPThomas108&nbsp;Thomas&nbsp;in&nbsp;VB.NET&nbsp;in</span>
-<span style="color:green;">//&nbsp;https://forums.autodesk.com/t5/revit-api-forum/extract-the-names-of-the-rooms-separated-by-a-wall/m-p/10428696</span>
-
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;For&nbsp;all&nbsp;rooms,&nbsp;determine&nbsp;all&nbsp;adjacent&nbsp;walls,</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;create&nbsp;dictionary&nbsp;mapping&nbsp;walls&nbsp;to&nbsp;adjacent&nbsp;rooms,</span>
@@ -254,7 +251,7 @@ End Function
 }
 </pre>
 
-<p>Note that the C# version processes all element whose element id appears as a key in the wall to room mapping, regardless of whether they are in fact a wall or not.</p>
+<p>Note that the C# version processes all elements whose element id appears as a key in the wall to room mapping, regardless of whether they are in fact a wall or not.</p>
 <p>The VB.NET version uses a filtered element collector to retrieve only wall elements.</p>
 <p>You need to decide which approach better matches your specific requirements.</p>
 <p>This is yet another example of a relationship inversion:
@@ -272,8 +269,8 @@ on how to <a href="https://forums.autodesk.com/t5/revit-api-forum/get-a-list-of-
 <p>Using the awesome code
 from <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/2083518">@FAIR59</a>
 and <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/7186046">@perry.swoboda</a>,
-here is a spreadsheet containing
-the <a href="https://docs.google.com/spreadsheets/d/12glULCZL_yJkq7ko_vI-gEHu69dUIoiCRnmvdLpIoSU/edit#gid=0">BuiltInFailures for Revit 2022</a> with
+here is
+a <a href="https://docs.google.com/spreadsheets/d/12glULCZL_yJkq7ko_vI-gEHu69dUIoiCRnmvdLpIoSU/edit#gid=0">spreadsheet containing the BuiltInFailures for Revit 2022</a> with
 their <code>Severity</code>, <code>Classname</code>, <code>Guid</code> and <code>Description</code>.
 Might come handy.</p>
 </blockquote>
@@ -291,7 +288,7 @@ the <a href="https://thebuildingcoder.typepad.com/blog/2021/05/revitlookup-updat
 <li><a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.0.10">2022.0.0.10</a> fix error where element cannot be retrieved for an element id because <code>SupportedColorFillCategoryIds</code> returns category ids instead</li>
 <li><a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.0.11">2022.0.0.11</a> add <code>PlanViewRange</code> functionality to display view range level id and offset</li>
 <li><a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.0.13">2022.0.0.13</a> add <code>OnLoad</code> to increase and optimise width of Snoop window value <code>ListView</code> last column</li>
-<li><a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.0.15">2022.0.0.15</a> added RevitLookup.Installation</li>
+<li><a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.0.15">2022.0.0.15</a> add RevitLookup.Installation</li>
 </ul>
 <p>Many thanks to
 all <a href="https://github.com/jeremytammik/RevitLookup/graphs/contributors">contributors</a> for
@@ -301,6 +298,6 @@ your great support!</p>
 the <a href="https://github.com/ricaun/RevitLookup.Installation">RevitLookup.Installation</a> project,
 a simple installation using <a href="https://jrsoftware.org/isinfo.php">Inno Setup</a> to
 extract the files to the <code>ApplicationPlugins</code> folder.</p>
-<p>It generates a digitally signed version of RevitLookup and supports the Revit releases 2017, 2018, 2019, 2020, 2021 and 2022.</p>
-<p>This can obviously also be used as a starting point for your own add-in installer.</p>
+<p>It generates a digitally signed version of RevitLookup and includes multi-version support for the Revit releases 2017, 2018, 2019, 2020, 2021 and 2022.</p>
+<p>It can obviously also be used as a starting point for your own add-in installer.</p>
 <p>Many thanks to Luiz Henrique for this and his other nice contributions!</p>

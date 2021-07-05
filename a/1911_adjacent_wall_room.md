@@ -191,9 +191,6 @@ Spelling it out, this does two things:
 I ported the VB.NET code to C# and [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/compare/2022.0.150.14...2022.0.150.15):
 
 <pre class="code">
-<span style="color:green;">//&nbsp;Originally&nbsp;implemented&nbsp;by&nbsp;Richard&nbsp;@RPThomas108&nbsp;Thomas&nbsp;in&nbsp;VB.NET&nbsp;in</span>
-<span style="color:green;">//&nbsp;https://forums.autodesk.com/t5/revit-api-forum/extract-the-names-of-the-rooms-separated-by-a-wall/m-p/10428696</span>
- 
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;For&nbsp;all&nbsp;rooms,&nbsp;determine&nbsp;all&nbsp;adjacent&nbsp;walls,</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;create&nbsp;dictionary&nbsp;mapping&nbsp;walls&nbsp;to&nbsp;adjacent&nbsp;rooms,</span>
@@ -269,7 +266,7 @@ I ported the VB.NET code to C# and [The Building Coder samples](https://github.c
 }
 </pre>
 
-Note that the C# version processes all element whose element id appears as a key in the wall to room mapping, regardless of whether they are in fact a wall or not.
+Note that the C# version processes all elements whose element id appears as a key in the wall to room mapping, regardless of whether they are in fact a wall or not.
 
 The VB.NET version uses a filtered element collector to retrieve only wall elements.
 
@@ -293,8 +290,8 @@ on how to [get all warnings](https://forums.autodesk.com/t5/revit-api-forum/get-
 > Using the awesome code
 from [@FAIR59](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/2083518)
 and [@perry.swoboda](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/7186046),
-here is a spreadsheet containing
-the [BuiltInFailures for Revit 2022](https://docs.google.com/spreadsheets/d/12glULCZL_yJkq7ko_vI-gEHu69dUIoiCRnmvdLpIoSU/edit#gid=0) with
+here is
+a [spreadsheet containing the BuiltInFailures for Revit 2022](https://docs.google.com/spreadsheets/d/12glULCZL_yJkq7ko_vI-gEHu69dUIoiCRnmvdLpIoSU/edit#gid=0) with
 their `Severity`, `Classname`, `Guid` and `Description`.
 Might come handy.
 
@@ -317,7 +314,7 @@ the [previous bunch of updates](https://thebuildingcoder.typepad.com/blog/2021/0
 - [2022.0.0.10](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.0.10) fix error where element cannot be retrieved for an element id because `SupportedColorFillCategoryIds` returns category ids instead
 - [2022.0.0.11](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.0.11) add `PlanViewRange` functionality to display view range level id and offset
 - [2022.0.0.13](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.0.13) add `OnLoad` to increase and optimise width of Snoop window value `ListView` last column
-- [2022.0.0.15](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.0.15) added RevitLookup.Installation
+- [2022.0.0.15](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.0.15) add RevitLookup.Installation
 
 Many thanks to
 all [contributors](https://github.com/jeremytammik/RevitLookup/graphs/contributors) for
@@ -330,9 +327,9 @@ the [RevitLookup.Installation](https://github.com/ricaun/RevitLookup.Installatio
 a simple installation using [Inno Setup](https://jrsoftware.org/isinfo.php) to
 extract the files to the `ApplicationPlugins` folder.
 
-It generates a digitally signed version of RevitLookup and supports the Revit releases 2017, 2018, 2019, 2020, 2021 and 2022.
+It generates a digitally signed version of RevitLookup and includes multi-version support for the Revit releases 2017, 2018, 2019, 2020, 2021 and 2022.
 
-This can obviously also be used as a starting point for your own add-in installer.
+It can obviously also be used as a starting point for your own add-in installer.
 
 Many thanks to Luiz Henrique for this and his other nice contributions!
 
