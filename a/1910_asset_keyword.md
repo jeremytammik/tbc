@@ -39,6 +39,17 @@ Two Revit API discussion forum threads reinforce the ever-present need to regene
 
 linkedin:
 
+The ever-present need to regenerate, access to various asset keyword properties and a free tool to create and update toposurface from a set of model lines with the #RevitAPI
+
+https://bit.ly/assetkeyword
+
+Two Revit API discussion forum threads reinforce the ever-present need to regenerate, the development team clarifies access to various asset keyword properties, and Harry Mattison shares a free tool to create and update a toposurface from a set of model lines:
+
+- Asset keyword access
+- Modifying group requires regen
+- Modifying part material requires regen
+- Topo from lines...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
