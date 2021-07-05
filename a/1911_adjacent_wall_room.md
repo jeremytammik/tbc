@@ -180,13 +180,15 @@ Private Function Obj_210629a( _
 End Function
 </pre>
 
+Thanks to Richard for sharing this very nice VB.NET implementation!
+
 Spelling it out, this does two things:
 
 - For all rooms, for each of its bounding walls, note the room to wall relationship
 - Use this to create a dictionary mapping the wall element id to a list of the rooms it bounds
 - For each wall element id in the dictionary created above, add a list of the names of all the rooms it bounds to its comment field 
 
-Here is this code ported to C#.
+I ported the VB.NET code to C# and [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/compare/2022.0.150.14...2022.0.150.15):
 
 <pre class="code">
 <span style="color:green;">//&nbsp;Originally&nbsp;implemented&nbsp;by&nbsp;Richard&nbsp;@RPThomas108&nbsp;Thomas&nbsp;in&nbsp;VB.NET&nbsp;in</span>

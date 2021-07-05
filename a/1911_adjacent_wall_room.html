@@ -167,13 +167,14 @@ Private Function Obj_210629a( _
 End Function
 </pre>
 
+<p>Thanks to Richard for sharing this very nice VB.NET implementation!</p>
 <p>Spelling it out, this does two things:</p>
 <ul>
 <li>For all rooms, for each of its bounding walls, note the room to wall relationship</li>
 <li>Use this to create a dictionary mapping the wall element id to a list of the rooms it bounds</li>
 <li>For each wall element id in the dictionary created above, add a list of the names of all the rooms it bounds to its comment field </li>
 </ul>
-<p>Here is this code ported to C#.</p>
+<p>I ported the VB.NET code to C# and <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2022.0.150.14...2022.0.150.15">The Building Coder samples</a>:</p>
 <pre class="code">
 <span style="color:green;">//&nbsp;Originally&nbsp;implemented&nbsp;by&nbsp;Richard&nbsp;@RPThomas108&nbsp;Thomas&nbsp;in&nbsp;VB.NET&nbsp;in</span>
 <span style="color:green;">//&nbsp;https://forums.autodesk.com/t5/revit-api-forum/extract-the-names-of-the-rooms-separated-by-a-wall/m-p/10428696</span>
