@@ -169,7 +169,8 @@ the topic of one of The Building Coder's very first posts, #16, in October 2008.
 
 ####<a name="3"></a> List of All Built-In Failures
 
-Gábor Schnierer very kindly shares a list of all built-in failures in
+Gábor Schnierer very kindly shares a list of
+all [built-in failures](https://www.revitapidocs.com/2021.1/eda15d4a-6b14-ee6b-0c44-6011077e6cfc.htm) in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on how to [get all warnings](https://forums.autodesk.com/t5/revit-api-forum/get-a-list-of-all-the-revit-warnings/m-p/10399203):
 
@@ -178,7 +179,7 @@ from [@FAIR59](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/20835
 and [@perry.swoboda](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/7186046),
 here is a spreadsheet containing
 the [BuiltInFailures for Revit 2022](https://docs.google.com/spreadsheets/d/12glULCZL_yJkq7ko_vI-gEHu69dUIoiCRnmvdLpIoSU/edit#gid=0) with
-their Severity, Classname, Guid and Description.
+their `Severity`, `Classname`, `Guid` and `Description`.
 Might come handy.
 
 Thank you very much, Gábor!
