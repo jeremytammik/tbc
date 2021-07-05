@@ -167,18 +167,22 @@ A [relationship inverter](http://thebuildingcoder.typepad.com/blog/2008/10/relat
 the topic of one of The Building Coder's very first posts, #16, in October 2008.  
 
 
-####<a name="3"></a> 
+####<a name="3"></a> List of All Built-In Failures
 
-- get all warnings
-https://forums.autodesk.com/t5/revit-api-forum/get-a-list-of-all-the-revit-warnings/m-p/10399203
- schnierer.gabor
-Gábor Schnierer
+Gábor Schnierer very kindly shares a list of all built-in failures in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on how to [get all warnings](https://forums.autodesk.com/t5/revit-api-forum/get-a-list-of-all-the-revit-warnings/m-p/10399203):
+
 > Using the awesome code
 from [@FAIR59](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/2083518)
-and [@perry.swoboda](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/7186046) here
-is a spreadsheet containing
+and [@perry.swoboda](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/7186046),
+here is a spreadsheet containing
 the [BuiltInFailures for Revit 2022](https://docs.google.com/spreadsheets/d/12glULCZL_yJkq7ko_vI-gEHu69dUIoiCRnmvdLpIoSU/edit#gid=0) with
-their Severity, Classname, Guid and Description. Might come handy.
+their Severity, Classname, Guid and Description.
+Might come handy.
+
+Thank you very much, Gábor!
+
 
 ####<a name="4"></a> Recent RevitLookup Updates
 
