@@ -67,7 +67,7 @@ A number of useful and important enhancement to RevitLookup, a list of all built
 - [RevitLookup installation](#5)
 
 <center>
-<img src="img/wall_adjacent_rooms.jpg" alt="" title="" width="286"/> <!-- 286 -->
+<img src="img/wall_adjacent_rooms.jpg" alt="" title="" width="200"/> <!-- 286 -->
 </center>
 
 ####<a name="2"></a> Adjacent Rooms and Walls
@@ -75,7 +75,7 @@ A number of useful and important enhancement to RevitLookup, a list of all built
 The [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) question
 on how to [extract the names of the rooms separated by a wall](https://forums.autodesk.com/t5/revit-api-forum/extract-the-names-of-the-rooms-separated-by-a-wall/m-p/10428696)
 prompted Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
-to share a neat utility method implementing much m ore than that:
+to share a neat utility method implementing much more than that:
 
 **Question:** I use Revit to model my projects, then I export the BOMs to a spreadsheet that creates my quotes for clients.
 However, I am running into a problem:
@@ -314,7 +314,7 @@ the [previous bunch of updates](https://thebuildingcoder.typepad.com/blog/2021/0
 
 - [2022.0.0.10](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.0.10) fix error where element cannot be retrieved for an element id because `SupportedColorFillCategoryIds` returns category ids instead
 - [2022.0.0.11](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.0.11) add `PlanViewRange` functionality to display view range level id and offset
-- [2022.0.0.13](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.0.13) add `OnLoad` to increrase and optimise width of Snoop window value `ListView` last column
+- [2022.0.0.13](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.0.13) add `OnLoad` to increase and optimise width of Snoop window value `ListView` last column
 - [2022.0.0.15](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.0.15) added RevitLookup.Installation
 
 Many thanks to
