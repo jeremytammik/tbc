@@ -67,7 +67,7 @@ A number of useful and important enhancement to RevitLookup, a list of all built
 - [RevitLookup installation](#5)
 
 <center>
-<img src="img/" alt="" title="" width="100"/> <!-- 850 -->
+<img src="img/wall_adjacent_rooms.jpg" alt="" title="" width="286"/> <!-- 286 -->
 </center>
 
 ####<a name="2"></a> Adjacent Rooms and Walls
