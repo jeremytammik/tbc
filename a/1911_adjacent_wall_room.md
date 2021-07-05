@@ -61,6 +61,11 @@ Many thanks to  for this very helpful explanation!
 
 A number of useful and important enhancement to RevitLookup, a list of all built-in Revit failures, and a neat utility to determine and document all room-wall adjacencies:
 
+- [Adjacent rooms and walls](#2)
+- [List of all built-in failures](#3)
+- [Recent RevitLookup updates](#4)
+- [RevitLookup installation](#5)
+
 <center>
 <img src="img/" alt="" title="" width="100"/> <!-- 850 -->
 </center>
