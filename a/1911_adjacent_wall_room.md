@@ -57,9 +57,9 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### Installer, Warning List, Adjacent Rooms and Walls
+### Installer, List of Failures, Adjacent Rooms and Walls
 
-A number of useful and important enhancement to RevitLookup, a list of all built-in Revit failures, and a neat utility to determine and document all room-wall adjacencies:
+We discuss enhancements to RevitLookup, a list of all built-in Revit failures, and a neat utility to determine all room-wall adjacencies:
 
 - [Adjacent rooms and walls](#2)
 - [List of all built-in failures](#3)
@@ -186,7 +186,7 @@ Spelling it out, this does two things:
 
 - For all rooms, for each of its bounding walls, note the room to wall relationship
 - Use this to create a dictionary mapping the wall element id to a list of the rooms it bounds
-- For each wall element id in the dictionary created above, add a list of the names of all the rooms it bounds to its comment field 
+- For each wall element id in the dictionary, add a list of the names of the rooms it bounds to its comment field 
 
 I ported the VB.NET code to C# and [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/compare/2022.0.150.14...2022.0.150.15):
 
@@ -277,7 +277,7 @@ every room maintains a relationship to its bounding elements, the walls.
 by retrieving and processing that mapping, we can invert the relationship and use that to add information to each wall about its adjacent rooms.
 
 This is a common Revit API task. 
-A [relationship inverter](http://thebuildingcoder.typepad.com/blog/2008/10/relationship-in.html) was
+A similar [relationship inverter](http://thebuildingcoder.typepad.com/blog/2008/10/relationship-in.html) was
 the topic of one of The Building Coder's very first posts, #16, in October 2008.
 
 ####<a name="3"></a> List of All Built-In Failures

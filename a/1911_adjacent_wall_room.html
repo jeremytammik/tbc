@@ -56,8 +56,8 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-<h3>Installer, Warning List, Adjacent Rooms and Walls</h3>
-<p>A number of useful and important enhancement to RevitLookup, a list of all built-in Revit failures, and a neat utility to determine and document all room-wall adjacencies:</p>
+<h3>Installer, List of Failures, Adjacent Rooms and Walls</h3>
+<p>We discuss enhancements to RevitLookup, a list of all built-in Revit failures, and a neat utility to determine all room-wall adjacencies:</p>
 <ul>
 <li><a href="#2">Adjacent rooms and walls</a></li>
 <li><a href="#3">List of all built-in failures</a></li>
@@ -172,7 +172,7 @@ End Function
 <ul>
 <li>For all rooms, for each of its bounding walls, note the room to wall relationship</li>
 <li>Use this to create a dictionary mapping the wall element id to a list of the rooms it bounds</li>
-<li>For each wall element id in the dictionary created above, add a list of the names of all the rooms it bounds to its comment field </li>
+<li>For each wall element id in the dictionary, add a list of the names of the rooms it bounds to its comment field </li>
 </ul>
 <p>I ported the VB.NET code to C# and <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2022.0.150.14...2022.0.150.15">The Building Coder samples</a>:</p>
 <pre class="code">
@@ -258,7 +258,7 @@ End Function
 every room maintains a relationship to its bounding elements, the walls.
 by retrieving and processing that mapping, we can invert the relationship and use that to add information to each wall about its adjacent rooms.</p>
 <p>This is a common Revit API task. 
-A <a href="http://thebuildingcoder.typepad.com/blog/2008/10/relationship-in.html">relationship inverter</a> was
+A similar <a href="http://thebuildingcoder.typepad.com/blog/2008/10/relationship-in.html">relationship inverter</a> was
 the topic of one of The Building Coder's very first posts, #16, in October 2008.</p>
 <h4><a name="3"></a> List of All Built-In Failures</h4>
 <p>Gábor Schnierer very kindly shares a list of
