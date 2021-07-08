@@ -33,8 +33,11 @@ add #thebuildingcoder
 
  with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/assetkeyword
 
-&ndash; 
-...
+We discuss enhancements to RevitLookup, a list of all built-in Revit failures, and a neat utility to determine all room-wall adjacencies
+&ndash; Adjacent rooms and walls
+&ndash; List of all built-in failures
+&ndash; Recent RevitLookup updates
+&ndash; RevitLookup installation...
 
 linkedin:
 
@@ -67,7 +70,7 @@ We discuss enhancements to RevitLookup, a list of all built-in Revit failures, a
 - [RevitLookup installation](#5)
 
 <center>
-<img src="img/wall_adjacent_rooms.jpg" alt="" title="" width="200"/> <!-- 286 -->
+<img src="img/wall_adjacent_rooms.jpg" alt="Wall adjacent rooms" title="Wall adjacent rooms" width="200"/> <!-- 286 -->
 </center>
 
 ####<a name="2"></a> Adjacent Rooms and Walls
