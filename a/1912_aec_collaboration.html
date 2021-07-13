@@ -81,12 +81,12 @@ and we'll send you the recording after the webinar.</p>
 on <a href="https://archi-lab.net/webview2-and-revits-dockable-panel">WebView2 and Revit’s Dockable Panel</a>.</p>
 <p>Unfortunately, he runs into a problem using <code>WebView2</code> to host a browser in them.</p>
 <p>Many thanks to Konrad for the nice introduction to dockable panels and subsequent problem analysis!</p>
-<p>Jason Masters addad a <a href="https://archi-lab.net/webview2-and-revits-dockable-panel/#comment-2813">comment on how he solved the conflict by disentanglement</a>, like the suggestion to achieve
-<a href="https://thebuildingcoder.typepad.com/blog/2019/04/set-floor-level-and-use-ipc-for-disentanglement.html#6">Disentanglement and Independence via IPC</a>, and adding:</p>
+<p>Jason Masters explained <a href="https://archi-lab.net/webview2-and-revits-dockable-panel/#comment-2813">how he solved the conflict by disentanglement</a>, like the suggestion to achieve
+<a href="https://thebuildingcoder.typepad.com/blog/2019/04/set-floor-level-and-use-ipc-for-disentanglement.html#6">disentanglement and independence via IPC</a>:</p>
 <blockquote>
-<p>It’s so frustrating because DLL hell was solved by Microsoft, like 15 years ago, using strong naming, but Autodesk just doesn’t support it.</p>
+<p>It’s so frustrating, because DLL hell was solved by Microsoft, like 15 years ago, using strong naming, but Autodesk just doesn’t support it.</p>
 <p>Personally, I just use Electron, built my whole client application there, and just shuttle <code>json</code> data back and forth to a thin Revit wrapper over named pipes.
-Still, the potential for DLL conflicts with different versions of <code>Newtonsoft.json</code>, but thankfully its core api has stayed pretty stable and consistent.</p>
+Still, the potential for DLL conflicts with different versions of <code>Newtonsoft.json</code> remains, but thankfully its core API has stayed pretty stable and consistent.</p>
 </blockquote>
 <h4><a name="4"></a> Dismissing Revit Pop-Ups</h4>
 <p>Another article by Konrad

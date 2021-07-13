@@ -96,13 +96,13 @@ Unfortunately, he runs into a problem using `WebView2` to host a browser in them
 
 Many thanks to Konrad for the nice introduction to dockable panels and subsequent problem analysis!
 
-Jason Masters addad a [comment on how he solved the conflict by disentanglement](https://archi-lab.net/webview2-and-revits-dockable-panel/#comment-2813), like the suggestion to achieve
-[Disentanglement and Independence via IPC](https://thebuildingcoder.typepad.com/blog/2019/04/set-floor-level-and-use-ipc-for-disentanglement.html#6), and adding:
+Jason Masters explained [how he solved the conflict by disentanglement](https://archi-lab.net/webview2-and-revits-dockable-panel/#comment-2813), like the suggestion to achieve
+[disentanglement and independence via IPC](https://thebuildingcoder.typepad.com/blog/2019/04/set-floor-level-and-use-ipc-for-disentanglement.html#6):
 
-> It’s so frustrating because DLL hell was solved by Microsoft, like 15 years ago, using strong naming, but Autodesk just doesn’t support it.
+> It’s so frustrating, because DLL hell was solved by Microsoft, like 15 years ago, using strong naming, but Autodesk just doesn’t support it.
 
 > Personally, I just use Electron, built my whole client application there, and just shuttle `json` data back and forth to a thin Revit wrapper over named pipes.
-Still, the potential for DLL conflicts with different versions of `Newtonsoft.json`, but thankfully its core api has stayed pretty stable and consistent.
+Still, the potential for DLL conflicts with different versions of `Newtonsoft.json` remains, but thankfully its core API has stayed pretty stable and consistent.
 
 ####<a name="4"></a> Dismissing Revit Pop-Ups
 
