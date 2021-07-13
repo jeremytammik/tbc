@@ -8,6 +8,12 @@
 
 -  [Register for the Live webinar *AEC Collaboration: BIM Collaborate for Project Managers*](https://forums.autodesk.com/t5/revit-api-forum/register-for-the-live-webinar-aec-collaboration-bim-collaborate/m-p/10462552)
 
+- decompile revitapi.dll
+  Orson Liu -- https://autodesk.slack.com/archives/C0SR6NAP8/p1624975627139600
+
+- railing geometry -- https://autodesk.slack.com/archives/C0SR6NAP8/p1624977919139900
+  Stephen Smith
+
 twitter:
 
 add #thebuildingcoder
@@ -82,6 +88,8 @@ on [WebView2 and Revit’s Dockable Panel](https://archi-lab.net/webview2-and-re
 
 Unfortunately, he runs into a problem using `WebView2` to host a browser in them.
 
+Many thanks to Konrad for the nice introduction to dockable panels and subsequent problem analysis!
+
 Jason Masters addad a [comment on how he solved the conflict by disentanglement](https://archi-lab.net/webview2-and-revits-dockable-panel/#comment-2813), like the suggestion to achieve
 [Disentanglement and Independence via IPC](https://thebuildingcoder.typepad.com/blog/2019/04/set-floor-level-and-use-ipc-for-disentanglement.html#6), and adding:
 
@@ -99,13 +107,61 @@ explains
 - How to set up and use the `DialogBoxShowing` event for the Revit-API-style solution, as well as,
 - Using the Win32Api `FindWindow` and `GetWindowText` methods to find the right button and simulate a user click on it
 
+Yet more thanks to Konrad for this helpful overview!
 
+This article nicely complements the existing articles in the topic group
+5.32 on [detecting and handling dialogues and failures](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32).
 
+####<a name="5"></a> Check API Changes using Decompiler
 
-<pre class="code">
-</pre>
+Comparing changes between different versions of the Revit API is possible using
+the free [ILSpy tool](https://github.com/icsharpcode/ILSpy) (e.g., version 5.0.0.4861-preview3)
+to:
 
+- Open the `RevitAPI.dll` assembly
+- Select the root node
+- Select File &gt; Save Code...
+- Select an empty folder to save all the decompiled source code
+- Create a git repo 
+- Save the API source code
 
+Repeat this process with another version of `RevitAPI.dll` to generate the decompiled source code, commit into the git repo to compare the different releases and the changes between them.
+
+####<a name="6"></a> Railing Geometry
+
+Some more or less arbitrary yet still possibly useful aspects of the tricky task of accessing railing geometry might be gleaned from these snippets of an internal discussion:
+
+Q: How can I extract the geometry from a `RailingType` element?
+
+A: Last time I tried, the best way to get geometry was using the `IModelExportContext`, but I forget whether a railing type actually has geometry one can get from API or if it's all on the railing.
+
+There is also the `Element.Geometry` property, `GeometryElement` and `GeometryInstance` objects that can be obtained directly, but in case of railings it could have some specific complications.
+
+Exactly, railings have a complicated representation and I have no idea what Element.get_Geometry actually gives for a RailingType.
+So, I'd need to look into an example and see what they give and what's best to use.
+
+For `RailingType` elements, `get_Geometry` returns null.
+I then used `GetDependentElements` with a filter for `Railing` elements.
+I can then call `get_Geometry` and/or `GetGeometryInstances` on the `Railing` element.
+Is this a valid workflow?
+Also, I would like to use `GetGeometryInstances` on the `Railing` element, but it is returning a identity transform, so, it is not using instanced geometry?
+
+Well, a railing has its own RailingType, so the railing being an identity transform of something does make sense regardless of where the railing is positioned.
+
+The issue is that the railing element is instanced 600 places in the model.
+I thought I would be able to get the instance geometry and it's transform.
+
+I'm confused &ndash; railings aren't instanced.
+
+I think I answered my own question.
+The RailingType has a dependent Railing element.
+This Railing element has a GeometryInstance in it's GeometryElement.
+I can get the geometry and it's transform from this element.
+
+That sounds right &ndash; a Railing geometrically should be small, one or a few GeometryInstances would be expected.
+
+There is some potential difference with the continuous rails; these are separate Elements but you may see them as part of the Railing's geometry.
+In that case it's also easy to encounter the continuous rails twice; in fact, Revit draws them twice, which is why you can tab select a top rail, for example, to toggle between the top rail alone and the railing which its attached to.
 
 
 
