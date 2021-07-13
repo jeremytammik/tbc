@@ -123,15 +123,15 @@ So, I'd need to look into an example and see what they give and what's best to u
 I then used <code>GetDependentElements</code> with a filter for <code>Railing</code> elements.
 I can then call <code>get_Geometry</code> and/or <code>GetGeometryInstances</code> on the <code>Railing</code> element.
 Is this a valid workflow?
-Also, I would like to use <code>GetGeometryInstances</code> on the <code>Railing</code> element, but it is returning a identity transform, so, it is not using instanced geometry?</p>
+Also, I would like to use <code>GetGeometryInstances</code> on the <code>Railing</code> element, but it is returning an identity transform; so, it is not using instanced geometry?</p>
 <p>Well, a railing has its own RailingType, so the railing being an identity transform of something does make sense regardless of where the railing is positioned.</p>
 <p>The issue is that the railing element is instanced 600 places in the model.
 I thought I would be able to get the instance geometry and it's transform.</p>
 <p>I'm confused &ndash; railings aren't instanced.</p>
 <p>I think I answered my own question.
 The RailingType has a dependent Railing element.
-This Railing element has a GeometryInstance in it's GeometryElement.
-I can get the geometry and it's transform from this element.</p>
+This Railing element has a GeometryInstance in its GeometryElement.
+I can get the geometry and its transform from this element.</p>
 <p>That sounds right &ndash; a Railing geometrically should be small, one or a few GeometryInstances would be expected.</p>
 <p>There is some potential difference with the continuous rails; these are separate Elements but you may see them as part of the Railing's geometry.
-In that case it's also easy to encounter the continuous rails twice; in fact, Revit draws them twice, which is why you can tab select a top rail, for example, to toggle between the top rail alone and the railing which its attached to.</p>
+In that case, it's also easy to encounter the continuous rails twice; in fact, Revit draws them twice, which is why you can tab select a top rail, for example, to toggle between the top rail alone and the railing which its attached to.</p>

@@ -150,7 +150,7 @@ For `RailingType` elements, `get_Geometry` returns null.
 I then used `GetDependentElements` with a filter for `Railing` elements.
 I can then call `get_Geometry` and/or `GetGeometryInstances` on the `Railing` element.
 Is this a valid workflow?
-Also, I would like to use `GetGeometryInstances` on the `Railing` element, but it is returning a identity transform, so, it is not using instanced geometry?
+Also, I would like to use `GetGeometryInstances` on the `Railing` element, but it is returning an identity transform; so, it is not using instanced geometry?
 
 Well, a railing has its own RailingType, so the railing being an identity transform of something does make sense regardless of where the railing is positioned.
 
@@ -161,13 +161,13 @@ I'm confused &ndash; railings aren't instanced.
 
 I think I answered my own question.
 The RailingType has a dependent Railing element.
-This Railing element has a GeometryInstance in it's GeometryElement.
-I can get the geometry and it's transform from this element.
+This Railing element has a GeometryInstance in its GeometryElement.
+I can get the geometry and its transform from this element.
 
 That sounds right &ndash; a Railing geometrically should be small, one or a few GeometryInstances would be expected.
 
 There is some potential difference with the continuous rails; these are separate Elements but you may see them as part of the Railing's geometry.
-In that case it's also easy to encounter the continuous rails twice; in fact, Revit draws them twice, which is why you can tab select a top rail, for example, to toggle between the top rail alone and the railing which its attached to.
+In that case, it's also easy to encounter the continuous rails twice; in fact, Revit draws them twice, which is why you can tab select a top rail, for example, to toggle between the top rail alone and the railing which its attached to.
 
 
 
