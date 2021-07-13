@@ -47,7 +47,13 @@ Many thanks to  for this very helpful explanation!
 
 ### AEC Collaboration
 
+An upcoming AEC collaboration webinar and overviews over dockable panels, dialogue handling, decompilation and railing geometry:
 
+- [AEC collaboration webinar](#2)
+- [Dockable panels and `WebView2`](#3)
+- [Dismissing Revit pop-ups](#4)
+- [Check API changes using decompilation](#5)
+- [Railing geometry](#6)
 
 <center>
 <img src="img/aec_collaboration_webinar.png" alt="AEC Collaboration: BIM Collaborate for Project Managers" title="AEC Collaboration: BIM Collaborate for Project Managers" width="600"/> <!-- 999 -->
@@ -112,7 +118,7 @@ Yet more thanks to Konrad for this helpful overview!
 This article nicely complements the existing articles in the topic group
 5.32 on [detecting and handling dialogues and failures](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32).
 
-####<a name="5"></a> Check API Changes using Decompiler
+####<a name="5"></a> Check API Changes using Decompilation
 
 Comparing changes between different versions of the Revit API is possible using
 the free [ILSpy tool](https://github.com/icsharpcode/ILSpy) (e.g., version 5.0.0.4861-preview3)
