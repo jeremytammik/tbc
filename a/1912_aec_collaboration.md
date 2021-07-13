@@ -6,7 +6,7 @@
 
 <!---
 
--  [Register for the Live webinar *AEC Collaboration: BIM Collaborate for Project Managers*](https://forums.autodesk.com/t5/revit-api-forum/register-for-the-live-webinar-aec-collaboration-bim-collaborate/m-p/10462552):
+-  [Register for the Live webinar *AEC Collaboration: BIM Collaborate for Project Managers*](https://forums.autodesk.com/t5/revit-api-forum/register-for-the-live-webinar-aec-collaboration-bim-collaborate/m-p/10462552)
 
 twitter:
 
@@ -75,16 +75,39 @@ Can't attend live?
 [Register](https://www.autodesk.com/webinars/aec/bim-collaborate-for-project-managers) anyway
 and we'll send you the recording after the webinar.
 
+####<a name="3"></a> Dockable Panels and WebView2
+
+Konrad Sobon presents a very nice general introduction get started with dockable panels in his article
+on [WebView2 and Revit’s Dockable Panel](https://archi-lab.net/webview2-and-revits-dockable-panel).
+
+Unfortunately, he runs into a problem using `WebView2` to host a browser in them.
+
+Jason Masters addad a [comment on how he solved the conflict by disentanglement](https://archi-lab.net/webview2-and-revits-dockable-panel/#comment-2813), like the suggestion to achieve
+[Disentanglement and Independence via IPC](https://thebuildingcoder.typepad.com/blog/2019/04/set-floor-level-and-use-ipc-for-disentanglement.html#6), and adding:
+
+> It’s so frustrating because DLL hell was solved by Microsoft, like 15 years ago, using strong naming, but Autodesk just doesn’t support it.
+
+> Personally, I just use Electron, built my whole client application there, and just shuttle `json` data back and forth to a thin Revit wrapper over named pipes.
+Still, the potential for DLL conflicts with different versions of `Newtonsoft.json`, but thankfully its core api has stayed pretty stable and consistent.
+
+####<a name="4"></a> Dismissing Revit Pop-Ups
+
+Another article by Konrad
+discusses [dismissing Revit pop-ups &ndash; the easy and not so easy ways](https://archi-lab.net/dismissing-revit-pop-ups-the-easy-and-not-so-easy-ways) and
+explains
+
+- How to set up and use the `DialogBoxShowing` event for the Revit-API-style solution, as well as,
+- Using the Win32Api `FindWindow` and `GetWindowText` methods to find the right button and simulate a user click on it
+
+
+
 
 <pre class="code">
-
 </pre>
 
 
 
-####<a name="3"></a> 
 
 
-####<a name="4"></a> 
 
 
