@@ -18,7 +18,7 @@ twitter:
 
 add #thebuildingcoder
 
-#RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+An invitation to the upcoming AEC collaboration webinar and overviews over dockable panels with and without WebView2, dialogue handling, decompilation and railing geometry in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/aeccollaboration
 
 An invitation to the upcoming AEC collaboration webinar and overviews over dockable panels, dialogue handling, decompilation and railing geometry
 &ndash; AEC collaboration webinar
