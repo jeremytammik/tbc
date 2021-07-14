@@ -47,7 +47,7 @@ Many thanks to  for this very helpful explanation!
 
 ### AEC Collaboration
 
-An upcoming AEC collaboration webinar and overviews over dockable panels, dialogue handling, decompilation and railing geometry:
+Here is an invitation to the upcoming AEC collaboration webinar and overviews over dockable panels, dialogue handling, decompilation and railing geometry:
 
 - [AEC collaboration webinar](#2)
 - [Dockable panels and `WebView2`](#3)
@@ -96,7 +96,7 @@ Unfortunately, he runs into a problem using `WebView2` to host a browser in them
 
 Many thanks to Konrad for the nice introduction to dockable panels and subsequent problem analysis!
 
-Jason Masters explained [how he solved the conflict by disentanglement](https://archi-lab.net/webview2-and-revits-dockable-panel/#comment-2813), like the suggestion to achieve
+Jason Masters explained [how he solved the conflict using named pipes to connect to a separate UI process](https://archi-lab.net/webview2-and-revits-dockable-panel/#comment-2813), similar to the suggestion to achieve
 [disentanglement and independence via IPC](https://thebuildingcoder.typepad.com/blog/2019/04/set-floor-level-and-use-ipc-for-disentanglement.html#6):
 
 > It’s so frustrating, because DLL hell was solved by Microsoft, like 15 years ago, using strong naming, but Autodesk just doesn’t support it.
@@ -110,12 +110,12 @@ Another article by Konrad
 discusses [dismissing Revit pop-ups &ndash; the easy and not so easy ways](https://archi-lab.net/dismissing-revit-pop-ups-the-easy-and-not-so-easy-ways) and
 explains
 
-- How to set up and use the `DialogBoxShowing` event for the Revit-API-style solution, as well as,
+- How to set up and use the `DialogBoxShowing` event for the Revit-API-style solution
 - Using the Win32Api `FindWindow` and `GetWindowText` methods to find the right button and simulate a user click on it
 
-Yet more thanks to Konrad for this helpful overview!
+Yet again many thanks to Konrad for this helpful overview!
 
-This article nicely complements the existing articles in the topic group
+This explanation nicely complements the existing articles in the topic group
 5.32 on [detecting and handling dialogues and failures](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32).
 
 ####<a name="5"></a> Check API Changes using Decompilation
@@ -135,7 +135,7 @@ Repeat this process with another version of `RevitAPI.dll` to generate the decom
 
 ####<a name="6"></a> Railing Geometry
 
-Some more or less arbitrary yet still possibly useful aspects of the tricky task of accessing railing geometry might be gleaned from these snippets of an internal discussion:
+Some useful aspects of the tricky task of accessing railing geometry can be gleaned from these snippets of an internal discussion:
 
 Q: How can I extract the geometry from a `RailingType` element?
 

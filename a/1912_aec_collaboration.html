@@ -45,7 +45,7 @@ Many thanks to  for this very helpful explanation!
 -->
 
 <h3>AEC Collaboration</h3>
-<p>An upcoming AEC collaboration webinar and overviews over dockable panels, dialogue handling, decompilation and railing geometry:</p>
+<p>Here is an invitation to the upcoming AEC collaboration webinar and overviews over dockable panels, dialogue handling, decompilation and railing geometry:</p>
 <ul>
 <li><a href="#2">AEC collaboration webinar</a></li>
 <li><a href="#3">Dockable panels and <code>WebView2</code></a></li>
@@ -81,7 +81,7 @@ and we'll send you the recording after the webinar.</p>
 on <a href="https://archi-lab.net/webview2-and-revits-dockable-panel">WebView2 and Revit’s Dockable Panel</a>.</p>
 <p>Unfortunately, he runs into a problem using <code>WebView2</code> to host a browser in them.</p>
 <p>Many thanks to Konrad for the nice introduction to dockable panels and subsequent problem analysis!</p>
-<p>Jason Masters explained <a href="https://archi-lab.net/webview2-and-revits-dockable-panel/#comment-2813">how he solved the conflict by disentanglement</a>, like the suggestion to achieve
+<p>Jason Masters explained <a href="https://archi-lab.net/webview2-and-revits-dockable-panel/#comment-2813">how he solved the conflict using named pipes to connect to a separate UI process</a>, similar to the suggestion to achieve
 <a href="https://thebuildingcoder.typepad.com/blog/2019/04/set-floor-level-and-use-ipc-for-disentanglement.html#6">disentanglement and independence via IPC</a>:</p>
 <blockquote>
 <p>It’s so frustrating, because DLL hell was solved by Microsoft, like 15 years ago, using strong naming, but Autodesk just doesn’t support it.</p>
@@ -93,11 +93,11 @@ Still, the potential for DLL conflicts with different versions of <code>Newtonso
 discusses <a href="https://archi-lab.net/dismissing-revit-pop-ups-the-easy-and-not-so-easy-ways">dismissing Revit pop-ups &ndash; the easy and not so easy ways</a> and
 explains</p>
 <ul>
-<li>How to set up and use the <code>DialogBoxShowing</code> event for the Revit-API-style solution, as well as,</li>
+<li>How to set up and use the <code>DialogBoxShowing</code> event for the Revit-API-style solution</li>
 <li>Using the Win32Api <code>FindWindow</code> and <code>GetWindowText</code> methods to find the right button and simulate a user click on it</li>
 </ul>
-<p>Yet more thanks to Konrad for this helpful overview!</p>
-<p>This article nicely complements the existing articles in the topic group
+<p>Yet again many thanks to Konrad for this helpful overview!</p>
+<p>This explanation nicely complements the existing articles in the topic group
 5.32 on <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32">detecting and handling dialogues and failures</a>.</p>
 <h4><a name="5"></a> Check API Changes using Decompilation</h4>
 <p>Comparing changes between different versions of the Revit API is possible using
@@ -113,7 +113,7 @@ to:</p>
 </ul>
 <p>Repeat this process with another version of <code>RevitAPI.dll</code> to generate the decompiled source code, commit into the git repo to compare the different releases and the changes between them.</p>
 <h4><a name="6"></a> Railing Geometry</h4>
-<p>Some more or less arbitrary yet still possibly useful aspects of the tricky task of accessing railing geometry might be gleaned from these snippets of an internal discussion:</p>
+<p>Some useful aspects of the tricky task of accessing railing geometry can be gleaned from these snippets of an internal discussion:</p>
 <p>Q: How can I extract the geometry from a <code>RailingType</code> element?</p>
 <p>A: Last time I tried, the best way to get geometry was using the <code>IModelExportContext</code>, but I forget whether a railing type actually has geometry one can get from API or if it's all on the railing.</p>
 <p>There is also the <code>Element.Geometry</code> property, <code>GeometryElement</code> and <code>GeometryInstance</code> objects that can be obtained directly, but in case of railings it could have some specific complications.</p>
