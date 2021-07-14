@@ -20,8 +20,12 @@ add #thebuildingcoder
 
 #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+An invitation to the upcoming AEC collaboration webinar and overviews over dockable panels, dialogue handling, decompilation and railing geometry
+&ndash; AEC collaboration webinar
+&ndash; Dockable panels and <code>WebView2</code>
+&ndash; Dismissing Revit pop-ups
+&ndash; Check API changes using decompilation
+&ndash; Railing geometry...
 
 linkedin:
 
@@ -45,7 +49,7 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### AEC Collaboration
+### Collaboration, Dockables, Railings, Pop-Ups, ILSpy
 
 Here is an invitation to the upcoming AEC collaboration webinar and overviews over dockable panels, dialogue handling, decompilation and railing geometry:
 
@@ -168,8 +172,3 @@ That sounds right &ndash; a Railing geometrically should be small, one or a few 
 
 There is some potential difference with the continuous rails; these are separate Elements but you may see them as part of the Railing's geometry.
 In that case, it's also easy to encounter the continuous rails twice; in fact, Revit draws them twice, which is why you can tab select a top rail, for example, to toggle between the top rail alone and the railing which its attached to.
-
-
-
-
-
