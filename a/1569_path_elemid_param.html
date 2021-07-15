@@ -1,11 +1,11 @@
 <p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <script src="run_prettify.js" type="text/javascript"></script>
 <!--
 <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" type="text/javascript"></script>
 -->
-</head></p>
+<p></head></p>
 <!---
 
 - https://forums.autodesk.com/t5/revit-api-forum/elegant-way-to-get-possible-elementid-values-for-specific/m-p/7166198
@@ -37,9 +37,9 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-extract-points
 <p><strong>Question:</strong> I  want to find shortest safety path from any room to the exit in Revit.</p>
 <p>Thus, I plan to divide areas (like rooms, exit, floor, doors) into two-dimensional grids to form vertex or nodes, so that I can apply them in a pathfinding algorithm like <a href="https://en.wikipedia.org/wiki/A*_search_algorithm">A*</a>.</p>
 <p><center>
-<img src="img/Astar_progress_animation.gif" alt="Astar progress animation" width="210">
+<img src="img/Astar_progress_animation.gif" alt="Astar progress animation" width="210"></p>
 <p style="font-size:smaller">By Subh83 &ndash; Own work, <a href="http://creativecommons.org/licenses/by-sa/3.0" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=14916867">Link</a></p>
-</center></p>
+<p></center></p>
 <p>I noticed that Revit has provided coordinates in floats number which cannot be used directly, though. Is there some similar functionality which can achieve my plan in Revit API?</p>
 <p><strong>Answer:</strong> Regarding tips about handling the Revit floating point coordinates: That is pretty trivial. I suggest that you convert them to millimetres, store those in integer numbers, and base your calculations on that. Then you can convert the results back to the Revit imperial coordinates when needed.</p>
 <p>The path finding aspect is much more interesting and challenging, of course.</p>
@@ -226,12 +226,13 @@ the <a href="http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.53
 </pre>
 
 <p><strong>Response:</strong> Unfortunately that's not what I'm looking to accomplish. Please see the <a href="https://www.youtube.com/watch?v=b_1k3uXaQrY">video below</a> for a better explanation of what I'm trying to do:</p>
-<p><center>
+<p><center></p>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/b_1k3uXaQrY?rel=0" frameborder="0" allowfullscreen></iframe>
-</center></p>
+<p></center></p>
 <p>Maybe you might have another idea.</p>
 <p><strong>Answer:</strong> Actually, it <u>is</u> part of what you are trying to accomplish. With an <code>ElementParameterFilter</code>, you get a list of elements (if there are any) that have a value for the parameter in question, and then you may find all the relevant values, or display all the found values.</p>
 <p><strong>Response:</strong> Oh, I see now, VERY CLEVER!!!</p>
 <p>Just implemented and works like a charm. Only caveat like you say is "if there are any", but I can live with that.</p>
 <p>Thanks for the great tip!!!</p>
 <p>Many thanks again to Fair59 for all his exciting solutions!</p>
+<!-- A-star pathfinding algorithm -->

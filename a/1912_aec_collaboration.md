@@ -29,6 +29,15 @@ An invitation to the upcoming AEC collaboration webinar and overviews over docka
 
 linkedin:
 
+An invitation to the upcoming AEC collaboration webinar and overviews over dockable panels with and without WebView2, dialogue handling, decompilation and railing geometry in the #RevitAPI
+
+https://autode.sk/aeccollaboration
+
+- AEC collaboration webinar
+- Dockable panels and <code>WebView2</code>
+- Dismissing Revit pop-ups
+- Check API changes using decompilation
+- Railing geometry...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 

@@ -282,3 +282,5 @@ Just implemented and works like a charm. Only caveat like you say is "if there a
 Thanks for the great tip!!!
 
 Many thanks again to Fair59 for all his exciting solutions!
+
+<!-- A-star pathfinding algorithm -->
