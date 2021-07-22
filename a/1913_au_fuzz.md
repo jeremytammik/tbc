@@ -175,3 +175,5 @@ many_solar_panels.jpg
 jtracer
 running into all the hurdles described in [Learning from the real world: A hardware hobby project]
 https://stackoverflow.blog/2021/07/12/the-difference-between-software-and-hardware-projects/
+
+
