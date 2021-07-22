@@ -162,8 +162,8 @@ For more material on Dynamo, Python, and .NET, please refer to our earlier notes
 <li><a href="https://thebuildingcoder.typepad.com/blog/2020/04/2021-migration-add-in-language-and-bim360-login.html">2021 Migration, Add-In Language, BIM360 Research</a></li>                      1838:<"#3.1"> C&#35; versus Python
 <li><a href="https://thebuildingcoder.typepad.com/blog/2020/04/2021-migration-add-in-language-and-bim360-login.html">2021 Migration, Add-In Language, BIM360 Research</a></li>                      1838:<"#3.2"> Python and .NET
 <li><a href="https://thebuildingcoder.typepad.com/blog/2021/02/splits-persona-collector-region-tag-modification.html">Splits: Persona, Collector, Region, Tag, Modification</a></li>                1890:<"#5"> Python and Dynamo Autotag Without Overlap
-<li><a href="https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html">Addin File, Learning Python and IFC.js</a></li>                                           1893:<"#3"> Learning Python and Dynamo
-<li><a href="https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html">Addin File, Learning Python and IFC.js</a></li>                                           1893:<"#3.2"> Take Dynamo Further Using Python
+<li><a href="https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html#3">Learning Python and Dynamo</a></li>                                           1893:<"#3"> Learning Python and Dynamo
+<li><a href="https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html#3.2">Take Dynamo Further Using Python</a></li>                                           1893:<"#3.2"> Take Dynamo Further Using Python
 </ul>
 
 
