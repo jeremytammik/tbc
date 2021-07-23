@@ -130,7 +130,7 @@ That is completely normal and must be taken into account whenever dealing with r
 The same issue came up again right away in the discussion
 on [element geometry not returning expected face count](https://forums.autodesk.com/t5/revit-api-forum/element-geometry-not-returning-expected-face-count/m-p/10473778).
 
-Rudi @Revitalizer Honke veerry succinctly explained is, saying
+As Rudi @Revitalizer Honke very succinctly puts it:
 
 > when comparing double values, it is necessary to add some tolerance.
 
