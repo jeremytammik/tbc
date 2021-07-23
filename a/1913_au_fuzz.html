@@ -1,9 +1,8 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
-</head>
-
+<p></head></p>
 <!---
 
 - au registration open and free
@@ -19,7 +18,7 @@
 
 - afaik, the ultimate guide on [Getting started with Python]
   https://stackoverflow.blog/2021/07/14/getting-started-with-python/
-  
+
 - solar panels
   many_solar_panels.jpg
   jtracer
@@ -56,94 +55,73 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### Fuzz and Autodesk University
-
-AU coming up, fuzzy comparisons for all real numbers, Python material and time for a break:
-
-- [Autodesk University 2022 Open and Free](#2)
-- [Real Number Comparison Requires Fuzz](#3)
-- [Getting Started with Python](#4)
-- [Vacation Time](#5)
-
-####<a name="2"></a> Autodesk University 2022 Open and Free
-
-Registration is live for Autodesk University 2022.
- 
-This year the event is a free, virtual and global conference held on October 5-14.
-
-For more info on the conference as a whole, visit the conference page.
-
-If you are curious what Forge is doing, please check out the web page and blog:
- 
-- [AU conference](https://www.autodesk.com/autodesk-university/conference/overview)
-- [AU registration](https://autodeskuniversity.smarteventscloud.com/portal)
-- [Forge at AU](https://forge.autodesk.com/AU)
-- [Forge Bootcamp registration](https://www.eventbrite.com/e/forge-training-online-sept-13-17-2021-registration-157191924277)
-- [Forge Hackathon registration](https://forge.autodesk.com/hackathon)
-
-<center>
+<h3>Fuzz and Autodesk University</h3>
+<p>AU coming up, fuzzy comparisons for all real numbers, Python material and time for a break:</p>
+<ul>
+<li><a href="#2">Autodesk University 2022 Open and Free</a></li>
+<li><a href="#3">Real Number Comparison Requires Fuzz</a></li>
+<li><a href="#4">Getting Started with Python</a></li>
+<li><a href="#5">Vacation Time</a></li>
+</ul>
+<h4><a name="2"></a> Autodesk University 2022 Open and Free</h4>
+<p>Registration is live for Autodesk University 2022.</p>
+<p>This year the event is a free, virtual and global conference held on October 5-14.</p>
+<p>For more info on the conference as a whole, visit the conference page.</p>
+<p>If you are curious what Forge is doing, please check out the web page and blog:</p>
+<ul>
+<li><a href="https://www.autodesk.com/autodesk-university/conference/overview">AU conference</a></li>
+<li><a href="https://autodeskuniversity.smarteventscloud.com/portal">AU registration</a></li>
+<li><a href="https://forge.autodesk.com/AU">Forge at AU</a></li>
+<li><a href="https://www.eventbrite.com/e/forge-training-online-sept-13-17-2021-registration-157191924277">Forge Bootcamp registration</a></li>
+<li><a href="https://forge.autodesk.com/hackathon">Forge Hackathon registration</a></li>
+</ul>
+<p><center>
 <img src="img/au_2022_registration.jpg" alt="AU 2022 registration" title="AU 2022 registration" width="400"/> <!-- 774 -->
-</center>
-
-####<a name="3"></a> Real Number Comparison Requires Fuzz
-
-On a digital computer, all real number comparisons require fuzz.
-
-This means that you cannot compare two real numbers directly.
+</center></p>
+<h4><a name="3"></a> Real Number Comparison Requires Fuzz</h4>
+<p>On a digital computer, all real number comparisons require fuzz.</p>
+<p>This means that you cannot compare two real numbers directly.
 Instead, you test whether they are close enough together, where 'close enough' is defined by a given tolerance.
-The tolerance depends on the context and the type of comparison being made.
-
-Revit BIM geometry often ends up with significant imprecision due to various complex editing steps, so fuzz is especially important in this area.
-
-This was highlighted yet again by the 
-recent [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on a [weird double value supposed to be zero but isn't](https://forums.autodesk.com/t5/revit-api-forum/weird-double-value-that-suppose-to-be-0-but-isn-t/m-p/10443154):
-
-**Question:** This happens after I set the beam family parameter `Start Level Offset` and `End Level Offset` to any non-zero value and then change it back to zero again:
-
-<center>
+The tolerance depends on the context and the type of comparison being made.</p>
+<p>Revit BIM geometry often ends up with significant imprecision due to various complex editing steps, so fuzz is especially important in this area.</p>
+<p>This was highlighted yet again by the 
+recent <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on a <a href="https://forums.autodesk.com/t5/revit-api-forum/weird-double-value-that-suppose-to-be-0-but-isn-t/m-p/10443154">weird double value supposed to be zero but isn't</a>:</p>
+<p><strong>Question:</strong> This happens after I set the beam family parameter <code>Start Level Offset</code> and <code>End Level Offset</code> to any non-zero value and then change it back to zero again:</p>
+<p><center>
 <img src="img/almost_zero_1.png" alt="Number almost zero" title="Number almost zero" width="400"/> <!-- 1974 -->
 <br/>
 <img src="img/almost_zero_2.png" alt="Number almost zero" title="Number almost zero" width="400"/> <!-- 1077 -->
-</center>
-
-**Answer:** This is due to the imprecision associated with real numbers in digital computers.
-
-The 'weird' number that you see is not really weird at all.
-
-It is just a very small number written in exponential or scientific notation.
-Read about:
-
-- [Real numbers in computation](https://en.wikipedia.org/wiki/Real_number#In_computation)
-- [Scientific notation](https://en.wikipedia.org/wiki/Scientific_notation)
-
-From your description, it was generated by adding an offset and subtracting it again.
+</center></p>
+<p><strong>Answer:</strong> This is due to the imprecision associated with real numbers in digital computers.</p>
+<p>The 'weird' number that you see is not really weird at all.</p>
+<p>It is just a very small number written in exponential or scientific notation.
+Read about:</p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Real_number#In_computation">Real numbers in computation</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Scientific_notation">Scientific notation</a></li>
+</ul>
+<p>From your description, it was generated by adding an offset and subtracting it again.
 Both of the offsets were not represented precisely, e.g., because they were converted from metric to imperial units.
-The result is imprecise, almost exactly zero, but very slightly off.
-
-That is completely normal and must be taken into account whenever dealing with real numbers of a digital computer, for instance, in many operations, e.g., comparisons,  by adding some fuzz:
-
-- [Fuzzy comparison](https://thebuildingcoder.typepad.com/blog/2017/06/sensors-bim-ai-revitlookup-and-fuzzy-comparison.html#4)
-- [Fuzzy comparison versus exact arithmetic for curve intersection](https://thebuildingcoder.typepad.com/blog/2017/12/project-identifier-and-fuzzy-comparison.html#3)
-- [Importance of fuzz for curtain wall dimensioning](https://thebuildingcoder.typepad.com/blog/2018/12/rebars-in-host-net-framework-and-importance-of-fuzz.html#4)
-
-The same issue came up again right away in the discussion
-on [element geometry not returning expected face count](https://forums.autodesk.com/t5/revit-api-forum/element-geometry-not-returning-expected-face-count/m-p/10473778).
-
-Rudi @Revitalizer Honke veerry succinctly explained is, saying
-
-> when comparing double values, it is necessary to add some tolerance.
-
-> Values may differ by 0.000000001, for example.
-
-####<a name="4"></a> Getting Started with Python
-
-In case you are considering learning Python, or to get started with programming in general, 
-[freecodecamp](https://www.freecodecamp.org) published the ultimate guide
-on [getting started with Python](https://stackoverflow.blog/2021/07/14/getting-started-with-python).
-
-For more material on Dynamo, Python, and .NET, please refer to our earlier notes on
-
+The result is imprecise, almost exactly zero, but very slightly off.</p>
+<p>That is completely normal and must be taken into account whenever dealing with real numbers of a digital computer, for instance, in many operations, e.g., comparisons,  by adding some fuzz:</p>
+<ul>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2017/06/sensors-bim-ai-revitlookup-and-fuzzy-comparison.html#4">Fuzzy comparison</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2017/12/project-identifier-and-fuzzy-comparison.html#3">Fuzzy comparison versus exact arithmetic for curve intersection</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2018/12/rebars-in-host-net-framework-and-importance-of-fuzz.html#4">Importance of fuzz for curtain wall dimensioning</a></li>
+</ul>
+<p>The same issue came up again right away in the discussion
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/element-geometry-not-returning-expected-face-count/m-p/10473778">element geometry not returning expected face count</a>.</p>
+<p>Rudi @Revitalizer Honke veerry succinctly explained is, saying</p>
+<blockquote>
+<p>when comparing double values, it is necessary to add some tolerance.</p>
+<p>Values may differ by 0.000000001, for example.</p>
+</blockquote>
+<h4><a name="4"></a> Getting Started with Python</h4>
+<p>In case you are considering learning Python, or to get started with programming in general, 
+<a href="https://www.freecodecamp.org">freecodecamp</a> published the ultimate guide
+on <a href="https://stackoverflow.blog/2021/07/14/getting-started-with-python">getting started with Python</a>.</p>
+<p>For more material on Dynamo, Python, and .NET, please refer to our earlier notes on</p>
 <!--
 0964:Python the Hard Way
 1057:Interactive Revit Database Exploration Using the Revit Python Shell
@@ -191,8 +169,6 @@ For more material on Dynamo, Python, and .NET, please refer to our earlier notes
 <li><a href="https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html#3.2">Take Dynamo Further Using Python</a></li>
 </ul>
 
-####<a name="5"></a> Vacation Time
-
-I'll be mostly offline for the coming three weeks, from July 26 until August 13, spending time in nature in different parts of Switzerland.
-
-I wish you a happy and fruitful time until I return.
+<h4><a name="5"></a> Vacation Time</h4>
+<p>I'll be mostly offline for the coming three weeks, from July 26 until August 13, spending time in nature in different parts of Switzerland.</p>
+<p>I wish you a happy and fruitful time until I return.</p>
