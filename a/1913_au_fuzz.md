@@ -56,9 +56,9 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### Autodesk University 2021, Fuzz, Python and Break
+### Autodesk University 2021, Python, Fuzz and Break
 
-AU coming up, fuzzy comparisons for all real numbers, Python material and time for a break:
+AU registration is open, fuzzy comparison is important for real numbers, Python learning material and time for a break:
 
 - [Autodesk University 2021 Open and Free](#2)
 - [Real Number Comparison Requires Fuzz](#3)
