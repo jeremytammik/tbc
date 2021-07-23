@@ -56,18 +56,18 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### Fuzz and Autodesk University
+### Autodesk University 2021, Fuzz, Python and Break
 
 AU coming up, fuzzy comparisons for all real numbers, Python material and time for a break:
 
-- [Autodesk University 2022 Open and Free](#2)
+- [Autodesk University 2021 Open and Free](#2)
 - [Real Number Comparison Requires Fuzz](#3)
 - [Getting Started with Python](#4)
 - [Vacation Time](#5)
 
-####<a name="2"></a> Autodesk University 2022 Open and Free
+####<a name="2"></a> Autodesk University 2021 Open and Free
 
-Registration is live for Autodesk University 2022.
+Registration is live for Autodesk University 2021.
  
 This year the event is a free, virtual and global conference held on October 5-14.
 
@@ -82,7 +82,7 @@ If you are curious what Forge is doing, please check out the web page and blog:
 - [Forge Hackathon registration](https://forge.autodesk.com/hackathon)
 
 <center>
-<img src="img/au_2022_registration.jpg" alt="AU 2022 registration" title="AU 2022 registration" width="400"/> <!-- 774 -->
+<img src="img/au_2021_registration.jpg" alt="AU 2021 registration" title="AU 2021 registration" width="400"/> <!-- 774 -->
 </center>
 
 ####<a name="3"></a> Real Number Comparison Requires Fuzz
@@ -103,7 +103,7 @@ on a [weird double value supposed to be zero but isn't](https://forums.autodesk.
 
 <center>
 <img src="img/almost_zero_1.png" alt="Number almost zero" title="Number almost zero" width="400"/> <!-- 1974 -->
-<br/>
+<p></p>
 <img src="img/almost_zero_2.png" alt="Number almost zero" title="Number almost zero" width="400"/> <!-- 1077 -->
 </center>
 
