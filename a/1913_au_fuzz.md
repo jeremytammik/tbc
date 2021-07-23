@@ -58,6 +58,13 @@ Many thanks to  for this very helpful explanation!
 
 ### Fuzz and Autodesk University
 
+AU coming up, fuzzy comparisons for all real numbers, Python material and time for a break:
+
+- [Autodesk University 2022 Open and Free](#2)
+- [Real Number Comparison Requires Fuzz](#3)
+- [Getting Started with Python](#4)
+- [Vacation Time](#5)
+
 ####<a name="2"></a> Autodesk University 2022 Open and Free
 
 Registration is live for Autodesk University 2022.
@@ -186,6 +193,6 @@ For more material on Dynamo, Python, and .NET, please refer to our earlier notes
 
 ####<a name="5"></a> Vacation Time
 
-I'll be offline quite a lot in the coming three weeks, from July 26 until August 13, with various activities planned in nature in different parts of Switzerland.
+I'll be mostly offline for the coming three weeks, from July 26 until August 13, spending time in nature in different parts of Switzerland.
 
-I wish you a happy and fruitful time until then.
+I wish you a happy and fruitful time until I return.
