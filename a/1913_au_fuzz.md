@@ -32,8 +32,11 @@ add #thebuildingcoder
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash;
-...
+AU registration is open, fuzzy comparison is important for real numbers, Python learning material and time for a break
+&ndash; Autodesk University 2021 open and free
+&ndash; Real number comparison requires fuzz
+&ndash; Getting started with Python
+&ndash; Vacation time...
 
 linkedin:
 
@@ -60,10 +63,10 @@ Many thanks to  for this very helpful explanation!
 
 AU registration is open, fuzzy comparison is important for real numbers, Python learning material and time for a break:
 
-- [Autodesk University 2021 Open and Free](#2)
-- [Real Number Comparison Requires Fuzz](#3)
-- [Getting Started with Python](#4)
-- [Vacation Time](#5)
+- [Autodesk University 2021 open and free](#2)
+- [Real number comparison requires fuzz](#3)
+- [Getting started with Python](#4)
+- [Vacation time](#5)
 
 ####<a name="2"></a> Autodesk University 2021 Open and Free
 
