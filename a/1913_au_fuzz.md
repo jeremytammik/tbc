@@ -30,7 +30,7 @@ twitter:
 
 add #thebuildingcoder
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+AU registration is open, real number comparison always requires fuzz, Python learning material and time for vacation from the  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/au_python_fuzz_vacation
 
 AU registration is open, fuzzy comparison is important for real numbers, Python learning material and time for a break
 &ndash; Autodesk University 2021 open and free
