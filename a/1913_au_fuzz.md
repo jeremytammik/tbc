@@ -40,6 +40,15 @@ AU registration is open, fuzzy comparison is important for real numbers, Python 
 
 linkedin:
 
+AU registration is open, real number comparison always requires fuzz, Python learning material and time for vacation from the #RevitAPI
+
+https://autode.sk/au_python_fuzz_vacation
+
+- Autodesk University 2021 open and free
+- Real number comparison requires fuzz
+- Getting started with Python
+- Vacation time...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
