@@ -68,10 +68,10 @@ I am back from my break, which I mostly spent chilling with friends and hiking i
 
 Let's start getting back into the flow again with these news bites:
 
-####<a name="2"></a> Model polygon or triangle count
-####<a name="3"></a> Floor creation API clarification
-####<a name="4"></a> Dynamo Studio EOL
-####<a name="5"></a> My solar power project
+- [Model polygon or triangle count](#2)
+- [Floor creation API clarification](#3)
+- [Dynamo Studio EOL](#4)
+- [My solar power project](#5)
 
 ####<a name="2"></a> Total Modal Polygon or Triangle Count
 
