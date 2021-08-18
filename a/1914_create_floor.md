@@ -330,11 +330,14 @@ Some old APIs were obsoleted, and the new methods work a bit differently, so som
 
 Sorry for the late information, and I hope it still helps with your migration.
 
+It definitely helps for me, since I still have exactly two remaining warnings when compiling The Building Coder samples:
 
+- Warning	CS0618 `Document.NewFloor(CurveArray, bool)` is obsolete; this method is deprecated in Revit 2022 and may be removed in the future version of Revit. To create new instance of Floor, call Floor.Create() &ndash; in CmdEditFloor.cs line 119
+Warning	CS0618 `Document.NewSlab(CurveArray, Level, Line, double, bool)` is obsolete; this method is deprecated in Revit 2022 and may be removed in the future version of Revit. To create new instance of Floor, call Floor.Create() &ndash; in CmdCreateSlopedSlab.cs line 88
 
-<center>
-<img src="img/.jpg" alt="AU" title="" width="100"/> <!-- 774 -->
-</center>
+I can make use of the sample snippet to fix these two now :-)
+
+Many thanks to Oleg Sheidwasser for providing this!
 
 ####<a name="3"></a> Dynamo Studio EOL
 
