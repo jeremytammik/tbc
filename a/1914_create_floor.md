@@ -64,7 +64,202 @@ Many thanks to  for this very helpful explanation!
 
 ###
 
-####<a name="2"></a> Floor Creation API Clarification
+####<a name="2"></a> Total Modal Polygon or Triangle Count
+
+A recent [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+asked [how to get polygon count of the project](https://forums.autodesk.com/t5/revit-api-forum/how-to-get-polygon-count-of-the-project/m-p/10530975):
+
+**Question:** I am exporting the model into OBJ format.
+Is it possible to the polygon count or the number of triangles in the model before export?
+Does Revit provide any API for that?
+Can I count the polygons for each element and then add them all?
+
+**Answer:** No, no such API is provided ready-built.
+
+As a non-programmer, you could export your Revit project (.rvt) or family (.rfa) file to FBX format and use an external viewer to view and analyse that.
+For instance, in Revit, go to File > Export > FBX.
+Open the FBX file in [Microsoft 3D Viewer](https://www.microsoft.com/en-us/p/3d-viewer/9nblggh42ths).
+Depending on the file size, it may take a little while to open.
+A spinning 3D box icon will indicate loading is in progress.
+In the viewer, go to Tools and click on "Stats & Shading".
+It will list the number of triangles and vertices.
+The 3D Viewer is a free download if you don't already have it in Windows 10.
+
+As a programmer, you can do as you suggest, retrieve all the element geometry, tessellate it, and sum up the total number of triangles.
+
+You might find it easiest to do so using
+a [custom exporter](http://thebuildingcoder.typepad.com/blog/about-the-author.html#5.1).
+The result should be the same as in the FBX export.
+
+[@techXMKH9](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/5770785) very
+kindly shared a nice and minimal sample custom exporter implementtion which I integrated into a new external command `CmdTriangleCount`
+in [release 2022.0.151.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2022.0.151.0)
+of [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples):
+
+<pre class="code">
+<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">TriangleCounterContext</span>&nbsp;:&nbsp;IExportContext
+{
+&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;Document&nbsp;document;
+ 
+&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;Func&lt;<span style="color:blue;">bool</span>&gt;&nbsp;isCanceled;
+ 
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;Callback&nbsp;at&nbsp;end&nbsp;with&nbsp;total&nbsp;count&nbsp;of&nbsp;model&nbsp;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;geometry&nbsp;triangles&nbsp;and&nbsp;material&nbsp;ids</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;Action&lt;<span style="color:blue;">long</span>,&nbsp;<span style="color:blue;">int</span>&gt;&nbsp;callback;
+ 
+&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">long</span>&nbsp;numTriangles;
+ 
+&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;List&lt;ElementId&gt;&nbsp;materialIds;
+ 
+&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">bool</span>&nbsp;includeMaterials&nbsp;=&nbsp;<span style="color:blue;">true</span>;
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;TriangleCounterContext(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;Document&nbsp;document,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;Func&lt;<span style="color:blue;">bool</span>&gt;&nbsp;isCanceled,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;Action&lt;<span style="color:blue;">long</span>,&nbsp;<span style="color:blue;">int</span>&gt;&nbsp;callback&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">this</span>.isCanceled&nbsp;=&nbsp;isCanceled;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">this</span>.callback&nbsp;=&nbsp;callback;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">this</span>.document&nbsp;=&nbsp;document;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">this</span>.materialIds&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;List&lt;ElementId&gt;();
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;OnPolymesh(&nbsp;PolymeshTopology&nbsp;polymesh&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">this</span>.numTriangles&nbsp;+=&nbsp;(<span style="color:blue;">long</span>)&nbsp;polymesh.NumberOfFacets;
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;Finish()
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">this</span>.callback(&nbsp;<span style="color:blue;">this</span>.numTriangles,&nbsp;<span style="color:blue;">this</span>.materialIds.Count&nbsp;);
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">bool</span>&nbsp;IsCanceled()
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">false</span>;
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">bool</span>&nbsp;Start()
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">this</span>.materialIds&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;List&lt;ElementId&gt;();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;<span style="color:blue;">true</span>;
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;OnRPC(&nbsp;RPCNode&nbsp;node&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;OnLight(&nbsp;LightNode&nbsp;node&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;RenderNodeAction&nbsp;OnViewBegin(&nbsp;ViewNode&nbsp;node&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;node.LevelOfDetail&nbsp;=&nbsp;8;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;0;
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;OnViewEnd(&nbsp;ElementId&nbsp;elementId&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;RenderNodeAction&nbsp;OnFaceBegin(&nbsp;FaceNode&nbsp;node&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;0;
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;OnFaceEnd(&nbsp;FaceNode&nbsp;node&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;RenderNodeAction&nbsp;OnElementBegin(&nbsp;ElementId&nbsp;elementId&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;0;
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;OnElementEnd(&nbsp;ElementId&nbsp;elementId&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;RenderNodeAction&nbsp;OnInstanceBegin(&nbsp;InstanceNode&nbsp;node&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;0;
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;OnInstanceEnd(&nbsp;InstanceNode&nbsp;node&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;RenderNodeAction&nbsp;OnLinkBegin(&nbsp;LinkNode&nbsp;node&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;0;
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;OnLinkEnd(&nbsp;LinkNode&nbsp;node&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;OnMaterial(&nbsp;MaterialNode&nbsp;node&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">this</span>.includeMaterials&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;node.MaterialId&nbsp;==&nbsp;ElementId.InvalidElementId&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;<span style="color:blue;">this</span>.materialIds.Contains(&nbsp;node.MaterialId&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">this</span>.materialIds.Add(&nbsp;node.MaterialId&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
+}
+ 
+<span style="color:blue;">void</span>&nbsp;TriangleCountReport(&nbsp;<span style="color:blue;">long</span>&nbsp;nTriangles,&nbsp;<span style="color:blue;">int</span>&nbsp;nMaterials&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;s&nbsp;=&nbsp;<span style="color:blue;">string</span>.Format(
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Total&nbsp;number&nbsp;of&nbsp;model&nbsp;triangles&nbsp;and&nbsp;materials:&nbsp;&quot;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;<span style="color:#a31515;">&quot;&nbsp;{0}&nbsp;triangle{1},&nbsp;{2}&nbsp;material{3}&quot;</span>,
+&nbsp;&nbsp;&nbsp;&nbsp;nTriangles,&nbsp;Util.PluralSuffix(&nbsp;nTriangles&nbsp;),
+&nbsp;&nbsp;&nbsp;&nbsp;nMaterials,&nbsp;Util.PluralSuffix(&nbsp;nMaterials&nbsp;)&nbsp;);
+ 
+&nbsp;&nbsp;Debug.Print(&nbsp;s&nbsp;);
+&nbsp;&nbsp;TaskDialog.Show(&nbsp;<span style="color:#a31515;">&quot;Triangle&nbsp;Count&quot;</span>,&nbsp;s&nbsp;);
+}
+ 
+<span style="color:blue;">public</span>&nbsp;Result&nbsp;Execute(
+&nbsp;&nbsp;ExternalCommandData&nbsp;commandData,
+&nbsp;&nbsp;<span style="color:blue;">ref</span>&nbsp;<span style="color:blue;">string</span>&nbsp;message,
+&nbsp;&nbsp;ElementSet&nbsp;elements&nbsp;)
+{
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;app&nbsp;=&nbsp;commandData.Application;
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;uidoc&nbsp;=&nbsp;app.ActiveUIDocument;
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;doc&nbsp;=&nbsp;uidoc.Document;
+ 
+&nbsp;&nbsp;TriangleCounterContext&nbsp;context&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;TriangleCounterContext(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;doc,&nbsp;<span style="color:blue;">null</span>,&nbsp;TriangleCountReport&nbsp;);
+ 
+&nbsp;&nbsp;CustomExporter&nbsp;exporter&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;CustomExporter(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;doc,&nbsp;context&nbsp;);
+ 
+&nbsp;&nbsp;exporter.Export(&nbsp;doc.ActiveView&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;Result.Succeeded;
+}
+</pre>
+
+Here is the result of running it in a minimal sample model:
+
+<center>
+<img src="img/tbc_samples_triangle_count.png" alt="Triangle count" title="Triangle count" width="387"/> <!-- 974 -->
+</center>
+
+####<a name="3"></a> Floor Creation API Clarification
 
 The developement team provide some clarification on how to user
 the [new floor creation API](https://thebuildingcoder.typepad.com/blog/2021/04/whats-new-in-the-revit-2022-api.html#4.1.4.1) introduced
@@ -73,40 +268,64 @@ in Revit 2022.
 Some old APIs were obsoleted, and the new methods work a bit differently, so some instructions on how to migrate from the old API to the new may come in handy, especially a sample code snippet like this:
 
 <pre class="code">
-/// The example below shows how to use Floor.Create method to create a new Floor with specified elevation, on one level 
-/// using a geometry profile and a floor type. 
-/// It shows how to adapt your code that used NewFloor and NewSlab methods, which are obsolete since 2022.
-/// In this sample, the geometry profile is a CurveLoop of lines, you can also use arcs, ellipses and splines.
-Floor CreateFloorAtElevation(Document document, double elevation)
-{
-   // Get a floor type for floor creation
-   // You must provide a valid floor type (unlike in now obsolete NewFloor and NewSlab methods).
-   ElementId floorTypeId = Floor.GetDefaultFloorType(document, false);
-
-   // Get a level
-   // You must provide a valid level (unlike in now obsolete NewFloor and NewSlab methods).
-   double offset;
-   ElementId levelId = Level.GetNearestLevelId(document, elevation, out offset);
-
-   // Build a floor profile for the floor creation
-   XYZ first = new XYZ(0, 0, 0);
-   XYZ second = new XYZ(20, 0, 0);
-   XYZ third = new XYZ(20, 15, 0);
-   XYZ fourth = new XYZ(0, 15, 0);
-   CurveLoop profile = new CurveLoop();
-   profile.Append(Line.CreateBound(first, second));
-   profile.Append(Line.CreateBound(second, third));
-   profile.Append(Line.CreateBound(third, fourth));
-   profile.Append(Line.CreateBound(fourth, first));
-
-   // The elevation of the curve loops is not taken into account (unlike in now obsolete NewFloor and NewSlab methods).
-   // If the default elevation is not what you want, you need to set it explicitly.
-   var floor = Floor.Create(document, new List<CurveLoop> { profile }, floorTypeId, levelId);
-   Parameter param = floor.get_Parameter(BuiltInParameter.FLOOR_HEIGHTABOVELEVEL_PARAM);
-   param.Set(offset);
-
-   return floor;
-}
+<pre style="font-family:Consolas;font-size:13px;color:black;background:white;">{
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;The&nbsp;example&nbsp;below&nbsp;shows&nbsp;how&nbsp;to&nbsp;use&nbsp;Floor.Create&nbsp;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;method&nbsp;to&nbsp;create&nbsp;a&nbsp;new&nbsp;Floor&nbsp;with&nbsp;a&nbsp;specified&nbsp;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;elevation&nbsp;on&nbsp;a&nbsp;level&nbsp;using&nbsp;a&nbsp;geometry&nbsp;profile&nbsp;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;and&nbsp;a&nbsp;floor&nbsp;type.&nbsp;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;It&nbsp;shows&nbsp;how&nbsp;to&nbsp;adapt&nbsp;your&nbsp;old&nbsp;code&nbsp;using&nbsp;the</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;NewFloor&nbsp;and&nbsp;NewSlab&nbsp;methods,&nbsp;which&nbsp;became&nbsp;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;obsolete&nbsp;with&nbsp;Revit&nbsp;2022.</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;In&nbsp;this&nbsp;sample,&nbsp;the&nbsp;geometry&nbsp;profile&nbsp;is&nbsp;a&nbsp;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;CurveLoop&nbsp;of&nbsp;lines;&nbsp;you&nbsp;can&nbsp;also&nbsp;use&nbsp;arcs,&nbsp;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;ellipses&nbsp;and&nbsp;splines.</span>
+&nbsp;&nbsp;Floor&nbsp;CreateFloorAtElevation(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;Document&nbsp;document,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;elevation&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Get&nbsp;a&nbsp;floor&nbsp;type&nbsp;for&nbsp;floor&nbsp;creation</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;You&nbsp;must&nbsp;provide&nbsp;a&nbsp;valid&nbsp;floor&nbsp;type&nbsp;(unlike&nbsp;the&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;obsolete&nbsp;NewFloor&nbsp;and&nbsp;NewSlab&nbsp;methods).</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;ElementId&nbsp;floorTypeId&nbsp;=&nbsp;Floor.GetDefaultFloorType(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;document,&nbsp;<span style="color:blue;">false</span>&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Get&nbsp;a&nbsp;level</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;You&nbsp;must&nbsp;provide&nbsp;a&nbsp;valid&nbsp;level&nbsp;(unlike&nbsp;the&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;obsolete&nbsp;NewFloor&nbsp;and&nbsp;NewSlab&nbsp;methods).</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;offset;
+&nbsp;&nbsp;&nbsp;&nbsp;ElementId&nbsp;levelId&nbsp;=&nbsp;Level.GetNearestLevelId(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;document,&nbsp;elevation,&nbsp;<span style="color:blue;">out</span>&nbsp;offset&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Build&nbsp;a&nbsp;floor&nbsp;profile&nbsp;for&nbsp;the&nbsp;floor&nbsp;creation</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;first&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;XYZ(&nbsp;0,&nbsp;0,&nbsp;0&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;second&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;XYZ(&nbsp;20,&nbsp;0,&nbsp;0&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;third&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;XYZ(&nbsp;20,&nbsp;15,&nbsp;0&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;fourth&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;XYZ(&nbsp;0,&nbsp;15,&nbsp;0&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;CurveLoop&nbsp;profile&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;CurveLoop();
+&nbsp;&nbsp;&nbsp;&nbsp;profile.Append(&nbsp;Line.CreateBound(&nbsp;first,&nbsp;second&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;profile.Append(&nbsp;Line.CreateBound(&nbsp;second,&nbsp;third&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;profile.Append(&nbsp;Line.CreateBound(&nbsp;third,&nbsp;fourth&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;profile.Append(&nbsp;Line.CreateBound(&nbsp;fourth,&nbsp;first&nbsp;)&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;The&nbsp;elevation&nbsp;of&nbsp;the&nbsp;curve&nbsp;loops&nbsp;is&nbsp;not&nbsp;taken&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;into&nbsp;account&nbsp;(unlike&nbsp;the&nbsp;obsolete&nbsp;NewFloor&nbsp;and&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;NewSlab&nbsp;methods).</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;If&nbsp;the&nbsp;default&nbsp;elevation&nbsp;is&nbsp;not&nbsp;what&nbsp;you&nbsp;want,&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;you&nbsp;need&nbsp;to&nbsp;set&nbsp;it&nbsp;explicitly.</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;floor&nbsp;=&nbsp;Floor.Create(&nbsp;document,&nbsp;<span style="color:blue;">new</span>&nbsp;List&lt;CurveLoop&gt;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;profile&nbsp;},&nbsp;floorTypeId,&nbsp;levelId&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;Parameter&nbsp;param&nbsp;=&nbsp;floor.get_Parameter(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BuiltInParameter.FLOOR_HEIGHTABOVELEVEL_PARAM&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;param.Set(&nbsp;offset&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;floor;
+&nbsp;&nbsp;}
 </pre>
 
 Sorry for the late information, and I hope it still helps with your migration.
