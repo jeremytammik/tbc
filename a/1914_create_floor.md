@@ -62,7 +62,16 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-###
+### Triangle Count, Floor and Slab Creation
+
+I am back from my break, which I mostly spent chilling with friends and hiking in the Jura and Ticino hills and mountains in the west and south of Switzerland.
+
+Lets start getting back into the flow again with these news bites:
+
+####<a name="2"></a> Model polygon or triangle count
+####<a name="3"></a> Floor creation API clarification
+####<a name="4"></a> Dynamo Studio EOL
+####<a name="5"></a> My solar power project
 
 ####<a name="2"></a> Total Modal Polygon or Triangle Count
 
@@ -339,7 +348,7 @@ I can make use of the sample snippet to fix these two now :-)
 
 Many thanks to Oleg Sheidwasser for providing this!
 
-####<a name="3"></a> Dynamo Studio EOL
+####<a name="4"></a> Dynamo Studio EOL
 
 Dynamo Studio is nearing its end of life.
 
@@ -349,9 +358,7 @@ Please refer to
 the [Dynamo Studio Frequently Asked Questions](https://knowledge.autodesk.com/support/dynamo-studio/learn-explore/caas/simplecontent/content/dynamo-studio-faq.html) for
 detailed information on the current state and future plans for Dynamo.
 
-
-
-####<a name="4"></a> Solar Panels
+####<a name="5"></a> Solar Panels
 
 I started experimenting with solar panels and an off-grid system requiring a charger, battery and inverter to generate standard 230 V AC power. 
 
