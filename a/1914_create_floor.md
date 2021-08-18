@@ -66,7 +66,7 @@ Many thanks to  for this very helpful explanation!
 
 I am back from my break, which I mostly spent chilling with friends and hiking in the Jura and Ticino hills and mountains in the west and south of Switzerland.
 
-Lets start getting back into the flow again with these news bites:
+Let's start getting back into the flow again with these news bites:
 
 ####<a name="2"></a> Model polygon or triangle count
 ####<a name="3"></a> Floor creation API clarification
@@ -101,7 +101,7 @@ a [custom exporter](http://thebuildingcoder.typepad.com/blog/about-the-author.ht
 The result should be the same as in the FBX export.
 
 [@techXMKH9](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/5770785) very
-kindly shared a nice and minimal sample custom exporter implementtion which I integrated into a new external command `CmdTriangleCount`
+kindly shared a nice and minimal sample custom exporter implementation that I integrated into a new external command `CmdTriangleCount`
 in [release 2022.0.151.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2022.0.151.0)
 of [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples):
 
@@ -270,7 +270,7 @@ Here is the result of running it in a minimal sample model:
 
 ####<a name="3"></a> Floor Creation API Clarification
 
-The developement team provide some clarification on how to user
+The development team provide some clarification on how to user
 the [new floor creation API](https://thebuildingcoder.typepad.com/blog/2021/04/whats-new-in-the-revit-2022-api.html#4.1.4.1) introduced
 in Revit 2022.
 
@@ -369,7 +369,7 @@ They did not provide much power before almost midday in summertime, so I later a
 I ran into numerous challenges working with hardware rather than software, nicely described in the article
 on [learning from the real world: a hardware hobby project](https://stackoverflow.blog/2021/07/12/the-difference-between-software-and-hardware-projects).
 
-One such challenge was implemeting a perfomance monitor for the charger, including the required serial conection cables, etc.
+One such challenge was implementing a performance monitor for the charger, including the required serial connection cables, etc.
 I published a little piece of associated software in
 the [jtracer GitHub repository](https://github.com/jeremytammik/jtracer)
 
