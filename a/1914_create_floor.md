@@ -265,7 +265,7 @@ of [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 Here is the result of running it in a minimal sample model:
 
 <center>
-<img src="img/tbc_samples_triangle_count.png" alt="Triangle count" title="Triangle count" width="387"/> <!-- 974 -->
+<img src="img/tbc_samples_triangle_count.png" alt="Triangle count" title="Triangle count" width="487"/> <!-- 974 -->
 </center>
 
 ####<a name="3"></a> Floor Creation API Clarification
