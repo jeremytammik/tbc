@@ -348,7 +348,22 @@ It definitely helps for me, since I still have exactly two remaining warnings wh
 
 I can make use of the sample snippet to fix these two now :-)
 
-Many thanks to Oleg Sheidwasser for providing this!
+Many thanks to Oleg Sheydvasser for providing this!
+
+<!-- 
+Oleg Sheydvasser
+
+Hi Jeremy,
+Welcome back and thank you for posting the snippets.
+Thank you for mentioning me in the article.
+The last name however got misspelled as Oleg Sheidwasser.
+It's almost as my brother, Jim Scheidwasser, spelling :)
+
+Jeremy Tammik
+
+oops! sorry about that! in the back of my mind, i remember thinking of checking the spelling. i almost always avoid manual typing to avoid typos and use copy and paste instead. especially for you, i made an exception. and am promptly rewarded with a typo. so, my careful and sometimes anal habits are reconfirmed, as so often before, once again...  thank you for noticing and pointing it out!
+
+-->
 
 ####<a name="4"></a> Dynamo Studio EOL
 
