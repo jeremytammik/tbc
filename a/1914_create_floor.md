@@ -357,7 +357,7 @@ Please refer to
 the [Dynamo Studio Frequently Asked Questions](https://knowledge.autodesk.com/support/dynamo-studio/learn-explore/caas/simplecontent/content/dynamo-studio-faq.html) for
 detailed information on the current state and future plans for Dynamo.
 
-####<a name="5"></a> Solar Panels
+####<a name="5"></a> Solar Power Project
 
 I started experimenting with solar panels and an off-grid system requiring a charger, battery and inverter to generate standard 230 V AC power. 
 
