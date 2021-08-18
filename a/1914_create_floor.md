@@ -380,6 +380,6 @@ Once that is up and running, I may start on something bigger, trying to provide 
 I hope I don't end up with something like this:
 
 <center>
-<img src="img/many_solar_panels.jpg" alt="Solar panels" title="Solar panels" width="100"/> <!-- 774 -->
+<img src="img/many_solar_panels.jpg" alt="Solar panels" title="Solar panels" width="400"/> <!-- 800 -->
 </center>
 
