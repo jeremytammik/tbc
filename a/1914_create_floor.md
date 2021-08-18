@@ -6,6 +6,14 @@
 
 <!---
 
+- get total polygon count
+  How to get polygon count of the project
+  https://forums.autodesk.com/t5/revit-api-forum/how-to-get-polygon-count-of-the-project/m-p/10530975
+  CmdTriangleCount
+  tbc_samples_triangle_count.png 974
+  tbc samples implemented and tested and debugged and improved CmdTriangleCount
+  https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2022.0.151.0
+
 - blog about the code snippet and instruction on floor creation API   
   https://autodesk.slack.com/archives/C0SR6NAP8/p1627395932194800
   Oleg Sheydvasser 27 Jul at 16:25
@@ -14,6 +22,9 @@
   Where should I put the instructions? The What's new section, the snippets?
   Scott Conover:no_entry:  22 days ago
   Snippets would be helpful.  For immediate availability, I'd suggest providing any guidance to @Jeremy Tammik so he can post about it faster than we can release an updated SDK.
+
+- Dynamo Studio EOL
+  https://knowledge.autodesk.com/support/dynamo-studio/learn-explore/caas/simplecontent/content/dynamo-studio-faq.html
 
 - solar panels
   many_solar_panels.jpg
@@ -106,7 +117,17 @@ Sorry for the late information, and I hope it still helps with your migration.
 <img src="img/.jpg" alt="AU" title="" width="100"/> <!-- 774 -->
 </center>
 
-####<a name="3"></a>
+####<a name="3"></a> Dynamo Studio EOL
+
+Dynamo Studio is nearing its end of life.
+
+That does not affect the rest of the Dynamo project in any way, though, nor its many other incarnations in various shapes and forms.
+
+Please refer to
+the [Dynamo Studio Frequently Asked Questions](https://knowledge.autodesk.com/support/dynamo-studio/learn-explore/caas/simplecontent/content/dynamo-studio-faq.html) for
+detailed information on the current state and future plans for Dynamo.
+
+
 
 ####<a name="4"></a> Solar Panels
 
