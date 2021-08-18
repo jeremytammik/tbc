@@ -38,8 +38,11 @@ add #thebuildingcoder
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash;
-...
+Getting back into the flow after my summer break
+&ndash; Model polygon or triangle count
+&ndash; Floor creation API clarification
+&ndash; Dynamo Studio EOL
+&ndash; My solar power project...
 
 linkedin:
 
@@ -62,7 +65,7 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### Triangle Count, Floor and Slab Creation
+### Triangle Count, New Floor and Slab Creation
 
 I am back from my break, which I mostly spent chilling with friends and hiking in the Jura and Ticino hills and mountains in the west and south of Switzerland.
 
