@@ -46,6 +46,15 @@ Getting back into the flow after my summer break
 
 linkedin:
 
+My solar power project, Dynamo Studio EOL, model polygon or triangle count, floor and slab API clarification in the #RevitAPI
+
+https://autode.sk/floorslabapi
+
+- Model polygon or triangle count
+- Floor creation API clarification
+- Dynamo Studio EOL
+- My solar power project...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
