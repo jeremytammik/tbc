@@ -14,8 +14,11 @@ add #thebuildingcoder
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Opportunities to provide feedback on the Revit product, the Revit API and the Forge Design Automation API for Revit
+&ndash; Revit public roadmap update
+&ndash; Revit and DA4R API survey 2021
+&ndash; MacOS Big Sur upgrade
+&ndash; The Economist on ransomware and cybersecurity...
 
 linkedin:
 
@@ -76,6 +79,8 @@ now also ready and eagerly awaiting your input.
 > Please take this brief 5-minute survey to help the Revit team prioritize new features and upcoming enhancements to the future releases of the Autodesk Revit and the Forge Design Automation for Revit APIs. 
 
 > The survey remains open till September 24th.
+
+So, you have exactly one month's time from now.
 
 Thank you in advance for your time and interest!  
 
