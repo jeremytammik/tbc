@@ -6,6 +6,8 @@
 
 <!---
 
+- https://blogs.autodesk.com/revit/2021/07/06/revit-public-roadmap-update-summer-2021/
+
 twitter:
 
 add #thebuildingcoder
@@ -41,12 +43,19 @@ Many thanks to  for this very helpful explanation!
 
 ### Revit Roadmap, API and DA4R Survey
 
-####<a name="2"></a>
+####<a name="2"></a> Revit Public Roadmap Update
 
-Here is the result of running it in a minimal sample model:
+The [Revit Public Roadmap Update Summer 2021](https://blogs.autodesk.com/revit/2021/07/06/revit-public-roadmap-update-summer-2021)
+was published in July with the invitation to provide feedback via likes:
+
+> Autodesk Revit 2022 shipped in April and we have added new features to the Revit Public Roadmap.
+For a live look, check out
+the [Kanban board on Trello and like your favorites...](https://trello.com/b/ldRXK9Gw/revit-public-roadmap) 
+
+Please refer to the main article for a snapshot of the Summer 2021 update.
 
 <center>
-<img src="img/.png" alt="v" title="" width="100"/> <!-- 974 -->
+<img src="img/2021-07-06_revit_public_roadmap.jpg" alt="Revit public roadmap" title="Revit public roadmap" width="800"/> <!-- 1564 -->
 </center>
 
 ####<a name="3"></a> Revit and DA4R API Survey 2021
