@@ -57,7 +57,7 @@ was published last month with an invitation to provide feedback via likes:
 
 > Autodesk Revit 2022 shipped in April and we have added new features to the Revit Public Roadmap.
 For a live look, check out
-the [Kanban board on Trello and like your favorites...](https://trello.com/b/ldRXK9Gw/revit-public-roadmap) 
+the [Kanban board on Trello and like your favourites...](https://trello.com/b/ldRXK9Gw/revit-public-roadmap) 
 
 <center>
 <img src="img/2021-07-06_revit_public_roadmap.jpg" alt="Revit public roadmap" title="Revit public roadmap" width="800"/> <!-- 1564 -->
@@ -171,7 +171,7 @@ sudo bless --folder ~/mount/System/Library/CoreServices --bootefi --create-snaps
 
 ####<a name="5"></a> The Economist on Ransomware and Cybersecurity
 
-Still in nthe realm of computers and technology, but not Revit API related either, 
+Still in the realm of computers and technology, but not Revit API related either, 
 *The Economist* published a nice overview
 explaining how [ransomware highlights the challenges and subtleties of cybersecurity](https://www.economist.com/briefing/2021/06/19/ransomware-highlights-the-challenges-and-subtleties-of-cybersecurity) and
 how governments want to defend themselves &ndash; and attack others.
