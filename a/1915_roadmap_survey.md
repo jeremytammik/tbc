@@ -46,13 +46,11 @@ Many thanks to  for this very helpful explanation!
 ####<a name="2"></a> Revit Public Roadmap Update
 
 The [Revit Public Roadmap Update Summer 2021](https://blogs.autodesk.com/revit/2021/07/06/revit-public-roadmap-update-summer-2021)
-was published in July with the invitation to provide feedback via likes:
+was published in last month with an invitation to provide feedback via likes:
 
 > Autodesk Revit 2022 shipped in April and we have added new features to the Revit Public Roadmap.
 For a live look, check out
 the [Kanban board on Trello and like your favorites...](https://trello.com/b/ldRXK9Gw/revit-public-roadmap) 
-
-Please refer to the main article for a snapshot of the Summer 2021 update.
 
 <center>
 <img src="img/2021-07-06_revit_public_roadmap.jpg" alt="Revit public roadmap" title="Revit public roadmap" width="800"/> <!-- 1564 -->
@@ -60,27 +58,28 @@ Please refer to the main article for a snapshot of the Summer 2021 update.
 
 ####<a name="3"></a> Revit and DA4R API Survey 2021
 
-[Revit and Design Automation for Revit &ndash; API Survey 2021](https://forge.autodesk.com/blog/revit-and-design-automation-revit-api-survey-2021)
-BY MIKAKO HARADA
+Specifically targeted at us Revit add-in and Forge app programmers,
+the [Revit and Design Automation for Revit API Survey 2021](https://forge.autodesk.com/blog/revit-and-design-automation-revit-api-survey-2021) is
+now also ready and eagerly awaiting your input.
 
-The Revit product team is conducting a survey to improve the functionality of Revit services. Please take this brief 5 minutes survey to help the Revit team prioritize new features and upcoming enhancements to the future releases of Autodesk Revit and the Forge Design Automation for Revit. 
+> The Revit product team is conducting a survey to improve the functionality of Revit services:
 
-Survey is open till September 24th.
+> <center><a href="https://autodeskfeedback.az1.qualtrics.com/jfe/form/SV_ex5UwT1A2lj0s6y">GO TO REVIT API SURVEY</a></center>
+
+> Please take this brief 5-minute survey to help the Revit team prioritize new features and upcoming enhancements to the future releases of the Autodesk Revit and the Forge Design Automation for Revit APIs. 
+
+> The survey remains open till September 24th.
 
 Thank you in advance for your time and interest!  
 
-GO TO REVIT API SURVEY 
-
-https://autodeskfeedback.az1.qualtrics.com/jfe/form/SV_ex5UwT1A2lj0s6y
-
 ####<a name="4"></a> MacOS Big Sur Upgrade
 
-Company policy forced me to upgrade to Big Sur MacOS 11.5.2.
+Not related to Revit or its API, company policy forced me to upgrade to Big Sur MacOS 11.5.2.
 
 The upgrade went smoothly.
 
-However, a few things caused problems after the successful upgrade.
-Luckily, other people have faced and solved the same issues in the months since the initial Big Sur release:
+However, a few things caused problems for me personally after the successful upgrade.
+Luckily, other people have faced and solved the same issues in the months since the initial Big Sur release &ndash; so it was a good thing I was able to wait a while before diving into it:
 
 - [Unable to mount my `/a`, `/j`, `/m` and `/p` folders in the root dir](https://www.quora.com/Can-you-mount-the-root-system-file-system-as-writable-in-Big-Sur-MacOS-Big-Sur-Apple)
 - [Komodo editor stopped running](https://community.komodoide.com/t/komodo-and-big-sur-do-not-upgrade/5191/15)
@@ -146,7 +145,7 @@ sudo mount -o nobrowse -t apfs /dev/disk1s2 ~/mount
 
 -->
 
-Mainly for my personal future reference, here are the steps I ended up taking to mount my shortcut folder in the root directory:
+Mainly for my personal future reference, here are the steps I ended up taking to mount my shortcut folders in the root directory:
 
 <pre>
 mount --&gt; /dev/disk1s5s1 on / (apfs, sealed, local, read-only, journaled)
@@ -161,9 +160,11 @@ sudo ln -s /Volumes v
 sudo bless --folder ~/mount/System/Library/CoreServices --bootefi --create-snapshot
 </pre>
 
+
 ####<a name="5"></a> The Economist on Ransomware and Cybersecurity
 
+Still in nthe realm of computers and technology, but even less Revit API related, 
 The Economist published a nice overview
-stating that [ransomware highlights the challenges and subtleties of cybersecurity](https://www.economist.com/briefing/2021/06/19/ransomware-highlights-the-challenges-and-subtleties-of-cybersecurity) &ndash;
-governments want to defend themselves—and attack others.
+stating that [ransomware highlights the challenges and subtleties of cybersecurity](https://www.economist.com/briefing/2021/06/19/ransomware-highlights-the-challenges-and-subtleties-of-cybersecurity),
+explaining how governments want to defend themselves &ndash; and attack others.
 
