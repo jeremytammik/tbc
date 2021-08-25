@@ -12,7 +12,7 @@ twitter:
 
 add #thebuildingcoder
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Opportunities to provide feedback on the @AutodeskRevit product, the #RevitAPI and the @AutodeskForge Design Automation API for Revit https://autode.sk/rvtapisurvey2021
 
 Opportunities to provide feedback on the Revit product, the Revit API and the Forge Design Automation API for Revit
 &ndash; Revit public roadmap update
