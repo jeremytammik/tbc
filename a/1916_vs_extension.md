@@ -37,6 +37,14 @@ Two useful community contributions and some thoughts on global warming
 
 linkedin:
 
+Two useful #RevitAPI community contributions and some thoughts on global warming:
+
+https://autode.sk/vsextension
+
+- Nina for Revit
+- The BIMdev VS extension
+- The Economist on climate change
+- We are the weather...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
