@@ -28,9 +28,12 @@ twitter:
 add #thebuildingcoder
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
- 
-&ndash; 
-...
+
+Two useful community contributions and some thoughts on global warming
+&ndash; Nina for Revit
+&ndash; The BIMdev VS extension
+&ndash; The Economist on climate change
+&ndash; We are the weather...
 
 linkedin:
 
@@ -57,7 +60,7 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### VS Extension and Nina
+### Nina and a VS Revti Add-In Extension
 
 Two useful community contributions and some thoughts on global warming:
 
@@ -174,4 +177,4 @@ The fourth is something we can act on immediately, the next time we sit down to 
 
 This list is rather focus on *don'ts*...
 I prefer to look at the positive side of things, and what I <b><i>do</i></b> want to do.
-That takes much longer to explain, though :-)
+That takes longer to explain, though :-)
