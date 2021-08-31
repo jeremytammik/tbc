@@ -70,11 +70,11 @@ Two useful community contributions and some thoughts on global warming:
 
 Another nice community contribution
 is [Nina for Revit](https://github.com/franpossetto/Nina)
-by Francisco Possetto, [franpossetto](https://github.com/franpossetto):
+by Francisco [franpossetto](https://github.com/franpossetto) Possetto:
 
 > A collection of tiny tools to work faster in Revit.
-Most of these commands are availables in Revit but as options in second windows.
-As they are actions that the users repeats very often, the goal is to be able to access them quickly, using keyboard shorcuts.
+Most of these commands are availables in Revit, but as options in secondary windows.
+Since these actions are repeated often, the goal is to access them quickly, using keyboard shorcuts.
 
 <center>
 <img src="img/nina_for_revit.png" alt="Nina for Revit" title="Nina for Revit" width="350"/> <!-- 719 -->
