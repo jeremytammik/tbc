@@ -61,13 +61,30 @@ Many thanks to  for this very helpful explanation!
 
 Two useful community contributions and some thoughts on global warming:
 
-- [The BIMdev VS extension](#2)
-- [Nina for Revit](#3)
+- [Nina for Revit](#2)
+- [The BIMdev VS extension](#3)
 - [The Economist on climate change](#4)
 - [We are the weather](#5)
 
+####<a name="2"></a> Nina for Revit
 
-####<a name="2"></a> The BIMdev VS Extension
+Another nice community contribution
+is [Nina for Revit](https://github.com/franpossetto/Nina)
+by Francisco Possetto, [franpossetto](https://github.com/franpossetto):
+
+> A collection of tiny tools to work faster in Revit.
+Most of these commands are availables in Revit but as options in second windows.
+As they are actions that the users repeats very often, the goal is to be able to access them quickly, using keyboard shorcuts.
+
+<center>
+<img src="img/nina_for_revit.png" alt="Nina for Revit" title="Nina for Revit" width="350"/> <!-- 719 -->
+</center>
+
+I was not aware of these tools until they were mentioned in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on a [pyRevit extension to toggle point cloud visibility](https://forums.autodesk.com/t5/revit-api-forum/pyrevit-extension-to-toggle-point-cloud-visibility/m-p/10559876).
+
+####<a name="3"></a> The BIMdev VS Extension
 
 Leandro [theBIMdev](https://github.com/theBIMdev) Teles very kindly shares a new Visual Studio extension for Revit add-ins,
 [BIMDev Revit Tools RevitExtension](https://github.com/theBIMdev/RevitExtension).
@@ -127,24 +144,6 @@ Here are the links:
  
 Thank you for your attention, and I’m sure we’ll cross paths again in the forums.
  
-####<a name="3"></a> Nina for Revit
-
-Another nice community contribution
-is [Nina for Revit](https://github.com/franpossetto/Nina)
-by Francisco Possetto, [franpossetto](https://github.com/franpossetto):
-
-> A collection of tiny tools to work faster in Revit.
-Most of these commands are availables in Revit but as options in second windows.
-As they are actions that the users repeats very often, the goal is to be able to access them quickly, using keyboard shorcuts.
-
-<center>
-<img src="img/nina_for_revit.png" alt="Nina for Revit" title="Nina for Revit" width="350"/> <!-- 719 -->
-</center>
-
-I was not aware of these tools until they were mentioned in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on a [pyRevit extension to toggle point cloud visibility](https://forums.autodesk.com/t5/revit-api-forum/pyrevit-extension-to-toggle-point-cloud-visibility/m-p/10559876).
-
 ####<a name="4"></a> The Economist on Climate Change
 
 I read a scary article in The Economist about how the temperature on Earth keeps rising:
