@@ -80,7 +80,7 @@ Since these actions are repeated often, the goal is to access them quickly, usin
 <img src="img/nina_for_revit.png" alt="Nina for Revit" title="Nina for Revit" width="350"/> <!-- 719 -->
 </center>
 
-I was not aware of these tools until they were mentioned in
+Many thanks to Francisco for these, and pointing them out in his answer to
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on a [pyRevit extension to toggle point cloud visibility](https://forums.autodesk.com/t5/revit-api-forum/pyrevit-extension-to-toggle-point-cloud-visibility/m-p/10559876).
 
@@ -144,6 +144,8 @@ Here are the links:
  
 Thank you for your attention, and I’m sure we’ll cross paths again in the forums.
  
+ Many thanks to Leandro for this tool, and good luck with your new enterprise.
+
 ####<a name="4"></a> The Economist on Climate Change
 
 I read a scary article in The Economist about how the temperature on Earth keeps rising:
