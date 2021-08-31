@@ -141,16 +141,31 @@ I was not aware of these tools until they were mentioned in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on a [pyRevit extension to toggle point cloud visibility](https://forums.autodesk.com/t5/revit-api-forum/pyrevit-extension-to-toggle-point-cloud-visibility/m-p/10559876).
 
-####<a name="4"></a> 
+####<a name="4"></a> The Economist on Climate Change
 
+I read a scary article in The Economist about how the temperature on Earth keeps rising:
+[The IPCC delivers its starkest warning yet about climate change](https://www.economist.com/science-and-technology/the-ipcc-delivers-its-starkest-warning-yet-about-climate-change/21803522)
+&ndash; The effects of a hotter planet are visible around the world (you may need to subscribe to read the full article).
+They discuss how to reduce greenhouse gas emissions, especialy methane, and actively remove carbon dioxide from the atmosphere to prevent the warming of our planet.
 
-####<a name="5"></a> 
+####<a name="5"></a> We are the Weather
 
+On the same topic, I recently finished Jonathan Safran Foer's book [*We are the weather*](https://wearetheweatherbook.com).
 
-- I just read an interesting article from this week's The Economist about how the temperature on Earth keeps rising.
-  The recommended solution is to reduce greenhouse gas emissions, especialy methane, and actively remove carbon dioxide from the atmosphere to prevent the warming of our planet. Here's the link to the news article (you may need to subscribe to read the full article):
-  https://www.economist.com/science-and-technology/the-ipcc-delivers-its-starkest-warning-yet-about-climate-change/21803522
+I highly recommend it to anyone interested in an analysis of what each of us can do about the climate change problem right here and now.
+Basically, he recommends we eat less meat and consume less animal products.
+According to the reliable sources he quotes, raising animals is contributing somewhere between 14.5% and 51% of *all* greenhouse gases, more than airplanes, cars, industry, construction, heating, anything and everything else.
 
-- I also recently finished Jonathan Safran Foer's *We are the weather* and can highly recommend it to anyone interested in an analysis of what each of us can do about the problem right here and now. Basically, he recommends we eat less meat and consume less animal products. According to the reliable sources he quotes, raising animals is contributing somewhere between 14.5% and 51% of *all* greenhouse gases, more than airplanes, cars, industry, construction, heating, anything and everything else.
-  Carbon farming, carbon removal by agriculture and land management,  might help on a global scale: https://www.carboncycle.org/carbon-farming; for me, as an individual, i see just four immediate relevant options: don't fly; don't drive; don't have children; don't consume animal products. rather full of 'don't's.... i prefer to look at the positive side of things, and what i do want to do. that takes longer to explain, though :-)
-  https://autodesk.slack.com/archives/C0KBT3859/p1629308234337400
+[Carbon farming](https://www.carboncycle.org/carbon-farming), carbon removal by agriculture and land management, might help on a global scale;
+however, for an individual, he identifies just four immediate relevant options:
+
+- don't fly
+- don't drive
+- don't have children
+- don't consume animal products
+
+The fourth is something we can take action on immediately, the next time we sit down to have a meal.
+
+This list is rather focus on 'dont's'...
+I prefer to look at the positive side of things, and what I <b><i>do</i></b> want to do.
+That takes much longer to explain, though :-)
