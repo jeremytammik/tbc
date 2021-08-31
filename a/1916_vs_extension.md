@@ -63,7 +63,7 @@ Two generous community contributions and some thoughts on global warming:
 
 
 
-####<a name="2"></a> TheBimDev VS Extension
+####<a name="2"></a> The BIMdev VS Extension
 
 Leandro [theBIMdev](https://github.com/theBIMdev) Teles very kindly shares a new Visual Studio extension for Revit add-ins,
 [BIMDev Revit Tools RevitExtension](https://github.com/theBIMdev/RevitExtension).
@@ -123,16 +123,34 @@ Here are the links:
  
 Thank you for your attention, and I’m sure we’ll cross paths again in the forums.
  
- 
+####<a name="3"></a> Nina for Revit
+
+Another nice community contribution
+is [Nina for Revit](https://github.com/franpossetto/Nina)
+by Francisco Possetto, [franpossetto](https://github.com/franpossetto):
+
+> A collection of tiny tools to work faster in Revit.
+Most of these commands are availables in Revit but as options in second windows.
+As they are actions that the users repeats very often, the goal is to be able to access them quickly, using keyboard shorcuts.
+
 <center>
-<img src="img/" alt="" title="" width="100"/> <!-- 1564 -->
+<img src="img/nina_for_revit.png" alt="Nina for Revit" title="Nina for Revit" width="350"/> <!-- 719 -->
 </center>
 
-####<a name="3"></a> 
-
+I was not aware of these tools until they were mentioned in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on a [pyRevit extension to toggle point cloud visibility](https://forums.autodesk.com/t5/revit-api-forum/pyrevit-extension-to-toggle-point-cloud-visibility/m-p/10559876).
 
 ####<a name="4"></a> 
 
 
 ####<a name="5"></a> 
 
+
+- I just read an interesting article from this week's The Economist about how the temperature on Earth keeps rising.
+  The recommended solution is to reduce greenhouse gas emissions, especialy methane, and actively remove carbon dioxide from the atmosphere to prevent the warming of our planet. Here's the link to the news article (you may need to subscribe to read the full article):
+  https://www.economist.com/science-and-technology/the-ipcc-delivers-its-starkest-warning-yet-about-climate-change/21803522
+
+- I also recently finished Jonathan Safran Foer's *We are the weather* and can highly recommend it to anyone interested in an analysis of what each of us can do about the problem right here and now. Basically, he recommends we eat less meat and consume less animal products. According to the reliable sources he quotes, raising animals is contributing somewhere between 14.5% and 51% of *all* greenhouse gases, more than airplanes, cars, industry, construction, heating, anything and everything else.
+  Carbon farming, carbon removal by agriculture and land management,  might help on a global scale: https://www.carboncycle.org/carbon-farming; for me, as an individual, i see just four immediate relevant options: don't fly; don't drive; don't have children; don't consume animal products. rather full of 'don't's.... i prefer to look at the positive side of things, and what i do want to do. that takes longer to explain, though :-)
+  https://autodesk.slack.com/archives/C0KBT3859/p1629308234337400
