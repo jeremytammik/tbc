@@ -73,8 +73,8 @@ is [Nina for Revit](https://github.com/franpossetto/Nina)
 by Francisco [franpossetto](https://github.com/franpossetto) Possetto:
 
 > A collection of tiny tools to work faster in Revit.
-Most of these commands are availables in Revit, but as options in secondary windows.
-Since these actions are repeated often, the goal is to access them quickly, using keyboard shorcuts.
+Most of these commands are available in Revit, but as options in secondary windows.
+Since these actions are repeated often, the goal is to access them quickly, using keyboard shortcuts.
 
 <center>
 <img src="img/nina_for_revit.png" alt="Nina for Revit" title="Nina for Revit" width="350"/> <!-- 719 -->
@@ -91,8 +91,9 @@ Leandro [theBIMdev](https://github.com/theBIMdev) Teles very kindly shares a new
 
 Some personal background (skip if not interested):
 I’m originally from Brazil but grew up in New York and now live near Seattle.
-I have been in the manual labor side of the residential construction industry since I was 18 (I am now 38).
-Because of my personal circumstances, I was never able to receive any formal education or degrees but have always loved programming and software development. This love became my favorite hobby, making me great at googling and pushing myself to learn all that I could.
+I have been in the manual labour side of the residential construction industry since I was 18 (I am now 38).
+Because of my personal circumstances, I was never able to receive any formal education or degrees but have always loved programming and software development.
+This love became my favourite hobby, making me great at googling and pushing myself to learn all that I could.
 Almost 4 years ago I was introduced to Revit and became certified in it, which marked the start of my employment at The Conco Companies. Conco is a commercial concrete contracting company in the west coast of the US.
 I was hired as a 'VDC modeler' in the estimating department, and for the first time in my life, I had a desk job. While performing my duties in this role I discovered the great potential that Revit provides in the form of the Revit API.
 I was able to take all my informal experience and apply it to developing addins that were very helpful to the department.
@@ -151,14 +152,14 @@ Thank you for your attention, and I’m sure we’ll cross paths again in the fo
 I read a scary article in The Economist about how the temperature on Earth keeps rising:
 [The IPCC delivers its starkest warning yet about climate change](https://www.economist.com/science-and-technology/the-ipcc-delivers-its-starkest-warning-yet-about-climate-change/21803522)
 &ndash; The effects of a hotter planet are visible around the world (you may need to subscribe to read the full article).
-They discuss how to reduce greenhouse gas emissions, especialy methane, and actively remove carbon dioxide from the atmosphere to prevent the warming of our planet.
+They discuss how to reduce greenhouse gas emissions, especially methane, and actively remove carbon dioxide from the atmosphere to prevent the warming of our planet.
 
 ####<a name="5"></a> We are the Weather
 
 On the same topic, I recently finished Jonathan Safran Foer's book [*We are the weather*](https://wearetheweatherbook.com).
 
 I highly recommend it to anyone interested in an analysis of what each of us can do about the climate change problem right here and now.
-Basically, he recommends we eat less meat and consume less animal products.
+Basically, he recommends we eat less meat and consume less animal products in general.
 According to the reliable sources he quotes, raising animals is contributing somewhere between 14.5% and 51% of *all* greenhouse gases, more than airplanes, cars, industry, construction, heating, anything and everything else.
 
 [Carbon farming](https://www.carboncycle.org/carbon-farming), carbon removal by agriculture and land management, might help on a global scale;
@@ -169,8 +170,8 @@ however, for an individual, he identifies just four immediate relevant options:
 - don't have children
 - don't consume animal products
 
-The fourth is something we can take action on immediately, the next time we sit down to have a meal.
+The fourth is something we can act on immediately, the next time we sit down to have a meal.
 
-This list is rather focus on 'dont's'...
+This list is rather focus on *don'ts*...
 I prefer to look at the positive side of things, and what I <b><i>do</i></b> want to do.
 That takes much longer to explain, though :-)
