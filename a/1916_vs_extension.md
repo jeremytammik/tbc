@@ -59,8 +59,12 @@ Many thanks to  for this very helpful explanation!
 
 ### VS Extension and Nina
 
-Two generous community contributions and some thoughts on global warming:
+Two useful community contributions and some thoughts on global warming:
 
+- [The BIMdev VS extension](#2)
+- [Nina for Revit](#3)
+- [The Economist on climate change](#4)
+- [We are the weather](#5)
 
 
 ####<a name="2"></a> The BIMdev VS Extension
