@@ -63,14 +63,25 @@ Many thanks to  for this very helpful explanation!
 
 ### View Sheet from View and Select Level
 
+Lots of Python oriented discussions coming up in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160)
+and a final deprecated API clean-up:
+
+- [The Building Coder samples clean](#2)
+- [Retrieving all elements on level](#3)
+- [Get ViewSheet from View](#4)
+- [Fabrication transaction in Dynamo](#5)
+
 ####<a name="2"></a> The Building Coder Samples Clean
 
-Before diving into the other topics, I'll just mention in passing that the deprecated Revit API usage that remained after the initial migration to the Revit 2022 API has now been removed.
+Before diving into the Python oriented topics, I'll mention in passing that the deprecated Revit API usage remaining after
+the [initial migration](https://thebuildingcoder.typepad.com/blog/2021/04/revit-2022-sdk-and-the-building-coder-samples.html#5) to
+the Revit 2022 API has now been removed.
 
 The deprecated API usage was caused by calls to the `NewFloor` and `NewSlab` methods.
 
 The recent [floor creation API clarification](https://thebuildingcoder.typepad.com/blog/2021/08/triangle-count-floor-and-slab-creation.html#3) explained
-how to address this,
+how to easily address this,
 and [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
 [release 2022.0.151.4](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2022.0.151.4) implement
 the fix, cf.
@@ -80,7 +91,7 @@ the [diff to the previous release](https://github.com/jeremytammik/the_building_
 <img src="img/.png" alt="" title="" width="100"/> <!-- 719 -->
 </center>
 
-####<a name="3"></a>
+####<a name="3"></a> Retrieving all Elements on Level
 
 Perry Lackowski jumped through several hoops
 to [select all content on level](https://forums.autodesk.com/t5/revit-api-forum/select-all-content-on-level/m-p/10577273) and
