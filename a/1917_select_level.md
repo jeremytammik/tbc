@@ -188,7 +188,7 @@ I believe the correct way to check for this is by comparing the element id to `E
 I also added some options so you can select the starting element before or after launching the script.
 
 Unfortunately, I was forced to make a list of all the categories I want to search through, since I haven't found an easier way to filter down the `FilteredElementCollector`.
-I included maybe 30 of the morer than 1000 categories, but it's not an exhaustive list, and there's a possibility I missed a few important ones that I'll discover later.
+I included maybe 30 of the more than 1000 categories, but it's not an exhaustive list, and there's a possibility I missed a few important ones that I'll discover later.
 I wish this page separated the 3D model categories from the rest, but alas.
 
 <pre class="prettyprint">
@@ -482,7 +482,7 @@ You can more examples on how to use it in the samples from the Revit SDK package
 
 **Response:** Thank you @vlad.pavel.
 
-Just last night I came accross a comment of someone saying this, and have made some progress since.  Unfortunately I am encountering a new problem when I set the readonly bool to 'true':
+Just last night I came across a comment of someone saying this, and have made some progress since.  Unfortunately I am encountering a new problem when I set the readonly bool to 'true':
 
 <pre class="code">
   new FabricationTransaction(doc, true, "Test")
