@@ -97,7 +97,7 @@ the [diff to the previous release](https://github.com/jeremytammik/the_building_
 
 Perry Lackowski jumped through several hoops
 to [select all content on level](https://forums.autodesk.com/t5/revit-api-forum/select-all-content-on-level/m-p/10577273) and
-very kindly documented his progress and re4sults to achieve this:
+very kindly documented his progress and results to achieve this:
 
 **Question:** I'm trying to put together a new script for a structural engineer.
 He wants to be able to quickly see all the elements that are linked to a particular `Level` of his choosing.
