@@ -379,15 +379,71 @@ Many thanks to Perry for all his research and documentation of this work.
 
 ####<a name="4"></a> Get ViewSheet from View
 
-- Get ViewSheet from View
-  https://forums.autodesk.com/t5/revit-api-forum/get-viewsheet-from-view/m-p/10491156
-  12966349 [Get ViewSheet from View]
-  https://forums.autodesk.com/t5/revit-api-forum/get-viewsheet-from-view/m-p/7075550
-  Getting Title Block Data and ViewSheet from View
-  https://thebuildingcoder.typepad.com/blog/2020/02/get-title-block-data-and-viewsheet-from-view.html
-  Get ViewSheet from a given View
-  Just a snippet get_sheet_from_view(view) that will return you ViewSheet for a given View with the help of FilteredElementCollector and FilterStringRule.
-  https://www.erikfrits.com/blog/get-viewsheet-from-given-view-with-filteredelementcollector-and-filterstringrule/
+We already discussed and documented
+how to [retrieve a `ViewSheet` from a `View`](https://thebuildingcoder.typepad.com/blog/2020/02/get-title-block-data-and-viewsheet-from-view.html) based on
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+[get ViewSheet from View](https://forums.autodesk.com/t5/revit-api-forum/get-viewsheet-from-view/m-p/10491156).
+
+Erik Frits added a solution code snippet to that for Python developers:
+
+> You can use my [snippet made with `FilteredElementCollector` and `FilterStringRule`](https://www.erikfrits.com/blog/get-viewsheet-from-given-view-with-filteredelementcollector-and-filterstringrule):
+
+> **Get ViewSheet from a given View**
+
+> Just a snippet `get_sheet_from_view(view)` that will return you `ViewSheet` for a given `View` with the help of `FilteredElementCollector` and `FilterStringRule`.
+
+<pre class="prettyprint">
+# -*- coding: utf-8 -*-
+__title__ = "Get sheet from View"
+__author__ = "Erik Frits"
+
+#>>>>>>>>>>>>>>>>>>>> IMPORTS
+import clr, os
+from Autodesk.Revit.DB import *
+
+#>>>>>>>>>>>>>>>>>>>> VARIABLES
+doc = __revit__.ActiveUIDocument.Document
+uidoc = __revit__.ActiveUIDocument
+app = __revit__.Application
+
+
+#>>>>>>>>>>>>>>>>>>>> FUNCTIONS
+def create_string_equals_filter(key_parameter, element_value, caseSensitive = True):
+  """Function to create ElementParameterFilter based on FilterStringRule."""
+  f_parameter         = ParameterValueProvider(ElementId(key_parameter))
+  f_parameter_value   = element_value
+  caseSensitive       = True
+  f_rule              = FilterStringRule(f_parameter, FilterStringEquals(),
+                        f_parameter_value, caseSensitive)
+  return ElementParameterFilter(f_rule)
+
+def get_sheet_from_view(view):
+  #type:(View) -> ViewPlan
+  """Function to get ViewSheet associated with the given ViewPlan"""
+  
+  #>>>>>>>>>> CREATE FILTER 
+  my_filter = create_string_equals_filter(key_parameter=BuiltInParameter.SHEET_NUMBER,
+    element_value=view.get_Parameter(BuiltInParameter.VIEWER_SHEET_NUMBER).AsString() )
+
+  #>>>>>>>>>> GET SHEET
+  return FilteredElementCollector(doc)
+    .OfCategory(BuiltInCategory.OST_Sheets)
+    .WhereElementIsNotElementType()
+    .WherePasses(my_filter).FirstElement()
+
+#>>>>>>>>>>>>>>>>>>>> MAIN
+if __name__ == '__main__':
+
+  #>>>>>>>>>> ACTIVE VIEW
+  active_view = doc.ActiveView
+  sheet     = get_sheet_from_view(active_view)
+
+  #>>>>>>>>>> PRINT RESULTS
+  if sheet:   print('Sheet Found: {} - {}'.format(sheet.SheetNumber, sheet.Name))
+  else:     print('No sheet associated with the given view: {}'.format(active_view.Name))
+</pre>
+
+Thanks to Erik for sharing this.
 
 ####<a name="5"></a> Fabrication Transaction in Dynamo
 
