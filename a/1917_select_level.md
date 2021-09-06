@@ -6,45 +6,17 @@
 
 <!---
 
-- Leandro Teles <lteles@thebimdev.com>
-  Visual Studio extension
-
-- Nina for Revit
-  https://github.com/franpossetto/Nina
-  A collection of tiny tools to work faster in Revit. Most of these commands are availables in Revit but as options in second windows. As they are actions that the users repeats very often, the goal is to be able to access them quickly, using keyboard shorcuts.
-  pyRevit extension to toggle point cloud visibility
-  https://forums.autodesk.com/t5/revit-api-forum/pyrevit-extension-to-toggle-point-cloud-visibility/m-p/10559876
-
-- I just read an interesting article from this week's The Economist about how the temperature on Earth keeps rising.
-  The recommended solution is to reduce greenhouse gas emissions, especialy methane, and actively remove carbon dioxide from the atmosphere to prevent the warming of our planet. Here's the link to the news article (you may need to subscribe to read the full article):
-  https://www.economist.com/science-and-technology/the-ipcc-delivers-its-starkest-warning-yet-about-climate-change/21803522
-
-- I also recently finished Jonathan Safran Foer's *We are the weather* and can highly recommend it to anyone interested in an analysis of what each of us can do about the problem right here and now. Basically, he recommends we eat less meat and consume less animal products. According to the reliable sources he quotes, raising animals is contributing somewhere between 14.5% and 51% of *all* greenhouse gases, more than airplanes, cars, industry, construction, heating, anything and everything else.
-  Carbon farming, carbon removal by agriculture and land management,  might help on a global scale: https://www.carboncycle.org/carbon-farming; for me, as an individual, i see just four immediate relevant options: don't fly; don't drive; don't have children; don't consume animal products. rather full of 'don't's.... i prefer to look at the positive side of things, and what i do want to do. that takes longer to explain, though :-)
-  https://autodesk.slack.com/archives/C0KBT3859/p1629308234337400
 
 twitter:
 
 add #thebuildingcoder
 
-Two useful #RevitAPI community contributions, Nina for Revit, the BIMdev VS extension, and thoughts on global warming @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/vsextension
+ @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-Two useful community contributions and some thoughts on global warming
-&ndash; Nina for Revit
-&ndash; The BIMdev VS extension
-&ndash; The Economist on climate change
-&ndash; We are the weather...
+&ndash;
+...
 
 linkedin:
-
-Two useful #RevitAPI community contributions and some thoughts on global warming:
-
-https://autode.sk/vsextension
-
-- Nina for Revit
-- The BIMdev VS extension
-- The Economist on climate change
-- We are the weather...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -68,7 +40,7 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### Nina and a VS Revit Add-In Extension
+### 
 
 Two useful community contributions and some thoughts on global warming:
 
