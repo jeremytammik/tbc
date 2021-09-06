@@ -81,9 +81,6 @@ and <a href="https://github.com/jeremytammik/the_building_coder_samples">The Bui
 <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2022.0.151.4">release 2022.0.151.4</a> implement
 the fix, cf.
 the <a href="https://github.com/jeremytammik/the_building_coder_samples/compare/2022.0.151.3...2022.0.151.4">diff to the previous release</a>.</p>
-<p><center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 719 -->
-</center></p>
 <h4><a name="3"></a> Retrieving all Elements on Level</h4>
 <p>Perry Lackowski jumped through several hoops
 to <a href="https://forums.autodesk.com/t5/revit-api-forum/select-all-content-on-level/m-p/10577273">select all content on level</a> and
@@ -359,6 +356,9 @@ else:
 </pre>
 
 <p>Many thanks to Perry for all his research and documentation of this work.</p>
+<p><center>
+<img src="img/spiritlevel.jpg" alt="Spirit level" title="Spirit level" width="400"/> <!-- 1000 -->
+</center></p>
 <h4><a name="4"></a> Get ViewSheet from View</h4>
 <p>We already discussed and documented
 how to <a href="https://thebuildingcoder.typepad.com/blog/2020/02/get-title-block-data-and-viewsheet-from-view.html">retrieve a <code>ViewSheet</code> from a <code>View</code></a> based on
@@ -459,7 +459,7 @@ Please advise!</p>
 In zero touch nodes with the advance steel API, you should use the <code>DocContext</code> class from <code>AdvanceSteelServices.dll</code> located in the sub-folder under Revit.exe, in <em>[Revit.exe path]\Addins\DynamoForRevit\Revit\nodes\steel-pkg\bin</em>.
 For the pure Revit API, you should use <em>RevitServices.Transactions.TransactionManager.Instance.EnsureInTransaction</em> from <code>RevitServices.dll</code>.</p>
 <p>So, for steel transactions in Dynamo for Revit, please replace</p>
-<pre class="prettyprint">
+<pre class="code">
   using(FabricationTransaction trans = new Fabrication...)
   {
     trans.commit()
@@ -467,7 +467,7 @@ For the pure Revit API, you should use <em>RevitServices.Transactions.Transactio
 </pre>
 
 <p>by</p>
-<pre class="prettyprint">
+<pre class="code">
   using (var ctx = new Dynamo.Applications.AdvanceSteel.Services.DocContext())
   {
     ...

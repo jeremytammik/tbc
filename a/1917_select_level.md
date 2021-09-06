@@ -87,10 +87,6 @@ and [The Building Coder samples](https://github.com/jeremytammik/the_building_co
 the fix, cf.
 the [diff to the previous release](https://github.com/jeremytammik/the_building_coder_samples/compare/2022.0.151.3...2022.0.151.4).
 
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 719 -->
-</center>
-
 ####<a name="3"></a> Retrieving all Elements on Level
 
 Perry Lackowski jumped through several hoops
@@ -388,6 +384,10 @@ else:
 
 Many thanks to Perry for all his research and documentation of this work.
 
+<center>
+<img src="img/spiritlevel.jpg" alt="Spirit level" title="Spirit level" width="400"/> <!-- 1000 -->
+</center>
+
 ####<a name="4"></a> Get ViewSheet from View
 
 We already discussed and documented
@@ -506,7 +506,7 @@ For the pure Revit API, you should use *RevitServices.Transactions.TransactionMa
 
 So, for steel transactions in Dynamo for Revit, please replace
 
-<pre class="prettyprint">
+<pre class="code">
   using(FabricationTransaction trans = new Fabrication...)
   {
     trans.commit()
@@ -515,7 +515,7 @@ So, for steel transactions in Dynamo for Revit, please replace
 
 by
 
-<pre class="prettyprint">
+<pre class="code">
   using (var ctx = new Dynamo.Applications.AdvanceSteel.Services.DocContext())
   {
     ...
