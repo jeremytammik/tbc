@@ -377,6 +377,84 @@ else:
 
 Many thanks to Perry for all his research and documentation of this work.
 
-####<a name="4"></a> 
+####<a name="4"></a> Get ViewSheet from View
 
-####<a name="5"></a> 
+- Get ViewSheet from View
+  https://forums.autodesk.com/t5/revit-api-forum/get-viewsheet-from-view/m-p/10491156
+  12966349 [Get ViewSheet from View]
+  https://forums.autodesk.com/t5/revit-api-forum/get-viewsheet-from-view/m-p/7075550
+  Getting Title Block Data and ViewSheet from View
+  https://thebuildingcoder.typepad.com/blog/2020/02/get-title-block-data-and-viewsheet-from-view.html
+  Get ViewSheet from a given View
+  Just a snippet get_sheet_from_view(view) that will return you ViewSheet for a given View with the help of FilteredElementCollector and FilterStringRule.
+  https://www.erikfrits.com/blog/get-viewsheet-from-given-view-with-filteredelementcollector-and-filterstringrule/
+
+####<a name="5"></a> Fabrication Transaction in Dynamo
+
+Lucas de Jong of [WSP Canada](https://www.wsp.com) clarified how to access a fabrication transaction in Dynamo, with invaluable support from Vlad Pavel of the Autodesk Revit development team, in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [why 'Modify parameters' returns null for a newly created structural connection](https://forums.autodesk.com/t5/revit-api-forum/why-modify-parameters-returns-null-for-newly-created-structural/m-p/10577688):
+
+**Question:** I got it working in a Revit Addin, but I am trying to get it working inside of a Dynamo Zero-Touch-Node.
+Any reason why my `GetFilerObject` returns null inside a Zero-Touch-Node?
+Any help is greatly appreciated.
+My code is mostly (if not all) copied from the SDK sample. 
+
+**Answer:** You should create a fabrication transaction in order to open a steel object:
+ 
+<pre class="code">
+  using ( FabricationTransaction trans
+    = new FabricationTransaction( doc, false, "Test" ) )
+  {
+    FilerObject filerObj = FilerObject.GetFilerObjectByHandle(asHandle);
+    ...
+  }
+>/pre>
+
+You can more examples on how to use it in the samples from the Revit SDK packages.
+
+**Response:** Thank you @vlad.pavel.
+
+Just last night I came accross a comment of someone saying this, and have made some progress since.  Unfortunately I am encountering a new problem when I set the readonly bool to 'true':
+
+<pre class="code">
+  new FabricationTransaction(doc, true, "Test")
+</pre>
+
+I can now extract the parameter values.
+So, that is a win for now.
+Then, of course, I want to edit the parameters also, like it was done in the SDK sample.
+
+When I leave the boolean on 'true' and try to write, load and update the `UserAutoConstructionObject`, Revit crashes.
+
+When I set it to 'false', I get the error message that I cannot start a new transaction.
+I hope that when I solve that issue, I have made it to the finish.
+Please advise!
+
+Please remember this is not in an external command, but in a Dynamo zero-touch-node.
+
+**Answer:** Looks like in Dynamo for Revit there are special mechanisms that handle the Revit &amp; Steel transactions.
+In zero touch nodes with the advance steel API, you should use the `DocContext` class from `AdvanceSteelServices.dll` located in the sub-folder under Revit.exe, in *[Revit.exe path]\Addins\DynamoForRevit\Revit\nodes\steel-pkg\bin*.
+For the pure Revit API, you should use *RevitServices.Transactions.TransactionManager.Instance.EnsureInTransaction* from `RevitServices.dll`.
+
+So, for steel transactions in Dynamo for Revit, please replace
+
+<pre class="prettyprint">
+  using(FabricationTransaction trans = new Fabrication...)
+  {
+    trans.commit()
+  } 
+</pre>
+
+by
+
+<pre class="prettyprint">
+  using (var ctx = new Dynamo.Applications.AdvanceSteel.Services.DocContext())
+  {
+    ...
+  }
+</pre>
+
+**Response:** @vlad.pavel I am so happy, you made my day!
+It worked perfectly! 
+
