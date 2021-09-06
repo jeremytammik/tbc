@@ -476,7 +476,7 @@ My code is mostly (if not all) copied from the SDK sample.
     FilerObject filerObj = FilerObject.GetFilerObjectByHandle(asHandle);
     ...
   }
->/pre>
+</pre>
 
 You can more examples on how to use it in the samples from the Revit SDK packages.
 
