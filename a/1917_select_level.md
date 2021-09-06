@@ -455,6 +455,12 @@ by
   }
 </pre>
 
+The Dynamo-Revit code is open source; that is where I found how to use transactions in zero touch nodes.
+For example,
+the [`Wall` class](https://github.com/DynamoDS/DynamoRevit/blob/master/src/Libraries/RevitNodes/Elements/Wall.cs) creates
+a wall.
+Unfortunately, we don't yet have any official documentation for this feature.
+
 **Response:** @vlad.pavel I am so happy, you made my day!
 It worked perfectly! 
 
