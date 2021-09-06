@@ -34,8 +34,13 @@ add #thebuildingcoder
 
  @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash;
-...
+View Sheet from View and Select All on Level
+
+Increasing numbers of of Python and Dynamo oriented topics in the Revit API discussion forum, and a final deprecated API clean-up
+&ndash; The Building Coder samples clean
+&ndash; Retrieving all elements on level
+&ndash; Get ViewSheet from View
+&ndash; Fabrication transaction in Dynamo...
 
 linkedin:
 
@@ -61,11 +66,12 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### View Sheet from View and Select Level
+### View Sheet from View and Select All on Level
 
-Lots of Python oriented discussions coming up in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160)
-and a final deprecated API clean-up:
+The number of Python and Dynamo oriented topics in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) is 
+increasing.
+Here are some of them, and a final deprecated API clean-up:
 
 - [The Building Coder samples clean](#2)
 - [Retrieving all elements on level](#3)
@@ -83,7 +89,7 @@ The deprecated API usage was caused by calls to the `NewFloor` and `NewSlab` met
 The recent [floor creation API clarification](https://thebuildingcoder.typepad.com/blog/2021/08/triangle-count-floor-and-slab-creation.html#3) explained
 how to easily address this,
 and [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
-[release 2022.0.151.4](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2022.0.151.4) implement
+[release 2022.0.151.4](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2022.0.151.4) implements
 the fix, cf.
 the [diff to the previous release](https://github.com/jeremytammik/the_building_coder_samples/compare/2022.0.151.3...2022.0.151.4).
 
@@ -93,7 +99,7 @@ Perry Lackowski jumped through several hoops
 to [select all content on level](https://forums.autodesk.com/t5/revit-api-forum/select-all-content-on-level/m-p/10577273) and
 very kindly documented his progress and re4sults to achieve this:
 
-***Question:** I'm trying to put together a new script for a structural engineer.
+**Question:** I'm trying to put together a new script for a structural engineer.
 He wants to be able to quickly see all the elements that are linked to a particular `Level` of his choosing.
 I chose to break this into two parts:
 
