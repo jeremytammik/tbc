@@ -44,6 +44,19 @@ Increasing numbers of of Python and Dynamo oriented topics in the Revit API disc
 
 linkedin:
 
+Fabrication transactions, retrieving all elements on level and getting ViewSheet from View in in Python, DynamoBim and the #RevitAPI
+
+https://autode.sk/selectonlevel
+
+View Sheet from View and Select All on Level
+
+Increasing numbers of of Python and Dynamo oriented topics in the Revit API discussion forum, and a final deprecated API clean-up:
+
+- The Building Coder samples clean
+- Retrieving all elements on level
+- Get ViewSheet from View
+- Fabrication transaction in Dynamo...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
