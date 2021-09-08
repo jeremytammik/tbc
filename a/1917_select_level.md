@@ -328,8 +328,11 @@ else:
 
 #print "Element selected: " + selected_element.Name
 
-# print "Search selected element for its reference level's element ID"
-target_level_id = get_level_id(selected_element)
+# print "Check if selected element is a Level and get its ID. If not, search through the parameters for the reference level."
+if selected_element.Category.Name.Equals("Levels"):
+  target_level_id = selected_element.Id
+else:
+  target_level_id = get_level_id(selected_element)
 # print target_level_id
 
 if target_level_id is not None:
