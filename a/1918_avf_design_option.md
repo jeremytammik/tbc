@@ -18,10 +18,12 @@ twitter:
 
 add #thebuildingcoder
 
- the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+Open source projects that help clean up parameter values, the Revit model and other operations, an important AVF cleanup required to prevent crashing, and some youngsters cleaning up some cash with the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+Open source projects that help clean up parameter values, the Revit model and other operations, an important AVF cleanup required to prevent crashing, and some youngsters cleaning up some cash
+&ndash; Kfpopeye open source projects
+&ndash; AVF result clean-up before design option switch
+&ndash; Young teen and kid sister crypto entrepreneurs...
 
 linkedin:
 
