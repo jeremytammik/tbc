@@ -47,9 +47,9 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### Cleanup Projects: Kfpopeye Sweeper, Open Source, AVF
+### Kfpopeye Open Source, AVF and Other Cleanup
 
-Lots of cleaning up operations:
+Lots of clean-up operations:
 open source projects that help clean up a Revit model, certain parameter values and other operations, an important AVF cleanup required to prevent crashing, and some youngsters cleaning up some cash:
 
 - [Kfpopeye open source projects](#2)
