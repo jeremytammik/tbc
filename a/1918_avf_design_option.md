@@ -25,8 +25,6 @@ add #thebuildingcoder
 
 linkedin:
 
-
-
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -50,8 +48,6 @@ Many thanks to  for this very helpful explanation!
 -->
 
 ### Cleanup Projects: Kfpopeye Sweeper, Open Source, AVF
-
-
 
 ####<a name="2"></a> Kfpopeye Open Source Projects
 
@@ -133,7 +129,6 @@ Here is the code:
 
 <pre class="code">
 
-
             var views = new FilteredElementCollector(doc)
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(View))
@@ -154,23 +149,14 @@ Since there is no change to the model itself, no need to open a transaction.
 
 **Answewr:** I haven't tested your code, but I see some potential problems (they could or could not really occured).
 
- 
-
 The first is View itself, it could be a template, a schedule or other table views, it could be a view sheet or some "internal" views such as project browser. Not sure if GetSpatialManager would throw an exception in these cases now (remember, this behaviour could change in future Revit releases), but I would add a check, something like that:
-
- 
 
 ...
 .Cast<View>()
 .Where(x => x.AllowsAnalysisDisplay()
 </pre>
- 
-
- 
 
 The second thing, are you sure you have to check all views from the model? Maybe it will be enough to check opened views only?
-
- 
 
 var views = uidoc
 	.GetOpenUIViews()
@@ -180,39 +166,22 @@ var views = uidoc
 	.ToList();
 </pre>
 
-
- 
 **response:** Thanks for the check.
 
- 
-
 Yes; I would have added `AllowAnalysisDisplay` too, if I had known it exists : P
-
- 
 
 I tried closing the view, then re-opening it; the AVF object is still there.
 So, I need to do a document-wide search, not just opened views.
 
 Many thanks to Zhu Liyi for raising this and to Alexander for the good solution!
 
-<center>
-<img src="img/" alt="" title="" width="100"/> <!-- 1000 -->
-</center>
-
 ####<a name="4"></a> Young Teen and Kid Sister Crypto Entrepreneurs
 
 A sweet and impressive story about how much is possible nowadays, given appropriate right support and motivation:
 
 [14- and 9-year-old siblings earn over $30,000 a month mining cryptocurrency](https://www.cnbc.com/2021/08/31/kid-siblings-earn-thousands-per-month-mining-crypto-like-bitcoin-eth.html)
-  
 
-
-####<a name="5"></a> 
- 
- 
-<pre class="code">
-</pre>
-
-
-
+<center>
+<img src="img/crypto_entrepreneurs.jpg" alt="Crypto entrepreneurs" title="Crypto entrepreneurs" width="400"/> <!-- 630 -->
+</center>
 
