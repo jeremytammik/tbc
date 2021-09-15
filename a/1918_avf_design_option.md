@@ -51,16 +51,16 @@ Many thanks to  for this very helpful explanation!
 
 ####<a name="2"></a> Kfpopeye Open Source Projects
 
-[kfpemail-2](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/11350013) kindly announced a bunch of new open Revit add-in projects in
+[Kfpemail-2](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/11350013) kindly announced a bunch of new open Revit add-in projects in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [Project Sweeper, ReVVed, and other apps now open source](https://forums.autodesk.com/t5/revit-api-forum/project-sweeper-revved-and-other-apps-now-open-source/m-p/10617548):
 
 A while ago I decided to shut down [pkh Lineworks](http://www.pkhlineworks.ca) and
-I discontinued work on my apps Project Sweeper, MLTE, ReVVed, Paraline and Knock Knock.
+discontinue work on my apps Project Sweeper, MLTE, ReVVed, Paraline and Knock Knock.
 I have now decided to make them open source, so anyone can download the code and continue to update them for future versions of Revit.
 
 The repositories can be found in
-the [kfpopeye](https://github.com/kfpopeye)
+the [Kfpopeye](https://github.com/kfpopeye)
 [repositories](https://github.com/kfpopeye?tab=repositories) on GitHub:
 
 - MLTE
@@ -77,14 +77,14 @@ I just added a readme file with a bit more information for them, plus a zip file
 - Project-Sweeper &ndash; a collection of tools that allow a user to quickly and accurately remove the following clutter from Revit projects: line styles line patterns text styles fill region types and fill patterns. Except for text styles, these items are not checked by Revit's "Purge Unused" command. Project Sweeper goes beyond just checking for unused styles and patterns. It also allows a user to convert from one style\pattern to another, delete all the elements using a style\pattern and to preview all the views\elements using a style\pattern before removing it.
 - ReVVed &ndash; an extension of commands for use within Autodesk® Revit
 
-Many thanks to [pkh Lineworks](http://www.pkhlineworks.ca) and [kfpopeye](https://github.com/kfpopeye) for sharing this work!
+Many thanks to [pkh Lineworks](http://www.pkhlineworks.ca) and [Kfpopeye](https://github.com/kfpopeye) for sharing this work!
 
 ####<a name="3"></a> AVF Result Clean-Up before Design Option Switch
 
 Zhu Liyi raises a serious issue highlighting the urgent need to clean up AVF results before a design option switch in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [how to search all AVF analysis result and remove them](https://forums.autodesk.com/t5/revit-api-forum/how-to-search-all-avf-analysis-result-and-remove-them/td-p/10437422),
-prompting a development ticket *REVIT-182024 &ndash; `SpatialFieldManager` within design option duplicated crashes* to improve the behaviour in future.
+prompting a development ticket *REVIT-182024 &ndash; `SpatialFieldManager` within design option duplicated crashes* to improve this behaviour in future.
 
 Happily, a simple workaround is perfectly feasible.
 
@@ -128,21 +128,19 @@ I did a complete AVF clearing of all views in document.
 Here is the code:
 
 <pre class="code">
-
-            var views = new FilteredElementCollector(doc)
-                .WhereElementIsNotElementType()
-                .OfClass(typeof(View))
-                .Cast<View>()
-                .ToList();
-            foreach(var view in views)
-            {
-                var sfm = SpatialFieldManager.GetSpatialFieldManager(view);
-                if (sfm == null)
-                    continue;
-                else
-                    sfm.Clear();
-            }
- 
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;views&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;FilteredElementCollector(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
+&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;View&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;View&gt;()
+&nbsp;&nbsp;&nbsp;&nbsp;.ToList();
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;var&nbsp;view&nbsp;<span style="color:blue;">in</span>&nbsp;views&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;sfm&nbsp;=&nbsp;SpatialFieldManager.GetSpatialFieldManager(&nbsp;view&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;sfm&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">continue</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">else</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sfm.Clear();
+&nbsp;&nbsp;}
 </pre>
 
 Since there is no change to the model itself, no need to open a transaction.
@@ -151,19 +149,21 @@ Since there is no change to the model itself, no need to open a transaction.
 
 The first is View itself, it could be a template, a schedule or other table views, it could be a view sheet or some "internal" views such as project browser. Not sure if GetSpatialManager would throw an exception in these cases now (remember, this behaviour could change in future Revit releases), but I would add a check, something like that:
 
-...
-.Cast<View>()
-.Where(x => x.AllowsAnalysisDisplay()
+<pre class="code">
+  ...
+  .Cast&lt;View&gt;()
+  .Where(&nbsp;x&nbsp;=&gt;&nbsp;x.AllowsAnalysisDisplay()
 </pre>
 
 The second thing, are you sure you have to check all views from the model? Maybe it will be enough to check opened views only?
 
-var views = uidoc
-	.GetOpenUIViews()
-	.Select(x => doc.GetElement(x.ViewId))
-	.Cast<View>()
-	.Where(x => x.AllowsAnalysisDisplay())
-	.ToList();
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;views&nbsp;=&nbsp;uidoc
+&nbsp;&nbsp;&nbsp;&nbsp;.GetOpenUIViews()
+&nbsp;&nbsp;&nbsp;&nbsp;.Select(&nbsp;x&nbsp;=&gt;&nbsp;doc.GetElement(&nbsp;x.ViewId&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;View&gt;()
+&nbsp;&nbsp;&nbsp;&nbsp;.Where(&nbsp;x&nbsp;=&gt;&nbsp;x.AllowsAnalysisDisplay()&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.ToList();
 </pre>
 
 **response:** Thanks for the check.
