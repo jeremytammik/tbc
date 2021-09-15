@@ -145,7 +145,7 @@ Here is the code:
 
 Since there is no change to the model itself, no need to open a transaction.
 
-**Answewr:** I haven't tested your code, but I see some potential problems (they could or could not really occured).
+**Answer:** I haven't tested your code, but I see some potential problems (they could or could not really occured).
 
 The first is View itself, it could be a template, a schedule or other table views, it could be a view sheet or some "internal" views such as project browser. Not sure if GetSpatialManager would throw an exception in these cases now (remember, this behaviour could change in future Revit releases), but I would add a check, something like that:
 
@@ -166,7 +166,7 @@ The second thing, are you sure you have to check all views from the model? Maybe
 &nbsp;&nbsp;&nbsp;&nbsp;.ToList();
 </pre>
 
-**response:** Thanks for the check.
+**Response:** Thanks for the check.
 
 Yes; I would have added `AllowAnalysisDisplay` too, if I had known it exists : P
 

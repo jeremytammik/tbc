@@ -77,7 +77,7 @@ the <a href="https://github.com/kfpopeye">Kfpopeye</a>
 <p>Zhu Liyi raises a serious issue highlighting the urgent need to clean up AVF results before a design option switch in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-search-all-avf-analysis-result-and-remove-them/td-p/10437422">how to search all AVF analysis result and remove them</a>,
-prompting a development ticket <em>REVIT-182024 &ndash; <code>SpatialFieldManager</code> within design option duplicated crashes</em> to improve the behaviour in future.</p>
+prompting a development ticket <em>REVIT-182024 &ndash; <code>SpatialFieldManager</code> within design option duplicated crashes</em> to improve this behaviour in future.</p>
 <p>Happily, a simple workaround is perfectly feasible.</p>
 <h4><a name="3.1"></a> Problem Description</h4>
 <p>SpatialFieldManager within design option duplicated crashes.</p>
@@ -107,39 +107,41 @@ But I'll try to suggest a workaround:</p>
 <p>I did a complete AVF clearing of all views in document.</p>
 <p>Here is the code:</p>
 <pre class="code">
-
-            var views = new FilteredElementCollector(doc)
-                .WhereElementIsNotElementType()
-                .OfClass(typeof(View))
-                .Cast<View>()
-                .ToList();
-            foreach(var view in views)
-            {
-                var sfm = SpatialFieldManager.GetSpatialFieldManager(view);
-                if (sfm == null)
-                    continue;
-                else
-                    sfm.Clear();
-            }
-
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;views&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;FilteredElementCollector(&nbsp;doc&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
+&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;View&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;View&gt;()
+&nbsp;&nbsp;&nbsp;&nbsp;.ToList();
+&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;var&nbsp;view&nbsp;<span style="color:blue;">in</span>&nbsp;views&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;sfm&nbsp;=&nbsp;SpatialFieldManager.GetSpatialFieldManager(&nbsp;view&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;sfm&nbsp;==&nbsp;<span style="color:blue;">null</span>&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">continue</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">else</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sfm.Clear();
+&nbsp;&nbsp;}
 </pre>
 
 <p>Since there is no change to the model itself, no need to open a transaction.</p>
-<p><strong>Answewr:</strong> I haven't tested your code, but I see some potential problems (they could or could not really occured).</p>
+<p><strong>Answer:</strong> I haven't tested your code, but I see some potential problems (they could or could not really occured).</p>
 <p>The first is View itself, it could be a template, a schedule or other table views, it could be a view sheet or some "internal" views such as project browser. Not sure if GetSpatialManager would throw an exception in these cases now (remember, this behaviour could change in future Revit releases), but I would add a check, something like that:</p>
-<p>...
-.Cast<View>()
-.Where(x =&gt; x.AllowsAnalysisDisplay()
-</pre></p>
+<pre class="code">
+  ...
+  .Cast&lt;View&gt;()
+  .Where(&nbsp;x&nbsp;=&gt;&nbsp;x.AllowsAnalysisDisplay()
+</pre>
+
 <p>The second thing, are you sure you have to check all views from the model? Maybe it will be enough to check opened views only?</p>
-<p>var views = uidoc
-    .GetOpenUIViews()
-    .Select(x =&gt; doc.GetElement(x.ViewId))
-    .Cast<View>()
-    .Where(x =&gt; x.AllowsAnalysisDisplay())
-    .ToList();
-</pre></p>
-<p><strong>response:</strong> Thanks for the check.</p>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;views&nbsp;=&nbsp;uidoc
+&nbsp;&nbsp;&nbsp;&nbsp;.GetOpenUIViews()
+&nbsp;&nbsp;&nbsp;&nbsp;.Select(&nbsp;x&nbsp;=&gt;&nbsp;doc.GetElement(&nbsp;x.ViewId&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;View&gt;()
+&nbsp;&nbsp;&nbsp;&nbsp;.Where(&nbsp;x&nbsp;=&gt;&nbsp;x.AllowsAnalysisDisplay()&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.ToList();
+</pre>
+
+<p><strong>Response:</strong> Thanks for the check.</p>
 <p>Yes; I would have added <code>AllowAnalysisDisplay</code> too, if I had known it exists : P</p>
 <p>I tried closing the view, then re-opening it; the AVF object is still there.
 So, I need to do a document-wide search, not just opened views.</p>
