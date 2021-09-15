@@ -177,7 +177,7 @@ Many thanks to Zhu Liyi for raising this and to Alexander for the good solution!
 
 ####<a name="4"></a> Young Teen and Kid Sister Crypto Entrepreneurs
 
-A sweet and impressive story about how much is possible nowadays, given appropriate right support and motivation:
+A sweet and impressive story about how much is possible nowadays, given appropriate support and motivation:
 
 [14- and 9-year-old siblings earn over $30,000 a month mining cryptocurrency](https://www.cnbc.com/2021/08/31/kid-siblings-earn-thousands-per-month-mining-crypto-like-bitcoin-eth.html)
 
