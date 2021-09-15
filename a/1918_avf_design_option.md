@@ -49,6 +49,15 @@ Many thanks to  for this very helpful explanation!
 
 ### Cleanup Projects: Kfpopeye Sweeper, Open Source, AVF
 
+Lots of cleaning up operations:
+open source projects that help clean up a Revit model, certain paarameter values and other operations, an important AVF cleanup required to prevent crashing, and some youngsters cleaning up some cash:
+
+- [Kfpopeye open source projects](#2)
+- [AVF result clean-up before design option switch](#3)
+    - [Problem description](#3.1)
+    - [Workaround](#3.2)
+- [Young teen and kid sister crypto entrepreneurs](#4)
+
 ####<a name="2"></a> Kfpopeye Open Source Projects
 
 [Kfpemail-2](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/11350013) kindly announced a bunch of new open Revit add-in projects in
@@ -72,7 +81,7 @@ the [Kfpopeye](https://github.com/kfpopeye)
 I just added a readme file with a bit more information for them, plus a zip file `html_help_files.zip` containing the help documentation in html format providing detailed descriptions of what each command does::
 
 - MLTE &ndash; M.L.T.E. (pronounced "multi") is program extension that is used inside Autodesk® Revit. It is a multiline text editor that can be used for editing the parameters of anything inside Revit but in a multi-line view instead of the single line that Revit's Properties Palette gives you. In addition to editing the values of parameters M.L.T.E. can also edit the formulas when used inside the Revit Family Editor. It even has syntax highlighting and auto-formatting to make complex nested if statements easier to follow and debug.
-- Knock-Knock &ndash; a program extension that is used inside Autodesk® Revit. It is designed for editing the values of door instance parameters, not for changing the way your door schedule is set up. The primary way Knock Knock oes this is by making text parameters act like Yes\No parameters. With a simple click users can change parameters values between multiple pre-defined values. There are more features as well.
+- Knock-Knock &ndash; a program extension for editing the values of door instance parameters, not for changing the way your door schedule is set up. The primary way Knock Knock oes this is by making text parameters act like Yes/No parameters. With a simple click, users can change parameters values between multiple pre-defined values. There are more features as well.
 - Paraline &ndash; a Revit program extension that allows you to convert the detail elements from standard orthographic drawings like plans and elevations into 3D isometric drawings.
 - Project-Sweeper &ndash; a collection of tools that allow a user to quickly and accurately remove the following clutter from Revit projects: line styles line patterns text styles fill region types and fill patterns. Except for text styles, these items are not checked by Revit's "Purge Unused" command. Project Sweeper goes beyond just checking for unused styles and patterns. It also allows a user to convert from one style\pattern to another, delete all the elements using a style\pattern and to preview all the views\elements using a style\pattern before removing it.
 - ReVVed &ndash; an extension of commands for use within Autodesk® Revit
