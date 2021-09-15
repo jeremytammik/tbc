@@ -85,13 +85,115 @@ Many thanks to [pkh Lineworks](http://www.pkhlineworks.ca) and [kfpopeye](https:
 
 ####<a name="3"></a> AVF Result Clean-Up before Design Option Switch
 
+Zhu Liyi raises a serious issue highlighting the urgent need to clean up AVF results before a design option switch in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [how to search all AVF analysis result and remove them](https://forums.autodesk.com/t5/revit-api-forum/how-to-search-all-avf-analysis-result-and-remove-them/td-p/10437422),
+prompting a development ticket *REVIT-182024 &ndash; `SpatialFieldManager` within design option duplicated crashes* to improve the behaviour in future.
 
-<pre class="prettyprint">
+Happily, a simple workaround is perfectly feasible.
+
+####<a name="3.1"></a> Problem Description 
+
+SpatialFieldManager within design option duplicated crashes.
+
+The `SpatialFieldManager` class is an AVF object that exists only in RAM, not in the model database.
+
+It will cause Revit to crash if the result is created inside a design option and that design option is duplicated.
+
+I would like to detect any result that's inside a design option and warn the user, but can't find a way to search for them.
+
+It would be nice to fix the crash bug, or disallow analysis result to be placed inside design option altogether.
+
+I cannot submit a sample model, since the object does not exist in model, only in RAM.
+
+The way to reproduce this is:
+
+- Create design option set and some design options
+- Get inside a design option (make it active)
+- Use some tool to create AVF object. The API sample add-in should do.
+- Exit to main model, duplicate the design option that contains AVF object.
+- Revit will crash.
+
+####<a name="3.2"></a> Workaround
+
+Alexander [@aignatovich](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478) [@CADBIMDeveloper](https://github.com/CADBIMDeveloper) Ignatovich, aka Александр Игнатович, suggested a fix:
+
+**Answer:** I have not faced crashes myself, because I haven't used it with design options yet.
+But I'll try to suggest a workaround:
+
+- Collect open views via the `UIDocument` `GetOpenUIViews` method
+- For each opened view, try to retrieve the spatial field manager via the `SpatialFieldManager` `GetSpatialFieldManager` method; if it returns non-null, the spatial field manager exists
+- Call `SpatialFieldManager.Clear` to remove AVF
+
+**Response:** This is the solution! Thanks.
+
+I did a complete AVF clearing of all views in document.
+
+Here is the code:
+
+<pre class="code">
+
+
+            var views = new FilteredElementCollector(doc)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(View))
+                .Cast<View>()
+                .ToList();
+            foreach(var view in views)
+            {
+                var sfm = SpatialFieldManager.GetSpatialFieldManager(view);
+                if (sfm == null)
+                    continue;
+                else
+                    sfm.Clear();
+            }
+ 
+</pre>
+
+Since there is no change to the model itself, no need to open a transaction.
+
+**Answewr:** I haven't tested your code, but I see some potential problems (they could or could not really occured).
+
+ 
+
+The first is View itself, it could be a template, a schedule or other table views, it could be a view sheet or some "internal" views such as project browser. Not sure if GetSpatialManager would throw an exception in these cases now (remember, this behaviour could change in future Revit releases), but I would add a check, something like that:
+
+ 
+
+...
+.Cast<View>()
+.Where(x => x.AllowsAnalysisDisplay()
+</pre>
+ 
+
+ 
+
+The second thing, are you sure you have to check all views from the model? Maybe it will be enough to check opened views only?
+
+ 
+
+var views = uidoc
+	.GetOpenUIViews()
+	.Select(x => doc.GetElement(x.ViewId))
+	.Cast<View>()
+	.Where(x => x.AllowsAnalysisDisplay())
+	.ToList();
 </pre>
 
 
-</pre>
+ 
+**response:** Thanks for the check.
 
+ 
+
+Yes; I would have added `AllowAnalysisDisplay` too, if I had known it exists : P
+
+ 
+
+I tried closing the view, then re-opening it; the AVF object is still there.
+So, I need to do a document-wide search, not just opened views.
+
+Many thanks to Zhu Liyi for raising this and to Alexander for the good solution!
 
 <center>
 <img src="img/" alt="" title="" width="100"/> <!-- 1000 -->
@@ -100,7 +202,6 @@ Many thanks to [pkh Lineworks](http://www.pkhlineworks.ca) and [kfpopeye](https:
 ####<a name="4"></a> 
 
 
-Thanks to ... for sharing this.
 
 ####<a name="5"></a> 
  
