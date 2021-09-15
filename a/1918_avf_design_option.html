@@ -48,7 +48,7 @@ Many thanks to  for this very helpful explanation!
 
 <h3>Cleanup Projects: Kfpopeye Sweeper, Open Source, AVF</h3>
 <p>Lots of cleaning up operations:
-open source projects that help clean up a Revit model, certain paarameter values and other operations, an important AVF cleanup required to prevent crashing, and some youngsters cleaning up some cash:</p>
+open source projects that help clean up a Revit model, certain parameter values and other operations, an important AVF cleanup required to prevent crashing, and some youngsters cleaning up some cash:</p>
 <ul>
 <li><a href="#2">Kfpopeye open source projects</a></li>
 <li><a href="#3">AVF result clean-up before design option switch</a><ul>
@@ -75,13 +75,21 @@ the <a href="https://github.com/kfpopeye">Kfpopeye</a>
 <li>Project-Sweeper</li>
 <li>ReVVed</li>
 </ul>
-<p>I just added a readme file with a bit more information for them, plus a zip file <code>html_help_files.zip</code> containing the help documentation in html format providing detailed descriptions of what each command does::</p>
+<p>I just added a readme file with a bit more information for them, plus a zip file <code>html_help_files.zip</code> containing the help documentation in html format providing detailed descriptions of what each command does:</p>
 <ul>
-<li>MLTE &ndash; M.L.T.E. (pronounced "multi") is program extension that is used inside Autodesk® Revit. It is a multiline text editor that can be used for editing the parameters of anything inside Revit but in a multi-line view instead of the single line that Revit's Properties Palette gives you. In addition to editing the values of parameters M.L.T.E. can also edit the formulas when used inside the Revit Family Editor. It even has syntax highlighting and auto-formatting to make complex nested if statements easier to follow and debug.</li>
-<li>Knock-Knock &ndash; a program extension for editing the values of door instance parameters, not for changing the way your door schedule is set up. The primary way Knock Knock oes this is by making text parameters act like Yes/No parameters. With a simple click, users can change parameters values between multiple pre-defined values. There are more features as well.</li>
+<li>MLTE &ndash; M.L.T.E. (pronounced "multi") is program extension that is used inside Autodesk® Revit. It is a multiline text editor that can be used for editing the parameters of anything inside Revit but in a multi-line view instead of the single line that Revit's Properties Palette gives you.
+In addition to editing the values of parameters M.L.T.E. can also edit the formulas when used inside the Revit Family Editor.
+It even has syntax highlighting and auto-formatting to make complex nested if statements easier to follow and debug.</li>
+<li>Knock-Knock &ndash; a program extension for editing the values of door instance parameters, not for changing the way your door schedule is set up.
+The primary way Knock Knock does this is by making text parameters act like <code>Yes</code>/<code>No</code> parameters.
+With a simple click, users can change parameters values between multiple pre-defined values.
+There are more features as well.</li>
 <li>Paraline &ndash; a Revit program extension that allows you to convert the detail elements from standard orthographic drawings like plans and elevations into 3D isometric drawings.</li>
-<li>Project-Sweeper &ndash; a collection of tools that allow a user to quickly and accurately remove the following clutter from Revit projects: line styles line patterns text styles fill region types and fill patterns. Except for text styles, these items are not checked by Revit's "Purge Unused" command. Project Sweeper goes beyond just checking for unused styles and patterns. It also allows a user to convert from one style\pattern to another, delete all the elements using a style\pattern and to preview all the views\elements using a style\pattern before removing it.</li>
-<li>ReVVed &ndash; an extension of commands for use within Autodesk® Revit</li>
+<li>Project-Sweeper &ndash; a collection of tools that allow a user to quickly and accurately remove the following clutter from Revit projects: line styles line patterns text styles fill region types and fill patterns.
+Except for text styles, these items are not checked by Revit's <em>Purge Unused</em> command.
+Project Sweeper goes beyond just checking for unused styles and patterns.
+It also allows a user to convert from one style or pattern to another, delete all the elements using a certain style or pattern and preview all the views or elements using a style or pattern before removing them.</li>
+<li>ReVVed &ndash; an extension of commands for use within Revit.</li>
 </ul>
 <p>Many thanks to <a href="http://www.pkhlineworks.ca">pkh Lineworks</a> and <a href="https://github.com/kfpopeye">Kfpopeye</a> for sharing this work!</p>
 <h4><a name="3"></a> AVF Result Clean-Up before Design Option Switch</h4>
@@ -134,7 +142,7 @@ But I'll try to suggest a workaround:</p>
 </pre>
 
 <p>Since there is no change to the model itself, no need to open a transaction.</p>
-<p><strong>Answer:</strong> I haven't tested your code, but I see some potential problems (they could or could not really occured).</p>
+<p><strong>Answer:</strong> I haven't tested your code, but I see some potential problems (they could or could not really occur).</p>
 <p>The first is View itself, it could be a template, a schedule or other table views, it could be a view sheet or some "internal" views such as project browser. Not sure if GetSpatialManager would throw an exception in these cases now (remember, this behaviour could change in future Revit releases), but I would add a check, something like that:</p>
 <pre class="code">
   ...
