@@ -109,7 +109,7 @@ the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API d
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/c-and-ironpython-hosting-for-revit-addins/m-p/10629723">C&#35; and IronPython hosting for Revit addins</a>:</p>
 <p><strong>Question:</strong> I try to run IronPython scripts via IronPython.Hosting in C#, inspired by Nick Cosentino's
 article <a href="https://www.codeproject.com/Articles/657698/Python-Visual-Studio-and-Csharp-So-Sweet">Python, Visual Studio, and C&#35;, so sweet</a>.</p>
-<p>The purpose of such effort is to create easy distributable and accessible addins in our company which are developed by a small group of non IT experts on the IronPython platform due to it's flexibility and lower demandings for coding skills.
+<p>The purpose of such effort is to create easy distributable and accessible addins in our company which are developed by a small group of non IT experts on the IronPython platform due to its flexibility and lower demandings for coding skills.
 Yes, I've heard about RevitPythonShell, but this is not exactly what would make sufficient result.</p>
 <p>I was able to run classes using references to <code>RevitAPI</code> and <code>RevitAPIUI</code> but receive empty objects trying to use <code>RevitServices</code>:</p>
 <pre class="prettyprint">
@@ -192,7 +192,7 @@ What gave you that idea?</p>
 <p>That said, you might also try to discuss pyRevit related issues directly with its creator Ehsan in
 the <a href="https://github.com/eirannejad/pyRevit">pyRevit repository</a> via
 the appropriate <a href="https://github.com/eirannejad/pyRevit#staying-updated">channels</a>.</p>
-<p><strong>Response:</strong> Thanks for clearing that up Jeremy.</p>
+<p><strong>Response:</strong> Thanks for clearing that up, Jeremy.</p>
 <p>I saw this on a webinar and misunderstood it, and only used IronPython inside Dynamo.
 Basically, the new Dynamo is transitioning
 from <a href="https://ironpython.net">IronPython</a>
@@ -204,7 +204,9 @@ I am assuming in the future it will drop IronPython.</p>
 <p>Pleae refer to the article
 on the <a href="https://www.caddmicrosystems.com/blog/top-5-new-features-for-dynamo-for-revit-2022">top 5 new features for Dynamo for Revit 2022</a>:</p>
 <blockquote>
-<p>One of the biggest things the Dynamo Core team has been working on is the transition from ironpython which limits python to version to 2.7 to Cpython which allows the use of python 3 syntax. This is HUGE for using python to access addition elements in the Revit API, as well as to handle more complex logic scenarios. As of the initial launch of Revit 2022, both ironpython and Cpython are installed as python engines and the engine used can vary within a single dynamo script (although that is not advised). Ironpython remains the default python engine, but can be changed in the settings. To help with the transition, there is a transition tool that will help migrate your python script from ironpython to Cpython.</p>
+<p>One of the biggest things the Dynamo Core team has been working on is the transition from IronPython which limits Python to version to 2.7 to CPython which allows the use of python 3 syntax. This is HUGE for using python to access addition elements in the Revit API, as well as to handle more complex logic scenarios. As of the initial launch of Revit 2022, both ironpython and Cpython are installed as python engines and the engine used can vary within a single dynamo script (although that is not advised).
+IronPython remains the default Python engine, but can be changed in the settings.
+To help with the transition, there is a transition tool that will help migrate your python script from ironpython to Cpython.</p>
 </blockquote>
 <p>Many thanbks to EatRevitPoopCad for the very interesting background information.
 I was unaware of it until now.
