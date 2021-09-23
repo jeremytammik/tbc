@@ -207,20 +207,44 @@ Many thanks to Daniel for his research and useful solution!
 
 ####<a name="5"></a> Python 3, CPython, pyRevit and Dynamo
 
-Continuing with POython related issues, here is a quick update on upcoming releases of pyRevit and Dynamo and their support for Python 3:
+Continuing with Python related issues, here is a quick update on upcoming releases of pyRevit and Dynamo and their support for Python 3, prompted by 
+EatRevitPoopCad (love the handle) in their discussion
+of [PyRevit and Revit 2022 w/ Dynamo](https://forums.autodesk.com/t5/revit-api-forum/pyrevit-and-revit-2022-w-dynamo/m-p/10638367):
 
+**Question:** I believe I saw somewhere that IronPython will not be supported with Revit 2022 and/or the Dynamo version it will come with...
+Some of my plugins use IronPython, which isn't a big deal, I can convert them to whatever the "New python" Dynamo will use...
+But what about... let's say PyRevit?
+I know it runs on IronPython.
+Does that mean it will not work?
+Or can you still install an older version of Dynamo in Revit 2022 that will support IronPython?
 
-CPython and Python 3
-PyRevit and Revit 2022 w/ Dynamo
-https://forums.autodesk.com/t5/revit-api-forum/pyrevit-and-revit-2022-w-dynamo/m-p/10638367
+**Answer:** The Revit API is based on .NET.
+Therefore, everything and anything that supports .NET can be used to work with the Revit API.
+IronPython is designed to enable usage of Python with .NET.
+I see no reason why it should stop working.
+What gave you that idea?
 
+That said, you might also try to discuss pyRevit related issues directly with its creator Ehsan in
+the [pyRevit repository](https://github.com/eirannejad/pyRevit) via
+the appropriate [channels](https://github.com/eirannejad/pyRevit#staying-updated).
 
+**Response:** Thanks for clearing that up Jeremy.
 
-<pre class="code">
+I saw this on a webinar and misunderstood it, and only used IronPython inside Dynamo.
+Basically, the new Dynamo is transitioning
+from [IronPython](https://ironpython.net)
+to [CPython](https://github.com/python/cpython).
+Revit 2021 came with Dynamo and IronPython by default.
+Revit 2022 comes with Dynamo that has IronPython and CPython, and recommends using CPython.
+I am assuming in the future it will drop IronPython.
 
-</pre>
+This won't affect pyRevit the way I thought it would; Dynamo and pyRevit are independent of each other.
 
+Pleae refer to the article
+on the [top 5 new features for Dynamo for Revit 2022](https://www.caddmicrosystems.com/blog/top-5-new-features-for-dynamo-for-revit-2022):
+ 
+> One of the biggest things the Dynamo Core team has been working on is the transition from ironpython which limits python to version to 2.7 to Cpython which allows the use of python 3 syntax. This is HUGE for using python to access addition elements in the Revit API, as well as to handle more complex logic scenarios. As of the initial launch of Revit 2022, both ironpython and Cpython are installed as python engines and the engine used can vary within a single dynamo script (although that is not advised). Ironpython remains the default python engine, but can be changed in the settings. To help with the transition, there is a transition tool that will help migrate your python script from ironpython to Cpython.
 
-
-**Answer:** 
-
+Many thanbks to EatRevitPoopCad for the very interesting background information.
+I was unaware of it until now.
+Myself, I just use (normal, standalone) Python for command line scripts and am still in a very slow and much overdue transitioning process from 2.7 to 3+...
