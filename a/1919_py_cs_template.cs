@@ -121,8 +121,89 @@ Thank you very much for sharing these, Роман!
 
 ####<a name="4"></a> IronPython Hosting in C&#35; Add-In
 
-C# and IronPython Hosting for Revit addins
-https://forums.autodesk.com/t5/revit-api-forum/c-and-ironpython-hosting-for-revit-addins/m-p/10629723
+Daniel Gerčák shares a solution implementing his
+own [IronPython](https://ironpython.net) hosting in a Revit add-in in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [C&#35; and IronPython hosting for Revit addins](https://forums.autodesk.com/t5/revit-api-forum/c-and-ironpython-hosting-for-revit-addins/m-p/10629723):
+
+
+**Question:** I try to run IronPython scripts via IronPython.Hosting in C#, inspired by Nick Cosentino's
+article [Python, Visual Studio, and C&#35;, so sweet](https://www.codeproject.com/Articles/657698/Python-Visual-Studio-and-Csharp-So-Sweet).
+
+The purpose of such effort is to create easy distributable and accessible addins in our company which are developed by a small group of non IT experts on the IronPython platform due to it's flexibility and lower demandings for coding skills.
+Yes, I've heard about RevitPythonShell, but this is not exactly what would make sufficient result.
+
+I was able to run classes using references to `RevitAPI` and `RevitAPIUI` but receive empty objects trying to use `RevitServices`:
+
+<pre class="prettyprint">
+from RevitServices.Persistence import DocumentManager
+doc = DocumentManager.Instance.CurrentDBDocument
+uiapp = DocumentManager.Instance.CurrentUIApplication
+uidoc = DocumentManager.Instance.CurrentUIApplication.ActiveUIDocument
+</pre>
+
+I wonder if my intention to run such scripts is useless effort due to some restrictions in source code or is there some way to deal with this issue.
+
+Here is a piece of code for better overview of what I am trying to achieve,
+[totalSelectedVolume.zip](zip/dg_totalSelectedVolume.zip),
+containing totalSelectedVolumeCommand.cs and totalSelectedVolume.py.
+The former implements an external command and executes the latter via the `IronPython.Hosting` `ExecuteFile` method, performing the actual computation.
+
+**Answer:** You can take a look at the open source implementations
+of [RevitPythonShell](https://github.com/architecture-building-systems/revitpythonshell)
+and [pyRevit](https://github.com/eirannejad/pyRevit) to
+discover how they have addressed this same issue.
+
+**Response:** I did a little research and I was succesful.
+
+The point was to create a new variable within the IronPython engine and assign the `commandData.Application` object to it so that you can access it from the Python environment.
+I named it the same way as it is in RPS, `__revit__`, in order to keep compatibility with scripts developed for RPS.
+Since I've tested it only by using simple Python code, I don't guarantee its functionality with more complex scripts.
+Additional settings might be required.
+
+The execute function looks like this.
+
+<pre class="code"> 
+
+public Result Execute(
+ExternalCommandData commandData,
+ref string message,
+ElementSet elements)
+{
+UIApplication _revit = commandData.Application;
+UIDocument uidoc = _revit.ActiveUIDocument;
+Application app = _revit.Application;
+Document doc = uidoc.Document;
+
+var flags = new Dictionary<string, object>() { { "Frames", true }, { "FullFrames", true } };
+var py = IronPython.Hosting.Python.CreateEngine(flags);
+var scope = IronPython.Hosting.Python.CreateModule(py, "__main__");
+scope.SetVariable("__commandData__", commandData);
+
+// add special variable: __revit__ to be globally visible everywhere:
+var builtin = IronPython.Hosting.Python.GetBuiltinModule(py);
+builtin.SetVariable("__revit__", _revit);
+py.Runtime.LoadAssembly(typeof(Autodesk.Revit.DB.Document).Assembly);
+py.Runtime.LoadAssembly(typeof(Autodesk.Revit.UI.TaskDialog).Assembly);
+
+try
+{
+py.ExecuteFile("totalSelectedVolume.py");
+}
+catch (Exception ex)
+{
+TaskDialog myDialog = new TaskDialog("IronPython Error");
+myDialog.MainInstruction = "Couldn't execute IronPython script totalSelectedVolume.py: ";
+myDialog.ExpandedContent = ex.Message;
+myDialog.Show();
+}
+
+return Result.Succeeded;
+</pre>
+
+Here is [IronPython_engine.zip](zip/dg_IronPython_engine.zip) containing a complete testing project.
+
+Many thanks to Daniel for his research and useful solution!
 
 ####<a name="5"></a> Python 3, CPython, pyRevit and Dynamo
 
