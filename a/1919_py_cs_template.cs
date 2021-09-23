@@ -82,9 +82,9 @@ The new `PartUtils` stream also populates the following highlighted entries:
 <img src="img/revitlookup_PartUtilsStream.png" alt="Snoop PartUtils" title="Snoop PartUtils" width="354"/> <!-- 354 -->
 </center>
 
-Duplicated `OriginalCategoryId` shows value as f.e. `OST_Walls` instead of `&lt;null&gt;`
-Duplicated `GetSourceElementIds` shows a flattened list of elements instead of original list of `LinkElementIds`
-Duplicated `GetSourceElementOriginalCategoryIds` uses `EnumerableAsString` to show value as f.e. 'OST_Walls, OST_Walls'
+- Duplicated `OriginalCategoryId` shows value as f.e. `OST_Walls` instead of `&lt;null&gt;`
+- Duplicated `GetSourceElementIds` shows a flattened list of elements instead of original list of `LinkElementIds`
+- Duplicated `GetSourceElementOriginalCategoryIds` uses `EnumerableAsString` to show value as f.e. 'OST_Walls, OST_Walls'
 
 Many thanks to [mphelt](https://github.com/mphelt) for the importasnt enhancement!
 
