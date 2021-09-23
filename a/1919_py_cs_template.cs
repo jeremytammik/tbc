@@ -207,6 +207,9 @@ Many thanks to Daniel for his research and useful solution!
 
 ####<a name="5"></a> Python 3, CPython, pyRevit and Dynamo
 
+Continuing with POython related issues, here is a quick update on upcoming releases of pyRevit and Dynamo and their support for Python 3:
+
+
 CPython and Python 3
 PyRevit and Revit 2022 w/ Dynamo
 https://forums.autodesk.com/t5/revit-api-forum/pyrevit-and-revit-2022-w-dynamo/m-p/10638367
