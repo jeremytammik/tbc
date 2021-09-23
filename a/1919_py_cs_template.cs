@@ -68,17 +68,26 @@ Many thanks to  for this very helpful explanation!
 
 
 
-####<a name="2"></a> RevitLokup Handles PartUtilsStream
+####<a name="2"></a> RevitLokup Handles PartUtils
 
-https://github.com/jeremytammik/RevitLookup/pull/91
-https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.0.16
-integrated pull request #91 by @mphelt to add PartUtilsStream
-https://github.com/mphelt
-Adds PartUtilsStream that populates highlighted entries:
-a/img/revitlookup_PartUtilsStream.png
-Duplicated OriginalCategoryId shows value as f.e. OST_Walls instead of < null >.
-Duplicated GetSourceElementIds shows a 'flattened' list of elements instead of original list of LinkElementIds.
-Duplicated GetSourceElementOriginalCategoryIds uses EnumerableAsString to show value as f.e. 'OST_Walls, OST_Walls'.
+RevitLokup now displays `PartUtils` information.
+
+[mphelt](https://github.com/mphelt) submitted
+[pull request #91 to add `PartUtilsStream`](https://github.com/jeremytammik/RevitLookup/pull/91),
+integrated in [RevitLookup release 2022.0.0.16](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.0.16).
+
+The new `PartUtils` stream also populates the following highlighted entries:
+
+<center>
+<img src="img/revitlookup_PartUtilsStream.png" alt="Snoop PartUtils" title="Snoop PartUtils" width="354"/> <!-- 354 -->
+</center>
+
+Duplicated `OriginalCategoryId` shows value as f.e. `OST_Walls` instead of `&lt;null&gt;`
+Duplicated `GetSourceElementIds` shows a flattened list of elements instead of original list of `LinkElementIds`
+Duplicated `GetSourceElementOriginalCategoryIds` uses `EnumerableAsString` to show value as f.e. 'OST_Walls, OST_Walls'
+
+Many thanks to [mphelt](https://github.com/mphelt) for the importasnt enhancement!
+
 
 ####<a name="3"></a> Revit Add-In C&#35; Template 
 
@@ -109,8 +118,4 @@ https://forums.autodesk.com/t5/revit-api-forum/pyrevit-and-revit-2022-w-dynamo/m
 
 
 **Answer:** 
-
-<center>
-<img src="img/" alt="" title="" width="100"/> <!-- 630 -->
-</center>
 
