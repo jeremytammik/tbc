@@ -65,8 +65,12 @@ Many thanks to  for this very helpful explanation!
 
 ### Snooping Parts, Python Topics and C&#35; Templates
 
+A neat RevitLookup enhancement, powerful new Revit add-in template, and a couple of Python related topics:
 
-
+- [RevitLokup handles `PartUtils`](#2)
+- [Nice3point Revit add-in C&#35; template](#3)
+- [IronPython hosting in C&#35; add-in](#4)
+- [Python 3, CPython, pyRevit and Dynamo](#5)
 
 ####<a name="2"></a> RevitLokup Handles PartUtils
 
