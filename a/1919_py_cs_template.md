@@ -36,8 +36,11 @@ add #thebuildingcoder
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+A neat RevitLookup enhancement, powerful new Revit add-in template, and a couple of Python related topics
+&ndash; RevitLokup handles <code>PartUtils</code>
+&ndash; Nice3point Revit add-in C&#35; template
+&ndash; IronPython hosting in C&#35; add-in
+&ndash; Python 3, CPython, pyRevit and Dynamo...
 
 linkedin:
 
@@ -63,7 +66,7 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### Snooping Parts, Python Topics and C&#35; Templates
+### Snooping Parts, C&#35; Templates and Python Topics
 
 A neat RevitLookup enhancement, powerful new Revit add-in template, and a couple of Python related topics:
 
