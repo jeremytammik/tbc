@@ -158,7 +158,7 @@ of [RevitPythonShell](https://github.com/architecture-building-systems/revitpyth
 and [pyRevit](https://github.com/eirannejad/pyRevit) to
 discover how they have addressed this same issue.
 
-**Response:** I did a little research and I was succesful.
+**Response:** I did a little research and I was successful.
 
 The point was to create a new variable within the IronPython engine and assign the `commandData.Application` object to it so that you can access it from the Python environment.
 I named it the same way as it is in RPS, `__revit__`, in order to keep compatibility with scripts developed for RPS.
@@ -167,42 +167,44 @@ Additional settings might be required.
 
 The execute function looks like this.
 
-<pre class="code"> 
-
-public Result Execute(
-ExternalCommandData commandData,
-ref string message,
-ElementSet elements)
-{
-UIApplication _revit = commandData.Application;
-UIDocument uidoc = _revit.ActiveUIDocument;
-Application app = _revit.Application;
-Document doc = uidoc.Document;
-
-var flags = new Dictionary<string, object>() { { "Frames", true }, { "FullFrames", true } };
-var py = IronPython.Hosting.Python.CreateEngine(flags);
-var scope = IronPython.Hosting.Python.CreateModule(py, "__main__");
-scope.SetVariable("__commandData__", commandData);
-
-// add special variable: __revit__ to be globally visible everywhere:
-var builtin = IronPython.Hosting.Python.GetBuiltinModule(py);
-builtin.SetVariable("__revit__", _revit);
-py.Runtime.LoadAssembly(typeof(Autodesk.Revit.DB.Document).Assembly);
-py.Runtime.LoadAssembly(typeof(Autodesk.Revit.UI.TaskDialog).Assembly);
-
-try
-{
-py.ExecuteFile("totalSelectedVolume.py");
-}
-catch (Exception ex)
-{
-TaskDialog myDialog = new TaskDialog("IronPython Error");
-myDialog.MainInstruction = "Couldn't execute IronPython script totalSelectedVolume.py: ";
-myDialog.ExpandedContent = ex.Message;
-myDialog.Show();
-}
-
-return Result.Succeeded;
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;Result&nbsp;Execute(
+&nbsp;&nbsp;&nbsp;&nbsp;ExternalCommandData&nbsp;commandData,
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">ref</span>&nbsp;<span style="color:blue;">string</span>&nbsp;message,
+&nbsp;&nbsp;&nbsp;&nbsp;ElementSet&nbsp;elements&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;UIApplication&nbsp;_revit&nbsp;=&nbsp;commandData.Application;
+&nbsp;&nbsp;&nbsp;&nbsp;UIDocument&nbsp;uidoc&nbsp;=&nbsp;_revit.ActiveUIDocument;
+&nbsp;&nbsp;&nbsp;&nbsp;Document&nbsp;doc&nbsp;=&nbsp;uidoc.Document;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;flags&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Dictionary&lt;<span style="color:blue;">string</span>,&nbsp;<span style="color:blue;">object</span>&gt;()&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;<span style="color:#a31515;">&quot;Frames&quot;</span>,&nbsp;<span style="color:blue;">true</span>&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;<span style="color:#a31515;">&quot;FullFrames&quot;</span>,&nbsp;<span style="color:blue;">true</span>&nbsp;}&nbsp;};
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;py&nbsp;=&nbsp;IronPython.Hosting.Python.CreateEngine(&nbsp;flags&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;scope&nbsp;=&nbsp;IronPython.Hosting.Python.CreateModule(&nbsp;py,&nbsp;<span style="color:#a31515;">&quot;__main__&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;scope.SetVariable(&nbsp;<span style="color:#a31515;">&quot;__commandData__&quot;</span>,&nbsp;commandData&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;add&nbsp;special&nbsp;variable:&nbsp;__revit__&nbsp;to&nbsp;be&nbsp;globally&nbsp;visible&nbsp;everywhere:</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;builtin&nbsp;=&nbsp;IronPython.Hosting.Python.GetBuiltinModule(&nbsp;py&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;builtin.SetVariable(&nbsp;<span style="color:#a31515;">&quot;__revit__&quot;</span>,&nbsp;_revit&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;py.Runtime.LoadAssembly(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;Autodesk.Revit.DB.Document&nbsp;).Assembly&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;py.Runtime.LoadAssembly(&nbsp;<span style="color:blue;">typeof</span>(&nbsp;Autodesk.Revit.UI.TaskDialog&nbsp;).Assembly&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">try</span>
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;py.ExecuteFile(&nbsp;<span style="color:#a31515;">&quot;totalSelectedVolume.py&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">catch</span>(&nbsp;Exception&nbsp;ex&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TaskDialog&nbsp;myDialog&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;TaskDialog(&nbsp;<span style="color:#a31515;">&quot;IronPython&nbsp;Error&quot;</span>&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myDialog.MainInstruction&nbsp;=&nbsp;<span style="color:#a31515;">&quot;Couldn&#39;t&nbsp;execute&nbsp;IronPython&nbsp;script&nbsp;totalSelectedVolume.py:&nbsp;&quot;</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myDialog.ExpandedContent&nbsp;=&nbsp;ex.Message;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myDialog.Show();
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">return</span>&nbsp;Result.Succeeded;
+&nbsp;&nbsp;}
 </pre>
 
 Here is [IronPython_engine.zip](zip/dg_IronPython_engine.zip) containing a complete testing project.
@@ -244,13 +246,13 @@ I am assuming in the future it will drop IronPython.
 
 This won't affect pyRevit the way I thought it would; Dynamo and pyRevit are independent of each other.
 
-Pleae refer to the article
+Please refer to the article
 on the [top 5 new features for Dynamo for Revit 2022](https://www.caddmicrosystems.com/blog/top-5-new-features-for-dynamo-for-revit-2022):
  
 > One of the biggest things the Dynamo Core team has been working on is the transition from IronPython which limits Python to version to 2.7 to CPython which allows the use of python 3 syntax. This is HUGE for using python to access addition elements in the Revit API, as well as to handle more complex logic scenarios. As of the initial launch of Revit 2022, both ironpython and Cpython are installed as python engines and the engine used can vary within a single dynamo script (although that is not advised).
 IronPython remains the default Python engine, but can be changed in the settings.
 To help with the transition, there is a transition tool that will help migrate your python script from ironpython to Cpython.
 
-Many thanbks to EatRevitPoopCad for the interesting background information.
+Many thanks to EatRevitPoopCad for the interesting background information.
 I was unaware of it until now.
 Myself, I just use (normal, standalone) Python for command line scripts and am still in a very slow and much overdue transitioning process from 2.7 to 3+...
