@@ -86,11 +86,11 @@ The new `PartUtils` stream also populates the following highlighted entries:
 <img src="img/revitlookup_PartUtilsStream.png" alt="Snoop PartUtils" title="Snoop PartUtils" width="354"/> <!-- 354 -->
 </center>
 
-- Duplicated `OriginalCategoryId` shows value as f.e. `OST_Walls` instead of `&lt;null&gt;`
+- Duplicated `OriginalCategoryId` shows value as f.e. `OST_Walls` instead of <code>&lt;null&gt;</code>
 - Duplicated `GetSourceElementIds` shows a flattened list of elements instead of original list of `LinkElementIds`
 - Duplicated `GetSourceElementOriginalCategoryIds` uses `EnumerableAsString` to show value as f.e. 'OST_Walls, OST_Walls'
 
-Many thanks to [mphelt](https://github.com/mphelt) for the importasnt enhancement!
+Many thanks to [mphelt](https://github.com/mphelt) for this important enhancement!
 
 
 ####<a name="3"></a> Nice3point Revit Add-In C&#35; Template 
@@ -251,6 +251,6 @@ on the [top 5 new features for Dynamo for Revit 2022](https://www.caddmicrosyste
 IronPython remains the default Python engine, but can be changed in the settings.
 To help with the transition, there is a transition tool that will help migrate your python script from ironpython to Cpython.
 
-Many thanbks to EatRevitPoopCad for the very interesting background information.
+Many thanbks to EatRevitPoopCad for the interesting background information.
 I was unaware of it until now.
 Myself, I just use (normal, standalone) Python for command line scripts and am still in a very slow and much overdue transitioning process from 2.7 to 3+...
