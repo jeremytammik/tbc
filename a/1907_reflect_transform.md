@@ -80,7 +80,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Before diving into these topics, a nice quote of the week from Quincy Larson's [freecodecamp](https://www.freecodecamp.org) newsletter:
 
 <blockquote>
-<p><i>There are only two kinds of programming languages: the ones people complain about and the ones nobody uses.</i></p>
+<p><i>There are only two kinds of programming languages: the ones people complain about and the ones nobody use.</i></p>
 <p style="text-align: right; font-style: italic">&ndash; Bjarne Stroustrup, creator of C++</p>
 </blockquote>
 

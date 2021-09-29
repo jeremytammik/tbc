@@ -6,6 +6,24 @@
 
 <!---
 
+- Revit Category Guide
+  https://docs.google.com/spreadsheets/d/1uNa77XYLjeN-1c63gsX6C5D5Pvn_3ZB4B0QMgPeloTw/edit#gid=1549586957
+  Category Name	- Built In Enum -	User Mapped	- Display Category Name	- Display Category Name (Rus)
+  
+- Additional .dll files as resource
+  https://forums.autodesk.com/t5/revit-api-forum/additional-dll-files-as-resource/m-p/10653802#M58650
+  ricaun in reply to: antonio.hipolito
+  @jrothMEIand @antonio.hipolito you could use Fody.Costura to embed the .dll references automatically, the Costura.Template has the ILTemplate.cs and Common.cs to handle all the load resources files, if the Assembly is already loaded the code does not force it to load again.
+  @jeremy.tammik I use this technic on the ConduitMaterial and others plugins.
+  Adding... ILTemplate.Attach(); on the IExternalApplication should do the trick.
+
+- quote
+  “Every man has two lives, and the second starts when he realizes he has just one.” — Confucius, courtesy of
+  Ehsan @eirannejad https://twitter.com/eirannejad
+
+- ExportCncFab updated for Revit 2022 https://github.com/jeremytammik/ExportCncFab/releases/tag/2022.0.0.0
+  ExportCncFab eliminated deprecated API usage https://github.com/jeremytammik/ExportCncFab/releases/tag/2022.0.0.1
+
 twitter:
 
 add #thebuildingcoder
@@ -41,6 +59,17 @@ Many thanks to  for this very helpful explanation!
 
 ### Apply Code Changes
 
+Before diving in, here is a nice little snippet of wisdom, courtesy
+of [Ehsan @eirannejad](https://twitter.com/eirannejad):
+
+<blockquote>
+<p><i>Every man has two lives; the second starts when he realizes he has just one.</i></p>
+<p style="text-align: right; font-style: italic">&ndash; Confucius</p>
+</blockquote>
+  
+
+
+
 ####<a name="2"></a> 
 
 Chris Hildebran pointed out that 'Apply code changes' now works when debugging and editing a Revit add-in:
@@ -56,7 +85,7 @@ I gather it has been available for C++ for quite a while but just recently for .
 
 While debugging, I thought id see if this would work in Revit Addin Development.
  
-Initial testing confirmed that it does indeed apply code changes which can be seen in a video demonstrating the modification of an add-in tool I'm working on. (in c# at least. Need to test .xaml)
+Initial testing confirmed that it does indeed apply code changes which can be seen in a video demonstrating the modification of an add-in tool I'm working on &ndash; in C# at least; Need to test `.xaml`.
  
 I've recorded a [two-minute video](https://www.screencast.com/t/5oCj1jBJha) demonstrating the initial test, which I hope is clear enough to see.
  
