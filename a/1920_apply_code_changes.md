@@ -48,6 +48,8 @@ Many thanks to  for this very helpful explanation!
 
 ####<a name="2"></a> 
 
+apply_code_changes.png 348
+
 
 RevitLokup now displays `PartUtils` information.
 

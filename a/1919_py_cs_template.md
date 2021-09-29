@@ -84,7 +84,7 @@ A neat RevitLookup enhancement, powerful new Revit add-in template, and a couple
 - [IronPython hosting in C&#35; add-in](#4)
 - [Python 3, CPython, pyRevit and Dynamo](#5)
 
-####<a name="2"></a> RevitLokup Handles PartUtils
+####<a name="2"></a> RevitLookup Handles PartUtils
 
 RevitLookup now displays `PartUtils` information.
 
