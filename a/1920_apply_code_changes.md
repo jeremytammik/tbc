@@ -12,8 +12,10 @@ add #thebuildingcoder
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+Today, I highlight our new local language Forge classes and the renewed ability to easily edit and continue while debugging a Revit add-in
+&ndash; Non-mobile after computer crash
+&ndash; Local language Forge classes
+&ndash; Apply code changes debugging Revit add-in...
 
 linkedin:
 
@@ -68,6 +70,8 @@ Unsurprisingly, the screen broke:
 <center>
 <img src="img/computer_crash_5.jpg" alt="Computer crash" title="Computer crash" width="359"/> <!-- 359 -->
 </center>
+
+That forced me off-line for a while... 
 
 More to my surprise, the rest remained intact; so, I am now happily up and running again with peripherals: external screen, keyboard and mouse:
 
@@ -134,7 +138,7 @@ the Microsoft article [introducing the .NET Hot Reload experience for editing co
 Many thanks to Chris for sharing this!
 
 For completeness, The Building Coder topic group
-on [debuging without restart and live development](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.49) discusses
+on [debugging without restart and live development](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.49) discusses
 how 'Edit and Continue' used to work way back in Revit 2008 and various other solutions suggested in the meantime.
 
 
