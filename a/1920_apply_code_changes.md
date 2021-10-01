@@ -6,24 +6,6 @@
 
 <!---
 
-- Revit Category Guide
-  https://docs.google.com/spreadsheets/d/1uNa77XYLjeN-1c63gsX6C5D5Pvn_3ZB4B0QMgPeloTw/edit#gid=1549586957
-  Category Name	- Built In Enum -	User Mapped	- Display Category Name	- Display Category Name (Rus)
-  
-- Additional .dll files as resource
-  https://forums.autodesk.com/t5/revit-api-forum/additional-dll-files-as-resource/m-p/10653802#M58650
-  ricaun in reply to: antonio.hipolito
-  @jrothMEIand @antonio.hipolito you could use Fody.Costura to embed the .dll references automatically, the Costura.Template has the ILTemplate.cs and Common.cs to handle all the load resources files, if the Assembly is already loaded the code does not force it to load again.
-  @jeremy.tammik I use this technic on the ConduitMaterial and others plugins.
-  Adding... ILTemplate.Attach(); on the IExternalApplication should do the trick.
-
-- quote
-  “Every man has two lives, and the second starts when he realizes he has just one.” — Confucius, courtesy of
-  Ehsan @eirannejad https://twitter.com/eirannejad
-
-- ExportCncFab updated for Revit 2022 https://github.com/jeremytammik/ExportCncFab/releases/tag/2022.0.0.0
-  ExportCncFab eliminated deprecated API usage https://github.com/jeremytammik/ExportCncFab/releases/tag/2022.0.0.1
-
 twitter:
 
 add #thebuildingcoder
@@ -89,11 +71,11 @@ More to my surprise, the rest remained intact; so, I am happily up and running a
 </center>
 
 
-####<a name="2"></a> Local Language Forge Classes 
+####<a name="3"></a> Local Language Forge Classes 
 
-We are running a Forge hackathon this week and have Autodesk University coming up next, so there is a lot of exciting activity going on at that front.
+Back to topics of more genertal interest, we are running a Forge hackathon this week and have Autodesk University coming up next, so there is a lot of exciting activity going on at that front.
 
-If you are interested in learning more about Forge and your primary language is not English, one of our new local language classes may be of interest:
+If you are interested in learning more about Forge and your primary language is not English, one of our new local language classes may be for you:
 
 <!--
 Automation & Jumeaux Numériques pour l‘industrialisation de la construction (SD500073) (French)
@@ -110,11 +92,13 @@ Be sure to check one of them out if your preferred language is French, German or
 
 Check them out if your preferred language is French, German or Spanish.
 
-For more information on the current Forge hackathon and Autodesk University cfoming up next week, check out Kean's article
-on [At the Forge Hackathon, counting down to AU2021](https://www.keanw.com/2021/09/at-the-forge-hackathon-counting-down-to-au2021.html).
+For more information on the current Forge hackathon and Autodesk University, check out
+the [AU website](https://www.autodesk.com/autodesk-university) and
+Kean's article
+on [the Forge Hackathon and counting down to AU2021](https://www.keanw.com/2021/09/at-the-forge-hackathon-counting-down-to-au2021.html).
 
 
-####<a name="2"></a> Apply Code Changes in Revit Add-In
+####<a name="4"></a> Apply Code Changes in Revit Add-In
 
 Chris Hildebran pointed out that 'Apply code changes' now works when debugging and editing a Revit add-in:
 
@@ -125,13 +109,13 @@ That discovery is the 'Apply Code Changes' button located to the right of the St
 <img src="img/apply_code_changes.png" alt="Apply code changes" title="Apply code changes" width="348"/> <!-- 348 -->
 </center>
 
-I gather it has been available for C++ for quite a while but just recently for .NET projects as of Visual Studio Version 16.11.0 Preview 1.0.
+I gather it has been available for C++ for quite a while, but just recently for .NET projects, as of Visual Studio Version 16.11.0 Preview 1.0.
 
-While debugging, I thought id see if this would work in Revit Addin Development.
+While debugging, I thought I'd see if this would work in Revit Addin Development.
  
-Initial testing confirmed that it does indeed apply code changes which can be seen in a video demonstrating the modification of an add-in tool I'm working on &ndash; in C# at least; Need to test `.xaml`.
+Initial testing confirmed that it does indeed apply code changes that can be seen in my video demonstrating the modification of an add-in tool I'm working on &ndash; at least in C#; still need to test `.xaml`.
  
-I've recorded a [two-minute video](https://www.screencast.com/t/5oCj1jBJha) demonstrating the initial test, which I hope is clear enough to see.
+Here is my [two-minute video](https://www.screencast.com/t/5oCj1jBJha) demonstrating the initial test, which I hope is clear enough to see.
  
 I had planned to implement a solution Josh Lumley proposed, but if this continues to work, I will continue using this feature to drastically speed up development.
  
@@ -145,16 +129,5 @@ Many thanks to Chris for sharing this!
 For completeness, The Building Coder topic group
 on [debuging without restart and live development](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.49) discusses
 how 'Edit and Continue' used to work way back in Revit 2008 and various other solutions suggested in the meantime.
-
-
-####<a name="3"></a> 
-
-
-####<a name="4"></a> 
-
-
-<pre class="code">
-
-</pre>
 
 
