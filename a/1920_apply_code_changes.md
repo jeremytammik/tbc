@@ -68,9 +68,32 @@ of [Ehsan @eirannejad](https://twitter.com/eirannejad):
 </blockquote>
   
 
+####<a name="2"></a> Local Language Forge Classes 
+
+We are running a Forge hackathon this week and have Autodesk University coming up next, so there is a lot of exciting activity going on at that front.
+
+If you are interested in learning more about Forge and your primary language is not English, one of our new local language classes may be of interest:
+
+<!--
+Automation & Jumeaux Numériques pour l‘industrialisation de la construction (SD500073) (French)
+Digitaler Zwilling und Automation auf dem Weg zum digitalen Bau (AS500379) (German)
+Uso de Forge para la transformación digital en arquitectura y construcción (CS500234) (Spanish)
+Be sure to check one of them out if your preferred language is French, German or Spanish.
+-->
+
+<ul>
+<li><a href="https://events-platform.autodesk.com/event/autodesk-university-2021/planning/UGxhbm5pbmdfNjcwMjAy" target="_blank">Automation &amp; Jumeaux numériques pour l'industrialisation de la construction (SD500073)</a> (French)</li>
+<li><a href="https://events-platform.autodesk.com/event/autodesk-university-2021/planning/UGxhbm5pbmdfNjcwMjMy" target="_blank">Digitaler Zwilling und Automation auf dem Weg zum digitalen Bau (AS500379)</a> (German)</li>
+<li><a href="https://events-platform.autodesk.com/event/autodesk-university-2021/planning/UGxhbm5pbmdfNjcwMTQz" target="_blank">Uso de Forge para la transformación digital en arquitectura y construcción (CS500234)</a> (Spanish)</li>
+</ul>
+
+Check them out if your preferred language is French, German or Spanish.
+
+For more information on the current Forge hackathon and Autodesk University cfoming up next week, check out Kean's article
+on [At the Forge Hackathon, counting down to AU2021](https://www.keanw.com/2021/09/at-the-forge-hackathon-counting-down-to-au2021.html).
 
 
-####<a name="2"></a> 
+####<a name="2"></a> Apply Code Changes in Revit Add-In
 
 Chris Hildebran pointed out that 'Apply code changes' now works when debugging and editing a Revit add-in:
 
