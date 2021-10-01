@@ -43,9 +43,9 @@ Many thanks to  for this very helpful explanation!
 
 Today, I highlight our new local language Forge classes and the renewed ability to easily edit and continue while debugging a Revit add-in:
 
-####<a name="2"></a> Non-mobile after computer crash
-####<a name="3"></a> Local language Forge classes
-####<a name="4"></a> Apply code changes debugging Revit add-in
+- [Non-mobile after computer crash](#2)
+- [Local language Forge classes](#3)
+- [Apply code changes debugging Revit add-in](#4)
 
 Before diving in, here is a nice little snippet of wisdom, courtesy
 of [Ehsan @eirannejad](https://twitter.com/eirannejad):
