@@ -57,7 +57,7 @@ of [Ehsan @eirannejad](https://twitter.com/eirannejad):
 
 ####<a name="2"></a> Non-Mobile after Computer Crash
 
-My computer crashed, quite litarally, falling several metres onto a stone floor and hitting its right front corner:
+My computer crashed, quite literally, falling several metres onto a stone floor and hitting its right front corner:
 
 <center>
 <img src="img/computer_crash_2.jpg" alt="Computer crash" title="Computer crash" width="359"/> <!-- 637 -->
@@ -118,7 +118,7 @@ That discovery is the 'Apply Code Changes' button located to the right of the St
 
 I gather it has been available for C++ for quite a while, but just recently for .NET projects, as of Visual Studio Version 16.11.0 Preview 1.0.
 
-While debugging, I thought I'd see if this would work in Revit Addin Development.
+While debugging, I thought I'd see if this would work in Revit add-in development.
  
 Initial testing confirmed that it does indeed apply code changes that can be seen in my video demonstrating the modification of an add-in tool I'm working on &ndash; at least in C#; still need to test `.xaml`.
  
