@@ -68,6 +68,27 @@ of [Ehsan @eirannejad](https://twitter.com/eirannejad):
 </blockquote>
   
 
+####<a name="2"></a> Non-Mobile after Computer Crash
+
+My computer crashed, quite litarally, falling over a metre onto a stone floor onto its front corner:
+
+<center>
+<img src="img/computer_crash_2.jpg" alt="Computer crash" title="Computer crash" width="359"/> <!-- 637 -->
+</center>
+
+Unsurprisingly, the screen broke:
+
+<center>
+<img src="img/computer_crash_5.jpg" alt="Computer crash" title="Computer crash" width="359"/> <!-- 359 -->
+</center>
+
+More to my surprise, the rest remained intact; so, I am happily up and running again with peripherals, an external screen, kayboard and mouse:
+
+<center>
+<img src="img/computer_crash_6.jpg" alt="Computer crash" title="Computer crash" width="359"/> <!-- 359 -->
+</center>
+
+
 ####<a name="2"></a> Local Language Forge Classes 
 
 We are running a Forge hackathon this week and have Autodesk University coming up next, so there is a lot of exciting activity going on at that front.
