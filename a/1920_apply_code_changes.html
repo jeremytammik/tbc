@@ -38,18 +38,64 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-<h3>Apply Code Changes</h3>
-<h4><a name="2"></a></h4>
+<h3>Localised Forge Intros and Apply Code Changes</h3>
+<p>Today, I highlight our new local language Forge classes and the renewed ability to easily edit and continue while debugging a Revit add-in:</p>
+<h4><a name="2"></a> Non-mobile after computer crash</h4>
+<h4><a name="3"></a> Local language Forge classes</h4>
+<h4><a name="4"></a> Apply code changes debugging Revit add-in</h4>
+<p>Before diving in, here is a nice little snippet of wisdom, courtesy
+of <a href="https://twitter.com/eirannejad">Ehsan @eirannejad</a>:</p>
+<blockquote>
+<p><i>Every man has two lives; the second starts when he realizes he has just one.</i></p>
+<p style="text-align: right; font-style: italic">&ndash; Confucius</p>
+</blockquote>
+
+<h4><a name="2"></a> Non-Mobile after Computer Crash</h4>
+<p>My computer crashed, quite litarally, falling several metres onto a stone floor and hitting its right front corner:</p>
+<p><center>
+<img src="img/computer_crash_2.jpg" alt="Computer crash" title="Computer crash" width="359"/> <!-- 637 -->
+</center></p>
+<p>Unsurprisingly, the screen broke:</p>
+<p><center>
+<img src="img/computer_crash_5.jpg" alt="Computer crash" title="Computer crash" width="359"/> <!-- 359 -->
+</center></p>
+<p>More to my surprise, the rest remained intact; so, I am now happily up and running again with peripherals: external screen, keyboard and mouse:</p>
+<p><center>
+<img src="img/computer_crash_6.jpg" alt="Computer crash" title="Computer crash" width="359"/> <!-- 359 -->
+</center></p>
+<p>Could have been worse...</p>
+<h4><a name="3"></a> Local Language Forge Classes</h4>
+<p>Back to topics of more general interest, we are running a Forge hackathon this week and have Autodesk University coming up next, so there is a lot of exciting activity going on at that front.</p>
+<p>If you are interested in learning more about Forge and your primary language is not English, one of our new local language classes may be for you:</p>
+<!--
+Automation & Jumeaux Numériques pour l‘industrialisation de la construction (SD500073) (French)
+Digitaler Zwilling und Automation auf dem Weg zum digitalen Bau (AS500379) (German)
+Uso de Forge para la transformación digital en arquitectura y construcción (CS500234) (Spanish)
+Be sure to check one of them out if your preferred language is French, German or Spanish.
+-->
+
+<ul>
+<li><a href="https://events-platform.autodesk.com/event/autodesk-university-2021/planning/UGxhbm5pbmdfNjcwMjAy" target="_blank">Automation &amp; Jumeaux numériques pour l'industrialisation de la construction (SD500073)</a> (French)</li>
+<li><a href="https://events-platform.autodesk.com/event/autodesk-university-2021/planning/UGxhbm5pbmdfNjcwMjMy" target="_blank">Digitaler Zwilling und Automation auf dem Weg zum digitalen Bau (AS500379)</a> (German)</li>
+<li><a href="https://events-platform.autodesk.com/event/autodesk-university-2021/planning/UGxhbm5pbmdfNjcwMTQz" target="_blank">Uso de Forge para la transformación digital en arquitectura y construcción (CS500234)</a> (Spanish)</li>
+</ul>
+
+<p>Please check them out if your preferred language is French, German or Spanish.</p>
+<p>For more information on the current Forge hackathon and Autodesk University, you can look at
+the <a href="https://www.autodesk.com/autodesk-university">AU website</a> and
+Kean's article
+on <a href="https://www.keanw.com/2021/09/at-the-forge-hackathon-counting-down-to-au2021.html">the Forge Hackathon and counting down to AU2021</a>.</p>
+<h4><a name="4"></a> Apply Code Changes Debugging Revit Add-In</h4>
 <p>Chris Hildebran pointed out that 'Apply code changes' now works when debugging and editing a Revit add-in:</p>
 <p>I'm writing as a result of a discovery I saw in Visual Studio today.
 That discovery is the 'Apply Code Changes' button located to the right of the Start/Continue button:</p>
 <p><center>
 <img src="img/apply_code_changes.png" alt="Apply code changes" title="Apply code changes" width="348"/> <!-- 348 -->
 </center></p>
-<p>I gather it has been available for C++ for quite a while but just recently for .NET projects as of Visual Studio Version 16.11.0 Preview 1.0.</p>
-<p>While debugging, I thought id see if this would work in Revit Addin Development.</p>
-<p>Initial testing confirmed that it does indeed apply code changes which can be seen in a video demonstrating the modification of an add-in tool I'm working on &ndash; in C# at least; Need to test <code>.xaml</code>.</p>
-<p>I've recorded a <a href="https://www.screencast.com/t/5oCj1jBJha">two-minute video</a> demonstrating the initial test, which I hope is clear enough to see.</p>
+<p>I gather it has been available for C++ for quite a while, but just recently for .NET projects, as of Visual Studio Version 16.11.0 Preview 1.0.</p>
+<p>While debugging, I thought I'd see if this would work in Revit Addin Development.</p>
+<p>Initial testing confirmed that it does indeed apply code changes that can be seen in my video demonstrating the modification of an add-in tool I'm working on &ndash; at least in C#; still need to test <code>.xaml</code>.</p>
+<p>Here is my <a href="https://www.screencast.com/t/5oCj1jBJha">two-minute video</a> demonstrating the initial test, which I hope is clear enough to see.</p>
 <p>I had planned to implement a solution Josh Lumley proposed, but if this continues to work, I will continue using this feature to drastically speed up development.</p>
 <p>Perhaps I'm late to the party, but I thought I'd mention it anyway.</p>
 <p>Here is
@@ -58,8 +104,3 @@ the Microsoft article <a href="https://devblogs.microsoft.com/dotnet/introducing
 <p>For completeness, The Building Coder topic group
 on <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.49">debuging without restart and live development</a> discusses
 how 'Edit and Continue' used to work way back in Revit 2008 and various other solutions suggested in the meantime.</p>
-<h4><a name="3"></a></h4>
-<h4><a name="4"></a></h4>
-<pre class="code">
-
-</pre>

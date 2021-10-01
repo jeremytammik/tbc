@@ -39,7 +39,13 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### Apply Code Changes
+### Localised Forge Intros and Apply Code Changes
+
+Today, I highlight our new local language Forge classes and the renewed ability to easily edit and continue while debugging a Revit add-in:
+
+####<a name="2"></a> Non-mobile after computer crash
+####<a name="3"></a> Local language Forge classes
+####<a name="4"></a> Apply code changes debugging Revit add-in
 
 Before diving in, here is a nice little snippet of wisdom, courtesy
 of [Ehsan @eirannejad](https://twitter.com/eirannejad):
@@ -48,11 +54,10 @@ of [Ehsan @eirannejad](https://twitter.com/eirannejad):
 <p><i>Every man has two lives; the second starts when he realizes he has just one.</i></p>
 <p style="text-align: right; font-style: italic">&ndash; Confucius</p>
 </blockquote>
-  
 
 ####<a name="2"></a> Non-Mobile after Computer Crash
 
-My computer crashed, quite litarally, falling over a metre onto a stone floor onto its front corner:
+My computer crashed, quite litarally, falling several metres onto a stone floor and hitting its right front corner:
 
 <center>
 <img src="img/computer_crash_2.jpg" alt="Computer crash" title="Computer crash" width="359"/> <!-- 637 -->
@@ -64,16 +69,18 @@ Unsurprisingly, the screen broke:
 <img src="img/computer_crash_5.jpg" alt="Computer crash" title="Computer crash" width="359"/> <!-- 359 -->
 </center>
 
-More to my surprise, the rest remained intact; so, I am happily up and running again with peripherals, an external screen, kayboard and mouse:
+More to my surprise, the rest remained intact; so, I am now happily up and running again with peripherals: external screen, keyboard and mouse:
 
 <center>
 <img src="img/computer_crash_6.jpg" alt="Computer crash" title="Computer crash" width="359"/> <!-- 359 -->
 </center>
 
+Could have been worse...
+
 
 ####<a name="3"></a> Local Language Forge Classes 
 
-Back to topics of more genertal interest, we are running a Forge hackathon this week and have Autodesk University coming up next, so there is a lot of exciting activity going on at that front.
+Back to topics of more general interest, we are running a Forge hackathon this week and have Autodesk University coming up next, so there is a lot of exciting activity going on at that front.
 
 If you are interested in learning more about Forge and your primary language is not English, one of our new local language classes may be for you:
 
@@ -90,15 +97,15 @@ Be sure to check one of them out if your preferred language is French, German or
 <li><a href="https://events-platform.autodesk.com/event/autodesk-university-2021/planning/UGxhbm5pbmdfNjcwMTQz" target="_blank">Uso de Forge para la transformación digital en arquitectura y construcción (CS500234)</a> (Spanish)</li>
 </ul>
 
-Check them out if your preferred language is French, German or Spanish.
+Please check them out if your preferred language is French, German or Spanish.
 
-For more information on the current Forge hackathon and Autodesk University, check out
+For more information on the current Forge hackathon and Autodesk University, you can look at
 the [AU website](https://www.autodesk.com/autodesk-university) and
 Kean's article
 on [the Forge Hackathon and counting down to AU2021](https://www.keanw.com/2021/09/at-the-forge-hackathon-counting-down-to-au2021.html).
 
 
-####<a name="4"></a> Apply Code Changes in Revit Add-In
+####<a name="4"></a> Apply Code Changes Debugging Revit Add-In
 
 Chris Hildebran pointed out that 'Apply code changes' now works when debugging and editing a Revit add-in:
 
