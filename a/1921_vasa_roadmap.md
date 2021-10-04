@@ -6,8 +6,6 @@
 
 <!---
 
-- [VASA, a Dynamo tool for 3D voxel-based architectural space analysis](https://www.keanw.com/2021/09/introducing-vasa-for-voxel-based-architectural-space-analysis.html)
-
 - roadmap
   [@AutodeskRevit](https://twitter.com/AutodeskRevit) shares
   the [Revit Public Roadmap Update Fall 2021](https://blogs.autodesk.com/revit/2021/09/30/revit-public-roadmap-update-fall-2021)
@@ -16,12 +14,9 @@
   here we're hosting [3 #AMA sessions](https://twitter.com/hashtag/AMA) to take your questions
   on what's new, what's in development, and the road ahead.
 
-Pawel Piechnik
-• 1st
-Product Manager, Strategist and Structural Engineer standing at the intersection of AEC and IT industries
-2d • 2 days ago
-
-... a structural recommendation for the upcoming #AU2021 : Check out this session discussing an immersive, "inside-#revit" structural design case study: "Revit-driven design of steel structures with real-time model updating using ENERCALC Structural Engineering Library design calculations.". https://lnkd.in/e2SS9J7N
+- Pawel Piechnik
+  Product Manager, Strategist and Structural Engineer standing at the intersection of AEC and IT industries
+   ... a structural recommendation for the upcoming #AU2021 : Check out this session discussing an immersive, "inside-#revit" structural design case study: "Revit-driven design of steel structures with real-time model updating using ENERCALC Structural Engineering Library design calculations.". https://lnkd.in/e2SS9J7N
 #structuralengineering
 
 - Revit Category Guide
@@ -30,6 +25,8 @@ Product Manager, Strategist and Structural Engineer standing at the intersection
   
 - how to hide internal edges of solids
   18247333 [Appearance of DirectShape created with Dynamo vs API]
+
+- [VASA, a Dynamo tool for 3D voxel-based architectural space analysis](https://www.keanw.com/2021/09/introducing-vasa-for-voxel-based-architectural-space-analysis.html)
 
 twitter:
 
@@ -90,8 +87,6 @@ on [the Forge Hackathon and counting down to AU2021](https://www.keanw.com/2021/
 
 
 ####<a name="4"></a> 
-
-- [VASA, a Dynamo tool for 3D voxel-based architectural space analysis](https://www.keanw.com/2021/09/introducing-vasa-for-voxel-based-architectural-space-analysis.html)
 
 - roadmap
   [@AutodeskRevit](https://twitter.com/AutodeskRevit) shares
@@ -216,3 +211,13 @@ In exploring this further, you might also appreciate this GitHub link to the ope
 Might not solve this problem entirely, but it should give a few strings to pull at.
 
 To summarise: if the input geometry is a solid or surface, Dynamo tries to use the `BrepBuilder`; if it fails, it uses the tessellated shape builder, e.g., if the input geometry is a `Mesh`, then it uses the tessellated shape builder directly. 
+
+####<a name="4"></a> VASA 3D Voxel-Based Architectural Space Analysis
+
+Talking about Dynamo, solids and volumes, you might be interested in Kean's presentation
+of [VASA, a Dynamo tool for 3D voxel-based architectural space analysis](https://www.keanw.com/2021/09/introducing-vasa-for-voxel-based-architectural-space-analysis.html):
+
+> Here’s a quick animation from the 'overview' sample that shows daylight, visibility and pathfinding combined. Performance is impressive &ndash; it’s very nearly interactive as we change the distance for the visibility field’s cut-off:
+
+
+
