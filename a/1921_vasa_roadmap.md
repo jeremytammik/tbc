@@ -73,6 +73,8 @@ Many thanks to  for this very helpful explanation!
 
 ### Roadmaps and Vasa 
 
+Lots of exciting announcements to expect at AU next week, and some of them in these days leqaading up to it:
+
 - [Revit roadmap update and AMA at AU](#2)
 - [Structural news at AU](#3)
 - [Revit category guide](#4)
@@ -94,12 +96,9 @@ take your questions on what's new, what's in development, and the road ahead.
 
 ####<a name="3"></a> Structural News at AU
 
-[Pawel Piechnik](https://twitter.com/piechnikp), Product Manager, Strategist and Structural Engineer standing at the intersection of AEC and IT industries, shares another important 
+[Pawel Piechnik](https://twitter.com/piechnikp), Product Manager, Strategist and Structural Engineer standing at the intersection of AEC and IT industries, shares numerous other important recommendations for Revit Structural at AU, e.g.,
 
-> structural recommendation for the upcoming #AU2021:
-Check out this session discussing an immersive, 'inside-#revit' structural design case study: "Revit-driven design of steel structures with real-time model updating using ENERCALC Structural Engineering Library design calculations.". https://lnkd.in/e2SS9J7N
-#structuralengineering
-
+> Check out [this session](https://lnkd.in/e2SS9J7N) discussing an immersive, 'inside-#revit' structural design case study: "Revit-driven design of steel structures with real-time model updating using ENERCALC Structural Engineering Library design calculations.", 
 [BIM-Driven Engineering: Structural Design Without Redundant Workload &ndash; *BES500004*](https://events-platform.autodesk.com/event/autodesk-university-2021/planning/UGxhbm5pbmdfNjY2OTI4)
 
 ####<a name="4"></a> Revit Category Guide
