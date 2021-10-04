@@ -21,7 +21,7 @@
 
 - Revit Category Guide
   https://docs.google.com/spreadsheets/d/1uNa77XYLjeN-1c63gsX6C5D5Pvn_3ZB4B0QMgPeloTw/edit#gid=1549586957
-  Category Name	- Built In Enum -	User Mapped	- Display Category Name	- Display Category Name (Rus)
+  Category Name, Built In Enum, User Mapped, Display Category Name, Display Category Name (Rus)
   
 - how to hide internal edges of solids
   18247333 [Appearance of DirectShape created with Dynamo vs API]
@@ -74,41 +74,32 @@ Many thanks to  for this very helpful explanation!
 ### Roadmaps and Vasa 
 
 
-####<a name="2"></a> 
+####<a name="2"></a> Revit Roadmap Update and AMA at AU
 
+To provide an idea where Revit is headed and enable you to contribute and influence the plans, 
+[@AutodeskRevit](https://twitter.com/AutodeskRevit) shares
+the [Revit Public Roadmap Update Fall 2021](https://blogs.autodesk.com/revit/2021/09/30/revit-public-roadmap-update-fall-2021):
 
-####<a name="3"></a>
+> The [#Revit team](https://twitter.com/hashtag/Revit) is out with the latest edition of the Revit Public Roadmap.
+Check it on the blog and don't forget to register
+for [#AU21](https://twitter.com/hashtag/AU21),
+where we're hosting [3 #AMA sessions](https://twitter.com/hashtag/AMA) (ask me anything) to
+take your questions on what's new, what's in development, and the road ahead.
 
+####<a name="3"></a> Structural News at AU
 
-For more information on the current Forge hackathon and Autodesk University, you can look at
-the [AU website](https://www.autodesk.com/autodesk-university) and
-Kean's article
-on [the Forge Hackathon and counting down to AU2021](https://www.keanw.com/2021/09/at-the-forge-hackathon-counting-down-to-au2021.html).
+[Pawel Piechnik](https://twitter.com/piechnikp), Product Manager, Strategist and Structural Engineer standing at the intersection of AEC and IT industries, shares another important 
 
-
-####<a name="4"></a> 
-
-- roadmap
-  [@AutodeskRevit](https://twitter.com/AutodeskRevit) shares
-  the [Revit Public Roadmap Update Fall 2021](https://blogs.autodesk.com/revit/2021/09/30/revit-public-roadmap-update-fall-2021)
-  > The [#Revit team](https://twitter.com/hashtag/Revit) is out with the latest edition of the Revit Public Roadmap.
-  Check it on the blog and don't forget to register for [#AU21](https://twitter.com/hashtag/AU21), w
-  here we're hosting [3 #AMA sessions](https://twitter.com/hashtag/AMA) to take your questions
-  on what's new, what's in development, and the road ahead.
-
-Pawel Piechnik
-• 1st
-Product Manager, Strategist and Structural Engineer standing at the intersection of AEC and IT industries
-2d • 2 days ago
-
-... a structural recommendation for the upcoming #AU2021 : Check out this session discussing an immersive, "inside-#revit" structural design case study: "Revit-driven design of steel structures with real-time model updating using ENERCALC Structural Engineering Library design calculations.". https://lnkd.in/e2SS9J7N
+> structural recommendation for the upcoming #AU2021:
+Check out this session discussing an immersive, 'inside-#revit' structural design case study: "Revit-driven design of steel structures with real-time model updating using ENERCALC Structural Engineering Library design calculations.". https://lnkd.in/e2SS9J7N
 #structuralengineering
+
+[BIM-Driven Engineering: Structural Design Without Redundant Workload &ndash; *BES500004*](https://events-platform.autodesk.com/event/autodesk-university-2021/planning/UGxhbm5pbmdfNjY2OTI4)
 
 ####<a name="4"></a> Revit Category Guide
 
-Revit Category Guide
-  https://docs.google.com/spreadsheets/d/1uNa77XYLjeN-1c63gsX6C5D5Pvn_3ZB4B0QMgPeloTw/edit#gid=1549586957
-  Category Name	- Built In Enum -	User Mapped	- Display Category Name	- Display Category Name (Rus)
+Talking about roadmaps, here is a handy
+[Revit Category Guide](https://docs.google.com/spreadsheets/d/1uNa77XYLjeN-1c63gsX6C5D5Pvn_3ZB4B0QMgPeloTw/edit#gid=1549586957), a spreadsheet listing all category names and associating Category Name, Built In Enum, User Mapped, Display Category Name, Display Category Name (Rus)
   
 ####<a name="4"></a> How to Hide Internal Edges of Solids
 
@@ -219,5 +210,6 @@ of [VASA, a Dynamo tool for 3D voxel-based architectural space analysis](https:/
 
 > Here’s a quick animation from the 'overview' sample that shows daylight, visibility and pathfinding combined. Performance is impressive &ndash; it’s very nearly interactive as we change the distance for the visibility field’s cut-off:
 
-
-
+<center>
+<img src="img/vasa_overview_sample.gif" alt="VASA overview sample" title="VASA overview sample" width="460"/> <!-- 3584 -->
+</center>
