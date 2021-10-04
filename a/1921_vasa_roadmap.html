@@ -71,6 +71,7 @@ Many thanks to  for this very helpful explanation!
 -->
 
 <h3>Roadmaps and Vasa</h3>
+<p>Numerous exciting announcements leading up to AU this week:</p>
 <ul>
 <li><a href="#2">Revit roadmap update and AMA at AU</a></li>
 <li><a href="#3">Structural news at AU</a></li>
@@ -90,13 +91,11 @@ where we're hosting <a href="https://twitter.com/hashtag/AMA">3 #AMA sessions</a
 take your questions on what's new, what's in development, and the road ahead.</p>
 </blockquote>
 <h4><a name="3"></a> Structural News at AU</h4>
-<p><a href="https://twitter.com/piechnikp">Pawel Piechnik</a>, Product Manager, Strategist and Structural Engineer standing at the intersection of AEC and IT industries, shares another important </p>
+<p><a href="https://twitter.com/piechnikp">Pawel Piechnik</a>, Product Manager, Strategist and Structural Engineer standing at the intersection of AEC and IT industries, shares numerous other important recommendations for Revit Structural at AU, e.g.,</p>
 <blockquote>
-<p>structural recommendation for the upcoming #AU2021:
-Check out this session discussing an immersive, 'inside-#revit' structural design case study: "Revit-driven design of steel structures with real-time model updating using ENERCALC Structural Engineering Library design calculations.". https://lnkd.in/e2SS9J7N</p>
+<p>Check out <a href="https://lnkd.in/e2SS9J7N">this session</a> discussing an immersive, 'inside-#revit' structural design case study: "Revit-driven design of steel structures with real-time model updating using ENERCALC Structural Engineering Library design calculations.", 
+<a href="https://events-platform.autodesk.com/event/autodesk-university-2021/planning/UGxhbm5pbmdfNjY2OTI4">BIM-Driven Engineering: Structural Design Without Redundant Workload &ndash; <em>BES500004</em></a></p>
 </blockquote>
-<h1>structuralengineering</h1>
-<p><a href="https://events-platform.autodesk.com/event/autodesk-university-2021/planning/UGxhbm5pbmdfNjY2OTI4">BIM-Driven Engineering: Structural Design Without Redundant Workload &ndash; <em>BES500004</em></a></p>
 <h4><a name="4"></a> Revit Category Guide</h4>
 <p>Talking about roadmaps, here is a handy
 <a href="https://docs.google.com/spreadsheets/d/1uNa77XYLjeN-1c63gsX6C5D5Pvn_3ZB4B0QMgPeloTw/edit#gid=1549586957">Revit Category Guide</a>, a spreadsheet listing all category names and associating Category Name, Built In Enum, User Mapped, Display Category Name, and Display Category Name in Russian.</p>
@@ -112,47 +111,51 @@ If I use the Dynamo <code>DirectShape.ByGeometry</code> node instead, the result
 <p>How do I create a solid without mesh edges in my own code? </p>
 <p>See my code for the creation of DirectShape:</p>
 <pre class="code">
-  RevitDB.Material material = GetPassMaterial(doc);
+&nbsp;&nbsp;RevitDB.Material&nbsp;material&nbsp;=&nbsp;GetPassMaterial(&nbsp;doc&nbsp;);
 
-  using (RevitDB.Transaction t = new RevitDB.Transaction(doc, "Create sphere direct shape"))
-  {
-    t.Start();
+&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;RevitDB.Transaction&nbsp;t&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;RevitDB.Transaction(&nbsp;doc,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Create&nbsp;sphere&nbsp;direct&nbsp;shape&quot;</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;t.Start();
 
-    int sens = 1;
-    var sortedPointsVolumesDS = pointsVolumesDS.ToArray().OrderBy(pv => origine.DistanceTo(pv.Key) * sens);
-    int passNumber = 1;
-    foreach (var item in sortedPointsVolumesDS)
-    {
-      string name = $"{fanName}_{driName}_{passNumber}";
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;sens&nbsp;=&nbsp;1;
 
-      // creation de la géometrie
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;sortedPointsVolumesDS&nbsp;=&nbsp;pointsVolumesDS.ToArray().OrderBy(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pv&nbsp;=&gt;&nbsp;origine.DistanceTo(&nbsp;pv.Key&nbsp;)&nbsp;*&nbsp;sens&nbsp;);
 
-      IList<RevitDB.GeometryObject> revitGeometry = item.Value.ToRevitType(
-        RevitDB.TessellatedShapeBuilderTarget.Solid,
-        RevitDB.TessellatedShapeBuilderFallback.Abort,
-        material.Id);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;passNumber&nbsp;=&nbsp;1;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;var&nbsp;item&nbsp;<span style="color:blue;">in</span>&nbsp;sortedPointsVolumesDS&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;name&nbsp;=&nbsp;<span style="color:#a31515;">$&quot;</span>{fanName}<span style="color:#a31515;">_</span>{driName}<span style="color:#a31515;">_</span>{passNumber}<span style="color:#a31515;">&quot;</span>;
 
-      //IList<RevitDB.GeometryObject> tessellatedShape = null;
-      // tessellatedShape = item.Value.ToRevitType(
-      // RevitDB.TessellatedShapeBuilderTarget.AnyGeometry,
-      // RevitDB.TessellatedShapeBuilderFallback.Abort,
-      // material.Id);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;creation&nbsp;de&nbsp;la&nbsp;géometrie</span>
 
-      if (revitGeometry?.Count>0)
-      {
-        RevitDB.DirectShape ds = RevitDB.DirectShape.CreateElement(doc,
-          new RevitDB.ElementId(RevitDB.BuiltInCategory.OST_GenericModel));
-        ds.ApplicationId = name;
-        ds.ApplicationDataId = Guid.NewGuid().ToString(); // "Geometry object id";
-        ds.SetShape(revitGeometry);
-        //ds.SetShape(tessellatedShape);
-      }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IList&lt;RevitDB.GeometryObject&gt;&nbsp;revitGeometry&nbsp;=&nbsp;item.Value.ToRevitType(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RevitDB.TessellatedShapeBuilderTarget.Solid,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RevitDB.TessellatedShapeBuilderFallback.Abort,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;material.Id&nbsp;);
 
-      // on incremente le numéro de la passe
-      passNumber++;
-    }
-    t.Commit();
-  }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//IList&lt;RevitDB.GeometryObject&gt;&nbsp;tessellatedShape&nbsp;=&nbsp;null;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;tessellatedShape&nbsp;=&nbsp;item.Value.ToRevitType(</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;RevitDB.TessellatedShapeBuilderTarget.AnyGeometry,</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;RevitDB.TessellatedShapeBuilderFallback.Abort,</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;material.Id);</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;revitGeometry?.Count&nbsp;&gt;&nbsp;0&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RevitDB.DirectShape&nbsp;ds&nbsp;=&nbsp;RevitDB.DirectShape.CreateElement(&nbsp;doc,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;RevitDB.ElementId(&nbsp;RevitDB.BuiltInCategory.OST_GenericModel&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ds.ApplicationId&nbsp;=&nbsp;name;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ds.ApplicationDataId&nbsp;=&nbsp;Guid.NewGuid().ToString();&nbsp;<span style="color:green;">//&nbsp;&quot;Geometry&nbsp;object&nbsp;id&quot;;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ds.SetShape(&nbsp;revitGeometry&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//ds.SetShape(tessellatedShape);</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;on&nbsp;incremente&nbsp;le&nbsp;numéro&nbsp;de&nbsp;la&nbsp;passe</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;passNumber++;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;t.Commit();
+&nbsp;&nbsp;}
 </pre>
 
 <p><strong>Answer:</strong> The quick answer is simple:</p>

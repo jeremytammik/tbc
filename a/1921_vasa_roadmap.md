@@ -73,7 +73,7 @@ Many thanks to  for this very helpful explanation!
 
 ### Roadmaps and Vasa 
 
-Lots of exciting announcements to expect at AU next week, and some of them in these days leqaading up to it:
+Numerous exciting announcements leading up to AU this week:
 
 - [Revit roadmap update and AMA at AU](#2)
 - [Structural news at AU](#3)
@@ -125,47 +125,51 @@ How do I create a solid without mesh edges in my own code?
 See my code for the creation of DirectShape:
 
 <pre class="code">
-  RevitDB.Material material = GetPassMaterial(doc);
-  
-  using (RevitDB.Transaction t = new RevitDB.Transaction(doc, "Create sphere direct shape"))
-  {
-    t.Start();
-    
-    int sens = 1;
-    var sortedPointsVolumesDS = pointsVolumesDS.ToArray().OrderBy(pv => origine.DistanceTo(pv.Key) * sens);
-    int passNumber = 1;
-    foreach (var item in sortedPointsVolumesDS)
-    {
-      string name = $"{fanName}_{driName}_{passNumber}";
-      
-      // creation de la géometrie
-      
-      IList<RevitDB.GeometryObject> revitGeometry = item.Value.ToRevitType(
-        RevitDB.TessellatedShapeBuilderTarget.Solid,
-        RevitDB.TessellatedShapeBuilderFallback.Abort,
-        material.Id);
-      
-      //IList<RevitDB.GeometryObject> tessellatedShape = null;
-      // tessellatedShape = item.Value.ToRevitType(
-      // RevitDB.TessellatedShapeBuilderTarget.AnyGeometry,
-      // RevitDB.TessellatedShapeBuilderFallback.Abort,
-      // material.Id);
-      
-      if (revitGeometry?.Count>0)
-      {
-        RevitDB.DirectShape ds = RevitDB.DirectShape.CreateElement(doc,
-          new RevitDB.ElementId(RevitDB.BuiltInCategory.OST_GenericModel));
-        ds.ApplicationId = name;
-        ds.ApplicationDataId = Guid.NewGuid().ToString(); // "Geometry object id";
-        ds.SetShape(revitGeometry);
-        //ds.SetShape(tessellatedShape);
-      }
-      
-      // on incremente le numéro de la passe
-      passNumber++;
-    }
-    t.Commit();
-  }
+&nbsp;&nbsp;RevitDB.Material&nbsp;material&nbsp;=&nbsp;GetPassMaterial(&nbsp;doc&nbsp;);
+ 
+&nbsp;&nbsp;<span style="color:blue;">using</span>(&nbsp;RevitDB.Transaction&nbsp;t&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;RevitDB.Transaction(&nbsp;doc,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;Create&nbsp;sphere&nbsp;direct&nbsp;shape&quot;</span>&nbsp;)&nbsp;)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;t.Start();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;sens&nbsp;=&nbsp;1;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;sortedPointsVolumesDS&nbsp;=&nbsp;pointsVolumesDS.ToArray().OrderBy(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pv&nbsp;=&gt;&nbsp;origine.DistanceTo(&nbsp;pv.Key&nbsp;)&nbsp;*&nbsp;sens&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">int</span>&nbsp;passNumber&nbsp;=&nbsp;1;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">foreach</span>(&nbsp;var&nbsp;item&nbsp;<span style="color:blue;">in</span>&nbsp;sortedPointsVolumesDS&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;name&nbsp;=&nbsp;<span style="color:#a31515;">$&quot;</span>{fanName}<span style="color:#a31515;">_</span>{driName}<span style="color:#a31515;">_</span>{passNumber}<span style="color:#a31515;">&quot;</span>;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;creation&nbsp;de&nbsp;la&nbsp;géometrie</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IList&lt;RevitDB.GeometryObject&gt;&nbsp;revitGeometry&nbsp;=&nbsp;item.Value.ToRevitType(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RevitDB.TessellatedShapeBuilderTarget.Solid,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RevitDB.TessellatedShapeBuilderFallback.Abort,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;material.Id&nbsp;);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//IList&lt;RevitDB.GeometryObject&gt;&nbsp;tessellatedShape&nbsp;=&nbsp;null;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;tessellatedShape&nbsp;=&nbsp;item.Value.ToRevitType(</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;RevitDB.TessellatedShapeBuilderTarget.AnyGeometry,</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;RevitDB.TessellatedShapeBuilderFallback.Abort,</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;material.Id);</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">if</span>(&nbsp;revitGeometry?.Count&nbsp;&gt;&nbsp;0&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RevitDB.DirectShape&nbsp;ds&nbsp;=&nbsp;RevitDB.DirectShape.CreateElement(&nbsp;doc,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;RevitDB.ElementId(&nbsp;RevitDB.BuiltInCategory.OST_GenericModel&nbsp;)&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ds.ApplicationId&nbsp;=&nbsp;name;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ds.ApplicationDataId&nbsp;=&nbsp;Guid.NewGuid().ToString();&nbsp;<span style="color:green;">//&nbsp;&quot;Geometry&nbsp;object&nbsp;id&quot;;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ds.SetShape(&nbsp;revitGeometry&nbsp;);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//ds.SetShape(tessellatedShape);</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;on&nbsp;incremente&nbsp;le&nbsp;numéro&nbsp;de&nbsp;la&nbsp;passe</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;passNumber++;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;t.Commit();
+&nbsp;&nbsp;}
 </pre>
 
 **Answer:** The quick answer is simple:
