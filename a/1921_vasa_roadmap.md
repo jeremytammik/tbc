@@ -73,6 +73,12 @@ Many thanks to  for this very helpful explanation!
 
 ### Roadmaps and Vasa 
 
+- [Revit roadmap update and AMA at AU](#2)
+- [Structural news at AU](#3)
+- [Revit category guide](#4)
+- [How to hide internal edges of solids](#5)
+- [VASA 3D voxel-based architectural space analysis](#6)
+
 
 ####<a name="2"></a> Revit Roadmap Update and AMA at AU
 
@@ -101,7 +107,7 @@ Check out this session discussing an immersive, 'inside-#revit' structural desig
 Talking about roadmaps, here is a handy
 [Revit Category Guide](https://docs.google.com/spreadsheets/d/1uNa77XYLjeN-1c63gsX6C5D5Pvn_3ZB4B0QMgPeloTw/edit#gid=1549586957), a spreadsheet listing all category names and associating Category Name, Built In Enum, User Mapped, Display Category Name, and Display Category Name in Russian.
   
-####<a name="4"></a> How to Hide Internal Edges of Solids
+####<a name="5"></a> How to Hide Internal Edges of Solids
 
 Back to a pure programming topic, we gleaned some new information on how to hide internal edges of solids in a discussion on the appearance of `DirectShape` elements created with Dynamo vs directly using the Revit API:
 
@@ -203,7 +209,7 @@ Might not solve this problem entirely, but it should give a few strings to pull 
 
 To summarise: if the input geometry is a solid or surface, Dynamo tries to use the `BrepBuilder`; if it fails, it uses the tessellated shape builder, e.g., if the input geometry is a `Mesh`, then it uses the tessellated shape builder directly. 
 
-####<a name="4"></a> VASA 3D Voxel-Based Architectural Space Analysis
+####<a name="6"></a> VASA 3D Voxel-Based Architectural Space Analysis
 
 Talking about Dynamo, solids and volumes, you might be interested in Kean's presentation
 of [VASA, a Dynamo tool for 3D voxel-based architectural space analysis](https://www.keanw.com/2021/09/introducing-vasa-for-voxel-based-architectural-space-analysis.html):
