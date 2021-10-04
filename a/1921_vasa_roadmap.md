@@ -73,7 +73,7 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### AU, Roadmaps and Vasa
+### Hiding Edges, AU, Roadmaps and Vasa
 
 Numerous exciting announcements leading up to AU this week:
 
