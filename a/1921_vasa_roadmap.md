@@ -131,9 +131,9 @@ Why?
 
 How do I create a solid without mesh edges in my own code? 
 
-
 See my code for the creation of DirectShape:
 
+<pre class="code">
   RevitDB.Material material = GetPassMaterial(doc);
   
   using (RevitDB.Transaction t = new RevitDB.Transaction(doc, "Create sphere direct shape"))
@@ -175,29 +175,18 @@ See my code for the creation of DirectShape:
     }
     t.Commit();
   }
+</pre>
 
-/a/case/sfdc/18247333/direct_shape_tessellation_edges.png
+**Answer:** The quick answer is simple:
 
------------------------------------------------------------------------
-Email: Regarding [CaseNo:18247333.] Appearance of DirectShape created with Dynamo vs API [ ref:_00D308uIL._5003gEAXvB:ref ] 9/28/2021 3:22 PM Outbound
+The entire Dynamo framework is open source, giving you access to
+the [full implementation source code](https://github.com/DynamoDS)
 
-Dear Sébastien,
+So, you might be able to find out how yourself from the Dynamo source code.
+You could also discuss this in detail with the Dynamo experts in
+the [Dynamo discussion forum](https://forum.dynamobim.com).
 
-Thank you for your query.
-
-The quick answer is simple:
-
-The entire Dynamo framework is open source, giving you access to the full implementation source code:
-
-https://github.com/DynamoDS
-
-So, you might be able to find out how yourself from the Dynamo source code, or you could ask the Dynamo experts in the Dynamo discussion forum:
-
-https://forum.dynamobim.com
-
-However, I also went ahead and ask the Revit development team for you (internal link: https://autodesk.slack.com/archives/C0SR6NAP8/p1632838728105500). Maybe they can provide a quick answer.
-
-Furthermore, I have a suspicion or two of my own:
+However, I have a suspicion or two of my own that I would like to check with the Revit development team for you first:
 
 Maybe, the direct shape showing all the internal face tessellation edges has been defined using lots of separate individual triangular faces, whereas the other one uses just one single more complex planar face for the top and bottom.
 
