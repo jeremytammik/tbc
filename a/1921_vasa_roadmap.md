@@ -192,78 +192,27 @@ Maybe, the direct shape showing all the internal face tessellation edges has bee
 
 Actually, I believe that direct shapes are not limited to linear edges, but can include curved edges as well. Maybe, the non-tessellated shape face does not consist of triangles at all, but just two straight edges and an arc.
 
-I hope this helps.
+Later: the development team confirm my hunch:
 
-Best regards,
+The Revit API doesn't have a way to turn on or off mesh edges.
+However, creating a mesh through `TessellatedShapeBuilder` may attempt to hide certain edges depending on the topology of the mesh. 
 
------------------------------------------------------------------------
-https://autodesk.slack.com/archives/C0SR6NAP8/p1632838728105500
+We have not yet changed or added any API functions for our recent project to hide (some) interior mesh edges.
+We simply modified the function that marks certain mesh edges as hidden so that it marks all two-sided mesh edges as hidden.
+Previously, it only marked (nearly) tangential edges as hidden.
 
-Jeremy Tammik
+It was already the case that `TessellatedShapeBuilder` called that function when it created a mesh.
+However, `TessellatedShapeBuilder` may create a 'faceted' BRep, i.e., a BRep with planar faces and straight edges, instead of a mesh, in which case no edge hiding is done (as far as I know).
+Moreover, the effectiveness of the new edge-hiding depends very much on the topological structure of the mesh, which itself depends on several factors.
 
-Dear experts, creating a direct shape from Dynamo hides the internal tessellation edges. The Revit-API-generated shape shows them. How can they be hidden using the native Revit API, please? -- SFDC #18247333 -- Here is the code:
+Given that the sample code uses the option `TessellatedShapeBuilderTarget.Solid`, it could be that the Revit object is a `Solid` (internally, a BRep) and not a `Mesh` (internally, a GPolyMesh).
 
-Boris Shafiro
+Dynamo is not hiding interior mesh edges.
+It is simply creating a proper solid in this case, which it will do when it can.
+Note that in the next major release, we will hide the mesh edges, although that will unfortunately fool the user into creating sub-optimal geometry as a result, creating a mesh, when a solid is possible.
 
-@John Mitchell or @Lou Bianchini could you please take a look and answer the question from Jeremy?
+In exploring this further, you might also appreciate this GitHub link to the open source Dynamo for Revit code base [DirectShape.cs module](https://github.com/DynamoDS/DynamoRevit/blob/5c3b0d869ccdc2f4d5fd24b5346933f22d39f279/src/Libraries/RevitNodes/Elements/DirectShape.cs).
 
-Lou Bianchini
+Might not solve this problem entirely, but it should give a few strings to pull at.
 
-As I recall, Revit API doesn't have a way to turn on or off mesh edges. However creating a mesh through TessellatedShapeBuilder may attempt to hide certain edges depending on the topology of the mesh. I defer to @John Mitchell to confirm if that's the case and if any recent improvement may change that for an upcoming preview release or not.
-
-John Mitchell 
-
-As Lou said, we did not change or add any API functions for our recent project to hide (some) interior mesh edges. We simply modified the function that marks certain mesh edges as hidden so that it marks all two-sided mesh edges as hidden. Previously, it only marked (nearly) tangential edges as hidden.
-It was already the case that TessellatedShapeBuilder called that function when it created a mesh. However, TessellatedShapeBuilder may create a "faceted" BRep (i.e., a BRep with planar faces and straight edges) instead of a mesh, in which case no edge hiding is done (as far as I know). Moreover, the effectiveness of the new edge-hiding depends very much on the topological structure of the mesh, which itself depends on several factors.
-Given that the sample code uses the option TessellatedShapeBuilderTarget.Solid, it could be that the Revit object is a Solid (internally, a BRep) and not a Mesh (internally, a GPolyMesh).
-
-Angel Velez
-
-Right.  Dynamo is not hiding interior mesh edges.  It is creating a proper solid in this case, which it will do when it can.  Note that in Revit 2023 we will hide the mesh edges, although in this case the user will be fooled into creating sub-optimal geometry (a mesh, when a solid is possible) as a result.
-
-Jacob Small
-
-The original poster might also appreciate this github link to the open source Dynamo for Revit code base:
-
-https://github.com/DynamoDS/DynamoRevit/blob/5c3b0d869ccdc2f4d5fd24b5346933f22d39f279/src/Libraries/RevitNodes/Elements/DirectShape.cs
-
-Might not solve his problem entirely but it should give him a few strings to pull at.
-
-Michael Kirschner
-
-Angel has it correct - if the input geometry is a solid or surface a Dynamo tries to use the BrepBuilder, if it fails it uses the tessellated shape builder, - if the input geometry is a Mesh, then it uses the tessellated shape builder directly. (Thanks for linking to the code Jacob) - been a while since I looked at this.
-
-Jeremy Tammik
-
-Great! Thank you all very much for the quick and complete and very helpful answers!
-
------------------------------------------------------------------------
-Email: Regarding [CaseNo:18247333.] Appearance of DirectShape created with Dynamo vs API [ ref:_00D308uIL._5003gEAXvB:ref ] 10/1/2021 12:45 PM Outbound
-
-Dear Sébastien,
-
-I heard back from the development team, and they confirm my hunch:
-
-The Revit API doesn't have a way to turn on or off mesh edges. However, creating a mesh through TessellatedShapeBuilder may attempt to hide certain edges depending on the topology of the mesh. 
-
-We have not yet changed or added any API functions for our recent project to hide (some) interior mesh edges. We simply modified the function that marks certain mesh edges as hidden so that it marks all two-sided mesh edges as hidden. Previously, it only marked (nearly) tangential edges as hidden.
-
-It was already the case that TessellatedShapeBuilder called that function when it created a mesh. However, TessellatedShapeBuilder may create a "faceted" BRep (i.e., a BRep with planar faces and straight edges) instead of a mesh, in which case no edge hiding is done (as far as I know). Moreover, the effectiveness of the new edge-hiding depends very much on the topological structure of the mesh, which itself depends on several factors.
-
-Given that the sample code uses the option TessellatedShapeBuilderTarget.Solid, it could be that the Revit object is a Solid (internally, a BRep) and not a Mesh (internally, a GPolyMesh).
-
-Dynamo is not hiding interior mesh edges.  It is simply creating a proper solid in this case, which it will do when it can.  Note that in the next major release, we will hide the mesh edges, although that will unfortunately fool the user into creating sub-optimal geometry as a result, creating a mesh, when a solid is possible.
-
-The original poster might also appreciate this github link to the open source Dynamo for Revit code base:
-
-https://github.com/DynamoDS/DynamoRevit/blob/5c3b0d869ccdc2f4d5fd24b5346933f22d39f279/src/Libraries/RevitNodes/Elements/DirectShape.cs
-
-Might not solve his problem entirely, but it should give him a few strings to pull at.
-
-To summarise: if the input geometry is a solid or surface, Dynamo tries to use the BrepBuilder; if it fails it uses the tessellated shape builder, e.g., if the input geometry is a Mesh, then it uses the tessellated shape builder directly. 
-
-I hope this helps.
-
-Best regards,
-
------------------------------------------------------------------------
+To summarise: if the input geometry is a solid or surface, Dynamo tries to use the `BrepBuilder`; if it fails, it uses the tessellated shape builder, e.g., if the input geometry is a `Mesh`, then it uses the tessellated shape builder directly. 
