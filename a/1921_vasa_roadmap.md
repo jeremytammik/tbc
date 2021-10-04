@@ -99,11 +99,11 @@ Check out this session discussing an immersive, 'inside-#revit' structural desig
 ####<a name="4"></a> Revit Category Guide
 
 Talking about roadmaps, here is a handy
-[Revit Category Guide](https://docs.google.com/spreadsheets/d/1uNa77XYLjeN-1c63gsX6C5D5Pvn_3ZB4B0QMgPeloTw/edit#gid=1549586957), a spreadsheet listing all category names and associating Category Name, Built In Enum, User Mapped, Display Category Name, Display Category Name (Rus)
+[Revit Category Guide](https://docs.google.com/spreadsheets/d/1uNa77XYLjeN-1c63gsX6C5D5Pvn_3ZB4B0QMgPeloTw/edit#gid=1549586957), a spreadsheet listing all category names and associating Category Name, Built In Enum, User Mapped, Display Category Name, and Display Category Name in Russian.
   
 ####<a name="4"></a> How to Hide Internal Edges of Solids
 
-We gleaned some new information on how to hide internal edges of solids in a discussion on the appearance of `DirectShape` elements created with Dynamo vs directly using the Revit API:
+Back to a pure programming topic, we gleaned some new information on how to hide internal edges of solids in a discussion on the appearance of `DirectShape` elements created with Dynamo vs directly using the Revit API:
 
 **Question:** I made a custom node that creates volumes using `DesignScript.Geometry.Solid`.
 If I convert this solid to a `DirectShape` in my node, the resulting solids obtained in Revit, `Revit.DB.Solid`, display the internal mesh edges.
