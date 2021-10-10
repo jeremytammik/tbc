@@ -43,6 +43,15 @@ Numerous exciting announcements leading up to AU this week
 
 linkedin:
 
+Revit roadmap update, structural news and AMA at AU, category guide, VASA 3D voxel-based architectural space analysis and how to hide internal edges of solids with the #RevitAPI
+
+https://autode.sk/hideedges
+
+- Revit roadmap update and AMA at AU
+- Structural news at AU
+- Revit category guide
+- How to hide internal edges of solids
+- VASA 3D voxel-based architectural space analysis...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
