@@ -75,7 +75,7 @@ Unfortunately, requiring an external screen and hence mains power significantly 
 
 As a next step, I was able to transfer the entire system with all user and application data to a temporary loaner machine using the Mac migration assistant.
 
-That worked riht out the box.
+That worked right out the box.
 The only problem remaining being that the updated OS prevented me
 from [setting up my personal root level directories](https://thebuildingcoder.typepad.com/blog/2021/08/revit-roadmap-api-and-da4r-survey.html#4).
 I am forced to rewrite all my (numerous) shell scripts and add `$HOME` to them.
@@ -132,7 +132,7 @@ The [Costura.Template](https://github.com/Fody/Costura/tree/develop/src/Costura.
 If the Assembly is already loaded, the code does not force it to load again.
 I use this technique on
 the [ConduitMaterial](https://apps.autodesk.com/RVT/en/Detail/Index?id=9120027511121592515) and
-others plugins.
+other plugins.
 Adding `ILTemplate.Attach()` on the `IExternalApplication` should do the trick.
 
 Many thanks to Luiz Henrique for sharing this!
