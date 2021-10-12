@@ -132,3 +132,29 @@ other plugins.
 Adding <code>ILTemplate.Attach()</code> on the <code>IExternalApplication</code> should do the trick.</p>
 </blockquote>
 <p>Many thanks to Luiz Henrique for sharing this!</p>
+<h4><a name="6"></a> Addendum &ndash; Handling MahApps Dependencies</h4>
+<p>Micah <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/4045014">@kraftwerk15</a> Gray adds:</p>
+<p>‎I also wanted to chime in here with resources.
+Ehsan actually hopped on a call with me and showed me his process with submodules.
+Since then that's how I have been handling other libraries that I need to use in my project.</p>
+<p>While I started with an <code>AssemblyResolver</code>, loading in a newer version of the assembly will not resolve correctly when a previous version has already been loaded.
+This came about because of the CTC addins still used the MahApps version 2 (I believe).
+Then I come barrelling in to the situation with the new 3.x versions of MahApps because I wanted to use the new, fancy features.
+Revit will resolve everything up to the point where you wanted to use one of the 3.x features that the 2.x didn't have.
+Then my app would throw an Exception telling me that it couldn't find that 3.x feature because CTC had loaded the 2.x version first.</p>
+<p>So, Ehsan told me about submodules in git (which I had to learn about) and re-building MahApps open-source code under a new .dll name.</p>
+<p>Opening the open-source project, changing the name, building the submodules, and then referencing the new submodules have been fantastic.</p>
+<p>Here is a snippet of my library with the re-built MahApps content:</p>
+<p><center>
+<img src="img/assembly_resolver_dependencies.png" alt="MahApps dependencies" title="MahApps dependencies" width="600"/> <!-- 1023 -->
+</center></p>
+<p>Also, if you look in pyRevit's library, Ehsan does the same thing, or at least used to.</p>
+<p>Kudos of course to Ehsan for showing me this and thanks to Jeremy for pointing out this thread from the blog.</p>
+<p>Hopefully this helps someone in the future.</p>
+<p>Kennan Chen adds:</p>
+<p>Same issue with MahApps before and I also rebuilt the whole project.</p>
+<p>Life can be easier to compile MahApps project with another Public/Private key pair (.snk file), which will sign a unique strong name to the dll.
+Referencing a strong-named dll is supposed to be a common practise to address the "dll hell" issue:</p>
+<ul>
+<li><a href="https://docs.microsoft.com/en-us/dotnet/standard/assembly/strong-named">Strong-named assemblies | Microsoft Docs</a></li>
+</ul>
