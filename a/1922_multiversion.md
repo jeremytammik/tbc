@@ -30,16 +30,11 @@ add #thebuildingcoder
 
  with the #RevitAPI add-in #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-Options to implement multi-version add-ins and hints on storing dependencies in your add-in resources:
-
-- [Migration assistant rocks](#2)
-- [ExportCncFab 2022](#3)
-- [Multi-version Revit add-in](#4)
-- [Deploying a DLL file as a resource](#5)
-
-
-&ndash; 
-...
+Lots of options to implement multi-version add-ins and examples showing how to store DLL dependencies in your add-in resources
+&ndash; Migration assistant rocks
+&ndash; ExportCncFab 2022
+&ndash; Multi-version Revit add-in
+&ndash; Deploying a DLL file as a resource...
 
 linkedin:
 
@@ -67,7 +62,7 @@ Many thanks to  for this very helpful explanation!
 
 ### DLL as Resource and Multi-Version Add-Ins
 
-Successfully moved from my broken-screen laptop to a loaner machine, updated `ExportCncFab`, collected a list of options to implement multi-version add-ins and some hints on storing dependencies in your add-in resources:
+Successfully moved from my broken-screen laptop to a loaner machine, updated `ExportCncFab`, collected a list of options to implement multi-version add-ins and some hints on storingLots of odependencies in your add-in resources:
 
 - [Migration assistant rocks](#2)
 - [ExportCncFab 2022](#3)
