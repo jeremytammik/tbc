@@ -28,7 +28,7 @@ twitter:
 
 add #thebuildingcoder
 
-Working mobile again, lots of options to implement multi-version add-ins and examples showing how to store DLL dependencies in your add-in resources with the #RevitAPI add-in #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon https://autode.sk/multiversion
+Working mobile again, lots of options to implement multi-version add-ins and examples showing how to store DLL dependencies in your add-in resources with the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon https://autode.sk/multiversion
 
 Lots of options to implement multi-version add-ins and examples showing how to store DLL dependencies in your add-in resources
 &ndash; Migration assistant rocks
@@ -37,6 +37,15 @@ Lots of options to implement multi-version add-ins and examples showing how to s
 &ndash; Deploying a DLL file as a resource...
 
 linkedin:
+
+Working mobile again, lots of options to implement multi-version add-ins and examples showing how to store DLL dependencies in your add-in resources with the #RevitAPI
+
+https://autode.sk/multiversion
+
+- Migration assistant rocks
+- ExportCncFab 2022
+- Multi-version Revit add-in
+- Deploying a DLL file as a resource...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
