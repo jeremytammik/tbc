@@ -59,7 +59,7 @@ Many thanks to  for this very helpful explanation!
 
 ### Multi-Version Add-Ins and DLL as Resource
 
-Successfully moved from my broken-screen laptop to a loaner machine, updated
+Successfully moved from my broken-screen laptop to a loaner machine, updated `ExportCncFab`, collected a list of options to implement multi-version add-ins and some hints on storin dependencies in your add-in resources:
 
 - [Migration assistant rocks](#2)
 - [ExportCncFab 2022](#3)
