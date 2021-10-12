@@ -59,7 +59,12 @@ Many thanks to  for this very helpful explanation!
 
 ### Multi-Version Add-Ins and DLL as Resource
 
-Successfully moved from my broken-screen laptop to a loaner machine, updated 
+Successfully moved from my broken-screen laptop to a loaner machine, updated
+
+- [Migration assistant rocks](#2)
+- [ExportCncFab 2022](#3)
+- [Multi-version Revit add-in](#4)
+- [Deploying a DLL file as a resource](#5)
 
 ####<a name="2"></a> Migration Assistant Rocks
 
@@ -112,7 +117,7 @@ To provide an overview of the some available options, I added
 a [list of alternatives](https://github.com/jeremytammik/VisualStudioRevitAddinWizard#alternatives) to
 the [VisualStudioRevitAddinWizard GitHub repository](https://github.com/jeremytammik/VisualStudioRevitAddinWizard).
 
-####<a name="5"></a> Deploy DLL File as a Resource
+####<a name="5"></a> Deploying a DLL File as a Resource
 
 In the thread
 on [additional `.dll` files as resource](https://forums.autodesk.com/t5/revit-api-forum/additional-dll-files-as-resource/m-p/10653802#M58650),
