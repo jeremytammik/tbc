@@ -117,7 +117,7 @@ the [VisualStudioRevitAddinWizard GitHub repository](https://github.com/jeremyta
 In the thread
 on [additional `.dll` files as resource](https://forums.autodesk.com/t5/revit-api-forum/additional-dll-files-as-resource/m-p/10653802#M58650),
 Luiz Henrique [@ricaun](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/4176855) Cassettari provides
-some useful hints on embedding a DLL in the add-iun assembly, saying:
+a pointer to some useful examples showing how to embed a DLL in the add-in assembly, saying:
 
 > You could
 use [Fody.Costura](https://github.com/Fody/Costura) to
