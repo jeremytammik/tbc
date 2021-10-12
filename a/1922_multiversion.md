@@ -116,15 +116,18 @@ the [VisualStudioRevitAddinWizard GitHub repository](https://github.com/jeremyta
 
 In the thread
 on [additional `.dll` files as resource](https://forums.autodesk.com/t5/revit-api-forum/additional-dll-files-as-resource/m-p/10653802#M58650),
-[ricaun]() provides
+Luiz Henrique [@ricaun](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/4176855) Cassettari provides
 some useful hints on embedding a DLL in the add-iun assembly, saying:
 
-> You could use `Fody.Costura` to embed the .dll references automatically.
-The `Costura.Template` provides ILTemplate.cs and Common.cs to handle all the load resources files.
+> You could
+use [Fody.Costura](https://github.com/Fody/Costura) to
+embed the .dll references automatically.
+The [Costura.Template](https://github.com/Fody/Costura/tree/develop/src/Costura.Template) provides
+`ILTemplate.cs` and `Common.cs` to handle all the load resources files.
 If the Assembly is already loaded, the code does not force it to load again.
 I use this technique on
-the [ConduitMaterial]() and
+the [ConduitMaterial](https://apps.autodesk.com/RVT/en/Detail/Index?id=9120027511121592515) and
 others plugins.
 Adding `ILTemplate.Attach()` on the `IExternalApplication` should do the trick.
 
-Many thanks to *ricaun* for sharing this.
+Many thanks to Luiz Henrique for sharing this!
