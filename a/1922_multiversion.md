@@ -77,7 +77,7 @@ I am forced to rewrite all my (numerous) shell scripts and add `$HOME` to them.
 I guess I can live with that.
 
 <center>
-<img src="img/problem_no_problem.jpg" alt="Problem &ndash; no problem" title="Problem &ndash; no problem" width="100"/> <!-- 921 -->
+<img src="img/problem_no_problem.jpg" alt="Problem &ndash; no problem" title="Problem &ndash; no problem" width="400"/> <!-- 825 -->
 </center>
 
 
