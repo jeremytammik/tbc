@@ -7,6 +7,7 @@
 <!---
 
 - mention gibson agency
+  william_gibson_agency.jpg
 
 - performance issue retrieving MEP pipe insulation elements using GetDependentElements
   by Александр Игнатович <cadbimdeveloper@yandex.ru>
@@ -101,7 +102,7 @@ Three quick notes from my recent email correspondance and reading:
 
 
 <center>
-<img src="img/.jpg" alt="" title="" width="100"/> <!-- 825 -->
+<img src="img/william_gibson_agency.jpg" alt="William Gibson Agency" title="William Gibson Agency" width="400"/> <!-- 1843 -->
 </center>
 
 ####<a name="3"></a>
