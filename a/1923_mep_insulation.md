@@ -83,8 +83,10 @@ add #thebuildingcoder
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+Three quick notes on critical and inspiring sci-fi, programming languages and MEP filtering
+&ndash; Pipe insulation retrieval performance
+&ndash; Programming languages to learn
+&ndash; Agency by William Gibson...
 
 linkedin:
 
