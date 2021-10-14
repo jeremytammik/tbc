@@ -1,9 +1,8 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
-</head>
-
+<p></head></p>
 <!---
 
 - mention gibson agency
@@ -111,15 +110,12 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### Pipe Insulation Retrieval Performance
-
-Three quick notes from my recent email correspondance and reading:
-
-
-####<a name="2"></a> Pipe Insulation Retrieval Performance
-
-- performance issue retrieving MEP pipe insulation elements using GetDependentElements
-  by Александр Игнатович <cadbimdeveloper@yandex.ru>
+<h3>Pipe Insulation Retrieval Performance</h3>
+<p>Three quick notes from my recent email correspondance and reading:</p>
+<h4><a name="2"></a> Pipe Insulation Retrieval Performance</h4>
+<ul>
+<li>performance issue retrieving MEP pipe insulation elements using GetDependentElements
+  by Александр Игнатович <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#99;&#97;&#100;&#98;&#105;&#109;&#100;&#101;&#118;&#101;&#108;&#111;&#112;&#101;&#114;&#64;&#121;&#97;&#110;&#100;&#101;&#120;&#46;&#114;&#117;">&#99;&#97;&#100;&#98;&#105;&#109;&#100;&#101;&#118;&#101;&#108;&#111;&#112;&#101;&#114;&#64;&#121;&#97;&#110;&#100;&#101;&#120;&#46;&#114;&#117;</a>
   I have a short note for TBC. Only a little part of the blogpost somewhere in the future.
   Recently I faced with a performance issue getting pipes insulation. My previous implementation looked like this:
   var pipeInsulation = pipe
@@ -134,57 +130,44 @@ Three quick notes from my recent email correspondance and reading:
     .OfType<PipeInsulation>()
     .FirstOrDefault();
   Now the entire calculations take seconds instead of hours.
-  This issue is related only to MEP; I haven't faced any other performance issues usng the `GetDependentElements` method.
-  thank you very much for the interesting observation!
-
-
-
-####<a name="3"></a> Programming Languages to Learn
-
-A frequent question is which programming language to learn to implement Revit add-ins.
-Here it comes up again, with an F# twist:
-
-**Questiuon:** We are now starting our in-house computational strategy in order to automate processes on both Revit-Dynamo and Inventor-iLogic and I am struggling to decide which language code we should start to learn.
+  This issue is related only to MEP; I haven't faced any other performance issues usng the <code>GetDependentElements</code> method.
+  thank you very much for the interesting observation!</li>
+</ul>
+<h4><a name="3"></a> Programming Languages to Learn</h4>
+<p>A frequent question is which programmin language to learn to implement Revit add-ins.
+Here it comes up again, with an F# twist:</p>
+<p><strong>Questiuon:</strong> We are now starting our in-house computational strategy in order to automate processes on both Revit-Dynamo and Inventor-iLogic and I am struggling to decide which language code we should start to learn.
 C#, Python or F#?
 I am takin my first steps into coding, but I have a few years of experience on Dynamo &amp; Grasshopper. 
 I would also like to add that our Inventor application has an automation interface developed by a consultant company written in F# that we would like to take control over in the long term.
-Long story short: I would like to understand the pro and cons of which of these three languages should we start to learn to better unify a future workflow between Revit and Inventor, keeping in mind that we have something in-house already developed in F#.
-
-**Answer:** Since the Revit API is completely .NET based and all .NET languages are completely interoperable, it really does not matter much at all which one you learn and use.
-Any one of them can be used to interact fully with any other.
-
-Furthermore, all .NET languages compile to the same underlying IL or intermediate language.
-From IL, you can decompile back into any other .NET languae, makin it easy to switch back and forth between languages and even transform your code base from one to another.
-
-Therefore, obviously, you need not really worry about learning F# at all, if you are not interested in procedural programming yourself.
-
-In short, I would say:
-
-- Python: best for learning, and for Dynamo
-- C#: best for pure Revit API, most example code available, cleanest .NET interface
-- F#: best for generic stateless procedural logical lambda computation, and you'll need it in the long run anyway
-
-Here are some other thoughts on this topic:
-
-- [What Language to choose for a Revit Add-In?](https://thebuildingcoder.typepad.com/blog/2020/04/2021-migration-add-in-language-and-bim360-login.html)
-- [A .NET Language Learning Resource](http://thebuildingcoder.typepad.com/blog/2009/07/a-net-language-learning-resource.html)
-- [Running Language Code and More Exporters](http://thebuildingcoder.typepad.com/blog/2012/07/determine-running-language-code.html)
-- [Revit Future and Saving User Configuration Settings](http://thebuildingcoder.typepad.com/blog/2015/08/revit-future-and-saving-user-configuration-settings.html)
-- [RTC Classes and Getting Started with Revit Macros](http://thebuildingcoder.typepad.com/blog/2015/10/rtc-classes-and-getting-started-with-revit-macros.html)
-    - [Choose a Programming Language](http://thebuildingcoder.typepad.com/blog/2015/10/rtc-classes-and-getting-started-with-revit-macros.html#15)
-    - [Converting Code from One Language to Another](http://thebuildingcoder.typepad.com/blog/2015/10/rtc-classes-and-getting-started-with-revit-macros.html#16)
-- [Most Popular Programming Languages 1965-2019](https://thebuildingcoder.typepad.com/blog/2019/10/invitation-to-devcon-visual-programming-in-infrastructure.html#5)
-- [The Most Popular Programming Languages 2015](http://thebuildingcoder.typepad.com/blog/2013/05/removing-extreneous-mac-architectures-and-languages.html#3)
-
-####<a name="4"></a> Agency by William Gibson
-
-I just finished reading *Agency* by William Gibson, a brilliant sci-fi including a critical look at politics and its helpless and fruitless attempts to control big business, the current pandemy, probably AI, soon, and other challenges.
+Long story short: I would like to understand the pro and cons of which of these three languages should we start to learn to better unify a future workflow between Revit and Inventor, keeping in mind that we have something in-house already developed in F#.</p>
+<p><strong>Answer:</strong> In short, I would say:</p>
+<ul>
+<li>Python: best for learning, and for Dynamo</li>
+<li>C#: best for pure Revit API, most example code available, cleanest .NET interface</li>
+<li>F#: best for generic stateless procedural logical lambda computation, and you'll need it in the long run anyway</li>
+</ul>
+<p>Here are some other thoughts on this topic:</p>
+<ul>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2020/04/2021-migration-add-in-language-and-bim360-login.html">What Language to choose for a Revit Add-In?</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/07/a-net-language-learning-resource.html">A .NET Language Learning Resource</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/07/determine-running-language-code.html">Running Language Code and More Exporters</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/08/revit-future-and-saving-user-configuration-settings.html">Revit Future and Saving User Configuration Settings</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/10/rtc-classes-and-getting-started-with-revit-macros.html">RTC Classes and Getting Started with Revit Macros</a><ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/10/rtc-classes-and-getting-started-with-revit-macros.html#15">Choose a Programming Language</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/10/rtc-classes-and-getting-started-with-revit-macros.html#16">Converting Code from One Language to Another</a></li>
+</ul>
+</li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/10/invitation-to-devcon-visual-programming-in-infrastructure.html#5">Most Popular Programming Languages 1965-2019</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/05/removing-extreneous-mac-architectures-and-languages.html#3">The Most Popular Programming Languages 2015</a></li>
+</ul>
+<h4><a name="4"></a> Agency by William Gibson</h4>
+<p>I just finished reading <em>Agency</em> by William Gibson, a brilliant sci-fi including a critical look at politics and its helpless and fruitless attempts to control big business, the current pandemy, probably AI, soon, and other challenges.
 It includes an original new (for me, anyway) idea on time travel and its impossibility.
 It treats the possibilities of AI with a lot of optimism, which I agree with.
 Gibson is a true visionary.
 He also coins (?) the term CCA, competitive control area, a territory where it is unclear who holds the power: government, warlords, multinational companies, criminal organisations...
-one wonders whether that might be an accurate and critical way of viewing of our current real world right now...
-
-<center>
+one wonders whether that might be an accurate and critical way of viewing of our current real world right now...</p>
+<p><center>
 <img src="img/william_gibson_agency.jpg" alt="William Gibson Agency" title="William Gibson Agency" width="400"/> <!-- 1843 -->
-</center>
+</center></p>
