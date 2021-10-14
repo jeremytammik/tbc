@@ -111,14 +111,15 @@ Many thanks to  for this very helpful explanation!
 -->
 
 <h3>Pipe Insulation Retrieval Performance</h3>
-<p>Three quick notes from my recent email correspondance and reading:</p>
+<p>Three quick notes from my recent email correspondence and reading:</p>
 <ul>
 <li><a href="#2">Pipe insulation retrieval performance</a></li>
 <li><a href="#3">Programming languages to learn</a></li>
 <li><a href="#4">Agency by William Gibson</a></li>
 </ul>
 <h4><a name="2"></a> Pipe Insulation Retrieval Performance</h4>
-<p>Alexander <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478">@aignatovich</a> <a href="https://github.com/CADBIMDeveloper">@CADBIMDeveloper</a> Ignatovich, aka Александр Игнатович, sahres an interesting observation on a performance issue retrieving MEP pipe insulation elements using <code>GetDependentElements</code>:</p>
+<p>Alexander <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478">@aignatovich</a> <a href="https://github.com/CADBIMDeveloper">@CADBIMDeveloper</a> Ignatovich, aka Александр Игнатович,
+shares an interesting observation on a performance issue retrieving MEP pipe insulation elements using <code>GetDependentElements</code>:</p>
 <p>Recently, I faced with a performance issue getting pipe insulation.
 My previous implementation looked like this:</p>
 <pre class="code">
@@ -131,7 +132,7 @@ My previous implementation looked like this:</p>
 </pre>
 
 <p>I didn't notice it before because I tested the code on a small model.</p>
-<p>However, in the big model, the entire calculation tooked over an hour.
+<p>However, in the big model, the entire calculation took over an hour.
 Calculations were also huge, so I spent some time trying to figure out what is going wrong.</p>
 <p>The improved solution looks like this:</p>
 <pre class="code">
@@ -148,7 +149,7 @@ Calculations were also huge, so I spent some time trying to figure out what is g
 <h4><a name="3"></a> Programming Languages to Learn</h4>
 <p>A frequent question is which programming language to learn to implement Revit add-ins.
 Here it comes up again, with an F# twist:</p>
-<p><strong>Questiuon:</strong> We are now starting our in-house computational strategy in order to automate processes on both Revit-Dynamo and Inventor-iLogic and I am struggling to decide which language code we should start to learn.
+<p><strong>Question:</strong> We are now starting our in-house computational strategy in order to automate processes on both Revit-Dynamo and Inventor-iLogic and I am struggling to decide which language code we should start to learn.
 C#, Python or F#?
 I am takin my first steps into coding, but I have a few years of experience on Dynamo &amp; Grasshopper. 
 I would also like to add that our Inventor application has an automation interface developed by a consultant company written in F# that we would like to take control over in the long term.
@@ -156,7 +157,7 @@ Long story short: I would like to understand the pro and cons of which of these 
 <p><strong>Answer:</strong> Since the Revit API is completely .NET based and all .NET languages are completely interoperable, it really does not matter much at all which one you learn and use.
 Any one of them can be used to interact fully with any other.</p>
 <p>Furthermore, all .NET languages compile to the same underlying IL or intermediate language.
-From IL, you can decompile back into any other .NET languae, makin it easy to switch back and forth between languages and even transform your code base from one to another.</p>
+From IL, you can decompile back into any other .NET language, making it easy to switch back and forth between languages and even transform your code base from one to another.</p>
 <p>Therefore, obviously, you need not really worry about learning F# at all, if you are not interested in procedural programming yourself.</p>
 <p>In short, I would say:</p>
 <ul>
@@ -179,7 +180,7 @@ From IL, you can decompile back into any other .NET languae, makin it easy to sw
 <li><a href="http://thebuildingcoder.typepad.com/blog/2013/05/removing-extreneous-mac-architectures-and-languages.html#3">The Most Popular Programming Languages 2015</a></li>
 </ul>
 <h4><a name="4"></a> Agency by William Gibson</h4>
-<p>I just finished reading <em>Agency</em> by William Gibson, a brilliant sci-fi including a critical look at politics and its helpless and fruitless attempts to control big business, the current pandemy, probably AI, soon, and other challenges.
+<p>I just finished reading <em>Agency</em> by William Gibson, a brilliant sci-fi including a critical look at politics and its rather helpless and fruitless attempts to control big business, the current pandemic, probably AI, soon, and other interesting challenges.
 It includes an original new (for me, anyway) idea on time travel and its impossibility.
 It treats the possibilities of AI with a lot of optimism, which I agree with.
 Gibson is a true visionary.
