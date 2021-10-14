@@ -115,6 +115,9 @@ Many thanks to  for this very helpful explanation!
 
 Three quick notes from my recent email correspondance and reading:
 
+- [Pipe insulation retrieval performance](#2)
+- [Programming languages to learn](#3)
+- [Agency by William Gibson](#4)
 
 ####<a name="2"></a> Pipe Insulation Retrieval Performance
 
