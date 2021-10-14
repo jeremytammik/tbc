@@ -28,7 +28,7 @@
   This issue is related only to MEP; I haven't faced any other performance issues usng the `GetDependentElements` method.
   thank you very much for the interesting observation!
 
-- lanuages to learn
+- programming languages to learn
   email [Computational Strategy - Question for the Expert] Andrea Rolle
   [Q] We are now starting our in-house computational strategy in order to automate processes on both Revit-Dynamo and Inventor-iLogic and I am struggling to decide which language code we should start to learn.
   C#, Python or F#? I am moving my first steps into coding but I have a few years of experience on Dynamo & Grasshopper. 
@@ -38,6 +38,44 @@
   - Python: best fpr learning, and for Dynamo
   - C# best for pure Revit API, most example code, cleanest .NET interface
   - F# best for stateless procedural generic logical lambda computation, and you'll need it in the long run anyway
+
+/Users/jta/a/doc/revit/tbc/git/a % tbcsh_search.py language
+0163:Language Integrated Query Linq
+0178:Language Independent Category Access
+0188:A .NET Language Learning Resource
+0512:Language Independent Subcategory Creation
+0799:Running Language Code and More Exporters
+0930:MUI: Multiple Language Interface Update
+0946:Removing Extreneous Mac Architectures, Languages and Files
+0948:All-zero Language Codes in the Revit Product GUID
+0998:Language Independent Section View Type Id Retrieval
+1078:Multi-language Shared Parameters
+1347:The Most Popular Programming Languages 2015
+1368:<"#15">Choose a Programming Language
+1368:<"#16">Converting Code from One Language to Another
+1523:Multiple Language RESX Resource Files
+1523:<"#2">Supporting Multiple Language Resource Files
+1792:<"#5"> Most Popular Programming Languages 1965-2019
+1838:2021 Migration, Add-In Language, BIM360 Research
+1838:<"#3"> What Language to choose for a Revit Add-In?
+1880:<"#3"> Más Allá de Dynamo &ndash; Spanish-Language Book
+1885:<"#4"> Internationalisation Using .NET Language Resources
+1892:Model Group and DA4R Language in Forge
+1892:<"#3"> Specifying the Revit UI Language in DA4R
+1920:<"#3"> Local Language Forge Classes
+
+/Users/jta/a/doc/revit/tbc/git/a % bl 0188 0799 0946 1347 1368 1792
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/07/a-net-language-learning-resource.html">A .NET Language Learning Resource</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2012/07/determine-running-language-code.html">Running Language Code and More Exporters</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/05/removing-extreneous-mac-architectures-and-languages.html">Removing Unused Mac Architectures, Languages and Files</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/08/revit-future-and-saving-user-configuration-settings.html">Revit Future and Saving User Configuration Settings</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/10/rtc-classes-and-getting-started-with-revit-macros.html">RTC Classes and Getting Started with Revit Macros</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/10/invitation-to-devcon-visual-programming-in-infrastructure.html">DevCon Invitation and Dynamo for Infrastructure</a></li>
+</ul>
+
+/Users/jta/a/doc/revit/tbc/git/a % blmd 0188 0799 0946 1347 1368 1792
+- [A .NET Language Learning Resource](http://thebuildingcoder.typepad.com/blog/2009/07/a-net-language-learning-resource.html) == - [Running Language Code and More Exporters](http://thebuildingcoder.typepad.com/blog/2012/07/determine-running-language-code.html) == - [Removing Unused Mac Architectures, Languages and Files](http://thebuildingcoder.typepad.com/blog/2013/05/removing-extreneous-mac-architectures-and-languages.html) == - [Revit Future and Saving User Configuration Settings](http://thebuildingcoder.typepad.com/blog/2015/08/revit-future-and-saving-user-configuration-settings.html) == - [RTC Classes and Getting Started with Revit Macros](http://thebuildingcoder.typepad.com/blog/2015/10/rtc-classes-and-getting-started-with-revit-macros.html) == - [DevCon Invitation and Dynamo for Infrastructure](https://thebuildingcoder.typepad.com/blog/2019/10/invitation-to-devcon-visual-programming-in-infrastructure.html)
 
 twitter:
 
@@ -73,12 +111,12 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### MEP Pipe Insulation Retrieval Performance
+### Pipe Insulation Retrieval Performance
 
 Three quick notes from my recent email correspondance and reading:
 
 
-####<a name="2"></a> MEP Pipe Insulation Retrieval Performance
+####<a name="2"></a> Pipe Insulation Retrieval Performance
 
 - performance issue retrieving MEP pipe insulation elements using GetDependentElements
   by Александр Игнатович <cadbimdeveloper@yandex.ru>
@@ -101,14 +139,44 @@ Three quick notes from my recent email correspondance and reading:
 
 
 
+####<a name="3"></a> Programming Languages to Learn
+
+A frequent question is which programmin language to learn to implement Revit add-ins.
+Here it comes up again, with an F# twist:
+
+**Questiuon:** We are now starting our in-house computational strategy in order to automate processes on both Revit-Dynamo and Inventor-iLogic and I am struggling to decide which language code we should start to learn.
+C#, Python or F#?
+I am takin my first steps into coding, but I have a few years of experience on Dynamo &amp; Grasshopper. 
+I would also like to add that our Inventor application has an automation interface developed by a consultant company written in F# that we would like to take control over in the long term.
+Long story short: I would like to understand the pro and cons of which of these three languages should we start to learn to better unify a future workflow between Revit and Inventor, keeping in mind that we have something in-house already developed in F#.
+
+**Answer:** In short, I would say:
+
+- Python: best for learning, and for Dynamo
+- C#: best for pure Revit API, most example code available, cleanest .NET interface
+- F#: best for generic stateless procedural logical lambda computation, and you'll need it in the long run anyway
+
+Here are some other thoughts on this topic:
+
+- [What Language to choose for a Revit Add-In?](https://thebuildingcoder.typepad.com/blog/2020/04/2021-migration-add-in-language-and-bim360-login.html)
+- [A .NET Language Learning Resource](http://thebuildingcoder.typepad.com/blog/2009/07/a-net-language-learning-resource.html)
+- [Running Language Code and More Exporters](http://thebuildingcoder.typepad.com/blog/2012/07/determine-running-language-code.html)
+- [Revit Future and Saving User Configuration Settings](http://thebuildingcoder.typepad.com/blog/2015/08/revit-future-and-saving-user-configuration-settings.html)
+- [RTC Classes and Getting Started with Revit Macros](http://thebuildingcoder.typepad.com/blog/2015/10/rtc-classes-and-getting-started-with-revit-macros.html)
+    - [Choose a Programming Language](http://thebuildingcoder.typepad.com/blog/2015/10/rtc-classes-and-getting-started-with-revit-macros.html#15)
+    - [Converting Code from One Language to Another](http://thebuildingcoder.typepad.com/blog/2015/10/rtc-classes-and-getting-started-with-revit-macros.html#16)
+- [Most Popular Programming Languages 1965-2019](https://thebuildingcoder.typepad.com/blog/2019/10/invitation-to-devcon-visual-programming-in-infrastructure.html#5)
+- [The Most Popular Programming Languages 2015](http://thebuildingcoder.typepad.com/blog/2013/05/removing-extreneous-mac-architectures-and-languages.html#3)
+
+####<a name="4"></a> Agency by William Gibson
+
+I just finished reading *Agency* by William Gibson, a brilliant sci-fi including a critical look at politics and its helpless and fruitless attempts to control big business, the current pandemy, probably AI, soon, and other challenges.
+It includes an original new (for me, anyway) idea on time travel and its impossibility.
+It treats the possibilities of AI with a lot of optimism, which I agree with.
+Gibson is a true visionary.
+He also coins (?) the term CCA, competitive control area, a territory where it is unclear who holds the power: government, warlords, multinational companies, criminal organisations...
+one wonders whether that might be an accurate and critical way of viewing of our current real world right now...
+
 <center>
 <img src="img/william_gibson_agency.jpg" alt="William Gibson Agency" title="William Gibson Agency" width="400"/> <!-- 1843 -->
 </center>
-
-####<a name="3"></a>
-
-
-####<a name="4"></a> 
-
-
-
