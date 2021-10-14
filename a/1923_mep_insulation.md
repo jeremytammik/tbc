@@ -90,6 +90,13 @@ Three quick notes on critical and inspiring sci-fi, programming languages and ME
 
 linkedin:
 
+Critical and inspiring sci-fi, MEP pipe insulation retrieval performance and programming languages to learn for the #RevitAPI
+
+https://autode.sk/pipeinsulation
+
+- Pipe insulation retrieval performance
+- Programming languages to learn
+- Agency by William Gibson...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
