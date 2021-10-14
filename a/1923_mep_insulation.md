@@ -200,7 +200,7 @@ Here are some other thoughts on this topic:
 
 I just finished reading *Agency* by William Gibson, a brilliant sci-fi including a critical look at politics and its rather helpless and fruitless attempts to control big business, the current pandemic, probably AI, soon, and other interesting challenges.
 It includes an original new (for me, anyway) idea on time travel and its impossibility.
-It treats the possibilities of AI with a lot of optimism, which I agree with.
+It treats the possibility of benevolent and humane AI with a lot of optimism, which I agree with.
 Gibson is a true visionary.
 He also coins (?) the term CCA, competitive control area, a territory where it is unclear who holds the power: government, warlords, multinational companies, criminal organisations...
 one wonders whether that might be an accurate and critical way of viewing of our current real world right now...
