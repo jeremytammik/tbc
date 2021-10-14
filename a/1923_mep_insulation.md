@@ -199,5 +199,5 @@ He also coins (?) the term CCA, competitive control area, a territory where it i
 one wonders whether that might be an accurate and critical way of viewing of our current real world right now...
 
 <center>
-<img src="img/william_gibson_agency.jpg" alt="William Gibson Agency" title="William Gibson Agency" width="400"/> <!-- 1843 -->
+<img src="img/william_gibson_agency.jpg" alt="William Gibson Agency" title="William Gibson Agency" width="260"/> <!-- 1843 -->
 </center>
