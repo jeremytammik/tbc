@@ -128,6 +128,28 @@ To provide an overview of the some available options, I added
 a [list of alternatives](https://github.com/jeremytammik/VisualStudioRevitAddinWizard#alternatives) to
 the [VisualStudioRevitAddinWizard GitHub repository](https://github.com/jeremytammik/VisualStudioRevitAddinWizard).
 
+####<a name="4.2"></a> Addendum &ndash; Multiple Projects in Single SLN
+
+Pablo Derendinger adds:
+
+Hi! I would like to share our experience with multi-version projects.
+
+After a lot of work with scripting and pre/post build steps, we found a solution that works like a charm.
+ 
+We use a shared project with all the code and a "build" project for each Revit version.
+ 
+Each build version retrieves its specific Revit dlls from nuget. 
+ 
+To support a new version, we just copy `csproj`, change it's name and nuget references.
+ 
+To support changes in the API, we use compile rules to ignore deprecated features.
+ 
+At the end of the day we have a single `sln` with a `csproj` per Revit version.
+
+Works perfectly under a CI/CD workflow.
+ 
+Hope you find it useful.
+
 ####<a name="5"></a> Deploying a DLL File as a Resource
 
 In the thread
@@ -187,24 +209,3 @@ Referencing a strong-named dll is supposed to be a common practise to address th
 
 - [Strong-named assemblies | Microsoft Docs](https://docs.microsoft.com/en-us/dotnet/standard/assembly/strong-named)
 
-####<a name="7"></a> Addendum 2 &ndash; Multiple Projects in Single SLN
-
-Pablo Derendinger adds:
-
-Hi! I would like to share our experience with multi-version projects.
-
-After a lot of work with scripting and pre/post build steps, we found a solution that works like a charm.
- 
-We use a shared project with all the code and a "build" project for each Revit version.
- 
-Each build version retrieves its specific Revit dlls from nuget. 
- 
-To support a new version, we just copy `csproj`, change it's name and nuget references.
- 
-To support changes in the API, we use compile rules to ignore deprecated features.
- 
-At the end of the day we have a single `sln` with a `csproj` per Revit version.
-
-Works perfectly under a CI/CD workflow.
- 
-Hope you find it useful.

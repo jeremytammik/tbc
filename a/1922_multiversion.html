@@ -114,6 +114,17 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/multi-version-revit-t
 <p>To provide an overview of the some available options, I added
 a <a href="https://github.com/jeremytammik/VisualStudioRevitAddinWizard#alternatives">list of alternatives</a> to
 the <a href="https://github.com/jeremytammik/VisualStudioRevitAddinWizard">VisualStudioRevitAddinWizard GitHub repository</a>.</p>
+<h4><a name="4.2"></a> Addendum &ndash; Multiple Projects in Single SLN</h4>
+<p>Pablo Derendinger adds:</p>
+<p>Hi! I would like to share our experience with multi-version projects.</p>
+<p>After a lot of work with scripting and pre/post build steps, we found a solution that works like a charm.</p>
+<p>We use a shared project with all the code and a "build" project for each Revit version.</p>
+<p>Each build version retrieves its specific Revit dlls from nuget. </p>
+<p>To support a new version, we just copy <code>csproj</code>, change it's name and nuget references.</p>
+<p>To support changes in the API, we use compile rules to ignore deprecated features.</p>
+<p>At the end of the day we have a single <code>sln</code> with a <code>csproj</code> per Revit version.</p>
+<p>Works perfectly under a CI/CD workflow.</p>
+<p>Hope you find it useful.</p>
 <h4><a name="5"></a> Deploying a DLL File as a Resource</h4>
 <p>In the thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/additional-dll-files-as-resource/m-p/10653802#M58650">additional <code>.dll</code> files as resource</a>,
@@ -158,14 +169,3 @@ Referencing a strong-named dll is supposed to be a common practise to address th
 <ul>
 <li><a href="https://docs.microsoft.com/en-us/dotnet/standard/assembly/strong-named">Strong-named assemblies | Microsoft Docs</a></li>
 </ul>
-<h4><a name="7"></a> Addendum 2 &ndash; Multiple Projects in Single SLN</h4>
-<p>Pablo Derendinger adds:</p>
-<p>Hi! I would like to share our experience with multi-version projects.</p>
-<p>After a lot of work with scripting and pre/post build steps, we found a solution that works like a charm.</p>
-<p>We use a shared project with all the code and a "build" project for each Revit version.</p>
-<p>Each build version retrieves its specific Revit dlls from nuget. </p>
-<p>To support a new version, we just copy <code>csproj</code>, change it's name and nuget references.</p>
-<p>To support changes in the API, we use compile rules to ignore deprecated features.</p>
-<p>At the end of the day we have a single <code>sln</code> with a <code>csproj</code> per Revit version.</p>
-<p>Works perfectly under a CI/CD workflow.</p>
-<p>Hope you find it useful.</p>
