@@ -124,11 +124,12 @@ Recently, I faced with a performance issue getting pipe insulation.
 My previous implementation looked like this:
 
 <pre class="code">
-var pipeInsulation = pipe
-  .GetDependentElements(new ElementClassFilter(typeof(PipeInsulation)))
-  .Select(pipe.Document.GetElement)
-  .Cast<PipeInsulation>()
-  .FirstOrDefault();
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;pipeInsulation&nbsp;=&nbsp;pipe
+&nbsp;&nbsp;&nbsp;&nbsp;.GetDependentElements(&nbsp;<span style="color:blue;">new</span>&nbsp;ElementClassFilter(&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">typeof</span>(&nbsp;PipeInsulation&nbsp;)&nbsp;)&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.Select(&nbsp;pipe.Document.GetElement&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;PipeInsulation&gt;()
+&nbsp;&nbsp;&nbsp;&nbsp;.FirstOrDefault();
 </pre>
 
 I didn't notice it before because I tested the code on a small model.
@@ -139,11 +140,11 @@ Calculations were also huge, so I spent some time trying to figure out what is g
 The improved solution looks like this:
 
 <pre class="code">
-var pipeInsulation = InsulationLiningBase
-  .GetInsulationIds(pipe.Document, pipe.Id)
-  .Select(pipe.Document.GetElement)
-  .OfType<PipeInsulation>()
-  .FirstOrDefault();
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;pipeInsulation&nbsp;=&nbsp;InsulationLiningBase
+&nbsp;&nbsp;&nbsp;&nbsp;.GetInsulationIds(&nbsp;pipe.Document,&nbsp;pipe.Id&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.Select(&nbsp;pipe.Document.GetElement&nbsp;)
+&nbsp;&nbsp;&nbsp;&nbsp;.OfType&lt;PipeInsulation&gt;()
+&nbsp;&nbsp;&nbsp;&nbsp;.FirstOrDefault();
 </pre>
 
 With that, the entire calculations take seconds instead of hours.
