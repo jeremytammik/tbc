@@ -118,26 +118,39 @@ Three quick notes from my recent email correspondance and reading:
 
 ####<a name="2"></a> Pipe Insulation Retrieval Performance
 
-- performance issue retrieving MEP pipe insulation elements using GetDependentElements
-  by Александр Игнатович <cadbimdeveloper@yandex.ru>
-  I have a short note for TBC. Only a little part of the blogpost somewhere in the future.
-  Recently I faced with a performance issue getting pipes insulation. My previous implementation looked like this:
-  var pipeInsulation = pipe
-    .GetDependentElements(new ElementClassFilter(typeof(PipeInsulation)))
-    .Select(pipe.Document.GetElement)
-    .Cast<PipeInsulation>()
-    .FirstOrDefault();
-  I didn't notice it before because I tested the code on a small model, however in the big model entire calculation tooked more than hour. Calculations were also huge, so I spent some time trying to figure out what is going wrong. Now the solution looks like this:
-  var pipeInsulation = InsulationLiningBase
-    .GetInsulationIds(pipe.Document, pipe.Id)
-    .Select(pipe.Document.GetElement)
-    .OfType<PipeInsulation>()
-    .FirstOrDefault();
-  Now the entire calculations take seconds instead of hours.
-  This issue is related only to MEP; I haven't faced any other performance issues usng the `GetDependentElements` method.
-  thank you very much for the interesting observation!
+Alexander [@aignatovich](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478) [@CADBIMDeveloper](https://github.com/CADBIMDeveloper) Ignatovich, aka Александр Игнатович, sahres an interesting observation on a performance issue retrieving MEP pipe insulation elements using `GetDependentElements`:
 
+Recently, I faced with a performance issue getting pipe insulation.
+My previous implementation looked like this:
 
+<pre class="code">
+var pipeInsulation = pipe
+  .GetDependentElements(new ElementClassFilter(typeof(PipeInsulation)))
+  .Select(pipe.Document.GetElement)
+  .Cast<PipeInsulation>()
+  .FirstOrDefault();
+</pre>
+
+I didn't notice it before because I tested the code on a small model.
+
+However, in the big model, the entire calculation tooked over an hour.
+Calculations were also huge, so I spent some time trying to figure out what is going wrong.
+
+The improved solution looks like this:
+
+<pre class="code">
+var pipeInsulation = InsulationLiningBase
+  .GetInsulationIds(pipe.Document, pipe.Id)
+  .Select(pipe.Document.GetElement)
+  .OfType<PipeInsulation>()
+  .FirstOrDefault();
+</pre>
+
+With that, the entire calculations take seconds instead of hours.
+
+This issue is related only to MEP; I haven't faced any other performance issues using the `GetDependentElements` method.
+
+Thank you very much for the interesting observation, Alex!
 
 ####<a name="3"></a> Programming Languages to Learn
 
