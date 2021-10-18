@@ -1,0 +1,92 @@
+  Reference myRef = uidoc.Selection.PickObject(ObjectType.Element);
+  Element e = document.GetElement(myRef);
+  List<Element> elementss = new List<Element>();
+  bool flag = false, flag2 = false;
+  Element last = e;
+  Element gec = e;
+  Connector connected = null;
+  ElementId lastId, gecId;
+  int say = 0, say2 = 0, say3 = 0;
+  ConnectorSet elementConSettt = GetConnectors(last);
+  foreach (Connector con in elementConSettt)
+  {
+    if (con.IsConnected == true) say++;
+  }
+  if (say == 2)
+  {
+    while (true)
+    {
+      ConnectorSet elementConSet = GetConnectors(last);
+      foreach (Connector con in elementConSet)
+      {
+        if (con.IsConnected == true)
+        {
+          ConnectorSet connectorSet = con.AllRefs;
+          ConnectorSetIterator csi = connectorSet.ForwardIterator();
+          while (csi.MoveNext())
+          {
+            connected = csi.Current as Connector;
+            lastId = connected.Owner.Id;
+            gecId = gec.Id;
+            //burada kendine eşitmi diye bakıcaz
+            if (lastId == last.Id) continue;
+            else
+            {
+              if (lastId != gecId)
+              {
+                gec = last;
+                last = connected.Owner;
+                flag2 = true;
+                break;
+              }
+            }
+          }
+          if (flag2) break;
+        }
+        else flag = true;
+      }
+      flag2 = false;
+      if (flag) break;
+    }
+  }
+  gec = last;
+  elementss.Add(last);
+  while (true)
+  {
+    ConnectorSet elementConSet = GetConnectors(last);
+    foreach (Connector con in elementConSet)
+    {
+      if (con.IsConnected == true) say2++;
+    }
+    if (say2 == 1) say3++;
+    if (say3 == 2 || say2 == 0) break;
+    say2 = 0;
+    foreach (Connector con in elementConSet)
+    {
+      if (con.IsConnected == true)
+      {
+        ConnectorSet connectorSet = con.AllRefs;
+        ConnectorSetIterator csi = connectorSet.ForwardIterator();
+        while (csi.MoveNext())
+        {
+          connected = csi.Current as Connector;
+          lastId = connected.Owner.Id;
+          gecId = gec.Id;
+          if (lastId == last.Id) continue;
+          else
+          {
+            if (lastId != gecId)
+            {
+              gec = last;
+              last = connected.Owner;
+              flag2 = true;
+              elementss.Add(last);
+              break;
+            }
+          }
+        }
+        if (flag2) break;
+      }
+    }
+    flag2 = false;
+  }
