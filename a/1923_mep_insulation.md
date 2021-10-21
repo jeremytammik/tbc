@@ -205,7 +205,7 @@ Here are some other thoughts on this topic:
 
 ####<a name="4"></a> Agency by William Gibson
 
-I just finished reading *Agency* by William Gibson, a brilliant sci-fi including a critical look at politics and its rather helpless and fruitless attempts to control big business, the current pandemic, probably AI, soon, and other interesting challenges.
+I just finished reading *Agency* by William Gibson, a brilliant sci-fi including a critical look at politics and its rather helpless and fruitless attempts to control climate change, big business, the current pandemic, probably AI, soon, and other interesting challenges.
 It includes an original new (for me, anyway) idea on time travel and its impossibility.
 It treats the possibility of benevolent and humane AI with a lot of optimism, which I agree with.
 Gibson is a true visionary.
@@ -215,3 +215,11 @@ one wonders whether that might be an accurate and critical way of viewing our cu
 <center>
 <img src="img/william_gibson_agency.jpg" alt="William Gibson Agency" title="William Gibson Agency" width="260"/> <!-- 1843 -->
 </center>
+
+####<a name="5"></a> Addendum &ndash; Jackpot
+
+Wow! Good news!
+
+I just discovered that Agency is part two of the [Jackpot trilogy](https://en.wikiquote.org/wiki/Jackpot_trilogy).
+
+So, next thing I do is order part one, [The Peripheral](https://en.wikipedia.org/wiki/The_Peripheral).
