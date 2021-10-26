@@ -60,7 +60,7 @@ Many thanks to  for this very helpful explanation!
 
 ### Modeless RevitLookup
 
-I am lad and proud to announce the most exciting RevitLookup enhancement in its entire history so far, yet another need for regen and a great new option for your personal safety:
+I am glad and proud to announce the most exciting RevitLookup enhancement in its entire history so far, yet another need for regen and a great new option for your personal safety:
 
 - [Modeless RevitLookup](#2)
 - [Need for regen for read-only parameter](#3)
@@ -73,7 +73,7 @@ I am lad and proud to announce the most exciting RevitLookup enhancement in its 
 a [RevitLookup](https://github.com/jeremytammik/RevitLookup) enhancement
 in [issue #92 &ndash; modeless window for lookup tools](https://github.com/jeremytammik/RevitLookup/issues/92):
 
-> while not able to code it myself, especially not in C#, a nice feature would be to get the windows of the tool in modeless mode.
+> ... while not able to code it myself, especially not in C#, a nice feature would be to get the windows of the tool in modeless mode.
 Allowing us to interact with the model directly.
 
 [NeVeSpl](https://github.com/NeVeSpl) very kindly picked this up and heroically implemented and tested it in a whole series of pull requests:
@@ -122,11 +122,22 @@ When accessing the same kinds of elements as part of any collection, the value i
 My read-only params were updated from other elements, that changed those parameter values.
 But I couldn't see it in the API until I used `doc.Regenerate()`.
 
-Here are some previous other examples that I already earmarked for inclusion in
+Here are some other previous examples that I also already earmarked for inclusion in
 the ['need to regenerate' list](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33):
 
 - [`LevelOffset` not working for arc extrusion roof](https://forums.autodesk.com/t5/revit-api-forum/leveloffset-not-working-for-arc-extrusion-roof/m-p/7681949)
+<br/>**Question:** I've encountered a strange result and I'd like to know if it's my fault or if there's an error somewhere or a known issue.
+I'm trying to create a new `ExtrusionRoof` with an arc profile and then change the `Level Offset` parameter to a different value.
+I use the `ROOF_CONSTRAINT_OFFSET_PARAM` `BuiltInParameter` to find that parameter and then set it.
+Unexpectedly, Revit sets the parameter to my value, but the roof doesn't shift.
+So, there's a discrepancy between the parameter value and the effective position of the roof.
+<br/>**Answer:** You are creating geometry and then in the same transaction make a change to it.
+In the past, such a workflow caused problems that could be solved by separating the creation and modification into 2 transactions.
+I would suggest you do the same and see if that resolves your problem.
 - [Circular chain of reference when creating opening on a floor](https://forums.autodesk.com/t5/revit-api-forum/error-circular-chain-of-reference-when-creating-opening-on-a/td-p/7681213)
+<br/>**Question:** Unable to create opening on a created floor, posted error "circular chain of reference"
+Problem is floor can be create while not the opening.
+<br/>**Answer:** Try to regenerate the model after creating the floor and before creating the opening.
 
 ####<a name="4"></a> Structural Bridge Design
 
