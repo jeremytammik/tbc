@@ -31,8 +31,11 @@ add #thebuildingcoder
 
  the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+The most exciting RevitLookup enhancement in its entire history, yet another need for regeneration and a great new option for your personal safety
+&ndash; Modeless RevitLookup
+&ndash; Need for regen for read-only parameter
+&ndash; Structural bridge design
+&ndash; Outdoor seatbelt...
 
 linkedin:
 
@@ -58,9 +61,9 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### Modeless RevitLookup
+### Bridges, Regeneration and Modeless RevitLookup
 
-I am glad and proud to announce the most exciting RevitLookup enhancement in its entire history so far, yet another need for regen and a great new option for your personal safety:
+I am glad and proud to announce the most exciting RevitLookup enhancement in its entire history so far, yet another need for regeneration and a great new option for your personal safety:
 
 - [Modeless RevitLookup](#2)
 - [Need for regen for read-only parameter](#3)
