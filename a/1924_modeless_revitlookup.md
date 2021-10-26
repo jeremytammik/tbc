@@ -16,8 +16,14 @@
   [LevelOffset not working for Arc extrusion Roof](https://forums.autodesk.com/t5/revit-api-forum/leveloffset-not-working-for-arc-extrusion-roof/m-p/7681949)
   [circular chain of reference when creating opening on a floor](https://forums.autodesk.com/t5/revit-api-forum/error-circular-chain-of-reference-when-creating-opening-on-a/td-p/7681213)
 
-- img/outdoor_seatbelt.jpg
+- Structural Bridge Design
+  18288465 Accessing Bridge design from external app
+  Accessing Structural Bridge Design from external app
+  There is no API. But there is a command line that you can use:
+  From 2020 release we have command led automation for the design section and design beam creation and analysis.  All data and commands are written to a json file which drives the automation.  For more details refer here.
+  https://help.autodesk.com/view/SBRDES/ENU/?guid=ASBD_Automation_Overview_html
 
+- img/outdoor_seatbelt.jpg
 
 twitter:
 
@@ -91,14 +97,46 @@ Ever so many thanks to NeVeSpl from me too for the careful and efficient impleme
 
 
 
-####<a name="3"></a> 
+####<a name="3"></a> Need for Regen for Read-Only Parameter
 
-**Question:** 
+A surprising new context to add to
+our [list of situations with a need for regeneration](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33) came up in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on being [unable to get parameter `AsString` value when the parameter is readonly](https://forums.autodesk.com/t5/revit-api-forum/unable-to-get-parameter-asstring-value-when-the-parameter-is/m-p/10713499):
 
-**Answer:** 
+**Question:** I've been struggling with this weird problem for a few hours now.
 
-####<a name="4"></a> 
+I have some elements that has a parameter called `PANEL ID`.
+Sometimes, this parameter is in read-only mode.
 
+When I'm accessing the element directly, I can get the parameter value perfectly fine.
+
+When accessing the same kinds of elements as part of any collection, the value is an empty string `""`.
+
+**Answer:** Seems like my problem was not using `doc.Regenerate()`.
+
+My readonly params were updated from other elements, that changed those parameter values.
+But I couldn't see it in the API until I used `doc.Regenerate()`.
+
+Here are some previous other examples that I already earmarked for includion in
+the ['need to regenerate' list](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33):
+
+- [`LevelOffset` not working for arc extrusion roof](https://forums.autodesk.com/t5/revit-api-forum/leveloffset-not-working-for-arc-extrusion-roof/m-p/7681949)
+- [Circular chain of reference when creating opening on a floor](https://forums.autodesk.com/t5/revit-api-forum/error-circular-chain-of-reference-when-creating-opening-on-a/td-p/7681213)
+
+
+####<a name="4"></a> Structural Bridge Design
+
+**Question:** A question came up on
+accessing [Structural Bridge Design](https://www.autodesk.com/products/structural-bridge-design/overview) from
+an external app.
+
+**Answer:** There is no API, but there is a command line that you can use:
+
+From the 2020 release on, we have command led automation for the design section and design beam creation and analysis.
+All data and commands are written to a `json` file which drives the automation.
+For more details, please refer
+to the [ASBD Automation Overview](https://help.autodesk.com/view/SBRDES/ENU/?guid=ASBD_Automation_Overview_html).
 
 ####<a name="5"></a> Outdoor Seatbelt?
 
