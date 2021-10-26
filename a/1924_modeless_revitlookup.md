@@ -9,8 +9,14 @@
 - Modeless RevitLookup
   RevitLookup_modeless.png
 
+- need for regen:
+  https://forums.autodesk.com/t5/revit-api-forum/unable-to-get-parameter-asstring-value-when-the-parameter-is/m-p/10713499#M59301
 
-- /Users/jta/a/doc/revit/tbc/git/a/img/outdoor_seatbelt.jpg
+- need for regen
+  [LevelOffset not working for Arc extrusion Roof](https://forums.autodesk.com/t5/revit-api-forum/leveloffset-not-working-for-arc-extrusion-roof/m-p/7681949)
+  [circular chain of reference when creating opening on a floor](https://forums.autodesk.com/t5/revit-api-forum/error-circular-chain-of-reference-when-creating-opening-on-a/td-p/7681213)
+
+- img/outdoor_seatbelt.jpg
 
 
 twitter:
