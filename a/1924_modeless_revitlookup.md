@@ -69,21 +69,21 @@ I am lad and proud to announce the most exciting RevitLookup enhancement in its 
 
 ####<a name="2"></a> Modeless RevitLookup
 
-[Jmcouffin](https://jmcouffin.com) raised a
-cool request for a RevitLookup enhancement
+[Jmcouffin](https://jmcouffin.com) raised a cool request for
+a [RevitLookup](https://github.com/jeremytammik/RevitLookup) enhancement
 in [issue #92 &ndash; modeless window for lookup tools](https://github.com/jeremytammik/RevitLookup/issues/92):
 
-> while not able to code it myself, especially not in C#, a nice feature would be to get the windows of the tool in modelless mode.
+> while not able to code it myself, especially not in C#, a nice feature would be to get the windows of the tool in modeless mode.
 Allowing us to interact with the model directly.
 
-[NeVeSpl](https://github.com/NeVeSpl) very kindly picked this up and heroically implemented and tested it in a whole serioes of pull requests:
+[NeVeSpl](https://github.com/NeVeSpl) very kindly picked this up and heroically implemented and tested it in a whole series of pull requests:
 
 - [93](https://github.com/jeremytammik/RevitLookup/pull/93) &ndash; Modeless windows
 - [94](https://github.com/jeremytammik/RevitLookup/pull/94) &ndash; Fixed problem with tranfering focus to Revit when using selectors from modeless window
-- [95](https://github.com/jeremytammik/RevitLookup/pull/95) &ndash; handle multiple open documents at the same time
-- [96](https://github.com/jeremytammik/RevitLookup/pull/96) &ndash; fix for crash that happens when user cancel picking object in cmds: SnoopPickFace, SnoopPickEdge, SnoopLinkedElement
+- [95](https://github.com/jeremytammik/RevitLookup/pull/95) &ndash; Handle multiple open documents at the same time
+- [96](https://github.com/jeremytammik/RevitLookup/pull/96) &ndash; Fix for crash that happens when user cancel picking object in cmds SnoopPickFace, SnoopPickEdge, SnoopLinkedElement
 - [97](https://github.com/jeremytammik/RevitLookup/pull/97) &ndash; Restore ability to snoop plan topologies
-- [99](https://github.com/jeremytammik/RevitLookup/pull/99) &ndash; Eliminate warnings from #98
+- [99](https://github.com/jeremytammik/RevitLookup/pull/99) &ndash; Eliminate warnings from [issue #98, warnings compiling...](https://github.com/jeremytammik/RevitLookup/issues/98)
 
 Here is a sample screen snapshot showing the result, snooping a level and two different walls, simultaneously running the Revit command to create yet more new walls:
 
