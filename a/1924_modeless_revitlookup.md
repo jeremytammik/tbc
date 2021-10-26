@@ -65,7 +65,7 @@ I am lad and proud to announce the most exciting RevitLookup enhancement in its 
 - [Modeless RevitLookup](#2)
 - [Need for regen for read-only parameter](#3)
 - [Structural bridge design](#4)
-- [Outdoor seatbelt?](#5)
+- [Outdoor seatbelt](#5)
 
 ####<a name="2"></a> Modeless RevitLookup
 
@@ -141,7 +141,7 @@ All data and commands are written to a `json` file which drives the automation.
 For more details, please refer
 to the [ASBD Automation Overview](https://help.autodesk.com/view/SBRDES/ENU/?guid=ASBD_Automation_Overview_html).
 
-####<a name="5"></a> Outdoor Seatbelt?
+####<a name="5"></a> Outdoor Seatbelt
 
 If you learned to enjoy wearing a mask when alone, you might also feel safer with an outdoor seatbelt:
 
