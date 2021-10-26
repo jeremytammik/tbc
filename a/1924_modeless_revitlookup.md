@@ -60,6 +60,12 @@ Many thanks to  for this very helpful explanation!
 
 ### Modeless RevitLookup
 
+I am lad and proud to announce the most exciting RevitLookup enhancement in its entire history so far, yet another need for regen and a ggreat new option for your personal safety:
+
+- [Modeless RevitLookup](#2)
+- [Need for regen for read-only parameter](#3)
+- [Structural bridge design](#4)
+- [Outdoor seatbelt?](#5)
 
 ####<a name="2"></a> Modeless RevitLookup
 
@@ -95,8 +101,6 @@ Great job @NeVeSpl!
 
 Ever so many thanks to NeVeSpl from me too for the careful and efficient implementation and thorough testing!
 
-
-
 ####<a name="3"></a> Need for Regen for Read-Only Parameter
 
 A surprising new context to add to
@@ -123,7 +127,6 @@ the ['need to regenerate' list](https://thebuildingcoder.typepad.com/blog/about-
 
 - [`LevelOffset` not working for arc extrusion roof](https://forums.autodesk.com/t5/revit-api-forum/leveloffset-not-working-for-arc-extrusion-roof/m-p/7681949)
 - [Circular chain of reference when creating opening on a floor](https://forums.autodesk.com/t5/revit-api-forum/error-circular-chain-of-reference-when-creating-opening-on-a/td-p/7681213)
-
 
 ####<a name="4"></a> Structural Bridge Design
 
