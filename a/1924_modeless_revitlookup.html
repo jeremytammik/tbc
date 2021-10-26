@@ -58,7 +58,7 @@ Many thanks to  for this very helpful explanation!
 -->
 
 <h3>Modeless RevitLookup</h3>
-<p>I am lad and proud to announce the most exciting RevitLookup enhancement in its entire history so far, yet another need for regen and a ggreat new option for your personal safety:</p>
+<p>I am lad and proud to announce the most exciting RevitLookup enhancement in its entire history so far, yet another need for regen and a great new option for your personal safety:</p>
 <ul>
 <li><a href="#2">Modeless RevitLookup</a></li>
 <li><a href="#3">Need for regen for read-only parameter</a></li>
@@ -76,7 +76,7 @@ Allowing us to interact with the model directly.</p>
 <p><a href="https://github.com/NeVeSpl">NeVeSpl</a> very kindly picked this up and heroically implemented and tested it in a whole series of pull requests:</p>
 <ul>
 <li><a href="https://github.com/jeremytammik/RevitLookup/pull/93">93</a> &ndash; Modeless windows</li>
-<li><a href="https://github.com/jeremytammik/RevitLookup/pull/94">94</a> &ndash; Fixed problem with tranfering focus to Revit when using selectors from modeless window</li>
+<li><a href="https://github.com/jeremytammik/RevitLookup/pull/94">94</a> &ndash; Fixed problem with tranferring focus to Revit when using selectors from modeless window</li>
 <li><a href="https://github.com/jeremytammik/RevitLookup/pull/95">95</a> &ndash; Handle multiple open documents at the same time</li>
 <li><a href="https://github.com/jeremytammik/RevitLookup/pull/96">96</a> &ndash; Fix for crash that happens when user cancel picking object in cmds SnoopPickFace, SnoopPickEdge, SnoopLinkedElement</li>
 <li><a href="https://github.com/jeremytammik/RevitLookup/pull/97">97</a> &ndash; Restore ability to snoop plan topologies</li>
@@ -99,16 +99,16 @@ Great job @NeVeSpl!</p>
 <p>A surprising new context to add to
 our <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33">list of situations with a need for regeneration</a> came up in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
-on being <a href="https://forums.autodesk.com/t5/revit-api-forum/unable-to-get-parameter-asstring-value-when-the-parameter-is/m-p/10713499">unable to get parameter <code>AsString</code> value when the parameter is readonly</a>:</p>
+on being <a href="https://forums.autodesk.com/t5/revit-api-forum/unable-to-get-parameter-asstring-value-when-the-parameter-is/m-p/10713499">unable to get parameter <code>AsString</code> value when the parameter is read-only</a>:</p>
 <p><strong>Question:</strong> I've been struggling with this weird problem for a few hours now.</p>
 <p>I have some elements that has a parameter called <code>PANEL ID</code>.
 Sometimes, this parameter is in read-only mode.</p>
 <p>When I'm accessing the element directly, I can get the parameter value perfectly fine.</p>
 <p>When accessing the same kinds of elements as part of any collection, the value is an empty string <code>""</code>.</p>
 <p><strong>Answer:</strong> Seems like my problem was not using <code>doc.Regenerate()</code>.</p>
-<p>My readonly params were updated from other elements, that changed those parameter values.
+<p>My read-only params were updated from other elements, that changed those parameter values.
 But I couldn't see it in the API until I used <code>doc.Regenerate()</code>.</p>
-<p>Here are some previous other examples that I already earmarked for includion in
+<p>Here are some previous other examples that I already earmarked for inclusion in
 the <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33">'need to regenerate' list</a>:</p>
 <ul>
 <li><a href="https://forums.autodesk.com/t5/revit-api-forum/leveloffset-not-working-for-arc-extrusion-roof/m-p/7681949"><code>LevelOffset</code> not working for arc extrusion roof</a></li>

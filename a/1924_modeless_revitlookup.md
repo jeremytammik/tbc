@@ -60,7 +60,7 @@ Many thanks to  for this very helpful explanation!
 
 ### Modeless RevitLookup
 
-I am lad and proud to announce the most exciting RevitLookup enhancement in its entire history so far, yet another need for regen and a ggreat new option for your personal safety:
+I am lad and proud to announce the most exciting RevitLookup enhancement in its entire history so far, yet another need for regen and a great new option for your personal safety:
 
 - [Modeless RevitLookup](#2)
 - [Need for regen for read-only parameter](#3)
@@ -79,7 +79,7 @@ Allowing us to interact with the model directly.
 [NeVeSpl](https://github.com/NeVeSpl) very kindly picked this up and heroically implemented and tested it in a whole series of pull requests:
 
 - [93](https://github.com/jeremytammik/RevitLookup/pull/93) &ndash; Modeless windows
-- [94](https://github.com/jeremytammik/RevitLookup/pull/94) &ndash; Fixed problem with tranfering focus to Revit when using selectors from modeless window
+- [94](https://github.com/jeremytammik/RevitLookup/pull/94) &ndash; Fixed problem with tranferring focus to Revit when using selectors from modeless window
 - [95](https://github.com/jeremytammik/RevitLookup/pull/95) &ndash; Handle multiple open documents at the same time
 - [96](https://github.com/jeremytammik/RevitLookup/pull/96) &ndash; Fix for crash that happens when user cancel picking object in cmds SnoopPickFace, SnoopPickEdge, SnoopLinkedElement
 - [97](https://github.com/jeremytammik/RevitLookup/pull/97) &ndash; Restore ability to snoop plan topologies
@@ -106,7 +106,7 @@ Ever so many thanks to NeVeSpl from me too for the careful and efficient impleme
 A surprising new context to add to
 our [list of situations with a need for regeneration](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33) came up in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on being [unable to get parameter `AsString` value when the parameter is readonly](https://forums.autodesk.com/t5/revit-api-forum/unable-to-get-parameter-asstring-value-when-the-parameter-is/m-p/10713499):
+on being [unable to get parameter `AsString` value when the parameter is read-only](https://forums.autodesk.com/t5/revit-api-forum/unable-to-get-parameter-asstring-value-when-the-parameter-is/m-p/10713499):
 
 **Question:** I've been struggling with this weird problem for a few hours now.
 
@@ -119,10 +119,10 @@ When accessing the same kinds of elements as part of any collection, the value i
 
 **Answer:** Seems like my problem was not using `doc.Regenerate()`.
 
-My readonly params were updated from other elements, that changed those parameter values.
+My read-only params were updated from other elements, that changed those parameter values.
 But I couldn't see it in the API until I used `doc.Regenerate()`.
 
-Here are some previous other examples that I already earmarked for includion in
+Here are some previous other examples that I already earmarked for inclusion in
 the ['need to regenerate' list](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33):
 
 - [`LevelOffset` not working for arc extrusion roof](https://forums.autodesk.com/t5/revit-api-forum/leveloffset-not-working-for-arc-extrusion-roof/m-p/7681949)
