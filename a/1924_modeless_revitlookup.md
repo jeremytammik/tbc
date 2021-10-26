@@ -10,6 +10,7 @@
   RevitLookup_modeless.png
 
 
+- /Users/jta/a/doc/revit/tbc/git/a/img/outdoor_seatbelt.jpg
 
 
 twitter:
@@ -92,8 +93,12 @@ Ever so many thanks to NeVeSpl from me too for the careful and efficient impleme
 
 ####<a name="4"></a> 
 
+
+####<a name="5"></a> Outdoor Seatbelt?
+
+If you learned to enjoy wearing a mask when alone, you might also feel safer with an outdoor seatbelt:
+
 <center>
-<img src="img/" alt="" title="" width="260"/> <!-- 1843 -->
+<img src="img/outdoor_seatbelt.jpg" alt="Outdoor seatbelt" title="Outdoor seatbelt" width="260"/> <!-- 1843 -->
 </center>
 
-####<a name="5"></a> 
