@@ -157,6 +157,6 @@ to the [ASBD Automation Overview](https://help.autodesk.com/view/SBRDES/ENU/?gui
 If you learned to enjoy wearing a mask when alone, you might also feel safer with an outdoor seatbelt:
 
 <center>
-<img src="img/outdoor_seatbelt.jpg" alt="Outdoor seatbelt" title="Outdoor seatbelt" width="260"/> <!-- 1843 -->
+<img src="img/outdoor_seatbelt.jpg" alt="Outdoor seatbelt" title="Outdoor seatbelt" width="360"/> <!-- 720 -->
 </center>
 
