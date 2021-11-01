@@ -21,6 +21,7 @@ The good news is the same enum value like @jeremy.tammik comment, I did not test
 var PG_WALL_CROSS_SECTION = (BuiltInParameterGroup)(-5000228);
 
 
+- img/revitlookup_installer.png
 
 twitter:
 
@@ -67,48 +68,215 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-### Bridges, Regeneration and Modeless RevitLookup
+###
 
-I am glad and proud to announce the most exciting RevitLookup enhancement in its entire history so far, yet another need for regeneration and a great new option for your personal safety:
 
-- [Modeless RevitLookup](#2)
-- [Need for regen for read-only parameter](#3)
-- [Structural bridge design](#4)
-- [Outdoor seatbelt](#5)
+[Revit Developer Center](https://www.autodesk.com/developer-network/platform-technologies/revit)
 
-####<a name="2"></a> Modeless RevitLookup
+You can download the updated Revit SDK here:
 
-[Jmcouffin](https://jmcouffin.com) raised a cool request for
-a [RevitLookup](https://github.com/jeremytammik/RevitLookup) enhancement
-in [issue #92 &ndash; modeless window for lookup tools](https://github.com/jeremytammik/RevitLookup/issues/92):
+Revit 2022.1 SDK (Update October 28, 2021)
+Revit 2022 SDK (Update April 12, 2021)
 
-> ... while not able to code it myself, especially not in C#, a nice feature would be to get the windows of the tool in modeless mode.
-Allowing us to interact with the model directly.
+####<a name="2"></a> Major additions to the Revit 2022.1 API
+ 
+View API additions
 
-[NeVeSpl](https://github.com/NeVeSpl) very kindly picked this up and heroically implemented and tested it in a whole series of pull requests:
+Duplicating Sheets 
 
-- [93](https://github.com/jeremytammik/RevitLookup/pull/93) &ndash; Modeless windows
-- [94](https://github.com/jeremytammik/RevitLookup/pull/94) &ndash; Fixed problem with tranferring focus to Revit when using selectors from modeless window
-- [95](https://github.com/jeremytammik/RevitLookup/pull/95) &ndash; Handle multiple open documents at the same time
-- [96](https://github.com/jeremytammik/RevitLookup/pull/96) &ndash; Fix for crash that happens when user cancel picking object in cmds SnoopPickFace, SnoopPickEdge, SnoopLinkedElement
-- [97](https://github.com/jeremytammik/RevitLookup/pull/97) &ndash; Restore ability to snoop plan topologies
-- [99](https://github.com/jeremytammik/RevitLookup/pull/99) &ndash; Eliminate warnings from [issue #98, warnings compiling...](https://github.com/jeremytammik/RevitLookup/issues/98)
+The new enum: 
 
-Here is a sample screen snapshot showing the result, snooping a level and two different walls, simultaneously running the Revit command to create yet more new walls:
+- SheetDuplicateOption
+
+allows you to indicate what information should be copied when duplicating a sheet. Its values are:
+
+- DuplicateEmptySheet - Only copies the title block. 
+- DuplicateSheetWithDetailing - Copies the title block and details. 
+- DuplicateSheetWithViewsOnly - Copies the title block, details, viewports and contained views. The newly created sheet will reference the newly duplicated views. 
+- DuplicateSheetWithViewsAndDetailing - Copies the title block, details, and viewports. Duplicates the sheet's contained views with detailing. The newly created sheet will reference the newly duplicated views.
+- DuplicateSheetWithViewsAsDependent - Copies the title block, details, and viewports. Duplicates the sheet's contained views as dependent. The newly created sheet will reference the newly duplicated dependent views.
+
+The new methods:
+
+- ViewSheet.Duplicate(SheetDuplicateOption)  
+- ViewSheet.CanBeDuplicated(SheetDuplicateOption)  
+
+allow you to duplicate sheets and identify sheets which can be duplicated. 
+
+Schedule API additions
+Schedule heights on sheets
+
+The new class:
+
+- Autodesk.Revit.DB.ScheduleHeightsOnSheet
+
+returns the heights of schedule title, column header and each body row on sheet view.
+
+The new method: 
+
+- ViewSchedule.GetScheduleHeightsOnSheet() 
+
+will return the heights object. 
+
+Managing schedule segments 
+
+The new methods:
+
+- ViewSchedule.IsSplit() 
+- ViewSchedule.Split(int segmentNumber)  
+- ViewSchedule.Split(IList<double> segmentHeights) 
+- ViewSchedule.SplitSegment() 
+- ViewSchedule.DeleteSegment() 
+- ViewSchedule.MergeSegments() 
+- ViewSchedule.GetSegmentCount() 
+- ViewSchedule.GetSegmentHeight() 
+- ViewSchedule.SetSegmentHeight() 
+
+provide the ability to split schedules and manage schedule segments. 
+
+The new method: 
+
+- ViewSchedule.GetScheduleInstances() 
+
+will return the schedule sheet instances for a schedule segment. 
+
+The new methods: 
+
+- ScheduleSheetInstance.SegmentIndex 
+- ScheduleSheetInstance.Create(Document document, ElementId viewSheetId, ElementId scheduleId, XYZ origin, int segmentIndex) 
+
+provide the ability to place a schedule segment on sheet and to get and set the schedule segment instance's segment index. 
+
+Worksharing API additions
+
+Delete Workset API
+
+The new method:
+
+- WorksetTable.DeleteWorkset()
+
+supports deleting of worksets from the model.  It takes a DeleteWorksetSettings input with options for what to do with elements contained by that workset. 
+
+Import and Export API additions 
+
+AXM Import 
+
+The new class:
+
+- Autodesk.Revit.DB.AXMImportOptions
+
+allows user to determine the import options when importing an AXM file.
+
+The new method:
+
+- Document.Import(String, AXMImportOptions, View)
+
+imports an AXM file into the document.
+
+The new method:
+
+- OptionalFunctionalityUtils.IsAXMImportLinkAvailable()
+
+checks if the Import FormIt function is available. 
+
+OBJ & STL import/export
+
+The new method:
+
+- Document.Export(String, String, OBJExportOptions)
+
+supports export of Revit geometry to OBJ format.  It uses a new class containing the options available for export:
+
+- OBJExportOptions.TargetUnit
+- OBJExportOptions.SurfaceTolerance
+- OBJExportOptions.NormalTolerance
+- OBJExportOptions.MaxEdgeLength
+- OBJExportOptions.GridAspectRatio
+- OBJExportOptions.SetTessellationSettings()
+
+The new methods:
+
+- Document.Import(String, OBJImportOptions, View)
+- Document.Import(String, STLImportOptions, View)
+
+provide support for importing files of STL and OBJ formats.  These methods use new classes representing the options for each of the new formats.
+
+The new property:
+
+- BaseImportOptions.DefaultLengthUnit
+
+supports specification of a default length unit to use during import of unitless STL and OBJ files.
+
+
+
+####<a name="2"></a> RevitLookup Build and Install
+
+Just last week saw a very exciting contribution to create
+a [modeless version of RevitLookup](https://thebuildingcoder.typepad.com/blog/2021/10/bridges-regeneration-and-modeless-revitlookup.html).
+
+The excitement continued with an untiring stint of contributions from Roman [@Nice3point](https://github.com/Nice3point) in a series of pull requests:
+
+
+
+- [110](https://github.com/jeremytammik/RevitLookup/pull/110) &ndash; Update Readme.md 
+- [108 ](https://github.com/jeremytammik/RevitLookup/pull/108 ) &ndash; Multi-version installer 
+- [107 ](https://github.com/jeremytammik/RevitLookup/pull/107 ) &ndash; Renaming 
+- [105 ](https://github.com/jeremytammik/RevitLookup/pull/105 ) &ndash; Update badges 
+- [104 ](https://github.com/jeremytammik/RevitLookup/pull/104 ) &ndash; Fix snoop db exception 
+- [102 ](https://github.com/jeremytammik/RevitLookup/pull/102 ) &ndash; Changelog. Remove unused files 
+- [101 ](https://github.com/jeremytammik/RevitLookup/pull/101 ) &ndash; Cleanup. Build system
+- [100](https://github.com/jeremytammik/RevitLookup/pull/100) &ndash; CleanUp. Fix naming. Pattern matching
+
+As a result, RevitLookup now boasts a modern up-to-date build system, a multi-version installer, separate GitHub developer branch `dev`, and many other enhancements:
 
 <center>
-<img src="img/RevitLookup_modeless.png" alt="Modeless RevitLookup" title="Modeless RevitLookup" width="600"/> <!-- 3360 -->
+<img src="img/.png" alt="RevitLookup installer" title="RevitLookup installer" width="600"/> <!--  -->
 </center>
 
-Summary by Jmcouffin:
+Here are some of his explanations from the pull request conversations:
 
-> It works much better than I even thought possible.
-You can now open multiple instances of RevitLookup tool and have each grab its own set of elements and data and dig through it!
-I tried all the functionalities without hitting a wall so far.
-I will keep on using it this week and let you know if anything arises.
-Great job @NeVeSpl!
+- Corrected the style of the code in accordance with the latest guidelines. Access modifiers and some unused variables and methods are not affected. The .sln file has been moved to the root folder, otherwise the development environment will not capture the installer project and other supporting files.
+- In recent commits, I have integrated the build system from my template https://github.com/Nice3point/RevitTemplates. Now the installer will build directly to github. After installation, I launched Revit, everything seems to work. For debugging added copying to AppData\Roaming\Autodesk\Revit\Addins\2022. To local build, net core 5 is required. If you still have version 3, please update
+- You can check how git action works here https://github.com/Nice3point/RevitLookup/actions/runs/1392275582 Artifacts will have an installer
+- to build installer on local machine install this via terminal dotnet tool install Nuke.GlobalTool --global Then you can run nuke command. Watch the video https://github.com/Nice3point/RevitTemplates/wiki/Installer-creation
+- moved the changelog to a separate file.
+- I think you can use this to automatically create a release https://github.com/marketplace/actions/create-release or https://github.com/marketplace/actions/automatic-releases or https://github.com/marketplace/actions/github-upload-release-artifacts
+- Removed the version numbers from the .csproj file. This is redundant information and removes duplication. This solution is not a nuget package and is not used in other projects. Therefore, the most correct decision is to change the installer version number, the dll version number in this case does not affect anything. For now, all you need to remember is to update the version number here https://github.com/jeremytammik/RevitLookup/blob/master/installer/Installer.cs#L19 and generate a new guid https://github.com/jeremytammik/RevitLookup/blob/master/installer/Installer.cs#L37 after Revit 2023 is released
+- Now the version of the file will be the same for the installer and dll. Will only be listed in the RevitLookup.csproj file
+- The `20` prefix in `2022` can be left to keep the usual versioning. Here's what I found about the version limitation in Windows http://msdn.microsoft.com/en-us/library/aa370859%28v=vs.85%29.aspx
+- Added all the latest versions of the plugin to the installer. DLLs are stored in the "Releases" folder, if you think that some versions are too outdated, delete the folder from there, the build system picks up the builds automatically, no hardcode. Adding the current assembly, now it is 2022, is not necessary, will cause a conflict. The current assembly is added after the project is compiled
+- Kept the old documentation somewhere, as history, for nostalgic reasons, in honour of Jim Awe. It is authored by Jim Awe, the original implementor of both RevitLookup and the corresponding AutoCAD snooping tool, so it has historical value in itself, i think.
+- you don't need to run nuke to debug. Only the green arrow on the VisualStudio panel. Nuke is used only for the purpose of building a project, it simplifies building if, for example, the project has several configurations, for example, for the 20th, 21st and 22nd versions of revit, Nuke build all dll variants at once. The build system is only needed to release a product.
+- Also, the project was refactored taking into account the latest versions of the C# language.
+Some places have been optimized, for the ribbon I created extension methods that are from
 
-Ever so many thanks to NeVeSpl from me too for the careful and efficient implementation and thorough testing!
+optionsBtn.AddPushButton (new PushButtonData (" HelloWorld "," Hello World ... ", ExecutingAssemblyPath, typeof (HelloWorld) .FullName));
+
+write like this
+
+optionsBtn.AddPushButton (typeof (HelloWorld)," HelloWorld "," Hello World ... ");
+
+The latest versions of the C # language allow you to write like this:
+
+MApp.DocumentClosed += m_app_DocumentClosed;
+
+instead of
+
+m_app.DocumentClosed += new EventHandler<Autodesk.Revit.DB.Events.DocumentClosedEventArgs>(m_app_DocumentClosed);
+
+Ever so many thanks to Roman for all his inspired work helping this tool move forward and especially his untiring efforts supporting me getting to grips with the new technology!
+
+
+
+
+
+
+
+
+
+
+
+
 
 ####<a name="3"></a> Need for Regen for Read-Only Parameter
 
