@@ -10,16 +10,15 @@
   https://www.autodesk.com/developer-network/platform-technologies/revit
 
 - Revit 2022.1 API unintended breaking change
-Revit 2022.1 unfortunately introduced a breaking change.
-https://autodesk.slack.com/archives/C0SR6NAP8/p1635432979033800
-Revit team is working on Knowledge Base article.
-RevitApi 2022 update change WallCrossSection to WallCrossSectionDefinition
-https://forums.autodesk.com/t5/revit-api-forum/revitapi-2022-update-change-wallcrosssection-to/td-p/10720345
-The good news is the same enum value like @jeremy.tammik comment, I did not test but this code should work in both versions 2022.0 and 2022.1
-// BuiltInParameterGroup.PG_WALL_CROSS_SECTION_DEFINITION; // -5000228,
-// BuiltInParameterGroup.PG_WALL_CROSS_SECTION; // -5000228,
-var PG_WALL_CROSS_SECTION = (BuiltInParameterGroup)(-5000228);
-
+  Revit 2022.1 unfortunately introduced a breaking change.
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1635432979033800
+  Revit team is working on Knowledge Base article.
+  RevitApi 2022 update change WallCrossSection to WallCrossSectionDefinition
+  https://forums.autodesk.com/t5/revit-api-forum/revitapi-2022-update-change-wallcrosssection-to/td-p/10720345
+  The good news is the same enum value like @jeremy.tammik comment, I did not test but this code should work in both versions 2022.0 and 2022.1
+  // BuiltInParameterGroup.PG_WALL_CROSS_SECTION_DEFINITION; // -5000228,
+  // BuiltInParameterGroup.PG_WALL_CROSS_SECTION; // -5000228,
+  var PG_WALL_CROSS_SECTION = (BuiltInParameterGroup)(-5000228);
 
 - img/revitlookup_installer.png
 
@@ -214,20 +213,20 @@ supports specification of a default length unit to use during import of unitless
 Just last week saw a very exciting contribution to create
 a [modeless version of RevitLookup](https://thebuildingcoder.typepad.com/blog/2021/10/bridges-regeneration-and-modeless-revitlookup.html).
 
-The excitement continued with an untiring stint of contributions from Roman [@Nice3point](https://github.com/Nice3point) in a series of pull requests:
+This exciting rapid evolution continues with an untiring stint of contributions
+from Roman [@Nice3point](https://github.com/Nice3point) and
+his extensive series of pull requests:
 
-
-
+- [100](https://github.com/jeremytammik/RevitLookup/pull/100) &ndash; Fix naming and implerment pattern matching
+- [101](https://github.com/jeremytammik/RevitLookup/pull/101) &ndash; Cleanup and build system
+- [102](https://github.com/jeremytammik/RevitLookup/pull/102) &ndash; Changelog and remove unused files 
+- [104](https://github.com/jeremytammik/RevitLookup/pull/104) &ndash; Fix snoop db exception 
+- [105](https://github.com/jeremytammik/RevitLookup/pull/105) &ndash; Update badges 
+- [107](https://github.com/jeremytammik/RevitLookup/pull/107) &ndash; Renaming 
+- [108](https://github.com/jeremytammik/RevitLookup/pull/108) &ndash; Multi-version installer 
 - [110](https://github.com/jeremytammik/RevitLookup/pull/110) &ndash; Update Readme.md 
-- [108 ](https://github.com/jeremytammik/RevitLookup/pull/108 ) &ndash; Multi-version installer 
-- [107 ](https://github.com/jeremytammik/RevitLookup/pull/107 ) &ndash; Renaming 
-- [105 ](https://github.com/jeremytammik/RevitLookup/pull/105 ) &ndash; Update badges 
-- [104 ](https://github.com/jeremytammik/RevitLookup/pull/104 ) &ndash; Fix snoop db exception 
-- [102 ](https://github.com/jeremytammik/RevitLookup/pull/102 ) &ndash; Changelog. Remove unused files 
-- [101 ](https://github.com/jeremytammik/RevitLookup/pull/101 ) &ndash; Cleanup. Build system
-- [100](https://github.com/jeremytammik/RevitLookup/pull/100) &ndash; CleanUp. Fix naming. Pattern matching
 
-As a result, RevitLookup now boasts a modern up-to-date build system, a multi-version installer, separate GitHub developer branch `dev`, and many other enhancements:
+As a result, RevitLookup now boasts a modern up-to-date build system, a multi-version installer, a separate GitHub developer branch `dev`, and many other enhancements:
 
 <center>
 <img src="img/.png" alt="RevitLookup installer" title="RevitLookup installer" width="600"/> <!--  -->
@@ -266,74 +265,31 @@ m_app.DocumentClosed += new EventHandler<Autodesk.Revit.DB.Events.DocumentClosed
 
 Ever so many thanks to Roman for all his inspired work helping this tool move forward and especially his untiring efforts supporting me getting to grips with the new technology!
 
+####<a name="3"></a> Bye Bye Lookup Builds
+
+Until now, you could always download the most recent build of RevitLookup
+from [lookupbuilds.com](https://lookupbuilds.com),
+provided by [Build Informed](https://www.buildinformed.com),
+[implemented back in 2017](https://thebuildingcoder.typepad.com/blog/2017/04/forgefader-ui-lookup-builds-purge-and-room-instances.html#3) and
+diligently maintained ever since by [Peter Hirn](https://github.com/peterhirn).
+
+The new build system broke that and replaces it, as discussed in
+the [issue #103 &ndash; Gitlab pipeline broken](https://github.com/jeremytammik/RevitLookup/issues/103).
+
+Ever so many thanks once again to Peter for all his work with this over the past years!
 
 
+####<a name="3"></a> Image Cleanup, Robot Arm and Happiness
+
+Some nice little snippets pointed out to me by colleagues yesterday:
+
+- [Quick and free alternative for cleaning up artifacts in images](https://cleanup.pictures)
+- [Robotic arm with full range of motion and static strength](https://youtu.be/H19p43NFqp4)
+- [Sam Berns' TEDx talk on his philosophy for a happy life](https://youtu.be/36m1o-tM05g)
 
 
-
-
-
-
-
-
-
-
-####<a name="3"></a> Need for Regen for Read-Only Parameter
-
-A surprising new context to add to
-our [list of situations with a need for regeneration](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33) came up in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on being [unable to get parameter `AsString` value when the parameter is read-only](https://forums.autodesk.com/t5/revit-api-forum/unable-to-get-parameter-asstring-value-when-the-parameter-is/m-p/10713499):
-
-**Question:** I've been struggling with this weird problem for a few hours now.
-
-I have some elements that has a parameter called `PANEL ID`.
-Sometimes, this parameter is in read-only mode.
-
-When I'm accessing the element directly, I can get the parameter value perfectly fine.
-
-When accessing the same kinds of elements as part of any collection, the value is an empty string `""`.
-
-**Answer:** Seems like my problem was not using `doc.Regenerate()`.
-
-My read-only params were updated from other elements, that changed those parameter values.
-But I couldn't see it in the API until I used `doc.Regenerate()`.
-
-Here are some other previous examples that I also already earmarked for inclusion in
-the ['need to regenerate' list](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33):
-
-- [`LevelOffset` not working for arc extrusion roof](https://forums.autodesk.com/t5/revit-api-forum/leveloffset-not-working-for-arc-extrusion-roof/m-p/7681949)
-<br/>**Question:** I've encountered a strange result and I'd like to know if it's my fault or if there's an error somewhere or a known issue.
-I'm trying to create a new `ExtrusionRoof` with an arc profile and then change the `Level Offset` parameter to a different value.
-I use the `ROOF_CONSTRAINT_OFFSET_PARAM` `BuiltInParameter` to find that parameter and then set it.
-Unexpectedly, Revit sets the parameter to my value, but the roof doesn't shift.
-So, there's a discrepancy between the parameter value and the effective position of the roof.
-<br/>**Answer:** You are creating geometry and then in the same transaction make a change to it.
-In the past, such a workflow caused problems that could be solved by separating the creation and modification into 2 transactions.
-I would suggest you do the same and see if that resolves your problem.
-- [Circular chain of reference when creating opening on a floor](https://forums.autodesk.com/t5/revit-api-forum/error-circular-chain-of-reference-when-creating-opening-on-a/td-p/7681213)
-<br/>**Question:** Unable to create opening on a created floor, posted error "circular chain of reference"
-Problem is floor can be create while not the opening.
-<br/>**Answer:** Try to regenerate the model after creating the floor and before creating the opening.
-
-####<a name="4"></a> Structural Bridge Design
-
-**Question:** A question came up on
-accessing [Structural Bridge Design](https://www.autodesk.com/products/structural-bridge-design/overview) from
-an external app.
-
-**Answer:** There is no API, but there is a command line that you can use:
-
-From the 2020 release on, we have command led automation for the design section and design beam creation and analysis.
-All data and commands are written to a `json` file which drives the automation.
-For more details, please refer
-to the [ASBD Automation Overview](https://help.autodesk.com/view/SBRDES/ENU/?guid=ASBD_Automation_Overview_html).
-
-####<a name="5"></a> Outdoor Seatbelt
-
-If you learned to enjoy wearing a mask when alone, you might also feel safer with an outdoor seatbelt:
 
 <center>
-<img src="img/outdoor_seatbelt.jpg" alt="Outdoor seatbelt" title="Outdoor seatbelt" width="360"/> <!-- 720 -->
+<img src="img/" alt="Outdoor seatbelt" title="Outdoor seatbelt" width="360"/> <!-- 720 -->
 </center>
 
