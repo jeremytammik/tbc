@@ -196,39 +196,32 @@ Here are some of Roman's explanations from our pull request conversations:
 - you don't need to run nuke to debug. Only the green arrow on the VisualStudio panel. Nuke is used only for the purpose of building a project, it simplifies building if, for example, the project has several configurations, for example, for the 20th, 21st and 22nd versions of revit, Nuke build all dll variants at once. The build system is only needed to release a product.
 - Also, the project was refactored taking into account the latest versions of the C# language.
 Some places have been optimized; for the ribbon, I created extension methods to enable shortening of lengthy repetitive data like this:
-
 <pre class="code">
 &nbsp;&nbsp;optionsBtn.AddPushButton(
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">PushButtonData</span>(<span style="color:#a31515;">&quot;&nbsp;HelloWorld&nbsp;&quot;</span>,<span style="color:#a31515;">&quot;&nbsp;Hello&nbsp;World&nbsp;...&nbsp;&quot;</span>,&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ExecutingAssemblyPath,&nbsp;<span style="color:blue;">typeof</span>&nbsp;(HelloWorld)&nbsp;.FullName));
 </pre>
-
 It can now be written like this:
-
 <pre class="code">
 &nbsp;&nbsp;optionsBtn.AddPushButton(<span style="color:blue;">typeof</span>&nbsp;(HelloWorld),
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;&nbsp;HelloWorld&nbsp;&quot;</span>,<span style="color:#a31515;">&quot;&nbsp;Hello&nbsp;World&nbsp;...&nbsp;&quot;</span>);
 </pre>
-
 The latest versions of the C# language allow you to write like this:
-
 <pre class="code">
   MApp.DocumentClosed += m_app_DocumentClosed;
 </pre>
-
 instead of
-
 <pre class="code">
 &nbsp;&nbsp;m_app.DocumentClosed&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;+=&nbsp;<span style="color:blue;">new</span>&nbsp;EventHandler&lt;Autodesk.Revit.DB.Events.DocumentClosedEventArgs&gt;(
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m_app_DocumentClosed);
 </pre>
 
-Ever so many thanks to Roman for all his inspired work helping this tool move forward and especially his untiring efforts supporting me getting to grips with the new technology!
+Ever so many thanks to Roman for all his inspired work moving this tool forward and especially his untiring efforts supporting me getting to grips with the new technology!
 
 ####<a name="5"></a> Bye-Bye Lookup Builds
 
-Until now, you could always download the most recent build of RevitLookup
+Until now, you could download the most recent build of RevitLookup
 from [lookupbuilds.com](https://lookupbuilds.com),
 provided by [Build Informed](https://www.buildinformed.com),
 [implemented back in 2017](https://thebuildingcoder.typepad.com/blog/2017/04/forgefader-ui-lookup-builds-purge-and-room-instances.html#3) and
@@ -237,7 +230,7 @@ diligently maintained ever since by [Peter Hirn](https://github.com/peterhirn).
 The new build system broke that and replaces it, as discussed in
 the [issue #103 &ndash; Gitlab pipeline broken](https://github.com/jeremytammik/RevitLookup/issues/103).
 
-Ever so many thanks once again to Peter for all his work with this over the past years!
+Ever so many thanks once again to Peter for all his work setting up and supporting lookupbuilds over the past years!
 
 ####<a name="6"></a> The Building Coder Samples Revamped
 
@@ -263,7 +256,8 @@ Now I just have to figure out how to get back my preferred personal C# editor an
 
 ####<a name="7"></a> Copy as HTML Update
 
-With the revamped version of The Building Coder Samples, I also finally moved from Visual Studio 2017 to 2019.
+With the revamped version of The Building Coder Samples, I also finally moved from Visual Studio 2017 to 2019 to compile it.
+I hope I am the last of the Revit add-in developer community to do so.
 
 It lacked the `Copy as HTML` option that I use for C# source code colourisation, so I revisited my 2019 note
 on [updating Copy as HTML](https://thebuildingcoder.typepad.com/blog/2019/09/face-intersect-face-is-unbounded.html#5) and
@@ -273,7 +267,7 @@ Extensions &gt; Manage Extensions.
 
 ####<a name="8"></a> Image Cleanup and a Robot Arm
 
-Two nice little snippets that caught my attention, a useful image editor tool and impressive novel hardware technology:
+Finally, two nice little snippets that caught my attention, a useful image editor tool and impressive novel hardware technology:
 
 - [Quick and free alternative for cleaning up artifacts in images](https://cleanup.pictures)
 - [Robotic arm with full range of motion and static strength](https://youtu.be/H19p43NFqp4)

@@ -169,18 +169,15 @@ Some places have been optimized; for the ribbon, I created extension methods to 
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">PushButtonData</span>(<span style="color:#a31515;">&quot;&nbsp;HelloWorld&nbsp;&quot;</span>,<span style="color:#a31515;">&quot;&nbsp;Hello&nbsp;World&nbsp;...&nbsp;&quot;</span>,&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ExecutingAssemblyPath,&nbsp;<span style="color:blue;">typeof</span>&nbsp;(HelloWorld)&nbsp;.FullName));
 </pre>
-
 <p>It can now be written like this:</p>
 <pre class="code">
 &nbsp;&nbsp;optionsBtn.AddPushButton(<span style="color:blue;">typeof</span>&nbsp;(HelloWorld),
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;&nbsp;HelloWorld&nbsp;&quot;</span>,<span style="color:#a31515;">&quot;&nbsp;Hello&nbsp;World&nbsp;...&nbsp;&quot;</span>);
 </pre>
-
 <p>The latest versions of the C# language allow you to write like this:</p>
 <pre class="code">
   MApp.DocumentClosed += m_app_DocumentClosed;
 </pre>
-
 <p>instead of</p>
 <pre class="code">
 &nbsp;&nbsp;m_app.DocumentClosed&nbsp;
@@ -188,16 +185,16 @@ Some places have been optimized; for the ribbon, I created extension methods to 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m_app_DocumentClosed);
 </pre>
 
-<p>Ever so many thanks to Roman for all his inspired work helping this tool move forward and especially his untiring efforts supporting me getting to grips with the new technology!</p>
+<p>Ever so many thanks to Roman for all his inspired work moving this tool forward and especially his untiring efforts supporting me getting to grips with the new technology!</p>
 <h4><a name="5"></a> Bye-Bye Lookup Builds</h4>
-<p>Until now, you could always download the most recent build of RevitLookup
+<p>Until now, you could download the most recent build of RevitLookup
 from <a href="https://lookupbuilds.com">lookupbuilds.com</a>,
 provided by <a href="https://www.buildinformed.com">Build Informed</a>,
 <a href="https://thebuildingcoder.typepad.com/blog/2017/04/forgefader-ui-lookup-builds-purge-and-room-instances.html#3">implemented back in 2017</a> and
 diligently maintained ever since by <a href="https://github.com/peterhirn">Peter Hirn</a>.</p>
 <p>The new build system broke that and replaces it, as discussed in
 the <a href="https://github.com/jeremytammik/RevitLookup/issues/103">issue #103 &ndash; Gitlab pipeline broken</a>.</p>
-<p>Ever so many thanks once again to Peter for all his work with this over the past years!</p>
+<p>Ever so many thanks once again to Peter for all his work setting up and supporting lookupbuilds over the past years!</p>
 <h4><a name="6"></a> The Building Coder Samples Revamped</h4>
 <p>As if all the above were not enough, Roman also went ahead and
 revamped <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>,
@@ -217,14 +214,15 @@ in <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/
 <p>Many thanks again to Roman for this!</p>
 <p>Now I just have to figure out how to get back my preferred personal C# editor and formatting settings...</p>
 <h4><a name="7"></a> Copy as HTML Update</h4>
-<p>With the revamped version of The Building Coder Samples, I also finally moved from Visual Studio 2017 to 2019.</p>
+<p>With the revamped version of The Building Coder Samples, I also finally moved from Visual Studio 2017 to 2019 to compile it.
+I hope I am the last of the Revit add-in developer community to do so.</p>
 <p>It lacked the <code>Copy as HTML</code> option that I use for C# source code colourisation, so I revisited my 2019 note
 on <a href="https://thebuildingcoder.typepad.com/blog/2019/09/face-intersect-face-is-unbounded.html#5">updating Copy as HTML</a> and
 again installed
 the <a href="https://marketplace.visualstudio.com/items?itemName=VisualStudioPlatformTeam.ProductivityPowerPack2017">Productivity Power Tools 2017/2019</a> via
 Extensions &gt; Manage Extensions.</p>
 <h4><a name="8"></a> Image Cleanup and a Robot Arm</h4>
-<p>Two nice little snippets that caught my attention, a useful image editor tool and impressive novel hardware technology:</p>
+<p>Finally, two nice little snippets that caught my attention, a useful image editor tool and impressive novel hardware technology:</p>
 <ul>
 <li><a href="https://cleanup.pictures">Quick and free alternative for cleaning up artifacts in images</a></li>
 <li><a href="https://youtu.be/H19p43NFqp4">Robotic arm with full range of motion and static strength</a></li>
