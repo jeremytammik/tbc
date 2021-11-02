@@ -74,7 +74,7 @@ Exciting news and a lot of changes to RevitLookup:
 - [Revit 2022.1 SDK released](#2)
 - [`WallCrossSection` vs. `WallCrossSectionDefinition`](#3)
 - [RevitLookup build and install](#4)
-- [Bye bye lookup builds](#5)
+- [Bye-bye lookup builds](#5)
 - [The Building Coder samples revamped](#6)
 - [Copy as HTML update](#7)
 - [Image cleanup and a robot arm](#8)
@@ -165,7 +165,7 @@ This rapid evolution continues with an untiring stint of contributions
 from Roman [@Nice3point](https://github.com/Nice3point) and
 his extensive series of pull requests:
 
-- [100](https://github.com/jeremytammik/RevitLookup/pull/100) &ndash; Fix naming and implerment pattern matching
+- [100](https://github.com/jeremytammik/RevitLookup/pull/100) &ndash; Fix naming and implement pattern matching
 - [101](https://github.com/jeremytammik/RevitLookup/pull/101) &ndash; Cleanup and build system
 - [102](https://github.com/jeremytammik/RevitLookup/pull/102) &ndash; Changelog and remove unused files 
 - [104](https://github.com/jeremytammik/RevitLookup/pull/104) &ndash; Fix snoop db exception 
@@ -226,7 +226,7 @@ instead of
 
 Ever so many thanks to Roman for all his inspired work helping this tool move forward and especially his untiring efforts supporting me getting to grips with the new technology!
 
-####<a name="5"></a> Bye Bye Lookup Builds
+####<a name="5"></a> Bye-Bye Lookup Builds
 
 Until now, you could always download the most recent build of RevitLookup
 from [lookupbuilds.com](https://lookupbuilds.com),
@@ -250,7 +250,7 @@ I did not add a build system, there is only one command in the project that disp
 Switched msbuild to Net SDK, now the .csproj file contains much fewer lines.
 Added automatic copying of dll and addin to Revit addins folder.
 Some variables cannot be renamed as it causes conflicts, manual renaming will take too long, left as is.
-There are some unoptimized sections left in the project, but their fixing requires manual labor, there are a lot of files, so I left it as it is.
+There are some unoptimized sections left in the project, but their fixing requires manual labour, there are a lot of files, so I left it as it is.
 Changelog has been moved to a separate file.
 Mainly this is the addition of new features of the latest versions of C#, refactoring according to the latest guidelines.
 
@@ -259,7 +259,7 @@ in [release 2022.1.152.2](https://github.com/jeremytammik/the_building_coder_sam
 
 Many thanks again to Roman for this!
 
-Now I just have to figure out how to get back my preferred presonal C# editor and formatting settings...
+Now I just have to figure out how to get back my preferred personal C# editor and formatting settings...
 
 ####<a name="7"></a> Copy as HTML Update
 
