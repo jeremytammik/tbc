@@ -75,7 +75,9 @@ Exciting news and a lot of changes to RevitLookup:
 - [`WallCrossSection` vs. `WallCrossSectionDefinition`](#3)
 - [RevitLookup build and install](#4)
 - [Bye bye lookup builds](#5)
-- [Image cleanup and a robot arm](#6)
+- [The Building Coder samples revamped](#6)
+- [Copy as HTML update](#7)
+- [Image cleanup and a robot arm](#8)
 
 ####<a name="2"></a> Revit 2022.1 SDK Released
 
