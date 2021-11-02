@@ -239,6 +239,25 @@ Ever so many thanks once again to Peter for all his work with this over the past
 
 ####<a name="6"></a> The Building Coder Samples Revamped
 
+As if all the above were not enough, Roman also went ahead and
+revamped [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples),
+submitting [pull request #18 &ndash; Refactoring](https://github.com/jeremytammik/the_building_coder_samples/pull/18):
+
+> Same as for RevitLookup.
+I did not add a build system, there is only one command in the project that displays a small dialog box.
+Switched msbuild to Net SDK, now the .csproj file contains much fewer lines.
+Added automatic copying of dll and addin to Revit addins folder.
+Some variables cannot be renamed as it causes conflicts, manual renaming will take too long, left as is.
+There are some unoptimized sections left in the project, but their fixing requires manual labor, there are a lot of files, so I left it as it is.
+Changelog has been moved to a separate file.
+Mainly this is the addition of new features of the latest versions of C#, refactoring according to the latest guidelines.
+
+Integrated and cursorily tested
+in [release 2022.1.152.2](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2022.1.152.2).
+
+Many thanks again to Roman for this!
+
+Now I just have to figure out how to get back my preferred presonal C# editor and formatting settings...
 
 ####<a name="7"></a> Copy as HTML Update
 
