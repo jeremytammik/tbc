@@ -67,7 +67,15 @@ Many thanks to  for this very helpful explanation!
 
 -->
 
-###
+### Revit 2022.1 SDK and RevitLookup Installer
+
+Exciting news and a lot of changes to RevitLookup:
+
+- [Revit 2022.1 SDK released](#2)
+- [`WallCrossSection` vs. `WallCrossSectionDefinition`](#3)
+- [RevitLookup build and install](#4)
+- [Bye bye lookup builds](#5)
+- [Image cleanup and a robot arm](#6)
 
 ####<a name="2"></a> Revit 2022.1 SDK Released
 
@@ -82,7 +90,7 @@ It includes important enhancements addressing new Revit product functionality an
 A list of what's new is provided in the SDK documentation in the *What's New* section and the *Changes and Additions* document.
 I'll put that information online for easier searching and finding asap.
 
-####<a name="2"></a> WallCrossSection vs. WallCrossSectionDefinition
+####<a name="3"></a> WallCrossSection vs. WallCrossSectionDefinition
 
 The Revit 2022.1 unfortunately introduced a breaking change:
 
@@ -224,10 +232,9 @@ the [issue #103 &ndash; Gitlab pipeline broken](https://github.com/jeremytammik/
 
 Ever so many thanks once again to Peter for all his work with this over the past years!
 
-####<a name="6"></a> Image Cleanup, Robot Arm and Happiness
+####<a name="6"></a> Image Cleanup and a Robot Arm
 
-Some nice little snippets pointed out to me by colleagues yesterday:
+Two nice little snippets that caught my attention, a useful image editor tool and impressive novel hardware technology:
 
 - [Quick and free alternative for cleaning up artifacts in images](https://cleanup.pictures)
 - [Robotic arm with full range of motion and static strength](https://youtu.be/H19p43NFqp4)
-- [Sam Berns' TEDx talk on his philosophy for a happy life](https://youtu.be/36m1o-tM05g)
