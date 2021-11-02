@@ -26,7 +26,7 @@ twitter:
 
 add #thebuildingcoder
 
- the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
+Revit 2022.1 SDK, RevitLookup build and install and The Building Coder samples revamped for the #RevitAPI #DynamoBim @AutodeskForge @AutodeskRevit #bim #ForgeDevCon https://autode.sk/sdk2022_1
 
 Exciting news with a lot of changes to RevitLookup and The Building Coder samples
 &ndash; Revit 2022.1 SDK released
