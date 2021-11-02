@@ -77,7 +77,7 @@ Exciting news with a lot of changes to RevitLookup and The Building Coder sample
 
 ####<a name="2"></a> Revit 2022.1 SDK Released
 
-The Revit 2022.1 SDK has been released on 
+The Revit 2022.1 SDK has been released in 
 the [Revit Developer Center](https://www.autodesk.com/developer-network/platform-technologies/revit).
 
 The initial Revit 2022 SDK dates from April 12, 2021.
