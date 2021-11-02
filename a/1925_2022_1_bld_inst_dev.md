@@ -69,21 +69,89 @@ Many thanks to  for this very helpful explanation!
 
 ###
 
+####<a name="2"></a> Revit 2022.1 SDK Released
 
-[Revit Developer Center](https://www.autodesk.com/developer-network/platform-technologies/revit)
+The Revit 2022.1 SDK has been released on 
+the [Revit Developer Center](https://www.autodesk.com/developer-network/platform-technologies/revit).
 
-You can download the updated Revit SDK here:
+The initial Revit 2022 SDK dates from April 12, 2021.
 
-Revit 2022.1 SDK (Update October 28, 2021)
-Revit 2022 SDK (Update April 12, 2021)
+The updated Revit 2022.1 SDK was released on October 28, 2021.
 
+It includes important enhancements addressing new Revit product functionality and developer wishes and requests.
+A list of what's new is provided in the SDK documentation in the *What's New* section and the *Changes and Additions* document.
+I'll put that information online for easier searching and finding asap.
 
-####<a name="2"></a> RevitLookup Build and Install
+####<a name="2"></a> WallCrossSection vs. WallCrossSectionDefinition
 
-Just last week saw a very exciting contribution to create
+The Revit 2022.1 unfortunately introduced a breaking change:
+
+`WallCrossSection` was renamed to `WallCrossSectionDefinition`
+
+The Revit team is working on a knowledge base article to document this and provide a recommendation on how to handle it.
+
+The issue was brought to our attention by [@ricaun](), Luiz Henrique Cassettari, in
+his [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [RevitApi 2022 update change WallCrossSection to WallCrossSectionDefinition](https://forums.autodesk.com/t5/revit-api-forum/revitapi-2022-update-change-wallcrosssection-to/td-p/10720345):
+
+**Question:** I was messing with `GroupTypeId` and found something interesting and a little worrying.
+
+On my computer, I have the Revit 2022 first release.
+
+- Product Version: 20210224_1515(x64)
+- RevitApi.dll Version: 22.0.2.392
+
+My plugin application uses
+the NuGet package [Revit_All_Main_Versions_API_x64](https://www.nuget.org/packages/Revit_All_Main_Versions_API_x64),
+and I usually use the last version:
+
+- Product Version: 20210921_1515(x64)
+- RevitApi.dll Version: 22.1.1.516
+
+The `GroupTypeId` property `WallCrossSection` changed to `WallCrossSectionDefinition` in the Revit 2022.1 update.
+
+If I use the old property, it will throw an exception on the new version.
+
+I use the new one, the first Revit 2022 release will break.
+
+I will probably never use this `ForgeTypeId`, but I worry that other things could change in this update.
+
+Should I be worried about my application breaking each time a new Hotfix is released?
+
+**Answer:** Very sorry about this mishap!
+
+No, you should not need to worry about that; this is an exceptional case and an error in the update release.
+
+Thank you very much for pointing it out!
+
+This launched a significant discussion in the development team.
+
+First of all, it did indeed happen as you noted.
+
+Secondly, it should not have happened.
+
+They are discussing both how to handle this specific issue and how to prevent anything similar from occurring in the future.
+
+The simple workaround for the moment is to use the integer value of the enum to cover both 2022.0 and 2022.1.
+
+They discussed reverting back again in future updates, but that would cause even more disruption.
+
+They discussed defining both enumerations with the same underlying integer values.
+
+For the moment, just using the underlying integers is the safest way to go, I guess:
+
+<pre class="code>
+  // BuiltInParameterGroup.PG_WALL_CROSS_SECTION_DEFINITION; // -5000228,
+  // BuiltInParameterGroup.PG_WALL_CROSS_SECTION; // -5000228,
+  var PG_WALL_CROSS_SECTION = (BuiltInParameterGroup)(-5000228);
+</pre>
+
+####<a name="4"></a> RevitLookup Build and Install
+
+Moving on to more positive news, we were blessed last week with a very exciting contribution to create
 a [modeless version of RevitLookup](https://thebuildingcoder.typepad.com/blog/2021/10/bridges-regeneration-and-modeless-revitlookup.html).
 
-This exciting rapid evolution continues with an untiring stint of contributions
+This rapid evolution continues with an untiring stint of contributions
 from Roman [@Nice3point](https://github.com/Nice3point) and
 his extensive series of pull requests:
 
@@ -99,10 +167,10 @@ his extensive series of pull requests:
 As a result, RevitLookup now boasts a modern up-to-date build system, a multi-version installer, a separate GitHub developer branch `dev`, and many other enhancements:
 
 <center>
-<img src="img/.png" alt="RevitLookup installer" title="RevitLookup installer" width="600"/> <!--  -->
+<img src="img/revitlookup_installer.png" alt="RevitLookup installer" title="RevitLookup installer" width="517"/> <!-- 1034 -->
 </center>
 
-Here are some of his explanations from the pull request conversations:
+Here are some of Roman's explanations from our pull request conversations:
 
 - Corrected the style of the code in accordance with the latest guidelines. Access modifiers and some unused variables and methods are not affected. The .sln file has been moved to the root folder, otherwise the development environment will not capture the installer project and other supporting files.
 - In recent commits, I have integrated the build system from my template https://github.com/Nice3point/RevitTemplates. Now the installer will build directly to github. After installation, I launched Revit, everything seems to work. For debugging added copying to AppData\Roaming\Autodesk\Revit\Addins\2022. To local build, net core 5 is required. If you still have version 3, please update
@@ -117,25 +185,33 @@ Here are some of his explanations from the pull request conversations:
 - Kept the old documentation somewhere, as history, for nostalgic reasons, in honour of Jim Awe. It is authored by Jim Awe, the original implementor of both RevitLookup and the corresponding AutoCAD snooping tool, so it has historical value in itself, i think.
 - you don't need to run nuke to debug. Only the green arrow on the VisualStudio panel. Nuke is used only for the purpose of building a project, it simplifies building if, for example, the project has several configurations, for example, for the 20th, 21st and 22nd versions of revit, Nuke build all dll variants at once. The build system is only needed to release a product.
 - Also, the project was refactored taking into account the latest versions of the C# language.
-Some places have been optimized, for the ribbon I created extension methods that are from
+Some places have been optimized; for the ribbon, I created extension methods to enable shortening of lengthy repetitive data like this:
 
-optionsBtn.AddPushButton (new PushButtonData (" HelloWorld "," Hello World ... ", ExecutingAssemblyPath, typeof (HelloWorld) .FullName));
+<pre class="code>
+  optionsBtn.AddPushButton (new PushButtonData (" HelloWorld "," Hello World ... ", ExecutingAssemblyPath, typeof (HelloWorld) .FullName));
+</pre>
 
-write like this
+It can now be written like this:
 
-optionsBtn.AddPushButton (typeof (HelloWorld)," HelloWorld "," Hello World ... ");
+<pre class="code>
+  optionsBtn.AddPushButton (typeof (HelloWorld)," HelloWorld "," Hello World ... ");
+</pre>
 
-The latest versions of the C # language allow you to write like this:
+The latest versions of the C# language allow you to write like this:
 
-MApp.DocumentClosed += m_app_DocumentClosed;
+<pre class="code>
+  MApp.DocumentClosed += m_app_DocumentClosed;
+</pre>
 
 instead of
 
-m_app.DocumentClosed += new EventHandler<Autodesk.Revit.DB.Events.DocumentClosedEventArgs>(m_app_DocumentClosed);
+<pre class="code>
+ m_app.DocumentClosed += new EventHandler<Autodesk.Revit.DB.Events.DocumentClosedEventArgs>(m_app_DocumentClosed);
+</pre>
 
 Ever so many thanks to Roman for all his inspired work helping this tool move forward and especially his untiring efforts supporting me getting to grips with the new technology!
 
-####<a name="3"></a> Bye Bye Lookup Builds
+####<a name="5"></a> Bye Bye Lookup Builds
 
 Until now, you could always download the most recent build of RevitLookup
 from [lookupbuilds.com](https://lookupbuilds.com),
@@ -148,18 +224,10 @@ the [issue #103 &ndash; Gitlab pipeline broken](https://github.com/jeremytammik/
 
 Ever so many thanks once again to Peter for all his work with this over the past years!
 
-
-####<a name="3"></a> Image Cleanup, Robot Arm and Happiness
+####<a name="6"></a> Image Cleanup, Robot Arm and Happiness
 
 Some nice little snippets pointed out to me by colleagues yesterday:
 
 - [Quick and free alternative for cleaning up artifacts in images](https://cleanup.pictures)
 - [Robotic arm with full range of motion and static strength](https://youtu.be/H19p43NFqp4)
 - [Sam Berns' TEDx talk on his philosophy for a happy life](https://youtu.be/36m1o-tM05g)
-
-
-
-<center>
-<img src="img/" alt="Outdoor seatbelt" title="Outdoor seatbelt" width="360"/> <!-- 720 -->
-</center>
-
