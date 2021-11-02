@@ -69,7 +69,7 @@ Many thanks to  for this very helpful explanation!
 
 ### Revit 2022.1 SDK and RevitLookup Installer
 
-Exciting news and a lot of changes to RevitLookup:
+Exciting news with a lot of changes to RevitLookup and The Building Coder samples:
 
 - [Revit 2022.1 SDK released](#2)
 - [`WallCrossSection` vs. `WallCrossSectionDefinition`](#3)
@@ -150,7 +150,7 @@ They discussed defining both enumerations with the same underlying integer value
 
 For the moment, just using the underlying integers is the safest way to go, I guess:
 
-<pre class="code>
+<pre class="code">
 &nbsp;&nbsp;<span style="color:green;">//&nbsp;BuiltInParameterGroup.PG_WALL_CROSS_SECTION_DEFINITION;&nbsp;//&nbsp;-5000228,</span>
 &nbsp;&nbsp;<span style="color:green;">//&nbsp;BuiltInParameterGroup.PG_WALL_CROSS_SECTION;&nbsp;//&nbsp;-5000228,</span>
 &nbsp;&nbsp;var&nbsp;PG_WALL_CROSS_SECTION&nbsp;=&nbsp;(BuiltInParameterGroup)&nbsp;(-5000228);
@@ -197,7 +197,7 @@ Here are some of Roman's explanations from our pull request conversations:
 - Also, the project was refactored taking into account the latest versions of the C# language.
 Some places have been optimized; for the ribbon, I created extension methods to enable shortening of lengthy repetitive data like this:
 
-<pre class="code>
+<pre class="code">
 &nbsp;&nbsp;optionsBtn.AddPushButton(
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">PushButtonData</span>(<span style="color:#a31515;">&quot;&nbsp;HelloWorld&nbsp;&quot;</span>,<span style="color:#a31515;">&quot;&nbsp;Hello&nbsp;World&nbsp;...&nbsp;&quot;</span>,&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ExecutingAssemblyPath,&nbsp;<span style="color:blue;">typeof</span>&nbsp;(HelloWorld)&nbsp;.FullName));
@@ -205,20 +205,20 @@ Some places have been optimized; for the ribbon, I created extension methods to 
 
 It can now be written like this:
 
-<pre class="code>
+<pre class="code">
 &nbsp;&nbsp;optionsBtn.AddPushButton(<span style="color:blue;">typeof</span>&nbsp;(HelloWorld),
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;&nbsp;HelloWorld&nbsp;&quot;</span>,<span style="color:#a31515;">&quot;&nbsp;Hello&nbsp;World&nbsp;...&nbsp;&quot;</span>);
 </pre>
 
 The latest versions of the C# language allow you to write like this:
 
-<pre class="code>
+<pre class="code">
   MApp.DocumentClosed += m_app_DocumentClosed;
 </pre>
 
 instead of
 
-<pre class="code>
+<pre class="code">
 &nbsp;&nbsp;m_app.DocumentClosed&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;+=&nbsp;<span style="color:blue;">new</span>&nbsp;EventHandler&lt;Autodesk.Revit.DB.Events.DocumentClosedEventArgs&gt;(
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m_app_DocumentClosed);
