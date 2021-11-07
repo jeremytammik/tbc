@@ -278,4 +278,4 @@ Extensions &gt; Manage Extensions.
 Finally, two nice little snippets that caught my attention, a useful image editor tool and impressive novel hardware technology:
 
 - [Quick and free alternative for cleaning up artifacts in images](https://cleanup.pictures)
-- [Robotic arm with full range of motion and static strength](https://youtu.be/H19p43NFqp4)
+- [Robotic arm with full range of motion and static strength](https://youtu.be/guDIwspRGJ8)
