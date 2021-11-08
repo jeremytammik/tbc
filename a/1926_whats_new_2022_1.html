@@ -51,26 +51,27 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <ul>
 <li><a href="#1">Information sources</a></li>
 <li><a href="#2">What's new in previous versions</a></li>
-<li><a href="#3">API Additions to the Revit 2022.1 API</a></li>
+<li><a href="#3">Diff to the Revit 2022 SDK</a></li>
+<li><a href="#4">API Additions to the Revit 2022.1 API</a></li>
 </ul>
 <ul class="toc">
-<li>3.1 <a href="#3.1"> View API additions</a></li>
+<li>4.1 <a href="#4.1"> View API additions</a></li>
 <ul class="toc">
-<li>3.1.1. <a href="#3.1.1."> Duplicating Sheets</a></li>
+<li>4.1.1. <a href="#4.1.1."> Duplicating Sheets</a></li>
 </ul>
-<li>3.2. <a href="#3.2."> Schedule API additions</a></li>
+<li>4.2. <a href="#4.2."> Schedule API additions</a></li>
 <ul class="toc">
-<li>3.2.1. <a href="#3.2.1."> Schedule heights on sheets</a></li>
-<li>3.2.2. <a href="#3.2.2."> Managing schedule segments</a></li>
+<li>4.2.1. <a href="#4.2.1."> Schedule heights on sheets</a></li>
+<li>4.2.2. <a href="#4.2.2."> Managing schedule segments</a></li>
 </ul>
-<li>3.3. <a href="#3.3."> Worksharing API additions</a></li>
+<li>4.3. <a href="#4.3."> Worksharing API additions</a></li>
 <ul class="toc">
-<li>3.3.1. <a href="#3.3.1."> Delete Workset API</a></li>
+<li>4.3.1. <a href="#4.3.1."> Delete Workset API</a></li>
 </ul>
-<li>3.4. <a href="#3.4."> Import and Export API additions</a></li>
+<li>4.4. <a href="#4.4."> Import and Export API additions</a></li>
 <ul class="toc">
-<li>3.4.1. <a href="#3.4.1."> AXM Import</a></li>
-<li>3.4.2. <a href="#3.4.2."> OBJ & STL import/export</a></li>
+<li>4.4.1. <a href="#4.4.1."> AXM Import</a></li>
+<li>4.4.2. <a href="#4.4.2."> OBJ & STL import/export</a></li>
 </ul>
 </ul>
 
@@ -122,6 +123,23 @@ in the <a href="http://help.autodesk.com/view/RVT/2022/ENU">Revit 2022 online he
 <li><a href="https://thebuildingcoder.typepad.com/blog/2020/08/revit-20211-sdk-and-whats-new.html">What's New in the Revit 2021.1 API</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2021/04/whats-new-in-the-revit-2022-api.html">What's New in the Revit 2022 API</a></li>
 </ul>
+<h4><a name="3"></a>Diff to the Revit 2022 SDK</h4>
+<p>I performed a quick diff between this update release and the original Revit 2022 SDK and found no significant differences at all.</p>
+<p>Presumably unintentionally, numerous <code>obj</code> intermediate compilation results were included in the SDK release, so
+my <a href="zip/diff_2022_2022_1_obj.txt">first diff</a> was large, 155 KB.</p>
+<p>Disregarding those files, I end up with only these <a href="zip/diff_2022_2022_1.txt">differences</a>:</p>
+<p><code>-- Revit 2022 : Revit 2022.1
+-- includes right-only and differing files:
+.\getting started with the revit api.docx   different (Revit 2022.1 is more recent)
+.\read me first.doc different (Revit 2022.1 is more recent)
+.\revit platform api changes and additions.docx different (Revit 2022.1 is more recent)
+.\revitaddinutility.chm different (Revit 2022.1 is more recent)
+.\revitapi.chm  different (Revit 2022.1 is more recent)
+.\add-in manager\autodesk.addinmanager.command.dll  different (Revit 2022.1 is more recent)
+.\samples\samplescontent.htm    different (Revit 2022.1 is more recent)
+.\samples\samplesindex.htm  different (Revit 2022.1 is more recent)
+.\samples\cloudapisample\cs\readme_cloudapisample.rtf   different (Revit 2022 is more recent)
+-- 9 files listed</code></p>
 <p></p>
 
 <p><center></p>
@@ -129,8 +147,8 @@ in the <a href="http://help.autodesk.com/view/RVT/2022/ENU">Revit 2022 online he
 <a name="3"></a><h1 class="new" style="font-weight: bold">API Additions to the Revit 2022.1 API</h1>
 </div>
 <p></center></p>
-<p><a name="3.1"></a><h2 class="new">3.1. View API additions</h2></p>
-<p><a name="3.1.1."></a><h3 class="new">3.1.1. Duplicating Sheets</h3></p>
+<p><a name="4.1"></a><h2 class="new">4.1. View API additions</h2></p>
+<p><a name="4.1.1."></a><h3 class="new">4.1.1. Duplicating Sheets</h3></p>
 <p>The new enum:</p>
 <ul>
 <li>SheetDuplicateOption</li>
@@ -149,8 +167,8 @@ in the <a href="http://help.autodesk.com/view/RVT/2022/ENU">Revit 2022 online he
 <li>ViewSheet.CanBeDuplicated(SheetDuplicateOption)</li>
 </ul>
 <p>allow you to duplicate sheets and identify sheets which can be duplicated.</p>
-<p><a name="3.2."></a><h2 class="new">3.2. Schedule API additions</h2>
-<a name="3.2.1."></a><h3 class="new">3.2.1. Schedule heights on sheets</h3></p>
+<p><a name="4.2."></a><h2 class="new">4.2. Schedule API additions</h2>
+<a name="4.2.1."></a><h3 class="new">4.2.1. Schedule heights on sheets</h3></p>
 <p>The new class:</p>
 <ul>
 <li>Autodesk.Revit.DB.ScheduleHeightsOnSheet</li>
@@ -161,7 +179,7 @@ in the <a href="http://help.autodesk.com/view/RVT/2022/ENU">Revit 2022 online he
 <li>ViewSchedule.GetScheduleHeightsOnSheet()</li>
 </ul>
 <p>will return the heights object.</p>
-<p><a name="3.2.2."></a><h3 class="new">3.2.2. Managing schedule segments</h3>
+<p><a name="4.2.2."></a><h3 class="new">4.2.2. Managing schedule segments</h3>
 The new methods:</p>
 <ul>
 <li>ViewSchedule.IsSplit()</li>
@@ -186,15 +204,15 @@ The new methods:</p>
 <li>ScheduleSheetInstance.Create(Document document, ElementId viewSheetId, ElementId scheduleId, XYZ origin, int segmentIndex)</li>
 </ul>
 <p>provide the ability to place a schedule segment on sheet and to get and set the schedule segment instance's segment index.</p>
-<p><a name="3.3."></a><h2 class="new">3.3. Worksharing API additions</h2>
-<a name="3.3.1."></a><h3 class="new">3.3.1. Delete Workset API</h3></p>
+<p><a name="4.3."></a><h2 class="new">4.3. Worksharing API additions</h2>
+<a name="4.3.1."></a><h3 class="new">4.3.1. Delete Workset API</h3></p>
 <p>The new method:</p>
 <ul>
 <li>WorksetTable.DeleteWorkset()</li>
 </ul>
 <p>supports deleting of worksets from the model.  It takes a DeleteWorksetSettings input with options for what to do with elements contained by that workset.</p>
-<p><a name="3.4."></a><h2 class="new">3.4. Import and Export API additions</h2>
-<a name="3.4.1."></a><h3 class="new">3.4.1. AXM Import</h3></p>
+<p><a name="4.4."></a><h2 class="new">4.4. Import and Export API additions</h2>
+<a name="4.4.1."></a><h3 class="new">4.4.1. AXM Import</h3></p>
 <p>The new class:</p>
 <ul>
 <li>Autodesk.Revit.DB.AXMImportOptions</li>
@@ -210,7 +228,7 @@ The new methods:</p>
 <li>OptionalFunctionalityUtils.IsAXMImportLinkAvailable()</li>
 </ul>
 <p>checks if the Import FormIt function is available.</p>
-<p><a name="3.4.2."></a><h3 class="new">3.4.2. OBJ &amp; STL import/export</h3></p>
+<p><a name="4.4.2."></a><h3 class="new">4.4.2. OBJ &amp; STL import/export</h3></p>
 <p>The new method:</p>
 <ul>
 <li>Document.Export(String, String, OBJExportOptions)</li>
