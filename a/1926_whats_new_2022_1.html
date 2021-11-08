@@ -24,14 +24,13 @@
 
 twitter:
 
-What's New in the Revit 2022.1 API? Exciting new functionality, migration information, overview of changes and additions, table of contents, full details of all new aspects of the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
+The Revit 2022.1 API? Exciting new functionality, migration information, overview of changes and additions, table of contents, full details of all new aspects of the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-The Revit 2022.1 API includes an exceptional list of exciting enhancements for add-in developers, including numerous developer wishes and requests that have now been explicitly addressed
+The Revit 2022.1 API includes some important enhancements addressing new Revit product functionality and developer wishes and requests
 &ndash; Information sources
 &ndash; What's new in previous versions
-&ndash; Detailed tasble of contents
-&ndash; API Changes
-&ndash; API Additions...
+&ndash; Diff to the Revit 2022 SDK
+&ndash; API additions...
 
 linkedin:
 
@@ -47,7 +46,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>What's New in the Revit 2022.1 API</h3>
-<p>The Revit 2022.1 API includes some important enhancements addressing new Revit product functionality and developer wishes and requests:</p>
+<p>The <a href="https://thebuildingcoder.typepad.com/blog/2021/11/revit-20221-sdk-revitlookup-build-and-install.html#2">Revit 2022.1 API was recently released</a> and
+includes some important enhancements addressing new Revit product functionality and developer wishes and requests:</p>
 <ul>
 <li><a href="#1">Information sources</a></li>
 <li><a href="#2">What's new in previous versions</a></li>
@@ -127,19 +127,22 @@ in the <a href="http://help.autodesk.com/view/RVT/2022/ENU">Revit 2022 online he
 <p>I performed a quick diff between this update release and the original Revit 2022 SDK and found no significant differences at all.</p>
 <p>Presumably unintentionally, numerous <code>obj</code> intermediate compilation results were included in the SDK release, so
 my <a href="zip/diff_2022_2022_1_obj.txt">first diff</a> was large, 155 KB.</p>
-<p>Disregarding those files, I end up with only these <a href="zip/diff_2022_2022_1.txt">differences</a>:</p>
-<p><code>-- Revit 2022 : Revit 2022.1
+<p>Disregarding the <code>obj</code> files, however, I end up with only these <a href="zip/diff_2022_2022_1.txt">differences</a>:</p>
+<pre>
+-- Revit 2022 : Revit 2022.1
 -- includes right-only and differing files:
-.\getting started with the revit api.docx   different (Revit 2022.1 is more recent)
-.\read me first.doc different (Revit 2022.1 is more recent)
-.\revit platform api changes and additions.docx different (Revit 2022.1 is more recent)
-.\revitaddinutility.chm different (Revit 2022.1 is more recent)
-.\revitapi.chm  different (Revit 2022.1 is more recent)
-.\add-in manager\autodesk.addinmanager.command.dll  different (Revit 2022.1 is more recent)
-.\samples\samplescontent.htm    different (Revit 2022.1 is more recent)
-.\samples\samplesindex.htm  different (Revit 2022.1 is more recent)
-.\samples\cloudapisample\cs\readme_cloudapisample.rtf   different (Revit 2022 is more recent)
--- 9 files listed</code></p>
+.\getting started with the revit api.docx (Revit 2022.1 is more recent)
+.\read me first.doc (Revit 2022.1 is more recent)
+.\revit platform api changes and additions.docx (Revit 2022.1 is more recent)
+.\revitaddinutility.chm (Revit 2022.1 is more recent)
+.\revitapi.chm (Revit 2022.1 is more recent)
+.\add-in manager\autodesk.addinmanager.command.dll (Revit 2022.1 is more recent)
+.\samples\samplescontent.htm (Revit 2022.1 is more recent)
+.\samples\samplesindex.htm (Revit 2022.1 is more recent)
+.\samples\cloudapisample\cs\readme_cloudapisample.rtf (Revit 2022 is more recent)
+-- 9 files listed
+</pre>
+
 <p></p>
 
 <p><center></p>
