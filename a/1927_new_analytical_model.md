@@ -11,13 +11,6 @@
   New API to enable direct control of the structural analytical model that allows developers to operate independently the creation and modification of analytical elements, offering simplified implementations that work in abstraction from physical elements.
   new_analytical_model_api.jpg
 
-- https://github.com/jeremytammik/RevitLookup/issues/113
-  It would be nice to remove this filter and replace ids.Any() with ids.Count > 0. This will improve performance as Any creates a new Enumerator
-  Regarding performance, code readability and semantic meaning are more important than performance in places where performance does not matter.
-  I agree that sometimes code readability is more important, but in this case additional lines or conditions are not added. And here is the difference in speed 1200 times with memory allocation = (
-  benchmark_any_vs_count.png
-  wow, impressive! thank you for the conclusive benchmark. i'll add a note of that result to the blog, i think.
-
 - Tweets of Praise for Modeless RevitLookup:
   Joshua Lumley @joshnewzealand: This is a breakthough.
   Timon Hazell @TmnHzll: These are some nice adds.  Thanks @jeremytammik
@@ -29,6 +22,13 @@
   Roy Qian: Great! 👍👍👍
   Daniel Swearson: Nice! Thanks Jeremy.
   Micheal Ibrahim: You are my hero ❤️
+
+- https://github.com/jeremytammik/RevitLookup/issues/113
+  It would be nice to remove this filter and replace ids.Any() with ids.Count > 0. This will improve performance as Any creates a new Enumerator
+  Regarding performance, code readability and semantic meaning are more important than performance in places where performance does not matter.
+  I agree that sometimes code readability is more important, but in this case additional lines or conditions are not added. And here is the difference in speed 1200 times with memory allocation = (
+  benchmark_any_vs_count.png
+  wow, impressive! thank you for the conclusive benchmark. i'll add a note of that result to the blog, i think.
 
 - use extensible storage carefully
   https://forums.autodesk.com/t5/revit-api-forum/bug-unable-to-open-revit-2019-model-after-saving-custom-schema/m-p/10736885
@@ -71,7 +71,7 @@ Please take a close look at it if you are interested in this area.
 > New API to enable direct control of the structural analytical model that allows developers to operate independently the creation and modification of analytical elements, offering simplified implementations that work in abstraction from physical elements.
 
 <center>
-<img src="img/new_analytical_model_api.jpg" alt="New Analytical Model API" title="New Analytical Model API" width="100"/> <!-- 1068 -->
+<img src="img/new_analytical_model_api.jpg" alt="New Analytical Model API" title="New Analytical Model API" width="600"/> <!-- 834 -->
 </center>
 
 To further track progress and news on analytical modellingg, you are also invited to apply to join
@@ -96,9 +96,30 @@ the new [modeless RevitLookup](https://thebuildingcoder.typepad.com/blog/2021/10
 - Nice! Thanks Jeremy. &ndash; <i>Daniel Swearson</i>
 - You are my hero ❤️ &ndash; <i>Micheal Ibrahim</i>
 
-Thank you for tyour appreciation, everybody, and yet again a huge thanks to [@NeVeSpl](https://github.com/NeVeSpl) from me too.
+Thank you for your appreciation, everybody, and yet again a huge thanks to [@NeVeSpl](https://github.com/NeVeSpl) from me too.
 
-####<a name="4"></a>
+####<a name="4"></a> Benchmarking Generic Any versus Count
+
+One interesting little item that came up after
+the subsequent [RevitLookup cleanup](https://thebuildingcoder.typepad.com/blog/2021/11/revit-20221-sdk-revitlookup-build-and-install.html#4)questions the use of the [generic `Any` method]() to check for an empty collection
+in [issue #113 &ndash; error snooping family type from project browser](https://github.com/jeremytammik/RevitLookup/issues/113),
+where [Roman @Nice3point](https://github.com/Nice3point) points out:
+
+> It would be nice to remove this filter and replace `ids.Any()` with `ids.Count > 0`.
+This will improve performance, as `Any` creates a new `Enumerator`.
+
+Proof:
+
+<center>
+<img src="img/any_versus_count_gt_zero.png" alt="Any versus Count" title="Any versus Count" width="464"/> <!-- 927 -->
+</center>
+
+> I agree that sometimes code readability is more important, but in this case additional lines or conditions are not added.
+The difference in speed is 1200 times with memory allocation =(
+
+> It takes 27 NANO seconds, and 40 Bytes in instruction that is invoked only once per use case 🤣.
+
+Many thanks to Roman for this little suggestion and benchmark, and much more so for all his other outstanding work recently improving and maintaining RevitLookup!
 
 ####<a name="5"></a>
 
