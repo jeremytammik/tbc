@@ -91,14 +91,14 @@ the new <a href="https://thebuildingcoder.typepad.com/blog/2021/10/bridges-regen
 <p>Thank you for your appreciation, everybody, and yet again a huge thanks to <a href="https://github.com/NeVeSpl">@NeVeSpl</a> from me too.</p>
 <h4><a name="4"></a> Benchmarking Generic Any versus Count</h4>
 <p>One interesting little item that came up after
-the subsequent <a href="https://thebuildingcoder.typepad.com/blog/2021/11/revit-20221-sdk-revitlookup-build-and-install.html#4">RevitLookup cleanup</a>questions the use of the <a href="">generic <code>Any</code> method</a> to check for an empty collection
+the subsequent <a href="https://thebuildingcoder.typepad.com/blog/2021/11/revit-20221-sdk-revitlookup-build-and-install.html#4">RevitLookup cleanup</a> questions the use of the <a href="">generic <code>Any</code> method</a> to check for an empty collection
 in <a href="https://github.com/jeremytammik/RevitLookup/issues/113">issue #113 &ndash; error snooping family type from project browser</a>,
 where <a href="https://github.com/Nice3point">Roman @Nice3point</a> points out:</p>
 <blockquote>
 <p>It would be nice to remove this filter and replace <code>ids.Any()</code> with <code>ids.Count &gt; 0</code>.
-This will improve performance, as <code>Any</code> creates a new <code>Enumerator</code>.</p>
+This will improve performance, as <code>Any</code> creates a new <code>Enumerator</code>.
+Proof:</p>
 </blockquote>
-<p>Proof:</p>
 <p><center>
 <img src="img/any_versus_count_gt_zero.png" alt="Any versus Count" title="Any versus Count" width="464"/> <!-- 927 -->
 </center></p>
@@ -108,6 +108,7 @@ The difference in speed is 1200 times with memory allocation =(</p>
 <p>It takes 27 NANO seconds, and 40 Bytes in instruction that is invoked only once per use case 🤣.</p>
 </blockquote>
 <p>Many thanks to Roman for this little suggestion and benchmark, and much more so for all his other outstanding work recently improving and maintaining RevitLookup!</p>
-<h4><a name="5"></a></h4>
-<h4><a name="6"></a></h4>
-<h4><a name="7"></a></h4>
+<h4><a name="5"></a> Use Extensible Storage Carefully</h4>
+<p>https://forums.autodesk.com/t5/revit-api-forum/bug-unable-to-open-revit-2019-model-after-saving-custom-schema/m-p/10736885</p>
+<h4><a name="6"></a> jQuery is Widespread but Outdated</h4>
+<p>https://thenewstack.io/why-outdated-jquery-is-still-the-dominant-javascript-library/</p>

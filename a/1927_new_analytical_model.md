@@ -101,13 +101,12 @@ Thank you for your appreciation, everybody, and yet again a huge thanks to [@NeV
 ####<a name="4"></a> Benchmarking Generic Any versus Count
 
 One interesting little item that came up after
-the subsequent [RevitLookup cleanup](https://thebuildingcoder.typepad.com/blog/2021/11/revit-20221-sdk-revitlookup-build-and-install.html#4)questions the use of the [generic `Any` method]() to check for an empty collection
+the subsequent [RevitLookup cleanup](https://thebuildingcoder.typepad.com/blog/2021/11/revit-20221-sdk-revitlookup-build-and-install.html#4) questions the use of the [generic `Any` method]() to check for an empty collection
 in [issue #113 &ndash; error snooping family type from project browser](https://github.com/jeremytammik/RevitLookup/issues/113),
 where [Roman @Nice3point](https://github.com/Nice3point) points out:
 
 > It would be nice to remove this filter and replace `ids.Any()` with `ids.Count > 0`.
 This will improve performance, as `Any` creates a new `Enumerator`.
-
 Proof:
 
 <center>
@@ -121,8 +120,11 @@ The difference in speed is 1200 times with memory allocation =(
 
 Many thanks to Roman for this little suggestion and benchmark, and much more so for all his other outstanding work recently improving and maintaining RevitLookup!
 
-####<a name="5"></a>
+####<a name="5"></a> Use Extensible Storage Carefully
 
-####<a name="6"></a>
+https://forums.autodesk.com/t5/revit-api-forum/bug-unable-to-open-revit-2019-model-after-saving-custom-schema/m-p/10736885
 
-####<a name="7"></a>
+####<a name="6"></a> jQuery is Widespread but Outdated
+
+https://thenewstack.io/why-outdated-jquery-is-still-the-dominant-javascript-library/
+
