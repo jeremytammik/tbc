@@ -146,17 +146,16 @@ In the new iteration, @aalondoqor asks:
 **Answer:** You have to be careful with Extensible Storage; it can cause these issues.
 
 I experienced the same issue with that sample in Revit 2022 when upgraded;
-I made the changes to `Application.cs` enclosed and no longer experienced the problem.
+I made the enclosed changes to `Application.cs` and no longer experienced the problem.
 
-Essentially, the changes consisted of constructing the schema when it is needed, not at start-up, not passing entities ByRef, looking for an existing schema and creating it if not found, via `Schema.Lookup(SchemaGuid)`, rather than just supplying GUID:
+Essentially, the changes consist of:
 
-new Entity(Schema)
-
-instead of
-
-new Entity(GUID)
-
-Making use of `ExtensibleStorageFilter`.
+- Constructing the schema when it is needed, not at start-up
+- Not passing entities `ByRef`
+- Looking for an existing schema 
+- Creating it if not found via `Schema.Lookup(SchemaGuid)`, rather than just supplying GUID
+- Using `new Entity(Schema)` instead of `new Entity(GUID)`
+- Making use of `ExtensibleStorageFilter`.
 
 I guess the 'archive error' failure to open should be investigated regardless, but comparison between enclosed and original may indicate the cause.
 
@@ -166,7 +165,7 @@ Due to referencing the Revit 2022 API, I had to change aspects related to `Displ
 Updated solution enclosed, not original:
 
 - [ApplicationREVISED.cs](zip/ApplicationREVISED.cs.txt)
-- [CS.Revit.TestLib updated](zip/extensible_storage_test_2.zip) to
+- [CS.Revit.TestLib updated](zip/extensible_storage_test_2.zip)
 
 When Extensible storage was introduced, we all went through a small period of time when we were using it wrong and we didn't see the implications until later (often the next year when we updated the add-ins but had the old schemas).
 So, will always be an important subject to developers with limited experience of it.

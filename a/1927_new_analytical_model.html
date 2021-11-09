@@ -125,12 +125,16 @@ run in Revit 2019 with a README.md specifying the problem reproduction steps.</p
 <p><strong>Response:</strong> Yes, is the same case exactly.</p>
 <p><strong>Answer:</strong> You have to be careful with Extensible Storage; it can cause these issues.</p>
 <p>I experienced the same issue with that sample in Revit 2022 when upgraded;
-I made the changes to <code>Application.cs</code> enclosed and no longer experienced the problem.</p>
-<p>Essentially, the changes consisted of constructing the schema when it is needed, not at start-up, not passing entities ByRef, looking for an existing schema and creating it if not found, via <code>Schema.Lookup(SchemaGuid)</code>, rather than just supplying GUID:</p>
-<p>new Entity(Schema)</p>
-<p>instead of</p>
-<p>new Entity(GUID)</p>
-<p>Making use of <code>ExtensibleStorageFilter</code>.</p>
+I made the enclosed changes to <code>Application.cs</code> and no longer experienced the problem.</p>
+<p>Essentially, the changes consist of:</p>
+<ul>
+<li>Constructing the schema when it is needed, not at start-up</li>
+<li>Not passing entities <code>ByRef</code></li>
+<li>Looking for an existing schema </li>
+<li>Creating it if not found via <code>Schema.Lookup(SchemaGuid)</code>, rather than just supplying GUID</li>
+<li>Using <code>new Entity(Schema)</code> instead of <code>new Entity(GUID)</code></li>
+<li>Making use of <code>ExtensibleStorageFilter</code>.</li>
+</ul>
 <p>I guess the 'archive error' failure to open should be investigated regardless, but comparison between enclosed and original may indicate the cause.</p>
 <p>The sample includes producing a library in netcore3.0 and dotnet47.
 I upgraded to dotnet48 and dropped the netcore3.0 version.
@@ -138,7 +142,7 @@ Due to referencing the Revit 2022 API, I had to change aspects related to <code>
 Updated solution enclosed, not original:</p>
 <ul>
 <li><a href="zip/ApplicationREVISED.cs.txt">ApplicationREVISED.cs</a></li>
-<li><a href="zip/extensible_storage_test_2.zip">CS.Revit.TestLib updated</a> to</li>
+<li><a href="zip/extensible_storage_test_2.zip">CS.Revit.TestLib updated</a></li>
 </ul>
 <p>When Extensible storage was introduced, we all went through a small period of time when we were using it wrong and we didn't see the implications until later (often the next year when we updated the add-ins but had the old schemas).
 So, will always be an important subject to developers with limited experience of it.</p>
