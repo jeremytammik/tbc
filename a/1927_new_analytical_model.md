@@ -56,18 +56,28 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### New Analytical Model
+### New Analytical Model API
 
+####<a name="2"></a> New Analytical Model API
 
+We have just added a new item to
+the [Revit Public Roadmap](https://trello.com/b/ldRXK9Gw/revit-public-roadmap) announcing
+a new API for analytical modelling in Revit.
+This is quite an evolution (if not revolution, as the old one will be deprecated).
+Please take a close look at it if you are interested in this area.
 
+> **New API Analytical Model**
+
+> New API to enable direct control of the structural analytical model that allows developers to operate independently the creation and modification of analytical elements, offering simplified implementations that work in abstraction from physical elements.
 
 <center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 1068 -->
+<img src="img/new_analytical_model_api.jpg" alt="New Analytical Model API" title="New Analytical Model API" width="100"/> <!-- 1068 -->
 </center>
 
+To further track progress and news on analytical modellingg, you are also invited to apply to join
+the [Revit preview project](https://feedback.autodesk.com/key/LHMJFVHGJK085G2M).
 
-
-
-####<a name="2"></a>
+Just like the [Revit Idea Station](https://forums.autodesk.com/t5/revit-ideas/idb-p/302),
+the roadmap enables you to vote for the roadmap items that have the greatest importance for your specific projects.
 
 ####<a name="3"></a>
