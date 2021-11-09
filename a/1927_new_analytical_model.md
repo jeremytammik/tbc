@@ -80,4 +80,28 @@ the [Revit preview project](https://feedback.autodesk.com/key/LHMJFVHGJK085G2M).
 Just like the [Revit Idea Station](https://forums.autodesk.com/t5/revit-ideas/idb-p/302),
 the roadmap enables you to vote for the roadmap items that have the greatest importance for your specific projects.
 
-####<a name="3"></a>
+####<a name="3"></a> Praise for Modeless RevitLookup
+
+A lot of praise came in on Twitter and LinkedIn for
+the new [modeless RevitLookup](https://thebuildingcoder.typepad.com/blog/2021/10/bridges-regeneration-and-modeless-revitlookup.html):
+
+- This is a breakthough. &ndash; <i>Joshua Lumley @joshnewzealand</i>
+- These are some nice adds. Thanks @jeremytammik. &ndash; <i>Timon Hazell @TmnHzll</i>
+- A dream come true. &ndash; <i>Manjaka Rakotoarisoa @RaManjaka</i>
+- A huge thank you to [@NeVeSpl](https://github.com/NeVeSpl) who took on my improvement request right away and made it real!
+  &ndash; <i>Jean-Marc Couffin @JeanMarcCouffin</i>
+- Thanks Jeremy, RevitLookup is my favorite addin. It is the must have addin for me. &ndash; <i>Carl S @CarlSirid</i>
+- Installed it yesterday. Thanks very much. &ndash; <i>David Wilson</i>
+- Great! 👍👍👍 &ndash; <i>Roy Qian</i>
+- Nice! Thanks Jeremy. &ndash; <i>Daniel Swearson</i>
+- You are my hero ❤️ &ndash; <i>Micheal Ibrahim</i>
+
+Thank you for tyour appreciation, everybody, and yet again a huge thanks to [@NeVeSpl](https://github.com/NeVeSpl) from me too.
+
+####<a name="4"></a>
+
+####<a name="5"></a>
+
+####<a name="6"></a>
+
+####<a name="7"></a>
