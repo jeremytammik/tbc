@@ -1,0 +1,182 @@
+using System;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.ExtensibleStorage;
+using Autodesk.Revit.UI;
+
+namespace TestLib
+{
+    public class Application : IExternalApplication
+    {
+        private static readonly Guid SchemaGuid = new Guid("D4769BCB-33A9-4A04-9F95-C709E306D55A");
+        private static Guid AppGuid;
+
+        public Result OnStartup(UIControlledApplication application)
+        {
+
+            string CodeBase = System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase;
+            string ASBDir = System.IO.Path.GetDirectoryName(CodeBase);
+            ASBDir = ASBDir.Replace(@"file:\", @"");
+            string ASBName = System.IO.Path.GetFileName(CodeBase);
+            string ASBpath = ASBDir + @"\" + ASBName;
+
+
+            AppGuid = application.ActiveAddInId.GetGUID();
+            RibbonPanel panel = application.CreateRibbonPanel(Tab.AddIns, "TestLib");
+            panel.AddItem(new PushButtonData("WriteData", "Write Data", ASBpath, "TestLib.StoreCmd"));
+            panel.AddItem(new PushButtonData("ReadData", "Read Data", ASBpath, "TestLib.ReadCmd"));
+
+            return Result.Succeeded;
+        }
+
+        public Result OnShutdown(UIControlledApplication application)
+        {
+            return Result.Succeeded;
+        }
+
+        private static Schema GetSchema()
+        {
+
+            Schema Sch = Autodesk.Revit.DB.ExtensibleStorage.Schema.Lookup(SchemaGuid);
+            if (Sch !=null)
+            {
+                return Sch;
+            }
+
+
+            // Create SchemaBuilder to store export window settings
+            SchemaBuilder schemaBuilder = new SchemaBuilder(SchemaGuid);
+            schemaBuilder.SetSchemaName("MyExportSettings");
+
+            // Allow anyone to read the object but restrict writing this addin only
+            schemaBuilder.SetReadAccessLevel(AccessLevel.Public);
+            schemaBuilder.SetWriteAccessLevel(AccessLevel.Application);
+            schemaBuilder.SetVendorId("ADSK"); // Is the same as the *.addin file
+            schemaBuilder.SetApplicationGUID(AppGuid);
+
+            // Create a field to store a export date
+            FieldBuilder exportDateField = schemaBuilder.AddSimpleField("ExportDate", typeof(string));
+            exportDateField.SetDocumentation("The last exported date of this project.");
+
+            // Create a field to store the export path value
+            FieldBuilder exportPathField = schemaBuilder.AddSimpleField("ExportPath", typeof(string));
+            exportPathField.SetDocumentation(
+                "Destination path where all files will be placed during the export process.");
+
+            // Create a field to store the grid cell size XYZ value
+            FieldBuilder gridCellSizeField = schemaBuilder.AddSimpleField("Size", typeof(XYZ));
+            gridCellSizeField.SetDocumentation("The size of the elements (in meters).");
+            gridCellSizeField.SetSpec(SpecTypeId.Length);
+
+            // Create a field to store a grid cell offset XYZ value
+            FieldBuilder gridOffsetField = schemaBuilder.AddSimpleField("Scale", typeof(XYZ));
+            gridOffsetField.SetDocumentation("The scale of the elements (in meters).");
+            gridOffsetField.SetSpec(SpecTypeId.Length);
+            // Finish and return the Schema object
+            Schema ExportSchema = schemaBuilder.Finish();
+            return ExportSchema;
+        }
+
+        #region Data Storage Helpers
+
+        /// <summary>
+        /// Retrieves the DataStorage element from the document (ignores out parameter)
+        /// </summary>
+        /// <param name="document">The input document to find the DataStorage element</param>
+        /// <param name="entity">The entity found inside the element</param>
+        /// <returns>Returns a DataStorage element and it's Entity, or null if not found.</returns>
+        private static DataStorage GetDataStorage(Document document)
+        {
+
+            ExtensibleStorageFilter EFilt = new ExtensibleStorageFilter(SchemaGuid);
+
+            FilteredElementCollector filteredElementCollector =
+               new FilteredElementCollector(document).WherePasses(EFilt);
+
+            foreach (Element element in filteredElementCollector)
+            {
+                DataStorage storage = element as DataStorage;
+
+                if (storage !=null)
+                {
+                    return storage;
+                }
+                 
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Retrieves the data storage from the document, or null if there has not been data prior to this point.
+        /// </summary>
+        /// <param name="document">Document used to find the data element</param>
+        /// <returns>Either null or the <see cref="DataStorageProperties"/> instance</returns>
+        public static DataStorageProperties ReadDataStorageProperties(Document document)
+        {
+            DataStorage DS = GetDataStorage(document);
+
+            if (DS == null)
+            {
+                return null;
+            }
+                
+            
+            Entity entity0 = DS.GetEntity(GetSchema());
+             if (entity0.IsValid() == false)
+            {
+                return null;
+            }
+               
+                      
+
+            return new DataStorageProperties
+            {
+                
+                ExportDate = entity0.Get<string>("ExportDate"),
+                ExportPath = entity0.Get<string>("ExportPath"),
+                Size = entity0.Get<XYZ>("Size", UnitTypeId.Meters),
+                Scale = entity0.Get<XYZ>("Scale", UnitTypeId.Meters),
+
+            };
+        }
+
+        /// <summary>
+        /// Stores the data to the document in it's dedicated element. 
+        /// </summary>
+        /// <param name="document">Document used to find the data element</param>
+        /// <param name="properties">The input properties to hand over.</param>
+        public static void WriteDataStorageProperties(Document document, DataStorageProperties properties)
+        {
+            DataStorage dataStorage = GetDataStorage(document)
+                                      ?? DataStorage.Create(document);
+
+            Entity entity = new Entity(GetSchema());
+
+            entity.Set("ExportDate", properties.ExportDate);
+            entity.Set("ExportPath", properties.ExportPath);
+
+
+            entity.Set("Size", properties.Size, UnitTypeId.Meters);
+            entity.Set("Scale", properties.Scale, UnitTypeId.Meters);
+            
+
+            dataStorage.SetEntity(entity);
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// Class type used to set the data storage object
+    /// </summary>
+    public class DataStorageProperties
+    {
+        public string ExportDate { get; set; }
+        public string ExportPath { get; set; }
+        public XYZ Size { get; set; }
+        public XYZ Scale { get; set; }
+
+        public override string ToString() =>
+            $"- {ExportDate}\r\n- {ExportPath}\r\n- {Size}\r\n- {Scale}";
+    }
+}

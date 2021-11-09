@@ -82,7 +82,7 @@ the roadmap enables you to vote for the roadmap items that have the greatest imp
 
 ####<a name="3"></a> Praise for Modeless RevitLookup
 
-A lot of praise came in on Twitter and LinkedIn for
+We received praise on Twitter and LinkedIn for
 the new [modeless RevitLookup](https://thebuildingcoder.typepad.com/blog/2021/10/bridges-regeneration-and-modeless-revitlookup.html):
 
 - This is a breakthough. &ndash; <i>Joshua Lumley @joshnewzealand</i>
@@ -123,9 +123,70 @@ Many thanks to Roman for this little suggestion and benchmark, and much more so 
 
 ####<a name="5"></a> Use Extensible Storage Carefully
 
-https://forums.autodesk.com/t5/revit-api-forum/bug-unable-to-open-revit-2019-model-after-saving-custom-schema/m-p/10736885
+@aalondoqor ran into a problem similaer to the one reported two years ago in 
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on a [Bug: Unable to open Revit 2019 model after saving custom schema in Project Info](https://forums.autodesk.com/t5/revit-api-forum/bug-unable-to-open-revit-2019-model-after-saving-custom-schema/m-p/10736885).
+
+With the help of the invaluable advice provided once again by
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas,
+it turns out not to be a bug after all...
+
+The original problem description includes
+an [an archive with a project CS.Revit.TestLib.zip](zip/extensible_storage_test_1.zip) to
+run in Revit 2019 with a README.md specifying the problem reproduction steps.
+
+In the new iteration, @aalondoqor asks:
+
+**Question:** Hi, can you solve this bug?
+
+**Answer:** Does the sample material provided previously exactly cover your problem as well?
+
+**Response:** Yes, is the same case exactly.
+
+**Answer:** You have to be careful with Extensible Storage; it can cause these issues.
+
+I experienced the same issue with that sample in Revit 2022 when upgraded;
+I made the changes to `Application.cs` enclosed and no longer experienced the problem.
+
+Essentially, the changes consisted of constructing the schema when it is needed, not at start-up, not passing entities ByRef, looking for an existing schema and creating it if not found, via `Schema.Lookup(SchemaGuid)`, rather than just supplying GUID:
+
+new Entity(Schema)
+
+instead of
+
+new Entity(GUID)
+
+Making use of `ExtensibleStorageFilter`.
+
+I guess the 'archive error' failure to open should be investigated regardless, but comparison between enclosed and original may indicate the cause.
+
+The sample includes producing a library in netcore3.0 and dotnet47.
+I upgraded to dotnet48 and dropped the netcore3.0 version.
+Due to referencing the Revit 2022 API, I had to change aspects related to `DisplayUnitType`.
+Updated solution enclosed, not original:
+
+- [ApplicationREVISED.cs](zip/ApplicationREVISED.cs.txt)
+- [CS.Revit.TestLib updated](zip/extensible_storage_test_2.zip) to
+
+When Extensible storage was introduced, we all went through a small period of time when we were using it wrong and we didn't see the implications until later (often the next year when we updated the add-ins but had the old schemas).
+So, will always be an important subject to developers with limited experience of it.
+
+I have to thank The Building Coder, because the majority of my knowledge of this subject is due to the AU handouts by Jeremy Tammik that are available on the web.
+They may not incorporate the latest ways of obtaining Schema's etc., but the process is still outlined correctly.
+From what I've seen, people often get into difficulties when they go too far away from these ways of doing it.
+I think the general rule is, don't hold onto objects and keep interactions as finite as possible.
+The Revit SDK also provides a good basic example under `SchemaBuilder`.
+
+If you conclude my fixes solved the issue or even if you demonstrate a better way (I did rewrite in a bit of a hurry), I would be happy to read that on the blog.
+
+We could ask Autodesk to find a more graceful way for Revit to handle the issue, but I think that is perhaps easier said than done (is a memory issue, is not new, we all have our part to play in terms of program stability).
+Often if you can't open a file, it may be possible to open it on a Revit version without the add-ins.
+The add-in in question was creating the schema `OnStartUp`, so would have already put something in memory before the document with the conflict was opened (could open it without the add-in when I checked later).
+
+**Response:** Thank you all very much, I fixed my problem with the example file supplied by RPTHOMAS108; thanks for sharing your knowledge.
 
 ####<a name="6"></a> jQuery is Widespread but Outdated
 
-https://thenewstack.io/why-outdated-jquery-is-still-the-dominant-javascript-library/
-
+Moving away from the Revit .NET API to the web, I have used [jQuery](https://jquery.com) in
+the past and would maybe continue doing so if I had not just noticed this article
+explaining [why outdated jQuery is still the dominant JavaScript library](https://thenewstack.io/why-outdated-jquery-is-still-the-dominant-javascript-library).
