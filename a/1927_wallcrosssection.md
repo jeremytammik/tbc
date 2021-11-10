@@ -73,7 +73,10 @@ Here is a sample code snippet in C#:
 
   ForgeTypeId id = new ForgeTypeId();            
   Type type = typeof(GroupTypeId);
-  PropertyInfo propOld = type.GetProperty("WallCrossSection", BindingFlags.Public | BindingFlags.Static);
+  
+  PropertyInfo propOld = type.GetProperty("WallCrossSection",
+    BindingFlags.Public | BindingFlags.Static);
+    
   if(null != propOld)
   {
     id = (ForgeTypeId)propOld.GetValue(null, null);
@@ -88,7 +91,6 @@ Here is a sample code snippet in C#:
 We tested it here, and it works for both Revit 2022.0 and Revit 2022.1.
   
 <center>
-<img src="img/.jpg" alt="" title="" width="100"/> <!-- 834 -->
+<img src="img/tech-comics-non-breaking-change.jpeg" alt="Non-breaking change" title="Non-breaking change" width="300"/> <!-- 495 -->
+<p style="font-size: 80%; font-style:italic">Non-breaking change &ndash; &copy; [Datamation](https://www.datamation.com)</p>
 </center>
-
-
