@@ -30,10 +30,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### WallCrossSection Renaming in the Revit 2022.1 API
 
+Breaking news fior the Revit development team:
+
 ####<a name="2"></a> WallCrossSection versus WallCrossSectionDefinition
 
-
-We mentioned the unfortunate breaking change inadvertently introduced with the Revit 2022.1 API update
+Last week, we mentioned the unfortunate breaking change inadvertently introduced with the Revit 2022.1 API update
 by [renaming `WallCrossSection` to `WallCrossSectionDefinition`](https://thebuildingcoder.typepad.com/blog/2021/11/revit-20221-sdk-revitlookup-build-and-install.html#3) and
 suggested a fix for the `BuiltInParameterGroup` enumeration value.
 
@@ -94,5 +95,5 @@ We tested it here, and it works for both Revit 2022.0 and Revit 2022.1.
   
 <center>
 <img src="img/tech-comics-non-breaking-change.jpeg" alt="Non-breaking change" title="Non-breaking change" width="300"/> <!-- 495 -->
-<p style="font-size: 80%; font-style:italic">Non-breaking change &ndash; &copy; [Datamation](https://www.datamation.com)</p>
+<p style="font-size: 80%; font-style:italic">Non-breaking change &ndash; &copy; <a href="https://www.datamation.com">Datamation</a></p>
 </center>
