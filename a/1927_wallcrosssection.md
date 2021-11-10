@@ -59,7 +59,7 @@ A solution for the first name change in the enum value was already suggested in 
 The actual integer value can be used instead to define a constant like this:
 
 <pre class="code">
-  var PG_WALL_CROSS_SECTION = (BuiltInParameterGroup)(-5000228);
+  <span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">PG_WALL_CROSS_SECTION</span>&nbsp;=&nbsp;(BuiltInParameterGroup)&nbsp;(-5000228);
 </pre>
 
 This value be used in both Revit 2022.0 and Revit 2022.1 without causing the problem.
@@ -69,22 +69,24 @@ A workaround for the second rename, the `WallCrossSection` property of the `Forg
 Here is a sample code snippet in C#:
 
 <pre class="code">
-  using System.Reflection;
+<span style="color:blue;">using</span>&nbsp;System.Reflection;
 
-  ForgeTypeId id = new ForgeTypeId();            
-  Type type = typeof(GroupTypeId);
-  
-  PropertyInfo propOld = type.GetProperty("WallCrossSection",
-    BindingFlags.Public | BindingFlags.Static);
-    
-  if(null != propOld)
+. . .
+
+  ForgeTypeId&nbsp;<span style="color:#1f377f;">id</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;ForgeTypeId();
+  Type&nbsp;<span style="color:#1f377f;">type</span>&nbsp;=&nbsp;<span style="color:blue;">typeof</span>(GroupTypeId);
+   
+  PropertyInfo&nbsp;<span style="color:#1f377f;">propOld</span>&nbsp;=&nbsp;type.GetProperty(<span style="color:#a31515;">&quot;WallCrossSection&quot;</span>,
+  &nbsp;&nbsp;BindingFlags.Public&nbsp;|&nbsp;BindingFlags.Static);
+   
+  <span style="color:#8f08c4;">if</span>&nbsp;(<span style="color:blue;">null</span>&nbsp;!=&nbsp;propOld)
   {
-    id = (ForgeTypeId)propOld.GetValue(null, null);
+    id&nbsp;=&nbsp;(ForgeTypeId)&nbsp;propOld.GetValue(<span style="color:blue;">null</span>,&nbsp;<span style="color:blue;">null</span>);
   }
-  else
+  <span style="color:#8f08c4;">else</span>
   {
-    PropertyInfo propNew = type.GetProperty("WallCrossSectionDefinition", BindingFlags.Public | BindingFlags.Static); 
-    id = (ForgeTypeId)propNew.GetValue(null, null);
+    PropertyInfo&nbsp;<span style="color:#1f377f;">propNew</span>&nbsp;=&nbsp;type.GetProperty(<span style="color:#a31515;">&quot;WallCrossSectionDefinition&quot;</span>,&nbsp;BindingFlags.Public&nbsp;|&nbsp;BindingFlags.Static);
+    id&nbsp;=&nbsp;(ForgeTypeId)&nbsp;propNew.GetValue(<span style="color:blue;">null</span>,&nbsp;<span style="color:blue;">null</span>);
   }
 </pre>
 
