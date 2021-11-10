@@ -63,9 +63,8 @@ there was a breaking change introduced in Revit 2022.1:</p>
 
   ForgeTypeId&nbsp;<span style="color:#1f377f;">id</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;ForgeTypeId();
   Type&nbsp;<span style="color:#1f377f;">type</span>&nbsp;=&nbsp;<span style="color:blue;">typeof</span>(GroupTypeId);
-
   PropertyInfo&nbsp;<span style="color:#1f377f;">propOld</span>&nbsp;=&nbsp;type.GetProperty(<span style="color:#a31515;">&quot;WallCrossSection&quot;</span>,
-  &nbsp;&nbsp;BindingFlags.Public&nbsp;|&nbsp;BindingFlags.Static);
+    BindingFlags.Public&nbsp;|&nbsp;BindingFlags.Static);
 
   <span style="color:#8f08c4;">if</span>&nbsp;(<span style="color:blue;">null</span>&nbsp;!=&nbsp;propOld)
   {
@@ -73,7 +72,8 @@ there was a breaking change introduced in Revit 2022.1:</p>
   }
   <span style="color:#8f08c4;">else</span>
   {
-    PropertyInfo&nbsp;<span style="color:#1f377f;">propNew</span>&nbsp;=&nbsp;type.GetProperty(<span style="color:#a31515;">&quot;WallCrossSectionDefinition&quot;</span>,&nbsp;BindingFlags.Public&nbsp;|&nbsp;BindingFlags.Static);
+    PropertyInfo&nbsp;<span style="color:#1f377f;">propNew</span>&nbsp;=&nbsp;type.GetProperty(<span style="color:#a31515;">&quot;WallCrossSectionDefinition&quot;</span>,
+      BindingFlags.Public&nbsp;|&nbsp;BindingFlags.Static);
     id&nbsp;=&nbsp;(ForgeTypeId)&nbsp;propNew.GetValue(<span style="color:blue;">null</span>,&nbsp;<span style="color:blue;">null</span>);
   }
 </pre>
