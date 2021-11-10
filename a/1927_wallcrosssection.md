@@ -90,6 +90,19 @@ Here is a sample code snippet in C#:
   }
 </pre>
 
+Or, if you prefer a more succinct version, use this:
+
+<pre class="code">
+&nbsp;&nbsp;Type&nbsp;<span style="color:#1f377f;">type</span>&nbsp;=&nbsp;<span style="color:blue;">typeof</span>(GroupTypeId);
+ 
+&nbsp;&nbsp;PropertyInfo&nbsp;<span style="color:#1f377f;">prop</span>&nbsp;=&nbsp;type.GetProperty(<span style="color:#a31515;">&quot;WallCrossSection&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;BindingFlags.Public&nbsp;|&nbsp;BindingFlags.Static)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;??&nbsp;type.GetProperty(<span style="color:#a31515;">&quot;WallCrossSectionDefinition&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BindingFlags.Public&nbsp;|&nbsp;BindingFlags.Static);
+ 
+&nbsp;&nbsp;ForgeTypeId&nbsp;<span style="color:#1f377f;">id</span>&nbsp;=&nbsp;(ForgeTypeId)&nbsp;prop.GetValue(<span style="color:blue;">null</span>,&nbsp;<span style="color:blue;">null</span>);
+</pre>
+
 We tested it here, and it works for both Revit 2022.0 and Revit 2022.1.
   
 <center>

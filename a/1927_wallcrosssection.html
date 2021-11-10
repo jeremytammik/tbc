@@ -78,6 +78,18 @@ there was a breaking change introduced in Revit 2022.1:</p>
   }
 </pre>
 
+<p>Or, if you prefer a more succinct version, use this:</p>
+<pre class="code">
+&nbsp;&nbsp;Type&nbsp;<span style="color:#1f377f;">type</span>&nbsp;=&nbsp;<span style="color:blue;">typeof</span>(GroupTypeId);
+
+&nbsp;&nbsp;PropertyInfo&nbsp;<span style="color:#1f377f;">prop</span>&nbsp;=&nbsp;type.GetProperty(<span style="color:#a31515;">&quot;WallCrossSection&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;BindingFlags.Public&nbsp;|&nbsp;BindingFlags.Static)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;??&nbsp;type.GetProperty(<span style="color:#a31515;">&quot;WallCrossSectionDefinition&quot;</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BindingFlags.Public&nbsp;|&nbsp;BindingFlags.Static);
+
+&nbsp;&nbsp;ForgeTypeId&nbsp;<span style="color:#1f377f;">id</span>&nbsp;=&nbsp;(ForgeTypeId)&nbsp;prop.GetValue(<span style="color:blue;">null</span>,&nbsp;<span style="color:blue;">null</span>);
+</pre>
+
 <p>We tested it here, and it works for both Revit 2022.0 and Revit 2022.1.</p>
 <p><center>
 <img src="img/tech-comics-non-breaking-change.jpeg" alt="Non-breaking change" title="Non-breaking change" width="300"/> <!-- 495 --></p>
