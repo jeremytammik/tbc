@@ -30,7 +30,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### WallCrossSection Renaming in the Revit 2022.1 API
 
-Breaking news fior the Revit development team:
+Breaking news from the Revit development team:
 
 ####<a name="2"></a> WallCrossSection versus WallCrossSectionDefinition
 
