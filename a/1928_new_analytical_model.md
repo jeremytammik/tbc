@@ -43,8 +43,13 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash;
-...
+Important news coming for structural developers, further development in RevitLookup, notes on extensible storage and JavaScript
+&ndash; New Analytical Model API
+&ndash; Praise for modeless RevitLookup
+&ndash; Benchmarking generic <code>Any</code> versus <code>Count</code>
+&ndash; Escape RevitLookup
+&ndash; Use extensible storage carefully
+&ndash; jQuery is widespread but outdated...
 
 linkedin:
 
@@ -61,7 +66,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### New Analytical Model API
 
-Important news for structural developers, further development in RevitLookup, and notes on extensible storage and JavaScript:
+Important news coming for structural developers, further development in RevitLookup, notes on extensible storage and JavaScript:
 
 - [New Analytical Model API](#2)
 - [Praise for modeless RevitLookup](#3)
