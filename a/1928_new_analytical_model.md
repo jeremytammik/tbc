@@ -30,6 +30,9 @@
   benchmark_any_vs_count.png
   wow, impressive! thank you for the conclusive benchmark. i'll add a note of that result to the blog, i think.
 
+- https://github.com/jeremytammik/RevitLookup/pull/115
+  Add Keyboard Escape to Close Form #115
+
 - use extensible storage carefully
   https://forums.autodesk.com/t5/revit-api-forum/bug-unable-to-open-revit-2019-model-after-saving-custom-schema/m-p/10736885
   
@@ -120,6 +123,14 @@ The difference in speed is 1200 times with memory allocation =(
 > It takes 27 NANO seconds, and 40 Bytes in instruction that is invoked only once per use case 🤣.
 
 Many thanks to Roman for this little suggestion and benchmark, and much more so for all his other outstanding work recently improving and maintaining RevitLookup!
+
+####<a name="5"></a> 
+
+After the Modeless update, the Escape button stop working.
+
+This PR enables the Escape Keyboard feature, now Focus Form Closes if the Escape button is pressed and the Owner gain focus.
+
+Luiz Henrique [@ricaun](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/4176855) Cassettari
 
 ####<a name="5"></a> Use Extensible Storage Carefully
 

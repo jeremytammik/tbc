@@ -108,7 +108,7 @@ The Revit 2022.1 unfortunately introduced a breaking change:
 
 The Revit team is working on a knowledge base article to document this and provide a recommendation on how to handle it.
 
-The issue was brought to our attention by [@ricaun](), Luiz Henrique Cassettari, in
+The issue was brought to our attention by [@ricaun](https://github.com/ricaun), Luiz Henrique Cassettari, in
 his [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [RevitApi 2022 update change WallCrossSection to WallCrossSectionDefinition](https://forums.autodesk.com/t5/revit-api-forum/revitapi-2022-update-change-wallcrosssection-to/td-p/10720345):
 
