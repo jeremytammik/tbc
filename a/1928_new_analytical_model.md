@@ -86,7 +86,7 @@ Please take a close look at it if you are interested in this area.
 <img src="img/new_analytical_model_api.jpg" alt="New Analytical Model API" title="New Analytical Model API" width="600"/> <!-- 834 -->
 </center>
 
-To further track progress and news on analytical modellingg, you are also invited to apply to join
+To further track progress and news on analytical modelling, you are also invited to apply to join
 the [Revit preview project](https://feedback.autodesk.com/key/LHMJFVHGJK085G2M).
 
 Just like the [Revit Idea Station](https://forums.autodesk.com/t5/revit-ideas/idb-p/302),
@@ -97,12 +97,12 @@ the roadmap enables you to vote for the roadmap items that have the greatest imp
 We received praise on Twitter and LinkedIn for
 the new [modeless RevitLookup](https://thebuildingcoder.typepad.com/blog/2021/10/bridges-regeneration-and-modeless-revitlookup.html):
 
-- This is a breakthough. &ndash; <i>Joshua Lumley @joshnewzealand</i>
+- This is a breakthrough. &ndash; <i>Joshua Lumley @joshnewzealand</i>
 - These are some nice adds. Thanks @jeremytammik. &ndash; <i>Timon Hazell @TmnHzll</i>
 - A dream come true. &ndash; <i>Manjaka Rakotoarisoa @RaManjaka</i>
 - A huge thank you to [@NeVeSpl](https://github.com/NeVeSpl) who took on my improvement request right away and made it real!
   &ndash; <i>Jean-Marc Couffin @JeanMarcCouffin</i>
-- Thanks Jeremy, RevitLookup is my favorite addin. It is the must have addin for me. &ndash; <i>Carl S @CarlSirid</i>
+- Thanks Jeremy, RevitLookup is my favourite addin. It is the must-have add-in for me. &ndash; <i>Carl S @CarlSirid</i>
 - Installed it yesterday. Thanks very much. &ndash; <i>David Wilson</i>
 - Great! 👍👍👍 &ndash; <i>Roy Qian</i>
 - Nice! Thanks Jeremy. &ndash; <i>Daniel Swearson</i>
@@ -145,11 +145,11 @@ This PR reenables the Escape keyboard feature; now the focused form closes if th
 
 Published in [RevitLookup release 2022.0.2.4](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.2.4).
 
-Many thabnks to Luiz Henrique for catching this!
+Many thanks to Luiz Henrique for catching this!
 
 ####<a name="6"></a> Use Extensible Storage Carefully
 
-@aalondoqor ran into a problem similaer to the one reported two years ago in 
+@aalondoqor ran into a problem similar to the one reported two years ago in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on a [Bug: Unable to open Revit 2019 model after saving custom schema in Project Info](https://forums.autodesk.com/t5/revit-api-forum/bug-unable-to-open-revit-2019-model-after-saving-custom-schema/m-p/10736885).
 
