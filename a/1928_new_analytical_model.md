@@ -140,7 +140,7 @@ Many thanks to Roman for this little suggestion and benchmark, and much more so 
 
 ####<a name="5"></a> Escape RevitLookup
 
-Before we escape this topic, another little update bears mentioning.
+Before we escape this topic, yet another little RevitLookup update bears mentioning:
 
 Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari submitted
 [pull request #115 to add keyboard escape to close form](https://github.com/jeremytammik/RevitLookup/pull/115):
@@ -154,6 +154,7 @@ Many thanks to Luiz Henrique for catching this!
 
 ####<a name="6"></a> Use Extensible Storage Carefully
 
+Moving away from RevitLookup to more general Revit API topics, 
 @aalondoqor ran into a problem similar to the one reported two years ago in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on a [Bug: Unable to open Revit 2019 model after saving custom schema in Project Info](https://forums.autodesk.com/t5/revit-api-forum/bug-unable-to-open-revit-2019-model-after-saving-custom-schema/m-p/10736885).
