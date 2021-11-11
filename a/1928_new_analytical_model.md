@@ -61,6 +61,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### New Analytical Model API
 
+Important news for structural developers, further development in RevitLookup, and notes on extensible storage and JavaScript:
+
+- [New Analytical Model API](#2)
+- [Praise for modeless RevitLookup](#3)
+- [Benchmarking generic `Any` versus `Count`](#4)
+- [Escape RevitLookup](#5)
+- [Use extensible storage carefully](#6)
+- [jQuery is widespread but outdated](#7)
+
 ####<a name="2"></a> New Analytical Model API
 
 We have just added a new item to
