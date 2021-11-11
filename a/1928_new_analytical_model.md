@@ -124,15 +124,21 @@ The difference in speed is 1200 times with memory allocation =(
 
 Many thanks to Roman for this little suggestion and benchmark, and much more so for all his other outstanding work recently improving and maintaining RevitLookup!
 
-####<a name="5"></a> 
+####<a name="5"></a> Escape RevitLookup
 
-After the Modeless update, the Escape button stop working.
+Before we escape this topic, another little update bears mentioning.
 
-This PR enables the Escape Keyboard feature, now Focus Form Closes if the Escape button is pressed and the Owner gain focus.
+Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari submitted
+[pull request #115 to add keyboard escape to close form](https://github.com/jeremytammik/RevitLookup/pull/115):
 
-Luiz Henrique [@ricaun](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/4176855) Cassettari
+> After the Modeless update, the Escape button stop working.
+This PR reenables the Escape keyboard feature; now the focused form closes if the Escape button is pressed, and the Owner regains focus.
 
-####<a name="5"></a> Use Extensible Storage Carefully
+Published in [RevitLookup release 2022.0.2.4](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.2.4).
+
+Many thabnks to Luiz Henrique for catching this!
+
+####<a name="6"></a> Use Extensible Storage Carefully
 
 @aalondoqor ran into a problem similaer to the one reported two years ago in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -195,7 +201,7 @@ The add-in in question was creating the schema `OnStartUp`, so would have alread
 
 **Response:** Thank you all very much, I fixed my problem with the example file supplied by RPTHOMAS108; thanks for sharing your knowledge.
 
-####<a name="6"></a> jQuery is Widespread but Outdated
+####<a name="7"></a> jQuery is Widespread but Outdated
 
 Moving away from the Revit .NET API to the web, I have used [jQuery](https://jquery.com) in
 the past and would maybe continue doing so if I had not just noticed this article

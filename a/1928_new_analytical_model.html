@@ -29,6 +29,9 @@
   benchmark_any_vs_count.png
   wow, impressive! thank you for the conclusive benchmark. i'll add a note of that result to the blog, i think.
 
+- https://github.com/jeremytammik/RevitLookup/pull/115
+  Add Keyboard Escape to Close Form #115
+
 - use extensible storage carefully
   https://forums.autodesk.com/t5/revit-api-forum/bug-unable-to-open-revit-2019-model-after-saving-custom-schema/m-p/10736885
 
@@ -109,7 +112,17 @@ The difference in speed is 1200 times with memory allocation =(</p>
 <p>It takes 27 NANO seconds, and 40 Bytes in instruction that is invoked only once per use case 🤣.</p>
 </blockquote>
 <p>Many thanks to Roman for this little suggestion and benchmark, and much more so for all his other outstanding work recently improving and maintaining RevitLookup!</p>
-<h4><a name="5"></a> Use Extensible Storage Carefully</h4>
+<h4><a name="5"></a> Escape RevitLookup</h4>
+<p>Before we escape this topic, another little update bears mentioning.</p>
+<p>Luiz Henrique <a href="https://github.com/ricaun">@ricaun</a> Cassettari submitted
+<a href="https://github.com/jeremytammik/RevitLookup/pull/115">pull request #115 to add keyboard escape to close form</a>:</p>
+<blockquote>
+<p>After the Modeless update, the Escape button stop working.
+This PR reenables the Escape keyboard feature; now the focused form closes if the Escape button is pressed, and the Owner regains focus.</p>
+</blockquote>
+<p>Published in <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.2.4">RevitLookup release 2022.0.2.4</a>.</p>
+<p>Many thabnks to Luiz Henrique for catching this!</p>
+<h4><a name="6"></a> Use Extensible Storage Carefully</h4>
 <p>@aalondoqor ran into a problem similaer to the one reported two years ago in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on a <a href="https://forums.autodesk.com/t5/revit-api-forum/bug-unable-to-open-revit-2019-model-after-saving-custom-schema/m-p/10736885">Bug: Unable to open Revit 2019 model after saving custom schema in Project Info</a>.</p>
@@ -156,7 +169,7 @@ The Revit SDK also provides a good basic example under <code>SchemaBuilder</code
 Often if you can't open a file, it may be possible to open it on a Revit version without the add-ins.
 The add-in in question was creating the schema <code>OnStartUp</code>, so would have already put something in memory before the document with the conflict was opened (could open it without the add-in when I checked later).</p>
 <p><strong>Response:</strong> Thank you all very much, I fixed my problem with the example file supplied by RPTHOMAS108; thanks for sharing your knowledge.</p>
-<h4><a name="6"></a> jQuery is Widespread but Outdated</h4>
+<h4><a name="7"></a> jQuery is Widespread but Outdated</h4>
 <p>Moving away from the Revit .NET API to the web, I have used <a href="https://jquery.com">jQuery</a> in
 the past and would maybe continue doing so if I had not just noticed this article
 explaining <a href="https://thenewstack.io/why-outdated-jquery-is-still-the-dominant-javascript-library">why outdated jQuery is still the dominant JavaScript library</a>.</p>
