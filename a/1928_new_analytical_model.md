@@ -53,6 +53,17 @@ Important news coming for structural developers, further development in RevitLoo
 
 linkedin:
 
+Important news on the Analytical Model API coming for structural developers, further development in RevitLookup, JavaScript and detailed notes on how to use extensible storage in the #RevitAPI 
+
+https://autode.sk/newanalyticalmodel
+
+- New Analytical Model API
+- Praise for modeless RevitLookup
+- Benchmarking generic <code>Any</code> versus <code>Count</code>
+- Escape RevitLookup
+- Use extensible storage carefully
+- jQuery is widespread but outdated...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
