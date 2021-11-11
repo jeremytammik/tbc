@@ -41,7 +41,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Important news on the Analytical Model API coming for structural developers, further development in RevitLookup and detailed notes on how to use extensible storage in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/newanalyticalmodel
 
 Important news coming for structural developers, further development in RevitLookup, notes on extensible storage and JavaScript
 &ndash; New Analytical Model API
