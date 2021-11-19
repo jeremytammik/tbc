@@ -69,17 +69,36 @@ Btw, some of our team are working on some FormIt stuff as we speak, some cool th
 
 Thanks to Kean and Radu for sharing these!
 
-
 ####<a name="3"></a> Escape RevitLookup
 
-Before we escape this topic, yet another little RevitLookup update bears mentioning:
+Yet another update to RevitLookup brings us
+to [release 2022.0.2.5](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.2.5),
+adding automatic generation of a release for the master branch and attaching the completerd installer as an asset to the release:
 
-Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari submitted
-[pull request #115 to add keyboard escape to close form](https://github.com/jeremytammik/RevitLookup/pull/115):
+<center>
+<img src="img/revitlookup_2022_0_2_5.png" alt="RevitLookup 2022.0.2.5" title="RevitLookup 2022.0.2.5" width="400"/> <!-- 978 -->
+</center>
 
-Published in [RevitLookup release 2022.0.2.4](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.2.4).
+This is the result of [pull request #118 tp release by GitAction](https://github.com/jeremytammik/RevitLookup/pull/118),
+including an intensive and very instructive conversation
+between [Roman @Nice3point](https://github.com/Nice3point)
+and Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari
+on how to optimally set it up, and a renewed summary by Roman on how to handle future pull requests:
 
-Many thanks to Luiz Henrique for catching this!
+> Once again, I will repeat the steps that you must take to publish:
+
+- Developers send PR to the `dev` branch.
+- We check, write a code review.
+- Accept PR.
+- Upgrade the build version in [`csproj` line 8](https://github.com/jeremytammik/RevitLookup/blob/dev/RevitLookup/RevitLookup.csproj#L8)
+- Log changes in the [changelog](https://github.com/jeremytammik/RevitLookup/blob/dev/Doc/Changelog.md);
+  multiple lines are supported;
+  the main thing is that a line does not start with a hyphen '-'; 
+  that means the end of the description of the current release.
+- Merge the `dev` branch into `master`.
+- Release will be generated automatically.
+
+Many thanks to Luiz Henrique and Roman for their deep discussion, insight and implementation!
 
 ####<a name="6"></a> Transform and Quaternions
 
