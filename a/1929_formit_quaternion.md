@@ -42,6 +42,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### FormIt and Quaterions
 
+Notes on FormIt and its API, the new automatically generated RevitLookup installer asset, transformations and quaternions:
+
+- [FormIt API and geographical context](#2)
+- [RevitLookup MSI installer asset](#3)
+- [Transform and quaternions](#4)
+
 ####<a name="2"></a> FormIt API and Geographical Context
 
 Good things are happening
@@ -69,7 +75,7 @@ Btw, some of our team are working on some FormIt stuff as we speak, some cool th
 
 Thanks to Kean and Radu for sharing these!
 
-####<a name="3"></a> Escape RevitLookup
+####<a name="3"></a> RevitLookup MSI Installer Asset
 
 Yet another update to RevitLookup brings us
 to [release 2022.0.2.5](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.2.5),
@@ -100,7 +106,7 @@ on how to optimally set it up, and a renewed summary by Roman on how to handle f
 
 Many thanks to Luiz Henrique and Roman for their deep discussion, insight and implementation!
 
-####<a name="6"></a> Transform and Quaternions
+####<a name="4"></a> Transform and Quaternions
 
 In
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
