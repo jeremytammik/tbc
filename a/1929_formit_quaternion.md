@@ -47,7 +47,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Good things are happening
 with [FormIt](https://formit.autodesk.com),
 a multi-platform architectural modelling, conceptual design and analysis tool.
-With FormIt, you can sketch, collaborate, analyze, and revise early-stage design concepts with BIM-based conceptual design.
+With FormIt, you can sketch, collaborate, analyse, and revise early-stage design concepts with BIM-based conceptual design.
 
 Kean Walmsley took a closer look
 at [FormIt and its JavaScript API](https://www.keanw.com/2021/11/autodesk-formit-and-its-javascript-api.html) and
@@ -73,7 +73,7 @@ Thanks to Kean and Radu for sharing these!
 
 Yet another update to RevitLookup brings us
 to [release 2022.0.2.5](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.2.5),
-adding automatic generation of a release for the master branch and attaching the completerd installer as an asset to the release:
+adding automatic generation of a release for the master branch and attaching the completed installer as an asset to the release:
 
 <center>
 <img src="img/revitlookup_2022_0_2_5.png" alt="RevitLookup 2022.0.2.5" title="RevitLookup 2022.0.2.5" width="400"/> <!-- 978 -->
