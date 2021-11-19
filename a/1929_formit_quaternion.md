@@ -24,8 +24,10 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Notes on FormIt and its JavaScript API, the new automatically generated RevitLookup MSI installer asset, transformations and quaternions
+&ndash; FormIt API and geographical context
+&ndash; RevitLookup MSI installer asset
+&ndash; Transform and quaternions...
 
 linkedin:
 
@@ -40,7 +42,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### FormIt and Quaterions
+### Installer Asset, FormIt and Quaterions
 
 Notes on FormIt and its API, the new automatically generated RevitLookup installer asset, transformations and quaternions:
 
@@ -85,7 +87,7 @@ adding automatic generation of a release for the master branch and attaching the
 <img src="img/revitlookup_2022_0_2_5.png" alt="RevitLookup 2022.0.2.5" title="RevitLookup 2022.0.2.5" width="400"/> <!-- 978 -->
 </center>
 
-This is the result of [pull request #118 tp release by GitAction](https://github.com/jeremytammik/RevitLookup/pull/118),
+This is the result of [pull request #118 to release by GitAction](https://github.com/jeremytammik/RevitLookup/pull/118),
 including an intensive and very instructive conversation
 between [Roman @Nice3point](https://github.com/Nice3point)
 and Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari
