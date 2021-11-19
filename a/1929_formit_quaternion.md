@@ -45,15 +45,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ####<a name="2"></a> FormIt API and Geographical Context
 
 Things are happening
-with [FormIt](https://formit.autodesk.com), a useful multi-platform architectural modelling, conceptual design and analysis tool.
-With FormIt, architects can sketch, collaborate, analyze, and revise early-stage design concepts with BIM-based conceptual design.
+with [FormIt](https://formit.autodesk.com),
+a multi-platform architectural modelling, conceptual design and analysis tool.
+With FormIt, you can sketch, collaborate, analyze, and revise early-stage design concepts with BIM-based conceptual design.
 Kean Walmsley took a closer look
 at [FormIt and its JavaScript API](https://www.keanw.com/2021/11/autodesk-formit-and-its-javascript-api.html) and
-describes hiow to get started with FormIt plugins.
+describes in detail how to get started with FormIt plugins.
 
-As as erious example of what you can achieve,
+That prompted   Radu Gidei @radugidei
+
 the [Matterlab FormIt plugin provides geographical context in Revit](https://twitter.com/radugidei/status/1458370952652378113?s=20);
-  Radu Gidei @radugidei
   Replying to @keanw
   Nice one and great intro to FormIt API! Look forward to the VASA integration, sounds very cool! 
   Btw, some of our team are working on some FormIt stuff as we speak, some cool things  coming for the community! (cough docs cough)
