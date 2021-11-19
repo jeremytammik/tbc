@@ -44,38 +44,33 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> FormIt API and Geographical Context
 
-Things are happening
+Good things are happening
 with [FormIt](https://formit.autodesk.com),
 a multi-platform architectural modelling, conceptual design and analysis tool.
 With FormIt, you can sketch, collaborate, analyze, and revise early-stage design concepts with BIM-based conceptual design.
+
 Kean Walmsley took a closer look
 at [FormIt and its JavaScript API](https://www.keanw.com/2021/11/autodesk-formit-and-its-javascript-api.html) and
 describes in detail how to get started with FormIt plugins.
 
-That prompted   Radu Gidei @radugidei
+That prompted Radu [@radugidei](https://twitter.com/radugidei) Gidei
+to [mention](https://twitter.com/radugidei/status/1458370952652378113?s=20)
+the Matterlab FormIt plugin making use of this to provide geographical context in Revit;
 
-the [Matterlab FormIt plugin provides geographical context in Revit](https://twitter.com/radugidei/status/1458370952652378113?s=20);
-  Replying to @keanw
-  Nice one and great intro to FormIt API! Look forward to the VASA integration, sounds very cool! 
-  Btw, some of our team are working on some FormIt stuff as we speak, some cool things  coming for the community! (cough docs cough)
-  https://github.com/matterlab-co/FormIt-Context-Plugin
+> Nice one and great intro to FormIt API!
+Look forward to the VASA integration, sounds very cool! 
+Btw, some of our team are working on some FormIt stuff as we speak, some cool things  coming for the community! (cough docs cough)
 
-https://github.com/matterlab-co/FormIt-Context-Plugin
-
+- [Matterlab FormiIt 3D Context Creator](https://github.com/matterlab-co/FormIt-Context-Plugin)
 
 <center>
-<img src="img/" alt="" title="" width="100"/> <!-- 834 -->
+<img src="img/formit_3d_context_creator.png" alt="3D context creator" title="3D context creator" width="400"/> <!-- 765 -->
 </center>
 
-####<a name="3"></a> 
+Thanks to Kean and Radu for sharing these!
 
-####<a name="4"></a> Benchmarking Generic Any versus Count
 
-where [Roman @Nice3point](https://github.com/Nice3point) points out:
-
-Many thanks to Roman for this little suggestion and benchmark, and much more so for all his other outstanding work recently improving and maintaining RevitLookup!
-
-####<a name="5"></a> Escape RevitLookup
+####<a name="3"></a> Escape RevitLookup
 
 Before we escape this topic, yet another little RevitLookup update bears mentioning:
 
