@@ -22,7 +22,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Notes on FormIt and its JavaScript API, the new automatically generated RevitLookup MSI installer asset, transformations and quaternions in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/formitapi
 
 Notes on FormIt and its JavaScript API, the new automatically generated RevitLookup MSI installer asset, transformations and quaternions
 &ndash; FormIt API and geographical context
