@@ -20,6 +20,22 @@
 - Get translation and rotation for a FamilyInstance (Export)
   https://forums.autodesk.com/t5/revit-api-forum/get-translation-and-rotation-for-a-familyinstance-export/m-p/10758975
 
+- How to export email text from Outlook 365 for Mac
+  - Select all the emails
+  - Right click and select 'View Source'
+  - This exports a mime text file for each email item
+  - All these files are opened in your system configured text editor
+  - Determine the folder containg one of these files
+  - It coinbtains all the others as well
+  - Navigate to that folder, grab the text files, and have your way with them
+  Example:
+  - Select an Outlook folder named `b62`
+  - Cmd-A to select all email items
+  - Right click and View Source
+  - Pick one, e.g., `19446350.mime`
+  - Determine its full path, e.g., `/Users/jta/Library/Group Containers/UBF8T346G9.Office/Outlook/Outlook 15 Profiles/Main Profile/Files/S0/1/MimeFiles/{63B52B5D-54C5-8647-A59F-0D190331F697}/19446350.mime`
+  - Go to that directory and copy all the mime files to the ir final destination
+
 twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
@@ -67,7 +83,7 @@ Published in [RevitLookup release 2022.0.2.4](https://github.com/jeremytammik/Re
 
 Many thanks to Luiz Henrique for catching this!
 
-####<a name="6"></a>
+####<a name="6"></a> Transform and Quaternions
 
 In
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
