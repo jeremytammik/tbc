@@ -20,22 +20,6 @@
 - Get translation and rotation for a FamilyInstance (Export)
   https://forums.autodesk.com/t5/revit-api-forum/get-translation-and-rotation-for-a-familyinstance-export/m-p/10758975
 
-- How to export email text from Outlook 365 for Mac
-  - Select all the emails
-  - Right click and select 'View Source'
-  - This exports a mime text file for each email item
-  - All these files are opened in your system configured text editor
-  - Determine the folder containg one of these files
-  - It coinbtains all the others as well
-  - Navigate to that folder, grab the text files, and have your way with them
-  Example:
-  - Select an Outlook folder named `b62`
-  - Cmd-A to select all email items
-  - Right click and View Source
-  - Pick one, e.g., `19446350.mime`
-  - Determine its full path, e.g., `/Users/jta/Library/Group Containers/UBF8T346G9.Office/Outlook/Outlook 15 Profiles/Main Profile/Files/S0/1/MimeFiles/{63B52B5D-54C5-8647-A59F-0D190331F697}/19446350.mime`
-  - Go to that directory and copy all the mime files to the ir final destination
-
 twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
@@ -59,6 +43,24 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### FormIt and Quaterions
 
 ####<a name="2"></a> FormIt API and Geographical Context
+
+Things are happening
+with [FormIt](https://formit.autodesk.com), a useful multi-platform architectural modelling, conceptual design and analysis tool.
+With FormIt, architects can sketch, collaborate, analyze, and revise early-stage design concepts with BIM-based conceptual design.
+Kean Walmsley took a closer look
+at [FormIt and its JavaScript API](https://www.keanw.com/2021/11/autodesk-formit-and-its-javascript-api.html) and
+describes hiow to get started with FormIt plugins.
+
+As as erious example of what you can achieve,
+the [Matterlab FormIt plugin provides geographical context in Revit](https://twitter.com/radugidei/status/1458370952652378113?s=20);
+  Radu Gidei @radugidei
+  Replying to @keanw
+  Nice one and great intro to FormIt API! Look forward to the VASA integration, sounds very cool! 
+  Btw, some of our team are working on some FormIt stuff as we speak, some cool things  coming for the community! (cough docs cough)
+  https://github.com/matterlab-co/FormIt-Context-Plugin
+
+https://github.com/matterlab-co/FormIt-Context-Plugin
+
 
 <center>
 <img src="img/" alt="" title="" width="100"/> <!-- 834 -->
