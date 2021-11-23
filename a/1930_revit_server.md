@@ -64,59 +64,48 @@ on [how to invoke the Revit Server base interface](https://forums.autodesk.com/t
 
 **Response:** Thanks for your solution, your answer helped me a lot; after reading these articles，I still have a question: after getting the Revit Server filepath, how do I open the file by Revit API?
 
-**Answewr:** I created several add-ins to manage Revit Server files. One of them is to batch export Navisworks files from the Revit Server and the other one for exporting Revit files.
+**Answewr:** I created several add-ins to manage Revit Server files.
+One of them is to batch export Navisworks files from the Revit Server and the other one for exporting Revit files.
 
-I didn't use the Revit Server API. You can use normal Revit and Windows methods to manage the paths and open the files.
+I didn't use the Revit Server API.
+You can use normal Revit and Windows methods to manage the paths and open the files.
 
-You can access the Revit Server project through Windows File Explorer. If you don't know the path ask your IT department. You will probably need permission to access these folders.
+You can access the Revit Server project through Windows File Explorer.
+If you don't know the path, ask your IT department.
+You will probably need permission to access these folders.
 
-In the image below you can see how it looks like (blurred bits for confidentiality).
-
-Note that each Revit file is represented by a folder, which ends in ".rvt"!! (not actual rvt files). However, if you get the path of these folders, you can use it to open the models.
-
-I hope this helps.
-
-2021-10-11_08h38_48.png
+In this image, you can see what it looks like (blurred bits for confidentiality):
 
 <center>
 <img src="img/revit_server_projects.png" alt="Revit Server projects" title="Revit Server projects" width="451"/> <!-- 902 -->
 </center>
 
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 9
-464905795
- Enthusiast 464905795 in reply to: jeremy.tammik
-‎2021-10-11 11:40 PM 
-Hello,Jeremy,    I read all the blog of revit server that you write,I have a general understanding of how Revit Server works，As  H.echeva said,I can get the revit server file(*.rvt) through Windows File Explorer.    For example,there have a revit server "172.18.1.32" and save a entral file at "testfolder\1.rvt",Now I can open the file by two ways,first:doc.OpenFile(@"RSN://172.18.1.32/testfolder/1.rvt"),the second ,use the method Application.CopyModel(),copy the file as a local file  ,then open the local file 。After modify the file , I want to   Synchronize with the central file,the two way about open file will be get different result?
+Note that each Revit file is represented by a folder, which ends in ".rvt"!
+This is not the actual `rvt` file.
+However, if you get the path of one of these folders, you can use it to open the model.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 6 OF 9
-jeremy.tammik
- Employee jeremy.tammik in reply to: 464905795
-‎2021-10-12 02:44 AM 
-Congratulations on successfully accessing the server files in the two ways you describe.
+**response:** I read all the Revit Server articles above and I have a general understanding of how Revit Server works.
+As described above, I can get the Revit Server `RVT` file through Windows File Explorer.
+For example, on a Revit Server "172.18.1.32", save a central file at "testfolder\1.rvt".
+Now I can open the file in two ways; first:
 
-Unfortunately, I cannot test the scenarios you describe.
+<pre class="code">
+  doc.OpenFile( @"RSN://172.18.1.32/testfolder/1.rvt" )
+</pre>
 
-Can you try it out and let us know how it works for you?
+Second:
 
-Thank you!
+- Use the method `Application.CopyModel`
+- Copy the file as a local file
+- Open the local file
 
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 7 OF 9
-464905795
- Enthusiast 464905795 in reply to: jeremy.tammik
-‎2021-10-12 07:02 PM 
-Hello,Jeremy! 
+After modifying the file, I want to synchronize with the central file.
 
-  Yesterday , input the file path in revit open file dialog like "RSN://172.18.1.32/8364dfab-968d-4a9c-8b6b-f75d0c1b5330/04_二次沉淀池_结构.rvt",the file was opened successfully, then I try to open the file by commandData.Application.Application.OpenDocumentFile(@"RSN://172.18.1.32/8364dfab-968d-4a9c-8b6b-f75d0c1b5330/04_二次沉淀池_结构.rvt"),however,it failed,revit return the error message "the filepath to be opened doesn't exist",the method  Application.CopyModel(),return the same message.
+Will I get a different result depending on which of the two way used to open the file?
+
+**Answer:** Can you try it out and let us know how it works for you?
+
+**Response:**   Yesterday , input the file path in revit open file dialog like "RSN://172.18.1.32/8364dfab-968d-4a9c-8b6b-f75d0c1b5330/04_二次沉淀池_结构.rvt",the file was opened successfully, then I try to open the file by commandData.Application.Application.OpenDocumentFile(@"RSN://172.18.1.32/8364dfab-968d-4a9c-8b6b-f75d0c1b5330/04_二次沉淀池_结构.rvt"),however,it failed,revit return the error message "the filepath to be opened doesn't exist",the method  Application.CopyModel(),return the same message.
 
   Now ,I'm very confused，can you provide a example about open revit server file?
 
@@ -127,7 +116,10 @@ MESSAGE 8 OF 9
 464905795
  Enthusiast 464905795 in reply to: H.echeva
 ‎2021-10-19 10:44 PM 
-1634708731(1).pnghello,H.echeva:
+
+1634708731(1).png
+
+hello,H.echeva:
 
  I copy the folder from revit server to local,but I don't know how to open the .rvt project though the folder and sub file.
 
