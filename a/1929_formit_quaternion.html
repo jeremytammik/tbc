@@ -49,7 +49,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Installer Asset, FormIt and Quaterions</h3>
+<h3>Installer Asset, FormIt and Quaternions</h3>
 <p>Notes on FormIt and its API, the new automatically generated RevitLookup installer asset, transformations and quaternions:</p>
 <ul>
 <li><a href="#2">FormIt API and geographical context</a></li>
@@ -118,3 +118,7 @@ shares a very nice and succinct explanation of quaternions and how they relate t
 <p>Given an axis you wish to rotate about (as a unit vector, <b>v</b>) and the amount you wish to rotate, <b>θ</b>, (in radians), the process of constructing a unit quaternion for that rotation is straight forward. The x, y, and z components of the unit quaternion are the x, y, and z components of v, multiplied by sin(θ/2) and the fourth component is cos(θ/2).</p>
 <p>If you don't know the axis and angle but only have the rotation matrix (i.e. a Revit Transform), there are algorithms for converting from a 3d rotation matrix to a quaternion, though I won't go into any here. Alternatively, it looks like in the latest version of SharpGLTF, AffineTransform has a constructor that takes a 4x4 matrix. To make such a matrix from a Revit Transform, the first 3 columns should be the BasisX, BasisY, and BasisZ of the Transform, with the fourth member of the column being zero, and the last column should be the Transform's origin, with the fourth member of the column being one.</p>
 <p>Many thanks to Matthew for this very nice overview!</p>
+<p>Barry @bnewcombe adds: ... Quarternion explanations always seem very confusing;
+the best explanation (primer) video I found were
+the <a href="https://youtu.be/1yoFjjJRnLY">10 mins GameDev Quaternion tips</a>.
+Thank you, Barry!</p>

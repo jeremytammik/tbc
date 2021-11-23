@@ -50,7 +50,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Installer Asset, FormIt and Quaterions
+### Installer Asset, FormIt and Quaternions
 
 Notes on FormIt and its API, the new automatically generated RevitLookup installer asset, transformations and quaternions:
 
@@ -133,3 +133,8 @@ Given an axis you wish to rotate about (as a unit vector, <b>v</b>) and the amou
 If you don't know the axis and angle but only have the rotation matrix (i.e. a Revit Transform), there are algorithms for converting from a 3d rotation matrix to a quaternion, though I won't go into any here. Alternatively, it looks like in the latest version of SharpGLTF, AffineTransform has a constructor that takes a 4x4 matrix. To make such a matrix from a Revit Transform, the first 3 columns should be the BasisX, BasisY, and BasisZ of the Transform, with the fourth member of the column being zero, and the last column should be the Transform's origin, with the fourth member of the column being one.
 
 Many thanks to Matthew for this very nice overview!
+
+Barry @bnewcombe adds: ... Quarternion explanations always seem very confusing;
+the best explanation (primer) video I found were
+the [10 mins GameDev Quaternion tips](https://youtu.be/1yoFjjJRnLY).
+Thank you, Barry!
