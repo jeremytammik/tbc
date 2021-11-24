@@ -84,7 +84,7 @@ Note that each Revit file is represented by a folder, which ends in ".rvt"!
 This is not the actual `rvt` file.
 However, if you get the path of one of these folders, you can use it to open the model.
 
-**response:** I read all the Revit Server articles above and I have a general understanding of how Revit Server works.
+**Response:** I read all the Revit Server articles above and I have a general understanding of how Revit Server works.
 As described above, I can get the Revit Server `RVT` file through Windows File Explorer.
 For example, on a Revit Server "172.18.1.32", save a central file at "testfolder\1.rvt".
 Now I can open the file in two ways; first:
@@ -103,66 +103,52 @@ After modifying the file, I want to synchronize with the central file.
 
 Will I get a different result depending on which of the two way used to open the file?
 
+<!---
+
 **Answer:** Can you try it out and let us know how it works for you?
 
-**Response:**   Yesterday , input the file path in revit open file dialog like "RSN://172.18.1.32/8364dfab-968d-4a9c-8b6b-f75d0c1b5330/04_二次沉淀池_结构.rvt",the file was opened successfully, then I try to open the file by commandData.Application.Application.OpenDocumentFile(@"RSN://172.18.1.32/8364dfab-968d-4a9c-8b6b-f75d0c1b5330/04_二次沉淀池_结构.rvt"),however,it failed,revit return the error message "the filepath to be opened doesn't exist",the method  Application.CopyModel(),return the same message.
+**Response:** When I enter the file path like this in the Revit open file dialogue: *"RSN://172.18.1.32/8364dfab-968d-4a9c-8b6b-f75d0c1b5330/04_二次沉淀池_结构.rvt"*, 
+it is opened successfully.
+When I try to open it using *Application.OpenDocumentFile( @"RSN://172.18.1.32/8364dfab-968d-4a9c-8b6b-f75d0c1b5330/04_二次沉淀池_结构.rvt")*,
+however, it fails; Revit returns the error message "the filepath to be opened doesn't exist",the method  Application.CopyModel(),return the same message.
 
-  Now ,I'm very confused，can you provide a example about open revit server file?
+Now I'm very confused; can you provide an example about open revit server file?
 
-Tags (0)
-Add tags
-Report
-MESSAGE 8 OF 9
-464905795
- Enthusiast 464905795 in reply to: H.echeva
-‎2021-10-19 10:44 PM 
+--->
 
-1634708731(1).png
-
-hello,H.echeva:
-
- I copy the folder from revit server to local,but I don't know how to open the .rvt project though the folder and sub file.
+**Response:** I copy the folder from Revit Server to local, but I don't know how to open the `.rvt` project though the folder and sub file:
 
 <center>
 <img src="img/revit_server_projects_2.png" alt="Revit Server projects" title="Revit Server projects" width="495"/> <!-- 991 -->
 </center>
 
-Tags (0)
-Add tags
-Report
-MESSAGE 9 OF 9
-H.echeva
- Advocate H.echeva in reply to: 464905795
-‎2021-10-20 12:19 AM 
-Hello,
-
-In Revit you need to open the folder that I point in your image. You need to pass Revit the path to that folder, not to what is inside!
-
-So fo example, if you have a path that is Autodesk/Revit Server 2021/Projects/FOLDER.rvt
-
-Just pass that path to the Revit API. I know it is weird because it is a folder and not a Revit file!!
-
-But this is how it works.
-
-Hecheva_0-1634714115252.png
+**Answer:** In Revit, you need to open the highlighted folder:
 
 <center>
 <img src="img/revit_server_projects_3.png" alt="Revit Server projects" title="Revit Server projects" width="278"/> <!-- 476 -->
 </center>
 
-EDIT: Sorry I forgot to mention, that you will need to transform the path to a Revit Server Path!
+You need to pass Revit the path to that folder, not to what is inside!
 
-So if my path is:
+So, for example, assume you have the path *Autodesk/Revit Server 2021/Projects/FOLDER.rvt*.
 
-\\revit-london\Autodesk$\Revit Server 2021\Projects\2054 SingleHouseProject\Model1.rvt
+Just pass that path to the Revit API. I know it is weird, because it is a folder and not a Revit file!!
+
+But this is how it works.
+
+Also, you will need to transform the path to a Revit Server path.
+
+So, given this path:
+
+- *\\revit-london\Autodesk$\Revit Server 2021\Projects\2054 SingleHouseProject\Model1.rvt*
 
 I need to transform it to:
 
-RSN://REVIT-LONDON.zzz.s/Autodesk$/Revit Server 2021/Projects/2054 SingleHouseProject/Model1.rvt
+- *RSN://REVIT-LONDON.zzz.s/Autodesk$/Revit Server 2021/Projects/2054 SingleHouseProject/Model1.rvt*
 
-Note that I also changed slash `/` to backslash `\`
+Note that I also changed slash `/` to backslash `\`.
 
-Thanks to ??? for his experience and explanation!
+Many thanks to Hernan for his experience and guidance!
 
 ####<a name="3"></a> 
 
