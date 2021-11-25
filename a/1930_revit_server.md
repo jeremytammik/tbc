@@ -164,7 +164,7 @@ I need to transform it to:
 
 Note that I also changed slash `/` to backslash `\`.
 
-Many thanks to Hernan for his experience and guidance!
+Many thanks to Hernan for his experience and friendly guidance!
 
 ####<a name="3"></a> Alerting About Missing Data
 
