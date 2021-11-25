@@ -59,7 +59,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 A nice mix of topics for this week:
 
 - [Non-API Revit Server access](#2)
-- [Filter to alert over missing data](#3)
+- [View filter alerts to missing data](#3)
 - [Exporting Outlook email text](#4)
 
 ####<a name="2"></a> Non-API Revit Server Access
@@ -173,7 +173,7 @@ Note that I also changed slash `/` to backslash `\`.
 
 Many thanks to Hernan for his experience and friendly guidance!
 
-####<a name="3"></a> Filter to Alert Over Missing Data
+####<a name="3"></a> View Filter Alerts to Missing Data
 
 A nice suggestion by Francisco [franpossetto](https://github.com/franpossetto) Possetto
 on how to simply and efficiently communicate a problem to the user by highlighting element graphics instead of issuing a warning, from
@@ -211,9 +211,9 @@ I found little guidance on achieving this in a simple way without implementing m
 
 Example:
 
-- Select an Outlook folder
+- Select the Outlook folder to export
 - Cmd-A to select all email items
 - Right click and `View Source`
-- Pick an arbitrary one of the text files in the editor, e.g., `19446350.mime`
+- Pick an arbitrary one of the text files in the editor, e.g., *19446350.mime*
 - Determine its full path, e.g., */Users/jta/Library/Group Containers/UBF8T346G9.Office/Outlook/Outlook 15 Profiles/Main Profile/Files/S0/1/MimeFiles/{63B52B5D-54C5-8647-A59F-0D190331F697}/*
-- Go to that directory and copy all the mime files to their final destination
+- Go to that directory and copy the mime text files to their final destination

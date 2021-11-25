@@ -57,7 +57,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>A nice mix of topics for this week:</p>
 <ul>
 <li><a href="#2">Non-API Revit Server access</a></li>
-<li><a href="#3">Filter to alert over missing data</a></li>
+<li><a href="#3">View filter alerts to missing data</a></li>
 <li><a href="#4">Exporting Outlook email text</a></li>
 </ul>
 <h4><a name="2"></a> Non-API Revit Server Access</h4>
@@ -146,7 +146,7 @@ Now I'm very confused; can you provide an example about open revit server file?
 </ul>
 <p>Note that I also changed slash <code>/</code> to backslash <code>\</code>.</p>
 <p>Many thanks to Hernan for his experience and friendly guidance!</p>
-<h4><a name="3"></a> Filter to Alert Over Missing Data</h4>
+<h4><a name="3"></a> View Filter Alerts to Missing Data</h4>
 <p>A nice suggestion by Francisco <a href="https://github.com/franpossetto">franpossetto</a> Possetto
 on how to simply and efficiently communicate a problem to the user by highlighting element graphics instead of issuing a warning, from
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
@@ -177,10 +177,10 @@ It worked for us; maybe you could consider it as an alternative. </p>
 </ul>
 <p>Example:</p>
 <ul>
-<li>Select an Outlook folder</li>
+<li>Select the Outlook folder to export</li>
 <li>Cmd-A to select all email items</li>
 <li>Right click and <code>View Source</code></li>
-<li>Pick an arbitrary one of the text files in the editor, e.g., <code>19446350.mime</code></li>
+<li>Pick an arbitrary one of the text files in the editor, e.g., <em>19446350.mime</em></li>
 <li>Determine its full path, e.g., <em>/Users/jta/Library/Group Containers/UBF8T346G9.Office/Outlook/Outlook 15 Profiles/Main Profile/Files/S0/1/MimeFiles/{63B52B5D-54C5-8647-A59F-0D190331F697}/</em></li>
-<li>Go to that directory and copy all the mime files to their final destination</li>
+<li>Go to that directory and copy the mime text files to their final destination</li>
 </ul>
