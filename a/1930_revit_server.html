@@ -58,7 +58,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>Hernan Echevarria shared some valuable experience on working with Revit Server in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-do-i-invoke-the-revit-server-base-interface/m-p/10700292">how to invoke the Revit Server base interface</a>:</p>
-<p><strong>Question:</strong> The SDK provides limited information about Revit Server，i want to calling the base interface method like:download...,can you provide an example?</p>
+<p><strong>Question:</strong> The SDK provides limited information about Revit Server.
+I want to call the base interface methods, like <code>download</code>... can you provide an example?</p>
 <p><strong>Answer:</strong> Maybe some of these can help:</p>
 <ul>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2012/11/au-classes-on-python-ui-server-and-framework-apis.html">AU Classes on Python, UI, Server and Framework APIs</a></li>
@@ -72,8 +73,8 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-do-i-invoke-the-r
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/02/revitserverapilib-truss-members-and-layers.html">Revit Server API Lib, Truss Members and Layers</a></li>
 </ul>
 
-<p><strong>Response:</strong> Thanks for your solution, your answer helped me a lot; after reading these articles，I still have a question: after getting the Revit Server filepath, how do I open the file by Revit API?</p>
-<p><strong>Answewr:</strong> I created several add-ins to manage Revit Server files.
+<p><strong>Response:</strong> Thanks for your solution, your answer helped me a lot; after reading these articles, I still have a question: after getting the Revit Server file path, how do I open the file by Revit API?</p>
+<p><strong>Answer:</strong> I created several add-ins to manage Revit Server files.
 One of them is to batch export Navisworks files from the Revit Server and the other one for exporting Revit files.</p>
 <p>I didn't use the Revit Server API.
 You can use normal Revit and Windows methods to manage the paths and open the files.</p>
@@ -140,17 +141,17 @@ Now I'm very confused; can you provide an example about open revit server file?
 <p>Note that I also changed slash <code>/</code> to backslash <code>\</code>.</p>
 <p>Many thanks to Hernan for his experience and friendly guidance!</p>
 <h4><a name="3"></a> Alerting About Missing Data</h4>
-<p>A nicesuggestion from Francisco <a href="https://github.com/franpossetto">franpossetto</a> Possetto
+<p>A nice suggestion by Francisco <a href="https://github.com/franpossetto">franpossetto</a> Possetto
 on how to simply and efficiently communicate a problem to the user by highlighting element graphics instead of issuing a warning, from
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
-asking <a href="https://forums.autodesk.com/t5/revit-api-forum/did-you-fill-the-parameter-value-or-is-it-still-blank/td-p/10627151">did you fill the parameter value or is it still blank?</a>:</p>
+asking <a href="https://forums.autodesk.com/t5/revit-api-forum/did-you-fill-the-parameter-value-or-is-it-still-blank/td-p/10627151">did you fill the parameter value or is it still blank?</a></p>
 <p><strong>Question:</strong> Prior to every synchronization, we have to check whether a specific parameter was filled in or not.
 If not, is there a way to remind user about it? </p>
-<p><strong>Answer:</strong> The Revit API provides numerous events that you can subscribe to in order to be notified before a certain command is executed and certain operations take place.
+<p><strong>Answer:</strong> The Revit API provides numerous events that you can subscribe to in order to be notified before a command is executed or certain operations take place.
+I am confident that you can find a suitable event that you can use to analyse the model and the element properties to check whether all required information has been entered and cancel the command execution otherwise.
 For instance, in
 a <a href="https://www.revitapidocs.com/2022/26a118b5-c583-a9b2-c935-c11b270e140e.htm">DocumentSaving event handler</a>,
-called before the document is saved, you could retrieve all the elements of interest, chec k that the required value has been set, and cancel the save operation if that is not the case.
-I am confident that you can find a suitable event that you can use to analyse the model and the element properties to check whether all required information has been entered and cancel the command execution otherwise.</p>
+called before the document is saved, you could retrieve all the elements of interest, check that the required value has been set, and cancel the save operation if that is not the case.</p>
 <p>Alternatively: I solved a similar requirement before without using the Revit API.
 I created a filter that paints elements if a certain parameter value is blank.
 That way, the users know whether they have to add the value or not.
@@ -158,7 +159,7 @@ I think you could use this strategy, for instance.
 It worked for us; maybe you could consider it as an alternative. </p>
 <h4><a name="4"></a> Exporting Outlook Email Text</h4>
 <p>I occasionally wish to archive some email text before Outlook does unexpected things with it, such as deleting it without warning.</p>
-<p>I found little guidance on achieving this in a simple way without implementing macros or installing addition utility software, so I found my own simple and effective manual solutioon:</p>
+<p>I found little guidance on achieving this in a simple way without implementing macros or installing addition utility software, so I found my own simple and effective manual solution:</p>
 <ul>
 <li>Select all the emails</li>
 <li>Right click and select 'View Source'</li>

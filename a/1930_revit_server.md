@@ -62,7 +62,8 @@ Hernan Echevarria shared some valuable experience on working with Revit Server i
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [how to invoke the Revit Server base interface](https://forums.autodesk.com/t5/revit-api-forum/how-do-i-invoke-the-revit-server-base-interface/m-p/10700292):
 
-**Question:** The SDK provides limited information about Revit Server，i want to calling the base interface method like:download...,can you provide an example?
+**Question:** The SDK provides limited information about Revit Server.
+I want to call the base interface methods, like `download`... can you provide an example?
 
 **Answer:** Maybe some of these can help:
 
@@ -78,9 +79,9 @@ on [how to invoke the Revit Server base interface](https://forums.autodesk.com/t
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/02/revitserverapilib-truss-members-and-layers.html">Revit Server API Lib, Truss Members and Layers</a></li>
 </ul>
 
-**Response:** Thanks for your solution, your answer helped me a lot; after reading these articles，I still have a question: after getting the Revit Server filepath, how do I open the file by Revit API?
+**Response:** Thanks for your solution, your answer helped me a lot; after reading these articles, I still have a question: after getting the Revit Server file path, how do I open the file by Revit API?
 
-**Answewr:** I created several add-ins to manage Revit Server files.
+**Answer:** I created several add-ins to manage Revit Server files.
 One of them is to batch export Navisworks files from the Revit Server and the other one for exporting Revit files.
 
 I didn't use the Revit Server API.
@@ -168,19 +169,19 @@ Many thanks to Hernan for his experience and friendly guidance!
 
 ####<a name="3"></a> Alerting About Missing Data
 
-A nicesuggestion from Francisco [franpossetto](https://github.com/franpossetto) Possetto
+A nice suggestion by Francisco [franpossetto](https://github.com/franpossetto) Possetto
 on how to simply and efficiently communicate a problem to the user by highlighting element graphics instead of issuing a warning, from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-asking [did you fill the parameter value or is it still blank?](https://forums.autodesk.com/t5/revit-api-forum/did-you-fill-the-parameter-value-or-is-it-still-blank/td-p/10627151):
+asking [did you fill the parameter value or is it still blank?](https://forums.autodesk.com/t5/revit-api-forum/did-you-fill-the-parameter-value-or-is-it-still-blank/td-p/10627151)
 
 **Question:** Prior to every synchronization, we have to check whether a specific parameter was filled in or not.
 If not, is there a way to remind user about it? 
 
-**Answer:** The Revit API provides numerous events that you can subscribe to in order to be notified before a certain command is executed and certain operations take place.
+**Answer:** The Revit API provides numerous events that you can subscribe to in order to be notified before a command is executed or certain operations take place.
+I am confident that you can find a suitable event that you can use to analyse the model and the element properties to check whether all required information has been entered and cancel the command execution otherwise.
 For instance, in
 a [DocumentSaving event handler](https://www.revitapidocs.com/2022/26a118b5-c583-a9b2-c935-c11b270e140e.htm),
-called before the document is saved, you could retrieve all the elements of interest, chec k that the required value has been set, and cancel the save operation if that is not the case.
-I am confident that you can find a suitable event that you can use to analyse the model and the element properties to check whether all required information has been entered and cancel the command execution otherwise.
+called before the document is saved, you could retrieve all the elements of interest, check that the required value has been set, and cancel the save operation if that is not the case.
 
 Alternatively: I solved a similar requirement before without using the Revit API.
 I created a filter that paints elements if a certain parameter value is blank.
@@ -192,7 +193,7 @@ It worked for us; maybe you could consider it as an alternative.
 
 I occasionally wish to archive some email text before Outlook does unexpected things with it, such as deleting it without warning.
 
-I found little guidance on achieving this in a simple way without implementing macros or installing addition utility software, so I found my own simple and effective manual solutioon:
+I found little guidance on achieving this in a simple way without implementing macros or installing addition utility software, so I found my own simple and effective manual solution:
 
 - Select all the emails
 - Right click and select 'View Source'
