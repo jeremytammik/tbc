@@ -56,7 +56,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Revit Server
 
-####<a name="2"></a> Revit Server
+A nice mix of topics for this week:
+
+- [Non-API Revit Server access](#2)
+- [Filter to alert over missing data](#3)
+- [Exporting Outlook email text](#4)
+
+####<a name="2"></a> Non-API Revit Server Access
 
 Hernan Echevarria shared some valuable experience on working with Revit Server in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -167,7 +173,7 @@ Note that I also changed slash `/` to backslash `\`.
 
 Many thanks to Hernan for his experience and friendly guidance!
 
-####<a name="3"></a> Alerting About Missing Data
+####<a name="3"></a> Filter to Alert Over Missing Data
 
 A nice suggestion by Francisco [franpossetto](https://github.com/franpossetto) Possetto
 on how to simply and efficiently communicate a problem to the user by highlighting element graphics instead of issuing a warning, from
