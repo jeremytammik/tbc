@@ -54,9 +54,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Revit Server
+### Revit Server and View Filter Alert
 
-A nice mix of topics for this week:
+A nice mix of topics for today:
 
 - [Non-API Revit Server access](#2)
 - [View filter alerts to missing data](#3)
@@ -122,7 +122,7 @@ Second:
 - Copy the file as a local file
 - Open the local file
 
-After modifying the file, I want to synchronize with the central file.
+After modifying the file, I want to synchronise with the central file.
 
 Will I get a different result depending on which of the two way used to open the file?
 
