@@ -18,6 +18,22 @@
   Did you fill the parameter value or is it still blank?
   https://forums.autodesk.com/t5/revit-api-forum/did-you-fill-the-parameter-value-or-is-it-still-blank/td-p/10627151
 
+- How to export email text from Outlook 365 for Mac
+  - Select all the emails
+  - Right click and select 'View Source'
+  - This exports a mime text file for each email item
+  - All these files are opened in your system configured text editor
+  - Determine the folder containg one of these files
+  - It coinbtains all the others as well
+  - Navigate to that folder, grab the text files, and have your way with them
+  Example:
+  - Select an Outlook folder named `b62`
+  - Cmd-A to select all email items
+  - Right click and View Source
+  - Pick one, e.g., `19446350.mime`
+  - Determine its full path, e.g., `/Users/jta/Library/Group Containers/UBF8T346G9.Office/Outlook/Outlook 15 Profiles/Main Profile/Files/S0/1/MimeFiles/{63B52B5D-54C5-8647-A59F-0D190331F697}/19446350.mime`
+  - Go to that directory and copy all the mime files to the ir final destination
+
 twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/formitapi
@@ -172,5 +188,25 @@ That way, the users know whether they have to add the value or not.
 I think you could use this strategy, for instance.
 It worked for us; maybe you could consider it as an alternative. 
 
-####<a name="4"></a> 
+####<a name="4"></a> Exporting Outlook Email Text 
 
+I occasionally wish to archive some email text before Outlook does unexpected things with it, such as deleting it without warning.
+
+I found little guidance on achieving this in a simple way without implementing macros or installing addition utility software, so I found my own simple and effective manual solutioon:
+
+- Select all the emails
+- Right click and select 'View Source'
+- This exports a mime text file for each email item
+- All these files are opened in your system configured text editor
+- Determine the folder containing one of these files
+- This folder contains all the others as well
+- Navigate to that folder, grab the text files, and have your way with them, e.g., copy them to a safe location of your own
+
+Example:
+
+- Select an Outlook folder
+- Cmd-A to select all email items
+- Right click and `View Source`
+- Pick an arbitrary one of the text files in the editor, e.g., `19446350.mime`
+- Determine its full path, e.g., */Users/jta/Library/Group Containers/UBF8T346G9.Office/Outlook/Outlook 15 Profiles/Main Profile/Files/S0/1/MimeFiles/{63B52B5D-54C5-8647-A59F-0D190331F697}/*
+- Go to that directory and copy all the mime files to their final destination
