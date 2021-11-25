@@ -150,8 +150,27 @@ Note that I also changed slash `/` to backslash `\`.
 
 Many thanks to Hernan for his experience and guidance!
 
-####<a name="3"></a> 
+####<a name="3"></a> Alerting About Missing Data
 
+A nicesuggestion from Francisco [franpossetto](https://github.com/franpossetto) Possetto
+on how to simply and efficiently communicate a problem to the user by highlighting element graphics instead of issuing a warning, from
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+asking [did you fill the parameter value or is it still blank?](https://forums.autodesk.com/t5/revit-api-forum/did-you-fill-the-parameter-value-or-is-it-still-blank/td-p/10627151):
+
+**Question:** Prior to every synchronization, we have to check whether a specific parameter was filled in or not.
+If not, is there a way to remind user about it? 
+
+**Answer:** The Revit API provides numerous events that you can subscribe to in order to be notified before a certain command is executed and certain operations take place.
+For instance, in
+a [DocumentSaving event handler](https://www.revitapidocs.com/2022/26a118b5-c583-a9b2-c935-c11b270e140e.htm),
+called before the document is saved, you could retrieve all the elements of interest, chec k that the required value has been set, and cancel the save operation if that is not the case.
+I am confident that you can find a suitable event that you can use to analyse the model and the element properties to check whether all required information has been entered and cancel the command execution otherwise.
+
+Alternatively: I solved a similar requirement before without using the Revit API.
+I created a filter that paints elements if a certain parameter value is blank.
+That way, the users know whether they have to add the value or not.
+I think you could use this strategy, for instance.
+It worked for us; maybe you could consider it as an alternative. 
 
 ####<a name="4"></a> 
 
