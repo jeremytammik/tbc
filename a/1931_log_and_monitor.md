@@ -63,7 +63,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 
 
-####<a name="3"></a> 
+####<a name="3"></a> Monitoring Deleted Elements
+
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+adeed some useful thoughts on monitoring deleted elements in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on 
+
+https://forums.autodesk.com/t5/revit-api-forum/find-the-user-of-the-deleted-element-in-revit/m-p/10743767
+10292440 [Accessing deleted elements]
+https://forums.autodesk.com/t5/revit-api-forum/get-uniqueid-of-deleted-element-within-dynamic-updater-with/m-p/10622152
+CF-2162 [API: DocumentChanging or ElementsDeleting event before element is deleted -- 10292440]
 
 ####<a name="4"></a> How to Favicon
 
