@@ -160,6 +160,24 @@ of [how to Favicon in 2021](https://dev.to/masakudamatsu/favicon-nightmare-how-t
 recommended by the extensive [favicon analysis by iconmap](https://iconmap.io/blog) based
 on their cool [favicon map](https://iconmap.io).
 
+####<a name="5"></a> DAO
 
+Our new word to learn today, this week's word of the week, is DAO
+or [decentralized autonomous organization](https://en.wikipedia.org/wiki/Decentralized_autonomous_organization).
 
+Find out all you need to know from
+the [Wikipedia link](https://en.wikipedia.org/wiki/Decentralized_autonomous_organization) and
+the CNBC article explaining [What are DAOs? Here’s what to know about the 'next big trend' in crypto](https://www.cnbc.com/2021/10/25/what-are-daos-what-to-know-about-the-next-big-trend-in-crypto.html).
+
+####<a name="6"></a> Palindrome and Ambigram
+
+Better late than never, I noticed that I missed
+a [special date last week](https://twitter.com/MLKessel/status/1466416660458491913?s=20):
+
+> Not only is today's date a palindrome, it's also an ambigram.
+You can read it left to right, right to left, and also upside down.
+
+<center>
+<img src="img/20211202.png" alt="Palindrome date" title="Palindrome date" width="200"/> <!-- 398 -->
+</center>
 
