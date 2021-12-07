@@ -69,7 +69,7 @@ A couple of useful insights on logging and monitoring:
 
 ####<a name="2"></a> Monitoring with SLOG
 
-Soome interesting insights on monitoring were provided by the Revit deelopment team
+Soome interesting insights on monitoring were provided by the Revit development team
 on [Tony Howard](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/693340)'s 
 [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [how to stop SLOG file from getting overwritten removing previous entries](https://forums.autodesk.com/t5/revit-api-forum/how-to-stop-slog-file-from-getting-overwritten-removing-previous/m-p/10757827):
@@ -81,10 +81,10 @@ Is this linked to journal file cleanup and when journal number exceeds limits, u
 Here is an image of a slog file that was accessed today:
 
 <center>
-<img src="img/slog_file_first_entry_for_the_day.jpg" alt="SLOG file" title="SLOG file" width="800"/> <!-- 1599 -->
+<img src="img/slog_file_first_entry_for_the_day.jpg" alt="SLOG file" title="SLOG file" width="1200"/> <!-- 1599 -->
 </center>
 
-Issue is that this file was created last month and has had multiple days work done on it and should therefore have older entries located within.
+Issue is that this file was created last month and has had multiple days' work done on it and should therefore have older entries located within.
 Yesterday it had older entries.
 
 We are looking at reading the slog file within Revit through the API as a potential time clock type tool. 
@@ -95,12 +95,12 @@ We can search for slog files on our server and extract this information via pyth
 
 The issue/question either as an API solution or an external Python solution: why does the slog file overwrite when it is supposed to append for each new session?
 
-The reason for looking at it from this approach is that we dont want to have to create an add in that requires staff to activate it if we can avoid it.
+The reason for looking at it from this approach is that we dont want to have to create an add-in that requires staff to activate it if we can avoid it.
 I know there are approaches that work when the save command is selected, and then export out data, but i am trying to cover all bases to see if we can do it externally to the API as well as internally so that we can track project progression over time as well.
-I can extract the files so that we can see if there has been any activity which is fine however would like to generate a "over time" result, if the file overwrites we could code that in but would like to have further documentation on the slog file and why it is functioning the way it appears to.
+I can extract the files so that we can see if there has been any activity, which is fine, however would like to generate an 'over time' result; if the file overwrites, we could code that in, but would like to have further documentation on the slog file and why it is functioning the way it appears to.
 
 **Answer:** Slogs (like journals) will only store data for so long before discarding old data.
-In my experience, they can also be lost when re-initiating a model as a central, or performing a few other actions which are similar in scope to recreating the central.
+In my experience, they can also be lost when re-initiating a model as a central or performing a few other actions which are similar in scope to recreating the central.
 As long as they are collected quickly enough (daily should be fine) and at major inflection points (about to recreate the central model), they shouldn’t have any issues with data loss.
  
 That said, for the task at hand they are somewhat ill-suited for a few reasons.
@@ -121,7 +121,7 @@ I guess those are some good reasons why I have not heard about slog files being 
 
 **Response:** Thank you for the detailed response.
 
-I was also looking at linking with journals however they live on temp directories on individual machines connected to our network (around 250 employees) so i was trying to use the slog to time stamp and problem solve. 
+I was also looking at linking with journals, however they live on temp directories on individual machines connected to our network (around 250 employees), so I was trying to use the slog to time stamp and problem solve. 
 
 I do still see value in the using the slog even if it will overwrite as we can still determine when a file is being accessed and should have at least some activity prior to a deadline so there is still value.
 
@@ -141,10 +141,10 @@ This same method is being used by a few offices I know to grab all journals from
 ####<a name="3"></a> Monitoring Deleted Elements
 
 In another monitoring topic,
-Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
-adeed some useful thoughts on monitoring deleted elements in
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas et al
+shared some useful thoughts on monitoring deleted elements in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on how to [Find the user of the deleted Element in Revit](https://forums.autodesk.com/t5/revit-api-forum/find-the-user-of-the-deleted-element-in-revit/m-p/10743767):
+on how to [find the user of a deleted element in Revit](https://forums.autodesk.com/t5/revit-api-forum/find-the-user-of-the-deleted-element-in-revit/m-p/10743767):
 
 Yes, as Jeremy noted, it is pretty difficult to retrieve information about deleted elements.
 You could log the ElementIds against username but there are mainly two issues with that:
@@ -180,7 +180,7 @@ the [TrackChangesCloud sample](https://thebuildingcoder.typepad.com/blog/2016/03
 
 You can't get UID from these, since the element is no longer available to look it up on.
 
-I rack my brains to think how you could do this without implicating the wrong person but I think the simple answer is whatever method you use system failures could lead to the wrong person being implicated.
+I rack my brains to think how you could do this without implicating the wrong person, but I think the simple answer is whatever method you use system failures could lead to the wrong person being implicated.
 
 As an extreme example:
 
@@ -194,10 +194,10 @@ It's a human management issue, no?
 If you have two production lines with two people on each and on one of those lines they are pointing the finger at one another, then swap one of those with one from the other production line.
 In the end, you'll find the common denominator(s).
 Also they have to address the atmosphere and what leads to the person not being open about the mistakes they've made.
-There used to be this idea in construction that mistakes are so critical to identify that you have to foster an atmosphere where when somebody makes a mistake they can be open about it.
+There used to be this idea in construction that mistakes are so critical to identify that you have to foster an atmosphere where when somebody makes a mistake, they can be open about it.
 A 'first mistake = last mistake' atmosphere leads to a situation where the mistakes are left to reveal themselves.
 
-The other issue is that in the end someone deleted it but someone should spot it missing.
+The other issue is that in the end someone deleted it, but someone should spot it missing.
 If a drawing goes out with a missing column for example, then that is a systemic problem.
 There should be more than one person at fault in that scenario, or it points to someone being overburdened with both production and final checking (akin to an overburdened defender in chess).
 Any system will fail if it doesn't recognise that humans operating within it are not infallible.
@@ -208,14 +208,14 @@ As noted previously, there are mechanisms to protect things considered unchangea
 There are even therefore ways of restricting what categories or individual elements a particular user can change.
 
 **Answer 3:** It's not an API solution, but, honestly, I think the best solution is to Pin important things you don't want deleted.
-Its kind of a pain, because to move or edit anything that is pinned, you have to unpin it and then re-pin it.
+It's kind of a pain, because to move or edit anything that is pinned, you have to unpin it and then re-pin it.
 
 But a user can't delete anything that's pinned without unpinning it first.
 That does stop a lot of non-intentional deletions.
 
 Many thanks to Richard and Steve @sragan Ragan for their valuable thoughts and advice.
 
-If you are interested in an earlier in-depth discussion of accessing deleted element data, you can also refer to the thread on hgow
+If you are interested in an earlier in-depth discussion of accessing deleted element data, you can also refer to the thread on how
 to [get `UniqueId` of deleted element within dynamic updater (with feature request)](https://forums.autodesk.com/t5/revit-api-forum/get-uniqueid-of-deleted-element-within-dynamic-updater-with/m-p/10622152) and
 the wish list item *CF-2162 &ndash; API: DocumentChanging or ElementsDeleting event before element is deleted -- 10292440*.
 
