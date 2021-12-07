@@ -50,6 +50,16 @@ Useful insights on logging and monitoring
 
 linkedin:
 
+Monitoring with SLOG and logging deleted elements with the #RevitAPI 
+
+https://autode.sk/monitoring
+
+- Monitoring with SLOG
+- Monitoring deleted elements
+- How to Favicon
+- Decentralised autonomous organisations
+- Palindrome and ambigram...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
