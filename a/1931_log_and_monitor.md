@@ -39,7 +39,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Monitoring with SLOG and logging deleted elements with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/monitoring
 
 Useful insights on logging and monitoring
 &ndash; Monitoring with SLOG
