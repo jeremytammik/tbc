@@ -69,14 +69,14 @@ A couple of useful insights on logging and monitoring:
 
 ####<a name="2"></a> Monitoring with SLOG
 
-Soome interesting insights on monitoring were provided by the Revit development team
+Some interesting insights on monitoring were provided by the Revit development team
 on [Tony Howard](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/693340)'s 
 [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [how to stop SLOG file from getting overwritten removing previous entries](https://forums.autodesk.com/t5/revit-api-forum/how-to-stop-slog-file-from-getting-overwritten-removing-previous/m-p/10757827):
 
 **Question:** My understanding of the slog file is that when a central file is accessed an entry is made.
-What i have noticed is that these entries are getting overwritten therefore removing all history of previous entries.
-Is there a way to stop this from occuring?
+What I have noticed is that these entries are getting overwritten therefore removing all history of previous entries.
+Is there a way to stop this from occurring?
 Is this linked to journal file cleanup and when journal number exceeds limits, usually set at default OOTB 10?
 Here is an image of a slog file that was accessed today:
 
@@ -95,8 +95,8 @@ We can search for slog files on our server and extract this information via pyth
 
 The issue/question either as an API solution or an external Python solution: why does the slog file overwrite when it is supposed to append for each new session?
 
-The reason for looking at it from this approach is that we dont want to have to create an add-in that requires staff to activate it if we can avoid it.
-I know there are approaches that work when the save command is selected, and then export out data, but i am trying to cover all bases to see if we can do it externally to the API as well as internally so that we can track project progression over time as well.
+The reason for looking at it from this approach is that we don't want to have to create an add-in that requires staff to activate it if we can avoid it.
+I know there are approaches that work when the save command is selected, and then export out data, but I am trying to cover all bases to see if we can do it externally to the API as well as internally so that we can track project progression over time as well.
 I can extract the files so that we can see if there has been any activity, which is fine, however would like to generate an 'over time' result; if the file overwrites, we could code that in, but would like to have further documentation on the slog file and why it is functioning the way it appears to.
 
 **Answer:** Slogs (like journals) will only store data for so long before discarding old data.
@@ -109,7 +109,7 @@ They only exist for central models, not families, massing, or non-workshared fil
 They do not log any actions beyond worksharing specific data, which is a small amount of content relatively speaking.
 They do not exist as a single easy access for all users who are worksharing when using cloud worksharing via Autodesk Docs/BIM360 (becoming very common).
  
-Journals catch the same data which is present in the SLOG, work in all Revit environments, and create a log of non-workshared content. They will tell you not just which models were synced with, but how long the user was in this any given model without a sync.
+Journals catch the same data that is present in the SLOG, work in all Revit environments, and create a log of non-workshared content. They will tell you not just which models were synced with, but how long the user was in this any given model without a sync.
 They’ll even tell you how long the user was in a given view.
  
 They can provide further insights into user actions (who could use some guidance on keyboard shortcuts?), model health (missing elements flag before there are too many), and performance (how often is mode A crashing vs model B?).

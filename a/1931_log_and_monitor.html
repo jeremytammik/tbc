@@ -65,42 +65,42 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li><a href="#6">Palindrome and ambigram</a></li>
 </ul>
 <h4><a name="2"></a> Monitoring with SLOG</h4>
-<p>Soome interesting insights on monitoring were provided by the Revit deelopment team
+<p>Some interesting insights on monitoring were provided by the Revit development team
 on <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/693340">Tony Howard</a>'s 
 <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-stop-slog-file-from-getting-overwritten-removing-previous/m-p/10757827">how to stop SLOG file from getting overwritten removing previous entries</a>:</p>
 <p><strong>Question:</strong> My understanding of the slog file is that when a central file is accessed an entry is made.
-What i have noticed is that these entries are getting overwritten therefore removing all history of previous entries.
-Is there a way to stop this from occuring?
+What I have noticed is that these entries are getting overwritten therefore removing all history of previous entries.
+Is there a way to stop this from occurring?
 Is this linked to journal file cleanup and when journal number exceeds limits, usually set at default OOTB 10?
 Here is an image of a slog file that was accessed today:</p>
 <p><center>
 <img src="img/slog_file_first_entry_for_the_day.jpg" alt="SLOG file" title="SLOG file" width="1200"/> <!-- 1599 -->
 </center></p>
-<p>Issue is that this file was created last month and has had multiple days work done on it and should therefore have older entries located within.
+<p>Issue is that this file was created last month and has had multiple days' work done on it and should therefore have older entries located within.
 Yesterday it had older entries.</p>
 <p>We are looking at reading the slog file within Revit through the API as a potential time clock type tool. </p>
 <p>Revit will read the slog file and generate a time in file output, as well as other outputs we require, that will go externally for other software to read.</p>
 <p>We can search for slog files on our server and extract this information via python however was looking for a Revit API solution. </p>
 <p>The issue/question either as an API solution or an external Python solution: why does the slog file overwrite when it is supposed to append for each new session?</p>
-<p>The reason for looking at it from this approach is that we dont want to have to create an add in that requires staff to activate it if we can avoid it.
-I know there are approaches that work when the save command is selected, and then export out data, but i am trying to cover all bases to see if we can do it externally to the API as well as internally so that we can track project progression over time as well.
-I can extract the files so that we can see if there has been any activity which is fine however would like to generate a "over time" result, if the file overwrites we could code that in but would like to have further documentation on the slog file and why it is functioning the way it appears to.</p>
+<p>The reason for looking at it from this approach is that we don't want to have to create an add-in that requires staff to activate it if we can avoid it.
+I know there are approaches that work when the save command is selected, and then export out data, but I am trying to cover all bases to see if we can do it externally to the API as well as internally so that we can track project progression over time as well.
+I can extract the files so that we can see if there has been any activity, which is fine, however would like to generate an 'over time' result; if the file overwrites, we could code that in, but would like to have further documentation on the slog file and why it is functioning the way it appears to.</p>
 <p><strong>Answer:</strong> Slogs (like journals) will only store data for so long before discarding old data.
-In my experience, they can also be lost when re-initiating a model as a central, or performing a few other actions which are similar in scope to recreating the central.
+In my experience, they can also be lost when re-initiating a model as a central or performing a few other actions which are similar in scope to recreating the central.
 As long as they are collected quickly enough (daily should be fine) and at major inflection points (about to recreate the central model), they shouldn’t have any issues with data loss.</p>
 <p>That said, for the task at hand they are somewhat ill-suited for a few reasons.</p>
 <p>They only exist for central models, not families, massing, or non-workshared file types.
 They do not log any actions beyond worksharing specific data, which is a small amount of content relatively speaking.
 They do not exist as a single easy access for all users who are worksharing when using cloud worksharing via Autodesk Docs/BIM360 (becoming very common).</p>
-<p>Journals catch the same data which is present in the SLOG, work in all Revit environments, and create a log of non-workshared content. They will tell you not just which models were synced with, but how long the user was in this any given model without a sync.
+<p>Journals catch the same data that is present in the SLOG, work in all Revit environments, and create a log of non-workshared content. They will tell you not just which models were synced with, but how long the user was in this any given model without a sync.
 They’ll even tell you how long the user was in a given view.</p>
 <p>They can provide further insights into user actions (who could use some guidance on keyboard shortcuts?), model health (missing elements flag before there are too many), and performance (how often is mode A crashing vs model B?).</p>
 <p>The only ‘problem’ with journals is that they need to have a LOT more processing as there is a LOT more data.
 They also need to be grabbed daily, but nothing should overwrite them beyond the look back timeframe.</p>
 <p>I guess those are some good reasons why I have not heard about slog files being used for this purpose in the past.</p>
 <p><strong>Response:</strong> Thank you for the detailed response.</p>
-<p>I was also looking at linking with journals however they live on temp directories on individual machines connected to our network (around 250 employees) so i was trying to use the slog to time stamp and problem solve. </p>
+<p>I was also looking at linking with journals, however they live on temp directories on individual machines connected to our network (around 250 employees), so I was trying to use the slog to time stamp and problem solve. </p>
 <p>I do still see value in the using the slog even if it will overwrite as we can still determine when a file is being accessed and should have at least some activity prior to a deadline so there is still value.</p>
 <p>I will look at coding the finding of the files, extracting the data and then capturing new data from the slog and appending it to the end of the captured data.</p>
 <p>I am currently extracting the slog files from the server daily so that is not the issue.</p>
@@ -113,7 +113,7 @@ This same method is being used by a few offices I know to grab all journals from
 <h4><a name="3"></a> Monitoring Deleted Elements</h4>
 <p>In another monitoring topic,
 Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas et al
-adeed some useful thoughts on monitoring deleted elements in
+shared some useful thoughts on monitoring deleted elements in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on how to <a href="https://forums.autodesk.com/t5/revit-api-forum/find-the-user-of-the-deleted-element-in-revit/m-p/10743767">find the user of a deleted element in Revit</a>:</p>
 <p>Yes, as Jeremy noted, it is pretty difficult to retrieve information about deleted elements.
@@ -142,7 +142,7 @@ the <a href="https://thebuildingcoder.typepad.com/blog/2016/03/implementing-the-
 <li><em>UpdaterData.GetDeletedElementIds</em> from IUpdater.Execute</li>
 </ul>
 <p>You can't get UID from these, since the element is no longer available to look it up on.</p>
-<p>I rack my brains to think how you could do this without implicating the wrong person but I think the simple answer is whatever method you use system failures could lead to the wrong person being implicated.</p>
+<p>I rack my brains to think how you could do this without implicating the wrong person, but I think the simple answer is whatever method you use system failures could lead to the wrong person being implicated.</p>
 <p>As an extreme example:</p>
 <p>Every time Application.DocumentSynchronizedWithCentral occurs, you make a copy of the central and store it somewhere.
 By comparison of time stamps or information added to the central, you can tell who synchronised that copy.</p>
@@ -152,9 +152,9 @@ Under that circumstance, the last record shows the element missing, but perhaps 
 If you have two production lines with two people on each and on one of those lines they are pointing the finger at one another, then swap one of those with one from the other production line.
 In the end, you'll find the common denominator(s).
 Also they have to address the atmosphere and what leads to the person not being open about the mistakes they've made.
-There used to be this idea in construction that mistakes are so critical to identify that you have to foster an atmosphere where when somebody makes a mistake they can be open about it.
+There used to be this idea in construction that mistakes are so critical to identify that you have to foster an atmosphere where when somebody makes a mistake, they can be open about it.
 A 'first mistake = last mistake' atmosphere leads to a situation where the mistakes are left to reveal themselves.</p>
-<p>The other issue is that in the end someone deleted it but someone should spot it missing.
+<p>The other issue is that in the end someone deleted it, but someone should spot it missing.
 If a drawing goes out with a missing column for example, then that is a systemic problem.
 There should be more than one person at fault in that scenario, or it points to someone being overburdened with both production and final checking (akin to an overburdened defender in chess).
 Any system will fail if it doesn't recognise that humans operating within it are not infallible.
@@ -163,11 +163,11 @@ If the error was spotted before there were major consequences, then that is wort
 As noted previously, there are mechanisms to protect things considered unchangeable.
 There are even therefore ways of restricting what categories or individual elements a particular user can change.</p>
 <p><strong>Answer 3:</strong> It's not an API solution, but, honestly, I think the best solution is to Pin important things you don't want deleted.
-Its kind of a pain, because to move or edit anything that is pinned, you have to unpin it and then re-pin it.</p>
+It's kind of a pain, because to move or edit anything that is pinned, you have to unpin it and then re-pin it.</p>
 <p>But a user can't delete anything that's pinned without unpinning it first.
 That does stop a lot of non-intentional deletions.</p>
 <p>Many thanks to Richard and Steve @sragan Ragan for their valuable thoughts and advice.</p>
-<p>If you are interested in an earlier in-depth discussion of accessing deleted element data, you can also refer to the thread on hgow
+<p>If you are interested in an earlier in-depth discussion of accessing deleted element data, you can also refer to the thread on how
 to <a href="https://forums.autodesk.com/t5/revit-api-forum/get-uniqueid-of-deleted-element-within-dynamic-updater-with/m-p/10622152">get <code>UniqueId</code> of deleted element within dynamic updater (with feature request)</a> and
 the wish list item <em>CF-2162 &ndash; API: DocumentChanging or ElementsDeleting event before element is deleted -- 10292440</em>.</p>
 <h4><a name="4"></a> How to Favicon</h4>
