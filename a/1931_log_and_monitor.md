@@ -58,6 +58,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Logging and Monitoring Deleted Data
 
+A couple of useful insights on logging and monitoring:
+
+- [Monitoring with SLOG](#2)
+- [Monitoring deleted elements](#3)
+- [How to Favicon](#4)
+- [DAO](#5)
+- [Palindrome and ambigram](#6)
+
+
 ####<a name="2"></a> Monitoring with SLOG
 
 Soome interesting insights on monitoring were provided by the Revit deelopment team
@@ -240,3 +249,5 @@ You can read it left to right, right to left, and also upside down.
 <img src="img/20211202.png" alt="Palindrome date" title="Palindrome date" width="200"/> <!-- 398 -->
 </center>
 
+It will take a while for next such date to appear, as far as I can tell off-hand.
+If I am not mistaken, the only further ones coming up in this century are 2050-05-02 and 2080-08-02...
