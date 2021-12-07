@@ -41,7 +41,12 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-...
+Useful insights on logging and monitoring
+&ndash; Monitoring with SLOG
+&ndash; Monitoring deleted elements
+&ndash; How to Favicon
+&ndash; Decentralised autonomous organisations
+&ndash; Palindrome and ambigram...
 
 linkedin:
 
@@ -63,7 +68,7 @@ A couple of useful insights on logging and monitoring:
 - [Monitoring with SLOG](#2)
 - [Monitoring deleted elements](#3)
 - [How to Favicon](#4)
-- [DAO](#5)
+- [Decentralised autonomous organisations](#5)
 - [Palindrome and ambigram](#6)
 
 
@@ -213,7 +218,7 @@ It's kind of a pain, because to move or edit anything that is pinned, you have t
 But a user can't delete anything that's pinned without unpinning it first.
 That does stop a lot of non-intentional deletions.
 
-Many thanks to Richard and Steve @sragan Ragan for their valuable thoughts and advice.
+Many thanks to Richard and Steve <i>@sragan</i> Ragan for their valuable thoughts and advice.
 
 If you are interested in an earlier in-depth discussion of accessing deleted element data, you can also refer to the thread on how
 to [get `UniqueId` of deleted element within dynamic updater (with feature request)](https://forums.autodesk.com/t5/revit-api-forum/get-uniqueid-of-deleted-element-within-dynamic-updater-with/m-p/10622152) and
@@ -225,10 +230,10 @@ Do you need to add a `favicon` to your web site?
 
 If so, it might be a good idea to first check out the definitive edition
 of [how to Favicon in 2021](https://dev.to/masakudamatsu/favicon-nightmare-how-to-maintain-sanity-3al7)
-recommended by the extensive [favicon analysis by iconmap](https://iconmap.io/blog) based
+recommended in the extensive [analysis by <i>iconmap</i>](https://iconmap.io/blog) based
 on their cool [favicon map](https://iconmap.io).
 
-####<a name="5"></a> DAO
+####<a name="5"></a> Decentralised Autonomous Organisations
 
 Our new word to learn today, this week's word of the week, is DAO
 or [decentralized autonomous organization](https://en.wikipedia.org/wiki/Decentralized_autonomous_organization).
