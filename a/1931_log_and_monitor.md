@@ -250,3 +250,5 @@ You can read it left to right, right to left, and also upside down.
 
 It will take a while for the next such date to appear, as far as I can tell off-hand.
 If I am not mistaken, the only further ones coming up in this century are 2050-05-02 and 2080-08-02...
+
+
