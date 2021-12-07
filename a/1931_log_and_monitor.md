@@ -254,5 +254,5 @@ You can read it left to right, right to left, and also upside down.
 <img src="img/20211202.png" alt="Palindrome date" title="Palindrome date" width="200"/> <!-- 398 -->
 </center>
 
-It will take a while for next such date to appear, as far as I can tell off-hand.
+It will take a while for the next such date to appear, as far as I can tell off-hand.
 If I am not mistaken, the only further ones coming up in this century are 2050-05-02 and 2080-08-02...
