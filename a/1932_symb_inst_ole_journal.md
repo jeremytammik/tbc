@@ -7,68 +7,8 @@
 <!---
 
 - clarification symbol versus instance geometry
-GetInstanceGeometry vs GetSymbolGeometry
-https://forums.autodesk.com/t5/revit-api-forum/getinstancegeometry-vs-getsymbolgeometry/m-p/10819201
-[Q] ... about the methods GeometryInstance.GetInstanceGeometry() and GeometryInstance.GetSymbolGeometry().
-
-In my file I've got only one imported dwg with only one line inside it. 
-
-There is a code below that i use to test:
-
-var reference = _selection.PickObject(ObjectType.PointOnElement);
-var element = _doc.GetElement(reference);
-var options = new Options();
-options.ComputeReferences = true;
-options.View = _doc.ActiveView;
-            
-var geometryElement = element.get_Geometry(options);
-var geometryInstance = geometryElement
-                .FirstOrDefault(x => x is GeometryInstance) as 
-                 GeometryInstance;
-
-var instanceGeometry = geometryInstance?.GetInstanceGeometry();
-var instanceCurve=instanceGeometry?.FirstOrDefault(x => x is Curve) as Curve;
-var instanceReference = instanceCurve?.Reference;
-var instanceRepresentation = instanceReference?.ConvertToStableRepresentation(_doc);
-            
-var symbolGeometry = geometryInstance?.GetSymbolGeometry();
-var symbolCurve=symbolGeometry?.FirstOrDefault(x => x is Curve) as Curve;
-var symbolReference = symbolCurve?.Reference;
-var symbolRepresentation = symbolReference?.ConvertToStableRepresentation(_doc);
-
-Executing this provides the following values:
-
-instanceRepresentation = e558d96b-a4b0-449d-a84e-00d8c2768a5c-00000a38:2:1:LINEAR 
-symbolRepresentation = e558d96b-a4b0-449d-a84e-00d8c2768a5c-00000c0f:0:INSTANCE:e558d96b-a4b0-449d-a84e-00d8c2768a5c-00000a38:2:1:LINEAR
-
-These include two `UniqueId` values:
-
-e558d96b-a4b0-449d-a84e-00d8c2768a5c-00000a38 &ndash; `CADLinkType`
-e558d96b-a4b0-449d-a84e-00d8c2768a5c-00000c0f &ndash; `ImportInstance`
-
-For me, it seems like these two results were mixed up.
-Looks like `instanceRepresentation` refers to symbol geometry, while `symbolRepresentation` refers to instance geometry.
-
-I will be grateful for any help.
-
-TestProject.rvt
-test.dwg
-
-[A] Seems logical in a way, no?
-When you use symbol it give the full lineage of symbol and instance of that symbol.
-When you use the copy (with method noted below) it just gives the symbol it was copied from.
-There is no actual instance for it, because that function just creates a copy at the time for you (is a helper method for specific purposes).
-
-Beyond CADLinks you'll find that there are multiple version of symbol geometries for a type, i.e., there is often a symbol to represent each structural framing length (with such lengths being driven by instance variations not type variations). So equating symbol geometry to family symbols probably is confusing to start with. That is to say they all different ids and at time of extraction the form of symbol geometry you get is going to be partly decided by the instance variations not just the type variations.
-
-Extract from [RevitAPI.chm on GeometryInstance.GetInstanceGeometry](https://www.revitapidocs.com/2022/22d4a5d4-dfc2-7227-2cae-b989729696ec.htm):
-
-> ...This method returns a copy of the Revit geometry. It is suitable for use in a tool which extracts geometry to another format or carries out a geometric analysis; however, because it returns a copy the references found in the geometry objects contained in this element are not suitable for creating new Revit elements referencing the original element (for example, dimensioning). Only the geometry returned by GetSymbolGeometry() with no transform can be used for that purpose."
-
-- Advanced Revit Remote Batch Command Processing
-David Echols, Senior Programmer at Hankins & Anderson, Inc.
-SD5980 at Autodesk University 2014
-This class will explain a process to run external commands in batch mode from a central server to remote Revit® application workstations. We will cover how to use client and server applications that communicate with each other to manage Revit® software on remote workstations with WCF (Windows Communication Foundation) services. We will examine how to pass XML command data to the Revit® application to open a Revit® model and initiate batch commands. We will also show a specific use case for batch export of DWG files for sheets. We will examine a flexible system for handling Revit® dialog boxes on the fly with usage examples and code snippets, and we will discuss the failure processing API in the context of bypassing warning and error messages while custom commands are running. Finally, we will show you how to gracefully close both the open Revit® model and the Revit® application.
+  GetInstanceGeometry vs GetSymbolGeometry
+  https://forums.autodesk.com/t5/revit-api-forum/getinstancegeometry-vs-getsymbolgeometry/m-p/10819201
 
 - https://forums.autodesk.com/t5/revit-api-forum/importing-and-displaying-satellite-images/m-p/10815534
 
@@ -95,6 +35,11 @@ Forge isn't necessarily a 'must use' as the data might be accessible via other m
   Also ensure that we have good product documentation on why this is in the file, and how it can be worked with, and the like. Otherwise we will have a LOT support cases around the feature.
   Shane Bluemel
   Fantastic, thanks Jacob. Yes, documentation and the options we present to the user around how they use this feature are important. We also need to be careful around the default name of the view so that it's purpose is obvious enough. Thanks for the help and advice.
+
+- Advanced Revit Remote Batch Command Processing
+David Echols, Senior Programmer at Hankins & Anderson, Inc.
+SD5980 at Autodesk University 2014
+This class will explain a process to run external commands in batch mode from a central server to remote Revit® application workstations. We will cover how to use client and server applications that communicate with each other to manage Revit® software on remote workstations with WCF (Windows Communication Foundation) services. We will examine how to pass XML command data to the Revit® application to open a Revit® model and initiate batch commands. We will also show a specific use case for batch export of DWG files for sheets. We will examine a flexible system for handling Revit® dialog boxes on the fly with usage examples and code snippets, and we will discuss the failure processing API in the context of bypassing warning and error messages while custom commands are running. Finally, we will show you how to gracefully close both the open Revit® model and the Revit® application.
 
 twitter:
 
@@ -209,7 +154,216 @@ This gets further complicated with cuts but it demonstrates that Revit is storin
 
 ####<a name="3"></a>
 
-- https://forums.autodesk.com/t5/revit-api-forum/importing-and-displaying-satellite-images/m-p/10815534
+Harm van den Brand shares a new implementation of a suggestion by Rudi *Revitalizer* Honke to create a new material and set its texture in 
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [importing and displaying satellite images](https://forums.autodesk.com/t5/revit-api-forum/importing-and-displaying-satellite-images/m-p/10815534):
+
+harmvandenbrand
+ Explorer harmvandenbrand 818 Views, 7 Replies
+‎2020-03-14 06:49 AM 
+Importing and Displaying Satellite Images
+Hello all,
+
+I'm building an add-in for Revit and I would like to be able to import and display third-party satellite imagery in order to place buildings in their 'real' position. I would like to be able to do this in a 3D view, but I don't know how.
+
+The user workflow for my add-in is this:
+
+- A user opens the add-in and is prompted to input a location through a WPF window.
+
+- Once a location is confirmed, a number of things are created/imported into the active project to make it look as close as possible to its actual real-life location. One of these things is the satellite image I'm seeking to import here.
+
+Essentially, my question is exactly this one, but instead doing that programmatically/automatically through an add-in. In that thread, a suggestion is made to create a decal with the desired image, but this does not seem to be supported through the API.
+
+Another approach I found is to use PostCommands to create and place decals, but these commands are apparently only executed after exiting the API context and only one at a time. As my add-in aims to perform a whole bunch of functionalities in one go, this seem ill-suited for my use case. It seems to be possible to chain a bunch of PostCommands, but this is a little 'hacky' and not recommended, especially for commercial use.
+
+Am I overlooking some existing functionality? Is my use case just not supported in current Revit? I'm new to programming for Revit, so it's very possible I've missed something.
+
+I'm running / programming for Revit 2019 on Windows 10.
+
+Thank you all for your time,
+
+Harm
+
+ Solved by Revitalizer. Go to Solution.
+
+Tags (4)
+Tags:APIdecalimagePostCommand
+ 
+Add tags
+Report
+7 REPLIES 
+Sort: 
+MESSAGE 2 OF 8
+jeremytammik
+ Employee jeremytammik in reply to: harmvandenbrand
+‎2020-03-16 03:02 AM 
+Dear Harm,
+
+Thank you for the interesting question and explanation, and all the research you already put into it.
+
+You have proceeded exactly as I would suggest, and the finding are what I would have expected.
+
+I am sorry to say that I have nothing to add from my point of view.
+
+I wish you good luck in putting together a viable and sufficiently robust workflow for your use case.
+
+Best regards,
+
+Jeremy
+
+Jeremy Tammik
+Developer Technical Services
+Autodesk Developer Network, ADN Open
+The Building Coder
+
+Tags (0)
+Add tags
+Report
+MESSAGE 3 OF 8
+Revitalizer
+ Advisor Revitalizer in reply to: harmvandenbrand
+‎2020-03-16 03:43 AM 
+Hi,
+
+what about creating a new material, setting its texture path - and then, making a TopoSurface and assigning the material to it?
+
+https://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html
+
+I don't know how to adjust the UV mapping for the TopoSurface, but it it worked, you would see your satellite image in 3D.
+
+Revitalizer
+
+Rudolf Honke
+Software Developer
+Mensch und Maschine
+
+Tags (0)
+Add tags
+Report
+MESSAGE 4 OF 8
+harmvandenbrand
+ Explorer harmvandenbrand in reply to: Revitalizer
+‎2020-03-28 04:13 AM 
+Thanks to all for the replies! It took some time to try out the proposed solution (accessing AppearanceElements is convoluted!), so that's why it took me this long to reply.
+
+In the end, though I had to work around some weird quirks with the API, adding the image as a texture to a topography through a material works great.
+
+Thanks again for the suggestion, I couldn't have made it work without it.
+
+Tags (0)
+Add tags
+Report
+MESSAGE 5 OF 8
+jeremytammik
+ Employee jeremytammik in reply to: harmvandenbrand
+‎2020-03-29 12:12 AM 
+Wow, congratulations!
+
+Can you share some of the quirks and weirdnesses you ran into, and how you handled them?
+
+The entire solution might be of great interest to others as well, in fact...
+
+Have a nice Sunday and good health to all!
+
+Jeremy Tammik
+Developer Technical Services
+Autodesk Developer Network, ADN Open
+The Building Coder
+
+Tags (0)
+Add tags
+Report
+MESSAGE 6 OF 8
+RakeshBSalwe
+ Explorer RakeshBSalwe in reply to: harmvandenbrand
+‎2021-12-03 02:38 AM 
+Hi Harmvandenbrand,
+
+I am also trying to achieve same functionality and didn't find API to achieve the same.
+
+If you can share the solution used to achieve the output, that will be great help.
+
+Thanks and Advance.
+
+Tags (0)
+Add tags
+Report
+MESSAGE 7 OF 8
+harmvandenbrand
+ Explorer harmvandenbrand in reply to: RakeshBSalwe
+‎2021-12-10 03:00 PM 
+Hi!
+
+My apologies for the late reply, both to Tamesh and especially to Jeremy 😅.
+
+As mentioned, I ended up taking Revitalizer's suggested approach of creating a new material and setting its texture.
+
+Material underlayMaterial = Material.Create(revitDocument, materialName);
+
+To this material, I link a so-called AppearanceAsset:
+
+underlayMaterial.AppearanceAssetId = assetElement.Id;
+
+(more on how I get this assetElement in a moment)
+
+And then I assign the path of a jpeg image to the texture asset:
+
+using (AppearanceAssetEditScope editScope = new AppearanceAssetEditScope(revitDocument))
+{
+    Asset editableAsset = editScope.Start(assetElement.Id);
+
+    AssetProperty assetProperty = editableAsset.FindByName("generic_diffuse");
+    Asset connectedAsset = assetProperty.GetConnectedProperty(0) as Asset;
+
+    //Edit bitmap
+    if (connectedAsset.Name == "UnifiedBitmapSchema")
+    {
+        AssetPropertyString path = connectedAsset.FindByName(UnifiedBitmap.UnifiedbitmapBitmap) as AssetPropertyString;
+
+        if (path.IsValidValue(imagePath))
+            path.Value = imagePath;
+
+        //You might have to fiddle a bit with the scale properties, for example when your source uses centimeters:
+        AssetPropertyDistance scaleX = connectedAsset.FindByName(UnifiedBitmap.TextureRealWorldScaleX) as AssetPropertyDistance;
+        AssetPropertyDistance scaleY = connectedAsset.FindByName(UnifiedBitmap.TextureRealWorldScaleY) as AssetPropertyDistance;
+
+        //Because newly added bitmaps are displayed in inches.
+        if (scaleX.DisplayUnitType == DisplayUnitType.DUT_DECIMAL_INCHES)
+            scaleX.Value /= 2.54;
+        if (scaleY.DisplayUnitType == DisplayUnitType.DUT_DECIMAL_INCHES)
+            scaleY.Value /= 2.54;
+
+    }
+    editScope.Commit(true);
+}
+
+Now, the reason why I would call my solution 'hacky', is because of how I retrieve the assetElement.
+
+Instinctively, I would want to create a new, empty instance of Asset. Something like AppearanceAssetElement assetElement = AppearanceAssetElement.Create();
+
+However, this is not how Revit's material/texture api works. We can only use those materials/textures/etc. that are present in Revit's libraries. Therefore we can only make copies of existing ones:
+
+//Retrieve asset library from the application (this is the only source available; instantiating from zero is impossible)
+IList<Asset> assetList = commandData.Application.Application.GetAssets(AssetType.Appearance);
+
+//Select arbitrary asset from library (200 works, not all do)
+Asset asset = assetList[200];
+
+AppearanceAssetElement assetElement;
+try
+{
+    assetElement = AppearanceAssetElement.Create(revitDocument, someNewName, asset);
+}
+
+Yes, I really just randomly tried indices in that assetList until I found one that worked, and hardcoded that one in. Not all AppearanceAssets in the list have the necessary "generic_diffuse" assetProperty to which we can bind a texture, so we have to select one that does.
+
+If you are developing your addin for external parties this is risky, because we can't ensure that the same libraries are available for any particular user. It's probably best to somehow filter for valid AppearanceAssets.
+
+Also, you can see that retrieving this appearanceAsset requires ExternalCommandData (which I named CommandData in the code given), which an addin retrieves via the 'Execute' method of a IExternalCommand-implementing class.
+
+Also, remember to wrap most of these snippets in transactions.
+
+I hope this helps!
 
 ####<a name="4"></a> RVT Dashboard Data Access
 
