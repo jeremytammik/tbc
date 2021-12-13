@@ -6,7 +6,6 @@
 
 <!---
 
-
 - clarification symbol versus instance geometry
 GetInstanceGeometry vs GetSymbolGeometry
 https://forums.autodesk.com/t5/revit-api-forum/getinstancegeometry-vs-getsymbolgeometry/m-p/10819201
@@ -97,7 +96,6 @@ Forge isn't necessarily a 'must use' as the data might be accessible via other m
   Shane Bluemel
   Fantastic, thanks Jacob. Yes, documentation and the options we present to the user around how they use this feature are important. We also need to be careful around the default name of the view so that it's purpose is obvious enough. Thanks for the help and advice.
 
-
 twitter:
 
  with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
@@ -105,8 +103,6 @@ twitter:
 &ndash; ...
 
 linkedin:
-
-
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -185,6 +181,38 @@ Extract from [RevitAPI.chm on GeometryInstance.GetInstanceGeometry](https://www.
 
 > ...This method returns a copy of the Revit geometry. It is suitable for use in a tool which extracts geometry to another format or carries out a geometric analysis; however, because it returns a copy the references found in the geometry objects contained in this element are not suitable for creating new Revit elements referencing the original element (for example, dimensioning). Only the geometry returned by GetSymbolGeometry() with no transform can be used for that purpose."
 
+Here is a simple example demonstrated:
+
+/Users/jta/a/doc/revit/tbc/git/a/img/rpt_symb_vs_inst_geom_1.png
+
+Two beams of same family type
+Two beams of same family type
+
+/Users/jta/a/doc/revit/tbc/git/a/img/rpt_symb_vs_inst_geom_2.png
+
+The short beam as id 427840
+The short beam as id 427840
+
+/Users/jta/a/doc/revit/tbc/git/a/img/rpt_symb_vs_inst_geom_3.png
+
+The long beam as id 427855
+The long beam as id 427855
+
+/Users/jta/a/doc/revit/tbc/git/a/img/rpt_symb_vs_inst_geom_4.png
+
+The FamilySymbol id 95037
+The FamilySymbol id 95037
+
+If you check the bounding boxes extents for the two geometry symbols you'll see they match the beam lengths.
+
+This gets further complicated with cuts but it demonstrates that Revit is storing geometrical symbol variations differently to how we think of the type instance relationships based on type and instance parameters.
+
+####<a name="3"></a>
+
+- https://forums.autodesk.com/t5/revit-api-forum/importing-and-displaying-satellite-images/m-p/10815534
+
+####<a name="4"></a> RVT Dashboard Data Access
+
 - how to access data in RVT for a dashboard
 https://autodesk.slack.com/archives/C0SR6NAP8/p1638915918163600
 [Q] I would like to collect data from Revit models for display in a dashboard.  I thought of using the model derivative APIs in Forge to retrieve the data, or use DA4R since the Revit model must be opened to access the database.  Well, this Apple team does not have access to Forge/DA4R and are asking for a way to read the data without Revit.  I let the team know that Revit must be used to unpack the database to make it useable to collect data from.  The reason for this is that much of the content in Revit is created on demand dynamically and not necessarily stored in the file database.
@@ -193,9 +221,8 @@ Am I on the right track here?  Apple has mentioned to me that Safe Software has 
 Because of that format some data is quite easy to access (ie: Transmission data and basic file info, both of which can be read with tools like Structured Storage Viewer), but other aspects are more difficult (ie: how many light fixtures are in room number 2143, how many warnings are in the model, how many doors don't have a valid mark, etc.).
 Forge isn't necessarily a 'must use' as the data might be accessible via other means (ie: upload to BIM360 or use the online viewer; use the model checker which is coming to the web soon) or move to another file format for the final deliverable (ie: perhaps they should be mining data from the digital twin or an IFC instead of an RVT). Short of those two alterations it's likely best to stick with forge.
 
-- marking and retrieving a custom element
-https://autodesk.slack.com/archives/C0SR6NAP8/p1638455279133900
-Shane Bluemel 
+####<a name="5"></a> Marking and Retrieving a Custom Element
+
 Hi folks. We're currently spiking a new feature in the Revit Issues Addin where we create our own view to show additional ACC data within Revit. We've hit a bump around the view ID and wondered whether there's something in the API we haven't spotted that might be able to help us.   
 We essentially want to create our own temporary view within Revit so that we can show ACC issues which are not on the current model loaded in Revit (i.e. from linked files or from a multi-model view only available in ACC). Our current spike creates a view, populates it and deletes it on shutdown. This is all fine. However, if the view is the only one open in Revit on shutdown it'll get saved into the file. This got us thinking that we could just save a default Addins view and look for it on next load. However, we can't find a way to determine the ID that's used for the view so we won't know what we're looking for. Some questions where you may be able to help us:
 Can we create a view with a read-only name (so the user can't edit it and we can search for that)?
@@ -209,18 +236,9 @@ Also ensure that we have good product documentation on why this is in the file, 
 Shane Bluemel
 Fantastic, thanks Jacob. Yes, documentation and the options we present to the user around how they use this feature are important. We also need to be careful around the default name of the view so that it's purpose is obvious enough. Thanks for the help and advice.
 
+####<a name="6"></a> Advanced Revit Remote Batch Command Processing
 
-- Advanced Revit Remote Batch Command Processing
 David Echols, Senior Programmer at Hankins & Anderson, Inc.
 SD5980 at Autodesk University 2014
 This class will explain a process to run external commands in batch mode from a central server to remote Revit® application workstations. We will cover how to use client and server applications that communicate with each other to manage Revit® software on remote workstations with WCF (Windows Communication Foundation) services. We will examine how to pass XML command data to the Revit® application to open a Revit® model and initiate batch commands. We will also show a specific use case for batch export of DWG files for sheets. We will examine a flexible system for handling Revit® dialog boxes on the fly with usage examples and code snippets, and we will discuss the failure processing API in the context of bypassing warning and error messages while custom commands are running. Finally, we will show you how to gracefully close both the open Revit® model and the Revit® application.
-
-
-
-
-####<a name="4"></a> How to Favicon
-
-####<a name="5"></a>
-
-####<a name="6"></a>
 
