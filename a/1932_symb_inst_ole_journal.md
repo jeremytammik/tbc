@@ -62,7 +62,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Symbol, Instance, OLE, Journal
 
-An eclectic mix of topics for today:
+This is probably my last post of the year, so let's wrap up with an eclectic mix of topics for today:
 
 ####<a name="2"></a> Clarification Symbol versus Instance Geometry
 
@@ -158,21 +158,15 @@ Harm van den Brand shares a new implementation of a suggestion by Rudi *Revitali
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [importing and displaying satellite images](https://forums.autodesk.com/t5/revit-api-forum/importing-and-displaying-satellite-images/m-p/10815534):
 
-harmvandenbrand
- Explorer harmvandenbrand 818 Views, 7 Replies
-‎2020-03-14 06:49 AM 
-Importing and Displaying Satellite Images
-Hello all,
-
-I'm building an add-in for Revit and I would like to be able to import and display third-party satellite imagery in order to place buildings in their 'real' position. I would like to be able to do this in a 3D view, but I don't know how.
+I'm building an add-in for Revit and I would like to be able to import and display third-party satellite imagery in order to place buildings in their 'real' position.
+I would like to be able to do this in a 3D view, but I don't know how.
 
 The user workflow for my add-in is this:
 
 - A user opens the add-in and is prompted to input a location through a WPF window.
-
 - Once a location is confirmed, a number of things are created/imported into the active project to make it look as close as possible to its actual real-life location. One of these things is the satellite image I'm seeking to import here.
 
-Essentially, my question is exactly this one, but instead doing that programmatically/automatically through an add-in. In that thread, a suggestion is made to create a decal with the desired image, but this does not seem to be supported through the API.
+Essentially, my question is exactly [this one](), but instead doing that programmatically/automatically through an add-in. In that thread, a suggestion is made to create a decal with the desired image, but this does not seem to be supported through the API.
 
 Another approach I found is to use PostCommands to create and place decals, but these commands are apparently only executed after exiting the API context and only one at a time. As my add-in aims to perform a whole bunch of functionalities in one go, this seem ill-suited for my use case. It seems to be possible to chain a bunch of PostCommands, but this is a little 'hacky' and not recommended, especially for commercial use.
 
@@ -396,3 +390,6 @@ David Echols, Senior Programmer at Hankins & Anderson, Inc.
 SD5980 at Autodesk University 2014
 This class will explain a process to run external commands in batch mode from a central server to remote Revit® application workstations. We will cover how to use client and server applications that communicate with each other to manage Revit® software on remote workstations with WCF (Windows Communication Foundation) services. We will examine how to pass XML command data to the Revit® application to open a Revit® model and initiate batch commands. We will also show a specific use case for batch export of DWG files for sheets. We will examine a flexible system for handling Revit® dialog boxes on the fly with usage examples and code snippets, and we will discuss the failure processing API in the context of bypassing warning and error messages while custom commands are running. Finally, we will show you how to gracefully close both the open Revit® model and the Revit® application.
 
+I wish you a wonderful midwinter break full of light and warmth!
+
+candlelight_snow.jpg 280
