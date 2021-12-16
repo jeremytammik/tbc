@@ -371,18 +371,33 @@ Forge isn't necessarily a 'must use' as the data might be accessible via other m
 
 ####<a name="5"></a> Marking and Retrieving a Custom Element
 
-Hi folks. We're currently spiking a new feature in the Revit Issues Addin where we create our own view to show additional ACC data within Revit. We've hit a bump around the view ID and wondered whether there's something in the API we haven't spotted that might be able to help us.   
-We essentially want to create our own temporary view within Revit so that we can show ACC issues which are not on the current model loaded in Revit (i.e. from linked files or from a multi-model view only available in ACC). Our current spike creates a view, populates it and deletes it on shutdown. This is all fine. However, if the view is the only one open in Revit on shutdown it'll get saved into the file. This got us thinking that we could just save a default Addins view and look for it on next load. However, we can't find a way to determine the ID that's used for the view so we won't know what we're looking for. Some questions where you may be able to help us:
-Can we create a view with a read-only name (so the user can't edit it and we can search for that)?
-Can we define a Revit View ID using a GUID somehow?
-Is there somewhere we could store the view ID used within the file so that we can retrieve it on load? We considered storing it in our own settings file but that doesn't work if the file gets sent to another user.
-Any help or advice you can offer would be much appreciated.
-Jacob Small
-This is a prime case for extensible storage in my opinion. Make a new schema and save the GUID of the view into it.
-Users will delete that view though, and if it doesn’t file into the project browser correctly there will be push back. Expect to delete and recreate the view often (even mid session).
-Also ensure that we have good product documentation on why this is in the file, and how it can be worked with, and the like. Otherwise we will have a LOT support cases around the feature.
-Shane Bluemel
-Fantastic, thanks Jacob. Yes, documentation and the options we present to the user around how they use this feature are important. We also need to be careful around the default name of the view so that it's purpose is obvious enough. Thanks for the help and advice.
+**Question:** My add-in creates its own view to show additional data within Revit.
+I hit a bump around the view element id and wonder whether anything in the API might be able to help.   
+I essentially want to create my own temporary view within Revit to show data that is not from the currently loaded model, i.e., from linked files or elsewhere.
+Right now, I create a view, populate it and delete it on shutdown.
+This is all fine.
+
+However, if the view is the only one open in Revit on shutdown, it gets saved into the file.
+This got me thinking that I could just save a default add-in view and look for it on next load.
+However, I can't find a way to determine the view element id, so I don't know what to look for. 
+
+- Can I create a view with a read-only name, so the user can't edit it and I can search for that?
+- Can I define a Revit view ID using a GUID somehow?
+
+Is there anywhere I could store the view ID, so that I can retrieve it on load? 
+I considered storing it in my own settings file, but that doesn't work if the file gets sent to another user.
+
+**Answer:** This is a prime case for [extensible storage](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.23) in my opinion.
+Make a new schema and save the `UniqueId` of the view into it.
+Users will delete that view, though, and if it doesn’t file into the project browser correctly, there will be push back.
+Expect to delete and recreate the view often (even mid session).
+Also, ensure that you have good product documentation on why this is in the file, and how it can be worked with, and the like.
+Otherwise you will have a LOT of support cases around the feature.
+
+**Response:** Fantastic.
+Yes, documentation and the options we present to the user around how they use this feature are important.
+We also need to be careful around the default name of the view, so it's purpose is obvious enough.
+Thanks for the help and advice.
 
 ####<a name="6"></a> Advanced Revit Remote Batch Command Processing
 
@@ -406,7 +421,7 @@ Celtic [Samhain](https://en.wikipedia.org/wiki/Samhain),
 Druid [Alban Arthan](https://en.wikipedia.org/wiki/Alban_Arthan),
 and many other sacred traditions.
 
-<p>A time of confusion, breaking things, going wrong, calming down, going slowly, contemplation, relaxing into peace and quiet.</p>
+A time of confusion, breaking things, going wrong, calming down, going slowly, contemplation, relaxing into peace and quiet and new beginnings.
 
 I wish you a wonderful midwinter break full of light and warmth!
 
