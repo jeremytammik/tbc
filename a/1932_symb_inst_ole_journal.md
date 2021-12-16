@@ -390,6 +390,24 @@ David Echols, Senior Programmer at Hankins & Anderson, Inc.
 SD5980 at Autodesk University 2014
 This class will explain a process to run external commands in batch mode from a central server to remote Revit® application workstations. We will cover how to use client and server applications that communicate with each other to manage Revit® software on remote workstations with WCF (Windows Communication Foundation) services. We will examine how to pass XML command data to the Revit® application to open a Revit® model and initiate batch commands. We will also show a specific use case for batch export of DWG files for sheets. We will examine a flexible system for handling Revit® dialog boxes on the fly with usage examples and code snippets, and we will discuss the failure processing API in the context of bypassing warning and error messages while custom commands are running. Finally, we will show you how to gracefully close both the open Revit® model and the Revit® application.
 
+####<a name="7"></a> Midwinter Break
+
+We are nearing the middle of winter here on the northern hemisphere, and Autodesk has announced company holidays in the last days of the calnbedar year.
+
+I am looking forward to some peaceful time to recuperate during the end
+of [advent](https://en.wikipedia.org/wiki/Advent),
+followed by the [twelve-night](https://en.wikipedia.org/wiki/Twelfth_Night_(holiday)) turning point of the year,
+also known as [Rauhnächte](https://de.wikipedia.org/wiki/Rauhnacht) or *raw nights* in German,
+full of special depth and significance, related to the differences between
+the [lunar](https://en.wikipedia.org/wiki/Lunar_calendar) and solar cycles,
+beginning with [Christmas](https://en.wikipedia.org/wiki/Christmas),
+[Hanukkah](https://en.wikipedia.org/wiki/Hanukkah),
+Celtic [Samhain](https://en.wikipedia.org/wiki/Samhain),
+Druid [Alban Arthan](https://en.wikipedia.org/wiki/Alban_Arthan),
+and many other sacred traditions.
+
+<p>A time of confusion, breaking things, going wrong, calming down, going slowly, contemplation, relaxing into peace and quiet.</p>
+
 I wish you a wonderful midwinter break full of light and warmth!
 
 <center>
