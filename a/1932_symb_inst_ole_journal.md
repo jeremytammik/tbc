@@ -392,4 +392,6 @@ This class will explain a process to run external commands in batch mode from a 
 
 I wish you a wonderful midwinter break full of light and warmth!
 
-candlelight_snow.jpg 280
+<center>
+<img src="img/candlelight_snow.jpg" alt="Candlelight in snow" title="Candlelight in snow" width="280"/>
+</center>
