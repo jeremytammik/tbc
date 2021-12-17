@@ -60,8 +60,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Symbol, Instance, OLE, Journal</h3>
-<p>This is probably my last post of the year, so let's wrap up with an eclectic mix of topics for today:</p>
-<h4><a name="2"></a> Clarification Symbol versus Instance Geometry</h4>
+<p>This is probably my last post of the year, so let's wrap up with an eclectic mix of topics to close with:</p>
+<ul>
+<li><a href="#2">Symbol vs instance geometry clarification</a></li>
+<li><a href="#3">Create new material with texture</a></li>
+<li><a href="#4">RVT dashboard data access</a></li>
+<li><a href="#5">Marking and retrieving a custom element</a></li>
+<li><a href="#6">Advanced remote batch command processing</a></li>
+<li><a href="#7">Midwinter break</a></li>
+</ul>
+<h4><a name="2"></a> Symbol vs Instance Geometry Clarification</h4>
 <p>Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
 clarifies some aspects of symbol versus instance geometry iin an imported DWG file in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
@@ -135,7 +143,7 @@ That is to say they are all different ids and at time of extraction the form of 
 <p>If you check the bounding box extents for the two geometry symbols, you'll see they match the beam lengths.</p>
 <p>This gets further complicated with cuts, but it demonstrates that Revit is storing geometrical symbol variations differently to how we think of the type-to-instance relationships based on type and instance parameters.</p>
 <p>Many thanks to Richard for yet another insightful and illuminating explanation!</p>
-<h4><a name="3"></a></h4>
+<h4><a name="3"></a> Create New Material with Texture</h4>
 <p>Harm van den Brand shares a new implementation of a suggestion by Rudi <em>Revitalizer</em> Honke to create a new material and set its texture in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/importing-and-displaying-satellite-images/m-p/10815534">importing and displaying satellite images</a>:</p>
@@ -304,7 +312,7 @@ Otherwise you will have a LOT of support cases around the feature.</p>
 Yes, documentation and the options we present to the user around how they use this feature are important.
 We also need to be careful around the default name of the view, so it's purpose is obvious enough.
 Thanks for the help and advice.</p>
-<h4><a name="6"></a> Advanced Revit Remote Batch Command Processing</h4>
+<h4><a name="6"></a> Advanced Remote Batch Command Processing</h4>
 <p>Several people recently raised questions on automating Revit workflows, and one possibility to consider is the use of Revit journal files.
 David Echols, Senior Programmer at Hankins &amp; Anderson, Inc. shared some important insights and experience in this area in his Autodesk University 2014 class SD5980 on <em>Advanced Revit Remote Batch Command Processing</em>:</p>
 <blockquote>

@@ -62,9 +62,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Symbol, Instance, OLE, Journal
 
-This is probably my last post of the year, so let's wrap up with an eclectic mix of topics for today:
+This is probably my last post of the year, so let's wrap up with an eclectic mix of topics to close with:
 
-####<a name="2"></a> Clarification Symbol versus Instance Geometry
+- [Symbol vs instance geometry clarification](#2)
+- [Create new material with texture](#3)
+- [RVT dashboard data access](#4)
+- [Marking and retrieving a custom element](#5)
+- [Advanced remote batch command processing](#6)
+- [Midwinter break](#7)
+
+
+####<a name="2"></a> Symbol vs Instance Geometry Clarification
 
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
 clarifies some aspects of symbol versus instance geometry iin an imported DWG file in 
@@ -154,7 +162,7 @@ This gets further complicated with cuts, but it demonstrates that Revit is stori
 
 Many thanks to Richard for yet another insightful and illuminating explanation!
 
-####<a name="3"></a>
+####<a name="3"></a> Create New Material with Texture
 
 Harm van den Brand shares a new implementation of a suggestion by Rudi *Revitalizer* Honke to create a new material and set its texture in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -355,7 +363,7 @@ Yes, documentation and the options we present to the user around how they use th
 We also need to be careful around the default name of the view, so it's purpose is obvious enough.
 Thanks for the help and advice.
 
-####<a name="6"></a> Advanced Revit Remote Batch Command Processing
+####<a name="6"></a> Advanced Remote Batch Command Processing
 
 Several people recently raised questions on automating Revit workflows, and one possibility to consider is the use of Revit journal files.
 David Echols, Senior Programmer at Hankins & Anderson, Inc. shared some important insights and experience in this area in his Autodesk University 2014 class SD5980 on *Advanced Revit Remote Batch Command Processing*:
