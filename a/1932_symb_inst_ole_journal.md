@@ -129,22 +129,22 @@ Extract from [RevitAPI.chm on GeometryInstance.GetInstanceGeometry](https://www.
 Here is a simple example demonstrated:
 
 <center>
-<img src="img/rpt_symb_vs_inst_geom_1.png" alt="Two beams of same family type" title="Two beams of same family type" width="600"/>
+<img src="img/rpt_symb_vs_inst_geom_1.png" alt="Two beams of same family type" title="Two beams of same family type" width="367"/>
 <p style="font-size: 80%; font-style:italic">Two beams of same family type</p>
 </center>
 
 <center>
-<img src="img/rpt_symb_vs_inst_geom_2.png" alt="The short beam as id 427840" title="The short beam as id 427840" width="600"/>
+<img src="img/rpt_symb_vs_inst_geom_2.png" alt="The short beam as id 427840" title="The short beam as id 427840" width="600"/> <!-- 802 -->
 <p style="font-size: 80%; font-style:italic">The short beam as id 427840</p>
 </center>
 
 <center>
-<img src="img/rpt_symb_vs_inst_geom_3.png" alt="The long beam as id 427855" title="The long beam as id 427855" width="600"/>
+<img src="img/rpt_symb_vs_inst_geom_3.png" alt="The long beam as id 427855" title="The long beam as id 427855" width="600"/> <!-- 802 -->
 <p style="font-size: 80%; font-style:italic">The long beam as id 427855</p>
 </center>
 
 <center>
-<img src="img/rpt_symb_vs_inst_geom_4.png" alt="The FamilySymbol id 95037" title="The FamilySymbol id 95037" width="600"/>
+<img src="img/rpt_symb_vs_inst_geom_4.png" alt="The FamilySymbol id 95037" title="The FamilySymbol id 95037" width="600"/> <!-- 802 -->
 <p style="font-size: 80%; font-style:italic">The FamilySymbol id 95037</p>
 </center>
 
