@@ -401,9 +401,13 @@ Thanks for the help and advice.
 
 ####<a name="6"></a> Advanced Revit Remote Batch Command Processing
 
-David Echols, Senior Programmer at Hankins & Anderson, Inc.
-SD5980 at Autodesk University 2014
-This class will explain a process to run external commands in batch mode from a central server to remote Revit® application workstations. We will cover how to use client and server applications that communicate with each other to manage Revit® software on remote workstations with WCF (Windows Communication Foundation) services. We will examine how to pass XML command data to the Revit® application to open a Revit® model and initiate batch commands. We will also show a specific use case for batch export of DWG files for sheets. We will examine a flexible system for handling Revit® dialog boxes on the fly with usage examples and code snippets, and we will discuss the failure processing API in the context of bypassing warning and error messages while custom commands are running. Finally, we will show you how to gracefully close both the open Revit® model and the Revit® application.
+Several people recently raised questions on automating Revit workflows, and one possibility to consider is the use of Revit journal files.
+David Echols, Senior Programmer at Hankins & Anderson, Inc. shared some important insights and experience in this area in his Autodesk University 2014 class SD5980 on *Advanced Revit Remote Batch Command Processing*:
+
+> This class explains a process to run external commands in batch mode from a central server to remote Revit application workstations.
+It covers how to use client and server applications that communicate with each other to manage Revit software on remote workstations with WCF (Windows Communication Foundation) services, examines how to pass XML command data to the Revit application to open a Revit model and initiate batch commands, shows a specific use case for batch export of DWG files for sheets, examines a flexible system for handling Revit dialog boxes on the fly with usage examples and code snippets, and discusses the failure processing API in the context of bypassing warning and error messages while custom commands are running. Finally, it shows you how to gracefully close both the open Revit model and the Revit application.
+
+- [Handout: *RevitJournals.pdf*](zip/RevitJournals.pdf)
 
 ####<a name="7"></a> Midwinter Break
 
