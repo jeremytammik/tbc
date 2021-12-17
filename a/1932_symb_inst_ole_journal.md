@@ -168,140 +168,46 @@ The user workflow for my add-in is this:
 
 Essentially, my question is exactly [this one](), but instead doing that programmatically/automatically through an add-in. In that thread, a suggestion is made to create a decal with the desired image, but this does not seem to be supported through the API.
 
-Another approach I found is to use PostCommands to create and place decals, but these commands are apparently only executed after exiting the API context and only one at a time. As my add-in aims to perform a whole bunch of functionalities in one go, this seem ill-suited for my use case. It seems to be possible to chain a bunch of PostCommands, but this is a little 'hacky' and not recommended, especially for commercial use.
+Another approach I found is to use `PostCommand` to create and place decals, but these commands are apparently only executed after exiting the API context and only one at a time.
+As my add-in aims to perform a whole bunch of functionalities in one go, this seem ill-suited for my use case.
+It seems to be possible to chain a bunch of `PostCommand` calls, but this is a little 'hacky' and not recommended, especially for commercial use.
 
-Am I overlooking some existing functionality? Is my use case just not supported in current Revit? I'm new to programming for Revit, so it's very possible I've missed something.
+Am I overlooking some existing functionality?
+Is my use case just not supported in current Revit?
+I'm new to programming for Revit, so it's very possible I've missed something.
 
 I'm running / programming for Revit 2019 on Windows 10.
 
-Thank you all for your time,
-
-Harm
-
- Solved by Revitalizer. Go to Solution.
-
-Tags (4)
-Tags:APIdecalimagePostCommand
- 
-Add tags
-Report
-7 REPLIES 
-Sort: 
-MESSAGE 2 OF 8
-jeremytammik
- Employee jeremytammik in reply to: harmvandenbrand
-‎2020-03-16 03:02 AM 
-Dear Harm,
-
-Thank you for the interesting question and explanation, and all the research you already put into it.
-
-You have proceeded exactly as I would suggest, and the finding are what I would have expected.
-
-I am sorry to say that I have nothing to add from my point of view.
-
-I wish you good luck in putting together a viable and sufficiently robust workflow for your use case.
-
-Best regards,
-
-Jeremy
-
-Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder
-
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 8
-Revitalizer
- Advisor Revitalizer in reply to: harmvandenbrand
-‎2020-03-16 03:43 AM 
-Hi,
-
-what about creating a new material, setting its texture path - and then, making a TopoSurface and assigning the material to it?
+**Answer:** What about creating a new material, setting its texture path, then making a `TopoSurface` and assigning the material to it?
 
 https://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html
 
-I don't know how to adjust the UV mapping for the TopoSurface, but it it worked, you would see your satellite image in 3D.
+I don't know how to adjust the UV mapping for the TopoSurface, but if it worked, you would see your satellite image in 3D.
 
-Revitalizer
-
-Rudolf Honke
-Software Developer
-Mensch und Maschine
-
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 8
-harmvandenbrand
- Explorer harmvandenbrand in reply to: Revitalizer
-‎2020-03-28 04:13 AM 
-Thanks to all for the replies! It took some time to try out the proposed solution (accessing AppearanceElements is convoluted!), so that's why it took me this long to reply.
+**Response:** Thanks to all for the replies!
+It took some time to try out the proposed solution (accessing AppearanceElements is convoluted!), so that's why it took me this long to reply.
 
 In the end, though I had to work around some weird quirks with the API, adding the image as a texture to a topography through a material works great.
 
 Thanks again for the suggestion, I couldn't have made it work without it.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 8
-jeremytammik
- Employee jeremytammik in reply to: harmvandenbrand
-‎2020-03-29 12:12 AM 
-Wow, congratulations!
-
-Can you share some of the quirks and weirdnesses you ran into, and how you handled them?
-
-The entire solution might be of great interest to others as well, in fact...
-
-Have a nice Sunday and good health to all!
-
-Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder
-
-Tags (0)
-Add tags
-Report
-MESSAGE 6 OF 8
-RakeshBSalwe
- Explorer RakeshBSalwe in reply to: harmvandenbrand
-‎2021-12-03 02:38 AM 
-Hi Harmvandenbrand,
-
-I am also trying to achieve same functionality and didn't find API to achieve the same.
-
-If you can share the solution used to achieve the output, that will be great help.
-
-Thanks and Advance.
-
-Tags (0)
-Add tags
-Report
-MESSAGE 7 OF 8
-harmvandenbrand
- Explorer harmvandenbrand in reply to: RakeshBSalwe
-‎2021-12-10 03:00 PM 
-Hi!
-
-My apologies for the late reply, both to Tamesh and especially to Jeremy 😅.
-
 As mentioned, I ended up taking Revitalizer's suggested approach of creating a new material and setting its texture.
 
+<pre class="code>
 Material underlayMaterial = Material.Create(revitDocument, materialName);
+</pre>
 
 To this material, I link a so-called AppearanceAsset:
 
+<pre class="code>
 underlayMaterial.AppearanceAssetId = assetElement.Id;
+</pre>
 
 (more on how I get this assetElement in a moment)
 
 And then I assign the path of a jpeg image to the texture asset:
 
+<pre class="code>
 using (AppearanceAssetEditScope editScope = new AppearanceAssetEditScope(revitDocument))
 {
     Asset editableAsset = editScope.Start(assetElement.Id);
@@ -330,14 +236,19 @@ using (AppearanceAssetEditScope editScope = new AppearanceAssetEditScope(revitDo
     }
     editScope.Commit(true);
 }
+</pre>
 
 Now, the reason why I would call my solution 'hacky', is because of how I retrieve the assetElement.
 
-Instinctively, I would want to create a new, empty instance of Asset. Something like AppearanceAssetElement assetElement = AppearanceAssetElement.Create();
+Instinctively, I would want to create a new, empty instance of Asset. Something like
+
+<pre class="code>
+AppearanceAssetElement assetElement = AppearanceAssetElement.Create();
 
 However, this is not how Revit's material/texture api works. We can only use those materials/textures/etc. that are present in Revit's libraries. Therefore we can only make copies of existing ones:
 
-//Retrieve asset library from the application (this is the only source available; instantiating from zero is impossible)
+<pre class="code>
+// Retrieve asset library from the application (this is the only source available; instantiating from zero is impossible)
 IList<Asset> assetList = commandData.Application.Application.GetAssets(AssetType.Appearance);
 
 //Select arbitrary asset from library (200 works, not all do)
@@ -348,6 +259,7 @@ try
 {
     assetElement = AppearanceAssetElement.Create(revitDocument, someNewName, asset);
 }
+</pre>
 
 Yes, I really just randomly tried indices in that assetList until I found one that worked, and hardcoded that one in. Not all AppearanceAssets in the list have the necessary "generic_diffuse" assetProperty to which we can bind a texture, so we have to select one that does.
 
@@ -361,7 +273,7 @@ I hope this helps!
 
 ####<a name="4"></a> RVT Dashboard Data Access
 
-Some noters from an internal discussion on how to access data in RVT for a dashboard:
+Some notes from an internal discussion on how to access data in RVT for a dashboard:
 
 **Question:** I would like to collect data from Revit models for display in a dashboard.
 I thought of using the model derivative APIs in Forge to retrieve the data, or use DA4R since the Revit model must be opened to access the database.
