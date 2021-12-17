@@ -128,29 +128,31 @@ Extract from [RevitAPI.chm on GeometryInstance.GetInstanceGeometry](https://www.
 
 Here is a simple example demonstrated:
 
-/Users/jta/a/doc/revit/tbc/git/a/img/rpt_symb_vs_inst_geom_1.png
+<center>
+<img src="img/rpt_symb_vs_inst_geom_1.png" alt="Two beams of same family type" title="Two beams of same family type" width="600"/>
+<p style="font-size: 80%; font-style:italic">Two beams of same family type</p>
+</center>
 
-Two beams of same family type
-Two beams of same family type
+<center>
+<img src="img/rpt_symb_vs_inst_geom_2.png" alt="The short beam as id 427840" title="The short beam as id 427840" width="600"/>
+<p style="font-size: 80%; font-style:italic">The short beam as id 427840</p>
+</center>
 
-/Users/jta/a/doc/revit/tbc/git/a/img/rpt_symb_vs_inst_geom_2.png
+<center>
+<img src="img/rpt_symb_vs_inst_geom_3.png" alt="The long beam as id 427855" title="The long beam as id 427855" width="600"/>
+<p style="font-size: 80%; font-style:italic">The long beam as id 427855</p>
+</center>
 
-The short beam as id 427840
-The short beam as id 427840
+<center>
+<img src="img/rpt_symb_vs_inst_geom_4.png" alt="The FamilySymbol id 95037" title="The FamilySymbol id 95037" width="600"/>
+<p style="font-size: 80%; font-style:italic">The FamilySymbol id 95037</p>
+</center>
 
-/Users/jta/a/doc/revit/tbc/git/a/img/rpt_symb_vs_inst_geom_3.png
+If you check the bounding boxes extents for the two geometry symbols, you'll see they match the beam lengths.
 
-The long beam as id 427855
-The long beam as id 427855
+This gets further complicated with cuts, but it demonstrates that Revit is storing geometrical symbol variations differently to how we think of the type-to-instance relationships based on type and instance parameters.
 
-/Users/jta/a/doc/revit/tbc/git/a/img/rpt_symb_vs_inst_geom_4.png
-
-The FamilySymbol id 95037
-The FamilySymbol id 95037
-
-If you check the bounding boxes extents for the two geometry symbols you'll see they match the beam lengths.
-
-This gets further complicated with cuts but it demonstrates that Revit is storing geometrical symbol variations differently to how we think of the type instance relationships based on type and instance parameters.
+Many thanks to Richard for yet another insightful and illuminating explanation!
 
 ####<a name="3"></a>
 
