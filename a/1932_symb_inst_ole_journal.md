@@ -361,13 +361,28 @@ I hope this helps!
 
 ####<a name="4"></a> RVT Dashboard Data Access
 
-- how to access data in RVT for a dashboard
-https://autodesk.slack.com/archives/C0SR6NAP8/p1638915918163600
-[Q] I would like to collect data from Revit models for display in a dashboard.  I thought of using the model derivative APIs in Forge to retrieve the data, or use DA4R since the Revit model must be opened to access the database.  Well, this Apple team does not have access to Forge/DA4R and are asking for a way to read the data without Revit.  I let the team know that Revit must be used to unpack the database to make it useable to collect data from.  The reason for this is that much of the content in Revit is created on demand dynamically and not necessarily stored in the file database.
-Am I on the right track here?  Apple has mentioned to me that Safe Software has created a platform called FME that can run on a Mac and can collect the Revit model data needed.  How is it possible for the FME platform to read the contents like this?  I expect that there is a cloud service utilizing DA4R or similar to process the model, but wanted to check in here before pushing back on Apple's desire to engage consulting to build a data collection engine outside of Revit (because I do not believe it is possible).
-[A] RVT file format is a structured storage file, so some content can be pulled without opening the file directly, but you'd have to code up your own means of doing so. We don't support it directly in any way I know.
-Because of that format some data is quite easy to access (ie: Transmission data and basic file info, both of which can be read with tools like Structured Storage Viewer), but other aspects are more difficult (ie: how many light fixtures are in room number 2143, how many warnings are in the model, how many doors don't have a valid mark, etc.).
-Forge isn't necessarily a 'must use' as the data might be accessible via other means (ie: upload to BIM360 or use the online viewer; use the model checker which is coming to the web soon) or move to another file format for the final deliverable (ie: perhaps they should be mining data from the digital twin or an IFC instead of an RVT). Short of those two alterations it's likely best to stick with forge.
+Some noters from an internal discussion on how to access data in RVT for a dashboard:
+
+**Question:** I would like to collect data from Revit models for display in a dashboard.
+I thought of using the model derivative APIs in Forge to retrieve the data, or use DA4R since the Revit model must be opened to access the database.
+However, I do not have access to Forge or DA4R and would prefer a way to read the data without Revit.
+I assume that Revit must be used to unpack the database to make it useable to collect data from.
+Much of the content in Revit is created on demand dynamically and not necessarily stored in the file database.
+Am I on the right track here?
+I heard about some other app that can collect the Revit model data needed.
+How can it read the contents without Revit?
+Is there some cloud service utilizing DA4R or similar to process the model?
+
+**Answer:** The RVT file format is a structured storage file, so some content can be pulled without opening the file directly. 
+Because of that format, some data is quite easy to access, e.g., using transmission data and basic file info, both of which can be read with tools like Structured Storage Viewer:
+
+- [BasicFileInfo](https://www.revitapidocs.com/2022/475edc09-cee7-6ff1-a0fa-4e427a56262a.htm)
+- [TransmissionData](https://www.revitapidocs.com/2022/d78d1e9c-1cee-1336-88d5-b605dacd077d.htm)
+
+Other aspects are more difficult, e.g., how many light fixtures are in room number 2143, how many warnings are in the model, how many doors don't have a valid mark, etc.
+Forge isn't necessarily a 'must use' as the data might be accessible via other means, e.g, upload to BIM360 or use the online viewer; use the model checker, or move to another file format for the final deliverable.
+Also, might be able to mine data from the digital twin or an IFC instead of an RVT.
+Short of those two, it's likely best to stick with forge.
 
 ####<a name="5"></a> Marking and Retrieving a Custom Element
 
