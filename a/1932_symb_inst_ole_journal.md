@@ -118,7 +118,7 @@ These include two `UniqueId` values:
 - e558d96b-a4b0-449d-a84e-00d8c2768a5c-00000a38 &ndash; `CADLinkType`
 - e558d96b-a4b0-449d-a84e-00d8c2768a5c-00000c0f &ndash; `ImportInstance`
 
-For me, it seems like these two results were mixed up.
+For me, it seems like these two results are mixed up.
 Looks like `instanceRepresentation` refers to symbol geometry, while `symbolRepresentation` refers to instance geometry.
 
 **Answer:** Seems logical in a way, no?
@@ -134,22 +134,28 @@ Extract from [RevitAPI.chm on GeometryInstance.GetInstanceGeometry](https://www.
 
 > ...This method returns a copy of the Revit geometry. It is suitable for use in a tool which extracts geometry to another format or carries out a geometric analysis; however, because it returns a copy the references found in the geometry objects contained in this element are not suitable for creating new Revit elements referencing the original element (for example, dimensioning). Only the geometry returned by GetSymbolGeometry() with no transform can be used for that purpose."
 
-Here is a simple example demonstrating the relationships:
+Here is a simple example demonstrating these relationships, snooping the elements with RevitLookup:
 
 <center>
-<img src="img/rpt_symb_vs_inst_geom_1.png" alt="Two beams of same family type" title="Two beams of same family type" width="300"/> <!-- 367 -->
+<img src="img/rpt_symb_vs_inst_geom_1.png" alt="Two beams of same family type" title="Two beams of same family type" width="200"/> <!-- 367 -->
 <p style="font-size: 80%; font-style:italic">Two beams of same family type</p>
 </center>
+
+The short beam element id is 427840:
 
 <center>
 <img src="img/rpt_symb_vs_inst_geom_2.png" alt="The short beam as id 427840" title="The short beam as id 427840" width="600"/> <!-- 802 -->
 <p style="font-size: 80%; font-style:italic">The short beam as id 427840</p>
 </center>
 
+The long beam element id is 427855:
+
 <center>
 <img src="img/rpt_symb_vs_inst_geom_3.png" alt="The long beam as id 427855" title="The long beam as id 427855" width="600"/> <!-- 802 -->
 <p style="font-size: 80%; font-style:italic">The long beam as id 427855</p>
 </center>
+
+The `FamilySymbol` element id is 95037:
 
 <center>
 <img src="img/rpt_symb_vs_inst_geom_4.png" alt="The FamilySymbol id 95037" title="The FamilySymbol id 95037" width="600"/> <!-- 802 -->
@@ -188,13 +194,13 @@ I'm new to programming for Revit, so it's very possible I've missed something.
 
 I'm running / programming for Revit 2019 on Windows 10.
 
-**Answer:** What about creating a new material, setting its texture path, then making a `TopoSurface` and assigning the material to it?
-
-https://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html
+**Answer:** What about creating a new material and setting its texture path as described
+in [modifying material visual appearance](https://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html),
+then making a `TopoSurface` and assigning the material to it?
 
 I don't know how to adjust the UV mapping for the TopoSurface, but if it worked, you would see your satellite image in 3D.
 
-**Response:** Thanks to all for the replies!
+**Response:** Thanks to all for the replyies!
 It took some time to try out the proposed solution (accessing AppearanceElements is convoluted!), so that's why it took me this long to reply.
 
 In the end, though I had to work around some weird quirks with the API, adding the image as a texture to a topography through a material works great.
@@ -203,14 +209,14 @@ Thanks again for the suggestion, I couldn't have made it work without it.
 
 As mentioned, I ended up taking Revitalizer's suggested approach of creating a new material and setting its texture.
 
-<pre class="code>
+<pre class="code">
 &nbsp;&nbsp;Material&nbsp;<span style="color:#1f377f;">underlayMaterial</span>&nbsp;=&nbsp;Material.Create(
 &nbsp;&nbsp;&nbsp;&nbsp;revitDocument,&nbsp;materialName);
 </pre>
 
 To this material, I link a so-called AppearanceAsset:
 
-<pre class="code>
+<pre class="code">
 &nbsp;&nbsp;underlayMaterial.AppearanceAssetId&nbsp;=&nbsp;assetElement.Id;
 </pre>
 
@@ -218,7 +224,7 @@ To this material, I link a so-called AppearanceAsset:
 
 And then I assign the path of a jpeg image to the texture asset:
 
-<pre class="code>
+<pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">using</span>&nbsp;(AppearanceAssetEditScope&nbsp;<span style="color:#1f377f;">editScope</span>&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;AppearanceAssetEditScope(revitDocument))
 &nbsp;&nbsp;{
@@ -270,14 +276,14 @@ Now, the reason why I would call my solution 'hacky', is because of how I retrie
 
 Instinctively, I would want to create a new, empty instance of Asset. Something like
 
-<pre class="code>
+<pre class="code">
 &nbsp;&nbsp;AppearanceAssetElement&nbsp;<span style="color:#1f377f;">assetElement</span>
 &nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;AppearanceAssetElement.Create();
 </pre>
 
 However, this is not how Revit's material/texture api works. We can only use those materials/textures/etc. that are present in Revit's libraries. Therefore we can only make copies of existing ones:
 
-<pre class="code>
+<pre class="code">
 &nbsp;&nbsp;<span style="color:green;">//&nbsp;Retrieve&nbsp;asset&nbsp;library&nbsp;from&nbsp;the&nbsp;application</span>
 &nbsp;&nbsp;<span style="color:green;">//&nbsp;(this&nbsp;is&nbsp;the&nbsp;only&nbsp;source&nbsp;available;</span>
 &nbsp;&nbsp;<span style="color:green;">//&nbsp;instantiating&nbsp;from&nbsp;zero&nbsp;is&nbsp;impossible)</span>
