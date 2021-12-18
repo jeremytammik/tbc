@@ -45,7 +45,13 @@ twitter:
 
  with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; ...
+We close this year with an eclectic mix of topics
+&ndash; Symbol vs instance geometry clarification
+&ndash; Create new material with texture
+&ndash; RVT dashboard data access
+&ndash; Marking and retrieving a custom element
+&ndash; Advanced remote batch command processing
+&ndash; Midwinter break...
 
 linkedin:
 
@@ -60,7 +66,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Symbol, Instance, OLE, Journal
+### Symbol, Instance, Material, Data, Journal, Break
 
 This is probably my last post of the year, so let's wrap up with an eclectic mix of topics to close with:
 
