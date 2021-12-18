@@ -75,7 +75,7 @@ This is probably my last post of the year, so let's wrap up with an eclectic mix
 ####<a name="2"></a> Symbol vs Instance Geometry Clarification
 
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
-clarifies some aspects of symbol versus instance geometry iin an imported DWG file in 
+clarifies some aspects of symbol versus instance geometry in an imported DWG file in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [`GetInstanceGeometry` vs `GetSymbolGeometry`](https://forums.autodesk.com/t5/revit-api-forum/getinstancegeometry-vs-getsymbolgeometry/m-p/10819201):
 
@@ -122,11 +122,11 @@ For me, it seems like these two results are mixed up.
 Looks like `instanceRepresentation` refers to symbol geometry, while `symbolRepresentation` refers to instance geometry.
 
 **Answer:** Seems logical in a way, no?
-When you use symbol, it give the full lineage of symbol and instance of that symbol.
+When you use symbol, it gives the full lineage of symbol and instance of that symbol.
 When you use the copy (with method noted below), it just gives the symbol it was copied from.
 There is no actual instance for it, because that function just creates a copy at the time for you (is a helper method for specific purposes).
 
-Beyond CADLinks, you'll find that there are multiple version of symbol geometries for a type, i.e., there is often a symbol to represent each structural framing length (with such lengths being driven by instance variations not type variations).
+Beyond CADLinks, you'll find that there are multiple versions of symbol geometries for a type, i.e., there is often a symbol to represent each structural framing length (with such lengths being driven by instance variations, not type variations).
 So, equating symbol geometry to family symbols probably is confusing to start with.
 That is to say they are all different ids and at time of extraction the form of symbol geometry you get is going to be partly decided by the instance variations not just the type variations.
 
@@ -174,7 +174,7 @@ Harm van den Brand shares a new implementation of a suggestion by Rudi *Revitali
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [importing and displaying satellite images](https://forums.autodesk.com/t5/revit-api-forum/importing-and-displaying-satellite-images/m-p/10815534):
 
-I'm building an add-in for Revit and I would like to be able to import and display third-party satellite imagery in order to place buildings in their 'real' position.
+I'm building an add-in for Revit, and I would like to be able to import and display third-party satellite imagery in order to place buildings in their 'real' position.
 I would like to be able to do this in a 3D view, but I don't know how.
 
 The user workflow for my add-in is this:
@@ -185,7 +185,7 @@ The user workflow for my add-in is this:
 Essentially, my question is exactly [this one](), but instead doing that programmatically/automatically through an add-in. In that thread, a suggestion is made to create a decal with the desired image, but this does not seem to be supported through the API.
 
 Another approach I found is to use `PostCommand` to create and place decals, but these commands are apparently only executed after exiting the API context and only one at a time.
-As my add-in aims to perform a whole bunch of functionalities in one go, this seem ill-suited for my use case.
+As my add-in aims to perform a whole bunch of functionalities in one go, this seems ill-suited for my use case.
 It seems to be possible to chain a bunch of `PostCommand` calls, but this is a little 'hacky' and not recommended, especially for commercial use.
 
 Am I overlooking some existing functionality?
@@ -200,21 +200,21 @@ then making a `TopoSurface` and assigning the material to it?
 
 I don't know how to adjust the UV mapping for the TopoSurface, but if it worked, you would see your satellite image in 3D.
 
-**Response:** Thanks to all for the replyies!
+**Response:** Thanks to all for the replies!
 It took some time to try out the proposed solution (accessing AppearanceElements is convoluted!), so that's why it took me this long to reply.
 
-In the end, though I had to work around some weird quirks with the API, adding the image as a texture to a topography through a material works great.
+In the end, though I had to work around some weird quirks with the API.
 
-Thanks again for the suggestion, I couldn't have made it work without it.
+Adding the image as a texture to a topography through a material works great.
 
-As mentioned, I ended up taking Revitalizer's suggested approach of creating a new material and setting its texture.
+I ended up taking Revitalizer's suggested approach of creating a new material and setting its texture.
 
 <pre class="code">
 &nbsp;&nbsp;Material&nbsp;<span style="color:#1f377f;">underlayMaterial</span>&nbsp;=&nbsp;Material.Create(
 &nbsp;&nbsp;&nbsp;&nbsp;revitDocument,&nbsp;materialName);
 </pre>
 
-To this material, I link a so-called AppearanceAsset:
+To this material, I link a so-called `AppearanceAsset`:
 
 <pre class="code">
 &nbsp;&nbsp;underlayMaterial.AppearanceAssetId&nbsp;=&nbsp;assetElement.Id;
@@ -222,7 +222,7 @@ To this material, I link a so-called AppearanceAsset:
 
 (more on how I get this assetElement in a moment)
 
-And then I assign the path of a jpeg image to the texture asset:
+Then, I assign the path of a jpeg image to the texture asset:
 
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">using</span>&nbsp;(AppearanceAssetEditScope&nbsp;<span style="color:#1f377f;">editScope</span>&nbsp;
@@ -237,7 +237,8 @@ And then I assign the path of a jpeg image to the texture asset:
 &nbsp;&nbsp;&nbsp;&nbsp;Asset&nbsp;<span style="color:#1f377f;">connectedAsset</span>&nbsp;=&nbsp;assetProperty
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetConnectedProperty(0)&nbsp;<span style="color:blue;">as</span>&nbsp;Asset;
  
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Edit&nbsp;bitmap</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">// Edit&nbsp;bitmap</span>
+
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">if</span>&nbsp;(connectedAsset.Name&nbsp;==&nbsp;<span style="color:#a31515;">&quot;UnifiedBitmapSchema&quot;</span>)
 &nbsp;&nbsp;&nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AssetPropertyString&nbsp;<span style="color:#1f377f;">path</span>&nbsp;=&nbsp;connectedAsset
@@ -272,16 +273,19 @@ And then I assign the path of a jpeg image to the texture asset:
 &nbsp;&nbsp;}
 </pre>
 
-Now, the reason why I would call my solution 'hacky', is because of how I retrieve the assetElement.
+I find this a bit 'hacky' because of how I retrieve the assetElement.
 
-Instinctively, I would want to create a new, empty instance of Asset. Something like
+Instinctively, I would want to create a new, empty instance of Asset.
+  Something like:
 
 <pre class="code">
 &nbsp;&nbsp;AppearanceAssetElement&nbsp;<span style="color:#1f377f;">assetElement</span>
 &nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;AppearanceAssetElement.Create();
 </pre>
 
-However, this is not how Revit's material/texture api works. We can only use those materials/textures/etc. that are present in Revit's libraries. Therefore we can only make copies of existing ones:
+However, this is not how Revit's material/texture API works.
+We can only use those materials/textures/etc. that are present in Revit's libraries.
+Therefore, we can only make copies of existing ones:
 
 <pre class="code">
 &nbsp;&nbsp;<span style="color:green;">//&nbsp;Retrieve&nbsp;asset&nbsp;library&nbsp;from&nbsp;the&nbsp;application</span>
@@ -306,13 +310,16 @@ However, this is not how Revit's material/texture api works. We can only use tho
 
 Yes, I really just randomly tried indices in that assetList until I found one that worked, and hardcoded that one in. Not all AppearanceAssets in the list have the necessary "generic_diffuse" assetProperty to which we can bind a texture, so we have to select one that does.
 
-If you are developing your addin for external parties this is risky, because we can't ensure that the same libraries are available for any particular user. It's probably best to somehow filter for valid AppearanceAssets.
+If you are developing your addin for external parties, this is risky, because we can't ensure that the same libraries are available for any particular user.
+It's probably best to somehow filter for valid AppearanceAssets.
 
-Also, you can see that retrieving this appearanceAsset requires ExternalCommandData (which I named CommandData in the code given), which an addin retrieves via the 'Execute' method of a IExternalCommand-implementing class.
+Also, you can see that retrieving this appearanceAsset requires `ExternalCommandData` (which I named CommandData in the code given), which an addin retrieves via the 'Execute' method of an `IExternalCommand` implementing class.
 
 Also, remember to wrap most of these snippets in transactions.
 
 I hope this helps!
+
+Many thanks to Revitalizer for the good suggestion and to Harm for the implementation and notes.
 
 ####<a name="4"></a> RVT Dashboard Data Access
 
@@ -335,7 +342,7 @@ Because of that format, some data is quite easy to access, e.g., using transmiss
 - [TransmissionData](https://www.revitapidocs.com/2022/d78d1e9c-1cee-1336-88d5-b605dacd077d.htm)
 
 Other aspects are more difficult, e.g., how many light fixtures are in room number 2143, how many warnings are in the model, how many doors don't have a valid mark, etc.
-Forge isn't necessarily a 'must use' as the data might be accessible via other means, e.g, upload to BIM360 or use the online viewer; use the model checker, or move to another file format for the final deliverable.
+Forge isn't necessarily a 'must use' as the data might be accessible via other means, e.g., upload to BIM360 or use the online viewer; use the model checker, or move to another file format for the final deliverable.
 Also, might be able to mine data from the digital twin or an IFC instead of an RVT.
 Short of those two, it's likely best to stick with forge.
 
@@ -360,7 +367,7 @@ I considered storing it in my own settings file, but that doesn't work if the fi
 **Answer:** This is a prime case for [extensible storage](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.23) in my opinion.
 Make a new schema and save the `UniqueId` of the view into it.
 Users will delete that view, though, and if it doesn’t file into the project browser correctly, there will be push back.
-Expect to delete and recreate the view often (even mid session).
+Expect to delete and recreate the view often (even mid-session).
 Also, ensure that you have good product documentation on why this is in the file, and how it can be worked with, and the like.
 Otherwise you will have a LOT of support cases around the feature.
 
@@ -377,11 +384,11 @@ David Echols, Senior Programmer at Hankins & Anderson, Inc. shared some importan
 > This class explains a process to run external commands in batch mode from a central server to remote Revit application workstations.
 It covers how to use client and server applications that communicate with each other to manage Revit software on remote workstations with WCF (Windows Communication Foundation) services, examines how to pass XML command data to the Revit application to open a Revit model and initiate batch commands, shows a specific use case for batch export of DWG files for sheets, examines a flexible system for handling Revit dialog boxes on the fly with usage examples and code snippets, and discusses the failure processing API in the context of bypassing warning and error messages while custom commands are running. Finally, it shows you how to gracefully close both the open Revit model and the Revit application.
 
-- [Handout: *RevitJournals.pdf*](zip/RevitJournals.pdf)
+>    - [Handout: *RevitJournals.pdf*](zip/RevitJournals.pdf)
 
 ####<a name="7"></a> Midwinter Break
 
-We are nearing the middle of winter here on the northern hemisphere, and Autodesk has announced company holidays in the last days of the calnbedar year.
+We are nearing the middle of winter here on the northern hemisphere, and Autodesk is celebrating company holidays in the last days of the calendar year.
 
 I am looking forward to some peaceful time to recuperate during the end
 of [advent](https://en.wikipedia.org/wiki/Advent),
