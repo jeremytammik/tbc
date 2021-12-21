@@ -9,6 +9,7 @@
 
 twitter:
 
+Feedback appreciated on RevitTemplates update 1.7.0...
 
 &ndash; 
 ...
@@ -32,7 +33,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Roman [Nice3point](https://github.com/Nice3point) made
 huge contributions to RevitLookup in the past few months.
 
-He would now appreciate your feedback
+Today, on this shortest day of the year (up here in the northern hemisphere), he would appreciate your feedback
 on [update 1.7.0](https://github.com/Nice3point/RevitTemplates/discussions/19) of another of his projects,
 [RevitTemplates](https://github.com/Nice3point/RevitTemplates):
 
