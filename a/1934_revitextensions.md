@@ -57,55 +57,84 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Happy New Year and welcome to 2022!
 
-I spent New Year's day climbing the Windhauser Schafberg in warm and dry weather.
+I spent a pleasant New Year's day climbing the Wildhauser Schafberg in warm and dry weather.
 
 <center>
 <img src="img/143943_jeremygipfelfahnengallionsfigur.jpg" alt="Jeremy as figurehead on Wildhauser Schafberg" title="Jeremy as figurehead on Wildhauser Schafberg" width="400"/> <!-- 800 -->
 </center>
 
-A friend pointed out this rather humourous New Year's greeting that renders better in its original German version than in English &ndash; I find it very hard to translate:
+Afterwards, a friend pointed out this rather humourous New Year's greeting from 1883.
+It renders better in its original German version than in English &ndash; I find it very hard to translate:
 
 <p style="text-align: center; font-weight: bold">Neujahrsgebet</p>
 
 <p style="text-align:center">Herr, setze dem Überfluss Grenzen
-und lasse die Grenzen überflüssig werden.
-Lasse die Leute kein falsches Geld machen
-und auch Geld keine falschen Leute.
-Nimm den Ehefrauen das letzte Wort
-Und erinnere die Ehemänner an ihr erstes.
-Schenke unseren Freunden mehr Wahrheit
-und der Wahrheit mehr Freunde.
-Gib den Regierenden ein besseres Deutsch
-Und den Deutschen eine bessere Regierung.
-Herr, sorge dafür, dass wir alle in den Himmel kommen
-Aber nicht sofort!</p>
+<br/>und lasse die Grenzen überflüssig werden.
+<br/>Lasse die Leute kein falsches Geld machen
+<br/>und auch Geld keine falschen Leute.
+<br/>Nimm den Ehefrauen das letzte Wort
+<br/>Und erinnere die Ehemänner an ihr erstes.
+<br/>Schenke unseren Freunden mehr Wahrheit
+<br/>und der Wahrheit mehr Freunde.
+<br/>Gib den Regierenden ein besseres Deutsch
+<br/>Und den Deutschen eine bessere Regierung.
+<br/>Herr, sorge dafür, dass wir alle in den Himmel kommen
+<br/>Aber nicht sofort!</p>
 
 <p style="text-align:center; font-style: italic">Lord, please border abundance
-and make borders superfluous.
-Don't let people make bad money
-and money no bad people either.
-Take the last word from the wives
-And remind the husbands of their first.
-Give more truth to our friends
-and more friends to the truth.
-Give the rulers a better German
-And better rulers to the Germans.
-Lord, please may we all go to heaven
-&ndash; but not too soon!</p>
+<br/>and make borders superfluous.
+<br/>Don't let people make bad money
+<br/>and don't let money make bad people.
+<br/>Take the last word away from the wives
+<br/>And remind the husbands of their first.
+<br/>Give more truth to our friends
+<br/>and more friends to the truth.
+<br/>Give the rulers a better German
+<br/>And better rulers to the Germans.
+<br/>Lord, please may we all go to heaven
+<br/>but not right away!</p>
 
 <p style="text-align:right; font-style: italic">Parish priest Hermann Josef Kappen of Lamberti church in Münster, 1883</p>
 
 <center>
-<img src="img/neujahrsgruss_1883.jpg" alt="Neujahrsgruss 1883" title="Neujahrsgruss 1883" width="600"/> <!-- 1130 -->
+<img src="img/neujahrsgruss_1883.jpg" alt="Neujahrsgruss 1883" title="Neujahrsgruss 1883" width="500"/> <!-- 1130 -->
 </center>
 
 #### RevitExtensions
 
 In the last post of the previous year, I mentioned 
-Roman [Nice3point](https://github.com/Nice3point), his huge contributions to RevitLookup in the past few months,
+Roman [Nice3point](https://github.com/Nice3point), his huge contributions
+to [RevitLookup](https://github.com/jeremytammik/RevitLookup) in the past few months,
 his [RevitTemplates Update 1.7.0](https://thebuildingcoder.typepad.com/blog/2021/12/revittemplates-update-170.html)
-and invitation to provide feedback on them.
+and the invitation to provide feedback on them.
 
 Lets move into this new year with yet another contribution and invitation from Roman:
 
+Hi guys, it's time to pump the Revit API.
+I started developing a library that will make it easier to write code using extensions.
+In general, instead of `Method(Method(Method(Method(Method()))))`, you can write `Method.Method.Method.Method.Method`.
+And, of course, I added a couple of new methods and overloads that are not in the API.
+Working with the Ribbon and *Utils classes has been greatly simplified.
+If you have any suggestions for improving the API, write to me about it in
+the
 
+<a href="https://github.com/Nice3point/RevitExtensions" style="text-align:center">RevitExtensions GitHub repository</a>.
+
+> Improve your experience with Revit API now
+
+> Extensions minimize the writing of repetitive code, add new methods not included in the native Revit API, and also allow you to write chained methods without worrying about API versioning:
+
+> <pre class="code">
+  new ElementId(123469)
+    .ToElement(document)
+    .GetParameter(BuiltInParameter.DOOR_HEIGHT)
+    .AsDouble()
+    .ToMillimeters()
+    .Round()
+</pre>
+
+> Extensions include annotations to help ReShaper parse your code and signal when a method may return null or the value returned by the method is not used in your code.
+
+Many thanks again to Roman for all his tremendous work supporting and enhancing Revit API development!
+
+Happy New Year to all!
