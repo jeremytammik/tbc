@@ -34,8 +34,9 @@ twitter:
 
 Feedback appreciated on RevitTemplates update 1.7.0...
 
-&ndash; 
-...
+Off we go into a new adventurous year of BIM programming
+&ndash; Happy New Year
+&ndash; RevitExtensions...
 
 linkedin:
 
@@ -53,18 +54,23 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Happy New Year with RevitExtensions
 
-#### Happy New Year
+Off we go into a new adventurous year of BIM programming:
+
+- [Happy New Year](#2)
+- [RevitExtensions](#3)
+
+####<a name="2"></a> Happy New Year
 
 Happy New Year and welcome to 2022!
 
 I spent a pleasant New Year's Day climbing the Wildhauser Schafberg in warm and dry weather.
 
 <center>
-<img src="img/143943_jeremygipfelfahnengallionsfigur.jpg" alt="Jeremy as figurehead on Wildhauser Schafberg" title="Jeremy as figurehead on Wildhauser Schafberg" width="400"/> <!-- 800 -->
+<img src="img/143943_jeremygipfelfahnengallionsfigur.jpg" alt="Jeremy figurehead on Wildhauser Schafberg" title="Jeremy figurehead on Wildhauser Schafberg" width="300"/> <!-- 800 -->
 </center>
 
 Afterwards, a friend pointed out this rather humorous New Year's greeting from 1883.
-It renders better in its original German version than in English &ndash; I find it very hard to translate:
+It renders better in its original German version than in English:
 
 <p style="text-align: center; font-weight: bold">Neujahrsgebet</p>
 
@@ -100,7 +106,7 @@ It renders better in its original German version than in English &ndash; I find 
 <img src="img/neujahrsgruss_1883.jpg" alt="Neujahrsgruss 1883" title="Neujahrsgruss 1883" width="500"/> <!-- 1130 -->
 </center>
 
-#### RevitExtensions
+####<a name="3"></a> RevitExtensions
 
 In the last post of the previous year, I mentioned 
 Roman [Nice3point](https://github.com/Nice3point), his huge contributions
@@ -118,7 +124,7 @@ Working with the Ribbon and *Utils classes has been greatly simplified.
 If you have any suggestions for improving the API, write to me about it in
 the
 
-<a href="https://github.com/Nice3point/RevitExtensions" style="text-align:center">RevitExtensions GitHub repository</a>.
+<p style="text-align:center"><a href="https://github.com/Nice3point/RevitExtensions">RevitExtensions GitHub repository</a>.</p>
 
 > Improve your experience with Revit API now
 
@@ -137,4 +143,4 @@ the
 
 Many thanks again to Roman for all his tremendous work supporting and enhancing Revit API development!
 
-Happy New Year to all!
+And, again, Happy New Year to all!
