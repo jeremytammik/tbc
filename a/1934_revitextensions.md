@@ -57,13 +57,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Happy New Year and welcome to 2022!
 
-I spent a pleasant New Year's day climbing the Wildhauser Schafberg in warm and dry weather.
+I spent a pleasant New Year's Day climbing the Wildhauser Schafberg in warm and dry weather.
 
 <center>
 <img src="img/143943_jeremygipfelfahnengallionsfigur.jpg" alt="Jeremy as figurehead on Wildhauser Schafberg" title="Jeremy as figurehead on Wildhauser Schafberg" width="400"/> <!-- 800 -->
 </center>
 
-Afterwards, a friend pointed out this rather humourous New Year's greeting from 1883.
+Afterwards, a friend pointed out this rather humorous New Year's greeting from 1883.
 It renders better in its original German version than in English &ndash; I find it very hard to translate:
 
 <p style="text-align: center; font-weight: bold">Neujahrsgebet</p>
@@ -105,10 +105,10 @@ It renders better in its original German version than in English &ndash; I find 
 In the last post of the previous year, I mentioned 
 Roman [Nice3point](https://github.com/Nice3point), his huge contributions
 to [RevitLookup](https://github.com/jeremytammik/RevitLookup) in the past few months,
-his [RevitTemplates Update 1.7.0](https://thebuildingcoder.typepad.com/blog/2021/12/revittemplates-update-170.html)
+his [RevitTemplates update 1.7.0](https://thebuildingcoder.typepad.com/blog/2021/12/revittemplates-update-170.html)
 and the invitation to provide feedback on them.
 
-Lets move into this new year with yet another contribution and invitation from Roman:
+Let's move into this new year with yet another contribution and invitation from Roman:
 
 Hi guys, it's time to pump the Revit API.
 I started developing a library that will make it easier to write code using extensions.
@@ -133,7 +133,7 @@ the
     .Round()
 </pre>
 
-> Extensions include annotations to help ReShaper parse your code and signal when a method may return null or the value returned by the method is not used in your code.
+> Extensions include annotations to help ReShaper parse your code and signal when a method may return null, or the value returned by the method is not used in your code.
 
 Many thanks again to Roman for all his tremendous work supporting and enhancing Revit API development!
 
