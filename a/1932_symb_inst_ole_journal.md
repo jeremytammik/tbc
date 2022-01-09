@@ -55,7 +55,6 @@ We close this year with an eclectic mix of topics
 
 linkedin:
 
-
 Symbol vs instance geometry clarification, creating new material with texture, marking and retrieving a custom element and advanced remote batch command processing with the #RevitAPI 
 
 https://autode.sk/materialtexture
@@ -86,11 +85,11 @@ This is probably my last post of the year, so let's wrap up with an eclectic mix
 
 - [Symbol vs instance geometry clarification](#2)
 - [Create new material with texture](#3)
+    - [Updates from Devteam, Richard, and Harm](#3.2)
 - [RVT dashboard data access](#4)
 - [Marking and retrieving a custom element](#5)
 - [Advanced remote batch command processing](#6)
 - [Midwinter break](#7)
-
 
 ####<a name="2"></a> Symbol vs Instance Geometry Clarification
 
@@ -340,6 +339,59 @@ Also, remember to wrap most of these snippets in transactions.
 I hope this helps!
 
 Many thanks to Revitalizer for the good suggestion and to Harm for the implementation and notes.
+
+####<a name="3.2"></a> Updates from Devteam, Richard, and Harm
+
+<u>Richard</u> adds: You can find an asset that contains a certain named property via Linq e.g.:
+
+<pre class="code">
+Dim Assets As List(Of Visual.Asset) = app.Application.GetAssets(Visual.AssetType.Appearance)
+
+' Find an asset with a property matching Visual.Generic.GenericDiffuse
+
+Dim J0 = Assets.FirstOrDefault(Function(x) x.FindByName(Visual.Generic.GenericDiffuse) IsNot Nothing)
+</pre>
+
+This seems better than a fixed index since you don't know for sure how that number may change, e.g., if user manually adds an asset etc.
+
+Obviously, the Assets library is quite large to search but there are existing Materials and Assets in the document which can be duplicated instead.
+So, it is often better to know what you are looking for, e.g., load a Family with your known material and the Asset you want to manipulate (if you can't find it).
+Most materials will have the appearance asset with the bitmap property though.
+
+There is an example of this within `RevitAPI.chm` under `AppearanceAssetElement.Duplicate`.
+As noted, if it isn't there in the document then it is straightforward to load something with it to add it.
+
+The <u>development team</u> also responded, saying:
+
+An asset is a resource with economic value that an individual, corporation or country owns or controls with the expectation that it will provide a future benefit.
+
+In Revit, an (material) asset is owned by the libraries too, but currently the libraries are only data but not classes in code, so there's no way to create an asset from the libraries, but can only duplicate one from existing.
+ 
+The user's problems is trying to find an asset that can assign an image; I suggest below steps:
+ 
+- Duplicate a new asset (or material) from any existing ones that serves only for this purpose.
+- If the new asset contains "unified_bitmap", then change it as desired.
+- If not, then create a connected asset with AssetProperty.AddConnectedAsset() that should contains "unified_bitmap" in the schema.
+
+At last, exposing decal element to API should be the best way. (There may also contains some workaround or hacky way through external file mechanism, but I cannot confirm that.)
+  
+<u>Harm</u> responds:
+
+Thanks for the update.
+If I understand correctly, my solution follows steps 1 and 2 of the dev-team's suggestion.
+So it's good to know I'm not doing anything too weird.
+Except for selecting a hardcoded element from the library by hand, but I'll happily use @RPTHOMAS108 's suggestion of selecting one through list filtering.
+It'll prevent any errors that would occur if the asset libraries ever were to change.
+
+Always good to go through old code again and find yourself thinking "this could be improved".
+
+I'm satisfied with how I currently create/copy an asset (again, step 1 and 2).
+It's just that when I first started digging through the api to get to the functionality I needed, it was a bit like groping around in the dark.
+My first instinct when it came to the `AppearanceAsset` part of the problem, at the time, was to instantiate a new one.
+It wasn't immediately clear to me that I couldn't do that, but that I could duplicate one.
+I learn more with every feature I implement &nbsp; :-)
+
+That having been said, things like your blog and the documentation at revitapidocs have helped out immensely, with this problem and with others, so thank you very much!
 
 ####<a name="4"></a> RVT Dashboard Data Access
 
