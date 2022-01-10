@@ -6,6 +6,19 @@
 
 <!---
 
+- get text font outline geometry from TextNode in custom export
+  Converting text to geometry when performing a 2d view export
+  https://forums.autodesk.com/t5/revit-api-forum/converting-text-to-geometry-when-performing-a-2d-view-export/m-p/10201712#M54774
+  /Users/jta/a/doc/revit/tbc/git/a/img/text_geometry.png
+
+- retrieve 2D geometry of generic element
+  View Reference Location
+  https://forums.autodesk.com/t5/revit-api-forum/view-reference-location/m-p/10867150
+
+- detailed wall layer geometry
+  Retrieving Detailed Wall Layer Geometry
+  https://forums.autodesk.com/t5/revit-api-forum/retrieving-detailed-wall-layer-geometry/m-p/10865604
+
 twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
@@ -27,7 +40,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### 
+### Detailed Wall Layer and 2D Text Geometry
+
 
 ####<a name="2"></a> 
 
