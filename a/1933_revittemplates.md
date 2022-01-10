@@ -9,7 +9,7 @@
 
 twitter:
 
-Feedback appreciated on RevitTemplates update 1.7.0...
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
 &ndash; 
 ...

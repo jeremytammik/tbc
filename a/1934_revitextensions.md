@@ -32,7 +32,10 @@ Extensions include annotations to help ReShaper parse your code and signal when 
 
 twitter:
 
-Feedback appreciated on RevitTemplates update 1.7.0...
+
+twitter:
+
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
 Off we go into a new adventurous year of BIM programming
 &ndash; Happy New Year
