@@ -35,7 +35,7 @@ twitter:
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+RevitExtensions simplifies and enhances #RevitAPI coding with extension methods, greatly simplified Ribbon and *Utils classes and other enhancements #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/rvtextensions
 
 Off we go into a new adventurous year of BIM programming
 &ndash; Happy New Year
