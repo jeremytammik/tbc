@@ -16,6 +16,9 @@ RevitTemplates update adds numerous new features for the #RevitAPI @AutodeskForg
 
 linkedin:
 
+RevitTemplates update adds numerous new features for the #RevitAPI
+
+https://bit.ly/rvttemplates
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 

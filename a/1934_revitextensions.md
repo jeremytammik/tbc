@@ -43,6 +43,14 @@ Off we go into a new adventurous year of BIM programming
 
 linkedin:
 
+RevitExtensions simplifies and enhances #RevitAPI coding with extension methods, greatly simplified Ribbon and *Utils classes and other enhancements
+
+https://bit.ly/rvtextensions
+
+Off we go into a new adventurous year of BIM programming:
+
+- Happy New Year
+- RevitExtensions...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
