@@ -178,7 +178,7 @@ Use the same to find out whether the landing or run faces are painted or not.
 Many thanks to Bruce for this simple and effective solution.
 We have not finished discussing this issue yet, so please refer to the discussion thread for more updates.
 
-####<a name="4"></a> Ray Tracing vs Location to Find Beams Intersecting Columns
+####<a name="3"></a> Ray Tracing vs Location to Find Beams Intersecting Columns
 
 Another recurring topic is how to find intersecting elements.
 
@@ -567,7 +567,7 @@ for the non-raytracing suggestion!
 
 oops... this video was taken down from youtube again...
 
-####<a name="5"></a> Play Doom on Wireless Lamp
+####<a name="4"></a> Play Doom on Wireless Lamp
 
 Computers are still getting smaller and more powerful.
 

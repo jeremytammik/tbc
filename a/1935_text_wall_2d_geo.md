@@ -15,6 +15,9 @@
   View Reference Location
   https://forums.autodesk.com/t5/revit-api-forum/view-reference-location/m-p/10867150
 
+- The height and width of the dimension text
+  https://forums.autodesk.com/t5/revit-api-forum/the-height-and-width-of-the-dimension-text/m-p/10873262
+
 - detailed wall layer geometry
   Retrieving Detailed Wall Layer Geometry
   https://forums.autodesk.com/t5/revit-api-forum/retrieving-detailed-wall-layer-geometry/m-p/10865604
