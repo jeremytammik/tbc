@@ -78,13 +78,30 @@ for [converting text to geometry when performing a 2D view export](https://forum
 - Retrieve 2D geometry of generic element, explained in the question
 on [view reference location](https://forums.autodesk.com/t5/revit-api-forum/view-reference-location/m-p/10867150)
 
-
 ####<a name="3"></a> Determine Text Font Geometry
 
+Haroon Haider describes a successful approach to access text font geometry in their thread
+on [converting text to geometry when performing a 2D view export](https://forums.autodesk.com/t5/revit-api-forum/converting-text-to-geometry-when-performing-a-2d-view-export/m-p/10201712):
+
+**Question:** We have been able to get access to the lines, grids, annotations and other basic elements of a 2D view using the `IExportContext2D` interface.
+Is there a way to convert the annotation text from strings to geometry using Revit API similar to how you can do in AutoCAD? 
+I'm looking to get something like this:
 
 <center>
-<img src="img/" alt="" title="" width="300"/> <!-- 800 -->
+<img src="img/text_font_geom.png" alt="Text font geometry" title="Text font geometry" width="223"/> <!-- 223 -->
 </center>
+
+**Answer:**: I ended up getting what I need by processing a `TextNode` from the export context method `OnText` call.
+There is enough information in the text node class to be able to convert it to a `GraphicsPath` and pull out the geometry from there.
+
+Many thanks to Haroon for sharing this!
+
+
+
+
+
+
+
 
 
 
