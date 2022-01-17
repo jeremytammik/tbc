@@ -45,8 +45,42 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Detailed Wall Layer and 2D Text Geometry
 
+Determining the extents of a text element has been a recurring and challenging task with several tricky solutions suggested in the past.
 
-####<a name="2"></a> 
+The advent of the 2D custom exporter brings new possibilities to address this.
+
+
+<!-- 0610 0646 1223 1440 1517 -->
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/07/text-size.html">Text Size</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/09/textnote-lost-in-space.html">TextNote Lost in Space?</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/10/new-text-note-and-text-width-calculation.html">New Text Note and Text Width Calculation</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/05/idea-station-and-textnote-bounding-box.html">TextNote Bounding Box</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/01/textnote-rotation-forge-devcon-tensorflow-and-keras.html">TextNote Rotation</a></li>
+</ul>
+
+####<a name="2"></a> Retrieve Dimension Text Height and Width
+
+The latest question in this series asks how to determine
+[the height and width of the dimension text ](https://forums.autodesk.com/t5/revit-api-forum/the-height-and-width-of-the-dimension-text/m-p/10873262):
+
+**Question: When dimension text overlaps, I want to move one of the dimensions to avoid the overlap.
+My idea is to calculate the rectangular border of the text through the position of the text and the width and height of the text, and then judge whether the rectangular borders intersect.
+So, how to calculate the width and height of dimension text?
+
+**Answer:** That should be possible using the approaches described in these two other recent threads:
+
+Look at these two recent threads here in the forum:
+
+- Get the text font outline geometry from the `TextNode` in a 2D custom export as described
+for [converting text to geometry when performing a 2D view export](https://forums.autodesk.com/t5/revit-api-forum/converting-text-to-geometry-when-performing-a-2d-view-export/m-p/10201712)
+- Retrieve 2D geometry of generic element, explained in the question
+on [view reference location](https://forums.autodesk.com/t5/revit-api-forum/view-reference-location/m-p/10867150)
+
+
+####<a name="3"></a> Determine Text Font Geometry
+
 
 <center>
 <img src="img/" alt="" title="" width="300"/> <!-- 800 -->
