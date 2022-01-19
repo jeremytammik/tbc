@@ -20,7 +20,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/2dtextgeo
+The 2D custom exporter provides a basis for a powerful approach to access detailed 2D geometry, e.g., retrieve dimension text height and width, determine text font geometry and retrieve 2D geometry of any element in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/2dtextgeo
 
 The 2D custom exporter provides a basis for a new and much more powerful approach to access detailed 2D geometry
 &ndash; Retrieve dimension text height and width
