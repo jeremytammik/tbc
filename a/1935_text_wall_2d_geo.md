@@ -22,8 +22,10 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash;
-...
+The 2D custom exporter provides a basis for a new and much more powerful approach to access detailed 2D geometry
+&ndash; Retrieve dimension text height and width
+&ndash; Determine text font geometry
+&ndash; Retrieve 2D geometry of any element...
 
 linkedin:
 
@@ -38,7 +40,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Detailed Wall Layer and 2D Text Geometry
+### Detailed 2D Text and Other Element Geometry
 
 Determining the extents of a text element has been a recurring and challenging task with several tricky solutions suggested in the past, e.g.:
 
@@ -52,11 +54,12 @@ Determining the extents of a text element has been a recurring and challenging t
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/01/textnote-rotation-forge-devcon-tensorflow-and-keras.html">TextNote Rotation</a></li>
 </ul>
 
-The advent of the 2D custom exporter provides a basis for a new and much more powerful approach to address this:
+The 2D custom exporter provides a basis for a much more powerful approach to address this, as already discussed once way back then 
+in [using a custom exporter for 2D](https://thebuildingcoder.typepad.com/blog/2015/11/au-begins-and-using-a-custom-exporter-for-2d.html#2):
 
-- [Retrieve Dimension Text Height and Width](#2)
-- [Determine Text Font Geometry](#3)
-- [Retrieve 2D Geometry of any Element](#4)
+- [Retrieve dimension text height and width](#2)
+- [Determine text font geometry](#3)
+- [Retrieve 2D geometry of any element](#4)
 
 ####<a name="2"></a> Retrieve Dimension Text Height and Width
 
