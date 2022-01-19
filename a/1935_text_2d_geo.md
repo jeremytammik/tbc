@@ -20,7 +20,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/2dtextgeo
 
 The 2D custom exporter provides a basis for a new and much more powerful approach to access detailed 2D geometry
 &ndash; Retrieve dimension text height and width
@@ -64,7 +64,7 @@ in [using a custom exporter for 2D](https://thebuildingcoder.typepad.com/blog/20
 ####<a name="2"></a> Retrieve Dimension Text Height and Width
 
 The latest question in this series asks how to determine
-[the height and width of the dimension text ](https://forums.autodesk.com/t5/revit-api-forum/the-height-and-width-of-the-dimension-text/m-p/10873262):
+[the height and width of the dimension text](https://forums.autodesk.com/t5/revit-api-forum/the-height-and-width-of-the-dimension-text/m-p/10873262):
 
 **Question:** When dimension text overlaps, I want to move one of the dimensions to avoid the overlap.
 My idea is to calculate the rectangular border of the text through the position of the text and the width and height of the text, and then judge whether the rectangular borders intersect.
