@@ -18,10 +18,6 @@
   View Reference Location
   https://forums.autodesk.com/t5/revit-api-forum/view-reference-location/m-p/10867150
 
-- detailed wall layer geometry
-  Retrieving Detailed Wall Layer Geometry
-  https://forums.autodesk.com/t5/revit-api-forum/retrieving-detailed-wall-layer-geometry/m-p/10865604
-
 twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
@@ -129,175 +125,171 @@ I would do the latter as it gives you more control.
 Note that this will happen regardless of what you set for `RenderNodeAction` in `OnElementBegin2D`.
 The best way to avoid calling `OnText` for text elements you are not interested in is to do as follows:
 
-- During OnElementBegin2d store the ElemendId as a variable
-- During OnElementEnd2d set the ElementId variable to ElementId.InvalidElementId
-- During OnText exit the sub if variable is not set to Elementid.InvalidElementId
+- During `OnElementBegin2d`, store the `ElemendId` as a variable
+- During `OnElementEnd2d` set the `ElementId` variable to `InvalidElementId`
+- During `OnText` exit the sub if variable is not set to `InvalidElementId`
 
-To export text you need to set `Export2DIncludingAnnotationObjects` to true.
+To export text, you also need to set `Export2DIncludingAnnotationObjects` to true.
 
+I'm finding the best approach is to implement `IExportContext2D` via a general class and then inherit that.
+This avoids having to implement all the members each time and you can build in some filtering similar to above:
 
-I'm finding the best approach is to implement IExportContext2D via a general class and then inherit that. This then avoids having to implement all the members each time and you can build in some filtering similar to above:
-
+<pre class="code">
 Imports Autodesk.Revit.DB
 
 Public Class RT_ExportContext2d_Limited
-    Implements IExportContext2D
+  Implements IExportContext2D
 
-    Private IntDoc As Document = Nothing
-    Private FilterEIDs As List(Of ElementId) = Nothing
-    Private IntCurrentEID As ElementId = ElementId.InvalidElementId
+  Private IntDoc As Document = Nothing
+  Private FilterEIDs As List(Of ElementId) = Nothing
+  Private IntCurrentEID As ElementId = ElementId.InvalidElementId
 
-    Public Property DefaultAction As RenderNodeAction = RenderNodeAction.Proceed
+  Public Property DefaultAction As RenderNodeAction = RenderNodeAction.Proceed
 
-    Public Sub New(D As Document, Optional TargetElementIds As List(Of ElementId) = Nothing)
-        FilterEIDs = TargetElementIds
-        IntDoc = D
-    End Sub
+  Public Sub New(D As Document, Optional TargetElementIds As List(Of ElementId) = Nothing)
+    FilterEIDs = TargetElementIds
+    IntDoc = D
+  End Sub
 
-    Public Overridable Function Start() As Boolean Implements IExportContext.Start
-        Return True
-    End Function
-    Public Overridable Sub Finish() Implements IExportContext.Finish
-    End Sub
-    Public Overridable Function IsCanceled() As Boolean Implements IExportContext.IsCanceled
-        Return False
-    End Function
+  Public Overridable Function Start() As Boolean Implements IExportContext.Start
+    Return True
+  End Function
+  Public Overridable Sub Finish() Implements IExportContext.Finish
+  End Sub
+  Public Overridable Function IsCanceled() As Boolean Implements IExportContext.IsCanceled
+    Return False
+  End Function
 
 #Region "OnBegins"
-    Public Overridable Function OnViewBegin(node As ViewNode) As RenderNodeAction Implements IExportContext.OnViewBegin
-        Return DefaultAction
-    End Function
-    Public Function OnElementBegin2D(node As ElementNode) As RenderNodeAction Implements IExportContext2D.OnElementBegin2D
-        IntCurrentEID = node.ElementId
+  Public Overridable Function OnViewBegin(node As ViewNode) As RenderNodeAction Implements IExportContext.OnViewBegin
+    Return DefaultAction
+  End Function
+  Public Function OnElementBegin2D(node As ElementNode) As RenderNodeAction Implements IExportContext2D.OnElementBegin2D
+    IntCurrentEID = node.ElementId
 
-        If FilterEIDs IsNot Nothing Then
-            If FilterEIDs.Contains(node.ElementId) Then
-                Return RenderNodeAction.Proceed
-            Else
-                Return RenderNodeAction.Skip
-            End If
-        Else
-            Return RenderNodeAction.Proceed
-        End If
+    If FilterEIDs IsNot Nothing Then
+      If FilterEIDs.Contains(node.ElementId) Then
+        Return RenderNodeAction.Proceed
+      Else
+        Return RenderNodeAction.Skip
+      End If
+    Else
+      Return RenderNodeAction.Proceed
+    End If
 
-        OnElementBegin2D_Overridable(node)
-    End Function
-    Public Overridable Sub OnElementBegin2D_Overridable(node As ElementNode)
-    End Sub
+    OnElementBegin2D_Overridable(node)
+  End Function
+  Public Overridable Sub OnElementBegin2D_Overridable(node As ElementNode)
+  End Sub
 
-    Public Function OnElementBegin(elementId As ElementId) As RenderNodeAction Implements IExportContext.OnElementBegin
-        'Never called for 2D export
-        Return DefaultAction
-    End Function
-    Public Function OnInstanceBegin(node As InstanceNode) As RenderNodeAction Implements IExportContext.OnInstanceBegin
-        Return DefaultAction
-    End Function
-    Public Function OnFaceBegin(node As FaceNode) As RenderNodeAction Implements IExportContext.OnFaceBegin
-        Return DefaultAction
-    End Function
-    Public Overridable Function OnFaceEdge2D(node As FaceEdgeNode) As RenderNodeAction Implements IExportContext2D.OnFaceEdge2D
-        Return DefaultAction
-    End Function
+  Public Function OnElementBegin(elementId As ElementId) As RenderNodeAction Implements IExportContext.OnElementBegin
+    'Never called for 2D export
+    Return DefaultAction
+  End Function
+  Public Function OnInstanceBegin(node As InstanceNode) As RenderNodeAction Implements IExportContext.OnInstanceBegin
+    Return DefaultAction
+  End Function
+  Public Function OnFaceBegin(node As FaceNode) As RenderNodeAction Implements IExportContext.OnFaceBegin
+    Return DefaultAction
+  End Function
+  Public Overridable Function OnFaceEdge2D(node As FaceEdgeNode) As RenderNodeAction Implements IExportContext2D.OnFaceEdge2D
+    Return DefaultAction
+  End Function
 
-    Public Function OnLinkBegin(node As LinkNode) As RenderNodeAction Implements IExportContext.OnLinkBegin
-        Return DefaultAction
-    End Function
+  Public Function OnLinkBegin(node As LinkNode) As RenderNodeAction Implements IExportContext.OnLinkBegin
+    Return DefaultAction
+  End Function
 
 #End Region
 
 #Region "OnFunctions_Returns"
-    Public Overridable Function OnFaceSilhouette2D(node As FaceSilhouetteNode) As RenderNodeAction Implements IExportContext2D.OnFaceSilhouette2D
-        Return DefaultAction
-    End Function
-    Public Overridable Function OnCurve(node As CurveNode) As RenderNodeAction Implements IExportContextBase.OnCurve
-        Return DefaultAction
-    End Function
-    Public Overridable Function OnPolyline(node As PolylineNode) As RenderNodeAction Implements IExportContextBase.OnPolyline
-        Return DefaultAction
-    End Function
+  Public Overridable Function OnFaceSilhouette2D(node As FaceSilhouetteNode) As RenderNodeAction Implements IExportContext2D.OnFaceSilhouette2D
+    Return DefaultAction
+  End Function
+  Public Overridable Function OnCurve(node As CurveNode) As RenderNodeAction Implements IExportContextBase.OnCurve
+    Return DefaultAction
+  End Function
+  Public Overridable Function OnPolyline(node As PolylineNode) As RenderNodeAction Implements IExportContextBase.OnPolyline
+    Return DefaultAction
+  End Function
 #End Region
 
 #Region "OnEnds_NoReturns"
-    Public Sub OnElementEnd2D(node As ElementNode) Implements IExportContext2D.OnElementEnd2D
-        IntCurrentEID = Nothing
-        OnElementEnd2D_Overridable(node)
-    End Sub
-    Public Overridable Sub OnElementEnd2D_Overridable(node As ElementNode)
-    End Sub
+  Public Sub OnElementEnd2D(node As ElementNode) Implements IExportContext2D.OnElementEnd2D
+    IntCurrentEID = Nothing
+    OnElementEnd2D_Overridable(node)
+  End Sub
+  Public Overridable Sub OnElementEnd2D_Overridable(node As ElementNode)
+  End Sub
 
-    Public Overridable Sub OnViewEnd(elementId As ElementId) Implements IExportContext.OnViewEnd
-    End Sub
-    Public Sub OnElementEnd(elementId As ElementId) Implements IExportContext.OnElementEnd
-    End Sub
+  Public Overridable Sub OnViewEnd(elementId As ElementId) Implements IExportContext.OnViewEnd
+  End Sub
+  Public Sub OnElementEnd(elementId As ElementId) Implements IExportContext.OnElementEnd
+  End Sub
 
-    Public Overridable Sub OnInstanceEnd(node As InstanceNode) Implements IExportContext.OnInstanceEnd
-    End Sub
-    Public Overridable Sub OnLinkEnd(node As LinkNode) Implements IExportContext.OnLinkEnd
-    End Sub
-    Public Overridable Sub OnFaceEnd(node As FaceNode) Implements IExportContext.OnFaceEnd
-    End Sub
+  Public Overridable Sub OnInstanceEnd(node As InstanceNode) Implements IExportContext.OnInstanceEnd
+  End Sub
+  Public Overridable Sub OnLinkEnd(node As LinkNode) Implements IExportContext.OnLinkEnd
+  End Sub
+  Public Overridable Sub OnFaceEnd(node As FaceNode) Implements IExportContext.OnFaceEnd
+  End Sub
 #End Region
 
 #Region "OnSubs_NoReturns"
-    Public Overridable Sub OnLineSegment(segment As LineSegment) Implements IExportContextBase.OnLineSegment
-    End Sub
-    Public Overridable Sub OnPolylineSegments(segments As PolylineSegments) Implements IExportContextBase.OnPolylineSegments
-    End Sub
-    Public Sub OnText(node As TextNode) Implements IExportContextBase.OnText
-        'For tags etc. some calls to this will be during on instance
-        'e.g. fixed text within family
-        'Some call will be outside OnInstance but before OnElementEnd2D of associated element
-        'e.g. tag values (variable text).
+  Public Overridable Sub OnLineSegment(segment As LineSegment) Implements IExportContextBase.OnLineSegment
+  End Sub
+  
+  Public Overridable Sub OnPolylineSegments(segments As PolylineSegments) Implements IExportContextBase.OnPolylineSegments
+  End Sub
+  
+  Public Sub OnText(node As TextNode) Implements IExportContextBase.OnText
+    'For tags etc. some calls to this will be during on instance
+    'e.g. fixed text within family
+    'Some call will be outside OnInstance but before OnElementEnd2D of associated element
+    'e.g. tag values (variable text).
 
-        If IntCurrentEID = ElementId.InvalidElementId Then Exit Sub Else
-        OnText_Overridable(node)
-    End Sub
+    If IntCurrentEID = ElementId.InvalidElementId Then Exit Sub Else
+    OnText_Overridable(node)
+  End Sub
 
-    Public Overridable Sub OnText_Overridable(node As TextNode)
-    End Sub
+  Public Overridable Sub OnText_Overridable(node As TextNode)
+  End Sub
 
-    Public Overridable Sub OnRPC(node As RPCNode) Implements IExportContext.OnRPC
-    End Sub
-    Public Overridable Sub OnLight(node As LightNode) Implements IExportContext.OnLight
-    End Sub
-    Public Overridable Sub OnMaterial(node As MaterialNode) Implements IExportContext.OnMaterial
-    End Sub
-    Public Overridable Sub OnPolymesh(node As PolymeshTopology) Implements IExportContext.OnPolymesh
-    End Sub
+  Public Overridable Sub OnRPC(node As RPCNode) Implements IExportContext.OnRPC
+  End Sub
+  Public Overridable Sub OnLight(node As LightNode) Implements IExportContext.OnLight
+  End Sub
+  Public Overridable Sub OnMaterial(node As MaterialNode) Implements IExportContext.OnMaterial
+  End Sub
+  Public Overridable Sub OnPolymesh(node As PolymeshTopology) Implements IExportContext.OnPolymesh
+  End Sub
 #End Region
 
 End Class
+</pre>
 
 A lot of the members are not called for the 2D scenario.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 6
-josh.roth.MEI
- Enthusiast josh.roth.MEI in reply to: RPTHOMAS108
-‎2022-01-09 08:40 AM 
-Thanks so much! That's a clever implementation of IExportContext2d. Appreciate the help!
+Here is a correction required to `OnText`, i.e., check the list of filtered contains the current id.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 6 OF 6
-RPTHOMAS108
- Advisor RPTHOMAS108 in reply to: josh.roth.MEI
-‎2022-01-09 03:33 PM 
-Thanks, there is just this below correction required to OnText i.e. check the list of filtered contains the current id.
-
+<pre class="code">
  Public Sub OnText(node As TextNode) Implements IExportContextBase.OnText
-        If FilterEIDs IsNot Nothing Then
-            If FilterEIDs.Contains(IntCurrentEID) = False Then
-                Exit Sub
-            End If
-        End If
+    If FilterEIDs IsNot Nothing Then
+      If FilterEIDs.Contains(IntCurrentEID) = False Then
+        Exit Sub
+      End If
+    End If
 
-        OnText_Overridable(node)
+    OnText_Overridable(node)
 End Sub
+</pre>
 
 The best way to understand the order of the exporter method calls is to log them.
 
-https://youtu.be/glQjCKAI4gA
+**Response:** Thanks so much!
+That's a clever implementation of `IExportContext2d`.
+Appreciate the help!
+
+Many thanks to Richard for sharing this!
+
+
