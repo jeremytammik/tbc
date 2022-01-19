@@ -135,7 +135,7 @@ contact me: 1056291511@qq.com
 
 #### <a name="4"></a>Insight into Insight
 
-An email conversation with a colleague of mine provides some insight on Insight, including links to learning materials and new features added in 2020.1 to get an idea about shat is going on in this area:
+An email conversation with a colleague of mine provides some insight on Insight, including links to learning materials and new features added in 2020.1 to get an idea about what is going on in this area:
 
 **Question:** Our MEP design team is really interested in Insight.
 Can you provide a demonstration of it?
