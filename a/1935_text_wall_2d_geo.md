@@ -54,6 +54,10 @@ Determining the extents of a text element has been a recurring and challenging t
 
 The advent of the 2D custom exporter provides a possibility for a nbew approach to address this:
 
+- [Retrieve Dimension Text Height and Width](#2)
+- [Determine Text Font Geometry](#3)
+- [Retrieve 2D Geometry of any Element](#4)
+
 ####<a name="2"></a> Retrieve Dimension Text Height and Width
 
 The latest question in this series asks how to determine
@@ -91,9 +95,10 @@ There is enough information in the text node class to be able to convert it to a
 
 Many thanks to Haroon for sharing this!
 
-####<a name="4"></a> 
+####<a name="4"></a> Retrieve 2D Geometry of any Element
 
-Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas shares a generic solution to retrieve the 2D geometry of any element in the thread 
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+shares a generic solution to retrieve the 2D geometry of any element in the thread 
 on [view reference location](https://forums.autodesk.com/t5/revit-api-forum/view-reference-location/m-p/10867150):
 
 **Question:** I am making a simple tool to add a leader annotation symbol to a View Reference, but have run into a bit of an issue.
