@@ -63,7 +63,7 @@ The advent of the 2D custom exporter provides a basis for a new and much more po
 The latest question in this series asks how to determine
 [the height and width of the dimension text ](https://forums.autodesk.com/t5/revit-api-forum/the-height-and-width-of-the-dimension-text/m-p/10873262):
 
-**Question: When dimension text overlaps, I want to move one of the dimensions to avoid the overlap.
+**Question:** When dimension text overlaps, I want to move one of the dimensions to avoid the overlap.
 My idea is to calculate the rectangular border of the text through the position of the text and the width and height of the text, and then judge whether the rectangular borders intersect.
 So, how to calculate the width and height of dimension text?
 
@@ -90,7 +90,7 @@ I'm looking to get something like this:
 <img src="img/text_font_geom.png" alt="Text font geometry" title="Text font geometry" width="223"/> <!-- 223 -->
 </center>
 
-**Answer:**: I ended up getting what I need by processing a `TextNode` from the export context method `OnText` call.
+**Answer:** I ended up getting what I need by processing a `TextNode` from the export context method `OnText` call.
 There is enough information in the text node class to be able to convert it to a `GraphicsPath` and pull out the geometry from there.
 
 Many thanks to Haroon for sharing this!
