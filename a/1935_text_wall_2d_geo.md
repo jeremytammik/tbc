@@ -45,10 +45,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Detailed Wall Layer and 2D Text Geometry
 
-Determining the extents of a text element has been a recurring and challenging task with several tricky solutions suggested in the past.
-
-The advent of the 2D custom exporter brings new possibilities to address this.
-
+Determining the extents of a text element has been a recurring and challenging task with several tricky solutions suggested in the past, e.g.:
 
 <!-- 0610 0646 1223 1440 1517 -->
 
@@ -59,6 +56,10 @@ The advent of the 2D custom exporter brings new possibilities to address this.
 <li><a href="http://thebuildingcoder.typepad.com/blog/2016/05/idea-station-and-textnote-bounding-box.html">TextNote Bounding Box</a></li>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2017/01/textnote-rotation-forge-devcon-tensorflow-and-keras.html">TextNote Rotation</a></li>
 </ul>
+
+The advent of the 2D custom exporter provides a possibility for a nbew approach to address this:
+
+
 
 ####<a name="2"></a> Retrieve Dimension Text Height and Width
 
@@ -77,6 +78,7 @@ Look at these two recent threads here in the forum:
 for [converting text to geometry when performing a 2D view export](https://forums.autodesk.com/t5/revit-api-forum/converting-text-to-geometry-when-performing-a-2d-view-export/m-p/10201712)
 - Retrieve 2D geometry of generic element, explained in the question
 on [view reference location](https://forums.autodesk.com/t5/revit-api-forum/view-reference-location/m-p/10867150)
+
 
 ####<a name="3"></a> Determine Text Font Geometry
 
@@ -97,14 +99,9 @@ There is enough information in the text node class to be able to convert it to a
 Many thanks to Haroon for sharing this!
 
 
+####<a name="4"></a> 
 
 
 
 
-
-
-
-
-
-####<a name="3"></a> 
-
+https://youtu.be/glQjCKAI4gA
