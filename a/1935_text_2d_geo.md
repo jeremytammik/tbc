@@ -29,6 +29,14 @@ The 2D custom exporter provides a basis for a new and much more powerful approac
 
 linkedin:
 
+The 2D custom exporter provides a powerful approach to access detailed 2D geometry in the #RevitAPI
+
+https://bit.ly/2dtextgeo
+
+- Retrieve dimension text height and width
+- Determine text font geometry
+- Retrieve 2D geometry of any element...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
