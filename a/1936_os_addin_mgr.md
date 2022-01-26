@@ -41,10 +41,6 @@ Add-in developers have benn clamouring for for ages for the Revit development te
 to [open source the Add-In Manager](https://forums.autodesk.com/t5/revit-ideas/open-source-add-in-manager/idi-p/8049456);
 the corresponding Revit Idea Station wish list item was raised in 2018 and has gathered 49 votes, and the request was originally raised and discussed earlier still.
 
-open source
-https://github.com/chuongmep/RevitAddInManager
-/Users/jta/a/doc/revit/tbc/git/a/img/RevitAddInManager.png
-
 Chuong Ho now took action and asks for your support:
 
 > Hi all Developer working with Revit API,
@@ -64,36 +60,35 @@ Comments:
 [apply code changes](https://thebuildingcoder.typepad.com/blog/2021/10/localised-forge-intros-and-apply-code-changes.html#4).
 I had some ideas on improving it a while ago, but when the project got bigger it appeared more reasonable an actually not-that-hard to use standard way to debug Revit plugins.
 
-**Question:**
-
-**Answer:** 
-
-####<a name="3"></a>
-
 <center>
-<img src="img/.png" alt="" title="" width="223"/> <!-- 223 -->
+<img src="img/RevitAddInManager.png" alt="RevitAddInManager" title="RevitAddInManager" width="386"/> <!-- 386 -->
 </center>
 
-####<a name="4"></a>
+By the way, I have started to use the <i>apply code changes</i> method now as well.
+It works fine and I love it.
+Remonds me of the good all days with <i>edit and continue</i>, which worked just a smoothly back then.
+
+####<a name="4"></a> FormulaManager and Scripting Support 
 
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+points out the existence and shows how to use
+the [FormulaManager class](https://www.revitapidocs.com/2022/d061dadf-70da-a883-ec12-5cf98ded069e.htm) in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [creating user extensible functionality](https://forums.autodesk.com/t5/revit-api-forum/create-user-extesible-funcionality/m-p/10887473):
 
-<pre class="code">
-
-</pre>
-
-[FormulaManager Class](https://www.revitapidocs.com/2022/d061dadf-70da-a883-ec12-5cf98ded069e.htm)
-rpthomas
-[Create user extensible functionality](https://forums.autodesk.com/t5/revit-api-forum/create-user-extesible-funcionality/m-p/10887473)
-[Q] I am creating a program that allows me to quantify elements. 
+**Question:** I am creating a program that allows me to quantify elements. 
 I calculate column surface areas using different formulas for interior and exterior columns.
-During the modelling process, the user may want to create new definitions, e.g. for a central column, with its own formula `get_area`.
-How could I implement support for the user to add such functionality?
-[A] Several useful suggestions were made using the powerful .NET functionality.
-RPT adds a pure Revit solution, saying:
+During the modelling process, the user may want to create new definitions, e.g., for a central column, with its own formula `get_area`.
+How could I implement support for the end user to add such functionality?
+
+**Answer:** Several useful suggestions were made using the powerful built-in .NET scripting functionality.
+Richard adds a pure Revit solution, saying:
+
 You may find `FormulaManager.Evaluate` offers a more Revit centric approach.
 However, it seems to imply that a parameter element is required:
+
 > It evaluates formula using list of global or family parameters depends on document type.
+
 This probably means you have to be in a family document to evaluate a family parameter and a project to evaluate a global one.
 I guess you could make it work via adding what you need in a temporary way if it is requiring a parameter of some kind, i.e., a global one in project (although you wouldn't be able to reference other parameter names in the formula string).
 Here is a simple example that works:
@@ -119,12 +114,14 @@ Here is a simple example that works:
   End Function
 </pre>
 
-Many thanks to Richard for sharing this!
+Many thanks to Richard for pointing out and sharing this!
 
 ####<a name="5"></a> Happy New Year of the Tiger 虎
 
+Before leaving, I wish you all a 
 Happy [Chinese New Year](https://en.wikipedia.org/wiki/Chinese_New_Year),
-the [Year of the Tiger](https://en.wikipedia.org/wiki/Tiger_(zodiac))!
+the [Year of the Tiger](https://en.wikipedia.org/wiki/Tiger_(zodiac)),
+beginning on February 1.
 
 <center>
 <img src="img/2022-01-26_tiger_year.jpg" alt="Year of the Tiger" title="Year of the Tiger" width="440"/> <!-- 1100 -->
