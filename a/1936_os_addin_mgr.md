@@ -33,9 +33,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-###
+### Add-In Manager, FormulaManager and Tiger Year
 
-####<a name="2"></a> Open Soiurce Add-In Manager
+Exciting news around debugging and loading add-ins and adding formulas and scripting support to your apps:
+
+- [Open source Add-In Manager](#2)
+- [FormulaManager and scripting support](#4)
+- [Happy New Year of the Tiger 虎](#5)
+
+####<a name="2"></a> Open Source Add-In Manager
 
 Add-in developers have benn clamouring for for ages for the Revit development team
 to [open source the Add-In Manager](https://forums.autodesk.com/t5/revit-ideas/open-source-add-in-manager/idi-p/8049456);
