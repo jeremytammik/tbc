@@ -43,14 +43,14 @@ Exciting news around debugging and loading add-ins and adding formulas and scrip
 
 ####<a name="2"></a> Open Source Add-In Manager
 
-Add-in developers have benn clamouring for ages for the Revit development team
+Add-in developers have been clamouring for ages for the Revit development team
 to [open source the Add-In Manager](https://forums.autodesk.com/t5/revit-ideas/open-source-add-in-manager/idi-p/8049456);
 the corresponding Revit Idea Station wish list item was raised in 2018 and has gathered 49 votes, and the request was originally raised and discussed earlier still.
 
 Chuong Ho now took action and asks for your support:
 
-> Hi all Developer working with Revit API,
-it's time; we need to improve addin manager tool for a long time.
+> Hi, all Developers working with Revit API, it's time;
+we need to improve addin manager tool for a long time.
 Now I'm in the process of developing and maintaining it on open source basis with more features to support developers easier access to Revit API.
 All the programmers in the world can help to make this product better for developer.
 Currently developing in my free time so nothing is perfect right now.
