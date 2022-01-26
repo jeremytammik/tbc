@@ -15,7 +15,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Debug and load your add-ins with the new open source Add-In Manager; add formulas and scripting support to your own apps with the #RevitAPI FormulaManager @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/osaddinmanager
 
 Exciting news around debugging and loading add-ins and adding formulas and scripting support to your own apps
 &ndash; Open source Add-In Manager
