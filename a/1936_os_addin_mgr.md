@@ -131,7 +131,7 @@ Many thanks to Richard for pointing out and sharing this!
 Before leaving, I wish you all a 
 Happy [Chinese New Year](https://en.wikipedia.org/wiki/Chinese_New_Year),
 the [Year of the Tiger](https://en.wikipedia.org/wiki/Tiger_(zodiac)),
-beginning on February 1.
+beginning next Tuesday, February 1.
 
 <center>
 <img src="img/2022-01-26_tiger_year.jpg" alt="Year of the Tiger" title="Year of the Tiger" width="440"/> <!-- 1100 -->
