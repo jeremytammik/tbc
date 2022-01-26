@@ -43,7 +43,7 @@ Exciting news around debugging and loading add-ins and adding formulas and scrip
 
 ####<a name="2"></a> Open Source Add-In Manager
 
-Add-in developers have benn clamouring for for ages for the Revit development team
+Add-in developers have benn clamouring for ages for the Revit development team
 to [open source the Add-In Manager](https://forums.autodesk.com/t5/revit-ideas/open-source-add-in-manager/idi-p/8049456);
 the corresponding Revit Idea Station wish list item was raised in 2018 and has gathered 49 votes, and the request was originally raised and discussed earlier still.
 
@@ -70,9 +70,11 @@ I had some ideas on improving it a while ago, but when the project got bigger it
 <img src="img/RevitAddInManager.png" alt="RevitAddInManager" title="RevitAddInManager" width="386"/> <!-- 386 -->
 </center>
 
+Many thanks to Chuong Ho for this great initiative!
+
 By the way, I have started to use the <i>apply code changes</i> method now as well.
 It works fine and I love it.
-Remonds me of the good all days with <i>edit and continue</i>, which worked just a smoothly back then.
+Reminds me of the good all days with <i>edit and continue</i>, which worked just a smoothly back then.
 
 ####<a name="4"></a> FormulaManager and Scripting Support 
 
