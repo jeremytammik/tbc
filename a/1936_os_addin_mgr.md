@@ -6,7 +6,6 @@
 
 <!---
 
-
 - open source
   https://github.com/chuongmep/RevitAddInManager
   /Users/jta/a/doc/revit/tbc/git/a/img/RevitAddInManager.png
@@ -34,62 +33,54 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### 
+###
 
+####<a name="2"></a> Open Soiurce Add-In Manager
 
-
-####<a name="2"></a> 
-
-**Question:** 
-
-
-**Answer:** 
-
-####<a name="3"></a> 
-
-
-<center>
-<img src="img/.png" alt="" title="" width="223"/> <!-- 223 -->
-</center>
-
-
-
-####<a name="4"></a> 
-
-
-Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
-
-
-<pre class="code">
-
-
-</pre>
-
-
-
-Add-in developers have benn clamluring for for ages for the Revit development team
+Add-in developers have benn clamouring for for ages for the Revit development team
 to [open source the Add-In Manager](https://forums.autodesk.com/t5/revit-ideas/open-source-add-in-manager/idi-p/8049456);
 the corresponding Revit Idea Station wish list item was raised in 2018 and has gathered 49 votes, and the request was originally raised and discussed earlier still.
-
-
-
 
 open source
 https://github.com/chuongmep/RevitAddInManager
 /Users/jta/a/doc/revit/tbc/git/a/img/RevitAddInManager.png
 
-Chuong Ho
-Hi all Developer working with Revit API,
-it's time we need to improve addin manager tool for a long time, now I'm in the process of developing and maintaining them on open source basis with more features to support developers easier access to revit api.All the programmers in the world can help to make this product better for developer.
-Currently developing in my free time so nothing is perfect right now
-Link project open source can search at 
-https://github.com/chuongmep/RevitAddInManager
+Chuong Ho now took action and asks for your support:
+
+> Hi all Developer working with Revit API,
+it's time; we need to improve addin manager tool for a long time.
+Now I'm in the process of developing and maintaining it on open source basis with more features to support developers easier access to Revit API.
+All the programmers in the world can help to make this product better for developer.
+Currently developing in my free time so nothing is perfect right now.
+Link to project open source at:
+
+> <p style="text-align:center"><a href="https://github.com/chuongmep/RevitAddInManager">github.com/chuongmep/RevitAddInManager</a></p>
+
 Comments:
-It's great to see advancements on the development of this tool, thanks you!
-Add-in manager became less useful with hot-reload feature of the latest release of Visual Sudio. I had some ideas on improving it a while ago, but when the project got bigger it appeared more reasonable an actually not-that-hard to use standard way to debug Revit plugins.
-Yes, only make the tool support developer better , anyway we still need a tool that programmers all over the world can modify and ask for ideas.
 
+- It's great to see advancements on the development of this tool, thank you!
+- Yes, only make the tool support developer better, anyway we still need a tool that programmers all over the world can modify and ask for ideas.
+- Add-in manager became less useful with the hot-reload feature of the latest release of Visual Studio,
+[apply code changes](https://thebuildingcoder.typepad.com/blog/2021/10/localised-forge-intros-and-apply-code-changes.html#4).
+I had some ideas on improving it a while ago, but when the project got bigger it appeared more reasonable an actually not-that-hard to use standard way to debug Revit plugins.
 
+**Question:**
+
+**Answer:** 
+
+####<a name="3"></a>
+
+<center>
+<img src="img/.png" alt="" title="" width="223"/> <!-- 223 -->
+</center>
+
+####<a name="4"></a>
+
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+
+<pre class="code">
+
+</pre>
 
 [FormulaManager Class](https://www.revitapidocs.com/2022/d061dadf-70da-a883-ec12-5cf98ded069e.htm)
 rpthomas
@@ -129,7 +120,6 @@ Here is a simple example that works:
 </pre>
 
 Many thanks to Richard for sharing this!
-
 
 ####<a name="5"></a> Happy New Year of the Tiger 虎
 
