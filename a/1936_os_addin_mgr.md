@@ -74,7 +74,9 @@ Many thanks to Chuong Ho for this great initiative!
 
 By the way, I have started to use the <i>apply code changes</i> method now as well.
 It works fine and I love it.
-Reminds me of the good all days with <i>edit and continue</i>, which worked just a smoothly back then.
+Reminds me of the good all days
+with [edit and continue](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.49),
+which worked just a smoothly back then.
 
 ####<a name="4"></a> FormulaManager and Scripting Support 
 
