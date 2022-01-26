@@ -17,8 +17,10 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Exciting news around debugging and loading add-ins and adding formulas and scripting support to your own apps
+&ndash; Open source Add-In Manager
+&ndash; FormulaManager and scripting support
+&ndash; Happy New Year of the Tiger 虎...
 
 linkedin:
 
@@ -35,7 +37,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Add-In Manager, FormulaManager and Tiger Year
 
-Exciting news around debugging and loading add-ins and adding formulas and scripting support to your apps:
+Exciting news around debugging and loading add-ins and adding formulas and scripting support to your own apps:
 
 - [Open source Add-In Manager](#2)
 - [FormulaManager and scripting support](#4)
@@ -58,19 +60,19 @@ Link to project open source at:
 
 > <p style="text-align:center"><a href="https://github.com/chuongmep/RevitAddInManager">github.com/chuongmep/RevitAddInManager</a></p>
 
-Comments:
+<center>
+<img src="img/RevitAddInManager.png" alt="RevitAddInManager" title="RevitAddInManager" width="386"/> <!-- 386 -->
+</center>
+
+Many thanks to Chuong Ho for this great initiative!
+
+Comments on LinkedIn:
 
 - It's great to see advancements on the development of this tool, thank you!
 - Yes, only make the tool support developer better, anyway we still need a tool that programmers all over the world can modify and ask for ideas.
 - Add-in manager became less useful with the hot-reload feature of the latest release of Visual Studio,
 [apply code changes](https://thebuildingcoder.typepad.com/blog/2021/10/localised-forge-intros-and-apply-code-changes.html#4).
 I had some ideas on improving it a while ago, but when the project got bigger it appeared more reasonable an actually not-that-hard to use standard way to debug Revit plugins.
-
-<center>
-<img src="img/RevitAddInManager.png" alt="RevitAddInManager" title="RevitAddInManager" width="386"/> <!-- 386 -->
-</center>
-
-Many thanks to Chuong Ho for this great initiative!
 
 By the way, I have started to use the <i>apply code changes</i> method now as well.
 It works fine and I love it.
