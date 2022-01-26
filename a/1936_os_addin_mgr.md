@@ -129,3 +129,13 @@ Here is a simple example that works:
 </pre>
 
 Many thanks to Richard for sharing this!
+
+
+####<a name="5"></a> Happy New Year of the Tiger 虎
+
+Happy [Chinese New Year](https://en.wikipedia.org/wiki/Chinese_New_Year),
+the [Year of the Tiger](https://en.wikipedia.org/wiki/Tiger_(zodiac))!
+
+<center>
+<img src="img/2022-01-26_tiger_year.jpg" alt="Year of the Tiger" title="Year of the Tiger" width="440"/> <!-- 1100 -->
+</center>
