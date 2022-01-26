@@ -67,6 +67,12 @@ Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-i
 
 
 
+Add-in developers have benn clamluring for for ages for the Revit development team
+to [open source the Add-In Manager](https://forums.autodesk.com/t5/revit-ideas/open-source-add-in-manager/idi-p/8049456);
+the corresponding Revit Idea Station wish list item was raised in 2018 and has gathered 49 votes, and the request was originally raised and discussed earlier still.
+
+
+
 
 open source
 https://github.com/chuongmep/RevitAddInManager
@@ -122,8 +128,4 @@ Here is a simple example that works:
   End Function
 </pre>
 
-
-
 Many thanks to Richard for sharing this!
-
-
