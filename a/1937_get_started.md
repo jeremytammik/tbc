@@ -65,7 +65,7 @@ thousand times already, and sincerely hope that it provides a couple of useful p
 
 Still, people keep running into problems anyway.
 
-A colleague hit another unexpected obstable last week:
+A colleague hit another unexpected obstacle last week:
 
 **Question:** I dived into the Getting Started with Revit platform API, following the DevTV tutorial by Augusto Goncalves.
 None of my commands appear on the Revit UI &gt; Add Ins &gt; external commands. 
