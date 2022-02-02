@@ -46,10 +46,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### 
+### Getting Started Once Again
 
+Welcoming my new colleague Carol leads to a renewed look at getting started:
 
-
+- [Access permission to load my first add-in](#2)
+- [My first Revit plug-in todo](#3)
+- [Books on Python for Revit Dynamo](#4)
+- [pyRevit saves insane amounts of time](#5)
+- [Newtonsoft Json.dll version conflict](#6)
+- [Lost in the World by Steve Cutts](#7)
 
 ####<a name="2"></a> Access Permission to Load my First Add-In
 
@@ -141,7 +147,7 @@ Best ones are:
 For more best Python book recommendations, check out
 the [10 Best Python Books for Beginners & Advanced Programmers](https://learndunia.com/best-python-books).
 
-####<a name="5"></a> 
+####<a name="5"></a> pyRevit Saves Insane Amounts of Time
 
 Talking about Python and Dynamo in Revit, Nicolas Catellier highlights
 [10 amazing pyRevit features to save insane amounts of time](https://revitpure.com/blog/10-amazing-pyrevit-features-to-save-insane-amounts-of-time).
