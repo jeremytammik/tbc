@@ -28,8 +28,7 @@
 
 twitter:
 
- the #RevitAPI FormulaManager @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
-
+Access permission to load add-in, my first Revit plug-in todo, pyRevit time savers and Newtonsoft Json.dll version conflict in the #RevitAPI FormulaManager @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/gettingstarted
 
 Welcoming my new colleague Carol leads to a renewed look at getting started
 &ndash; Access permission to load my first add-in
@@ -40,6 +39,19 @@ Welcoming my new colleague Carol leads to a renewed look at getting started
 &ndash; Lost in the World by Steve Cutts...
 
 linkedin:
+
+Access permission required to load add-in, my first Revit plug-in todo, pyRevit time savers and Newtonsoft Json.dll version conflict in the #RevitAPI
+
+https://autode.sk/gettingstarted
+
+Welcoming my new colleague Carol leads to a renewed look at getting started:
+
+- Access permission to load my first add-in
+- My first Revit plug-in todo
+- Books on Python for Revit Dynamo
+- pyRevit saves insane amounts of time
+- Newtonsoft Json.dll version conflict
+- Lost in the World by Steve Cutts...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -199,3 +211,7 @@ leading me to check out several of [his other animations](https://www.stevecutts
 <center>
 <img src="img/stevecutts.png" alt="Steve Cutts" title="Steve Cutts" width="260"/> <!-- 519 -->
 </center>
+
+Happy Twosday!
+
+<p style="font-size: 150%">2/2/22</p>
