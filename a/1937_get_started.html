@@ -29,8 +29,14 @@ twitter:
 
  the #RevitAPI FormulaManager @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash; 
-...
+
+Welcoming my new colleague Carol leads to a renewed look at getting started
+&ndash; Access permission to load my first add-in
+&ndash; My first Revit plug-in todo
+&ndash; Books on Python for Revit Dynamo
+&ndash; pyRevit saves insane amounts of time
+&ndash; Newtonsoft Json.dll version conflict
+&ndash; Lost in the World by Steve Cutts...
 
 linkedin:
 
@@ -141,7 +147,7 @@ Still, they cause problems with BIM360 under certain circumstances:</p>
 </ul>
 <p><strong>Answer:</strong> Probably some DLL in the customer’s add-on conflicts with Revit’s.</p>
 <p>Does it by any chance use <code>Newtonsoft.Json.dll</code>?</p>
-<p>After some analysis, I can see it does indeed.</p>
+<p>After some analysis, I can see that it does indeed.</p>
 <p>The add-in uses <code>Newtonsoft.Json.dll</code> version 13.0.1, two major versions newer than the one shipped with Revit 2021, which is version 11.0.2.</p>
 <p>Probably they will have to downgrade the DLL.
 That is easy, if the app doesn’t consume any features only available only in versions 12 or 13.</p>
