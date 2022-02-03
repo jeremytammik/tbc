@@ -69,6 +69,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Welcoming my new colleague Carol leads to a renewed look at getting started:
 
 - [Access permission to load my first add-in](#2)
+- [Assembly path and buttons missing](#2.2)
 - [My first Revit plug-in todo](#3)
 - [Books on Python for Revit Dynamo](#4)
 - [pyRevit saves insane amounts of time](#5)
@@ -133,6 +134,40 @@ This path:
 I utilised the try and catch exception to see the issue.
 
 Once I gave access permission, the add-in file is now visible; it worked!
+
+####<a name="2.2"></a> Assembly Path and Buttons Missing
+
+Another issue getting started was resolved by decompiling and analysing the add-in .NET assembly DLL using IL decompilers, 
+[<i>Failed to initialize the</i> add_in_name <i>because the assembly</i> path_to_an_add_in_DLL_file <i>does not exist</i> when launching Revit](https://stackoverflow.com/questions/70887489/failed-to-initialize-the-add-in-name-because-the-assembly-path-to-an-add-in):
+
+**Question:** I've exhausted every resource possible and can not figure out what the issue is.
+Button images won't show and I keep getting this message launching Revit when I try to use the command:
+
+> Failed to initialize the [add-in name] because the assembly [path to an add-in DLL file] does not exist
+
+But I may have been trying to run before I learned to walk with this one.
+The only thing I'm not understanding is why the commands work fine in the addins but the buttons can't find them.
+
+**Answer:** Maybe your add-in is trying to reference a .NET assembly DLL that cannot be found when Revit tries to load it.
+Looking at the list of namespaces that you reference in your source code `using` statements, I see nothing but standard Autodesk Revit, Microsoft and .NET assemblies listed.
+So, they should all be present and accessible.
+Are you using anything else elsewhere in your code that is not obvious from that list?
+You might be able to use tools like `fuslogv` to analyse your add-in dependencies during load time, as suggested in the note
+on [exploring assembly reference DLL hell with Fuslogvw](https://thebuildingcoder.typepad.com/blog/2021/05/revitlookup-update-fuslogvw-and-override-joins.html#6).
+
+**Resdponse:** Looks like I'm getting some XAML Binding errors during debug.
+
+Update: I got one of the buttons to work correctly after I put the full path for the assemblies:
+
+- <i>C:\ProgramData\Autodesk\Revit\Addins\2021\TpMechanical\bin\Debug\TpMechanical.dll</i>
+
+Update 2: The IL decompiler did the trick!
+The full class name was pulling as a different name.
+Now I just have to figure out the button images and I'll be in a good spot to start on my own plugins. 
+
+Update 3: Just solved my image issue.
+I changed the resources to embed and used the full path to the resources.
+Seems to have done the trick.
 
 ####<a name="3"></a> My First Revit Plug-in Todo
 
