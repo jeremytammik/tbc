@@ -138,7 +138,7 @@ Once I gave access permission, the add-in file is now visible; it worked!
 ####<a name="2.2"></a> Assembly Path and Buttons Missing
 
 Another issue getting started was resolved by decompiling and analysing the add-in .NET assembly DLL using IL decompilers, 
-[<i>Failed to initialize the</i> add_in_name <i>because the assembly</i> path_to_an_add_in_DLL_file <i>does not exist</i> when launching Revit](https://stackoverflow.com/questions/70887489/failed-to-initialize-the-add-in-name-because-the-assembly-path-to-an-add-in):
+["Failed to initialize the <i>add_in_name</i> because the assembly <i>path_to_an_add_in_DLL_file</i> does not exist" when launching Revit](https://stackoverflow.com/questions/70887489/failed-to-initialize-the-add-in-name-because-the-assembly-path-to-an-add-in):
 
 **Question:** I've exhausted every resource possible and can not figure out what the issue is.
 Button images won't show and I keep getting this message launching Revit when I try to use the command:
