@@ -155,7 +155,7 @@ Are you using anything else elsewhere in your code that is not obvious from that
 You might be able to use tools like `fuslogv` to analyse your add-in dependencies during load time, as suggested in the note
 on [exploring assembly reference DLL hell with Fuslogvw](https://thebuildingcoder.typepad.com/blog/2021/05/revitlookup-update-fuslogvw-and-override-joins.html#6).
 
-**Resdponse:** Looks like I'm getting some XAML Binding errors during debug.
+**Response:** Looks like I'm getting some XAML Binding errors during debug.
 
 Update: I got one of the buttons to work correctly after I put the full path for the assemblies:
 
