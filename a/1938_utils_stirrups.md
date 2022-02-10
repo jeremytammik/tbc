@@ -42,6 +42,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Utility Classes and Constraining Stirrups
 
+Taking a look at yet another overlooked utility class, rebar constraints, and learning basics of power, energy, entropy and information:
+
 - [ParameterFilterUtilities](#2)
 - [Constrain stirrup to host cover](#3)
 - [Rowers illustrate power and building energy](#4)
