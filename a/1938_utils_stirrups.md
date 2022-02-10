@@ -42,7 +42,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Utility Classes and Constraining Stirrups
 
-Taking a look at yet another overlooked utility class, rebar constraints, and learning basics of power, energy, entropy and information:
+Taking a look at
+yet another [overlooked Revit API utility class](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5,52),
+rebar constraints, and learning basics of power, energy, entropy and information:
 
 - [ParameterFilterUtilities](#2)
 - [Constrain stirrup to host cover](#3)
@@ -59,7 +61,7 @@ to [get all possible `FilterRule` parameters](https://forums.autodesk.com/t5/rev
 **Question:** I would like to list all possible `ViewFilter` parameters for a given category, e.g., for the category `Walls` the parameters shown in this screenshot:
 
 <center>
-<img src="img/filter_rule_valid_params_for_wall.jpg" alt="" title="" width="800"/> <!-- 1394 -->
+<img src="img/filter_rule_valid_params_for_wall.jpg" alt="Valid ViewFilter parameters" title="Valid ViewFilter parameters" width="800"/> <!-- 1394 -->
 </center>
 
 It seems like these are combinations of Project Parameters, Type Parameters and Instance Parameters.
