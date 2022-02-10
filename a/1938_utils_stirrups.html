@@ -94,7 +94,7 @@ This is how I checked for valid parameters for the category is <code>Walls</code
 <p><center>
 <img src="img/GetFilterableParameters.jpg" alt="GetFilterableParameters" title="GetFilterableParameters" width="600"/> <!-- 673 -->
 </center></p>
-<p>Many thanks to Samuel for raising this question and confirmning the solution!</p>
+<p>Many thanks to Samuel for raising this question and confirming the solution!</p>
 <h4><a name="3"></a> Constrain Stirrup to Host Cover</h4>
 <p>I had a fruitful conversation with Kevin Richard Anggrek a year ago
 on <a href="https://thebuildingcoder.typepad.com/blog/2021/03/boundary-elements-and-stirrup-constraints.html#2">implementing valid rebar stirrup constraints</a>.</p>
@@ -107,7 +107,62 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/rebar-location-contro
 can you compare with <code>RebarConstraint.GetDistanceToTargetCover</code>?</p>
 <p><strong>Answer:</strong> I will try to explain how I constrain the stirrups to the concrete cover.</p>
 <p>First, I use the <code>CreateFromRebarShape</code> method to create an initial stirrup by using a template rebar shape that is provided by Revit.
-As you probably have noticed, the initial stirrup follows the size of the template rebar shape and we need to constrain it down to the appropriate size that matches the size of our concrete element.</p>
+As you probably have noticed, the initial stirrup follows the size of the template rebar shape,Utility Classes and Constraining Stirrups
+Taking a look at yet another overlooked utility class, rebar constraints, and learning basics of power, energy, entropy and information:</p>
+<p>ParameterFilterUtilities
+Constrain stirrup to host cover
+Rowers illustrate power and building energy
+Wordle entropy and information
+ParameterFilterUtilities
+Another example of the useful functionality provided by the Revit API *Utils classes that are often overlooked was highlighted by Samuel Kreuz' question and answer in the thread on using ParameterFilterUtilities to get all possible FilterRule parameters:</p>
+<p>Question: I would like to list all possible ViewFilter parameters for a given category, e.g., for the category Walls the parameters shown in this screenshot:</p>
+<p>It seems like these are combinations of Project Parameters, Type Parameters and Instance Parameters. How to retrieve all parameters allowed for creating a filter rule? Or at least a way to check if a parameter is valid for creating a filter rule?</p>
+<p>Answer: Take a look at the ParameterFilterUtilities class, specifically the GetFilterableParametersInCommon method.</p>
+<p>Response: This is exactly what I am looking for! I wasn't aware of the ParameterFilterUtilities until now. They seem to have some really useful methods for working with ViewFilters. This is how I checked for valid parameters for the category is Walls:</p>
+<p>List<string> parameterNames = new List<string>();
+  IList<ElementId> wallCatList = new List<ElementId>() 
+  { 
+    new ElementId(BuiltInCategory.OST_Walls) 
+  };</p>
+<p>var paramColl = ParameterFilterUtilities
+    .GetFilterableParametersInCommon(
+      doc, wallCatList);</p>
+<p>foreach (ElementId param in paramColl)
+  {
+    BuiltInParameter bip 
+      = (BuiltInParameter) param.IntegerValue;</p>
+<pre><code>string label = LabelUtils.GetLabelFor(bip);
+parameterNames.Add(label);
+</code></pre>
+<p>}</p>
+<p>parameterNames.Sort();
+  StringBuilder sb = new StringBuilder();
+  parameterNames.ForEach(e =&gt; sb.Append(e + "\r\n"));
+  TaskDialog.Show("Filtered Parameters", sb.ToString());
+The result includes all built-in parameters that can be used for filtering:</p>
+<p>GetFilterableParameters
+Many thanks to Samuel for raising this question and confirmning the solution!</p>
+<p>Constrain Stirrup to Host Cover
+I had a fruitful conversation with Kevin Richard Anggrek a year ago on implementing valid rebar stirrup constraints.</p>
+<p>Kevin now very kindly summarised some further advice and aspects in this area answering a new request in his thread on constraining stirrups to the cover of the host element. It would be a great shame to let his nice explanation languish unnoticed for all but a select few in the forum thread. I hope we can bring it to light to receive the attention it deserves here:</p>
+<p>Question: I too am stuck constraining stirrups and raised a question on rebar location controlling; can you compare with RebarConstraint.GetDistanceToTargetCover?</p>
+<p>Answer: I will try to explain how I constrain the stirrups to the concrete cover.</p>
+<p>First, I use the CreateFromRebarShape method to create an initial stirrup by using a template rebar shape that is provided by Revit. As you probably have noticed, the initial stirrup follows the size of the template rebar shape and we need to constrain it down to the appropriate size that matches the size of our concrete element.</p>
+<p>So, the next thing that we need to do is to call the RebarConstraintManager of the particular initial stirrup in order to access and modify the rebar constraints of the initial stirrup.</p>
+<p>By using the RebarConstraintManager, I would first collect all of the handles of the stirrup by using the GetAllHandles Method and store them in a list or array. Handles are those interaction points located on the rebar element that one normally uses when trying to modify the shape or size of the rebar through the user interface of Revit.</p>
+<p>The logic here is that I would like to move the handles of the stirrup, especially the handles at the legs of the stirrup, so that they can be placed or constrained to the correct concrete cover of our current beam/column element, thus we can obtain the correct stirrup size.</p>
+<p>So, the next thing we should do is to iterate through all of the handle in the list of handles that we obtained previously. For each handle, find all of the constraint candidates that are of the type ToCover using the GetConstraintCandidatesForHandle method. Rebar handles can be constrained to a lot of things, but what we want here are the ToCover constraints, because we want to constraint a particular handle to the concrete cover. You can imagine each ToCover constraint as a representation of the handles' constraint to a concrete cover. By following this method, a single handle will detect several ToCover constraints. Now, imagine that you are editing a rebar handle of one stirrup leg; notice that a rectangular column would have eight concrete covers that the leg handle can be constrained to. However, the leg handle shall only be constrained to the correct concrete cover, which in this case is the cover that is closest to the particular leg handle. This is where the GetDistanceToTargetCover plays a role.</p>
+<p>Before we get into that, there is something that you need to be careful of: when trying to find all of the ToCover constraints of a particular handle, Revit API will also detect not only the concrete cover of a particular concrete element, but also all of the ToCover constraints of other concrete elements in the periphery of the stirrup. Therefore, it is necessary that you first make sure that the ToCover constraint that you are targeting is the same as the concrete element that you will use as the host of your stirrup. In my case, I first checked for the ElementId of the target element of the ToCover constraint and compared it with the ElementId of my host concrete element. If you are not careful, your handle will end up getting constrained to the cover of some other adjacent concrete element instead of the intended concrete element.</p>
+<p>After you have cleared that, we can safely move on to find the nearest ToCover constraint that we are going to constrain our handle to. I used the GetDistanceToTargetCover() method; this method finds the distance between the current ToCover constraint of the handle to the target cover. Then, find the one with absolute minimum distance. When I say absolute, I mean that you first need to find the absolute value of the distance before comparing it to the other distance to find the actual minimum distance. This was actually my issue before, where the handle won't be constrained to the nearest cover. Turns out, my code previously compared non-absolute values. After I debugged the code, I noticed something like: the distance to the nearest cover was 10, but the distance to the farthest cover was -400; if we compare non-absolute values, -400 is less than 10, but the absolute value is the true indicator of the distance to the cover. So, if we compare the absolute values, it is obvious that 400 is greater than 10.</p>
+<p>After we find the nearest cover constraint to the handle, we can go ahead and move the constraint of the handle to the cover itself using the SetDistanceToTargetCover method and setting the distance as 0. After the constraint of the handle has been moved to its cover, we can go ahead and set the constraint as the preferred constraint for the handle by using the SetPreferredConstraintForHandle method; this will set the constraint that we just moved to the cover as the preferred constraint that the handle will use. At the end, this will move the handle to the cover.</p>
+<p>Many thanks to Kevion for this extremely helpful explanation! Happy New Year of the Tiger to you!</p>
+<p>Rowers Illustrate Power and Building Energy
+The TUDelft created a MOOC about Zero-Energy Design: an approach to make your building sustainable, teaching how to get to a net zero energy use of an existing building.</p>
+<p>I love the eight-minute course introduction video, Energy Slaves. Intro to MOOC: Zero-Energy Design: an approach to make your building sustainable:</p>
+<p>It illustrates the energy used by a house and their occupants by simulating it being suplied by human rowers. An average rower produces ca. 220 W and continuous power, 330 W peak.</p>
+<p>By the way, another interesting fact about energy and power: a match or candle flame provides about 100 W; so does a human body at rest; that is enough to heat a cup of tea, coffee, or water; for a hot shower, a water heater needs to provide about 10 kW; some have an array of 10 x 10 = 100 gas flames, producing 100 x 100 W = 10 kW of heat.</p>
+<p>Wordle Entropy and Information
+On YouTube, I also stumbled across the half-hour explanation on how to solve Wordle using information theory... and we need to constrain it down to the appropriate size that matches the size of our concrete element.</p>
 <p>So, the next thing that we need to do is to call the <code>RebarConstraintManager</code> of the particular initial stirrup in order to access and modify the rebar constraints of the initial stirrup.</p>
 <p>By using the RebarConstraintManager, I would first collect all of the handles of the stirrup by using the <code>GetAllHandles</code> Method and store them in a list or array. Handles are those interaction points located on the rebar element that one normally uses when trying to modify the shape or size of the rebar through the user interface of Revit.</p>
 <p>The logic here is that I would like to move the handles of the stirrup, especially the handles at the legs of the stirrup, so that they can be placed or constrained to the correct concrete cover of our current beam/column element, thus we can obtain the correct stirrup size.</p>
@@ -134,7 +189,7 @@ So, if we compare the absolute values, it is obvious that 400 is greater than 10
 <p>After we find the nearest cover constraint to the handle, we can go ahead and move the constraint of the handle to the cover itself using the <code>SetDistanceToTargetCover</code> method and setting the distance as 0.
 After the constraint of the handle has been moved to its cover, we can go ahead and set the constraint as the preferred constraint for the handle by using the <code>SetPreferredConstraintForHandle</code> method; this will set the constraint that we just moved to the cover as the preferred constraint that the handle will use.
 At the end, this will move the handle to the cover.</p>
-<p>Many thanks to Kevion for this extremely helpful explanation!
+<p>Many thanks to Kevin for this extremely helpful explanation!
 Happy New Year of the Tiger to you!</p>
 <h4><a name="4"></a> Rowers Illustrate Power and Building Energy</h4>
 <p>The <a href="https://www.tudelft.nl">TUDelft</a> created 
@@ -146,7 +201,7 @@ teaching how to get to a net zero energy use of an existing building.</p>
 <p><center></p>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/Jo5W6y0_Tkk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <p></center></p>
-<p>It illustrates the energy used by a house and their occupants by simulating it being suplied by human rowers.
+<p>It illustrates the energy used by a house and their occupants by simulating it being supplied by human rowers.
 An average rower produces ca. 220 W and continuous power, 330 W peak.</p>
 <p>By the way, another interesting fact about energy and power: a match or candle flame provides about 100 W; so does a human body at rest; that is enough to heat a cup of tea, coffee, or water; for a hot shower, a water heater needs to provide about 10 kW; some have an array of 10 x 10 = 100 gas flames, producing 100 x 100 W = 10 kW of heat.</p>
 <h4><a name="5"></a> Wordle Entropy and Information</h4>
