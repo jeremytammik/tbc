@@ -42,7 +42,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Utility Classes and Constraining Stirrups
 
-####<a name="2"></a> 
+- [ParameterFilterUtilities](#2)
+- [Constrain stirrup to host cover](#3)
+- [Rowers illustrate power and building energy](#4)
+- [Wordle entropy and information](#5)
+
+####<a name="2"></a> ParameterFilterUtilities
 
 Another example of the useful functionality provided by
 the [Revit API `*Utils` classes that are often overlooked](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.52) was
@@ -156,7 +161,7 @@ At the end, this will move the handle to the cover.
 Many thanks to Kevion for this extremely helpful explanation!
 Happy New Year of the Tiger to you!
 
-####<a name="4"></a> Rowers Illustrate Power and Energy
+####<a name="4"></a> Rowers Illustrate Power and Building Energy
 
 The [TUDelft](https://www.tudelft.nl) created 
 a [MOOC](https://en.wikipedia.org/wiki/Massive_open_online_course)
@@ -175,7 +180,7 @@ An average rower produces ca. 220 W and continuous power, 330 W peak.
 
 By the way, another interesting fact about energy and power: a match or candle flame provides about 100 W; so does a human body at rest; that is enough to heat a cup of tea, coffee, or water; for a hot shower, a water heater needs to provide about 10 kW; some have an array of 10 x 10 = 100 gas flames, producing 100 x 100 W = 10 kW of heat.
 
-####<a name="5"></a> Information and Entropy Solving Wordle
+####<a name="5"></a> Wordle Entropy and Information 
 
 On YouTube, I also stumbled across 
 the half-hour explanation on how to [solve Wordle using information theory](https://youtu.be/v68zYyaEmEA)...
