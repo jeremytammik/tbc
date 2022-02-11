@@ -32,6 +32,17 @@ Taking a look at yet another overlooked Revit API utility class, rebar constrain
 
 linkedin:
 
+ParameterFilterUtilities, constraining rebar stirrup to host cover in the #RevitAPI
+
+https://autode.sk/parameterfilterutilities
+
+Taking a look at yet another overlooked Revit API utility class, rebar constraints, and learning basics of power, energy, entropy and information:
+
+- ParameterFilterUtilities
+- Constrain stirrup to host cover
+- Rowers illustrate power and building energy
+- Wordle entropy and information...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
