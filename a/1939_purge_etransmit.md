@@ -67,7 +67,83 @@ Python https://github.com/OliverEGreen/CodeSamples/blob/master/PurgeRevitViaAPI.
 
 ####<a name="3"></a> eTransmit Functionality in DA4R
 
-- Kai Kasugai <kk@formitas.de> Re: eTransmit functionality
+Dr. Kai Kasugai
+Web       www.formitas.de
+
+Formitas AG
+
+sure, as we derived most of the code from the source you provided us, I am glad to share the few modifications that we made to make it work for us in Design Automation.
+
+This code, as the DynamoRevit code, tries to delete all unused elements and materials from the document.
+I think the main modification was to step out of the recursive loop once the purgeable element count does not change anymore.
+
+This is a point that we consider to improve further, as the count itself might not have changed, but the purgeable element ids did change.
+
+Please find attached a hopefully complete set of functions that are required to implement the functionality.
+
+
+Best regards,
+Kai
+
+
+Hello Jeremy, 
+ 
+I just wanted to give you some feedback on the integration of the Purge Code from the Dynamo for Revit code base, which you and the Dev Team proposed.
+ 
+It really worked great and much faster than our previous attempt!
+ 
+We have tested it in a lot of scenarios, small files and large files and it always worked as expected.
+ 
+This was a really important step for us, as this automation was one of the first that we integrated for our client and
+around 100 ACC users can now use that in the growing number of projects that we are currently moving from on-prem to ACC.
+ 
+So thank you very much,
+best regards,
+Kai
+
+
+Dear Jeremy, 
+thank you very much for your (and the development teams) quick response. That looks very relevant, as it includes a method to purge materials.
+I am looking forward to check how that performs in our scenario.
+ 
+While this looks very promising, I would still appreciate to hear from you regarding the other topics discussed (possibility of implementation by Autodesk and,
+if so, rough timing).
+ 
+Best regards,
+Kai
+
+Am 13.12.2021 um 11:22 schrieb Jeremy Tammik <jeremy.tammik@autodesk.com>:
+ 
+Dear Kai,
+ 
+thank you for your appreciation and code snippet.
+ 
+It was a pleasure meeting you.
+ 
+I discussed the issue with the development team, and they reply:
+ 
+Might be another good instance of learning from the Dynamo for Revit code base, as there is a PurgeUnused node in Dynamo for Revit 2022.
+
+Starts around line 110 here: https://github.com/DynamoDS/DynamoRevit/blob/f1165c9a629d9fcf8ccc7b5300c83cc37e5ea5ed/src/Libraries/RevitNodes/Application/Document.cs
+
+Not sure how closely that follows the ETransmit code, or if it’s a viable option, but worth a review all the same.
+ 
+Here is my link to the Dynamo PurgeUnused method:
+ 
+https://github.com/DynamoDS/DynamoRevit/blob/f1165c9a629d9fcf8ccc7b5300c83cc37e5ea5ed/src/Libraries/RevitNodes/Application/Document.cs#L111-L130
+ 
+Maybe that will help you solve the issue right away today?
+ 
+Best regards and happy advent!
+ 
+jeremy
+ 
+
+We are trying to implement the eTransmit functionality in DA4R, the Forge Design Automation API for Revit.
+
+
+
+
 
 ####<a name="4"></a> Updated Autodesk Revit IFC Manual
 

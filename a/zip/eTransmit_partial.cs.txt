@@ -1,0 +1,275 @@
+        public int lastPurgeableElementCount = 0;
+        public int loopCount = 0;
+
+        public List<int> PurgeUnused(Document doc, bool fullPurge = false)
+        {
+            LogTrace("LOG#PurgeUnused");
+            List<ElementId> purgedElementIds = new List<ElementId>();
+
+            purgedElementIds.AddRange(PurgeElements(doc, fullPurge));
+            purgedElementIds.AddRange(PurgeMaterials(doc));
+
+
+            if (purgedElementIds.Count == 0)
+                return null;
+
+            return purgedElementIds.Select(x => x.IntegerValue).ToList();
+        }
+
+        private List<ElementId> PurgeElements(Document doc, bool runRecursively)
+        {
+            loopCount++;
+            LogTrace("LOG#purgeElements begin: " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
+            List<ElementId> purgedElementIds = new List<ElementId>();
+            List<ElementId> purgeableElementIds = GetPurgeableElementIds(doc);
+
+            if (purgeableElementIds == null)
+                return purgedElementIds;
+
+            purgedElementIds.AddRange(purgeableElementIds);
+
+            if (lastPurgeableElementCount > 0 && purgeableElementIds.Count == lastPurgeableElementCount)
+            {
+                runRecursively = false;
+                return purgedElementIds;
+            }
+
+            LogTrace("LOG#To deleted Count purgeableElementIds: " + purgeableElementIds.Count.ToString());
+            LogTrace("LOG#first purgeableElementId: " + purgeableElementIds[0].ToString());
+            Random rand = new Random();
+            int numTrans = rand.Next();
+
+            using (Transaction tt = new Transaction(doc, "delete purgeElements" + numTrans.ToString()))
+            {
+                try
+                {
+                    tt.Start();
+
+                    ICollection<ElementId> purgedElementIdsResult = doc.Delete(purgeableElementIds);
+                    LogTrace("LOG#purgeElements->found Ids count: " + purgeableElementIds.Count.ToString() + " - return Ids count by delete " + purgedElementIdsResult.Count.ToString());
+                    tt.Commit();
+                }
+                catch (Exception e)
+                {
+                    LogTrace("LOG#purgeableElementIds delete error: " + e.Message);
+                    tt.RollBack();
+                }
+
+                lastPurgeableElementCount = purgeableElementIds.Count;
+
+                if (runRecursively)
+                {
+                    purgedElementIds.AddRange(PurgeElements(doc, runRecursively));
+                }
+            }
+
+            LogTrace("LOG#purgeElements end: " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
+
+            return purgedElementIds;
+        }
+
+        private List<ElementId> PurgeMaterials(Document doc)
+        {
+            LogTrace("LOG#purgeableMaterials begin: " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
+            List<Autodesk.Revit.DB.ElementId> materials = new FilteredElementCollector(doc)
+                .OfClass(typeof(Autodesk.Revit.DB.Material))
+                .ToElementIds()
+                .ToList();
+
+            if (materials == null)
+                return new List<ElementId>();
+
+            List<Autodesk.Revit.DB.Element> elementTypes = new FilteredElementCollector(doc)
+                .WhereElementIsElementType()
+                .ToElements()
+                .ToList();
+
+            if (elementTypes == null)
+                return new List<ElementId>();
+
+            var nonPurgedElements = new HashSet<ElementId>();
+
+            for (int i = 0; i < elementTypes.Count; i++)
+            {
+                nonPurgedElements.UnionWith(GetUsedMaterialIds(elementTypes[i]));
+            }
+
+            List<ElementId> purgeableMaterials = materials.Except(nonPurgedElements).ToList();
+
+            if (purgeableMaterials.Count > 0)
+            {
+                LogTrace("purgeableMaterials count: " + purgeableMaterials.Count.ToString());
+                using (Transaction tMaterial = new Transaction(doc, "delete Materials"))
+                {
+                    try
+                    {
+                        tMaterial.Start();
+                        ICollection<ElementId> purgeableMaterialsResult = doc.Delete(purgeableMaterials);
+                        LogTrace("LOG#purgeableMaterials->found Ids count: " + purgeableMaterials.Count.ToString() + " - return Ids count by delete " + purgeableMaterialsResult.Count.ToString());
+                        tMaterial.Commit();
+
+                    }
+                    catch (Exception e)
+                    {
+                        LogTrace("LOG#PurgeMaterials error: " + e.Message);
+                        tMaterial.RollBack();
+                    }
+                }
+            }
+
+            LogTrace("LOG#purgeableMaterials end: " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
+
+            List<ElementId> purgedMaterialAssets = PurgeMaterialAssets(nonPurgedElements.ToList(), doc);
+
+            return purgeableMaterials.Concat(purgedMaterialAssets).ToList();
+        }
+
+        private List<Autodesk.Revit.DB.ElementId> GetPurgeableElementIds(Document doc)
+        {
+            List<Autodesk.Revit.DB.FailureMessage> failureMessages = PerformanceAdviser.GetPerformanceAdviser()
+                                                                                       .ExecuteRules(doc, PerformanceAdviserRuleIds)
+                                                                                       .ToList();
+            if (failureMessages.Count > 0)
+            {
+                List<ElementId> purgeableElementIds = failureMessages[0].GetFailingElements().ToList();
+                LogTrace("LOG#purgeableElementIds count: " + purgeableElementIds.Count.ToString());
+                return purgeableElementIds;
+            }
+            LogTrace("LOG#no purgeableElementIds");
+            return null;
+        }
+
+        private List<PerformanceAdviserRuleId> performanceAdviserRuleIds;
+        private List<PerformanceAdviserRuleId> PerformanceAdviserRuleIds
+        {
+            get
+            {
+                if (performanceAdviserRuleIds == null)
+                {
+                    this.performanceAdviserRuleIds = GetPerfromanceAdviserRuleIdForPurge();
+                }
+                return performanceAdviserRuleIds;
+            }
+        }
+
+        private static List<PerformanceAdviserRuleId> GetPerfromanceAdviserRuleIdForPurge()
+        {
+            //The internal GUID of the purge Performance Adviser Rule 
+            const string purgePerformanceAdviserRuleGuid = "e8c63650-70b7-435a-9010-ec97660c1bda";
+
+            IList<PerformanceAdviserRuleId> performanceAdviserRules = PerformanceAdviser.GetPerformanceAdviser().GetAllRuleIds();
+            List<PerformanceAdviserRuleId> performanceAdviserRuleId = performanceAdviserRules.Where(x => x.Guid.ToString() == purgePerformanceAdviserRuleGuid).ToList();
+            if (performanceAdviserRuleId != null)
+            {
+                LogTrace("LOG#performanceAdviserRuleId count: " + performanceAdviserRuleId.Count.ToString());
+            }
+            else
+            {
+                LogTrace("LOG#performanceAdviserRuleId is null");
+            }
+            return performanceAdviserRuleId;
+        }
+
+
+        private static HashSet<ElementId> GetUsedMaterialIds(Autodesk.Revit.DB.Element type)
+        {
+            HostObjAttributes hostObj = type as HostObjAttributes;
+            HashSet<ElementId> usedMaterialIds = new HashSet<ElementId>();
+            if (hostObj != null)
+            {
+                var compoundStructure = hostObj.GetCompoundStructure();
+                if (compoundStructure != null)
+                {
+                    int layerCount = compoundStructure.LayerCount;
+                    for (int j = 0; j < layerCount; j++)
+                    {
+                        usedMaterialIds.Add(compoundStructure.GetMaterialId(j));
+                    }
+                }
+            }
+            List<ElementId> elementMaterialIds = type.GetMaterialIds(false).ToList();
+            if (elementMaterialIds.Any())
+                usedMaterialIds.UnionWith(elementMaterialIds);
+
+            return usedMaterialIds;
+        }
+
+        private List<Autodesk.Revit.DB.ElementId> PurgeMaterialAssets(List<Autodesk.Revit.DB.ElementId> elementIds, Document doc)
+        {
+            LogTrace("LOG#PurgeMaterialAssets");
+            List<ElementId> appearanceAssetIds = new FilteredElementCollector(doc)
+                .OfClass(typeof(AppearanceAssetElement))
+                .ToElementIds()
+                .ToList();
+
+            // The PropertySetElement contains either the Thermal or Structural Asset
+            // https://forums.autodesk.com/t5/revit-api-forum/material-assets-collector-appearance-structural-physical-amp/td-p/7256944
+            List<ElementId> propertySet = new FilteredElementCollector(doc)
+                .OfClass(typeof(PropertySetElement))
+                .ToElementIds()
+                .ToList();
+
+            int elementIdsCount = elementIds.Count();
+            for (int i = 0; i < elementIdsCount; i++)
+            {
+                try
+                {
+                    var material = doc.GetElement(elementIds[i]) as Autodesk.Revit.DB.Material;
+                    propertySet.Remove(material.ThermalAssetId);
+                    propertySet.Remove(material.StructuralAssetId);
+                    appearanceAssetIds.Remove(material.AppearanceAssetId);
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+            }
+
+            if (appearanceAssetIds.Count > 0)
+            {
+                LogTrace("LOG#appearanceAssetIds count: " + appearanceAssetIds.Count.ToString());
+                LogTrace("LOG#appearanceAsset begin: " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
+                using (Transaction tAsset = new Transaction(doc, "delete Assets"))
+                {
+                    try
+                    {
+                        tAsset.Start();
+
+                        ICollection<ElementId> appearanceAssetIdsResult = doc.Delete(appearanceAssetIds);
+                        LogTrace("LOG#appearanceAssetIds->found Ids count: " + appearanceAssetIds.Count.ToString() + " - return Ids count by delete " + appearanceAssetIdsResult.Count.ToString());
+                        tAsset.Commit();
+                    }
+                    catch (Exception e)
+                    {
+                        LogTrace("LOG#appearanceAssetIds delete error: " + e.Message);
+                        tAsset.RollBack();
+                    }
+                }
+                LogTrace("LOG#appearanceAsset end: " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
+            }
+
+            if (propertySet.Count > 0)
+            {
+                LogTrace("LOG#propertySet count: " + propertySet.Count.ToString());
+                LogTrace("LOG#propertySet begin: " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
+                using (Transaction tProperty = new Transaction(doc, "delete propertySet"))
+                {
+                    try
+                    {
+                        tProperty.Start();
+                        ICollection<ElementId> propertySetResult = doc.Delete(propertySet);
+                        LogTrace("LOG#propertySet->found Ids count: " + propertySet.Count.ToString() + " - return Ids count by delete " + propertySetResult.Count.ToString());
+                        tProperty.Commit();
+
+                    }
+                    catch (Exception e)
+                    {
+                        LogTrace("LOG#propertySet delete error: " + e.Message);
+                        tProperty.RollBack();
+                    }
+                }
+                LogTrace("LOG#propertySet end: " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
+            }
+
+            return appearanceAssetIds.Concat(propertySet).ToList();
+        }
