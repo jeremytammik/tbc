@@ -6,42 +6,39 @@
 
 <!---
 
-- another utility to keep in mind:
-  Use `ParameterFilterUtilities` to
-  Get all possible FilterRule parameters
-  https://forums.autodesk.com/t5/revit-api-forum/get-all-possible-filterrule-parameters/m-p/10936268
+- Kai Kasugai <kk@formitas.de> Re: eTransmit functionality
 
-- Constraining Stirrups to the Cover of the Host Element
-  https://forums.autodesk.com/t5/revit-api-forum/problem-with-constraining-stirrups-to-the-cover-of-the-host/td-p/10045899
+- purge via performance advisor
+  commennt https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html#comment-5716062022
+  by Virone Lorenzo
+  VB https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html#comment-5716062022
+  by Matt Taylor, associate and CAD developer at [WSP](https://www.wsp.com)
+  migrated by Ollie Green [OliverEGreen](https://github.com/OliverEGreen)
+  C# https://github.com/OliverEGreen/CodeSamples/blob/master/PurgeRevitViaAPI.cs
+  Python https://github.com/OliverEGreen/CodeSamples/blob/master/PurgeRevitViaAPI.py
 
-- zero energy house https://www.edx.org/course/zero-energy-design-an-approach-to-make-your-buildi?hs_analytics_source=referrals&utm_source=mooc.org&utm_medium=referral&utm_campaign=mooc.org-course-list
-TUDelft rowers 220 W continuous power, 330 peak; a match or candle flame provides about 100 W; to a water heater to provide 10 kW, you can see an array of 10 x 10 = 100 gas flames, where 100 x 100 W = 10 kW.
+- Now Available: Autodesk Revit IFC Manual Version 2.0
+  https://blogs.autodesk.com/revit/2022/02/09/now-available-revit-ifc-manual-version-2-0/
+  The Autodesk Revit IFC Manual provides technical guidance for teams working with openBIM workflows. IFC is the basis for exchanging data between different applications through openBIM workflows for building design, construction, procurement, maintenance, and operation, within project teams and across software applications.  According to buildingSMART, IFC “is a standardized, digital description of the built environment, including buildings and civil infrastructure. It is an open, international standard, meant to be vendor-neutral, or agnostic, and usable across a wide range of hardware devices, software platforms, and interfaces for many different use cases.”
+  Download version 2 of the manual here, available in 9 languages:    
 
-- Zero-Energy Design: an approach to make your building sustainable
-  /j/doc/book/zero_energy_design_sustainable_building/zed.txt
+- Reading ASHRAE Table information from elements
+  https://adndevblog.typepad.com/aec/2015/05/reading-ashrae-table-information-from-elements.html
+  By Augusto Goncalves
+
+- AI solves small human programming puzzles
+  DeepMind says its new AI coding engine is as good as an average human programmer
+  https://www.theverge.com/2022/2/2/22914085/alphacode-ai-coding-program-automatic-deepmind-codeforce
 
 twitter:
 
-ParameterFilterUtilities, constraining rebar stirrup to host cover, power, energy, entropy and information in the #RevitAPI FormulaManager @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/parameterfilterutilities
+ in the #RevitAPI FormulaManager @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-Taking a look at yet another overlooked Revit API utility class, rebar constraints, and learning basics of power, energy, entropy and information
-&ndash; ParameterFilterUtilities
-&ndash; Constrain stirrup to host cover
-&ndash; Rowers illustrate power and building energy
-&ndash; Wordle entropy and information...
+&ndash; 
+...
 
 linkedin:
 
-ParameterFilterUtilities, constraining rebar stirrup to host cover in the #RevitAPI
-
-https://autode.sk/parameterfilterutilities
-
-Taking a look at yet another overlooked Revit API utility class, rebar constraints, and learning basics of power, energy, entropy and information:
-
-- ParameterFilterUtilities
-- Constrain stirrup to host cover
-- Rowers illustrate power and building energy
-- Wordle entropy and information...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -54,66 +51,25 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Utility Classes and Constraining Stirrups
+### 
 
-Taking a look at
-yet another [overlooked Revit API utility class](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5,52),
-rebar constraints, and learning basics of power, energy, entropy and information:
+####<a name="2"></a> 
 
-- [ParameterFilterUtilities](#2)
-- [Constrain stirrup to host cover](#3)
-- [Rowers illustrate power and building energy](#4)
-- [Wordle entropy and information](#5)
-
-####<a name="2"></a> ParameterFilterUtilities
-
-Another example of the useful functionality provided by
-the [Revit API `*Utils` classes that are often overlooked](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.52) was
-highlighted by Samuel Kreuz' question and answer in the thread on using `ParameterFilterUtilities`
-to [get all possible `FilterRule` parameters](https://forums.autodesk.com/t5/revit-api-forum/get-all-possible-filterrule-parameters/m-p/10936268):
-
-**Question:** I would like to list all possible `ViewFilter` parameters for a given category, e.g., for the category `Walls` the parameters shown in this screenshot:
+**Question:** 
 
 <center>
-<img src="img/filter_rule_valid_params_for_wall.jpg" alt="Valid ViewFilter parameters" title="Valid ViewFilter parameters" width="800"/> <!-- 1394 -->
+<img src="img/.jpg" alt="" title="" width="800"/> <!-- 1394 -->
 </center>
 
-It seems like these are combinations of Project Parameters, Type Parameters and Instance Parameters.
-How to retrieve all parameters allowed for creating a filter rule?
-Or at least a way to check if a parameter is valid for creating a filter rule?
 
-**Answer:** Take a look at the `ParameterFilterUtilities` class, specifically
-the [GetFilterableParametersInCommon method](https://www.revitapidocs.com/2022/7ea624c7-2c0d-c9bb-3b2c-1ac798cf6606.htm).
 
-**Response:** This is exactly what I am looking for!
-I wasn't aware of the `ParameterFilterUtilities` until now.
-They seem to have some really useful methods for working with ViewFilters.
-This is how I checked for valid parameters for the category is `Walls`:
+**Answer:** 
+
+**Response:** 
 
 <pre class="code">
-&nbsp;&nbsp;List&lt;<span style="color:blue;">string</span>&gt;&nbsp;<span style="color:#1f377f;">parameterNames</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;List&lt;<span style="color:blue;">string</span>&gt;();
-&nbsp;&nbsp;IList&lt;ElementId&gt;&nbsp;<span style="color:#1f377f;">wallCatList</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;List&lt;ElementId&gt;()&nbsp;
-&nbsp;&nbsp;{&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">new</span>&nbsp;ElementId(BuiltInCategory.OST_Walls)&nbsp;
-&nbsp;&nbsp;};
- 
-&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">paramColl</span>&nbsp;=&nbsp;ParameterFilterUtilities
-&nbsp;&nbsp;&nbsp;&nbsp;.GetFilterableParametersInCommon(
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;doc,&nbsp;wallCatList);
- 
-&nbsp;&nbsp;<span style="color:#8f08c4;">foreach</span>&nbsp;(ElementId&nbsp;<span style="color:#1f377f;">param</span>&nbsp;<span style="color:#8f08c4;">in</span>&nbsp;paramColl)
-&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;BuiltInParameter&nbsp;<span style="color:#1f377f;">bip</span>&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;(BuiltInParameter)&nbsp;param.IntegerValue;
- 
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">string</span>&nbsp;<span style="color:#1f377f;">label</span>&nbsp;=&nbsp;LabelUtils.GetLabelFor(bip);
-&nbsp;&nbsp;&nbsp;&nbsp;parameterNames.Add(label);
-&nbsp;&nbsp;}
- 
-&nbsp;&nbsp;parameterNames.Sort();
-&nbsp;&nbsp;StringBuilder&nbsp;<span style="color:#1f377f;">sb</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;StringBuilder();
-&nbsp;&nbsp;parameterNames.ForEach(<span style="color:#1f377f;">e</span>&nbsp;=&gt;&nbsp;sb.Append(e&nbsp;+&nbsp;<span style="color:#a31515;">&quot;\r\n&quot;</span>));
-&nbsp;&nbsp;TaskDialog.Show(<span style="color:#a31515;">&quot;Filtered&nbsp;Parameters&quot;</span>,&nbsp;sb.ToString());</pre>
+
+
 </pre>
 
 The result includes all built-in parameters that can be used for filtering:
