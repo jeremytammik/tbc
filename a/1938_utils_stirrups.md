@@ -113,7 +113,7 @@ This is how I checked for valid parameters for the category is `Walls`:
 &nbsp;&nbsp;parameterNames.Sort();
 &nbsp;&nbsp;StringBuilder&nbsp;<span style="color:#1f377f;">sb</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;StringBuilder();
 &nbsp;&nbsp;parameterNames.ForEach(<span style="color:#1f377f;">e</span>&nbsp;=&gt;&nbsp;sb.Append(e&nbsp;+&nbsp;<span style="color:#a31515;">&quot;\r\n&quot;</span>));
-&nbsp;&nbsp;TaskDialog.Show(<span style="color:#a31515;">&quot;Filtered&nbsp;Parameters&quot;</span>,&nbsp;sb.ToString());</pre>
+&nbsp;&nbsp;TaskDialog.Show(<span style="color:#a31515;">&quot;Filtered&nbsp;Parameters&quot;</span>,&nbsp;sb.ToString());
 </pre>
 
 The result includes all built-in parameters that can be used for filtering:
