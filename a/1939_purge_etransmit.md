@@ -52,7 +52,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 
 
-Many thanks to ??? for raising this question and confirming the solution!
 
 ####<a name="2"></a> Purge via Performance Advisor
 
@@ -135,11 +134,10 @@ Download version 2 of the manual, available in 9 languages...
 ####<a name="5"></a> AI Solves Programming Tasks
 
 An AI now solves small human programming puzzles:
-[DeepMind says its new AI coding engine is as good as an average human programmer](https://www.theverge.com/2022/2/2/22914085/alphacode-ai-coding-program-automatic-deepmind-codeforce).
+[DeepMind says its new AI coding engine is as good as an average human programmer](https://www.theverge.com/2022/2/2/22914085/alphacode-ai-coding-program-automatic-deepmind-codeforce):
+
+> AlphaCode is good, but not great &ndash; not yet
 
 <center>
-<img src="img/.jpg" alt="" title="" width="800"/> <!-- 1394 -->
+<img src="img/alphacode.webp" alt="AlphaCode" title="AlphaCode" width="800"/> <!-- 1720 -->
 </center>
-
-<pre class="code">
-</pre>
