@@ -56,20 +56,35 @@ Many thanks to ??? for raising this question and confirming the solution!
 
 ####<a name="2"></a> Purge via Performance Advisor
 
-- purge via performance advisor
-commennt https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html#comment-5716062022
-by Virone Lorenzo
-VB https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html#comment-5716062022
-by Matt Taylor, associate and CAD developer at [WSP](https://www.wsp.com)
-migrated by Ollie Green [OliverEGreen](https://github.com/OliverEGreen)
-C# https://github.com/OliverEGreen/CodeSamples/blob/master/PurgeRevitViaAPI.cs
-Python https://github.com/OliverEGreen/CodeSamples/blob/master/PurgeRevitViaAPI.py
+Apparently, it is worthwhile pointing out again
+that you can [Purge Unused using Performance Adviser](https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html),
+as Virone Lorenzo pointed out in his [commennt](https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html#comment-5716062022):
+
+> WOAW this post is awesome and it seems to work in Revit 2021 very well!
+Thank you for the code and thank to Ollie for his publish in C#.
+It's better than a PostableCommand.
+
+Matt Taylor, associate and CAD developer at [WSP](https://www.wsp.com), provided the original implementation in VB.NET.
+Ollie ported it to both C# and Python, saying:
+
+> This is a massively underrated post!
+Thanks to Matt for sharing and to Jeremy for spreading the knowledge!
+I had a quick go at putting this together in C#.
+There's also an IronPython version of more or less the same in
+my [GitHub `CodeSamples` repository](https://github.com/OliverEGreen/CodeSamples/blob/master/PurgeRevitViaAPI.cs).
+Feel free to edit / republish!
+
+- [C#](https://github.com/OliverEGreen/CodeSamples/blob/master/PurgeRevitViaAPI.cs)
+- [Python](https://github.com/OliverEGreen/CodeSamples/blob/master/PurgeRevitViaAPI.py)
+
+Many thanks again to Matt and Ollie for providing this.
 
 ####<a name="3"></a> eTransmit Functionality in DA4R
 
 Dr. Kai Kasugai of [Formitas AG](https://formitas.de) took
 the task of purging a step further and implemented it for
-the [Forge Design Automation for Revit API, DA4R](https://forge.autodesk.com/en/docs/design-automation/v3/developers_guide/overview):
+the [Forge Design Automation for Revit API, DA4R](https://forge.autodesk.com/en/docs/design-automation/v3/developers_guide/overview),
+based on the Dynamo `PurgeUnused` node:
 
 **Question:** We are trying to implement the eTransmit functionality in DA4R, the Forge Design Automation API for Revit.
 
@@ -107,7 +122,6 @@ Here is a hopefully complete set of functions required to implement the function
 
 Many thanks to Kai for confirming this and sharing their imnprovements!
 
-
 ####<a name="4"></a> Updated Autodesk Revit IFC Manual
 
 Hot off the press from the factory,
@@ -116,24 +130,16 @@ Hot off the press from the factory,
 > The Autodesk Revit IFC Manual provides technical guidance for teams working with openBIM workflows.
 IFC is the basis for exchanging data between different applications through openBIM workflows for building design, construction, procurement, maintenance, and operation, within project teams and across software applications.
 According to buildingSMART, IFC is <i>a standardized, digital description of the built environment, including buildings and civil infrastructure. It is an open, international standard, meant to be vendor-neutral, or agnostic, and usable across a wide range of hardware devices, software platforms, and interfaces for many different use cases.</i>
-Download version 2 of the manual, available in 9 languages ...
+Download version 2 of the manual, available in 9 languages...
 
 ####<a name="5"></a> AI Solves Programming Tasks
 
-AI solves small human programming puzzles
-DeepMind says its new AI coding engine is as good as an average human programmer
-https://www.theverge.com/2022/2/2/22914085/alphacode-ai-coding-program-automatic-deepmind-codeforce
-
-
-**Question:** 
+An AI now solves small human programming puzzles:
+[DeepMind says its new AI coding engine is as good as an average human programmer](https://www.theverge.com/2022/2/2/22914085/alphacode-ai-coding-program-automatic-deepmind-codeforce).
 
 <center>
 <img src="img/.jpg" alt="" title="" width="800"/> <!-- 1394 -->
 </center>
-
-**Answer:** 
-
-**Response:** 
 
 <pre class="code">
 </pre>
