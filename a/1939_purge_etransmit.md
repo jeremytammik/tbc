@@ -85,9 +85,9 @@ Here are some past suggestions for purging unused elements:
 
 Apparently, the last post in the list above is worthwhile pointing out again;
 you can [purge unused using Performance Adviser](https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html),
-as Virone Lorenzo also underlined in his [commennt](https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html#comment-5716062022):
+as Virone Lorenzo also underlined in his [comment](https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html#comment-5716062022):
 
-> WOAW this post is awesome and it seems to work in Revit 2021 very well!
+> WOAW this post is awesome, and it seems to work in Revit 2021 very well!
 Thank you for the code and thanks to Ollie for publishing it in C#.
 It's better than a PostableCommand.
 
@@ -141,13 +141,12 @@ As we derived most of the code from the source you provided, I am glad to share 
 This code, as the DynamoRevit code, tries to delete all unused elements and materials from the document.
 I think the main modification was to step out of the recursive loop once the purgeable element count does not change anymore.
 
-This is a point that we are considering to improve further, as the count itself might not have changed, but the purgeable element ids did change.
+This is a point that we are considering improving further, as the count itself might not have changed, but the purgeable element ids did change.
 
 Here is a hopefully complete set of functions required to implement the functionality:
 
 - [eTransmit.cs](zip/eTransmit_partial.cs.txt)
 
-Many thanks to Kai for confirming this and sharing their imnprovements!
 
 ####<a name="5"></a> Updated Autodesk Revit IFC Manual
 

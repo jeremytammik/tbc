@@ -78,9 +78,9 @@ I want to write a script to purge unused in files.</p>
 <h4><a name="3"></a> Purge via Performance Advisor</h4>
 <p>Apparently, the last post in the list above is worthwhile pointing out again;
 you can <a href="https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html">purge unused using Performance Adviser</a>,
-as Virone Lorenzo also underlined in his <a href="https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html#comment-5716062022">commennt</a>:</p>
+as Virone Lorenzo also underlined in his <a href="https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html#comment-5716062022">comment</a>:</p>
 <blockquote>
-<p>WOAW this post is awesome and it seems to work in Revit 2021 very well!
+<p>WOAW this post is awesome, and it seems to work in Revit 2021 very well!
 Thank you for the code and thanks to Ollie for publishing it in C#.
 It's better than a PostableCommand.</p>
 </blockquote>
@@ -121,12 +121,11 @@ That looks very relevant, as it includes a method to purge materials.</p>
 <p>As we derived most of the code from the source you provided, I am glad to share the few modifications that we made to make it work for us in Design Automation.</p>
 <p>This code, as the DynamoRevit code, tries to delete all unused elements and materials from the document.
 I think the main modification was to step out of the recursive loop once the purgeable element count does not change anymore.</p>
-<p>This is a point that we are considering to improve further, as the count itself might not have changed, but the purgeable element ids did change.</p>
+<p>This is a point that we are considering improving further, as the count itself might not have changed, but the purgeable element ids did change.</p>
 <p>Here is a hopefully complete set of functions required to implement the functionality:</p>
 <ul>
 <li><a href="zip/eTransmit_partial.cs.txt">eTransmit.cs</a></li>
 </ul>
-<p>Many thanks to Kai for confirming this and sharing their imnprovements!</p>
 <h4><a name="5"></a> Updated Autodesk Revit IFC Manual</h4>
 <p>Hot off the press from the factory,
 <a href="https://blogs.autodesk.com/revit/2022/02/09/now-available-revit-ifc-manual-version-2-0">Now Available: Autodesk Revit IFC Manual Version 2.0</a>:</p>
