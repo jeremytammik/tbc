@@ -35,7 +35,6 @@ twitter:
 
 linkedin:
 
-
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -49,18 +48,47 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Purge and eTransmit for DA4R
 
+Today, let's return for a summary and a new, deeper look at a recurring topic:
 
+- [eTransmit documentation](#2)
+- [Purge via performance advisor](#3)
+- [eTransmit functionality in DA4R](#4)
+- [Updated Autodesk Revit IFC manual](#5)
+- [AI solves programming tasks](#6)
 
+####<a name="2"></a> eTransmit Documentation 
 
+Lately, a number of questions were raised on eTransmit and 'purge unused', e.g.,
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [eTransmit documentation](https://forums.autodesk.com/t5/revit-api-forum/etransmit-documentation/m-p/10949826):
 
-####<a name="2"></a> Purge via Performance Advisor
+**Question:** Is there documentation for `eTransmit`? 
+I want to write a script to purge unused in files.
 
-Apparently, it is worthwhile pointing out again
-that you can [Purge Unused using Performance Adviser](https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html),
-as Virone Lorenzo pointed out in his [commennt](https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html#comment-5716062022):
+**Answer:** All I am aware of is what you can find in the online help and in the web in general:
+
+- [help.autodesk.com/view/RVT/2022/ENU/?query=ETRANSMIT%20(Command)](https://help.autodesk.com/view/RVT/2022/ENU/?query=ETRANSMIT%20(Command))
+- [duckduckgo.com/?q=etransmit+revit](https://duckduckgo.com/?q=etransmit+revit)
+
+Here are some past suggestions for purging unused elements:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/11/purge-unused-text-note-types.html">Purge Unused Text Note Types</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/determining-purgeable-elements.html">Determining Purgeable Elements</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2013/07/sydney-revit-api-training-and-vacation.html#5">Purge all Zero-Area Rooms and Spaces</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2017/04/forgefader-ui-lookup-builds-purge-and-room-instances.html#4">Purging Types, Families and Materials</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/11/purge-and-detecting-an-empty-view.html">Purge and Detecting an Empty View</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html">Purge Unused using Performance Adviser</a></li>
+</ul>
+
+####<a name="3"></a> Purge via Performance Advisor
+
+Apparently, the last post is worthwhile pointing out again;
+you can [Purge Unused using Performance Adviser](https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html),
+as Virone Lorenzo also underlined out in his [commennt](https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html#comment-5716062022):
 
 > WOAW this post is awesome and it seems to work in Revit 2021 very well!
-Thank you for the code and thank to Ollie for his publish in C#.
+Thank you for the code and thank to Ollie for publishing it in C#.
 It's better than a PostableCommand.
 
 Matt Taylor, associate and CAD developer at [WSP](https://www.wsp.com), provided the original implementation in VB.NET.
@@ -78,7 +106,7 @@ Feel free to edit / republish!
 
 Many thanks again to Matt and Ollie for providing this.
 
-####<a name="3"></a> eTransmit Functionality in DA4R
+####<a name="4"></a> eTransmit Functionality in DA4R
 
 Dr. Kai Kasugai of [Formitas AG](https://formitas.de) took
 the task of purging a step further and implemented it for
@@ -121,7 +149,7 @@ Here is a hopefully complete set of functions required to implement the function
 
 Many thanks to Kai for confirming this and sharing their imnprovements!
 
-####<a name="4"></a> Updated Autodesk Revit IFC Manual
+####<a name="5"></a> Updated Autodesk Revit IFC Manual
 
 Hot off the press from the factory,
 [Now Available: Autodesk Revit IFC Manual Version 2.0](https://blogs.autodesk.com/revit/2022/02/09/now-available-revit-ifc-manual-version-2-0):
@@ -131,7 +159,7 @@ IFC is the basis for exchanging data between different applications through open
 According to buildingSMART, IFC is <i>a standardized, digital description of the built environment, including buildings and civil infrastructure. It is an open, international standard, meant to be vendor-neutral, or agnostic, and usable across a wide range of hardware devices, software platforms, and interfaces for many different use cases.</i>
 Download version 2 of the manual, available in 9 languages...
 
-####<a name="5"></a> AI Solves Programming Tasks
+####<a name="6"></a> AI Solves Programming Tasks
 
 An AI now solves small human programming puzzles:
 [DeepMind says its new AI coding engine is as good as an average human programmer](https://www.theverge.com/2022/2/2/22914085/alphacode-ai-coding-program-automatic-deepmind-codeforce):
