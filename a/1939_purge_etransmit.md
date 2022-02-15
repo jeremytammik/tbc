@@ -46,7 +46,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Purge and eTransmit for DA4R
+### Purge Unused and eTransmit for DA4R
 
 Today, let's return for a summary and a new, deeper look at a recurring topic:
 
@@ -165,5 +165,5 @@ An AI now solves small human programming puzzles:
 AlphaCode is good, but not great... not yet:
 
 <center>
-<img src="img/alphacode.webp" alt="AlphaCode" title="AlphaCode" width="800"/> <!-- 1720 -->
+<img src="img/alphacode.webp" alt="AlphaCode" title="AlphaCode" width="800"/> <!-- 1984 -->
 </center>
