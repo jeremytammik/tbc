@@ -110,10 +110,13 @@ Many thanks to Kai for confirming this and sharing their imnprovements!
 
 ####<a name="4"></a> Updated Autodesk Revit IFC Manual
 
-- Now Available: Autodesk Revit IFC Manual Version 2.0
-https://blogs.autodesk.com/revit/2022/02/09/now-available-revit-ifc-manual-version-2-0/
-The Autodesk Revit IFC Manual provides technical guidance for teams working with openBIM workflows. IFC is the basis for exchanging data between different applications through openBIM workflows for building design, construction, procurement, maintenance, and operation, within project teams and across software applications.  According to buildingSMART, IFC “is a standardized, digital description of the built environment, including buildings and civil infrastructure. It is an open, international standard, meant to be vendor-neutral, or agnostic, and usable across a wide range of hardware devices, software platforms, and interfaces for many different use cases.”
-Download version 2 of the manual here, available in 9 languages:    
+Hot off the press from the factory,
+[Now Available: Autodesk Revit IFC Manual Version 2.0](https://blogs.autodesk.com/revit/2022/02/09/now-available-revit-ifc-manual-version-2-0):
+
+> The Autodesk Revit IFC Manual provides technical guidance for teams working with openBIM workflows.
+IFC is the basis for exchanging data between different applications through openBIM workflows for building design, construction, procurement, maintenance, and operation, within project teams and across software applications.
+According to buildingSMART, IFC is <i>a standardized, digital description of the built environment, including buildings and civil infrastructure. It is an open, international standard, meant to be vendor-neutral, or agnostic, and usable across a wide range of hardware devices, software platforms, and interfaces for many different use cases.</i>
+Download version 2 of the manual, available in 9 languages ...
 
 ####<a name="5"></a> AI Solves Programming Tasks
 
