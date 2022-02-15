@@ -58,7 +58,7 @@ Today, let's return for a summary and a new, deeper look at a recurring topic:
 
 ####<a name="2"></a> eTransmit Documentation 
 
-Lately, a number of questions were raised on eTransmit and 'purge unused', e.g.,
+Lately, a number of questions were raised on eTransmit and 'purge unused', e.g., in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [eTransmit documentation](https://forums.autodesk.com/t5/revit-api-forum/etransmit-documentation/m-p/10949826):
 
@@ -73,22 +73,22 @@ I want to write a script to purge unused in files.
 Here are some past suggestions for purging unused elements:
 
 <ul>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2010/11/purge-unused-text-note-types.html">Purge Unused Text Note Types</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/determining-purgeable-elements.html">Determining Purgeable Elements</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2013/07/sydney-revit-api-training-and-vacation.html#5">Purge all Zero-Area Rooms and Spaces</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2017/04/forgefader-ui-lookup-builds-purge-and-room-instances.html#4">Purging Types, Families and Materials</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2017/11/purge-and-detecting-an-empty-view.html">Purge and Detecting an Empty View</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html">Purge Unused using Performance Adviser</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/11/purge-unused-text-note-types.html">Purge unused text note types</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/determining-purgeable-elements.html">Determining purgeable elements</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2013/07/sydney-revit-api-training-and-vacation.html#5">Purge all zero-area rooms and spaces</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2017/04/forgefader-ui-lookup-builds-purge-and-room-instances.html#4">Purging types, families and materials</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/11/purge-and-detecting-an-empty-view.html">Purge and detecting an empty view</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html">Purge unused using Performance Adviser</a></li>
 </ul>
 
 ####<a name="3"></a> Purge via Performance Advisor
 
-Apparently, the last post is worthwhile pointing out again;
-you can [Purge Unused using Performance Adviser](https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html),
-as Virone Lorenzo also underlined out in his [commennt](https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html#comment-5716062022):
+Apparently, the last post in the list above is worthwhile pointing out again;
+you can [purge unused using Performance Adviser](https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html),
+as Virone Lorenzo also underlined in his [commennt](https://thebuildingcoder.typepad.com/blog/2018/08/purge-unused-using-performance-adviser.html#comment-5716062022):
 
 > WOAW this post is awesome and it seems to work in Revit 2021 very well!
-Thank you for the code and thank to Ollie for publishing it in C#.
+Thank you for the code and thanks to Ollie for publishing it in C#.
 It's better than a PostableCommand.
 
 Matt Taylor, associate and CAD developer at [WSP](https://www.wsp.com), provided the original implementation in VB.NET.
@@ -128,9 +128,9 @@ That looks very relevant, as it includes a method to purge materials.
 
 Later: some feedback on the integration of the Purge Code from the Dynamo for Revit code base: 
  
-It really worked great and much faster than our previous attempt!
+It really worked great and much faster than our previous attempts!
  
-We have tested it in a lot of scenarios, small and large files, and it always worked as expected.
+We tested it in a lot of scenarios, small and large files, and it always worked as expected.
  
 This was a really important step for us, as this automation was one of the first that we integrated for our client and around 100 ACC users can now use that in the growing number of projects that we are currently moving from on-prem to ACC.
 
@@ -162,9 +162,8 @@ Download version 2 of the manual, available in 9 languages...
 ####<a name="6"></a> AI Solves Programming Tasks
 
 An AI now solves small human programming puzzles:
-[DeepMind says its new AI coding engine is as good as an average human programmer](https://www.theverge.com/2022/2/2/22914085/alphacode-ai-coding-program-automatic-deepmind-codeforce):
-
-> AlphaCode is good, but not great &ndash; not yet
+[DeepMind says its new AI coding engine is as good as an average human programmer](https://www.theverge.com/2022/2/2/22914085/alphacode-ai-coding-program-automatic-deepmind-codeforce);
+AlphaCode is good, but not great... not yet:
 
 <center>
 <img src="img/alphacode.webp" alt="AlphaCode" title="AlphaCode" width="800"/> <!-- 1720 -->
