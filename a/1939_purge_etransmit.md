@@ -179,5 +179,5 @@ An AI now solves small human programming puzzles:
 AlphaCode is good, but not great... not yet:
 
 <center>
-<img src="img/alphacode.webp" alt="AlphaCode" title="AlphaCode" width="800"/> <!-- 1984 -->
+<img src="img/alphacode.png" alt="AlphaCode" title="AlphaCode" width="800"/> <!-- 1984 -->
 </center>
