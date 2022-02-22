@@ -31,6 +31,15 @@ We take a look at maintaining relationships between Revit elements when copying,
 
 linkedin:
 
+We take a look at ACC, the Autodesk Construction Cloud, its APIs, the upcoming ACC summit and maintaining relationships between Revit elements when copying with the #RevitAPI
+
+https://autode.sk/copyrelationship
+
+- ACC Model Properties API
+- ACC integration partner summit
+- Maintain relationships copying elements
+- Unsplash with free images...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
