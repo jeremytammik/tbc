@@ -21,6 +21,8 @@
 
 twitter:
 
+ACC, the Autodesk Construction Cloud, its APIs, the upcoming ACC summit and maintaining relationships between Revit elements when copying with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/copyrelationship
+
 We take a look at maintaining relationships between Revit elements when copying, at ACC, the Autodesk Construction Cloud, and its APIs
 &ndash; ACC Model Properties API
 &ndash; ACC integration partner summit
@@ -48,6 +50,8 @@ We take a look at maintaining relationships between Revit elements when copying,
 - [ACC integration partner summit](#3)
 - [Maintain relationships copying elements](#4)
 - [Unsplash with free images](#5)
+- [Happy Twosday](#6)
+
 
 ####<a name="2"></a> ACC Model Properties API
 
@@ -149,3 +153,13 @@ the [Unsplash License](https://unsplash.com/license).
 <center>
 <img src="img/clark_van_der_beken_dtFnCDYHA2Q_unsplash.jpg" alt="Unsplash" title="Unsplash" width="300"/> <!-- 1000 -->
 </center>
+
+####<a name="6"></a> Happy Twosday
+
+This Tuesday, February 22, 2022, is both a Tuesday and a spectacular, unique Twosday, the date being both a palindrome and an ambigram:
+
+<center>
+<img src="img/2022-02-22_twosday.png" alt="Twosday" title="Twosday" width="400"/> <!-- 1196 -->
+</center>
+
+According to the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) international standard covering the worldwide exchange and communication of date- and time-related data, this is wrong, of course, and should be written the other way around, as 2022-02-22...
