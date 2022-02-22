@@ -21,8 +21,11 @@
 
 twitter:
 
-&ndash; 
-...
+We take a look at maintaining relationships between Revit elements when copying, at ACC, the Autodesk Construction Cloud, and its APIs
+&ndash; ACC Model Properties API
+&ndash; ACC integration partner summit
+&ndash; Maintain relationships copying elements
+&ndash; Unsplash with free images...
 
 linkedin:
 
@@ -37,9 +40,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### ACC, Model Properties, Copy Relationships
+### ACC Summit, Model Properties, Copy Relationships
 
-Let's take a look at maintaining relationships between Revit elements when copying, at ACC, the Autodesk Construction Cloud, and its APIs:
+We take a look at maintaining relationships between Revit elements when copying, at ACC, the Autodesk Construction Cloud, and its APIs:
 
 - [ACC Model Properties API](#2)
 - [ACC integration partner summit](#3)
@@ -59,13 +62,13 @@ This causes a considerable performance gain, especially dealing with large model
 Of course, as a developer, you have more functionality to take advantage of with less coding.
 With more and more people interested in analysing models, moving toward a model-based approach, and sharing models saved in Docs, among various disciplines and phases, we foresee a lot of potential use cases using this tool.
 
-Check out the comparison
-of [Model Properties API versus Model Derivative API](https://forge.autodesk.com/blog/model-properties-api-vs-model-derivative-api),
-and all the [other Forge community blog posts about ACC APIs](https://forge.autodesk.com/apis-and-services/autodesk-construction-cloud-acc-apis).
+For more information, check out the article mentioned above,
+the comparison of [Model Properties API versus Model Derivative API](https://forge.autodesk.com/blog/model-properties-api-vs-model-derivative-api) and
+the other [Forge community blog posts about ACC APIs](https://forge.autodesk.com/apis-and-services/autodesk-construction-cloud-acc-apis).
 
 ####<a name="3"></a> ACC Integration Partner Summit
 
-If you interested in learning more about Autodesk Construction Cloud products and making use of 
+If you are interested in learning more about Autodesk Construction Cloud products and making use of 
 the [Autodesk Construction Cloud (ACC) APIs](https://forge.autodesk.com/apis-and-services/autodesk-construction-cloud-acc-apis),
 you are invited you to join the [ACC Integration Partner Summit 2022](https://autodesk.registration.goldcast.io/events/636f754d-f617-4a4f-8fa9-38108c6f19d7),
 a virtual event on March 17, 2022.
@@ -129,7 +132,7 @@ When I collected the elements in my source document, I also collected their `Pha
 
 This allowed me to compare the output of `CopyElements` with that list and apply the settings of each element individually.
 
-Many thanks to Fabio for raising this issue and Steve Ragan for the effective solution!
+Many thanks to Fabio for raising this issue and Steve Ragan for sharing and explaining his effective solution!
 
 ####<a name="5"></a> Unsplash with Free Images
 
