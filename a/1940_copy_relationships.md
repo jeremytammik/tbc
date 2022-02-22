@@ -72,5 +72,5 @@ All photos are free to download and use under
 the [Unsplash License](https://unsplash.com/license).
 
 <center>
-<img src="img/alphacode.png" alt="AlphaCode" title="AlphaCode" width="800"/> <!-- 1984 -->
+<img src="img/clark_van_der_beken_dtFnCDYHA2Q_unsplash.jpg" alt="Unsplash" title="Unsplash" width="500"/> <!-- 1000 -->
 </center>
