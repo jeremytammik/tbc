@@ -37,101 +37,88 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### ACS Summit and Copy Relationships
+### ACC, Model Properties, Copy Relationships
 
-####<a name="2"></a> ACS Integration Partner Summit 2022
+####<a name="2"></a> ACC Model Properties
 
-Are you interested to learn more about Autodesk Construction Cloud products and make use of 
-the [Autodesk Construction Cloud (ACC) APIs](https://forge.autodesk.com/apis-and-services/autodesk-construction-cloud-acc-apis)?
+A new exciting Forge API may prove especially useful to Revit users,
+the [BIM 360/ACC Model Properties API](https://forge.autodesk.com/blog/bim-360acc-model-properties-api).
 
-If so, you are invited you to join the [ACC Integration Partner Summit 2022](https://autodesk.registration.goldcast.io/events/636f754d-f617-4a4f-8fa9-38108c6f19d7),
+It provides a powerful new tool to query, filter and compare properties of models. 
+
+For example, previously, if you were interested in only MEP elements (e.g., pipes and ducts) with a subset of their properties, you were required to download the entire model data and to parse the massive body if BIM data yourself. With this new tool, you can download only the elements and properties that you are interested in.
+The actual query operation is performed in the cloud, so you have much less data to download.
+This causes a considerable performance gain, especially dealing with large models.
+Of course, as a developer, you have more functionality to take advantage of with less coding.
+With more and more people interested in analysing models, moving toward a model-based approach, and sharing models saved in Docs, among various disciplines and phases, we foresee a lot of potential use cases using this tool.
+
+Check out the comparison
+of [Model Properties API versus Model Derivative API](https://forge.autodesk.com/blog/model-properties-api-vs-model-derivative-api),
+and all the [other Forge community blog posts about ACC APIs](https://forge.autodesk.com/apis-and-services/autodesk-construction-cloud-acc-apis).
+
+####<a name="3"></a> ACS Integration Partner Summit 2022
+
+If you interested in learning more about Autodesk Construction Cloud products and making use of 
+the [Autodesk Construction Cloud (ACC) APIs](https://forge.autodesk.com/apis-and-services/autodesk-construction-cloud-acc-apis),
+you are invited you to join the [ACC Integration Partner Summit 2022](https://autodesk.registration.goldcast.io/events/636f754d-f617-4a4f-8fa9-38108c6f19d7),
 a virtual event on March 17, 2022.
+
 Your Autodesk hosts will be Jim Lynch, SVP & GM of ACS, Josh Cheney, Senior Manager of Strategic Alliances, Jim Gray, Director of Product, ACS Service Infrastructure, and Anna Lazar, Strategic Alliances & Partnerships.
 
-For more information about the event, pleasze refer to the community blog article
+For more information about the event, please refer to the community blog article
 on [ACS Integration Partner Summit 2022](https://forge.autodesk.com/blog/acs-integration-partner-summit-2022),
-or you can jump directly to
+or jump directly to
 the [registration form](https://autodesk.registration.goldcast.io/events/636f754d-f617-4a4f-8fa9-38108c6f19d7).
 
-####<a name="3"></a> Maintain Relationships Copying Elements
+####<a name="4"></a> Maintain Relationships Copying Elements
 
 Returning to the pure .NET desktop Revit API, some interesting aspects of maintaining relationships between elements were discussed in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [PhaseCreated and PhaseDemolished after using `CopyElements`](https://forums.autodesk.com/t5/revit-api-forum/phasecreated-amp-phasedemolished-after-using-copyelements/m-p/10964247):
 
-**Question:**
+**Question:** I'm trying to copy elements from one document into another, which I'm managing fine.
+The issue I'm facing is that, despite having the origin document phases present in the destination document (same phase names at least), the copied elements' `Phase Created` and `Phase Demolished` do not match the original elements'.
 
- FabioLorettiOliveira 69 Views, 4 Replies
-‎2022-02-16 08:09 PM 
-PhaseCreated & PhaseDemolished after using CopyElements()
-Dear Santa,
+I checked if the ElementIds returned by `CopyElements` come up in the same order as the given ElementIds, but unfortunately that was not the case, and once the elements are copied I'm struggling to make a connection between origin and destination so I can match the phases.
 
-I know I'm a bit late but hopefully I can get this for my 2022 Christmas.
+I read the discussion
+on [copying elements, types and parameters](https://forums.autodesk.com/t5/revit-api-forum/copying-elements-types-and-parameters/m-p/9542634), 
+but it didn't help.
 
-I'm trying to copy elements from one document into another, which I'm managing fine. The issue I'm facing is that, despite having the origin document phases present in the destination document (same phase names at least), the copied elements' Phase Created and Phase Demolished are not matching the original elements'.
+**Answer 1:** I believe that when you collect a bunch of elements and copy them all together in one single operation, Revit will try to maintain and restore all their mutual relationships in the target database.
+Therefore, it might help if you add all possible references these elements have to other source database elements to the set of elements to copy.
+These references will include the element instances themselves, their types, phases, levels, views, materials, and whatever other objects you are interested in.
+Then you will have to test and see what Revit can do to try to avoid creating duplicates of them in the target database and map them to existing target objects instead.
 
-I've checked if the ElementIds returned by CopyElements() come up in the same order as the given ElementIds but unfortunately that was not the case and once the elements are copied I'm struggling to make a connection between origin and destination so I can match the phases.
+This behaviour is hinted at in the list
+of [extensible storage features](https://thebuildingcoder.typepad.com/blog/2011/06/extensible-storage-features.html#7).
 
-I'll try and behave this year!
+**Answer 2:** That’s standard behavior for the Revit User Interface.
+Elements that are pasted into a view do not get their phases from the copied elements.
+Instead, they get their phases from the phase of the view they are pasted into.
+For example, if the view pasted into has a new construction phase, that’s the phase that the elements will inherit for their created in phase.
 
-Fabio
+It’s possible to check the phases of every element copied, store those in an array, and then apply the phases to the new elements.
+I’ve created an addin that does that, and I’ve posted the code online:
 
- Solved by sragan. Go to Solution.
+- [Copy Similar Code](https://sites.google.com/site/revitapi123/copy-similar-code)
+> Here is the C# code for an app I wrote that copies and pastes Revit elements, and gives the pasted elements the same phase and workset of the copied elements. 
 
-Tags (0)
-Add tags
-Report
-4 REPLIES 
-Sort: 
-MESSAGE 2 OF 5
-FabioLorettiOliveira
- Advocate FabioLorettiOliveira in reply to: FabioLorettiOliveira
-‎2022-02-16 08:12 PM 
-Oh, and I've seen this too but it didn't help.
+You will have to do some extra work to deal with the fact that you are pasting into a different document, but that should be fairly easy to do.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 5
-jeremy.tammik
- Employee jeremy.tammik in reply to: FabioLorettiOliveira
-‎2022-02-17 12:58 AM 
-I believe that when you collect a bunch of elements and copy them all together in one single operation, Revit will try to maintain and restore all their mutual relationships in the target database. Therefore, it might help if you add all possible references these elements have to other source database elements to the set of elements to copy. These references will include the element instances themselves, their types, phases, levels, views, materials, and whatever other objects you are interested in. Then you will have to test and see what Revit can do to try to avoid creating duplicates of them in the target database and map them to existing target objects instead.
+**Response:** Thanks for the help, @jeremy.tammik and @sragan.
 
-This behaviour is hinted at in the list of extensible storage features:
+@sragan I was doing exactly what you suggested but I was getting inconsistent results when comparing the elements from the source model against the destination model. I then tried a few different ways and ended up realising that the `CopyElements` does return the same order of the given `ElementId` list, which then solved my problem.
 
-https://thebuildingcoder.typepad.com/blog/2011/06/extensible-storage-features.html#7
+When I collected the elements in my source document I also collected their `Phase Created` and `Phase Demolished` and stored all 3 in a list:
 
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 5
-sragan
- Advocate sragan in reply to: FabioLorettiOliveira
-‎2022-02-17 11:23 AM 
-That’s standard behavior for the Revit User Interface.  Elements that are pasted into a view do not get their phases from the copied elements.  Instead, they get their phases from the phase of the view they are pasted into.   For example, if the view pasted into has a new construction phase, that’s the phase that the elements will inherit for their created in phase.
+<pre class="code">
+  List&lt;KeyValuePair&lt;ElementId, KeyValuePair&lt;string, string&gt;&gt;&gt;()
+</pre>
 
-It’s possible to check the phases of every element copied, store those in an array, and then apply the phases to the new elements.  I’ve created an addin that does that, and I’ve posted the code online.  You will have to do some extra work to deal with the fact that you are pasting into a different document, but that should be fairly easy to do.
+This allowed me to compared the output of `CopyElements` with that list and apply the settings of each element individually.
 
-https://sites.google.com/site/revitapi123/copy-similar-code
-
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 5
-FabioLorettiOliveira
- Advocate FabioLorettiOliveira in reply to: FabioLorettiOliveira
-‎2022-02-21 11:26 PM 
-Thanks for the help, @jeremy.tammik and @sragan .
-
-@sragan I was doing exactly what you suggested but I was getting inconsistent results when comparing the elements from the source model against the destination model. I then tried a few different ways and ended up realising that the CopyElements() does return the same order of the given ElementId list, which then solved my problem.
-
-When I collected the elements in my source document I also collected their Phase Created and Phase Demolished and stored all 3 in a list as shown below. This allowed me to compared the output of CopyElements() with that list and apply the settings of each element individually.
-
-List<KeyValuePair<ElementId, KeyValuePair<string, string>>>()
-
-**Answer:** 
+Many thanks to Fabio for raising this issue and Steve Ragan for the effective solution!
 
 ####<a name="4"></a> Unsplash with Free Images
 
