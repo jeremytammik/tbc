@@ -77,6 +77,10 @@ on [ACS Integration Partner Summit 2022](https://forge.autodesk.com/blog/acs-int
 or jump directly to
 the [registration form](https://autodesk.registration.goldcast.io/events/636f754d-f617-4a4f-8fa9-38108c6f19d7).
 
+<center>
+<img src="img/acc_summit_2022.jpg" alt="ACC Integration Partner Summit" title="ACC Integration Partner Summit" width="500"/> <!-- 1060 -->
+</center>
+
 ####<a name="4"></a> Maintain Relationships Copying Elements
 
 Returning to the pure .NET desktop Revit API, some interesting aspects of maintaining relationships between elements were discussed in
