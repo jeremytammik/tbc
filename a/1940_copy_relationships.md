@@ -80,7 +80,7 @@ a virtual event on March 17, 2022.
 Your Autodesk hosts will be Jim Lynch, SVP & GM of ACS, Josh Cheney, Senior Manager of Strategic Alliances, Jim Gray, Director of Product, ACS Service Infrastructure, and Anna Lazar, Strategic Alliances & Partnerships.
 
 For more information about the event, please refer to the community blog article
-on [ACS Integration Partner Summit 2022](https://forge.autodesk.com/blog/acs-integration-partner-summit-2022),
+on [ACC Integration Partner Summit 2022](https://forge.autodesk.com/blog/acs-integration-partner-summit-2022),
 or jump directly to
 the [registration form](https://autodesk.registration.goldcast.io/events/636f754d-f617-4a4f-8fa9-38108c6f19d7).
 
