@@ -78,7 +78,7 @@ or jump directly to
 the [registration form](https://autodesk.registration.goldcast.io/events/636f754d-f617-4a4f-8fa9-38108c6f19d7).
 
 <center>
-<img src="img/acc_summit_2022.jpg" alt="ACC Integration Partner Summit" title="ACC Integration Partner Summit" width="500"/> <!-- 1060 -->
+<img src="img/acc_summit_2022.jpg" alt="ACC Integration Partner Summit" title="ACC Integration Partner Summit" width="400"/> <!-- 1060 -->
 </center>
 
 ####<a name="4"></a> Maintain Relationships Copying Elements
@@ -90,7 +90,7 @@ on [PhaseCreated and PhaseDemolished after using `CopyElements`](https://forums.
 **Question:** I'm trying to copy elements from one document into another, which I'm managing fine.
 The issue I'm facing is that, despite having the origin document phases present in the destination document (same phase names at least), the copied elements' `Phase Created` and `Phase Demolished` do not match the original elements'.
 
-I checked if the ElementIds returned by `CopyElements` come up in the same order as the given ElementIds, but unfortunately that was not the case, and once the elements are copied I'm struggling to make a connection between origin and destination so I can match the phases.
+I checked if the ElementIds returned by `CopyElements` come up in the same order as the given ElementIds, but unfortunately that was not the case, and once the elements are copied, I'm struggling to make a connection between origin and destination so I can match the phases.
 
 I read the discussion
 on [copying elements, types and parameters](https://forums.autodesk.com/t5/revit-api-forum/copying-elements-types-and-parameters/m-p/9542634), 
@@ -104,16 +104,16 @@ Then you will have to test and see what Revit can do to try to avoid creating du
 This behaviour is hinted at in the list
 of [extensible storage features](https://thebuildingcoder.typepad.com/blog/2011/06/extensible-storage-features.html#7).
 
-**Answer 2:** That’s standard behavior for the Revit User Interface.
+**Answer 2:** That’s standard behaviour for the Revit User Interface.
 Elements that are pasted into a view do not get their phases from the copied elements.
 Instead, they get their phases from the phase of the view they are pasted into.
 For example, if the view pasted into has a new construction phase, that’s the phase that the elements will inherit for their created in phase.
 
 It’s possible to check the phases of every element copied, store those in an array, and then apply the phases to the new elements.
-I’ve created an addin that does that, and I’ve posted the code online:
+I created an add-in that does exactly that and posted the code online:
 
 - [Copy Similar Code](https://sites.google.com/site/revitapi123/copy-similar-code)
-> Here is the C# code for an app I wrote that copies and pastes Revit elements, and gives the pasted elements the same phase and workset of the copied elements. 
+> Here is the C# code for an app I wrote that copies and pastes Revit elements and gives the pasted elements the same phase and workset of the copied elements. 
 
 You will have to do some extra work to deal with the fact that you are pasting into a different document, but that should be fairly easy to do.
 
@@ -121,13 +121,13 @@ You will have to do some extra work to deal with the fact that you are pasting i
 
 @sragan I was doing exactly what you suggested but I was getting inconsistent results when comparing the elements from the source model against the destination model. I then tried a few different ways and ended up realising that the `CopyElements` does return the same order of the given `ElementId` list, which then solved my problem.
 
-When I collected the elements in my source document I also collected their `Phase Created` and `Phase Demolished` and stored all 3 in a list:
+When I collected the elements in my source document, I also collected their `Phase Created` and `Phase Demolished` and stored all 3 in a list:
 
 <pre class="code">
   List&lt;KeyValuePair&lt;ElementId, KeyValuePair&lt;string, string&gt;&gt;&gt;()
 </pre>
 
-This allowed me to compared the output of `CopyElements` with that list and apply the settings of each element individually.
+This allowed me to compare the output of `CopyElements` with that list and apply the settings of each element individually.
 
 Many thanks to Fabio for raising this issue and Steve Ragan for the effective solution!
 
@@ -144,5 +144,5 @@ All photos are free to download and use under
 the [Unsplash License](https://unsplash.com/license).
 
 <center>
-<img src="img/clark_van_der_beken_dtFnCDYHA2Q_unsplash.jpg" alt="Unsplash" title="Unsplash" width="500"/> <!-- 1000 -->
+<img src="img/clark_van_der_beken_dtFnCDYHA2Q_unsplash.jpg" alt="Unsplash" title="Unsplash" width="300"/> <!-- 1000 -->
 </center>

@@ -65,7 +65,7 @@ on <a href="https://forge.autodesk.com/blog/acs-integration-partner-summit-2022"
 or jump directly to
 the <a href="https://autodesk.registration.goldcast.io/events/636f754d-f617-4a4f-8fa9-38108c6f19d7">registration form</a>.</p>
 <p><center>
-<img src="img/acc_summit_2022.jpg" alt="ACC Integration Partner Summit" title="ACC Integration Partner Summit" width="500"/> <!-- 1060 -->
+<img src="img/acc_summit_2022.jpg" alt="ACC Integration Partner Summit" title="ACC Integration Partner Summit" width="400"/> <!-- 1060 -->
 </center></p>
 <h4><a name="4"></a> Maintain Relationships Copying Elements</h4>
 <p>Returning to the pure .NET desktop Revit API, some interesting aspects of maintaining relationships between elements were discussed in
@@ -73,7 +73,7 @@ the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API d
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/phasecreated-amp-phasedemolished-after-using-copyelements/m-p/10964247">PhaseCreated and PhaseDemolished after using <code>CopyElements</code></a>:</p>
 <p><strong>Question:</strong> I'm trying to copy elements from one document into another, which I'm managing fine.
 The issue I'm facing is that, despite having the origin document phases present in the destination document (same phase names at least), the copied elements' <code>Phase Created</code> and <code>Phase Demolished</code> do not match the original elements'.</p>
-<p>I checked if the ElementIds returned by <code>CopyElements</code> come up in the same order as the given ElementIds, but unfortunately that was not the case, and once the elements are copied I'm struggling to make a connection between origin and destination so I can match the phases.</p>
+<p>I checked if the ElementIds returned by <code>CopyElements</code> come up in the same order as the given ElementIds, but unfortunately that was not the case, and once the elements are copied, I'm struggling to make a connection between origin and destination so I can match the phases.</p>
 <p>I read the discussion
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/copying-elements-types-and-parameters/m-p/9542634">copying elements, types and parameters</a>, 
 but it didn't help.</p>
@@ -83,27 +83,27 @@ These references will include the element instances themselves, their types, pha
 Then you will have to test and see what Revit can do to try to avoid creating duplicates of them in the target database and map them to existing target objects instead.</p>
 <p>This behaviour is hinted at in the list
 of <a href="https://thebuildingcoder.typepad.com/blog/2011/06/extensible-storage-features.html#7">extensible storage features</a>.</p>
-<p><strong>Answer 2:</strong> That’s standard behavior for the Revit User Interface.
+<p><strong>Answer 2:</strong> That’s standard behaviour for the Revit User Interface.
 Elements that are pasted into a view do not get their phases from the copied elements.
 Instead, they get their phases from the phase of the view they are pasted into.
 For example, if the view pasted into has a new construction phase, that’s the phase that the elements will inherit for their created in phase.</p>
 <p>It’s possible to check the phases of every element copied, store those in an array, and then apply the phases to the new elements.
-I’ve created an addin that does that, and I’ve posted the code online:</p>
+I created an add-in that does exactly that and posted the code online:</p>
 <ul>
 <li><a href="https://sites.google.com/site/revitapi123/copy-similar-code">Copy Similar Code</a><blockquote>
-<p>Here is the C# code for an app I wrote that copies and pastes Revit elements, and gives the pasted elements the same phase and workset of the copied elements. </p>
+<p>Here is the C# code for an app I wrote that copies and pastes Revit elements and gives the pasted elements the same phase and workset of the copied elements. </p>
 </blockquote>
 </li>
 </ul>
 <p>You will have to do some extra work to deal with the fact that you are pasting into a different document, but that should be fairly easy to do.</p>
 <p><strong>Response:</strong> Thanks for the help, @jeremy.tammik and @sragan.</p>
 <p>@sragan I was doing exactly what you suggested but I was getting inconsistent results when comparing the elements from the source model against the destination model. I then tried a few different ways and ended up realising that the <code>CopyElements</code> does return the same order of the given <code>ElementId</code> list, which then solved my problem.</p>
-<p>When I collected the elements in my source document I also collected their <code>Phase Created</code> and <code>Phase Demolished</code> and stored all 3 in a list:</p>
+<p>When I collected the elements in my source document, I also collected their <code>Phase Created</code> and <code>Phase Demolished</code> and stored all 3 in a list:</p>
 <pre class="code">
   List&lt;KeyValuePair&lt;ElementId, KeyValuePair&lt;string, string&gt;&gt;&gt;()
 </pre>
 
-<p>This allowed me to compared the output of <code>CopyElements</code> with that list and apply the settings of each element individually.</p>
+<p>This allowed me to compare the output of <code>CopyElements</code> with that list and apply the settings of each element individually.</p>
 <p>Many thanks to Fabio for raising this issue and Steve Ragan for the effective solution!</p>
 <h4><a name="5"></a> Unsplash with Free Images</h4>
 <p>I am a fan of open source, the creative commons license, free stuff, good will, sharing and learning together as a community.
@@ -116,5 +116,5 @@ All photos are free to download and use under
 the <a href="https://unsplash.com/license">Unsplash License</a>.</p>
 </blockquote>
 <p><center>
-<img src="img/clark_van_der_beken_dtFnCDYHA2Q_unsplash.jpg" alt="Unsplash" title="Unsplash" width="500"/> <!-- 1000 -->
+<img src="img/clark_van_der_beken_dtFnCDYHA2Q_unsplash.jpg" alt="Unsplash" title="Unsplash" width="300"/> <!-- 1000 -->
 </center></p>
