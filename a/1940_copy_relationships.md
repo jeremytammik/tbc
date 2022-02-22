@@ -41,18 +41,26 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 
 ####<a name="2"></a> ACS Integration Partner Summit 2022
-https://forge.autodesk.com/blog/acs-integration-partner-summit-2022
-registration
-https://autodesk.registration.goldcast.io/events/636f754d-f617-4a4f-8fa9-38108c6f19d7
 
+Are you interested to learn more about Autodesk Construction Cloud products and make use of 
+the [Autodesk Construction Cloud (ACC) APIs](https://forge.autodesk.com/apis-and-services/autodesk-construction-cloud-acc-apis)?
+
+If so, you are invited you to join the [ACC Integration Partner Summit 2022](https://autodesk.registration.goldcast.io/events/636f754d-f617-4a4f-8fa9-38108c6f19d7),
+a virtual event on March 17, 2022.
+Your Autodesk hosts will be Jim Lynch, SVP & GM of ACS, Josh Cheney, Senior Manager of Strategic Alliances, Jim Gray, Director of Product, ACS Service Infrastructure, and Anna Lazar, Strategic Alliances & Partnerships.
+
+For more information about the event, pleasze refer to the community blog article
+on [ACS Integration Partner Summit 2022](https://forge.autodesk.com/blog/acs-integration-partner-summit-2022),
+or you can jump directly to
+the [registration form](https://autodesk.registration.goldcast.io/events/636f754d-f617-4a4f-8fa9-38108c6f19d7).
 
 ####<a name="3"></a> Maintain Relationships Copying Elements
 
-PhaseCreated & PhaseDemolished after using CopyElements()
-https://forums.autodesk.com/t5/revit-api-forum/phasecreated-amp-phasedemolished-after-using-copyelements/m-p/10964247
-
-
+Returning to the pure .NET desktop Revit API, some interesting aspects of maintaining relationships between elements were discussed in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [PhaseCreated and PhaseDemolished after using `CopyElements`](https://forums.autodesk.com/t5/revit-api-forum/phasecreated-amp-phasedemolished-after-using-copyelements/m-p/10964247):
+
+
 
 
 **Question:**
