@@ -39,14 +39,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### ACC, Model Properties, Copy Relationships
 
-Let's take a look at how to maintain relationships between Revit elements when copying and at ACC, the Autodesk Construction Cloud and its APIs:
+Let's take a look at maintaining relationships between Revit elements when copying, at ACC, the Autodesk Construction Cloud, and its APIs:
 
-####<a name="2"></a> ACC Model Properties
-####<a name="3"></a> ACC Integration Partner Summit
-####<a name="4"></a> Maintain Relationships Copying Elements
-####<a name="5"></a> Unsplash with Free Images
+- [ACC Model Properties API](#2)
+- [ACC integration partner summit](#3)
+- [Maintain relationships copying elements](#4)
+- [Unsplash with free images](#5)
 
-####<a name="2"></a> ACC Model Properties
+####<a name="2"></a> ACC Model Properties API
 
 A new exciting Forge API may prove especially useful to Revit users,
 the [BIM 360/ACC Model Properties API](https://forge.autodesk.com/blog/bim-360acc-model-properties-api).
