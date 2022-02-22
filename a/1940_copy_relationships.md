@@ -39,6 +39,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### ACC, Model Properties, Copy Relationships
 
+Let's take a look at how to maintain relationships between Revit elements when copying and at ACC, the Autodesk Construction Cloud and its APIs:
+
+####<a name="2"></a> ACC Model Properties
+####<a name="3"></a> ACC Integration Partner Summit
+####<a name="4"></a> Maintain Relationships Copying Elements
+####<a name="5"></a> Unsplash with Free Images
+
 ####<a name="2"></a> ACC Model Properties
 
 A new exciting Forge API may prove especially useful to Revit users,
@@ -56,7 +63,7 @@ Check out the comparison
 of [Model Properties API versus Model Derivative API](https://forge.autodesk.com/blog/model-properties-api-vs-model-derivative-api),
 and all the [other Forge community blog posts about ACC APIs](https://forge.autodesk.com/apis-and-services/autodesk-construction-cloud-acc-apis).
 
-####<a name="3"></a> ACS Integration Partner Summit 2022
+####<a name="3"></a> ACC Integration Partner Summit
 
 If you interested in learning more about Autodesk Construction Cloud products and making use of 
 the [Autodesk Construction Cloud (ACC) APIs](https://forge.autodesk.com/apis-and-services/autodesk-construction-cloud-acc-apis),
@@ -120,7 +127,7 @@ This allowed me to compared the output of `CopyElements` with that list and appl
 
 Many thanks to Fabio for raising this issue and Steve Ragan for the effective solution!
 
-####<a name="4"></a> Unsplash with Free Images
+####<a name="5"></a> Unsplash with Free Images
 
 I am a fan of open source, the creative commons license, free stuff, good will, sharing and learning together as a community.
 Consequently, I share everything I can in public in the hope that it will come in useful for others as well and help make the world a better place.
