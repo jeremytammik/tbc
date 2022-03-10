@@ -25,8 +25,10 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+I am working on a few side projects and proofs of concept for my own and other teams
+&ndash; <code>RvtParamDrop</code> exports visible element properties
+&ndash; <code>RvtLock3r</code> validates BIM element properties
+&ndash; Drilling holes in beams...
 
 linkedin:
 
@@ -44,7 +46,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Drilling Holes in Beams and Other Projects
 
-I am working on various side projects and proofs of concept for my own and other teams, so I find myself a bit challenged finding enough time for blogging and monitoring the forum at the same time:
+I am working on a few side projects and proofs of concept for my own and other teams, so I find myself challenged finding enough time for blogging and monitoring the forum at the same time:
 
 - [RvtParamDrop exports visible element properties](#2)
 - [RvtLock3r validates BIM element properties](#3)
