@@ -44,61 +44,92 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Void in Family
 
+I am working on various side prjects and prrofs of concept for my own and other teams, so I am a bit challenged to find enough time for blogging and monitoring the forum at the same time:
+
+####<a name="2"></a> RvtParamDrop Exports Visible Element Properties
+
+The first side project was [RvtParamDrop](https://github.com/jeremytammik/RvtParamDrop).
+
+It simply exports all properties of all elements visible in a selected view for comparison and verification of all expected parameter values.
+
+The most interesting aspect is that all referenced elements and all their parameter also need to be included, recursively.
+
+In more detail, it generates a count and a `csv` of Revit parameters on elements in a view.
+
+- Do not limit yourself to shared parameters
+- Do limit yourself to parameters with a value
+- Name of the parameter
+- Schema (`TypeId`)
+
+A small number of parameters are intentionally ignored as redundant:
+
+- ELEM_CATEGORY_PARAM
+- ELEM_CATEGORY_PARAM_MT
+- ELEM_FAMILY_AND_TYPE_PARAM
+- ELEM_TYPE_PARAM
+- SYMBOL_ID_PARAM
+
+Include parameters from both elements and their types, i.e., both instance and type parameters.
+
+Actually, it's more complicated than that.
+Anything that is visible in the view will include its instance and type parameters.
+If an instance or a type has a parameter that refers to another `Element`, its instance and type parameters are also exported, regardless of whether it is visible or not.
+That is recursive, so if X references Y references Z references W, then W's parameters are exported if X, Y, or Z is visible.
+We follow all references.
+Who are we to say that a referenced `Element` isn't useful?
+
+If you find this useful or interesting, please let me know. 
+
+####<a name="3"></a> RvtParamDrop Exports Visible Element Properties
+
 ####<a name="2"></a> Void in Family to Drill Hole
 
 Richard explains how to drill a hole in a beam using a void or an opening by face in a family definition in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [how to create different unattached families to a `.rft` file without stacking it](https://forums.autodesk.com/t5/revit-api-forum/how-to-create-different-unattached-families-to-a-rft-file/td-p/10934607):
 
-**Question:** I'm coding a tool to drill holes to beams (structural framing). Each beam will host 2 drills, one to each end of it.
-To create my void extrusion that will cut the host I create an Arc at the coordinate (0, 0, 0) and extrude it in my "Metric Generic Model.rtf" located at "C:\ProgramData\Autodesk\RVT 2020\Family Templates\English" directory. Then I load the family into the document with the beams to be drilled and get the FamilySymbol like this:
+**Question:** I'm coding a tool to drill holes to beams (structural framing).
+Each beam will host 2 drills, one at each end.
+To create my void extrusion to cut the host, I create an `Arc` at the coordinate (0, 0, 0) and extrude it in my *Metric Generic Model.rtf* located in the *C:\ProgramData\Autodesk\RVT 2020\Family Templates\English* directory.
+Then, I load the family into the document with the beams to be drilled and get the `FamilySymbol` like this:
 
-Family family = familyTemplateDoc.LoadFamily(doc);
+<pre class="code">
+  Family family = familyTemplateDoc.LoadFamily(doc);
+  
+  FamilySymbol familySymbol = family.GetFamilySymbolIds()
+    .Select(x => doc.GetElement(x) as FamilySymbol)
+    .FirstOrDefault();
+</pre>
 
-FamilySymbol familySymbol = family.GetFamilySymbolIds()
-.Select(x => doc.GetElement(x) as FamilySymbol)
-.FirstOrDefault();
-
-In my document I insert the family instance using "doc.Create.NewFamilyInstance" ate the desired coordinate and finally AddInstanceVoidCut the beams.
+In my document I insert the family instance using `NewFamilyInstance` at the desired coordinate and finally `AddInstanceVoidCut` the beams.
 I'm facing the following issue (I moved the voids up so we can see it easily):
-mateuskomarchesqui_0-1644265722791.png
-Apparently each time I extrude a new Arc I am stacking it (the thicker cylinder is above for visualisation, it would overwrite the thinner one).
-The next beam to be drilled will keep stacking the void forms. So if I select 4 beams, the 8th hole will be done by the 8 void forms stacked.
-What could I be doing wrong? The extrusion needs to be created at the (0, 0, 0) coordinate so it can be easily modified at the .rfa file, beeing easily found throughout the .rfa file.
-Solved by RPTHOMAS108. Go to Solution.
-Tags (0)
-Add tags
-Report
-2 REPLIES 
-Sort: 
-MESSAGE 2 OF 3
-RPTHOMAS108
-Advisor RPTHOMAS108 in reply to: mateus.komarchesqui
-‎2022-02-07 02:02 PM 
-Sounds like a case of wrong type of family template and wrong NewFamilyInstance overload, there are easier ways to create holes in beams:
-Use "Metric Generic Model face based.rft" cut the host with the void in the family.
-Load the family into the project
-Host the family on the beam web:
-NewFamilyInstance(Face, XYZ, XYZ, FamilySymbol) or
-NewFamilyInstance(Reference, XYZ, XYZ, FamilySymbol)
-Note also there is no need to even create a family for this, you can create an opening by face:
-Document.NewOpening
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 3
-mateus.komarchesqui
-Explorer mateus.komarchesqui in reply to: RPTHOMAS108
-‎2022-02-07 02:46 PM 
-I wanted to use voids in order to learn it, I'm new at the API and I was overcomplicating the solution. It's kinda overkill what I was trying to do...
-Switched up to Document.Create.NewOpening and it works like a charm! Thank you.
-
 
 <center>
-<img src="img/void_in_family.png" alt="Void in family" title="Void in family" width="400"/> <!-- 1427 -->
+<img src="img/stacked_voids.png" alt="Stacked voids" title="Stacked voids" width="400"/> <!-- 1427 -->
 </center>
 
+Apparently, each time I extrude a new `Arc` I am stacking it (the thicker cylinder is above for visualisation, it would overwrite the thinner one).
+The next beam to be drilled will keep stacking the void forms. So if I select 4 beams, the 8th hole will be done by the 8 void forms stacked.
+What could I be doing wrong?
+The extrusion needs to be created at the (0, 0, 0) coordinate so it can be easily modified at the .rfa file, beeing easily found throughout the .rfa file.
 
+**Answer:** This sounds like a case of wrong type of family template and wrong `NewFamilyInstance` overload.
+There are easier ways to create holes in beams:
+
+- Use "Metric Generic Model face based.rft" cut the host with the void in the family.
+- Load the family into the project
+- Host the family on the beam web:
+- NewFamilyInstance(Face, XYZ, XYZ, FamilySymbol) or
+- NewFamilyInstance(Reference, XYZ, XYZ, FamilySymbol)
+
+Note also there is no need to even create a family for this, you can create an opening by face:
+
+- Document.NewOpening
+
+**Response:** I wanted to use voids in order to learn it; I'm new at the API and I was overcomplicating the solution.
+It's kinda overkill what I was trying to do...
+
+Switched up to `NewOpening` and it works like a charm! Thank you.
 
 ####<a name="3"></a> 
 
