@@ -56,7 +56,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 </ul>
 <h4><a name="2"></a> RvtParamDrop Exports Visible Element Properties</h4>
 <p>The first recent side project was <a href="https://github.com/jeremytammik/RvtParamDrop">RvtParamDrop</a>.</p>
-<p>It simply exports all properties of all elements visible in a selected view for comparison and verification of all expected parameter values, generateing a count and a <code>csv</code> output file.</p>
+<p>It simply exports all properties of all elements visible in a selected view for comparison and verification of all expected parameter values, generating a count and a <code>csv</code> output file.</p>
 <p>One interesting aspect is that all referenced elements and all their properties also need to be included, recursively.</p>
 <p>Here is the specification in slightly more detail:</p>
 <ul>
@@ -80,7 +80,7 @@ If an instance or a type has a parameter that refers to another <code>Element</c
 That is recursive, so if X references Y references Z references W, then W's parameters are exported if X, Y, or Z is visible.
 We follow all references.
 Who are we to say that a referenced <code>Element</code> isn't useful?</p>
-<p>Hi hope you find this interesting and useful.</p>
+<p>I hope you find this interesting and useful.</p>
 <h4><a name="3"></a> RvtLock3r Validates BIM Element Properties</h4>
 <p>Another on-going project is still WIP, and also an exercise getting started with the Revit API for
 my new colleague <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/11981988">Caroline</a>.</p>
@@ -110,7 +110,7 @@ the <a href="https://en.wikipedia.org/wiki/Ground_truth">ground truth</a> input 
 and they can be completely automated, more or less programmatically assisted, or fully manual.</p>
 <p>In all three cases, you will first need to determine up front what elements and which shared parameters on them are to be checked. Retrieve the corresponding parameter values, compute their checksums, and save the above-mentioned triples.</p>
 <h4><a name="3.4"></a> Storage</h4>
-<p>The ground truth data triples containing the data rerquired for integrity validation needs to be stored somewhere. That could be hard-wired directly into the add-in code for a specific BIM, stored in an external text file, within the <code>RVT</code> document, or elsewhere; it may be <code>JSON</code> formatted; it may be encrypted; still to be decided.</p>
+<p>The ground truth data triples containing the data required for integrity validation needs to be stored somewhere. That could be hard-wired directly into the add-in code for a specific BIM, stored in an external text file, within the <code>RVT</code> document, or elsewhere; it may be <code>JSON</code> formatted; it may be encrypted; still to be decided.</p>
 <p>Two options are available for storing custom data directly within the <code>RVT</code> project file: shared parameters and extensible storage.
 The latter is more modern and explicitly tailored for use by applications and data that is not accessible to the end user or even Revit itself.
 That seems most suitable for our purpose here.
@@ -144,7 +144,7 @@ I'm facing the following issue (I moved the voids up so we can see it easily):</
 <p>Apparently, each time I extrude a new <code>Arc</code> I am stacking it (the thicker cylinder is above for visualisation, it would overwrite the thinner one).
 The next beam to be drilled will keep stacking the void forms. So if I select 4 beams, the 8th hole will be done by the 8 void forms stacked.
 What could I be doing wrong?
-The extrusion needs to be created at the (0, 0, 0) coordinate so it can be easily modified at the .rfa file, beeing easily found throughout the .rfa file.</p>
+The extrusion needs to be created at the origin so it can be easily found and modified.</p>
 <p><strong>Answer:</strong> This sounds like a case of wrong type of family template and wrong <code>NewFamilyInstance</code> overload.
 There are easier ways to create holes in beams:</p>
 <ul>

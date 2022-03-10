@@ -58,7 +58,7 @@ I am working on various side projects and proofs of concept for my own and other
 
 The first recent side project was [RvtParamDrop](https://github.com/jeremytammik/RvtParamDrop).
 
-It simply exports all properties of all elements visible in a selected view for comparison and verification of all expected parameter values, generateing a count and a `csv` output file.
+It simply exports all properties of all elements visible in a selected view for comparison and verification of all expected parameter values, generating a count and a `csv` output file.
 
 One interesting aspect is that all referenced elements and all their properties also need to be included, recursively.
 
@@ -86,7 +86,7 @@ That is recursive, so if X references Y references Z references W, then W's para
 We follow all references.
 Who are we to say that a referenced `Element` isn't useful?
 
-Hi hope you find this interesting and useful.
+I hope you find this interesting and useful.
 
 ####<a name="3"></a> RvtLock3r Validates BIM Element Properties 
 
@@ -135,7 +135,7 @@ In all three cases, you will first need to determine up front what elements and 
 
 ####<a name="3.4"></a> Storage
 
-The ground truth data triples containing the data rerquired for integrity validation needs to be stored somewhere. That could be hard-wired directly into the add-in code for a specific BIM, stored in an external text file, within the `RVT` document, or elsewhere; it may be `JSON` formatted; it may be encrypted; still to be decided.
+The ground truth data triples containing the data required for integrity validation needs to be stored somewhere. That could be hard-wired directly into the add-in code for a specific BIM, stored in an external text file, within the `RVT` document, or elsewhere; it may be `JSON` formatted; it may be encrypted; still to be decided.
 
 Two options are available for storing custom data directly within the `RVT` project file: shared parameters and extensible storage.
 The latter is more modern and explicitly tailored for use by applications and data that is not accessible to the end user or even Revit itself.
@@ -176,7 +176,7 @@ I'm facing the following issue (I moved the voids up so we can see it easily):
 Apparently, each time I extrude a new `Arc` I am stacking it (the thicker cylinder is above for visualisation, it would overwrite the thinner one).
 The next beam to be drilled will keep stacking the void forms. So if I select 4 beams, the 8th hole will be done by the 8 void forms stacked.
 What could I be doing wrong?
-The extrusion needs to be created at the (0, 0, 0) coordinate so it can be easily modified at the .rfa file, beeing easily found throughout the .rfa file.
+The extrusion needs to be created at the origin so it can be easily found and modified.
 
 **Answer:** This sounds like a case of wrong type of family template and wrong `NewFamilyInstance` overload.
 There are easier ways to create holes in beams:
