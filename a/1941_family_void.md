@@ -104,7 +104,7 @@ Here are some notes from the current state of the project repository readme:
 
 Revit does not provide any functionality to ensure that shared parameter values are not modified.
 
-The add-in stores a checksum for the original intended values of selected shared parameters and implements a validation function to ensure that the current values compute the same checksum.
+RvtLock3r stores a checksum for the original intended values of selected shared parameters and implements a validation function to ensure that the current values compute the same checksum.
 
 The validation function is initially implemented as an external command.
 
@@ -112,7 +112,7 @@ It may later be triggered automatically on opening or saving a document to notif
 
 ####<a name="3.2"></a> Validation
 
-The customer add-in reads a set of [ground truth](https://en.wikipedia.org/wiki/Ground_truth) data from some [storage location](#storage). It contains a list of triples:
+RvtLock3r reads a set of [ground truth](https://en.wikipedia.org/wiki/Ground_truth) data from some [storage location](#storage). It contains a list of triples:
 
 - `ElementId`
 - Shared parameter `GUID`

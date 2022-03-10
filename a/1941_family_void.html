@@ -91,11 +91,11 @@ that certain specified BIM element properties have not been modified.</p>
 <p>Here are some notes from the current state of the project repository readme:</p>
 <h4><a name="3.1"></a> Motivation</h4>
 <p>Revit does not provide any functionality to ensure that shared parameter values are not modified.</p>
-<p>The add-in stores a checksum for the original intended values of selected shared parameters and implements a validation function to ensure that the current values compute the same checksum.</p>
+<p>RvtLock3r stores a checksum for the original intended values of selected shared parameters and implements a validation function to ensure that the current values compute the same checksum.</p>
 <p>The validation function is initially implemented as an external command.</p>
 <p>It may later be triggered automatically on opening or saving a document to notify the user that undesired tampering has taken place.</p>
 <h4><a name="3.2"></a> Validation</h4>
-<p>The customer add-in reads a set of <a href="https://en.wikipedia.org/wiki/Ground_truth">ground truth</a> data from some <a href="#storage">storage location</a>. It contains a list of triples:</p>
+<p>RvtLock3r reads a set of <a href="https://en.wikipedia.org/wiki/Ground_truth">ground truth</a> data from some <a href="#storage">storage location</a>. It contains a list of triples:</p>
 <ul>
 <li><code>ElementId</code></li>
 <li>Shared parameter <code>GUID</code></li>
