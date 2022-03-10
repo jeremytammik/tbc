@@ -42,9 +42,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Void in Family
+### Drilling Holes in Beams and Other Projects
 
-I am working on various side prjects and prrofs of concept for my own and other teams, so I am a bit challenged to find enough time for blogging and monitoring the forum at the same time:
+I am working on various side projects and proofs of concept for my own and other teams, so I find myself a bit challenged finding enough time for blogging and monitoring the forum at the same time:
+
+####<a name="2"></a> RvtParamDrop Exports Visible Element Properties
+####<a name="3"></a> RvtLock3r Validate BIM Element Properties
+####<a name="3.1"></a> Motivation
+####<a name="3.2"></a> Validation
+####<a name="3.3"></a> Preparation
+####<a name="3.4"></a> Storage
+####<a name="4"></a> Drilling Holes in Beams
 
 ####<a name="2"></a> RvtParamDrop Exports Visible Element Properties
 
@@ -137,7 +145,7 @@ However, it interferes least with Revit operation when placed on a dedicated `Da
 especially [in a worksharing environment](http://thebuildingcoder.typepad.com/blog/2015/02/extensible-storage-in-a-worksharing-environment.html).
 Creation and population of a `DataStorage` element is demonstrated by the [named GUID storage for project identification](https://thebuildingcoder.typepad.com/blog/2016/04/named-guid-storage-for-project-identification.html) sample.
 
-####<a name="4"></a> Void in Family to Drill Hole
+####<a name="4"></a> Drilling Holes in Beams
 
 Getting back to real-life issues,
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas explains
