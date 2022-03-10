@@ -80,11 +80,68 @@ Who are we to say that a referenced `Element` isn't useful?
 
 If you find this useful or interesting, please let me know. 
 
-####<a name="3"></a> RvtParamDrop Exports Visible Element Properties
+####<a name="3"></a> RvtLock3r Validate BIM Element Properties 
 
-####<a name="2"></a> Void in Family to Drill Hole
+Another on-going project is still WIP, and also an exercise getting started with the Revit API for
+my new colleague [Caroline](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/11981988).
 
-Richard explains how to drill a hole in a beam using a void or an opening by face in a family definition in
+[RvtLock3r](https://github.com/jeremytammik/RvtLock3r) validates
+that certain specified BIM element properties have not been modified.
+
+Here are some notes from the current state of the project repository readme:
+
+####<a name="3.1"></a> Motivation
+
+Revit does not provide any functionality to ensure that shared parameter values are not modified.
+
+The add-in stores a checksum for the original intended values of selected shared parameters and implements a validation function to ensure that the current values compute the same checksum.
+
+The validation function is initially implemented as an external command.
+
+It may later be triggered automatically on opening or saving a document to notify the user that undesired tampering has taken place.
+
+####<a name="3.2"></a> Validation
+
+The customer add-in reads a set of [ground truth](https://en.wikipedia.org/wiki/Ground_truth) data from some [storage location](#storage). It contains a list of triples:
+
+- `ElementId`
+- Shared parameter `GUID`
+- Checksum
+
+The add-in iterates over all elements and shared parameters specified by these triples, reads the corresponding shared parameter value, calculates its checksum and validates it by comparison with the ground truth value.
+
+Discrepancies are logged and a report is presented to the user.
+
+The add-in does not care what kind of elements or shared parameters are being examined.
+That worry is left up to whoever creates the ground truth file.
+
+In the initial proof of concept, the triples are simply space separated in individual lines in a text file.
+
+####<a name="3.3"></a> Preparation
+
+There are various possible approaches to prepare
+the [ground truth](https://en.wikipedia.org/wiki/Ground_truth) input text file,
+and they can be completely automated, more or less programmatically assisted, or fully manual.
+
+In all three cases, you will first need to determine up front what elements and which shared parameters on them are to be checked. Retrieve the corresponding parameter values, compute their checksums, and save the above-mentioned triples.
+
+####<a name="3.4"></a> Storage
+
+The ground truth data triples containing the data rerquired for integrity validation needs to be stored somewhere. That could be hard-wired directly into the add-in code for a specific BIM, stored in an external text file, within the `RVT` document, or elsewhere; it may be `JSON` formatted; it may be encrypted; still to be decided.
+
+Two options are available for storing custom data directly within the `RVT` project file: shared parameters and extensible storage.
+The latter is more modern and explicitly tailored for use by applications and data that is not accessible to the end user or even Revit itself.
+That seems most suitable for our purpose here.
+Extensible storage can be added to any database element.
+However, it interferes least with Revit operation when placed on a dedicated `DataStorage` element,
+especially [in a worksharing environment](http://thebuildingcoder.typepad.com/blog/2015/02/extensible-storage-in-a-worksharing-environment.html).
+Creation and population of a `DataStorage` element is demonstrated by the [named GUID storage for project identification](https://thebuildingcoder.typepad.com/blog/2016/04/named-guid-storage-for-project-identification.html) sample.
+
+####<a name="4"></a> Void in Family to Drill Hole
+
+Getting back to real-life issues,
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas explains
+how to drill a hole in a beam using a void or an opening by face in a family definition in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [how to create different unattached families to a `.rft` file without stacking it](https://forums.autodesk.com/t5/revit-api-forum/how-to-create-different-unattached-families-to-a-rft-file/td-p/10934607):
 
@@ -94,11 +151,11 @@ To create my void extrusion to cut the host, I create an `Arc` at the coordinate
 Then, I load the family into the document with the beams to be drilled and get the `FamilySymbol` like this:
 
 <pre class="code">
-  Family family = familyTemplateDoc.LoadFamily(doc);
-  
-  FamilySymbol familySymbol = family.GetFamilySymbolIds()
-    .Select(x => doc.GetElement(x) as FamilySymbol)
-    .FirstOrDefault();
+  Family&nbsp;family&nbsp;=&nbsp;familyTemplateDoc.LoadFamily(doc);
+ 
+  FamilySymbol&nbsp;familySymbol&nbsp;=&nbsp;family.GetFamilySymbolIds()
+  &nbsp;&nbsp;.Select(<span style="color:#1f377f;">x</span>&nbsp;=&gt;&nbsp;doc.GetElement(x)&nbsp;<span style="color:blue;">as</span>&nbsp;FamilySymbol)
+  &nbsp;&nbsp;.FirstOrDefault();
 </pre>
 
 In my document I insert the family instance using `NewFamilyInstance` at the desired coordinate and finally `AddInstanceVoidCut` the beams.
@@ -131,18 +188,5 @@ It's kinda overkill what I was trying to do...
 
 Switched up to `NewOpening` and it works like a charm! Thank you.
 
-####<a name="3"></a> 
-
-####<a name="4"></a> 
-
-**Question:** 
-
-**Answer 1:** 
-
-
-**Response:** 
-
-<pre class="code">
-</pre>
-
+Many thanks once again to Richard for contributing all his reliable in-depth help and experience in the forum!
 
