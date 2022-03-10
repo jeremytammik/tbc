@@ -46,13 +46,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 I am working on various side projects and proofs of concept for my own and other teams, so I find myself a bit challenged finding enough time for blogging and monitoring the forum at the same time:
 
-- [RvtParamDrop Exports Visible Element Properties](#2)
-- [RvtLock3r Validate BIM Element Properties](#3)
-- [Motivation](#3.1)
-- [Validation](#3.2)
-- [Preparation](#3.3)
-- [Storage](#3.4)
-- [Drilling Holes in Beams](#4)
+- [RvtParamDrop exports visible element properties](#2)
+- [RvtLock3r validates BIM element properties](#3)
+    - [Motivation](#3.1)
+    - [Validation](#3.2)
+    - [Preparation](#3.3)
+    - [Storage](#3.4)
+- [Drilling holes in beams](#4)
 
 ####<a name="2"></a> RvtParamDrop Exports Visible Element Properties
 
@@ -88,7 +88,7 @@ Who are we to say that a referenced `Element` isn't useful?
 
 If you find this useful or interesting, please let me know. 
 
-####<a name="3"></a> RvtLock3r Validate BIM Element Properties 
+####<a name="3"></a> RvtLock3r Validates BIM Element Properties 
 
 Another on-going project is still WIP, and also an exercise getting started with the Revit API for
 my new colleague [Caroline](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/11981988).
