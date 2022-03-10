@@ -55,17 +55,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li><a href="#4">Drilling holes in beams</a></li>
 </ul>
 <h4><a name="2"></a> RvtParamDrop Exports Visible Element Properties</h4>
-<p>The first side project was <a href="https://github.com/jeremytammik/RvtParamDrop">RvtParamDrop</a>.</p>
-<p>It simply exports all properties of all elements visible in a selected view for comparison and verification of all expected parameter values.</p>
-<p>The most interesting aspect is that all referenced elements and all their parameter also need to be included, recursively.</p>
-<p>In more detail, it generates a count and a <code>csv</code> of Revit parameters on elements in a view.</p>
+<p>The first recent side project was <a href="https://github.com/jeremytammik/RvtParamDrop">RvtParamDrop</a>.</p>
+<p>It simply exports all properties of all elements visible in a selected view for comparison and verification of all expected parameter values, generateing a count and a <code>csv</code> output file.</p>
+<p>One interesting aspect is that all referenced elements and all their properties also need to be included, recursively.</p>
+<p>Here is the specification in slightly more detail:</p>
 <ul>
 <li>Do not limit yourself to shared parameters</li>
 <li>Do limit yourself to parameters with a value</li>
 <li>Name of the parameter</li>
 <li>Schema (<code>TypeId</code>)</li>
 </ul>
-<p>A small number of parameters are intentionally ignored as redundant:</p>
+<p>A small number of parameters can be ignored as redundant:</p>
 <ul>
 <li>ELEM_CATEGORY_PARAM</li>
 <li>ELEM_CATEGORY_PARAM_MT</li>
@@ -80,7 +80,7 @@ If an instance or a type has a parameter that refers to another <code>Element</c
 That is recursive, so if X references Y references Z references W, then W's parameters are exported if X, Y, or Z is visible.
 We follow all references.
 Who are we to say that a referenced <code>Element</code> isn't useful?</p>
-<p>If you find this useful or interesting, please let me know. </p>
+<p>Hi hope you find this interesting and useful.</p>
 <h4><a name="3"></a> RvtLock3r Validates BIM Element Properties</h4>
 <p>Another on-going project is still WIP, and also an exercise getting started with the Revit API for
 my new colleague <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/11981988">Caroline</a>.</p>

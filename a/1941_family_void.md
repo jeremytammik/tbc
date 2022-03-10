@@ -56,20 +56,20 @@ I am working on various side projects and proofs of concept for my own and other
 
 ####<a name="2"></a> RvtParamDrop Exports Visible Element Properties
 
-The first side project was [RvtParamDrop](https://github.com/jeremytammik/RvtParamDrop).
+The first recent side project was [RvtParamDrop](https://github.com/jeremytammik/RvtParamDrop).
 
-It simply exports all properties of all elements visible in a selected view for comparison and verification of all expected parameter values.
+It simply exports all properties of all elements visible in a selected view for comparison and verification of all expected parameter values, generateing a count and a `csv` output file.
 
-The most interesting aspect is that all referenced elements and all their parameter also need to be included, recursively.
+One interesting aspect is that all referenced elements and all their properties also need to be included, recursively.
 
-In more detail, it generates a count and a `csv` of Revit parameters on elements in a view.
+Here is the specification in slightly more detail:
 
 - Do not limit yourself to shared parameters
 - Do limit yourself to parameters with a value
 - Name of the parameter
 - Schema (`TypeId`)
 
-A small number of parameters are intentionally ignored as redundant:
+A small number of parameters can be ignored as redundant:
 
 - ELEM_CATEGORY_PARAM
 - ELEM_CATEGORY_PARAM_MT
@@ -86,7 +86,7 @@ That is recursive, so if X references Y references Z references W, then W's para
 We follow all references.
 Who are we to say that a referenced `Element` isn't useful?
 
-If you find this useful or interesting, please let me know. 
+Hi hope you find this interesting and useful.
 
 ####<a name="3"></a> RvtLock3r Validates BIM Element Properties 
 
