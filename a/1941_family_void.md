@@ -149,7 +149,7 @@ Creation and population of a `DataStorage` element is demonstrated by the [named
 
 Getting back to real-life issues,
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas explains
-how to drill a hole in a beam using a void or an opening by face in a family definition in
+how to drill a hole in a beam  in a family definition using an opening by face in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [how to create different unattached families to a `.rft` file without stacking it](https://forums.autodesk.com/t5/revit-api-forum/how-to-create-different-unattached-families-to-a-rft-file/td-p/10934607):
 
