@@ -46,13 +46,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 I am working on various side projects and proofs of concept for my own and other teams, so I find myself a bit challenged finding enough time for blogging and monitoring the forum at the same time:
 
-####<a name="2"></a> RvtParamDrop Exports Visible Element Properties
-####<a name="3"></a> RvtLock3r Validate BIM Element Properties
-####<a name="3.1"></a> Motivation
-####<a name="3.2"></a> Validation
-####<a name="3.3"></a> Preparation
-####<a name="3.4"></a> Storage
-####<a name="4"></a> Drilling Holes in Beams
+- [RvtParamDrop Exports Visible Element Properties](#2)
+- [RvtLock3r Validate BIM Element Properties](#3)
+- [Motivation](#3.1)
+- [Validation](#3.2)
+- [Preparation](#3.3)
+- [Storage](#3.4)
+- [Drilling Holes in Beams](#4)
 
 ####<a name="2"></a> RvtParamDrop Exports Visible Element Properties
 
