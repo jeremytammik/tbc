@@ -46,23 +46,18 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> Void in Family to Drill Hole
 
+Richard explains how to drill a hole in a beam using a void or an opening by face in a family definition in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [how to create different unattached families to a `.rft` file without stacking it](https://forums.autodesk.com/t5/revit-api-forum/how-to-create-different-unattached-families-to-a-rft-file/td-p/10934607):
 
-<center>
-<img src="img/void_in_family.png" alt="Void in family" title="Void in family" width="400"/> <!-- 1427 -->
-</center>
-
-  Richard explains how to drill a hole in a beam using a void or an opening by face in a family definition in
-  the r...
-  on [How to create different unattached families to a .rft file without stacking it]()
-  https://forums.autodesk.com/t5/revit-api-forum/how-to-create-different-unattached-families-to-a-rft-file/td-p/10934607
-  [Q] I'm coding a tool to drill holes to beams (structural framing). Each beam will host 2 drills, one to each end of it.
+**Question:** I'm coding a tool to drill holes to beams (structural framing). Each beam will host 2 drills, one to each end of it.
 To create my void extrusion that will cut the host I create an Arc at the coordinate (0, 0, 0) and extrude it in my "Metric Generic Model.rtf" located at "C:\ProgramData\Autodesk\RVT 2020\Family Templates\English" directory. Then I load the family into the document with the beams to be drilled and get the FamilySymbol like this:
 
-  Family family = familyTemplateDoc.LoadFamily(doc);
-  
-  FamilySymbol familySymbol = family.GetFamilySymbolIds()
-    .Select(x => doc.GetElement(x) as FamilySymbol)
-    .FirstOrDefault();
+Family family = familyTemplateDoc.LoadFamily(doc);
+
+FamilySymbol familySymbol = family.GetFamilySymbolIds()
+.Select(x => doc.GetElement(x) as FamilySymbol)
+.FirstOrDefault();
 
 In my document I insert the family instance using "doc.Create.NewFamilyInstance" ate the desired coordinate and finally AddInstanceVoidCut the beams.
 I'm facing the following issue (I moved the voids up so we can see it easily):
@@ -97,6 +92,12 @@ Explorer mateus.komarchesqui in reply to: RPTHOMAS108
 ‎2022-02-07 02:46 PM 
 I wanted to use voids in order to learn it, I'm new at the API and I was overcomplicating the solution. It's kinda overkill what I was trying to do...
 Switched up to Document.Create.NewOpening and it works like a charm! Thank you.
+
+
+<center>
+<img src="img/void_in_family.png" alt="Void in family" title="Void in family" width="400"/> <!-- 1427 -->
+</center>
+
 
 
 ####<a name="3"></a> 
