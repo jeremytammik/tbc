@@ -6,14 +6,28 @@
 
 <!---
 
+https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.4.0
+Minimize, maximize support #134. Fixed problem with sending a print job #133
+
+Allow user maximize form full screen #134
+
+> Enable user to maximize all forms to full screen; useful to display long string data or to  expand the form full size of review 
+
+Fix automatic execute method SubmitPrint #133
+
+> A problem when user snoops to `PrintManager` and invokes the `SubmitPrint` method
+
+Many thanks to 
+[Chuong Ho](https://github.com/chuongmep)
+[Roman 'Nice3point'](https://github.com/Nice3point)
+
 twitter:
 
-RvtParamDrop exports BIM element properties, RvtLock3r validates them, and drilling holes in beams in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/drillholeinbeam
+the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-I am working on a few side projects and proofs of concept for my own and other teams
-&ndash; <code>RvtParamDrop</code> exports visible element properties
 &ndash; <code>RvtLock3r</code> validates BIM element properties
-&ndash; Drilling holes in beams...
+&ndash; 
+...
 
 linkedin:
 
