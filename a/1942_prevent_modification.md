@@ -48,7 +48,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-###
+### Prevent Modification, RevitLookup and WPF
+
+
+
+
+####<a name="2"></a> Prevent Modification
 
 Revit is a design tool and as such targeted at people editing the BIM.
 
@@ -62,22 +67,119 @@ For read-only access to a model, you might want to consider using a pure viewer 
 
 [Rational BIM Programming](https://thebuildingcoder.typepad.com/blog/2017/10/rational-bim-programming-at-au-darmstadt.html)
 
-I mentioned my current RvtLock3r side project that ensures that certain specified parameter values have not been modifiecd.
+I [mentioned](https://thebuildingcoder.typepad.com/blog/2022/03/drilling-holes-in-beams-and-other-projects.html#3) my
+current [RvtLock3r](https://github.com/jeremytammik/RvtLock3r) side project
+that ensures that certain specified parameter values have not been modifiecd.
 
-Let's look at some other approaches to prevent model modification
+Two other recent queries on how to prevent model modification came up in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
+on how to [hide or block explode import instance](https://forums.autodesk.com/t5/revit-api-forum/hide-or-block-explode-import-instance-cads/m-p/10829603)
+and how to [make instance and its parameters NOT editable](https://forums.autodesk.com/t5/revit-api-forum/make-instance-and-its-parameters-not-editable/m-p/9821547):
 
+**Question :** At some point at creating a drawing, we have a status of instances in the drawing, that the user/architect is NOT allowed anymore to change ANY parameters in the instance and is NOT allowed to move the instance at all.
 
-####<a name="2"></a> 
+I found out that you can pin the elements and make them not selectable anymore:
 
-[Make instance and its parameters NOT editable](https://forums.autodesk.com/t5/revit-api-forum/make-instance-and-its-parameters-not-editable/m-p/9821547)
+<pre class="code">
+element.Pinned = true
+
+var options =  SelectionUIOptions.GetSelectionUIOptions();
+
+options.SelectPinned = false;
+</pre>
+
+Also, I could add a Trigger to observe a custom parameter or a built in parameter.
+
+BUT (!) the user can still check that checkbox of the "Select pinned elements" again and I cannot find an Event that observes these user action.
+
+The `DocumentChanged` event is not fired, when I click on that checkbox.
+
+Is there any other option to make instances not editable anymore? Or can I observe the action of the user, when he/she is checking or unchecking the Selection option?
+
+My workaround would be, that if the user would want to change the element again and it has this kind of (locked) status set, to observe this and undo the action. But this is such a dirty workaround I would not be happy with it.
+
+I would have to set a trigger for everything in this element. And in my opinion this is a bad solution.
+
+**Answer:** Pining the element to prevent change is probably the wrong starting point, since that mechanism is mostly useful for datum elements and links, i.e., the items you more often than not want to prevent movement of.
+The 'select pinned items in view' button I believe is more of a user preference than a document change so I assume that setting would be per user and so not stored with the Document.
+Additionally, if I pin something I can still change it's parameters.
+
+There is a slow filter 'SelectableInViewFilter' which can be used to determine if something can be selected in view.
+So, one approach could be to store the ElementIds of your protected items and run this filter for a view to ensure nothing is missing. This also seems more trouble than it is worth since it is a slow filter and you'd probably have to run it quite often.
+
+The best approach I know of for change control is to put the protected elements on mirrored worksets:
+
+- GridsAndLevels > GridsAndLevelsReadOnly
+- PrimaryStructure > PrimaryStructureReadonly etc.
+
+The 'ReadOnly' worksets above would have an owner that isn't a normal user, i.e., you create a fictitious user and have that user take ownership of the worksets.
+This was easier in the past when you could change the Revit user name.
+Depending on your product licensing arrangement this may still be a viable option for you.
+I say it is the best approach since element ownership through worksets is an inherent aspect of Revit and so you can rely on the infrastructure already in place.
+
+An alternative approach is to implement an `IUpdater`, decorate the element with a parameter value or extensible storage and then, if that Element is changed, post a failure with the only option being undo.
+
+**Response:** Thank you for your suggestions &nbsp; :-)
+
+I looked at
+the video [BIMedge &ndash; Admin User to Lock out Worksets](https://youtu.be/0KS2nwHWZRQ) that 
+shows the Workset stuff that you mean &ndash; the thing is, that I can easily change my account into "Admin" and so every other user could do it like that (change his user name.. etc).
+
+Another problem I had was that the workset option was greyed out in my document.
+But I think I should first make sure what a "Workset" is and how to create and use it.
+
+I already implemented an Updater Trigger for a user parameter (its what I mentioned in my question). And then dynamically add another trigger which catches EVERY change of the element (with Element.GetChangeTypeAny) and undo it, if its status is set to our defined "not editable anymore" status.
+
+I just thought that this solution is not nice and thought there must be a nicer and cleaner solution to this.
+
+But it seems there isn't.
+
+So I will implement it like I already planned.
+
+Thanks a lot for your help!!
+
+**Answer:** That's fine; just bear in mind there is no absolute way of preventing a user from editing something, not even with the API. An add-in only enforces something if it is running.
+
+I think there has to be a level of trust that the users will not act inappropriately; additionally there needs to be a model audit / checking process.
+
+**Response:** Yes, you are right.
+If the user wants to commit to our database I would check, if he changed something without the add-in.
+The commit can only be done via the add-in.
+
+Users are clever, they always find a way to "cheat" ... :-)
+
+**Answer 2:** The cleanest solution would be to prevent the user selecting the element.
+So, program your own "SelectionChanged Event" as described in the thread
+on [element selection changed event implementation struggles](https://forums.autodesk.com/t5/revit-api-forum/element-selection-changed-event-implementation-struggles/m-p/9229523).
+
+In the "eventhandler", or, in my solution, the IsCommandAvailable method, find the selected elements in the active document `Selection` `GetElementIds`.
+If your target Ids are present in the selection, remove them from the selection, effectively blocking the user from selecting the element.
+
+I don't know how time-consuming the removal of id's will be with a large number of target Ids.
+
+**Response:** Thanks for your answer.
+
+The thing is, the user would then see no more information about the element.
+
+So, I think that my first suggestion with pinning the elements and making them not selectable is a very bad idea.
+
+Later: so, I have talked to the support.
+
+Atm there is no way to "lock" an instance in the model...
+
+Unfortunately the workaround(s) are the only ways to get such behavior...
+
+Thanks a lot again for your help!!!
+
+Many thanks to Diana, Richard and Fair59 for the interesting discussion and solutions!
 
 ####<a name="3"></a> 
+
 
 **Question:** 
 
 <pre class="code">
 </pre>
-
 
 **Answer:** 
 
