@@ -31,7 +31,6 @@ twitter:
 
 the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; <code>RvtLock3r</code> validates BIM element properties
 &ndash; 
 ...
 
@@ -173,25 +172,74 @@ Thanks a lot again for your help!!!
 
 Many thanks to Diana, Richard and Fair59 for the interesting discussion and solutions!
 
-####<a name="3"></a> 
+####<a name="3"></a> RevitLookup Updates
 
+Several up dates were added
+to [RevitLookup](https://github.com/jeremytammik/RevitLookup)
+especially by very active contributor [Chuong Ho](https://github.com/chuongmep):
 
-**Question:** 
+- [Release 2022.0.4.0](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.4.0): 
+    - Minimize and maximize window support [#134](https://github.com/jeremytammik/RevitLookup/pull/134):
+      Enable user to maximize all forms to full screen; useful to display long string data and to expand the form to full size for review 
+    - Fixed problem with sending a print job [#133](https://github.com/jeremytammik/RevitLookup/pull/133):
+      A problem when user snoops to `PrintManager` and invokes the `SubmitPrint` method
 
-<pre class="code">
-</pre>
+Many thanks to
+[Chuong Ho](https://github.com/chuongmep) or these enhancements and to 
+[Roman 'Nice3point'](https://github.com/Nice3point) for managing the releases.
 
-**Answer:** 
+####<a name="4"></a> RevitLookup in WPF
 
-**Response:** 
+Chuong Ho or [Hồ Văn Chương](https://chuongmep.com) is very active in other areas as well.
 
-Many thanks  to  for contributing 
+Among many other projects, he is working
+on [RevitLookupWpf](https://github.com/weianweigan/RevitLookupWpf):
 
-####<a name="6"></a> Pilcrow
+> Hello everyone,
+Today, I would like to introduce to you
+the [Revitlookupwpf project](https://github.com/weianweigan/RevitLookupWpf).
+This project deeply supports Revit API by me and a Chinese friend is dududu collaborate;
+this is one of our efforts to enhance development improvement in the construction industry.
+With Revitlookupwpf, you can look into every detail clearly inside and execute it directly, and many more exciting things we are working on.
+We are creating features that have never been available before and we are open to accepting any ideas and pull requests.
+This is opensource project and everyone can view it.
 
-I enjoy using words the I never used before, and sometimes I find ones that I never even heard of.
+**Question:** How is this different than the original [RevitLookup](https://github.com/jeremytammik/RevitLookup)?
+Am I missing something?
+Is the difference that yours is using WPF instead of WinForms?
+
+**Answer:**  Yes, and more.
+
+Basically it is not the same.
+I will write a document explaining all after complete feature.
+It is an example, you can see description of methods and properties from code, and it is linked with [revitapidocs](https://www.revitapidocs.com).
+
+**Question:**  Is it a Modeless window now? Would be a great thing.
+
+**Answer:**  Yes, it working in a modeless window.
+
+**Question:**  Great! Is is free to download?
+
+**Answer:**  Sure, it free and you can download file `msi` to install from
+the [latest release](https://github.com/weianweigan/RevitLookupWpf/releases/latest).
+
+<center>
+<img src="img/revitlookupwpf.jpg" alt="RevitLookupWpf" title="RevitLookupWpf" width="686"/>
+</center>
+
+Many thanks to Chuong Ho for this great initiative, and the best of luck with it in future!
+ 
+<center>
+<img src="img/chuongmep.tiff" alt="Hồ Văn Chương" title="Hồ Văn Chương" width="256"/>
+</center>
+
+####<a name="5"></a> Pilcrow
+
+I enjoy using words that I never used before, and sometimes discover new ones that I never even heard of.
 
 An opportunity presented itself in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [AutoCAD to Revit text importing](https://forums.autodesk.com/t5/revit-api-forum/autocad-to-revit-text-importing/m-p/10822619):
 
-https://forums.autodesk.com/t5/revit-api-forum/autocad-to-revit-text-importing/m-p/10822619
-
+> I just performed an Internet search for &para; and learned that it is named [Pilcrow](https://en.wikipedia.org/wiki/Pilcrow).
+Never heard that name before.
