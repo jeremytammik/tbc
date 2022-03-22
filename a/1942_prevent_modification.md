@@ -49,7 +49,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Prevent Modification, RevitLookup and WPF
 
-Some notes on different approaches to prevent modification on certain elements and the latest news on RevitLookup:
+Some notes on different approaches to prevent modification of certain elements and the latest news on RevitLookup:
 
 - [Prevent modification](#2)
 - [RevitLookup updates](#3)
@@ -62,13 +62,11 @@ Revit is a design tool and as such targeted at people editing the BIM.
 
 In many situations, orders of magnitude more people might need to view is or query certain properties.
 
-For instance, a couple of dozen people might design an airport, thousands might build it, and millions might end up usig=ng it a requiring a floor plan or other navigation support to to so effectively.
+For instance, a couple of dozen people might design an airport, thousands might build it, and millions might end up using it, wandering around and requiring a floor plan or other navigation support to to so effectively.
 
 For such situations, you would use a viewer or other simplified or read-only access to certain aspects, subsets or properties of the the BIM.
 
 For read-only access to a model, you might want to consider using a pure viewer instead, first and foremost something globally accessible like the Forge platform.
-
-[Rational BIM Programming](https://thebuildingcoder.typepad.com/blog/2017/10/rational-bim-programming-at-au-darmstadt.html)
 
 I [mentioned](https://thebuildingcoder.typepad.com/blog/2022/03/drilling-holes-in-beams-and-other-projects.html#3) my
 current [RvtLock3r](https://github.com/jeremytammik/RvtLock3r) side project
