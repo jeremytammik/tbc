@@ -49,8 +49,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Prevent Modification, RevitLookup and WPF
 
+Some notes on different approaches to prevent modification on certain elements and the latest news on RevitLookup:
 
-
+- [Prevent modification](#2)
+- [RevitLookup updates](#3)
+- [RevitLookupWpf](#4)
+- [Pilcrow](#5)
 
 ####<a name="2"></a> Prevent Modification
 
@@ -80,11 +84,11 @@ and how to [make instance and its parameters NOT editable](https://forums.autode
 I found out that you can pin the elements and make them not selectable anymore:
 
 <pre class="code">
-element.Pinned = true
-
-var options =  SelectionUIOptions.GetSelectionUIOptions();
-
-options.SelectPinned = false;
+  element.Pinned = true;
+  
+  var options =  SelectionUIOptions.GetSelectionUIOptions();
+  
+  options.SelectPinned = false;
 </pre>
 
 Also, I could add a Trigger to observe a custom parameter or a built in parameter.
