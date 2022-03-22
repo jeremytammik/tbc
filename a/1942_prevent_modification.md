@@ -234,11 +234,13 @@ It is an example, you can see description of methods and properties from code, a
 **Answer:**  Sure, it free and you can download file `msi` to install from
 the [latest release](https://github.com/weianweigan/RevitLookupWpf/releases/latest).
 
-Many thanks to Chuong Ho for this great initiative, and the best of luck with it in future!
- 
+Many thanks to Chuong Ho for this great initiative, and the best of luck with it going forward!
+
+<!---
 <center>
 <img src="img/chuongmep.tiff" alt="Hồ Văn Chương" title="Hồ Văn Chương" width="256"/>
 </center>
+--->
 
 ####<a name="5"></a> Pilcrow
 
