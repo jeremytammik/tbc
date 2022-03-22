@@ -68,7 +68,7 @@ For such situations, you would use a viewer or other simplified or read-only acc
 
 For read-only access to a model, you might want to consider using a pure viewer instead, first and foremost something globally accessible like the Forge platform.
 
-I [mentioned](https://thebuildingcoder.typepad.com/blog/2022/03/drilling-holes-in-beams-and-other-projects.html#3) my
+I [recently mentioned](https://thebuildingcoder.typepad.com/blog/2022/03/drilling-holes-in-beams-and-other-projects.html#3) my
 current [RvtLock3r](https://github.com/jeremytammik/RvtLock3r) side project
 that ensures that certain specified parameter values have not been modifiecd.
 
@@ -102,34 +102,35 @@ My workaround would be, that if the user would want to change the element again 
 I would have to set a trigger for everything in this element. And in my opinion this is a bad solution.
 
 **Answer:** Pining the element to prevent change is probably the wrong starting point, since that mechanism is mostly useful for datum elements and links, i.e., the items you more often than not want to prevent movement of.
-The 'select pinned items in view' button I believe is more of a user preference than a document change so I assume that setting would be per user and so not stored with the Document.
-Additionally, if I pin something I can still change it's parameters.
+The 'select pinned items in view' button I believe is more of a user preference than a document change, so I assume that setting would be per user and therefore not stored with the Document.
+Additionally, if I pin something, I can still change it's parameters.
 
 There is a slow filter 'SelectableInViewFilter' which can be used to determine if something can be selected in view.
 So, one approach could be to store the ElementIds of your protected items and run this filter for a view to ensure nothing is missing. This also seems more trouble than it is worth since it is a slow filter and you'd probably have to run it quite often.
 
 The best approach I know of for change control is to put the protected elements on mirrored worksets:
 
-- GridsAndLevels > GridsAndLevelsReadOnly
-- PrimaryStructure > PrimaryStructureReadonly etc.
+- GridsAndLevels &rarr; GridsAndLevelsReadOnly
+- PrimaryStructure &rarr; PrimaryStructureReadonly etc.
 
 The 'ReadOnly' worksets above would have an owner that isn't a normal user, i.e., you create a fictitious user and have that user take ownership of the worksets.
 This was easier in the past when you could change the Revit user name.
-Depending on your product licensing arrangement this may still be a viable option for you.
-I say it is the best approach since element ownership through worksets is an inherent aspect of Revit and so you can rely on the infrastructure already in place.
+Depending on your product licensing arrangement, this may still be a viable option for you.
+I think this is the best approach, since element ownership through worksets is an inherent aspect of Revit and so you can rely on the infrastructure already in place.
 
-An alternative approach is to implement an `IUpdater`, decorate the element with a parameter value or extensible storage and then, if that Element is changed, post a failure with the only option being undo.
+An alternative approach is to implement an `IUpdater`, mark the element with a parameter value or extensible storage and then, if that Element is changed, post a failure with the only option being undo.
 
 **Response:** Thank you for your suggestions &nbsp; :-)
 
 I looked at
 the video [BIMedge &ndash; Admin User to Lock out Worksets](https://youtu.be/0KS2nwHWZRQ) that 
-shows the Workset stuff that you mean &ndash; the thing is, that I can easily change my account into "Admin" and so every other user could do it like that (change his user name.. etc).
+shows the Workset stuff that you mean &ndash; the thing is, that I can easily change my account into "Admin" and so every other user could do it like that (change user name, etc.).
 
 Another problem I had was that the workset option was greyed out in my document.
 But I think I should first make sure what a "Workset" is and how to create and use it.
 
-I already implemented an Updater Trigger for a user parameter (its what I mentioned in my question). And then dynamically add another trigger which catches EVERY change of the element (with Element.GetChangeTypeAny) and undo it, if its status is set to our defined "not editable anymore" status.
+I already implemented an Updater Trigger for a user parameter (as mentioned in my question).
+And then dynamically add another trigger which catches EVERY change of the element (with Element.GetChangeTypeAny) and undo it, if its status is set to our defined "not editable anymore" status.
 
 I just thought that this solution is not nice and thought there must be a nicer and cleaner solution to this.
 
@@ -141,7 +142,7 @@ Thanks a lot for your help!!
 
 **Answer:** That's fine; just bear in mind there is no absolute way of preventing a user from editing something, not even with the API. An add-in only enforces something if it is running.
 
-I think there has to be a level of trust that the users will not act inappropriately; additionally there needs to be a model audit / checking process.
+I think there has to be a level of trust that the users will not act inappropriately; additionally, there needs to be a model audit / checking process.
 
 **Response:** Yes, you are right.
 If the user wants to commit to our database I would check, if he changed something without the add-in.
@@ -153,7 +154,7 @@ Users are clever, they always find a way to "cheat" ... :-)
 So, program your own "SelectionChanged Event" as described in the thread
 on [element selection changed event implementation struggles](https://forums.autodesk.com/t5/revit-api-forum/element-selection-changed-event-implementation-struggles/m-p/9229523).
 
-In the "eventhandler", or, in my solution, the IsCommandAvailable method, find the selected elements in the active document `Selection` `GetElementIds`.
+In the "eventhandler", or, in my solution, the `IsCommandAvailable` method, find the selected elements in the active document `Selection` `GetElementIds`.
 If your target Ids are present in the selection, remove them from the selection, effectively blocking the user from selecting the element.
 
 I don't know how time-consuming the removal of id's will be with a large number of target Ids.

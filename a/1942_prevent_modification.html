@@ -60,7 +60,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>For instance, a couple of dozen people might design an airport, thousands might build it, and millions might end up using it, wandering around and requiring a floor plan or other navigation support to to so effectively.</p>
 <p>For such situations, you would use a viewer or other simplified or read-only access to certain aspects, subsets or properties of the the BIM.</p>
 <p>For read-only access to a model, you might want to consider using a pure viewer instead, first and foremost something globally accessible like the Forge platform.</p>
-<p>I <a href="https://thebuildingcoder.typepad.com/blog/2022/03/drilling-holes-in-beams-and-other-projects.html#3">mentioned</a> my
+<p>I <a href="https://thebuildingcoder.typepad.com/blog/2022/03/drilling-holes-in-beams-and-other-projects.html#3">recently mentioned</a> my
 current <a href="https://github.com/jeremytammik/RvtLock3r">RvtLock3r</a> side project
 that ensures that certain specified parameter values have not been modifiecd.</p>
 <p>Two other recent queries on how to prevent model modification came up in
@@ -84,20 +84,20 @@ and how to <a href="https://forums.autodesk.com/t5/revit-api-forum/make-instance
 <p>My workaround would be, that if the user would want to change the element again and it has this kind of (locked) status set, to observe this and undo the action. But this is such a dirty workaround I would not be happy with it.</p>
 <p>I would have to set a trigger for everything in this element. And in my opinion this is a bad solution.</p>
 <p><strong>Answer:</strong> Pining the element to prevent change is probably the wrong starting point, since that mechanism is mostly useful for datum elements and links, i.e., the items you more often than not want to prevent movement of.
-The 'select pinned items in view' button I believe is more of a user preference than a document change so I assume that setting would be per user and so not stored with the Document.
-Additionally, if I pin something I can still change it's parameters.</p>
+The 'select pinned items in view' button I believe is more of a user preference than a document change, so I assume that setting would be per user and therefore not stored with the Document.
+Additionally, if I pin something, I can still change it's parameters.</p>
 <p>There is a slow filter 'SelectableInViewFilter' which can be used to determine if something can be selected in view.
 So, one approach could be to store the ElementIds of your protected items and run this filter for a view to ensure nothing is missing. This also seems more trouble than it is worth since it is a slow filter and you'd probably have to run it quite often.</p>
 <p>The best approach I know of for change control is to put the protected elements on mirrored worksets:</p>
 <ul>
-<li>GridsAndLevels &gt; GridsAndLevelsReadOnly</li>
-<li>PrimaryStructure &gt; PrimaryStructureReadonly etc.</li>
+<li>GridsAndLevels &rarr; GridsAndLevelsReadOnly</li>
+<li>PrimaryStructure &rarr; PrimaryStructureReadonly etc.</li>
 </ul>
 <p>The 'ReadOnly' worksets above would have an owner that isn't a normal user, i.e., you create a fictitious user and have that user take ownership of the worksets.
 This was easier in the past when you could change the Revit user name.
-Depending on your product licensing arrangement this may still be a viable option for you.
-I say it is the best approach since element ownership through worksets is an inherent aspect of Revit and so you can rely on the infrastructure already in place.</p>
-<p>An alternative approach is to implement an <code>IUpdater</code>, decorate the element with a parameter value or extensible storage and then, if that Element is changed, post a failure with the only option being undo.</p>
+Depending on your product licensing arrangement, this may still be a viable option for you.
+I think this is the best approach, since element ownership through worksets is an inherent aspect of Revit and so you can rely on the infrastructure already in place.</p>
+<p>An alternative approach is to implement an <code>IUpdater</code>, mark the element with a parameter value or extensible storage and then, if that Element is changed, post a failure with the only option being undo.</p>
 <p><strong>Response:</strong> Thank you for your suggestions &nbsp; :-)</p>
 <p>I looked at
 the video <a href="https://youtu.be/0KS2nwHWZRQ">BIMedge &ndash; Admin User to Lock out Worksets</a> that 
