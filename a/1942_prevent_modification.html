@@ -101,16 +101,17 @@ I think this is the best approach, since element ownership through worksets is a
 <p><strong>Response:</strong> Thank you for your suggestions &nbsp; :-)</p>
 <p>I looked at
 the video <a href="https://youtu.be/0KS2nwHWZRQ">BIMedge &ndash; Admin User to Lock out Worksets</a> that 
-shows the Workset stuff that you mean &ndash; the thing is, that I can easily change my account into "Admin" and so every other user could do it like that (change his user name.. etc).</p>
+shows the Workset stuff that you mean &ndash; the thing is, that I can easily change my account into "Admin" and so every other user could do it like that (change user name, etc.).</p>
 <p>Another problem I had was that the workset option was greyed out in my document.
 But I think I should first make sure what a "Workset" is and how to create and use it.</p>
-<p>I already implemented an Updater Trigger for a user parameter (its what I mentioned in my question). And then dynamically add another trigger which catches EVERY change of the element (with Element.GetChangeTypeAny) and undo it, if its status is set to our defined "not editable anymore" status.</p>
+<p>I already implemented an Updater Trigger for a user parameter (as mentioned in my question).
+And then dynamically add another trigger which catches EVERY change of the element (with Element.GetChangeTypeAny) and undo it, if its status is set to our defined "not editable anymore" status.</p>
 <p>I just thought that this solution is not nice and thought there must be a nicer and cleaner solution to this.</p>
 <p>But it seems there isn't.</p>
 <p>So I will implement it like I already planned.</p>
 <p>Thanks a lot for your help!!</p>
 <p><strong>Answer:</strong> That's fine; just bear in mind there is no absolute way of preventing a user from editing something, not even with the API. An add-in only enforces something if it is running.</p>
-<p>I think there has to be a level of trust that the users will not act inappropriately; additionally there needs to be a model audit / checking process.</p>
+<p>I think there has to be a level of trust that the users will not act inappropriately; additionally, there needs to be a model audit / checking process.</p>
 <p><strong>Response:</strong> Yes, you are right.
 If the user wants to commit to our database I would check, if he changed something without the add-in.
 The commit can only be done via the add-in.</p>
@@ -118,7 +119,7 @@ The commit can only be done via the add-in.</p>
 <p><strong>Answer 2:</strong> The cleanest solution would be to prevent the user selecting the element.
 So, program your own "SelectionChanged Event" as described in the thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/element-selection-changed-event-implementation-struggles/m-p/9229523">element selection changed event implementation struggles</a>.</p>
-<p>In the "eventhandler", or, in my solution, the IsCommandAvailable method, find the selected elements in the active document <code>Selection</code> <code>GetElementIds</code>.
+<p>In the "eventhandler", or, in my solution, the <code>IsCommandAvailable</code> method, find the selected elements in the active document <code>Selection</code> <code>GetElementIds</code>.
 If your target Ids are present in the selection, remove them from the selection, effectively blocking the user from selecting the element.</p>
 <p>I don't know how time-consuming the removal of id's will be with a large number of target Ids.</p>
 <p><strong>Response:</strong> Thanks for your answer.</p>
@@ -126,22 +127,23 @@ If your target Ids are present in the selection, remove them from the selection,
 <p>So, I think that my first suggestion with pinning the elements and making them not selectable is a very bad idea.</p>
 <p>Later: so, I have talked to the support.</p>
 <p>Atm there is no way to "lock" an instance in the model...</p>
-<p>Unfortunately the workaround(s) are the only ways to get such behavior...</p>
-<p>Thanks a lot again for your help!!!</p>
+<p>Unfortunately, the workaround(s) are the only ways to get such behavior...</p>
+<p>Thanks a lot again for your help!</p>
 <p>Many thanks to Diana, Richard and Fair59 for the interesting discussion and solutions!</p>
 <h4><a name="3"></a> RevitLookup Updates</h4>
 <p>Several up dates were added
 to <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a>
 especially by very active contributor <a href="https://github.com/chuongmep">Chuong Ho</a>:</p>
 <ul>
-<li><a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.4.0">Release 2022.0.4.0</a>: <ul>
-<li>Minimize and maximize window support <a href="https://github.com/jeremytammik/RevitLookup/pull/134">#134</a>:
-  Enable user to maximize all forms to full screen; useful to display long string data and to expand the form to full size for review </li>
 <li>Fixed problem with sending a print job <a href="https://github.com/jeremytammik/RevitLookup/pull/133">#133</a>:
   A problem when user snoops to <code>PrintManager</code> and invokes the <code>SubmitPrint</code> method</li>
+<li>Minimize and maximize window support <a href="https://github.com/jeremytammik/RevitLookup/pull/134">#134</a>:
+  Enable user to maximize all forms to full screen; useful to display long string data and to expand the form to full size for review </li>
+<li>Minor UI changes <a href="https://github.com/jeremytammik/RevitLookup/pull/135">#135</a></li>
 </ul>
-</li>
-</ul>
+<p><center>
+<img src="img/revitlookup_maximise.png" alt="RevitLookup maximise button" title="RevitLookup maximise button" width="401"/> <!-- 802 -->
+</center></p>
 <p>Many thanks to
 <a href="https://github.com/chuongmep">Chuong Ho</a> or these enhancements and to 
 <a href="https://github.com/Nice3point">Roman 'Nice3point'</a> for managing the releases.</p>
@@ -159,6 +161,9 @@ With Revitlookupwpf, you can look into every detail clearly inside and execute i
 We are creating features that have never been available before and we are open to accepting any ideas and pull requests.
 This is opensource project and everyone can view it.</p>
 </blockquote>
+<p><center>
+<img src="img/revitlookupwpf.jpg" alt="RevitLookupWpf" title="RevitLookupWpf" width="686"/>
+</center></p>
 <p><strong>Question:</strong> How is this different than the original <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a>?
 Am I missing something?
 Is the difference that yours is using WPF instead of WinForms?</p>
@@ -171,9 +176,6 @@ It is an example, you can see description of methods and properties from code, a
 <p><strong>Question:</strong>  Great! Is is free to download?</p>
 <p><strong>Answer:</strong>  Sure, it free and you can download file <code>msi</code> to install from
 the <a href="https://github.com/weianweigan/RevitLookupWpf/releases/latest">latest release</a>.</p>
-<p><center>
-<img src="img/revitlookupwpf.jpg" alt="RevitLookupWpf" title="RevitLookupWpf" width="686"/>
-</center></p>
 <p>Many thanks to Chuong Ho for this great initiative, and the best of luck with it in future!</p>
 <p><center>
 <img src="img/chuongmep.tiff" alt="Hồ Văn Chương" title="Hồ Văn Chương" width="256"/>

@@ -169,9 +169,9 @@ Later: so, I have talked to the support.
 
 Atm there is no way to "lock" an instance in the model...
 
-Unfortunately the workaround(s) are the only ways to get such behavior...
+Unfortunately, the workaround(s) are the only ways to get such behavior...
 
-Thanks a lot again for your help!!!
+Thanks a lot again for your help!
 
 Many thanks to Diana, Richard and Fair59 for the interesting discussion and solutions!
 
@@ -181,11 +181,15 @@ Several up dates were added
 to [RevitLookup](https://github.com/jeremytammik/RevitLookup)
 especially by very active contributor [Chuong Ho](https://github.com/chuongmep):
 
-- [Release 2022.0.4.0](https://github.com/jeremytammik/RevitLookup/releases/tag/2022.0.4.0): 
-    - Minimize and maximize window support [#134](https://github.com/jeremytammik/RevitLookup/pull/134):
-      Enable user to maximize all forms to full screen; useful to display long string data and to expand the form to full size for review 
-    - Fixed problem with sending a print job [#133](https://github.com/jeremytammik/RevitLookup/pull/133):
-      A problem when user snoops to `PrintManager` and invokes the `SubmitPrint` method
+- Fixed problem with sending a print job [#133](https://github.com/jeremytammik/RevitLookup/pull/133):
+  A problem when user snoops to `PrintManager` and invokes the `SubmitPrint` method
+- Minimize and maximize window support [#134](https://github.com/jeremytammik/RevitLookup/pull/134):
+  Enable user to maximize all forms to full screen; useful to display long string data and to expand the form to full size for review 
+- Minor UI changes [#135](https://github.com/jeremytammik/RevitLookup/pull/135)
+
+<center>
+<img src="img/revitlookup_maximise.png" alt="RevitLookup maximise button" title="RevitLookup maximise button" width="401"/> <!-- 802 -->
+</center>
 
 Many thanks to
 [Chuong Ho](https://github.com/chuongmep) or these enhancements and to 
@@ -207,6 +211,10 @@ With Revitlookupwpf, you can look into every detail clearly inside and execute i
 We are creating features that have never been available before and we are open to accepting any ideas and pull requests.
 This is opensource project and everyone can view it.
 
+<center>
+<img src="img/revitlookupwpf.jpg" alt="RevitLookupWpf" title="RevitLookupWpf" width="686"/>
+</center>
+
 **Question:** How is this different than the original [RevitLookup](https://github.com/jeremytammik/RevitLookup)?
 Am I missing something?
 Is the difference that yours is using WPF instead of WinForms?
@@ -225,10 +233,6 @@ It is an example, you can see description of methods and properties from code, a
 
 **Answer:**  Sure, it free and you can download file `msi` to install from
 the [latest release](https://github.com/weianweigan/RevitLookupWpf/releases/latest).
-
-<center>
-<img src="img/revitlookupwpf.jpg" alt="RevitLookupWpf" title="RevitLookupWpf" width="686"/>
-</center>
 
 Many thanks to Chuong Ho for this great initiative, and the best of luck with it in future!
  
