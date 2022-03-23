@@ -62,15 +62,15 @@ Revit is a design tool and as such targeted at people editing the BIM.
 
 In many situations, orders of magnitude more people might need to view is or query certain properties.
 
-For instance, a couple of dozen people might design an airport, thousands might build it, and millions might end up using it, wandering around and requiring a floor plan or other navigation support to to so effectively.
+For instance, a couple of dozen people might design an airport, thousands might build it, and millions might end up using it, wandering around and requiring a floor plan or other navigation support to do so effectively.
 
-For such situations, you would use a viewer or other simplified or read-only access to certain aspects, subsets or properties of the the BIM.
+For such situations, you would use a viewer or other simplified or read-only access to certain aspects, subsets or properties of the BIM.
 
 For read-only access to a model, you might want to consider using a pure viewer instead, first and foremost something globally accessible like the Forge platform.
 
 I [recently mentioned](https://thebuildingcoder.typepad.com/blog/2022/03/drilling-holes-in-beams-and-other-projects.html#3) my
 current [RvtLock3r](https://github.com/jeremytammik/RvtLock3r) side project
-that ensures that certain specified parameter values have not been modifiecd.
+that ensures that certain specified parameter values have not been modified.
 
 Two other recent queries on how to prevent model modification came up in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
@@ -99,14 +99,14 @@ Is there any other option to make instances not editable anymore? Or can I obser
 
 My workaround would be, that if the user would want to change the element again and it has this kind of (locked) status set, to observe this and undo the action. But this is such a dirty workaround I would not be happy with it.
 
-I would have to set a trigger for everything in this element. And in my opinion this is a bad solution.
+I would have to set a trigger for everything in this element. And in my opinion, this is a bad solution.
 
 **Answer:** Pining the element to prevent change is probably the wrong starting point, since that mechanism is mostly useful for datum elements and links, i.e., the items you more often than not want to prevent movement of.
 The 'select pinned items in view' button I believe is more of a user preference than a document change, so I assume that setting would be per user and therefore not stored with the Document.
-Additionally, if I pin something, I can still change it's parameters.
+Additionally, if I pin something, I can still change its parameters.
 
 There is a slow filter 'SelectableInViewFilter' which can be used to determine if something can be selected in view.
-So, one approach could be to store the ElementIds of your protected items and run this filter for a view to ensure nothing is missing. This also seems more trouble than it is worth since it is a slow filter and you'd probably have to run it quite often.
+So, one approach could be to store the ElementIds of your protected items and run this filter for a view to ensure nothing is missing. This also seems more trouble than it is worth since it is a slow filter, and you'd probably have to run it quite often.
 
 The best approach I know of for change control is to put the protected elements on mirrored worksets:
 
@@ -114,7 +114,7 @@ The best approach I know of for change control is to put the protected elements 
 - PrimaryStructure &rarr; PrimaryStructureReadonly etc.
 
 The 'ReadOnly' worksets above would have an owner that isn't a normal user, i.e., you create a fictitious user and have that user take ownership of the worksets.
-This was easier in the past when you could change the Revit user name.
+This was easier in the past when you could change the Revit username.
 Depending on your product licensing arrangement, this may still be a viable option for you.
 I think this is the best approach, since element ownership through worksets is an inherent aspect of Revit and so you can rely on the infrastructure already in place.
 
@@ -124,7 +124,7 @@ An alternative approach is to implement an `IUpdater`, mark the element with a p
 
 I looked at
 the video [BIMedge &ndash; Admin User to Lock out Worksets](https://youtu.be/0KS2nwHWZRQ) that 
-shows the Workset stuff that you mean &ndash; the thing is, that I can easily change my account into "Admin" and so every other user could do it like that (change user name, etc.).
+shows the Workset stuff that you mean &ndash; the thing is, that I can easily change my account into "Admin" and so every other user could do it like that (change username, etc.).
 
 Another problem I had was that the workset option was greyed out in my document.
 But I think I should first make sure what a "Workset" is and how to create and use it.
@@ -169,7 +169,7 @@ Later: so, I have talked to the support.
 
 Atm there is no way to "lock" an instance in the model...
 
-Unfortunately, the workaround(s) are the only ways to get such behavior...
+Unfortunately, the workaround(s) are the only ways to get such behaviour...
 
 Thanks a lot again for your help!
 
@@ -177,7 +177,7 @@ Many thanks to Diana, Richard and Fair59 for the interesting discussion and solu
 
 ####<a name="3"></a> RevitLookup Updates
 
-Several up dates were added
+Several updates were added
 to [RevitLookup](https://github.com/jeremytammik/RevitLookup)
 especially by very active contributor [Chuong Ho](https://github.com/chuongmep):
 
@@ -188,7 +188,7 @@ especially by very active contributor [Chuong Ho](https://github.com/chuongmep):
 - Minor UI changes [#135](https://github.com/jeremytammik/RevitLookup/pull/135)
 
 <center>
-<img src="img/revitlookup_maximise.png" alt="RevitLookup maximise button" title="RevitLookup maximise button" width="401"/> <!-- 802 -->
+<img src="img/revitlookup_maximise.png" alt="RevitLookup maximise button" title="RevitLookup maximise button" width="600"/> <!-- 802 -->
 </center>
 
 Many thanks to
@@ -204,7 +204,7 @@ on [RevitLookupWpf](https://github.com/weianweigan/RevitLookupWpf):
 
 > Hello everyone,
 Today, I would like to introduce to you
-the [Revitlookupwpf project](https://github.com/weianweigan/RevitLookupWpf).
+the [RevitLookupWpf project](https://github.com/weianweigan/RevitLookupWpf).
 This project deeply supports Revit API by me and a Chinese friend is dududu collaborate;
 this is one of our efforts to enhance development improvement in the construction industry.
 With Revitlookupwpf, you can look into every detail clearly inside and execute it directly, and many more exciting things we are working on.
@@ -212,7 +212,7 @@ We are creating features that have never been available before and we are open t
 This is opensource project and everyone can view it.
 
 <center>
-<img src="img/revitlookupwpf.jpg" alt="RevitLookupWpf" title="RevitLookupWpf" width="686"/>
+<img src="img/revitlookupwpf.jpg" alt="RevitLookupWpf" title="RevitLookupWpf" width="600"/> <!-- 686 -->
 </center>
 
 **Question:** How is this different than the original [RevitLookup](https://github.com/jeremytammik/RevitLookup)?
@@ -227,9 +227,9 @@ It is an example, you can see description of methods and properties from code, a
 
 **Question:**  Is it a Modeless window now? Would be a great thing.
 
-**Answer:**  Yes, it working in a modeless window.
+**Answer:**  Yes, it works in a modeless window.
 
-**Question:**  Great! Is is free to download?
+**Question:**  Great! Is it free to download?
 
 **Answer:**  Sure, it free and you can download file `msi` to install from
 the [latest release](https://github.com/weianweigan/RevitLookupWpf/releases/latest).
