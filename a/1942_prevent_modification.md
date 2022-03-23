@@ -31,8 +31,11 @@ twitter:
 
 the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Different approaches to prevent modification of certain elements and the latest news on RevitLookup
+&ndash; Prevent modification
+&ndash; RevitLookup updates
+&ndash; RevitLookupWpf
+&ndash; Pilcrow...
 
 linkedin:
 
@@ -47,7 +50,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Prevent Modification, RevitLookup and WPF
+### RevitLookup, WPF, Preventing Modification
 
 Some notes on different approaches to prevent modification of certain elements and the latest news on RevitLookup:
 
@@ -192,7 +195,7 @@ especially by very active contributor [Chuong Ho](https://github.com/chuongmep):
 </center>
 
 Many thanks to
-[Chuong Ho](https://github.com/chuongmep) or these enhancements and to 
+[Chuong Ho](https://github.com/chuongmep) for these useful enhancements and to 
 [Roman 'Nice3point'](https://github.com/Nice3point) for managing the releases.
 
 ####<a name="4"></a> RevitLookup in WPF
