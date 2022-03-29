@@ -793,10 +793,14 @@ and there are lots of workaround such as PerformanceAdvisor and PostableCommand 
 So I was wondering, how the marvellous eTransmit addin made by Autodesk is actually Purging the models whilst transmitting?
 So I went looking into the folder, found the .dll and in our addin referenced the eTransmitForRevitDB.dll and looked into the public methods
 
+purge_unused_etransmit_1.jpeg 1152
+
 Non è stato fornito nessun testo alternativo per questa immagine
 
 wow.
 could that be so easy?
+
+purge_unused_etransmit_2.jpeg 1085
 
 Non è stato fornito nessun testo alternativo per questa immagine
 
