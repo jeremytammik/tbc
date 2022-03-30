@@ -37,7 +37,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Purge Unused and the Autodesk Camel
 
-We return once again to the topic of programmatic purging and learn the history and latest news about the venerasble Autodesk Camel:
+We return once again to the topic of programmatic purging and learn the history and latest news about the venerable Autodesk Camel:
 
 - [Purge unused using eTransmitForRevitDB.dll](#2)
     - [The Purge via API method](#2.1)
@@ -123,7 +123,7 @@ Nicolas Menu and other colleagues from Neuchatel shared the story of the Autodes
 
 This is an important story, so I take the opportunity to preserve it here as well:
 
-After many years at Autodesk European Headquaters 's office in Neuchatel, Switzerland, the Camel (our office's mascot) moved tonight to the Swiss Siberia.
+After many years at Autodesk European headquarter office in Neuchatel, Switzerland, the Camel (our office's mascot) moved tonight to the Swiss Siberia.
 
 <center>
 <img src="img/autodesk_camel.jpeg" alt="Autodesk Camel" title="Autodesk Camel" width="640"/> <!-- 1280 -->
@@ -131,20 +131,20 @@ After many years at Autodesk European Headquaters 's office in Neuchatel, Switze
 
 History...
 
-- 1982, Autodesk, Mill Valley, Marin County, CA, USA
-- 1991 Autodesk european headquarters Marin, Switzerland
+- 1982 Autodesk, Mill Valley, Marin County, CA, USA
+- 1991 Autodesk European Headquarters, Marin, Switzerland
 
-From Marin County, to ...Marin, Switzerland !
+From Marin County, to... Marin, Switzerland!
 
-The office later moved a few km away to Neuchatel, Switzerland, but the camel remained within the new office as a mascott, a landmark.
+The office later moved a few km away to Neuchatel, and the camel remained in the new office as a mascott, a landmark.
 
-- 2017... Autodesk european headquaters close and move to Dublin.
+- 2017... Autodesk European headquaters close and move to Dublin.
 
 But The Camel didn't like it and decided to remain fidel and stay right here...
 
-For about 5 years he stays with Coral an Francesco, and tonight it has find a new home.. guess where :)
+For about 5 years he stays with Coral and Francesco, and tonight it has find a new home... guess where :)
 
-The Camel is now with our family in the coldest village of switzerland... Long Life to the Camel!
+The Camel is now with our family in the coldest village of Switzerland... Long Life to the Camel!
 
 Claudio Ombrella adds: Nice. Let me take the opportunity to share the story of the camel.
 It was January 1993 when I joined the Marin, Switzerland office from Autodesk in Milano.
@@ -161,16 +161,17 @@ In 1994 we moved to the Puits Godet office and the camel moved too.
 With the years it deteriorated a bit and then Bodo Vahldieck loaded on his VW Multivan and took it home for a complete restore.
 Then it came back to the office in perfect shape.
 
-In 2015 my team opened a job and a young person applied to it so we invited for an on-site interview.
+In 2015 my team opened a job and a young person applied for it, so we invited for an on-site interview.
 When the person saw the camel he said to me: “and you have the camel? I am the son of the shop Tapis d’Orient, I am so surprised to see it again”.
 
-Thank you Nicolas Menu for giving a new life to our old friend, the camel.
+Thank you, Nicolas, for giving a new life to our old friend, the camel.
 
 John C.: The camel was first on the list of assets to be moved from Marin to Puits-Godet!
 Thanks for bringing such good memories! 
 
-Lisa Senauke: And, James Carrington and I arrived when the Marin office had just opened and we were among the first 5 or 6 to arrive &ndash; Kern (and John Walker) Hans, Sheila, James, and I &ndash; who else? Creighton?
-When were campaigning to be chosen to work in Switzerland, one of my proudest moments was when Hansi said to me, while I was pondering if we would get to go, and if there would be a job for me as well.
+Lisa Senauke: James Carrington and I arrived when the Marin office had just opened and we were among the first 5 or 6 to arrive
+&ndash; Kern (and John Walker) Hans, Sheila, James, and I &ndash; who else? Creighton?
+When we were campaigning to be chosen to work in Switzerland, one of my proudest moments was when Hansi said to me, while I was pondering if we would get to go, and if there would be a job for me as well.
 Hans looked at me and said, "Lisa, where I go, YOU go!" 🥰 And I did!
 The Camel was standing proud and tall by the entrance of the building, welcoming us to our new home!
 For me, it was a Jungian peak experience!
