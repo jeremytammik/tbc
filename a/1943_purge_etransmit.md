@@ -37,6 +37,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Purge Unused and the Autodesk Camel
 
+We return once again to the topic of programmatic purging and learn the history and latest news about the venerasble Autodesk Camel:
+
+- [Purge unused using eTransmitForRevitDB.dll](#2)
+    - [The Purge via API method](#2.1)
+- [The Autodesk office Camel](#3)
+- [Node.js reference architecture](#4)
+
 ####<a name="2"></a> Purge Unused using eTransmitForRevitDB.dll
 
 Last montch, we discussed several approaches to automating the purge command.
