@@ -50,7 +50,7 @@ Last month, we
 discussed [several approaches to automating the purge command](https://thebuildingcoder.typepad.com/blog/2022/02/purge-unused-and-etransmit-for-da4r.html).
 
 Now Emiliano Capasso,
-Head of BIM at [ANTONIO CITTERIO PATRICIA VIEL](https://www.citterio-viel.com),
+Head of BIM at [Antonio Citterio Patricia Viel](https://www.citterio-viel.com),
 shared an even better one,
 explaining [why the Revit Purge​ command is an act of love](https://www.linkedin.com/pulse/why-revit-purge-command-act-love-via-api-emiliano-capasso),
 or <i>Perché il comando "Purge" di Revit è un atto d'amore</i>:
