@@ -15,15 +15,6 @@
   > just wanted to share our recent discovery (I'm pretty sure someone else was aware of it..) but in case
   [Why Revit "Purge"​ Command is an act of love (via API)](https://www.linkedin.com/pulse/why-revit-purge-command-act-love-via-api-emiliano-capasso)
 
-- hide edges:
-  We discussed [how to hide internal edges of solids](https://thebuildingcoder.typepad.com/blog/2021/10/au-roadmaps-and-vasa.html#5).
-  Tor Miguel suggests a very simple and effective approach in
-  his [comment](https://thebuildingcoder.typepad.com/blog/2019/09/parameters-and-hiding-directshape-edges.html#comment-5777039273) pointing out
-  his answer to
-  the thread on
-  [TesselatedShapeBuilder and DirectShape: Hiding internal edges?](https://forums.autodesk.com/t5/revit-api-forum/tesselatedshapebuilder-and-directshape-hiding-internal-edges/td-p/6895600)
-  /Users/jta/a/doc/revit/tbc/git/a/img/display_options_show_edges.png 343
-
 - need advice on components to use for your Forge app?
   check out the [Node.js Reference Architecture](https://github.com/nodeshift/nodejs-reference-architecture) by IBM and Red Hat.
 
@@ -773,57 +764,73 @@ Worked like a charm. Thanks!
 
 ####<a name="3"></a> Purge Unused using eTransmitForRevitDB.dll
 
+Last montch, we discussed several approaches to automating the purge command.
 
-Why Revit "Purge"​ Command is an act of love (via API)
-Published on March 18, 2022
-Emiliano Capasso
-Head of BIM at ANTONIO CITTERIO PATRICIA VIEL
+Now Emiliano Capasso, Head of BIM at [ANTONIO CITTERIO PATRICIA VIEL](https://www.citterio-viel.com),
+shared an even better one,
+explaining [why the Revit Purge​ command is an act of love](https://www.linkedin.com/pulse/why-revit-purge-command-act-love-via-api-emiliano-capasso),
+<i>Perché il comando "Purge" di Revit è un atto d'amore</i>:
 
-Perché il comando "Purge" di Revit è un atto d'amore.
+I'm writing this hoping it will be useful for all BIM Managers, Head of BIMs, BIM Directors, etc. around the world.
 
-I'm writing this hoping it will be useful for all BIM Managers, Head of BIMs, BIM Directors, etc.. around the world.
 The Life-Changing Magic of Tidying is the mantra of Marie Kondo, and the Japanese chain MUJI even published a book named “CLEANING” with hundreds of photos of cleaning activities all over the world.
+
 An organised life is key and so why our models should be a mess?
+
 Purging, cleaning the models is the key of maintaining a high-quality standard, and for us delivering state of the art BIM Models is the priority.
-Messy models are problematic, all of our systems work around the clock with automations and data extractions to our BI dashboards to monitor KPI. But as most of our architects are deeply caught in the design process and they forget to keep a tidy model, but our BIM department is here to help.
-But with more than 40 active projects how could we purge (3 times.) manually every one of the 500ish models that we have?
-The Purge via API Method
-tons of words have been spent about Purging in Revit via API, which is apparently impossible as the guru of Revit API (the latest post here https://thebuildingcoder.typepad.com/blog/2022/02/purge-unused-and-etransmit-for-da4r.html)
-and there are lots of workaround such as PerformanceAdvisor and PostableCommand but none of which was satisfying me.
-So I was wondering, how the marvellous eTransmit addin made by Autodesk is actually Purging the models whilst transmitting?
-So I went looking into the folder, found the .dll and in our addin referenced the eTransmitForRevitDB.dll and looked into the public methods
 
-purge_unused_etransmit_1.jpeg 1152
+Messy models are problematic, all of our systems work around the clock with automations and data extractions to our BI dashboards to monitor KPI.
+But as most of our architects are deeply caught in the design process and they forget to keep a tidy model, but our BIM department is here to help.
 
-Non è stato fornito nessun testo alternativo per questa immagine
+But with more than 40 active projects, how could we purge (3 times) manually every one of the 500ish models that we have?
 
-wow.
-could that be so easy?
+####<a name="3.1"></a> The Purge via API Method
 
-purge_unused_etransmit_2.jpeg 1085
+Tons of words have been spent about Purging in Revit via API, which is apparently impossible, cf.,
+the [latest post on the topic](https://thebuildingcoder.typepad.com/blog/2022/02/purge-unused-and-etransmit-for-da4r.html)).
 
-Non è stato fornito nessun testo alternativo per questa immagine
+There are lots of workarounds, such as <b>PerformanceAdvisor</b> and <b>PostableCommand</b>, but none of which was satisfying me.
 
-yes.
-below the snippet.
+So I was wondering, how the marvellous <b>eTransmit</b> addin made by Autodesk is actually Purging the models whilst transmitting?
 
+So I went looking into the folder, found the .dll and in our addin referenced the <b>eTransmitForRevitDB.dll</b> and looked into its <b>public</b> methods:
+
+<center>
+<img src="img/purge_unused_etransmit_1.jpeg" alt="eTransmitForRevitDB.dll public methods" title="eTransmitForRevitDB.dll public methods" width="600"/> <!-- 1152 -->
+</center>
+
+Wow.
+
+Could that be so easy?
+
+<center>
+<img src="img/purge_unused_etransmit_2.jpeg" alt="eTransmitForRevitDB.dll public methods" title="eTransmitForRevitDB.dll public methods" width="600"/> <!-- 1085 -->
+</center>
+
+Yes.
+
+Below the snippet:
+
+<pre class="code">
   public bool Purge(Application app, Document doc)
   {
-    eTransmitUpgradeOMatic eTransmitUpgradeOMatic = new eTransmitUpgradeOMatic(app);
-    UpgradeFailureType result = eTransmitUpgradeOMatic.purgeUnused(doc);
-    if (result == UpgradeFailureType.UpgradeSucceeded) return true;
-    else return false;
+    eTransmitUpgradeOMatic eTransmitUpgradeOMatic
+      = new eTransmitUpgradeOMatic(app);
+      
+    UpgradeFailureType result
+      = eTransmitUpgradeOMatic.purgeUnused(doc);
+      
+    return (result == UpgradeFailureType.UpgradeSucceeded);
   }
-  
-Just create an instance of eTrasmitUpgradeOMatic passing the Application and then call the method purgeUnused passing the Document which will return an UpgradeFailureType.
+</pre>
+
+Just create an instance of `eTrasmitUpgradeOMatic` passing the `Application` and call the method `purgeUnused` passing the `Document`; that will return an `UpgradeFailureType`.
+
 Now you have your model purged (3 times also).
-So satisfying
 
+So satisfying.
 
-
-
-
-####<a name="4"></a> 
+Many thanks to Emiliano or his research and nice explanation!
 
 ####<a name="5"></a> The Autodesk Office Camel
 
