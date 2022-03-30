@@ -108,7 +108,8 @@ Below the snippet:
   }
 </pre>
 
-Just create an instance of `eTrasmitUpgradeOMatic` passing the `Application` and call the method `purgeUnused` passing the `Document`; that will return an `UpgradeFailureType`.
+Just create an instance of `eTrasmitUpgradeOMatic` passing the `Application` and call its method `purgeUnused` passing the `Document`;
+that will return an `UpgradeFailureType`.
 
 Now you have your model purged (3 times also).
 
@@ -180,9 +181,9 @@ Long live the camel!
 
 ####<a name="4"></a> Node.js Reference Architecture
 
-Could you use some advice on which components to use for your Forge app?
+Moving from the desktop to the cloud, could you use some advice on which components to employ for your Forge app?
 
-Or are you working with other cloud applications and conounded by the plethora of available libraries?
+Or are you working with other cloud applications and confounded by the plethora of available libraries?
 
 Maybe the [Node.js Reference Architecture](https://github.com/nodeshift/nodejs-reference-architecture) by
 IBM and Red Hat will help make a well-founded decision.
