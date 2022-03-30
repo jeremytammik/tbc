@@ -46,12 +46,14 @@ We return once again to the topic of programmatic purging and learn the history 
 
 ####<a name="2"></a> Purge Unused using eTransmitForRevitDB.dll
 
-Last montch, we discussed several approaches to automating the purge command.
+Last month, we
+discussed [several approaches to automating the purge command](https://thebuildingcoder.typepad.com/blog/2022/02/purge-unused-and-etransmit-for-da4r.html).
 
-Now Emiliano Capasso, Head of BIM at [ANTONIO CITTERIO PATRICIA VIEL](https://www.citterio-viel.com),
+Now Emiliano Capasso,
+Head of BIM at [ANTONIO CITTERIO PATRICIA VIEL](https://www.citterio-viel.com),
 shared an even better one,
 explaining [why the Revit Purge​ command is an act of love](https://www.linkedin.com/pulse/why-revit-purge-command-act-love-via-api-emiliano-capasso),
-<i>Perché il comando "Purge" di Revit è un atto d'amore</i>:
+or <i>Perché il comando "Purge" di Revit è un atto d'amore</i>:
 
 I'm writing this hoping it will be useful for all BIM Managers, Head of BIMs, BIM Directors, etc. around the world.
 
