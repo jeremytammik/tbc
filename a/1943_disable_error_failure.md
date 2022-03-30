@@ -829,3 +829,65 @@ So satisfying
 ####<a name="4"></a> 
 
 ####<a name="5"></a> 
+
+Autodesk Office Camel
+
+
+Nicolas MenuStatus is online
+Nicolas Menu
+• 1st
+Sparking new technologies to AEC. Reality capture, 3D, 4D, BIM Infrastructure. Analysis, Consulting & Complex issues solving under Civil 3D
+1w • Edited • 1 week ago
+After many years at Autodesk European Headquaters 's office in #Neuchatel , Switzerland, the Camel (our office's mascot) moved tonight to the Swiss Siberia.
+
+History...
+1982, Autodesk, Mill Valley, Marin County, CA, USA
+1991 Autodesk european headquarters Marin, Switzerland
+
+From Marin County, to ...Marin, Switzerland !
+
+The office, later moved a few km away to Neuchatel, Switzerland, but the camel remained within the new office as a mascott, a landmark.
+2017... Autodesk european headquaters close and move to Dublin.
+
+But The Camel didn't like it and decided to remain fidel and stay, right here...
+For about 5 years he stays with Coral an Francesco, and tonight it has find a new home.. guess where :) The Camel is now with our family in the coldest village of switzerland... Long Life to the Camel !
+...and soon will be digitalised
+
+Claudio Ombrella
+ 1st degree connection1st
+Founder and co-CEO at Digilac, Atlassian Silver Solution Partner. Jira and Confluence Expert, ACP-600, ACP620 Certified.
+1w
+Nice. Let me take the opportunity to share the story of the camel. It was January 1993 when I joined the Marin, Switzerland office from Autodesk in Milano. The Autodesk office was located at the first floor of the number 14b of the Av. Champs Montant. All people driving to find the office did it from the West side: at the ground floor there a Persian carpet shop named “Tapis d’Orient”. They had put a camel, better say “the camel” outside the office. It quickly became the “signpost” to arrive to the office: “our entrance is by camel” used to say our colleague Sheila Ahles to any visitor needing instructions.
+
+One day the shop closed and the camel became orphan. But not for so long, because Autodesk employees pulled the camel into the office. And it became the mascot with its own badge that was regularly reprinted at every company logo change!
+
+In 1994 we moved to the Puits Godet office and the camel moved too. With the years it deteriorated a bit and then Bodo Vahldieck loaded on his VW Multivan and took it home for a complete restore. Then it came back to the office in perfect shape. But the story didn’t finish yet…
+
+Ran out of characters see next message:
+
+Claudio Ombrella
+ 1st degree connection1st
+Founder and co-CEO at Digilac, Atlassian Silver Solution Partner. Jira and Confluence Expert, ACP-600, ACP620 Certified.
+1w
+In 2015 my team opened a job and a young person applied to it so we invited for an on-site interview. When the person saw the camel he said to me: “and you have the camel? I am the son of the shop Tapis d’Orient, I am so surprised to see it again”.
+
+Thank you Nicolas Menu for giving a new life to our old friend, the camel.
+
+John C.
+ 2nd degree connection2nd
+Global IT Business Partner for Pharmaceutical Operations at Bristol Myers Squibb. Certified Leadership, Team and Organization Coach.
+1w
+The camel was first on the list of assets to be moved from Marin to Puits-Godet! Thanks for bringing such good memories! Hi to old colleagues around the world…
+
+Lisa Senauke
+(She/Her)
+ 1st degree connection1st
+Certified Assistant Preschool Teacher
+1w
+And, James Carrington (now my ex, But no worries, amicable) and I arrived when the Marin office had just opened and we were among the first 5 or 6 to arrive— Kern (and John Walker) Hans, Sheila, James, and I- who else? Creighton? When were campaigning to be chosen to work in Switzerland, one of my proudest moments was when Hansi said to me, while I was pondering if we would get to go, and if there would be a job for me as well. Hans looked at me and said, “Lisa, where I go, YOU go!”🥰 . And I did! The Camel was standing proud and tall by the entrance of the building, welcoming us to our new home! For me, it was a Jungian peak experience!
+
+Raquel Aragonés
+ 2nd degree connection2nd
+Coach Bien-être Indépendante Herbalife
+11h
+Oh dear! I had completely forgotten about the camel. I was thigh there from 1992-3 to 1997! Long live the camel !!!
