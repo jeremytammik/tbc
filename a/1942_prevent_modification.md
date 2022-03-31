@@ -39,6 +39,17 @@ Different approaches to prevent modification of certain elements and the latest 
 
 linkedin:
 
+RevitLookup, WPF and preventing modification using the #RevitAPI
+
+https://autode.sk/stopmodify
+
+Different approaches to prevent modification of certain elements and the latest news on RevitLookup:
+
+- Prevent modification
+- RevitLookup updates
+- RevitLookupWpf
+- Pilcrow...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
