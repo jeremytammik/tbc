@@ -11,12 +11,17 @@
 
 twitter:
 
-Revit macro user survey with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Revit macro user survey with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/macrosurvey
 
 We invite all Revit Macro users to take a short survey...
 
 linkedin:
 
+Revit macro user survey with the #RevitAPI
+
+https://autode.sk/macrosurvey
+
+We invite all Revit Macro users to take a short survey...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
