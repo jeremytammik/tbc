@@ -119,15 +119,18 @@ To give you a quick first impression, here is its table of contents:
 
 Let's round off for today with an impressive demonstration of the importance of an audio track complementing a video experience.
 
-My son [Christopher](http://tammik.ca) studied sound design at the [Vancouver Film School](http://vfs.edu/programs/sound-design) last year.
+<!-- My son [Christopher](http://tammik.ca) -->
 
-He then launched his career as an independent computer game sound designer, only to veer off into a more programming oriented direction once he realised that the most efficient approach to accomplishing his goals would require his to implement his own tools in the Unity gaming engine first anyway.
+One of my offspring studied sound design at the [Vancouver Film School](http://vfs.edu/programs/sound-design) last year.
+
+They then launched a career as an independent computer game sound designer, only to veer off into a more programming oriented direction once they realised that the most efficient approach to accomplishing their goals would require them to implement their own tools in the Unity gaming engine first anyway.
 
 Anyway, back to the VFS:
 
-For his final exam, Chris picked a five-minute video equipped with a sound track and implemented a full sound replacement for it.
+For the final exam, they picked a five-minute video equipped with a sound track and implemented a full sound replacement for it.
 
-This involves music, a cast of voice characters, background sound replacement, synchronisation, etc. It is a bit harder than you might initially imagine &nbsp; :-)
+This involves music, a cast of voice characters, background sound replacement, synchronisation, etc.
+It is a bit harder than you might initially imagine &nbsp; :-)
 
 Here is the original video and the full sound replacement version side by side:
 
