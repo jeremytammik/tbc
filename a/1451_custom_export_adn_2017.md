@@ -33,7 +33,9 @@ I am happy to say that I returned safe and sound to Switzerland from my long sta
 the [Forge DevCon](http://forge.autodesk.com/conference) developer conference
 and [Cloud Accelerator](http://autodeskcloudaccelerator.com).
 
-I travelled there via Vancouver, paradoxically saving a little bit on airfare costs and enabling me to visit my son Christopher:
+I travelled there via Vancouver, paradoxically saving a little bit on airfare costs:
+
+<!-- and enabling me to visit my son Christopher -->
 
 <center>
 <a data-flickr-embed="true"  href="https://www.flickr.com/photos/jeremytammik/albums/72157670359072255" title="Vancouver"><img src="https://c8.staticflickr.com/8/7554/27886955751_5bda328ae8_n.jpg" width="320" height="240" alt="Vancouver"></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
@@ -299,11 +301,13 @@ I also implemented a number of earlier samples on connecting the desktop and the
 
 #### <a name="7"></a>Unity Scripting and C# Events
 
-My son [Christopher](http://tammik.ca) is a professional independent sound designer specialising in audio games and now learning C# for Unity scripting to implement his own personal sound design toolbelt within that framework.
+<!-- My son [Christopher](http://tammik.ca) is a -->
 
-I am very impressed by the super powerful, clean, effective C# Unity API, and by the rapid progress he is making with it.
+A professional independent sound designer friend is specialising in audio games and now learning C# for Unity scripting to implement their own personal sound design toolbelt within that framework.
 
-For instance, he is implementing his own events using delegates, dictionaries, abstract base classes, timers, separate threads, called co-routines in Unity &ndash; impressive stuff for just a couple of days of coding.
+I am very impressed by the super powerful, clean, effective C# Unity API, and by the rapid progress they are making with it.
+
+For instance, they are implementing their own events using delegates, dictionaries, abstract base classes, timers, separate threads, called co-routines in Unity &ndash; impressive stuff for just a couple of days of coding.
 
 For the delegate implementation, the Unity discussion on [using C# events with Unity](http://forum.unity3d.com/threads/using-c-events-with-unity.58367) helped, especially the contribution by DifficultMass, supplying these lines of code:
 
@@ -322,13 +326,15 @@ For the delegate implementation, the Unity discussion on [using C# events with U
   }
 </pre>
 
+<!--
+
 Here is an early snapshot of the project as WIP:
 
 <center>
 <blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">I have been working on this <a href="https://twitter.com/hashtag/gameaudio?src=hash">#gameaudio</a> script for <a href="https://twitter.com/unity3d">@unity3d</a> over the weekend. Loads more ideas I want to add... <a href="https://twitter.com/hashtag/VR?src=hash">#VR</a> <a href="https://t.co/07ezzqcgKT">pic.twitter.com/07ezzqcgKT</a></p>&mdash; Chris Tammik (@chtammik) <a href="https://twitter.com/chtammik/status/747289609973862404">June 27, 2016</a></blockquote>
 <script async src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>
 </center>
-
+-->
 
 #### <a name="8"></a>Opendesk at Autodesk Forge Accelerator Barcelona
 
