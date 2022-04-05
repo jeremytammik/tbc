@@ -135,12 +135,14 @@ It is a bit harder than you might initially imagine &nbsp; :-)
 Here is the original video and the full sound replacement version side by side:
 
 - [Endtrip &ndash; Original version by The Outpost](https://vimeo.com/73537360)
-- [Endtrip &ndash; full sound replacement by Christopher](https://vimeo.com/148054745)
+- [Endtrip &ndash; full sound replacement](https://vimeo.com/148054745)
 
 <center>
 <iframe src="https://player.vimeo.com/video/148054745" width="480" height="297" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
-<p><a href="https://vimeo.com/148054745">Endtrip (full sound replacement)</a> from <a href="https://vimeo.com/chtammik">Chris Tammik</a> on <a href="https://vimeo.com">Vimeo</a>.</p>
+<p><a href="https://vimeo.com/148054745">Endtrip (full sound replacement)</a> on <a href="https://vimeo.com">Vimeo</a>.</p>
 </center>
+
+<!--  from <a href="https://vimeo.com/chtammik">Chris Tammik</a> -->
 
 For the sake of completeness, yet another version exists as well, [Endtrip Rescored by Sergio Ramis](https://www.youtube.com/watch?v=WjLWsTdISfY).
 
