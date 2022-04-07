@@ -46,12 +46,12 @@ So, here we go again:</p>
 <h4><a name="2"></a> Update the RevitSdkSamples Repo</h4>
 <p>I installed the new SDK and performed a pretty exhaustive comparison with the previous version to ensure that I do not overwrite anything important in
 the <a href="https://github.com/jeremytammik/RevitSdkSamples">RevitSdkSamples repository</a>.</p>
-<p>The advantage of amintaining a public repository for this is that changes can easily be tracked and I can share the steps that I take to compile the SDK samples and set up <code>RvtSamples</code> to load them.</p>
+<p>The advantage of maintaining a public repository for this is that changes can easily be tracked and I can share the steps that I take to compile the SDK samples and set up <code>RvtSamples</code> to load them.</p>
 <p>I enjoyed the support and conversation with <a href="https://github.com/jmcouffin">jmcouffin</a> during this process, in
 his <a href="https://github.com/jeremytammik/RevitSdkSamples/pull/1">pull request #1 2023SDK samples</a>.
 That was the first time anyone offered to help with this repository, by the way, so thank you very much indeed for that!</p>
 <p>I compiled <code>diff_2022_2023.txt</code> listing the differences between the Revit 2023 SDK samples and previous versions, both in the directory structure and individual files.</p>
-<p>Afact from that analysis, three new samples were added:</p>
+<p>Afaict from that analysis, three new samples were added:</p>
 <ul>
 <li>SheetToView3D</li>
 <li>SelectionChanged</li>
@@ -63,14 +63,16 @@ First things first, though: compile the SDK and set up <code>RvtSamples</code>.<
 <p>The first attempt at compiling <code>SDKSamples.sln</code> right out of the box produced 9544 error and 1168 warnings;
 the namespace <code>Autodesk</code> could not be found.</p>
 <p>SDKSamples includes 199 solution projects, and I am not going to edit their references one by one, so I need to implement a batch update somehow.</p>
-<p>Luckily, there is no need to do so either; searching globally for <code>RevitAPI.dll</code>, I find only 8 occurences, in the <code>targets</code> files in the <code>VSProps</code> folder and in the <code>ContextualAnalyticalModel.csproj</code>.
+<p>Luckily, there is no need to do so either; searching globally for <code>RevitAPI.dll</code>, I find only 8 occurrences, in the <code>targets</code> files in the <code>VSProps</code> folder and in the <code>ContextualAnalyticalModel.csproj</code>.
 Apparently, the latter is an exception.</p>
 <p>I ended up fixing the Revit API references by replacing variable expressions by a constant <em>C:\Program Files\Autodesk\Revit 2023</em> in the following files:</p>
-<p>ContextualAnalyticalModel.csproj
-SDKSamples.CivilAlignments.targets
-SDKSamples.VB.targets
-SDKSamples.targets
-SDKSamples.Steel.targets</p>
+<ul>
+<li>ContextualAnalyticalModel.csproj</li>
+<li>SDKSamples.CivilAlignments.targets</li>
+<li>SDKSamples.VB.targets</li>
+<li>SDKSamples.targets</li>
+<li>SDKSamples.Steel.targets</li>
+</ul>
 <p>With those modifications, I was able to successully compile all 199 projects with zero errors. </p>
 <h4><a name="4"></a> Eliminate Processor Architecture Mismatch Warning</h4>
 <p>95 warnings remain. Most of those concern the everlasting processor architecture mismatch, e.g.:</p>
@@ -84,7 +86,7 @@ SDKSamples.Steel.targets</p>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2014/09/architecture-mismatch-warning-disabler-update.html">Architecture Mismatch Warning Disabler Update</a></li>
 </ul>
 
-<p>I implemeneted the <a href="https://github.com/jeremytammik/DisableMismatchWarning">DisableMismatchWarning</a> utility to help me do so, and make use of that now as well:</p>
+<p>I implemented the <a href="https://github.com/jeremytammik/DisableMismatchWarning">DisableMismatchWarning</a> utility to help me do so, and make use of that now as well:</p>
 <p>After running that over all samples,
 only <a href="zip/revit_2023_sdk_samples_errors_warnings_1.txt">6 warnings</a> remain.</p>
 <h4><a name="5"></a> Missing XML Comments</h4>
@@ -145,7 +147,7 @@ In fact, it defines no such command; instead, it implements three others:</p>
 <li>RemoveAssociation</li>
 <li>SetOuterContourForPanels</li>
 </ul>
-<p>RvtSamples.txt erroneously lists three others: AddRelation, UodateRelation and BreakRelation.</p>
+<p>RvtSamples.txt erroneously lists three others: AddRelation, UpdateRelation and BreakRelation.</p>
 <p>I replaced them by AddAssociation and RemoveAssociation.</p>
 <h4><a name="7.4"></a> CivilAlignments Commands</h4>
 <p>The CivilAlignments sample defines two commands and tries to create menu entries named "Infrastructure Alignments" or both of them.</p>

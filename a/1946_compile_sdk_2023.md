@@ -48,7 +48,7 @@ So, here we go again:
 I installed the new SDK and performed a pretty exhaustive comparison with the previous version to ensure that I do not overwrite anything important in
 the [RevitSdkSamples repository](https://github.com/jeremytammik/RevitSdkSamples).
 
-The advantage of amintaining a public repository for this is that changes can easily be tracked and I can share the steps that I take to compile the SDK samples and set up `RvtSamples` to load them.
+The advantage of maintaining a public repository for this is that changes can easily be tracked and I can share the steps that I take to compile the SDK samples and set up `RvtSamples` to load them.
 
 I enjoyed the support and conversation with [jmcouffin](https://github.com/jmcouffin) during this process, in
 his [pull request #1 2023SDK samples](https://github.com/jeremytammik/RevitSdkSamples/pull/1).
@@ -56,7 +56,7 @@ That was the first time anyone offered to help with this repository, by the way,
 
 I compiled `diff_2022_2023.txt` listing the differences between the Revit 2023 SDK samples and previous versions, both in the directory structure and individual files.
 
-Afact from that analysis, three new samples were added:
+Afaict from that analysis, three new samples were added:
 
 - SheetToView3D
 - SelectionChanged
@@ -73,16 +73,16 @@ the namespace `Autodesk` could not be found.
 
 SDKSamples includes 199 solution projects, and I am not going to edit their references one by one, so I need to implement a batch update somehow.
 
-Luckily, there is no need to do so either; searching globally for `RevitAPI.dll`, I find only 8 occurences, in the `targets` files in the `VSProps` folder and in the `ContextualAnalyticalModel.csproj`.
+Luckily, there is no need to do so either; searching globally for `RevitAPI.dll`, I find only 8 occurrences, in the `targets` files in the `VSProps` folder and in the `ContextualAnalyticalModel.csproj`.
 Apparently, the latter is an exception.
 
 I ended up fixing the Revit API references by replacing variable expressions by a constant *C:\Program Files\Autodesk\Revit 2023* in the following files:
 
-ContextualAnalyticalModel.csproj
-SDKSamples.CivilAlignments.targets
-SDKSamples.VB.targets
-SDKSamples.targets
-SDKSamples.Steel.targets
+- ContextualAnalyticalModel.csproj
+- SDKSamples.CivilAlignments.targets
+- SDKSamples.VB.targets
+- SDKSamples.targets
+- SDKSamples.Steel.targets
 
 With those modifications, I was able to successully compile all 199 projects with zero errors. 
 
@@ -100,7 +100,7 @@ I mentioned this warning when it appeared and have been fixing it in every relea
 <li><a href="http://thebuildingcoder.typepad.com/blog/2014/09/architecture-mismatch-warning-disabler-update.html">Architecture Mismatch Warning Disabler Update</a></li>
 </ul>
 
-I implemeneted the [DisableMismatchWarning](https://github.com/jeremytammik/DisableMismatchWarning) utility to help me do so, and make use of that now as well:
+I implemented the [DisableMismatchWarning](https://github.com/jeremytammik/DisableMismatchWarning) utility to help me do so, and make use of that now as well:
 
 After running that over all samples,
 only [6 warnings](zip/revit_2023_sdk_samples_errors_warnings_1.txt) remain.
@@ -173,7 +173,7 @@ ContextualAnalyticalModel defines 15 external commands:
 - RemoveAssociation
 - SetOuterContourForPanels
 
-RvtSamples.txt erroneously lists three others: AddRelation, UodateRelation and BreakRelation.
+RvtSamples.txt erroneously lists three others: AddRelation, UpdateRelation and BreakRelation.
 
 I replaced them by AddAssociation and RemoveAssociation.
 
