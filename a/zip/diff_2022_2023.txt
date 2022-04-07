@@ -1,0 +1,149 @@
+Comparing directories only:
+
+% diff du2022.txt du2023.txt
+
+--
+377a378,380
+> Samples/SheetToView3D/CS/Properties
+> Samples/SheetToView3D/CS
+> Samples/SheetToView3D
+584a588,590
+> Samples/Events/SelectionChanged/CS/Properties
+> Samples/Events/SelectionChanged/CS
+> Samples/Events/SelectionChanged
+646a653,655
+> Samples/ContextualAnalyticalModel/CS/Properties
+> Samples/ContextualAnalyticalModel/CS
+> Samples/ContextualAnalyticalModel
+833c842
+< 2022
+--
+
+Comparing files and directories:
+
+find . | sort  > ff2022.txt
+find . | sort  > ff2023.txt
+diff ff2022.txt ff2023.txt >> diff_2022_2023.txt
+
+--
+> 2023
+780d779
+< ./Samples/AnalysisVisualizationFramework/DistanceToSurfaces/CS/Properties
+787d785
+< ./Samples/AnalysisVisualizationFramework/MultithreadedCalculation/CS/Properties
+792d789
+< ./Samples/AnalysisVisualizationFramework/SpatialFieldGradient/CS/Properties
+834d830
+< ./Samples/ArchSample/VB.NET/My Project
+942d937
+< ./Samples/BrowseBindings/VB.NET/My Project
+1007a1003,1025
+> ./Samples/ContextualAnalyticalModel
+> ./Samples/ContextualAnalyticalModel/CS
+> ./Samples/ContextualAnalyticalModel/CS/AddAssociation.cs
+> ./Samples/ContextualAnalyticalModel/CS/AnalyticalNodeConnStatus.cs
+> ./Samples/ContextualAnalyticalModel/CS/ContextualAnalyticalModel.addin
+> ./Samples/ContextualAnalyticalModel/CS/ContextualAnalyticalModel.csproj
+> ./Samples/ContextualAnalyticalModel/CS/CreateAnalytcalPanel.cs
+> ./Samples/ContextualAnalyticalModel/CS/CreateAnalyticalMember.cs
+> ./Samples/ContextualAnalyticalModel/CS/FlipAnalyticalMember.cs
+> ./Samples/ContextualAnalyticalModel/CS/MemberForcesAnalyticalMember.cs
+> ./Samples/ContextualAnalyticalModel/CS/ModifyPanelContour.cs
+> ./Samples/ContextualAnalyticalModel/CS/MoveAnalyticalMemberUsingElementTransformUtils.cs
+> ./Samples/ContextualAnalyticalModel/CS/MoveAnalyticalMemberUsingSetCurve.cs
+> ./Samples/ContextualAnalyticalModel/CS/MoveAnalyticalNodeUsingElementTransformUtils.cs
+> ./Samples/ContextualAnalyticalModel/CS/MoveAnalyticalPanelUsingElementTransformUtils.cs
+> ./Samples/ContextualAnalyticalModel/CS/MoveAnalyticalPanelUsingSketchEditScope.cs
+> ./Samples/ContextualAnalyticalModel/CS/Properties
+> ./Samples/ContextualAnalyticalModel/CS/Properties/AssemblyInfo.cs
+> ./Samples/ContextualAnalyticalModel/CS/ReadMe_ContextualAnalyticalModel.rtf
+> ./Samples/ContextualAnalyticalModel/CS/ReleaseConditionsAnalyticalMember.cs
+> ./Samples/ContextualAnalyticalModel/CS/RemoveAssociation.cs
+> ./Samples/ContextualAnalyticalModel/CS/SetOuterContourForPanels.cs
+> ./Samples/ContextualAnalyticalModel/CS/Utilities.cs
+1045d1062
+< ./Samples/CreateBeamsColumnsBraces/VB.NET/My Project
+1089d1105
+< ./Samples/CreateShared/VB.NET/My Project
+1284d1299
+< ./Samples/DeleteObject/VB.NET/My Project
+1294d1308
+< ./Samples/DesignOptionReader/VB.NET/My Project
+1312d1325
+< ./Samples/DirectionCalculation/CS/Properties
+1534a1548,1560
+> ./Samples/Events/SelectionChanged
+> ./Samples/Events/SelectionChanged/CS
+> ./Samples/Events/SelectionChanged/CS/Command.cs
+> ./Samples/Events/SelectionChanged/CS/InfoWindow.xaml
+> ./Samples/Events/SelectionChanged/CS/InfoWindow.xaml.cs
+> ./Samples/Events/SelectionChanged/CS/LogManager.cs
+> ./Samples/Events/SelectionChanged/CS/Properties
+> ./Samples/Events/SelectionChanged/CS/Properties/AssemblyInfo.cs
+> ./Samples/Events/SelectionChanged/CS/ReadMe_SelectionChanged.rtf
+> ./Samples/Events/SelectionChanged/CS/SelectionChanged.addin
+> ./Samples/Events/SelectionChanged/CS/SelectionChanged.cs
+> ./Samples/Events/SelectionChanged/CS/SelectionChanged.csproj
+> ./Samples/Events/SelectionChanged/CS/SelectionChangedEventArgsExtension.cs
+1651a1678
+> ./Samples/FabricationPartLayout/CS/FlipPart.cs
+1789d1815
+< ./Samples/FindReferencesByDirection/FindColumns/CS/Properties
+1796d1821
+< ./Samples/FindReferencesByDirection/MeasureHeight/CS/Properties
+1821d1845
+< ./Samples/FireRating/VB.NET/My Project
+2041d2064
+< ./Samples/HelloRevit/VB.NET/My Project
+2292d2314
+< ./Samples/MaterialProperties/VB.NET/My Project
+2299d2320
+< ./Samples/MaterialQuantities/CS/Properties
+2657d2677
+< ./Samples/PerformanceAdviserControl/CS/Properties
+2668d2687
+< ./Samples/PhaseSample/VB.NET/My Project
+2721d2739
+< ./Samples/PointCloudEngine/CS/PointCloudEngine.XML
+2727d2744
+< ./Samples/PointCloudEngine/CS/Properties
+2892d2908
+< ./Samples/RevitCommands/VB.NET/My Project
+2975d2990
+< ./Samples/RotateFramingObjects/VB.NET/My Project
+3030d3044
+< ./Samples/RvtSamples/CS/RvtSamples.csproj.user
+3150a3165,3172
+> ./Samples/SheetToView3D
+> ./Samples/SheetToView3D/CS
+> ./Samples/SheetToView3D/CS/Properties
+> ./Samples/SheetToView3D/CS/Properties/AssemblyInfo.cs
+> ./Samples/SheetToView3D/CS/ReadMe_SheetToView3D.rtf
+> ./Samples/SheetToView3D/CS/SheetToView3D.addin
+> ./Samples/SheetToView3D/CS/SheetToView3D.cs
+> ./Samples/SheetToView3D/CS/SheetToView3D.csproj
+3203d3224
+< ./Samples/SlabProperties/VB.NET/My Project
+3302d3322
+< ./Samples/StructuralLayerFunction/VB.NET/My Project
+3325d3344
+< ./Samples/TestFloorThickness/VB.NET/My Project
+3333d3351
+< ./Samples/TestWallThickness/VB.NET/My Project
+3358d3375
+< ./Samples/TraverseSystem/CS/TraverseSystem.XML
+3381d3397
+< ./Samples/TypeSelector/VB.NET/My Project
+3499d3514
+< ./Samples/Viewers/AnalyticalViewer/VB.NET/My Project
+3507d3521
+< ./Samples/Viewers/ElementViewer/VB.NET/My Project
+3513d3526
+< ./Samples/Viewers/RevitViewer/VB.NET/My Project
+3527d3539
+< ./Samples/Viewers/RoomViewer/VB.NET/My Project
+3901c3913
+< ./ff2022.txt
+---
+> ./ff2023.txt
+--
