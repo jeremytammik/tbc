@@ -29,6 +29,19 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Compiling the Revit 2023 SDK
 
+The first thing I do after installing the new release of Revit is compile the Revit SDK and set up RvtSamples to load the external commands.
+So, here we go again:
+
+- [Update the RevitSdkSamples Repo](#2)
+- [Set the Revit API References](#3)
+- [Eliminate Processor Architecture Mismatch Warning](#4)
+- [Missing XML Comments](#5)
+- [Targets and Rule Sets](#6)
+- [Set Up RvtSamples](#7)
+    - [DatumsModification Commmands](#7.2)
+    - [ContextualAnalyticalModel Commmands](#7.3)
+    - [CivilAlignments Commmands](#7.4)
+- [Conclusion](#8)
 
 ####<a name="2"></a> Update the RevitSdkSamples Repo
 
@@ -103,7 +116,7 @@ Two of the remaining six warnings are easy to fix, so let's do so:
   
 I simply added placeholder XML documentation to both methods.
 
-####<a name="5"></a> Missing XML Comments
+####<a name="6"></a> Targets and Rule Sets
 
 The four remaining warnings seem unimportant and can be ignored:
 
@@ -116,7 +129,7 @@ The four remaining warnings seem unimportant and can be ignored:
 - Warning  Could not find rule set file "GeometryCreation_BooleanOperation.ruleset". GeometryCreation_BooleanOperation   
 - Warning  Could not find rule set file "ProximityDetection_WallJoinControl.ruleset". ProximityDetection_WallJoinControl   
 
-####<a name="6"></a> Set Up RvtSamples
+####<a name="7"></a> Set Up RvtSamples
 
 I added my local system path *Y:/a/src/rvt/RevitSdkSamples/SDK/Samples/* in both `RvtSamples.addin` and `RvtSamples.txt`.
 
@@ -129,7 +142,7 @@ Some add-in file paths are not found, so I set the debugging flag in `RvtSamples
 The culprits are the usual suspects, all of them VB.NET samples, but strangely enough not all VB.NET samples,
 cf. [revit_2023_sdk_samples_errors_warnings_2.txt](zip/revit_2023_sdk_samples_errors_warnings_2.txt).
 
-####<a name="6.2"></a> DatumsModification Commmands
+####<a name="7.2"></a> DatumsModification Commmands
 
 RvtSamples.txt erroneously listed an external command named `Command` for the `DatumsModification` SDK sample.
 In fact, it defines no such command; instead, it implements three others:
@@ -140,7 +153,7 @@ In fact, it defines no such command; instead, it implements three others:
 
 I updated RvtSamples.txt accordingly.
 
-####<a name="6.3"></a> ContextualAnalyticalModel Commmands
+####<a name="7.3"></a> ContextualAnalyticalModel Commmands
 
 ContextualAnalyticalModel defines 15 external commands:
 
@@ -164,7 +177,7 @@ RvtSamples.txt erroneously lists three others: AddRelation, UodateRelation and B
 
 I replaces them by AddAssociation and RemoveAssociation.
 
-####<a name="6.4"></a> CivilAlignments Commmands
+####<a name="7.4"></a> CivilAlignments Commmands
 
 The CivilAlignments sample defines two commands and tries to create menu entries named "Infrastructure Alignments" or both of them.
 
@@ -172,7 +185,7 @@ This causes Revit to throw an exception.
 
 I fixed that by naming them 'Infrastructure Alignments CreateAlignmentStationLabelsCmd' and 'Infrastructure Alignments ShowPropertiesCmd', respectively.
 
-####<a name="7"></a> Conclusion
+####<a name="8"></a> Conclusion
 
 I finished off by resetting the `testClassName` debug switch and creating the final
 [RevitSdkSamples release 2023.0.0.3](https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2023.0.0.3).
