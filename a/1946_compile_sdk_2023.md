@@ -84,7 +84,7 @@ I ended up fixing the Revit API references by replacing variable expressions by 
 - SDKSamples.targets
 - SDKSamples.Steel.targets
 
-With those modifications, I was able to successully compile all 199 projects with zero errors. 
+With those modifications, I was able to successfully compile all 199 projects with zero errors. 
 
 ####<a name="4"></a> Eliminate Processor Architecture Mismatch Warning
 
