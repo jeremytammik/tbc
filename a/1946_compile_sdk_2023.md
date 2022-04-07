@@ -9,7 +9,7 @@
 
 twitter:
 
-the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Compile Revit 2023 SDK samples, set up RvtSamples and update the RevitSdkSamples repo for the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/rvt2023sdk
 
 I log my work compiling the new Revit 2023 SDK and setting up RvtSamples to load the external commands
 &ndash; Update the RevitSdkSamples repo
