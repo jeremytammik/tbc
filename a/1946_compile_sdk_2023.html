@@ -30,15 +30,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>The first thing I do after installing the new release of Revit is compile the Revit SDK and set up RvtSamples to load the external commands.
 So, here we go again:</p>
 <ul>
-<li><a href="#2">Update the RevitSdkSamples Repo</a></li>
-<li><a href="#3">Set the Revit API References</a></li>
-<li><a href="#4">Eliminate Processor Architecture Mismatch Warning</a></li>
-<li><a href="#5">Missing XML Comments</a></li>
-<li><a href="#6">Targets and Rule Sets</a></li>
-<li><a href="#7">Set Up RvtSamples</a><ul>
-<li><a href="#7.2">DatumsModification Commmands</a></li>
-<li><a href="#7.3">ContextualAnalyticalModel Commmands</a></li>
-<li><a href="#7.4">CivilAlignments Commmands</a></li>
+<li><a href="#2">Update the RevitSdkSamples repo</a></li>
+<li><a href="#3">Set the Revit API references</a></li>
+<li><a href="#4">Eliminate processor architecture mismatch warning</a></li>
+<li><a href="#5">Missing XML comments</a></li>
+<li><a href="#6">Targets and rule sets</a></li>
+<li><a href="#7">Set up RvtSamples</a><ul>
+<li><a href="#7.2">DatumsModification commands</a></li>
+<li><a href="#7.3">ContextualAnalyticalModel commands</a></li>
+<li><a href="#7.4">CivilAlignments commands</a></li>
 </ul>
 </li>
 <li><a href="#8">Conclusion</a></li>
@@ -84,7 +84,7 @@ SDKSamples.Steel.targets</p>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2014/09/architecture-mismatch-warning-disabler-update.html">Architecture Mismatch Warning Disabler Update</a></li>
 </ul>
 
-<p>I implemeneted the <a href="https://github.com/jeremytammik/DisableMismatchWarning">DisableMismatchWarning</a> utility to help me do so, and make use o that now as well:</p>
+<p>I implemeneted the <a href="https://github.com/jeremytammik/DisableMismatchWarning">DisableMismatchWarning</a> utility to help me do so, and make use of that now as well:</p>
 <p>After running that over all samples,
 only <a href="zip/revit_2023_sdk_samples_errors_warnings_1.txt">6 warnings</a> remain.</p>
 <h4><a name="5"></a> Missing XML Comments</h4>
@@ -117,7 +117,7 @@ only <a href="zip/revit_2023_sdk_samples_errors_warnings_1.txt">6 warnings</a> r
 
 <p>The culprits are the usual suspects, all of them VB.NET samples, but strangely enough not all VB.NET samples,
 cf. <a href="zip/revit_2023_sdk_samples_errors_warnings_2.txt">revit_2023_sdk_samples_errors_warnings_2.txt</a>.</p>
-<h4><a name="7.2"></a> DatumsModification Commmands</h4>
+<h4><a name="7.2"></a> DatumsModification Commands</h4>
 <p>RvtSamples.txt erroneously listed an external command named <code>Command</code> for the <code>DatumsModification</code> SDK sample.
 In fact, it defines no such command; instead, it implements three others:</p>
 <ul>
@@ -126,7 +126,7 @@ In fact, it defines no such command; instead, it implements three others:</p>
 <li>DatumStyleModification</li>
 </ul>
 <p>I updated RvtSamples.txt accordingly.</p>
-<h4><a name="7.3"></a> ContextualAnalyticalModel Commmands</h4>
+<h4><a name="7.3"></a> ContextualAnalyticalModel Commands</h4>
 <p>ContextualAnalyticalModel defines 15 external commands:</p>
 <ul>
 <li>AddAssociation</li>
@@ -146,8 +146,8 @@ In fact, it defines no such command; instead, it implements three others:</p>
 <li>SetOuterContourForPanels</li>
 </ul>
 <p>RvtSamples.txt erroneously lists three others: AddRelation, UodateRelation and BreakRelation.</p>
-<p>I replaces them by AddAssociation and RemoveAssociation.</p>
-<h4><a name="7.4"></a> CivilAlignments Commmands</h4>
+<p>I replaced them by AddAssociation and RemoveAssociation.</p>
+<h4><a name="7.4"></a> CivilAlignments Commands</h4>
 <p>The CivilAlignments sample defines two commands and tries to create menu entries named "Infrastructure Alignments" or both of them.</p>
 <p>This causes Revit to throw an exception.</p>
 <p>I fixed that by naming them 'Infrastructure Alignments CreateAlignmentStationLabelsCmd' and 'Infrastructure Alignments ShowPropertiesCmd', respectively.</p>
