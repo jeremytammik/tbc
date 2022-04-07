@@ -32,15 +32,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 The first thing I do after installing the new release of Revit is compile the Revit SDK and set up RvtSamples to load the external commands.
 So, here we go again:
 
-- [Update the RevitSdkSamples Repo](#2)
-- [Set the Revit API References](#3)
-- [Eliminate Processor Architecture Mismatch Warning](#4)
-- [Missing XML Comments](#5)
-- [Targets and Rule Sets](#6)
-- [Set Up RvtSamples](#7)
-    - [DatumsModification Commmands](#7.2)
-    - [ContextualAnalyticalModel Commmands](#7.3)
-    - [CivilAlignments Commmands](#7.4)
+- [Update the RevitSdkSamples repo](#2)
+- [Set the Revit API references](#3)
+- [Eliminate processor architecture mismatch warning](#4)
+- [Missing XML comments](#5)
+- [Targets and rule sets](#6)
+- [Set up RvtSamples](#7)
+    - [DatumsModification commands](#7.2)
+    - [ContextualAnalyticalModel commands](#7.3)
+    - [CivilAlignments commands](#7.4)
 - [Conclusion](#8)
 
 ####<a name="2"></a> Update the RevitSdkSamples Repo
@@ -100,7 +100,7 @@ I mentioned this warning when it appeared and have been fixing it in every relea
 <li><a href="http://thebuildingcoder.typepad.com/blog/2014/09/architecture-mismatch-warning-disabler-update.html">Architecture Mismatch Warning Disabler Update</a></li>
 </ul>
 
-I implemeneted the [DisableMismatchWarning](https://github.com/jeremytammik/DisableMismatchWarning) utility to help me do so, and make use o that now as well:
+I implemeneted the [DisableMismatchWarning](https://github.com/jeremytammik/DisableMismatchWarning) utility to help me do so, and make use of that now as well:
 
 After running that over all samples,
 only [6 warnings](zip/revit_2023_sdk_samples_errors_warnings_1.txt) remain.
@@ -142,7 +142,7 @@ Some add-in file paths are not found, so I set the debugging flag in `RvtSamples
 The culprits are the usual suspects, all of them VB.NET samples, but strangely enough not all VB.NET samples,
 cf. [revit_2023_sdk_samples_errors_warnings_2.txt](zip/revit_2023_sdk_samples_errors_warnings_2.txt).
 
-####<a name="7.2"></a> DatumsModification Commmands
+####<a name="7.2"></a> DatumsModification Commands
 
 RvtSamples.txt erroneously listed an external command named `Command` for the `DatumsModification` SDK sample.
 In fact, it defines no such command; instead, it implements three others:
@@ -153,7 +153,7 @@ In fact, it defines no such command; instead, it implements three others:
 
 I updated RvtSamples.txt accordingly.
 
-####<a name="7.3"></a> ContextualAnalyticalModel Commmands
+####<a name="7.3"></a> ContextualAnalyticalModel Commands
 
 ContextualAnalyticalModel defines 15 external commands:
 
@@ -175,9 +175,9 @@ ContextualAnalyticalModel defines 15 external commands:
 
 RvtSamples.txt erroneously lists three others: AddRelation, UodateRelation and BreakRelation.
 
-I replaces them by AddAssociation and RemoveAssociation.
+I replaced them by AddAssociation and RemoveAssociation.
 
-####<a name="7.4"></a> CivilAlignments Commmands
+####<a name="7.4"></a> CivilAlignments Commands
 
 The CivilAlignments sample defines two commands and tries to create menu entries named "Infrastructure Alignments" or both of them.
 
