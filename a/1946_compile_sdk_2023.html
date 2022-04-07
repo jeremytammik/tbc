@@ -10,8 +10,14 @@ twitter:
 
 the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+I log my work compiling the new Revit 2023 SDK and setting up RvtSamples to load the external commands
+&ndash; Update the RevitSdkSamples repo
+&ndash; Set the Revit API references
+&ndash; Eliminate processor architecture mismatch warning
+&ndash; Set up RvtSamples
+&ndash; DatumsModification
+&ndash; ContextualAnalyticalModel
+&ndash; CivilAlignments...
 
 linkedin:
 
@@ -26,7 +32,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Compiling the Revit 2023 SDK</h3>
+<h3>Compiling the Revit 2023 SDK Samples</h3>
 <p>The first thing I do after installing the new release of Revit is compile the Revit SDK and set up RvtSamples to load the external commands.
 So, here we go again:</p>
 <ul>
@@ -50,7 +56,8 @@ the <a href="https://github.com/jeremytammik/RevitSdkSamples">RevitSdkSamples re
 <p>I enjoyed the support and conversation with <a href="https://github.com/jmcouffin">jmcouffin</a> during this process, in
 his <a href="https://github.com/jeremytammik/RevitSdkSamples/pull/1">pull request #1 2023SDK samples</a>.
 That was the first time anyone offered to help with this repository, by the way, so thank you very much indeed for that!</p>
-<p>I compiled <code>diff_2022_2023.txt</code> listing the differences between the Revit 2023 SDK samples and previous versions, both in the directory structure and individual files.</p>
+<p>I compiled <a href="zip/diff_2022_2023.txt">diff_2022_2023.txt</a> listing
+the differences between the Revit 2023 SDK samples and previous versions, both in the directory structure and individual files.</p>
 <p>Afaict from that analysis, three new samples were added:</p>
 <ul>
 <li>SheetToView3D</li>
@@ -93,9 +100,9 @@ only <a href="zip/revit_2023_sdk_samples_errors_warnings_1.txt">6 warnings</a> r
 <p>Two of the remaining six warnings are easy to fix, so let's do so:</p>
 <ul>
 <li>Warning CS1591: Missing XML comment for publicly visible type or member 'ExportPDFData.Combine' in ImportExport,
-  <em>Y:\a\src\rvt\RevitSdkSamples\SDK\Samples\ImportExport\CS\Export\ExportPDFData.cs</em> line 41</li>
+  <em>...\ImportExport\CS\Export\ExportPDFData.cs</em> line 41</li>
 <li>Warning CS1591: Missing XML comment for publicly visible type or member 'ExportPDFOptionsForm.ExportPDFOptionsForm(ExportPDFData)' in ImportExport,
-  <em>Y:\a\src\rvt\RevitSdkSamples\SDK\Samples\ImportExport\CS\Export\ExportPDFOptionsForm.cs</em>, line 45</li>
+  <em>...\ImportExport\CS\Export\ExportPDFOptionsForm.cs</em>, line 45</li>
 </ul>
 <p>I simply added placeholder XML documentation to both methods.</p>
 <h4><a name="6"></a> Targets and Rule Sets</h4>

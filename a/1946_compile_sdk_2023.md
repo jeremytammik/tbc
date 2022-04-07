@@ -11,8 +11,14 @@ twitter:
 
 the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+I log my work compiling the new Revit 2023 SDK and setting up RvtSamples to load the external commands
+&ndash; Update the RevitSdkSamples repo
+&ndash; Set the Revit API references
+&ndash; Eliminate processor architecture mismatch warning
+&ndash; Set up RvtSamples
+&ndash; DatumsModification
+&ndash; ContextualAnalyticalModel
+&ndash; CivilAlignments...
 
 linkedin:
 
@@ -27,7 +33,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Compiling the Revit 2023 SDK
+### Compiling the Revit 2023 SDK Samples
 
 The first thing I do after installing the new release of Revit is compile the Revit SDK and set up RvtSamples to load the external commands.
 So, here we go again:
@@ -54,7 +60,8 @@ I enjoyed the support and conversation with [jmcouffin](https://github.com/jmcou
 his [pull request #1 2023SDK samples](https://github.com/jeremytammik/RevitSdkSamples/pull/1).
 That was the first time anyone offered to help with this repository, by the way, so thank you very much indeed for that!
 
-I compiled `diff_2022_2023.txt` listing the differences between the Revit 2023 SDK samples and previous versions, both in the directory structure and individual files.
+I compiled [diff_2022_2023.txt](zip/diff_2022_2023.txt) listing
+the differences between the Revit 2023 SDK samples and previous versions, both in the directory structure and individual files.
 
 Afaict from that analysis, three new samples were added:
 
@@ -110,9 +117,9 @@ only [6 warnings](zip/revit_2023_sdk_samples_errors_warnings_1.txt) remain.
 Two of the remaining six warnings are easy to fix, so let's do so:
 
 - Warning CS1591: Missing XML comment for publicly visible type or member 'ExportPDFData.Combine' in ImportExport,
-  *Y:\a\src\rvt\RevitSdkSamples\SDK\Samples\ImportExport\CS\Export\ExportPDFData.cs* line 41
+  *...\ImportExport\CS\Export\ExportPDFData.cs* line 41
 - Warning CS1591: Missing XML comment for publicly visible type or member 'ExportPDFOptionsForm.ExportPDFOptionsForm(ExportPDFData)' in ImportExport,
-  *Y:\a\src\rvt\RevitSdkSamples\SDK\Samples\ImportExport\CS\Export\ExportPDFOptionsForm.cs*, line 45
+  *...\ImportExport\CS\Export\ExportPDFOptionsForm.cs*, line 45
   
 I simply added placeholder XML documentation to both methods.
 
