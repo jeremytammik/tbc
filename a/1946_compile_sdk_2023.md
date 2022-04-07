@@ -22,6 +22,20 @@ I log my work compiling the new Revit 2023 SDK and setting up RvtSamples to load
 
 linkedin:
 
+Compile Revit 2023 SDK samples, set up RvtSamples and update the RevitSdkSamples repo for the #RevitAPI
+
+https://autode.sk/rvt2023sdk
+
+I log my work compiling the new Revit 2023 SDK and setting up RvtSamples to load the external commands:
+
+- Update the RevitSdkSamples repo
+- Set the Revit API references
+- Eliminate processor architecture mismatch warning
+- Set up RvtSamples
+- DatumsModification
+- ContextualAnalyticalModel
+- CivilAlignments...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
