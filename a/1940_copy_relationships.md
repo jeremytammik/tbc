@@ -147,7 +147,7 @@ This allowed me to compare the output of `CopyElements` with that list and apply
 
 Many thanks to Fabio for raising this issue and Steve Ragan for sharing and explaining his effective solution!
 
-####<a name="5"></a> Unsplash with Free Images
+####<a name="5"></a> Unsplash Free Image Library
 
 I am a fan of open source, the creative commons license, free stuff, good will, sharing and learning together as a community.
 Consequently, I share everything I can in public in the hope that it will come in useful for others as well and help make the world a better place.
