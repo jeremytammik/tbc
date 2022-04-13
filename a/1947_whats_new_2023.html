@@ -41,23 +41,50 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>What's New in the Revit 2023 API</h3>
-<p>The Revit 2023 API includes an exceptional list of exciting enhancements for add-in developers, including numerous developer wishes and requests that have now been explicitly addressed:</p>
+<p>The Revit 2023 API includes many exciting enhancements for add-in developers:</p>
 <ul>
 <li><a href="#1">Information sources</a></li>
 <li><a href="#2">What's new in previous versions</a></li>
 <li><a href="#4">Detailed table of contents</a></li>
 </ul>
-<p>Table of contents top level:</p>
+<p>Top level table of contents:</p>
 <ul class="toc">
-<li>1 <a href="#4.1">API Changes</a></li>
+<li>1 <a href="#4.1">API changes </a></li>
 <ul class="toc">
-<li>1.1 <a href="#4.1.1">Parameter API changes (migration to ForgeTypeId)</a></li>
-<li>1.15 <a href="#4.1.15">Removal of obsoleted APIs</a></li>
+<li>1.1 <a href="#4.1.1">New version of CEFSharp </a></li>
+<li>1.2 <a href="#4.1.2">Replacement for Structural Analytical Model elements </a></li>
+<li>1.3 <a href="#4.1.3">Geometry API changes </a></li>
+<li>1.4 <a href="#4.1.4">Custom Export API changes </a></li>
+<li>1.5 <a href="#4.1.5">Export API changes </a></li>
+<li>1.6 <a href="#4.1.6">Energy Analysis API changes </a></li>
+<li>1.7 <a href="#4.1.7">Reinforcement API changes </a></li>
+<li>1.8 <a href="#4.1.8">Project Browser API removal </a></li>
+<li>1.9 <a href="#4.1.9">Obsolete API removal </a></li>
 </ul>
-<li>2 <a href="#4.2">API Additions</a></li>
+<li>2 <a href="#4.2">API additions </a></li>
 <ul class="toc">
-<li>2.1 <a href="#4.2.1">Sketched Elements API</a></li>
-<li>2.22 <a href="#4.2.22">Energy Analysis API additions</a></li>
+<li>2.1 <a href="#4.2.1">Schedule API additions </a></li>
+<li>2.2 <a href="#4.2.2">Worksharing API additions </a></li>
+<li>2.3 <a href="#4.2.3">Geometry API additions </a></li>
+<li>2.4 <a href="#4.2.4">DirectShape API additions </a></li>
+<li>2.5 <a href="#4.2.5">Import/Export API additions </a></li>
+<li>2.6 <a href="#4.2.6">View API additions </a></li>
+<li>2.7 <a href="#4.2.7">Electrical API additions </a></li>
+<li>2.8 <a href="#4.2.8">Mechanical API additions </a></li>
+<li>2.9 <a href="#4.2.9">ElementId API additions </a></li>
+<li>2.10 <a href="#4.2.10">Element API additions </a></li>
+<li>2.11 <a href="#4.2.11">Document API additions </a></li>
+<li>2.12 <a href="#4.2.12">Annotation API additions </a></li>
+<li>2.13 <a href="#4.2.13">Energy Analysis API additions </a></li>
+<li>2.14 <a href="#4.2.14">Slab API additions </a></li>
+<li>2.15 <a href="#4.2.15">Applications API additions </a></li>
+<li>2.16 <a href="#4.2.16">Sketched Elements API additions </a></li>
+<li>2.17 <a href="#4.2.17">Project Browser API additions </a></li>
+<li>2.18 <a href="#4.2.18">Structure API additions </a></li>
+<li>2.19 <a href="#4.2.19">Selection API additions </a></li>
+<li>2.20 <a href="#4.2.20">MEP API additions </a></li>
+<li>2.21 <a href="#4.2.21">Parameter API additions </a></li>
+<li>2.22 <a href="#4.2.22">Print API additions </a></li>
 </ul>
 </ul>
 
@@ -986,12 +1013,12 @@ in the <a href="http://help.autodesk.com/view/RVT/2023/ENU">Revit 2023 online he
 <ul>
 <li>Document.NewDimension()</li>
 </ul>
-<p>and its overrides can now support creation of dimensions in Sketch Edit mode. If users need to create dimensions in the sketch they must call this method under sketch edit mode, passing the view parameter as null and using sketch entities as dimension references. The method signatures were not changed but descriptions have been updated.</p>
+<p>and its overrides can now support creation of dimensions in Sketch Edit mode. If users need to create dimensions in the sketch, they must call this method under sketch edit mode, passing the view parameter as null and using sketch entities as dimension references. The method signatures were not changed but descriptions have been updated.</p>
 <p>The method:</p>
 <ul>
 <li>Document.NewFamilyInstance()</li>
 </ul>
-<p>and its overrides can now support creation of dimensions in Sketch Edit mode. If users need to create dimensions in the sketch they must call this method under sketch edit mode, passing the view parameter as null and using sketch entities as dimension references. The method signatures were not changed but descriptions have been updated.</p>
+<p>and its overrides can now support creation of dimensions in Sketch Edit mode. If users need to create dimensions in the sketch, they must call this method under sketch edit mode, passing the view parameter as null and using sketch entities as dimension references. The method signatures were not changed but descriptions have been updated.</p>
 <p><a name="4.2.16.3"></a><h3 class="new">2.16.3. Filled Region for sketch plane</h3></p>
 <p>The new method:</p>
 <ul>
@@ -1072,7 +1099,7 @@ in the <a href="http://help.autodesk.com/view/RVT/2023/ENU">Revit 2023 online he
 <p><a name="4.2.19.2"></a><h3 class="new">2.19.2. UIApplication</h3></p>
 <p>The new events: </p>
 <ul>
-<li>Autodesk.Revit.UI.UIApplication.SelectionChanged &ndash; Subscribe to the SelectionChange event to be notified after the selection was changed.</li>
+<li>Autodesk.Revit.UI.UIApplication.SelectionChanged &ndash; Subscribe to the SelectionChanged event to be notified after the selection was changed.</li>
 <li>Autodesk.Revit.UI.UIControlledApplication.SelectionChanged</li>
 </ul>
 <p><a name="4.2.19.3"></a><h3 class="new">2.19.3. Events</h3></p>
