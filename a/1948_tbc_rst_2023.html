@@ -53,7 +53,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
   Please use the constructor without the <code>caseSensitive</code> argument instead.</li>
 </ul>
 <p>The Boolean argument was not working as expected in previous versions and can simply be removed.</p>
-<h4><a name="3"></a> Not Migrating The Derived Analytical Model</h4>
+<h4><a name="3"></a> Not Migrating the Derived Analytical Model</h4>
 <p>After removing the Boolean argument to <code>CreateEqualsRule</code>, the
 remaining <a href="zip/tbc_samples_2023_migr_01.txt">8 errors and 4 warnings</a> are
 all caused by the analytical model changes, above all the removal of the <code>GetAnalyticalModel</code> method.</p>
@@ -71,7 +71,7 @@ It includes some sample code as well.</p>
 <p>The bottom line is that the relation between physical element and analytical element can now be edited &ndash; in the old approach, this was not possible &ndash; and the class which handles these relations is called <code>AnalyticalToPhysicalAssociationManager</code>.</p>
 <p>I asked the development team myself how to migrate a sample using the <code>GetAnalyticalModel</code> method.
 They reply:</p>
-<p>It correct to assume that the following code makes no sense at all any longer in Revit 2023 and needs to be completely rewritten:</p>
+<p>The following code makes no sense at all any longer in Revit 2023 and needs to be completely rewritten:</p>
 <pre class="code">
   var am = wall.GetAnalyticalModel();
 
@@ -102,7 +102,7 @@ the <a href="https://help.autodesk.com/view/RVT/2023/ENU/?guid=Revit_API_Revit_A
 still work-in-progress and will be updated soon.</p>
 <p>Finally,
 the 47-minute <a href="https://youtu.be/jfUIVGNqlFU">Revit 2023 Structural Analytical Model API webinar recording</a> created
-during the pre-release phase has now been published and explains all the new concepts in ful depth and detail.</p>
+during the pre-release phase has now been published and explains all the new concepts in full depth and detail.</p>
 <p><center>
 <img src="img/rst_2023_objectives.png" alt="Revit 2023 Structural API objectives" title="Revit 2023 Structural API objectives" width="600"/> <!-- 1200 -->
 </center></p>
