@@ -1,0 +1,108 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<p></head></p>
+<!---
+
+- slack https://autodesk.slack.com/archives/C0SR6NAP8/p1650388044451449
+- comment https://thebuildingcoder.typepad.com/blog/2022/04/whats-new-in-the-revit-2023-api.html#comment-5838192874
+- youtube The “Revit Structure Analytical Model API beta Webinar” has been posted to You Tube.
+  [Revit 2023 Structural Analytical Model API webinar recording](https://youtu.be/jfUIVGNqlFU)
+
+Boris Shafiro  17:23
+API Studio Recording (2022-04-19):
+https://share.autodesk.com/:v:/r/sites/BID/BID%20Documents/Building%20Design%20Products/Guilds/API/API%20Studio%20Recordings/2022/2022-04-19-API-Studio-Recording.mp4?csf=1&web=1&e=2THEGX
+Agenda: New FamilyInstance creation API proposal. Oleg Sheydvasser, Ivan Dobrianov.
+
+twitter:
+
+ the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+&ndash; 
+...
+
+linkedin:
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>TBC Samples 2023 and the New Structural API</h3>
+<p>Migrating The Building Coder samples, I encountered the same problems as others trying to update obsolete structural API code, so let's take a look at some resources assisting us in that area:</p>
+<ul>
+<li><a href="#2">Migrating The Building Coder samples</a></li>
+<li><a href="#3">Not migrating the derived analytical model</a></li>
+<li><a href="#3">Revit 2023 Structural API</a></li>
+</ul>
+<h4><a name="2"></a> Migrating The Building Coder Samples</h4>
+<p>I migrated <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder Samples</a> last week.</p>
+<p>Except for the deprecation of the derived analytical model that we discuss below, it was straightforward with hardly any changes at all except for updating the Revit API .NET assembly DLL references.</p>
+<p>After that step, <a href="zip/tbc_samples_2023_migr_01.txt">8 errors and 5 warnings</a> remain.</p>
+<p>We can easily deal with the warning about the <code>ParameterFilterRuleFactory</code> <code>CreateEqualsRule</code> in the module CmdCollectorPerformance.cs:</p>
+<ul>
+<li>Warning CS0618 <i>ParameterFilterRuleFactory.CreateEqualsRule(ElementId, string, bool)</i> is obsolete:
+  This method is deprecated in Revit 2023 and may be removed in a future version of Revit.
+  Please use the constructor without the <code>caseSensitive</code> argument instead.</li>
+</ul>
+<p>The Boolean argument was not working as expected in previous versions and can simply be removed.</p>
+<h4><a name="3"></a> Not Migrating The Derived Analytical Model</h4>
+<p>After removing the Boolean argument to <code>CreateEqualsRule</code>, the
+remaining <a href="zip/tbc_samples_2023_migr_01.txt">8 errors and 4 warnings</a> are
+all caused by the analytical model changes, above all the removal of the <code>GetAnalyticalModel</code> method.</p>
+<p>The existing code cannot easily be migrated to the new structural API, as I explained in the answer
+to <a href="https://thebuildingcoder.typepad.com/blog/2022/04/whats-new-in-the-revit-2023-api.html#comment-5838111563">Ozan Aksu's comment</a>:</p>
+<p><strong>Question:</strong> Can't find <code>AnalyticalToPhysicalRelationManager</code>.
+Where is it?
+I was using <code>GetAnalyticalModel</code>.
+Now I am stuck.</p>
+<p><strong>Answer:</strong> Yes, indeed, some hard and sudden changes have been made to the Structural API.</p>
+<p>Please refer to the online help page
+on <a href="https://help.autodesk.com/view/RVT/2023/ENU/?guid=GUID-A1157199-4E27-41F9-BF45-53A5CD79E9A1">The Contextual Analytical Model in the Revit API</a>.
+It includes some sample code as well.</p>
+<p>The sample describing how to access the analytical element for a given physical element is in the section named <i>Gets the associated analytical element for a physical one</i>.</p>
+<p>The bottom line is that the relation between physical element and analytical element can now be edited &ndash; in the old approach, this was not possible &ndash; and the class which handles these relations is called <code>AnalyticalToPhysicalAssociationManager</code>.</p>
+<p>I asked the development team myself how to migrate a sample using the <code>GetAnalyticalModel</code> method.
+They reply:</p>
+<p>It correct to assume that the following code makes no sense at all any longer in Revit 2023 and needs to be completely rewritten:</p>
+<pre class="code">
+  var am = wall.GetAnalyticalModel();
+
+  foreach (var ct in CurveTypes)
+  {
+    var curves = am.GetCurves(ct);
+    var n = curves.Count;
+
+    Debug.Print("{0} {1} curve{2}.",
+      n, ct, Util.PluralSuffix(n));
+
+    foreach (var curve in curves)
+      creator.CreateModelCurve(
+        curve.CreateTransformed(T));
+  }
+</pre>
+
+<p>There is no meaningful way to migrate it, since the basic concepts changed.
+Yes, most of the code must be rewritten.</p>
+<p>As always with the Revit API, it will help to learn and understand the new concepts from the end user point of view first, before trying to address the programming side of things.</p>
+<h4><a name="3"></a> Revit 2023 Structural API</h4>
+<p>So, let's dive deeper into the Revit 2023 Structural API.</p>
+<p>The explanation
+of <a href="https://help.autodesk.com/view/RVT/2023/ENU/?guid=GUID-A1157199-4E27-41F9-BF45-53A5CD79E9A1">the contextual analytical model in the Revit API</a> contains
+all the up-to-date information and may be the best starting point.</p>
+<p>The Revit Developer's Guide description of
+the <a href="https://help.autodesk.com/view/RVT/2023/ENU/?guid=Revit_API_Revit_API_Developers_Guide_Discipline_Specific_Functionality_Structural_Engineering_Analytical_Model_html">Analytical Model</a> is
+still work-in-progress and will be updated soon.</p>
+<p>Finally,
+the 47-minute <a href="https://youtu.be/jfUIVGNqlFU">Revit 2023 Structural Analytical Model API webinar recording</a> created
+during the pre-release phase has now been published and explains all the new concepts in ful depth and detail.</p>
+<p><center>
+<img src="img/rst_2023_objectives.png" alt="Revit 2023 Structural API objectives" title="Revit 2023 Structural API objectives" width="600"/> <!-- 1200 -->
+</center></p>
