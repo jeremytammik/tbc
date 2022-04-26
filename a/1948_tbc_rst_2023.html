@@ -19,8 +19,9 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Migrating The Building Coder samples, I encountered the same problems as others trying to update obsolete structural API code, so let's take a look at some resources assisting us in that area
+&ndash; Not migrating the derived analytical model
+&ndash; Revit 2023 Structural API...
 
 linkedin:
 
@@ -40,10 +41,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <ul>
 <li><a href="#2">Migrating The Building Coder samples</a></li>
 <li><a href="#3">Not migrating the derived analytical model</a></li>
-<li><a href="#3">Revit 2023 Structural API</a></li>
+<li><a href="#4">Revit 2023 Structural API</a></li>
 </ul>
 <h4><a name="2"></a> Migrating The Building Coder Samples</h4>
-<p>I migrated <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder Samples</a> last week.</p>
+<p>I migrated <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder Samples</a> last week, creating
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2023.1.152.0">release 2023.1.152.0</a>.</p>
 <p>Except for the deprecation of the derived analytical model that we discuss below, it was straightforward with hardly any changes at all except for updating the Revit API .NET assembly DLL references.</p>
 <p>After that step, <a href="zip/tbc_samples_2023_migr_01.txt">8 errors and 5 warnings</a> remain.</p>
 <p>We can easily deal with the warning about the <code>ParameterFilterRuleFactory</code> <code>CreateEqualsRule</code> in the module CmdCollectorPerformance.cs:</p>
@@ -91,12 +93,13 @@ They reply:</p>
 
 <p>There is no meaningful way to migrate it, since the basic concepts changed.
 Yes, most of the code must be rewritten.</p>
+<p>My simplistic solution was to remove the two offending external commands <code>CmdAnalyticalModelGeom</code> and <code>CmdNewLineLoad</code>.</p>
 <p>As always with the Revit API, it will help to learn and understand the new concepts from the end user point of view first, before trying to address the programming side of things.</p>
-<h4><a name="3"></a> Revit 2023 Structural API</h4>
+<h4><a name="4"></a> Revit 2023 Structural API</h4>
 <p>So, let's dive deeper into the Revit 2023 Structural API.</p>
 <p>The explanation
 of <a href="https://help.autodesk.com/view/RVT/2023/ENU/?guid=GUID-A1157199-4E27-41F9-BF45-53A5CD79E9A1">the contextual analytical model in the Revit API</a> contains
-all the up-to-date information and may be the best starting point.</p>
+all the up-to-date information and provides a good starting point.</p>
 <p>The Revit Developer's Guide description of
 the <a href="https://help.autodesk.com/view/RVT/2023/ENU/?guid=Revit_API_Revit_API_Developers_Guide_Discipline_Specific_Functionality_Structural_Engineering_Analytical_Model_html">Analytical Model</a> is
 still work-in-progress and will be updated soon.</p>
