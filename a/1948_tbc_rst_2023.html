@@ -134,17 +134,17 @@ a <code>GetAnalyticalModel</code> workaround on LinkedIn, saying:</p>
 
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Gets&nbsp;the&nbsp;AnalyticalToPhysicalAssociationManager&nbsp;for&nbsp;this&nbsp;document</span>
 
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">analyticalToPhysicalmanager</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">analyticalToPhysicalManager</span>&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;AnalyticalToPhysicalAssociationManager
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetAnalyticalToPhysicalAssociationManager(_document);
 
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">if</span>&nbsp;(analyticalToPhysicalmanager&nbsp;==&nbsp;<span style="color:blue;">null</span>)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">if</span>&nbsp;(analyticalToPhysicalManager&nbsp;==&nbsp;<span style="color:blue;">null</span>)
 &nbsp;&nbsp;&nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">throw</span>&nbsp;<span style="color:blue;">new</span>&nbsp;System.Exception(OrchidBase.InvalidType);
 &nbsp;&nbsp;&nbsp;&nbsp;}
 
 &nbsp;&nbsp;&nbsp;&nbsp;ElementId&nbsp;<span style="color:#1f377f;">_elementId</span>&nbsp;=&nbsp;GetDynamic(element).Id;
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;analyticalToPhysicalmanager.GetAssociatedElementId(_elementId);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;analyticalToPhysicalManager.GetAssociatedElementId(_elementId);
 &nbsp;&nbsp;}
 
 &nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;dynElement&nbsp;<span style="color:#74531f;">GetAnalytical</span>(dynElement&nbsp;<span style="color:#1f377f;">element</span>)
@@ -178,3 +178,9 @@ a <code>GetAnalyticalModel</code> workaround on LinkedIn, saying:</p>
   &nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;m.GetAssociatedElementId(e.Id);
   }
 </pre>
+
+<p>Erik adds:</p>
+<blockquote>
+<p>the "translation" from dynamo implementation to pure C# is correct :-)</p>
+<p>... by the way the <code>GetDynamic(element)</code> has a dynamic cast built-in from a Dynamo element to a Revit element, and a check that it can hold a analytical element :-)</p>
+</blockquote>
