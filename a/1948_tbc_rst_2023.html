@@ -52,6 +52,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li><a href="#2">Migrating The Building Coder samples</a></li>
 <li><a href="#3">Not migrating the derived analytical model</a></li>
 <li><a href="#4">Revit 2023 Structural API</a></li>
+<li><a href="#5">Addendum &ndash; <code>GetAnalyticalModel</code> workaround</a></li>
 </ul>
 <h4><a name="2"></a> Migrating The Building Coder Samples</h4>
 <p>I migrated <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder Samples</a> last week, creating
@@ -119,3 +120,61 @@ during the pre-release phase has now been published and explains all the new con
 <p><center>
 <img src="img/rst_2023_objectives.png" alt="Revit 2023 Structural API objectives" title="Revit 2023 Structural API objectives" width="600"/> <!-- 1200 -->
 </center></p>
+<h4><a name="5"></a> Addendum &ndash; GetAnalyticalModel Workaround</h4>
+<p>Erik Falck Jørgensen of <a href="https://www.dtu.dk">DTU, the Technical University of Denmark</a>, provided
+a <code>GetAnalyticalModel</code> workaround on LinkedIn, saying:</p>
+<blockquote>
+<p>I have attached a snippet from a <code>cs</code> file...</p>
+<p>The essence is that I can <code>GetAnalyticalModel()</code> in slightly the same way :-)</p>
+</blockquote>
+<pre class="code">
+&nbsp;&nbsp;<span style="color:blue;">private</span>&nbsp;<span style="color:blue;">static</span>&nbsp;ElementId&nbsp;<span style="color:#74531f;">GetAnalyticalElementId</span>(dynElement&nbsp;<span style="color:#1f377f;">element</span>)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;_document&nbsp;=&nbsp;iDocument.Current.WrappedType;
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;Gets&nbsp;the&nbsp;AnalyticalToPhysicalAssociationManager&nbsp;for&nbsp;this&nbsp;document</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">analyticalToPhysicalmanager</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;AnalyticalToPhysicalAssociationManager
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetAnalyticalToPhysicalAssociationManager(_document);
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">if</span>&nbsp;(analyticalToPhysicalmanager&nbsp;==&nbsp;<span style="color:blue;">null</span>)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">throw</span>&nbsp;<span style="color:blue;">new</span>&nbsp;System.Exception(OrchidBase.InvalidType);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;&nbsp;&nbsp;ElementId&nbsp;<span style="color:#1f377f;">_elementId</span>&nbsp;=&nbsp;GetDynamic(element).Id;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;analyticalToPhysicalmanager.GetAssociatedElementId(_elementId);
+&nbsp;&nbsp;}
+
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;dynElement&nbsp;<span style="color:#74531f;">GetAnalytical</span>(dynElement&nbsp;<span style="color:#1f377f;">element</span>)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;GetAnalyticalElementId(element).ToDynamoType();
+&nbsp;&nbsp;}
+</pre>
+
+<p>Many thanks to Erik for this suggestion!</p>
+<p>Removing the Dynamo wrappers, I guess the gist of it is something like this:</p>
+<pre class="code">
+  ///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;Return&nbsp;the&nbsp;associated&nbsp;analytical&nbsp;element&nbsp;id&nbsp;</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;for&nbsp;the&nbsp;given&nbsp;element</span>
+  <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+  ElementId&nbsp;<span style="color:#74531f;">GetAnalyticalElementId</span>(Element&nbsp;<span style="color:#1f377f;">e</span>)
+  {
+  &nbsp;&nbsp;Document&nbsp;<span style="color:#1f377f;">doc</span>&nbsp;=&nbsp;e.Document;
+
+  &nbsp;&nbsp;AnalyticalToPhysicalAssociationManager&nbsp;<span style="color:#1f377f;">m</span>&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;AnalyticalToPhysicalAssociationManager
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GetAnalyticalToPhysicalAssociationManager(
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;doc);
+
+  &nbsp;&nbsp;<span style="color:#8f08c4;">if</span>&nbsp;(<span style="color:blue;">null</span>&nbsp;==&nbsp;m)
+  &nbsp;&nbsp;{
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">throw</span>&nbsp;<span style="color:blue;">new</span>&nbsp;System.ArgumentException(
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;No&nbsp;AnalyticalToPhysicalAssociationManager&nbsp;found&quot;</span>);
+  &nbsp;&nbsp;}
+
+  &nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;m.GetAssociatedElementId(e.Id);
+  }
+</pre>
