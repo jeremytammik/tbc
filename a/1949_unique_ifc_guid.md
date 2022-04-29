@@ -95,7 +95,7 @@ We created a very detailed tagging procedure.
 Every element identifier will be maintained by a user.
 We need to keep those identifiers during IFC export from Revit.
 After that, we can easily link them to rest of the data that we have in Excel.
-But, if we loose the identifiers during IFC export, we can't do anything...
+But, if we lose the identifiers during IFC export, we can't do anything...
 
 I have these questions:
 
