@@ -49,27 +49,18 @@ At Forge Data Days, you’ll hear directly from experts on how Forge is powering
  
 With the exclusive Early Bird registration links below, you can choose between 5 different European cities to join us at. Don’t wait, registration opens to the public on May 3rd and spots will fill up fast! 
  
-European cities
-Date
-Registration Link
-Munich, Germany
-May 31st
-Register today
-Gothenburg, Sweden
-June 2nd
-Register today
-Birmingham, UK
-June 7th
-Register today
-Milan, Italy
-June 9th
-Register today
-Barcelona, Spain
-June 14th
-Register today
-Click here to see all event locations. 
+Here are the dates and registration links for the first five locations, starting out in Europe:
 
+- May 31st &ndash; [Munich, Germany](https://cvent.autodesk.com/event/c064e191-cced-4cf6-a0ff-56a92a3c2689/summary)
+- June 2nd &ndash; [Gothenburg, Sweden](https://cvent.autodesk.com/event/994e1f82-52fc-41a2-9a64-efadde9e4273/summary)
+- June 7th &ndash; [Birmingham, UK](https://cvent.autodesk.com/event/bedd310d-fa7d-4b02-99dd-2c4c5b40293d/summary)
+- June 9th &ndash; [Milan, Italy](https://cvent.autodesk.com/event/5733cfc3-51cf-41fb-bacf-457ba6b1ae97/summary)
+- June 14th &ndash; [Barcelona, Spain](https://cvent.autodesk.com/event/84021b3b-9286-4586-af2a-c6b1f2b5f301/summary)
+- [All event locations](https://forge.autodesk.com/forge-data-days)
 
+<center>
+<img src="img/2022_forge_data_days.png" alt="Forge Data Days" title="Forge Data Days" width="800"/> <!-- 1200 -->
+</center>
 
 ####<a name="3"></a> 
 
@@ -86,8 +77,5 @@ Click here to see all event locations.
 
 ####<a name="4"></a> 
 
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 1200 -->
-</center>
 
 ####<a name="5"></a> 
