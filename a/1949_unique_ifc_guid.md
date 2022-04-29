@@ -110,22 +110,24 @@ Any answer would be greatly appreciated.
 **Answer:** The Revit IFC exporter has the option below to store each element's IFC GUID in an element parameter after export: 
 
 <center>
-<img src="img/ifc_guid_1.png" alt="IFC GUID parameter" title="IFC GUID parameter" width="800"/> <!-- 1200 -->
+<img src="img/ifc_guid_1.png" alt="IFC GUID parameter" title="IFC GUID parameter" width="800"/> <!-- 879 -->
 </center>
 
-When the export occurs, the GUID used for the exported instance is added as an instance parameter on the instance in the Revit model.
-If then the IFC is exported again later, the exporter should read this instance parameter value to use the same GUID for that export also.
-
-So is this not working or fully supporting your needs?
+When the export occurs, the GUID used for the exported instance is added as an instance parameter on the instance in the Revit model:
 
 <center>
-<img src="img/ifc_guid_2.png" alt="IFC GUID parameter" title="IFC GUID parameter" width="800"/> <!-- 1200 -->
-<br/>
-<img src="img/ifc_guid_3.png" alt="IFC GUID parameter" title="IFC GUID parameter" width="800"/> <!-- 1200 -->
+<img src="img/ifc_guid_2.png" alt="IFC GUID parameter" title="IFC GUID parameter" width="696"/> <!-- 696 -->
+</center>
+
+If then the IFC is exported again later, the exporter should read this instance parameter value to use the same GUID for that export also:
+
+<center>
+<img src="img/ifc_guid_3.png" alt="IFC GUID parameter" title="IFC GUID parameter" width="600"/> <!-- 781 -->
 </center>
 
 **Response:** @RPTHOMAS108 thank you! This is what I was looking for!
 
 Many thanks (again and again) to Richard for sharing his inexhaustible experience and providing so many great solutions!
 
-By the way, this was also explained by 
+By the way, this was also explained by The Building Coder in 2015,
+on [accessing the IFC GUID of an imported wall](http://thebuildingcoder.typepad.com/blog/2015/06/ifc-guid-access-life-span-and-cloning-of-geometry.html#3).
