@@ -131,3 +131,4 @@ Many thanks (again and again) to Richard for sharing his inexhaustible experienc
 
 By the way, this was also explained by The Building Coder in 2015,
 on [accessing the IFC GUID of an imported wall](http://thebuildingcoder.typepad.com/blog/2015/06/ifc-guid-access-life-span-and-cloning-of-geometry.html#3).
+
