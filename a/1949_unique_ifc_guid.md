@@ -17,8 +17,10 @@ twitter:
 
  #RevitAPI code @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+We take yet another look at element ids and maintaining connectivity with IFC GUIDs
+&ndash; Linking IFC export with modified BIM
+&ndash; You cannot control the unique id
+&ndash; You can control the IFC Export GUID...
 
 linkedin:
 
@@ -33,7 +35,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Unique Id and IFC GUID
+### Unique Id and IFC GUID Parameter
 
 Let's take yet another look at element ids and maintaining connectivity with IFC GUIDs:
 
