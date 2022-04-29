@@ -15,7 +15,7 @@
   
 twitter:
 
- #RevitAPI code @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Another look at element ids, IFC GUID, maintaining connectivity between RVT & IFC, linking IFC export with modified BIM, controlling the unique id and the IFC export GUID in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/uniqidifcguid
 
 We take yet another look at element ids and maintaining connectivity with IFC GUIDs
 &ndash; Linking IFC export with modified BIM
