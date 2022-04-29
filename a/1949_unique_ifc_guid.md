@@ -37,8 +37,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Let's take yet another look at element ids and maintaining connectivity with IFC GUIDs:
 
+- [Linking IFC export with modified BIM](#3)
+- [You cannot control the unique id](#4)
+- [You can control the IFC Export GUID](#5)
 
-####<a name="3"></a> Linking IFC Export with modified BIM
+####<a name="3"></a> Linking IFC Export with Modified BIM
 
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
 points out the important possibility to store the exported IFC GUID in an RVT BIM element parameter in order to maintain connectivity in
@@ -46,7 +49,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 on [GUID](https://forums.autodesk.com/t5/revit-api-forum/guid/m-p/10616955) (congratulations on the shortest thread title ever!) and
 asking [specific GUID; is it possible?](https://forums.autodesk.com/t5/revit-api-forum/specific-guid-is-it-posible/m-p/11136697):
 
-####<a name="3.1"></a> You Cannot Control the Unique Id
+####<a name="4"></a> You Cannot Control the Unique Id
 
 **Question:** How can I generate elements that have specific GUID? 
 
@@ -74,14 +77,14 @@ You can easily program a workaround.
 You will not be able to force Revit to use the unique ids you need, but you can easily equip the building elements with the pre-existing ids in your own data structure and replace them in the IFC file or elsewhere along the processing pipeline.
 Be creative.
 
-There is already an existing mechanism for keeping IFC GUID's consistent for elements between IFC exports from a Revit project, described in the thread on [GUID](https://forums.autodesk.com/t5/revit-api-forum/guid/m-p/10616955) (cf. [below](#3.2).
+There is already an existing mechanism for keeping IFC GUID's consistent for elements between IFC exports from a Revit project, described in the thread on [GUID](https://forums.autodesk.com/t5/revit-api-forum/guid/m-p/10616955) (cf. [below](#5).
 
 If you need to recreate the elements in Revit, then you need to repopulate the parameter used to store the GUID in relation to the above setting with the value you want it to be.
 
 So, if you are creating elements in Revit from data in this external database, then just populate the parameter of that created element with what exists in your external database (removing same superseded item in Revit).
 Then, when exported, the IFC GUID will be generated from the parameter if the above setting is used for export.
 
-####<a name="3.2"></a> You Can Control the IFC Export Id
+####<a name="5"></a> You Can Control the IFC Export GUID
 
 **Question:** We are working on a very large project.
 Many engineering service providers are involved.
