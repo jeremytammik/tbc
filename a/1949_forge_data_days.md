@@ -114,14 +114,45 @@ Then, when exported, the IFC GUID will be generated from the parameter if the ab
 
 ####<a name="3.2"></a> You Can Control the IFC Export Id
 
+**Question:** We are working on a very large project.
+Many engineering service providers are involved.
+Since Revit is not the only engineering tool people use, we need to use another software for our common data environment.
+This software imports IFC file formats.
 
+We created a very detailed tagging procedure.
+Every element identifier will be maintained by a user.
+We need to keep those identifiers during IFC export from Revit.
+After that, we can easily link them to rest of the data that we have in Excel.
+But, if we loose the identifiers during IFC export, we can't do anything...
 
-**Answer:** 
+I have these questions:
 
-<pre class="code">
+- How can users create and maintain the identifiers?
+  Can we use the parameter “Mark” as an identifier or it has to be the GUID?
+  Can a user change the GUID?
+- How can we keep the identifiers during IFC export?
+  IFC exporting looses the parameter “Mark”, and the old GUID is automatically being replaced by a new one.
 
-</pre>
+Any answer would be greatly appreciated.
 
-####<a name="4"></a>
+**Answer:** The Revit IFC exporter has the option below to store each element's IFC GUID in an element parameter after export: 
 
-####<a name="5"></a> 
+<center>
+<img src="img/ifc_guid_1.png" alt="IFC GUID parameter" title="IFC GUID parameter" width="800"/> <!-- 1200 -->
+</center>
+
+When the export occurs, the GUID used for the exported instance is added as an instance parameter on the instance in the Revit model.
+If then the IFC is exported again later, the exporter should read this instance parameter value to use the same GUID for that export also.
+
+So is this not working or fully supporting your needs?
+
+<center>
+<img src="img/ifc_guid_2.png" alt="IFC GUID parameter" title="IFC GUID parameter" width="800"/> <!-- 1200 -->
+<br/>
+<img src="img/ifc_guid_3.png" alt="IFC GUID parameter" title="IFC GUID parameter" width="800"/> <!-- 1200 -->
+</center>
+
+**Response:** @RPTHOMAS108 thank you! This is what I was looking for!
+
+Many thanks (again and again) to Richard for sharing his inexhaustible experience and providing so many great solutions!
+
