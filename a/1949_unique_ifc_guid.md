@@ -103,7 +103,7 @@ I have these questions:
   Can we use the parameter “Mark” as an identifier or it has to be the GUID?
   Can a user change the GUID?
 - How can we keep the identifiers during IFC export?
-  IFC exporting looses the parameter “Mark”, and the old GUID is automatically being replaced by a new one.
+  IFC exporting loses the parameter “Mark”, and the old GUID is automatically being replaced by a new one.
 
 Any answer would be greatly appreciated.
 
