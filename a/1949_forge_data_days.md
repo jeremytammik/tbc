@@ -42,18 +42,7 @@ Below you’ll find an email template that you can use to invite those customers
  
 EMEA Early Bird Registration (1:1 direct outreach): April 21st - May 2nd
 EMEA Registration open to the public: May 3rd – the event dates (May 3rd is when the registration links will be added to the event page and an email invite will go out to everyone that is opted into Forge communications (i.e. newsletter) and meets other Forge criteria in Marketo)
- 
-We will follow up with a similar process for the AMER event cities that are held later in June:
-AMER Early Bird Registration (1:1 direct outreach): May 10th – May 23rd
-AMER Registration open to the public: May 24th – the event dates (May 24th is when the registration links will be added to the event page and an email invite will go out)
- 
-Please let me know if you have any questions and please forward to others on your team.  We really appreciate your help in promoting our first back in person event series. We can’t wait to see everyone in person!
- 
-BELOW EMAIL TEMPLATE IS FOR EUROPEAN CITIES ONLY:
- 
- 
-Hello,
- 
+  
 I am reaching out to personally invite you to Forge Data Days, a one-day, in-person event happening in 20 cities worldwide, to learn how to fully unlock the value of your data with Forge. There are a limited number of seats available per event, but I have a feeling you won’t want to miss this, so I am sending you an exclusive Early Bird registration opportunity!
  
 At Forge Data Days, you’ll hear directly from experts on how Forge is powering enterprise digital transformation. See how we are making data more granular, standardized, and transparent – and helping you connect your teams, processes, and workflows. Learn how new Forge data capabilities and APIs can increase your productivity, automation, and profitability. 
