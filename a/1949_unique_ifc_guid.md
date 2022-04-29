@@ -24,6 +24,14 @@ We take yet another look at element ids and maintaining connectivity with IFC GU
 
 linkedin:
 
+Another look at element ids, IFC GUID, maintaining connectivity between RVT & IFC, linking IFC export with modified BIM, controlling the unique id and the IFC export GUID in the #RevitAPI 
+
+https://autode.sk/uniqidifcguid
+
+- Linking IFC export with modified BIM
+- You cannot control the unique id
+- You can control the IFC Export GUID...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
