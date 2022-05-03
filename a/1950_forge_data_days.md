@@ -33,11 +33,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> Forge Data Days
 
-To learn more about the event, please check out
-the [Forge Data Days global event series announcement](https://forge.autodesk.com/blog/announcing-forge-data-days-global-event-series) and 
-the [Forge Data Days event page](https://forge.autodesk.com/forge-data-days).
-
-I am reaching out to personally invite you to
+Finally, after a pandemic DevDays break, we can meet again live, face to face:
 
 The Forge Data Days are coming up soon, a one-day, in-person event happening in 20 cities worldwide, to learn how to fully unlock the value of your data with Forge.
 There are a limited number of seats available for each event, so I encourage you to register as soon as possible once you have decided that this is of interest for you.
@@ -56,7 +52,12 @@ With the following exclusive Early Bird registration links for the first five lo
 - June 14th &ndash; [Barcelona, Spain](https://cvent.autodesk.com/event/84021b3b-9286-4586-af2a-c6b1f2b5f301/summary)
 - [All event locations](https://forge.autodesk.com/forge-data-days)
 
-Registration opens to the public on May 3rd, and spots will fill up fast, so don't wait too long making up your mind...
+Registration opens to the public today, May 3rd, and spots will fill up fast, so don't wait too long making up your mind...
+
+To learn more about the event, please check out
+the [Forge Data Days global event series announcement](https://forge.autodesk.com/blog/announcing-forge-data-days-global-event-series) and 
+the [Forge Data Days event page](https://forge.autodesk.com/forge-data-days).
+
 
 <center>
 <img src="img/2022_forge_data_days.png" alt="Forge Data Days" title="Forge Data Days" width="800"/> <!-- 1200 -->
