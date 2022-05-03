@@ -33,7 +33,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> Forge Data Days
 
-Finally, after a pandemic DevDays break, we can meet again live, face to face:
+Finally, after the world-wide pandemic break, which also affected our traditional yearly DevDays, we can meet again live, face to face:
 
 The Forge Data Days are coming up soon, a one-day, in-person event happening in 20 cities worldwide, to learn how to fully unlock the value of your data with Forge.
 There are a limited number of seats available for each event, so I encourage you to register as soon as possible once you have decided that this is of interest for you.
@@ -62,3 +62,18 @@ the [Forge Data Days event page](https://forge.autodesk.com/forge-data-days).
 <center>
 <img src="img/2022_forge_data_days.png" alt="Forge Data Days" title="Forge Data Days" width="800"/> <!-- 1200 -->
 </center>
+
+
+
+####<a name="4"></a> La Serre &ndash; Greenhouse Wheelbarrow Ballet
+
+Just four fun, if you feel like a five-minute humorous and rather poetic break, take a look at
+[La Serre](https://youtu.be/G1XarNWgzCk) by Didier André and Jean-Paul Lefeuvre,
+a greenhouse circus artist wheelbarrow ballet with banjo:
+
+<iframe width="480" height="270" src="https://www.youtube.com/embed/G1XarNWgzCk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+> Formés au Centre national des arts du cirque, Jean-Paul Lefeuvre et Didier André ... ces deux circassiens ont étayé leur univers jusqu'à créer en 2001 <i>La Serre</i>, spectacle poético-agricole ... Dans un univers ingénieux, ces "Buster Keaton" de l'horticulture parsèment d'humour absurde et de rêverie aérienne leur grande humanité.
+
+> <i>Trained at the national centre of circus art, Jean-Paul Lefeuvre and Didier André ... created La Serre in 2001, a poetic-agricultural show ... in an ingenious universe, these "Buster Keatons" of horticulture sprinkle their great humanity with absurd humor and aerial reverie.</i>
+
