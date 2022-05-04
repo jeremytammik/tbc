@@ -17,7 +17,7 @@
   
 twitter:
 
-Forge Data Days, finally a chance to meet and learn live about Forge, the updated Revit 2023 developer's guide and a nice JoinGeometryUtils sample to obtaining closed loops for joined element parts in the #RevitAPI code @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/joingeometryutils
+Forge Data Days, the updated Revit 2023 developer's guide and a nice JoinGeometryUtils sample to obtain closed loops for joined element parts in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/joingeometryutils
 
 Finally a chance to meet and learn live about Forge, the updated developer's guide and a nice <code>JoinGeometryUtils</code> sample
 &ndash; Revit 2023 developer's guide
@@ -27,6 +27,18 @@ Finally a chance to meet and learn live about Forge, the updated developer's gui
 &ndash; La Serre greenhouse wheelbarrow ballet...
 
 linkedin:
+
+Forge Data Days, the updated Revit 2023 developer's guide and a nice JoinGeometryUtils sample to obtain closed loops for joined element parts in the #RevitAPI
+
+https://autode.sk/joingeometryutils
+
+Finally a chance to meet and learn live about Forge!
+
+- Revit 2023 developer's guide
+- Forge Data Days
+- Obtaining closed loops for joined element parts
+- Create and style your QR code
+- La Serre greenhouse wheelbarrow ballet...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
