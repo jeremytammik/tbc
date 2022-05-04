@@ -37,7 +37,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Forge Data Days
 
+Finally a chance to meet and learn live about Forge, the updated developer's guide and a brilliant `JoinGeometryUtils` sample:
 
+- [Revit 2023 Developer's Guide](#2)
+- [Forge Data Days](#3)
+- [Obtaining Closed Loops for Joined Element Parts](#4)
+- [Create and Style Your QR Code](#5)
+- [La Serre &ndash; Greenhouse Wheelbarrow Ballet](#6)
 
 ####<a name="2"></a> Revit 2023 Developer's Guide
 
