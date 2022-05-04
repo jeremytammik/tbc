@@ -35,9 +35,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Forge Data Days
+### Forge Data Days and JoinGeometryUtils
 
-Finally a chance to meet and learn live about Forge, the updated developer's guide and a brilliant `JoinGeometryUtils` sample:
+Finally a chance to meet and learn live about Forge, the updated developer's guide and a nice `JoinGeometryUtils` sample:
 
 - [Revit 2023 Developer's Guide](#2)
 - [Forge Data Days](#3)
@@ -126,7 +126,6 @@ The below code uses the following `JoinGeometryUtils` API calls to achieve what 
 &nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">Els</span>&nbsp;<span style="color:blue;">As</span>&nbsp;List(<span style="color:blue;">Of</span>&nbsp;Element)&nbsp;=&nbsp;FEC_Flr.WherePasses(ECF_Flr).ToElements
 &nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">Curves</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;List(<span style="color:blue;">Of</span>&nbsp;Tuple(<span style="color:blue;">Of</span>&nbsp;List(<span style="color:blue;">Of</span>&nbsp;Curve),&nbsp;Plane))
  
- 
 &nbsp;&nbsp;<span style="color:blue;">Using</span>&nbsp;Tx&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;Transaction(IntDoc,&nbsp;<span style="color:#a31515;">&quot;Gather&quot;</span>)
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">If</span>&nbsp;Tx.Start&nbsp;=&nbsp;TransactionStatus.Started&nbsp;<span style="color:#8f08c4;">Then</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">For</span>&nbsp;i&nbsp;=&nbsp;0&nbsp;<span style="color:#8f08c4;">To</span>&nbsp;Els.Count&nbsp;-&nbsp;1
@@ -193,7 +192,7 @@ The below code uses the following `JoinGeometryUtils` API calls to achieve what 
 
 ####<a name="5"></a> Create and Style Your QR Code
 
-Moving away from progamming topics, I was not aware how much freedom you can have in stylking a QR code until I took a look at
+Moving away from programming topics, I was not aware how much freedom you can have in styling a QR code until I took a look at
 the [qrcode-monkey](https://www.qrcode-monkey.com).
 
 ####<a name="6"></a> La Serre &ndash; Greenhouse Wheelbarrow Ballet
@@ -206,5 +205,5 @@ a greenhouse circus artist wheelbarrow ballet accompanied by banjo:
 
 > Formés au Centre national des arts du cirque, Jean-Paul Lefeuvre et Didier André ... ces deux circassiens ont étayé leur univers jusqu'à créer en 2001 <i>La Serre</i>, spectacle poético-agricole ... Dans un univers ingénieux, ces "Buster Keaton" de l'horticulture parsèment d'humour absurde et de rêverie aérienne leur grande humanité.
 
-> <i>Trained at the national centre of circus art, Jean-Paul Lefeuvre and Didier André ... created La Serre in 2001, a poetic-agricultural show ... in an ingenious universe, these "Buster Keatons" of horticulture sprinkle their great humanity with absurd humor and aerial reverie.</i>
+> <i>Trained at the national centre of circus art, Jean-Paul Lefeuvre and Didier André ... created La Serre in 2001, a poetic-agricultural show ... in an ingenious universe, these "Buster Keatons" of horticulture sprinkle their great humanity with absurd humour and aerial reverie.</i>
 
