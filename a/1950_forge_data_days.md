@@ -19,8 +19,13 @@ twitter:
 
  #RevitAPI code @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+
+Finally a chance to meet and learn live about Forge, the updated developer's guide and a nice <code>JoinGeometryUtils</code> sample
+&ndash; Revit 2023 developer's guide
+&ndash; Forge Data Days
+&ndash; Obtaining closed loops for joined element parts
+&ndash; Create and style your QR code
+&ndash; La Serre &ndash; greenhouse wheelbarrow ballet...
 
 linkedin:
 
@@ -39,11 +44,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Finally a chance to meet and learn live about Forge, the updated developer's guide and a nice `JoinGeometryUtils` sample:
 
-- [Revit 2023 Developer's Guide](#2)
+- [Revit 2023 developer's guide](#2)
 - [Forge Data Days](#3)
-- [Obtaining Closed Loops for Joined Element Parts](#4)
-- [Create and Style Your QR Code](#5)
-- [La Serre &ndash; Greenhouse Wheelbarrow Ballet](#6)
+- [Obtaining closed loops for joined element parts](#4)
+- [Create and style your QR code](#5)
+- [La Serre &ndash; greenhouse wheelbarrow ballet](#6)
 
 ####<a name="2"></a> Revit 2023 Developer's Guide
 
@@ -199,7 +204,7 @@ the [qrcode-monkey](https://www.qrcode-monkey.com).
 
 Finally, unrelated to Revit and other hi-tech, just for fun, if you feel like a five-minute humorous poetic break, take a look at
 [La Serre](https://youtu.be/G1XarNWgzCk) by Didier André and Jean-Paul Lefeuvre,
-a greenhouse circus artist wheelbarrow ballet accompanied by banjo:
+a banjo-accompanied circus artist greenhouse wheelbarrow ballet:
 
 <iframe width="480" height="270" src="https://www.youtube.com/embed/G1XarNWgzCk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
