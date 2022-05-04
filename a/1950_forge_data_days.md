@@ -193,14 +193,14 @@ The below code uses the following `JoinGeometryUtils` API calls to achieve what 
 
 ####<a name="5"></a> Create and Style Your QR Code
 
-I was not aware how much freedom you can have in stylking a QR code until I took a look at
+Moving away from progamming topics, I was not aware how much freedom you can have in stylking a QR code until I took a look at
 the [qrcode-monkey](https://www.qrcode-monkey.com).
 
 ####<a name="6"></a> La Serre &ndash; Greenhouse Wheelbarrow Ballet
 
-Unrelated to Revit and other hi-tech, just for fun, if you feel like a five-minute humorous and rather poetic break, take a look at
+Finally, unrelated to Revit and other hi-tech, just for fun, if you feel like a five-minute humorous poetic break, take a look at
 [La Serre](https://youtu.be/G1XarNWgzCk) by Didier André and Jean-Paul Lefeuvre,
-a greenhouse circus artist wheelbarrow ballet with banjo:
+a greenhouse circus artist wheelbarrow ballet accompanied by banjo:
 
 <iframe width="480" height="270" src="https://www.youtube.com/embed/G1XarNWgzCk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
