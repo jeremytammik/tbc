@@ -203,7 +203,7 @@ So, all in all, there is currently no alternative to save to the Revit Cloud Wor
 
 Open/Save operations on RCW are high priority, but no ETA defined yet.
 
-####<a name="3"></a> Every program Launch is Logged
+####<a name="3"></a> Every Program Launch is Logged
 
 So, whereas DA4R is isolated from Internet access, you computer very probably is not, whether you wish it to be or not.
 
