@@ -6,6 +6,11 @@
 
 <!---
 
+- https://www.revitapidocs.com/2023/
+
+- [Upgrading Revit API Apps For Newer Revit Versions](https://revthat.com/upgrading-revit-api-apps-for-newer-revit-versions)
+  Eric Boehlke truevis
+
 - Disable error with 'Error' severity
   https://forums.autodesk.com/t5/revit-api-forum/disable-error-with-error-severity/m-p/11004220
 
@@ -29,10 +34,21 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Disable Failure with Error Severity
+### Disable Error Failure with Error Severity
 
 
-####<a name="2"></a> 
+####<a name="2"></a> Revit API Docs 2023
+
+
+<center>
+<img src="img/revitapidocs2023.png" alt="Revit API Docs 2023" title="Revit API Docs 2023" width="600"/> <!-- 1000 -->
+</center>
+
+
+
+####<a name="3"></a> Migrating Add-In to Revit 2023
+
+####<a name="4"></a> Disable Failure with Error Severity
 
 
 Alexander [@aignatovich](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478) [@CADBIMDeveloper](https://github.com/CADBIMDeveloper) Ignatovich, aka Александр Игнатович, adds:
