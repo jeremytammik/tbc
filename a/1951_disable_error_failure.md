@@ -36,6 +36,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Disable Error Failure with Error Severity
 
+We continue updating all systems Revit 2023 and take a deep dive into the mysteries and pitfalls of the Failure processing API:
+
+- [RevitApiDocs support for Revit 2023](#2)
+- [Migrating add-ins to Revit 2023](#3)
+- [Disable failure with error severity](#4)
+
 ####<a name="2"></a> RevitApiDocs Support for Revit 2023
 
 [Gui Talarico](https://twitter.com/gtalarico) updated the online Revit API documentation for Revit 2023, both:
@@ -54,7 +60,7 @@ Very many thanks to Gui for all his work on these invaluable resources, and the 
 <img src="img/revitapidocs2023.png" alt="Revit API Docs 2023" title="Revit API Docs 2023" width="600"/> <!-- 1000 -->
 </center>
 
-####<a name="3"></a> Migrating Add-In to Revit 2023
+####<a name="3"></a> Migrating Add-Ins to Revit 2023
 
 Eric Boehlke of [truevis BIM Consulting](https://truevis.com) shares
 his experience and detailed process
