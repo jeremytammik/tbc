@@ -36,21 +36,19 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Disable Error Failure with Error Severity
 
-
 ####<a name="2"></a> RevitApiDocs Support for Revit 2023
-k 1897
 
 [Gui Talarico](https://twitter.com/gtalarico) updated the online Revit API documentation for Revit 2023, both:
 
 - [apidocs](https://apidocs.co/apps/revit/2023/d4648875-d41a-783b-d5f4-638df39ee413.htm)
-- [revitapidocs]()
+- [revitapidocs](https://www.revitapidocs.com)
 
-Check out the new features ontwitter at:
+Notifications of new features are pubished on twitter at:
 
 - [@ApiDocsCo](https://twitter.com/ApiDocsCo)
 - [@RevitApiDocs](https://twitter.com/RevitApiDocs)
 
-Very many thanks to Gui for the great news, all his work on these invaluable resources, and the fast turn-around time!
+Very many thanks to Gui for all his work on these invaluable resources, and the fast turn-around time for the Revit 2023 API!
 
 <center>
 <img src="img/revitapidocs2023.png" alt="Revit API Docs 2023" title="Revit API Docs 2023" width="600"/> <!-- 1000 -->
@@ -62,21 +60,24 @@ Eric Boehlke of [truevis BIM Consulting](https://truevis.com) shares
 his experience and detailed process
 of [upgrading Revit API apps for newer Revit versions](https://revthat.com/upgrading-revit-api-apps-for-newer-revit-versions).
 
-For The Building Coder's notes on the topic, please simply search this site
+For The Building Coder's notes on the topic this time around, please simply search this site
 for [migration 2023](https://www.google.com/search?q=migration+2023&as_sitesearch=thebuildingcoder.typepad.com).
-
 
 ####<a name="4"></a> Disable Failure with Error Severity
 
-
-Alexander [@aignatovich](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478) [@CADBIMDeveloper](https://github.com/CADBIMDeveloper) Ignatovich, aka Александр Игнатович, adds:
+We have presented many solutions 
+for [detecting and automatically handling dialogues and failures](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32).
+The Failure API is a great help in many cases.
+Handling warnings can be achieved using a [warning swallower](http://thebuildingcoder.typepad.com/blog/2016/09/warning-swallower-and-roomedit3d-viewer-extension.html#2).
+Alexander [@aignatovich](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478) [@CADBIMDeveloper](https://github.com/CADBIMDeveloper) Ignatovich, aka Александр Игнатович,
+explains how real errors are more difficult but also possible in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [disabling error with `Error`  severity](https://forums.autodesk.com/t5/revit-api-forum/disable-error-with-error-severity/m-p/11004220):
 
  tomerFUNPJ 184 Views, 23 Replies
 ‎2022-03-13 06:38 AM 
 Disable error with 'Error' severity
 Hello,
-
- 
 
 I have a specific failure that I want to disable.
 
@@ -85,8 +86,6 @@ I'm able to 'catch' the error (With FailuresProcessing event).
 The problem is that I can't find a way to disable / delete the error.
 
 DeleteWarning only works for 'Warning' severity, and my failure is 'Error' severity.
-
- 
 
 Thanks in advance!
 
@@ -102,8 +101,6 @@ jeremy.tammik
  Employee jeremy.tammik in reply to: tomerFUNPJ
 ‎2022-03-13 09:30 AM 
 How do you handle the situation manually in the end user interface? Please note that the Revit API almost always just duplicates or provides access to the standard UI functionality.
-
-  
 
 Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
 Tags (0)
@@ -126,23 +123,13 @@ jeremy.tammik
 ‎2022-03-13 09:52 AM 
 Yes, well if you click cancel, then the operation is aborted, isn't it?
 
- 
-
 I would assume that Revit absolutely refuses to perform this operation, because it would corrupt the entire BIM.
-
- 
 
 In the UI you have to cancel it, and in the API the same.
 
-   
-
 A warning is a warning and is permissible. An error is an error and is forbidden.
 
-   
-
 Or am I misunderstanding?
-
-  
 
 Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
 Tags (0)
@@ -165,27 +152,15 @@ jeremy.tammik
 ‎2022-03-14 12:37 AM 
 Sorry, I do not understand. If you want to delete the element causing the error, why don't you just delete it? Then, no error will be caused. You can see how lost I am here...
 
- 
-
 However, regardless of whether I understand or not, maybe the previous discussions of the Failure API functionality and usage will help solve the issue?
-
- 
 
 https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32
 
-   
-
 Or previous discussions here in the forum?
-
- 
 
 Or maybe even the warning swallower?
 
- 
-
 https://forums.autodesk.com/t5/revit-api-forum/failure-processing-warnings-swallower-only-for-specif...
-
-  
 
 Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
 Tags (0)
@@ -197,26 +172,17 @@ aignatovich
 ‎2022-03-14 12:52 AM 
 Hi guys,
 
- 
-
 @tomerFUNPJ , I think, you could try to either resolve the failure or rollback transaction?
 
- 
-
 If so you could try to delete elements automatically in your failure preprocessor:
-
- 
 
 if (failureAccessor.HasResolutionOfType(FailureResolutionType.DeleteElements))
 {
     failureAccessor.SetCurrentResolutionType(FailureResolutionType.DeleteElements);
     failuresAccessor.ResolveFailure(failureAccessor);
 }
- 
 
 You should return FailureProcessingResult.ProceedWithCommit if you set resolution type.
-
- 
 
 This failure preprocessor solves a bit different task, but I think it could help you:
 
@@ -242,18 +208,13 @@ This failure preprocessor solves a bit different task, but I think it could help
             return FailureProcessingResult.ProceedWithCommit;
         }
     }
- 
 
 If you can't resolve the error with FailureResolutionType.DeleteElements, then you can return FailureProcessingResult.ProceedWithRollBack
-
- 
 
 In such case you have to set:
 
 failureOptions.SetClearAfterRollback(true);
 for your transaction.
-
- 
 
 Hope this helps
 
@@ -271,8 +232,6 @@ I'll explain my flow with more details:
 - No deletion is done whatsoever. Which is good - that was my goal
 
 - Although no deletion is done, the user still get this warning:
-
- 
 
 I want to hide it because it can be confusing to my user. The problem is that - The severity of this message is 'Error' and not warning and therefore I can't use Failure Accessor 'DeleteWarning' method.
 
@@ -358,24 +317,15 @@ From SDK (FailureResolutionType):
 
 Default - Special (reserved) type. It cannot be used as a type when defining a resolution, but can be used as a key to query default resolution from FailureMessage or FailureDefinition.
 
- 
-
 I don't think you have to call "ResolveFailure" if you want to rollback the transaction
 
 I would try to set "clear after rollback" through transaction options before starting the transaction, e.g.:
-
- 
-
- 
 
 var failureOptions = transaction.GetFailureHandlingOptions();
 failureOptions.SetClearAfterRollback(true);
 ...
 transaction.SetFailureHandlingOptions(failureOptions);
 transaction.Start();
- 
-
- 
 
 Tags (0)
 Add tags
@@ -399,8 +349,6 @@ Do you use
 
 Application.RegisterFailuresProcessor
 method?
-
- 
 
 I personally would suggest to avoid this...
 
@@ -488,8 +436,6 @@ aignatovich
 ‎2022-03-15 04:01 AM 
 Pick one - choose either application level failure processor (as for me - it's a bad choice) or failure processing event.
 
- 
-
 Could you prepare a simple reproducible case: addin + model + what to do to reproduce?
 
 Tags (0)
@@ -505,15 +451,12 @@ I am doing multiple things but let's focus only on the problem:
 The goal is this - When the user tries to delete a part (That was created in the past by my code and has a scheme I made), raise a popup saying he can't do that and block the deletion. I am doing that successfully!
 In addition to blocking the deletion, I don't want the error message I attached yesterday to be shown, so there won't be a confusion.
 
- 
-
 To block the deletion I have a class which inherits from IUpdater and uses a FailureDefinition GUID that I registered when Revit loads:
 
 public class SplitElementUpdater : IUpdater
     {
         static AddInId m_appId;
         static UpdaterId m_updaterId;
-
 
         /// <summary>
         /// Finds the failure definition id based on a constant GUID
@@ -586,7 +529,6 @@ public class SplitElementUpdater : IUpdater
             return "Surface Split Updater";
         }
     }
- 
 
 This class works as expected and blocks the deletion, I'm setting up the trigger here:
 
@@ -635,8 +577,6 @@ public static UpdaterId SurfaceSplitElementUpdaterSetup(AddInId addinId, Documen
         }
 All of this is fine!
 
- 
-
 And now, the problem 🙂
 
 We know we can't swallow the error because it's of 'error' severity, but I'm unable to resolve it as well (Tried with / without resolve failure, tried proceed with commit and continue, nothing worked)
@@ -661,7 +601,6 @@ public FailureProcessingResult PreprocessFailures(FailuresAccessor failuresAcces
 
             return FailureProcessingResult.Continue;
         }
- 
 
 Thank you!
 
@@ -673,8 +612,6 @@ aignatovich
  Advisor aignatovich in reply to: tomerFUNPJ
 ‎2022-03-15 07:30 AM 
 Try something like that:
-
- 
 
 public class RevitApplication : IExternalApplication
 {
@@ -775,16 +712,12 @@ tomerFUNPJ
 ‎2022-03-15 08:47 AM 
 Worked like a charm. Thanks!
 
-
 **Question :** 
 
 <pre class="code">
 </pre>
 
-
-
 **Answer:** 
 
-**Response:** 
-
+**Response:**
 
