@@ -34,7 +34,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Disable Error Failure with Error Severity</h3>
-<p>We continue updating all systems Revit 2023 and take a deep dive into the mysteries and pitfalls of the Failure processing API:</p>
+<p>We continue updating all systems Revit 2023 and take a deep dive into the mysteries and pitfalls of the Failure API:</p>
 <ul>
 <li><a href="#2">RevitApiDocs support for Revit 2023</a></li>
 <li><a href="#3">Migrating add-ins to Revit 2023</a></li>
@@ -57,7 +57,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 </center></p>
 <h4><a name="3"></a> Migrating Add-Ins to Revit 2023</h4>
 <p>Eric Boehlke of <a href="https://truevis.com">truevis BIM Consulting</a> shares
-his experience and detailed process
+his experience and detailed illustrated process
 of <a href="https://revthat.com/upgrading-revit-api-apps-for-newer-revit-versions">upgrading Revit API apps for newer Revit versions</a>.</p>
 <p>For The Building Coder's notes on the topic this time around, please simply search this site
 for <a href="https://www.google.com/search?q=migration+2023&amp;as_sitesearch=thebuildingcoder.typepad.com">migration 2023</a>.</p>
@@ -67,7 +67,7 @@ for <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.3
 The Failure API is a great help in many cases.
 Handling warnings can be achieved using a <a href="http://thebuildingcoder.typepad.com/blog/2016/09/warning-swallower-and-roomedit3d-viewer-extension.html#2">warning swallower</a>.
 Alexander <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478">@aignatovich</a> <a href="https://github.com/CADBIMDeveloper">@CADBIMDeveloper</a> Ignatovich, aka Александр Игнатович,
-explains how real errors are more difficult but also possible in
+explains how real errors are more difficult but also possible to handle in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/disable-error-with-error-severity/m-p/11004220">disabling error with <code>Error</code>  severity</a>:</p>
 <p><strong>Question:</strong> I have a specific failure that I want to disable.</p>
@@ -496,5 +496,5 @@ public class SyntheticFailureReplacement : IExternalEventHandler
 }
 </pre>
 
-<p><strong>response</strong> Worked like a charm. Thanks!</p>
+<p><strong>Response:</strong> Worked like a charm. Thanks!</p>
 <p>Many thanks to Alexander for his deep expertise in this area, and above all for his super-human patience providing such detailed guidance!</p>

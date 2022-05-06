@@ -36,7 +36,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Disable Error Failure with Error Severity
 
-We continue updating all systems Revit 2023 and take a deep dive into the mysteries and pitfalls of the Failure processing API:
+We continue updating all systems Revit 2023 and take a deep dive into the mysteries and pitfalls of the Failure API:
 
 - [RevitApiDocs support for Revit 2023](#2)
 - [Migrating add-ins to Revit 2023](#3)
@@ -63,7 +63,7 @@ Very many thanks to Gui for all his work on these invaluable resources, and the 
 ####<a name="3"></a> Migrating Add-Ins to Revit 2023
 
 Eric Boehlke of [truevis BIM Consulting](https://truevis.com) shares
-his experience and detailed process
+his experience and detailed illustrated process
 of [upgrading Revit API apps for newer Revit versions](https://revthat.com/upgrading-revit-api-apps-for-newer-revit-versions).
 
 For The Building Coder's notes on the topic this time around, please simply search this site
@@ -76,7 +76,7 @@ for [detecting and automatically handling dialogues and failures](https://thebui
 The Failure API is a great help in many cases.
 Handling warnings can be achieved using a [warning swallower](http://thebuildingcoder.typepad.com/blog/2016/09/warning-swallower-and-roomedit3d-viewer-extension.html#2).
 Alexander [@aignatovich](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478) [@CADBIMDeveloper](https://github.com/CADBIMDeveloper) Ignatovich, aka Александр Игнатович,
-explains how real errors are more difficult but also possible in
+explains how real errors are more difficult but also possible to handle in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [disabling error with `Error`  severity](https://forums.autodesk.com/t5/revit-api-forum/disable-error-with-error-severity/m-p/11004220):
 
@@ -555,6 +555,6 @@ public class SyntheticFailureReplacement : IExternalEventHandler
 }
 </pre>
 
-**response** Worked like a charm. Thanks!
+**Response:** Worked like a charm. Thanks!
 
 Many thanks to Alexander for his deep expertise in this area, and above all for his super-human patience providing such detailed guidance!
