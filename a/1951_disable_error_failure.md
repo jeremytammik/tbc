@@ -235,7 +235,7 @@ I just don't want to get the error I attached in the picture a few comments abov
 
 **Answer:** Do you use the `Application.RegisterFailuresProcessor` method?
 
-I personally would suggest to avoid this...
+Personally, I would suggest avoiding this...
 
 From the API docs:
 
@@ -423,7 +423,7 @@ To block the deletion, I have a class which inherits from `IUpdater` and uses a 
 &nbsp;&nbsp;}
 </pre>
 
-This class works as expected and blocks the deletion, I'm setting up the trigger here:
+This class works as expected and blocks the deletion; I'm setting up the trigger here:
 
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;UpdaterId&nbsp;<span style="color:#74531f;">SurfaceSplitElementUpdaterSetup</span>(AddInId&nbsp;<span style="color:#1f377f;">addinId</span>,&nbsp;Document&nbsp;<span style="color:#1f377f;">doc</span>)
@@ -477,7 +477,7 @@ And now, the problem:
 
 We know we can't swallow the error because it's of 'error' severity, but I'm unable to resolve it as well.
 
-I tried with and without resolve failure, tried proceed with commit and continue, nothing worked.
+I tried with and without resolve failure, tried proceeding with commit and continue, nothing worked.
 
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;FailureProcessingResult&nbsp;<span style="color:#74531f;">PreprocessFailures</span>(FailuresAccessor&nbsp;<span style="color:#1f377f;">failuresAccessor</span>)
