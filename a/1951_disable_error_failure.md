@@ -161,8 +161,8 @@ for your transaction.
 **Response:** I'll explain my workflow with more details:
 
 - I'm successfully preventing the users from deleting parts that have a specific scheme I made
-- No deletion is done whatsoever. Which is good - that was my goal
-- Although no deletion is done, the user still get this warning:
+- No deletion is done whatsoever. Which is good &ndash; that was my goal
+- Although no deletion is done, the user still gets this warning
 
 I want to hide it because it can be confusing to my user.
 The problem is that the severity of this message is `Error` and not warning, and therefore I can't use the Failure Accessor `DeleteWarning` method.
@@ -213,7 +213,7 @@ The error still appears:
 
 **Answer:** From the API dopcumentation on `FailureResolutionType`:
 
-> Default - Special (reserved) type. It cannot be used as a type when defining a resolution, but can be used as a key to query default resolution from FailureMessage or FailureDefinition.
+> Default &ndash; Special (reserved) type. It cannot be used as a type when defining a resolution, but can be used as a key to query default resolution from FailureMessage or FailureDefinition.
 
 I don't think you have to call `ResolveFailure` if you want to rollback the transaction.
 
@@ -307,7 +307,7 @@ Have you tried to remove `ResolveFailure` and leave only:
 
 I tried to return `ProceedWithRollBack` and removing `ResolveFailure` &ndash; didn't help.
 
-**Answer:** Pick one means: choose either an application level failure processor (as for me - it's a bad choice) or a failure processing event.
+**Answer:** Pick one means: choose either an application level failure processor (as for me &ndash; it's a bad choice) or a failure processing event.
 
 Could you prepare a simple reproducible case: addin + model + what to do to reproduce?
 

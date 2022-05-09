@@ -137,8 +137,8 @@ So, I want to prevent from this error from appearing in the first place.</p>
 <p><strong>Response:</strong> I'll explain my workflow with more details:</p>
 <ul>
 <li>I'm successfully preventing the users from deleting parts that have a specific scheme I made</li>
-<li>No deletion is done whatsoever. Which is good - that was my goal</li>
-<li>Although no deletion is done, the user still get this warning:</li>
+<li>No deletion is done whatsoever. Which is good &ndash; that was my goal</li>
+<li>Although no deletion is done, the user still gets this warning</li>
 </ul>
 <p>I want to hide it because it can be confusing to my user.
 The problem is that the severity of this message is <code>Error</code> and not warning, and therefore I can't use the Failure Accessor <code>DeleteWarning</code> method.</p>
@@ -182,7 +182,7 @@ The error still appears:</p>
 
 <p><strong>Answer:</strong> From the API dopcumentation on <code>FailureResolutionType</code>:</p>
 <blockquote>
-<p>Default - Special (reserved) type. It cannot be used as a type when defining a resolution, but can be used as a key to query default resolution from FailureMessage or FailureDefinition.</p>
+<p>Default &ndash; Special (reserved) type. It cannot be used as a type when defining a resolution, but can be used as a key to query default resolution from FailureMessage or FailureDefinition.</p>
 </blockquote>
 <p>I don't think you have to call <code>ResolveFailure</code> if you want to rollback the transaction.</p>
 <p>I would try to set "clear after rollback" through transaction options before starting the transaction, e.g.:</p>
@@ -260,7 +260,7 @@ Have you tried to remove <code>ResolveFailure</code> and leave only:</p>
 <p>?</p>
 <p><strong>Response:</strong> What do you mean by 'pick one'?</p>
 <p>I tried to return <code>ProceedWithRollBack</code> and removing <code>ResolveFailure</code> &ndash; didn't help.</p>
-<p><strong>Answer:</strong> Pick one means: choose either an application level failure processor (as for me - it's a bad choice) or a failure processing event.</p>
+<p><strong>Answer:</strong> Pick one means: choose either an application level failure processor (as for me &ndash; it's a bad choice) or a failure processing event.</p>
 <p>Could you prepare a simple reproducible case: addin + model + what to do to reproduce?</p>
 <p><strong>Response:</strong> Yep, I'm using a failure processing event.</p>
 <p>I am doing multiple things but let's focus only on the problem:
