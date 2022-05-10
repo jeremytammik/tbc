@@ -25,6 +25,16 @@ We continue updating all systems the new release and take a deep dive into the m
 
 linkedin:
 
+Updated #RevitAPI documentation for Revit 2023 and a deep dive into the mysteries and pitfalls of the Failure API to disable a failure with error severity
+
+https://autode.sk/errorfailure
+
+We continue updating all systems the new release:
+
+- RevitApiDocs support for Revit 2023
+- Migrating add-ins to Revit 2023
+- Disable failure with error severity...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
