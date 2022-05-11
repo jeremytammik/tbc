@@ -6,6 +6,20 @@
 
 <!---
 
+- Revit Macro Study Shareback
+  https://www.autodeskresearchcommunity.com/hub/posts/post-25914628
+  zip/revit_macro_study_shareback.pdf
+
+- add-in manager Debug Trace
+  Chuong Ho
+  Revit Addin Manager supports Debug/Trace Writeline include dockpanel for developer now.
+  It's an improvement that i think it will save even more debugging time for programmers 🤗
+  Download at opensource : https://lnkd.in/gtpy9RpV
+  #developer #revitapi #autodesk #bim #AEC #addinmanager
+  addinmanager_debugtrace.jpg 386
+  [RevitAddInManager](https://github.com/chuongmep/RevitAddInManager)
+  > Usually, when developing and debugging an addin with RevitAPI, user has to close & re-open Revit each time he/she modifies the addin code and wants to re-compile. But with Add-In Manager, user can modify and run the addin directly without closing & re-opening Revit again and again.
+
 - interesting project
   [Journalysis](https://github.com/andydandy74/Journalysis) by
   Andreas [@andydandy74](https://github.com/andydandy74) Dieckmann
@@ -18,20 +32,6 @@
   Monitor memory usage
   Monitor sync with central duration
   Keyboard shortcut usage
-
-- add-in manager Debug Trace
-  Chuong Ho
-  Revit Addin Manager supports Debug/Trace Writeline include dockpanel for developer now.
-  It's an improvement that i think it will save even more debugging time for programmers 🤗
-  Download at opensource : https://lnkd.in/gtpy9RpV
-  #developer #revitapi #autodesk #bim #AEC #addinmanager
-  addinmanager_debugtrace.jpg 386
-  [RevitAddInManager](https://github.com/chuongmep/RevitAddInManager)
-  > Usually, when developing and debugging an addin with RevitAPI, user has to close & re-open Revit each time he/she modifies the addin code and wants to re-compile. But with Add-In Manager, user can modify and run the addin directly without closing & re-opening Revit again and again.
-
-- Revit Macro Study Shareback
-  https://www.autodeskresearchcommunity.com/hub/posts/post-25914628
-  zip/revit_macro_study_shareback.pdf
 
 - 3D construction printing -- https://cobod.com -- https://cobod.com/videos/
 
@@ -115,3 +115,11 @@ zip/revit_macro_study_shareback.pdf
 
 - [Switch to HSL Color Format](https://youtu.be/VInSzHOeFkE)
 with numerous useful CSS links (ca. 7 minutes)
+
+
+Tomasz Wojdyla  5 days ago
+Hi Team!
+Tomek is here :wink: I am a fairly new PO for Robot Structural Analysis trying to find myself in the organization - sorry for silly questions - there could be more than a few in the next weeks and months :wink:
+Recently we started to wonder about the future for Revit Extension Framework (aka. REX) which we support in yearly basis even though (we believe) there is no internal use of this component anymore. External use is some sort of the question mark - it would be great if we could collect some data about its (external) users. We know one for sure and 2 more who are more than likely no longer with REX/Autodesk toolstack. Is there any chance you may share some info on this topic, maybe know some ADN users?
+All info or advisory is greatly appreciated!:thankyou:
+Cheers,
