@@ -94,12 +94,32 @@ To save others the same process, time and effort, I took the liberty of printing
 
 Many thanks to the Revit development team and Siyu Guo for the shareback and interesting results.
 
+####<a name="3"></a> Add-In Manager with Debug Trace
+
+We recently mentioned
+Chuong Ho's [open source add-in manager](https://thebuildingcoder.typepad.com/blog/2022/01/add-in-manager-formulamanager-and-tiger-year.html#2).
+
+> Usually, when developing and debugging an addin with RevitAPI, user has to recompile, close and reopen Revit each time they modify the add-in code. 
+With Add-In Manager, you can modify and run the add-in directly without closing and reopening Revit again and again.
+
+Chuong announces new enhancements:
+
+> Revit Add-in Manager supports Debug/Trace WriteLine including a dockable panel now.
+> It's an improvement that I think will save even more debugging time for programmers 🤗
+> Download from the [RevitAddInManager GitHub repo](https://github.com/chuongmep/RevitAddInManager).
+
 
 <center>
-<img src="img/.png" alt="" title="" width="600"/> <!-- 1000 -->
+<img src="img/addinmanager_debugtrace.jpg" alt="Add-in manager with debug trace" title="Add-in manager with debug trace" width="386"/> <!-- 386 -->
 </center>
 
-####<a name="3"></a> 
+By the way, for the sake of completeness, note that
+the [.NET hot reload for editing code at runtime](https://devblogs.microsoft.com/dotnet/introducing-net-hot-reload)
+in Visual Studio 2019 also enables you to update your add-in code on the fly, cf.
+[apply code changes debugging Revit add-in](https://thebuildingcoder.typepad.com/blog/2021/10/localised-forge-intros-and-apply-code-changes.html#4).
+
+
+
 
 ####<a name="4"></a>
 
@@ -116,15 +136,6 @@ Monitor memory usage
 Monitor sync with central duration
 Keyboard shortcut usage
 
-- add-in manager Debug Trace
-Chuong Ho
-Revit Addin Manager supports Debug/Trace Writeline include dockpanel for developer now.
-It's an improvement that i think it will save even more debugging time for programmers 🤗
-Download at opensource : https://lnkd.in/gtpy9RpV
-#developer #revitapi #autodesk #bim #AEC #addinmanager
-addinmanager_debugtrace.jpg 386
-[RevitAddInManager](https://github.com/chuongmep/RevitAddInManager)
-> Usually, when developing and debugging an addin with RevitAPI, user has to close & re-open Revit each time he/she modifies the addin code and wants to re-compile. But with Add-In Manager, user can modify and run the addin directly without closing & re-opening Revit again and again.
 
 - 3D construction printing -- https://cobod.com -- https://cobod.com/videos/
 
