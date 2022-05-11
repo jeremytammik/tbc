@@ -118,23 +118,22 @@ the [.NET hot reload for editing code at runtime](https://devblogs.microsoft.com
 in Visual Studio 2019 also enables you to update your add-in code on the fly, cf.
 [apply code changes debugging Revit add-in](https://thebuildingcoder.typepad.com/blog/2021/10/localised-forge-intros-and-apply-code-changes.html#4).
 
+####<a name="4"></a> Journal File Analysis
 
+I happened to notice
+Andreas [@andydandy74](https://github.com/andydandy74) Dieckmann's
+interesting project [Journalysis](https://github.com/andydandy74/Journalysis).
 
-
-####<a name="4"></a>
-
-- interesting project
-[Journalysis](https://github.com/andydandy74/Journalysis) by
-Andreas [@andydandy74](https://github.com/andydandy74) Dieckmann
-Berlin, Germany
 > Journalysis is a Revit journal, worksharing log and keyboard shortcuts analysis package for the Dynamo visual programming environment.
-> Since there is hardly any documentation on Revit journals, it is a slow process. I have started writing some documentation in the [wiki](https://github.com/andydandy74/Journalysis/wiki) that may, however, not be entirely complete.
-> This package is aimed at automating the analysis of Revit journals and worksharing logs for statistical purposes. Some possible use cases:
-Monitor crashes
-Monitor API errors
-Monitor memory usage
-Monitor sync with central duration
-Keyboard shortcut usage
+> Since there is hardly any documentation on Revit journals, it is a slow process.
+> I have started writing some documentation in the [wiki](https://github.com/andydandy74/Journalysis/wiki) that may not be entirely complete.
+> This package is aimed at automating the analysis of Revit journals and worksharing logs for statistical purposes.
+> Some possible use cases:
+> - Monitor crashes
+> - Monitor API errors
+> - Monitor memory usage
+> - Monitor sync with central duration
+> - Keyboard shortcut usage
 
 
 - 3D construction printing -- https://cobod.com -- https://cobod.com/videos/
