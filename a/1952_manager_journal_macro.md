@@ -9,6 +9,7 @@
 - Revit Macro Study Shareback
   https://www.autodeskresearchcommunity.com/hub/posts/post-25914628
   zip/revit_macro_study_shareback.pdf
+  https://forums.autodesk.com/t5/revit-api-forum/research-how-do-you-use-revit-macros/m-p/11158305
 
 - add-in manager Debug Trace
   Chuong Ho
@@ -74,7 +75,25 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 
 
-####<a name="2"></a> 
+####<a name="2"></a> Revit Macro Study Shareback
+
+We recently
+asked for feedback from the add-in developer community in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [how you use Revit Macros](https://forums.autodesk.com/t5/revit-api-forum/research-how-do-you-use-revit-macros/m-p/11158305).
+
+The rsults are now in, and we share them with you for further evaluation and feedback:
+
+> Feel free to review the research result summary and add any comments or suggestions at: 
+
+> <center><a href="https://www.autodeskresearchcommunity.com/hub/posts/post-25914628">Revit Macro Study Shareback</a></center>
+
+You have to set up an account with Autodesk research, fill in a survey and await the response email to see them.
+
+To save others the same process, time and effort, I took the liberty of printing the results to PDF and sharing them here in [revit_macro_study_shareback.pdf](zip/revit_macro_study_shareback.pdf).
+
+Many thanks to the Revit development team and Siyu Guo for the shareback and interesting results.
+
 
 <center>
 <img src="img/.png" alt="" title="" width="600"/> <!-- 1000 -->
@@ -106,10 +125,6 @@ Download at opensource : https://lnkd.in/gtpy9RpV
 addinmanager_debugtrace.jpg 386
 [RevitAddInManager](https://github.com/chuongmep/RevitAddInManager)
 > Usually, when developing and debugging an addin with RevitAPI, user has to close & re-open Revit each time he/she modifies the addin code and wants to re-compile. But with Add-In Manager, user can modify and run the addin directly without closing & re-opening Revit again and again.
-
-- Revit Macro Study Shareback
-https://www.autodeskresearchcommunity.com/hub/posts/post-25914628
-zip/revit_macro_study_shareback.pdf
 
 - 3D construction printing -- https://cobod.com -- https://cobod.com/videos/
 
