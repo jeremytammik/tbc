@@ -135,16 +135,11 @@ interesting project [Journalysis](https://github.com/andydandy74/Journalysis).
 > - Monitor sync with central duration
 > - Keyboard shortcut usage
 
+####<a name="5"></a> Plugging the HSL Colour Format
 
-- 3D construction printing -- https://cobod.com -- https://cobod.com/videos/
+Unrelated to the Revit API, I found the 7-minute video explaining and motivating us 
+to [switch to HSL color format](https://youtu.be/VInSzHOeFkE) very interesting and informative:
 
-- [Switch to HSL Color Format](https://youtu.be/VInSzHOeFkE)
-with numerous useful CSS links (ca. 7 minutes)
-
-
-Tomasz Wojdyla  5 days ago
-Hi Team!
-Tomek is here :wink: I am a fairly new PO for Robot Structural Analysis trying to find myself in the organization - sorry for silly questions - there could be more than a few in the next weeks and months :wink:
-Recently we started to wonder about the future for Revit Extension Framework (aka. REX) which we support in yearly basis even though (we believe) there is no internal use of this component anymore. External use is some sort of the question mark - it would be great if we could collect some data about its (external) users. We know one for sure and 2 more who are more than likely no longer with REX/Autodesk toolstack. Is there any chance you may share some info on this topic, maybe know some ADN users?
-All info or advisory is greatly appreciated!:thankyou:
-Cheers,
+<center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/VInSzHOeFkE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
