@@ -41,24 +41,12 @@
 
 twitter:
 
-Updated #RevitAPI documentation for Revit 2023 and a deep dive into the mysteries and pitfalls of the Failure API to disable a failure with error severity @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/errorfailure
+#RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-We continue updating all systems the new release and take a deep dive into the mysteries and pitfalls of the Failure API
-&ndash; RevitApiDocs support for Revit 2023
-&ndash; Migrating add-ins to Revit 2023
-&ndash; Disable failure with error severity...
+&ndash;
+...
 
 linkedin:
-
-Updated #RevitAPI documentation for Revit 2023 and a deep dive into the mysteries and pitfalls of the Failure API to disable a failure with error severity
-
-https://autode.sk/errorfailure
-
-We continue updating all systems the new release:
-
-- RevitApiDocs support for Revit 2023
-- Migrating add-ins to Revit 2023
-- Disable failure with error severity...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -71,9 +59,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### 
+### Analysis of Macros, Journals and Add-In Manager
 
-
+- [Revit macro study shareback](#2)
+- [Add-in manager with debug trace](#3)
+- [Journal file analysis](#4)
+- [Plugging the HSL colour format](#5)
 
 ####<a name="2"></a> Revit Macro Study Shareback
 
