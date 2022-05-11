@@ -13,7 +13,7 @@
 
 - add-in manager Debug Trace
   Chuong Ho
-  Revit Addin Manager supports Debug/Trace Writeline include dockpanel for developer now.
+  Revit add-in manager supports Debug/Trace Writeline include dockpanel for developer now.
   It's an improvement that i think it will save even more debugging time for programmers 🤗
   Download at opensource : https://lnkd.in/gtpy9RpV
   #developer #revitapi #autodesk #bim #AEC #addinmanager
@@ -90,7 +90,7 @@ Many thanks to the Revit development team and Siyu Guo for the shareback and int
 We recently mentioned
 Chuong Ho's [open source add-in manager](https://thebuildingcoder.typepad.com/blog/2022/01/add-in-manager-formulamanager-and-tiger-year.html#2).
 
-> Usually, when developing and debugging an addin with RevitAPI, user has to recompile, close and reopen Revit each time they modify the add-in code. 
+> Usually, when developing and debugging an add-in with Revit API, user has to recompile, close and reopen Revit each time they modify the add-in code. 
 With Add-In Manager, you can modify and run the add-in directly without closing and reopening Revit again and again.
 
 Chuong announces new enhancements:
