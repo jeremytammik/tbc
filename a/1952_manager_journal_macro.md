@@ -73,7 +73,7 @@ asked for feedback from the add-in developer community in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [how you use Revit Macros](https://forums.autodesk.com/t5/revit-api-forum/research-how-do-you-use-revit-macros/m-p/11158305).
 
-The rsults are now in, and we share them with you for further evaluation and feedback:
+The results are now in, and we share them with you for further evaluation and feedback:
 
 > Feel free to review the research result summary and add any comments or suggestions at: 
 
@@ -119,18 +119,16 @@ interesting project [Journalysis](https://github.com/andydandy74/Journalysis).
 > Since there is hardly any documentation on Revit journals, it is a slow process.
 > I have started writing some documentation in the [wiki](https://github.com/andydandy74/Journalysis/wiki) that may not be entirely complete.
 > This package is aimed at automating the analysis of Revit journals and worksharing logs for statistical purposes.
-> Some possible use cases:
-> - Monitor crashes
-> - Monitor API errors
-> - Monitor memory usage
-> - Monitor sync with central duration
-> - Keyboard shortcut usage
+> It helps track and monitor crashes, API errors, memory usage, sync with central duration, keyboard shortcut usage and more.
 
 ####<a name="5"></a> Plugging the HSL Colour Format
 
 Unrelated to the Revit API, I found the 7-minute video explaining and motivating us 
-to [switch to HSL color format](https://youtu.be/VInSzHOeFkE) very interesting and informative:
+to [switch to HSL colour format](https://youtu.be/VInSzHOeFkE) very interesting and informative:
 
 <center>
-<iframe width="480" height="270" src="https://www.youtube.com/embed/VInSzHOeFkE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/VInSzHOeFkE"
+  title="Switch to HSL colour format" frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen></iframe>
 </center>
