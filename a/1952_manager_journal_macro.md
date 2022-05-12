@@ -61,6 +61,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Analysis of Macros, Journals and Add-In Manager
 
+Let's look at the Revit macro study results, add-in manager debug/trace functionaliy and a journal analysis tool:
+
 - [Revit macro study shareback](#2)
 - [Add-in manager with debug trace](#3)
 - [Journal file analysis](#4)
