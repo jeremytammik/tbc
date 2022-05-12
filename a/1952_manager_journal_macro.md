@@ -41,9 +41,9 @@
 
 twitter:
 
-#RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Looking at Revit macro usage, open source WPF add-in manager debug/trace functionality and journal analysis in Python, Dynamo and the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-Looking at Revit macro usage, add-in manager debug/trace functionaliy and journal analysis
+Looking at Revit macro usage, add-in manager debug/trace functionality and journal analysis in Python and Dynamo
 &ndash; Revit macro study shareback
 &ndash; Add-in manager with debug trace
 &ndash; Journal file analysis
@@ -64,7 +64,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Analysis of Macros, Journals and Add-In Manager
 
-Let's look at the Revit macro study results, add-in manager debug/trace functionaliy and a journal analysis tool:
+Let's look at the Revit macro study results, add-in manager debug/trace functionality and a Python and Dynamo journal analysis tool:
 
 - [Revit macro study shareback](#2)
 - [Add-in manager with debug trace](#3)
@@ -118,7 +118,7 @@ in Visual Studio 2019 also enables you to update your add-in code on the fly, cf
 
 I happened to notice
 Andreas [@andydandy74](https://github.com/andydandy74) Dieckmann's
-interesting project [Journalysis](https://github.com/andydandy74/Journalysis).
+interesting Python and Dynamo project [Journalysis](https://github.com/andydandy74/Journalysis).
 
 > Journalysis is a Revit journal, worksharing log and keyboard shortcuts analysis package for the Dynamo visual programming environment.
 > Since there is hardly any documentation on Revit journals, it is a slow process.
