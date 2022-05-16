@@ -61,6 +61,31 @@ Thank you for feedback Jeremy! At this moment all options are open. As we discus
 
 ####<a name="3"></a>
 
+@Stefan Dobre, @Pawel Piechnik, we received several serious and well-founded questions on rebar API for one developer, including detailed descriptions, code and sample images:
+
+* [AreElementsValidForMultiReferenceAnnotation](https://forums.autodesk.com/t5/revit-api-forum/areelementsvalidformultireferenceannotation/td-p/11148745)
+* [GetCustomDistributionPath from RebarFreeFormAccessor](https://forums.autodesk.com/t5/revit-api-forum/getcustomdistributionpath-from-rebarfreeformaccessor/td-p/11148790)
+* [Number of segments](https://forums.autodesk.com/t5/revit-api-forum/number-of-segments/td-p/11148840)
+* [IsRebarInSection()](https://forums.autodesk.com/t5/revit-api-forum/isrebarinsection/td-p/11148854)
+
+Rather than copying them over here one by one, would it be possible for you or other rebar API experts to take a look at them and respond directly in the forum?
+
+Or what else would you suggest as the most effective way to handle this? Thank you!
+
+Hi @Jeremy Tammik. I take quick look on these questions and I don't see any problems here. It is just a misunderstanding of the API and how the rebar works. I'll respond to them directly on the forum.
+
+
+Jeremy Tammik  11 days ago
+thank you ever so much, @Stefan Dobre! very kind of you!
+
+
+Stefan Dobre  10 days ago
+I answered on the forum to all of these questions and I entered REVIT-191469 to update the description and (maybe) the name of the Rebar.IsRebarInSection() function.
+
+
+Jeremy Tammik  5 days ago
+brilliant! thank you very much! i will take a look at your answers and see whether i can convert them to a blog post to ensure they are preserved.
+
 
 
 <center>
