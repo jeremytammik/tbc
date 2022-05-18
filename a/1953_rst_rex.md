@@ -55,27 +55,20 @@ Thank you for feedback Jeremy! At this moment all options are open. As we discus
 
 ####<a name="3"></a> Rebar API Questions
 
-@Stefan Dobre, @Pawel Piechnik, we received several serious and well-founded questions on rebar API for one developer, including detailed descriptions, code and sample images:
+Miguel [MiguelGT17](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/5130624) Gutierrez raised a number of rebar questions in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) that were very kindly answered
+by Stefan Dobre, ‪senior principal engineer of the Revit Structural development team:
 
 - [AreElementsValidForMultiReferenceAnnotation](https://forums.autodesk.com/t5/revit-api-forum/areelementsvalidformultireferenceannotation/td-p/11148745)
 - [GetCustomDistributionPath from RebarFreeFormAccessor](https://forums.autodesk.com/t5/revit-api-forum/getcustomdistributionpath-from-rebarfreeformaccessor/td-p/11148790)
 - [Number of segments](https://forums.autodesk.com/t5/revit-api-forum/number-of-segments/td-p/11148840)
 - [IsRebarInSection()](https://forums.autodesk.com/t5/revit-api-forum/isrebarinsection/td-p/11148854)
 
-Rather than copying them over here one by one, would it be possible for you or other rebar API experts to take a look at them and respond directly in the forum?
+He responded: After a quick look on these questions, I don't see any problems.
+It is just a misunderstanding of the API and how the rebar works.
+I answered in the forum and submitted a change request *REVIT-191469* to update the description and (maybe) the name of the `Rebar.IsRebarInSection` function.
 
-Or what else would you suggest as the most effective way to handle this? Thank you!
-
-Hi @Jeremy Tammik. I take quick look on these questions and I don't see any problems here. It is just a misunderstanding of the API and how the rebar works. I'll respond to them directly on the forum.
-
-Jeremy Tammik  11 days ago
-thank you ever so much, @Stefan Dobre! very kind of you!
-
-Stefan Dobre  10 days ago
-I answered on the forum to all of these questions and I entered REVIT-191469 to update the description and (maybe) the name of the Rebar.IsRebarInSection() function.
-
-Jeremy Tammik  5 days ago
-brilliant! thank you very much! i will take a look at your answers and see whether i can convert them to a blog post to ensure they are preserved.
+Many thanks to Stefan foir the quick solutions!
 
 <!-- 
 ####<a name="4"></a> AreElementsValidForMultiReferenceAnnotation
@@ -92,17 +85,9 @@ Is there a way to group up rebars without using RebarContainer command and loadi
 
 MiguelGT17_2-1651722970309.png
 
- 
-
- 
-
 Furthermore, There is something strange going on when creating a rebar container. Its distribution path is not correlated to the actual true distribution path
 
 MiguelGT17_1-1651722817393.png
-
- 
-
- 
 
 Tags (0)
 Add tags
@@ -125,8 +110,6 @@ MiguelGT17
 ‎2022-05-05 09:05 AM 
 Appreciate the interest for making Revit even great than it is now, we'll be married to the software if we can manage that data
 
- 
-
 Best regards
 
 Tags (0)
@@ -141,12 +124,8 @@ Question 1:
 There are two types of Free Form rebar:
 
 The one created from curves, and which doesn’t have any constraints to the host. The input curves for each bar in set can be in any position and it is not possible to set a distribution path for it. An example of such rebar is the sketched free form. To create such Rebar you should call       public static Rebar CreateFreeForm(Document doc, RebarBarType barType, Element host, IList<CurveLoop> curves, out RebarFreeFormValidationResult error);
- 
 
 The one created through a server (callback), and which has constraints to the host. Any time when the constraints are modified, the server is called to recompute the Rebar curves. During this calculation, a distribution path can be set too. This distribution path is a list of curves. Aligned and Surface distributions are examples of such free form. To create such Rebar, you should use public static Rebar CreateFreeForm(Document doc, Guid serverGUID, RebarBarType barType, Element host). Look also at the documentation for IRebarUpdateServer class. In the RevitSDK there is a sample that demonstrates how such a free form rebar can be created.
- 
-
- 
 
 Question 2:
 
@@ -170,8 +149,6 @@ Concerning question 2 reply, I'm worried about it. I'll find the best approach t
 This set of rebars has been sketched as a free form.
 
 MiguelGT17_1-1651725624198.png
-
- 
 
 The wear fact is that revit lookup shows a single segment for this bar, which is not true
 
@@ -216,15 +193,11 @@ If you want the bar to be matched with other shapes, you should set the workshop
 
 For more details on how the shape matching is working  you can have a look on this: https://knowledge.autodesk.com/support/revit/learn-explore/caas/CloudHelp/cloudhelp/2019/ENU/Revit-M...
 
- 
-
 Rebar.IsRebarInSection(View view) returns true only if the view is a section or elevation and the view plane is cutting at least one of the rebar curves, false otherwise. This API function is the correspondent of this UI option:
 
 IsRebarInSection.png
 
  
-
- 
 
 Tags (0)
 Add tags
@@ -243,11 +216,7 @@ I have place a set of rebars in a viewPlan that only have 1 segment:
 
 MiguelGT17_0-1651726217067.png
 
- 
-
 I was expecting the IsRebarInSection() command to throw a true boolean as the rebars are shown as a cross section. If that is not the case, what this method stands for and which api method should I be looking up instead?
-
- 
 
 Test code:
 
@@ -285,9 +254,7 @@ MESSAGE 2 OF 5
 jeremy.tammik
  Employee jeremy.tammik in reply to: MiguelGT17
 ‎2022-05-05 12:24 AM 
-And yet again: This sounds like a request for some in-depth rebar API expertise beyond my limited ken, so I asked the devteam for you. I hope we can find an efficient way to address your very valid questions. 
-
-  
+And yet again: This sounds like a request for some in-depth rebar API expertise beyond my limited ken, so I asked the devteam for you. I hope we can find an efficient way to address your very valid questions.
 
 Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
 Tags (0)
@@ -310,11 +277,9 @@ IsRebarInSection(View view) returns true only if the view is a section or elevat
 
 This API function is the correspondent of this UI option:
 
-IsRebarInSection.png
-
- 
-
- 
+<center>
+<img src="img/mg_nr_segments_4.png" alt="IsRebarInSection" title="IsRebarInSection" width="100"/> <!--  -->
+</center>
 
 In your case,  to see that the straight bar is shown as a point you can verify this on your own. You can get the centerline curves like this rebar.GetTransformedCenterlineCurves(false, true, true, MultiplanarOption.IncludeOnlyPlanarCurves, 0);, You will get only one line. If the line’s direction is parallel with view’s direction it means that the bar is shown as a cross section, false otherwise.
 
@@ -327,9 +292,3 @@ MiguelGT17
 ‎2022-05-06 04:53 PM 
 Thanks for your prompt reply!, I will explore what you've suggested this weekend
 
-<center>
-<img src="img/.jpg" alt="" title="" width="100"/> <!-- 386 -->
-</center>
-
-
-Miguel [MiguelGT17](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/5130624) Gutierrez
