@@ -79,68 +79,40 @@ Many thanks to Stefan foir the quick solutions!
 
 ####<a name="5"></a> GetCustomDistributionPath
 
-- [GetCustomDistributionPath from RebarFreeFormAccessor](https://forums.autodesk.com/t5/revit-api-forum/getcustomdistributionpath-from-rebarfreeformaccessor/td-p/11148790)
+So, ho to
+get [GetCustomDistributionPath from RebarFreeFormAccessor](https://forums.autodesk.com/t5/revit-api-forum/getcustomdistributionpath-from-rebarfreeformaccessor/td-p/11148790)?
 
-Is there a way to group up rebars without using RebarContainer command and loading the distribution path data?
+**Question:** Is there a way to group up rebars without using the `RebarContainer` command and loading the distribution path data?
 
-MiguelGT17_2-1651722970309.png
+<center>
+<img src="img/mg_distributionpath_1.png" alt="Distribution path" title="Distribution path" width="100"/> <!--  -->
+</center>
 
-Furthermore, There is something strange going on when creating a rebar container. Its distribution path is not correlated to the actual true distribution path
+Furthermore, There is something strange going on when creating a rebar container.
+Its distribution path is not correlated to the actual true distribution path:
 
-MiguelGT17_1-1651722817393.png
 
-Tags (0)
-Add tags
-Report
-4 REPLIES 
-Sort: 
-MESSAGE 2 OF 5
-jeremy.tammik
- Employee jeremy.tammik in reply to: MiguelGT17
-‎2022-05-05 12:23 AM 
-Ditto: This sounds like a request for some in-depth rebar API expertise beyond my limited ken, so I asked the devteam for you.
+<center>
+<img src="img/mg_distributionpath_1.png" alt="Distribution path" title="Distribution path" width="100"/> <!--  -->
+</center>
 
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 5
-MiguelGT17
- Advocate MiguelGT17 in reply to: jeremy.tammik
-‎2022-05-05 09:05 AM 
-Appreciate the interest for making Revit even great than it is now, we'll be married to the software if we can manage that data
-
-Best regards
-
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 5
-stefan.dobre
- Employee stefan.dobre in reply to: MiguelGT17
-‎2022-05-06 04:34 AM 
-Question 1:
-
-There are two types of Free Form rebar:
+**Answer to Question 1:** There are two types of Free Form rebar:
 
 The one created from curves, and which doesn’t have any constraints to the host. The input curves for each bar in set can be in any position and it is not possible to set a distribution path for it. An example of such rebar is the sketched free form. To create such Rebar you should call       public static Rebar CreateFreeForm(Document doc, RebarBarType barType, Element host, IList<CurveLoop> curves, out RebarFreeFormValidationResult error);
 
 The one created through a server (callback), and which has constraints to the host. Any time when the constraints are modified, the server is called to recompute the Rebar curves. During this calculation, a distribution path can be set too. This distribution path is a list of curves. Aligned and Surface distributions are examples of such free form. To create such Rebar, you should use public static Rebar CreateFreeForm(Document doc, Guid serverGUID, RebarBarType barType, Element host). Look also at the documentation for IRebarUpdateServer class. In the RevitSDK there is a sample that demonstrates how such a free form rebar can be created.
 
-Question 2:
+**Answer to Question 2:** RebarContainerItem is created from a Rebar element (which is a set).
 
-RebarContainerItem is created from a Rebar element (which is a set) and has its own number of bars and of course it will have its own distribution path which is the source Rebar’s distribution path. RebarContainer is just storing a list of RebarContainerItems without having any relations between them.
+It has its own number of bars and of course it will have its own distribution path which is the source rebar’s distribution path.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 5
-MiguelGT17
- Advocate MiguelGT17 in reply to: stefan.dobre
-‎2022-05-06 05:08 PM 
-Appreciate those comments, indeed they are very deep insights about question 1.
+RebarContainer is just storing a list of RebarContainerItems without having any relations between them.
 
-Concerning question 2 reply, I'm worried about it. I'll find the best approach to reach my goal with the information you have provided so far. Stay bless.
+**Response:** Appreciate those comments; indeed, they are very deep insights about question 1.
+
+Concerning question 2 reply, I'm worried about it.
+I'll find the best approach to reach my goal with the information you have provided so far.
+Stay blessed.
 
 ####<a name="6"></a> Number of Segments
 
