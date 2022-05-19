@@ -67,12 +67,12 @@ I answered in the forum and submitted a change request <em>REVIT-191469</em> to 
 call <a href="https://forums.autodesk.com/t5/revit-api-forum/getcustomdistributionpath-from-rebarfreeformaccessor/td-p/11148790">GetCustomDistributionPath from RebarFreeFormAccessor</a>?</p>
 <p><strong>Question:</strong> Is there a way to group up rebars without using the <code>RebarContainer</code> command and loading the distribution path data?</p>
 <p><center>
-<img src="img/mg_distributionpath_1.png" alt="Distribution path" title="Distribution path" width="100"/> <!--  -->
+<img src="img/mg_distributionpath_1.png" alt="Distribution path" title="Distribution path" width="600"/> <!-- 1345 -->
 </center></p>
 <p>Furthermore, There is something strange going on when creating a rebar container.
 Its distribution path is not correlated to the actual true distribution path:</p>
 <p><center>
-<img src="img/mg_distributionpath_1.png" alt="Distribution path" title="Distribution path" width="100"/> <!--  -->
+<img src="img/mg_distributionpath_1.png" alt="Distribution path" title="Distribution path" width="600"/> <!-- 1816 -->
 </center></p>
 <p><strong>Answer to Question 1:</strong> There are two types of Free Form rebar:</p>
 <p>The one created from curves, and which doesn’t have any constraints to the host. The input curves for each bar in set can be in any position and it is not possible to set a distribution path for it. An example of such rebar is the sketched free form. To create such Rebar you should call       public static Rebar CreateFreeForm(Document doc, RebarBarType barType, Element host, IList<CurveLoop> curves, out RebarFreeFormValidationResult error);</p>
@@ -90,15 +90,15 @@ Stay blessed.</p>
 the <a href="https://forums.autodesk.com/t5/revit-api-forum/number-of-segments/td-p/11148840">number of segments</a>:</p>
 <p><strong>Question:</strong> This set of rebars has been sketched as a free form.</p>
 <p><center>
-<img src="img/mg_nr_segments_1.png" alt="Number of segments" title="Number of segments" width="100"/> <!--  -->
+<img src="img/mg_nr_segments_1.png" alt="Number of segments" title="Number of segments" width="600"/> <!-- 961 -->
 </center></p>
 <p>RevitLookup shows a single segment for this bar:</p>
 <p><center>
-<img src="img/mg_nr_segments_2.png" alt="Number of segments" title="Number of segments" width="100"/> <!--  -->
+<img src="img/mg_nr_segments_2.png" alt="Number of segments" title="Number of segments" width="600"/> <!-- 1720 -->
 </center></p>
 <p>This is not true:</p>
 <p><center>
-<img src="img/mg_nr_segments_3.png" alt="Number of segments" title="Number of segments" width="100"/> <!--  -->
+<img src="img/mg_nr_segments_3.png" alt="Number of segments" title="Number of segments" width="253"/> <!-- 253 -->
 </center></p>
 <p>Moreover, the <code>IsRebarInSection(view)</code> command always return false, regardless of the view.
 So, I am not going to have the appropriate data when I sketch rebars as freeform?</p>
@@ -107,7 +107,7 @@ So, I am not going to have the appropriate data when I sketch rebars as freeform
 <p>For more details on how the shape matching is working  you can have a look on this: https://knowledge.autodesk.com/support/revit/learn-explore/caas/CloudHelp/cloudhelp/2019/ENU/Revit-M...</p>
 <p>Rebar.IsRebarInSection(View view) returns true only if the view is a section or elevation and the view plane is cutting at least one of the rebar curves, false otherwise. This API function is the correspondent of this UI option:</p>
 <p><center>
-<img src="img/mg_nr_segments_4.png" alt="IsRebarInSection" title="IsRebarInSection" width="100"/> <!--  -->
+<img src="img/mg_nr_segments_4.png" alt="IsRebarInSection" title="IsRebarInSection" width="600"/> <!-- 1915 -->
 </center></p>
 <p><strong>Response:</strong> Thanks for your prompt reply; my bad, I was not aware of those parameters.
 I will double check them and perform another test this weekend.
