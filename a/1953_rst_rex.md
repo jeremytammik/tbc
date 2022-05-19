@@ -85,7 +85,7 @@ call [GetCustomDistributionPath from RebarFreeFormAccessor](https://forums.autod
 <img src="img/mg_distributionpath_1.png" alt="Distribution path" title="Distribution path" width="600"/> <!-- 1345 -->
 </center>
 
-Furthermore, There is something strange going on when creating a rebar container.
+Furthermore, there is something strange going on when creating a rebar container.
 Its distribution path is not correlated to the actual true distribution path:
 
 <center>
@@ -94,15 +94,39 @@ Its distribution path is not correlated to the actual true distribution path:
 
 **Answer to Question 1:** There are two types of Free Form rebar:
 
-The one created from curves, and which doesn’t have any constraints to the host. The input curves for each bar in set can be in any position and it is not possible to set a distribution path for it. An example of such rebar is the sketched free form. To create such Rebar you should call       public static Rebar CreateFreeForm(Document doc, RebarBarType barType, Element host, IList<CurveLoop> curves, out RebarFreeFormValidationResult error);
+The one created from curves, and which doesn’t have any constraints to the host.
+The input curves for each bar in set can be in any position and it is not possible to set a distribution path for it.
+An example of such rebar is the sketched free form.
+To create such Rebar you should call
 
-The one created through a server (callback), and which has constraints to the host. Any time when the constraints are modified, the server is called to recompute the Rebar curves. During this calculation, a distribution path can be set too. This distribution path is a list of curves. Aligned and Surface distributions are examples of such free form. To create such Rebar, you should use public static Rebar CreateFreeForm(Document doc, Guid serverGUID, RebarBarType barType, Element host). Look also at the documentation for IRebarUpdateServer class. In the RevitSDK there is a sample that demonstrates how such a free form rebar can be created.
+<pre class="code">
+  Rebar CreateFreeForm( Document doc,
+    RebarBarType barType, Element host,
+    IList&lt;CurveLoop&gt; curves,
+    out RebarFreeFormValidationResult error);
+</pre>
 
-**Answer to Question 2:** RebarContainerItem is created from a Rebar element (which is a set).
+The one created through a server (callback), and which has constraints to the host.
+Any time when the constraints are modified, the server is called to recompute the Rebar curves.
+During this calculation, a distribution path can be set too.
+This distribution path is a list of curves.
+Aligned and Surface distributions are examples of such free form.
+To create such Rebar, you should use
+
+<pre class="code">
+  Rebar CreateFreeForm( Document doc,
+    Guid serverGUID, RebarBarType barType,
+    Element host);
+</pre>
+
+Look also at the documentation for `IRebarUpdateServer` class.
+The Revit SDK includes a sample that demonstrates how such a free form rebar can be created.
+
+**Answer to Question 2:** `RebarContainerItem` is created from a Rebar element (which is a set).
 
 It has its own number of bars and of course it will have its own distribution path which is the source rebar’s distribution path.
 
-RebarContainer is just storing a list of RebarContainerItems without having any relations between them.
+`RebarContainer` is just storing a list of RebarContainerItems without masintaining any relations between them.
 
 **Response:** Appreciate those comments;
 indeed, they are very deep insights about question 1.
@@ -177,7 +201,6 @@ Test code:
     }
     <span style="color:#8f08c4;">else</span>&nbsp;<span style="color:#8f08c4;">if</span>&nbsp;(element&nbsp;<span style="color:blue;">is</span>&nbsp;Rebar)
     {
-   
       Rebar&nbsp;<span style="color:#1f377f;">el</span>&nbsp;=&nbsp;element&nbsp;<span style="color:blue;">as</span>&nbsp;Rebar;
       <span style="color:#8f08c4;">if</span>&nbsp;(el.IsRebarFreeForm()&nbsp;==&nbsp;<span style="color:blue;">true</span>)
       {
