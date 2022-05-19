@@ -42,24 +42,18 @@ Today, we ponder some structural rebar questions and the future of the REX struc
 
 ####<a name="2"></a> Future of REX
 
-Tomasz Wojdyla  14:35
-Hi Team!
-Tomek is here :wink: I am a fairly new PO for Robot Structural Analysis trying to find myself in the organization - sorry for silly questions - there could be more than a few in the next weeks and months :wink:
-Recently we started to wonder about the future for Revit Extension Framework (aka. REX) which we support in yearly basis even though (we believe) there is no internal use of this component anymore. External use is some sort of the question mark - it would be great if we could collect some data about its (external) users. We know one for sure and 2 more who are more than likely no longer with REX/Autodesk toolstack. Is there any chance you may share some info on this topic, maybe know some ADN users?
-All info or advisory is greatly appreciated!:thankyou:
-Cheers,
-TW
+Tomasz Wojdyla joined the Robot Structural Analysis team as senior product owner and is wondering about the future of the Revit Extension Framework, aka. REX.
 
-However, whatever we decide to do, I would suggest proceeding in the standard Revit API manner by posting very clear signs in the SDK announcing that REX is deprecated in one release and then removing it as obsolete in the next, one year later.
+We currently support it on a yearly basis even though (we believe) there is no internal use of this component anymore.
 
-Jeremy Tammik  5 days ago
-Alternatively, how about simply sharing the entire REX code base right now and telling the developer community: here guys, this is what we have, we will no longer deal with it, it is completely unsupported, do what you like with it?
+External use is a question mark &ndash; it would be great if we could collect some data about its (external) users.
 
-Jeremy Tammik  5 days ago
-In my (naive) eyes, that would cost zero effort and have immediate effect.
+Can you please let us know if you are interested in this framework?
+You can simply provide your details in a comment below, or send
+a [private message](https://thebuildingcoder.typepad.com/blog/about-the-author.html#1) if you prefer that.
 
-Tomasz Wojdyla  5 days ago
-Thank you for feedback Jeremy! At this moment all options are open. As we discussed it with team the 1 year notice manner is clear. I will post on the forums. Of course any more thoughts from everyone are welcome. Thanks again!
+All info and advice is greatly appreciated!
+Thank you!
 
 ####<a name="3"></a> Rebar API Questions
 
