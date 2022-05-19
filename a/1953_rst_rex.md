@@ -89,7 +89,7 @@ Furthermore, there is something strange going on when creating a rebar container
 Its distribution path is not correlated to the actual true distribution path:
 
 <center>
-<img src="img/mg_distributionpath_1.png" alt="Distribution path" title="Distribution path" width="600"/> <!-- 1816 -->
+<img src="img/mg_distributionpath_2.png" alt="Distribution path" title="Distribution path" width="600"/> <!-- 1816 -->
 </center>
 
 **Answer to Question 1:** There are two types of Free Form rebar:
@@ -226,7 +226,7 @@ Test code:
 This API function is the correspondent of this UI option:
 
 <center>
-<img src="img/mg_nr_segments_4.png" alt="IsRebarInSection" title="IsRebarInSection" width="100"/> <!--  -->
+<img src="img/mg_nr_segments_4.png" alt="IsRebarInSection" title="IsRebarInSection" width="600"/> <!-- 1915 -->
 </center>
 
 In your case, to see that the straight bar is shown as a point you can verify this on your own.
