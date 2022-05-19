@@ -30,7 +30,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Structural Questions and Future of REX
+### Structural Questions and the Future of REX
 
 Today, we ponder some structural rebar questions and the future of the REX structural Revit extensions included with the Revit SDK:
 
