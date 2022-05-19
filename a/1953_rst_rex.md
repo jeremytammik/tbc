@@ -14,8 +14,12 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+We ponder some structural rebar questions and the future of the REX structural Revit extensions included with the Revit SDK
+&ndash; Future of REX
+&ndash; Rebar API questions
+&ndash; GetCustomDistributionPath
+&ndash; Number of segments
+&ndash; IsRebarInSection...
 
 linkedin:
 
