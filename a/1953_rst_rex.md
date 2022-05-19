@@ -32,6 +32,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Structural Questions and Future of REX
 
+Today, we ponder some structural rebar questions and the future of the REX structural Revit extensions included with the Revit SDK:
+
+- [Future of REX](#2)
+- [Rebar API questions](#3)
+- [GetCustomDistributionPath](#4)
+- [Number of segments](#5)
+- [IsRebarInSection](#6)
+
 ####<a name="2"></a> Future of REX
 
 Tomasz Wojdyla  14:35
@@ -59,10 +67,13 @@ Miguel [MiguelGT17](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) that were very kindly answered
 by Stefan Dobre, ‪senior principal engineer of the Revit Structural development team:
 
-- [AreElementsValidForMultiReferenceAnnotation](https://forums.autodesk.com/t5/revit-api-forum/areelementsvalidformultireferenceannotation/td-p/11148745)
-- [GetCustomDistributionPath from RebarFreeFormAccessor](https://forums.autodesk.com/t5/revit-api-forum/getcustomdistributionpath-from-rebarfreeformaccessor/td-p/11148790)
-- [Number of segments](https://forums.autodesk.com/t5/revit-api-forum/number-of-segments/td-p/11148840)
-- [IsRebarInSection()](https://forums.autodesk.com/t5/revit-api-forum/isrebarinsection/td-p/11148854)
+1. [GetCustomDistributionPath from RebarFreeFormAccessor](https://forums.autodesk.com/t5/revit-api-forum/getcustomdistributionpath-from-rebarfreeformaccessor/td-p/11148790)
+2. [Number of segments](https://forums.autodesk.com/t5/revit-api-forum/number-of-segments/td-p/11148840)
+3. [IsRebarInSection()](https://forums.autodesk.com/t5/revit-api-forum/isrebarinsection/td-p/11148854)
+
+<!--
+4. [AreElementsValidForMultiReferenceAnnotation](https://forums.autodesk.com/t5/revit-api-forum/areelementsvalidformultireferenceannotation/td-p/11148745)
+-->
 
 He responded: After a quick look on these questions, I don't see any problems.
 It is just a misunderstanding of the API and how the rebar works.
@@ -70,17 +81,10 @@ I answered in the forum and submitted a change request *REVIT-191469* to update 
 
 Many thanks to Stefan foir the quick solutions!
 
-<!-- 
-####<a name="4"></a> AreElementsValidForMultiReferenceAnnotation
+####<a name="4"></a> GetCustomDistributionPath
 
-- [AreElementsValidForMultiReferenceAnnotation](https://forums.autodesk.com/t5/revit-api-forum/areelementsvalidformultireferenceannotation/td-p/11148745)
-
--->
-
-####<a name="5"></a> GetCustomDistributionPath
-
-So, ho to
-get [GetCustomDistributionPath from RebarFreeFormAccessor](https://forums.autodesk.com/t5/revit-api-forum/getcustomdistributionpath-from-rebarfreeformaccessor/td-p/11148790)?
+First, how to
+call [GetCustomDistributionPath from RebarFreeFormAccessor](https://forums.autodesk.com/t5/revit-api-forum/getcustomdistributionpath-from-rebarfreeformaccessor/td-p/11148790)?
 
 **Question:** Is there a way to group up rebars without using the `RebarContainer` command and loading the distribution path data?
 
@@ -114,7 +118,7 @@ Concerning question 2 reply, I'm worried about it.
 I'll find the best approach to reach my goal with the information you have provided so far.
 Stay blessed.
 
-####<a name="6"></a> Number of Segments
+####<a name="5"></a> Number of Segments
 
 Next, Miguel raises a question on 
 the [number of segments](https://forums.autodesk.com/t5/revit-api-forum/number-of-segments/td-p/11148840):
@@ -156,7 +160,7 @@ Rebar.IsRebarInSection(View view) returns true only if the view is a section or 
 I will double check them and perform another test this weekend.
 Cheers!
 
-####<a name="7"></a> IsRebarInSection
+####<a name="6"></a> IsRebarInSection
 
 Finally, on [IsRebarInSection()](https://forums.autodesk.com/t5/revit-api-forum/isrebarinsection/td-p/11148854):
 
@@ -219,3 +223,10 @@ You can get the centerline curves like this:
 
 You will get only one line. If the line’s direction is parallel with view’s direction it means that the bar is shown as a cross section, false otherwise.
 
+
+<!-- 
+####<a name="7"></a> AreElementsValidForMultiReferenceAnnotation
+
+- [AreElementsValidForMultiReferenceAnnotation](https://forums.autodesk.com/t5/revit-api-forum/areelementsvalidformultireferenceannotation/td-p/11148745)
+
+-->
