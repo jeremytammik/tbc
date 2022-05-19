@@ -170,29 +170,33 @@ If that is not the case, what does this method stand for, and which API method s
 Test code:
 
 <pre class="code">
-foreach (Element element in rebars) {
-				if (element is RebarContainer) {
-					
-				}
-				else if (element is Rebar) {
-					
-					Rebar el = element as Rebar;
-					if (el.IsRebarFreeForm() == true) {
-						
-					}
-					else if(el.IsRebarShapeDriven() == true){
-						RebarShapeDrivenAccessor acc=(element as Rebar).GetShapeDrivenAccessor();
-						XYZ dir=acc.GetDistributionPath().Direction;
-						
-						double angle=dir.AngleTo(view.ViewDirection);
-						angle=angle*(180/Math.PI); //90,0
-						stb.AppendLine(angle.ToString());
-						stb.AppendLine(el.IsRebarInSection(view).ToString());
-
-				
-				}
-			}
-			TaskDialog.Show("dd",stb.ToString());
+  <span style="color:#8f08c4;">foreach</span>&nbsp;(Element&nbsp;<span style="color:#1f377f;">element</span>&nbsp;<span style="color:#8f08c4;">in</span>&nbsp;rebars)
+  {
+    <span style="color:#8f08c4;">if</span>&nbsp;(element&nbsp;<span style="color:blue;">is</span>&nbsp;RebarContainer)
+    {
+   
+    }
+    <span style="color:#8f08c4;">else</span>&nbsp;<span style="color:#8f08c4;">if</span>&nbsp;(element&nbsp;<span style="color:blue;">is</span>&nbsp;Rebar)
+    {
+   
+      Rebar&nbsp;<span style="color:#1f377f;">el</span>&nbsp;=&nbsp;element&nbsp;<span style="color:blue;">as</span>&nbsp;Rebar;
+      <span style="color:#8f08c4;">if</span>&nbsp;(el.IsRebarFreeForm()&nbsp;==&nbsp;<span style="color:blue;">true</span>)
+      {
+   
+      }
+      <span style="color:#8f08c4;">else</span>&nbsp;<span style="color:#8f08c4;">if</span>&nbsp;(el.IsRebarShapeDriven()&nbsp;==&nbsp;<span style="color:blue;">true</span>)
+      {
+        RebarShapeDrivenAccessor&nbsp;<span style="color:#1f377f;">acc</span>&nbsp;=&nbsp;(element&nbsp;<span style="color:blue;">as</span>&nbsp;Rebar).GetShapeDrivenAccessor();
+        XYZ&nbsp;<span style="color:#1f377f;">dir</span>&nbsp;=&nbsp;acc.GetDistributionPath().Direction;
+   
+        <span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">angle</span>&nbsp;=&nbsp;dir.AngleTo(view.ViewDirection);
+        angle&nbsp;=&nbsp;angle&nbsp;*&nbsp;(180&nbsp;/&nbsp;Math.PI);&nbsp;<span style="color:green;">//90,0</span>
+        stb.AppendLine(angle.ToString());
+        stb.AppendLine(el.IsRebarInSection(view).ToString());
+      }
+    }
+    TaskDialog.Show(<span style="color:#a31515;">&quot;dd&quot;</span>,&nbsp;stb.ToString());
+  }
 </pre>
 
 **Answer:** `IsRebarInSection` returns true only if the view is a section or elevation and the view plane is cutting at least one of the rebar curves, false otherwise.
@@ -208,7 +212,7 @@ You can get the centerline curves like this:
 
 <pre class="code">
   rebar.GetTransformedCenterlineCurves(
-    false, true, true,
+    <span style="color:blue;">false</span>,&nbsp;<span style="color:blue;">true</span>,&nbsp;<span style="color:blue;">true</span>,
     MultiplanarOption.IncludeOnlyPlanarCurves,
     0);
 </pre>
