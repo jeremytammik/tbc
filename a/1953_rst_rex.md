@@ -91,7 +91,6 @@ get [GetCustomDistributionPath from RebarFreeFormAccessor](https://forums.autode
 Furthermore, There is something strange going on when creating a rebar container.
 Its distribution path is not correlated to the actual true distribution path:
 
-
 <center>
 <img src="img/mg_distributionpath_1.png" alt="Distribution path" title="Distribution path" width="100"/> <!--  -->
 </center>
@@ -108,7 +107,8 @@ It has its own number of bars and of course it will have its own distribution pa
 
 RebarContainer is just storing a list of RebarContainerItems without having any relations between them.
 
-**Response:** Appreciate those comments; indeed, they are very deep insights about question 1.
+**Response:** Appreciate those comments;
+indeed, they are very deep insights about question 1.
 
 Concerning question 2 reply, I'm worried about it.
 I'll find the best approach to reach my goal with the information you have provided so far.
@@ -116,50 +116,31 @@ Stay blessed.
 
 ####<a name="6"></a> Number of Segments
 
-- [Number of segments](https://forums.autodesk.com/t5/revit-api-forum/number-of-segments/td-p/11148840)
+Next, Miguel raises a question on 
+the [number of segments](https://forums.autodesk.com/t5/revit-api-forum/number-of-segments/td-p/11148840):
 
-This set of rebars has been sketched as a free form.
+**Question:** This set of rebars has been sketched as a free form.
 
-MiguelGT17_1-1651725624198.png
+<center>
+<img src="img/mg_nr_segments_1.png" alt="Number of segments" title="Number of segments" width="100"/> <!--  -->
+</center>
 
-The wear fact is that revit lookup shows a single segment for this bar, which is not true
+RevitLookup shows a single segment for this bar:
 
-MiguelGT17_0-1651725500376.png
+<center>
+<img src="img/mg_nr_segments_2.png" alt="Number of segments" title="Number of segments" width="100"/> <!--  -->
+</center>
 
-MiguelGT17_2-1651725669880.png
+This is not true:
 
-More over, the IsRebarInSection(view) command always return false regardless of the view. So am not going to have the appropriate data when I sketch rebars as freeform?
+<center>
+<img src="img/mg_nr_segments_3.png" alt="Number of segments" title="Number of segments" width="100"/> <!--  -->
+</center>
 
-Tags (0)
-Add tags
-Report
-4 REPLIES 
-Sort: 
-MESSAGE 2 OF 5
-jeremy.tammik
- Employee jeremy.tammik in reply to: MiguelGT17
-‎2022-05-05 12:23 AM 
-And again: This sounds like a request for some in-depth rebar API expertise beyond my limited ken, so I asked the devteam for you.
+Moreover, the `IsRebarInSection(view)` command always return false, regardless of the view.
+So, I am not going to have the appropriate data when I sketch rebars as freeform?
 
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 5
-MiguelGT17
- Advocate MiguelGT17 in reply to: MiguelGT17
-‎2022-05-05 08:03 AM 
-Thanks for your support Jeremy, I'll be more than glad to hear from you
-
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 5
-stefan.dobre
- Employee stefan.dobre in reply to: MiguelGT17
-‎2022-05-06 03:49 AM 
- 
-As I can see in your images you have a free form rebar that has the Workshop Instructions parameter set to Keep Straight. This means that no matter what curves the free form has, it will always be matched with a straight shape (M_00).
+**Answer:** As I can see in your images, you have a free form rebar that has the Workshop Instructions parameter set to Keep Straight. This means that no matter what curves the free form has, it will always be matched with a straight shape (M_00).
 
 If you want the bar to be matched with other shapes, you should set the workshop parameter to Bend. One you set this option, each bar in the set will be matched with the existing rebar shapes from the project. If it doesn't match with any existing shapes, it will try to create new Rebar Shapes. If it can’t create new Rebar Shapes and error message will be posted and will continue to consider the bar as a straight one.
 
@@ -167,31 +148,28 @@ For more details on how the shape matching is working  you can have a look on th
 
 Rebar.IsRebarInSection(View view) returns true only if the view is a section or elevation and the view plane is cutting at least one of the rebar curves, false otherwise. This API function is the correspondent of this UI option:
 
-IsRebarInSection.png
+<center>
+<img src="img/mg_nr_segments_4.png" alt="IsRebarInSection" title="IsRebarInSection" width="100"/> <!--  -->
+</center>
 
- 
-
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 5
-MiguelGT17
- Advocate MiguelGT17 in reply to: stefan.dobre
-‎2022-05-06 04:54 PM 
-Thanks for your prompt reply, My bad I was not aware of those parameters. I will double check them and perform another test this weekend. Cheers!
+**Response:** Thanks for your prompt reply; my bad, I was not aware of those parameters.
+I will double check them and perform another test this weekend.
+Cheers!
 
 ####<a name="7"></a> IsRebarInSection
 
-- [IsRebarInSection()](https://forums.autodesk.com/t5/revit-api-forum/isrebarinsection/td-p/11148854)
+Finally, on [IsRebarInSection()](https://forums.autodesk.com/t5/revit-api-forum/isrebarinsection/td-p/11148854):
 
-I have place a set of rebars in a viewPlan that only have 1 segment:
+**Question:** I have placed a set of rebars in a viewPlan that only has 1 segment:
 
 MiguelGT17_0-1651726217067.png
 
-I was expecting the IsRebarInSection() command to throw a true boolean as the rebars are shown as a cross section. If that is not the case, what this method stands for and which api method should I be looking up instead?
+I was expecting the `IsRebarInSection` method to return a `true` Boolean, as the rebars are shown as a cross section.
+If that is not the case, what does this method stand for, and which API method should I be looking up instead?
 
 Test code:
 
+<pre class="code">
 foreach (Element element in rebars) {
 				if (element is RebarContainer) {
 					
@@ -215,37 +193,9 @@ foreach (Element element in rebars) {
 				}
 			}
 			TaskDialog.Show("dd",stb.ToString());
-Best Regards
+</pre>
 
-Tags (0)
-Add tags
-Report
-4 REPLIES 
-Sort: 
-MESSAGE 2 OF 5
-jeremy.tammik
- Employee jeremy.tammik in reply to: MiguelGT17
-‎2022-05-05 12:24 AM 
-And yet again: This sounds like a request for some in-depth rebar API expertise beyond my limited ken, so I asked the devteam for you. I hope we can find an efficient way to address your very valid questions.
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 5
-MiguelGT17
- Advocate MiguelGT17 in reply to: jeremy.tammik
-‎2022-05-05 07:46 AM 
-Appreciate the reply Jeremy, I'll be more than  glad to hear from the team
-
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 5
-stefan.dobre
- Employee stefan.dobre in reply to: MiguelGT17
-‎2022-05-06 03:34 AM 
-IsRebarInSection(View view) returns true only if the view is a section or elevation and the view plane is cutting at least one of the rebar curves, false otherwise.
+**Answer:** IsRebarInSection(View view) returns true only if the view is a section or elevation and the view plane is cutting at least one of the rebar curves, false otherwise.
 
 This API function is the correspondent of this UI option:
 
