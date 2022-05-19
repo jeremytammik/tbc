@@ -61,7 +61,7 @@ by Stefan Dobre, ‪senior principal engineer of the Revit Structural developmen
 <p>He responded: After a quick look on these questions, I don't see any problems.
 It is just a misunderstanding of the API and how the rebar works.
 I answered in the forum and submitted a change request <em>REVIT-191469</em> to update the description and (maybe) the name of the <code>Rebar.IsRebarInSection</code> function.</p>
-<p>Many thanks to Stefan foir the quick solutions!</p>
+<p>Many thanks to Stefan for the quick solutions!</p>
 <h4><a name="4"></a> GetCustomDistributionPath</h4>
 <p>First, how to
 call <a href="https://forums.autodesk.com/t5/revit-api-forum/getcustomdistributionpath-from-rebarfreeformaccessor/td-p/11148790">GetCustomDistributionPath from RebarFreeFormAccessor</a>?</p>
@@ -102,7 +102,7 @@ To create such Rebar, you should use</p>
 The Revit SDK includes a sample that demonstrates how such a free form rebar can be created.</p>
 <p><strong>Answer to Question 2:</strong> <code>RebarContainerItem</code> is created from a Rebar element (which is a set).</p>
 <p>It has its own number of bars and of course it will have its own distribution path which is the source rebar’s distribution path.</p>
-<p><code>RebarContainer</code> is just storing a list of RebarContainerItems without masintaining any relations between them.</p>
+<p><code>RebarContainer</code> is just storing a list of RebarContainerItems without maintaining any relations between them.</p>
 <p><strong>Response:</strong> Appreciate those comments;
 indeed, they are very deep insights about question 1.</p>
 <p>Concerning question 2 reply, I'm worried about it.

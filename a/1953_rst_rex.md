@@ -72,7 +72,7 @@ He responded: After a quick look on these questions, I don't see any problems.
 It is just a misunderstanding of the API and how the rebar works.
 I answered in the forum and submitted a change request *REVIT-191469* to update the description and (maybe) the name of the `Rebar.IsRebarInSection` function.
 
-Many thanks to Stefan foir the quick solutions!
+Many thanks to Stefan for the quick solutions!
 
 ####<a name="4"></a> GetCustomDistributionPath
 
@@ -126,7 +126,7 @@ The Revit SDK includes a sample that demonstrates how such a free form rebar can
 
 It has its own number of bars and of course it will have its own distribution path which is the source rebar’s distribution path.
 
-`RebarContainer` is just storing a list of RebarContainerItems without masintaining any relations between them.
+`RebarContainer` is just storing a list of RebarContainerItems without maintaining any relations between them.
 
 **Response:** Appreciate those comments;
 indeed, they are very deep insights about question 1.
