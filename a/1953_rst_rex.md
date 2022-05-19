@@ -195,7 +195,7 @@ foreach (Element element in rebars) {
 			TaskDialog.Show("dd",stb.ToString());
 </pre>
 
-**Answer:** IsRebarInSection(View view) returns true only if the view is a section or elevation and the view plane is cutting at least one of the rebar curves, false otherwise.
+**Answer:** `IsRebarInSection` returns true only if the view is a section or elevation and the view plane is cutting at least one of the rebar curves, false otherwise.
 
 This API function is the correspondent of this UI option:
 
@@ -203,14 +203,15 @@ This API function is the correspondent of this UI option:
 <img src="img/mg_nr_segments_4.png" alt="IsRebarInSection" title="IsRebarInSection" width="100"/> <!--  -->
 </center>
 
-In your case,  to see that the straight bar is shown as a point you can verify this on your own. You can get the centerline curves like this rebar.GetTransformedCenterlineCurves(false, true, true, MultiplanarOption.IncludeOnlyPlanarCurves, 0);, You will get only one line. If the line’s direction is parallel with view’s direction it means that the bar is shown as a cross section, false otherwise.
+In your case, to see that the straight bar is shown as a point you can verify this on your own.
+You can get the centerline curves like this:
 
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 5
-MiguelGT17
- Advocate MiguelGT17 in reply to: stefan.dobre
-‎2022-05-06 04:53 PM 
-Thanks for your prompt reply!, I will explore what you've suggested this weekend
+<pre class="code">
+  rebar.GetTransformedCenterlineCurves(
+    false, true, true,
+    MultiplanarOption.IncludeOnlyPlanarCurves,
+    0);
+</pre>
+
+You will get only one line. If the line’s direction is parallel with view’s direction it means that the bar is shown as a cross section, false otherwise.
 
