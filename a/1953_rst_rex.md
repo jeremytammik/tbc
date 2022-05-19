@@ -155,11 +155,13 @@ Cheers!
 
 ####<a name="6"></a> IsRebarInSection
 
-Finally, on [IsRebarInSection()](https://forums.autodesk.com/t5/revit-api-forum/isrebarinsection/td-p/11148854):
+Finally, on [`IsRebarInSection`](https://forums.autodesk.com/t5/revit-api-forum/isrebarinsection/td-p/11148854):
 
 **Question:** I have placed a set of rebars in a viewPlan that only has 1 segment:
 
-MiguelGT17_0-1651726217067.png
+<center>
+<img src="img/mg_isrebarinsection.png" alt="IsRebarInSection" title="IsRebarInSection" width="600"/> <!-- 1109 -->
+</center>
 
 I was expecting the `IsRebarInSection` method to return a `true` Boolean, as the rebars are shown as a cross section.
 If that is not the case, what does this method stand for, and which API method should I be looking up instead?
