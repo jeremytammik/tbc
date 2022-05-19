@@ -61,12 +61,11 @@ Miguel [MiguelGT17](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) that were very kindly answered
 by Stefan Dobre, ‪senior principal engineer of the Revit Structural development team:
 
-1. [GetCustomDistributionPath from RebarFreeFormAccessor](https://forums.autodesk.com/t5/revit-api-forum/getcustomdistributionpath-from-rebarfreeformaccessor/td-p/11148790)
-2. [Number of segments](https://forums.autodesk.com/t5/revit-api-forum/number-of-segments/td-p/11148840)
-3. [IsRebarInSection()](https://forums.autodesk.com/t5/revit-api-forum/isrebarinsection/td-p/11148854)
-
 <!--
-4. [AreElementsValidForMultiReferenceAnnotation](https://forums.autodesk.com/t5/revit-api-forum/areelementsvalidformultireferenceannotation/td-p/11148745)
+- [GetCustomDistributionPath from RebarFreeFormAccessor](https://forums.autodesk.com/t5/revit-api-forum/getcustomdistributionpath-from-rebarfreeformaccessor/td-p/11148790)
+- [Number of segments](https://forums.autodesk.com/t5/revit-api-forum/number-of-segments/td-p/11148840)
+- [IsRebarInSection()](https://forums.autodesk.com/t5/revit-api-forum/isrebarinsection/td-p/11148854)
+- [AreElementsValidForMultiReferenceAnnotation](https://forums.autodesk.com/t5/revit-api-forum/areelementsvalidformultireferenceannotation/td-p/11148745)
 -->
 
 He responded: After a quick look on these questions, I don't see any problems.
@@ -83,14 +82,14 @@ call [GetCustomDistributionPath from RebarFreeFormAccessor](https://forums.autod
 **Question:** Is there a way to group up rebars without using the `RebarContainer` command and loading the distribution path data?
 
 <center>
-<img src="img/mg_distributionpath_1.png" alt="Distribution path" title="Distribution path" width="100"/> <!--  -->
+<img src="img/mg_distributionpath_1.png" alt="Distribution path" title="Distribution path" width="600"/> <!-- 1345 -->
 </center>
 
 Furthermore, There is something strange going on when creating a rebar container.
 Its distribution path is not correlated to the actual true distribution path:
 
 <center>
-<img src="img/mg_distributionpath_1.png" alt="Distribution path" title="Distribution path" width="100"/> <!--  -->
+<img src="img/mg_distributionpath_1.png" alt="Distribution path" title="Distribution path" width="600"/> <!-- 1816 -->
 </center>
 
 **Answer to Question 1:** There are two types of Free Form rebar:
@@ -120,19 +119,19 @@ the [number of segments](https://forums.autodesk.com/t5/revit-api-forum/number-o
 **Question:** This set of rebars has been sketched as a free form.
 
 <center>
-<img src="img/mg_nr_segments_1.png" alt="Number of segments" title="Number of segments" width="100"/> <!--  -->
+<img src="img/mg_nr_segments_1.png" alt="Number of segments" title="Number of segments" width="600"/> <!-- 961 -->
 </center>
 
 RevitLookup shows a single segment for this bar:
 
 <center>
-<img src="img/mg_nr_segments_2.png" alt="Number of segments" title="Number of segments" width="100"/> <!--  -->
+<img src="img/mg_nr_segments_2.png" alt="Number of segments" title="Number of segments" width="600"/> <!-- 1720 -->
 </center>
 
 This is not true:
 
 <center>
-<img src="img/mg_nr_segments_3.png" alt="Number of segments" title="Number of segments" width="100"/> <!--  -->
+<img src="img/mg_nr_segments_3.png" alt="Number of segments" title="Number of segments" width="253"/> <!-- 253 -->
 </center>
 
 Moreover, the `IsRebarInSection(view)` command always return false, regardless of the view.
@@ -147,7 +146,7 @@ For more details on how the shape matching is working  you can have a look on th
 Rebar.IsRebarInSection(View view) returns true only if the view is a section or elevation and the view plane is cutting at least one of the rebar curves, false otherwise. This API function is the correspondent of this UI option:
 
 <center>
-<img src="img/mg_nr_segments_4.png" alt="IsRebarInSection" title="IsRebarInSection" width="100"/> <!--  -->
+<img src="img/mg_nr_segments_4.png" alt="IsRebarInSection" title="IsRebarInSection" width="600"/> <!-- 1915 -->
 </center>
 
 **Response:** Thanks for your prompt reply; my bad, I was not aware of those parameters.
