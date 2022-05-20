@@ -23,6 +23,16 @@ We ponder some structural rebar questions and the future of the REX structural R
 
 linkedin:
 
+We ponder some structural rebar questions and the future of the REX structural Revit extensions included with the #RevitAPI SDK
+
+https://autode.sk/rst_rex
+
+- Future of REX
+- Rebar API questions
+- GetCustomDistributionPath
+- Number of segments
+- IsRebarInSection...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -244,7 +254,6 @@ You can get the centerline curves like this:
 </pre>
 
 You will get only one line. If the line’s direction is parallel with view’s direction it means that the bar is shown as a cross section, false otherwise.
-
 
 <!-- 
 ####<a name="7"></a> AreElementsValidForMultiReferenceAnnotation
