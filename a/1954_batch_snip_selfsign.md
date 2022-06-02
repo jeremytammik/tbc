@@ -49,8 +49,6 @@ https://github.com/mayconrfreitas/RevitAPISnippets/tree/develop/Snippets/RevitAP
   Way to check if family is corrupt
   https://forums.autodesk.com/t5/revit-api-forum/way-to-check-if-family-is-corrupt/m-p/11174180
 
-
-
 twitter:
 
 the #RevitAPI SDK @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
@@ -107,3 +105,31 @@ elsewhere:
 **Answer:** 
 
 
+
+- tired of struggling with the Revit add-in security warning about an unsigned add-in saying, the publisher of this add-in could not be verified?
+KONRAD SOBON of [archi+lab](https://archi-lab.net) explains how
+to [Create a Self-signed Code Signing Certificate](https://archi-lab.net/creating-a-self-signed-code-signing-certificate) for free, valid for the next 17 years or so:
+> ... <i>[detailed explanation]</i> ... That’s it! That should create your PFX file that you can now use with signtool, and code sign your Revit plugins for free! This self signed code signing certificate won’t expire for another 17 years so you should be good to go for a while.
+Now, be aware of the fact that this self-signed code signing certificate is not the same as one issued to you by a 3rd party. I guess the level of “trust” here would be a little different, but in this particular case, I don’t think it matters to me. I am fed up with paying money to companies that have just atrocious customer support. If you are using these code signing certificates literally to just sign Revit plugins, then there is no reason to obtain one from a 3rd party and pay a hefty price for it on top of all the hoops that they will make you jump through.
+I hope this helps some of the AEC development community out there save some money and time.
+
+- main discussion forumthread on resolving this + other threads
+
+- thesde threads mentioined before?
+
+####<a name="5"></a> Revit API Code Snippet Repository
+
+Maycon Freitas, architect, Dynamo, Revit API Developer and Forge enthusiast at [Blossom Consult](https://www.blossomconsult.com),
+shares a new collection of Revit API code snippets and invites the community to join in:
+
+> I'm creating the [RevitAPISnippets GitHub repository](https://github.com/mayconrfreitas/RevitAPISnippets) to
+share Revit API code snippets with our Revit developer community.
+If you're interested in contributing somehow, I would really appreciate.
+The idea is to create an open source project to help developers to improve coding performance.
+
+More about this project in the two-and-a-half-minute video
+on [RevitAPISnippets: 170+ code lines in 2 minutes (Revit API)](https://youtu.be/moD7CYUkJHw).
+
+####<a name="5"></a> Batch Processing and Monitoring Progress
+
+[Way to check if family is corrupt](https://forums.autodesk.com/t5/revit-api-forum/way-to-check-if-family-is-corrupt/m-p/11174180)
