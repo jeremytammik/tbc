@@ -215,7 +215,7 @@ When you call cancel on the event it throws an exception for the calling method 
 
 You could as an alternative use the progress Position property but to get a percentage you need to divide the Position property by the UpperRange property. This approach doesn't seem as good as the regen caption approach because the percentages encountered are more random and not a good indicator of a pattern of repetition (would have to store more in an array to check against).
 
-<pre class="code">
+<pre class="prettyprint">
   Private IntRegenCount As Integer = 0
   
   Private Sub ProgressChanged(a As Object, e As Autodesk.Revit.DB.Events.ProgressChangedEventArgs)
@@ -266,7 +266,7 @@ The limit of T below often occurs first and seems to give adequate time allowanc
 
 For either case, you have to handle the DialogBoxShowing event to cancel the dialogue that appears after cancelling the progress changed event.
 
-<pre class="code">
+<pre class="prettyprint">
   Private IntProgressLog As Integer() = New Integer(20) {}
   
   Private Sub ProgressChanged(s As Object, e As Autodesk.Revit.DB.Events.ProgressChangedEventArgs)
