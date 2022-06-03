@@ -112,6 +112,11 @@ Picking up some specaly interesting topics from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
 elsewhere:
 
+- [Revit 2023 parameters service](#2)
+- [Roll your own verified publisher](#3)
+- [Revit API code snippet repository](#4)
+- [Batch processing and monitoring progress](#5)
+
 ####<a name="2"></a> Revit 2023 Parameters Service
 
 In Revit 2023, a new cloud-based parameters service is under evaluation.
