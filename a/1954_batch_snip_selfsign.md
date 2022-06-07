@@ -108,7 +108,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Parameters, Code Snippets, Batch Mode and Self-Signing
 
-Picking up some specaly interesting topics from
+Picking up some specialy interesting topics from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
 elsewhere:
 
