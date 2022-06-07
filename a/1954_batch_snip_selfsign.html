@@ -1,9 +1,8 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
-</head>
-
+<p></head></p>
 <!---
 
 - Revit 2023: Parameters Service
@@ -35,7 +34,7 @@
   3. If I have an older (from 2022) ForgeTypeId.TypeId value stored for a ParameterTypeId that has been renamed in the new version, will the new version of Revit know that it is equivalent to the one with the new name? 
   Specifically using the old value to create a ForgeTypeId and then either comparing it to one retrieved from a parameter definition using NameEquals(ForgeTypeId other) or use it to call Element.GetParameter(ForgeTypeId parameterTypeId)? 
   I understand the the older version of Revit won't know, but only having one direction to manage is better than both.
-  Dec 22, 2021 @ 3:30 PM	 
+  Dec 22, 2021 @ 3:30 PM     
   David Becroft
   The Factory
   Unified Parameters Service - INTERNAL
@@ -106,124 +105,95 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Parameters, Code Snippets, Batch Mode and Self-Signing
-
-Picking up some specialy interesting topics from
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
-elsewhere:
-
-- [Revit 2023 parameters service](#2)
-- [Roll your own verified publisher](#3)
-- [Revit API code snippet repository](#4)
-- [Batch processing and monitoring progress](#5)
-
-####<a name="2"></a> Revit 2023 Parameters Service
-
-In Revit 2023, a new cloud-based parameters service is under evaluation.
-
-Learn all about it in the two-and-a-half-minute video
-on [Revit 2023 Parameters Service](https://youtu.be/cRz7kQz88mA).
-
-> Manage your parameters library more efficiently across projects and locations using the Parameters Service with Revit and the Autodesk Construction Cloud
-
-It’s currently in a preview phase with no API, yet.
-API support will presumably be coming along after the evaluation phase.
-
-####<a name="3"></a> Roll Your Own Verified Publisher
-
-Are you getting tired of struggling with the Revit add-in security warning about an unsigned add-in saying, *the publisher of this add-in could not be verified*?
-
-Konrad Sobon of [archi+lab](https://archi-lab.net) explains how
-to [create a self-signed code signing certificate](https://archi-lab.net/creating-a-self-signed-code-signing-certificate) for yourself for free:
-
-> ... <i>[detailed explanation]</i> ... That’s it!
+<h3>Parameters, Code Snippets, Batch Mode and Self-Signing</h3>
+<p>Picking up some specialy interesting topics from
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> and
+elsewhere:</p>
+<ul>
+<li><a href="#2">Revit 2023 parameters service</a></li>
+<li><a href="#3">Roll your own verified publisher</a></li>
+<li><a href="#4">Revit API code snippet repository</a></li>
+<li><a href="#5">Batch processing and monitoring progress</a></li>
+</ul>
+<h4><a name="2"></a> Revit 2023 Parameters Service</h4>
+<p>In Revit 2023, a new cloud-based parameters service is under evaluation.</p>
+<p>Learn all about it in the two-and-a-half-minute video
+on <a href="https://youtu.be/cRz7kQz88mA">Revit 2023 Parameters Service</a>.</p>
+<blockquote>
+<p>Manage your parameters library more efficiently across projects and locations using the Parameters Service with Revit and the Autodesk Construction Cloud</p>
+</blockquote>
+<p>It’s currently in a preview phase with no API, yet.
+API support will presumably be coming along after the evaluation phase.</p>
+<h4><a name="3"></a> Roll Your Own Verified Publisher</h4>
+<p>Are you getting tired of struggling with the Revit add-in security warning about an unsigned add-in saying, <em>the publisher of this add-in could not be verified</em>?</p>
+<p>Konrad Sobon of <a href="https://archi-lab.net">archi+lab</a> explains how
+to <a href="https://archi-lab.net/creating-a-self-signed-code-signing-certificate">create a self-signed code signing certificate</a> for yourself for free:</p>
+<blockquote>
+<p>... <i>[detailed explanation]</i> ... That’s it!
 That should create your PFX file that you can now use with signtool, and code sign your Revit plugins for free!
 This self-signed code signing certificate won’t expire for another 17 years so you should be good to go for a while.
 Now, be aware of the fact that this self-signed code signing certificate is not the same as one issued to you by a 3rd party.
 I guess the level of “trust” here would be a little different, but in this particular case, I don’t think it matters to me.
 I am fed up with paying money to companies that have just atrocious customer support.
 If you are using these code signing certificates literally to just sign Revit plugins, then there is no reason to obtain one from a 3rd party and pay a hefty price for it on top of all the hoops that they will make you jump through.
-I hope this helps some of the AEC development community out there save some money and time.
-
-Thank you very much, Konrad for digging in so deep and sharing this very helpful approach!
-
-For the sake of completeness, you can also check out
-Konrad's previous post on [code signing of your Revit plug-ins](http://archi-lab.net/code-signing-of-your-revit-plug-ins),
-the main [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [Code signing of Revit Addins](https://forums.autodesk.com/t5/revit-api-forum/code-signing-of-revit-addins/m-p/5981560)
-and previous articles on this by The Building Coder:
-
+I hope this helps some of the AEC development community out there save some money and time.</p>
+</blockquote>
+<p>Thank you very much, Konrad for digging in so deep and sharing this very helpful approach!</p>
+<p>For the sake of completeness, you can also check out
+Konrad's previous post on <a href="http://archi-lab.net/code-signing-of-your-revit-plug-ins">code signing of your Revit plug-ins</a>,
+the main <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/code-signing-of-revit-addins/m-p/5981560">Code signing of Revit Addins</a>
+and previous articles on this by The Building Coder:</p>
 <ul>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2016/04/whats-new-in-the-revit-2017-api.html#2.4">What's New in the Revit 2017 API &ndash; Code signing of Revit Addins</a></li>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2016/09/trusted-signature-motivation-and-fishing.html#2">How Does Code Signing of Revit Add-Ins Increase Security?</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2020/09/code-signing-preview-and-element-type-predicates.html#2">Revit Add-In Code Signing YAML</a> to automate code signing in CI</li>
 </ul>
 
-####<a name="4"></a> Revit API Code Snippet Repository
-
-Maycon Freitas, architect, Dynamo, Revit API Developer and Forge enthusiast at [Blossom Consult](https://www.blossomconsult.com),
-shares a new collection of Revit API code snippets and invites the community to join in:
-
-> I'm creating the [RevitAPISnippets GitHub repository](https://github.com/mayconrfreitas/RevitAPISnippets) to
+<h4><a name="4"></a> Revit API Code Snippet Repository</h4>
+<p>Maycon Freitas, architect, Dynamo, Revit API Developer and Forge enthusiast at <a href="https://www.blossomconsult.com">Blossom Consult</a>,
+shares a new collection of Revit API code snippets and invites the community to join in:</p>
+<blockquote>
+<p>I'm creating the <a href="https://github.com/mayconrfreitas/RevitAPISnippets">RevitAPISnippets GitHub repository</a> to
 share Revit API code snippets with our Revit developer community.
 If you're interested in contributing somehow, I would really appreciate.
-The idea is to create an open source project to help developers to improve coding performance.
-
-More about this project in the two-and-a-half-minute video
-on [RevitAPISnippets: 170+ code lines in 2 minutes (Revit API)](https://youtu.be/moD7CYUkJHw).
-
-####<a name="5"></a> Batch Processing and Monitoring Progress
-
-Questions on batch processing BIMs come up on a regular basis, and surfaced again discussing 
-a [way to check if family is corrupt](https://forums.autodesk.com/t5/revit-api-forum/way-to-check-if-family-is-corrupt/m-p/11174180) with
-[pPhillip Miller](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/311888) and
-Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas:
-
-**Question:** I have a simple addon that iterates over all the families in a document and exports them to a folder amongst other things, using fam.`SaveAs(path, options)`.
-
-All works as expected until in the very rare case it hits a family that is corrupt.
+The idea is to create an open source project to help developers to improve coding performance.</p>
+</blockquote>
+<p>More about this project in the two-and-a-half-minute video
+on <a href="https://youtu.be/moD7CYUkJHw">RevitAPISnippets: 170+ code lines in 2 minutes (Revit API)</a>.</p>
+<h4><a name="5"></a> Batch Processing and Monitoring Progress</h4>
+<p>Questions on batch processing BIMs come up on a regular basis, and surfaced again discussing 
+a <a href="https://forums.autodesk.com/t5/revit-api-forum/way-to-check-if-family-is-corrupt/m-p/11174180">way to check if family is corrupt</a> with
+<a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/311888">pPhillip Miller</a> and
+Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas:</p>
+<p><strong>Question:</strong> I have a simple addon that iterates over all the families in a document and exports them to a folder amongst other things, using fam.<code>SaveAs(path, options)</code>.</p>
+<p>All works as expected until in the very rare case it hits a family that is corrupt.
 I know this doesn't happen often, but it does happen.
-When it hits a family like this there are no warning messages, doesn't crash, just hangs.
-
-My question: Is there a way that I can check for this situation or a way to skip on to the next family?
-
-**Answer:** I don't think so.
-
-You can't cancel the process either so also no possibility of setting a time limit. Only thing you could do is create a logging system where the last item that caused the issue along with those already exported up to that point can be skipped on the next run of the Add-in.
-
-For these kind of issues, all you can really do from an API developer perspective is get end user to open a support case with Autodesk regarding the attached project file (or you could open one).
-A brief review of the journal indicates an issue with many short curves.
-
-Regarding end user support case they can easily replicate the issue outside of the API by attempting to edit the family in the UI.
+When it hits a family like this there are no warning messages, doesn't crash, just hangs.</p>
+<p>My question: Is there a way that I can check for this situation or a way to skip on to the next family?</p>
+<p><strong>Answer:</strong> I don't think so.</p>
+<p>You can't cancel the process either so also no possibility of setting a time limit. Only thing you could do is create a logging system where the last item that caused the issue along with those already exported up to that point can be skipped on the next run of the Add-in.</p>
+<p>For these kind of issues, all you can really do from an API developer perspective is get end user to open a support case with Autodesk regarding the attached project file (or you could open one).
+A brief review of the journal indicates an issue with many short curves.</p>
+<p>Regarding end user support case they can easily replicate the issue outside of the API by attempting to edit the family in the UI.
 It seems to be getting stuck in a regeneration loop and may eventually resolve.
 I wouldn't classify it as document corruption because that tends to have an abrupt end, i.e., file would not open and error message would be shown in UI.
-Seems to be an issue with how Revit responds to a certain circumstance that the file causes, i.e., problem with Revit.
-
-**Response:** Thanks for your reply.
-
-It was what I thought but just wanted to make sure I wasn't missing anything.
-
-This is meant to be a totally automated process with no user interaction so is a bit of a shame I can't get around this catch and move on.  What I will have to do is set a timer and if there is a long period of time opening a family, pop up a message box of some sort to notify the user of the issue when they get back to their workstation.
-
-**Answer:** Should also mention the `ProgressChangedEventArgs.Cancel` of `Application.ProgressChanged`.
-
-This reports the progress of the little green bar that appears in the bottom left.
+Seems to be an issue with how Revit responds to a certain circumstance that the file causes, i.e., problem with Revit.</p>
+<p><strong>Response:</strong> Thanks for your reply.</p>
+<p>It was what I thought but just wanted to make sure I wasn't missing anything.</p>
+<p>This is meant to be a totally automated process with no user interaction so is a bit of a shame I can't get around this catch and move on.  What I will have to do is set a timer and if there is a long period of time opening a family, pop up a message box of some sort to notify the user of the issue when they get back to their workstation.</p>
+<p><strong>Answer:</strong> Should also mention the <code>ProgressChangedEventArgs.Cancel</code> of <code>Application.ProgressChanged</code>.</p>
+<p>This reports the progress of the little green bar that appears in the bottom left.
 This has a cancel button next to it that is available when opening a family.
-So, it may be possible to cancel via that if you spot a recurring pattern of progress as appears to happen with this family, e.g., how many times it goes to 25% after 50% etc.
-
-ProgressChangedEventArgs.Caption may also report `Regenerating`, so you could also count those and set limits on that.
-
-This all hinges on if ProgressChangedEventArgs.Cancel works, i.e., it works in the UI immediately for the family in question.
-
-Below is an example that seems to work well for English Language Revit.
-
-When you call cancel on the event it throws an exception for the calling method so you can catch that and move onto the next item. The below works by counting the occurrences of "Regenerating", a count of around 2200 is about right for that family (when it starts to loop).
-
-You could as an alternative use the progress Position property but to get a percentage you need to divide the Position property by the UpperRange property. This approach doesn't seem as good as the regen caption approach because the percentages encountered are more random and not a good indicator of a pattern of repetition (would have to store more in an array to check against).
-
+So, it may be possible to cancel via that if you spot a recurring pattern of progress as appears to happen with this family, e.g., how many times it goes to 25% after 50% etc.</p>
+<p>ProgressChangedEventArgs.Caption may also report <code>Regenerating</code>, so you could also count those and set limits on that.</p>
+<p>This all hinges on if ProgressChangedEventArgs.Cancel works, i.e., it works in the UI immediately for the family in question.</p>
+<p>Below is an example that seems to work well for English Language Revit.</p>
+<p>When you call cancel on the event it throws an exception for the calling method so you can catch that and move onto the next item. The below works by counting the occurrences of "Regenerating", a count of around 2200 is about right for that family (when it starts to loop).</p>
+<p>You could as an alternative use the progress Position property but to get a percentage you need to divide the Position property by the UpperRange property. This approach doesn't seem as good as the regen caption approach because the percentages encountered are more random and not a good indicator of a pattern of repetition (would have to store more in an array to check against).</p>
 <pre class="prettyprint">
   Private IntRegenCount As Integer = 0
-  
+
   Private Sub ProgressChanged(a As Object, e As Autodesk.Revit.DB.Events.ProgressChangedEventArgs)
     If e.Caption = "Regenerating" Then
       IntRegenCount += 1
@@ -264,17 +234,14 @@ You could as an alternative use the progress Position property but to get a perc
   End Function
 </pre>
 
-This below non-language dependant example appears to work also.
-In below I attempt to edit the problem family before moving on to a second family in the project file that does open.
-
-Again, you have to look at the numbers for variables N and T below.
-The limit of T below often occurs first and seems to give adequate time allowance to edit problem family.
-
-For either case, you have to handle the DialogBoxShowing event to cancel the dialogue that appears after cancelling the progress changed event.
-
+<p>This below non-language dependant example appears to work also.
+In below I attempt to edit the problem family before moving on to a second family in the project file that does open.</p>
+<p>Again, you have to look at the numbers for variables N and T below.
+The limit of T below often occurs first and seems to give adequate time allowance to edit problem family.</p>
+<p>For either case, you have to handle the DialogBoxShowing event to cancel the dialogue that appears after cancelling the progress changed event.</p>
 <pre class="prettyprint">
   Private IntProgressLog As Integer() = New Integer(20) {}
-  
+
   Private Sub ProgressChanged(s As Object, e As Autodesk.Revit.DB.Events.ProgressChangedEventArgs)
     Dim ULim As Double = e.UpperRange
     Dim Pos As Double = e.Position
@@ -329,26 +296,20 @@ For either case, you have to handle the DialogBoxShowing event to cancel the dia
   End Function
 </pre>
 
-**Answwer 2:** Following up on some of your initial thoughts, I would assume that this can be totally automated after all, like this:
-
-- Run an external Windows app that monitors progress and can kill Revit.exe by terminating the process via native OS calls
-- Loop through all the families and call SaveAs on each, logging progress to an external file (or wherever you like)
-- The log file helps keep track of where you are and where you need to proceed next
-- If the external file has not been updated for a while (a minute? ten minutes?), kill Revit.exe and restart with the next family to export, logging and skipping the corrupt one
-
-Sound feasible? It is a pretty standard approach to run a batch process.
+<p><strong>Answwer 2:</strong> Following up on some of your initial thoughts, I would assume that this can be totally automated after all, like this:</p>
+<ul>
+<li>Run an external Windows app that monitors progress and can kill Revit.exe by terminating the process via native OS calls</li>
+<li>Loop through all the families and call SaveAs on each, logging progress to an external file (or wherever you like)</li>
+<li>The log file helps keep track of where you are and where you need to proceed next</li>
+<li>If the external file has not been updated for a while (a minute? ten minutes?), kill Revit.exe and restart with the next family to export, logging and skipping the corrupt one</li>
+</ul>
+<p>Sound feasible? It is a pretty standard approach to run a batch process.
 Revit is not designed for batch processing dozens of files, let alone hundreds or thousands, so crashes of all kinds are to be expected, perfectly normal, and need to be handled gracefully by batch processing workflows.
-Check out [The Building Coder 'batch' category](https://thebuildingcoder.typepad.com/blog/batch).
-
-**Response:** Thank you so much.
-
-You have gone way above and beyond with providing examples etc, and I thank you for that.
-
-I'm back working on this project next week and I will let you know how I get on.
-
-Many thanks to Phillip for raising the issue and Richard for his indefatigable help.
-
-<center>
+Check out <a href="https://thebuildingcoder.typepad.com/blog/batch">The Building Coder 'batch' category</a>.</p>
+<p><strong>Response:</strong> Thank you so much.</p>
+<p>You have gone way above and beyond with providing examples etc, and I thank you for that.</p>
+<p>I'm back working on this project next week and I will let you know how I get on.</p>
+<p>Many thanks to Phillip for raising the issue and Richard for his indefatigable help.</p>
+<p><center>
 <img src="img/programming_progress_joke.png" alt="Programming progress" title="Programming progress" width="480"/> <!-- 960 -->
-</center>
-
+</center></p>
