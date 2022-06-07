@@ -356,6 +356,6 @@ I'm back working on this project next week and I will let you know how I get on.
 Many thanks to Phillip for raising the issue and Richard for his indefatigable help.
 
 <center>
-<img src="img/programming_progress_joke.png" alt="Programming progress" title="Programming progress" width="480"/> <!-- 960 -->
+<img src="img/programming_progress_joke.png" alt="Programming progress" title="Programming progress" width="400"/> <!-- 960 -->
 </center>
 
