@@ -88,10 +88,17 @@ https://github.com/mayconrfreitas/RevitAPISnippets/tree/develop/Snippets/RevitAP
 
 twitter:
 
+
 the #RevitAPI SDK @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash;
-...
+specially interesting topics from
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
+elsewhere:
+
+Test run the Revit 2023 parameters service cloud
+&ndash; Roll your own verified publisher
+&ndash; Revit API code snippet repository
+&ndash; Batch processing and monitoring progress...
 
 linkedin:
 
@@ -106,25 +113,25 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Parameters, Code Snippets, Batch Mode and Self-Signing
+### Parameters, Snippets, Batch Mode and Self-Signing
 
 Picking up some specially interesting topics from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
 elsewhere:
 
-- [Revit 2023 parameters service](#2)
+- [Revit 2023 parameters service cloud](#2)
 - [Roll your own verified publisher](#3)
 - [Revit API code snippet repository](#4)
 - [Batch processing and monitoring progress](#5)
 
-####<a name="2"></a> Revit 2023 Parameters Service
+####<a name="2"></a> Revit 2023 Parameters Service Cloud
 
 In Revit 2023, a new cloud-based parameters service is under evaluation.
 
 Learn all about it in the two-and-a-half-minute video
 on [Revit 2023 Parameters Service](https://youtu.be/cRz7kQz88mA).
 
-> Manage your parameters library more efficiently across projects and locations using the Parameters Service with Revit and the Autodesk Construction Cloud
+> Manage your parameters library more efficiently across projects and locations using the Parameters Service with Revit and the Autodesk Construction Cloud...
 
 It’s currently in a preview phase with no API, yet.
 API support will presumably be coming along after the evaluation phase.
