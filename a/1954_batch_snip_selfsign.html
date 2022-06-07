@@ -106,7 +106,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Parameters, Code Snippets, Batch Mode and Self-Signing</h3>
-<p>Picking up some specialy interesting topics from
+<p>Picking up some specially interesting topics from
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> and
 elsewhere:</p>
 <ul>
@@ -164,12 +164,12 @@ on <a href="https://youtu.be/moD7CYUkJHw">RevitAPISnippets: 170+ code lines in 2
 <h4><a name="5"></a> Batch Processing and Monitoring Progress</h4>
 <p>Questions on batch processing BIMs come up on a regular basis, and surfaced again discussing 
 a <a href="https://forums.autodesk.com/t5/revit-api-forum/way-to-check-if-family-is-corrupt/m-p/11174180">way to check if family is corrupt</a> with
-<a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/311888">pPhillip Miller</a> and
+<a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/311888">Phillip Miller</a> and
 Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas:</p>
-<p><strong>Question:</strong> I have a simple addon that iterates over all the families in a document and exports them to a folder amongst other things, using fam.<code>SaveAs(path, options)</code>.</p>
-<p>All works as expected until in the very rare case it hits a family that is corrupt.
-I know this doesn't happen often, but it does happen.
-When it hits a family like this there are no warning messages, doesn't crash, just hangs.</p>
+<p><strong>Question:</strong> I have a simple addon that iterates over all the families in a document and exports them to a folder amongst other things, using <code>fam.SaveAs(path, options)</code>.</p>
+<p>All works as expected until the very rare case when it hits a family that is corrupt.
+This doesn't happen often, but it does happen.
+When it hits such a family there are no warning messages, doesn't crash, just hangs.</p>
 <p>My question: Is there a way that I can check for this situation or a way to skip on to the next family?</p>
 <p><strong>Answer:</strong> I don't think so.</p>
 <p>You can't cancel the process either so also no possibility of setting a time limit. Only thing you could do is create a logging system where the last item that caused the issue along with those already exported up to that point can be skipped on the next run of the Add-in.</p>
@@ -296,7 +296,7 @@ The limit of T below often occurs first and seems to give adequate time allowanc
   End Function
 </pre>
 
-<p><strong>Answwer 2:</strong> Following up on some of your initial thoughts, I would assume that this can be totally automated after all, like this:</p>
+<p><strong>Answer 2:</strong> Following up on some of your initial thoughts, I would assume that this can be totally automated after all, like this:</p>
 <ul>
 <li>Run an external Windows app that monitors progress and can kill Revit.exe by terminating the process via native OS calls</li>
 <li>Loop through all the families and call SaveAs on each, logging progress to an external file (or wherever you like)</li>

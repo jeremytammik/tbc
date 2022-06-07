@@ -108,7 +108,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Parameters, Code Snippets, Batch Mode and Self-Signing
 
-Picking up some specialy interesting topics from
+Picking up some specially interesting topics from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
 elsewhere:
 
@@ -176,14 +176,14 @@ on [RevitAPISnippets: 170+ code lines in 2 minutes (Revit API)](https://youtu.be
 
 Questions on batch processing BIMs come up on a regular basis, and surfaced again discussing 
 a [way to check if family is corrupt](https://forums.autodesk.com/t5/revit-api-forum/way-to-check-if-family-is-corrupt/m-p/11174180) with
-[pPhillip Miller](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/311888) and
+[Phillip Miller](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/311888) and
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas:
 
-**Question:** I have a simple addon that iterates over all the families in a document and exports them to a folder amongst other things, using fam.`SaveAs(path, options)`.
+**Question:** I have a simple addon that iterates over all the families in a document and exports them to a folder amongst other things, using `fam.SaveAs(path, options)`.
 
-All works as expected until in the very rare case it hits a family that is corrupt.
-I know this doesn't happen often, but it does happen.
-When it hits a family like this there are no warning messages, doesn't crash, just hangs.
+All works as expected until the very rare case when it hits a family that is corrupt.
+This doesn't happen often, but it does happen.
+When it hits such a family there are no warning messages, doesn't crash, just hangs.
 
 My question: Is there a way that I can check for this situation or a way to skip on to the next family?
 
@@ -329,7 +329,7 @@ For either case, you have to handle the DialogBoxShowing event to cancel the dia
   End Function
 </pre>
 
-**Answwer 2:** Following up on some of your initial thoughts, I would assume that this can be totally automated after all, like this:
+**Answer 2:** Following up on some of your initial thoughts, I would assume that this can be totally automated after all, like this:
 
 - Run an external Windows app that monitors progress and can kill Revit.exe by terminating the process via native OS calls
 - Loop through all the families and call SaveAs on each, logging progress to an external file (or wherever you like)
