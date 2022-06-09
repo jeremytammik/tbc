@@ -118,6 +118,7 @@ elsewhere:</p>
 <ul>
 <li><a href="#2">Revit 2023 parameters service cloud</a></li>
 <li><a href="#3">Roll your own verified publisher</a></li>
+<li><a href="#3b">Reset the unsigned add-in security warning</a></li>
 <li><a href="#4">Revit API code snippet repository</a></li>
 <li><a href="#5">Batch processing and monitoring progress</a></li>
 </ul>
@@ -156,6 +157,29 @@ and previous articles on this by The Building Coder:</p>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2020/09/code-signing-preview-and-element-type-predicates.html#2">Revit Add-In Code Signing YAML</a> to automate code signing in CI</li>
 </ul>
 
+<h4><a name="3b"></a> Reset the Unsigned Add-In Security Warning</h4>
+<p>If, on the contrary, you wish to see the message, and accidentally disabled it, Eatrevitpoopcad's discovery how 
+to <a href="https://forums.autodesk.com/t5/revit-api-forum/reset-the-unsigned-add-in-security-warning/td-p/11090662">reset the unsigned add-in security warning</a> will
+come in useful:</p>
+<p><strong>Question:</strong> Does anyone know how to reset the security warning Revit gives you when loading unsigned add-ins?</p>
+<p>After you click <em>Always Load</em> and you never see it again?</p>
+<p>Let's say I pressed <em>Always Load</em> and then changed my mind and would like to keep seeing that message:</p>
+<p><center>
+<img src="img/unsigned_addin_warning_message.png" alt="Unsigned add-in security warning message" title="Unsigned add-in security warning message" width="575"/> <!-- 575 -->
+</center></p>
+<p><strong>Answer:</strong> I found it in the registry!</p>
+<p>Here is how to reset code signing warnings:</p>
+<ul>
+<li>Go to START </li>
+<li>Enter REGEDIT</li>
+<li>Go to the following registry key:
+  <em>HKEY_CURRENT_USER\SOFTWARE\Autodesk\Revit\Autodesk Revit 2022\CodeSigning</em></li>
+</ul>
+<p>You will see a bunch of GUID value names with data values 0 or 1.
+Each one is for a different plugin you codesigned.
+Select them all and delete them.</p>
+<p>This is for Revit 2022; for other versions of Revit, go up a folder and pick the Revit version for which you would like to clear code signing entries.</p>
+<p>Many thanks to Eatrevitpoopcad for sharing this!</p>
 <h4><a name="4"></a> Revit API Code Snippet Repository</h4>
 <p>Maycon Freitas, architect, Dynamo, Revit API Developer and Forge enthusiast at <a href="https://www.blossomconsult.com">Blossom Consult</a>,
 shares a new collection of Revit API code snippets and invites the community to join in:</p>
