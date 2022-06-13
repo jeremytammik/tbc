@@ -121,6 +121,7 @@ elsewhere:
 - [Revit 2023 parameters service cloud](#2)
 - [Roll your own verified publisher](#3)
 - [Reset the unsigned add-in security warning](#3b)
+- [Remove the code signing certificate](#3c)
 - [Revit API code snippet repository](#4)
 - [Batch processing and monitoring progress](#5)
 
@@ -199,6 +200,23 @@ This is for Revit 2022; for other versions of Revit, go up a folder and pick the
 
 Many thanks to Eatrevitpoopcad for sharing this!
 
+####<a name="3c"></a> Remove the Code Signing Certificate
+
+Matthew Taylor adds:
+
+If you want to completely remove the code signing certificate, you can follow these steps:
+
+- From a cmd prompt, run MMC, the Microsoft Management Console. 
+  You may also type MMC after bringing up the Windows ‘Start’ menu.
+- File &gt; Add/Remove Snap-in... &gt; Certificates &gt; Add &gt; My user account &gt; Okay.
+- Navigate to Certificates - Current User &gt; Trusted Publishers &gt; Certificates.
+- You should now see a list of signatures.
+- Proceed with extreme caution.
+- To delete a certificate, just right-click &gt; Delete.
+- To close the console: File &gt; Close &gt; No.
+
+Thank you, Matt!
+
 ####<a name="4"></a> Revit API Code Snippet Repository
 
 Maycon Freitas, architect, Dynamo, Revit API Developer and Forge enthusiast at [Blossom Consult](https://www.blossomconsult.com),
@@ -243,7 +261,8 @@ Seems to be an issue with how Revit responds to a certain circumstance that the 
 
 It was what I thought but just wanted to make sure I wasn't missing anything.
 
-This is meant to be a totally automated process with no user interaction so is a bit of a shame I can't get around this catch and move on.  What I will have to do is set a timer and if there is a long period of time opening a family, pop up a message box of some sort to notify the user of the issue when they get back to their workstation.
+This is meant to be a totally automated process with no user interaction so is a bit of a shame I can't get around this catch and move on.
+What I will have to do is set a timer and if there is a long period of time opening a family, pop up a message box of some sort to notify the user of the issue when they get back to their workstation.
 
 **Answer:** Should also mention the `ProgressChangedEventArgs.Cancel` of `Application.ProgressChanged`.
 

@@ -119,6 +119,7 @@ elsewhere:</p>
 <li><a href="#2">Revit 2023 parameters service cloud</a></li>
 <li><a href="#3">Roll your own verified publisher</a></li>
 <li><a href="#3b">Reset the unsigned add-in security warning</a></li>
+<li><a href="#3c">Remove the code signing certificate</a></li>
 <li><a href="#4">Revit API code snippet repository</a></li>
 <li><a href="#5">Batch processing and monitoring progress</a></li>
 </ul>
@@ -180,6 +181,20 @@ Each one is for a different plugin you codesigned.
 Select them all and delete them.</p>
 <p>This is for Revit 2022; for other versions of Revit, go up a folder and pick the Revit version for which you would like to clear code signing entries.</p>
 <p>Many thanks to Eatrevitpoopcad for sharing this!</p>
+<h4><a name="3c"></a> Remove the Code Signing Certificate</h4>
+<p>Matthew Taylor adds:</p>
+<p>If you want to completely remove the code signing certificate, you can follow these steps:</p>
+<ul>
+<li>From a cmd prompt, run MMC, the Microsoft Management Console. 
+  You may also type MMC after bringing up the Windows ‘Start’ menu.</li>
+<li>File &gt; Add/Remove Snap-in... &gt; Certificates &gt; Add &gt; My user account &gt; Okay.</li>
+<li>Navigate to Certificates - Current User &gt; Trusted Publishers &gt; Certificates.</li>
+<li>You should now see a list of signatures.</li>
+<li>Proceed with extreme caution.</li>
+<li>To delete a certificate, just right-click &gt; Delete.</li>
+<li>To close the console: File &gt; Close &gt; No.</li>
+</ul>
+<p>Thank you, Matt!</p>
 <h4><a name="4"></a> Revit API Code Snippet Repository</h4>
 <p>Maycon Freitas, architect, Dynamo, Revit API Developer and Forge enthusiast at <a href="https://www.blossomconsult.com">Blossom Consult</a>,
 shares a new collection of Revit API code snippets and invites the community to join in:</p>
@@ -211,7 +226,8 @@ I wouldn't classify it as document corruption because that tends to have an abru
 Seems to be an issue with how Revit responds to a certain circumstance that the file causes, i.e., problem with Revit.</p>
 <p><strong>Response:</strong> Thanks for your reply.</p>
 <p>It was what I thought but just wanted to make sure I wasn't missing anything.</p>
-<p>This is meant to be a totally automated process with no user interaction so is a bit of a shame I can't get around this catch and move on.  What I will have to do is set a timer and if there is a long period of time opening a family, pop up a message box of some sort to notify the user of the issue when they get back to their workstation.</p>
+<p>This is meant to be a totally automated process with no user interaction so is a bit of a shame I can't get around this catch and move on.
+What I will have to do is set a timer and if there is a long period of time opening a family, pop up a message box of some sort to notify the user of the issue when they get back to their workstation.</p>
 <p><strong>Answer:</strong> Should also mention the <code>ProgressChangedEventArgs.Cancel</code> of <code>Application.ProgressChanged</code>.</p>
 <p>This reports the progress of the little green bar that appears in the bottom left.
 This has a cancel button next to it that is available when opening a family.
