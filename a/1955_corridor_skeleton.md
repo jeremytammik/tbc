@@ -123,8 +123,9 @@ I read more about Straight skeleton.
 It led me to Medial Axis, which is basically the centerlines that we are talking about.
 There are a few algorithms to calculate Medial Axis, e.g.,
 to [find medial axis of a polygon using C#](https://stackoverflow.com/questions/1069523/find-medial-axis-of-a-polygon-using-c-sharp).
-But this seems quite time consuming, and for now I am adhering to Kiss! :-)
-Thanks @jeremy.tammik  and @mhannonQ65N2 for your inputs. 
+But this seems quite time consuming, and for now I am adhering
+to [Kiss](https://en.wikipedia.org/wiki/KISS_principle)! :-)
+Thanks @jeremy.tammik and @mhannonQ65N2 for your inputs. 
 
 Here is the Method which returns the list of pairs of vertices which are 'nearby'.
 
