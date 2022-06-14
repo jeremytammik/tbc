@@ -15,14 +15,10 @@ twitter:
 
  in the #RevitAPI SDK @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/paramcloud
 
-
-
 &ndash; 
 ...
 
 linkedin:
-
-
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -39,9 +35,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Today, we highlight an urgent request for feedback from the Revit development team and an especially interesting thread from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
-
-
-
 
 ####<a name="2"></a> New Copy and Paste API Feedback
 
@@ -71,94 +64,69 @@ to [Help us test the enhanced Copy API for Sketch Members!](https://forums.autod
 
 ####<a name="3"></a> Corridor Skeleton
 
-[get room centerlines and intersections for corridors and passages]
-https://forums.autodesk.com/t5/revit-api-forum/get-room-centerline-s-and-intersections-for-corridors-passage/m-p/11216756
+An exciting discussion ensued in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread on how 
+to [get room centerlines and intersections for corridors and passages](https://forums.autodesk.com/t5/revit-api-forum/get-room-centerline-s-and-intersections-for-corridors-passage/m-p/11216756):
 
-
-Participant amrut.modani.wwi 159 Views, 7 Replies
-‎2022-06-02 11:13 PM 
-Get room centerline(s) and intersections (For corridors/passage type rooms)
-How do I get the centerlines of a single room shown below?
+**Question:** How do I get the centerlines of a single room shown below?
 I know one way is to divide the room manually into rectangular rooms with additional room separation lines, that way I can just use bounding boxes and get individual center lines.
 But how Do I approach this for a single room with multiple turns/crossing/intersection??
-Thanks in advance 🙂
-amrutmodaniwwi_0-1654236487105.png
 
-corridor_centerline_1.png 1117
+<center>
+<img src="img/corridor_centerline_1.png" alt="Corridor centerline" title="Corridor centerline" width="600"/> <!-- 1117 -->
+</center>
 
+**Answer:** This sounds like an interesting computational algebra task.
+I would suggest doing some purely geometrical research completely disconnected from Revit and BIM, to start with.
+Initially, I thought that
+an [alpha shape](https://en.wikipedia.org/wiki/Alpha_shape) might
+be useful for you, but just looking at the picture,
+the [minimum spanning tree](https://en.wikipedia.org/wiki/Minimum_spanning_tree) looks more like your goal.
 
-jeremy.tammik
- Employee jeremy.tammik in reply to: amrut.modani.wwi
-‎2022-06-03 12:21 AM 
-This sounds like an interesting computational algebra task. I would suggest doing some purely geometrical research completely disconnected from Revit and BIM, to start with. Initially, I thought that an alpha shape might be useful for you, but just looking at the picture, the minimal spanning tree looks more like your goal:
+**Response:** Thanks for the Alpha Shape suggestion.
+That is what I am ultimately looking for.
+It's also called Concave hull in some forums.
 
-  
+I went through the steps where one has to vary the 'Alpha' to get the desired outcome which is basically the radius of the circle getting used in the algorithm.
 
-https://en.wikipedia.org/wiki/Alpha_shape
-
-  
-
-Please let us know how it goes for you. I'll be happy to continue discussing this a bit more...
-
-  
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 8
-amrut.modani.wwi
- Participant amrut.modani.wwi in reply to: jeremy.tammik
-‎2022-06-03 05:23 AM 
- 
-Thanks for the Alpha Shape suggestion. That is what I am ultimately looking for. It's also called Concave hull in some forums.
-I went through the steps where one has to vary the 'Alpha' to get the desired outcome which is basically the radius of the circle getting used in the algorithm. (Link for reference: https://stackoverflow.com/questions/16625063/alpha-shape-concave-hull-algorithm-in-c-sharp).
+I looked at this [alpha shape (concave hull) algorithm in C#](https://stackoverflow.com/questions/16625063/alpha-shape-concave-hull-algorithm-in-c-sharp).
 I definitely want to implement this for my case.
-
 
 Meanwhile, me being lazy, I figured out an easy way to solve my particular problem.
 
- 
+I used part of
+your [Revit API code for convex hull](https://thebuildingcoder.typepad.com/blog/2016/08/online-revit-api-docs-and-convex-hull.html#3) to
+get the vertices of the room. 
+This is necessary, as there are multiple boundary segments when there is an overlapping room separation line, a door in the wall, etc.
+Instead of calculating the convex hull, I just iterated over those resulting vertices, and determined the pair of points which are 'nearby'.
+As the corridor width is fairly standard, I could just define my own suitable 'nearby' tolerance.
+Then, I just calculate the center of the pairs, and that basically provides the centerline vertices.
 
-I used part of your code from for convex hull. (https://thebuildingcoder.typepad.com/blog/2016/08/online-revit-api-docs-and-convex-hull.html#3) to get the vertices of the room (this is necessary as there are multiple boundary segments when there is an overlapping room separation line/ a door in the wall, etc).
-Instead of calculating convex hull, I just iterated over those vertices, and got the pair of points which are 'nearby' (As the corridor width is fairly standard, I could just define the 'nearby' tolerance). Then I just calculate the center of the pairs, and can basically get centerlines.
+<center>
+<img src="img/corridor_centerline_2.png" alt="Corridor centerline" title="Corridor centerline" width="600"/> <!-- 1135 -->
+</center>
 
-amrutmodaniwwi_0-1654259004371.png
+I understand this is just a temporary and lazy solution that only works for my case.
+I intend to implement the Alpha shape (concave hull) algorithm over the weekend. 
 
-corridor_centerline_2.png 1135
+**Answer:** The simpler the better.
+[Kiss](https://en.wikipedia.org/wiki/KISS_principle)!
+I love your pragmatic closest-point-pair approach.
+Thank you very much for sharing that, and looking forward to the alpha shape results.
+Happy, fruitful weekend and successful coding!
 
+**Answer2:** I think a [straight skeleton](https://en.wikipedia.org/wiki/Straight_skeleton),
+or some other topological skeleton, would work much better than an alpha shape for your situation.
 
-I understand this is just a temporary and lazy solution that only works for my case. I intend to implement Alpha shape (concave hull) algorithm over the weekend. I'll reply here once I implement it.
-
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 8
-jeremy.tammik
- Employee jeremy.tammik in reply to: amrut.modani.wwi
-‎2022-06-03 07:43 AM 
-The simpler the better. Kiss! I love your pragmatic point-pair approach. Thank you very much for sharing that, and looking forward to the alpha shape results. Happy, fruitful weekend and successful coding!
-
-  
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 8
-mhannonQ65N2
- Advocate mhannonQ65N2 in reply to: amrut.modani.wwi
-‎2022-06-03 01:29 PM 
-I think a straight skeleton, or some other topological skeleton, would work much better than an alpha shape for your situation.
-
-
-**Response:**
-
-So I was implementing Alpha shape for this polygon; and halfway through, I realized that it is already an Alpha shape. 😶
-I read more about Straight skeleton. It led me to Medial Axis. Which is basically the centerlines that we are talking about. There are few algorithms to calculate Medial Axis, (One way: https://stackoverflow.com/questions/1069523/find-medial-axis-of-a-polygon-using-c-sharp). But this seems quite time consuming and for now I am adhering to Kiss! 🙂
+**Response:** So, I was implementing Alpha shape for this polygon; halfway through, I realized that already is an Alpha shape. :-)
+I read more about Straight skeleton.
+It led me to Medial Axis, which is basically the centerlines that we are talking about.
+There are a few algorithms to calculate Medial Axis, e.g.,
+to [find medial axis of a polygon using C#](https://stackoverflow.com/questions/1069523/find-medial-axis-of-a-polygon-using-c-sharp).
+But this seems quite time consuming, and for now I am adhering to Kiss! :-)
 Thanks @jeremy.tammik  and @mhannonQ65N2 for your inputs. 
 
-Here is the Method which returns the List of pairs of vertices which are 'nearby'.
+Here is the Method which returns the list of pairs of vertices which are 'nearby'.
 
 Note: This only works when the corridor width is around 1500mm (which is design standard in my firm). For larger width, we can vary the 'tolerance' variable. Also, the length of a single branch/ junction is not less than 2550mm. Otherwise it'll return additional pairs. Which is more or less fine as the center points of those pairs will also lie on the Medial Axis (corridor centerline)
 
@@ -247,30 +215,6 @@ Helper method to check whether points are collinear, used to skip collinear boun
   }
 </pre>
 
-####<a name="3"></a> 
-
-####<a name="3b"></a> 
-
-
-**Question:** 
-
-<center>
-<img src="img/.png" alt="" title="" width="575"/> <!-- 575 -->
-</center>
-
-**Answer:** 
-
-Many thanks to 
-
-for sharing this!
-
-####<a name="4"></a> 
-
-####<a name="5"></a> 
-
-<pre class="prettyprint">
-
-  
-</pre>
+Many thanks to @amrut.modani.wwi for raising this and sharing his nice approach!
 
 
