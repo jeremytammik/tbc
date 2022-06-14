@@ -37,14 +37,39 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Corridor Skeleton
 
-Picking up some specially interesting topics from
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
-elsewhere:
+Today, we highlight an urgent request for feedback from the Revit development team and an especially interesting thread from
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
 
 
 
 
-####<a name="2"></a> 
+####<a name="2"></a> New Copy and Paste API Feedback
+
+The developement team is working on an update to the Copy/Paste API and would love to get some feedback on that via the Revit Prerelease forum.
+
+Unfortunately, no add-in deverloper input was received during the merry month of May.
+
+The June Preview Release will become available to users on June 15th.
+
+The development team announced the Copy/Paste API enhancement and request feedback on it in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread asking 
+to [Help us test the enhanced Copy API for Sketch Members!](https://forums.autodesk.com/t5/revit-api-forum/june-preview-release-help-us-test-the-enhanced-copy-api-for/td-p/11234171)
+
+> June Preview Release: 
+
+> If you are a participant in the Revit beta program, please check out this month's preview release!
+
+> We have an enhanced API to better support Copy-Paste of Sketch members and would like your feedback on it.
+
+> We’ve made Copy-Pasting of Sketch members in API more consistent with UI, and in the process fixed multiple bugs.
+
+> Find the summary of changes and code samples to try out the new functionality on our Preview Release Forum.
+
+> Apply for access at [revit.preview.access@autodesk.com](mailto:revit.preview.access@autodesk.com).
+
+> For any For all questions or concerns you might have, please us at [feedback.autodesk.com](mailto:feedback.autodesk.com).
+
+####<a name="3"></a> Corridor Skeleton
 
 [get room centerlines and intersections for corridors and passages]
 https://forums.autodesk.com/t5/revit-api-forum/get-room-centerline-s-and-intersections-for-corridors-passage/m-p/11216756
