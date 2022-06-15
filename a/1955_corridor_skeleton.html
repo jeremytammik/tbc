@@ -1,9 +1,8 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
-</head>
-
+<p></head></p>
 <!---
 
 - alpha shape
@@ -31,101 +30,77 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Corridor Skeleton
-
-Today, we highlight an urgent request for feedback from the Revit development team and an especially interesting thread from
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
-
-- [Copy and paste API Feedback](#2)
-- [Corridor skeleton](#3)
-
-####<a name="2"></a> Copy and Paste API Feedback
-
-The development team announced the Copy/Paste API enhancement and request feedback on it in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread asking 
-to [help us test the enhanced Copy API for sketch members!](https://forums.autodesk.com/t5/revit-api-forum/june-preview-release-help-us-test-the-enhanced-copy-api-for/td-p/11234171)
-
-> If you are a participant in the Revit beta program, please check out this month's June preview release!
-
-> We have an enhanced API to better support Copy-Paste of Sketch members and would like your feedback on it.
-
-> We’ve made Copy-Pasting of Sketch members in API more consistent with UI, and in the process fixed multiple bugs.
-
-> Find the summary of changes and code samples to try out the new functionality on our Preview Release Forum.
-
-> Apply for access at [revit.preview.access@autodesk.com](mailto:revit.preview.access@autodesk.com).
-
-> For any For all questions or concerns you might have, please us at [feedback.autodesk.com](mailto:feedback.autodesk.com).
- 
-####<a name="3"></a> Corridor Skeleton
-
-An exciting discussion ensued in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread on how 
-to [get room centerlines and intersections for corridors and passages](https://forums.autodesk.com/t5/revit-api-forum/get-room-centerline-s-and-intersections-for-corridors-passage/m-p/11216756):
-
-**Question:** How do I get the centerlines of a single room shown below?
+<h3>Corridor Skeleton</h3>
+<p>Today, we highlight an urgent request for feedback from the Revit development team and an especially interesting thread from
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>:</p>
+<ul>
+<li><a href="#2">Copy and paste API Feedback</a></li>
+<li><a href="#3">Corridor skeleton</a></li>
+</ul>
+<h4><a name="2"></a> Copy and Paste API Feedback</h4>
+<p>The development team announced the Copy/Paste API enhancement and request feedback on it in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread asking 
+to <a href="https://forums.autodesk.com/t5/revit-api-forum/june-preview-release-help-us-test-the-enhanced-copy-api-for/td-p/11234171">help us test the enhanced Copy API for sketch members!</a></p>
+<blockquote>
+<p>If you are a participant in the Revit beta program, please check out this month's June preview release!</p>
+<p>We have an enhanced API to better support Copy-Paste of Sketch members and would like your feedback on it.</p>
+<p>We’ve made Copy-Pasting of Sketch members in API more consistent with UI, and in the process fixed multiple bugs.</p>
+<p>Find the summary of changes and code samples to try out the new functionality on our Preview Release Forum.</p>
+<p>Apply for access at <a href="mailto:revit.preview.access@autodesk.com">revit.preview.access@autodesk.com</a>.</p>
+<p>For any For all questions or concerns you might have, please us at <a href="mailto:feedback.autodesk.com">feedback.autodesk.com</a>.</p>
+</blockquote>
+<h4><a name="3"></a> Corridor Skeleton</h4>
+<p>An exciting discussion ensued in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread on how 
+to <a href="https://forums.autodesk.com/t5/revit-api-forum/get-room-centerline-s-and-intersections-for-corridors-passage/m-p/11216756">get room centerlines and intersections for corridors and passages</a>:</p>
+<p><strong>Question:</strong> How do I get the centerlines of a single room shown below?
 I know one way is to divide the room manually into rectangular rooms with additional room separation lines, that way I can just use bounding boxes and get individual center lines.
-But how Do I approach this for a single room with multiple turns/crossing/intersection??
-
-<center>
+But how Do I approach this for a single room with multiple turns/crossing/intersection??</p>
+<p><center>
 <img src="img/corridor_centerline_1.png" alt="Corridor centerline" title="Corridor centerline" width="400"/> <!-- 1117 -->
-</center>
-
-**Answer:** This sounds like an interesting computational algebra task.
+</center></p>
+<p><strong>Answer:</strong> This sounds like an interesting computational algebra task.
 I would suggest doing some purely geometrical research completely disconnected from Revit and BIM, to start with.
 Initially, I thought that
-an [alpha shape](https://en.wikipedia.org/wiki/Alpha_shape) might
+an <a href="https://en.wikipedia.org/wiki/Alpha_shape">alpha shape</a> might
 be useful for you, but just looking at the picture,
-the [minimum spanning tree](https://en.wikipedia.org/wiki/Minimum_spanning_tree) looks more like your goal.
-
-**Response:** Thanks for the Alpha Shape suggestion.
+the <a href="https://en.wikipedia.org/wiki/Minimum_spanning_tree">minimum spanning tree</a> looks more like your goal.</p>
+<p><strong>Response:</strong> Thanks for the Alpha Shape suggestion.
 That is what I am ultimately looking for.
-It's also called Concave hull in some forums.
-
-I went through the steps where one has to vary the 'Alpha' to get the desired outcome which is basically the radius of the circle getting used in the algorithm.
-
-I looked at this [alpha shape (concave hull) algorithm in C#](https://stackoverflow.com/questions/16625063/alpha-shape-concave-hull-algorithm-in-c-sharp).
-I definitely want to implement this for my case.
-
-Meanwhile, me being lazy, I figured out an easy way to solve my particular problem.
-
-I used part of
-your [Revit API code for convex hull](https://thebuildingcoder.typepad.com/blog/2016/08/online-revit-api-docs-and-convex-hull.html#3) to
+It's also called Concave hull in some forums.</p>
+<p>I went through the steps where one has to vary the 'Alpha' to get the desired outcome which is basically the radius of the circle getting used in the algorithm.</p>
+<p>I looked at this <a href="https://stackoverflow.com/questions/16625063/alpha-shape-concave-hull-algorithm-in-c-sharp">alpha shape (concave hull) algorithm in C#</a>.
+I definitely want to implement this for my case.</p>
+<p>Meanwhile, me being lazy, I figured out an easy way to solve my particular problem.</p>
+<p>I used part of
+your <a href="https://thebuildingcoder.typepad.com/blog/2016/08/online-revit-api-docs-and-convex-hull.html#3">Revit API code for convex hull</a> to
 get the vertices of the room. 
 This is necessary, as there are multiple boundary segments when there is an overlapping room separation line, a door in the wall, etc.
 Instead of calculating the convex hull, I just iterated over those resulting vertices, and determined the pair of points which are 'nearby'.
 As the corridor width is fairly standard, I could just define my own suitable 'nearby' tolerance.
-Then, I just calculate the center of the pairs, and that basically provides the centerline vertices.
-
-<center>
+Then, I just calculate the center of the pairs, and that basically provides the centerline vertices.</p>
+<p><center>
 <img src="img/corridor_centerline_2.png" alt="Corridor centerline" title="Corridor centerline" width="400"/> <!-- 1135 -->
-</center>
-
-I understand this is just a temporary and lazy solution that only works for my case.
-I intend to implement the Alpha shape (concave hull) algorithm over the weekend. 
-
-**Answer:** The simpler the better.
-[Kiss](https://en.wikipedia.org/wiki/KISS_principle)!
+</center></p>
+<p>I understand this is just a temporary and lazy solution that only works for my case.
+I intend to implement the Alpha shape (concave hull) algorithm over the weekend. </p>
+<p><strong>Answer:</strong> The simpler the better.
+<a href="https://en.wikipedia.org/wiki/KISS_principle">Kiss</a>!
 I love your pragmatic closest-point-pair approach.
 Thank you very much for sharing that, and looking forward to the alpha shape results.
-Happy, fruitful weekend and successful coding!
-
-**Answer2:** I think a [straight skeleton](https://en.wikipedia.org/wiki/Straight_skeleton),
-or some other topological skeleton, would work much better than an alpha shape for your situation.
-
-**Response:** So, I was implementing Alpha shape for this polygon; halfway through, I realized that already is an Alpha shape. :-)
+Happy, fruitful weekend and successful coding!</p>
+<p><strong>Answer2:</strong> I think a <a href="https://en.wikipedia.org/wiki/Straight_skeleton">straight skeleton</a>,
+or some other topological skeleton, would work much better than an alpha shape for your situation.</p>
+<p><strong>Response:</strong> So, I was implementing Alpha shape for this polygon; halfway through, I realized that already is an Alpha shape. :-)
 I read more about Straight skeleton.
 It led me to Medial Axis, which is basically the centerlines that we are talking about.
 There are a few algorithms to calculate Medial Axis, e.g.,
-to [find medial axis of a polygon using C#](https://stackoverflow.com/questions/1069523/find-medial-axis-of-a-polygon-using-c-sharp).
+to <a href="https://stackoverflow.com/questions/1069523/find-medial-axis-of-a-polygon-using-c-sharp">find medial axis of a polygon using C#</a>.
 But this seems quite time consuming, and for now I am adhering
-to [Kiss](https://en.wikipedia.org/wiki/KISS_principle)! :-)
-Thanks @jeremy.tammik and @mhannonQ65N2 for your inputs. 
-
-Here is the Method which returns the list of pairs of vertices which are 'nearby'.
-
-Note: This only works when the corridor width is around 1500mm (which is design standard in my firm). For larger width, we can vary the 'tolerance' variable. Also, the length of a single branch/ junction is not less than 2550mm. Otherwise it'll return additional pairs. Which is more or less fine as the center points of those pairs will also lie on the Medial Axis (corridor centerline)
-
+to <a href="https://en.wikipedia.org/wiki/KISS_principle">Kiss</a>! :-)
+Thanks @jeremy.tammik and @mhannonQ65N2 for your inputs. </p>
+<p>Here is the Method which returns the list of pairs of vertices which are 'nearby'.</p>
+<p>Note: This only works when the corridor width is around 1500mm (which is design standard in my firm). For larger width, we can vary the 'tolerance' variable. Also, the length of a single branch/ junction is not less than 2550mm. Otherwise it'll return additional pairs. Which is more or less fine as the center points of those pairs will also lie on the Medial Axis (corridor centerline)</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;List&lt;List&lt;XYZ&gt;&gt;&nbsp;<span style="color:#74531f;">ReturnVertexPairs</span>(Room&nbsp;<span style="color:#1f377f;">corridorRoom</span>)
 &nbsp;&nbsp;{
@@ -134,22 +109,22 @@ Note: This only works when the corridor width is around 1500mm (which is design 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SpatialElementBoundaryLocation&nbsp;=
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SpatialElementBoundaryLocation.Finish
 &nbsp;&nbsp;&nbsp;&nbsp;};
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;IList&lt;IList&lt;BoundarySegment&gt;&gt;&nbsp;<span style="color:#1f377f;">loops</span>&nbsp;=&nbsp;corridorRoom.GetBoundarySegments(opt);
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;List&lt;XYZ&gt;&nbsp;<span style="color:#1f377f;">roomVertices</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;List&lt;XYZ&gt;();&nbsp;<span style="color:green;">//List&nbsp;of&nbsp;all&nbsp;room&nbsp;vertices</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">foreach</span>&nbsp;(IList&lt;BoundarySegment&gt;&nbsp;<span style="color:#1f377f;">loop</span>&nbsp;<span style="color:#8f08c4;">in</span>&nbsp;loops)
 &nbsp;&nbsp;&nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//TaskDialog.Show(&quot;Revit&quot;,&nbsp;&quot;Total&nbsp;Segments&nbsp;=&nbsp;&quot;&nbsp;+&nbsp;loop.Count().ToString());</span>
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;<span style="color:#1f377f;">p0</span>&nbsp;=&nbsp;<span style="color:blue;">null</span>;&nbsp;<span style="color:green;">//previous&nbsp;segment&nbsp;start&nbsp;point</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;<span style="color:#1f377f;">p</span>&nbsp;=&nbsp;<span style="color:blue;">null</span>;&nbsp;<span style="color:green;">//&nbsp;segment&nbsp;start&nbsp;point</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;<span style="color:#1f377f;">q</span>&nbsp;=&nbsp;<span style="color:blue;">null</span>;&nbsp;<span style="color:green;">//&nbsp;segment&nbsp;end&nbsp;point</span>
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">foreach</span>&nbsp;(BoundarySegment&nbsp;<span style="color:#1f377f;">seg</span>&nbsp;<span style="color:#8f08c4;">in</span>&nbsp;loop)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;q&nbsp;=&nbsp;seg.GetCurve().GetEndPoint(1);
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">if</span>&nbsp;(p&nbsp;==&nbsp;<span style="color:blue;">null</span>)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;roomVertices.Add(seg.GetCurve().GetEndPoint(0));
@@ -173,7 +148,7 @@ Note: This only works when the corridor width is around 1500mm (which is design 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p0&nbsp;=&nbsp;p;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
 &nbsp;&nbsp;&nbsp;&nbsp;}
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">tolerance</span>&nbsp;=&nbsp;2550;&nbsp;<span style="color:green;">//Distance&nbsp;between&nbsp;two&nbsp;Points&nbsp;(in&nbsp;mm)&nbsp;should&nbsp;be&nbsp;less&nbsp;than&nbsp;this&nbsp;number</span>
 &nbsp;&nbsp;&nbsp;&nbsp;List&lt;List&lt;XYZ&gt;&gt;&nbsp;<span style="color:#1f377f;">nearbyPairs</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;List&lt;List&lt;XYZ&gt;&gt;();&nbsp;<span style="color:green;">//List&nbsp;of&nbsp;Pairs&nbsp;of&nbsp;nearby&nbsp;points</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">for</span>&nbsp;(<span style="color:blue;">int</span>&nbsp;<span style="color:#1f377f;">i</span>&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;roomVertices.Count()&nbsp;-&nbsp;1;&nbsp;i++)
@@ -191,11 +166,10 @@ Note: This only works when the corridor width is around 1500mm (which is design 
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//&nbsp;&nbsp;+&nbsp;Environment.NewLine&nbsp;+&nbsp;&quot;Total&nbsp;Pairs&nbsp;=&nbsp;&quot;&nbsp;+&nbsp;nearbyPairs.Count());</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;nearbyPairs;
 &nbsp;&nbsp;}
- 
+
 </pre>
 
-Helper method to check whether points are collinear, used to skip collinear boundary segments:
-
+<p>Helper method to check whether points are collinear, used to skip collinear boundary segments:</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">bool</span>&nbsp;<span style="color:#74531f;">AreCollinear</span>(XYZ&nbsp;<span style="color:#1f377f;">p1</span>,&nbsp;XYZ&nbsp;<span style="color:#1f377f;">p2</span>,&nbsp;XYZ&nbsp;<span style="color:#1f377f;">p3</span>)
 &nbsp;&nbsp;{
@@ -212,4 +186,4 @@ Helper method to check whether points are collinear, used to skip collinear boun
 &nbsp;&nbsp;}
 </pre>
 
-Many thanks to @amrut.modani.wwi for raising this and sharing his nice approach!
+<p>Many thanks to @amrut.modani.wwi for raising this and sharing his nice approach!</p>
