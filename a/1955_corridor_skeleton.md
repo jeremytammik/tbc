@@ -38,7 +38,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Today, we highlight an urgent request for feedback from the Revit development team and an especially interesting thread from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
 
-- [Copy and paste API Feedback](#2)
+- [Copy and paste API feedback](#2)
 - [Corridor skeleton](#3)
 
 ####<a name="2"></a> Copy and Paste API Feedback
