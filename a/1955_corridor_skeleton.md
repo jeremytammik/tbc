@@ -22,6 +22,13 @@ the Revit API discussion forum
 
 linkedin:
 
+A request for feedback on the upcoming Copy and Paste API enhancements and various interesting approaches to defining a corridor centre line in the #RevitAPI
+
+https://autode.sk/corridorskeleton
+
+- Copy and paste API Feedback
+- Corridor skeleton...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
