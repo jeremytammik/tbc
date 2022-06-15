@@ -55,7 +55,7 @@ to [help us test the enhanced Copy API for sketch members!](https://forums.autod
 
 > Apply for access at [revit.preview.access@autodesk.com](mailto:revit.preview.access@autodesk.com).
 
-> For any For all questions or concerns you might have, please us at [feedback.autodesk.com](mailto:feedback.autodesk.com).
+> For any questions or concerns you might have, please get in touch with us at [feedback.autodesk.com](mailto:feedback.autodesk.com).
  
 ####<a name="3"></a> Corridor Skeleton
 
