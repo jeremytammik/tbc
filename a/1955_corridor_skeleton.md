@@ -15,8 +15,10 @@ twitter:
 
  in the #RevitAPI SDK @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/paramcloud
 
-&ndash; 
-...
+An urgent request for feedback from the Revit development team and an especially interesting thread from
+the Revit API discussion forum
+&ndash; Copy and paste API Feedback
+&ndash; Corridor skeleton...
 
 linkedin:
 
