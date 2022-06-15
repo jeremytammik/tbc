@@ -93,9 +93,10 @@ I used part of
 your [Revit API code for convex hull](https://thebuildingcoder.typepad.com/blog/2016/08/online-revit-api-docs-and-convex-hull.html#3) to
 get the vertices of the room. 
 This is necessary, as there are multiple boundary segments when there is an overlapping room separation line, a door in the wall, etc.
-Instead of calculating the convex hull, I just iterated over those resulting vertices, and determined the pair of points which are 'nearby'.
-As the corridor width is fairly standard, I could just define my own suitable 'nearby' tolerance.
-Then, I just calculate the center of the pairs, and that basically provides the centerline vertices.
+Instead of calculating the convex hull, I just iterate over those resulting vertices and determine the pair of points which are 'nearby'.
+As the corridor width is fairly standard, I can define my own suitable 'nearby' tolerance.
+Then, I calculate the midpoint of each pair.
+That basically provides the centerline vertices:
 
 <center>
 <img src="img/corridor_centerline_2.png" alt="Corridor centerline" title="Corridor centerline" width="400"/> <!-- 1135 -->
