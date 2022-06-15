@@ -62,6 +62,13 @@ to [Help us test the enhanced Copy API for Sketch Members!](https://forums.autod
 
 > For any For all questions or concerns you might have, please us at [feedback.autodesk.com](mailto:feedback.autodesk.com).
 
+Revit June Preview Release API: Help us test the enhanced Copy API for Sketch Members!
+If you are a participant in the Revit beta program, please check out this month's preview release!
+We have an enhanced API to better support Copy-Paste of Sketch members and would like your feedback on it.
+We’ve made Copy-Pasting of Sketch members in API more consistent with UI, and in the process fixed multiple bugs.
+Find the summary of changes and code samples to try out the new functionality on our Preview Release Forum (apply for access at revit.preview.access@autodesk.com)
+Contact us for any questions/concerns you might have at feedback.autodesk.com!
+ 
 ####<a name="3"></a> Corridor Skeleton
 
 An exciting discussion ensued in
@@ -217,5 +224,3 @@ Helper method to check whether points are collinear, used to skip collinear boun
 </pre>
 
 Many thanks to @amrut.modani.wwi for raising this and sharing his nice approach!
-
-
