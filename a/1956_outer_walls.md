@@ -54,21 +54,29 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Outer Walls
 
-####<a name="2"></a>
+####<a name="2"></a> RevitLookup 2023.1.0
 
-- RevitLookup Release 2023.1.0
-New: Hello World window changed to About
-New: re-sorted commands on the Revit ribbon, frequently used moved to the top
-New: added Snoop Active Document command
-Fix: revert support search index from keyboard
-Fix: removed label if ElementID was -1
+A new version of [RevitLookup](https://github.com/jeremytammik/RevitLookup) is available.
 
-####<a name="3"></a> 
+[RevitLookup release 2023.1.0](https://github.com/jeremytammik/RevitLookup/releases/tag/2023.1.0) includes the4 following enhancements:
 
-- Filter different BuiltInCategories at same time
+- New: Hello World window changed to About
+- New: re-sorted commands on the Revit ribbon, frequently used moved to the top
+- New: added Snoop Active Document command
+- Fix: revert support search index from keyboard
+- Fix: removed label if ElementID was -1
+
+Somne of them are explained in more depth in
+the [discussion #124 of enhancements](https://github.com/jeremytammik/RevitLookup/discussions/124#discussioncomment-2675274).
+
+Thank you very much, Roman (Роман) [@Nice3point](https://github.com/Nice3point), for your great ideas and diligent maintenance work!
+
+####<a name="3"></a> Filter Multiple Built-In Categories
+
+Filter different BuiltInCategories at same time
 https://forums.autodesk.com/t5/revit-api-forum/can-i-filter-different-builtincategories-at-same-time/m-p/11254486
 
-####<a name="4"></a> 
+####<a name="4"></a> Retrieving All Outer Walls
 
 - How do I get all the outermost walls in the model?
 https://forums.autodesk.com/t5/revit-api-forum/how-do-i-get-all-the-outermost-walls-in-the-model/m-p/11250597#M64192
@@ -81,7 +89,7 @@ There are of course workarounds to this: Determine the z-heights of each wall in
 I am guessing the `BuildingEnvelopeAnalyzer` needs a cell size variable to solve this same problem (though they are more likely to internally use a horizontal section plane to find intersecting walls and determine the exterior walls from a much smaller set of candidates).
 So, the room around the entire design is probably the best solution with the least requirements, but it will need some non-trivial modifications to be able to handle designs with stacked walls  
 
-####<a name="5"></a> 
+####<a name="5"></a> Zen and the Art of React Programming
 
 - zen and the art of react programming
 [How to build Gmail-like UI with React Native at a Zen temple Koshoji](https://youtu.be/w-M9UFHLAl0)
