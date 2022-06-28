@@ -53,6 +53,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Outer Walls
 
+Returning once again to freshen up a few of our favourite topics:
+
+- [RevitLookup 2023.1.0](#2)
+- [Filter multiple built-in categories](#3)
+- [Retrieving all outer walls](#4)
+- [Zen and the art of React programming](#5)
+
 ####<a name="2"></a> RevitLookup 2023.1.0
 
 A new version of [RevitLookup](https://github.com/jeremytammik/RevitLookup) is available.
