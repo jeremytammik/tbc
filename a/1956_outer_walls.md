@@ -147,7 +147,6 @@ to [retrieve MEP elements](https://thebuildingcoder.typepad.com/blog/2010/06/ret
 and [structural elements](https://thebuildingcoder.typepad.com/blog/2010/07/retrieve-structural-elements.html),
 or I would have opted for that back then.
 
-
 ####<a name="4"></a> Retrieving All Outer Walls
 
 Mark de Vries of [ICN Development](https://icn.eu/) shared
@@ -173,8 +172,7 @@ Thank you Mark, for sharing your valuable knowledge and experience.
 
 An unusal and beautiful two-and-a-half-hour full-length feature film with beautiful views 
 on [how to build Gmail-like UI with React Native at the Zen temple Koshoji](https://youtu.be/w-M9UFHLAl0) is
-remarkably chockful of information and calming at the same time.
-
+chockful of information and calming at the same time.
 
 <center>
 <img src="img/zen_react_programming.png" alt="Zen and the Art of React Programming" title="Zen and the Art of React Programming" width="500"/> <!-- 1000 -->
