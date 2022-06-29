@@ -35,8 +35,15 @@ twitter:
 
  the #RevitAPI  @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash;
-...
+Returning once again to freshen up a few of our favourite recurring topics:
+
+RevitLookup update, filtering for multiple built-in categories, retrieving all outer walls
+
+Freshening up a few of our favourite recurring topics
+&ndash; RevitLookup update
+&ndash; Filtering for multiple built-in categories
+&ndash; Retrieving all outer walls
+&ndash; Zen and the art of React programming...
 
 linkedin:
 
