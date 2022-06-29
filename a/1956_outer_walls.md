@@ -51,9 +51,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Outer Walls
+### Outer Walls, Lookup Update and Filtering
 
-Returning once again to freshen up a few of our favourite topics:
+Returning once again to freshen up a few of our favourite recurring topics:
 
 - [RevitLookup 2023.1.0](#2)
 - [Filter multiple built-in categories](#3)
@@ -64,7 +64,7 @@ Returning once again to freshen up a few of our favourite topics:
 
 A new version of [RevitLookup](https://github.com/jeremytammik/RevitLookup) is available.
 
-[RevitLookup release 2023.1.0](https://github.com/jeremytammik/RevitLookup/releases/tag/2023.1.0) includes the4 following enhancements:
+[RevitLookup release 2023.1.0](https://github.com/jeremytammik/RevitLookup/releases/tag/2023.1.0) includes the following enhancements:
 
 - New: Hello World window changed to About
 - New: re-sorted commands on the Revit ribbon, frequently used moved to the top
@@ -72,7 +72,7 @@ A new version of [RevitLookup](https://github.com/jeremytammik/RevitLookup) is a
 - Fix: revert support search index from keyboard
   Fix: removed label if `ElementId` was -1
 
-Some of them are explained in more depth in
+They are discussed in more depth in
 the [enhancements discussion #124](https://github.com/jeremytammik/RevitLookup/discussions/124#discussioncomment-2675274).
 
 Thank you very much, Roman, Роман [@Nice3point](https://t.me/nice3point) Карпович, for your great ideas and diligent maintenance work!
@@ -89,7 +89,7 @@ Because I want to improve my code efficiency in my big Revit file, so I only wan
 
 Or is there any other way to get instances of these built-in categories in a list?
 
-<pre class="code">
+<pre class="prettyprint">
 bic_beam = DB.BuiltInCategory.OST_StructuralFraming
 bic_collumn = DB.BuiltInCategory.OST_StructuralColumns
 bic_beam_tag = DB.BuiltInCategory.OST_StructuralFramingTags
@@ -98,7 +98,7 @@ bic_collumn_tag = DB.BuiltInCategory.OST_StructuralColumnTags
 
 So far, I only know the basic collector and filtering for one BuiltInCategory:
 
-<pre class="code">
+<pre class="prettyprint">
 collector = DB.FilteredElementCollector(doc, doc.Active.Id)
 beam_filter = DB.ElementCategoryFilter(DB.BuiltInCategory.OST_StructuralFraming)
 beam_elements = collector.WherePasses(beam_filter ).ToElementIds()
