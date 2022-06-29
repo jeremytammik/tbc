@@ -1,0 +1,151 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<p></head></p>
+<!---
+
+- RevitLookup Release 2023.1.0
+  New: Hello World window changed to About
+  New: re-sorted commands on the Revit ribbon, frequently used moved to the top
+  New: added Snoop Active Document command
+  Fix: revert support search index from keyboard
+  Fix: removed label if `ElementId` was -1
+
+- Filter different BuiltInCategories at same time
+  https://forums.autodesk.com/t5/revit-api-forum/can-i-filter-different-builtincategories-at-same-time/m-p/11254486
+
+- How do I get all the outermost walls in the model?
+  https://forums.autodesk.com/t5/revit-api-forum/how-do-i-get-all-the-outermost-walls-in-the-model/m-p/11250597#M64192
+  1656_exterior_walls.md
+  addendum
+[m.de.vriesTH5VM](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/5479182)
+This algorithm to create a room around the building and let it determine its boundary walls is the most reliable and fastest solution to this particular problem of finding the exterior walls of a building. It also works better with e.g. Dutch drawing practice where compound walls are split into individual walls for its layers, making approaches that rely on 'isExternal' properties or the count of bounded rooms unreliable at best.
+There is however one caveat that is important to keep in mind. This is essentially a 2D approach to finding boundaries as you are working with boundary lines and not planes. This appears to be a fundamental limitation of the Revit API. This is not normally a problem for this particular algorithm, but it will become one if your model has vertically stacked walls within a single level. In that case only one wall of that stack will be found, usually the one closest to the bottom of the temporary room.
+There are of course workarounds to this: Determine the z-heights of each wall in the stack and create a separate room for each of those heights. This of course has to be done for every wall that falls into or crosses a particular z-height range that you are interested in, so the scan for finding all the z-heights that need to be checked separately can be time consuming for large designs.
+I am guessing the `BuildingEnvelopeAnalyzer` needs a cell size variable to solve this same problem (though they are more likely to internally use a horizontal section plane to find intersecting walls and determine the exterior walls from a much smaller set of candidates).
+So, the room around the entire design is probably the best solution with the least requirements, but it will need some non-trivial modifications to be able to handle designs with stacked walls  
+
+- zen and the art of react programming
+  [How to build Gmail-like UI with React Native at a Zen temple Koshoji](https://youtu.be/w-M9UFHLAl0)
+  two-and-a-half-hour full feature film with beautiful views 
+
+twitter:
+
+ the #RevitAPI  @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+
+&ndash;
+...
+
+linkedin:
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600" height=""/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>Outer Walls</h3>
+<p>Returning once again to freshen up a few of our favourite topics:</p>
+<ul>
+<li><a href="#2">RevitLookup 2023.1.0</a></li>
+<li><a href="#3">Filter multiple built-in categories</a></li>
+<li><a href="#4">Retrieving all outer walls</a></li>
+<li><a href="#5">Zen and the art of React programming</a></li>
+</ul>
+<h4><a name="2"></a> RevitLookup 2023.1.0</h4>
+<p>A new version of <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a> is available.</p>
+<p><a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2023.1.0">RevitLookup release 2023.1.0</a> includes the4 following enhancements:</p>
+<ul>
+<li>New: Hello World window changed to About</li>
+<li>New: re-sorted commands on the Revit ribbon, frequently used moved to the top</li>
+<li>New: added Snoop Active Document command</li>
+<li>Fix: revert support search index from keyboard
+  Fix: removed label if <code>ElementId</code> was -1</li>
+</ul>
+<p>Some of them are explained in more depth in
+the <a href="https://github.com/jeremytammik/RevitLookup/discussions/124#discussioncomment-2675274">enhancements discussion #124</a>.</p>
+<p>Thank you very much, Roman, Роман <a href="https://t.me/nice3point">@Nice3point</a> Карпович, for your great ideas and diligent maintenance work!</p>
+<h4><a name="3"></a> Filter Multiple Built-In Categories</h4>
+<p>A short note from
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/can-i-filter-different-builtincategories-at-same-time/m-p/11254486">filtering different built-in categories at the same time</a>:</p>
+<p><strong>Question:</strong> Is it possible to filter different BuiltInCategories at same time?</p>
+<p>Because I want to improve my code efficiency in my big Revit file, so I only want to filter once.</p>
+<p>Or is there any other way to get instances of these built-in categories in a list?</p>
+<pre class="code">
+bic_beam = DB.BuiltInCategory.OST_StructuralFraming
+bic_collumn = DB.BuiltInCategory.OST_StructuralColumns
+bic_beam_tag = DB.BuiltInCategory.OST_StructuralFramingTags
+bic_collumn_tag = DB.BuiltInCategory.OST_StructuralColumnTags
+</pre>
+
+<p>So far, I only know the basic collector and filtering for one BuiltInCategory:</p>
+<pre class="code">
+collector = DB.FilteredElementCollector(doc, doc.Active.Id)
+beam_filter = DB.ElementCategoryFilter(DB.BuiltInCategory.OST_StructuralFraming)
+beam_elements = collector.WherePasses(beam_filter ).ToElementIds()
+</pre>
+
+<p><strong>Answer:</strong> First, a comment on your second code snippet: it is always advisable to use the filter shortcuts.</p>
+<p>In this case, use <code>OfCategory</code> instead of <code>ElementCategoryFilter</code> + <code>WherePasses</code>.
+It is shorter, clearer, and guarantees that you are using a quick filter.</p>
+<p>Second, the answer to your question is <em>yes</em>.
+I think this is the one and only purpose of
+the <a href="https://www.revitapidocs.com/2022/7df5b10b-c423-b5c8-6492-1274d7a447d9.htm"><code>FilterCategoryRule</code> class</a>.</p>
+<p>Read the article on <a href="https://thebuildingcoder.typepad.com/blog/2018/05/how-to-use-filtercategoryrule.html">how to use FilterCategoryRule</a> for more info.</p>
+<p>It also mentions how you can easily achieve the same without using FilterCategoryRule, by using a Boolean OR combination filter of ElementCategoryFilter instances, showing how that approach can be used to:</p>
+<ul>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2010/06/retrieve-mep-elements-and-connectors.html">Retrieve MEP elements</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2010/07/retrieve-structural-elements.html">Retrieve structural elements</a></li>
+</ul>
+<p>For yet more info, please refer to
+The Building Coder <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.9">topic group on filtering for elements</a>.</p>
+<p>Last but not least, you can also use
+the <a href="https://www.revitapidocs.com/2022/e43a304a-6931-7492-441c-3cac428f2431.htm"><code>ElementMulticategoryFilter</code> class</a>,
+a filter used to find elements whose category matches any of a given set of categories, e.g.:</p>
+<pre class="prettyprint">
+cat_list = [BuiltInCategory.OST_Walls, BuiltInCategory.OST_Windows, BuiltInCategory.OST_Doors, BuiltInCategory.OST_Floors, BuiltInCategory.OST_Ceilings]
+types = List[BuiltInCategory](cat_list)
+multiCat = ElementMulticategoryFilter(types)
+Elements = FilteredElementCollector(doc).WherePasses(multiCat).WhereElementIsNotElementType().ToElements()
+</pre>
+
+<p><strong>Response:</strong> Thank you! That is exactly what I need!</p>
+<p>Two questions to clarify:</p>
+<p>So, the two approaches <code>OfCategory</code> and <code>ElementCategoryFilter</code> + <code>WherePasses</code> both achieve the same goal.
+In addition, both ways are quick filters.
+However, using <code>OfCategory</code> directly can be more readable and clearer. </p>
+<p>Is that right?</p>
+<p>I will compare using <code>FilterCategoryRule</code> with <code>ElemenetMulticategoryFilter</code>.</p>
+<p><strong>Answer:</strong> Yes, that is absolutely correct.</p>
+<p>I prefer <code>ElementMulticategoryFilter</code> myself, now I think about it.
+It is clearer and more direct.
+It did not exist when I originally implemented the samples
+to <a href="https://thebuildingcoder.typepad.com/blog/2010/06/retrieve-mep-elements-and-connectors.html">retrieve MEP elements</a>
+and <a href="https://thebuildingcoder.typepad.com/blog/2010/07/retrieve-structural-elements.html">structural elements</a>,
+or I would have opted for that back then.</p>
+<h4><a name="4"></a> Retrieving All Outer Walls</h4>
+<p>Mark de Vries of <a href="https://icn.eu/">ICN Development</a> shared
+some important real-world considerations on the discussion
+about <a href="https://forums.autodesk.com/t5/revit-api-forum/how-do-i-get-all-the-outermost-walls-in-the-model/m-p/11250597">how to get all the outermost walls in the model</a>
+that we edited and shared here four years ago in the article
+on <a href="http://thebuildingcoder.typepad.com/blog/2018/05/filterrule-use-and-retrieving-exterior-walls.html"><code>FilterRule</code> use and retrieving exterior walls</a>:</p>
+<p>This algorithm to create a room around the building and let it determine its boundary walls is the most reliable and fastest solution to this particular problem of finding the exterior walls of a building. It also works better with, e.g., Dutch drawing practice, where compound walls are split into individual walls for its layers, making approaches that rely on <code>isExternal</code> properties or the count of bounded rooms unreliable at best.</p>
+<p>There is however one caveat that is important to keep in mind. This is essentially a 2D approach to finding boundaries, as you are working with boundary lines, and not planes. This appears to be a fundamental limitation of the Revit API. This is not normally a problem for this particular algorithm, but it will become one if your model has vertically stacked walls within a single level. In that case, only one wall of that stack will be found, usually the one closest to the bottom of the temporary room.</p>
+<p>There are of course workarounds to this: Determine the z-heights of each wall in the stack and create a separate room for each of those heights. This of course has to be done for every wall that falls into or crosses a particular z-height range that you are interested in, so the scan for finding all the z-heights that need to be checked separately can be time consuming for large designs.</p>
+<p>I am guessing the <code>BuildingEnvelopeAnalyzer</code> needs a cell size variable to solve this same problem (though they are more likely to internally use a horizontal section plane to find intersecting walls and determine the exterior walls from a much smaller set of candidates).</p>
+<p>So, the room around the entire design is probably the best solution with the least requirements, but it will need some non-trivial modifications to be able to handle designs with stacked walls.</p>
+<p>Thank you, Mark, for sharing your valuable knowledge and experience.</p>
+<h4><a name="5"></a> Zen and the Art of React Programming</h4>
+<p>An unusual and beautiful two-and-a-half-hour full-length feature film with beautiful views 
+on <a href="https://youtu.be/w-M9UFHLAl0">how to build Gmail-like UI with React Native at the Zen temple Koshoji</a> is
+chockful of information and calming at the same time.</p>
+<p><center>
+<img src="img/zen_react_programming.png" alt="Zen and the Art of React Programming" title="Zen and the Art of React Programming" width="500"/> <!-- 1000 -->
+</center></p>

@@ -11,7 +11,7 @@
   New: re-sorted commands on the Revit ribbon, frequently used moved to the top
   New: added Snoop Active Document command
   Fix: revert support search index from keyboard
-  Fix: removed label if ElementID was -1
+  Fix: removed label if `ElementId` was -1
 
 - Filter different BuiltInCategories at same time
   https://forums.autodesk.com/t5/revit-api-forum/can-i-filter-different-builtincategories-at-same-time/m-p/11254486
@@ -70,10 +70,10 @@ A new version of [RevitLookup](https://github.com/jeremytammik/RevitLookup) is a
 - New: re-sorted commands on the Revit ribbon, frequently used moved to the top
 - New: added Snoop Active Document command
 - Fix: revert support search index from keyboard
-- Fix: removed label if ElementID was -1
+  Fix: removed label if `ElementId` was -1
 
-Somne of them are explained in more depth in
-the [discussion #124 of enhancements](https://github.com/jeremytammik/RevitLookup/discussions/124#discussioncomment-2675274).
+Some of them are explained in more depth in
+the [enhancements discussion #124](https://github.com/jeremytammik/RevitLookup/discussions/124#discussioncomment-2675274).
 
 Thank you very much, Roman, Роман [@Nice3point](https://t.me/nice3point) Карпович, for your great ideas and diligent maintenance work!
 
@@ -87,7 +87,7 @@ on [filtering different built-in categories at the same time](https://forums.aut
 
 Because I want to improve my code efficiency in my big Revit file, so I only want to filter once.
 
-Or Any other way to get instances of these BuildInCategories in a list?
+Or is there any other way to get instances of these built-in categories in a list?
 
 <pre class="code">
 bic_beam = DB.BuiltInCategory.OST_StructuralFraming
@@ -132,6 +132,7 @@ cat_list = [BuiltInCategory.OST_Walls, BuiltInCategory.OST_Windows, BuiltInCateg
 types = List[BuiltInCategory](cat_list)
 multiCat = ElementMulticategoryFilter(types)
 Elements = FilteredElementCollector(doc).WherePasses(multiCat).WhereElementIsNotElementType().ToElements()
+</pre>
 
 **Response:** Thank you! That is exactly what I need!
 
@@ -143,7 +144,7 @@ However, using `OfCategory` directly can be more readable and clearer.
 
 Is that right?
 
-I wil compare using `FilterCategoryRule` with `ElemenetMulticategoryFilter`.
+I will compare using `FilterCategoryRule` with `ElemenetMulticategoryFilter`.
 
 **Answer:** Yes, that is absolutely correct.
 
@@ -172,12 +173,12 @@ I am guessing the `BuildingEnvelopeAnalyzer` needs a cell size variable to solve
 
 So, the room around the entire design is probably the best solution with the least requirements, but it will need some non-trivial modifications to be able to handle designs with stacked walls.
 
-Thank you Mark, for sharing your valuable knowledge and experience.
+Thank you, Mark, for sharing your valuable knowledge and experience.
 
 
 ####<a name="5"></a> Zen and the Art of React Programming
 
-An unusal and beautiful two-and-a-half-hour full-length feature film with beautiful views 
+An unusual and beautiful two-and-a-half-hour full-length feature film with beautiful views 
 on [how to build Gmail-like UI with React Native at the Zen temple Koshoji](https://youtu.be/w-M9UFHLAl0) is
 chockful of information and calming at the same time.
 
