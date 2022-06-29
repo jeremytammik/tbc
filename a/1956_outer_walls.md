@@ -158,7 +158,7 @@ or I would have opted for that back then.
 ####<a name="4"></a> Retrieving All Outer Walls
 
 Mark de Vries of [ICN Development](https://icn.eu/) shared
-some important real-world considerations on the discussion
+some important real-world considerations in the discussion
 about [how to get all the outermost walls in the model](https://forums.autodesk.com/t5/revit-api-forum/how-do-i-get-all-the-outermost-walls-in-the-model/m-p/11250597)
 that we edited and shared here four years ago in the article
 on [`FilterRule` use and retrieving exterior walls](http://thebuildingcoder.typepad.com/blog/2018/05/filterrule-use-and-retrieving-exterior-walls.html):

@@ -50,8 +50,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Outer Walls</h3>
-<p>Returning once again to freshen up a few of our favourite topics:</p>
+<h3>Outer Walls, Lookup Update and Filtering</h3>
+<p>Returning once again to freshen up a few of our favourite recurring topics:</p>
 <ul>
 <li><a href="#2">RevitLookup 2023.1.0</a></li>
 <li><a href="#3">Filter multiple built-in categories</a></li>
@@ -60,7 +60,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 </ul>
 <h4><a name="2"></a> RevitLookup 2023.1.0</h4>
 <p>A new version of <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a> is available.</p>
-<p><a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2023.1.0">RevitLookup release 2023.1.0</a> includes the4 following enhancements:</p>
+<p><a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2023.1.0">RevitLookup release 2023.1.0</a> includes the following enhancements:</p>
 <ul>
 <li>New: Hello World window changed to About</li>
 <li>New: re-sorted commands on the Revit ribbon, frequently used moved to the top</li>
@@ -68,7 +68,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li>Fix: revert support search index from keyboard
   Fix: removed label if <code>ElementId</code> was -1</li>
 </ul>
-<p>Some of them are explained in more depth in
+<p>They are discussed in more depth in
 the <a href="https://github.com/jeremytammik/RevitLookup/discussions/124#discussioncomment-2675274">enhancements discussion #124</a>.</p>
 <p>Thank you very much, Roman, Роман <a href="https://t.me/nice3point">@Nice3point</a> Карпович, for your great ideas and diligent maintenance work!</p>
 <h4><a name="3"></a> Filter Multiple Built-In Categories</h4>
@@ -78,7 +78,7 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/can-i-filter-differen
 <p><strong>Question:</strong> Is it possible to filter different BuiltInCategories at same time?</p>
 <p>Because I want to improve my code efficiency in my big Revit file, so I only want to filter once.</p>
 <p>Or is there any other way to get instances of these built-in categories in a list?</p>
-<pre class="code">
+<pre class="prettyprint">
 bic_beam = DB.BuiltInCategory.OST_StructuralFraming
 bic_collumn = DB.BuiltInCategory.OST_StructuralColumns
 bic_beam_tag = DB.BuiltInCategory.OST_StructuralFramingTags
@@ -86,7 +86,7 @@ bic_collumn_tag = DB.BuiltInCategory.OST_StructuralColumnTags
 </pre>
 
 <p>So far, I only know the basic collector and filtering for one BuiltInCategory:</p>
-<pre class="code">
+<pre class="prettyprint">
 collector = DB.FilteredElementCollector(doc, doc.Active.Id)
 beam_filter = DB.ElementCategoryFilter(DB.BuiltInCategory.OST_StructuralFraming)
 beam_elements = collector.WherePasses(beam_filter ).ToElementIds()
@@ -132,7 +132,7 @@ and <a href="https://thebuildingcoder.typepad.com/blog/2010/07/retrieve-structur
 or I would have opted for that back then.</p>
 <h4><a name="4"></a> Retrieving All Outer Walls</h4>
 <p>Mark de Vries of <a href="https://icn.eu/">ICN Development</a> shared
-some important real-world considerations on the discussion
+some important real-world considerations in the discussion
 about <a href="https://forums.autodesk.com/t5/revit-api-forum/how-do-i-get-all-the-outermost-walls-in-the-model/m-p/11250597">how to get all the outermost walls in the model</a>
 that we edited and shared here four years ago in the article
 on <a href="http://thebuildingcoder.typepad.com/blog/2018/05/filterrule-use-and-retrieving-exterior-walls.html"><code>FilterRule</code> use and retrieving exterior walls</a>:</p>
