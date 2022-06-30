@@ -33,7 +33,7 @@ So, the room around the entire design is probably the best solution with the lea
 
 twitter:
 
-RevitLookup update, filtering for multiple built-in categories and considerations retrieving all outer walls in the #RevitAPI  @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+RevitLookup update, filtering for multiple built-in categories and considerations retrieving all outer walls in the #RevitAPI  @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://bit.ly/outerwalls
 
 Freshening up a few of our favourite recurring topics
 &ndash; RevitLookup update
@@ -42,6 +42,17 @@ Freshening up a few of our favourite recurring topics
 &ndash; Zen and the art of React programming...
 
 linkedin:
+
+RevitLookup update, filtering for multiple built-in categories and considerations retrieving all outer walls in the #RevitAPI
+
+https://bit.ly/outerwalls
+
+Freshening up a few of our favourite recurring topics:
+
+- RevitLookup update
+- Filtering for multiple built-in categories
+- Retrieving all outer walls
+- Zen and the art of React programming...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
