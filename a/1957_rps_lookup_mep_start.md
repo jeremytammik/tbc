@@ -48,8 +48,6 @@
   demo video
   https://user-images.githubusercontent.com/31106432/176649030-d07dc40e-8662-47af-8a0b-528128c45384.gif
 
-- RevitLookup 
-
 twitter:
 
  in the #RevitAPI  @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
@@ -85,67 +83,65 @@ Do you have any related examples to share with me?
 
 **Answer:** Welcome to the Revit API!
 
-The Building Coder shares a wealth of information on getting started with the Revit API:
-
-https://thebuildingcoder.typepad.com/blog/about-the-author.html#2
+The Building Coder shares a wealth of information
+on [getting started with the Revit API](https://thebuildingcoder.typepad.com/blog/about-the-author.html#2).
 
 However, before you start even thinking about programming, it is important to gain some fundamental understanding of the BIM, the BIM paradigm and BIM processes.
 
 Furthermore, you should determine in detail exactly how to address your task manually through the end user interface making use of the optimal workflows and respecting best practices, before you start trying to automate the task.
 
-All the questions you raise are adressed by and demonstrated in the Revit SDK samples. The SDK can be downloaded from the official Autodesk Revit developer page:
-
-https://www.autodesk.com/developer-network/platform-technologies/revit
+All the questions you raise are adressed by and demonstrated in the Revit SDK samples.
+The SDK can be downloaded from
+the official Autodesk [Revit developer page](https://www.autodesk.com/developer-network/platform-technologies/revit).
 
 MEP components are represented by family instances, so you can simply use generic code to insert a family instance.
 
 However, there are also many MEP-specific enhancements that may or may not apply.
 
-To determine whether two pipes are connected, you simply query them for their connectors, represented by the Connector class:
+To determine whether two pipes are connected, you simply query them for their connectors, represented by
+the [`Connector` class](https://www.revitapidocs.com/2022/11e07082-b3f2-26a1-de79-16535f44716c.htm).
 
-https://www.revitapidocs.com/2022/11e07082-b3f2-26a1-de79-16535f44716c.htm
-
-It has a ConnectorManager property:
-
-https://www.revitapidocs.com/2022/61339b71-5d90-c53d-bec4-2209bab97787.htm
+It has
+a [ConnectorManager property](https://www.revitapidocs.com/2022/61339b71-5d90-c53d-bec4-2209bab97787.htm).
 
 That in turn proves access to the neighbouring parts' connectors.
 
 System traversal is also demonstrated by some of the SDK samples.
 
-In addition to the official sample material from Autodesk, you can also check out Building Coder blog.
+In addition to the official sample material from Autodesk, you can also check out The Building Coder blog.
+My favourite articles from there on connecting pipes is
+the series exploring [how to create a rolling offset](http://thebuildingcoder.typepad.com/blog/2014/01/final-rolling-offset-using-pipecreate.html).
 
-Here is my favourite series of articles from there on connecting pipes:
+Here are two other articles from The Building Coder on system traversal:
 
-http://thebuildingcoder.typepad.com/blog/2014/01/final-rolling-offset-using-pipecreate.html
-
-Here are some relevant articles from there on system traversal:
-
-Simple MEP System Traversal -- http://thebuildingcoder.typepad.com/blog/2013/02/simple-mep-system-traversal.html
-
-Traversing and Exporting all MEP System Graphs -- http://thebuildingcoder.typepad.com/blog/2016/06/traversing-and-exporting-all-mep-system-graphs.html
+- [Simple MEP system traversal](http://thebuildingcoder.typepad.com/blog/2013/02/simple-mep-system-traversal.html)
+- [Traversing and exporting all MEP system graphs](http://thebuildingcoder.typepad.com/blog/2016/06/traversing-and-exporting-all-mep-system-graphs.html)
 
 
-####<a name="3"></a> 
+####<a name="3"></a> New Life for RevitPythonShell and Connecting RevitLookup
 
-**Question:** 
+[RevitPythonShell](https://github.com/architecture-building-systems/revitpythonshell) was
+apparently nearing the end of its active life when its author Daren Thomas moved on to other things.
 
-<pre class="prettyprint">
-</pre>
+Now new life has been breathed into the faltering project by
+Chuong Ho or [Hồ Văn Chương](https://chuongmep.com), with numerous contributions:
 
+- Updated for Revit 2023
+- Implemented a CI pipeline
+- Added new powerful functionality by hooking it up directly with RevitLookup
 
+add links for CI and REPL
 
+So, now you can snoop your database in an interactive REPL commandline console, providing powerful database exploration functionality par excellence, never previously available to such an extent.
 
+Here are some of the pull requests and issues implementing this:
 
+- [Automatic Process CI/CD Maintain Support 2023 #122](https://github.com/architecture-building-systems/revitpythonshell/pull/122)
+- [Need create a branch dev to collaborator #123](https://github.com/architecture-building-systems/revitpythonshell/issues/123)
+- [Update Support use method from revitlookup to snoop #124](https://github.com/architecture-building-systems/revitpythonshell/pull/124)
 
-
-**Response:** 
-
-
-
-####<a name="4"></a> 
-
-####<a name="5"></a> 
+Check out the demo video
+of [RevitLookup snopoping from the Python command line](https://user-images.githubusercontent.com/31106432/176649030-d07dc40e-8662-47af-8a0b-528128c45384.gif):
 
 <center>
 <img src="img/.png" alt="" title="" width="500"/> <!-- 1000 -->
