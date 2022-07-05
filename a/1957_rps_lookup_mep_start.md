@@ -48,9 +48,11 @@
   demo video
   https://user-images.githubusercontent.com/31106432/176649030-d07dc40e-8662-47af-8a0b-528128c45384.gif
 
+- do_while_joke.jpg
+
 twitter:
 
- in the #RevitAPI  @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+ in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
 &ndash; 
 ...
@@ -69,7 +71,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Getting Started with MEP API and RevitPythonShell with Lookup
+### MEP API Intro and RevitPythonShell with Lookup
 
 ####<a name="2"></a> Getting Started with the Revit API for MEP
 
