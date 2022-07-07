@@ -149,11 +149,12 @@ Here are some of the pull requests and issues implementing this:
 - [Update Support use method from revitlookup to snoop #124](https://github.com/architecture-building-systems/revitpythonshell/pull/124)
 
 Check out the demo video
-of [RevitLookup snopoping from the Python command line](https://user-images.githubusercontent.com/31106432/176649030-d07dc40e-8662-47af-8a0b-528128c45384.gif):
+of [RevitLookup snopoping from the Python command line](https://user-images.githubusercontent.com/31106432/176649030-d07dc40e-8662-47af-8a0b-528128c45384.gif) online
+or in this [local copy](img/rps_lookup_snoop.gif).
 
 Talking about REPL and loops...
 
 <center>
-<img src="img/do_while_joke.jpg" alt="" title="" width="500"/> <!-- 1000 -->
+<img src="img/do_while_joke.jpg" alt="While versus do-while" title="While versus do-while" width="400"/> <!-- 1000 -->
 </center>
 
