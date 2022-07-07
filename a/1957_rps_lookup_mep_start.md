@@ -73,6 +73,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### MEP API Intro and RevitPythonShell Lookup Nuptials
 
+Back to the beginning with a quick look at the Revit MEP API, and a great step forward for RevitPythonShell:
 
 - [Revit MEP API intro](#2)
 - [RevitPythonShell RevitLookup nuptials](#3)
@@ -96,7 +97,7 @@ However, before you start even thinking about programming, it is important to ga
 
 Furthermore, you should determine in detail exactly how to address your task manually through the end user interface making use of the optimal workflows and respecting best practices, before you start trying to automate the task.
 
-All the questions you raise are adressed by and demonstrated in the Revit SDK samples.
+All the questions you raise are addressed by and demonstrated in the Revit SDK samples.
 The SDK can be downloaded from
 the official Autodesk [Revit developer page](https://www.autodesk.com/developer-network/platform-technologies/revit).
 
@@ -138,7 +139,7 @@ Chuong Ho or [Hồ Văn Chương](https://chuongmep.com), with numerous contribu
 
 add links for CI and REPL
 
-So, now you can snoop your database directly in an interactive REPL commandline console,
+So, now you can snoop your database directly in an interactive REPL command line console,
 a so-called [read–eval–print loop](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop),
 providing powerful database exploration functionality par excellence, never previously available to such an extent.
 
@@ -149,10 +150,10 @@ Here are some of the pull requests and issues implementing this:
 - [Update Support use method from revitlookup to snoop #124](https://github.com/architecture-building-systems/revitpythonshell/pull/124)
 
 Check out the demo video
-of [RevitLookup snopoping from the Python command line](https://user-images.githubusercontent.com/31106432/176649030-d07dc40e-8662-47af-8a0b-528128c45384.gif) online
+of [RevitLookup snooping from the Python command line](https://user-images.githubusercontent.com/31106432/176649030-d07dc40e-8662-47af-8a0b-528128c45384.gif) online
 or in this [local copy](img/rps_lookup_snoop.gif).
 
-Talking about REPL and loops...
+Talking about REPL and loops, watch out...
 
 <center>
 <img src="img/do_while_joke.jpg" alt="While versus do-while" title="While versus do-while" width="400"/> <!-- 1000 -->
