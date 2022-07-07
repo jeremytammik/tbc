@@ -71,9 +71,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### MEP API Intro and RevitPythonShell with Lookup
+### MEP API Intro and RevitPythonShell Lookup Nuptials
 
-####<a name="2"></a> Getting Started with the Revit API for MEP
+
+- [Revit MEP API intro](#2)
+- [RevitPythonShell RevitLookup nuptials](#3)
+
+####<a name="2"></a> Revit MEP API Intro
 
 **Question:** I am trying to develop some Revit add-ins.
 
@@ -120,7 +124,7 @@ Here are two other articles from The Building Coder on system traversal:
 - [Traversing and exporting all MEP system graphs](http://thebuildingcoder.typepad.com/blog/2016/06/traversing-and-exporting-all-mep-system-graphs.html)
 
 
-####<a name="3"></a> New Life for RevitPythonShell and Connecting RevitLookup
+####<a name="3"></a> RevitPythonShell RevitLookup Nuptials
 
 [RevitPythonShell](https://github.com/architecture-building-systems/revitpythonshell) was
 apparently nearing the end of its active life when its author Daren Thomas moved on to other things.
