@@ -54,8 +54,9 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Back to the beginning with a quick look at the Revit MEP API, and a great step forward for RevitPythonShell
+&ndash; Revit MEP API intro
+&ndash; RevitPythonShell RevitLookup nuptials...
 
 linkedin:
 
@@ -137,8 +138,6 @@ Chuong Ho or [Hồ Văn Chương](https://chuongmep.com), with numerous contribu
 - Implemented a [CI pipeline](https://en.wikipedia.org/wiki/Continuous_integration) for continuous integration
 - Added new powerful functionality by hooking it up directly with RevitLookup
 
-add links for CI and REPL
-
 So, now you can snoop your database directly in an interactive REPL command line console,
 a so-called [read–eval–print loop](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop),
 providing powerful database exploration functionality par excellence, never previously available to such an extent.
@@ -153,9 +152,25 @@ Check out the demo video
 of [RevitLookup snooping from the Python command line](https://user-images.githubusercontent.com/31106432/176649030-d07dc40e-8662-47af-8a0b-528128c45384.gif) online
 or in this [local copy](img/rps_lookup_snoop.gif).
 
+The new [RevitPythonShell release 1.0.1](https://github.com/architecture-building-systems/revitpythonshell/releases/tag/1.0.1) includes:
+
+- Add Process CI/CD Automatic
+- Fix Problem show owner window
+- Upgrade process use SDK Style .NET6
+- Improve Codebase build button
+- Fix minimize form window
+- Support installation in one single file msi from Revit 2018 to Revit 2023
+- Version number changed due to single msi installer for all versions, e.g., from 2023.0.0 to 1.0.0
+
+Here is a direct link to the installer:
+
+- [RevitPythonShell-1.0.1.msi](https://github.com/architecture-building-systems/revitpythonshell/releases/download/1.0.1/RevitPythonShell-1.0.1.msi)
+
+Ever so many thanks to Chuong Ho for this brilliant work!
+
 Talking about REPL and loops, watch out...
 
 <center>
-<img src="img/do_while_joke.jpg" alt="While versus do-while" title="While versus do-while" width="400"/> <!-- 1000 -->
+<img src="img/do_while_joke.jpg" alt="While versus do-while" title="While versus do-while" width="500"/> <!-- 1000 -->
 </center>
 
