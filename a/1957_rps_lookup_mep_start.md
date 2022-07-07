@@ -52,7 +52,7 @@
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Getting started with the Revit MEP API, and going forward with RevitPythonShell joiining forces with RevitLookup in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/rps_snoop
 
 Back to the beginning with a quick look at the Revit MEP API, and a great step forward for RevitPythonShell
 &ndash; Revit MEP API intro
@@ -124,7 +124,6 @@ Here are two other articles from The Building Coder on system traversal:
 
 - [Simple MEP system traversal](http://thebuildingcoder.typepad.com/blog/2013/02/simple-mep-system-traversal.html)
 - [Traversing and exporting all MEP system graphs](http://thebuildingcoder.typepad.com/blog/2016/06/traversing-and-exporting-all-mep-system-graphs.html)
-
 
 ####<a name="3"></a> RevitPythonShell RevitLookup Nuptials
 
