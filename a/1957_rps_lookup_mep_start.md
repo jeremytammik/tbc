@@ -129,12 +129,14 @@ Now new life has been breathed into the faltering project by
 Chuong Ho or [Hồ Văn Chương](https://chuongmep.com), with numerous contributions:
 
 - Updated for Revit 2023
-- Implemented a CI pipeline
+- Implemented a [CI pipeline](https://en.wikipedia.org/wiki/Continuous_integration) for continuous integration
 - Added new powerful functionality by hooking it up directly with RevitLookup
 
 add links for CI and REPL
 
-So, now you can snoop your database in an interactive REPL commandline console, providing powerful database exploration functionality par excellence, never previously available to such an extent.
+So, now you can snoop your database directly in an interactive REPL commandline console,
+a so-called [read–eval–print loop](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop),
+providing powerful database exploration functionality par excellence, never previously available to such an extent.
 
 Here are some of the pull requests and issues implementing this:
 
@@ -145,7 +147,9 @@ Here are some of the pull requests and issues implementing this:
 Check out the demo video
 of [RevitLookup snopoping from the Python command line](https://user-images.githubusercontent.com/31106432/176649030-d07dc40e-8662-47af-8a0b-528128c45384.gif):
 
+Talking about REPL and loops...
+
 <center>
-<img src="img/.png" alt="" title="" width="500"/> <!-- 1000 -->
+<img src="img/do_while_joke.jpg" alt="" title="" width="500"/> <!-- 1000 -->
 </center>
 
