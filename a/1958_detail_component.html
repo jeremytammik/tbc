@@ -55,7 +55,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Lazy Detail Component</h3>
+<h3>Tag Extent and Lazy Detail Component</h3>
 <style>
 p.quote {
   text-align: center;
@@ -71,7 +71,71 @@ p.author  {
 <p class="quote">Today, I am wise and try to change myself.</p>
 <p class="author">Rumi</p>
 
-<h4><a name="2"></a></h4>
+<h4><a name="2"></a> Determining Tag Extents</h4>
+<p>We repeatedly discussed how to ensure that tags do not overlap, both here and in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>,
+e.g., in the threads
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/tags-without-overlapping/m-p/11275579">tags without overlapping</a>
+and <a href="https://forums.autodesk.com/t5/revit-api-forum/auto-tagging-without-overlap/td-p/9996808">auto tagging without overlap</a>.</p>
+<p>A hard-coded algorithm to achieve partial success was presented in the latter and reproduced 
+in <a href="https://thebuildingcoder.typepad.com/blog/2021/02/splits-persona-collector-region-tag-modification.html#5">Python and Dynamo autotag without overlap</a>.
+A more complete solution using a more advanced algorithm is now available commercially,
+<a href="https://bimlogiq.com/products/smart-annotataion">Smart Annotation</a> by <a href="https://bimlogiq.com">BIMLOGiQ</a>.</p>
+<p>One prerequisite for achieving this task is determining the extents of a tag.</p>
+<p><a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/9455666">AmitMetz</a> very kindly shares sample code for a method to achieve this in the thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/tag-width-height-or-accurate-boundingbox-of-independenttag/m-p/11274095">tag width/height or accurate <code>BoundingBox</code> of <code>IndependentTag</code></a>.
+Says he:</p>
+<p>Following the helpful comments above, here is a method that return tag dimensions.</p>
+<p>A few comments on the implementation:</p>
+<ul>
+<li>First, we need to make sure the LeaderEndCondition is free in order to find the LeaderEndPoint.</li>
+<li>Move the tag and it's elbow to LeaderEndPoint.</li>
+<li>We get the correct BoundingBox only after moving the tag and it's elbow, and committing the Transaction.</li>
+<li>I tried to use an unwrapped <code>transaction.rollback</code> without <code>TransactionGroup</code>, but it didn't work.
+  So, if we want to keep the tag in it's original location, we have to commit the transaction and then roll back the transaction group.</li>
+</ul>
+<pre class="code">
+  public static Tuple<double, double> GetTagDimension(Document doc, IndependentTag newTag)
+  {
+    //Dimension to return
+    double tagWidth;
+    double tagHeight;
+
+    //Tag's View and Element
+    View sec = doc.GetElement(newTag.OwnerViewId) as View;
+    XYZ rightDirection = sec.RightDirection;
+    XYZ upDirection = sec.UpDirection;
+    Reference pipeReference = newTag.GetTaggedReferences().First();
+    //Reference pipeReference = newTag.GetTaggedReference(); //Older Revit Version
+
+    using (TransactionGroup transG = new TransactionGroup(doc, "Tag Dimension"))
+    {
+      transG.Start();
+
+      using (Transaction trans = new Transaction(doc, "Tag D"))
+      {
+        trans.Start();
+
+        newTag.LeaderEndCondition = LeaderEndCondition.Free;
+        XYZ leaderEndPoint = newTag.GetLeaderEnd(pipeReference);
+        newTag.TagHeadPosition = leaderEndPoint;
+        newTag.SetLeaderElbow(pipeReference, leaderEndPoint);
+
+        trans.Commit();
+      }
+
+      //Tag Dimension
+      BoundingBoxXYZ tagBox = newTag.get_BoundingBox(sec);
+      tagWidth = (tagBox.Max - tagBox.Min).DotProduct(rightDirection);
+      tagHeight = (tagBox.Max - tagBox.Min).DotProduct(upDirection);
+
+      transG.RollBack();
+    }
+    return Tuple.Create(tagWidth, tagHeight);
+  }
+</pre>
+
+<p>Many thanks to Amit for this nice solution!</p>
 <h4><a name="3"></a></h4>
 <p><center>
 <img src="img/.jpg" alt="" title="" width="100"/> <!-- 1000 -->
