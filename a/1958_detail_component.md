@@ -6,6 +6,18 @@
 
 <!---
 
+- Tag Width/Height or Accurate BoundingBox of IndependentTag
+  https://forums.autodesk.com/t5/revit-api-forum/tag-width-height-or-accurate-boundingbox-of-independenttag/m-p/11274095
+
+- not trivial to solve: tags without Overlapping
+  https://forums.autodesk.com/t5/revit-api-forum/tags-without-overlapping/m-p/11275579
+
+- Auto Tagging without overlap
+  https://forums.autodesk.com/t5/revit-api-forum/auto-tagging-without-overlap/td-p/9996808
+  
+- Python and Dynamo Autotag Without Overlap
+  https://thebuildingcoder.typepad.com/blog/2021/02/splits-persona-collector-region-tag-modification.html#5
+
 - OS add-in One click convert detail elements to Detail Family
   https://forums.autodesk.com/t5/revit-api-forum/one-click-convert-detail-elements-to-detail-family/td-p/11230155
   
@@ -47,6 +59,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### Lazy Detail Component
 
 
+<span style="text-align: center; font-style: italic;">
+  <p>Yesterday, I was clever and tried to change the world.</p>
+  <p>Today, I am wise and try to change myself.</p>
+  <span style="text-align: right">
+    <p>Rumi</p>
+  </span>
+</span>
 
 
 ####<a name="2"></a> 
