@@ -56,6 +56,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Tag Extent and Lazy Detail Component</h3>
+<h4><a name="2"></a> Determining Tag Extents</h4>
+<h4><a name="3"></a> Auto-Convert Detail Elements to Detail Family</h4>
 <p class="quote">Yesterday, I was clever and tried to change the world.</p>
 <p class="quote">Today, I am wise and try to change myself.</p>
 <p class="author">Rumi</p>
@@ -69,9 +71,10 @@ and <a href="https://forums.autodesk.com/t5/revit-api-forum/auto-tagging-without
 <p>A hard-coded algorithm to achieve partial success was presented in the latter and reproduced 
 in <a href="https://thebuildingcoder.typepad.com/blog/2021/02/splits-persona-collector-region-tag-modification.html#5">Python and Dynamo autotag without overlap</a>.
 A more complete solution using a more advanced algorithm is now available commercially,
-<a href="https://bimlogiq.com/products/smart-annotataion">Smart Annotation</a> by <a href="https://bimlogiq.com">BIMLOGiQ</a>.</p>
+called <a href="https://bimlogiq.com/products/smart-annotataion">Smart Annotation</a> by <a href="https://bimlogiq.com">BIMLOGiQ</a>.</p>
 <p>One prerequisite for achieving this task is determining the extents of a tag.</p>
-<p><a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/9455666">AmitMetz</a> very kindly shares sample code for a method to achieve this in the thread
+<p><a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/9455666">AmitMetz</a> very
+kindly shares sample code for a method to achieve this in the thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/tag-width-height-or-accurate-boundingbox-of-independenttag/m-p/11274095">tag width/height or accurate <code>BoundingBox</code> of <code>IndependentTag</code></a>.
 Says he:</p>
 <p>Following the helpful comments above, here is a method that returns tag dimensions.</p>
@@ -84,50 +87,69 @@ Says he:</p>
   So, if we want to keep the tag in it's original location, we have to commit the transaction and then roll back the transaction group.</li>
 </ul>
 <pre class="code">
-  public static Tuple<double, double> GetTagDimension(Document doc, IndependentTag newTag)
-  {
-    //Dimension to return
-    double tagWidth;
-    double tagHeight;
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;Determine&nbsp;tag&nbsp;extents,&nbsp;width&nbsp;and&nbsp;height</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;Tuple&lt;<span style="color:blue;">double</span>,&nbsp;<span style="color:blue;">double</span>&gt;&nbsp;<span style="color:#74531f;">GetTagExtents</span>(
+&nbsp;&nbsp;Document&nbsp;<span style="color:#1f377f;">doc</span>,&nbsp;
+&nbsp;&nbsp;IndependentTag&nbsp;<span style="color:#1f377f;">tag</span>)
+{
+&nbsp;&nbsp;Debug.Assert(
+&nbsp;&nbsp;&nbsp;&nbsp;tag.Document.GetProjectId().Equals(doc.GetProjectId()),&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;expected&nbsp;same&nbsp;document&quot;</span>);
 
-    //Tag's View and Element
-    View sec = doc.GetElement(newTag.OwnerViewId) as View;
-    XYZ rightDirection = sec.RightDirection;
-    XYZ upDirection = sec.UpDirection;
-    Reference pipeReference = newTag.GetTaggedReferences().First();
-    //Reference pipeReference = newTag.GetTaggedReference(); //Older Revit Version
+&nbsp;&nbsp;<span style="color:green;">//Dimension&nbsp;to&nbsp;return</span>
+&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">tagWidth</span>;
+&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">tagHeight</span>;
 
-    using (TransactionGroup transG = new TransactionGroup(doc, "Tag Dimension"))
-    {
-      transG.Start();
+&nbsp;&nbsp;<span style="color:green;">//Tag&#39;s&nbsp;View&nbsp;and&nbsp;Element</span>
+&nbsp;&nbsp;View&nbsp;<span style="color:#1f377f;">sec</span>&nbsp;=&nbsp;doc.GetElement(tag.OwnerViewId)&nbsp;<span style="color:blue;">as</span>&nbsp;View;
+&nbsp;&nbsp;XYZ&nbsp;<span style="color:#1f377f;">rightDirection</span>&nbsp;=&nbsp;sec.RightDirection;
+&nbsp;&nbsp;XYZ&nbsp;<span style="color:#1f377f;">upDirection</span>&nbsp;=&nbsp;sec.UpDirection;
+&nbsp;&nbsp;Reference&nbsp;<span style="color:#1f377f;">pipeReference</span>&nbsp;=&nbsp;tag.GetTaggedReferences().First();
+&nbsp;&nbsp;<span style="color:green;">//Reference&nbsp;pipeReference&nbsp;=&nbsp;tag.GetTaggedReference();&nbsp;//Older&nbsp;Revit&nbsp;Version</span>
 
-      using (Transaction trans = new Transaction(doc, "Tag D"))
-      {
-        trans.Start();
+&nbsp;&nbsp;<span style="color:blue;">using</span>&nbsp;(TransactionGroup&nbsp;<span style="color:#1f377f;">transG</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;TransactionGroup(doc))
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;transG.Start(<span style="color:#a31515;">&quot;Determine&nbsp;Tag&nbsp;Dimension&quot;</span>);
 
-        newTag.LeaderEndCondition = LeaderEndCondition.Free;
-        XYZ leaderEndPoint = newTag.GetLeaderEnd(pipeReference);
-        newTag.TagHeadPosition = leaderEndPoint;
-        newTag.SetLeaderElbow(pipeReference, leaderEndPoint);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>&nbsp;(Transaction&nbsp;<span style="color:#1f377f;">trans</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Transaction(doc,&nbsp;<span style="color:#a31515;">&quot;Determine&nbsp;Tag&nbsp;Dimension&quot;</span>))
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Start();
 
-        trans.Commit();
-      }
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag.LeaderEndCondition&nbsp;=&nbsp;LeaderEndCondition.Free;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;<span style="color:#1f377f;">leaderEndPoint</span>&nbsp;=&nbsp;tag.GetLeaderEnd(pipeReference);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag.TagHeadPosition&nbsp;=&nbsp;leaderEndPoint;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag.SetLeaderElbow(pipeReference,&nbsp;leaderEndPoint);
 
-      //Tag Dimension
-      BoundingBoxXYZ tagBox = newTag.get_BoundingBox(sec);
-      tagWidth = (tagBox.Max - tagBox.Min).DotProduct(rightDirection);
-      tagHeight = (tagBox.Max - tagBox.Min).DotProduct(upDirection);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Commit();
+&nbsp;&nbsp;&nbsp;&nbsp;}
 
-      transG.RollBack();
-    }
-    return Tuple.Create(tagWidth, tagHeight);
-  }
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Tag&nbsp;Dimension</span>
+&nbsp;&nbsp;&nbsp;&nbsp;BoundingBoxXYZ&nbsp;<span style="color:#1f377f;">tagBox</span>&nbsp;=&nbsp;tag.get_BoundingBox(sec);
+&nbsp;&nbsp;&nbsp;&nbsp;tagWidth&nbsp;=&nbsp;(tagBox.Max&nbsp;-&nbsp;tagBox.Min).DotProduct(rightDirection);
+&nbsp;&nbsp;&nbsp;&nbsp;tagHeight&nbsp;=&nbsp;(tagBox.Max&nbsp;-&nbsp;tagBox.Min).DotProduct(upDirection);
+
+&nbsp;&nbsp;&nbsp;&nbsp;transG.RollBack();
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;Tuple.Create(tagWidth,&nbsp;tagHeight);
+}
 </pre>
 
 <p>Many thanks to Amit for this nice solution!</p>
-<h4><a name="3"></a></h4>
+<h4><a name="3"></a> Auto-Convert Detail Elements to Detail Family</h4>
+<p>Another nice solution and entire sample add-in is shared by
+Peter <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/12564927">PitPaf</a> of <a href="https://www.zurawarchitekt.pl">Piotr Żuraw Architekt</a>
+presenting <a href="https://forums.autodesk.com/t5/revit-api-forum/one-click-convert-detail-elements-to-detail-family/td-p/11230155">one click convert detail elements to detail family</a>:</p>
+<blockquote>
+<p>I'm working on Revit Addin to automate and simplify creation of detail Components families.</p>
+<p>This is helps create detail components on the fly just in model view.</p>
+<p>It allows the user to draw parts of a detail with lines and fill regions in model view and change it to a component without opening the family editor.</p>
+<p>Here I want to share with you the first version of this add-in, including source code and compiled install files:</p>
+<p><p style="text-align:center"><a href="https://github.com/PitPaf/LazyDetailComponent">github.com/PitPaf/LazyDetailComponent</a></p></p>
+<p>Feel free to use it if you find it interesting. I appreciate all your comments.</p>
+</blockquote>
 <p><center>
-<img src="img/.jpg" alt="" title="" width="100"/> <!-- 1000 -->
+<img src="img/lazy_detail_component.png" alt="Lazy detail component" title="Lazy detail component" width="438"/> <!-- 438 -->
 </center></p>
-<p><strong>Question:</strong> </p>
-<p><strong>Answer:</strong> </p>
+<p>Many thanks to Peter for implementing, documenting and sharing this nice solution!</p>

@@ -99,52 +99,50 @@ A few comments on the implementation:
 <pre class="code">
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;Determine&nbsp;tag&nbsp;extents,&nbsp;width&nbsp;and&nbsp;height</span>
-<span style="color:gray;">///</span><span style="color:green;">&nbsp;By&nbsp;AmitMetz&nbsp;in&nbsp;</span>
-<span style="color:gray;">///</span><span style="color:green;">&nbsp;https://forums.autodesk.com/t5/revit-api-forum/tag-width-height-or-accurate-boundingbox-of-independenttag/m-p/11274095</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
 <span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;Tuple&lt;<span style="color:blue;">double</span>,&nbsp;<span style="color:blue;">double</span>&gt;&nbsp;<span style="color:#74531f;">GetTagExtents</span>(
-&nbsp;&nbsp;&nbsp;&nbsp;Document&nbsp;<span style="color:#1f377f;">doc</span>,&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;IndependentTag&nbsp;<span style="color:#1f377f;">tag</span>)
+&nbsp;&nbsp;Document&nbsp;<span style="color:#1f377f;">doc</span>,&nbsp;
+&nbsp;&nbsp;IndependentTag&nbsp;<span style="color:#1f377f;">tag</span>)
 {
-&nbsp;&nbsp;&nbsp;&nbsp;Debug.Assert(
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag.Document.GetProjectId().Equals(doc.GetProjectId()),&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;expected&nbsp;same&nbsp;document&quot;</span>);
+&nbsp;&nbsp;Debug.Assert(
+&nbsp;&nbsp;&nbsp;&nbsp;tag.Document.GetProjectId().Equals(doc.GetProjectId()),&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;expected&nbsp;same&nbsp;document&quot;</span>);
  
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Dimension&nbsp;to&nbsp;return</span>
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">tagWidth</span>;
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">tagHeight</span>;
+&nbsp;&nbsp;<span style="color:green;">//Dimension&nbsp;to&nbsp;return</span>
+&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">tagWidth</span>;
+&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">tagHeight</span>;
  
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Tag&#39;s&nbsp;View&nbsp;and&nbsp;Element</span>
-&nbsp;&nbsp;&nbsp;&nbsp;View&nbsp;<span style="color:#1f377f;">sec</span>&nbsp;=&nbsp;doc.GetElement(tag.OwnerViewId)&nbsp;<span style="color:blue;">as</span>&nbsp;View;
-&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;<span style="color:#1f377f;">rightDirection</span>&nbsp;=&nbsp;sec.RightDirection;
-&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;<span style="color:#1f377f;">upDirection</span>&nbsp;=&nbsp;sec.UpDirection;
-&nbsp;&nbsp;&nbsp;&nbsp;Reference&nbsp;<span style="color:#1f377f;">pipeReference</span>&nbsp;=&nbsp;tag.GetTaggedReferences().First();
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Reference&nbsp;pipeReference&nbsp;=&nbsp;tag.GetTaggedReference();&nbsp;//Older&nbsp;Revit&nbsp;Version</span>
+&nbsp;&nbsp;<span style="color:green;">//Tag&#39;s&nbsp;View&nbsp;and&nbsp;Element</span>
+&nbsp;&nbsp;View&nbsp;<span style="color:#1f377f;">sec</span>&nbsp;=&nbsp;doc.GetElement(tag.OwnerViewId)&nbsp;<span style="color:blue;">as</span>&nbsp;View;
+&nbsp;&nbsp;XYZ&nbsp;<span style="color:#1f377f;">rightDirection</span>&nbsp;=&nbsp;sec.RightDirection;
+&nbsp;&nbsp;XYZ&nbsp;<span style="color:#1f377f;">upDirection</span>&nbsp;=&nbsp;sec.UpDirection;
+&nbsp;&nbsp;Reference&nbsp;<span style="color:#1f377f;">pipeReference</span>&nbsp;=&nbsp;tag.GetTaggedReferences().First();
+&nbsp;&nbsp;<span style="color:green;">//Reference&nbsp;pipeReference&nbsp;=&nbsp;tag.GetTaggedReference();&nbsp;//Older&nbsp;Revit&nbsp;Version</span>
  
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>&nbsp;(TransactionGroup&nbsp;<span style="color:#1f377f;">transG</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;TransactionGroup(doc))
+&nbsp;&nbsp;<span style="color:blue;">using</span>&nbsp;(TransactionGroup&nbsp;<span style="color:#1f377f;">transG</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;TransactionGroup(doc))
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;transG.Start(<span style="color:#a31515;">&quot;Determine&nbsp;Tag&nbsp;Dimension&quot;</span>);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>&nbsp;(Transaction&nbsp;<span style="color:#1f377f;">trans</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Transaction(doc,&nbsp;<span style="color:#a31515;">&quot;Determine&nbsp;Tag&nbsp;Dimension&quot;</span>))
 &nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;transG.Start(<span style="color:#a31515;">&quot;Determine&nbsp;Tag&nbsp;Dimension&quot;</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Start();
  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>&nbsp;(Transaction&nbsp;<span style="color:#1f377f;">trans</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Transaction(doc,&nbsp;<span style="color:#a31515;">&quot;Determine&nbsp;Tag&nbsp;Dimension&quot;</span>))
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Start();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag.LeaderEndCondition&nbsp;=&nbsp;LeaderEndCondition.Free;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;<span style="color:#1f377f;">leaderEndPoint</span>&nbsp;=&nbsp;tag.GetLeaderEnd(pipeReference);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag.TagHeadPosition&nbsp;=&nbsp;leaderEndPoint;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag.SetLeaderElbow(pipeReference,&nbsp;leaderEndPoint);
  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag.LeaderEndCondition&nbsp;=&nbsp;LeaderEndCondition.Free;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;<span style="color:#1f377f;">leaderEndPoint</span>&nbsp;=&nbsp;tag.GetLeaderEnd(pipeReference);
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag.TagHeadPosition&nbsp;=&nbsp;leaderEndPoint;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag.SetLeaderElbow(pipeReference,&nbsp;leaderEndPoint);
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Commit();
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Tag&nbsp;Dimension</span>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BoundingBoxXYZ&nbsp;<span style="color:#1f377f;">tagBox</span>&nbsp;=&nbsp;tag.get_BoundingBox(sec);
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tagWidth&nbsp;=&nbsp;(tagBox.Max&nbsp;-&nbsp;tagBox.Min).DotProduct(rightDirection);
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tagHeight&nbsp;=&nbsp;(tagBox.Max&nbsp;-&nbsp;tagBox.Min).DotProduct(upDirection);
- 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;transG.RollBack();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Commit();
 &nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;Tuple.Create(tagWidth,&nbsp;tagHeight);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Tag&nbsp;Dimension</span>
+&nbsp;&nbsp;&nbsp;&nbsp;BoundingBoxXYZ&nbsp;<span style="color:#1f377f;">tagBox</span>&nbsp;=&nbsp;tag.get_BoundingBox(sec);
+&nbsp;&nbsp;&nbsp;&nbsp;tagWidth&nbsp;=&nbsp;(tagBox.Max&nbsp;-&nbsp;tagBox.Min).DotProduct(rightDirection);
+&nbsp;&nbsp;&nbsp;&nbsp;tagHeight&nbsp;=&nbsp;(tagBox.Max&nbsp;-&nbsp;tagBox.Min).DotProduct(upDirection);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;transG.RollBack();
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;Tuple.Create(tagWidth,&nbsp;tagHeight);
 }
 </pre>
 
