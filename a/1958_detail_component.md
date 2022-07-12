@@ -58,6 +58,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Tag Extent and Lazy Detail Component
 
+Today, let's highlight two really nice contributions from the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
 
 - [Determining tag extents](#2)
 - [One-click detail family generator](#3)
@@ -94,7 +95,7 @@ A few comments on the implementation:
 - Move the tag and it's elbow to LeaderEndPoint.
 - We get the correct BoundingBox only after moving the tag and it's elbow, and committing the Transaction.
 - I tried to use an unwrapped `transaction.rollback` without `TransactionGroup`, but it didn't work.
-  So, if we want to keep the tag in it's original location, we have to commit the transaction and then roll back the transaction group.
+  So, if we want to keep the tag in its original location, we have to commit the transaction and then roll back the transaction group.
 
 <pre class="code">
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
@@ -150,7 +151,7 @@ Another nice solution and entire sample add-in is shared by
 Peter [PitPaf](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/12564927) of [Piotr Żuraw Architekt](https://www.zurawarchitekt.pl)
 presenting [one click convert detail elements to detail family](https://forums.autodesk.com/t5/revit-api-forum/one-click-convert-detail-elements-to-detail-family/td-p/11230155):
 
-> I'm working on Revit Addin to automate and simplify creation of detail Components families.
+> I'm working on a Revit add-in to automate and simplify creation of detail Components families.
 
 > This is helps create detail components on the fly just in model view.
 

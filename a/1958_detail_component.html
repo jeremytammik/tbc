@@ -56,6 +56,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Tag Extent and Lazy Detail Component</h3>
+<p>Today, let's highlight two really nice contributions from the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>:</p>
 <ul>
 <li><a href="#2">Determining tag extents</a></li>
 <li><a href="#3">One-click detail family generator</a></li>
@@ -86,7 +87,7 @@ Says he:</p>
 <li>Move the tag and it's elbow to LeaderEndPoint.</li>
 <li>We get the correct BoundingBox only after moving the tag and it's elbow, and committing the Transaction.</li>
 <li>I tried to use an unwrapped <code>transaction.rollback</code> without <code>TransactionGroup</code>, but it didn't work.
-  So, if we want to keep the tag in it's original location, we have to commit the transaction and then roll back the transaction group.</li>
+  So, if we want to keep the tag in its original location, we have to commit the transaction and then roll back the transaction group.</li>
 </ul>
 <pre class="code">
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
@@ -140,7 +141,7 @@ Says he:</p>
 Peter <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/12564927">PitPaf</a> of <a href="https://www.zurawarchitekt.pl">Piotr Żuraw Architekt</a>
 presenting <a href="https://forums.autodesk.com/t5/revit-api-forum/one-click-convert-detail-elements-to-detail-family/td-p/11230155">one click convert detail elements to detail family</a>:</p>
 <blockquote>
-<p>I'm working on Revit Addin to automate and simplify creation of detail Components families.</p>
+<p>I'm working on a Revit add-in to automate and simplify creation of detail Components families.</p>
 <p>This is helps create detail components on the fly just in model view.</p>
 <p>It allows the user to draw parts of a detail with lines and fill regions in model view and change it to a component without opening the family editor.</p>
 <p>Here I want to share with you the first version of this add-in, including source code and compiled install files:</p>
