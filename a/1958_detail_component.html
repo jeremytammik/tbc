@@ -56,8 +56,10 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Tag Extent and Lazy Detail Component</h3>
-<h4><a name="2"></a> Determining Tag Extents</h4>
-<h4><a name="3"></a> Auto-Convert Detail Elements to Detail Family</h4>
+<ul>
+<li><a href="#2">Determining tag extents</a></li>
+<li><a href="#3">One-click detail family generator</a></li>
+</ul>
 <p class="quote">Yesterday, I was clever and tried to change the world.</p>
 <p class="quote">Today, I am wise and try to change myself.</p>
 <p class="author">Rumi</p>
@@ -94,10 +96,6 @@ Says he:</p>
 &nbsp;&nbsp;Document&nbsp;<span style="color:#1f377f;">doc</span>,&nbsp;
 &nbsp;&nbsp;IndependentTag&nbsp;<span style="color:#1f377f;">tag</span>)
 {
-&nbsp;&nbsp;Debug.Assert(
-&nbsp;&nbsp;&nbsp;&nbsp;tag.Document.GetProjectId().Equals(doc.GetProjectId()),&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;expected&nbsp;same&nbsp;document&quot;</span>);
-
 &nbsp;&nbsp;<span style="color:green;">//Dimension&nbsp;to&nbsp;return</span>
 &nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">tagWidth</span>;
 &nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">tagHeight</span>;
@@ -136,8 +134,8 @@ Says he:</p>
 }
 </pre>
 
-<p>Many thanks to Amit for this nice solution!</p>
-<h4><a name="3"></a> Auto-Convert Detail Elements to Detail Family</h4>
+<p>Many thanks to Amit for this nice implementation!</p>
+<h4><a name="3"></a> One-Click Detail Family Generator</h4>
 <p>Another nice solution and entire sample add-in is shared by
 Peter <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/12564927">PitPaf</a> of <a href="https://www.zurawarchitekt.pl">Piotr Żuraw Architekt</a>
 presenting <a href="https://forums.autodesk.com/t5/revit-api-forum/one-click-convert-detail-elements-to-detail-family/td-p/11230155">one click convert detail elements to detail family</a>:</p>
