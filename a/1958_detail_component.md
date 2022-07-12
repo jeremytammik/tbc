@@ -18,30 +18,18 @@
 - Python and Dynamo Autotag Without Overlap
   https://thebuildingcoder.typepad.com/blog/2021/02/splits-persona-collector-region-tag-modification.html#5
 
-- OS add-in One click convert detail elements to Detail Family
+- OS add-in:
+  One click convert detail elements to Detail Family
   https://forums.autodesk.com/t5/revit-api-forum/one-click-convert-detail-elements-to-detail-family/td-p/11230155
-  
   Peter [PitPaf](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/12564927) of [Piotr Żuraw Architekt](https://www.zurawarchitekt.pl)
-
-One click convert detail elements to Detail Family
-Hi All, I'm working on Revit Addin to automate and simplify creation of detail Components families.
-
-This is going to help create detail components on fly just in model view.
-
-My goal is to allow user to draw parts of detail with lines and fill regions in model view and change it to component without opening family editor.
-
-Here I want to share with you first version of this Add-in. Source code and compiled install files:
-
-https://github.com/PitPaf/LazyDetailComponent
-
-Feel free to use it if you find it interesting. I appreciate all your comments
 
 twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash;
-...
+Today, we highlight two nice contributions from the Revit API discussion forum
+&ndash; Determining tag extents
+&ndash; One-click detail family generator...
 
 linkedin:
 
@@ -56,16 +44,18 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Tag Extent and Lazy Detail Component
+### Tag Extents and Lazy Detail Components
 
 Today, let's highlight two really nice contributions from the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
 
 - [Determining tag extents](#2)
 - [One-click detail family generator](#3)
 
-<p class="quote">Yesterday, I was clever and tried to change the world.</p>
-<p class="quote">Today, I am wise and try to change myself.</p>
-<p class="author">Rumi</p>
+First, though, a little aphorism to ponder:
+
+<p class="quote">Yesterday, I was clever and tried to change the world.
+<br/>Today, I am wise and try to change myself.</p>
+<p class="author">&ndash; Rumi</p>
 
 ####<a name="2"></a> Determining Tag Extents
 
@@ -102,9 +92,10 @@ A few comments on the implementation:
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;Determine&nbsp;tag&nbsp;extents,&nbsp;width&nbsp;and&nbsp;height</span>
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
 <span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;Tuple&lt;<span style="color:blue;">double</span>,&nbsp;<span style="color:blue;">double</span>&gt;&nbsp;<span style="color:#74531f;">GetTagExtents</span>(
-&nbsp;&nbsp;Document&nbsp;<span style="color:#1f377f;">doc</span>,&nbsp;
 &nbsp;&nbsp;IndependentTag&nbsp;<span style="color:#1f377f;">tag</span>)
 {
+&nbsp;&nbsp;Document&nbsp;<span style="color:#1f377f;">doc</span>&nbsp;=&nbsp;tag.Document;
+
 &nbsp;&nbsp;<span style="color:green;">//Dimension&nbsp;to&nbsp;return</span>
 &nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">tagWidth</span>;
 &nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">tagHeight</span>;
@@ -120,9 +111,9 @@ A few comments on the implementation:
 &nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;transG.Start(<span style="color:#a31515;">&quot;Determine&nbsp;Tag&nbsp;Dimension&quot;</span>);
  
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>&nbsp;(Transaction&nbsp;<span style="color:#1f377f;">trans</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Transaction(doc,&nbsp;<span style="color:#a31515;">&quot;Determine&nbsp;Tag&nbsp;Dimension&quot;</span>))
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>&nbsp;(Transaction&nbsp;<span style="color:#1f377f;">trans</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Transaction(doc))
 &nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Start();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Start(<span style="color:#a31515;">&quot;Determine&nbsp;Tag&nbsp;Dimension&quot;</span>);
  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag.LeaderEndCondition&nbsp;=&nbsp;LeaderEndCondition.Free;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;<span style="color:#1f377f;">leaderEndPoint</span>&nbsp;=&nbsp;tag.GetLeaderEnd(pipeReference);
@@ -147,7 +138,7 @@ Many thanks to Amit for this nice implementation!
 
 ####<a name="3"></a> One-Click Detail Family Generator
 
-Another nice solution and entire sample add-in is shared by
+Another nice solution and entire open source sample add-in is shared by
 Peter [PitPaf](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/12564927) of [Piotr Żuraw Architekt](https://www.zurawarchitekt.pl)
 presenting [one click convert detail elements to detail family](https://forums.autodesk.com/t5/revit-api-forum/one-click-convert-detail-elements-to-detail-family/td-p/11230155):
 
