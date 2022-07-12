@@ -58,10 +58,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Tag Extent and Lazy Detail Component
 
+
+####<a name="2"></a> Determining Tag Extents
+####<a name="3"></a> Auto-Convert Detail Elements to Detail Family
+
 <p class="quote">Yesterday, I was clever and tried to change the world.</p>
 <p class="quote">Today, I am wise and try to change myself.</p>
 <p class="author">Rumi</p>
-
 
 ####<a name="2"></a> Determining Tag Extents
 
@@ -74,11 +77,12 @@ and [auto tagging without overlap](https://forums.autodesk.com/t5/revit-api-foru
 A hard-coded algorithm to achieve partial success was presented in the latter and reproduced 
 in [Python and Dynamo autotag without overlap](https://thebuildingcoder.typepad.com/blog/2021/02/splits-persona-collector-region-tag-modification.html#5).
 A more complete solution using a more advanced algorithm is now available commercially,
-[Smart Annotation](https://bimlogiq.com/products/smart-annotataion) by [BIMLOGiQ](https://bimlogiq.com).
+called [Smart Annotation](https://bimlogiq.com/products/smart-annotataion) by [BIMLOGiQ](https://bimlogiq.com).
 
 One prerequisite for achieving this task is determining the extents of a tag.
 
-[AmitMetz](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/9455666) very kindly shares sample code for a method to achieve this in the thread
+[AmitMetz](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/9455666) very
+kindly shares sample code for a method to achieve this in the thread
 on [tag width/height or accurate `BoundingBox` of `IndependentTag`](https://forums.autodesk.com/t5/revit-api-forum/tag-width-height-or-accurate-boundingbox-of-independenttag/m-p/11274095).
 Says he:
  
@@ -93,55 +97,79 @@ A few comments on the implementation:
   So, if we want to keep the tag in it's original location, we have to commit the transaction and then roll back the transaction group.
 
 <pre class="code">
-  public static Tuple<double, double> GetTagDimension(Document doc, IndependentTag newTag)
-  {
-    //Dimension to return
-    double tagWidth;
-    double tagHeight;
-  
-    //Tag's View and Element
-    View sec = doc.GetElement(newTag.OwnerViewId) as View;
-    XYZ rightDirection = sec.RightDirection;
-    XYZ upDirection = sec.UpDirection;
-    Reference pipeReference = newTag.GetTaggedReferences().First();
-    //Reference pipeReference = newTag.GetTaggedReference(); //Older Revit Version
-  
-    using (TransactionGroup transG = new TransactionGroup(doc, "Tag Dimension"))
-    {
-      transG.Start();
-  
-      using (Transaction trans = new Transaction(doc, "Tag D"))
-      {
-        trans.Start();
-  
-        newTag.LeaderEndCondition = LeaderEndCondition.Free;
-        XYZ leaderEndPoint = newTag.GetLeaderEnd(pipeReference);
-        newTag.TagHeadPosition = leaderEndPoint;
-        newTag.SetLeaderElbow(pipeReference, leaderEndPoint);
-  
-        trans.Commit();
-      }
-  
-      //Tag Dimension
-      BoundingBoxXYZ tagBox = newTag.get_BoundingBox(sec);
-      tagWidth = (tagBox.Max - tagBox.Min).DotProduct(rightDirection);
-      tagHeight = (tagBox.Max - tagBox.Min).DotProduct(upDirection);
-  
-      transG.RollBack();
-    }
-    return Tuple.Create(tagWidth, tagHeight);
-  }
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;Determine&nbsp;tag&nbsp;extents,&nbsp;width&nbsp;and&nbsp;height</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;By&nbsp;AmitMetz&nbsp;in&nbsp;</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;https://forums.autodesk.com/t5/revit-api-forum/tag-width-height-or-accurate-boundingbox-of-independenttag/m-p/11274095</span>
+<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;Tuple&lt;<span style="color:blue;">double</span>,&nbsp;<span style="color:blue;">double</span>&gt;&nbsp;<span style="color:#74531f;">GetTagExtents</span>(
+&nbsp;&nbsp;&nbsp;&nbsp;Document&nbsp;<span style="color:#1f377f;">doc</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;IndependentTag&nbsp;<span style="color:#1f377f;">tag</span>)
+{
+&nbsp;&nbsp;&nbsp;&nbsp;Debug.Assert(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag.Document.GetProjectId().Equals(doc.GetProjectId()),&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#a31515;">&quot;expected&nbsp;same&nbsp;document&quot;</span>);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Dimension&nbsp;to&nbsp;return</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">tagWidth</span>;
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">tagHeight</span>;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Tag&#39;s&nbsp;View&nbsp;and&nbsp;Element</span>
+&nbsp;&nbsp;&nbsp;&nbsp;View&nbsp;<span style="color:#1f377f;">sec</span>&nbsp;=&nbsp;doc.GetElement(tag.OwnerViewId)&nbsp;<span style="color:blue;">as</span>&nbsp;View;
+&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;<span style="color:#1f377f;">rightDirection</span>&nbsp;=&nbsp;sec.RightDirection;
+&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;<span style="color:#1f377f;">upDirection</span>&nbsp;=&nbsp;sec.UpDirection;
+&nbsp;&nbsp;&nbsp;&nbsp;Reference&nbsp;<span style="color:#1f377f;">pipeReference</span>&nbsp;=&nbsp;tag.GetTaggedReferences().First();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Reference&nbsp;pipeReference&nbsp;=&nbsp;tag.GetTaggedReference();&nbsp;//Older&nbsp;Revit&nbsp;Version</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>&nbsp;(TransactionGroup&nbsp;<span style="color:#1f377f;">transG</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;TransactionGroup(doc))
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;transG.Start(<span style="color:#a31515;">&quot;Determine&nbsp;Tag&nbsp;Dimension&quot;</span>);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">using</span>&nbsp;(Transaction&nbsp;<span style="color:#1f377f;">trans</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;Transaction(doc,&nbsp;<span style="color:#a31515;">&quot;Determine&nbsp;Tag&nbsp;Dimension&quot;</span>))
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Start();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag.LeaderEndCondition&nbsp;=&nbsp;LeaderEndCondition.Free;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XYZ&nbsp;<span style="color:#1f377f;">leaderEndPoint</span>&nbsp;=&nbsp;tag.GetLeaderEnd(pipeReference);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag.TagHeadPosition&nbsp;=&nbsp;leaderEndPoint;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag.SetLeaderElbow(pipeReference,&nbsp;leaderEndPoint);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trans.Commit();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Tag&nbsp;Dimension</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BoundingBoxXYZ&nbsp;<span style="color:#1f377f;">tagBox</span>&nbsp;=&nbsp;tag.get_BoundingBox(sec);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tagWidth&nbsp;=&nbsp;(tagBox.Max&nbsp;-&nbsp;tagBox.Min).DotProduct(rightDirection);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tagHeight&nbsp;=&nbsp;(tagBox.Max&nbsp;-&nbsp;tagBox.Min).DotProduct(upDirection);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;transG.RollBack();
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;Tuple.Create(tagWidth,&nbsp;tagHeight);
+}
 </pre>
 
 Many thanks to Amit for this nice solution!
 
-####<a name="3"></a> 
+####<a name="3"></a> Auto-Convert Detail Elements to Detail Family
+
+Another nice solution and entire sample add-in is shared by
+Peter [PitPaf](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/12564927) of [Piotr Żuraw Architekt](https://www.zurawarchitekt.pl)
+presenting [one click convert detail elements to detail family](https://forums.autodesk.com/t5/revit-api-forum/one-click-convert-detail-elements-to-detail-family/td-p/11230155):
+
+> I'm working on Revit Addin to automate and simplify creation of detail Components families.
+
+> This is helps create detail components on the fly just in model view.
+
+> It allows the user to draw parts of a detail with lines and fill regions in model view and change it to a component without opening the family editor.
+
+> Here I want to share with you the first version of this add-in, including source code and compiled install files:
+
+> <p style="text-align:center"><a href="https://github.com/PitPaf/LazyDetailComponent">github.com/PitPaf/LazyDetailComponent</a></p>
+
+> Feel free to use it if you find it interesting. I appreciate all your comments.
 
 <center>
-<img src="img/.jpg" alt="" title="" width="100"/> <!-- 1000 -->
+<img src="img/lazy_detail_component.png" alt="Lazy detail component" title="Lazy detail component" width="438"/> <!-- 438 -->
 </center>
 
-
-**Question:** 
-
-**Answer:** 
+Many thanks to Peter for implementing, documenting and sharing this nice solution!
