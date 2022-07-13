@@ -25,7 +25,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+How to determine tag extents, width, height and an open source single-click detail family generator add-in with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/detailcomponent
 
 Today, we highlight two nice contributions from the Revit API discussion forum
 &ndash; Determining tag extents
