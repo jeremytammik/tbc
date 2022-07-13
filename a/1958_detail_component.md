@@ -33,6 +33,13 @@ Today, we highlight two nice contributions from the Revit API discussion forum
 
 linkedin:
 
+How to determine tag extents, width, height and an open source single-click detail family generator add-in with the #RevitAPI
+
+https://autode.sk/detailcomponent
+
+- Determining tag extents
+- One-click detail family generator...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
