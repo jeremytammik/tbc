@@ -56,6 +56,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Today, let's highlight two really nice contributions from the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
 
 - [Determining tag extents](#2)
+    - [Unrotate rotated tags](#2.2)
 - [One-click detail family generator](#3)
 
 First, though, a little aphorism to ponder:
@@ -142,6 +143,18 @@ A few comments on the implementation:
 </pre>
 
 Many thanks to Amit for this nice implementation!
+
+####<a name="2.2"></a> Unrotate Rotated Tags
+
+Steven Micaletti, VDC Software & Technology Developer added
+a [comment on this method](https://www.linkedin.com/feed/update/urn:li:activity:6952994276876169216?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A6952994276876169216%2C6953115731991433216%29), saying:
+
+> Good stuff; however, the GetTagExtents() implementation is missing a critical step &ndash; rotating the Pipe.
+The Pipe in the thread is at an angle, while the tag is not, and this is not generally how MEP elements are tagged.
+MEP tag families usually have the "rotate with component" option enabled, and in that scenario the bounding box returned is unusable.
+We must first disconnect and rotate the pipe to be model axis aligned before we set the TagHeadPosition, get the BoundingBox, and RollBack() the Transaction.
+
+Thank you, Steven, for pointing this out!
 
 ####<a name="3"></a> One-Click Detail Family Generator
 
