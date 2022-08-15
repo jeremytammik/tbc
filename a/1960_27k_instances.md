@@ -100,8 +100,46 @@ Here is t
 
 **Response:** 
 
+####<a name="2"></a> Forge Hackathon
 
-####<a name="3"></a> Creating a Large Number of Instances
+[Register is open](https://forge.autodesk.com/hackathon) for 
+the [Forge Hackathon 2022](https://forge.autodesk.com/blog/save-date-2022-forge-hackathon),
+being held virtually from September 19th-23rd.
+
+Prize categories:
+
+You had me at 3D game
+Show me the Data!
+I feel the need, the need for Digital Twin
+Task automation is a state of mind
+There’s no place like ACC
+
+Judging criteria:
+
+Innovation
+Elegance
+Business problem solved
+Progress made during the week
+Depth of Forge use
+Wow factor
+
+For all further details, please refer to the [Forge Hackathon 2022 blog post](https://forge.autodesk.com/blog/save-date-2022-forge-hackathon).
+
+
+<center>
+<img src="img/forge_hackathon_2022.jpg" alt="Forge Hackathon 2022" title="Forge Hackathon 2022" width="600" height="350"/> <!-- 1200 x 700 -->
+</center>
+
+####<a name="3"></a> forge ifc exporter
+
+Eason Kang updated his IFC exporter addin.
+Now it supports user defined property sets and the new JSON schema from Revit IFC repo
+You can find it here:
+https://github.com/yiskang/forge-revit-ifc-exporter-appbundle
+
+
+
+####<a name="4"></a> Creating a Large Number of Instances
 
 Here are some notes from an internal discussion on performance issues g=creating 27000 family instances that I found useful and interesting and may be of good use to others as well:
 
@@ -151,7 +189,7 @@ Is the Revit model generally slow after having placed so many instances or only 
 
 
 
-####<a name="3"></a> Set Parameter to Vary by Group Instance
+####<a name="5"></a> Set Parameter to Vary by Group Instance
 
 Mark Ackerley demonstrates how
 to [set parameter to vary by group instance](https://forum.dynamobim.com/t/set-parameter-to-vary-by-group-instance) in
@@ -287,7 +325,7 @@ OUT = output
 
 Many thanks to Mark for sharing this useful solution!
 
-####<a name="3"></a> Web Based Spell Checker for Everything
+####<a name="6"></a> Web Based Spell Checker for Everything
 
 I recently started testing [Grammarly](https://www.grammarly.com) for
 integrated AI-enhanced spell and grammar checking including advanced writing support such as suggestions on better wording for clarity.
