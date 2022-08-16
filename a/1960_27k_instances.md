@@ -130,13 +130,12 @@ For all further details, please refer to the [Forge Hackathon 2022 blog post](ht
 <img src="img/forge_hackathon_2022.jpg" alt="Forge Hackathon 2022" title="Forge Hackathon 2022" width="600" height="350"/> <!-- 1200 x 700 -->
 </center>
 
-####<a name="3"></a> forge ifc exporter
+####<a name="3"></a> Forge IFC Exporter 
 
-Eason Kang updated his IFC exporter addin.
-Now it supports user defined property sets and the new JSON schema from Revit IFC repo
-You can find it here:
-https://github.com/yiskang/forge-revit-ifc-exporter-appbundle
+Eason Kang updated his IFC exporter addin to now support user defined property sets and the new JSON schema from the Revit IFC repository.
 
+Check it out in
+the [forge-revit-ifc-exporter-appbundle GitHub repo](https://github.com/yiskang/forge-revit-ifc-exporter-appbundle).
 
 
 ####<a name="4"></a> Creating a Large Number of Instances
