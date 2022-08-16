@@ -108,20 +108,20 @@ being held virtually from September 19th-23rd.
 
 Prize categories:
 
-You had me at 3D game
-Show me the Data!
-I feel the need, the need for Digital Twin
-Task automation is a state of mind
-There’s no place like ACC
+- You had me at 3D game
+- Show me the Data!
+- I feel the need, the need for Digital Twin
+- Task automation is a state of mind
+- There’s no place like ACC
 
 Judging criteria:
 
-Innovation
-Elegance
-Business problem solved
-Progress made during the week
-Depth of Forge use
-Wow factor
+- Innovation
+- Elegance
+- Business problem solved
+- Progress made during the week
+- Depth of Forge use
+- Wow factor
 
 For all further details, please refer to the [Forge Hackathon 2022 blog post](https://forge.autodesk.com/blog/save-date-2022-forge-hackathon).
 
@@ -137,56 +137,47 @@ Eason Kang updated his IFC exporter addin to now support user defined property s
 Check it out in
 the [forge-revit-ifc-exporter-appbundle GitHub repo](https://github.com/yiskang/forge-revit-ifc-exporter-appbundle).
 
+####<a name="4"></a> NewFamilyInstances2 Can Create 27000 Instances
 
-####<a name="4"></a> Creating a Large Number of Instances
+Here are some notes from an internal discussion on performance issues creating 27000 family instances that I found useful and interesting and may be of good use to others as well:
 
-Here are some notes from an internal discussion on performance issues g=creating 27000 family instances that I found useful and interesting and may be of good use to others as well:
+**Question:** I need to create 27000+ FamilyInstances in a Revit Document.
 
-Paolo Serra
-Hi, I have a customer that needs to create 27000+ FamilyInstances in a Revit Document, the performance of Document.Create.NewFamilyInstance(XYZ, FamilySymbol, StructuralType) degrades from 190 FamilyInstances / sec to 4 FamilyInstances / sec over the course of the execution (more than 1.5h). The process memory maxes at 1.5GB on my machine. Are there any recommendations on how to improve the performance? I was thinking that splitting the task into chunks of not more than 200 FamilyInstances might produce some benefits but I'm wondering if the time required to commit and start the transactions would erode them. Any advice is much appreciated. (edited) 
+However, this takes more than 1.5 hours, because the performance of *Document.Create.NewFamilyInstance(XYZ, FamilySymbol, StructuralType)* degrades from 190 FamilyInstances / sec to 4 FamilyInstances / sec over the course of the execution.
+The process memory maxes at 1.5 GB on my machine.
+Are there any recommendations on how to improve the performance?
+I was thinking that splitting the task into chunks of not more than 200 FamilyInstances might produce some benefits but I'm wondering if the time required to commit and start the transactions would erode them. 
 
-Scott Conover
-we used to have batch creation routines for FamilyInstances.  But those were only needed because the API used to regenerate after nearly every model change, and this could be much less performant when not necessary.  So when we switched those became unneeded and were removed (mostly, I see some remnants but not useful ones).
-Some of the problems I suspect relate to adding 27000+ expanded elements.  There is no way to unexpand the elements in memory once they are expanded.   If this is a batch/non-visible process maybe saving/closing the model and reopening periodically might help with the overall performance and memory consumption?   If the model is visible this might be disruptive to the user.
+**Answer:** we used to have batch creation routines for FamilyInstances.
+Back then, those were needed, because the API used to regenerate after nearly every model change, and this could be much less performant when not necessary.
+So, when we switched, those became less important and were mostly removed.
+Some of the problems I suspect relate to adding 27000+ expanded elements.
+There is no way to unexpand the elements in memory once they are expanded.
+If this is a batch/non-visible process, maybe saving/closing the model and reopening periodically might help with the overall performance and memory consumption?
+If the model is visible, this might be disruptive to the user.
 
-Actually, we do still have a routine in place, NewFamilyInstances2() - horrible name - takes a collection of family instance creation data objects.  I suspect it won't perform any better than individual calls, but perhaps...
+Actually, we do still have one routine in place, `NewFamilyInstances2` &ndash; horrible name &ndash; takes a collection of family instance creation data objects. 
 
-Paolo Serra
-I'll give it a go and see if produces any better results, I'll let you now. Thank you all for your prompt response
+If it's a regeneration issue, perhaps placing empty families first to reduce (if not remove) the regeneration time, then swapping for the family you want to use?
 
-Jacob Small
-If it's a regeneration issue perhaps placing empty families first to reduce (if not remove) the regeneration time, then swapping for the family you want to use?
+**Response:** Regeneration is not an issue for now, but I'll keep that suggestion in mind in case it becomes a problem, thanks.
 
-Paolo Serra
-I used the NewFamilyInstances2() in batches of 200, without committing the transaction, and it was able to generate the families in 4:48 seconds, very promising. Now I need to see how it handles updating the parameters of the instances, would be nice to have a similar method (edited) 
+I used `NewFamilyInstances2` in batches of 200, without committing the transaction, and it was able to generate the families in 4:48 seconds, very promising.
+Now I need to see how it handles updating the parameters of the instances; it would be nice to have a similar method for that.
 
-Paolo Serra
-@Jacob Small  FYI regeneration is not an issue for now but I'll keep your suggestion in case it becomes a problem, thanks
+with further optimization on the logic, the instances went down to about 22000 and even setting 3 or 4 parameters from Excel on each instance and running interpolations takes less than 3.5 minutes, that is a great result.
 
-Paolo Serra
-with further optimization on the logic the instances went down to about 22000 and even setting 3/4 parameters from Excel on each instance and running interpolations takes not more than 3.5 minutes, that is a great result.
+**Answer:** Now I'm wondering what type of optimizations are in that `NewFamilyInstances2` method.
+I thought it was just trying to avoid excess regenerations...
 
-Scott Conover
-Now I'm wondering what type of optimizations are in that NewFamilyInstances2() method.  I thought it was just trying to avoid excess regenerations...
-
-Paolo Serra
-they basically want to create a Voxel representation of the soil based on boreholes samples, if there is some kind of vectorization happening in NewFamilyInstances2() it would be nice to have a similar approach to edit parameters in bulk
+**Response:** They display a Voxel representation of soil based on boreholes samples; if there is some kind of vectorization happening in `NewFamilyInstances2`, it would be nice to have a similar approach to edit parameters in bulk.
 
 <center>
-<img src="img/set_param_vary_by_group_inst.png" alt="Creating many instances" title="Creating many instances" width="1280" height="773"/> <!-- 1280 x 773 -->
+<img src="img/create_27k_instances_1280.png" alt="Creating many instances" title="Creating many instances" width="1280" height="773"/> <!-- 1280 x 773 -->
 </center>
 
-create_27k_instances_1280.png 
-
-Tamas Badics
-Looks like NewFamilyInstance() commits a subtransaction for each call. That may be the main reason why it is much slower than the batch NewFamilyInstance2() method. Still it may be worth debugging fully.
-
-Rahul Bhobe
-Is the Revit model generally slow after having placed so many instances or only the act of placing the instances? If the model in general slow, does closing the file and opening it improves the performance? Is there a sample revit file for the image you posted?
-
-
-
-
+**Answer:** Looks like `NewFamilyInstance` commits a subtransaction for each call.
+That may be the main reason why it is much slower than the batch `NewFamilyInstance2` method.
 
 ####<a name="5"></a> Set Parameter to Vary by Group Instance
 
