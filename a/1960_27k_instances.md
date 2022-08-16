@@ -76,9 +76,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### Create Many Instances and Vary by Group
 
 
-####<a name="2"></a>
-
-
+- [Forge hackathon](#2)
+- [Forge IFC exporter](#3)
+- [NewFamilyInstances2 creates 27000 instances](#4)
+- [Set parameter to vary by group instance](#5)
+- [Ubiquitous web-based AI-enhanced spell checker](#6)
 
 <p class="quote">Are you concerned about the increase in artificial intelligence?
 <br/>I am more concerned about the decrease in real intelligence.</p>
