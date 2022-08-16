@@ -82,26 +82,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 - [Set parameter to vary by group instance](#5)
 - [Ubiquitous web-based AI-enhanced spell checker](#6)
 
-<p class="quote">Are you concerned about the increase in artificial intelligence?
-<br/>I am more concerned about the decrease in real intelligence.</p>
-
-**Question:** 
-
-<center>
-<img src="img/.png" alt="" title="" width="800"/> <!-- 848 x 726 -->
-</center>
-
-Here is t
-
-<pre class="code">
-
-
-</pre>
-
-**Answer:** 
-
-**Response:** 
-
 ####<a name="2"></a> Forge Hackathon
 
 [Register is open](https://forge.autodesk.com/hackathon) for 
@@ -329,3 +309,7 @@ Somebody else suggested
 the [websiteplanet Online Spell Checker](https://www.websiteplanet.com/webtools/spell-checker),
 but I have not tried that myself at all.
 
+On the topic of AI...
+
+<p class="quote">Are you concerned about the increase in artificial intelligence?
+<br/>I am more concerned about the decrease in real intelligence.</p>
