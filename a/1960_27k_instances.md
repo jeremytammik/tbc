@@ -51,7 +51,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+A Forge hackathon coming up, IFC property sets, NewFamilyInstances2 creates 27000 instances in bulk and parameters that vary by group instance in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/bulkinstances
 
 Today, we talk about Forge, IFC, family instance creation in bulk, parameters that vary by group instance and a handy spell checker
 &ndash; Forge hackathon
@@ -300,7 +300,7 @@ OUT = output
 
 Many thanks to Mark for sharing this useful solution!
 
-####<a name="6"></a> Web Based Spell Checker for Everything
+####<a name="6"></a> AI-Enhanced Web-Based Spell Checker
 
 I recently installed
 the [Grammarly](https://www.grammarly.com) integrated
