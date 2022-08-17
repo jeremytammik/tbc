@@ -73,7 +73,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Create Many Instances and Vary by Group
+### IFC Property Set, Bulk Instances and Vary by Group
 
 Today, we talk about Forge, IFC, family instance creation in bulk, parameters that vary by group instance and a handy spell checker:
 
