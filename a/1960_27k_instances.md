@@ -62,6 +62,17 @@ Today, we talk about Forge, IFC, family instance creation in bulk, parameters th
 
 linkedin:
 
+A Forge hackathon coming up, IFC property sets, NewFamilyInstances2 creates 27000 instances in bulk and parameters that vary by group instance in the #RevitAPI
+
+https://autode.sk/bulkinstances
+
+Today, we talk about Forge, IFC, family instance creation in bulk, parameters that vary by group instance and a handy spell checker:
+
+- Forge hackathon
+- Forge IFC exporter
+- NewFamilyInstances2 creates 27000 instances
+- Set parameter to vary by group instance
+- AI-enhanced web-based spell checker...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
