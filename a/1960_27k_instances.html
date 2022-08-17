@@ -1,14 +1,13 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
-</head>
-
+<p></head></p>
 <!---
-  
+
 - Forge hackathon
   https://www.keanw.com/2022/08/register-today-for-this-years-forge-hackathon.html
-  
+
 - forge ifc exporter
   Eason Kang updated his IFC exporter addin.
   Now it supports user defined property sets and the new JSON schema from Revit IFC repo
@@ -73,109 +72,84 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Create Many Instances and Vary by Group
-
-Today, we talk about Forge, IFC, family instance creation in bulk, parameters that vary by group instance and a handy spell checker:
-
-- [Forge hackathon](#2)
-- [Forge IFC exporter](#3)
-- [NewFamilyInstances2 creates 27000 instances](#4)
-- [Set parameter to vary by group instance](#5)
-- [AI-enhanced web-based spell checker](#6)
-
-####<a name="2"></a> Forge Hackathon
-
-[Registration is open](https://forge.autodesk.com/hackathon) for 
-the [Forge Hackathon 2022](https://forge.autodesk.com/blog/save-date-2022-forge-hackathon),
-being held virtually from September 19-23.
-
-Prize categories:
-
-- You had me at 3D game
-- Show me the Data!
-- I feel the need, the need for Digital Twin
-- Task automation is a state of mind
-- There’s no place like ACC
-
-Judging criteria:
-
-- Innovation
-- Elegance
-- Business problem solved
-- Progress made during the week
-- Depth of Forge use
-- Wow factor
-
-For further details, please refer to the [Forge Hackathon 2022 blog post](https://forge.autodesk.com/blog/save-date-2022-forge-hackathon).
-
-<center>
+<h3>Create Many Instances and Vary by Group</h3>
+<p>Today, we talk about Forge, IFC, family instance creation in bulk, parameters that vary by group instance and a handy spell checker:</p>
+<ul>
+<li><a href="#2">Forge hackathon</a></li>
+<li><a href="#3">Forge IFC exporter</a></li>
+<li><a href="#4">NewFamilyInstances2 creates 27000 instances</a></li>
+<li><a href="#5">Set parameter to vary by group instance</a></li>
+<li><a href="#6">AI-enhanced web-based spell checker</a></li>
+</ul>
+<h4><a name="2"></a> Forge Hackathon</h4>
+<p><a href="https://forge.autodesk.com/hackathon">Registration is open</a> for 
+the <a href="https://forge.autodesk.com/blog/save-date-2022-forge-hackathon">Forge Hackathon 2022</a>,
+being held virtually from September 19-23.</p>
+<p>Prize categories:</p>
+<ul>
+<li>You had me at 3D game</li>
+<li>Show me the Data!</li>
+<li>I feel the need, the need for Digital Twin</li>
+<li>Task automation is a state of mind</li>
+<li>There’s no place like ACC</li>
+</ul>
+<p>Judging criteria:</p>
+<ul>
+<li>Innovation</li>
+<li>Elegance</li>
+<li>Business problem solved</li>
+<li>Progress made during the week</li>
+<li>Depth of Forge use</li>
+<li>Wow factor</li>
+</ul>
+<p>For further details, please refer to the <a href="https://forge.autodesk.com/blog/save-date-2022-forge-hackathon">Forge Hackathon 2022 blog post</a>.</p>
+<p><center>
 <img src="img/forge_hackathon_2022.jpg" alt="Forge Hackathon 2022" title="Forge Hackathon 2022" width="400"/> <!-- 1200 x 700 -->
-</center>
-
-####<a name="3"></a> Forge IFC Exporter 
-
-Eason Kang updated his IFC exporter addin to now support user defined property sets and the new JSON schema from the Revit IFC repository.
+</center></p>
+<h4><a name="3"></a> Forge IFC Exporter</h4>
+<p>Eason Kang updated his IFC exporter addin to now support user defined property sets and the new JSON schema from the Revit IFC repository.
 Check it out in
-the [forge-revit-ifc-exporter-appbundle GitHub repo](https://github.com/yiskang/forge-revit-ifc-exporter-appbundle).
-
-####<a name="4"></a> NewFamilyInstances2 Can Create 27000 Instances
-
-Here are some useful and exciting notes from an internal discussion on performance issues creating 27000 family instances:
-
-**Question:** I need to create 27000+ FamilyInstances in a Revit Document.
-
-However, this takes more than 1.5 hours, because the performance of *Document.Create.NewFamilyInstance(XYZ, FamilySymbol, StructuralType)* degrades from 190 FamilyInstances / sec to 4 FamilyInstances / sec over the course of the execution.
+the <a href="https://github.com/yiskang/forge-revit-ifc-exporter-appbundle">forge-revit-ifc-exporter-appbundle GitHub repo</a>.</p>
+<h4><a name="4"></a> NewFamilyInstances2 Can Create 27000 Instances</h4>
+<p>Here are some useful and exciting notes from an internal discussion on performance issues creating 27000 family instances:</p>
+<p><strong>Question:</strong> I need to create 27000+ FamilyInstances in a Revit Document.</p>
+<p>However, this takes more than 1.5 hours, because the performance of <em>Document.Create.NewFamilyInstance(XYZ, FamilySymbol, StructuralType)</em> degrades from 190 FamilyInstances / sec to 4 FamilyInstances / sec over the course of the execution.
 The process memory maxes at 1.5 GB on my machine.
 Are there any recommendations on how to improve the performance?
-I was thinking that splitting the task into chunks of not more than 200 FamilyInstances might produce some benefits but I'm wondering if the time required to commit and start the transactions would erode them. 
-
-**Answer:** We used to have batch creation routines for FamilyInstances.
+I was thinking that splitting the task into chunks of not more than 200 FamilyInstances might produce some benefits but I'm wondering if the time required to commit and start the transactions would erode them. </p>
+<p><strong>Answer:</strong> We used to have batch creation routines for FamilyInstances.
 Back then, those were needed, because the API used to regenerate after nearly every model change, and this could be much less performant when not necessary.
 So, when we switched, those became less important and were mostly removed.
 Some of the problems I suspect relate to adding 27000+ expanded elements.
 There is no way to unexpand the elements in memory once they are expanded.
 If this is a batch/non-visible process, maybe saving/closing the model and reopening periodically might help with the overall performance and memory consumption?
-If the model is visible, this might be disruptive to the user.
-
-Actually, we do still have one routine in place, `NewFamilyInstances2` &ndash; horrible name &ndash; takes a collection of family instance creation data objects. 
-
-If it's a regeneration issue, perhaps placing empty families first to reduce (if not remove) the regeneration time, then swapping for the family you want to use?
-
-**Response:** Regeneration is not an issue for now, but I'll keep that suggestion in mind in case it becomes a problem, thanks.
-
-I used `NewFamilyInstances2` in batches of 200, without committing the transaction, and it was able to generate the families in 4:48 seconds, very promising.
-Now I need to see how it handles updating the parameters of the instances; it would be nice to have a similar method for that.
-
-with further optimization on the logic, the instances went down to about 22000 and even setting 3 or 4 parameters from Excel on each instance and running interpolations takes less than 3.5 minutes, that is a great result.
-
-**Answer:** Now I'm wondering what type of optimizations are in that `NewFamilyInstances2` method.
-I thought it was just trying to avoid excess regenerations...
-
-**Response:** They display a Voxel representation of soil based on boreholes samples; if there is some kind of vectorization happening in `NewFamilyInstances2`, it would be nice to have a similar approach to edit parameters in bulk.
-
-<center>
+If the model is visible, this might be disruptive to the user.</p>
+<p>Actually, we do still have one routine in place, <code>NewFamilyInstances2</code> &ndash; horrible name &ndash; takes a collection of family instance creation data objects. </p>
+<p>If it's a regeneration issue, perhaps placing empty families first to reduce (if not remove) the regeneration time, then swapping for the family you want to use?</p>
+<p><strong>Response:</strong> Regeneration is not an issue for now, but I'll keep that suggestion in mind in case it becomes a problem, thanks.</p>
+<p>I used <code>NewFamilyInstances2</code> in batches of 200, without committing the transaction, and it was able to generate the families in 4:48 seconds, very promising.
+Now I need to see how it handles updating the parameters of the instances; it would be nice to have a similar method for that.</p>
+<p>with further optimization on the logic, the instances went down to about 22000 and even setting 3 or 4 parameters from Excel on each instance and running interpolations takes less than 3.5 minutes, that is a great result.</p>
+<p><strong>Answer:</strong> Now I'm wondering what type of optimizations are in that <code>NewFamilyInstances2</code> method.
+I thought it was just trying to avoid excess regenerations...</p>
+<p><strong>Response:</strong> They display a Voxel representation of soil based on boreholes samples; if there is some kind of vectorization happening in <code>NewFamilyInstances2</code>, it would be nice to have a similar approach to edit parameters in bulk.</p>
+<p><center>
 <img src="img/create_27k_instances_1280.png" alt="Creating many instances" title="Creating many instances" width="1280" height="773"/> <!-- 1280 x 773 -->
-</center>
-
-**Answer:** Looks like `NewFamilyInstance` commits a subtransaction for each call.
-That may be the main reason why it is much slower than the batch `NewFamilyInstance2` method.
-
-####<a name="5"></a> Set Parameter to Vary by Group Instance
-
-Mark Ackerley demonstrates how
-to [set parameter to vary by group instance](https://forum.dynamobim.com/t/set-parameter-to-vary-by-group-instance) in
-the [Dynamo BIM forum](https://forum.dynamobim.com), saying:
-
-> Might be useful to people…
-
-> This is limited by the types of parameter which are allowed to vary by group instance, this does not include Yes/No or Length.
-
-> Thanks to @jeremytammik and anyone else who has done work in this area.
-
-<center>
+</center></p>
+<p><strong>Answer:</strong> Looks like <code>NewFamilyInstance</code> commits a subtransaction for each call.
+That may be the main reason why it is much slower than the batch <code>NewFamilyInstance2</code> method.</p>
+<h4><a name="5"></a> Set Parameter to Vary by Group Instance</h4>
+<p>Mark Ackerley demonstrates how
+to <a href="https://forum.dynamobim.com/t/set-parameter-to-vary-by-group-instance">set parameter to vary by group instance</a> in
+the <a href="https://forum.dynamobim.com">Dynamo BIM forum</a>, saying:</p>
+<blockquote>
+<p>Might be useful to people…</p>
+<p>This is limited by the types of parameter which are allowed to vary by group instance, this does not include Yes/No or Length.</p>
+<p>Thanks to @jeremytammik and anyone else who has done work in this area.</p>
+</blockquote>
+<p><center>
 <img src="img/set_param_vary_by_group_inst.png" alt="Set parameter to vary by group instance" title="Set parameter to vary by group instance" width="551" height="365"/> <!-- 551 x 365 -->
-</center>
-
+</center></p>
 <pre class="prettyprint">
 import clr
 
@@ -199,31 +173,31 @@ dataEnteringNode = IN
 keyWord = IN[0]
 
 def isInstance(definition_Name):
-	#for some reason, returning the name of the Key in the bindings iterator
-	#fails sometimes and says item can't be managed? so then restart Revit
-	
-	#the list of parameters in doc.ParameterBindings is only the ones which are
-	#added in the Project Parameters box, so you're not getting ones which
-	#just exist in families
-	
-	#this is the only way to see if a parameter is 'bound' to the doc as
-	#a type or an instance parameter
-	
-	bindings = doc.ParameterBindings
-	it = doc.ParameterBindings.ForwardIterator()
-	defs = []
-	value = False
-	while(it.MoveNext()):
-		d = it.Key
-		b = it.Current
-		if d.Name == definition_Name and b.GetType() == InstanceBinding:
-			value = True
-			break
-	return value	
+    #for some reason, returning the name of the Key in the bindings iterator
+    #fails sometimes and says item can't be managed? so then restart Revit
+
+    #the list of parameters in doc.ParameterBindings is only the ones which are
+    #added in the Project Parameters box, so you're not getting ones which
+    #just exist in families
+
+    #this is the only way to see if a parameter is 'bound' to the doc as
+    #a type or an instance parameter
+
+    bindings = doc.ParameterBindings
+    it = doc.ParameterBindings.ForwardIterator()
+    defs = []
+    value = False
+    while(it.MoveNext()):
+        d = it.Key
+        b = it.Current
+        if d.Name == definition_Name and b.GetType() == InstanceBinding:
+            value = True
+            break
+    return value    
 
 def canBeEditableInGroup(parameter):
   parameter_Type = parameter.ParameterType
-  
+
   variable_Parameter_Types_List = [ParameterType.Text, 
     ParameterType.Area, 
     ParameterType.Volume, 
@@ -231,12 +205,12 @@ def canBeEditableInGroup(parameter):
     ParameterType.MassDensity, 
     ParameterType.URL, 
     ParameterType.Material]
-  
+
   if parameter_Type in variable_Parameter_Types_List:
     return True
   else:
     return False
-    
+
 # Place your code below this line
 output = []
 #catch anything that doesn't work and output the error
@@ -253,16 +227,16 @@ try:
     #the 'definition' is a container of the shared parameter
     #that holds the information about whether
     #the parameter is variable by instance in a group
-    
+
     #we only want the shared parameters with our key word
     #we only want them if they are a type which can vary
     #we only want them if they are not already true
     #we only want them if they are instance parameters
-    
+
     definition = sP.GetDefinition()  
 
     varies_Query = definition.VariesAcrossGroups
-    
+
 
     if keyWord in definition.Name and canBeEditableInGroup(definition) and isInstance(definition.Name) and varies_Query != True:
       try:
@@ -294,21 +268,16 @@ else:
 OUT = output
 </pre>
 
-Many thanks to Mark for sharing this useful solution!
-
-####<a name="6"></a> Web Based Spell Checker for Everything
-
-I recently started testing [Grammarly](https://www.grammarly.com) for
+<p>Many thanks to Mark for sharing this useful solution!</p>
+<h4><a name="6"></a> Web Based Spell Checker for Everything</h4>
+<p>I recently started testing <a href="https://www.grammarly.com">Grammarly</a> for
 integrated AI-enhanced spell and grammar checking including advanced writing support such as suggestions on better wording for clarity.
 It works in the web browser edit boxes, and also in the Microsoft Outlook email editor.
 It has made several suggestions that I like beter than I what I would hve written myself, so I am quite impressed.
-Definitely better suggestions than any other tools I tried (or mostly didn't in fact) in the past...
-
-Somebody else suggested
-the [websiteplanet Online Spell Checker](https://www.websiteplanet.com/webtools/spell-checker),
-but I have not tried that myself at all.
-
-On the topic of AI...
-
+Definitely better suggestions than any other tools I tried (or mostly didn't in fact) in the past...</p>
+<p>Somebody else suggested
+the <a href="https://www.websiteplanet.com/webtools/spell-checker">websiteplanet Online Spell Checker</a>,
+but I have not tried that myself at all.</p>
+<p>On the topic of AI...</p>
 <p class="quote">Are you concerned about the increase in artificial intelligence?
 <br/>I am more concerned about the decrease in real intelligence.</p>
