@@ -114,7 +114,7 @@ For further details, please refer to the [Forge Hackathon 2022 blog post](https:
 
 ####<a name="3"></a> Forge IFC Exporter 
 
-Eason Kang updated his IFC exporter addin to now support user defined property sets and the new JSON schema from the Revit IFC repository.
+Eason Kang updated his IFC exporter add-in to now support user defined property sets and the new JSON schema from the Revit IFC repository.
 Check it out in
 the [forge-revit-ifc-exporter-appbundle GitHub repo](https://github.com/yiskang/forge-revit-ifc-exporter-appbundle).
 
@@ -154,7 +154,7 @@ I thought it was just trying to avoid excess regenerations...
 **Response:** They display a Voxel representation of soil based on boreholes samples; if there is some kind of vectorization happening in `NewFamilyInstances2`, it would be nice to have a similar approach to edit parameters in bulk.
 
 <center>
-<img src="img/create_27k_instances_1280.png" alt="Creating many instances" title="Creating many instances" width="1280" height="773"/> <!-- 1280 x 773 -->
+<img src="img/create_27k_instances_1280.png" alt="Creating many instances" title="Creating many instances" width="800"/> <!-- 1280 x 773 -->
 </center>
 
 **Answer:** Looks like `NewFamilyInstance` commits a subtransaction for each call.
@@ -298,15 +298,15 @@ Many thanks to Mark for sharing this useful solution!
 
 ####<a name="6"></a> Web Based Spell Checker for Everything
 
-I recently started testing [Grammarly](https://www.grammarly.com) for
-integrated AI-enhanced spell and grammar checking including advanced writing support such as suggestions on better wording for clarity.
-It works in the web browser edit boxes, and also in the Microsoft Outlook email editor.
-It has made several suggestions that I like beter than I what I would hve written myself, so I am quite impressed.
-Definitely better suggestions than any other tools I tried (or mostly didn't in fact) in the past...
+I recently installed
+the [Grammarly](https://www.grammarly.com) integrated
+AI-enhanced spell and grammar checking including advanced writing support such as suggestions on better wording for clarity.
+It works in web browser edit boxes and also in my email editor.
+It made several suggestions that improved my wording and I am quite impressed, with better suggestions than any other tools I ever tried in the past...
 
 Somebody else suggested
 the [websiteplanet Online Spell Checker](https://www.websiteplanet.com/webtools/spell-checker),
-but I have not tried that myself at all.
+but I have not looked at all at that myself.
 
 On the topic of AI...
 

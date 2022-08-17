@@ -107,7 +107,7 @@ being held virtually from September 19-23.</p>
 <img src="img/forge_hackathon_2022.jpg" alt="Forge Hackathon 2022" title="Forge Hackathon 2022" width="400"/> <!-- 1200 x 700 -->
 </center></p>
 <h4><a name="3"></a> Forge IFC Exporter</h4>
-<p>Eason Kang updated his IFC exporter addin to now support user defined property sets and the new JSON schema from the Revit IFC repository.
+<p>Eason Kang updated his IFC exporter add-in to now support user defined property sets and the new JSON schema from the Revit IFC repository.
 Check it out in
 the <a href="https://github.com/yiskang/forge-revit-ifc-exporter-appbundle">forge-revit-ifc-exporter-appbundle GitHub repo</a>.</p>
 <h4><a name="4"></a> NewFamilyInstances2 Can Create 27000 Instances</h4>
@@ -134,7 +134,7 @@ Now I need to see how it handles updating the parameters of the instances; it wo
 I thought it was just trying to avoid excess regenerations...</p>
 <p><strong>Response:</strong> They display a Voxel representation of soil based on boreholes samples; if there is some kind of vectorization happening in <code>NewFamilyInstances2</code>, it would be nice to have a similar approach to edit parameters in bulk.</p>
 <p><center>
-<img src="img/create_27k_instances_1280.png" alt="Creating many instances" title="Creating many instances" width="1280" height="773"/> <!-- 1280 x 773 -->
+<img src="img/create_27k_instances_1280.png" alt="Creating many instances" title="Creating many instances" width="800"/> <!-- 1280 x 773 -->
 </center></p>
 <p><strong>Answer:</strong> Looks like <code>NewFamilyInstance</code> commits a subtransaction for each call.
 That may be the main reason why it is much slower than the batch <code>NewFamilyInstance2</code> method.</p>
@@ -270,14 +270,14 @@ OUT = output
 
 <p>Many thanks to Mark for sharing this useful solution!</p>
 <h4><a name="6"></a> Web Based Spell Checker for Everything</h4>
-<p>I recently started testing <a href="https://www.grammarly.com">Grammarly</a> for
-integrated AI-enhanced spell and grammar checking including advanced writing support such as suggestions on better wording for clarity.
-It works in the web browser edit boxes, and also in the Microsoft Outlook email editor.
-It has made several suggestions that I like beter than I what I would hve written myself, so I am quite impressed.
-Definitely better suggestions than any other tools I tried (or mostly didn't in fact) in the past...</p>
+<p>I recently installed
+the <a href="https://www.grammarly.com">Grammarly</a> integrated
+AI-enhanced spell and grammar checking including advanced writing support such as suggestions on better wording for clarity.
+It works in web browser edit boxes and also in my email editor.
+It made several suggestions that improved my wording and I am quite impressed, with better suggestions than any other tools I ever tried in the past...</p>
 <p>Somebody else suggested
 the <a href="https://www.websiteplanet.com/webtools/spell-checker">websiteplanet Online Spell Checker</a>,
-but I have not tried that myself at all.</p>
+but I have not looked at all at that myself.</p>
 <p>On the topic of AI...</p>
 <p class="quote">Are you concerned about the increase in artificial intelligence?
 <br/>I am more concerned about the decrease in real intelligence.</p>
