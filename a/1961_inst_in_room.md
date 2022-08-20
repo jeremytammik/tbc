@@ -6,6 +6,9 @@
 
 <!---
 
+- Get FamilyInstances within The Room
+  https://forums.autodesk.com/t5/revit-api-forum/get-familyinstances-within-the-room/td-p/11364696
+
 twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/bulkinstances
@@ -32,11 +35,69 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### Instances in Room
 
 
-####<a name="2"></a> 
+####<a name="2"></a> Get Family Instances Within Room
+
+A common task is
+to [Get FamilyInstances within a room](https://forums.autodesk.com/t5/revit-api-forum/get-familyinstances-within-the-room/td-p/11364696):
+
+**Question:** I'm facing a small issue in filtering family instances within the room.
+A few families do not get filtered; for example, non-solid families are getting excluded.
+How to filter intersected 2D families also?
+Reference Image!!!
+arshad99_0-1660745687988.png
+ 
 
 <center>
-<img src="img/" alt="" title="" width="400"/> <!-- 1200 x 700 -->
+<img src="img/instances_in_room.png" alt="Family instances in room" title="Family instances in room" width="600"/> <!-- 1258 x 776 -->
 </center>
+
+
+
+This my Code!!!
+//Get Family Instance
+public List<FamilyInstance> GetFamilyInstance(Document revitDoc, Room room)
+{
+  //Get Closed Shell
+  GeometryElement geoEle = room.ClosedShell;
+  GeometryObject geoObject = null;
+  //Get Geometry Object From Geometry Element
+  foreach (GeometryObject obj in geoEle)
+  {
+      if (obj is Solid)
+      {
+          geoObject = obj;
+      }
+  }
+  ElementIntersectsSolidFilter elementIntersectsSolidFilter = new ElementIntersectsSolidFilter(geoObject as Solid);
+  return new FilteredElementCollector(revitDoc)
+        .OfClass(typeof(FamilyInstance))
+        .WhereElementIsNotElementType().
+        WherePasses(elementIntersectsSolidFilter).
+        Cast<FamilyInstance>().
+        ToList();
+}
+
+SamBerk
+Try using the Room property:
+public List<FamilyInstance> GetFamilyInstance(Document revitDoc, Room room)
+{
+var elements = new FilteredElementCollector(revitDoc)
+.OfClass(typeof(FamilyInstance))
+.WhereElementIsNotElementType()
+.Cast<FamilyInstance>()
+.Where(i => IsInstanceInRoom(i, room))
+.ToList();
+return elements;    
+}
+bool IsInstanceInRoom(FamilyInstance instance, Room room)
+{
+var isInstanceInRoom = instance.Room != null && instance.Room.Id == room.Id;
+return isInstanceInRoom;
+}
+
+RPTHOMAS108
+ElementIntersectsSolidFilter requires element to have solid geometry and be of category supported by interference checking.
+Use either as @SamBerk suggests or Room.IsPointInRoom, by constructing point based on geometry location and elevate it slightly to ensure it will be found within vertical limits of room.
 
 ####<a name="3"></a> 
 
