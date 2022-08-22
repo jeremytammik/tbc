@@ -9,6 +9,12 @@
 - Get FamilyInstances within The Room
   https://forums.autodesk.com/t5/revit-api-forum/get-familyinstances-within-the-room/td-p/11364696
 
+- another look at fuzz:
+  Unit converted parameter value not matching parsed string value
+  https://forums.autodesk.com/t5/revit-api-forum/unit-converted-parameter-value-not-matching-parsed-string-value/m-p/11353053
+  Comparing double values in C#
+  https://stackoverflow.com/questions/1398753/comparing-double-values-in-c-sharp
+
 twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/bulkinstances
@@ -33,7 +39,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 ### Instances in Room
-
 
 ####<a name="2"></a> Get Family Instances Within Room
 
@@ -109,21 +114,69 @@ You may need to elevate it slightly off the floor to ensure it will be found wit
 Many thanks to Sam Berk and
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas for their helpful advice!
 
-####<a name="3"></a> 
+####<a name="3"></a> Again, the Need for Fuzz
 
-####<a name="4"></a> 
+We take yet another look at fuzz, required in order to deal with comparison of real numbers on digital computers.
 
-**Question:** 
+The topic came up once again in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [unit converted parameter value not matching parsed string value](https://forums.autodesk.com/t5/revit-api-forum/unit-converted-parameter-value-not-matching-parsed-string-value/m-p/11353053).
 
-**Answer:** 
+To skip all the jabber and jump right to a solution, please refer to the StackOverflow discussion
+on [comparing double values in C#](https://stackoverflow.com/questions/1398753/comparing-double-values-in-c-sharp).
 
-**Response:** 
+**Question:** Strictly speaking, this is not a Revit API issue I'm facing, but after some research I couldn't find the answer here or anywhere else and it's still a challenge related to Revit.
 
-####<a name="5"></a> 
+I'm comparing a family parameter value with values in a spreadsheet so I can update the parameter accordingly if they don't match, but I'm getting weird results when comparing them. The snippet below shows how I'm extracting the double value of the `WW_Width` parameter and converting it to millimetres. Then, I compare it to the a parsed string with the exact same value as a double, but I get a false result to whether or not they match.
 
-<pre class="prettyprint">
+<pre class="code">
+var famPars = doc.FamilyManager.Parameters;
+var famTypes = doc.FamilyManager.Types;
+
+foreach (FamilyParameter param in famPars)
+{
+	foreach (FamilyType famtype in famTypes)
+	{
+		if (param.Definition.Name == "WW_Width")
+		{
+			console.ShowBoldMessage("WW_Width");
+			console.ShowMessage($"UnitType: {param.Definition.UnitType}");
+			console.ShowMessage($"StorageType: {param.StorageType}\n");
+
+			double valueInMM = UnitUtils.ConvertFromInternalUnits((double)famtype.AsDouble(param),
+																	DisplayUnitType.DUT_MILLIMETERS);
+			double parsedString = double.Parse("2448");
+
+			console.ShowMessage($"Value: {valueInMM}");
+			console.ShowMessage($"Parsed string: {parsedString}");
+			console.ShowMessage($"Values match: {valueInMM == parsedString}");
+		}
+	}
+}
 </pre>
 
+This is what my console shows as a result; I don't get why I'm getting a mismatch:
+
+<pre class="code">
+  WW_Width
+  UnitType: UT_Length
+  StorageType: Double
+  
+  Value: 2448
+  Parsed string: 2448
+  Values match: False
+</pre>
+
+**Answer:** You need to add some fuzz; you
+can [search The Building Coder for 'fuzz'](https://www.google.com/search?q=fuzz&as_sitesearch=thebuildingcoder.typepad.com).
+
+**Response:** Thanks for the steer in the right direction.
+I wasn't aware of that issue with doubles/floats.
+Instead of directly comparing the doubles, I'm subtracting one from the other and checking if the difference is under a certain tolerance (e.g. A - B < 0.001), and that works.
+
+The StackOverflow article
+on [comparing double values in C#](https://stackoverflow.com/questions/1398753/comparing-double-values-in-c-sharp) explains
+it well in case anyone faces this issue in the future.
 
 ####<a name="6"></a> Avoid PDF for On-Screen Reading
 
@@ -140,5 +193,4 @@ to use HTML gateway pages instead of PDFs,
 since [gateway pages prevent pdf shock](https://www.nngroup.com/articles/gateway-pages-prevent-pdf-shock).
 
 I fully agree with the latter, and mostly try to clearly mark links that lead to a PDF so that the unwary reader is prepared for leaving the world of HTML.
-
 
