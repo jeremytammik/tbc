@@ -26,6 +26,16 @@ Common tasks include finding instances with a given room, comparing real numbers
 
 linkedin:
 
+Retrieving family instances with a given room and comparing real numbers in the #RevitAPI
+
+https://autode.sk/instancesinroom
+
+Common tasks include finding instances with a given room, comparing real numbers, and sharing documentation online:
+
+- Get family instances within room
+- Again, the need for fuzz
+- Avoid PDF for on-screen reading...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
