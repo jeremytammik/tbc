@@ -57,31 +57,31 @@ How to filter intersected 2D families also?
 This my code:
 
 <pre class="code">
-<span style="color:green;">//Get&nbsp;Family&nbsp;Instance</span>
-<span style="color:blue;">public</span>&nbsp;List&lt;FamilyInstance&gt;&nbsp;<span style="color:#74531f;">GetFamilyInstance</span>(Document&nbsp;<span style="color:#1f377f;">revitDoc</span>,&nbsp;Room&nbsp;<span style="color:#1f377f;">room</span>)
-{
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Get&nbsp;Closed&nbsp;Shell</span>
-&nbsp;&nbsp;&nbsp;&nbsp;GeometryElement&nbsp;<span style="color:#1f377f;">geoEle</span>&nbsp;=&nbsp;room.ClosedShell;
-&nbsp;&nbsp;&nbsp;&nbsp;GeometryObject&nbsp;<span style="color:#1f377f;">geoObject</span>&nbsp;=&nbsp;<span style="color:blue;">null</span>;
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:green;">//Get&nbsp;Geometry&nbsp;Object&nbsp;From&nbsp;Geometry&nbsp;Element</span>
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">foreach</span>&nbsp;(GeometryObject&nbsp;<span style="color:#1f377f;">obj</span>&nbsp;<span style="color:#8f08c4;">in</span>&nbsp;geoEle)
-&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">if</span>&nbsp;(obj&nbsp;<span style="color:blue;">is</span>&nbsp;Solid)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;geoObject&nbsp;=&nbsp;obj;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;}
- 
-&nbsp;&nbsp;&nbsp;&nbsp;ElementIntersectsSolidFilter&nbsp;<span style="color:#1f377f;">elementIntersectsSolidFilter</span>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;ElementIntersectsSolidFilter(geoObject&nbsp;<span style="color:blue;">as</span>&nbsp;Solid);
- 
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;<span style="color:blue;">new</span>&nbsp;FilteredElementCollector(revitDoc)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(<span style="color:blue;">typeof</span>(FamilyInstance))
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType().
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WherePasses(elementIntersectsSolidFilter).
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cast&lt;FamilyInstance&gt;().
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ToList();
-}
+  <span style="color:green;">//Get&nbsp;Family&nbsp;Instance</span>
+  <span style="color:blue;">public</span>&nbsp;List&lt;FamilyInstance&gt;&nbsp;<span style="color:#74531f;">GetFamilyInstance</span>(Document&nbsp;<span style="color:#1f377f;">revitDoc</span>,&nbsp;Room&nbsp;<span style="color:#1f377f;">room</span>)
+  {
+  &nbsp;&nbsp;<span style="color:green;">//Get&nbsp;Closed&nbsp;Shell</span>
+  &nbsp;&nbsp;GeometryElement&nbsp;<span style="color:#1f377f;">geoEle</span>&nbsp;=&nbsp;room.ClosedShell;
+  &nbsp;&nbsp;GeometryObject&nbsp;<span style="color:#1f377f;">geoObject</span>&nbsp;=&nbsp;<span style="color:blue;">null</span>;
+  &nbsp;&nbsp;<span style="color:green;">//Get&nbsp;Geometry&nbsp;Object&nbsp;From&nbsp;Geometry&nbsp;Element</span>
+  &nbsp;&nbsp;<span style="color:#8f08c4;">foreach</span>&nbsp;(GeometryObject&nbsp;<span style="color:#1f377f;">obj</span>&nbsp;<span style="color:#8f08c4;">in</span>&nbsp;geoEle)
+  &nbsp;&nbsp;{
+  &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">if</span>&nbsp;(obj&nbsp;<span style="color:blue;">is</span>&nbsp;Solid)
+  &nbsp;&nbsp;&nbsp;&nbsp;{
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;geoObject&nbsp;=&nbsp;obj;
+  &nbsp;&nbsp;&nbsp;&nbsp;}
+  &nbsp;&nbsp;}
+   
+  &nbsp;&nbsp;ElementIntersectsSolidFilter&nbsp;<span style="color:#1f377f;">elementIntersectsSolidFilter</span>
+  &nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;ElementIntersectsSolidFilter(geoObject&nbsp;<span style="color:blue;">as</span>&nbsp;Solid);
+   
+  &nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;<span style="color:blue;">new</span>&nbsp;FilteredElementCollector(revitDoc)
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(<span style="color:blue;">typeof</span>(FamilyInstance))
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType().
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WherePasses(elementIntersectsSolidFilter).
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cast&lt;FamilyInstance&gt;().
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ToList();
+  }
 </pre>
 
 **Answer:** The `ElementIntersectsSolidFilter` requires the filtered elements to have solid geometry and be of a category supported by interference checking.
@@ -90,22 +90,22 @@ Your 2D instances do not fulfil this requirement.
 You can try using the family instance `Room` property like this:
 
 <pre class="code">
-<span style="color:blue;">bool</span>&nbsp;<span style="color:#74531f;">IsInstanceInRoom</span>(FamilyInstance&nbsp;<span style="color:#1f377f;">instance</span>,&nbsp;Room&nbsp;<span style="color:#1f377f;">room</span>)
-{
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">isInstanceInRoom</span>&nbsp;=&nbsp;instance.Room&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;&amp;&amp;&nbsp;instance.Room.Id&nbsp;==&nbsp;room.Id;
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;isInstanceInRoom;
-}
- 
-<span style="color:blue;">public</span>&nbsp;List&lt;FamilyInstance&gt;&nbsp;<span style="color:#74531f;">GetFamilyInstance</span>(Document&nbsp;<span style="color:#1f377f;">revitDoc</span>,&nbsp;Room&nbsp;<span style="color:#1f377f;">room</span>)
-{
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">elements</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;FilteredElementCollector(revitDoc)
-&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(<span style="color:blue;">typeof</span>(FamilyInstance))
-&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType()
-&nbsp;&nbsp;&nbsp;&nbsp;.Cast&lt;FamilyInstance&gt;()
-&nbsp;&nbsp;&nbsp;&nbsp;.Where(<span style="color:#1f377f;">i</span>&nbsp;=&gt;&nbsp;IsInstanceInRoom(i,&nbsp;room))
-&nbsp;&nbsp;&nbsp;&nbsp;.ToList();
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;elements;
-}
+  <span style="color:blue;">bool</span>&nbsp;<span style="color:#74531f;">IsInstanceInRoom</span>(FamilyInstance&nbsp;<span style="color:#1f377f;">instance</span>,&nbsp;Room&nbsp;<span style="color:#1f377f;">room</span>)
+  {
+  &nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">isInstanceInRoom</span>&nbsp;=&nbsp;instance.Room&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;&amp;&amp;&nbsp;instance.Room.Id&nbsp;==&nbsp;room.Id;
+  &nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;isInstanceInRoom;
+  }
+   
+  <span style="color:blue;">public</span>&nbsp;List&lt;FamilyInstance&gt;&nbsp;<span style="color:#74531f;">GetFamilyInstance</span>(Document&nbsp;<span style="color:#1f377f;">revitDoc</span>,&nbsp;Room&nbsp;<span style="color:#1f377f;">room</span>)
+  {
+  &nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">elements</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;FilteredElementCollector(revitDoc)
+  &nbsp;&nbsp;.OfClass(<span style="color:blue;">typeof</span>(FamilyInstance))
+  &nbsp;&nbsp;.WhereElementIsNotElementType()
+  &nbsp;&nbsp;.Cast&lt;FamilyInstance&gt;()
+  &nbsp;&nbsp;.Where(<span style="color:#1f377f;">i</span>&nbsp;=&gt;&nbsp;IsInstanceInRoom(i,&nbsp;room))
+  &nbsp;&nbsp;.ToList();
+  &nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;elements;
+  }
 </pre>
 
 Another approach is to use the `Room.IsPointInRoom` predicate and check the family instance location point or constructing some other point based on geometry location.
@@ -130,29 +130,29 @@ on [comparing double values in C#](https://stackoverflow.com/questions/1398753/c
 I'm comparing a family parameter value with values in a spreadsheet so I can update the parameter accordingly if they don't match, but I'm getting weird results when comparing them. The snippet below shows how I'm extracting the double value of the `WW_Width` parameter and converting it to millimetres. Then, I compare it to the a parsed string with the exact same value as a double, but I get a false result to whether or not they match.
 
 <pre class="code">
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">famPars</span>&nbsp;=&nbsp;doc.FamilyManager.Parameters;
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">famTypes</span>&nbsp;=&nbsp;doc.FamilyManager.Types;
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">famPars</span>&nbsp;=&nbsp;doc.FamilyManager.Parameters;
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">famTypes</span>&nbsp;=&nbsp;doc.FamilyManager.Types;
  
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">foreach</span>&nbsp;(FamilyParameter&nbsp;<span style="color:#1f377f;">param</span>&nbsp;<span style="color:#8f08c4;">in</span>&nbsp;famPars)
+&nbsp;&nbsp;<span style="color:#8f08c4;">foreach</span>&nbsp;(FamilyParameter&nbsp;<span style="color:#1f377f;">param</span>&nbsp;<span style="color:#8f08c4;">in</span>&nbsp;famPars)
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">foreach</span>&nbsp;(FamilyType&nbsp;<span style="color:#1f377f;">famtype</span>&nbsp;<span style="color:#8f08c4;">in</span>&nbsp;famTypes)
 &nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">foreach</span>&nbsp;(FamilyType&nbsp;<span style="color:#1f377f;">famtype</span>&nbsp;<span style="color:#8f08c4;">in</span>&nbsp;famTypes)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">if</span>&nbsp;(param.Definition.Name&nbsp;==&nbsp;<span style="color:#a31515;">&quot;WW_Width&quot;</span>)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.ShowBoldMessage(<span style="color:#a31515;">&quot;WW_Width&quot;</span>);
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.ShowMessage(<span style="color:#a31515;">$&quot;UnitType:&nbsp;</span>{param.Definition.UnitType}<span style="color:#a31515;">&quot;</span>);
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.ShowMessage(<span style="color:#a31515;">$&quot;StorageType:&nbsp;</span>{param.StorageType}<span style="color:#a31515;">\n&quot;</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">if</span>&nbsp;(param.Definition.Name&nbsp;==&nbsp;<span style="color:#a31515;">&quot;WW_Width&quot;</span>)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.ShowBoldMessage(<span style="color:#a31515;">&quot;WW_Width&quot;</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.ShowMessage(<span style="color:#a31515;">$&quot;UnitType:&nbsp;</span>{param.Definition.UnitType}<span style="color:#a31515;">&quot;</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.ShowMessage(<span style="color:#a31515;">$&quot;StorageType:&nbsp;</span>{param.StorageType}<span style="color:#a31515;">\n&quot;</span>);
  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">valueInMM</span>&nbsp;=&nbsp;UnitUtils.ConvertFromInternalUnits((<span style="color:blue;">double</span>)&nbsp;famtype.AsDouble(param),
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DisplayUnitType.DUT_MILLIMETERS);
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">parsedString</span>&nbsp;=&nbsp;<span style="color:blue;">double</span>.Parse(<span style="color:#a31515;">&quot;2448&quot;</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">valueInMM</span>&nbsp;=&nbsp;UnitUtils.ConvertFromInternalUnits((<span style="color:blue;">double</span>)&nbsp;famtype.AsDouble(param),
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DisplayUnitType.DUT_MILLIMETERS);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">parsedString</span>&nbsp;=&nbsp;<span style="color:blue;">double</span>.Parse(<span style="color:#a31515;">&quot;2448&quot;</span>);
  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.ShowMessage(<span style="color:#a31515;">$&quot;Value:&nbsp;</span>{valueInMM}<span style="color:#a31515;">&quot;</span>);
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.ShowMessage(<span style="color:#a31515;">$&quot;Parsed&nbsp;string:&nbsp;</span>{parsedString}<span style="color:#a31515;">&quot;</span>);
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.ShowMessage(<span style="color:#a31515;">$&quot;Values&nbsp;match:&nbsp;</span>{valueInMM&nbsp;==&nbsp;parsedString}<span style="color:#a31515;">&quot;</span>);
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.ShowMessage(<span style="color:#a31515;">$&quot;Value:&nbsp;</span>{valueInMM}<span style="color:#a31515;">&quot;</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.ShowMessage(<span style="color:#a31515;">$&quot;Parsed&nbsp;string:&nbsp;</span>{parsedString}<span style="color:#a31515;">&quot;</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.ShowMessage(<span style="color:#a31515;">$&quot;Values&nbsp;match:&nbsp;</span>{valueInMM&nbsp;==&nbsp;parsedString}<span style="color:#a31515;">&quot;</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
 &nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;}
 </pre>
 
 This is what my console shows as a result; I don't get why I'm getting a mismatch:
