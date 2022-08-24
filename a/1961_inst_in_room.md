@@ -40,6 +40,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Instances in Room
 
+Standard tasks include finding instances with a given room, comparing real numbers, and sharing documentation online:
+
+- [Get family instances within room](#2)
+- [Again, the need for fuzz](#3)
+- [Avoid PDF for on-screen reading](#4)
+
 ####<a name="2"></a> Get Family Instances Within Room
 
 A common task is
