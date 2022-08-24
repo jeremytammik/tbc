@@ -133,7 +133,9 @@ on [comparing double values in C#](https://stackoverflow.com/questions/1398753/c
 
 **Question:** Strictly speaking, this is not a Revit API issue I'm facing, but after some research I couldn't find the answer here or anywhere else and it's still a challenge related to Revit.
 
-I'm comparing a family parameter value with values in a spreadsheet so I can update the parameter accordingly if they don't match, but I'm getting weird results when comparing them. The snippet below shows how I'm extracting the double value of the `WW_Width` parameter and converting it to millimetres. Then, I compare it to the a parsed string with the exact same value as a double, but I get a false result to whether or not they match.
+I'm comparing a family parameter value with values in a spreadsheet so I can update the parameter accordingly if they don't match, but I'm getting weird results when comparing them.
+The snippet below shows how I'm extracting the double value of the `WW_Width` parameter and converting it to millimetres.
+Then, I compare it to a parsed string with the exact same value as a double, but I get a false result as to whether or not they match.
 
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">famPars</span>&nbsp;=&nbsp;doc.FamilyManager.Parameters;
@@ -192,10 +194,9 @@ However, I am very glad to be well informed about my bad manners.
 
 The recommendation stands
 to [avoid PDF for on-screen reading](https://www.nngroup.com/articles/avoid-pdf-onscreen-reading-original).
-It was vaced a long time, and apparently still stand,
+It was voiced a long time ago and apparently still stands,
 cf. [PDF: still unfit for human consumption, 20 years later](https://www.nngroup.com/articles/pdf-unfit-for-human-consumption).
-In stead, the author recommends
-to use HTML gateway pages instead of PDFs,
+Instead, the author recommends using HTML gateway pages instead of PDFs,
 since [gateway pages prevent pdf shock](https://www.nngroup.com/articles/gateway-pages-prevent-pdf-shock).
 
 I fully agree with the latter, and mostly try to clearly mark links that lead to a PDF so that the unwary reader is well prepared for leaving the world of HTML before following the link.

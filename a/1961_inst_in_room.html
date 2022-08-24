@@ -116,7 +116,9 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/unit-converted-parame
 <p>To skip the jabber and jump right to a solution, please refer to the StackOverflow discussion
 on <a href="https://stackoverflow.com/questions/1398753/comparing-double-values-in-c-sharp">comparing double values in C#</a>.</p>
 <p><strong>Question:</strong> Strictly speaking, this is not a Revit API issue I'm facing, but after some research I couldn't find the answer here or anywhere else and it's still a challenge related to Revit.</p>
-<p>I'm comparing a family parameter value with values in a spreadsheet so I can update the parameter accordingly if they don't match, but I'm getting weird results when comparing them. The snippet below shows how I'm extracting the double value of the <code>WW_Width</code> parameter and converting it to millimetres. Then, I compare it to the a parsed string with the exact same value as a double, but I get a false result to whether or not they match.</p>
+<p>I'm comparing a family parameter value with values in a spreadsheet so I can update the parameter accordingly if they don't match, but I'm getting weird results when comparing them.
+The snippet below shows how I'm extracting the double value of the <code>WW_Width</code> parameter and converting it to millimetres.
+Then, I compare it to a parsed string with the exact same value as a double, but I get a false result as to whether or not they match.</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">famPars</span>&nbsp;=&nbsp;doc.FamilyManager.Parameters;
 &nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">famTypes</span>&nbsp;=&nbsp;doc.FamilyManager.Types;
@@ -167,9 +169,8 @@ it well in case anyone faces this issue in the future.</p>
 <p>However, I am very glad to be well informed about my bad manners.</p>
 <p>The recommendation stands
 to <a href="https://www.nngroup.com/articles/avoid-pdf-onscreen-reading-original">avoid PDF for on-screen reading</a>.
-It was vaced a long time, and apparently still stand,
+It was voiced a long time ago and apparently still stands,
 cf. <a href="https://www.nngroup.com/articles/pdf-unfit-for-human-consumption">PDF: still unfit for human consumption, 20 years later</a>.
-In stead, the author recommends
-to use HTML gateway pages instead of PDFs,
+Instead, the author recommends using HTML gateway pages instead of PDFs,
 since <a href="https://www.nngroup.com/articles/gateway-pages-prevent-pdf-shock">gateway pages prevent pdf shock</a>.</p>
 <p>I fully agree with the latter, and mostly try to clearly mark links that lead to a PDF so that the unwary reader is well prepared for leaving the world of HTML before following the link.</p>
