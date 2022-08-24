@@ -19,8 +19,10 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/bulkinstances
 
-&ndash;
-...
+Common tasks include finding instances with a given room, comparing real numbers, and sharing documentation online
+&ndash; Get family instances within room
+&ndash; Again, the need for fuzz
+&ndash; Avoid PDF for on-screen reading...
 
 linkedin:
 
@@ -38,7 +40,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Instances in Room
+### Instances in Room and Need for Fuzz
 
 Common tasks include finding instances with a given room, comparing real numbers, and sharing documentation online:
 
@@ -64,7 +66,9 @@ This my code:
 
 <pre class="code">
   <span style="color:green;">//Get&nbsp;Family&nbsp;Instance</span>
-  <span style="color:blue;">public</span>&nbsp;List&lt;FamilyInstance&gt;&nbsp;<span style="color:#74531f;">GetFamilyInstance</span>(Document&nbsp;<span style="color:#1f377f;">revitDoc</span>,&nbsp;Room&nbsp;<span style="color:#1f377f;">room</span>)
+  <span style="color:blue;">public</span>&nbsp;List&lt;FamilyInstance&gt;&nbsp;<span style="color:#74531f;">GetFamilyInstance</span>(
+    Document&nbsp;<span style="color:#1f377f;">revitDoc</span>,
+    Room&nbsp;<span style="color:#1f377f;">room</span>)
   {
   &nbsp;&nbsp;<span style="color:green;">//Get&nbsp;Closed&nbsp;Shell</span>
   &nbsp;&nbsp;GeometryElement&nbsp;<span style="color:#1f377f;">geoEle</span>&nbsp;=&nbsp;room.ClosedShell;
@@ -82,11 +86,11 @@ This my code:
   &nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;ElementIntersectsSolidFilter(geoObject&nbsp;<span style="color:blue;">as</span>&nbsp;Solid);
    
   &nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;<span style="color:blue;">new</span>&nbsp;FilteredElementCollector(revitDoc)
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(<span style="color:blue;">typeof</span>(FamilyInstance))
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType().
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WherePasses(elementIntersectsSolidFilter).
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cast&lt;FamilyInstance&gt;().
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ToList();
+  &nbsp;&nbsp;&nbsp;&nbsp;.OfClass(<span style="color:blue;">typeof</span>(FamilyInstance))
+  &nbsp;&nbsp;&nbsp;&nbsp;.WhereElementIsNotElementType().
+  &nbsp;&nbsp;&nbsp;&nbsp;WherePasses(elementIntersectsSolidFilter).
+  &nbsp;&nbsp;&nbsp;&nbsp;Cast&lt;FamilyInstance&gt;().
+  &nbsp;&nbsp;&nbsp;&nbsp;ToList();
   }
 </pre>
 
@@ -98,18 +102,21 @@ You can try using the family instance `Room` property like this:
 <pre class="code">
   <span style="color:blue;">bool</span>&nbsp;<span style="color:#74531f;">IsInstanceInRoom</span>(FamilyInstance&nbsp;<span style="color:#1f377f;">instance</span>,&nbsp;Room&nbsp;<span style="color:#1f377f;">room</span>)
   {
-  &nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">isInstanceInRoom</span>&nbsp;=&nbsp;instance.Room&nbsp;!=&nbsp;<span style="color:blue;">null</span>&nbsp;&amp;&amp;&nbsp;instance.Room.Id&nbsp;==&nbsp;room.Id;
+  &nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">isInstanceInRoom</span>&nbsp;=&nbsp;(instance.Room&nbsp;!=&nbsp;<span style="color:blue;">null</span>)&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;&nbsp;instance.Room.Id&nbsp;==&nbsp;room.Id;
   &nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;isInstanceInRoom;
   }
    
-  <span style="color:blue;">public</span>&nbsp;List&lt;FamilyInstance&gt;&nbsp;<span style="color:#74531f;">GetFamilyInstance</span>(Document&nbsp;<span style="color:#1f377f;">revitDoc</span>,&nbsp;Room&nbsp;<span style="color:#1f377f;">room</span>)
+  <span style="color:blue;">public</span>&nbsp;List&lt;FamilyInstance&gt;&nbsp;<span style="color:#74531f;">GetFamilyInstance</span>(
+    Document&nbsp;<span style="color:#1f377f;">revitDoc</span>,
+    Room&nbsp;<span style="color:#1f377f;">room</span>)
   {
   &nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">elements</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;FilteredElementCollector(revitDoc)
-  &nbsp;&nbsp;.OfClass(<span style="color:blue;">typeof</span>(FamilyInstance))
-  &nbsp;&nbsp;.WhereElementIsNotElementType()
-  &nbsp;&nbsp;.Cast&lt;FamilyInstance&gt;()
-  &nbsp;&nbsp;.Where(<span style="color:#1f377f;">i</span>&nbsp;=&gt;&nbsp;IsInstanceInRoom(i,&nbsp;room))
-  &nbsp;&nbsp;.ToList();
+    &nbsp;&nbsp;.OfClass(<span style="color:blue;">typeof</span>(FamilyInstance))
+    &nbsp;&nbsp;.WhereElementIsNotElementType()
+    &nbsp;&nbsp;.Cast&lt;FamilyInstance&gt;()
+    &nbsp;&nbsp;.Where(<span style="color:#1f377f;">i</span>&nbsp;=&gt;&nbsp;IsInstanceInRoom(i,&nbsp;room))
+    &nbsp;&nbsp;.ToList();
   &nbsp;&nbsp;<span style="color:#8f08c4;">return</span>&nbsp;elements;
   }
 </pre>
@@ -151,8 +158,9 @@ Then, I compare it to a parsed string with the exact same value as a double, but
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.ShowMessage(<span style="color:#a31515;">$&quot;UnitType:&nbsp;</span>{param.Definition.UnitType}<span style="color:#a31515;">&quot;</span>);
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.ShowMessage(<span style="color:#a31515;">$&quot;StorageType:&nbsp;</span>{param.StorageType}<span style="color:#a31515;">\n&quot;</span>);
  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">valueInMM</span>&nbsp;=&nbsp;UnitUtils.ConvertFromInternalUnits((<span style="color:blue;">double</span>)&nbsp;famtype.AsDouble(param),
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DisplayUnitType.DUT_MILLIMETERS);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">valueInMM</span>&nbsp;=&nbsp;UnitUtils.ConvertFromInternalUnits(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span style="color:blue;">double</span>)&nbsp;famtype.AsDouble(param),
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DisplayUnitType.DUT_MILLIMETERS);
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">double</span>&nbsp;<span style="color:#1f377f;">parsedString</span>&nbsp;=&nbsp;<span style="color:blue;">double</span>.Parse(<span style="color:#a31515;">&quot;2448&quot;</span>);
  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.ShowMessage(<span style="color:#a31515;">$&quot;Value:&nbsp;</span>{valueInMM}<span style="color:#a31515;">&quot;</span>);
@@ -163,7 +171,7 @@ Then, I compare it to a parsed string with the exact same value as a double, but
 &nbsp;&nbsp;}
 </pre>
 
-This is what my console shows as a result; I don't get why I'm getting a mismatch:
+This is what my console shows as a result; I don't understand why I'm getting a mismatch:
 
 <pre class="code">
   WW_Width
