@@ -17,7 +17,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/bulkinstances
+Retrieving family instances with a given room and comparing real numbers in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/instancesinroom
 
 Common tasks include finding instances with a given room, comparing real numbers, and sharing documentation online
 &ndash; Get family instances within room
