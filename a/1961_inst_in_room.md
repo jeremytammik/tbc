@@ -134,8 +134,24 @@ You can try using the family instance `Room` property like this:
 Another approach is to use the `Room.IsPointInRoom` predicate and check the family instance location point or constructing some other point based on geometry location.
 You may need to elevate it slightly off the floor to ensure it will be found within vertical limits of room.
 
-Many thanks to Sam Berk and
-Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas for their helpful advice!
+**Response:** So, I need to take a center point of the family instance and then use `IsPointInRoom` to ensure that it is within the room limits.
+Can you write some simple code for me?
+
+**Answer:** The solution is very kindly given by EatRevitPoopCad
+explaining [how to determine if a toilet belongs to a room](https://forums.autodesk.com/t5/revit-api-forum/how-to-determinate-if-a-toilet-belongs-to-a-room/m-p/10305412).
+
+You could also simply search this forum for `IsPointInRoom` to find it yourself.
+
+Many thanks to Sam Berk,
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+and EatRevitPoopCad for their helpful advice!
+
+####<a name="2.1"></a> Rooms in Linked Models
+
+As Joshua Lumley points out in his [comment below](https://thebuildingcoder.typepad.com/blog/2022/08/instances-in-room-and-need-for-fuzz.html#comment-5959441109),
+`IsPointInRoom` works well for rooms in linked models as well; just remember to inverse the total transform of the linkedinstance before doing it.
+
+
 
 ####<a name="3"></a> Again, the Need for Fuzz
 

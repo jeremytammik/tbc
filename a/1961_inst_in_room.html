@@ -25,6 +25,16 @@ Common tasks include finding instances with a given room, comparing real numbers
 
 linkedin:
 
+Retrieving family instances with a given room and comparing real numbers in the #RevitAPI
+
+https://autode.sk/instancesinroom
+
+Common tasks include finding instances with a given room, comparing real numbers, and sharing documentation online:
+
+- Get family instances within room
+- Again, the need for fuzz
+- Avoid PDF for on-screen reading...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -113,8 +123,17 @@ Your 2D instances do not fulfil this requirement.</p>
 
 <p>Another approach is to use the <code>Room.IsPointInRoom</code> predicate and check the family instance location point or constructing some other point based on geometry location.
 You may need to elevate it slightly off the floor to ensure it will be found within vertical limits of room.</p>
-<p>Many thanks to Sam Berk and
-Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas for their helpful advice!</p>
+<p><strong>Response:</strong> So, I need to take a center point of the family instance and then use <code>IsPointInRoom</code> to ensure that it is within the room limits.
+Can you write some simple code for me?</p>
+<p><strong>Answer:</strong> The solution is very kindly given by EatRevitPoopCad
+explaining <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-determinate-if-a-toilet-belongs-to-a-room/m-p/10305412">how to determine if a toilet belongs to a room</a>.</p>
+<p>You could also simply search this forum for <code>IsPointInRoom</code> to find it yourself.</p>
+<p>Many thanks to Sam Berk,
+Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
+and EatRevitPoopCad for their helpful advice!</p>
+<h4><a name="2.1"></a> Rooms in Linked Models</h4>
+<p>As Joshua Lumley points out in his <a href="https://thebuildingcoder.typepad.com/blog/2022/08/instances-in-room-and-need-for-fuzz.html#comment-5959441109">comment below</a>,
+<code>IsPointInRoom</code> works well for rooms in linked models as well; just remember to inverse the total transform of the linkedinstance before doing it.</p>
 <h4><a name="3"></a> Again, the Need for Fuzz</h4>
 <p>We take yet another look at fuzz, required in order to deal with comparison of real numbers on digital computers.</p>
 <p>The topic came up once again in
