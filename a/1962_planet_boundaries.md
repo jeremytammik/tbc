@@ -6,11 +6,12 @@
 
 <!---
 
-- home planet at risk
+- Dynamo versus pure Revit API
+  https://forums.autodesk.com/t5/revit-api-forum/dynamo/m-p/11380940
+
+- home planet at great risk
   The Nine Planetary Boundaries
   https://labs.blogs.com/its_alive_in_the_lab/2022/08/nine-planetary-boundaries.html
-
-
 
 twitter:
 
@@ -35,7 +36,130 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### The Nine Planet Boundaries
+### To Dy or Not to Dy, Home Planet at Risk
+
+####<a name="2"></a> To Dynamo or Not to Dynamo
+
+I explained some aspects of getting started with the Revit API and Dynamo programming, as well as the choice between working with Dynamo versus the pure Revit API, in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [Dynamo](https://forums.autodesk.com/t5/revit-api-forum/dynamo/m-p/11380940):
+
+**Question:** I am completely new to Dynamo.
+Is there a way to generate different plate sizes in Revit using a `.txt` file with Dynamo?
+I have `txt` files with all the information needed to generate steel frames.
+Before buying Revit, I would like to know if `txt` data can be uploaded into Revit and used to generate 3D models (maybe by using Dynamo).
+
+**Answer:** Welcome to the Revit API!
+
+Yes, what you describe is possible in Revit.
+
+However, please note that this discussion forum is dedicated to programming Revit using the standard .NET Revit API.
+
+If you specifically want to implement your solution using Dynamo, the best place to discuss it is probably in
+the [Dynamo discussion forum](https://forum.dynamobim.com).
+
+If you want to work with the standard .NET Revit API, please read
+the [Revit API getting started material](http://thebuildingcoder.typepad.com/blog/about-the-author.html#2) first
+and work through the DevTV and My first Revit plugin tutorials.
+
+**Response:** Thank you. Can I ask you one more question?
+
+Is standard .NET Revit API better than Dynamo to import text data into Revit to auto generate steel frames?
+I have a 3rd party program that designs custom steel frames.
+The data files have everything needed to generate a 3D model.
+I don't know Dynamo or standard .NET Revit API so I will be starting from scratch.
+I know just enough Revit to be dangerous.
+I  really appreciato your advice!
+
+xyz
+
+<p>&nbsp;&nbsp;</p>
+<p>It also adds some functionality of its own, e.g., its own geometry library.</p>
+<p>&nbsp;&nbsp;</p>
+<p>For your purposes, I think both would work well.</p>
+<p>&nbsp;</p>
+<p>For learning purposes, I would suggest starting step by step with different areas:</p>
+<p>&nbsp;&nbsp;</p>
+<ul>
+<li>Revit end-user interface, optimal workflow and best practices</li>
+<li>Programming basics, e.g., a non-Revit-related Python tutorial</li>
+<li>.NET&nbsp;programming basics, e.g., a non-Revit-related C# tutorial</li>
+<li>Revit API basics, e.g., the My First Revit Plug-in video tutorial</li>
+<li>A Dynamo tutorial</li>
+</ul>
+<p>&nbsp;</p>
+<p>The first is vital. You need that to understand and solve your Revit task. Only after understanding it from a UI point of view will you be able to address it effectively from the API side of things.</p>
+<p>&nbsp;&nbsp;</p>
+<p>Learning a little bit of Python is highly recommended. It is the most didactical language there is, and learning basic programming with it is fun and easy.</p>
+<p>&nbsp;&nbsp;</p>
+<p>.NET is the foundation of the Revit API, so you need some understanding of that.</p>
+<p>&nbsp;&nbsp;</p>
+<p>You need to understand the architecture of the Revit API to get an add-in implemented, loaded and running.</p>
+<p>&nbsp; &nbsp;</p>
+<p>You can quickly dive in to Dynamo and then compare to see what you prefer:</p>
+<p>&nbsp;</p>
+<ul>
+<li>Python versus C#</li>
+<li>Pure Revit API versus Dynamo</li>
+</ul>
+<p>&nbsp;&nbsp;</p>
+<p>Please look in depth at the Revit API getting started material and procedures listed here:</p>
+<p>&nbsp;&nbsp;</p>
+<p><a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#2" target="_blank" rel="noopener">https://thebuildingcoder.typepad.com/blog/about-the-author.html#2</a></p>
+<p>&nbsp;&nbsp;</p>
+<p>Good luck and have fun!</p>
+<p>&nbsp;&nbsp;</p>
+<p>Please let us know how it goes for you, what you end up choosing, and why.</p>
+<p>&nbsp;&nbsp;</p>
+<p>&nbsp;</p>
+
+**Answer:** Dynamo is a wrapper around the standard Revit API; search these articles for 'dynamo' and 'wrapper':
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/10/rtc-revit-api-panel-idea-station-edit-and-continue.html" target="_blank" rel="noopener">RTC Revit API Panel, Idea Station, Edit and Continue</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2018/12/dynamo-symbol-vs-type-and-exporter-exception.html" target="_blank" rel="noopener">Dynamo, Symbol vs Type and Exporter Exception</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/08/revit-api-and-design-automation-api-survey.html" target="_blank" rel="noopener">Revit API and Design Automation API Survey</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/08/zero-touch-node-element-wrapper-and-load-from-stream.html" target="_blank" rel="noopener">Zero Touch Node Wrapper and Load from Stream</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/08/11-years-and-revit-api-docs-full-text-search.html" target="_blank" rel="noopener">11 Years and Revit API Docs Full Text Search</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2022/04/tbc-samples-2023-and-the-new-structural-api.html" target="_blank" rel="noopener">TBC Samples 2023 and the New Structural API</a></li>
+</ul>
+
+It also adds some functionality of its own, e.g., its own geometry library.
+
+For your purposes, I think both would work well.
+
+For learning purposes, I would suggest starting step by step with different areas:
+
+- Revit end-user interface, optimal workflow and best practices
+- Programming basics, e.g., a non-Revit-related Python tutorial
+- .NET programming basics, e.g., a non-Revit-related C# tutorial
+- Revit API basics, e.g., the My First Revit Plug-in video tutorial
+- A Dynamo tutorial
+
+The first is vital. You need that to understand and solve your Revit task.
+Only after understanding it from a UI point of view will you be able to address it effectively from the API side of things.
+
+Learning a little bit of Python is highly recommended.
+It is the most didactical language there is, and learning basic programming with it is fun and easy.
+
+.NET is the foundation of the Revit API, so you need some understanding of that.
+
+You need to understand the architecture of the Revit API to get an add-in implemented, loaded and running.
+
+You can quickly dive in to Dynamo and then compare to see what you prefer:
+
+- Python versus C#
+- Pure Revit API versus Dynamo
+
+Rereading your question, I think that the most important step for you first of all is the first one: research the exact manual steps required in the user interface to read the available text data and generate your steel framing in Revit from that. I assume that the text data specifies the steel framing cross-section in some way, either by using predefined profile definitions or specifying the exact geometry of the cross-section. So, how can that data be transformed into Revit to define an appropriate steel framing element type? Once you have the profiles and element types defined, I guess placing the steel framing is simply a matter of reading the beam, column and framing element start and end point and placing straight segments. Finally, your text data may be specifying how the elements are connected and joined. That may be very complex. All of this is probably non-trivial to achieve in the UI. You need to know the exact UI approach, best practices and detailed execution steps before you can start thinking about programming it.
+
+The pure Revit API will give you the greatest flexibility. The Dynamo framework may possibly offer predefined existing libraries and packages that you can use, and you may find it easier to learn. That is a question of taste.
+
+But, first things first: what do you have, what do you need, and how to achieve it optimally in the UI, applying best practices?
+
+####<a name="3"></a> Home Planet at Great Risk
+
+The Nine Planet Boundaries
 
 Stockholm Resilience Centre
 https://www.stockholmresilience.org/research/research-news/2021-04-30-new-netflix-documentary-brings-the-planetary-boundaries-to-the-world.html
@@ -45,7 +169,6 @@ Sir David Attenborough Presents: Breaking Boundaries: The Science of Our Planet 
 https://youtu.be/2Jq23mSDh9U
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/2Jq23mSDh9U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
 
 215,943 views  23 Apr 2021  Breaking Boundaries tells the story of the most important scientific discovery of our time - that humanity has pushed Earth beyond the boundaries that have kept Earth stable for 10,000 years, since the dawn of civilization. The 75-minute film takes the audience on a journey of discovery of planetary thresholds we must not exceed, not just for the stability of our planet, but for the future of humanity. It offers up the solutions we can and must put in place now if we are to protect Earth’s life support systems.
 
@@ -141,10 +264,8 @@ Here are some of the comments that stood out for me:
 <img src="img/.png" alt="" title="" width="600"/> <!-- 1258 x 776 -->
 </center>
 
-
 <pre class="code">
 </pre>
-
 
 ####<a name="3"></a> 
 
