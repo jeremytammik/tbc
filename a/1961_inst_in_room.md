@@ -148,7 +148,7 @@ If you are using Phasing, you have to pass in the phase:
 **Response:** So, I need to take a center point of the family instance and then use `IsPointInRoom` to ensure that it is within the room limits.
 Can you write some simple code for me?
 
-**Answer:** The solution is very kindly given by EatRevitPoopCad
+**Answer:** The solution for that is very kindly given by EatRevitPoopCad
 explaining [how to determine if a toilet belongs to a room](https://forums.autodesk.com/t5/revit-api-forum/how-to-determinate-if-a-toilet-belongs-to-a-room/m-p/10305412).
 You could also simply search this forum for `IsPointInRoom` to find it yourself.
 
