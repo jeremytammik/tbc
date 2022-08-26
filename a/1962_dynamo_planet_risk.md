@@ -15,7 +15,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Risking our one and only home planet and the survival of civilisation as we know it by crossing planetary boundaries, we choose whether to Dy or not to Dy, not just in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/todyornottody
 
 Let's look at two serious choices that we are facing &ndash; one more serious than the other
 &ndash; To Dynamo or not to Dynamo
