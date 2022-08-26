@@ -36,7 +36,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### To Dy or Not to Dy, Home Planet at Risk
+### Home Planet and to Dy or Not to Dy
 
 ####<a name="2"></a> To Dynamo or Not to Dynamo
 
