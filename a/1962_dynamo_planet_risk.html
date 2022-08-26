@@ -36,6 +36,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Home Planet and to Dy or Not to Dy</h3>
+<p>Let's look at two serious choices that we are facing:</p>
 <h4><a name="2"></a> To Dynamo or Not to Dynamo</h4>
 <p>I explained some aspects of getting started with the Revit API and Dynamo programming, as well as the choice between working with Dynamo versus the pure Revit API, in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
@@ -61,15 +62,15 @@ I know just enough Revit to be dangerous.
 I  really appreciate your advice!</p>
 <p><strong>Answer:</strong> Dynamo is a wrapper around the standard Revit API; search these articles for 'dynamo' and 'wrapper':</p>
 <ul>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2016/10/rtc-revit-api-panel-idea-station-edit-and-continue.html" target="_blank" rel="noopener">RTC Revit API Panel, Idea Station, Edit and Continue</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2018/12/dynamo-symbol-vs-type-and-exporter-exception.html" target="_blank" rel="noopener">Dynamo, Symbol vs Type and Exporter Exception</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2019/08/revit-api-and-design-automation-api-survey.html" target="_blank" rel="noopener">Revit API and Design Automation API Survey</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2019/08/zero-touch-node-element-wrapper-and-load-from-stream.html" target="_blank" rel="noopener">Zero Touch Node Wrapper and Load from Stream</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2019/08/11-years-and-revit-api-docs-full-text-search.html" target="_blank" rel="noopener">11 Years and Revit API Docs Full Text Search</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2022/04/tbc-samples-2023-and-the-new-structural-api.html" target="_blank" rel="noopener">TBC Samples 2023 and the New Structural API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/10/rtc-revit-api-panel-idea-station-edit-and-continue.html">RTC Revit API Panel, Idea Station, Edit and Continue</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2018/12/dynamo-symbol-vs-type-and-exporter-exception.html">Dynamo, Symbol vs Type and Exporter Exception</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/08/revit-api-and-design-automation-api-survey.html">Revit API and Design Automation API Survey</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/08/zero-touch-node-element-wrapper-and-load-from-stream.html">Zero Touch Node Wrapper and Load from Stream</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/08/11-years-and-revit-api-docs-full-text-search.html">11 Years and Revit API Docs Full Text Search</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2022/04/tbc-samples-2023-and-the-new-structural-api.html">TBC Samples 2023 and the New Structural API</a></li>
 </ul>
 
-<p>It also adds some functionality of its own, e.g., its own geometry library.</p>
+<p>Dynamo also adds some functionality of its own, e.g., its own geometry library.</p>
 <p>For your purposes, I think both would work well.</p>
 <p>For learning purposes, I would suggest starting step by step with different areas:</p>
 <ul>
@@ -94,14 +95,20 @@ It is the most didactical language there is, and learning basic programming with
 <p>The pure Revit API will give you the greatest flexibility. The Dynamo framework may possibly offer predefined existing libraries and packages that you can use, and you may find it easier to learn. That is a question of taste.</p>
 <p>But, first things first: what do you have, what do you need, and how to achieve it optimally in the UI, applying best practices?</p>
 <h4><a name="3"></a> Home Planet at Great Risk</h4>
+<p>Our one and only home planet is at great risk and requires immediate radical action if we wish it to continue sustaining life and human civilisation in the manner we are accustomed to.</p>
+<p>This fact is expressed very clearly and with as much hope as we can possibly muster
+by <a href="https://youtu.be/2Jq23mSDh9U">Sir David Attenborough presenting Breaking Boundaries &ndash; the Science of Our Planet</a>,
+a 10-minute preview of a Netflix documentary:</p>
+<blockquote>
+<p>Breaking Boundaries tells the story of the most important scientific discovery of our time &ndash; that humanity has pushed Earth beyond the boundaries that have kept Earth stable for 10,000 years, since the dawn of civilization. The 75-minute film takes the audience on a journey of discovery of planetary thresholds we must not exceed, not just for the stability of our planet, but for the future of humanity. It offers up the solutions we can and must put in place now if we are to protect Earth’s life support systems.</p>
+</blockquote>
 <p>The Nine Planet Boundaries</p>
 <p>Stockholm Resilience Centre
 https://www.stockholmresilience.org/research/research-news/2021-04-30-new-netflix-documentary-brings-the-planetary-boundaries-to-the-world.html</p>
 <p>Sir David Attenborough Presents: Breaking Boundaries: The Science of Our Planet | Doc Preview</p>
-<p>https://youtu.be/2Jq23mSDh9U</p>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/2Jq23mSDh9U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-<p>215,943 views  23 Apr 2021  Breaking Boundaries tells the story of the most important scientific discovery of our time - that humanity has pushed Earth beyond the boundaries that have kept Earth stable for 10,000 years, since the dawn of civilization. The 75-minute film takes the audience on a journey of discovery of planetary thresholds we must not exceed, not just for the stability of our planet, but for the future of humanity. It offers up the solutions we can and must put in place now if we are to protect Earth’s life support systems.</p>
+<p>215,943 views  23 Apr 2021  Breaking Boundaries tells the story of the most important scientific discovery of our time &ndash; that humanity has pushed Earth beyond the boundaries that have kept Earth stable for 10,000 years, since the dawn of civilization. The 75-minute film takes the audience on a journey of discovery of planetary thresholds we must not exceed, not just for the stability of our planet, but for the future of humanity. It offers up the solutions we can and must put in place now if we are to protect Earth’s life support systems.</p>
 <p>Here are some of the comments that stood out for me:</p>
 <ul>
 <li>This was frightening but gives hope. So much waste and for what? Our planet and life are amazing.</li>
@@ -115,22 +122,22 @@ https://www.stockholmresilience.org/research/research-news/2021-04-30-new-netfli
 <p><span style="font-size: 8pt;">Data sources for the charts:</span></p>
 <ul>
 <li><span style="font-size: 8pt;"><a href="https://www.stockholmresilience.org/research/research-news/2015-01-15-planetary-boundaries---an-update.html" rel="noopener" target="_blank">Stockholm Resilience Centre</a></span></li>
-<li><span style="font-size: 8pt;"><a href="Planetary%20Boundaries - an update" rel="noopener" target="_blank">Our World in Data: Annual CO<sub>2</sub> Emissions</a></span></li>
+<li><span style="font-size: 8pt;"><a href="Planetary%20Boundaries &ndash; an update" rel="noopener" target="_blank">Our World in Data: Annual CO<sub>2</sub> Emissions</a></span></li>
 <li><span style="font-size: 8pt;"><a href="https://ourworldindata.org/outdoor-air-pollution" rel="noopener" target="_blank">Our World in Data: Outdoor Air Pollution</a></span></li>
 </ul>
 <p>&quot;Save the Planet&quot; is a misnomer. Whether the result of human activity or natural long-term planetary cycles, planet change will not destroy the planet, but it might make it inhospitable to humans. The Earth is our home. If you stopped paying your electric bill, didn&#39;t repair your air conditioner, or got the water turned off to your home, your house would still stand and not crumble, but you wouldn&#39;t want to live there. So regardless of the cause of planetary change, we must take care of the Earth as our home. &quot;Save the People&quot; appears to be a more apt slogan.</p>
 <p>The Stockholm Resilience Centre is an international research center on resilience and sustainability science. The center is a joint initiative between Stockholm University and the Beijer Institute of Ecological Economics at The Royal Swedish Academy of Sciences. The center believes in the importance of reconnecting humanity to the biosphere. People must stop considering nature as something separate from society because people and nature are indeed intertwined in social-ecological systems. The development of places and things can no longer be done without an increased understanding of nature&#39;s role in humanity&#39;s own survival and well-being. <sup>[<a href="https://www.stockholmresilience.org/about-us.html" rel="noopener" target="_blank">stockholmresilience.org</a>]</sup></p>
 <p>One of the tenets of the Stockholm Resilience Centre is a set of nine planetary boundaries:</p>
 <ul>
-<li>Ozone - stratospheric ozone depletion</li>
-<li>Biodiversity - biosphere integrity</li>
-<li>Pollution - novel entities (e.g., organic pollutants, radioactive materials, nanomaterials, microplastics)</li>
-<li>Temperature - overall planetary warming from climate change</li>
-<li>Ocean - ocean acidification</li>
-<li>Freshwater - freshwater use</li>
-<li>Forests - land system change</li>
-<li>Plants - biogeochemical flows</li>
-<li>Clouds - atmospheric aerosol loading</li>
+<li>Ozone &ndash; stratospheric ozone depletion</li>
+<li>Biodiversity &ndash; biosphere integrity</li>
+<li>Pollution &ndash; novel entities (e.g., organic pollutants, radioactive materials, nanomaterials, microplastics)</li>
+<li>Temperature &ndash; overall planetary warming from climate change</li>
+<li>Ocean &ndash; ocean acidification</li>
+<li>Freshwater &ndash; freshwater use</li>
+<li>Forests &ndash; land system change</li>
+<li>Plants &ndash; biogeochemical flows</li>
+<li>Clouds &ndash; atmospheric aerosol loading</li>
 </ul>
 <p>The theory behind these boundaries is that if we allow the Earth to cross enough of them, there is no turning back. The Earth will no longer be a hospitable place for us. Though the nine planetary boundaries were established in 2009, there have been some recent articles (in the last few months alone) related to them:</p>
 <ul>
@@ -158,8 +165,8 @@ https://www.stockholmresilience.org/research/research-news/2021-04-30-new-netfli
 </li>
 <li>Ocean
 <ul>
-<li><a href="https://www.euronews.com/green/2022/06/29/one-celebrity-slaps-another-and-it-gets-more-coverage-why-we-need-to-take-ocean-health-ser" rel="noopener" target="_blank">&#39;One celebrity slaps another, and it gets more coverage&#39; - Why we need to take ocean health seriously</a></li>
-<li><a href="https://www.naroomanewsonline.com.au/story/7741848/ocean-acidification-and-heating-a-threat-to-our-seafood-industry-south-east-climate-alliance/" rel="noopener" target="_blank">Ocean acidification and heating a threat to our seafood industry - South East Climate Alliance</a></li>
+<li><a href="https://www.euronews.com/green/2022/06/29/one-celebrity-slaps-another-and-it-gets-more-coverage-why-we-need-to-take-ocean-health-ser" rel="noopener" target="_blank">&#39;One celebrity slaps another, and it gets more coverage&#39; &ndash; Why we need to take ocean health seriously</a></li>
+<li><a href="https://www.naroomanewsonline.com.au/story/7741848/ocean-acidification-and-heating-a-threat-to-our-seafood-industry-south-east-climate-alliance/" rel="noopener" target="_blank">Ocean acidification and heating a threat to our seafood industry &ndash; South East Climate Alliance</a></li>
 </ul>
 </li>
 <li>Freshwater
