@@ -16,8 +16,9 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Let's look at two serious choices that we are facing &ndash; one more serious than the other
+&ndash; To Dynamo or not to Dynamo
+&ndash; Home planet at great risk...
 
 linkedin:
 
@@ -68,7 +69,6 @@ I  really appreciate your advice!</p>
 <ul>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2016/10/rtc-revit-api-panel-idea-station-edit-and-continue.html">RTC Revit API Panel, Idea Station, Edit and Continue</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2018/12/dynamo-symbol-vs-type-and-exporter-exception.html">Dynamo, Symbol vs Type and Exporter Exception</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2019/08/revit-api-and-design-automation-api-survey.html">Revit API and Design Automation API Survey</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2019/08/zero-touch-node-element-wrapper-and-load-from-stream.html">Zero Touch Node Wrapper and Load from Stream</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2019/08/11-years-and-revit-api-docs-full-text-search.html">11 Years and Revit API Docs Full Text Search</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2022/04/tbc-samples-2023-and-the-new-structural-api.html">TBC Samples 2023 and the New Structural API</a></li>
@@ -90,14 +90,14 @@ Only after understanding it from a UI point of view will you be able to address 
 It is the most didactical language there is, and learning basic programming with it is fun and easy.</p>
 <p>.NET is the foundation of the Revit API, so you need some understanding of that.</p>
 <p>You need to understand the architecture of the Revit API to get an add-in implemented, loaded and running.</p>
-<p>You can quickly dive in to Dynamo and then compare to see what you prefer:</p>
+<p>You can quickly dive into Dynamo and then compare to see what you prefer:</p>
 <ul>
 <li>Python versus C#</li>
 <li>Pure Revit API versus Dynamo</li>
 </ul>
 <p>Rereading your question, I think that the most important step for you first of all is the first one: research the exact manual steps required in the user interface to read the available text data and generate your steel framing in Revit from that. I assume that the text data specifies the steel framing cross-section in some way, either by using predefined profile definitions or specifying the exact geometry of the cross-section. So, how can that data be transformed into Revit to define an appropriate steel framing element type? Once you have the profiles and element types defined, I guess placing the steel framing is simply a matter of reading the beam, column and framing element start and end point and placing straight segments. Finally, your text data may be specifying how the elements are connected and joined. That may be very complex. All of this is probably non-trivial to achieve in the UI. You need to know the exact UI approach, best practices and detailed execution steps before you can start thinking about programming it.</p>
 <p>The pure Revit API will give you the greatest flexibility. The Dynamo framework may possibly offer predefined existing libraries and packages that you can use, and you may find it easier to learn. That is a question of taste.</p>
-<p>But, first things first: what do you have, what do you need, and how to achieve it optimally in the UI, applying best practices?</p>
+<p>But first things first: what do you have, what do you need, and how to achieve it optimally in the UI, applying best practices?</p>
 <p><center>
 <img src="img/dynamo_for_revit.png" alt="Dynamo for Revit" title="Dynamo for Revit" width="600"/> <!-- 960 x 540 -->
 </center></p>

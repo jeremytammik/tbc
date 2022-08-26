@@ -17,8 +17,9 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Let's look at two serious choices that we are facing &ndash; one more serious than the other
+&ndash; To Dynamo or not to Dynamo
+&ndash; Home planet at great risk...
 
 linkedin:
 
@@ -81,7 +82,6 @@ I  really appreciate your advice!
 <ul>
 <li><a href="http://thebuildingcoder.typepad.com/blog/2016/10/rtc-revit-api-panel-idea-station-edit-and-continue.html">RTC Revit API Panel, Idea Station, Edit and Continue</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2018/12/dynamo-symbol-vs-type-and-exporter-exception.html">Dynamo, Symbol vs Type and Exporter Exception</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2019/08/revit-api-and-design-automation-api-survey.html">Revit API and Design Automation API Survey</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2019/08/zero-touch-node-element-wrapper-and-load-from-stream.html">Zero Touch Node Wrapper and Load from Stream</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2019/08/11-years-and-revit-api-docs-full-text-search.html">11 Years and Revit API Docs Full Text Search</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2022/04/tbc-samples-2023-and-the-new-structural-api.html">TBC Samples 2023 and the New Structural API</a></li>
@@ -109,7 +109,7 @@ It is the most didactical language there is, and learning basic programming with
 
 You need to understand the architecture of the Revit API to get an add-in implemented, loaded and running.
 
-You can quickly dive in to Dynamo and then compare to see what you prefer:
+You can quickly dive into Dynamo and then compare to see what you prefer:
 
 - Python versus C#
 - Pure Revit API versus Dynamo
@@ -118,7 +118,7 @@ Rereading your question, I think that the most important step for you first of a
 
 The pure Revit API will give you the greatest flexibility. The Dynamo framework may possibly offer predefined existing libraries and packages that you can use, and you may find it easier to learn. That is a question of taste.
 
-But, first things first: what do you have, what do you need, and how to achieve it optimally in the UI, applying best practices?
+But first things first: what do you have, what do you need, and how to achieve it optimally in the UI, applying best practices?
 
 <center>
 <img src="img/dynamo_for_revit.png" alt="Dynamo for Revit" title="Dynamo for Revit" width="600"/> <!-- 960 x 540 -->
