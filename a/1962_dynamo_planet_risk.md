@@ -166,6 +166,10 @@ Scott Sheppard explains several other aspects and points out detailed research r
 how [Autodesk software can help address the nine planetary boundaries](https://labs.blogs.com/its_alive_in_the_lab/2022/08/nine-planetary-boundaries.html);
 I quote from there:
 
+<center>
+<img src="img/nine_planet_boundaries.png" alt="Breaking planet boundaries" title="Breaking planet boundaries" width="600"/> <!-- 1102 x 625 -->
+</center>
+
 <p><span style="font-size: 8pt;">Data sources for the charts:</span></p>
 <ul>
 <li><span style="font-size: 8pt;"><a href="https://www.stockholmresilience.org/research/research-news/2015-01-15-planetary-boundaries---an-update.html">Stockholm Resilience Centre</a></span></li>
