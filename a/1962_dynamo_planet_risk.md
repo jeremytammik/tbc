@@ -241,7 +241,41 @@ I quote from there:
 </ul>
 </li>
 </ul>
-<p>At Autodesk, we are inspired by the prospect of a better world designed and made for all. Our mission is to empower innovators with design and make technology so they can achieve the new possible. To do that, we deliver customers intuitive, powerful, and accessible technology that provides automation and insight for their design and make processes, enabling them to achieve better outcomes for their products, their businesses, and the world. Everyone&#39;s definition of &quot;better&quot; may differ, but hopefully, everyone can agree that it includes &quot;hospitable&quot;.</p>
+<p>At Autodesk, we are inspired by the prospect of a better world designed and made for all. Our mission is to empower innovators with design and make technology so they can achieve the new possible. To do that, we deliver customers intuitive, powerful, and accessible technology that provides automation and insight for their design and make processes, enabling them to achieve better outcomes for their products, their businesses, and the world. Everyone&#39;s definition of &quot;better&quot; may differ, but hopefully, everyone can agree that it includes &quot;hospitable.&quot;</p>
+
+<!--
+
+On “hospitable,” the period goes inside the quotes as in “hospitable.” I know it’s weird, but I am just following the rules.
+ 
+Scott Sheppard
+
+From: Jeremy Tammik <jeremy.tammik@autodesk.com> 
+Sent: Friday, August 26, 2022 5:24 AM
+To: Scott Sheppard <Scott.Sheppard@autodesk.com>
+Subject: Re: nine planet boundaries
+ 
+Wow.
+ 
+thank you very much for taking a look so quickly!
+ 
+I actually added the image now, apparently after you checked and before receiving this mail.
+ 
+Wow. What a weird rule. I intentionally changed it to look more sensible. I'll change it back, if you prefer it to be correct, since I am quoting you.
+ 
+Would you like me to fix it to the way it was?
+ 
+How very observant of you to notice!
+ 
+cheers,
+ 
+jeremy
+
+Since you are quoting me, “hospitable.” Is preferred.
+ 
+Scott Sheppard
+
+-->
+
 <p>Respecting boundaries is alive in the lab.</p>
 
 Many thanks to Scott for raising the issue and permission to quote your text!
