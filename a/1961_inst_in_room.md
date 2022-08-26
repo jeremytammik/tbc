@@ -134,6 +134,17 @@ You can try using the family instance `Room` property like this:
 Another approach is to use the `Room.IsPointInRoom` predicate and check the family instance location point or constructing some other point based on geometry location.
 You may need to elevate it slightly off the floor to ensure it will be found within vertical limits of room.
 
+You can also try to use the `FromRoom` and `ToRoom` properties.
+If you are using Phasing, you have to pass in the phase:
+
+<pre class="code">
+  instance.get_Room(phase)
+  // or
+  instance.get_FroomRoom(phase)
+  //or
+  instance.get_ToRoom(phase)
+</pre>
+
 **Response:** So, I need to take a center point of the family instance and then use `IsPointInRoom` to ensure that it is within the room limits.
 Can you write some simple code for me?
 
