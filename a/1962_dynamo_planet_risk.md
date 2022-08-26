@@ -69,49 +69,7 @@ I have a 3rd party program that designs custom steel frames.
 The data files have everything needed to generate a 3D model.
 I don't know Dynamo or standard .NET Revit API so I will be starting from scratch.
 I know just enough Revit to be dangerous.
-I  really appreciato your advice!
-
-xyz
-
-<p>&nbsp;&nbsp;</p>
-<p>It also adds some functionality of its own, e.g., its own geometry library.</p>
-<p>&nbsp;&nbsp;</p>
-<p>For your purposes, I think both would work well.</p>
-<p>&nbsp;</p>
-<p>For learning purposes, I would suggest starting step by step with different areas:</p>
-<p>&nbsp;&nbsp;</p>
-<ul>
-<li>Revit end-user interface, optimal workflow and best practices</li>
-<li>Programming basics, e.g., a non-Revit-related Python tutorial</li>
-<li>.NET&nbsp;programming basics, e.g., a non-Revit-related C# tutorial</li>
-<li>Revit API basics, e.g., the My First Revit Plug-in video tutorial</li>
-<li>A Dynamo tutorial</li>
-</ul>
-<p>&nbsp;</p>
-<p>The first is vital. You need that to understand and solve your Revit task. Only after understanding it from a UI point of view will you be able to address it effectively from the API side of things.</p>
-<p>&nbsp;&nbsp;</p>
-<p>Learning a little bit of Python is highly recommended. It is the most didactical language there is, and learning basic programming with it is fun and easy.</p>
-<p>&nbsp;&nbsp;</p>
-<p>.NET is the foundation of the Revit API, so you need some understanding of that.</p>
-<p>&nbsp;&nbsp;</p>
-<p>You need to understand the architecture of the Revit API to get an add-in implemented, loaded and running.</p>
-<p>&nbsp; &nbsp;</p>
-<p>You can quickly dive in to Dynamo and then compare to see what you prefer:</p>
-<p>&nbsp;</p>
-<ul>
-<li>Python versus C#</li>
-<li>Pure Revit API versus Dynamo</li>
-</ul>
-<p>&nbsp;&nbsp;</p>
-<p>Please look in depth at the Revit API getting started material and procedures listed here:</p>
-<p>&nbsp;&nbsp;</p>
-<p><a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#2" target="_blank" rel="noopener">https://thebuildingcoder.typepad.com/blog/about-the-author.html#2</a></p>
-<p>&nbsp;&nbsp;</p>
-<p>Good luck and have fun!</p>
-<p>&nbsp;&nbsp;</p>
-<p>Please let us know how it goes for you, what you end up choosing, and why.</p>
-<p>&nbsp;&nbsp;</p>
-<p>&nbsp;</p>
+I  really appreciate your advice!
 
 **Answer:** Dynamo is a wrapper around the standard Revit API; search these articles for 'dynamo' and 'wrapper':
 
