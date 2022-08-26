@@ -38,9 +38,10 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Home Planet and to Dy or Not to Dy
 
-Let's look at two serious choices that we are facing:
+Let's look at two serious choices that we are facing &ndash; one more serious than the other:
 
-
+- [To Dynamo or not to Dynamo](#2)
+- [Home planet at great risk](#3)
 
 ####<a name="2"></a> To Dynamo or Not to Dynamo
 
@@ -227,7 +228,7 @@ I quote from there:
 </ul>
 </li>
 </ul>
-<p>At Autodesk, we are inspired by the prospect of a better world designed and made for all. Our mission is to empower innovators with design and make technology so they can achieve the new possible. To do that, we deliver customers intuitive, powerful, and accessible technology that provides automation and insight for their design and make processes, enabling them to achieve better outcomes for their products, their businesses, and the world. Everyone&#39;s definition of &quot;better&quot; may differ, but hopefully, everyone can agree that it includes &quot;hospitable.&quot;</p>
+<p>At Autodesk, we are inspired by the prospect of a better world designed and made for all. Our mission is to empower innovators with design and make technology so they can achieve the new possible. To do that, we deliver customers intuitive, powerful, and accessible technology that provides automation and insight for their design and make processes, enabling them to achieve better outcomes for their products, their businesses, and the world. Everyone&#39;s definition of &quot;better&quot; may differ, but hopefully, everyone can agree that it includes &quot;hospitable&quot;.</p>
 <p>Respecting boundaries is alive in the lab.</p>
 
 Many thanks to Scott for raising the issue and permission to quote your text!
