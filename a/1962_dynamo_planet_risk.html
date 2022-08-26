@@ -94,6 +94,9 @@ It is the most didactical language there is, and learning basic programming with
 <p>Rereading your question, I think that the most important step for you first of all is the first one: research the exact manual steps required in the user interface to read the available text data and generate your steel framing in Revit from that. I assume that the text data specifies the steel framing cross-section in some way, either by using predefined profile definitions or specifying the exact geometry of the cross-section. So, how can that data be transformed into Revit to define an appropriate steel framing element type? Once you have the profiles and element types defined, I guess placing the steel framing is simply a matter of reading the beam, column and framing element start and end point and placing straight segments. Finally, your text data may be specifying how the elements are connected and joined. That may be very complex. All of this is probably non-trivial to achieve in the UI. You need to know the exact UI approach, best practices and detailed execution steps before you can start thinking about programming it.</p>
 <p>The pure Revit API will give you the greatest flexibility. The Dynamo framework may possibly offer predefined existing libraries and packages that you can use, and you may find it easier to learn. That is a question of taste.</p>
 <p>But, first things first: what do you have, what do you need, and how to achieve it optimally in the UI, applying best practices?</p>
+<p><center>
+<img src="img/dynamo_for_revit.png" alt="Dynamo for Revit" title="Dynamo for Revit" width="600"/> <!-- 960 x 540 -->
+</center></p>
 <h4><a name="3"></a> Home Planet at Great Risk</h4>
 <p>Our one and only home planet is at great risk and requires immediate radical action if we wish it to continue sustaining life and human civilisation in the manner we are accustomed to.</p>
 <p>This fact is expressed very clearly and with as much hope as we can possibly muster
@@ -102,14 +105,14 @@ a 10-minute preview of a Netflix documentary:</p>
 <blockquote>
 <p>Breaking Boundaries tells the story of the most important scientific discovery of our time &ndash; that humanity has pushed Earth beyond the boundaries that have kept Earth stable for 10,000 years, since the dawn of civilization. The 75-minute film takes the audience on a journey of discovery of planetary thresholds we must not exceed, not just for the stability of our planet, but for the future of humanity. It offers up the solutions we can and must put in place now if we are to protect Earth’s life support systems.</p>
 </blockquote>
-<p>The Nine Planet Boundaries</p>
-<p>Stockholm Resilience Centre
-https://www.stockholmresilience.org/research/research-news/2021-04-30-new-netflix-documentary-brings-the-planetary-boundaries-to-the-world.html</p>
-<p>Sir David Attenborough Presents: Breaking Boundaries: The Science of Our Planet | Doc Preview</p>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/2Jq23mSDh9U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-<p>215,943 views  23 Apr 2021  Breaking Boundaries tells the story of the most important scientific discovery of our time &ndash; that humanity has pushed Earth beyond the boundaries that have kept Earth stable for 10,000 years, since the dawn of civilization. The 75-minute film takes the audience on a journey of discovery of planetary thresholds we must not exceed, not just for the stability of our planet, but for the future of humanity. It offers up the solutions we can and must put in place now if we are to protect Earth’s life support systems.</p>
-<p>Here are some of the comments that stood out for me:</p>
+<p><center></p>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/2Jq23mSDh9U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<p></center></p>
+<p>The boundaries he talks about are the nine planet boundaries identified by
+the <a href="https://www.stockholmresilience.org">Stockholm Resilience Centre</a>.
+It presents the film in more detail in its research news:
+<a href="https://www.stockholmresilience.org/research/research-news/2021-04-30-new-netflix-documentary-brings-the-planetary-boundaries-to-the-world.html">New Netflix documentary brings the planetary boundaries to the world</a>.</p>
+<p>Here are some of the comments on the YouTube preview that stood out for me:</p>
 <ul>
 <li>This was frightening but gives hope. So much waste and for what? Our planet and life are amazing.</li>
 <li>Just imagine a civilization that dreamed up 52 different flavors of ice cream, and the atomic bomb &ndash; being so lazy, it could NOT SAVE ITSELF from a looming, self-made extinction level event. The Age of Stupid is upon us, and David Attenborough is sounding the alarm.</li>
@@ -119,14 +122,17 @@ https://www.stockholmresilience.org/research/research-news/2021-04-30-new-netfli
   What will we say to our kids, a couple of decades hence &ndash; when it's too late? 
   The responsible thing would be to get political and demand change NOW &ndash; even if it hurts.</li>
 </ul>
+<p>Scott Sheppard explains several other aspects and points out detailed research results in each of the critical areas in his article explaining
+how <a href="https://labs.blogs.com/its_alive_in_the_lab/2022/08/nine-planetary-boundaries.html">Autodesk software can help address the nine planetary boundaries</a>;
+I quote from there:</p>
 <p><span style="font-size: 8pt;">Data sources for the charts:</span></p>
 <ul>
-<li><span style="font-size: 8pt;"><a href="https://www.stockholmresilience.org/research/research-news/2015-01-15-planetary-boundaries---an-update.html" rel="noopener" target="_blank">Stockholm Resilience Centre</a></span></li>
-<li><span style="font-size: 8pt;"><a href="Planetary%20Boundaries &ndash; an update" rel="noopener" target="_blank">Our World in Data: Annual CO<sub>2</sub> Emissions</a></span></li>
-<li><span style="font-size: 8pt;"><a href="https://ourworldindata.org/outdoor-air-pollution" rel="noopener" target="_blank">Our World in Data: Outdoor Air Pollution</a></span></li>
+<li><span style="font-size: 8pt;"><a href="https://www.stockholmresilience.org/research/research-news/2015-01-15-planetary-boundaries---an-update.html">Stockholm Resilience Centre</a></span></li>
+<li><span style="font-size: 8pt;"><a href="Planetary%20Boundaries &ndash; an update">Our World in Data: Annual CO<sub>2</sub> Emissions</a></span></li>
+<li><span style="font-size: 8pt;"><a href="https://ourworldindata.org/outdoor-air-pollution">Our World in Data: Outdoor Air Pollution</a></span></li>
 </ul>
 <p>&quot;Save the Planet&quot; is a misnomer. Whether the result of human activity or natural long-term planetary cycles, planet change will not destroy the planet, but it might make it inhospitable to humans. The Earth is our home. If you stopped paying your electric bill, didn&#39;t repair your air conditioner, or got the water turned off to your home, your house would still stand and not crumble, but you wouldn&#39;t want to live there. So regardless of the cause of planetary change, we must take care of the Earth as our home. &quot;Save the People&quot; appears to be a more apt slogan.</p>
-<p>The Stockholm Resilience Centre is an international research center on resilience and sustainability science. The center is a joint initiative between Stockholm University and the Beijer Institute of Ecological Economics at The Royal Swedish Academy of Sciences. The center believes in the importance of reconnecting humanity to the biosphere. People must stop considering nature as something separate from society because people and nature are indeed intertwined in social-ecological systems. The development of places and things can no longer be done without an increased understanding of nature&#39;s role in humanity&#39;s own survival and well-being. <sup>[<a href="https://www.stockholmresilience.org/about-us.html" rel="noopener" target="_blank">stockholmresilience.org</a>]</sup></p>
+<p>The Stockholm Resilience Centre is an international research center on resilience and sustainability science. The center is a joint initiative between Stockholm University and the Beijer Institute of Ecological Economics at The Royal Swedish Academy of Sciences. The center believes in the importance of reconnecting humanity to the biosphere. People must stop considering nature as something separate from society because people and nature are indeed intertwined in social-ecological systems. The development of places and things can no longer be done without an increased understanding of nature&#39;s role in humanity&#39;s own survival and well-being. <sup>[<a href="https://www.stockholmresilience.org/about-us.html">stockholmresilience.org</a>]</sup></p>
 <p>One of the tenets of the Stockholm Resilience Centre is a set of nine planetary boundaries:</p>
 <ul>
 <li>Ozone &ndash; stratospheric ozone depletion</li>
@@ -143,62 +149,54 @@ https://www.stockholmresilience.org/research/research-news/2021-04-30-new-netfli
 <ul>
 <li>Ozone
 <ul>
-<li><a href="https://www.sciencedaily.com/releases/2022/07/220707141840.htm" rel="noopener" target="_blank">Ozone depletion over North Pole produces weather anomalies</a></li>
+<li><a href="https://www.sciencedaily.com/releases/2022/07/220707141840.htm">Ozone depletion over North Pole produces weather anomalies</a></li>
 </ul>
 </li>
 <li>Biodiversity
 <ul>
-<li><a href="https://original.newsbreak.com/@dope-quick-reads-1592891/2705043260017-new-recent-study-predicts-earth-will-soon-experience-alarming-sixth-mass-extinction-of-millions-of-species-in-year-2030" rel="noopener" target="_blank">New Recent Study Predicts Earth Will Soon Experience Alarming Sixth Mass Extinction of Millions of Species in Year 2030</a></li>
-<li><a href="https://www.businessinsider.com/biological-annihilation-sixth-mass-extinction-2017-7" rel="noopener" target="_blank">Scientists say we&#39;re witnessing the planet&#39;s sixth mass extinction — and &#39;biological annihilation&#39; is the latest sign</a></li>
+<li><a href="https://original.newsbreak.com/@dope-quick-reads-1592891/2705043260017-new-recent-study-predicts-earth-will-soon-experience-alarming-sixth-mass-extinction-of-millions-of-species-in-year-2030">New Recent Study Predicts Earth Will Soon Experience Alarming Sixth Mass Extinction of Millions of Species in Year 2030</a></li>
+<li><a href="https://www.businessinsider.com/biological-annihilation-sixth-mass-extinction-2017-7">Scientists say we&#39;re witnessing the planet&#39;s sixth mass extinction — and &#39;biological annihilation&#39; is the latest sign</a></li>
 <li><a href="https://www.labiotech.eu/in-depth/dna-sequencing-can-safeguard-against-biodiversity-loss/">How DNA sequencing can safeguard against biodiversity loss</a></li>
 </ul>
 </li>
 <li>Pollution
 <ul>
-<li><a href="https://www.businessgreen.com/news/4052436/diy-giant-kingfisher-constructs-stronger-net-zero-targets" rel="noopener" target="_blank">DIY giant Kingfisher constructs stronger net zero targets</a></li>
+<li><a href="https://www.businessgreen.com/news/4052436/diy-giant-kingfisher-constructs-stronger-net-zero-targets">DIY giant Kingfisher constructs stronger net zero targets</a></li>
 </ul>
 </li>
 <li>Temperature
 <ul>
-<li><a href="http://www.global-greenhouse-warming.com/climate-change-letter.html" rel="noopener" target="_blank">Global Greenhouse Warming Climate Change Letter</a></li>
+<li><a href="http://www.global-greenhouse-warming.com/climate-change-letter.html">Global Greenhouse Warming Climate Change Letter</a></li>
 </ul>
 </li>
 <li>Ocean
 <ul>
-<li><a href="https://www.euronews.com/green/2022/06/29/one-celebrity-slaps-another-and-it-gets-more-coverage-why-we-need-to-take-ocean-health-ser" rel="noopener" target="_blank">&#39;One celebrity slaps another, and it gets more coverage&#39; &ndash; Why we need to take ocean health seriously</a></li>
-<li><a href="https://www.naroomanewsonline.com.au/story/7741848/ocean-acidification-and-heating-a-threat-to-our-seafood-industry-south-east-climate-alliance/" rel="noopener" target="_blank">Ocean acidification and heating a threat to our seafood industry &ndash; South East Climate Alliance</a></li>
+<li><a href="https://www.euronews.com/green/2022/06/29/one-celebrity-slaps-another-and-it-gets-more-coverage-why-we-need-to-take-ocean-health-ser">&#39;One celebrity slaps another, and it gets more coverage&#39; &ndash; Why we need to take ocean health seriously</a></li>
+<li><a href="https://www.naroomanewsonline.com.au/story/7741848/ocean-acidification-and-heating-a-threat-to-our-seafood-industry-south-east-climate-alliance/">Ocean acidification and heating a threat to our seafood industry &ndash; South East Climate Alliance</a></li>
 </ul>
 </li>
 <li>Freshwater
 <ul>
-<li><a href="https://www.news18.com/news/buzz/what-is-green-water-one-of-the-planetary-boundaries-to-be-monitored-5279191.html" rel="noopener" target="_blank">What is Green Water, One of The Planetary Boundaries to Be Monitored?</a></li>
+<li><a href="https://www.news18.com/news/buzz/what-is-green-water-one-of-the-planetary-boundaries-to-be-monitored-5279191.html">What is Green Water, One of The Planetary Boundaries to Be Monitored?</a></li>
 </ul>
 </li>
 <li>Forests
 <ul>
-<li><a href="https://www.washingtonpost.com/world/2022/06/20/spain-wildfires-2022-europe-heatwave/" rel="noopener" target="_blank">Spain devastated by wildfires amid record-breaking heat wave</a></li>
+<li><a href="https://www.washingtonpost.com/world/2022/06/20/spain-wildfires-2022-europe-heatwave/">Spain devastated by wildfires amid record-breaking heat wave</a></li>
 </ul>
 </li>
 <li>Plants
 <ul>
-<li><a href="https://theconversation.com/australia-has-overshot-three-planetary-boundaries-based-on-how-we-use-land-183728" rel="noopener" target="_blank">Australia has overshot three planetary boundaries based on how we use land</a></li>
+<li><a href="https://theconversation.com/australia-has-overshot-three-planetary-boundaries-based-on-how-we-use-land-183728">Australia has overshot three planetary boundaries based on how we use land</a></li>
 </ul>
 </li>
 <li>Clouds
 <ul>
-<li><a href="https://acp.copernicus.org/articles/22/8175/2022/acp-22-8175-2022.pdf" rel="noopener" target="_blank">Aerosol atmospheric rivers: climatology, event characteristics, and detection algorithm sensitivities</a></li>
+<li><a href="https://acp.copernicus.org/articles/22/8175/2022/acp-22-8175-2022.pdf">Aerosol atmospheric rivers: climatology, event characteristics, and detection algorithm sensitivities</a></li>
 </ul>
 </li>
 </ul>
 <p>At Autodesk, we are inspired by the prospect of a better world designed and made for all. Our mission is to empower innovators with design and make technology so they can achieve the new possible. To do that, we deliver customers intuitive, powerful, and accessible technology that provides automation and insight for their design and make processes, enabling them to achieve better outcomes for their products, their businesses, and the world. Everyone&#39;s definition of &quot;better&quot; may differ, but hopefully, everyone can agree that it includes &quot;hospitable.&quot;</p>
 <p>Respecting boundaries is alive in the lab.</p>
 
-<h4><a name="2"></a></h4>
-<p><strong>Question:</strong> </p>
-<p><center>
-<img src="img/.png" alt="" title="" width="600"/> <!-- 1258 x 776 -->
-</center></p>
-<pre class="code">
-</pre>
-
-<h4><a name="3"></a></h4>
+<p>Many thanks to Scott for raising the issue and permission to quote your text!</p>
