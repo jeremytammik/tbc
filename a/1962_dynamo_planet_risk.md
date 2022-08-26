@@ -23,6 +23,15 @@ Let's look at two serious choices that we are facing &ndash; one more serious th
 
 linkedin:
 
+Risking our one and only home planet and the survival of civilisation as we know it by crossing planetary boundaries, we choose whether to Dy or not to Dy, not just in the #RevitAPI 
+
+https://autode.sk/todyornottody
+
+Let's look at two serious choices that we are facing - one more serious than the other:
+
+- To Dynamo or not to Dynamo
+- Home planet at great risk...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
