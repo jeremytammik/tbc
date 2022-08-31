@@ -55,7 +55,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Common tasks include finding instances with a given room, comparing real numbers, and sharing documentation online:
 
 - [Get family instances within room](#2)
-    - [Rooms in Linked Models](#2.1)
+    - [Rooms in linked models](#2.1)
     - [MEP components near ceilings](#2.2)
 - [Again, the need for fuzz](#3)
 - [Avoid PDF for on-screen reading](#4)
