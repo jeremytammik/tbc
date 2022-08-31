@@ -53,7 +53,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>Common tasks include finding instances with a given room, comparing real numbers, and sharing documentation online:</p>
 <ul>
 <li><a href="#2">Get family instances within room</a><ul>
-<li><a href="#2.1">Rooms in Linked Models</a></li>
+<li><a href="#2.1">Rooms in linked models</a></li>
 <li><a href="#2.2">MEP components near ceilings</a></li>
 </ul>
 </li>
@@ -147,19 +147,19 @@ Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/103
 and EatRevitPoopCad for their helpful advice!</p>
 <h4><a name="2.1"></a> Rooms in Linked Models</h4>
 <p>As Joshua Lumley points out in his <a href="https://thebuildingcoder.typepad.com/blog/2022/08/instances-in-room-and-need-for-fuzz.html#comment-5959441109">comment below</a>,
-<code>IsPointInRoom</code> works well for rooms in linked models as well; just remember to inverse the total transform of the linkedinstance before doing it.</p>
+<code>IsPointInRoom</code> works well for rooms in linked models as well; just remember to invert the total transform of the linked instance before doing it.</p>
 <h4><a name="2.2"></a> MEP Components Near Ceilings</h4>
 <p>Erik Falck Jørgensen adds in
 his <a href="https://www.linkedin.com/feed/update/urn:li:groupPost:3323631-6968139988962025473?commentUrn=urn%3Ali%3Acomment%3A%28groupPost%3A3323631-6968139988962025473%2C6970603210860339200%29">comment on LinkedIn</a>:</p>
 <blockquote>
-<p>Great approach, Jeremy; however, as I see it, we still have the problem with ceilings cutting rooms off and issues capturing (MEP) components without the point option above ceiling level but still inside the constructive room.
+<p>Great approach; however, as I see it, we still have the problem with ceilings cutting rooms off and issues capturing (MEP) components without the point option above ceiling level but still inside the constructive room.
 It would be a great help if either the room or the ceiling element could respect the need for working with elements inside this range.</p>
 </blockquote>
-<p>Answer: Yup. That presumably requires a different approach.
+<p>Answer: Yup. That may require a different approach.
 Maybe those cases can be addressed by querying the room for its solid using
 its <a href="https://www.revitapidocs.com/2023/1a510aef-63f6-4d32-c0ff-a8071f5e23b8.htm"><code>ClosedShell</code> property</a> and
 using a full 3D Boolean operation.
-Or, simpler, implementing a point-in-3D-polyhedron algorithm.</p>
+Or, simpler, implementing a <a href="https://duckduckgo.com/?q=point+in+polyhedron">point-in-3D-polyhedron algorithm</a>.</p>
 <h4><a name="3"></a> Again, the Need for Fuzz</h4>
 <p>We take yet another look at fuzz, required in order to deal with comparison of real numbers on digital computers.</p>
 <p>The topic came up once again in
