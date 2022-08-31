@@ -6,6 +6,25 @@
 
 <!---
 
+- pick point in cloud point
+  https://forums.autodesk.com/t5/revit-api-forum/definition-of-work-plane-for-picking-point-of-point-cloud-in/td-p/11366329
+
+- rpthomas explains
+  https://forums.autodesk.com/t5/revit-api-forum/access-point-cloud-points-through-api/m-p/11374437#M65416
+
+- 8125 [Carla Ferreyra: Link Point Cloud with BIM] 
+  open source point cloud engine https://github.com/potree/potree
+  Here are two point cloud demos with the Forge viewer using potree.js
+  by [Petr Broz](https://github.com/petrbroz) and [Michael Beale](https://github.com/wallabyway):
+  - [Pointcloud with Revit](https://github.com/wallabyway/forge-pointcloud-with-revit)
+  - [forge-potree-demo](https://github.com/petrbroz/forge-potree-demo)
+  According to Michael’s slide deck, you need to convert your point cloud files to the potree supported format via `PotreeConverter` before using the potree viewer extension. A `.pts` file requires conversion to `.las`, `.zlas`, or `.bin` file before passing to `PotreeConverter`.
+
+- https://forums.autodesk.com/t5/revit-api-forum/highlight-100-000-nodes-xyz-coordinates-at-once-in-revit/m-p/9349258
+  search todo_tbc.txt for 'point cloud api'
+
+- https://forums.autodesk.com/t5/revit-api-forum/sdk-sample-pointcloudengine-crash-for-revit-2018-and-2019/m-p/8580174
+
 twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 

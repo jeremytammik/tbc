@@ -55,6 +55,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Common tasks include finding instances with a given room, comparing real numbers, and sharing documentation online:
 
 - [Get family instances within room](#2)
+    - [Rooms in Linked Models](#2.1)
+    - [MEP components near ceilings](#2.2)
 - [Again, the need for fuzz](#3)
 - [Avoid PDF for on-screen reading](#4)
 
@@ -161,6 +163,19 @@ and EatRevitPoopCad for their helpful advice!
 As Joshua Lumley points out in his [comment below](https://thebuildingcoder.typepad.com/blog/2022/08/instances-in-room-and-need-for-fuzz.html#comment-5959441109),
 `IsPointInRoom` works well for rooms in linked models as well; just remember to inverse the total transform of the linkedinstance before doing it.
 
+####<a name="2.2"></a> MEP Components Near Ceilings
+
+Erik Falck Jørgensen adds in
+his [comment on LinkedIn](https://www.linkedin.com/feed/update/urn:li:groupPost:3323631-6968139988962025473?commentUrn=urn%3Ali%3Acomment%3A%28groupPost%3A3323631-6968139988962025473%2C6970603210860339200%29):
+
+> Great approach, Jeremy; however, as I see it, we still have the problem with ceilings cutting rooms off and issues capturing (MEP) components without the point option above ceiling level but still inside the constructive room.
+It would be a great help if either the room or the ceiling element could respect the need for working with elements inside this range.
+
+Answer: Yup. That presumably requires a different approach.
+Maybe those cases can be addressed by querying the room for its solid using
+its [`ClosedShell` property](https://www.revitapidocs.com/2023/1a510aef-63f6-4d32-c0ff-a8071f5e23b8.htm) and
+using a full 3D Boolean operation.
+Or, simpler, implementing a point-in-3D-polyhedron algorithm.
 
 
 ####<a name="3"></a> Again, the Need for Fuzz
