@@ -112,4 +112,4 @@ So, if the amount of points is less then the max number then I assume you have a
 
 Additionally the `PointCollection` has the member `GetpointBufferPointer`; this could then provides a faster way to count the points in each block to establish if the block needs further subdividing.
 
-Many thabnks to Richard for his helpful advice and great expertise.
+Many thanks to Richard for his helpful advice and great expertise.
