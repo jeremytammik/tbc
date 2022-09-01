@@ -174,7 +174,6 @@ In realistic visual style, the colour is taken from the Appearance Asset Colour 
 However, each face is set to a different material.
 This can also be seen in RevitLookup:
 
-
 <center>
 <img src="img/tesselated_shape_face_color_snoop1.png" alt="Snooping tessellated shape face colour" title="Snooping tessellated shape face colour" width="600"/> <!-- 802 x 524 -->
 <img src="img/tesselated_shape_face_color_snoop2.png" alt="Snooping tessellated shape face colour" title="Snooping tessellated shape face colour" width="600"/> <!-- 802 x 524 -->
