@@ -47,13 +47,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Point Cloud Pick and Access
+###
 
-
-
-####<a name="2"></a> 
-
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+####<a name="2"></a>
 
 **Question:** 
 
@@ -65,4 +61,55 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <img src="img/.png" alt="" title="" width="600"/> <!-- 960 x 540 -->
 </center>
 
-####<a name="3"></a> 
+####<a name="3"></a> Pick and Access Point Cloud Points
+
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+solved two tricky point cloud related questions in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) that
+I earmarked for editing and republishing here.
+
+The latest explains how to address 
+the [definition of work plane for picking point of point cloud in orthographic 3D view](https://forums.autodesk.com/t5/revit-api-forum/definition-of-work-plane-for-picking-point-of-point-cloud-in/td-p/11366329).
+In summary, Richard recommends using the `Selection.PickObject` method specifying `ObjectType.PointOnElement` and shares code to:
+
+-  Get the minimum point of the UIView from UIView.GetZoomCorners
+-  Set up a work plane using view direction and min point from (1)*
+-  Pick the point on the plane
+-  Filter the cloud by creating a box aligned with the view direction around the picked point
+-  Transform the filtered cloud points to model space and project them onto plane and find nearest to original picked point.
+ 
+There is a lot more to it than it sounds, though...
+
+Before that, he also addressed
+how to [access point cloud points through API](https://forums.autodesk.com/t5/revit-api-forum/access-point-cloud-points-through-api/m-p/11374437):
+
+**Question:** I imported an `.rcs` point cloud to Revit 2022 using Insert &gt; Point Cloud.
+I would like to access its points and colors through Revit API.
+For that, I found the `PointCloudInstance.GetPoints` method.
+Its third input is `numPoints`, representing the number of points which should be extracted from the point cloud.
+However, this input cannot be larger than 1 million.
+And if I try to make it larger, it raises an error message: 'It can be from 1 to 1000000.'
+Does this mean that for any point cloud we import to Revit, we can only access its first 1 million points through Revit API, and those beyond are inaccessible?
+
+**Answer:** I think the statement regarding how many points you can access is incorrect.
+
+Yes, there is a limit, but you can process the cloud in blocks by adjusting the filter limits and thus access all the points, not just the limit of one block.
+
+A confusing aspect is the `averageDistance`:
+
+> Desired average distance between "adjacent" cloud points (Revit units of length). The smaller the averageDistance the larger number of points will be returned up to the numPoints limit. Specifying this parameter makes actual number of points returned for a given filter independent of the density of coverage produced by the scanner.
+
+What is the lowest number I can set this to, the limit of the scanner or smallest possible +ve double value? I think it should be an optional parameter whereby it just returns all the points for an area up to the max number of points limit. It says: "Specifying this parameter...", making it sound like it is optional, but it doesn't tell me it can be null for example.
+
+I would probably split the cloud up into blocks and test the number of points has not reached the limit for each.
+If it has reached the limit for a given block then subdivide that block up into more blocks.
+
+Note:
+
+> If there are more points in the cloud passing the filter than the number requested in this function, the results may not be consistent if the same call is made again.
+
+So, if the amount of points is less then the max number then I assume you have all the points for that block.
+
+Additionally the `PointCollection` has the member `GetpointBufferPointer`; this could then provides a faster way to count the points in each block to establish if the block needs further subdividing.
+
+Many thabnks to Richard for his helpful advice and great expertise.
