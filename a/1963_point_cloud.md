@@ -6,6 +6,15 @@
 
 <!---
 
+- Using different material on each face of a tessellated shape
+  https://forums.autodesk.com/t5/revit-api-forum/using-different-material-on-each-face-of-a-tessellated-shape/m-p/11359278#M65249
+  + assign different material to each face of direct shape
+  Using different material on each face of a tessellated shape
+  https://forums.autodesk.com/t5/revit-api-forum/using-different-material-on-each-face-of-a-tessellated-shape/m-p/10550191
+
+- DirectContext3D Colorized Triangles
+  https://forums.autodesk.com/t5/revit-api-forum/directcontext3d-colorized-triangles/td-p/10567609
+
 - pick point in cloud point
   https://forums.autodesk.com/t5/revit-api-forum/definition-of-work-plane-for-picking-point-of-point-cloud-in/td-p/11366329
 
@@ -49,19 +58,186 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ###
 
-####<a name="2"></a>
-
-**Question:** 
-
-**Answer:** 
-
-**Response:** 
-
 <center>
 <img src="img/.png" alt="" title="" width="600"/> <!-- 960 x 540 -->
 </center>
 
-####<a name="3"></a> Pick and Access Point Cloud Points
+####<a name="2"></a> 
+
+####<a name="3"></a> DirectContext3D Colorized Triangles
+
+Tamas Deri explored and answered the question of how to
+create [DirectContext3D Colorized Triangles](https://forums.autodesk.com/t5/revit-api-forum/directcontext3d-colorized-triangles/td-p/10567609):
+
+**Question:** I'm having trouble applying colors to triangles that are shown via a `DirectContext3DServer`.
+I use a `ColorWithTransparency` object as a basis.
+Lines working fine, but here is the issue with triangles:
+
+I can apply the color via the `EffectInstance`, but only if I set it's Emissive Color through `SetEmissiveColor`.
+If I set all it's other colors like, Color, DiffuseColor, SpecularColor or AmbientColor, it stays black.
+Changing transparency works fine. The biggest issue if I'd like to apply the colors per vertices it wont work.
+I'm using VertexFormatBits.PositionNormalColored, and set for instance ColorWithTransparency(255,0,0,200) as it's color, but all triangles will be transparent black.
+Any idea what could be the issue? No exceptions thrown, all buffers are valid, the geometries are being shown, but without the right color applied.
+
+**Answer:** I tried to put together a reproducible case, and I've just found out what the issue was.
+I left a line in the code which set the EffectInstance's transparency, and I think if any property of the EffectInstance is set, then it overrides all vertex properties.
+That's why the vertex colors got ignored, and it falled back to transparent black.
+Once I removed that line, and kept only the just-constructed EffectInstance it worked as intended.
+
+Here is a partial code that updates the buffers if it is neccessary.
+The rest is similar to what is available from other sources regarding DirectContext3D.
+
+<pre class="prettyprint">
+def update_buffer(self):
+  if self.penetrations is None: return False
+  try:
+    lines = []
+    triangles = []
+    colors = []
+    for pen_item in self.penetrations:
+      if pen_item.proposed:
+        primitives = pen_item.proposed.get_wireframe()
+      else:
+        primitives = pen_item.current.get_wireframe()
+      lines.extend(primitives[0])
+      triangles.extend(primitives[1])
+      colors.append(pen_item.status_color)
+
+    tri_f_bits = dc.VertexFormatBits.PositionNormalColored
+    tri_vertex_format = dc.VertexFormat(tri_f_bits)
+
+    tri_effect_instance = dc.EffectInstance(tri_f_bits)
+
+    # If you try to handle transparency globally it will also 
+    # overrides vertex colors, and overrides them to black
+    
+    # tri_effect_instance.SetTransparency(0.8)
+
+    tri_vertex_buffer_size = \
+      dc.VertexPositionNormalColored.GetSizeInFloats() \
+      * len(triangles) * 3
+    tri_vertex_buffer = dc.VertexBuffer(tri_vertex_buffer_size)
+
+    tri_index_buffer_size = \
+      dc.IndexTriangle.GetSizeInShortInts() * len(triangles)
+    tri_index_buffer = dc.IndexBuffer(tri_index_buffer_size)
+
+    tri_vertex_buffer.Map(tri_vertex_buffer_size)
+    tri_index_buffer.Map(tri_index_buffer_size)
+    tri_vertex_stream_p = \
+      tri_vertex_buffer.GetVertexStreamPositionNormalColored()
+    tri_index_stream_p = tri_index_buffer.GetIndexStreamTriangle()
+    for triangle in triangles:
+      triangle_index = triangles.index(triangle)
+      first_idx = triangle_index * 3
+      tri_vertex_stream_p.AddVertex(dc.VertexPositionNormalColored(
+        triangle[1], triangle[0], colors[triangle_index / 12]
+      ))
+      tri_vertex_stream_p.AddVertex(dc.VertexPositionNormalColored(
+        triangle[2], triangle[0], colors[triangle_index / 12]
+      ))
+      tri_vertex_stream_p.AddVertex(dc.VertexPositionNormalColored(
+        triangle[3], triangle[0], colors[triangle_index / 12]
+      ))
+      tri_index_stream_p.AddTriangle(dc.IndexTriangle(
+        first_idx,
+        first_idx + 1,
+        first_idx + 2
+      ))
+    tri_vertex_buffer.Unmap()
+    tri_index_buffer.Unmap()
+
+    self.triangle_buffer = (
+      tri_vertex_buffer,
+      tri_vertex_buffer_size,
+      tri_index_buffer,
+      tri_index_buffer_size,
+      tri_vertex_format,
+      tri_effect_instance,
+      dc.PrimitiveType.TriangleList,
+      0,
+      len(triangles)
+    )
+
+    line_f_bits = dc.VertexFormatBits.PositionColored
+    line_vertex_format = dc.VertexFormat(line_f_bits)
+
+    line_effect_instance = dc.EffectInstance(line_f_bits)
+
+    line_vertex_buffer_size = \
+      dc.VertexPositionColored.GetSizeInFloats() * len(lines) * 2
+    line_vertex_buffer = dc.VertexBuffer(line_vertex_buffer_size)
+
+    line_index_buffer_size = \
+      dc.IndexLine.GetSizeInShortInts() * len(lines)
+    line_index_buffer = dc.IndexBuffer(line_index_buffer_size)
+
+    line_vertex_buffer.Map(line_vertex_buffer_size)
+    line_index_buffer.Map(line_index_buffer_size)
+    line_vertex_stream_p = \
+      line_vertex_buffer.GetVertexStreamPositionColored()
+    line_index_stream_p = line_index_buffer.GetIndexStreamLine()
+    for line in lines:
+      line_index = lines.index(line)
+      first_idx = line_index * 2
+      line_vertex_stream_p.AddVertex(dc.VertexPositionColored(
+        line.GetEndPoint(0), colors[line_index / 12]
+      ))
+      line_vertex_stream_p.AddVertex(dc.VertexPositionColored(
+        line.GetEndPoint(1), colors[line_index / 12]
+      ))
+      line_index_stream_p.AddLine(dc.IndexLine(
+        first_idx,
+        first_idx + 1
+      ))
+    line_vertex_buffer.Unmap()
+    line_index_buffer.Unmap()
+
+    self.line_buffer = (
+      line_vertex_buffer,
+      line_vertex_buffer_size,
+      line_index_buffer,
+      line_index_buffer_size,
+      line_vertex_format,
+      line_effect_instance,
+      dc.PrimitiveType.LineList,
+      0,
+      len(lines)
+    )
+    self.update_flag = False
+    return True
+  except:
+    return False
+</pre>
+
+At least there is some python example of DirectContext3D :-)
+
+I also managed to figure out why the vertex colors were not applied.
+It is related to the EffectInstance, but it has nothing to do with its colors.
+The problem was that I've been using an EffectInstance created as *EffectInstance (VertexFormatBits.PositionNormalColored)*, even though my display style was not shaded.
+This made all my triangles black on non shaded views, but they did work fine on shaded views.
+So I added the following lines:
+
+<pre class="prettyprint">
+      if any([
+          display_style == DB.DisplayStyle.Shading,
+          display_style == DB.DisplayStyle.ShadingWithEdges
+      ]):
+        tri_effect_instance = dc.EffectInstance(
+          dc.VertexFormatBits.PositionNormalColored
+        )
+      else:
+        tri_effect_instance = dc.EffectInstance(
+          dc.VertexFormatBits.PositionColored
+        )
+</pre>
+
+Now it works on all views as expected, and I was able to keep the vertices as VertexPositionNormalColored in all cases.
+The EffectInstance did the trick by itself.
+
+Many thanks to Tamas for the good research and sample code.
+
+####<a name="4"></a> Pick and Access Point Cloud Points
 
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
 solved two tricky point cloud related questions in
