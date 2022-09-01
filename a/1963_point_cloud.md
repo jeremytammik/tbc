@@ -58,11 +58,130 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ###
 
+
+####<a name="2"></a>
+
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+is currently solving the majority of tricky questions in 
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and has been doing so for a long time now.
+
+Among many others, he addressed [using different material on each face of a tessellated shape](https://forums.autodesk.com/t5/revit-api-forum/using-different-material-on-each-face-of-a-tessellated-shape/m-p/10550191):
+
+**Question:** I am creating a complex tessellated shape, in which I am trying to use more than one material.
+Essentially, I am trying to paint each face with its own color.
+
+However, the end result seems to use just one material for the entire shape (I think it's the material that I've used for the first face). 
+
+The API allows me to specify the material id on a face level - the TesselatedFace constructor accepts the vertices and the material.
+
+I am currently trying to specify the color of each face by creating a new material.
+
+Is there a more straightforward way to paint individual faces of a tessellated shape?
+
+**Answer:** I don't see the same issue in Revit 2022:
+
 <center>
-<img src="img/.png" alt="" title="" width="600"/> <!-- 960 x 540 -->
+<img src="img/tesselated_shape_face_color.png" alt="Tessellated shape face colour" title="Tessellated shape face colour" width="400"/> <!-- 622 x 485 -->
 </center>
 
-####<a name="2"></a> 
+<pre class="code">
+Private Function Obj_210816c(ByVal commandData As Autodesk.Revit.UI.ExternalCommandData,
+ByRef message As String, ByVal elements As Autodesk.Revit.DB.ElementSet) As Result
+
+        Dim UIDoc As UIDocument = commandData.Application.ActiveUIDocument
+        If UIDoc Is Nothing Then Return Result.Cancelled Else
+        Dim IntDoc As Document = UIDoc.Document
+
+        Dim Mats As New List(Of String)
+        Mats.Add("RT_Red,255,0,0")
+        Mats.Add("RT_Green,0,255,0")
+        Mats.Add("RT_Blue,0,0,255")
+        Mats.Add("RT_Cyan,0,255,255")
+
+        Dim FEC As New FilteredElementCollector(IntDoc)
+        Dim ECF As New ElementClassFilter(GetType(Material))
+        Dim MatsFound As List(Of Element) = FEC.WherePasses(ECF).ToElements.Where(Function(n) n.Name.StartsWith("RT_")).ToList
+        Dim NewMats As ElementId() = New ElementId(3) {}
+
+        Using tx As New Transaction(IntDoc, "Add materials")
+            If tx.Start = TransactionStatus.Started Then
+                Dim Commit As Boolean = False
+                Dim Ix As Integer = 0
+                For Each item As String In Mats
+                    Dim Str As String() = item.Split(New Char() {","}, StringSplitOptions.None)
+                    Dim M As Element = MatsFound.FirstOrDefault(Function(x) x.Name = Str(0))
+                    If M Is Nothing Then
+                        NewMats(Ix) = Material.Create(IntDoc, Str(0))
+                        Commit = True
+
+                        IntDoc.Regenerate()
+                        Dim M1 As Material = IntDoc.GetElement(NewMats(Ix))
+                        M1.Color = New Color(CByte(Str(1)), CByte(Str(2)), CByte(Str(3)))
+                    Else
+                        NewMats(Ix) = M.Id
+                    End If
+
+                    Ix += 1
+                Next
+                If Commit Then
+                    tx.Commit()
+                Else
+                    tx.RollBack()
+                End If
+            End If
+        End Using
+
+        Dim Size As Double = 1
+        Dim v1 As New XYZ((8 / 9) ^ 0.5, 0, -1 / 3)
+        Dim v2 As New XYZ(-(2 / 9) ^ 0.5, (2 / 3) ^ 0.5, -1 / 3)
+        Dim v3 As New XYZ(-(2 / 9) ^ 0.5, -(2 / 3) ^ 0.5, -1 / 3)
+        Dim v4 As New XYZ(0, 0, 1)
+
+        v1 *= Size
+        v2 *= Size
+        v3 *= Size
+        v4 *= Size
+
+        Dim F As XYZ(,) = New XYZ(3, 2) {{v4, v1, v2}, {v4, v2, v3}, {v4, v3, v1}, {v1, v2, v3}}
+
+        Dim TSB As New TessellatedShapeBuilder()
+        TSB.OpenConnectedFaceSet(True)
+        For i = 0 To 3
+            Dim EID As ElementId = NewMats(i)
+            TSB.AddFace(New TessellatedFace({F(i, 0), F(i, 1), F(i, 2)}.ToList, EID))
+        Next
+        TSB.CloseConnectedFaceSet()
+        TSB.Build()
+
+        Using tx As New Transaction(IntDoc, "Tetrahedron")
+            If tx.Start = TransactionStatus.Started Then
+                Dim DS As DirectShape = DirectShape.CreateElement(IntDoc, New ElementId(BuiltInCategory.OST_GenericModel))
+                DS.AppendShape(TSB)
+
+                tx.Commit()
+            End If
+        End Using
+        Return Result.Succeeded
+
+    End Function
+</pre>
+
+TessellatedShapeBuilder.GraphicsStyleId will be set for whole shape i.e. can have Category with Material
+
+This code sets a material per face, originally for Revit 2022, and still works in Revit 2023.
+
+In realistic visual style, the colour is taken from the Appearance Asset Colour which has not be set for the four materials created above (this can be changed via the assets of the material).
+However, each face is set to a different material.
+This can also be seen in RevitLookup:
+
+
+<center>
+<img src="img/tesselated_shape_face_color_snoop1.png" alt="Snooping tessellated shape face colour" title="Snooping tessellated shape face colour" width="600"/> <!-- 802 x 524 -->
+<img src="img/tesselated_shape_face_color_snoop2.png" alt="Snooping tessellated shape face colour" title="Snooping tessellated shape face colour" width="600"/> <!-- 802 x 524 -->
+</center>
+
+Thank you, Richard, for the useful sample code and explanation.
+
 
 ####<a name="3"></a> DirectContext3D Colorized Triangles
 
