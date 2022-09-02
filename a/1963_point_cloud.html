@@ -180,10 +180,10 @@ This can also be seen in RevitLookup:</p>
 <br/>
 <img src="img/tesselated_shape_face_color_snoop2.png" alt="Snooping tessellated shape face colour" title="Snooping tessellated shape face colour" width="600"/> <!-- 802 x 524 -->
 </center></p>
-<p>Thank you, Richard, for the useful sample code and explanation.</p>
+<p>Thank you, Richard, for the useful sample code and explanation!</p>
 <h4><a name="3"></a> DirectContext3D Colorized Triangles</h4>
-<p>Tamas Deri explored and answered the question of how to
-create <a href="https://forums.autodesk.com/t5/revit-api-forum/directcontext3d-colorized-triangles/td-p/10567609">DirectContext3D Colorized Triangles</a>:</p>
+<p>Tamas Deri explored and answered his own question of how to
+create <a href="https://forums.autodesk.com/t5/revit-api-forum/directcontext3d-colorized-triangles/td-p/10567609">DirectContext3D colorized triangles</a>:</p>
 <p><strong>Question:</strong> I'm having trouble applying colors to triangles that are shown via a <code>DirectContext3DServer</code>.
 I use a <code>ColorWithTransparency</code> object as a basis.
 Lines working fine, but here is the issue with triangles:</p>
@@ -343,21 +343,21 @@ So I added the following lines:</p>
 
 <p>Now it works on all views as expected, and I was able to keep the vertices as VertexPositionNormalColored in all cases.
 The EffectInstance did the trick by itself.</p>
-<p>Many thanks to Tamas for the good research and sample code.</p>
+<p>Many thanks to Tamas for the good research and sample code!</p>
 <h4><a name="4"></a> Pick and Access Point Cloud Points</h4>
 <p>Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
-solved two tricky point cloud related questions in
-the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> that
-I earmarked for editing and republishing here.</p>
+solved two more tricky point cloud related questions as well.</p>
 <p>The latest explains how to address 
 the <a href="https://forums.autodesk.com/t5/revit-api-forum/definition-of-work-plane-for-picking-point-of-point-cloud-in/td-p/11366329">definition of work plane for picking point of point cloud in orthographic 3D view</a>.
 In summary, Richard recommends using the <code>Selection.PickObject</code> method specifying <code>ObjectType.PointOnElement</code> and shares code to:</p>
 <ul>
 <li>Get the minimum point of the UIView from UIView.GetZoomCorners</li>
-<li>Set up a work plane using view direction and min point from (1)*</li>
+<li>Set up a work plane using view direction and min point from above;
+  note that since the user can rotate the view during selection of points, this invalidates the work plane position for point selection.
+  So, I'm locking the view orientation after the projection plane is set.</li>
 <li>Pick the point on the plane</li>
 <li>Filter the cloud by creating a box aligned with the view direction around the picked point</li>
-<li>Transform the filtered cloud points to model space and project them onto plane and find nearest to original picked point.</li>
+<li>Transform the filtered cloud points to model space and project them onto plane and find nearest to original picked point</li>
 </ul>
 <p>There is a lot more to it than it sounds, though...</p>
 <p>Before that, he also addressed

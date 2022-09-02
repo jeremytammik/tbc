@@ -196,13 +196,13 @@ This can also be seen in RevitLookup:
 <img src="img/tesselated_shape_face_color_snoop2.png" alt="Snooping tessellated shape face colour" title="Snooping tessellated shape face colour" width="600"/> <!-- 802 x 524 -->
 </center>
 
-Thank you, Richard, for the useful sample code and explanation.
+Thank you, Richard, for the useful sample code and explanation!
 
 
 ####<a name="3"></a> DirectContext3D Colorized Triangles
 
-Tamas Deri explored and answered the question of how to
-create [DirectContext3D Colorized Triangles](https://forums.autodesk.com/t5/revit-api-forum/directcontext3d-colorized-triangles/td-p/10567609):
+Tamas Deri explored and answered his own question of how to
+create [DirectContext3D colorized triangles](https://forums.autodesk.com/t5/revit-api-forum/directcontext3d-colorized-triangles/td-p/10567609):
 
 **Question:** I'm having trouble applying colors to triangles that are shown via a `DirectContext3DServer`.
 I use a `ColorWithTransparency` object as a basis.
@@ -370,24 +370,24 @@ So I added the following lines:
 Now it works on all views as expected, and I was able to keep the vertices as VertexPositionNormalColored in all cases.
 The EffectInstance did the trick by itself.
 
-Many thanks to Tamas for the good research and sample code.
+Many thanks to Tamas for the good research and sample code!
 
 ####<a name="4"></a> Pick and Access Point Cloud Points
 
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
-solved two tricky point cloud related questions in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) that
-I earmarked for editing and republishing here.
+solved two more tricky point cloud related questions as well.
 
 The latest explains how to address 
 the [definition of work plane for picking point of point cloud in orthographic 3D view](https://forums.autodesk.com/t5/revit-api-forum/definition-of-work-plane-for-picking-point-of-point-cloud-in/td-p/11366329).
 In summary, Richard recommends using the `Selection.PickObject` method specifying `ObjectType.PointOnElement` and shares code to:
 
--  Get the minimum point of the UIView from UIView.GetZoomCorners
--  Set up a work plane using view direction and min point from (1)*
--  Pick the point on the plane
--  Filter the cloud by creating a box aligned with the view direction around the picked point
--  Transform the filtered cloud points to model space and project them onto plane and find nearest to original picked point.
+- Get the minimum point of the UIView from UIView.GetZoomCorners
+- Set up a work plane using view direction and min point from above;
+  note that since the user can rotate the view during selection of points, this invalidates the work plane position for point selection.
+  So, I'm locking the view orientation after the projection plane is set.
+- Pick the point on the plane
+- Filter the cloud by creating a box aligned with the view direction around the picked point
+- Transform the filtered cloud points to model space and project them onto plane and find nearest to original picked point
  
 There is a lot more to it than it sounds, though...
 
