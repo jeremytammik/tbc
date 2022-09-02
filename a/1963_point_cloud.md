@@ -88,85 +88,95 @@ Is there a more straightforward way to paint individual faces of a tessellated s
 </center>
 
 <pre class="code">
-Private Function Obj_210816c(ByVal commandData As Autodesk.Revit.UI.ExternalCommandData,
-ByRef message As String, ByVal elements As Autodesk.Revit.DB.ElementSet) As Result
-
-        Dim UIDoc As UIDocument = commandData.Application.ActiveUIDocument
-        If UIDoc Is Nothing Then Return Result.Cancelled Else
-        Dim IntDoc As Document = UIDoc.Document
-
-        Dim Mats As New List(Of String)
-        Mats.Add("RT_Red,255,0,0")
-        Mats.Add("RT_Green,0,255,0")
-        Mats.Add("RT_Blue,0,0,255")
-        Mats.Add("RT_Cyan,0,255,255")
-
-        Dim FEC As New FilteredElementCollector(IntDoc)
-        Dim ECF As New ElementClassFilter(GetType(Material))
-        Dim MatsFound As List(Of Element) = FEC.WherePasses(ECF).ToElements.Where(Function(n) n.Name.StartsWith("RT_")).ToList
-        Dim NewMats As ElementId() = New ElementId(3) {}
-
-        Using tx As New Transaction(IntDoc, "Add materials")
-            If tx.Start = TransactionStatus.Started Then
-                Dim Commit As Boolean = False
-                Dim Ix As Integer = 0
-                For Each item As String In Mats
-                    Dim Str As String() = item.Split(New Char() {","}, StringSplitOptions.None)
-                    Dim M As Element = MatsFound.FirstOrDefault(Function(x) x.Name = Str(0))
-                    If M Is Nothing Then
-                        NewMats(Ix) = Material.Create(IntDoc, Str(0))
-                        Commit = True
-
-                        IntDoc.Regenerate()
-                        Dim M1 As Material = IntDoc.GetElement(NewMats(Ix))
-                        M1.Color = New Color(CByte(Str(1)), CByte(Str(2)), CByte(Str(3)))
-                    Else
-                        NewMats(Ix) = M.Id
-                    End If
-
-                    Ix += 1
-                Next
-                If Commit Then
-                    tx.Commit()
-                Else
-                    tx.RollBack()
-                End If
-            End If
-        End Using
-
-        Dim Size As Double = 1
-        Dim v1 As New XYZ((8 / 9) ^ 0.5, 0, -1 / 3)
-        Dim v2 As New XYZ(-(2 / 9) ^ 0.5, (2 / 3) ^ 0.5, -1 / 3)
-        Dim v3 As New XYZ(-(2 / 9) ^ 0.5, -(2 / 3) ^ 0.5, -1 / 3)
-        Dim v4 As New XYZ(0, 0, 1)
-
-        v1 *= Size
-        v2 *= Size
-        v3 *= Size
-        v4 *= Size
-
-        Dim F As XYZ(,) = New XYZ(3, 2) {{v4, v1, v2}, {v4, v2, v3}, {v4, v3, v1}, {v1, v2, v3}}
-
-        Dim TSB As New TessellatedShapeBuilder()
-        TSB.OpenConnectedFaceSet(True)
-        For i = 0 To 3
-            Dim EID As ElementId = NewMats(i)
-            TSB.AddFace(New TessellatedFace({F(i, 0), F(i, 1), F(i, 2)}.ToList, EID))
-        Next
-        TSB.CloseConnectedFaceSet()
-        TSB.Build()
-
-        Using tx As New Transaction(IntDoc, "Tetrahedron")
-            If tx.Start = TransactionStatus.Started Then
-                Dim DS As DirectShape = DirectShape.CreateElement(IntDoc, New ElementId(BuiltInCategory.OST_GenericModel))
-                DS.AppendShape(TSB)
-
-                tx.Commit()
-            End If
-        End Using
-        Return Result.Succeeded
-
-    End Function
+<span style="color:blue;">Private</span>&nbsp;<span style="color:blue;">Function</span>&nbsp;<span style="color:#74531f;">Obj_210816c</span>(
+&nbsp;&nbsp;<span style="color:blue;">ByVal</span>&nbsp;<span style="color:#1f377f;">commandData</span>&nbsp;<span style="color:blue;">As</span>&nbsp;Autodesk.Revit.UI.ExternalCommandData,
+&nbsp;&nbsp;<span style="color:blue;">ByRef</span>&nbsp;<span style="color:#1f377f;">message</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">String</span>,
+&nbsp;&nbsp;<span style="color:blue;">ByVal</span>&nbsp;<span style="color:#1f377f;">elements</span>&nbsp;<span style="color:blue;">As</span>&nbsp;Autodesk.Revit.DB.ElementSet)&nbsp;<span style="color:blue;">As</span>&nbsp;Result
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">UIDoc</span>&nbsp;<span style="color:blue;">As</span>&nbsp;UIDocument&nbsp;=&nbsp;commandData.Application.ActiveUIDocument
+&nbsp;&nbsp;<span style="color:#8f08c4;">If</span>&nbsp;UIDoc&nbsp;<span style="color:blue;">Is</span>&nbsp;<span style="color:blue;">Nothing</span>&nbsp;<span style="color:#8f08c4;">Then</span>&nbsp;<span style="color:#8f08c4;">Return</span>&nbsp;Result.Cancelled&nbsp;<span style="color:blue;">Else</span>
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">IntDoc</span>&nbsp;<span style="color:blue;">As</span>&nbsp;Document&nbsp;=&nbsp;UIDoc.Document
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">Mats</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;List(<span style="color:blue;">Of</span>&nbsp;<span style="color:blue;">String</span>)
+&nbsp;&nbsp;Mats.Add(<span style="color:#a31515;">&quot;RT_Red,255,0,0&quot;</span>)
+&nbsp;&nbsp;Mats.Add(<span style="color:#a31515;">&quot;RT_Green,0,255,0&quot;</span>)
+&nbsp;&nbsp;Mats.Add(<span style="color:#a31515;">&quot;RT_Blue,0,0,255&quot;</span>)
+&nbsp;&nbsp;Mats.Add(<span style="color:#a31515;">&quot;RT_Cyan,0,255,255&quot;</span>)
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">FEC</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;FilteredElementCollector(IntDoc)
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">ECF</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;ElementClassFilter(<span style="color:blue;">GetType</span>(Material))
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">MatsFound</span>&nbsp;<span style="color:blue;">As</span>&nbsp;List(<span style="color:blue;">Of</span>&nbsp;Element)&nbsp;=&nbsp;FEC.WherePasses(ECF)&nbsp;_
+&nbsp;&nbsp;&nbsp;&nbsp;.ToElements.Where(<span style="color:blue;">Function</span>(<span style="color:#1f377f;">n</span>)&nbsp;n.Name.StartsWith(<span style="color:#a31515;">&quot;RT_&quot;</span>))&nbsp;_
+&nbsp;&nbsp;&nbsp;&nbsp;.ToList
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">NewMats</span>&nbsp;<span style="color:blue;">As</span>&nbsp;ElementId()&nbsp;=&nbsp;<span style="color:blue;">New</span>&nbsp;ElementId(3)&nbsp;{}
+ 
+&nbsp;&nbsp;<span style="color:blue;">Using</span>&nbsp;tx&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;Transaction(IntDoc,&nbsp;<span style="color:#a31515;">&quot;Add&nbsp;materials&quot;</span>)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">If</span>&nbsp;tx.Start&nbsp;=&nbsp;TransactionStatus.Started&nbsp;<span style="color:#8f08c4;">Then</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">Commit</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">Boolean</span>&nbsp;=&nbsp;<span style="color:blue;">False</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">Ix</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">Integer</span>&nbsp;=&nbsp;0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">For</span>&nbsp;<span style="color:#8f08c4;">Each</span>&nbsp;item&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">String</span>&nbsp;<span style="color:#8f08c4;">In</span>&nbsp;Mats
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">Str</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">String</span>()&nbsp;=&nbsp;item.Split(<span style="color:blue;">New</span>&nbsp;<span style="color:blue;">Char</span>()&nbsp;{<span style="color:#a31515;">&quot;,&quot;</span>},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;StringSplitOptions.None)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">M</span>&nbsp;<span style="color:blue;">As</span>&nbsp;Element&nbsp;=&nbsp;MatsFound.FirstOrDefault(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Function</span>(<span style="color:#1f377f;">x</span>)&nbsp;x.Name&nbsp;=&nbsp;Str(0))
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">If</span>&nbsp;M&nbsp;<span style="color:blue;">Is</span>&nbsp;<span style="color:blue;">Nothing</span>&nbsp;<span style="color:#8f08c4;">Then</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NewMats(Ix)&nbsp;=&nbsp;Material.Create(IntDoc,&nbsp;Str(0))
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Commit&nbsp;=&nbsp;<span style="color:blue;">True</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IntDoc.Regenerate()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">M1</span>&nbsp;<span style="color:blue;">As</span>&nbsp;Material&nbsp;=&nbsp;IntDoc.GetElement(NewMats(Ix))
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;M1.Color&nbsp;=&nbsp;<span style="color:blue;">New</span>&nbsp;Color(<span style="color:blue;">CByte</span>(Str(1)),
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">CByte</span>(Str(2)),&nbsp;<span style="color:blue;">CByte</span>(Str(3)))
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">Else</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NewMats(Ix)&nbsp;=&nbsp;M.Id
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">End</span>&nbsp;<span style="color:#8f08c4;">If</span>
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ix&nbsp;+=&nbsp;1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">Next</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">If</span>&nbsp;Commit&nbsp;<span style="color:#8f08c4;">Then</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tx.Commit()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">Else</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tx.RollBack()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">End</span>&nbsp;<span style="color:#8f08c4;">If</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">End</span>&nbsp;<span style="color:#8f08c4;">If</span>
+&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Using</span>
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">Size</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">Double</span>&nbsp;=&nbsp;1
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">v1</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;XYZ((8&nbsp;/&nbsp;9)&nbsp;^&nbsp;0.5,&nbsp;0,&nbsp;-1&nbsp;/&nbsp;3)
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">v2</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;XYZ(-(2&nbsp;/&nbsp;9)&nbsp;^&nbsp;0.5,&nbsp;(2&nbsp;/&nbsp;3)&nbsp;^&nbsp;0.5,&nbsp;-1&nbsp;/&nbsp;3)
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">v3</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;XYZ(-(2&nbsp;/&nbsp;9)&nbsp;^&nbsp;0.5,&nbsp;-(2&nbsp;/&nbsp;3)&nbsp;^&nbsp;0.5,&nbsp;-1&nbsp;/&nbsp;3)
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">v4</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;XYZ(0,&nbsp;0,&nbsp;1)
+ 
+&nbsp;&nbsp;v1&nbsp;*=&nbsp;Size
+&nbsp;&nbsp;v2&nbsp;*=&nbsp;Size
+&nbsp;&nbsp;v3&nbsp;*=&nbsp;Size
+&nbsp;&nbsp;v4&nbsp;*=&nbsp;Size
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">F</span>&nbsp;<span style="color:blue;">As</span>&nbsp;XYZ(,)&nbsp;=&nbsp;<span style="color:blue;">New</span>&nbsp;XYZ(3,&nbsp;2)&nbsp;{{v4,&nbsp;v1,&nbsp;v2},
+&nbsp;&nbsp;&nbsp;&nbsp;{v4,&nbsp;v2,&nbsp;v3},&nbsp;{v4,&nbsp;v3,&nbsp;v1},&nbsp;{v1,&nbsp;v2,&nbsp;v3}}
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">TSB</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;TessellatedShapeBuilder()
+&nbsp;&nbsp;TSB.OpenConnectedFaceSet(<span style="color:blue;">True</span>)
+&nbsp;&nbsp;<span style="color:#8f08c4;">For</span>&nbsp;i&nbsp;=&nbsp;0&nbsp;<span style="color:#8f08c4;">To</span>&nbsp;3
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">EID</span>&nbsp;<span style="color:blue;">As</span>&nbsp;ElementId&nbsp;=&nbsp;NewMats(i)
+&nbsp;&nbsp;&nbsp;&nbsp;TSB.AddFace(<span style="color:blue;">New</span>&nbsp;TessellatedFace(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{F(i,&nbsp;0),&nbsp;F(i,&nbsp;1),&nbsp;F(i,&nbsp;2)}.ToList,&nbsp;EID))
+&nbsp;&nbsp;<span style="color:#8f08c4;">Next</span>
+&nbsp;&nbsp;TSB.CloseConnectedFaceSet()
+&nbsp;&nbsp;TSB.Build()
+ 
+&nbsp;&nbsp;<span style="color:blue;">Using</span>&nbsp;tx&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;Transaction(IntDoc,&nbsp;<span style="color:#a31515;">&quot;Tetrahedron&quot;</span>)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">If</span>&nbsp;tx.Start&nbsp;=&nbsp;TransactionStatus.Started&nbsp;<span style="color:#8f08c4;">Then</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">DS</span>&nbsp;<span style="color:blue;">As</span>&nbsp;DirectShape&nbsp;=&nbsp;DirectShape.CreateElement(
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IntDoc,&nbsp;<span style="color:blue;">New</span>&nbsp;ElementId(BuiltInCategory.OST_GenericModel))
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DS.AppendShape(TSB)
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tx.Commit()
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">End</span>&nbsp;<span style="color:#8f08c4;">If</span>
+&nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Using</span>
+&nbsp;&nbsp;<span style="color:#8f08c4;">Return</span>&nbsp;Result.Succeeded
+ 
+<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Function</span>
 </pre>
 
 TessellatedShapeBuilder.GraphicsStyleId will be set for the whole shape, i.e., it can have Category with Material.
