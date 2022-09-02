@@ -45,6 +45,14 @@ Let's look at accessing point cloud points and colouring individual triangles an
 
 linkedin:
 
+Accessing point cloud points and colouring individual DirectShape and DirectContext3D triangles and faces in the #RevitAPI:
+
+https://bit.ly/coloringfaces
+
+- Assigning material to each face
+- DirectContext3D colorized triangles
+- Pick and access point cloud points...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
