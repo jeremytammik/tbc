@@ -56,10 +56,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-###
+### Points, Coloured Triangles and Faces
 
+- [Assigning material to each face](#2)
+- [DirectContext3D colorized triangles](#3)
+- [Pick and access point cloud points](#4)
 
-####<a name="2"></a>
+####<a name="2"></a> Assigning Material to Each Face
 
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
 is currently solving the majority of tricky questions in 
@@ -166,11 +169,11 @@ ByRef message As String, ByVal elements As Autodesk.Revit.DB.ElementSet) As Resu
     End Function
 </pre>
 
-TessellatedShapeBuilder.GraphicsStyleId will be set for whole shape i.e. can have Category with Material
+TessellatedShapeBuilder.GraphicsStyleId will be set for the whole shape, i.e., it can have Category with Material.
 
 This code sets a material per face, originally for Revit 2022, and still works in Revit 2023.
 
-In realistic visual style, the colour is taken from the Appearance Asset Colour which has not be set for the four materials created above (this can be changed via the assets of the material).
+In realistic visual style, the colour is taken from the Appearance Asset Colour which has not been set for the four materials created above (this can be changed via the assets of the material).
 However, each face is set to a different material.
 This can also be seen in RevitLookup:
 
