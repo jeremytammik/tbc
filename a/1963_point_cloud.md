@@ -209,15 +209,16 @@ I use a `ColorWithTransparency` object as a basis.
 Lines working fine, but here is the issue with triangles:
 
 I can apply the color via the `EffectInstance`, but only if I set it's Emissive Color through `SetEmissiveColor`.
-If I set all it's other colors like, Color, DiffuseColor, SpecularColor or AmbientColor, it stays black.
-Changing transparency works fine. The biggest issue if I'd like to apply the colors per vertices it wont work.
+If I set all its other colors like, Color, DiffuseColor, SpecularColor or AmbientColor, it stays black.
+Changing transparency works fine.
+The biggest issue if I'd like to apply the colors per vertices it won't work.
 I'm using VertexFormatBits.PositionNormalColored, and set for instance ColorWithTransparency(255,0,0,200) as it's color, but all triangles will be transparent black.
 Any idea what could be the issue? No exceptions thrown, all buffers are valid, the geometries are being shown, but without the right color applied.
 
 **Answer:** I tried to put together a reproducible case, and I've just found out what the issue was.
 I left a line in the code which set the EffectInstance's transparency, and I think if any property of the EffectInstance is set, then it overrides all vertex properties.
 That's why the vertex colors got ignored, and it falled back to transparent black.
-Once I removed that line, and kept only the just-constructed EffectInstance it worked as intended.
+Once I removed that line and kept only the just-constructed EffectInstance it worked as intended.
 
 Here is a partial code that updates the buffers if it is neccessary.
 The rest is similar to what is available from other sources regarding DirectContext3D.
@@ -350,7 +351,7 @@ At least there is some python example of DirectContext3D :-)
 I also managed to figure out why the vertex colors were not applied.
 It is related to the EffectInstance, but it has nothing to do with its colors.
 The problem was that I've been using an EffectInstance created as *EffectInstance (VertexFormatBits.PositionNormalColored)*, even though my display style was not shaded.
-This made all my triangles black on non shaded views, but they did work fine on shaded views.
+This made all my triangles black on non-shaded views, but they did work fine on shaded views.
 So I added the following lines:
 
 <pre class="prettyprint">
@@ -413,14 +414,14 @@ A confusing aspect is the `averageDistance`:
 What is the lowest number I can set this to, the limit of the scanner or smallest possible +ve double value? I think it should be an optional parameter whereby it just returns all the points for an area up to the max number of points limit. It says: "Specifying this parameter...", making it sound like it is optional, but it doesn't tell me it can be null for example.
 
 I would probably split the cloud up into blocks and test the number of points has not reached the limit for each.
-If it has reached the limit for a given block then subdivide that block up into more blocks.
+If it has reached the limit for a given block, then subdivide that block up into more blocks.
 
 Note:
 
 > If there are more points in the cloud passing the filter than the number requested in this function, the results may not be consistent if the same call is made again.
 
-So, if the amount of points is less then the max number then I assume you have all the points for that block.
+So, if the amount of points is less than the max number then I assume you have all the points for that block.
 
-Additionally the `PointCollection` has the member `GetpointBufferPointer`; this could then provides a faster way to count the points in each block to establish if the block needs further subdividing.
+Additionally the `PointCollection` has the member `GetpointBufferPointer`; this could then provide a faster way to count the points in each block to establish if the block needs further subdividing.
 
 Many thanks again to Richard for his helpful advice and great expertise!
