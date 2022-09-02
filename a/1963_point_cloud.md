@@ -56,7 +56,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Points, Coloured Triangles and Faces
+### Point Clouds, Coloured Triangles and Faces
 
 Let's look at accessing point cloud points and colouring individual triangles and faces:
 
