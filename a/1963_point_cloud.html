@@ -1,9 +1,8 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
-</head>
-
+<p></head></p>
 <!---
 
 - Using different material on each face of a tessellated shape
@@ -56,63 +55,52 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Points, Coloured Triangles and Faces
-
-Let's look at accessing point cloud points and colouring individual triangles and faces:
-
-- [Assigning material to each face](#2)
-- [DirectContext3D colorized triangles](#3)
-- [Pick and access point cloud points](#4)
-
-####<a name="2"></a> Assigning Material to Each Face
-
-Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+<h3>Points, Coloured Triangles and Faces</h3>
+<p>Let's look at accessing point cloud points and colouring individual triangles and faces:</p>
+<ul>
+<li><a href="#2">Assigning material to each face</a></li>
+<li><a href="#3">DirectContext3D colorized triangles</a></li>
+<li><a href="#4">Pick and access point cloud points</a></li>
+</ul>
+<h4><a name="2"></a> Assigning Material to Each Face</h4>
+<p>Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
 has been solving the majority of tricky questions in 
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) for
-quite some time.
-
-Among many others, he addressed [using different material on each face of a tessellated shape](https://forums.autodesk.com/t5/revit-api-forum/using-different-material-on-each-face-of-a-tessellated-shape/m-p/10550191):
-
-**Question:** I am creating a complex tessellated shape, in which I am trying to use more than one material.
-Essentially, I am trying to paint each face with its own colour.
-
-However, the end result seems to use just one material for the entire shape (I think it's the material that I've used for the first face). 
-
-The API allows me to specify the material id on a face level &ndash; the TesselatedFace constructor accepts the vertices and the material.
-
-I am currently trying to specify the colour of each face by creating a new material.
-
-Is there a more straightforward way to paint individual faces of a tessellated shape?
-
-**Answer:** I don't see the same issue in Revit 2022:
-
-<center>
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> for
+quite some time.</p>
+<p>Among many others, he addressed <a href="https://forums.autodesk.com/t5/revit-api-forum/using-different-material-on-each-face-of-a-tessellated-shape/m-p/10550191">using different material on each face of a tessellated shape</a>:</p>
+<p><strong>Question:</strong> I am creating a complex tessellated shape, in which I am trying to use more than one material.
+Essentially, I am trying to paint each face with its own colour.</p>
+<p>However, the end result seems to use just one material for the entire shape (I think it's the material that I've used for the first face). </p>
+<p>The API allows me to specify the material id on a face level &ndash; the TesselatedFace constructor accepts the vertices and the material.</p>
+<p>I am currently trying to specify the colour of each face by creating a new material.</p>
+<p>Is there a more straightforward way to paint individual faces of a tessellated shape?</p>
+<p><strong>Answer:</strong> I don't see the same issue in Revit 2022:</p>
+<p><center>
 <img src="img/tesselated_shape_face_color.png" alt="Tessellated shape face colour" title="Tessellated shape face colour" width="400"/> <!-- 622 x 485 -->
-</center>
-
+</center></p>
 <pre class="code">
 <span style="color:blue;">Private</span>&nbsp;<span style="color:blue;">Function</span>&nbsp;<span style="color:#74531f;">Obj_210816c</span>(
 &nbsp;&nbsp;<span style="color:blue;">ByVal</span>&nbsp;<span style="color:#1f377f;">commandData</span>&nbsp;<span style="color:blue;">As</span>&nbsp;Autodesk.Revit.UI.ExternalCommandData,
 &nbsp;&nbsp;<span style="color:blue;">ByRef</span>&nbsp;<span style="color:#1f377f;">message</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">String</span>,
 &nbsp;&nbsp;<span style="color:blue;">ByVal</span>&nbsp;<span style="color:#1f377f;">elements</span>&nbsp;<span style="color:blue;">As</span>&nbsp;Autodesk.Revit.DB.ElementSet)&nbsp;<span style="color:blue;">As</span>&nbsp;Result
- 
+
 &nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">UIDoc</span>&nbsp;<span style="color:blue;">As</span>&nbsp;UIDocument&nbsp;=&nbsp;commandData.Application.ActiveUIDocument
 &nbsp;&nbsp;<span style="color:#8f08c4;">If</span>&nbsp;UIDoc&nbsp;<span style="color:blue;">Is</span>&nbsp;<span style="color:blue;">Nothing</span>&nbsp;<span style="color:#8f08c4;">Then</span>&nbsp;<span style="color:#8f08c4;">Return</span>&nbsp;Result.Cancelled&nbsp;<span style="color:blue;">Else</span>
 &nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">IntDoc</span>&nbsp;<span style="color:blue;">As</span>&nbsp;Document&nbsp;=&nbsp;UIDoc.Document
- 
+
 &nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">Mats</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;List(<span style="color:blue;">Of</span>&nbsp;<span style="color:blue;">String</span>)
 &nbsp;&nbsp;Mats.Add(<span style="color:#a31515;">&quot;RT_Red,255,0,0&quot;</span>)
 &nbsp;&nbsp;Mats.Add(<span style="color:#a31515;">&quot;RT_Green,0,255,0&quot;</span>)
 &nbsp;&nbsp;Mats.Add(<span style="color:#a31515;">&quot;RT_Blue,0,0,255&quot;</span>)
 &nbsp;&nbsp;Mats.Add(<span style="color:#a31515;">&quot;RT_Cyan,0,255,255&quot;</span>)
- 
+
 &nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">FEC</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;FilteredElementCollector(IntDoc)
 &nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">ECF</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;ElementClassFilter(<span style="color:blue;">GetType</span>(Material))
 &nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">MatsFound</span>&nbsp;<span style="color:blue;">As</span>&nbsp;List(<span style="color:blue;">Of</span>&nbsp;Element)&nbsp;=&nbsp;FEC.WherePasses(ECF)&nbsp;_
 &nbsp;&nbsp;&nbsp;&nbsp;.ToElements.Where(<span style="color:blue;">Function</span>(<span style="color:#1f377f;">n</span>)&nbsp;n.Name.StartsWith(<span style="color:#a31515;">&quot;RT_&quot;</span>))&nbsp;_
 &nbsp;&nbsp;&nbsp;&nbsp;.ToList
 &nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">NewMats</span>&nbsp;<span style="color:blue;">As</span>&nbsp;ElementId()&nbsp;=&nbsp;<span style="color:blue;">New</span>&nbsp;ElementId(3)&nbsp;{}
- 
+
 &nbsp;&nbsp;<span style="color:blue;">Using</span>&nbsp;tx&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;Transaction(IntDoc,&nbsp;<span style="color:#a31515;">&quot;Add&nbsp;materials&quot;</span>)
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">If</span>&nbsp;tx.Start&nbsp;=&nbsp;TransactionStatus.Started&nbsp;<span style="color:#8f08c4;">Then</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">Commit</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">Boolean</span>&nbsp;=&nbsp;<span style="color:blue;">False</span>
@@ -125,7 +113,7 @@ Is there a more straightforward way to paint individual faces of a tessellated s
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">If</span>&nbsp;M&nbsp;<span style="color:blue;">Is</span>&nbsp;<span style="color:blue;">Nothing</span>&nbsp;<span style="color:#8f08c4;">Then</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NewMats(Ix)&nbsp;=&nbsp;Material.Create(IntDoc,&nbsp;Str(0))
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Commit&nbsp;=&nbsp;<span style="color:blue;">True</span>
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IntDoc.Regenerate()
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">M1</span>&nbsp;<span style="color:blue;">As</span>&nbsp;Material&nbsp;=&nbsp;IntDoc.GetElement(NewMats(Ix))
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;M1.Color&nbsp;=&nbsp;<span style="color:blue;">New</span>&nbsp;Color(<span style="color:blue;">CByte</span>(Str(1)),
@@ -133,7 +121,7 @@ Is there a more straightforward way to paint individual faces of a tessellated s
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">Else</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NewMats(Ix)&nbsp;=&nbsp;M.Id
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">End</span>&nbsp;<span style="color:#8f08c4;">If</span>
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ix&nbsp;+=&nbsp;1
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">Next</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">If</span>&nbsp;Commit&nbsp;<span style="color:#8f08c4;">Then</span>
@@ -143,21 +131,21 @@ Is there a more straightforward way to paint individual faces of a tessellated s
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">End</span>&nbsp;<span style="color:#8f08c4;">If</span>
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">End</span>&nbsp;<span style="color:#8f08c4;">If</span>
 &nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Using</span>
- 
+
 &nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">Size</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">Double</span>&nbsp;=&nbsp;1
 &nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">v1</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;XYZ((8&nbsp;/&nbsp;9)&nbsp;^&nbsp;0.5,&nbsp;0,&nbsp;-1&nbsp;/&nbsp;3)
 &nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">v2</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;XYZ(-(2&nbsp;/&nbsp;9)&nbsp;^&nbsp;0.5,&nbsp;(2&nbsp;/&nbsp;3)&nbsp;^&nbsp;0.5,&nbsp;-1&nbsp;/&nbsp;3)
 &nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">v3</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;XYZ(-(2&nbsp;/&nbsp;9)&nbsp;^&nbsp;0.5,&nbsp;-(2&nbsp;/&nbsp;3)&nbsp;^&nbsp;0.5,&nbsp;-1&nbsp;/&nbsp;3)
 &nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">v4</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;XYZ(0,&nbsp;0,&nbsp;1)
- 
+
 &nbsp;&nbsp;v1&nbsp;*=&nbsp;Size
 &nbsp;&nbsp;v2&nbsp;*=&nbsp;Size
 &nbsp;&nbsp;v3&nbsp;*=&nbsp;Size
 &nbsp;&nbsp;v4&nbsp;*=&nbsp;Size
- 
+
 &nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">F</span>&nbsp;<span style="color:blue;">As</span>&nbsp;XYZ(,)&nbsp;=&nbsp;<span style="color:blue;">New</span>&nbsp;XYZ(3,&nbsp;2)&nbsp;{{v4,&nbsp;v1,&nbsp;v2},
 &nbsp;&nbsp;&nbsp;&nbsp;{v4,&nbsp;v2,&nbsp;v3},&nbsp;{v4,&nbsp;v3,&nbsp;v1},&nbsp;{v1,&nbsp;v2,&nbsp;v3}}
- 
+
 &nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">TSB</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;TessellatedShapeBuilder()
 &nbsp;&nbsp;TSB.OpenConnectedFaceSet(<span style="color:blue;">True</span>)
 &nbsp;&nbsp;<span style="color:#8f08c4;">For</span>&nbsp;i&nbsp;=&nbsp;0&nbsp;<span style="color:#8f08c4;">To</span>&nbsp;3
@@ -167,61 +155,49 @@ Is there a more straightforward way to paint individual faces of a tessellated s
 &nbsp;&nbsp;<span style="color:#8f08c4;">Next</span>
 &nbsp;&nbsp;TSB.CloseConnectedFaceSet()
 &nbsp;&nbsp;TSB.Build()
- 
+
 &nbsp;&nbsp;<span style="color:blue;">Using</span>&nbsp;tx&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;Transaction(IntDoc,&nbsp;<span style="color:#a31515;">&quot;Tetrahedron&quot;</span>)
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">If</span>&nbsp;tx.Start&nbsp;=&nbsp;TransactionStatus.Started&nbsp;<span style="color:#8f08c4;">Then</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">DS</span>&nbsp;<span style="color:blue;">As</span>&nbsp;DirectShape&nbsp;=&nbsp;DirectShape.CreateElement(
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IntDoc,&nbsp;<span style="color:blue;">New</span>&nbsp;ElementId(BuiltInCategory.OST_GenericModel))
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DS.AppendShape(TSB)
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tx.Commit()
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">End</span>&nbsp;<span style="color:#8f08c4;">If</span>
 &nbsp;&nbsp;<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Using</span>
 &nbsp;&nbsp;<span style="color:#8f08c4;">Return</span>&nbsp;Result.Succeeded
- 
+
 <span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Function</span>
 </pre>
 
-TessellatedShapeBuilder.GraphicsStyleId will be set for the whole shape, i.e., it can have Category with Material.
-
-This code sets a material per face, originally for Revit 2022, and still works in Revit 2023.
-
-In realistic visual style, the colour is taken from the Appearance Asset Colour which has not been set for the four materials created above (this can be changed via the assets of the material).
+<p>TessellatedShapeBuilder.GraphicsStyleId will be set for the whole shape, i.e., it can have Category with Material.</p>
+<p>This code sets a material per face, originally for Revit 2022, and still works in Revit 2023.</p>
+<p>In realistic visual style, the colour is taken from the Appearance Asset Colour which has not been set for the four materials created above (this can be changed via the assets of the material).
 However, each face is set to a different material.
-This can also be seen in RevitLookup:
-
-<center>
+This can also be seen in RevitLookup:</p>
+<p><center>
 <img src="img/tesselated_shape_face_color_snoop1.png" alt="Snooping tessellated shape face colour" title="Snooping tessellated shape face colour" width="600"/> <!-- 802 x 524 -->
 <br/>
 <img src="img/tesselated_shape_face_color_snoop2.png" alt="Snooping tessellated shape face colour" title="Snooping tessellated shape face colour" width="600"/> <!-- 802 x 524 -->
-</center>
-
-Thank you, Richard, for the useful sample code and explanation.
-
-
-####<a name="3"></a> DirectContext3D Colorized Triangles
-
-Tamas Deri explored and answered the question of how to
-create [DirectContext3D Colorized Triangles](https://forums.autodesk.com/t5/revit-api-forum/directcontext3d-colorized-triangles/td-p/10567609):
-
-**Question:** I'm having trouble applying colors to triangles that are shown via a `DirectContext3DServer`.
-I use a `ColorWithTransparency` object as a basis.
-Lines working fine, but here is the issue with triangles:
-
-I can apply the color via the `EffectInstance`, but only if I set it's Emissive Color through `SetEmissiveColor`.
+</center></p>
+<p>Thank you, Richard, for the useful sample code and explanation.</p>
+<h4><a name="3"></a> DirectContext3D Colorized Triangles</h4>
+<p>Tamas Deri explored and answered the question of how to
+create <a href="https://forums.autodesk.com/t5/revit-api-forum/directcontext3d-colorized-triangles/td-p/10567609">DirectContext3D Colorized Triangles</a>:</p>
+<p><strong>Question:</strong> I'm having trouble applying colors to triangles that are shown via a <code>DirectContext3DServer</code>.
+I use a <code>ColorWithTransparency</code> object as a basis.
+Lines working fine, but here is the issue with triangles:</p>
+<p>I can apply the color via the <code>EffectInstance</code>, but only if I set it's Emissive Color through <code>SetEmissiveColor</code>.
 If I set all it's other colors like, Color, DiffuseColor, SpecularColor or AmbientColor, it stays black.
 Changing transparency works fine. The biggest issue if I'd like to apply the colors per vertices it wont work.
 I'm using VertexFormatBits.PositionNormalColored, and set for instance ColorWithTransparency(255,0,0,200) as it's color, but all triangles will be transparent black.
-Any idea what could be the issue? No exceptions thrown, all buffers are valid, the geometries are being shown, but without the right color applied.
-
-**Answer:** I tried to put together a reproducible case, and I've just found out what the issue was.
+Any idea what could be the issue? No exceptions thrown, all buffers are valid, the geometries are being shown, but without the right color applied.</p>
+<p><strong>Answer:</strong> I tried to put together a reproducible case, and I've just found out what the issue was.
 I left a line in the code which set the EffectInstance's transparency, and I think if any property of the EffectInstance is set, then it overrides all vertex properties.
 That's why the vertex colors got ignored, and it falled back to transparent black.
-Once I removed that line, and kept only the just-constructed EffectInstance it worked as intended.
-
-Here is a partial code that updates the buffers if it is neccessary.
-The rest is similar to what is available from other sources regarding DirectContext3D.
-
+Once I removed that line, and kept only the just-constructed EffectInstance it worked as intended.</p>
+<p>Here is a partial code that updates the buffers if it is neccessary.
+The rest is similar to what is available from other sources regarding DirectContext3D.</p>
 <pre class="prettyprint">
 def update_buffer(self):
   if self.penetrations is None: return False
@@ -245,7 +221,7 @@ def update_buffer(self):
 
     # If you try to handle transparency globally it will also 
     # overrides vertex colors, and overrides them to black
-    
+
     # tri_effect_instance.SetTransparency(0.8)
 
     tri_vertex_buffer_size = \
@@ -345,14 +321,12 @@ def update_buffer(self):
     return False
 </pre>
 
-At least there is some python example of DirectContext3D :-)
-
-I also managed to figure out why the vertex colors were not applied.
+<p>At least there is some python example of DirectContext3D :-)</p>
+<p>I also managed to figure out why the vertex colors were not applied.
 It is related to the EffectInstance, but it has nothing to do with its colors.
-The problem was that I've been using an EffectInstance created as *EffectInstance (VertexFormatBits.PositionNormalColored)*, even though my display style was not shaded.
+The problem was that I've been using an EffectInstance created as <em>EffectInstance (VertexFormatBits.PositionNormalColored)</em>, even though my display style was not shaded.
 This made all my triangles black on non shaded views, but they did work fine on shaded views.
-So I added the following lines:
-
+So I added the following lines:</p>
 <pre class="prettyprint">
       if any([
           display_style == DB.DisplayStyle.Shading,
@@ -367,60 +341,47 @@ So I added the following lines:
         )
 </pre>
 
-Now it works on all views as expected, and I was able to keep the vertices as VertexPositionNormalColored in all cases.
-The EffectInstance did the trick by itself.
-
-Many thanks to Tamas for the good research and sample code.
-
-####<a name="4"></a> Pick and Access Point Cloud Points
-
-Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+<p>Now it works on all views as expected, and I was able to keep the vertices as VertexPositionNormalColored in all cases.
+The EffectInstance did the trick by itself.</p>
+<p>Many thanks to Tamas for the good research and sample code.</p>
+<h4><a name="4"></a> Pick and Access Point Cloud Points</h4>
+<p>Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
 solved two tricky point cloud related questions in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) that
-I earmarked for editing and republishing here.
-
-The latest explains how to address 
-the [definition of work plane for picking point of point cloud in orthographic 3D view](https://forums.autodesk.com/t5/revit-api-forum/definition-of-work-plane-for-picking-point-of-point-cloud-in/td-p/11366329).
-In summary, Richard recommends using the `Selection.PickObject` method specifying `ObjectType.PointOnElement` and shares code to:
-
--  Get the minimum point of the UIView from UIView.GetZoomCorners
--  Set up a work plane using view direction and min point from (1)*
--  Pick the point on the plane
--  Filter the cloud by creating a box aligned with the view direction around the picked point
--  Transform the filtered cloud points to model space and project them onto plane and find nearest to original picked point.
- 
-There is a lot more to it than it sounds, though...
-
-Before that, he also addressed
-how to [access point cloud points through API](https://forums.autodesk.com/t5/revit-api-forum/access-point-cloud-points-through-api/m-p/11374437):
-
-**Question:** I imported an `.rcs` point cloud to Revit 2022 using Insert &gt; Point Cloud.
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> that
+I earmarked for editing and republishing here.</p>
+<p>The latest explains how to address 
+the <a href="https://forums.autodesk.com/t5/revit-api-forum/definition-of-work-plane-for-picking-point-of-point-cloud-in/td-p/11366329">definition of work plane for picking point of point cloud in orthographic 3D view</a>.
+In summary, Richard recommends using the <code>Selection.PickObject</code> method specifying <code>ObjectType.PointOnElement</code> and shares code to:</p>
+<ul>
+<li>Get the minimum point of the UIView from UIView.GetZoomCorners</li>
+<li>Set up a work plane using view direction and min point from (1)*</li>
+<li>Pick the point on the plane</li>
+<li>Filter the cloud by creating a box aligned with the view direction around the picked point</li>
+<li>Transform the filtered cloud points to model space and project them onto plane and find nearest to original picked point.</li>
+</ul>
+<p>There is a lot more to it than it sounds, though...</p>
+<p>Before that, he also addressed
+how to <a href="https://forums.autodesk.com/t5/revit-api-forum/access-point-cloud-points-through-api/m-p/11374437">access point cloud points through API</a>:</p>
+<p><strong>Question:</strong> I imported an <code>.rcs</code> point cloud to Revit 2022 using Insert &gt; Point Cloud.
 I would like to access its points and colors through Revit API.
-For that, I found the `PointCloudInstance.GetPoints` method.
-Its third input is `numPoints`, representing the number of points which should be extracted from the point cloud.
+For that, I found the <code>PointCloudInstance.GetPoints</code> method.
+Its third input is <code>numPoints</code>, representing the number of points which should be extracted from the point cloud.
 However, this input cannot be larger than 1 million.
 And if I try to make it larger, it raises an error message: 'It can be from 1 to 1000000.'
-Does this mean that for any point cloud we import to Revit, we can only access its first 1 million points through Revit API, and those beyond are inaccessible?
-
-**Answer:** I think the statement regarding how many points you can access is incorrect.
-
-Yes, there is a limit, but you can process the cloud in blocks by adjusting the filter limits and thus access all the points, not just the limit of one block.
-
-A confusing aspect is the `averageDistance`:
-
-> Desired average distance between "adjacent" cloud points (Revit units of length). The smaller the averageDistance the larger number of points will be returned up to the numPoints limit. Specifying this parameter makes actual number of points returned for a given filter independent of the density of coverage produced by the scanner.
-
-What is the lowest number I can set this to, the limit of the scanner or smallest possible +ve double value? I think it should be an optional parameter whereby it just returns all the points for an area up to the max number of points limit. It says: "Specifying this parameter...", making it sound like it is optional, but it doesn't tell me it can be null for example.
-
-I would probably split the cloud up into blocks and test the number of points has not reached the limit for each.
-If it has reached the limit for a given block then subdivide that block up into more blocks.
-
-Note:
-
-> If there are more points in the cloud passing the filter than the number requested in this function, the results may not be consistent if the same call is made again.
-
-So, if the amount of points is less then the max number then I assume you have all the points for that block.
-
-Additionally the `PointCollection` has the member `GetpointBufferPointer`; this could then provides a faster way to count the points in each block to establish if the block needs further subdividing.
-
-Many thanks to Richard for his helpful advice and great expertise.
+Does this mean that for any point cloud we import to Revit, we can only access its first 1 million points through Revit API, and those beyond are inaccessible?</p>
+<p><strong>Answer:</strong> I think the statement regarding how many points you can access is incorrect.</p>
+<p>Yes, there is a limit, but you can process the cloud in blocks by adjusting the filter limits and thus access all the points, not just the limit of one block.</p>
+<p>A confusing aspect is the <code>averageDistance</code>:</p>
+<blockquote>
+<p>Desired average distance between "adjacent" cloud points (Revit units of length). The smaller the averageDistance the larger number of points will be returned up to the numPoints limit. Specifying this parameter makes actual number of points returned for a given filter independent of the density of coverage produced by the scanner.</p>
+</blockquote>
+<p>What is the lowest number I can set this to, the limit of the scanner or smallest possible +ve double value? I think it should be an optional parameter whereby it just returns all the points for an area up to the max number of points limit. It says: "Specifying this parameter...", making it sound like it is optional, but it doesn't tell me it can be null for example.</p>
+<p>I would probably split the cloud up into blocks and test the number of points has not reached the limit for each.
+If it has reached the limit for a given block then subdivide that block up into more blocks.</p>
+<p>Note:</p>
+<blockquote>
+<p>If there are more points in the cloud passing the filter than the number requested in this function, the results may not be consistent if the same call is made again.</p>
+</blockquote>
+<p>So, if the amount of points is less then the max number then I assume you have all the points for that block.</p>
+<p>Additionally the <code>PointCollection</code> has the member <code>GetpointBufferPointer</code>; this could then provides a faster way to count the points in each block to establish if the block needs further subdividing.</p>
+<p>Many thanks to Richard for his helpful advice and great expertise.</p>
