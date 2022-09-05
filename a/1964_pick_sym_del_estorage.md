@@ -75,10 +75,13 @@ The file contains 4 macros:
 
 > In Revit, 2020 I am not able to remove any schemata when the IFC link is loaded.
 
+Many thanks to Marek @Songohu_85 for testing and reporting this.
 
+I wonder whether it will help others resolve similar issues.
 
 ####<a name="3"></a> Picking, Selection and UI Design
 
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
 
 solution by rpthomas with some important UI design and selection advice in general
 Pick FamilySymbol from Project Browser?
