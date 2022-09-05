@@ -36,8 +36,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### 
-
+###
 
 **Question:** 
 
@@ -50,9 +49,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <pre class="code">
 </pre>
 
-
 Thank you ... for the useful sample code and explanation!
-
 
 ####<a name="2"></a> Unload IFC Links to Delete Extensible Storage
 
@@ -82,15 +79,108 @@ I wonder whether it will help others resolve similar issues.
 ####<a name="3"></a> Picking, Selection and UI Design
 
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+shares some mimportant advice on Revit add-in UI design and selection in general in his answer on
+how to [pick `FamilySymbol` from project browser](https://forums.autodesk.com/t5/revit-api-forum/pick-familysymbol-from-project-browser/td-p/11390552):
 
-solution by rpthomas with some important UI design and selection advice in general
-Pick FamilySymbol from Project Browser?
-https://forums.autodesk.com/t5/revit-api-forum/pick-familysymbol-from-project-browser/td-p/11390552
+**Question:** I want my user to select a FamilySymbol that's already loaded from the UI (more specifically, the Project Browser) that I then further process in my own code. I'm aware that there are different methods for filtering the already existing custom families/loading families from file and so on, but is there a way to prompt the user to pick one from the project browser? Ideally, it would NOT require the user to make conscious decisions on where to click before starting the add-in.
 
+Cheers
+
+ Solved by RPTHOMAS108. Go to Solution.
+
+Report
+Labels (2)
+FamilySymbol PickObject
+6 REPLIES
+MESSAGE 2 OF 7
+Yien_Chao
+ Advisor Yien_Chao in reply to: grubdex
+‎08-30-2022 09:50 AM 
+hi
+
+you can ask users to select element(s) instance from their view then manage to get the FamilySymbol, but i don't think it's possible from the browser.
+
+Report
+MESSAGE 3 OF 7
+RPTHOMAS108
+ Mentor RPTHOMAS108 in reply to: grubdex
+‎08-30-2022 04:29 PM 
+It's not the usual workflow but now in 2023 you have the selection changed event which also applies to project browser. The below prompts user to select from browser before adding a selection changed event.
+
+The handler filters for the class of FamilySymbol* and shows a dialogue if the result yields more than 0 results.
+
+Note that not every thing in the project browser is a FamilySymbol so ElementType class will cover more aspects such as system families.
+
+You would have to continue execution in the handler and perhaps raise an external event to get an editable document status (I suspect the selection changed event doesn't give you that).
+
+You can also use e.GetDocument below instead of casting sender 's' to UIApplication to get the Document.
+
+Public Function Obj_220831a(commandData As ExternalCommandData, ByRef message As String, elements As ElementSet) As Result
+        Dim IntUIApp As UIApplication = commandData.Application
+        Dim IntUIDoc As UIDocument = commandData.Application.ActiveUIDocument
+        Dim IntDoc As Document = IntUIDoc.Document
+
+        TaskDialog.Show("Select", "Pick family symbol from project browser")
+        AddHandler IntUIApp.SelectionChanged, AddressOf SelectionChanged
+
+        Return Result.Succeeded
+    End Function
+
+    Public Sub SelectionChanged(s As Object, e As Autodesk.Revit.UI.Events.SelectionChangedEventArgs)
+        Dim UIapp As UIApplication = s
+        Dim J As ISet(Of ElementId) = e.GetSelectedElements
+        Dim J0 As List(Of ElementId) = J.ToList
+
+        Dim FEC As New FilteredElementCollector(UIapp.ActiveUIDocument.Document, J0)
+        Dim F0 As New ElementClassFilter(GetType(FamilySymbol))
+        Dim Els As List(Of Element) = FEC.WherePasses(F0).ToElements
+
+        If Els.Count > 0 Then
+            TaskDialog.Show("Selection", Els(0).Name)
+            RemoveHandler UIapp.SelectionChanged, AddressOf SelectionChanged
+        End If
+    End Sub
+
+Report
+MESSAGE 4 OF 7
+grubdex
+ New Member grubdex in reply to: RPTHOMAS108
+‎08-31-2022 01:17 AM 
+Thanks for your reply. In your opinion, what would be a workflow that is more common?
+
+Report
+MESSAGE 5 OF 7
+RPTHOMAS108
+ Mentor RPTHOMAS108 in reply to: grubdex
+‎08-31-2022 05:51 AM 
+It really depends on what your add-in is being used for i.e is it modal or modeless interaction is it working with a few categories of elements or many?
+
+It is often the case you have to create dialogues that replicate the ones Revit inherently has which is a bit annoying but doesn't take that long with WPF for something such as FamilySymbol selection. That would allow a modal interaction.
+
+You aim to stay within the IExternalCommand context in a modal way to start with but if that isn't possible then you have to get back into a similar context via raising ExternalEvents from modeless forms etc. There are also other methods of obtaining a valid context to work with.
+
+Report
+MESSAGE 6 OF 7
+grubdex
+ New Member grubdex in reply to: RPTHOMAS108
+‎09-01-2022 06:41 AM 
+Thanks for the answer!
+
+Do you happen to have any pointers or examples of how to develop modeless forms with the Revit API by chance? Would be much appreciated, thanks!
+
+Report
+MESSAGE 7 OF 7
+RPTHOMAS108
+ Mentor RPTHOMAS108 in reply to: grubdex
+‎09-01-2022 09:13 AM 
+There are samples in the SDK:
+
+...\Samples\ModelessDialog\ModelessForm_ExternalEvent
+
+It is for Windows Forms but same approach would be used for WPF.
 
 ####<a name="5"></a> Feedback is Always a Great Gift
 
- 
 thank you for the important impulse.
  
 In case anyone is interested in going one step further in the direction of listening and basically all kinds of human communication and interaction, I can highly recommend a book by Scott Peck on community building:
@@ -135,7 +225,6 @@ Axios CEO Jim VandeHei is here with his weekly learnings on life and leadership.
 Illustration of a newspaper with the Axios logo and a thought bubble.
 Illustration: Lindsey Bailey/Axios
 
- 
 In the summer of 2004, hours before John Kerry's nomination speech at the Democratic convention, Washington Post political editor Maralee Schwartz gut-punched me with some brutal feedback.
 
 I was covering Kerry for The Post. But she said I didn't write fast enough or think big enough to capture this historic moment. John Harris (a Post star who later co-founded Politico with us) got the call instead.
@@ -158,5 +247,4 @@ Case in point: Often when you're giving a face-to-face review, people will valid
 "Jim doesn't listen" or "Jim makes too many excuses" or "Jim doesn’t welcome constructive criticism."
 If I then start excuse-peddling or butt-covering, I've kind of made their point.  
 The bottom line: Life is about forward motion. Elicit and take feedback to make your personal and professional performance tomorrow better than today.
-
 
