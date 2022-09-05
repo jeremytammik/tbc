@@ -56,7 +56,26 @@ Thank you ... for the useful sample code and explanation!
 
 ####<a name="2"></a> Unload IFC Links to Delete Extensible Storage
 
-https://forums.autodesk.com/t5/revit-api-forum/not-able-to-delete-extensible-storage-schema/m-p/11397400#M65728
+Several developers reported problems deleting extensible storage.
+
+A new contribution to 
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+[not able to delete extensible storage schema](https://forums.autodesk.com/t5/revit-api-forum/not-able-to-delete-extensible-storage-schema/m-p/11397400) reports
+that unloading IFC links may help:
+
+> I created a very small
+example [Example_RemoveSchemas.zip](zip/Example_RemoveSchemas.zip) with
+an IFC link with a few walls created in Revit 2020.
+The file contains 4 macros:
+
+>    - Create example schema
+- Remove example schema
+- List all schemata
+- Remove all schemata
+
+> In Revit, 2020 I am not able to remove any schemata when the IFC link is loaded.
+
+
 
 ####<a name="3"></a> Picking, Selection and UI Design
 
