@@ -136,98 +136,108 @@ You can also use `e.GetDocument` instead of casting the sender `s` to `UIApplica
 **Response:** Thanks for your reply.
 In your opinion, what would be a workflow that is more common?
 
-**Answer:** It really depends on what your add-in is being used for, i.e., is it modal or modeless interaction? Is it working with a few categories of elements or many?
+**Answer:** It really depends on what your add-in is being used for, i.e., is it modal or modeless interaction?
+Is it working with a few categories of elements or many?
 
-It is often the case you have to create dialogues that replicate the ones Revit inherently has which is a bit annoying but doesn't take that long with WPF for something such as FamilySymbol selection. That would allow a modal interaction.
+It is often the case you have to create dialogues that replicate the ones Revit inherently has which is a bit annoying but doesn't take that long with WPF for something such as FamilySymbol selection.
+That would allow a modal interaction.
 
-You aim to stay within the IExternalCommand context in a modal way to start with but if that isn't possible then you have to get back into a similar context via raising ExternalEvents from modeless forms etc. There are also other methods of obtaining a valid context to work with.
+You aim to stay within the `IExternalCommand` context in a modal way to start with, but if that isn't possible, then you have to get back into a similar context via raising an `ExternalEvent` from modeless forms etc.
+There are also other methods of obtaining a valid context to work with.
 
-Report
-MESSAGE 6 OF 7
-grubdex
- New Member grubdex in reply to: RPTHOMAS108
-‎09-01-2022 06:41 AM 
-Thanks for the answer!
+**Response:** Thanks for the answer!
 
-Do you happen to have any pointers or examples of how to develop modeless forms with the Revit API by chance? Would be much appreciated, thanks!
+Do you happen to have any pointers or examples of how to develop modeless forms with the Revit API by chance?
+Would be much appreciated, thanks!
 
-Report
-MESSAGE 7 OF 7
-RPTHOMAS108
- Mentor RPTHOMAS108 in reply to: grubdex
-‎09-01-2022 09:13 AM 
-There are samples in the SDK:
+**Answer:** There are samples in the SDK:
 
-...\Samples\ModelessDialog\ModelessForm_ExternalEvent
+- ...\Samples\ModelessDialog\ModelessForm_ExternalEvent
 
-It is for Windows Forms but same approach would be used for WPF.
+It is for Windows Forms, but same approach would be used for WPF.
+
+Many thanks to Richgard for the important and fundamental advice.
 
 ####<a name="5"></a> Feedback is Always a Great Gift
 
-thank you for the important impulse.
- 
-In case anyone is interested in going one step further in the direction of listening and basically all kinds of human communication and interaction, I can highly recommend a book by Scott Peck on community building:
- 
-https://en.wikipedia.org/wiki/M._Scott_Peck#Community_building
- 
-one of the best books I have ever read.
- 
-And its main focus is on really truly listening.
- 
-After we both read the book, Moni and I participated in a weekend workshop to practice community building with 26 people we didn't know, supported by 5 facilitators. The facilitators basically did nothing but repeat certain very simple and basic communication recommendations, such as:
- 
-I really listen
-I speak only about myself
-I speak only when truly moved to speak
- 
-Highly recommended practices for all human interaction, especially in teams, relationships, families, politics, enterprises, projects…
- 
-Happy sunday and good listening to all,
- 
-cheers,
- 
-jeremy
- 
-From: Jim Quanci <jim.quanci@autodesk.com>
-Date: Sunday, 4 September 2022 at 11:23
-To: DAS Worldwide <das-worldwide@autodesk.com>
-Subject: FW: 🎁 Axios Finish Line: Taking the gift
+Jim Quanci, our senior director of developer advocacy, pointed out a nice article encouraging feedback:
 
-Thought some of you might find the below piece on “feedback” interesting.
-I actually believe most of our team is pretty good at accepting feedback… but I know I can at times “not full embrace feedback enough”.
-This article is a nice reminder.  To some degree, its about receiving feedback with humility. 😉
- 
-Cheers,
-Jim Q
+> Thought some of you might find the below piece on 'feedback' interesting.
+I actually believe most of our team is pretty good at accepting feedback... but I know I can at times 'not fully embrace feedback enough'.
+This article is a nice reminder.
+To some degree, its about receiving feedback with humility. :-)
 
-Subject: 🎁 Axios Finish Line: Taking the gift
-
-Axios CEO Jim VandeHei is here with his weekly learnings on life and leadership. Share your thinking with him at jim@axios.com.
+Axios CEO Jim VandeHei sharesa his weekly learnings on life and leadership:
 
 1 big thing: How to take feedback
-Illustration of a newspaper with the Axios logo and a thought bubble.
-Illustration: Lindsey Bailey/Axios
 
 In the summer of 2004, hours before John Kerry's nomination speech at the Democratic convention, Washington Post political editor Maralee Schwartz gut-punched me with some brutal feedback.
 
-I was covering Kerry for The Post. But she said I didn't write fast enough or think big enough to capture this historic moment. John Harris (a Post star who later co-founded Politico with us) got the call instead.
-I was pissed. She was right.
-Why it matters: "Feedback is a gift," the management gurus say. But in my experience running two companies, it's a gift most don't truly want.
+- I was covering Kerry for The Post.
+But she said I didn't write fast enough or think big enough to capture this historic moment.
+John Harris (a Post star who later co-founded Politico with us) got the call instead.
+- I was pissed.
+She was right.
 
-It's true at work and in relationships. Every time my wife gives me feedback, I respond defensively, telling her all the reasons I rock. 😉
-But learning to accept the gift with wisdom and humility is a superpower we all need. It's the gateway to growth.
+Why it matters: "Feedback is a gift," the management gurus say.
+But in my experience running two companies, it's a gift most don't truly want.
 
-Whether in a workplace or a relationship, feedback — honest, no-B.S. insight on what you could do better — is priceless. Too many people mess it up by talking instead of listening.
- Here's my blunt feedback about taking blunt feedback:
+- It's true at work and in relationships.
+Every time my wife gives me feedback, I respond defensively, telling her all the reasons I rock. 😉
 
-Listen! Don't make excuses or talk about the past. Actually, don't talk at all. Soak up, with self-confidence and humility, what the person is saying and take time before responding. When they're finished, you can say, "Good point" if you agree … or, "I hear you" if you want to think more about it. Or just: "Thank you."
-Assume positive intent. The selfish approach for the other person would be to suppress what they really think. If someone has the guts to be frank with you, embrace it and thank them. When Mike asks for critiques from people, he says: "I promise to take it in the spirit it's intended."
-Don't be defensive. That's the worst response to helpful feedback. It makes the person giving it feel unheard — and less likely to shoot straight with you in the future.
-Ask for it. You're more likely to get feedback if you ask peers or superiors — in a sincere, humble, open-minded way — how you could be more effective. That projects strength, not weakness.
-Act on it. If you show you're responsive, you'll get more input. And you'll get better at life and on the job.
+But learning to accept the gift with wisdom and humility is a superpower we all need.
+It's the gateway to growth.
+
+- Whether in a workplace or a relationship, feedback &ndash; honest, no-B.S. insight on what you could do better &ndash; is priceless.
+Too many people mess it up by talking instead of listening.
+
+Here's my blunt feedback about taking blunt feedback:
+
+- Listen! Don't make excuses or talk about the past.
+  Actually, don't talk at all.
+  Soak up, with self-confidence and humility, what the person is saying and take time before responding.
+  When they're finished, you can say, "Good point" if you agree ... or, "I hear you" if you want to think more about it.
+  Or just: "Thank you."
+- Assume positive intent.
+  The selfish approach for the other person would be to suppress what they really think.
+  If someone has the guts to be frank with you, embrace it and thank them.
+  When Mike asks for critiques from people, he says: "I promise to take it in the spirit it's intended."
+- Don't be defensive.
+  That's the worst response to helpful feedback.
+  It makes the person giving it feel unheard &ndash; and less likely to shoot straight with you in the future.
+- Ask for it.
+  You're more likely to get feedback if you ask peers or superiors &ndash; in a sincere, humble, open-minded way &ndash; how you could be more effective.
+  That projects strength, not weakness.
+- Act on it.
+  If you show you're responsive, you'll get more input.
+  And you'll get better at life and on the job.
+
 Case in point: Often when you're giving a face-to-face review, people will validate and vindicate areas of weakness in the written eval.
 
-"Jim doesn't listen" or "Jim makes too many excuses" or "Jim doesn’t welcome constructive criticism."
-If I then start excuse-peddling or butt-covering, I've kind of made their point.  
+- "Jim doesn't listen" or "Jim makes too many excuses" or "Jim doesn’t welcome constructive criticism."
+- If I then start excuse-peddling or butt-covering, I've kind of made their point.
+
 The bottom line: Life is about forward motion. Elicit and take feedback to make your personal and professional performance tomorrow better than today.
 
+####<a name="6"></a> Scott Peck and Community Building
+
+The topic of accepting and appreciating feedback reminded me of my own recent enthusiasm for a book and experience in a weekend-long community building workshop:
+
+In case anyone is interested in going one step further in the direction of active listening and personally enhancing all their human communication and interaction, I can highly recommend a book
+by [Scott Peck](https://en.wikipedia.org/wiki/M._Scott_Peck)
+on [community building](https://en.wikipedia.org/wiki/M._Scott_Peck#Community_building):
+<i>The Different Drum: Community Making and Peace</i>.
+  
+It is one of the best books I have ever read. 
+And its main focus is on really truly listening.
+ 
+After we both read the book, my partner and I participated in a weekend workshop to practice community building with 26 people we didn't know, supported by 5 facilitators. The facilitators mainly just repeatedly pointed out a few very simple and basic communication recommendations, such as:
+ 
+- I really listen
+- I speak only about myself
+- I speak only when truly moved to speak
+ 
+Highly recommended practices for all human interaction, especially in teams, relationships, families, politics, enterprises, projects.
+
+Our workshop was organised by Andreas in Biel and led by Edward Groody
+of [CBI, Community Building International](https://communitybuilding.com/our-team).
