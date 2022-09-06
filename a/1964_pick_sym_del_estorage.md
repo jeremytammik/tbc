@@ -88,32 +88,16 @@ Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-i
 shares some mimportant advice on Revit add-in UI design and selection in general in his answer on
 how to [pick `FamilySymbol` from project browser](https://forums.autodesk.com/t5/revit-api-forum/pick-familysymbol-from-project-browser/td-p/11390552):
 
-**Question:** I want my user to select a FamilySymbol that's already loaded from the UI (more specifically, the Project Browser) that I then further process in my own code. I'm aware that there are different methods for filtering the already existing custom families/loading families from file and so on, but is there a way to prompt the user to pick one from the project browser? Ideally, it would NOT require the user to make conscious decisions on where to click before starting the add-in.
+**Question:** I want my user to select a FamilySymbol that's already loaded from the UI (more specifically, the Project Browser) that I then further process in my own code.
+I'm aware that there are different methods for filtering the already existing custom families/loading families from file and so on, but is there a way to prompt the user to pick one from the project browser?
+Ideally, it would NOT require the user to make conscious decisions on where to click before starting the add-in.
 
+**Answer:** You could ask users to select an element instance from their view, then get the FamilySymbol from that, but i don't think it's possible from the browser.
 
+It's not the usual workflow, but now, in Revit 2023, you have the selection changed event which also applies to project browser.
+This code prompts user to select from browser before adding a selection changed event:
 
-Yien_Chao
- Advisor Yien_Chao in reply to: grubdex
-‎08-30-2022 09:50 AM 
-hi
-
-you can ask users to select element(s) instance from their view then manage to get the FamilySymbol, but i don't think it's possible from the browser.
-
-Report
-MESSAGE 3 OF 7
-RPTHOMAS108
- Mentor RPTHOMAS108 in reply to: grubdex
-‎08-30-2022 04:29 PM 
-It's not the usual workflow but now in 2023 you have the selection changed event which also applies to project browser. The below prompts user to select from browser before adding a selection changed event.
-
-The handler filters for the class of FamilySymbol* and shows a dialogue if the result yields more than 0 results.
-
-Note that not every thing in the project browser is a FamilySymbol so ElementType class will cover more aspects such as system families.
-
-You would have to continue execution in the handler and perhaps raise an external event to get an editable document status (I suspect the selection changed event doesn't give you that).
-
-You can also use e.GetDocument below instead of casting sender 's' to UIApplication to get the Document.
-
+<pre class="code">
 Public Function Obj_220831a(commandData As ExternalCommandData, ByRef message As String, elements As ElementSet) As Result
         Dim IntUIApp As UIApplication = commandData.Application
         Dim IntUIDoc As UIDocument = commandData.Application.ActiveUIDocument
@@ -139,20 +123,20 @@ Public Function Obj_220831a(commandData As ExternalCommandData, ByRef message As
             RemoveHandler UIapp.SelectionChanged, AddressOf SelectionChanged
         End If
     End Sub
+</pre>
 
-Report
-MESSAGE 4 OF 7
-grubdex
- New Member grubdex in reply to: RPTHOMAS108
-‎08-31-2022 01:17 AM 
-Thanks for your reply. In your opinion, what would be a workflow that is more common?
+The handler filters for the class of FamilySymbol* and shows a dialogue if the result yields more than 0 results.
 
-Report
-MESSAGE 5 OF 7
-RPTHOMAS108
- Mentor RPTHOMAS108 in reply to: grubdex
-‎08-31-2022 05:51 AM 
-It really depends on what your add-in is being used for i.e is it modal or modeless interaction is it working with a few categories of elements or many?
+Note that not every thing in the project browser is a `FamilySymbol`; the parent `ElementType` class will cover more aspects such as system families.
+
+You would have to continue execution in the handler and perhaps raise an external event to get an editable document status (I suspect the selection changed event doesn't give you that).
+
+You can also use `e.GetDocument` instead of casting the sender `s` to `UIApplication` to get the `Document`.
+
+**Response:** Thanks for your reply.
+In your opinion, what would be a workflow that is more common?
+
+**Answer:** It really depends on what your add-in is being used for, i.e., is it modal or modeless interaction? Is it working with a few categories of elements or many?
 
 It is often the case you have to create dialogues that replicate the ones Revit inherently has which is a bit annoying but doesn't take that long with WPF for something such as FamilySymbol selection. That would allow a modal interaction.
 
