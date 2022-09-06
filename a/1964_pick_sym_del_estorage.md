@@ -44,18 +44,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ###
 
-**Question:** 
+- [Unload IFC links to delete extensible storage](#2)
+- [Picking, selection and ui design](#3)
+- [Feedback is always a great gift](#5)
+- [Scott Peck and community building](#6)
 
-**Answer:** 
 
 <center>
 <img src="img/.png" alt="" title="" width="400"/> <!-- 622 x 485 -->
 </center>
 
-<pre class="code">
-</pre>
 
-Thank you ... for the useful sample code and explanation!
 
 ####<a name="2"></a> Unload IFC Links to Delete Extensible Storage
 
