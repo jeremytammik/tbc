@@ -97,31 +97,38 @@ It's not the usual workflow, but now, in Revit 2023, you have the selection chan
 This code prompts user to select from browser before adding a selection changed event:
 
 <pre class="code">
-Public Function Obj_220831a(commandData As ExternalCommandData, ByRef message As String, elements As ElementSet) As Result
-        Dim IntUIApp As UIApplication = commandData.Application
-        Dim IntUIDoc As UIDocument = commandData.Application.ActiveUIDocument
-        Dim IntDoc As Document = IntUIDoc.Document
-
-        TaskDialog.Show("Select", "Pick family symbol from project browser")
-        AddHandler IntUIApp.SelectionChanged, AddressOf SelectionChanged
-
-        Return Result.Succeeded
-    End Function
-
-    Public Sub SelectionChanged(s As Object, e As Autodesk.Revit.UI.Events.SelectionChangedEventArgs)
-        Dim UIapp As UIApplication = s
-        Dim J As ISet(Of ElementId) = e.GetSelectedElements
-        Dim J0 As List(Of ElementId) = J.ToList
-
-        Dim FEC As New FilteredElementCollector(UIapp.ActiveUIDocument.Document, J0)
-        Dim F0 As New ElementClassFilter(GetType(FamilySymbol))
-        Dim Els As List(Of Element) = FEC.WherePasses(F0).ToElements
-
-        If Els.Count > 0 Then
-            TaskDialog.Show("Selection", Els(0).Name)
-            RemoveHandler UIapp.SelectionChanged, AddressOf SelectionChanged
-        End If
-    End Sub
+<span style="color:blue;">Public</span>&nbsp;<span style="color:blue;">Function</span>&nbsp;<span style="color:#74531f;">Obj_220831a</span>(
+&nbsp;&nbsp;<span style="color:#1f377f;">commandData</span>&nbsp;<span style="color:blue;">As</span>&nbsp;ExternalCommandData,
+&nbsp;&nbsp;<span style="color:blue;">ByRef</span>&nbsp;<span style="color:#1f377f;">message</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">String</span>,
+&nbsp;&nbsp;<span style="color:#1f377f;">elements</span>&nbsp;<span style="color:blue;">As</span>&nbsp;ElementSet)&nbsp;<span style="color:blue;">As</span>&nbsp;Result
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">IntUIApp</span>&nbsp;<span style="color:blue;">As</span>&nbsp;UIApplication&nbsp;=&nbsp;commandData.Application
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">IntUIDoc</span>&nbsp;<span style="color:blue;">As</span>&nbsp;UIDocument&nbsp;=&nbsp;commandData.Application.ActiveUIDocument
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">IntDoc</span>&nbsp;<span style="color:blue;">As</span>&nbsp;Document&nbsp;=&nbsp;IntUIDoc.Document
+ 
+&nbsp;&nbsp;TaskDialog.Show(<span style="color:#a31515;">&quot;Select&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;Pick&nbsp;family&nbsp;symbol&nbsp;from&nbsp;project&nbsp;browser&quot;</span>)
+&nbsp;&nbsp;<span style="color:blue;">AddHandler</span>&nbsp;IntUIApp.SelectionChanged,&nbsp;<span style="color:blue;">AddressOf</span>&nbsp;SelectionChanged
+ 
+&nbsp;&nbsp;<span style="color:#8f08c4;">Return</span>&nbsp;Result.Succeeded
+<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Function</span>
+ 
+<span style="color:blue;">Public</span>&nbsp;<span style="color:blue;">Sub</span>&nbsp;<span style="color:#74531f;">SelectionChanged</span>(
+&nbsp;&nbsp;<span style="color:#1f377f;">s</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">Object</span>,
+&nbsp;&nbsp;<span style="color:#1f377f;">e</span>&nbsp;<span style="color:blue;">As</span>&nbsp;Autodesk.Revit.UI.Events.SelectionChangedEventArgs)
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">UIapp</span>&nbsp;<span style="color:blue;">As</span>&nbsp;UIApplication&nbsp;=&nbsp;s
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">J</span>&nbsp;<span style="color:blue;">As</span>&nbsp;ISet(<span style="color:blue;">Of</span>&nbsp;ElementId)&nbsp;=&nbsp;e.GetSelectedElements
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">J0</span>&nbsp;<span style="color:blue;">As</span>&nbsp;List(<span style="color:blue;">Of</span>&nbsp;ElementId)&nbsp;=&nbsp;J.ToList
+ 
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">FEC</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;FilteredElementCollector(UIapp.ActiveUIDocument.Document,&nbsp;J0)
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">F0</span>&nbsp;<span style="color:blue;">As</span>&nbsp;<span style="color:blue;">New</span>&nbsp;ElementClassFilter(<span style="color:blue;">GetType</span>(FamilySymbol))
+&nbsp;&nbsp;<span style="color:blue;">Dim</span>&nbsp;<span style="color:#1f377f;">Els</span>&nbsp;<span style="color:blue;">As</span>&nbsp;List(<span style="color:blue;">Of</span>&nbsp;Element)&nbsp;=&nbsp;FEC.WherePasses(F0).ToElements
+ 
+&nbsp;&nbsp;<span style="color:#8f08c4;">If</span>&nbsp;Els.Count&nbsp;&gt;&nbsp;0&nbsp;<span style="color:#8f08c4;">Then</span>
+&nbsp;&nbsp;&nbsp;&nbsp;TaskDialog.Show(<span style="color:#a31515;">&quot;Selection&quot;</span>,&nbsp;Els(0).Name)
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">RemoveHandler</span>&nbsp;UIapp.SelectionChanged,&nbsp;<span style="color:blue;">AddressOf</span>&nbsp;SelectionChanged
+&nbsp;&nbsp;<span style="color:#8f08c4;">End</span>&nbsp;<span style="color:#8f08c4;">If</span>
+<span style="color:blue;">End</span>&nbsp;<span style="color:blue;">Sub</span>
 </pre>
 
 The handler filters for the class of FamilySymbol* and shows a dialogue if the result yields more than 0 results.
