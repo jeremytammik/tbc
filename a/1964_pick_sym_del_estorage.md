@@ -6,6 +6,12 @@
 
 <!---
 
+- https://www.linkedin.com/posts/scott-conover-b09bb65_senior-product-owner-building-and-energy-activity-6971538735788138496-oP4J?utm_source=share&utm_medium=member_desktop
+Scott Conover, Director, Engineering at Autodesk
+We're hiring! I strongly believe that the tools we will be building on this team are critical to the future of building design - and improving the state of the planet in the future. Let me know if you know someone who might have an interest...
+[Senior Product Owner, Building and Energy]
+https://autodesk.wd1.myworkdayjobs.com/en-US/Ext/details/Senior-Product-Owner--Building-and-Energy_22WD63355?q=Product+Owner
+
 - unload ifc links to delete extensible storage?
   https://forums.autodesk.com/t5/revit-api-forum/not-able-to-delete-extensible-storage-schema/m-p/11397400#M65728
 
@@ -84,15 +90,8 @@ how to [pick `FamilySymbol` from project browser](https://forums.autodesk.com/t5
 
 **Question:** I want my user to select a FamilySymbol that's already loaded from the UI (more specifically, the Project Browser) that I then further process in my own code. I'm aware that there are different methods for filtering the already existing custom families/loading families from file and so on, but is there a way to prompt the user to pick one from the project browser? Ideally, it would NOT require the user to make conscious decisions on where to click before starting the add-in.
 
-Cheers
 
- Solved by RPTHOMAS108. Go to Solution.
 
-Report
-Labels (2)
-FamilySymbol PickObject
-6 REPLIES
-MESSAGE 2 OF 7
 Yien_Chao
  Advisor Yien_Chao in reply to: grubdex
 ‎08-30-2022 09:50 AM 
