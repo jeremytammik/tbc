@@ -42,6 +42,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Deleting Storage and Picking a Symbol</h3>
+<p>Today, I share two interesting hints from the forum and some thoughts on feedback, community and communication:</p>
 <ul>
 <li><a href="#2">Unload IFC links to delete extensible storage</a></li>
 <li><a href="#3">Picking, selection and UI design</a></li>
@@ -69,7 +70,7 @@ The file contains 4 macros:</p>
 </blockquote>
 <p>Many thanks to Marek @Songohu_85 for testing and reporting this.</p>
 <p>I wonder whether it will help others resolve similar issues.</p>
-<p>To ilklustrate this post, I asked <a href="https://www.artbreeder.com">artbreeder</a> to create some images with the description <em>unload ifc link to delete extensible storage</em>:</p>
+<p>To illustrate this post, I asked <a href="https://www.artbreeder.com">artbreeder</a> to create some images with the description <em>unload ifc link to delete extensible storage</em>:</p>
 <p><center>
 <img src="img/unload_ifc_to_delete_estorage_1.png" alt="Unload IFC link to delete extensible storage" title="Unload IFC link to delete extensible storage" width="200"/></p>
 <p/>
@@ -83,12 +84,12 @@ The file contains 4 macros:</p>
 </center></p>
 <h4><a name="3"></a> Picking, Selection and UI Design</h4>
 <p>Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
-shares some mimportant advice on Revit add-in UI design and selection in general in his answer on
+shares some advice on Revit add-in UI design and selection in general in his answer on
 how to <a href="https://forums.autodesk.com/t5/revit-api-forum/pick-familysymbol-from-project-browser/td-p/11390552">pick <code>FamilySymbol</code> from project browser</a>:</p>
 <p><strong>Question:</strong> I want my user to select a FamilySymbol that's already loaded from the UI (more specifically, the Project Browser) that I then further process in my own code.
 I'm aware that there are different methods for filtering the already existing custom families/loading families from file and so on, but is there a way to prompt the user to pick one from the project browser?
 Ideally, it would NOT require the user to make conscious decisions on where to click before starting the add-in.</p>
-<p><strong>Answer:</strong> You could ask users to select an element instance from their view, then get the FamilySymbol from that, but i don't think it's possible from the browser.</p>
+<p><strong>Answer:</strong> You could ask users to select an element instance from their view, then get the FamilySymbol from that, but I don't think it's possible from the browser.</p>
 <p>It's not the usual workflow, but now, in Revit 2023, you have the selection changed event which also applies to project browser.
 This code prompts user to select from browser before adding a selection changed event:</p>
 <pre class="code">
@@ -127,7 +128,7 @@ This code prompts user to select from browser before adding a selection changed 
 </pre>
 
 <p>The handler filters for the class of FamilySymbol* and shows a dialogue if the result yields more than 0 results.</p>
-<p>Note that not every thing in the project browser is a <code>FamilySymbol</code>; the parent <code>ElementType</code> class will cover more aspects such as system families.</p>
+<p>Note that not everything in the project browser is a <code>FamilySymbol</code>; the parent <code>ElementType</code> class will cover more aspects such as system families.</p>
 <p>You would have to continue execution in the handler and perhaps raise an external event to get an editable document status (I suspect the selection changed event doesn't give you that).</p>
 <p>You can also use <code>e.GetDocument</code> instead of casting the sender <code>s</code> to <code>UIApplication</code> to get the <code>Document</code>.</p>
 <p><strong>Response:</strong> Thanks for your reply.
@@ -146,16 +147,16 @@ Would be much appreciated, thanks!</p>
 <li>...\Samples\ModelessDialog\ModelessForm_ExternalEvent</li>
 </ul>
 <p>It is for Windows Forms, but same approach would be used for WPF.</p>
-<p>Many thanks to Richgard for the important and fundamental advice.</p>
+<p>Many thanks to Richard for the important fundamental advice.</p>
 <h4><a name="5"></a> Feedback is Always a Great Gift</h4>
 <p>Jim Quanci, our senior director of developer advocacy, pointed out a nice article encouraging feedback:</p>
 <blockquote>
 <p>Thought some of you might find the below piece on 'feedback' interesting.
 I actually believe most of our team is pretty good at accepting feedback... but I know I can at times 'not fully embrace feedback enough'.
 This article is a nice reminder.
-To some degree, its about receiving feedback with humility. :-)</p>
+To some degree, it's about receiving feedback with humility. :-)</p>
 </blockquote>
-<p>Axios CEO Jim VandeHei sharesa his weekly learnings on life and leadership:</p>
+<p>Axios CEO Jim VandeHei shares his weekly learnings on life and leadership:</p>
 <p>1 big thing: How to take feedback</p>
 <p>In the summer of 2004, hours before John Kerry's nomination speech at the Democratic convention, Washington Post political editor Maralee Schwartz gut-punched me with some brutal feedback.</p>
 <ul>
@@ -205,14 +206,15 @@ Too many people mess it up by talking instead of listening.</li>
 </ul>
 <p>The bottom line: Life is about forward motion. Elicit and take feedback to make your personal and professional performance tomorrow better than today.</p>
 <h4><a name="6"></a> Scott Peck and Community Building</h4>
-<p>The topic of accepting and appreciating feedback reminded me of my own recent enthusiasm for a book and experience in a weekend-long community building workshop:</p>
-<p>In case anyone is interested in going one step further in the direction of active listening and personally enhancing all their human communication and interaction, I can highly recommend a book
+<p>The topic of accepting and appreciating feedback reminded me of my own recent exploration of community building in a book and a weekend workshop.</p>
+<p>In case anyone is interested in going one step further in the direction of active listening and personally enhancing all their human communication and interaction, I can highly recommend the book
 by <a href="https://en.wikipedia.org/wiki/M._Scott_Peck">Scott Peck</a>
 on <a href="https://en.wikipedia.org/wiki/M._Scott_Peck#Community_building">community building</a>:
 <i>The Different Drum: Community Making and Peace</i>.</p>
 <p>It is one of the best books I have ever read. 
-And its main focus is on really truly listening.</p>
-<p>After we both read the book, my partner and I participated in a weekend workshop to practice community building with 26 people we didn't know, supported by 5 facilitators. The facilitators mainly just repeatedly pointed out a few very simple and basic communication recommendations, such as:</p>
+One main focus is on really truly listening.</p>
+<p>After we both read the book, my partner and I participated in a weekend workshop to practice community building with 26 people we didn't know, supported by 5 facilitators.
+The facilitators mainly just pointed out some basic communication recommendations, such as:</p>
 <ul>
 <li>I really listen</li>
 <li>I speak only about myself</li>

@@ -44,6 +44,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Deleting Storage and Picking a Symbol
 
+Today, I share two interesting hints from the forum and some thoughts on feedback, community and communication:
+
 - [Unload IFC links to delete extensible storage](#2)
 - [Picking, selection and UI design](#3)
 - [Feedback is always a great gift](#5)
@@ -234,17 +236,18 @@ The bottom line: Life is about forward motion. Elicit and take feedback to make 
 
 ####<a name="6"></a> Scott Peck and Community Building
 
-The topic of accepting and appreciating feedback reminded me of my own recent enthusiasm for a book and experience in a weekend-long community building workshop:
+The topic of accepting and appreciating feedback reminded me of my own recent exploration of community building in a book and a weekend workshop.
 
-In case anyone is interested in going one step further in the direction of active listening and personally enhancing all their human communication and interaction, I can highly recommend a book
+In case anyone is interested in going one step further in the direction of active listening and personally enhancing all their human communication and interaction, I can highly recommend the book
 by [Scott Peck](https://en.wikipedia.org/wiki/M._Scott_Peck)
 on [community building](https://en.wikipedia.org/wiki/M._Scott_Peck#Community_building):
 <i>The Different Drum: Community Making and Peace</i>.
   
 It is one of the best books I have ever read. 
-And its main focus is on really truly listening.
+One main focus is on really truly listening.
  
-After we both read the book, my partner and I participated in a weekend workshop to practice community building with 26 people we didn't know, supported by 5 facilitators. The facilitators mainly just repeatedly pointed out a few very simple and basic communication recommendations, such as:
+After we both read the book, my partner and I participated in a weekend workshop to practice community building with 26 people we didn't know, supported by 5 facilitators.
+The facilitators mainly just pointed out some basic communication recommendations, such as:
  
 - I really listen
 - I speak only about myself
