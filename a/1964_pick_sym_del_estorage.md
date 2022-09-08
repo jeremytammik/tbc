@@ -42,19 +42,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-###
+### Deleting Storage and Picking a Symbol
 
 - [Unload IFC links to delete extensible storage](#2)
-- [Picking, selection and ui design](#3)
+- [Picking, selection and UI design](#3)
 - [Feedback is always a great gift](#5)
 - [Scott Peck and community building](#6)
-
-
-<center>
-<img src="img/.png" alt="" title="" width="400"/> <!-- 622 x 485 -->
-</center>
-
-
 
 ####<a name="2"></a> Unload IFC Links to Delete Extensible Storage
 
@@ -80,6 +73,20 @@ The file contains 4 macros:
 Many thanks to Marek @Songohu_85 for testing and reporting this.
 
 I wonder whether it will help others resolve similar issues.
+
+To ilklustrate this post, I asked [artbreeder](https://www.artbreeder.com) to create some images with the description *unload ifc link to delete extensible storage*:
+
+<center>
+<img src="img/unload_ifc_to_delete_estorage_1.png" alt="Unload IFC link to delete extensible storage" title="Unload IFC link to delete extensible storage" width="200"/>
+<p/>
+<img src="img/unload_ifc_to_delete_estorage_2.png" alt="Unload IFC link to delete extensible storage" title="Unload IFC link to delete extensible storage" width="200"/>
+<p/>
+<img src="img/unload_ifc_to_delete_estorage_3.png" alt="Unload IFC link to delete extensible storage" title="Unload IFC link to delete extensible storage" width="200"/>
+<p/>
+<img src="img/unload_ifc_to_delete_estorage_4.png" alt="Unload IFC link to delete extensible storage" title="Unload IFC link to delete extensible storage" width="200"/>
+<p/>
+<img src="img/unload_ifc_to_delete_estorage_5.png" alt="Unload IFC link to delete extensible storage" title="Unload IFC link to delete extensible storage" width="200"/>
+</center>
 
 ####<a name="3"></a> Picking, Selection and UI Design
 
