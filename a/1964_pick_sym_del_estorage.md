@@ -74,7 +74,7 @@ Many thanks to Marek @Songohu_85 for testing and reporting this.
 
 I wonder whether it will help others resolve similar issues.
 
-To ilklustrate this post, I asked [artbreeder](https://www.artbreeder.com) to create some images with the description *unload ifc link to delete extensible storage*:
+To illustrate this post, I asked [artbreeder](https://www.artbreeder.com) to create some images with the description *unload ifc link to delete extensible storage*:
 
 <center>
 <img src="img/unload_ifc_to_delete_estorage_1.png" alt="Unload IFC link to delete extensible storage" title="Unload IFC link to delete extensible storage" width="200"/>
@@ -91,14 +91,14 @@ To ilklustrate this post, I asked [artbreeder](https://www.artbreeder.com) to cr
 ####<a name="3"></a> Picking, Selection and UI Design
 
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
-shares some mimportant advice on Revit add-in UI design and selection in general in his answer on
+shares some advice on Revit add-in UI design and selection in general in his answer on
 how to [pick `FamilySymbol` from project browser](https://forums.autodesk.com/t5/revit-api-forum/pick-familysymbol-from-project-browser/td-p/11390552):
 
 **Question:** I want my user to select a FamilySymbol that's already loaded from the UI (more specifically, the Project Browser) that I then further process in my own code.
 I'm aware that there are different methods for filtering the already existing custom families/loading families from file and so on, but is there a way to prompt the user to pick one from the project browser?
 Ideally, it would NOT require the user to make conscious decisions on where to click before starting the add-in.
 
-**Answer:** You could ask users to select an element instance from their view, then get the FamilySymbol from that, but i don't think it's possible from the browser.
+**Answer:** You could ask users to select an element instance from their view, then get the FamilySymbol from that, but I don't think it's possible from the browser.
 
 It's not the usual workflow, but now, in Revit 2023, you have the selection changed event which also applies to project browser.
 This code prompts user to select from browser before adding a selection changed event:
@@ -140,7 +140,7 @@ This code prompts user to select from browser before adding a selection changed 
 
 The handler filters for the class of FamilySymbol* and shows a dialogue if the result yields more than 0 results.
 
-Note that not every thing in the project browser is a `FamilySymbol`; the parent `ElementType` class will cover more aspects such as system families.
+Note that not everything in the project browser is a `FamilySymbol`; the parent `ElementType` class will cover more aspects such as system families.
 
 You would have to continue execution in the handler and perhaps raise an external event to get an editable document status (I suspect the selection changed event doesn't give you that).
 
@@ -169,7 +169,7 @@ Would be much appreciated, thanks!
 
 It is for Windows Forms, but same approach would be used for WPF.
 
-Many thanks to Richgard for the important and fundamental advice.
+Many thanks to Richard for the important fundamental advice.
 
 ####<a name="5"></a> Feedback is Always a Great Gift
 
@@ -178,9 +178,9 @@ Jim Quanci, our senior director of developer advocacy, pointed out a nice articl
 > Thought some of you might find the below piece on 'feedback' interesting.
 I actually believe most of our team is pretty good at accepting feedback... but I know I can at times 'not fully embrace feedback enough'.
 This article is a nice reminder.
-To some degree, its about receiving feedback with humility. :-)
+To some degree, it's about receiving feedback with humility. :-)
 
-Axios CEO Jim VandeHei sharesa his weekly learnings on life and leadership:
+Axios CEO Jim VandeHei shares his weekly learnings on life and leadership:
 
 1 big thing: How to take feedback
 
