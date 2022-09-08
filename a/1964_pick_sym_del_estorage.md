@@ -31,6 +31,17 @@ Interesting hints from the forum and thoughts on feedback, community and communi
 
 linkedin:
 
+Unload IFC links to delete extensible storage, and picking, selection and UI design in the #RevitAPI
+
+https://autode.sk/deleteestorage
+
+Interesting hints from the forum and thoughts on feedback, community and communication:
+
+- Unload IFC links to delete extensible storage
+- Picking, selection and UI design
+- Feedback is always a great gift
+- Scott Peck and community building...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
