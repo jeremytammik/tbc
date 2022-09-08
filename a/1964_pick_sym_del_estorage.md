@@ -51,6 +51,15 @@ Today, I share two interesting hints from the forum and some thoughts on feedbac
 - [Feedback is always a great gift](#5)
 - [Scott Peck and community building](#6)
 
+Before we get into these, I'll highlight an open position in the Revit development team:
+
+Scott Conover, director of engineering at Autodesk [says on LinkedIn](https://www.linkedin.com/posts/scott-conover-b09bb65_senior-product-owner-building-and-energy-activity-6971538735788138496-oP4J):
+
+> We're hiring!
+I strongly believe that the tools we will be building on this team are critical to the future of building design &ndash; and improving the state of the planet in the future.
+Let me know if you know someone who might have an interest...
+[Senior Product Owner, Building and Energy](https://autodesk.wd1.myworkdayjobs.com/en-US/Ext/details/Senior-Product-Owner--Building-and-Energy_22WD63355)
+
 ####<a name="2"></a> Unload IFC Links to Delete Extensible Storage
 
 Several developers reported problems deleting extensible storage.
