@@ -23,8 +23,11 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Interesting hints from the forum and thoughts on feedback, community and communication
+&ndash; Unload IFC links to delete extensible storage
+&ndash; Picking, selection and UI design
+&ndash; Feedback is always a great gift
+&ndash; Scott Peck and community building...
 
 linkedin:
 
@@ -51,8 +54,7 @@ Today, I share two interesting hints from the forum and some thoughts on feedbac
 - [Feedback is always a great gift](#5)
 - [Scott Peck and community building](#6)
 
-Before we get into these, I'll highlight an open position in the Revit development team:
-
+Before we get into these, we have an open position in the Revit development team:
 Scott Conover, director of engineering at Autodesk [says on LinkedIn](https://www.linkedin.com/posts/scott-conover-b09bb65_senior-product-owner-building-and-energy-activity-6971538735788138496-oP4J):
 
 > We're hiring!
