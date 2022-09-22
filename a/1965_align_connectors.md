@@ -6,6 +6,12 @@
 
 <!---
 
+- Top 10 Dynamo Blogs
+ The Building Coder has been selected by our panelist as one of the Top 10 Dynamo Blogs on the web.
+ https://blog.feedspot.com/dynamo_blogs/
+ Anuj Agarwal, Feedspot
+ Email: agarwal.anuj@feedspot.com
+ 
 - Haluk Uzuner
   Align conectors in 3D space
   https://forums.autodesk.com/t5/revit-api-forum/align-conectors-in-3d-space/m-p/11412155
@@ -55,7 +61,7 @@ My code is at below. I explained code as much as I could. The code is working wh
 
 Am I in the wrong path? Is there a better way to do it?
 
-<pre class="code">
+<pre class="prettyprint">
 private: static void rotate(UIApplication^ uiapp, elmstoreplace^ elms)
 {
 	// Select some elements in Revit before invoking this command
@@ -157,7 +163,16 @@ https://www.revitapidocs.com/2023/aaddd413-01b0-2878-3f79-a281abb6d364.htm
 
 Watch out that other attached elements are not moved as well.
 
-**Response:** O improved picture. As far as understood move element moves families/elements only. So that, I find U vector and subtract W from it and find V vector you mentioned. In the way you mentioned is works if two families placed in the same plane and orientation. In my case none of axes are parallel. My problem starts after moving element. My aim is finding crossproduct of two Z axes which is perpendicular to both axes. And rotate it by angle. I stuck in creating rotation axis along z axis of crossproduct. As shown in the picture, crossproduct BasisX, Y, Z always give unit vectors.
+**Response:** Some improved pictures:
+As far as understood, move element moves families/elements only.
+So that, I find U vector and subtract W from it and find V vector you mentioned.
+In the way you mentioned is works if two families placed in the same plane and orientation.
+In my case, none of axes are parallel.
+My problem starts after moving element.
+My aim is finding cross product of two Z axes that is perpendicular to both axes.
+And rotate it by angle.
+I am stuck in creating rotation axis along Z axis of crossproduct.
+As shown in the picture, crossproduct BasisX, Y, Z always give unit vectors.
 
 <center>
 <img src="img/align_connectors_2.png" alt="Align connectors" title="Align connectors" width="200"/> <! 387 x 108 -->
@@ -307,7 +322,30 @@ Many thanks to Haluk for sharing this nice topic and solution.
 
 **Response:**
 
-####<a name="5"></a> Harari Sapiens
+####<a name="5"></a> Pipedream
+
+Watch us build an integration in ~5 minutes using:
+
+- Pre-built, open source components for Twitter and Google Sheets
+- Node.js with the axios npm package and Pipedream managed authentication for Google Translate
+- Python and the nltk pypi package.
+
+Pipedream is the fastest way to automate any process that connects APIs. Build and run workflows with code-level control when you need it, and no code when you don't.
+
+The Pipedream platform includes:
+
+- A serverless runtime and workflow service
+- Open source triggers and actions for hundreds of integrated apps
+- One-click OAuth and key-based authentication for hundreds of APIs
+
+Get started:
+ - https://pipedream.com
+ - Quickstart: https://pipedream.com/docs/quickstart/
+ - Docs: https://pipedream.com/docs/quickstart/
+ - Community: https://pipedream.com/community
+ 
+ 
+####<a name="6"></a> Harari Sapiens
 
 [Sapiens: A Brief History of Humankind](https://en.wikipedia.org/wiki/Sapiens:_A_Brief_History_of_Humankind)
 by [Yuval Noah Harari](https://en.wikipedia.org/wiki/Yuval_Noah_Harari)
@@ -332,3 +370,5 @@ Moreover, despite the astonishing things that humans are capable of doing, we re
 Is there anything more dangerous than dissatisfied and irresponsible gods who don’t know what they want?
 
 <p style="text-align:right; font-style: italic">&ndash; Published [online by Erenow](https://erenow.net/common/sapiensbriefhistory/112.php)</p>
+
+
