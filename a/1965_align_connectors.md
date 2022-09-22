@@ -7,20 +7,20 @@
 <!---
 
 - Top 10 Dynamo Blogs
- The Building Coder has been selected by our panelist as one of the Top 10 Dynamo Blogs on the web.
- https://blog.feedspot.com/dynamo_blogs/
- Anuj Agarwal, Feedspot
- Email: agarwal.anuj@feedspot.com
- 
+  The Building Coder has been selected by our panelist as one of the Top 10 Dynamo Blogs on the web.
+  https://blog.feedspot.com/dynamo_blogs/
+  Anuj Agarwal, Feedspot
+  Email: agarwal.anuj@feedspot.com
+
 - Haluk Uzuner
   Align conectors in 3D space
   https://forums.autodesk.com/t5/revit-api-forum/align-conectors-in-3d-space/m-p/11412155
 
 twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+ in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash; 
+&ndash;
 ...
 
 linkedin:
@@ -41,9 +41,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Align Connectors
 
+
+
+The Building Coder was selected by feedspot as one of
+the [Top 10 Dynamo Blogs](https://blog.feedspot.com/dynamo_blogs).
+Thank you for the recognition.
+
 ####<a name="2"></a> Align Connectors
 
-Haluk Uzuner raised and solved the interesting issue of 
+Haluk Uzuner raised and solved the interesting issue of
 how to [align conectors in 3D space](https://forums.autodesk.com/t5/revit-api-forum/align-conectors-in-3d-space/m-p/11412155),
 sharing his C++ implementation:
 
@@ -64,109 +70,109 @@ Am I in the wrong path? Is there a better way to do it?
 <pre class="prettyprint">
 private: static void rotate(UIApplication^ uiapp, elmstoreplace^ elms)
 {
-	// Select some elements in Revit before invoking this command
+  // Select some elements in Revit before invoking this command
 
-	// Get the handle of current document.
-	UIDocument^ uidoc = uiapp->ActiveUIDocument;
-	Document^ doc = uidoc->Document;
+  // Get the handle of current document.
+  UIDocument^ uidoc = uiapp->ActiveUIDocument;
+  Document^ doc = uidoc->Document;
 
-	//	Elelements are stored in other header. We will read from there.
-	//	We saved them there by selecting in GUI.
-	Element^ elmfrom = doc->GetElement(elmstoreplace::elmFrom);	// Element will be aligned.
-	Element^ elmto = doc->GetElement(elmstoreplace::elmTo);	//	Element will be aligned to.
-	// 1. Cast Element to FamilyInstance
-	FamilyInstance^ faminstfrom = (FamilyInstance^)elmfrom;
-	FamilyInstance^ faminstto = (FamilyInstance^)elmto;
+  // Elelements are stored in other header. We will read from there.
+  // We saved them there by selecting in GUI.
+  Element^ elmfrom = doc->GetElement(elmstoreplace::elmFrom); // Element will be aligned.
+  Element^ elmto = doc->GetElement(elmstoreplace::elmTo); // Element will be aligned to.
 
-	// 2. Get MEPModel Property
-	MEPModel^ mepmodelfrom = faminstfrom->MEPModel;
-	MEPModel^ mepmodelto = faminstto->MEPModel;
+  // 1. Cast Element to FamilyInstance
+  FamilyInstance^ faminstfrom = (FamilyInstance^)elmfrom;
+  FamilyInstance^ faminstto = (FamilyInstance^)elmto;
 
-	// 3. Get connector set of MEPModel
-	ConnectorSet^ connectorSetfrom = mepmodelfrom->ConnectorManager->Connectors;
-	ConnectorSet^ connectorSetto = mepmodelto->ConnectorManager->Connectors;
+  // 2. Get MEPModel Property
+  MEPModel^ mepmodelfrom = faminstfrom->MEPModel;
+  MEPModel^ mepmodelto = faminstto->MEPModel;
 
-	// Connector numbers to be aligned to each other are stored in other file.
-	//	We saved them there by selecting in GUI.
-	Connector^ connFrom =nullptr;	// Connector will be aligned.
-	Connector^ connTo = nullptr;	// Connector to be aligned to.
+  // 3. Get connector set of MEPModel
+  ConnectorSet^ connectorSetfrom = mepmodelfrom->ConnectorManager->Connectors;
+  ConnectorSet^ connectorSetto = mepmodelto->ConnectorManager->Connectors;
 
-	// Get connector by iterating in connectorset. 
-	for each (Connector ^ connector in connectorSetfrom)
-	{
-		if (connector->Id == elmstoreplace::connNoFrom)
-		{
-		connFrom = connector;
-		}
+  // Connector numbers to be aligned to each other are stored in other file.
+  // We saved them there by selecting in GUI.
+  Connector^ connFrom =nullptr; // Connector will be aligned.
+  Connector^ connTo = nullptr; // Connector to be aligned to.
 
-	}
+  // Get connector by iterating in connectorset.
+  for each (Connector ^ connector in connectorSetfrom)
+  {
+    if (connector->Id == elmstoreplace::connNoFrom)
+    {
+    connFrom = connector;
+    }
+  }
 
-	// Get connector by iterating in connectorset.
-	for each (Connector ^ connector in connectorSetto)
-	{
-		if (connector->Id == elmstoreplace::connNoTo)
-		{
-			connTo = connector;
-		}
-	}
+  // Get connector by iterating in connectorset.
+  for each (Connector ^ connector in connectorSetto)
+  {
+    if (connector->Id == elmstoreplace::connNoTo)
+    {
+     connTo = connector;
+    }
+  }
 
-	// Get the element current location
-	LocationPoint^ elmfromLoc = (LocationPoint^)elmfrom->Location;
+  // Get the element current location
+  LocationPoint^ elmfromLoc = (LocationPoint^)elmfrom->Location;
 
-	// Create vector based on element location and connector location.
-	XYZ^ diffvec1 = connFrom->Origin->Subtract(elmfromLoc->Point);
-	// Subtract element location which will be moved.
-	XYZ^ diffvec2 = connTo->Origin->Subtract(elmfromLoc->Point);
-	// Bring two connectors to same point
-	ElementTransformUtils::MoveElement(doc, elmfrom->Id, diffvec2->Add(diffvec1->Negate()));
+  // Create vector based on element location and connector location.
+  XYZ^ diffvec1 = connFrom->Origin->Subtract(elmfromLoc->Point);
+  // Subtract element location which will be moved.
+  XYZ^ diffvec2 = connTo->Origin->Subtract(elmfromLoc->Point);
+  // Bring two connectors to same point
+  ElementTransformUtils::MoveElement(doc, elmfrom->Id, diffvec2->Add(diffvec1->Negate()));
 
-	//	Get basisZ of connectors.
-	XYZ^ basisZTo = connTo->CoordinateSystem->BasisZ;
-	//	Transform vector.
-	XYZ^ getOfbasisZTo = getOfVector(basisZTo);
-	//	Get basisZ of connectors.
-	XYZ^ basisZFrom = connFrom->CoordinateSystem->BasisZ;
-	//	Transform vector.
-	XYZ^ getOfbasisZFrom = getOfVector(basisZFrom);
-	
-	//	Calculate angle between connectors.
-	double angle  = getOfbasisZTo->AngleTo(getOfbasisZFrom);
+  // Get basisZ of connectors.
+  XYZ^ basisZTo = connTo->CoordinateSystem->BasisZ;
+  // Transform vector.
+  XYZ^ getOfbasisZTo = getOfVector(basisZTo);
+  // Get basisZ of connectors.
+  XYZ^ basisZFrom = connFrom->CoordinateSystem->BasisZ;
+  // Transform vector.
+  XYZ^ getOfbasisZFrom = getOfVector(basisZFrom);
 
-	// Calculate crossproduct of two vectors.
-	XYZ^ crossprod = getOfbasisZTo->CrossProduct(getOfbasisZFrom);
-	//	Calculate crossproduct of two vectors. 
-	//	Somehow this always give unit vectors 
-	// BasisX(1,0,0), BasisY(0,1,0), BasisX(0,0,1)
-	// I think that is my problem.
-	XYZ^ getOfcrossprod = getOfVector(crossprod);
-	
-	// Create rotation axis.
-	Line^ rotationaxis = Line::CreateUnbound(connTo->Origin, crossprod->BasisZ);	
+  // Calculate angle between connectors.
+  double angle  = getOfbasisZTo->AngleTo(getOfbasisZFrom);
 
-	//	Rotate element around axis.
-	ElementTransformUtils::RotateElement(doc, elmfrom->Id, rotationaxis, Math::PI - angle);
+  // Calculate crossproduct of two vectors.
+  XYZ^ crossprod = getOfbasisZTo->CrossProduct(getOfbasisZFrom);
+  // Calculate crossproduct of two vectors.
+  // Somehow this always give unit vectors
+  // BasisX(1,0,0), BasisY(0,1,0), BasisX(0,0,1)
+  // I think that is my problem.
+  XYZ^ getOfcrossprod = getOfVector(crossprod);
+
+  // Create rotation axis.
+  Line^ rotationaxis = Line::CreateUnbound(connTo->Origin, crossprod->BasisZ);
+
+  // Rotate element around axis.
+  ElementTransformUtils::RotateElement(doc, elmfrom->Id, rotationaxis, Math::PI - angle);
 }
 
-public: static XYZ^ getOfVector(XYZ^ xyz)	
+public: static XYZ^ getOfVector(XYZ^ xyz)
 {
-	XYZ^ OfVector(xyz);
-	return xyz;
+  XYZ^ OfVector(xyz);
+  return xyz;
 }
 </pre>
 
-**Answer:** 
-How can I align the connectors?
+**Answer:** *How can I align the connectors?*
 
-Given two elements E and F containing connectors A and B with locations P and Q. Determine the difference between P and Q, the vector V = Q - P. If you translate the element E containing A by V, A will lie in exactly the same spot as B. If you don't want it in the exact same spot, but only vertically or horizontally aligned in some way, you need to adapt some of the coordinates of V accordingly. The translation can be accomplished using the MoveElement method:
-
-https://www.revitapidocs.com/2023/aaddd413-01b0-2878-3f79-a281abb6d364.htm
-
+Given two elements E and F containing connectors A and B with locations P and Q.
+Determine the difference between P and Q, the vector V = Q - P.
+If you translate the element E containing A by V, A will lie in exactly the same spot as B.
+If you don't want it in the exact same spot, but only vertically or horizontally aligned in some way, you need to adapt some of the coordinates of V accordingly.
+The translation can be accomplished using the [MoveElement method](https://www.revitapidocs.com/2023/aaddd413-01b0-2878-3f79-a281abb6d364.htm).
 Watch out that other attached elements are not moved as well.
 
 **Response:** Some improved pictures:
 As far as understood, move element moves families/elements only.
-So that, I find U vector and subtract W from it and find V vector you mentioned.
-In the way you mentioned is works if two families placed in the same plane and orientation.
+So, I find U vector and subtract P from it and find V vector you mentioned.
+In the way you mentioned, it works if two families placed in the same plane and orientation.
 In my case, none of axes are parallel.
 My problem starts after moving element.
 My aim is finding cross product of two Z axes that is perpendicular to both axes.
@@ -185,144 +191,142 @@ As shown in the picture, crossproduct BasisX, Y, Z always give unit vectors.
 Later:
 
 I finally got it to work.
-My problem was understanding "Basis" vectors.
-My final code is at below.
+My problem was understanding the `Basis` vectors.
+My final code is below.
 It worked perfectly for me.
 I additionally draw rotation axis and rotation arc to visualize rotation.
 
-Besides, I was very surprised there is no similar code samples on the Internet.
-There is many codes but they are working on parallel planes. Revit itself already does the action which I was after.
-But API developers didn't need it.
+Besides, I was very surprised there are no similar code samples on the Internet.
+There is many samples, but they are working on parallel planes.
+Revit itself already does the action which I was after.
+But apparently API developers didn't need it.
 
 <pre class="code">
-	private: static void RotateOnConnector(UIApplication^ uiapp, elmstoreplace^ elms)
-	{
-		try
-		{
-			// Select some elements in Revit before invoking this command
+private: static void RotateOnConnector(UIApplication^ uiapp, elmstoreplace^ elms)
+{
+  try
+  {
+    // Select some elements in Revit before invoking this command
+    
+    // Get the handle of current document.
+    UIDocument^ uidoc = uiapp->ActiveUIDocument;
+    Document^ doc = uidoc->Document;
+    
+    // Elelements are stored in other header. They will be read from there.
+    // They are saved there by selecting in GUI.
+    Element^ elmfrom = doc->GetElement(elmstoreplace::elmFrom);
+    Element^ elmto = doc->GetElement(elmstoreplace::elmTo);
+   
+    // 1. Cast Element to FamilyInstance
+    FamilyInstance^ faminstfrom = (FamilyInstance^)elmfrom;
+    FamilyInstance^ faminstto = (FamilyInstance^)elmto;
+    
+    // 2. Get MEPModel Property
+    MEPModel^ mepmodelfrom = faminstfrom->MEPModel;
+    MEPModel^ mepmodelto = faminstto->MEPModel;
+    
+    // 3. Get connector set of MEPModel
+    ConnectorSet^ connectorSetfrom = mepmodelfrom->ConnectorManager->Connectors;
+    ConnectorSet^ connectorSetto = mepmodelto->ConnectorManager->Connectors;
+    
+    // Connector numbers to be aligned to each other are stored in other file.
+    // They saved there by selecting in GUI.
+    Connector^ connFrom =nullptr; // Connector will be aligned.
+    Connector^ connTo = nullptr; // Connector to be aligned to.
+    
+    // Get connector by iterating in connectorset.
+    for each (Connector ^ connector in connectorSetfrom)
+    {
+      if (connector->Id == elmstoreplace::connNoFrom)
+      {
+        connFrom = connector;
+        String^ message = "Connector is owned by: " + connector->Owner->Name;
+      }
+    }
 
-			// Get the handle of current document.
-			UIDocument^ uidoc = uiapp->ActiveUIDocument;
-			Document^ doc = uidoc->Document;
-			
-			//	Elelements are stored in other header. They will be read from there.
-			//	They are saved there by selecting in GUI.
-			Element^ elmfrom = doc->GetElement(elmstoreplace::elmFrom);
-			Element^ elmto = doc->GetElement(elmstoreplace::elmTo);
-			// 1. Cast Element to FamilyInstance
-			FamilyInstance^ faminstfrom = (FamilyInstance^)elmfrom;
-			FamilyInstance^ faminstto = (FamilyInstance^)elmto;
-
-			// 2. Get MEPModel Property
-			MEPModel^ mepmodelfrom = faminstfrom->MEPModel;
-			MEPModel^ mepmodelto = faminstto->MEPModel;
-
-			// 3. Get connector set of MEPModel
-			ConnectorSet^ connectorSetfrom = mepmodelfrom->ConnectorManager->Connectors;
-			ConnectorSet^ connectorSetto = mepmodelto->ConnectorManager->Connectors;
-
-			// Connector numbers to be aligned to each other are stored in other file.
-			//	They saved there by selecting in GUI.
-			Connector^ connFrom =nullptr;	// Connector will be aligned.
-			Connector^ connTo = nullptr;	// Connector to be aligned to.
-
-			// Get connector by iterating in connectorset. 
-			for each (Connector ^ connector in connectorSetfrom)
-			{
-				if (connector->Id == elmstoreplace::connNoFrom)
-				{
-
-				connFrom = connector;
-					String^ message = "Connector is owned by: " + connector->Owner->Name;
-				}
-
-			}
-			// Get connector by iterating in connectorset.
-			for each (Connector ^ connector in connectorSetto)
-			{
-				if (connector->Id == elmstoreplace::connNoTo)
-				{
-					connTo = connector;
-				}
-			}
-
-			// Get the element current location
-			LocationPoint^ elmfromLoc = (LocationPoint^)elmfrom->Location;
-
-			// Create vector based on element location and connector location.
-			XYZ^ diffvec1 = connFrom->Origin->Subtract(elmfromLoc->Point);
-			// Subtract element location which will be moved.
-			XYZ^ diffvec2 = connTo->Origin->Subtract(elmfromLoc->Point);
-			// Bring two connectors to same point
-			ElementTransformUtils::MoveElement(doc, elmfrom->Id, diffvec2->Add(diffvec1->Negate()));
-
-			//	Get BasisZ of connectors.
-			XYZ^ basisZTo = connTo->CoordinateSystem->BasisZ;
-			XYZ^ basisZFrom = connFrom->CoordinateSystem->BasisZ;
-			
-			//	Calculate angle between connectors.
-			double angle  = basisZTo->AngleTo(basisZFrom);
-			
-			// Calculate crossproduct of two vectors.
-			XYZ^ crossprod = basisZTo->CrossProduct(basisZFrom);
-
-			// Create rotation axis.
-			Line^ rotationaxis = Line::CreateBound(connTo->Origin, gcnew XYZ(connTo->Origin->X+crossprod->X, connTo->Origin->Y+crossprod->Y, connTo->Origin->Z+crossprod->Z));
-
-			//	Rotate element around axis.
-			ElementTransformUtils::RotateElement(doc, elmfrom->Id, rotationaxis, Math::PI-angle);
-
-			// get handle to application from document
-			Autodesk::Revit::ApplicationServices::Application^ application = doc->Application;
-
-			// Create a geometry line in Revit application
-			XYZ^ startPoint = connTo->Origin;
-			XYZ^ endPoint = gcnew XYZ(connTo->Origin->X + crossprod->X, 
-									connTo->Origin->Y + crossprod->Y, 
-									connTo->Origin->Z + crossprod->Z);
-			Line^ geomLine = Line::CreateBound(startPoint, endPoint);
-
-			// Create a geometry plane in Revit application
-			Plane^ linePlane = Plane::CreateByThreePoints(
-				connTo->Origin,
-				gcnew XYZ(connTo->Origin->X,
-					connTo->Origin->Y,
-					connTo->Origin->Z + connTo->CoordinateSystem->BasisZ->Z),
-				gcnew XYZ(connTo->Origin->X + crossprod->X,
-					connTo->Origin->Y + crossprod->Y,
-					connTo->Origin->Z + crossprod->Z));
-			Plane^ arcPlane = Plane::CreateByNormalAndOrigin(crossprod->Normalize(), connTo->Origin);
-			Arc^ geomArc = Arc::Create(arcPlane, 0.5, 0, angle);
-
-			// Create a sketch plane in current document
-			SketchPlane^ linesketch = SketchPlane::Create(doc, linePlane);
-			SketchPlane^ arcsketch = SketchPlane::Create(doc, arcPlane);
-
-			// Create a ModelLine element using the created geometry line and sketch plane
-			ModelLine^ line = (ModelLine^)doc->Create->NewModelCurve(geomLine, linesketch);
-
-			// Create a ModelArc element using the created geometry arc and sketch plane
-			ModelArc^ arc = (ModelArc^)doc->Create->NewModelCurve(geomArc, arcsketch);
-		}
-		catch (Exception^ ex)
-		{
-			TaskDialog::Show("!!! ", ex->Message->ToString());
-		}
-	}
+    // Get connector by iterating in connectorset.
+    for each (Connector ^ connector in connectorSetto)
+    {
+      if (connector->Id == elmstoreplace::connNoTo)
+      {
+        connTo = connector;
+      }
+    }
+    
+    // Get the element current location
+    LocationPoint^ elmfromLoc = (LocationPoint^)elmfrom->Location;
+    
+    // Create vector based on element location and connector location.
+    XYZ^ diffvec1 = connFrom->Origin->Subtract(elmfromLoc->Point);
+    // Subtract element location which will be moved.
+    XYZ^ diffvec2 = connTo->Origin->Subtract(elmfromLoc->Point);
+    // Bring two connectors to same point
+    ElementTransformUtils::MoveElement(doc, elmfrom->Id, diffvec2->Add(diffvec1->Negate()));
+    
+    // Get BasisZ of connectors.
+    XYZ^ basisZTo = connTo->CoordinateSystem->BasisZ;
+    XYZ^ basisZFrom = connFrom->CoordinateSystem->BasisZ;
+    
+    // Calculate angle between connectors.
+    double angle  = basisZTo->AngleTo(basisZFrom);
+    
+    // Calculate crossproduct of two vectors.
+    XYZ^ crossprod = basisZTo->CrossProduct(basisZFrom);
+    
+    // Create rotation axis.
+    Line^ rotationaxis = Line::CreateBound(connTo->Origin,
+      gcnew XYZ(connTo->Origin->X+crossprod->X,
+      connTo->Origin->Y+crossprod->Y,
+      connTo->Origin->Z+crossprod->Z));
+    
+    // Rotate element around axis.
+    ElementTransformUtils::RotateElement(doc, elmfrom->Id,
+      rotationaxis, Math::PI-angle);
+    
+    // get handle to application from document
+    Autodesk::Revit::ApplicationServices::Application^ application
+      = doc->Application;
+    
+    // Create a geometry line in Revit application
+    XYZ^ startPoint = connTo->Origin;
+    XYZ^ endPoint = gcnew XYZ(connTo->Origin->X + crossprod->X,
+     connTo->Origin->Y + crossprod->Y,
+     connTo->Origin->Z + crossprod->Z);
+    Line^ geomLine = Line::CreateBound(startPoint, endPoint);
+    
+    // Create a geometry plane in Revit application
+    Plane^ linePlane = Plane::CreateByThreePoints(
+    connTo->Origin,
+    gcnew XYZ(connTo->Origin->X,
+    connTo->Origin->Y,
+    connTo->Origin->Z + connTo->CoordinateSystem->BasisZ->Z),
+    gcnew XYZ(connTo->Origin->X + crossprod->X,
+    connTo->Origin->Y + crossprod->Y,
+    connTo->Origin->Z + crossprod->Z));
+    Plane^ arcPlane = Plane::CreateByNormalAndOrigin(crossprod->Normalize(),
+      connTo->Origin);
+    Arc^ geomArc = Arc::Create(arcPlane, 0.5, 0, angle);
+    
+    // Create a sketch plane in current document
+    SketchPlane^ linesketch = SketchPlane::Create(doc, linePlane);
+    SketchPlane^ arcsketch = SketchPlane::Create(doc, arcPlane);
+    
+    // Create a ModelLine element using the created geometry line and sketch plane
+    ModelLine^ line = (ModelLine^)doc->Create->NewModelCurve(geomLine, linesketch);
+    
+    // Create a ModelArc element using the created geometry arc and sketch plane
+    ModelArc^ arc = (ModelArc^)doc->Create->NewModelCurve(geomArc, arcsketch);
+  }
+  catch (Exception^ ex)
+  {
+    TaskDialog::Show("!!! ", ex->Message->ToString());
+  }
+}
 </pre>
 
-Many thanks to Haluk for sharing this nice topic and solution.
+Many thanks to Haluk for sharing this nice topic and C++ solution.
 
-
-####<a name="3"></a> 
-
-**Question:** 
-
-**Answer:** 
-
-**Response:**
-
-####<a name="5"></a> Pipedream
+####<a name="3"></a> Pipedream
 
 Watch us build an integration in ~5 minutes using:
 
@@ -343,9 +347,8 @@ Get started:
  - Quickstart: https://pipedream.com/docs/quickstart/
  - Docs: https://pipedream.com/docs/quickstart/
  - Community: https://pipedream.com/community
- 
- 
-####<a name="6"></a> Harari Sapiens
+
+####<a name="4"></a> Harari Sapiens
 
 [Sapiens: A Brief History of Humankind](https://en.wikipedia.org/wiki/Sapiens:_A_Brief_History_of_Humankind)
 by [Yuval Noah Harari](https://en.wikipedia.org/wiki/Yuval_Noah_Harari)
@@ -357,7 +360,7 @@ the book, I must be rather (or even, very) naive to enjoy it so much.
 Judging from the [enthusiastic popular reception](https://en.wikipedia.org/wiki/Sapiens:_A_Brief_History_of_Humankind#Popular_reception),
 I guess I am average after all.
 
-####<a name="6"></a> Afterword: The Animal that Became a God
+####<a name="5"></a> Afterword: The Animal that Became a God
 
 SEVENTY THOUSAND YEARS AGO, HOMO sapiens was still an insignificant animal minding its own business in a corner of Africa. In the following millennia it transformed itself into the master of the entire planet and the terror of the ecosystem. Today it stands on the verge of becoming a god, poised to acquire not only eternal youth, but also the divine abilities of creation and destruction.
 
