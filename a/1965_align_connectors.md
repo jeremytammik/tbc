@@ -27,6 +27,16 @@ A C++ sample demonstrating how to align connectors, an impressive modern platfor
 
 linkedin:
 
+A nice illustrative C++ sample demonstrating how to align MEP connectors in the #RevitAPI
+
+https://autode.sk/alignconnectors
+
+Also, an impressive modern platform for implementing and streamlining online API processes, and my impressions of Harari's book on the history of mankind:
+
+- Align connectors in C++
+- Pipedream serverless API workflow
+- Harari: Sapiens...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
