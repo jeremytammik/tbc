@@ -41,7 +41,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Align Connectors
 
-A nice little C++ sample demonstrating how to align connectors, an impressive modern platform for implementing and streamlining API processes, and my impressions of Harari's book on the history of mankind:
+A nice little C++ sample demonstrating how to align connectors, an impressive modern platform for implementing and streamlining online API processes, and my impressions of Harari's book on the history of mankind:
 
 - [Align connectors in C++](#2)
 - [Pipedream serverless API workflow](#3)
@@ -69,9 +69,11 @@ Graphically, it might look like this:
 <img src="img/align_connectors_1.png" alt="Elements and connectors not aligned" title="Elements and connectors not aligned" width="600"/> <! 1229 x 733 -->
 </center>
 
-My code is at below. I explained code as much as I could. The code is working when element located parallel to project axes. But it doesn't in other situations.
+My code is at below.
+It works when the element is located parallel to project axes, but not in the general situation.
 
-Am I in the wrong path? Is there a better way to do it?
+Am I in the wrong path?
+Is there a better way to do it?
 
 <pre class="prettyprint">
 private: static void rotate(UIApplication^ uiapp, elmstoreplace^ elms)
@@ -166,24 +168,23 @@ public: static XYZ^ getOfVector(XYZ^ xyz)
 }
 </pre>
 
-**Answer:** *How can I align the connectors?*
+**Answer:** To align the connectors, given two elements E and F containing connectors A and B with locations P and Q:
 
-Given two elements E and F containing connectors A and B with locations P and Q.
 Determine the difference between P and Q, the vector V = Q - P.
 If you translate the element E containing A by V, A will lie in exactly the same spot as B.
 If you don't want it in the exact same spot, but only vertically or horizontally aligned in some way, you need to adapt some of the coordinates of V accordingly.
 The translation can be accomplished using the [MoveElement method](https://www.revitapidocs.com/2023/aaddd413-01b0-2878-3f79-a281abb6d364.htm).
 Watch out that other attached elements are not moved as well.
 
-**Response:** Some improved pictures:
+**Response:** I added some improved pictures below.
 As far as understood, move element moves families/elements only.
-So, I find U vector and subtract P from it and find V vector you mentioned.
+So, I find U vector and subtract P from it and find the V vector you mentioned.
 In the way you mentioned, it works if two families placed in the same plane and orientation.
 In my case, none of axes are parallel.
 My problem starts after moving element.
 My aim is finding cross product of two Z axes that is perpendicular to both axes.
 And rotate it by angle.
-I am stuck in creating rotation axis along Z axis of cross product.
+I am stuck in creating a rotation axis along Z axis of cross product.
 As shown in the picture, cross product BasisX, Y, Z always give unit vectors.
 
 <center>
@@ -202,8 +203,8 @@ My final code is below.
 It worked perfectly for me.
 I additionally draw rotation axis and rotation arc to visualize rotation.
 
-Besides, I was very surprised there are no similar code samples on the Internet.
-There are many samples, but they are all working on parallel planes.
+Besides, I was surprised there are no similar code samples on the Internet.
+There are many samples, but they all work on parallel planes.
 Revit itself already does the action which I am after.
 But apparently, API developers didn't need it.
 

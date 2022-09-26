@@ -39,7 +39,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Align Connectors</h3>
-<p>A nice little C++ sample demonstarting how to align connectors, an impressive modern platform for implementing and streamlining API processes, and my impressions of Harari's book on the history of mankind:</p>
+<p>A nice little C++ sample demonstrating how to align connectors, an impressive modern platform for implementing and streamlining online API processes, and my impressions of Harari's book on the history of mankind:</p>
 <ul>
 <li><a href="#2">Align connectors in C++</a></li>
 <li><a href="#3">Pipedream serverless API workflow</a></li>
@@ -51,7 +51,7 @@ the <a href="https://blog.feedspot.com/dynamo_blogs">Top 10 Dynamo Blogs</a>.
 Thank you for the recognition.</p>
 <h4><a name="2"></a> Align Connectors</h4>
 <p>Haluk Uzuner raised and solved the interesting issue of
-how to <a href="https://forums.autodesk.com/t5/revit-api-forum/align-conectors-in-3d-space/m-p/11412155">align conectors in 3D space</a>,
+how to <a href="https://forums.autodesk.com/t5/revit-api-forum/align-conectors-in-3d-space/m-p/11412155">align connectors in 3D space</a>,
 sharing his C++ implementation:</p>
 <p><strong>Question:</strong> I want to align two families by their connectors.</p>
 <p>Families can be placed in any direction in 3D space.
@@ -60,8 +60,10 @@ Graphically, it might look like this:</p>
 <p><center>
 <img src="img/align_connectors_1.png" alt="Elements and connectors not aligned" title="Elements and connectors not aligned" width="600"/> &lt;! 1229 x 733 --&gt;
 </center></p>
-<p>My code is at below. I explained code as much as I could. The code is working when element located parallel to project axes. But it doesn't in other situations.</p>
-<p>Am I in the wrong path? Is there a better way to do it?</p>
+<p>My code is at below.
+It works when the element is located parallel to project axes, but not in the general situation.</p>
+<p>Am I in the wrong path?
+Is there a better way to do it?</p>
 <pre class="prettyprint">
 private: static void rotate(UIApplication^ uiapp, elmstoreplace^ elms)
 {
@@ -155,23 +157,22 @@ public: static XYZ^ getOfVector(XYZ^ xyz)
 }
 </pre>
 
-<p><strong>Answer:</strong> <em>How can I align the connectors?</em></p>
-<p>Given two elements E and F containing connectors A and B with locations P and Q.
-Determine the difference between P and Q, the vector V = Q - P.
+<p><strong>Answer:</strong> To align the connectors, given two elements E and F containing connectors A and B with locations P and Q:</p>
+<p>Determine the difference between P and Q, the vector V = Q - P.
 If you translate the element E containing A by V, A will lie in exactly the same spot as B.
 If you don't want it in the exact same spot, but only vertically or horizontally aligned in some way, you need to adapt some of the coordinates of V accordingly.
 The translation can be accomplished using the <a href="https://www.revitapidocs.com/2023/aaddd413-01b0-2878-3f79-a281abb6d364.htm">MoveElement method</a>.
 Watch out that other attached elements are not moved as well.</p>
-<p><strong>Response:</strong> Some improved pictures:
+<p><strong>Response:</strong> I added some improved pictures below.
 As far as understood, move element moves families/elements only.
-So, I find U vector and subtract P from it and find V vector you mentioned.
+So, I find U vector and subtract P from it and find the V vector you mentioned.
 In the way you mentioned, it works if two families placed in the same plane and orientation.
 In my case, none of axes are parallel.
 My problem starts after moving element.
 My aim is finding cross product of two Z axes that is perpendicular to both axes.
 And rotate it by angle.
-I am stuck in creating rotation axis along Z axis of crossproduct.
-As shown in the picture, crossproduct BasisX, Y, Z always give unit vectors.</p>
+I am stuck in creating a rotation axis along Z axis of cross product.
+As shown in the picture, cross product BasisX, Y, Z always give unit vectors.</p>
 <p><center>
 <img src="img/align_connectors_2.png" alt="Align connectors" title="Align connectors" width="200"/> &lt;! 387 x 108 --&gt;
 <br/>
@@ -185,10 +186,10 @@ My problem was understanding the <code>Basis</code> vectors.
 My final code is below.
 It worked perfectly for me.
 I additionally draw rotation axis and rotation arc to visualize rotation.</p>
-<p>Besides, I was very surprised there are no similar code samples on the Internet.
-There is many samples, but they are working on parallel planes.
-Revit itself already does the action which I was after.
-But apparently API developers didn't need it.</p>
+<p>Besides, I was surprised there are no similar code samples on the Internet.
+There are many samples, but they all work on parallel planes.
+Revit itself already does the action which I am after.
+But apparently, API developers didn't need it.</p>
 <pre class="code">
 private: static void RotateOnConnector(UIApplication^ uiapp, elmstoreplace^ elms)
 {
@@ -258,7 +259,7 @@ private: static void RotateOnConnector(UIApplication^ uiapp, elmstoreplace^ elms
     // Calculate angle between connectors.
     double angle  = basisZTo->AngleTo(basisZFrom);
 
-    // Calculate crossproduct of two vectors.
+    // Calculate cross product of two vectors.
     XYZ^ crossprod = basisZTo->CrossProduct(basisZFrom);
 
     // Create rotation axis.
