@@ -331,7 +331,7 @@ private: static void RotateOnConnector(UIApplication^ uiapp, elmstoreplace^ elms
 }
 </pre>
 
-Many thanks to Haluk for sharing this nice topic and C++ solution.
+Many thanks to Haluk for rectifying that and sharing this nice topic and C++ solution.
 
 ####<a name="3"></a> Pipedream Serverless API Workflow
 
