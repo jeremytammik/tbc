@@ -41,6 +41,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Align Connectors
 
+A nice little C++ sample demonstarting how to align connectors, an impressive modern platform for implementing and streamlining API processes, and my impressions of Harari's book on the history of mankind:
+
+- [Align connectors in C++](#2)
+- [Pipedream serverless API workflow](#3)
+- [Harari Sapiens](#4)
+- [Afterword: The Animal that Became a God](#5)
 
 
 The Building Coder was selected by feedspot as one of
@@ -326,15 +332,10 @@ private: static void RotateOnConnector(UIApplication^ uiapp, elmstoreplace^ elms
 
 Many thanks to Haluk for sharing this nice topic and C++ solution.
 
-####<a name="3"></a> Pipedream
+####<a name="3"></a> Pipedream Serverless API Workflow
 
-Watch us build an integration in ~5 minutes using:
-
-- Pre-built, open source components for Twitter and Google Sheets
-- Node.js with the axios npm package and Pipedream managed authentication for Google Translate
-- Python and the nltk pypi package.
-
-Pipedream is the fastest way to automate any process that connects APIs. Build and run workflows with code-level control when you need it, and no code when you don't.
+Pipedream is a fast way to automate any process that connects APIs.
+Build and run workflows with code-level control when you need it, and no code when you don't.
 
 The Pipedream platform includes:
 
@@ -342,11 +343,11 @@ The Pipedream platform includes:
 - Open source triggers and actions for hundreds of integrated apps
 - One-click OAuth and key-based authentication for hundreds of APIs
 
-Get started:
- - https://pipedream.com
- - Quickstart: https://pipedream.com/docs/quickstart/
- - Docs: https://pipedream.com/docs/quickstart/
- - Community: https://pipedream.com/community
+Check out the impressive [7-minute demo](https://youtu.be/pRHsQyyfYl0) using:
+
+- Pre-built, open source components for Twitter and Google Sheets
+- Node.js with the axios npm package and Pipedream managed authentication for Google Translate
+- Python and the nltk pypi package
 
 ####<a name="4"></a> Harari Sapiens
 
