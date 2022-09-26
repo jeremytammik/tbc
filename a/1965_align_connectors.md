@@ -197,7 +197,6 @@ As shown in the picture, cross product BasisX, Y, Z always give unit vectors.
 </center>
 
 Later:
-
 I finally got it to work.
 My problem was understanding the `Basis` vectors.
 My final code is below.
