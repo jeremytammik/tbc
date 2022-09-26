@@ -20,8 +20,10 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash;
-...
+A C++ sample demonstrating how to align connectors, an impressive modern platform for implementing and streamlining online API processes, and my impressions of Harari's book on the history of mankind
+&ndash; Align connectors in C++
+&ndash; Pipedream serverless API workflow
+&ndash; Harari: Sapiens...
 
 linkedin:
 
@@ -39,17 +41,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Align Connectors
+### Aligning Connectors
 
 A nice little C++ sample demonstrating how to align connectors, an impressive modern platform for implementing and streamlining online API processes, and my impressions of Harari's book on the history of mankind:
 
 - [Align connectors in C++](#2)
 - [Pipedream serverless API workflow](#3)
-- [Harari Sapiens](#4)
+- [Harari: Sapiens](#4)
 - [Afterword: The Animal that Became a God](#5)
 
-
-The Building Coder was selected by feedspot as one of
+By the way, The Building Coder was selected by feedspot as one of
 the [Top 10 Dynamo Blogs](https://blog.feedspot.com/dynamo_blogs).
 Thank you for the recognition.
 
@@ -69,7 +70,7 @@ Graphically, it might look like this:
 <img src="img/align_connectors_1.png" alt="Elements and connectors not aligned" title="Elements and connectors not aligned" width="600"/> <! 1229 x 733 -->
 </center>
 
-My code is at below.
+My code is below.
 It works when the element is located parallel to project axes, but not in the general situation.
 
 Am I in the wrong path?
@@ -188,11 +189,11 @@ I am stuck in creating a rotation axis along Z axis of cross product.
 As shown in the picture, cross product BasisX, Y, Z always give unit vectors.
 
 <center>
-<img src="img/align_connectors_2.png" alt="Align connectors" title="Align connectors" width="200"/> <! 387 x 108 -->
+<img src="img/align_connectors_2.png" alt="Align connectors" title="Align connectors" width="387"/> <!-- 387 x 108 -->
 <br/>
-<img src="img/align_connectors_3.png" alt="Align connectors" title="Align connectors" width="600"/> <! 1248 x 742-->
+<img src="img/align_connectors_3.png" alt="Align connectors" title="Align connectors" width="600"/> <!-- 1248 x 742-->
 <br/>
-<img src="img/align_connectors_4.png" alt="Align connectors" title="Align connectors" width="600"/> <! 1280 x 798 -->
+<img src="img/align_connectors_4.png" alt="Align connectors" title="Align connectors" width="600"/> <!-- 1280 x 798 -->
 </center>
 
 Later:
@@ -208,7 +209,7 @@ There are many samples, but they all work on parallel planes.
 Revit itself already does the action which I am after.
 But apparently, API developers didn't need it.
 
-<pre class="code">
+<pre class="prettyprint">
 private: static void RotateOnConnector(UIApplication^ uiapp, elmstoreplace^ elms)
 {
   try
@@ -335,7 +336,7 @@ Many thanks to Haluk for sharing this nice topic and C++ solution.
 
 ####<a name="3"></a> Pipedream Serverless API Workflow
 
-Pipedream is a fast way to automate any process that connects APIs.
+[Pipedream](https://pipedream.com) is a fast way to automate any process that connects APIs.
 Build and run workflows with code-level control when you need it, and no code when you don't.
 
 The Pipedream platform includes:
@@ -350,10 +351,10 @@ Check out the impressive [7-minute demo](https://youtu.be/pRHsQyyfYl0) using:
 - Node.js with the axios npm package and Pipedream managed authentication for Google Translate
 - Python and the nltk pypi package
 
-####<a name="4"></a> Harari Sapiens
+####<a name="4"></a> Harari: Sapiens
 
-[Sapiens: A Brief History of Humankind](https://en.wikipedia.org/wiki/Sapiens:_A_Brief_History_of_Humankind)
-by [Yuval Noah Harari](https://en.wikipedia.org/wiki/Yuval_Noah_Harari)
+I read [Sapiens: A Brief History of Humankind](https://en.wikipedia.org/wiki/Sapiens:_A_Brief_History_of_Humankind)
+by [Yuval Noah Harari](https://en.wikipedia.org/wiki/Yuval_Noah_Harari).
 
 Judging from
 the [very critical scholarly reception](https://en.wikipedia.org/wiki/Sapiens:_A_Brief_History_of_Humankind#Scholarly_reception) of
@@ -374,6 +375,7 @@ Moreover, despite the astonishing things that humans are capable of doing, we re
 
 Is there anything more dangerous than dissatisfied and irresponsible gods who don’t know what they want?
 
-<p style="text-align:right; font-style: italic">&ndash; Published [online by Erenow](https://erenow.net/common/sapiensbriefhistory/112.php)</p>
+<p style="text-align:right; font-style: italic">&ndash;
+Published online by <a href="https://erenow.net/common/sapiensbriefhistory/112.php">Erenow</a></p>
 
 

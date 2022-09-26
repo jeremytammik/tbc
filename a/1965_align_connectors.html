@@ -19,8 +19,10 @@ twitter:
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon
 
-&ndash;
-...
+A C++ sample demonstrating how to align connectors, an impressive modern platform for implementing and streamlining online API processes, and my impressions of Harari's book on the history of mankind
+&ndash; Align connectors in C++
+&ndash; Pipedream serverless API workflow
+&ndash; Harari: Sapiens...
 
 linkedin:
 
@@ -38,15 +40,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Align Connectors</h3>
+<h3>Aligning Connectors</h3>
 <p>A nice little C++ sample demonstrating how to align connectors, an impressive modern platform for implementing and streamlining online API processes, and my impressions of Harari's book on the history of mankind:</p>
 <ul>
 <li><a href="#2">Align connectors in C++</a></li>
 <li><a href="#3">Pipedream serverless API workflow</a></li>
-<li><a href="#4">Harari Sapiens</a></li>
+<li><a href="#4">Harari: Sapiens</a></li>
 <li><a href="#5">Afterword: The Animal that Became a God</a></li>
 </ul>
-<p>The Building Coder was selected by feedspot as one of
+<p>By the way, The Building Coder was selected by feedspot as one of
 the <a href="https://blog.feedspot.com/dynamo_blogs">Top 10 Dynamo Blogs</a>.
 Thank you for the recognition.</p>
 <h4><a name="2"></a> Align Connectors</h4>
@@ -60,7 +62,7 @@ Graphically, it might look like this:</p>
 <p><center>
 <img src="img/align_connectors_1.png" alt="Elements and connectors not aligned" title="Elements and connectors not aligned" width="600"/> &lt;! 1229 x 733 --&gt;
 </center></p>
-<p>My code is at below.
+<p>My code is below.
 It works when the element is located parallel to project axes, but not in the general situation.</p>
 <p>Am I in the wrong path?
 Is there a better way to do it?</p>
@@ -174,11 +176,11 @@ And rotate it by angle.
 I am stuck in creating a rotation axis along Z axis of cross product.
 As shown in the picture, cross product BasisX, Y, Z always give unit vectors.</p>
 <p><center>
-<img src="img/align_connectors_2.png" alt="Align connectors" title="Align connectors" width="200"/> &lt;! 387 x 108 --&gt;
+<img src="img/align_connectors_2.png" alt="Align connectors" title="Align connectors" width="387"/> <!-- 387 x 108 -->
 <br/>
-<img src="img/align_connectors_3.png" alt="Align connectors" title="Align connectors" width="600"/> &lt;! 1248 x 742--&gt;
+<img src="img/align_connectors_3.png" alt="Align connectors" title="Align connectors" width="600"/> <!-- 1248 x 742-->
 <br/>
-<img src="img/align_connectors_4.png" alt="Align connectors" title="Align connectors" width="600"/> &lt;! 1280 x 798 --&gt;
+<img src="img/align_connectors_4.png" alt="Align connectors" title="Align connectors" width="600"/> <!-- 1280 x 798 -->
 </center></p>
 <p>Later:</p>
 <p>I finally got it to work.
@@ -190,7 +192,7 @@ I additionally draw rotation axis and rotation arc to visualize rotation.</p>
 There are many samples, but they all work on parallel planes.
 Revit itself already does the action which I am after.
 But apparently, API developers didn't need it.</p>
-<pre class="code">
+<pre class="prettyprint">
 private: static void RotateOnConnector(UIApplication^ uiapp, elmstoreplace^ elms)
 {
   try
@@ -315,7 +317,7 @@ private: static void RotateOnConnector(UIApplication^ uiapp, elmstoreplace^ elms
 
 <p>Many thanks to Haluk for sharing this nice topic and C++ solution.</p>
 <h4><a name="3"></a> Pipedream Serverless API Workflow</h4>
-<p>Pipedream is a fast way to automate any process that connects APIs.
+<p><a href="https://pipedream.com">Pipedream</a> is a fast way to automate any process that connects APIs.
 Build and run workflows with code-level control when you need it, and no code when you don't.</p>
 <p>The Pipedream platform includes:</p>
 <ul>
@@ -329,9 +331,9 @@ Build and run workflows with code-level control when you need it, and no code wh
 <li>Node.js with the axios npm package and Pipedream managed authentication for Google Translate</li>
 <li>Python and the nltk pypi package</li>
 </ul>
-<h4><a name="4"></a> Harari Sapiens</h4>
-<p><a href="https://en.wikipedia.org/wiki/Sapiens:_A_Brief_History_of_Humankind">Sapiens: A Brief History of Humankind</a>
-by <a href="https://en.wikipedia.org/wiki/Yuval_Noah_Harari">Yuval Noah Harari</a></p>
+<h4><a name="4"></a> Harari: Sapiens</h4>
+<p>I read <a href="https://en.wikipedia.org/wiki/Sapiens:_A_Brief_History_of_Humankind">Sapiens: A Brief History of Humankind</a>
+by <a href="https://en.wikipedia.org/wiki/Yuval_Noah_Harari">Yuval Noah Harari</a>.</p>
 <p>Judging from
 the <a href="https://en.wikipedia.org/wiki/Sapiens:_A_Brief_History_of_Humankind#Scholarly_reception">very critical scholarly reception</a> of
 the book, I must be naive to enjoy it so much.</p>
@@ -343,4 +345,5 @@ though, I guess I am average after all.</p>
 <p>In the last few decades we have at last made some real progress as far as the human condition is concerned, with the reduction of famine, plague and war. Yet the situation of other animals is deteriorating more rapidly than ever before, and the improvement in the lot of humanity is too recent and fragile to be certain of.</p>
 <p>Moreover, despite the astonishing things that humans are capable of doing, we remain unsure of our goals and we seem to be as discontented as ever. We have advanced from canoes to galleys to steamships to space shuttles – but nobody knows where we’re going. We are more powerful than ever before, but have very little idea what to do with all that power. Worse still, humans seem to be more irresponsible than ever. Self-made gods with only the laws of physics to keep us company, we are accountable to no one. We are consequently wreaking havoc on our fellow animals and on the surrounding ecosystem, seeking little more than our own comfort and amusement, yet never finding satisfaction.</p>
 <p>Is there anything more dangerous than dissatisfied and irresponsible gods who don’t know what they want?</p>
-<p style="text-align:right; font-style: italic">&ndash; Published [online by Erenow](https://erenow.net/common/sapiensbriefhistory/112.php)</p>
+<p style="text-align:right; font-style: italic">&ndash;
+Published online by <a href="https://erenow.net/common/sapiensbriefhistory/112.php">Erenow</a></p>
