@@ -119,6 +119,8 @@ these industry clouds will connect processes to drive new ways of working:
 
 ####<a name="4"></a> Linked Element Visibility
 
+Back to the Revit API and BIM...
+
 **Question:** 
 I know the question of "How to hide an individual element from a linked model via the Revit API" has been asked multiple times and there seems to be no way to do this yet.
 However, I would like to know whether there is any way to find out if a specific element in a linked model was hidden by the user.
