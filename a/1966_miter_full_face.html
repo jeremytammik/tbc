@@ -33,12 +33,12 @@
 
 - visibility of a specific element in a view
   https://autodesk.slack.com/archives/C0SR6NAP8/p1664278836397949
-  [Q] I am on the Assemble team and trying to determine if a Structural Framing element is visible when processing a model.  The element type is a Girder and the View has the Girder sub category turned off in the Visibility settings.  I have not figured out the magic to check these 2 things:
+  [Q] I am on the Assemble team and trying to determine if a Structural Framing element is visible when processing a model.  The element type is a Girder and the View has the Girder subcategory turned off in the Visibility settings.  I have not figured out the magic to check these 2 things:
   What is the type of Structural Framing element, that is Girder, Joist, etc.
-  How to determine the Visibility setting for these sub category elements
+  How to determine the Visibility setting for these subcategory elements
   If you could just map out the pseudo code for the necessary calls, I would appreciate it!
   [A] FamilyInstance.StructuralUsage should tell you #1.   For #2, if the category is turned off View.GetCategoryHidden() will identify this.  You need the category id for the type you are looking for, which I'd expect to get from new ElementId( BuiltInCategory.OST_Girder).  There may not be an easy to code relationship between the StructuralInstanceUsage and the built in (sub)categories in this case.
-  [Q] Thanks Scott.  It's a pain to sort all these sub category visibilities out, I can't believe there is not a built in function for an element's visibility in the active view.
+  [Q] Thanks Scott.  It's a pain to sort all these subcategory visibilities out, I can't believe there is not a built in function for an element's visibility in the active view.
 
 - set wall join to miter for full face
   CalculateSpatialElementGeometry(), not retrieving all the boundary faces
@@ -119,11 +119,11 @@ Might be a bit expensive just to get this information.</p>
 <h4><a name="5"></a> Visibility of a Specific Element in a View</h4>
 <p><strong>Question:</strong> 
 I am trying to determine if a Structural Framing element is visible when processing a model.
-The element type is a Girder and the View has the Girder sub category turned off in the Visibility settings.
+The element type is a Girder and the View has the Girder subcategory turned off in the Visibility settings.
 I have not figured out the magic to check these 2 things:</p>
 <ul>
 <li>What is the type of Structural Framing element, that is Girder, Joist, etc.</li>
-<li>How to determine the Visibility setting for these sub category elements</li>
+<li>How to determine the Visibility setting for these subcategory elements</li>
 </ul>
 <p>If you could just map out the pseudo code for the necessary calls, I would appreciate it!</p>
 <p><strong>Answer:</strong> 
@@ -137,11 +137,11 @@ solved the question raised by Miguel Gutiérrez
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/calculatespatialelementgeometry-not-retrieving-all-the-boundary/m-p/11446249"><code>CalculateSpatialElementGeometry</code> not retrieving all the boundary faces</a> with
 the suggestion to temporarily set the wall joins to miter:</p>
 <p><strong>Question:</strong> 
-I'm working on a automatic skirtingboard placement add-in and it'll be necessary to gather all the boundary faces to remove part of the baseboard or overextend them a bit more:</p>
+I'm working on an automatic skirtingboard placement add-in and it'll be necessary to gather all the boundary faces to remove part of the baseboard or overextend them a bit more:</p>
 <p><center>
 <img src="img/spatial_element_geometry_full_face_1.png" alt="Skirtingboard placement" title="Skirtingboard placement" width="600"/> <!-- 936 x 757 -->
 </center></p>
-<p>I've managed to tessellated the faces returned by the combination of the <code>CalculateSpatialElementGeometry</code>, <code>GetBoundaryFaceInfo</code> and <code>GetBoundingElementFace</code> methods and I came up with this: </p>
+<p>I've managed to tessellate the faces returned by the combination of the <code>CalculateSpatialElementGeometry</code>, <code>GetBoundaryFaceInfo</code> and <code>GetBoundingElementFace</code> methods and I came up with this: </p>
 <p><center>
 <img src="img/spatial_element_geometry_full_face_2.png" alt="Skirtingboard placement" title="Skirtingboard placement" width="600"/> <!-- 933 x 781 -->
 <br/>
