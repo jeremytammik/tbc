@@ -75,6 +75,12 @@ in full swing and brings exciting news.
 Meanwhile, the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) continues
 unperturbed with other equally exciting conversations and solutions:
 
+- [Forge is dead &ndash; long live APS](#2)
+- [Forma for AEC](#3)
+- [Linked element visibility](#4)
+- [Visibility of a specific element in a view](#5)
+- [Miter join walls to retrieve full faces](#6)
+
 ####<a name="2"></a> Forge is Dead &ndash; Long Live APS
 
 Andrew Anagnost announced in the General Session that the Forge brand is evolving into Autodesk Platform Services.
@@ -104,7 +110,7 @@ these industry clouds will connect processes to drive new ways of working:
 - Autodesk Flow, the industry cloud for M&amp;E, connects customer workflows, data, and teams across the entire production lifecycle from earliest concept to final delivery. The first cloud product available on Flow will focus on Asset Management, giving users the ability to manage assets throughout the entire production process.
 - Autodesk Fusion, the industry cloud for D&amp;M, connects customer data and people across the entire product development lifecycle from top floor to shop floor. Fusion 360, together with Autodesk Fusion 360 Manage with Upchain, and Prodsmart make up the initial cloud offerings within Autodesk Fusion.
 
-> Underpinning these three clouds is Autodesk Platform Services, the set of cross-industry APIs and services formerly known as Forge.
+> Underpinning these three clouds is Autodesk Platform Services, the set of cross-industry APIs and services formerly known as Forge...
 
 ####<a name="4"></a> Linked Element Visibility
 
@@ -153,14 +159,16 @@ I'm working on a automatic skirtingboard placement add-in and it'll be necessary
 <img src="img/spatial_element_geometry_full_face_1.png" alt="Skirtingboard placement" title="Skirtingboard placement" width="600"/> <!-- 936 x 757 -->
 </center>
 
-I've managed to tessellated the faces returned by the combination of CalculateSpatialElementGeometry(), GetBoundaryFaceInfo() &  GetBoundingElementFace () methods and I came up with this: 
+I've managed to tessellated the faces returned by the combination of the `CalculateSpatialElementGeometry`, `GetBoundaryFaceInfo` and `GetBoundingElementFace` methods and I came up with this: 
 
 <center>
 <img src="img/spatial_element_geometry_full_face_2.png" alt="Skirtingboard placement" title="Skirtingboard placement" width="600"/> <!-- 933 x 781 -->
+<br/>
+<br/>
 <img src="img/spatial_element_geometry_full_face_3.png" alt="Skirtingboard placement" title="Skirtingboard placement" width="300"/> <!-- 357 x 358 -->
 </center>
 
-I'm not getting the faces from the orthogonal walls.
+As you can see, I'm not getting the faces from the orthogonal walls.
 
 Do you have any ideas to get those faces as well?
 
@@ -175,7 +183,8 @@ This changes the geometry of the wall used for graphics.
 It is abutted by default, which means the face of the wall stops in line with the other face and you have a hidden contextual edge.
 
 <center>
-<img src="img/spatial_element_geometry_full_face_4_abut.png" alt="Abut" title="Abut" width="400"/> <!-- 429 x 489 -->
+<img src="img/spatial_element_geometry_full_face_4_abut.png" alt="Abut" title="Abut" width="300"/> <!-- 429 x 489 -->
+&nbsp;
 <img src="img/spatial_element_geometry_full_face_5_miter.png" alt="Miter" title="Miter" width="300"/> <!-- 428 x 490 -->
 </center>
 
