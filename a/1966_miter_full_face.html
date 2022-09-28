@@ -1,9 +1,8 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
-</head>
-
+<p></head></p>
 <!---
 
 - Autodesk Paves Path to Digital Transformation in the Cloud
@@ -11,7 +10,7 @@
 
 - Autodesk University and Forge Data = unique opportunities!
   https://forge.autodesk.com/blog/autodesk-university-and-forge-data-unique-opportunities
-  
+
 - forge rebranding -- zip/AutodeskPlatformServicesRebrand.pptx
   The change of the "name" Forge to Autodesk Platform Services.
   Starting Tuesday (Wednesday in Asia) next week.
@@ -53,13 +52,13 @@
 CalculateSpatialElementGeometry(), not retrieving all the boundary faces
 Hi mates, hope this topic find you all well
 
- 
+
 
 I'm currently working on a automatic skirtingboard placement add-in and it'll be necessary to gather all the boundary faces to remove part of the baseboard or overextend them a bit more:
 
 MiguelGT17_1-1664158956140.png
 
- 
+
 
 I've managed to tessellated the faces returned by the combination of CalculateSpatialElementGeometry(), GetBoundaryFaceInfo() &  GetBoundingElementFace () methods and I came up with this: 
 
@@ -67,17 +66,17 @@ MiguelGT17_0-1664158339297.png
 
 MiguelGT17_2-1664159132530.png
 
- 
+
 
 I'm not getting the face from the orthogonal walls. 
 
- 
+
 
 Do you have any ideas to get those faces as well?
 
 Thanks in advanced, all the best
 
- 
+
 
 Miguel Gutiérrez
 
@@ -94,7 +93,7 @@ jeremy.tammik
 ‎2022-09-26 01:41 AM 
 The only suggestion I have off-hand is to query the room for its boundary edges and compare those with the spatial element geometry faces. I think the boundary edges may give you access to the walls that generate them, so you might be able to add the missing face pieces from those.
 
-  
+
 
 Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
 Tags (0)
@@ -106,11 +105,11 @@ RPTHOMAS108
 ‎2022-09-26 01:46 AM 
 I don't know if there is a better solution offhand but you can try temporarily setting the join type of the wall to miter instead of abut to see if that helps. This setting can be found on LocationCurve.JoinType.
 
- 
+
 
 This changes the geometry of the wall used for graphics. It is abutted by default which means the face of the wall stops in line with the other face and you have a hidden contextual edge. 
 
- 
+
 
 Miter
 Miter
@@ -119,7 +118,7 @@ Abut
 
 You can also try setting SpatialElementBoundaryLocation to centre and offsetting the line.
 
- 
+
 
 As is always the case with these kinds of things the reliability of the result is going to depend on the standard of work used within the model.
 
@@ -141,7 +140,7 @@ MiguelGT17
 ‎2022-09-26 10:29 AM 
 Thanks for replying me Thomas, you are the men! I was not aware of the WallJoins tool, Now, I can have the full face from the boundary walls. Thank you so much!
 
- 
+
 
 MiguelGT17_0-1664213339981.png
 
@@ -168,73 +167,46 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### APS, AU, and Miter for Full Face
-
-[Autodesk University 2022](https://www.autodesk.com/autodesk-university) is
+<h3>APS, AU, and Miter for Full Face</h3>
+<p><a href="https://www.autodesk.com/autodesk-university">Autodesk University 2022</a> is
 in full swing and brings exciting news.
-Meanwhile, the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) continues
-unperturbed with other equally exciting conversations and solutions:
-
-
-
-
-
-####<a name="2"></a> Forge is Dead &ndash; Long Live APS
-
-Andrew Anagnost announced in the General Session that the Forge brand is evolving into Autodesk Platform Services.
-
-[Autodesk Platform Services](https://forge.autodesk.com/) consists of an evolving set of APIs and services to help you customize our products, create innovative workflows, and integrate other tools and data.
-In addition to web service APIs, Autodesk Platform Services (APS) offers an app marketplace of pre-built solutions that can help you quickly connect gaps, as well as a cloud information model that can streamline how teams create and share project data across project lifecycles.  
-
-<center>
+Meanwhile, the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> continues
+unperturbed with other equally exciting conversations and solutions:</p>
+<h4><a name="2"></a> Forge is Dead &ndash; Long Live APS</h4>
+<p>Andrew Anagnost announced in the General Session that the Forge brand is evolving into Autodesk Platform Services.</p>
+<p><a href="https://forge.autodesk.com/">Autodesk Platform Services</a> consists of an evolving set of APIs and services to help you customize our products, create innovative workflows, and integrate other tools and data.
+In addition to web service APIs, Autodesk Platform Services (APS) offers an app marketplace of pre-built solutions that can help you quickly connect gaps, as well as a cloud information model that can streamline how teams create and share project data across project lifecycles.  </p>
+<p><center>
 <img src="img/autodesk_platform_services_rebrand.png" alt="Autodesk Platform Services" title="Autodesk Platform Services" width="600"/> <!-- 1544 x 690 -->
-</center>
-
-Kevin Vandecar shares an overview of the APS-related classes at AU in his article
-on [Autodesk University and Forge Data = unique opportunities!](https://forge.autodesk.com/blog/autodesk-university-and-forge-data-unique-opportunities)
-
-####<a name="3"></a> Forma for AEC
-
-Another new terms is Forma, the Autodesk industry cloud for AEC and BIM, as explained in
-the news release [Autodesk paves path to digital transformation in the cloud](https://investors.autodesk.com/news-releases/news-release-details/autodesk-paves-path-digital-transformation-cloud):
-
-> Autodesk is supporting and advancing its customers' digital transformation journeys by connecting workflows in the cloud for better outcomes and workflows.
+</center></p>
+<p>Kevin Vandecar shares an overview of the APS-related classes at AU in his article
+on <a href="https://forge.autodesk.com/blog/autodesk-university-and-forge-data-unique-opportunities">Autodesk University and Forge Data = unique opportunities!</a></p>
+<h4><a name="3"></a> Forma for AEC</h4>
+<p>Another new terms is Forma, the Autodesk industry cloud for AEC and BIM, as explained in
+the news release <a href="https://investors.autodesk.com/news-releases/news-release-details/autodesk-paves-path-digital-transformation-cloud">Autodesk paves path to digital transformation in the cloud</a>:</p>
+<blockquote>
+<p>Autodesk is supporting and advancing its customers' digital transformation journeys by connecting workflows in the cloud for better outcomes and workflows.
 At AU, Autodesk is introducing three industry clouds: Autodesk Forma, Autodesk Flow and Autodesk Fusion.
 Part of
-the [Autodesk Platform](https://www.autodesk.com/company/autodesk-platform),
-these industry clouds will connect processes to drive new ways of working:
-
-> - Autodesk Forma, the industry cloud for AEC, unifies building information modeling (BIM) workflows for teams who design, build, and operate the built environment. The first Forma offering will help customers extend the BIM process into planning and early-stage design.
-- Autodesk Flow, the industry cloud for M&E, connects customer workflows, data, and teams across the entire production lifecycle from earliest concept to final delivery. The first cloud product available on Flow will focus on Asset Management, giving users the ability to manage assets throughout the entire production process.
-- Autodesk Fusion, the industry cloud for D&M, connects customer data and people across the entire product development lifecycle from top floor to shop floor. Fusion 360, together with Autodesk Fusion 360 Manage with Upchain, and Prodsmart make up the initial cloud offerings within Autodesk Fusion.
-
-> Underpinning these three clouds is Autodesk Platform Services, the set of cross-industry APIs and services formerly known as Forge.
-
-
-
-
-
-**Question:** 
-
-<center>
-<img src="img/.png" alt="" title="" width="600"/> <! 1229 x 733 -->
-</center>
-
-
-
+the <a href="https://www.autodesk.com/company/autodesk-platform">Autodesk Platform</a>,
+these industry clouds will connect processes to drive new ways of working:</p>
+<ul>
+<li>Autodesk Forma, the industry cloud for AEC, unifies building information modeling (BIM) workflows for teams who design, build, and operate the built environment. The first Forma offering will help customers extend the BIM process into planning and early-stage design.</li>
+<li>Autodesk Flow, the industry cloud for M&amp;E, connects customer workflows, data, and teams across the entire production lifecycle from earliest concept to final delivery. The first cloud product available on Flow will focus on Asset Management, giving users the ability to manage assets throughout the entire production process.</li>
+<li>Autodesk Fusion, the industry cloud for D&amp;M, connects customer data and people across the entire product development lifecycle from top floor to shop floor. Fusion 360, together with Autodesk Fusion 360 Manage with Upchain, and Prodsmart make up the initial cloud offerings within Autodesk Fusion.</li>
+</ul>
+<p>Underpinning these three clouds is Autodesk Platform Services, the set of cross-industry APIs and services formerly known as Forge.</p>
+</blockquote>
+<p><strong>Question:</strong> </p>
+<p><center>
+<img src="img/.png" alt="" title="" width="600"/> &lt;! 1229 x 733 --&gt;
+</center></p>
 <pre class="prettyprint">
 
 </pre>
 
-**Answer:** 
-
-**Response:** 
-
-
-Many thanks to ??? for rectifying that and sharing this nice topic and C++ solution.
-
-####<a name="3"></a> 
-
-
-####<a name="4"></a> 
-
+<p><strong>Answer:</strong> </p>
+<p><strong>Response:</strong> </p>
+<p>Many thanks to ??? for rectifying that and sharing this nice topic and C++ solution.</p>
+<h4><a name="3"></a></h4>
+<h4><a name="4"></a></h4>
