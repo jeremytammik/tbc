@@ -49,8 +49,13 @@
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+Autodesk University 2022 is in full swing and brings exciting news.
+Meanwhile, the Revit API discussion forum continues unperturbed with other equally exciting conversations and solutions
+&ndash; Forge is dead &ndash; long live APS
+&ndash; Forma for AEC
+&ndash; Linked element visibility
+&ndash; Visibility of a specific element in a view
+&ndash; Miter join walls to retrieve full faces...
 
 linkedin:
 
@@ -68,7 +73,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### APS, AU, and Miter for Full Face
+### APS, AU, and Miter Wall Join for Full Face
 
 [Autodesk University 2022](https://www.autodesk.com/autodesk-university) is
 in full swing and brings exciting news.
@@ -97,7 +102,7 @@ on [Autodesk University and Forge Data = unique opportunities!](https://forge.au
 
 ####<a name="3"></a> Forma for AEC
 
-Another new terms is Forma, the Autodesk industry cloud for AEC and BIM, as explained in
+Another new term is Forma, the Autodesk industry cloud for AEC and BIM, as explained in
 the news release [Autodesk paves path to digital transformation in the cloud](https://investors.autodesk.com/news-releases/news-release-details/autodesk-paves-path-digital-transformation-cloud):
 
 > Autodesk is supporting and advancing its customers' digital transformation journeys by connecting workflows in the cloud for better outcomes and workflows.
@@ -201,11 +206,10 @@ I was not aware of the `WallJoins` tool.
 
 Now, I can retrieve the full face from the boundary walls.
 
-Thank you so much!
-
-
 <center>
 <img src="img/spatial_element_geometry_full_face_6.png" alt="Full wall faces" title="Full wall faces" width="600"/> <!-- 860 x 749 -->
 </center>
+
+Thank you so much!
 
 Many thanks to Miguel and Richard for raising and solving this question.
