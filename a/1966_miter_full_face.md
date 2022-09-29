@@ -47,7 +47,7 @@
 
  twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+AU news, the Autodesk Platform Services and Forma for AEC, visibility of linke element and wall miter to retrieve full faces in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/miterwallface
 
 Autodesk University 2022 is in full swing and brings exciting news.
 Meanwhile, the Revit API discussion forum continues unperturbed with other equally exciting conversations and solutions
