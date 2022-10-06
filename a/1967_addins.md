@@ -41,6 +41,18 @@ An important solution to fix a problem loading BIM 360 links and lots of advice 
 
 linkedin:
 
+Solution for BIM 360 links not found, AppStore guidelines and coding Revit add-ins the e-verse way in the #RevitAPI
+
+https://autode.sk/addintips
+
+An important solution to fix a problem loading BIM 360 links and lots of advice on programming Revit add-ins in general:
+
+- New Revit material appearance asset
+- BIM 360 links not found solution
+- AppStore guidelines for Revit add-in
+- Coding Revit add-ins the e-verse way
+- VS wizard template location...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
