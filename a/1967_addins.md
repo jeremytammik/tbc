@@ -107,7 +107,7 @@ Many thanks to Luiz Henrique for documenting and sharing this important solution
 
 ####<a name="4"></a> AppStore Guidelines for Revit Add-In
 
-If you are thinking about programming a Revit add-in in general, and especially if your are thinking about the AppStore, you should check out the AppStore guidelines and its numerous useful general development recommendations:
+If you are thinking about programming a Revit add-in in general, and especially if you are thinking about the AppStore, you should check out the AppStore guidelines and its numerous useful general development recommendations:
 
 - [The Autodesk App Store &ndash; information for Revit developers](https://www.autodesk.com/developer-network/app-store/revit)
 
@@ -142,12 +142,12 @@ One of the templates mentioned above is the very simple and minimal
 C# and VB.
 
 I recently resolved an issue I had getting it to work on my system using Parallels on the Mac.
-My template was dispalyed, and I had a hard time discovering why.
+My template was displayed, and I had a hard time discovering why.
 For instance, the thread
 on how to [fix Visual Studio when templates disappear from your Add New Item dialogue](https://kwilson.io/blog/fix-visual-studio-when-templates-disappear-from-your-add-new-item-dialogue) did
 not help.
 
-Finally, I discoverd that some part of the Parallels setup had modified my VS project template location settings:
+Finally, I discovered that the Parallels setup had surreptitiously modified my VS project template location settings:
 
 <center>
 <iframe width="480" height="270" src="`://www.youtube.com/embed/gNnZZjbBVlU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
