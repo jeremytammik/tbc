@@ -99,3 +99,52 @@ Related references:
 
 Many thanks to Luiz Henrique for documenting and sharing this important solution!
 
+####<a name="4"></a> AppStore Guidelines for Revit Add-In
+
+- programming an add-in?
+  thinking about the AppStore?
+  check out the AppStore guidelines and many useful general development recommendations
+  [The Autodesk App Store &ndash; information for Revit developers](https://www.autodesk.com/developer-network/app-store/revit)
+
+####<a name="6"></a> Coding Revit Add-Ins the E-Verse Way
+
+A very comprehensive guide explaining many more complex and intricate aspects of Revit add-in coding is presented by
+Francisco Maranchello of [e-verse](https://e-verse.com) in his article
+on [coding Revit add-ins the e-verse way](https://blog.e-verse.com/build/coding-revit-add-ins-the-e-verse-way), saying:
+
+> I'm an architect and coder and have worked on many Revit addins these past few years, alongside other stuff like recently building and scaling [e-verse](https://e-verse.com/).
+I wanted to share an article we recently published on our blog to see if it could help the community, shedding some light on the structure we use for Revit addins:
+[blog.e-verse.com/build/coding-revit-add-ins-the-e-verse-way](https://blog.e-verse.com/build/coding-revit-add-ins-the-e-verse-way).
+I know you've covered this subject and shared many templates over the years since I've been a reader of The Building Coder for a while now, so I figured maybe we could contribute to that if you find anything you think can add value there.
+There's more to come as well.
+Thank you!
+
+Francisco covers the complete ecosystem including
+
+- Git code repository
+- A .NET Framework solution containing multiple projects
+- NuGet dependencies
+- Post-build events for debugging releasing 
+- A configuration file to manage settings and environment variables outside the main logic
+- CI/CD pipelines leveraging GitHub Actions
+
+Very many thanks to Francisco for sharing his experience and in-depth advice!
+
+####<a name="5"></a> VS Wizard Template Location
+
+One of the templates mentioned above is the very simple and minimal
+[Visual Studio Revit Add-in Template](https://github.com/jeremytammik/VisualStudioRevitAddinWizard) for
+C# and VB.
+
+I recently resolved an issue I had getting it to work on my system using Parallels on the Mac.
+My template was dispalyed, and I had a hard time discovering why.
+For instance, the thread
+on how to [fix Visual Studio when templates disappear from your Add New Item dialogue](https://kwilson.io/blog/fix-visual-studio-when-templates-disappear-from-your-add-new-item-dialogue) did
+not help.
+
+Finally, I discoverd that some part of the Parallels setup had modified my VS project template location settings:
+
+
+  a/img/vs_2019_project_template_location.png
+  https://github.com/jeremytammik/VisualStudioRevitAddinWizard/releases/tag/2023.0.0.0
+  added note to readme
