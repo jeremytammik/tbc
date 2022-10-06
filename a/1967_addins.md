@@ -26,10 +26,11 @@
 - Coding Revit add-ins: the e-verse way
   https://blog.e-verse.com/build/coding-revit-add-ins-the-e-verse-way
   > Hi Jeremy! Nice to "meet" you. I'm an architect/coder and have worked on many Revit addins these past few years, alongside other stuff like recently building and scaling e-verse (https://e-verse.com/). I wanted to share an article we recently published on our blog to see if it could help the community, shedding some light on the structure we use for Revit addins: https://blog.e-verse.com/build/coding-revit-add-ins-the-e-verse-way. I know you've covered this subject and shared many templates over the years since I've been a reader of The Building Coder for a while now, so I figured maybe we could contribute to that if you find anything you think can add value there. There's more to come as well. Thank you!
+  linkedin conversation with Francisco Maranchello, COO at e-verse, Cordoba, Córdoba, Argentina
 
  twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Solution for BIM 360 links not found, AppStore guidelines and coding Revit add-ins the e-verse way in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/addintips
 
 An important solution to fix a problem loading BIM 360 links and lots of advice on programming Revit add-ins in general
 &ndash; New Revit material appearance asset
