@@ -31,8 +31,12 @@
 
  in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+An important solution to fix a problem loading BIM 360 links and lots of advice on programming Revit add-ins in general
+&ndash; New Revit material appearance asset
+&ndash; BIM 360 links not found solution
+&ndash; AppStore guidelines for Revit add-in
+&ndash; Coding Revit add-ins the e-verse way
+&ndash; VS wizard template location...
 
 linkedin:
 
@@ -85,7 +89,7 @@ Now, if you have two copies of `Newtonsoft.Json` with the same version loaded in
 <img src="img/ricaun_bim360_link_cannot_load.png" alt="Cannot load BIM360 link" title="Cannot load BIM360 link" width="400"/> <!-- 802 x 603 -->
 </center>
 
-A quick fix would be to remove or change the name of the 'Newtonsoft.Json.dll' file in the Autodesk `PnIDModeler` add-in.
+A quick fix would be to remove or change the name of the `Newtonsoft.Json.dll` file in the Autodesk `PnIDModeler` add-in.
 
 Or, if you are a developer using an old version like version 9, it should work; Revit will load the default version instead. But if you need to use a specific version of `Newtonsoft.Json`, be aware that it could cause some issues in Revit.
 
