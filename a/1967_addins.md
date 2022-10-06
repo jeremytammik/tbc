@@ -52,7 +52,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### BIM360 Links and Programming Add-Ins
 
-Today, we share Naveen Kumar T's first Revit API blog post, an important solution to fix a problem loading BIM 360 links, and several different aspects of programming Revit add-0ins in general
+Today, we share Naveen Kumar T's first Revit API blog post, an important solution to fix a problem loading BIM 360 links, and lots of tools and advice on programming Revit add-ins in general:
+
+- [New Revit material appearance asset](#2)
+- [BIM 360 links not found solution](#3)
+- [AppStore guidelines for Revit add-in](#4)
+- [Coding Revit add-ins the e-verse way](#5)
+- [VS wizard template location](#6)
 
 ####<a name="2"></a> New Revit Material Appearance Asset
 
@@ -129,7 +135,7 @@ Francisco covers the complete add-in ecosystem including:
 
 Very many thanks to Francisco for sharing his experience and in-depth advice!
 
-####<a name="5"></a> VS Wizard Template Location
+####<a name="6"></a> VS Wizard Template Location
 
 One of the templates mentioned above is the very simple and minimal
 [Visual Studio Revit Add-in Template](https://github.com/jeremytammik/VisualStudioRevitAddinWizard) for
