@@ -64,7 +64,7 @@ the <a href="https://adndevblog.typepad.com/aec">DAS AEC DevBlog</a> showing
 how to <a href="https://adndevblog.typepad.com/aec/2022/10/setting-appearanceasset-properties-of-newly-created-revit-material.html">set <code>AppearanceAsset</code> properties of a newly created Revit material</a>.</p>
 <p>Many thanks to Naveen, and looking forward to many future posts.</p>
 <h4><a name="3"></a> BIM 360 Links Not Found Solution</h4>
-<p>Luiz Henrique <a href="https://github.com/ricaun">@ricaun</a> Cassettari shared a very helpful 
+<p>Luiz Henrique <a href="https://github.com/ricaun">@ricaun</a> Cassettari shared a helpful 
 <a href="https://forums.autodesk.com/t5/revit-api-forum/bim-360-links-not-found-fix/td-p/11463147">BIM 360 links not found fix</a>:</p>
 <p>A user reports to me that some of my plugins had problems with BIM360 links; after testing a lot of things, I found out what is causing the problem. It's a known problem here in the forum. It is caused by referencing a higher version of the <code>Newtonsoft.Json</code> package.</p>
 <p>In Revit 2021, the default version of <code>Newtonsoft.Json</code> is 11; when an application or plugin requests to load <code>Newtonsoft.Json</code> version 13 and it is not found in the plugins folder, something strange happens.</p>
@@ -75,10 +75,10 @@ how to <a href="https://adndevblog.typepad.com/aec/2022/10/setting-appearanceass
 </center></p>
 <p>A quick fix would be to remove or change the name of the 'Newtonsoft.Json.dll' file in the Autodesk <code>PnIDModeler</code> add-in.</p>
 <p>Or, if you are a developer using an old version like version 9, it should work; Revit will load the default version instead. But if you need to use a specific version of <code>Newtonsoft.Json</code>, be aware that it could cause some issues in Revit.</p>
-<p>Here is a seven-minute video
+<p>Here is Luiz' seven-minute video explanation 
 on <a href="https://youtu.be/gNnZZjbBVlU">how to fix BIM360 link not found problem</a>:</p>
 <p><center></p>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/gNnZZjbBVlU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/gNnZZjbBVlU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <p></center></p>
 <p>Related references:</p>
 <ul>
@@ -89,7 +89,8 @@ on <a href="https://youtu.be/gNnZZjbBVlU">how to fix BIM360 link not found probl
 </ul>
 <p>Many thanks to Luiz Henrique for documenting and sharing this important solution!</p>
 <h4><a name="4"></a> AppStore Guidelines for Revit Add-In</h4>
-<p>If you are thinking about programming a Revit add-in in general, and especially if you are thinking about the AppStore, you should check out the AppStore guidelines and its numerous useful general development recommendations:</p>
+<p>Now, let's move on to some generic add-in hints:
+if you are thinking about programming a Revit add-in at all, and especially if you are thinking about the AppStore, you should check out the AppStore guidelines and its numerous useful general development recommendations:</p>
 <ul>
 <li><a href="https://www.autodesk.com/developer-network/app-store/revit">The Autodesk App Store &ndash; information for Revit developers</a></li>
 </ul>
@@ -117,7 +118,7 @@ Thank you!</p>
 <p>Very many thanks to Francisco for sharing his experience and in-depth advice!</p>
 <h4><a name="6"></a> VS Wizard Template Location</h4>
 <p>One of the templates mentioned above is the very simple and minimal
-<a href="https://github.com/jeremytammik/VisualStudioRevitAddinWizard">Visual Studio Revit Add-in Template</a> for
+<a href="https://github.com/jeremytammik/VisualStudioRevitAddinWizard">Visual Studio Revit add-in template</a> for
 C# and VB.</p>
 <p>I recently resolved an issue I had getting it to work on my system using Parallels on the Mac.
 My template was displayed, and I had a hard time discovering why.
@@ -125,11 +126,8 @@ For instance, the thread
 on how to <a href="https://kwilson.io/blog/fix-visual-studio-when-templates-disappear-from-your-add-new-item-dialogue">fix Visual Studio when templates disappear from your Add New Item dialogue</a> did
 not help.</p>
 <p>Finally, I discovered that the Parallels setup had surreptitiously modified my VS project template location settings:</p>
-<p><center></p>
-<iframe width="480" height="270" src="`://www.youtube.com/embed/gNnZZjbBVlU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-<p></center></p>
 <p><center>
-<img src="img/vs_2019_project_template_location.png" alt="Visual Studio project template location" title="Visual Studio project template location" width="400"/> <!-- 1276 x 870 -->
+<img src="img/vs_2019_project_template_location.png" alt="Visual Studio project template location" title="Visual Studio project template location" width="600"/> <!-- 1276 x 870 -->
 </center></p>
 <p>Once that was understood, the issue was easy to resolve, setting the location back to the default folder on the C: drive.</p>
 <p>I also added a corresponding note to the <a href="https://github.com/jeremytammik/VisualStudioRevitAddinWizard#user-project-template-location">readme</a> for

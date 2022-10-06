@@ -70,7 +70,7 @@ Many thanks to Naveen, and looking forward to many future posts.
 
 ####<a name="3"></a> BIM 360 Links Not Found Solution 
 
-Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari shared a very helpful 
+Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari shared a helpful 
 [BIM 360 links not found fix](https://forums.autodesk.com/t5/revit-api-forum/bim-360-links-not-found-fix/td-p/11463147):
 
 A user reports to me that some of my plugins had problems with BIM360 links; after testing a lot of things, I found out what is causing the problem. It's a known problem here in the forum. It is caused by referencing a higher version of the `Newtonsoft.Json` package.
@@ -89,11 +89,11 @@ A quick fix would be to remove or change the name of the 'Newtonsoft.Json.dll' f
 
 Or, if you are a developer using an old version like version 9, it should work; Revit will load the default version instead. But if you need to use a specific version of `Newtonsoft.Json`, be aware that it could cause some issues in Revit.
 
-Here is a seven-minute video
+Here is Luiz' seven-minute video explanation 
 on [how to fix BIM360 link not found problem](https://youtu.be/gNnZZjbBVlU):
 
 <center>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/gNnZZjbBVlU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/gNnZZjbBVlU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </center>
 
 Related references:
@@ -107,7 +107,8 @@ Many thanks to Luiz Henrique for documenting and sharing this important solution
 
 ####<a name="4"></a> AppStore Guidelines for Revit Add-In
 
-If you are thinking about programming a Revit add-in in general, and especially if you are thinking about the AppStore, you should check out the AppStore guidelines and its numerous useful general development recommendations:
+Now, let's move on to some generic add-in hints:
+if you are thinking about programming a Revit add-in at all, and especially if you are thinking about the AppStore, you should check out the AppStore guidelines and its numerous useful general development recommendations:
 
 - [The Autodesk App Store &ndash; information for Revit developers](https://www.autodesk.com/developer-network/app-store/revit)
 
@@ -138,7 +139,7 @@ Very many thanks to Francisco for sharing his experience and in-depth advice!
 ####<a name="6"></a> VS Wizard Template Location
 
 One of the templates mentioned above is the very simple and minimal
-[Visual Studio Revit Add-in Template](https://github.com/jeremytammik/VisualStudioRevitAddinWizard) for
+[Visual Studio Revit add-in template](https://github.com/jeremytammik/VisualStudioRevitAddinWizard) for
 C# and VB.
 
 I recently resolved an issue I had getting it to work on my system using Parallels on the Mac.
@@ -150,11 +151,7 @@ not help.
 Finally, I discovered that the Parallels setup had surreptitiously modified my VS project template location settings:
 
 <center>
-<iframe width="480" height="270" src="`://www.youtube.com/embed/gNnZZjbBVlU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</center>
-
-<center>
-<img src="img/vs_2019_project_template_location.png" alt="Visual Studio project template location" title="Visual Studio project template location" width="400"/> <!-- 1276 x 870 -->
+<img src="img/vs_2019_project_template_location.png" alt="Visual Studio project template location" title="Visual Studio project template location" width="600"/> <!-- 1276 x 870 -->
 </center>
 
 Once that was understood, the issue was easy to resolve, setting the location back to the default folder on the C: drive.
