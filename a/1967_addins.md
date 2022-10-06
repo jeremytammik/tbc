@@ -101,14 +101,13 @@ Many thanks to Luiz Henrique for documenting and sharing this important solution
 
 ####<a name="4"></a> AppStore Guidelines for Revit Add-In
 
-- programming an add-in?
-  thinking about the AppStore?
-  check out the AppStore guidelines and many useful general development recommendations
-  [The Autodesk App Store &ndash; information for Revit developers](https://www.autodesk.com/developer-network/app-store/revit)
+If you are thinking about programming a Revit add-in in general, and especially if your are thinking about the AppStore, you should check out the AppStore guidelines and its numerous useful general development recommendations:
 
-####<a name="6"></a> Coding Revit Add-Ins the E-Verse Way
+- [The Autodesk App Store &ndash; information for Revit developers](https://www.autodesk.com/developer-network/app-store/revit)
 
-A very comprehensive guide explaining many more complex and intricate aspects of Revit add-in coding is presented by
+####<a name="5"></a> Coding Revit Add-Ins the E-Verse Way
+
+Going much further and on into the modern development process, a comprehensive guide explaining more complex and intricate aspects of Revit add-in coding is presented by
 Francisco Maranchello of [e-verse](https://e-verse.com) in his article
 on [coding Revit add-ins the e-verse way](https://blog.e-verse.com/build/coding-revit-add-ins-the-e-verse-way), saying:
 
@@ -119,12 +118,12 @@ I know you've covered this subject and shared many templates over the years sinc
 There's more to come as well.
 Thank you!
 
-Francisco covers the complete ecosystem including
+Francisco covers the complete add-in ecosystem including:
 
 - Git code repository
-- A .NET Framework solution containing multiple projects
+- A .NET framework solution containing multiple projects
 - NuGet dependencies
-- Post-build events for debugging releasing 
+- Post-build events for debugging and releasing 
 - A configuration file to manage settings and environment variables outside the main logic
 - CI/CD pipelines leveraging GitHub Actions
 
@@ -144,7 +143,15 @@ not help.
 
 Finally, I discoverd that some part of the Parallels setup had modified my VS project template location settings:
 
+<center>
+<iframe width="480" height="270" src="`://www.youtube.com/embed/gNnZZjbBVlU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
 
-  a/img/vs_2019_project_template_location.png
-  https://github.com/jeremytammik/VisualStudioRevitAddinWizard/releases/tag/2023.0.0.0
-  added note to readme
+<center>
+<img src="img/vs_2019_project_template_location.png" alt="Visual Studio project template location" title="Visual Studio project template location" width="400"/> <!-- 1276 x 870 -->
+</center>
+
+Once that was understood, the issue was easy to resolve, setting the location back to the default folder on the C: drive.
+
+I also added a corresponding note to the [readme](https://github.com/jeremytammik/VisualStudioRevitAddinWizard#user-project-template-location) for
+my own and others' future reference.
