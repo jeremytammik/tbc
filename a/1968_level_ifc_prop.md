@@ -125,15 +125,13 @@ might help, including and not limited to:
 
 ####<a name="4"></a> IFC Custom Properties in Revit
 
-Eason recently addressed another important IFC related question:
+Eason also recently addressed another important IFC related question:
 
 **Question:** Can the Revit API be used to add custom properties in an IFC file opened in Revit?
 Can Revit export this IFC with those new properties?
-Do you know if DGN supports changing or adding properties?
-Is it viable using Revit API?
 
 **Answer:** There is no direct way in Revit to add custom properties to IFC.
-However, it can be achieved through the following:
+However, it can be achieved indirectly through the following steps:
 
 - Open the IFC model with Revit’s OpenIFC
 (API: [Application.OpenIFCDocument](https://www.revitapidocs.com/2023/bb14933b-a758-2b34-b160-686a28cc48cb.htm)) to
