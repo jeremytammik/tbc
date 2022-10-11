@@ -88,6 +88,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ###Element Level and IFC Properties 
 
+Today, we mention another publisher of Revit API tutorials and add-ins, some tips on handling IFC, and recent discussions on controlling the level of BIM elements:
+
 - [TwentyTwo add-ins and tutorials](#2)
 - [IFC tips for APS and Forge](#3)
 - [IFC custom properties in Revit](#4)
@@ -218,7 +220,7 @@ $ tbcsh_search.py level
 
 **Question:** I'm placing a new face-based family instance into my Revit model with the help of the NewFamilyInstance method taking (Face, XYZ, XYZ, FamilySymbol).
 This works fine, except the instance does not have its level set to that of the host; it's set to -1 in the API and just left blank in the UI.
-I tried setting the level like such usng the placed instance `LevelId` property and also tried setting its `BuiltInParameter` `FAMILY_LEVEL_PARAM`.
+I tried setting the level like such using the placed instance `LevelId` property and also tried setting its `BuiltInParameter` `FAMILY_LEVEL_PARAM`.
 Both throw an error saying the parameter is read-only.
 
 **Answer:** On some elements, the element level can only be set during the creation of the element.
@@ -233,7 +235,7 @@ Another potentially helpful suggestion came up on the blog:
 
 ####<a name="6"></a> Set Level in NewFamilyInstance
 
-Xikes shared a valusable observation in
+Xikes shared a valuable observation in
 their [comment](https://thebuildingcoder.typepad.com/blog/2011/01/family-instance-missing-level-property.html#comment-5925189938)
 on [family instance missing `Level` property](https://thebuildingcoder.typepad.com/blog/2011/01/family-instance-missing-level-property.html):
 

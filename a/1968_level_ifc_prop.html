@@ -86,6 +86,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Element Level and IFC Properties</h3>
+<p>Today, we mention another publisher of Revit API tutorials and add-ins, some tips on handling IFC, and recent discussions on controlling the level of BIM elements:</p>
 <ul>
 <li><a href="#2">TwentyTwo add-ins and tutorials</a></li>
 <li><a href="#3">IFC tips for APS and Forge</a></li>
@@ -206,7 +207,7 @@ $ tbcsh_search.py level
 
 <p><strong>Question:</strong> I'm placing a new face-based family instance into my Revit model with the help of the NewFamilyInstance method taking (Face, XYZ, XYZ, FamilySymbol).
 This works fine, except the instance does not have its level set to that of the host; it's set to -1 in the API and just left blank in the UI.
-I tried setting the level like such usng the placed instance <code>LevelId</code> property and also tried setting its <code>BuiltInParameter</code> <code>FAMILY_LEVEL_PARAM</code>.
+I tried setting the level like such using the placed instance <code>LevelId</code> property and also tried setting its <code>BuiltInParameter</code> <code>FAMILY_LEVEL_PARAM</code>.
 Both throw an error saying the parameter is read-only.</p>
 <p><strong>Answer:</strong> On some elements, the element level can only be set during the creation of the element.
 For that, I would assume that you need to use a different <a href="https://www.revitapidocs.com/2017/0c0d640b-7810-55e4-3c5e-cd295dede87b.htm">overload of the <code>NewFamilyInstance</code> method</a>.
@@ -218,7 +219,7 @@ Please refer to this explanation by The Building Coder and a few recent discussi
 </ul>
 <p>Another potentially helpful suggestion came up on the blog:</p>
 <h4><a name="6"></a> Set Level in NewFamilyInstance</h4>
-<p>Xikes shared a valusable observation in
+<p>Xikes shared a valuable observation in
 their <a href="https://thebuildingcoder.typepad.com/blog/2011/01/family-instance-missing-level-property.html#comment-5925189938">comment</a>
 on <a href="https://thebuildingcoder.typepad.com/blog/2011/01/family-instance-missing-level-property.html">family instance missing <code>Level</code> property</a>:</p>
 <p>For those who are still stuck with this problem even when using the correct overload:</p>
