@@ -89,9 +89,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ###Element Level and IFC Properties 
 
 
-####<a name="2"></a> 
+####<a name="2"></a> TwentyTwo
 
-Many thanks to , and looking forward to many future posts.
+According to its own mission statement, 
+[TwentyTwo](https://twentytwo.space) is creating forever free Autodesk add-ins that help you do more with less time and effort,
+delivering efficient applications, as simple as possible, to handle tedious tasks and complex operations.
+Besides the [TwentyTwo blog](https://twentytwo.space),
+they also share add-ins and API tutorials for both 
+[Navisworks](https://twentytwo.space/navisworks-add-ins-development) and
+[Revit](https://twentytwo.space/revit-add-in-development).
+
+Many thanks to [Min Naung](https://twentytwo.space/author/mgjean) for putting together and sharing this material!
 
 ####<a name="3"></a> 
 
