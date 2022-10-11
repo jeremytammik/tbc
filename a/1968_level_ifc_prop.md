@@ -161,37 +161,92 @@ know how to construct IFCExportOptions for API)
 
 Many thanks to Eason for the useful explanation!
 
+####<a name="4"></a> Set Level Id of Existing Element
 
+Returning to pure desktop Revit API topics, several discussions recently in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) circled
+around setting the level of an existing element, e.g.:
 
+<!--
 
+[`LevelId` is null](https://forums.autodesk.com/t5/revit-api-forum/levelid-is-null/m-p/11392692) and
+how to [change level on line based family](https://forums.autodesk.com/t5/revit-api-forum/change-level-on-line-based-family/m-p/10307454).
 
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 802 x 603 -->
-</center>
-
-- https://thebuildingcoder.typepad.com/blog/2011/01/family-instance-missing-level-property.html#comment-5925189938
-xikes
-For those who are still stuck with this problem even when using the correct overload:
-public FamilyInstance NewFamilyInstance(
-XYZ location,
-FamilySymbol symbol,
-Element host,
-StructuralType structuralType
-)
-It is essential to pass in the function parameter host as a Level and not as an Element.
-Add a quick cast like (Level)MyHostElement and it should do the trick and the Level parameter is created properly and is not read-only.
-Keep in mind, this will screw up the offset values, but you can adjust those afterwards.
-
-- set level id of existing element
 $ tbcsh_search.py level
-https://forums.autodesk.com/t5/revit-api-forum/levelid-is-null/m-p/11392692
-https://forums.autodesk.com/t5/revit-api-forum/change-level-on-line-based-family/m-p/10307454
-[Q] I'm placing a new face-based family instance into my Revit model with the help of the NewFamilyInstance method taking (Face, XYZ, XYZ, FamilySymbol).
+
+0079 0107 0301 0333 0340 0346 0383 0464 0525 0716 0830 0840 0860 0903 0904 0938 1093 1107 1158 1246 1311 1406 1429 1529 1537 1551 1728 1732 1737 1828 1850 1917
+
+- [Walls and Doors on Two Levels](http://thebuildingcoder.typepad.com/blog/2009/01/walls-and-doors-on-two-levels.html)
+- [Create Room on Level in Phase](http://thebuildingcoder.typepad.com/blog/2009/03/create-room-on-level-in-phase.html)
+- [Detail Curve on Level](http://thebuildingcoder.typepad.com/blog/2010/02/detail-curve-on-level.html)
+- [Collector Benchmark](http://thebuildingcoder.typepad.com/blog/2010/04/collector-benchmark.html)
+- [Element Level Events](http://thebuildingcoder.typepad.com/blog/2010/04/element-level-events.html)
+- [Retrieve Stairs on Level](http://thebuildingcoder.typepad.com/blog/2010/04/retrieve-stairs-on-level.html)
+- [Parameter Filter](http://thebuildingcoder.typepad.com/blog/2010/06/parameter-filter.html)
+- [Level Filter Benchmark](http://thebuildingcoder.typepad.com/blog/2010/10/level-filter-benchmark.html)
+- [Family Instance Missing Level Property](http://thebuildingcoder.typepad.com/blog/2011/01/family-instance-missing-level-property.html)
+- [Level Generator ADN Plugin of the Month](http://thebuildingcoder.typepad.com/blog/2012/02/level-generator-adn-plugin-of-the-month.html)
+- [Mobile Device Room Location](http://thebuildingcoder.typepad.com/blog/2012/09/mobile-device-room-location.html)
+- [UIView, Windows Coordinates, ReferenceIntersector and My Own Tooltip](http://thebuildingcoder.typepad.com/blog/2012/10/uiview-windows-coordinates-referenceintersector-and-my-own-tooltip.html)
+- [Building Performance Analysis and Face Tessellation](http://thebuildingcoder.typepad.com/blog/2012/11/building-performance-analysis-and-face-tessellation.html)
+- [What's New in the Revit 2012 API](http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2012-api.html)
+- [What's New in the Revit 2013 API](http://thebuildingcoder.typepad.com/blog/2013/03/whats-new-in-the-revit-2013-api.html)
+- [What's New in the Revit 2014 API](http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html)
+- [Final Rolling Offset Using Pipe.Create](http://thebuildingcoder.typepad.com/blog/2014/01/final-rolling-offset-using-pipecreate.html)
+- [Different Revit API Aspects and Features](http://thebuildingcoder.typepad.com/blog/2014/02/different-revit-api-aspects-and-features.html)
+- [Views Displaying Given Element, SVG and NoSQL](http://thebuildingcoder.typepad.com/blog/2014/05/views-displaying-given-element-svg-and-nosql.html)
+- [WebGL Goes Mobile and Sorted Level Retrieval](http://thebuildingcoder.typepad.com/blog/2014/11/webgl-goes-mobile-and-sorted-level-retrieval.html)
+- [What's New in the Revit 2016 API](http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html)
+- [IFC Import Levels and MEP Element Shapes](http://thebuildingcoder.typepad.com/blog/2016/02/ifc-import-levels-and-mep-element-shapes.html)
+- [Reference Stable Representation Magic Voodoo](http://thebuildingcoder.typepad.com/blog/2016/04/stable-reference-string-magic-voodoo.html)
+- [RevitLookup with Reflection Cleanup](http://thebuildingcoder.typepad.com/blog/2017/02/revitlookup-with-reflection-cleanup.html)
+- [Events, UV Coordinates and Rooms on Level](http://thebuildingcoder.typepad.com/blog/2017/03/events-uv-coordinates-and-rooms-on-level.html)
+- [What's New in the Revit 2018 API](http://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-revit-2018-api.html)
+- [Assigning a Level to an Element Missing It](https://thebuildingcoder.typepad.com/blog/2019/03/assigning-a-level-to-an-element-missing-it.html)
+- [Forge Picture, Debugging, Snooping Appearances](https://thebuildingcoder.typepad.com/blog/2019/03/-architecture-edit-and-continue-snooping-appearance-assets.html)
+- [Set Floor Level and Use IPC for Disentanglement](https://thebuildingcoder.typepad.com/blog/2019/04/set-floor-level-and-use-ipc-for-disentanglement.html)
+- [Panel Schedule Slots and Changing Room Level](https://thebuildingcoder.typepad.com/blog/2020/03/panel-schedule-slots-and-change-room-level.html)
+- [Creating Material Texture and Retaining Pixels](https://thebuildingcoder.typepad.com/blog/2020/06/creating-material-texture-and-retaining-pixels.html)
+- [View Sheet from View and Select All on Level](https://thebuildingcoder.typepad.com/blog/2021/09/view-sheet-from-view-and-select-all-on-level.html)
+
+-->
+
+**Question:** I'm placing a new face-based family instance into my Revit model with the help of the NewFamilyInstance method taking (Face, XYZ, XYZ, FamilySymbol).
 This works fine, except the instance does not have its level set to that of the host; it's set to -1 in the API and just left blank in the UI.
 I tried setting the level like such usng the placed instance `LevelId` property and also tried setting its `BuiltInParameter` `FAMILY_LEVEL_PARAM`.
 Both throw an error saying the parameter is read-only.
-[A] On some elements, the element level can only be set during the creation of the element. For that, I would assume that you need to use a different [overload of the `NewFamilyInstance` method](https://www.revitapidocs.com/2017/0c0d640b-7810-55e4-3c5e-cd295dede87b.htm). Please refer to this explanation by The Building Coder and a few recent discussions of related topics in the Revit API discussion forum:
+
+**Answer:** On some elements, the element level can only be set during the creation of the element.
+For that, I would assume that you need to use a different [overload of the `NewFamilyInstance` method](https://www.revitapidocs.com/2017/0c0d640b-7810-55e4-3c5e-cd295dede87b.htm).
+Please refer to this explanation by The Building Coder and a few recent discussions of related topics in the Revit API discussion forum:
+
 - [Change level of existing element](https://thebuildingcoder.typepad.com/blog/2020/06/creating-material-texture-and-retaining-pixels.html#4)
 - [LevelId is null](https://forums.autodesk.com/t5/revit-api-forum/levelid-is-null/m-p/11392692)
 - [Change level on line based family](https://forums.autodesk.com/t5/revit-api-forum/change-level-on-line-based-family/m-p/10307454)
 
+Another potentially helpful suggestion came up on the blog:
+
+####<a name="5"></a> Set Level in NewFamilyInstance
+
+Xikes shared a valusable observation in
+their [comment](https://thebuildingcoder.typepad.com/blog/2011/01/family-instance-missing-level-property.html#comment-5925189938)
+on [family instance missing `Level` property](https://thebuildingcoder.typepad.com/blog/2011/01/family-instance-missing-level-property.html):
+
+For those who are still stuck with this problem even when using the correct overload:
+
+<pre class="code">
+  public FamilyInstance NewFamilyInstance(
+    XYZ location,
+    FamilySymbol symbol,
+    Element host, 
+    StructuralType structuralType )
+</pre>
+
+It is essential to pass in the function parameter `host` as a `Level` and not as an `Element`.
+Add a quick cast like `(Level) myHostElement`.
+It should do the trick.
+The `Level` parameter is created properly and is not read-only.
+Keep in mind that this will screw up the offset values, but you can adjust those afterwards.
+
+It would be very helpful if other developers could confirm this observation.
+Thank you.
