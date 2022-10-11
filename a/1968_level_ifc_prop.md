@@ -116,23 +116,24 @@ might help, including and not limited to:
 - 3rd-party IFC viewers
 - Show All Presentations
 
+####<a name="3"></a> IFC Custom Properties
 
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 802 x 603 -->
-</center>
+Eason recently addressed another important IFC related question:
 
--  by Eason Kang
-https://twitter.com/AutodeskForge/status/1567800161983676416?s=20&t=qIK9wsdnKoIEA7_oVygclw
+**Question:** Can the Revit API be used to add custom properties in an IFC file opened in Revit?
+Can Revit export this IFC with those new properties?
+Do you know if DGN supports changing or adding properties?
+Is it viable using Revit API?
 
-- [Q] Can Revit API add custom properties in an IFC file opened in Revit? Can Revit export this IFC with those new properties?
-[A] Do you know if DGN supports changing or adding properties? Is it viable using Revit API?
-Eason Kang
-For adding custom props to IFC, there is no direct way with Revit. We need to the below to achieve that:
-Open the IFC model with Revit’s OpenIFC (API: Application.OpenIFCDocument) to convert IFC to RVT
-Add customer props by share parameters and give values (sample code from Jeremy)
-Define custom Property Sets for IFC (here is a tutorial video from 3rd-party or check this AKN page)
-Specify the custom Property Sets in IFC export setup (See userDefinedPSets in Revit IFC repo to know how to construct IFCExportOptions for API)
-Export the modified RVT to IFC (API: Document.Export)
+**Answer:** There is no direct way in Revit to add custom properties to IFC.
+However, it can be achieved through the following:
+
+- Open the IFC model with Revit’s OpenIFC (API: `Application.OpenIFCDocument`) to convert IFC to RVT
+- Add customer properties by adding shared parameters and specifying values for them (sample code from The Building Coder)
+- Define custom Property Sets for IFC (here is a tutorial video from 3rd-party or check this AKN page)
+- Specify the custom Property Sets in IFC export setup (See userDefinedPSets in Revit IFC repo to know how to construct IFCExportOptions for API)
+- Export the modified RVT to IFC (API: Document.Export)
+
 custom Property Sets in IFC export setup.png
 Demo-Added custom prop `FM ID` in IFC.png
 Imported IFC in Navisworks.png
@@ -145,6 +146,13 @@ ifc_custom_property_3_nw_import.png
 ifc_custom_property_4_content.png
 ifc_custom_property_5_forge.png
 Hey @Eason Kang thank you for the nice explanation on adding
+
+
+
+
+<center>
+<img src="img/.png" alt="" title="" width="100"/> <!-- 802 x 603 -->
+</center>
 
 - https://thebuildingcoder.typepad.com/blog/2011/01/family-instance-missing-level-property.html#comment-5925189938
 xikes
