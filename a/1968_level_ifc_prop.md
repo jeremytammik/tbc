@@ -128,24 +128,39 @@ Is it viable using Revit API?
 **Answer:** There is no direct way in Revit to add custom properties to IFC.
 However, it can be achieved through the following:
 
-- Open the IFC model with Revit’s OpenIFC (API: `Application.OpenIFCDocument`) to convert IFC to RVT
-- Add customer properties by adding shared parameters and specifying values for them (sample code from The Building Coder)
-- Define custom Property Sets for IFC (here is a tutorial video from 3rd-party or check this AKN page)
-- Specify the custom Property Sets in IFC export setup (See userDefinedPSets in Revit IFC repo to know how to construct IFCExportOptions for API)
-- Export the modified RVT to IFC (API: Document.Export)
+- Open the IFC model with Revit’s OpenIFC
+(API: [Application.OpenIFCDocument](https://www.revitapidocs.com/2023/bb14933b-a758-2b34-b160-686a28cc48cb.htm)) to
+convert IFC to RVT
+- Add customer properties by adding shared parameters and specifying values for them
+([sample code](https://github.com/jeremytammik/FireRatingCloud/blob/master/FireRatingCloud/Cmd_1_CreateAndBindSharedParameter.cs) from
+The Building Coder)
+- Define custom Property Sets for IFC (here is a [tutorial video from 3rd-party](https://youtu.be/SswHKtcM3mI) or
+check this [AKN page](https://knowledge.autodesk.com/search-result/caas/simplecontent/content/export-custom-bim-standards-and-property-sets-to-ifc.html))
+- Specify the custom Property Sets in IFC export setup
+(See [userDefinedPSets in Revit IFC repo](https://github.com/Autodesk/revit-ifc/blob/df1485b9accd598c2912a055af205ee1b03648c7/Source/IFCExporterUIOverride/IFCExportConfiguration.cs#L425) to
+know how to construct IFCExportOptions for API)
+- Export the modified RVT to IFC
+(API: [Document.Export](https://www.revitapidocs.com/2023/7efa4eb3-8d94-b8e7-f608-3dbae751331d.htm))
 
-custom Property Sets in IFC export setup.png
-Demo-Added custom prop `FM ID` in IFC.png
-Imported IFC in Navisworks.png
-Content of my user define property set.png
-In Forge Viewer
-Screen Shot 2022-07-14 at 10.49.50 AM.png 
-ifc_custom_property_1_export_setup.png
-ifc_custom_property_2_added_fm_id.png
-ifc_custom_property_3_nw_import.png
-ifc_custom_property_4_content.png
-ifc_custom_property_5_forge.png
-Hey @Eason Kang thank you for the nice explanation on adding
+<center>
+<img src="img/ifc_custom_property_1_export_setup.png" alt="Custom property sets in IFC export setup" title="Custom property sets in IFC export setup" width="600" height=""/> <!-- 872 x 556 -->
+<p style="font-size: 80%; font-style:italic">Custom property sets in IFC export setup</p>
+
+<img src="img/ifc_custom_property_2_added_fm_id.png" alt="Demo-added custom prop `FM ID` in IFC" title="Demo-added custom prop `FM ID` in IFC" width="600" height=""/> <!-- 2032 x 1167 -->
+<p style="font-size: 80%; font-style:italic">Demo-added custom prop `FM ID` in IFC</p>
+
+<img src="img/ifc_custom_property_3_nw_import.png" alt="Imported IFC in Navisworks" title="Imported IFC in Navisworks" width="600" height=""/> <!-- 1920 x 1055 -->
+<p style="font-size: 80%; font-style:italic">Imported IFC in Navisworks</p>
+
+<img src="img/ifc_custom_property_4_content.png" alt="Content of user defined property set" title="Content of user defined property set" width="600" height=""/> <!-- 1429 x 725 -->
+<p style="font-size: 80%; font-style:italic">Content of user defined property set</p>
+
+<img src="img/ifc_custom_property_5_forge.png" alt="Forge Viewer" title="Forge Viewer" width="600" height=""/> <!-- 1583 x 982 -->
+<p style="font-size: 80%; font-style:italic">Forge Viewer</p>
+</center>
+
+Many thanks to Eason for the useful explanation!
+
 
 
 
