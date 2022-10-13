@@ -65,7 +65,7 @@
 
  twitter:
 
- in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+Tips on IFC custom properties in APS, Forge and Revit and how to control the level of BIM elements, existing and new, in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/ifcproperties
 
 Tips on handling IFC and recent discussions on controlling the level of BIM elements
 &ndash; TwentyTwo add-ins and tutorials
