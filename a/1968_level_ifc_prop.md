@@ -76,6 +76,16 @@ Tips on handling IFC and recent discussions on controlling the level of BIM elem
 
 linkedin:
 
+Tips on IFC custom properties in APS, Forge and Revit and how to control the level of BIM elements, existing and new, in the #RevitAPI
+
+https://autode.sk/ifcproperties
+
+- TwentyTwo add-ins and tutorials
+- IFC tips for APS and Forge
+- IFC custom properties in Revit
+- Set level id of existing element
+- Set level in NewFamilyInstance...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
