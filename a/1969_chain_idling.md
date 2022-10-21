@@ -57,8 +57,13 @@ https://forums.autodesk.com/t5/revit-api-forum/can-you-chain-idling-events/m-p/1
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+AU 2022 classes are available online now, as well as a new Dynamo book and resources project.
+I also present some ongoing nitty-gritty discussions on external events and `Idling`
+&ndash; Modern add-in deployment and testing
+&ndash; Parametric curvature in families
+&ndash; Awesome Dynamo online book project
+&ndash; Launching command after closing form
+&ndash; Chaining Idling events and other solutions...
 
 linkedin:
 
@@ -116,7 +121,7 @@ We’ll work primarily in the traditional Family Editor but most techniques appl
 Chuong Ho [initiated](https://www.linkedin.com/posts/chuongmep_dynamo-bim-developer-activity-6984467588034543616-U7b6)
 the online book project Awesome Dynamo.
 
-> The Awesome Dynamo project celebrates and aggregates authors, essential and complete content with a large contribution from the community, the main purpose of which is to store dynamo core values and make it easy to learn, apply to work and explore power of Dynamo.
+> The Awesome Dynamo project celebrates and aggregates authors, essential and complete content with a large contribution from the community, the main purpose of which is to store Dynamo core values and make it easy to learn, apply to work and explore power of Dynamo.
 
 > I'm in the process of working and perfecting it, so please help me if you can:
 
