@@ -128,63 +128,49 @@ Several recent [Revit API discussion forum](http://forums.autodesk.com/t5/revit-
 deal with questions on chaining sequences of functionality, e.g.,
 [I would like to launch a command after the export file form closes](https://forums.autodesk.com/t5/revit-api-forum/i-would-like-to-launch-a-command-after-the-export-file-form/td-p/11494782):
 
-**Question:** 
+**Question:** I have a custom button that launches the DXF Export window.
+I would like to be able to Launch another method after the Export window is closed.
+Currently, my code opens the Export Form and then launches my other method, but I need the second method to process using information from the form.
+Is there a way to do this? 
 
-**Answer:** 
+**Answer:** The standard Revit API approach to launch a command after the previous one has been completed is to use
+the [Idling event](https://www.revitapidocs.com/2023/56145d84-e948-730a-dc72-2a7b88a50a99.htm).
+Explanations and many samples are provided in the topic group
+on [Idling and external events for modeless access and driving Revit from outside](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28).
 
-The standard Revit API approach to launch a command after the previous one has been completed is to use the Idling event:
+However, there are other possibilities as well.
+For example, check out these other recent discussions on similar topics:
 
-https://www.revitapidocs.com/2023/56145d84-e948-730a-dc72-2a7b88a50a99.htm
-https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28
+- [Exporting to DWG after Dynamo script being executed](https://forums.autodesk.com/t5/revit-api-forum/exporting-to-dwg-after-dynamo-script-being-executed/m-p/11487750)
+- [Can you chain Idling events?](https://forums.autodesk.com/t5/revit-api-forum/can-you-chain-idling-events/m-p/11484370)
 
-However, there are other possibilities as well. For example, check out these recent discussions on similar topics:
+In both of those, simpler solutions seems to be possible.
+We always recommand keeping to the [KISS principle](https://en.wikipedia.org/wiki/KISS_principle).
 
-https://forums.autodesk.com/t5/revit-api-forum/can-you-chain-idling-events/m-p/11484370
+####<a name="6"></a> Chaining Idling Events and Other Solutions
 
-[Exporting to DWG after Dynamo script being executed](https://forums.autodesk.com/t5/revit-api-forum/exporting-to-dwg-after-dynamo-script-being-executed/m-p/11487750)
+At the time of writing, the discussion is not yet wrapped up
+on [Can you chain Idling events?](https://forums.autodesk.com/t5/revit-api-forum/can-you-chain-idling-events/m-p/11489054)
 
+**Question:** Is it possible to chain Idling events?
 
-####<a name="5"></a> Chaining Idling Events and Other Solutions
-
-[Can you chain Idling events?
-(https://forums.autodesk.com/t5/revit-api-forum/can-you-chain-idling-events/m-p/11489054)
-
-Is it possible to chain Idling events?
-
-Say I have two functions, FuncA and FuncB. I want to run FuncA the first time revit idles, then run FuncB after FuncA is done running and revit idles again. Inside my FuncA handler, I am removing the handler to FuncA from UIApp.Idling, but I can not assign a new handler because I don't have a valid API context.
-
+Say I have two functions, `FuncA` and `FuncB`.
+I want to run FuncA the first time revit idles, then run FuncB after FuncA is done running and Revit idles again.
+Inside my FuncA handler, I am removing the handler to FuncA from `UIApp.Idling`, but I cannot assign a new handler because I don't have a valid API context.
 Is there a way for me to achieve my intended behavior?
+My goal is
+to [download a file from a server and then open that file](https://forums.autodesk.com/t5/revit-api-forum/internal-exception-downloading-file-from-server-and-the-opening/m-p/11388140).
 
-NOTE: The reason I'm doing any of this at all is because of this referenced post. For some reason, Revit throws an internal exception if my FuncA and FuncB are called one after the other. So I am separating them with an idling event. Now I need to add another idling event before FuncA.
-
-Tags (1)
-Tags:idling
- 
-Add tags
-Report
-8 REPLIES 
-Sort: 
-MESSAGE 2 OF 9
-RPTHOMAS108
- Mentor RPTHOMAS108 in reply to: ariWZRFQ
-‎2022-10-16 05:29 PM 
-It doesn't sound like a good idea in general, however.
+**Answer 1:** This doesn't sound like a good idea in general.
 
 When Revit idles you want to run FunctionA when it idles again you want to run FunctionA but with different settings i.e. subscribe to FunctionA and change what FunctionA does based on what it did last. Then after a set number of things that FunctionA does unsubscribe. In the end you are waiting for the same event in-between doing tasks with the same function.
 
 You can use static variable etc. to store stage of FunctionA.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 9
-jeremy.tammik
- Employee jeremy.tammik in reply to: ariWZRFQ
-‎2022-10-17 01:36 AM 
-Afaik, you cannot chain them directly, but you can easily achieve the same effect:
+**Answer 2:** Afaik, you cannot chain them directly, but you can easily achieve the same effect:
 
-Subscribe to the Idling event and attach handlerA
-In handlerA, unsubscribe from the Idling event, then subscribe to the Idling event and attach handlerB
+- Subscribe to the Idling event and attach `handlerA`
+- In `handlerA`, unsubscribe from the `Idling` event, then subscribe to the `Idling` event and attach `handlerB`
 
 Depending on other factors, Revit may or may not execute other actions in between the two event handler calls, but their relative order should be preserved.
 
@@ -194,215 +180,134 @@ Why not? Within the Idling event handler, I thought you do have a valid Revit AP
 
 Question: why do the actions A and B have to be executed separately? Can't you just execute them both within the same Idling event handler?
 
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 9
-ricaun
- Advocate ricaun in reply to: ariWZRFQ
-‎2022-10-17 07:13 AM 
-You should create a queue service for that, subscribing and unsubscribing Revit events in your App as static.
+**Answer 3:** You should create a queue service for that, subscribing and unsubscribing Revit events in your App as static.
 
-Something like this maybe helps: https://gist.github.com/ricaun/11b272c5bec46f05c3fe49525fcc3fdf
+Something like this [IdlingQueueService.cs](https://gist.github.com/ricaun/11b272c5bec46f05c3fe49525fcc3fdf) maybe helps.
 
-You can register the service in your IExternalApplication.
+You can register the service in your `IExternalApplication` and add some `Action` to run on the `Idling` event;
+each one is gonna run in a different Idling Event.
 
-public class App : IExternalApplication
-{
-    public static IdlingQueueService IdlingActionService { get; private set; }
-    public Result OnStartup(UIControlledApplication application)
-    {
-        IdlingActionService = new IdlingQueueService(application);
-        return Result.Succeeded;
-    }
+**Respnse:** Thank you all for your responses. I have tried 3 different solutions all to no success...
 
-    public Result OnShutdown(UIControlledApplication application)
-    {
-        IdlingActionService?.Dispose();
-        return Result.Succeeded;
-    }
-}
+If I step back from all the details of my implementation, my problem is really not too complicated.
+I just wish I could run the `Execute` function of `IExternalCommand` like below.
 
-Then you could add some Action to run on the Idling Event, each one gonna run in a different Idling Event.
+<pre class="code">
+  public Result Execute(
+    ExternalCommandData commandData,
+    ref string message,
+    ElementSet elements)
+  {
+    Object1 obj1 = new Object1(commandData)
+    
+    await obj1.func1;
+    await obj1.func2;
+    obj1.func3;  // THIS IS THE ONLY REVIT INTERACTION
+    
+    return Autodesk.Revit.UI.Result.Succeeded;
+  }
+</pre>
 
-[Transaction(TransactionMode.Manual)]
-public class Command : IExternalCommand
-{
-    public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elementSet)
-    {
-        App.IdlingActionService.Add((uiapp) => { System.Windows.MessageBox.Show("1"); });
-        App.IdlingActionService.Add((uiapp) => { System.Windows.MessageBox.Show("2"); });
+This doesn't work because I can not make the `Execute` function `async` but this is the theory.
+Not being able to `await` `func1` and `func2` is what is causing me to dive so deep into idling events.
 
-        return Result.Succeeded;
-    }
-}
+Func1 and Func2 have nothing to do with Revit:
 
-I hope this helps.
-
-Luiz Henrique Cassettari
-
-ricaun.com - Revit API Developer
-
-AppLoader EasyConduit WireInConduit ConduitMaterial CircuitName ElectricalUtils
-IdlingQueueService is a class to run actions in the Idling Revit event in a queue.
-IdlingQueueService is a class to run actions in the Idling Revit event in a queue.
-gist.github.com/ricaun/11b272c5bec46f05c3fe4952...
-Instantly share code, notes, and snippets. IdlingQueueService is a class to run actions in the Idling Revit event in a queue. You can't perform that action at this time. You signed in with another tab or window. You signed out in another tab or window. Reload to refresh your session. Reload to ...
-Tags (0)
-Add tags
-Report
-Success!
-
-Click to go to your post.
-MESSAGE 5 OF 9
-ariWZRFQ
- Explorer ariWZRFQ in reply to: ariWZRFQ
-‎2022-10-17 03:26 PM 
-Thank you all for your responses. I have tried 3 different solutions all to no success.
-
-I tried running 1 idling event with block if statements just to perform different actions based on some state variables.
-This fails because one of my functions also ends up giving Revit the opportunity to idle. This causes a never ending idling loop.
-I retried subscribing to a new handler inside of handler A.
-This fails with an error "Cannot subscribe to an event during execution of that event". I am attempting to subscribe to a different handler function with code in the form of below.
-
-public async void OnIdlingA(object sender, IdlingEventArgs e)
-{
-     Autodesk.Revit.UI.UIApplication uiapp = sender as 
-     Autodesk.Revit.UI.UIApplication;
-
-     Debug.Assert(null != uiapp,
-         "expected a valid Revit application instance");
-
-     if (uiapp != null)
-     {
-          uiapp.Idling -= OnIdlingA;
-          uiapp.Idling += new
-                EventHandler<Autodesk.Revit.UI.Events.IdlingEventArgs>
-                (OnIdlingB);
-
-          await FuncA();
-     }
-}
-​
-
-Finally, I tried the Idling Queue service
-This also fails due the the fact that I am getting extra idling events while my functions are running causing the execution to dive into the idling functions before finishing the current function.
-
-If I step back from all the details of my implementation, my problem is really not too complicated. I just wish I could run the Execute function of IExternalCommand like below.
-
-public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
-{
-      Object1 obj1 = new Object1(commandData)
-      
-      await obj1.func1;
-      await obj1.func2;
-      obj1.func3;  //THIS IS THE ONLY REVIT INTERACTION
-
-      return Autodesk.Revit.UI.Result.Succeeded;
-}
-
-This doesn't work because I can not make the Execute function async but this is the theory. Not being able to await func1 and func2 is what is causing me to dive so deep into idling events. Func1 and Func2 have nothing to do with Revit.
-
-Func1 calls a web server to do authentication in a webview
-
-Func2 calls a web server to download Revit files
-
-Func3 opens those files and uses that data to manipulate the current document.
+- Func1 calls a web server to do authentication in a webview
+- Func2 calls a web server to download Revit files
+- Func3 opens those files and uses that data to manipulate the current document.
 
 Thank you all for the guidance
 
-Tags (0)
-Add tags
-Report
-MESSAGE 6 OF 9
-ricaun
- Advocate ricaun in reply to: ariWZRFQ
-‎2022-10-17 03:51 PM 
-You forgot to explain that you are using 'await' functions.
+**Answer:** You forgot to explain that you are using 'await' functions.
 
-Revit does not like async stuff, and your code looks odd. How can you add an await without an async method...
+Revit does not like async stuff, and your code looks odd.
+How can you add an await without an async method...
 
-To work with async and Revit use the Revit.Async package, so the package gonna manage the Idling stuff.
+To work with async and Revit use the [Revit.Async](https://github.com/KennanChan/Revit.Async) package, so the package gonna manage the Idling stuff.
 
-Luiz Henrique Cassettari
-
-ricaun.com - Revit API Developer
-
-AppLoader EasyConduit WireInConduit ConduitMaterial CircuitName ElectricalUtils
-Tags (0)
-Add tags
-Report
-MESSAGE 7 OF 9
-ariWZRFQ
- Explorer ariWZRFQ in reply to: ricaun
-‎2022-10-17 03:55 PM 
-Sorry, I just edited my reply for clarity. I am not actually running the functions with await as shown. That is how I would do it if the Execute function could be made async.
+**Resoponse:** Sorry, I just edited my reply for clarity.
+I am not actually running the functions with await as shown. That is how I would do it if the Execute function could be made async.
 
 Func1 and Func2 are async functions which is why I am/was trying to run them in idling events.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 8 OF 9
-ricaun
- Advocate ricaun in reply to: ariWZRFQ
-‎2022-10-17 04:22 PM 
-One thing that is important is that when an IExternalCommand is running the Idling is not gonna trigger until the command ends. The Idling means the Revit is not busy doing something and is ready to receive some user interaction.
+**Answer:** One thing that is important is that when an IExternalCommand is running the Idling is not gonna trigger until the command ends.
+The Idling means the Revit is not busy doing something and is ready to receive some user interaction.
 
 I guess the best approach in your case should be to use Revit.Async package with something like this.
 
-public async Task Execute()
-{
-      await func1;
-      await func2;
-      await RevitTask.RunAsync(func3);  //THIS IS THE ONLY REVIT INTERACTION
-}
+<pre class="code">
+  public async Task Execute()
+  {
+    await func1;
+    await func2;
+    await RevitTask.RunAsync(func3);  //THIS IS THE ONLY REVIT INTERACTION
+  }
+</pre>
 
 Using the RevitTask you can run the func3 in Revit context.
 
-Luiz Henrique Cassettari
+Starting again from scratch:
 
-ricaun.com - Revit API Developer
+One correct, reliable and effective approach to address the situation you describe is to implement
+an [external event](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28).
 
-AppLoader EasyConduit WireInConduit ConduitMaterial CircuitName ElectricalUtils
-Tags (0)
-Add tags
-Report
-MESSAGE 9 OF 9
-jeremy.tammik
- Employee jeremy.tammik in reply to: ariWZRFQ
-‎2022-10-20 02:47 AM 
-One correct, reliable and effective approach to address the situation you describe is to implement an external event:
-
-https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28
-
-In the event handler, simply run the code to execute func3.
+In the event handler, simply run the code to execute `func3`.
 
 All the rest has nothing to do with Revit and does not require the Revit API.
 
-Therefore, you can execute it independently, externally, and simply raise the external event after func1 and func2 have completed successfully.
+Therefore, you can execute it independently, externally, and simply raise the external event after `func1` and `func2` have completed successfully.
 
 Oh dear. I just noticed your statement:
 
 > Func1 and Func2 are async functions which is why I am/was trying to run them in idling events.
 
-Well, that is just about the opposite of what you could or should do. Or at least it is not intended, afaict.
+Well, that is just about the opposite of what you could or should do.
+Or at least it is not intended, afaict.
 
-Revit and its API is single threaded. The Idling event handler is single threaded. So, as long as that event handler is busy executing, e.g., your func1 and func2, it will block Revit from doing anything else.
+Revit and its API is single threaded.
+The `Idling` event handler is single threaded.
+So, as long as that event handler is busy executing, e.g., your func1 and func2, it will block Revit from doing anything else.
 
 The purpose of the Idling event is to enable you to execute some action as soon as Revit has stopped being occupied with and therefore blocked by other tasks.
 
 This confirms my preceding answer: it seems to me that an appropriate way to handle this would be to disconnect func1 and func2 from Revit and your add-in as much as possible, and let them trigger an external event when they are completed, to execute func3.
 
+**Response:** So what I ended up doing is below. It seems to work but would love some feedback if its unsafe:
 
+- The main IExternalCommand Execute function just subscribes to an idling event.
+- The event handler is an async function.
+- In the async event handler function, I await the 3 functions and wrap the third one with RevitTask. 
+
+This still feels like the original idling action is unnecessary and I should be able to just dive right into the async func1, but other than that this works!
+
+**Question:** How would you recommend disconnecting Func1 and Func2? The functions are async in that they use async functions in them but I don't need them to run truly asynchronously. Blocking Revit is fine for them. At all points in my code base, I am awaiting the results of the async functions so that everything runs essentially synchronously. All of my problems are due to the fact that the Revit execute function can not be made "async" so I can not "await" func1 and func2. 
+
+I can't imagine that this is the first time this problem has been encountered. It's a pretty standard workflow assuming that other plugins need some sort of authentication. First send an HTTP request to a server, then following a successful response, do all the Revit stuff.
+
+**Answer:** Yes, this is a standard situation, and I described the standard solution above.
+No need for async anything, just create an external event X, raise the event when func1 and func2 have completed, and execute func3 in the external event X handler.
+No Idling needed, no async needed.
+
+**Response:** Oh maybe I need to learn more about how async works in C# if its different than JS development.
+
+I would expect that if run func1 and func2 without the await flag, func2 will start before func1 has completed and the external event will be raised before func1 and func2 are completed. This would not work for my code since I would be trying to run code before the authentication step (func1) is completed.
+
+Have I misunderstood? Thanks.
+
+**Answer:** In the context of the Revit. API, I would recommend scrapping async completely.
+That will totally simplify things.
+
+**Response:** haha I wish, but I still need to send requests to external servers. I can't think of a way to do that without async.
+
+**Answer:** Well, I did myself, many times,
+[connecting desktop and cloud](https://github.com/jeremytammik/FireRatingCloud).
+
+Not very long ago, `async` did not exist.
+Push and pull functionality was up and running for decades before async was invented in the form you know it,
+cf. the [history of C&#35;](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-version-history).
 
 <center>
 <img src="img/.png" alt="" title="" width="100" height=""/> <!-- 872 x 556 -->
 </center>
 
-Many thanks to ??? for the useful explanation!
-
-
-<pre class="code">
-</pre>
