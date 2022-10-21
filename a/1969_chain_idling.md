@@ -67,6 +67,16 @@ I also present some ongoing nitty-gritty discussions on external events and <cod
 
 linkedin:
 
+AU 2022 classes and a new Dynamo book online, external events, Idling and launching a command after closing a form in the #RevitAPI
+
+https://autode.sk/chainidling
+
+- Modern add-in deployment and testing
+- Parametric curvature in families
+- Awesome Dynamo online book project
+- Launching command after closing form
+- Chaining Idling events and other solutions...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
