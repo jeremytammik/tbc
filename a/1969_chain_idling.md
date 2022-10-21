@@ -82,23 +82,46 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 A couple of notes on interesting contributions from AU and on Dynamo, and some nitty-gritty discussions on Idling stuff:
 
-####<a name="2"></a> 
+####<a name="2"></a> Deployment and Testing
 
-Many thanks to ??? for putting together and sharing this material!
+Andrea [@dre_tas](https://twitter.com/dre_tas) Tassera shared a very inspiring class
+You wanted to see my presentation at #AU2022 on #DevoOps for 
+@AutodeskRevit
+ plugins, but missed it for some reason (sore feet and hungover as the most common)? No judgement here. We've all been there.
+You can now find the recording here
+[Deploy Better Plugins Faster Through CI/CD and Unit Testing in Azure DevOps](https://www.autodesk.com/autodesk-university/class/Deploy-Better-Plugins-Faster-Through-CICD-and-Unit-Testing-Azure-DevOps-2022)
 
-####<a name="3"></a>
+> At Woods Bagot we managed to cut the deployment time of our tools from days to minutes, while increasing quality and reliability, by repurposing common concepts and tools from the Software Development world.
+By implementing a DevOps philosophy in your workflow, not only do you deliver automation tools quicker, but you also empower your teams from the start, improving communication and collaboration and promoting professional growth.
+You increase quality and reliability of the software product deployed, thanks to automated testing and a faster feedback cycle.
+Moreover, with the ability of more frequent faster releases, backed up by live monitoring systems, developers can deploy tools that are tailored to the users and really respond to their needs.
+The session will showcase how Woods Bagot has developed a full workflow for their Revit toolbar through the use an Azure DevOps pipeline, but the principles can be applied to any platform that benefits from automation tools.
 
-####<a name="4"></a> 
+####<a name="3"></a> Parametric Curvature in Families
 
-**Question:** 
+Paul F. [@paulfaubin](https://twitter.com/paulfaubin) Aubin
+discussed [Taming Parametric Curvature in the Revit Family Editor](https://www.autodesk.com/autodesk-university/class/Taming-Parametric-Curved-Geometry-Revit-Family-Editor-2022),
+complete with downloadable sample files and a step-by-step handout:
 
-**Answer:** 
+> Have you ever tried to control the shape of a curved form parametrically in the Family Editor?
+If so, you’ve no doubt discovered that flexing them sometimes throws you a curveball.
+In this session we’ll explore several techniques to tame your unruly parametric curves.
+We’ll look at examples of circles, arcs, quarter round, half round, arches, and we’ll even check out some splines.
+We’ll look at both simple and compound curves.
+We’ll work primarily in the traditional Family Editor but most techniques apply to the massing Family Editor environment as well. We’ll explore curvature and rotation, using both armatures (or rigs) and formulas to constrain flexing behavior. We’ll even throw in some trigonometry for good measure! After this session, I cannot guarantee that you’ll never have another misbehaving curve in your family content, but what I can promise is that you’ll come away with several useful tools to help you tame them when curve-mischief strikes!
 
-<center>
-<img src="img/.png" alt="" title="" width="100" height=""/> <!-- 872 x 556 -->
-</center>
+####<a name="4"></a> Awesome Dynamo Online Book Project
 
-Many thanks to ??? for the useful explanation!
+Chuong Ho [initiated](https://www.linkedin.com/posts/chuongmep_dynamo-bim-developer-activity-6984467588034543616-U7b6)
+the online book project Awesome Dynamo.
+
+> The Awesome Dynamo project celebrates and aggregates authors, essential and complete content with a large contribution from the community, the main purpose of which is to store dynamo core values and make it easy to learn, apply to work and explore power of Dynamo.
+
+> I'm in the process of working and perfecting it, so please help me if you can:
+
+- [Ebook Online](https://chuongmep.github.io/Awesome-Dynamo/intro.html)
+- [GitHub repository](https://github.com/chuongmep/Awesome-Dynamo)
+
 
 ####<a name="5"></a> 
 
@@ -353,3 +376,14 @@ Revit and its API is single threaded. The Idling event handler is single threade
 The purpose of the Idling event is to enable you to execute some action as soon as Revit has stopped being occupied with and therefore blocked by other tasks.
 
 This confirms my preceding answer: it seems to me that an appropriate way to handle this would be to disconnect func1 and func2 from Revit and your add-in as much as possible, and let them trigger an external event when they are completed, to execute func3.
+
+
+**Question:** 
+
+**Answer:** 
+
+<center>
+<img src="img/.png" alt="" title="" width="100" height=""/> <!-- 872 x 556 -->
+</center>
+
+Many thanks to ??? for the useful explanation!
