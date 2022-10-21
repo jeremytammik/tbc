@@ -55,10 +55,10 @@ https://forums.autodesk.com/t5/revit-api-forum/can-you-chain-idling-events/m-p/1
 
  twitter:
 
- the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+AU 2022 classes and a new Dynamo book online, external events, Idling and launching a command after closing a form in the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/chainidling
 
 AU 2022 classes are available online now, as well as a new Dynamo book and resources project.
-I also present some ongoing nitty-gritty discussions on external events and `Idling`
+I also present some ongoing nitty-gritty discussions on external events and <code>Idling</code>
 &ndash; Modern add-in deployment and testing
 &ndash; Parametric curvature in families
 &ndash; Awesome Dynamo online book project
