@@ -76,15 +76,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Chain Idling and Avoid Doing So
+### Can You Avoid Chaining Idling?
 
-AU 2022 classes are available online now, as well as a Dynamo book and resources project.
-I also present an ongoing nitty-gritty discussion on external events and `Idling`:
+AU 2022 classes are available online now, as well as a new Dynamo book and resources project.
+I also present some ongoing nitty-gritty discussions on external events and `Idling`:
 
 - [Modern add-in deployment and testing](#2)
 - [Parametric curvature in families](#3)
 - [Awesome Dynamo online book project](#4)
-- [Chaining Idling events and other solutions](#5)
+- [Launching command after closing form](#5)
+- [Chaining Idling events and other solutions](#6)
 
 ####<a name="2"></a> Deployment and Testing
 
@@ -307,7 +308,14 @@ Not very long ago, `async` did not exist.
 Push and pull functionality was up and running for decades before async was invented in the form you know it,
 cf. the [history of C&#35;](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-version-history).
 
-<center>
-<img src="img/.png" alt="" title="" width="100" height=""/> <!-- 872 x 556 -->
-</center>
+Let's wrap up for the time being with two jokes:
 
+- Knock, knock
+- An `async` function
+- Who's there?
+
+<center>
+<img src="img/async_await_cat_in_tree.png" alt="Async and await" title="Async and await" width="800" height=""/> <!-- 960 x 928 -->
+<p style="font-size: 80%; font-style:italic">
+<a href="https://jordicabot.com">Jordi Cabot</a> via <a href="https://pin.it/3U3OOWG">Pinterest</a></p>
+</center>
