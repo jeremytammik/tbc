@@ -32,8 +32,6 @@ Ebook Online : https://lnkd.in/gHM3XVFn -- https://chuongmep.github.io/Awesome-D
 Github : https://lnkd.in/gHNqyjKH -- https://github.com/chuongmep/Awesome-Dynamo
 #Dynamo #BIM #Developer #Autodesk #NoteBook
 
-- https://forums.autodesk.com/t5/revit-api-forum/ilist-vs-list/m-p/11483464
-
 - I would like to launch a Command After the Export File Form Closes
   https://forums.autodesk.com/t5/revit-api-forum/i-would-like-to-launch-a-command-after-the-export-file-form/td-p/11494782
 
@@ -80,16 +78,18 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Chain Idling and Avoid Doing So
 
-A couple of notes on interesting contributions from AU and on Dynamo, and some nitty-gritty discussions on Idling stuff:
+AU 2022 classes are available online now, as well as a Dynamo book and resources project.
+I also present an ongoing nitty-gritty discussion on external events and `Idling`:
+
+- [Modern add-in deployment and testing](#2)
+- [Parametric curvature in families](#3)
+- [Awesome Dynamo online book project](#4)
+- [Chaining Idling events and other solutions](#5)
 
 ####<a name="2"></a> Deployment and Testing
 
-Andrea [@dre_tas](https://twitter.com/dre_tas) Tassera shared a very inspiring class
-You wanted to see my presentation at #AU2022 on #DevoOps for 
-@AutodeskRevit
- plugins, but missed it for some reason (sore feet and hungover as the most common)? No judgement here. We've all been there.
-You can now find the recording here
-[Deploy Better Plugins Faster Through CI/CD and Unit Testing in Azure DevOps](https://www.autodesk.com/autodesk-university/class/Deploy-Better-Plugins-Faster-Through-CICD-and-Unit-Testing-Azure-DevOps-2022)
+Andrea [@dre_tas](https://twitter.com/dre_tas) Tassera shared his presentation at #AU2022 on #DevoOps for @AutodeskRevit,
+[Deploy Better Plugins Faster Through CI/CD and Unit Testing in Azure DevOps](https://www.autodesk.com/autodesk-university/class/Deploy-Better-Plugins-Faster-Through-CICD-and-Unit-Testing-Azure-DevOps-2022):
 
 > At Woods Bagot we managed to cut the deployment time of our tools from days to minutes, while increasing quality and reliability, by repurposing common concepts and tools from the Software Development world.
 By implementing a DevOps philosophy in your workflow, not only do you deliver automation tools quicker, but you also empower your teams from the start, improving communication and collaboration and promoting professional growth.
@@ -119,14 +119,32 @@ the online book project Awesome Dynamo.
 
 > I'm in the process of working and perfecting it, so please help me if you can:
 
-- [Ebook Online](https://chuongmep.github.io/Awesome-Dynamo/intro.html)
+> - [Ebook Online](https://chuongmep.github.io/Awesome-Dynamo/intro.html)
 - [GitHub repository](https://github.com/chuongmep/Awesome-Dynamo)
 
+####<a name="5"></a> Launching Command after Closing Form
 
-####<a name="5"></a> 
+Several recent [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
+deal with questions on chaining sequences of functionality, e.g.,
+[I would like to launch a command after the export file form closes](https://forums.autodesk.com/t5/revit-api-forum/i-would-like-to-launch-a-command-after-the-export-file-form/td-p/11494782):
 
-<pre class="code">
-</pre>
+**Question:** 
+
+**Answer:** 
+
+The standard Revit API approach to launch a command after the previous one has been completed is to use the Idling event:
+
+https://www.revitapidocs.com/2023/56145d84-e948-730a-dc72-2a7b88a50a99.htm
+https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28
+
+However, there are other possibilities as well. For example, check out these recent discussions on similar topics:
+
+https://forums.autodesk.com/t5/revit-api-forum/can-you-chain-idling-events/m-p/11484370
+
+[Exporting to DWG after Dynamo script being executed](https://forums.autodesk.com/t5/revit-api-forum/exporting-to-dwg-after-dynamo-script-being-executed/m-p/11487750)
+
+
+####<a name="5"></a> Chaining Idling Events and Other Solutions
 
 [Can you chain Idling events?
 (https://forums.autodesk.com/t5/revit-api-forum/can-you-chain-idling-events/m-p/11489054)
@@ -378,12 +396,13 @@ The purpose of the Idling event is to enable you to execute some action as soon 
 This confirms my preceding answer: it seems to me that an appropriate way to handle this would be to disconnect func1 and func2 from Revit and your add-in as much as possible, and let them trigger an external event when they are completed, to execute func3.
 
 
-**Question:** 
-
-**Answer:** 
 
 <center>
 <img src="img/.png" alt="" title="" width="100" height=""/> <!-- 872 x 556 -->
 </center>
 
 Many thanks to ??? for the useful explanation!
+
+
+<pre class="code">
+</pre>
