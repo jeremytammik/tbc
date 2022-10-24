@@ -326,6 +326,21 @@ Not very long ago, `async` did not exist.
 Push and pull functionality was up and running for decades before async was invented in the form you know it,
 cf. the [history of C&#35;](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-version-history).
 
+That said, [Kennan Chen](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3373609),
+[author](https://github.com/KennanChan) of
+[Revit.Async](https://github.com/KennanChan/Revit.Async),
+underlines the suggestion above 
+by Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari:
+
+> This seems to be a highly matched case that Revit.Async is designed to solve.
+
+> I came up with the idea of Revit.Async for a cloud-based RFA management system.
+The main use case was to query the server about the information of an RFA file (your function 1),
+then download it (your function 2) and finally place it with Revit API (your function 3).
+I used a pattern similar to Revit.Async to chain them up and it worked like a charm.
+
+> I suggest you to take a look at Revit.Async and you will not be disappointed.
+
 Let's wrap up for the time being with two jokes:
 
 - Knock, knock
