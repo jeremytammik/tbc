@@ -11,7 +11,16 @@
   Michael Dewberry, 20 Oct at 20:26
   Best practices for Revit add-ins using WebView2
 
- twitter:
+- get ref plane in element
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1663057482687699
+
+- Remove Revisions on Sheets
+  https://forums.autodesk.com/t5/revit-api-forum/remove-revisions-on-sheets/m-p/11449618
+
+- LandXML P tag
+  https://forums.autodesk.com/t5/revit-api-forum/a-question-about-exporting-and-reading-landxml/m-p/11405400
+
+twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
@@ -36,6 +45,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### WebView2
 
 ####<a name="2"></a> Future of CefSharp and WebView2 for Revit add-ins
+
+Here are some thoughts and experiences and
 
 An internal discussion aimed to define best practices for Revit add-ins using WebView2.
 
@@ -97,9 +108,39 @@ If anything, we might stop shipping CefSharp at some point.
 
 Also, WV2 comes included in Win11 by default and can't be uninstalled (I think...), so that will be no issue hopefully soon.
 
+####<a name="3"></a> Retrieve Reference Plane in Element
 
+Some clarification on how symbol and instance geometry is generated from the family definiton:
 
-####<a name="3"></a> 
+**Question:** How can I retrieve a reference plane that is inside an element?
+I prefer to avoid opening and analysing the family file.
+Is it possible to get the reference plane directly from the element via Revit API?
+
+**Answer:** You don't need to open the family.
+If there is a placed instance, you can call `GetReferenceByName` on that instance, or get all the references from it.
+
+**Response:** I am able to get the reference using 
+
+Reference reference=famInst.GetReferenceByName("Center (Left/Right)");
+
+Now, how to get the reference plane from the reference?
+
+**Answer:** Use `GetGeometryObjectFromReference`.
+
+**Response:** That throws an exception saying that I cannot convert `GeometryObject` to `ReferencePlane`:
+
+<center>
+<img src="img/cast_geometryobject.png" alt="Cast error" title="Cast error" width="1000" height=""/> <!-- 1168 x 37 -->
+</center>
+
+**Answer:** I think the problem is that you're actually getting back a surface instead of a plane, so your cast fails.
+try casting to a surface, or, better yet, check out the underlying type in Visual Studio.
+
+A reference in an element is not a ReferencePlane element.
+In the family definition, a ReferencePlane element is added, but in the family symbol and instance, all geometry generated is consumed into the single element.  
+Therefore, you are receiving a Surface or more specifically a Plane, which gives you the location of the plane.
+If you want to attach a dimension to it, use the Reference you get originally.
+You don't have access to a separate element from this.
 
 ####<a name="4"></a> 
 
@@ -119,6 +160,3 @@ Also, WV2 comes included in Win11 by default and can't be uninstalled (I think..
 
 
 
-<center>
-<img src="img/.png" alt="" title="" width="100" height=""/> <!-- 960 x 928 -->
-</center>
