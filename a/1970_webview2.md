@@ -217,7 +217,9 @@ https://forums.autodesk.com/t5/revit-api-forum/a-question-about-exporting-and-re
 
 **Question:** A question about exporting and reading LandXML
  
-<P id="1">Y   X  Z</P>
+<pre class="code">
+  &lt;P id="1"&gt;Y X Z&lt;/P&gt;
+</pre>
 
 This may be a bit off-topic. But I wonder about exporting toposurface to LandXML.
 Why the order of collocation is (Y X Z) and not (X Y Z)
@@ -230,15 +232,23 @@ https://thebuildingcoder.typepad.com/blog/2010/01/import-landxml-surface.html
 <img src="img/landxml_p_tag_2.png" alt="LandXML P tag" title="LandXML P tag" width="350"/> <!-- 702 x 486 -->
 </center>
 
-**Answer:** Yes. That is sort of off-topic. Not just here, but everywhere in the universe. There are probably reasons for that definition, but who cares? Are you planning to change the LandXML definition? If so, then you might want to discuss this with the people responsible for it, maybe here:
+**Answer:** Yes.
+That is sort of off-topic.
+Not just here, but almost everywhere in the universe.
+There are probably reasons for that definition, but who cares?
+Are you planning to change the LandXML definition?
+If so, then you might want to discuss this with the people responsible for it
+at [LandXML.org](http://landxml.org).
 
-http://landxml.org
+In general, when I am programming something that connects with something else, I have to accept the given conditions and adapt to them.
+It may help to know the underlying reasons, but only in theory, for my acceptance and motivation.
+If I can accept the facts and motivate myself regardless, there is no need to understand the underlying reasons.
+Actually, that applies to every aspect of life.
+Actually, to death as well: "Ours is not to question why; ours is but to do or die."
 
-In general, when I am programming something that connects with something else, I have to accept the given conditions and adapt to them. It may help to know the underlying reasons, but only in theory, for my acceptance and motivation. If I can accept the facts and motivate myself regardless, there is no need to understand the underlying reasons. Actually, that applies to every aspect of life. Actually, to death as well: "Ours is not to question why; ours is but to do or die."
-
-Later: Actually, I do have an answer after all. Look at the LandXML specification for the P tag:
-
-http://www.landxml.org/schema/LandXML-1.2/documentation/LandXML-1.2Doc_P.html#Link07F5D020
+Later: I discovered an answer after all, in
+the [LandXML specification for the P tag](http://www.landxml.org/schema/LandXML-1.2/documentation/LandXML-1.2Doc_P.html#Link07F5D020):
 
 > A surface point. it contains an id attribute and a space delimited "northing easting elevation" text value.
 
+The order of northing, easting, elevation makes perfect sense in the LandXML domain, and translates directly to the Y, X, Z that you observe in the file format and Revit XYZ class.
