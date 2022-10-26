@@ -130,7 +130,7 @@ Now, how to get the reference plane from the reference?
 **Response:** That throws an exception saying that I cannot convert `GeometryObject` to `ReferencePlane`:
 
 <center>
-<img src="img/cast_geometryobject.png" alt="Cast error" title="Cast error" width="1000" height=""/> <!-- 1168 x 37 -->
+<img src="img/cast_geometryobject.png" alt="Cast error" title="Cast error" width="1000"/> <!-- 1168 x 37 -->
 </center>
 
 **Answer:** I think the problem is that you're actually getting back a surface instead of a plane, so your cast fails.
@@ -146,10 +146,7 @@ You don't have access to a separate element from this.
 
 [Remove Revisions on Sheets](https://forums.autodesk.com/t5/revit-api-forum/remove-revisions-on-sheets/m-p/11449618)
 
- rhanzlick 1171 Views, 6 Replies
-‎2021-02-01 11:13 AM 
-Remove Revisions on Sheets
-I am writing an addin to edit revisions for many sheets simultaneously. I see in the API that revisions can be added to a particular sheet using the 'SetAdditionalRevisionIds' method. However, I don't see an obvious way to remove revisions currently on a sheet. (This is all assuming we are modifying revisions that were manually added and not controlled by any content on the sheet eg revision clouds.) Is there a way to remove revisions from a sheet in the API?
+**Question:** I am writing an addin to edit revisions for many sheets simultaneously. I see in the API that revisions can be added to a particular sheet using the 'SetAdditionalRevisionIds' method. However, I don't see an obvious way to remove revisions currently on a sheet. (This is all assuming we are modifying revisions that were manually added and not controlled by any content on the sheet eg revision clouds.) Is there a way to remove revisions from a sheet in the API?
 
 Any help would be much appreciated.
 
@@ -157,18 +154,7 @@ Thanks,
 
 Ryan
 
- Solved by TripleM-Dev.net. Go to Solution.
-
-Tags (0)
-Add tags
-Report
-6 REPLIES 
-Sort: 
-MESSAGE 2 OF 7
-TripleM-Dev.net
- Advisor TripleM-Dev.net in reply to: rhanzlick
-‎2021-02-01 12:51 PM 
-Hi,
+**Answer:**
 
 Use GetAdditionalRevisionIds  , these are the revisions not created by revisionclouds on the sheet or in any of the placed views.
 
@@ -184,34 +170,12 @@ Note deleting (and adding) Revisionclouds only possible if the Issued state of t
 
 This is not needed for SetAdditionalRevisionId (like in UI).
 
-- Michel
+**Response:** I thought I tried this method, and it made no changes (the revisions were set to 'Issued').
+However, I must have done something wrong the first time, because when I reimplemented, it works great!
 
-Tags (3)
-Tags:GetAdditionalRevisionIdsGetAllRevisionIdsrevision
- 
-Add tags
-Report
-MESSAGE 3 OF 7
-rhanzlick
- Enthusiast rhanzlick in reply to: rhanzlick
-‎2021-02-01 02:26 PM 
-I thought I tried this method, and it made no changes (the revisions were set to 'Issued'). However, I must have done something wrong the first time, because when I reimplemented, it works great!
+**Answer 2:** This week I had to solve a similar problem. Another way to approach this matter is by using the FilteredElementCollector. Assuming everything related to all the revisions on a sheet will be deleted, you can break it down in steps. First delete all revision cloud tags, secondly delete the revision clouds and finally the revisions. Below you can see an example. To complete the routine I also added a bit of code to avoid conflicts with revisions that are already issued. Hopefully this will help somebody for future use.
 
-Thanks,
-
-Ryan
-
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 7
-tc
- Participant tc in reply to: rhanzlick
-‎2022-09-28 02:40 AM 
-Dear fellow coders,
-
-This week I had to solve a similar problem. Another way to approach this matter is by using the FilteredElementCollector. Assuming everything related to all the revisions on a sheet will be deleted, you can break it down in steps. First delete all revision cloud tags, secondly delete the revision clouds and finally the revisions. Below you can see an example. To complete the routine I also added a bit of code to avoid conflicts with revisions that are already issued. Hopefully this will help somebody for future use.
-
+<pre class="code">
 Dim revs As New SortedList(Of String, Boolean)
 Dim colRev As New FilteredElementCollector(doc)
 
@@ -235,108 +199,46 @@ For Each r In revs
 
    rev.Issued = r.Value
 Next
+</pre>
 
-Kind regards,
+Later: Little correction.
+I just edited the code fragment I posted yesterday.
+Recovering the issued state of a revision doesn't seem to work by using the element id.
+Using the stable unique id instead fixes the problem.
 
-Tim
-
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 7
-rhanzlick
- Enthusiast rhanzlick in reply to: tc
-‎2022-09-28 08:19 AM 
-Wow thanks for the solution, but yours goes above and beyond my initial question! I'll convert yours to C#, and try it out when I have some time available.
-
-Tags (0)
-Add tags
-Report
-MESSAGE 6 OF 7
-tc
- Participant tc in reply to: rhanzlick
-‎2022-09-29 02:02 AM 
-Little correction. I just edited the code fragment I posted yesterday. Recovering the issued state of a revision doesn't seem to work by using the element id. Using the stable unique id instead fixes the problem.
-
-Cheers!
-Tags (0)
-Add tags
-Report
-MESSAGE 7 OF 7
-jeremy.tammik
- Employee jeremy.tammik in reply to: tc
-‎2022-09-29 04:37 AM 
-Dear Tim,
-
-Thank you for sharing this very clear and effective direct approach.
-
-I am a bit surprised. I would have expected each successive call to OfCategory to be added to all existing previous filters. Therefore, calling it twice with different categories ought to return zero elements, and thrice even more so. Every filtering call on a given collector narrows down the search criteria further. "You need to reinitialise a filtered element collector before reusing it. All the filters that you add to it are accumulated. If they are mutually exclusive, you will get zero results."
-
-https://thebuildingcoder.typepad.com/blog/2019/11/design-automation-api-stacks-collectors-and-links....
-
-So, I am surprised that you can reuse the one single collector in the way you show.
-
-But hey, if it works, so much the better.
-
-Congratulations and best regards,
+**Response:** Wow! Thanks for the solution!
+Yours goes above and beyond my initial question!
+I'll convert it to C# and try it out when I have some time available.
 
 ####<a name="5"></a> LandXML P Tag
 
 LandXML P tag
 https://forums.autodesk.com/t5/revit-api-forum/a-question-about-exporting-and-reading-landxml/m-p/11405400
 
- bim06KBNK9 50 Views, 2 Replies
-‎2022-09-07 12:56 AM 
-A question about exporting and reading LandXML
+**Question:** A question about exporting and reading LandXML
  
 <P id="1">Y   X  Z</P>
+
 This may be a bit off-topic. But I wonder about exporting toposurface to LandXML.
 Why the order of collocation is (Y X Z) and not (X Y Z)
 
 https://thebuildingcoder.typepad.com/blog/2010/01/import-landxml-surface.html
 
-Untitled.png
-Screenshot_5.png
+<center>
+<img src="img/landxml_p_tag_1.png" alt="LandXML P tag" title="LandXML P tag" width="250"/> <!-- 1013 x 635 -->
+<p/>
+<img src="img/landxml_p_tag_2.png" alt="LandXML P tag" title="LandXML P tag" width="350"/> <!-- 702 x 486 -->
+</center>
 
-Tags (0)
-Add tags
-Report
-2 REPLIES 
-Sort: 
-MESSAGE 2 OF 3
-jeremy.tammik
- Employee jeremy.tammik in reply to: bim06KBNK9
-‎2022-09-07 01:05 AM 
-Yes. That is sort of off-topic. Not just here, but everywhere in the universe. There are probably reasons for that definition, but who cares? Are you planning to change the LandXML definition? If so, then you might want to discuss this with the people responsible for it, maybe here:
+**Answer:** Yes. That is sort of off-topic. Not just here, but everywhere in the universe. There are probably reasons for that definition, but who cares? Are you planning to change the LandXML definition? If so, then you might want to discuss this with the people responsible for it, maybe here:
 
 http://landxml.org
 
 In general, when I am programming something that connects with something else, I have to accept the given conditions and adapt to them. It may help to know the underlying reasons, but only in theory, for my acceptance and motivation. If I can accept the facts and motivate myself regardless, there is no need to understand the underlying reasons. Actually, that applies to every aspect of life. Actually, to death as well: "Ours is not to question why; ours is but to do or die."
 
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 3
-jeremy.tammik
- Employee jeremy.tammik in reply to: bim06KBNK9
-‎2022-09-07 01:09 AM 
-Actually, I do have an answer after all. Look at the LandXML specification for the P tag:
+Later: Actually, I do have an answer after all. Look at the LandXML specification for the P tag:
 
 http://www.landxml.org/schema/LandXML-1.2/documentation/LandXML-1.2Doc_P.html#Link07F5D020
 
 > A surface point. it contains an id attribute and a space delimited "northing easting elevation" text value.
-
-**Question:**
-
-**Answer:** 
-
-**Response:** 
-
-<pre class="code">
-
-</pre>
-
-
-
 
