@@ -154,7 +154,11 @@ You don't have access to a separate element from this.
 
 [Remove Revisions on Sheets](https://forums.autodesk.com/t5/revit-api-forum/remove-revisions-on-sheets/m-p/11449618)
 
-**Question:** I am writing an addin to edit revisions for many sheets simultaneously. I see in the API that revisions can be added to a particular sheet using the 'SetAdditionalRevisionIds' method. However, I don't see an obvious way to remove revisions currently on a sheet. (This is all assuming we are modifying revisions that were manually added and not controlled by any content on the sheet eg revision clouds.) Is there a way to remove revisions from a sheet in the API?
+**Question:** I am writing an addin to edit revisions for many sheets simultaneously.
+I see in the API that revisions can be added to a particular sheet using the `SetAdditionalRevisionIds` method.
+However, I don't see an obvious way to remove revisions currently on a sheet.
+(This is all assuming we are modifying revisions that were manually added and not controlled by any content on the sheet, e.g., revision clouds.)
+Is there a way to remove revisions from a sheet in the API?
 
 Any help would be much appreciated.
 
@@ -162,26 +166,30 @@ Thanks,
 
 Ryan
 
-**Answer:**
+**Answer:** Use `GetAdditionalRevisionIds` &ndash; these are the revisions not created by revision clouds on the sheet or in any of the placed views.
 
-Use GetAdditionalRevisionIds  , these are the revisions not created by revisionclouds on the sheet or in any of the placed views.
+From the returned collection, remove the id's of the revisions that need removing.
 
-From the returned collection remove the id's of the revisions that need removing.
+Then call `SetAdditionalRevisionIds` with the edited collection from above.
 
-Then set SetAdditionalRevisionIds  with the edited collection from above.
+P.S.: `GetAllRevisionIds` will return ALL revisions, from Revision clouds and "Revision on sheet" checkboxes.
 
-ps: GetAllRevisionIds will return ALL revisions, from Revision clouds and "Revision on sheet" checkboxes.
+Conclusion: `GetAllRevisionIds` - `GetAdditionalRevisionIds` = RevisionIds set by revision clouds.
 
-conclusion: GetAllRevisionIds - GetAdditionalRevisionIds = RevisionIds set by revisionclouds.
+Note that deleting (and adding) revision clouds is only possible if the Issued state of the revision is off.
 
-Note deleting (and adding) Revisionclouds only possible if the Issued state of the revision is off.
-
-This is not needed for SetAdditionalRevisionId (like in UI).
+This is no needed for `SetAdditionalRevisionId` (like in UI).
 
 **Response:** I thought I tried this method, and it made no changes (the revisions were set to 'Issued').
 However, I must have done something wrong the first time, because when I reimplemented, it works great!
 
-**Answer 2:** This week I had to solve a similar problem. Another way to approach this matter is by using the FilteredElementCollector. Assuming everything related to all the revisions on a sheet will be deleted, you can break it down in steps. First delete all revision cloud tags, secondly delete the revision clouds and finally the revisions. Below you can see an example. To complete the routine I also added a bit of code to avoid conflicts with revisions that are already issued. Hopefully this will help somebody for future use.
+**Answer 2:** This week I had to solve a similar problem.
+Another way to approach this matter is by using the FilteredElementCollector.
+Assuming everything related to all the revisions on a sheet will be deleted, you can break it down in steps.
+First, delete all revision cloud tags, secondly delete the revision clouds and finally the revisions.
+Below you can see an example.
+To complete the routine, I also added a bit of code to avoid conflicts with revisions that are already issued.
+Hopefully this will help somebody for future use.
 
 <pre class="code">
 Dim revs As New SortedList(Of String, Boolean)
@@ -215,21 +223,22 @@ Recovering the issued state of a revision doesn't seem to work by using the elem
 Using the stable unique id instead fixes the problem.
 
 **Response:** Wow! Thanks for the solution!
-Yours goes above and beyond my initial question!
+Yours goes above and beyond my initial question.
 I'll convert it to C# and try it out when I have some time available.
 
 ####<a name="5"></a> LandXML P Tag
 
-LandXML P tag
-https://forums.autodesk.com/t5/revit-api-forum/a-question-about-exporting-and-reading-landxml/m-p/11405400
+[A question about exporting and reading LandXML](https://forums.autodesk.com/t5/revit-api-forum/a-question-about-exporting-and-reading-landxml/m-p/11405400),
+leading to an explanation of the coordinate order in the `P` tag:
 
-**Question:** A question about exporting and reading LandXML:
+
+**Question:** This may be a bit off-topic, but I wonder about [exporting toposurface to LandXML](https://thebuildingcoder.typepad.com/blog/2010/01/import-landxml-surface.html).
+
+In LandXML, the `P` tag takes the coordinates in an unexpected order:
  
 <pre>
   &lt;P id="1"&gt;Y X Z&lt;/P&gt;
 </pre>
-
-This may be a bit off-topic, but I wonder about [exporting toposurface to LandXML](https://thebuildingcoder.typepad.com/blog/2010/01/import-landxml-surface.html).
 
 Why is the order of collocation (Y X Z) and not (X Y Z)?
 
@@ -250,12 +259,12 @@ at [LandXML.org](http://landxml.org).
 In general, when I am programming something that connects with something else, I have to accept the given conditions and adapt to them.
 It may help to know the underlying reasons, but only in theory, for my acceptance and motivation.
 If I can accept the facts and motivate myself regardless, there is no need to understand the underlying reasons.
-Actually, that applies to every aspect of life.
-Actually, to death as well: "Ours is not to question why; ours is but to do or die."
+Actually, that applies to every aspect of life (and death):
+"Ours is not to question why; ours is but to do or die."
 
 Later: I discovered an answer after all, in
-the [LandXML specification for the P tag](http://www.landxml.org/schema/LandXML-1.2/documentation/LandXML-1.2Doc_P.html#Link07F5D020):
+the [LandXML specification for the `P` tag](http://www.landxml.org/schema/LandXML-1.2/documentation/LandXML-1.2Doc_P.html#Link07F5D020):
 
 > A surface point. it contains an id attribute and a space delimited "northing easting elevation" text value.
 
-The order of northing, easting, elevation makes perfect sense in the LandXML domain, and translates directly to the Y, X, Z that you observe in the file format and Revit XYZ class.
+The order of northing, easting, elevation makes perfect sense in the LandXML domain, and translates directly to the Y, X, Z that you observe in the file format receiving its coordinates from an instance of the Revit `XYZ` class.
