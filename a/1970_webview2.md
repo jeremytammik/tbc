@@ -44,7 +44,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### WebView2
 
-####<a name="2"></a> Future of CefSharp and WebView2 for Revit add-ins
+Questions on using WebView2 in an add-in cropped up now and then, so we share some clarification on that usage, plus a couple of other interesting little titbits from
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
+
+- [WebView2 and CefSharp in Revit add-ins](#2)
+- [Retrieve reference plane in element](#3)
+- [Remove revisions on sheets](#4)
+- [LandXML `P` tag](#5)
+
+####<a name="2"></a> WebView2 and CefSharp in Revit Add-Ins
 
 Here are some thoughts and experiences and
 
@@ -215,16 +223,15 @@ I'll convert it to C# and try it out when I have some time available.
 LandXML P tag
 https://forums.autodesk.com/t5/revit-api-forum/a-question-about-exporting-and-reading-landxml/m-p/11405400
 
-**Question:** A question about exporting and reading LandXML
+**Question:** A question about exporting and reading LandXML:
  
-<pre class="code">
+<pre>
   &lt;P id="1"&gt;Y X Z&lt;/P&gt;
 </pre>
 
-This may be a bit off-topic. But I wonder about exporting toposurface to LandXML.
-Why the order of collocation is (Y X Z) and not (X Y Z)
+This may be a bit off-topic, but I wonder about [exporting toposurface to LandXML](https://thebuildingcoder.typepad.com/blog/2010/01/import-landxml-surface.html).
 
-https://thebuildingcoder.typepad.com/blog/2010/01/import-landxml-surface.html
+Why is the order of collocation (Y X Z) and not (X Y Z)?
 
 <center>
 <img src="img/landxml_p_tag_1.png" alt="LandXML P tag" title="LandXML P tag" width="250"/> <!-- 1013 x 635 -->
