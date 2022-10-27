@@ -24,7 +24,11 @@ twitter:
 
  the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; Chaining Idling events and other solutions...
+Using WebView2 in an add-in and other interesting little titbits from the Revit API discussion forum
+&ndash; WebView2 and CefSharp in Revit add-ins
+&ndash; Retrieve reference plane in element
+&ndash; Remove revisions on sheets
+&ndash; LandXML <code>P</code> tag...
 
 linkedin:
 
