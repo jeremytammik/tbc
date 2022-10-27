@@ -101,7 +101,7 @@ Actually, if it works for you without problems, we should probably compare notes
 
 In Revit, we are working on a separate component that isolates the browser code from Revit and I would like all our uses to go through that.
 It supports both CEF and WV2, so it's easy to switch which one we want to use.
-Among other things, it takes care of setting up the UDF so they are all in the same location.
+Among other things, it takes care of setting up the UDF, so they are all in the same location.
 
 The development builds of Revit include both WV2 and the evergreen runtime.
 In fact, it was put into Revit even before we started the migration; looks like the SSO component uses it now.
@@ -129,7 +129,9 @@ If there is a placed instance, you can call `GetReferenceByName` on that instanc
 
 **Response:** I am able to get the reference using 
 
+<pre class="code">
 Reference reference=famInst.GetReferenceByName("Center (Left/Right)");
+</pre>
 
 Now, how to get the reference plane from the reference?
 
@@ -168,7 +170,7 @@ Ryan
 
 **Answer:** Use `GetAdditionalRevisionIds` &ndash; these are the revisions not created by revision clouds on the sheet or in any of the placed views.
 
-From the returned collection, remove the id's of the revisions that need removing.
+From the returned collection, remove the ids of the revisions that need removing.
 
 Then call `SetAdditionalRevisionIds` with the edited collection from above.
 
