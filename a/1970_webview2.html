@@ -128,15 +128,13 @@ Therefore, you are receiving a Surface or more specifically a Plane, which gives
 If you want to attach a dimension to it, use the Reference you get originally.
 You don't have access to a separate element from this.</p>
 <h4><a name="4"></a> Remove Revisions on Sheets</h4>
-<p><a href="https://forums.autodesk.com/t5/revit-api-forum/remove-revisions-on-sheets/m-p/11449618">Remove Revisions on Sheets</a></p>
+<p>Two solutions
+to <a href="https://forums.autodesk.com/t5/revit-api-forum/remove-revisions-on-sheets/m-p/11449618">remove revisions on sheets</a>:</p>
 <p><strong>Question:</strong> I am writing an addin to edit revisions for many sheets simultaneously.
 I see in the API that revisions can be added to a particular sheet using the <code>SetAdditionalRevisionIds</code> method.
 However, I don't see an obvious way to remove revisions currently on a sheet.
 (This is all assuming we are modifying revisions that were manually added and not controlled by any content on the sheet, e.g., revision clouds.)
 Is there a way to remove revisions from a sheet in the API?</p>
-<p>Any help would be much appreciated.</p>
-<p>Thanks,</p>
-<p>Ryan</p>
 <p><strong>Answer:</strong> Use <code>GetAdditionalRevisionIds</code> &ndash; these are the revisions not created by revision clouds on the sheet or in any of the placed views.</p>
 <p>From the returned collection, remove the ids of the revisions that need removing.</p>
 <p>Then call <code>SetAdditionalRevisionIds</code> with the edited collection from above.</p>
@@ -188,7 +186,7 @@ Yours goes above and beyond my initial question.
 I'll convert it to C# and try it out when I have some time available.</p>
 <h4><a name="5"></a> LandXML P Tag</h4>
 <p><a href="https://forums.autodesk.com/t5/revit-api-forum/a-question-about-exporting-and-reading-landxml/m-p/11405400">A question about exporting and reading LandXML</a>,
-leading to an explanation of the coordinate order in the <code>P</code> tag:</p>
+led to an explanation of the coordinate order in the <code>P</code> tag:</p>
 <p><strong>Question:</strong> This may be a bit off-topic, but I wonder about <a href="https://thebuildingcoder.typepad.com/blog/2010/01/import-landxml-surface.html">exporting toposurface to LandXML</a>.</p>
 <p>In LandXML, the <code>P</code> tag takes the coordinates in an unexpected order:</p>
 <pre>

@@ -158,19 +158,14 @@ You don't have access to a separate element from this.
 
 ####<a name="4"></a> Remove Revisions on Sheets
 
-[Remove Revisions on Sheets](https://forums.autodesk.com/t5/revit-api-forum/remove-revisions-on-sheets/m-p/11449618)
+Two solutions
+to [remove revisions on sheets](https://forums.autodesk.com/t5/revit-api-forum/remove-revisions-on-sheets/m-p/11449618):
 
 **Question:** I am writing an addin to edit revisions for many sheets simultaneously.
 I see in the API that revisions can be added to a particular sheet using the `SetAdditionalRevisionIds` method.
 However, I don't see an obvious way to remove revisions currently on a sheet.
 (This is all assuming we are modifying revisions that were manually added and not controlled by any content on the sheet, e.g., revision clouds.)
 Is there a way to remove revisions from a sheet in the API?
-
-Any help would be much appreciated.
-
-Thanks,
-
-Ryan
 
 **Answer:** Use `GetAdditionalRevisionIds` &ndash; these are the revisions not created by revision clouds on the sheet or in any of the placed views.
 
@@ -235,7 +230,7 @@ I'll convert it to C# and try it out when I have some time available.
 ####<a name="5"></a> LandXML P Tag
 
 [A question about exporting and reading LandXML](https://forums.autodesk.com/t5/revit-api-forum/a-question-about-exporting-and-reading-landxml/m-p/11405400),
-leading to an explanation of the coordinate order in the `P` tag:
+led to an explanation of the coordinate order in the `P` tag:
 
 
 **Question:** This may be a bit off-topic, but I wonder about [exporting toposurface to LandXML](https://thebuildingcoder.typepad.com/blog/2010/01/import-landxml-surface.html).
