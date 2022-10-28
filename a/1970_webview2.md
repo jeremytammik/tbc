@@ -32,6 +32,15 @@ Using WebView2 in an add-in and other interesting little titbits from the Revit 
 
 linkedin:
 
+Using WebView2 in a #RevitAPI add-in, retrieving reference plane in element and removing revisions on sheets
+
+https://autode.sk/webview2
+
+- WebView2 and CefSharp in Revit add-ins
+- Retrieve reference plane in element
+- Remove revisions on sheets
+- LandXML <code>P</code> tag...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -119,6 +128,38 @@ Dynamo is currently fully committed to WebView2 from v2.17, so we are testing it
 If anything, we might stop shipping CefSharp at some point. 
 
 Also, WV2 comes included in Win11 by default and can't be uninstalled (I think...), so that will be no issue hopefully soon.
+
+####<a name="2.1"></a> WebView2 Example
+
+[Alexander Laktionov](https://www.linkedin.com/in/alexander-laktionov-a50474162/), [@laksan1](https://github.com/laksan1),
+shared a WebView2 sample add-in on [LinkedIn](https://www.linkedin.com/posts/alexander-laktionov-a50474162_bim-revit-autodesk-activity-6967953596038438913-R0xk?utm_source=share&utm_medium=member_desktop):
+
+Have you ever wondered, "How can I link a plugin in Revit to an application created on a web platform?"
+Usually, plug-ins in Revit are created on a ribbon, but that's not the only way.
+You can create your own panel in several ways:
+
+- RibbonPanel (built into Revit)
+- Dockable Panel (built into Revit)
+- Electron
+- Telegram (you can create commands and call your plugins)
+- Any web project and connect it to the Revit plugin via sockets (websockets or socket.io), specifically:
+- WebView2
+
+Let's talk about the last method.
+What is WebView2?
+The Microsoft Edge WebView2 control allows you to embed web technologies (HTML, CSS, and JavaScript) into native applications.
+The WebView2 control uses Microsoft Edge as a rendering mechanism to display web content in native applications.
+The [WebView2Example GitHub repository](https://github.com/laksan1/WebView2Example) shows 
+such an application.
+
+The repository contains two projects.
+The first is a frontend made in angular (you can use any other framework).
+It uses a single `WebView2Service` file to interact with your plugin to send data to the Revit application.
+The second project is a C# project that includes the nugget package `Microsoft.Web.WebView2`.
+For introductory purposes, I made a simple project that updates floors in the Revit model when they are changed in the WPF window (WebView2).
+
+webview2example.gif
+
 
 ####<a name="3"></a> Retrieve Reference Plane in Element
 
