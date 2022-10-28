@@ -158,8 +158,9 @@ It uses a single `WebView2Service` file to interact with your plugin to send dat
 The second project is a C# project that includes the nugget package `Microsoft.Web.WebView2`.
 For introductory purposes, I made a simple project that updates floors in the Revit model when they are changed in the WPF window (WebView2).
 
-webview2example.gif
-
+<center>
+<img src="img/webview2example.gif" alt="WebView2Example" title="WebView2Example" width="800"/> <!-- 1958 x 1016 >
+</center>
 
 ####<a name="3"></a> Retrieve Reference Plane in Element
 
