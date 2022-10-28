@@ -159,8 +159,10 @@ The second project is a C# project that includes the nugget package `Microsoft.W
 For introductory purposes, I made a simple project that updates floors in the Revit model when they are changed in the WPF window (WebView2).
 
 <center>
-<img src="img/webview2example.gif" alt="WebView2Example" title="WebView2Example" width="800"/> <!-- 1958 x 1016 >
+<img src="img/webview2example.gif" alt="WebView2Example" title="WebView2Example" width="800"/>  <!-- 1958 x 1016 -->
 </center>
+
+Many thanks to Alexander for sharing this nice sample!
 
 ####<a name="3"></a> Retrieve Reference Plane in Element
 
