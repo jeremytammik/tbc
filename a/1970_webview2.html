@@ -136,7 +136,9 @@ The first is a frontend made in angular (you can use any other framework).
 It uses a single <code>WebView2Service</code> file to interact with your plugin to send data to the Revit application.
 The second project is a C# project that includes the nugget package <code>Microsoft.Web.WebView2</code>.
 For introductory purposes, I made a simple project that updates floors in the Revit model when they are changed in the WPF window (WebView2).</p>
-<p>webview2example.gif</p>
+<p><center>
+<img src="img/webview2example.gif" alt="WebView2Example" title="WebView2Example" width="800"/> &lt;!-- 1958 x 1016 &gt;
+</center></p>
 <h4><a name="3"></a> Retrieve Reference Plane in Element</h4>
 <p>Some clarification on how symbol and instance geometry is generated from the family definiton:</p>
 <p><strong>Question:</strong> How can I retrieve a reference plane that is inside an element?
@@ -145,10 +147,9 @@ Is it possible to get the reference plane directly from the element via Revit AP
 <p><strong>Answer:</strong> You don't need to open the family.
 If there is a placed instance, you can call <code>GetReferenceByName</code> on that instance, or get all the references from it.</p>
 <p><strong>Response:</strong> I am able to get the reference using </p>
-<pre class="code">
+<p><pre class="code">
 Reference reference=famInst.GetReferenceByName("Center (Left/Right)");
-</pre>
-
+</pre></p>
 <p>Now, how to get the reference plane from the reference?</p>
 <p><strong>Answer:</strong> Use <code>GetGeometryObjectFromReference</code>.</p>
 <p><strong>Response:</strong> That throws an exception saying that I cannot convert <code>GeometryObject</code> to <code>ReferencePlane</code>:</p>
