@@ -61,6 +61,7 @@ Questions on using WebView2 in an add-in cropped up now and then, so we share so
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
 
 - [WebView2 and CefSharp in Revit add-ins](#2)
+- [WebView2 sample add-in project](#2.1)
 - [Retrieve reference plane in element](#3)
 - [Remove revisions on sheets](#4)
 - [LandXML `P` tag](#5)
@@ -129,7 +130,7 @@ If anything, we might stop shipping CefSharp at some point.
 
 Also, WV2 comes included in Win11 by default and can't be uninstalled (I think...), so that will be no issue hopefully soon.
 
-####<a name="2.1"></a> WebView2 Example
+####<a name="2.1"></a> WebView2 Sample Add-In Project
 
 [Alexander Laktionov](https://www.linkedin.com/in/alexander-laktionov-a50474162/), [@laksan1](https://github.com/laksan1),
 shared a WebView2 sample add-in on [LinkedIn](https://www.linkedin.com/posts/alexander-laktionov-a50474162_bim-revit-autodesk-activity-6967953596038438913-R0xk?utm_source=share&utm_medium=member_desktop):
