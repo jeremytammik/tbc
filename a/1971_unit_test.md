@@ -69,7 +69,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 A summary of the announcements made at AU, a bunch of interesting Revit API discussions, and miscellaneous notes to self, mostly AI-related news:
 
-- [AU 2022 announcements What’s New and What’s Ahead](#2)
+- [What’s New and What’s Ahead from AU 2022](#2)
 - [Learning Revit API as a complete beginner](#3)
 - [Retrieving all fabrication item materials](#4)
 - [`List` vs. `IList`](#5)
@@ -102,7 +102,7 @@ Many thanks to ??? for sharing this nice sample!
 
 
 
-####<a name="2"></a> AU 2022 Announcements What’s New and What’s Ahead
+####<a name="2"></a> What’s New and What’s Ahead from AU 2022
 
 All the Announcements from AU 2022: What’s New and What’s Ahead
 https://www.autodesk.com/autodesk-university/blog/All-Announcements-AU-2022-Whats-New-and-Whats-Ahead-2022
