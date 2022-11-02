@@ -99,6 +99,16 @@ Many thanks to ??? for sharing this nice sample!
 </pre>
 
 
+APS (Formerly Forge) Accelerator in Dublin office Nov 14th - 18th
+
+Hi Team,
+ 
+Maxime was kind enough to share this alias with me. I’m reaching out to all of you to let you know that we are planning an accelerator in the Autodesk Dublin Office this upcoming November 14thto 18th. We are looking for customers who will be interested in joining us onsite to work with the Developer advocates team in coding solutions using Autodesk Platform Services (formerly Forge). We have an ongoing registration that you can share with them and promote the event with your customers in the area so we can have a full house for the event. In the past (before covid) we hosted events in EMEA region to have software developers join us for the week. Also, if you are around in the Dublin area let me know so we can include you in our celebration dinner for that week. 
+ 
+https://www.eventbrite.com/e/autodesk-platform-services-aps-accelerator-dublin-november-14-18-2022-registration-440477168067
+
+For more details about this and other APS Accelerator events: https://forge.autodesk.com/accelerator-program.
+
 
 
 
