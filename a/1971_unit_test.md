@@ -117,8 +117,52 @@ of [announcements from AU 2022: What’s New and What’s Ahead](https://www.aut
 
 ####<a name="4"></a> Learning Revit API as a Complete Beginner
 
-Advice About learning API forum as a complete beginer
-https://forums.autodesk.com/t5/revit-api-forum/advice-about-learning-api-forum-as-a-complete-beginer/m-p/11522223
+Back to the Revit API, we once again provide
+some [advice about learning Revit API as a complete beginner](https://forums.autodesk.com/t5/revit-api-forum/advice-about-learning-api-forum-as-a-complete-beginer/m-p/11522223):
+
+**Question:** I was recently informed by my organization that I need to start working with the Revit API.
+I know how to use Revit quite well and Dynamo also I have a good experience with it.
+However, I have no experience at all considering that I don't know anything about C# language or forums.
+Here are my questions:
+
+- What is the best way to learn in this case? 
+- Where can I ask and find information?
+- How much usually is time to learn such process?
+- Do I need to learn the whole C# language or just the Revit Api? 
+
+I'd appreciate any help with where to start learning and what to do
+
+**Answer:** Welcome to the Revit API!
+
+Normally, I would point you to
+The Building Coder [tips on getting started](https://thebuildingcoder.typepad.com/blog/about-the-author.html#2).
+
+Unfortunately, the Typepad blog host platform is currently having serious problems, so take a look at
+the [GitHub source code of The Building Coder blog](http://jeremytammik.github.io/tbc/a/#2) instead.
+
+It answers all you questions in depth, possibly except about time. Still, I'll briefly reiterate:
+
+- What is the best way to learn in this case?
+
+Start by exploring the Revit UI. You already have. Gain some basic understanding of .NET and C#, of you plan to work in C#. That should be doable in a couple of hours or a couple of days, depending on you. Then, work through the Revit API getting started material. There are walkthroughs, video tutorials, numerous YouTube introductions, hundreds of options. Many have been mentioned and discussed here in the forum in the past.
+
+- Where can I ask and find information?
+
+Please work through the getting started material before asking any questions. If you encounter problems with the getting started material, please search for existing answers. I guarantee that you will not have a problem that has not already been discussed and solved here in the past.
+
+- How much usually is time to learn such process?
+
+Days, weeks, and years. Depends how far you wish to go. A proficient programmer can understand the system and have a non-trivial macro up and running within hours.
+
+- Do I need to learn the whole C# language or just the Revit Api?
+
+There is no good way to use half a programming language.
+You have to learn and understand the entire .NET environment.
+That can be programmed in C# or in other languages as well.
+
+All of this information has been presented hundreds of times in the past, so please search thoroughly for answers before raising any new questions.
+
+Thank you! Good luck and have fun!
 
 ####<a name="5"></a> Retrieving All Fabrication Item Materials
 
@@ -171,16 +215,6 @@ The Great Pandemic Hand-Washing Blooper
 https://www.theatlantic.com/health/archive/2022/10/covid-pandemic-airborne-virus-transmission-hand-washing/671831/
 Should you wash your hands? Yes. Does it matter for respiratory viruses? Not as much as we once thought.
 
-
-
-
-
-**Question:** 
-
-**Answer:** 
-
-**Response:** 
-
 <center>
 <img src="img/" alt="" title="" width="100"/>  <!-- 1958 x 1016 -->
 </center>
@@ -189,3 +223,5 @@ Many thanks to ??? for sharing this nice sample!
 
 <pre class="code">
 </pre>
+
+**Response:** 
