@@ -67,7 +67,24 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Unit Test Your Revit Add-In
 
-Live, hands-on, face-to-face acelerator in Europe, summary of the announcements made at AU, a bunch of interesting Revit API discussions, and miscellaneous notes to self, mostly AI-related news:
+Finally, after almost a week of serious disruption on the Typepad blogging platform hosting The Building Coder, I am back with a new post.
+
+If any similar hiccups crop up in the fiuture, please be aware that The Building Coder is also available directly on GitHub pages in the [`tbc` repostitory](https://github.com/jeremytammik/tbc) hosting the source and chronological index for The Building Coder Revit API blog.
+It includes all the markdown source text, HTML, CSS and images for The Building Coder, plus the cmplete chronological index of all posts.
+Besides providing a workaround for Typepad failure, it also enables you to grab all The Building Coder source text, host it locally, and use it to implemet your own search algorithms or even train your AI to answer Revit API questions.
+
+As I explained in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+about [The Building Coder blog standalone](https://forums.autodesk.com/t5/revit-api-forum/the-building-coder-blog-standalone/td-p/11519594):
+
+> You can continue reading all blog posts by The Building Coder on GitHub in the [`tbc` repository](https://github.com/jeremytammik/tbc).
+All articles are published there as well, including their source text.
+The Building Coder standalone boasts a [global chronological blog post index ](http://jeremytammik.github.io/tbc/a).
+Here is the blog post describing how I started the `tbc` repository in 2016:
+[`tbc` &ndash' The Building Coder Source and Index on GitHub](http://thebuildingcoder.typepad.com/blog/2016/02/tbc-the-building-coder-source-and-index-on-github.html)
+([^](http://jeremytammik.github.io/tbc/a/1408_tbc_github.html)).
+
+Back to everyday blogging again, I discuss the upcoming live, hands-on, face-to-face European APS accelerator, a summary of the announcements made at AU, a bunch of interesting Revit API discussions, and miscellaneous notes to self, mostly AI-related news:
 
 - [APS accelerator Dublin Nov 14-18](#2)
 - [What’s New and What’s Ahead from AU 2022](#3)
