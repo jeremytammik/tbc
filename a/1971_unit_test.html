@@ -77,16 +77,15 @@ about <a href="https://forums.autodesk.com/t5/revit-api-forum/the-building-coder
 All articles are published there as well, including their source text.
 The Building Coder standalone boasts a <a href="http://jeremytammik.github.io/tbc/a">global chronological blog post index </a>.
 Here is the blog post describing how I started the <code>tbc</code> repository in 2016:
-<a href="http://thebuildingcoder.typepad.com/blog/2016/02/tbc-the-building-coder-source-and-index-on-github.html"><code>tbc</code> &amp;ndash' The Building Coder Source and Index on GitHub</a>
+<a href="http://thebuildingcoder.typepad.com/blog/2016/02/tbc-the-building-coder-source-and-index-on-github.html"><code>tbc</code> &ndash; The Building Coder Source and Index on GitHub</a>
 (<a href="http://jeremytammik.github.io/tbc/a/1408_tbc_github.html">^</a>).</p>
 </blockquote>
-<p>Back to everyday blogging again, I discuss the upcoming live, hands-on, face-to-face European APS accelerator, a summary of the announcements made at AU, a bunch of interesting Revit API discussions, and miscellaneous notes to self, mostly AI-related news:</p>
+<p>Back to everyday blogging again, a pointer to the upcoming live, hands-on, face-to-face European APS accelerator, a summary of the announcements made at AU, a bunch of interesting Revit API discussions, and miscellaneous notes to self, mostly AI-related news:</p>
 <ul>
 <li><a href="#2">APS accelerator Dublin Nov 14-18</a></li>
 <li><a href="#3">What’s New and What’s Ahead from AU 2022</a></li>
 <li><a href="#4">Learning Revit API as a complete beginner</a></li>
 <li><a href="#5">Retrieving all fabrication item materials</a></li>
-<li><a href="#6"><code>List</code> vs. <code>IList</code></a></li>
 <li><a href="#7">Revit add-in unit testing</a></li>
 <li><a href="#8">Bleeding edge of AI</a></li>
 <li><a href="#9">AI-driven coding tool may violate copyright</a></li>
@@ -206,141 +205,71 @@ the <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.1
 <p>Luiz Henrique <a href="https://github.com/ricaun">@ricaun</a> Cassettari provided some updated advice on that in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/best-unit-test-framework-2022/td-p/11520295">best unit test framework 2022</a>:</p>
-<p>I started developing a new plug-in for Revit recently, it's been a while since the last time I worked</p>
-<p>on a new coding project, I was wondering which framework is best for the specific tast of making</p>
-<p>a Revit Add-on ? I'm developing with VS22 for windows only.</p>
-<p>Solved by ricaun. Go to Solution.</p>
-<p>Tags (0)
-Add tags
-Report
-10 REPLIES 
-Sort: 
-MESSAGE 2 OF 11
-ricaun
- Advocate ricaun in reply to: TomB.ADV
-‎2022-10-31 07:45 AM 
-Here are some unit tests:</p>
-<p>Dynamo's Revit Tester Framework - https://github.com/DynamoDS/RevitTestFramework
-Geberit's Revit Test Runner - https://github.com/geberit/Revit.TestRunner
-Speckle's Revit Test Runner - https://github.com/specklesystems/xUnitRevit
-I have been using the Geberit version and was trying to create my own to run directly in Visual Studio 2022.</p>
-<p>Is kinda working: https://youtube.com/shorts/ZwtmHP72_Zc</p>
-<p>Luiz Henrique Cassettari</p>
-<p>ricaun.com - Revit API Developer</p>
-<p>AppLoader EasyConduit WireInConduit ConduitMaterial CircuitName ElectricalUtils
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 11
-TomB.ADV
- Explorer TomB.ADV in reply to: ricaun
-‎2022-10-31 09:06 AM 
-So if I understand correctly, Speckle's Revit Test Runner, will allow me to test my code against any .rvt model without manually activating each custom function/command in the add-on ? Is that right ? </p>
-<p>Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 11
-danielJY6FB
- Contributor danielJY6FB in reply to: TomB.ADV
-‎2022-10-31 10:46 AM 
-TomB.AD,</p>
-<p>I believe so? I don't 100% understand what you are asking, but I will second that speckle's Revit unit test is the best available test framework for Revit that we've found. You can run test functions using the speckle UI, and you don't have to test a full external command - you can test individual methods.</p>
-<p>Note that you still have to open Revit to use it, as I haven't seen a Revit Test Framework that can get around that - as far as I know Revit has to be open to have access to it's API, which is required to test anything that uses and Revit API calls. We've used Speckle a bit at our company, but eventually moved away from it in support of developing our own Revit Unit Test framework that better suited our needs and process.</p>
-<p>Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 11
-danielJY6FB
- Contributor danielJY6FB in reply to: ricaun
-‎2022-10-31 10:56 AM 
-ricaun,</p>
-<p>Cool vid! I think it's awesome that you are developing your own! I think more Revit devs should be more focused on testing to ensure better and more stable applications! Is that test class calling the Revit API? I would be amazed if you found a way to get that working with the Revit API but outside of Revit - if so lemme know how!</p>
-<p>Our company actually ended up making our own Revit Test Framework to better suit our needs, and we'd like to make it open source one day! Here's a screenshot:</p>
-<p>unit test window 1.png
-80 KB</p>
-<p>unit test window 2.png
-68 KB
-Tags (0)
-Add tags
-Report
-MESSAGE 6 OF 11
-TomB.ADV
- Explorer TomB.ADV in reply to: danielJY6FB
-‎2022-10-31 11:10 AM 
-@danielJY6FB @ricaun</p>
-<p>I was reffering to the below example where on line 4 there is a method calling a Revit model from the solution folder.</p>
+<p><strong>Question:</strong> I started developing a new plug-in for Revit recently;
+it's been a while since the last time I worked on a new coding project.
+I was wondering which framework is best for the specific task of making a Revit Add-on?</p>
+<p><strong>Answer:</strong> Here are some unit tests:</p>
+<ul>
+<li><a href="https://github.com/DynamoDS/RevitTestFramework">Dynamo's Revit Tester Framework</a></li>
+<li><a href="https://github.com/geberit/Revit.TestRunner">Geberit's Revit Test Runner</a></li>
+<li><a href="https://github.com/specklesystems/xUnitRevit">Speckle's Revit Test Runner</a></li>
+</ul>
+<p>I have been using the Geberit version and was trying to create my own to run directly in Visual Studio 2022.</p>
+<p>Is kinda working, cf. my minirecording <a href="https://youtube.com/shorts/ZwtmHP72_Zc">Revit Unit Test Framework in Visual Studio 2022</a>.</p>
+<p><strong>Response:</strong> So, if I understand correctly, Speckle's Revit Test Runner will allow me to test my code against any <code>.rvt</code> model without manually activating each custom function/command in the add-on? Is that right? </p>
+<p><strong>Answer:</strong> I believe so.
+I don't 100% understand what you are asking, but I will second that speckle's Revit unit test is the best available test framework for Revit that we've found.
+You can run test functions using the speckle UI, and you don't have to test a full external command &ndash; you can test individual methods.</p>
+<p>Note that you still have to open Revit to use it, as I haven't seen a Revit Test Framework that can get around that &ndash; as far as I know, Revit has to be open to have access to it's API, which is required to test anything that uses and Revit API calls.
+We've used Speckle a bit at our company, but eventually moved away from it in support of developing our own Revit Unit Test framework that better suited our needs and process.</p>
+<p><strong>Response:</strong> Cool vid!
+I think it's awesome that you are developing your own!
+I think more Revit devs should be more focused on testing to ensure better and more stable applications!
+Is that test class calling the Revit API?
+I would be amazed if you found a way to get that working with the Revit API but outside of Revit &ndash; if so lemme know how!</p>
+<p>Our company actually ended up making our own Revit Test Framework to better suit our needs, and we'd like to make it open source one day!
+Here's a screenshot:</p>
+<p><center>
+<img src="img/daniel_unit_test_window_1.png" alt="Unit test" title="Unit test" width="400"/>  <!-- 648 × 823 -->
+</center></p>
+<p>Unit test report:</p>
+<p><center>
+<img src="img/daniel_unit_test_window_2.png" alt="Unit test" title="Unit test" width="600"/>  <!-- 895 × 678  -->
+</center></p>
+<p><strong>Response:</strong> I was reffering to the below example where on line 4 there is a method calling a Revit model from the solution folder.</p>
 <p>I could be wrong but looks like there is a method to load rvt model and execute API methods directly (line 7), meaning I don't have to open a new revit session to run tests.</p>
 <p>https://github.com/specklesystems/xUnitRevit</p>
-<p>[Fact]
+<pre class="code">
+[Fact]
 public void WallsHaveVolume()
 {
   var testModel = GetTestModel("walls.rvt");
-  var doc = xru.OpenDoc(testModel);</p>
-<p>var walls = new FilteredElementCollector(doc).WhereElementIsNotElementType().OfCategory(BuiltInCategory.OST_Walls).ToElements();</p>
-<p>foreach(var wall in walls)
+  var doc = xru.OpenDoc(testModel);
+
+  var walls = new FilteredElementCollector(doc).WhereElementIsNotElementType().OfCategory(BuiltInCategory.OST_Walls).ToElements();
+
+  foreach(var wall in walls)
   {
     var volumeParam = wall.get_Parameter(BuiltInParameter.HOST_VOLUME_COMPUTED);
     Assert.NotNull(volumeParam);
-    Assert.True(volumeParam.AsDouble() &gt; 0);
+    Assert.True(volumeParam.AsDouble() > 0);
   }
   doc.Close(false);
-}</p>
-<p>Tags (0)
-Add tags
-Report
-MESSAGE 7 OF 11
-danielJY6FB
- Contributor danielJY6FB in reply to: TomB.ADV
-‎2022-10-31 11:19 AM 
-TomB.ADV,</p>
-<p>Yes I believe Speckle provides methods for you to load and switch between revit files, among other utilities. However, I also though speckle tests needed to be run via the speckle test ui, which is a revit addin - so you have to open that to run the tests. I could be mistaken, as I haven't used speckle in a little while!</p>
-<p>Edit:</p>
-<p>Here's a link to a speckle unit test blog post - I think this is the framework we are talking about? It mentioned three parts, one of which is a revit addin that actually runs the tests:</p>
-<p>https://speckle.systems/blog/xunitrevit/ </p>
-<p>Tags (0)
-Add tags
-Report
-MESSAGE 8 OF 11
-TomB.ADV
- Explorer TomB.ADV in reply to: danielJY6FB
-‎2022-10-31 11:37 AM 
-I see, well, this is pritty much still better IMO compared to the alternatives but I wish there was a framework to execute tests without launching a new revit session, otherwise it is very restricting in terms of the machine specs I have to run the tests on 😞</p>
-<p>Tags (0)
-Add tags
-Report
-MESSAGE 9 OF 11
-ricaun
- Advocate ricaun in reply to: danielJY6FB
-‎2022-10-31 11:51 AM 
-Without Revit open is not possible I guess, but you could use the Design Automation to run some tests: The demo that I created for the Forge: https://youtu.be/EL5uJm_Nj8g</p>
-<p>The Test part is the missing key in my workflow, I was thinking to add a UI for testing in the AppLoader plugin but makes more sense to use the Test Explorer in Visual Studio 2022, just need to create a IPC between Revit and Visual Studio.</p>
-<p>Luiz Henrique Cassettari</p>
-<p>ricaun.com - Revit API Developer</p>
-<p>AppLoader EasyConduit WireInConduit ConduitMaterial CircuitName ElectricalUtils
-ricaun - Forge Hackathon 2022 - Demo
-ricaun - Forge Hackathon 2022 - Demo
-youtu.be/EL5uJm_Nj8g
-Using Design Automation to run a unit test for Revit Api - Forge Hackathon 2022. https://github.com/ricaun-io/RevitAddin.CountIt.Test --- Download Plugins: AppLoader: https://ricaun.com/apploader/ EasyConduit: https://ricaun.com/easyconduit/ WireInConduit: https://ricaun.com/wireinconduit/ ...
-Tags (0)
-Add tags
-Report
-MESSAGE 10 OF 11
-TomB.ADV
- Explorer TomB.ADV in reply to: ricaun
-‎2022-10-31 12:00 PM 
-That looks very interesting, looks like your are building a useful solution, looking forward to see this developed.</p>
-<p>Unfortenutlly, I didn't have the time to expirement with forge, I will look into it at a later stage, I guess
-for the time being I will take whatever is available...</p>
-<p>Tags (0)
-Add tags
-Report
-MESSAGE 11 OF 11
-danielJY6FB
- Contributor danielJY6FB in reply to: ricaun
-‎2022-10-31 01:15 PM 
-ricaun,</p>
-<p>This is REALLY cool, thanks for sharing! I like the idea of using forge, and that does seem to be where Autodesk wants to head in the future.</p>
-<p>Edit: Does running that via the Design Automation require the use of any Autodesk Cloud Credits?</p>
+}
+</pre>
+
+<p><strong>Answer:</strong> Yes, I believe Speckle provides methods for you to load and switch between Revit files, among other utilities.
+However, I also though speckle tests needed to be run via the speckle test ui, which is a revit addin &ndash; so you have to open that to run the tests.
+I could be mistaken, as I haven't used speckle in a little while!</p>
+<p>Here's a link to a <a href="https://speckle.systems/blog/xunitrevit">speckle unit test blog post</a> &ndash; I think this is the framework we are talking about? It mentioned three parts, one of which is a Revit addin that actually runs the tests.</p>
+<p><strong>Response:</strong> I see, well, this is pritty much still better IMO compared to the alternatives but I wish there was a framework to execute tests without launching a new Revit session, otherwise it is very restricting in terms of the machine specs I have to run the tests on.</p>
+<p><strong>Answer:</strong> Without Revit open is not possible I guess, but you could use
+the Autodesk Platform Services (APS) (ex Forge) <a href="https://forge.autodesk.com/en/docs/design-automation/v3/developers_guide/overview/">Design Automation API</a> to
+run some tests.</p>
+<p>I created a demo doing so, <a href="https://youtu.be/EL5uJm_Nj8g">ricaun &ndash; Forge Hackathon 2022 &ndash; demo</a>.</p>
+<p>The Test part is the missing key in my workflow; I was thinking to add a UI for testing in the AppLoader plugin, but makes more sense to use the Test Explorer in Visual Studio 2022, just need to create a IPC between Revit and Visual Studio.</p>
+<p><strong>Response 1:</strong> This is REALLY cool, thanks for sharing! I like the idea of using Forge, and that does seem to be where Autodesk wants to head in the future.</p>
+<p>Many thanks to ricaun for this important research and explanation!</p>
 <h4><a name="8"></a> Bleeding Edge of AI</h4>
 <p>Wrappoing up with some short notes on non-Revit-API topics, let's start
 with <a href="https://bleedingedge.ai">the bleeding edge of AI</a>:</p>

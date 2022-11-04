@@ -81,16 +81,15 @@ about [The Building Coder blog standalone](https://forums.autodesk.com/t5/revit-
 All articles are published there as well, including their source text.
 The Building Coder standalone boasts a [global chronological blog post index ](http://jeremytammik.github.io/tbc/a).
 Here is the blog post describing how I started the `tbc` repository in 2016:
-[`tbc` &ndash' The Building Coder Source and Index on GitHub](http://thebuildingcoder.typepad.com/blog/2016/02/tbc-the-building-coder-source-and-index-on-github.html)
+[`tbc` &ndash; The Building Coder Source and Index on GitHub](http://thebuildingcoder.typepad.com/blog/2016/02/tbc-the-building-coder-source-and-index-on-github.html)
 ([^](http://jeremytammik.github.io/tbc/a/1408_tbc_github.html)).
 
-Back to everyday blogging again, I discuss the upcoming live, hands-on, face-to-face European APS accelerator, a summary of the announcements made at AU, a bunch of interesting Revit API discussions, and miscellaneous notes to self, mostly AI-related news:
+Back to everyday blogging again, a pointer to the upcoming live, hands-on, face-to-face European APS accelerator, a summary of the announcements made at AU, a bunch of interesting Revit API discussions, and miscellaneous notes to self, mostly AI-related news:
 
 - [APS accelerator Dublin Nov 14-18](#2)
 - [What’s New and What’s Ahead from AU 2022](#3)
 - [Learning Revit API as a complete beginner](#4)
 - [Retrieving all fabrication item materials](#5)
-- [`List` vs. `IList`](#6)
 - [Revit add-in unit testing](#7)
 - [Bleeding edge of AI](#8)
 - [AI-driven coding tool may violate copyright](#9)
