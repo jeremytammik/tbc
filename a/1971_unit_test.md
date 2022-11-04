@@ -166,9 +166,81 @@ Thank you! Good luck and have fun!
 
 ####<a name="5"></a> Retrieving All Fabrication Item Materials
 
-how hard it is to read the documentation, and how unknown the info it contains:
-How to get all Materials(of Fabrication) item possible in the database?
-https://forums.autodesk.com/t5/revit-api-forum/how-to-get-all-materials-of-fabrication-item-possible-in-the/td-p/11509305
+We all know how hard it can be to read the documentation, and how utterly unknown some of the information it contains still remains, in spite of being documented.
+A case at hand came up in the question
+on [how to get all materials (of fabrication items) possible in the database](https://forums.autodesk.com/t5/revit-api-forum/how-to-get-all-materials-of-fabrication-item-possible-in-the/td-p/11509305):
+
+**Question:** 
+I want to get all the fabrication material name and their group's name,
+
+As I want to create a setting where the users may select material-based action.
+
+Currently I'm only able to get the materials that are used in Placed FabricationPart instance via 
+the below mentioned code:
+
+var allFabParts = new FilteredElementCollector(document).OfClass(typeof(FabricationPart)).Cast<FabricationPart>();
+FabricationConfiguration fabConfig = FabricationConfiguration.GetFabricationConfiguration(document);
+var materialDetails = allFabParts.SelectMany(x => fabConfig.GetAllMaterials(x))
+                .Select(x => new { MatName = fabConfig.GetMaterialName(x), MatGroup = fabConfig.GetMaterialGroup(x) });
+
+**Answer:** Where and how do you see the desired materials in the end user interface?
+
+Can you use RevitLookup to snoop the database to find the corresponding storage location API access?
+
+Here are some previous articles on API interaction with materials:
+
+https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.5
+
+Are the materials you are after included when you use a filtered element collector to retrieve all Material elements? If so, then all you need to do is discover the criteria that mark them for usage in fabrication parts.
+
+**Response:** The UI will be quite simple where the user will choose the fabrication material name (which the user will see from fabrication CADmep).
+
+I can't filter fabrication materials from filter element collector as the aren't elements.
+I have gone through the posts I didn't find what I was looking for.
+
+This is fabrication material I'm talking about.
+Like in the below image the "Material" id is "4",
+by this integer number I can query in the fabrication configuration to get further info about the fabrication material like it's name the group name to which the material belongs to etc.
+
+Currently I'm only able to get this material ids (Not Revit Materials) from the placed fabrication instances only, I wanted to know if there is a way to get all the possible fabrication material ids without placing any FabricationPart instance.
+
+<center>
+<img src="img/fabrication_part_material.png" alt="Fabrication part material" title="Fabrication part material" width="100"/>  <!-- 802 x 524 -->
+</center>
+
+
+**Answer:** 
+Unfortunately, the only way is to get the property from the existing elements.
+  
+Sorry for the bad news and that this functionality is not currently available. You could submit a wish for it to the Revit Idea Station:
+
+Whenever you require a new or enhanced Revit product or Revit API functionality, the Revit Idea Station is the place to go.
+
+Please search there for a corresponding wish list entry for the suggested functionality and add your comments to it, or create a new one, if none already exists:
+
+https://forums.autodesk.com/t5/revit-ideas/idb-p/302
+
+Tag it as an API wish:
+
+https://forums.autodesk.com/t5/revit-ideas/idb-p/302/tab/most-recent/label-name/api
+
+Ensuring that a wish gets as many votes as possible helps underline its importance to you and the rest of the developer community.
+
+The Revit Idea Station is currently one of the main driving input forces for Revit API enhancements.
+
+The Revit development team looks there. Your comment here in the discussion forum might be overlooked.
+
+**Answer 2:** The documentation for FabricationConfiguration.GetAllMaterials() says "If a part is passed, only returns materials which are valid for the part, otherwise returns all materials." Does it return all materials if you pass it null?
+
+**Response:** 
+Yes, it's returning a lot of material ids if provided 'null' - FabricationConfiguration.GetAllMaterials(null) and hopefully these are all the materials available.
+Feeling like, how did I miss it out... 🤔
+
+Thanks a lot for pointing it out.
+
+**Answer:** Wow! Thank you very much for the observation and confirmation. It just goes to show, yet again, how hard it is to read the documentation, really grasp everything it tells us, and how unknown the information it contains, even to the development team itself.
+
+Many thanks to Matthew [mhannonQ65N2](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/8377999) Hannon for his careful reading of the documentation!
 
 ####<a name="6"></a> List vs. IList
 
@@ -214,10 +286,6 @@ Surveillance isn’t just imposed on people: Many of us buy into it willingly
 The Great Pandemic Hand-Washing Blooper
 https://www.theatlantic.com/health/archive/2022/10/covid-pandemic-airborne-virus-transmission-hand-washing/671831/
 Should you wash your hands? Yes. Does it matter for respiratory viruses? Not as much as we once thought.
-
-<center>
-<img src="img/" alt="" title="" width="100"/>  <!-- 1958 x 1016 -->
-</center>
 
 Many thanks to ??? for sharing this nice sample!
 
