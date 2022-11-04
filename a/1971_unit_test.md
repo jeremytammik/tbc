@@ -241,54 +241,222 @@ It just goes to show, yet again, how hard it is to read the documentation, reall
 
 Many thanks to Matthew [mhannonQ65N2](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/8377999) Hannon for his careful reading of the documentation!
 
-####<a name="6"></a> List vs. IList
-
-[IList vs. List](https://forums.autodesk.com/t5/revit-api-forum/ilist-vs-list/m-p/11483464)
-
 ####<a name="7"></a> Revit Add-In Unit Testing
 
-Best unit test Framework 2022
-https://forums.autodesk.com/t5/revit-api-forum/best-unit-test-framework-2022/td-p/11520295
+Another recurring topic is reliable automated testing, cf.
+the [topic group on unit testing](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.16).
+
+Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari provided some updated advice on that in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [best unit test framework 2022](https://forums.autodesk.com/t5/revit-api-forum/best-unit-test-framework-2022/td-p/11520295):
+
+I started developing a new plug-in for Revit recently, it's been a while since the last time I worked
+
+on a new coding project, I was wondering which framework is best for the specific tast of making
+
+a Revit Add-on ? I'm developing with VS22 for windows only.
+
+ Solved by ricaun. Go to Solution.
+
+Tags (0)
+Add tags
+Report
+10 REPLIES 
+Sort: 
+MESSAGE 2 OF 11
+ricaun
+ Advocate ricaun in reply to: TomB.ADV
+‎2022-10-31 07:45 AM 
+Here are some unit tests:
+
+Dynamo's Revit Tester Framework - https://github.com/DynamoDS/RevitTestFramework
+Geberit's Revit Test Runner - https://github.com/geberit/Revit.TestRunner
+Speckle's Revit Test Runner - https://github.com/specklesystems/xUnitRevit
+I have been using the Geberit version and was trying to create my own to run directly in Visual Studio 2022.
+
+Is kinda working: https://youtube.com/shorts/ZwtmHP72_Zc
+
+Luiz Henrique Cassettari
+
+ricaun.com - Revit API Developer
+
+AppLoader EasyConduit WireInConduit ConduitMaterial CircuitName ElectricalUtils
+Tags (0)
+Add tags
+Report
+MESSAGE 3 OF 11
+TomB.ADV
+ Explorer TomB.ADV in reply to: ricaun
+‎2022-10-31 09:06 AM 
+So if I understand correctly, Speckle's Revit Test Runner, will allow me to test my code against any .rvt model without manually activating each custom function/command in the add-on ? Is that right ? 
+
+Tags (0)
+Add tags
+Report
+MESSAGE 4 OF 11
+danielJY6FB
+ Contributor danielJY6FB in reply to: TomB.ADV
+‎2022-10-31 10:46 AM 
+TomB.AD,
+
+I believe so? I don't 100% understand what you are asking, but I will second that speckle's Revit unit test is the best available test framework for Revit that we've found. You can run test functions using the speckle UI, and you don't have to test a full external command - you can test individual methods.
+
+Note that you still have to open Revit to use it, as I haven't seen a Revit Test Framework that can get around that - as far as I know Revit has to be open to have access to it's API, which is required to test anything that uses and Revit API calls. We've used Speckle a bit at our company, but eventually moved away from it in support of developing our own Revit Unit Test framework that better suited our needs and process.
+
+Tags (0)
+Add tags
+Report
+MESSAGE 5 OF 11
+danielJY6FB
+ Contributor danielJY6FB in reply to: ricaun
+‎2022-10-31 10:56 AM 
+ricaun,
+
+Cool vid! I think it's awesome that you are developing your own! I think more Revit devs should be more focused on testing to ensure better and more stable applications! Is that test class calling the Revit API? I would be amazed if you found a way to get that working with the Revit API but outside of Revit - if so lemme know how!
+
+Our company actually ended up making our own Revit Test Framework to better suit our needs, and we'd like to make it open source one day! Here's a screenshot:
+
+unit test window 1.png
+80 KB
+ 
+unit test window 2.png
+68 KB
+Tags (0)
+Add tags
+Report
+MESSAGE 6 OF 11
+TomB.ADV
+ Explorer TomB.ADV in reply to: danielJY6FB
+‎2022-10-31 11:10 AM 
+@danielJY6FB @ricaun
+
+I was reffering to the below example where on line 4 there is a method calling a Revit model from the solution folder.
+
+I could be wrong but looks like there is a method to load rvt model and execute API methods directly (line 7), meaning I don't have to open a new revit session to run tests.
+
+https://github.com/specklesystems/xUnitRevit
+
+[Fact]
+public void WallsHaveVolume()
+{
+  var testModel = GetTestModel("walls.rvt");
+  var doc = xru.OpenDoc(testModel);
+
+  var walls = new FilteredElementCollector(doc).WhereElementIsNotElementType().OfCategory(BuiltInCategory.OST_Walls).ToElements();
+
+  foreach(var wall in walls)
+  {
+    var volumeParam = wall.get_Parameter(BuiltInParameter.HOST_VOLUME_COMPUTED);
+    Assert.NotNull(volumeParam);
+    Assert.True(volumeParam.AsDouble() > 0);
+  }
+  doc.Close(false);
+}
+
+Tags (0)
+Add tags
+Report
+MESSAGE 7 OF 11
+danielJY6FB
+ Contributor danielJY6FB in reply to: TomB.ADV
+‎2022-10-31 11:19 AM 
+TomB.ADV,
+
+Yes I believe Speckle provides methods for you to load and switch between revit files, among other utilities. However, I also though speckle tests needed to be run via the speckle test ui, which is a revit addin - so you have to open that to run the tests. I could be mistaken, as I haven't used speckle in a little while!
+
+Edit:
+
+Here's a link to a speckle unit test blog post - I think this is the framework we are talking about? It mentioned three parts, one of which is a revit addin that actually runs the tests:
+
+https://speckle.systems/blog/xunitrevit/ 
+
+Tags (0)
+Add tags
+Report
+MESSAGE 8 OF 11
+TomB.ADV
+ Explorer TomB.ADV in reply to: danielJY6FB
+‎2022-10-31 11:37 AM 
+I see, well, this is pritty much still better IMO compared to the alternatives but I wish there was a framework to execute tests without launching a new revit session, otherwise it is very restricting in terms of the machine specs I have to run the tests on 😞
+
+Tags (0)
+Add tags
+Report
+MESSAGE 9 OF 11
+ricaun
+ Advocate ricaun in reply to: danielJY6FB
+‎2022-10-31 11:51 AM 
+Without Revit open is not possible I guess, but you could use the Design Automation to run some tests: The demo that I created for the Forge: https://youtu.be/EL5uJm_Nj8g
+
+The Test part is the missing key in my workflow, I was thinking to add a UI for testing in the AppLoader plugin but makes more sense to use the Test Explorer in Visual Studio 2022, just need to create a IPC between Revit and Visual Studio.
+
+Luiz Henrique Cassettari
+
+ricaun.com - Revit API Developer
+
+AppLoader EasyConduit WireInConduit ConduitMaterial CircuitName ElectricalUtils
+ricaun - Forge Hackathon 2022 - Demo
+ricaun - Forge Hackathon 2022 - Demo
+youtu.be/EL5uJm_Nj8g
+Using Design Automation to run a unit test for Revit Api - Forge Hackathon 2022. https://github.com/ricaun-io/RevitAddin.CountIt.Test --- Download Plugins: AppLoader: https://ricaun.com/apploader/ EasyConduit: https://ricaun.com/easyconduit/ WireInConduit: https://ricaun.com/wireinconduit/ ...
+Tags (0)
+Add tags
+Report
+MESSAGE 10 OF 11
+TomB.ADV
+ Explorer TomB.ADV in reply to: ricaun
+‎2022-10-31 12:00 PM 
+That looks very interesting, looks like your are building a useful solution, looking forward to see this developed.
+
+Unfortenutlly, I didn't have the time to expirement with forge, I will look into it at a later stage, I guess
+for the time being I will take whatever is available...
+
+Tags (0)
+Add tags
+Report
+MESSAGE 11 OF 11
+danielJY6FB
+ Contributor danielJY6FB in reply to: ricaun
+‎2022-10-31 01:15 PM 
+ricaun,
+
+This is REALLY cool, thanks for sharing! I like the idea of using forge, and that does seem to be where Autodesk wants to head in the future.
+
+Edit: Does running that via the Design Automation require the use of any Autodesk Cloud Credits?
 
 ####<a name="8"></a> Bleeding Edge of AI
 
-the bleeding edge of ai -- https://bleedingedge.ai/
-bleeding edge is a feed of noteworthy developments in AI.
-The pace of development in AI right now is staggering and there’s been no easy way to keep up with all of the interesting developments. bleeding edge is my attempt at solving that. It’s a chronological collation of all the most noteworthy developments
+Wrappoing up with some short notes on non-Revit-API topics, let's start
+with [the bleeding edge of AI](https://bleedingedge.ai):
+
+> [bleeding edge](https://bleedingedge.ai) is a feed of noteworthy developments in AI.
+The pace of development in AI right now is staggering and there’s been no easy way to keep up with all of the interesting developments.
+bleeding edge is my attempt at solving that.
+It’s a chronological collation of all the most noteworthy developments...
 
 ####<a name="9"></a> AI-Driven Coding Tool may Violate Copyright 
 
-How GitHub Copilot could steer Microsoft into a copyright storm
-https://www.theregister.com/2022/10/19/github_copilot_copyright/
-AI-driven coding tool might generate other people's code – who knew? Well, Redmond, for one
+[How GitHub Copilot could steer Microsoft into a copyright storm](https://www.theregister.com/2022/10/19/github_copilot_copyright): 
+AI-driven coding tool might generate other people's code &ndash; who knew? Well, Redmond, for one...
 
-####<a name="10"></a> AI-Generated Podcast with Joe Rogan and Steve Jobs
+####<a name="10"></a> AI-Generated Podcasts
 
-This is pretty mind-blowing: a podcast that is entirely generated by artificial intelligence where Joe Rogan interviews Steve Jobs.
-
-https://podcast.ai
+This is pretty mind-blowing: [podcast.ai](https://podcast.ai) presents podcasts entirely generated by artificial intelligence, e.g.,  Joe Rogan interviewing Steve Jobs, Lex Fridman interviewing Richard Feynman...
 
 ####<a name="11"></a> Super Realistic Animated Eye Rendering
 
-super realistic animated eye sequence character rendering
-https://twitter.com/sefkiibrahim/status/1580970724084584453?s=20&t=eAEMUoCTskHLTOZU0GB8jw
-by Şefki [@sefkiibrahim](https://twitter.com/sefkiibrahim) Ibrahim, 3D digital human character artist
+Less related to AI and nonetheless extremely impressive,
+Şefki [@sefkiibrahim](https://twitter.com/sefkiibrahim) Ibrahim, 3D digital human character artist,
+presents a [super realistic animated eye sequence character rendering](https://twitter.com/sefkiibrahim/status/1580970724084584453?s=20&t=eAEMUoCTskHLTOZU0GB8jw).
 
 ####<a name="12"></a> Luxury Surveillance
 
-The Rise of ‘Luxury Surveillance’
-https://www.theatlantic.com/technology/archive/2022/10/amazon-tracking-devices-surveillance-state/671772/
-Surveillance isn’t just imposed on people: Many of us buy into it willingly
+Pondering [the rise of ‘luxury surveillance’](https://www.theatlantic.com/technology/archive/2022/10/amazon-tracking-devices-surveillance-state/671772): 
+Surveillance isn’t just imposed on people: Many of us buy into it willingly...
 
 ####<a name="13"></a> Pandemic Hand-Washing Blooper
 
-The Great Pandemic Hand-Washing Blooper
-https://www.theatlantic.com/health/archive/2022/10/covid-pandemic-airborne-virus-transmission-hand-washing/671831/
-Should you wash your hands? Yes. Does it matter for respiratory viruses? Not as much as we once thought.
+And, to finally close off for today, some notes
+on [the great pandemic hand-washing blooper](https://www.theatlantic.com/health/archive/2022/10/covid-pandemic-airborne-virus-transmission-hand-washing/671831):
+Should you wash your hands? Yes. Does it matter for respiratory viruses? Not as much as we once thought...
 
-Many thanks to ??? for sharing this nice sample!
-
-<pre class="code">
-</pre>
-
-**Response:** 
