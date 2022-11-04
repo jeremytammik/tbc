@@ -98,7 +98,7 @@ Back to everyday blogging again, a pointer to the upcoming live, hands-on, face-
 - [AI-generated podcasts](#9)
 - [Super realistic animated eye rendering](#10)
 - [Luxury surveillance](#11)
-- [Pandemic Hand-washing blooper](#12)
+- [Pandemic hand-washing blooper](#12)
 
 ####<a name="2"></a> APS (ex-Forge) Accelerator Dublin Nov 14-18
 
