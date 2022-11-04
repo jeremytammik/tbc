@@ -139,7 +139,7 @@ The Building Coder [tips on getting started](https://thebuildingcoder.typepad.co
 Unfortunately, the Typepad blog host platform is currently having serious problems, so take a look at
 the [GitHub source code of The Building Coder blog](http://jeremytammik.github.io/tbc/a/#2) instead.
 
-It answers all you questions in depth, possibly except about time. Still, I'll briefly reiterate:
+It answers all your questions in depth, possibly except about time. Still, I'll briefly reiterate:
 
 - What is the best way to learn in this case?
 
@@ -178,10 +178,16 @@ Currently I'm only able to get the materials that are used in Placed Fabrication
 the below mentioned code:
 
 <pre class="code">
-var allFabParts = new FilteredElementCollector(document).OfClass(typeof(FabricationPart)).Cast<FabricationPart>();
-FabricationConfiguration fabConfig = FabricationConfiguration.GetFabricationConfiguration(document);
-var materialDetails = allFabParts.SelectMany(x => fabConfig.GetAllMaterials(x))
-                .Select(x => new { MatName = fabConfig.GetMaterialName(x), MatGroup = fabConfig.GetMaterialGroup(x) });
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">allFabParts</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;FilteredElementCollector(document)
+&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(<span style="color:blue;">typeof</span>(FabricationPart)).Cast&lt;FabricationPart&gt;();
+ 
+&nbsp;&nbsp;FabricationConfiguration&nbsp;<span style="color:#1f377f;">fabConfig</span>&nbsp;=&nbsp;FabricationConfiguration
+&nbsp;&nbsp;&nbsp;&nbsp;.GetFabricationConfiguration(document);
+ 
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">materialDetails</span>&nbsp;=&nbsp;allFabParts
+&nbsp;&nbsp;&nbsp;&nbsp;.SelectMany(<span style="color:#1f377f;">x</span>&nbsp;=&gt;&nbsp;fabConfig.GetAllMaterials(x))
+&nbsp;&nbsp;&nbsp;&nbsp;.Select(<span style="color:#1f377f;">x</span>&nbsp;=&gt;&nbsp;<span style="color:blue;">new</span>&nbsp;{&nbsp;MatName&nbsp;=&nbsp;fabConfig.GetMaterialName(x),&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MatGroup&nbsp;=&nbsp;fabConfig.GetMaterialGroup(x)&nbsp;});
 </pre>
 
 **Answer:** Where and how do you see the desired materials in the end user interface?
@@ -201,7 +207,7 @@ I have gone through the posts I didn't find what I was looking for.
 This is fabrication material I'm talking about:
 
 <center>
-<img src="img/fabrication_part_material.png" alt="Fabrication part material" title="Fabrication part material" width="100"/>  <!-- 802 x 524 -->
+<img src="img/fabrication_part_material.png" alt="Fabrication part material" title="Fabrication part material" width="401"/>  <!-- 802 x 524 -->
 </center>
 
 In the image, the `Material` id is `4`.
@@ -298,22 +304,22 @@ I could be wrong but looks like there is a method to load rvt model and execute 
 https://github.com/specklesystems/xUnitRevit
 
 <pre class="code">
-[Fact]
-public void WallsHaveVolume()
-{
-  var testModel = GetTestModel("walls.rvt");
-  var doc = xru.OpenDoc(testModel);
-
-  var walls = new FilteredElementCollector(doc).WhereElementIsNotElementType().OfCategory(BuiltInCategory.OST_Walls).ToElements();
-
-  foreach(var wall in walls)
-  {
-    var volumeParam = wall.get_Parameter(BuiltInParameter.HOST_VOLUME_COMPUTED);
-    Assert.NotNull(volumeParam);
-    Assert.True(volumeParam.AsDouble() > 0);
-  }
-  doc.Close(false);
-}
+&nbsp;&nbsp;[Fact]
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;<span style="color:#74531f;">WallsHaveVolume</span>()
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">testModel</span>&nbsp;=&nbsp;GetTestModel(<span style="color:#a31515;">&quot;walls.rvt&quot;</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">doc</span>&nbsp;=&nbsp;xru.OpenDoc(testModel);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">walls</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;FilteredElementCollector(doc).WhereElementIsNotElementType().OfCategory(BuiltInCategory.OST_Walls).ToElements();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">foreach</span>&nbsp;(var&nbsp;<span style="color:#1f377f;">wall</span>&nbsp;<span style="color:#8f08c4;">in</span>&nbsp;walls)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">volumeParam</span>&nbsp;=&nbsp;wall.get_Parameter(BuiltInParameter.HOST_VOLUME_COMPUTED);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Assert.NotNull(volumeParam);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Assert.True(volumeParam.AsDouble()&nbsp;&gt;&nbsp;0);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;doc.Close(<span style="color:blue;">false</span>);
+&nbsp;&nbsp;}
 </pre>
 
 **Answer:** Yes, I believe Speckle provides methods for you to load and switch between Revit files, among other utilities.
@@ -368,7 +374,7 @@ Surveillance isn’t just imposed on people: Many of us buy into it willingly...
 
 ####<a name="12"></a> Pandemic Hand-Washing Blooper
 
-And, to finally close off for today, some notes
+And, to finally end for today, some notes
 on [the great pandemic hand-washing blooper](https://www.theatlantic.com/health/archive/2022/10/covid-pandemic-airborne-virus-transmission-hand-washing/671831):
 Should you wash your hands? Yes. Does it matter for respiratory viruses? Not as much as we once thought...
 

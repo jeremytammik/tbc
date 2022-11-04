@@ -86,17 +86,17 @@ Here is the blog post describing how I started the <code>tbc</code> repository i
 <li><a href="#3">What’s New and What’s Ahead from AU 2022</a></li>
 <li><a href="#4">Learning Revit API as a complete beginner</a></li>
 <li><a href="#5">Retrieving all fabrication item materials</a></li>
-<li><a href="#7">Revit add-in unit testing</a></li>
-<li><a href="#8">Bleeding edge of AI</a></li>
-<li><a href="#9">AI-driven coding tool may violate copyright</a></li>
-<li><a href="#10">AI-generated podcast with Joe Rogan and Steve Jobs</a></li>
-<li><a href="#11">Super realistic animated eye rendering</a></li>
-<li><a href="#12">Luxury surveillance</a></li>
-<li><a href="#13">Pandemic Hand-washing blooper</a></li>
+<li><a href="#6">Revit add-in unit testing</a></li>
+<li><a href="#7">Bleeding edge of AI</a></li>
+<li><a href="#8">AI-driven coding tool may violate copyright</a></li>
+<li><a href="#9">AI-generated podcasts</a></li>
+<li><a href="#10">Super realistic animated eye rendering</a></li>
+<li><a href="#11">Luxury surveillance</a></li>
+<li><a href="#12">Pandemic Hand-washing blooper</a></li>
 </ul>
 <h4><a name="2"></a> APS (ex-Forge) Accelerator Dublin Nov 14-18</h4>
 <p>Quick reminder on behalf of Jaime:
-we are planning an accelerator in the Autodesk Dublin Office this upcoming November 14thto 18th.
+we are planning an accelerator in the Autodesk Dublin Office this upcoming November 14th to 18th.
 We are looking for customers interested in joining us onsite to work with the Developer advocates team in coding solutions using Autodesk Platform Services (formerly Forge).
 In the past (pre-covid), we regularly hosted such events in the EMEA region to have software developers join us for the week.
 We have an ongoing registration and would love to have a full house for the event:</p>
@@ -126,7 +126,7 @@ Here are my questions:</p>
 The Building Coder <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#2">tips on getting started</a>.</p>
 <p>Unfortunately, the Typepad blog host platform is currently having serious problems, so take a look at
 the <a href="http://jeremytammik.github.io/tbc/a/#2">GitHub source code of The Building Coder blog</a> instead.</p>
-<p>It answers all you questions in depth, possibly except about time. Still, I'll briefly reiterate:</p>
+<p>It answers all your questions in depth, possibly except about time. Still, I'll briefly reiterate:</p>
 <ul>
 <li>What is the best way to learn in this case?</li>
 </ul>
@@ -157,10 +157,16 @@ I want to get all the fabrication material name and their group's name,</p>
 <p>Currently I'm only able to get the materials that are used in Placed FabricationPart instance via 
 the below mentioned code:</p>
 <pre class="code">
-var allFabParts = new FilteredElementCollector(document).OfClass(typeof(FabricationPart)).Cast<FabricationPart>();
-FabricationConfiguration fabConfig = FabricationConfiguration.GetFabricationConfiguration(document);
-var materialDetails = allFabParts.SelectMany(x => fabConfig.GetAllMaterials(x))
-                .Select(x => new { MatName = fabConfig.GetMaterialName(x), MatGroup = fabConfig.GetMaterialGroup(x) });
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">allFabParts</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;FilteredElementCollector(document)
+&nbsp;&nbsp;&nbsp;&nbsp;.OfClass(<span style="color:blue;">typeof</span>(FabricationPart)).Cast&lt;FabricationPart&gt;();
+
+&nbsp;&nbsp;FabricationConfiguration&nbsp;<span style="color:#1f377f;">fabConfig</span>&nbsp;=&nbsp;FabricationConfiguration
+&nbsp;&nbsp;&nbsp;&nbsp;.GetFabricationConfiguration(document);
+
+&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">materialDetails</span>&nbsp;=&nbsp;allFabParts
+&nbsp;&nbsp;&nbsp;&nbsp;.SelectMany(<span style="color:#1f377f;">x</span>&nbsp;=&gt;&nbsp;fabConfig.GetAllMaterials(x))
+&nbsp;&nbsp;&nbsp;&nbsp;.Select(<span style="color:#1f377f;">x</span>&nbsp;=&gt;&nbsp;<span style="color:blue;">new</span>&nbsp;{&nbsp;MatName&nbsp;=&nbsp;fabConfig.GetMaterialName(x),&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MatGroup&nbsp;=&nbsp;fabConfig.GetMaterialGroup(x)&nbsp;});
 </pre>
 
 <p><strong>Answer:</strong> Where and how do you see the desired materials in the end user interface?</p>
@@ -173,7 +179,7 @@ If so, then all you need to do is discover the criteria that mark them for usage
 I have gone through the posts I didn't find what I was looking for.</p>
 <p>This is fabrication material I'm talking about:</p>
 <p><center>
-<img src="img/fabrication_part_material.png" alt="Fabrication part material" title="Fabrication part material" width="100"/>  <!-- 802 x 524 -->
+<img src="img/fabrication_part_material.png" alt="Fabrication part material" title="Fabrication part material" width="401"/>  <!-- 802 x 524 -->
 </center></p>
 <p>In the image, the <code>Material</code> id is <code>4</code>.
 by this integer number I can query in the fabrication configuration to get further info about the fabrication material like it's name, the group name to which it belongs, etc.</p>
@@ -199,7 +205,7 @@ The Revit development team looks there. Your comment here in the discussion foru
 <p><strong>Answer:</strong> Wow! Thank you very much for the observation and confirmation.
 It just goes to show, yet again, how hard it is to read the documentation, really grasp everything it tells us, and how unknown the information it contains, even to the development team itself.</p>
 <p>Many thanks to Matthew <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/8377999">mhannonQ65N2</a> Hannon for his careful reading of the documentation!</p>
-<h4><a name="7"></a> Revit Add-In Unit Testing</h4>
+<h4><a name="6"></a> Revit Add-In Unit Testing</h4>
 <p>Another recurring topic is reliable automated testing, cf.
 the <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.16">topic group on unit testing</a>.</p>
 <p>Luiz Henrique <a href="https://github.com/ricaun">@ricaun</a> Cassettari provided some updated advice on that in
@@ -240,22 +246,22 @@ Here's a screenshot:</p>
 <p>I could be wrong but looks like there is a method to load rvt model and execute API methods directly (line 7), meaning I don't have to open a new revit session to run tests.</p>
 <p>https://github.com/specklesystems/xUnitRevit</p>
 <pre class="code">
-[Fact]
-public void WallsHaveVolume()
-{
-  var testModel = GetTestModel("walls.rvt");
-  var doc = xru.OpenDoc(testModel);
+&nbsp;&nbsp;[Fact]
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;<span style="color:#74531f;">WallsHaveVolume</span>()
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">testModel</span>&nbsp;=&nbsp;GetTestModel(<span style="color:#a31515;">&quot;walls.rvt&quot;</span>);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">doc</span>&nbsp;=&nbsp;xru.OpenDoc(testModel);
 
-  var walls = new FilteredElementCollector(doc).WhereElementIsNotElementType().OfCategory(BuiltInCategory.OST_Walls).ToElements();
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">walls</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;FilteredElementCollector(doc).WhereElementIsNotElementType().OfCategory(BuiltInCategory.OST_Walls).ToElements();
 
-  foreach(var wall in walls)
-  {
-    var volumeParam = wall.get_Parameter(BuiltInParameter.HOST_VOLUME_COMPUTED);
-    Assert.NotNull(volumeParam);
-    Assert.True(volumeParam.AsDouble() > 0);
-  }
-  doc.Close(false);
-}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8f08c4;">foreach</span>&nbsp;(var&nbsp;<span style="color:#1f377f;">wall</span>&nbsp;<span style="color:#8f08c4;">in</span>&nbsp;walls)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">volumeParam</span>&nbsp;=&nbsp;wall.get_Parameter(BuiltInParameter.HOST_VOLUME_COMPUTED);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Assert.NotNull(volumeParam);
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Assert.True(volumeParam.AsDouble()&nbsp;&gt;&nbsp;0);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;doc.Close(<span style="color:blue;">false</span>);
+&nbsp;&nbsp;}
 </pre>
 
 <p><strong>Answer:</strong> Yes, I believe Speckle provides methods for you to load and switch between Revit files, among other utilities.
@@ -270,7 +276,7 @@ run some tests.</p>
 <p>The Test part is the missing key in my workflow; I was thinking to add a UI for testing in the AppLoader plugin, but makes more sense to use the Test Explorer in Visual Studio 2022, just need to create a IPC between Revit and Visual Studio.</p>
 <p><strong>Response 1:</strong> This is REALLY cool, thanks for sharing! I like the idea of using Forge, and that does seem to be where Autodesk wants to head in the future.</p>
 <p>Many thanks to ricaun for this important research and explanation!</p>
-<h4><a name="8"></a> Bleeding Edge of AI</h4>
+<h4><a name="7"></a> Bleeding Edge of AI</h4>
 <p>Wrappoing up with some short notes on non-Revit-API topics, let's start
 with <a href="https://bleedingedge.ai">the bleeding edge of AI</a>:</p>
 <blockquote>
@@ -279,19 +285,19 @@ The pace of development in AI right now is staggering and there’s been no easy
 bleeding edge is my attempt at solving that.
 It’s a chronological collation of all the most noteworthy developments...</p>
 </blockquote>
-<h4><a name="9"></a> AI-Driven Coding Tool may Violate Copyright</h4>
+<h4><a name="8"></a> AI-Driven Coding Tool may Violate Copyright</h4>
 <p><a href="https://www.theregister.com/2022/10/19/github_copilot_copyright">How GitHub Copilot could steer Microsoft into a copyright storm</a>: 
 AI-driven coding tool might generate other people's code &ndash; who knew? Well, Redmond, for one...</p>
-<h4><a name="10"></a> AI-Generated Podcasts</h4>
+<h4><a name="9"></a> AI-Generated Podcasts</h4>
 <p>This is pretty mind-blowing: <a href="https://podcast.ai">podcast.ai</a> presents podcasts entirely generated by artificial intelligence, e.g.,  Joe Rogan interviewing Steve Jobs, Lex Fridman interviewing Richard Feynman...</p>
-<h4><a name="11"></a> Super Realistic Animated Eye Rendering</h4>
+<h4><a name="10"></a> Super Realistic Animated Eye Rendering</h4>
 <p>Less related to AI and nonetheless extremely impressive,
 Şefki <a href="https://twitter.com/sefkiibrahim">@sefkiibrahim</a> Ibrahim, 3D digital human character artist,
 presents a <a href="https://twitter.com/sefkiibrahim/status/1580970724084584453?s=20&amp;t=eAEMUoCTskHLTOZU0GB8jw">super realistic animated eye sequence character rendering</a>.</p>
-<h4><a name="12"></a> Luxury Surveillance</h4>
+<h4><a name="11"></a> Luxury Surveillance</h4>
 <p>Pondering <a href="https://www.theatlantic.com/technology/archive/2022/10/amazon-tracking-devices-surveillance-state/671772">the rise of ‘luxury surveillance’</a>: 
 Surveillance isn’t just imposed on people: Many of us buy into it willingly...</p>
-<h4><a name="13"></a> Pandemic Hand-Washing Blooper</h4>
-<p>And, to finally close off for today, some notes
+<h4><a name="12"></a> Pandemic Hand-Washing Blooper</h4>
+<p>And, to finally end for today, some notes
 on <a href="https://www.theatlantic.com/health/archive/2022/10/covid-pandemic-airborne-virus-transmission-hand-washing/671831">the great pandemic hand-washing blooper</a>:
 Should you wash your hands? Yes. Does it matter for respiratory viruses? Not as much as we once thought...</p>
