@@ -66,9 +66,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 <h3>Unit Test Your Revit Add-In</h3>
 <p>Finally, after almost a week of serious disruption on the Typepad blogging platform hosting The Building Coder, I am back with a new post.</p>
-<p>If any similar hiccups crop up in the fiuture, please be aware that The Building Coder is also available directly on GitHub pages in the <a href="https://github.com/jeremytammik/tbc"><code>tbc</code> repostitory</a> hosting the source and chronological index for The Building Coder Revit API blog.
-It includes all the markdown source text, HTML, CSS and images for The Building Coder, plus the cmplete chronological index of all posts.
-Besides providing a workaround for Typepad failure, it also enables you to grab all The Building Coder source text, host it locally, and use it to implemet your own search algorithms or even train your AI to answer Revit API questions.</p>
+<p>If any similar hiccups crop up in the future, please be aware that The Building Coder is also available directly on GitHub pages in the <a href="https://github.com/jeremytammik/tbc"><code>tbc</code> repostitory</a> hosting the source and chronological index for The Building Coder Revit API blog.
+It includes all the markdown source text, HTML, CSS and images for The Building Coder, plus the complete chronological index of all posts.
+Besides providing a workaround for Typepad failure, it also enables you to grab all The Building Coder source text, host it locally, and use it to implement your own search algorithms or even train your AI to answer Revit API questions.</p>
 <p>As I explained in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 about <a href="https://forums.autodesk.com/t5/revit-api-forum/the-building-coder-blog-standalone/td-p/11519594">The Building Coder blog standalone</a>:</p>
@@ -118,7 +118,7 @@ Here are my questions:</p>
 <li>What is the best way to learn in this case? </li>
 <li>Where can I ask and find information?</li>
 <li>How much usually is time to learn such process?</li>
-<li>Do I need to learn the whole C# language or just the Revit Api? </li>
+<li>Do I need to learn the whole C# language or just the Revit API? </li>
 </ul>
 <p>I'd appreciate any help with where to start learning and what to do</p>
 <p><strong>Answer:</strong> Welcome to the Revit API!</p>
@@ -140,7 +140,7 @@ the <a href="http://jeremytammik.github.io/tbc/a/#2">GitHub source code of The B
 </ul>
 <p>Days, weeks, and years. Depends how far you wish to go. A proficient programmer can understand the system and have a non-trivial macro up and running within hours.</p>
 <ul>
-<li>Do I need to learn the whole C# language or just the Revit Api?</li>
+<li>Do I need to learn the whole C# language or just the Revit API?</li>
 </ul>
 <p>There is no good way to use half a programming language.
 You have to learn and understand the entire .NET environment.
@@ -151,11 +151,9 @@ That can be programmed in C# or in other languages as well.</p>
 <p>We all know how hard it can be to read the documentation, and how utterly unknown some of the information it contains still remains, in spite of being documented.
 A case at hand came up in the question
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-get-all-materials-of-fabrication-item-possible-in-the/td-p/11509305">how to get all materials (of fabrication items) possible in the database</a>:</p>
-<p><strong>Question:</strong> 
-I want to get all the fabrication material name and their group's name,</p>
-<p>As I want to create a setting where the users may select material-based action.</p>
-<p>Currently I'm only able to get the materials that are used in Placed FabricationPart instance via 
-the below mentioned code:</p>
+<p><strong>Question:</strong> I want to get all the fabrication material names and their groups' names to create a setting where the users may select material-based actions.</p>
+<p>Currently, I'm only able to get the materials that are used in placed <code>FabricationPart</code> instances via 
+this code:</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">var</span>&nbsp;<span style="color:#1f377f;">allFabParts</span>&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;FilteredElementCollector(document)
 &nbsp;&nbsp;&nbsp;&nbsp;.OfClass(<span style="color:blue;">typeof</span>(FabricationPart)).Cast&lt;FabricationPart&gt;();
@@ -182,9 +180,9 @@ I have gone through the posts I didn't find what I was looking for.</p>
 <img src="img/fabrication_part_material.png" alt="Fabrication part material" title="Fabrication part material" width="802"/>  <!-- 802 x 524 -->
 </center></p>
 <p>In the image, the <code>Material</code> id is <code>4</code>.
-by this integer number I can query in the fabrication configuration to get further info about the fabrication material like it's name, the group name to which it belongs, etc.</p>
+by this integer number I can query in the fabrication configuration to get further info about the fabrication material like its name, the group name to which it belongs, etc.</p>
 <p>Currently, I'm only able to get these material ids (not Revit Materials) from the placed fabrication instances only, I wanted to know if there is a way to get all the possible fabrication material ids without placing any <code>FabricationPart</code> instance.</p>
-<p><strong>Answer:</strong> I aksed the development team for you, and they say:</p>
+<p><strong>Answer:</strong> I asked the development team for you, and they say:</p>
 <p>Unfortunately, the only way is to get the property from the existing elements.</p>
 <p>Sorry for the bad news and that this functionality is not currently available.
 You could submit a wish for it to the <a href="https://forums.autodesk.com/t5/revit-ideas/idb-p/302">Revit Idea Station</a>.
@@ -213,7 +211,7 @@ the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API d
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/best-unit-test-framework-2022/td-p/11520295">best unit test framework 2022</a>:</p>
 <p><strong>Question:</strong> I started developing a new plug-in for Revit recently;
 it's been a while since the last time I worked on a new coding project.
-I was wondering which framework is best for the specific task of making a Revit Add-on?</p>
+I was wondering which framework is best for the specific task of making a Revit add-in?</p>
 <p><strong>Answer:</strong> Here are some unit tests:</p>
 <ul>
 <li><a href="https://github.com/DynamoDS/RevitTestFramework">Dynamo's Revit Tester Framework</a></li>
@@ -226,7 +224,7 @@ I was wondering which framework is best for the specific task of making a Revit 
 <p><strong>Answer:</strong> I believe so.
 I don't 100% understand what you are asking, but I will second that speckle's Revit unit test is the best available test framework for Revit that we've found.
 You can run test functions using the speckle UI, and you don't have to test a full external command &ndash; you can test individual methods.</p>
-<p>Note that you still have to open Revit to use it, as I haven't seen a Revit Test Framework that can get around that &ndash; as far as I know, Revit has to be open to have access to it's API, which is required to test anything that uses and Revit API calls.
+<p>Note that you still have to open Revit to use it, as I haven't seen a Revit Test Framework that can get around that &ndash; as far as I know, Revit has to be open to have access to its API, which is required to test anything that uses and Revit API calls.
 We've used Speckle a bit at our company, but eventually moved away from it in support of developing our own Revit Unit Test framework that better suited our needs and process.</p>
 <p><strong>Response:</strong> Cool vid!
 I think it's awesome that you are developing your own!
@@ -268,12 +266,12 @@ Here's a screenshot:</p>
 However, I also though speckle tests needed to be run via the speckle test ui, which is a revit addin &ndash; so you have to open that to run the tests.
 I could be mistaken, as I haven't used speckle in a little while!</p>
 <p>Here's a link to a <a href="https://speckle.systems/blog/xunitrevit">speckle unit test blog post</a> &ndash; I think this is the framework we are talking about? It mentioned three parts, one of which is a Revit addin that actually runs the tests.</p>
-<p><strong>Response:</strong> I see, well, this is pritty much still better IMO compared to the alternatives but I wish there was a framework to execute tests without launching a new Revit session, otherwise it is very restricting in terms of the machine specs I have to run the tests on.</p>
+<p><strong>Response:</strong> I see, well, this is pritty much still better IMO compared to the alternatives, but I wish there was a framework to execute tests without launching a new Revit session, otherwise it is very restricting in terms of the machine specs I have to run the tests on.</p>
 <p><strong>Answer:</strong> Without Revit open is not possible I guess, but you could use
 the Autodesk Platform Services (APS) (ex Forge) <a href="https://forge.autodesk.com/en/docs/design-automation/v3/developers_guide/overview/">Design Automation API</a> to
 run some tests.</p>
 <p>I created a demo doing so, <a href="https://youtu.be/EL5uJm_Nj8g">ricaun &ndash; Forge Hackathon 2022 &ndash; demo</a>.</p>
-<p>The Test part is the missing key in my workflow; I was thinking to add a UI for testing in the AppLoader plugin, but makes more sense to use the Test Explorer in Visual Studio 2022, just need to create a IPC between Revit and Visual Studio.</p>
+<p>The Test part is the missing key in my workflow; I was thinking to add a UI for testing in the AppLoader plugin, but makes more sense to use the Test Explorer in Visual Studio 2022, just need to create an IPC between Revit and Visual Studio.</p>
 <p><strong>Response 1:</strong> This is REALLY cool, thanks for sharing! I like the idea of using Forge, and that does seem to be where Autodesk wants to head in the future.</p>
 <p>Many thanks to ricaun for this important research and explanation!</p>
 <h4><a name="7"></a> Bleeding Edge of AI</h4>
