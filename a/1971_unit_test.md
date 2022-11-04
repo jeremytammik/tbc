@@ -46,6 +46,8 @@ twitter:
 
  #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
+The Building Coder blog standalone on GitHub, APS accelerator in Dublin, AU announcements, learning Revit APIretrieving all fabrication item materials, Revit add-in unit testing, AI-generated code, podcasts, news and more...
+
 &ndash; 
 ...
 
@@ -84,7 +86,7 @@ Here is the blog post describing how I started the `tbc` repository in 2016:
 [`tbc` &ndash; The Building Coder Source and Index on GitHub](http://thebuildingcoder.typepad.com/blog/2016/02/tbc-the-building-coder-source-and-index-on-github.html)
 ([^](http://jeremytammik.github.io/tbc/a/1408_tbc_github.html)).
 
-Back to everyday blogging again, a pointer to the upcoming live, hands-on, face-to-face European APS accelerator, a summary of the announcements made at AU, a bunch of interesting Revit API discussions, and miscellaneous notes to self, mostly AI-related news:
+Back to everyday blogging again, a pointer to the upcoming live, hands-on, face-to-face European APS accelerator, a summary of the announcements made at AU, three interesting Revit API discussions to highlight, and miscellaneous notes to self, mostly AI-related news:
 
 - [APS accelerator Dublin Nov 14-18](#2)
 - [What’s New and What’s Ahead from AU 2022](#3)
@@ -294,11 +296,9 @@ Unit test report:
 <img src="img/daniel_unit_test_window_2.png" alt="Unit test" title="Unit test" width="500"/>  <!-- 895 × 678  -->
 </center>
 
-**Response:** I was reffering to the below example where on line 4 there is a method calling a Revit model from the solution folder.
+**Response:** I was referring to the below example where on line 4 there is a method calling a Revit model from the solution folder.
 
-I could be wrong but looks like there is a method to load rvt model and execute API methods directly (line 7), meaning I don't have to open a new revit session to run tests.
-
-https://github.com/specklesystems/xUnitRevit
+I could be wrong but looks like there is a method to load RVT model and execute API methods directly (line 7), meaning I don't have to open a new Revit session to run tests: [github.com/specklesystems/xUnitRevit](https://github.com/specklesystems/xUnitRevit):
 
 <pre class="code">
 &nbsp;&nbsp;[Fact]
