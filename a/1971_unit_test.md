@@ -207,7 +207,7 @@ I have gone through the posts I didn't find what I was looking for.
 This is fabrication material I'm talking about:
 
 <center>
-<img src="img/fabrication_part_material.png" alt="Fabrication part material" title="Fabrication part material" width="401"/>  <!-- 802 x 524 -->
+<img src="img/fabrication_part_material.png" alt="Fabrication part material" title="Fabrication part material" width="802"/>  <!-- 802 x 524 -->
 </center>
 
 In the image, the `Material` id is `4`.
@@ -288,13 +288,13 @@ Our company actually ended up making our own Revit Test Framework to better suit
 Here's a screenshot:
 
 <center>
-<img src="img/daniel_unit_test_window_1.png" alt="Unit test" title="Unit test" width="400"/>  <!-- 648 × 823 -->
+<img src="img/daniel_unit_test_window_1.png" alt="Unit test" title="Unit test" width="600"/>  <!-- 648 × 823 -->
 </center>
 
 Unit test report:
 
 <center>
-<img src="img/daniel_unit_test_window_2.png" alt="Unit test" title="Unit test" width="600"/>  <!-- 895 × 678  -->
+<img src="img/daniel_unit_test_window_2.png" alt="Unit test" title="Unit test" width="500"/>  <!-- 895 × 678  -->
 </center>
 
 **Response:** I was reffering to the below example where on line 4 there is a method calling a Revit model from the solution folder.
