@@ -358,7 +358,7 @@ Many thanks to ricaun for this important research and explanation!
 
 ####<a name="7"></a> Bleeding Edge of AI
 
-Wrappoing up with some short notes on non-Revit-API topics, let's start
+Wrapping up with some short notes on non-Revit-API topics, let's start
 with [the bleeding edge of AI](https://bleedingedge.ai):
 
 > [bleeding edge](https://bleedingedge.ai) is a feed of noteworthy developments in AI.
