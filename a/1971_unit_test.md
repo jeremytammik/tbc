@@ -7,40 +7,55 @@
 <!---
 
 - Advice About learning API forum as a complete beginer
-https://forums.autodesk.com/t5/revit-api-forum/advice-about-learning-api-forum-as-a-complete-beginer/m-p/11522223
+  https://forums.autodesk.com/t5/revit-api-forum/advice-about-learning-api-forum-as-a-complete-beginer/m-p/11522223
 
 - Best unit test Framework 2022
-https://forums.autodesk.com/t5/revit-api-forum/best-unit-test-framework-2022/td-p/11520295
+  https://forums.autodesk.com/t5/revit-api-forum/best-unit-test-framework-2022/td-p/11520295
 
 - All the Announcements from AU 2022: What’s New and What’s Ahead
-https://www.autodesk.com/autodesk-university/blog/All-Announcements-AU-2022-Whats-New-and-Whats-Ahead-2022
+  https://www.autodesk.com/autodesk-university/blog/All-Announcements-AU-2022-Whats-New-and-Whats-Ahead-2022
 
 - how hard it is to read the documentation, and how unknown the info it contains:
-How to get all Materials(of Fabrication) item possible in the database?
-https://forums.autodesk.com/t5/revit-api-forum/how-to-get-all-materials-of-fabrication-item-possible-in-the/td-p/11509305
+  How to get all Materials(of Fabrication) item possible in the database?
+  https://forums.autodesk.com/t5/revit-api-forum/how-to-get-all-materials-of-fabrication-item-possible-in-the/td-p/11509305
+
+- fabrication material
+  Is it possible to retrieve all *Fabrication Materials* from the database without placing any fabrication parts? I want to get all the fabrication material names and group names. I need them to create a possibility for the user to select material-based action.
+  Currently I'm only able to get the materials that are used in Placed FabricationPart instances like this:
+  ```
+  var allFabParts = new FilteredElementCollector(document).OfClass(typeof(FabricationPart)).Cast<FabricationPart>();
+  FabricationConfiguration fabConfig = FabricationConfiguration.GetFabricationConfiguration(document);
+  var materialDetails = allFabParts.SelectMany(x => fabConfig.GetAllMaterials(x)).Select(x => new { MatName = fabConfig.GetMaterialName(x), MatGroup = fabConfig.GetMaterialGroup(x) });
+  ```
+  The UI will be quite simple where the user will choose the fabrication material name (which the user will see from fabrication CADmep).
+  I can't retrieve fabrication materials from a filtered element collector as the aren't elements.
+  The screen snapshot shows a fabrication material I'm talking about, with the "Material" id "4".
+  With this integer number I can query in the fabrication configuration to get further info about the fabrication material like its name and the group name to which it belongs etc.
+  Currently I'm only able to get these material ids (not Revit Materials) from the placed fabrication instances only, I wanted to know if there is a way to get all the possible fabrication material ids without placing any FabricationPart instance.
+  Thank you! -- https://forums.autodesk.com/t5/revit-api-forum/how-to-get-all-materials-of-fabrication-item-possible-in-the/m-p/11511642
 
 - the bleeding edge of ai -- https://bleedingedge.ai/
-bleeding edge is a feed of noteworthy developments in AI.
-The pace of development in AI right now is staggering and there’s been no easy way to keep up with all of the interesting developments. bleeding edge is my attempt at solving that. It’s a chronological collation of all the most noteworthy developments
+  bleeding edge is a feed of noteworthy developments in AI.
+  The pace of development in AI right now is staggering and there’s been no easy way to keep up with all of the interesting developments. bleeding edge is my attempt at solving that. It’s a chronological collation of all the most noteworthy developments
 
 - The Rise of ‘Luxury Surveillance’
-https://www.theatlantic.com/technology/archive/2022/10/amazon-tracking-devices-surveillance-state/671772/
-Surveillance isn’t just imposed on people: Many of us buy into it willingly
+  https://www.theatlantic.com/technology/archive/2022/10/amazon-tracking-devices-surveillance-state/671772/
+  Surveillance isn’t just imposed on people: Many of us buy into it willingly
 
 - The Great Pandemic Hand-Washing Blooper
-https://www.theatlantic.com/health/archive/2022/10/covid-pandemic-airborne-virus-transmission-hand-washing/671831/
-Should you wash your hands? Yes. Does it matter for respiratory viruses? Not as much as we once thought.
+  https://www.theatlantic.com/health/archive/2022/10/covid-pandemic-airborne-virus-transmission-hand-washing/671831/
+  Should you wash your hands? Yes. Does it matter for respiratory viruses? Not as much as we once thought.
 
 - How GitHub Copilot could steer Microsoft into a copyright storm
-https://www.theregister.com/2022/10/19/github_copilot_copyright/
-AI-driven coding tool might generate other people's code – who knew? Well, Redmond, for one
+  https://www.theregister.com/2022/10/19/github_copilot_copyright/
+  AI-driven coding tool might generate other people's code – who knew? Well, Redmond, for one
 
 - super realistic animated eye sequence character rendering
-https://twitter.com/sefkiibrahim/status/1580970724084584453?s=20&t=eAEMUoCTskHLTOZU0GB8jw
-by Şefki [@sefkiibrahim](https://twitter.com/sefkiibrahim) Ibrahim, 3D digital human character artist
+  https://twitter.com/sefkiibrahim/status/1580970724084584453?s=20&t=eAEMUoCTskHLTOZU0GB8jw
+  by Şefki [@sefkiibrahim](https://twitter.com/sefkiibrahim) Ibrahim, 3D digital human character artist
 
 - This is pretty mind-blowing: a podcast that is entirely generated by artificial intelligence where Joe Rogan interviews Steve Jobs. 
-https://podcast.ai- https://forums.autodesk.com/t5/revit-api-forum/ilist-vs-list/m-p/11483464
+  https://podcast.ai- https://forums.autodesk.com/t5/revit-api-forum/ilist-vs-list/m-p/11483464
 
 twitter:
 
