@@ -43,7 +43,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li><a href="#4">The CSS OKLCH colour space</a></li>
 </ul>
 <h4><a name="2"></a> APS (ex-Forge) Accelerator Dublin Dec 5-9</h4>
-<p>Quick upodate on behalf of Jaime:
+<p>Quick update on behalf of Jaime:
 we decided to push the date of the upcoming Dublin Hybrid Accelerator in the Autodesk Dublin Office to next month.</p>
 <p>We are looking for customers interested in joining us onsite to work with the Developer advocates team in coding solutions using Autodesk Platform Services (formerly Forge).
 In the past (pre-covid), we regularly hosted such events in the EMEA region to have software developers join us for the week.
@@ -53,7 +53,7 @@ We have an ongoing registration and would love to have a full house for the even
 <li><a href="https://forge.autodesk.com/accelerator-program">More details about this and other APS Accelerators</a></li>
 </ul>
 <h4><a name="3"></a> Reloading a Purged Family</h4>
-<p>My solution engineer collague Lejla Secerbegovic explored how to trigger the re-loading of family types after having (accidentally) purged them.</p>
+<p>My solution engineer colleague Lejla Secerbegovic explored how to trigger the re-loading of family types after having (accidentally) purged them.</p>
 <p>Here is a 46-second video showing the <a href="https://youtu.be/bHi_9Z3srqo">issue reloading purged family in Revit</a>:</p>
 <p><center></p>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/bHi_9Z3srqo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -68,9 +68,9 @@ From my understanding, I need to get Revit to trigger the following dialog (whic
 <p><strong>Question:</strong> Is there any way to restore the family types that were removed by purging?
 As you can see in the video, if I purge the unused types and then try reloading the family, it will not restore the types (probably because it thinks nothing in the family has changed?)</p>
 <p><strong>Answer:</strong> Family types can be created in the project and are not sent back to the rfa file unless you save out a new version of the family.
-So, if you load the family, make types in the project, then delete or or purge them in the project, they are gone.
+So, if you load the family, make types in the project, then delete or purge them in the project, they are gone.
 Reloading the rfa will just load it before the types ever existed.
-You would need a a backup of the projects before the purge, then you could save out the families and load them to the pureged project... I think...</p>
+You would need a backup of the projects before the purge; then you could save out the families and load them to the purged project... I think...</p>
 <p><strong>Response:</strong> Sorry if it wasn’t clear in the video: the types exist in the .rfa and were not created in the project.
 Users sometimes purge “accidentally”, which removes all unused types, and this is why we are looking for a way to easily restore them from the .rfa.</p>
 <p>I’m not using any type catalogues, but families with different types created in the family environment and this happens with EVERY family.
@@ -86,7 +86,7 @@ Steps to reproduce:</p>
 <p>Here are the 2 families I tested this with:</p>
 <ul>
 <li><a href="zip/ls_M_Desk.rfa">M_Desk.rfa</a>, from our official library</li>
-<li><a href="zip/ls_LEGO_Brick.rfa">M_Desk.rfa</a> custom created lego brick used in the video</li>
+<li><a href="zip/ls_LEGO_Brick.rfa">LEGO_Brick.rfa</a> custom created Lego brick used in the video</li>
 </ul>
 <p><strong>Answer:</strong> With your steps I can reproduce.</p>
 <p>According to our developer, this is by design and we will not need to discuss it further.</p>
@@ -99,7 +99,7 @@ Steps to reproduce:</p>
 </ul>
 <p>Regarding the original post &ndash; correct!
 If you did not change the family in any way, this results in a NOP.
-You can also see there there is no transaction in the Undo dropdown.</p>
+You can also see that there is no transaction in the Undo dropdown.</p>
 <p>This is how it is by design.</p>
 <p><strong>Response:</strong> Thanks for the response &ndash; what would then be the recommendation for the following scenario:</p>
 <ul>
@@ -119,19 +119,19 @@ I envision:</p>
 <p>Because of the invisible modification, the family has a change and can be reloaded with all types.
 They could save if they wanted to, but not much need.</p>
 <p>Question is what is an acceptable invisible edit.
-I’d personally use something like an extensible storage entity that just gets incremented by one, but that’s hard for many to self manage.
+I’d personally use something like an extensible storage entity that just gets incremented by one, but that’s hard for many to self-manage.
 They could use a hidden parameter with a toggle value in a similar way though.</p>
-<p>That would be a fairly straight forward tool they can self build if so inclined.</p>
+<p>That would be a fairly straight forward tool they can self-build if so inclined.</p>
 <p>The change can also be unmade after the load.
-So it could be a Boolean "Reload Me" parameter that gets changed to true before the reload and false after.</p>
+So, it could be a Boolean "Reload Me" parameter that gets changed to true before the reload and false after.</p>
 <p>Thanks to Angel Velez, Ivan Dobrianov, Jacob Small, Lejla Secerbegovic, Mariah Hanning and Steven Crotty for the fruitful discussion.</p>
 <h4><a name="4"></a> The CSS OKLCH Colour Space</h4>
 <p>Moving to a completely different topic: just half a year ago, I pointed out
-the <a href="https://thebuildingcoder.typepad.com/blog/2022/05/analysis-of-macros-journals-and-add-in-manager.html#5">advantages of the HSL colour spoace in CSS</a>.</p>
+the <a href="https://thebuildingcoder.typepad.com/blog/2022/05/analysis-of-macros-journals-and-add-in-manager.html#5">advantages of the HSL colour space in CSS</a>.</p>
 <p>That can be yet further improved on, cf. <a href="https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl">OKLCH in CSS: why we moved from RGB and HSL</a>.</p>
 <blockquote>
-<p>In CSS, we’ve been encoding colors with <code>rgb()</code> or hex (mostly for historical reasons).
+<p>In CSS, we’ve been encoding colours with <code>rgb()</code> or hex (mostly for historical reasons).
 However, the new <a href="https://www.w3.org/TR/css-color-4/">CSS Color 4</a> specification
-adds many better ways of declaring colors in CSS.
+adds many better ways of declaring colours in CSS.
 Of these, <code>oklch()</code> is the most interesting one &ndash; this article explains why.</p>
 </blockquote>
