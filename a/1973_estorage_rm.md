@@ -122,98 +122,43 @@ After the ES data has been written to the file it won't go away. I am being able
 
 The procedure I'm trying is:
 
-Open the Revit file with the saved ES data.
-Delete all the DataStorage elements holding the data.
-Save and close Revit, reopen the file again.
-Erase all schemas created by our addin.
-Save and close Revit to make sure I clear the schemas in memory.
-Start Revit again.
-Use the Schema.ListSchemas() function with no documents open to make sure our custom schemas are not loaded, this clears out.
-Open the file and use the Schema.ListSchemas() function, now all the schemas that I have erased previously reappear after opening the file!
-I'm using the same procedure found in the "ExtensibleStorageUtility" code example in the Revit SDK in a macro (code below).
+- Open the Revit file with the saved ES data.
+- Delete all the DataStorage elements holding the data.
+- Save and close Revit, reopen the file again.
+- Erase all schemas created by our addin.
+- Save and close Revit to make sure I clear the schemas in memory.
+- Start Revit again.
+- Use the Schema.ListSchemas() function with no documents open to make sure our custom schemas are not loaded, this clears out.
+- Open the file and use the Schema.ListSchemas() function, now all the schemas that I have erased previously reappear after opening the file!
 
-One observation I have that if I close Revit without saving after step 4 I get no warning to save the file as if no changes happened to the file, although I'm doing the erase inside a transaction.
+I'm using the same procedure found in the "ExtensibleStorageUtility" code example in the Revit SDK in a macro.
 
-This article has some info on ES and Schema behaviors that I tried to utilize but didn't work:
+One observation I have that if I close Revit without saving after step 4, I get no warning to save the file, as if no changes happened to it, although I'm doing the erase inside a transaction.
 
-https://www.caddmicrosystems.com/blog/cadd-helpdesk-hot-picks-classification-manager-schema-error/
-
-Below is the macro function I'm using:
-
-		public void DeleteSchemas() {
-			
-			var uiDoc = this.ActiveUIDocument;
-			var document = uiDoc.Document;
-			
-			var message = "";				
-			IList<Schema> schemas = Schema.ListSchemas();
-			int deleted = 0;
-			int count = schemas.Count;
-			
-			using(Transaction tErase = new Transaction(document, "Erase EStorage")){
-				
-				tErase.Start();
-				
-				foreach (Schema schema in schemas.Where(s=> s.VendorId == "MYAD"))
-				{
-					//Note-this will delete storage of this schema in *all* open documents.
-					try{
-						document.EraseSchemaAndAllEntities(schema);
-						Schema.EraseSchemaAndAllEntities(schema, true);
-						deleted++;
-					} catch {
-						
-					}
-				}
-				tErase.Commit();
-			}
-			
-			message =string.Format( "{0} storage elements out of {1} were deleted.", deleted.ToString(), count.ToString());
-			
-			TaskDialog.Show("ExtensibleStorageUtility", message);
-		}
+I tried to utilizethe info on ES and Schema behaviors
+from [CADD helpdesk hot picks – classification manager schema error](https://www.caddmicrosystems.com/blog/cadd-helpdesk-hot-picks-classification-manager-schema-error),
+but that didn't work:
 
 Any light on this would be much appreciated.
 
-
 The add-in cdoes not reate the schema when it's loaded; the schema is created on demand.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 28
-jeremy.tammik
- Employee jeremy.tammik in reply to: snajjar
-‎2021-11-02 12:25 AM 
-I would avoid the try/catch with an empty catch-all. Using that, you will never notice if anything goes wrong. Never catch all exceptions:
+**Answer:** I would avoid the try/catch with an empty catch-all.
+Using that, you will never notice if anything goes wrong.
+[Never catch all exceptions](https://thebuildingcoder.typepad.com/blog/2017/05/prompt-cancel-throws-exception-in-revit-2018.html#5)!
 
-https://thebuildingcoder.typepad.com/blog/2017/05/prompt-cancel-throws-exception-in-revit-2018.html#...
+Here is an old article by The Building Coder
+on [erasing extensible storage](https://thebuildingcoder.typepad.com/blog/2013/11/erasing-extensible-storage-with-linked-files.html).
 
-Here is an old article by The Building Coder on erasing extensible storage:
+**Response:** I already looked at all the Schema related posts in The Building Coder blog.
+None helped solving the issue in hand.
 
-https://thebuildingcoder.typepad.com/blog/2013/11/erasing-extensible-storage-with-linked-files.html
+After further investigation, it turned out that the `Schema.EraseSchemaAndAllEntitie` function is working fine in Revit 2019; it is in Revit 2022 that it is failing.
+I haven't tried the in-between versions, but I suspect that this is the case for 2021 as well, as it is in that version that the API change happened, deprecating this function from the `Schema` class and providing one in the `Document` class.
 
-If the problem persists, I would suggest putting together a minimal reproducible case for deeper analysis:
+<!------
 
-https://thebuildingcoder.typepad.com/blog/about-the-author.html#1b
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-
-
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 28
-snajjar
- Contributor snajjar in reply to: jeremy.tammik
-‎2021-11-11 08:41 PM 
-Thank you for the swift reply @jeremy.tammik 
-
-I have already looked at all the Schema related posts in the building coder blog, none helped solving the issue in hand.
-
-After further investigation, it turned out that the Schema.EraseSchemaAndAllEntities(...) function is working fine in Revit 2019, it is in Revit 2022 that it is failing. I haven't tried the in-between versions but I suspect that this is the case for 2021 as well as it is in that version that the API change happened of deprecating this function from the Schema class and providing one in the Document class.
-
-I have attached 2 Revit files with embedded macros for versions 2019 and 2022, both files have the same code except that the 2022 file is using the new Document.EraseSchemaAndAllEntities(...) function along with the deprecated one.
+I attached 2 Revit files with embedded macros for versions 2019 and 2022, both files have the same code except that the 2022 file is using the new Document.EraseSchemaAndAllEntities(...) function along with the deprecated one.
 
 To replicate the issue:
 
@@ -240,13 +185,9 @@ Sam
 es test - V19.rvt
  
 es test - V22.rvt
-Tags (0)
-Add tags
-Report
-MESSAGE 6 OF 28
+
 jeremy.tammik
- Employee jeremy.tammik in reply to: snajjar
-‎2021-11-17 09:41 PM 
+
 Dear Sam,
 
 Sorry for not following up immediately and thank you for pointing out this again.
@@ -261,25 +202,23 @@ Cheers,
 
 Jeremy
 
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 7 OF 28
 snajjar
- Contributor snajjar in reply to: jeremy.tammik
-‎2021-11-18 10:03 PM 
+
 Thank you for your reply @jeremy.tammik, I much appreciate all the help you provide.
 
-I read through the new blog post and the solution by @RPTHOMAS108, and I'm sorry to say that it does not address the issue I'm having.
+-->
 
-The solution and guidelines are addressing DataStorag and Schema creation and retrieval, I don't have issues there, and I can say that we are following the proposed best practices mentioned in the blog post for the creation procedures:
+I read through all the blog posts and the solution by @RPTHOMAS108, and I'm sorry to say that it does not address the issue I'm having.
 
-Schemas are being created on-demand
-Using new Entity(Schema) instead of new Entity(GUID)
-Not passing entities ByRef
-Utilizing ExtensibleStorageFilter and Schema.Lookup(SchemaGuid).
-My issue is with deleting the schema, which is working fine in 2019 but not in 2022.
+The solution and guidelines are addressing `DataStorage` and `Schema` creation and retrieval,
+I don't have issues there, and I can say that we are following the proposed best practices mentioned in the blog post for the creation procedures:
+
+- Schemas are being created on-demand
+- Using new Entity(Schema) instead of new Entity(GUID)
+- Not passing entities ByRef
+- Utilizing ExtensibleStorageFilter and Schema.Lookup(SchemaGuid).
+
+My issue is with <u>deleting</u> the schema, which is working fine in 2019 but not in 2022.
 
 I am testing this in freshly created Revit files which I have included in my previous response with embedded macro code. The same code is being used in both files, but the 2022 one is not working.
 
@@ -287,60 +226,30 @@ The reason we are seeking Schema deletion is that when a Revit file that contain
 
 I really hope this can be looked at by the development team to see if it is a bug caused by the API update that took place in Revit 2021.
 
-Thank you again for all your help!
+**Answer:** I've not looked into this;
+it should be possible to delete the schema if it is not used regardless, so that does seem wrong (especially if it previously worked).
+Did you have schema conflicts in the 2019 version though?
 
-Sam
+However, one thing that occurred to me as I read your latest message is that you should only get that warning in the first place if you've done something wrong in terms of managing the schemas.
+When you create a schema with a GUID that is that version forever.
+To add additional members you should create a new version and transfer the data (leave the old one alone, do not reuse it's GUID).
 
-Tags (0)
-Add tags
-Report
-MESSAGE 8 OF 28
-RPTHOMAS108
- Mentor RPTHOMAS108 in reply to: snajjar
-‎2021-11-19 01:35 AM 
-I've not looked into this it should be possible to delete the schema if it is not used regardless, so that does seem wrong (especially if it previously worked). Did you have schema conflicts in the 2019 version though?
-
-However one thing that occurred to me as I read your latest message is that you should only get that warning in the first place if you've done something wrong in terms of managing the schemas. When you create a schema with a GUID that is that version forever. To add additional members you should create a new version and transfer the data (leave the old one alone not reuse it's GUID).
-
-Tags (0)
-Add tags
-Report
-MESSAGE 9 OF 28
-jeremy.tammik
- Employee jeremy.tammik in reply to: RPTHOMAS108
-‎2021-11-19 01:41 AM 
-Oh wow, well spotted!
-
-Very sorry I missed that, Sam. You say:
-
-> a newer version of the schema (adding more fields for example)
+You say, <i>a newer version of the schema (adding more fields for example)</i>.
 
 No such thing exists!
 
 If you have created such a situation, you are in serious trouble.
 
-Please refer to numerous articles by The Building Coder pointing out that an existing schema cannot be modified:
+An existing schema cannot be modified:
 
-https://thebuildingcoder.typepad.com/blog/2013/08/deleting-and-updating-extensible-storage-schema.ht...
-https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.23
+**Response:** I followed the procedure above (2022 version only) and was also not able to remove the schema, so regardless of misuse something seemingly warranting some further investigation with the `EraseSchemaAndAllEntities` methods perhaps. i.e. this is a clean file to start with presumably.
 
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 10 OF 28
-RPTHOMAS108
- Mentor RPTHOMAS108 in reply to: jeremy.tammik
-‎2021-11-19 04:30 AM 
-Hello @jeremy.tammik
+Note that the macro doesn't delete the `DataStorage` element, but I deleted this manually prior to step 6.
+However I still wasn't able to permanently remove the schema.
 
-I followed the procedure above (2022 version only) and was also not able to remove the schema, so regardless of misuse something seemingly warranting some further investigation with the EraseSchemaAndAllEntities methods perhaps. i.e. this is a clean file to start with presumably.
+I note that the old method `Schema.EraseSchemaAndAllEntities` has a Boolean `overrideWriteAccessWithUserPermission` which is not present in the new `Document` method of the same name.
 
-Note that the macro doesn't delete the DataStorage element but I deleted this manually prior to step 6. However I still wasn't able to permanently remove the schema.
-
-I note that the old method (Schema.EraseSchemaAndAllEntities) has a boolean overrideWriteAccessWithUserPermission which is not present in the new Document method of the same name.
-
-This may be a conceptual choice going forward but may be part of the issue (changes to underlying method that serves both). Also the test was only conducted within the macro environment (add-in id is explicitly set in the attribute).
+This may be a conceptual choice going forward but may be part of the issue (changes to underlying method that serves both). Also, the test was only conducted within the macro environment (add-in id is explicitly set in the attribute).
 
 I made the below minor change so any exceptions would show up but still no exceptions were reported:
 
