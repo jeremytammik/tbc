@@ -38,28 +38,27 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> Welcome, George!
 
-I’m happy to inform you that Moturi George (you can call him George) has just joined DAS (Developer Advocacy and Support) team. He is based in Nairobi, Kenya.
-He comes with computer science background, and has worked for a few companies as a web developer. Initially, he will be focusing on learning and supporting Revit API, and eventually stepping into Forge and Autodesk Construction Cloud.
+A warm welcome to my new colleague George Moturi!
+He joined the DAS Developer Advocacy and Support team in September.
+He is based in Nairobi, Kenya.
+He comes with a computer science background and has worked for a few companies as a web developer.
+Initially, he will be focusing on learning and supporting the Revit API, and later stepping into Forge and ACC, the Autodesk Construction Cloud.
+In his own words:
  
-Below is the introduction in his own words:
- 
-“My name is Moturi George, and I am joining as a Developer Advocate. Prior to being joing Autodesk as a Developer Advocate, I was a Software Developer going for 5 years and a few months now. I have previously worked for a fintech company, media & advertising company and a digital marketing company. My previous role which was in a fintech involved API development and also integration of the same with different providers and vendors. Over the course of my career, I have developed applications using .NET Framework in C#, built websites using PHP, Vue JS, HTML and CSS.
- 
-When I am not working, I love to watch documentaries and playing computer games. If I am not doing one of those, I am probably having a chat on current affairs with my neighbors or friends.
- 
+> My name is Moturi George and I am joining as a Developer Advocate.
+Prior to that, I was a software developer for 5 years.
+I worked for fintech, media &amp; advertising and a digital marketing company, involving API development and integration with different providers and vendors.
+I have developed applications using the .NET Framework in C#, built websites using PHP, Vue JS, HTML and CSS.
+When not working, I love to watch documentaries, play computer games nad having a chat on current affairs with my neighbors or friends. 
 I'm happy and excited to be part of this amazing team that is building great Autodesk Community experiences!”
 
 <center>
 <img src="img/george_moturi.png" alt="George Moturi" title="George Moturi" width="400"/>  <!-- 565 × 881 pixels -->
 </center>
 
-Please join me welcoming George to the team!
+####<a name="3"></a> WPF Form UIApplication Access
 
-
-
-####<a name="3"></a> Mazri's Revit, Dynamo, Web and WPF Playlists
-
-George came to mind because he added a very helpful pointer to 
+George just added a very helpful pointer to 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [How to call UIApplication of my current Document](https://forums.autodesk.com/t5/revit-api-forum/how-to-call-uiapplication-of-my-current-document/m-p/11570137):
 
@@ -73,34 +72,31 @@ Here is a tutorial that explains step by step how to create WPF forms and call i
 
 - [Revit + WPF -Quick starting guide- Ep4: adding UI to a command](https://youtu.be/vHsqxRAqQOg)
 
-####<a name="3"></a> Mazri's Revit, Dynamo, Web and WPF Playlists
+####<a name="4"></a> Mazri's Revit, Dynamo, Web and WPF Playlists
 
-[Mazri's BIM Diary](https://www.youtube.com/@mazrisbimdiary2045)
-
-[playlists](https://www.youtube.com/@mazrisbimdiary2045/playlists) include:
-
-
+Looking more closely at George's recommendation in the answer above, I am very impressed
+with [Mazri](https://twitter.com/mazri_a),
+his [YouTube BIM Diary](https://www.youtube.com/@mazrisbimdiary2045)
+and [tutorial playlists](https://www.youtube.com/@mazrisbimdiary2045/playlists), covering the following areas:
 
 - Web dev
-- Dynamo & Data
-- Revit + WPF
+- Dynamo &amp; Data
 - Make Your own Revit Plug-ins
 - Revit Programming using Python
+- Revit + WPF
 
-**Nice friendly C# course for beginners**: https://www.youtube.com/playlist?list=PLLAZ4kZ9dFpNIBTYHNDrhfE9C-imUXCmk
-Microsoft [XAML overview (WPF .NET)](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/xaml/?view=netdesktop-6.0)
-Tim Corey [Intro to WPF: Learn the basics and best practices of WPF for C#](https://youtu.be/gSfMNjWNoX0)
-AngelSix [C# WPF UI Tutorials: 01 - The Basics](https://youtu.be/Vjldip84CXQ)
+Specifically targeted at getting started with C# programming and WPF, Mazri recommends:
 
+- A [nice friendly C# course for beginners](https://www.youtube.com/playlist?list=PLLAZ4kZ9dFpNIBTYHNDrhfE9C-imUXCmk)
+- Microsoft's [XAML overview (WPF .NET)](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/xaml/?view=netdesktop-6.0)
+- Tim Corey's [Intro to WPF: Learn the basics and best practices of WPF for C#](https://youtu.be/gSfMNjWNoX0)
+- AngelSix' [C# WPF UI Tutorials: 01 - The Basics](https://youtu.be/Vjldip84CXQ)
 
+Looks like great stuff!
 
-Follow me on Instagram: https://www.instagram.com/eng.mazri/
-Follow me on Twitter: https://twitter.com/mazri_a
+Many thanks to Mazri for his great work, and to George for poointing it out.
 
-
-
-
-####<a name="2"></a> Extensible Starage Schema Deletion
+####<a name="5"></a> Extensible Starage Schema Deletion
 
 Some developers have encountered issues creating and deleting extensible starage schemata.
 
