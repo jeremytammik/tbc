@@ -35,6 +35,71 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Extensible Storage Schema Deletion
 
+
+####<a name="2"></a> Welcome, George!
+
+I’m happy to inform you that Moturi George (you can call him George) has just joined DAS (Developer Advocacy and Support) team. He is based in Nairobi, Kenya.
+He comes with computer science background, and has worked for a few companies as a web developer. Initially, he will be focusing on learning and supporting Revit API, and eventually stepping into Forge and Autodesk Construction Cloud.
+ 
+Below is the introduction in his own words:
+ 
+“My name is Moturi George, and I am joining as a Developer Advocate. Prior to being joing Autodesk as a Developer Advocate, I was a Software Developer going for 5 years and a few months now. I have previously worked for a fintech company, media & advertising company and a digital marketing company. My previous role which was in a fintech involved API development and also integration of the same with different providers and vendors. Over the course of my career, I have developed applications using .NET Framework in C#, built websites using PHP, Vue JS, HTML and CSS.
+ 
+When I am not working, I love to watch documentaries and playing computer games. If I am not doing one of those, I am probably having a chat on current affairs with my neighbors or friends.
+ 
+I'm happy and excited to be part of this amazing team that is building great Autodesk Community experiences!”
+
+<center>
+<img src="img/george_moturi.png" alt="George Moturi" title="George Moturi" width="400"/>  <!-- 565 × 881 pixels -->
+</center>
+
+Please join me welcoming George to the team!
+
+
+
+####<a name="3"></a> Mazri's Revit, Dynamo, Web and WPF Playlists
+
+George came to mind because he added a very helpful pointer to 
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [How to call UIApplication of my current Document](https://forums.autodesk.com/t5/revit-api-forum/how-to-call-uiapplication-of-my-current-document/m-p/11570137):
+
+**Question:** I defined a command class that implements the `Execute` method and some other methods and Windows form named `LoadFamily`. Its first parameter is `UIApplication`. However, I don't know how should I call that parameter when I'm in a form button.In other word, how should I call the `UIApplication` of my command class in one of its other methods?
+
+**Answer:** Make the `UIApplication` instance a member variable of your form class.
+Store the value you receive in the constructor in the member variable.
+Use its value in the button click handler method.
+
+Here is a tutorial that explains step by step how to create WPF forms and call its methods outside your command class:
+
+- [Revit + WPF -Quick starting guide- Ep4: adding UI to a command](https://youtu.be/vHsqxRAqQOg)
+
+####<a name="3"></a> Mazri's Revit, Dynamo, Web and WPF Playlists
+
+[Mazri's BIM Diary](https://www.youtube.com/@mazrisbimdiary2045)
+
+[playlists](https://www.youtube.com/@mazrisbimdiary2045/playlists) include:
+
+
+
+- Web dev
+- Dynamo & Data
+- Revit + WPF
+- Make Your own Revit Plug-ins
+- Revit Programming using Python
+
+**Nice friendly C# course for beginners**: https://www.youtube.com/playlist?list=PLLAZ4kZ9dFpNIBTYHNDrhfE9C-imUXCmk
+Microsoft [XAML overview (WPF .NET)](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/xaml/?view=netdesktop-6.0)
+Tim Corey [Intro to WPF: Learn the basics and best practices of WPF for C#](https://youtu.be/gSfMNjWNoX0)
+AngelSix [C# WPF UI Tutorials: 01 - The Basics](https://youtu.be/Vjldip84CXQ)
+
+
+
+Follow me on Instagram: https://www.instagram.com/eng.mazri/
+Follow me on Twitter: https://twitter.com/mazri_a
+
+
+
+
 ####<a name="2"></a> Extensible Starage Schema Deletion
 
 Some developers have encountered issues creating and deleting extensible starage schemata.
