@@ -363,6 +363,8 @@ Many thanks to Sam, Marek and Richard for all their research and the fruitful di
 
 ####<a name="6"></a> Extensible Storage Schema Conflict
 
+Another aspect was tagged on at the end of the above:
+
 **Question:** OK, I guess I need to jump on board the Schema issue.
 I'm also getting an error for an EnigmaSchema that is in multiple files:
 
