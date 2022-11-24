@@ -94,7 +94,7 @@ Specifically targeted at getting started with C# programming and WPF, Mazri reco
 
 Looks like great stuff!
 
-Many thanks to Mazri for his great work, and to George for poointing it out.
+Many thanks to Mazri for his great work, and to George for pointing it out.
 
 ####<a name="5"></a> Extensible Starage Schema Deletion
 
