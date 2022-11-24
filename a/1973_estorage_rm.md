@@ -111,12 +111,17 @@ The most fundamental ones are:
 You can get into as nice mess by violating any of these principles.
 To be more precise, they cannot be biolated, but people still try to, and then things get unpleasant.
 
-Some aspects are clarified by
-this recent [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+A new fundamental recommendation came up in the following extensive discussion 
 on [not able to delete extensible storage schema](https://forums.autodesk.com/t5/revit-api-forum/not-able-to-delete-extensible-storage-schema/m-p/11541801):
 
-Not able to delete Extensible Storage schema
-I'm trying to put together a command to erase Extensible Storage (ES) data and the corresponding Schemas for our addin in case if unwanted by the users or corrupt. I had no luck so far. 
+- The [`ExtensibleStorage.Schema` version of `EraseSchemaAndAllEntities` erasing `Schema` from all open documents had been deprecated and removed](https://www.revitapidocs.com/2023/80983aac-0cca-c211-1c7b-b5350624f046.htm)
+  &ndash;
+  the [Document.EraseSchemaAndAllEntities](https://www.revitapidocs.com/2023/50debcb0-3c4f-b32b-2edb-8a6ef7b4bf8d.htm) method
+should be used instead
+
+Here is an edited version of the conversation:
+
+**Question:: I'm trying to put together a command to erase Extensible Storage (ES) data and the corresponding Schemas for our addin in case if unwanted by the users or corrupt. I had no luck so far. 
 
 After the ES data has been written to the file it won't go away. I am being able to delete the DataStorage elements with no troubles, but the schemas keep popping up after erasing them.
 
@@ -354,8 +359,9 @@ should be used instead:
 
 - Erases Schema and all its Entities from the document.
 
+Many thanks to Sam, Marek and Richard for all their research and the fruitful discussion.
 
-####<a name="3"></a> Extensible Storage Schema Conflict
+####<a name="6"></a> Extensible Storage Schema Conflict
 
 **Question:** OK, I guess I need to jump on board the Schema issue.
 I'm also getting an error for an EnigmaSchema that is in multiple files:
@@ -390,12 +396,3 @@ Run ListSchemas &ndash; the schema is purged.
 So, please use Purge Unused to delete schemas without entities.
 
 
-**Question:** 
-
-**Answer:** 
-
-**Response:** 
-
-Thanks to ... for the fruitful discussion.
-
-####<a name="4"></a> 
