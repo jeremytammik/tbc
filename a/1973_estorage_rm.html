@@ -46,7 +46,7 @@ Prior to that, I was a software developer for 5 years.
 I worked for fintech, media &amp; advertising and a digital marketing company, involving API development and integration with different providers and vendors.
 I have developed applications using the .NET Framework in C#, built websites using PHP, Vue JS, HTML and CSS.
 When not working, I love to watch documentaries, play computer games nad having a chat on current affairs with my neighbors or friends. 
-I'm happy and excited to be part of this amazing team that is building great Autodesk Community experiences!”</p>
+I'm happy and excited to be part of this amazing team that is building great Autodesk Community experiences!</p>
 </blockquote>
 <p><center>
 <img src="img/george_moturi.png" alt="George Moturi" title="George Moturi" width="260"/>  <!-- 565 × 881 pixels -->
@@ -83,7 +83,7 @@ and <a href="https://www.youtube.com/@mazrisbimdiary2045/playlists">tutorial pla
 <li>AngelSix' <a href="https://youtu.be/Vjldip84CXQ">C# WPF UI Tutorials: 01 - The Basics</a></li>
 </ul>
 <p>Looks like great stuff!</p>
-<p>Many thanks to Mazri for his great work, and to George for poointing it out.</p>
+<p>Many thanks to Mazri for his great work, and to George for pointing it out.</p>
 <h4><a name="5"></a> Extensible Starage Schema Deletion</h4>
 <p>Some developers have encountered issues creating and deleting extensible starage schemata.</p>
 <p>Many of these can be resolved by understanding and adhering to the underlying basic principles.</p>
@@ -95,13 +95,14 @@ and <a href="https://www.youtube.com/@mazrisbimdiary2045/playlists">tutorial pla
 </ul>
 <p>You can get into as nice mess by violating any of these principles.
 To be more precise, they cannot be biolated, but people still try to, and then things get unpleasant.</p>
-<p>A new fundamental recommendation came up in the following extensive discussion 
+<p>A new obvious step came up in the following extensive discussion 
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/not-able-to-delete-extensible-storage-schema/m-p/11541801">not able to delete extensible storage schema</a>:</p>
 <ul>
 <li>The <a href="https://www.revitapidocs.com/2023/80983aac-0cca-c211-1c7b-b5350624f046.htm"><code>ExtensibleStorage.Schema</code> version of <code>EraseSchemaAndAllEntities</code> erasing <code>Schema</code> from all open documents had been deprecated and removed</a>
   &ndash;
   the <a href="https://www.revitapidocs.com/2023/50debcb0-3c4f-b32b-2edb-8a6ef7b4bf8d.htm">Document.EraseSchemaAndAllEntities</a> method
-should be used instead</li>
+should be used instead
+  &ndash; maybe in earlier releases as well</li>
 </ul>
 <p>Here is an edited version of the conversation:</p>
 <p>**Question:: I'm trying to put together a command to erase Extensible Storage (ES) data and the corresponding Schemas for our addin in case if unwanted by the users or corrupt. I had no luck so far. </p>

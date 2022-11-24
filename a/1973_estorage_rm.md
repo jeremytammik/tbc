@@ -50,7 +50,7 @@ Prior to that, I was a software developer for 5 years.
 I worked for fintech, media &amp; advertising and a digital marketing company, involving API development and integration with different providers and vendors.
 I have developed applications using the .NET Framework in C#, built websites using PHP, Vue JS, HTML and CSS.
 When not working, I love to watch documentaries, play computer games nad having a chat on current affairs with my neighbors or friends. 
-I'm happy and excited to be part of this amazing team that is building great Autodesk Community experiences!”
+I'm happy and excited to be part of this amazing team that is building great Autodesk Community experiences!
 
 <center>
 <img src="img/george_moturi.png" alt="George Moturi" title="George Moturi" width="260"/>  <!-- 565 × 881 pixels -->
@@ -111,13 +111,14 @@ The most fundamental ones are:
 You can get into as nice mess by violating any of these principles.
 To be more precise, they cannot be biolated, but people still try to, and then things get unpleasant.
 
-A new fundamental recommendation came up in the following extensive discussion 
+A new obvious step came up in the following extensive discussion 
 on [not able to delete extensible storage schema](https://forums.autodesk.com/t5/revit-api-forum/not-able-to-delete-extensible-storage-schema/m-p/11541801):
 
 - The [`ExtensibleStorage.Schema` version of `EraseSchemaAndAllEntities` erasing `Schema` from all open documents had been deprecated and removed](https://www.revitapidocs.com/2023/80983aac-0cca-c211-1c7b-b5350624f046.htm)
   &ndash;
   the [Document.EraseSchemaAndAllEntities](https://www.revitapidocs.com/2023/50debcb0-3c4f-b32b-2edb-8a6ef7b4bf8d.htm) method
 should be used instead
+  &ndash; maybe in earlier releases as well
 
 Here is an edited version of the conversation:
 
