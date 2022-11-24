@@ -253,251 +253,86 @@ This may be a conceptual choice going forward but may be part of the issue (chan
 
 I made the below minor change so any exceptions would show up but still no exceptions were reported:
 
-/Users/jta/a/doc/revit/tbc/git/a/img/estorage_delete_1.png
+<center>
+<img src="img/estorage_erase_error.png" alt="Extensible storage schema erase error" title="Extensible storage schema erase error" width="600"/>  <!-- 856 × 324 p -->
+</center>
 
-Tags (0)
-Add tags
-Report
-MESSAGE 11 OF 28
-snajjar
- Contributor snajjar in reply to: RPTHOMAS108
-‎2021-11-19 06:39 AM 
-Thank you for the follow-up @RPTHOMAS108 and @jeremy.tammik,
+**Respinse:** Your observation is spot-on, my usual procedure is to change the guid if I ever change something in the schema so a new schema would be created, but it looks like I missed doing that in one class, and this is why I am seeking the deletion functionality.
+This should not be an issue for future updates, but I need to provide a resolution for the models edited by the current version.
 
-Your observation is spot-on, my usual procedure is to change the guid if I ever change something in the schema so a new schema would be created, but it looks like I missed doing that in one class, and this is why I am seeking the deletion functionality. This should not be an issue for future updates, but I need to provide a resolution for the models edited by the current version.
+The issue with not being able to delete the schema is irrelevant to what I did wrong.
 
-And again, the issue with not being able to delete the schema is irrelevant to what I did wrong.
+The sample files are in their simplest forms, freshly made out of the architectural template and contain no elements, just the embedded macro scripts.
 
-Appreciate the help!
-
-Tags (0)
-Add tags
-Report
-MESSAGE 12 OF 28
-jeremy.tammik
- Employee jeremy.tammik in reply to: snajjar
-‎2021-11-22 05:21 AM 
-OK, so it seems I have to pass this on to the development team for further analysis. Are the two sample files that you shared above in a fit state to be passed on to them, or is there anything that can be simplified or cleaned up before I go ahead? Thank you!
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 13 OF 28
-snajjar
- Contributor snajjar in reply to: jeremy.tammik
-‎2021-11-23 08:40 AM 
-The files are in their simplest forms, they are freshly made out of the architectural template and contain no elements, just the embedded macro scripts.
-Tags (0)
-Add tags
-Report
-MESSAGE 14 OF 28
-jeremy.tammik
- Employee jeremy.tammik in reply to: snajjar
-‎2022-01-05 08:26 AM 
-Happy New Year!
-
-Thank you for your confirmation and patience. Thanks also to Richard for pointing out this existing thread in the new one raising a similar question:
-
-https://forums.autodesk.com/t5/revit-api-forum/error-with-new-api-schema-revit/m-p/10858918
-
-I have passed on both issues to the development team for further analysis and hopefully some helpful advice.
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 15 OF 28
-jeremy.tammik
- Employee jeremy.tammik in reply to: snajjar
-‎2022-01-06 11:59 PM 
-The devteam replied:
-
-After running DeleteSchemas macro, open Manage > Purge Unused. In the tree, select Extensible Storage Schema.
-Check the schema a9dc2b48 and click OK to purge it. Run ListSchemas &ndash; the schema is purged. So, please use Purge Unused to delete schemas without entities.
+**Answer:** The devteam replied: After running `DeleteSchemas` macro, open Manage > Purge Unused.
+In the tree, select Extensible Storage Schema.
+Check the schema a9dc2b48 and click OK to purge it.
+Run `ListSchemas` &ndash; the schema is purged.
+So, please use Purge Unused to delete schemas without entities.
  
-I pointed out that this question comes from add-in developers automating processes and asked how they should run the purge command programmatically. We'll see what they come up with next.
+I pointed out that this question comes from add-in developers automating processes and asked how they should run the purge command programmatically.
+We'll see what they come up with next.
   
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 16 OF 28
-jeremy.tammik
- Employee jeremy.tammik in reply to: snajjar
-‎2022-05-03 11:58 AM 
 A similar issue came up again with a new customer, and the devteam underline:
 
 I would strongly recommend to any developer not to reuse a GUID for a new or modified schema for any reason, even if you think it has been purged from one document it may not be purged from other documents and you are setting yourselves up for a potential in-memory conflict.
  
 We have seen this many times from developers who copied and did not modify the GUID in our samples.
 
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 17 OF 28
-2537747694
- Observer 2537747694 in reply to: snajjar
-‎2022-08-28 03:27 AM 
-Hi, have you found a solution to your problem? I probably had the same problem
+**Question:** Recently I faced the same issue: for some projects, I got an InternalException while trying to remove ExtensibleStorage schemas.
+The exception does not occur after I unloaded IFC links. 
 
-Tags (1)
-Tags:Schema回答
- 
-Add tags
-Report
-MESSAGE 18 OF 28
-Songohu_85
- Contributor Songohu_85 in reply to: snajjar
-‎2022-09-02 04:03 AM 
-Very recently I faced the same issue, that for some projects I got InternalException while trying to remove ExtensibleStorage schemas. The exception does not occur after I unloaded IFC links. 
+**Answer:** Thank you for your interesting observation.
+It would be nice (and very useful) if the other parties concerned could test and hopefully verify this solution.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 19 OF 28
-jeremy.tammik
- Employee jeremy.tammik in reply to: Songohu_85
-‎2022-09-02 05:23 AM 
-Wow. Thank you for a very interesting observation. It would be nice (and very useful) if the other parties concerned could test and hopefully verify this solution.
+**Response:** I created a very small example with IFC link (link with a few walls created in Revit2020):
 
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 20 OF 28
-Songohu_85
- Contributor Songohu_85 in reply to: jeremy.tammik
-‎2022-09-02 08:28 AM 
-I created a very small example with IFC link (link with a few walls created in Revit2020).
-In the file you will find 4 macros:
+- [zip/estorage_delete_schema_example.zip](/Users/jta/a/doc/revit/tbc/git/a/zip/estorage_delete_schema_example.zip)
 
-1. To create example schema
+It includes 4 macros:
 
-2. To remove example schema
+- Create example schema
+- Remove example schema
+- List all schemato
+- Remove all schemato
 
-3. To list all schemas
+In Revit 2020, I am not able to remove any schemata when the IFC link is loaded.
 
-4. To remove all schemas
-In Revit2020 I am not able to remove any schemas when the IFC link is loaded.
+An InternalException also occurs when removing schemata when there is more than one project file opened (Revit 2020).
 
-Update: InternalException when removing schemas occurs also when there is more than one project file opened (Revit 2020)
-
-Kind regards
-Marek
-
-/Users/jta/a/doc/revit/tbc/git/a/zip/estorage_delete_schema_example.zip
-
-Tags (0)
-Add tags
-Report
-MESSAGE 21 OF 28
-jeremy.tammik
- Employee jeremy.tammik in reply to: Songohu_85
-‎2022-09-02 08:36 AM 
-Beautiful! Thank you for testing, reproducing, and sharing the proof of the pudding!
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 22 OF 28
-jeremy.tammik
- Employee jeremy.tammik in reply to: Songohu_85
-‎2022-09-05 05:29 AM 
-Dear Marek,
-
-Thank you for your report, clear description, and sample material.
-
-Sorry to hear about this.
-
-I logged the issue REVIT-196204 [IFC link prevents extensible storage delete] with our development team for this on your behalf as it requires further exploration and possibly a modification to our software. Please make a note of this number for future reference.
-
-You are welcome to request an update on the status of this issue or to provide additional information on it at any time quoting this change request number.
-
-This issue is important to me. What can I do to help?
-
-This issue needs to be assessed by our engineering team and prioritised against all other outstanding change requests. Any information that you can provide to influence this assessment will help. Please provide the following where possible:
-
-Impact on your application and/or your development.
-The number of users affected.
-The potential revenue impact to you.
-The potential revenue impact to Autodesk.
-Realistic timescale over which a fix would help you.
-In the case of a request for a new feature or a feature enhancement, please also provide detailed Use cases for the workflows that this change would address.
-
-This information is extremely important. Our engineering team has limited resources, and so must focus their efforts on the highest impact items. We do understand that this will cause you delays and affect your development planning, and we appreciate your cooperation and patience.
-
-Best regards,
-
-Jeremy
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 23 OF 28
-Songohu_85
- Contributor Songohu_85 in reply to: jeremy.tammik
-‎2022-09-13 06:07 AM 
-Dear Jeremy,
+**Answer:** I logged the issue REVIT-196204 [IFC link prevents extensible storage delete] for this 
 
 InternalException when trying to remove schemas is currently not a big issue for me.
 
-I landed on this thread because of difficulties related to upgrade from Revit2020 to Revit2023. In a few models we experience some critical errors when trying to upgrade to version 2023. We came to the point that it could be directly or indirectly related to schemas. After we remove ExStorage schemas the upgrade to 2023 is successful.
+I landed on this thread because of difficulties related to upgrade from Revit 2020 to Revit 2023.
+In a few models we experience some critical errors when trying to upgrade to version 2023.
+We came to the point that it could be directly or indirectly related to schemas.
+After we remove ExStorage schemas the upgrade to 2023 is successful.
 
 I noticed that removing schemas and entities sometimes causes Errors and Warnings, for example:
-Error: Can't keep elements joined. (Model Lines, Walls)
-Warning: Highlighted lines overlap. Lines may not form closed loops. (Model Lines)
-Edit: But most likely it is just because the elements are regenerated after the entitiy is removed.
+
+- Error: Can't keep elements joined. (Model Lines, Walls)
+- Warning: Highlighted lines overlap. Lines may not form closed loops. (Model Lines)
+
+Possibly this is just because the elements are regenerated after the entitiy is removed.
 
 I wouldn't believe that ExStorages could cause any upgrade issues  if I didn't see it happening.
 
 What is your opinion on the possibility that ExtensibleStorage schemas and entities may cause upgrade issues?
 
-Kind regards
-
-Marek
-
-Tags (0)
-Add tags
-Report
-MESSAGE 24 OF 28
-RPTHOMAS108
- Mentor RPTHOMAS108 in reply to: Songohu_85
-‎2022-09-13 06:26 PM 
-A link opens a document in the background but you can't edit that linked document can you.
-
+**Answer:** A link opens a document in the background, but you can't edit that linked document, can you?
 Does the linked document contain the same schema itself?
-
 If so, then I would see it as logical why the linked document causes issues. Should not cause an exception though.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 25 OF 28
-jeremy.tammik
- Employee jeremy.tammik in reply to: RPTHOMAS108
-‎2022-09-14 01:32 AM 
-Extensible storage schema is an application-wide object. If it exists at all in the application, it will populate and "infect" every single document that you touch. That makes it hard to remove, and complicated to understand.
+Extensible storage schema is an application-wide object.
+If it exists at all in the application, it will populate and "infect" every single document that you touch.
+That makes it hard to remove, and complicated to understand.
 
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 26 OF 28
-jeremy.tammik
- Employee jeremy.tammik in reply to: Songohu_85
-‎2022-11-09 06:47 AM 
-Dear Marek,
+The development team analysed the development ticket and decided not to make any changes, explaining:
 
-Thank you for your patience
+The `Document` class provides the method `EraseSchemaAndAllEntities`:
 
-The development team analysed the issue REVIT-196204 [IFC link prevents extensible storage delete] and decided not to make any changes, explaining:
-
-The Document class provides the method EraseSchemaAndAllEntities:
-
+<pre>
   # Erases Schema and all its Entities from the document.
   remarks
      # The Schema remains in memory.
@@ -507,30 +342,23 @@ The Document class provides the method EraseSchemaAndAllEntities:
   validate DocumentValidation::isDocumentModifiable(this)
   throws ArgumentException
      # No write access to this Schema.
+</pre>
 
-The version of EraseSchemaAndAllEntities erasing Schema from all open documents had been deprecated and removed:
+The [version of `EraseSchemaAndAllEntities` erasing `Schema` from all open documents had been deprecated and removed](https://www.revitapidocs.com/2023/80983aac-0cca-c211-1c7b-b5350624f046.htm):
 
-https://www.revitapidocs.com/2023/80983aac-0cca-c211-1c7b-b5350624f046.htm
+- 2023 | Resource Not Available for the Active API Year: `EraseSchemaAndAllEntities` Method
+  &ndash; Erases all Entities corresponding to this Schema from all open documents and erases this Schema from memory.
 
-2023 | Resource Not Available for the Active API Year: EraseSchemaAndAllEntities Method -- Erases all Entities corresponding to this Schema from all open documents and erases this Schema from memory.
+The [Document.EraseSchemaAndAllEntities](https://www.revitapidocs.com/2023/50debcb0-3c4f-b32b-2edb-8a6ef7b4bf8d.htm) method
+should be used instead:
 
-The document method should be used instead:
+- Erases Schema and all its Entities from the document.
 
-https://www.revitapidocs.com/2023/50debcb0-3c4f-b32b-2edb-8a6ef7b4bf8d.htm
-
-Erases Schema and all its Entities from the document.
-
-Best regards,
-
-Jeremy
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
 
 ####<a name="3"></a> Extensible Storage Schema Conflict
 
 **Question:** OK, I guess I need to jump on board the Schema issue.
 I'm also getting an error for an EnigmaSchema that is in multiple files:
-
 
 <center>
 <img src="img/estorage_schema_conflict.png" alt="Extensible storage schema conflict" title="Extensible storage schema conflict" width="445"/>  <!-- 445 × 331 -->
