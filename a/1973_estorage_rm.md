@@ -53,7 +53,7 @@ When not working, I love to watch documentaries, play computer games nad having 
 I'm happy and excited to be part of this amazing team that is building great Autodesk Community experiences!”
 
 <center>
-<img src="img/george_moturi.png" alt="George Moturi" title="George Moturi" width="400"/>  <!-- 565 × 881 pixels -->
+<img src="img/george_moturi.png" alt="George Moturi" title="George Moturi" width="260"/>  <!-- 565 × 881 pixels -->
 </center>
 
 ####<a name="3"></a> WPF Form UIApplication Access
