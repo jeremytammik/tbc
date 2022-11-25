@@ -52,7 +52,7 @@ I'm happy and excited to be part of this amazing team that is building great Aut
 <img src="img/george_moturi.png" alt="George Moturi" title="George Moturi" width="260"/>  <!-- 565 × 881 pixels -->
 </center></p>
 <h4><a name="3"></a> WPF Form UIApplication Access</h4>
-<p>George just added a very helpful pointer to 
+<p>George just added a helpful pointer to 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-call-uiapplication-of-my-current-document/m-p/11570137">How to call UIApplication of my current Document</a>:</p>
 <p><strong>Question:</strong> I defined a command class that implements the <code>Execute</code> method and some other methods and Windows form named <code>LoadFamily</code>. Its first parameter is <code>UIApplication</code>. However, I don't know how should I call that parameter when I'm in a form button.In other word, how should I call the <code>UIApplication</code> of my command class in one of its other methods?</p>
@@ -83,7 +83,7 @@ and <a href="https://www.youtube.com/@mazrisbimdiary2045/playlists">tutorial pla
 <li>AngelSix' <a href="https://youtu.be/Vjldip84CXQ">C# WPF UI Tutorials: 01 - The Basics</a></li>
 </ul>
 <p>Looks like great stuff!</p>
-<p>Many thanks to Mazri for his great work, and to George for pointing it out.</p>
+<p>Many thanks to Mazri for his work, and to George for making me aware of it.</p>
 <h4><a name="5"></a> Extensible Starage Schema Deletion</h4>
 <p>Some developers have encountered issues creating and deleting extensible starage schemata.</p>
 <p>Many of these can be resolved by understanding and adhering to the underlying basic principles.</p>
@@ -94,18 +94,18 @@ and <a href="https://www.youtube.com/@mazrisbimdiary2045/playlists">tutorial pla
 <li>A schema is universal</li>
 </ul>
 <p>You can get into as nice mess by violating any of these principles.
-To be more precise, they cannot be biolated, but people still try to, and then things get unpleasant.</p>
-<p>A new obvious step came up in the following extensive discussion 
+To be more precise, they cannot be violated, but people sometimes still inadvertently try to, and then things get unpleasant.</p>
+<p>A new aspect came up in the following extensive discussion 
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/not-able-to-delete-extensible-storage-schema/m-p/11541801">not able to delete extensible storage schema</a>:</p>
 <ul>
 <li>The <a href="https://www.revitapidocs.com/2023/80983aac-0cca-c211-1c7b-b5350624f046.htm"><code>ExtensibleStorage.Schema</code> version of <code>EraseSchemaAndAllEntities</code> erasing <code>Schema</code> from all open documents had been deprecated and removed</a>
   &ndash;
   the <a href="https://www.revitapidocs.com/2023/50debcb0-3c4f-b32b-2edb-8a6ef7b4bf8d.htm">Document.EraseSchemaAndAllEntities</a> method
 should be used instead
-  &ndash; maybe in earlier releases as well</li>
+  &ndash; maybe in earlier releases as well...</li>
 </ul>
 <p>Here is an edited version of the conversation:</p>
-<p>**Question:: I'm trying to put together a command to erase Extensible Storage (ES) data and the corresponding Schemas for our addin in case if unwanted by the users or corrupt. I had no luck so far. </p>
+<p><strong>Question:</strong> I'm trying to put together a command to erase Extensible Storage (ES) data and the corresponding Schemas for our addin in case if unwanted by the users or corrupt. I had no luck so far. </p>
 <p>After the ES data has been written to the file it won't go away. I am being able to delete the DataStorage elements with no troubles, but the schemas keep popping up after erasing them.</p>
 <p>The procedure I'm trying is:</p>
 <ul>
@@ -218,7 +218,7 @@ However I still wasn't able to permanently remove the schema.</p>
 <p><center>
 <img src="img/estorage_erase_error.png" alt="Extensible storage schema erase error" title="Extensible storage schema erase error" width="600"/>  <!-- 856 × 324 p -->
 </center></p>
-<p><strong>Respinse:</strong> Your observation is spot-on, my usual procedure is to change the guid if I ever change something in the schema so a new schema would be created, but it looks like I missed doing that in one class, and this is why I am seeking the deletion functionality.
+<p><strong>Response:</strong> Your observation is spot-on, my usual procedure is to change the guid if I ever change something in the schema so a new schema would be created, but it looks like I missed doing that in one class, and this is why I am seeking the deletion functionality.
 This should not be an issue for future updates, but I need to provide a resolution for the models edited by the current version.</p>
 <p>The issue with not being able to delete the schema is irrelevant to what I did wrong.</p>
 <p>The sample files are in their simplest forms, freshly made out of the architectural template and contain no elements, just the embedded macro scripts.</p>
