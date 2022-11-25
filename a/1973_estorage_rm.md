@@ -40,7 +40,7 @@ A new team member, new Revit API and WPF tutorials, and new insights on handling
 - [Welcome, George!](#2)
 - [WPF form UIApplication access](#3)
 - [Mazri's Revit, Dynamo, web and WPF playlists](#4)
-- [Extensible starage schema deletion](#5)
+- [Extensible storage schema deletion](#5)
 - [Extensible storage schema conflict](#6)
 
 ####<a name="2"></a> Welcome, George!
@@ -69,7 +69,10 @@ George just added a helpful pointer to
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [How to call UIApplication of my current Document](https://forums.autodesk.com/t5/revit-api-forum/how-to-call-uiapplication-of-my-current-document/m-p/11570137):
 
-**Question:** I defined a command class that implements the `Execute` method and some other methods and Windows form named `LoadFamily`. Its first parameter is `UIApplication`. However, I don't know how should I call that parameter when I'm in a form button.In other word, how should I call the `UIApplication` of my command class in one of its other methods?
+**Question:** I defined a command class that implements the `Execute` method and some other methods and Windows form named `LoadFamily`.
+Its first parameter is `UIApplication`.
+However, I don't know how I should call that parameter when I'm in a form button.
+In other word, how should I call the `UIApplication` of my command class in one of its other methods?
 
 **Answer:** Make the `UIApplication` instance a member variable of your form class.
 Store the value you receive in the constructor in the member variable.
@@ -103,9 +106,9 @@ Looks like great stuff!
 
 Many thanks to Mazri for his work, and to George for making me aware of it.
 
-####<a name="5"></a> Extensible Starage Schema Deletion
+####<a name="5"></a> Extensible Storage Schema Deletion
 
-Some developers have encountered issues creating and deleting extensible starage schemata.
+Some developers have encountered issues creating and deleting extensible storage schemata.
 
 Many of these can be resolved by understanding and adhering to the underlying basic principles.
 
@@ -245,7 +248,7 @@ Did you have schema conflicts in the 2019 version though?
 
 However, one thing that occurred to me as I read your latest message is that you should only get that warning in the first place if you've done something wrong in terms of managing the schemas.
 When you create a schema with a GUID that is that version forever.
-To add additional members you should create a new version and transfer the data (leave the old one alone, do not reuse it's GUID).
+To add additional members, you should create a new version and transfer the data (leave the old one alone, do not reuse it's GUID).
 
 You say, <i>a newer version of the schema (adding more fields for example)</i>.
 
@@ -255,10 +258,10 @@ If you have created such a situation, you are in serious trouble.
 
 An existing schema cannot be modified:
 
-**Response:** I followed the procedure above (2022 version only) and was also not able to remove the schema, so regardless of misuse something seemingly warranting some further investigation with the `EraseSchemaAndAllEntities` methods perhaps. i.e. this is a clean file to start with presumably.
+**Response:** I followed the procedure above (2022 version only) and was also not able to remove the schema, so regardless of misuse something seemingly warranting some further investigation with the `EraseSchemaAndAllEntities` methods perhaps, i.e., this is a clean file to start with, presumably.
 
 Note that the macro doesn't delete the `DataStorage` element, but I deleted this manually prior to step 6.
-However I still wasn't able to permanently remove the schema.
+However, I still wasn't able to permanently remove the schema.
 
 I note that the old method `Schema.EraseSchemaAndAllEntities` has a Boolean `overrideWriteAccessWithUserPermission` which is not present in the new `Document` method of the same name.
 
@@ -383,14 +386,16 @@ I'm also getting an error for an EnigmaSchema that is in multiple files:
 No idea how to get this to be removed.
 Any help would be appreciated.
 
-**Answer:** You have to write a macro/addin that calls the above function and if that doesn't work it is usually due to entities on elements in nested families etc.  So it is not easy because sometimes it involves iterating families opening them calling the above and reloading them. This issue is also evident on links where the documents for such are loaded in the background and are not editable from the file they are linked into.
+**Answer:** You have to write a macro/addin that calls the above function and if that doesn't work it is usually due to entities on elements in nested families etc.
+So, it is not easy because sometimes it involves iterating families opening them calling the above and reloading them.
+This issue is also evident on links where the documents for such are loaded in the background and are not editable from the file they are linked into.
 
 Once a schema is loaded, then a different one loaded with the same id will cause this.
 Developers often don't appreciate that even changing the documentation for a schema makes it different.
 Any change to the structure of the schema or documentation makes it different.
 In this case, prevention is better than cure because the cure is very hard to achieve.
 
-Not sure who wrote the EnigmaSchema but they obviously wanted to leave no details.
+Not sure who wrote the EnigmaSchema, but they obviously wanted to leave no details.
 
 What I've also noticed in the past (not sure it is still true) is that once you get this dialogue then you can't remove the schema because it is in conflict.
 So, in the case of links for example you had to unload them all and deal with each file separately, i.e., to have Revit always in a state where the conflict had not arisen when you go to remove the schema.
