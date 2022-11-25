@@ -56,7 +56,7 @@ In his own words:
 Prior to that, I was a software developer for 5 years.
 I worked for fintech, media &amp; advertising and a digital marketing company, involving API development and integration with different providers and vendors.
 I have developed applications using the .NET Framework in C#, built websites using PHP, Vue JS, HTML and CSS.
-When not working, I love to watch documentaries, play computer games nad having a chat on current affairs with my neighbors or friends. 
+When not working, I love to watch documentaries, play computer games and having a chat on current affairs with my neighbours and friends. 
 I'm happy and excited to be part of this amazing team that is building great Autodesk Community experiences!
 
 <center>
@@ -151,13 +151,13 @@ I'm using the same procedure found in the "ExtensibleStorageUtility" code exampl
 
 One observation I have that if I close Revit without saving after step 4, I get no warning to save the file, as if no changes happened to it, although I'm doing the erase inside a transaction.
 
-I tried to utilizethe info on ES and Schema behaviors
+I tried to utilize the info on ES and Schema behaviours
 from [CADD helpdesk hot picks – classification manager schema error](https://www.caddmicrosystems.com/blog/cadd-helpdesk-hot-picks-classification-manager-schema-error),
 but that didn't work:
 
 Any light on this would be much appreciated.
 
-The add-in cdoes not reate the schema when it's loaded; the schema is created on demand.
+The add-in does not create the schema when it's loaded; the schema is created on demand.
 
 **Answer:** I would avoid the try/catch with an empty catch-all.
 Using that, you will never notice if anything goes wrong.
@@ -309,8 +309,8 @@ It includes 4 macros:
 
 - Create example schema
 - Remove example schema
-- List all schemato
-- Remove all schemato
+- List all schemata
+- Remove all schemata
 
 In Revit 2020, I am not able to remove any schemata when the IFC link is loaded.
 
@@ -330,7 +330,7 @@ I noticed that removing schemas and entities sometimes causes Errors and Warning
 - Error: Can't keep elements joined. (Model Lines, Walls)
 - Warning: Highlighted lines overlap. Lines may not form closed loops. (Model Lines)
 
-Possibly this is just because the elements are regenerated after the entitiy is removed.
+Possibly this is just because the elements are regenerated after the entity is removed.
 
 I wouldn't believe that ExStorages could cause any upgrade issues  if I didn't see it happening.
 
