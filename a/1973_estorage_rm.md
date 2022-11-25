@@ -23,6 +23,16 @@ A new team member, new Revit API and WPF tutorials, and new insights on handling
 
 linkedin:
 
+A new team member, new Revit API and WPF tutorials, and new insights on handling extensible storage deletion and conflicts with the #RevitAPI
+
+https://autode.sk/estoragedeletion
+
+- Welcome, George!
+- WPF form UIApplication access
+- Mazri's Revit, Dynamo, web and WPF playlists
+- Extensible storage schema deletion
+- Extensible storage schema conflict...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
