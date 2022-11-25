@@ -35,6 +35,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Extensible Storage Schema Deletion
 
+A new team member, new Revit API and WPF tutorials, and new insights on handling extensible storage:
+
+- [Welcome, George!](#2)
+- [WPF form UIApplication access](#3)
+- [Mazri's Revit, Dynamo, web and WPF playlists](#4)
+- [Extensible starage schema deletion](#5)
+- [Extensible storage schema conflict](#6)
 
 ####<a name="2"></a> Welcome, George!
 
