@@ -409,5 +409,3 @@ In the tree, select Extensible Storage Schema.
 Check the schema id and click OK to purge it.
 Run ListSchemas &ndash; the schema is purged.
 So, please use Purge Unused to delete schemas without entities.
-
-
