@@ -12,7 +12,7 @@
 
 twitter:
 
- with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
+A new team member, new Revit API and WPF tutorials, and new insights on handling extensible storage deletion and conflicts with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/estoragedeletion
 
 A new team member, new Revit API and WPF tutorials, and new insights on handling extensible storage
 &ndash; Welcome, George!
