@@ -58,7 +58,7 @@ I'm happy and excited to be part of this amazing team that is building great Aut
 
 ####<a name="3"></a> WPF Form UIApplication Access
 
-George just added a very helpful pointer to 
+George just added a helpful pointer to 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [How to call UIApplication of my current Document](https://forums.autodesk.com/t5/revit-api-forum/how-to-call-uiapplication-of-my-current-document/m-p/11570137):
 
@@ -94,7 +94,7 @@ Specifically targeted at getting started with C# programming and WPF, Mazri reco
 
 Looks like great stuff!
 
-Many thanks to Mazri for his great work, and to George for pointing it out.
+Many thanks to Mazri for his work, and to George for making me aware of it.
 
 ####<a name="5"></a> Extensible Starage Schema Deletion
 
@@ -109,20 +109,20 @@ The most fundamental ones are:
 - A schema is universal
 
 You can get into as nice mess by violating any of these principles.
-To be more precise, they cannot be biolated, but people still try to, and then things get unpleasant.
+To be more precise, they cannot be violated, but people sometimes still inadvertently try to, and then things get unpleasant.
 
-A new obvious step came up in the following extensive discussion 
+A new aspect came up in the following extensive discussion 
 on [not able to delete extensible storage schema](https://forums.autodesk.com/t5/revit-api-forum/not-able-to-delete-extensible-storage-schema/m-p/11541801):
 
 - The [`ExtensibleStorage.Schema` version of `EraseSchemaAndAllEntities` erasing `Schema` from all open documents had been deprecated and removed](https://www.revitapidocs.com/2023/80983aac-0cca-c211-1c7b-b5350624f046.htm)
   &ndash;
   the [Document.EraseSchemaAndAllEntities](https://www.revitapidocs.com/2023/50debcb0-3c4f-b32b-2edb-8a6ef7b4bf8d.htm) method
 should be used instead
-  &ndash; maybe in earlier releases as well
+  &ndash; maybe in earlier releases as well...
 
 Here is an edited version of the conversation:
 
-**Question:: I'm trying to put together a command to erase Extensible Storage (ES) data and the corresponding Schemas for our addin in case if unwanted by the users or corrupt. I had no luck so far. 
+**Question:** I'm trying to put together a command to erase Extensible Storage (ES) data and the corresponding Schemas for our addin in case if unwanted by the users or corrupt. I had no luck so far. 
 
 After the ES data has been written to the file it won't go away. I am being able to delete the DataStorage elements with no troubles, but the schemas keep popping up after erasing them.
 
@@ -263,7 +263,7 @@ I made the below minor change so any exceptions would show up but still no excep
 <img src="img/estorage_erase_error.png" alt="Extensible storage schema erase error" title="Extensible storage schema erase error" width="600"/>  <!-- 856 × 324 p -->
 </center>
 
-**Respinse:** Your observation is spot-on, my usual procedure is to change the guid if I ever change something in the schema so a new schema would be created, but it looks like I missed doing that in one class, and this is why I am seeking the deletion functionality.
+**Response:** Your observation is spot-on, my usual procedure is to change the guid if I ever change something in the schema so a new schema would be created, but it looks like I missed doing that in one class, and this is why I am seeking the deletion functionality.
 This should not be an issue for future updates, but I need to provide a resolution for the models edited by the current version.
 
 The issue with not being able to delete the schema is irrelevant to what I did wrong.
