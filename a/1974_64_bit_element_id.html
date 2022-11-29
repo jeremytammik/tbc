@@ -1,6 +1,6 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
 
 <style>
@@ -16,8 +16,7 @@ th{
   text-align:left;
 }
 </style>
-</head>
-
+<p></head></p>
 <!---
 
 - 10168713 [Revit Schedule - Title/headers]
@@ -51,69 +50,51 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### 64-Bit Element Ids
-
-
-
-####<a name="2"></a> 64-Bit Element Ids
-
-Autodesk almost never discusses any upcoming functionality in future products whatsoever, for legal reasons.
-
-Still, just as a heads-up warning, the development team thought it worthwhile to point out that we are thinking about possibly converting the internal representation of Revit element ids from 32 to 64 bit in a future release of Revit.
-
+<h3>64-Bit Element Ids</h3>
+<h4><a name="2"></a> 64-Bit Element Ids</h4>
+<p>Autodesk almost never discusses any upcoming functionality in future products whatsoever, for legal reasons.</p>
+<p>Still, just as a heads-up warning, the development team thought it worthwhile to point out that we are thinking about possibly converting the internal representation of Revit element ids from 32 to 64 bit in a future release of Revit.</p>
 <!--
 
 > Forward looking statements Disclaimer. This document contains “forward looking statements” as defined or implied in common law and within the meaning of the Corporations Law. All expressions an expectations or belief sas to future events or results are expressed in good faith... However, forward looking statements are subject to risks, uncertainties and other factors, which could cause actual results to differ materially from future results expressed, projected or implied by such forward looking statements...
 
 -->
 
-Here is a writeup of what that would imply and what a developer would need to do about it:
-
-ElementIds will change from storing 32-bit integers to storing 64-bit values (type `long` in C# or `Int64` in .NET).
+<p>Here is a writeup of what that would imply and what a developer would need to do about it:</p>
+<p>ElementIds will change from storing 32-bit integers to storing 64-bit values (type <code>long</code> in C# or <code>Int64</code> in .NET).
 This will allow for larger and more complicated models.
 Most functions which take or return ElementIds will continue to work with no changes.
-However, there are a few things to keep in mind:
- 
-If you are storing ElementIds externally as integers, you will need to update your storage to take 64-bit values.
- 
-The constructor Autodesk.Revit.DB.ElementId(Int32) has been deprecated and replaced by a new constructor, Autodesk.Revit.DB.ElementId(Int64).
-
-The property Autodesk.Revit.DB.ElementId.IntegerValue has been deprecated.
+However, there are a few things to keep in mind:</p>
+<p>If you are storing ElementIds externally as integers, you will need to update your storage to take 64-bit values.</p>
+<p>The constructor Autodesk.Revit.DB.ElementId(Int32) has been deprecated and replaced by a new constructor, Autodesk.Revit.DB.ElementId(Int64).</p>
+<p>The property Autodesk.Revit.DB.ElementId.IntegerValue has been deprecated.
 It returns only the lowest 32-bits of the ElementId value.
-Please use the replacement property Autodesk.Revit.DB.ElementId.Value, which will return the entire value.
- 
-Support has been added for using 64-bit types in ExtensibleStorage.
-Both Autodesk.Revit.DB.ExtensibleStorage.SchemaBuilder.AddSimpleField() and AddMapField() can now take in 64-bit values for the fieldType, keyType, and valueType parameters.
- 
-Two binary breaking changes have been made.
+Please use the replacement property Autodesk.Revit.DB.ElementId.Value, which will return the entire value.</p>
+<p>Support has been added for using 64-bit types in ExtensibleStorage.
+Both Autodesk.Revit.DB.ExtensibleStorage.SchemaBuilder.AddSimpleField() and AddMapField() can now take in 64-bit values for the fieldType, keyType, and valueType parameters.</p>
+<p>Two binary breaking changes have been made.
 Both Autodesk.Revit.DB.BuiltInCategory and Autodesk.Revit.DB.BuiltInParameter have been updated so that the size type of the underlying enums are 64-bits instead of 32.
 Code built against earlier versions of the API may experience type cast and other type related exceptions when run against the next versions of the API when working with the enum.
-Please rebuild your addins against the next release's API when it is available.
- 
-Here is a table showing the deprecated and replacement members:
-
-<center>
+Please rebuild your addins against the next release's API when it is available.</p>
+<p>Here is a table showing the deprecated and replacement members:</p>
+<p><center></p>
 <table>
 <tr><th>Deprecated API</th><th>Replacement</th></tr>
 <tr><td>Autodesk.Revit.DB.ElementId(Int32)</td><td>Autodesk.Revit.DB.ElementId(Int64)</td></tr>
 <tr><td>Autodesk.Revit.DB.ElementId.IntegerValue</td><td>Autodesk.Revit.DB.ElementId.Value</td></tr>
 </table>
-</center>
- 
-####<a name="3"></a> Revit Schedule Title Headers
-
-A number of developers asked for a snippet of sample code in 
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [Revit schedule title/headers](https://forums.autodesk.com/t5/revit-api-forum/revit-schedule-title-headers/m-p/11573145).
-
-Hernan  [H.echeva](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3063892) Echevarria
-kindly jumoped in and shared his implementation:
-
-> I found this post which was very helpful, thank you for the info.
-
-> I created a small example macro that gets the header text.
-I hope this helps:
-
+<p></center></p>
+<h4><a name="3"></a> Revit Schedule Title Headers</h4>
+<p>A number of developers asked for a snippet of sample code in 
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-schedule-title-headers/m-p/11573145">Revit schedule title/headers</a>.</p>
+<p>Hernan  <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3063892">H.echeva</a> Echevarria
+kindly jumoped in and shared his implementation:</p>
+<blockquote>
+<p>I found this post which was very helpful, thank you for the info.</p>
+<p>I created a small example macro that gets the header text.
+I hope this helps:</p>
+</blockquote>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
 &nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;This&nbsp;macro&nbsp;gets&nbsp;the&nbsp;header&nbsp;text&nbsp;of&nbsp;the&nbsp;active&nbsp;Schedule&nbsp;View</span>
@@ -122,50 +103,42 @@ I hope this helps:
 &nbsp;&nbsp;{
 &nbsp;&nbsp;&nbsp;&nbsp;UIDocument&nbsp;<span style="color:#1f377f;">uidoc</span>&nbsp;=&nbsp;<span style="color:blue;">this</span>.ActiveUIDocument;
 &nbsp;&nbsp;&nbsp;&nbsp;Document&nbsp;<span style="color:#1f377f;">doc</span>&nbsp;=&nbsp;uidoc.Document;
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;ViewSchedule&nbsp;<span style="color:#1f377f;">mySchedule</span>&nbsp;=&nbsp;uidoc.ActiveView&nbsp;<span style="color:blue;">as</span>&nbsp;ViewSchedule;
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;TableData&nbsp;<span style="color:#1f377f;">myTableData</span>&nbsp;=&nbsp;mySchedule.GetTableData();
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;TableSectionData&nbsp;<span style="color:#1f377f;">myData</span>&nbsp;=&nbsp;myTableData.GetSectionData(SectionType.Header);
- 
+
 &nbsp;&nbsp;&nbsp;&nbsp;TaskDialog.Show(<span style="color:#a31515;">&quot;Header&nbsp;Info&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;The&nbsp;Header&nbsp;Text&nbsp;is:&nbsp;\n&quot;</span>&nbsp;+&nbsp;myData.GetCellText(0,&nbsp;0));
 &nbsp;&nbsp;}
 </pre>
 
-Thank you, Hernan!
-
-####<a name="4"></a> Beyond Dynamo: Python manual for Revit
-
-I avoid advertising commercial products, but I made an exception
-for [Más Allá de Dynamo](https://thebuildingcoder.typepad.com/blog/2020/12/dynamo-book-and-texture-bitmap-uv-coordinates.html#3),
-the Spanish-Language Python manual focused on Dynamo and the Revit API.
-
-It is now also available in English
-as [Beyond Dynamo: Python manual for Revit](https://www.amazon.com/dp/B0BMSV6YXD),
-by Kevin Himmelreich, Alejandro Martín-Herrer and Ignacio Moreu:
-
-> This is a Python handbook specifically created for working on BIM methodology with Autodesk Dynamo and Revit.
+<p>Thank you, Hernan!</p>
+<h4><a name="4"></a> Beyond Dynamo: Python manual for Revit</h4>
+<p>I avoid advertising commercial products, but I made an exception
+for <a href="https://thebuildingcoder.typepad.com/blog/2020/12/dynamo-book-and-texture-bitmap-uv-coordinates.html#3">Más Allá de Dynamo</a>,
+the Spanish-Language Python manual focused on Dynamo and the Revit API.</p>
+<p>It is now also available in English
+as <a href="https://www.amazon.com/dp/B0BMSV6YXD">Beyond Dynamo: Python manual for Revit</a>,
+by Kevin Himmelreich, Alejandro Martín-Herrer and Ignacio Moreu:</p>
+<blockquote>
+<p>This is a Python handbook specifically created for working on BIM methodology with Autodesk Dynamo and Revit.
 It has a practical approach aimed at professionals who have never programmed before.
-If you know how to program in Python, it will be equally useful, as it explains deeply most of the classes, methods and properties of the Revit API.
-
-<center>
+If you know how to program in Python, it will be equally useful, as it explains deeply most of the classes, methods and properties of the Revit API.</p>
+</blockquote>
+<p><center>
 <img src="img/beyond_dynamo_en.png" alt="" title="" width="252"/>  <!-- 252 × 330 -->
-</center>
-
-Note that we also discussed lots of other resources
-for [learning Python and Dynamo](https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html#3).
-
-####<a name="5"></a> Managing Thousands of Families with Electron and IFC.js
-
-Emiliano Capasso, Head of BIM at [Antonio Citterio Patricia Viel](https://www.citterio-viel.com),
+</center></p>
+<p>Note that we also discussed lots of other resources
+for <a href="https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html#3">learning Python and Dynamo</a>.</p>
+<h4><a name="5"></a> Managing Thousands of Families with Electron and IFC.js</h4>
+<p>Emiliano Capasso, Head of BIM at <a href="https://www.citterio-viel.com">Antonio Citterio Patricia Viel</a>,
 shared some interesting advice 
-on [how to make an interior designer happy with Electron, IFC.js and Revit API](https://www.linkedin.com/pulse/how-make-interior-designer-happy-electron-ifcjs-revit-capasso).
-
-The aim is to speed up the process of comparing and selecting families for large interior design projects.
+on <a href="https://www.linkedin.com/pulse/how-make-interior-designer-happy-electron-ifcjs-revit-capasso">how to make an interior designer happy with Electron, IFC.js and Revit API</a>.</p>
+<p>The aim is to speed up the process of comparing and selecting families for large interior design projects.
 They require numerous categories of families with hundreds of families in each.
 Initial idea: developing a nice web viewer in IFC.js for viewing families instead of buildings.
 Now, every interior designer or architect in the office can navigate (way faster than opening the showrooms in Revit) inside all the showrooms using their browser.
-That leads to the even better idea...
-
-Thank you Emiliano, for sharing this great idea and nice write-up.
+That leads to the even better idea...</p>
+<p>Thank you Emiliano, for sharing this great idea and nice write-up.</p>
