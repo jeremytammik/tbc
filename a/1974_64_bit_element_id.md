@@ -53,6 +53,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### 64-Bit Element Ids
 
+We may need to scale up the handling of element id integer values in future, a sample snippet to retrieve schedule headers, a Dynamo book, and a web-based family showroom browser:
+
+- [64-Bit element ids](#2)
+- [Revit schedule title headers](#3)
+- [Beyond Dynamo: Python manual for Revit](#4)
+- [Managing many families with Electron and IFC.js](#5)
 
 
 ####<a name="2"></a> 64-Bit Element Ids
@@ -135,7 +141,7 @@ I hope this helps:
 
 Thank you, Hernan!
 
-####<a name="4"></a> Beyond Dynamo: Python manual for Revit
+####<a name="4"></a> Beyond Dynamo: Python Manual for Revit
 
 I avoid advertising commercial products, but I made an exception
 for [Más Allá de Dynamo](https://thebuildingcoder.typepad.com/blog/2020/12/dynamo-book-and-texture-bitmap-uv-coordinates.html#3),
