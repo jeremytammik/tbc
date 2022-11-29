@@ -6,6 +6,10 @@
 
 <!---
 
+- How to make an Interior Designer Happy (with Electron, IFC.js and Revit API)
+  https://www.linkedin.com/pulse/how-make-interior-designer-happy-electron-ifcjs-revit-capasso
+  speed up the process of comparing and selecting families for our interior design projects.
+  numerous categories of families with hundreds of families in each
 
 twitter:
 
@@ -79,6 +83,8 @@ Here is a table showing the deprecated and replacement members:
  
 ####<a name="3"></a> Beyond Dynamo: Python manual for Revit
 
+####<a name="4"></a> Beyond Dynamo: Python manual for Revit
+
 I avoid advertising commercial products, but I made an exception
 for [Más Allá de Dynamo](https://thebuildingcoder.typepad.com/blog/2020/12/dynamo-book-and-texture-bitmap-uv-coordinates.html#3),
 the Spanish-Language Python manual focused on Dynamo and the Revit API.
@@ -131,3 +137,17 @@ TableSectionData myData = myTableData.GetSectionData(SectionType.Header);
 
 TaskDialog.Show("Header Info", "The Header Text is: \n" +myData.GetCellText(0,0));
 }
+
+####<a name="5"></a> Managing Thousands of Families with Electron and IFC.js
+
+Emiliano Capasso, Head of BIM at [Antonio Citterio Patricia Viel](https://www.citterio-viel.com),
+shared some interesting advice 
+on [how to make an interior designer happy with Electron, IFC.js and Revit API](https://www.linkedin.com/pulse/how-make-interior-designer-happy-electron-ifcjs-revit-capasso).
+
+The aim is to speed up the process of comparing and selecting families for large interior design projects.
+They require numerous categories of families with hundreds of families in each.
+Initial idea: developing a nice web viewer in IFC.js for viewing Families instead of buildings.
+Now, every interior designer or architect in the office can navigate (way faster than opening the showrooms in Revit) inside all the showrooms using their browser.
+That leads to the even better idea...
+
+Thank you Emiliano, for the nice write-up.
