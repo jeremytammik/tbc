@@ -6,6 +6,9 @@
 
 <!---
 
+- 10168713 [Revit Schedule - Title/headers]
+  [Revit schedule title/headers](https://forums.autodesk.com/t5/revit-api-forum/revit-schedule-title-headers/m-p/11573145).
+
 - How to make an Interior Designer Happy (with Electron, IFC.js and Revit API)
   https://www.linkedin.com/pulse/how-make-interior-designer-happy-electron-ifcjs-revit-capasso
   speed up the process of comparing and selecting families for our interior design projects.
@@ -81,7 +84,38 @@ Here is a table showing the deprecated and replacement members:
 <tr><td>Autodesk.Revit.DB.ElementId.IntegerValue</td><td>Autodesk.Revit.DB.ElementId.Value</td></tr>
 </table>
  
-####<a name="3"></a> Beyond Dynamo: Python manual for Revit
+####<a name="3"></a> Revit Schedule Title Headers
+
+A number of developers asked for a snippet of sample code in 
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [Revit schedule title/headers](https://forums.autodesk.com/t5/revit-api-forum/revit-schedule-title-headers/m-p/11573145).
+
+Hernan  [H.echeva](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3063892) Echevarria
+kindly jumoped in and shared his implementation:
+
+> I found this post which was very helpful, thank you for the info.
+
+> I created a small example macro that gets the Header text.
+I hope this helps:
+
+<pre class="code">
+/// <summary>
+/// This macro gets the header text of the active Schedule View
+/// </summary>
+public void ScheduleHeader()
+{
+UIDocument uidoc = this.ActiveUIDocument;
+Document doc = uidoc.Document;
+
+ViewSchedule mySchedule =  uidoc.ActiveView as ViewSchedule;
+
+TableData myTableData = mySchedule.GetTableData();
+
+TableSectionData myData = myTableData.GetSectionData(SectionType.Header);
+
+TaskDialog.Show("Header Info", "The Header Text is: \n" +myData.GetCellText(0,0));
+}
+</pre>
 
 ####<a name="4"></a> Beyond Dynamo: Python manual for Revit
 
@@ -106,37 +140,6 @@ for [learning Python and Dynamo](https://thebuildingcoder.typepad.com/blog/2021/
 
 
 
-**Response:** 
-
-
-
-
-
- 
-- Revit Schedule - Title/headers
-https://forums.autodesk.com/t5/revit-api-forum/revit-schedule-title-headers/m-p/11573145#M67572
-10168713 [Revit Schedule - Title/headers]
-Many asked for a snippet of sample code. 
-Hernan Echevarria [H.echeva](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3063892)
-jumoped in andkindly shared his implementation:
-I found this post which was very helpful, thank you @jeremytammik for the info.
-I have created a small example macro that gets the Header text (it is very basic and may need to be made safer). I hope this helps
-/// <summary>
-/// This macro gets the header text of the active Schedule View
-/// </summary>
-public void ScheduleHeader()
-{
-UIDocument uidoc = this.ActiveUIDocument;
-Document doc = uidoc.Document;
-
-ViewSchedule mySchedule =  uidoc.ActiveView as ViewSchedule;
-
-TableData myTableData = mySchedule.GetTableData();
-
-TableSectionData myData = myTableData.GetSectionData(SectionType.Header);
-
-TaskDialog.Show("Header Info", "The Header Text is: \n" +myData.GetCellText(0,0));
-}
 
 ####<a name="5"></a> Managing Thousands of Families with Electron and IFC.js
 
