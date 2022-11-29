@@ -99,22 +99,22 @@ kindly jumoped in and shared his implementation:
 I hope this helps:
 
 <pre class="code">
-/// <summary>
-/// This macro gets the header text of the active Schedule View
-/// </summary>
-public void ScheduleHeader()
-{
-UIDocument uidoc = this.ActiveUIDocument;
-Document doc = uidoc.Document;
-
-ViewSchedule mySchedule =  uidoc.ActiveView as ViewSchedule;
-
-TableData myTableData = mySchedule.GetTableData();
-
-TableSectionData myData = myTableData.GetSectionData(SectionType.Header);
-
-TaskDialog.Show("Header Info", "The Header Text is: \n" +myData.GetCellText(0,0));
-}
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;This&nbsp;macro&nbsp;gets&nbsp;the&nbsp;header&nbsp;text&nbsp;of&nbsp;the&nbsp;active&nbsp;Schedule&nbsp;View</span>
+&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;/</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>
+&nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:blue;">void</span>&nbsp;<span style="color:#74531f;">ScheduleHeader</span>()
+&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;UIDocument&nbsp;<span style="color:#1f377f;">uidoc</span>&nbsp;=&nbsp;<span style="color:blue;">this</span>.ActiveUIDocument;
+&nbsp;&nbsp;&nbsp;&nbsp;Document&nbsp;<span style="color:#1f377f;">doc</span>&nbsp;=&nbsp;uidoc.Document;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;ViewSchedule&nbsp;<span style="color:#1f377f;">mySchedule</span>&nbsp;=&nbsp;uidoc.ActiveView&nbsp;<span style="color:blue;">as</span>&nbsp;ViewSchedule;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;TableData&nbsp;<span style="color:#1f377f;">myTableData</span>&nbsp;=&nbsp;mySchedule.GetTableData();
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;TableSectionData&nbsp;<span style="color:#1f377f;">myData</span>&nbsp;=&nbsp;myTableData.GetSectionData(SectionType.Header);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;TaskDialog.Show(<span style="color:#a31515;">&quot;Header&nbsp;Info&quot;</span>,&nbsp;<span style="color:#a31515;">&quot;The&nbsp;Header&nbsp;Text&nbsp;is:&nbsp;\n&quot;</span>&nbsp;+&nbsp;myData.GetCellText(0,&nbsp;0));
+&nbsp;&nbsp;}
 </pre>
 
 ####<a name="4"></a> Beyond Dynamo: Python manual for Revit
