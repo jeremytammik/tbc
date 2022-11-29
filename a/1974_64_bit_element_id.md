@@ -58,7 +58,7 @@ We may need to scale up the handling of element id integer values in future, a s
 - [64-Bit element ids](#2)
 - [Revit schedule title headers](#3)
 - [Beyond Dynamo: Python manual for Revit](#4)
-- [Managing many families with Electron and IFC.js](#5)
+- [Web-based family management showroom](#5)
 
 
 ####<a name="2"></a> 64-Bit Element Ids
@@ -162,10 +162,10 @@ If you know how to program in Python, it will be equally useful, as it explains 
 Note that we also discussed lots of other resources
 for [learning Python and Dynamo](https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html#3).
 
-####<a name="5"></a> Managing Thousands of Families with Electron and IFC.js
+####<a name="5"></a> Web-Based Family Management Showroom
 
 Emiliano Capasso, Head of BIM at [Antonio Citterio Patricia Viel](https://www.citterio-viel.com),
-shared some interesting advice 
+shared some interesting advice on managing thousands of families and
 on [how to make an interior designer happy with Electron, IFC.js and Revit API](https://www.linkedin.com/pulse/how-make-interior-designer-happy-electron-ifcjs-revit-capasso).
 
 The aim is to speed up the process of comparing and selecting families for large interior design projects.
