@@ -34,25 +34,50 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 
 
-####<a name="2"></a> 
+####<a name="2"></a> 64-Bit Element Ids
 
-<center>
-<img src="img/.png" alt="" title="" width="100"/>  <!--  -->
-</center>
+Autodesk almost never discusses any upcoming functionality in future products whatsoever, for legal reasons.
 
-####<a name="3"></a> 
+Still just as a heads-up warning, the development team thought it worthwhile to point out that we are thinking about possibly converting the internal representation of Revit element ids from 32 to 64 bit.
 
-**Question:** 
+<!--
 
-**Answer:** 
+> Forward looking statements Disclaimer. This document contains “forward looking statements” as defined or implied in common law and within the meaning of the Corporations Law. All expressions an expectations or belief sas to future events or results are expressed in good faith... However, forward looking statements are subject to risks, uncertainties and other factors, which could cause actual results to differ materially from future results expressed, projected or implied by such forward looking statements...
 
-####<a name="4"></a> 
+-->
 
+Here is a writeup of what that would imply and what a developer would need to do about it:
 
-Many thanks to  for his work
+ElementIds will change from storing 32-bit integers to storing 64-bit values (type `long` in C# or `Int64` in .NET).
+This will allow for larger and more complicated models.
+Most functions which take or return ElementIds will continue to work with no changes.
+However, there are a few things to keep in mind:
+ 
+If you are storing ElementIds externally as integers, you will need to update your storage to take 64-bit values.
+ 
+The constructor Autodesk.Revit.DB.ElementId(Int32) has been deprecated and replaced by a new constructor, Autodesk.Revit.DB.ElementId(Int64).
 
+The property Autodesk.Revit.DB.ElementId.IntegerValue has been deprecated.
+It returns only the lowest 32-bits of the ElementId value.
+Please use the replacement property Autodesk.Revit.DB.ElementId.Value, which will return the entire value.
+ 
+Support has been added for using 64-bit types in ExtensibleStorage.
+Both Autodesk.Revit.DB.ExtensibleStorage.SchemaBuilder.AddSimpleField() and AddMapField() can now take in 64-bit values for the fieldType, keyType, and valueType parameters.
+ 
+Two binary breaking changes have been made.
+Both Autodesk.Revit.DB.BuiltInCategory and Autodesk.Revit.DB.BuiltInParameter have been updated so that the size type of the underlying enums are 64-bits instead of 32.
+Code built against earlier versions of the API may experience type cast and other type related exceptions when run against the next versions of the API when working with the enum.
+Please rebuild your addins against the next release's API when it is available.
+ 
+Here is a table showing the deprecated and replacement members:
 
-####<a name="5"></a> Beyond Dynamo: Python manual for Revit
+<table>
+<tr><td>Deprecated API</td><td>Replacement</td></tr>
+<tr><td>Autodesk.Revit.DB.ElementId(Int32)</td><td>Autodesk.Revit.DB.ElementId(Int64)</td></tr>
+<tr><td>Autodesk.Revit.DB.ElementId.IntegerValue</td><td>Autodesk.Revit.DB.ElementId.Value</td></tr>
+</table>
+ 
+####<a name="3"></a> Beyond Dynamo: Python manual for Revit
 
 I avoid advertising commercial products, but I made an exception
 for [Más Allá de Dynamo](https://thebuildingcoder.typepad.com/blog/2020/12/dynamo-book-and-texture-bitmap-uv-coordinates.html#3),
@@ -81,30 +106,28 @@ for [learning Python and Dynamo](https://thebuildingcoder.typepad.com/blog/2021/
 
 
 
-Ah, ok cool. This is the technical writeup of what changed: 
+ 
+- Revit Schedule - Title/headers
+https://forums.autodesk.com/t5/revit-api-forum/revit-schedule-title-headers/m-p/11573145#M67572
+10168713 [Revit Schedule - Title/headers]
+Many asked for a snippet of sample code. 
+Hernan Echevarria [H.echeva](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3063892)
+jumoped in andkindly shared his implementation:
+I found this post which was very helpful, thank you @jeremytammik for the info.
+I have created a small example macro that gets the Header text (it is very basic and may need to be made safer). I hope this helps
+/// <summary>
+/// This macro gets the header text of the active Schedule View
+/// </summary>
+public void ScheduleHeader()
+{
+UIDocument uidoc = this.ActiveUIDocument;
+Document doc = uidoc.Document;
 
-Here is a writeup of what’s changing and what a developer would need to do about it. @Harlan Brumm – is this ok as-is? I am assuming that since we decided this was worth talking about pre-release that it’s ok to explain the exact API as it stands now. Let me know if you want me to change anything.
- 
-Diane
+ViewSchedule mySchedule =  uidoc.ActiveView as ViewSchedule;
 
-We will be changing ElementIds from storing 32-bit integers to storing 64-bit values (type long in C# or Int64 in .NET). This will allow for larger and more complicated models. Most functions which take or return ElementIds will continue to work with no changes. However, there are a few things to keep in mind:
- 
-If you are storing ElementIds externally as integers, you will need to update your storage to take 64-bit values.
- 
-The constructor Autodesk.Revit.DB.ElementId(Int32) has been deprecated and replaced by a new constructor, Autodesk.Revit.DB.ElementId(Int64).
-                                                                                                                                                                       
-The property Autodesk.Revit.DB.ElementId.IntegerValue has been deprecated. It returns only the lowest 32-bits of the ElementId value. Please use the replacement property Autodesk.Revit.DB.ElementId.Value, which will return the entire value.
- 
-Support has been added for using 64-bit types in ExtensibleStorage. Both Autodesk.Revit.DB.ExtensibleStorage.SchemaBuilder.AddSimpleField() and AddMapField() can now take in 64-bit values for the fieldType, keyType, and valueType parameters.
- 
-Two binary breaking changes have been made. Both Autodesk.Revit.DB.BuiltInCategory and Autodesk.Revit.DB.BuiltInParameter have been updated so that the size type of the underlying enums are 64-bits instead of 32. Code built against earlier versions of the API may experience type cast and other type related exceptions when run against the next versions of the API when working with the enum. Please rebuild your addins against the next release's API when it is available.
- 
-Here is a table showing the deprecated and replacement members:
-Deprecated API
-Replacement
-Autodesk.Revit.DB.ElementId(Int32)
-Autodesk.Revit.DB.ElementId(Int64)
-Autodesk.Revit.DB.ElementId.IntegerValue
-Autodesk.Revit.DB.ElementId.Value
- 
- 
+TableData myTableData = mySchedule.GetTableData();
+
+TableSectionData myData = myTableData.GetSectionData(SectionType.Header);
+
+TaskDialog.Show("Header Info", "The Header Text is: \n" +myData.GetCellText(0,0));
+}
