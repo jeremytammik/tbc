@@ -59,7 +59,7 @@ We may need to scale up the handling of element id integer values in future, a s
 - [Revit schedule title headers](#3)
 - [Beyond Dynamo: Python manual for Revit](#4)
 - [Web-based family management showroom](#5)
-
+- [High-documentation, low-meeting work culture](#6)
 
 ####<a name="2"></a> 64-Bit Element Ids
 
@@ -175,3 +175,13 @@ Now, every interior designer or architect in the office can navigate (way faster
 That leads to the even better idea...
 
 Thank you Emiliano, for sharing this great idea and nice write-up.
+
+####<a name="6"></a> High-Documentation, Low-Meeting Work Culture
+
+I enjoyed this analysis
+of [The Perks of a High-Documentation, Low-Meeting Work Culture](https://www.tremendous.com/blog/the-perks-of-a-high-documentation-low-meeting-work-culture).
+It seems highly relevant to our distributed DAS team, Autodesk Developer Advocacy and Support.
+ 
+It also lines up very well with my personal experience working within our team, and also in my external interactions, both with the diffuse blog- and forum-based Revit API pseudo-community as well as occasionally consulting individually add-in developers with special requirements.
+ 
+Looking forward to hearing what you think of it.
