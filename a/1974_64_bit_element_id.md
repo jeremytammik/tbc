@@ -32,8 +32,13 @@ twitter:
 
  with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+We may need to scale up the handling of element id integer values in future, a sample snippet to retrieve schedule headers, a Dynamo book, and a web-based family showroom browser
+&ndash; 64-Bit element ids
+&ndash; Revit schedule title headers
+&ndash; Beyond Dynamo: Python manual for Revit
+&ndash; Web-based family management showroom
+&ndash; Tree view in pure CSS
+&ndash; High-documentation, low-meeting work culture...
 
 linkedin:
 
@@ -51,7 +56,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### 64-Bit Element Ids
+### 64-Bit Element Ids, Maybe?
 
 We may need to scale up the handling of element id integer values in future, a sample snippet to retrieve schedule headers, a Dynamo book, and a web-based family showroom browser:
 
@@ -59,7 +64,8 @@ We may need to scale up the handling of element id integer values in future, a s
 - [Revit schedule title headers](#3)
 - [Beyond Dynamo: Python manual for Revit](#4)
 - [Web-based family management showroom](#5)
-- [High-documentation, low-meeting work culture](#6)
+- [Tree view in pure CSS](#6)
+- [High-documentation, low-meeting work culture](#7)
 
 ####<a name="2"></a> 64-Bit Element Ids
 
@@ -96,6 +102,13 @@ Both Autodesk.Revit.DB.BuiltInCategory and Autodesk.Revit.DB.BuiltInParameter ha
 Code built against earlier versions of the API may experience type cast and other type related exceptions when run against the next versions of the API when working with the enum.
 Please rebuild your addins against the next release's API when it is available.
  
+Here is an overview mapping the deprecated to the replacement members:
+
+- Autodesk.Revit.DB.ElementId(Int32) <br/> &rarr; Autodesk.Revit.DB.ElementId(Int64)
+- Autodesk.Revit.DB.ElementId.IntegerValue <br/> &rarr; Autodesk.Revit.DB.ElementId.Value
+
+<!--
+
 Here is a table showing the deprecated and replacement members:
 
 <center>
@@ -105,7 +118,9 @@ Here is a table showing the deprecated and replacement members:
 <tr><td>Autodesk.Revit.DB.ElementId.IntegerValue</td><td>Autodesk.Revit.DB.ElementId.Value</td></tr>
 </table>
 </center>
- 
+
+-->
+
 ####<a name="3"></a> Revit Schedule Title Headers
 
 A number of developers asked for a snippet of sample code in 
@@ -156,7 +171,7 @@ It has a practical approach aimed at professionals who have never programmed bef
 If you know how to program in Python, it will be equally useful, as it explains deeply most of the classes, methods and properties of the Revit API.
 
 <center>
-<img src="img/beyond_dynamo_en.png" alt="" title="" width="252"/>  <!-- 252 × 330 -->
+<img src="img/beyond_dynamo_en.png" alt="Beyond Dynamo" title="Beyond Dynamo" width="252"/>  <!-- 252 × 330 -->
 </center>
 
 Note that we also discussed lots of other resources
@@ -176,9 +191,13 @@ That leads to the even better idea...
 
 Thank you, Emiliano, for sharing this great idea and nice write-up.
 
-####<a name="6"></a> Tree views in pure CSS
+####<a name="6"></a> Tree View in Pure CSS
 
 A very nice, clean and lean tree view (collapsible list) can be created using only HTML and CSS, without any need for JavaScript.
+Check out the demonstration and detailed step-by-step explanation,
+[tree views in CSS](https://iamkate.com/code/tree-views).
+
+<!--
 
 <style>
 .tree-padding{
@@ -264,6 +283,7 @@ A very nice, clean and lean tree view (collapsible list) can be created using on
 }
 </style>
 
+<center>
 <ul class="tree-padding tree-vertical-lines tree-horizontal-lines tree-summaries tree-markers tree-buttons">
   <li>
     <details open>
@@ -291,9 +311,9 @@ A very nice, clean and lean tree view (collapsible list) can be created using on
     </details>
   </li>
 </ul>
+</center>
 
-Check out the demonstration and detailed step-by-step explanation
-in [tree views in CSS](https://iamkate.com/code/tree-views).
+-->
 
 ####<a name="7"></a> High-Documentation, Low-Meeting Work Culture
 

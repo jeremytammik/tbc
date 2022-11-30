@@ -31,8 +31,13 @@ twitter:
 
  with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon 
 
-&ndash; 
-...
+We may need to scale up the handling of element id integer values in future, a sample snippet to retrieve schedule headers, a Dynamo book, and a web-based family showroom browser
+&ndash; 64-Bit element ids
+&ndash; Revit schedule title headers
+&ndash; Beyond Dynamo: Python manual for Revit
+&ndash; Web-based family management showroom
+&ndash; Tree view in pure CSS
+&ndash; High-documentation, low-meeting work culture...
 
 linkedin:
 
@@ -50,14 +55,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>64-Bit Element Ids</h3>
+<h3>64-Bit Element Ids, Maybe?</h3>
 <p>We may need to scale up the handling of element id integer values in future, a sample snippet to retrieve schedule headers, a Dynamo book, and a web-based family showroom browser:</p>
 <ul>
 <li><a href="#2">64-Bit element ids</a></li>
 <li><a href="#3">Revit schedule title headers</a></li>
 <li><a href="#4">Beyond Dynamo: Python manual for Revit</a></li>
 <li><a href="#5">Web-based family management showroom</a></li>
-<li><a href="#6">High-documentation, low-meeting work culture</a></li>
+<li><a href="#6">Tree view in pure CSS</a></li>
+<li><a href="#7">High-documentation, low-meeting work culture</a></li>
 </ul>
 <h4><a name="2"></a> 64-Bit Element Ids</h4>
 <p>Autodesk almost never discusses any upcoming functionality in future products whatsoever, for legal reasons.</p>
@@ -84,14 +90,25 @@ Both Autodesk.Revit.DB.ExtensibleStorage.SchemaBuilder.AddSimpleField() and AddM
 Both Autodesk.Revit.DB.BuiltInCategory and Autodesk.Revit.DB.BuiltInParameter have been updated so that the size type of the underlying enums are 64-bits instead of 32.
 Code built against earlier versions of the API may experience type cast and other type related exceptions when run against the next versions of the API when working with the enum.
 Please rebuild your addins against the next release's API when it is available.</p>
-<p>Here is a table showing the deprecated and replacement members:</p>
-<p><center></p>
+<p>Here is an overview mapping the deprecated to the replacement members:</p>
+<ul>
+<li>Autodesk.Revit.DB.ElementId(Int32) <br/> &rarr; Autodesk.Revit.DB.ElementId(Int64)</li>
+<li>Autodesk.Revit.DB.ElementId.IntegerValue <br/> &rarr; Autodesk.Revit.DB.ElementId.Value</li>
+</ul>
+<!--
+
+Here is a table showing the deprecated and replacement members:
+
+<center>
 <table>
 <tr><th>Deprecated API</th><th>Replacement</th></tr>
 <tr><td>Autodesk.Revit.DB.ElementId(Int32)</td><td>Autodesk.Revit.DB.ElementId(Int64)</td></tr>
 <tr><td>Autodesk.Revit.DB.ElementId.IntegerValue</td><td>Autodesk.Revit.DB.ElementId.Value</td></tr>
 </table>
-<p></center></p>
+</center>
+
+-->
+
 <h4><a name="3"></a> Revit Schedule Title Headers</h4>
 <p>A number of developers asked for a snippet of sample code in 
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
@@ -136,7 +153,7 @@ It has a practical approach aimed at professionals who have never programmed bef
 If you know how to program in Python, it will be equally useful, as it explains deeply most of the classes, methods and properties of the Revit API.</p>
 </blockquote>
 <p><center>
-<img src="img/beyond_dynamo_en.png" alt="" title="" width="252"/>  <!-- 252 × 330 -->
+<img src="img/beyond_dynamo_en.png" alt="Beyond Dynamo" title="Beyond Dynamo" width="252"/>  <!-- 252 × 330 -->
 </center></p>
 <p>Note that we also discussed lots of other resources
 for <a href="https://thebuildingcoder.typepad.com/blog/2021/02/addin-file-learning-python-and-ifcjs.html#3">learning Python and Dynamo</a>.</p>
@@ -150,8 +167,12 @@ Initial idea: developing a nice web viewer in IFC.js for viewing families instea
 Now, every interior designer or architect in the office can navigate (way faster than opening the showrooms in Revit) inside all the showrooms using their browser.
 That leads to the even better idea...</p>
 <p>Thank you, Emiliano, for sharing this great idea and nice write-up.</p>
-<h4><a name="6"></a> Tree views in pure CSS</h4>
-<p>A very nice, clean and lean tree view (collapsible list) can be created using only HTML and CSS, without any need for JavaScript.</p>
+<h4><a name="6"></a> Tree View in Pure CSS</h4>
+<p>A very nice, clean and lean tree view (collapsible list) can be created using only HTML and CSS, without any need for JavaScript.
+Check out the demonstration and detailed step-by-step explanation,
+<a href="https://iamkate.com/code/tree-views">tree views in CSS</a>.</p>
+<!--
+
 <style>
 .tree-padding{
   --spacing    : 1.5rem;
@@ -236,6 +257,7 @@ That leads to the even better idea...</p>
 }
 </style>
 
+<center>
 <ul class="tree-padding tree-vertical-lines tree-horizontal-lines tree-summaries tree-markers tree-buttons">
   <li>
     <details open>
@@ -263,9 +285,10 @@ That leads to the even better idea...</p>
     </details>
   </li>
 </ul>
+</center>
 
-<p>Check out the demonstration and detailed step-by-step explanation
-in <a href="https://iamkate.com/code/tree-views">tree views in CSS</a>.</p>
+-->
+
 <h4><a name="7"></a> High-Documentation, Low-Meeting Work Culture</h4>
 <p>I enjoyed this analysis
 of <a href="https://www.tremendous.com/blog/the-perks-of-a-high-documentation-low-meeting-work-culture">the perks of a high-documentation, low-meeting work culture</a>.
