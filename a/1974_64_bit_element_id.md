@@ -33,7 +33,7 @@ twitter:
 Maybe need to scale up the handling of element id integer values, a #DynamoBim book, a web-based family showroom browser and retrieving schedule headers with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #ForgeDevCon https://autode.sk/64bitelementid
 
 We may need to scale up the handling of element id integer values in future, a sample snippet to retrieve schedule headers, a Dynamo book, and a web-based family showroom browser
-&ndash; 64-Bit element ids
+&ndash; 64-bit element ids
 &ndash; Revit schedule title headers
 &ndash; Beyond Dynamo: Python manual for Revit
 &ndash; Web-based family management showroom
@@ -46,7 +46,7 @@ Maybe need to scale up the handling of element id integer values, a Dynamo book,
 
 https://autode.sk/64bitelementid
 
-- 64-Bit element ids
+- 64-bit element ids
 - Revit schedule title headers
 - Beyond Dynamo: Python manual for Revit
 - Web-based family management showroom
@@ -71,7 +71,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 We may need to scale up the handling of element id integer values in future, a sample snippet to retrieve schedule headers, a Dynamo book, and a web-based family showroom browser:
 
-- [64-Bit element ids](#2)
+- [64-bit element ids](#2)
 - [Revit schedule title headers](#3)
 - [Beyond Dynamo: Python manual for Revit](#4)
 - [Web-based family management showroom](#5)
