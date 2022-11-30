@@ -113,9 +113,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 on [Revit schedule title/headers](https://forums.autodesk.com/t5/revit-api-forum/revit-schedule-title-headers/m-p/11573145).
 
 Hernan  [H.echeva](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3063892) Echevarria
-kindly jumoped in and shared his implementation:
+kindly jumped in and shared his implementation:
 
-> I found this post which was very helpful, thank you for the info.
+> I found this post, which was very helpful; thank you for the info.
 
 > I created a small example macro that gets the header text.
 I hope this helps:
@@ -174,12 +174,132 @@ Initial idea: developing a nice web viewer in IFC.js for viewing families instea
 Now, every interior designer or architect in the office can navigate (way faster than opening the showrooms in Revit) inside all the showrooms using their browser.
 That leads to the even better idea...
 
-Thank you Emiliano, for sharing this great idea and nice write-up.
+Thank you, Emiliano, for sharing this great idea and nice write-up.
 
-####<a name="6"></a> High-Documentation, Low-Meeting Work Culture
+####<a name="6"></a> Tree views in pure CSS
+
+A very nice, clean and lean tree view (collapsible list) can be created using only HTML and CSS, without any need for JavaScript.
+
+<style>
+.tree-padding{
+  --spacing    : 1.5rem;
+  --radius     : 10px;
+  padding-left : 1rem;
+}
+
+.tree-padding li{
+  display      : block;
+  position     : relative;
+  padding-left : calc(2 * var(--spacing) - var(--radius) - 2px);
+}
+
+.tree-padding ul{
+  margin-left  : calc(var(--radius) - var(--spacing));
+  padding-left : 0;
+}
+
+.tree-vertical-lines ul li{
+  border-left : 2px solid var(--dark-grey);
+}
+
+.tree-vertical-lines ul li:last-child{
+  border-color : transparent;
+}
+
+.tree-horizontal-lines ul li::before{
+  content      : '';
+  display      : block;
+  position     : absolute;
+  top          : calc(var(--spacing) / -2);
+  left         : -2px;
+  width        : calc(var(--spacing) + 2px);
+  height       : calc(var(--spacing) + 1px);
+  border       : solid var(--dark-grey);
+  border-width : 0 0 2px 2px;
+}
+
+.tree-summaries summary{
+  display : block;
+  cursor  : pointer;
+}
+
+.tree-summaries summary::marker,
+.tree-summaries summary::-webkit-details-marker{
+  display : none;
+}
+
+.tree-summaries summary:focus{
+  outline : none;
+}
+
+.tree-summaries summary:focus-visible{
+  outline : 1px dotted #000;
+}
+
+.tree-markers li::after,
+.tree-markers summary::before{
+  content       : '';
+  display       : block;
+  position      : absolute;
+  top           : calc(var(--spacing) / 2 - var(--radius));
+  left          : calc(var(--spacing) - var(--radius) - 1px);
+  width         : calc(2 * var(--radius));
+  height        : calc(2 * var(--radius));
+  border-radius : 50%;
+  background    : var(--dark-grey);
+}
+
+.tree-buttons summary::before{
+  content     : '+';
+  z-index     : 1;
+  background  : var(--accent);
+  color       : #fff;
+  font-weight : 400;
+  line-height : calc(2 * var(--radius) - 2px);
+  text-align  : center;
+}
+
+.tree-buttons details[open] > summary::before{
+  content : '−';
+}
+</style>
+
+<ul class="tree-padding tree-vertical-lines tree-horizontal-lines tree-summaries tree-markers tree-buttons">
+  <li>
+    <details open>
+      <summary>Giant planets</summary>
+      <ul>
+        <li>
+          <details>
+            <summary>Gas giants</summary>
+            <ul>
+              <li>Jupiter</li>
+              <li>Saturn</li>
+            </ul>
+          </details>
+        </li>
+        <li>
+          <details>
+            <summary>Ice giants</summary>
+            <ul>
+              <li>Uranus</li>
+              <li>Neptune</li>
+            </ul>
+          </details>
+        </li>
+      </ul>
+    </details>
+  </li>
+</ul>
+
+Check out the demonstration and detailed step-by-step explanation
+in [tree views in CSS](https://iamkate.com/code/tree-views).
+
+####<a name="7"></a> High-Documentation, Low-Meeting Work Culture
 
 I enjoyed this analysis
 of [the perks of a high-documentation, low-meeting work culture](https://www.tremendous.com/blog/the-perks-of-a-high-documentation-low-meeting-work-culture).
 It seems highly relevant to our distributed DAS team, Autodesk Developer Advocacy and Support.
 It also lines up very well with my personal experience working within our team, and also in my external interactions, both with the diffuse blog- and forum-based Revit API pseudo-community as well as occasionally consulting individually add-in developers with special requirements.
 Looking forward to hearing what you think of it.
+
