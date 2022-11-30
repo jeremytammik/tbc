@@ -42,6 +42,17 @@ We may need to scale up the handling of element id integer values in future, a s
 
 linkedin:
 
+Maybe need to scale up the handling of element id integer values, a Dynamo book, a web-based family showroom browser and retrieving schedule headers with the #RevitAPI
+
+https://autode.sk/64bitelementid
+
+- 64-Bit element ids
+- Revit schedule title headers
+- Beyond Dynamo: Python manual for Revit
+- Web-based family management showroom
+- Tree view in pure CSS
+- High-documentation, low-meeting work culture...
+
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
