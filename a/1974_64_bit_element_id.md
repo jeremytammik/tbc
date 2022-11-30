@@ -181,7 +181,5 @@ Thank you Emiliano, for sharing this great idea and nice write-up.
 I enjoyed this analysis
 of [the perks of a high-documentation, low-meeting work culture](https://www.tremendous.com/blog/the-perks-of-a-high-documentation-low-meeting-work-culture).
 It seems highly relevant to our distributed DAS team, Autodesk Developer Advocacy and Support.
- 
 It also lines up very well with my personal experience working within our team, and also in my external interactions, both with the diffuse blog- and forum-based Revit API pseudo-community as well as occasionally consulting individually add-in developers with special requirements.
- 
 Looking forward to hearing what you think of it.
