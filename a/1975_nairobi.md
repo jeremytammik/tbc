@@ -6,6 +6,24 @@
 
 <!---
 
+- NetTopologySuite
+  Room boundary to baseboards: group up the connected line segments
+  https://forums.autodesk.com/t5/revit-api-forum/room-boundary-to-baseboards-group-up-the-connected-line-segments/m-p/11582383#M67643
+  BenoitE&A in reply to: MiguelGT17
+  I'm wondering what you are trying to do. Creating railings is tedious if the aim is only to work on geometry.
+  We've done a lot of Geometry of this type. I guess you retrieve the geometry of the room with GetBoundarySegments.
+  I have never crossed a case where the arrangement of the BoundarySegments are not consecutive (and I've seen tens and my algos thousands) so I'm really curious (and skeptical) about that. 
+  We made the choice to compute geometry using both internal and external tools (NetTopologySuite) because we needed to have boolean algebra and specific tools to work on Room boundaries, which we found tedious using XYZ.
+  Anyway I'm curious...
+  https://nettopologysuite.github.io/NetTopologySuite/index.html
+  ... sounds very interesting indeed! Thank you for pointing it out. Would you like to share some examples of using it in combination with the Revit API? This might make a brilliant article for The Building Coder and motivate many others to widen their horizon working with 2D geometry in the Revit API.
+  Ahah we did many things:
+  - automatically place furniture in housing (from beds, the easiest, to TV set, kitchen appliances and bathroom stuff)
+  - automatically place electric fixtures in housing (lights, switches, plugs) or HVAC elements (ventilation, heating)
+  - automatically recognize housing units and name Rooms from their caracteristics
+  The first 2 examples use mainly simple geometric rules while the last makes an extensive use of boolean 2D operations.
+  And we are currently working on connecting 2 elements with for ex. cold water pipe, which is not that easy (more geometry there ;))
+
 twitter:
 
  with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #ForgeDevCon https://autode.sk/64bitelementid
@@ -53,8 +71,29 @@ Thank you, !
 </center>
 
 
-####<a name="5"></a> 
+####<a name="5"></a> NetTopologySuite in Revit Add-Ins
 
+Benoit Favre, CEO of [etudes &amp; automates](http://www.etudesetautomates.com), 
+made an interesting suggestion in 
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [room boundary to baseboards: group up the connected line segments](https://forums.autodesk.com/t5/revit-api-forum/room-boundary-to-baseboards-group-up-the-connected-line-segments/m-p/11582383#M67643):
+
+BenoitE&A in reply to: MiguelGT17
+I'm wondering what you are trying to do. Creating railings is tedious if the aim is only to work on geometry.
+We've done a lot of Geometry of this type. I guess you retrieve the geometry of the room with GetBoundarySegments.
+I have never crossed a case where the arrangement of the BoundarySegments are not consecutive (and I've seen tens and my algos thousands) so I'm really curious (and skeptical) about that. 
+We made the choice to compute geometry using both internal and external tools (NetTopologySuite) because we needed to have boolean algebra and specific tools to work on Room boundaries, which we found tedious using XYZ.
+Anyway I'm curious...
+https://nettopologysuite.github.io/NetTopologySuite/index.html
+... sounds very interesting indeed! Thank you for pointing it out. Would you like to share some examples of using it in combination with the Revit API? This might make a brilliant article for The Building Coder and motivate many others to widen their horizon working with 2D geometry in the Revit API.
+Ahah we did many things:
+- automatically place furniture in housing (from beds, the easiest, to TV set, kitchen appliances and bathroom stuff)
+- automatically place electric fixtures in housing (lights, switches, plugs) or HVAC elements (ventilation, heating)
+- automatically recognize housing units and name Rooms from their caracteristics
+The first 2 examples use mainly simple geometric rules while the last makes an extensive use of boolean 2D operations.
+And we are currently working on connecting 2 elements with for ex. cold water pipe, which is not that easy (more geometry there ;))
+
+Many thanks to Benoit for the interesting pointer.
 
 ####<a name="6"></a> 
 
