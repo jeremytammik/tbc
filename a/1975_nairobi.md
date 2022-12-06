@@ -58,16 +58,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ####<a name="3"></a> 
 
 
-<pre class="code">
-
-</pre>
-
-Thank you, !
-
-####<a name="4"></a> 
-
 <center>
-<img src="img/.png" alt="" title="" width="100"/>  <!-- 252 × 330 -->
+<img src="img/2022-12-06_nairobi_team.jpg" alt="Nairobi team" title="Nairobi team" width="690"/>  <!-- 1380 × 880 pixels -->
+<p style="font-size: 80%; font-style:italic">Nairobi team: Fidel, Carol, Brian, Jeremy, Harun, Emmanuel, George</p>
 </center>
 
 
@@ -96,4 +89,12 @@ And we are currently working on connecting 2 elements with for ex. cold water pi
 Many thanks to Benoit for the interesting pointer.
 
 ####<a name="6"></a> 
+
+
+
+<pre class="code">
+
+</pre>
+
+Thank you, !
 
