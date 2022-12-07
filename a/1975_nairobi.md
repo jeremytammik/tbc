@@ -28,7 +28,11 @@ twitter:
 
  with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #ForgeDevCon https://autode.sk/64bitelementid
 
-...
+I am writing this in Nairobi, Kenya, getting to know the team here; also, the new APS landing page just went live, and Benoit points out a useful geometric modelling library to help power your Revit add-in
+&ndash; DAS team in Nairobi, Kenya
+&ndash; NetTopologySuite in Revit add-ins
+&ndash; New APS landing page
+&ndash; You can create RVT using APS...
 
 linkedin:
 
@@ -48,7 +52,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### APS, Nairobi and NetTopologySuite
 
-I am writing this in Nairobi, working as normal and getting to know the team here; also, the new APS landing page went live, and Benoit points out a useful geometric modelling library to help power your Revit add-in:
+I am writing this in Nairobi, Kenya, getting to know the team here; also, the new APS landing page just went live, and Benoit points out a useful geometric modelling library to help power your Revit add-in:
 
 - [DAS team in Nairobi, Kenya](#2)
 - [NetTopologySuite in Revit add-ins](#3)
@@ -94,9 +98,10 @@ e.g., [NetTopologySuite](https://nettopologysuite.github.io/NetTopologySuite/ind
 because we need to have Boolean algebra and specific tools to work on Room boundaries, which we found tedious using XYZ.
 
 > We did many things with NetTopologySuite:
-- automatically place furniture in housing (from beds, the easiest, to TV set, kitchen appliances and bathroom stuff)
+
+> - automatically place furniture in housing (from beds, the easiest, to TV set, kitchen appliances and bathroom stuff)
 - automatically place electric fixtures in housing (lights, switches, plugs) or HVAC elements (ventilation, heating)
-- automatically recognize housing units and name Rooms from their caracteristics
+- automatically recognize housing units and name Rooms from their characteristics
 
 > The first 2 examples use mainly simple geometric rules, while the last makes an extensive use of Boolean 2D operations.
 And we are currently working on connecting 2 elements with for ex. cold water pipe, which is not that easy (more geometry there ;))
