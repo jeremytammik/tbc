@@ -58,10 +58,16 @@ Met with the Nairobi DAS team yesterday:
 
 <center>
 <img src="img/2022-12-06_nairobi_team.jpg" alt="Nairobi team" title="Nairobi team" width="690"/>  <!-- 1380 × 880 pixels -->
-<p style="font-size: 80%; font-style:italic">Nairobi team: Fidel, Carol, Brian, Jeremy, Harun, Emmanuel, George</p>
+<p style="font-size: 80%; font-style:italic">Nairobi team: Fidel, Carol, Brian, Jeremy, Harun, Emmanuel, George (sans Timothy and Allan)</p>
 </center>
 
 Today I spent the morning with Timothy and Allan.
+The purpose of the visit is team building.
+I am also continuing with my normal work, i.e., supporting
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
+blogging.
+Plus, I received my new PC, a Macbook 
+
 
 ####<a name="3"></a> NetTopologySuite in Revit Add-Ins
 
