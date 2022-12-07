@@ -66,12 +66,13 @@ The purpose of the visit is team building.
 I am also continuing with my normal work, i.e., supporting
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
 blogging.
-Plus, I received my new PC, a Macbook 
 
+Plus, I received my new PC, a MacBook M1, and am hoping to set it up during my visit here.
+Hopefully, the reports on running Windows in Parallels and [Revit on the MacBook M1](https://kinship.io/blog/revit-m1-macbook-pro/) will indeed work out.
 
 ####<a name="3"></a> NetTopologySuite in Revit Add-Ins
 
-Returning to the Revit API, 
+Returning to the Revit API and current cases, 
 Benoit Favre, CEO of [etudes &amp; automates](http://www.etudesetautomates.com), 
 made an interesting suggestion in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -106,7 +107,7 @@ I immediately grabbed the chance to highlight that in this clarification on how 
 
 ####<a name="5"></a> You can create RVT using APS 
 
-A question on [creating .RVT file from C#](https://forums.autodesk.com/t5/revit-api-forum/create-rvt-file-from-c/td-p/9693451):
+APS came up in the question on [creating .RVT file from C#](https://forums.autodesk.com/t5/revit-api-forum/create-rvt-file-from-c/td-p/9693451):
 
 **Question:** I am a software developer and I am very new to Revit and AutoCAD.
 For a project, I need to create RVT file from C# using the Revit API.
