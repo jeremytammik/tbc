@@ -48,6 +48,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### APS, Nairobi and NetTopologySuite
 
+I am writing this in Nairobi, working as normal and getting to know the team here; also, the new APS landing page went live, and Benoit points out a useful geometric modelling library to help power your Revit add-in:
+
+- [DAS team in Nairobi, Kenya](#2)
+- [NetTopologySuite in Revit add-ins](#3)
+- [New APS landing page](#4)
+- [You can create RVT using APS](#5)
+
 ####<a name="2"></a> DAS Team in Nairobi, Kenya
 
 Unexpectedly, I find myself travelling again, on rather short notice, to our new office in Nairobi, Kenya.
@@ -105,7 +112,7 @@ Now, we are glad and proud to announce the new [APS landing page](https://aps.au
 
 I immediately grabbed the chance to highlight that in this clarification on how to create an RVT project file from scratch without running Revit locally:
 
-####<a name="5"></a> You can create RVT using APS 
+####<a name="5"></a> You Can Create RVT using APS 
 
 APS came up in the question on [creating .RVT file from C#](https://forums.autodesk.com/t5/revit-api-forum/create-rvt-file-from-c/td-p/9693451):
 
