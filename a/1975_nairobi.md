@@ -48,7 +48,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Nairobi, Kenya
 
-
 ####<a name="2"></a> DAS Team in Nairobi, Kenya
 
 Unexpectedly, I find myself travelling again, on rather short notice, to our new office in Nairobi, Kenya.
@@ -90,13 +89,33 @@ And we are currently working on connecting 2 elements with for ex. cold water pi
 
 Many thanks to Benoit for the interesting pointer!
 
-####<a name="4"></a> 
+####<a name="4"></a> New APS Landing Page
 
+As you may have heard,
+[Autodesk Forge was renamed to Autodesk Platform Services, APS](https://thebuildingcoder.typepad.com/blog/2022/09/aps-au-and-miter-wall-join-for-full-face.html#2).
 
+Now, we are glad and proud to anounce the the new [APS landing page](https://aps.autodesk.com) went live.
 
-<pre class="code">
+I immediately grabbed the chance to highlight that in this clarification on how to create an RVT project file from scratch without running Revit locally:
 
-</pre>
+####<a name="5"></a> You can create RVT using APS 
 
-Thank you, !
+A question on [creating .RVT file from C#](https://forums.autodesk.com/t5/revit-api-forum/create-rvt-file-from-c/td-p/9693451):
 
+**Question:** I am a software developer and I am very new to Revit and AutoCAD.
+For a project, I need to create RVT file from C# using the Revit API.
+I do not want to develop a plugin, I want to simply be able to draw objects and save them in a file `.rvt` extension so that the end user can just double click on this file and open it directly in Revit. 
+I am unable to figure out a way to do this since the API documentation suggests its usage for building plugins. 
+
+**Answer:** Using APS, you can manipulate models without the need to open Revit.
+
+There is no (official) way to programmatically create an RVT project file without making use of the Revit API, and the Revit API requires a running session of Revit.exe to obtain a valid Revit API context. Without such a valid Revit API context, the API cannot be used. It is completely event driven, and only Revit can launch the necessary events.
+So, for the desktop, this means you need to have a full Revit product installation and a running Revit session.
+
+However, you can make use of the [APS Autodesk Platform Services (formerly Forge)](https://aps.autodesk.com).
+
+The APS Design Automation API for Revit enables you to create an RVT project file without installing Revit on your local machine.
+Instead, a Revit engine is launched in the cloud and executes your add-in code on a server, returning the resulting RVT file for you to download locally:
+
+- [APS Design Automation API](https://aps.autodesk.com/en/docs/design-automation/v3/developers_guide/overview/)
+- [APS Design Automation API for Revit](https://aps.autodesk.com/en/docs/design-automation/v3/developers_guide/overview/#design-automation-api-for-revit)
