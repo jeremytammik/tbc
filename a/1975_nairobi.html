@@ -11,7 +11,7 @@
   BenoitE&A in reply to: MiguelGT17
   I'm wondering what you are trying to do. Creating railings is tedious if the aim is only to work on geometry.
   We've done a lot of Geometry of this type. I guess you retrieve the geometry of the room with GetBoundarySegments.
-  I have never crossed a case where the arrangement of the BoundarySegments are not consecutive (and I've seen tens and my algos thousands) so I'm really curious (and skeptical) about that. 
+  I have never crossed a case where the arrangement of the BoundarySegments is not consecutive (and I've seen tens and my algos thousands) so I'm really curious (and sceptical) about that. 
   We made the choice to compute geometry using both internal and external tools (NetTopologySuite) because we needed to have boolean algebra and specific tools to work on Room boundaries, which we found tedious using XYZ.
   Anyway I'm curious...
   https://nettopologysuite.github.io/NetTopologySuite/index.html
@@ -19,7 +19,7 @@
   Ahah we did many things:
   - automatically place furniture in housing (from beds, the easiest, to TV set, kitchen appliances and bathroom stuff)
   - automatically place electric fixtures in housing (lights, switches, plugs) or HVAC elements (ventilation, heating)
-  - automatically recognize housing units and name Rooms from their caracteristics
+  - automatically recognize housing units and name Rooms from their characteristics
   The first 2 examples use mainly simple geometric rules while the last makes an extensive use of boolean 2D operations.
   And we are currently working on connecting 2 elements with for ex. cold water pipe, which is not that easy (more geometry there ;))
 
@@ -86,7 +86,7 @@ And we are currently working on connecting 2 elements with for ex. cold water pi
 <h4><a name="4"></a> New APS Landing Page</h4>
 <p>As you may have heard,
 <a href="https://thebuildingcoder.typepad.com/blog/2022/09/aps-au-and-miter-wall-join-for-full-face.html#2">Autodesk Forge was renamed to Autodesk Platform Services, APS</a>.</p>
-<p>Now, we are glad and proud to anounce the the new <a href="https://aps.autodesk.com">APS landing page</a> went live.</p>
+<p>Now, we are glad and proud to announce the new <a href="https://aps.autodesk.com">APS landing page</a> went live.</p>
 <p>I immediately grabbed the chance to highlight that in this clarification on how to create an RVT project file from scratch without running Revit locally:</p>
 <h4><a name="5"></a> You can create RVT using APS</h4>
 <p>APS came up in the question on <a href="https://forums.autodesk.com/t5/revit-api-forum/create-rvt-file-from-c/td-p/9693451">creating .RVT file from C#</a>:</p>
