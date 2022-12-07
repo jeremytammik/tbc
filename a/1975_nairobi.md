@@ -97,7 +97,7 @@ We made the choice to compute geometry using both internal and external tools,
 e.g., [NetTopologySuite](https://nettopologysuite.github.io/NetTopologySuite/index.html),
 because we need to have Boolean algebra and specific tools to work on Room boundaries, which we found tedious using XYZ.
 
-> We did many things with NetTopologySuite:
+> We did many things with [NetTopologySuite](https://nettopologysuite.github.io/NetTopologySuite/index.html):
 
 > - automatically place furniture in housing (from beds, the easiest, to TV set, kitchen appliances and bathroom stuff)
 - automatically place electric fixtures in housing (lights, switches, plugs) or HVAC elements (ventilation, heating)
