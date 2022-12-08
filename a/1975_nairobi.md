@@ -36,14 +36,14 @@ I am writing this in Nairobi, Kenya, getting to know the team here; also, the ne
 
 linkedin:
 
+I am in Nairobi, Kenya, right now, getting to know the team here; new APS landing page, create RVT using APS and using the NetTopologySuite geometric modelling library with the #RevitAPI
 
-I am in Nairobi, Kenya, right now, getting to know the team here; new APS landing page, create RVT using APS and using NetTopologySuite with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #ForgeDevCon https://autode.sk/nairobi
+https://autode.sk/nairobi
 
-I am writing this in Nairobi, Kenya, getting to know the team here; also, the new APS landing page just went live, and Benoit points out a useful geometric modelling library to help power your Revit add-in
-&ndash; DAS team in Nairobi, Kenya
-&ndash; NetTopologySuite in Revit add-ins
-&ndash; New APS landing page
-&ndash; You can create RVT using APS...
+- DAS team in Nairobi, Kenya
+- NetTopologySuite in Revit add-ins
+- New APS landing page
+- You can create RVT using APS...
 
 #bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
