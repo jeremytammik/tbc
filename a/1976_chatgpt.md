@@ -147,6 +147,15 @@ Many thanks to ??? for the interesting pointer!
   - Chuong Ho: Still not yet, I working with control parameters input to help respone better for AEC
 
 
+
+####<a name="4"></a> VS2022 on MacBook Pro M! with Parallels
+
+Debug Revit Add-In in
+
+vs2022_debug_addin.png 3168 × 1320 pixels
+
+
+
 ####<a name="5"></a> Chasing the Travelling Salesman
 
 [Diego Vicente](https://diego.codes/about/) published a new approach to tackle a really hard NP-complete challenge, 
