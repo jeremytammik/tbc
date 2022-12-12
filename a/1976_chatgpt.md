@@ -87,74 +87,124 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 I am still in Nairobi, Kenya, getting to know the lay of the land and team here; meanwhile, OpenAI ChatGPT is making global waves and first steps are made to use it with the Revit API:
 
 
-####<a name="2"></a> 
+####<a name="2"></a> First Outings in Nairobi
+
+My colleagues are continuously warning me of the dangers of moving around freely here, so I am being very careful.
+
+Not a single bad experiennce so far, though, and a huge amount of security all around.
+Security checkes entering every building, for instance.
+
+Every single person I met so far has been either purely neutral or friendly.
+
+So far, besides working, I went for a hike to Mount Longonot on Satuyrday and took a long walk into the centre of town on a Sunday, with very little going on that day.
+
+Here are my [pictures in and around Nairobi](https://flic.kr/s/aHBqjAiJv1) so far.
+
+####<a name="3"></a> ChatGPT in Kiswahili
+
+[ChatGPT](https://chat.openai.com/chat) is currently a very hot topic among techies, so I created an account and checked it out:
+
+Jeremy: can you speak swahili?
+
+> Huna! Naunga mkono nyumbani kwako. Samahani, sijawahi kusoma Swahili. Je, unaweza kusema kwa Kiingereza?
+
+Jeremy: oh dear. i am afraid i cannot.
+
+> Asante sana. Inawezekana kukutumia lugha ya Kiingereza katika mazungumzo yetu. Kwamba ni ajabu kwa sababu Swahili ni lugha nne ya makundi ya Bantu na inatumika sana katika Afrika Mashariki. Kama una nia njema, unaweza kusoma zaidi kuhusu Swahili kupitia tovuti za mtandao.
+
+Jeremy: i wish i could.
+
+> Kama unahitaji msaada zaidi, basi wasiliana nami. Napenda kusaidia katika mambo yanayohusiana na lugha za Afrika.
+
+Jeremy: can you translate all that you said for me, please?
+
+> Sure! Here's my previous response translated into English:
+"Hello! I extend my hand to your home.
+Sorry, I haven't read Swahili.
+Well, can you speak English?
+Thank you very much.
+It is possible to use the English language in our conversation.
+It is strange because Swahili is one of the four languages of the Bantu group and is widely used in East Africa.
+If you are interested, you can learn more about Swahili through websites.
+If you need more help, please contact me.
+I like to help with things related to African languages."
+
+I was surprised how much sense that made.
+
+####<a name="4"></a> ChatGPT for Music and Poetry Mimicry
+
+Another interesting example was brought
+by Raphaël Millière [@raphaelmilliere](https://twitter.com/raphaelmilliere)
+on [twitter](https://twitter.com/raphaelmilliere/status/1598469100535259136?t=upd),
+triggering a lot of response and discussion:
+
+> I asked ChatGPT to rewrite Bohemian Rhapsody to be about the life of a postdoc, and the output was flawless...
+
+####<a name="4"></a> ChatGPT for Revit API I
+
+The obvious next step for this community is to try out its abilities helping with Revcit API questions.
+My colleague [Jacob Small](https://twitter.com/JacobWSmall) tried that out
+and [documented his steps on twitter](https://twitter.com/JacobWSmall/status/1600477115853737984):
+
+- Ok, so I have an option here... I could 'try again' which might make things fail worse off as in my first go-round that resulted in brand new stuff. Or I could try and get it to improve by telling where the error was. Let's go for the later as design of anything needs iteration.
+- Again, trying to guiding it like a user would guide me in a text chat (which I happen to have a few years of experience with). Already know that it's going to fail at the Id property of the undefined level variable, but we'll get there when we get the error.
+- Good(ish) news, is that the new code returned a new error (new errors are good things as it often means we fixed something).
+- Bad news is that it is a 'calling a variable which hasn't been defined'. The chatbot appears to be copy/pasting line by line instead of sections of code.
+- In the chatbot's defense, I've done this myself a few times by not ensuring the user had robust enough boilerplate code to start with. I'm going to switch to not bothering with running this, as __revit__ also hasn't been defined. No longer a user guided chat though.
+- Well it's thinking a lot... Am I not playing by the chatbot's rules?
+- Ok... it doesn't take directions as well as a software engineer on the Dynamo or Revit team. Let's try the previous prompt like a user would, and just reply with the errors for another few minutes or until I get bored. 
+- And yes, I could have written this from scratch by now.
+
+You need to look at the original thread including all the screen snapshots to understabnd the details of what he's talking about, of course.
+
+####<a name="4"></a> ChatGPT for Revit API II
+
+Bird Tools also tried out and
+documented [using ChatGPT for Revit API](https://www.linkedin.com/posts/bird-tools_openai-revit-code-activity-7005369990614798336-vqXP) on LinkedIn,
+garnering many more interesting comments.
+
+####<a name="4"></a> ChatGPT for Revit Interaction
+
+Last but not least, our very active contributor [Chuong Ho](https://github.com/chuongmep) started exploring the possiblity
+to [integrate ChaGPT interactively into Revit](https://www.linkedin.com/posts/chuongmep_dynamo-gpt3-openai-activity-7007387062999928832-AyL5).
+Here are the first few comments on that effort, but manty more have come in since then:
+
+- Chuong Ho: Do you know, Chat GPT3, OpenAI will be coming soon Dynamo BIM 🤣. I'm still figuring out how to make them good at the moment, it's surprisingly accurate, but sometimes it's as innocent as a toddler learning to speak. I'd love to have comments right now.
+- Maycon Freitas: Awesome, Chuong Ho!! I tried to create a chatbot to integrate Revit and Whatsapp using Dynamo sometime ago (but a dumb one, not smart as GPT3) - https://www.linkedin.com/feed/update/urn:li:activity:6671175468063973376/ - and also using Forge + Whatsapp - https://www.linkedin.com/feed/update/urn:li:activity:6851904940378480640/... 
+- Chuong Ho: So, as you might already know, my suggestion is: Chatbots to execute some tasks, extract data e so on. It would be a really good feature to implement.
+- Luisa Cypriano: Great one Chuong Ho :) Did you publish openly the pack already?
+- Chuong Ho: Still not yet, I working with control parameters input to help respone better for AEC
+
+####<a name="4"></a> Teaching ChatGPT About the Birds and the Bees
+
+Finally, for an example where ChatGPT really excels and surpasses all expectations, check out my namesake Jeremy Pinto's 2-minute article
+on [teaching ChatGPT about the birds and the bees](https://www.jerpint.io/blog/chatgpt).
+
+####<a name="4"></a> ChatGPT Limitations and Improvement
+
+Leon Furze takes his analysis one step further and explores aspects of writing essays, disrupting education, the  limitations and improvement possibilitiues in some depth in his article
+on [prompt whispering: getting better results from ChatGPT](https://www.linkedin.com/pulse/prompt-whispering-getting-better-results-from-chatgpt-leon-furze).
+
+####<a name="4"></a> VS2022 on MacBook Pro M1 with Parallels
+
+Moving on now from this inexhaustible and rapidly evolving topic, meanwhile, I received and started setting up my new PC, a MacBook Pro (16-inch, 2021) with
+an [Apple M1 Pro ARM chip](https://en.wikipedia.org/wiki/Apple_M1).
+
+So, with no Intel hardware, can I use it for Revit at all?
+
+Well, I gave up trying to install Visual Studio 2019, which I had previously been using, prompted by this thread
+on [running Visual Studio 2019 on Windows 11 on M1 Mac](https://forum.parallels.com/threads/running-visual-studio-2019-on-windows-11-on-m1-mac.355149),
+since it ends with the following unequivocal advice:
+
+> I genuinely recommend just using VS2022; it's actually ARM-native, so it will run a lot faster and with far less issues.
+
+I installed Parallels Desktop 18 for Mac, Windows 11, Revit 2023 and Visual Studio 2022, in that order, and am now able to open and compile a sample Revit add-in, launch Revit in the Visual Studio debugger and successfully trigger a breakpoint:
 
 <center>
-<img src="img/" alt="" title="" width="100"/>  <!-- 1380 × 880 pixels -->
+<img src="img/vs2022_debug_addin.png" alt="Debug Revit add-in on ARM" title="Debug Revit add-in on ARM" width="800"/>  <!-- 3168 × 1320 pixels -->
 </center>
 
-
-####<a name="3"></a>
-
-- ChatGPT in Swahil:
-  https://chat.openai.com/chat:
-  Jeremy: can you speak swahili?
-  > Huna! Naunga mkono nyumbani kwako. Samahani, sijawahi kusoma Swahili. Je, unaweza kusema kwa Kiingereza?
-  jeremy: oh dear. i am afraid i cannot.
-  > Asante sana. Inawezekana kukutumia lugha ya Kiingereza katika mazungumzo yetu. Kwamba ni ajabu kwa sababu Swahili ni lugha nne ya makundi ya Bantu na inatumika sana katika Afrika Mashariki. Kama una nia njema, unaweza kusoma zaidi kuhusu Swahili kupitia tovuti za mtandao.
-  jeremy: i wish i could.
-  > Kama unahitaji msaada zaidi, basi wasiliana nami. Napenda kusaidia katika mambo yanayohusiana na lugha za Afrika.
-  jeremy: can you translate all that you said for me, please?
-  > Sure! Here's my previous response translated into English:
-  "Hello! I extend my hand to your home. Sorry, I haven't read Swahili. Well, can you speak English?
-  Thank you very much. It is possible to use the English language in our conversation. It is strange because Swahili is one of the four languages of the Bantu group and is widely used in East Africa. If you are interested, you can learn more about Swahili through websites.
-  If you need more help, please contact me. I like to help with things related to African languages."
-
-- ChatGPT for music and poetry mimicry
-  https://twitter.com/raphaelmilliere/status/1598469100535259136?t=upd7rt-_ASl8omur-JjrJQ&s=19
-  Raphaël Millière @raphaelmilliere
-  I asked ChatGPT to rewrite Bohemian Rhapsody to be about the life of a postdoc, and the output was flawless:
-
-- ChatGPT for Revit API by Bird Tools, plus interesting comments
-  https://www.linkedin.com/posts/bird-tools_openai-revit-code-activity-7005369990614798336-vqXP?utm_source=share&utm_medium=member_desktop
-  
-- ChatGPT for Revit API by Jacob Small, plus interesting comments
-  https://twitter.com/JacobWSmall/status/1600477115853737984?s=20&t=pCNirHrPPDHHzLrx29q15w
-  Jacob Small @JacobWSmall
-  Ok, so I have an option here... I could 'try again' which might make things fail worse off as in my first go-round that resulted in brand new stuff. Or I could try and get it to improve by telling where the error was. Let's go for the later as design of anything needs iteration.
-  Again, trying to guiding it like a user would guide me in a text chat (which I happen to have a few years of experience with). Already know that it's going to fail at the Id property of the undefined level variable, but we'll get there when we get the error.
-  Good(ish) news, is that the new code returned a new error (new errors are good things as it often means we fixed something).
-  Bad news is that it is a 'calling a variable which hasn't been defined'. The chatbot appears to be copy/pasting line by line instead of sections of code.
-  In the chatbot's defense, I've done this myself a few times by not ensuring the user had robust enough boilerplate code to start with. I'm going to switch to not bothering with running this, as __revit__ also hasn't been defined. No longer a user guided chat though.
-  Well it's thinking a lot... Am I not playing by the chatbot's rules?
-  Ok... it doesn't take directions as well as a software engineer on the Dynamo or Revit team. Let's try the previous prompt like a user would, and just reply with the errors for another few minutes or until I get bored. 
-  And yes, I could have written this from scratch by now.
-
-
-
-Many thanks to ??? for the interesting pointer!
-
-####<a name="4"></a> 
-
-- ChatGPT for Revit  
-  Chuong Ho
-  https://www.linkedin.com/posts/chuongmep_dynamo-gpt3-openai-activity-7007387062999928832-AyL5?utm_source=share&utm_medium=member_desktop
-  Do you know, Chat GPT3, OpenAI will be coming soon Dynamo BIM 🤣. I'm still figuring out how to make them good at the moment, it's surprisingly accurate, but sometimes it's as innocent as a toddler learning to speak. I'd love to have comments right now.
-  #Dynamo #GPT3 #OpenAI
-  - Maycon Freitas: Awesome, Chuong Ho!! I tried to create a chatbot to integrate Revit and Whatsapp using Dynamo sometime ago (but a dumb one, not smart as GPT3) - https://www.linkedin.com/feed/update/urn:li:activity:6671175468063973376/ - and also using Forge + Whatsapp - https://www.linkedin.com/feed/update/urn:li:activity:6851904940378480640/... 
-  So, as you might already know, my suggestion is: Chatbots to execute some tasks, extract data e so on. It would be a really good feature to implement.
-  - Luisa Cypriano: Great one Chuong Ho :) Did you publish openly the pack already?
-  - Chuong Ho: Still not yet, I working with control parameters input to help respone better for AEC
-
-
-
-####<a name="4"></a> VS2022 on MacBook Pro M! with Parallels
-
-Debug Revit Add-In in
-
-vs2022_debug_addin.png 3168 × 1320 pixels
-
-
+No further testing performed yet, though.
 
 ####<a name="5"></a> Chasing the Travelling Salesman
 
