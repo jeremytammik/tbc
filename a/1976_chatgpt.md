@@ -79,10 +79,20 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Exploring ChatGPT
+### Exploring ARM, ChatGPT and Nairobi
 
-I am still in Nairobi, Kenya, getting to know the lay of the land and team here; meanwhile, OpenAI ChatGPT is making global waves and first steps are made to use it with the Revit API:
+I am still in Nairobi, Kenya, getting to know the lay of the land and team here, as well as setting up my new computer; meanwhile, OpenAI ChatGPT is making global waves and first explorative steps are being made to use it with the Revit API:
 
+- [First outings in Nairobi](#2)
+- [ChatGPT in Kiswahili](#3)
+- [ChatGPT for music and poetry mimicry](#4)
+- [ChatGPT for Revit API I](#5)
+- [ChatGPT for Revit API II](#6)
+- [ChatGPT for Revit interaction](#7)
+- [Teaching ChatGPT about the birds and the bees](#8)
+- [ChatGPT limitations and improvement](#9)
+- [VS2022 on MacBook Pro M1 with Parallels](#10)
+- [Chasing the travelling salesman](#11)
 
 ####<a name="2"></a> First Outings in Nairobi
 
