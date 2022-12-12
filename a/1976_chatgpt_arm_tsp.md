@@ -91,8 +91,9 @@ I am still in Nairobi, Kenya, getting to know the lay of the land and team here,
 - [ChatGPT for Revit interaction](#7)
 - [Teaching ChatGPT about the birds and the bees](#8)
 - [ChatGPT limitations and improvement](#9)
-- [VS2022 on MacBook Pro M1 with Parallels](#10)
-- [Chasing the travelling salesman](#11)
+- [ChatGPT acrostic poem](#10)
+- [VS2022 on MacBook Pro M1 with Parallels](#11)
+- [Chasing the travelling salesman](#12)
 
 ####<a name="2"></a> First Outings in Nairobi
 
@@ -192,7 +193,7 @@ on [teaching ChatGPT about the birds and the bees](https://www.jerpint.io/blog/c
 Leon Furze takes his analysis one step further and explores aspects of writing essays, disrupting education, the  limitations and improvement possibilitiues in some depth in his article
 on [prompt whispering: getting better results from ChatGPT](https://www.linkedin.com/pulse/prompt-whispering-getting-better-results-from-chatgpt-leon-furze).
 
-####<a name="10"></a> ChatGPT Limitations and Improvement
+####<a name="10"></a> ChatGPT Acrostic Poem
 
 Finally, to round this off, demand seems to be pretty high now;
 I wanted to ask for a suitable French idiom to wish Cyrille happy holidays, and was rewarded with
@@ -211,7 +212,7 @@ C: ChatGPT is currently down
 </center>
 
 
-####<a name="10"></a> VS2022 on MacBook Pro M1 with Parallels
+####<a name="11"></a> VS2022 on MacBook Pro M1 with Parallels
 
 Moving on now from this inexhaustible and rapidly evolving topic, meanwhile, I received and started setting up my new PC, a MacBook Pro (16-inch, 2021) with
 an [Apple M1 Pro ARM chip](https://en.wikipedia.org/wiki/Apple_M1).
@@ -232,7 +233,7 @@ I installed Parallels Desktop 18 for Mac, Windows 11, Revit 2023 and Visual Stud
 
 No further testing performed yet, though.
 
-####<a name="11"></a> Chasing the Travelling Salesman
+####<a name="12"></a> Chasing the Travelling Salesman
 
 [Diego Vicente](https://diego.codes/about/) published a new approach to tackle a really hard NP-complete challenge, 
 [using self-organizing maps to solve the traveling salesman problem](https://diego.codes/post/som-tsp/).
