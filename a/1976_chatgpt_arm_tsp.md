@@ -192,6 +192,25 @@ on [teaching ChatGPT about the birds and the bees](https://www.jerpint.io/blog/c
 Leon Furze takes his analysis one step further and explores aspects of writing essays, disrupting education, the  limitations and improvement possibilitiues in some depth in his article
 on [prompt whispering: getting better results from ChatGPT](https://www.linkedin.com/pulse/prompt-whispering-getting-better-results-from-chatgpt-leon-furze).
 
+####<a name="10"></a> ChatGPT Limitations and Improvement
+
+Finally, to round this off, demand seems to be pretty high now;
+I wanted to ask for a suitable French idiom to wish Cyrille happy holidays, and was rewarded with
+an [acrostic poem](https://en.wikipedia.org/wiki/Acrostic):
+
+<center>
+C: ChatGPT is currently down
+<br/>H: Huge demand has caused the site to cras<br/>h
+<br/>A: All users will have to wait
+<br/>T: Time is needed for the servers to catch up
+<br/>G: Go grab a coffee and check back soon
+<br/>P: Patience is key in this situation
+<br/>T: Trust that the team is working hard to fix it up
+<br/>
+<img src="img/chatgpt_down.png" alt="Acrostic poem by ChatGPT" title="Acrostic poem by ChatGPT" width="800"/>  <!-- 1714 × 700 pixels -->
+</center>
+
+
 ####<a name="10"></a> VS2022 on MacBook Pro M1 with Parallels
 
 Moving on now from this inexhaustible and rapidly evolving topic, meanwhile, I received and started setting up my new PC, a MacBook Pro (16-inch, 2021) with
