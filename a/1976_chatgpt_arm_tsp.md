@@ -102,7 +102,10 @@ Not a single bad experiennce so far, though.
 Lots of security all around, such as security checks entering every building.
 The people I meet in the street are either neutral or friendly, though, and I feel happy and safe.
 
-So far, besides working, I went for a hike to Mount Longonot on Saturday and took a long walk into the centre of town on a Sunday, with very little going on that day.
+So far, besides working, I went for a hike
+to [Mount Longonot](https://www.alltrails.com/trail/kenya/rift-valley/mount-longonot) on
+Saturday and took a long walk into the centre of town on a Sunday;
+however, most things were closed and the city was pretty empty with very little going on that day.
 
 Here are my [pictures in and around Nairobi](https://flic.kr/s/aHBqjAiJv1) so far.
 
