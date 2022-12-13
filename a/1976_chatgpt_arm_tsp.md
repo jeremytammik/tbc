@@ -45,10 +45,10 @@
   https://www.linkedin.com/posts/chuongmep_dynamo-gpt3-openai-activity-7007387062999928832-AyL5?utm_source=share&utm_medium=member_desktop
   Do you know, Chat GPT3, OpenAI will be coming soon Dynamo BIM 🤣. I'm still figuring out how to make them good at the moment, it's surprisingly accurate, but sometimes it's as innocent as a toddler learning to speak. I'd love to have comments right now.
   #Dynamo #GPT3 #OpenAI
-  - Maycon Freitas: Awesome, Chuong Ho!! I tried to create a chatbot to integrate Revit and Whatsapp using Dynamo sometime ago (but a dumb one, not smart as GPT3) - https://www.linkedin.com/feed/update/urn:li:activity:6671175468063973376/ - and also using Forge + Whatsapp - https://www.linkedin.com/feed/update/urn:li:activity:6851904940378480640/... 
+  &ndash; Maycon Freitas: Awesome, Chuong Ho!! I tried to create a chatbot to integrate Revit and Whatsapp using Dynamo some time ago (but a dumb one, not smart as GPT3) &ndash; https://www.linkedin.com/feed/update/urn:li:activity:6671175468063973376/ &ndash; and also using Forge + WhatsApp &ndash; https://www.linkedin.com/feed/update/urn:li:activity:6851904940378480640/... 
   So, as you might already know, my suggestion is: Chatbots to execute some tasks, extract data e so on. It would be a really good feature to implement.
   - Luisa Cypriano: Great one Chuong Ho :) Did you publish openly the pack already?
-  - Chuong Ho: Still not yet, I working with control parameters input to help respone better for AEC
+  - Chuong Ho: Still not yet, I'm working with control parameters input to help respond better for AEC
 
 - new approach tackling an NP-complete challenge:
   [Diego Vicente](https://diego.codes/about/)
@@ -196,7 +196,7 @@ on [teaching ChatGPT about the birds and the bees](https://www.jerpint.io/blog/c
 
 ####<a name="9"></a> ChatGPT Limitations and Improvement
 
-Leon Furze takes his analysis one step further and explores aspects of writing essays, disrupting education, ChatGPT limitations and improvement possibilitiues in his article
+Leon Furze takes his analysis one step further and explores aspects of writing essays, disrupting education, ChatGPT limitations and improvement possibilities in his article
 on [prompt whispering: getting better results from ChatGPT](https://www.linkedin.com/pulse/prompt-whispering-getting-better-results-from-chatgpt-leon-furze).
 
 ####<a name="10"></a> ChatGPT Acrostic Poem
@@ -207,7 +207,7 @@ an [acrostic poem](https://en.wikipedia.org/wiki/Acrostic):
 
 <center>
 C: ChatGPT is currently down
-<br/>H: Huge demand has caused the site to cras<br/>h
+<br/>H: Huge demand has caused the site to crash
 <br/>A: All users will have to wait
 <br/>T: Time is needed for the servers to catch up
 <br/>G: Go grab a coffee and check back soon
