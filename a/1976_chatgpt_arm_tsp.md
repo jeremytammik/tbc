@@ -64,7 +64,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Exploring ARM, ChatGPT and Nairobi 
+### Exploring ARM, ChatGPT, Nairobi and the TSP
 
 I am still in Nairobi, Kenya, getting to know the lay of the land and team here, as well as setting up my new computer; meanwhile, OpenAI ChatGPT is making global waves and first explorative steps are being made to use it with the Revit API:
 
@@ -164,7 +164,7 @@ a LinkedIn post, with many more interesting comments.
 
 ####<a name="7"></a> ChatGPT for Revit Interaction
 
-Last but not least concerning the Revit API, our very active contributor [Chuong Ho](https://github.com/chuongmep) started exploring the possibility
+Last but not least concerning the Revit API, our active contributor [Chuong Ho](https://github.com/chuongmep) started exploring the possibility
 to [integrate ChaGPT interactively into Revit](https://www.linkedin.com/posts/chuongmep_dynamo-gpt3-openai-activity-7007387062999928832-AyL5).
 Here are the first few comments on that effort, with many more following since then:
 
@@ -233,6 +233,6 @@ Finally, completely unrelated to ChatGPT and Revit,
 successfully [using self-organizing maps to solve the traveling salesman problem](https://diego.codes/post/som-tsp/).
 
 <center>
-<img src="img/tsp_som_italy.png" alt="Self-organizing maps approximating the traveling salesman problem for Italy" title="" width="800"/>  <!-- 2392 × 860 pixels -->
+<img src="img/tsp_som_italy.png" alt="Self-organizing maps approximating the traveling salesman problem for Italy" title="Self-organizing maps approximating the traveling salesman problem for Italy" width="800"/>  <!-- 2392 × 860 pixels -->
 </center>
 
