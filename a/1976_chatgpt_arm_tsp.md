@@ -74,7 +74,7 @@ I am still in Nairobi, Kenya, getting to know the lay of the land and team here,
 ####<a name="2"></a> First Outings in Nairobi
 
 My colleagues warn me of the dangers of moving around freely here, so I am being careful.
-Not a single bad experiennce so far, though.
+Not a single bad experience so far, though. All good.
 Lots of security all around, such as security checks entering every building.
 The people I meet in the street are either neutral or friendly, though, and I feel happy and safe.
 
@@ -138,7 +138,7 @@ and [documented his steps on twitter](https://twitter.com/JacobWSmall/status/160
 - Again, trying to guide it like a user would guide me in a text chat (which I happen to have a few years of experience with). Already know that it's going to fail at the Id property of the undefined level variable, but we'll get there when we get the error.
 - Good(ish) news, is that the new code returned a new error (new errors are good things as it often means we fixed something).
 - Bad news is that it is a 'calling a variable which hasn't been defined'. The chatbot appears to be copy/pasting line by line instead of sections of code.
-- In the chatbot's defense, I've done this myself a few times by not ensuring the user had robust enough boilerplate code to start with. I'm going to switch to not bothering with running this, as __revit__ also hasn't been defined. No longer a user guided chat though.
+- In the chatbot's defence, I've done this myself a few times by not ensuring the user had robust enough boilerplate code to start with. I'm going to switch to not bothering with running this, as `__revit__` also hasn't been defined. No longer a user guided chat though.
 - Well, it's thinking a lot... Am I not playing by the chatbot's rules?
 - Ok... it doesn't take directions as well as a software engineer on the Dynamo or Revit team. Let's try the previous prompt like a user would, and just reply with the errors for another few minutes or until I get bored. 
 - And yes, I could have written this from scratch by now.
@@ -155,12 +155,12 @@ a LinkedIn post, with many more interesting comments.
 
 ####<a name="7"></a> ChatGPT for Revit Interaction
 
-Last but not least concerning the Revit API, our very active contributor [Chuong Ho](https://github.com/chuongmep) started exploring the possiblity
+Last but not least concerning the Revit API, our very active contributor [Chuong Ho](https://github.com/chuongmep) started exploring the possibility
 to [integrate ChaGPT interactively into Revit](https://www.linkedin.com/posts/chuongmep_dynamo-gpt3-openai-activity-7007387062999928832-AyL5).
 Here are the first few comments on that effort, with many more following since then:
 
 - Chuong Ho: Do you know, Chat GPT3, OpenAI will be coming soon Dynamo BIM 🤣. I'm still figuring out how to make them good at the moment, it's surprisingly accurate, but sometimes it's as innocent as a toddler learning to speak. I'd love to have comments right now.
-- Maycon Freitas: Awesome, Chuong Ho!! I tried to create a chatbot to integrate Revit and WhatsApp using Dynamo some time ago (but a dumb one, not smart as GPT3) - https://www.linkedin.com/feed/update/urn:li:activity:6671175468063973376/ - and also using Forge + Whatsapp - https://www.linkedin.com/feed/update/urn:li:activity:6851904940378480640/... 
+- Maycon Freitas: Awesome, Chuong Ho!! I tried to create a chatbot to integrate Revit and WhatsApp using Dynamo some time ago (but a dumb one, not smart as GPT3) &ndash; https://www.linkedin.com/feed/update/urn:li:activity:6671175468063973376/ &ndash; and also using Forge + Whatsapp &ndash; https://www.linkedin.com/feed/update/urn:li:activity:6851904940378480640/... 
 - Chuong Ho: So, as you might already know, my suggestion is: Chatbots to execute some tasks, extract data e so on. It would be a really good feature to implement.
 - Luisa Cypriano: Great one Chuong Ho :) Did you publish openly the pack already?
 - Chuong Ho: Still not yet, I working with control parameters input to help respond better for AEC
