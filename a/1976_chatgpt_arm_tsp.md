@@ -150,6 +150,8 @@ triggering a lot of response and discussion:
 
 > I asked ChatGPT to rewrite Bohemian Rhapsody to be about the life of a postdoc, and the output was flawless...
 
+Check out the [full thread with comments](https://twitter.com/raphaelmilliere/status/1598469100535259136?t=upd) for details.
+
 ####<a name="5"></a> ChatGPT for Revit API I
 
 The obvious next step for this community is to try out its abilities helping with Revcit API questions.
