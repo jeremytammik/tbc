@@ -34,8 +34,17 @@ twitter:
 
  with the #RevitAPI @AutodeskForge @AutodeskRevit #bim #ForgeDevCon 
 
-&ndash; 
-...
+I am still in Nairobi, Kenya, getting to know the lay of the land and team here, as well as setting up my new computer; meanwhile, OpenAI ChatGPT is making global waves and first explorative steps are being made to use it with the Revit API
+&ndash; Outings in Nairobi
+&ndash; ChatGPT in Kiswahili
+&ndash; for music and poetry mimicry
+&ndash; for Revit API
+&ndash; for Revit interaction
+&ndash; teaching about the birds and the bees
+&ndash; limitations and improvement
+&ndash; acrostic poem
+&ndash; VS2022 on MacBook Pro M1 with Parallels
+&ndash; Chasing the travelling salesman...
 
 linkedin:
 
