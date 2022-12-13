@@ -97,14 +97,12 @@ I am still in Nairobi, Kenya, getting to know the lay of the land and team here,
 
 ####<a name="2"></a> First Outings in Nairobi
 
-My colleagues are continuously warning me of the dangers of moving around freely here, so I am being very careful.
+My colleagues warn me of the dangers of moving around freely here, so I am being careful.
+Not a single bad experiennce so far, though.
+Lots of security all around, such as security checks entering every building.
+The people I meet in the street are either neutral or friendly, though, and I feel happy and safe.
 
-Not a single bad experiennce so far, though, and a huge amount of security all around.
-Security checkes entering every building, for instance.
-
-Every single person I met so far has been either purely neutral or friendly.
-
-So far, besides working, I went for a hike to Mount Longonot on Satuyrday and took a long walk into the centre of town on a Sunday, with very little going on that day.
+So far, besides working, I went for a hike to Mount Longonot on Saturday and took a long walk into the centre of town on a Sunday, with very little going on that day.
 
 Here are my [pictures in and around Nairobi](https://flic.kr/s/aHBqjAiJv1) so far.
 
@@ -138,6 +136,7 @@ If you need more help, please contact me.
 I like to help with things related to African languages."
 
 I was surprised how much sense that made.
+Since some people I talk with make less sense, I would say the Turing test is passed.
 
 ####<a name="4"></a> ChatGPT for Music and Poetry Mimicry
 
@@ -241,3 +240,4 @@ No further testing performed yet, though.
 <center>
 <img src="img/tsp_som_italy.png" alt="Self-organizing maps approximating the traveling salesman problem for Italy" title="" width="800"/>  <!-- 2392 × 860 pixels -->
 </center>
+
