@@ -154,7 +154,7 @@ Check out the [full thread with comments](https://twitter.com/raphaelmilliere/st
 
 ####<a name="5"></a> ChatGPT for Revit API I
 
-The obvious next step for this community is to try out its abilities helping with Revcit API questions.
+The obvious next step for this community is to try out its abilities helping with Revit API questions.
 My colleague [Jacob Small](https://twitter.com/JacobWSmall) tried that out
 and [documented his steps on twitter](https://twitter.com/JacobWSmall/status/1600477115853737984):
 
