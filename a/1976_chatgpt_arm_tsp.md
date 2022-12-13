@@ -189,11 +189,11 @@ C: ChatGPT is currently down
 <br/>G: Go grab a coffee and check back soon
 <br/>P: Patience is key in this situation
 <br/>T: Trust that the team is working hard to fix it up
-<br/>
+<p/>
 <img src="img/chatgpt_down.png" alt="Acrostic poem by ChatGPT" title="Acrostic poem by ChatGPT" width="800"/>  <!-- 1714 × 700 pixels -->
 </center>
 
-So enough of this topic for now.
+So, enough of ChatGPT for now.
 
 ####<a name="11"></a> VS2022 on MacBook Pro M1 with Parallels
 
@@ -220,7 +220,7 @@ No further testing performed yet, though.
 ####<a name="12"></a> Chasing the Travelling Salesman
 
 Finally, completely unrelated to ChatGPT and Revit,
-[Diego Vicente](https://diego.codes/about/) published a new approach to approximately tackle the best-known hard NP-complete challenge,
+[Diego Vicente](https://diego.codes/about/) published a new approach to approximately tackle the well-known hard NP-complete challenge,
 successfully [using self-organizing maps to solve the traveling salesman problem](https://diego.codes/post/som-tsp/).
 
 <center>
