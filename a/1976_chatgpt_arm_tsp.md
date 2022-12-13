@@ -167,19 +167,21 @@ and [documented his steps on twitter](https://twitter.com/JacobWSmall/status/160
 - Ok... it doesn't take directions as well as a software engineer on the Dynamo or Revit team. Let's try the previous prompt like a user would, and just reply with the errors for another few minutes or until I get bored. 
 - And yes, I could have written this from scratch by now.
 
-You need to look at the original thread including all the screen snapshots to understabnd the details of what he's talking about, of course.
+You need to look at
+the [original thread including all the screen snapshots](https://twitter.com/JacobWSmall/status/1600477115853737984) to
+see the details of what he's talking about.
 
 ####<a name="6"></a> ChatGPT for Revit API II
 
 Bird Tools also tried out and
-documented [using ChatGPT for Revit API](https://www.linkedin.com/posts/bird-tools_openai-revit-code-activity-7005369990614798336-vqXP) on LinkedIn,
-garnering many more interesting comments.
+documented [using ChatGPT for Revit API](https://www.linkedin.com/posts/bird-tools_openai-revit-code-activity-7005369990614798336-vqXP) in
+a LinkedIn post, with many more interesting comments.
 
 ####<a name="7"></a> ChatGPT for Revit Interaction
 
-Last but not least, our very active contributor [Chuong Ho](https://github.com/chuongmep) started exploring the possiblity
+Last but not least concerning the Revit API, our very active contributor [Chuong Ho](https://github.com/chuongmep) started exploring the possiblity
 to [integrate ChaGPT interactively into Revit](https://www.linkedin.com/posts/chuongmep_dynamo-gpt3-openai-activity-7007387062999928832-AyL5).
-Here are the first few comments on that effort, but manty more have come in since then:
+Here are the first few comments on that effort, with many more following since then:
 
 - Chuong Ho: Do you know, Chat GPT3, OpenAI will be coming soon Dynamo BIM 🤣. I'm still figuring out how to make them good at the moment, it's surprisingly accurate, but sometimes it's as innocent as a toddler learning to speak. I'd love to have comments right now.
 - Maycon Freitas: Awesome, Chuong Ho!! I tried to create a chatbot to integrate Revit and Whatsapp using Dynamo sometime ago (but a dumb one, not smart as GPT3) - https://www.linkedin.com/feed/update/urn:li:activity:6671175468063973376/ - and also using Forge + Whatsapp - https://www.linkedin.com/feed/update/urn:li:activity:6851904940378480640/... 
@@ -189,12 +191,12 @@ Here are the first few comments on that effort, but manty more have come in sinc
 
 ####<a name="8"></a> Teaching ChatGPT About the Birds and the Bees
 
-Finally, for an example where ChatGPT really excels and surpasses all expectations, check out my namesake Jeremy Pinto's 2-minute article
+For an example beyond the Revit API where ChatGPT really excels and surpasses all expectations, check out my namesake Jeremy Pinto's 20-minute AI training implementation article
 on [teaching ChatGPT about the birds and the bees](https://www.jerpint.io/blog/chatgpt).
 
 ####<a name="9"></a> ChatGPT Limitations and Improvement
 
-Leon Furze takes his analysis one step further and explores aspects of writing essays, disrupting education, the  limitations and improvement possibilitiues in some depth in his article
+Leon Furze takes his analysis one step further and explores aspects of writing essays, disrupting education, ChatGPT limitations and improvement possibilitiues in his article
 on [prompt whispering: getting better results from ChatGPT](https://www.linkedin.com/pulse/prompt-whispering-getting-better-results-from-chatgpt-leon-furze).
 
 ####<a name="10"></a> ChatGPT Acrostic Poem
@@ -215,15 +217,17 @@ C: ChatGPT is currently down
 <img src="img/chatgpt_down.png" alt="Acrostic poem by ChatGPT" title="Acrostic poem by ChatGPT" width="800"/>  <!-- 1714 × 700 pixels -->
 </center>
 
+So enough of this topic for now.
 
 ####<a name="11"></a> VS2022 on MacBook Pro M1 with Parallels
 
-Moving on now from this inexhaustible and rapidly evolving topic, meanwhile, I received and started setting up my new PC, a MacBook Pro (16-inch, 2021) with
+Meanwhile, moving on from this inexhaustible and rapidly evolving topic, I received and started setting up my new PC, a MacBook Pro M1 with
 an [Apple M1 Pro ARM chip](https://en.wikipedia.org/wiki/Apple_M1).
 
 So, with no Intel hardware, can I use it for Revit at all?
 
-Well, I gave up trying to install Visual Studio 2019, which I had previously been using, prompted by this thread
+Well, I gave up trying to install Visual Studio 2019, which I had previously been using.
+The final decision was prompted by a thread
 on [running Visual Studio 2019 on Windows 11 on M1 Mac](https://forum.parallels.com/threads/running-visual-studio-2019-on-windows-11-on-m1-mac.355149),
 since it ends with the following unequivocal advice:
 
@@ -239,8 +243,9 @@ No further testing performed yet, though.
 
 ####<a name="12"></a> Chasing the Travelling Salesman
 
-[Diego Vicente](https://diego.codes/about/) published a new approach to tackle a really hard NP-complete challenge, 
-[using self-organizing maps to solve the traveling salesman problem](https://diego.codes/post/som-tsp/).
+Finally, completely unrelated to ChatGPT and Revit,
+[Diego Vicente](https://diego.codes/about/) published a new approach to approximately tackle the best-known hard NP-complete challenge,
+successfully [using self-organizing maps to solve the traveling salesman problem](https://diego.codes/post/som-tsp/).
 
 <center>
 <img src="img/tsp_som_italy.png" alt="Self-organizing maps approximating the traveling salesman problem for Italy" title="" width="800"/>  <!-- 2392 × 860 pixels -->
