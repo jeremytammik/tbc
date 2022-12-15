@@ -134,7 +134,7 @@ However, if the value would actually need more than 32 bits to represent it, we 
 <p>To add a bit more about our intentions, as things currently stand:</p>
 <p>Our intention is to find an optimal balance between 64-bit readiness and minimising disruption for API developers.
 We would NOT remap existing ElementIds to higher values.
-An Element with an Id of 50 would still have an Id of 50, and either property would return the correct value.</p>
+An <code>Element</code> with an <code>Id</code> of 50 would still have an <code>Id</code> of 50, and either property would return the correct value.</p>
 <p>Most models will not get so large as to exhaust the 32-bit id space.
 So, in general, <code>ElementId.IntegerValue</code> would still work.
 This would give developers a chance to update their applications, rather than having the function immediately disappear.</p>

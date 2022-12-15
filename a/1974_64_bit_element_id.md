@@ -151,7 +151,7 @@ To add a bit more about our intentions, as things currently stand:
  
 Our intention is to find an optimal balance between 64-bit readiness and minimising disruption for API developers.
 We would NOT remap existing ElementIds to higher values.
-An Element with an Id of 50 would still have an Id of 50, and either property would return the correct value.
+An `Element` with an `Id` of 50 would still have an `Id` of 50, and either property would return the correct value.
  
 Most models will not get so large as to exhaust the 32-bit id space.
 So, in general, `ElementId.IntegerValue` would still work.
