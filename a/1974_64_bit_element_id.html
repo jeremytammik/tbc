@@ -125,10 +125,10 @@ Here is a table showing the deprecated and replacement members:
 <p>We have an amendment to add to the original post.
 One of the things we originally said above has actually changed, and I think it also helps
 address <a href="https://thebuildingcoder.typepad.com/blog/2022/11/64-bit-element-ids-maybe.html#comment-6054377627">cadferret’s question below</a>:</p>
-<p>With the caveat that anything we say here might change, we wanted to amend the initially published proposal.</p>
+<p>With the caveat that anything we say here might change, we want to amend the initially published proposal.</p>
 <p>The previous version stated that <code>ElementId.IntegerValue</code> would
 handle <a href="https://en.wikipedia.org/wiki/Integer_overflow">integer overflow</a> by
-truncating 64-bit values down to 32 bits to .
+truncating 64-bit values down to 32 bits.
 For values which will fit in 32 bits, we will return the value as an integer.
 However, if the value would actually need more than 32 bits to represent it, we will throw an exception.</p>
 <p>To add a bit more about our intentions, as things currently stand:</p>

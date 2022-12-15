@@ -139,11 +139,11 @@ We have an amendment to add to the original post.
 One of the things we originally said above has actually changed, and I think it also helps
 address [cadferret’s question below](https://thebuildingcoder.typepad.com/blog/2022/11/64-bit-element-ids-maybe.html#comment-6054377627):
  
-With the caveat that anything we say here might change, we wanted to amend the initially published proposal.
+With the caveat that anything we say here might change, we want to amend the initially published proposal.
  
 The previous version stated that `ElementId.IntegerValue` would
 handle [integer overflow](https://en.wikipedia.org/wiki/Integer_overflow) by
-truncating 64-bit values down to 32 bits to .
+truncating 64-bit values down to 32 bits.
 For values which will fit in 32 bits, we will return the value as an integer.
 However, if the value would actually need more than 32 bits to represent it, we will throw an exception.
  
