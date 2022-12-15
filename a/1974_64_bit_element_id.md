@@ -159,8 +159,7 @@ This would give developers a chance to update their applications, rather than ha
  
 However, if a model were so large as to have Ids that needed more than 32 bits to store the value, the `ElementId.IntegerValue` property would throw an exception, return a truncated value, or something similar.
  
-This is an attempt to allow models which need 64-bit ids sooner while minimising outright breaking changes in the API.
-
+This is an attempt to allow models which need 64-bit ids sooner, simultaneously minimising outright breaking changes in the API.
 
 ####<a name="3"></a> Revit Schedule Title Headers
 
