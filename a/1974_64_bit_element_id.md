@@ -139,7 +139,7 @@ We have an amendment to add to the original post.
 One of the things we originally said above has actually changed, and I think it also helps
 address [cadferret’s question below](https://thebuildingcoder.typepad.com/blog/2022/11/64-bit-element-ids-maybe.html#comment-6054377627):
  
-With the caveat that anything we say here might change, we wanted to amend the current proposal.
+With the caveat that anything we say here might change, we wanted to amend the initially published proposal.
  
 The previous version stated that `ElementId.IntegerValue` would
 handle [integer overflow](https://en.wikipedia.org/wiki/Integer_overflow) by
