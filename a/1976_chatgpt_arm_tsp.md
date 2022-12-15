@@ -94,6 +94,7 @@ I am still in Nairobi, Kenya, getting to know the lay of the land and team here,
 - [ChatGPT acrostic poem](#10)
 - [VS2022 on MacBook Pro M1 with Parallels](#11)
 - [Chasing the travelling salesman](#12)
+- [LinkedIn comments](#13)
 
 ####<a name="2"></a> First Outings in Nairobi
 
@@ -251,3 +252,16 @@ successfully [using self-organizing maps to solve the traveling salesman problem
 <img src="img/tsp_som_italy.png" alt="Self-organizing maps approximating the traveling salesman problem for Italy" title="Self-organizing maps approximating the traveling salesman problem for Italy" width="800"/>  <!-- 2392 × 860 pixels -->
 </center>
 
+####<a name="13"></a> LinkedIn Comments
+
+I'm only adding the first two of them... can't keep on updating forever...
+
+[Igor KhisamievView  asks](https://www.linkedin.com/feed/update/urn:li:activity:7008498173014888449?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A7008498173014888449%2C7008922401031741440%29&dashCommentUrn=urn%3Ali%3Afsd_comment%3A%287008922401031741440%2Curn%3Ali%3Aactivity%3A7008498173014888449%29): 
+
+> Hi, Jeremy. How are you testing your addins on MacBook? Revit doesn’t work on MacBook 🤔 or is Windows installed?
+
+> **Answer:** I use [Parallels to run Windows on MacOS](https://www.parallels.com/products/desktop)
+
+[Göker Malik Altuntaş says](https://www.linkedin.com/feed/update/urn:li:activity:7008498173014888449?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A7008498173014888449%2C7008946537527435264%29):
+
+> I am literally amazed by #ChatGPT after seeing it can actually write a functioning Revit plug-in. Thank you for fantastic sharings 👍
