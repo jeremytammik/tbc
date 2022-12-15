@@ -72,6 +72,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 We may need to scale up the handling of element id integer values in future, a sample snippet to retrieve schedule headers, a Dynamo book, and a web-based family showroom browser:
 
 - [64-bit element ids](#2)
+- [Amendment &ndash; how to handle overflow](#2.1)
 - [Revit schedule title headers](#3)
 - [Beyond Dynamo: Python manual for Revit](#4)
 - [Web-based family management showroom](#5)
@@ -131,6 +132,35 @@ Here is a table showing the deprecated and replacement members:
 </center>
 
 -->
+
+####<a name="2.1"></a> Amendment &ndash; How to Handle Overflow
+
+We have an amendment to add to the original post.
+One of the things we originally said above has actually changed, and I think it also helps
+address [cadferret’s question below](https://thebuildingcoder.typepad.com/blog/2022/11/64-bit-element-ids-maybe.html#comment-6054377627):
+ 
+With the caveat that anything we say here might change, we wanted to amend the current proposal.
+ 
+The previous version stated that `ElementId.IntegerValue` would
+handle [integer overflow](https://en.wikipedia.org/wiki/Integer_overflow) by
+truncating 64-bit values down to 32 bits to .
+For values which will fit in 32 bits, we will return the value as an integer.
+However, if the value would actually need more than 32 bits to represent it, we will throw an exception.
+ 
+To add a bit more about our intentions, as things currently stand:
+ 
+Our intention is to find an optimal balance between 64-bit readiness and minimising disruption for API developers.
+We would NOT remap existing ElementIds to higher values.
+An Element with an Id of 50 would still have an Id of 50, and either property would return the correct value.
+ 
+Most models will not get so large as to exhaust the 32-bit id space.
+So, in general, `ElementId.IntegerValue` would still work.
+This would give developers a chance to update their applications, rather than having the function immediately disappear.
+ 
+However, if a model were so large as to have Ids that needed more than 32 bits to store the value, the `ElementId.IntegerValue` property would throw an exception, return a truncated value, or something similar.
+ 
+This is an attempt to allow models which need 64-bit ids sooner while minimising outright breaking changes in the API.
+
 
 ####<a name="3"></a> Revit Schedule Title Headers
 
