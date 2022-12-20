@@ -68,9 +68,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> WebView2 and CefSharp in Revit Add-Ins
 
-Here are some thoughts and experiences from an internal discussion aimed to define best practices for Revit add-ins using WebView2:
+Here are some thoughts and experiences from an internal discussion aimed at defining best practices for Revit add-ins using WebView2:
 
-**Question:** I would like to make use of WaebView2 in my add-in.
+**Question:** I would like to make use of WebView2 in my add-in.
 What should I do?
 
 - Rely on future versions of Revit installing the evergreen runtime?
