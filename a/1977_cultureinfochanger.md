@@ -22,12 +22,6 @@
   CadPythonShell : https://lnkd.in/gj6Bxqiq
   RevitPythonShell: https://lnkd.in/g5-r5PWU
 
-- ChatGPT in academia:
-  https://academia.stackexchange.com/questions/191643/how-should-a-faculty-deal-with-the-problem-of-artificial-intelligence-ai-gener?utm_source=Iterable
-
-- Mohamed Elimam, SIAC Construction, using ChatGOT with Revit API
-  https://www.linkedin.com/posts/mohamed-elimam_programming-chatgbt-ai-activity-7010260045649063936-dQds?utm_source=share&utm_medium=member_desktop
-
 - journal files au class
   Journal - step by step
   https://forums.autodesk.com/t5/revit-api-forum/journal-step-by-step/m-p/11625744
@@ -39,9 +33,13 @@
 
 twitter:
 
-
-&ndash; 
-...
+Happy New Year 2023!
+Topics to begin 
+&ndash; Copy as HTML 2022
+&ndash; Size MEP connector with <code>CultureInfoChanger</code>
+&ndash; Journal files AU class
+&ndash; Bulk reload families with <code>IFamilyLoadOptions</code>
+&ndash; IronPython3, APS and RPS...
 
 linkedin:
 
@@ -61,7 +59,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### CultureInfoChanger
+### CultureInfoChanger and IronPython3
 
 Happy New Year 2023!
 
@@ -255,7 +253,7 @@ helping to get started working on a macro to automate the execution of `LoadFami
 
 ####<a name="6"></a> IronPython3, APS and RPS
 
-Chuong Ho shared some exciting news on IronPython3, APS and RPS.
+Chuong Ho shared some exciting news on [IronPython3](https://ironpython.net), APS and RPS.
 
 RPS is the beloved [RevitPythonShell](ttps://github.com/architecture-building-systems/revitpythonshell) that
 adds an IronPython interpreter to Revit and lets you to write plugins for Revit in Python.
@@ -275,6 +273,3 @@ The RevitPythonShell enhancement was submitted, discussed and merged in
 the [PR 136 &ndash; support IronPython3.4](https://github.com/architecture-building-systems/revitpythonshell/pull/136).
 
 Many thanks to Chuong Ho for implementing this!
-
-
-
