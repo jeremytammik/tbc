@@ -68,7 +68,8 @@ Happy New Year 2023!
 
 ####<a name="2"></a> Copy as HTML 2022
 
-After moving to the new Mac and switching to Visual Studio 2022, I also need to update my C# source code colorisr.
+After [moving to the new Mac and switching to Visual Studio 2022](https://thebuildingcoder.typepad.com/blog/2022/12/exploring-arm-chatgpt-nairobi-and-the-tsp.html#11),
+I also need to update my C# source code colouriser.
 
 The last time was the
 [Copy as HTML update](https://thebuildingcoder.typepad.com/blog/2021/11/revit-20221-sdk-revitlookup-build-and-install.html#7) in November 2021 using the Productivity Power Tools 2017/2019.
@@ -83,7 +84,7 @@ Converts RTF, outputted by VS, into HTML.
 <img src="img/copyashtml2022.png" alt="Copy As HTML 2022" title="Copy As HTML 2022" width="300"/>  <!-- 586 × 1206 pixels -->
 </center>
 
-You can see the results of using the new code coloriser immediately below to format the `CultureInfoChanger` sample.
+You can see the results of using the new code colouriser immediately below to format the `CultureInfoChanger` sample.
 
 I also updated [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) for VS 2022, in
 [release 2023.1.153.5](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2023.1.153.5).
