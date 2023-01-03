@@ -1,9 +1,8 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
-</head>
-
+<p></head></p>
 <!---
 
 - ricaun CultureInfoChanger with IDisposable 
@@ -61,42 +60,48 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### CultureInfoChanger
+<h3>CultureInfoChanger</h3>
+<p>Happy New Year 2023!</p>
+<h4><a name="2"></a></h4>
+<h4><a name="3"></a></h4>
+<p><center>
+<img src="img/.png" alt="" title="" width="800"/>  <!-- 3168 × 1320 pixels -->
+</center></p>
+<h4><a name="2"></a> Size MEP Connector with CultureInfoChanger</h4>
+<p>Luiz Henrique <a href="https://github.com/ricaun">@ricaun</a> Cassettari implemented a nice workaround to solve the problem raised in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+being <a href="https://forums.autodesk.com/t5/revit-api-forum/unable-to-size-mep-connectors-with-revit-2021/m-p/9609260">unable to size MEP connectors with Revit 2021</a>.</p>
+<p><i>Ekaterina.kudelina.beam</i> noticed that switching the <code>CurrentCulture</code> from <code>de-DE</code> to <code>en-EN</code> makes it possible to change connector size in a project. <i>Ricaun</i> made use of this observation to implement a <code>CultureInfoChanger</code> derived from <code>IDisposable</code> that can be used to wrap the setting, temporarily changing <code>CultureInfo</code> to English and resetting it back to the original when disposed:</p>
+<pre class="code">
+/// <summary>
+/// CultureInfoChanger
+/// </summary>
+public class CultureInfoChanger : IDisposable
+{
+    private readonly CultureInfo CultureInfo;
 
-Happy New Year 2023!
-
-
-####<a name="6"></a> Copy as HTML 2022
-
-After moving to the new Mac and switching to Visual Studio 2022, I also need to update my C# source code colorisr.
-
-The last time was the
-[Copy as HTML update](https://thebuildingcoder.typepad.com/blog/2021/11/revit-20221-sdk-revitlookup-build-and-install.html#7) in November 2021 using the Productivity Power Tools 2017/2019.
-
-This time around, I switched to a new extension, Copy As HTML 2022 by Tim Mathias:
-
-> Copy selected code in HTML format while preserving syntax highlighting, indentation, background colour and font.
-Options: Max Height, Title Block, Alternating Lines, Line Numbers, Wrap Lines, Un-indent, Background Colour, Class Names.
-Converts RTF, outputted by VS, into HTML.
-
-<center>
-<img src="img/copyashtml2022.png" alt="" title="" width="500"/>  <!-- 586 × 1206 pixels -->
-</center>
-
-I also updated [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) for VS 2022, in
-[release 2023.1.153.5](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2023.1.153.5).
-
-
-####<a name="2"></a> Size MEP Connector with CultureInfoChanger
-
-Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari implemented a nice workaround to solve the problem raised in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-being [unable to size MEP connectors with Revit 2021](https://forums.autodesk.com/t5/revit-api-forum/unable-to-size-mep-connectors-with-revit-2021/m-p/9609260).
-
-<i>Ekaterina.kudelina.beam</i> noticed that switching the `CurrentCulture` from `de-DE` to `en-EN` makes it possible to change connector size in a project. <i>Ricaun</i> made use of this observation to implement a `CultureInfoChanger` derived from `IDisposable` that can be used to wrap the setting, temporarily changing `CultureInfo` to English and resetting it back to the original when disposed:
+    /// <summary>
+    /// CultureInfoChanger
+    /// </summary>
+    /// <param name="name"></param>
+    public CultureInfoChanger(string name = "en")
+    {
+        CultureInfo = CultureInfo.CurrentCulture;
+        CultureInfo.CurrentCulture = new CultureInfo(name);
+    }
+    /// <summary>
+    /// Dispose
+    /// </summary>
+    public void Dispose()
+    {
+        CultureInfo.CurrentCulture = CultureInfo;
+    }
+}
+</pre>
 
 <div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
-<div style="background-color: #ffffff; color: #000000; max-height: 300px; overflow: auto; padding: 2px 5px;"><span style="color:#808080">///</span><span style="color:#008000"> </span><span style="color:#808080">&lt;summary&gt;</span><br>
+<div style="background-color: #ffffff; color: #000000; max-height: 300px; overflow: auto; padding: 2px 5px;"><br>
+<span style="color:#808080">///</span><span style="color:#008000"> </span><span style="color:#808080">&lt;summary&gt;</span><br>
 <span style="color:#808080">///</span><span style="color:#008000"> CultureInfoChanger</span><br>
 <span style="color:#808080">///</span><span style="color:#008000"> </span><span style="color:#808080">&lt;/summary&gt;</span><br>
 <span style="color:#0000ff">public</span> <span style="color:#0000ff">class</span> <span style="color:#2b91af">CultureInfoChanger</span> : IDisposable<br>
@@ -122,15 +127,7 @@ being [unable to size MEP connectors with Revit 2021](https://forums.autodesk.co
 }</div>
 </div>
 
-
-
-
-
-
-
-
-The code could be something like this.
-
+<p>The code could be something like this.</p>
 <pre class="code">
 using (new CultureInfoChanger())
 {
@@ -138,8 +135,7 @@ using (new CultureInfoChanger())
 }
 </pre>
 
-An extension should be perfect in this case, some SetRadius, SetWidth, and SetHeight.
-
+<p>An extension should be perfect in this case, some SetRadius, SetWidth, and SetHeight.</p>
 <pre class="code">
   connector.SetRadius(0.5);
   connector.SetHeight(0.5);
@@ -159,56 +155,52 @@ public static void SetRadius(this Connector connector, double radius)
 }
 </pre>
 
-The source code for the full extension with a command sample is provided in
-the [ConnectorSetValueExtension.cs gist](https://gist.github.com/ricaun/693470e914295786fa62a2be6c67e662):
-
-> Connector Set Value Extension for Revit to 'fix' the ArgumentOutOfRangeException when setting Radius, Width, and Height.
-
-Many thanks to Luiz Henrique for this nice solution!
-
-
-####<a name="3"></a> Bulk reloading families in a template from a slightly different location
-
-Bulk reloading families in a template from a slightly different location
-https://forums.autodesk.com/t5/revit-api-forum/bulk-reloading-families-in-a-template-from-a-slightly-different/td-p/11623721
-
-####<a name="4"></a> RPS + APS
-
-RPS + APS
-https://www.linkedin.com/posts/chuongmep_bim-python-ironpython3-activity-7009453448463077377-cQtY?utm_source=share&utm_medium=member_desktop
+<p>The source code for the full extension with a command sample is provided in
+the <a href="https://gist.github.com/ricaun/693470e914295786fa62a2be6c67e662">ConnectorSetValueExtension.cs gist</a>:</p>
+<blockquote>
+<p>Connector Set Value Extension for Revit to 'fix' the ArgumentOutOfRangeException when setting Radius, Width, and Height.</p>
+</blockquote>
+<p>Many thanks to Luiz Henrique for this nice solution!</p>
+<h4><a name="3"></a> Bulk reloading families in a template from a slightly different location</h4>
+<p>Bulk reloading families in a template from a slightly different location
+https://forums.autodesk.com/t5/revit-api-forum/bulk-reloading-families-in-a-template-from-a-slightly-different/td-p/11623721</p>
+<h4><a name="4"></a> RPS + APS</h4>
+<p>RPS + APS
+https://www.linkedin.com/posts/chuongmep_bim-python-ironpython3-activity-7009453448463077377-cQtY?utm_source=share&amp;utm_medium=member_desktop
 Chuong Ho
 Ironpython 3.4 coming
 I'm very excited because last week the Ironpython3 team released 3.4.0. And today I also quickly brought them to CadPythonShell and RevitPythonShell, which is a great expectation of Python-friendly engineers, and Python 3.4 is a big upgrade for engineers to get the most out of these features. new feature that python brings.
 CadPythonShell : https://lnkd.in/gj6Bxqiq
-RevitPythonShell: https://lnkd.in/g5-r5PWU
-
-####<a name="5"></a> journal files au class
-
-journal files au class
+RevitPythonShell: https://lnkd.in/g5-r5PWU</p>
+<h4><a name="5"></a> journal files au class</h4>
+<p>journal files au class
 Journal - step by step
 https://forums.autodesk.com/t5/revit-api-forum/journal-step-by-step/m-p/11625744
 [Q] is any idea to run journal file step by step to debug where is e problem to run all journal file? 
 [A] Nope. It is all or nothing. For more info, please check The Building Coder articles: https://thebuildingcoder.typepad.com/blog/journal/
 There is this Autodesk University class about Journal Files.
 Revit Journal Files: They Aren’t Just for Autodesk Support:
-https://www.autodesk.com/autodesk-university/class/Revit-Journal-Files-They-Arent-Just-Autodesk-Support-2018#video
-
-
-
-
-
-
-####<a name="7"></a> ChatGPT in academia:
-
-ChatGPT in academia:
-https://academia.stackexchange.com/questions/191643/how-should-a-faculty-deal-with-the-problem-of-artificial-intelligence-ai-gener?utm_source=Iterable
-
-####<a name="8"></a> Mohamed Elimam, SIAC Construction, using ChatGOT with Revit API
-
-Mohamed Elimam, SIAC Construction, using ChatGOT with Revit API
-https://www.linkedin.com/posts/mohamed-elimam_programming-chatgbt-ai-activity-7010260045649063936-dQds?utm_source=share&utm_medium=member_desktop
-
-####<a name="9"></a> ChatGPT with Rene
-
-
-
+https://www.autodesk.com/autodesk-university/class/Revit-Journal-Files-They-Arent-Just-Autodesk-Support-2018#video</p>
+<h4><a name="6"></a> Copy as HTML Update</h4>
+<p><a href="https://thebuildingcoder.typepad.com/blog/2021/11/revit-20221-sdk-revitlookup-build-and-install.html#7">Copy as HTML Update</a></p>
+<p>With the revamped version of The Building Coder Samples, I also finally moved from Visual Studio 2017 to 2019 to compile it.
+I hope I am the last of the Revit add-in developer community to do so.</p>
+<p>It lacked the <code>Copy as HTML</code> option that I use for C# source code colourisation, so I revisited my 2019 note
+on <a href="https://thebuildingcoder.typepad.com/blog/2019/09/face-intersect-face-is-unbounded.html#5">updating Copy as HTML</a> and
+again installed
+the <a href="https://marketplace.visualstudio.com/items?itemName=VisualStudioPlatformTeam.ProductivityPowerPack2017">Productivity Power Tools 2017/2019</a> via
+Extensions &gt; Manage Extensions.</p>
+<p>Copy As HTML 2022
+1/3/2023 9:02:28 AM -   Author             : Tim Mathias</p>
+<blockquote>
+<p>Copy selected code in HTML format while preserving syntax highlighting, indentation, background colour and font. Options: Max Height, Title Block, Alternating Lines, Line Numbers, Wrap Lines, Un-indent, Background Colour, Class Names. Converts RTF, outputted by VS, into HTML.</p>
+</blockquote>
+<p>copyashtml2022.png 586 × 1206 pixels</p>
+<p>Also upated The Building Coder samples for VS 2022.</p>
+<h4><a name="7"></a> ChatGPT in academia:</h4>
+<p>ChatGPT in academia:
+https://academia.stackexchange.com/questions/191643/how-should-a-faculty-deal-with-the-problem-of-artificial-intelligence-ai-gener?utm_source=Iterable</p>
+<h4><a name="8"></a> Mohamed Elimam, SIAC Construction, using ChatGOT with Revit API</h4>
+<p>Mohamed Elimam, SIAC Construction, using ChatGOT with Revit API
+https://www.linkedin.com/posts/mohamed-elimam_programming-chatgbt-ai-activity-7010260045649063936-dQds?utm_source=share&amp;utm_medium=member_desktop</p>
+<h4><a name="9"></a> ChatGPT with Rene</h4>
