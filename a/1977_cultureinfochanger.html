@@ -62,9 +62,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 <h3>CultureInfoChanger</h3>
 <p>Happy New Year 2023!</p>
+<p>Topics to begin the new year:</p>
+<ul>
+<li><a href="#2">Copy as HTML 2022</a></li>
+<li><a href="#3">Size MEP connector with <code>CultureInfoChanger</code></a></li>
+<li><a href="#4">Journal files AU class</a></li>
+<li><a href="#5">Bulk reload families with <code>IFamilyLoadOptions</code></a></li>
+<li><a href="#6">IronPython3, APS and RPS</a></li>
+</ul>
 <h4><a name="2"></a> Copy as HTML 2022</h4>
 <p>After <a href="https://thebuildingcoder.typepad.com/blog/2022/12/exploring-arm-chatgpt-nairobi-and-the-tsp.html#11">moving to the new Mac and switching to Visual Studio 2022</a>,
-I also need to update my C# source code colouriser.</p>
+I also needed to update my C# source code colouriser.</p>
 <p>The last time was the
 <a href="https://thebuildingcoder.typepad.com/blog/2021/11/revit-20221-sdk-revitlookup-build-and-install.html#7">Copy as HTML update</a> in November 2021 using the Productivity Power Tools 2017/2019.</p>
 <p>This time around, I switched to a new extension, Copy As HTML 2022 by Tim Mathias:</p>
@@ -140,7 +148,7 @@ public class CultureInfoChanger : IDisposable
 }</div>
 </div>
 
-<p>The code could be something like this.</p>
+<p>The code to use it could be something like this.</p>
 <!--
 
 <pre class="code">
@@ -210,18 +218,18 @@ public static void SetRadius(this Connector connector, double radius)
 </blockquote>
 <p>Many thanks to Luiz Henrique for this nice solution!</p>
 <h4><a name="4"></a> Journal Files AU Class</h4>
-<p>Luiz Henrique also pointed ouit a very interesting AU class on journal files in the thread
+<p>Luiz Henrique also pointed out an interesting AU class on journal files in the thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/journal-step-by-step/m-p/11625744">journal step by step</a>:</p>
 <p><strong>Question:</strong> Any idea how to run a journal file step by step to debug a problem running it?</p>
 <p><strong>Answer:</strong> Nope. It is all or nothing.
 For more info, please check The Building Coder articles in the <a href="https://thebuildingcoder.typepad.com/blog/journal">Journal category</a>.</p>
-<p>You could look at this Autodesk University class 
+<p>You could look at the Autodesk University class 
 on <a href="https://www.autodesk.com/autodesk-university/class/Revit-Journal-Files-They-Arent-Just-Autodesk-Support-2018#video">Revit Journal files: they aren’t just for Autodesk support</a>.</p>
 <h4><a name="5"></a> Bulk Reload Families with IFamilyLoadOptions</h4>
 <p>Before Christmas, I had a nice and fruitful conversation
 with <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/10364294">@Eatrevitpoopcad</a>
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/bulk-reloading-families-in-a-template-from-a-slightly-different/td-p/11623721">bulk reloading families in a template from a slightly different location</a>,
-helping to get started working on a macro to automate the execution of <code>LoadFamily</code> with an <code>IFamilyLoadOptions</code> handler to save a large amount of manual labour.</p>
+helping to get started working on a macro to automate the execution of <code>LoadFamily</code> with an <code>IFamilyLoadOptions</code> handler and saving a large amount of manual labour.</p>
 <h4><a name="6"></a> IronPython3, APS and RPS</h4>
 <p>Chuong Ho shared some exciting news on IronPython3, APS and RPS.</p>
 <p>RPS is the beloved <a href="ttps://github.com/architecture-building-systems/revitpythonshell">RevitPythonShell</a> that
@@ -230,8 +238,8 @@ Even better, it provides you with an interactive shell that lets you see the res
 This is great for exploring the Revit API while writing your Revit Addins, escpecially in combination with
 the <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup database exploration tool</a>.</p>
 <p>APS is the <a href="https://github.com/chuongmep/CadPythonShell">CADPythonShell</a>, a fork of RevitPythonShell, bringing an IronPython interpreter to AutoCAD as well.</p>
-<p>Chuong Ho <a href="https://www.linkedin.com/posts/chuongmep_bim-python-ironpython3-activity-7009453448463077377-cQtY?utm_source=share&amp;utm_medium=member_desktop">announces</a> that 
-IronPython 3.4 is coming:</p>
+<p>Chuong Ho <a href="https://www.linkedin.com/posts/chuongmep_bim-python-ironpython3-activity-7009453448463077377-cQtY?utm_source=share&amp;utm_medium=member_desktop">announced</a> the
+advent of IronPython 3.4:</p>
 <blockquote>
 <p>I'm very excited because last week the IronPython3 team released 3.4.0.
 Today, I also quickly brought them to CadPythonShell and RevitPythonShell, which is a great expectation of Python-friendly engineers. Python 3.4 is a big upgrade for engineers to get the most out of the new features that Python brings.</p>

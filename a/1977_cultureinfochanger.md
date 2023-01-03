@@ -65,11 +65,18 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Happy New Year 2023!
 
+Topics to begin the new year:
+
+- [Copy as HTML 2022](#2)
+- [Size MEP connector with `CultureInfoChanger`](#3)
+- [Journal files AU class](#4)
+- [Bulk reload families with `IFamilyLoadOptions`](#5)
+- [IronPython3, APS and RPS](#6)
 
 ####<a name="2"></a> Copy as HTML 2022
 
 After [moving to the new Mac and switching to Visual Studio 2022](https://thebuildingcoder.typepad.com/blog/2022/12/exploring-arm-chatgpt-nairobi-and-the-tsp.html#11),
-I also need to update my C# source code colouriser.
+I also needed to update my C# source code colouriser.
 
 The last time was the
 [Copy as HTML update](https://thebuildingcoder.typepad.com/blog/2021/11/revit-20221-sdk-revitlookup-build-and-install.html#7) in November 2021 using the Productivity Power Tools 2017/2019.
@@ -153,7 +160,7 @@ public class CultureInfoChanger : IDisposable
 }</div>
 </div>
 
-The code could be something like this.
+The code to use it could be something like this.
 
 <!--
 
@@ -228,7 +235,7 @@ Many thanks to Luiz Henrique for this nice solution!
 
 ####<a name="4"></a> Journal Files AU Class
 
-Luiz Henrique also pointed ouit a very interesting AU class on journal files in the thread
+Luiz Henrique also pointed out an interesting AU class on journal files in the thread
 on [journal step by step](https://forums.autodesk.com/t5/revit-api-forum/journal-step-by-step/m-p/11625744):
 
 **Question:** Any idea how to run a journal file step by step to debug a problem running it?
@@ -236,7 +243,7 @@ on [journal step by step](https://forums.autodesk.com/t5/revit-api-forum/journal
 **Answer:** Nope. It is all or nothing.
 For more info, please check The Building Coder articles in the [Journal category](https://thebuildingcoder.typepad.com/blog/journal).
 
-You could look at this Autodesk University class 
+You could look at the Autodesk University class 
 on [Revit Journal files: they aren’t just for Autodesk support](https://www.autodesk.com/autodesk-university/class/Revit-Journal-Files-They-Arent-Just-Autodesk-Support-2018#video).
 
 ####<a name="5"></a> Bulk Reload Families with IFamilyLoadOptions
@@ -244,7 +251,7 @@ on [Revit Journal files: they aren’t just for Autodesk support](https://www.au
 Before Christmas, I had a nice and fruitful conversation
 with [@Eatrevitpoopcad](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/10364294)
 on [bulk reloading families in a template from a slightly different location](https://forums.autodesk.com/t5/revit-api-forum/bulk-reloading-families-in-a-template-from-a-slightly-different/td-p/11623721),
-helping to get started working on a macro to automate the execution of `LoadFamily` with an `IFamilyLoadOptions` handler to save a large amount of manual labour.
+helping to get started working on a macro to automate the execution of `LoadFamily` with an `IFamilyLoadOptions` handler and saving a large amount of manual labour.
 
 ####<a name="6"></a> IronPython3, APS and RPS
 
@@ -258,8 +265,8 @@ the [RevitLookup database exploration tool](https://github.com/jeremytammik/Revi
 
 APS is the [CADPythonShell](https://github.com/chuongmep/CadPythonShell), a fork of RevitPythonShell, bringing an IronPython interpreter to AutoCAD as well.
 
-Chuong Ho [announces](https://www.linkedin.com/posts/chuongmep_bim-python-ironpython3-activity-7009453448463077377-cQtY?utm_source=share&utm_medium=member_desktop) that 
-IronPython 3.4 is coming:
+Chuong Ho [announced](https://www.linkedin.com/posts/chuongmep_bim-python-ironpython3-activity-7009453448463077377-cQtY?utm_source=share&utm_medium=member_desktop) the
+advent of IronPython 3.4:
 
 > I'm very excited because last week the IronPython3 team released 3.4.0.
 Today, I also quickly brought them to CadPythonShell and RevitPythonShell, which is a great expectation of Python-friendly engineers. Python 3.4 is a big upgrade for engineers to get the most out of the new features that Python brings.
