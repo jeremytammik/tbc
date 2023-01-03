@@ -82,6 +82,7 @@ Topics to begin the new year:
 - [Journal files AU class](#4)
 - [Bulk reload families with `IFamilyLoadOptions`](#5)
 - [IronPython3, APS and RPS](#6)
+- [IronPython3 in pyRevit](#6.1)
 
 ####<a name="2"></a> Copy as HTML 2022
 
@@ -285,3 +286,10 @@ The RevitPythonShell enhancement was submitted, discussed and merged in
 the [PR 136 &ndash; support IronPython3.4](https://github.com/architecture-building-systems/revitpythonshell/pull/136).
 
 Many thanks to Chuong Ho for implementing this!
+
+####<a name="6.1"></a> IronPython3 in pyRevit
+
+Ehsan Iran Nejad added in his [comment below](https://thebuildingcoder.typepad.com/blog/2023/01/cultureinfochanger-and-ironpython3.html#comment-6080745754):
+
+> We added [IronPython3 to pyRevit work-in-progress](https://discourse.pyrevitlabs.io/t/ironpython-3-4-0/1310) as well...
+
