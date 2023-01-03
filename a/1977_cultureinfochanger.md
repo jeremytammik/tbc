@@ -45,9 +45,19 @@ Topics to begin
 
 linkedin:
 
+Happy New Year 2023!
 
+Sizing MEP connectors, bulk reloading families and RevitPythonShell with IronPython3 in the #RevitAPI
 
-#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+https://autode.sk/sizeconnector
+
+- Copy as HTML 2022
+- Size MEP connector with <code>CultureInfoChanger</code>
+- Journal files AU class
+- Bulk reload families with <code>IFamilyLoadOptions</code>
+- IronPython3, APS and RPS...
+
+#bim #DynamoBim #AutodeskAPS #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 
