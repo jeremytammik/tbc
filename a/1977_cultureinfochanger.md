@@ -81,7 +81,7 @@ I also needed to update my C# source code colouriser.
 The last time was the
 [Copy as HTML update](https://thebuildingcoder.typepad.com/blog/2021/11/revit-20221-sdk-revitlookup-build-and-install.html#7) in November 2021 using the Productivity Power Tools 2017/2019.
 
-This time around, I switched to a new extension, Copy As HTML 2022 by Tim Mathias:
+This time around, I switched to a new extension, Copy as HTML 2022 by Tim Mathias:
 
 > Copy selected code in HTML format while preserving syntax highlighting, indentation, background colour and font.
 Options: Max Height, Title Block, Alternating Lines, Line Numbers, Wrap Lines, Un-indent, Background Colour, Class Names.
@@ -260,7 +260,7 @@ Chuong Ho shared some exciting news on IronPython3, APS and RPS.
 RPS is the beloved [RevitPythonShell](ttps://github.com/architecture-building-systems/revitpythonshell) that
 adds an IronPython interpreter to Revit and lets you to write plugins for Revit in Python.
 Even better, it provides you with an interactive shell that lets you see the results of your code as you type it.
-This is great for exploring the Revit API while writing your Revit Addins, escpecially in combination with
+This is great for exploring the Revit API while writing your Revit Addins, especially in combination with
 the [RevitLookup database exploration tool](https://github.com/jeremytammik/RevitLookup).
 
 APS is the [CADPythonShell](https://github.com/chuongmep/CadPythonShell), a fork of RevitPythonShell, bringing an IronPython interpreter to AutoCAD as well.
