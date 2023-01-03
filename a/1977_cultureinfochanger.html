@@ -62,17 +62,28 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 <h3>CultureInfoChanger</h3>
 <p>Happy New Year 2023!</p>
-<h4><a name="2"></a></h4>
-<h4><a name="3"></a></h4>
+<h4><a name="6"></a> Copy as HTML 2022</h4>
+<p>After moving to the new Mac and switching to Visual Studio 2022, I also need to update my C# source code colorisr.</p>
+<p>The last time was the
+<a href="https://thebuildingcoder.typepad.com/blog/2021/11/revit-20221-sdk-revitlookup-build-and-install.html#7">Copy as HTML update</a> in November 2021 using the Productivity Power Tools 2017/2019.</p>
+<p>This time around, I switched to a new extension, Copy As HTML 2022 by Tim Mathias:</p>
+<blockquote>
+<p>Copy selected code in HTML format while preserving syntax highlighting, indentation, background colour and font.
+Options: Max Height, Title Block, Alternating Lines, Line Numbers, Wrap Lines, Un-indent, Background Colour, Class Names.
+Converts RTF, outputted by VS, into HTML.</p>
+</blockquote>
 <p><center>
-<img src="img/.png" alt="" title="" width="800"/>  <!-- 3168 × 1320 pixels -->
+<img src="img/copyashtml2022.png" alt="Copy As HTML 2022" title="Copy As HTML 2022" width="300"/>  <!-- 586 × 1206 pixels -->
 </center></p>
+<p>I also updated <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> for VS 2022, in
+<a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2023.1.153.5">release 2023.1.153.5</a>.</p>
 <h4><a name="2"></a> Size MEP Connector with CultureInfoChanger</h4>
 <p>Luiz Henrique <a href="https://github.com/ricaun">@ricaun</a> Cassettari implemented a nice workaround to solve the problem raised in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 being <a href="https://forums.autodesk.com/t5/revit-api-forum/unable-to-size-mep-connectors-with-revit-2021/m-p/9609260">unable to size MEP connectors with Revit 2021</a>.</p>
 <p><i>Ekaterina.kudelina.beam</i> noticed that switching the <code>CurrentCulture</code> from <code>de-DE</code> to <code>en-EN</code> makes it possible to change connector size in a project. <i>Ricaun</i> made use of this observation to implement a <code>CultureInfoChanger</code> derived from <code>IDisposable</code> that can be used to wrap the setting, temporarily changing <code>CultureInfo</code> to English and resetting it back to the original when disposed:</p>
-<pre class="code">
+<!--
+
 /// <summary>
 /// CultureInfoChanger
 /// </summary>
@@ -97,11 +108,11 @@ public class CultureInfoChanger : IDisposable
         CultureInfo.CurrentCulture = CultureInfo;
     }
 }
-</pre>
+
+-->
 
 <div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
-<div style="background-color: #ffffff; color: #000000; max-height: 300px; overflow: auto; padding: 2px 5px;"><br>
-<span style="color:#808080">///</span><span style="color:#008000"> </span><span style="color:#808080">&lt;summary&gt;</span><br>
+<div style="background-color: #ffffff; color: #000000; max-height: 300px; overflow: auto; padding: 2px 5px;"><span style="color:#808080">///</span><span style="color:#008000"> </span><span style="color:#808080">&lt;summary&gt;</span><br>
 <span style="color:#808080">///</span><span style="color:#008000"> CultureInfoChanger</span><br>
 <span style="color:#808080">///</span><span style="color:#008000"> </span><span style="color:#808080">&lt;/summary&gt;</span><br>
 <span style="color:#0000ff">public</span> <span style="color:#0000ff">class</span> <span style="color:#2b91af">CultureInfoChanger</span> : IDisposable<br>
@@ -128,6 +139,8 @@ public class CultureInfoChanger : IDisposable
 </div>
 
 <p>The code could be something like this.</p>
+<!--
+
 <pre class="code">
 using (new CultureInfoChanger())
 {
@@ -135,7 +148,18 @@ using (new CultureInfoChanger())
 }
 </pre>
 
-<p>An extension should be perfect in this case, some SetRadius, SetWidth, and SetHeight.</p>
+-->
+
+<div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
+<div style="background-color: #ffffff; color: #000000; max-height: 300px; overflow: auto; padding: 2px 5px;"><span style="color:#0000ff">using</span> (<span style="color:#0000ff">new</span> CultureInfoChanger())<br>
+{<br>
+&#160; connector.Radius = 0.5;<br>
+}</div>
+</div>
+
+<p>An extension should be perfect in this case, some <code>SetRadius</code>, <code>SetWidth</code>, and <code>SetHeight</code>.</p>
+<!--
+
 <pre class="code">
   connector.SetRadius(0.5);
   connector.SetHeight(0.5);
@@ -155,8 +179,30 @@ public static void SetRadius(this Connector connector, double radius)
 }
 </pre>
 
+-->
+
+<div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
+<div style="background-color: #ffffff; color: #000000; max-height: 300px; overflow: auto; padding: 2px 5px;">
+&#160; connector.SetRadius(0.5);<br>
+&#160; connector.SetHeight(0.5);<br>
+&#160; connector.SetWidth(0.5);<br>
+<br>
+<span style="color:#808080">///</span><span style="color:#008000"> </span><span style="color:#808080">&lt;summary&gt;</span><br>
+<span style="color:#808080">///</span><span style="color:#008000"> Set the radius of the connector. </span><br>
+<span style="color:#808080">///</span><span style="color:#008000"> </span><span style="color:#808080">&lt;/summary&gt;</span><br>
+<span style="color:#808080">///</span><span style="color:#008000"> </span><span style="color:#808080">&lt;param</span> <span style="color:#808080">name=&quot;</span>connector<span style="color:#808080">&quot;&gt;&lt;/param&gt;</span><br>
+<span style="color:#808080">///</span><span style="color:#008000"> </span><span style="color:#808080">&lt;param</span> <span style="color:#808080">name=&quot;</span>radius<span style="color:#808080">&quot;&gt;&lt;/param&gt;</span><br>
+<span style="color:#0000ff">public</span> <span style="color:#0000ff">static</span> <span style="color:#0000ff">void</span> SetRadius(<span style="color:#0000ff">this</span> Connector connector, <span style="color:#0000ff">double</span> radius)<br>
+{<br>
+&#160; <span style="color:#0000ff">using</span> (<span style="color:#0000ff">new</span> CultureInfoChanger())<br>
+&#160; {<br>
+&#160;&#160;&#160; connector.Radius = radius;<br>
+&#160; }<br>
+}</div>
+</div>
+
 <p>The source code for the full extension with a command sample is provided in
-the <a href="https://gist.github.com/ricaun/693470e914295786fa62a2be6c67e662">ConnectorSetValueExtension.cs gist</a>:</p>
+<a href="https://gist.github.com/ricaun/693470e914295786fa62a2be6c67e662">Ricaun's ConnectorSetValueExtension.cs gist</a>:</p>
 <blockquote>
 <p>Connector Set Value Extension for Revit to 'fix' the ArgumentOutOfRangeException when setting Radius, Width, and Height.</p>
 </blockquote>
@@ -181,22 +227,6 @@ https://forums.autodesk.com/t5/revit-api-forum/journal-step-by-step/m-p/11625744
 There is this Autodesk University class about Journal Files.
 Revit Journal Files: They Aren’t Just for Autodesk Support:
 https://www.autodesk.com/autodesk-university/class/Revit-Journal-Files-They-Arent-Just-Autodesk-Support-2018#video</p>
-<h4><a name="6"></a> Copy as HTML Update</h4>
-<p><a href="https://thebuildingcoder.typepad.com/blog/2021/11/revit-20221-sdk-revitlookup-build-and-install.html#7">Copy as HTML Update</a></p>
-<p>With the revamped version of The Building Coder Samples, I also finally moved from Visual Studio 2017 to 2019 to compile it.
-I hope I am the last of the Revit add-in developer community to do so.</p>
-<p>It lacked the <code>Copy as HTML</code> option that I use for C# source code colourisation, so I revisited my 2019 note
-on <a href="https://thebuildingcoder.typepad.com/blog/2019/09/face-intersect-face-is-unbounded.html#5">updating Copy as HTML</a> and
-again installed
-the <a href="https://marketplace.visualstudio.com/items?itemName=VisualStudioPlatformTeam.ProductivityPowerPack2017">Productivity Power Tools 2017/2019</a> via
-Extensions &gt; Manage Extensions.</p>
-<p>Copy As HTML 2022
-1/3/2023 9:02:28 AM -   Author             : Tim Mathias</p>
-<blockquote>
-<p>Copy selected code in HTML format while preserving syntax highlighting, indentation, background colour and font. Options: Max Height, Title Block, Alternating Lines, Line Numbers, Wrap Lines, Un-indent, Background Colour, Class Names. Converts RTF, outputted by VS, into HTML.</p>
-</blockquote>
-<p>copyashtml2022.png 586 × 1206 pixels</p>
-<p>Also upated The Building Coder samples for VS 2022.</p>
 <h4><a name="7"></a> ChatGPT in academia:</h4>
 <p>ChatGPT in academia:
 https://academia.stackexchange.com/questions/191643/how-should-a-faculty-deal-with-the-problem-of-artificial-intelligence-ai-gener?utm_source=Iterable</p>

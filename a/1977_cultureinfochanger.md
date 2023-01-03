@@ -80,7 +80,7 @@ Options: Max Height, Title Block, Alternating Lines, Line Numbers, Wrap Lines, U
 Converts RTF, outputted by VS, into HTML.
 
 <center>
-<img src="img/copyashtml2022.png" alt="" title="" width="500"/>  <!-- 586 × 1206 pixels -->
+<img src="img/copyashtml2022.png" alt="Copy As HTML 2022" title="Copy As HTML 2022" width="300"/>  <!-- 586 × 1206 pixels -->
 </center>
 
 I also updated [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) for VS 2022, in
@@ -94,6 +94,35 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 being [unable to size MEP connectors with Revit 2021](https://forums.autodesk.com/t5/revit-api-forum/unable-to-size-mep-connectors-with-revit-2021/m-p/9609260).
 
 <i>Ekaterina.kudelina.beam</i> noticed that switching the `CurrentCulture` from `de-DE` to `en-EN` makes it possible to change connector size in a project. <i>Ricaun</i> made use of this observation to implement a `CultureInfoChanger` derived from `IDisposable` that can be used to wrap the setting, temporarily changing `CultureInfo` to English and resetting it back to the original when disposed:
+
+<!--
+
+/// <summary>
+/// CultureInfoChanger
+/// </summary>
+public class CultureInfoChanger : IDisposable
+{
+    private readonly CultureInfo CultureInfo;
+
+    /// <summary>
+    /// CultureInfoChanger
+    /// </summary>
+    /// <param name="name"></param>
+    public CultureInfoChanger(string name = "en")
+    {
+        CultureInfo = CultureInfo.CurrentCulture;
+        CultureInfo.CurrentCulture = new CultureInfo(name);
+    }
+    /// <summary>
+    /// Dispose
+    /// </summary>
+    public void Dispose()
+    {
+        CultureInfo.CurrentCulture = CultureInfo;
+    }
+}
+
+-->
 
 <div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
 <div style="background-color: #ffffff; color: #000000; max-height: 300px; overflow: auto; padding: 2px 5px;"><span style="color:#808080">///</span><span style="color:#008000"> </span><span style="color:#808080">&lt;summary&gt;</span><br>
@@ -122,14 +151,9 @@ being [unable to size MEP connectors with Revit 2021](https://forums.autodesk.co
 }</div>
 </div>
 
-
-
-
-
-
-
-
 The code could be something like this.
+
+<!--
 
 <pre class="code">
 using (new CultureInfoChanger())
@@ -138,7 +162,18 @@ using (new CultureInfoChanger())
 }
 </pre>
 
-An extension should be perfect in this case, some SetRadius, SetWidth, and SetHeight.
+-->
+
+<div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
+<div style="background-color: #ffffff; color: #000000; max-height: 300px; overflow: auto; padding: 2px 5px;"><span style="color:#0000ff">using</span> (<span style="color:#0000ff">new</span> CultureInfoChanger())<br>
+{<br>
+&#160; connector.Radius = 0.5;<br>
+}</div>
+</div>
+
+An extension should be perfect in this case, some `SetRadius`, `SetWidth`, and `SetHeight`.
+
+<!--
 
 <pre class="code">
   connector.SetRadius(0.5);
@@ -159,8 +194,32 @@ public static void SetRadius(this Connector connector, double radius)
 }
 </pre>
 
+-->
+
+
+<div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
+<div style="background-color: #ffffff; color: #000000; max-height: 300px; overflow: auto; padding: 2px 5px;">
+&#160; connector.SetRadius(0.5);<br>
+&#160; connector.SetHeight(0.5);<br>
+&#160; connector.SetWidth(0.5);<br>
+<br>
+<span style="color:#808080">///</span><span style="color:#008000"> </span><span style="color:#808080">&lt;summary&gt;</span><br>
+<span style="color:#808080">///</span><span style="color:#008000"> Set the radius of the connector. </span><br>
+<span style="color:#808080">///</span><span style="color:#008000"> </span><span style="color:#808080">&lt;/summary&gt;</span><br>
+<span style="color:#808080">///</span><span style="color:#008000"> </span><span style="color:#808080">&lt;param</span> <span style="color:#808080">name=&quot;</span>connector<span style="color:#808080">&quot;&gt;&lt;/param&gt;</span><br>
+<span style="color:#808080">///</span><span style="color:#008000"> </span><span style="color:#808080">&lt;param</span> <span style="color:#808080">name=&quot;</span>radius<span style="color:#808080">&quot;&gt;&lt;/param&gt;</span><br>
+<span style="color:#0000ff">public</span> <span style="color:#0000ff">static</span> <span style="color:#0000ff">void</span> SetRadius(<span style="color:#0000ff">this</span> Connector connector, <span style="color:#0000ff">double</span> radius)<br>
+{<br>
+&#160; <span style="color:#0000ff">using</span> (<span style="color:#0000ff">new</span> CultureInfoChanger())<br>
+&#160; {<br>
+&#160;&#160;&#160; connector.Radius = radius;<br>
+&#160; }<br>
+}</div>
+</div>
+
+
 The source code for the full extension with a command sample is provided in
-the [ConnectorSetValueExtension.cs gist](https://gist.github.com/ricaun/693470e914295786fa62a2be6c67e662):
+[Ricaun's ConnectorSetValueExtension.cs gist](https://gist.github.com/ricaun/693470e914295786fa62a2be6c67e662):
 
 > Connector Set Value Extension for Revit to 'fix' the ArgumentOutOfRangeException when setting Radius, Width, and Height.
 
