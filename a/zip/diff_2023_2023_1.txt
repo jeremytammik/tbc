@@ -1,0 +1,41 @@
+/Users/jta/a/lib/revit/jeremy/diff_2023_2023_1.txt
+
+cd /Users/jta/a/lib/revit/
+
+Remove binary sample models:
+
+ffrm "*.rvt"
+ffrm "*.rfa"
+
+/Users/jta/a/lib/revit % du 2023.1 | cut -d / -f2- > jeremy/du2023_1.txt
+
+Comparing directories only:
+
+cd /Users/jta/a/lib/revit/jeremy/
+
+% diff du2023.txt du2023_1.txt >> diff_2023_2023_1.txt
+
+842c842
+< 2023
+---
+> 542280	2023.1
+
+Comparing files and directories:
+
+cd /Users/jta/a/lib/revit/2023.1/
+find . | sort  > ../jeremy/ff2023_1.txt
+diff ff2023.txt ff2023_1.txt >> diff_2023_2023_1.txt
+
+1009a1010
+> ./Samples/ContextualAnalyticalModel/CS/CreateAnalyticalCurvedPanel.cs
+1966c1967
+< ./Samples/GeometryAPI/GeometryCreation_BooleanOperation/CS/AnalysisVisualizationFramework .cs
+---
+> ./Samples/GeometryAPI/GeometryCreation_BooleanOperation/CS/AnalysisVisualizationFramework.cs
+3913d3913
+< ./ff2023.txt
+
+One new C# sample module: CreateAnalyticalCurvedPanel.cs
+
+Extraneous space removed in the AnalysisVisualizationFramework.cs module filename
+
