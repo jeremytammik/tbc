@@ -30,7 +30,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Revit 2023.1 SDK and VS 2022 Add-In Wizard</h3>
+<h3>SDK, Add-In Wizard and TrackChanges Updates</h3>
 <p>Analysing the recent Revit SDK update, and still setting up my new Mac PC:</p>
 <ul>
 <li><a href="#2">Revit 2023.1 SDK update</a></li>
@@ -41,8 +41,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>An update of the Revit SDK has been released for Revit 2023.1 to
 the <a href="https://www.autodesk.com/developer-network/platform-technologies/revit">Revit Developer Center autodesk.com/developrevit</a>.</p>
 <p>I installed and compared it with the original Revit 2023 SDK and detected
-only <a href="zip/diff_2023_2023_1.txt">very small differences</a>:</p>
-<p>Comparing directories only indicates no changes whatsoever in the folder structure:</p>
+only <a href="zip/diff_2023_2023_1.txt">very small differences</a>.</p>
+<p>Comparing only directories indicates no changes whatsoever in the folder structure:</p>
 <pre>
 % diff du2023.txt du2023_1.txt
 
@@ -79,7 +79,7 @@ First, Visual Studio 2022 prompted me to update it to version 17.4.3.
 <code>install.bat</code> was set up to copy the template zip files to the <code>C:</code> drive, which required me to modify
 the <a href="https://thebuildingcoder.typepad.com/blog/2022/10/bim360-links-and-programming-add-ins.html#6">VS wizard template location</a> last
 time I tried.
-I then noticed that the <code>\\mac\</code> folder actuaslly maps to my <code>Y:</code> drive and left the VS Options setting as is.
+I then noticed that the <code>\\mac\</code> folder actually maps to my <code>Y:</code> drive and left the VS Options setting as is.
 I also <a href="https://learn.microsoft.com/en-us/answers/questions/714454/location-of-visual-studio-2022-project-template-ca.html">cleared the Visual Studio 2022 project template cache</a>.
 Without really knowing which of these steps was required and which was not, I ended up with a working template in the end:</p>
 <p><center>
@@ -111,7 +111,7 @@ Can Revit journals be queried to determine how much actual work happened during 
 </ul>
 
 <p><strong>Response:</strong> Thanks very much, Mr. T.!
-I am acutely aware that discussing this sort of tracking can seem like shades of Big Brother, but in defense of company management, since they are paying money to people in exchange for work, management has some right to ensuring that the work is being done.
+I am acutely aware that discussing this sort of tracking can seem like shades of Big Brother, but in defence of company management, since they are paying money to people in exchange for work, management has some right to ensuring that the work is being done.
 How management then uses that information is a separate consideration, of course.
 Thanks again, sir.</p>
 <p><strong>Answer:</strong> Yup, such is the world we inhabit and co-create.
