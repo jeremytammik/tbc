@@ -35,7 +35,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 
 
-####<a name="2"></a> 
+####<a name="2"></a> Happy Year of the Rabbit
+
+- year of the rabbit
+  "Xīnnián hǎo" (新年好)
+  Chinese Spring Festival is coming this weekend.  
+  In lunar calendar, 2023 is Rabbit Year. The sign of Rabbit is a symbol of longevity, peace, and prosperity in Chinese culture. 2023 is predicted to be a year of hope, especially after long pandemic period…
+  Wish all of us more healthy, energetic and happy in the new year! 😊
 
 ####<a name="3"></a> 
 
