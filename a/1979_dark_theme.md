@@ -56,7 +56,7 @@ We recently announced internal thoughts
 on [possibly converting the internal representation of Revit element ids from 32 to 64 bit in a future release of Revit](https://thebuildingcoder.typepad.com/blog/2022/11/64-bit-element-ids-maybe.html).
 
 In a similar vein, here is another internal topic being pondered.
-PLease note the important safe harbor statement concerning these thoughts:
+Please note the important safe harbor statement concerning these thoughts:
  
 > Roadmaps are plans, not promises.
 We’re as excited as you to see new functionality make it into the products, but the development, releases, and timing of any features or functionality remains at our sole discretion.
@@ -77,16 +77,16 @@ If you choose this option, Revit will use the Windows color scheme and switch to
 Light:
 
 <center>
-<img src="img/dark_theme_2.png" alt="Dark theme &ndash; light" title="Dark theme &ndash; light" width="624"/> <!-- 624 × 162 pixels -->
+<img src="img/dark_theme_2.png" alt="Dark theme &ndash; light" title="Dark theme &ndash; light" width="500"/> <!-- 624 × 162 pixels -->
 </center>
 
 Dark:
 
 <center>
-<img src="img/dark_theme_3.png" alt="Dark theme &ndash; dark" title="Dark theme &ndash; dark" width="624"/> <!-- 624 × 160 pixels -->
+<img src="img/dark_theme_3.png" alt="Dark theme &ndash; dark" title="Dark theme &ndash; dark" width="500"/> <!-- 624 × 160 pixels -->
 </center>
 
-The UI Active Theme options can define other colour settings to override the default settings:
+The UI Active Theme options can define other colour settings to override the default ones:
 
 <center>
 <img src="img/dark_theme_1.png" alt="Dark theme" title="Dark theme" width="584"/> <!-- 584 × 692 pixels -->
@@ -104,86 +104,43 @@ New properties and events may be added for dark theme support:
 
 ####<a name="2.3"></a> Dark Theme Add-In Considerations
 
-Here are examples of the default dark theme ribbon background and button colour settings:
+Here are samples of the default dark theme ribbon background and button colour settings:
 
 Light ribbon background:
 
 <center>
-<img src="img/dark_theme_4.png" alt="Dark theme &ndash; light ribbon background" title="Dark theme &ndash; light ribbon background" width="508"/> <!-- 508 × 160 pixels -->
+<img src="img/dark_theme_4.png" alt="Dark theme &ndash; light ribbon background" title="Dark theme &ndash; light ribbon background" width="500"/> <!-- 508 × 160 pixels -->
 </center>
 
 Dark ribbon background:
 
 <center>
-<img src="img/dark_theme_5.png" alt="Dark theme &ndash; light ribbon background" title="Dark theme &ndash; light ribbon background" width="496"/> <!-- 496 × 160 pixels -->
+<img src="img/dark_theme_5.png" alt="Dark theme &ndash; light ribbon background" title="Dark theme &ndash; light ribbon background" width="500"/> <!-- 496 × 160 pixels -->
 </center>
  
 Light ribbon buttons:
 
 <center>
-<img src="img/dark_theme_6.png" alt="Dark theme &ndash; light ribbon button" title="Dark theme &ndash; light ribbon button" width="1430"/> <!-- 1430 × 415 pixels -->
+<img src="img/dark_theme_6.png" alt="Dark theme &ndash; light ribbon buttons" title="Dark theme &ndash; light ribbon buttons" width="1200"/> <!-- 1430 × 415 pixels -->
 </center>
 
 Dark ribbon buttons:
 
 <center>
-<img src="img/dark_theme_7.png" alt="Dark theme &ndash; dark ribbon button" title="Dark theme &ndash; dark ribbon button" width="1430"/> <!-- 1430 × 394 pixels -->
+<img src="img/dark_theme_7.png" alt="Dark theme &ndash; dark ribbon buttons" title="Dark theme &ndash; dark ribbon buttons" width="1200"/> <!-- 1430 × 394 pixels -->
 </center>
  
-- Size: small button &ndash; 16x16px, large button &ndash; 32x32px
+- Small button size: 16x16px
+- Large button size: 32x32px
 - Resolution: 96 DPI
 - Icons
 
 ####<a name="2.4"></a> Code Example: Handling Themed Ribbon Icons
 
-internal class TestRibbon : IExternalApplication
-{
-    private PushButton m_ribbonBtn;
-    public Result OnStartup(UIControlledApplication application)
-    {
-        var ribbonPanel = application.CreateRibbonPanel("33900745-04F5-4CC2-9BAC-3230716E3A54", "Test");
-        var buttonData = new PushButtonData("Test", "Test", typeof(CmdEntry).Assembly.Location, typeof(CmdEntry).FullName);
-        buttonData.AvailabilityClassName = typeof(CmdEntry).FullName;
-        m_ribbonBtn = ribbonPanel.AddItem(buttonData) as PushButton;
-        updateImageByTheme();
-        application.ThemeChanged += ThemeChanged;
-        return Result.Succeeded;
-    }
-    private void setButtonImage(string pic, string largePic)
-    {
-        var assemblyLocation = typeof(TestRibbon).Assembly.Location;
-        var assemblyDirectory = Path.GetDirectoryName(assemblyLocation);
-        var imagePath = Path.Combine(assemblyDirectory, pic);
-        var largeImagePath = Path.Combine(assemblyDirectory, largePic);
-        if (File.Exists(imagePath))
-            m_ribbonBtn.Image = new System.Windows.Media.Imaging.BitmapImage(new Uri(imagePath));
-        if (File.Exists(largeImagePath))
-            m_ribbonBtn.LargeImage = new System.Windows.Media.Imaging.BitmapImage(new Uri(largeImagePath));
-    }
-    private void updateImageByTheme()
-    {
-        UITheme theme = UIThemeManager.CurrentTheme;
-        switch (theme)
-        {
-            case UITheme.Dark:
-                setButtonImage("dark.png", "darkLarge.png");
-                break;
-            case UITheme.Light:
-                setButtonImage("light.png", "lightLarge.png");
-                break;
-        }
-    }
-    private void ThemeChanged(object sender, Autodesk.Revit.UI.Events.ThemeChangedEventArgs e)
-    {
-        updateImageByTheme();
-    }
-}
-
 
 <div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
-<div style="background: #000080; color: #fff; font-family: Verdana, Tahoma, Arial, sans-serif; font-weight: bold; padding: 2px 5px">Code Snippet</div>
-<div style="background: #f3f3f3; color: #000000; max-height: 300px; overflow: auto">
-<ol start="18" style="background: #ffffff; margin: 0 0 0 3em; padding: 0;">
+<div style="background: #f3f3f3; color: #000000; max-height: 500px; overflow: auto">
+<ol start="18" style="background: #ffffff; margin: 0; padding: 0;">
 <li><span style="color:#0000ff">internal</span> <span style="color:#0000ff">class</span> <span style="color:#2b91af">TestRibbon</span> : IExternalApplication</li>
 <li style="background: #f3f3f3">{</li>
 <li>&#160; <span style="color:#0000ff">private</span> PushButton m_ribbonBtn;</li>
