@@ -1,9 +1,8 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
-</head>
-
+<p></head></p>
 <!---
 
 
@@ -31,112 +30,83 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Dark Theme Possibility Looming
-
-
-Happy New Year of the Rabbit, xīnnián hǎo, 新年好!
-
-<center>
+<h3>Dark Theme Possibility Looming</h3>
+<p>Happy New Year of the Rabbit, xīnnián hǎo, 新年好!</p>
+<p><center>
 <img src="img/2023_year_of_the_rabbit_1.jpg" alt="Happy New Year of the Rabbit!" title="Happy New Year of the Rabbit!" width="400"/> <!-- 800 × 514 pixels -->
-</center>
-
-The Spring Festival is coming up this weekend, starting on Sunday, January 22, celebrating 
-the [Chinese New Year](https://en.wikipedia.org/wiki/Chinese_New_Year) and 
-another [Year of the Rabbit](https://en.wikipedia.org/wiki/Rabbit_(zodiac)).
-
-In the lunar calendar, 2023 is a Water Rabbit Year.
+</center></p>
+<p>The Spring Festival is coming up this weekend, starting on Sunday, January 22, celebrating 
+the <a href="https://en.wikipedia.org/wiki/Chinese_New_Year">Chinese New Year</a> and 
+another <a href="https://en.wikipedia.org/wiki/Rabbit_(zodiac)">Year of the Rabbit</a>.</p>
+<p>In the lunar calendar, 2023 is a Water Rabbit Year.
 The sign of the Rabbit is a symbol of longevity, peace, and prosperity in Chinese culture.
 2023 is predicted to be a year of hope, especially after the long pandemic period.
-Wishing all of us lots of health, energy and happiness in the new year!
-
-
-####<a name="2"></a> Dark Theme Possibility Looming
-
-We recently announced internal thoughts
-on [possibly converting the internal representation of Revit element ids from 32 to 64 bit in a future release of Revit](https://thebuildingcoder.typepad.com/blog/2022/11/64-bit-element-ids-maybe.html).
-
-In a similar vein, here is another internal topic being pondered.
-PLease note the important safe harbor statement concerning these thoughts:
- 
-> Roadmaps are plans, not promises.
+Wishing all of us lots of health, energy and happiness in the new year!</p>
+<h4><a name="2"></a> Dark Theme Possibility Looming</h4>
+<p>We recently announced internal thoughts on possibly switching the</p>
+<p>In a similar vein, here is another</p>
+<p>PLease not the important safe harbor statement:</p>
+<blockquote>
+<p>Roadmaps are plans, not promises.
 We’re as excited as you to see new functionality make it into the products, but the development, releases, and timing of any features or functionality remains at our sole discretion.
-These updates should not be used to make purchasing decisions.
-
-So, the possibility that I would like to present today concerns supporting a Dark Theme UI in Revit add-ins:
-
-####<a name="2.1"></a> Dark Theme Switching
-
-Setting the UI Active Theme will switch the appearance of the Ribbon between light gray and dark blue, with three options:
-
-- Light
-- Dark 
-- Use system setting
+These updates should not be used to make purchasing decisions.</p>
+</blockquote>
+<p>So, the possibility that I would like to present today concers supporting Dark Theme in Revit add-ins:</p>
+<h4><a name="2.1"></a> Dark Theme Switching</h4>
+<p>Setting the UI Active Theme will switch the appearance of the Ribbon between light gray and dark blue, with three options:</p>
+<ul>
+<li>Light</li>
+<li>Dark </li>
+<li>Use system setting
 &ndash; Windows supports light and dark color schemes.
-If you choose this option, Revit will use the Windows color scheme and switch to a matching theme accordingly.
-
-Light:
-
-<center>
+If you choose this option, Revit will use the Windows color scheme and switch to a matching theme accordingly.</li>
+</ul>
+<p>Light:</p>
+<p><center>
 <img src="img/dark_theme_2.png" alt="Dark theme &ndash; light" title="Dark theme &ndash; light" width="624"/> <!-- 624 × 162 pixels -->
-</center>
-
-Dark:
-
-<center>
+</center></p>
+<p>Dark:</p>
+<p><center>
 <img src="img/dark_theme_3.png" alt="Dark theme &ndash; dark" title="Dark theme &ndash; dark" width="624"/> <!-- 624 × 160 pixels -->
-</center>
-
-The UI Active Theme options can define other colour settings to override the default settings:
-
-<center>
+</center></p>
+<p>The UI Active Theme options can define other colour settings to override the default settings:</p>
+<p><center>
 <img src="img/dark_theme_1.png" alt="Dark theme" title="Dark theme" width="584"/> <!-- 584 × 692 pixels -->
-</center>
- 
-####<a name="2.2"></a> Dark Theme API Information
-
-New properties and events may be added for dark theme support:
-
-- ThemeChangedEventArgs &ndash; Arguments for the ThemeChanged event
-- UIThemeManager.CurrentTheme &ndash; Allows you to set /get the overall theme for the Revit session
-- UIThemeManager.FollowSystemColorTheme &ndash; Allows you to set /get if the overall theme follows operating system color theme 
-- UIThemeManager.CurrentCanvasTheme &ndash; Allows you to set/get a canvas theme for the current Revit session (as opposed to the default theme)
-- ColorOption &ndash; Allows you to set/get the colors in the current canvas theme
-
-####<a name="2.3"></a> Dark Theme Add-In Considerations
-
-Here are examples of the default dark theme ribbon background and button colour settings:
-
-Light ribbon background:
-
-<center>
+</center></p>
+<h4><a name="2.2"></a> Dark Theme API Information</h4>
+<p>New properties and events may be added for dark theme support:</p>
+<ul>
+<li>ThemeChangedEventArgs &ndash; Arguments for the ThemeChanged event</li>
+<li>UIThemeManager.CurrentTheme &ndash; Allows you to set /get the overall theme for the Revit session</li>
+<li>UIThemeManager.FollowSystemColorTheme &ndash; Allows you to set /get if the overall theme follows operating system color theme </li>
+<li>UIThemeManager.CurrentCanvasTheme &ndash; Allows you to set/get a canvas theme for the current Revit session (as opposed to the default theme)</li>
+<li>ColorOption &ndash; Allows you to set/get the colors in the current canvas theme</li>
+</ul>
+<h4><a name="2.3"></a> Dark Theme Add-In Considerations</h4>
+<p>Here are examples of the default dark theme ribbon background and button colour settings:</p>
+<p>Light ribbon background:</p>
+<p><center>
 <img src="img/dark_theme_4.png" alt="Dark theme &ndash; light ribbon background" title="Dark theme &ndash; light ribbon background" width="508"/> <!-- 508 × 160 pixels -->
-</center>
-
-Dark ribbon background:
-
-<center>
+</center></p>
+<p>Dark ribbon background:</p>
+<p><center>
 <img src="img/dark_theme_5.png" alt="Dark theme &ndash; light ribbon background" title="Dark theme &ndash; light ribbon background" width="496"/> <!-- 496 × 160 pixels -->
-</center>
- 
-Light ribbon buttons:
-
-<center>
+</center></p>
+<p>Light ribbon buttons:</p>
+<p><center>
 <img src="img/dark_theme_6.png" alt="Dark theme &ndash; light ribbon button" title="Dark theme &ndash; light ribbon button" width="1430"/> <!-- 1430 × 415 pixels -->
-</center>
-
-Dark ribbon buttons:
-
-<center>
+</center></p>
+<p>Dark ribbon buttons:</p>
+<p><center>
 <img src="img/dark_theme_7.png" alt="Dark theme &ndash; dark ribbon button" title="Dark theme &ndash; dark ribbon button" width="1430"/> <!-- 1430 × 394 pixels -->
-</center>
- 
-- Size: small button &ndash; 16x16px, large button &ndash; 32x32px
-- Resolution: 96 DPI
-- Icons
-
-####<a name="2.4"></a> Code Example: Handling Themed Ribbon Icons
-
-internal class TestRibbon : IExternalApplication
+</center></p>
+<ul>
+<li>Size: small button &ndash; 16x16px, large button &ndash; 32x32px</li>
+<li>Resolution: 96 DPI</li>
+<li>Icons</li>
+</ul>
+<h4><a name="2.4"></a> Code Example: Handling Themed Ribbon Icons</h4>
+<p>internal class TestRibbon : IExternalApplication
 {
     private PushButton m_ribbonBtn;
     public Result OnStartup(UIControlledApplication application)
@@ -177,9 +147,7 @@ internal class TestRibbon : IExternalApplication
     {
         updateImageByTheme();
     }
-}
-
-
+}</p>
 <div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
 <div style="background: #000080; color: #fff; font-family: Verdana, Tahoma, Arial, sans-serif; font-weight: bold; padding: 2px 5px">Code Snippet</div>
 <div style="background: #f3f3f3; color: #000000; max-height: 300px; overflow: auto">
@@ -230,18 +198,10 @@ internal class TestRibbon : IExternalApplication
 </div>
 </div>
 
-####<a name="2.5"></a> Dark Theme Additional Notes
-
-Please note that only the 1st level UI supports the dark theme option.
-
-
-
-####<a name="3"></a> 
-
-####<a name="4"></a> 
-
-**Question:** 
-
-**Answer:** 
-
-**Response:** 
+<h4><a name="2.5"></a> Dark Theme Additional Notes</h4>
+<p>Please note that only the 1st level UI supports the dark theme option.</p>
+<h4><a name="3"></a></h4>
+<h4><a name="4"></a></h4>
+<p><strong>Question:</strong> </p>
+<p><strong>Answer:</strong> </p>
+<p><strong>Response:</strong> </p>
