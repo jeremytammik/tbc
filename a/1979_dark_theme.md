@@ -6,7 +6,6 @@
 
 <!---
 
-
 twitter:
 
 Happy New Year of the Rabbit, xīnnián hǎo, 新年好! Pondering the looming possibility of a dark theme in the @AutodeskRevit UI and #RevitAPI #BIM @AutodeskAPS: Dark theme switching, API, icons and code example to handle themed ribbon icons https://autode.sk/darktheme
@@ -66,6 +65,7 @@ In this new year, the Revit development team has another topic to share with us:
 - [Dark theme icons](#2.3)
 - [Code example: handling themed ribbon icons](#2.4)
 - [Dark theme additional notes](#2.5)
+- [Autodesk AEC Public Roadmaps](#3)
 
 ####<a name="2"></a> Dark Theme Possibility Looming
 
@@ -154,7 +154,6 @@ Dark ribbon buttons:
 
 ####<a name="2.4"></a> Code Example: Handling Themed Ribbon Icons
 
-
 <div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
 <div style="background: #f3f3f3; color: #000000; max-height: 500px; overflow: auto">
 <ol start="18" style="background: #ffffff; margin: 0; padding: 0;">
@@ -210,13 +209,49 @@ Please note that only the 1st level UI supports the dark theme option.
 
 <!--
 
-####<a name="3"></a> 
-
-####<a name="4"></a> 
-
 **Question:** 
 
 **Answer:** 
 
 **Response:** 
+
+https://www.btl-blog.com/between_the_lines/2023/01/aec-product-roadmap-ask-me-anything-series-this-week.html
+
+AEC Product Roadmap Ask Me Anything Series This Week
+
+AEC Product Roadmap Ask Me Anything Series This Week
+Join us and learn about highlights from recent releases, including Revit and the AEC Collection and ask the Product Managers and experts about the future of Autodesk AEC products such as Revit, Dynamo, InfraWorks, Civil 3D, ReCap, Structures, and MEP.
+
+Join the conversations!
+
+Tuesday
+Architecture and Platform Product (Revit) Roadmap Ask Me Anything
+Tuesday, January 17, 2023, at 8:00 am PDT
+Computational Design and Automation (Dynamo) Roadmap Ask Me Anything
+Tuesday, January 17, 2023, at 10:00 am PDT
+
+Wednesday:
+Infrastructure Product Roadmap Ask Me Anything
+Wednesday, January 18, 2023, at 8:00 am PDT
+
+Thursday:
+
+Structures Product Roadmap Ask Me Anything
+Thursday, January 19, 2022, at 8:00 am PDT
+MEP Product Roadmap Ask Me Anything
+Thursday, January 19, 2023, at 10:00 am PDT
+
+All these live events will be live in English and have Zoom’s live translation captioning available from English to 11 languages
+
 -->
+
+####<a name="3"></a> Autodesk AEC Public Roadmaps
+
+For more exciting news on possible upcoming product enhancements, check out
+the [Autodesk AEC Public Roadmaps](https://blogs.autodesk.com/revit/roadmap) with dozens of items in each of the sections:
+
+- Revit &ndash; Architecture
+- Revit &ndash; Structures
+- Revit &ndash; MEP
+- Dynamo Public Roadmap
+
