@@ -14,7 +14,8 @@ Happy New Year of the Rabbit, xīnnián hǎo, 新年好! Pondering the looming p
 &ndash; Dark theme switching
 &ndash; API
 &ndash; icons
-&ndash; Code example: handling themed ribbon icons...
+&ndash; Code example: handling themed ribbon icons
+&ndash; New public roadmaps...
 
 linkedin:
 
@@ -40,7 +41,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Dark Theme Possibility Looming
+### New Roadmaps, Dark Theme Possibility Looming
 
 Happy New Year of the Rabbit, xīnnián hǎo, 新年好!
 
