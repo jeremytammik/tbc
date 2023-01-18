@@ -49,6 +49,14 @@ The sign of the Rabbit is a symbol of longevity, peace, and prosperity in Chines
 2023 is predicted to be a year of hope, especially after the long pandemic period.
 Wishing all of us lots of health, energy and happiness in the new year!
 
+In this new year, the Revit development team has another topic to share with us:
+
+- [Dark theme possibility looming](#2)
+- [Dark theme switching](#2.1)
+- [Dark theme API](#2.2)
+- [Dark theme icons](#2.3)
+- [Code example: handling themed ribbon icons](#2.4)
+- [Dark theme additional notes](#2.5)
 
 ####<a name="2"></a> Dark Theme Possibility Looming
 
@@ -92,7 +100,7 @@ The UI Active Theme options can define other colour settings to override the def
 <img src="img/dark_theme_1.png" alt="Dark theme" title="Dark theme" width="584"/> <!-- 584 × 692 pixels -->
 </center>
  
-####<a name="2.2"></a> Dark Theme API Information
+####<a name="2.2"></a> Dark Theme API
 
 New properties and events may be added for dark theme support:
 
@@ -102,7 +110,7 @@ New properties and events may be added for dark theme support:
 - UIThemeManager.CurrentCanvasTheme &ndash; Allows you to set/get a canvas theme for the current Revit session (as opposed to the default theme)
 - ColorOption &ndash; Allows you to set/get the colors in the current canvas theme
 
-####<a name="2.3"></a> Dark Theme Add-In Considerations
+####<a name="2.3"></a> Dark Theme Icons
 
 Here are samples of the default dark theme ribbon background and button colour settings:
 

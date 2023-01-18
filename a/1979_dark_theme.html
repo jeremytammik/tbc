@@ -42,11 +42,20 @@ another <a href="https://en.wikipedia.org/wiki/Rabbit_(zodiac)">Year of the Rabb
 The sign of the Rabbit is a symbol of longevity, peace, and prosperity in Chinese culture.
 2023 is predicted to be a year of hope, especially after the long pandemic period.
 Wishing all of us lots of health, energy and happiness in the new year!</p>
+<p>In this new year, the Revit development team has another topic to share with us:</p>
+<ul>
+<li><a href="#2">Dark theme possibility looming</a></li>
+<li><a href="#2.1">Dark theme switching</a></li>
+<li><a href="#2.2">Dark theme API</a></li>
+<li><a href="#2.3">Dark theme icons</a></li>
+<li><a href="#2.4">Code example: handling themed ribbon icons</a></li>
+<li><a href="#2.5">Dark theme additional notes</a></li>
+</ul>
 <h4><a name="2"></a> Dark Theme Possibility Looming</h4>
 <p>We recently announced internal thoughts
 on <a href="https://thebuildingcoder.typepad.com/blog/2022/11/64-bit-element-ids-maybe.html">possibly converting the internal representation of Revit element ids from 32 to 64 bit in a future release of Revit</a>.</p>
 <p>In a similar vein, here is another internal topic being pondered.
-PLease note the important safe harbor statement concerning these thoughts:</p>
+Please note the important safe harbor statement concerning these thoughts:</p>
 <blockquote>
 <p>Roadmaps are plans, not promises.
 We’re as excited as you to see new functionality make it into the products, but the development, releases, and timing of any features or functionality remains at our sole discretion.
@@ -74,7 +83,7 @@ If you choose this option, Revit will use the Windows color scheme and switch to
 <p><center>
 <img src="img/dark_theme_1.png" alt="Dark theme" title="Dark theme" width="584"/> <!-- 584 × 692 pixels -->
 </center></p>
-<h4><a name="2.2"></a> Dark Theme API Information</h4>
+<h4><a name="2.2"></a> Dark Theme API</h4>
 <p>New properties and events may be added for dark theme support:</p>
 <ul>
 <li>ThemeChangedEventArgs &ndash; Arguments for the ThemeChanged event</li>
@@ -83,7 +92,7 @@ If you choose this option, Revit will use the Windows color scheme and switch to
 <li>UIThemeManager.CurrentCanvasTheme &ndash; Allows you to set/get a canvas theme for the current Revit session (as opposed to the default theme)</li>
 <li>ColorOption &ndash; Allows you to set/get the colors in the current canvas theme</li>
 </ul>
-<h4><a name="2.3"></a> Dark Theme Add-In Considerations</h4>
+<h4><a name="2.3"></a> Dark Theme Icons</h4>
 <p>Here are samples of the default dark theme ribbon background and button colour settings:</p>
 <p>Light ribbon background:</p>
 <p><center>
