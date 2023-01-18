@@ -11,8 +11,11 @@ twitter:
 
  @AutodeskRevit  #RevitAPI  #BIM @AutodeskAPS 
 
-&ndash; 
-...
+Happy New Year of the Rabbit, xīnnián hǎo, 新年好! Pondering the looming possibility of a dark theme in the Revit UI and API
+&ndash; Dark theme switching
+&ndash; API
+&ndash; icons
+&ndash; Code example: handling themed ribbon icons...
 
 linkedin:
 
@@ -32,7 +35,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 ### Dark Theme Possibility Looming
-
 
 Happy New Year of the Rabbit, xīnnián hǎo, 新年好!
 
