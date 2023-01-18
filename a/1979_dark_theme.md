@@ -70,17 +70,17 @@ Please note the important safe harbor statement concerning these thoughts:
 We’re as excited as you to see new functionality make it into the products, but the development, releases, and timing of any features or functionality remains at our sole discretion.
 These updates should not be used to make purchasing decisions.
 
-So, the possibility that I would like to present today concerns supporting a Dark Theme UI in Revit add-ins:
+So, the possibility that I would like to present today concerns supporting the Dark Theme and how to handle it in a Revit add-in:
 
 ####<a name="2.1"></a> Dark Theme Switching
 
-Setting the UI Active Theme will switch the appearance of the Ribbon between light gray and dark blue, with three options:
+Setting the UI Active Theme will switch the appearance of the Ribbon between light grey and dark blue, with three options:
 
 - Light
 - Dark 
 - Use system setting
-&ndash; Windows supports light and dark color schemes.
-If you choose this option, Revit will use the Windows color scheme and switch to a matching theme accordingly.
+&ndash; Windows supports light and dark colour schemes.
+If you choose this option, Revit will use the Windows colour scheme and switch to a matching theme accordingly.
 
 Light:
 
@@ -108,7 +108,7 @@ New properties and events may be added for dark theme support:
 - UIThemeManager.CurrentTheme &ndash; Allows you to set /get the overall theme for the Revit session
 - UIThemeManager.FollowSystemColorTheme &ndash; Allows you to set /get if the overall theme follows operating system color theme 
 - UIThemeManager.CurrentCanvasTheme &ndash; Allows you to set/get a canvas theme for the current Revit session (as opposed to the default theme)
-- ColorOption &ndash; Allows you to set/get the colors in the current canvas theme
+- ColorOption &ndash; Allows you to set/get the colours in the current canvas theme
 
 ####<a name="2.3"></a> Dark Theme Icons
 
@@ -199,7 +199,7 @@ Dark ribbon buttons:
 
 Please note that only the 1st level UI supports the dark theme option.
 
-
+<!--
 
 ####<a name="3"></a> 
 
@@ -210,3 +210,4 @@ Please note that only the 1st level UI supports the dark theme option.
 **Answer:** 
 
 **Response:** 
+-->
