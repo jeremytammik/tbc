@@ -34,14 +34,24 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### Dark Theme Possibility Ahead
 
 
+Happy New Year of the Rabbit, Xīnnián hǎo, 新年好!
+
+<center>
+<img src="img/2023_year_of_the_rabbit_1.jpg" alt="Happy New Year of the Rabbit!" title="Happy New Year of the Rabbit!" width="400"/> <!-- 800 × 514 pixels -->
+</center>
+
+The Spring Festival is already underway / coming up this weekend celebrating 
+the [Chinese New Year](https://en.wikipedia.org/wiki/Chinese_New_Year) and 
+another [Year of the Rabbit](https://en.wikipedia.org/wiki/Rabbit_(zodiac)).
+
+In the lunar calendar, 2023 is a Rabbit Year.
+The sign of the Rabbit is a symbol of longevity, peace, and prosperity in Chinese culture.
+2023 is predicted to be a year of hope, especially after the long pandemic period.
+Wishing all of us lots of health, energy and happiness in the new year!
+
 
 ####<a name="2"></a> Happy Year of the Rabbit
 
-- year of the rabbit
-  "Xīnnián hǎo" (新年好)
-  Chinese Spring Festival is coming this weekend.  
-  In lunar calendar, 2023 is Rabbit Year. The sign of Rabbit is a symbol of longevity, peace, and prosperity in Chinese culture. 2023 is predicted to be a year of hope, especially after long pandemic period…
-  Wish all of us more healthy, energetic and happy in the new year! 😊
 
 ####<a name="3"></a> 
 
