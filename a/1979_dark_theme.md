@@ -66,6 +66,7 @@ In this new year, the Revit development team has another topic to share with us:
 - [Dark theme icons](#2.3)
 - [Code example: handling themed ribbon icons](#2.4)
 - [Dark theme additional notes](#2.5)
+- [Autodesk icon guidelines snapshot](#2.6)
 - [Autodesk AEC Public Roadmaps](#3)
 
 ####<a name="2"></a> Dark Theme Possibility Looming
@@ -207,6 +208,17 @@ Dark ribbon buttons:
 ####<a name="2.5"></a> Dark Theme Additional Notes
 
 Please note that only the 1st level UI supports the dark theme option.
+
+####<a name="2.6"></a> Autodesk Icon Guidelines Snapshot
+
+Prompted by [Luiz'](https://thebuildingcoder.typepad.com/blog/2023/01/dark-theme-possibility-looming.html#comment-6093239283)
+and [Gábor's comments below](https://thebuildingcoder.typepad.com/blog/2023/01/dark-theme-possibility-looming.html#comment-6093873493),
+I acquired and posted an up-to-date snapshot of the current state of the Autodesk icon guidelines including the images above:
+
+- [Autodesk icon guidelines PDF](https://thebuildingcoder.typepad.com/icon/2023-01-20_icon_design_guidelines.pdf)
+- [Zip file including badges and PNG instructiuons](https://thebuildingcoder.typepad.com/icon/2023-01-20_icon_design_guideline.zip)
+
+Thank you for asking, Luiz and Gábor.
 
 <!--
 
