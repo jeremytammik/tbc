@@ -161,7 +161,6 @@ UpdaterRegistry.SetExecutionOrder(previous, last);
 }
 }
 
-
 <div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
 <div style="background: #f3f3f3; color: #000000; max-height: 500px; overflow: auto">
 <ol start="29" style="background: #ffffff; margin: 0; padding: 0;">
@@ -205,7 +204,6 @@ public void SetExecutionOrder(List<IUpdater> updaters)
 		}
 		while (lastLoop == false);
 	}
-
 
 <div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
 <div style="background: #f3f3f3; color: #000000; max-height: 500px; overflow: auto">
@@ -280,7 +278,6 @@ At least until AU 2023 where everything will change! &nbsp; :-)
 Try block not catching owner/permission locks
 https://forums.autodesk.com/t5/revit-api-forum/try-block-not-catching-owner-permission-locks/m-p/11683634#M68596
 
-
 Try block not catching owner/permission locks
 I have a piece of code that's identifying changes in the model and updating a parameter across a number of detail items whenever the parameter's value is no longer accurate. It gathers the list of items to update, then inside of a transaction it uses a try/except block (I'm using pyrevit) so it can update as many of them as possible. The trouble is that if any of the items are checked out by other users I receive a warning and the entire transaction is rolled back. I'd like to catch this warning in the except block, but that doesn't seem to be happening.
 
@@ -293,7 +290,6 @@ for item in items_to_update:
     except:
         print(':cross_mark: {} {} Failed to set Circuit_Count parameter to: {}'.format(item[1],output.linkify(item[0].Id), item[2]))
 t.Commit()
- 
 
 The error I receive looks like "Can't edit the element until [user] resaves the element to central and relinquishes it and you Reload Latest." 
 
@@ -310,47 +306,25 @@ jeremy.tammik
 ‎2022-12-15 02:42 AM 
 So, apparently the transaction is catching the exception internally and aborting. You cannot change that.
 
-  
-
 You could start and commit a separate transaction for each individual call to LookupParameter + Set. Then, you could catch the exception that the aborted transaction is throwing.
-
-  
 
 That would be extremely inefficient.
 
-  
-
 Furthermore, the call to LookupParameter alone is inefficient as well. Why? Because it loops through all parameters and uses a string comparison on each.
-
-  
 
 A more efficient solution to avoid calling LookupParameter inside the loop would be to call it once only before you start looping and use it to retrieve the Parameter object's Definition object:
 
-  
-
 https://www.revitapidocs.com/2023/dc30c65f-cfc4-244e-5a5c-bc333d7cd4c5.htm
-
-  
 
 Then, you can very efficiently retrieve the parameter from the element directly without searching for it using Element.Parameter(Definition):
 
-  
-
 https://www.revitapidocs.com/2023/87d8a88c-906e-85a9-f575-f263788b8584.htm
-
-  
 
 Now, to actually address your question: you are calling LookupParameter and blindly calling Set on the result. However, sometimes no such parameter is found, so LookupParameter returns null, and you are calling Set on a null object. That throws an exception.
 
-  
-
 The solution is simple: check for null before calling Set.
 
-  
-
 The same applies regardless of whether you use LookupParameter of Element.Parameter(Definition) to access the parameter. Check for null first. If the result is null, no such parameter is present on the element, and you can skip it.
-
-  
 
 Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
 Tags (0)
@@ -362,15 +336,11 @@ RPTHOMAS108
 ‎2022-12-15 03:55 AM 
 Regarding worksharing there are two aspects you have to check on each element before attempting to edit it:
 
- 
-
 Ownership
 
 WorksharingUtils.GetCheckoutStatus
 
 Only a status of OwnedByOtherUser will cause an issue here
-
- 
 
 Update status
 
@@ -382,12 +352,7 @@ DeletedInCentral (should not make changes on these elements since they no longer
 
 UpdatedInCentral (You can call reload latest but I find it is generally better to log these)
 
- 
 Generally logging is a better approach to reloading since reloading can be time consuming and should be an end user driven decision. However you may implement a system whereby you group the UpdatedInCentral, reload latest and then get status again to confirm they can now be edited. I don't see the need for this especially and it may require more than one iteration depending on what others are doing.
-
- 
-
- 
 
 Tags (0)
 Add tags
@@ -405,7 +370,6 @@ def is_not_available(elem_id):
     if status == DB.ModelUpdatesStatus.DeletedInCentral or status == DB.ModelUpdatesStatus.UpdatedInCentral:
         return True
     return False
- 
 
 Tags (0)
 Add tags
@@ -416,15 +380,9 @@ RPTHOMAS108
 ‎2023-01-16 01:34 PM 
 I've always used these methods and it has always worked however I noticed recently another post to the contrary.
 
- 
-
 The information for those methods is cached so you should really call WorksharingUtils.CheckoutElements to confirm it since that interacts with the central file. The other get status methods just check the local cache information which is often right but apparently not always. I think I would probably still use the get status methods as a primary check.
 
- 
-
 The RevitAPI.chm gives details of the fitness for purpose for the various methods of WorksharingUtils.
-
- 
 
 Testing these issues is a lot harder than it used to be due to the single licence fixed Revit user log-in. In the past we just switched the Revit user name in the options dialogue and that was that. There should be an API method for faking Revit user names i.e. names in a form that indicate they are obviously not actual Revit users or account holders (just for testing worksharing with add-ins). Instead of: log in as UserA do something then log in as UserB, does it work?
 
