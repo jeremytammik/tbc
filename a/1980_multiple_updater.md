@@ -6,18 +6,6 @@
 
 <!---
 
-- insight and experience handling multiple updaters
-  and iterative use of SetExecutionOrder
-  an interesting background information based on several man-years of experience by two important contributors 
-  Can the method "SetExecutionOrder" by used to set the order of more than two IUpdaters
-  https://forums.autodesk.com/t5/revit-api-forum/can-the-method-quot-setexecutionorder-quot-by-used-to-set-the/m-p/11683732#M68598
-
-- Richard provided another solution to solve the question 
-  Try block not catching owner/permission locks
-  https://forums.autodesk.com/t5/revit-api-forum/try-block-not-catching-owner-permission-locks/m-p/11683634#M68596
-
-- Speckle [Chuong Ho: Featured Developer](https://speckle.systems/blog/chuong-ho-featured-developer)
- 
 - Community Conversations
   https://www.linkedin.com/feed/update/urn:li:activity:7021162362904735744?utm_source=share&utm_medium=member_desktop
   past events
@@ -30,6 +18,18 @@
   https://aps.autodesk.com/en/docs/parameters/v1/overview/introduction/
   The Parameters API will work alongside the Revit API to load parameters from the service into Revit projects and families.
 
+- insight and experience handling multiple updaters
+  and iterative use of SetExecutionOrder
+  an interesting background information based on several man-years of experience by two important contributors 
+  Can the method "SetExecutionOrder" by used to set the order of more than two IUpdaters
+  https://forums.autodesk.com/t5/revit-api-forum/can-the-method-quot-setexecutionorder-quot-by-used-to-set-the/m-p/11683732#M68598
+
+- Richard provided another solution to solve the question 
+  Try block not catching owner/permission locks
+  https://forums.autodesk.com/t5/revit-api-forum/try-block-not-catching-owner-permission-locks/m-p/11683634#M68596
+
+- Speckle [Chuong Ho: Featured Developer](https://speckle.systems/blog/chuong-ho-featured-developer)
+ 
 twitter:
 
 &ndash; 
@@ -52,6 +52,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 ### Handling Multiple Updaters
+
+- [Community Conversation Roadmap AMAs](#2)
+- [APS Parameters API](#3)
+- [Handling Multiple Updaters](#4)
+- [WorksharingUtils help Check Element Status](#5)
+- [Chuong Ho is Featured Speckle Developer](#6)
 
 <center>
 <img src="img/.jpg" alt="" title="" width="100"/> <!-- 800 × 514 pixels -->
@@ -273,13 +279,14 @@ It given us time to discover and adjust our needs and goals as a company and gro
 
 At least until AU 2023 where everything will change! &nbsp; :-)
 
-####<a name="3"></a> Richard provided another solution to solve the question
+####<a name="5"></a> WorksharingUtils help Check Element Status
+
+Richard provided another solution to solve the question
+
+[`try` block not catching owner/permission locks](https://forums.autodesk.com/t5/revit-api-forum/try-block-not-catching-owner-permission-locks/m-p/11683634)
 
 Try block not catching owner/permission locks
-https://forums.autodesk.com/t5/revit-api-forum/try-block-not-catching-owner-permission-locks/m-p/11683634#M68596
-
-Try block not catching owner/permission locks
-I have a piece of code that's identifying changes in the model and updating a parameter across a number of detail items whenever the parameter's value is no longer accurate. It gathers the list of items to update, then inside of a transaction it uses a try/except block (I'm using pyrevit) so it can update as many of them as possible. The trouble is that if any of the items are checked out by other users I receive a warning and the entire transaction is rolled back. I'd like to catch this warning in the except block, but that doesn't seem to be happening.
+I have a piece of code that's identifying changes in the model and updating a parameter across a number of detail items whenever the parameter's value is no longer accurate. It gathers the list of items to update, then inside of a transaction it uses a try/except block (I'm using pyRevit) so it can update as many of them as possible. The trouble is that if any of the items are checked out by other users I receive a warning and the entire transaction is rolled back. I'd like to catch this warning in the except block, but that doesn't seem to be happening.
 
 t = DB.Transaction(doc, 'Update')
 t.Start()
@@ -293,14 +300,7 @@ t.Commit()
 
 The error I receive looks like "Can't edit the element until [user] resaves the element to central and relinquishes it and you Reload Latest." 
 
- Solved by RPTHOMAS108. Go to Solution.
 
-Tags (0)
-Add tags
-Report
-4 REPLIES 
-Sort: 
-MESSAGE 2 OF 5
 jeremy.tammik
  Employee jeremy.tammik in reply to: PerryLackowski
 ‎2022-12-15 02:42 AM 
@@ -326,14 +326,9 @@ The solution is simple: check for null before calling Set.
 
 The same applies regardless of whether you use LookupParameter of Element.Parameter(Definition) to access the parameter. Check for null first. If the result is null, no such parameter is present on the element, and you can skip it.
 
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 5
+
 RPTHOMAS108
- Mentor RPTHOMAS108 in reply to: PerryLackowski
-‎2022-12-15 03:55 AM 
+
 Regarding worksharing there are two aspects you have to check on each element before attempting to edit it:
 
 Ownership
@@ -354,13 +349,9 @@ UpdatedInCentral (You can call reload latest but I find it is generally better t
 
 Generally logging is a better approach to reloading since reloading can be time consuming and should be an end user driven decision. However you may implement a system whereby you group the UpdatedInCentral, reload latest and then get status again to confirm they can now be edited. I don't see the need for this especially and it may require more than one iteration depending on what others are doing.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 5
+
 PerryLackowski
- Advocate PerryLackowski in reply to: RPTHOMAS108
-‎2023-01-16 01:28 PM 
+
 I had this post open for a month, waiting for the worksharing warning to happen again so I could debug it. @RPTHOMAS108, your solution worked great - I coded up a simple function that'll I'll likely use on some other scripts. Thanks for the help!
 
 def is_not_available(elem_id):
@@ -371,22 +362,19 @@ def is_not_available(elem_id):
         return True
     return False
 
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 5
+
 RPTHOMAS108
- Mentor RPTHOMAS108 in reply to: PerryLackowski
-‎2023-01-16 01:34 PM 
+
 I've always used these methods and it has always worked however I noticed recently another post to the contrary.
 
 The information for those methods is cached so you should really call WorksharingUtils.CheckoutElements to confirm it since that interacts with the central file. The other get status methods just check the local cache information which is often right but apparently not always. I think I would probably still use the get status methods as a primary check.
 
-The RevitAPI.chm gives details of the fitness for purpose for the various methods of WorksharingUtils.
+The RevitAPI.chm help file gives details of the fitness for purpose for
+the various [methods of `WorksharingUtils`](https://www.revitapidocs.com/2023/653a0e7c-8e55-b715-b2a5-e71a416ecb14.htm).
 
-Testing these issues is a lot harder than it used to be due to the single licence fixed Revit user log-in. In the past we just switched the Revit user name in the options dialogue and that was that. There should be an API method for faking Revit user names i.e. names in a form that indicate they are obviously not actual Revit users or account holders (just for testing worksharing with add-ins). Instead of: log in as UserA do something then log in as UserB, does it work?
+Testing these issues is a lot harder than it used to be due to the single licence fixed Revit user log-in. In the past, we just switched the Revit user name in the options dialogue and that was that. There should be an API method for faking Revit user names, i.e., names in a form that indicate they are obviously not actual Revit users or account holders (just for testing worksharing with add-ins). Instead of: log in as UserA &ndash; do something  &ndash;  log in as UserB  &ndash;  does it work?
 
-####<a name="3"></a> Chuong Ho is Featured Speckle Developer
+####<a name="6"></a> Chuong Ho is Featured Speckle Developer
 
 Congratulations to [Chuong Ho](https://github.com/chuongmep),
 who has made huge contributions to the Revit and Dynamo communitiers lately, last but not least
