@@ -59,20 +59,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 - [WorksharingUtils help Check Element Status](#5)
 - [Chuong Ho is Featured Speckle Developer](#6)
 
-<center>
-<img src="img/.jpg" alt="" title="" width="100"/> <!-- 800 × 514 pixels -->
-</center>
-
-####<a name="2"></a> 
-
-Thank you for asking, 
-
-**Question:** 
-
-**Answer:** 
-
-**Response:** 
-
 ####<a name="2"></a> Community Conversation Roadmap AMAs
 
 Last week saw a bunch of roadmap discussions looking at future ideas and directions of different areas of Revit and Dynamo in <i>Ask me Anything</i> format:
@@ -288,22 +274,23 @@ Richard provided another solution to solve the question
 Try block not catching owner/permission locks
 I have a piece of code that's identifying changes in the model and updating a parameter across a number of detail items whenever the parameter's value is no longer accurate. It gathers the list of items to update, then inside of a transaction it uses a try/except block (I'm using pyRevit) so it can update as many of them as possible. The trouble is that if any of the items are checked out by other users I receive a warning and the entire transaction is rolled back. I'd like to catch this warning in the except block, but that doesn't seem to be happening.
 
-t = DB.Transaction(doc, 'Update')
-t.Start()
-for item in items_to_update:
+<pre class="prettyprint">
+  t = DB.Transaction(doc, 'Update')
+  t.Start()
+  for item in items_to_update:
     try:
-        item[0].LookupParameter('Circuit_Count').Set(int(item[2]))
-        print(':white_heavy_check_mark: {} {} Circuit_Count parameter has been set to: {}'.format(item[1],output.linkify(item[0].Id), item[2]))
+      item[0].LookupParameter('Circuit_Count').Set(int(item[2]))
+      print(':white_heavy_check_mark: {} {} Circuit_Count parameter has been set to: {}'.format(item[1],output.linkify(item[0].Id), item[2]))
     except:
-        print(':cross_mark: {} {} Failed to set Circuit_Count parameter to: {}'.format(item[1],output.linkify(item[0].Id), item[2]))
-t.Commit()
+      print(':cross_mark: {} {} Failed to set Circuit_Count parameter to: {}'.format(item[1],output.linkify(item[0].Id), item[2]))
+  t.Commit()
+</pre>
 
 The error I receive looks like "Can't edit the element until [user] resaves the element to central and relinquishes it and you Reload Latest." 
 
 
 jeremy.tammik
- Employee jeremy.tammik in reply to: PerryLackowski
-‎2022-12-15 02:42 AM 
+
 So, apparently the transaction is catching the exception internally and aborting. You cannot change that.
 
 You could start and commit a separate transaction for each individual call to LookupParameter + Set. Then, you could catch the exception that the aborted transaction is throwing.
@@ -354,14 +341,15 @@ PerryLackowski
 
 I had this post open for a month, waiting for the worksharing warning to happen again so I could debug it. @RPTHOMAS108, your solution worked great - I coded up a simple function that'll I'll likely use on some other scripts. Thanks for the help!
 
-def is_not_available(elem_id):
+<pre class="prettyprint">
+  def is_not_available(elem_id):
     if DB.WorksharingUtils.GetCheckoutStatus(doc,elem_id) == DB.CheckoutStatus.OwnedByOtherUser:
-        return True
+      return True
     status = DB.WorksharingUtils.GetModelUpdatesStatus(doc,elem_id)
     if status == DB.ModelUpdatesStatus.DeletedInCentral or status == DB.ModelUpdatesStatus.UpdatedInCentral:
-        return True
+      return True
     return False
-
+</pre>
 
 RPTHOMAS108
 
@@ -373,6 +361,10 @@ The RevitAPI.chm help file gives details of the fitness for purpose for
 the various [methods of `WorksharingUtils`](https://www.revitapidocs.com/2023/653a0e7c-8e55-b715-b2a5-e71a416ecb14.htm).
 
 Testing these issues is a lot harder than it used to be due to the single licence fixed Revit user log-in. In the past, we just switched the Revit user name in the options dialogue and that was that. There should be an API method for faking Revit user names, i.e., names in a form that indicate they are obviously not actual Revit users or account holders (just for testing worksharing with add-ins). Instead of: log in as UserA &ndash; do something  &ndash;  log in as UserB  &ndash;  does it work?
+
+<center>
+<img src="img/worksharing.png" alt="Worksharing" title="Worksharing" width="500"/> <!-- 716 × 403 pixels -->
+</center>
 
 ####<a name="6"></a> Chuong Ho is Featured Speckle Developer
 
