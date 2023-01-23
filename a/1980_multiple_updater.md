@@ -53,11 +53,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Handling Multiple Updaters
 
-
 <center>
 <img src="img/.jpg" alt="" title="" width="100"/> <!-- 800 × 514 pixels -->
 </center>
-
 
 ####<a name="2"></a> 
 
@@ -92,13 +90,154 @@ Thursday, January 19, 2023
 Check them out in
 the [community-conversation recordings of past events](https://forums.autodesk.com/t5/community-conversations/eb-p/communityconversations?include_past=true).
 
-
 ####<a name="3"></a> insight and experience handling multiple updaters
 
-and iterative use of SetExecutionOrder
-an interesting background information based on several man-years of experience by two important contributors 
-Can the method "SetExecutionOrder" by used to set the order of more than two IUpdaters
-https://forums.autodesk.com/t5/revit-api-forum/can-the-method-quot-setexecutionorder-quot-by-used-to-set-the/m-p/11683732#M68598
+Moving more to the nitty-gritty aspects of Revit API programming,
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+and [Chris Hildebran](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/2814832) exchanged
+some valuable background information based on many man-years of experience working with
+the [Dynamic Model Updater Framework DMU](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.31)
+and ended up presenting an iterative use of the `SetExecutionOrder` method in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+asking [Can `SetExecutionOrder` be used to set the order of more than two IUpdaters?](https://forums.autodesk.com/t5/revit-api-forum/can-the-method-quot-setexecutionorder-quot-by-used-to-set-the/m-p/11683732):
+
+**Question:** Looking at
+the [SetExecutionOrder method](https://www.revitapidocs.com/2023/87d62116-cdb4-efc4-e2e2-e4f5b41b3441.htm)...
+We have about eight IUpdaters in our addin and have the need to specify the order in which they fire.
+
+Has anyone had this need and if so, do you know if you can set the order of more than two?
+
+I was thinking a "Two at a time" approach setting the order of one pair (as allowed using the SetExecutionOrder) IUpdaters then continuing this for the remaining in a list each time incrementing an index. 
+
+Since every updater adds a performance hit to the model processing and execution time, so we have already done some work to consolidate them.
+
+Fortunately, the IUpdater system we have set up is working fine (aside from the execution order need) even on large modes (+1GB) but...
+the system does have a code smell.
+We do address a bit of technical debt in each sprint:
+When can we do it is the question.
+We have quite a backlog of cool things to implement. 
+
+Perhaps I should have prefaced my OP by mentioning that we have consolidated our IUpdaters to the quantity we have currently, and that further consolidation is forthcoming.
+Until then we'd like to control the execution order. 
+
+**Solution:** It appears you can use the `SetExecutionOrder` iteratively.
+
+The list you pass in has to be ordered in the desired order.
+
+So, until i can consolidate a bit more this will work.
+
+public void SetExecutionOrder(List<IUpdater> updaters)
+{
+var count = updaters.Count;
+
+for (var i = 0; i < count; i++)
+{
+var previous = updaters[i].GetUpdaterId();
+
+var last = updaters[i + 1].GetUpdaterId();
+
+UpdaterRegistry.SetExecutionOrder(previous, last);
+}
+}
+
+**Update:** To better handle the situation where the count of items (IUpdaters) is odd it was better to implement a do...while loop.
+
+public void SetExecutionOrder(List<IUpdater> updaters)
+	{
+		var last     = updaters[updaters.Count - 1];
+		var lastLoop = false;
+		var index    = 0;
+
+		do
+		{
+			var current = updaters[index];  
+
+			var next = updaters[index + 1];  
+
+			lastLoop = next == last;  
+
+			UpdaterRegistry.SetExecutionOrder(current.GetUpdaterId(), next.GetUpdaterId());
+
+			index++;
+		}
+		while (lastLoop == false);
+	}
+
+**Further discussion:**
+
+Out of interest could you give a brief description of why you have implemented eight updaters in the single add-in?
+
+We never know 100% for sure that an updater will not find itself disabled by Revit due to an unforeseen issue. I think therefore we can't really assume that one will execute before another we can only tell that if it does execute it will be before the other.
+
+Therefore for me the execution order should be largely irrelevant in the design of the DMU since you can't overly rely on it. Also the update is all predefined the moment the update is triggered ideally you would do the most you could in the single execute method. Perhaps the only advantage of setting the order is to limit the retriggering, is that your aim?
+
+Tags (0)
+Add tags
+Report
+MESSAGE 8 OF 13
+TheRealChrisHildebran
+ Advocate TheRealChrisHildebran in reply to: RPTHOMAS108
+‎2023-01-16 03:06 PM 
+I want to reiterate that the number of IUpdaters hasn't had a noticeable negative effect on our model performance. Many of which approach 1GB in size. On the contrary, I'm confident our detailing department would revolt if taken away. 😊 Their inclusion offers so much productivity its worth whatever the performance hit is.
+
+Soon after my post-dynamo start down the road of c# programming in 2017, I learned about these updaters and implemented several simple ones based on examples from the Autodesk website and The Building Coder website.
+
+The several became a half dozen but were monstrous implementations with far too much "cyclomatic complexity". Most likely because of my inexperience in OOP, Revit API, and short-sightedness.
+
+Around 2020 I split them up into, I'm guessing, about two dozen updaters. And subsequently pared down a bit more.
+
+Today, they are lightweight and unobtrusive little micro-services with distinct work scopes. I could likely combine/refactor, and probably that review will happen later this year.
+
+As far as updaters becoming disabled or their firing order, I'm not 100% convinced that they will continue to fire in the order I desire for the duration of the Application Session. Still, for all the testing so far, the updaters are firing in the order I asked them to.
+
+I'm hopeful that soon I will be able to refactor the remaining DMU's into a better design.
+Tags (0)
+Add tags
+Report
+MESSAGE 9 OF 13
+RPTHOMAS108
+ Mentor RPTHOMAS108 in reply to: TheRealChrisHildebran
+‎2023-01-16 03:36 PM 
+That's fine was just curious about your motivation for the order and the numbers of updaters. I never used that method probably wasn't available historically. I assume it is only included so you can better prevent one updater triggering another.
+
+I always recall a situation from years ago when an end user colleague pinned down an odd delay in Revit to the precast add-in (as it was then a separate thing from main Revit). Whenever you moved something concrete or otherwise there was this blue circle on the screen for a period of time (it was probably about three to four seconds). I think in the course of a day it got really irritating.  So the add-in was uninstalled and people have been warry of it ever since. I recall there was this Red on/off button for it and as soon as you turned it on that was it (your day just got longer).
+
+There are quire a few instances like that; small delays were people start looking for culprits. Kind of surprised Autodesk don't take a similar approach to Microsoft by now. In outlook etc. when an add-in takes up a lot of processing time it reports that and the user can understand where the time is spent (otherwise it is considered a Revit issue by default). I think in the MS Outlook case it is checking start-up time but in theory time spent executing particular DMU's could be considered by Revit over the course of a session.
+
+Tags (0)
+Add tags
+Report
+MESSAGE 10 OF 13
+TheRealChrisHildebran
+ Advocate TheRealChrisHildebran in reply to: TheRealChrisHildebran
+‎2023-01-16 04:04 PM 
+The primary reason at the moment is to force one of the updaters to run last. It's a new updater that is updating all construction data from cached SQL Server data. We are now only storing a primary key on a family or Fabrication Part. The construction data will be written to non user-modifiable, project bound, Shared Parameters. Gone will be the days of stale data stored in one of our 5000 rfa's and Fabrication Database. Our content manager is both happy and scared. 🙂
+
+Tags (0)
+Add tags
+Report
+MESSAGE 11 OF 13
+RPTHOMAS108
+ Mentor RPTHOMAS108 in reply to: TheRealChrisHildebran
+‎2023-01-16 04:23 PM 
+Sounds interesting.  Similarly in theory we could avoid all information for COBie in Revit and just have keys. Then form the spreadsheet based on those keys and the information held elsewhere.
+
+I often wonder about the history of keys and the information they point to however. When a key is stored it points to an item in a database but was that item defined in the database the same way as when later referenced with the key (you would expect not otherwise why have a key)? That is both the advantage and the disadvantage of it. It could be the historic information is lost and the key now points to misleading (since updated) version of the item in the database. When do you essentially need to define a new key, when is the product significantly different from what it was. Probably you have to keep the old information unchanged anyway for historic purposes.
+
+Tags (0)
+Add tags
+Report
+MESSAGE 12 OF 13
+TheRealChrisHildebran
+ Advocate TheRealChrisHildebran in reply to: RPTHOMAS108
+‎2023-01-16 05:11 PM 
+In our case the database Id's will persist indefinitely. A record may be set as obsolete, however.
+
+We've been slowly turning the ship with regards to construction data for about 3 years. This sprint is the final adjustment.
+
+It given us time to discover and adjust our needs and goals as a company and grow confident that this direction is the correct one.
+
+At least until AU 2023 where everything will change! 🙂
 
 ####<a name="3"></a> Richard provided another solution to solve the question
 
