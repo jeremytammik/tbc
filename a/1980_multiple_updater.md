@@ -18,7 +18,7 @@
 
 - Speckle [Chuong Ho: Featured Developer](https://speckle.systems/blog/chuong-ho-featured-developer)
  
- - Community Conversations
+- Community Conversations
   https://www.linkedin.com/feed/update/urn:li:activity:7021162362904735744?utm_source=share&utm_medium=member_desktop
   past events
   https://forums.autodesk.com/t5/community-conversations/eb-p/communityconversations?include_past=true
@@ -90,7 +90,30 @@ Thursday, January 19, 2023
 Check them out in
 the [community-conversation recordings of past events](https://forums.autodesk.com/t5/community-conversations/eb-p/communityconversations?include_past=true).
 
-####<a name="3"></a> insight and experience handling multiple updaters
+####<a name="3"></a> Parameters API
+
+Talking about roadmaps and upcoming changes, one important and long-awaited enhancement revolves around the handling of parameter definitions.
+
+The Autodesk Platform Services APS (formerly Forge) documentation includes a very nice beta documentation of
+the [new Parameters API](https://aps.autodesk.com/en/docs/parameters/v1/overview/introduction) from
+the web side of things.
+
+> The Parameters API will work alongside the Revit API to load parameters from the service into Revit projects and families.
+
+Please note that this API is in beta and its current documentation is intended for beta users only:
+
+> Almost every Autodesk application has its own mechanism to manage parameters (properties and attributes are the alternative name for the same type of constructs). Some applications let the customers define their own parameters & properties. For example, Revit uses a concept called shared parameters. These are currently locked away in text files that are not intended to be edited. Revit users are required to manage the files on local devices or shared network drives. This opens this data to the risk of being edited accidentally and that the wrong data is being used. There is no central source of truth for parameters and properties which spans the diversity of tools used to deliver a design project.
+
+> The Parameters Service lets you store and manage parameter definitions in the cloud. You can easily manage your parameters in one place and organize them using new capabilities with collections, labels and saved searches. The built-in search capability enables your users to quickly discover specific parameters or narrow down suitable options for meaningful consumption. The Parameters Service also lets you set defaults for values like Revit Categories, type vs instance, and property palette group.
+
+> A collection of parameters will always be up to date and in sync across various products and services within the Autodesk ecosystem. Only administrators, those with properly assigned permissions, within Autodesk Construction Cloud manage parameter definitions, while collaborators, and team members can explore and load parameter definitions into their connected application.
+
+> As of Autodesk Revit 2023, the Parameters Service is available in both Revit and for account administrators in the Autodesk Construction Cloud Library. For more information
+see [Technology Preview: Parameters Service](https://help.autodesk.com/view/RVT/2023/ENU/?guid=GUID-073AB0E7-64BF-4A6E-9E67-59D3709266C3).
+
+
+
+####<a name="4"></a> insight and experience handling multiple updaters
 
 Moving more to the nitty-gritty aspects of Revit API programming,
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
@@ -245,10 +268,4 @@ Try block not catching owner/permission locks
 https://forums.autodesk.com/t5/revit-api-forum/try-block-not-catching-owner-permission-locks/m-p/11683634#M68596
 
 ####<a name="3"></a> Speckle [Chuong Ho: Featured Developer](https://speckle.systems/blog/chuong-ho-featured-developer)
-
-####<a name="3"></a> Parameters API
-
-... nice documentation
-https://aps.autodesk.com/en/docs/parameters/v1/overview/introduction/
-The Parameters API will work alongside the Revit API to load parameters from the service into Revit projects and families.
 
