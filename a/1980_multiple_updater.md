@@ -113,7 +113,7 @@ asking [can `SetExecutionOrder` be used to set the order of more than two IUpdat
 
 **Question:** Looking at
 the [SetExecutionOrder method](https://www.revitapidocs.com/2023/87d62116-cdb4-efc4-e2e2-e4f5b41b3441.htm)...
-We have about eight IUpdaters in our addin and have the need to specify the order in which they fire.
+We have about eight IUpdaters in our add-in and have the need to specify the order in which they fire.
 
 Has anyone had this need and if so, do you know if you can set the order of more than two?
 
@@ -134,7 +134,7 @@ Until then we'd like to control the execution order.
 
 The list you pass in has to be ordered in the desired order.
 
-So, until i can consolidate a bit more, this will work:
+So, until I can consolidate a bit more, this will work:
 
 <div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
 <div style="background: #f3f3f3; color: #000000; max-height: 500px; overflow: auto">
@@ -186,11 +186,13 @@ So, until i can consolidate a bit more, this will work:
 
 We never know 100% for sure that an updater will not find itself disabled by Revit due to an unforeseen issue. I think therefore we can't really assume that one will execute before another we can only tell that if it does execute it will be before the other.
 
-Therefore for me the execution order should be largely irrelevant in the design of the DMU since you can't overly rely on it. Also the update is all predefined the moment the update is triggered ideally you would do the most you could in the single execute method. Perhaps the only advantage of setting the order is to limit the retriggering, is that your aim?
+Therefore, for me, the execution order should be largely irrelevant in the design of the DMU since you can't overly rely on it. 
+Also, the update is all predefined the moment the update is triggered ideally you would do the most you could in the single execute method. 
+Perhaps the only advantage of setting the order is to limit the retriggering; is that your aim?
 
 **Answer:** I want to reiterate that the number of IUpdaters hasn't had a noticeable negative effect on our model performance. Many of which approach 1GB in size. On the contrary, I'm confident our detailing department would revolt if taken away. 😊 Their inclusion offers so much productivity its worth whatever the performance hit is.
 
-Soon after my post-dynamo start down the road of c# programming in 2017, I learned about these updaters and implemented several simple ones based on examples from the Autodesk website and The Building Coder website.
+Soon after my post-dynamo start down the road of C# programming in 2017, I learned about these updaters and implemented several simple ones based on examples from the Autodesk website and The Building Coder website.
 
 The several became a half dozen but were monstrous implementations with far too much "cyclomatic complexity". Most likely because of my inexperience in OOP, Revit API, and short-sightedness.
 
@@ -206,15 +208,21 @@ I'm hopeful that soon I will be able to refactor the remaining DMU's into a bett
 I never used that method probably wasn't available historically.
 I assume it is only included so you can better prevent one updater triggering another.
 
-I always recall a situation from years ago when an end user colleague pinned down an odd delay in Revit to the precast add-in (as it was then a separate thing from main Revit). Whenever you moved something concrete or otherwise there was this blue circle on the screen for a period of time (it was probably about three to four seconds). I think in the course of a day it got really irritating.  So the add-in was uninstalled and people have been warry of it ever since. I recall there was this Red on/off button for it and as soon as you turned it on that was it (your day just got longer).
+I always recall a situation from years ago when an end user colleague pinned down an odd delay in Revit to the precast add-in (as it was then a separate thing from main Revit). Whenever you moved something concrete or otherwise there was this blue circle on the screen for a period of time (it was probably about three to four seconds). I think in the course of a day it got really irritating.  
+So, the add-in was uninstalled and people have been warry of it ever since. 
+I recall there was this Red on/off button for it and as soon as you turned it on that was it (your day just got longer).
 
-There are quire a few instances like that; small delays were people start looking for culprits. Kind of surprised Autodesk don't take a similar approach to Microsoft by now. In outlook etc. when an add-in takes up a lot of processing time it reports that and the user can understand where the time is spent (otherwise it is considered a Revit issue by default). I think in the MS Outlook case it is checking start-up time but in theory time spent executing particular DMU's could be considered by Revit over the course of a session.
+There are quite a few instances like that; small delays where people start looking for culprits. 
+Kind of surprised Autodesk don't take a similar approach to Microsoft by now. 
+In Outlook etc., when an add-in takes up a lot of processing time, it reports that, and the user can understand where the time is spent (otherwise it is considered a Revit issue by default). 
+I think in the MS Outlook case it is checking start-up time, but in theory time spent executing particular DMU's could be considered by Revit over the course of a session.
 
 **Answer:** The primary reason at the moment is to force one of the updaters to run last. It's a new updater that is updating all construction data from cached SQL Server data. We are now only storing a primary key on a family or Fabrication Part. The construction data will be written to non user-modifiable, project bound, Shared Parameters. Gone will be the days of stale data stored in one of our 5000 rfa's and Fabrication Database. Our content manager is both happy and scared. &nbsp; :-)
 
 **Response:** Sounds interesting.  Similarly in theory we could avoid all information for COBie in Revit and just have keys. Then form the spreadsheet based on those keys and the information held elsewhere.
 
-I often wonder about the history of keys and the information they point to however. When a key is stored it points to an item in a database but was that item defined in the database the same way as when later referenced with the key (you would expect not otherwise why have a key)? That is both the advantage and the disadvantage of it. It could be the historic information is lost and the key now points to misleading (since updated) version of the item in the database. When do you essentially need to define a new key, when is the product significantly different from what it was. Probably you have to keep the old information unchanged anyway for historic purposes.
+I often wonder about the history of keys and the information they point to, however. 
+When a key is stored, it points to an item in a database but was that item defined in the database the same way as when later referenced with the key (you would expect not otherwise why have a key)? That is both the advantage and the disadvantage of it. It could be the historic information is lost and the key now points to misleading (since updated) version of the item in the database. When do you essentially need to define a new key, when is the product significantly different from what it was. Probably you have to keep the old information unchanged anyway for historic purposes.
 
 **Answer:** In our case, the database Id's will persist indefinitely. A record may be set as obsolete, however.
 
@@ -232,7 +240,7 @@ Richard provided another solution to help address a worksharing issue in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [`try` block not catching owner/permission locks](https://forums.autodesk.com/t5/revit-api-forum/try-block-not-catching-owner-permission-locks/m-p/11683634):
 
-**Question:** I have a piece of code that's identifying changes in the model and updating a parameter across a number of detail items whenever the parameter's value is no longer accurate. It gathers the list of items to update, then inside of a transaction it uses a try/except block (I'm using pyRevit) so it can update as many of them as possible. The trouble is that if any of the items are checked out by other users I receive a warning and the entire transaction is rolled back. I'd like to catch this warning in the except block, but that doesn't seem to be happening.
+**Question:** I have a piece of code that's identifying changes in the model and updating a parameter across a number of detail items whenever the parameter's value is no longer accurate. It gathers the list of items to update, then inside of a transaction it uses a try/except block (I'm using pyRevit) so it can update as many of them as possible. The trouble is that if any of the items are checked out by other users, I receive a warning and the entire transaction is rolled back. I'd like to catch this warning in the except block, but that doesn't seem to be happening.
 
 <pre class="prettyprint">
   t = DB.Transaction(doc, 'Update')
@@ -295,7 +303,7 @@ Thanks for the help!
     return False
 </pre>
 
-**Answer:** I've always used these methods and it has always worked; however I noticed recently another post to the contrary.
+**Answer:** I've always used these methods and it has always worked; however, I noticed recently another post to the contrary.
 
 The information for those methods is cached, so you should really call WorksharingUtils.CheckoutElements to confirm it, since that interacts with the central file. The other get status methods just check the local cache information, which is often right, but apparently not always. 
 I think I would probably still use the get status methods as a primary check.
