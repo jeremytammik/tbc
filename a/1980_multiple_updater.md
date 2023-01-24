@@ -53,15 +53,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Handling Multiple Updaters
 
-- [Community Conversation Roadmap AMAs](#2)
+- [Community conversation roadmap AMAs](#2)
 - [Platform Services Parameters API](#3)
-- [Handling Multiple Updaters](#4)
-- [WorksharingUtils help Check Element Status](#5)
-- [Chuong Ho is Featured Speckle Developer](#6)
+- [Handling multiple updaters](#4)
+- [WorksharingUtils help check element status](#5)
+- [Chuong Ho is featured Speckle developer](#6)
 
 ####<a name="2"></a> Community Conversation Roadmap AMAs
 
-Last week saw a bunch of roadmap discussions looking at future ideas and directions of different areas of Revit and Dynamo in <i>Ask me Anything</i> format:
+Last week saw a bunch of roadmap discussions looking at future ideas and directions of different areas of Revit and Dynamo in <i>Ask me Anything</i> format, and now the event recordings are provided for your illumination and enjoyment:
 
 - Architecture and Platform Product (Revit) Roadmap Ask Me Anything
  &ndash; Community Conversation about the future of Autodesk AEC solutions, highlights from recent releases, including Revit and the AEC Collection, future of Autodesk AEC products, roadmap &ndash; Panelists: Harlan Brumm Autodesk Sr. Product Line Manager, Mike Engel Autodesk  Sr. Product Manager, Bogdan Matei Autodesk Revit Product Manager, Matt Arsenault Autodesk Revit Product Manager, Sam Anderson of Twinmotion by Epic Games &ndash; [Event Recording](https://youtu.be/HLrrGEtBKEM); 
@@ -83,8 +83,8 @@ the [community conversation recordings of past events](https://forums.autodesk.c
 
 Talking about roadmaps and upcoming changes, one important and long-awaited enhancement revolves around the handling of parameter definitions.
 
-The Autodesk Platform Services APS (formerly Forge) documentation includes a very nice beta documentation of
-the [new Parameters API](https://aps.autodesk.com/en/docs/parameters/v1/overview/introduction) from
+The Autodesk Platform Services APS (formerly Forge) documentation includes a nice beta documentation of
+the new [Parameters API](https://aps.autodesk.com/en/docs/parameters/v1/overview/introduction) from
 the web side of things.
 
 > The Parameters API will work alongside the Revit API to load parameters from the service into Revit projects and families.
@@ -109,7 +109,7 @@ some valuable background information based on many man-years of experience worki
 the [Dynamic Model Updater Framework DMU](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.31)
 and ended up presenting an iterative use of the `SetExecutionOrder` method in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-asking [Can `SetExecutionOrder` be used to set the order of more than two IUpdaters?](https://forums.autodesk.com/t5/revit-api-forum/can-the-method-quot-setexecutionorder-quot-by-used-to-set-the/m-p/11683732):
+asking [can `SetExecutionOrder` be used to set the order of more than two IUpdaters?](https://forums.autodesk.com/t5/revit-api-forum/can-the-method-quot-setexecutionorder-quot-by-used-to-set-the/m-p/11683732):
 
 **Question:** Looking at
 the [SetExecutionOrder method](https://www.revitapidocs.com/2023/87d62116-cdb4-efc4-e2e2-e4f5b41b3441.htm)...
@@ -134,7 +134,7 @@ Until then we'd like to control the execution order.
 
 The list you pass in has to be ordered in the desired order.
 
-So, until i can consolidate a bit more this will work.
+So, until i can consolidate a bit more, this will work:
 
 <div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
 <div style="background: #f3f3f3; color: #000000; max-height: 500px; overflow: auto">
@@ -155,7 +155,7 @@ So, until i can consolidate a bit more this will work.
 </div>
 </div>
 
-**Update:** To better handle the situation where the count of items (IUpdaters) is odd it was better to implement a `do` ...`while` loop:
+**Update:** To improve handling of an odd number of `IUpdater` items, it was better to implement a `do` ... `while` loop:
 
 <div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
 <div style="background: #f3f3f3; color: #000000; max-height: 500px; overflow: auto">
@@ -223,6 +223,8 @@ We've been slowly turning the ship with regards to construction data for about 3
 It given us time to discover and adjust our needs and goals as a company and grow confident that this direction is the correct one.
 
 At least until AU 2023 where everything will change! &nbsp; :-)
+
+Many thanks to Chris and Richard for the valuable insights and experience!
 
 ####<a name="5"></a> WorksharingUtils help Check Element Status
 

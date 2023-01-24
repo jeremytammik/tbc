@@ -52,14 +52,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 <h3>Handling Multiple Updaters</h3>
 <ul>
-<li><a href="#2">Community Conversation Roadmap AMAs</a></li>
+<li><a href="#2">Community conversation roadmap AMAs</a></li>
 <li><a href="#3">Platform Services Parameters API</a></li>
-<li><a href="#4">Handling Multiple Updaters</a></li>
-<li><a href="#5">WorksharingUtils help Check Element Status</a></li>
-<li><a href="#6">Chuong Ho is Featured Speckle Developer</a></li>
+<li><a href="#4">Handling multiple updaters</a></li>
+<li><a href="#5">WorksharingUtils help check element status</a></li>
+<li><a href="#6">Chuong Ho is featured Speckle developer</a></li>
 </ul>
 <h4><a name="2"></a> Community Conversation Roadmap AMAs</h4>
-<p>Last week saw a bunch of roadmap discussions looking at future ideas and directions of different areas of Revit and Dynamo in <i>Ask me Anything</i> format:</p>
+<p>Last week saw a bunch of roadmap discussions looking at future ideas and directions of different areas of Revit and Dynamo in <i>Ask me Anything</i> format, and now the event recordings are provided for your illumination and enjoyment:</p>
 <ul>
 <li>Architecture and Platform Product (Revit) Roadmap Ask Me Anything
  &ndash; Community Conversation about the future of Autodesk AEC solutions, highlights from recent releases, including Revit and the AEC Collection, future of Autodesk AEC products, roadmap &ndash; Panelists: Harlan Brumm Autodesk Sr. Product Line Manager, Mike Engel Autodesk  Sr. Product Manager, Bogdan Matei Autodesk Revit Product Manager, Matt Arsenault Autodesk Revit Product Manager, Sam Anderson of Twinmotion by Epic Games &ndash; <a href="https://youtu.be/HLrrGEtBKEM">Event Recording</a>; 
@@ -78,8 +78,8 @@ Tuesday, January 17, 2023</li>
 the <a href="https://forums.autodesk.com/t5/community-conversations/eb-p/communityconversations?include_past=true">community conversation recordings of past events</a>.</p>
 <h4><a name="3"></a> Platform Services Parameters API</h4>
 <p>Talking about roadmaps and upcoming changes, one important and long-awaited enhancement revolves around the handling of parameter definitions.</p>
-<p>The Autodesk Platform Services APS (formerly Forge) documentation includes a very nice beta documentation of
-the <a href="https://aps.autodesk.com/en/docs/parameters/v1/overview/introduction">new Parameters API</a> from
+<p>The Autodesk Platform Services APS (formerly Forge) documentation includes a nice beta documentation of
+the new <a href="https://aps.autodesk.com/en/docs/parameters/v1/overview/introduction">Parameters API</a> from
 the web side of things.</p>
 <blockquote>
 <p>The Parameters API will work alongside the Revit API to load parameters from the service into Revit projects and families.</p>
@@ -100,7 +100,7 @@ some valuable background information based on many man-years of experience worki
 the <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.31">Dynamic Model Updater Framework DMU</a>
 and ended up presenting an iterative use of the <code>SetExecutionOrder</code> method in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
-asking <a href="https://forums.autodesk.com/t5/revit-api-forum/can-the-method-quot-setexecutionorder-quot-by-used-to-set-the/m-p/11683732">Can <code>SetExecutionOrder</code> be used to set the order of more than two IUpdaters?</a>:</p>
+asking <a href="https://forums.autodesk.com/t5/revit-api-forum/can-the-method-quot-setexecutionorder-quot-by-used-to-set-the/m-p/11683732">can <code>SetExecutionOrder</code> be used to set the order of more than two IUpdaters?</a>:</p>
 <p><strong>Question:</strong> Looking at
 the <a href="https://www.revitapidocs.com/2023/87d62116-cdb4-efc4-e2e2-e4f5b41b3441.htm">SetExecutionOrder method</a>...
 We have about eight IUpdaters in our addin and have the need to specify the order in which they fire.</p>
@@ -116,7 +116,7 @@ We have quite a backlog of cool things to implement. </p>
 Until then we'd like to control the execution order. </p>
 <p><strong>Solution:</strong> It appears you can use the <code>SetExecutionOrder</code> iteratively.</p>
 <p>The list you pass in has to be ordered in the desired order.</p>
-<p>So, until i can consolidate a bit more this will work.</p>
+<p>So, until i can consolidate a bit more, this will work:</p>
 <div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
 <div style="background: #f3f3f3; color: #000000; max-height: 500px; overflow: auto">
 <ol start="29" style="background: #ffffff; margin: 0; padding: 0;">
@@ -136,7 +136,7 @@ Until then we'd like to control the execution order. </p>
 </div>
 </div>
 
-<p><strong>Update:</strong> To better handle the situation where the count of items (IUpdaters) is odd it was better to implement a <code>do</code> ...<code>while</code> loop:</p>
+<p><strong>Update:</strong> To improve handling of an odd number of <code>IUpdater</code> items, it was better to implement a <code>do</code> ... <code>while</code> loop:</p>
 <div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
 <div style="background: #f3f3f3; color: #000000; max-height: 500px; overflow: auto">
 <ol start="29" style="background: #ffffff; margin: 0; padding: 0;">
