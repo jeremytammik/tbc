@@ -64,23 +64,20 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Last week saw a bunch of roadmap discussions looking at future ideas and directions of different areas of Revit and Dynamo in <i>Ask me Anything</i> format:
 
 - Architecture and Platform Product (Revit) Roadmap Ask Me Anything
-Join us for a Community Conversation about the future of Autodesk AEC solutions. - Learn about highlights from recent releases, including Revit and the AEC Collection - Ask product managers and experts about the future of Autodesk AEC products - Check the roadmap and join the conversation! Panelists: Harlan Brumm Autodesk Sr. Product Line Manager Mike Engel Autodesk  Sr. Product Manager Bogdan Matei Autodesk Revit Product Manager Matt Arsenault Autodesk Revit Product Manager Sam Anderson of Twinmotion by Epic Games Event Recording: https://youtu.be/HLrrGEtBKEM
+ &ndash; Community Conversation about the future of Autodesk AEC solutions, highlights from recent releases, including Revit and the AEC Collection, future of Autodesk AEC products, roadmap &ndash; Panelists: Harlan Brumm Autodesk Sr. Product Line Manager, Mike Engel Autodesk  Sr. Product Manager, Bogdan Matei Autodesk Revit Product Manager, Matt Arsenault Autodesk Revit Product Manager, Sam Anderson of Twinmotion by Epic Games &ndash; [Event Recording](https://youtu.be/HLrrGEtBKEM); 
 Tuesday, January 17, 2023
-- Computational Design and Automation (Dynamo) Roadmap Ask Me Anything
-Have questions about the public roadmap for Computational Design and Automation using Dynamo? We've got answers! Join us for a Community Conversation about the future of Dynamo and Autodesk AEC solutions. - Learn about highlights from recent releases - Ask product managers and experts about the future of Dynamo Panelists: Lilli Smith Autodesk  Sr. Product Manager Sol Amour Autodesk Product Line Mgr. Jacob Small Autodesk Global Consulting Delivery  Event recording: https://youtu.be/LfERZO3Fdzg
+- Computational Design and Automation (Dynamo) Roadmap Ask Me Anything 
+&ndash; Public roadmap for Computational Design and Automation using Dynamo, future of Dynamo and Autodesk AEC solutions &ndash; Panelists: Lilli Smith Autodesk  Sr. Product Manager, Sol Amour Autodesk Product Line Mgr., Jacob Small Autodesk Global Consulting Delivery &ndash; [Event recording](https://youtu.be/LfERZO3Fdzg); 
 Tuesday, January 17, 2023
 - Infrastructure Product Roadmap Ask Me Anything
-Have questions about the public roadmap for civil infrastructure products? We've got answers! Join us for a Community Conversation about the future of Autodesk AEC solutions.   - Learn about highlights from recent releases, including Civil 3D, InfraWorks, ReCap Pro, and the AEC Collection - Ask product managers and experts about the future of Autodesk AEC products - Check the roadmap and join the conversation! Panelists: Dave Simeone Autodesk Sr. Product Manager, Civil Products Tim Yarris Autodesk Product Manager – Civil 3D Ramesh Sridharan Autodesk Product Manager – ReCap, InfraWorks Recording:  https://youtu.be/t2tuGOqax-w  See the Civil Infrastructure Public Roadmap: https://trello.com/b/tafIRGcN/autodesk-civil-infrastructure-product-roadmap Join the Infrastructure Futures https://feedback.autodesk.com/key/InfrastructureFutures
-Wednesday, January 18, 2023
+ &ndash; Public roadmap for civil infrastructure products, future Civil 3D, InfraWorks, ReCap Pro, and the AEC Collection &ndash; Panelists: Dave Simeone Autodesk Sr. Product Manager Civil Products, Tim Yarris Autodesk Product Manager Civil 3D, Ramesh Sridharan Autodesk Product Manager ReCap + InfraWorks &ndash; [Recording](https://youtu.be/t2tuGOqax-w); [Civil Infrastructure Public Roadmap](https://trello.com/b/tafIRGcN/autodesk-civil-infrastructure-product-roadmap); [Infrastructure Futures](https://feedback.autodesk.com/key/InfrastructureFutures); Wednesday, January 18, 2023
 - Structures Product Roadmap Ask Me Anything
-Have questions about the public roadmap for structural engineering products? We've got answers! Join us for a Community Conversation about the future of Autodesk AEC solutions.   - Learn about highlights from recent releases, including Revit and the AEC Collection - Ask product managers and experts about the future of Autodesk AEC products - Check the roadmap and join the conversation! Panelists: Pawel Piechnik Autodesk Director, Product Management, Structures Product Line Dan Peticila Autodesk Product Manager Event recording: https://youtu.be/JJ53a1EKFm8 See the Revit Public Roadmap: https://blogs.autodesk.com/revit/roadmap/
-Thursday, January 19, 2023
+ &ndash; Public roadmap for structural engineering products, Revit and the AEC Collection &ndash; Panelists: Pawel Piechnik Autodesk Director Product Management Structures Product Line, Dan Peticila Autodesk Product Manager &ndash; [Event recording](https://youtu.be/JJ53a1EKFm8); [Revit Public Roadmap](https://blogs.autodesk.com/revit/roadmap); Thursday, January 19, 2023
 - MEP Product Roadmap Ask Me Anything
-Have questions about the product roadmap for MEP products? Join Autodesk product managers and get them answered live.   - Learn about highlights from recent releases, including Revit and the AEC Collection - Ask product managers and experts about the future of Autodesk AEC products - Join the conversation!   Panelists: Martin Schmid Autodesk Product Line Manager Event recording: https://youtu.be/y3sHuWQqtYc Submit questions before the event for the team to answer: https://admin.sli.do/event/7mLL71KUV1j85pHW2uYCoJ/polls    Register Now to Attend: https://autodesk.zoom.us/meeting/register/tJYkcuqorzIoEtD9lq9xGRUryaaki5baUaLM See the Revit Public Roadmap: https://blogs.autodesk.com/revit/roadmap/
-Thursday, January 19, 2023
+ &ndash; Product roadmap for MEP products, including Revit and the AEC Collection &ndash; Panelists: Martin Schmid Autodesk Product Line Manager &ndash; [Event recording](https://youtu.be/y3sHuWQqtYc); [Revit Public Roadmap](https://blogs.autodesk.com/revit/roadmap); Thursday, January 19, 2023
 
-Check them out in
-the [community-conversation recordings of past events](https://forums.autodesk.com/t5/community-conversations/eb-p/communityconversations?include_past=true).
+Check them all out in
+the [community conversation recordings of past events](https://forums.autodesk.com/t5/community-conversations/eb-p/communityconversations?include_past=true).
 
 ####<a name="3"></a> Parameters API
 
@@ -139,86 +136,48 @@ The list you pass in has to be ordered in the desired order.
 
 So, until i can consolidate a bit more this will work.
 
-public void SetExecutionOrder(List<IUpdater> updaters)
-{
-var count = updaters.Count;
-
-for (var i = 0; i < count; i++)
-{
-var previous = updaters[i].GetUpdaterId();
-
-var last = updaters[i + 1].GetUpdaterId();
-
-UpdaterRegistry.SetExecutionOrder(previous, last);
-}
-}
-
 <div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
 <div style="background: #f3f3f3; color: #000000; max-height: 500px; overflow: auto">
 <ol start="29" style="background: #ffffff; margin: 0; padding: 0;">
-<li>{</li>
-<li style="background: #f3f3f3">&#160;&#160;&#160; <span style="color:#0000ff">public</span> <span style="color:#0000ff">void</span> SetExecutionOrder(List&lt;IUpdater&gt; updaters)</li>
-<li>&#160;&#160;&#160; {</li>
-<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span style="color:#0000ff">var</span> count = updaters.Count;</li>
+<li style="background: #f3f3f3">&#160;&#160;<span style="color:#0000ff">public</span> <span style="color:#0000ff">void</span> SetExecutionOrder(List&lt;IUpdater&gt; updaters)</li>
+<li>&#160;&#160;{</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;<span style="color:#0000ff">var</span> count = updaters.Count;</li>
 <li>&nbsp;</li>
-<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span style="color:#0000ff">for</span> (<span style="color:#0000ff">var</span> i = 0; i &lt; count; i++)</li>
-<li>&#160;&#160;&#160;&#160;&#160;&#160;&#160; {</li>
-<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span style="color:#0000ff">var</span> previous = updaters[i].GetUpdaterId();</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;<span style="color:#0000ff">for</span> (<span style="color:#0000ff">var</span> i = 0; i &lt; count; i++)</li>
+<li>&#160;&#160;&#160;&#160;{</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#0000ff">var</span> previous = updaters[i].GetUpdaterId();</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#0000ff">var</span> last = updaters[i + 1].GetUpdaterId();</li>
 <li>&nbsp;</li>
-<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span style="color:#0000ff">var</span> last = updaters[i + 1].GetUpdaterId();</li>
-<li>&nbsp;</li>
-<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; UpdaterRegistry.SetExecutionOrder(previous, last);</li>
-<li>&#160;&#160;&#160;&#160;&#160;&#160;&#160; }</li>
-<li style="background: #f3f3f3">&#160;&#160;&#160; }</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;UpdaterRegistry.SetExecutionOrder(previous, last);</li>
+<li>&#160;&#160;&#160;&#160;}</li>
+<li style="background: #f3f3f3">&#160;&#160;}</li>
 </ol>
 </div>
 </div>
 
 **Update:** To better handle the situation where the count of items (IUpdaters) is odd it was better to implement a `do` ...`while` loop:
 
-public void SetExecutionOrder(List<IUpdater> updaters)
-	{
-		var last     = updaters[updaters.Count - 1];
-		var lastLoop = false;
-		var index    = 0;
-
-		do
-		{
-			var current = updaters[index];  
-
-			var next = updaters[index + 1];  
-
-			lastLoop = next == last;  
-
-			UpdaterRegistry.SetExecutionOrder(current.GetUpdaterId(), next.GetUpdaterId());
-
-			index++;
-		}
-		while (lastLoop == false);
-	}
-
 <div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
 <div style="background: #f3f3f3; color: #000000; max-height: 500px; overflow: auto">
 <ol start="29" style="background: #ffffff; margin: 0; padding: 0;">
-<li>{</li>
-<li style="background: #f3f3f3">&#160;&#160;&#160; <span style="color:#0000ff">public</span> <span style="color:#0000ff">void</span> SetExecutionOrder(List&lt;IUpdater&gt; updaters)</li>
-<li>&#160;&#160;&#160; {</li>
-<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span style="color:#0000ff">var</span> last = updaters[updaters.Count - 1];</li>
-<li>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span style="color:#0000ff">var</span> lastLoop = <span style="color:#0000ff">false</span>;</li>
-<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span style="color:#0000ff">var</span> index = 0;</li>
+<li style="background: #f3f3f3">&#160;&#160;<span style="color:#0000ff">public</span> <span style="color:#0000ff">void</span> SetExecutionOrder(List&lt;IUpdater&gt; updaters)</li>
+<li>&#160;&#160;{</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;<span style="color:#0000ff">var</span> last = updaters[updaters.Count - 1];</li>
+<li>&#160;&#160;&#160;&#160;<span style="color:#0000ff">var</span> lastLoop = <span style="color:#0000ff">false</span>;</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;<span style="color:#0000ff">var</span> index = 0;</li>
 <li>&nbsp;</li>
-<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span style="color:#0000ff">do</span></li>
-<li>&#160;&#160;&#160;&#160;&#160;&#160;&#160; {</li>
-<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span style="color:#0000ff">var</span> current = updaters[index];</li>
-<li>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span style="color:#0000ff">var</span> next = updaters[index + 1];</li>
-<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; lastLoop = next == last;</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;<span style="color:#0000ff">do</span></li>
+<li>&#160;&#160;&#160;&#160;{</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#0000ff">var</span> current = updaters[index];</li>
+<li>&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#0000ff">var</span> next = updaters[index + 1];</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;lastLoop = next == last;</li>
 <li>&nbsp;</li>
-<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; UpdaterRegistry.SetExecutionOrder(current.GetUpdaterId(), next.GetUpdaterId());</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;UpdaterRegistry.SetExecutionOrder(current.GetUpdaterId(), next.GetUpdaterId());</li>
 <li>&nbsp;</li>
-<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; index++;</li>
-<li>&#160;&#160;&#160;&#160;&#160;&#160;&#160; }</li>
-<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span style="color:#0000ff">while</span> (lastLoop == <span style="color:#0000ff">false</span>);</li>
-<li>&#160;&#160;&#160; }</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;index++;</li>
+<li>&#160;&#160;&#160;&#160;}</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;<span style="color:#0000ff">while</span> (lastLoop == <span style="color:#0000ff">false</span>);</li>
+<li>&#160;&#160;}</li>
 </ol>
 </div>
 </div>
@@ -267,12 +226,11 @@ At least until AU 2023 where everything will change! &nbsp; :-)
 
 ####<a name="5"></a> WorksharingUtils help Check Element Status
 
-Richard provided another solution to solve the question
+Richard provided another solution to help address a worksharing issue in 
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [`try` block not catching owner/permission locks](https://forums.autodesk.com/t5/revit-api-forum/try-block-not-catching-owner-permission-locks/m-p/11683634):
 
-[`try` block not catching owner/permission locks](https://forums.autodesk.com/t5/revit-api-forum/try-block-not-catching-owner-permission-locks/m-p/11683634)
-
-Try block not catching owner/permission locks
-I have a piece of code that's identifying changes in the model and updating a parameter across a number of detail items whenever the parameter's value is no longer accurate. It gathers the list of items to update, then inside of a transaction it uses a try/except block (I'm using pyRevit) so it can update as many of them as possible. The trouble is that if any of the items are checked out by other users I receive a warning and the entire transaction is rolled back. I'd like to catch this warning in the except block, but that doesn't seem to be happening.
+**Question:** I have a piece of code that's identifying changes in the model and updating a parameter across a number of detail items whenever the parameter's value is no longer accurate. It gathers the list of items to update, then inside of a transaction it uses a try/except block (I'm using pyRevit) so it can update as many of them as possible. The trouble is that if any of the items are checked out by other users I receive a warning and the entire transaction is rolled back. I'd like to catch this warning in the except block, but that doesn't seem to be happening.
 
 <pre class="prettyprint">
   t = DB.Transaction(doc, 'Update')
@@ -288,58 +246,42 @@ I have a piece of code that's identifying changes in the model and updating a pa
 
 The error I receive looks like "Can't edit the element until [user] resaves the element to central and relinquishes it and you Reload Latest." 
 
+**Answer:** So, apparently the transaction is catching the exception internally and aborting. You cannot change that.
 
-jeremy.tammik
-
-So, apparently the transaction is catching the exception internally and aborting. You cannot change that.
-
-You could start and commit a separate transaction for each individual call to LookupParameter + Set. Then, you could catch the exception that the aborted transaction is throwing.
+You could start and commit a separate transaction for each individual call to `LookupParameter` + `Set`. 
+Then, you could catch the exception that the aborted transaction is throwing.
 
 That would be extremely inefficient.
 
-Furthermore, the call to LookupParameter alone is inefficient as well. Why? Because it loops through all parameters and uses a string comparison on each.
+Furthermore, the call to `LookupParameter` alone is inefficient as well. 
+Why? Because it loops through all parameters and uses a string comparison on each.
 
-A more efficient solution to avoid calling LookupParameter inside the loop would be to call it once only before you start looping and use it to retrieve the Parameter object's Definition object:
+A more efficient solution to avoid calling LookupParameter inside the loop would be to call it once only before you start looping and use it to [retrieve the Parameter object's Definition object](https://www.revitapidocs.com/2023/dc30c65f-cfc4-244e-5a5c-bc333d7cd4c5.htm).
 
-https://www.revitapidocs.com/2023/dc30c65f-cfc4-244e-5a5c-bc333d7cd4c5.htm
+Then, you can very efficiently retrieve the parameter from the element directly without searching for 
+it [using Element.Parameter(Definition)](https://www.revitapidocs.com/2023/87d8a88c-906e-85a9-f575-f263788b8584.htm).
 
-Then, you can very efficiently retrieve the parameter from the element directly without searching for it using Element.Parameter(Definition):
-
-https://www.revitapidocs.com/2023/87d8a88c-906e-85a9-f575-f263788b8584.htm
-
-Now, to actually address your question: you are calling LookupParameter and blindly calling Set on the result. However, sometimes no such parameter is found, so LookupParameter returns null, and you are calling Set on a null object. That throws an exception.
+Now, to actually address your question: you are calling LookupParameter and blindly calling Set on the result. 
+However, sometimes no such parameter is found, so LookupParameter returns null, and you are calling Set on a null object. That throws an exception.
 
 The solution is simple: check for null before calling Set.
 
 The same applies regardless of whether you use LookupParameter of Element.Parameter(Definition) to access the parameter. Check for null first. If the result is null, no such parameter is present on the element, and you can skip it.
 
+**Answer2:** Regarding worksharing, there are two aspects you have to check on each element before attempting to edit it:
 
-RPTHOMAS108
+- <b>Ownership</b>: WorksharingUtils.GetCheckoutStatus &ndash; Only a status of OwnedByOtherUser will cause an issue here
+- <b>Update status</b>: WorksharingUtils.GetModelUpdatesStatus &ndash;  The following two aspects will cause issues:
+    - DeletedInCentral &ndash; should not make changes on these elements, since they no longer exist
+    - UpdatedInCentral &ndash; You can call reload latest, but I find it is generally better to log these
 
-Regarding worksharing there are two aspects you have to check on each element before attempting to edit it:
+Generally, logging is a better approach to reloading, since reloading can be time consuming and should be an end user driven decision. 
+However, you may implement a system whereby you group the UpdatedInCentral, reload latest and then get status again to confirm they can now be edited. 
+I don't see the need for this especially and it may require more than one iteration, depending on what others are doing.
 
-Ownership
-
-WorksharingUtils.GetCheckoutStatus
-
-Only a status of OwnedByOtherUser will cause an issue here
-
-Update status
-
-WorksharingUtils.GetModelUpdatesStatus
-
-The following two aspects will cause issues
-
-DeletedInCentral (should not make changes on these elements since they no longer exist)
-
-UpdatedInCentral (You can call reload latest but I find it is generally better to log these)
-
-Generally logging is a better approach to reloading since reloading can be time consuming and should be an end user driven decision. However you may implement a system whereby you group the UpdatedInCentral, reload latest and then get status again to confirm they can now be edited. I don't see the need for this especially and it may require more than one iteration depending on what others are doing.
-
-
-PerryLackowski
-
-I had this post open for a month, waiting for the worksharing warning to happen again so I could debug it. @RPTHOMAS108, your solution worked great - I coded up a simple function that'll I'll likely use on some other scripts. Thanks for the help!
+**Response:** I had this post open for a month, waiting for the worksharing warning to happen again so I could debug it.
+@RPTHOMAS108, your solution worked great &ndash;  I coded up a simple function that'll I'll likely use on some other scripts. 
+Thanks for the help!
 
 <pre class="prettyprint">
   def is_not_available(elem_id):
@@ -351,16 +293,18 @@ I had this post open for a month, waiting for the worksharing warning to happen 
     return False
 </pre>
 
-RPTHOMAS108
+**Answer:** I've always used these methods and it has always worked; however I noticed recently another post to the contrary.
 
-I've always used these methods and it has always worked however I noticed recently another post to the contrary.
-
-The information for those methods is cached so you should really call WorksharingUtils.CheckoutElements to confirm it since that interacts with the central file. The other get status methods just check the local cache information which is often right but apparently not always. I think I would probably still use the get status methods as a primary check.
+The information for those methods is cached, so you should really call WorksharingUtils.CheckoutElements to confirm it, since that interacts with the central file. The other get status methods just check the local cache information, which is often right, but apparently not always. 
+I think I would probably still use the get status methods as a primary check.
 
 The RevitAPI.chm help file gives details of the fitness for purpose for
 the various [methods of `WorksharingUtils`](https://www.revitapidocs.com/2023/653a0e7c-8e55-b715-b2a5-e71a416ecb14.htm).
 
-Testing these issues is a lot harder than it used to be due to the single licence fixed Revit user log-in. In the past, we just switched the Revit user name in the options dialogue and that was that. There should be an API method for faking Revit user names, i.e., names in a form that indicate they are obviously not actual Revit users or account holders (just for testing worksharing with add-ins). Instead of: log in as UserA &ndash; do something  &ndash;  log in as UserB  &ndash;  does it work?
+Testing these issues is a lot harder than it used to be due to the single licence fixed Revit user log-in. 
+In the past, we just switched the Revit user name in the options dialogue and that was that. 
+There should be an API method for faking Revit user names, i.e., names in a form that indicate they are obviously not actual Revit users or account holders (just for testing worksharing with add-ins). 
+Instead of: log in as UserA &mdash; do something &mdash; log in as UserB &mdash; does it work?
 
 <center>
 <img src="img/worksharing.png" alt="Worksharing" title="Worksharing" width="500"/> <!-- 716 × 403 pixels -->
@@ -368,10 +312,10 @@ Testing these issues is a lot harder than it used to be due to the single licenc
 
 ####<a name="6"></a> Chuong Ho is Featured Speckle Developer
 
-Congratulations to [Chuong Ho](https://github.com/chuongmep),
+Let's wrap up for today by congratulating [Chuong Ho](https://github.com/chuongmep),
 who has made huge contributions to the Revit and Dynamo communitiers lately, last but not least
 to [RevitLookup](https://github.com/jeremytammik/RevitLookup/graphs/contributors).
-Very many thanks for all your work.
+Very many thanks for all your work!
 
 As a well-deserved recognition, among others, Chuong Ho has been nominated 
 [Featured Speckle Developer](https://speckle.systems/blog/chuong-ho-featured-developer).
