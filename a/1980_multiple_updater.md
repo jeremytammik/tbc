@@ -54,7 +54,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### Handling Multiple Updaters
 
 - [Community Conversation Roadmap AMAs](#2)
-- [APS Parameters API](#3)
+- [Platform Services Parameters API](#3)
 - [Handling Multiple Updaters](#4)
 - [WorksharingUtils help Check Element Status](#5)
 - [Chuong Ho is Featured Speckle Developer](#6)
@@ -79,7 +79,7 @@ Tuesday, January 17, 2023
 Check them all out in
 the [community conversation recordings of past events](https://forums.autodesk.com/t5/community-conversations/eb-p/communityconversations?include_past=true).
 
-####<a name="3"></a> Parameters API
+####<a name="3"></a> Platform Services Parameters API
 
 Talking about roadmaps and upcoming changes, one important and long-awaited enhancement revolves around the handling of parameter definitions.
 
