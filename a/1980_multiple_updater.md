@@ -32,8 +32,12 @@
  
 twitter:
 
-&ndash; 
-...
+Recordings of the roadmap presentations, handling updaters and worksharing
+&ndash; Community conversation roadmap AMAs
+&ndash; Platform Services Parameters API
+&ndash; Handling multiple updaters
+&ndash; WorksharingUtils help check element status
+&ndash; Chuong Ho is featured Speckle developer...
 
 linkedin:
 
@@ -51,7 +55,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Handling Multiple Updaters
+### Roadmap AmAs and Handling Multiple Updaters
+
+Recordings of the roadmap presentations are now available to help us all see and understand where things are headed, and updaters and worksharing help us monitor what is happening right now:
 
 - [Community conversation roadmap AMAs](#2)
 - [Platform Services Parameters API](#3)
@@ -72,7 +78,7 @@ Last week saw a bunch of roadmap discussions looking at future ideas and directi
   [Civil Infrastructure Public Roadmap](https://trello.com/b/tafIRGcN/autodesk-civil-infrastructure-product-roadmap);
   [Infrastructure Futures](https://feedback.autodesk.com/key/InfrastructureFutures)
   &ndash; Public roadmap for civil infrastructure products, future Civil 3D, InfraWorks, ReCap Pro, and the AEC Collection &ndash; Panelists: Dave Simeone Autodesk Sr. Product Manager Civil Products, Tim Yarris Autodesk Product Manager Civil 3D, Ramesh Sridharan Autodesk Product Manager ReCap + InfraWorks
-- 2023-01-19 Structures Product Roadmap AmA [Event recording](https://youtu.be/JJ53a1EKFm8); 
+- 2023-01-19 Structures Product Roadmap AmA [Event recording](https://youtu.be/JJ53a1EKFm8)
   &ndash; Public roadmap for structural engineering products, Revit and the AEC Collection &ndash; Panelists: Pawel Piechnik Autodesk Director Product Management Structures Product Line, Dan Peticila Autodesk Product Manager
 - 2023-01-19 MEP Product Roadmap AmA [Event recording](https://youtu.be/y3sHuWQqtYc)
   &ndash; Product roadmap for MEP products, including Revit and the AEC Collection &ndash; Panelists: Martin Schmid Autodesk Product Line Manager
