@@ -61,20 +61,22 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> Community Conversation Roadmap AMAs
 
-Last week saw a bunch of roadmap discussions looking at future ideas and directions of different areas of Revit and Dynamo in <i>Ask me Anything</i> format, and now the event recordings are provided for your illumination and enjoyment:
+Last week saw a bunch of roadmap discussions looking at future ideas and directions of different areas of Revit and Dynamo in <i>Ask me Anything</i> or AmA format, and now the event recordings are provided for your illumination and enjoyment:
 
-- Architecture and Platform Product (Revit) Roadmap Ask Me Anything
- &ndash; Community Conversation about the future of Autodesk AEC solutions, highlights from recent releases, including Revit and the AEC Collection, future of Autodesk AEC products, roadmap &ndash; Panelists: Harlan Brumm Autodesk Sr. Product Line Manager, Mike Engel Autodesk  Sr. Product Manager, Bogdan Matei Autodesk Revit Product Manager, Matt Arsenault Autodesk Revit Product Manager, Sam Anderson of Twinmotion by Epic Games &ndash; [Event Recording](https://youtu.be/HLrrGEtBKEM); 
-Tuesday, January 17, 2023
-- Computational Design and Automation (Dynamo) Roadmap Ask Me Anything 
-&ndash; Public roadmap for Computational Design and Automation using Dynamo, future of Dynamo and Autodesk AEC solutions &ndash; Panelists: Lilli Smith Autodesk  Sr. Product Manager, Sol Amour Autodesk Product Line Mgr., Jacob Small Autodesk Global Consulting Delivery &ndash; [Event recording](https://youtu.be/LfERZO3Fdzg); 
-Tuesday, January 17, 2023
-- Infrastructure Product Roadmap Ask Me Anything
- &ndash; Public roadmap for civil infrastructure products, future Civil 3D, InfraWorks, ReCap Pro, and the AEC Collection &ndash; Panelists: Dave Simeone Autodesk Sr. Product Manager Civil Products, Tim Yarris Autodesk Product Manager Civil 3D, Ramesh Sridharan Autodesk Product Manager ReCap + InfraWorks &ndash; [Recording](https://youtu.be/t2tuGOqax-w); [Civil Infrastructure Public Roadmap](https://trello.com/b/tafIRGcN/autodesk-civil-infrastructure-product-roadmap); [Infrastructure Futures](https://feedback.autodesk.com/key/InfrastructureFutures); Wednesday, January 18, 2023
-- Structures Product Roadmap Ask Me Anything
- &ndash; Public roadmap for structural engineering products, Revit and the AEC Collection &ndash; Panelists: Pawel Piechnik Autodesk Director Product Management Structures Product Line, Dan Peticila Autodesk Product Manager &ndash; [Event recording](https://youtu.be/JJ53a1EKFm8); [Revit Public Roadmap](https://blogs.autodesk.com/revit/roadmap); Thursday, January 19, 2023
-- MEP Product Roadmap Ask Me Anything
- &ndash; Product roadmap for MEP products, including Revit and the AEC Collection &ndash; Panelists: Martin Schmid Autodesk Product Line Manager &ndash; [Event recording](https://youtu.be/y3sHuWQqtYc); [Revit Public Roadmap](https://blogs.autodesk.com/revit/roadmap); Thursday, January 19, 2023
+- [Revit Public Roadmap](https://blogs.autodesk.com/revit/roadmap)
+- 2023-01-17 Architecture and Platform Product (Revit) Roadmap AmA [Event Recording](https://youtu.be/HLrrGEtBKEM)
+  &ndash; Community Conversation about the future of Autodesk AEC solutions, highlights from recent releases, including Revit and the AEC Collection, future of Autodesk AEC products, roadmap &ndash; Panelists: Harlan Brumm Autodesk Sr. Product Line Manager, Mike Engel Autodesk  Sr. Product Manager, Bogdan Matei Autodesk Revit Product Manager, Matt Arsenault Autodesk Revit Product Manager, Sam Anderson of Twinmotion by Epic Games
+- 2023-01-17 Computational Design and Automation (Dynamo) Roadmap AmA [Event recording](https://youtu.be/LfERZO3Fdzg)
+  &ndash; Public roadmap for Computational Design and Automation using Dynamo, future of Dynamo and Autodesk AEC solutions &ndash; Panelists: Lilli Smith Autodesk  Sr. Product Manager, Sol Amour Autodesk Product Line Mgr., Jacob Small Autodesk Global Consulting Delivery
+- 2023-01-18 Infrastructure Product Roadmap AmA [Event Recording](https://youtu.be/t2tuGOqax-w);
+  [Civil Infrastructure Public Roadmap](https://trello.com/b/tafIRGcN/autodesk-civil-infrastructure-product-roadmap);
+  [Infrastructure Futures](https://feedback.autodesk.com/key/InfrastructureFutures)
+  &ndash; Public roadmap for civil infrastructure products, future Civil 3D, InfraWorks, ReCap Pro, and the AEC Collection &ndash; Panelists: Dave Simeone Autodesk Sr. Product Manager Civil Products, Tim Yarris Autodesk Product Manager Civil 3D, Ramesh Sridharan Autodesk Product Manager ReCap + InfraWorks
+- 2023-01-19 Structures Product Roadmap AmA [Event recording](https://youtu.be/JJ53a1EKFm8); 
+  &ndash; Public roadmap for structural engineering products, Revit and the AEC Collection &ndash; Panelists: Pawel Piechnik Autodesk Director Product Management Structures Product Line, Dan Peticila Autodesk Product Manager
+- 2023-01-19 MEP Product Roadmap AmA [Event recording](https://youtu.be/y3sHuWQqtYc)
+  &ndash; Product roadmap for MEP products, including Revit and the AEC Collection &ndash; Panelists: Martin Schmid Autodesk Product Line Manager
+
 
 Check them all out in
 the [community conversation recordings of past events](https://forums.autodesk.com/t5/community-conversations/eb-p/communityconversations?include_past=true).
