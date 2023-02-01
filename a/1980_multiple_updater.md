@@ -43,6 +43,16 @@ Recordings of the roadmap presentations, handling updaters and worksharing
 
 linkedin:
 
+Recordings of the roadmap presentations, new parameters API, handling multiple updaters and worksharing in the #RevitAPI 
+
+https://autode.sk/multipledmu
+
+- Community conversation roadmap AMAs
+- Platform Services Parameters API
+- Handling multiple updaters
+- WorksharingUtils help check element status
+- Chuong Ho is featured Speckle developer...
+
 #bim #DynamoBim #AutodeskAPS #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
