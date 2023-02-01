@@ -6,7 +6,23 @@
 
 <!---
 
-
+- back to the basics:
+  And whoever else is interested in the Revit API:
+  I just answered four cases this morning on StackOverflow and in the discussion forum where I repeat some basic recommendations that I have already given hundreds of times in the past:
+  element filtering: https://stackoverflow.com/questions/74806242/simplify-a-series-of-repetitive-functions-with-sort-options/74809786#74809786
+  parameter access: https://forums.autodesk.com/t5/revit-api-forum/try-block-not-catching-owner-permission-locks/m-p/11621464
+  XYZ trigonometry: https://forums.autodesk.com/t5/revit-api-forum/how-to-create-a-vector-xyz-tilted-up-from-the-view-direction-by/m-p/11621339
+  projecting points: https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128
+  I would really be happy if I did not have to continue repeating them over and over again.
+  All four of these could give a blog post each, or all four together.
+  At the very least, I hope that you guys all agree with me that the recommendations I make there are sensible and relevant.
+  Please read them, tell me what you think, and feel free to summarise them in one or several blog posts of your own, if you like.
+  Above all, please confirm that you understand them and let me know if you have any questions or doubts whatsoever.
+  element filtering: https://stackoverflow.com/questions/74806242/simplify-a-series-of-repetitive-functions-with-sort-options/74809786#74809786
+  parameter access: https://forums.autodesk.com/t5/revit-api-forum/try-block-not-catching-owner-permission-locks/m-p/11621464
+  XYZ trigonometry: https://forums.autodesk.com/t5/revit-api-forum/how-to-create-a-vector-xyz-tilted-up-from-the-view-direction-by/m-p/11621339
+  /Users/jta/a/doc/revit/tbc/git/a/trigonometry.png 640 × 836 pixels
+  projecting points: https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128
  
 twitter:
 
@@ -31,7 +47,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### ChatGPT
+### Back to Basics and ChatGPT
+
+I answered a bunch of very basic questions for the umpteenth time before Christmas and thought I might summarise some of them yet again.
+
+I am still impressed and intrigued by what ChatGPT can and cannot do, and keep trying out new aspects myself and with my friends.
+
+I strongly advise anyone interested in it to try it out for themselves rather than just reading the numerous articles on it published by others.
 
 
 
@@ -59,6 +81,35 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <img src="img/.png" alt="" title="" width="100"/> <!-- 716 × 403 pixels -->
 </center>
 
+####<a name="2"></a> Back to the Basics
+
+Here are four typical questions from StackOverflow and the discussion forum where I repeat some basic recommendations that I have already given many times before:
+
+element filtering: https://stackoverflow.com/questions/74806242/simplify-a-series-of-repetitive-functions-with-sort-options/74809786#74809786
+parameter access: https://forums.autodesk.com/t5/revit-api-forum/try-block-not-catching-owner-permission-locks/m-p/11621464
+XYZ trigonometry: https://forums.autodesk.com/t5/revit-api-forum/how-to-create-a-vector-xyz-tilted-up-from-the-view-direction-by/m-p/11621339
+projecting points: https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128
+/Users/jta/a/doc/revit/tbc/git/a/trigonometry.png 640 × 836 pixels
+projecting points: https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128
+
+I would really be happy if I did not have to continue repeating them.
+
+I am sure that by now, based on the publicly available information, ChatGPT can answer them just as well or better than I have done.
+
+I hope that you guys all agree with me that the recommendations I make there are sensible and relevant.
+
+Please let me know if you disagree or can improve on them in any way.
+
+Thank you!
+
+element filtering: https://stackoverflow.com/questions/74806242/simplify-a-series-of-repetitive-functions-with-sort-options/74809786#74809786
+parameter access: https://forums.autodesk.com/t5/revit-api-forum/try-block-not-catching-owner-permission-locks/m-p/11621464
+XYZ trigonometry: https://forums.autodesk.com/t5/revit-api-forum/how-to-create-a-vector-xyz-tilted-up-from-the-view-direction-by/m-p/11621339
+projecting points: https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128
+/Users/jta/a/doc/revit/tbc/git/a/trigonometry.png 640 × 836 pixels
+projecting points: https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128
+
+####<a name="2"></a> Kean on the Coming Year
 
 Kean on Reflections on what’s coming in 2023, partly focussed on ChatGPT and
 https://www.keanw.com/2023/01/reflections-on-whats-coming-in-2023.html
