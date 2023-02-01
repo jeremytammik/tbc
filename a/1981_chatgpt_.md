@@ -159,18 +159,13 @@ I'm sorry, but I am not a physical machine or computer program that can be acces
 
 ####<a name="6"></a> Uplifting Books
 
+A friend was looking for positive uplifting books about the future of our society and planet, and good things happening already now. 
+So, we asked ChatGPT for some suggestions, and were duly rewarded.
+It took us three prompts (in German) to get the desired surprisingly good results:
 
-my friend was looking for positive uplifting books about the future of our society and planet,
-
-and good things happening bnow. so, we asked ChatGPT for some suggestions, and were duly rewarded.
-
-It took us three prompts to get the desired surprisingly good results:
-
-1. Bitte nenne uns gute literarische romane die wohlwollend, zuversichtlich und mutmachend in die zukunft blicken und inspirieren. --> list of mainstream books
-
-2. das passt fuer mich nicht, die sind nicht positiv. lieber positive utopien wie zum beispiel oekotopia. --> list of less mainstream books, but heavily scifi oriented
-
-3. es soll auf der erde spielen und oekologische  und gesellschaftliche loesungen zeigen --> very interesting results, including a pointer to 
+- Bitte nenne uns gute literarische romane die wohlwollend, zuversichtlich und mutmachend in die zukunft blicken und inspirieren. &rarr; list of mainstream books
+- Das passt fuer mich nicht, die sind nicht positiv. lieber positive utopien wie zum beispiel oekotopia. &rarr; list of less mainstream books, but heavily scifi oriented
+- Es soll auf der erde spielen und oekologische  und gesellschaftliche loesungen zeigen &rarr; very interesting results, including a pointer to 
 
 the [Solarpunk Manifesto](http://www.re-des.org/a-solarpunk-manifesto):
 
