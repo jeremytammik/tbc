@@ -39,23 +39,23 @@ In this code, the dimension will be created at the same location as the original
 options = DB.Options()
 options.ComputeReferences = True
 arc = detail_line \
-    .Geometry[options] \
-    .Where(lambda x: isinstance(x, DB.Arc)) \
-    .First()
+  .Geometry[options] \
+  .Where(lambda x: isinstance(x, DB.Arc)) \
+  .First()
 dimension_type = doc.GetElement(DB.ElementId(2530))
 with DB.Transaction(doc, 'Create Arc Length Dimension') as t:
-    t.Start()
-    DB.AngularDimension.Create(
-        doc,
-        doc.ActiveView,
-        arc,
-        [
-            arc.GetEndPointReference(0),
-            arc.GetEndPointReference(1)
-        ],
-        dimension_type
-    )
-    t.Commit()
+  t.Start()
+  DB.AngularDimension.Create(
+    doc,
+    doc.ActiveView,
+    arc,
+    [
+      arc.GetEndPointReference(0),
+      arc.GetEndPointReference(1)
+    ],
+    dimension_type
+  )
+  t.Commit()
 
 Maxim Stepannikov | Architect, BIM Manager, Instructor
 
@@ -178,35 +178,32 @@ It is a waste of memory and computation time, as I have pointed out repeatedly i
 in [How to Distinguish Redundant Rooms](https://thebuildingcoder.typepad.com/blog/2016/04/how-to-distinguish-redundant-rooms.html#2). 
 
 Now, to address your question, you can simply implement a common method `get_elements_of_category_and_class` taking a category and a class argument. 
-Pass in either one or the other or both and execute `OfClass` and `OfCategory` checks on the filtered element collector, either one or the other or both, skipping evaluation of `null-valued arguments.
+Pass in either one or the other or both and execute `OfClass` and `OfCategory` checks on the filtered element collector, either one or the other or both, skipping evaluation of `null`-valued arguments.
 
-####<a name="3"></a> Work Parameter Access
 
-1980_multiple_updater.md:Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+####<a name="3"></a> WorksharingUtils Parameter Access
 
-<li><a href="http://thebuildingcoder.typepad.com/blog/2015/11/worksharingutils.html">WorksharingUtils</a></li>
-[](https://forums.autodesk.com/t5/revit-api-forum/try-block-not-catching-owner-permission-locks/m-p/11621464)
 
-Try block not catching owner/permission locks
-4 REPLIES  SOLVED Back to Revit Products Category Back to forum
- 
-MESSAGE 1 OF 5
-PerryLackowski
- Advocate PerryLackowski 161 Views, 4 Replies
-‎2022-12-14 07:35 PM 
-Try block not catching owner/permission locks
-I have a piece of code that's identifying changes in the model and updating a parameter across a number of detail items whenever the parameter's value is no longer accurate. It gathers the list of items to update, then inside of a transaction it uses a try/except block (I'm using pyrevit) so it can update as many of them as possible. The trouble is that if any of the items are checked out by other users I receive a warning and the entire transaction is rolled back. I'd like to catch this warning in the except block, but that doesn't seem to be happening.
 
+We already discussed the [WorksharingUtils utility class](http://thebuildingcoder.typepad.com/blog/2015/11/worksharingutils.html">WorksharingUtils) in the year 2015.
+
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+brought it up again in his solution 
+to [`try` block not catching owner/permission locks](https://forums.autodesk.com/t5/revit-api-forum/try-block-not-catching-owner-permission-locks/m-p/11621464):
+
+**Question:** I have a piece of code that's identifying changes in the model and updating a parameter across a number of detail items whenever the parameter's value is no longer accurate. It gathers the list of items to update, then inside of a transaction it uses a try/except block (I'm using pyrevit) so it can update as many of them as possible. The trouble is that if any of the items are checked out by other users I receive a warning and the entire transaction is rolled back. I'd like to catch this warning in the except block, but that doesn't seem to be happening.
+
+<pre class="prettyprint">
 t = DB.Transaction(doc, 'Update')
 t.Start()
 for item in items_to_update:
-    try:
-        item[0].LookupParameter('Circuit_Count').Set(int(item[2]))
-        print(':white_heavy_check_mark: {} {} Circuit_Count parameter has been set to: {}'.format(item[1],output.linkify(item[0].Id), item[2]))
-    except:
-        print(':cross_mark: {} {} Failed to set Circuit_Count parameter to: {}'.format(item[1],output.linkify(item[0].Id), item[2]))
+  try:
+    item[0].LookupParameter('Circuit_Count').Set(int(item[2]))
+    print(':white_heavy_check_mark: {} {} Circuit_Count parameter has been set to: {}'.format(item[1],output.linkify(item[0].Id), item[2]))
+  except:
+    print(':cross_mark: {} {} Failed to set Circuit_Count parameter to: {}'.format(item[1],output.linkify(item[0].Id), item[2]))
 t.Commit()
- 
+</pre> 
 
 The error I receive looks like "Can't edit the element until [user] resaves the element to central and relinquishes it and you Reload Latest." 
 
@@ -311,14 +308,15 @@ PerryLackowski
 ‎2023-01-16 01:28 PM 
 I had this post open for a month, waiting for the worksharing warning to happen again so I could debug it. @RPTHOMAS108, your solution worked great - I coded up a simple function that'll I'll likely use on some other scripts. Thanks for the help!
 
+<pre class="prettyprint">
 def is_not_available(elem_id):
-    if DB.WorksharingUtils.GetCheckoutStatus(doc,elem_id) == DB.CheckoutStatus.OwnedByOtherUser:
-        return True
-    status = DB.WorksharingUtils.GetModelUpdatesStatus(doc,elem_id)
-    if status == DB.ModelUpdatesStatus.DeletedInCentral or status == DB.ModelUpdatesStatus.UpdatedInCentral:
-        return True
-    return False
- 
+  if DB.WorksharingUtils.GetCheckoutStatus(doc,elem_id) == DB.CheckoutStatus.OwnedByOtherUser:
+    return True
+  status = DB.WorksharingUtils.GetModelUpdatesStatus(doc,elem_id)
+  if status == DB.ModelUpdatesStatus.DeletedInCentral or status == DB.ModelUpdatesStatus.UpdatedInCentral:
+    return True
+  return False
+ </pre>
 
 Tags (0)
 Add tags
@@ -351,12 +349,10 @@ Testing these issues is a lot harder than it used to be due to the single licenc
 
 /Users/jta/a/doc/revit/tbc/git/a/trigonometry.png 640 × 836 pixels
 
-
 <center>
-<img src="img/trigonometry.png" alt="ChatGPT AI ethics headlines" title="ChatGPT AI ethics headlines" width="800"/> <!-- 1532 × 928 pixels -->
+<img src="img/trigonometry.png" alt="" title="" width="100"/> <!--  -->
 </center>
 
-####<a name="3"></a> 
 
 ####<a name="3"></a> Kean on the Coming Year
 
