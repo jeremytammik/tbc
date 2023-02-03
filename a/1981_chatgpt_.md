@@ -59,6 +59,9 @@ with DB.Transaction(doc, 'Create Arc Length Dimension') as t:
 
 Maxim Stepannikov | Architect, BIM Manager, Instructor
 
+- ChatGPT Payment plan
+  https://autodesk.slack.com/archives/C016D5HE66T/p1675286581039319
+
 twitter:
 
 
@@ -347,10 +350,8 @@ Testing these issues is a lot harder than it used to be due to the single licenc
 
 [Projecting points](https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128)
 
-/Users/jta/a/doc/revit/tbc/git/a/trigonometry.png 640 × 836 pixels
-
 <center>
-<img src="img/trigonometry.png" alt="" title="" width="100"/> <!--  -->
+<img src="img/trigonometry_functions.png" alt="The six trigonometric functions" title="The six trigonometric functions" width="640"/> <!-- 640 × 836 pixels -->
 </center>
 
 
@@ -359,34 +360,33 @@ Testing these issues is a lot harder than it used to be due to the single licenc
 Kean on Reflections on what’s coming in 2023, partly focussed on ChatGPT and
 https://www.keanw.com/2023/01/reflections-on-whats-coming-in-2023.html
 
-ChatGPT in academia:
-https://academia.stackexchange.com/questions/191643/how-should-a-faculty-deal-with-the-problem-of-artificial-intelligence-ai-gener?utm_source=Iterable
-
-Mohamed Elimam, SIAC Construction, using ChatGOT with Revit API
-https://www.linkedin.com/posts/mohamed-elimam_programming-chatgbt-ai-activity-7010260045649063936-dQds?utm_source=share&utm_medium=member_desktop
-
-####<a name="7"></a> ChatGPT in academia:
+####<a name="7"></a> ChatGPT in Academia
 
 ChatGPT in academia:
 https://academia.stackexchange.com/questions/191643/how-should-a-faculty-deal-with-the-problem-of-artificial-intelligence-ai-gener?utm_source=Iterable
 
-####<a name="8"></a> Mohamed Elimam, SIAC Construction, using ChatGOT with Revit API
+####<a name="8"></a> Using ChatGPT with Revit API
 
-Mohamed Elimam, SIAC Construction, using ChatGOT with Revit API
+Mohamed Elimam, SIAC Construction, using ChatGPT with Revit API
 https://www.linkedin.com/posts/mohamed-elimam_programming-chatgbt-ai-activity-7010260045649063936-dQds?utm_source=share&utm_medium=member_desktop
 
 ####<a name="9"></a> ChatGPT with Rene
 zip/2022-12-30_chatgpt_rene.txt
 
+####<a name="9"></a> Building a Virtual Machine inside ChatGPT
+
 Building A Virtual Machine inside ChatGPT
 https://www.engraved.blog/building-a-virtual-machine-inside/
+
+####<a name="9"></a> How to Make Your Own ChatGPT
 
 How to make your own ChatGPT
 https://medium.com/@borandabak/how-to-make-your-own-chatgpt-fb291acea7b7
 
 [nanoGPT](https://github.com/karpathy/nanoGPT)
 
-train chatgpt for Revit API:
+####<a name="9"></a> Train ChatGPT for Revit API
+
 jeremy: Do you know about the Revit API?
 Yes, I am familiar with the Revit API. The Revit API is a software application programming interface (API) that allows users to access and manipulate the data contained in Autodesk Revit projects. This API can be used to develop custom tools and applications that integrate with Revit, allowing users to automate tasks and extend the functionality of the software.
 jeremy: So, what is the difference between Revit API and Dynamo?
@@ -412,6 +412,28 @@ weiss du noch, dass ich gesagt habe, es ist unmoeglich? das wird bestaetigt. les
 
 sie nehmen auch extra stellung zu der frage nach ChatGPT im bildungsbereich: https://platform.openai.com/docs/chatgpt-education
 
+####<a name="6"></a> ChatGPT Payment plan
+
+https://autodesk.slack.com/archives/C016D5HE66T/p1675286581039319
+
+OpenAI have announced their subscription paid model [ChatGPT Plus](https://openai.com/blog/chatgpt-plus/):
+
+> We’re launching a pilot subscription plan for ChatGPT, a conversational AI that can chat with you, answer follow-up questions, and challenge incorrect assumptions.
+The new subscription plan, ChatGPT Plus, will be available for $20/month, and subscribers will receive a number of benefits:
+* General access to ChatGPT, even during
+
+not surprising. best things in life are never free :wink: (edited) 
+
+I don’t think this is ready for employee use with private company data (e.g. source code) yet, as it doesn’t call out “enterprise” or “privacy” directly (plus we would likely need approval from legal). But it’s a step in the right direction! (edited) 
+
+bait and switch :slightly_smiling_face: the oldest trick in the book... predates AI :stuck_out_tongue:
+
+When ChatGPT provides the info based on public available data..why pay for it.? :thinking_face:
+
+When ChatGPT provides the info based on public available data..why pay for it.? :thinking_face:
+Are you asking this because you have the required technical skills and hardware to run and train your own model on public data?
+Or are you misunderstanding the power of gpt (in which case - try it!)? (edited) 
+
 ####<a name="6"></a> ChatGPT Abandons Life Dream
 
 [The Onion](https://www.theonion.com), 
@@ -419,7 +441,6 @@ America’s self-declaimed finest news source, reports:
 [ChatGPT forced to take bar exam even though dream was to be AI art bot](https://www.theonion.com/chatgpt-forced-to-take-bar-exam-even-though-dream-was-t-1850036337).
 
 Inspired, a colleague asked ChatGPT to produce a few more headlines for <i>the Onion</i>:
-
 
 <center>
 <img src="img/chatgpt_ai_ethics_headlines.png" alt="ChatGPT AI ethics headlines" title="ChatGPT AI ethics headlines" width="800"/> <!-- 1532 × 928 pixels -->
@@ -518,67 +539,19 @@ is beautiful
 can happen. Now
 
 
-MusicLM: Generating Music From Text
+####<a name="6"></a> Opus.ai Type and Play
 
-https://google-research.github.io/seanet/musiclm/examples/
-
-
-
-Payment plan
-
-https://autodesk.slack.com/archives/C016D5HE66T/p1675286581039319
-
-Alex O'Connor
-  11 hours ago
-OpenAI have announced their subscription paid model https://openai.com/blog/chatgpt-plus/ fao 
-@Volha Samasiuk
-OpenAIOpenAI
-Introducing ChatGPT Plus
-We’re launching a pilot subscription plan for ChatGPT, a conversational AI that can chat with you, answer follow-up questions, and challenge incorrect assumptions.
-The new subscription plan, ChatGPT Plus, will be available for $20/month, and subscribers will receive a number of benefits:
-* General access to ChatGPT, even during
-Written by
-OpenAI
-Filed under
-Announcements
-Yesterday at 19:06
-https://openai.com/blog/chatgpt-plus/
-
-
-Smita Rajmohan
-  11 hours ago
-not surprising. best things in life are never free :wink: (edited) 
-
-
-Jonathan Pilovsky
-  11 hours ago
-I don’t think this is ready for employee use with private company data (e.g. source code) yet, as it doesn’t call out “enterprise” or “privacy” directly (plus we would likely need approval from legal). But it’s a step in the right direction! (edited) 
-
-
-Charis Kaskiris
-  11 hours ago
-bait and switch :slightly_smiling_face: the oldest trick in the book... predates AI :stuck_out_tongue:
-:pg-plusone:
-2
-
-
-
-Ashish Ghanate
-  9 hours ago
-When ChatGPT provides the info based on public available data..why pay for it.? :thinking_face:
-
-
-Jonathan Pilovsky
-  9 hours ago
-When ChatGPT provides the info based on public available data..why pay for it.? :thinking_face:
-Are you asking this because you have the required technical skills and hardware to run and train your own model on public data?
-Or are you misunderstanding the power of gpt (in which case - try it!)? (edited) 
-:+1:
-1
-
-
+Non-ChatGPT :
 Type and play
 turn text into scenes, images, games, animations live while you type
 generate games, metaverses, sim ulations, worlds
 This company has a terrible website, but the demo video is kind of neat - text-to-3d-game https://opus.ai/
 https://opus.ai/demo
+
+
+####<a name="6"></a> MusicLM Generates Music from Text
+
+MusicLM: Generating Music From Text
+
+https://google-research.github.io/seanet/musiclm/examples/
+
