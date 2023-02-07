@@ -351,7 +351,7 @@ Testing these issues is a lot harder than it used to be due to the single licenc
 [Projecting points](https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128)
 
 <center>
-<img src="img/trigonometry_functions.png" alt="The six trigonometric functions" title="The six trigonometric functions" width="640"/> <!-- 640 × 836 pixels -->
+<img src="img/trigonometry_functions.png" alt="The six trigonometric functions" title="The six trigonometric functions" width="320"/> <!-- 640 × 836 pixels -->
 </center>
 
 ####<a name="3"></a> Generative AI and Multi-Modal Learning
