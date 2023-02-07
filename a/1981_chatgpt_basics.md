@@ -56,17 +56,17 @@ I am still impressed and intrigued by what ChatGPT can and cannot do, and keep t
 
 I strongly advise anyone interested in it to try it out for yourself rather than just reading the numerous articles published by others &ndash; for example, my notes below :-)
 
-- [Back to the Basics](#2)
-- [Element Filtering](#3)
-- [XYZ Trigonometry](#4)
-- [Projecting Points](#5)
+- [Back to the basics](#2)
+- [Element filtering](#3)
+- [XYZ trigonometry](#4)
+- [Projecting points](#5)
 - [Train ChatGPT for Revit API](#6)
-- [Asking ChatGPT a Revit API Question](#7)
-- [Generative AI and Multi-Modal Learning](#8)
-- [More Notes on ChatGPT et al](#9)
+- [Asking ChatGPT a Revit API question](#7)
+- [Using ChatGPT with Revit API](#8)
+- [Generative AI and multi-Modal learning](#9)
+- [More Notes on ChatGPT et al](#10)
     - [Kean on the Coming Year](#9.01)
     - [ChatGPT in Academia](#9.02)
-    - [Using ChatGPT with Revit API](#9.03)
     - [Building a VM inside ChatGPT](#9.04)
     - [How to Make Your Own ChatGPT](#9.05)
     - [Differentiate Human vs. AI](#9.06)
@@ -236,7 +236,6 @@ project it from global 3D space onto the face 2D.
 
 **Response:** Thank you. That was just what I needed!
 
-
 ####<a name="6"></a> Train ChatGPT for Revit API
 
 I asked ChatGPT some basic questions to determine whether it knows about the Revit API, Dynamo, The Building Coder blog and the Revit API discussion forum. 
@@ -303,7 +302,12 @@ So, it isn't even like you could copy and paste, then update.
 Anyway, it is surprising and impressive how sensible-sounding the answer is; plus, in many cases, it is actually correct.
 It all depends on what ChatGPT was fed in its pre-training curriculum.
 
-####<a name="8"></a> Generative AI and Multi-Modal Learning
+####<a name="8"></a> Using ChatGPT with Revit API
+
+On the other hand, Mohamed Elimam, SIAC Construction, presented 
+some [success using ChatGPT to help work with Revit API](https://www.linkedin.com/posts/mohamed-elimam_programming-chatgbt-ai-activity-7010260045649063936-dQds).
+
+####<a name="9"></a> Generative AI and Multi-Modal Learning
 
 The past few months hint at exciting and adventurous times full of radical change ahead.
 
@@ -348,7 +352,7 @@ Our brains are extremely good at this, especially when we are babies and toddler
 It is a key ingredient in how we learn about the world. 
 Seeing a toy block, feeling its sharp corners, hearing the sound it makes when it falls on the floor, and then hearing a parent say “block” is all part of a multi-modal learning process. 
 
-####<a name="9"></a> More Notes on ChatGPT et al
+####<a name="10"></a> More Notes on ChatGPT et al
 
 I performed a few experiments with friends asking various questions in different domains, some of them in German. 
 The following is a list of pointers and short notes on those and other's experiments and a couple of other related issues.
@@ -360,29 +364,24 @@ I cannot teach ChatGPT new tricks, since it is pre-trained.
 I can, however, ensure that as much reliable information as possible is out there on the web to hopefully be included in the pre-training resources in the next version.
 In the case of the Revit API, I do so by moderating the Revit API discussion forum and trying to provide reliable information in The Building Coder blog, hoping that that information will find its way into the pre-training dataset sooner or later.
 
-####<a name="9.01"></a> Kean on the Coming Year
+####<a name="10.01"></a> Kean on the Coming Year
 
 Kean Walmsley shared 
 his [reflections on what’s coming in 2023](https://www.keanw.com/2023/01/reflections-on-whats-coming-in-2023.html), 
 partly focussed on ChatGPT.
 
 
-####<a name="9.02"></a> ChatGPT in Academia
+####<a name="10.02"></a> ChatGPT in Academia
 
 An interesting analysis of ChatGPT in academia, 
 on [how a faculty should deal with the problem of AI generated texts](https://academia.stackexchange.com/questions/191643/how-should-a-faculty-deal-with-the-problem-of-artificial-intelligence-ai-gener).
 
-####<a name="9.03"></a> Using ChatGPT with Revit API
-
-Mohamed Elimam, SIAC Construction, presented 
-some [success using ChatGPT to help work with Revit API](https://www.linkedin.com/posts/mohamed-elimam_programming-chatgbt-ai-activity-7010260045649063936-dQds).
-
-####<a name="9.04"></a> Building a Virtual Machine inside ChatGPT
+####<a name="10.04"></a> Building a Virtual Machine inside ChatGPT
 
 You can do some funny things with it, such 
 as [build and run a virtual machine inside ChatGPT](https://www.engraved.blog/building-a-virtual-machine-inside/).
 
-####<a name="9.05"></a> How to Make Your Own ChatGPT
+####<a name="10.05"></a> How to Make Your Own ChatGPT
 
 [How to make your own ChatGPT](https://medium.com/@borandabak/how-to-make-your-own-chatgpt-fb291acea7b7) is 
 not really about m,aking your own, but making use of the ChatGPT API in your own app.
@@ -390,17 +389,17 @@ not really about m,aking your own, but making use of the ChatGPT API in your own
 In order to make your own, you might want to start with something smaller, such 
 as [nanoGPT](https://github.com/karpathy/nanoGPT).
 
-####<a name="9.06"></a> Differentiate Human vs. AI
+####<a name="10.06"></a> Differentiate Human vs. AI
 
 zu dem thema unterscheidung AI-generierter versus menschengeschriebener text: ein solches werkzeug wird seit gestern von openai.com angeboten, also von der herstellern von ChatGPT: https://openai.com/blog/new-ai-classifier-for-indicating-ai-written-text/
 
 weiss du noch, dass ich gesagt habe, es ist unmoeglich? das wird bestaetigt. lese dazu die einschraenkungen: https://openai.com/blog/new-ai-classifier-for-indicating-ai-written-text/#limitations
 
-####<a name="9.07"></a> ChatGPT and Education
+####<a name="10.07"></a> ChatGPT and Education
 
 ChatGPT nimmt Stellung zu der Frage nach ChatGPT im bildungsbereich: https://platform.openai.com/docs/chatgpt-education
 
-####<a name="9.08"></a> ChatGPT Payment plan
+####<a name="10.08"></a> ChatGPT Payment plan
 
 https://autodesk.slack.com/archives/C016D5HE66T/p1675286581039319
 
@@ -422,7 +421,7 @@ When ChatGPT provides the info based on public available data..why pay for it.? 
 Are you asking this because you have the required technical skills and hardware to run and train your own model on public data?
 Or are you misunderstanding the power of gpt (in which case - try it!)? (edited) 
 
-####<a name="9.09"></a> Uplifting Books
+####<a name="10.09"></a> Uplifting Books
 
 A friend was looking for positive uplifting books about the future of our society and planet, and good things happening already now. 
 So, we asked ChatGPT for some suggestions, and were duly rewarded.
@@ -434,7 +433,7 @@ It took us three prompts (in German) to get the desired surprisingly good result
 
 the [Solarpunk Manifesto](http://www.re-des.org/a-solarpunk-manifesto):
 
-####<a name="9.10"></a> Solarpunk
+####<a name="10.10"></a> Solarpunk
 
 Solarpunk is a movement in speculative fiction, art, fashion, and activism that seeks to answer and embody the question “what does a sustainable civilization look like, and how can we get there?” 
 
@@ -446,7 +445,7 @@ Solutions to thrive without fossil fuels, to equitably manage real scarcity and 
 
 Solarpunk is at once a vision of the future, a thoughtful provocation, a way of living and a set of achievable proposals to get there...
 
-####<a name="9.11"></a> Opus.ai Type and Play
+####<a name="10.11"></a> Opus.ai Type and Play
 
 Moving away from ChatGPT, here is another AI site, [Opus.ai](https://opus.ai/demo),
 enabling type and play by turning text into scenes, images, games, animations live while you type:
@@ -454,12 +453,12 @@ enabling type and play by turning text into scenes, images, games, animations li
 > generate games, metaverses, sim ulations, worlds
 
 
-####<a name="9.12"></a> MusicLM Generates Music from Text
+####<a name="10.12"></a> MusicLM Generates Music from Text
 
 Yet another one, [MusicLM: Generating Music From Text](https://google-research.github.io/seanet/musiclm/examples)
 
 
-####<a name="9.13"></a> ChatGPT Abandons Life Dream
+####<a name="10.13"></a> ChatGPT Abandons Life Dream
 
 Ending this long exploration on a funnier note, 
 [The Onion](https://www.theonion.com), 
