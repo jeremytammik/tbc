@@ -254,7 +254,7 @@ At least until AU 2023 where everything will change! &nbsp; :-)
 
 Many thanks to Chris and Richard for the valuable insights and experience!
 
-####<a name="5"></a> WorksharingUtils help Check Element Status
+####<a name="5"></a> WorksharingUtils Help Check Element Status
 
 Richard provided another solution to help address a worksharing issue in 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread

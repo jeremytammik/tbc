@@ -24,41 +24,6 @@
   /Users/jta/a/doc/revit/tbc/git/a/trigonometry.png 640 × 836 pixels
   projecting points: https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128
 
-https://forums.autodesk.com/t5/revit-api-forum/how-to-create-an-arc-length-dimension-in-a-doc-view/m-p/11726515#M69098
-How to create an Arc Length Dimension in a doc view?
-I've tried using AngularDimension but only shows the angle of the arc. It has a property called "DimensionShape" that is read only. I cannot set it to ArcLength.
-This issue was raised repeatedly recently:
-https://forums.autodesk.com/t5/forums/searchpage/tab/message?advanced=false&allow_punctuation=false&...
-architect.bim 
-To do this, you need to select the correct DimensionType object in the project. You can do this via the FilteredElementCollector class or directly by the Id value (you can find it out with RevitLookup by creating a dimension manually in the project and looking up the Id of its dimension type).
-
-Here is a small example of creating a dimension that shows the arc length of the detail line. Note that you need to set the ComputeReferences property in the Options object to be able to get references to the start and end of the arc.
-
-In this code, the dimension will be created at the same location as the original arc. If you want to place the dimension somewhere else, you have to offset the original arc and pass it instead of the original arc.
-
-options = DB.Options()
-options.ComputeReferences = True
-arc = detail_line \
-  .Geometry[options] \
-  .Where(lambda x: isinstance(x, DB.Arc)) \
-  .First()
-dimension_type = doc.GetElement(DB.ElementId(2530))
-with DB.Transaction(doc, 'Create Arc Length Dimension') as t:
-  t.Start()
-  DB.AngularDimension.Create(
-    doc,
-    doc.ActiveView,
-    arc,
-    [
-      arc.GetEndPointReference(0),
-      arc.GetEndPointReference(1)
-    ],
-    dimension_type
-  )
-  t.Commit()
-
-Maxim Stepannikov | Architect, BIM Manager, Instructor
-
 - ChatGPT Payment plan
   https://autodesk.slack.com/archives/C016D5HE66T/p1675286581039319
 
@@ -95,38 +60,16 @@ I strongly advise anyone interested in it to try it out for yourself rather than
 
 
 
-####<a name="2"></a> 
-
-####<a name="3"></a> 
-
-####<a name="4"></a> 
-
-**Question:** 
-
-**Solution:** 
-
-
-**Update:** 
-
-
-<pre class="prettyprint">
-
-</pre>
-
-
-
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 716 × 403 pixels -->
-</center>
 
 ####<a name="2"></a> Back to the Basics
 
 Here are four typical questions from StackOverflow and the discussion forum where I repeat some basic recommendations that I have already given many times before:
 
-- [element filtering](#3)
+- [Element filtering](#3)
 - [parameter access](#4)
 - [XYZ trigonometry](#5)
 - [projecting points](#6)
+
 
 I would really be happy if I did not have to continue repeating them.
 
@@ -140,9 +83,9 @@ Thank you!
 
 ####<a name="3"></a> Element Filtering
 
-[Simplify a series of repetitive functions with sort options](https://stackoverflow.com/questions/74806242/simplify-a-series-of-repetitive-functions-with-sort-options/74809786#74809786)
+[Simplify a series of repetitive functions with sort options](https://stackoverflow.com/questions/74806242/simplify-a-series-of-repetitive-functions-with-sort-options)
 
-I have a series of functions in a module which are starting to become quite repetitive. Each function extracts a list, and has an optional boolean argument to sort the list before returning it. Feels like there ought to be a way to inherit the sorting from a parent function?
+I have a series of functions in a module which are starting to become quite repetitive. Each function extracts a list, and has an optional Boolean argument to sort the list before returning it. Feels like there ought to be a way to inherit the sorting from a parent function?
 
 <pre class="prettyprint">
 def get_electrical_equipment(sort_by_name = False):
@@ -184,120 +127,77 @@ Now, to address your question, you can simply implement a common method `get_ele
 Pass in either one or the other or both and execute `OfClass` and `OfCategory` checks on the filtered element collector, either one or the other or both, skipping evaluation of `null`-valued arguments.
 
 
-####<a name="3"></a> WorksharingUtils Parameter Access
+####<a name="3"></a> XYZ Trigonometry
+
+Another recurring question is basic trigonometry, such 
+as [how to create a vector `XYZ` tilted up from the view direction by a specified angle](https://forums.autodesk.com/t5/revit-api-forum/how-to-create-a-vector-xyz-tilted-up-from-the-view-direction-by/m-p/11621339):
+
+**Question:** I have a the view direction that I use for my reference intersector. 
+I would like to try various altitude angles up from the view direction in a section with starting point at a wall like in this section view:
 
 
+<center>
+<img src="img/vector_tilted_up.png" alt="Vector tilted up from plane" title="Vector tilted up from plane" width="600"/> <!-- 1199 × 530 pixels -->
+</center>
 
-We already discussed the [WorksharingUtils utility class](http://thebuildingcoder.typepad.com/blog/2015/11/worksharingutils.html">WorksharingUtils) in the year 2015.
+I know there are transforms and various complex maths answers on StackOverflow; I was hoping to use a simpler built-in method if available? 
 
-Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
-brought it up again in his solution 
-to [`try` block not catching owner/permission locks](https://forums.autodesk.com/t5/revit-api-forum/try-block-not-catching-owner-permission-locks/m-p/11621464):
-
-**Question:** I have a piece of code that's identifying changes in the model and updating a parameter across a number of detail items whenever the parameter's value is no longer accurate. It gathers the list of items to update, then inside of a transaction it uses a try/except block (I'm using pyrevit) so it can update as many of them as possible. The trouble is that if any of the items are checked out by other users I receive a warning and the entire transaction is rolled back. I'd like to catch this warning in the except block, but that doesn't seem to be happening.
-
-<pre class="prettyprint">
-t = DB.Transaction(doc, 'Update')
-t.Start()
-for item in items_to_update:
-  try:
-    item[0].LookupParameter('Circuit_Count').Set(int(item[2]))
-    print(':white_heavy_check_mark: {} {} Circuit_Count parameter has been set to: {}'.format(item[1],output.linkify(item[0].Id), item[2]))
-  except:
-    print(':cross_mark: {} {} Failed to set Circuit_Count parameter to: {}'.format(item[1],output.linkify(item[0].Id), item[2]))
-t.Commit()
-</pre> 
-
-The error I receive looks like "Can't edit the element until [user] resaves the element to central and relinquishes it and you Reload Latest." 
-
- Solved by RPTHOMAS108. Go to Solution.
-
-Tags (0)
-Add tags
-Report
-4 REPLIES 
-Sort: 
-MESSAGE 2 OF 5
-jeremy.tammik
- Employee jeremy.tammik in reply to: PerryLackowski
-‎2022-12-15 02:42 AM 
-So, apparently the transaction is catching the exception internally and aborting. You cannot change that.
+**Answer:** This kind of trigonometry is not difficult. Your children learn it in school, I hope. Please take a moment to either read the Wikipedia article or study some other tutorials:
 
   
 
-You could start and commit a separate transaction for each individual call to LookupParameter + Set. Then, you could catch the exception that the aborted transaction is throwing.
+https://en.wikipedia.org/wiki/Trigonometric_functions#Law_of_tangents
 
   
 
-That would be extremely inefficient.
+From that article, I find this image most helpful:
 
   
 
-Furthermore, the call to LookupParameter alone is inefficient as well. Why? Because it loops through all parameters and uses a string comparison on each.
+Unit Circle Definitions of Six Trigonometric Functions
 
   
 
-A more efficient solution to avoid calling LookupParameter inside the loop would be to call it once only before you start looping and use it to retrieve the Parameter object's Definition object:
+https://en.wikipedia.org/wiki/File:Unit_Circle_Definitions_of_Six_Trigonometric_Functions.png
 
   
 
-https://www.revitapidocs.com/2023/dc30c65f-cfc4-244e-5a5c-bc333d7cd4c5.htm
+wiki_trigo.png
+
+
+<center>
+<img src="img/trigonometry_functions.png" alt="The six trigonometric functions" title="The six trigonometric functions" width="320"/> <!-- 640 × 836 pixels -->
+</center>
+
+
+Decide what angle you wish to use, e.g., 30 degrees. Determine its tangens value, ca. 30*3.14/180 = 0.5. Take your horizontal view direction XYZ vector (x,y,0). Replace the Z coordinate by the tangens you calculated, yielding  (x,y,0.5). Voila. That is your new tilted direction vector. You may normalise it if you like.
+
+   
+
+Please do not be afraid of trigonometry, it is very intuitive as soon as you stop being scared of it.
+
+    
+
+I condemn our teachers and education systems (not all, but all too many) for inoculating kids with fear of maths and geometry.
 
   
 
-Then, you can very efficiently retrieve the parameter from the element directly without searching for it using Element.Parameter(Definition):
+This is basic human intuitive understanding,. The greeks mastered it 3000 yeards ago. We can handle a computer and a smartphone, but not simple trigonometry? 
 
   
 
-https://www.revitapidocs.com/2023/87d8a88c-906e-85a9-f575-f263788b8584.htm
+Why?
 
-  
-
-Now, to actually address your question: you are calling LookupParameter and blindly calling Set on the result. However, sometimes no such parameter is found, so LookupParameter returns null, and you are calling Set on a null object. That throws an exception.
-
-  
-
-The solution is simple: check for null before calling Set.
-
-  
-
-The same applies regardless of whether you use LookupParameter of Element.Parameter(Definition) to access the parameter. Check for null first. If the result is null, no such parameter is present on the element, and you can skip it.
-
-  
+   
 
 Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
 Tags (0)
 Add tags
 Report
-MESSAGE 3 OF 5
+MESSAGE 5 OF 6
 RPTHOMAS108
- Mentor RPTHOMAS108 in reply to: PerryLackowski
-‎2022-12-15 03:55 AM 
-Regarding worksharing there are two aspects you have to check on each element before attempting to edit it:
-
- 
-
-Ownership
-
-WorksharingUtils.GetCheckoutStatus
-
-Only a status of OwnedByOtherUser will cause an issue here
-
- 
-
-Update status
-
-WorksharingUtils.GetModelUpdatesStatus
-
-The following two aspects will cause issues
-
-DeletedInCentral (should not make changes on these elements since they no longer exist)
-
-UpdatedInCentral (You can call reload latest but I find it is generally better to log these)
-
- 
-Generally logging is a better approach to reloading since reloading can be time consuming and should be an end user driven decision. However you may implement a system whereby you group the UpdatedInCentral, reload latest and then get status again to confirm they can now be edited. I don't see the need for this especially and it may require more than one iteration depending on what others are doing.
-
+ Mentor RPTHOMAS108 in reply to: FrankHolidaytoiling
+‎2022-12-15 04:22 AM 
  
 
  
@@ -305,54 +205,45 @@ Generally logging is a better approach to reloading since reloading can be time 
 Tags (0)
 Add tags
 Report
-MESSAGE 4 OF 5
-PerryLackowski
- Advocate PerryLackowski in reply to: RPTHOMAS108
-‎2023-01-16 01:28 PM 
-I had this post open for a month, waiting for the worksharing warning to happen again so I could debug it. @RPTHOMAS108, your solution worked great - I coded up a simple function that'll I'll likely use on some other scripts. Thanks for the help!
-
-<pre class="prettyprint">
-def is_not_available(elem_id):
-  if DB.WorksharingUtils.GetCheckoutStatus(doc,elem_id) == DB.CheckoutStatus.OwnedByOtherUser:
-    return True
-  status = DB.WorksharingUtils.GetModelUpdatesStatus(doc,elem_id)
-  if status == DB.ModelUpdatesStatus.DeletedInCentral or status == DB.ModelUpdatesStatus.UpdatedInCentral:
-    return True
-  return False
- </pre>
-
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 5
+MESSAGE 6 OF 6
 RPTHOMAS108
- Mentor RPTHOMAS108 in reply to: PerryLackowski
-‎2023-01-16 01:34 PM 
-I've always used these methods and it has always worked however I noticed recently another post to the contrary.
+ Mentor RPTHOMAS108 in reply to: RPTHOMAS108
+‎2022-12-15 04:25 AM 
+I would probably look at it in terms of the ratio between the forward direction and XYZ.BasisZ that the angle represents.
 
  
 
-The information for those methods is cached so you should really call WorksharingUtils.CheckoutElements to confirm it since that interacts with the central file. The other get status methods just check the local cache information which is often right but apparently not always. I think I would probably still use the get status methods as a primary check.
+i.e. for 45 degrees it would be the average of the two (forward and up). When you consider each component of each vector they range from the value you have looking forward to the value you have looking up. If you divide these delta values by 90 do you then have a fraction for each component you can multiple by your angle (in degrees) to add to the forward direction? 
 
  
 
-The RevitAPI.chm gives details of the fitness for purpose for the various methods of WorksharingUtils.
+I've never done it that way to be fair, I would probably have also solved it with trigonometry but the XYZ has good functionality for arithmetic operations.
 
  
 
-Testing these issues is a lot harder than it used to be due to the single licence fixed Revit user log-in. In the past we just switched the Revit user name in the options dialogue and that was that. There should be an API method for faking Revit user names i.e. names in a form that indicate they are obviously not actual Revit users or account holders (just for testing worksharing with add-ins). Instead of: log in as UserA do something then log in as UserB, does it work?
+Similar as noted above in Jeremy's post below is probably the easiest way:
 
-####<a name="3"></a> XYZ Trigonometry
+ 
 
-[XYZ trigonometry](https://forums.autodesk.com/t5/revit-api-forum/how-to-create-a-vector-xyz-tilted-up-from-the-view-direction-by/m-p/11621339)
+Dim V0 As New XYZ(1, 0.5, 0) 'some random flat direction
+V0 = V0.Normalize
+Dim Ang As Double = 30 'Angle in degrees
+Dim Ang_r As Double = (Math.PI / 180) * Ang
+Dim T As Double = Math.Tan(Ang_r) 'Tan(Ang) = Opp/1
+Dim Vz As New XYZ(0, 0, T)
+Dim V1 As XYZ = (V0 + Vz).Normalize 'The direction with tilt of 30 degrees up from horizontal
+ 
 
-####<a name="3"></a> Projecting Points
+I think I was oversimplifying earlier because it isn't linear. Always on the lookout for new ways of doing the same things. Above is ok from 0 to < 90.  From that point on you have to check the quadrant and consider the Tan function doesn't work approaching 90 or 270 but you know those values are looking straight up and straight down respectively.
 
-[Projecting points](https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128)
 
 <center>
 <img src="img/trigonometry_functions.png" alt="The six trigonometric functions" title="The six trigonometric functions" width="320"/> <!-- 640 × 836 pixels -->
 </center>
+
+####<a name="3"></a> Projecting Points
+
+[Projecting points](https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128)
 
 ####<a name="3"></a> Generative AI and Multi-Modal Learning
 
@@ -601,3 +492,29 @@ MusicLM: Generating Music From Text
 
 https://google-research.github.io/seanet/musiclm/examples/
 
+
+
+
+####<a name="2"></a> 
+
+####<a name="3"></a> 
+
+####<a name="4"></a> 
+
+**Question:** 
+
+**Solution:** 
+
+
+**Update:** 
+
+
+<pre class="prettyprint">
+
+</pre>
+
+
+
+<center>
+<img src="img/.png" alt="" title="" width="100"/> <!-- 716 × 403 pixels -->
+</center>
