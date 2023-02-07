@@ -126,7 +126,6 @@ in [How to Distinguish Redundant Rooms](https://thebuildingcoder.typepad.com/blo
 Now, to address your question, you can simply implement a common method `get_elements_of_category_and_class` taking a category and a class argument. 
 Pass in either one or the other or both and execute `OfClass` and `OfCategory` checks on the filtered element collector, either one or the other or both, skipping evaluation of `null`-valued arguments.
 
-
 ####<a name="3"></a> XYZ Trigonometry
 
 Another recurring question is basic trigonometry, such 
@@ -135,96 +134,48 @@ as [how to create a vector `XYZ` tilted up from the view direction by a specifie
 **Question:** I have a the view direction that I use for my reference intersector. 
 I would like to try various altitude angles up from the view direction in a section with starting point at a wall like in this section view:
 
-
 <center>
 <img src="img/vector_tilted_up.png" alt="Vector tilted up from plane" title="Vector tilted up from plane" width="600"/> <!-- 1199 × 530 pixels -->
 </center>
 
 I know there are transforms and various complex maths answers on StackOverflow; I was hoping to use a simpler built-in method if available? 
 
-**Answer:** This kind of trigonometry is not difficult. Your children learn it in school, I hope. Please take a moment to either read the Wikipedia article or study some other tutorials:
-
-  
-
-https://en.wikipedia.org/wiki/Trigonometric_functions#Law_of_tangents
-
-  
-
-From that article, I find this image most helpful:
-
-  
-
-Unit Circle Definitions of Six Trigonometric Functions
-
-  
-
-https://en.wikipedia.org/wiki/File:Unit_Circle_Definitions_of_Six_Trigonometric_Functions.png
-
-  
-
-wiki_trigo.png
-
+**Answer:** This kind of trigonometry is not difficult. 
+Your children learn it in school, I hope. 
+Please take a moment to either read 
+the [Wikipedia article on Trigonometric functions and the Law of tangents](https://en.wikipedia.org/wiki/Trigonometric_functions#Law_of_tangents) or 
+study some other tutorials. 
+From that article, I find this image on the unit circle definitions of six trigonometric functions most helpful:
 
 <center>
-<img src="img/trigonometry_functions.png" alt="The six trigonometric functions" title="The six trigonometric functions" width="320"/> <!-- 640 × 836 pixels -->
+<img src="img/trigonometry_functions.png" alt="Unit circle definitions of six trigonometric functions" title="Unit circle definitions of six trigonometric functions" width="320"/> <!-- 640 × 836 pixels -->
 </center>
 
-
-Decide what angle you wish to use, e.g., 30 degrees. Determine its tangens value, ca. 30*3.14/180 = 0.5. Take your horizontal view direction XYZ vector (x,y,0). Replace the Z coordinate by the tangens you calculated, yielding  (x,y,0.5). Voila. That is your new tilted direction vector. You may normalise it if you like.
-
-   
+Decide what angle you wish to use, e.g., 30 degrees. 
+Determine its tangens value, ca. 30 x 3.14 / 180 = 0.5. 
+Take your horizontal view direction XYZ vector (x,y,0). 
+Replace the Z coordinate by the tangens you calculated, yielding  (x,y,0.5). 
+Voila. 
+That is your new tilted direction vector. 
+You may normalise it if you like.
 
 Please do not be afraid of trigonometry, it is very intuitive as soon as you stop being scared of it.
 
-    
-
 I condemn our teachers and education systems (not all, but all too many) for inoculating kids with fear of maths and geometry.
 
-  
-
-This is basic human intuitive understanding,. The greeks mastered it 3000 yeards ago. We can handle a computer and a smartphone, but not simple trigonometry? 
-
-  
+This is basic human intuitive understanding. 
+The greeks mastered it 3000 years ago. 
+We can handle a computer and a smartphone, but not simple trigonometry? 
 
 Why?
 
-   
+**Answer 2:** I would probably look at it in terms of the ratio between the forward direction and XYZ.BasisZ that the angle represents.
 
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 6
-RPTHOMAS108
- Mentor RPTHOMAS108 in reply to: FrankHolidaytoiling
-‎2022-12-15 04:22 AM 
- 
+Also, the `XYZ` class has good functionality for arithmetic operations.
 
- 
+Similar as noted above, below shows an easy way:
 
-Tags (0)
-Add tags
-Report
-MESSAGE 6 OF 6
-RPTHOMAS108
- Mentor RPTHOMAS108 in reply to: RPTHOMAS108
-‎2022-12-15 04:25 AM 
-I would probably look at it in terms of the ratio between the forward direction and XYZ.BasisZ that the angle represents.
-
- 
-
-i.e. for 45 degrees it would be the average of the two (forward and up). When you consider each component of each vector they range from the value you have looking forward to the value you have looking up. If you divide these delta values by 90 do you then have a fraction for each component you can multiple by your angle (in degrees) to add to the forward direction? 
-
- 
-
-I've never done it that way to be fair, I would probably have also solved it with trigonometry but the XYZ has good functionality for arithmetic operations.
-
- 
-
-Similar as noted above in Jeremy's post below is probably the easiest way:
-
- 
-
+<pre class="prettyprint">
 Dim V0 As New XYZ(1, 0.5, 0) 'some random flat direction
 V0 = V0.Normalize
 Dim Ang As Double = 30 'Angle in degrees
@@ -232,14 +183,10 @@ Dim Ang_r As Double = (Math.PI / 180) * Ang
 Dim T As Double = Math.Tan(Ang_r) 'Tan(Ang) = Opp/1
 Dim Vz As New XYZ(0, 0, T)
 Dim V1 As XYZ = (V0 + Vz).Normalize 'The direction with tilt of 30 degrees up from horizontal
- 
+</pre> 
 
-I think I was oversimplifying earlier because it isn't linear. Always on the lookout for new ways of doing the same things. Above is ok from 0 to < 90.  From that point on you have to check the quadrant and consider the Tan function doesn't work approaching 90 or 270 but you know those values are looking straight up and straight down respectively.
-
-
-<center>
-<img src="img/trigonometry_functions.png" alt="The six trigonometric functions" title="The six trigonometric functions" width="320"/> <!-- 640 × 836 pixels -->
-</center>
+This works from 0 to < 90.  
+From that point on, you have to check the quadrant and consider the `Tan` function doesn't work approaching 90 or 270 degrees, but you know those values are looking straight up and straight down respectively.
 
 ####<a name="3"></a> Projecting Points
 
