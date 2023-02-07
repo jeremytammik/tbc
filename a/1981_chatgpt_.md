@@ -354,6 +354,52 @@ Testing these issues is a lot harder than it used to be due to the single licenc
 <img src="img/trigonometry_functions.png" alt="The six trigonometric functions" title="The six trigonometric functions" width="640"/> <!-- 640 × 836 pixels -->
 </center>
 
+####<a name="3"></a> Generative AI and Multi-Modal Learning
+
+The past few months hint at exciting and adventurous times full of radical change ahead.
+
+The speed at which machine learning models are evolving is breathtaking. 
+There are more companies, labs and institutions working on these than ever before. 
+The language model GPT3 from OpenAI, released in 2021, was a key breakthrough.
+This year, OpenAI plans to release GPT4, an even larger language model. 
+
+> The disruption from this technology is like nothing we have ever encountered in software history. 
+It is paralleled only by the advent of the computer itself. 
+This technology will be more impactful than the Internet, mobile computing, and GUIs. 
+It stands to upend every aspect of how we work. 
+It will fundamentally change how we interact with computers, treating them as something closer to an assistant than a smart calculator. 
+The very essence of what it means to create something will change. 
+We will feel challenged by these systems in novel ways. 
+This technology disrupts entire industries. 
+Legal frameworks will be at a loss for how to adjust. 
+New economies will appear while others die off. 
+
+What powers this innovation? 
+
+Behind the amazing capabilities of these models are two concepts: Generative AI and Multi-Modal Learning. 
+The most prevalent examples of Generative AI are Large Language Models (LLM) that both ingest and produce language.
+Researchers feed LLMs with immense amounts of text across every spoken, written and computer language that exists. 
+The models learn to correlate and produce new, original text based on prompts with astonishing results. 
+
+One way to think of these models is that they are learning language and how we use it by discovering the patterns and frequencies of words and how we group them. 
+As LLMs scale up and train across vast amounts of text, including many spoken and computer languages, the models learn increasingly advanced and nuanced concepts that have meaning to us. 
+It seems like magic.
+That’s because language is so central to being human.
+
+<blockquote>
+<p>The truly unique feature of our language is... the ability to transmit information 
+about things that do not exist at all. As far as we know, only Sapiens can talk 
+about entire kinds of entities that they have never seen, touched or smelled.
+<span style="text-align: right; font-style: italic">&ndash; Yuval Noah Harari, Sapiens</span></p>
+</blockquote>
+
+Multi-modal learning is an old idea and, just as with language, it is something deeply human. 
+It means to learn from multiple sources of information at the same time, inferring the relationships and meanings across them. 
+Our brains are extremely good at this, especially when we are babies and toddlers. 
+It is a key ingredient in how we learn about the world. 
+Seeing a toy block, feeling its sharp corners, hearing the sound it makes when it falls on the floor, and then hearing a parent say “block” is all part of a multi-modal learning process. 
+
+
 
 ####<a name="3"></a> Kean on the Coming Year
 
