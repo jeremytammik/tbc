@@ -191,8 +191,6 @@ From that point on, you have to check the quadrant and consider the `Tan` functi
 
 **Question:** I am currently trying to create an add-in that will allow me to perform a calculation on various points on a duct face.
 
- 
-
 For now, the user is selecting the face, but in the future, I plan to process the top face of each duct in the view.
 
 I am following along with the [RvtFader example project](https://github.com/jeremytammik/RvtFader).
@@ -201,21 +199,13 @@ A reference to my face is passed into the `SpatialFieldManager`, exactly like in
 
 The UpdateSpatialFieldPrimiate method runs without error, and my duct is shaded with a single solid color.
 
- 
-
 I believe my issue is that I am feeding the FieldDomainPointsByUV with UV points that are in the global coordinate system instead of the local coordinates system to the face. I suspect because create a BoundingBoxUV of my face, and supplying the bb.Min and bb.Max, along with 0, 10 as FieldValues, I get a correctly shaded (using a gradient) duct. 
-
- 
 
 Is there a way to convert WCS XYZ points to local UV points?
 
 I assume I don't care about the Z coordinate...
 
- 
-
 What am I missing here? 
-
- 
 
 **Answer:** Normally, the `UV` coordinates depend on the face. 
 Simply converting the `XYZ` X and Y values directly to UV will not work.
@@ -225,6 +215,42 @@ the [Face.Project method](https://www.revitapidocs.com/2023/4bee3e30-74fa-3103-c
 project it from global 3D space onto the face 2D.
 
 **Response:** Thank you. That was just what I needed!
+
+
+####<a name="9"></a> Train ChatGPT for Revit API
+
+I asked ChatGPT some basic questions to determine whether it knows about the Revit API, Dynamo, The Building Coder blog and the Revit API discussion forum. 
+The results were surprisingly mixed:
+
+jeremy: Do you know about the Revit API?
+
+ChatGPT: Yes, I am familiar with the Revit API. The Revit API is a software application programming interface (API) that allows users to access and manipulate the data contained in Autodesk Revit projects. This API can be used to develop custom tools and applications that integrate with Revit, allowing users to automate tasks and extend the functionality of the software.
+
+jeremy: So, what is the difference between Revit API and Dynamo?
+
+ChatGPT: Dynamo is a visual programming platform that can be used with Revit to automate and simplify tasks and workflows. The Revit API, on the other hand, is a set of programming tools and libraries that can be used to develop custom applications and tools that integrate with Revit. While Dynamo is a user-friendly platform that allows users to create scripts and automate tasks without writing code, the Revit API is a more advanced tool that requires some programming knowledge to use effectively. Additionally, Dynamo is built on top of the Revit API, so using the Revit API allows for even greater customization and control over the automation of tasks in Revit.
+
+jeremy: Do you know the Revit API discussion forum?
+
+ChatGPT: I am not aware of a specific discussion forum for the Revit API. However, there are many online forums and communities where users of the Revit API can ask questions, share tips and advice, and discuss their experiences with the API. Some examples of these forums include the Autodesk Developer Network forums, the Autodesk Revit API discussion group on LinkedIn, and the Revit API discussion forum on Autodesk Community. These forums can be a great resource for users of the Revit API who are looking for help, advice, or simply want to connect with other users of the API.
+
+jeremy: Do you know The Building Coder blog?
+
+ChatGPT: I'm sorry, but I am not aware of The Building Coder blog. As a large language model trained by OpenAI, my knowledge is based on the text that has been fed into my training data. I do not have the ability to browse the internet or access additional information outside of what has been provided to me during my training. I apologize if I am unable to provide you with the information you are looking for. Is there anything else I may be able to assist you with?
+
+jeremy: Can you read The Building Coder blog 
+at [thebuildingcoder.typepad.com](https://thebuildingcoder.typepad.com/) so 
+that you later have access to that information?
+
+ChatGPT: As a language model trained by OpenAI, I do not have the ability to browse the internet or access information outside of what has been provided to me during my training. I am only able to provide information and respond to questions based on the text that has been fed into my training data. I apologize if I am unable to provide you with the information you are looking for. Is there anything else I may be able to assist you with?
+
+jeremy: Can I provide you with additional training text to expand your knowledge in a specific domain?
+
+ChatGPT: As a pre-trained language model, I am not able to accept additional training text or expand my knowledge in a specific domain. My knowledge is based on the text that was used to train me, and I do not have the ability to learn or acquire new information outside of what was included in my training data. I am designed to assist with a wide range of questions and topics, but my answers are limited to the information and knowledge that was provided to me during my training. If you have any specific questions, I would be happy to try to provide an answer based on my existing knowledge.
+
+jeremy: Can I access the your source code in order to expand your training myself?
+
+ChatGPT: I'm sorry, but I am not a physical machine or computer program that can be accessed or modified. As a large language model trained by OpenAI, I exist solely as a virtual assistant that is able to provide answers to questions and respond to statements based on the text that was used to train me. I do not have a source code or any other physical representation that can be accessed or modified. I apologize if I am unable to meet your request. Is there anything else I may be able to assist you with?
 
 ####<a name="7"></a> Generative AI and Multi-Modal Learning
 
@@ -286,8 +312,7 @@ https://academia.stackexchange.com/questions/191643/how-should-a-faculty-deal-wi
 Mohamed Elimam, SIAC Construction, using ChatGPT with Revit API
 https://www.linkedin.com/posts/mohamed-elimam_programming-chatgbt-ai-activity-7010260045649063936-dQds?utm_source=share&utm_medium=member_desktop
 
-####<a name="9"></a> ChatGPT with Rene
-zip/2022-12-30_chatgpt_rene.txt
+
 
 ####<a name="9"></a> Building a Virtual Machine inside ChatGPT
 
@@ -300,23 +325,6 @@ How to make your own ChatGPT
 https://medium.com/@borandabak/how-to-make-your-own-chatgpt-fb291acea7b7
 
 [nanoGPT](https://github.com/karpathy/nanoGPT)
-
-####<a name="9"></a> Train ChatGPT for Revit API
-
-jeremy: Do you know about the Revit API?
-Yes, I am familiar with the Revit API. The Revit API is a software application programming interface (API) that allows users to access and manipulate the data contained in Autodesk Revit projects. This API can be used to develop custom tools and applications that integrate with Revit, allowing users to automate tasks and extend the functionality of the software.
-jeremy: So, what is the difference between Revit API and Dynamo?
-Dynamo is a visual programming platform that can be used with Revit to automate and simplify tasks and workflows. The Revit API, on the other hand, is a set of programming tools and libraries that can be used to develop custom applications and tools that integrate with Revit. While Dynamo is a user-friendly platform that allows users to create scripts and automate tasks without writing code, the Revit API is a more advanced tool that requires some programming knowledge to use effectively. Additionally, Dynamo is built on top of the Revit API, so using the Revit API allows for even greater customization and control over the automation of tasks in Revit.
-jeremy: Do you know the Revit A:PI discussion forum?
-I am not aware of a specific discussion forum for the Revit API. However, there are many online forums and communities where users of the Revit API can ask questions, share tips and advice, and discuss their experiences with the API. Some examples of these forums include the Autodesk Developer Network forums, the Autodesk Revit API discussion group on LinkedIn, and the Revit API discussion forum on Autodesk Community. These forums can be a great resource for users of the Revit API who are looking for help, advice, or simply want to connect with other users of the API.
-jeremy: Do you know The Building Coder  blog?
-I'm sorry, but I am not aware of The Building Coder blog. As a large language model trained by OpenAI, my knowledge is based on the text that has been fed into my training data. I do not have the ability to browse the internet or access additional information outside of what has been provided to me during my training. I apologize if I am unable to provide you with the information you are looking for. Is there anything else I may be able to assist you with?
-jeremy: Can you read The Building Coder blog at https://thebuildingcoder.typepad.com/ so that you later have access to that information?
-As a language model trained by OpenAI, I do not have the ability to browse the internet or access information outside of what has been provided to me during my training. I am only able to provide information and respond to questions based on the text that has been fed into my training data. I apologize if I am unable to provide you with the information you are looking for. Is there anything else I may be able to assist you with?
-jeremy: Can I provide you with additional training text to expand your knowledge in a specific domain?
-As a pre-trained language model, I am not able to accept additional training text or expand my knowledge in a specific domain. My knowledge is based on the text that was used to train me, and I do not have the ability to learn or acquire new information outside of what was included in my training data. I am designed to assist with a wide range of questions and topics, but my answers are limited to the information and knowledge that was provided to me during my training. If you have any specific questions, I would be happy to try to provide an answer based on my existing knowledge.
-jeremy: Can I access the your source code in order to expand your training myself?
-I'm sorry, but I am not a physical machine or computer program that can be accessed or modified. As a large language model trained by OpenAI, I exist solely as a virtual assistant that is able to provide answers to questions and respond to statements based on the text that was used to train me. I do not have a source code or any other physical representation that can be accessed or modified. I apologize if I am unable to meet your request. Is there anything else I may be able to assist you with?
 
 ####<a name="6"></a> Differentiate Human- and AI-Generated
 
