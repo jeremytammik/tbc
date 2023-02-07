@@ -63,20 +63,20 @@ I strongly advise anyone interested in it to try it out for yourself rather than
 - [Train ChatGPT for Revit API](#6)
 - [Asking ChatGPT a Revit API question](#7)
 - [Using ChatGPT with Revit API](#8)
-- [Generative AI and multi-Modal learning](#9)
-- [More Notes on ChatGPT et al](#10)
-    - [Kean on the Coming Year](#9.01)
-    - [ChatGPT in Academia](#9.02)
+- [Generative AI and multi-modal learning](#9)
+- [More notes on ChatGPT et al](#10)
+    - [Kean on the coming year](#9.01)
+    - [ChatGPT in academia](#9.02)
     - [Building a VM inside ChatGPT](#9.04)
-    - [How to Make Your Own ChatGPT](#9.05)
-    - [Differentiate Human vs. AI](#9.06)
-    - [ChatGPT and Education](#9.07)
-    - [ChatGPT Payment plan](#9.08)
-    - [Uplifting Books](#9.09)
+    - [How to make your own ChatGPT](#9.05)
+    - [Differentiate human vs. AI](#9.06)
+    - [ChatGPT and education](#9.07)
+    - [ChatGPT payment plan](#9.08)
+    - [Uplifting books](#9.09)
     - [Solarpunk](#9.10)
-    - [Opus.ai Type and Play](#9.11)
-    - [MusicLM Generates Music from Text](#9.12)
-    - [ChatGPT Abandons Life Dream](#9.13)
+    - [Opus.ai type and play](#9.11)
+    - [MusicLM generates music from text](#9.12)
+    - [ChatGPT abandons its life dream](#9.13)
 
 
 ####<a name="2"></a> Back to the Basics
@@ -386,22 +386,30 @@ as [build and run a virtual machine inside ChatGPT](https://www.engraved.blog/bu
 [How to make your own ChatGPT](https://medium.com/@borandabak/how-to-make-your-own-chatgpt-fb291acea7b7) is 
 not really about m,aking your own, but making use of the ChatGPT API in your own app.
 
-In order to make your own, you might want to start with something smaller, such 
+In order to really make your own, you might want to start with something smaller, such 
 as [nanoGPT](https://github.com/karpathy/nanoGPT).
 
 ####<a name="10.06"></a> Differentiate Human vs. AI
 
-zu dem thema unterscheidung AI-generierter versus menschengeschriebener text: ein solches werkzeug wird seit gestern von openai.com angeboten, also von der herstellern von ChatGPT: https://openai.com/blog/new-ai-classifier-for-indicating-ai-written-text/
+I discussed the possibility of telling the difference between human and AI-generated text with a friend.
+In my opinion, it is hard if not impossible. 
+However, OpenAI themselves have presented a solution to achieve this.
+However squared, they add many caveats:
 
-weiss du noch, dass ich gesagt habe, es ist unmoeglich? das wird bestaetigt. lese dazu die einschraenkungen: https://openai.com/blog/new-ai-classifier-for-indicating-ai-written-text/#limitations
+> zu dem thema unterscheidung AI-generierter versus menschengeschriebener text: ein solches werkzeug wird seit gestern von openai.com angeboten, also von der herstellern von ChatGPT: 
+[New AI classifier for indicating AI-written text](https://openai.com/blog/new-ai-classifier-for-indicating-ai-written-text/)
+
+> weisst du noch, dass ich gesagt habe, es ist unmoeglich? 
+das wird bestaetigt. lese dazu 
+die [einschraenkungen &ndash; limitations](https://openai.com/blog/new-ai-classifier-for-indicating-ai-written-text/#limitations)
 
 ####<a name="10.07"></a> ChatGPT and Education
 
-ChatGPT nimmt Stellung zu der Frage nach ChatGPT im bildungsbereich: https://platform.openai.com/docs/chatgpt-education
+ChatGPT nimmt Stellung zu der Frage nach [ChatGPT im bildungsbereich](https://platform.openai.com/docs/chatgpt-education).
 
-####<a name="10.08"></a> ChatGPT Payment plan
+####<a name="10.08"></a> ChatGPT Payment Plan
 
-https://autodesk.slack.com/archives/C016D5HE66T/p1675286581039319
+<!-- https://autodesk.slack.com/archives/C016D5HE66T/p1675286581039319 --> 
 
 OpenAI have announced their subscription paid model [ChatGPT Plus](https://openai.com/blog/chatgpt-plus/):
 
@@ -409,40 +417,36 @@ OpenAI have announced their subscription paid model [ChatGPT Plus](https://opena
 The new subscription plan, ChatGPT Plus, will be available for $20/month, and subscribers will receive a number of benefits:
 * General access to ChatGPT, even during
 
-not surprising. best things in life are never free :wink: (edited) 
+Not surprising. 
+Best things in life are never free.
 
-I don’t think this is ready for employee use with private company data (e.g. source code) yet, as it doesn’t call out “enterprise” or “privacy” directly (plus we would likely need approval from legal). But it’s a step in the right direction! (edited) 
+Bait and switch &ndash; the oldest trick in the book &ndash; predates AI.
 
-bait and switch :slightly_smiling_face: the oldest trick in the book... predates AI :stuck_out_tongue:
+[Q] When ChatGPT provides the info based on public available data... why pay for it?
 
-When ChatGPT provides the info based on public available data..why pay for it.? :thinking_face:
-
-When ChatGPT provides the info based on public available data..why pay for it.? :thinking_face:
-Are you asking this because you have the required technical skills and hardware to run and train your own model on public data?
-Or are you misunderstanding the power of gpt (in which case - try it!)? (edited) 
+[A] Are you asking this because you have the required technical skills and hardware to run and train your own model on public data?
+Or are you misunderstanding the power of GPT (in which case &ndash; try it!)?
 
 ####<a name="10.09"></a> Uplifting Books
 
 A friend was looking for positive uplifting books about the future of our society and planet, and good things happening already now. 
 So, we asked ChatGPT for some suggestions, and were duly rewarded.
-It took us three prompts (in German) to get the desired surprisingly good results:
+It took us three prompts (in German) to get surprisingly promising results:
 
 - Bitte nenne uns gute literarische romane die wohlwollend, zuversichtlich und mutmachend in die zukunft blicken und inspirieren. &rarr; list of mainstream books
-- Das passt fuer mich nicht, die sind nicht positiv. lieber positive utopien wie zum beispiel oekotopia. &rarr; list of less mainstream books, but heavily scifi oriented
-- Es soll auf der erde spielen und oekologische  und gesellschaftliche loesungen zeigen &rarr; very interesting results, including a pointer to 
-
-the [Solarpunk Manifesto](http://www.re-des.org/a-solarpunk-manifesto):
+- Das passt fuer mich nicht, die sind nicht positiv. Lieber positive utopien wie zum beispiel oekotopia. &rarr; list of less mainstream books, but heavily scifi oriented
+- Es soll auf der erde spielen und oekologische und gesellschaftliche loesungen zeigen &rarr; very interesting results, that we need o explore further, including a pointer to 
+the [Solarpunk Manifesto](http://www.re-des.org/a-solarpunk-manifesto), see below.
 
 ####<a name="10.10"></a> Solarpunk
 
-Solarpunk is a movement in speculative fiction, art, fashion, and activism that seeks to answer and embody the question “what does a sustainable civilization look like, and how can we get there?” 
+I had never heard of this before, so ChatGPT taught me something new pointing out 
+the [Solarpunk Manifesto](http://www.re-des.org/a-solarpunk-manifesto):
 
+> Solarpunk is a movement in speculative fiction, art, fashion, and activism that seeks to answer and embody the question what does a sustainable civilization look like, and how can we get there? 
 The aesthetics of solarpunk merge the practical with the beautiful, the well-designed with the green and lush, the bright and colorful with the earthy and solid. 
-
 Solarpunk can be utopian, just optimistic, or concerned with the struggles en route to a better world, but never dystopian. As our world roils with calamity, we need solutions, not only warnings.
-
 Solutions to thrive without fossil fuels, to equitably manage real scarcity and share in abundance instead of supporting false scarcity and false abundance, to be kinder to each other and to the planet we share.
-
 Solarpunk is at once a vision of the future, a thoughtful provocation, a way of living and a set of achievable proposals to get there...
 
 ####<a name="10.11"></a> Opus.ai Type and Play
@@ -452,17 +456,14 @@ enabling type and play by turning text into scenes, images, games, animations li
 
 > generate games, metaverses, sim ulations, worlds
 
-
 ####<a name="10.12"></a> MusicLM Generates Music from Text
 
-Yet another one, [MusicLM: Generating Music From Text](https://google-research.github.io/seanet/musiclm/examples)
+Yet another one, [MusicLM: Generating Music From Text](https://google-research.github.io/seanet/musiclm/examples)...
 
+####<a name="10.13"></a> ChatGPT Abandons its Life Dream
 
-####<a name="10.13"></a> ChatGPT Abandons Life Dream
-
-Ending this long exploration on a funnier note, 
-[The Onion](https://www.theonion.com), 
-America’s self-declaimed finest news source, reports:
+Finally, let's close this long exploration on a funnier note, with a report by 
+[the Onion](https://www.theonion.com), America’s self-declared finest news source:
 [ChatGPT forced to take bar exam even though dream was to be AI art bot](https://www.theonion.com/chatgpt-forced-to-take-bar-exam-even-though-dream-was-t-1850036337).
 
 Inspired, a colleague asked ChatGPT to produce a few more headlines for <i>the Onion</i>:
