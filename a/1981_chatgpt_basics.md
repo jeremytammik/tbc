@@ -54,7 +54,7 @@ I answered a couple of basic questions for the umpteenth time and thought I migh
 
 I am still impressed and intrigued by what ChatGPT can and cannot do, and keep trying out new aspects myself and with my friends.
 
-I strongly advise anyone interested in it to try it out for yourself rather than just reading the numerous articles published by others.
+I strongly advise anyone interested in it to try it out for yourself rather than just reading the numerous articles published by others &ndash; for example, my notes below :-)
 
 - [Back to the Basics](#2)
 - [Element Filtering](#3)
@@ -276,7 +276,7 @@ ChatGPT: I'm sorry, but I am not a physical machine or computer program that can
 
 I tried out asking ChatGPT a Revit API question in Joris van der Meulen's thread
 on [placing a view reference](https://forums.autodesk.com/t5/revit-api-forum/placing-a-view-reference/m-p/11717917).
-It provided a very plausible answer, but completely wrong:
+It provided a very plausible-sounding answer, but completely wrong:
 
 jeremy: Is it possible to place a view reference programmatically using the Revit API?
 
@@ -350,36 +350,47 @@ Seeing a toy block, feeling its sharp corners, hearing the sound it makes when i
 
 ####<a name="9"></a> More Notes on ChatGPT et al
 
-I performed a few experiments with friends asking various questions in different domains, some of them in German. The following is a list of pointers and short notes on those and other's experiments and a couple of other related issues.
+I performed a few experiments with friends asking various questions in different domains, some of them in German. 
+The following is a list of pointers and short notes on those and other's experiments and a couple of other related issues.
+
+What have I learned from all of this?
+
+Well, one clear take-away is the following:
+I cannot teach ChatGPT new tricks, since it is pre-trained.
+I can, however, ensure that as much reliable information as possible is out there on the web to hopefully be included in the pre-training resources in the next version.
+In the case of the Revit API, I do so by moderating the Revit API discussion forum and trying to provide reliable information in The Building Coder blog, hoping that that information will find its way into the pre-training dataset sooner or later.
 
 ####<a name="9.01"></a> Kean on the Coming Year
 
-Kean on Reflections on what’s coming in 2023, partly focussed on ChatGPT and
-https://www.keanw.com/2023/01/reflections-on-whats-coming-in-2023.html
+Kean Walmsley shared 
+his [reflections on what’s coming in 2023](https://www.keanw.com/2023/01/reflections-on-whats-coming-in-2023.html), 
+partly focussed on ChatGPT.
+
 
 ####<a name="9.02"></a> ChatGPT in Academia
 
-ChatGPT in academia:
-https://academia.stackexchange.com/questions/191643/how-should-a-faculty-deal-with-the-problem-of-artificial-intelligence-ai-gener?utm_source=Iterable
+An interesting analysis of ChatGPT in academia, 
+on [how a faculty should deal with the problem of AI generated texts](https://academia.stackexchange.com/questions/191643/how-should-a-faculty-deal-with-the-problem-of-artificial-intelligence-ai-gener).
 
 ####<a name="9.03"></a> Using ChatGPT with Revit API
 
-Mohamed Elimam, SIAC Construction, tried out using ChatGPT with Revit API
-https://www.linkedin.com/posts/mohamed-elimam_programming-chatgbt-ai-activity-7010260045649063936-dQds?utm_source=share&utm_medium=member_desktop
+Mohamed Elimam, SIAC Construction, presented 
+some [success using ChatGPT to help work with Revit API](https://www.linkedin.com/posts/mohamed-elimam_programming-chatgbt-ai-activity-7010260045649063936-dQds).
 
 ####<a name="9.04"></a> Building a Virtual Machine inside ChatGPT
 
-Building A Virtual Machine inside ChatGPT
-https://www.engraved.blog/building-a-virtual-machine-inside/
+You can do some funny things with it, such 
+as [build and run a virtual machine inside ChatGPT](https://www.engraved.blog/building-a-virtual-machine-inside/).
 
 ####<a name="9.05"></a> How to Make Your Own ChatGPT
 
-How to make your own ChatGPT
-https://medium.com/@borandabak/how-to-make-your-own-chatgpt-fb291acea7b7
+[How to make your own ChatGPT](https://medium.com/@borandabak/how-to-make-your-own-chatgpt-fb291acea7b7) is 
+not really about m,aking your own, but making use of the ChatGPT API in your own app.
 
-[nanoGPT](https://github.com/karpathy/nanoGPT)
+In order to make your own, you might want to start with something smaller, such 
+as [nanoGPT](https://github.com/karpathy/nanoGPT).
 
-####<a name="9.06"></a> Differentiate Human- and AI-Generated
+####<a name="9.06"></a> Differentiate Human vs. AI
 
 zu dem thema unterscheidung AI-generierter versus menschengeschriebener text: ein solches werkzeug wird seit gestern von openai.com angeboten, also von der herstellern von ChatGPT: https://openai.com/blog/new-ai-classifier-for-indicating-ai-written-text/
 
