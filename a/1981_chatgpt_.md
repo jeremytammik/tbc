@@ -56,6 +56,29 @@ I am still impressed and intrigued by what ChatGPT can and cannot do, and keep t
 
 I strongly advise anyone interested in it to try it out for yourself rather than just reading the numerous articles published by others.
 
+- [Back to the Basics](#2)
+- [Element Filtering](#3)
+- [XYZ Trigonometry](#4)
+- [Projecting Points](#5)
+- [Train ChatGPT for Revit API](#6)
+- [Asking ChatGPT a Revit API Question](#7)
+- [Generative AI and Multi-Modal Learning](#8)
+- [More Notes on ChatGPT et al](#9)
+    - [Kean on the Coming Year](#9.01)
+    - [ChatGPT in Academia](#9.02)
+    - [Using ChatGPT with Revit API](#9.03)
+    - [Building a VM inside ChatGPT](#9.04)
+    - [How to Make Your Own ChatGPT](#9.05)
+    - [Differentiate Human vs. AI](#9.06)
+    - [ChatGPT and Education](#9.07)
+    - [ChatGPT Payment plan](#9.08)
+    - [Uplifting Books](#9.09)
+    - [Solarpunk](#9.10)
+    - [Opus.ai Type and Play](#9.11)
+    - [MusicLM Generates Music from Text](#9.12)
+    - [ChatGPT Abandons Life Dream](#9.13)
+
+
 ####<a name="2"></a> Back to the Basics
 
 Here are a couple of typical questions from StackOverflow and the discussion forum where I repeat some basic recommendations that I have already given before:
@@ -132,7 +155,7 @@ as [how to create a vector `XYZ` tilted up from the view direction by a specifie
 I would like to try various altitude angles up from the view direction in a section with starting point at a wall like in this section view:
 
 <center>
-<img src="img/vector_tilted_up.png" alt="Vector tilted up from plane" title="Vector tilted up from plane" width="600"/> <!-- 1199 × 530 pixels -->
+<img src="img/vector_tilted_up.png" alt="Vector tilted up from plane" title="Vector tilted up from plane" width="400"/> <!-- 1199 × 530 pixels -->
 </center>
 
 I know there are transforms and various complex maths answers on StackOverflow; I was hoping to use a simpler built-in method if available? 
@@ -182,12 +205,13 @@ Dim Vz As New XYZ(0, 0, T)
 Dim V1 As XYZ = (V0 + Vz).Normalize 'The direction with tilt of 30 degrees up from horizontal
 </pre> 
 
-This works from 0 to < 90.  
+This works from 0 to < 90.
 From that point on, you have to check the quadrant and consider the `Tan` function doesn't work approaching 90 or 270 degrees, but you know those values are looking straight up and straight down respectively.
 
-####<a name="6"></a> Projecting Points
+####<a name="5"></a> Projecting Points
 
-[Using AVF on ductwork - Coordinates issue?](https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128)
+Another simple geometric question came up 
+on [Using AVF on ductwork &ndash; coordinates issue?](https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128):
 
 **Question:** I am currently trying to create an add-in that will allow me to perform a calculation on various points on a duct face.
 
@@ -197,15 +221,11 @@ I am following along with the [RvtFader example project](https://github.com/jere
 
 A reference to my face is passed into the `SpatialFieldManager`, exactly like in the RvtFader example. 
 
-The UpdateSpatialFieldPrimiate method runs without error, and my duct is shaded with a single solid color.
+The UpdateSpatialFieldPrimitive method runs without error, and my duct is shaded with a single solid color.
 
-I believe my issue is that I am feeding the FieldDomainPointsByUV with UV points that are in the global coordinate system instead of the local coordinates system to the face. I suspect because create a BoundingBoxUV of my face, and supplying the bb.Min and bb.Max, along with 0, 10 as FieldValues, I get a correctly shaded (using a gradient) duct. 
+I believe my issue is that I am feeding the FieldDomainPointsByUV with UV points that are in the global coordinate system instead of the local coordinates system to the face. I suspect because creating a BoundingBoxUV of my face, and supplying the bb.Min and bb.Max, along with 0, 10 as FieldValues, I get a correctly shaded (using a gradient) duct. 
 
 Is there a way to convert WCS XYZ points to local UV points?
-
-I assume I don't care about the Z coordinate...
-
-What am I missing here? 
 
 **Answer:** Normally, the `UV` coordinates depend on the face. 
 Simply converting the `XYZ` X and Y values directly to UV will not work.
@@ -217,7 +237,7 @@ project it from global 3D space onto the face 2D.
 **Response:** Thank you. That was just what I needed!
 
 
-####<a name="9"></a> Train ChatGPT for Revit API
+####<a name="6"></a> Train ChatGPT for Revit API
 
 I asked ChatGPT some basic questions to determine whether it knows about the Revit API, Dynamo, The Building Coder blog and the Revit API discussion forum. 
 The results were surprisingly mixed:
@@ -252,7 +272,38 @@ jeremy: Can I access the your source code in order to expand your training mysel
 
 ChatGPT: I'm sorry, but I am not a physical machine or computer program that can be accessed or modified. As a large language model trained by OpenAI, I exist solely as a virtual assistant that is able to provide answers to questions and respond to statements based on the text that was used to train me. I do not have a source code or any other physical representation that can be accessed or modified. I apologize if I am unable to meet your request. Is there anything else I may be able to assist you with?
 
-####<a name="7"></a> Generative AI and Multi-Modal Learning
+####<a name="7"></a> Asking ChatGPT a Revit API Question
+
+I tried out asking ChatGPT a Revit API question in Joris van der Meulen's thread
+on [placing a view reference](https://forums.autodesk.com/t5/revit-api-forum/placing-a-view-reference/m-p/11717917).
+It provided a very plausible answer, but completely wrong:
+
+jeremy: Is it possible to place a view reference programmatically using the Revit API?
+
+ChatGPT: Yes, it is possible to place a view reference programmatically using the Revit API.
+
+jeremy: What API calls does that require?
+
+ChatGPT: Placing a view reference programmatically using the Revit API requires creating a new instance of a Viewport type, setting its location and size, and linking it to the target view. The following API calls can be used:
+
+- Viewport.Create() to create a new instance of Viewport.
+- ElementTransformUtils.MoveElement() to set the location of the Viewport.
+- Viewport.get_Parameter() and Parameter.Set() to set the size of the Viewport.
+- Viewport.ViewId property to link the Viewport to the target view.
+
+This is incorrect, however, as Joris and Sean Page point out:
+
+ChatGPT suggests to create a viewport. 
+A viewport is something we place on a sheet. 
+A View Reference is in instance of a system family which we place on a view (floorplan, section, etc). 
+
+As far as I know, this is not possible, nor can you modify the Reference after it is placed because the parameter is read-only. 
+So, it isn't even like you could copy and paste, then update. 
+
+Anyway, it is surprising and impressive how sensible-sounding the answer is; plus, in many cases, it is actually correct.
+It all depends on what ChatGPT was fed in its pre-training curriculum.
+
+####<a name="8"></a> Generative AI and Multi-Modal Learning
 
 The past few months hint at exciting and adventurous times full of radical change ahead.
 
@@ -297,46 +348,48 @@ Our brains are extremely good at this, especially when we are babies and toddler
 It is a key ingredient in how we learn about the world. 
 Seeing a toy block, feeling its sharp corners, hearing the sound it makes when it falls on the floor, and then hearing a parent say “block” is all part of a multi-modal learning process. 
 
-####<a name="3"></a> Kean on the Coming Year
+####<a name="9"></a> More Notes on ChatGPT et al
+
+I performed a few experiments with friends asking various questions in different domains, some of them in German. The following is a list of pointers and short notes on those and other's experiments and a couple of other related issues.
+
+####<a name="9.01"></a> Kean on the Coming Year
 
 Kean on Reflections on what’s coming in 2023, partly focussed on ChatGPT and
 https://www.keanw.com/2023/01/reflections-on-whats-coming-in-2023.html
 
-####<a name="7"></a> ChatGPT in Academia
+####<a name="9.02"></a> ChatGPT in Academia
 
 ChatGPT in academia:
 https://academia.stackexchange.com/questions/191643/how-should-a-faculty-deal-with-the-problem-of-artificial-intelligence-ai-gener?utm_source=Iterable
 
-####<a name="8"></a> Using ChatGPT with Revit API
+####<a name="9.03"></a> Using ChatGPT with Revit API
 
-Mohamed Elimam, SIAC Construction, using ChatGPT with Revit API
+Mohamed Elimam, SIAC Construction, tried out using ChatGPT with Revit API
 https://www.linkedin.com/posts/mohamed-elimam_programming-chatgbt-ai-activity-7010260045649063936-dQds?utm_source=share&utm_medium=member_desktop
 
-
-
-####<a name="9"></a> Building a Virtual Machine inside ChatGPT
+####<a name="9.04"></a> Building a Virtual Machine inside ChatGPT
 
 Building A Virtual Machine inside ChatGPT
 https://www.engraved.blog/building-a-virtual-machine-inside/
 
-####<a name="9"></a> How to Make Your Own ChatGPT
+####<a name="9.05"></a> How to Make Your Own ChatGPT
 
 How to make your own ChatGPT
 https://medium.com/@borandabak/how-to-make-your-own-chatgpt-fb291acea7b7
 
 [nanoGPT](https://github.com/karpathy/nanoGPT)
 
-####<a name="6"></a> Differentiate Human- and AI-Generated
+####<a name="9.06"></a> Differentiate Human- and AI-Generated
 
 zu dem thema unterscheidung AI-generierter versus menschengeschriebener text: ein solches werkzeug wird seit gestern von openai.com angeboten, also von der herstellern von ChatGPT: https://openai.com/blog/new-ai-classifier-for-indicating-ai-written-text/
 
 weiss du noch, dass ich gesagt habe, es ist unmoeglich? das wird bestaetigt. lese dazu die einschraenkungen: https://openai.com/blog/new-ai-classifier-for-indicating-ai-written-text/#limitations
 
-####<a name="6"></a> ChatGPT and Education
+####<a name="9.07"></a> ChatGPT and Education
 
-sie nehmen auch extra stellung zu der frage nach ChatGPT im bildungsbereich: https://platform.openai.com/docs/chatgpt-education
+ChatGPT nimmt Stellung zu der Frage nach ChatGPT im bildungsbereich: https://platform.openai.com/docs/chatgpt-education
 
-####<a name="6"></a> ChatGPT Payment plan
+####<a name="9.08"></a> ChatGPT Payment plan
 
 https://autodesk.slack.com/archives/C016D5HE66T/p1675286581039319
 
@@ -358,8 +411,46 @@ When ChatGPT provides the info based on public available data..why pay for it.? 
 Are you asking this because you have the required technical skills and hardware to run and train your own model on public data?
 Or are you misunderstanding the power of gpt (in which case - try it!)? (edited) 
 
-####<a name="6"></a> ChatGPT Abandons Life Dream
+####<a name="9.09"></a> Uplifting Books
 
+A friend was looking for positive uplifting books about the future of our society and planet, and good things happening already now. 
+So, we asked ChatGPT for some suggestions, and were duly rewarded.
+It took us three prompts (in German) to get the desired surprisingly good results:
+
+- Bitte nenne uns gute literarische romane die wohlwollend, zuversichtlich und mutmachend in die zukunft blicken und inspirieren. &rarr; list of mainstream books
+- Das passt fuer mich nicht, die sind nicht positiv. lieber positive utopien wie zum beispiel oekotopia. &rarr; list of less mainstream books, but heavily scifi oriented
+- Es soll auf der erde spielen und oekologische  und gesellschaftliche loesungen zeigen &rarr; very interesting results, including a pointer to 
+
+the [Solarpunk Manifesto](http://www.re-des.org/a-solarpunk-manifesto):
+
+####<a name="9.10"></a> Solarpunk
+
+Solarpunk is a movement in speculative fiction, art, fashion, and activism that seeks to answer and embody the question “what does a sustainable civilization look like, and how can we get there?” 
+
+The aesthetics of solarpunk merge the practical with the beautiful, the well-designed with the green and lush, the bright and colorful with the earthy and solid. 
+
+Solarpunk can be utopian, just optimistic, or concerned with the struggles en route to a better world, but never dystopian. As our world roils with calamity, we need solutions, not only warnings.
+
+Solutions to thrive without fossil fuels, to equitably manage real scarcity and share in abundance instead of supporting false scarcity and false abundance, to be kinder to each other and to the planet we share.
+
+Solarpunk is at once a vision of the future, a thoughtful provocation, a way of living and a set of achievable proposals to get there...
+
+####<a name="9.11"></a> Opus.ai Type and Play
+
+Moving away from ChatGPT, here is another AI site, [Opus.ai](https://opus.ai/demo),
+enabling type and play by turning text into scenes, images, games, animations live while you type:
+
+> generate games, metaverses, sim ulations, worlds
+
+
+####<a name="9.12"></a> MusicLM Generates Music from Text
+
+Yet another one, [MusicLM: Generating Music From Text](https://google-research.github.io/seanet/musiclm/examples)
+
+
+####<a name="9.13"></a> ChatGPT Abandons Life Dream
+
+Ending this long exploration on a funnier note, 
 [The Onion](https://www.theonion.com), 
 America’s self-declaimed finest news source, reports:
 [ChatGPT forced to take bar exam even though dream was to be AI art bot](https://www.theonion.com/chatgpt-forced-to-take-bar-exam-even-though-dream-was-t-1850036337).
@@ -372,127 +463,3 @@ Inspired, a colleague asked ChatGPT to produce a few more headlines for <i>the O
 <img src="img/chatgpt_ai_ethics_paragraph.png" alt="ChatGPT AI ethics paragraph" title="ChatGPT AI ethics paragraph" width="800"/> <!-- 1676 × 1702 pixels -->
 </center>
 
-####<a name="6"></a> Uplifting Books
-
-A friend was looking for positive uplifting books about the future of our society and planet, and good things happening already now. 
-So, we asked ChatGPT for some suggestions, and were duly rewarded.
-It took us three prompts (in German) to get the desired surprisingly good results:
-
-- Bitte nenne uns gute literarische romane die wohlwollend, zuversichtlich und mutmachend in die zukunft blicken und inspirieren. &rarr; list of mainstream books
-- Das passt fuer mich nicht, die sind nicht positiv. lieber positive utopien wie zum beispiel oekotopia. &rarr; list of less mainstream books, but heavily scifi oriented
-- Es soll auf der erde spielen und oekologische  und gesellschaftliche loesungen zeigen &rarr; very interesting results, including a pointer to 
-
-the [Solarpunk Manifesto](http://www.re-des.org/a-solarpunk-manifesto):
-
-####<a name="6"></a> Solarpunk
-
-Solarpunk is a movement in speculative fiction, art, fashion, and activism that seeks to answer and embody the question “what does a sustainable civilization look like, and how can we get there?” 
-
-The aesthetics of solarpunk merge the practical with the beautiful, the well-designed with the green and lush, the bright and colorful with the earthy and solid. 
-
-Solarpunk can be utopian, just optimistic, or concerned with the struggles en route to a better world ,  but never dystopian. As our world roils with calamity, we need solutions, not only warnings.
-
-Solutions to thrive without fossil fuels, to equitably manage real scarcity and share in abundance instead of supporting false scarcity and false abundance, to be kinder to each other and to the planet we share.
-
-Solarpunk is at once a vision of the future, a thoughtful provocation, a way of living and a set of achievable proposals to get there.
-
-We are solarpunks because optimism has been taken away from us and we are trying to take it back.
-
-We are solarpunks because the only other options are denial or despair.
-
-At its core, Solarpunk is a vision of a future that embodies the best of what humanity can achieve: a post-scarcity, post-hierarchy, post-capitalistic world where humanity sees itself as part of nature and clean energy replaces fossil fuels.
-
-The “punk” in Solarpunk is about rebellion, counterculture, post-capitalism, decolonialism and enthusiasm. It is about going in a different direction than the mainstream, which is increasingly going in a scary direction.
-
-Solarpunk is a movement as much as it is a genre: it is not just about the stories, it is also about how we can get there.
-
-Solarpunk embraces a diversity of tactics: there is no single right way to do solarpunk. Instead, diverse communities from around the world adopt the name and the ideas, and build little nests of self-sustaining revolution.
-
-Solarpunk provides a valuable new perspective, a paradigm and a vocabulary through which to describe one possible future. Instead of embracing retrofuturism, solarpunk looks completely to the future. Not an alternative future, but a possible future.
-
-Our futurism is not nihilistic like cyberpunk and it avoids steampunk’s potentially quasi-reactionary tendencies: it is about ingenuity, generativity, independence, and community.
-
-Solarpunk emphasizes environmental sustainability and social justice.
-
-Solarpunk is about finding ways to make life more wonderful for us right now, and also for the generations that follow us.
-
-Our future must involve repurposing and creating new things from what we already have. Imagine “smart cities” being junked in favor of smart citizenry.
-
-Solarpunk recognizes the historical influence politics and science fiction have had on each other.
-
-Solarpunk recognizes science fiction as not just entertainment but as a form of activism.
-
-Solarpunk wants to counter the scenarios of a dying earth, an insuperable gap between rich and poor, and a society controlled by corporations. Not in hundreds of years, but within reach.
-
-Solarpunk is about youth maker culture, local solutions, local energy grids, ways of creating autonomous functioning systems. It is about loving the world.
-
-Solarpunk culture includes all cultures, religions, abilities, sexes, genders and sexual identities.
-
-Solarpunk is the idea of humanity achieving a social evolution that embraces not just mere tolerance, but a more expansive compassion and acceptance.
-
-The visual aesthetics of Solarpunk are open and evolving. As it stands, it is a mash-up of the following:
-
-1800s age-of-sail/frontier living (but with more bicycles)
-
-Creative reuse of existing infrastructure (sometimes post-apocalyptic, sometimes present-weird)
-
-Appropriate technology
-
-Art Nouveau
-
-Hayao Miyazaki
-
-Jugaad-style innovation from the non-Western world
-
-High-tech backends with simple, elegant outputs
-
-Solarpunk is set in a future built according to principles of New Urbanism or New Pedestrianism and environmental sustainability.
-
-Solarpunk envisions a built environment creatively adapted for solar gain, amongst other things, using different technologies. The objective is to promote self sufficiency and living within natural limits.
-
-In Solarpunk we’ve pulled back just in time to stop the slow destruction of our planet. We’ve learned to use science wisely, for the betterment of our life conditions as part of our planet. We’re no longer overlords. We’re caretakers. We’re gardeners.
-
-Solarpunk:
-
-is diverse
-
-has room for spirituality and science to coexist
-
-is beautiful
-
-can happen. Now
-
-####<a name="6"></a> Opus.ai Type and Play
-
-Non-ChatGPT :
-Type and play
-turn text into scenes, images, games, animations live while you type
-generate games, metaverses, sim ulations, worlds
-This company has a terrible website, but the demo video is kind of neat - text-to-3d-game https://opus.ai/
-https://opus.ai/demo
-
-####<a name="6"></a> MusicLM Generates Music from Text
-
-MusicLM: Generating Music From Text
-
-https://google-research.github.io/seanet/musiclm/examples/
-
-####<a name="2"></a> 
-
-####<a name="3"></a> 
-
-####<a name="4"></a> 
-
-**Question:** 
-
-**Solution:** 
-
-**Update:** 
-
-<pre class="prettyprint">
-
-</pre>
-
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 716 × 403 pixels -->
-</center>

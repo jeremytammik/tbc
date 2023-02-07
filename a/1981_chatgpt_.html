@@ -51,6 +51,31 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>I answered a couple of basic questions for the umpteenth time and thought I might summarise some of them here yet again.</p>
 <p>I am still impressed and intrigued by what ChatGPT can and cannot do, and keep trying out new aspects myself and with my friends.</p>
 <p>I strongly advise anyone interested in it to try it out for yourself rather than just reading the numerous articles published by others.</p>
+<ul>
+<li><a href="#2">Back to the Basics</a></li>
+<li><a href="#3">Element Filtering</a></li>
+<li><a href="#4">XYZ Trigonometry</a></li>
+<li><a href="#5">Projecting Points</a></li>
+<li><a href="#6">Train ChatGPT for Revit API</a></li>
+<li><a href="#7">Asking ChatGPT a Revit API Question</a></li>
+<li><a href="#8">Generative AI and Multi-Modal Learning</a></li>
+<li><a href="#9">More Notes on ChatGPT et al</a><ul>
+<li><a href="#9.01">Kean on the Coming Year</a></li>
+<li><a href="#9.02">ChatGPT in Academia</a></li>
+<li><a href="#9.03">Using ChatGPT with Revit API</a></li>
+<li><a href="#9.04">Building a VM inside ChatGPT</a></li>
+<li><a href="#9.05">How to Make Your Own ChatGPT</a></li>
+<li><a href="#9.06">Differentiate Human vs. AI</a></li>
+<li><a href="#9.07">ChatGPT and Education</a></li>
+<li><a href="#9.08">ChatGPT Payment plan</a></li>
+<li><a href="#9.09">Uplifting Books</a></li>
+<li><a href="#9.10">Solarpunk</a></li>
+<li><a href="#9.11">Opus.ai Type and Play</a></li>
+<li><a href="#9.12">MusicLM Generates Music from Text</a></li>
+<li><a href="#9.13">ChatGPT Abandons Life Dream</a></li>
+</ul>
+</li>
+</ul>
 <h4><a name="2"></a> Back to the Basics</h4>
 <p>Here are a couple of typical questions from StackOverflow and the discussion forum where I repeat some basic recommendations that I have already given before:</p>
 <ul>
@@ -117,7 +142,7 @@ as <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-create-a-vecto
 <p><strong>Question:</strong> I have a the view direction that I use for my reference intersector. 
 I would like to try various altitude angles up from the view direction in a section with starting point at a wall like in this section view:</p>
 <p><center>
-<img src="img/vector_tilted_up.png" alt="Vector tilted up from plane" title="Vector tilted up from plane" width="600"/> <!-- 1199 × 530 pixels -->
+<img src="img/vector_tilted_up.png" alt="Vector tilted up from plane" title="Vector tilted up from plane" width="400"/> <!-- 1199 × 530 pixels -->
 </center></p>
 <p>I know there are transforms and various complex maths answers on StackOverflow; I was hoping to use a simpler built-in method if available? </p>
 <p><strong>Answer:</strong> This kind of trigonometry is not difficult. 
@@ -155,26 +180,25 @@ Dim Vz As New XYZ(0, 0, T)
 Dim V1 As XYZ = (V0 + Vz).Normalize 'The direction with tilt of 30 degrees up from horizontal
 </pre>
 
-<p>This works from 0 to &lt; 90.<br />
+<p>This works from 0 to &lt; 90.
 From that point on, you have to check the quadrant and consider the <code>Tan</code> function doesn't work approaching 90 or 270 degrees, but you know those values are looking straight up and straight down respectively.</p>
-<h4><a name="6"></a> Projecting Points</h4>
-<p><a href="https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128">Using AVF on ductwork - Coordinates issue?</a></p>
+<h4><a name="5"></a> Projecting Points</h4>
+<p>Another simple geometric question came up 
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128">Using AVF on ductwork &ndash; coordinates issue?</a>:</p>
 <p><strong>Question:</strong> I am currently trying to create an add-in that will allow me to perform a calculation on various points on a duct face.</p>
 <p>For now, the user is selecting the face, but in the future, I plan to process the top face of each duct in the view.</p>
 <p>I am following along with the <a href="https://github.com/jeremytammik/RvtFader">RvtFader example project</a>.</p>
 <p>A reference to my face is passed into the <code>SpatialFieldManager</code>, exactly like in the RvtFader example. </p>
-<p>The UpdateSpatialFieldPrimiate method runs without error, and my duct is shaded with a single solid color.</p>
-<p>I believe my issue is that I am feeding the FieldDomainPointsByUV with UV points that are in the global coordinate system instead of the local coordinates system to the face. I suspect because create a BoundingBoxUV of my face, and supplying the bb.Min and bb.Max, along with 0, 10 as FieldValues, I get a correctly shaded (using a gradient) duct. </p>
+<p>The UpdateSpatialFieldPrimitive method runs without error, and my duct is shaded with a single solid color.</p>
+<p>I believe my issue is that I am feeding the FieldDomainPointsByUV with UV points that are in the global coordinate system instead of the local coordinates system to the face. I suspect because creating a BoundingBoxUV of my face, and supplying the bb.Min and bb.Max, along with 0, 10 as FieldValues, I get a correctly shaded (using a gradient) duct. </p>
 <p>Is there a way to convert WCS XYZ points to local UV points?</p>
-<p>I assume I don't care about the Z coordinate...</p>
-<p>What am I missing here? </p>
 <p><strong>Answer:</strong> Normally, the <code>UV</code> coordinates depend on the face. 
 Simply converting the <code>XYZ</code> X and Y values directly to UV will not work.</p>
 <p>To convert a XYZ point to the face UV space, you can use 
 the <a href="https://www.revitapidocs.com/2023/4bee3e30-74fa-3103-c2f4-d07618fbcedf.htm">Face.Project method</a> to 
 project it from global 3D space onto the face 2D.</p>
 <p><strong>Response:</strong> Thank you. That was just what I needed!</p>
-<h4><a name="9"></a> Train ChatGPT for Revit API</h4>
+<h4><a name="6"></a> Train ChatGPT for Revit API</h4>
 <p>I asked ChatGPT some basic questions to determine whether it knows about the Revit API, Dynamo, The Building Coder blog and the Revit API discussion forum. 
 The results were surprisingly mixed:</p>
 <p>jeremy: Do you know about the Revit API?</p>
@@ -193,7 +217,29 @@ that you later have access to that information?</p>
 <p>ChatGPT: As a pre-trained language model, I am not able to accept additional training text or expand my knowledge in a specific domain. My knowledge is based on the text that was used to train me, and I do not have the ability to learn or acquire new information outside of what was included in my training data. I am designed to assist with a wide range of questions and topics, but my answers are limited to the information and knowledge that was provided to me during my training. If you have any specific questions, I would be happy to try to provide an answer based on my existing knowledge.</p>
 <p>jeremy: Can I access the your source code in order to expand your training myself?</p>
 <p>ChatGPT: I'm sorry, but I am not a physical machine or computer program that can be accessed or modified. As a large language model trained by OpenAI, I exist solely as a virtual assistant that is able to provide answers to questions and respond to statements based on the text that was used to train me. I do not have a source code or any other physical representation that can be accessed or modified. I apologize if I am unable to meet your request. Is there anything else I may be able to assist you with?</p>
-<h4><a name="7"></a> Generative AI and Multi-Modal Learning</h4>
+<h4><a name="7"></a> Asking ChatGPT a Revit API Question</h4>
+<p>I tried out asking ChatGPT a Revit API question in Joris van der Meulen's thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/placing-a-view-reference/m-p/11717917">placing a view reference</a>.
+It provided a very plausible answer, but completely wrong:</p>
+<p>jeremy: Is it possible to place a view reference programmatically using the Revit API?</p>
+<p>ChatGPT: Yes, it is possible to place a view reference programmatically using the Revit API.</p>
+<p>jeremy: What API calls does that require?</p>
+<p>ChatGPT: Placing a view reference programmatically using the Revit API requires creating a new instance of a Viewport type, setting its location and size, and linking it to the target view. The following API calls can be used:</p>
+<ul>
+<li>Viewport.Create() to create a new instance of Viewport.</li>
+<li>ElementTransformUtils.MoveElement() to set the location of the Viewport.</li>
+<li>Viewport.get_Parameter() and Parameter.Set() to set the size of the Viewport.</li>
+<li>Viewport.ViewId property to link the Viewport to the target view.</li>
+</ul>
+<p>This is incorrect, however, as Joris and Sean Page point out:</p>
+<p>ChatGPT suggests to create a viewport. 
+A viewport is something we place on a sheet. 
+A View Reference is in instance of a system family which we place on a view (floorplan, section, etc). </p>
+<p>As far as I know, this is not possible, nor can you modify the Reference after it is placed because the parameter is read-only. 
+So, it isn't even like you could copy and paste, then update. </p>
+<p>Anyway, it is surprising and impressive how sensible-sounding the answer is; plus, in many cases, it is actually correct.
+It all depends on what ChatGPT was fed in its pre-training curriculum.</p>
+<h4><a name="8"></a> Generative AI and Multi-Modal Learning</h4>
 <p>The past few months hint at exciting and adventurous times full of radical change ahead.</p>
 <p>The speed at which machine learning models are evolving is breathtaking. 
 There are more companies, labs and institutions working on these than ever before. 
@@ -232,28 +278,30 @@ It means to learn from multiple sources of information at the same time, inferri
 Our brains are extremely good at this, especially when we are babies and toddlers. 
 It is a key ingredient in how we learn about the world. 
 Seeing a toy block, feeling its sharp corners, hearing the sound it makes when it falls on the floor, and then hearing a parent say “block” is all part of a multi-modal learning process. </p>
-<h4><a name="3"></a> Kean on the Coming Year</h4>
+<h4><a name="9"></a> More Notes on ChatGPT et al</h4>
+<p>I performed a few experiments with friends asking various questions in different domains, some of them in German. The following is a list of pointers and short notes on those and other's experiments and a couple of other related issues.</p>
+<h4><a name="9.01"></a> Kean on the Coming Year</h4>
 <p>Kean on Reflections on what’s coming in 2023, partly focussed on ChatGPT and
 https://www.keanw.com/2023/01/reflections-on-whats-coming-in-2023.html</p>
-<h4><a name="7"></a> ChatGPT in Academia</h4>
+<h4><a name="9.02"></a> ChatGPT in Academia</h4>
 <p>ChatGPT in academia:
 https://academia.stackexchange.com/questions/191643/how-should-a-faculty-deal-with-the-problem-of-artificial-intelligence-ai-gener?utm_source=Iterable</p>
-<h4><a name="8"></a> Using ChatGPT with Revit API</h4>
-<p>Mohamed Elimam, SIAC Construction, using ChatGPT with Revit API
+<h4><a name="9.03"></a> Using ChatGPT with Revit API</h4>
+<p>Mohamed Elimam, SIAC Construction, tried out using ChatGPT with Revit API
 https://www.linkedin.com/posts/mohamed-elimam_programming-chatgbt-ai-activity-7010260045649063936-dQds?utm_source=share&amp;utm_medium=member_desktop</p>
-<h4><a name="9"></a> Building a Virtual Machine inside ChatGPT</h4>
+<h4><a name="9.04"></a> Building a Virtual Machine inside ChatGPT</h4>
 <p>Building A Virtual Machine inside ChatGPT
 https://www.engraved.blog/building-a-virtual-machine-inside/</p>
-<h4><a name="9"></a> How to Make Your Own ChatGPT</h4>
+<h4><a name="9.05"></a> How to Make Your Own ChatGPT</h4>
 <p>How to make your own ChatGPT
 https://medium.com/@borandabak/how-to-make-your-own-chatgpt-fb291acea7b7</p>
 <p><a href="https://github.com/karpathy/nanoGPT">nanoGPT</a></p>
-<h4><a name="6"></a> Differentiate Human- and AI-Generated</h4>
+<h4><a name="9.06"></a> Differentiate Human- and AI-Generated</h4>
 <p>zu dem thema unterscheidung AI-generierter versus menschengeschriebener text: ein solches werkzeug wird seit gestern von openai.com angeboten, also von der herstellern von ChatGPT: https://openai.com/blog/new-ai-classifier-for-indicating-ai-written-text/</p>
 <p>weiss du noch, dass ich gesagt habe, es ist unmoeglich? das wird bestaetigt. lese dazu die einschraenkungen: https://openai.com/blog/new-ai-classifier-for-indicating-ai-written-text/#limitations</p>
-<h4><a name="6"></a> ChatGPT and Education</h4>
-<p>sie nehmen auch extra stellung zu der frage nach ChatGPT im bildungsbereich: https://platform.openai.com/docs/chatgpt-education</p>
-<h4><a name="6"></a> ChatGPT Payment plan</h4>
+<h4><a name="9.07"></a> ChatGPT and Education</h4>
+<p>ChatGPT nimmt Stellung zu der Frage nach ChatGPT im bildungsbereich: https://platform.openai.com/docs/chatgpt-education</p>
+<h4><a name="9.08"></a> ChatGPT Payment plan</h4>
 <p>https://autodesk.slack.com/archives/C016D5HE66T/p1675286581039319</p>
 <p>OpenAI have announced their subscription paid model <a href="https://openai.com/blog/chatgpt-plus/">ChatGPT Plus</a>:</p>
 <blockquote>
@@ -268,17 +316,7 @@ The new subscription plan, ChatGPT Plus, will be available for $20/month, and su
 <p>When ChatGPT provides the info based on public available data..why pay for it.? :thinking_face:
 Are you asking this because you have the required technical skills and hardware to run and train your own model on public data?
 Or are you misunderstanding the power of gpt (in which case - try it!)? (edited) </p>
-<h4><a name="6"></a> ChatGPT Abandons Life Dream</h4>
-<p><a href="https://www.theonion.com">The Onion</a>, 
-America’s self-declaimed finest news source, reports:
-<a href="https://www.theonion.com/chatgpt-forced-to-take-bar-exam-even-though-dream-was-t-1850036337">ChatGPT forced to take bar exam even though dream was to be AI art bot</a>.</p>
-<p>Inspired, a colleague asked ChatGPT to produce a few more headlines for <i>the Onion</i>:</p>
-<p><center>
-<img src="img/chatgpt_ai_ethics_headlines.png" alt="ChatGPT AI ethics headlines" title="ChatGPT AI ethics headlines" width="800"/> <!-- 1532 × 928 pixels -->
-<br/>
-<img src="img/chatgpt_ai_ethics_paragraph.png" alt="ChatGPT AI ethics paragraph" title="ChatGPT AI ethics paragraph" width="800"/> <!-- 1676 × 1702 pixels -->
-</center></p>
-<h4><a name="6"></a> Uplifting Books</h4>
+<h4><a name="9.09"></a> Uplifting Books</h4>
 <p>A friend was looking for positive uplifting books about the future of our society and planet, and good things happening already now. 
 So, we asked ChatGPT for some suggestions, and were duly rewarded.
 It took us three prompts (in German) to get the desired surprisingly good results:</p>
@@ -288,65 +326,28 @@ It took us three prompts (in German) to get the desired surprisingly good result
 <li>Es soll auf der erde spielen und oekologische  und gesellschaftliche loesungen zeigen &rarr; very interesting results, including a pointer to </li>
 </ul>
 <p>the <a href="http://www.re-des.org/a-solarpunk-manifesto">Solarpunk Manifesto</a>:</p>
-<h4><a name="6"></a> Solarpunk</h4>
+<h4><a name="9.10"></a> Solarpunk</h4>
 <p>Solarpunk is a movement in speculative fiction, art, fashion, and activism that seeks to answer and embody the question “what does a sustainable civilization look like, and how can we get there?” </p>
 <p>The aesthetics of solarpunk merge the practical with the beautiful, the well-designed with the green and lush, the bright and colorful with the earthy and solid. </p>
-<p>Solarpunk can be utopian, just optimistic, or concerned with the struggles en route to a better world ,  but never dystopian. As our world roils with calamity, we need solutions, not only warnings.</p>
+<p>Solarpunk can be utopian, just optimistic, or concerned with the struggles en route to a better world, but never dystopian. As our world roils with calamity, we need solutions, not only warnings.</p>
 <p>Solutions to thrive without fossil fuels, to equitably manage real scarcity and share in abundance instead of supporting false scarcity and false abundance, to be kinder to each other and to the planet we share.</p>
-<p>Solarpunk is at once a vision of the future, a thoughtful provocation, a way of living and a set of achievable proposals to get there.</p>
-<p>We are solarpunks because optimism has been taken away from us and we are trying to take it back.</p>
-<p>We are solarpunks because the only other options are denial or despair.</p>
-<p>At its core, Solarpunk is a vision of a future that embodies the best of what humanity can achieve: a post-scarcity, post-hierarchy, post-capitalistic world where humanity sees itself as part of nature and clean energy replaces fossil fuels.</p>
-<p>The “punk” in Solarpunk is about rebellion, counterculture, post-capitalism, decolonialism and enthusiasm. It is about going in a different direction than the mainstream, which is increasingly going in a scary direction.</p>
-<p>Solarpunk is a movement as much as it is a genre: it is not just about the stories, it is also about how we can get there.</p>
-<p>Solarpunk embraces a diversity of tactics: there is no single right way to do solarpunk. Instead, diverse communities from around the world adopt the name and the ideas, and build little nests of self-sustaining revolution.</p>
-<p>Solarpunk provides a valuable new perspective, a paradigm and a vocabulary through which to describe one possible future. Instead of embracing retrofuturism, solarpunk looks completely to the future. Not an alternative future, but a possible future.</p>
-<p>Our futurism is not nihilistic like cyberpunk and it avoids steampunk’s potentially quasi-reactionary tendencies: it is about ingenuity, generativity, independence, and community.</p>
-<p>Solarpunk emphasizes environmental sustainability and social justice.</p>
-<p>Solarpunk is about finding ways to make life more wonderful for us right now, and also for the generations that follow us.</p>
-<p>Our future must involve repurposing and creating new things from what we already have. Imagine “smart cities” being junked in favor of smart citizenry.</p>
-<p>Solarpunk recognizes the historical influence politics and science fiction have had on each other.</p>
-<p>Solarpunk recognizes science fiction as not just entertainment but as a form of activism.</p>
-<p>Solarpunk wants to counter the scenarios of a dying earth, an insuperable gap between rich and poor, and a society controlled by corporations. Not in hundreds of years, but within reach.</p>
-<p>Solarpunk is about youth maker culture, local solutions, local energy grids, ways of creating autonomous functioning systems. It is about loving the world.</p>
-<p>Solarpunk culture includes all cultures, religions, abilities, sexes, genders and sexual identities.</p>
-<p>Solarpunk is the idea of humanity achieving a social evolution that embraces not just mere tolerance, but a more expansive compassion and acceptance.</p>
-<p>The visual aesthetics of Solarpunk are open and evolving. As it stands, it is a mash-up of the following:</p>
-<p>1800s age-of-sail/frontier living (but with more bicycles)</p>
-<p>Creative reuse of existing infrastructure (sometimes post-apocalyptic, sometimes present-weird)</p>
-<p>Appropriate technology</p>
-<p>Art Nouveau</p>
-<p>Hayao Miyazaki</p>
-<p>Jugaad-style innovation from the non-Western world</p>
-<p>High-tech backends with simple, elegant outputs</p>
-<p>Solarpunk is set in a future built according to principles of New Urbanism or New Pedestrianism and environmental sustainability.</p>
-<p>Solarpunk envisions a built environment creatively adapted for solar gain, amongst other things, using different technologies. The objective is to promote self sufficiency and living within natural limits.</p>
-<p>In Solarpunk we’ve pulled back just in time to stop the slow destruction of our planet. We’ve learned to use science wisely, for the betterment of our life conditions as part of our planet. We’re no longer overlords. We’re caretakers. We’re gardeners.</p>
-<p>Solarpunk:</p>
-<p>is diverse</p>
-<p>has room for spirituality and science to coexist</p>
-<p>is beautiful</p>
-<p>can happen. Now</p>
-<h4><a name="6"></a> Opus.ai Type and Play</h4>
-<p>Non-ChatGPT :
-Type and play
-turn text into scenes, images, games, animations live while you type
-generate games, metaverses, sim ulations, worlds
-This company has a terrible website, but the demo video is kind of neat - text-to-3d-game https://opus.ai/
-https://opus.ai/demo</p>
-<h4><a name="6"></a> MusicLM Generates Music from Text</h4>
-<p>MusicLM: Generating Music From Text</p>
-<p>https://google-research.github.io/seanet/musiclm/examples/</p>
-<h4><a name="2"></a></h4>
-<h4><a name="3"></a></h4>
-<h4><a name="4"></a></h4>
-<p><strong>Question:</strong> </p>
-<p><strong>Solution:</strong> </p>
-<p><strong>Update:</strong> </p>
-<pre class="prettyprint">
-
-</pre>
-
+<p>Solarpunk is at once a vision of the future, a thoughtful provocation, a way of living and a set of achievable proposals to get there...</p>
+<h4><a name="9.11"></a> Opus.ai Type and Play</h4>
+<p>Moving away from ChatGPT, here is another AI site, <a href="https://opus.ai/demo">Opus.ai</a>,
+enabling type and play by turning text into scenes, images, games, animations live while you type:</p>
+<blockquote>
+<p>generate games, metaverses, sim ulations, worlds</p>
+</blockquote>
+<h4><a name="9.12"></a> MusicLM Generates Music from Text</h4>
+<p>Yet another one, <a href="https://google-research.github.io/seanet/musiclm/examples">MusicLM: Generating Music From Text</a></p>
+<h4><a name="9.13"></a> ChatGPT Abandons Life Dream</h4>
+<p>Ending this long exploration on a funnier note, 
+<a href="https://www.theonion.com">The Onion</a>, 
+America’s self-declaimed finest news source, reports:
+<a href="https://www.theonion.com/chatgpt-forced-to-take-bar-exam-even-though-dream-was-t-1850036337">ChatGPT forced to take bar exam even though dream was to be AI art bot</a>.</p>
+<p>Inspired, a colleague asked ChatGPT to produce a few more headlines for <i>the Onion</i>:</p>
 <p><center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 716 × 403 pixels -->
+<img src="img/chatgpt_ai_ethics_headlines.png" alt="ChatGPT AI ethics headlines" title="ChatGPT AI ethics headlines" width="800"/> <!-- 1532 × 928 pixels -->
+<br/>
+<img src="img/chatgpt_ai_ethics_paragraph.png" alt="ChatGPT AI ethics paragraph" title="ChatGPT AI ethics paragraph" width="800"/> <!-- 1676 × 1702 pixels -->
 </center></p>
