@@ -29,12 +29,10 @@
 
 twitter:
 
-
 &ndash; 
 ...
 
 linkedin:
-
 
 #bim #DynamoBim #AutodeskAPS #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -58,18 +56,15 @@ I am still impressed and intrigued by what ChatGPT can and cannot do, and keep t
 
 I strongly advise anyone interested in it to try it out for yourself rather than just reading the numerous articles published by others.
 
-
-
-
 ####<a name="2"></a> Back to the Basics
 
-Here are four typical questions from StackOverflow and the discussion forum where I repeat some basic recommendations that I have already given many times before:
+Here are a couple of typical questions from StackOverflow and the discussion forum where I repeat some basic recommendations that I have already given before:
 
 - [Element filtering](#3)
 - [XYZ trigonometry](#4)
 - [Projecting points](#6)
 
-Maybe, by now, based on the publicly available information, ChatGPT can answer them just as well or better than I have done.
+Maybe, by now, or very soon, based on the publicly available information, ChatGPT and other pretrained language models will be able to answer them just as well or better than I can.
 
 <!--
 I would really be happy if I did not have to continue repeating them.
@@ -194,7 +189,6 @@ From that point on, you have to check the quadrant and consider the `Tan` functi
 
 [Using AVF on ductwork - Coordinates issue?](https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128)
 
-
 **Question:** I am currently trying to create an add-in that will allow me to perform a calculation on various points on a duct face.
 
  
@@ -276,8 +270,6 @@ It means to learn from multiple sources of information at the same time, inferri
 Our brains are extremely good at this, especially when we are babies and toddlers. 
 It is a key ingredient in how we learn about the world. 
 Seeing a toy block, feeling its sharp corners, hearing the sound it makes when it falls on the floor, and then hearing a parent say “block” is all part of a multi-modal learning process. 
-
-
 
 ####<a name="3"></a> Kean on the Coming Year
 
@@ -462,7 +454,6 @@ is beautiful
 
 can happen. Now
 
-
 ####<a name="6"></a> Opus.ai Type and Play
 
 Non-ChatGPT :
@@ -472,15 +463,11 @@ generate games, metaverses, sim ulations, worlds
 This company has a terrible website, but the demo video is kind of neat - text-to-3d-game https://opus.ai/
 https://opus.ai/demo
 
-
 ####<a name="6"></a> MusicLM Generates Music from Text
 
 MusicLM: Generating Music From Text
 
 https://google-research.github.io/seanet/musiclm/examples/
-
-
-
 
 ####<a name="2"></a> 
 
@@ -492,15 +479,11 @@ https://google-research.github.io/seanet/musiclm/examples/
 
 **Solution:** 
 
-
 **Update:** 
-
 
 <pre class="prettyprint">
 
 </pre>
-
-
 
 <center>
 <img src="img/.png" alt="" title="" width="100"/> <!-- 716 × 403 pixels -->
