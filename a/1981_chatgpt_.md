@@ -66,11 +66,12 @@ I strongly advise anyone interested in it to try it out for yourself rather than
 Here are four typical questions from StackOverflow and the discussion forum where I repeat some basic recommendations that I have already given many times before:
 
 - [Element filtering](#3)
-- [parameter access](#4)
-- [XYZ trigonometry](#5)
-- [projecting points](#6)
+- [XYZ trigonometry](#4)
+- [Projecting points](#6)
 
+Maybe, by now, based on the publicly available information, ChatGPT can answer them just as well or better than I have done.
 
+<!--
 I would really be happy if I did not have to continue repeating them.
 
 I am sure that by now, based on the publicly available information, ChatGPT can answer them just as well or better than I have done.
@@ -80,6 +81,7 @@ I hope that you guys all agree with me that the recommendations I make there are
 Please let me know if you disagree or can improve on them in any way.
 
 Thank you!
+-->
 
 ####<a name="3"></a> Element Filtering
 
@@ -126,7 +128,7 @@ in [How to Distinguish Redundant Rooms](https://thebuildingcoder.typepad.com/blo
 Now, to address your question, you can simply implement a common method `get_elements_of_category_and_class` taking a category and a class argument. 
 Pass in either one or the other or both and execute `OfClass` and `OfCategory` checks on the filtered element collector, either one or the other or both, skipping evaluation of `null`-valued arguments.
 
-####<a name="3"></a> XYZ Trigonometry
+####<a name="4"></a> XYZ Trigonometry
 
 Another recurring question is basic trigonometry, such 
 as [how to create a vector `XYZ` tilted up from the view direction by a specified angle](https://forums.autodesk.com/t5/revit-api-forum/how-to-create-a-vector-xyz-tilted-up-from-the-view-direction-by/m-p/11621339):
@@ -188,11 +190,49 @@ Dim V1 As XYZ = (V0 + Vz).Normalize 'The direction with tilt of 30 degrees up fr
 This works from 0 to < 90.  
 From that point on, you have to check the quadrant and consider the `Tan` function doesn't work approaching 90 or 270 degrees, but you know those values are looking straight up and straight down respectively.
 
-####<a name="3"></a> Projecting Points
+####<a name="6"></a> Projecting Points
 
-[Projecting points](https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128)
+[Using AVF on ductwork - Coordinates issue?](https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128)
 
-####<a name="3"></a> Generative AI and Multi-Modal Learning
+
+**Question:** I am currently trying to create an add-in that will allow me to perform a calculation on various points on a duct face.
+
+ 
+
+For now, the user is selecting the face, but in the future, I plan to process the top face of each duct in the view.
+
+I am following along with the [RvtFader example project](https://github.com/jeremytammik/RvtFader).
+
+A reference to my face is passed into the `SpatialFieldManager`, exactly like in the RvtFader example. 
+
+The UpdateSpatialFieldPrimiate method runs without error, and my duct is shaded with a single solid color.
+
+ 
+
+I believe my issue is that I am feeding the FieldDomainPointsByUV with UV points that are in the global coordinate system instead of the local coordinates system to the face. I suspect because create a BoundingBoxUV of my face, and supplying the bb.Min and bb.Max, along with 0, 10 as FieldValues, I get a correctly shaded (using a gradient) duct. 
+
+ 
+
+Is there a way to convert WCS XYZ points to local UV points?
+
+I assume I don't care about the Z coordinate...
+
+ 
+
+What am I missing here? 
+
+ 
+
+**Answer:** Normally, the `UV` coordinates depend on the face. 
+Simply converting the `XYZ` X and Y values directly to UV will not work.
+
+To convert a XYZ point to the face UV space, you can use 
+the [Face.Project method](https://www.revitapidocs.com/2023/4bee3e30-74fa-3103-c2f4-d07618fbcedf.htm) to 
+project it from global 3D space onto the face 2D.
+
+**Response:** Thank you. That was just what I needed!
+
+####<a name="7"></a> Generative AI and Multi-Modal Learning
 
 The past few months hint at exciting and adventurous times full of radical change ahead.
 

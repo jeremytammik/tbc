@@ -23,41 +23,6 @@
   /Users/jta/a/doc/revit/tbc/git/a/trigonometry.png 640 × 836 pixels
   projecting points: https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128
 
-https://forums.autodesk.com/t5/revit-api-forum/how-to-create-an-arc-length-dimension-in-a-doc-view/m-p/11726515#M69098
-How to create an Arc Length Dimension in a doc view?
-I've tried using AngularDimension but only shows the angle of the arc. It has a property called "DimensionShape" that is read only. I cannot set it to ArcLength.
-This issue was raised repeatedly recently:
-https://forums.autodesk.com/t5/forums/searchpage/tab/message?advanced=false&allow_punctuation=false&...
-architect.bim 
-To do this, you need to select the correct DimensionType object in the project. You can do this via the FilteredElementCollector class or directly by the Id value (you can find it out with RevitLookup by creating a dimension manually in the project and looking up the Id of its dimension type).
-
-Here is a small example of creating a dimension that shows the arc length of the detail line. Note that you need to set the ComputeReferences property in the Options object to be able to get references to the start and end of the arc.
-
-In this code, the dimension will be created at the same location as the original arc. If you want to place the dimension somewhere else, you have to offset the original arc and pass it instead of the original arc.
-
-options = DB.Options()
-options.ComputeReferences = True
-arc = detail_line \
-  .Geometry[options] \
-  .Where(lambda x: isinstance(x, DB.Arc)) \
-  .First()
-dimension_type = doc.GetElement(DB.ElementId(2530))
-with DB.Transaction(doc, 'Create Arc Length Dimension') as t:
-  t.Start()
-  DB.AngularDimension.Create(
-    doc,
-    doc.ActiveView,
-    arc,
-    [
-      arc.GetEndPointReference(0),
-      arc.GetEndPointReference(1)
-    ],
-    dimension_type
-  )
-  t.Commit()
-
-Maxim Stepannikov | Architect, BIM Manager, Instructor
-
 - ChatGPT Payment plan
   https://autodesk.slack.com/archives/C016D5HE66T/p1675286581039319
 
@@ -88,35 +53,29 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>I answered a couple of basic questions for the umpteenth time and thought I might summarise some of them here yet again.</p>
 <p>I am still impressed and intrigued by what ChatGPT can and cannot do, and keep trying out new aspects myself and with my friends.</p>
 <p>I strongly advise anyone interested in it to try it out for yourself rather than just reading the numerous articles published by others.</p>
-<h4><a name="2"></a></h4>
-<h4><a name="3"></a></h4>
-<h4><a name="4"></a></h4>
-<p><strong>Question:</strong> </p>
-<p><strong>Solution:</strong> </p>
-<p><strong>Update:</strong> </p>
-<pre class="prettyprint">
-
-</pre>
-
-<p><center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 716 × 403 pixels -->
-</center></p>
 <h4><a name="2"></a> Back to the Basics</h4>
 <p>Here are four typical questions from StackOverflow and the discussion forum where I repeat some basic recommendations that I have already given many times before:</p>
 <ul>
-<li><a href="#3">element filtering</a></li>
-<li><a href="#4">parameter access</a></li>
-<li><a href="#5">XYZ trigonometry</a></li>
-<li><a href="#6">projecting points</a></li>
+<li><a href="#3">Element filtering</a></li>
+<li><a href="#4">XYZ trigonometry</a></li>
+<li><a href="#6">Projecting points</a></li>
 </ul>
-<p>I would really be happy if I did not have to continue repeating them.</p>
-<p>I am sure that by now, based on the publicly available information, ChatGPT can answer them just as well or better than I have done.</p>
-<p>I hope that you guys all agree with me that the recommendations I make there are sensible and relevant.</p>
-<p>Please let me know if you disagree or can improve on them in any way.</p>
-<p>Thank you!</p>
+<p>Maybe, by now, based on the publicly available information, ChatGPT can answer them just as well or better than I have done.</p>
+<!--
+I would really be happy if I did not have to continue repeating them.
+
+I am sure that by now, based on the publicly available information, ChatGPT can answer them just as well or better than I have done.
+
+I hope that you guys all agree with me that the recommendations I make there are sensible and relevant.
+
+Please let me know if you disagree or can improve on them in any way.
+
+Thank you!
+-->
+
 <h4><a name="3"></a> Element Filtering</h4>
-<p><a href="https://stackoverflow.com/questions/74806242/simplify-a-series-of-repetitive-functions-with-sort-options/74809786#74809786">Simplify a series of repetitive functions with sort options</a></p>
-<p>I have a series of functions in a module which are starting to become quite repetitive. Each function extracts a list, and has an optional boolean argument to sort the list before returning it. Feels like there ought to be a way to inherit the sorting from a parent function?</p>
+<p><a href="https://stackoverflow.com/questions/74806242/simplify-a-series-of-repetitive-functions-with-sort-options">Simplify a series of repetitive functions with sort options</a></p>
+<p>I have a series of functions in a module which are starting to become quite repetitive. Each function extracts a list, and has an optional Boolean argument to sort the list before returning it. Feels like there ought to be a way to inherit the sorting from a parent function?</p>
 <pre class="prettyprint">
 def get_electrical_equipment(sort_by_name = False):
 
@@ -154,101 +113,70 @@ It is a waste of memory and computation time, as I have pointed out repeatedly i
 in <a href="https://thebuildingcoder.typepad.com/blog/2016/04/how-to-distinguish-redundant-rooms.html#2">How to Distinguish Redundant Rooms</a>. </p>
 <p>Now, to address your question, you can simply implement a common method <code>get_elements_of_category_and_class</code> taking a category and a class argument. 
 Pass in either one or the other or both and execute <code>OfClass</code> and <code>OfCategory</code> checks on the filtered element collector, either one or the other or both, skipping evaluation of <code>null</code>-valued arguments.</p>
-<h4><a name="3"></a> WorksharingUtils Parameter Access</h4>
-<p>We already discussed the <a href="http://thebuildingcoder.typepad.com/blog/2015/11/worksharingutils.html&quot;&gt;WorksharingUtils">WorksharingUtils utility class</a> in the year 2015.</p>
-<p>Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
-brought it up again in his solution 
-to <a href="https://forums.autodesk.com/t5/revit-api-forum/try-block-not-catching-owner-permission-locks/m-p/11621464"><code>try</code> block not catching owner/permission locks</a>:</p>
-<p><strong>Question:</strong> I have a piece of code that's identifying changes in the model and updating a parameter across a number of detail items whenever the parameter's value is no longer accurate. It gathers the list of items to update, then inside of a transaction it uses a try/except block (I'm using pyrevit) so it can update as many of them as possible. The trouble is that if any of the items are checked out by other users I receive a warning and the entire transaction is rolled back. I'd like to catch this warning in the except block, but that doesn't seem to be happening.</p>
+<h4><a name="4"></a> XYZ Trigonometry</h4>
+<p>Another recurring question is basic trigonometry, such 
+as <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-create-a-vector-xyz-tilted-up-from-the-view-direction-by/m-p/11621339">how to create a vector <code>XYZ</code> tilted up from the view direction by a specified angle</a>:</p>
+<p><strong>Question:</strong> I have a the view direction that I use for my reference intersector. 
+I would like to try various altitude angles up from the view direction in a section with starting point at a wall like in this section view:</p>
+<p><center>
+<img src="img/vector_tilted_up.png" alt="Vector tilted up from plane" title="Vector tilted up from plane" width="600"/> <!-- 1199 × 530 pixels -->
+</center></p>
+<p>I know there are transforms and various complex maths answers on StackOverflow; I was hoping to use a simpler built-in method if available? </p>
+<p><strong>Answer:</strong> This kind of trigonometry is not difficult. 
+Your children learn it in school, I hope. 
+Please take a moment to either read 
+the <a href="https://en.wikipedia.org/wiki/Trigonometric_functions#Law_of_tangents">Wikipedia article on Trigonometric functions and the Law of tangents</a> or 
+study some other tutorials. 
+From that article, I find this image on the unit circle definitions of six trigonometric functions most helpful:</p>
+<p><center>
+<img src="img/trigonometry_functions.png" alt="Unit circle definitions of six trigonometric functions" title="Unit circle definitions of six trigonometric functions" width="320"/> <!-- 640 × 836 pixels -->
+</center></p>
+<p>Decide what angle you wish to use, e.g., 30 degrees. 
+Determine its tangens value, ca. 30 x 3.14 / 180 = 0.5. 
+Take your horizontal view direction XYZ vector (x,y,0). 
+Replace the Z coordinate by the tangens you calculated, yielding  (x,y,0.5). 
+Voila. 
+That is your new tilted direction vector. 
+You may normalise it if you like.</p>
+<p>Please do not be afraid of trigonometry, it is very intuitive as soon as you stop being scared of it.</p>
+<p>I condemn our teachers and education systems (not all, but all too many) for inoculating kids with fear of maths and geometry.</p>
+<p>This is basic human intuitive understanding. 
+The greeks mastered it 3000 years ago. 
+We can handle a computer and a smartphone, but not simple trigonometry? </p>
+<p>Why?</p>
+<p><strong>Answer 2:</strong> I would probably look at it in terms of the ratio between the forward direction and XYZ.BasisZ that the angle represents.</p>
+<p>Also, the <code>XYZ</code> class has good functionality for arithmetic operations.</p>
+<p>Similar as noted above, below shows an easy way:</p>
 <pre class="prettyprint">
-t = DB.Transaction(doc, 'Update')
-t.Start()
-for item in items_to_update:
-  try:
-    item[0].LookupParameter('Circuit_Count').Set(int(item[2]))
-    print(':white_heavy_check_mark: {} {} Circuit_Count parameter has been set to: {}'.format(item[1],output.linkify(item[0].Id), item[2]))
-  except:
-    print(':cross_mark: {} {} Failed to set Circuit_Count parameter to: {}'.format(item[1],output.linkify(item[0].Id), item[2]))
-t.Commit()
+Dim V0 As New XYZ(1, 0.5, 0) 'some random flat direction
+V0 = V0.Normalize
+Dim Ang As Double = 30 'Angle in degrees
+Dim Ang_r As Double = (Math.PI / 180) * Ang
+Dim T As Double = Math.Tan(Ang_r) 'Tan(Ang) = Opp/1
+Dim Vz As New XYZ(0, 0, T)
+Dim V1 As XYZ = (V0 + Vz).Normalize 'The direction with tilt of 30 degrees up from horizontal
 </pre>
 
-<p>The error I receive looks like "Can't edit the element until [user] resaves the element to central and relinquishes it and you Reload Latest." </p>
-<p>Solved by RPTHOMAS108. Go to Solution.</p>
-<p>Tags (0)
-Add tags
-Report
-4 REPLIES 
-Sort: 
-MESSAGE 2 OF 5
-jeremy.tammik
- Employee jeremy.tammik in reply to: PerryLackowski
-‎2022-12-15 02:42 AM 
-So, apparently the transaction is catching the exception internally and aborting. You cannot change that.</p>
-<p>You could start and commit a separate transaction for each individual call to LookupParameter + Set. Then, you could catch the exception that the aborted transaction is throwing.</p>
-<p>That would be extremely inefficient.</p>
-<p>Furthermore, the call to LookupParameter alone is inefficient as well. Why? Because it loops through all parameters and uses a string comparison on each.</p>
-<p>A more efficient solution to avoid calling LookupParameter inside the loop would be to call it once only before you start looping and use it to retrieve the Parameter object's Definition object:</p>
-<p>https://www.revitapidocs.com/2023/dc30c65f-cfc4-244e-5a5c-bc333d7cd4c5.htm</p>
-<p>Then, you can very efficiently retrieve the parameter from the element directly without searching for it using Element.Parameter(Definition):</p>
-<p>https://www.revitapidocs.com/2023/87d8a88c-906e-85a9-f575-f263788b8584.htm</p>
-<p>Now, to actually address your question: you are calling LookupParameter and blindly calling Set on the result. However, sometimes no such parameter is found, so LookupParameter returns null, and you are calling Set on a null object. That throws an exception.</p>
-<p>The solution is simple: check for null before calling Set.</p>
-<p>The same applies regardless of whether you use LookupParameter of Element.Parameter(Definition) to access the parameter. Check for null first. If the result is null, no such parameter is present on the element, and you can skip it.</p>
-<p>Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 5
-RPTHOMAS108
- Mentor RPTHOMAS108 in reply to: PerryLackowski
-‎2022-12-15 03:55 AM 
-Regarding worksharing there are two aspects you have to check on each element before attempting to edit it:</p>
-<p>Ownership</p>
-<p>WorksharingUtils.GetCheckoutStatus</p>
-<p>Only a status of OwnedByOtherUser will cause an issue here</p>
-<p>Update status</p>
-<p>WorksharingUtils.GetModelUpdatesStatus</p>
-<p>The following two aspects will cause issues</p>
-<p>DeletedInCentral (should not make changes on these elements since they no longer exist)</p>
-<p>UpdatedInCentral (You can call reload latest but I find it is generally better to log these)</p>
-<p>Generally logging is a better approach to reloading since reloading can be time consuming and should be an end user driven decision. However you may implement a system whereby you group the UpdatedInCentral, reload latest and then get status again to confirm they can now be edited. I don't see the need for this especially and it may require more than one iteration depending on what others are doing.</p>
-<p>Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 5
-PerryLackowski
- Advocate PerryLackowski in reply to: RPTHOMAS108
-‎2023-01-16 01:28 PM 
-I had this post open for a month, waiting for the worksharing warning to happen again so I could debug it. @RPTHOMAS108, your solution worked great - I coded up a simple function that'll I'll likely use on some other scripts. Thanks for the help!</p>
-<pre class="prettyprint">
-def is_not_available(elem_id):
-  if DB.WorksharingUtils.GetCheckoutStatus(doc,elem_id) == DB.CheckoutStatus.OwnedByOtherUser:
-    return True
-  status = DB.WorksharingUtils.GetModelUpdatesStatus(doc,elem_id)
-  if status == DB.ModelUpdatesStatus.DeletedInCentral or status == DB.ModelUpdatesStatus.UpdatedInCentral:
-    return True
-  return False
- </pre>
-
-<p>Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 5
-RPTHOMAS108
- Mentor RPTHOMAS108 in reply to: PerryLackowski
-‎2023-01-16 01:34 PM 
-I've always used these methods and it has always worked however I noticed recently another post to the contrary.</p>
-<p>The information for those methods is cached so you should really call WorksharingUtils.CheckoutElements to confirm it since that interacts with the central file. The other get status methods just check the local cache information which is often right but apparently not always. I think I would probably still use the get status methods as a primary check.</p>
-<p>The RevitAPI.chm gives details of the fitness for purpose for the various methods of WorksharingUtils.</p>
-<p>Testing these issues is a lot harder than it used to be due to the single licence fixed Revit user log-in. In the past we just switched the Revit user name in the options dialogue and that was that. There should be an API method for faking Revit user names i.e. names in a form that indicate they are obviously not actual Revit users or account holders (just for testing worksharing with add-ins). Instead of: log in as UserA do something then log in as UserB, does it work?</p>
-<h4><a name="3"></a> XYZ Trigonometry</h4>
-<p><a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-create-a-vector-xyz-tilted-up-from-the-view-direction-by/m-p/11621339">XYZ trigonometry</a></p>
-<h4><a name="3"></a> Projecting Points</h4>
-<p><a href="https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128">Projecting points</a></p>
-<p><center>
-<img src="img/trigonometry_functions.png" alt="The six trigonometric functions" title="The six trigonometric functions" width="320"/> <!-- 640 × 836 pixels -->
-</center></p>
-<h4><a name="3"></a> Generative AI and Multi-Modal Learning</h4>
+<p>This works from 0 to &lt; 90.<br />
+From that point on, you have to check the quadrant and consider the <code>Tan</code> function doesn't work approaching 90 or 270 degrees, but you know those values are looking straight up and straight down respectively.</p>
+<h4><a name="6"></a> Projecting Points</h4>
+<p><a href="https://forums.autodesk.com/t5/revit-api-forum/using-avf-on-ductwork-coordinates-issue/m-p/11621128">Using AVF on ductwork - Coordinates issue?</a></p>
+<p><strong>Question:</strong> I am currently trying to create an add-in that will allow me to perform a calculation on various points on a duct face.</p>
+<p>For now, the user is selecting the face, but in the future, I plan to process the top face of each duct in the view.</p>
+<p>I am following along with the <a href="https://github.com/jeremytammik/RvtFader">RvtFader example project</a>.</p>
+<p>A reference to my face is passed into the <code>SpatialFieldManager</code>, exactly like in the RvtFader example. </p>
+<p>The UpdateSpatialFieldPrimiate method runs without error, and my duct is shaded with a single solid color.</p>
+<p>I believe my issue is that I am feeding the FieldDomainPointsByUV with UV points that are in the global coordinate system instead of the local coordinates system to the face. I suspect because create a BoundingBoxUV of my face, and supplying the bb.Min and bb.Max, along with 0, 10 as FieldValues, I get a correctly shaded (using a gradient) duct. </p>
+<p>Is there a way to convert WCS XYZ points to local UV points?</p>
+<p>I assume I don't care about the Z coordinate...</p>
+<p>What am I missing here? </p>
+<p><strong>Answer:</strong> Normally, the <code>UV</code> coordinates depend on the face. 
+Simply converting the <code>XYZ</code> X and Y values directly to UV will not work.</p>
+<p>To convert a XYZ point to the face UV space, you can use 
+the <a href="https://www.revitapidocs.com/2023/4bee3e30-74fa-3103-c2f4-d07618fbcedf.htm">Face.Project method</a> to 
+project it from global 3D space onto the face 2D.</p>
+<p><strong>Response:</strong> Thank you. That was just what I needed!</p>
+<h4><a name="7"></a> Generative AI and Multi-Modal Learning</h4>
 <p>The past few months hint at exciting and adventurous times full of radical change ahead.</p>
 <p>The speed at which machine learning models are evolving is breathtaking. 
 There are more companies, labs and institutions working on these than ever before. 
@@ -409,3 +337,16 @@ https://opus.ai/demo</p>
 <h4><a name="6"></a> MusicLM Generates Music from Text</h4>
 <p>MusicLM: Generating Music From Text</p>
 <p>https://google-research.github.io/seanet/musiclm/examples/</p>
+<h4><a name="2"></a></h4>
+<h4><a name="3"></a></h4>
+<h4><a name="4"></a></h4>
+<p><strong>Question:</strong> </p>
+<p><strong>Solution:</strong> </p>
+<p><strong>Update:</strong> </p>
+<pre class="prettyprint">
+
+</pre>
+
+<p><center>
+<img src="img/.png" alt="" title="" width="100"/> <!-- 716 × 403 pixels -->
+</center></p>
