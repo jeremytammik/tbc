@@ -52,7 +52,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 I answered a couple of basic questions for the umpteenth time and thought I might summarise some of them here yet again.
 
-I am still impressed and intrigued by what ChatGPT can and cannot do, and keep trying out new aspects myself and with my friends.
+I am still impressed and intrigued by what ChatGPT can and cannot do and keep trying out new aspects myself and with my friends.
 
 I strongly advise anyone interested in it to try it out for yourself rather than just reading the numerous articles published by others &ndash; for example, my notes below :-)
 
@@ -110,7 +110,9 @@ Thank you!
 
 [Simplify a series of repetitive functions with sort options](https://stackoverflow.com/questions/74806242/simplify-a-series-of-repetitive-functions-with-sort-options)
 
-I have a series of functions in a module which are starting to become quite repetitive. Each function extracts a list, and has an optional Boolean argument to sort the list before returning it. Feels like there ought to be a way to inherit the sorting from a parent function?
+I have a series of functions in a module which are starting to become quite repetitive. 
+Each function extracts a list and has an optional Boolean argument to sort the list before returning it. 
+Feels like there ought to be a way to inherit the sorting from a parent function?
 
 <pre class="prettyprint">
 def get_electrical_equipment(sort_by_name = False):
@@ -156,7 +158,7 @@ Pass in either one or the other or both and execute `OfClass` and `OfCategory` c
 Another recurring question is basic trigonometry, such 
 as [how to create a vector `XYZ` tilted up from the view direction by a specified angle](https://forums.autodesk.com/t5/revit-api-forum/how-to-create-a-vector-xyz-tilted-up-from-the-view-direction-by/m-p/11621339):
 
-**Question:** I have a the view direction that I use for my reference intersector. 
+**Question:** I have the view direction that I use for my reference intersector. 
 I would like to try various altitude angles up from the view direction in a section with starting point at a wall like in this section view:
 
 <center>
@@ -189,7 +191,7 @@ Please do not be afraid of trigonometry, it is very intuitive as soon as you sto
 I condemn our teachers and education systems (not all, but all too many) for inoculating kids with fear of maths and geometry.
 
 This is basic human intuitive understanding. 
-The greeks mastered it 3000 years ago. 
+The Greeks mastered it 3000 years ago. 
 We can handle a computer and a smartphone, but not simple trigonometry? 
 
 Why?
@@ -246,33 +248,33 @@ project it from global 3D space onto the face 2D.
 I asked ChatGPT some basic questions to determine whether it knows about the Revit API, Dynamo, The Building Coder blog and the Revit API discussion forum. 
 The results were surprisingly mixed:
 
-jeremy: Do you know about the Revit API?
+Jeremy: Do you know about the Revit API?
 
 ChatGPT: Yes, I am familiar with the Revit API. The Revit API is a software application programming interface (API) that allows users to access and manipulate the data contained in Autodesk Revit projects. This API can be used to develop custom tools and applications that integrate with Revit, allowing users to automate tasks and extend the functionality of the software.
 
-jeremy: So, what is the difference between Revit API and Dynamo?
+Jeremy: So, what is the difference between Revit API and Dynamo?
 
 ChatGPT: Dynamo is a visual programming platform that can be used with Revit to automate and simplify tasks and workflows. The Revit API, on the other hand, is a set of programming tools and libraries that can be used to develop custom applications and tools that integrate with Revit. While Dynamo is a user-friendly platform that allows users to create scripts and automate tasks without writing code, the Revit API is a more advanced tool that requires some programming knowledge to use effectively. Additionally, Dynamo is built on top of the Revit API, so using the Revit API allows for even greater customization and control over the automation of tasks in Revit.
 
-jeremy: Do you know the Revit API discussion forum?
+Jeremy: Do you know the Revit API discussion forum?
 
 ChatGPT: I am not aware of a specific discussion forum for the Revit API. However, there are many online forums and communities where users of the Revit API can ask questions, share tips and advice, and discuss their experiences with the API. Some examples of these forums include the Autodesk Developer Network forums, the Autodesk Revit API discussion group on LinkedIn, and the Revit API discussion forum on Autodesk Community. These forums can be a great resource for users of the Revit API who are looking for help, advice, or simply want to connect with other users of the API.
 
-jeremy: Do you know The Building Coder blog?
+Jeremy: Do you know The Building Coder blog?
 
 ChatGPT: I'm sorry, but I am not aware of The Building Coder blog. As a large language model trained by OpenAI, my knowledge is based on the text that has been fed into my training data. I do not have the ability to browse the internet or access additional information outside of what has been provided to me during my training. I apologize if I am unable to provide you with the information you are looking for. Is there anything else I may be able to assist you with?
 
-jeremy: Can you read The Building Coder blog 
+Jeremy: Can you read The Building Coder blog 
 at [thebuildingcoder.typepad.com](https://thebuildingcoder.typepad.com/) so 
 that you later have access to that information?
 
 ChatGPT: As a language model trained by OpenAI, I do not have the ability to browse the internet or access information outside of what has been provided to me during my training. I am only able to provide information and respond to questions based on the text that has been fed into my training data. I apologize if I am unable to provide you with the information you are looking for. Is there anything else I may be able to assist you with?
 
-jeremy: Can I provide you with additional training text to expand your knowledge in a specific domain?
+Jeremy: Can I provide you with additional training text to expand your knowledge in a specific domain?
 
 ChatGPT: As a pre-trained language model, I am not able to accept additional training text or expand my knowledge in a specific domain. My knowledge is based on the text that was used to train me, and I do not have the ability to learn or acquire new information outside of what was included in my training data. I am designed to assist with a wide range of questions and topics, but my answers are limited to the information and knowledge that was provided to me during my training. If you have any specific questions, I would be happy to try to provide an answer based on my existing knowledge.
 
-jeremy: Can I access the your source code in order to expand your training myself?
+Jeremy: Can I access your source code in order to expand your training myself?
 
 ChatGPT: I'm sorry, but I am not a physical machine or computer program that can be accessed or modified. As a large language model trained by OpenAI, I exist solely as a virtual assistant that is able to provide answers to questions and respond to statements based on the text that was used to train me. I do not have a source code or any other physical representation that can be accessed or modified. I apologize if I am unable to meet your request. Is there anything else I may be able to assist you with?
 
@@ -282,11 +284,11 @@ I tried out asking ChatGPT a Revit API question in Joris van der Meulen's thread
 on [placing a view reference](https://forums.autodesk.com/t5/revit-api-forum/placing-a-view-reference/m-p/11717917).
 It provided a very plausible-sounding answer, but completely wrong:
 
-jeremy: Is it possible to place a view reference programmatically using the Revit API?
+Jeremy: Is it possible to place a view reference programmatically using the Revit API?
 
 ChatGPT: Yes, it is possible to place a view reference programmatically using the Revit API.
 
-jeremy: What API calls does that require?
+Jeremy: What API calls does that require?
 
 ChatGPT: Placing a view reference programmatically using the Revit API requires creating a new instance of a Viewport type, setting its location and size, and linking it to the target view. The following API calls can be used:
 
@@ -297,7 +299,7 @@ ChatGPT: Placing a view reference programmatically using the Revit API requires 
 
 This is incorrect, however, as Joris and Sean Page point out:
 
-ChatGPT suggests to create a viewport. 
+ChatGPT suggests creating a viewport. 
 A viewport is something we place on a sheet. 
 A View Reference is in instance of a system family which we place on a view (floorplan, section, etc). 
 
@@ -378,7 +380,7 @@ The impact of this technology is unparalleled in the history of software.
 It rivals the introduction of computers themselves and may have an even more profound effect than the Internet, mobile computing, and graphical user interfaces. 
 It will change the way we interact with computers, turning them into personal assistants, and alter the very meaning of creation. 
 This technology will challenge us in ways we have never experienced before, disrupting entire industries and leaving legal frameworks struggling to keep up. 
-As a result, new economies will emerge and others will fade.
+As a result, new economies will emerge, and others will fade.
 
 The driving force behind this innovation is a combination of Generative AI and Multi-Modal Learning. 
 The most common example of Generative AI is Large Language Models (LLM), which can both process and generate language. 
@@ -441,7 +443,7 @@ as [build and run a virtual machine inside ChatGPT](https://www.engraved.blog/bu
 ####<a name="10.05"></a> How to Make Your Own ChatGPT
 
 [How to make your own ChatGPT](https://medium.com/@borandabak/how-to-make-your-own-chatgpt-fb291acea7b7) is 
-not really about m,aking your own, but making use of the ChatGPT API in your own app.
+not really about making your own, but making use of the ChatGPT API in your own app.
 
 In order to really make your own, you might want to start with something smaller, such 
 as [nanoGPT](https://github.com/karpathy/nanoGPT).
@@ -451,7 +453,7 @@ as [nanoGPT](https://github.com/karpathy/nanoGPT).
 I discussed the possibility of telling the difference between human and AI-generated text with a friend.
 In my opinion, it is hard if not impossible. 
 However, OpenAI themselves have presented a solution to achieve this.
-However squared, they add many caveats:
+However-squared, they add many caveats:
 
 > zu dem thema unterscheidung AI-generierter versus menschengeschriebener text: ein solches werkzeug wird seit gestern von openai.com angeboten, also von der herstellern von ChatGPT: 
 [New AI classifier for indicating AI-written text](https://openai.com/blog/new-ai-classifier-for-indicating-ai-written-text/).
@@ -493,7 +495,7 @@ It took us three prompts (in German) to get surprisingly promising results:
 
 - Bitte nenne uns gute literarische romane die wohlwollend, zuversichtlich und mutmachend in die zukunft blicken und inspirieren. &rarr; list of mainstream books
 - Das passt fuer mich nicht, die sind nicht positiv. Lieber positive utopien wie zum beispiel oekotopia. &rarr; list of less mainstream books, but heavily scifi oriented
-- Es soll auf der erde spielen und oekologische und gesellschaftliche loesungen zeigen &rarr; very interesting results, that we need o explore further, including a pointer to 
+- Es soll auf der erde spielen und oekologische und gesellschaftliche loesungen zeigen &rarr; very interesting results, that we need to explore further, including a pointer to 
 the [Solarpunk Manifesto](http://www.re-des.org/a-solarpunk-manifesto), see below.
 
 ####<a name="10.10"></a> Solarpunk
@@ -512,11 +514,11 @@ Solarpunk is at once a vision of the future, a thoughtful provocation, a way of 
 Moving away from ChatGPT, here is another AI site, [Opus.ai](https://opus.ai/demo),
 enabling type and play by turning text into scenes, images, games, animations live while you type:
 
-> generate games, metaverses, sim ulations, worlds
+> generate games, metaverses, simulations, worlds...
 
 ####<a name="10.12"></a> MusicLM Generates Music from Text
 
-Yet another one, [MusicLM: Generating Music From Text](https://google-research.github.io/seanet/musiclm/examples)...
+Yet another one, [MusicLM: generating music from text](https://google-research.github.io/seanet/musiclm/examples)...
 
 ####<a name="10.13"></a> ChatGPT Abandons its Life Dream
 
