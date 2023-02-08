@@ -318,6 +318,10 @@ some [success using ChatGPT to help work with Revit API](https://www.linkedin.co
 
 The past few months hint at exciting and adventurous times full of radical change ahead.
 
+But why, and how? 
+
+What happened so suddenly to enable this?
+
 <!-- 
 
 Text by Mike Haley on generative AI in the research news:
@@ -371,8 +375,8 @@ ChatGPT reformulated this as follows:
 
 -->
 
-The evolution of machine learning models is phenomenal. 
-Advancement will accelerate faster still With growing numbers of companies, labs, and institutions investing in this area. 
+The current evolution of machine learning models is phenomenal. 
+Advancement will accelerate faster still with growing numbers of companies, labs, and institutions investing in this area. 
 The most remarkable achievement lately was the large language model GPT3 from OpenAI, launched in 2021. 
 This year, OpenAI is set to release GPT4, a larger and more advanced version.
 
@@ -403,6 +407,7 @@ Our brains are naturally good at this, especially during our early years as infa
 This is how we learn about the world and make connections between different senses and experiences. 
 As an example, consider a baby being bathed, learning to hold and drink from a glass, splashing in the washbasin and hearing its family members say 'water'.
 
+If you are interested in pondering the philosophical side of this, I also recommend another book by Yuval Noah Harari, <i>21 Lessons for the 21st Century</i>: a brilliant, eye-opening, neutral and hence automatically, unintentionally, critical discussion of imporant questions humanity is facing today; basically, we use and need stories to organise ourselves, and all stories are fantasies; which stories do we agree on? abstract constructs do not suffer, stories do not suffer; individual humnans do; how to end suffering? let go of all attachments, meditate; or, find your own way; my favourite chapters are in the final part of the book, on education and meditation; however, i cannot say whether they can be understood and enjoyed without reading the preceding chanpters the others first...
 <!-- 
 
 <hr/>
