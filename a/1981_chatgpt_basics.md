@@ -311,6 +311,8 @@ some [success using ChatGPT to help work with Revit API](https://www.linkedin.co
 
 The past few months hint at exciting and adventurous times full of radical change ahead.
 
+<hr/>
+
 The speed at which machine learning models are evolving is breathtaking. 
 There are more companies, labs and institutions working on these than ever before. 
 The language model GPT3 from OpenAI, released in 2021, was a key breakthrough.
@@ -351,6 +353,34 @@ It means to learn from multiple sources of information at the same time, inferri
 Our brains are extremely good at this, especially when we are babies and toddlers. 
 It is a key ingredient in how we learn about the world. 
 Seeing a toy block, feeling its sharp corners, hearing the sound it makes when it falls on the floor, and then hearing a parent say “block” is all part of a multi-modal learning process. 
+
+<hr/>
+
+ChatGPT reformulated this as follows:
+
+The evolution of machine learning models is nothing short of phenomenal. With more companies, labs, and institutions investing in this area, the advancements are only getting bigger and better. One such remarkable achievement is the language model GPT3 from OpenAI, which was launched in 2021. This year, OpenAI is set to release an even more advanced version of the model, known as GPT4.
+
+The impact of this technology is unparalleled in the history of software. It rivals the introduction of computers themselves and will have a more profound effect than the Internet, mobile computing, and graphical user interfaces. It will change the way we interact with computers, turning them into personal assistants, and alter the very meaning of creation. This technology will challenge us in ways we have never experienced before, disrupting entire industries and leaving legal frameworks struggling to keep up. As a result, new economies will emerge and others will fade away.
+
+The driving force behind this innovation is a combination of Generative AI and Multi-Modal Learning. The most common example of Generative AI is Large Language Models (LLM), which can both process and generate language. Researchers feed LLMs massive amounts of text in every language that exists, spoken, written or computer-generated. The models then learn to produce new and original text based on prompts with impressive results.
+
+These models essentially learn about language and how we use it by identifying patterns and frequencies of words and phrases. As they process vast amounts of text, including multiple languages, they acquire increasingly advanced and nuanced concepts that hold meaning for us. This may seem like magic, but it makes sense given the central role that language plays in our lives as humans.
+
+<blockquote>
+<p>The truly unique feature of our language is... the ability to transmit information 
+about things that do not exist at all. As far as we know, only Sapiens can talk 
+about entire kinds of entities that they have never seen, touched or smelled.
+<span style="text-align: right; font-style: italic">&ndash; Yuval Noah Harari, Sapiens</span></p>
+</blockquote>
+
+Multi-Modal Learning, on the other hand, is the ability to learn from multiple sources of information at the same time. Our brains are naturally good at this, especially during our early years when we are infants and toddlers. This is how we learn about the world and make connections between different senses and experiences. 
+As an example of multi-modal learning, consider a baby being bathed, drinking from a glass, splashing in the washbasin and hearing its family members say 'water'.
+
+<hr/>
+
+For example, when a child sees a toy block, feels its sharp corners, hears the sound it makes when it drops on the floor, and hears a parent say "block," it is an example of multi-modal learning. -->
+
+
 
 ####<a name="10"></a> More Notes on ChatGPT et al
 
