@@ -89,6 +89,11 @@ Here are a couple of typical questions from StackOverflow and the discussion for
 
 Maybe, by now, or very soon, based on the publicly available information, ChatGPT and other pretrained language models will be able to answer them just as well or better than I can.
 
+See below for examples of 
+what it [can do &ndash; using ChatGPT with Revit API](#8),
+what it [can't do &ndash; asking ChatGPT a Revit API question](#7), 
+and [an explanation of why it works at all &ndash; generative AI and multi-modal learning](#9).
+
 <!--
 I would really be happy if I did not have to continue repeating them.
 
@@ -449,15 +454,16 @@ However, OpenAI themselves have presented a solution to achieve this.
 However squared, they add many caveats:
 
 > zu dem thema unterscheidung AI-generierter versus menschengeschriebener text: ein solches werkzeug wird seit gestern von openai.com angeboten, also von der herstellern von ChatGPT: 
-[New AI classifier for indicating AI-written text](https://openai.com/blog/new-ai-classifier-for-indicating-ai-written-text/)
+[New AI classifier for indicating AI-written text](https://openai.com/blog/new-ai-classifier-for-indicating-ai-written-text/).
 
 > weisst du noch, dass ich gesagt habe, es ist unmoeglich? 
 das wird bestaetigt. lese dazu 
-die [einschraenkungen &ndash; limitations](https://openai.com/blog/new-ai-classifier-for-indicating-ai-written-text/#limitations)
+die [einschraenkungen &ndash; limitations](https://openai.com/blog/new-ai-classifier-for-indicating-ai-written-text/#limitations).
 
 ####<a name="10.07"></a> ChatGPT and Education
 
-ChatGPT nimmt Stellung zu der Frage nach [ChatGPT im bildungsbereich](https://platform.openai.com/docs/chatgpt-education).
+ChatGPT nimmt Stellung zu der Frage 
+nach [ChatGPT im Bildungsbereich &ndash; educator considerations for ChatGPT](https://platform.openai.com/docs/chatgpt-education).
 
 ####<a name="10.08"></a> ChatGPT Payment Plan
 
@@ -470,7 +476,7 @@ The new subscription plan, ChatGPT Plus, will be available for $20/month, and su
 * General access to ChatGPT, even during
 
 Not surprising. 
-Best things in life are never free.
+The best things in life are never free.
 
 Bait and switch &ndash; the oldest trick in the book &ndash; predates AI.
 
