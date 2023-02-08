@@ -364,13 +364,24 @@ ChatGPT reformulated this as follows:
 
 -->
 
-The evolution of machine learning models is nothing short of phenomenal. With more companies, labs, and institutions investing in this area, the advancements are only getting bigger and better. One such remarkable achievement is the language model GPT3 from OpenAI, which was launched in 2021. This year, OpenAI is set to release an even more advanced version of the model, known as GPT4.
+The evolution of machine learning models is nothing short of phenomenal. 
+With growing numbers of companies, labs, and institutions investing in this area, the advancements are only accelerating faster still. 
+The most remarkable achievement lately was the large language model GPT3 from OpenAI, launched in 2021. 
+This year, OpenAI is set to release GPT4, an even larger and more advanced version.
 
-The impact of this technology is unparalleled in the history of software. It rivals the introduction of computers themselves and will have a more profound effect than the Internet, mobile computing, and graphical user interfaces. It will change the way we interact with computers, turning them into personal assistants, and alter the very meaning of creation. This technology will challenge us in ways we have never experienced before, disrupting entire industries and leaving legal frameworks struggling to keep up. As a result, new economies will emerge and others will fade away.
+The impact of this technology is unparalleled in the history of software. 
+It rivals the introduction of computers themselves and may have an even more profound effect than the Internet, mobile computing, and graphical user interfaces. 
+It will change the way we interact with computers, turning them into personal assistants, and alter the very meaning of creation. 
+This technology will challenge us in ways we have never experienced before, disrupting entire industries and leaving legal frameworks struggling to keep up. 
+As a result, new economies will emerge and others will fade.
 
-The driving force behind this innovation is a combination of Generative AI and Multi-Modal Learning. The most common example of Generative AI is Large Language Models (LLM), which can both process and generate language. Researchers feed LLMs massive amounts of text in every language that exists, spoken, written or computer-generated. The models then learn to produce new and original text based on prompts with impressive results.
+The driving force behind this innovation is a combination of Generative AI and Multi-Modal Learning. 
+The most common example of Generative AI is Large Language Models (LLM), which can both process and generate language. 
+Researchers feed LLMs massive amounts of text in many languages, including speech, writing and programming. The models then learn to produce new and original text based on prompts with impressive results.
 
-These models essentially learn about language and how we use it by identifying patterns and frequencies of words and phrases. As they process vast amounts of text, including multiple languages, they acquire increasingly advanced and nuanced concepts that hold meaning for us. This may seem like magic, but it makes sense given the central role that language plays in our lives as humans.
+These models essentially learn about language and how we use it by identifying patterns and frequencies of words and phrases. 
+As they process the vast amounts of text fed in, they acquire increasingly advanced and nuanced concepts that hold meaning for us. 
+This may seem like magic, but makes total sense given the central role that language plays in our human lives:
 
 <blockquote>
 <p>The truly unique feature of our language is... the ability to transmit information 
@@ -379,8 +390,10 @@ about entire kinds of entities that they have never seen, touched or smelled.
 <span style="text-align: right; font-style: italic">&ndash; Yuval Noah Harari, Sapiens</span></p>
 </blockquote>
 
-Multi-Modal Learning, on the other hand, is the ability to learn from multiple sources of information at the same time. Our brains are naturally good at this, especially during our early years when we are infants and toddlers. This is how we learn about the world and make connections between different senses and experiences. 
-As an example of multi-modal learning, consider a baby being bathed, drinking from a glass, splashing in the washbasin and hearing its family members say 'water'.
+Multi-Modal Learning is the ability to learn from multiple sources of information at the same time. 
+Our brains are naturally good at this, especially during our early years as infants and toddlers.
+This is how we learn about the world and make connections between different senses and experiences. 
+As an example, consider a baby being bathed, learning to hold and drink from a glass, splashing in the washbasin and hearing its family members say 'water'.
 
 <!-- 
 
