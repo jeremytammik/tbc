@@ -386,7 +386,7 @@ As an example of multi-modal learning, consider a baby being bathed, drinking fr
 
 <hr/>
 
-For example, when a child sees a toy block, feels its sharp corners, hears the sound it makes when it drops on the floor, and hears a parent say "block," it is an example of multi-modal learning. -->
+For example, when a child sees a toy block, feels its sharp corners, hears the sound it makes when it drops on the floor, and hears a parent say "block," it is an example of multi-modal learning. 
 
 -->
 
