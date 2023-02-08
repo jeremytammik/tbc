@@ -29,6 +29,16 @@
 
 twitter:
 
+### Back to Basics and ChatGPT
+
+Impressed and intrigued by what ChatGPT can and cannot do, trying out new aspects myself and with my friends
+&ndash; Element filtering
+&ndash; XYZ trigonometry
+&ndash; Projecting points
+&ndash; Using ChatGPT with Revit API
+&ndash; Generative AI and multi-modal learning
+&ndash; ChatGPT in academia, education, building a VM, DIY, payment plan, Solarpunk...
+
 &ndash; 
 ...
 
