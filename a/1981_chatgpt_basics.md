@@ -373,6 +373,10 @@ Seeing a toy block, feeling its sharp corners, hearing the sound it makes when i
 
 ChatGPT reformulated this as follows:
 
+<hr/>
+
+For example, when a child sees a toy block, feels its sharp corners, hears the sound it makes when it drops on the floor, and hears a parent say "block," it is an example of multi-modal learning. 
+
 -->
 
 The current evolution of machine learning models is phenomenal. 
@@ -408,13 +412,6 @@ This is how we learn about the world and make connections between different sens
 As an example, consider a baby being bathed, learning to hold and drink from a glass, splashing in the washbasin and hearing its family members say 'water'.
 
 If you are interested in pondering the philosophical side of this, I also recommend another book by Yuval Noah Harari, <i>21 Lessons for the 21st Century</i>: a brilliant, eye-opening, neutral and hence automatically, unintentionally, critical discussion of imporant questions humanity is facing today; basically, we use and need stories to organise ourselves, and all stories are fantasies; which stories do we agree on? abstract constructs do not suffer, stories do not suffer; individual humnans do; how to end suffering? let go of all attachments, meditate; or, find your own way; my favourite chapters are in the final part of the book, on education and meditation; however, i cannot say whether they can be understood and enjoyed without reading the preceding chanpters the others first...
-<!-- 
-
-<hr/>
-
-For example, when a child sees a toy block, feels its sharp corners, hears the sound it makes when it drops on the floor, and hears a parent say "block," it is an example of multi-modal learning. 
-
--->
 
 
 ####<a name="10"></a> More Notes on ChatGPT et al
