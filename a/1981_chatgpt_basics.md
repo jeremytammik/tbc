@@ -371,15 +371,15 @@ ChatGPT reformulated this as follows:
 
 -->
 
-The evolution of machine learning models is nothing short of phenomenal. 
-With growing numbers of companies, labs, and institutions investing in this area, the advancements are only accelerating faster still. 
+The evolution of machine learning models is phenomenal. 
+Advancement will accelerate faster still With growing numbers of companies, labs, and institutions investing in this area. 
 The most remarkable achievement lately was the large language model GPT3 from OpenAI, launched in 2021. 
-This year, OpenAI is set to release GPT4, an even larger and more advanced version.
+This year, OpenAI is set to release GPT4, a larger and more advanced version.
 
 The impact of this technology is unparalleled in the history of software. 
-It rivals the introduction of computers themselves and may have an even more profound effect than the Internet, mobile computing, and graphical user interfaces. 
+It rivals the introduction of computers themselves and may have an even more profound effect on our work and everyday life than the Internet, mobile computing, and graphical user interfaces. 
 It will change the way we interact with computers, turning them into personal assistants, and alter the very meaning of creation. 
-This technology will challenge us in ways we have never experienced before, disrupting entire industries and leaving legal frameworks struggling to keep up. 
+This technology will challenge us in ways we have never experienced before, disrupting industries and leaving legal frameworks struggling to keep up. 
 As a result, new economies will emerge, and others will fade.
 
 The driving force behind this innovation is a combination of Generative AI and Multi-Modal Learning. 
@@ -387,13 +387,14 @@ The most common example of Generative AI is Large Language Models (LLM), which c
 Researchers feed LLMs massive amounts of text in many languages, including speech, writing and programming. The models then learn to produce new and original text based on prompts with impressive results.
 
 These models essentially learn about language and how we use it by identifying patterns and frequencies of words and phrases. 
-As they process the vast amounts of text fed in, they acquire increasingly advanced and nuanced concepts that hold meaning for us. 
+As they process the vast amounts of data fed in, they acquire increasingly advanced and nuanced concepts that hold meaning for us. 
 This may seem like magic, but makes total sense given the central role that language plays in our human lives:
 
 <blockquote>
-<p>The truly unique feature of our language is... the ability to transmit information 
-about things that do not exist at all. As far as we know, only Sapiens can talk 
-about entire kinds of entities that they have never seen, touched or smelled.
+<p>The truly unique feature of our language is... 
+the ability to transmit information about things that do not exist at all. 
+As far as we know, only Sapiens can talk about entire kinds of entities 
+that they have never seen, touched or smelled.
 <span style="text-align: right; font-style: italic">&ndash; Yuval Noah Harari, Sapiens</span></p>
 </blockquote>
 
