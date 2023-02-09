@@ -1,0 +1,166 @@
+https://autodesk.slack.com/archives/C016D5HE66T/p1675805955391249
+
+Alex O'Connor
+Hi folks, clarification for the AI/ML Hackathon - ChatGPT and openAI services are not to be used for this event. This is based on a recent decision from leadership. If you want to work on similar models, the huggingface open source models can be used with AWS Sagemaker - you don’t use the spaces or hub products. Useful models are:
+Flann-t5 https://huggingface.co/google/flan-t5-xl, codegen https://huggingface.co/Salesforce/codegen-2B-multi.gpt-j https://huggingface.co/EleutherAI/gpt-j-6B (edited) 
+huggingface.co
+google/flan-t5-xl · Hugging Face
+We’re on a journey to advance and democratize artificial intelligence through open source and open science. (478 kB)
+https://huggingface.co/google/flan-t5-xl
+
+huggingface.co
+EleutherAI/gpt-j-6B · Hugging Face
+We’re on a journey to advance and democratize artificial intelligence through open source and open science. (480 kB)
+https://huggingface.co/EleutherAI/gpt-j-6B
+
+Resources for training and hosting these models can be found here https://huggingface.co/docs/sagemaker/index
+https://catalog.us-east-1.prod.workshops.aws/workshops/74da6491-2f74-466a-86a5-3bcce6541904/en-US/training/training-huggingface-model-on-amazon-sagemaker
+huggingface.co
+Hugging Face on Amazon SageMaker
+We’re on a journey to advance and democratize artificial intelligence through open source and open science. (42 kB)
+https://huggingface.co/docs/sagemaker/index
+
+catalog.us-east-1.prod.workshops.awscatalog.us-east-1.prod.workshops.aws
+Workshop Studio
+Discover and participate in AWS workshops and GameDays
+
+
+Jonathan Pilovsky
+I disagree with a blanket ban on openai. It signals a lack of trust in employees to not provide it private data.
+For the hackathon - I can imagine several use cases that leverage openai and abide by our policies (simple example: chat bot trained on public support articles). (edited) 
+
+
+Matthew Nichols
+  1 day ago
+Thank you 
+@Alex O'Connor
+ for this information!
+:+1::skin-tone-2:
+1
+
+
+
+Alex O'Connor
+  1 day ago
+@Jonathan Pilovsky
+ for those use cases, you can train a transformer model as a proof of concept, or try one of the many zero shot models
+:+1:
+2
+
+
+
+Krish Seth
+  13 hours ago
+Hey 
+@Alex O'Connor
+, would we be able to use OpenAi spaces on huggingface? Particularly for point-e: https://huggingface.co/spaces/openai/point-e/tree/main
+huggingface.co
+openai/point-e at main
+We’re on a journey to advance and democratize artificial intelligence through open source and open science. (282 kB)
+https://huggingface.co/spaces/openai/point-e/tree/main
+
+
+
+Alex O'Connor
+  13 hours ago
+so you can’t use spaces, but you can definitely use that model on sagemaker. You should be able to adapt https://github.com/openai/point-e/blob/main/point_e/examples/text2pointcloud.ipynb this one for example to run on sagemaker easily enough
+text2pointcloud.ipynb
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+Show more
+<https://github.com/openai/point-e|openai/point-e>openai/point-e | Added by GitHub
+
+
+Krish Seth
+  13 hours ago
+Gotcha, so we can utilize some of their open source code, but we just can’t use any APIs/compute?
+
+
+Alex O'Connor
+  13 hours ago
+exactly - open source models are encouarged, just use the aws hackathon resources :slightly_smiling_face:
+:raised_hands::skin-tone-4:
+1
+:+1:
+1
+
+
+
+Krish Seth
+  13 hours ago
+great - thanks for clarifying!
+
+
+Alex O'Connor
+  13 hours ago
+This app code might also be useful https://huggingface.co/spaces/MirageML/point-e/blob/main/app.py
+huggingface.co
+app.py · MirageML/point-e at main
+We’re on a journey to advance and democratize artificial intelligence through open source and open science. (322 kB)
+https://huggingface.co/spaces/MirageML/point-e/blob/main/app.py
+
+
+
+Alex O'Connor
+  7 hours ago
+I got point-e running on a g4dn base instance in studio. Here’s the code 
+@Krish Seth
+ (edited) 
+
+
+
+
+https://autodesk.slack.com/archives/C016D5HE66T/p1675859574444459
+
+Tyler Liu
+Seeking guidance:
+We (BID Infrastructure) have a special recharge sprint in March, where all people can choose what they are interested in to learn during this two-week period. As you might imagine, many colleagues showed great interest in ChatGPT. After an initial discussion, we would like to form a study group to improve our learning by interacting with each other.
+May I ask your experts what and how to choose to start learning if as complete laymen.
+Honestly, none of us know what expectations should be set that are reasonable. After the discussion, some common expectations emerged:
+We hope that after this learning, we can have an application-level understanding of AI/DL (take ChatGPT as sample), and know whether and how it can help our product development team to increase/improve efficiency.
+For example, can it be used to improve the effectiveness of analysis of product crash reports and increase analysis efficiency? What does product team need to do to make it work, etc.?
+Any suggestion would be greatly appreciated! (edited) 
+
+Alex O'Connor
+Hi Tyler. I think there are a lot of different threads of investigation to pursue with something like ChatGPT.  At one level, that is just one service that provides a very convenient interface, but is not specialised. It’s principally a generation tool, conditioned on a prompt, so you’d want to think about using it that way.
+I would also advise you strongly to talk to your LBP before doing anything in-depth. There is significant data policy restrictions on what should or can be shared with as service that records every interaction for future use.
+Thread 1: using chatgpt
+This is mostly in learning to try different prompts interactively, for different results.
+https://drive.google.com/file/d/1UOfN0iB_A0rEGYc2CbYnpIF44FupQn2I/view
+https://levelup.gitconnected.com/chatgpt-guide-for-product-managers-top-20-most-important-prompts-a2c48dcc63c6
+Thread 2: more general approaches to nlp.
+You could learn some coding, or test out some no-code interfaces like https://aws.amazon.com/sagemaker/canvas/
+These don’t use chatgpt necessarily, but use other types of ml model.
+Thread 3: Theory
+worth understanding a little about that’s going on under the hood, and maybe some limitations. https://jalammar.github.io/illustrated-transformer/
+https://huggingface.co/blog/dialog-agents
+MediumMedium
+ChatGPT Guide for Product Managers: Top 20 Most Important Prompts
+Complete, end-to-end guide: 10 subprompts for each of the 20 prompts are included
+Reading time
+14 min read
+24 Jan (1 MB)
+https://levelup.gitconnected.com/chatgpt-guide-for-product-managers-top-20-most-important-prompts-a2c48dcc63c6
+
+Amazon Web Services, Inc.Amazon Web Services, Inc.
+No-code machine learning - Amazon Web Services
+Build machine learning (ML) models and generate accurate predictions with the Amazon SageMaker Canvas no-code, visual, drag and drop interface.
+jalammar.github.io
+The Illustrated Transformer
+Discussions:
+Hacker News (65 points, 4 comments), Reddit r/MachineLearning (29 points, 3 comments)
+Translations: Arabic, Chinese (Simplified) 1, Chinese (Simplified) 2, French 1, French 2, Japanese, Korean, Persian, Russian, Spanish, Vietnamese
+Watch: MIT’s Deep Learning State of the Art lecture referencing this post
+In the previous post, we looked at Attention – a ubiquitous method in modern deep learning models. Attention is a concept that helped improve the performance of neural machine translation applications. In this post, we will look at The Transformer – a model that uses attention to boost the speed with which these models can be trained. The Transformer outperforms the Google Neural Ma… Show more
+huggingface.co
+What Makes a Dialog Agent Useful?
+We’re on a journey to advance and democratize artificial intelligence through open source and open science. (858 kB)
+https://huggingface.co/blog/dialog-agents
+
+Tyler Liu
+Thank you very much for compiling these learning materials from different levels. As you said, there are so many discussions about ChatGPT nowadays, and this sharing of yours saves us a lot of time, especially as it allows us to avoid spending those hours just in confusion.
+Thank you also for the reminder about compliance with using data, this will also be something that we will go back to highlight in the product team.
+

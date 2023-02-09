@@ -29,7 +29,7 @@
 
 twitter:
 
-### Back to Basics and ChatGPT
+Impressed and intrigued by what #ChatGPT can and cannot do, trying out new aspects myself, with my friends and with @AutodeskRevit #RevitAPI element filtering, XYZ trigonometry, projecting points , academia, education, and #Solarpunk #BIM @AutodeskAPS  https://autode.sk/chatgpt4rvtapi
 
 Impressed and intrigued by what ChatGPT can and cannot do, trying out new aspects myself and with my friends
 &ndash; Element filtering
