@@ -6,6 +6,81 @@
 
 <!---
 
+- ricaun shared
+RevitAddin.CommandLoader - Compile/Running 'IExternalCommand' with Revit open!
+https://forums.autodesk.com/t5/revit-api-forum/revitaddin-commandloader-compile-running-iexternalcommand-with/td-p/11742530
+> I present my first RevitAddin open-source project CommandLoader. With this plugin is possible to compile IExternalCommand directly in Revit, and the command is added as a PushButton in the Addins Tab.
+Here is a video explaining the features and some limitations.
+[Compile/Running 'IExternalCommand' with Revit open!](https://youtu.be/l4V4-vohcWY)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/l4V4-vohcWY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+RevitAddin.CommandLoader project compiles IExternalCommand with Revit open using CodeDom.Compiler and creates a PushButton on the Revit ribbon.
+[GitHub repository](https://github.com/ricaun-io/RevitAddin.CommandLoader)
+
+- richard suggested how to 
+How to modify levels extents (X and Y direction)
+https://forums.autodesk.com/t5/revit-api-forum/how-to-modify-levels-extents-x-and-y-direction/td-p/11731529
+
+- richard implemented a very nice little sample using the TessellatedShapeBuilder to create a DirectShape
+  create a [pyramid](https://en.wikipedia.org/wiki/Pyramid_(geometry)), or, 
+  more specifically, a right pyramid with a regular base for the ...
+  on [Is it possible to create a solid from the edges of Pyramids?]
+  https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-create-a-solid-from-the-edges-of-pyramids/td-p/11729445
+
+- cleaning up and simplifying curve loops
+Benoit Favre, CEO of [etudes &amp; automates](http://www.etudesetautomates.com)
+Boundary Segments Issue
+https://forums.autodesk.com/t5/revit-api-forum/boundary-segments-issue/m-p/11732446#M69140
+Funny to get this very old post alive.
+I'd change my answer from the time and say:
+- sometimes the BoundarySegment list is holed (around windows and at the end of walls ending in the middle of the Room). So you have to close the List, practically we add another Segment to the List.
+- check either Douglas Peucker or Visvaligham algorithms, easy to implement and very useful. At least that's what we use and these work fine for us.
+douglas peucker algorithm
+https://duckduckgo.com/?q=douglas+peucker+algorithm
+Ramer–Douglas–Peucker algorithm
+https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
+visvalingam algorithm
+https://duckduckgo.com/?q=visvalingam+algorithm
+Visvalingam–Whyatt algorithm
+https://en.wikipedia.org/wiki/Visvalingam%E2%80%93Whyatt_algorithm
+Many thanks to Benoit for the interesting pointer!
+
+- switch document display units:
+Converting All Parameter Values from Imperial Units to Metric Units
+https://forums.autodesk.com/t5/revit-api-forum/converting-all-parameter-values-from-imperial-units-to-metric/m-p/11728282#M69113
+nikolaEXEZM wrote two simple macros to convert the project units between Imperial and Metric. 
+Works with both project and family documents. 
+Just create a new Macro Module, and paste in the code below:
+public void ChangeUnitsToImperial()
+{
+    Document doc = this.ActiveUIDocument.Document;
+    Document templateDoc = Application.OpenDocumentFile(@"C:\ProgramData\Autodesk\RVT " + this.Application.VersionNumber + @"\Templates\English-Imperial\default.rte");
+    using (Transaction ta = new Transaction(doc))
+       {
+        ta.Start("Change Project Units to Imperial");
+        doc.SetUnits(templateDoc.GetUnits());
+        ta.Commit();
+    }
+}
+public void ChangeUnitsToMetric()
+{
+    Document doc = this.ActiveUIDocument.Document;
+    Document templateDoc = Application.OpenDocumentFile(@"C:\ProgramData\Autodesk\RVT " + this.Application.VersionNumber + @"\Templates\English\DefaultMetric.rte");
+    using (Transaction ta = new Transaction(doc))
+       {
+        ta.Start("Change Project Units to Metric");
+        doc.SetUnits(templateDoc.GetUnits());
+        ta.Commit();
+    }
+}
+
+- avoid conflict with revit dlls
+  Do I need to include RevitAPI.dll and RevitAPIUI.dll in my release package?
+  https://forums.autodesk.com/t5/revit-api-forum/do-i-need-to-include-revitapi-dll-and-revitapiui-dll-in-my/m-p/11727761
+
+- workaround for REVIT-20249 
+  REVIT-20249 [As a Revit user, I want my material tags to stop displaying "?" after minor changes to the model, so that I don't have to waste time regen-ing or nudging all material tags right before printing a drawing set]
+  Workaround as stated by one customer: "Standard Operating Procedure around here is right before printing, select a material tag > right click > select all instances in entire project > nudge right > nudge left, then print."
+
 - sublime text
   Sublime Text: remember cursor position plugin
   https://gmpy.dev/blog/2022/sublime-text-remember-cursor-position-plugin
