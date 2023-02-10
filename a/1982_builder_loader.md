@@ -16,15 +16,15 @@ Here is a video explaining the features and some limitations.
 RevitAddin.CommandLoader project compiles IExternalCommand with Revit open using CodeDom.Compiler and creates a PushButton on the Revit ribbon.
 [GitHub repository](https://github.com/ricaun-io/RevitAddin.CommandLoader)
 
-- richard suggested how to 
-How to modify levels extents (X and Y direction)
-https://forums.autodesk.com/t5/revit-api-forum/how-to-modify-levels-extents-x-and-y-direction/td-p/11731529
-
 - richard implemented a very nice little sample using the TessellatedShapeBuilder to create a DirectShape
   create a [pyramid](https://en.wikipedia.org/wiki/Pyramid_(geometry)), or, 
   more specifically, a right pyramid with a regular base for the ...
   on [Is it possible to create a solid from the edges of Pyramids?]
   https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-create-a-solid-from-the-edges-of-pyramids/td-p/11729445
+
+- richard suggested how to 
+How to modify levels extents (X and Y direction)
+https://forums.autodesk.com/t5/revit-api-forum/how-to-modify-levels-extents-x-and-y-direction/td-p/11731529
 
 - cleaning up and simplifying curve loops
 Benoit Favre, CEO of [etudes &amp; automates](http://www.etudesetautomates.com)
@@ -125,9 +125,22 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="4"></a> 
 
+Richard also suggested [how to modify levels extents (X and Y direction)](https://forums.autodesk.com/t5/revit-api-forum/how-to-modify-levels-extents-x-and-y-direction/td-p/11731529):
+
+**Question:** I can get levels extents with `get_BoundingBox`, and am looking for something like `set_BoundingBox`. I want to keep the level's Z elevation at the same level and stretch its bounding box in X and Y direction:
+
 <center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 1199 × 530 pixels -->
+<img src="img/level_extent_x_y.png" alt="Level X Y extent" title="Level X Y extent" width="500"/> <!-- 923 × 435 pixels -->
 </center>
+
+**Answer:** There is some functionality on the `DatumPlane` class that `Level` inherits from, e.g.: 
+
+- DatumPlane.SetCurveInView
+- DatumPlane.Maximize3DExtent
+- DatumPlane.PropagateToViews
+
+Seems better to maximize the extents and propagate to views rather than individually manipulating curves.
+
 
 
 
