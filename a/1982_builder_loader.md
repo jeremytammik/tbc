@@ -6,6 +6,9 @@
 
 <!---
 
+- successful ChatGPT answer in forum:
+https://forums.autodesk.com/t5/revit-api-forum/find-centroid-of-wall-in-revit-api/m-p/11746962
+
 - ricaun shared
 RevitAddin.CommandLoader - Compile/Running 'IExternalCommand' with Revit open!
 https://forums.autodesk.com/t5/revit-api-forum/revitaddin-commandloader-compile-running-iexternalcommand-with/td-p/11742530
@@ -25,6 +28,21 @@ RevitAddin.CommandLoader project compiles IExternalCommand with Revit open using
 - richard suggested how to 
 How to modify levels extents (X and Y direction)
 https://forums.autodesk.com/t5/revit-api-forum/how-to-modify-levels-extents-x-and-y-direction/td-p/11731529
+
+- how to filter for subsets of elements
+https://autodesk.slack.com/archives/C0SR6NAP8/p1675998082315159
+Shen Wang
+A question about the parsed element structure of the Revit model, you could think of it as the model tree in Navisworks.
+Users want to access the parsed structured data and graphic elements of Revit model, select objects by filtering Revit views, grids, family categories or MEP systems, and then create assemblies after selecting elements for documentation.
+Example 1, a relatively complex building includes multiple piping systems. The user hopes to quickly select the circuit of a certain piping system on a certain floor by developing a plug-in.
+Example 2, a section of linear engineering, such as an elevated road, the user hopes to develop a plugin so that to quickly select the Revit elements between two grids.
+---------------------------
+As my understood, the user's objective is to quickly select objects by filtering Revit properties.
+Do you have any advice?
+Appreciated.
+filter_for_subset_bridge.png 1000x580
+Scott Conover
+We have many ways to use the API to filter down to the element(s) you are looking for.  It depends on the particular need, but in Example 1, you'd probably want to start with the elements in the target system, but then filter further with an ElementParameterFilter for the reference level and/or with a geometric filter like BoundingBoxIntersectsFilter or ElementIntersectsSolidFilter.  In Example 2, it seems more geometric, so filter first by certain categories and then use the geometric filters after calculating a shape that represents the space between grids.   For more on all the filters we have see: https://knowledge.autodesk.com/es/support/revit/learn-explore/caas/CloudHelp/cloudhelp/2[…]/files/GUID-A2686090-69D5-48D3-8DF9-0AC4CC4067A5-htm.html
 
 - cleaning up and simplifying curve loops
 Benoit Favre, CEO of [etudes &amp; automates](http://www.etudesetautomates.com)
@@ -146,6 +164,7 @@ Seems better to maximize the extents and propagate to views rather than individu
 
 
 ####<a name="5"></a> 
+
 
 **Question:** 
 
