@@ -6,9 +6,6 @@
 
 <!---
 
-- successful ChatGPT answer in forum:
-https://forums.autodesk.com/t5/revit-api-forum/find-centroid-of-wall-in-revit-api/m-p/11746962
-
 - ricaun shared
 RevitAddin.CommandLoader - Compile/Running 'IExternalCommand' with Revit open!
 https://forums.autodesk.com/t5/revit-api-forum/revitaddin-commandloader-compile-running-iexternalcommand-with/td-p/11742530
@@ -44,24 +41,6 @@ filter_for_subset_bridge.png 1000x580
 Scott Conover
 We have many ways to use the API to filter down to the element(s) you are looking for.  It depends on the particular need, but in Example 1, you'd probably want to start with the elements in the target system, but then filter further with an ElementParameterFilter for the reference level and/or with a geometric filter like BoundingBoxIntersectsFilter or ElementIntersectsSolidFilter.  In Example 2, it seems more geometric, so filter first by certain categories and then use the geometric filters after calculating a shape that represents the space between grids.   For more on all the filters we have see: https://knowledge.autodesk.com/es/support/revit/learn-explore/caas/CloudHelp/cloudhelp/2[…]/files/GUID-A2686090-69D5-48D3-8DF9-0AC4CC4067A5-htm.html
 
-- cleaning up and simplifying curve loops
-Benoit Favre, CEO of [etudes &amp; automates](http://www.etudesetautomates.com)
-Boundary Segments Issue
-https://forums.autodesk.com/t5/revit-api-forum/boundary-segments-issue/m-p/11732446#M69140
-Funny to get this very old post alive.
-I'd change my answer from the time and say:
-- sometimes the BoundarySegment list is holed (around windows and at the end of walls ending in the middle of the Room). So you have to close the List, practically we add another Segment to the List.
-- check either Douglas Peucker or Visvaligham algorithms, easy to implement and very useful. At least that's what we use and these work fine for us.
-douglas peucker algorithm
-https://duckduckgo.com/?q=douglas+peucker+algorithm
-Ramer–Douglas–Peucker algorithm
-https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
-visvalingam algorithm
-https://duckduckgo.com/?q=visvalingam+algorithm
-Visvalingam–Whyatt algorithm
-https://en.wikipedia.org/wiki/Visvalingam%E2%80%93Whyatt_algorithm
-Many thanks to Benoit for the interesting pointer!
-
 - switch document display units:
 Converting All Parameter Values from Imperial Units to Metric Units
 https://forums.autodesk.com/t5/revit-api-forum/converting-all-parameter-values-from-imperial-units-to-metric/m-p/11728282#M69113
@@ -90,10 +69,6 @@ public void ChangeUnitsToMetric()
         ta.Commit();
     }
 }
-
-- avoid conflict with revit dlls
-  Do I need to include RevitAPI.dll and RevitAPIUI.dll in my release package?
-  https://forums.autodesk.com/t5/revit-api-forum/do-i-need-to-include-revitapi-dll-and-revitapiui-dll-in-my/m-p/11727761
 
 - workaround for REVIT-20249 
   REVIT-20249 [As a Revit user, I want my material tags to stop displaying "?" after minor changes to the model, so that I don't have to waste time regen-ing or nudging all material tags right before printing a drawing set]
@@ -131,17 +106,34 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 
 
-####<a name="2"></a> 
+####<a name="2"></a> Dynamic Load, Compile and Run
+
+Recently, 
+several [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
+revolved around how to dynamically load and compile Revit add-ins.
+
+Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari now shared a solution for that,
+[RevitAddin.CommandLoader &ndash; compile and run `IExternalCommand` with Revit open](https://forums.autodesk.com/t5/revit-api-forum/revitaddin-commandloader-compile-running-iexternalcommand-with/td-p/11742530):
+
+> I present my first RevitAddin open-source project CommandLoader. 
+With this plugin is possible to compile `IExternalCommand` directly in Revit, and the command is added as a `PushButton` in the Addins Tab.
+Here is a video explaining the features and some limitations, [compile and run 'IExternalCommand' with Revit open](https://youtu.be/l4V4-vohcWY):
+
+<iframe width="480" height="270" src="https://www.youtube.com/embed/l4V4-vohcWY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+> RevitAddin.CommandLoader project compiles `IExternalCommand` with Revit open using `CodeDom.Compiler` and creates a `PushButton` on the Revit ribbon.
+
+- [GitHub repository](https://github.com/ricaun-io/RevitAddin.CommandLoader)
 
 ####<a name="3"></a> 
 
-<pre class="prettyprint">
+- richard implemented a very nice little sample using the TessellatedShapeBuilder to create a DirectShape
+create a [pyramid](https://en.wikipedia.org/wiki/Pyramid_(geometry)), or, 
+more specifically, a right pyramid with a regular base for the ...
+on [Is it possible to create a solid from the edges of Pyramids?]
+https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-create-a-solid-from-the-edges-of-pyramids/td-p/11729445
 
-</pre>
-
-**Answer:** 
-
-####<a name="4"></a> 
+####<a name="4"></a> Modify Level Element X and Y Extents
 
 Richard also suggested [how to modify levels extents (X and Y direction)](https://forums.autodesk.com/t5/revit-api-forum/how-to-modify-levels-extents-x-and-y-direction/td-p/11731529):
 
@@ -160,19 +152,62 @@ Richard also suggested [how to modify levels extents (X and Y direction)](https:
 Seems better to maximize the extents and propagate to views rather than individually manipulating curves.
 
 
-
-
-
 ####<a name="5"></a> 
 
+- how to filter for subsets of elements
+https://autodesk.slack.com/archives/C0SR6NAP8/p1675998082315159
+Shen Wang
+A question about the parsed element structure of the Revit model, you could think of it as the model tree in Navisworks.
+Users want to access the parsed structured data and graphic elements of Revit model, select objects by filtering Revit views, grids, family categories or MEP systems, and then create assemblies after selecting elements for documentation.
+Example 1, a relatively complex building includes multiple piping systems. The user hopes to quickly select the circuit of a certain piping system on a certain floor by developing a plug-in.
+Example 2, a section of linear engineering, such as an elevated road, the user hopes to develop a plugin so that to quickly select the Revit elements between two grids.
+---------------------------
+As my understood, the user's objective is to quickly select objects by filtering Revit properties.
+Do you have any advice?
+Appreciated.
+filter_for_subset_bridge.png 1000x580
+Scott Conover
+We have many ways to use the API to filter down to the element(s) you are looking for.  It depends on the particular need, but in Example 1, you'd probably want to start with the elements in the target system, but then filter further with an ElementParameterFilter for the reference level and/or with a geometric filter like BoundingBoxIntersectsFilter or ElementIntersectsSolidFilter.  In Example 2, it seems more geometric, so filter first by certain categories and then use the geometric filters after calculating a shape that represents the space between grids.   For more on all the filters we have see: https://knowledge.autodesk.com/es/support/revit/learn-explore/caas/CloudHelp/cloudhelp/2[…]/files/GUID-A2686090-69D5-48D3-8DF9-0AC4CC4067A5-htm.html
 
-**Question:** 
+####<a name="6"></a> 
 
-**Answer:** 
+- switch document display units:
+Converting All Parameter Values from Imperial Units to Metric Units
+https://forums.autodesk.com/t5/revit-api-forum/converting-all-parameter-values-from-imperial-units-to-metric/m-p/11728282#M69113
+nikolaEXEZM wrote two simple macros to convert the project units between Imperial and Metric. 
+Works with both project and family documents. 
+Just create a new Macro Module, and paste in the code below:
+public void ChangeUnitsToImperial()
+{
+Document doc = this.ActiveUIDocument.Document;
+Document templateDoc = Application.OpenDocumentFile(@"C:\ProgramData\Autodesk\RVT " + this.Application.VersionNumber + @"\Templates\English-Imperial\default.rte");
+using (Transaction ta = new Transaction(doc))
+{
+ta.Start("Change Project Units to Imperial");
+doc.SetUnits(templateDoc.GetUnits());
+ta.Commit();
+}
+}
+public void ChangeUnitsToMetric()
+{
+Document doc = this.ActiveUIDocument.Document;
+Document templateDoc = Application.OpenDocumentFile(@"C:\ProgramData\Autodesk\RVT " + this.Application.VersionNumber + @"\Templates\English\DefaultMetric.rte");
+using (Transaction ta = new Transaction(doc))
+{
+ta.Start("Change Project Units to Metric");
+doc.SetUnits(templateDoc.GetUnits());
+ta.Commit();
+}
+}
 
-**Response:** 
+####<a name="7"></a> 
 
-####<a name="5"></a> Sublime Text
+- workaround for REVIT-20249 
+REVIT-20249 [As a Revit user, I want my material tags to stop displaying "?" after minor changes to the model, so that I don't have to waste time regen-ing or nudging all material tags right before printing a drawing set]
+Workaround as stated by one customer: "Standard Operating Procedure around here is right before printing, select a material tag > right click > select all instances in entire project > nudge right > nudge left, then print."
+
+
+####<a name="8"></a> Sublime Text
 
 I recently updated my computer to 
 the [MacBook Pro M1 ARM](https://thebuildingcoder.typepad.com/blog/2022/12/exploring-arm-chatgpt-nairobi-and-the-tsp.html#11).
@@ -194,4 +229,18 @@ Same procedure: install the Python file in the appropriate location
 &ndash; and it start working immediately.
 
 This is the way everything should work.
+
+
+
+
+
+<pre class="prettyprint">
+
+</pre>
+
+**Question:** 
+
+**Answer:** 
+
+**Response:** 
 
