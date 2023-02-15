@@ -46,8 +46,14 @@ twitter:
 
  @AutodeskRevit #RevitAPI #BIM @AutodeskAPS
 
-&ndash;
-...
+Pyramid Builder, CommandLoader, and more
+&ndash; Dynamic load, compile and run code
+&ndash; DirectShape pyramids
+&ndash; Modify level element X and Y extents
+&ndash; How to filter for subsets of elements
+&ndash; Switch document display units
+&ndash; Material tags displaying '?'
+&ndash; Sublime Text...
 
 linkedin:
 
@@ -66,7 +72,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Pyramid Builder and CommandLoader</h3>
+<h3>Pyramid Builder, CommandLoader, et al</h3>
+<p>Happy St. Valentine's Day!</p>
 <p>Lots of activity in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> and
 elsewhere:</p>
@@ -87,11 +94,12 @@ revolved around how to dynamically load and compile Revit add-ins.</p>
 <p>I present my first Revit add-in open-source project CommandLoader.
 With this plugin is possible to compile <code>IExternalCommand</code> directly in Revit, and the command is added as a <code>PushButton</code> in the Addins Tab.
 Here is an 8-minute video explaining the features and some limitations, <a href="https://youtu.be/l4V4-vohcWY">compile and run 'IExternalCommand' with Revit open</a>:</p>
+<p><center></p>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/l4V4-vohcWY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-
+<p></center></p>
 <p>RevitAddin.CommandLoader project compiles <code>IExternalCommand</code> with Revit open using <code>CodeDom.Compiler</code> and creates a <code>PushButton</code> on the Revit ribbon.</p>
 <ul>
-<li><a href="https://github.com/ricaun-io/RevitAddin.CommandLoader">GitHub repository</a></li>
+<li><a href="https://github.com/ricaun-io/RevitAddin.CommandLoader">RevitAddin.CommandLoader GitHub repository</a></li>
 </ul>
 <h4><a name="3"></a> DirectShape Pyramids</h4>
 <p>Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
@@ -281,7 +289,7 @@ Example 2 seems more geometric, so filter first by certain categories and then u
 For more information on all the filters, please refer to the knowledgebase article
 on <a href="https://knowledge.autodesk.com/support/revit/learn-explore/caas/CloudHelp/cloudhelp/2014/ENU/Revit/files/GUID-A2686090-69D5-48D3-8DF9-0AC4CC4067A5-htm.html">Applying Filters</a>.</p>
 <h4><a name="6"></a> Switch Document Display Units</h4>
-<p>In the slightly confusing thread
+<p>In the thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/converting-all-parameter-values-from-imperial-units-to-metric/m-p/11728282">converting all parameter values from imperial to metric units</a>,
 <i>nikolaEXEZM</i> shared two simple macros showing how to switch document display units between Imperial and Metric.</p>
 <blockquote>
@@ -334,7 +342,7 @@ A workaround for this was mentioned in the ticket <i>REVIT-20249</i>:</p>
 <h4><a name="8"></a> Sublime Text</h4>
 <p>Closing with a non-Revit topic, I recently updated my computer to
 the <a href="https://thebuildingcoder.typepad.com/blog/2022/12/exploring-arm-chatgpt-nairobi-and-the-tsp.html#11">MacBook Pro M1 ARM</a>.
-Then, I updated the OS to MacOS Ventura, and my old Komodo Edit text editor stopped working.
+Then, I updated the OS to MacOS Ventura, and my beloved and trusty old Komodo Edit text editor stopped working.
 It has not been maintained for years.
 Searching for a new minimalist text editor, I happened
 upon <a href="https://www.sublimetext.com/">Sublime Text</a> and
@@ -346,5 +354,5 @@ I am glad to report that it works perfectly for me.</p>
 <a href="https://gmpy.dev/blog/2022/sublime-text-remember-cursor-position-plugin">Sublime Text: remember cursor position plugin</a>.
 Same procedure: install the Python file in the appropriate location
 &ndash; <i>~/Library/Application Support/Sublime Text/Packages/User</i>, in my case
-&ndash; and it start working immediately.</p>
+&ndash; and it immediately starts working.</p>
 <p>I wish everything worked like this.</p>

@@ -47,8 +47,14 @@ twitter:
 
  @AutodeskRevit #RevitAPI #BIM @AutodeskAPS
 
-&ndash;
-...
+Pyramid Builder, CommandLoader, and more
+&ndash; Dynamic load, compile and run code
+&ndash; DirectShape pyramids
+&ndash; Modify level element X and Y extents
+&ndash; How to filter for subsets of elements
+&ndash; Switch document display units
+&ndash; Material tags displaying '?'
+&ndash; Sublime Text...
 
 linkedin:
 
@@ -67,7 +73,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Pyramid Builder and CommandLoader
+### Pyramid Builder, CommandLoader, et al
+
+Happy St. Valentine's Day!
 
 Lots of activity in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
@@ -93,11 +101,13 @@ I present my first Revit add-in open-source project CommandLoader.
 With this plugin is possible to compile `IExternalCommand` directly in Revit, and the command is added as a `PushButton` in the Addins Tab.
 Here is an 8-minute video explaining the features and some limitations, [compile and run 'IExternalCommand' with Revit open](https://youtu.be/l4V4-vohcWY):
 
+<center>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/l4V4-vohcWY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+</center>
 
 RevitAddin.CommandLoader project compiles `IExternalCommand` with Revit open using `CodeDom.Compiler` and creates a `PushButton` on the Revit ribbon.
 
-- [GitHub repository](https://github.com/ricaun-io/RevitAddin.CommandLoader)
+- [RevitAddin.CommandLoader GitHub repository](https://github.com/ricaun-io/RevitAddin.CommandLoader)
 
 ####<a name="3"></a> DirectShape Pyramids
 
@@ -308,7 +318,7 @@ on [Applying Filters](https://knowledge.autodesk.com/support/revit/learn-explore
 
 ####<a name="6"></a> Switch Document Display Units
 
-In the slightly confusing thread
+In the thread
 on [converting all parameter values from imperial to metric units](https://forums.autodesk.com/t5/revit-api-forum/converting-all-parameter-values-from-imperial-units-to-metric/m-p/11728282),
 <i>nikolaEXEZM</i> shared two simple macros showing how to switch document display units between Imperial and Metric.
 > Works with both project and family documents.
@@ -365,7 +375,7 @@ A workaround for this was mentioned in the ticket <i>REVIT-20249</i>:
 
 Closing with a non-Revit topic, I recently updated my computer to
 the [MacBook Pro M1 ARM](https://thebuildingcoder.typepad.com/blog/2022/12/exploring-arm-chatgpt-nairobi-and-the-tsp.html#11).
-Then, I updated the OS to MacOS Ventura, and my old Komodo Edit text editor stopped working.
+Then, I updated the OS to MacOS Ventura, and my beloved and trusty old Komodo Edit text editor stopped working.
 It has not been maintained for years.
 Searching for a new minimalist text editor, I happened
 upon [Sublime Text](https://www.sublimetext.com/) and
@@ -380,7 +390,7 @@ Now, to round it off, I installed my first plugin, implemented in Python by Giam
 [Sublime Text: remember cursor position plugin](https://gmpy.dev/blog/2022/sublime-text-remember-cursor-position-plugin).
 Same procedure: install the Python file in the appropriate location
 &ndash; <i>~/Library/Application Support/Sublime Text/Packages/User</i>, in my case
-&ndash; and it start working immediately.
+&ndash; and it immediately starts working.
 
 I wish everything worked like this.
 
