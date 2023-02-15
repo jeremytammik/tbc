@@ -84,7 +84,7 @@ elsewhere:</p>
 revolved around how to dynamically load and compile Revit add-ins.</p>
 <p>Luiz Henrique <a href="https://github.com/ricaun">@ricaun</a> Cassettari now shared a solution for that,
 <a href="https://forums.autodesk.com/t5/revit-api-forum/revitaddin-commandloader-compile-running-iexternalcommand-with/td-p/11742530">RevitAddin.CommandLoader &ndash; compile and run <code>IExternalCommand</code> with Revit open</a>:</p>
-<p>I present my first RevitAddin open-source project CommandLoader.
+<p>I present my first Revit add-in open-source project CommandLoader.
 With this plugin is possible to compile <code>IExternalCommand</code> directly in Revit, and the command is added as a <code>PushButton</code> in the Addins Tab.
 Here is an 8-minute video explaining the features and some limitations, <a href="https://youtu.be/l4V4-vohcWY">compile and run 'IExternalCommand' with Revit open</a>:</p>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/l4V4-vohcWY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
@@ -253,7 +253,7 @@ You can do so with <code>TessellatedShapeBuilder</code>, but you only need the p
 <p>Many thanks to Richard for the nice sample!</p>
 <h4><a name="4"></a> Modify Level Element X and Y Extents</h4>
 <p>Richard also suggested <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-modify-levels-extents-x-and-y-direction/td-p/11731529">how to modify level extents in X and Y direction</a>:</p>
-<p><strong>Question:</strong> I can get levels extents with <code>get_BoundingBox</code>, and am looking for something like <code>set_BoundingBox</code>. I want to keep the level's Z elevation at the same level and stretch its bounding box in X and Y direction:</p>
+<p><strong>Question:</strong> I can get levels extents with <code>get_BoundingBox</code> and am looking for something like <code>set_BoundingBox</code>. I want to keep the level's Z elevation at the same level and stretch its bounding box in X and Y direction:</p>
 <p><center>
 <img src="img/level_extent_x_y.png" alt="Level X Y extent" title="Level X Y extent" width="500"/> <!-- 923 × 435 pixels -->
 </center></p>
@@ -265,7 +265,7 @@ You can do so with <code>TessellatedShapeBuilder</code>, but you only need the p
 </ul>
 <p>Seems better to maximize the extents and propagate to views rather than individually manipulating curves.</p>
 <h4><a name="5"></a> How to Filter for Subsets of Elements</h4>
-<p>Some very basic hints on generic filtering casme up in this question:</p>
+<p>Some very basic hints on generic filtering came up in this question:</p>
 <p><strong>Question:</strong> ... on the parsed element structure of the Revit model; you could think of it as the model tree in Navisworks.
 Users want to access the parsed structured data and graphic elements of the BIM, select objects by filtering Revit views, grids, family categories or MEP systems, and then create assemblies after selecting elements for documentation.</p>
 <p>Example 1: a relatively complex building includes multiple piping systems.

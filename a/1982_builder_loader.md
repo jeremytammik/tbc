@@ -89,7 +89,7 @@ revolved around how to dynamically load and compile Revit add-ins.
 Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari now shared a solution for that,
 [RevitAddin.CommandLoader &ndash; compile and run `IExternalCommand` with Revit open](https://forums.autodesk.com/t5/revit-api-forum/revitaddin-commandloader-compile-running-iexternalcommand-with/td-p/11742530):
 
-I present my first RevitAddin open-source project CommandLoader.
+I present my first Revit add-in open-source project CommandLoader.
 With this plugin is possible to compile `IExternalCommand` directly in Revit, and the command is added as a `PushButton` in the Addins Tab.
 Here is an 8-minute video explaining the features and some limitations, [compile and run 'IExternalCommand' with Revit open](https://youtu.be/l4V4-vohcWY):
 
@@ -267,7 +267,7 @@ Many thanks to Richard for the nice sample!
 
 Richard also suggested [how to modify level extents in X and Y direction](https://forums.autodesk.com/t5/revit-api-forum/how-to-modify-levels-extents-x-and-y-direction/td-p/11731529):
 
-**Question:** I can get levels extents with `get_BoundingBox`, and am looking for something like `set_BoundingBox`. I want to keep the level's Z elevation at the same level and stretch its bounding box in X and Y direction:
+**Question:** I can get levels extents with `get_BoundingBox` and am looking for something like `set_BoundingBox`. I want to keep the level's Z elevation at the same level and stretch its bounding box in X and Y direction:
 
 <center>
 <img src="img/level_extent_x_y.png" alt="Level X Y extent" title="Level X Y extent" width="500"/> <!-- 923 × 435 pixels -->
@@ -284,7 +284,7 @@ Seems better to maximize the extents and propagate to views rather than individu
 
 ####<a name="5"></a> How to Filter for Subsets of Elements
 
-Some very basic hints on generic filtering casme up in this question:
+Some very basic hints on generic filtering came up in this question:
 
 **Question:** ... on the parsed element structure of the Revit model; you could think of it as the model tree in Navisworks.
 Users want to access the parsed structured data and graphic elements of the BIM, select objects by filtering Revit views, grids, family categories or MEP systems, and then create assemblies after selecting elements for documentation.
