@@ -58,6 +58,17 @@ Pyramid Builder, CommandLoader, and more
 
 linkedin:
 
+Command loader dynamically loads, compiles and runs add-in code, a DirectShape pyramid builder, level element X and Y extents, filtering for subsets of elements and switching document display units with the #RevitAPI 
+
+https://autode.sk/rvtaddincodeloader
+
+- Dynamic load, compile and run code
+- DirectShape pyramids
+- Modify level element X and Y extents
+- How to filter for subsets of elements
+- Switch document display units
+- Material tags displaying '?'
+- Sublime Text...
 
 #bim #DynamoBim #AutodeskAPS #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
