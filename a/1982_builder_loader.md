@@ -127,11 +127,168 @@ Here is a video explaining the features and some limitations, [compile and run '
 
 ####<a name="3"></a> 
 
-- richard implemented a very nice little sample using the TessellatedShapeBuilder to create a DirectShape
-create a [pyramid](https://en.wikipedia.org/wiki/Pyramid_(geometry)), or, 
-more specifically, a right pyramid with a regular base for the ...
-on [Is it possible to create a solid from the edges of Pyramids?]
-https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-create-a-solid-from-the-edges-of-pyramids/td-p/11729445
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+implemented a very nice little sample using the `TessellatedShapeBuilder` to create a `DirectShape` 
+[pyramid](https://en.wikipedia.org/wiki/Pyramid_(geometry)), or, 
+more specifically, a right pyramid with a regular base to answer 
+the question [is it possible to create a solid from the edges of pyramids?](https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-create-a-solid-from-the-edges-of-pyramids/td-p/11729445)
+
+<center>
+<img src="img/pyramids.png" alt="Pyramids" title="Pyramids" width="400"/> <!-- 491 x 509 pixels -->
+</center>
+
+**Answer:** Yes.  
+You can do so with `TessellatedShapeBuilder`, but you only need the points:
+
+<pre class="prettyprint">
+  Private Function Obj_230204a( _
+    ByVal commandData As Autodesk.Revit.UI.ExternalCommandData, 
+    ByRef message As String, 
+    ByVal elements As Autodesk.Revit.DB.ElementSet) As Result
+
+    Dim UIApp As UIApplication = commandData.Application
+    Dim UIDoc As UIDocument = commandData.Application.ActiveUIDocument
+    If UIDoc Is Nothing Then Return Result.Cancelled Else
+    Dim IntDoc As Document = UIDoc.Document
+
+    Const NumberOfSides As Integer = 6
+    Const BaseRadius As Double = 1
+    Const ApexHeight As Double = 2
+
+    Dim Seg As Double = 2.0 / NumberOfSides
+    Dim Points As XYZ() = New XYZ(NumberOfSides - 1) {}
+    For i = 0 To NumberOfSides - 1
+      Dim P As Double = i * Seg
+      Dim X As Double = Math.Sin(Math.PI * P) * BaseRadius
+      Dim Y As Double = Math.Cos(Math.PI * P) * BaseRadius
+
+      Points(i) = New XYZ(X, Y, 0)
+    Next
+    Dim builder As New TessellatedShapeBuilder()
+    builder.OpenConnectedFaceSet(True)
+
+    'The bottom face
+    builder.AddFace(New TessellatedFace(Points, ElementId.InvalidElementId))
+
+    'Side faces
+    Dim ApexPt As New XYZ(0, 0, ApexHeight)
+
+    For i = 0 To Points.Length - 1
+      Dim J As Integer = i + 1
+      If i = Points.Length - 1 Then
+        J = 0
+      End If
+
+      Dim P1 As XYZ = Points(i)
+      Dim P2 As XYZ = Points(J)
+      builder.AddFace(New TessellatedFace(New XYZ(2) {P1, P2, ApexPt}, ElementId.InvalidElementId))
+    Next
+    builder.CloseConnectedFaceSet()
+
+    builder.Target = TessellatedShapeBuilderTarget.Solid
+    builder.Fallback = TessellatedShapeBuilderFallback.Abort
+    builder.Build()
+
+    Dim Res As TessellatedShapeBuilderResult = builder.GetBuildResult
+    If Res.Outcome = TessellatedShapeBuilderOutcome.Solid Then
+
+      Using Tx As New Transaction(IntDoc, "Pyramid")
+        If Tx.Start = TransactionStatus.Started Then
+
+          Dim ds As DirectShape = DirectShape.CreateElement(IntDoc, New ElementId(BuiltInCategory.OST_GenericModel))
+          ds.SetShape(Res.GetGeometricalObjects())
+
+          Tx.Commit()
+        End If
+      End Using
+
+    End If
+
+    Return Result.Succeeded
+  End Function
+</pre>
+
+Rough C# translation from VB.NET:
+
+<pre class="prettyprint">
+  public Result Obj_230204a(
+    Autodesk.Revit.UI.ExternalCommandData commandData, 
+    ref string message, 
+    Autodesk.Revit.DB.ElementSet elements)
+  {
+    UIApplication UIApp = commandData.Application;
+    UIDocument UIDoc = commandData.Application.ActiveUIDocument;
+    if (UIDoc == null)
+      return Result.Cancelled;
+    Document IntDoc = UIDoc.Document;
+
+    const int NumberOfSides = 6;
+    const double BaseRadius = 1;
+    const double ApexHeight = 2;
+
+    double Seg = 2.0 / NumberOfSides;
+    XYZ[] Points = new XYZ[NumberOfSides];
+    for (int i = 0; i <= NumberOfSides - 1; i++)
+    {
+      double P = i * Seg;
+      double X = Math.Sin(Math.PI * P) * BaseRadius;
+      double Y = Math.Cos(Math.PI * P) * BaseRadius;
+
+      Points[i] = new XYZ(X, Y, 0);
+    }
+    TessellatedShapeBuilder builder = new TessellatedShapeBuilder();
+    builder.OpenConnectedFaceSet(true);
+
+    //The bottom face
+    builder.AddFace(new TessellatedFace(Points, ElementId.InvalidElementId));
+
+    //Side faces
+    XYZ ApexPt = new XYZ(0, 0, ApexHeight);
+
+    for (int i = 0; i <= Points.Length - 1; i++)
+    {
+      int J = i + 1;
+      if (i == Points.Length - 1)
+      {
+        J = 0;
+      }
+
+      XYZ P1 = Points[i];
+      XYZ P2 = Points[J];
+      builder.AddFace(new TessellatedFace(new XYZ[3] {
+      P1,
+      P2,
+      ApexPt
+    }, ElementId.InvalidElementId));
+    }
+    builder.CloseConnectedFaceSet();
+
+    builder.Target = TessellatedShapeBuilderTarget.Solid;
+    builder.Fallback = TessellatedShapeBuilderFallback.Abort;
+    builder.Build();
+
+    TessellatedShapeBuilderResult Res = builder.GetBuildResult();
+
+    if (Res.Outcome == TessellatedShapeBuilderOutcome.Solid)
+    {
+      using (Transaction Tx = new Transaction(IntDoc, "Pyramid"))
+      {
+
+        if (Tx.Start() == TransactionStatus.Started)
+        {
+          DirectShape ds = DirectShape.CreateElement(IntDoc, 
+            new ElementId(BuiltInCategory.OST_GenericModel));
+          ds.SetShape(Res.GetGeometricalObjects());
+
+          Tx.Commit();
+        }
+      }
+    }
+    return Result.Succeeded;
+  }
+</pre>
+ 
+Many thanks to Richard for the nice sample!
 
 ####<a name="4"></a> Modify Level Element X and Y Extents
 
@@ -152,22 +309,29 @@ Richard also suggested [how to modify levels extents (X and Y direction)](https:
 Seems better to maximize the extents and propagate to views rather than individually manipulating curves.
 
 
-####<a name="5"></a> 
+####<a name="5"></a> How to Filter for Subsets of Elements
 
-- how to filter for subsets of elements
-https://autodesk.slack.com/archives/C0SR6NAP8/p1675998082315159
-Shen Wang
-A question about the parsed element structure of the Revit model, you could think of it as the model tree in Navisworks.
-Users want to access the parsed structured data and graphic elements of Revit model, select objects by filtering Revit views, grids, family categories or MEP systems, and then create assemblies after selecting elements for documentation.
-Example 1, a relatively complex building includes multiple piping systems. The user hopes to quickly select the circuit of a certain piping system on a certain floor by developing a plug-in.
-Example 2, a section of linear engineering, such as an elevated road, the user hopes to develop a plugin so that to quickly select the Revit elements between two grids.
----------------------------
-As my understood, the user's objective is to quickly select objects by filtering Revit properties.
-Do you have any advice?
-Appreciated.
-filter_for_subset_bridge.png 1000x580
-Scott Conover
-We have many ways to use the API to filter down to the element(s) you are looking for.  It depends on the particular need, but in Example 1, you'd probably want to start with the elements in the target system, but then filter further with an ElementParameterFilter for the reference level and/or with a geometric filter like BoundingBoxIntersectsFilter or ElementIntersectsSolidFilter.  In Example 2, it seems more geometric, so filter first by certain categories and then use the geometric filters after calculating a shape that represents the space between grids.   For more on all the filters we have see: https://knowledge.autodesk.com/es/support/revit/learn-explore/caas/CloudHelp/cloudhelp/2[…]/files/GUID-A2686090-69D5-48D3-8DF9-0AC4CC4067A5-htm.html
+Some very basic hints on generic filtering casme up in this question:
+
+**Question:** ... on the parsed element structure of the Revit model; you could think of it as the model tree in Navisworks.
+Users want to access the parsed structured data and graphic elements of the BIM, select objects by filtering Revit views, grids, family categories or MEP systems, and then create assemblies after selecting elements for documentation.
+
+Example 1: a relatively complex building includes multiple piping systems. 
+The user needs to quickly select the circuit of a certain piping system on a certain floor.
+
+Example 2: in a section of linear engineering, such as an elevated road, the user needs to quickly select the elements between two grids:
+
+<center>
+<img src="img/filter_for_subset_bridge.png" alt="Elevated road" title="Elevated road" width="500"/> <!-- 1000 × 491 pixels -->
+</center>
+
+**Answer:** The Revit API provides many ways to filter down to the elements you are looking for.  
+It depends on the particular need.
+In Example 1, you might want to start with the elements in the target system, but then filter further with an `ElementParameterFilter` for the reference level and/or with a geometric filter like `BoundingBoxIntersectsFilter` or `ElementIntersectsSolidFilter`.  
+Example 2 seems more geometric, so filter first by certain categories and then use the geometric filters after calculating a shape that represents the space between grids.   
+For more information on all the filters, please refer to the knowledgebase article 
+on [Applying Filters](https://knowledge.autodesk.com/support/revit/learn-explore/caas/CloudHelp/cloudhelp/2014/ENU/Revit/files/GUID-A2686090-69D5-48D3-8DF9-0AC4CC4067A5-htm.html).
+
 
 ####<a name="6"></a> 
 
@@ -238,9 +402,5 @@ This is the way everything should work.
 
 </pre>
 
-**Question:** 
 
-**Answer:** 
-
-**Response:** 
 
