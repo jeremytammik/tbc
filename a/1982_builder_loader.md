@@ -7,14 +7,14 @@
 <!---
 
 - ricaun shared
-RevitAddin.CommandLoader - Compile/Running 'IExternalCommand' with Revit open!
-https://forums.autodesk.com/t5/revit-api-forum/revitaddin-commandloader-compile-running-iexternalcommand-with/td-p/11742530
-> I present my first RevitAddin open-source project CommandLoader. With this plugin is possible to compile IExternalCommand directly in Revit, and the command is added as a PushButton in the Addins Tab.
-Here is a video explaining the features and some limitations.
-[Compile/Running 'IExternalCommand' with Revit open!](https://youtu.be/l4V4-vohcWY)
-<iframe width="560" height="315" src="https://www.youtube.com/embed/l4V4-vohcWY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-RevitAddin.CommandLoader project compiles IExternalCommand with Revit open using CodeDom.Compiler and creates a PushButton on the Revit ribbon.
-[GitHub repository](https://github.com/ricaun-io/RevitAddin.CommandLoader)
+  RevitAddin.CommandLoader - Compile/Running 'IExternalCommand' with Revit open!
+  https://forums.autodesk.com/t5/revit-api-forum/revitaddin-commandloader-compile-running-iexternalcommand-with/td-p/11742530
+  > I present my first RevitAddin open-source project CommandLoader. With this plugin is possible to compile IExternalCommand directly in Revit, and the command is added as a PushButton in the Addins Tab.
+  Here is a video explaining the features and some limitations.
+  [Compile/Running 'IExternalCommand' with Revit open!](https://youtu.be/l4V4-vohcWY)
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/l4V4-vohcWY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+  RevitAddin.CommandLoader project compiles IExternalCommand with Revit open using CodeDom.Compiler and creates a PushButton on the Revit ribbon.
+  [GitHub repository](https://github.com/ricaun-io/RevitAddin.CommandLoader)
 
 - richard implemented a very nice little sample using the TessellatedShapeBuilder to create a DirectShape
   create a [pyramid](https://en.wikipedia.org/wiki/Pyramid_(geometry)), or, 
@@ -23,52 +23,17 @@ RevitAddin.CommandLoader project compiles IExternalCommand with Revit open using
   https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-create-a-solid-from-the-edges-of-pyramids/td-p/11729445
 
 - richard suggested how to 
-How to modify levels extents (X and Y direction)
-https://forums.autodesk.com/t5/revit-api-forum/how-to-modify-levels-extents-x-and-y-direction/td-p/11731529
+  How to modify levels extents (X and Y direction)
+  https://forums.autodesk.com/t5/revit-api-forum/how-to-modify-levels-extents-x-and-y-direction/td-p/11731529
 
 - how to filter for subsets of elements
-https://autodesk.slack.com/archives/C0SR6NAP8/p1675998082315159
-Shen Wang
-A question about the parsed element structure of the Revit model, you could think of it as the model tree in Navisworks.
-Users want to access the parsed structured data and graphic elements of Revit model, select objects by filtering Revit views, grids, family categories or MEP systems, and then create assemblies after selecting elements for documentation.
-Example 1, a relatively complex building includes multiple piping systems. The user hopes to quickly select the circuit of a certain piping system on a certain floor by developing a plug-in.
-Example 2, a section of linear engineering, such as an elevated road, the user hopes to develop a plugin so that to quickly select the Revit elements between two grids.
----------------------------
-As my understood, the user's objective is to quickly select objects by filtering Revit properties.
-Do you have any advice?
-Appreciated.
-filter_for_subset_bridge.png 1000x580
-Scott Conover
-We have many ways to use the API to filter down to the element(s) you are looking for.  It depends on the particular need, but in Example 1, you'd probably want to start with the elements in the target system, but then filter further with an ElementParameterFilter for the reference level and/or with a geometric filter like BoundingBoxIntersectsFilter or ElementIntersectsSolidFilter.  In Example 2, it seems more geometric, so filter first by certain categories and then use the geometric filters after calculating a shape that represents the space between grids.   For more on all the filters we have see: https://knowledge.autodesk.com/es/support/revit/learn-explore/caas/CloudHelp/cloudhelp/2[…]/files/GUID-A2686090-69D5-48D3-8DF9-0AC4CC4067A5-htm.html
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1675998082315159
+  Shen Wang
+  Scott Conover
 
 - switch document display units:
-Converting All Parameter Values from Imperial Units to Metric Units
-https://forums.autodesk.com/t5/revit-api-forum/converting-all-parameter-values-from-imperial-units-to-metric/m-p/11728282#M69113
-nikolaEXEZM wrote two simple macros to convert the project units between Imperial and Metric. 
-Works with both project and family documents. 
-Just create a new Macro Module, and paste in the code below:
-public void ChangeUnitsToImperial()
-{
-    Document doc = this.ActiveUIDocument.Document;
-    Document templateDoc = Application.OpenDocumentFile(@"C:\ProgramData\Autodesk\RVT " + this.Application.VersionNumber + @"\Templates\English-Imperial\default.rte");
-    using (Transaction ta = new Transaction(doc))
-       {
-        ta.Start("Change Project Units to Imperial");
-        doc.SetUnits(templateDoc.GetUnits());
-        ta.Commit();
-    }
-}
-public void ChangeUnitsToMetric()
-{
-    Document doc = this.ActiveUIDocument.Document;
-    Document templateDoc = Application.OpenDocumentFile(@"C:\ProgramData\Autodesk\RVT " + this.Application.VersionNumber + @"\Templates\English\DefaultMetric.rte");
-    using (Transaction ta = new Transaction(doc))
-       {
-        ta.Start("Change Project Units to Metric");
-        doc.SetUnits(templateDoc.GetUnits());
-        ta.Commit();
-    }
-}
+  Converting All Parameter Values from Imperial Units to Metric Units
+  https://forums.autodesk.com/t5/revit-api-forum/converting-all-parameter-values-from-imperial-units-to-metric/m-p/11728282#M69113
 
 - workaround for REVIT-20249 
   REVIT-20249 [As a Revit user, I want my material tags to stop displaying "?" after minor changes to the model, so that I don't have to waste time regen-ing or nudging all material tags right before printing a drawing set]
@@ -333,47 +298,64 @@ For more information on all the filters, please refer to the knowledgebase artic
 on [Applying Filters](https://knowledge.autodesk.com/support/revit/learn-explore/caas/CloudHelp/cloudhelp/2014/ENU/Revit/files/GUID-A2686090-69D5-48D3-8DF9-0AC4CC4067A5-htm.html).
 
 
-####<a name="6"></a> 
+####<a name="6"></a> Switch Document Display Units
 
-- switch document display units:
-Converting All Parameter Values from Imperial Units to Metric Units
-https://forums.autodesk.com/t5/revit-api-forum/converting-all-parameter-values-from-imperial-units-to-metric/m-p/11728282#M69113
-nikolaEXEZM wrote two simple macros to convert the project units between Imperial and Metric. 
-Works with both project and family documents. 
+In the slightly confusing thread 
+on [converting all parameter values from imperial to metric units](https://forums.autodesk.com/t5/revit-api-forum/converting-all-parameter-values-from-imperial-units-to-metric/m-p/11728282),
+<i>nikolaEXEZM</i> shared two simple macros showing how to switch document display units between Imperial and Metric. 
+> Works with both project and family documents. 
 Just create a new Macro Module, and paste in the code below:
+
+<pre class="prettyprint">
 public void ChangeUnitsToImperial()
 {
-Document doc = this.ActiveUIDocument.Document;
-Document templateDoc = Application.OpenDocumentFile(@"C:\ProgramData\Autodesk\RVT " + this.Application.VersionNumber + @"\Templates\English-Imperial\default.rte");
-using (Transaction ta = new Transaction(doc))
-{
-ta.Start("Change Project Units to Imperial");
-doc.SetUnits(templateDoc.GetUnits());
-ta.Commit();
+  Document doc = this.ActiveUIDocument.Document;
+
+  Document templateDoc = Application.OpenDocumentFile(
+    @"C:\ProgramData\Autodesk\RVT " 
+      + this.Application.VersionNumber 
+      + @"\Templates\English-Imperial\default.rte");
+
+  using (Transaction ta = new Transaction(doc))
+  {
+    ta.Start("Change Project Units to Imperial");
+    doc.SetUnits(templateDoc.GetUnits());
+    ta.Commit();
+  }
 }
-}
+
 public void ChangeUnitsToMetric()
 {
-Document doc = this.ActiveUIDocument.Document;
-Document templateDoc = Application.OpenDocumentFile(@"C:\ProgramData\Autodesk\RVT " + this.Application.VersionNumber + @"\Templates\English\DefaultMetric.rte");
-using (Transaction ta = new Transaction(doc))
-{
-ta.Start("Change Project Units to Metric");
-doc.SetUnits(templateDoc.GetUnits());
-ta.Commit();
-}
-}
+  Document doc = this.ActiveUIDocument.Document;
 
-####<a name="7"></a> 
+  Document templateDoc = Application.OpenDocumentFile(
+    @"C:\ProgramData\Autodesk\RVT " 
+      + this.Application.VersionNumber 
+      + @"\Templates\English\DefaultMetric.rte");
 
-- workaround for REVIT-20249 
-REVIT-20249 [As a Revit user, I want my material tags to stop displaying "?" after minor changes to the model, so that I don't have to waste time regen-ing or nudging all material tags right before printing a drawing set]
-Workaround as stated by one customer: "Standard Operating Procedure around here is right before printing, select a material tag > right click > select all instances in entire project > nudge right > nudge left, then print."
+  using (Transaction ta = new Transaction(doc))
+  {
+    ta.Start("Change Project Units to Metric");
+    doc.SetUnits(templateDoc.GetUnits());
+    ta.Commit();
+  }
+}
+</pre>
+
+Many thanks to Nikola for sharing these.
+
+
+####<a name="7"></a> Material Tags Displaying '?'
+
+A couple of threads mentioned a problem with material tags displaying question marks '?' after minor changes to the model, forcing the user to waste time regenerating or nudging all material tags every time right before printing a drawing set. 
+A workaround for this was mentioned in the ticket <i>REVIT-20249</i>: 
+
+> Standard Operating Procedure around here is right before printing, select a material tag &gt; right click &gt; select all instances in entire project &gt; nudge right &gt; nudge left &gt; print.
 
 
 ####<a name="8"></a> Sublime Text
 
-I recently updated my computer to 
+Closing with a non-Revit topic, I recently updated my computer to 
 the [MacBook Pro M1 ARM](https://thebuildingcoder.typepad.com/blog/2022/12/exploring-arm-chatgpt-nairobi-and-the-tsp.html#11).
 Then, I updated the OS to MacOS Ventura, and my old Komodo Edit text editor stopped working.
 It has not been maintained for years.
@@ -392,15 +374,5 @@ Same procedure: install the Python file in the appropriate location
 &ndash; <i>~/Library/Application Support/Sublime Text/Packages/User</i>, in my case 
 &ndash; and it start working immediately.
 
-This is the way everything should work.
-
-
-
-
-
-<pre class="prettyprint">
-
-</pre>
-
-
+I wish everything worked like this.
 
