@@ -69,9 +69,19 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Pyramid Builder and CommandLoader
 
+Lots of activity in  
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and 
+elsewhere:
 
+- [Dynamic load, compile and run code](#2)
+- [DirectShape pyramids](#3)
+- [Modify level element X and Y extents](#4)
+- [How to filter for Subsets of elements](#5)
+- [Switch document Display units](#6)
+- [Material tags displaying '?'](#7)
+- [Sublime Text](#8)
 
-####<a name="2"></a> Dynamic Load, Compile and Run
+####<a name="2"></a> Dynamic Load, Compile and Run Code
 
 Recently, 
 several [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
@@ -90,7 +100,7 @@ Here is a video explaining the features and some limitations, [compile and run '
 
 - [GitHub repository](https://github.com/ricaun-io/RevitAddin.CommandLoader)
 
-####<a name="3"></a> 
+####<a name="3"></a> DirectShape Pyramids
 
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
 implemented a very nice little sample using the `TessellatedShapeBuilder` to create a `DirectShape` 
@@ -103,7 +113,7 @@ the question [is it possible to create a solid from the edges of pyramids?](http
 </center>
 
 **Answer:** Yes.  
-You can do so with `TessellatedShapeBuilder`, but you only need the points:
+You can do so with `TessellatedShapeBuilder`, but you only need the points, not the edges:
 
 <pre class="prettyprint">
   Private Function Obj_230204a( _
