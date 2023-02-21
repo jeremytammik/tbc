@@ -35,6 +35,21 @@ Many thanks to Benoit for the interesting pointer!
   Some annotations, schedules, view templates, filters, and views related to analytical elements might be modified or lost during the upgrade process
   https://forums.autodesk.com/t5/revit-api-forum/some-annotations-schedules-view-templates-filters-and-views/m-p/11721147
 
+- A awesome package for MEP, Computational Design Inside Dynamo Revit
+https://github.com/chuongmep/OpenMEP
+OpenMEP Package also includes a comprehensive library of MEP components, making it easy to select and incorporate the right components into your design.This library includes a wide range of mechanical, electrical, and plumbing components, including pipes, fittings, valves, ducts, electrical equipment, and more fully automate your design process in design, maintenance, calculation and analysis,...
+I believe that the MEP Package will be a valuable asset to construction professionals looking to streamline the MEP design process and ensure that their projects are completed on time and within budget.
+https://www.linkedin.com/posts/chuongmep_opensource-dynamo-autodesk-activity-7033100499461570561-OUfG?utm_source=share&utm_medium=member_desktop
+Chuong Ho
+Computational Design Researcher | Autodesk Expert Elite
+Hi everyone, today I want to tell you that a stable and long-term support package for MEP engineers open source has been released.
+Open MEP Package also includes a comprehensive library of MEP components, making it easy to select and incorporate the right components into your design. This library includes a wide range of mechanical, electrical, and plumbing components, including pipes, fittings, valves, ducts, electrical equipment, and more fully automate your design process in design, maintenance, calculation and analysis,...
+I believe that the MEP Package will be a valuable asset to construction professionals looking to streamline the MEP design process and ensure that their projects are completed on time and within budget.
+Discuss on forum : https://lnkd.in/gtAi8RUP
+Open Source : https://lnkd.in/gcWvCCXK
+Now, I accept all ideas and all problems, contributions from all engineers, communities around the world.
+
+
 - [Why we all need subtitles now](https://www.youtube.com/watch?v=VYJtb2YXae8)
 
 twitter:
