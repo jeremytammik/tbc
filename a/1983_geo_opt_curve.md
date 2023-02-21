@@ -77,25 +77,34 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Geometry Options and Clean Simple Curves
 
+
+
+
 ####<a name="2"></a> Curve Loop Simplify and Clean Up
 
-- cleaning up and simplifying curve loops
-Benoit Favre, CEO of [etudes &amp; automates](http://www.etudesetautomates.com)
-Boundary Segments Issue
-https://forums.autodesk.com/t5/revit-api-forum/boundary-segments-issue/m-p/11732446#M69140
+Benoit Favre, CEO of [etudes &amp; automates](http://www.etudesetautomates.com) shared 
+some interesting advice on how to simplify and clean up curve loops in 
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on a [boundary segments issue](https://forums.autodesk.com/t5/revit-api-forum/boundary-segments-issue/m-p/11732446#m69140):
+
 Funny to get this very old post alive.
-I'd change my answer from the time and say:
-- sometimes the BoundarySegment list is holed (around windows and at the end of walls ending in the middle of the Room). So you have to close the List, practically we add another Segment to the List.
-- check either Douglas Peucker or Visvaligham algorithms, easy to implement and very useful. At least that's what we use and these work fine for us.
-douglas peucker algorithm
-https://duckduckgo.com/?q=douglas+peucker+algorithm
-Ramer–Douglas–Peucker algorithm
-https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
-visvalingam algorithm
-https://duckduckgo.com/?q=visvalingam+algorithm
-Visvalingam–Whyatt algorithm
-https://en.wikipedia.org/wiki/Visvalingam%E2%80%93Whyatt_algorithm
-Many thanks to Benoit for the interesting pointer!
+
+I'd change my answer from the first time and now say:
+
+- Sometimes the `BoundarySegment` list has gaps, e.g., around windows and at the end of walls ending in the middle of a room. 
+  So, you have to close the gap; in practice, we add another segment to the list.
+- Check out either 
+  the [Douglas Peucker](https://duckduckgo.com/?q=douglas+peucker+algorithm)
+  or [Visvaligham algorithm](https://duckduckgo.com/?q=visvalingam+algorithm);
+  they are easy to implement and very useful. 
+  At least that's what we use and they work fine for us.
+
+On Wikipedia:
+
+- [Ramer–Douglas–Peucker algorithm](https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm)
+- [Visvalingam–Whyatt algorithm](https://en.wikipedia.org/wiki/Visvalingam%E2%80%93Whyatt_algorithm)
+
+Many thanks to Benoit for the interesting pointers!
 
 ####<a name="2"></a> Geometry Options
 
