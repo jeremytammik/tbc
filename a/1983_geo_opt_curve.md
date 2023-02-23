@@ -60,7 +60,6 @@ with the @AutodeskRevit #RevitAPI #BIM @AutodeskAPS
 
 linkedin:
 
-
 #bim #DynamoBim #AutodeskAPS #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -76,9 +75,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 ### Geometry Options and Clean Simple Curves
-
-
-
 
 ####<a name="2"></a> Curve Loop Simplify and Clean Up
 
@@ -108,9 +104,44 @@ Many thanks to Benoit for the interesting pointers!
 
 ####<a name="2"></a> Geometry Options
 
-- clarifying geometry options, app.Create.NewGeometryOptions, 
-Find Centroid of wall in Revit API
-https://forums.autodesk.com/t5/revit-api-forum/find-centroid-of-wall-in-revit-api/m-p/11748826
+The question on how to [find centroid of wall in Revit API](https://forums.autodesk.com/t5/revit-api-forum/find-centroid-of-wall-in-revit-api/m-p/11748826)
+provided an opportunity to clarify the meaning of specific settings in the geometry `Options` and the use of the `NewGeometryOptions` method:
+
+[`ComputeReferences`](https://www.revitapidocs.com/2023/d7da6de4-74a9-60e2-826f-698a5730d0a8.htm) is 
+only needed if you require references to the geometry, e.g., for dimensioning purposes. 
+Furthermore, it adds computational effort. 
+Therefore, you should not set it to true unless needed, as explained in the 2010 article 
+on [Geometry Options](https://thebuildingcoder.typepad.com/blog/2010/01/geometry-options.html).
+
+The effect of turning off `ComputeReferences` was recently benchmarked in the discussion 
+on [computing the correlation of objects in Revit](https://forums.autodesk.com/t5/revit-api-forum/computing-the-correlation-of-objects-in-revit/m-p/11701329/highlight/true#M68810):
+
+It includes the final code and the benchmark results:
+
+PC specs:
+
+- CPU: 11th Gen Intel(R) Core(TM) i5-11400F @ 2.60GHz 2.59 GHz
+- GPU: NVidia GeForce GTX 1650
+- RAM: 32.0 GB
+- OS: Windows 10 Pro 
+
+The call to <i>BooleanOperationsUtils.ExecuteBooleanOperation(solidST, solidAR, BooleanOperationsType.Intersect)</i>
+is triggered 113,696 times, both lists columnsSTR and columnsARC have 336 items each.
+
+- Code runtime with `ComputeReferences` = true : 10.38 sec, AVG. 91.34 micro-seconds per intersection.
+- Code runtime with `ComputeReferences` = false : 9.52 sec, AVG. 83.76 micro-seconds per intersection.
+
+`IncludeNonVisibleObjects` is only required for certain supplementary graphical elements, e.g., 
+for [curtain walls](https://thebuildingcoder.typepad.com/blog/2010/05/curtain-wall-geometry.html).
+
+I am pretty sure that it is never needed for such basic element geometry as solids.
+
+So, I would leave both of those turned off in this case, set to their default value of false.
+
+Furthermore, I very much doubt that there is any different between using `new Options` and `app.Create.NewGeometryOptions`. 
+
+However, specifying a view argument in the options will definitely make a difference, depending on the view you supply. 
+That can be achieved using both `new Options` and `app.Create.NewGeometryOptions`. 
 
 ####<a name="2"></a> JtClicker
 
@@ -141,7 +172,6 @@ Now, I accept all ideas and all problems, contributions from all engineers, comm
 
 - [Why we all need subtitles now](https://www.youtube.com/watch?v=VYJtb2YXae8)
 
-
 <center>
 <img src="img/.png" alt="" title="" width="100"/> <!-- 491 x 509 pixels -->
 </center>
@@ -150,17 +180,11 @@ Now, I accept all ideas and all problems, contributions from all engineers, comm
 
 <pre class="prettyprint">
 
-
 </pre>
-
-
 
 Many thanks to  for the nice sample!
 
 ####<a name="4"></a> 
 
-
 **Answer:** 
-
-
 
