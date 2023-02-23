@@ -145,12 +145,214 @@ That can be achieved using both `new Options` and `app.Create.NewGeometryOptions
 
 ####<a name="2"></a> JtClicker
 
+
+Jacopo Chiappetti of [One Team srl](https://www.oneteam.it) shared 
+a new implementation of [JtClciker](https://github.com/jeremytammik/JtClicker) to
+programmatically dismiss a UI warning message in the thread 
+on [some annotations, schedules, view templates, filters, and views related to analytical elements might be modified or lost during the upgrade process](https://forums.autodesk.com/t5/revit-api-forum/some-annotations-schedules-view-templates-filters-and-views/m-p/11721147):
+
+**Question:** In Revit 2023, every time I open a model that contains at least one analytical element, a warning is displayed at the end of the process 
+to [Upgrade the Analytical Model](https://help.autodesk.com/view/RVT/2023/ENU/?guid=GUID-E74EC52F-EFC6-4914-84B8-0119002A1C98): 
+"Some annotations, schedules, view templates, filters, and views related to analytical elements might be modified or lost during the upgrade process."
+
+This error window doesn't seem to be trappable by code (i.e., `Application_FailuresProcessing`) and blocks the automatic process of the model (custom code), after it is opened, until it's closed by the user. 
+Is there a way to eliminate the message or intercept it somehow?
+
+<center>
+<img src="img/jc_error_msg.png" alt="JtClicker handles it" title="JtClicker handles it" width="231"/> <!-- 231 x 349 pixels -->
+</center>
+
+**Answer:** Yes, definitely. I
+f worst comes to worst, you can use the native Windows API to catch and dismiss this dialogue. 
+Look at the various options listed in The Building Coder topic group 
+on [detecting and handling dialogues and failures](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32).
+
+**Response:** I cannot use `Application.FailuresProcessing` because it doesn't trap this warning.
+Also, I cannot use `ControlledApplication.DialogBoxShowing`, as I use `IExternalDBApplication`, not `IExternalApplication`.
+Hence, I have no access to any UI related functionality at all.
+So, the only way seems using your JtClicker, isn't it? 
+
+I gave the "Greg" solution here https://thebuildingcoder.typepad.com/blog/2009/10/dismiss-dialogue-using-windows-api.html a try and it works with some small mods
+
+loading process is slower but finally I can trap warning dialog and close it
+
+I really can't understand why this warning hasn't been included, along with all the others, in the Application.FailuresProcessing event or is not given the possibility to disable it: really disheartening
+
+thanks again
+
+
+jeremy.tammik
+2023-01-30 09:09 AM 
+Congratulations on solving it and thank you for letting us know. Maybe it is an oversight. I asked the development team for you.
+
+
+jacopo.chiappetti
+2023-01-31 01:46 AM 
+
+since the dialogbox does not contemplate any action, as for the other warnings, the best solution could be to add a property of OpenOptions, something like oo.IgnoreAnalyticalElements, to open document
+
+jeremy.tammik
+2023-01-31 05:19 AM 
+The development team replied: 
+
+ 
+
+You should respond to the DialogBoxShowing event callbacks and overrides, I think. It's not actually a document "failure" which is why it doesn't work with FailuresProcessing.
+
+  
+
+Didn't you say that you tried that?
+
+  
+
+jacopo.chiappetti
+2023-01-31 05:25 AM 
+as I said I cannot use ControlledApplication.DialogBoxShowing as I use (Implements) IExternalDBApplication, not IExternalApplication
+
+I know  it's not a document "failure" , for this reason I proposed to add a property of OpenOptions, something like oo.IgnoreAnalyticalElements, to open document: that way works even without UI
+
+Tags (0)
+Add tags
+Report
+MESSAGE 10 OF 14
+jeremy.tammik
+ Employee jeremy.tammik in reply to: jacopo.chiappetti
+2023-01-31 05:34 AM 
+Ah yes, of course, so you said. That makes perfect sense. Well, I'm glad that the native API solution works. I have pointed out this hole in the API to the development team.
+
+  
+
+Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
+Tags (0)
+Add tags
+Report
+MESSAGE 11 OF 14
+jeremy.tammik
+ Employee jeremy.tammik in reply to: jacopo.chiappetti
+2023-02-01 01:27 AM 
+Their opinion also makes sense: If they are operating in an interactive session of Revit they should be able to use IExternalApplication.   I expect they may be trying to keep their code split validly between DB and UI levels (which is great; it allows the DB code to work with Design Automation API), so they might need a specific small UI Application subscribing to and dismissing just this notice.
+
+  
+Is that feasible for you? Or is the JtClicker approach easier? Would you care to share your JtClicker implementation, in case other have need for it as well? Thank you!
+  
+Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
+Tags (0)
+Add tags
+Report
+MESSAGE 12 OF 14
+jacopo.chiappetti
+ Enthusiast jacopo.chiappetti in reply to: jeremy.tammik
+2023-02-01 02:11 AM 
+for many reasons I prefer to don't use UI so it's easier to use the "JtClicker approach"
+
+I post my implementation but it's very similar to the "Greg" version
+
+<pre class="prettyprint">
+    Public timer1 As Timer
+    Public timer_interval As Integer = 1000  'millisecondi
+    Public timer_attempts As Integer 'not used
+    Public Const diagTitle As String = "Aggiornamento del modello analitico strutturale"
+    Public Const diagButton As String = "&Chiudi"
+
+   Public Function EnumWindowsProc(ByVal hwnd As Integer, ByVal lParam As Integer) As Boolean
+        Dim sbTitle As New StringBuilder(256)
+        Dim test As Integer = User32.GetWindowText(hwnd, sbTitle, sbTitle.Capacity)
+        Dim title As String = sbTitle.ToString()
+        If title.Length > 0 AndAlso title = diagTitle Then
+            User32.EnumChildWindows(hwnd, New User32.EnumWindowsProc(AddressOf EnumChildProc), 0)
+            Return False
+        Else
+            Return True
+        End If
+
+    End Function
+
+    Public Function EnumChildProc(ByVal hwnd As Integer, ByVal lParam As Integer) As Boolean
+        Dim sbTitle As New StringBuilder(256)
+        User32.GetWindowText(hwnd, sbTitle, sbTitle.Capacity)
+        Dim title As String = sbTitle.ToString()
+        If title.Length > 0 AndAlso title = diagButton Then
+            User32.SendMessage(hwnd, User32.BM_SETSTATE, 1, 0)
+            User32.SendMessage(hwnd, User32.WM_LBUTTONDOWN, 0, 0)
+            User32.SendMessage(hwnd, User32.WM_LBUTTONUP, 0, 0)
+            User32.SendMessage(hwnd, User32.BM_SETSTATE, 1, 0)
+            If Not timer1 Is Nothing Then
+                timer1.Stop()
+                timer1 = Nothing
+            End If
+            Return False
+        Else
+            Return True
+        End If
+
+    End Function
+
+    Public Sub timer1_Elapsed(ByVal sender As Object, ByVal e As EventArgs)
+        'If timer_attempts < 3000 Then
+        User32.EnumWindows(New User32.EnumWindowsProc(AddressOf EnumWindowsProc), 0)
+        'Else
+        '    timer1.Stop()
+        'End If
+        'timer_attempts += 1
+        'Debug.Print(timer_attempts.ToString())
+    End Sub
+
+    Public Sub closeOptionsDialog()
+        timer_attempts = 0
+        If timer1 Is Nothing Then
+            timer1 = New Timer()
+        End If
+        timer1.Interval = timer_interval
+        AddHandler timer1.Elapsed, New ElapsedEventHandler(AddressOf timer1_Elapsed)
+        timer1.Start()
+    End Sub
+</pre> 
+
+user32 module is the same
+
+<pre class="prettyprint">
+Imports System
+Imports System.Runtime.InteropServices
+Imports System.Text
+
+Module User32
+    Delegate Function EnumWindowsProc(ByVal hWnd As Integer, ByVal lParam As Integer) As Boolean
+
+    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+    Function FindWindow(ByVal className As String, ByVal windowName As String) As Integer
+    End Function
+
+    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+    Function EnumWindows(ByVal callbackFunc As EnumWindowsProc, ByVal lParam As Integer) As Integer
+    End Function
+
+    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+    Function EnumChildWindows(ByVal hwnd As Integer, ByVal callbackFunc As EnumWindowsProc, ByVal lParam As Integer) As Integer
+    End Function
+
+    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+    Function GetWindowText(ByVal hwnd As Integer, ByVal buff As StringBuilder, ByVal maxCount As Integer) As Integer
+    End Function
+
+    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+    Function GetLastActivePopup(ByVal hwnd As Integer) As Integer
+    End Function
+
+    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+    Function SendMessage(ByVal hwnd As Integer, ByVal Msg As Integer, ByVal wParam As Integer, ByVal lParam As Integer) As Integer
+    End Function
+
+    Public BM_SETSTATE As Integer = 243
+    Public WM_LBUTTONDOWN As Integer = 513
+    Public WM_LBUTTONUP As Integer = 514
+End Module
+</pre>
+ 
+
 - Greg version of JtClicker in 2023
 Jacopo Chiappetti
 Senior Analyst & Developer
 One Team srl
-Some annotations, schedules, view templates, filters, and views related to analytical elements might be modified or lost during the upgrade process
-https://forums.autodesk.com/t5/revit-api-forum/some-annotations-schedules-view-templates-filters-and-views/m-p/11721147
 
 ####<a name="2"></a> OpenMEP
 
@@ -178,13 +380,9 @@ Now, I accept all ideas and all problems, contributions from all engineers, comm
 
 **Answer:** 
 
-<pre class="prettyprint">
-
-</pre>
 
 Many thanks to  for the nice sample!
 
-####<a name="4"></a> 
 
-**Answer:** 
+
 
