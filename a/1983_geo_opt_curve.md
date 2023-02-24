@@ -102,7 +102,7 @@ On Wikipedia:
 
 Many thanks to Benoit for the interesting pointers!
 
-####<a name="2"></a> Geometry Options
+####<a name="3"></a> Geometry Options
 
 The question on how to [find centroid of wall in Revit API](https://forums.autodesk.com/t5/revit-api-forum/find-centroid-of-wall-in-revit-api/m-p/11748826)
 provided an opportunity to clarify the meaning of specific settings in the geometry `Options` and the use of the `NewGeometryOptions` method:
@@ -143,8 +143,7 @@ Furthermore, I very much doubt that there is any different between using `new Op
 However, specifying a view argument in the options will definitely make a difference, depending on the view you supply. 
 That can be achieved using both `new Options` and `app.Create.NewGeometryOptions`. 
 
-####<a name="2"></a> JtClicker
-
+####<a name="4"></a> JtClicker 2023
 
 Jacopo Chiappetti of [One Team srl](https://www.oneteam.it) shared 
 a new implementation of [JtClciker](https://github.com/jeremytammik/JtClicker) to
@@ -162,8 +161,8 @@ Is there a way to eliminate the message or intercept it somehow?
 <img src="img/jc_error_msg.png" alt="JtClicker handles it" title="JtClicker handles it" width="231"/> <!-- 231 x 349 pixels -->
 </center>
 
-**Answer:** Yes, definitely. I
-f worst comes to worst, you can use the native Windows API to catch and dismiss this dialogue. 
+**Answer:** Yes, definitely. 
+If worst comes to worst, you can use the native Windows API to catch and dismiss this dialogue. 
 Look at the various options listed in The Building Coder topic group 
 on [detecting and handling dialogues and failures](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.32).
 
@@ -172,143 +171,84 @@ Also, I cannot use `ControlledApplication.DialogBoxShowing`, as I use `IExternal
 Hence, I have no access to any UI related functionality at all.
 So, the only way seems using your JtClicker, isn't it? 
 
-I gave the "Greg" solution here https://thebuildingcoder.typepad.com/blog/2009/10/dismiss-dialogue-using-windows-api.html a try and it works with some small mods
+I gave 
+the [.NET Dialogue Clicker in VB by Greg Wesner](https://thebuildingcoder.typepad.com/blog/2009/10/dismiss-dialogue-using-windows-api.html) a 
+try and it works with some small mods.
 
-loading process is slower but finally I can trap warning dialog and close it
+The loading process is slower, but finally I can trap the warning dialog and close it.
 
-I really can't understand why this warning hasn't been included, along with all the others, in the Application.FailuresProcessing event or is not given the possibility to disable it: really disheartening
+I really can't understand why this warning hasn't been included, along with all the others, in the `FailuresProcessing` event and no possibility is given to disable it: really disheartening.
 
-thanks again
-
-
-jeremy.tammik
-2023-01-30 09:09 AM 
-Congratulations on solving it and thank you for letting us know. Maybe it is an oversight. I asked the development team for you.
-
-
-jacopo.chiappetti
-2023-01-31 01:46 AM 
-
-since the dialogbox does not contemplate any action, as for the other warnings, the best solution could be to add a property of OpenOptions, something like oo.IgnoreAnalyticalElements, to open document
-
-jeremy.tammik
-2023-01-31 05:19 AM 
-The development team replied: 
-
- 
-
-You should respond to the DialogBoxShowing event callbacks and overrides, I think. It's not actually a document "failure" which is why it doesn't work with FailuresProcessing.
-
+**Answer:** If you are operating in an interactive session of Revit, you should be able to use IExternalApplication.
+It is great to keep your code split validly between DB and UI levels; it allows the DB code to work with the APS Design Automation API.
+In that case, you might need a specific small UI Application subscribing to and dismissing just this notice.
   
+Is that feasible for you? 
+Or is the JtClicker approach easier? 
 
-Didn't you say that you tried that?
-
-  
-
-jacopo.chiappetti
-2023-01-31 05:25 AM 
-as I said I cannot use ControlledApplication.DialogBoxShowing as I use (Implements) IExternalDBApplication, not IExternalApplication
-
-I know  it's not a document "failure" , for this reason I proposed to add a property of OpenOptions, something like oo.IgnoreAnalyticalElements, to open document: that way works even without UI
-
-Tags (0)
-Add tags
-Report
-MESSAGE 10 OF 14
-jeremy.tammik
- Employee jeremy.tammik in reply to: jacopo.chiappetti
-2023-01-31 05:34 AM 
-Ah yes, of course, so you said. That makes perfect sense. Well, I'm glad that the native API solution works. I have pointed out this hole in the API to the development team.
-
-  
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 11 OF 14
-jeremy.tammik
- Employee jeremy.tammik in reply to: jacopo.chiappetti
-2023-02-01 01:27 AM 
-Their opinion also makes sense: If they are operating in an interactive session of Revit they should be able to use IExternalApplication.   I expect they may be trying to keep their code split validly between DB and UI levels (which is great; it allows the DB code to work with Design Automation API), so they might need a specific small UI Application subscribing to and dismissing just this notice.
-
-  
-Is that feasible for you? Or is the JtClicker approach easier? Would you care to share your JtClicker implementation, in case other have need for it as well? Thank you!
-  
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 12 OF 14
-jacopo.chiappetti
- Enthusiast jacopo.chiappetti in reply to: jeremy.tammik
-2023-02-01 02:11 AM 
-for many reasons I prefer to don't use UI so it's easier to use the "JtClicker approach"
-
-I post my implementation but it's very similar to the "Greg" version
+**Response:** For many reasons, I prefer not to use UI, so it's easier to use the "JtClicker approach".
+Here is my implementation; it's very similar to Greg's version:
 
 <pre class="prettyprint">
-    Public timer1 As Timer
-    Public timer_interval As Integer = 1000  'millisecondi
-    Public timer_attempts As Integer 'not used
-    Public Const diagTitle As String = "Aggiornamento del modello analitico strutturale"
-    Public Const diagButton As String = "&Chiudi"
+  Public timer1 As Timer
+  Public timer_interval As Integer = 1000  'millisecondi
+  Public timer_attempts As Integer 'not used
+  Public Const diagTitle As String = "Aggiornamento del modello analitico strutturale"
+  Public Const diagButton As String = "&Chiudi"
 
-   Public Function EnumWindowsProc(ByVal hwnd As Integer, ByVal lParam As Integer) As Boolean
-        Dim sbTitle As New StringBuilder(256)
-        Dim test As Integer = User32.GetWindowText(hwnd, sbTitle, sbTitle.Capacity)
-        Dim title As String = sbTitle.ToString()
-        If title.Length > 0 AndAlso title = diagTitle Then
-            User32.EnumChildWindows(hwnd, New User32.EnumWindowsProc(AddressOf EnumChildProc), 0)
-            Return False
-        Else
-            Return True
-        End If
+  Public Function EnumWindowsProc(ByVal hwnd As Integer, ByVal lParam As Integer) As Boolean
+    Dim sbTitle As New StringBuilder(256)
+    Dim test As Integer = User32.GetWindowText(hwnd, sbTitle, sbTitle.Capacity)
+    Dim title As String = sbTitle.ToString()
+    If title.Length > 0 AndAlso title = diagTitle Then
+      User32.EnumChildWindows(hwnd, New User32.EnumWindowsProc(AddressOf EnumChildProc), 0)
+      Return False
+    Else
+      Return True
+    End If
+  End Function
 
-    End Function
+  Public Function EnumChildProc(ByVal hwnd As Integer, ByVal lParam As Integer) As Boolean
+    Dim sbTitle As New StringBuilder(256)
+    User32.GetWindowText(hwnd, sbTitle, sbTitle.Capacity)
+    Dim title As String = sbTitle.ToString()
+    If title.Length > 0 AndAlso title = diagButton Then
+      User32.SendMessage(hwnd, User32.BM_SETSTATE, 1, 0)
+      User32.SendMessage(hwnd, User32.WM_LBUTTONDOWN, 0, 0)
+      User32.SendMessage(hwnd, User32.WM_LBUTTONUP, 0, 0)
+      User32.SendMessage(hwnd, User32.BM_SETSTATE, 1, 0)
+      If Not timer1 Is Nothing Then
+        timer1.Stop()
+        timer1 = Nothing
+      End If
+      Return False
+    Else
+      Return True
+    End If
+  End Function
 
-    Public Function EnumChildProc(ByVal hwnd As Integer, ByVal lParam As Integer) As Boolean
-        Dim sbTitle As New StringBuilder(256)
-        User32.GetWindowText(hwnd, sbTitle, sbTitle.Capacity)
-        Dim title As String = sbTitle.ToString()
-        If title.Length > 0 AndAlso title = diagButton Then
-            User32.SendMessage(hwnd, User32.BM_SETSTATE, 1, 0)
-            User32.SendMessage(hwnd, User32.WM_LBUTTONDOWN, 0, 0)
-            User32.SendMessage(hwnd, User32.WM_LBUTTONUP, 0, 0)
-            User32.SendMessage(hwnd, User32.BM_SETSTATE, 1, 0)
-            If Not timer1 Is Nothing Then
-                timer1.Stop()
-                timer1 = Nothing
-            End If
-            Return False
-        Else
-            Return True
-        End If
+  Public Sub timer1_Elapsed(ByVal sender As Object, ByVal e As EventArgs)
+    'If timer_attempts < 3000 Then
+    User32.EnumWindows(New User32.EnumWindowsProc(AddressOf EnumWindowsProc), 0)
+    'Else
+    '  timer1.Stop()
+    'End If
+    'timer_attempts += 1
+    'Debug.Print(timer_attempts.ToString())
+  End Sub
 
-    End Function
-
-    Public Sub timer1_Elapsed(ByVal sender As Object, ByVal e As EventArgs)
-        'If timer_attempts < 3000 Then
-        User32.EnumWindows(New User32.EnumWindowsProc(AddressOf EnumWindowsProc), 0)
-        'Else
-        '    timer1.Stop()
-        'End If
-        'timer_attempts += 1
-        'Debug.Print(timer_attempts.ToString())
-    End Sub
-
-    Public Sub closeOptionsDialog()
-        timer_attempts = 0
-        If timer1 Is Nothing Then
-            timer1 = New Timer()
-        End If
-        timer1.Interval = timer_interval
-        AddHandler timer1.Elapsed, New ElapsedEventHandler(AddressOf timer1_Elapsed)
-        timer1.Start()
-    End Sub
+  Public Sub closeOptionsDialog()
+    timer_attempts = 0
+    If timer1 Is Nothing Then
+      timer1 = New Timer()
+    End If
+    timer1.Interval = timer_interval
+    AddHandler timer1.Elapsed, New ElapsedEventHandler(AddressOf timer1_Elapsed)
+    timer1.Start()
+  End Sub
 </pre> 
 
-user32 module is the same
+The `user32` module is identical:
 
 <pre class="prettyprint">
 Imports System
@@ -316,43 +256,39 @@ Imports System.Runtime.InteropServices
 Imports System.Text
 
 Module User32
-    Delegate Function EnumWindowsProc(ByVal hWnd As Integer, ByVal lParam As Integer) As Boolean
+  Delegate Function EnumWindowsProc(ByVal hWnd As Integer, ByVal lParam As Integer) As Boolean
 
-    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
-    Function FindWindow(ByVal className As String, ByVal windowName As String) As Integer
-    End Function
+  <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+  Function FindWindow(ByVal className As String, ByVal windowName As String) As Integer
+  End Function
 
-    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
-    Function EnumWindows(ByVal callbackFunc As EnumWindowsProc, ByVal lParam As Integer) As Integer
-    End Function
+  <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+  Function EnumWindows(ByVal callbackFunc As EnumWindowsProc, ByVal lParam As Integer) As Integer
+  End Function
 
-    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
-    Function EnumChildWindows(ByVal hwnd As Integer, ByVal callbackFunc As EnumWindowsProc, ByVal lParam As Integer) As Integer
-    End Function
+  <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+  Function EnumChildWindows(ByVal hwnd As Integer, ByVal callbackFunc As EnumWindowsProc, ByVal lParam As Integer) As Integer
+  End Function
 
-    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
-    Function GetWindowText(ByVal hwnd As Integer, ByVal buff As StringBuilder, ByVal maxCount As Integer) As Integer
-    End Function
+  <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+  Function GetWindowText(ByVal hwnd As Integer, ByVal buff As StringBuilder, ByVal maxCount As Integer) As Integer
+  End Function
 
-    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
-    Function GetLastActivePopup(ByVal hwnd As Integer) As Integer
-    End Function
+  <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+  Function GetLastActivePopup(ByVal hwnd As Integer) As Integer
+  End Function
 
-    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
-    Function SendMessage(ByVal hwnd As Integer, ByVal Msg As Integer, ByVal wParam As Integer, ByVal lParam As Integer) As Integer
-    End Function
+  <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+  Function SendMessage(ByVal hwnd As Integer, ByVal Msg As Integer, ByVal wParam As Integer, ByVal lParam As Integer) As Integer
+  End Function
 
-    Public BM_SETSTATE As Integer = 243
-    Public WM_LBUTTONDOWN As Integer = 513
-    Public WM_LBUTTONUP As Integer = 514
+  Public BM_SETSTATE As Integer = 243
+  Public WM_LBUTTONDOWN As Integer = 513
+  Public WM_LBUTTONUP As Integer = 514
 End Module
 </pre>
  
-
-- Greg version of JtClicker in 2023
-Jacopo Chiappetti
-Senior Analyst & Developer
-One Team srl
+Many thanks to Jacopo for sharing his solution and thoughts!
 
 ####<a name="2"></a> OpenMEP
 
