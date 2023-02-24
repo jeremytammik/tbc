@@ -55,8 +55,11 @@ twitter:
 
 with the @AutodeskRevit #RevitAPI #BIM @AutodeskAPS 
 
-&ndash; 
-...
+Geometry options and clean simple curves
+&ndash; Curve loop simplify and clean up
+&ndash; Geometry options clarification
+&ndash; JtClicker 2023
+&ndash; OpenMEP by Chuong Ho...
 
 linkedin:
 
@@ -210,7 +213,7 @@ Here is my implementation; it's very similar to Greg's version:
     Dim sbTitle As New StringBuilder(256)
     Dim test As Integer = User32.GetWindowText(hwnd, sbTitle, sbTitle.Capacity)
     Dim title As String = sbTitle.ToString()
-    If title.Length > 0 AndAlso title = diagTitle Then
+    If title.Length &gt; 0 AndAlso title = diagTitle Then
       User32.EnumChildWindows(hwnd, New User32.EnumWindowsProc(AddressOf EnumChildProc), 0)
       Return False
     Else
@@ -222,7 +225,7 @@ Here is my implementation; it's very similar to Greg's version:
     Dim sbTitle As New StringBuilder(256)
     User32.GetWindowText(hwnd, sbTitle, sbTitle.Capacity)
     Dim title As String = sbTitle.ToString()
-    If title.Length > 0 AndAlso title = diagButton Then
+    If title.Length &gt; 0 AndAlso title = diagButton Then
       User32.SendMessage(hwnd, User32.BM_SETSTATE, 1, 0)
       User32.SendMessage(hwnd, User32.WM_LBUTTONDOWN, 0, 0)
       User32.SendMessage(hwnd, User32.WM_LBUTTONUP, 0, 0)
@@ -238,7 +241,7 @@ Here is my implementation; it's very similar to Greg's version:
   End Function
 
   Public Sub timer1_Elapsed(ByVal sender As Object, ByVal e As EventArgs)
-    'If timer_attempts < 3000 Then
+    'If timer_attempts &lt; 3000 Then
     User32.EnumWindows(New User32.EnumWindowsProc(AddressOf EnumWindowsProc), 0)
     'Else
     '  timer1.Stop()
@@ -268,27 +271,27 @@ Imports System.Text
 Module User32
   Delegate Function EnumWindowsProc(ByVal hWnd As Integer, ByVal lParam As Integer) As Boolean
 
-  <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+  &lt;DllImport("user32.dll", CharSet:=CharSet.Unicode)&gt;
   Function FindWindow(ByVal className As String, ByVal windowName As String) As Integer
   End Function
 
-  <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+  &lt;DllImport("user32.dll", CharSet:=CharSet.Unicode)&gt;
   Function EnumWindows(ByVal callbackFunc As EnumWindowsProc, ByVal lParam As Integer) As Integer
   End Function
 
-  <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+  &lt;DllImport("user32.dll", CharSet:=CharSet.Unicode)&gt;
   Function EnumChildWindows(ByVal hwnd As Integer, ByVal callbackFunc As EnumWindowsProc, ByVal lParam As Integer) As Integer
   End Function
 
-  <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+  &lt;DllImport("user32.dll", CharSet:=CharSet.Unicode)&gt;
   Function GetWindowText(ByVal hwnd As Integer, ByVal buff As StringBuilder, ByVal maxCount As Integer) As Integer
   End Function
 
-  <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+  &lt;DllImport("user32.dll", CharSet:=CharSet.Unicode)&gt;
   Function GetLastActivePopup(ByVal hwnd As Integer) As Integer
   End Function
 
-  <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+  &lt;DllImport("user32.dll", CharSet:=CharSet.Unicode)&gt;
   Function SendMessage(ByVal hwnd As Integer, ByVal Msg As Integer, ByVal wParam As Integer, ByVal lParam As Integer) As Integer
   End Function
 
