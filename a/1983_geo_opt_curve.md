@@ -101,7 +101,7 @@ I'd change my answer from the first time and now say:
   the [Douglas Peucker](https://duckduckgo.com/?q=douglas+peucker+algorithm)
   or [Visvaligham algorithm](https://duckduckgo.com/?q=visvalingam+algorithm);
   they are easy to implement and very useful. 
-  At least that's what we use and they work fine for us.
+  At least that's what we use, and they work fine for us.
 
 On Wikipedia:
 
@@ -314,6 +314,6 @@ I believe that the MEP Package will be a valuable asset to construction professi
 
 ####<a name="6"></a> Unintelligible Film Dialogue
 
-Completely removed from programming and the Revit MEP, I enjoyed this 11-minute explasnation 
+Completely removed from programming and the Revit MEP, I enjoyed this 11-minute analysis 
 of [why we all need subtitles now](https://www.youtube.com/watch?v=VYJtb2YXae8).
 
