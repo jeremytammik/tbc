@@ -290,35 +290,16 @@ End Module
  
 Many thanks to Jacopo for sharing his solution and thoughts!
 
-####<a name="2"></a> OpenMEP
+####<a name="5"></a> OpenMEP by Chuong Ho
 
-- A awesome package for MEP, Computational Design Inside Dynamo Revit
-https://github.com/chuongmep/OpenMEP
-OpenMEP Package also includes a comprehensive library of MEP components, making it easy to select and incorporate the right components into your design.This library includes a wide range of mechanical, electrical, and plumbing components, including pipes, fittings, valves, ducts, electrical equipment, and more fully automate your design process in design, maintenance, calculation and analysis,...
-I believe that the MEP Package will be a valuable asset to construction professionals looking to streamline the MEP design process and ensure that their projects are completed on time and within budget.
-https://www.linkedin.com/posts/chuongmep_opensource-dynamo-autodesk-activity-7033100499461570561-OUfG?utm_source=share&utm_medium=member_desktop
-Chuong Ho
-Computational Design Researcher | Autodesk Expert Elite
-Hi everyone, today I want to tell you that a stable and long-term support package for MEP engineers open source has been released.
-Open MEP Package also includes a comprehensive library of MEP components, making it easy to select and incorporate the right components into your design. This library includes a wide range of mechanical, electrical, and plumbing components, including pipes, fittings, valves, ducts, electrical equipment, and more fully automate your design process in design, maintenance, calculation and analysis,...
-I believe that the MEP Package will be a valuable asset to construction professionals looking to streamline the MEP design process and ensure that their projects are completed on time and within budget.
-Discuss on forum : https://lnkd.in/gtAi8RUP
-Open Source : https://lnkd.in/gcWvCCXK
-Now, I accept all ideas and all problems, contributions from all engineers, communities around the world.
+Chuong Ho released [OpenMEP, an awesome package for MEP and computational design inside Dynamo Revit](https://github.com/chuongmep/OpenMEP):
 
-####<a name="2"></a> Unintelligible
+- [LinkedIn post](https://www.linkedin.com/posts/chuongmep_opensource-dynamo-autodesk-activity-7033100499461570561-OUfG)
+- [DynamoBIM forum OpenMEP Package Feedback Thread](https://forum.dynamobim.com/t/openmep-package-feedback-thread/86350)
+- [OpenMEP GitHub repository](https://github.com/chuongmep/OpenMEP)
 
-- [Why we all need subtitles now](https://www.youtube.com/watch?v=VYJtb2YXae8)
+####<a name="6"></a> Unintelligible
 
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 491 x 509 pixels -->
-</center>
-
-**Answer:** 
-
-
-Many thanks to  for the nice sample!
-
-
-
+Completely removed from programming and the Revit MEP, I enjoyed this 11-minute explasnation 
+of [why we all need subtitles now](https://www.youtube.com/watch?v=VYJtb2YXae8).
 
