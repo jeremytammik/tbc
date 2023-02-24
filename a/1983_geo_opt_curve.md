@@ -59,7 +59,8 @@ Geometry options and clean simple curves
 &ndash; Curve loop simplify and clean up
 &ndash; Geometry options clarification
 &ndash; JtClicker 2023
-&ndash; OpenMEP by Chuong Ho...
+&ndash; OpenMEP by Chuong Ho
+&ndash; Unintelligible film dialogue...
 
 linkedin:
 
@@ -302,6 +303,15 @@ End Module
 </pre>
  
 Many thanks to Jacopo for sharing his solution and thoughts on this!
+
+By the way, Kev_D added another aspect: 
+
+**Question:** Is there a non API solution to remove this?
+
+**Answer:** I doubt it. 
+But, of course, there are [Windows automation tools](https://duckduckgo.com/?q=windows+automation+tool) that you can use. 
+Standard Windows automation. 
+They can click buttons for you, i.e., simulate the required user interaction to dismiss the dialogue.
 
 ####<a name="5"></a> OpenMEP by Chuong Ho
 
