@@ -76,6 +76,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Geometry Options and Clean Simple Curves
 
+Today we look at important aspects of geometry handling and other useful stuff:
+
+- [Curve loop simplify and clean up](#2)
+- [Geometry options clarification](#3)
+- [JtClicker 2023](#4)
+- [OpenMEP by Chuong Ho](#5)
+- [Unintelligible film dialogue](#6)
+
 ####<a name="2"></a> Curve Loop Simplify and Clean Up
 
 Benoit Favre, CEO of [etudes &amp; automates](http://www.etudesetautomates.com) shared 
@@ -102,7 +110,7 @@ On Wikipedia:
 
 Many thanks to Benoit for the interesting pointers!
 
-####<a name="3"></a> Geometry Options
+####<a name="3"></a> Geometry Options Clarification
 
 The question on how to [find centroid of wall in Revit API](https://forums.autodesk.com/t5/revit-api-forum/find-centroid-of-wall-in-revit-api/m-p/11748826)
 provided an opportunity to clarify the meaning of specific settings in the geometry `Options` and the use of the `NewGeometryOptions` method:
@@ -298,7 +306,7 @@ Chuong Ho released [OpenMEP, an awesome package for MEP and computational design
 - [DynamoBIM forum OpenMEP Package Feedback Thread](https://forum.dynamobim.com/t/openmep-package-feedback-thread/86350)
 - [OpenMEP GitHub repository](https://github.com/chuongmep/OpenMEP)
 
-####<a name="6"></a> Unintelligible
+####<a name="6"></a> Unintelligible Film Dialogue
 
 Completely removed from programming and the Revit MEP, I enjoyed this 11-minute explasnation 
 of [why we all need subtitles now](https://www.youtube.com/watch?v=VYJtb2YXae8).
