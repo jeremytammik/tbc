@@ -58,9 +58,48 @@ https://github.com/jeremytammik/RevitLookup/discussions/146
 
 ####<a name="3"></a> transient elements, jig, graphics:
 
-transient elements, jig, graphics:
-draw line visible on screen
-https://forums.autodesk.com/t5/revit-api-forum/draw-line-visible-on-screen/m-p/11778165#M69522
+A couple of ideas on creating transient elements graphics similar to the AutoCAD jig functionality using
+the `IDirectContext3DServer` functionality or the temporary InCanvas graphics API were recapitulated in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [drawing line visible on screen](https://forums.autodesk.com/t5/revit-api-forum/draw-line-visible-on-screen/m-p/11778165):
+
+<ul>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2020/10/onbox-directcontext-jig-and-no-cdn.html" target="_blank" rel="noopener">Onbox, DirectContext Jig and No CDN</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2021/01/transient-graphics-humane-ai-basic-income-and-lockdown.html" target="_blank" rel="noopener">Transient Graphics, Humane AI, BI and Lockdown</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2021/05/flip-mirror-transform-and-transient-graphics.html" target="_blank" rel="noopener">Flip, Mirror, Transform and Transient Graphics</a></li>
+</ul>
+
+Lorenzo Virone shared a [different approach](https://forums.autodesk.com/t5/revit-api-forum/draw-line-visible-on-screen/m-p/11778165#M69522), creating and deleting database-resident Revit elements on the fly in a loop:
+
+I faced a similar UI problem to create a rubber band between two points.
+I used these two functions, `Line.CreateBound` and `NewDetailCurve`, inside a loop to create a line at the cursor position, refresh, and delete the line every 0.1 seconds, until the user chooses the second point.
+A little tricky, but it worked fine for me and Revit seems to execute these 2 functions very fast.
+
+I didn't use it to create a line, but this trick will work with anything:
+create new elements on each mouse movement, refresh, delete the created elements and replace them with new ones.
+It can technically work with anything, model or detail elements, and it's easy to implement, because you just need to call the two methods, like this:
+
+<pre class="prettyprint">
+  bool done = false;
+  List<ElementId> temp = new List<ElementId>();
+
+  while(!done)
+  {
+    doc.Delete(temp);
+
+    // Create temp elements
+    // Save their IDs in `temp`
+    // Set `done` to `true` when finished
+
+    doc.regenerate();
+    uidoc.RefreshActiveView();
+    Thread.Sleep(500); // milliseconds
+  }
+
+  // Your final elements are in `temp`
+</pre>
+
+Many thanks to Lorenzo for sharing this nice solution.
 
 ####<a name="4"></a> Open files located in ACC Docs
 
@@ -94,6 +133,4 @@ Many thanks to
 
 **Response:**
 
-<pre class="prettyprint">
-</pre>
  
