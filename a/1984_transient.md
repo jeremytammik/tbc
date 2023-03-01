@@ -48,8 +48,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Transient
+### Lookup Ideas, Jigs and ACC Docs Access
 
+Today we look at a request for new ideas for enhancing RevitLookup, implementing a pickpoint rubber band and opening BIMs on ACC Docs:
+
+- [Request for RevitLookup ideas](#2)
+- [Transient elements for jig](#3)
+- [Opening a model in ACC Docs](#4)
+- [Stop using JPEG](#5)
+- [Stop using Voice id](#6)
 
 ####<a name="2"></a> Request for RevitLookup Ideas
 
@@ -120,7 +127,7 @@ It's easy to implement, because you just need to call the two methods, e.g., lik
 
 Many thanks to Lorenzo for sharing this nice solution.
 
-####<a name="4"></a> Open files located in ACC Docs
+####<a name="4"></a> Opening a Model in ACC Docs
 
 We started out
 discussing [opening a cloud model with Revit API](https://forums.autodesk.com/t5/revit-api-forum/opening-a-cloud-model-with-revit-api/m-p/11767222) in
