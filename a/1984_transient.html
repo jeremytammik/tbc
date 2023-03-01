@@ -1,9 +1,8 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
-</head>
-
+<p></head></p>
 <!---
 
 - RevitLookup Ideas #146
@@ -48,52 +47,37 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Transient
-
-
-####<a name="2"></a> Request for RevitLookup Ideas
-
-Do you have any ideas
-for [RevitLookup](https://github.com/jeremytammik/RevitLookup) enhancements?
-
-A lot of exciting functionality has already been worked on in
-the [dev](https://github.com/jeremytammik/RevitLookup/tree/dev)
-and [dev_winui](https://github.com/jeremytammik/RevitLookup/tree/dev_winui) branches.
-We expect to see that coming out quite soon.
-
-Meanwhile, Roman [Nice3point](https://github.com/Nice3point) opened a discussion for collecting
-[RevitLookup Ideas](https://github.com/jeremytammik/RevitLookup/discussions/146).
+<h3>Transient</h3>
+<h4><a name="2"></a> Request for RevitLookup Ideas</h4>
+<p>Do you have any ideas
+for <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a> enhancements?</p>
+<p>A lot of exciting functionality has already been worked on in
+the <a href="https://github.com/jeremytammik/RevitLookup/tree/dev">dev</a>
+and <a href="https://github.com/jeremytammik/RevitLookup/tree/dev_winui">dev_winui</a> branches.
+We expect to see that coming out quite soon.</p>
+<p>Meanwhile, Roman <a href="https://github.com/Nice3point">Nice3point</a> opened a discussion for collecting
+<a href="https://github.com/jeremytammik/RevitLookup/discussions/146">RevitLookup Ideas</a>.
 Your contributions there are welcome.
-Thank you!
-
-####<a name="3"></a> Transient Elements for Jig
-
-A couple of ideas on creating transient elements graphics similar to the AutoCAD jig functionality using
-the `IDirectContext3DServer` functionality or the temporary InCanvas graphics API were recapitulated in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [drawing line visible on screen](https://forums.autodesk.com/t5/revit-api-forum/draw-line-visible-on-screen/m-p/11778165):
-
+Thank you!</p>
+<h4><a name="3"></a> transient elements, jig, graphics:</h4>
+<p>A couple of ideas on creating transient elements graphics similar to the AutoCAD jig functionality using
+the <code>IDirectContext3DServer</code> functionality or the temporary InCanvas graphics API were recapitulated in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/draw-line-visible-on-screen/m-p/11778165">drawing line visible on screen</a>:</p>
 <ul>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2020/10/onbox-directcontext-jig-and-no-cdn.html" target="_blank" rel="noopener">Onbox, DirectContext Jig and No CDN</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2021/01/transient-graphics-humane-ai-basic-income-and-lockdown.html" target="_blank" rel="noopener">Transient Graphics, Humane AI, BI and Lockdown</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2021/05/flip-mirror-transform-and-transient-graphics.html" target="_blank" rel="noopener">Flip, Mirror, Transform and Transient Graphics</a></li>
 </ul>
 
-<center>
-<img src="img/pick_point_rubber_band.png" alt="Pick point ruber band" title="Pick point ruber band" width="426"/> <!-- 426 x 271 pixels -->
-</center>
-
-Lorenzo Virone shared a [different approach](https://forums.autodesk.com/t5/revit-api-forum/draw-line-visible-on-screen/m-p/11778165#M69522), creating and deleting database-resident Revit elements on the fly in a loop:
-
-I faced a similar UI problem to create a rubber band between two points.
-I used two functions, `Line.CreateBound` and `NewDetailCurve`, inside a loop to create a line at the cursor position, refresh, and delete the line every 0.1 seconds, until the user chooses the second point.
-A little tricky, but it works fine for me, and Revit seems to execute these 2 functions very fast.
-
-This trick will technically work with anything:
+<p>Lorenzo Virone shared a <a href="https://forums.autodesk.com/t5/revit-api-forum/draw-line-visible-on-screen/m-p/11778165#M69522">different approach</a>, creating and deleting database-resident Revit elements on the fly in a loop:</p>
+<p>I faced a similar UI problem to create a rubber band between two points.
+I used two functions, <code>Line.CreateBound</code> and <code>NewDetailCurve</code>, inside a loop to create a line at the cursor position, refresh, and delete the line every 0.1 seconds, until the user chooses the second point.
+A little tricky, but it works fine for me, and Revit seems to execute these 2 functions very fast.</p>
+<p>This trick will technically work with anything:
 create new elements on each mouse movement, refresh, delete the created elements and replace them with new ones.
 You can use either model or detail elements.
-It's easy to implement, because you just need to call the two methods, e.g., like this:
-
+It's easy to implement, because you just need to call the two methods, e.g., like this:</p>
 <div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
 <div style="background: #f3f3f3; color: #000000; max-height: 300px; overflow: auto">
 <ol start="28" style="background: #ffffff; margin: 0; padding: 0;">
@@ -118,27 +102,20 @@ It's easy to implement, because you just need to call the two methods, e.g., lik
 </div>
 </div>
 
-Many thanks to Lorenzo for sharing this nice solution.
-
-####<a name="4"></a> Open files located in ACC Docs
-
-We started out
-discussing [opening a cloud model with Revit API](https://forums.autodesk.com/t5/revit-api-forum/opening-a-cloud-model-with-revit-api/m-p/11767222) in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160),
+<p>Many thanks to Lorenzo for sharing this nice solution.</p>
+<h4><a name="4"></a> Open files located in ACC Docs</h4>
+<p>We started out
+discussing <a href="https://forums.autodesk.com/t5/revit-api-forum/opening-a-cloud-model-with-revit-api/m-p/11767222">opening a cloud model with Revit API</a> in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>,
 but then moved it over to StackOverflow, the better place for such a cloud-related topic, where my colleague Eason Kang explains
-how to [open files located in ACC Docs](https://stackoverflow.com/questions/75530623/open-files-located-in-the-accdocs):
-
-**Question:** My Visual Studio Revit API add-in open Revit files to export data in a batch.
+how to <a href="https://stackoverflow.com/questions/75530623/open-files-located-in-the-accdocs">open files located in ACC Docs</a>:</p>
+<p><strong>Question:</strong> My Visual Studio Revit API add-in open Revit files to export data in a batch.
 I can add many files which are on the networks and the plugin automatically opens them all.
-Is it possible to also open files that are in the ACC Docs cloud?
-
-I know I can open AccDocs which were be already downloaded locally by searching for them in the collaboration cache folder, but how to open files which have not yet been downloaded?
-
-**Answer:** Since you mention the `collaboration cache` folder, I suppose your Revit model is the [Revit Cloud Worksharing model](https://knowledge.autodesk.com/support/bim-360/learn-explore/caas/CloudHelp/cloudhelp/ENU/About-BIM360/files/about-bim-360-design/About-BIM360-about-bim-360-design-about-revit-cloud-worksharing-html-html.html),
-a.k.a `C4R` model, the model for Autodesk Collaboration for Revit.
-
-If so, we can call APS Data Management to obtain the `projectGuid` and `modelGuid` in the model's version tip like this:
-
+Is it possible to also open files that are in the ACC Docs cloud?</p>
+<p>I know I can open AccDocs which were be already downloaded locally by searching for them in the collaboration cache folder, but how to open files which have not yet been downloaded?</p>
+<p><strong>Answer:</strong> Since you mention the <code>collaboration cache</code> folder, I suppose your Revit model is the <a href="https://knowledge.autodesk.com/support/bim-360/learn-explore/caas/CloudHelp/cloudhelp/ENU/About-BIM360/files/about-bim-360-design/About-BIM360-about-bim-360-design-about-revit-cloud-worksharing-html-html.html">Revit Cloud Worksharing model</a>,
+a.k.a <code>C4R</code> model, the model for Autodesk Collaboration for Revit.</p>
+<p>If so, we can call APS Data Management to obtain the <code>projectGuid</code> and <code>modelGuid</code> in the model's version tip like this:</p>
 <pre class="prettyprint lang-json">
 {
    "type":"versions",
@@ -166,8 +143,7 @@ If so, we can call APS Data Management to obtain the `projectGuid` and `modelGui
 }
 </pre>
 
-Afterward, open the C4R model using Revit API like this:
-
+<p>Afterward, open the C4R model using Revit API like this:</p>
 <pre class="prettyprint lang-cs">
   // where is your BIM360/ACC account based, US or EU?
 
@@ -196,27 +172,27 @@ Afterward, open the C4R model using Revit API like this:
   // app.OpenDocumentFile( modelPath, openOptions );
 </pre>
 
-You can use
-the [Visual Studio APS Data Management package on NuGet](https://www.nuget.org/packages/Autodesk.Forge) for this.
-The [Hubs Browser tutorial](https://tutorials.autodesk.io/tutorials/hubs-browser/) demonstrates its use.
-
-References:
-
-- [Accessing BIM 360 Design models on Revit](https://aps.autodesk.com/blog/accessing-bim-360-design-models-revit)
-- [How to Open a Cloud Model](https://thebuildingcoder.typepad.com/blog/2020/04/revit-2021-cloud-model-api.html#4.4)
-- [Developer's Guide online help on Cloud Models](https://help.autodesk.com/view/RVT/2023/ENU/?guid=Revit_API_Revit_API_Developers_Guide_Introduction_Application_and_Document_CloudFiles_html)
-
-Many thanks to Eason for this very comprehensive answer!
-
-
-####<a name="5"></a> Stop Using JPEG
-
-Daniel Immke suggests
-that [it’s the future &ndash; you can stop using JPEGs ](https://daniel.do/article/its-the-future-stop-using-jpegs) and
-presents an overview and rationale for some compelling alternatives, e.g., AVIF and WebP.
-
-####<a name="6"></a> Stop Using Voice Id
-
-Joseph Cox describes [how he broke into a bank account with an AI-generated voice](https://www.vice.com/en/article/dy7axa/how-i-broke-into-a-bank-account-with-an-ai-generated-voice)
+<p>You can use
+the <a href="https://www.nuget.org/packages/Autodesk.Forge">Visual Studio APS Data Management package on NuGet</a> for this.
+The <a href="https://tutorials.autodesk.io/tutorials/hubs-browser/">Hubs Browser tutorial</a> demonstrates its use.</p>
+<p>References:</p>
+<ul>
+<li><a href="https://aps.autodesk.com/blog/accessing-bim-360-design-models-revit">Accessing BIM 360 Design models on Revit</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2020/04/revit-2021-cloud-model-api.html#4.4">How to Open a Cloud Model</a></li>
+<li><a href="https://help.autodesk.com/view/RVT/2023/ENU/?guid=Revit_API_Revit_API_Developers_Guide_Introduction_Application_and_Document_CloudFiles_html">Developer's Guide online help on Cloud Models</a></li>
+</ul>
+<p>Many thanks to Eason for this very comprehensive answer!</p>
+<h4><a name="6"></a> Stop Using JPEG</h4>
+<p><a href="https://daniel.do/article/its-the-future-stop-using-jpegs">stop using JPEG</a>
+It’s the future — you can stop using JPEGs
+An overview of some compelling alternatives.</p>
+<h4><a name="7"></a> Stop Using Voice Id</h4>
+<p>Joseph Cox describes <a href="https://www.vice.com/en/article/dy7axa/how-i-broke-into-a-bank-account-with-an-ai-generated-voice">How I broke into a bank account with an AI-generated voice</a>
 &ndash; some banks tout voice ID as a secure way to log into your account.
-He proves it's possible to trick such systems with free or cheap AI-generated voices.
+I proved it's possible to trick such systems with free or cheap AI-generated voices.</p>
+<p><center>
+<img src="img/.png" alt="" title="" width="100"/> <!-- 349 x 231 pixels -->
+</center></p>
+<p><strong>Question:</strong></p>
+<p><strong>Answer:</strong></p>
+<p><strong>Response:</strong></p>
