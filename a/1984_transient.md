@@ -141,10 +141,13 @@ Is it possible to also open files that are in the ACC Docs cloud?
 
 I know I can open AccDocs which were be already downloaded locally by searching for them in the collaboration cache folder, but how to open files which have not yet been downloaded?
 
-**Answer:** Since you mention the `collaboration cache` folder, I suppose your Revit model is the [Revit Cloud Worksharing model](https://knowledge.autodesk.com/support/bim-360/learn-explore/caas/CloudHelp/cloudhelp/ENU/About-BIM360/files/about-bim-360-design/About-BIM360-about-bim-360-design-about-revit-cloud-worksharing-html-html.html),
-a.k.a `C4R` model, the model for Autodesk Collaboration for Revit.
+**Answer:** Since you mention the collaboration cache folder, I assume your are using
+the [Revit Cloud Worksharing model](https://knowledge.autodesk.com/support/bim-360/learn-explore/caas/CloudHelp/cloudhelp/ENU/About-BIM360/files/about-bim-360-design/About-BIM360-about-bim-360-design-about-revit-cloud-worksharing-html-html.html),
+a.k.a `C4R`, the model for Autodesk Collaboration for Revit.
 
-If so, we can call APS Data Management to obtain the `projectGuid` and `modelGuid` in the model's version tip like this:
+If so, you can make use of
+the [APS Data Management API](https://aps.autodesk.com/en/docs/data/v2/developers_guide/overview/) to
+obtain the `projectGuid` and `modelGuid` in the model version tip like this:
 
 <pre class="prettyprint lang-json">
 {
@@ -173,7 +176,7 @@ If so, we can call APS Data Management to obtain the `projectGuid` and `modelGui
 }
 </pre>
 
-Afterward, open the C4R model using Revit API like this:
+With those in hand, you can open the C4R model using Revit API like this:
 
 <pre class="prettyprint lang-cs">
   // where is your BIM360/ACC account based, US or EU?
@@ -203,22 +206,21 @@ Afterward, open the C4R model using Revit API like this:
   // app.OpenDocumentFile( modelPath, openOptions );
 </pre>
 
-You can use
+You can also make use
 the [Visual Studio APS Data Management package on NuGet](https://www.nuget.org/packages/Autodesk.Forge) for this.
 The [Hubs Browser tutorial](https://tutorials.autodesk.io/tutorials/hubs-browser/) demonstrates its use.
 
 References:
 
-- [Accessing BIM 360 Design models on Revit](https://aps.autodesk.com/blog/accessing-bim-360-design-models-revit)
-- [How to Open a Cloud Model](https://thebuildingcoder.typepad.com/blog/2020/04/revit-2021-cloud-model-api.html#4.4)
-- [Developer's Guide online help on Cloud Models](https://help.autodesk.com/view/RVT/2023/ENU/?guid=Revit_API_Revit_API_Developers_Guide_Introduction_Application_and_Document_CloudFiles_html)
+- [Accessing BIM 360 design models on Revit](https://aps.autodesk.com/blog/accessing-bim-360-design-models-revit)
+- [How to open a cloud model](https://thebuildingcoder.typepad.com/blog/2020/04/revit-2021-cloud-model-api.html#4.4)
+- [Developer's guide online help on cloud models](https://help.autodesk.com/view/RVT/2023/ENU/?guid=Revit_API_Revit_API_Developers_Guide_Introduction_Application_and_Document_CloudFiles_html)
 
-Many thanks to Eason for this very comprehensive answer!
-
+Many thanks to Eason for this comprehensive answer!
 
 ####<a name="5"></a> Stop Using JPEG
 
-Daniel Immke suggests
+Moving away from Revit and its API to other interesting current news, Daniel Immke suggests
 that [it’s the future &ndash; you can stop using JPEGs ](https://daniel.do/article/its-the-future-stop-using-jpegs) and
 presents an overview and rationale for some compelling alternatives, e.g., AVIF and WebP.
 

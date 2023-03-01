@@ -124,9 +124,12 @@ how to <a href="https://stackoverflow.com/questions/75530623/open-files-located-
 I can add many files which are on the networks and the plugin automatically opens them all.
 Is it possible to also open files that are in the ACC Docs cloud?</p>
 <p>I know I can open AccDocs which were be already downloaded locally by searching for them in the collaboration cache folder, but how to open files which have not yet been downloaded?</p>
-<p><strong>Answer:</strong> Since you mention the <code>collaboration cache</code> folder, I suppose your Revit model is the <a href="https://knowledge.autodesk.com/support/bim-360/learn-explore/caas/CloudHelp/cloudhelp/ENU/About-BIM360/files/about-bim-360-design/About-BIM360-about-bim-360-design-about-revit-cloud-worksharing-html-html.html">Revit Cloud Worksharing model</a>,
-a.k.a <code>C4R</code> model, the model for Autodesk Collaboration for Revit.</p>
-<p>If so, we can call APS Data Management to obtain the <code>projectGuid</code> and <code>modelGuid</code> in the model's version tip like this:</p>
+<p><strong>Answer:</strong> Since you mention the collaboration cache folder, I assume your are using
+the <a href="https://knowledge.autodesk.com/support/bim-360/learn-explore/caas/CloudHelp/cloudhelp/ENU/About-BIM360/files/about-bim-360-design/About-BIM360-about-bim-360-design-about-revit-cloud-worksharing-html-html.html">Revit Cloud Worksharing model</a>,
+a.k.a <code>C4R</code>, the model for Autodesk Collaboration for Revit.</p>
+<p>If so, you can make use of
+the <a href="https://aps.autodesk.com/en/docs/data/v2/developers_guide/overview/">APS Data Management API</a> to
+obtain the <code>projectGuid</code> and <code>modelGuid</code> in the model version tip like this:</p>
 <pre class="prettyprint lang-json">
 {
    "type":"versions",
@@ -154,7 +157,7 @@ a.k.a <code>C4R</code> model, the model for Autodesk Collaboration for Revit.</p
 }
 </pre>
 
-<p>Afterward, open the C4R model using Revit API like this:</p>
+<p>With those in hand, you can open the C4R model using Revit API like this:</p>
 <pre class="prettyprint lang-cs">
   // where is your BIM360/ACC account based, US or EU?
 
@@ -183,18 +186,18 @@ a.k.a <code>C4R</code> model, the model for Autodesk Collaboration for Revit.</p
   // app.OpenDocumentFile( modelPath, openOptions );
 </pre>
 
-<p>You can use
+<p>You can also make use
 the <a href="https://www.nuget.org/packages/Autodesk.Forge">Visual Studio APS Data Management package on NuGet</a> for this.
 The <a href="https://tutorials.autodesk.io/tutorials/hubs-browser/">Hubs Browser tutorial</a> demonstrates its use.</p>
 <p>References:</p>
 <ul>
-<li><a href="https://aps.autodesk.com/blog/accessing-bim-360-design-models-revit">Accessing BIM 360 Design models on Revit</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2020/04/revit-2021-cloud-model-api.html#4.4">How to Open a Cloud Model</a></li>
-<li><a href="https://help.autodesk.com/view/RVT/2023/ENU/?guid=Revit_API_Revit_API_Developers_Guide_Introduction_Application_and_Document_CloudFiles_html">Developer's Guide online help on Cloud Models</a></li>
+<li><a href="https://aps.autodesk.com/blog/accessing-bim-360-design-models-revit">Accessing BIM 360 design models on Revit</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2020/04/revit-2021-cloud-model-api.html#4.4">How to open a cloud model</a></li>
+<li><a href="https://help.autodesk.com/view/RVT/2023/ENU/?guid=Revit_API_Revit_API_Developers_Guide_Introduction_Application_and_Document_CloudFiles_html">Developer's guide online help on cloud models</a></li>
 </ul>
-<p>Many thanks to Eason for this very comprehensive answer!</p>
+<p>Many thanks to Eason for this comprehensive answer!</p>
 <h4><a name="5"></a> Stop Using JPEG</h4>
-<p>Daniel Immke suggests
+<p>Moving away from Revit and its API to other interesting current news, Daniel Immke suggests
 that <a href="https://daniel.do/article/its-the-future-stop-using-jpegs">it’s the future &ndash; you can stop using JPEGs </a> and
 presents an overview and rationale for some compelling alternatives, e.g., AVIF and WebP.</p>
 <h4><a name="6"></a> Stop Using Voice Id</h4>
