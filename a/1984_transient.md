@@ -60,7 +60,7 @@ Today, we look at a request for new ideas for enhancing RevitLookup, implementin
 - [Transient elements for jig](#3)
 - [Opening a model in ACC Docs](#4)
 - [Stop using JPEG](#5)
-- [Stop using Voice id](#6)
+- [Stop using voice id](#6)
 
 ####<a name="2"></a> Request for RevitLookup Ideas
 
