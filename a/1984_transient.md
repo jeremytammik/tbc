@@ -207,6 +207,7 @@ Chuong Ho adds: This technique can also be used with a `DirectShape` element:
 <img src="img/pick_point_rubber_band_jig_directshape.gif" alt="Pick point rubber band" title="Pick point rubber band" width="426"/> <!-- 426 x 271 pixels -->
 </center>
 
+Many thanks to Chuong Ho for this addition!
 
 ####<a name="4"></a> Opening a Model in ACC Docs
 
