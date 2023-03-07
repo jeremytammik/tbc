@@ -27,16 +27,26 @@
 
 twitter:
 
- @DynamoBIM  with the @AutodeskRevit #RevitAPI #BIM @AutodeskAPS https://autode.sk/simplifycurveloop
+A request for new ideas for enhancing RevitLookup, implementing transient elements for a jig, e.g., a pickpoint rubber band, and opening BIMs on ACC Docs with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/openaccdocs`
 
 A request for new ideas for enhancing RevitLookup, implementing a pickpoint rubber band and opening BIMs on ACC Docs
 &ndash; Request for RevitLookup ideas
 &ndash; Transient elements for jig
 &ndash; Opening a model in ACC Docs
 &ndash; Stop using JPEG
-&ndash; Stop using Voice id...
+&ndash; Stop using voice id...
 
 linkedin:
+
+A request for new ideas for enhancing RevitLookup, implementing transient elements for a jig, e.g., a pickpoint rubber band, and opening BIMs on ACC Docs with the #RevitAPI
+
+https://autode.sk/openaccdocs`
+
+- Request for RevitLookup ideas
+- Transient elements for jig
+- Opening a model in ACC Docs
+- Stop using JPEG
+- Stop using voice id...
 
 #BIM #DynamoBim #AutodeskAPS #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
 
@@ -58,6 +68,7 @@ Today, we look at a request for new ideas for enhancing RevitLookup, implementin
 
 - [Request for RevitLookup ideas](#2)
 - [Transient elements for jig](#3)
+- [Transient `DirectShape` jig](#3.1)
 - [Opening a model in ACC Docs](#4)
 - [Stop using JPEG](#5)
 - [Stop using voice id](#6)
@@ -130,6 +141,111 @@ It's easy to implement, because you just need to call the two methods, e.g., lik
 </div>
 
 Many thanks to Lorenzo for sharing this nice solution.
+
+####<a name="3.1"></a> Transient DirectShape Jig
+
+Chuong Ho adds: This technique can also be used with a `DirectShape` element:
+
+
+using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI.Selection;
+using Line = Autodesk.Revit.DB.Line;
+using Point = Autodesk.Revit.DB.Point;
+var Doc = commandData.Application.ActiveUIDocument.Document;
+using TransactionGroup trang = new TransactionGroup(Doc, "test");
+        trang.Start();
+        XYZ a = UIDoc.Selection.PickPoint(ObjectSnapTypes.None);
+        SetPoint(a);
+        XYZ b = UIDoc.Selection.PickPoint(ObjectSnapTypes.None);
+        SetPoint(b);
+        SetLine(a,b);
+        XYZ p1 = UIDoc.Selection.PickPoint(ObjectSnapTypes.None);
+        SetPoint(p1);
+        XYZ p2 = UIDoc.Selection.PickPoint(ObjectSnapTypes.None);
+        SetPoint(p2);
+        bool isSamSide = IsSamSide(p1, p2, a, b);
+        MessageBox.Show(isSamSide.ToString());
+        trang.Assimilate();
+// visualize a point
+void SetPoint(XYZ xyz)
+        {
+            using (Transaction tran = new Transaction(Doc, "Add point"))
+            {
+                tran.Start();
+                Point point1 = Point.Create(xyz);
+                DirectShape ds =
+                    DirectShape.CreateElement(Doc, new ElementId(BuiltInCategory.OST_GenericModel));
+                ds.SetShape(new List<GeometryObject>() {point1});
+                tran.Commit();
+            }
+        }
+// visualize a line
+void SetLine(XYZ x1,XYZ x2)
+{
+    using (Transaction tran = new Transaction(Doc, "Add line"))
+    {
+        tran.Start();
+        Line line = Line.CreateBound(x1, x2);
+        DirectShape ds =
+            DirectShape.CreateElement(Doc, new ElementId(BuiltInCategory.OST_GenericModel));
+        ds.SetShape(new List<GeometryObject>() {line});
+        tran.Commit();
+    }
+}
+
+
+<div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
+<div style="background: #f3f3f3; color: #000000; max-height: 300px; overflow: auto">
+<ol start="15" style="background: #ffffff; margin: 0; padding: 0;">
+<li><span style="color:#0000ff">var</span> Doc = commandData.Application.ActiveUIDocument.Document;</li>
+<li style="background: #f3f3f3">&nbsp;</li>
+<li><span style="color:#0000ff">using</span> TransactionGroup trang = <span style="color:#0000ff">new</span> TransactionGroup(Doc, <span style="color:#a31515">&quot;test&quot;</span>);</li>
+<li style="background: #f3f3f3">trang.Start();</li>
+<li>XYZ a = UIDoc.Selection.PickPoint(ObjectSnapTypes.None);</li>
+<li style="background: #f3f3f3">SetPoint(a);</li>
+<li>XYZ b = UIDoc.Selection.PickPoint(ObjectSnapTypes.None);</li>
+<li style="background: #f3f3f3">SetPoint(b);</li>
+<li>SetLine(a, b);</li>
+<li style="background: #f3f3f3">XYZ p1 = UIDoc.Selection.PickPoint(ObjectSnapTypes.None);</li>
+<li>SetPoint(p1);</li>
+<li style="background: #f3f3f3">XYZ p2 = UIDoc.Selection.PickPoint(ObjectSnapTypes.None);</li>
+<li>SetPoint(p2);</li>
+<li style="background: #f3f3f3"><span style="color:#0000ff">bool</span> isSamSide = IsSamSide(p1, p2, a, b);</li>
+<li>MessageBox.Show(isSamSide.ToString());</li>
+<li style="background: #f3f3f3">trang.Assimilate();</li>
+<li>&nbsp;</li>
+<li style="background: #f3f3f3"><span style="color:#008000">// visualize a point</span></li>
+<li><span style="color:#0000ff">void</span> SetPoint(XYZ xyz)</li>
+<li style="background: #f3f3f3">{</li>
+<li>&#160; <span style="color:#0000ff">using</span> (Transaction tran = <span style="color:#0000ff">new</span> Transaction(Doc, <span style="color:#a31515">&quot;Add point&quot;</span>))</li>
+<li style="background: #f3f3f3">&#160; {</li>
+<li>&#160;&#160;&#160; tran.Start();</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160; Point point1 = Point.Create(xyz);</li>
+<li>&#160;&#160;&#160; DirectShape ds =</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160;&#160;&#160; DirectShape.CreateElement(Doc, <span style="color:#0000ff">new</span> ElementId(BuiltInCategory.OST_GenericModel));</li>
+<li>&#160;&#160;&#160; ds.SetShape(<span style="color:#0000ff">new</span> List&lt;GeometryObject&gt;() { point1 });</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160; tran.Commit();</li>
+<li>&#160; }</li>
+<li style="background: #f3f3f3">}</li>
+<li>&nbsp;</li>
+<li style="background: #f3f3f3"><span style="color:#008000">// visualize a line</span></li>
+<li><span style="color:#0000ff">void</span> SetLine(XYZ x1, XYZ x2)</li>
+<li style="background: #f3f3f3">{</li>
+<li>&#160; <span style="color:#0000ff">using</span> (Transaction tran = <span style="color:#0000ff">new</span> Transaction(Doc, <span style="color:#a31515">&quot;Add line&quot;</span>))</li>
+<li style="background: #f3f3f3">&#160; {</li>
+<li>&#160;&#160;&#160; tran.Start();</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160; Line line = Line.CreateBound(x1, x2);</li>
+<li>&#160;&#160;&#160; DirectShape ds = DirectShape.CreateElement(</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160; Doc, <span style="color:#0000ff">new</span> ElementId(BuiltInCategory.OST_GenericModel));</li>
+<li>&#160;&#160;&#160; ds.SetShape(<span style="color:#0000ff">new</span> List&lt;GeometryObject&gt;() { line });</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160; tran.Commit();</li>
+<li>&#160; }</li>
+<li style="background: #f3f3f3">}</li>
+</ol>
+</div>
+</div>
+
 
 ####<a name="4"></a> Opening a Model in ACC Docs
 
