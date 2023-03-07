@@ -29,8 +29,12 @@ twitter:
 
  @DynamoBIM  with the @AutodeskRevit #RevitAPI #BIM @AutodeskAPS https://autode.sk/simplifycurveloop
 
-&ndash;
-...
+A request for new ideas for enhancing RevitLookup, implementing a pickpoint rubber band and opening BIMs on ACC Docs
+&ndash; Request for RevitLookup ideas
+&ndash; Transient elements for jig
+&ndash; Opening a model in ACC Docs
+&ndash; Stop using JPEG
+&ndash; Stop using Voice id...
 
 linkedin:
 
@@ -50,7 +54,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Lookup Ideas, Jigs and ACC Docs Access
 
-Today we look at a request for new ideas for enhancing RevitLookup, implementing a pickpoint rubber band and opening BIMs on ACC Docs:
+Today, we look at a request for new ideas for enhancing RevitLookup, implementing a pickpoint rubber band and opening BIMs on ACC Docs:
 
 - [Request for RevitLookup ideas](#2)
 - [Transient elements for jig](#3)
@@ -141,9 +145,9 @@ Is it possible to also open files that are in the ACC Docs cloud?
 
 I know I can open AccDocs which were be already downloaded locally by searching for them in the collaboration cache folder, but how to open files which have not yet been downloaded?
 
-**Answer:** Since you mention the collaboration cache folder, I assume your are using
+**Answer:** Since you mention the collaboration cache folder, I assume you are using
 the [Revit Cloud Worksharing model](https://knowledge.autodesk.com/support/bim-360/learn-explore/caas/CloudHelp/cloudhelp/ENU/About-BIM360/files/about-bim-360-design/About-BIM360-about-bim-360-design-about-revit-cloud-worksharing-html-html.html),
-a.k.a `C4R`, the model for Autodesk Collaboration for Revit.
+a.k.a. `C4R`, the model for Autodesk Collaboration for Revit.
 
 If so, you can make use of
 the [APS Data Management API](https://aps.autodesk.com/en/docs/data/v2/developers_guide/overview/) to

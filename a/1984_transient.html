@@ -28,8 +28,12 @@ twitter:
 
  @DynamoBIM  with the @AutodeskRevit #RevitAPI #BIM @AutodeskAPS https://autode.sk/simplifycurveloop
 
-&ndash;
-...
+A request for new ideas for enhancing RevitLookup, implementing a pickpoint rubber band and opening BIMs on ACC Docs
+&ndash; Request for RevitLookup ideas
+&ndash; Transient elements for jig
+&ndash; Opening a model in ACC Docs
+&ndash; Stop using JPEG
+&ndash; Stop using Voice id...
 
 linkedin:
 
@@ -48,7 +52,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Lookup Ideas, Jigs and ACC Docs Access</h3>
-<p>Today we look at a request for new ideas for enhancing RevitLookup, implementing a pickpoint rubber band and opening BIMs on ACC Docs:</p>
+<p>Today, we look at a request for new ideas for enhancing RevitLookup, implementing a pickpoint rubber band and opening BIMs on ACC Docs:</p>
 <ul>
 <li><a href="#2">Request for RevitLookup ideas</a></li>
 <li><a href="#3">Transient elements for jig</a></li>
@@ -124,9 +128,9 @@ how to <a href="https://stackoverflow.com/questions/75530623/open-files-located-
 I can add many files which are on the networks and the plugin automatically opens them all.
 Is it possible to also open files that are in the ACC Docs cloud?</p>
 <p>I know I can open AccDocs which were be already downloaded locally by searching for them in the collaboration cache folder, but how to open files which have not yet been downloaded?</p>
-<p><strong>Answer:</strong> Since you mention the collaboration cache folder, I assume your are using
+<p><strong>Answer:</strong> Since you mention the collaboration cache folder, I assume you are using
 the <a href="https://knowledge.autodesk.com/support/bim-360/learn-explore/caas/CloudHelp/cloudhelp/ENU/About-BIM360/files/about-bim-360-design/About-BIM360-about-bim-360-design-about-revit-cloud-worksharing-html-html.html">Revit Cloud Worksharing model</a>,
-a.k.a <code>C4R</code>, the model for Autodesk Collaboration for Revit.</p>
+a.k.a. <code>C4R</code>, the model for Autodesk Collaboration for Revit.</p>
 <p>If so, you can make use of
 the <a href="https://aps.autodesk.com/en/docs/data/v2/developers_guide/overview/">APS Data Management API</a> to
 obtain the <code>projectGuid</code> and <code>modelGuid</code> in the model version tip like this:</p>
