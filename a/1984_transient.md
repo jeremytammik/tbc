@@ -102,7 +102,7 @@ on [drawing line visible on screen](https://forums.autodesk.com/t5/revit-api-for
 </ul>
 
 <center>
-<img src="img/pick_point_rubber_band.png" alt="Pick point rubber band" title="Pick point rubber band" width="426"/> <!-- 426 x 271 pixels -->
+<img src="img/pick_point_rubber_band.png" alt="Pick point rubber band" title="Pick point rubber band" width="600"/> <!-- 600 x 367 pixels -->
 </center>
 
 Lorenzo Virone shared a [different approach](https://forums.autodesk.com/t5/revit-api-forum/draw-line-visible-on-screen/m-p/11778165#M69522), creating and deleting database-resident Revit elements on the fly in a loop:
