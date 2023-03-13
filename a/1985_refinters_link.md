@@ -6,6 +6,8 @@
 
 <!---
 
+- /Users/jta/a/doc/revit/tbc/git/a/img/referenceintersector_with_link_that_moved.png
+
 - ReferenceIntersector+BoundingBoxIntersectsFilter fails on RevitLinkInstance ?
   https://forums.autodesk.com/t5/revit-api-forum/referenceintersector-boundingboxintersectsfilter-fails-on/td-p/11782120
 
@@ -75,28 +77,21 @@ Looks like the ReferenceIntersector+BoundingBoxIntersectsFilter fails on moved R
 Am I doing something wrong or does the BoundingBoxIntersectsFilter fails om then moved (elements in the) RevitLinkInstance ??
 
 
-
+referenceintersector_with_link_01.png
 
 ReferenceIntersector and BoundingBoxIntersectsFilter.png
-27 KB
-Labels (4)
+
 BoundingBoxIntersectsFilter fail ReferenceIntersector RevitLinkInstance
-15 REPLIES
-Sort:
+
 jeremy.tammik
- Employee jeremy.tammik in reply to: c.hanschen
-Interesting question. I asked the development team for you whether this behaviour is known, understood and intentional. If they need to take a closer look, they will probably require a complete minimal reproducible case:
 
-
-
-https://thebuildingcoder.typepad.com/blog/about-the-author.html#1b
-
-
+Interesting question. I asked the development team for you whether this behaviour is known, understood and intentional.
 
 They explain:  Since the filters mentioned do not know about the link's transform, they assume no transform exists.   You can't really affect the ElementInteresectsElementFilter, as it looks directly at the Element's geometry within the link, but you can apply the transform to the bounding box for BoundingBoxIntersectsFilter before you pass it in.  Note that rotations might cause a different size bounding box to be generated as the input bounding box is always aligned with whatever coordinate system is in the host model.
 
 
 c.hanschen
+
 "but you can apply the transform to the bounding box for BoundingBoxIntersectsFilter before you pass it in"
 That would only be a possibility when when you are just investigating this one link, no other links (with different transform) or elements in the opened model with the same Ray.
 
@@ -154,6 +149,7 @@ I tested this on two instances of the same link relocated from where they were i
 
 230503a.PNG
 
+referenceintersector_with_link_02.png
 
 
     Private Function Obj_230305a(ByVal commandData As Autodesk.Revit.UI.ExternalCommandData,
@@ -233,6 +229,7 @@ Note no link instance in position where bounding box points are transformed to i
 
 230503b.PNG
 
+referenceintersector_with_link_03.png
 
 
 thomas
@@ -247,6 +244,7 @@ The long and short of it is you have one option available to get reliable result
 
 thomas_0-1678528264706.png
 
+referenceintersector_with_link_04.png
 
 
 RPTHOMAS108
@@ -372,7 +370,9 @@ FindReferencesInRevitLinks = True, FindReferenceTarget.Element
 
 
 
- 230312.PNG
+230312.PNG
+
+referenceintersector_with_link_05.png
 
 I've not checked regarding inclusion of elements outside of bounding box scope. Currently using the or filter I would have expected the two walls captured by the or combination of the two bounding boxes. When in reality only the top bounding box was required to capture both. I think however  it does demonstrate that the ReferenceIntersector isn't internally processing the two bounding boxes for the check in an unconsolidated way.
 
@@ -407,15 +407,6 @@ I agree with the conclusion of @thomas  : combining the RefIntersector with othe
 
 
 Thanks again for all your replies! much appreciated!
-
-
-
-gr. Chris Hanschen
-
-LKSVDD architecten
-
-The Netherlands
-
 
 
 ####<a name="3"></a>
