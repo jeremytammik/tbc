@@ -350,9 +350,7 @@ We found that as modelling complexity increased over this time, so did compute t
 
 The ReferenceIntersector is also inconsistent if other types of element filter are used, so, returning to the original post, your best bet (simple, consistent but slow) is to use the `ReferenceIntersector` overload taking <i>Autodesk.Revit.DB.View3D view3d</i>, as addition of filters create more problems than they solve; otherwise, see if there are alternatives you can use.
 
-**Response:** Thanks for all your replies!
-
-I agree with the conclusion of @thomas: combining the RefIntersector with other Filters creates more problems than it solves! Using Transform to change the Boundingboxfilter is no solution, it has to be done for all the linkinstances, so same conclusion here: creates more problems than it solves.
+**Response:** Thanks for all your replies! I agree with the final conclusion: combining the RefIntersector with other Filters creates more problems than it solves! Using Transform to change the Boundingboxfilter is no solution, it has to be done for all the linkinstances, so same conclusion here: creates more problems than it solves.
 
 Thanks again for all your replies! Much appreciated!
 

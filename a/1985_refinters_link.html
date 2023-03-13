@@ -292,8 +292,7 @@ I think however it does demonstrate that the ReferenceIntersector isn't internal
 Coincidentally, we just removed calls to the ReferenceIntersector in one of our apps having used it for over 2 years.
 We found that as modelling complexity increased over this time, so did compute time, resulting in a performance increase of around 95% once we replaced it with an alternative (surface projection once, then storing this result in our object model).</p>
 <p>The ReferenceIntersector is also inconsistent if other types of element filter are used, so, returning to the original post, your best bet (simple, consistent but slow) is to use the <code>ReferenceIntersector</code> overload taking <i>Autodesk.Revit.DB.View3D view3d</i>, as addition of filters create more problems than they solve; otherwise, see if there are alternatives you can use.</p>
-<p><strong>Response:</strong> Thanks for all your replies!</p>
-<p>I agree with the conclusion of @thomas: combining the RefIntersector with other Filters creates more problems than it solves! Using Transform to change the Boundingboxfilter is no solution, it has to be done for all the linkinstances, so same conclusion here: creates more problems than it solves.</p>
+<p><strong>Response:</strong> Thanks for all your replies! I agree with the final conclusion: combining the RefIntersector with other Filters creates more problems than it solves! Using Transform to change the Boundingboxfilter is no solution, it has to be done for all the linkinstances, so same conclusion here: creates more problems than it solves.</p>
 <p>Thanks again for all your replies! Much appreciated!</p>
 <h4><a name="3"></a></h4>
 <p>Many thanks to
