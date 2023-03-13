@@ -40,9 +40,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a>
 
-A lot of interesting information and experience on using the reference intersector in conjunction with other filters and in linked files was discussed
+A lot of interesting information and insights on pros and cons based on years of experience on using the reference intersector in conjunction with other filters and in linked files was discussed
 by Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
-and Thomas Mahon of [](https://bimorph.com) in the question
+and Thomas Mahon of [Bimorph](https://bimorph.com) in the question
 on [`ReferenceIntersector` + `BoundingBoxIntersectsFilter` fails on `RevitLinkInstance`](https://forums.autodesk.com/t5/revit-api-forum/referenceintersector-boundingboxintersectsfilter-fails-on/td-p/11782120) raised
 by Chris Hanschen of [LKSVDD architecten](https://www.lksvdd.nl):
 
@@ -253,65 +253,68 @@ I've just discovered another problem using a filter with linked elements flagged
 
 Looks like the performance hit from ReferenceIntersector(Autodesk.Revit.DB.View3D view3d) overload is the lesser of all evils!
 
-<pre class="prettyprint">
-public IList<int> GetElementsFromRayshoot(
-  Document document,
-  IList<BoundingBoxXYZ> boundingBoxes,
-  XYZ origin,
-  XYZ rayDirection)
-{
-  var filters = new List<ElementFilter>();
-  foreach (var boundingBox in boundingBoxes)
-  {
-    var outline = new Outline(boundingBox.Min, boundingBox.Max);
+<div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
+<div style="background: #f3f3f3; color: #000000; max-height: 300px; overflow: auto">
+<ol start="24" style="background: #ffffff; margin: 0; padding: 0;">
+<li><span style="color:#0000ff">public</span> IList&lt;<span style="color:#0000ff">int</span>&gt; GetElementsFromRayshoot(</li>
+<li style="background: #f3f3f3">&#160; Document document,</li>
+<li>&#160; IList&lt;BoundingBoxXYZ&gt; boundingBoxes,</li>
+<li style="background: #f3f3f3">&#160; XYZ origin,</li>
+<li>&#160; XYZ rayDirection)</li>
+<li style="background: #f3f3f3">{</li>
+<li>&#160; <span style="color:#0000ff">var</span> filters = <span style="color:#0000ff">new</span> List&lt;ElementFilter&gt;();</li>
+<li style="background: #f3f3f3">&#160; <span style="color:#0000ff">foreach</span> (var boundingBox <span style="color:#0000ff">in</span> boundingBoxes)</li>
+<li>&#160; {</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160; <span style="color:#0000ff">var</span> outline = <span style="color:#0000ff">new</span> Outline(boundingBox.Min, boundingBox.Max);</li>
+<li>&nbsp;</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160; filters.Add(<span style="color:#0000ff">new</span> BoundingBoxIntersectsFilter(outline));</li>
+<li>&#160; }</li>
+<li style="background: #f3f3f3">&nbsp;</li>
+<li>&#160; <span style="color:#0000ff">var</span> logicFilter = <span style="color:#0000ff">new</span> LogicalOrFilter(filters);</li>
+<li style="background: #f3f3f3">&nbsp;</li>
+<li>&#160; <span style="color:#0000ff">var</span> referenceIntersector = <span style="color:#0000ff">new</span> ReferenceIntersector(</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160; logicFilter, FindReferenceTarget.Element,</li>
+<li>&#160;&#160;&#160; document.ActiveView)</li>
+<li style="background: #f3f3f3">&#160; {</li>
+<li>&#160;&#160;&#160; FindReferencesInRevitLinks = <span style="color:#0000ff">true</span></li>
+<li style="background: #f3f3f3">&#160; };</li>
+<li>&nbsp;</li>
+<li style="background: #f3f3f3">&#160; <span style="color:#0000ff">var</span> refWithContextResults = referenceIntersector.Find(origin, rayDirection);</li>
+<li>&nbsp;</li>
+<li style="background: #f3f3f3">&#160; <span style="color:#0000ff">var</span> elementIds = <span style="color:#0000ff">new</span> List&lt;<span style="color:#0000ff">int</span>&gt;();</li>
+<li>&#160; <span style="color:#0000ff">foreach</span> (var refWithContext <span style="color:#0000ff">in</span> refWithContextResults)</li>
+<li style="background: #f3f3f3">&#160; {</li>
+<li>&#160;&#160;&#160; <span style="color:#0000ff">var</span> reference = refWithContext.GetReference();</li>
+<li style="background: #f3f3f3">&nbsp;</li>
+<li>&#160;&#160;&#160; <span style="color:#0000ff">var</span> linkedElementId = reference.LinkedElementId;</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160; <span style="color:#0000ff">if</span> (linkedElementId.Equals(ElementId.InvalidElementId))</li>
+<li>&#160;&#160;&#160;&#160;&#160; elementIds.Add(reference.ElementId.IntegerValue);</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160; <span style="color:#0000ff">else</span></li>
+<li>&#160;&#160;&#160;&#160;&#160; elementIds.Add(linkedElementId.IntegerValue);</li>
+<li style="background: #f3f3f3">&#160; }</li>
+<li>&#160; <span style="color:#0000ff">return</span> elementIds;</li>
+<li style="background: #f3f3f3">}</li>
+</ol>
+</div>
+</div>
 
-    filters.Add(new BoundingBoxIntersectsFilter(outline))
-  }
+Test model Revit 2022:
 
-  var logicFilter = new LogicalOrFilter(filters);
+<pre>
+  BB1.Min/Max = (-12.4839, -8.3542, 0) , (-5.0602, -0.9306, 9.8425)
+  BB2.Min/Max = (-11.4847, -12.3077, 0) , (-6.0974, -10.8641, 9.8425)
+  Ray = XYZ.BasisX
+  Origin = BB1.Min with Z+3
+</pre>
 
-  var referenceIntersector = new ReferenceIntersector(logicFilter, FindReferenceTarget.Element, document.ActiveView)
-  {
-    FindReferencesInRevitLinks = True
-  };
-
-  var refWithContextResults = referenceIntersector.Find(origin, rayDirection);
-
-  var elementIds = new List<Int>();
-  foreach (var refWithContext in refWithContextResults)
-  {
-    var reference = refWithContext.GetReference();
-
-    var linkedElementId = reference.LinkedElementId;
-    if linkedElementId.Equals(ElementId.InvalidElementId):
-      elementIds.append(reference.ElementId.IntegerValue)
-    else:
-      elementIds.append(linkedElementId.IntegerValue)
-  }
-
-  return elementIds;
-}
-
-
-Test model R2022:
-
-BB1.Min/Max = (-12.4839, -8.3542, 0) , (-5.0602, -0.9306, 9.8425)
-
-BB2.Min/Max = (-11.4847, -12.3077, 0) , (-6.0974, -10.8641, 9.8425)
-
-Ray = XYZ.BasisX
-
-Origin = BB1.Min with Z+3
-
+<!--
 TestProject.rvt
-
 Project1.rvt
+-->
 
-RPTHOMAS108
+**Answer (R):** Interesting; I think it is varying the option set for FindReferenceTarget in order to find the elements (by nested references) in the link; then, as a consequence of that, it reports the references of the elements outside of the link.
 
-Interesting I think it is varying the option set for FindReferenceTarget in order to find the elements (by nested references) in the link then as a consequence of that it
-
-
+<pre>
 FindReferencesInRevitLinks = True, FindReferenceTarget.Element
 309836, 309843, REFERENCE_TYPE_SURFACE, 3.76375750430962 (Linked wall near face)
 309836, 309843, REFERENCE_TYPE_SURFACE, 4.71520107386343 (Linked wall far face)
@@ -326,50 +329,34 @@ FindReferencesInRevitLinks = True, FindReferenceTarget.Element
 310123, -1, REFERENCE_TYPE_SURFACE, 2.84087372715355 (Wall far face)
 310123, -1, REFERENCE_TYPE_SURFACE, 1.39730417334777 (Wall near face)
 310123, -1, REFERENCE_TYPE_NONE, 1.39730417334777 (Wall element)
+</pre>
 
+<center>
+<img src="img/referenceintersector_with_link_05.png" alt="ReferenceIntersector with distances" title="ReferenceIntersector with distances" width="420"/> <!-- Pixel Height: 435, Pixel Width: 433 -->
+</center>
 
-
-
-
-
-230312.PNG
-
-referenceintersector_with_link_05.png
-
-I've not checked regarding inclusion of elements outside of bounding box scope. Currently using the or filter I would have expected the two walls captured by the or combination of the two bounding boxes. When in reality only the top bounding box was required to capture both. I think however  it does demonstrate that the ReferenceIntersector isn't internally processing the two bounding boxes for the check in an unconsolidated way.
-
-
+I've not checked regarding inclusion of elements outside of bounding box scope.
+Currently, using the `OR` filter, I would have expected the two walls captured by the `OR` combination of the two bounding boxes.
+When in reality only the top bounding box was required to capture both.
+I think however it does demonstrate that the ReferenceIntersector isn't internally processing the two bounding boxes for the check in an unconsolidated way.
 
 I think also we have not considered nested links but they are all instanced top level in reality. The requirement to supply a 3D view for the ReferenceIntersector often puts me off using it since there is the requirement to ensure the elements you are looking for are visible in the view and we know elements can be not visible for numerous reasons.
 
-
-
 I wouldn't be using the ReferenceIntersector to find elements unless I knew the type of elements I was looking for with it i.e. unless I could limit the search to certain categories and understand what affects the visibility of such.
-
-
 
 The bounding box and ReferenceIntersector combination is a bit of an odd one anyway since you know where the ray is pointing so know the region the bounding box should occupy. The bounding box size then therefore becomes about the extents along the ray to capture. The wider those extents the larger the overall bounding box but the ray should ideally pass through the centre of it (why put the box somewhere the ray will not hit).  Would be easier to rule out the rays that don't pass through the box to start with if using some mass ray casting approach.
 
+**Answer (T):** I would avoid using the ReferenceIntersector if possible; it's too inefficient.
+Coincidentally, we just removed calls to the ReferenceIntersector in one of our apps having used it for over 2 years.
+We found that as modelling complexity increased over this time, so did compute time, resulting in a performance increase of around 95% once we replaced it with an alternative (surface projection once, then storing this result in our object model).
 
+The ReferenceIntersector is also inconsistent if other types of element filter are used, so, returning to the original post, your best bet (simple, consistent but slow) is to use the `ReferenceIntersector` overload taking <i>Autodesk.Revit.DB.View3D view3d</i>, as addition of filters create more problems than they solve; otherwise, see if there are alternatives you can use.
 
-thomas
+**Response:** Thanks for all your replies!
 
-i would avoid using the ReferenceIntersector if possible, its too inefficient. Coincidentally, we just removed calls to the ReferenceIntersector in one of our apps having used it for over 2 years. We found that as modelling complexity increased over this time, so did compute time, resulting in a performance increase of around 95% once we replaced it with an alternative (surface projection once, then storing this result in our object model).
+I agree with the conclusion of @thomas: combining the RefIntersector with other Filters creates more problems than it solves! Using Transform to change the Boundingboxfilter is no solution, it has to be done for all the linkinstances, so same conclusion here: creates more problems than it solves.
 
-
-
-The ReferenceIntersector is also inconsistent if other types of element filter are used, so returning to the OP, your best bet (simple, consistent but slow) is to use ReferenceIntersector(Autodesk.Revit.DB.View3D view3d) overload as addition of filters create more problems than they solve, otherwise, see if there are alternatives you can use.
-
-c.hanschen
-
-Thanks for all your replies!
-
-I agree with the conclusion of @thomas  : combining the RefIntersector with other Filters create more problems than they solve! Using Transform to change the Boundingboxfilter is no solution, it has to be done for all the linkinstances, so same conclusion her: create more problems than they solve.
-
-
-
-Thanks again for all your replies! much appreciated!
-
+Thanks again for all your replies! Much appreciated!
 
 ####<a name="3"></a>
 
