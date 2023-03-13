@@ -6,8 +6,6 @@
 
 <!---
 
-- /Users/jta/a/doc/revit/tbc/git/a/img/referenceintersector_with_link_that_moved.png
-
 - ReferenceIntersector+BoundingBoxIntersectsFilter fails on RevitLinkInstance ?
   https://forums.autodesk.com/t5/revit-api-forum/referenceintersector-boundingboxintersectsfilter-fails-on/td-p/11782120
 
@@ -69,7 +67,7 @@ referenceintersector_with_link_01.png
 -->
 
 <center>
-<img src="img/referenceintersector_with_link_01.png" alt="ReferenceIntersector and BoundingBoxIntersectsFilter" title="ReferenceIntersector and BoundingBoxIntersectsFilter" width="500"/> <!-- Pixel Height: 433, Pixel Width: 1,006 -->
+<img src="img/referenceintersector_with_link_01.png" alt="ReferenceIntersector and BoundingBoxIntersectsFilter" title="ReferenceIntersector and BoundingBoxIntersectsFilter" width="600"/> <!-- Pixel Height: 433, Pixel Width: 1,006 -->
 </center>
 
 The ray really hits the linked model, the linked element, within the (local) BoundingBoxIntersectsFilter, but nothing is found.
@@ -127,7 +125,7 @@ Below is some code that demonstrates using a logical `OR` filter with bounding b
 I tested this on two instances of the same link relocated from where they were inserted (X=0, Y=0):
 
 <center>
-<img src="img/referenceintersector_with_link_02.png" alt="ReferenceIntersector with two link instances" title="ReferenceIntersector  with two link instances" width="420"/> <!-- Pixel Height: 572, Pixel Width: 845 -->
+<img src="img/referenceintersector_with_link_02.png" alt="ReferenceIntersector with two link instances" title="ReferenceIntersector  with two link instances" width="490"/> <!-- Pixel Height: 572, Pixel Width: 845 -->
 </center>
 
 <pre class="prettyprint">
@@ -204,7 +202,7 @@ Can be noted that the faces are not returned in order of proximity.
 Note no link instance in position where bounding box points are transformed to in host document:
 
 <center>
-<img src="img/referenceintersector_with_link_03.png" alt="ReferenceIntersector with two link instances" title="ReferenceIntersector  with two link instances" width="420"/> <!-- Pixel Height: 426, Pixel Width: 493 -->
+<img src="img/referenceintersector_with_link_03.png" alt="ReferenceIntersector with two link instances" title="ReferenceIntersector  with two link instances" width="493"/> <!-- Pixel Height: 426, Pixel Width: 493 -->
 </center>
 
 **Answer (T):** The limitations you've encountered are explained in the ReferenceIntersector documentation.
@@ -215,7 +213,7 @@ The problem with this is you'll need to do this for each link in your document a
 Subsequently, you'll have the additional problem of identifying duplicates and omitting them from your combined list of results once all your ReferenceIntersector's have run.
 
 <center>
-<img src="img/referenceintersector_with_link_04.png" alt="ReferenceIntersector documentation" title="ReferenceIntersector documentation" width="420"/> <!-- Pixel Height: 1,135, Pixel Width: 2,768 -->
+<img src="img/referenceintersector_with_link_04.png" alt="ReferenceIntersector documentation" title="ReferenceIntersector documentation" width="600"/> <!-- Pixel Height: 1,135, Pixel Width: 2,768 -->
 </center>
 
 **Answer (R):** In reality, you need only one bounding box filter per link instance, which could be combined into a logical or filter as above.
@@ -332,7 +330,7 @@ FindReferencesInRevitLinks = True, FindReferenceTarget.Element
 </pre>
 
 <center>
-<img src="img/referenceintersector_with_link_05.png" alt="ReferenceIntersector with distances" title="ReferenceIntersector with distances" width="420"/> <!-- Pixel Height: 435, Pixel Width: 433 -->
+<img src="img/referenceintersector_with_link_05.png" alt="ReferenceIntersector with distances" title="ReferenceIntersector with distances" width="433"/> <!-- Pixel Height: 435, Pixel Width: 433 -->
 </center>
 
 I've not checked regarding inclusion of elements outside of bounding box scope.
