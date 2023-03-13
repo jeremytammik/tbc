@@ -48,165 +48,145 @@ by Chris Hanschen of [LKSVDD architecten](https://www.lksvdd.nl):
 
 **Question:** I am a big fan of the ReferenceIntersector filter, finding elements like that is great!
 
-In this post Jeremy Tammik explains this slow filter and the use of combinations of filters:
+In the post
+on [how to use the `ElementIntersectsElementFilter` from the `RevitLinkInstance`](https://forums.autodesk.com/t5/revit-api-forum/how-to-use-the-elementintersectselementfilter-from-the/m-p/8440204),
+Jeremy explains this slow filter and the use of combinations of filters.
+The combination of `BoundingBoxIntersectsFilter` and `ReferenceIntersector` can boost the performance of the slow ReferenceIntersector Filter.
+Even when using linked models, the ReferenceIntersector can find the link (at first) and the `ReferenceWithContext` can give you information about the element in the RevitLinkInstance, works great!
 
-https://forums.autodesk.com/t5/revit-api-forum/how-to-use-the-elementintersectselementfilter-from-th...
+When the RevitLinkInstance is NOT moved, the combination of ReferenceIntersector + BoundingBoxIntersectsFilter works great, but when the RevitLinkInstance is moved, no elements are found.
 
-The combination of BoundingBoxIntersectsFilter and ReferenceIntersector can boost the performance of the slow ReferenceIntersector Filter. Even when using linked-models, the ReferenceIntersector can find the link (at first) and the ReferenceWithContext can give you information about the element in the RevitLinkInstance, works great!
+It seems as if the BoundingBoxIntersectsFilter not only filters elements in the opened model, but also the elements in the linked model, by checkng their coordinates or something.
 
+But, when the RevitLinkInstance is moved in your opened models, the coordinates are different, and the BoundingBoxIntersectsFilter fails.
 
+In this situation, the linked model is not found within the BoundingBoxIntersectsFilter, by the ReferenceIntersector, although it is there!
 
-When the RevitLinkInstance is NOT moved, the combination of ReferenceIntersector+BoundingBoxIntersectsFilter works great, but when the RevitLinkInstance is moved, no elements are found.
-
-
-
-It looks like the BoundingBoxIntersectsFilter not only filters elements in the opened model, but also the elements in the linked model, by check of coordinates or something.
-
-But when the RevitLinkInstance is moved in your opened models, the coordinates are different, the BoundingBoxIntersectsFilter fails.
-
-
-
-See attached image, the linked model is not found within the BoundingBoxIntersectsFilter, by the ReferenceIntersector, but is is there!
-
-The Ray realy hits the linked model, the linked element, within the (local) BoundingBoxIntersectsFilter, but nothing is found.
-
-Looks like the ReferenceIntersector+BoundingBoxIntersectsFilter fails on moved RevitLinkInstance.
-
-
-
-Am I doing something wrong or does the BoundingBoxIntersectsFilter fails om then moved (elements in the) RevitLinkInstance ??
-
-
-referenceintersector_with_link_01.png
-
+<!--
 ReferenceIntersector and BoundingBoxIntersectsFilter.png
+referenceintersector_with_link_that_moved.png
+referenceintersector_with_link_01.png
+-->
 
-BoundingBoxIntersectsFilter fail ReferenceIntersector RevitLinkInstance
+<center>
+<img src="img/referenceintersector_with_link_01.png" alt="ReferenceIntersector and BoundingBoxIntersectsFilter" title="ReferenceIntersector and BoundingBoxIntersectsFilter" width="500"/> <!-- Pixel Height: 433, Pixel Width: 1,006 -->
+</center>
 
-jeremy.tammik
+The ray really hits the linked model, the linked element, within the (local) BoundingBoxIntersectsFilter, but nothing is found.
 
-Interesting question. I asked the development team for you whether this behaviour is known, understood and intentional.
+Looks like the ReferenceIntersector + BoundingBoxIntersectsFilter fails on moved RevitLinkInstance.
 
-They explain:  Since the filters mentioned do not know about the link's transform, they assume no transform exists.   You can't really affect the ElementInteresectsElementFilter, as it looks directly at the Element's geometry within the link, but you can apply the transform to the bounding box for BoundingBoxIntersectsFilter before you pass it in.  Note that rotations might cause a different size bounding box to be generated as the input bounding box is always aligned with whatever coordinate system is in the host model.
+Am I doing something wrong or does the BoundingBoxIntersectsFilter really fail on the moved (elements in the) RevitLinkInstance?
 
+**Answer:** Interesting question. The development team explain:
+Since the filters mentioned do not know about the link's transform, they assume no transform exists.
+You can't really affect the ElementInteresectsElementFilter, as it looks directly at the Element's geometry within the link, but you can apply the transform to the bounding box for BoundingBoxIntersectsFilter before you pass it in.
+Note that rotations might cause a different size bounding box to be generated as the input bounding box is always aligned with whatever coordinate system is in the host model.
 
-c.hanschen
+**Response:** Applying the transform to the bounding box for the BoundingBoxIntersectsFilter before passing it in would only be a possibility when when you are just investigating this one link, no other links (with different transform) or elements in the opened model with the same Ray.
 
-"but you can apply the transform to the bounding box for BoundingBoxIntersectsFilter before you pass it in"
-That would only be a possibility when when you are just investigating this one link, no other links (with different transform) or elements in the opened model with the same Ray.
-
-
-
-"Since the filters mentioned do not know about the link's transform"
-
-Why not? When hitting a RevitLinkInstance, the transform is known, can't this be used?
-
-
+You say the filters mentioned do not know about the link's transform... Why not? When hitting a RevitLinkInstance, the transform is known, can't this be used?
 
 The ReferenceIntersector is a great way to find ALL elements (multiplex links, with different transforms, and model elements) at the same time, with just 1 Ray. But it is a slow filter, so you want to be able to speed this up by using BoundingBoxIntersectsFilter. The Elements are there! the RevitLinkInstance should be found.
 
-
-
 Is there a way to get this working properly?
 
+**Answer (R):** Filters work within the current document only, so the bounding box is relevant to the space within that, i.e., within link document.
+The link document doesn't know where it is placed in the host document, since that is information associated with the link instance in the host document.
+Hence, that is why the filter doesn't know.
 
-RPTHOMAS108
+The ReferenceIntersector is not a slow filter, or any kind of filter at all; it is a utility to strike something with a ray based on origin and direction.
+The ReferenceIntersector works within the current document where the various links take up a final specific known position; so, it is not analogous to an element filter or limitation of such.
 
-Filters work within the document so the bounding box is relevant to the space within that i.e. within link document. The link document doesn't know where it is placed in the host document since that is information associated with the link instance in the host document. Hence that is why the filter doesn't know.
+The RefereceIntersector will only find things based upon visibility of the elements in the 3D view provided.
+So, that is one way of filtering beforehand what the RefereceIntersector strikes.
+Although visibility control of elements in links via the API is fairly limited still.
+Regarding links, the suggestion I believe is to transform the bounding box into the space of the linked document.
 
+Not sure I follow your issue with transforming the bounding box to the link space.
+If you have a link instance in multiple positions, then you only need to check one instance of that link.
+Since transforming the box into the link document will result in the same target position in the link document?
+Depends how you are using the bounding box filter to begin with?
+You are interested in a certain region, so what link instances are in that region to transform the box into and check for initial elements?
 
+The only real limitation, as mentioned, is that the bounding box is parallel to the document space and this may not be the same in the linked document as the host document.
+Since the object you use is `Outline`, and that doesn't have a transform to give you an alternative orientation for the model it is used in.
+However, it is a rough exercise for an initial coarse result.
+I would probably create the bounding box corner points in the host document for a box aligned with the link transform axis, so that they match up when transformed into the link.
+If you create the corner points based on a box aligned with the host document, then it may not represent the same when those points are transformed into the associated linked document positions.
 
-The ReferenceIntersector is not a slow filter or any kind of filter it is a utility to strike something with a ray based on origin and direction. The ReferenceIntersector works within the current document where the various links take up a final specific known position (so it is not analogous to an element filter or limitation of such).
-
-
-
-The RefereceIntersector will only find things based upon visibility of the elements in the 3D view provided. So that is one way of filtering beforehand what the RefereceIntersector strikes. Although visibility control of elements in links via the API is fairly limited still. Regarding links the suggestion I believe is to transform the bounding box into the space of the linked document.
-
-
-
-Not sure I follow your issue with transforming the bounding box to the link space. If you have a link instance in multiple positions then you only need to check one instance of that link. Since transforming the box into the link document will result in the same target position in the link document? Depends how you are using the bounding box filter to begin with? You are interested in a certain region so what link instances are in that region to transform the box into and check for initial elements?
-
-
-
-The only real limitation as mentioned is that the bounding box is parallel to the document space and this may not be the same in the linked document as the host document. Since object you use is 'Outline' and that doesn't have a transform to give you an alternative orientation for the model it is used in. However it is a rough exercise for an initial coarse result. I would probably create the bounding box corner points in the host document for a box aligned with the link transform axis, so that they match up when transformed into the link. If you create the corner points based on a box aligned with the host document then it may not represent the same when those points are transformed into the associated linked document positions.
-
-c.hanschen
-
-My issue: combination of BoundingBoxIntersectsFilter and ReferenceIntersector fails for LinkedDocumentElements, fails only when LinkedInstance is moved.
-I understand why, understand this is not easily solved, but for now I can't use this combination of filters.
-The use of only ReferenceIntersector gives me the result I need, but when firering more than x1000 rays, the use of only ReferenceIntersector is way slower than the combination of these 2 filters.
+**Response:** My issue: combination of BoundingBoxIntersectsFilter and ReferenceIntersector fails for LinkedDocumentElements, and it fails only when the LinkedInstance is moved.
+I understand why, and I understand this is not easily solved, but for now I can't use this combination of filters.
+The use of only ReferenceIntersector gives me the result I need, but when firering more than 1000 rays, the use of only ReferenceIntersector is way slower than the combination of these 2 filters.
 The geometry is there, at the location given, in the 3D view given, so i did not for see this behavior.
 
-Still a huge fan of the ReferenceIntersector Filter, but a little bit disappointed in the combination of these filters 🙂
+Still a huge fan of the ReferenceIntersector Filter, but a little bit disappointed in the combination of these filters.
 
-RPTHOMAS108
-
-You know the link instance position via its transform so you know where the bounding box needs to be relocated to suit that. The below code demonstrates using a logical or filter with bounding box for each inverse link instance location.
-
-
-
+**Answer (R):** You know the link instance position via its transform, so you know where the bounding box needs to be relocated to suit that.
+Below is some code that demonstrates using a logical `OR` filter with bounding box for each inverse link instance location.
 I tested this on two instances of the same link relocated from where they were inserted (X=0, Y=0):
 
-230503a.PNG
+<center>
+<img src="img/referenceintersector_with_link_02.png" alt="ReferenceIntersector with two link instances" title="ReferenceIntersector  with two link instances" width="420"/> <!-- Pixel Height: 572, Pixel Width: 845 -->
+</center>
 
-referenceintersector_with_link_02.png
+<pre class="prettyprint">
+  Private Function Obj_230305a(ByVal commandData As Autodesk.Revit.UI.ExternalCommandData,
+ByRef message As String, ByVal elements As Autodesk.Revit.DB.ElementSet) As Result
 
+    Dim UIApp As UIApplication = commandData.Application
+    Dim UIDoc As UIDocument = commandData.Application.ActiveUIDocument
+    If UIDoc Is Nothing Then Return Result.Cancelled Else
+    Dim IntDoc As Document = UIDoc.Document
 
-    Private Function Obj_230305a(ByVal commandData As Autodesk.Revit.UI.ExternalCommandData,
-ByRef         Dim UIApp As UIApplication = commandData.Application
-        Dim UIDoc As UIDocument = commandData.Application.ActiveUIDocument
-        If UIDoc Is Nothing Then Return Result.Cancelled Else
-        Dim IntDoc As Document = UIDoc.Document
+    Dim FEC As New FilteredElementCollector(IntDoc)
+    Dim RvtLnks As List(Of RevitLinkInstance) =
+        FEC.OfClass(GetType(RevitLinkInstance)).OfType(Of RevitLinkInstance).ToList
 
-        Dim FEC As New FilteredElementCollector(IntDoc)
-        Dim RvtLnks As List(Of RevitLinkInstance) =
-              FEC.OfClass(GetType(RevitLinkInstance)).OfType(Of RevitLinkInstance).ToList
+    Dim BBOrds As XYZ() = New XYZ(1) {New XYZ(-11.3, 10, -1), New XYZ(2.3, 31.9, 0.1)}
+    Dim EFs As ElementFilter() = New ElementFilter(RvtLnks.Count - 1) {}
 
-        Dim BBOrds As XYZ() = New XYZ(1) {New XYZ(-11.3, 10, -1), New XYZ(2.3, 31.9, 0.1)}
-        Dim EFs As ElementFilter() = New ElementFilter(RvtLnks.Count - 1) {}
+    For i = 0 To RvtLnks.Count - 1
+      Dim RInst As RevitLinkInstance = RvtLnks(i)
+      Dim Tinv As Transform = RInst.GetTransform.Inverse
+      Dim Min As XYZ = Tinv.OfPoint(BBOrds(0))
+      Dim Max As XYZ = Tinv.OfPoint(BBOrds(1))
+      Dim OL As New Outline(Min, Max)
+      EFs(i) = New BoundingBoxIsInsideFilter(OL)
+    Next
 
-        For i = 0 To RvtLnks.Count - 1
-            Dim RInst As RevitLinkInstance = RvtLnks(i)
-            Dim Tinv As Transform = RInst.GetTransform.Inverse
-            Dim Min As XYZ = Tinv.OfPoint(BBOrds(0))
-            Dim Max As XYZ = Tinv.OfPoint(BBOrds(1))
-            Dim OL As New Outline(Min, Max)
-            EFs(i) = New BoundingBoxIsInsideFilter(OL)
-        Next
+    Dim LorF As New LogicalOrFilter(EFs.ToList)
+    Dim V3D As View3D = TryCast(UIDoc.ActiveGraphicalView, View3D)
+    If V3D Is Nothing Then Return Result.Cancelled Else
 
-        Dim LorF As New LogicalOrFilter(EFs.ToList)
-        Dim V3D As View3D = TryCast(UIDoc.ActiveGraphicalView, View3D)
-        If V3D Is Nothing Then Return Result.Cancelled Else
+    Dim REFInt As New ReferenceIntersector(LorF, FindReferenceTarget.Element, V3D) With {.FindReferencesInRevitLinks = True}
 
-        Dim REFInt As New ReferenceIntersector(LorF, FindReferenceTarget.Element, V3D) With {.FindReferencesInRevitLinks = True}
+    Dim R As Reference = Nothing
+    Try
+      R = UIDoc.Selection.PickObject(Selection.ObjectType.Element, "Pick ray line")
+    Catch ex As Exception
+      Return Result.Cancelled
+    End Try
+    Dim CE As CurveElement = TryCast(IntDoc.GetElement(R), CurveElement)
+    If CE Is Nothing Then Return Result.Cancelled Else
+    Dim LN As Line = TryCast(CE.GeometryCurve, Line)
+    If LN Is Nothing Then Return Result.Cancelled Else
 
-        Dim R As Reference = Nothing
-        Try
-            R = UIDoc.Selection.PickObject(Selection.ObjectType.Element, "Pick ray line")
-        Catch ex As Exception
-            Return Result.Cancelled
-        End Try
-        Dim CE As CurveElement = TryCast(IntDoc.GetElement(R), CurveElement)
-        If CE Is Nothing Then Return Result.Cancelled Else
-        Dim LN As Line = TryCast(CE.GeometryCurve, Line)
-        If LN Is Nothing Then Return Result.Cancelled Else
+    Dim Res As List(Of ReferenceWithContext) = REFInt.Find(LN.GetEndPoint(0), LN.Direction)
 
-        Dim Res As List(Of ReferenceWithContext) = REFInt.Find(LN.GetEndPoint(0), LN.Direction)
+    For i = 0 To Res.Count - 1
+      Dim RwC As ReferenceWithContext = Res(i)
+      Dim Rf As Reference = RwC.GetReference
+      Debug.WriteLine($"{Rf.ElementId.IntegerValue}, {Rf.LinkedElementId?.IntegerValue}, {RwC.Proximity}")
+    Next
+    Return Result.Succeeded
 
-        For i = 0 To Res.Count - 1
-            Dim RwC As ReferenceWithContext = Res(i)
-            Dim Rf As Reference = RwC.GetReference
-            Debug.WriteLine($"{Rf.ElementId.IntegerValue}, {Rf.LinkedElementId?.IntegerValue}, {RwC.Proximity}")
-        Next
-        Return Result.Succeeded
-
-    End Function
-
+  End Function
+</pre>
 
 Output:
 
-
-
+<pre>
 432129, 432128, 6.68864267244516
 432129, 432128, 3.38973099408717
 432129, 432168, 13.2864660291611
@@ -215,88 +195,70 @@ Output:
 432142, 432128, 14.6895644493475
 432142, 432168, 24.5862994844214
 432142, 432168, 21.2873878060635
-
+</pre>
 
 Eight faces, two linked element ids in each of the two element ids representing link instances i.e. four unique permutations of ElementId, LinkedElementId.
 
-
-
 Can be noted that the faces are not returned in order of proximity.
-
-
 
 Note no link instance in position where bounding box points are transformed to in host document:
 
-230503b.PNG
+<center>
+<img src="img/referenceintersector_with_link_03.png" alt="ReferenceIntersector with two link instances" title="ReferenceIntersector  with two link instances" width="420"/> <!-- Pixel Height: 426, Pixel Width: 493 -->
+</center>
 
-referenceintersector_with_link_03.png
+**Answer (T):** The limitations you've encountered are explained in the ReferenceIntersector documentation.
 
+The long and short of it is you have one option available to get reliable results where links are concerned, and that's using the `ReferenceIntersector` overload taking a `View3D` argument only.
+This method is really slow, so you you could follow what @RPTHOMAS108 suggested, 'transform' the BB to the location of the link instance then provide your element filter.
+The problem with this is you'll need to do this for each link in your document and you'll end up accumulating live elements with each ReferenceIntersector + link elements from other links if their origin-to-origin location happens to coincide with your transformed BB.
+Subsequently, you'll have the additional problem of identifying duplicates and omitting them from your combined list of results once all your ReferenceIntersector's have run.
 
-thomas
+<center>
+<img src="img/referenceintersector_with_link_04.png" alt="ReferenceIntersector documentation" title="ReferenceIntersector documentation" width="420"/> <!-- Pixel Height: 1,135, Pixel Width: 2,768 -->
+</center>
 
-The limitations you've encountered are explained in the ReferenceIntersector documentation.
+**Answer (R):** In reality, you need only one bounding box filter per link instance, which could be combined into a logical or filter as above.
+So, not multiple reference intersections, just a single one or one for all the links combined and one for other elements (non-linked).
+You would need to include a non transformed bounding box if looking for elements not in links.
 
+All of the bounding boxes used in the `OR` filter will be overlapping in a similar position if they come from a single bounding box position that the ReferenceIntersector is using to focus on in the model.
+That transformed bounding box remote position will wrongly capture elements in the model away from the focus of the ReferenceIntersector, but the ReferenceIntersector itself will rule them out.
+I think further testing is required for cases where the link instance is moved parallel with the ReferenceIntersector ray.
+It would probably be a good idea to separate out the links into their own ReferenceIntersector and limit the length of the ray.
+I think there are probably simple cases we can prove where the above may go wrong.
 
+If using multiple ReferenceIntersectors, then identifying duplicates would not be a major issue.
+In any scenario we get back an ElementId and a linked ElementId, so a comparison based on that combination could be done with Distinct/Union etc.
 
-The long and short of it is you have one option available to get reliable results where links are concerned, and that's using the ReferenceIntersector(Autodesk.Revit.DB.View3D view3d) overload only. This method is really slow, so you you could follow what @RPTHOMAS108 suggested, 'transform' the BB to the location of the link instance then provide your element filter. The problem with this is you'll need to do this for each link in your document and you'll end up accumulating live elements with each ReferenceIntersector + link elements from other links if their origin-to-origin location happens to coincide with your transformed BB. Subsequently, you'll have the additional problem of identifying duplicates and omitting them from your combined list of results once all your ReferenceIntersector's have run.
+**Answer (T):** That's a good point, but you're only going to get a unique element using `FindNearest`.
+If you use `Find`, then you'll end up with duplicates as the BBs in a LogicOrFilter are iterated over.
+I guess it could be solved by adding all the BBs together, if they happen to intersect.
+If they don't but are in close proximity, then the same problem will occur.
+Untransformed BBs also wont help to preclude linked elements (if the flag is set); for example, if the origin-to-origin location of the link happens to coincide with the BB, linked elements will end up in the result.
+There's no good way to go about it really, but your suggestion to transform the bb is the way to go if thats what the @c.hanschen needs, otherwise see if there are better ways of achieving your end-goal.
 
-
-
-thomas_0-1678528264706.png
-
-referenceintersector_with_link_04.png
-
-
-RPTHOMAS108
-
-In reality you need only one bounding box filter per link instance which could be combined into a logical or filter as above. So not multiple reference intersections just a single one or one for all the links combined and one for other elements (non-linked). You would need to include a non transformed bounding box if looking for elements not in links.
-
-
-
-All of the bounding boxes used in the or filter will be overlapping in a similar position if they come from a single bounding box position that the ReferenceIntersector is using to focus on in the model. That transformed bounding box remote position will wrongly capture elements in the model away from the focus of the ReferenceIntersector but the ReferenceIntersector itself will rule them out. I think further testing is required for cases where the link instance is moved parallel with the ReferenceIntersector ray. It would probably be a good idea to separate out the links into their own ReferenceIntersector and limit the length of the ray. I think there are probably simple cases we can prove where the above may go wrong.
-
-
-
-If using multiple ReferenceIntersectors then identifying duplicates would not be a major issue. In any scenario we get back an ElementId and a linked ElementId so a comparison based on that combination could be done with Distinct/Union etc.
-
-
-
-
-
-thomas
-
-That's a good point but you're only going to get a unique element using FindNearest(). If you use Find() then you'll end up with duplicates as the BBs in a LogicOrFilter are iterated over. I guess it could be solved by adding all the BBs together, if they happen to intersect. If they don't but are in close proximity then the same problem will occur. Untransformed BBs also wont help to preclude linked elements (if the flag is set); for example if the origin-to-origin location of the link happens to coincide with the BB, linked elements will end up in the result. There's no good way to go about it really, but your suggestion to transform the bb is the way to go if thats what the @c.hanschen needs otherwise see if there are better ways of achieving your end-goal.
-
-RPTHOMAS108
-
-Yes it is a bit more complicated than initially considered.
-
-
+**Answer (R):** Yes, it is a bit more complicated than initially considered.
 
 We get back references and I think it is true to say that the elements not in links can be found via Reference.LinkedElementId being -1.
 
+So, we could perhaps reduce the problem to two ReferenceIntersectors one for the links where we have to filter out the non-linked elements. The second ReferenceIntersector would not have the flag set, so only find elements in the main document.
 
+I did some simple testing of problematic cases I thought would cause issues but didn't encounter such issues in practice.
+However I can't foresee every scenario used so suggest @c.hanschen satisfies themselves with testing the specific cases they are likely to encounter.
 
-So we could perhaps reduce the problem to two ReferenceIntersectors one for the links where we have to filter out the non-linked elements. The second ReferenceIntersector would not have the flag set so only find elements in the main document.
+**Answer (T):** The ReferenceIntersectors accepting linked elements will still collect any live elements in the host document if the ray hits, so removing duplicates post-process would still be necessary given this could occur in any given model.
 
-
-
-I did some simple testing of problematic cases I thought would cause issues but didn't encounter such issues in practice. However I can't foresee every scenario used so suggest @c.hanschen satisfies themselves with testing the specific cases they are likely to encounter.
-
-thomas
-The ReferenceIntersectors accepting linked elements will still collect any live elements in the host document if the ray hits, so removing duplicates post-process would still be necessary given this could occur in any given model.
-
-
-
-I've just discovered another problem using a filter with linked elements flagged: any live elements will be returned 3 times, irrespective of whether it passes the filter. Linked elements seem to be returned twice (which might make sense assuming the ray hits both sides of a wall element, but when omitting linked elements, only one live element is returned instead so its inconsistent?). Not sure if this is a bug CC @jeremy.tammik?
-
-
+I've just discovered another problem using a filter with linked elements flagged: any live elements will be returned 3 times, irrespective of whether it passes the filter. Linked elements seem to be returned twice (which might make sense assuming the ray hits both sides of a wall element, but when omitting linked elements, only one live element is returned instead so its inconsistent?). Not sure if this is a bug?
 
 Looks like the performance hit from ReferenceIntersector(Autodesk.Revit.DB.View3D view3d) overload is the lesser of all evils!
 
-
-
-public IList<int> GetElementsFromRayshoot(Document document, IList<BoundingBoxXYZ> boundingBoxes, XYZ origin, XYZ rayDirection)
+<pre class="prettyprint">
+public IList<int> GetElementsFromRayshoot(
+  Document document,
+  IList<BoundingBoxXYZ> boundingBoxes,
+  XYZ origin,
+  XYZ rayDirection)
 {
   var filters = new List<ElementFilter>();
   foreach (var boundingBox in boundingBoxes)
@@ -412,11 +374,6 @@ Thanks again for all your replies! much appreciated!
 ####<a name="3"></a>
 
 
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- 600 x 367 pixels -->
-</center>
-
-
 Many thanks to
  for sharing this nice solution.
 
@@ -431,11 +388,6 @@ Many thanks to
 **Answer:**
 
 <pre class="prettyprint lang-json">
-</pre>
-
-
-<pre class="prettyprint lang-cs">
-
 </pre>
 
 
