@@ -61,7 +61,7 @@ An extensive discussion on pros and cons of the reference intersector and how to
 - [Running Dalai LLaMa locally](#5)
 - [ChatGPT invented a game &ndash; creative?](#6)
 
-Before we get to that, let's briefly mention
+Before we get to the main topic, let's briefly mention
 
 ####<a name="1"></a> Otto Desć
 
