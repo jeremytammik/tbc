@@ -467,6 +467,28 @@ a [large language model](https://en.wikipedia.org/wiki/Large_language_model) fro
 Meta AI, similar to GPT, cf.
 the [list of large language models](https://en.wikipedia.org/wiki/Large_language_model#List_of_large_language_models)
 
+I followed the advice given and prompted "The sky is blue because:".
+The answer was rather weird.
+Next, I tried "Gandhi is famous for:".
+That produced an extremely sensible result, although I was surprised how long it went on for.
+I noteced the parameter `n_predict` was set to 1000, and reduced it to 100.
+With that setting, I am very happy indeed with the repsonse to my third prompt, "grass is green because":
+
+> grass is green because of the chlorophyll in leaves, but it would not be green without light.
+Light energy enters plants through their surface and converts to chemical potential for growth;
+this process takes place throughout most plant tissues including veins that conduct water and
+nutrients from roots upwardly into growing shoots or leaf blades (Figure 1).
+This is a fundamental dynamic of photosynthesis, the conversion of light energy by plants using CO2.
+In addition to being an important
+
+I see no Figure 1, and the result breaks of midsentence, after 79 words, including my four-word prompt.
+But apparently `n_predict` reallyt does control how much to spout.
+
+<center>
+<img src="img/dalai_llama.png" alt="Dalai LLaMa" title="Dalai LLaMa" width="600"/> <!-- Pixel Height: 821, Pixel Width: 1,000 -->
+</center>
+
+
 ####<a name="6"></a> ChatGPT Invented a Game &ndash; Creative?
 
 [A puzzle aficionado used ChatGPT to create a new game that's basically 'reverse Sudoku'](https://www.businessinsider.com/sudoku-like-puzzle-game-online-chatgpt-sumplete-2023-3).
