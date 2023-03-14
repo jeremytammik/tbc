@@ -25,7 +25,7 @@
 
 twitter:
 
-the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
+Using reference intersector with linked files and filters, installing large language models locally, an APS DA4R IFC exporter and dimensioning linked element voodoo with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/linkintersector
 
 Pros and cons of the reference intersector and how to use it with linked files and filtered element collectors, a design automation IFC exporter, dimensioning linked elements using the reference stable representation and new forays with large language models
 &ndash; Reference intersector with filters and links
