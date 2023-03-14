@@ -474,5 +474,5 @@ the [list of large language models](https://en.wikipedia.org/wiki/Large_language
 [Sumplete](https://sumplete.com)
 
 <center>
-<img src="img/sumplete.png" alt="Sumplete" title="Sumplete" width="490"/> <!-- Pixel Height: 572, Pixel Width: 845 -->
+<img src="img/sumplete.png" alt="Sumplete" title="Sumplete" width="400"/> <!-- Pixel Height: 9xx, Pixel Width: 600 -->
 </center>
