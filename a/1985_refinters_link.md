@@ -433,21 +433,8 @@ I have not found an official approach to address this need and am currently work
 </div>
 </div>
 
-
 This solution is not ideal and seems only work for liner dimension with my tests.
 I wonder if we can get the liked element reference in host without doing this.
-Thank you!
-
-
-
-
-**Question:**
-
-
-**Answer:**
-
-<pre class="prettyprint lang-json">
-</pre>
 
 ####<a name="5"></a> Dalai LLaMa
 
@@ -498,6 +485,8 @@ This is a post about using the API to write applications for our own needs, so
 <img src="img/dalai_llama.png" alt="Dalai LLaMa" title="Dalai LLaMa" width="600"/> <!-- Pixel Height: 821, Pixel Width: 1,000 -->
 </center>
 
+It does not seem to be as fine-tuned, well-managed and creative as ChatGPT (cf. [below](#6)),
+but seems like a fun, useful and quite impressive thing to have installed locally on my own system.
 
 ####<a name="6"></a> ChatGPT Invented a Game &ndash; Creative?
 
