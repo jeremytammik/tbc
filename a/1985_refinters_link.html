@@ -46,7 +46,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Reference Intersector with Links</h3>
-<h4><a name="2"></a></h4>
+<p>A long discussion on pros and cons of the reference intersector and how to use it with linked files and filtered element collections, an update to the design automation IFC exporter, dimensioning with linked elements using the reference stable representation and some new forays with large language models:</p>
+<ul>
+<li><a href="#2">Reference intersector with filters and links</a></li>
+<li><a href="#3">Revit IFC exporter for APS DA</a></li>
+<li><a href="#4">Stable representation voodoo with links</a></li>
+<li><a href="#5">Running Dalai LLaMa locally</a></li>
+<li><a href="#6">ChatGPT invented a game &ndash; creative?</a></li>
+</ul>
+<h4><a name="2"></a> Reference Intersector with Filters and Links</h4>
 <p>A lot of interesting information and insights on pros and cons based on years of experience on using the reference intersector in conjunction with other filters and in linked files was discussed
 by Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
 and Thomas Mahon of <a href="https://bimorph.com">Bimorph</a> in the question
@@ -315,7 +323,7 @@ his <a href="https://github.com/yiskang/forge-revit-ifc-exporter-appbundle#expor
 It demonstrates how to implement a Revit exporter appbundle for the APS Design Automation API that supports the Revit IFC export options.
 He now enhanced it to also support exporting IFC from a specific view.
 Many thanks to Eason for implementing and documenting this useful solution!</p>
-<h4><a name="4"></a> Stable Representation Voodoo</h4>
+<h4><a name="4"></a> Stable Representation Voodoo with Links</h4>
 <p>Eason also pointed out a neat use of the stable representation voodoo mentioned in the thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/create-dimensions-for-familyinstance-in-linked-file/m-p/8442391">creating dimensions for family instance in linked file</a>.</p>
 <p>I want to create dimensions between grids in host and linked duct elements.
@@ -369,25 +377,26 @@ I have not found an official approach to address this need and am currently work
 
 <p>This solution is not ideal and seems only work for liner dimension with my tests.
 I wonder if we can get the liked element reference in host without doing this.</p>
-<h4><a name="5"></a> Dalai LLaMa</h4>
+<h4><a name="5"></a> Running Dalai LLaMa Locally</h4>
 <p>Dalai provides a 'dead simple way' to run LLaMA on your computer:</p>
 <ul>
 <li><a href="https://github.com/cocktailpeanut/dalai">Github</a></li>
 <li><a href="https://twitter.com/cocktailpeanut">Twitter</a></li>
 </ul>
-<p>For example, if you want to know why the sky is blue, don't submit "Why is the sky blue?".</p>
-<p>Instead, submit "The sky is blue because:" and press enter.</p>
-<p>What is LLaMa?</p>
+<p>Huh? What is LLaMa?</p>
 <p>LLaMa is
 a <a href="https://en.wikipedia.org/wiki/Large_language_model">large language model</a> from
 Meta AI, similar to GPT, cf.
-the <a href="https://en.wikipedia.org/wiki/Large_language_model#List_of_large_language_models">list of large language models</a></p>
-<p>I followed the advice given and prompted "The sky is blue because:".
+the <a href="https://en.wikipedia.org/wiki/Large_language_model#List_of_large_language_models">list of large language models</a>.</p>
+<p>It handles prompts differently (and maybe less conveniently) than ChatGPY.
+For example, if you want to know why the sky is blue, don't submit "Why is the sky blue?".
+Instead, submit "The sky is blue because:" and press enter.</p>
+<p>I followed that advice and prompted "The sky is blue because:".
 The answer was rather weird.
 Next, I tried "Gandhi is famous for:".
 That produced an extremely sensible result, although I was surprised how long it went on for.
 I noteced the parameter <code>n_predict</code> was set to 1000, and reduced it to 100.
-With that setting, I am very happy indeed with the repsonse to my third prompt, "grass is green because":</p>
+With that setting, I was very happy indeed with the response to my third prompt, "grass is green because":</p>
 <blockquote>
 <p>grass is green because of the chlorophyll in leaves, but it would not be green without light.
 Light energy enters plants through their surface and converts to chemical potential for growth;
@@ -396,8 +405,8 @@ nutrients from roots upwardly into growing shoots or leaf blades (Figure 1).
 This is a fundamental dynamic of photosynthesis, the conversion of light energy by plants using CO2.
 In addition to being an important</p>
 </blockquote>
-<p>I see no Figure 1, and the result breaks of midsentence, after 79 words, including my four-word prompt.
-But apparently <code>n_predict</code> reallyt does control how much to spout.</p>
+<p>I see no Figure 1, and the result breaks off midsentence, after 79 words, including my four-word prompt.
+But apparently <code>n_predict</code> really does control more or less how much to spout.</p>
 <p>A final prompt to finish off, "The Revit API enables us to":</p>
 <blockquote>
 <p>The Revit API enables us to create our own custom applications for Revit.
@@ -408,6 +417,8 @@ For example – I’ve written an extension to allow users to create Revit
 families from within Inventor.
 This is a post about using the API to write applications for our own needs, so</p>
 </blockquote>
+<p>That seems like a pretty specific quote to me.
+Repeating the same prompt over produces completely different results each time.</p>
 <p><center>
 <img src="img/dalai_llama.png" alt="Dalai LLaMa" title="Dalai LLaMa" width="600"/> <!-- Pixel Height: 821, Pixel Width: 1,000 -->
 </center></p>

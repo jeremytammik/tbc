@@ -48,9 +48,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Reference Intersector with Links
 
+A long discussion on pros and cons of the reference intersector and how to use it with linked files and filtered element collections, an update to the design automation IFC exporter, dimensioning with linked elements using the reference stable representation and some new forays with large language models:
 
+- [Reference intersector with filters and links](#2)
+- [Revit IFC exporter for APS DA](#3)
+- [Stable representation voodoo with links](#4)
+- [Running Dalai LLaMa locally](#5)
+- [ChatGPT invented a game &ndash; creative?](#6)
 
-####<a name="2"></a>
+####<a name="2"></a> Reference Intersector with Filters and Links
 
 A lot of interesting information and insights on pros and cons based on years of experience on using the reference intersector in conjunction with other filters and in linked files was discussed
 by Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
@@ -377,7 +383,7 @@ It demonstrates how to implement a Revit exporter appbundle for the APS Design A
 He now enhanced it to also support exporting IFC from a specific view.
 Many thanks to Eason for implementing and documenting this useful solution!
 
-####<a name="4"></a> Stable Representation Voodoo
+####<a name="4"></a> Stable Representation Voodoo with Links
 
 Eason also pointed out a neat use of the stable representation voodoo mentioned in the thread
 on [creating dimensions for family instance in linked file](https://forums.autodesk.com/t5/revit-api-forum/create-dimensions-for-familyinstance-in-linked-file/m-p/8442391).
@@ -436,30 +442,30 @@ I have not found an official approach to address this need and am currently work
 This solution is not ideal and seems only work for liner dimension with my tests.
 I wonder if we can get the liked element reference in host without doing this.
 
-####<a name="5"></a> Dalai LLaMa
+####<a name="5"></a> Running Dalai LLaMa Locally
 
 Dalai provides a 'dead simple way' to run LLaMA on your computer:
 
 - [Github](https://github.com/cocktailpeanut/dalai)
 - [Twitter](https://twitter.com/cocktailpeanut)
 
-For example, if you want to know why the sky is blue, don't submit "Why is the sky blue?".
-
-Instead, submit "The sky is blue because:" and press enter.
-
-What is LLaMa?
+Huh? What is LLaMa?
 
 LLaMa is
 a [large language model](https://en.wikipedia.org/wiki/Large_language_model) from
 Meta AI, similar to GPT, cf.
-the [list of large language models](https://en.wikipedia.org/wiki/Large_language_model#List_of_large_language_models)
+the [list of large language models](https://en.wikipedia.org/wiki/Large_language_model#List_of_large_language_models).
 
-I followed the advice given and prompted "The sky is blue because:".
+It handles prompts differently (and maybe less conveniently) than ChatGPY.
+For example, if you want to know why the sky is blue, don't submit "Why is the sky blue?".
+Instead, submit "The sky is blue because:" and press enter.
+
+I followed that advice and prompted "The sky is blue because:".
 The answer was rather weird.
 Next, I tried "Gandhi is famous for:".
 That produced an extremely sensible result, although I was surprised how long it went on for.
 I noteced the parameter `n_predict` was set to 1000, and reduced it to 100.
-With that setting, I am very happy indeed with the repsonse to my third prompt, "grass is green because":
+With that setting, I was very happy indeed with the response to my third prompt, "grass is green because":
 
 > grass is green because of the chlorophyll in leaves, but it would not be green without light.
 Light energy enters plants through their surface and converts to chemical potential for growth;
@@ -468,8 +474,8 @@ nutrients from roots upwardly into growing shoots or leaf blades (Figure 1).
 This is a fundamental dynamic of photosynthesis, the conversion of light energy by plants using CO2.
 In addition to being an important
 
-I see no Figure 1, and the result breaks of midsentence, after 79 words, including my four-word prompt.
-But apparently `n_predict` reallyt does control how much to spout.
+I see no Figure 1, and the result breaks off midsentence, after 79 words, including my four-word prompt.
+But apparently `n_predict` really does control more or less how much to spout.
 
 A final prompt to finish off, "The Revit API enables us to":
 
@@ -480,6 +486,9 @@ covered by Autodesk yet in their main product offerings (in my opinion).
 For example – I’ve written an extension to allow users to create Revit
 families from within Inventor.
 This is a post about using the API to write applications for our own needs, so
+
+That seems like a pretty specific quote to me.
+Repeating the same prompt over produces completely different results each time.
 
 <center>
 <img src="img/dalai_llama.png" alt="Dalai LLaMa" title="Dalai LLaMa" width="600"/> <!-- Pixel Height: 821, Pixel Width: 1,000 -->
