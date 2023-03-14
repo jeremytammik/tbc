@@ -484,6 +484,16 @@ In addition to being an important
 I see no Figure 1, and the result breaks of midsentence, after 79 words, including my four-word prompt.
 But apparently `n_predict` reallyt does control how much to spout.
 
+A final prompt to finish off, "The Revit API enables us to":
+
+> The Revit API enables us to create our own custom applications for Revit.
+There is a huge amount of functionality built into the base application which
+we can use as-is, but there are also opportunities here that have not been
+covered by Autodesk yet in their main product offerings (in my opinion).
+For example – I’ve written an extension to allow users to create Revit
+families from within Inventor.
+This is a post about using the API to write applications for our own needs, so
+
 <center>
 <img src="img/dalai_llama.png" alt="Dalai LLaMa" title="Dalai LLaMa" width="600"/> <!-- Pixel Height: 821, Pixel Width: 1,000 -->
 </center>

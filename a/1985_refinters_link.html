@@ -388,6 +388,35 @@ Thank you!</p>
 a <a href="https://en.wikipedia.org/wiki/Large_language_model">large language model</a> from
 Meta AI, similar to GPT, cf.
 the <a href="https://en.wikipedia.org/wiki/Large_language_model#List_of_large_language_models">list of large language models</a></p>
+<p>I followed the advice given and prompted "The sky is blue because:".
+The answer was rather weird.
+Next, I tried "Gandhi is famous for:".
+That produced an extremely sensible result, although I was surprised how long it went on for.
+I noteced the parameter <code>n_predict</code> was set to 1000, and reduced it to 100.
+With that setting, I am very happy indeed with the repsonse to my third prompt, "grass is green because":</p>
+<blockquote>
+<p>grass is green because of the chlorophyll in leaves, but it would not be green without light.
+Light energy enters plants through their surface and converts to chemical potential for growth;
+this process takes place throughout most plant tissues including veins that conduct water and
+nutrients from roots upwardly into growing shoots or leaf blades (Figure 1).
+This is a fundamental dynamic of photosynthesis, the conversion of light energy by plants using CO2.
+In addition to being an important</p>
+</blockquote>
+<p>I see no Figure 1, and the result breaks of midsentence, after 79 words, including my four-word prompt.
+But apparently <code>n_predict</code> reallyt does control how much to spout.</p>
+<p>A final prompt to finish off, "The Revit API enables us to":</p>
+<blockquote>
+<p>The Revit API enables us to create our own custom applications for Revit.
+There is a huge amount of functionality built into the base application which
+we can use as-is, but there are also opportunities here that have not been
+covered by Autodesk yet in their main product offerings (in my opinion).
+For example – I’ve written an extension to allow users to create Revit
+families from within Inventor.
+This is a post about using the API to write applications for our own needs, so</p>
+</blockquote>
+<p><center>
+<img src="img/dalai_llama.png" alt="Dalai LLaMa" title="Dalai LLaMa" width="600"/> <!-- Pixel Height: 821, Pixel Width: 1,000 -->
+</center></p>
 <h4><a name="6"></a> ChatGPT Invented a Game &ndash; Creative?</h4>
 <p><a href="https://www.businessinsider.com/sudoku-like-puzzle-game-online-chatgpt-sumplete-2023-3">A puzzle aficionado used ChatGPT to create a new game that's basically 'reverse Sudoku'</a>.</p>
 <p>The result is online and has had tens of thousands visitors play already:</p>
