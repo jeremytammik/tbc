@@ -9,6 +9,12 @@
 - ReferenceIntersector+BoundingBoxIntersectsFilter fails on RevitLinkInstance ?
   https://forums.autodesk.com/t5/revit-api-forum/referenceintersector-boundingboxintersectsfilter-fails-on/td-p/11782120
 
+- this addin support exporting IFC from specific view now. I just added this support to it.
+  https://github.com/yiskang/forge-revit-ifc-exporter-appbundle#export-only-elements-visible-in-the-given-view-unique-id-via-inline-json
+  email [Internal discussions //Re: [EXT]:RE: Autodesk Forge]
+  Eason
+
+
 twitter:
 
 the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
@@ -350,18 +356,18 @@ We found that as modelling complexity increased over this time, so did compute t
 
 The ReferenceIntersector is also inconsistent if other types of element filter are used, so, returning to the original post, your best bet (simple, consistent but slow) is to use the `ReferenceIntersector` overload taking <i>Autodesk.Revit.DB.View3D view3d</i>, as addition of filters create more problems than they solve; otherwise, see if there are alternatives you can use.
 
-**Response:** Thanks for all your replies! I agree with the final conclusion: combining the RefIntersector with other Filters creates more problems than it solves! Using Transform to change the Boundingboxfilter is no solution, it has to be done for all the linkinstances, so same conclusion here: creates more problems than it solves.
-
+**Response:** Thanks for all your replies!
+I agree with the final conclusion: combining the RefIntersector with other Filters creates more problems than it solves! Using Transform to change the Boundingboxfilter is no solution, it has to be done for all the link instances, so same conclusion here: creates more problems than it solves.
 Thanks again for all your replies! Much appreciated!
 
-####<a name="3"></a>
+####<a name="3"></a> APS DA Revit IFC Exporter
 
-
-Many thanks to
- for sharing this nice solution.
-
-
-
+My colleague Eason [@yiskang](https://twitter.com/yiskang) Kang updated
+his [Revit IFC Exporter Appbundle for APS Design Automation](https://github.com/yiskang/forge-revit-ifc-exporter-appbundle#export-only-elements-visible-in-the-given-view-unique-id-via-inline-json
+).
+It demonstrates how to implement a Revit exporter appbundle for the APS Design Automation API that supports the Revit IFC export options.
+He now enhanced it to also support exporting IFC from a specific view.
+Many thanks to Eason for implementing and documenting this useful solution.
 
 ####<a name="4"></a>
 

@@ -8,6 +8,12 @@
 - ReferenceIntersector+BoundingBoxIntersectsFilter fails on RevitLinkInstance ?
   https://forums.autodesk.com/t5/revit-api-forum/referenceintersector-boundingboxintersectsfilter-fails-on/td-p/11782120
 
+- this addin support exporting IFC from specific view now. I just added this support to it.
+  https://github.com/yiskang/forge-revit-ifc-exporter-appbundle#export-only-elements-visible-in-the-given-view-unique-id-via-inline-json
+  email [Internal discussions //Re: [EXT]:RE: Autodesk Forge]
+  Eason
+
+
 twitter:
 
 the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
@@ -292,11 +298,15 @@ I think however it does demonstrate that the ReferenceIntersector isn't internal
 Coincidentally, we just removed calls to the ReferenceIntersector in one of our apps having used it for over 2 years.
 We found that as modelling complexity increased over this time, so did compute time, resulting in a performance increase of around 95% once we replaced it with an alternative (surface projection once, then storing this result in our object model).</p>
 <p>The ReferenceIntersector is also inconsistent if other types of element filter are used, so, returning to the original post, your best bet (simple, consistent but slow) is to use the <code>ReferenceIntersector</code> overload taking <i>Autodesk.Revit.DB.View3D view3d</i>, as addition of filters create more problems than they solve; otherwise, see if there are alternatives you can use.</p>
-<p><strong>Response:</strong> Thanks for all your replies! I agree with the final conclusion: combining the RefIntersector with other Filters creates more problems than it solves! Using Transform to change the Boundingboxfilter is no solution, it has to be done for all the linkinstances, so same conclusion here: creates more problems than it solves.</p>
-<p>Thanks again for all your replies! Much appreciated!</p>
-<h4><a name="3"></a></h4>
-<p>Many thanks to
- for sharing this nice solution.</p>
+<p><strong>Response:</strong> Thanks for all your replies!
+I agree with the final conclusion: combining the RefIntersector with other Filters creates more problems than it solves! Using Transform to change the Boundingboxfilter is no solution, it has to be done for all the link instances, so same conclusion here: creates more problems than it solves.
+Thanks again for all your replies! Much appreciated!</p>
+<h4><a name="3"></a> APS DA Revit IFC Exporter</h4>
+<p>My colleague Eason <a href="https://twitter.com/yiskang">@yiskang</a> Kang updated
+his <a href="https://github.com/yiskang/forge-revit-ifc-exporter-appbundle#export-only-elements-visible-in-the-given-view-unique-id-via-inline-json">Revit IFC Exporter Appbundle for APS Design Automation</a>.
+It demonstrates how to implement a Revit exporter appbundle for the APS Design Automation API that supports the Revit IFC export options.
+He now enhanced it to also support exporting IFC from a specific view.
+Many thanks to Eason for implementing and documenting this useful solution.</p>
 <h4><a name="4"></a></h4>
 <p><strong>Question:</strong></p>
 <p><strong>Answer:</strong></p>
