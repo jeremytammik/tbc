@@ -360,14 +360,14 @@ The ReferenceIntersector is also inconsistent if other types of element filter a
 I agree with the final conclusion: combining the RefIntersector with other Filters creates more problems than it solves! Using Transform to change the Boundingboxfilter is no solution, it has to be done for all the link instances, so same conclusion here: creates more problems than it solves.
 Thanks again for all your replies! Much appreciated!
 
-####<a name="3"></a> APS DA Revit IFC Exporter
+####<a name="3"></a> Revit IFC Exporter for APS DA
 
 My colleague Eason [@yiskang](https://twitter.com/yiskang) Kang updated
-his [Revit IFC Exporter Appbundle for APS Design Automation](https://github.com/yiskang/forge-revit-ifc-exporter-appbundle#export-only-elements-visible-in-the-given-view-unique-id-via-inline-json
+his [Revit IFC exporter for APS Design Automation](https://github.com/yiskang/forge-revit-ifc-exporter-appbundle#export-only-elements-visible-in-the-given-view-unique-id-via-inline-json
 ).
 It demonstrates how to implement a Revit exporter appbundle for the APS Design Automation API that supports the Revit IFC export options.
 He now enhanced it to also support exporting IFC from a specific view.
-Many thanks to Eason for implementing and documenting this useful solution.
+Many thanks to Eason for implementing and documenting this useful solution!
 
 ####<a name="4"></a>
 
