@@ -54,11 +54,23 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 An extensive discussion on pros and cons of the reference intersector and how to use it with linked files and filtered element collectors, an update to the design automation IFC exporter, dimensioning with linked elements using the reference stable representation and some new forays with large language models:
 
+- [Otto Desć](#1)
 - [Reference intersector with filters and links](#2)
 - [Revit IFC exporter for APS DA](#3)
 - [Stable representation voodoo with links](#4)
 - [Running Dalai LLaMa locally](#5)
 - [ChatGPT invented a game &ndash; creative?](#6)
+
+Before we get to that, let's briefly mention
+
+####<a name="1"></a> Otto Desć
+
+The Oscar ceremony was punctuated by a series of advertisements by Autodesk.
+Some pay homage to a mythical filmmaker and visual effects specialist named Otto Desćinski, or Otto Desć to his friends, e.g.,
+the two-minute spot [Autodesk makes the software that makes the magic](https://youtu.be/MqMg9iAjwdw):
+
+<iframe width="480" height="270" src="https://www.youtube.com/embed/MqMg9iAjwdw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
 
 ####<a name="2"></a> Reference Intersector with Filters and Links
 
