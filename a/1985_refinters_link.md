@@ -74,7 +74,7 @@ Even when using linked models, the ReferenceIntersector can find the link (at fi
 
 When the RevitLinkInstance is NOT moved, the combination of ReferenceIntersector + BoundingBoxIntersectsFilter works great, but when the RevitLinkInstance is moved, no elements are found.
 
-It seems as if the BoundingBoxIntersectsFilter not only filters elements in the opened model, but also the elements in the linked model, by checkng their coordinates or something.
+It seems as if the BoundingBoxIntersectsFilter not only filters elements in the opened model, but also the elements in the linked model, by checking their coordinates or something.
 
 But, when the RevitLinkInstance is moved in your opened models, the coordinates are different, and the BoundingBoxIntersectsFilter fails.
 
@@ -101,7 +101,7 @@ Since the filters mentioned do not know about the link's transform, they assume 
 You can't really affect the ElementInteresectsElementFilter, as it looks directly at the Element's geometry within the link, but you can apply the transform to the bounding box for BoundingBoxIntersectsFilter before you pass it in.
 Note that rotations might cause a different size bounding box to be generated as the input bounding box is always aligned with whatever coordinate system is in the host model.
 
-**Response:** Applying the transform to the bounding box for the BoundingBoxIntersectsFilter before passing it in would only be a possibility when when you are just investigating this one link, no other links (with different transform) or elements in the opened model with the same Ray.
+**Response:** Applying the transform to the bounding box for the BoundingBoxIntersectsFilter before passing it in would only be a possibility when you are just investigating this one link, no other links (with different transform) or elements in the opened model with the same Ray.
 
 You say the filters mentioned do not know about the link's transform... Why not? When hitting a RevitLinkInstance, the transform is known, can't this be used?
 
@@ -116,7 +116,7 @@ Hence, that is why the filter doesn't know.
 The ReferenceIntersector is not a slow filter, or any kind of filter at all; it is a utility to strike something with a ray based on origin and direction.
 The ReferenceIntersector works within the current document where the various links take up a final specific known position; so, it is not analogous to an element filter or limitation of such.
 
-The RefereceIntersector will only find things based upon visibility of the elements in the 3D view provided.
+The ReferenceIntersector will only find things based upon visibility of the elements in the 3D view provided.
 So, that is one way of filtering beforehand what the RefereceIntersector strikes.
 Although visibility control of elements in links via the API is fairly limited still.
 Regarding links, the suggestion I believe is to transform the bounding box into the space of the linked document.
@@ -228,7 +228,7 @@ Note no link instance in position where bounding box points are transformed to i
 **Answer (T):** The limitations you've encountered are explained in the ReferenceIntersector documentation.
 
 The long and short of it is you have one option available to get reliable results where links are concerned, and that's using the `ReferenceIntersector` overload taking a `View3D` argument only.
-This method is really slow, so you you could follow what @RPTHOMAS108 suggested, 'transform' the BB to the location of the link instance then provide your element filter.
+This method is really slow, so you could follow what @RPTHOMAS108 suggested, 'transform' the BB to the location of the link instance then provide your element filter.
 The problem with this is you'll need to do this for each link in your document and you'll end up accumulating live elements with each ReferenceIntersector + link elements from other links if their origin-to-origin location happens to coincide with your transformed BB.
 Subsequently, you'll have the additional problem of identifying duplicates and omitting them from your combined list of results once all your ReferenceIntersector's have run.
 
@@ -446,7 +446,7 @@ I wonder if we can get the liked element reference in host without doing this.
 
 Dalai provides a 'dead simple way' to run LLaMA on your computer:
 
-- [Github](https://github.com/cocktailpeanut/dalai)
+- [GitHub](https://github.com/cocktailpeanut/dalai)
 - [Twitter](https://twitter.com/cocktailpeanut)
 
 Huh? What is LLaMa?
@@ -456,15 +456,15 @@ a [large language model](https://en.wikipedia.org/wiki/Large_language_model) fro
 Meta AI, similar to GPT, cf.
 the [list of large language models](https://en.wikipedia.org/wiki/Large_language_model#List_of_large_language_models).
 
-It handles prompts differently (and maybe less conveniently) than ChatGPY.
+LLaMa handles prompts differently (and maybe less conveniently) than ChatGPT.
 For example, if you want to know why the sky is blue, don't submit "Why is the sky blue?".
 Instead, submit "The sky is blue because:" and press enter.
 
 I followed that advice and prompted "The sky is blue because:".
 The answer was rather weird.
 Next, I tried "Gandhi is famous for:".
-That produced an extremely sensible result, although I was surprised how long it went on for.
-I noteced the parameter `n_predict` was set to 1000, and reduced it to 100.
+That produced a very sensible result, although I was surprised how long it went on for.
+I noticed the parameter `n_predict` was set to 1000 and reduced it to 100.
 With that setting, I was very happy indeed with the response to my third prompt, "grass is green because":
 
 > grass is green because of the chlorophyll in leaves, but it would not be green without light.
@@ -487,15 +487,16 @@ For example – I’ve written an extension to allow users to create Revit
 families from within Inventor.
 This is a post about using the API to write applications for our own needs, so
 
-That seems like a pretty specific quote to me.
-Repeating the same prompt over produces completely different results each time.
+This answer seems to include a pretty specific quote.
+I repeated the same prompt several times.
+The result was completely different for each, and each sounded as if taken from some specific source document.
 
 <center>
 <img src="img/dalai_llama.png" alt="Dalai LLaMa" title="Dalai LLaMa" width="600"/> <!-- Pixel Height: 821, Pixel Width: 1,000 -->
 </center>
 
-It does not seem to be as fine-tuned, well-managed and creative as ChatGPT (cf. [below](#6)),
-but seems like a fun, useful and quite impressive thing to have installed locally on my own system.
+LLaMa does not seem to be as fine-tuned, well-managed and creative as ChatGPT (cf. [below](#6)),
+but seems like a fun, useful and very impressive thing to have installed locally on my own system.
 
 ####<a name="6"></a> ChatGPT Invented a Game &ndash; Creative?
 
