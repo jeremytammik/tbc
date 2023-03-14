@@ -27,8 +27,12 @@ twitter:
 
 the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-&ndash;
-...
+Pros and cons of the reference intersector and how to use it with linked files and filtered element collectors, a design automation IFC exporter, dimensioning linked elements using the reference stable representation and new forays with large language models
+&ndash; Reference intersector with filters and links
+&ndash; Revit IFC exporter for APS DA
+&ndash; Stable representation voodoo with links
+&ndash; Running Dalai LLaMa locally
+&ndash; ChatGPT invented a game...
 
 linkedin:
 
@@ -46,9 +50,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Reference Intersector with Links
+### IFC, Dimension and Reference Intersector with Links
 
-A long discussion on pros and cons of the reference intersector and how to use it with linked files and filtered element collections, an update to the design automation IFC exporter, dimensioning with linked elements using the reference stable representation and some new forays with large language models:
+An extensive discussion on pros and cons of the reference intersector and how to use it with linked files and filtered element collectors, an update to the design automation IFC exporter, dimensioning with linked elements using the reference stable representation and some new forays with large language models:
 
 - [Reference intersector with filters and links](#2)
 - [Revit IFC exporter for APS DA](#3)
@@ -377,8 +381,7 @@ Thanks again for all your replies! Much appreciated!
 ####<a name="3"></a> Revit IFC Exporter for APS DA
 
 My colleague Eason [@yiskang](https://twitter.com/yiskang) Kang updated
-his [Revit IFC exporter for APS Design Automation](https://github.com/yiskang/forge-revit-ifc-exporter-appbundle#export-only-elements-visible-in-the-given-view-unique-id-via-inline-json
-).
+his [Revit IFC exporter for APS Design Automation](https://github.com/yiskang/forge-revit-ifc-exporter-appbundle#export-only-elements-visible-in-the-given-view-unique-id-via-inline-json).
 It demonstrates how to implement a Revit exporter appbundle for the APS Design Automation API that supports the Revit IFC export options.
 He now enhanced it to also support exporting IFC from a specific view.
 Many thanks to Eason for implementing and documenting this useful solution!
@@ -440,7 +443,7 @@ I have not found an official approach to address this need and am currently work
 </div>
 
 This solution is not ideal and seems only work for liner dimension with my tests.
-I wonder if we can get the liked element reference in host without doing this.
+I wonder if we can get the linked element reference in host without doing this.
 
 ####<a name="5"></a> Running Dalai LLaMa Locally
 
@@ -455,6 +458,11 @@ LLaMa is
 a [large language model](https://en.wikipedia.org/wiki/Large_language_model) from
 Meta AI, similar to GPT, cf.
 the [list of large language models](https://en.wikipedia.org/wiki/Large_language_model#List_of_large_language_models).
+
+I went ahead and tried out the 'dead simple' approach.
+All I did was enter the two prompts suggested, one to download and build, the second to run locally.
+My first attempt to download and build failed after ten minutes or so, the second succeeded with no changes or intervention from my side.
+So, after less than half an hour and just two command line prompts, I was up and running my own local LLaMa instance.
 
 LLaMa handles prompts differently (and maybe less conveniently) than ChatGPT.
 For example, if you want to know why the sky is blue, don't submit "Why is the sky blue?".
@@ -502,7 +510,7 @@ but seems like a fun, useful and very impressive thing to have installed locally
 
 [A puzzle aficionado used ChatGPT to create a new game that's basically 'reverse Sudoku'](https://www.businessinsider.com/sudoku-like-puzzle-game-online-chatgpt-sumplete-2023-3).
 
-The result is online and has had tens of thousands visitors play already:
+The result is online and has had tens of thousands of visitors play already:
 
 - [Sumplete](https://sumplete.com)
 

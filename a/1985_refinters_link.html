@@ -26,8 +26,12 @@ twitter:
 
 the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-&ndash;
-...
+Pros and cons of the reference intersector and how to use it with linked files and filtered element collectors, a design automation IFC exporter, dimensioning linked elements using the reference stable representation and new forays with large language models
+&ndash; Reference intersector with filters and links
+&ndash; Revit IFC exporter for APS DA
+&ndash; Stable representation voodoo with links
+&ndash; Running Dalai LLaMa locally
+&ndash; ChatGPT invented a game...
 
 linkedin:
 
@@ -45,8 +49,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Reference Intersector with Links</h3>
-<p>A long discussion on pros and cons of the reference intersector and how to use it with linked files and filtered element collections, an update to the design automation IFC exporter, dimensioning with linked elements using the reference stable representation and some new forays with large language models:</p>
+<h3>IFC, Dimension and Reference Intersector with Links</h3>
+<p>An extensive discussion on pros and cons of the reference intersector and how to use it with linked files and filtered element collectors, an update to the design automation IFC exporter, dimensioning with linked elements using the reference stable representation and some new forays with large language models:</p>
 <ul>
 <li><a href="#2">Reference intersector with filters and links</a></li>
 <li><a href="#3">Revit IFC exporter for APS DA</a></li>
@@ -376,7 +380,7 @@ I have not found an official approach to address this need and am currently work
 </div>
 
 <p>This solution is not ideal and seems only work for liner dimension with my tests.
-I wonder if we can get the liked element reference in host without doing this.</p>
+I wonder if we can get the linked element reference in host without doing this.</p>
 <h4><a name="5"></a> Running Dalai LLaMa Locally</h4>
 <p>Dalai provides a 'dead simple way' to run LLaMA on your computer:</p>
 <ul>
@@ -388,6 +392,10 @@ I wonder if we can get the liked element reference in host without doing this.</
 a <a href="https://en.wikipedia.org/wiki/Large_language_model">large language model</a> from
 Meta AI, similar to GPT, cf.
 the <a href="https://en.wikipedia.org/wiki/Large_language_model#List_of_large_language_models">list of large language models</a>.</p>
+<p>I went ahead and tried out the 'dead simple' approach.
+All I did was enter the two prompts suggested, one to download and build, the second to run locally.
+My first attempt to download and build failed after ten minutes or so, the second succeeded with no changes or intervention from my side.
+So, after less than half an hour and just two command line prompts, I was up and running my own local LLaMa instance.</p>
 <p>LLaMa handles prompts differently (and maybe less conveniently) than ChatGPT.
 For example, if you want to know why the sky is blue, don't submit "Why is the sky blue?".
 Instead, submit "The sky is blue because:" and press enter.</p>
@@ -427,7 +435,7 @@ The result was completely different for each, and each sounded as if taken from 
 but seems like a fun, useful and very impressive thing to have installed locally on my own system.</p>
 <h4><a name="6"></a> ChatGPT Invented a Game &ndash; Creative?</h4>
 <p><a href="https://www.businessinsider.com/sudoku-like-puzzle-game-online-chatgpt-sumplete-2023-3">A puzzle aficionado used ChatGPT to create a new game that's basically 'reverse Sudoku'</a>.</p>
-<p>The result is online and has had tens of thousands visitors play already:</p>
+<p>The result is online and has had tens of thousands of visitors play already:</p>
 <ul>
 <li><a href="https://sumplete.com">Sumplete</a></li>
 </ul>
