@@ -506,6 +506,10 @@ The result was completely different for each, and each sounded as if taken from 
 LLaMa does not seem to be as fine-tuned, well-managed and creative as ChatGPT (cf. [below](#6)),
 but seems like a fun, useful and very impressive thing to have installed locally on my own system.
 
+I tried it a few more times after writing this and am not so impressed after all.
+ChatGPT is much more to my liking.
+I wish I could install that locally.
+
 ####<a name="6"></a> ChatGPT Invented a Game &ndash; Creative?
 
 [A puzzle aficionado used ChatGPT to create a new game that's basically 'reverse Sudoku'](https://www.businessinsider.com/sudoku-like-puzzle-game-online-chatgpt-sumplete-2023-3).
