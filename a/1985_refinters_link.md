@@ -139,7 +139,7 @@ Below is some code that demonstrates using a logical `OR` filter with bounding b
 I tested this on two instances of the same link relocated from where they were inserted (X=0, Y=0):
 
 <center>
-<img src="img/referenceintersector_with_link_02.png" alt="ReferenceIntersector with two link instances" title="ReferenceIntersector  with two link instances" width="490"/> <!-- Pixel Height: 572, Pixel Width: 845 -->
+<img src="img/referenceintersector_with_link_02.png" alt="ReferenceIntersector with two link instances" title="ReferenceIntersector with two link instances" width="490"/> <!-- Pixel Height: 572, Pixel Width: 845 -->
 </center>
 
 <pre class="prettyprint">
@@ -470,3 +470,9 @@ the [list of large language models](https://en.wikipedia.org/wiki/Large_language
 ####<a name="6"></a> ChatGPT Invented a Game &ndash; Creative?
 
 [A puzzle aficionado used ChatGPT to create a new game that's basically 'reverse Sudoku'](https://www.businessinsider.com/sudoku-like-puzzle-game-online-chatgpt-sumplete-2023-3)
+
+[Sumplete](https://sumplete.com)
+
+<center>
+<img src="img/sumplete.png" alt="Sumplete" title="Sumplete" width="490"/> <!-- Pixel Height: 572, Pixel Width: 845 -->
+</center>
