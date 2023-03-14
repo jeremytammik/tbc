@@ -14,6 +14,14 @@
   email [Internal discussions //Re: [EXT]:RE: Autodesk Forge]
   Eason
 
+- Eason also pointed out this neat use of the stable representation voodoo
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1677833276435759
+  Do we have updates for the old opening ticket REVIT-141823 ?
+  We got a similar case of creating dimensions between grids in host and liked Duct elements with Revit 2020 via SFDC#20157388, but I can also reproduce this issue with Revit 2023.
+  Although we can workaround this by transforming linked element’s reference like below, it’s not ideal.
+  This approach seems only work for liner dimension with my tests.
+  So, I wonder if we can get the liked element reference in host w/o doing this. Thank you!
+  https://forums.autodesk.com/t5/revit-api-forum/create-dimensions-for-familyinstance-in-linked-file/m-p/8442391
 
 twitter:
 
@@ -369,7 +377,69 @@ It demonstrates how to implement a Revit exporter appbundle for the APS Design A
 He now enhanced it to also support exporting IFC from a specific view.
 Many thanks to Eason for implementing and documenting this useful solution!
 
-####<a name="4"></a>
+####<a name="4"></a> Stable Representation Voodoo
+
+Eason also pointed out a neat use of the stable representation voodoo mentioned in the thread
+on [creating dimensions for family instance in linked file](https://forums.autodesk.com/t5/revit-api-forum/create-dimensions-for-familyinstance-in-linked-file/m-p/8442391).
+
+I want to create dimensions between grids in host and linked duct elements.
+I have not found an official approach to address this need and am currently working around it by transforming the linked element’s reference like this:
+
+
+<div style="border: #000080 1px solid; color: #000; font-family: 'Cascadia Mono', Consolas, 'Courier New', Courier, Monospace; font-size: 10pt">
+<div style="background: #f3f3f3; color: #000000; max-height: 300px; overflow: auto">
+<ol start="24" style="background: #ffffff; margin: 0; padding: 0;">
+<li><span style="color:#0000ff">private</span> Reference MakeLinkedReference4Dimension(Document doc, Reference r)</li>
+<li style="background: #f3f3f3">{</li>
+<li>&#160; <span style="color:#0000ff">if</span> (r.LinkedElementId == ElementId.InvalidElementId) <span style="color:#0000ff">return</span> <span style="color:#0000ff">null</span>;</li>
+<li style="background: #f3f3f3">&#160; <span style="color:#0000ff">string</span>[] ss = r.ConvertToStableRepresentation(doc).Split(<span style="color:#a31515">&#39;:&#39;</span>);</li>
+<li>&#160; <span style="color:#0000ff">string</span> res = <span style="color:#0000ff">string</span>.Empty;</li>
+<li style="background: #f3f3f3">&#160; <span style="color:#0000ff">bool</span> first = <span style="color:#0000ff">true</span>;</li>
+<li>&#160; <span style="color:#0000ff">foreach</span> (<span style="color:#0000ff">string</span> s <span style="color:#0000ff">in</span> ss)</li>
+<li style="background: #f3f3f3">&#160; {</li>
+<li>&#160;&#160;&#160; <span style="color:#0000ff">string</span> t = s;</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160; <span style="color:#0000ff">if</span> (s.Contains(<span style="color:#a31515">&quot;RVTLINK&quot;</span>))</li>
+<li>&#160;&#160;&#160; {</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160; <span style="color:#0000ff">if</span> (res.EndsWith(<span style="color:#a31515">&quot;:0&quot;</span>)) { t = <span style="color:#a31515">&quot;RVTLINK&quot;</span>; }</li>
+<li>&#160;&#160;&#160;&#160;&#160; <span style="color:#0000ff">else</span> { t = <span style="color:#a31515">&quot;0:RVTLINK&quot;</span>; }</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160; }</li>
+<li>&#160;&#160;&#160; <span style="color:#0000ff">if</span> (!first)</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160; {</li>
+<li>&#160;&#160;&#160;&#160;&#160; res = <span style="color:#0000ff">string</span>.Concat(res, <span style="color:#a31515">&quot;:&quot;</span>, t);</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160; }</li>
+<li>&#160;&#160;&#160; <span style="color:#0000ff">else</span></li>
+<li style="background: #f3f3f3">&#160;&#160;&#160; {</li>
+<li>&#160;&#160;&#160;&#160;&#160; res = t;</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160;&#160;&#160; first = <span style="color:#0000ff">false</span>;</li>
+<li>&#160;&#160;&#160; }</li>
+<li style="background: #f3f3f3">&#160; }</li>
+<li>&nbsp;</li>
+<li style="background: #f3f3f3">&#160; res += <span style="color:#a31515">&quot;:0:LINEAR&quot;</span>; <span style="color:#008000">//!&lt;&lt;&lt; this line added by ADN team</span></li>
+<li>&#160; <span style="color:#0000ff">return</span> Reference.ParseFromStableRepresentation(doc, res);</li>
+<li style="background: #f3f3f3">}</li>
+<li>&nbsp;</li>
+<li style="background: #f3f3f3">&#160; <span style="color:#0000ff">var</span> ductRef1 = <span style="color:#0000ff">new</span> Reference(duct1);</li>
+<li>&#160; Reference ductRefInHost = <span style="color:#0000ff">null</span>;</li>
+<li style="background: #f3f3f3">&#160; Transform linkTtransform = <span style="color:#0000ff">null</span>;</li>
+<li>&nbsp;</li>
+<li style="background: #f3f3f3">&#160; <span style="color:#0000ff">using</span> (<span style="color:#0000ff">var</span> collector = <span style="color:#0000ff">new</span> FilteredElementCollector(<span style="color:#0000ff">this</span>.Document))</li>
+<li>&#160; {</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160; <span style="color:#0000ff">var</span> instance = collector.OfClass(<span style="color:#0000ff">typeof</span>(RevitLinkInstance)).FirstElement() <span style="color:#0000ff">as</span> RevitLinkInstance;</li>
+<li>&#160;&#160;&#160; linkTtransform = instance.GetTotalTransform();</li>
+<li style="background: #f3f3f3">&#160;&#160;&#160; ductRefInHost = ductRef1.CreateLinkReference(instance);</li>
+<li>&#160;&#160;&#160; ductRefInHost = <span style="color:#0000ff">this</span>.MakeLinkedReference4Dimension(<span style="color:#0000ff">this</span>.Document, ductRefInHost);</li>
+<li style="background: #f3f3f3">&#160; }</li>
+</ol>
+</div>
+</div>
+
+
+This solution is not ideal and seems only work for liner dimension with my tests.
+I wonder if we can get the liked element reference in host without doing this.
+Thank you!
+
+
+
 
 **Question:**
 
@@ -379,6 +449,24 @@ Many thanks to Eason for implementing and documenting this useful solution!
 <pre class="prettyprint lang-json">
 </pre>
 
+####<a name="5"></a> Dalai LLaMa
 
+Dalai provides a 'dead simple way' to run LLaMA on your computer:
 
+- [Github](https://github.com/cocktailpeanut/dalai)
+- [Twitter](https://twitter.com/cocktailpeanut)
 
+For example, if you want to know why the sky is blue, don't submit "Why is the sky blue?".
+
+Instead, submit "The sky is blue because:" and press enter.
+
+What is LLaMa?
+
+LLaMa is
+a [large language model](https://en.wikipedia.org/wiki/Large_language_model) from
+Meta AI, similar to GPT, cf.
+the [list of large language models](https://en.wikipedia.org/wiki/Large_language_model#List_of_large_language_models)
+
+####<a name="6"></a> ChatGPT Invented a Game &ndash; Creative?
+
+[A puzzle aficionado used ChatGPT to create a new game that's basically 'reverse Sudoku'](https://www.businessinsider.com/sudoku-like-puzzle-game-online-chatgpt-sumplete-2023-3)
