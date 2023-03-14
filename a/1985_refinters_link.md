@@ -469,9 +469,11 @@ the [list of large language models](https://en.wikipedia.org/wiki/Large_language
 
 ####<a name="6"></a> ChatGPT Invented a Game &ndash; Creative?
 
-[A puzzle aficionado used ChatGPT to create a new game that's basically 'reverse Sudoku'](https://www.businessinsider.com/sudoku-like-puzzle-game-online-chatgpt-sumplete-2023-3)
+[A puzzle aficionado used ChatGPT to create a new game that's basically 'reverse Sudoku'](https://www.businessinsider.com/sudoku-like-puzzle-game-online-chatgpt-sumplete-2023-3).
 
-[Sumplete](https://sumplete.com)
+The result is online and has had tens of thousands visitors play already:
+
+- [Sumplete](https://sumplete.com)
 
 <center>
 <img src="img/sumplete.png" alt="Sumplete" title="Sumplete" width="400"/> <!-- Pixel Height: 9xx, Pixel Width: 600 -->
