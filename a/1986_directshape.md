@@ -10,6 +10,18 @@
   https://forums.autodesk.com/t5/revit-api-forum/modify-directshapetype/m-p/11802821
   DirectShape versus AddExternallyTaggedGeometry
 
+- avoid conflict with revit dlls
+  Do I need to include RevitAPI.dll and RevitAPIUI.dll in my release package?
+  https://forums.autodesk.com/t5/revit-api-forum/do-i-need-to-include-revitapi-dll-and-revitapiui-dll-in-my/m-p/11727761
+
+- SSSVG Interactive SVG Reference
+  https://fffuel.co/sssvg/
+  SVGs are awesome! Thanks to math and geometry, SVG graphics give us a standardized way to create images and icons on the web to be displayed at any size without any loss in image quality.
+  Here's an interactive reference to the most popular and/or interesting parts of the SVG spec.
+
+- Coding Accessibility: Becky
+  https://youtu.be/MmHqthzJER4
+
 twitter:
 
  with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/linkintersector
@@ -63,3 +75,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ####<a name="4"></a>
 
 ####<a name="5"></a>
+
+One of the most touching YouTube videos I have ever seen, a ten-minute documentary
+
+The first installment in GitHub’s “Coding Accessibility” video series features Becky Tyler, a bright, funny, and incredibly tenacious young woman with quadriplegic cerebral palsy who interacts with her computer exclusively by using her eyes. Becky started off simply wanting to play Minecraft, but the shortcomings of available accessibility tech led her down a path beyond mining ore and into the world of open source software and collaboration. She now attends the University of Dundee, where she studies applied computing.
+
+
+
+- Coding Accessibility: Becky
+  https://youtu.be/MmHqthzJER4
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/MmHqthzJER4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
