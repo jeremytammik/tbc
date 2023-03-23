@@ -47,229 +47,83 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### Modify DirectShapeType
 
 
-####<a name="2"></a>
+####<a name="2"></a> DirectShapeType and AddExternallyTaggedGeometry
 
+The [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on how to [modify `DirectShapeType`](https://forums.autodesk.com/t5/revit-api-forum/modify-directshapetype/m-p/11802821) led
+to an onteresting explanation comparing the use of `DirectShape` with `AddExternallyTaggedGeometry`:
 
-**Question:**
-
-
-Is it possible to delete certain element from the existing DirectShapeType definition, and the add a new one?
+**Question:** Is it possible to delete a certain element from the existing `DirectShapeType` definition, and then add a new one?
 Basically, I would like to know how to modify the elements inside the existing DirectShapeType definition.
 
-Any help is appreciated.
-
-jeremy.tammik
-2023-03-06 09:23 PM
-I have not looked into any details and wonder what your use case is. Because, another approach would just be to create a new DirectShapeType to replace the old one and update all existing references to it from the old to the new. In that case, the answer to your question would not really matter that much.
-
-
-
-Disregarding that aspect, I don't see why it should not be possible to modify an existing DirectShapeType. Why do you ask? Do you have reason to think otherwise?
-
-
-george1985
-2023-03-07 01:35 AM
-Hi @jeremy.tammik
-Thank you for the quick reply.
-We are making our doors in the project with DirectShapeType and then instantiating it. It's much more faster than creating a door family first.
-Creating a new DirectShapeType in our case won't work, because then the name would have to be different. We register each DirectShapeType definition name into client's database, and after changes are made - the name should remain the same.
-
-If not providing the code, do you have a Revit API method suggestion, how to delete any element inside the DirectShapeType definition?
-
-jeremy.tammik
-2023-03-07 04:45 AM
-Nope, never tried to do that yet. All I have is this:
-
-
-
-https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.50
-
-
-
-So, your hopefully successful experience solving this will be much appreciated! Good luck!
-
-
-george1985
-2023-03-09 02:40 AM
-Thank you @jeremy.tammik
-Do you mind if I ask: is there some Autodesk API support that I can contact?
-An email, a ticket system?
-I am pretty sure my company has some sort of "Autodesk support" included in their license program.
-
-jeremy.tammik
-2023-03-09 02:48 AM
-Dear George,
-
-
-
-Yes, Autodesk has at least two technical support teams: product support, for end user issues, and the DAS team, developer advocacy and support, formerly ADN, the Autodesk Developer Network:
-
-
-
-https://www.autodesk.com/developer-network/overview
-https://knowledge.autodesk.com/support/autocad/learn-explore/caas/sfdcarticles/sfdcarticles/Joining-...
-https://developer.autodesk.com/
-
-
-For Revit API questions, the ticketing system start right here in this forum.
-
-
-
-Please also note that this is the preferred method to submit non-confidential DAS (Autodesk Developer Advocacy and Support, previously ADN (Autodesk Developer Network)) queries or requests on the Revit API. Any thread that you submit here using your email address registered as a DAS member will be recognised as such and automatically escalated to us in the DAS team in case no one else addresses it first. At the same time, you will address a larger audience, more of your peers will see it, be able to chip in and help, and more people will see and profit from the answers we provide. We therefore prioritise cases from the discussion forum. Please submit your non-confidential queries via the Revit API discussion forum.
-
-
-
-Thank you!
-
-george1985
-2023-03-09 03:07 AM
-Dear @jeremy.tammik ,
-Thank you for the reply.
-This topic is posted in the Revit API forum.
-As pointed out by yourself, you don't know the answer. Thus I asked if I can get further help.
-
-I didn't understand this part:
-
-        "Please submit your non-confidential queries via the Revit API discussion forum."
-
-
-This topic is not considered as non-confidential query in the Revit API discussion forum?
-
-
-jeremy.tammik
-2023-03-09 04:22 AM
-Sure it is. Maybe the email address that you are using here is not linked to any officially recognised DAS or ADN membership.
-
-I have asked the development team for you. Just 'is it possible to modify, yes/no'. If you want more than that, e.g., have tried it out yourself and it does not work as expected, you can provide a complete minimal reproducible case demonstrating exactly what you are doing, how it behaves, what behaviour you would expect, and how the two differ:
-
-
-
-https://thebuildingcoder.typepad.com/blog/about-the-author.html#1b
-
-
-ricaun
-2023-03-09 05:57 AM
-I never tried to modify an existent DirectShapeType, but what do you mean by modify?
-
-
-Do you mean to modify the shape in the DirectShapeType and then make all children DirectShape updates? This would be coll but I don't know if is possible.
-
-Luiz Henrique Cassettari
-
-
-george1985
-2023-03-09 01:12 PM
-Thank you very much for the help @jeremy.tammik. Apologies if my reply sounded not appropriate.
-
-Yes, @ricaun exactly. I don't see the point of DirectShapeType instances, if there is no way to update their definition.
-
-
-RPTHOMAS108
-2023-03-09 05:44 PM
-From wording of DirectShape.SetShape it sounds like it can be set at any future point i.e.:
-
-
-
-RevitAPI.chm DirectShape.SetShape
-
-"Builds the shape of this object from the supplied collection of GeometryObjects. The objects are copied. If the new shape is identical to the old one, the old shape will be kept."
-
-
-
-So if the 'new' shape is not identical to the 'old' one I suspect the 'old' one will not be kept...Confucius
-
-
-
-A two minute experiment would likely answer any remaining doubts. I don't believe you can cut/join direct shapes as can be done with some other more intelligent Revit elements. They are basically the thing you resort to when nothing else works or is practical, I doubt they are that popular with an end user (they also lack element specific parameters i.e. only having category specific ones). It is also possible to create an actual family with FreeFormElement items or direct shapes.
-
-jeremy.tammik
-2023-03-10 06:06 AM
-I heard back from the development team:
-
-
-
-Reading through the thread, what I gather is, the user wants to change the geometry in an existing DirectShapeType. Depending on what version of Revit API they're targeting, we have an older API that is widely used which is Autodesk.Revit.DB.DirectShapeType.SetShape:
-
-
-
-https://www.revitapidocs.com/2023/d8642243-fb35-0cbe-08d8-df4518929946.htm
-
-
-
+**Answer:** What is your use case?
+Because, another approach would just be to create a new DirectShapeType to replace the old one and update all existing references to it from the old to the new.
+Here are our articles so far
+on [various aspects of using direct shapes](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.50).
+
+**Response:** We are making our doors in the project with DirectShapeType and then instantiating it.
+It's much faster than creating a door family first.
+Creating a new DirectShapeType in our case won't work, because then the name would have to be different.
+We register each DirectShapeType definition name into client's database, and after changes are made &ndash; the name should remain the same.
+I don't see the point of DirectShapeType instances, if there is no way to update their definition.
+
+**Answer:** From the wording of
+the [DirectShape.SetShape documentation](https://www.revitapidocs.com/2023/de35fe1d-a1e4-b003-ff87-66978f6a19f0.htm),
+it sounds like it can be set at any future point:
+
+> Builds the shape of this object from the supplied collection of GeometryObjects.
+The objects are copied.
+If the new shape is identical to the old one, the old shape will be kept.
+
+So, if the new shape is not identical to the old one, I suspect the old one will not be kept...Confucius.
+
+A two minute experiment would likely answer any remaining doubts.
+I don't believe you can cut/join direct shapes as can be done with some other more intelligent Revit elements.
+They are basically the thing you resort to when nothing else works or is practical, I doubt they are that popular with an end user (they also lack element specific parameters, i.e., only having category specific ones).
+It is also possible to create an actual family with FreeFormElement items or direct shapes.
+
+The development team adds: Reading through the thread, what I gather is, the user wants to change the geometry in an existing DirectShapeType.
+Depending on what version of Revit API they're targeting, we have an older API that is widely used,
+[DirectShapeType.SetShape](https://www.revitapidocs.com/2023/d8642243-fb35-0cbe-08d8-df4518929946.htm).
 It overwrites the shape, just like when the DirectShapeType was originally created.
+That is the oldest API that exists; an AppendShape was later added which doesn't overwrite, just appends.
 
-
-
-That is the oldest API that exists; an AppendShape was later added which doesn't overwrite, but just appends.
-
-
-
-Then we added an externally tagged geometry based API where you can add geometry and give them unique names. This is `AddExternallyTaggedGeometry`:
-
-
-
-https://www.revitapidocs.com/2023/2c551429-8b90-ed46-3e29-a6b3dbc1cb95.htm
-
-
+Later, we added an externally tagged geometry based API where you can add geometry and give them unique names
+using [`AddExternallyTaggedGeometry`](https://www.revitapidocs.com/2023/2c551429-8b90-ed46-3e29-a6b3dbc1cb95.htm).
 
 There are two convenience methods to delete existing externally tagged geometry:
 
-
-
-`RemoveExternallyTaggedGeometry` that takes an `ExternalGeometryId`, and
-`ResetExternallyTaggedGeometry` which clears all `ExternallyTaggedGeometry`.
-
+- `RemoveExternallyTaggedGeometry` that takes an `ExternalGeometryId`, and
+- `ResetExternallyTaggedGeometry` which clears all `ExternallyTaggedGeometry`.
 
 There's also a convenience method `UpdateExternallyTaggedGeometry`, which updates an existing `ExternallyTaggedGeometry`.
 
-
-
 The advantage of `ExternallyTaggedGeometry` is, if you've got something conceptually the same but it has changed representation (e.g., a line has moved), and you had references (e.g., dimensions) to it, then updating the externally tagged geometry can preserve the dimensions, so long as it still makes geometric sense (swapping a line for an arc probably doesn't make sense).
 
-
-
-So, calling `DirectShapeType.SetShape` will not remove any extant `ExternallyTaggedGeometry`. They are separate universes, hence the ResetExternallyTaggedGeometry.
-
-
+So, calling `DirectShapeType.SetShape` will not remove any extant `ExternallyTaggedGeometry`.
+They are separate universes, hence the `ResetExternallyTaggedGeometry`.
 
 For this user, my guess is they used SetShape originally and should just need to setup a transaction and call SetShape again.
 
-
-
 If the DirectShapeLibrary is in use, that could cause some issues, but I don't see mention of that.
-
-
 
 As you can see from the speculation in the answer, the analysis is significantly simplified and more efficient the more specific details are provided in the original question.
 
-
 By the way, just to understand the motivation behind the whole shebang: direct shapes were originally introduced to more efficiently support IFC import. Rather than creating a new family definition in a separate RFA and including instances of that for repetitive shapes, the direct shape enables repetitive shape definition in-place in the RVT BIM project file.
 
+Some testing proves that yes, indeed, is possible to change the DirectShapeType and DirectShape using SetShape.
 
-ricaun
-2023-03-10 06:55 AM
-I tested and yes is possible to change the DirectShapeType and DirectShape using SetShape.
+Here is a simple sample code snippet
+to [change an existent DirectShapeType or DirectShape](https://gist.github.com/ricaun/5145ce37c3bbf0613930c8d167d4ab73).
 
+I tested this in Revit 2021 using `DirectShapeLibrary` to create the type and works fine; in Revit 2023 it works fine as well.
 
+**Response:** Thank you very much, all three of you!
+@RPTHOMAS108 for suggesting the final solution, @jeremy.tammik for taking time to further provide more detailed possibilities, and @ricaun for testing.
+I truly appreciate the help from all three of you.
 
-Here is a simple sample to change an existent DirectShapeType or DirectShape: https://gist.github.com/ricaun/5145ce37c3bbf0613930c8d167d4ab73
-
-
-
-Edited: Tested in Revit 2021 using DirectShapeLibrary to create the type and works fine, and in Revit 2023 works fine as well.
-
-
-
-
-
-Luiz Henrique Cassettari
-
-george1985
-2023-03-11 02:11 PM
-Thank you very much, all three of your
-@RPTHOMAS108 for suggesting the final solution, @jeremy.tammik for taking your time to further give me more detailed possibilities. And @ricaun for testing. I truly appreciate the help from all three of you.
-
-@ricaun Thank you for the code. Worked like a charm on Revit 2022.1 as well!
+@ricaun Thank you for the code.
+It works like a charm on Revit 2022.1 as well!
 
 
 
