@@ -92,7 +92,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Modify DirectShapeType</h3>
-<p>Two illuminating discussions on direct shapes, working with direct shape librariers, and handling Revit and third-party .NET assembly DLLs:</p>
+<p>Two illuminating discussions on direct shapes, working with direct shape libraries, and handling Revit and third-party .NET assembly DLLs:</p>
 <ul>
 <li><a href="#2">DirectShapeType and AddExternallyTaggedGeometry</a></li>
 <li><a href="#3">Referencing and avoiding conflict with Revit DLLs</a></li>
@@ -102,7 +102,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <h4><a name="2"></a> DirectShapeType and AddExternallyTaggedGeometry</h4>
 <p>The <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on how to <a href="https://forums.autodesk.com/t5/revit-api-forum/modify-directshapetype/m-p/11802821">modify <code>DirectShapeType</code></a> led
-to an onteresting explanation comparing the use of <code>DirectShape</code> with <code>AddExternallyTaggedGeometry</code>:</p>
+to an interesting explanation comparing the use of <code>DirectShape</code> with <code>AddExternallyTaggedGeometry</code>:</p>
 <p><strong>Question:</strong> Is it possible to delete a certain element from the existing <code>DirectShapeType</code> definition, and then add a new one?
 Basically, I would like to know how to modify the elements inside the existing DirectShapeType definition.</p>
 <p><strong>Answer:</strong> What is your use case?
@@ -123,7 +123,7 @@ The objects are copied.
 If the new shape is identical to the old one, the old shape will be kept.</p>
 </blockquote>
 <p>So, if the new shape is not identical to the old one, I suspect the old one will not be kept...Confucius.</p>
-<p>A two minute experiment would likely answer any remaining doubts.
+<p>A two-minute experiment would likely answer any remaining doubts.
 I don't believe you can cut/join direct shapes as can be done with some other more intelligent Revit elements.
 They are basically the thing you resort to when nothing else works or is practical, I doubt they are that popular with an end user (they also lack element specific parameters, i.e., only having category specific ones).
 It is also possible to create an actual family with FreeFormElement items or direct shapes.</p>
@@ -209,7 +209,7 @@ Thanks.</p>
 <p><center>
 <svg class="sssvg mb-4" xmlns="http://www.w3.org/2000/svg" width="480" height="165" fill="none" viewBox="0 0 2048 704"><title>Decorative title for SVG reference</title><g class="shapes" stroke-width="9"><path id="shape-1" fill="#EEC96B" stroke="#DBA519" d="m313.452 225.741 10.56 27.245a24.499 24.499 0 0 0 21.483 15.608l29.174 1.624c14.132.786 19.903 18.546 8.932 27.49l-22.648 18.461a24.501 24.501 0 0 0-8.206 25.255l7.471 28.248c3.62 13.684-11.488 24.66-23.384 16.99l-24.557-15.835a24.498 24.498 0 0 0-26.554 0l-24.557 15.835c-11.896 7.67-27.004-3.306-23.384-16.99l7.471-28.248a24.501 24.501 0 0 0-8.206-25.255l-22.648-18.461c-10.971-8.944-5.2-26.704 8.932-27.49l29.174-1.624a24.499 24.499 0 0 0 21.483-15.608l10.56-27.245c5.115-13.198 23.789-13.198 28.904 0Z"></path><path id="shape-2" fill="#7DEE6B" stroke="#35DB19" d="M602.94 102.974c6.534 10.15 22.151 6.83 23.992-5.1.717-4.651 7.419-4.651 8.136 0 1.841 11.93 17.458 15.25 23.992 5.1 2.548-3.958 8.669-1.232 7.433 3.309-3.171 11.647 9.746 21.032 19.843 14.417 3.937-2.579 8.421 2.401 5.445 6.047-7.634 9.351.349 23.178 12.264 21.242 4.645-.755 6.716 5.618 2.514 7.738-10.777 5.437-9.108 21.316 2.564 24.393 4.551 1.2 3.85 7.865-.851 8.092-12.056.584-16.99 15.769-7.579 23.328 3.669 2.947.319 8.75-4.068 7.046-11.252-4.371-21.936 7.494-16.413 18.228 2.154 4.185-3.267 8.124-6.582 4.782-8.502-8.569-23.087-2.075-22.407 9.977.265 4.699-6.29 6.092-7.959 1.691-4.281-11.286-20.247-11.286-24.528 0-1.669 4.401-8.224 3.008-7.959-1.691.68-12.052-13.905-18.546-22.407-9.977-3.315 3.342-8.736-.597-6.582-4.782 5.523-10.734-5.161-22.599-16.413-18.228-4.387 1.704-7.737-4.099-4.068-7.046 9.411-7.559 4.477-22.744-7.579-23.328-4.701-.227-5.402-6.892-.851-8.092 11.672-3.077 13.341-18.956 2.564-24.393-4.202-2.12-2.131-8.493 2.514-7.738 11.915 1.936 19.898-11.891 12.264-21.242-2.976-3.646 1.507-8.626 5.445-6.047 10.097 6.615 23.014-2.77 19.843-14.417-1.236-4.541 4.885-7.267 7.433-3.309Z"></path><path id="shape-3" fill="#6B87EE" stroke="#1944DB" d="m1029.13 62.684 18.17 46.88a14.504 14.504 0 0 0 12.71 9.238l50.2 2.793c5.02.28 7.07 6.582 3.17 9.755l-38.97 31.767a14.518 14.518 0 0 0-4.86 14.947l12.86 48.607c1.29 4.856-4.08 8.751-8.3 6.029l-42.25-27.247a14.503 14.503 0 0 0-15.72 0L973.887 232.7c-4.221 2.722-9.582-1.173-8.298-6.029l12.856-48.607a14.5 14.5 0 0 0-4.856-14.947l-38.972-31.767c-3.893-3.173-1.845-9.475 3.17-9.755l50.201-2.793a14.496 14.496 0 0 0 12.712-9.238l18.17-46.88c1.82-4.683 8.44-4.683 10.26 0Z"></path><path id="shape-4" fill="#6BEEE6" stroke="#19DBD0" d="m1452.38 139.167-4.91 43.769a21.54 21.54 0 0 0 4.06 15.155l26.14 35.451c6.47 8.779-.62 21.056-11.45 19.84l-43.77-4.909c-5.39-.604-10.8.846-15.16 4.06l-35.45 26.137c-8.78 6.472-21.06-.616-19.84-11.455l4.91-43.769a21.54 21.54 0 0 0-4.06-15.155l-26.14-35.451c-6.47-8.779.62-21.056 11.46-19.84l43.77 4.909c5.38.604 10.79-.846 15.15-4.06l35.45-26.137c8.78-6.472 21.06.616 19.84 11.455Z"></path><path id="shape-5" fill="#D3EE6B" stroke="#B5DC19" d="m1799.8 250.163 2.43 70.028-2.43 70.028c-.39 11.452-12.65 18.53-22.77 13.147l-61.86-32.913-59.43-37.115c-9.72-6.07-9.72-20.224 0-26.294l59.43-37.115 61.86-32.913c10.12-5.383 22.38 1.695 22.77 13.147Z"></path></g><g fill="var(--clr-70)" font-size="400" font-weight="bold" stroke-width="11" stroke="hsl(var(--base-hue), var(--base-sat), 40%)"><text fill-opacity=".6" stroke-opacity=".6"><tspan x="651.844" y="635.4">S</tspan></text><text fill-opacity=".2" stroke-opacity=".2"><tspan x="409.266" y="615.4">S</tspan></text><text><tspan x="894.422" y="665.4">SVG</tspan></text></g></svg>
 </center></p>
-<p>A nice example of how to interactively document programming functionality, visually demonstrsating the effect of function input arguments:
+<p>A nice example of how to interactively document programming functionality, visually demonstrating the effect of function input arguments:
 the <a href="https://fffuel.co/sssvg/">SSSVG Interactive SVG Reference</a>.</p>
 <blockquote>
 <p>SVGs are awesome!
@@ -224,7 +224,7 @@ Here's an interactive reference to the most popular and/or interesting parts of 
 on <a href="https://youtu.be/MmHqthzJER4">Coding Accessibility: Becky</a>,
 a young woman coding with her eyes:</p>
 <blockquote>
-<p>The first installment in GitHub’s “Coding Accessibility” video series features Becky Tyler, a bright, funny, and incredibly tenacious young woman with quadriplegic cerebral palsy who interacts with her computer exclusively by using her eyes.
+<p>The first instalment in GitHub’s “Coding Accessibility” video series features Becky Tyler, a bright, funny, and incredibly tenacious young woman with quadriplegic cerebral palsy who interacts with her computer exclusively by using her eyes.
 Becky started off simply wanting to play Minecraft, but the shortcomings of available accessibility tech led her down a path beyond mining ore and into the world of open source software and collaboration.
 She now attends the University of Dundee, where she studies applied computing.</p>
 </blockquote>
