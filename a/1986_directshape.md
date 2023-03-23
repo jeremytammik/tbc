@@ -126,130 +126,70 @@ I truly appreciate the help from all three of you.
 It works like a charm on Revit 2022.1 as well!
 
 
-####<a name="3"></a> Avoiding Conflict with Revit DLLs
+####<a name="3"></a> Referencing and Avoiding Conflict with Revit DLLs
 
-Do I need to include RevitAPI.dll and RevitAPIUI.dll in my release package?
-https://forums.autodesk.com/t5/revit-api-forum/do-i-need-to-include-revitapi-dll-and-revitapiui-dll-in-my/m-p/11727761
+**Question:** [Do I need to include RevitAPI.dll and RevitAPIUI.dll in my release package?](https://forums.autodesk.com/t5/revit-api-forum/do-i-need-to-include-revitapi-dll-and-revitapiui-dll-in-my/m-p/11727761)
 
+This is a fairly simple question that came to mind when I started researching Design Automation (APS/Forge).
+One of the DA tutorials says that Revit API dlls are not required in app bundle and that is correct.
+I managed to upload the app bundle with just my DLL + addin file and was able to run a successful work.
 
-adam.konca
-2023-02-01 07:33 PM
-Do I need to include RevitAPI.dll and RevitAPIUI.dll in my release package?
-Hi,
-
-This is a fairly simple question that came to mind when I started researching Design Automation (APS/Forge). One of the DA tutorials says that Revit API dlls are not required in app bundle and that is correct. I managed to upload the app bundle with just my dll + addin file and was able to run a successful work.
-
-Before we switch completely to Forge, we still have our regular addin and as of now, we are including Revit API files into our release package (that is installed on client computers with Revit). Seeing the Forge case, I started wondering, is this required for regular addins?
-
-Thanks a lot for you time.
+Before we switch completely to Forge, we still have our regular desktop addin.
+As of now, we are including Revit API files into our release package (that is installed on client computers with Revit).
+Seeing the Forge case, I started wondering, is this required for regular addins?
 
 
-moturi.magati.george
-2023-02-01 10:26 PM
-Hi @adam.konca,
+**Answer:** Nope, absolutely no need to include the Revit API assemblies with your desktop add-in distribution, and actually a big non-no to do so.
+They are part of the Revit installation and live in the same folder as Revit.exe itself.
+In your development environment, you should set the 'Copy Local' property on all Revit API assemblies to 'false' to ensure that they are not copied into your distribution package.
+Your add-in should (and must) use the Revit API assemblies provided (and already loaded) by Revit:
 
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/06/export-family-instance-to-gbxml.html" target="_blank" rel="noopener">Export Family Instance to gbXML</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/08/set-copy-local-to-false.html" target="_blank" rel="noopener">Set Copy Local to False</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/06/copy-local-false-and-ifc-utils-for-wall-openings.html" target="_blank" rel="noopener">Copy Local False and IFC Utils for Wall Openings</a></li>
+</ul>
 
+So, it is best practice to not include the `RevitAPI.dll` or other dll file included in Revit with your release.
 
-Forge is a cloud-based service. This means that instead of installing the software on your machine, the same is done on Autodesk servers and you are able to utilize the resources online.
+Most of the time Revit is gonna ignore the DLL that is already loaded.
 
+Revit in Forge/APS works in the same way; it is basically the same engine without the UI.
 
+In the end, is better to not include it, makes your package smaller size &ndash; RevitAPI.dll alone is around ±28kb.
 
-This said, you don't need to include to include RevitAPI.dll and RevitAPIUI.dll when building a forge application. If some services might need it, I might not be aware of the same.
+**Response:** Thank you very much for the info.
+This is exactly what I wanted to hear.
+Awesome news.
 
+Actually, package size is one of the reasons I asked this question, because we support multiple Revit versions, so deleting multiple revit api files is going to reduce size quite a lot &nbsp; :-)
 
+One more question if I may:
+What about other libraries like Newtonsoft.Json.dll?
+I see that it also comes with Revit, so can I set "Copy Local" to false on it as well?
+What happens when I use newer version of this library than the one provided with Revit?
+Which one would be loaded?
 
-You can read more here: https://aps.autodesk.com/blog/what-forge
+**Answer:** I never copy the Newtonsoft.Json.dll and always use version 9.0.1, the same as Revit does.
 
+If your application asks for a bigger version than Revit contains, it is probably gonna load two versions of the Newtonsoft.Json in the AppDomain and strange things could happen, like this:
+[BIM 360 Links Not Found - Fix](https://forums.autodesk.com/t5/revit-api-forum/bim-360-links-not-found-fix/td-p/11463147).
 
-
-You can also view examples and walkthroughs here: https://github.com/orgs/Autodesk-Forge/repositories?type=all
-
-
-
-
-
-
-
-  Moturi George,     Developer Advocacy and Support,  ADN Open
-
-
-jeremy.tammik
-2023-02-02 12:29 AM
-Yes, and to address the desktop part of your question (well, the only part, actually):
-
-
-
-Nope, absolutely no need to include the Revit API assemblies with your desktop add-in distribution, and actually a big non-no to do so. They are part of the Revit installation and live in the same folder as Revit.exe itself. In your development environment, you should set the 'Copy Local' property on all Revit API assemblies to 'false' to ensure that they are not copied into your distribution package. Your add-in should (and must) use the Revit API assemblies provided (and already loaded) by Revit:
-
-
-
-Export Family Instance to gbXML
-Set Copy Local to False
-Copy Local False and IFC Utils for Wall Openings
-
-ricaun
-2023-02-02 04:54 AM
-It's a good practice to not include the RevitAPI.dll or other dll file included in Revit with your release.
-
-Most of the time Revit gonna ignore the dll that is already loaded.
-
-And the Revit in Forge/APS works in the same way, is basically the same engine without the UI.
-
-In the end, is better to not include it, makes your package smaller size. (RevitAPI.dll around ±28kb)
-Luiz Henrique Cassettari
-
-adam.konca
-2023-02-03 02:52 AM
-@moturi.magati.georgeYes, I already knew I don't need them in Forge 🙂
-
-@jeremy.tammikThank you very much for the info. This is exactly what I wanted to hear. Awesome news.
-
-@ricaunActually, package size is one of the reasons I asked this question, because we support multiple Revit versions, so deleting multiple revit api files is going to reduce size quite a lot 🙂
-
-adam.konca
-2023-02-03 07:43 AM
-@jeremy.tammikOne more question if I may. What about other libraries like Newtonsoft.Json.dll? I see that it also comes with Revit, so can I set "Copy Local" to false on it as well? What happens when I use newer version of this library than the one provided with Revit? Which one would be loaded?
-
-
-ricaun
-2023-02-03 08:03 AM
-I never copy the Newtonsoft.Json.dll and always use version 9.0.1.
-
-
-
-If your application ask for a bigger version than that Revit contain, probably gonna load two version of the Newtonsoft.Json in the AppDomain and stages things could happen.
-
-
-
-Like this: https://forums.autodesk.com/t5/revit-api-forum/bim-360-links-not-found-fix/td-p/11463147
-
-
-adam.konca
-2023-02-03 09:13 AM
-Does it mean that every time I am adding a library to my addin, I need to check if it is shipped with Revit first? And if it is, just add the same version to my addin with "Copy Local" set to false?
+**Response:** Does that mean that every time I am adding a library to my addin, I need to check if it is shipped with Revit first?
+And if it is, just add the same version to my addin with "Copy Local" set to false?
 However, if it is not shipped with Revit then I can freely add my version with "Copy Local" true.
 Do I understand it correctly?
 
-ricaun
+**Answer:** Basically yes; and, if you copy the reference to your addin folder, most of the time Revit gonna ignore it and use the version that is already loaded in the AppDomain, or load a version shipped with Revit.
 
-Basically yes, and if you copy the reference to your addin folder, most of the time Revit gonna ignore it and use the version that is already loaded in the AppDomain or load a version shipped with Revit.
+Only one version can be loaded, because there is only one AppDomain for the Revit API.
+Revit has already loaded its version, so your attempt to load a different one will fail.
+So, you cannot use a newer version than the one used by Revit.
+In some (rare?) cases, Revit includes an add-in or other piece of functionality that does not load all its dependencies up front; in that case, if you load your own ("wrong") version first, you might even end up breaking some of the built-in Revit functionality.
 
-Luiz Henrique Cassettari
-
-ricaun.com - Revit API Developer
-
-
-adam.konca
-2023-02-03 02:52 PM
-Good to know. Thanks!
-
-jeremy.tammik
-2023-02-06 03:35 AM
-I totally agree with Luiz. Only one version can be loaded, because there is only one AppDomain for the Revit API. Revit has already loaded its version, so your attempt to load a different one will fail. So, you cannot use a newer version than the one used by Revit. In some (rare?) cases, Revit includes an add-in or other piece of functionality that doies not load all its dependencies up front; in that case, if you load your own ("wrong") version first, you might even end up breaking some of the built-in Revit functionality.
-
-adam.konca
-2023-02-06 09:24 AM
-Makes perfect sense. Once again, appreciate the explanations. Thanks.
+**Response:** Makes perfect sense.
+Once again, appreciate the explanations.
+Thanks.
 
 
 ####<a name="4"></a> SSSVG Interactive SVG Reference
