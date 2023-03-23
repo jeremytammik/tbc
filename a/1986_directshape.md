@@ -203,7 +203,11 @@ Here's an interactive reference to the most popular and/or interesting parts of 
 
 ####<a name="5"></a> Coding With Eyes Only
 
-I was very deeply touched by the ten-minute documentary
+<center>
+<img src="img/eyes26.gif" alt="Eyes" title="Eyes" width="160"/> <!-- Pixel Height: 72 Pixel Width: 160 -->
+</center>
+
+I was deeply touched by the ten-minute documentary
 on [Coding Accessibility: Becky](https://youtu.be/MmHqthzJER4),
 a young woman coding with her eyes:
 
@@ -219,9 +223,6 @@ I happened upon it reading the more exhaustive GitHub article
 
 
 
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 433, Pixel Width: 1,006 -->
-</center>
 
 **Answer:**
 
