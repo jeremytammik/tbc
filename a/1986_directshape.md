@@ -126,25 +126,6 @@ I truly appreciate the help from all three of you.
 It works like a charm on Revit 2022.1 as well!
 
 
-
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 433, Pixel Width: 1,006 -->
-</center>
-
-
-
-**Answer:**
-
-**Response:**
-
-<pre class="prettyprint">
-
-</pre>
-
-
-
-**Response:**
-
 ####<a name="3"></a> Avoiding Conflict with Revit DLLs
 
 Do I need to include RevitAPI.dll and RevitAPIUI.dll in my release package?
@@ -280,9 +261,9 @@ the [SSSVG Interactive SVG Reference](https://fffuel.co/sssvg/).
 Thanks to math and geometry, SVG graphics give us a standardized way to create images and icons on the web to be displayed at any size without any loss in image quality.
 Here's an interactive reference to the most popular and/or interesting parts of the SVG spec.
 
-####<a name="5"></a> Coding Using Your Eyes
+####<a name="5"></a> Coding With Eyes Only
 
-One of the most touching YouTube videos I have ever seen, a ten-minute documentary
+I was very deeply touched by the ten-minute documentary
 on [Coding Accessibility: Becky](https://youtu.be/MmHqthzJER4),
 a young woman coding with her eyes:
 
@@ -295,3 +276,16 @@ She now attends the University of Dundee, where she studies applied computing.
 I happened upon it reading the more exhaustive GitHub article
 [from gaming with your eyes to coding with AI: new frontiers for accessibility](https://github.com/readme/featured/open-source-accessibility).
 
+
+
+
+<center>
+<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 433, Pixel Width: 1,006 -->
+</center>
+
+**Answer:**
+
+**Response:**
+
+<pre class="prettyprint">
+</pre>
