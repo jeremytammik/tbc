@@ -74,7 +74,11 @@ twitter:
 
  with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/linkintersector
 
-&ndash; ...
+Two illuminating discussions on direct shapes, working with direct shape libraries, and handling Revit and third-party .NET assembly DLLs
+&ndash; DirectShapeType and AddExternallyTaggedGeometry
+&ndash; Referencing and avoiding conflict with Revit DLLs
+&ndash; SSSVG interactive SVG reference
+&ndash; Coding with eyes only...
 
 linkedin:
 
@@ -92,14 +96,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Modify DirectShapeType
+### .NET Assembly and DirectShape Libraries
 
 Two illuminating discussions on direct shapes, working with direct shape libraries, and handling Revit and third-party .NET assembly DLLs:
 
 - [DirectShapeType and AddExternallyTaggedGeometry](#2)
 - [Referencing and avoiding conflict with Revit DLLs](#3)
 - [SSSVG interactive SVG reference](#4)
-- [Coding with Eyes only](#5)
+- [Coding with eyes only](#5)
 
 ####<a name="2"></a> DirectShapeType and AddExternallyTaggedGeometry
 
