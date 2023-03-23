@@ -2,6 +2,32 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="bc.css">
 <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+
+<style>
+    #shape-1,
+    #shape-5 {
+      animation: spin 4.5s infinite;
+      animation-direction: alternate-reverse;
+    }
+    #shape-2 {
+      animation: spin 5.5s infinite;
+      animation-direction: alternate;
+      animation-delay: 0.75s;
+      animation-fill-mode: backwards;
+    }
+    #shape-3 {
+      animation: spin 7.5s infinite;
+      animation-direction: alternate-reverse;
+      animation-delay: 1s;
+      animation-fill-mode: backwards;
+    }
+    #shape-4 {
+      animation: spin 5.5s infinite;
+      animation-direction: alternate;
+      animation-delay: 1.75s;
+      animation-fill-mode: backwards;
+    }
+  </style>
 </head>
 
 <!---
