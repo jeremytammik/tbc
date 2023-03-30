@@ -70,50 +70,24 @@ https://github.com/jeremytammik/UnitMigration/releases/tag/2023.0.0.1
 
 ####<a name="3"></a> What is UV?
 
-https://thebuildingcoder.typepad.com/blog/2014/09/planes-projections-and-picking-points.html#comment-6144595024
+Angelo Mastroberardino [commented](https://thebuildingcoder.typepad.com/blog/2014/09/planes-projections-and-picking-points.html#comment-6144595024)
+on [Planes, Projections and Picking Points](https://thebuildingcoder.typepad.com/blog/2014/09/planes-projections-and-picking-points.html) and
+the [revitapidocs `ComputeDerivatives` method](https://www.revitapidocs.com/2021.1/77ca18ef-783e-9db5-a37a-2d76f637d1a1.htm) asking:
 
+**Question:** What is the point `UV`?
+What is its reference frame and origin?
+Are these `UV` the same (x,y) coordinates of any `XYZ` points of the `Face.EdgeLoops` without the z-coordinate?
 
-Angelo Mastroberardino
+**Answer:** The best place to start understanding UV coordinates is Scott Conover's 2010 AU class
+on [Analysing Building Geometry](https://thebuildingcoder.typepad.com/blog/2010/01/analyse-building-geometry.html),
+spread out over ten or so blog posts.
 
-Hi Jeremy, I write you here hoping to get to you sooner. I posted a question on revitapi docs about Face.ComputeDerivatives(UV):
+Read that and all will be clear.
+Drilling down into further detail and practical application, here is an article explaining
+the [relationship between 2D UV and 3D XYZ coordinates](https://thebuildingcoder.typepad.com/blog/2011/03/converting-between-2d-uv-and-3d-xyz-coordinates.html).
 
-https://www.revitapidocs.com/2021.1/77ca18ef-783e-9db5-a37a-2d76f637d1a1.htm
-
-Do you have a blog post about how that works / what the parameters mean ? Thank you
-
-https://www.revitapidocs.com/2021.1/77ca18ef-783e-9db5-a37a-2d76f637d1a1.htm
-
-Angelo Mastroberardino
-
-I don't understand this method. What is the point UV ? What is its reference frame and origin ?
-
-My first guess was: this UV are the same (x,y) coordinates of any XYZ point of the Face.EdgeLoops without the z-coordinate. Am I wrong?
-
-jeremy tammik Mod Angelo Mastroberardino
-
-Dear Angelo,
-
-I answered your comment on https://www.revitapidocs.com, but that is still pending approval, so I repeat it here as well.
-
-First, to repeat your question:
-
-[Q] What is the point UV? What is its reference frame and origin? Are these UV the same (x,y) coordinates of any XYZ points of the Face.EdgeLoops without the z-coordinate?
-
-[A] The best place to start understanding UV coordinates is Scott Conover's 2010 AU class on Analysing Building Geometry, spread out over ten or so blog posts, starting here:
-
-https://thebuildingcoder.typepad.com/blog/2010/01/analyse-building-geometry.html
-
-Read that and all will be clear. Drilling down into further detail and practical application, here is a blog post explaining the relationship between 2D UV and 3D XYZ coordinates:
-
-https://thebuildingcoder.typepad.com/blog/2011/03/converting-between-2d-uv-and-3d-xyz-coordinates.html
-
-To round off, here is a nice debugging explanation showing how you can use AVF to document and label the UV coordinates:
-
-https://thebuildingcoder.typepad.com/blog/2020/12/dynamo-book-and-texture-bitmap-uv-coordinates.html#2
-
-I hope this helps.
-
-Cheers, Jeremy.
+To round off, here is a nice debugging explanation showing how you
+can [use AVF to document and label the UV coordinates](https://thebuildingcoder.typepad.com/blog/2020/12/dynamo-book-and-texture-bitmap-uv-coordinates.html#2).
 
 
 ####<a name="4"></a> What is Fuzz
