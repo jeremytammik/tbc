@@ -95,8 +95,22 @@ can [use AVF to document and label the UV coordinates](https://thebuildingcoder.
 Confusion around comparison of floating point values persists, and came up agin in the question
 on [analytical node vs analytical member coordinate accuracy](https://forums.autodesk.com/t5/revit-api-forum/analytical-node-vs-analytical-member-coordinate-accuracy-issue/m-p/11848971):
 
+**Question:** I came across a puzzling inconsistency with the new Analytical Members vs Analytical Nodes.
+It seems that somewhere in the guts of Revit, the geometry curve end point coordinates that get reported get mysteriously rounded, but the `ReferencePoint` coordinates do not.
+In my case, the AnalyticalNode ReferencePoint X Coordinate is 100.000002115674, but the AnalyticalMember Line.EndPoint(0) sees it's X coordinate as 100.000000000.
+I'm no expert, but that seems bad to me; even though it's very small numbers, any operation looking for A==B is not going to have any success unless someone knew ahead of time that they needed to go on and round down to 5 decimal places before doing a comparison.
 
+**Answer:** Yes.
+In fact, anyone experienced in the comparison of real floating-point numbers does already know that you [need to perform some rounding operation when comparing any and all such numbers on a digital computer](https://duckduckgo.com/?q=comparing+floating+point+number).
+That is standard.
+The Building Coder quite regularly repeats the [need for fuzz](https://www.google.com/search?q=fuzz&as_sitesearch=thebuildingcoder.typepad.com).
 
+In the case, of Revit, matters are even worse than in some other areas, since the Revit database represents property values and dimensions such as legth using `float` instead of `double`.
+Hence, the need to [think big in Revit](https://thebuildingcoder.typepad.com/blog/2009/07/think-big-in-revit.html) and ignore every deviation below a certain (quite large) tolerance as irrelevant to the BIM, any "length below about 0.004 feet, i.e. ca. 0.05 inches or 1.2 millimetres".
+
+Personally, when I retrieve vertex or coordinate data from Revit, I simply round it to the closest millimetre while retrieving it. I add every vertex or coordinate data item as a key to a dictionary. Every new item is looked up in the dictionary and conidered equal to the existing item if it lies within a millimetre of it.
+
+So, in my case, A==B if A-B is smaller than 1 mm.
 
 ####<a name="5"></a> What is get_Parameter?
 
