@@ -16,7 +16,7 @@
   https://thebuildingcoder.typepad.com/blog/2014/09/planes-projections-and-picking-points.html#comment-6144595024
 
 - What is fuzz
-  https://forums.autodesk.com/t5/revit-api-forum/analytical-node-vs-analytical-member-coordinate-accuracy-issue/m-p/11848971/highlight/false#M70197
+  https://forums.autodesk.com/t5/revit-api-forum/analytical-node-vs-analytical-member-coordinate-accuracy-issue/m-p/11848971
 
 - Whats the deal with get_Parameter()? (insert Seinfeld Bassline here)
   https://forums.autodesk.com/t5/revit-api-forum/whats-the-deal-with-get-parameter-insert-seinfeld-bassline-here/m-p/11845778
@@ -92,7 +92,11 @@ can [use AVF to document and label the UV coordinates](https://thebuildingcoder.
 
 ####<a name="4"></a> What is Fuzz
 
-https://forums.autodesk.com/t5/revit-api-forum/analytical-node-vs-analytical-member-coordinate-accuracy-issue/m-p/11848971/highlight/false#M70197
+Confusion around comparison of floating point values persists, and came up agin in the question
+on [analytical node vs analytical member coordinate accuracy](https://forums.autodesk.com/t5/revit-api-forum/analytical-node-vs-analytical-member-coordinate-accuracy-issue/m-p/11848971):
+
+
+
 
 ####<a name="5"></a> What is get_Parameter?
 
