@@ -85,7 +85,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 - [Switch metric + imperial units](#2)
 - [What is UV?](#3)
 - [What is fuzz?](#4)
-- [What is get_Parameter?](#5)
+- [What is get_Parameter and get_Geometry?](#5)
 - [Default localised workset names](#6)
 - [Bing chat Python and Dynamo tutor](#7)
 - [Claude on Slack summarises and answers questions](#8)
@@ -146,7 +146,7 @@ Personally, when I retrieve vertex or coordinate data from Revit, I simply round
 
 So, in my case, A==B if A-B is smaller than 1 mm.
 
-####<a name="5"></a> What is get_Parameter?
+####<a name="5"></a> What is get_Parameter and get_Geometry?
 
 For a final FAQ reiteration, we address
 [what's the deal with `get_Parameter`](https://forums.autodesk.com/t5/revit-api-forum/whats-the-deal-with-get-parameter-insert-seinfeld-bassline-here/m-p/11845778):

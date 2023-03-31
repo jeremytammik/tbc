@@ -83,7 +83,7 @@ the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API d
 <li><a href="#2">Switch metric + imperial units</a></li>
 <li><a href="#3">What is UV?</a></li>
 <li><a href="#4">What is fuzz?</a></li>
-<li><a href="#5">What is get_Parameter?</a></li>
+<li><a href="#5">What is get_Parameter and get_Geometry?</a></li>
 <li><a href="#6">Default localised workset names</a></li>
 <li><a href="#7">Bing chat Python and Dynamo tutor</a></li>
 <li><a href="#8">Claude on Slack summarises and answers questions</a></li>
@@ -128,7 +128,7 @@ The Building Coder quite regularly repeats the <a href="https://www.google.com/s
 Hence, the need to <a href="https://thebuildingcoder.typepad.com/blog/2009/07/think-big-in-revit.html">think big in Revit</a> and ignore every deviation below a certain (quite large) tolerance as irrelevant to the BIM, any "length below about 0.004 feet, i.e. ca. 0.05 inches or 1.2 millimetres".</p>
 <p>Personally, when I retrieve vertex or coordinate data from Revit, I simply round it to the closest millimetre while retrieving it. I add every vertex or coordinate data item as a key to a dictionary. Every new item is looked up in the dictionary and considered equal to the existing item if it lies within a millimetre of it.</p>
 <p>So, in my case, A==B if A-B is smaller than 1 mm.</p>
-<h4><a name="5"></a> What is get_Parameter?</h4>
+<h4><a name="5"></a> What is get_Parameter and get_Geometry?</h4>
 <p>For a final FAQ reiteration, we address
 <a href="https://forums.autodesk.com/t5/revit-api-forum/whats-the-deal-with-get-parameter-insert-seinfeld-bassline-here/m-p/11845778">what's the deal with <code>get_Parameter</code></a>:</p>
 <p><strong>Question:</strong> This is more of a request for a history lesson here about the Revit API, but what's the deal with the method <code>get_Parameter</code>?
