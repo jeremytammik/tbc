@@ -149,7 +149,7 @@ So, in my case, A==B if A-B is smaller than 1 mm.
 ####<a name="5"></a> What is get_Parameter?
 
 For a final FAQ reiteration, we address
-[what's the deal with `get_Parameter`](https://forums.autodesk.com/t5/revit-api-forum/whats-the-deal-with-get-parameter-insert-seinfeld-bassline-here/m-p/11845778)
+[what's the deal with `get_Parameter`](https://forums.autodesk.com/t5/revit-api-forum/whats-the-deal-with-get-parameter-insert-seinfeld-bassline-here/m-p/11845778):
 
 **Question:** This is more of a request for a history lesson here about the Revit API, but what's the deal with the method `get_Parameter`?
 I've seen it used in past forum posts for use in Revit versions before 2022, but I don't see any references to it in the [revitapidocs](https://www.revitapidocs.com/).
