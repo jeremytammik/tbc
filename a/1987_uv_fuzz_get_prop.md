@@ -75,6 +75,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Here are some recent topics of interest that came up in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and elsewhere:
 
+- [Switch metric + imperial units](#2)
+- [What is UV?](#3)
+- [What is fuzz?](#4)
+- [What is get_Parameter?](#5)
+- [Default localised workset names](#6)
+- [Bing chat Python and Dynamo tutor](#7)
+- [Claude on Slack summarises and Answers questions](#8)
+- [Sparks of artificial General intelligence](#9)
 
 
 ####<a name="2"></a> Switch Metric + Imperial Units
