@@ -51,8 +51,15 @@ twitter:
 
  with the #RevitAPI  @AutodeskRevit #BIM @DynamoBIM @AutodeskAPS
 
-&ndash;
-...
+Current topics of interest from the Revit API discussion forum and elsewhere
+&ndash; Switch metric + imperial units
+&ndash; What is UV?
+&ndash; What is fuzz?
+&ndash; What is get_Parameter?
+&ndash; Default localised workset names
+&ndash; Bing Chat Python and Dynamo tutor
+&ndash; Claude on Slack summarises and answers questions
+&ndash; Emergence and sparks of artificial general intelligence...
 
 linkedin:
 
@@ -81,15 +88,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 - [What is get_Parameter?](#5)
 - [Default localised workset names](#6)
 - [Bing chat Python and Dynamo tutor](#7)
-- [Claude on Slack summarises and Answers questions](#8)
-- [Sparks of artificial General intelligence](#9)
+- [Claude on Slack summarises and answers questions](#8)
+- [Sparks of artificial general intelligence](#9)
 
 
 ####<a name="2"></a> Switch Metric + Imperial Units
 
 The Revit Idea Station wish list entry
 to [change project units between imperial and metric with one button click](https://forums.autodesk.com/t5/revit-ideas/change-project-units-between-imperial-and-metric-with-one-button/idc-p/11852849) has
-already been addressed by providing an add-in solution.
+already been addressed by providing
+the [UnitMigration add-in solution and source code](https://github.com/jeremytammik/UnitMigration).
 However, since some people lack the possibility to compile it, I shared updated compiled .NET assemblies
 for [Revit 2021](https://github.com/jeremytammik/UnitMigration/releases/tag/2021.0.0.1)
 and [Revit 2023](https://github.com/jeremytammik/UnitMigration/releases/tag/2023.0.0.1) that
@@ -131,7 +139,7 @@ In fact, anyone experienced in the comparison of real floating-point numbers doe
 That is standard.
 The Building Coder quite regularly repeats the [need for fuzz](https://www.google.com/search?q=fuzz&as_sitesearch=thebuildingcoder.typepad.com).
 
-In the case, of Revit, matters are even worse than in some other areas, since the Revit database represents property values and dimensions such as length using `float` instead of `double`.
+In the case of Revit, matters are even worse than in some other areas, since the Revit database represents property values and dimensions such as length using `float` instead of `double`.
 Hence, the need to [think big in Revit](https://thebuildingcoder.typepad.com/blog/2009/07/think-big-in-revit.html) and ignore every deviation below a certain (quite large) tolerance as irrelevant to the BIM, any "length below about 0.004 feet, i.e. ca. 0.05 inches or 1.2 millimetres".
 
 Personally, when I retrieve vertex or coordinate data from Revit, I simply round it to the closest millimetre while retrieving it. I add every vertex or coordinate data item as a key to a dictionary. Every new item is looked up in the dictionary and considered equal to the existing item if it lies within a millimetre of it.
@@ -141,7 +149,7 @@ So, in my case, A==B if A-B is smaller than 1 mm.
 ####<a name="5"></a> What is get_Parameter?
 
 For a final FAQ reiteration, we address
-[What's the deal with `get_Parameter`](https://forums.autodesk.com/t5/revit-api-forum/whats-the-deal-with-get-parameter-insert-seinfeld-bassline-here/m-p/11845778)
+[what's the deal with `get_Parameter`](https://forums.autodesk.com/t5/revit-api-forum/whats-the-deal-with-get-parameter-insert-seinfeld-bassline-here/m-p/11845778)
 
 **Question:** This is more of a request for a history lesson here about the Revit API, but what's the deal with the method `get_Parameter`?
 I've seen it used in past forum posts for use in Revit versions before 2022, but I don't see any references to it in the [revitapidocs](https://www.revitapidocs.com/).

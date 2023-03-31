@@ -50,8 +50,15 @@ twitter:
 
  with the #RevitAPI  @AutodeskRevit #BIM @DynamoBIM @AutodeskAPS
 
-&ndash;
-...
+Current topics of interest from the Revit API discussion forum and elsewhere
+&ndash; Switch metric + imperial units
+&ndash; What is UV?
+&ndash; What is fuzz?
+&ndash; What is get_Parameter?
+&ndash; Default localised workset names
+&ndash; Bing Chat Python and Dynamo tutor
+&ndash; Claude on Slack summarises and answers questions
+&ndash; Emergence and sparks of artificial general intelligence...
 
 linkedin:
 
@@ -69,7 +76,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>UV, Fuzz and the get_ Prefix</h3>
+<h3>UV, Emergence, Fuzz and the get_ Prefix</h3>
 <p>Here are some recent topics of interest that came up in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> and elsewhere:</p>
 <ul>
@@ -79,13 +86,14 @@ the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API d
 <li><a href="#5">What is get_Parameter?</a></li>
 <li><a href="#6">Default localised workset names</a></li>
 <li><a href="#7">Bing chat Python and Dynamo tutor</a></li>
-<li><a href="#8">Claude on Slack summarises and Answers questions</a></li>
-<li><a href="#9">Sparks of artificial General intelligence</a></li>
+<li><a href="#8">Claude on Slack summarises and answers questions</a></li>
+<li><a href="#9">Sparks of artificial general intelligence</a></li>
 </ul>
 <h4><a name="2"></a> Switch Metric + Imperial Units</h4>
 <p>The Revit Idea Station wish list entry
 to <a href="https://forums.autodesk.com/t5/revit-ideas/change-project-units-between-imperial-and-metric-with-one-button/idc-p/11852849">change project units between imperial and metric with one button click</a> has
-already been addressed by providing an add-in solution.
+already been addressed by providing
+the <a href="https://github.com/jeremytammik/UnitMigration">UnitMigration add-in solution and source code</a>.
 However, since some people lack the possibility to compile it, I shared updated compiled .NET assemblies
 for <a href="https://github.com/jeremytammik/UnitMigration/releases/tag/2021.0.0.1">Revit 2021</a>
 and <a href="https://github.com/jeremytammik/UnitMigration/releases/tag/2023.0.0.1">Revit 2023</a> that
@@ -116,13 +124,13 @@ I'm no expert, but that seems bad to me; even though it's very small numbers, an
 In fact, anyone experienced in the comparison of real floating-point numbers does already know that you <a href="https://duckduckgo.com/?q=comparing+floating+point+number">need to perform some rounding operation when comparing any and all such numbers on a digital computer</a>.
 That is standard.
 The Building Coder quite regularly repeats the <a href="https://www.google.com/search?q=fuzz&amp;as_sitesearch=thebuildingcoder.typepad.com">need for fuzz</a>.</p>
-<p>In the case, of Revit, matters are even worse than in some other areas, since the Revit database represents property values and dimensions such as length using <code>float</code> instead of <code>double</code>.
+<p>In the case of Revit, matters are even worse than in some other areas, since the Revit database represents property values and dimensions such as length using <code>float</code> instead of <code>double</code>.
 Hence, the need to <a href="https://thebuildingcoder.typepad.com/blog/2009/07/think-big-in-revit.html">think big in Revit</a> and ignore every deviation below a certain (quite large) tolerance as irrelevant to the BIM, any "length below about 0.004 feet, i.e. ca. 0.05 inches or 1.2 millimetres".</p>
 <p>Personally, when I retrieve vertex or coordinate data from Revit, I simply round it to the closest millimetre while retrieving it. I add every vertex or coordinate data item as a key to a dictionary. Every new item is looked up in the dictionary and considered equal to the existing item if it lies within a millimetre of it.</p>
 <p>So, in my case, A==B if A-B is smaller than 1 mm.</p>
 <h4><a name="5"></a> What is get_Parameter?</h4>
 <p>For a final FAQ reiteration, we address
-<a href="https://forums.autodesk.com/t5/revit-api-forum/whats-the-deal-with-get-parameter-insert-seinfeld-bassline-here/m-p/11845778">What's the deal with <code>get_Parameter</code></a></p>
+<a href="https://forums.autodesk.com/t5/revit-api-forum/whats-the-deal-with-get-parameter-insert-seinfeld-bassline-here/m-p/11845778">what's the deal with <code>get_Parameter</code></a></p>
 <p><strong>Question:</strong> This is more of a request for a history lesson here about the Revit API, but what's the deal with the method <code>get_Parameter</code>?
 I've seen it used in past forum posts for use in Revit versions before 2022, but I don't see any references to it in the <a href="https://www.revitapidocs.com/">revitapidocs</a>.
 Does anyone know where it stems from (the API, another API, the enchanted jungle of BIM?) and if still a valid method to use today in lieu of the <code>GetParameter</code> method (seems far easier to just use <code>get_Parameter</code> with a GUID vs <code>GetParameter</code>.</p>
