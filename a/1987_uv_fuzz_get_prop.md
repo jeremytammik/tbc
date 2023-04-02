@@ -49,7 +49,7 @@
 
 twitter:
 
- with the #RevitAPI  @AutodeskRevit #BIM @DynamoBIM @AutodeskAPS
+Emergence, sparks of artificial general intelligence, switching metric + imperial units, UV, fuzz, and the .NET property get_ prefix in the #RevitAPI @AutodeskRevit #BIM @DynamoBIM @AutodeskAPS https://autode.sk/uv_fuzz_get
 
 Current topics of interest from the Revit API discussion forum and elsewhere
 &ndash; Switch metric + imperial units
