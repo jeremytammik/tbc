@@ -1,0 +1,1194 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+
+<style>
+  ul.toc { list-style-type: none; }
+  h1.new { font-size: 150%; }
+  h2.new { font-size: 150%; }
+  h3.new { font-size: 120%; }
+  h4.new { font-size: 120%; }
+</style>
+
+<p></head></p>
+<!---
+
+twitter:
+
+What's New in the Revit 2024 API? Exciting new functionality, migration information, overview of changes and additions, table of contents, full details of all new aspects of the #RevitAPI @AutodeskForge @AutodeskRevit #bim #DynamoBim #ForgeDevCon https://autode.sk/rvt2024apinews
+
+The Revit 2024 API contains many exciting enhancements for add-in developers
+&ndash; Information sources
+&ndash; What's new in previous versions
+&ndash; Detailed table of contents
+&ndash; API Changes
+&ndash; API Additions...
+
+linkedin:
+
+#bim #DynamoBim #ForgeDevCon #Revit #API #IFC #SDK #AI #VisualStudio #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>What's New in the Revit 2024 API</h3>
+<p>The Revit 2024 API contains many exciting enhancements for add-in developers:</p>
+<ul>
+<li><a href="#1">Information sources</a></li>
+<li><a href="#2">What's new in previous versions</a></li>
+<li><a href="#4">Detailed table of contents</a></li>
+</ul>
+<p>Top level table of contents:</p>
+<ul class="toc">
+<li>1. <a href="#4.1">API changes </a></li>
+<ul class="toc">
+<li>1.1. <a href="#4.1.1">New version of CEFSharp </a></li>
+<li>1.9. <a href="#4.1.9">Obsolete API removal </a></li>
+</ul>
+<li>2. <a href="#4.2">API additions </a></li>
+<ul class="toc">
+<li>2.1. <a href="#4.2.1">Schedule API additions </a></li>
+<li>2.22. <a href="#4.2.22">Print API additions </a></li>
+</ul>
+</ul>
+
+<h4><a name="1"></a>Information Sources</h4>
+<p>The information below is based on the contents of the <em>Revit Platform API Changes and Additions.docx</em> document included with
+the Revit 2024 SDK, the software developers kit available from
+the <a href="https://www.autodesk.com/developer-network/platform-technologies/revit">Revit Developer Centre</a>.</p>
+<p>It is also provided in the section on <em>What's New</em> in the Revit 2024 API help file <code>RevitAPI.chm</code> included with the SDK:</p>
+<p><center>
+<img src="img/revit_2024_api_chm.png" alt="Revit 2024 API help on What's New" title="Revit 2024 API help on What's New" width="621"/> <!-- 1242 -->
+</center></p>
+<p>For convenient, easy, and effective web searching, this blog post provides a cleaned-up online HTML version of that information with numbering and table of contents added, as well as the following PDF printout of the original document included in the SDK with table of contents and page numbers added:</p>
+<ul>
+<li><a href="zip/Revit_Platform_API_Changes_and_Additions_2024_01.pdf">Revit_Platform_API_Changes_and_Additions_2024.pdf</a></li>
+</ul>
+<p>The <em>What's New</em> section and the <em>Changes and Additions</em> document provide important information, both for discovering and exploring the newly added API functionality and for later reference.</p>
+<p>If you encounter any issues migrating your existing add-ins between different versions, this is one of the first places to look.</p>
+<p>For detailed information on all other aspects of the Revit API, please refer to the rest of the API documentation and samples provided in the SDK.</p>
+<p>The most important things to install and always keep at hand are:</p>
+<ul>
+<li>The Revit API help file <code>RevitAPI.chm</code></li>
+<li>The Visual Studio solution containing all the SDK samples, <code>Samples\SDKSamples.sln</code></li>
+</ul>
+<p>You will regularly need both for research on how to solve specific Revit API programming tasks.</p>
+<p>More in-depth official explanations and background information is provided by the
+online <a href="http://help.autodesk.com/view/RVT/2024/ENU/?guid=Revit_API_Revit_API_Developers_Guide_html">Revit API Developers Guide</a> included
+in the <a href="http://help.autodesk.com/view/RVT/2024/ENU">Revit 2024 online help</a>.</p>
+<h4><a name="2"></a>What's New in Previous Versions</h4>
+<p>Here are links to previous discussions of <em>What's New in the Revit API</em>:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2010-api.html">What's New in the Revit 2010 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2011-api.html">What's New in the Revit 2011 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2012-api.html">What's New in the Revit 2012 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/whats-new-in-the-revit-2013-api.html">What's New in the Revit 2013 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">What's New in the Revit 2014 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html">What's New in the Revit 2015 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html">What's New in the Revit 2016 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/04/whats-new-in-the-revit-2017-api.html">What's New in the Revit 2017 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/11/whats-new-in-the-revit-20171-api.html">What's New in the Revit 2017.1 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-revit-2018-api.html">What's New in the Revit 2018 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/08/revit-20181-and-the-visual-materials-api.html">Revit 2018.1 and the Visual Materials API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/09/revit-201811-fixes-cropbox-setting.html">Revit 2018.1.1 and 2018.1 API Docs Online</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html">Revit 2018.1 Visual Materials API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/12/whats-new-in-the-revit-20182-api.html">What's New in the Revit 2018.2 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2018/04/whats-new-in-the-revit-2019-api.html">What's New in the Revit 2019 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html">What's New in the Revit 2020 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/09/whats-new-in-the-revit-20201-api.html">What's New in the Revit 2020.1 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2020/04/whats-new-in-the-revit-2021-api.html">What's New in the Revit 2021 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2020/08/revit-20211-sdk-and-whats-new.html">What's New in the Revit 2021.1 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2021/04/whats-new-in-the-revit-2022-api.html">What's New in the Revit 2022 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2021/11/whats-new-in-the-revit-20221-api.html">What's New in the Revit 2022.1 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2022/04/whats-new-in-the-revit-2023-api.html">What's New in the Revit 2023 API</a></li>
+</ul>
+<h4><a name="4"></a>Detailed Table of Contents</h4>
+<!-- <h1>Major changes and renovations to the Revit API -->
+
+<ul class="toc">
+<li>1. <a href="#4.1">API changes </a></li>
+<ul class="toc">
+<li>1.1. <a href="#4.1.1">CefSharp upgrade</a></li>
+<li>1.2. <a href="#4.1.2">Upgrade ElementId Storage to 64-Bit</a></li>
+<ul class="toc">
+<li>1.2.1. <a href="#4.1.2.1">Changes to pre-existing enumerated types</a></li>
+<li>1.2.2. <a href="#4.1.2.2">Binary breaking change to the Autodesk.Revit.DB.BuiltInParameter enumeration</a></li>
+<li>1.2.3. <a href="#4.1.2.3">Changes to other APIs</a></li>
+<li>1.2.4. <a href="#4.1.2.4">Changes to decal properties</a></li>
+</ul>
+<li>1.3. <a href="#4.1.3">Replacement of TopographySurface with Toposolid</a></li>
+<ul class="toc">
+<li>1.3.1. <a href="#4.1.3.1">Point Visibility Settings</a></li>
+</ul>
+<li>1.4. <a href="#4.1.4">Family API changes</a></li>
+<ul class="toc">
+<li>1.4.1. <a href="#4.1.4.1">Placement of Level based instances in family documents</a></li>
+<li>1.4.2. <a href="#4.1.4.2">FamilyManager</a></li>
+</ul>
+<li>1.5. <a href="#4.1.5">FamilyInstance API changes</a></li>
+<li>1.6. <a href="#4.1.6">Removal of Open ADSK workflow</a></li>
+<li>1.7. <a href="#4.1.7">ImportExport API changes</a></li>
+<li>1.8. <a href="#4.1.8">Copy/Paste API changes</a></li>
+<ul class="toc">
+<li>1.8.1. <a href="#4.1.8.1">Additional validation for Copy and Mirror API</a></li>
+</ul>
+<li>1.9. <a href="#4.1.9">Correction of deprecation of Mass Level Data API</a></li>
+<li>1.10. <a href="#4.1.10">Schedule API changes</a></li>
+<li>1.11. <a href="#4.1.11">UI API Changes</a></li>
+<li>1.12. <a href="#4.1.12">Structure API changes</a></li>
+<li>1.13. <a href="#4.1.13">Fabrication API changes</a></li>
+<li>1.14. <a href="#4.1.14">DirectShape API changes</a></li>
+<li>1.15. <a href="#4.1.15">Parameter API changes</a></li>
+<ul class="toc">
+<li>1.15.1. <a href="#4.1.15.1">Element.Parameters</a></li>
+<li>1.15.2. <a href="#4.1.15.2">Shared Parameters</a></li>
+<li>1.15.3. <a href="#4.1.15.3">Parameter Definition</a></li>
+<li>1.15.4. <a href="#4.1.15.4">Parameter Binding</a></li>
+<li>1.15.5. <a href="#4.1.15.5">Parameter Utils</a></li>
+</ul>
+<li>1.16. <a href="#4.1.16">Obsolete API removal</a></li>
+<ul class="toc">
+<li>1.16.1. <a href="#4.1.16.1">Classes</a></li>
+<li>1.16.2. <a href="#4.1.16.2">Methods</a></li>
+<li>1.16.3. <a href="#4.1.16.3">Properties</a></li>
+<li>1.16.4. <a href="#4.1.16.4">Enums</a></li>
+</ul>
+</ul>
+
+<li>2. <a href="#4.2">API additions </a></li>
+
+<ul class="toc">
+<li>2.1. <a href="#4.2.1">Element Iteration API additions</a></li>
+<li>2.2. <a href="#4.2.2">Filled Region API additions</a></li>
+<li>2.3. <a href="#4.2.3">Analysis API additions</a></li>
+<ul class="toc">
+<li>2.3.1. <a href="#4.2.3.1">Analytical surfaces in the energy model</a></li>
+<li>2.3.2. <a href="#4.2.3.2">Energy Analysis Surface</a></li>
+<li>2.3.3. <a href="#4.2.3.3">Energy Analysis Opening</a></li>
+<li>2.3.4. <a href="#4.2.3.4">Energy Analysis Construction</a></li>
+<li>2.3.5. <a href="#4.2.3.5">EnergyDataSettings</a></li>
+</ul>
+<li>2.4. <a href="#4.2.4">Structural Analytical Model API additions</a></li>
+<ul class="toc">
+<li>2.4.1. <a href="#4.2.4.1">Analytical to Physical Associations</a></li>
+<li>2.4.2. <a href="#4.2.4.2">Structural Analytical Model Elements</a></li>
+</ul>
+<li>2.5. <a href="#4.2.5">3D View API additions</a></li>
+<li>2.6. <a href="#4.2.6">DirectShape API additions</a></li>
+<ul class="toc">
+<li>2.6.1. <a href="#4.2.6.1">DirectShapeType</a></li>
+<li>2.6.2. <a href="#4.2.6.2">DirectShapeReferenceOptions</a></li>
+<li>2.6.3. <a href="#4.2.6.3">DirectShape</a></li>
+</ul>
+<li>2.7. <a href="#4.2.7">Detailing API additions</a></li>
+<ul class="toc">
+<li>2.7.1. <a href="#4.2.7.1">Detail element draw order</a></li>
+</ul>
+<li>2.8. <a href="#4.2.8">Selection API additions</a></li>
+<ul class="toc">
+<li>2.8.1. <a href="#4.2.8.1">UI Application</a></li>
+</ul>
+<li>2.9. <a href="#4.2.9">3D Shape API additions</a></li>
+<li>2.10. <a href="#4.2.10">Reinforcement API additions</a></li>
+<ul class="toc">
+<li>2.10.1. <a href="#4.2.10.1">Rebar</a></li>
+</ul>
+<li>2.11. <a href="#4.2.11">Parameter API additions</a></li>
+<li>2.12. <a href="#4.2.12">Slab API additions</a></li>
+<li>2.13. <a href="#4.2.13">Groups API additions</a></li>
+<ul class="toc">
+<li>2.13.1. <a href="#4.2.13.1">Group Load Options</a></li>
+<li>2.13.2. <a href="#4.2.13.2">Group Type</a></li>
+</ul>
+<li>2.14. <a href="#4.2.14">Link Visibility/Graphic Override API additions</a></li>
+<li>2.15. <a href="#4.2.15">Purge unused elements API additions</a></li>
+<li>2.16. <a href="#4.2.16">Parameter API additions</a></li>
+<ul class="toc">
+<li>2.16.1. <a href="#4.2.16.1">ParameterDownloadOptions</a></li>
+<li>2.16.2. <a href="#4.2.16.2">ParameterUtils</a></li>
+</ul>
+<li>2.17. <a href="#4.2.17">Electrical Analytical API additions</a></li>
+<ul class="toc">
+<li>2.17.1. <a href="#4.2.17.1">ElectricalAnalyticalLoadSet</a></li>
+<li>2.17.2. <a href="#4.2.17.2">AreaBasedLoadData</a></li>
+<li>2.17.3. <a href="#4.2.17.3">PointLoadData</a></li>
+<li>2.17.4. <a href="#4.2.17.4">ElectricalAnalyticalNode</a></li>
+<li>2.17.5. <a href="#4.2.17.5">ElectricalLoadClassification</a></li>
+</ul>
+<li>2.18. <a href="#4.2.18">Structural API additions</a></li>
+<ul class="toc">
+<li>2.18.1. <a href="#4.2.18.1">Bending details in view</a></li>
+<li>2.18.2. <a href="#4.2.18.2">Path Alignment Options for Free Form Rebar API</a></li>
+<li>2.18.3. <a href="#4.2.18.3">LoadBase</a></li>
+<li>2.18.4. <a href="#4.2.18.4">LineLoad</a></li>
+<li>2.18.5. <a href="#4.2.18.5">AreaLoad</a></li>
+<li>2.18.6. <a href="#4.2.18.6">PointLoad</a></li>
+<li>2.18.7. <a href="#4.2.18.7">Loads Display Scaling</a></li>
+<li>2.18.8. <a href="#4.2.18.8">Schedule Custom Field</a></li>
+</ul>
+<li>2.19. <a href="#4.2.19">FilledRegion API additions</a></li>
+<li>2.20. <a href="#4.2.20">Fabrication API additions</a></li>
+<li>2.21. <a href="#4.2.21">Schedule API additions</a></li>
+<ul class="toc">
+<li>2.21.1. <a href="#4.2.21.1">ViewSchedule</a></li>
+<li>2.21.2. <a href="#4.2.21.2">ScheduleableField</a></li>
+<li>2.21.3. <a href="#4.2.21.3">Scheduling Revision Clouds</a></li>
+<li>2.21.4. <a href="#4.2.21.4">HostCount</a></li>
+<li>2.21.5. <a href="#4.2.21.5">Vertical Alignment of Schedules</a></li>
+<li>2.21.6. <a href="#4.2.21.6">Custom Field API additions</a></li>
+</ul>
+<li>2.22. <a href="#4.2.22">External Service API addition</a></li>
+<li>2.23. <a href="#4.2.23">View API additions</a></li>
+<ul class="toc">
+<li>2.23.1. <a href="#4.2.23.1">Revision Clouds in Sheets</a></li>
+</ul>
+<li>2.24. <a href="#4.2.24">Graphics API additions</a></li>
+<ul class="toc">
+<li>2.24.1. <a href="#4.2.24.1">Additional view graphics</a></li>
+</ul>
+<li>2.25. <a href="#4.2.25">UI API additions</a></li>
+<ul class="toc">
+<li>2.25.1. <a href="#4.2.25.1">UIThemeManager</a></li>
+<li>2.25.2. <a href="#4.2.25.2">ThemeChangedEventArgs</a></li>
+<li>2.25.3. <a href="#4.2.25.3">Selection</a></li>
+</ul>
+<li>2.26. <a href="#4.2.26">Mechanical API additions</a></li>
+<li>2.27. <a href="#4.2.27">Toposolid API additions</a></li>
+<ul class="toc">
+<li>2.27.1. <a href="#4.2.27.1">Toposolid and Toposolid Type</a></li>
+</ul>
+<li>2.28. <a href="#4.2.28">Import/Export API additions</a></li>
+<li>2.29. <a href="#4.2.29">Miscellaneous</a></li>
+<ul class="toc">
+<li>2.29.1. <a href="#4.2.29.1">SunStudyTimeInterval</a></li>
+</ul>
+</ul>
+</ul>
+
+<p><center></p>
+<div style="border-style:solid; border-width:2px 0px 2px 0px">
+<a name="4.1"></a><h1 class="new" style="font-weight: bold">1. API Changes</h1>
+</div>
+<p></center></p>
+<p><a name="4.1.1"></a><h2 class="new">1.1. CefSharp upgrade</h2></p>
+<p>Revit and Autodesk add-ins use the CEFsharp library internally for several features. Some third-party add-ins do so as well. Occasionally, when different versions of the library are used, it leads to instability issues for Revit. In order to avoid version conflicts, we are clarifying what CEFsharp version is being used, and loading it prior to all add-in initializations.</p>
+<ul>
+<li>In this version, Revit uses CEFsharp version v105.3.390</li>
+</ul>
+<p><a name="4.1.2"></a><h2 class="new">1.2. Upgrade ElementId Storage to 64-Bit</h2></p>
+<p>The internal storage of Autodesk.Revit.DB.ElementId was updated from a 32-bit integer to a 64-bit size value (long long in C++/CLI, long in C#).</p>
+<p>This resulted in changes to the ElementId class and members and some other tools.</p>
+<ul>
+<li>Deprecated member(s) &rarr; Replacement member(s) &ndash; Notes</li>
+<li>Autodesk.Revit.DB.ElementId.IntegerValue
+&rarr; Autodesk.Revit.DB.ElementId.Value
+&ndash; IntegerValue will throw an exception if called on an ElementId whose value is high enough to need more than 32 bits to describe it. It is replaced by the new Value property that returns the full 64-bit value.</li>
+<li>Autodesk.Revit.DB.ElementId()
+&rarr; Autodesk.Revit.DB.ElementId(System::Int64 id)
+&ndash; Replaced by a constructor that takes the full 64-bit Value.</li>
+</ul>
+<p>The new property:</p>
+<ul>
+<li>Autodesk.Revit.DB.ElementId.Value</li>
+</ul>
+<p>allows users to provide the value of the ElementId as System::Int64 The new constructor:</p>
+<ul>
+<li>Autodesk.Revit.DB.ElementId(System.Int64 id)</li>
+</ul>
+<p>allows users to create an ElementId handle with the given Int64 id.</p>
+<p><a name="4.1.2.1"></a><h2 class="new">1.2.1. Changes to pre-existing enumerated types</h2></p>
+<p>To support storage/conversion of Autodesk.Revit.DB.BuiltInCategory as an Autodesk.Revit.DB.ElementId, the underlying type size of the enum was upgraded from 32-bit to 64-bit.</p>
+<ul>
+<li>This requires little to no code changes, however, code built against pre-2024 versions of the API may experience type cast and other type related exceptions when run against the 2024 versions of the API when working with the enum.</li>
+<li>In order to run successfully, code needs to be rebuilt against the Revit 2024 API.</li>
+</ul>
+<p><a name="4.1.2.2"></a><h2 class="new">1.2.2. Binary breaking change to the Autodesk.Revit.DB.BuiltInParameter enumeration</h2></p>
+<p>To support storage/conversion of Autodesk.Revit.DB.BuiltInParameter as an Autodesk.Revit.DB.ElementId, the underlying type size of the enum was upgraded from 32-bit to 64-bit.</p>
+<ul>
+<li>This requires little to no code changes, however, code built against pre-2024 versions of the API may experience type cast and other type related exceptions when run against the 2024 versions of the API when working with the enum.</li>
+<li>In order to run successfully, code needs to be rebuilt against the Revit 2024 API.</li>
+</ul>
+<p><a name="4.1.2.3"></a><h2 class="new">1.2.3. Changes to other APIs</h2></p>
+<p>Support was added for System.Int64 types to Extensible Storage.</p>
+<ul>
+<li>Updated Autodesk.Revit.DB.ExtensibleStorage.SchemaBuilder.AddSimpleField() now accepts System.Int64 as a valid type for the fieldType.</li>
+<li>Updated Autodesk.Revit.DB.ExtensibleStorage.SchemaBuilder.AddMapField() now accepts System.Int64 as a valid type for the keyType and valueType.</li>
+</ul>
+<p><a name="4.1.2.4"></a><h2 class="new">1.2.4. Changes to decal properties</h2></p>
+<p>The decal asset properties named decalelementId and materialId are changed from type AssetPropertyInteger to AssetPropertyInt64.</p>
+<p>The code that would find these properties and then use them as AssetPropertyInteger/ AssetPropertyType.Integer type should be changed to use them as AssetPropertyInt64 / AssetPropertyType.Longlong type. For example:</p>
+<pre>
+  AssetPropertyInteger decalElementIdProp
+    = (asset.FindByName("decalelementId")
+      as AssetPropertyInteger);
+
+  if (decalElementIdProp.Type == AssetPropertyType.Integer)
+</pre>
+
+<p>should be changed to</p>
+<pre>
+  AssetPropertyInt64 decalElementIdProp
+    = (asset.FindByName("decalelementId")
+      as AssetPropertyInt64);
+
+  if (decalElementIdProp.Type == AssetPropertyType.Longlong)
+</pre>
+
+<p><a name="4.1.3"></a><h2 class="new">1.3. Replacement of TopographySurface with Toposolid</h2></p>
+<p>TopographySurface and SiteSubRegion elements have been superseded as of Revit 2024 by a new element Autodesk.Revit.DB.Architecture.Toposolid and related classes. It is recommended that all newly created elements and modifications operate from the new Toposolid class. The TopographySurface element remains in the API for backwards compatibility and upgrade.</p>
+<p>As a result of this change, the following methods are marked as deprecated:</p>
+<ul>
+<li>Deprecated member(s) &rarr; Replacement member(s) &ndash; Notes</li>
+<li>TopographySurface.Create()
+&rarr; Toposolid.Create() (from points or curve profiles)
+&ndash; Toposolid.CreateFromTopographyS urface() is also available to convert an older element to its more modern replacement.</li>
+<li>TopographySurface.AddPoints(),
+TopographySurface.DeletePoints(),
+TopographySurface.MovePoint(),
+TopographySurface.ChangePointElevation(),
+TopographySurface.ChangePointsElevation()
+&rarr; Toposolid.GetSlabShapeEditor()
+&ndash; Use the SlabShapeEditor to query, add, modify and delete individual points</li>
+<li>SiteSubRegion.Create()
+&rarr; Toposolid.CreateSubDivision()</li>
+<li>SiteSubRegion.SetBoundary()
+&rarr; Edit the sketch of the subdivision Toposolid element using SketchEditScope</li>
+</ul>
+<p><a name="4.1.3.1"></a><h2 class="new">1.3.1. Point Visibility Settings</h2></p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.SSEPointVisibilitySettings</li>
+</ul>
+<p>offers tools to control the point visibility for SlabShapeEditor based elements (floors, roofs and toposolids) on a per-category basis.</p>
+<p><a name="4.1.4"></a><h2 class="new">1.4. Family API changes</h2></p>
+<p><a name="4.1.4.1"></a><h2 class="new">1.4.1. Placement of Level based instances in family documents</h2></p>
+<p>The API for placing new family instances for level based families was available in previous releases but could only be used in the project environment.</p>
+<p>The method:</p>
+<ul>
+<li>NewFamilyInstance(XYZ, FamilySymbol, Level, StructuralType)</li>
+</ul>
+<p>has been moved to the Autodesk.Revit.Creation.ItemFactoryBase class and can now be accessed in both family and project documents using the appropriate version.</p>
+<ul>
+<li>Autodesk.Revit.Creation.Document.NewFamilyInstance()</li>
+<li>Autodesk.Revit.Creation.FamilyItemFactory.NewFamilyInstance()</li>
+</ul>
+<p><a name="4.1.4.2"></a><h2 class="new">1.4.2. FamilyManager</h2></p>
+<p>Deprecated member(s) &rarr; Replacement member(s)
+FamilyManager.AddParameter(ExternalDefinition, BuiltInParameterGroup, bool) &rarr; FamilyManager.AddParameter(ExternalDefiniti on, ForgeTypeId, bool)
+FamilyManager.AddParameter(string, BuiltInParameterGroup, Category, bool) &rarr; FamilyManager.AddParameter(String, ForgeTypeId, Category, bool)
+FamilyManager.ReplaceParameter(FamilyParameter, ExternalDefinition, BuiltInParameterGroup, bool) &rarr; FamilyManager.ReplaceParameter(FamilyPara meter, ExternalDefinition, ForgeTypeId, bool)
+FamilyManager.ReplaceParameter(FamilyParameter, string, BuiltInParameterGroup, bool) &rarr; FamilyManager.ReplaceParameter(FamilyPara meter, ExternalDefinition, ForgeTypeId, bool)
+FamilyManager.IsUserAssignableParameterGroup(BuiltInParameterGroup) &rarr; FamilyManager.IsUserAssignableParameterGroup(ForgeTypeId)</p>
+<p><a name="4.1.5"></a><h2 class="new">1.5. FamilyInstance API changes</h2></p>
+<p>The behavior of the following methods has changed. When the Phase does not apply to the FamilyInstance (e.g., FamilyInstance for annotation), they now return null instead of throwing InvalidOperationException.</p>
+<ul>
+<li>FamilyInstance.Room()</li>
+<li>FamilyInstance.Room(Phase)</li>
+<li>FamilyInstance.FromRoom</li>
+<li>FamilyInstance.FromRoom(Phase)</li>
+<li>FamilyInstance.ToRoom</li>
+<li>FamilyInstance.ToRoom(Phase)</li>
+<li>FamilyInstance.Space</li>
+<li>FamilyInstance.Space(Phase)</li>
+</ul>
+<p><a name="4.1.6"></a><h2 class="new">1.6. Removal of Open ADSK workflow</h2></p>
+<p>Open ADSK functionality has been removed from Revit, including the associated API:</p>
+<ul>
+<li>Application.OpenBuildingComponentDocument()</li>
+</ul>
+<p><a name="4.1.7"></a><h2 class="new">1.7. ImportExport API changes</h2></p>
+<p>The base class</p>
+<ul>
+<li>ATFExportOptions</li>
+</ul>
+<p>was renamed to BIMExportOptions to better reflect the purpose that it serves in the export options hierarchy. No functionality was changed.</p>
+<p><a name="4.1.8"></a><h2 class="new">1.8. Copy/Paste API changes</h2></p>
+<p>The Copy/Paste API has been improved to support several new scenarios in Sketch Edit Mode. Method signatures remain unchanged.</p>
+<p>The method:</p>
+<ul>
+<li>ElementTransformUtils.CopyElements(View, ICollection(ElementId), View, Transform, CopyPasteOptions)</li>
+</ul>
+<p>can now be used to copy sketch members from a sketch to the main document.</p>
+<p>Additional supported copy/paste cases:</p>
+<ul>
+<li>Copying within one Sketch &ndash; If there is an active sketch edit mode, you can now copy sketch members of the active sketch. The copied elements will be added to the active sketch.</li>
+<li>Copying between Sketches &ndash; Allows you to copy sketch members from one sketch to another. To do this, sketches must be parallel and the destination sketch must be in edit mode.</li>
+<li>Copying ModelCurves from the Document to a Sketch &ndash; Allows you to copy ModelCurves from the document to a sketch, if the sketch is in edit mode. To do this, the sketch plane must be parallel to the WorkPlane that ModelCurves are based on.</li>
+</ul>
+<p><a name="4.1.8.1"></a><h2 class="new">1.8.1. Additional validation for Copy and Mirror API</h2></p>
+<p>The methods:</p>
+<ul>
+<li>ElementTransformUtils.CopyElements()</li>
+<li>ElementTransformUtils.MirrorElements()</li>
+</ul>
+<p>have had additional validation added to handle copying within or between sketches. All copied elements must come from the same sketch. Also, to paste elements into a sketch, that sketch must be within sketch edit mode.</p>
+<p>Additionally, copying between two sketches is only allowed if the sketches are parallel. This validation has been applied to all copy methods.</p>
+<p><a name="4.1.9"></a><h2 class="new">1.9. Correction of deprecation of Mass Level Data API</h2></p>
+<p>The class:</p>
+<ul>
+<li>Autodesk.Revit.DB.Analysis.MassLevelData</li>
+</ul>
+<p>was mistakenly marked for deprecation in Revit 2023, but the class is still applicable, so it is now no longer marked for deprecation.</p>
+<p><a name="4.1.10"></a><h2 class="new">1.10. Schedule API changes</h2></p>
+<ul>
+<li>Deprecated member &rarr; Replacement member</li>
+<li>ViewSchedule.ImageRowHeight &rarr; ViewSchedule.RowHeight</li>
+</ul>
+<p><a name="4.1.11"></a><h2 class="new">1.11. UI API Changes</h2></p>
+<p>The DefaultTheme property allowed users to read or write the theme type from <code>.ini</code> file.
+The new property CurrentTheme has been extended to have similar function, so deprecated DefaultTheme to avoid the functional overlap.</p>
+<ul>
+<li>Deprecated member &rarr; Replacement member</li>
+<li>Autodesk.Revit.UI.UIThemeManager.DefaultTheme &rarr; Autodesk.Revit.UI.UIThemeManager.CurrentTheme</li>
+</ul>
+<p><a name="4.1.12"></a><h2 class="new">1.12. Structure API changes</h2></p>
+<p>The following members will now throw InvalidOperationException if the load is un-hosted:</p>
+<ul>
+<li>AreaLoad.SetLoops()</li>
+<li>LineLoad.SetPoints()</li>
+<li>PointLoad.Point { set; }</li>
+</ul>
+<p><a name="4.1.13"></a><h2 class="new">1.13. Fabrication API changes</h2></p>
+<p>Some flow-related parameters are renamed.</p>
+<ul>
+<li>Original parameter name &rarr; Renamed value &ndash; Notes</li>
+<li>RBS_PIPE_RELATIVE_ROUGHNESS_PARAM &rarr; RELATIVE_ROUGHNESS &ndash; Covers all design and fabrication elements.</li>
+<li>RBS_PIPE_FRICTION_FACTOR_PARAM &rarr; FRICTION_FACTOR &ndash; Covers all design and fabrication elements.</li>
+<li>RBS_CURVETYPE_ROUGHNESS_PARAM &rarr; DUCT_ROUGHNESS &ndash; Covers design and fabrication ducts.</li>
+<li>RBS_PIPE_ROUGHNESS_PARAM &rarr; PIPE_ROUGHNESS &ndash; Covers design and fabrication pipes.</li>
+</ul>
+<p><a name="4.1.14"></a><h2 class="new">1.14. DirectShape API changes</h2></p>
+<p>You can now provide an external tag to reference geometry. There is a change in behavior for the following methods:</p>
+<ul>
+<li>DirectShape.AddReferencePlane()</li>
+<li>DirectShape.AddReferencePoint()</li>
+<li>DirectShape.AddReferenceCurve()</li>
+<li>DirectShapeType.AddReferencePlane()</li>
+<li>DirectShapeType.AddReferencePoint()</li>
+<li>DirectShapeType.AddReferenceCurve()</li>
+</ul>
+<p>Methods which accepted an Autodesk.Revit.DB.DirectShapeReferenceOptions argument will now associate an external ID with the added reference object, if the options specify one. An exception is thrown if the DirectShape or DirectShapeType already has reference geometry with the specified external ID.</p>
+<p><a name="4.1.15"></a><h2 class="new">1.15. Parameter API changes</h2></p>
+<p><a name="4.1.15.1"></a><h2 class="new">1.15.1. Element.Parameters</h2></p>
+<p>The method Element.GetOrderedParameters() is compiled as the current description but the order of the parameters have changed. The parameters are returned in the order in which they appear in the Revit UI within a given group but order of grouped is changed. It is not defined in documentation.</p>
+<p><a name="4.1.15.2"></a><h2 class="new">1.15.2. Shared Parameters</h2></p>
+<ul>
+<li>Deprecated member &rarr; Replacement member</li>
+<li>LabelUtils.GetLabelFor(BuiltInParameterGroup) &rarr; LabelUtils.GetLabelForGroup(ForgeTypeId)</li>
+</ul>
+<p><a name="4.1.15.3"></a><h2 class="new">1.15.3. Parameter Definition</h2></p>
+<ul>
+<li>Deprecated property &rarr; Replacement member</li>
+<li>Definition.ParameterGroup &rarr; Definition.GetGroupTypeId()</li>
+</ul>
+<p><a name="4.1.15.4"></a><h2 class="new">1.15.4. Parameter Binding</h2></p>
+<ul>
+<li>Deprecated member &rarr; Replacement member</li>
+<li>BindingMap.Insert(Definition, Binding, BuiltInParameterGroup) &rarr; BindingMap.Insert(Definition, Binding, ForgeTypeId)</li>
+<li>BindingMap.ReInsert(Definition, Binding, BuiltInParameterGroup) B&rarr; indingMap.ReInsert(Definition, Binding, ForgeTypeId)</li>
+</ul>
+<p><a name="4.1.15.5"></a><h2 class="new">1.15.5. Parameter Utils</h2></p>
+<ul>
+<li>Deprecated member &rarr; Replacement member</li>
+<li>ParameterUtils.GetParameterGroupTypeId(BuiltInParameterGroup) &rarr; Please use members of the <code>GroupTypeId</code> class instead.</li>
+<li>ParameterUtils.GetBuiltInParameterGroup(ForgeTypeId) &rarr; Please use members of the <code>GroupTypeId</code> class instead.</li>
+</ul>
+<p><a name="4.1.16"></a><h2 class="new">1.16. Obsolete API removal</h2></p>
+<p>The following API members and classes which had previously been marked Deprecated have been removed in this release. Consult the API documentation from prior releases for information on the replacements to use:</p>
+<p><a name="4.1.16.1"></a><h2 class="new">1.16.1. Classes</h2></p>
+<ul>
+<li>Analysis.MassGBXMLExportOptions</li>
+<li>Analysis.MassZone</li>
+<li>Analysis.MassEnergyAnalyticalModel</li>
+</ul>
+<p><a name="4.1.16.2"></a><h2 class="new">1.16.2. Methods</h2></p>
+<ul>
+<li>STLExportOptions.SetTessellationSettings(STLExportResolution)</li>
+<li>Analysis.EnergyDataSetting.EnableConceptualEnergyAnalyticalMod()</li>
+<li>Analysis.EnergyDataSetting.SetCreateAnalyticalModel()</li>
+<li>Mechanical.ZoneEquipment.Create(Document, AnalyticalSystemDomain, String)</li>
+<li>GroupNode.GetSymbolId()</li>
+<li>Rebar.IsSolidInView()</li>
+<li>Rebar.SetSolidInView()</li>
+<li>AreaReinforcement.IsSolidInView()</li>
+<li>AreaReinforcement.SetSolidInView()</li>
+<li>PathReinforcement.IsSolidInView()</li>
+<li>PathReinforcement.SetSolidInView()</li>
+<li>RebarInSystem.IsSolidInView()</li>
+<li>RebarInSystem.SetSolidInView()</li>
+<li>FabricSheet.IsSolidInView()</li>
+<li>FabricSheet.SetSolidInView()</li>
+<li>RebarContainer.IsSolidInView()</li>
+<li>RebarContainer.SetSolidInView()</li>
+</ul>
+<p><a name="4.1.16.3"></a><h2 class="new">1.16.3. Properties</h2></p>
+<ul>
+<li>EnergyAnalysisSpace.AnalyticalVolume</li>
+<li>EnergyAnalysisSpace.InnerVolume</li>
+<li>GeometryInstance.Symbol</li>
+</ul>
+<p><a name="4.1.16.4"></a><h2 class="new">1.16.4. Enums</h2></p>
+<ul>
+<li>STLExportResolution</li>
+<li>Analysis.AnalysisMode.ConceptualMasses</li>
+</ul>
+<p><center></p>
+<div style="border-style:solid; border-width:2px 0px 2px 0px">
+<a name="4.2"></a><h1 class="new" style="font-weight: bold">2. API Additions</h1>
+</div>
+<p></center></p>
+<p><a name="4.2.1"></a><h2 class="new">2.1. Element Iteration API additions</h2></p>
+<p>The new constructor:</p>
+<ul>
+<li>FilteredElementCollector(Document hostDocument, ElementId viewId, ElementId linkId)</li>
+</ul>
+<p>creates a FilteredElementCollector set to iterate the visible elements in a Revit link instance in a certain view of the host document. Elements returned by iteration of this collector will be from the Revit link instance's document.</p>
+<p><a name="4.2.2"></a><h2 class="new">2.2. Filled Region API additions</h2></p>
+<p>Added functionality that allows users to create either a masking region on a sketch plane in a 3D model family or a view specific masking region from the given boundaries.</p>
+<p>The new methods:</p>
+<ul>
+<li>FilledRegion.CreateMaskingRegion(Document, SketchPlane, IList&lt;CurveLoop&gt;)</li>
+<li>FilledRegion.CreateMaskingRegion(Document, ElementId, IList&lt;CurveLoop&gt;)</li>
+</ul>
+<p><a name="4.2.3"></a><h2 class="new">2.3. Analysis API additions</h2></p>
+<p><a name="4.2.3.1"></a><h2 class="new">2.3.1. Analytical surfaces in the energy model</h2></p>
+<p>Several new classes were added in the Autodesk.Revit.DB.Analysis namespace that allows users to retrieve thermal properties and material layers for analytical constructions and window types associated with analytical surfaces in the energy model. All thermal properties on EnergyAnalysisConstruction and EnergyAnalysisMaterial should be read-only.</p>
+<p>The new classes:</p>
+<ul>
+<li>EnergyAnalysisZone &ndash; Represents the analytical zone.</li>
+<li>EnergyAnalysisConstruction &ndash; Represent an analytical construction as a composite of layered
+materials.</li>
+<li>EnergyAnalysisWindowType &ndash; Represent an analytical construction containing window type data.</li>
+<li>EnergyAnalysisMaterial &ndash; Represents description of a material with thermal properties in a
+composite construction.</li>
+</ul>
+<p>The new values available for energy analysis enumerated types:</p>
+<ul>
+<li>gbXMLSurfaceType.ExposedFloor &ndash; New type of surface that can be assigned in the energy analytical model and gbXML output.</li>
+<li>ConstructionType.UndergroundWall &ndash; New type of construction that can be assigned to a portion of the energy analytical model.</li>
+</ul>
+<p><a name="4.2.3.2"></a><h2 class="new">2.3.2. Energy Analysis Surface</h2></p>
+<p>The new properties:</p>
+<ul>
+<li>EnergyAnalysisSurface.OriginatingElementId</li>
+<li>EnergyAnalysisSurface.OriginatingElementName</li>
+</ul>
+<p>allows users to identify the originating Revit element's id and name.</p>
+<p>The new method:</p>
+<ul>
+<li>EnergyAnalysisSurface.GetConstruction()</li>
+</ul>
+<p>allows users to get the analytic construction this surface is associated with.</p>
+<p><a name="4.2.3.3"></a><h2 class="new">2.3.3. Energy Analysis Opening</h2></p>
+<p>The new properties:</p>
+<ul>
+<li>EnergyAnalysisOpening.OriginatingElementId</li>
+<li>EnergyAnalysisOpening.OriginatingElementName</li>
+</ul>
+<p>allows users to identify the originating Revit element's id and name.</p>
+<p>The new methods:
+- EnergyAnalysisOpening.GetConstruction() &ndash; Allows users to get the analytical construction this opening is associated with.
+- EnergyAnalysisOpening.GetWindowType() &ndash; Allows users to get the analytical window type this opening is associated with.</p>
+<p><a name="4.2.3.4"></a><h2 class="new">2.3.4. Energy Analysis Construction</h2></p>
+<p>The new property in EnergyAnalysisConstruction indicates if this originated from a schematic or analytical construction.</p>
+<ul>
+<li>EnergyAnalysisConstruction.IsSchematic</li>
+</ul>
+<p><a name="4.2.3.5"></a><h2 class="new">2.3.5. EnergyDataSettings</h2></p>
+<p>The new property:</p>
+<ul>
+<li>Autodesk.Revit.DB.Analysis.EnergyDataSettings.UseCurrentViewOnly</li>
+</ul>
+<p>returns true only if elements visible in the currently active view are used for generation of Energy Model, false otherwise. This setting is ignored if the currently active view is not a 3D view or AnalysisType is RoomsOrSpaces.</p>
+<h3>MEP Duct/Pipe pressure loss calculations</h3>
+
+<p>Users can now access the flow/pressure values and use them to create customized reports and tools. This includes all design and fabrication flow/pressure calculations.</p>
+<p>The new classes:</p>
+<ul>
+<li>Autodesk.Revit.DB.Analysis.MEPAnalyticalModelData</li>
+<li>Autodesk.Revit.DB.Analysis.MEPAnalyticalSegment</li>
+<li>Autodesk.Revit.DB.Analysis.MEPAnalyticalNode</li>
+<li>Autodesk.Revit.DB.Analysis.MEPNetworkSegmentId</li>
+<li>Autodesk.Revit.DB.Analysis.MEPNetworkSegmentData</li>
+<li>Autodesk.Revit.DB.Analysis.MEPNetworkIterator</li>
+</ul>
+<p><a name="4.2.4"></a><h2 class="new">2.4. Structural Analytical Model API additions</h2></p>
+<p><a name="4.2.4.1"></a><h2 class="new">2.4.1. Analytical to Physical Associations</h2></p>
+<p>The following new methods in AnalyticalToPhysicalAssociationManager allow users to distinguish if it's an analytical or a physical element.</p>
+<ul>
+<li>Autodesk.Revit.DB.Structure.AnalyticalToPhysicalAssociationManager.IsAnalyticalElement()</li>
+<li>Autodesk.Revit.DB.Structure.AnalyticalToPhysicalAssociationManager.IsPhysicalElement()</li>
+</ul>
+<p>The following new methods in AnalyticalToPhysicalAssociationManager allow users to add and retrieve an association between a group of analytical elements and a group of physical elements.</p>
+<ul>
+<li>Autodesk.Revit.DB.Structure.AnalyticalToPhysicalAssociationManager.AddAssociation()</li>
+<li>Autodesk.Revit.DB.Structure.AnalyticalToPhysicalAssociationManager.GetAssociatedElementIds()</li>
+</ul>
+<p>The new property:</p>
+<ul>
+<li>Autodesk.Revit.DB.Structure.AnalyticalToPhysicalAssociationManager.EnableAssistedAssociation</li>
+</ul>
+<p>allows users to indicate if associations between Analytical and Physical Elements should be created automatically.</p>
+<p><a name="4.2.4.2"></a><h2 class="new">2.4.2. Structural Analytical Model Elements</h2></p>
+<p>The new method:</p>
+<ul>
+<li>Autodesk.Revit.DB.Structure.AnalyticalPanel.Create(Document, Curve profile, XYZ normal)</li>
+</ul>
+<p>creates and returns new AnalyticalPanel from a curve and an extrusion direction.</p>
+<p><a name="4.2.5"></a><h2 class="new">2.5. 3D View API additions</h2></p>
+<p>The new enum:</p>
+<ul>
+<li>Autodesk.Revit.DB.BackClippingParam</li>
+</ul>
+<p>corresponds to the values of the parameters Autodesk.Revit.DB.BuiltInParameter.VIEW_BACK_CLIPPING and VIEWER_BOUND_FAR_CLIPPING.</p>
+<p><a name="4.2.6"></a><h2 class="new">2.6. DirectShape API additions</h2></p>
+<p>These additions enhance the ability to add reference geometry and externally tagged geometry.</p>
+<p><a name="4.2.6.1"></a><h2 class="new">2.6.1. DirectShapeType</h2></p>
+<p>Several new methods in Autodesk.Revit.DB.DirectShapeType allow removing or tagging references:</p>
+<ul>
+<li>DirectShapeType.Has/GetExternallyTaggedReference()</li>
+<li>DirectShapeType.RemoveReferenceObject(Autodesk.Revit.DB.ExternalGeometryId
+externalGeometryId) &ndash; Allows users to remove any reference object associated with the provided ExternalGeometryId from the DirectShapeType. Nothing is done if no reference object has the given external ID or if the external ID is an empty string. Note: This overloads the existing method Autodesk.Revit.DB.DirectShapeType.RemoveReferenceObject(string) to remove a reference by name. (Names are non-unique).</li>
+<li>DirectShapeType.IsValidUsage()</li>
+</ul>
+<p><a name="4.2.6.2"></a><h2 class="new">2.6.2. DirectShapeReferenceOptions</h2></p>
+<p>Three new methods have been added to Autodesk.Revit.DB.DirectShapeReferenceOptions:</p>
+<ul>
+<li>DirectShapeReferenceOptions.GetExternalGeometryId()</li>
+<li>DirectShapeReferenceOptions.SetExternalGeometryId()</li>
+<li>DirectShapeReferenceOptions.IsValidExternalGeometryId()</li>
+</ul>
+<p><a name="4.2.6.3"></a><h2 class="new">2.6.3. DirectShape</h2></p>
+<p>Similar to DirectShapeType, Autodesk.Revit.DB.DirectShape has the following new methods:</p>
+<ul>
+<li>DirectShape.Has/GetExternallyTaggedReference()</li>
+<li>DirectShape.RemoveReferenceObject()</li>
+<li>DirectShape.IsValidUsage()</li>
+</ul>
+<p><a name="4.2.7"></a><h2 class="new">2.7. Detailing API additions</h2></p>
+<p><a name="4.2.7.1"></a><h2 class="new">2.7.1. Detail element draw order</h2></p>
+<p>The new method:</p>
+<ul>
+<li>DetailElementOrderUtils.GetDrawOrderForDetails(DBView, ICollection&lt;ElementId&gt;)</li>
+</ul>
+<p>allows you to understand the sorting of the given element ids by their detail draw order in the provided view.</p>
+<p><a name="4.2.8"></a><h2 class="new">2.8. Selection API additions</h2></p>
+<p><a name="4.2.8.1"></a><h2 class="new">2.8.1. UI Application</h2></p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.UI.Events.ThemeChangedEventArgs represents the event arguments used by the ThemeChanged event.</li>
+</ul>
+<p>The new event:</p>
+<ul>
+<li>Autodesk.Revit.UI.UIApplication.ThemeChanged</li>
+</ul>
+<p>subscribe to the new new event ThemeChanged to be notified after the theme was changed. This event
+is raised after the theme was changed.</p>
+<p><a name="4.2.9"></a><h2 class="new">2.9. 3D Shape API additions</h2></p>
+<p>The new method:</p>
+<ul>
+<li>Autodesk.Revit.DB.Mesh.ComputeSurfaceArea()</li>
+</ul>
+<p>allows users to compute and returns the surface area of the mesh. The surface area is the sum of the areas of the constituent facets of the mesh.</p>
+<p><a name="4.2.10"></a><h2 class="new">2.10. Reinforcement API additions</h2></p>
+<p><a name="4.2.10.1"></a><h2 class="new">2.10.1. Rebar</h2></p>
+<p>Added the ability to control the behavior of the free form rebar when pressing space. The new members:</p>
+<ul>
+<li>RebarFreeFormAccessor.CycleCounter()</li>
+<li>RebarUpdateCurvesData.CycleCounterChanged()</li>
+<li>RebarUpdateCurvesData.GetCycleCounter()</li>
+<li>RebarUpdateCurvesData.SetCycleCounter()</li>
+</ul>
+<p>Added the ability to set different orientation methods for an Aligned Free Form Rebar. The new members:</p>
+<ul>
+<li>RebarFreeFormAccessor.hasValidAlignedServer()</li>
+<li>RebarFreeFormAccessor.AlignedFreeFormSetOrientationOptions()</li>
+<li>RebarFreeFormAccessor.AlignedFreeFormSetOrientationOptions – The enum has the following
+values<ul>
+<li>AlignedToDistributionPath</li>
+<li>ParallelToFace</li>
+<li>PerpendicularToFace</li>
+</ul>
+</li>
+</ul>
+<p>Added the ability to identify the direction for a positive offset value for a Rebar-to-Rebar constraint.</p>
+<p>The new method:</p>
+<ul>
+<li>RebarConstraint.GetPositiveOffsetDirectionForToOtherRebarConstraint()</li>
+</ul>
+<p><a name="4.2.11"></a><h2 class="new">2.11. Parameter API additions</h2></p>
+<p>The new methods in Element supports getting all parameters of an element or specified parameters of an element in one call.</p>
+<ul>
+<li>Element.EvaluateAllParameterValues()</li>
+<li>Element.EvaluateParameterValues()</li>
+</ul>
+<p>The new class:</p>
+<ul>
+<li>EvaluatedParameter</li>
+</ul>
+<p>represents the type and value of a parameter returned from methods that extract multiple parameters and their values at once. The new members below provide access to the information about the extracted parameter &amp; value:</p>
+<ul>
+<li>EvaluatedParameter.Definition</li>
+<li>EvaluatedParameter.Value</li>
+<li>EvaluatedParameter.StorageType</li>
+<li>EvaluatedParameter.HasValue</li>
+</ul>
+<p><a name="4.2.12"></a><h2 class="new">2.12. Slab API additions</h2></p>
+<p>The new enum:</p>
+<ul>
+<li>Autodesk.Revit.DB.CurvedEdgeConditionParam &ndash; Allows you to understand/set the HOST_SSE_CURVED_EDGE_CONDITION_PARAM built-in parameter's value.</li>
+</ul>
+<p><a name="4.2.13"></a><h2 class="new">2.13. Groups API additions</h2></p>
+<p><a name="4.2.13.1"></a><h2 class="new">2.13.1. Group Load Options</h2></p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.GroupLoadOptions</li>
+</ul>
+<p>provides options for loading the Revit group from the file.</p>
+<p>The new methods:</p>
+<ul>
+<li>GroupLoadOptions.SetDuplicateTypeNamesHandler(IDuplicateTypeNamesHandler)</li>
+<li>GroupLoadOptions.GetDuplicateTypeNamesHandler()</li>
+</ul>
+<p>allows you to set or retrieve a duplicate type names handler. If this value is not set, the default handler is used. It returns null if none is set.</p>
+<p>It has the following properties:</p>
+<ul>
+<li>GroupLoadOptions.ReplaceDuplicatedGroups &ndash; If there are groups with the same names in source and destination documents set this property to true to replace existing groups, otherwise the operation will be canceled. The default value is false.</li>
+<li>GroupLoadOptions.IncludeGrids &ndash; Returns true if grids should be brought in from the input file, false otherwise.</li>
+<li>GroupLoadOptions.IncludeLevels &ndash; Returns true if levels should be brought in from the input file, false otherwise.</li>
+<li>GroupLoadOptions.IncludeAttachedDetails &ndash; Returns true if attached detail groups should be included, false otherwise.</li>
+</ul>
+<p><a name="4.2.13.2"></a><h2 class="new">2.13.2. Group Type</h2></p>
+<p>The new method in GroupType allows the user to replace the group with the contents of the input file.</p>
+<ul>
+<li>GroupType.LoadFrom(string, GroupLoadOptions)</li>
+</ul>
+<p><a name="4.2.14"></a><h2 class="new">2.14. Link Visibility/Graphic Override API additions</h2></p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.RevitLinkGraphicsSettings</li>
+</ul>
+<p>represents settings to override display of Revit link in a view.</p>
+<p>The new methods:</p>
+<ul>
+<li>Revit.DB.View.GetLinkOverrides(ElementId) &ndash; Allows users to return settings representing graphic overrides for the input element Id in the view. Accepts ElementId of a RevitLinkType or RevitLinkInstance</li>
+<li>Revit.DB.View.SetLinkOverrides(ElementId, RevitLinkGraphicsSettings) &ndash; Allows users to set graphic overrides of a RevitLinkType or RevitLinkInstance in the view.</li>
+<li>Revit.DB.View.RemoveLinkOverrides(ElementId) &ndash; Allows users to delete graphical link overrides in the current view. Accepts ElementId of a RevitLinkType or RevitLinkInstance</li>
+</ul>
+<p>It has the following properties:</p>
+<ul>
+<li>Revit.DB.RevitLinkGraphicsSettings.LinkedViewId &ndash; The id of the linked view associated with RevitLinkGraphicsSettings or the invalid element Id if no view is selected.</li>
+<li>Revit.DB.RevitLinkGraphicsSettings.LinkVisibilityType &ndash; The visibility type of RevitLinkGraphicsSettings.</li>
+</ul>
+<p><a name="4.2.15"></a><h2 class="new">2.15. Purge unused elements API additions</h2></p>
+<p>The new methods in Autodesk.Revit.DB.Document allows users to get unused elements. These methods return unused element Ids that are available in the Purge Unused window in Revit.</p>
+<ul>
+<li>Autodesk.Revit.DB.Document.GetUnusedElements() &ndash; Returns the list of element Ids that are not used and can be purged from the document.</li>
+<li>Autodesk.Revit.DB.Document.GetAllUnusedElements() &ndash; Returns the list of unused element Ids, including those elements that Revit may not allow to delete the last instance of.</li>
+</ul>
+<p>Regarding the difference between the two functions &ndash; For certain categories, you must leave at least one type in the document, even if it is not "in use." GetUnusedElements() will reserve one for you if applicable. GetAllUnusedElements() returns the full list and allows you to choose what to keep.</p>
+<p><a name="4.2.16"></a><h2 class="new">2.16. Parameter API additions</h2></p>
+<p><a name="4.2.16.1"></a><h2 class="new">2.16.1. ParameterDownloadOptions</h2></p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.ParameterDownloadOptions</li>
+</ul>
+<p>is an option class used for downloading parameters from the Parameters Service. It has the following properties:</p>
+<ul>
+<li>ParameterDownloadOptions.Categories &ndash; Categories for binding.</li>
+<li>ParameterDownloadOptions.IsInstance &ndash; Returns true if binding to element instances, false if
+binding to element types.</li>
+<li>ParameterDownloadOptions.Visible &ndash; Returns true if the parameter is visible to the user, false if it is hidden and accessible only via the API.</li>
+<li>ParameterDownloadOptions.GroupTypeId &ndash; Properties palette group identifier.</li>
+</ul>
+<p><a name="4.2.16.2"></a><h2 class="new">2.16.2. ParameterUtils</h2></p>
+<p>The new methods:</p>
+<ul>
+<li>ParameterUtils.DownloadParameter() &ndash; Allows users to create a shared parameter element in the given document according to a parameter definition downloaded from the Parameters Service.</li>
+<li>ParameterUtils.DownloadParameterOptions() &ndash; Allows users to retrieve the requested parameter's category, visibility and group bindings from the Forge Schema Service.</li>
+<li>ParameterUtils.DownloadCompanyName() &ndash; Allows users to download and record the name of the given parameter schema identifier's owning account in the given document.</li>
+</ul>
+<p><a name="4.2.17"></a><h2 class="new">2.17. Electrical Analytical API additions</h2></p>
+<p><a name="4.2.17.1"></a><h2 class="new">2.17.1. ElectricalAnalyticalLoadSet</h2></p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.Electrical.ElectricalAnalyticalLoadSet</li>
+</ul>
+<p>It has the following methods:</p>
+<ul>
+<li>ElectricalAnalyticalLoadSet.Create() &ndash; Allows users to create an electrical analytical load set.</li>
+<li>ElectricalAnalyticalLoadSet.GetLoadIds() &ndash; Allows users to fetch the equipment load ids in the
+LoadSet.</li>
+</ul>
+<p>It has the following properties:</p>
+<ul>
+<li>ElectricalAnalyticalLoadSet.QuantityOnStandBy &ndash; Represents the number of equipment loads that are not operational at any time.</li>
+<li>ElectricalAnalyticalLoadSet.TotalQuantity &ndash; Represents the total count of the equipment loads in the LoadSet.</li>
+</ul>
+<p><a name="4.2.17.2"></a><h2 class="new">2.17.2. AreaBasedLoadData</h2></p>
+<p>The new methods:</p>
+<ul>
+<li>AreaBasedLoadData.ConnectToUpstreamNode() &ndash; Allows users to connect to an upstream electrical analytical node.</li>
+<li>AreaBasedLoadData.DisconnectFromUpstreamNode() &ndash; Allows users to disconnect from an upstream electrical analytical node.</li>
+<li>AreaBasedLoadData.CanDisconnectFromUpstreamNode() &ndash; Verifies that the area based load can disconnect from the upstream electrical analytical node. If the area based load hasn't an upstream node, it can't disconnect from the upstream node.</li>
+<li>AreaBasedLoadData.CanConnectToUpstreamNode() &ndash; Verifies that the area based load can connect to the upstream electrical analytical node. If the area based load already has an upstream node or the upstream node is full of downstream nodes, the area based load can't connect to the upstream node.</li>
+<li>AreaBasedLoadData.GetUpstreamNodeId() &ndash; Allows users to get the upstream electrical analytical node id.</li>
+</ul>
+<p><a name="4.2.17.3"></a><h2 class="new">2.17.3. PointLoadData</h2></p>
+<p>The new property:</p>
+<ul>
+<li>Autodesk.Revit.DB.Electrical.AnalyticalEquipmentLoadData.LoadSet &ndash; Represents the electrical analytical load set of the analytical equipment load.</li>
+</ul>
+<p><a name="4.2.17.4"></a><h2 class="new">2.17.4. ElectricalAnalyticalNode</h2></p>
+<p>The new method:</p>
+<ul>
+<li>Autodesk.Revit.DB.Electrical.ElectricalAnalyticalNode.GetAllDownstreamLoadIds() &ndash; Allows users to get all the descendant Electrical Analytical Load ids of the node.</li>
+</ul>
+<p><a name="4.2.17.5"></a><h2 class="new">2.17.5. ElectricalLoadClassification</h2></p>
+<p>The new property</p>
+<ul>
+<li>Autodesk.Revit.DB.Electrical.ElectricalLoadClassification.Other &ndash; Indicates if it is the default load classification, and its name is Other.</li>
+</ul>
+<p><a name="4.2.18"></a><h2 class="new">2.18. Structural API additions</h2></p>
+<p><a name="4.2.18.1"></a><h2 class="new">2.18.1. Bending details in view</h2></p>
+<p>Added functionality that allows users to create, move, rotate bending details and to get/set the rebars that they represent. The class RebarBendingDetailType represents the type for the bending detail, allowing users to set its appearance.</p>
+<p>The new classes:</p>
+<ul>
+<li>Autodesk.Revit.DB.Structure.RebarBendingDetailType</li>
+<li>Autodesk.Revit.DB.Structure.RebarBendingDetail</li>
+</ul>
+<p>The new enums:</p>
+<ul>
+<li>Autodesk.Revit.DB.Structure.BendingDetailTypeMultipleValuesIndicatorOptions</li>
+</ul>
+<p>allows users to describe how the parameters with multiple values will be represented. It has the following
+values:</p>
+<ul>
+<li>FromOneBar &ndash; Obtain parameter value from only one bar.</li>
+<li>
+<p>MinimumMaximum &ndash; The values will be obtained from all included bars in the rebar set and it will
+be shown in a form like minimumValue...maximumValue.</p>
+</li>
+<li>
+<p>Autodesk.Revit.DB.Structure.BendingDetailLevelOfDetail</p>
+</li>
+</ul>
+<p>allows users to describe the level of detail in which the Bending Detail will be represented. It has the following values:</p>
+<ul>
+<li>ByView &ndash; The level detail is taken from the view.</li>
+<li>Coarse &ndash; Centerline representation of the Bending Detail.</li>
+<li>Fine &ndash; Ribbon representation of Bending Detail.</li>
+</ul>
+<p>The new method:</p>
+<ul>
+<li>Autodesk.Revit.DB.IndependentTag.HasTagBehavior()
+allows users to check if the IndependentTag has a tag behavior.</li>
+</ul>
+<p><a name="4.2.18.2"></a><h2 class="new">2.18.2. Path Alignment Options for Free Form Rebar API</h2></p>
+<p>The new Enum Autodesk.Revit.DB.Structure.AlignedFreeFormSetOrientationOptions provides orientation options for Aligned Free Form Rebar set. It has the following values.</p>
+<ul>
+<li>AlignedToDistributionPath &ndash; Cutting planes are perpendicular to the distribution path.</li>
+<li>Vertical &ndash; Cutting planes are oriented vertically, X or Y vector being Z axis.</li>
+<li>ParallelToFace &ndash; Cutting planes are parallel to a selected planar face.</li>
+<li>PerpendicularToFace &ndash; Cutting planes are oriented perpendicular to a selected planar face, X or Y vector being the face normal.</li>
+</ul>
+<p><a name="4.2.18.3"></a><h2 class="new">2.18.3. LoadBase</h2></p>
+<p>The new methods:</p>
+<ul>
+<li>LoadBase.IsConstrainedOnHost() &ndash; Represents if the load is constrained to host or not.</li>
+<li>LoadBase.RemoveHostConstraint() &ndash; Allows users to remove constraint from host for this load.</li>
+</ul>
+<p><a name="4.2.18.4"></a><h2 class="new">2.18.4. LineLoad</h2></p>
+<p>Three new methods support custom line loads:</p>
+<ul>
+<li>LineLoad.Create()</li>
+<li>LineLoad.IsCurveInsideHostBoundaries() &ndash; Allows users to determine if the curve is inside panel's boundaries or if the curve is on the member's curve.</li>
+<li>LineLoad.SetCurve()</li>
+</ul>
+<p><a name="4.2.18.5"></a><h2 class="new">2.18.5. AreaLoad</h2></p>
+<p>Several new methods support custom area loads:</p>
+<ul>
+<li>AreaLoad.Create(Document, hostElemId, IList&lt;CurveLoop&gt;, forceVector, AreaLoadType symbol)</li>
+<li>AreaLoad.Create(Document, hostElemId, IList&lt;CurveLoop&gt;, IList&lt;XYZ&gt; forceVectors, IList&lt;int&gt;
+refPointCurveIndexes, IList&lt;int&gt; refPointCurveEnds, AreaLoadType symbol)</li>
+<li>AreaLoad.AreCurveLoopsValid()</li>
+<li>AreaLoad.IsCurveLoopsInsideHostBoundaries() &ndash; Allows users to check if contour loops are
+inside host boundaries.</li>
+</ul>
+<p><a name="4.2.18.6"></a><h2 class="new">2.18.6. PointLoad</h2></p>
+<p>Two new methods support custom point loads:</p>
+<ul>
+<li>PointLoad.Create()</li>
+<li>PointLoad.IsPointInsideHostBoundaries() &ndash; Allows users to indicate if the point is inside panel
+boundaries or is on the member's curve.</li>
+</ul>
+<p><a name="4.2.18.7"></a><h2 class="new">2.18.7. Loads Display Scaling</h2></p>
+<p>The new methods:</p>
+<ul>
+<li>Autodesk.Revit.DB.Structure.StructuralSettings.GetLoadForceVectorReprLine()</li>
+</ul>
+<p>returns the representative line of the load force vector.</p>
+<ul>
+<li>Autodesk.Revit.DB.Structure.StructuralSettings.SetValuesForLoadsDisplayScaling()</li>
+</ul>
+<p>allows users to set values for loads display scaling by providing two load forces and their corresponding length of the representative lines in internal units.</p>
+<p>The new property:</p>
+<ul>
+<li>Autodesk.Revit.DB.Structure.StructuralSettings.UseLoadsDisplayScaling</li>
+</ul>
+<p>represents whether to use loads display scaling. If disabled, loads are displayed according to force scale type parameters.</p>
+<p><a name="4.2.18.8"></a><h2 class="new">2.18.8. Schedule Custom Field</h2></p>
+<p>We now provide a new type of field in schedule. For this field type the value for each row is computed based on the (sub)elements that are grouped on that row and can have a graphic representation when the schedule is placed on a sheet.</p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.Structure.BendingDetailCustomFieldProperties</li>
+</ul>
+<p>represents the properties of a Bending Detail Custom Field.</p>
+<p>It has many properties. (Please see the RevitAPI.chm for full documentation.) Some notable ones include:</p>
+<ul>
+<li>SegmentLengthDimensionsEnabled &ndash; Allows users to identify if any segment length dimensions will be shown or not.</li>
+<li>AngularDimensionsEnabled &ndash; Allows users to identify if any angular dimensions will be shown or not.</li>
+<li>BendDiameterDimensionsEnabled &ndash; Allows users to identify if any radial or diameter dimensions will be shown or not.</li>
+<li>ParametersDisplayOption &ndash; Allows users to identify how the parameters will be represented.</li>
+</ul>
+<p>The new enums in BendingDetailCustomFieldProperties:</p>
+<ul>
+<li>BendingDetailBendDiameterDimensionType &ndash; Describes the dimension type for bend diameter.</li>
+<li>BendingDetailSegmentLengthsDisplayOptions &ndash; Describes if the segment lengths are
+represented using dimensions or just as text.</li>
+<li>BendingDetailAngularDimensionsDisplayOptions &ndash; Describes the angular dimensions display
+options.</li>
+<li>BendingDetailAngularDimensionsMeasurementOptions &ndash; Describes the angular dimension
+measurement options.</li>
+<li>BendingDetailDisplayParametersOptions &ndash; Describes how the parameters will be represented.</li>
+<li>BendingDetailFor3DShapesOptions &ndash; Describes how the Bending Detail will be represented for 3D shapes.</li>
+<li>BendingDetailSegmentsRepresentation &ndash; Describes how the Bending Detail will represent the bar segments.</li>
+<li>BendingDetailCustomFieldMultipleValuesIndicatorOptions &ndash; Describes how the parameters with multiple values will be represented.</li>
+</ul>
+<p><a name="4.2.19"></a><h2 class="new">2.19. FilledRegion API additions</h2></p>
+<p>Several new methods have been added to Autodesk.Revit.DB.FilledRegionType:</p>
+<ul>
+<li>Autodesk.Revit.DB.FilledRegionType.isValidMasking() &ndash; Allows users to validate if the input can be assigned to a FilledRegionType.</li>
+<li>Autodesk.Revit.DB.FilledRegionType.isValidFillPatternId() &ndash; Allows users to check if the input elementId is a FillPatternElement.</li>
+<li>Autodesk.Revit.DB.FilledRegionType.isValidForegroundPatternId() &ndash; Allows users to check if the input elementId is a valid FillPatternElement for a foreground pattern.</li>
+<li>Autodesk.Revit.DB.FilledRegionType.isValidBackgroundPatternId() &ndash; Allows users to check if the input elementId is a valid FillPatternElement for a background pattern.</li>
+<li>Autodesk.Revit.DB.FilledRegionType.isValidSolidFillPatternId() &ndash; Allows users to validate the solidFill is a valid FillPatternElement for the FilledRegionType.</li>
+</ul>
+<p><a name="4.2.20"></a><h2 class="new">2.20. Fabrication API additions</h2></p>
+<p>The new class for mapping fabrication services to Revit fluid types and temperatures.</p>
+<ul>
+<li>Autodesk.Revit.DB.FabricationServiceSettings</li>
+</ul>
+<p>represents the settings that specify the fluid type and temperature for fabrication service. The values are used in the fabrication flow and pressure drop calculation.</p>
+<p>It has the following methods:</p>
+<ul>
+<li>FabricationServiceSettings.GetFabricationServiceSettings() &ndash; Allows users to get the settings element in the document.</li>
+<li>FabricationServiceSettings.SetFluidTypeAndTemperature()</li>
+<li>FabricationServiceSettings.RemoveFluidSetting()</li>
+<li>FabricationServiceSettings.getFluidTemperature()</li>
+<li>FabricationServiceSettings.getFluidType()</li>
+<li>FabricationServiceSettings.hasValidFluidSetting() &ndash; Allows users to validate if the service is associated with fluid type and temperature. Returns false otherwise.</li>
+</ul>
+<p>It has the following properties:</p>
+<ul>
+<li>FabricationServiceSettings.AirFluidType &ndash; Represents a special fluid type for fabrication HVAC services.</li>
+</ul>
+<p><a name="4.2.21"></a><h2 class="new">2.21. Schedule API additions</h2></p>
+<p><a name="4.2.21.1"></a><h2 class="new">2.21.1. ViewSchedule</h2></p>
+<p>Users now have the ability to resize schedule rows.</p>
+<p>The following new properties have been added to ViewSchedule:</p>
+<ul>
+<li>ViewSchedule.RowHeightOverride &ndash; Allows users to define the override that is applied to the row height.</li>
+<li>ViewSchedule.RowHeight &ndash; Allows users to define the schedule body rows height. The property is applied only for when the schedule is placed on sheet as a ScheduleSheetInstance.</li>
+</ul>
+<p>The new enum:</p>
+<ul>
+<li>Autodesk.Revit.DB.RowHeightOverrideOptions</li>
+</ul>
+<p>describes the options for overriding schedule body row heights. It has the following values</p>
+<ul>
+<li>None &ndash; No override would be applied for the row height.</li>
+<li>All &ndash; Override row height for any body rows in the schedule.</li>
+<li>ImageRows &ndash; Override row height for body rows containing images in the schedule. (This
+preserves the current behavior that the deprecated ImageRowHeight controls.)</li>
+</ul>
+<p><a name="4.2.21.2"></a><h2 class="new">2.21.2. ScheduleableField</h2></p>
+<p>In order to support the ability to define a custom field in the schedule for any element category, new members were added to SchedulableField class.
+The new methods:
+- SchedulableField.SchedulableField() &ndash; Allows users to create a new SchedulableField whose type is CustomField and which is identified by the input GUID.
+- SchedulableField.GetCustomFieldData() &ndash; Allows users to get the data associated with this custom field. If this field isn't a ScheduleFieldType.CustomField, it will return null.
+The new property:
+- SchedulableField.VerticalAlignment &ndash; Represents the vertical alignment of the column's data.</p>
+<p><a name="4.2.21.3"></a><h2 class="new">2.21.3. Scheduling Revision Clouds</h2></p>
+<p>Users can now schedule revision clouds. They can also schedule the view name and sheet info for revision clouds.</p>
+<p>The new values for enum Autodesk.Revit.DB.ScheduleFieldType:</p>
+<ul>
+<li>Revision &ndash; Represents the parameter of the revision element that the scheduled revision cloud element belongs to.</li>
+<li>Views &ndash; Represents the parameter of the primary view owning an annotation element (e.g., Revision Cloud.)</li>
+<li>Sheets &ndash; Represents the parameter of the sheet view owning an annotation element (e.g., Revision Cloud.)</li>
+</ul>
+<p><a name="4.2.21.4"></a><h2 class="new">2.21.4. HostCount</h2></p>
+<p>We have also added the ability to identify the HostCount in Autodesk.Revit.DB.ScheduleFieldType:</p>
+<ul>
+<li>HostCount &ndash; Counts the number of hosts with different mark.</li>
+</ul>
+<p><a name="4.2.21.5"></a><h2 class="new">2.21.5. Vertical Alignment of Schedules</h2></p>
+<p>The new enum:</p>
+<ul>
+<li>Autodesk.Revit.DB.ScheduleVerticalAlignment</li>
+</ul>
+<p>represents the vertical alignment of data in a schedule.</p>
+<p><a name="4.2.21.6"></a><h2 class="new">2.21.6. Custom Field API additions</h2></p>
+<p>We now provide a new schedule field type: the custom field. For this field type, the value for each row is computed based on the (sub)elements that are grouped on that row. It can have a graphic representation when the schedule is placed on a sheet.</p>
+<p>The new class Autodesk.Revit.DB.CustomFieldData allows users access to the information about a custom field.</p>
+<p>It has the following properties:</p>
+<ul>
+<li>FieldName</li>
+<li>FieldTooltip &ndash; Represents the tooltip that will be shown in the schedule properties dialog for this
+custom field.</li>
+<li>DefaultRowHeightOnSheet &ndash; Identifies the default row height for this field.</li>
+</ul>
+<p>It has the following methods:</p>
+<ul>
+<li>GetCustomFieldId() &ndash; Allows user to get a unique identifier of the custom field.</li>
+<li>Get/SetCustomFieldProperties()</li>
+<li>ValidateCustomFieldProperties() &ndash; Allows users to validate the custom field properties.</li>
+</ul>
+<p>The new interface Autodesk.Revit.DB.ICustomFieldProperties represents the base class for the properties of a custom field.</p>
+<p>The method:</p>
+<ul>
+<li>AreEqualTo(ICustomFieldProperties otherProperties)</li>
+</ul>
+<p>allows users to identify if two custom field properties are equal or not.</p>
+<p>The new value in enum Autodesk.Revit.DB.CellType:</p>
+<ul>
+<li>CustomField</li>
+</ul>
+<p>represents whether the data is bound to a Schedule Custom Field.</p>
+<p>The new method:</p>
+<ul>
+<li>TableSectionData.GetCustomFieldId()</li>
+</ul>
+<p>allows users to get a custom field id from the specified cell.</p>
+<p><a name="4.2.22"></a><h2 class="new">2.22. External Service API addition</h2></p>
+<p>The new property in Autodesk.Revit.DB.ExternalService.ExternalServiceOptions and Autodesk.Revit.DB.ExternalService.ExternalService:</p>
+<ul>
+<li>SupportActivation</li>
+</ul>
+<p>indicates if the service supports activation/deactivation of its servers.</p>
+<p><a name="4.2.23"></a><h2 class="new">2.23. View API additions</h2></p>
+<p><a name="4.2.23.1"></a><h2 class="new">2.23.1. Revision Clouds in Sheets</h2></p>
+<p>The new method:</p>
+<ul>
+<li>Autodesk.Revit.DB.ViewSheet.GetAllRevisionCloudIds()</li>
+</ul>
+<p>allows users to get the ids of the revision clouds which appear on the sheet's revision schedules.</p>
+<p><a name="4.2.24"></a><h2 class="new">2.24. Graphics API additions</h2></p>
+<p><a name="4.2.24.1"></a><h2 class="new">2.24.1. Additional view graphics</h2></p>
+<p>We now provide the ability to add view graphics on top of existing element graphics, to elements which have model or view specific graphics.</p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.ExternallyTaggedNonBReps</li>
+</ul>
+<p>represents a collection of ExternallyTaggedNonBRep instances</p>
+<p>The new methods:</p>
+<ul>
+<li>Autodesk.Revit.DB.ExternallyTaggedNonBReps.CanAddExternallyTaggedNonBRep(ExternallyTaggedNonBRep) &ndash; Allows users to validate if the input can be held in this collection.</li>
+<li>Autodesk.Revit.DB.ExternallyTaggedNonBReps.Add(ExternallyTaggedNonBRep) &ndash; Allows users to add a copy of the input to the container.</li>
+<li>Autodesk.Revit.DB.ExternallyTaggedNonBRep.SetUsage(ExternallyTaggedNonBRepUsage) &ndash; Allows users to control the usage of this ExternallyTaggedNonBRep.</li>
+</ul>
+<p>The new enum:</p>
+<ul>
+<li>Autodesk.Revit.DB.ExternallyTaggedNonBRepUsage</li>
+</ul>
+<p>represents the ways in which an ExternallyTaggedNonBRep can be used in Revit. It has the following values:</p>
+<ul>
+<li>Displayable</li>
+<li>Selectable</li>
+<li>Snappable</li>
+<li>Referenceable</li>
+</ul>
+<p><a name="4.2.25"></a><h2 class="new">2.25. UI API additions</h2></p>
+<p><a name="4.2.25.1"></a><h2 class="new">2.25.1. UIThemeManager</h2></p>
+<p>The new properties in Autodesk.Revit.UI.UIThemeManager</p>
+<ul>
+<li>UIThemeManager.CurrentCanvasTheme &ndash; Allows users to indicate the current canvas theme.</li>
+<li>UIThemeManager.FollowSystemColorTheme &ndash; Allows users to indicate if the overall theme
+follows operating system color theme.</li>
+<li>UIThemeManager.FollowSystemColorSetting &ndash; Represents Revit's UI theme following system
+color setting.</li>
+</ul>
+<p><a name="4.2.25.2"></a><h2 class="new">2.25.2. ThemeChangedEventArgs</h2></p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.UI.Events.ThemeChangedEventArgs</li>
+</ul>
+<p>represents the event arguments used by the ThemeChanged event.</p>
+<p><a name="4.2.25.3"></a><h2 class="new">2.25.3. Selection</h2></p>
+<p>The new value for enum Autodesk.Revit.UI.Selection.ObjectSnapTypes</p>
+<ul>
+<li>CoordinationModelPoints &ndash; Allows users to snap to coordination model points.</li>
+</ul>
+<p><a name="4.2.26"></a><h2 class="new">2.26. Mechanical API additions</h2></p>
+<p>The new property:</p>
+<ul>
+<li>Autodesk.Revit.DB.Mechanical.DuctSettings.NetworkBasedCalculations</li>
+</ul>
+<p>indicates whether to enable network-based calculations for duct networks.</p>
+<p><a name="4.2.27"></a><h2 class="new">2.27. Toposolid API additions</h2></p>
+<p><a name="4.2.27.1"></a><h2 class="new">2.27.1. Toposolid and Toposolid Type</h2></p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.Toposolid</li>
+</ul>
+<p>represents a Toposolid within the Autodesk Revit project. This new topography element is a solid element that has an assigned type and basic parameters and is eligible for Boolean operations such as cutting with Mass and In-place component. In the API, the element is closely related with floors and the points are editable using the same SlabShapeEditor interfaces. In addition, if the element has a Sketch boundary it can be accessed via the standard SketchEditScope capabilities.</p>
+<p>The Toposolid class offers the following new members:</p>
+<ul>
+<li>Toposolid.Create(Document, IList&lt;CurveLoop&gt;, ElementId topoTypeId, ElementId levelId) &ndash; Allows users to create a toposolid from an external profile.</li>
+<li>Toposolid.Create(Document, IList&lt;XYZ&gt;, ElementId topoTypeId, ElementId levelId) &ndash; Allows users to create a toposolid from a set of points, with the convex boundary generated automatically.</li>
+<li>Toposolid.Create(Document, IList&lt;CurveLoop&gt;, IList&lt;XYZ&gt;, ElementId topoTypeId, ElementId levelId) &ndash; Allows users to create a toposolid from a profile and a set of points.</li>
+<li>Toposolid.CreateFromTopographySurface()</li>
+<li>Toposolid.GetSlabShapeEditor()</li>
+<li>Toposolid.CreateSubDivision()</li>
+<li>Toposolid.GetSubDivisionIds()</li>
+<li>Toposolid.Split()</li>
+<li>Toposolid.Simplify()</li>
+<li>Toposolid.SketchId</li>
+<li>Toposolid.HostTopoId</li>
+</ul>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.ToposolidType</li>
+</ul>
+<p>represents the type of a Toposolid in Autodesk Revit. This class inherits from HostObjAttributes and so provides read/write access to the CompoundStructure of the ToposolidType.</p>
+<p>The ToposolidType class offers the following new members:</p>
+<ul>
+<li>ToposolidType.GetContourSetting()</li>
+</ul>
+<p><a name="4.2.28"></a><h2 class="new">2.28. Import/Export API additions</h2></p>
+<p>The new method:</p>
+<ul>
+<li>EvaluatedParameter.AsValueString(Document, FormatOptions)</li>
+</ul>
+<p>allows users to format an evaluated parameter as a string with custom format options. This provides a new overload to the previously added EvaluatedParameter.AsValueString(Document) to provide parity with Parameter.AsValueString() and Parameter.AsValueString(FormatOptions)</p>
+<p>The new property:</p>
+<ul>
+<li>Document.CreationGUID</li>
+</ul>
+<p>represents the document's creation GUID from the document history.</p>
+<p><a name="4.2.29"></a><h2 class="new">2.29. Miscellaneous</h2></p>
+<p><a name="4.2.29.1"></a><h2 class="new">2.29.1. SunStudyTimeInterval</h2></p>
+<p>The new values for enum Autodesk.Revit.DB.SunStudyTimeInterval allows user to use seconds for solar study time interval to run the simulation more precisely</p>
+<ul>
+<li>Seconds15 &ndash; Interval occurs every 15 seconds</li>
+<li>Seconds30 &ndash; Interval occurs every 30 seconds</li>
+<li>Seconds45 &ndash; Interval occurs every 45 seconds</li>
+<li>Minute &ndash; Interval occurs every minute</li>
+</ul>
