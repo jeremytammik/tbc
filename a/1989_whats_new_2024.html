@@ -518,7 +518,7 @@ The new property CurrentTheme has been extended to have similar function, so dep
 <p>Methods which accepted an Autodesk.Revit.DB.DirectShapeReferenceOptions argument will now associate an external ID with the added reference object, if the options specify one. An exception is thrown if the DirectShape or DirectShapeType already has reference geometry with the specified external ID.</p>
 <p><a name="4.1.15"></a><h2 class="new">1.15. Parameter API changes</h2></p>
 <p><a name="4.1.15.1"></a><h2 class="new">1.15.1. Element.Parameters</h2></p>
-<p>The method Element.GetOrderedParameters() is compiled as the current description but the order of the parameters have changed. The parameters are returned in the order in which they appear in the Revit UI within a given group but order of grouped is changed. It is not defined in documentation.</p>
+<p>The method Element.GetOrderedParameters() is compiled as the current description but the order of the parameters has changed. The parameters are returned in the order in which they appear in the Revit UI within a given group but order of grouped is changed. It is not defined in documentation.</p>
 <p><a name="4.1.15.2"></a><h2 class="new">1.15.2. Shared Parameters</h2></p>
 <ul>
 <li>Deprecated member &rarr; Replacement member</li>
@@ -730,7 +730,7 @@ externalGeometryId) &ndash; Allows users to remove any reference object associat
 <ul>
 <li>Autodesk.Revit.UI.UIApplication.ThemeChanged</li>
 </ul>
-<p>subscribe to the new new event ThemeChanged to be notified after the theme was changed. This event
+<p>subscribe to the new event ThemeChanged to be notified after the theme was changed. This event
 is raised after the theme was changed.</p>
 <p><a name="4.2.9"></a><h2 class="new">2.9. 3D Shape API additions</h2></p>
 <p>The new method:</p>
@@ -765,7 +765,7 @@ values<ul>
 <li>RebarConstraint.GetPositiveOffsetDirectionForToOtherRebarConstraint()</li>
 </ul>
 <p><a name="4.2.11"></a><h2 class="new">2.11. Parameter API additions</h2></p>
-<p>The new methods in Element supports getting all parameters of an element or specified parameters of an element in one call.</p>
+<p>The new Element methods support getting all parameters of an element or specified parameters of an element in one call.</p>
 <ul>
 <li>Element.EvaluateAllParameterValues()</li>
 <li>Element.EvaluateParameterValues()</li>
