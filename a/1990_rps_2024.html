@@ -1,0 +1,221 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<p></head></p>
+<!---
+
+- What's new in Revit 2024 release reel
+  https://youtu.be/qA74NHN8lh0
+  https://youtu.be/qA74NHN8lh0?t=2
+  https://youtu.be/qA74NHN8lh0?t=30
+  https://youtu.be/qA74NHN8lh0?t=89
+  https://youtu.be/qA74NHN8lh0?t=157
+  https://youtu.be/qA74NHN8lh0?t=226
+  https://youtu.be/qA74NHN8lh0?t=300
+  https://youtu.be/qA74NHN8lh0?t=324
+  Chapters
+  00:00 Introduction https://www.youtube.com/watch?v=qA74NHN8lh0&list=RDCMUC605NHqEkxXsFYdoPrD6mOg&index=1&t=0s
+  00:30 For Everyone https://www.youtube.com/watch?v=qA74NHN8lh0&list=RDCMUC605NHqEkxXsFYdoPrD6mOg&index=1&t=30s
+  01:29 Architects
+  02:37 MEP
+  03:46 Structure
+  05:00 Model Coordination
+  05:24 Documentation
+
+- https://blogs.autodesk.com/revit/roadmap/
+
+- webinar
+  AEC Collection Essentials:
+  What’s New in Revit 2024
+  https://www.autodesk.com/webinars/aec/revit-whats-new-2024
+  https://twitter.com/AutodeskRevit/status/1645819085886717956?s=20
+
+- RevitLookup 2024
+  https://github.com/jeremytammik/RevitLookup/blob/dev_winui/Changelog.md
+
+- RevitLookup 2024.0.1
+  https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.1
+
+- RevitLookup 2024.0.2
+  Fixed Fatal Error on Windows 10 #153
+  Accent colour sync with OS now only available in Windows 11 and above. Many thanks to Aleksey Negus for testing builds
+  https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.2
+
+- WPF UI
+  https://github.com/jeremytammik/RevitLookup/discussions/149#discussioncomment-5565125
+  gaborschnierer
+  Awesome job! Thank you for your contributions!
+  I really like the winui style wpf windows. I tried to achieve a similar result for my project, but failed. I'll dive into into the code, but if you can recommend any guides and tweaks to get a basic winui style window displayed in Revit, that would save me a ton of brainwork. 😅
+  Nice3point
+  Thank you, I'm very pleased) The easiest way is to copy the UI project from RevitLookup. You will not be able to use the original winui project because it is tied to the use of the static Appication.Current property, which is not available for the dll applications that are used in Revit.
+  In addition, you should not forget to add the manifest file to your application)
+  изображение
+  /Users/jta/a/doc/revit/tbc/git/a/img/wpf_ui_app_manifest.png
+  There are probably no manuals, just learning the code 😉
+  Using Microsoft.Extensions.Hosting.Host is optional, you can create a regular window, new FluentWindow() and call the ShowDialog() method, if you tell me what fails you, I can give more information)
+  gaborschnierer reacted with rocket emoji
+  Thanks for the tip. Tried the Host way as well, but it just starts to get so dependent on RevitLookup classes like Host and IWindow, that I gave up. Alternatively newing up the FluentWindow and calling ShowDialog() throws when trying to remove the backdrop. Do you have any quick tips? If not, don't worry, it's not so vital.
+  Nice3point
+  The documentation used to be here https://wpfui.lepo.co/documentation/, unfortunately it is not available nowTry running this project on your computer and learn how it works
+  gaborschnierer
+  Yea, I'll build it from ground up when I get the chance. Thanks! 🙏
+  https://github.com/lepoco/wpfui
+
+- Revit API training
+  Q Do you teach or have you ever taught Revit in an online mode? I could use that.
+  A We used to teach face-to-face courses and published the material on GitHub:
+  https://github.com/ADN-DevTech/RevitTrainingMaterial
+  https://github.com/jeremytammik/AdnRevitApiLabsXtra
+  I never did online. I know Harry Mattison did:
+  https://www.youtube.com/user/BoostYourBIM
+
+- Siemens and Microsoft drive industrial productivity with generative artificial intelligence
+  https://new.siemens.com/us/en/company/press/press-releases/digital-industries/siemens-microsoft-generative-artificial-intelligence.html
+
+- Free Dolly: Introducing the World's First Truly Open Instruction-Tuned LLM
+  https://www.databricks.com/blog/2023/04/12/dolly-first-open-commercially-viable-instruction-tuned-llm
+
+- Build Your Own Large Language Model Like Dolly
+  How to fine-tune and deploy your custom LLM
+  https://www.databricks.com/resources/webinar/build-your-own-large-language-model-dolly
+
+- 12 secret websites powered by AI to finish hours of work in minutes
+  https://twitter.com/heyBarsee/status/1646161514682884099?s=20
+
+- Cory Doctorow
+  pwn
+  https://en.wikipedia.org/wiki/Leet#Owned_and_pwned
+  leet
+  leetspeak
+  https://md5decrypt.net/en/Leet-translator/#results
+
+twitter:
+
+News reel, roadmap and RevitLookup 2024 update,
+for the @AutodeskRevit #BIM #RevitAPI @DynamoBIM @AutodeskAPS
+
+-
+ ...
+
+linkedin:
+
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>RevitPythonShell 2024 and RevitLookup 2024 Update</h3>
+<p>More news and updates related to Revit 2024 and some little tidbits on AI and literature:</p>
+<ul>
+<li><a href="#2">News reel and AEC roadmaps</a></li>
+<li><a href="#3">Revit API training</a></li>
+<li><a href="#4">RevitLookup 2024 updates</a></li>
+<li><a href="#5">Free Dolly open source instruction-tuned LLM</a></li>
+<li><a href="#6">Websites powered by AI</a></li>
+<li><a href="#7">Walkaway by Cory Doctorow</a></li>
+</ul>
+<h4><a name="2"></a> News Reel and AEC Roadmaps</h4>
+<p>To get a quick overview of what's new in the Revit 2024 product, you can check out the news reel:</p>
+<ul>
+<li>00:00 <a href="https://youtu.be/qA74NHN8lh0">Introduction</a></li>
+<li>00:30 <a href="https://youtu.be/qA74NHN8lh0?t=30">For Everyone</a></li>
+<li>01:29 <a href="https://youtu.be/qA74NHN8lh0?t=89">Architects</a></li>
+<li>02:37 <a href="https://youtu.be/qA74NHN8lh0?t=157">MEP</a></li>
+<li>03:46 <a href="https://youtu.be/qA74NHN8lh0?t=226">Structure</a></li>
+<li>05:00 <a href="https://youtu.be/qA74NHN8lh0?t=300">Model Coordination</a></li>
+<li>05:24 <a href="https://youtu.be/qA74NHN8lh0?t=324">Documentation</a></li>
+</ul>
+<p>To find out where it is going from here forward, explore
+the updated <a href="https://blogs.autodesk.com/revit/roadmap/">Autodesk AEC Public Roadmaps</a> and
+take the opportunity to contribute your own requirements and ideas.</p>
+<h4><a name="3"></a> Revit API Training</h4>
+<p>I was asked once again about Revit API training:</p>
+<p><strong>Question:</strong> Do you teach or have you ever taught Revit in an online mode? I could use that.</p>
+<p><strong>Answer:</strong> We used to teach face-to-face courses before concentrating harder on making all mterial  publicly available to larger audiences world-wide.
+Now, the material we used back then has been published and maintained on GitHub:</p>
+<ul>
+<li><a href="https://github.com/ADN-DevTech/RevitTrainingMaterial">ADN RevitTrainingMaterial</a></li>
+<li><a href="https://github.com/jeremytammik/AdnRevitApiLabsXtra">AdnRevitApiLabsXtra</a></li>
+</ul>
+<p>I never did online courses myself.
+I know <a href="https://www.youtube.com/user/BoostYourBIM">Harry Mattison</a> did, though.</p>
+<h4><a name="4"></a> RevitLookup 2024 Updates</h4>
+<p>We already have two RevitLookup updates to share, 2024.0.1 and 2024.0.2:</p>
+<ul>
+<li>
+<p><a href="https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.2">RevitLookup 2024.0.2</a>
+  &ndash; Fixed Fatal Error on Windows 10 <a href="https://github.com/jeremytammik/RevitLookup/issues/153">#153</a>
+  &ndash; Accent colour sync with OS now only available in Windows 11 and above
+  &ndash; Many thanks to <a href="https://t.me/a_negus">Aleksey Negus</a> for testing builds.</p>
+</li>
+<li>
+<p><a href="https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.1">RevitLookup 2024.0.1</a></p>
+</li>
+</ul>
+<h5>Breaking changes</h5>
+<ul>
+<li>Added option to enable hardware acceleration (experimental)
+<br/>The user interface is now more responsive. Revit uses software acceleration by default. Contact us if you encounter problems with your graphics cards
+<br/>Known issue: rendering performance drops on selection. This is especially evident on roofs,
+  cf. <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-2024-rendering-performance-drops-on-selection/td-p/11878396">Revit 2024 rendering performance drops on selection</a></li>
+<li>Added button to enable RevitLookup panel on Modify tab by @ricaun in <a href="https://github.com/jeremytammik/RevitLookup/pull/152">#152</a>
+<br/>Disabled by default. Thanks vor voting! <a href="https://github.com/jeremytammik/RevitLookup/discussions/151">#151</a></li>
+<li>Opening RevitLookup window only when the Revit runtime context is available <a href="https://github.com/jeremytammik/RevitLookup/issues/155">#155</a></li>
+</ul>
+<h5>Improvements</h5>
+<ul>
+<li>Added shortcuts support for the Modify tab <a href="https://github.com/jeremytammik/RevitLookup/issues/150">#150</a></li>
+<li>Added EvaluatedParameter support</li>
+<li>Added Category.get_Visible support</li>
+<li>Added Category.get_AllowsVisibilityControl support</li>
+<li>Added Category.GetLineWeight support</li>
+<li>Added Category.GetLinePatternId support</li>
+<li>Added Category.GetElements extension</li>
+<li>Added Reference.ConvertToStableRepresentation support</li>
+</ul>
+<h5>Bugs</h5>
+<ul>
+<li>Fixed rare crashes in EventMonitor on large models</li>
+<li>Fixed Curve.Evaluate resolver using EndParameter as values</li>
+</ul>
+<h5>Other</h5>
+<ul>
+<li>Added installers for <a href="https://github.com/jeremytammik/RevitLookup/wiki/Versions">previous RevitLookup versions</a></li>
+</ul>
+<p>Many thanks to Roman <a href="https://github.com/Nice3point">Nice3point</a> for maintaining this!</p>
+<h4><a name="5"></a> Free Dolly Open Source Instruction-Tuned LLM</h4>
+<p>In spite of its name, <a href="https://en.wikipedia.org/wiki/OpenAI">OpenAI</a> is not open.</p>
+<p>Hence, this is exciting, welcome  and positive news for the open community:</p>
+<ul>
+<li><a href="https://www.databricks.com/blog/2023/04/12/dolly-first-open-commercially-viable-instruction-tuned-llm">Free Dolly: Introducing the World's First Truly Open Instruction-Tuned LLM</a></li>
+</ul>
+<p>Coming up soon is a
+webinar <a href="https://www.databricks.com/resources/webinar/build-your-own-large-language-model-dolly">Build Your Own Large Language Model Like Dolly</a> on
+How to fine-tune and deploy your custom LLM.</p>
+<h4><a name="6"></a> Websites Powered by AI</h4>
+<p>To experience some helpful AI in action yourself, you can check
+out <a href="https://twitter.com/heyBarsee/status/1646161514682884099?s=20">12 secret websites powered by AI to finish hours of work in minutes</a>.</p>
+<h4><a name="7"></a> Walkaway by Cory Doctorow</h4>
+<p>I discovered a new author and a new favourite book,
+<a href="https://en.wikipedia.org/wiki/Walkaway_(Doctorow_novel)">Walkaway</a>
+by <a href="https://en.wikipedia.org/wiki/Cory_Doctorow">Cory Doctorow</a>.</p>
+<p>For me, it is a brilliant philosophical scifi reminiscent
+of <a href="https://thebuildingcoder.typepad.com/blog/2021/10/sci-fi-languages-and-pipe-insulation-retrieval.html#4">William Gibson's Agency</a> that I was so thrilled by in 2021.</p>
+<p>It is also focused on community, cooperation, communication, appreciation, relationships, exploitation, rich exploiters fighting for a world of unequality, walkaways proving that we live in a world of surplus, not shortage, realising a post-scarcity gift economy, on-site fabrication of everything you need, and finally moving towards real scifi visions like eternal life using digital simulations of the human mind.</p>
+<p>I also learned some new vocabulary,
+such as <span style="font-weight: bold; font-style: italic;">pwn</span>,
+as in <a href="https://en.wikipedia.org/wiki/Leet#Owned_and_pwned">owned and pwned</a>.
+That in turn led me to discover <a href="https://en.wikipedia.org/wiki/Leet">leet</a> and
+<a href="https://duckduckgo.com/?q=leetspeak+translator">leetspeak translators</a>.
+Not useful, but stuff to be aware of.</p>
+<p><center>
+<img src="img/walkaway_cory_doctorow.jpg" alt="Walkaway by Cory Doctorow" title="Walkaway by Cory Doctorow" width="260"/> <!-- Pixel Height: 393 Pixel Width: 260 -->
+</center></p>
