@@ -93,11 +93,16 @@
 
 twitter:
 
-News reel, roadmap and RevitLookup 2024 update,
+News reel, roadmap and RevitLookup 2024 updates,
 for the @AutodeskRevit #BIM #RevitAPI @DynamoBIM @AutodeskAPS
 
--
- ...
+More news and updates related to Revit 2024, and some little titbits on AI and literature:
+&ndash; News reel and AEC roadmaps
+&ndash; Revit API training
+&ndash; RevitLookup 2024 updates
+&ndash; Free Dolly open-source instruction-tuned LLM
+&ndash; Websites powered by AI
+&ndash; Walkaway by Cory Doctorow...
 
 linkedin:
 
@@ -113,7 +118,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### News Reel, Roadmap and RevitLookup 2024 Updates
+### News Reel, Roadmap and RevitLookup Updates
 
 More news and updates related to Revit 2024 and some little titbits on AI and literature:
 
