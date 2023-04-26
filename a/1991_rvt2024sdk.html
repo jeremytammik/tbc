@@ -1,9 +1,8 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
-</head>
-
+<p></head></p>
 <!---
 
 
@@ -30,92 +29,78 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Nice Accelerator
-
-I'm in Nice, France, today and tomorrow, attending the [APS cloud accelerator](https://aps.autodesk.com/accelerator-program).
-This one is help in parallel with another one in Medellin, Columbia, so we are hosting two at the same time this week.
-
-I finally got around to installing Revit 2024 myself and compiling the Revit 2024 SDK samples, plus we have yet another new release of RevitLookup with even more exciting new features:
-
-- [RevitLookup 2024.0.3 and the Debug tab](#2)
-- [Compiling the Revit 2024 SDK samples](#3)
-- [Visual introduction to machine learning](#4)
-
-####<a name="2"></a> RevitLookup 2024.0.3 and the Debug Tab
-
-Roman [Nice3point](https://github.com/Nice3point) published another update,
-[RevitLookup 2024.0.3](https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.3):
-
-The main change is a new option to enable the Revit `Debug` tab.
+<h3>Nice Accelerator</h3>
+<p>I'm in Nice, France, today and tomorrow, attending the <a href="https://aps.autodesk.com/accelerator-program">APS cloud accelerator</a>.
+This one is help in parallel with another one in Medellin, Columbia, so we are hosting two at the same time this week.</p>
+<p>I finally got around to installing Revit 2024 myself and compiling the Revit 2024 SDK samples, plus we have yet another new release of RevitLookup with even more exciting new features:</p>
+<ul>
+<li><a href="#2">RevitLookup 2024.0.3 and the Debug tab</a></li>
+<li><a href="#3">Compiling the Revit 2024 SDK samples</a></li>
+<li><a href="#4">Visual introduction to machine learning</a></li>
+</ul>
+<h4><a name="2"></a> RevitLookup 2024.0.3 and the Debug Tab</h4>
+<p>Roman <a href="https://github.com/Nice3point">Nice3point</a> published another update,
+<a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.3">RevitLookup 2024.0.3</a>:</p>
+<p>The main change is a new option to enable the Revit <code>Debug</code> tab.
 Here, you will find many different commands that allow you to configure the hidden features of Revit, create model dumps, and gain an even deeper understanding of how the software works.
-Dumps are saved in the same folder as Revit journals:
-
-- %LOCALAPPDATA%\Autodesk\Revit\Autodesk Revit 2024\Journals
-
-The Debug tab is part of Revit, built-in, unofficial, and hence unsupported.
+Dumps are saved in the same folder as Revit journals:</p>
+<ul>
+<li>%LOCALAPPDATA%\Autodesk\Revit\Autodesk Revit 2024\Journals</li>
+</ul>
+<p>The Debug tab is part of Revit, built-in, unofficial, and hence unsupported.
 RevitLookup simply allows you to activate it.
-So, we cannot attend to any possible crashes or other issues related to this tab.
-
-Further improvements include:
-
-- Added Workset support
-- Added WorksetTable support
-- Added Document.GetUnusedElements support
-
-Fixes:
-
-- Fixed Dashboard window startup location
-
-<center>
+So, we cannot attend to any possible crashes or other issues related to this tab.</p>
+<p>Further improvements include:</p>
+<ul>
+<li>Added Workset support</li>
+<li>Added WorksetTable support</li>
+<li>Added Document.GetUnusedElements support</li>
+</ul>
+<p>Fixes:</p>
+<ul>
+<li>Fixed Dashboard window startup location</li>
+</ul>
+<p><center>
 <img src="img/revit_debug_functions.png" alt="Revit Debug tab" title="Revit Debug tab" width="600"/> <!-- Pixel Height: 375, Pixel Width: 859 -->
-</center>
-
-####<a name="3"></a> Compiling the Revit 2024 SDK Samples
-
-I installed the Revit 2024 SDK samples and updated
-the [RevitSdkSamples repository](https://github.com/jeremytammik/RevitSdkSamples) to
-the original pristine [release 2024.0.0.0](https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2024.0.0.0).
-
-Loading `SDKSamples.sln` in Visual Studio and hitting 'compile' initially produced 9658 errors and warnings due to missing Revit API references.
-
-I need to update `SDKSamples.targets`. In there, i replaced
-
-- $(SolutionDir)..\..\..\..\$(ConfigurationName)$(PlatformName)\
-
-or, more specifically, as a regular expression,
-
-- \$\(SolutionDir\)\.\.\\\.\.\\\.\.\\\.\.\\\$\(ConfigurationName\)\$\(PlatformName\)\\
-
-by
-
-- C:/Program Files/Autodesk/Revit 2024/
-
-That reduced the count to 543 errors and 141 warnings.
-
-So, I repeated the same process in the other three files as well, i.e., all four files in the *SDK/Samples/VSProps* folder:
-
-- SDKSamples.CivilAlignments.targets
-- SDKSamples.Steel.targets
-- SDKSamples.VB.targets
-- SDKSamples.targets
-
-I had to unload and reload the sol;ution file between each of these modifications.
-
-That brought me down to 2 errors and 60 warnings, the same ones I encountered
-[last time around, for Revit 2023](https://thebuildingcoder.typepad.com/blog/2022/04/compiling-the-revit-2023-sdk-samples.html):
-
-- Error CS1591: Missing XML comment for publicly visible type or member bla, bla, bla
-  &ndash; [Missing XML Comments](https://thebuildingcoder.typepad.com/blog/2022/04/compiling-the-revit-2023-sdk-samples.html#5)
-- Warning: There was a mismatch between the processor architecture of the project being built "MSIL" and the processor architecture of the reference "RevitAPI", "AMD64"...
-  &ndash; [DisableMismatchWarning](https://github.com/jeremytammik/DisableMismatchWarning)
-
-That brings it down to three warnings, which I will ignore.
-
-I captured this state of affairs
-in [RevitSdkSamples release 2024.0.0.2](https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2024.0.0.2).
-
-So, we have now compiled all projects; 200 succeeded, 0 failed, 0 skipped:
-
+</center></p>
+<h4><a name="3"></a> Compiling the Revit 2024 SDK Samples</h4>
+<p>I installed the Revit 2024 SDK samples and updated
+the <a href="https://github.com/jeremytammik/RevitSdkSamples">RevitSdkSamples repository</a> to
+the original pristine <a href="https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2024.0.0.0">release 2024.0.0.0</a>.</p>
+<p>Loading <code>SDKSamples.sln</code> in Visual Studio and hitting 'compile' initially produced 9658 errors and warnings due to missing Revit API references.</p>
+<p>I need to update <code>SDKSamples.targets</code>. In there, i replaced</p>
+<ul>
+<li>$(SolutionDir)........\$(ConfigurationName)$(PlatformName)\</li>
+</ul>
+<p>or, more specifically, as a regular expression,</p>
+<ul>
+<li>\$(SolutionDir)..\..\..\..\\$(ConfigurationName)\$(PlatformName)\</li>
+</ul>
+<p>by</p>
+<ul>
+<li>C:/Program Files/Autodesk/Revit 2024/</li>
+</ul>
+<p>That reduced the count to 543 errors and 141 warnings.</p>
+<p>So, I repeated the same process in the other three files as well, i.e., all four files in the <em>SDK/Samples/VSProps</em> folder:</p>
+<ul>
+<li>SDKSamples.CivilAlignments.targets</li>
+<li>SDKSamples.Steel.targets</li>
+<li>SDKSamples.VB.targets</li>
+<li>SDKSamples.targets</li>
+</ul>
+<p>I had to unload and reload the sol;ution file between each of these modifications.</p>
+<p>That brought me down to 2 errors and 60 warnings, the same ones I encountered
+<a href="https://thebuildingcoder.typepad.com/blog/2022/04/compiling-the-revit-2023-sdk-samples.html">last time around, for Revit 2023</a>:</p>
+<ul>
+<li>Error CS1591: Missing XML comment for publicly visible type or member bla, bla, bla
+  &ndash; <a href="https://thebuildingcoder.typepad.com/blog/2022/04/compiling-the-revit-2023-sdk-samples.html#5">Missing XML Comments</a></li>
+<li>Warning: There was a mismatch between the processor architecture of the project being built "MSIL" and the processor architecture of the reference "RevitAPI", "AMD64"...
+  &ndash; <a href="https://github.com/jeremytammik/DisableMismatchWarning">DisableMismatchWarning</a></li>
+</ul>
+<p>That brings it down to three warnings, which I will ignore.</p>
+<p>I captured this state of affairs
+in <a href="https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2024.0.0.2">RevitSdkSamples release 2024.0.0.2</a>.</p>
+<p>So, we have now compiled all projects; 200 succeeded, 0 failed, 0 skipped:</p>
 <pre style="font-size:50%">
 Rebuild started...
 1>------ Rebuild All started: Project: Toposolid, Configuration: Debug Any CPU ------
@@ -525,8 +510,6 @@ Rebuild started...
 ========== Rebuild started at 3:20 PM and took 19.627 seconds ==========
 </pre>
 
-####<a name="4"></a> Visual Introduction to Machine Learning
-
-Just for fun and to see what is possible, let's round off for today with this
-impressive [visual introduction to machine learning](https://www.r2d3.us/visual-intro-to-machine-learning-part-1).
-
+<h4><a name="4"></a> Visual Introduction to Machine Learning</h4>
+<p>Just for fun and to see what is possible, let's round off for today with this
+impressive <a href="https://www.r2d3.us/visual-intro-to-machine-learning-part-1">visual introduction to machine learning</a>.</p>
