@@ -68,7 +68,7 @@ So, we cannot attend to any possible crashes or other issues related to this tab
 the <a href="https://github.com/jeremytammik/RevitSdkSamples">RevitSdkSamples repository</a> to
 the original pristine <a href="https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2024.0.0.0">release 2024.0.0.0</a>.</p>
 <p>Loading <code>SDKSamples.sln</code> in Visual Studio and hitting 'compile' initially produced 9658 errors and warnings due to missing Revit API references.</p>
-<p>I need to update <code>SDKSamples.targets</code>. In there, i replaced</p>
+<p>I need to update <code>SDKSamples.targets</code>. In there, I replaced</p>
 <ul>
 <li>$(SolutionDir)........\$(ConfigurationName)$(PlatformName)\</li>
 </ul>
@@ -88,7 +88,7 @@ the original pristine <a href="https://github.com/jeremytammik/RevitSdkSamples/r
 <li>SDKSamples.VB.targets</li>
 <li>SDKSamples.targets</li>
 </ul>
-<p>I had to unload and reload the sol;ution file between each of these modifications.</p>
+<p>I had to unload and reload the solution file between each of these modifications.</p>
 <p>That brought me down to 2 errors and 60 warnings, the same ones I encountered
 <a href="https://thebuildingcoder.typepad.com/blog/2022/04/compiling-the-revit-2023-sdk-samples.html">last time around, for Revit 2023</a>:</p>
 <ul>
