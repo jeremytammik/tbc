@@ -337,7 +337,7 @@ LLONG_MAX is 9,223,372,036,854,775,807. We wont need to worry about it.
 Should the next element id field in document be rolled back on transaction rollback is an independent issue though. Another independent issue is should the editor rubber banding (?) should reuse same element ids on every iteration?
 
 Jeremy Tammik
-well, if i rubber band a line in a loop and create a new element id for every iteration, and assuming an extremely slow loop running 100 iterations per second, i would end up using 100*60*60*24*365 = 3.153.600.000 element ids in one year of rubber banding... that is not a completely insignificant number... (edited)
+well, if i rubber band a line in a loop and create a new element id for every iteration, and assuming an extremely slow loop running 100 iterations per second, i would end up using 100*60*60*24*365 = 3.153.600.000 element ids in one year of rubber banding... that is not a completely insignificant number...
 
 Diane Christoforo
 Jeremy, is that three trillion?
@@ -396,11 +396,12 @@ am returning to Switzerland, using the long train ride time to continue my Revit
 now addressing the RvtSamples external application ad-in:
 
 - [Configuring RvtSamples 2024](#3)
-- [DatumsModification](#4)
-- [ContextualAnalyticalModel](#5)
-- [Infrastructure Alignments](#6)
-- [Toposolid](#7)
-- [Conclusion](#8)
+    - [DatumsModification](#4)
+    - [ContextualAnalyticalModel](#5)
+    - [Infrastructure Alignments](#6)
+    - [Toposolid](#7)
+    - [Conclusion](#8)
+- [Consuming huge numbers of element ids](#9)
 
 <!--
 
@@ -567,30 +568,32 @@ in [RevitSdkSamples release 2024.0.0.3](https://github.com/jeremytammik/RevitSdk
 
 ####<a name="9"></a> Consuming Huge Numbers of Element Ids
 
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+The [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on how to [draw a line visible on screen](https://forums.autodesk.com/t5/revit-api-forum/draw-line-visible-on-screen/m-p/11922998) spawned
 several useful ideas on how to generate and display transient graphics for rubber banding functionality similar to AutoCAD jigs.
 
 It also raised the question of generating (and consuming) huge amounts of element ids, since each transient element in a loop consumes a new element id, even if the transaction is never commited.
+Luckily, Revit 2024 [upgraded `ElementId` storage to 64-bit](https://thebuildingcoder.typepad.com/blog/2023/04/whats-new-in-the-revit-2024-api.html#4.1.2).
 
-That led to the following amusing internal discussion:
+Anyway, that question led to the following amusing discussion:
 
 - An interesting question was raised in the discussion on drawing transient geometry: if I create a new element in a transaction that is rolled back (not committed) and wrap that in a loop, a new element id is consumed in each iteration. That can consume all of the element ids space if I run it for long enough. How should this be handled, please?
-- This is a non issue in Revit 2024.+. Element id is now 64 bit.
+- This is a non-issue in Revit 2024.+. Element id is now 64 bit.
 - That does not make it a non-issue. It just means it takes a million or a billion time more time to consume all the possible tokens. Is that a real solution?
-- LLONG_MAX is 9,223,372,036,854,775,807. We wont need to worry about it.
-Should the next element id field in document be rolled back on transaction rollback is an independent issue though. Another independent issue is should the editor rubber banding (?) should reuse same element ids on every iteration?
-- Well, if i rubber band a line in a loop and create a new element id for every iteration, and assuming an extremely slow loop running 100 iterations per second, i would end up using 100*60*60*24*365 = 3.153.600.000 element ids in one year of rubber banding... that is not a completely insignificant number... (edited)
+- `LLONG_MAX` is 9,223,372,036,854,775,807. We won't need to worry about it.
+Should the next element id field in document be rolled back on transaction rollback is an independent issue though.
+Another independent issue is should the editor rubber banding reuse the same element ids on every iteration?
+- Well, if I rubber band a line in a loop and create a new element id for every iteration, and assuming an extremely slow loop running 100 iterations per second, I will end up using 100*60*60*24*365 = 3.153.600.000 element ids in one year of rubber banding... that is not a completely insignificant number...
 - Jeremy, is that three trillion?
-- It's three thousand millions. I don't know the exact definition of a trillion, but its a big number :-)
+- It's three thousand million. I don't know the exact definition of a trillion, but it's a big number :-)
 - Ok. the new Element id max is 9 quintillion. Dividing 9 quintillion by your number gives me 3 million, which would be the number of years required for your example to run through the ElementId space. That's why we've asserted that the 64-bit ids are unlikely to run out any time soon.
-- [What is a billion?](https://youtu.be/C-52AI_ojyQ)
 - To do another example, if we had an operation running 24/7 which generated 1 million new ids per second:
     - 1,000,000 * 60 * 60 * 24 * 365 = 3.1536e+13
     - 9,223,372,036,854,775,807 / 3.1536e+13 = 292471 (plus a fraction)
     - which is just a wild number of years.
-- It is worth noting that we tried doing this, and estimated that it would take days to even get to the end of the 32-bit space by creating the simple transient elements. It would therefore take on the order 2^31 days to run out of 64-bit ids. So to confirm what is said above, it would take an extremely long time to run out of the newly extended elementid space
-- Dividing 9 quintillion by your number gives me 3 million, which would be the number of years required for your example to run through the ElementId space.
-Revit will survive 3 million years, but the rubber bands will surely lose some elasticity.
+- It is worth noting that we tried doing this and estimated that it would take days to even get to the end of the 32-bit space by creating the simple transient elements. It would therefore take on the order 2^31 days to run out of 64-bit ids.
+  So, to confirm what is said above, it would take an extremely long time to run out of the newly extended elementid space
+- To pick up on the 3 million years mentioned above: Revit will survive 3 million years, but the rubber bands will surely lose some elasticity.
 - Can I just say all of you are awesome and this conversation makes me so happy I work here &ndash; :-)
 
+Illuminating ten-minute video by Numberphile explaining [what is a billion?](https://youtu.be/C-52AI_ojyQ)
