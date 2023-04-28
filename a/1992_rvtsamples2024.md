@@ -362,44 +362,132 @@ Pixel Width: 2,096 -->
 
 ####<a name="3"></a> Configuring RvtSamples 2024
 
-After successfully [compiling the Revit 2024 SDK samples](https://thebuildingcoder.typepad.com/blog/2023/04/nice-accelerator-and-compiling-the-revit-2024-sdk.html),
-the time is now ripe to configure the RvtSamples external application to load all the external commands defined by the Revit 2024 SDK samples.
+Now that I completed installing Revit 2024,
+[successfully compiled the Revit 2024 SDK samples](https://thebuildingcoder.typepad.com/blog/2023/04/nice-accelerator-and-compiling-the-revit-2024-sdk.html)
+and updated the [RevitSdkSamples repository](https://github.com/jeremytammik/RevitSdkSamples),
+the time is now ripe to configure the RvtSamples external application to load all 246 Revit 2024 SDK sample external commands.
+Yes, 246 of them.
+Pretty hard to manage one by one.
 
 Mainly, this consists of editing RvtSamples.txt, the input text file specifying the name and location of the commands and the .NET assembly DLLs implementing them.
 
-Here is the history of RvtSamples, including the initial implementation and similar migration efforts in the past:
+Here is the history of RvtSamples, including its initial implementation and similar migration efforts in the past:
 
 - [Loading SDK Samples](https://thebuildingcoder.typepad.com/blog/2008/09/loading-sdk-sam.html)
 - [Adding `#include` functionality](https://thebuildingcoder.typepad.com/blog/2008/11/loading-the-building-coder-samples.html)
-
-<ul>
-
-<li><a href="http://thebuildingcoder.typepad.com/blog/2009/05/porting-the-building-coder-samples.html">RvtSamples Conversion from 2009 to 2010</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2010/04/debugging-with-visual-studio-2010-and-rvtsamples.html">Debugging with Visual Studio 2010 and RvtSamples</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2011/04/migrating-the-building-coder-samples-to-revit-2012.html">Migrating the Building Coder Samples to Revit 2012</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/compiling-the-revit-2014-sdk.html">Compiling the Revit 2014 SDK</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2014/04/compiling-the-revit-2015-sdk-and-migrating-bc-samples.html">Compiling the Revit 2015 SDK and Migrating Bc Samples</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2015/05/migrating-the-building-coder-samples-to-revit-2016.html">Migrating The Building Coder Samples to Revit 2016</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2016/04/rvtsamples-for-revit-2017.html">RvtSamples for Revit 2017</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2016/05/the-building-coder-samples-2017.html">The Building Coder Samples 2017</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2017/05/sdk-update-rvtsamples-and-modifying-grid-end-point.html">SDK Update, RvtSamples and Setting Grid Endpoint</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2018/04/rvtsamples-2019.html">RvtSamples 2019</a></li>
-<li><a href="http://thebuildingcoder.typepad.com/blog/2018/05/installing-the-revit-2019-sdk-april-update.html">Installing the Revit 2019 SDK April Update</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/the-revit-2020-fcs-api-and-sdk.html">The Revit 2020 FCS, API and SDK</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/close-doc-and-zero-doc-rvtsamples.html">Close Doc and Zero Doc RvtSamples</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2019/09/whats-new-in-the-revit-20201-api.html">What's New in the Revit 2020.1 API</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2020/05/setting-up-rvtsamples-for-revit-2021.html">Setting up RvtSamples for Revit 2021</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2021/04/revit-2022-sdk-and-the-building-coder-samples.html">Revit 2022 SDK and The Building Coder Samples</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2022/04/compiling-the-revit-2023-sdk-samples.html">Compiling the Revit 2023 SDK Samples</a></li>
-</ul>
-
-I installed the Revit 2024 SDK samples and updated
-the [RevitSdkSamples repository](https://github.com/jeremytammik/RevitSdkSamples) to
-the original pristine [release 2024.0.0.0](https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2024.0.0.0).
+- [RvtSamples Conversion from 2009 to 2010](http://thebuildingcoder.typepad.com/blog/2009/05/porting-the-building-coder-samples.html)
+- [Debugging with Visual Studio 2010 and RvtSamples](http://thebuildingcoder.typepad.com/blog/2010/04/debugging-with-visual-studio-2010-and-rvtsamples.html)
+- [Migrating the Building Coder Samples to Revit 2012](http://thebuildingcoder.typepad.com/blog/2011/04/migrating-the-building-coder-samples-to-revit-2012.html)
+- [Compiling the Revit 2014 SDK](http://thebuildingcoder.typepad.com/blog/2013/04/compiling-the-revit-2014-sdk.html)
+- [Compiling the Revit 2015 SDK and Migrating Bc Samples](http://thebuildingcoder.typepad.com/blog/2014/04/compiling-the-revit-2015-sdk-and-migrating-bc-samples.html)
+- [Migrating The Building Coder Samples to Revit 2016](http://thebuildingcoder.typepad.com/blog/2015/05/migrating-the-building-coder-samples-to-revit-2016.html)
+- [RvtSamples for Revit 2017](http://thebuildingcoder.typepad.com/blog/2016/04/rvtsamples-for-revit-2017.html)
+- [The Building Coder Samples 2017](http://thebuildingcoder.typepad.com/blog/2016/05/the-building-coder-samples-2017.html)
+- [RvtSamples for Revit 2018](http://thebuildingcoder.typepad.com/blog/2017/05/sdk-update-rvtsamples-and-modifying-grid-end-point.html)
+- [RvtSamples 2019](http://thebuildingcoder.typepad.com/blog/2018/04/rvtsamples-2019.html)
+- [RvtSamples 2019 Update](http://thebuildingcoder.typepad.com/blog/2018/05/installing-the-revit-2019-sdk-april-update.html)
+- [RvtSamples 2020](https://thebuildingcoder.typepad.com/blog/2019/04/the-revit-2020-fcs-api-and-sdk.html)
+- [Close Doc and Zero Doc RvtSamples](https://thebuildingcoder.typepad.com/blog/2019/04/close-doc-and-zero-doc-rvtsamples.html)
+- [RvtSamples 2020.1](https://thebuildingcoder.typepad.com/blog/2019/09/whats-new-in-the-revit-20201-api.html#4)
+- [Setting up RvtSamples for Revit 2021](https://thebuildingcoder.typepad.com/blog/2020/05/setting-up-rvtsamples-for-revit-2021.html)
+- [Revit 2022 SDK and The Building Coder Samples](https://thebuildingcoder.typepad.com/blog/2021/04/revit-2022-sdk-and-the-building-coder-samples.html)
+- [Compiling the Revit 2023 SDK Samples](https://thebuildingcoder.typepad.com/blog/2022/04/compiling-the-revit-2023-sdk-samples.html)
 
 
+Compiling the Revit 2023 SDK Samples
+https://thebuildingcoder.typepad.com/blog/2022/04/compiling-the-revit-2023-sdk-samples.html
 
-I captured this state of affairs
-in [RevitSdkSamples release 2024.0.0.2](https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2024.0.0.2).
+Set Up RvtSamples
+https://thebuildingcoder.typepad.com/blog/2022/04/compiling-the-revit-2023-sdk-samples.html#7
 
+C:\Users\jta\AppData\Roaming\Autodesk\Revit\Addins\2024>
+copy Y:\a\src\rvt\RevitSdkSamples\SDK\Samples\RvtSamples\CS\RvtSamples.txt
+copy Y:\a\src\rvt\RevitSdkSamples\SDK\Samples\RvtSamples\CS\RvtSamples.addin
+
+DatumsModification
+
+DatumAlignment
+DatumPropagation
+DatumStyleModification
+
+ContextualAnalyticalModel
+
+The SDK source code actually implements the following 21 ContextualAnalyticalModel external commands:
+
+Use `grep "class.*IExternalCom" *cs`
+AddAssociation
+AddCustomAssociation
+AnalyticalNodeConnStatus
+CreateAnalyticalPanel
+CreateAnalyticalCurvedPanel
+CreateAnalyticalMember
+CreateAreaLoadWithRefPoint
+CreateCustomAreaLoad
+CreateCustomLineLoad
+CreateCustomPointLoad
+FlipAnalyticalMember
+MemberForcesAnalyticalMember
+ModifyPanelContour
+MoveAnalyticalMemberUsingElementTransformUtils
+MoveAnalyticalMemberUsingSetCurve
+MoveAnalyticalNodeUsingElementTransformUtils
+MoveAnalyticalPanelUsingElementTransformUtils
+MoveAnalyticalPanelUsingSketchEditScope
+ReleaseConditionsAnalyticalMember
+RemoveAssociation
+SetOuterContourForPanels
+
+These are the ContextualAnalyticalModel external commands listed in RvtSamples.txt:
+
+Use `grep "^ContextualAnalyticalModel" RvtSamples.txt | sort`
+ContextualAnalyticalModel.AddRelation
+ContextualAnalyticalModel.AnalyticalNodeConnStatus
+ContextualAnalyticalModel.BreakRelation
+ContextualAnalyticalModel.CreateAnalyticalCurvedPanel
+ContextualAnalyticalModel.CreateAnalyticalMember
+ContextualAnalyticalModel.CreateAnalyticalPanel
+ContextualAnalyticalModel.FlipAnalyticalMember
+ContextualAnalyticalModel.MemberForcesAnalyticalMember
+ContextualAnalyticalModel.ModifyPanelContour
+ContextualAnalyticalModel.MoveAnalyticalMemberUsingElementTransformUtils
+ContextualAnalyticalModel.MoveAnalyticalMemberUsingSetCurve
+ContextualAnalyticalModel.MoveAnalyticalNodeUsingElementTransformUtils
+ContextualAnalyticalModel.MoveAnalyticalPanelUsingElementTransformUtils
+ContextualAnalyticalModel.MoveAnalyticalPanelUsingSketchEditScope
+ContextualAnalyticalModel.ReleaseConditionsAnalyticalMember
+ContextualAnalyticalModel.SetOuterContourForPanels
+ContextualAnalyticalModel.UpdateRelation
+
+RvtSamples: The name already exists in pulldown:Infrastructure alignments
+
+Infrastructure Alignment Station Label
+Infrastructure Alignment Properties
+
+The Toposolid sample only has one entry in RvtSamples.txt specifying an external command named
+
+- Revit.SDK.Samples.Toposolid.CS.Command
+
+This command does not exist. Instead, the sample implements the following external commands:
+
+ToposolidCreation
+ToposolidFromDWG
+ContourSettingCreation
+ContourSettingModification
+ToposolidFromSurface
+SSEPointVisibility
+SplitToposolid
+SimplifyToposolid
+
+
+
+This time around, I submitted a ticket with the development team in the hope of avoiding having to repeat this entire process for the next SDK update:
+
+- REVIT-206304 &ndash; Update RvtSamples.txt for Revit 2024 SDK
+
+My current running version of RvtSamples is captured
+in [RevitSdkSamples release 2024.0.0.3](https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2024.0.0.3).
+
+<center>
+<img src="img/rvtsamples2024.png" alt="RvtSamples 2024" title="RvtSamples 2024" width="800"/> <!-- Pixel Height: 562 Pixel Width: 1,562 -->
+</center>
 
