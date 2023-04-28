@@ -317,57 +317,8 @@ Parameter name: newItemName: n = 1911, k = 1911, lines[k] = eof
 
 - generating (and consuming) huge amounts of element ids?
   https://forums.autodesk.com/t5/revit-api-forum/draw-line-visible-on-screen/m-p/11922998
-  IsSameSide method
-https://autodesk.slack.com/archives/C0SR6NAP8/p1682512568340939
-Jeremy Tammik
-An interesting question was raised in the discussion on drawing transient geometry: if I create a new element in a transaction that is rolled back (not committed) and wrap that in a loop, a new element id is consumed in each iteration. That can consume all of the element ids space if I run it for long enough. How should this be handled, please?
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1682512568340939
 
-Autodesk Community
-DRAW LINE VISIBLE ON SCREEN
-Hello friends is there any way to create a linewhen the first point appearsthen click on the second pointI have the following codewith which I **** the first point and then the secondand the line is drawn.     Public Sub CrealineaPickpoint()      Dim doc As Document = Me.Application.ActiveUIDocument.Document      Dim uidoc As UIDocument = Me.Application.ActiveUIDocument            Dim startPoint As XYZ = uidoc.Selection.PickPoint(
-
-Rahul Bhobe
-This is a non issue in Revit 2024.+. Element id is now 64 bit.
-
-Jeremy Tammik
-that does not make it a non-issue. It just means it takes a million or a billion time more time to consume all the possible tokens. Is that a real solution?
-
-Rahul Bhobe
-LLONG_MAX is 9,223,372,036,854,775,807. We wont need to worry about it.
-Should the next element id field in document be rolled back on transaction rollback is an independent issue though. Another independent issue is should the editor rubber banding (?) should reuse same element ids on every iteration?
-
-Jeremy Tammik
-well, if i rubber band a line in a loop and create a new element id for every iteration, and assuming an extremely slow loop running 100 iterations per second, i would end up using 100*60*60*24*365 = 3.153.600.000 element ids in one year of rubber banding... that is not a completely insignificant number...
-
-Diane Christoforo
-Jeremy, is that three trillion?
-
-Jeremy Tammik
-it's three thousand millions. i don't know the exact definition of a trillion, but its a big number :-)
-
-Diane Christoforo
-Ok. the new Element id max is 9 quintillion. Dividing 9 quintillion by your number gives me 3 million, which would be the number of years required for your example to run through the ElementId space. That's why we've asserted that the 64-bit ids are unlikely to run out any time soon.
-
-Rahul Bhobe
-[What is a billion?](https://youtu.be/C-52AI_ojyQ)
-
-Diane Christoforo
-To do another example, if we had an operation running 24/7 which generated 1 million new ids per second:
-1,000,000 * 60 * 60 * 24 * 365 = 3.1536e+13
-9,223,372,036,854,775,807 / 3.1536e+13 = 292471 (plus a fraction)
-which is just a wild number of years.
-
-Mariya Petrova
-It is worth noting that we tried doing this, and estimated that it would take days to even get to the end of the 32-bit space by creating the simple transient elements. It would therefore take on the order 2^31 days to run out of 64-bit ids. So to confirm what is said above, it would take an extremely long time to run out of the newly extended elementid space
-
-Rahul Bhobe
-Dividing 9 quintillion by your number gives me 3 million, which would be the number of years required for your example to run through the ElementId space.
-Revit will survive 3 million years, but the rubber bands will surely lose some elasticity.
-
-Scott Conover
-Can I just say all of you are awesome and this conversation makes me so happy I work here :smile:
-
----------------------------------------------
 twitter:
 
 APS cloud accelerators in Nice and Medellin, and configuring RvtSamples for the Revit 2024 SDK samples in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/rvt2024sdk
