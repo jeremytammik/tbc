@@ -314,8 +314,6 @@ Parameter name: newItemName: n = 1911, k = 1911, lines[k] = eof
 [OK]
 
 
-
-
 twitter:
 
 APS cloud accelerators in Nice and Medellin, and configuring RvtSamples for the Revit 2024 SDK samples in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/rvt2024sdk
@@ -339,13 +337,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Configuring RvtSamples 2024
 
-I'm in Nice, France, today and tomorrow, attending the [APS cloud accelerator](https://aps.autodesk.com/accelerator-program).
-This one is help in parallel with another one in Medellin, Columbia, so we are hosting two at the same time this week.
-
-After successfully [compiling the Revit 2024 SDK samples](https://thebuildingcoder.typepad.com/blog/2023/04/nice-accelerator-and-compiling-the-revit-2024-sdk.html),
-the time os now ripe to configure the RvtSamples external application to load all the external commands defined by the Revit 2024 SDK samples.
-
-Mainly, this consists of editing RvtSamples.txt, the input text file specifying the name and location of the commands and the .NET assembly DLLs implementing them.
+I left the Nice APS accelerator [APS cloud accelerator](https://aps.autodesk.com/accelerator-program) and
+am returning to Switzerland, using the long train ride time to continue my Revit 2024 migration process:
 
 By the way, we also have a new release of RevtLookup to celebrate, including some minor fixes:
 
@@ -368,6 +361,37 @@ Pixel Width: 2,096 -->
 </center>
 
 ####<a name="3"></a> Configuring RvtSamples 2024
+
+After successfully [compiling the Revit 2024 SDK samples](https://thebuildingcoder.typepad.com/blog/2023/04/nice-accelerator-and-compiling-the-revit-2024-sdk.html),
+the time is now ripe to configure the RvtSamples external application to load all the external commands defined by the Revit 2024 SDK samples.
+
+Mainly, this consists of editing RvtSamples.txt, the input text file specifying the name and location of the commands and the .NET assembly DLLs implementing them.
+
+Here is the history of RvtSamples, including the initial implementation and similar migration efforts in the past:
+
+- [Loading SDK Samples](https://thebuildingcoder.typepad.com/blog/2008/09/loading-sdk-sam.html)
+- [Adding `#include` functionality](https://thebuildingcoder.typepad.com/blog/2008/11/loading-the-building-coder-samples.html)
+
+<ul>
+
+<li><a href="http://thebuildingcoder.typepad.com/blog/2009/05/porting-the-building-coder-samples.html">RvtSamples Conversion from 2009 to 2010</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2010/04/debugging-with-visual-studio-2010-and-rvtsamples.html">Debugging with Visual Studio 2010 and RvtSamples</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/04/migrating-the-building-coder-samples-to-revit-2012.html">Migrating the Building Coder Samples to Revit 2012</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/compiling-the-revit-2014-sdk.html">Compiling the Revit 2014 SDK</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/04/compiling-the-revit-2015-sdk-and-migrating-bc-samples.html">Compiling the Revit 2015 SDK and Migrating Bc Samples</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/05/migrating-the-building-coder-samples-to-revit-2016.html">Migrating The Building Coder Samples to Revit 2016</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/04/rvtsamples-for-revit-2017.html">RvtSamples for Revit 2017</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/05/the-building-coder-samples-2017.html">The Building Coder Samples 2017</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/05/sdk-update-rvtsamples-and-modifying-grid-end-point.html">SDK Update, RvtSamples and Setting Grid Endpoint</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2018/04/rvtsamples-2019.html">RvtSamples 2019</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2018/05/installing-the-revit-2019-sdk-april-update.html">Installing the Revit 2019 SDK April Update</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/the-revit-2020-fcs-api-and-sdk.html">The Revit 2020 FCS, API and SDK</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/close-doc-and-zero-doc-rvtsamples.html">Close Doc and Zero Doc RvtSamples</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/09/whats-new-in-the-revit-20201-api.html">What's New in the Revit 2020.1 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2020/05/setting-up-rvtsamples-for-revit-2021.html">Setting up RvtSamples for Revit 2021</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2021/04/revit-2022-sdk-and-the-building-coder-samples.html">Revit 2022 SDK and The Building Coder Samples</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2022/04/compiling-the-revit-2023-sdk-samples.html">Compiling the Revit 2023 SDK Samples</a></li>
+</ul>
 
 I installed the Revit 2024 SDK samples and updated
 the [RevitSdkSamples repository](https://github.com/jeremytammik/RevitSdkSamples) to
