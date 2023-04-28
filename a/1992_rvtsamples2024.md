@@ -393,92 +393,96 @@ Here is the history of RvtSamples, including its initial implementation and simi
 - [Revit 2022 SDK and The Building Coder Samples](https://thebuildingcoder.typepad.com/blog/2021/04/revit-2022-sdk-and-the-building-coder-samples.html)
 - [Compiling the Revit 2023 SDK Samples](https://thebuildingcoder.typepad.com/blog/2022/04/compiling-the-revit-2023-sdk-samples.html)
 
+<!--
 
-Compiling the Revit 2023 SDK Samples
-https://thebuildingcoder.typepad.com/blog/2022/04/compiling-the-revit-2023-sdk-samples.html
-
-Set Up RvtSamples
-https://thebuildingcoder.typepad.com/blog/2022/04/compiling-the-revit-2023-sdk-samples.html#7
-
-C:\Users\jta\AppData\Roaming\Autodesk\Revit\Addins\2024>
+C:\Users\jta\AppData\Roaming\Autodesk\Revit\Addins\2024
 copy Y:\a\src\rvt\RevitSdkSamples\SDK\Samples\RvtSamples\CS\RvtSamples.txt
 copy Y:\a\src\rvt\RevitSdkSamples\SDK\Samples\RvtSamples\CS\RvtSamples.addin
 
-DatumsModification
+-->
 
-DatumAlignment
-DatumPropagation
-DatumStyleModification
+Some of the errors I encountered were already present in previous SDK releases, so I already described how to handle them before:
 
-ContextualAnalyticalModel
+####<a name="3"></a> DatumsModification
+
+Correct list of external commands for the DatumsModification add-in:
+
+- DatumAlignment
+- DatumPropagation
+- DatumStyleModification
+
+####<a name="3"></a> ContextualAnalyticalModel
 
 The SDK source code actually implements the following 21 ContextualAnalyticalModel external commands:
 
-Use `grep "class.*IExternalCom" *cs`
-AddAssociation
-AddCustomAssociation
-AnalyticalNodeConnStatus
-CreateAnalyticalPanel
-CreateAnalyticalCurvedPanel
-CreateAnalyticalMember
-CreateAreaLoadWithRefPoint
-CreateCustomAreaLoad
-CreateCustomLineLoad
-CreateCustomPointLoad
-FlipAnalyticalMember
-MemberForcesAnalyticalMember
-ModifyPanelContour
-MoveAnalyticalMemberUsingElementTransformUtils
-MoveAnalyticalMemberUsingSetCurve
-MoveAnalyticalNodeUsingElementTransformUtils
-MoveAnalyticalPanelUsingElementTransformUtils
-MoveAnalyticalPanelUsingSketchEditScope
-ReleaseConditionsAnalyticalMember
-RemoveAssociation
-SetOuterContourForPanels
+- Use `grep "class.*IExternalCom" *cs`
+- AddAssociation
+- AddCustomAssociation
+- AnalyticalNodeConnStatus
+- CreateAnalyticalPanel
+- CreateAnalyticalCurvedPanel
+- CreateAnalyticalMember
+- CreateAreaLoadWithRefPoint
+- CreateCustomAreaLoad
+- CreateCustomLineLoad
+- CreateCustomPointLoad
+- FlipAnalyticalMember
+- MemberForcesAnalyticalMember
+- ModifyPanelContour
+- MoveAnalyticalMemberUsingElementTransformUtils
+- MoveAnalyticalMemberUsingSetCurve
+- MoveAnalyticalNodeUsingElementTransformUtils
+- MoveAnalyticalPanelUsingElementTransformUtils
+- MoveAnalyticalPanelUsingSketchEditScope
+- ReleaseConditionsAnalyticalMember
+- RemoveAssociation
+- SetOuterContourForPanels
 
 These are the ContextualAnalyticalModel external commands listed in RvtSamples.txt:
 
-Use `grep "^ContextualAnalyticalModel" RvtSamples.txt | sort`
-ContextualAnalyticalModel.AddRelation
-ContextualAnalyticalModel.AnalyticalNodeConnStatus
-ContextualAnalyticalModel.BreakRelation
-ContextualAnalyticalModel.CreateAnalyticalCurvedPanel
-ContextualAnalyticalModel.CreateAnalyticalMember
-ContextualAnalyticalModel.CreateAnalyticalPanel
-ContextualAnalyticalModel.FlipAnalyticalMember
-ContextualAnalyticalModel.MemberForcesAnalyticalMember
-ContextualAnalyticalModel.ModifyPanelContour
-ContextualAnalyticalModel.MoveAnalyticalMemberUsingElementTransformUtils
-ContextualAnalyticalModel.MoveAnalyticalMemberUsingSetCurve
-ContextualAnalyticalModel.MoveAnalyticalNodeUsingElementTransformUtils
-ContextualAnalyticalModel.MoveAnalyticalPanelUsingElementTransformUtils
-ContextualAnalyticalModel.MoveAnalyticalPanelUsingSketchEditScope
-ContextualAnalyticalModel.ReleaseConditionsAnalyticalMember
-ContextualAnalyticalModel.SetOuterContourForPanels
-ContextualAnalyticalModel.UpdateRelation
+- Use `grep "^ContextualAnalyticalModel" RvtSamples.txt | sort`
+- ContextualAnalyticalModel.AddRelation
+- ContextualAnalyticalModel.AnalyticalNodeConnStatus
+- ContextualAnalyticalModel.BreakRelation
+- ContextualAnalyticalModel.CreateAnalyticalCurvedPanel
+- ContextualAnalyticalModel.CreateAnalyticalMember
+- ContextualAnalyticalModel.CreateAnalyticalPanel
+- ContextualAnalyticalModel.FlipAnalyticalMember
+- ContextualAnalyticalModel.MemberForcesAnalyticalMember
+- ContextualAnalyticalModel.ModifyPanelContour
+- ContextualAnalyticalModel.MoveAnalyticalMemberUsingElementTransformUtils
+- ContextualAnalyticalModel.MoveAnalyticalMemberUsingSetCurve
+- ContextualAnalyticalModel.MoveAnalyticalNodeUsingElementTransformUtils
+- ContextualAnalyticalModel.MoveAnalyticalPanelUsingElementTransformUtils
+- ContextualAnalyticalModel.MoveAnalyticalPanelUsingSketchEditScope
+- ContextualAnalyticalModel.ReleaseConditionsAnalyticalMember
+- ContextualAnalyticalModel.SetOuterContourForPanels
+- ContextualAnalyticalModel.UpdateRelation
 
-RvtSamples: The name already exists in pulldown:Infrastructure alignments
+####<a name="3"></a> Infrastructure Alignments
 
-Infrastructure Alignment Station Label
-Infrastructure Alignment Properties
+- Infrastructure Alignment Station Label
+- Infrastructure Alignment Properties
 
-The Toposolid sample only has one entry in RvtSamples.txt specifying an external command named
+####<a name="3"></a> Toposolid
+
+The Toposolid sample only has one entry in RvtSamples.txt specifying an external command named:
 
 - Revit.SDK.Samples.Toposolid.CS.Command
 
-This command does not exist. Instead, the sample implements the following external commands:
+This command does not exist.
+Instead, the sample implements the following external commands:
 
-ToposolidCreation
-ToposolidFromDWG
-ContourSettingCreation
-ContourSettingModification
-ToposolidFromSurface
-SSEPointVisibility
-SplitToposolid
-SimplifyToposolid
+- ToposolidCreation
+- ToposolidFromDWG
+- ContourSettingCreation
+- ContourSettingModification
+- ToposolidFromSurface
+- SSEPointVisibility
+- SplitToposolid
+- SimplifyToposolid
 
-
+####<a name="3"></a> Conclusion
 
 This time around, I submitted a ticket with the development team in the hope of avoiding having to repeat this entire process for the next SDK update:
 
