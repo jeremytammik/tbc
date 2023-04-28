@@ -321,11 +321,13 @@ Parameter name: newItemName: n = 1911, k = 1911, lines[k] = eof
 
 twitter:
 
-APS cloud accelerators in Nice and Medellin, and configuring RvtSamples for the Revit 2024 SDK samples in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/rvt2024sdk
-
-APS cloud accelerators in Nice and Medellin
-&ndash; Compiling the Revit 2024 SDK samples
-&ndash; Visual introduction to machine learning...
+Configuring RvtSamples 2024
+&ndash; DatumsModification
+&ndash; ContextualAnalyticalModel
+&ndash; Infrastructure Alignments
+&ndash; Toposolid
+&ndash; Conclusion
+&ndash; Consuming huge numbers of element ids...
 
 linkedin:
 
@@ -340,7 +342,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Configuring RvtSamples 2024
+### Configuring RvtSamples 2024 and Big Numbers
 
 I left the Nice APS accelerator [APS cloud accelerator](https://aps.autodesk.com/accelerator-program) and
 am returning to Switzerland, using the long train ride time to continue my Revit 2024 migration process,
@@ -545,6 +547,6 @@ Another independent issue is should the editor rubber banding reuse the same ele
 - It is worth noting that we tried doing this and estimated that it would take days to even get to the end of the 32-bit space by creating the simple transient elements. It would therefore take on the order 2^31 days to run out of 64-bit ids.
   So, to confirm what is said above, it would take an extremely long time to run out of the newly extended elementid space
 - To pick up on the 3 million years mentioned above: Revit will survive 3 million years, but the rubber bands will surely lose some elasticity.
-- Can I just say all of you are awesome and this conversation makes me so happy I work here &ndash; :-)
+- Can I just say all of you are awesome and this conversation makes me so happy I work here &nbsp; :-)
 
-Illuminating ten-minute video by Numberphile explaining [what is a billion?](https://youtu.be/C-52AI_ojyQ)
+For some related facts, consult the illuminating ten-minute video by Numberphile explaining [what is a billion?](https://youtu.be/C-52AI_ojyQ).
