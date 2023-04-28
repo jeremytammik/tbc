@@ -340,8 +340,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 I left the Nice APS accelerator [APS cloud accelerator](https://aps.autodesk.com/accelerator-program) and
 am returning to Switzerland, using the long train ride time to continue my Revit 2024 migration process:
 
-By the way, we also have a new release of RevtLookup to celebrate, including some minor fixes:
+- [Configuring RvtSamples 2024](#3)
+- [DatumsModification](#4)
+- [ContextualAnalyticalModel](#5)
+- [Infrastructure Alignments](#6)
+- [Toposolid](#7)
+- [Conclusion](#8)
 
+<!--
+
+By the way, we also have a new release of RevtLookup to celebrate, including some minor fixes:
 
 ####<a name="2"></a> RevitLookup 2024.0.4
 
@@ -356,9 +364,12 @@ Improvements include:
 - Fixed Dashboard window startup location
 
 <center>
-<img src="img/revitlookup2024dashboard.png" alt="RevitLookup 2024 dashboard" title="RevitLookup 2024 dashboard" width="800"/> <!-- Pixel Height: 2,014
-Pixel Width: 2,096 -->
+<img src="img/revitlookup2024dashboard.png" alt="RevitLookup 2024 dashboard" title="RevitLookup 2024 dashboard" width="800"/>
+Pixel Height: 2,014
+Pixel Width: 2,096
 </center>
+
+-->
 
 ####<a name="3"></a> Configuring RvtSamples 2024
 
@@ -403,7 +414,7 @@ copy Y:\a\src\rvt\RevitSdkSamples\SDK\Samples\RvtSamples\CS\RvtSamples.addin
 
 Some of the errors I encountered were already present in previous SDK releases, so I already described how to handle them before:
 
-####<a name="3"></a> DatumsModification
+####<a name="4"></a> DatumsModification
 
 Correct list of external commands for the DatumsModification add-in:
 
@@ -411,7 +422,7 @@ Correct list of external commands for the DatumsModification add-in:
 - DatumPropagation
 - DatumStyleModification
 
-####<a name="3"></a> ContextualAnalyticalModel
+####<a name="5"></a> ContextualAnalyticalModel
 
 The SDK source code actually implements the following 21 ContextualAnalyticalModel external commands:
 
@@ -459,12 +470,12 @@ These are the ContextualAnalyticalModel external commands listed in RvtSamples.t
 - ContextualAnalyticalModel.SetOuterContourForPanels
 - ContextualAnalyticalModel.UpdateRelation
 
-####<a name="3"></a> Infrastructure Alignments
+####<a name="6"></a> Infrastructure Alignments
 
 - Infrastructure Alignment Station Label
 - Infrastructure Alignment Properties
 
-####<a name="3"></a> Toposolid
+####<a name="7"></a> Toposolid
 
 The Toposolid sample only has one entry in RvtSamples.txt specifying an external command named:
 
@@ -482,7 +493,7 @@ Instead, the sample implements the following external commands:
 - SplitToposolid
 - SimplifyToposolid
 
-####<a name="3"></a> Conclusion
+####<a name="8"></a> Conclusion
 
 This time around, I submitted a ticket with the development team in the hope of avoiding having to repeat this entire process for the next SDK update:
 
