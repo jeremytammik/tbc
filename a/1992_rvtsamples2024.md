@@ -321,6 +321,8 @@ Parameter name: newItemName: n = 1911, k = 1911, lines[k] = eof
 
 twitter:
 
+Configuring RvtSamples 2024, DatumsModification, ContextualAnalyticalModel, Infrastructure alignments, Toposolid samples and consuming huge numbers of element ids in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/rvtsamples2024
+
 Configuring RvtSamples 2024
 &ndash; DatumsModification
 &ndash; ContextualAnalyticalModel
