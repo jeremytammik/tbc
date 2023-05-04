@@ -56,62 +56,66 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ####<a name="2"></a> Dark Theme Icons
 
 Matthew Taylor, associate and CAD developer at [WSP](https://www.wsp.com) shared
-some useful tips and tricks to support
+two [dark theme icon hacks](https://forums.autodesk.com/t5/revit-api-forum/dark-theme-icons-a-couple-of-hacks/m-p/11935167),
+useful time- and labour-saving tips and tricks to support
 the [dark theme](https://thebuildingcoder.typepad.com/blog/2023/01/dark-theme-possibility-looming.html)
-in Revit 2024, cf.
-the [UI API additions](https://thebuildingcoder.typepad.com/blog/2023/04/whats-new-in-the-revit-2024-api.html#4.2.25).
+in Revit 2024.
+By the way, the new API functionality to support theme switching is listed in the Revit API news section
+on [UI API additions](https://thebuildingcoder.typepad.com/blog/2023/04/whats-new-in-the-revit-2024-api.html#4.2.25).
 Says Matt:
 
 ####<a name="2.1"></a> Hack 1 &ndash; Dark Icons by ImageMagick
 
 I've long used .bmp files as my raw ribbon icon images.
 
-I take those .bmp files and create .png files using a program called ImageMagick (https://imagemagick.org - I'm not affiliated).
+I take those .bmp files and create .png files using a program called [ImageMagick](https://imagemagick.org) &ndash; I'm not affiliated).
 
-Once installed you may use it in batch scripts etc:
+Once installed, you may use it in batch scripts etc.:
 
-https://imagemagick.org/script/command-line-processing.php
+- [Anatomy of the Command-line](https://imagemagick.org/script/command-line-processing.php)
+- [Annotated List of Command-line Options](https://imagemagick.org/script/command-line-options.php)
 
-https://imagemagick.org/script/command-line-options.php
+This is what I used in Revit 2023:
 
-
-
-This what I used in Revit 2023:
-
+<pre>
 rem For each .bmp file in this folder,
 rem   convert the white pixels to transparent,
 rem   and save the result to .png.
 for %%f in (*.bmp) do ( convert -transparent white %%f %%~nf.png)
+</pre>
 
-
-Then with Revit 2024, the Dark theme came along!
+Then, with Revit 2024, the dark theme came along!
 
 This is what I ended up with, in addition to the above:
 
+<pre>
 rem For each .bmp file in this folder,
-rem   invert the grayscale pixels only (white->black, lightgray->darkgray, darkgray->lightgray, black->white etc etc)
+rem   invert the grayscale pixels only (white-&gt;black,
+rem   lightgray-&gt;darkgray, darkgray-&gt;lightgray,
+rem   black-&gt;white etc.)
 rem   convert the black pixels to transparent,
-rem   add 30 to each R,G,B value (necessary as our dark mode is not black - this is an arbitrary value to lighten the overall image),
+rem   add 30 to each R,G,B value (necessary as our dark
+rem   mode is not black - this is an arbitrary value to
+rem   lighten the overall image),
 rem   and save the result to _dark.png.
 for %%f in (*.bmp) do ( convert +negate -transparent black -colorize 30,30,30  %%f %%~nf_dark.png)
+</pre>
 
-
-This system works well with grayscale icons, and icons that already used a similar colour scheme to native Revit.
-
-
+This system works well with grayscale icons and icons that already used a similar colour scheme to native Revit.
 
 I imagine it's possible to use the -scale switch to create 16x16 icons from 32x32 icons, but I've not tested that.
 
-I imagine it's also possible to add badges (from the zip in Jeremy's post) to images using something like this: https://stackoverflow.com/questions/11095007/add-an-image-on-top-of-existing-one-with-imagemagick-co...
-
+I imagine it's also possible to add badges (from the zip in Jeremy's post) to images using something like this:
+[Add an image on top of existing one with ImageMagick command line](https://stackoverflow.com/questions/11095007/add-an-image-on-top-of-existing-one-with-imagemagick-command-line).
 
 ####<a name="2.2"></a> Hack 2 &ndash; Embed Name in BitMapSource
 
 Another issue I had was that I was using icons as embedded resources.
 
-I couldn't work out how to get the name of the icon from the ribbon item Image or LargeImage property in order to get the dark or light equivalent. (I was changing the icons in the ThemeChanged event.)
-I worked out I could embed the name within the BitMapSource when initially adding the image:
+I couldn't work out how to get the name of the icon from the ribbon item `Image` or `LargeImage` property in order to get the dark or light equivalent. (I was changing the icons in the ThemeChanged event.)
+I worked out I could embed the name within the `BitMapSource` when initially adding the image:
 
+<pre>
 Private Shared Function GetEmbeddedImage(ByVal assembly As Assembly, ByVal imageFullName As String) As BitmapSource
   If Not String.IsNullOrEmpty(imageFullName) Then
       Dim s As IO.Stream = assembly.GetManifestResourceStream(imageFullName)
@@ -125,10 +129,11 @@ Private Shared Function GetEmbeddedImage(ByVal assembly As Assembly, ByVal image
   End If
   Return Nothing
 End Function
-
+</pre>
 
 I could then retrieve that name:
 
+<pre>
 Dim ribbonItem as RibbonItem...
 Dim bitmapSource As BitmapSource = CType(ribbonItem.Image, BitmapSource)
 Dim metadata As BitmapMetadata = CType(bitmapSource.Metadata, BitmapMetadata)
@@ -137,6 +142,7 @@ If metadata IsNot Nothing Then
    Dim imageName As String = TryCast(existingValue, String)
    'Use image name to get an embedded resource and set it to the ribbon item image.
 End If
+</pre>
 
 I hope this saves some of you a bit of time and effort.
 
