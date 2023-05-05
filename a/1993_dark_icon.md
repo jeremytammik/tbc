@@ -156,3 +156,31 @@ Many thanks to Matt for these valuable work- and time-savers!
 
 
 ####<a name="4"></a>
+
+
+
+Google "We Have No Moat, And Neither Does OpenAI"
+
+https://www.semianalysis.com/p/google-we-have-no-moat-and-neither
+
+I’m talking, of course, about open source. Plainly put, they are lapping us. Things we consider “major open problems” are solved and in people’s hands today. Just to name a few:
+
+Timeline of major milestones crossed
+
+Feb 24, 2023 - LLaMA is Launched
+March 3, 2023 - LLaMA public
+March 12, 2023 - Language models on a Raspberry Pi
+March 13, 2023 - Fine Tuning on a Laptop
+March 18, 2023 - Now It’s Fast on CPU, No GPU
+March 19, 2023 - A 13B model achieves “parity” with Bard
+March 25, 2023 - Choose Your Own Model
+March 28, 2023 - Open Source GPT-3
+March 28, 2023 - Multimodal Training in One Hour
+April 3, 2023 - Real Humans Can’t Tell the Difference Between a 13B Open Model and ChatGPT
+April 15, 2023 - Open Source RLHF at ChatGPT Levels
+
+####<a name="4"></a> Great Risk of AI Manipulation
+
+ [Yuval Noah Harari](https://en.wikipedia.org/wiki/Yuval_Noah_Harari) warned last year
+ that [humans will be "hacked" if artificial intelligence is not globally regulated](https://www.cbsnews.com/news/yuval-harari-sapiens-60-minutes-2021-10-29/) and
+ argues that [AI has hacked the operating system of human civilisation](https://www.linkedin.com/pulse/yuval-noah-harari-argues-ai-has-hacked-operating-system-harish/).
