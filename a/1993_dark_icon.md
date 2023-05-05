@@ -9,9 +9,6 @@
 - Dark Theme Icons - a couple of hacks
   https://forums.autodesk.com/t5/revit-api-forum/dark-theme-icons-a-couple-of-hacks/m-p/11935167
 
-- external event needs to be kept alive via static member
-  Revit 2024 rendering performance drops on selection
-
 - Getting the wrong NewFamilyInstance override
   https://forums.autodesk.com/t5/revit-api-forum/getting-the-wrong-newfamilyinstance-override/m-p/11936658
   explanation and solution by Kennan Chan using Reflection or the C# `dynamic` keyword
@@ -51,7 +48,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Dark Icons and Event Lifetime
 
-
+####<a name="2"></a> Dark Theme Icons
+####<a name="2.1"></a> Hack 1 &ndash; Dark Icons by ImageMagick
+####<a name="2.2"></a> Hack 2 &ndash; Embed Name in BitMapSource
+####<a name="3"></a>
+####<a name="4"></a> Open Source AI Surging Ahead
+####<a name="4.1"></a> Timeline of Major Milestones Crossed
+####<a name="4"></a> Great Risk of AI Manipulation
 
 ####<a name="2"></a> Dark Theme Icons
 
@@ -150,34 +153,48 @@ Many thanks to Matt for these valuable work- and time-savers!
 
 ####<a name="3"></a>
 
+Kennan Chen provided a very clear explanation and solution
+for [getting the wrong `NewFamilyInstance` override](https://forums.autodesk.com/t5/revit-api-forum/getting-the-wrong-newfamilyinstance-override/m-p/11936658) using
+.NET Reflection or the C# `dynamic` keyword. In short:
+
+In Revit 2024, the method you are using is defined in the `Autodesk.Revit.Creation.ItemFactoryBase` class and the `Autodesk.Revit.Creation.Document` class just inherits it.
+This means that `ItemFactoryBase.NewFamilyInstance` is invoked underneath by the C# compiler generated code.
+
 <center>
-<img src="img/rvtsamples2024.png" alt="RvtSamples 2024" title="RvtSamples 2024" width="800"/> <!-- Pixel Height: 562 Pixel Width: 1,562 -->
+<img src="img/kc_newfamilyinstance_moved.png" alt="NewFamilyInstance moved" title="NewFamilyInstance moved" width="639"/> <!-- Pixel Height: 300 Pixel Width: 639 -->
 </center>
 
+In previous versions of Revit, the "same" method is defined directly in `Autodesk.Revit.Creation.Document` class.
 
-####<a name="4"></a>
+The use of the method looks the same but they result in different compiled code when linked with different releases of RevitAPI.dll, which means the dll compiled against Revit 2024 cannot be used in Revit 2023 if you use this method.
+
+This is an API compatibility issue. The standard solution is to build different Revit add-in DLLs targeting the different versions of Revit.
+
+For full details of this discussion, please refer to the original discussion thread
+on [getting the wrong `NewFamilyInstance` override](https://forums.autodesk.com/t5/revit-api-forum/getting-the-wrong-newfamilyinstance-override/m-p/11936658).
+
+Many thanks to Kennan for his research and explanation!
 
 
+####<a name="4"></a> Open Source AI Surging Ahead
 
-Google "We Have No Moat, And Neither Does OpenAI"
+A puprotedly leaked document titled [Google "We Have No Moat, And Neither Does OpenAI"](https://www.semianalysis.com/p/google-we-have-no-moat-and-neither) highlights the impressive acceleration of AI research success in the past month:
 
-https://www.semianalysis.com/p/google-we-have-no-moat-and-neither
+> I’m talking, of course, about open source. Plainly put, they are lapping us. Things we consider “major open problems” are solved and in people’s hands today. Just to name a few:
 
-I’m talking, of course, about open source. Plainly put, they are lapping us. Things we consider “major open problems” are solved and in people’s hands today. Just to name a few:
+####<a name="4.1"></a> Timeline of Major Milestones Crossed
 
-Timeline of major milestones crossed
-
-Feb 24, 2023 - LLaMA is Launched
-March 3, 2023 - LLaMA public
-March 12, 2023 - Language models on a Raspberry Pi
-March 13, 2023 - Fine Tuning on a Laptop
-March 18, 2023 - Now It’s Fast on CPU, No GPU
-March 19, 2023 - A 13B model achieves “parity” with Bard
-March 25, 2023 - Choose Your Own Model
-March 28, 2023 - Open Source GPT-3
-March 28, 2023 - Multimodal Training in One Hour
-April 3, 2023 - Real Humans Can’t Tell the Difference Between a 13B Open Model and ChatGPT
-April 15, 2023 - Open Source RLHF at ChatGPT Levels
+- Feb 24, 2023 &ndash; LLaMA is Launched
+- March 3, 2023 &ndash; LLaMA public
+- March 12, 2023 &ndash; Language models on a Raspberry Pi
+- March 13, 2023 &ndash; Fine Tuning on a Laptop
+- March 18, 2023 &ndash; Now It’s Fast on CPU, No GPU
+- March 19, 2023 &ndash; A 13B model achieves “parity” with Bard
+- March 25, 2023 &ndash; Choose Your Own Model
+- March 28, 2023 &ndash; Open Source GPT-3
+- March 28, 2023 &ndash; Multimodal Training in One Hour
+- April 3, 2023 &ndash; Real Humans Can’t Tell the Difference Between a 13B Open Model and ChatGPT
+- April 15, 2023 &ndash; Open Source RLHF at ChatGPT Levels
 
 ####<a name="4"></a> Great Risk of AI Manipulation
 
