@@ -51,10 +51,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ####<a name="2"></a> Dark Theme Icons
 ####<a name="2.1"></a> Hack 1 &ndash; Dark Icons by ImageMagick
 ####<a name="2.2"></a> Hack 2 &ndash; Embed Name in BitMapSource
-####<a name="3"></a>
+####<a name="3"></a> New NewFamilyInstance Overload
 ####<a name="4"></a> Open Source AI Surging Ahead
 ####<a name="4.1"></a> Timeline of Major Milestones Crossed
 ####<a name="4"></a> Great Risk of AI Manipulation
+
 
 ####<a name="2"></a> Dark Theme Icons
 
@@ -151,7 +152,7 @@ I hope this saves some of you a bit of time and effort.
 
 Many thanks to Matt for these valuable work- and time-savers!
 
-####<a name="3"></a>
+####<a name="3"></a> New NewFamilyInstance Overload
 
 Kennan Chen provided a very clear explanation and solution
 for [getting the wrong `NewFamilyInstance` override](https://forums.autodesk.com/t5/revit-api-forum/getting-the-wrong-newfamilyinstance-override/m-p/11936658) using
@@ -165,6 +166,9 @@ This means that `ItemFactoryBase.NewFamilyInstance` is invoked underneath by the
 </center>
 
 In previous versions of Revit, the "same" method is defined directly in `Autodesk.Revit.Creation.Document` class.
+
+The Revit API news highlights this change in the section
+[1.4.1. Placement of Level based instances in family documents](https://thebuildingcoder.typepad.com/blog/2023/04/whats-new-in-the-revit-2024-api.html#4.1.4.1).
 
 The use of the method looks the same but they result in different compiled code when linked with different releases of RevitAPI.dll, which means the dll compiled against Revit 2024 cannot be used in Revit 2023 if you use this method.
 
