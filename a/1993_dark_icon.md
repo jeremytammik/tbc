@@ -48,7 +48,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Dark Icons and Event Lifetime
 
-Revit 2024 brought us theme switching functionality that may require new icons, and a new `NewFamilyInstance` overload;
+Revit 2024 brought us theme switching functionality requiring new icons, and a new `NewFamilyInstance` overload;
 meanwhile, the AI revolution acceleration continues growing:
 
 - [Dark theme icons](#2)
@@ -67,10 +67,9 @@ meanwhile, the AI revolution acceleration continues growing:
 Matthew Taylor, associate and CAD developer at [WSP](https://www.wsp.com) shared
 two [dark theme icon hacks](https://forums.autodesk.com/t5/revit-api-forum/dark-theme-icons-a-couple-of-hacks/m-p/11935167),
 useful time- and labour-saving tips and tricks to support
-the [dark theme](https://thebuildingcoder.typepad.com/blog/2023/01/dark-theme-possibility-looming.html)
-in Revit 2024.
-By the way, the new API functionality to support theme switching is listed in the Revit API news section
-on [UI API additions](https://thebuildingcoder.typepad.com/blog/2023/04/whats-new-in-the-revit-2024-api.html#4.2.25).
+the [dark theme in Revit 2024](https://thebuildingcoder.typepad.com/blog/2023/01/dark-theme-possibility-looming.html).
+The new API functionality to support theme switching is listed in
+the [Revit API news section on UI API additions](https://thebuildingcoder.typepad.com/blog/2023/04/whats-new-in-the-revit-2024-api.html#4.2.25).
 Says Matt:
 
 ####<a name="2.1"></a> Hack 1 &ndash; Dark Icons by ImageMagick
@@ -86,7 +85,7 @@ Once installed, you may use it in batch scripts etc.:
 
 This is what I used in Revit 2023:
 
-<pre>
+<pre class="prettyprint">
 rem For each .bmp file in this folder,
 rem   convert the white pixels to transparent,
 rem   and save the result to .png.
@@ -97,7 +96,7 @@ Then, with Revit 2024, the dark theme came along!
 
 This is what I ended up with, in addition to the above:
 
-<pre>
+<pre class="prettyprint">
 rem For each .bmp file in this folder,
 rem   invert the grayscale pixels only (white-&gt;black,
 rem   lightgray-&gt;darkgray, darkgray-&gt;lightgray,
@@ -124,7 +123,7 @@ Another issue I had was that I was using icons as embedded resources.
 I couldn't work out how to get the name of the icon from the ribbon item `Image` or `LargeImage` property in order to get the dark or light equivalent. (I was changing the icons in the ThemeChanged event.)
 I worked out I could embed the name within the `BitMapSource` when initially adding the image:
 
-<pre>
+<pre class="prettyprint">
 Private Shared Function GetEmbeddedImage(ByVal assembly As Assembly, ByVal imageFullName As String) As BitmapSource
   If Not String.IsNullOrEmpty(imageFullName) Then
       Dim s As IO.Stream = assembly.GetManifestResourceStream(imageFullName)
@@ -142,7 +141,7 @@ End Function
 
 I could then retrieve that name:
 
-<pre>
+<pre class="prettyprint">
 Dim ribbonItem as RibbonItem...
 Dim bitmapSource As BitmapSource = CType(ribbonItem.Image, BitmapSource)
 Dim metadata As BitmapMetadata = CType(bitmapSource.Metadata, BitmapMetadata)
@@ -186,7 +185,7 @@ Many thanks to Kennan for his research and explanation!
 
 ####<a name="4"></a> Open Source AI Surging Ahead
 
-A puprotedly leaked document titled [Google "We Have No Moat, And Neither Does OpenAI"](https://www.semianalysis.com/p/google-we-have-no-moat-and-neither) highlights the impressive acceleration of AI research success in the past month:
+A purportedly leaked document titled [Google "We Have No Moat, And Neither Does OpenAI"](https://www.semianalysis.com/p/google-we-have-no-moat-and-neither) highlights the impressive acceleration of AI research success in the past month:
 
 > I’m talking, of course, about open source. Plainly put, they are lapping us. Things we consider “major open problems” are solved and in people’s hands today. Just to name a few:
 
@@ -206,7 +205,7 @@ A puprotedly leaked document titled [Google "We Have No Moat, And Neither Does O
 
 ####<a name="5"></a> Non-Technical Explanation of AI and Deep Learning
 
-To just get a quick feel tor the topics involved in the current LLM revolution,
+For a newbie to get a quick feel for some of the basic topics involved in the current LLM revolution,
 here is [a completely non-technical explanation of AI and deep learning](https://www.parand.com/a-completely-non-technical-explanation-of-ai.html).
 
 ####<a name="6"></a> Using AI to Read Your Thoughts
@@ -218,11 +217,11 @@ Now, [scientists can use GPT AI to passively read people's thoughts](https://www
 
 ####<a name="7"></a> AI Emergent Abilities May Not Be Emergent After All
 
-Scientists were surprised comparing ChatGPT using GPT 3.5 with some greater capabilities exhibited by GPT 4,
+In March, scientists were surprised comparing ChatGPT using GPT 3.5 with some greater capabilities exhibited by GPT 4,
 hypothesising [sparks of artificial general intelligence in the LLM](https://thebuildingcoder.typepad.com/blog/2023/03/uv-emergence-fuzz-and-the-get_-prefix.html#9).
 
 A more recent paper questions this, instead
-asking [are emergent abilities of large language models a mirage?](https://arxiv.org/abs/2304.15004):
+asking [are emergent abilities of large language models a mirage?](https://arxiv.org/abs/2304.15004)
 
 > Figure 2: Emergent abilities of large language models are creations of the researcher’s analyses, not fundamental changes in model outputs with scale
 
@@ -235,7 +234,9 @@ argues that [AI has hacked the operating system of human civilisation](https://w
 It is indisputablke that we will all need to significantly sharpen our skills to critically evaluate all the input we receive.
 Soon, it will be almost impossible to distinguish deep fake from reality.
 
-That reminds me of Harari's last chapter in <i>21 Lessons for the 21st Century</i>, on meditation.
+That reminds me of Harari's last chapter
+in [21 Lessons for the 21st Century](https://en.wikipedia.org/wiki/21_Lessons_for_the_21st_Century,
+on meditation.
 He shares his own very personal answer on how to keep reconnecting with reality: retreat into myself and feel my reality through my own senses, cutting off myself for a while from all external input.
 I love that book, as I mentioned discussing [generative AI and multi-modal learning](https://thebuildingcoder.typepad.com/blog/2023/02/back-to-basics-and-chatgpt.html#9) back in February this year.
 
