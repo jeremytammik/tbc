@@ -55,7 +55,7 @@ meanwhile, the AI revolution acceleration continues growing:
     - [Hack 1 &ndash; dark icons by ImageMagick](#2.1)
     - [Hack 2 &ndash; embed name in `BitMapSource`](#2.2)
 - [New `NewFamilyInstance` overload](#3)
-- [Open source AI surging ahead](#4)
+- [Open-source AI surging ahead](#4)
     - [Timeline of major milestones crossed](#4.1)
 - [Non-technical explanation of AI and deep learning](#5)
 - [Using AI to read your thoughts](#6)
@@ -174,7 +174,7 @@ In previous versions of Revit, the "same" method is defined directly in `Autodes
 The Revit API news highlights this change in the section
 [1.4.1. Placement of Level based instances in family documents](https://thebuildingcoder.typepad.com/blog/2023/04/whats-new-in-the-revit-2024-api.html#4.1.4.1).
 
-The use of the method looks the same but they result in different compiled code when linked with different releases of RevitAPI.dll, which means the dll compiled against Revit 2024 cannot be used in Revit 2023 if you use this method.
+The use of the method looks the same, but they result in different compiled code when linked with different releases of RevitAPI.dll, which means the DLL compiled against Revit 2024 cannot be used in Revit 2023 if you use this method.
 
 This is an API compatibility issue. The standard solution is to build different Revit add-in DLLs targeting the different versions of Revit.
 
@@ -183,7 +183,7 @@ on [getting the wrong `NewFamilyInstance` override](https://forums.autodesk.com/
 
 Many thanks to Kennan for his research and explanation!
 
-####<a name="4"></a> Open Source AI Surging Ahead
+####<a name="4"></a> Open-Source AI Surging Ahead
 
 A purportedly leaked document titled [Google "We Have No Moat, And Neither Does OpenAI"](https://www.semianalysis.com/p/google-we-have-no-moat-and-neither) highlights the impressive acceleration of AI research success in the past month:
 
@@ -231,7 +231,7 @@ Among many others, [Yuval Noah Harari](https://en.wikipedia.org/wiki/Yuval_Noah_
 that [humans will be "hacked" if artificial intelligence is not globally regulated](https://www.cbsnews.com/news/yuval-harari-sapiens-60-minutes-2021-10-29/) and
 argues that [AI has hacked the operating system of human civilisation](https://www.linkedin.com/pulse/yuval-noah-harari-argues-ai-has-hacked-operating-system-harish/).
 
-It is indisputablke that we will all need to significantly sharpen our skills to critically evaluate all the input we receive.
+It is indisputable that we will all need to significantly sharpen our skills to critically evaluate all the input we receive.
 Soon, it will be almost impossible to distinguish deep fake from reality.
 
 That reminds me of Harari's last chapter
