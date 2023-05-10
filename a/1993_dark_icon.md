@@ -237,6 +237,7 @@ Soon, it will be almost impossible to distinguish deep fake from reality.
 That reminds me of Harari's last chapter
 in [21 Lessons for the 21st Century](https://en.wikipedia.org/wiki/21_Lessons_for_the_21st_Century),
 on meditation.
-He shares his own very personal answer on how to keep reconnecting with reality: retreat into myself and feel my reality through my own senses, cutting off myself for a while from all external input.
+He shares his own very personal answer on how to reconnect with reality: retreat into myself and feel it through my own senses, cutting off myself for a while from all external input.
 I love that book, as I mentioned discussing [generative AI and multi-modal learning](https://thebuildingcoder.typepad.com/blog/2023/02/back-to-basics-and-chatgpt.html#9) back in February this year.
+Highly recommended.
 
