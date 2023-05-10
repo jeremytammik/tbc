@@ -48,14 +48,19 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Dark Icons and Event Lifetime
 
-####<a name="2"></a> Dark Theme Icons
-####<a name="2.1"></a> Hack 1 &ndash; Dark Icons by ImageMagick
-####<a name="2.2"></a> Hack 2 &ndash; Embed Name in BitMapSource
-####<a name="3"></a> New NewFamilyInstance Overload
-####<a name="4"></a> Open Source AI Surging Ahead
-####<a name="4.1"></a> Timeline of Major Milestones Crossed
-####<a name="4"></a> Great Risk of AI Manipulation
+Revit 2024 brought us theme switching functionality that may require new icons, and a new `NewFamilyInstance` overload;
+meanwhile, the AI revolution acceleration continues growing:
 
+- [Dark theme icons](#2)
+    - [Hack 1 &ndash; dark icons by ImageMagick](#2.1)
+    - [Hack 2 &ndash; embed name in `BitMapSource`](#2.2)
+- [New `NewFamilyInstance` overload](#3)
+- [Open source AI surging ahead](#4)
+    - [Timeline of major milestones crossed](#4.1)
+- [Non-technical explanation of AI and deep learning](#5)
+- [Using AI to read your thoughts](#6)
+- [AI emergent abilities may not be emergent after all](#7)
+- [Risk of AI manipulation](#8)
 
 ####<a name="2"></a> Dark Theme Icons
 
@@ -179,7 +184,6 @@ on [getting the wrong `NewFamilyInstance` override](https://forums.autodesk.com/
 
 Many thanks to Kennan for his research and explanation!
 
-
 ####<a name="4"></a> Open Source AI Surging Ahead
 
 A puprotedly leaked document titled [Google "We Have No Moat, And Neither Does OpenAI"](https://www.semianalysis.com/p/google-we-have-no-moat-and-neither) highlights the impressive acceleration of AI research success in the past month:
@@ -200,8 +204,38 @@ A puprotedly leaked document titled [Google "We Have No Moat, And Neither Does O
 - April 3, 2023 &ndash; Real Humans Can’t Tell the Difference Between a 13B Open Model and ChatGPT
 - April 15, 2023 &ndash; Open Source RLHF at ChatGPT Levels
 
-####<a name="4"></a> Great Risk of AI Manipulation
+####<a name="5"></a> Non-Technical Explanation of AI and Deep Learning
 
- [Yuval Noah Harari](https://en.wikipedia.org/wiki/Yuval_Noah_Harari) warned last year
- that [humans will be "hacked" if artificial intelligence is not globally regulated](https://www.cbsnews.com/news/yuval-harari-sapiens-60-minutes-2021-10-29/) and
- argues that [AI has hacked the operating system of human civilisation](https://www.linkedin.com/pulse/yuval-noah-harari-argues-ai-has-hacked-operating-system-harish/).
+To just get a quick feel tor the topics involved in the current LLM revolution,
+here is [a completely non-technical explanation of AI and deep learning](https://www.parand.com/a-completely-non-technical-explanation-of-ai.html).
+
+####<a name="6"></a> Using AI to Read Your Thoughts
+
+Connecting AI with our human brain holds both very scary and very promising potential.
+Now, [scientists can use GPT AI to passively read people's thoughts](https://www.vice.com/en/article/4a3w3g/scientists-use-gpt-ai-to-passively-read-peoples-thoughts-in-breakthrough):
+
+> AI model combined with fMRI reading non-invasively decodes continuous language from subjects
+
+####<a name="7"></a> AI Emergent Abilities May Not Be Emergent After All
+
+Scientists were surprised comparing ChatGPT using GPT 3.5 with some greater capabilities exhibited by GPT 4,
+hypothesising [sparks of artificial general intelligence in the LLM](https://thebuildingcoder.typepad.com/blog/2023/03/uv-emergence-fuzz-and-the-get_-prefix.html#9).
+
+A more recent paper questions this, instead
+asking [are emergent abilities of large language models a mirage?](https://arxiv.org/abs/2304.15004):
+
+> Figure 2: Emergent abilities of large language models are creations of the researcher’s analyses, not fundamental changes in model outputs with scale
+
+####<a name="8"></a> Risk of AI Manipulation
+
+Among many others, [Yuval Noah Harari](https://en.wikipedia.org/wiki/Yuval_Noah_Harari) warned last year
+that [humans will be "hacked" if artificial intelligence is not globally regulated](https://www.cbsnews.com/news/yuval-harari-sapiens-60-minutes-2021-10-29/) and
+argues that [AI has hacked the operating system of human civilisation](https://www.linkedin.com/pulse/yuval-noah-harari-argues-ai-has-hacked-operating-system-harish/).
+
+It is indisputablke that we will all need to significantly sharpen our skills to critically evaluate all the input we receive.
+Soon, it will be almost impossible to distinguish deep fake from reality.
+
+That reminds me of Harari's last chapter in <i>21 Lessons for the 21st Century</i>, on meditation.
+He shares his own very personal answer on how to keep reconnecting with reality: retreat into myself and feel my reality through my own senses, cutting off myself for a while from all external input.
+I love that book, as I mentioned discussing [generative AI and multi-modal learning](https://thebuildingcoder.typepad.com/blog/2023/02/back-to-basics-and-chatgpt.html#9) back in February this year.
+
