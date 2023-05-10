@@ -27,7 +27,7 @@
 
 twitter:
 
- in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
+AI acceleration, new NewFamilyInstance method and dark icons for Revit 2024 add-ins with ImageMagick in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/darkicon
 
 Hacks for dark icons supporting Revit 2024 theme switching and news from the ever-accelerating AI revolution
 &ndash; Dark theme icons by ImageMagick
