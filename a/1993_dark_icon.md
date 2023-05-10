@@ -42,6 +42,21 @@ Hacks for dark icons supporting Revit 2024 theme switching and news from the eve
 
 linkedin:
 
+AI acceleration, new NewFamilyInstance method and dark icons for Revit 2024 add-ins with ImageMagick in the #RevitAPI
+
+https://autode.sk/darkicon
+
+Hacks for dark icons supporting Revit 2024 theme switching and news from the ever-accelerating AI revolution:
+
+- Dark theme icons by ImageMagick
+- Embed dark theme icon name in <code>BitMapSource</code>
+- New <code>NewFamilyInstance</code> overload
+- Open-source AI surging ahead
+- Timeline of major milestones crossed
+- Non-technical explanation of AI and deep learning
+- Using AI to read your thoughts
+- AI emergent abilities may not be emergent after all
+- Risk of AI manipulation...
 
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
