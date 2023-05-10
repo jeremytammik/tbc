@@ -29,8 +29,16 @@ twitter:
 
  in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-&ndash;
-...
+Hacks for dark icons supporting Revit 2024 theme switching and news from the ever-accelerating AI revolution
+&ndash; Dark theme icons by ImageMagick
+&ndash; Embed dark theme icon name in <code>BitMapSource</code>
+&ndash; New <code>NewFamilyInstance</code> overload
+&ndash; Open-source AI surging ahead
+&ndash; Timeline of major milestones crossed
+&ndash; Non-technical explanation of AI and deep learning
+&ndash; Using AI to read your thoughts
+&ndash; AI emergent abilities may not be emergent after all
+&ndash; Risk of AI manipulation...
 
 linkedin:
 
@@ -46,7 +54,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Dark Icons and Event Lifetime
+### Dark Icons, NewFamilyInstance and AI News
 
 Revit 2024 brought us theme switching functionality requiring new icons, and a new `NewFamilyInstance` overload;
 meanwhile, the AI revolution acceleration continues growing:
