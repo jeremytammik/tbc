@@ -1,0 +1,61 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css">
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head>
+
+<!---
+
+- Electrical Wire not found in BoundingBoxIsInsideFilter
+  https://forums.autodesk.com/t5/revit-api-forum/electrical-wire-not-found-in-boundingboxisinsidefilter/m-p/11938583
+  ricaun created the BoundingBoxViewIntersectsFilter and BoundingBoxViewIsInsideFilter:
+  https://gist.github.com/ricaun/14ec0730e7efb3cc737f2134475e2539
+
+- https://forums.autodesk.com/t5/revit-api-forum/visualizing-circuits-in-3d/td-p/11937368
+
+- align two elements:
+  How to use the Alignment method for family Instance
+  https://forums.autodesk.com/t5/revit-api-forum/how-to-use-the-alignment-method-using-for-family-instance/m-p/11938454
+
+twitter:
+
+ in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
+
+&ndash;
+...
+
+linkedin:
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+### Align an Instance and Find a Wire
+
+
+
+
+####<a name="2"></a>
+
+<pre class="prettyprint">
+
+</pre>
+
+
+
+
+####<a name="3"></a>
+
+<center>
+<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 300 Pixel Width: 639 -->
+</center>
+
+
+
