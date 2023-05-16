@@ -82,50 +82,76 @@ MikeM615_4-1682684901736.pngMikeM615_5-1682684903736.pngMikeM615_6-1682684905452
 Everything at face value looks like the filters should work, it just seems I am missing something simple.
 Here is the section of code I used just to produce those values, but the BoundingBoxIsInsideFilter is failing on:
 
-private List<Wire> WireCollector( ForEachView viewPlan )
-        {
-            List<Wire> wireCollector = new FilteredElementCollector( _Doc, viewPlan.Id )
-                    .OfCategory( BuiltInCategory.OST_Wire )
-                    .WhereElementIsNotElementType( )
-                    .OfType<Wire>( )
-                    .ToList( );
-            //If view is dependent view, filter wires by bounding box
-            if ( viewPlan.PrimaryPlan != ElementId.InvalidElementId )
-            {
-                ////Set Z value to 1 ft above and below level
-                XYZ viewBoundingBoxMin = new XYZ( viewPlan.ViewBoundingBox.Min.X, viewPlan.ViewBoundingBox.Min.Y, -1 );
-                XYZ viewBoundingBoxMax = new XYZ( viewPlan.ViewBoundingBox.Max.X, viewPlan.ViewBoundingBox.Max.Y,  1 );
-                //Create Outline and BoundingBox
-                Outline outline = new Outline( viewBoundingBoxMin, viewBoundingBoxMax );
-                BoundingBoxIsInsideFilter boundingBoxIsInsideFilter = new BoundingBoxIsInsideFilter( outline );
-                //Test Value Reporting
-                TaskDialog.Show( "Wire Export", viewBoundingBoxMin.ToString( ) + " Min " + viewBoundingBoxMax.ToString( ) + " Max " );
-                //Add elements to new list if passes filter
+<pre class="prettyprint">
+  private List&lt;Wire&gt; WireCollector( ForEachView viewPlan )
+  {
+    List&lt;Wire&gt; wireCollector
+      = new FilteredElementCollector( _Doc, viewPlan.Id )
+        .OfCategory( BuiltInCategory.OST_Wire )
+        .WhereElementIsNotElementType( )
+        .OfType&lt;Wire&gt;( )
+        .ToList( );
 
-                //Test Value Reporting
-                foreach ( Wire wire in wireCollector)
-                {
-                    TaskDialog.Show( "Wire Export", wire.get_BoundingBox( viewPlan.CropRegionElement ).Min.ToString( ) + " Min " + wire.get_BoundingBox( viewPlan.CropRegionElement ).Max.ToString( ) + "Max" );
-                }
+    // If view is dependent view, filter wires by bounding box
 
-                List<Wire> filteredWires = wireCollector
-                    .Where( w => boundingBoxIsInsideFilter.PassesFilter(w) )
-                    .ToList( );
+    if ( viewPlan.PrimaryPlan != ElementId.InvalidElementId )
+    {
+      // Set Z value to 1 ft above and below level
 
-                //Test Value Reporting
-                TaskDialog.Show( "Wire Export", $"There are {filteredWires.Count} wires in the view {viewPlan.Name}." );
-                return filteredWires;
-            }
-            else
-            {
-                //Test Value Reporting
-                TaskDialog.Show( "Wire Export", $"There are {wireCollector.Count} wires in the view {viewPlan.Name}." );
-                return wireCollector;
-            }
-        }
+      XYZ viewBoundingBoxMin = new XYZ(
+        viewPlan.ViewBoundingBox.Min.X,
+        viewPlan.ViewBoundingBox.Min.Y, -1 );
+      XYZ viewBoundingBoxMax = new XYZ(
+        viewPlan.ViewBoundingBox.Max.X,
+        viewPlan.ViewBoundingBox.Max.Y,  1 );
+
+      // Create Outline and BoundingBox
+
+      Outline outline = new Outline( viewBoundingBoxMin,
+        viewBoundingBoxMax );
+      BoundingBoxIsInsideFilter boundingBoxIsInsideFilter
+        = new BoundingBoxIsInsideFilter( outline );
+
+      // Test Value Reporting
+
+      TaskDialog.Show( "Wire Export", viewBoundingBoxMin.ToString( )
+        + " Min " + viewBoundingBoxMax.ToString( ) + " Max " );
+
+      // Add elements to new list if passes filter
+
+      // Test Value Reporting
+
+      foreach ( Wire wire in wireCollector)
+      {
+        TaskDialog.Show( "Wire Export", wire.get_BoundingBox(
+            viewPlan.CropRegionElement ).Min.ToString( )
+          + " Min " + wire.get_BoundingBox(
+            viewPlan.CropRegionElement ).Max.ToString( )
+          + "Max" );
+      }
+
+      List&lt;Wire&gt; filteredWires = wireCollector
+        .Where( w =&gt; boundingBoxIsInsideFilter.PassesFilter(w) )
+        .ToList( );
+
+      // Test Value Reporting
+
+      TaskDialog.Show( "Wire Export",
+        $"There are {filteredWires.Count} wires in the view {viewPlan.Name}." );
+      return filteredWires;
+    }
+    else
+    {
+      // Test Value Reporting
+
+      TaskDialog.Show( "Wire Export",
+        $"There are {wireCollector.Count} wires in the view {viewPlan.Name}." );
+      return wireCollector;
+    }
+  }
+</pre>
 
 ricaun
- Collaborator ricaun in reply to: MikeM615
 2023-04-28 08:33 AM
 I'm not sure the bound box filter does work with 2d elements that are owned by a view.
 
@@ -165,7 +191,7 @@ namespace RevitAddin.Commands
       var wires = new FilteredElementCollector(document)
           .OfCategory(BuiltInCategory.OST_Wire)
           .WhereElementIsNotElementType()
-          .OfType<Wire>()
+          .OfType&lt;Wire&gt;()
           .ToList();
 
       System.Console.WriteLine($"Wires: {wires.Count}");
@@ -209,6 +235,7 @@ Thank you for the examples, that is exactly what I needed!
 
 I'm trying to create a script that will help me better visualize circuits in 3D. Basically, you select one or more electrical panels, and temporary generic model lines will get drawn in between all the elements in each circuit on the panel. The problem is that a single circuit may have 10 or more receptacles, and I don't want a line going from the panelboard to each receptacle - I'd like to show them daisy-chained together like when you create a circuit. I set up a nearest-neighbor algorithm and a minimum spanning tree algorithm, but neither really matches the results that you'd see if you tab-select a circuit and add wiring. Here's my current implementation in pyRevit. I have attached screenshots of the results of each.
 
+<pre class="prettyprint">
 """ Visualize Connected Circuits
 
 Author: Perry Lackowski
@@ -229,189 +256,189 @@ uidoc = revit.uidoc
 output = script.get_output()
 
 selectable_categories = [
-    int(DB.BuiltInCategory.OST_ElectricalEquipment),
-    int(DB.BuiltInCategory.OST_ElectricalFixtures)
+  int(DB.BuiltInCategory.OST_ElectricalEquipment),
+  int(DB.BuiltInCategory.OST_ElectricalFixtures)
 ]
 
 def UI_get_equipment():
-    selected_equipment_ids = uidoc.Selection.GetElementIds()
+  selected_equipment_ids = uidoc.Selection.GetElementIds()
 
-    # If pre-selection, convert ids to elements, and remove anything that
-    # isn't electrical equipment.
-    if selected_equipment_ids:
-        selected_equipment = [doc.GetElement(eId) for eId in selected_equipment_ids]
-        selected_equipment = [x for x in selected_equipment if x.Category.Id.IntegerValue in selectable_categories]
-        use_preselected_elements = forms.alert(msg='You currently have {} elements selected. Do you want to proceed with the currently selected item(s)?'.format(len(selected_equipment)),ok=False,yes=True, no=True)
-        if use_preselected_elements:
-            return selected_equipment
+  # If pre-selection, convert ids to elements, and remove anything that
+  # isn't electrical equipment.
+  if selected_equipment_ids:
+    selected_equipment = [doc.GetElement(eId) for eId in selected_equipment_ids]
+    selected_equipment = [x for x in selected_equipment if x.Category.Id.IntegerValue in selectable_categories]
+    use_preselected_elements = forms.alert(msg='You currently have {} elements selected. Do you want to proceed with the currently selected item(s)?'.format(len(selected_equipment)),ok=False,yes=True, no=True)
+    if use_preselected_elements:
+      return selected_equipment
 
-    # If post selection, use the Revit's PickObjects to select items.
-    # selection_filter limits selection to electrical equipment.
-    selection_filter = electrical_equipment_filter()
-    try:
-        selection_reference = uidoc.Selection.PickObjects(ObjectType.Element, selection_filter, 'Select Electrical Equipment to rename.')
-    except:
-        # if selection is aborted, it throws an exception...
-        sys.exit()
-    if not selection_reference:
-        sys.exit()
-    selected_equipment = [doc.GetElement(r.ElementId) for r in selection_reference]
+  # If post selection, use the Revit's PickObjects to select items.
+  # selection_filter limits selection to electrical equipment.
+  selection_filter = electrical_equipment_filter()
+  try:
+    selection_reference = uidoc.Selection.PickObjects(ObjectType.Element, selection_filter, 'Select Electrical Equipment to rename.')
+  except:
+    # if selection is aborted, it throws an exception...
+    sys.exit()
+  if not selection_reference:
+    sys.exit()
+  selected_equipment = [doc.GetElement(r.ElementId) for r in selection_reference]
 
-    return selected_equipment
+  return selected_equipment
 
 class electrical_equipment_filter(ISelectionFilter):
-    def __init__(self):
-        pass
-    def AllowElement(self, element):
-        if element.Category.Id.IntegerValue in selectable_categories:
-            return True
-        else:
-            return False
-    def AllowReference(self, element):
-        return False
+  def __init__(self):
+    pass
+  def AllowElement(self, element):
+    if element.Category.Id.IntegerValue in selectable_categories:
+      return True
+    else:
+      return False
+  def AllowReference(self, element):
+    return False
 
 def get_parents_and_children(elem):
-    parents_and_children = list(elem.MEPModel.GetElectricalSystems())
+  parents_and_children = list(elem.MEPModel.GetElectricalSystems())
 
-    children = list(elem.MEPModel.GetAssignedElectricalSystems())
-    parents = []
-    for es in parents_and_children:
-        if es.Id not in [x.Id for x in children]:
-            parents.append(es)
+  children = list(elem.MEPModel.GetAssignedElectricalSystems())
+  parents = []
+  for es in parents_and_children:
+    if es.Id not in [x.Id for x in children]:
+      parents.append(es)
 
-    # To get the corresponding elements from the circuit, you can typically use
-    # circuit.Elements. However, if you're looking at the parent circuit, the
-    # base element element will be the only item in this list. In parent
-    # circuits, you'll want to look at the BaseEquipment property.
+  # To get the corresponding elements from the circuit, you can typically use
+  # circuit.Elements. However, if you're looking at the parent circuit, the
+  # base element element will be the only item in this list. In parent
+  # circuits, you'll want to look at the BaseEquipment property.
 
-    return parents, children
+  return parents, children
 
 class Colors(Enum):
-    Red = DB.Color(255,0,0)
-    Green = DB.Color(0,128,0)
-    Blue = DB.Color(70,65,240)
+  Red = DB.Color(255,0,0)
+  Green = DB.Color(0,128,0)
+  Blue = DB.Color(70,65,240)
 
 def create_line(start, end):
-    if start.DistanceTo(end) < 1:
-         return False
-    new_line = DB.Line.CreateBound(start,end)
-    return new_line
+  if start.DistanceTo(end) &lt; 1:
+     return False
+  new_line = DB.Line.CreateBound(start,end)
+  return new_line
 
 def make_shape(lines, color):
-    new_shape = DB.DirectShape.CreateElement(doc, DB.ElementId(DB.BuiltInCategory.OST_GenericModel))
-    new_shape.SetShape(lines)
+  new_shape = DB.DirectShape.CreateElement(doc, DB.ElementId(DB.BuiltInCategory.OST_GenericModel))
+  new_shape.SetShape(lines)
 
-    graphic_settings = DB.OverrideGraphicSettings()
-    graphic_settings.SetProjectionLineColor(color)
-    graphic_settings.SetProjectionLineWeight(6)
+  graphic_settings = DB.OverrideGraphicSettings()
+  graphic_settings.SetProjectionLineColor(color)
+  graphic_settings.SetProjectionLineWeight(6)
 
-    doc.ActiveView.SetElementOverrides(new_shape.Id, graphic_settings)
+  doc.ActiveView.SetElementOverrides(new_shape.Id, graphic_settings)
 
-    return new_shape
+  return new_shape
 
 def set_shape_params(shape, circuit_slot, circuit_name):
-    shape.get_Parameter(DB.BuiltInParameter.ALL_MODEL_MARK).Set('pyRevit Electrical Circuit Visualization')
-    shape.get_Parameter(DB.BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set('{} - {}'.format(circuit_slot, circuit_name))
+  shape.get_Parameter(DB.BuiltInParameter.ALL_MODEL_MARK).Set('pyRevit Electrical Circuit Visualization')
+  shape.get_Parameter(DB.BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set('{} - {}'.format(circuit_slot, circuit_name))
 
 from itertools import izip, tee
 def pairwise(iterable):
-    "s -> (s0, s1), (s1, s2), (s2, s3), ..."
-    a, b = tee(iterable)
-    next(b, None)
-    return izip(a, b)
+  "s -&gt; (s0, s1), (s1, s2), (s2, s3), ..."
+  a, b = tee(iterable)
+  next(b, None)
+  return izip(a, b)
 
 # def minimum_spanning_tree(source, points):
-#     # Create a set to keep track of visited points
-#     visited = set()
+#   # Create a set to keep track of visited points
+#   visited = set()
 
-#     # Initialize the source point
-#     visited.add(source)
+#   # Initialize the source point
+#   visited.add(source)
 
-#     # Initialize the lines list
-#     lines = []
+#   # Initialize the lines list
+#   lines = []
 
-#     # Loop until all points have been visited
-#     while len(visited) < len(points) + 1:
-#         # Find the closest unvisited point to the visited set
-#         min_dist = float('inf')
-#         min_point = None
-#         for visited_point in visited:
-#             for neighbor in points:
-#                 if neighbor in visited:
-#                     continue
-#                 dist = visited_point.DistanceTo(neighbor)
-#                 if dist < min_dist:
-#                     min_dist = dist
-#                     min_point = neighbor
+#   # Loop until all points have been visited
+#   while len(visited) &lt; len(points) + 1:
+#     # Find the closest unvisited point to the visited set
+#     min_dist = float('inf')
+#     min_point = None
+#     for visited_point in visited:
+#       for neighbor in points:
+#         if neighbor in visited:
+#           continue
+#         dist = visited_point.DistanceTo(neighbor)
+#         if dist &lt; min_dist:
+#           min_dist = dist
+#           min_point = neighbor
 
-#         # Add the closest point to the visited set and draw a line to it
-#         visited.add(min_point)
-#         new_line = create_line(min_point, visited_point)
-#         lines.append(new_line)
+#     # Add the closest point to the visited set and draw a line to it
+#     visited.add(min_point)
+#     new_line = create_line(min_point, visited_point)
+#     lines.append(new_line)
 
-#     return lines
+#   return lines
 
 def nearest_neighbor(source, points):
-    unvisited = set(points)
-    sorted_points = [source]
-    while unvisited:
-        closest = min(unvisited, key=lambda p: p.DistanceTo(sorted_points[-1]))
-        sorted_points.append(closest)
-        unvisited.remove(closest)
-    lines = []
-    for x, y in pairwise(sorted_points):
-        line = create_line(x, y)
-        lines.append(line)
-    return lines
+  unvisited = set(points)
+  sorted_points = [source]
+  while unvisited:
+    closest = min(unvisited, key=lambda p: p.DistanceTo(sorted_points[-1]))
+    sorted_points.append(closest)
+    unvisited.remove(closest)
+  lines = []
+  for x, y in pairwise(sorted_points):
+    line = create_line(x, y)
+    lines.append(line)
+  return lines
 
 # def star_connect(source, points):
-#     lines = []
-#     for point in points:
-#         line = create_line(source, point)
-#         lines.append(line)
-#     return lines
+#   lines = []
+#   for point in points:
+#     line = create_line(source, point)
+#     lines.append(line)
+#   return lines
 
 def visualize_circuits(equipment):
-    equipment_origin = equipment.GetTransform().Origin
-    parents, children = get_parents_and_children(equipment)
-    new_shapes = []
-    lines = []
+  equipment_origin = equipment.GetTransform().Origin
+  parents, children = get_parents_and_children(equipment)
+  new_shapes = []
+  lines = []
 
-    # First draw circuits for parents (upstream sources)
-    for circuit in parents:
-        circuit_slot = circuit.Name
-        circuit_name = circuit.get_Parameter(DB.BuiltInParameter.RBS_ELEC_CIRCUIT_NAME).AsString()
-        line = create_line(equipment_origin, circuit.BaseEquipment.GetTransform().Origin)
-        if line:
-            lines.append(line)
+  # First draw circuits for parents (upstream sources)
+  for circuit in parents:
+    circuit_slot = circuit.Name
+    circuit_name = circuit.get_Parameter(DB.BuiltInParameter.RBS_ELEC_CIRCUIT_NAME).AsString()
+    line = create_line(equipment_origin, circuit.BaseEquipment.GetTransform().Origin)
+    if line:
+      lines.append(line)
+  if lines:
+    shape = make_shape(lines, Colors.Red.value)
+    set_shape_params(shape, circuit_slot, circuit_name)
+    new_shapes.append(shape)
+    print('Source Vector: {}'.format(output.linkify(shape.Id)))
+
+  children = sorted(children, key=lambda x: x.Name)
+
+  # Next draw circuits for children (downstream loads)
+  for circuit in children:
+    circuit_slot = circuit.Name
+    circuit_name = circuit.get_Parameter(DB.BuiltInParameter.RBS_ELEC_CIRCUIT_NAME).AsString()
+    if 'SPARE' in circuit_name or 'SPACE' in circuit_name:
+      continue
+    print('{} - {}'.format(circuit_slot, circuit_name))
+    load_locations = [elem.GetTransform().Origin for elem in circuit.Elements]
+
+    lines = nearest_neighbor(equipment_origin, load_locations)
+    ## Two alternate algorithms for drawing lines:
+    # lines = minimum_spanning_tree(equipment_origin, load_locations)
+    # lines = star_connect(equipment_origin, load_locations)
+
     if lines:
-        shape = make_shape(lines, Colors.Red.value)
-        set_shape_params(shape, circuit_slot, circuit_name)
-        new_shapes.append(shape)
-        print('Source Vector: {}'.format(output.linkify(shape.Id)))
-
-    children = sorted(children, key=lambda x: x.Name)
-
-    # Next draw circuits for children (downstream loads)
-    for circuit in children:
-        circuit_slot = circuit.Name
-        circuit_name = circuit.get_Parameter(DB.BuiltInParameter.RBS_ELEC_CIRCUIT_NAME).AsString()
-        if 'SPARE' in circuit_name or 'SPACE' in circuit_name:
-            continue
-        print('{} - {}'.format(circuit_slot, circuit_name))
-        load_locations = [elem.GetTransform().Origin for elem in circuit.Elements]
-
-        lines = nearest_neighbor(equipment_origin, load_locations)
-        ## Two alternate algorithms for drawing lines:
-        # lines = minimum_spanning_tree(equipment_origin, load_locations)
-        # lines = star_connect(equipment_origin, load_locations)
-
-        if lines:
-            shape = make_shape(lines, Colors.Blue.value)
-            set_shape_params(shape, circuit_slot, circuit_name)
-            new_shapes.append(shape)
-            print('Load Vector: {}'.format(output.linkify(shape.Id)))
-    return new_shapes
+      shape = make_shape(lines, Colors.Blue.value)
+      set_shape_params(shape, circuit_slot, circuit_name)
+      new_shapes.append(shape)
+      print('Load Vector: {}'.format(output.linkify(shape.Id)))
+  return new_shapes
 
 selected_equipment = UI_get_equipment()
 t = DB.Transaction(doc, "Visualize Electrical Equipment")
@@ -419,17 +446,18 @@ t.Start()
 all_created_circuits = []
 
 for equipment in selected_equipment:
-    all_created_circuits.append(visualize_circuits(equipment))
+  all_created_circuits.append(visualize_circuits(equipment))
 
 if all_created_circuits:
-    selection = ui.Selection()
-    selection.clear()
+  selection = ui.Selection()
+  selection.clear()
 
-    for shape in all_created_circuits:
-        selection.add(shape)
+  for shape in all_created_circuits:
+    selection.add(shape)
 
-    selection.update()
+  selection.update()
 t.Commit()
+</pre>
 
 pr_circuit_minimum_spanning_tree.png
 pr_circuit_nearest_neighbour.png
@@ -445,13 +473,7 @@ Wow. Intimidating project, intimidating pictures, for me. Not knowing much whats
 
 https://duckduckgo.com/?q=display+complex+graph+relationships
 
-ricaun
- Collaborator ricaun in reply to: PerryLackowski
-2023-05-03 07:46 AM
-
-I used the Delaunay algorithm to connect all the elements that have electrical circuits.
-
-https://en.wikipedia.org/wiki/Delaunay_triangulation
+**Answer:** I used the [Delaunay algorithm](https://en.wikipedia.org/wiki/Delaunay_triangulation) to connect all the elements that have electrical circuits.
 
 ricaun_0-1683123397917.png
 
@@ -480,9 +502,8 @@ Desired Result.png
 
 mhannonQ65N2
 2023-05-03 10:36 AM
-Have you looked at ElectricalSystem.GetCircuitPath()?
 
-https://apidocs.co/apps/revit/2020.1/0448a0ee-c9bf-f037-c1b7-d49ce03ffa71.htm
+Have you looked at [ElectricalSystem.GetCircuitPath()](https://apidocs.co/apps/revit/2020.1/0448a0ee-c9bf-f037-c1b7-d49ce03ffa71.htm)?
 
 PerryLackowski
 2023-05-03 11:10 AM
@@ -495,7 +516,6 @@ Problem Case.png
 pr_circuit_problem_case.png
 
 ricaun
- Collaborator ricaun in reply to: PerryLackowski
 2023-05-03 11:58 AM
 If your goal is to check if your panel is near or far from the load, the best approach should be to create a load center from the panel. Basically, the interpolation between each element location using the load value (Load1*Location1 + Load2*Location2) / (Load1 + Load2).
 
@@ -518,13 +538,14 @@ I agree using wire is not ideal - it would take quite a bit of manipulation to g
 Also, good to know I can SetName on the DirectShapes. I have just been storing info in the comment and mark parameters, but that leaves them open to editing by others, which is risky if I ever need to search through them and delete them based on a filter.
 
 ricaun
- Collaborator ricaun in reply to: PerryLackowski
 2023-05-04 04:56 PM
-I'm not sure if the distance is too useful to know where is the best place to put the panel. And probably gonna add some features like that in the plugin ElectricalUtils, using DirectContext3D would be fun to show the load center without creating any element.
+I'm not sure if the distance is too useful to know where is the best place to put the panel.
+And probably gonna add some features like that in the plugin ElectricalUtils;
+using `DirectContext3D` would be fun to show the load center without creating any element.
 
 ####<a name="4"></a> Aligning Two Elements
 
-Let's wrap up with sme hints
+Let's wrap up with some hints
 on [how to use the alignment method for family instance](https://forums.autodesk.com/t5/revit-api-forum/how-to-use-the-alignment-method-using-for-family-instance/m-p/11938454):
 
 **Question:** I need to align a `FamilyInstance` which I created using C# to a line that I also created Via C# in Revit 2023,
@@ -543,8 +564,9 @@ This is how I want the column to be aligned to the `ModelCurve`:
 Here is sample code from my script:
 
 <pre class="prettyprint">
-Line line = Line.CreateBound(startPoint, endPoint);
-Element newPile = doc.Create.NewFamilyInstance(point, symbol, Level, structuralType);
+  Line line = Line.CreateBound(startPoint, endPoint);
+  Element newPile = doc.Create.NewFamilyInstance(
+    point, symbol, Level, structuralType);
 </pre>
 
 **Answer:** Well, first of all you need to understand how to implement such a constraint manually in the end user interface.
@@ -585,76 +607,73 @@ using Document = Autodesk.Revit.DB.Document;
 
 namespace Tunnel
 {
-public class SheetPile
-{
-double meters = 3.28084;
+  public class SheetPile
+  {
+    double meters = 3.28084;
 
-public SheetPile(Document doc, double x, String PileName, Level Level, TunnelFloors tunnelFloors)
-{
+    public SheetPile(Document doc, double x, String PileName, Level Level, TunnelFloors tunnelFloors)
+    {
+      Options options = new Options();
+      Plane plane = Plane.CreateByNormalAndOrigin(new XYZ(0, 0, 1), new XYZ(0, 0, 0));
+      SketchPlane sketchPlane = SketchPlane.Create(doc, plane);
+      // Create a new view plan for Level 1
+      // Get the floor plan view family type
+      ViewFamilyType viewFamilyType = new FilteredElementCollector(doc)
+        .OfClass(typeof(ViewFamilyType))
+        .Cast&lt;ViewFamilyType&gt;()
+        .FirstOrDefault(v =&gt; v.ViewFamily == ViewFamily.StructuralPlan);
 
-Options options = new Options();
-Plane plane = Plane.CreateByNormalAndOrigin(new XYZ(0, 0, 1), new XYZ(0, 0, 0));
-SketchPlane sketchPlane = SketchPlane.Create(doc, plane);
-// Create a new view plan for Level 1
-// Get the floor plan view family type
-ViewFamilyType viewFamilyType = new FilteredElementCollector(doc)
-.OfClass(typeof(ViewFamilyType))
-.Cast<ViewFamilyType>()
-.FirstOrDefault(v => v.ViewFamily == ViewFamily.StructuralPlan);
-// Create a new view plan for Level 1
+      // Create a new view plan for Level 1
 
-ViewPlan viewPlan = ViewPlan.Create(doc, viewFamilyType.Id, Level.Id);
-// Convert input values from feet to meters
-x = x * meters;
+      ViewPlan viewPlan = ViewPlan.Create(doc, viewFamilyType.Id, Level.Id);
+      // Convert input values from feet to meters
+      x = x * meters;
 
-// Define the family symbol and structural type
-FamilySymbol symbol = new FilteredElementCollector(doc)
-.OfClass(typeof(FamilySymbol))
-.OfCategory(BuiltInCategory.OST_StructuralColumns)
-.FirstOrDefault(e => e.Name == PileName) as FamilySymbol;
-StructuralType structuralType = StructuralType.Column;
+      // Define the family symbol and structural type
+      FamilySymbol symbol = new FilteredElementCollector(doc)
+        .OfClass(typeof(FamilySymbol))
+        .OfCategory(BuiltInCategory.OST_StructuralColumns)
+        .FirstOrDefault(e =&gt; e.Name == PileName) as FamilySymbol;
 
-// Create a list of curves
-List<Curve> curves = new List<Curve>();
-foreach (Floor floor in tunnelFloors.Floors)
-{
-Sketch sketch = doc.GetElement(floor.SketchId) as Sketch;
-foreach (CurveArray curveArray in sketch.Profile)
-{
-foreach (Curve curve in curveArray)
-{
-XYZ p0 = (new XYZ(curve.GetEndPoint(0).X, curve.GetEndPoint(0).Y, 0));
-XYZ p1 = (new XYZ(curve.GetEndPoint(1).X, curve.GetEndPoint(1).Y, 0));
-Curve c1 = Line.CreateBound(p0, p1);
-curves.Add(curve);
-}
+      StructuralType structuralType = StructuralType.Column;
 
-}
-}
+      // Create a list of curves
+      List&lt;Curve&gt; curves = new List&lt;Curve&gt;();
+      foreach (Floor floor in tunnelFloors.Floors)
+      {
+        Sketch sketch = doc.GetElement(floor.SketchId) as Sketch;
+        foreach (CurveArray curveArray in sketch.Profile)
+        {
+          foreach (Curve curve in curveArray)
+          {
+            XYZ p0 = (new XYZ(curve.GetEndPoint(0).X, curve.GetEndPoint(0).Y, 0));
+            XYZ p1 = (new XYZ(curve.GetEndPoint(1).X, curve.GetEndPoint(1).Y, 0));
+            Curve c1 = Line.CreateBound(p0, p1);
+            curves.Add(curve);
+          }
+        }
+      }
 
-foreach (Curve curve in curves)
-{
+      foreach (Curve curve in curves)
+      {
+        ModelCurve m1 = doc.Create.NewModelCurve(curve, sketchPlane);
+        // Move the family instance along the curve by the distance variable
+        double length = curve.Length;
+        int count = (int)(length / x);
+        for (int j = 1; j &lt;= count; j++)
+        {
+          XYZ point = curve.Evaluate((double)j * x / length, true);
+          FamilyInstance newPile = doc.Create.NewFamilyInstance(point, symbol, Level, structuralType);
+          newPile.LookupParameter("Top Level").Set("Level 2");
+          Reference s = newPile.GetReferenceByName("SS");
+          // Get the reference plane named "SS" from the family instance
 
-ModelCurve m1 = doc.Create.NewModelCurve(curve, sketchPlane);
-// Move the family instance along the curve by the distance variable
-double length = curve.Length;
-int count = (int)(length / x);
-for (int j = 1; j <= count; j++)
-{
-XYZ point = curve.Evaluate((double)j * x / length, true);
-FamilyInstance newPile = doc.Create.NewFamilyInstance(point, symbol, Level, structuralType);
-newPile.LookupParameter("Top Level").Set("Level 2");
-Reference s = newPile.GetReferenceByName("SS");
-// Get the reference plane named "SS" from the family instance
-
-//uidoc.Selection.PickObject(ObjectType.PointOnElement);
-doc.Create.NewAlignment(viewPlan, s, curve.Reference);
-
-}
-}
-}
-
-}
+          //uidoc.Selection.PickObject(ObjectType.PointOnElement);
+          doc.Create.NewAlignment(viewPlan, s, curve.Reference);
+        }
+      }
+    }
+  }
 }
 </pre>
 
