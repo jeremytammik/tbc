@@ -229,6 +229,7 @@ ricaun.com - Revit API Developer
 
 MikeM615
 2023-05-03 05:17 AM
+
 Thank you @ricaun, that makes a lot of sense and matches what I was seeing in my results and assumptions, I definitely got stuck on the problem and couldn't think of a next step at all in the moment!
 
 Thank you for the examples, that is exactly what I needed!
@@ -472,9 +473,7 @@ Nearest Neighbor.png
 Minimum Spanning Tree.png
 Star Connected.png
 
-jeremy.tammik
-2023-05-03 01:59 AM
-Wow. Intimidating project, intimidating pictures, for me. Not knowing much whatsoever about the subject, the reality it is helps describe, and the use of the functionality you are aiming to implement, I would suggest taking a step back from Revit and model lines and ponder how to best display complex graph relationships, e.g.,
+**Answer:** Wow. Intimidating project, intimidating pictures, for me. Not knowing much whatsoever about the subject, the reality it is helps describe, and the use of the functionality you are aiming to implement, I would suggest taking a step back from Revit and model lines and ponder how to best display complex graph relationships, e.g.,
 
 https://duckduckgo.com/?q=display+complex+graph+relationships
 
@@ -520,8 +519,8 @@ Problem Case.png
 
 pr_circuit_problem_case.png
 
-ricaun
-2023-05-03 11:58 AM
+**Answer:**
+
 If your goal is to check if your panel is near or far from the load, the best approach should be to create a load center from the panel. Basically, the interpolation between each element location using the load value (Load1*Location1 + Load2*Location2) / (Load1 + Load2).
 
 I don't use Revit Wire, I have a plugin to create wires inside Conduit/CableTray, that's a requirement in my country, so Revit Wire is useless in my case.
@@ -542,9 +541,7 @@ I agree using wire is not ideal - it would take quite a bit of manipulation to g
 
 Also, good to know I can SetName on the DirectShapes. I have just been storing info in the comment and mark parameters, but that leaves them open to editing by others, which is risky if I ever need to search through them and delete them based on a filter.
 
-ricaun
-2023-05-04 04:56 PM
-I'm not sure if the distance is too useful to know where is the best place to put the panel.
+**Answer:** I'm not sure if the distance is too useful to know where is the best place to put the panel.
 And probably gonna add some features like that in the plugin ElectricalUtils;
 using `DirectContext3D` would be fun to show the load center without creating any element.
 
