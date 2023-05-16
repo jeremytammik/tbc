@@ -524,96 +524,54 @@ I'm not sure if the distance is too useful to know where is the best place to pu
 
 ####<a name="4"></a> Aligning Two Elements
 
-[how to use the alignment method for family instance](https://forums.autodesk.com/t5/revit-api-forum/how-to-use-the-alignment-method-using-for-family-instance/m-p/11938454)
+Let's wrap up with sme hints
+on [how to use the alignment method for family instance](https://forums.autodesk.com/t5/revit-api-forum/how-to-use-the-alignment-method-using-for-family-instance/m-p/11938454):
 
-I Need to align a FamilyInstance in which I created using C# to a Line that I also Created Via C# in Revit 2023. For example the First Picture would show a structural column and a ModelCurve which are not aligned together.
+**Question:** I need to align a `FamilyInstance` which I created using C# to a line that I also created Via C# in Revit 2023,
+like in this picture showing a structural column and a `ModelCurve` that are not yet aligned:
 
 <center>
 <img src="img/align_element_1.png" alt="Align element &ndash; not aligned" title="Align element &ndash; not aligned" width="100"/> <!-- Pixel Height: 300 Pixel Width: 639 -->
 </center>
 
-The second picture would Show How I want my column to be aligned to a ModelCurve.
+This is how I want the column to be aligned to the `ModelCurve`:
 
 <center>
 <img src="img/align_element_2.png" alt="Align element" title="Align element" width="100"/> <!-- Pixel Height: 300 Pixel Width: 639 -->
 </center>
 
-I would greatly apricate if someone can show me just the method of how can I use the alignment method in C# . Here is just a sample code for my script :
+Here is sample code from my script:
 
+<pre class="prettyprint">
 Line line = Line.CreateBound(startPoint, endPoint);
 Element newPile = doc.Create.NewFamilyInstance(point, symbol, Level, structuralType);
+</pre>
 
- Solved by jeremy.tammik. Go to Solution.
+**Answer:** Well, first of all you need to understand how to implement such a constraint manually in the end user interface.
+I believe you define a dimension between the two objects to do so, and constrain it to a zero distance.
+The [Family API samples](https://thebuildingcoder.typepad.com/blog/2009/08/the-revit-family-api.html) demonstrate
+how such a constraint can be set up programmatically.
 
-8 REPLIES
-Sort:
-jeremy.tammik
-2023-05-03 02:16 AM
-Well, first of all you need to understand how to implement such a constraint manually in the end user interface. I believe you define a dimension between the two objects to do so, and constrain it to a zero distance. The Family API samples may demonstrate how such a constraint can be set up programmatically:
+Reading that myself, I discover that
+the [NewAlignment method](https://www.revitapidocs.com/2023/b3c10008-aba6-9eee-99c9-7e05ace75796.htm) might
+come in handy.
 
-https://thebuildingcoder.typepad.com/blog/2009/08/the-revit-family-api.html
-
-Reading that myself, I discover that the NewAlignment method might come in handy:
-
-https://www.revitapidocs.com/2023/b3c10008-aba6-9eee-99c9-7e05ace75796.htm
-
-Searching this forum for NewAlignment ought to turn up something useful for you.
+Searching this forum for other threads on `NewAlignment` ought to turn up something useful for you.
 
 Good luck!
 
-ahmadkhalaf7892
-2023-05-03 04:21 AM
-Hi Jeremy .
-Thanks a  lot for introducing this method for me .  I am trying to align the family instance called newPile to the model Curve however I am getting this error under :
-Autodesk.Revit.Exceptions.ArgumentException: 'The two references are not geometrically aligned so the Alignment cannot be created.
-Parameter name: reference2'
+**Response:** Thanks a lot for introducing this method for me .
+I am trying to align the family instance called newPile to the model Curve however I am getting this error:
 
-I have created both the model Curve and the familyinstance in the same level.
+- Autodesk.Revit.Exceptions.ArgumentException:
+  The two references are not geometrically aligned so the Alignment cannot be created.
+  Parameter name: reference2
 
-This is the code that I am using :
+I have created both the model curve and the family instance on the same level.
 
-// Create a list of curves
-List<Curve> curves = new List<Curve>();
-foreach (Floor floor in tunnelFloors.Floors)
-{
-Sketch sketch = doc.GetElement(floor.SketchId) as Sketch;
-foreach (CurveArray curveArray in sketch.Profile)
-{
-foreach (Curve curve in curveArray)
-{
-XYZ p0 = (new XYZ(curve.GetEndPoint(0).X, curve.GetEndPoint(0).Y, 0));
-XYZ p1 = (new XYZ(curve.GetEndPoint(1).X, curve.GetEndPoint(1).Y, 0));
-Curve c1 = Line.CreateBound(p0, p1);
-curves.Add(c1);
-}
+This is the code that I am using:
 
-}
-}
-
-foreach (Curve curve in curves)
-{
-
-ModelCurve m1 = doc.Create.NewModelCurve(curve, sketchPlane);
-// Move the family instance along the curve by the distance variable
-double length = curve.Length;
-int count = (int)(length / x);
-for (int j = 1; j <= count; j++)
-{
-XYZ point = curve.Evaluate((double)j * x / length, true);
-FamilyInstance newPile = doc.Create.NewFamilyInstance(point, symbol, Level, structuralType);
-Reference s= newPile.GetReferenceByName("SS");
-// Get the reference plane named "SS" from the family instance
-
-//uidoc.Selection.PickObject(ObjectType.PointOnElement);
-Dimension alignToLine3 = doc.Create.NewAlignment(viewPlan, m1.GeometryCurve.Reference, s);
-
-}
-}
-
-ahmadkhalaf7892
-2023-05-03 05:14 AM
-here is the full constructor in case needed :
-
+<pre class="prettyprint">
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -698,42 +656,26 @@ doc.Create.NewAlignment(viewPlan, s, curve.Reference);
 
 }
 }
+</pre>
 
-Tags:is the full
-
-jeremy.tammik
-2023-05-03 05:26 AM
-Did you read the remarks in the Revit API docs?
-
-https://www.revitapidocs.com/2023/b3c10008-aba6-9eee-99c9-7e05ace75796.htm
+**Answer:** Did you read the remarks on
+the [NewAlignment method](https://www.revitapidocs.com/2023/b3c10008-aba6-9eee-99c9-7e05ace75796.htm) in
+the Revit API docs?
 
 > These references must be already geometrically aligned (this function will not force them to become aligned).
 
-ahmadkhalaf7892
-2023-05-03 05:29 AM
-Ah Sorry , I have been working on this for hours . I'm loosing my concentration , I didn't pay attention to it .
-Is there any way I can force Them to be aligned using the Revit API?
-I have been trying for the past 4 hours. If it is a dead end please inform me .
-Thanks very much.
+**Response:** Is there any way I can force Them to be aligned using the Revit API?
 
-jeremy.tammik
-2023-05-03 05:36 AM
-Take a rest! Go for a walk!
+**Answer:** The easiest way to ensure they are aligned is to create them accordingly in the first place, if they are being generated from scratch.
+Otherwise, you can use the standard translation and rotation functionality provided by `ElementTransformUtils`.
+Or, you can set the location curve via the `Location` property.
 
-The easiest way to ensure they are aligned is to create them accordingly in the first place, if they are being generated from scratch. Otherwise, you can use the standard translation and rotation functionality provided by ElementTransformUtils. Or, you can set the location curve via the Location property.
+**Response:** I will rest for a few then see which approach fits better.
+I am using a family which is already loaded in the Project and I am placing them on a line with a specific distance .
+However I want them to rotate according to the Curve or Line they are placed on.
+I haven't been able to do such thing.
+Should I use `ElementTransformUtils.Rotate` in this case?
 
-ahmadkhalaf7892
-2023-05-03 05:43 AM
-I will rest for a few then see which approach fits better. I am using a family which is already loaded in the Project and I am placing them on a line with a specific distance . However I want them to rotate according to the Curve or Line they are placed on. I haven't been able to do such thing. I will see what I can do .
-I should use the ElementTransformUtils.Rotate in this case ?
-I really appreciate the help Jeremy
-
-jeremy.tammik
-2023-05-03 05:47 AM
-Either ElementTransformUtils.Rotate or just manipulate the LocationPoint or LocationCurve via Rotate, e.g.:
-
-https://www.revitapidocs.com/2023/e1071a1b-b98e-5875-2e13-b673e2b9fef6.htm
-https://www.revitapidocs.com/2023/ed4de043-9a60-f6cd-c09b-b13c4612b343.htm
-
-Enjoy your break.
+**Answer:** Either `ElementTransformUtils.Rotate` or just manipulate the `LocationPoint` or `LocationCurve`
+via [`Rotate`](https://www.revitapidocs.com/2023/ed4de043-9a60-f6cd-c09b-b13c4612b343.htm).
 
