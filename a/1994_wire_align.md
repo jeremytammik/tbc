@@ -37,7 +37,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Align an Instance and Find a Wire
+### Align Instance, Visualise and Find Wires
 
 ####<a name="2"></a> Bounding Box Filter for Wires
 
@@ -45,9 +45,10 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 I am currently trying to locate electrical wires that exist within a dependent view's bounding box. However, I have not been successful in using methods such as BoundingBoxIsInsideFilter, BoundingBoxIntersectsFilter, or VisibleInViewFilter.
 
-In order to obtain the wires' bounding box, I had to use wire.get_BoundingBox(viewTheyExistOn) to get any value for their location. Despite following Jeremy's example in message #4 of this link
-
-https://forums.autodesk.com/t5/revit-api-forum/check-to-see-if-a-point-is-inside-bounding-box/m-p/43... I am still unable to get any wires into my list.
+In order to obtain a wire's bounding box, I had to use `wire.get_BoundingBox`, passing in the view it exists on, to get any value for its location.
+Despite following Jeremy's example in message #4 in the thread
+on how to [check to see if a point is inside bounding box](https://forums.autodesk.com/t5/revit-api-forum/check-to-see-if-a-point-is-inside-bounding-box/m-p/4354446),
+I am still unable to get any wires into my list.
 
 I apologize for the mess in my example snippets as I have been trying various approaches to make it work.
 
@@ -153,17 +154,21 @@ Here is the section of code I used just to produce those values, but the Boundin
 
 ricaun
 2023-04-28 08:33 AM
-I'm not sure the bound box filter does work with 2d elements that are owned by a view.
+I'm not sure the bounding box filter works with 2d elements that are owned by a view.
 
 I guess in the bound box filter implementation, the filter tries to get the bound box of the element without a view, like element.get_BoundingBox(null), and the result would be null, resulting in a PassesFilter to false.
 
 I guess the only way should be to create your own filter and add a View to use in the comparison (Gonna be a slow filter to use with Linq).
 
-I created the BoundingBoxViewIntersectsFilter and BoundingBoxViewIsInsideFilter.
+I created
+the [Revit API Filter for BoundingBox element in a View](https://gist.github.com/ricaun/14ec0730e7efb3cc737f2134475e2539) with
+`BoundingBoxViewIntersectsFilter`, `BoundingBoxViewIsInsideFilter` and a command to test them:
 
-https://gist.github.com/ricaun/14ec0730e7efb3cc737f2134475e2539
+- [BoundingBoxViewIntersectsFilter.cs](https://gist.github.com/ricaun/14ec0730e7efb3cc737f2134475e2539#file-boundingboxviewintersectsfilter-cs)
+- [BoundingBoxViewIsInsideFilter.cs](https://gist.github.com/ricaun/14ec0730e7efb3cc737f2134475e2539#file-boundingboxviewisinsidefilter-cs)
+- [CommandWireIsInside.cs](https://gist.github.com/ricaun/14ec0730e7efb3cc737f2134475e2539#file-commandwireisinside-cs)
 
-And here is a code sample to test, I put a big tolerance to force the PassesFilter to be true.
+Here is a code sample to test; I use a big tolerance to force the `PassesFilter` to return true.
 
 <pre class="prettyprint">
 using Autodesk.Revit.Attributes;
