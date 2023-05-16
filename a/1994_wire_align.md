@@ -45,7 +45,206 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 
 
-####<a name="2"></a>
+####<a name="2"></a> Bounding Box Filter for Wires
+
+
+[Electrical Wire not found in BoundingBoxIsInsideFilter](https://forums.autodesk.com/t5/revit-api-forum/electrical-wire-not-found-in-boundingboxisinsidefilter/m-p/11938583)
+
+I am currently trying to locate electrical wires that exist within a dependent view's bounding box. However, I have not been successful in using methods such as BoundingBoxIsInsideFilter, BoundingBoxIntersectsFilter, or VisibleInViewFilter.
+
+In order to obtain the wires' bounding box, I had to use wire.get_BoundingBox(viewTheyExistOn) to get any value for their location. Despite following Jeremy's example in message #4 of this link
+
+https://forums.autodesk.com/t5/revit-api-forum/check-to-see-if-a-point-is-inside-bounding-box/m-p/43... I am still unable to get any wires into my list.
+
+I apologize for the mess in my example snippets as I have been trying various approaches to make it work.
+
+
+
+MikeM615_3-1682625734940.png
+
+
+
+MikeM615_2-1682625440894.png
+
+electrical_wire_collector.png
+
+
+jeremy.tammik
+ Autodesk jeremy.tammik in reply to: MikeM615
+‎2023-04-28 02:10 AM
+I am not sure whether the filtered element collectors are ever able to take wire geometry into account. Do your wires have real geometry, e.g., a curve and a location? The filtered element collectors only deal with BIM elements and BIM element geometry. If your wires have valid geometry, it may not be recognised by them a valid BIM element geometry, so you will have to treat is as abstract pure non-BIM geometry and use other means than the filtered element collectors to retrieve it. So, yes, using a pure geometry bounding box sounds like a good way to go. Just be clear that this is completely separate from filtered element collectors.
+
+
+
+Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
+Tags (0)
+Add tags
+Report
+MESSAGE 3 OF 5
+MikeM615
+ Participant MikeM615 in reply to: jeremy.tammik
+‎2023-04-28 05:32 AM
+Yes sir they do have a curve and location, I am able to find them just fine through the FilteredElementCollector for each View, except on a Dependent View.
+
+
+
+The Dependent View will show all wires of the Primary View not just what is within its Crop Region. Took a few iterations but I finally found how to get the actual Crop Region of the Dependent View, the first few ways I tried gave me the Primary Views Crop Region, so I ended up having to get the extents from the BuiltInParameter
+
+MikeM615_1-1682683809965.png
+
+I also tried to extend my Z from that 1000' in either direction and it still did not show up, but if I invert any of those three filters, it finds all the wires of the Primary View even including the handful inside the Crop Region which shouldn't with it inverted.
+
+This is the extents of the Dependent Views Crop Region:
+
+MikeM615_3-1682684885657.png
+
+And these are the wires within it:
+
+MikeM615_4-1682684901736.pngMikeM615_5-1682684903736.pngMikeM615_6-1682684905452.png
+
+
+
+Everything at face value looks like the filters should work, it just seems I am missing something simple.
+Here is the section of code I used just to produce those values, but the BoundingBoxIsInsideFilter is failing on:
+
+private List<Wire> WireCollector( ForEachView viewPlan )
+        {
+            List<Wire> wireCollector = new FilteredElementCollector( _Doc, viewPlan.Id )
+                    .OfCategory( BuiltInCategory.OST_Wire )
+                    .WhereElementIsNotElementType( )
+                    .OfType<Wire>( )
+                    .ToList( );
+            //If view is dependent view, filter wires by bounding box
+            if ( viewPlan.PrimaryPlan != ElementId.InvalidElementId )
+            {
+                ////Set Z value to 1 ft above and below level
+                XYZ viewBoundingBoxMin = new XYZ( viewPlan.ViewBoundingBox.Min.X, viewPlan.ViewBoundingBox.Min.Y, -1 );
+                XYZ viewBoundingBoxMax = new XYZ( viewPlan.ViewBoundingBox.Max.X, viewPlan.ViewBoundingBox.Max.Y,  1 );
+                //Create Outline and BoundingBox
+                Outline outline = new Outline( viewBoundingBoxMin, viewBoundingBoxMax );
+                BoundingBoxIsInsideFilter boundingBoxIsInsideFilter = new BoundingBoxIsInsideFilter( outline );
+                //Test Value Reporting
+                TaskDialog.Show( "Wire Export", viewBoundingBoxMin.ToString( ) + " Min " + viewBoundingBoxMax.ToString( ) + " Max " );
+                //Add elements to new list if passes filter
+
+                //Test Value Reporting
+                foreach ( Wire wire in wireCollector)
+                {
+                    TaskDialog.Show( "Wire Export", wire.get_BoundingBox( viewPlan.CropRegionElement ).Min.ToString( ) + " Min " + wire.get_BoundingBox( viewPlan.CropRegionElement ).Max.ToString( ) + "Max" );
+                }
+
+
+                List<Wire> filteredWires = wireCollector
+                    .Where( w => boundingBoxIsInsideFilter.PassesFilter(w) )
+                    .ToList( );
+
+                //Test Value Reporting
+                TaskDialog.Show( "Wire Export", $"There are {filteredWires.Count} wires in the view {viewPlan.Name}." );
+                return filteredWires;
+            }
+            else
+            {
+                //Test Value Reporting
+                TaskDialog.Show( "Wire Export", $"There are {wireCollector.Count} wires in the view {viewPlan.Name}." );
+                return wireCollector;
+            }
+        }
+
+
+Tags (0)
+Add tags
+Report
+MESSAGE 4 OF 5
+ricaun
+ Collaborator ricaun in reply to: MikeM615
+‎2023-04-28 08:33 AM
+I'm not sure the bound box filter does work with 2d elements that are owned by a view.
+
+
+
+I guess in the bound box filter implementation, the filter tries to get the bound box of the element without a view, like element.get_BoundingBox(null), and the result would be null, resulting in a PassesFilter to false.
+
+
+
+I guess the only way should be to create your own filter and add a View to use in the comparison (Gonna be a slow filter to use with Linq).
+
+
+
+I created the BoundingBoxViewIntersectsFilter and BoundingBoxViewIsInsideFilter.
+
+https://gist.github.com/ricaun/14ec0730e7efb3cc737f2134475e2539
+
+
+And here is a code sample to test, I put a big tolerance to force the PassesFilter to be true.
+
+
+
+
+
+using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Electrical;
+using Autodesk.Revit.UI;
+using System.Linq;
+
+namespace RevitAddin.Commands
+{
+    [Transaction(TransactionMode.Manual)]
+    public class CommandWireIsInside : IExternalCommand
+    {
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elementSet)
+        {
+            UIApplication uiapp = commandData.Application;
+
+            UIDocument uidoc = uiapp.ActiveUIDocument;
+            Document document = uidoc.Document;
+            View view = uidoc.ActiveView;
+
+            var wires = new FilteredElementCollector(document)
+                    .OfCategory(BuiltInCategory.OST_Wire)
+                    .WhereElementIsNotElementType()
+                    .OfType<Wire>()
+                    .ToList();
+
+            System.Console.WriteLine($"Wires: {wires.Count}");
+
+            var tolerance = 1e3;
+            var viewBox = view.CropBox;
+            var outline = new Outline(viewBox.Min, viewBox.Max);
+            var boundingBoxFilter = new BoundingBoxViewIsInsideFilter(outline, view, tolerance);
+
+            var wiresBox = wires
+                    .Where(boundingBoxFilter.PassesFilter)
+                    .ToList();
+
+            System.Console.WriteLine($"WiresBox: {wiresBox.Count}");
+
+            TaskDialog.Show($"Wires: {wires.Count}", $"WiresBox: {wiresBox.Count}");
+
+            return Result.Succeeded;
+        }
+    }
+}
+
+
+Luiz Henrique Cassettari
+
+ricaun.com - Revit API Developer
+
+AppLoader EasyConduit WireInConduit ConduitMaterial CircuitName ElectricalUtils
+Tags (0)
+Add tags
+Report
+MESSAGE 5 OF 5
+MikeM615
+ Participant MikeM615 in reply to: ricaun
+‎2023-05-03 05:17 AM
+Thank you @ricaun, that makes a lot of sense and matches what I was seeing in my results and assumptions, I definitely got stuck on the problem and couldn't think of a next step at all in the moment!
+
+
+
+Thank you for the examples, that is exactly what I needed!
+
 
 <pre class="prettyprint">
 
@@ -323,15 +522,7 @@ That was the best I found to visualize circuits in 3d.
 
 
 
-Luiz Henrique Cassettari
 
-ricaun.com - Revit API Developer
-
-AppLoader EasyConduit WireInConduit ConduitMaterial CircuitName ElectricalUtils
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 9
 PerryLackowski
  Advocate PerryLackowski in reply to: PerryLackowski
 ‎2023-05-03 08:49 AM
@@ -360,18 +551,16 @@ Thanks for the help!
 
 
 
-
+pr_circuit_desired_result.png
 
 Desired Result.png
-59 KB
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 9
+
 mhannonQ65N2
  Advocate mhannonQ65N2 in reply to: PerryLackowski
 ‎2023-05-03 10:36 AM
 Have you looked at ElectricalSystem.GetCircuitPath()?
+
+https://apidocs.co/apps/revit/2020.1/0448a0ee-c9bf-f037-c1b7-d49ce03ffa71.htm
 
 Tags (0)
 Add tags
@@ -387,11 +576,10 @@ I did try that at first, but it had its own problems. The first is that the circ
 And while that would likely get us pretty close to the desired result, it's also still not perfect. As a test, I cleared the wires from a lighting circuit and redrew them using the automatic tool. Then I opened up the Edit Path tool and set the Path Mode to All Devices, and you can see in the attachment that the path still contains closed loops, whereas the wires do not.
 
 Problem Case.png
-198 KB
-Tags (0)
-Add tags
-Report
-MESSAGE 7 OF 9
+
+pr_circuit_problem_case.png
+
+
 ricaun
  Collaborator ricaun in reply to: PerryLackowski
 ‎2023-05-03 11:58 AM
