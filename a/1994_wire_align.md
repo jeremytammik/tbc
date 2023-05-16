@@ -39,14 +39,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Align an Instance and Find a Wire
 
-
-
-
-
-
-
 ####<a name="2"></a> Bounding Box Filter for Wires
-
 
 [Electrical Wire not found in BoundingBoxIsInsideFilter](https://forums.autodesk.com/t5/revit-api-forum/electrical-wire-not-found-in-boundingboxisinsidefilter/m-p/11938583)
 
@@ -58,35 +51,19 @@ https://forums.autodesk.com/t5/revit-api-forum/check-to-see-if-a-point-is-inside
 
 I apologize for the mess in my example snippets as I have been trying various approaches to make it work.
 
-
-
 MikeM615_3-1682625734940.png
-
-
 
 MikeM615_2-1682625440894.png
 
 electrical_wire_collector.png
 
-
 jeremy.tammik
- Autodesk jeremy.tammik in reply to: MikeM615
-‎2023-04-28 02:10 AM
+2023-04-28 02:10 AM
 I am not sure whether the filtered element collectors are ever able to take wire geometry into account. Do your wires have real geometry, e.g., a curve and a location? The filtered element collectors only deal with BIM elements and BIM element geometry. If your wires have valid geometry, it may not be recognised by them a valid BIM element geometry, so you will have to treat is as abstract pure non-BIM geometry and use other means than the filtered element collectors to retrieve it. So, yes, using a pure geometry bounding box sounds like a good way to go. Just be clear that this is completely separate from filtered element collectors.
 
-
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 5
 MikeM615
- Participant MikeM615 in reply to: jeremy.tammik
-‎2023-04-28 05:32 AM
+2023-04-28 05:32 AM
 Yes sir they do have a curve and location, I am able to find them just fine through the FilteredElementCollector for each View, except on a Dependent View.
-
-
 
 The Dependent View will show all wires of the Primary View not just what is within its Crop Region. Took a few iterations but I finally found how to get the actual Crop Region of the Dependent View, the first few ways I tried gave me the Primary Views Crop Region, so I ended up having to get the extents from the BuiltInParameter
 
@@ -101,8 +78,6 @@ MikeM615_3-1682684885657.png
 And these are the wires within it:
 
 MikeM615_4-1682684901736.pngMikeM615_5-1682684903736.pngMikeM615_6-1682684905452.png
-
-
 
 Everything at face value looks like the filters should work, it just seems I am missing something simple.
 Here is the section of code I used just to produce those values, but the BoundingBoxIsInsideFilter is failing on:
@@ -133,7 +108,6 @@ private List<Wire> WireCollector( ForEachView viewPlan )
                     TaskDialog.Show( "Wire Export", wire.get_BoundingBox( viewPlan.CropRegionElement ).Min.ToString( ) + " Min " + wire.get_BoundingBox( viewPlan.CropRegionElement ).Max.ToString( ) + "Max" );
                 }
 
-
                 List<Wire> filteredWires = wireCollector
                     .Where( w => boundingBoxIsInsideFilter.PassesFilter(w) )
                     .ToList( );
@@ -150,37 +124,22 @@ private List<Wire> WireCollector( ForEachView viewPlan )
             }
         }
 
-
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 5
 ricaun
  Collaborator ricaun in reply to: MikeM615
-‎2023-04-28 08:33 AM
+2023-04-28 08:33 AM
 I'm not sure the bound box filter does work with 2d elements that are owned by a view.
-
-
 
 I guess in the bound box filter implementation, the filter tries to get the bound box of the element without a view, like element.get_BoundingBox(null), and the result would be null, resulting in a PassesFilter to false.
 
-
-
 I guess the only way should be to create your own filter and add a View to use in the comparison (Gonna be a slow filter to use with Linq).
-
-
 
 I created the BoundingBoxViewIntersectsFilter and BoundingBoxViewIsInsideFilter.
 
 https://gist.github.com/ricaun/14ec0730e7efb3cc737f2134475e2539
 
-
 And here is a code sample to test, I put a big tolerance to force the PassesFilter to be true.
 
-
-
-
-
+<pre class="prettyprint">
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
@@ -189,68 +148,59 @@ using System.Linq;
 
 namespace RevitAddin.Commands
 {
-    [Transaction(TransactionMode.Manual)]
-    public class CommandWireIsInside : IExternalCommand
+  [Transaction(TransactionMode.Manual)]
+  public class CommandWireIsInside : IExternalCommand
+  {
+    public Result Execute(
+      ExternalCommandData commandData,
+      ref string message,
+      ElementSet elementSet)
     {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elementSet)
-        {
-            UIApplication uiapp = commandData.Application;
+      UIApplication uiapp = commandData.Application;
 
-            UIDocument uidoc = uiapp.ActiveUIDocument;
-            Document document = uidoc.Document;
-            View view = uidoc.ActiveView;
+      UIDocument uidoc = uiapp.ActiveUIDocument;
+      Document document = uidoc.Document;
+      View view = uidoc.ActiveView;
 
-            var wires = new FilteredElementCollector(document)
-                    .OfCategory(BuiltInCategory.OST_Wire)
-                    .WhereElementIsNotElementType()
-                    .OfType<Wire>()
-                    .ToList();
+      var wires = new FilteredElementCollector(document)
+          .OfCategory(BuiltInCategory.OST_Wire)
+          .WhereElementIsNotElementType()
+          .OfType<Wire>()
+          .ToList();
 
-            System.Console.WriteLine($"Wires: {wires.Count}");
+      System.Console.WriteLine($"Wires: {wires.Count}");
 
-            var tolerance = 1e3;
-            var viewBox = view.CropBox;
-            var outline = new Outline(viewBox.Min, viewBox.Max);
-            var boundingBoxFilter = new BoundingBoxViewIsInsideFilter(outline, view, tolerance);
+      var tolerance = 1e3;
+      var viewBox = view.CropBox;
+      var outline = new Outline(viewBox.Min, viewBox.Max);
+      var boundingBoxFilter = new BoundingBoxViewIsInsideFilter(
+        outline, view, tolerance);
 
-            var wiresBox = wires
-                    .Where(boundingBoxFilter.PassesFilter)
-                    .ToList();
+      var wiresBox = wires
+          .Where(boundingBoxFilter.PassesFilter)
+          .ToList();
 
-            System.Console.WriteLine($"WiresBox: {wiresBox.Count}");
+      System.Console.WriteLine($"WiresBox: {wiresBox.Count}");
 
-            TaskDialog.Show($"Wires: {wires.Count}", $"WiresBox: {wiresBox.Count}");
+      TaskDialog.Show(
+        $"Wires: {wires.Count}",
+        $"WiresBox: {wiresBox.Count}");
 
-            return Result.Succeeded;
-        }
+      return Result.Succeeded;
     }
+  }
 }
-
+</pre>
 
 Luiz Henrique Cassettari
 
 ricaun.com - Revit API Developer
 
-AppLoader EasyConduit WireInConduit ConduitMaterial CircuitName ElectricalUtils
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 5
 MikeM615
- Participant MikeM615 in reply to: ricaun
-‎2023-05-03 05:17 AM
+2023-05-03 05:17 AM
 Thank you @ricaun, that makes a lot of sense and matches what I was seeing in my results and assumptions, I definitely got stuck on the problem and couldn't think of a next step at all in the moment!
 
-
-
 Thank you for the examples, that is exactly what I needed!
-
-
-<pre class="prettyprint">
-
-</pre>
-
-
 
 
 ####<a name="3"></a> Visualizing Circuits in 3D
@@ -481,7 +431,6 @@ if all_created_circuits:
     selection.update()
 t.Commit()
 
-
 pr_circuit_minimum_spanning_tree.png
 pr_circuit_nearest_neighbour.png
 pr_circuit_star_connected.png
@@ -490,25 +439,15 @@ Nearest Neighbor.png
 Minimum Spanning Tree.png
 Star Connected.png
 
-
 jeremy.tammik
- Autodesk jeremy.tammik in reply to: PerryLackowski
-‎2023-05-03 01:59 AM
+2023-05-03 01:59 AM
 Wow. Intimidating project, intimidating pictures, for me. Not knowing much whatsoever about the subject, the reality it is helps describe, and the use of the functionality you are aiming to implement, I would suggest taking a step back from Revit and model lines and ponder how to best display complex graph relationships, e.g.,
-
-
 
 https://duckduckgo.com/?q=display+complex+graph+relationships
 
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 9
 ricaun
  Collaborator ricaun in reply to: PerryLackowski
-‎2023-05-03 07:46 AM
+2023-05-03 07:46 AM
 
 I used the Delaunay algorithm to connect all the elements that have electrical circuits.
 
@@ -520,58 +459,34 @@ pr_circuit_ricaun_delaunay.png
 
 That was the best I found to visualize circuits in 3d.
 
-
-
-
 PerryLackowski
- Advocate PerryLackowski in reply to: PerryLackowski
-‎2023-05-03 08:49 AM
+2023-05-03 08:49 AM
 
 The goal of this script is to help our team decide if panels can/should be relocated based on the locations of their loads (to minimize feeder lengths and voltage drop). Typically, I might just go to a plan view and look at the wiring, but with the size of the project we're working on, we have 21 views across two floors, across multiple disciplines like lighting, power distribution, house power.
 
-
-
 The star-connected approach has been ok, as long as I group the generic models I'm creating by circuit so I can see which clusters of lines belong together. But it looks very messy when two circuits feed to the same room, so there might be 10-20 lines going off in the same direction. I'm really looking to generate a node graph that matches the proposed wiring that Revit provides when you create new circuits (see attached image). If I could, I'd like to just use the existing wiring that's in the views in the project (basically I'd do a search for the wires that are linked with that circuit and use the end points of those wires as the X- and Y-coordinates, then add the Z-coordinate from the model elements to draw my 3D graph lines), however I can't guarantee that every element is wired in the plans, and there's also no guarantee that the wire layouts are up-to-date/accurate. So I'd settle for an approximate layout that uses Revit's predictive wiring system.
-
-
 
 I see in the API that Revit has a Wire Create() method, but it seems like the set of XYZ points you provide to the method argument are used to generate a single wire at a time. Is there a way to provide multiple XYZ points and have Revit insert multiple wires to inter-connect the points?
 
-
-
 Otherwise, after finding this page, using a force-directed graph with simulated annealing seems like the closest approach. However, I'm in way over my head here, and sadly I just won't have time to implement this. It also looks like it's generating a 'closed' graph, similar to the Delaunay approach, where all the nodes are interconnected. It would still need some second function to eliminate closed loops if we want it to be more accurate.
-
-
 
 Finally, are there any recommendations as far as modeling these vectors go? I'm generating lines and placing them in Generic Model elements right now, but I'm wondering if that's the best approach. It offers no easy way for me to select all similar and delete them when I'm done, so if I forget they are there and start doing other things, I'll eventually need a script to find and delete them. Perhaps putting them in a unique sub-category of electrical equipment, or maybe under analytical models somewhere?
 
-
-
 Thanks for the help!
-
-
 
 pr_circuit_desired_result.png
 
 Desired Result.png
 
 mhannonQ65N2
- Advocate mhannonQ65N2 in reply to: PerryLackowski
-‎2023-05-03 10:36 AM
+2023-05-03 10:36 AM
 Have you looked at ElectricalSystem.GetCircuitPath()?
 
 https://apidocs.co/apps/revit/2020.1/0448a0ee-c9bf-f037-c1b7-d49ce03ffa71.htm
 
-Tags (0)
-Add tags
-Report
-MESSAGE 6 OF 9
 PerryLackowski
- Advocate PerryLackowski in reply to: mhannonQ65N2
-‎2023-05-03 11:10 AM
+2023-05-03 11:10 AM
 I did try that at first, but it had its own problems. The first is that the circuit's Path Mode must be set to 'All Devices', rather than 'Farthest Device'. This isn't always the case. If it's set to Farthest Device, then GetCircuitPath() only returns the points to get to the farthest device. I'd have to override the existing Path Mode settings for each circuit on the panel, and then set them back when done - and this means taking ownership over all the circuits, which may not be feasible with the number of users we have on this project.
-
-
 
 And while that would likely get us pretty close to the desired result, it's also still not perfect. As a test, I cleared the wires from a lighting circuit and redrew them using the automatic tool. Then I opened up the Edit Path tool and set the Path Mode to All Devices, and you can see in the attachment that the path still contains closed loops, whereas the wires do not.
 
@@ -579,21 +494,14 @@ Problem Case.png
 
 pr_circuit_problem_case.png
 
-
 ricaun
  Collaborator ricaun in reply to: PerryLackowski
-‎2023-05-03 11:58 AM
+2023-05-03 11:58 AM
 If your goal is to check if your panel is near or far from the load, the best approach should be to create a load center from the panel. Basically, the interpolation between each element location using the load value (Load1*Location1 + Load2*Location2) / (Load1 + Load2).
-
-
 
 I don't use Revit Wire, I have a plugin to create wires inside Conduit/CableTray, that's a requirement in my country, so Revit Wire is useless in my case.
 
-
-
 If you only need to verify the panel location probably messing with Wire is a bad choice, Wire is a 2d element that needs to have a view to work. You could try to get the location of the Wire and draw the lines, but I'm not sure if gonna be easy to see in a 3d view.
-
-
 
 You already using DirectShape to create the lines, I guess that is the easiest way. You could set a name in the DirectShape element and use that to select every single one and delete using another command.
 
@@ -601,33 +509,18 @@ Luiz Henrique Cassettari
 
 ricaun.com - Revit API Developer
 
-AppLoader EasyConduit WireInConduit ConduitMaterial CircuitName ElectricalUtils
-Tags (0)
-Add tags
-Report
-MESSAGE 8 OF 9
 PerryLackowski
- Advocate PerryLackowski in reply to: ricaun
-‎2023-05-04 08:47 AM
+2023-05-04 08:47 AM
 Good ideas @ricaun. Finding a center-point that's weighted based on the loads may be an easier approach. I could then use the distance between that center-point and the panel origin as a metric that I could even potentially calculate for every panel, without having to model anything. I may eventually put that together as a separate tool which you could use first, to find the problem panels.
-
-
 
 I agree using wire is not ideal - it would take quite a bit of manipulation to get from 2D wire to 3D vector shapes. If I eventually find time to pursue this further, I'll likely use a Delaunay implementation as you have suggested. It's too bad Revit wire isn't 3D - I have gotten in trouble before for copying a plan view with wires; I eventually deleted the wires from the first view and it took me ages to figure out why I still couldn't recircuit the elements.
 
-
-
 Also, good to know I can SetName on the DirectShapes. I have just been storing info in the comment and mark parameters, but that leaves them open to editing by others, which is risky if I ever need to search through them and delete them based on a filter.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 9 OF 9
 ricaun
  Collaborator ricaun in reply to: PerryLackowski
-‎2023-05-04 04:56 PM
+2023-05-04 04:56 PM
 I'm not sure if the distance is too useful to know where is the best place to put the panel. And probably gonna add some features like that in the plugin ElectricalUtils, using DirectContext3D would be fun to show the load center without creating any element.
-
 
 ####<a name="4"></a> Aligning Two Elements
 
@@ -635,13 +528,11 @@ I'm not sure if the distance is too useful to know where is the best place to pu
 
 I Need to align a FamilyInstance in which I created using C# to a Line that I also Created Via C# in Revit 2023. For example the First Picture would show a structural column and a ModelCurve which are not aligned together.
 
-
 <center>
 <img src="img/align_element_1.png" alt="Align element &ndash; not aligned" title="Align element &ndash; not aligned" width="100"/> <!-- Pixel Height: 300 Pixel Width: 639 -->
 </center>
 
- The second picture would Show How I want my column to be aligned to a ModelCurve.
-
+The second picture would Show How I want my column to be aligned to a ModelCurve.
 
 <center>
 <img src="img/align_element_2.png" alt="Align element" title="Align element" width="100"/> <!-- Pixel Height: 300 Pixel Width: 639 -->
@@ -649,54 +540,29 @@ I Need to align a FamilyInstance in which I created using C# to a Line that I al
 
 I would greatly apricate if someone can show me just the method of how can I use the alignment method in C# . Here is just a sample code for my script :
 
-
 Line line = Line.CreateBound(startPoint, endPoint);
 Element newPile = doc.Create.NewFamilyInstance(point, symbol, Level, structuralType);
 
-
-
-
  Solved by jeremy.tammik. Go to Solution.
 
-Tags (0)
-Add tags
-Report
 8 REPLIES
 Sort:
-MESSAGE 2 OF 9
 jeremy.tammik
- Autodesk jeremy.tammik in reply to: ahmadkhalaf7892
-‎2023-05-03 02:16 AM
+2023-05-03 02:16 AM
 Well, first of all you need to understand how to implement such a constraint manually in the end user interface. I believe you define a dimension between the two objects to do so, and constrain it to a zero distance. The Family API samples may demonstrate how such a constraint can be set up programmatically:
-
-
 
 https://thebuildingcoder.typepad.com/blog/2009/08/the-revit-family-api.html
 
-
 Reading that myself, I discover that the NewAlignment method might come in handy:
-
-
 
 https://www.revitapidocs.com/2023/b3c10008-aba6-9eee-99c9-7e05ace75796.htm
 
-
 Searching this forum for NewAlignment ought to turn up something useful for you.
-
-
 
 Good luck!
 
-
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 9
 ahmadkhalaf7892
- Advocate ahmadkhalaf7892 in reply to: jeremy.tammik
-‎2023-05-03 04:21 AM
+2023-05-03 04:21 AM
 Hi Jeremy .
 Thanks a  lot for introducing this method for me .  I am trying to align the family instance called newPile to the model Curve however I am getting this error under :
 Autodesk.Revit.Exceptions.ArgumentException: 'The two references are not geometrically aligned so the Alignment cannot be created.
@@ -744,15 +610,9 @@ Dimension alignToLine3 = doc.Create.NewAlignment(viewPlan, m1.GeometryCurve.Refe
 }
 }
 
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 9
 ahmadkhalaf7892
- Advocate ahmadkhalaf7892 in reply to: jeremy.tammik
-‎2023-05-03 05:14 AM
+2023-05-03 05:14 AM
 here is the full constructor in case needed :
-
 
 using System;
 using System.Collections.Generic;
@@ -839,78 +699,41 @@ doc.Create.NewAlignment(viewPlan, s, curve.Reference);
 }
 }
 
-Tags (1)
 Tags:is the full
 
-Add tags
-Report
-MESSAGE 5 OF 9
 jeremy.tammik
- Autodesk jeremy.tammik in reply to: ahmadkhalaf7892
-‎2023-05-03 05:26 AM
+2023-05-03 05:26 AM
 Did you read the remarks in the Revit API docs?
-
-
 
 https://www.revitapidocs.com/2023/b3c10008-aba6-9eee-99c9-7e05ace75796.htm
 
-
 > These references must be already geometrically aligned (this function will not force them to become aligned).
 
-
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 6 OF 9
 ahmadkhalaf7892
- Advocate ahmadkhalaf7892 in reply to: jeremy.tammik
-‎2023-05-03 05:29 AM
+2023-05-03 05:29 AM
 Ah Sorry , I have been working on this for hours . I'm loosing my concentration , I didn't pay attention to it .
 Is there any way I can force Them to be aligned using the Revit API?
 I have been trying for the past 4 hours. If it is a dead end please inform me .
 Thanks very much.
-Tags (0)
-Add tags
-Report
-MESSAGE 7 OF 9
+
 jeremy.tammik
- Autodesk jeremy.tammik in reply to: ahmadkhalaf7892
-‎2023-05-03 05:36 AM
+2023-05-03 05:36 AM
 Take a rest! Go for a walk!
-
-
 
 The easiest way to ensure they are aligned is to create them accordingly in the first place, if they are being generated from scratch. Otherwise, you can use the standard translation and rotation functionality provided by ElementTransformUtils. Or, you can set the location curve via the Location property.
 
-
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 8 OF 9
 ahmadkhalaf7892
- Advocate ahmadkhalaf7892 in reply to: jeremy.tammik
-‎2023-05-03 05:43 AM
+2023-05-03 05:43 AM
 I will rest for a few then see which approach fits better. I am using a family which is already loaded in the Project and I am placing them on a line with a specific distance . However I want them to rotate according to the Curve or Line they are placed on. I haven't been able to do such thing. I will see what I can do .
 I should use the ElementTransformUtils.Rotate in this case ?
 I really appreciate the help Jeremy
-Tags (0)
-Add tags
-Report
-MESSAGE 9 OF 9
+
 jeremy.tammik
- Autodesk jeremy.tammik in reply to: ahmadkhalaf7892
-‎2023-05-03 05:47 AM
+2023-05-03 05:47 AM
 Either ElementTransformUtils.Rotate or just manipulate the LocationPoint or LocationCurve via Rotate, e.g.:
-
-
 
 https://www.revitapidocs.com/2023/e1071a1b-b98e-5875-2e13-b673e2b9fef6.htm
 https://www.revitapidocs.com/2023/ed4de043-9a60-f6cd-c09b-b13c4612b343.htm
-
 
 Enjoy your break.
 
