@@ -21,8 +21,10 @@ twitter:
 
  in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-&ndash;
-...
+Two challenging electrical wire issues addressed by @ricaun and a recurring question on element alignment for defining a constraint
+&ndash; Bounding box filter for wires
+&ndash; Visualizing circuits in 3D
+&ndash; Aligning two elements...
 
 linkedin:
 
@@ -37,7 +39,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Align Instance, Visualise and Find Wires
+### Aligning Elements, Finding and Visualising Wires
 
 Two challenging electrical wire issues addressed by
 Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari and
