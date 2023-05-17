@@ -707,7 +707,7 @@ the Revit API docs?
 Otherwise, you can use the standard translation and rotation functionality provided by `ElementTransformUtils`.
 Or, you can set the location curve via the `Location` property.
 
-**Response:** I will rest for a few then see which approach fits better.
+**Response:** I will rest for a few then see which approach fits best.
 I am using a family which is already loaded in the Project and I am placing them on a line with a specific distance .
 However I want them to rotate according to the Curve or Line they are placed on.
 I haven't been able to do such thing.
