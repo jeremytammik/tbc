@@ -540,9 +540,8 @@ The <a href="https://thebuildingcoder.typepad.com/blog/2009/08/the-revit-family-
 how such a constraint can be set up programmatically.</p>
 <p>Reading that myself, I discover that
 the <a href="https://www.revitapidocs.com/2023/b3c10008-aba6-9eee-99c9-7e05ace75796.htm">NewAlignment method</a> might
-come in handy.</p>
-<p>Searching this forum for other threads on <code>NewAlignment</code> ought to turn up something useful for you.</p>
-<p>Good luck!</p>
+come in handy.
+Searching this forum for other threads on <code>NewAlignment</code> ought to turn up something useful for you.</p>
 <p><strong>Response:</strong> Thanks a lot for introducing this method for me .
 I am trying to align the family instance called newPile to the model Curve however I am getting this error:</p>
 <ul>
@@ -642,7 +641,7 @@ the Revit API docs?</p>
 <blockquote>
 <p>These references must be already geometrically aligned (this function will not force them to become aligned).</p>
 </blockquote>
-<p><strong>Response:</strong> Is there any way I can force Them to be aligned using the Revit API?</p>
+<p><strong>Response:</strong> Is there any way I can force them to be aligned using the Revit API?</p>
 <p><strong>Answer:</strong> The easiest way to ensure they are aligned is to create them accordingly in the first place, if they are being generated from scratch.
 Otherwise, you can use the standard translation and rotation functionality provided by <code>ElementTransformUtils</code>.
 Or, you can set the location curve via the <code>Location</code> property.</p>

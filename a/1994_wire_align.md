@@ -598,10 +598,7 @@ how such a constraint can be set up programmatically.
 Reading that myself, I discover that
 the [NewAlignment method](https://www.revitapidocs.com/2023/b3c10008-aba6-9eee-99c9-7e05ace75796.htm) might
 come in handy.
-
 Searching this forum for other threads on `NewAlignment` ought to turn up something useful for you.
-
-Good luck!
 
 **Response:** Thanks a lot for introducing this method for me .
 I am trying to align the family instance called newPile to the model Curve however I am getting this error:
@@ -704,7 +701,7 @@ the Revit API docs?
 
 > These references must be already geometrically aligned (this function will not force them to become aligned).
 
-**Response:** Is there any way I can force Them to be aligned using the Revit API?
+**Response:** Is there any way I can force them to be aligned using the Revit API?
 
 **Answer:** The easiest way to ensure they are aligned is to create them accordingly in the first place, if they are being generated from scratch.
 Otherwise, you can use the standard translation and rotation functionality provided by `ElementTransformUtils`.
