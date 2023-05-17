@@ -40,7 +40,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### Align Instance, Visualise and Find Wires
 
 Two challenging electrical wire issues addressed by
-Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari
+Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari and
+a recurring question on element alignment for defining a constraint:
+
+- [Bounding box filter for wires](#2)
+- [Visualizing circuits in 3D](#3)
+- [Aligning two elements](#4)
 
 ####<a name="2"></a> Bounding Box Filter for Wires
 
