@@ -39,11 +39,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Align Instance, Visualise and Find Wires
 
+Two challenging electrical wire issues addressed by
+Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari
+
 ####<a name="2"></a> Bounding Box Filter for Wires
 
-[Electrical Wire not found in BoundingBoxIsInsideFilter](https://forums.autodesk.com/t5/revit-api-forum/electrical-wire-not-found-in-boundingboxisinsidefilter/m-p/11938583)
+Luiz shared a solution for the task of retrieving electrical wires within a bounding box in the thread
+on [electrical wire not found in `BoundingBoxIsInsideFilter`](https://forums.autodesk.com/t5/revit-api-forum/electrical-wire-not-found-in-boundingboxisinsidefilter/m-p/11938583):
 
-I am currently trying to locate electrical wires that exist within a dependent view's bounding box. However, I have not been successful in using methods such as BoundingBoxIsInsideFilter, BoundingBoxIntersectsFilter, or VisibleInViewFilter.
+**Question:** I am currently trying to locate electrical wires that exist within a dependent view's bounding box. However, I have not been successful in using methods such as BoundingBoxIsInsideFilter, BoundingBoxIntersectsFilter, or VisibleInViewFilter.
 
 In order to obtain a wire's bounding box, I had to use `wire.get_BoundingBox`, passing in the view it exists on, to get any value for its location.
 Despite following Jeremy's example in message #4 in the thread
@@ -52,26 +56,30 @@ I am still unable to get any wires into my list.
 
 I apologize for the mess in my example snippets as I have been trying various approaches to make it work.
 
-MikeM615_3-1682625734940.png
+<center>
+<img src="img/electrical_wire_collector.png" alt="Electrical wire collector" title="Electrical wire collector" width="800"/> <!-- Pixel Height: 534 Pixel Width: 1,757 -->
+</center>
 
-MikeM615_2-1682625440894.png
+**Answer:** I am not sure whether the filtered element collectors are ever able to take wire geometry into account.
+Do your wires have real geometry, e.g., a curve and a location?
+The filtered element collectors only deal with BIM elements and BIM element geometry.
+If your wires have valid geometry, it may not be recognised by them a valid BIM element geometry,
+so you will have to treat is as abstract pure non-BIM geometry and use other means than the filtered element collectors to retrieve it.
+So, yes, using a pure geometry bounding box sounds like a good way to go.
+Just be clear that this is completely separate from filtered element collectors.
 
-electrical_wire_collector.png
+**Response:** Yes sir they do have a curve and location, I am able to find them just fine through the `FilteredElementCollector` for each View, except on a Dependent View.
 
-jeremy.tammik
-2023-04-28 02:10 AM
-I am not sure whether the filtered element collectors are ever able to take wire geometry into account. Do your wires have real geometry, e.g., a curve and a location? The filtered element collectors only deal with BIM elements and BIM element geometry. If your wires have valid geometry, it may not be recognised by them a valid BIM element geometry, so you will have to treat is as abstract pure non-BIM geometry and use other means than the filtered element collectors to retrieve it. So, yes, using a pure geometry bounding box sounds like a good way to go. Just be clear that this is completely separate from filtered element collectors.
+The Dependent View will show all wires of the Primary View not just what is within its Crop Region.
+Took a few iterations but I finally found how to get the actual Crop Region of the Dependent View,
+the first few ways I tried gave me the Primary Views Crop Region, so I ended up having to get the
+extents from the BuiltInParameter.
 
-MikeM615
-2023-04-28 05:32 AM
-Yes sir they do have a curve and location, I am able to find them just fine through the FilteredElementCollector for each View, except on a Dependent View.
+I also tried to extend my Z from that 1000' in either direction and it still did not show up,
+but if I invert any of those three filters, it finds all the wires of the Primary View even
+including the handful inside the Crop Region which shouldn't with it inverted.
 
-The Dependent View will show all wires of the Primary View not just what is within its Crop Region. Took a few iterations but I finally found how to get the actual Crop Region of the Dependent View, the first few ways I tried gave me the Primary Views Crop Region, so I ended up having to get the extents from the BuiltInParameter
-
-MikeM615_1-1682683809965.png
-
-I also tried to extend my Z from that 1000' in either direction and it still did not show up, but if I invert any of those three filters, it finds all the wires of the Primary View even including the handful inside the Crop Region which shouldn't with it inverted.
-
+<!--
 This is the extents of the Dependent Views Crop Region:
 
 MikeM615_3-1682684885657.png
@@ -79,9 +87,10 @@ MikeM615_3-1682684885657.png
 And these are the wires within it:
 
 MikeM615_4-1682684901736.pngMikeM615_5-1682684903736.pngMikeM615_6-1682684905452.png
+-->
 
 Everything at face value looks like the filters should work, it just seems I am missing something simple.
-Here is the section of code I used just to produce those values, but the BoundingBoxIsInsideFilter is failing on:
+Here is the section of code I used just to produce those values, but the `BoundingBoxIsInsideFilter` is failing on:
 
 <pre class="prettyprint">
   private List&lt;Wire&gt; WireCollector( ForEachView viewPlan )
@@ -152,16 +161,13 @@ Here is the section of code I used just to produce those values, but the Boundin
   }
 </pre>
 
-ricaun
-2023-04-28 08:33 AM
-I'm not sure the bounding box filter works with 2d elements that are owned by a view.
+**Answer:** I'm not sure the bounding box filter works with 2d elements that are owned by a view.
 
-I guess in the bound box filter implementation, the filter tries to get the bound box of the element without a view, like element.get_BoundingBox(null), and the result would be null, resulting in a PassesFilter to false.
+I guess in the bound box filter implementation, the filter tries to get the bound box of the element without a view, like `element.get_BoundingBox(null)`, and the result would be null, resulting in a PassesFilter to false.
 
-I guess the only way should be to create your own filter and add a View to use in the comparison (Gonna be a slow filter to use with Linq).
+I guess the only way would be to create your own filter and add a View to use in the comparison (Gonna be a slow filter to use with Linq).
 
-I created
-the [Revit API Filter for BoundingBox element in a View](https://gist.github.com/ricaun/14ec0730e7efb3cc737f2134475e2539) with
+I created a [Revit API Filter for BoundingBox element in a View](https://gist.github.com/ricaun/14ec0730e7efb3cc737f2134475e2539) with
 `BoundingBoxViewIntersectsFilter`, `BoundingBoxViewIsInsideFilter` and a command to test them:
 
 - [BoundingBoxViewIntersectsFilter.cs](https://gist.github.com/ricaun/14ec0730e7efb3cc737f2134475e2539#file-boundingboxviewintersectsfilter-cs)
@@ -223,23 +229,25 @@ namespace RevitAddin.Commands
 }
 </pre>
 
-Luiz Henrique Cassettari
-
-ricaun.com - Revit API Developer
-
-MikeM615
-2023-05-03 05:17 AM
-
-Thank you @ricaun, that makes a lot of sense and matches what I was seeing in my results and assumptions, I definitely got stuck on the problem and couldn't think of a next step at all in the moment!
+**Response:** Thank you @ricaun, that makes a lot of sense and matches what I was seeing in my results and assumptions;
+I definitely got stuck on the problem and couldn't think of a next step at all in the moment!
 
 Thank you for the examples, that is exactly what I needed!
 
-
 ####<a name="3"></a> Visualizing Circuits in 3D
 
-[Visualizing circuits in 3D](https://forums.autodesk.com/t5/revit-api-forum/visualizing-circuits-in-3d/td-p/11937368)
+Luiz also shared advice
+on [visualizing circuits in 3D](https://forums.autodesk.com/t5/revit-api-forum/visualizing-circuits-in-3d/td-p/11937368):
 
-I'm trying to create a script that will help me better visualize circuits in 3D. Basically, you select one or more electrical panels, and temporary generic model lines will get drawn in between all the elements in each circuit on the panel. The problem is that a single circuit may have 10 or more receptacles, and I don't want a line going from the panelboard to each receptacle - I'd like to show them daisy-chained together like when you create a circuit. I set up a nearest-neighbor algorithm and a minimum spanning tree algorithm, but neither really matches the results that you'd see if you tab-select a circuit and add wiring. Here's my current implementation in pyRevit. I have attached screenshots of the results of each.
+**Question:** I'm trying to create a script that will help me better visualize circuits in 3D.
+Basically, you select one or more electrical panels, and temporary generic model lines will get
+drawn in between all the elements in each circuit on the panel.
+The problem is that a single circuit may have 10 or more receptacles, and I don't want a line
+going from the panelboard to each receptacle &ndash; I'd like to show them daisy-chained together
+like when you create a circuit.
+I set up a nearest-neighbor algorithm and a minimum spanning tree algorithm, but neither really
+matches the results that you'd see if you tab-select a circuit and add wiring.
+Here's my current implementation in pyRevit:
 
 <pre class="prettyprint">
 """ Visualize Connected Circuits
@@ -465,30 +473,33 @@ if all_created_circuits:
 t.Commit()
 </pre>
 
-pr_circuit_minimum_spanning_tree.png
-pr_circuit_nearest_neighbour.png
-pr_circuit_star_connected.png
+Here are screenshots of the results of each:
 
-Nearest Neighbor.png
-Minimum Spanning Tree.png
-Star Connected.png
+<center>
+<img src="img/pr_circuit_nearest_neighbour.png" alt="Nearest Neighbor" title="Nearest Neighbor" width="800"/> <!-- Pixel Height: 1,332 Pixel Width: 1,822 -->
+</center>
 
-**Answer:** Wow. Intimidating project, intimidating pictures, for me. Not knowing much whatsoever about the subject, the reality it is helps describe, and the use of the functionality you are aiming to implement, I would suggest taking a step back from Revit and model lines and ponder how to best display complex graph relationships, e.g.,
+<center>
+<img src="img/pr_circuit_minimum_spanning_tree.png" alt="Minimum Spanning Tree" title="Minimum Spanning Tree" width="800"/> <!-- Pixel Height: 1,474 Pixel Width: 2,002 -->
+</center>
 
-https://duckduckgo.com/?q=display+complex+graph+relationships
+<center>
+<img src="img/pr_circuit_star_connected.png" alt="Star Connected" title="Star Connected" width="800"/> <!-- Pixel Height: 1,326 Pixel Width: 1,800 -->
+</center>
 
-**Answer:** I used the [Delaunay algorithm](https://en.wikipedia.org/wiki/Delaunay_triangulation) to connect all the elements that have electrical circuits.
+**Answer:** I would suggest taking a step back from Revit and model lines and ponder how
+to best [display complex graph relationships](https://duckduckgo.com/?q=display+complex+graph+relationships).
 
-ricaun_0-1683123397917.png
+I used the [Delaunay algorithm](https://en.wikipedia.org/wiki/Delaunay_triangulation) to
+connect all the elements that have electrical circuits:
 
-pr_circuit_ricaun_delaunay.png
+<center>
+<img src="img/pr_circuit_ricaun_delaunay.png" alt="Delaunay algorithm" title="Delaunay algorithm" width="800"/> <!-- Pixel Height: 2,160 Pixel Width: 3,840 -->
+</center>
 
 That was the best I found to visualize circuits in 3d.
 
-PerryLackowski
-2023-05-03 08:49 AM
-
-The goal of this script is to help our team decide if panels can/should be relocated based on the locations of their loads (to minimize feeder lengths and voltage drop). Typically, I might just go to a plan view and look at the wiring, but with the size of the project we're working on, we have 21 views across two floors, across multiple disciplines like lighting, power distribution, house power.
+**Response:** The goal of this script is to help our team decide if panels can/should be relocated based on the locations of their loads (to minimize feeder lengths and voltage drop). Typically, I might just go to a plan view and look at the wiring, but with the size of the project we're working on, we have 21 views across two floors, across multiple disciplines like lighting, power distribution, house power.
 
 The star-connected approach has been ok, as long as I group the generic models I'm creating by circuit so I can see which clusters of lines belong together. But it looks very messy when two circuits feed to the same room, so there might be 10-20 lines going off in the same direction. I'm really looking to generate a node graph that matches the proposed wiring that Revit provides when you create new circuits (see attached image). If I could, I'd like to just use the existing wiring that's in the views in the project (basically I'd do a search for the wires that are linked with that circuit and use the end points of those wires as the X- and Y-coordinates, then add the Z-coordinate from the model elements to draw my 3D graph lines), however I can't guarantee that every element is wired in the plans, and there's also no guarantee that the wire layouts are up-to-date/accurate. So I'd settle for an approximate layout that uses Revit's predictive wiring system.
 
@@ -500,28 +511,23 @@ Finally, are there any recommendations as far as modeling these vectors go? I'm 
 
 Thanks for the help!
 
-pr_circuit_desired_result.png
+<center>
+<img src="img/pr_circuit_desired_result.png" alt="Desired Result" title="Desired Result" width="800"/> <!-- Pixel Height: 902 Pixel Width: 1,096 -->
+</center>
 
-Desired Result.png
+**Answer:** Have you looked at [ElectricalSystem.GetCircuitPath()](https://apidocs.co/apps/revit/2020.1/0448a0ee-c9bf-f037-c1b7-d49ce03ffa71.htm)?
 
-mhannonQ65N2
-2023-05-03 10:36 AM
-
-Have you looked at [ElectricalSystem.GetCircuitPath()](https://apidocs.co/apps/revit/2020.1/0448a0ee-c9bf-f037-c1b7-d49ce03ffa71.htm)?
-
-PerryLackowski
-2023-05-03 11:10 AM
-I did try that at first, but it had its own problems. The first is that the circuit's Path Mode must be set to 'All Devices', rather than 'Farthest Device'. This isn't always the case. If it's set to Farthest Device, then GetCircuitPath() only returns the points to get to the farthest device. I'd have to override the existing Path Mode settings for each circuit on the panel, and then set them back when done - and this means taking ownership over all the circuits, which may not be feasible with the number of users we have on this project.
+**Response:** I did try that at first, but it had its own problems.
+The first is that the circuit's Path Mode must be set to 'All Devices', rather than 'Farthest Device'.
+This isn't always the case. If it's set to Farthest Device, then GetCircuitPath() only returns the points to get to the farthest device. I'd have to override the existing Path Mode settings for each circuit on the panel, and then set them back when done - and this means taking ownership over all the circuits, which may not be feasible with the number of users we have on this project.
 
 And while that would likely get us pretty close to the desired result, it's also still not perfect. As a test, I cleared the wires from a lighting circuit and redrew them using the automatic tool. Then I opened up the Edit Path tool and set the Path Mode to All Devices, and you can see in the attachment that the path still contains closed loops, whereas the wires do not.
 
-Problem Case.png
+<center>
+<img src="img/pr_circuit_problem_case.png" alt="Problem Case" title="Problem Case" width="800"/> <!-- Pixel Height: 1,346 Pixel Width: 2,720 -->
+</center>
 
-pr_circuit_problem_case.png
-
-**Answer:**
-
-If your goal is to check if your panel is near or far from the load, the best approach should be to create a load center from the panel. Basically, the interpolation between each element location using the load value (Load1*Location1 + Load2*Location2) / (Load1 + Load2).
+**Answer:** If your goal is to check if your panel is near or far from the load, the best approach should be to create a load center from the panel. Basically, the interpolation between each element location using the load value (Load1*Location1 + Load2*Location2) / (Load1 + Load2).
 
 I don't use Revit Wire, I have a plugin to create wires inside Conduit/CableTray, that's a requirement in my country, so Revit Wire is useless in my case.
 
@@ -529,13 +535,9 @@ If you only need to verify the panel location probably messing with Wire is a ba
 
 You already using DirectShape to create the lines, I guess that is the easiest way. You could set a name in the DirectShape element and use that to select every single one and delete using another command.
 
-Luiz Henrique Cassettari
-
-ricaun.com - Revit API Developer
-
-PerryLackowski
-2023-05-04 08:47 AM
-Good ideas @ricaun. Finding a center-point that's weighted based on the loads may be an easier approach. I could then use the distance between that center-point and the panel origin as a metric that I could even potentially calculate for every panel, without having to model anything. I may eventually put that together as a separate tool which you could use first, to find the problem panels.
+**Response:** Good ideas @ricaun.
+Finding a center-point that's weighted based on the loads may be an easier approach.
+I could then use the distance between that center-point and the panel origin as a metric that I could even potentially calculate for every panel, without having to model anything. I may eventually put that together as a separate tool which you could use first, to find the problem panels.
 
 I agree using wire is not ideal - it would take quite a bit of manipulation to get from 2D wire to 3D vector shapes. If I eventually find time to pursue this further, I'll likely use a Delaunay implementation as you have suggested. It's too bad Revit wire isn't 3D - I have gotten in trouble before for copying a plan view with wires; I eventually deleted the wires from the first view and it took me ages to figure out why I still couldn't recircuit the elements.
 
@@ -544,6 +546,8 @@ Also, good to know I can SetName on the DirectShapes. I have just been storing i
 **Answer:** I'm not sure if the distance is too useful to know where is the best place to put the panel.
 And probably gonna add some features like that in the plugin ElectricalUtils;
 using `DirectContext3D` would be fun to show the load center without creating any element.
+
+Many thanks to Luiz 'ricaun' for sharing these great suggestions and his extensive experience!
 
 ####<a name="4"></a> Aligning Two Elements
 
