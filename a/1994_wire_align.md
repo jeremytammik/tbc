@@ -59,8 +59,6 @@ Despite following Jeremy's example in message #4 in the thread
 on how to [check to see if a point is inside bounding box](https://forums.autodesk.com/t5/revit-api-forum/check-to-see-if-a-point-is-inside-bounding-box/m-p/4354446),
 I am still unable to get any wires into my list.
 
-I apologize for the mess in my example snippets as I have been trying various approaches to make it work.
-
 <center>
 <img src="img/electrical_wire_collector.png" alt="Electrical wire collector" title="Electrical wire collector" width="800"/> <!-- Pixel Height: 534 Pixel Width: 1,757 -->
 <p style="font-size: 80%; font-style:italic">Electrical wire collector</p>
