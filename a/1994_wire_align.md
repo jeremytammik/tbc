@@ -58,6 +58,7 @@ I apologize for the mess in my example snippets as I have been trying various ap
 
 <center>
 <img src="img/electrical_wire_collector.png" alt="Electrical wire collector" title="Electrical wire collector" width="800"/> <!-- Pixel Height: 534 Pixel Width: 1,757 -->
+<p style="font-size: 80%; font-style:italic">Electrical wire collector</p>
 </center>
 
 **Answer:** I am not sure whether the filtered element collectors are ever able to take wire geometry into account.
@@ -477,14 +478,17 @@ Here are screenshots of the results of each:
 
 <center>
 <img src="img/pr_circuit_nearest_neighbour.png" alt="Nearest Neighbor" title="Nearest Neighbor" width="800"/> <!-- Pixel Height: 1,332 Pixel Width: 1,822 -->
+<p style="font-size: 80%; font-style:italic">Nearest Neighbor</p>
 </center>
 
 <center>
 <img src="img/pr_circuit_minimum_spanning_tree.png" alt="Minimum Spanning Tree" title="Minimum Spanning Tree" width="800"/> <!-- Pixel Height: 1,474 Pixel Width: 2,002 -->
+<p style="font-size: 80%; font-style:italic">Minimum Spanning Tree</p>
 </center>
 
 <center>
 <img src="img/pr_circuit_star_connected.png" alt="Star Connected" title="Star Connected" width="800"/> <!-- Pixel Height: 1,326 Pixel Width: 1,800 -->
+<p style="font-size: 80%; font-style:italic">Star Connected</p>
 </center>
 
 **Answer:** I would suggest taking a step back from Revit and model lines and ponder how
@@ -495,6 +499,7 @@ connect all the elements that have electrical circuits:
 
 <center>
 <img src="img/pr_circuit_ricaun_delaunay.png" alt="Delaunay algorithm" title="Delaunay algorithm" width="800"/> <!-- Pixel Height: 2,160 Pixel Width: 3,840 -->
+<p style="font-size: 80%; font-style:italic">Delaunay algorithm</p>
 </center>
 
 That was the best I found to visualize circuits in 3d.
@@ -513,6 +518,7 @@ Thanks for the help!
 
 <center>
 <img src="img/pr_circuit_desired_result.png" alt="Desired Result" title="Desired Result" width="800"/> <!-- Pixel Height: 902 Pixel Width: 1,096 -->
+<p style="font-size: 80%; font-style:italic">Desired Result</p>
 </center>
 
 **Answer:** Have you looked at [ElectricalSystem.GetCircuitPath()](https://apidocs.co/apps/revit/2020.1/0448a0ee-c9bf-f037-c1b7-d49ce03ffa71.htm)?
@@ -525,6 +531,7 @@ And while that would likely get us pretty close to the desired result, it's also
 
 <center>
 <img src="img/pr_circuit_problem_case.png" alt="Problem Case" title="Problem Case" width="800"/> <!-- Pixel Height: 1,346 Pixel Width: 2,720 -->
+<p style="font-size: 80%; font-style:italic">Problem Case</p>
 </center>
 
 **Answer:** If your goal is to check if your panel is near or far from the load, the best approach should be to create a load center from the panel. Basically, the interpolation between each element location using the load value (Load1*Location1 + Load2*Location2) / (Load1 + Load2).
@@ -558,13 +565,15 @@ on [how to use the alignment method for family instance](https://forums.autodesk
 like in this picture showing a structural column and a `ModelCurve` that are not yet aligned:
 
 <center>
-<img src="img/align_element_1.png" alt="Align element &ndash; not aligned" title="Align element &ndash; not aligned" width="100"/> <!-- Pixel Height: 300 Pixel Width: 639 -->
+<img src="img/align_element_1.png" alt="Align element &ndash; not aligned" title="Align element &ndash; not aligned" width="300"/>
+<p style="font-size: 80%; font-style:italic">Align element &ndash; not aligned</p>
 </center>
 
 This is how I want the column to be aligned to the `ModelCurve`:
 
 <center>
-<img src="img/align_element_2.png" alt="Align element" title="Align element" width="100"/> <!-- Pixel Height: 300 Pixel Width: 639 -->
+<img src="img/align_element_2.png" alt="Align element" title="Align element" width="300"/>
+<p style="font-size: 80%; font-style:italic">Align element</p>
 </center>
 
 Here is sample code from my script:
