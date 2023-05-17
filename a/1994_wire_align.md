@@ -539,7 +539,8 @@ And while that would likely get us pretty close to the desired result, it's also
 <p style="font-size: 80%; font-style:italic">Problem Case</p>
 </center>
 
-**Answer:** If your goal is to check if your panel is near or far from the load, the best approach should be to create a load center from the panel. Basically, the interpolation between each element location using the load value (Load1*Location1 + Load2*Location2) / (Load1 + Load2).
+**Answer:** If your goal is to check if your panel is near or far from the load, the best approach should be to create a load center from the panel.
+Basically, the interpolation between each element location using the load value (Load1 x Location1 + Load2 x Location2) / (Load1 + Load2).
 
 I don't use Revit Wire, I have a plugin to create wires inside Conduit/CableTray, that's a requirement in my country, so Revit Wire is useless in my case.
 
