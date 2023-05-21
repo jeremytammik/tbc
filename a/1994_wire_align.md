@@ -28,6 +28,14 @@ Two challenging electrical wire issues addressed by @ricaun and a recurring ques
 
 linkedin:
 
+Aligning two elements for a constraint and two electrical wire issues, filtering and visualising circuits in 3D in the #RevitAPI
+
+https://autode.sk/find_see_wire
+
+- Bounding box filter for wires
+- Visualizing circuits in 3D
+- Aligning two elements...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
