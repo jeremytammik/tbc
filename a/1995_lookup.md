@@ -6,6 +6,44 @@
 
 <!---
 
+- 2023-05-15_rvt_updates.png
+  https://twitter.com/TheRevitGeek/status/1659593050535120896?s=20
+  New @AutodeskRevit updates; go to http://Manage.Autodesk.com to get them
+  https://manage.autodesk.com
+
+- RevitLookup
+  https://github.com/jeremytammik/RevitLookup/blob/dev/Changelog.md#next-202405
+  Release 2024.0.5 (#165)
+  * Cleanup
+  * Update Nuke
+  * Fix GetMaterialIds
+  * DefinitionGroup support
+  * Disable Show for ElementType
+  * Demo project restore
+  * Nuke update
+  * Material area, volume support
+  * Static members support
+  * Update Changelog.md
+  * Update nuget packages
+  * Update Codeowners
+  * FamilyInstance rooms support
+  * Update Changelog.md
+
+- handling ElementId 64 bit backward compatibility
+  https://forums.autodesk.com/t5/revit-api-forum/upgrade-2024-api-causing-schema-error/td-p/11953147
+
+- 15-minute cities, 20-minute neighbourhoods and 30-second offices
+  https://www.keanw.com/2023/02/15-minute-cities-20-minute-neighbourhoods-and-30-second-offices.html
+
+- 100 GB of data in the cloud per year results in carbon footprint of about 0.2 tons of CO2?
+  That is about the same as:
+  Driving a car for approximately 965 km
+  Burning 45 kg of coal
+  The production of about 1,000 plastic bags
+
+- See this page fetch itself, byte by byte, over TLS
+  https://subtls.pages.dev/
+  This page performs a live, annotated https: request for its own source.
 
 twitter:
 
@@ -27,7 +65,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### RevitLookup
+### Revit and RevitLookup Updates
 
 ####<a name="2"></a>
 
