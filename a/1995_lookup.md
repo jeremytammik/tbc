@@ -141,6 +141,9 @@ Here is a list of all updates and their enhancements since the initial 2024 rele
     - Other:
         - Added installers for previous RevitLookup versions https://github.com/jeremytammik/RevitLookup/wiki/Versions
 
+Ever so many thanks to Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari and above all
+to Roman [Nice3point](https://github.com/Nice3point) for this impressive list of enhancements, with extra kudos to Roman for all the RevitLookup maintenance work!
+
 ####<a name="4"></a> Backward Compatible 64 Bit Element Id
 
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
@@ -191,7 +194,7 @@ You have probably seen hundreds if not thousands of email footers reminding you 
 
 Now the time has come to add a reminder not to save ever bit of information you receive digitally either.
 
-Apparently, storing 100 GB of data in the cloud results in carbon footprint of about 0.2 tons of CO2 per year.
+Apparently, storing 100 GB of data in the cloud results in a carbon footprint of about 0.2 tons of CO2 per year.
 
 That is about the same as:
 
