@@ -68,75 +68,98 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <h4><a name="2"></a> Revit X.Y.2 Update</h4>
 <p>Update number 2 has been released for both Revit 2023 and 2024, Revit 2023.1.2 and Revit 2024.0.2, repectively:</p>
 <p><center>
-<img src="img/2023-05-15_rvt_updates.png" alt="" title="" width="236"/> <!-- Pixel Height: 205 Pixel Width: 236 -->
+<img src="img/2023-05-15_rvt_updates.png" alt="Revit X.Y.2 update" title="Revit X.Y.2 update" width="236"/> <!-- Pixel Height: 205 Pixel Width: 236 -->
 </center></p>
-<p>Go to <a href="http://Manage.Autodesk.com">manage.autodesk.com</a> to get them.</p>
+<p>As usual, they can be obtained from <a href="http://Manage.Autodesk.com">manage.autodesk.com</a>.</p>
 <h4><a name="3"></a> RevitLookup 2024.0.5</h4>
 <p><a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a> also sports a new update,
-<a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.5">release 2024.0.5</a>.</p>
-<p><a href="https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.5">RevitLookup 2024.0.5</a>:</p>
-<p>It adds two new features, support for static members and a ribbon update, plus a number of other improvements and bug fixes:</p>
-<p>Static members support:</p>
-<p>For example, RevitLookup now supports the display of these and other properties and methods:
-<code>c#
+<a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.5">release 2024.0.5</a>.
+Here is a list of all updates and their enhancements since the forst 2024 release:</p>
+<ul>
+<li><a href="https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.5">RevitLookup 2024.0.5</a>:<ul>
+<li>Static members support: RevitLookup now supports the display of these and other properties and methods:
+<pre class="prettyprint">
 Category.GetCategory();
 Document.GetDocumentVersion()
 UIDocument.GetRevitUIFamilyLoadOptions()
-Application.MinimumThickness</code></p>
-<p><img alt="image" src="https://github.com/jeremytammik/RevitLookup/assets/20504884/1712cf55-2451-4ed8-8487-20c5ab973278" /></p>
-<p>Ribbon update:</p>
-<p>SplitButton replaced by PullDownButton. Thank for voting https://github.com/jeremytammik/RevitLookup/discussions/159</p>
-<p><img alt="image" src="https://github.com/jeremytammik/RevitLookup/assets/20504884/b6819f3b-5670-45ad-9353-1dabf9d3b512" /></p>
-<p>Other improvements:
-* Added DefinitionGroup support
-* Added Element.GetMaterialArea support
-* Added Element.GetMaterialVolume support
-* Added FamilyInstance.get_Room support
-* Added FamilyInstance.get_ToRoom support
-* Added FamilyInstance.get_FromRoom support
-* "Show element" is no longer available for ElementType
-Bugs:
-* Fixed issue when GetMaterialIds method didn't return nonPaint materials https://github.com/jeremytammik/RevitLookup/issues/163</p>
-<p><a href="https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.4">RevitLookup 2024.0.4</a>:</p>
-<p>Improvements:
-* Added Workset support
-* Added WorksetTable support
-* Added Document.GetUnusedElements support
-Bugs:
-* Fixed Dashboard window startup location</p>
-<p><a href="https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.2">RevitLookup 2024.0.2</a>:</p>
-<p>Bugs:
-* Fixed Fatal Error on Windows 10 https://github.com/jeremytammik/RevitLookup/issues/153</p>
-<p>Accent colour sync with OS now only available in Windows 11 and above. Many thanks to <a href="https://t.me/a_negus">Aleksey Negus</a> for testing builds</p>
-<p><a href="https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.1">RevitLookup 2024.0.1</a>:</p>
-<p>Major changes:</p>
-<ul>
+Application.MinimumThickness
+</pre>
+<center>
+<img src="img/revitlookup_static_members.png" alt="Static members" title="Static members" width="600"/> <!-- Pixel Height: 622 Pixel Width: 1,087 -->
+</center></li>
+<li>Ribbon update: SplitButton replaced by PullDownButton.
+Thanks for <a href="https://github.com/jeremytammik/RevitLookup/discussions/159">voting</a>!
+<center>
+<img src="img/revitlookup_splitbutton.png" alt="SplitButton" title="SplitButton" width="335"/> <!-- Pixel Height: 343 Pixel Width: 335 -->
+</center></li>
+<li>Other improvements:<ul>
+<li>Added DefinitionGroup support</li>
+<li>Added Element.GetMaterialArea support</li>
+<li>Added Element.GetMaterialVolume support</li>
+<li>Added FamilyInstance.get_Room support</li>
+<li>Added FamilyInstance.get_ToRoom support</li>
+<li>Added FamilyInstance.get_FromRoom support</li>
+<li>"Show element" is no longer available for ElementType</li>
+</ul>
+</li>
+<li>Bugs:<ul>
+<li>Fixed issue when GetMaterialIds method didn't return nonPaint materials https://github.com/jeremytammik/RevitLookup/issues/163</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.4">RevitLookup 2024.0.4</a>:<ul>
+<li>Improvements:<ul>
+<li>Added Workset support</li>
+<li>Added WorksetTable support</li>
+<li>Added Document.GetUnusedElements support</li>
+</ul>
+</li>
+<li>Bugs:<ul>
+<li>Fixed Dashboard window startup location</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.2">RevitLookup 2024.0.2</a>:<ul>
+<li>Bugs:<ul>
+<li>Fixed Fatal Error on Windows 10 https://github.com/jeremytammik/RevitLookup/issues/153
+  Accent colour sync with OS now only available in Windows 11 and above. Many thanks to <a href="https://t.me/a_negus">Aleksey Negus</a> for testing builds</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.1">RevitLookup 2024.0.1</a>:<ul>
+<li>Major changes:<ul>
 <li>Added option to enable hardware acceleration (experimental)</li>
-</ul>
-<p>The user interface is now more responsive. Revit uses software acceleration by default. Contact us if you encounter problems with your graphics cards</p>
-<p>Known issue: rendering performance drops on selection. This is especially evident on
-roofs. https://forums.autodesk.com/t5/revit-api-forum/revit-2024-rendering-performance-drops-on-selection/td-p/11878396</p>
-<ul>
-<li>Added button to enable RevitLookup panel on Modify tab by @ricaun in https://github.com/jeremytammik/RevitLookup/pull/152</li>
-</ul>
-<p>Disabled by default. Thanks vor voting https://github.com/jeremytammik/RevitLookup/discussions/151</p>
-<ul>
+<li>Added button to enable RevitLookup panel on Modify tab by @ricaun in <a href="https://github.com/jeremytammik/RevitLookup/pull/152">#152</a>
+  Disabled by default. Thanks vor <a href="https://github.com/jeremytammik/RevitLookup/discussions/151">voting</a>!</li>
 <li>Opening RevitLookup window only when the Revit runtime context is available https://github.com/jeremytammik/RevitLookup/issues/155</li>
 </ul>
-<p>Improvements:
-* Added shortcuts support for the Modify tab https://github.com/jeremytammik/RevitLookup/issues/150
-* Added EvaluatedParameter support
-* Added Category.get_Visible support
-* Added Category.get_AllowsVisibilityControl support
-* Added Category.GetLineWeight support
-* Added Category.GetLinePatternId support
-* Added Category.GetElements extension
-* Added Reference.ConvertToStableRepresentation support
-Bugs:
-* Fixed rare crashes in EventMonitor on large models
-* Fixed Curve.Evaluate resolver using EndParameter as values
-Other:
-* Added installers for previous RevitLookup versions https://github.com/jeremytammik/RevitLookup/wiki/Versions</p>
+</li>
+<li>Improvements:<ul>
+<li>Added shortcuts support for the Modify tab https://github.com/jeremytammik/RevitLookup/issues/150</li>
+<li>Added EvaluatedParameter support</li>
+<li>Added Category.get_Visible support</li>
+<li>Added Category.get_AllowsVisibilityControl support</li>
+<li>Added Category.GetLineWeight support</li>
+<li>Added Category.GetLinePatternId support</li>
+<li>Added Category.GetElements extension</li>
+<li>Added Reference.ConvertToStableRepresentation support</li>
+</ul>
+</li>
+<li>Bugs:<ul>
+<li>Fixed rare crashes in EventMonitor on large models</li>
+<li>Fixed Curve.Evaluate resolver using EndParameter as values</li>
+</ul>
+</li>
+<li>Other:<ul>
+<li>Added installers for previous RevitLookup versions https://github.com/jeremytammik/RevitLookup/wiki/Versions</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 <h4><a name="4"></a></h4>
 <p><strong>Question:</strong></p>
 <p><strong>Answer:</strong></p>

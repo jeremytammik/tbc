@@ -67,7 +67,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Revit and RevitLookup Updates
 
-####<a name="2"></a> Revit X.Y.2 Update
+####<a name="2"></a> Revit X.Y.2 Updates
 
 Update number 2 has been released for both Revit 2023 and 2024, Revit 2023.1.2 and Revit 2024.0.2, repectively:
 
@@ -81,7 +81,7 @@ As usual, they can be obtained from [manage.autodesk.com](http://Manage.Autodesk
 
 [RevitLookup](https://github.com/jeremytammik/RevitLookup) also sports a new update,
 [release 2024.0.5](https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.5).
-Here is a list of all updates and their enhancements since the forst 2024 release:
+Here is a list of all updates and their enhancements since the initial 2024 release:
 
 - [RevitLookup 2024.0.5](https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.5):
     - Static members support: RevitLookup now supports the display of these and other properties and methods:
@@ -92,12 +92,12 @@ Here is a list of all updates and their enhancements since the forst 2024 releas
     Application.MinimumThickness
     </pre>
     <center>
-    <img src="img/2023-05-revitlookup_static_members.png" alt="Static members" title="Static members" width="600"/> <!-- Pixel Height: 622 Pixel Width: 1,087 -->
+    <img src="img/revitlookup_static_members.png" alt="Static members" title="Static members" width="600"/> <!-- Pixel Height: 622 Pixel Width: 1,087 -->
     </center>
     - Ribbon update: SplitButton replaced by PullDownButton.
     Thanks for [voting](https://github.com/jeremytammik/RevitLookup/discussions/159)!
     <center>
-    <img src="img/2023-05-revitlookup_splitbutton.png" alt="SplitButton" title="SplitButton" width="335"/> <!-- Pixel Height: 343 Pixel Width: 335 -->
+    <img src="img/revitlookup_splitbutton.png" alt="SplitButton" title="SplitButton" width="335"/> <!-- Pixel Height: 343 Pixel Width: 335 -->
     </center>
     - Other improvements:
         - Added DefinitionGroup support
@@ -141,8 +141,58 @@ Here is a list of all updates and their enhancements since the forst 2024 releas
     - Other:
         - Added installers for previous RevitLookup versions https://github.com/jeremytammik/RevitLookup/wiki/Versions
 
+####<a name="4"></a> Backward Compatible 64 Bit Element Id
 
-####<a name="4"></a>
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+shares code for handling `ElementId` 64 bit backward compatibility in the thread
+on [upgrade 2024 API causing schema error](https://forums.autodesk.com/t5/revit-api-forum/upgrade-2024-api-causing-schema-error/td-p/11953147),
+explaining:
+
+> The change to `Int64` should be transparent for most situations;
+there is a design decision some developers will need to consider in terms of how the `ElementId` `IntegerValue` property is replaced with the old `Value`.
+I decided it was better to update backwards the base code with an extension method `ElementId.Value`.
+Can't do much about the constructor, however:
+
+<pre class="prettyprint">
+Module RT_ElementIdExtensionModule
+
+#If RvtVer &gt;= 2024 Then
+    &lt;Extension&gt;
+    Public Function NewElementId(L As Long) As ElementId
+        Return New ElementId(L)
+    End Function
+#Else
+     &lt;Extension&gt;
+    Public Function Value(ID As ElementId) As Long
+        Return ID.IntegerValue
+    End Function
+    &lt;Extension&gt;
+    Public Function NewElementId(L As Long) As ElementId
+        If L &gt; Int32.MaxValue OrElse L &lt; Int32.MinValue Then
+            Throw New OverflowException("Value for ElementId out of range.")
+        End If
+        Return New ElementId(CInt(L))
+    End Function
+#End If
+
+End Module
+</pre>
+
+Many thanks to Richard for sharing this approach.
+
+
+- 15-minute cities, 20-minute neighbourhoods and 30-second offices
+https://www.keanw.com/2023/02/15-minute-cities-20-minute-neighbourhoods-and-30-second-offices.html
+
+- 100 GB of data in the cloud per year results in carbon footprint of about 0.2 tons of CO2?
+That is about the same as:
+Driving a car for approximately 965 km
+Burning 45 kg of coal
+The production of about 1,000 plastic bags
+
+- See this page fetch itself, byte by byte, over TLS
+https://subtls.pages.dev/
+This page performs a live, annotated https: request for its own source.
 
 
 **Question:**
