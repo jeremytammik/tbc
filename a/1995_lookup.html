@@ -65,7 +65,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Revit and RevitLookup Updates</h3>
-<h4><a name="2"></a> Revit X.Y.2 Update</h4>
+<h4><a name="2"></a> Revit X.Y.2 Updates</h4>
 <p>Update number 2 has been released for both Revit 2023 and 2024, Revit 2023.1.2 and Revit 2024.0.2, repectively:</p>
 <p><center>
 <img src="img/2023-05-15_rvt_updates.png" alt="Revit X.Y.2 update" title="Revit X.Y.2 update" width="236"/> <!-- Pixel Height: 205 Pixel Width: 236 -->
@@ -74,7 +74,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <h4><a name="3"></a> RevitLookup 2024.0.5</h4>
 <p><a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a> also sports a new update,
 <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.5">release 2024.0.5</a>.
-Here is a list of all updates and their enhancements since the forst 2024 release:</p>
+Here is a list of all updates and their enhancements since the initial 2024 release:</p>
 <ul>
 <li><a href="https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.5">RevitLookup 2024.0.5</a>:<ul>
 <li>Static members support: RevitLookup now supports the display of these and other properties and methods:
@@ -160,9 +160,59 @@ Thanks for <a href="https://github.com/jeremytammik/RevitLookup/discussions/159"
 </ul>
 </li>
 </ul>
-<h4><a name="4"></a></h4>
-<p><strong>Question:</strong></p>
-<p><strong>Answer:</strong></p>
-<p><strong>Response:</strong></p>
+<h4><a name="4"></a> Backward Compatible 64 Bit Element Id</h4>
+<p>Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
+shares code for handling <code>ElementId</code> 64 bit backward compatibility in the thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/upgrade-2024-api-causing-schema-error/td-p/11953147">upgrade 2024 API causing schema error</a>,
+explaining:</p>
+<blockquote>
+<p>The change to <code>Int64</code> should be transparent for most situations;
+there is a design decision some developers will need to consider in terms of how the <code>ElementId</code> <code>IntegerValue</code> property is replaced with the old <code>Value</code>.
+I decided it was better to update backwards the base code with an extension method <code>ElementId.Value</code>.
+Can't do much about the constructor, however:</p>
+</blockquote>
 <pre class="prettyprint">
+Module RT_ElementIdExtensionModule
+
+#If RvtVer &gt;= 2024 Then
+    &lt;Extension&gt;
+    Public Function NewElementId(L As Long) As ElementId
+        Return New ElementId(L)
+    End Function
+#Else
+     &lt;Extension&gt;
+    Public Function Value(ID As ElementId) As Long
+        Return ID.IntegerValue
+    End Function
+    &lt;Extension&gt;
+    Public Function NewElementId(L As Long) As ElementId
+        If L &gt; Int32.MaxValue OrElse L &lt; Int32.MinValue Then
+            Throw New OverflowException("Value for ElementId out of range.")
+        End If
+        Return New ElementId(CInt(L))
+    End Function
+#End If
+
+End Module
 </pre>
+
+<p>Many thanks to Richard for sharing this approach.</p>
+<h4><a name="5"></a> 15-Minute Cities</h4>
+<p>I just noticed Kean Walmsley;s nice discucussion
+of <a href="https://www.keanw.com/2023/02/15-minute-cities-20-minute-neighbourhoods-and-30-second-offices.html">15-minute cities, 20-minute neighbourhoods and 30-second offices</a>.</p>
+<h4><a name="6"></a> Cloud Data Carbon Footprint</h4>
+<p>You have probably seen hundreds if not thousands of email footers reminding you not to print every email you receive on paper.</p>
+<p>Now the time has come to add a reminder not to save ever bit of information you receive digitally either.</p>
+<p>Apparently, storing 100 GB of data in the cloud results in carbon footprint of about 0.2 tons of CO2 per year.</p>
+<p>That is about the same as:</p>
+<ul>
+<li>Burning 45 kg of coal</li>
+<li>Driving a car for approximately 965 km</li>
+<li>The production of about 1,000 plastic bags</li>
+</ul>
+<h4><a name="7"></a> Watch Annoteted Https Request Live</h4>
+<p>Talking about bits stored in the cloud, here is a neat web page that enables you
+to <a href="https://subtls.pages.dev/">see this page fetch itself, byte by byte, over TLS</a>:</p>
+<blockquote>
+<p>This page performs a live, annotated <code>https:</code> request for its own source.</p>
+</blockquote>

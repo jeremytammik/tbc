@@ -180,27 +180,29 @@ End Module
 
 Many thanks to Richard for sharing this approach.
 
+####<a name="5"></a> 15-Minute Cities
 
-- 15-minute cities, 20-minute neighbourhoods and 30-second offices
-https://www.keanw.com/2023/02/15-minute-cities-20-minute-neighbourhoods-and-30-second-offices.html
+I just noticed Kean Walmsley;s nice discucussion
+of [15-minute cities, 20-minute neighbourhoods and 30-second offices](https://www.keanw.com/2023/02/15-minute-cities-20-minute-neighbourhoods-and-30-second-offices.html).
 
-- 100 GB of data in the cloud per year results in carbon footprint of about 0.2 tons of CO2?
+####<a name="6"></a> Cloud Data Carbon Footprint
+
+You have probably seen hundreds if not thousands of email footers reminding you not to print every email you receive on paper.
+
+Now the time has come to add a reminder not to save ever bit of information you receive digitally either.
+
+Apparently, storing 100 GB of data in the cloud results in carbon footprint of about 0.2 tons of CO2 per year.
+
 That is about the same as:
-Driving a car for approximately 965 km
-Burning 45 kg of coal
-The production of about 1,000 plastic bags
 
-- See this page fetch itself, byte by byte, over TLS
-https://subtls.pages.dev/
-This page performs a live, annotated https: request for its own source.
+- Burning 45 kg of coal
+- Driving a car for approximately 965 km
+- The production of about 1,000 plastic bags
 
+####<a name="7"></a> Watch Annoteted Https Request Live
 
-**Question:**
+Talking about bits stored in the cloud, here is a neat web page that enables you
+to [see this page fetch itself, byte by byte, over TLS](https://subtls.pages.dev/):
 
+> This page performs a live, annotated `https:` request for its own source.
 
-**Answer:**
-
-**Response:**
-
-<pre class="prettyprint">
-</pre>
