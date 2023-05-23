@@ -67,13 +67,19 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Revit and RevitLookup Updates
 
-####<a name="2"></a>
+####<a name="2"></a> Revit X.Y.2 Update
+
+Update number 2 has been released for both Revit 2023 and 2024, Revit 2023.1.2 and Revit 2024.0.2, repectively:
+
+<center>
+<img src="img/2023-05-15_rvt_updates.png" alt="" title="" width="236"/> <!-- Pixel Height: 205 Pixel Width: 236 -->
+</center>
+
+Go to [manage.autodesk.com](http://Manage.Autodesk.com) to get them.
+
 
 **Question:**
 
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 534 Pixel Width: 1,757 -->
-</center>
 
 **Answer:**
 
