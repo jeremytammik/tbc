@@ -72,10 +72,77 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Update number 2 has been released for both Revit 2023 and 2024, Revit 2023.1.2 and Revit 2024.0.2, repectively:
 
 <center>
-<img src="img/2023-05-15_rvt_updates.png" alt="" title="" width="236"/> <!-- Pixel Height: 205 Pixel Width: 236 -->
+<img src="img/2023-05-15_rvt_updates.png" alt="Revit X.Y.2 update" title="Revit X.Y.2 update" width="236"/> <!-- Pixel Height: 205 Pixel Width: 236 -->
 </center>
 
-Go to [manage.autodesk.com](http://Manage.Autodesk.com) to get them.
+As usual, they can be obtained from [manage.autodesk.com](http://Manage.Autodesk.com).
+
+####<a name="3"></a> RevitLookup 2024.0.5
+
+[RevitLookup](https://github.com/jeremytammik/RevitLookup) also sports a new update,
+[release 2024.0.5](https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.5).
+Here is a list of all updates and their enhancements since the forst 2024 release:
+
+- [RevitLookup 2024.0.5](https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.5):
+    - Static members support: RevitLookup now supports the display of these and other properties and methods:
+    <pre class="prettyprint">
+    Category.GetCategory();
+    Document.GetDocumentVersion()
+    UIDocument.GetRevitUIFamilyLoadOptions()
+    Application.MinimumThickness
+    </pre>
+    <center>
+    <img src="img/2023-05-revitlookup_static_members.png" alt="Static members" title="Static members" width="600"/> <!-- Pixel Height: 622 Pixel Width: 1,087 -->
+    </center>
+    - Ribbon update: SplitButton replaced by PullDownButton.
+    Thanks for [voting](https://github.com/jeremytammik/RevitLookup/discussions/159)!
+    <center>
+    <img src="img/2023-05-revitlookup_splitbutton.png" alt="SplitButton" title="SplitButton" width="335"/> <!-- Pixel Height: 343 Pixel Width: 335 -->
+    </center>
+    - Other improvements:
+        - Added DefinitionGroup support
+        - Added Element.GetMaterialArea support
+        - Added Element.GetMaterialVolume support
+        - Added FamilyInstance.get_Room support
+        - Added FamilyInstance.get_ToRoom support
+        - Added FamilyInstance.get_FromRoom support
+        - "Show element" is no longer available for ElementType
+    - Bugs:
+        - Fixed issue when GetMaterialIds method didn't return nonPaint materials https://github.com/jeremytammik/RevitLookup/issues/163
+- [RevitLookup 2024.0.4](https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.4):
+    - Improvements:
+        - Added Workset support
+        - Added WorksetTable support
+        - Added Document.GetUnusedElements support
+    - Bugs:
+        - Fixed Dashboard window startup location
+- [RevitLookup 2024.0.2](https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.2):
+    - Bugs:
+        - Fixed Fatal Error on Windows 10 https://github.com/jeremytammik/RevitLookup/issues/153
+          Accent colour sync with OS now only available in Windows 11 and above. Many thanks to [Aleksey Negus](https://t.me/a_negus) for testing builds
+- [RevitLookup 2024.0.1](https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.1):
+    - Major changes:
+        - Added option to enable hardware acceleration (experimental)
+        - Added button to enable RevitLookup panel on Modify tab by @ricaun in [#152](https://github.com/jeremytammik/RevitLookup/pull/152)
+          Disabled by default. Thanks vor [voting](https://github.com/jeremytammik/RevitLookup/discussions/151)!
+        - Opening RevitLookup window only when the Revit runtime context is available https://github.com/jeremytammik/RevitLookup/issues/155
+    - Improvements:
+        - Added shortcuts support for the Modify tab https://github.com/jeremytammik/RevitLookup/issues/150
+        - Added EvaluatedParameter support
+        - Added Category.get_Visible support
+        - Added Category.get_AllowsVisibilityControl support
+        - Added Category.GetLineWeight support
+        - Added Category.GetLinePatternId support
+        - Added Category.GetElements extension
+        - Added Reference.ConvertToStableRepresentation support
+    - Bugs:
+        - Fixed rare crashes in EventMonitor on large models
+        - Fixed Curve.Evaluate resolver using EndParameter as values
+    - Other:
+        - Added installers for previous RevitLookup versions https://github.com/jeremytammik/RevitLookup/wiki/Versions
+
+
+####<a name="4"></a>
 
 
 **Question:**
@@ -86,11 +153,4 @@ Go to [manage.autodesk.com](http://Manage.Autodesk.com) to get them.
 **Response:**
 
 <pre class="prettyprint">
-
-
 </pre>
-
-
-####<a name="3"></a>
-
-####<a name="4"></a>

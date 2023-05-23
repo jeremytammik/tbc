@@ -1,0 +1,145 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<p></head></p>
+<!---
+
+- 2023-05-15_rvt_updates.png
+  https://twitter.com/TheRevitGeek/status/1659593050535120896?s=20
+  New @AutodeskRevit updates; go to http://Manage.Autodesk.com to get them
+  https://manage.autodesk.com
+
+- RevitLookup
+  https://github.com/jeremytammik/RevitLookup/blob/dev/Changelog.md#next-202405
+  Release 2024.0.5 (#165)
+  * Cleanup
+  * Update Nuke
+  * Fix GetMaterialIds
+  * DefinitionGroup support
+  * Disable Show for ElementType
+  * Demo project restore
+  * Nuke update
+  * Material area, volume support
+  * Static members support
+  * Update Changelog.md
+  * Update nuget packages
+  * Update Codeowners
+  * FamilyInstance rooms support
+  * Update Changelog.md
+
+- handling ElementId 64 bit backward compatibility
+  https://forums.autodesk.com/t5/revit-api-forum/upgrade-2024-api-causing-schema-error/td-p/11953147
+
+- 15-minute cities, 20-minute neighbourhoods and 30-second offices
+  https://www.keanw.com/2023/02/15-minute-cities-20-minute-neighbourhoods-and-30-second-offices.html
+
+- 100 GB of data in the cloud per year results in carbon footprint of about 0.2 tons of CO2?
+  That is about the same as:
+  Driving a car for approximately 965 km
+  Burning 45 kg of coal
+  The production of about 1,000 plastic bags
+
+- See this page fetch itself, byte by byte, over TLS
+  https://subtls.pages.dev/
+  This page performs a live, annotated https: request for its own source.
+
+twitter:
+
+ in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
+
+&ndash;
+...
+
+linkedin:
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>Revit and RevitLookup Updates</h3>
+<h4><a name="2"></a> Revit X.Y.2 Update</h4>
+<p>Update number 2 has been released for both Revit 2023 and 2024, Revit 2023.1.2 and Revit 2024.0.2, repectively:</p>
+<p><center>
+<img src="img/2023-05-15_rvt_updates.png" alt="" title="" width="236"/> <!-- Pixel Height: 205 Pixel Width: 236 -->
+</center></p>
+<p>Go to <a href="http://Manage.Autodesk.com">manage.autodesk.com</a> to get them.</p>
+<h4><a name="3"></a> RevitLookup 2024.0.5</h4>
+<p><a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a> also sports a new update,
+<a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.5">release 2024.0.5</a>.</p>
+<p><a href="https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.5">RevitLookup 2024.0.5</a>:</p>
+<p>It adds two new features, support for static members and a ribbon update, plus a number of other improvements and bug fixes:</p>
+<p>Static members support:</p>
+<p>For example, RevitLookup now supports the display of these and other properties and methods:
+<code>c#
+Category.GetCategory();
+Document.GetDocumentVersion()
+UIDocument.GetRevitUIFamilyLoadOptions()
+Application.MinimumThickness</code></p>
+<p><img alt="image" src="https://github.com/jeremytammik/RevitLookup/assets/20504884/1712cf55-2451-4ed8-8487-20c5ab973278" /></p>
+<p>Ribbon update:</p>
+<p>SplitButton replaced by PullDownButton. Thank for voting https://github.com/jeremytammik/RevitLookup/discussions/159</p>
+<p><img alt="image" src="https://github.com/jeremytammik/RevitLookup/assets/20504884/b6819f3b-5670-45ad-9353-1dabf9d3b512" /></p>
+<p>Other improvements:
+* Added DefinitionGroup support
+* Added Element.GetMaterialArea support
+* Added Element.GetMaterialVolume support
+* Added FamilyInstance.get_Room support
+* Added FamilyInstance.get_ToRoom support
+* Added FamilyInstance.get_FromRoom support
+* "Show element" is no longer available for ElementType
+Bugs:
+* Fixed issue when GetMaterialIds method didn't return nonPaint materials https://github.com/jeremytammik/RevitLookup/issues/163</p>
+<p><a href="https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.4">RevitLookup 2024.0.4</a>:</p>
+<p>Improvements:
+* Added Workset support
+* Added WorksetTable support
+* Added Document.GetUnusedElements support
+Bugs:
+* Fixed Dashboard window startup location</p>
+<p><a href="https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.2">RevitLookup 2024.0.2</a>:</p>
+<p>Bugs:
+* Fixed Fatal Error on Windows 10 https://github.com/jeremytammik/RevitLookup/issues/153</p>
+<p>Accent colour sync with OS now only available in Windows 11 and above. Many thanks to <a href="https://t.me/a_negus">Aleksey Negus</a> for testing builds</p>
+<p><a href="https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.1">RevitLookup 2024.0.1</a>:</p>
+<p>Major changes:</p>
+<ul>
+<li>Added option to enable hardware acceleration (experimental)</li>
+</ul>
+<p>The user interface is now more responsive. Revit uses software acceleration by default. Contact us if you encounter problems with your graphics cards</p>
+<p>Known issue: rendering performance drops on selection. This is especially evident on
+roofs. https://forums.autodesk.com/t5/revit-api-forum/revit-2024-rendering-performance-drops-on-selection/td-p/11878396</p>
+<ul>
+<li>Added button to enable RevitLookup panel on Modify tab by @ricaun in https://github.com/jeremytammik/RevitLookup/pull/152</li>
+</ul>
+<p>Disabled by default. Thanks vor voting https://github.com/jeremytammik/RevitLookup/discussions/151</p>
+<ul>
+<li>Opening RevitLookup window only when the Revit runtime context is available https://github.com/jeremytammik/RevitLookup/issues/155</li>
+</ul>
+<p>Improvements:
+* Added shortcuts support for the Modify tab https://github.com/jeremytammik/RevitLookup/issues/150
+* Added EvaluatedParameter support
+* Added Category.get_Visible support
+* Added Category.get_AllowsVisibilityControl support
+* Added Category.GetLineWeight support
+* Added Category.GetLinePatternId support
+* Added Category.GetElements extension
+* Added Reference.ConvertToStableRepresentation support
+Bugs:
+* Fixed rare crashes in EventMonitor on large models
+* Fixed Curve.Evaluate resolver using EndParameter as values
+Other:
+* Added installers for previous RevitLookup versions https://github.com/jeremytammik/RevitLookup/wiki/Versions</p>
+<h4><a name="4"></a></h4>
+<p><strong>Question:</strong></p>
+<p><strong>Answer:</strong></p>
+<p><strong>Response:</strong></p>
+<pre class="prettyprint">
+</pre>
