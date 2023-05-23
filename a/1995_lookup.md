@@ -49,8 +49,14 @@ twitter:
 
  in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-&ndash;
-...
+Revit and RevitLookup updates and 64 bit element id handling:
+&ndash; Revit 2023.1.2
+&ndash; Revit 2024.0.2
+&ndash; RevitLookup 2024.0.5
+&ndash; Backward compatible 64 bit element id
+&ndash; 15-minute cities
+&ndash; Cloud data carbon footprint
+&ndash; Live annotated `https` request log...
 
 linkedin:
 
@@ -74,7 +80,7 @@ Important updates to both Revit and RevitLookup, and other interesting news:
 - [Backward compatible 64 bit element id](#4)
 - [15-minute cities](#5)
 - [Cloud data carbon footprint](#6)
-- [Live annoteted `https` request log](#7)
+- [Live annotated `https` request log](#7)
 
 ####<a name="2"></a> Revit X.Y.2 Updates
 
@@ -93,31 +99,35 @@ As usual, they can be obtained from [manage.autodesk.com](http://Manage.Autodesk
 Here is a list of all updates and their enhancements since the initial 2024 release:
 
 - [RevitLookup 2024.0.5](https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.5):
-    - Static members support: RevitLookup now supports the display of these and other properties and methods:
-    <pre class="prettyprint">
-    Category.GetCategory();
-    Document.GetDocumentVersion()
-    UIDocument.GetRevitUIFamilyLoadOptions()
-    Application.MinimumThickness
-    </pre>
-    <center>
-    <img src="img/revitlookup_static_members.png" alt="Snoop static members" title="Snoop static members" width="600"/> <!-- Pixel Height: 622 Pixel Width: 1,087 -->
-    </center>
-    - Ribbon update: SplitButton replaced by PullDownButton.
-    Thanks for [voting](https://github.com/jeremytammik/RevitLookup/discussions/159)!
-    <center>
-    <img src="img/revitlookup_splitbutton.png" alt="SplitButton menu" title="SplitButton menu" width="335"/> <!-- Pixel Height: 343 Pixel Width: 335 -->
-    </center>
-    - Other improvements:
-        - Added DefinitionGroup support
-        - Added Element.GetMaterialArea support
-        - Added Element.GetMaterialVolume support
-        - Added FamilyInstance.get_Room support
-        - Added FamilyInstance.get_ToRoom support
-        - Added FamilyInstance.get_FromRoom support
-        - "Show element" is no longer available for ElementType
-    - Bugs:
-        - Fixed issue when GetMaterialIds method didn't return nonPaint materials https://github.com/jeremytammik/RevitLookup/issues/163
+
+- Static members support: RevitLookup now supports the display of these and other properties and methods:
+  <pre class="prettyprint">
+  Category.GetCategory();
+  Document.GetDocumentVersion()
+  UIDocument.GetRevitUIFamilyLoadOptions()
+  Application.MinimumThickness
+  </pre>
+  <center>
+  <img src="img/revitlookup_static_members.png" alt="Snoop static members" title="Snoop static members" width="600"/> <!-- Pixel Height: 622 Pixel Width: 1,087 -->
+  </center>
+
+- Ribbon update: SplitButton replaced by PullDownButton.
+  Thanks for [voting](https://github.com/jeremytammik/RevitLookup/discussions/159)!
+  <center>
+  <img src="img/revitlookup_splitbutton.png" alt="SplitButton menu" title="SplitButton menu" width="335"/> <!-- Pixel Height: 343 Pixel Width: 335 -->
+  </center>
+
+- Other improvements:
+    - Added DefinitionGroup support
+    - Added Element.GetMaterialArea support
+    - Added Element.GetMaterialVolume support
+    - Added FamilyInstance.get_Room support
+    - Added FamilyInstance.get_ToRoom support
+    - Added FamilyInstance.get_FromRoom support
+    - "Show element" is no longer available for ElementType
+- Bugs:
+    - Fixed issue when GetMaterialIds method didn't return nonPaint materials
+      [#163](https://github.com/jeremytammik/RevitLookup/issues/163)
 - [RevitLookup 2024.0.4](https://github.com/jeremytammik/RevitLookup/releases/edit/2024.0.4):
     - Improvements:
         - Added Workset support
