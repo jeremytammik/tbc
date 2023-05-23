@@ -65,7 +65,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Revit and RevitLookup Updates
+### 64 Bit Ids, Revit and RevitLookup Updates
 
 Important updates to both Revit and RevitLookup, and other interesting news:
 
@@ -78,7 +78,7 @@ Important updates to both Revit and RevitLookup, and other interesting news:
 
 ####<a name="2"></a> Revit X.Y.2 Updates
 
-Update number 2 has been released for both Revit 2023 and 2024, Revit 2023.1.2 and Revit 2024.0.2, repectively:
+Update number 2 has been released for both Revit 2023 and 2024, Revit 2023.1.2 and Revit 2024.0.2, respectively:
 
 <center>
 <img src="img/2023-05-15_rvt_updates.png" alt="Revit X.Y.2 update" title="Revit X.Y.2 update" width="236"/> <!-- Pixel Height: 205 Pixel Width: 236 -->
@@ -101,12 +101,12 @@ Here is a list of all updates and their enhancements since the initial 2024 rele
     Application.MinimumThickness
     </pre>
     <center>
-    <img src="img/revitlookup_static_members.png" alt="Static members" title="Static members" width="600"/> <!-- Pixel Height: 622 Pixel Width: 1,087 -->
+    <img src="img/revitlookup_static_members.png" alt="Snoop static members" title="Snoop static members" width="600"/> <!-- Pixel Height: 622 Pixel Width: 1,087 -->
     </center>
     - Ribbon update: SplitButton replaced by PullDownButton.
     Thanks for [voting](https://github.com/jeremytammik/RevitLookup/discussions/159)!
     <center>
-    <img src="img/revitlookup_splitbutton.png" alt="SplitButton" title="SplitButton" width="335"/> <!-- Pixel Height: 343 Pixel Width: 335 -->
+    <img src="img/revitlookup_splitbutton.png" alt="SplitButton menu" title="SplitButton menu" width="335"/> <!-- Pixel Height: 343 Pixel Width: 335 -->
     </center>
     - Other improvements:
         - Added DefinitionGroup support
@@ -194,7 +194,7 @@ Many thanks to Richard for sharing this approach.
 
 ####<a name="5"></a> 15-Minute Cities
 
-I just noticed Kean Walmsley;s nice discucussion
+I just noticed Kean Walmsley's nice discussion
 of [15-minute cities, 20-minute neighbourhoods and 30-second offices](https://www.keanw.com/2023/02/15-minute-cities-20-minute-neighbourhoods-and-30-second-offices.html).
 
 ####<a name="6"></a> Cloud Data Carbon Footprint
@@ -211,7 +211,7 @@ That is about the same as:
 - Driving a car for approximately 965 km
 - The production of about 1,000 plastic bags
 
-####<a name="7"></a> Live Annoteted Https Request Log
+####<a name="7"></a> Live Annotated Https Request Log
 
 Talking about bits stored in the cloud, here is a neat web page that enables you
 to [see this page fetch itself, byte by byte, over TLS](https://subtls.pages.dev/):
