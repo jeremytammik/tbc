@@ -67,6 +67,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Revit and RevitLookup Updates
 
+Important updates to both Revit and RevitLookup, and other interesting news:
+
+- [Revit X.Y.2 Updates](#2)
+- [RevitLookup 2024.0.5](#3)
+- [Backward Compatible 64 Bit Element Id](#4)
+- [15-Minute Cities](#5)
+- [Cloud Data Carbon Footprint](#6)
+- [Watch Annoteted Https Request Live](#7)
+
 ####<a name="2"></a> Revit X.Y.2 Updates
 
 Update number 2 has been released for both Revit 2023 and 2024, Revit 2023.1.2 and Revit 2024.0.2, repectively:
