@@ -69,12 +69,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Important updates to both Revit and RevitLookup, and other interesting news:
 
-- [Revit X.Y.2 Updates](#2)
+- [Revit X.Y.2 updates](#2)
 - [RevitLookup 2024.0.5](#3)
-- [Backward Compatible 64 Bit Element Id](#4)
-- [15-Minute Cities](#5)
-- [Cloud Data Carbon Footprint](#6)
-- [Watch Annoteted Https Request Live](#7)
+- [Backward compatible 64 bit element id](#4)
+- [15-minute cities](#5)
+- [Cloud data carbon footprint](#6)
+- [Live annoteted `https` request log](#7)
 
 ####<a name="2"></a> Revit X.Y.2 Updates
 
@@ -211,7 +211,7 @@ That is about the same as:
 - Driving a car for approximately 965 km
 - The production of about 1,000 plastic bags
 
-####<a name="7"></a> Watch Annoteted Https Request Live
+####<a name="7"></a> Live Annoteted Https Request Log
 
 Talking about bits stored in the cloud, here is a neat web page that enables you
 to [see this page fetch itself, byte by byte, over TLS](https://subtls.pages.dev/):
