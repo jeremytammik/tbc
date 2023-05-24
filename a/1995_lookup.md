@@ -47,7 +47,7 @@
 
 twitter:
 
- in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
+Revit updates 2023.1.2, 2024.0.2, RevitLookup 2024.0.5 and backward compatible 64-bit element id handling in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/rvt2024updates
 
 Revit and RevitLookup updates and 64 bit element id handling
 &ndash; Revit 2023.1.2
