@@ -60,6 +60,18 @@ Revit and RevitLookup updates and 64 bit element id handling
 
 linkedin:
 
+Revit updates 2023.1.2, 2024.0.2, RevitLookup 2024.0.5 and backward compatible 64-bit element id handling in the #RevitAPI
+
+https://autode.sk/rvt2024updates
+
+- Revit 2023.1.2
+- Revit 2024.0.2
+- RevitLookup 2024.0.5
+- Backward compatible 64 bit element id
+- 15-minute cities
+- Cloud data carbon footprint
+- Live annotated `https` request log...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
