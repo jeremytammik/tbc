@@ -127,9 +127,8 @@ have [SetElementIds](https://www.revitapidocs.com/2023/813a9d31-bc4f-1ebc-9a7b-6
 That only enables you to select top-level elements in the host document.
 I am not aware of any other way to select an element from another document in pre-2023 Revit.
 
-####<a name="4"></a>
+####<a name="4"></a> WallType Naming Best Practices
 
-WallType naming best practices
 https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-change-the-walltype-name-through-api/m-p/11990210
 
 <center>
