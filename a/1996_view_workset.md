@@ -110,19 +110,22 @@ Hope this helps!
 
 Many thanks to Richard and Jonas for the explanation and solution!
 
-####<a name="3"></a>
+####<a name="3"></a> Selection SetReferences
 
-Selection.SetReferences
-https://autodesk.slack.com/archives/C0SR6NAP8/p1685354466881299
-Shen Wang
-A customer raised a Revit API question about PickObjects (ObjectType.LinkedElement).
-After he gets the graphic element in the linked file via PickObjects(ObjectType.LinkedElement), how to make the linked graphic element selected in the current view, just like to achieve the effect of TAB button to select the linked element.
-Martha Hirstoaga
-Hello, since Revit 2023 you can use Autodesk.Revit.UI.Selection.SetReferences(IList<Reference> references), which  selects the given references. Reference can be an element or a subelement in the host or a linked document.
-Shen Wang
-If the customer is using the version less than 2023, is the above variable still available? Otherwise, does he have any other choice before 2023? Since he is still using 2020.
-Martha Hirstoaga
-In Revit Pre-2023, only Autodesk.Revit.UI.Selection.SetElementIds(ICollection<ElementId> elementIds) was available, being able to select only elements in the host document. I am not aware of any other way to select an element  from other document in pre-2023 Revit.
+FYI, a quick pointer to the relatively
+new :
+
+**Question:** After retrieving an element in a linked file via `PickObjects` with a 'LinkedElement' 'ObjectType', how can I highlight the linked element selected in the current view to achieve the effect of using the TAB key to select the linked element in the UI?
+
+**Answer:** Since Revit 2023, you can use the Selection [`SetReferences` method](https://www.revitapidocs.com/2023/813a9d31-bc4f-1ebc-9a7b-69a2a99d22ac.htm) to highlight the references passed in to it.
+A reference can be an element or a subelement in the host or a linked document.
+
+**Question:** How about previous releases of Revit?
+
+**Answer:** In Revit pre-2023, you only
+have [SetElementIds](https://www.revitapidocs.com/2023/813a9d31-bc4f-1ebc-9a7b-69a2a99d22ac.htm).
+That only enables you to select top-level elements in the host document.
+I am not aware of any other way to select an element from another document in pre-2023 Revit.
 
 ####<a name="4"></a>
 
