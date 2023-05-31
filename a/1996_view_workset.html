@@ -1,0 +1,307 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<p></head></p>
+<!---
+
+- View's Workset Editable - Change from No to Yes with the API?
+  https://forums.autodesk.com/t5/revit-api-forum/view-s-workset-editable-change-from-no-to-yes-with-the-api/m-p/11997681#M71740
+  [Q] Can anyone tell me if it's possible to change a view's workset status from "No" to "Yes" (editable) using the Revit API (Revit 2023 or earlier). See image blow.
+I'm not asking to have anyone do my work for me. I just want to know if it's possible and maybe toss me a hint or two? I've searched the internet and I've found several similar posts saying it wasn't possible but they were for much older versions of Revit.
+Thanks in advance!
+view_workset_editable.jpg
+[A]
+explanation by RPT and solution by Jonas Hoyer
+
+- Selection.SetReferences
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1685354466881299
+  Shen Wang
+  A customer raised a Revit API question about PickObjects (ObjectType.LinkedElement).
+  After he gets the graphic element in the linked file via PickObjects(ObjectType.LinkedElement), how to make the linked graphic element selected in the current view, just like to achieve the effect of TAB button to select the linked element.
+  Martha Hirstoaga
+  Hello, since Revit 2023 you can use Autodesk.Revit.UI.Selection.SetReferences(IList<Reference> references), which  selects the given references. Reference can be an element or a subelement in the host or a linked document.
+  Shen Wang
+  If the customer is using the version less than 2023, is the above variable still available? Otherwise, does he have any other choice before 2023? Since he is still using 2020.
+  Martha Hirstoaga
+  In Revit Pre-2023, only Autodesk.Revit.UI.Selection.SetElementIds(ICollection<ElementId> elementIds) was available, being able to select only elements in the host document. I am not aware of any other way to select an element  from other document in pre-2023 Revit.
+
+- WallType naming best practices
+  https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-change-the-walltype-name-through-api/m-p/11990210
+
+twitter:
+
+ in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
+
+&ndash;
+...
+
+linkedin:
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3></h3>
+<h4><a name="2"></a> Modify View Workset Editable</h4>
+<p>explanation by RPT and solution by Jonas Hoyer</p>
+<p>A nice explanation and succinct solution
+by Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
+and <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/8174024">Jonas Hoyer</a>
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/view-s-workset-editable-change-from-no-to-yes-with-the-api/m-p/11997681">view's workset editable &ndash; change from No to Yes with the API?</a>:</p>
+<p><strong>Question:</strong> Can anyone tell me if it's possible to change a view's workset status from "No" to "Yes" (editable) using the Revit API (Revit 2023 or earlier), in this form:</p>
+<p><center>
+<img src="img/view_workset_editable.jpg" alt="View workset editable" title="View workset editable" width="313"/> <!-- Pixel Height: 354 Pixel Width: 313 -->
+</center></p>
+<p>I searched the Internet and found several similar posts saying it wasn't possible, but they were for much older versions of Revit.
+Thanks in advance!</p>
+<p><strong>Explanation:</strong> When you take ownership of a workset, it becomes editable to that user 'Yes'; when you relinquish the workset it reverts to 'No' (which doesn't actually mean you can't edit it).</p>
+<p><a href="https://www.revitapidocs.com/2023/39b55560-c85b-bebc-e825-b76b5ba313a7.htm">WorksharingUtils CheckoutWorksets</a> allows
+the user to take ownership of the workset and make them editable to that user.</p>
+<p><a href="https://www.revitapidocs.com/2023/09f4e163-cb8f-de87-d641-3ba667adf4e0.htm">RelinquishOwnership</a> allows
+user to decide via RelinquishOptions what is relinquished (given back) including various workset types.</p>
+<p>I believe the 'editable' indicator is just a function of if the current user has taken ownership of a certain workset or not, i.e., they can take ownership of a workset for whatever time period to be sole editor of it until they relinquish it.
+The 'Yes/No' is only meaningful when you are the owner of it.
+The interface is probably outdated and contains bad terminology to a certain extent.
+The default is 'No (Non Editable)' meaning everyone can edit items on a workset via borrowing elements (so 'non editable' means you can edit it and so can everyone else).</p>
+<p>I believe the only other time it is 'yes' is when you've just created a workset but are yet to synchronise it to central.
+You can't make it 'non editable' available to all users until after you've synchronised it (because it doesn't yet exist in the central file).
+So, under that circumstance, you would have to synchronise then relinquish.
+Similarly, if you wanted to rename a workset you would have to make it 'editable' first.</p>
+<p>So, in summary, the 'Editable/Non Editable' aspect should be read as relating to if current user can solely edit the workset or not rather than just being a borrower of elements on a workset.</p>
+<p>The 'Owner' column exists separately from the 'Yes/No' one because some types of workset you decide to be the editor/owner of (user created ones) whereas when you create a view the ownership of the view workset is inherently you until synchronised.</p>
+<p>Have you tried the <a href="https://www.revitapidocs.com/2023/ae7857a0-4e9b-f9c1-84c7-8b250af68068.htm">WorsharingUtils</a> class for the View worksets in question?</p>
+<p>Under certain circumstances described above you will not be able to influence this 'editable/non editable' aspect via the API for a single user because it is related to how two or more people are interacting in a workshared environment e.g if someone else owns the workset then you can only ask they relinquish it.</p>
+<p>Choosing to take ownership of entire worksets is generally the old way of working before element borrowing was used.
+Mostly, people take ownership just to do infrequent things such as change workset names but that isn't applicable to View worksets.
+They may also take ownership to restrict access but again not for views.</p>
+<p><strong>Solution:</strong> To set the editable status of the view workset to <code>yes</code> you have to check out the workset of the view by using
+the <a href="https://www.revitapidocs.com/2023/97f0d4eb-ad2a-ca9d-a896-5144bd68c5a5.htm">CheckoutWorksets</a> method
+of the WorksharingUtils class.
+You can retrieve the <code>WorksetId</code> of the view with the <code>ELEM_PARTITION_PARAM</code> <code>BuiltInParameter</code>.
+Then, you can construct a <code>WorksetId</code> with the returned integer and use that to checkout the view's workset.
+That will set the editable status to yes.
+Hope this helps!</p>
+<p>Many thanks to Richard and Jonas for the explanation and solution!</p>
+<h4><a name="3"></a> Selection SetReferences</h4>
+<p>FYI, a quick pointer to the relatively
+new :</p>
+<p><strong>Question:</strong> After retrieving an element in a linked file via <code>PickObjects</code> with a 'LinkedElement' 'ObjectType', how can I highlight the linked element selected in the current view to achieve the effect of using the TAB key to select the linked element in the UI?</p>
+<p><strong>Answer:</strong> Since Revit 2023, you can use the Selection <a href="https://www.revitapidocs.com/2023/813a9d31-bc4f-1ebc-9a7b-69a2a99d22ac.htm"><code>SetReferences</code> method</a> to highlight the references passed in to it.
+A reference can be an element or a subelement in the host or a linked document.</p>
+<p><strong>Question:</strong> How about previous releases of Revit?</p>
+<p><strong>Answer:</strong> In Revit pre-2023, you only
+have <a href="https://www.revitapidocs.com/2023/813a9d31-bc4f-1ebc-9a7b-69a2a99d22ac.htm">SetElementIds</a>.
+That only enables you to select top-level elements in the host document.
+I am not aware of any other way to select an element from another document in pre-2023 Revit.</p>
+<h4><a name="4"></a> WallType Naming Best Practices</h4>
+<p>https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-change-the-walltype-name-through-api/m-p/11990210</p>
+<p>Is it possible to change the walltype name through API?
+I am trying to change the WallType for all walls in the selection.</p>
+<p>I am trying to implement it in the following way:</p>
+<pre class="prettyprint">
+
+Selection selection = uidoc.Selection;
+ElementSet collection = selection.Elements;
+
+List<WallType> type=new List<Walltype>();
+
+int index =0;
+
+
+
+Transaction trans = new Transaction(doc);
+                trans.Start("Wall Type");
+                foreach (Element collectedElem in collection)
+                {
+
+if (collectedElem.GetType().Name == "Wall")
+                    {
+                        Wall wall = null;
+                        wall = (Wall)collectedElem;
+
+                      string wallValue = collectedElem.Name.ToUpper() + ":" + collectedElem.Level.Name;
+
+
+
+//excelWallInfo is a string list loaded from external excel file. Each entry is in the format WalltypeName+":"+Level+":"+NewName
+
+                    foreach (string entry in excelWallInfo)
+                        {
+                            if (entry.Contains(wallValue) == true)
+                            {
+
+                                string[] entryElements = entry.Split(':');
+                                string newWallTypeName = entryElements[2];
+                                if (newWallTypeName == "None" || newWallTypeName == null)
+                                {
+                                    newWallTypeName = "EmptyName";
+                                }
+
+
+
+                              type.Add((WallType)wall.WallType.Duplicate(newWallTypeName)); //This line has problem in the second iteration.
+
+                                TaskDialog.Show("Duplicated Element Type", type[index].Name);
+                                  wall.WallType = type[index];
+
+                                  index ++;
+
+
+
+
+                            }
+
+                        }
+
+                    }
+                    trans.Commit();
+
+                }
+
+
+</PRE>
+
+<p>The above code stopped in the second iteration. The first change is successful. However, in the second iteration. The revit software throughs it into the exception.</p>
+<p>Any help is appreciated! Thanks very much!</p>
+<p>Tags (0)
+Add tags
+Report
+7 REPLIES
+Sort:
+MESSAGE 2 OF 8
+jeffreybo.liu
+Explorer jeffreybo.liu in reply to: jeffreybo.liu
+‎2014-07-28 04:59 PM
+I am not just want to change the WallType.Name, since it will change the name of all walls of the same type. I am trying to give each wall a new name.</p>
+<p>Thank you very much!</p>
+<p>Tags (0)
+Add tags
+Report
+MESSAGE 3 OF 8
+jeremytammik
+Autodesk jeremytammik in reply to: jeffreybo.liu
+‎2014-07-29 12:09 AM
+Dear Jeffreybo.liu,</p>
+<p>I see several issues with your code.</p>
+<p>Before addressing those, though, are you absolutely sure that you know what you are doing?</p>
+<p>Waht you are trying to achieve sounds rather questionable to me.</p>
+<p>Do you have an in depth understanding of the underlying Revit BIM paradigm and best practices?</p>
+<p>Anyway, if you really wnat to achieve what you say, I have the following suggestions:</p>
+<p>I recommend encapsulating the transaction instantiation in a C# 'using' statement:</p>
+<p>http://thebuildingcoder.typepad.com/blog/2012/04/using-using-automagically-disposes-and-rolls-back.h...</p>
+<p>http://thebuildingcoder.typepad.com/blog/2012/11/temporary-transaction-trick-touchup.html</p>
+<p>Furthermore, it will probably clarify and simplify things if you separate the different steps of your operation, instead of lumping them all into one single big iteration, e.g.:</p>
+<p>Iterate over the selection and collect the walls that need updating. Close the iteration.
+Iterate over excelWallInfo and determine the required wall types. Close the iteration.
+Open a transaction.
+Duplicate the required wall types.
+Iterate over the walls that need modifying and do the dirty deed.
+Commit the transaction.</p>
+<p>I hope this helps.</p>
+<p>Cheers,</p>
+<p>Jeremy</p>
+<p>Jeremy Tammik
+Developer Technical Services
+Autodesk Developer Network, ADN Open
+The Building Coder</p>
+<p>Tags (0)
+Add tags
+Report
+MESSAGE 4 OF 8
+fernadonoso
+Explorer fernadonoso in reply to: jeremytammik
+‎2023-05-25 09:36 AM
+I am thinking in develop a Script that change all Walls types names based in properties of the walls types, is not first time that the name of the type mentions 30cm Thickness wall and it does not match to the real thickness of the wall type, so in my script the name of the wall type will be generated taking the function (exterior, interior , etc) the material of each layer of the wall and thickness and the total wall thickness.</p>
+<p>For example InteriorWall_Concrete-100, for a one layer interior wall and 100mm thickness or</p>
+<p>ExteriorWall_Concrete-100_Bricks-100_200.</p>
+<p>My I ask why is that against best practices?</p>
+<p>With that plugging I will avoid have different naming system and I will be sure that the name of the type is matching to the real properties... sounds a crazy thing for you? or super complicated task?</p>
+<p>I will appreciate your advice 🙂</p>
+<p>Tags (0)
+Add tags
+Report
+MESSAGE 5 OF 8
+jeremy.tammik
+Autodesk jeremy.tammik in reply to: fernadonoso
+‎2023-05-25 11:04 AM
+For me as a programmer, that makes perfect sense and is perfectly feasible.</p>
+<p>However, I am not a BIM expert and cannot advise you on best practices.</p>
+<p>I would suggest that you raise that question in the generic architectural forum instead.</p>
+<p>Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
+Tags (0)
+Add tags
+Report
+MESSAGE 6 OF 8
+GaryOrrMBI
+Advocate GaryOrrMBI in reply to: fernadonoso
+‎2023-05-25 12:25 PM
+To respond to the comment made by @jeremy.tammik concerning going over to the Arch group and asking the question again... I might be able to add a bit of info for you...</p>
+<p>My primary job is Revit tech (and support) in an Architectural firm (I just do a little coding when needed to get things working the way we need them to) and I have worked as CAD/BIM Manager at a couple of firms over the many years and I can tell you:</p>
+<p>That is an excellent idea and will greatly benefit those working in the model(s).</p>
+<p>-Gary</p>
+<p>Gary J. Orr
+GaryOrrMBI (MBI Companies 2014-Current)
+aka (past user names):
+Gary_J_Orr (GOMO Stuff 2008-2014);
+OrrG (Forum Studio 2005-2008);
+Gary J. Orr (LHB Inc 2002-2005);
+Orr, Gary J. (Gossen Livingston 1997-2002)
+Tags (0)
+Add tags
+Report
+MESSAGE 7 OF 8
+TripleM-Dev.net
+Advisor TripleM-Dev.net in reply to: fernadonoso
+‎2023-05-25 02:12 PM
+Hi @jeffreybo.liu ,</p>
+<p>I can't follow the code completely some context is missing, but from what I think it does I would not recommend it.</p>
+<p>Couple of things with the code / logic:</p>
+<ol>
+<li>It tries to Duplicate a WallType X each time with a Wall Type Named Y, this fails because Wall Type Y already exists.</li>
+</ol>
+<p>You should first retrieve all walltypes and if Wall Type Y already exists it can't be recreated!</p>
+<p>Imagine creating a second walltype "EmptyName", that won't work either.</p>
+<ol>
+<li>Why create a new Walltype altogether?, it's based on it's type properties, then just rename it.</li>
+</ol>
+<p>do check if the name already exists, .... what action to take if it already exist??</p>
+<ol>
+<li>
+<p>Level, what does this have to do with the Type name of a wall, from what I see the Level is stripped from the new name, so 2 walls with identical types but on different levels would have different names (?) in the ExcelWallInfo but would be renamed identicall, again each name can only exist once in project.</p>
+</li>
+<li>
+<p>The ExcelWallInfo list, how is this built, seems it doesn't take the layers, thickness, interior into account</p>
+</li>
+<li>
+<p>Model Groups; walls in groups can't have their walltype changed by API etc...</p>
+</li>
+<li>
+<p>Can't read the code clearly, (use the forums Code insert button), looks that the commit happens each iteration of the selected walls, call the Commit after all walls are processed.</p>
+</li>
+<li>
+<p>If all this could be corrected you would end up with a lot of WallTypes....and what about the description or other text fields?</p>
+</li>
+</ol>
+<p>If I would need to force a naming structure just iterate the WallTypes in the project and base it's name on the properties as total width (as in you're other post), with maybe a translation dictionary if certain materials(names) are used in layers.</p>
+<p>This is one of the fundamental things we all want to do at some point: reduce what a type is to a string value of the main things that define it. The idea works fine until there is a certain minor detail which distinguishes two types. In the end human beings use Revit models not robots. So there is only a certain extent to which you can codify such things and it still be readable and fit on screen where it is read. What features are most important to represent and in which order, that is always the endless discussion.</p>
+<p>Regarding original post from 2014 by others the issue is likely related to:</p>
+<ul>
+<li>Name cannot contain any of the following characters:
+<br/>(:01:&lt;&gt; ?'~
+or any of the non-printable characters.</li>
+</ul>
+<p>/Users/jta/a/doc/revit/tbc/git/a/img/invalid_symbol_characters.png
+Pixel Height: 203
+Pixel Width: 357</p>
+<p>They are also using the name from GetType rather than Revit parameter value or API property i.e. not using something written specifically for RevitAPI but instead depending on a general programming feature (things inherited from object).</p>
+<pre class="prettyprint">
+
+</pre>
