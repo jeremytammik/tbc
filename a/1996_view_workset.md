@@ -110,8 +110,6 @@ Visit the [release page](https://github.com/jeremytammik/RevitLookup/releases) t
 
 ####<a name="5"></a> Modify View Workset Editable
 
-explanation by RPT and solution by Jonas Hoyer
-
 A nice explanation and succinct solution
 by Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
 and [Jonas Hoyer](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/8174024)
@@ -168,7 +166,7 @@ Many thanks to Richard and Jonas for the explanation and solution!
 
 ####<a name="6"></a> Selection SetReferences
 
-FYI, a quick pointer to a relatively new API method enabling sub-element highlighting:
+Since we have not mentioned it before, here is a quick heads-up to a relatively new API method enabling sub-element highlighting:
 
 **Question:** After retrieving an element in a linked file via `PickObjects` with a 'LinkedElement' 'ObjectType', how can I highlight the linked element selected in the current view to achieve the effect of using the TAB key to select the linked element in the UI?
 

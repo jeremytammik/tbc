@@ -102,7 +102,6 @@ so, please share your feedback on the new release in the
 </ul>
 <p>Visit the <a href="https://github.com/jeremytammik/RevitLookup/releases">release page</a> to download them.</p>
 <h4><a name="5"></a> Modify View Workset Editable</h4>
-<p>explanation by RPT and solution by Jonas Hoyer</p>
 <p>A nice explanation and succinct solution
 by Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
 and <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/8174024">Jonas Hoyer</a>
@@ -142,7 +141,7 @@ That will set the editable status to yes.
 Hope this helps!</p>
 <p>Many thanks to Richard and Jonas for the explanation and solution!</p>
 <h4><a name="6"></a> Selection SetReferences</h4>
-<p>FYI, a quick pointer to a relatively new API method enabling sub-element highlighting:</p>
+<p>Since we have not mentioned it before, here is a quick heads-up to a relatively new API method enabling sub-element highlighting:</p>
 <p><strong>Question:</strong> After retrieving an element in a linked file via <code>PickObjects</code> with a 'LinkedElement' 'ObjectType', how can I highlight the linked element selected in the current view to achieve the effect of using the TAB key to select the linked element in the UI?</p>
 <p><strong>Answer:</strong> Since Revit 2023, you can use the Selection <a href="https://www.revitapidocs.com/2023/813a9d31-bc4f-1ebc-9a7b-69a2a99d22ac.htm"><code>SetReferences</code> method</a> to highlight the references passed in to it.
 A reference can be an element or a subelement in the host or a linked document.</p>
