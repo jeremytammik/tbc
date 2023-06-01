@@ -58,25 +58,19 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> Forma Sustainability Flyer
 
-AU 2022 introduced [Forma for AEC](https://thebuildingcoder.typepad.com/blog/2022/09/aps-au-and-miter-wall-join-for-full-face.html#3)
+AU 2022 introduced [Forma for AEC](https://thebuildingcoder.typepad.com/blog/2022/09/aps-au-and-miter-wall-join-for-full-face.html#3 without
+gping into much detail.
+More detail is added by
+the [Forma sustainability flyer](/Users/jta/a/doc/revit/tbc/git/a/zip/forma_sustainability_flyer.pdf):
 
+> [Design a Better Future with Forma’s Suite of Sustainability Solutions](https://blogs.autodesk.com/forma/2023/05/08/sustainability-solutions):
 
-Design a Better Future with Forma’s Suite of Sustainability Solutions
-https://blogs.autodesk.com/forma/2023/05/08/sustainability-solutions/
+> Cities consume more than two-thirds of the world’s energy and account for over 70% of global carbon emissions
+([source](https://unfccc.int/news/urban-climate-action-is-crucial-to-bend-the-emissions-curve#:~:text=Cities%20consume%20over%20two%2Dthirds,Asia%20and%20Sub%2DSaharan%20Africa)).
+This means architects, real estate developers, and urban planners have an exceptional opportunity to mitigate the environmental impact of our cities by designing buildings and communities with sustainable outcomes in mind.
 
-Cities consume more than two-thirds of the world’s energy and account for over 70% of global carbon emissions*. This means architects, real estate developers, and urban planners have an exceptional opportunity to mitigate the environmental impact of our cities by designing buildings and communities with sustainable outcomes in mind.
-
-Sustainable outcomes are best achieved through a proactive, data-driven approach that starts at the earliest stages of design before it becomes costly and difficult to make changes. Autodesk Forma’s powerful suite of real-time analyses equips design teams with the quick, visual insights needed to prioritize sustainability from day one of a project.
-
-
-https://blogs.autodesk.com/forma/wp-content/uploads/sites/163/UPDATED_Forma-Sustainability-Flyer.pdf
-
-/Users/jta/a/doc/revit/tbc/git/a/zip/forma_sustainability_flyer.pdf
-
-UPDATED_Forma-Sustainability-Flyer
-*Source: https://unfccc.int/news/urban-climate-action-is-crucial-to-bend-the-emissions-curve#:~:text=Cities%20consume%20over%20two%2Dthirds,Asia%20and%20Sub%2DSaharan%20Africa.
-
-
+> Sustainable outcomes are best achieved through a proactive, data-driven approach that starts at the earliest stages of design before it becomes costly and difficult to make changes.
+Autodesk Forma’s powerful suite of real-time analyses equips design teams with the quick, visual insights needed to prioritize sustainability from day one of a project.
 
 ####<a name="2"></a> RevitLookup Enhanced Member Support Optiobs
 
