@@ -266,7 +266,7 @@ Furthermore, it will probably clarify and simplify things if you separate the di
 
 I sometimes see a name of the type that mentions 30cm Thickness and does not match the real thickness of the wall type, so my script should generate the wall type name based on the function (exterior, interior , etc.), the material of each layer of the wall and thickness and the total wall thickness.
 
-For example `InteriorWall_Concrete-100` for a one layer interior wall and 100mm thickness, or
+For example `InteriorWall_Concrete-100` for a one layer interior wall and 100mm thickness, or, more complex,
 
 - ExteriorWall_Concrete-100_Bricks-100_200
 
