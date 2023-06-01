@@ -91,7 +91,7 @@ We still need to discuss which options should be enabled by default;
 so, please share your feedback on the new release in the
 [RevitLookup GitHub repository](https://github.com/jeremytammik/RevitLookup).
 
-####<a name="4"></a> RevitLookup Previous Release
+####<a name="4"></a> RevitLookup Supports Previous Releases
 
 The new release has 10 assets and thus supports previous releases of Revit all the way back to Revit 2021:
 
