@@ -5,6 +5,10 @@
 <p></head></p>
 <!---
 
+Design a Better Future with Forma’s Suite of Sustainability Solutions
+https://blogs.autodesk.com/forma/2023/05/08/sustainability-solutions/
+
+
 - View's Workset Editable - Change from No to Yes with the API?
   https://forums.autodesk.com/t5/revit-api-forum/view-s-workset-editable-change-from-no-to-yes-with-the-api/m-p/11997681#M71740
   [Q] Can anyone tell me if it's possible to change a view's workset status from "No" to "Yes" (editable) using the Revit API (Revit 2023 or earlier). See image blow.
@@ -50,7 +54,54 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3></h3>
-<h4><a name="2"></a> Modify View Workset Editable</h4>
+<h4><a name="2"></a> Forma Sustainability Flyer</h4>
+<p>AU 2022 introduced <a href="https://thebuildingcoder.typepad.com/blog/2022/09/aps-au-and-miter-wall-join-for-full-face.html#3">Forma for AEC</a>.
+Now, its vision is explained further by
+the <a href="/Users/jta/a/doc/revit/tbc/git/a/zip/forma_sustainability_flyer.pdf">Forma sustainability flyer</a>:</p>
+<blockquote>
+<p><a href="https://blogs.autodesk.com/forma/2023/05/08/sustainability-solutions">Design a Better Future with Forma’s Suite of Sustainability Solutions</a>:</p>
+<p>Cities consume more than two-thirds of the world’s energy and account for over 70% of global carbon emissions
+(<a href="https://unfccc.int/news/urban-climate-action-is-crucial-to-bend-the-emissions-curve#:~:text=Cities%20consume%20over%20two%2Dthirds,Asia%20and%20Sub%2DSaharan%20Africa">source</a>).
+This means architects, real estate developers, and urban planners have an exceptional opportunity to mitigate the environmental impact of our cities by designing buildings and communities with sustainable outcomes in mind.</p>
+<p>Sustainable outcomes are best achieved through a proactive, data-driven approach that starts at the earliest stages of design before it becomes costly and difficult to make changes.
+Autodesk Forma’s powerful suite of real-time analyses equips design teams with the quick, visual insights needed to prioritize sustainability from day one of a project.</p>
+</blockquote>
+<h4><a name="3"></a> RevitLookup 2024.0.6</h4>
+<p><a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.6">RevitLookup 2024.0.6</a> bring
+a wealth of new and enhanced functionality:</p>
+<ul>
+<li>User interface Icons &ndash; a collection of new icons for properties, methods, fields, and events, ensuring a visually appealing representation &ndash; <a href="https://github-production-user-asset-6210df.s3.amazonaws.com/20504884/242402267-ffbba475-e240-4928-bf02-68d8f75cbc4c.png">image</a></li>
+<li>Enhanced Performance with Separate UI Thread &ndash; the RevitLookup user interface now operates in a dedicated thread, independent of Revit's workload. This architectural improvement significantly enhances smoothness and responsiveness.</li>
+<li>New Additional Setting Options &ndash; Introducing a range of new setting options that expand customization capabilities and provide users with greater control over the tool's behavior</li>
+<li>[Enhanced Member Support Optios <a href="https://github.com/jeremytammik/RevitLookup/pull/168">#168</a><ul>
+<li>Class fields &ndash; support for displaying class fields, enabling a comprehensive understanding of the class structure &ndash;
+<a href="https://github-production-user-asset-6210df.s3.amazonaws.com/20504884/242403456-a4304fd4-4537-4bd2-8d90-88f46137a55a.png">image</a></li>
+<li>Class events &ndash; support for displaying class events, facilitating better comprehension of event-driven programming within the class &ndash; <a href="https://github-production-user-asset-6210df.s3.amazonaws.com/20504884/242403960-3b7ae347-e7bc-4642-89a0-99cd089f0abe.png">image</a></li>
+<li>Class private members &ndash; ability to visualize and access class private fields, properties, methods, and events, providing a complete overview of the class implementation &ndash; <a href="https://github-production-user-asset-6210df.s3.amazonaws.com/20504884/242406752-4c6e4459-cf2f-4d35-9b03-fe0b259b3c9a.png">image</a></li>
+</ul>
+</li>
+<li>ElementId Redirection to Category &ndash; automatically redirect <code>ElementId</code> to <code>Category</code>, whenever applicable. This simplifies navigation and enhances the user experience</li>
+<li>Content Virtualization &ndash; applied content virtualization to the dashboard and settings page, optimizing performance by efficiently managing large amounts of data and dynamically loading content as needed. This results in a smoother and more efficient user interaction</li>
+</ul>
+<p>We need to discuss which options should be enabled by default
+in theory, we could do a release) and then do a survey
+Let's maybe gather feedback on the new release and then release the poll on GitHub</p>
+<h4><a name="4"></a> RevitLookup Previous Release</h4>
+<p>The new release has 10 assets and thus supports previous releases of Revit all the way back to Revit 2021:</p>
+<ul>
+<li>RevitLookup-2021.2.6-MultiUser.msi</li>
+<li>RevitLookup-2021.2.6-SingleUser.msi</li>
+<li>RevitLookup-2022.2.6-MultiUser.msi</li>
+<li>RevitLookup-2022.2.6-SingleUser.msi</li>
+<li>RevitLookup-2023.2.6-MultiUser.msi</li>
+<li>RevitLookup-2023.2.6-SingleUser.msi</li>
+<li>RevitLookup-2024.0.6-MultiUser.msi</li>
+<li>RevitLookup-2024.0.6-SingleUser.msi</li>
+<li>Source code (zip)</li>
+<li>Source code (tar.gz)</li>
+</ul>
+<p>Visit the <a href="https://github.com/jeremytammik/RevitLookup/releases">release page</a> to download them.</p>
+<h4><a name="5"></a> Modify View Workset Editable</h4>
 <p>explanation by RPT and solution by Jonas Hoyer</p>
 <p>A nice explanation and succinct solution
 by Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
@@ -90,9 +141,8 @@ Then, you can construct a <code>WorksetId</code> with the returned integer and u
 That will set the editable status to yes.
 Hope this helps!</p>
 <p>Many thanks to Richard and Jonas for the explanation and solution!</p>
-<h4><a name="3"></a> Selection SetReferences</h4>
-<p>FYI, a quick pointer to the relatively
-new :</p>
+<h4><a name="6"></a> Selection SetReferences</h4>
+<p>FYI, a quick pointer to a relatively new API method enabling sub-element highlighting:</p>
 <p><strong>Question:</strong> After retrieving an element in a linked file via <code>PickObjects</code> with a 'LinkedElement' 'ObjectType', how can I highlight the linked element selected in the current view to achieve the effect of using the TAB key to select the linked element in the UI?</p>
 <p><strong>Answer:</strong> Since Revit 2023, you can use the Selection <a href="https://www.revitapidocs.com/2023/813a9d31-bc4f-1ebc-9a7b-69a2a99d22ac.htm"><code>SetReferences</code> method</a> to highlight the references passed in to it.
 A reference can be an element or a subelement in the host or a linked document.</p>
@@ -101,207 +151,147 @@ A reference can be an element or a subelement in the host or a linked document.<
 have <a href="https://www.revitapidocs.com/2023/813a9d31-bc4f-1ebc-9a7b-69a2a99d22ac.htm">SetElementIds</a>.
 That only enables you to select top-level elements in the host document.
 I am not aware of any other way to select an element from another document in pre-2023 Revit.</p>
-<h4><a name="4"></a> WallType Naming Best Practices</h4>
-<p>https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-change-the-walltype-name-through-api/m-p/11990210</p>
-<p>Is it possible to change the walltype name through API?
-I am trying to change the WallType for all walls in the selection.</p>
-<p>I am trying to implement it in the following way:</p>
-<pre class="prettyprint">
+<h4><a name="7"></a> WallType Naming Best Practices</h4>
+<p>A discussion on best practices naming <code>WallType</code> elements in the thread
+asking <a href="https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-change-the-walltype-name-through-api/m-p/11990210">is it possible to change the <code>WallType</code> name through API?</a></p>
+<!---
 
+**Question:** Is this possible?
+I am trying to change the WallType for all walls in the selection like this:
+
+<pre class="prettyprint">
 Selection selection = uidoc.Selection;
 ElementSet collection = selection.Elements;
 
-List<WallType> type=new List<Walltype>();
+List&lt;WallType&Gt;§ type=new List&lt;Walltype&Gt;§();
 
 int index =0;
-
-
-
 Transaction trans = new Transaction(doc);
-                trans.Start("Wall Type");
-                foreach (Element collectedElem in collection)
-                {
+trans.Start("Wall Type");
+foreach (Element collectedElem in collection)
+{
+  if (collectedElem.GetType().Name == "Wall")
+  {
+    Wall wall = null;
+    wall = (Wall) collectedElem;
 
-if (collectedElem.GetType().Name == "Wall")
-                    {
-                        Wall wall = null;
-                        wall = (Wall)collectedElem;
+    string wallValue = collectedElem.Name.ToUpper()
+      + ":" + collectedElem.Level.Name;
 
-                      string wallValue = collectedElem.Name.ToUpper() + ":" + collectedElem.Level.Name;
+    // excelWallInfo is a string list loaded from external excel file.
+    // Each entry is in the format WalltypeName+":"+Level+":"+NewName
 
+    foreach (string entry in excelWallInfo)
+    {
+      if (entry.Contains(wallValue) == true)
+      {
+        string[] entryElements = entry.Split(':');
+        string newWallTypeName = entryElements[2];
+        if (newWallTypeName == "None" || newWallTypeName == null)
+        {
+          newWallTypeName = "EmptyName";
+        }
 
+        type.Add((WallType)wall.WallType.Duplicate(newWallTypeName)); //This line has problem in the second iteration.
 
-//excelWallInfo is a string list loaded from external excel file. Each entry is in the format WalltypeName+":"+Level+":"+NewName
+        TaskDialog.Show("Duplicated Element Type", type[index].Name);
+          wall.WallType = type[index];
+          ++index;
+      }
+    }
+  }
+  trans.Commit();
+}
+</pre>
 
-                    foreach (string entry in excelWallInfo)
-                        {
-                            if (entry.Contains(wallValue) == true)
-                            {
+The above code stopped in the second iteration.
+The first change is successful.
+However, the second iteration throws an exception.
 
-                                string[] entryElements = entry.Split(':');
-                                string newWallTypeName = entryElements[2];
-                                if (newWallTypeName == "None" || newWallTypeName == null)
-                                {
-                                    newWallTypeName = "EmptyName";
-                                }
+I don't just want to change the WallType.Name, since it will change the name of all walls of the same type.
+I am trying to give each wall a new name.
 
+**Answer:** I see several issues with your code.
+Before addressing those, though, are you absolutely sure that you know what you are doing?
+What you are trying to achieve sounds rather questionable to me.
+Do you have an in-depth understanding of the underlying Revit BIM paradigm and best practices?
 
+Anyway, if you really want to achieve what you say, I have the following suggestions:
 
-                              type.Add((WallType)wall.WallType.Duplicate(newWallTypeName)); //This line has problem in the second iteration.
+I recommend [encapsulating the transaction instantiation in a C# 'using' statement](https://thebuildingcoder.typepad.com/blog/2012/04/using-using-automagically-disposes-and-rolls-back.html).
 
-                                TaskDialog.Show("Duplicated Element Type", type[index].Name);
-                                  wall.WallType = type[index];
+Furthermore, it will probably clarify and simplify things if you separate the different steps of your operation, instead of lumping them all into one single big iteration, e.g.:
 
-                                  index ++;
+- Iterate over the selection and collect the walls that need updating. Close the iteration.
+- Iterate over excelWallInfo and determine the required wall types. Close the iteration.
+- Open a transaction.
+- Duplicate the required wall types.
+- Iterate over the walls that need modifying and do the dirty deed.
+- Commit the transaction.
 
+--->
 
-
-
-                            }
-
-                        }
-
-                    }
-                    trans.Commit();
-
-                }
-
-
-</PRE>
-
-<p>The above code stopped in the second iteration. The first change is successful. However, in the second iteration. The revit software throughs it into the exception.</p>
-<p>Any help is appreciated! Thanks very much!</p>
-<p>Tags (0)
-Add tags
-Report
-7 REPLIES
-Sort:
-MESSAGE 2 OF 8
-jeffreybo.liu
-Explorer jeffreybo.liu in reply to: jeffreybo.liu
-‎2014-07-28 04:59 PM
-I am not just want to change the WallType.Name, since it will change the name of all walls of the same type. I am trying to give each wall a new name.</p>
-<p>Thank you very much!</p>
-<p>Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 8
-jeremytammik
-Autodesk jeremytammik in reply to: jeffreybo.liu
-‎2014-07-29 12:09 AM
-Dear Jeffreybo.liu,</p>
-<p>I see several issues with your code.</p>
-<p>Before addressing those, though, are you absolutely sure that you know what you are doing?</p>
-<p>Waht you are trying to achieve sounds rather questionable to me.</p>
-<p>Do you have an in depth understanding of the underlying Revit BIM paradigm and best practices?</p>
-<p>Anyway, if you really wnat to achieve what you say, I have the following suggestions:</p>
-<p>I recommend encapsulating the transaction instantiation in a C# 'using' statement:</p>
-<p>http://thebuildingcoder.typepad.com/blog/2012/04/using-using-automagically-disposes-and-rolls-back.h...</p>
-<p>http://thebuildingcoder.typepad.com/blog/2012/11/temporary-transaction-trick-touchup.html</p>
-<p>Furthermore, it will probably clarify and simplify things if you separate the different steps of your operation, instead of lumping them all into one single big iteration, e.g.:</p>
-<p>Iterate over the selection and collect the walls that need updating. Close the iteration.
-Iterate over excelWallInfo and determine the required wall types. Close the iteration.
-Open a transaction.
-Duplicate the required wall types.
-Iterate over the walls that need modifying and do the dirty deed.
-Commit the transaction.</p>
-<p>I hope this helps.</p>
-<p>Cheers,</p>
-<p>Jeremy</p>
-<p>Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder</p>
-<p>Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 8
-fernadonoso
-Explorer fernadonoso in reply to: jeremytammik
-‎2023-05-25 09:36 AM
-I am thinking in develop a Script that change all Walls types names based in properties of the walls types, is not first time that the name of the type mentions 30cm Thickness wall and it does not match to the real thickness of the wall type, so in my script the name of the wall type will be generated taking the function (exterior, interior , etc) the material of each layer of the wall and thickness and the total wall thickness.</p>
-<p>For example InteriorWall_Concrete-100, for a one layer interior wall and 100mm thickness or</p>
-<p>ExteriorWall_Concrete-100_Bricks-100_200.</p>
-<p>My I ask why is that against best practices?</p>
-<p>With that plugging I will avoid have different naming system and I will be sure that the name of the type is matching to the real properties... sounds a crazy thing for you? or super complicated task?</p>
-<p>I will appreciate your advice 🙂</p>
-<p>Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 8
-jeremy.tammik
-Autodesk jeremy.tammik in reply to: fernadonoso
-‎2023-05-25 11:04 AM
-For me as a programmer, that makes perfect sense and is perfectly feasible.</p>
-<p>However, I am not a BIM expert and cannot advise you on best practices.</p>
-<p>I would suggest that you raise that question in the generic architectural forum instead.</p>
-<p>Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 6 OF 8
-GaryOrrMBI
-Advocate GaryOrrMBI in reply to: fernadonoso
-‎2023-05-25 12:25 PM
-To respond to the comment made by @jeremy.tammik concerning going over to the Arch group and asking the question again... I might be able to add a bit of info for you...</p>
-<p>My primary job is Revit tech (and support) in an Architectural firm (I just do a little coding when needed to get things working the way we need them to) and I have worked as CAD/BIM Manager at a couple of firms over the many years and I can tell you:</p>
-<p>That is an excellent idea and will greatly benefit those working in the model(s).</p>
-<p>-Gary</p>
-<p>Gary J. Orr
-GaryOrrMBI (MBI Companies 2014-Current)
-aka (past user names):
-Gary_J_Orr (GOMO Stuff 2008-2014);
-OrrG (Forum Studio 2005-2008);
-Gary J. Orr (LHB Inc 2002-2005);
-Orr, Gary J. (Gossen Livingston 1997-2002)
-Tags (0)
-Add tags
-Report
-MESSAGE 7 OF 8
-TripleM-Dev.net
-Advisor TripleM-Dev.net in reply to: fernadonoso
-‎2023-05-25 02:12 PM
-Hi @jeffreybo.liu ,</p>
-<p>I can't follow the code completely some context is missing, but from what I think it does I would not recommend it.</p>
-<p>Couple of things with the code / logic:</p>
-<ol>
-<li>It tries to Duplicate a WallType X each time with a Wall Type Named Y, this fails because Wall Type Y already exists.</li>
-</ol>
-<p>You should first retrieve all walltypes and if Wall Type Y already exists it can't be recreated!</p>
-<p>Imagine creating a second walltype "EmptyName", that won't work either.</p>
-<ol>
-<li>Why create a new Walltype altogether?, it's based on it's type properties, then just rename it.</li>
-</ol>
-<p>do check if the name already exists, .... what action to take if it already exist??</p>
-<ol>
-<li>
-<p>Level, what does this have to do with the Type name of a wall, from what I see the Level is stripped from the new name, so 2 walls with identical types but on different levels would have different names (?) in the ExcelWallInfo but would be renamed identicall, again each name can only exist once in project.</p>
-</li>
-<li>
-<p>The ExcelWallInfo list, how is this built, seems it doesn't take the layers, thickness, interior into account</p>
-</li>
-<li>
-<p>Model Groups; walls in groups can't have their walltype changed by API etc...</p>
-</li>
-<li>
-<p>Can't read the code clearly, (use the forums Code insert button), looks that the commit happens each iteration of the selected walls, call the Commit after all walls are processed.</p>
-</li>
-<li>
-<p>If all this could be corrected you would end up with a lot of WallTypes....and what about the description or other text fields?</p>
-</li>
-</ol>
-<p>If I would need to force a naming structure just iterate the WallTypes in the project and base it's name on the properties as total width (as in you're other post), with maybe a translation dictionary if certain materials(names) are used in layers.</p>
-<p>This is one of the fundamental things we all want to do at some point: reduce what a type is to a string value of the main things that define it. The idea works fine until there is a certain minor detail which distinguishes two types. In the end human beings use Revit models not robots. So there is only a certain extent to which you can codify such things and it still be readable and fit on screen where it is read. What features are most important to represent and in which order, that is always the endless discussion.</p>
-<p>Regarding original post from 2014 by others the issue is likely related to:</p>
+<p><strong>Question:</strong> I am thinking in develop a script that changes all walls' types' names based on properties of the wall types.</p>
+<p>I sometimes see a name of the type that mentions 30cm Thickness and does not match the real thickness of the wall type, so my script should generate the wall type name based on the function (exterior, interior , etc.), the material of each layer of the wall and thickness and the total wall thickness.</p>
+<p>For example <code>InteriorWall_Concrete-100</code> for a one layer interior wall and 100mm thickness, or</p>
 <ul>
-<li>Name cannot contain any of the following characters:
-<br/>(:01:&lt;&gt; ?'~
-or any of the non-printable characters.</li>
+<li>ExteriorWall_Concrete-100_Bricks-100_200</li>
 </ul>
-<p>/Users/jta/a/doc/revit/tbc/git/a/img/invalid_symbol_characters.png
+<p>Is that against best practices?</p>
+<p>That plugin would avoid having different naming systems and ensure that the name of the type matches the real properties... sounds a crazy thing for you? or super complicated task?</p>
+<p><strong>Answer 1:</strong> For me, as a programmer, that makes perfect sense and is perfectly feasible.
+However, I am not a BIM expert and cannot advise you on best practices.
+I would suggest that you also raise that question in the generic architectural forum.</p>
+<p><strong>Answer 2:</strong> I might be able to add a bit of info for you;
+my primary job is Revit tech (and support) in an Architectural firm (I just do a little coding when needed to get things working the way we need them to) and I have worked as CAD/BIM Manager at a couple of firms over the many years and I can confirm:</p>
+<p>That is an excellent idea and will greatly benefit those working in the model(s).</p>
+<p><strong>Answer 3:</strong> This is one of the fundamental things we all want to do at some point: reduce what a type is to a string value of the main things that define it. The idea works fine until there is a certain minor detail which distinguishes two types. In the end, human beings use Revit models not robots. So there is only a certain extent to which you can codify such things and it still be readable and fit on screen where it is read. What features are most important to represent and in which order, that is always the endless discussion.</p>
+<!---
+
+Hi @jeffreybo.liu ,
+
+I can't follow the code completely some context is missing, but from what I think it does I would not recommend it.
+
+Couple of things with the code / logic:
+
+1. It tries to Duplicate a WallType X each time with a Wall Type Named Y, this fails because Wall Type Y already exists.
+
+You should first retrieve all walltypes and if Wall Type Y already exists it can't be recreated!
+
+Imagine creating a second walltype "EmptyName", that won't work either.
+
+2. Why create a new Walltype altogether?, it's based on it's type properties, then just rename it.
+
+do check if the name already exists, .... what action to take if it already exist??
+
+3. Level, what does this have to do with the Type name of a wall, from what I see the Level is stripped from the new name, so 2 walls with identical types but on different levels would have different names (?) in the ExcelWallInfo but would be renamed identicall, again each name can only exist once in project.
+
+4. The ExcelWallInfo list, how is this built, seems it doesn't take the layers, thickness, interior into account
+
+5. Model Groups; walls in groups can't have their walltype changed by API etc...
+
+6. Can't read the code clearly, (use the forums Code insert button), looks that the commit happens each iteration of the selected walls, call the Commit after all walls are processed.
+
++ If all this could be corrected you would end up with a lot of WallTypes....and what about the description or other text fields?
+
+If I would need to force a naming structure just iterate the WallTypes in the project and base it's name on the properties as total width (as in you're other post), with maybe a translation dictionary if certain materials(names) are used in layers.
+
+This is one of the fundamental things we all want to do at some point: reduce what a type is to a string value of the main things that define it. The idea works fine until there is a certain minor detail which distinguishes two types. In the end human beings use Revit models not robots. So there is only a certain extent to which you can codify such things and it still be readable and fit on screen where it is read. What features are most important to represent and in which order, that is always the endless discussion.
+
+Regarding original post from 2014 by others the issue is likely related to:
+
+- Name cannot contain any of the following characters:
+<br/>(:01:&lt;&gt; ?'~
+or any of the non-printable characters.
+
+/Users/jta/a/doc/revit/tbc/git/a/img/invalid_symbol_characters.png
 Pixel Height: 203
-Pixel Width: 357</p>
-<p>They are also using the name from GetType rather than Revit parameter value or API property i.e. not using something written specifically for RevitAPI but instead depending on a general programming feature (things inherited from object).</p>
+Pixel Width: 357
+
+They are also using the name from GetType rather than Revit parameter value or API property i.e. not using something written specifically for RevitAPI but instead depending on a general programming feature (things inherited from object).
+
 <pre class="prettyprint">
 
 </pre>
+
+--->
