@@ -85,8 +85,8 @@ been released, bringing a wealth of new and enhanced functionality:
 
 - User interface Icons &ndash; a collection of new icons for properties, methods, fields, and events, ensuring a visually appealing representation &ndash; [image](https://github-production-user-asset-6210df.s3.amazonaws.com/20504884/242402267-ffbba475-e240-4928-bf02-68d8f75cbc4c.png)
 - Enhanced Performance with Separate UI Thread &ndash; the RevitLookup user interface now operates in a dedicated thread, independent of Revit's workload. This architectural improvement significantly enhances smoothness and responsiveness.
-- New Additional Setting Options &ndash; Introducing a range of new setting options that expand customization capabilities and provide users with greater control over the tool's behavior
-- [Enhanced Member Support Optios [#168](https://github.com/jeremytammik/RevitLookup/pull/168)
+- New Additional Setting Options &ndash; Introducing a range of new setting options that expand customization capabilities and provide users with greater control over the tool's behaviour
+- Enhanced Member Support Options [#168](https://github.com/jeremytammik/RevitLookup/pull/168)
     - Class fields &ndash; support for displaying class fields, enabling a comprehensive understanding of the class structure &ndash;
     [image](https://github-production-user-asset-6210df.s3.amazonaws.com/20504884/242403456-a4304fd4-4537-4bd2-8d90-88f46137a55a.png)
     - Class events &ndash; support for displaying class events, facilitating better comprehension of event-driven programming within the class &ndash; [image](https://github-production-user-asset-6210df.s3.amazonaws.com/20504884/242403960-3b7ae347-e7bc-4642-89a0-99cd089f0abe.png)
@@ -155,7 +155,7 @@ The 'Owner' column exists separately from the 'Yes/No' one because some types of
 
 Have you tried the [WorsharingUtils](https://www.revitapidocs.com/2023/ae7857a0-4e9b-f9c1-84c7-8b250af68068.htm) class for the View worksets in question?
 
-Under certain circumstances described above you will not be able to influence this 'editable/non editable' aspect via the API for a single user because it is related to how two or more people are interacting in a workshared environment e.g if someone else owns the workset then you can only ask they relinquish it.
+Under certain circumstances described above you will not be able to influence this 'editable/non editable' aspect via the API for a single user because it is related to how two or more people are interacting in a workshared environment, e.g., if someone else owns the workset then you can only ask they relinquish it.
 
 Choosing to take ownership of entire worksets is generally the old way of working before element borrowing was used.
 Mostly, people take ownership just to do infrequent things such as change workset names but that isn't applicable to View worksets.
@@ -273,7 +273,7 @@ Furthermore, it will probably clarify and simplify things if you separate the di
 
 I sometimes see a name of the type that mentions 30cm Thickness and does not match the real thickness of the wall type, so my script should generate the wall type name based on the function (exterior, interior , etc.), the material of each layer of the wall and thickness and the total wall thickness.
 
-For example `InteriorWall_Concrete-100` for a one layer interior wall and 100mm thickness, or, more complex,
+For example, `InteriorWall_Concrete-100` for a one layer interior wall and 100mm thickness, or, more complex,
 
 - ExteriorWall_Concrete-100_Bricks-100_200
 
@@ -290,7 +290,7 @@ my primary job is Revit tech (and support) in an Architectural firm (I just do a
 
 That is an excellent idea and will greatly benefit those working in the model(s).
 
-**Answer 3:** This is one of the fundamental things we all want to do at some point: reduce what a type is to a string value of the main things that define it. The idea works fine until there is a certain minor detail which distinguishes two types. In the end, human beings use Revit models not robots. So there is only a certain extent to which you can codify such things and it still be readable and fit on screen where it is read. What features are most important to represent and in which order, that is always the endless discussion.
+**Answer 3:** This is one of the fundamental things we all want to do at some point: reduce what a type is to a string value of the main things that define it. The idea works fine until there is a certain minor detail which distinguishes two types. In the end, human beings use Revit models not robots. So, there is only a certain extent to which you can codify such things and it still be readable and fit on screen where it is read. What features are most important to represent and in which order, that is always the endless discussion.
 
 
 <!---
