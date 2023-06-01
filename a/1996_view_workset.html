@@ -37,8 +37,11 @@ twitter:
 
  in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-&ndash;
-...
+Forma sustainability flyer
+&ndash; RevitLookup 2024.0.6 and support for previous releases
+&ndash; Modify view workset editable
+&ndash; Selection <code>SetReferences</code>
+&ndash; <code>WallType</code> naming best practices...
 
 linkedin:
 
@@ -54,6 +57,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Sustainability, Lookup, Sub-Elements and Wall Types</h3>
+<p>A whole bunch of exciting stuff going on:</p>
 <ul>
 <li><a href="#2">Forma sustainability flyer</a></li>
 <li><a href="#3">RevitLookup 2024.0.6</a></li>
@@ -242,7 +246,7 @@ Furthermore, it will probably clarify and simplify things if you separate the di
 <p>I sometimes see a name of the type that mentions 30cm Thickness and does not match the real thickness of the wall type, so my script should generate the wall type name based on the function (exterior, interior , etc.), the material of each layer of the wall and thickness and the total wall thickness.</p>
 <p>For example, <code>InteriorWall_Concrete-100</code> for a one layer interior wall and 100mm thickness, or, more complex,</p>
 <ul>
-<li>ExteriorWall_Concrete-100_Bricks-100_200</li>
+<li><code>ExteriorWall_Concrete-100_Bricks-100_200</code></li>
 </ul>
 <p>Is that against best practices?</p>
 <p>That plugin would avoid having different naming systems and ensure that the name of the type matches the real properties... sounds a crazy thing for you? or super complicated task?</p>

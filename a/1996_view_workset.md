@@ -38,8 +38,11 @@ twitter:
 
  in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-&ndash;
-...
+Forma sustainability flyer
+&ndash; RevitLookup 2024.0.6 and support for previous releases
+&ndash; Modify view workset editable
+&ndash; Selection <code>SetReferences</code>
+&ndash; <code>WallType</code> naming best practices...
 
 linkedin:
 
@@ -55,6 +58,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 ### Sustainability, Lookup, Sub-Elements and Wall Types
+
+A whole bunch of exciting stuff going on:
 
 - [Forma sustainability flyer](#2)
 - [RevitLookup 2024.0.6](#3)
@@ -275,7 +280,7 @@ I sometimes see a name of the type that mentions 30cm Thickness and does not mat
 
 For example, `InteriorWall_Concrete-100` for a one layer interior wall and 100mm thickness, or, more complex,
 
-- ExteriorWall_Concrete-100_Bricks-100_200
+- `ExteriorWall_Concrete-100_Bricks-100_200`
 
 Is that against best practices?
 
