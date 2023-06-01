@@ -59,8 +59,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ####<a name="2"></a> Forma Sustainability Flyer
 
 AU 2022 introduced [Forma for AEC](https://thebuildingcoder.typepad.com/blog/2022/09/aps-au-and-miter-wall-join-for-full-face.html#3 without
-gping into much detail.
-More detail is added by
+going into much detail.
+Some clarification of the vision is provided by
 the [Forma sustainability flyer](/Users/jta/a/doc/revit/tbc/git/a/zip/forma_sustainability_flyer.pdf):
 
 > [Design a Better Future with Forma’s Suite of Sustainability Solutions](https://blogs.autodesk.com/forma/2023/05/08/sustainability-solutions):
@@ -72,254 +72,44 @@ This means architects, real estate developers, and urban planners have an except
 > Sustainable outcomes are best achieved through a proactive, data-driven approach that starts at the earliest stages of design before it becomes costly and difficult to make changes.
 Autodesk Forma’s powerful suite of real-time analyses equips design teams with the quick, visual insights needed to prioritize sustainability from day one of a project.
 
-####<a name="2"></a> RevitLookup Enhanced Member Support Optiobs
+####<a name="3"></a> RevitLookup 2024.0.6
 
+[RevitLookup 2024.0.6](https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.6) bring
+a wealth of new and enhanced functionality:
 
-@jeremytammik We need to discuss which options should be enabled by default
+- User interface Icons &ndash; a collection of new icons for properties, methods, fields, and events, ensuring a visually appealing representation &ndash; [image](https://github-production-user-asset-6210df.s3.amazonaws.com/20504884/242402267-ffbba475-e240-4928-bf02-68d8f75cbc4c.png)
+- Enhanced Performance with Separate UI Thread &ndash; the RevitLookup user interface now operates in a dedicated thread, independent of Revit's workload. This architectural improvement significantly enhances smoothness and responsiveness.
+- New Additional Setting Options &ndash; Introducing a range of new setting options that expand customization capabilities and provide users with greater control over the tool's behavior
+- [Enhanced Member Support Optios [#168](https://github.com/jeremytammik/RevitLookup/pull/168)
+    - Class fields &ndash; support for displaying class fields, enabling a comprehensive understanding of the class structure &ndash;
+    [image](https://github-production-user-asset-6210df.s3.amazonaws.com/20504884/242403456-a4304fd4-4537-4bd2-8d90-88f46137a55a.png)
+    - Class events &ndash; support for displaying class events, facilitating better comprehension of event-driven programming within the class &ndash; [image](https://github-production-user-asset-6210df.s3.amazonaws.com/20504884/242403960-3b7ae347-e7bc-4642-89a0-99cd089f0abe.png)
+    - Class private members &ndash; ability to visualize and access class private fields, properties, methods, and events, providing a complete overview of the class implementation &ndash; [image](https://github-production-user-asset-6210df.s3.amazonaws.com/20504884/242406752-4c6e4459-cf2f-4d35-9b03-fe0b259b3c9a.png)
+- ElementId Redirection to Category &ndash; automatically redirect `ElementId` to `Category`, whenever applicable. This simplifies navigation and enhances the user experience
+- Content Virtualization &ndash; applied content virtualization to the dashboard and settings page, optimizing performance by efficiently managing large amounts of data and dynamically loading content as needed. This results in a smoother and more efficient user interaction
 
+We need to discuss which options should be enabled by default
+in theory, we could do a release) and then do a survey
+Let's maybe gather feedback on the new release and then release the poll on GitHub
 
-Enhanced member support #168
-https://github.com/jeremytammik/RevitLookup/pull/168
+####<a name="4"></a> RevitLookup Previous Release
 
-# Summary of the Pull Request
+The new release has 10 assets and thus supports previous releases of Revit all the way back to Revit 2021:
 
-**Description:**
+- RevitLookup-2021.2.6-MultiUser.msi
+- RevitLookup-2021.2.6-SingleUser.msi
+- RevitLookup-2022.2.6-MultiUser.msi
+- RevitLookup-2022.2.6-SingleUser.msi
+- RevitLookup-2023.2.6-MultiUser.msi
+- RevitLookup-2023.2.6-SingleUser.msi
+- RevitLookup-2024.0.6-MultiUser.msi
+- RevitLookup-2024.0.6-SingleUser.msi
+- Source code (zip)
+- Source code (tar.gz)
 
-Fields, events support
-![изображение](https://github.com/jeremytammik/RevitLookup/assets/20504884/ae8cdea7-ec76-4618-b72a-fbbb9361225e)
+Visit the [release page](https://github.com/jeremytammik/RevitLookup/releases) to download them.
 
-Private members support
-![изображение](https://github.com/jeremytammik/RevitLookup/assets/20504884/8f945edb-6365-4d28-89a8-b8a8d2b0e33e)
-
-Settings update
-![изображение](https://github.com/jeremytammik/RevitLookup/assets/20504884/550b593c-2039-4ec6-a665-ac0fe0e65215)
-
-## Quality Checklist
-
-- [x] My code follows the style guidelines of this project
-- [x] I have performed a self-review of my own code
-- [ ] I have made corresponding changes to the documentation
-- [x] My changes generate no new warnings
-
-
-@jeremytammik in theory, we could do a release) and then do a survey
-
-
-That sounds like an effective approach to me. Then, I can mention on the blog to please take a look and respond within a given time frame, for example. How long? Or leave it open?
-
-
-If you do a blog mention it's not obvious where users can vote) Let's maybe gather feedback on the new release and then release the poll on GitHub
-
-
-yes, better. then i'll just mention the new release and ask people to provide feedback on it.
-
-https://github.com/jeremytammik/RevitLookup/pull/169
-Release 2024.0.6 #169
-
-
-
-Cleanup
-6ef136a
-@Nice3point
-Update Nuke
-112ff8f
-@Nice3point
-Fix GetMaterialIds
-f371559
-@Nice3point
-DefinitionGroup support
-a2acf7c
-@Nice3point
-Disable Show for ElementType
-6d7e4f7
-@Nice3point
-Demo project restore
-0b0259a
-@Nice3point
-Nuke update
-3b93574
-@Nice3point
-Material area, volume support
-1a3d6b8
-@Nice3point
-Static members support
-0760578
-@Nice3point
-Update Changelog.md
-f8fdc6f
-@Nice3point
-Update nuget packages
-298f227
-@Nice3point
-Update Codeowners
-b3cd202
-@Nice3point
-FamilyInstance rooms support
-8572c8f
-@Nice3point
-Update Changelog.md
-4d8afe4
-@Nice3point
-Merge remote-tracking branch 'origin/master' into dev
-f0160ae
-@Nice3point
-Separate UI thread
-3f07edc
-@Nice3point
-CleanUp
-0658f26
-@Nice3point
-Merge branch 'dev' into dev_threads
-25f571b
-@Nice3point
-Remove debug RenderOptions
-c8f2c45
-@Nice3point
-Fix initialisation render mode
-561a2f9
-@Nice3point
-Separate thread for UI (#166)
-adc82da
-@Nice3point
-Update Build.Installer
-d3a2ce9
-@Nice3point
-Merge remote-tracking branch 'origin/dev' into dev
-1e83db1
-@Nice3point
-Fix context menu dispatcher
-a45712f
-@Nice3point
-Icons support
-610ddfe
-@Nice3point
-Icons support (#167)
-706a43c
-@Nice3point
-Merge remote-tracking branch 'origin/dev_icons' into dev
-1fb7112
-@Nice3point
-Pages virtualization
-5dc922d
-@Nice3point
-Category redirection support
-f57949c
-@Nice3point
-Rework metadata builder
-0540675
-Nice3point added 12 commits 16 hours ago
-@Nice3point
-Fields, events support
-d09cffa
-@Nice3point
-Fix R24 compability
-77297de
-@Nice3point
-Bump version
-9cd52ce
-@Nice3point
-Update Contributing.md
-84501bd
-@Nice3point
-Update Changelog.md
-9586242
-@Nice3point
-Update Changelog.md
-6473f88
-@Nice3point
-Update icon
-6336f68
-@Nice3point
-Disable transition by default
-1df9e4a
-@Nice3point
-Enhanced member support (#168)
-7667116
-@Nice3point
-Icons update
-127fb42
-@Nice3point
-Merge branch 'dev_members' into dev
-1637ada
-@Nice3point
-Update Changelog.md
-
-
-
-2024.0.6
-
-Repository: jeremytammik/RevitLookup · Tag: 2024.0.6 · Commit: 80ddf15 · Released by: github-actions[bot]
-
-Features
-
-User interface
-
-Icons
-
-Introducing a collection of new icons for properties, methods, fields, and events, ensuring a visually appealing representation
-image
-https://github-production-user-asset-6210df.s3.amazonaws.com/20504884/242402267-ffbba475-e240-4928-bf02-68d8f75cbc4c.png
-
-Enhanced Performance with Separate UI Thread
-
-The RevitLookup user interface now operates in a dedicated thread, independent of Revit's workload. This architectural improvement significantly enhances smoothness and responsiveness
-
-New Additional Setting Options
-
-Introducing a range of new setting options that expand customization capabilities and provide users with greater control over the tool's behavior
-
-Core
-
-Class fields
-
-Introducing support for displaying class fields, enabling a comprehensive understanding of the class structure
-image
-https://github-production-user-asset-6210df.s3.amazonaws.com/20504884/242403456-a4304fd4-4537-4bd2-8d90-88f46137a55a.png
-
-
-Class events
-
-Introducing support for displaying class events, facilitating better comprehension of event-driven programming within the class
-image
-https://github-production-user-asset-6210df.s3.amazonaws.com/20504884/242403960-3b7ae347-e7bc-4642-89a0-99cd089f0abe.png
-
-Class private members
-
-Empowering developers with the ability to visualize and access class private fields, properties, methods, and events, providing a complete overview of the class implementation
-image
-https://github-production-user-asset-6210df.s3.amazonaws.com/20504884/242406752-4c6e4459-cf2f-4d35-9b03-fe0b259b3c9a.png
-
-Improvements
-
-ElementId Redirection to Category
-
-Implemented a helpful feature that automatically redirects ElementId to Category, whenever applicable. This simplifies navigation and enhances the user experience
-
-Content Virtualization
-
-Applied content virtualization to the dashboard and settings page, optimizing performance by efficiently managing large amounts of data and dynamically loading content as needed. This results in a smoother and more efficient user interaction
-
-—
-This release has 10 assets:
-
-RevitLookup-2021.2.6-MultiUser.msi
-RevitLookup-2021.2.6-SingleUser.msi
-RevitLookup-2022.2.6-MultiUser.msi
-RevitLookup-2022.2.6-SingleUser.msi
-RevitLookup-2023.2.6-MultiUser.msi
-RevitLookup-2023.2.6-SingleUser.msi
-RevitLookup-2024.0.6-MultiUser.msi
-RevitLookup-2024.0.6-SingleUser.msi
-Source code (zip)
-Source code (tar.gz)
-Visit the release page to download them.
-
-https://github.com/jeremytammik/RevitLookup/releases
-
-
-
-
-####<a name="2"></a> Modify View Workset Editable
+####<a name="5"></a> Modify View Workset Editable
 
 explanation by RPT and solution by Jonas Hoyer
 
@@ -377,7 +167,7 @@ Hope this helps!
 
 Many thanks to Richard and Jonas for the explanation and solution!
 
-####<a name="3"></a> Selection SetReferences
+####<a name="6"></a> Selection SetReferences
 
 FYI, a quick pointer to a relatively new API method enabling sub-element highlighting:
 
@@ -393,7 +183,7 @@ have [SetElementIds](https://www.revitapidocs.com/2023/813a9d31-bc4f-1ebc-9a7b-6
 That only enables you to select top-level elements in the host document.
 I am not aware of any other way to select an element from another document in pre-2023 Revit.
 
-####<a name="4"></a> WallType Naming Best Practices
+####<a name="7"></a> WallType Naming Best Practices
 
 A discussion on best practices naming `WallType` elements in the thread
 asking [is it possible to change the `WallType` name through API?](https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-change-the-walltype-name-through-api/m-p/11990210)
