@@ -56,6 +56,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ###
 
+- [Forma sustainability flyer](#2)
+- [RevitLookup 2024.0.6](#3)
+- [RevitLookup supports previous releases](#4)
+- [Modify view workset editable](#5)
+- [Selection `SetReferences`](#6)
+- [`WallType` naming best practices](#7)
+
 ####<a name="2"></a> Forma Sustainability Flyer
 
 AU 2022 introduced [Forma for AEC](https://thebuildingcoder.typepad.com/blog/2022/09/aps-au-and-miter-wall-join-for-full-face.html#3).
