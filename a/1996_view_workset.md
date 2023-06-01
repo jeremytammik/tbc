@@ -399,166 +399,109 @@ I am not aware of any other way to select an element from another document in pr
 
 ####<a name="4"></a> WallType Naming Best Practices
 
-https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-change-the-walltype-name-through-api/m-p/11990210
+Several developers contributed suggestions on best practices naming `WallType` elements in the thread
+asking [is it possible to change the `WallType` name through API?](https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-change-the-walltype-name-through-api/m-p/11990210)
 
-Is it possible to change the walltype name through API?
-I am trying to change the WallType for all walls in the selection.
+<!---
 
-I am trying to implement it in the following way:
+**Question:** Is this possible?
+I am trying to change the WallType for all walls in the selection like this:
 
 <pre class="prettyprint">
-  Selection selection = uidoc.Selection;
-  ElementSet collection = selection.Elements;
+Selection selection = uidoc.Selection;
+ElementSet collection = selection.Elements;
 
-  List&lt;WallType&Gt;§ type=new List&lt;Walltype&Gt;§();
+List&lt;WallType&Gt;§ type=new List&lt;Walltype&Gt;§();
 
-  int index =0;
-  Transaction trans = new Transaction(doc);
-  trans.Start("Wall Type");
-  foreach (Element collectedElem in collection)
+int index =0;
+Transaction trans = new Transaction(doc);
+trans.Start("Wall Type");
+foreach (Element collectedElem in collection)
+{
+  if (collectedElem.GetType().Name == "Wall")
   {
-    if (collectedElem.GetType().Name == "Wall")
-    {
-      Wall wall = null;
-      wall = (Wall)collectedElem;
+    Wall wall = null;
+    wall = (Wall) collectedElem;
 
-      string wallValue = collectedElem.Name.ToUpper() + ":" + collectedElem.Level.Name;
+    string wallValue = collectedElem.Name.ToUpper()
+      + ":" + collectedElem.Level.Name;
 
     // excelWallInfo is a string list loaded from external excel file.
     // Each entry is in the format WalltypeName+":"+Level+":"+NewName
 
     foreach (string entry in excelWallInfo)
+    {
+      if (entry.Contains(wallValue) == true)
       {
-        if (entry.Contains(wallValue) == true)
+        string[] entryElements = entry.Split(':');
+        string newWallTypeName = entryElements[2];
+        if (newWallTypeName == "None" || newWallTypeName == null)
         {
-          string[] entryElements = entry.Split(':');
-          string newWallTypeName = entryElements[2];
-          if (newWallTypeName == "None" || newWallTypeName == null)
-          {
-            newWallTypeName = "EmptyName";
-          }
-
-          type.Add((WallType)wall.WallType.Duplicate(newWallTypeName)); //This line has problem in the second iteration.
-
-          TaskDialog.Show("Duplicated Element Type", type[index].Name);
-            wall.WallType = type[index];
-            ++index;
+          newWallTypeName = "EmptyName";
         }
+
+        type.Add((WallType)wall.WallType.Duplicate(newWallTypeName)); //This line has problem in the second iteration.
+
+        TaskDialog.Show("Duplicated Element Type", type[index].Name);
+          wall.WallType = type[index];
+          ++index;
       }
     }
-    trans.Commit();
   }
+  trans.Commit();
+}
 </pre>
 
-The above code stopped in the second iteration. The first change is successful. However, in the second iteration. The revit software throughs it into the exception.
+The above code stopped in the second iteration.
+The first change is successful.
+However, the second iteration throws an exception.
 
-Any help is appreciated! Thanks very much!
+I don't just want to change the WallType.Name, since it will change the name of all walls of the same type.
+I am trying to give each wall a new name.
 
-jeffreybo.liu
-2014-07-28 04:59 PM
-
-I am not just want to change the WallType.Name, since it will change the name of all walls of the same type. I am trying to give each wall a new name.
-
-Thank you very much!
-
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 8
-jeremytammik
-Autodesk jeremytammik in reply to: jeffreybo.liu
-2014-07-29 12:09 AM
-Dear Jeffreybo.liu,
-
-I see several issues with your code.
-
+**Answer:** I see several issues with your code.
 Before addressing those, though, are you absolutely sure that you know what you are doing?
+What you are trying to achieve sounds rather questionable to me.
+Do you have an in-depth understanding of the underlying Revit BIM paradigm and best practices?
 
-Waht you are trying to achieve sounds rather questionable to me.
+Anyway, if you really want to achieve what you say, I have the following suggestions:
 
-Do you have an in depth understanding of the underlying Revit BIM paradigm and best practices?
-
-Anyway, if you really wnat to achieve what you say, I have the following suggestions:
-
-I recommend encapsulating the transaction instantiation in a C# 'using' statement:
-
-http://thebuildingcoder.typepad.com/blog/2012/04/using-using-automagically-disposes-and-rolls-back.h...
-
-http://thebuildingcoder.typepad.com/blog/2012/11/temporary-transaction-trick-touchup.html
+I recommend [encapsulating the transaction instantiation in a C# 'using' statement](https://thebuildingcoder.typepad.com/blog/2012/04/using-using-automagically-disposes-and-rolls-back.html).
 
 Furthermore, it will probably clarify and simplify things if you separate the different steps of your operation, instead of lumping them all into one single big iteration, e.g.:
 
-Iterate over the selection and collect the walls that need updating. Close the iteration.
-Iterate over excelWallInfo and determine the required wall types. Close the iteration.
-Open a transaction.
-Duplicate the required wall types.
-Iterate over the walls that need modifying and do the dirty deed.
-Commit the transaction.
+- Iterate over the selection and collect the walls that need updating. Close the iteration.
+- Iterate over excelWallInfo and determine the required wall types. Close the iteration.
+- Open a transaction.
+- Duplicate the required wall types.
+- Iterate over the walls that need modifying and do the dirty deed.
+- Commit the transaction.
 
-I hope this helps.
+--->
 
-Cheers,
+**Question:** I am thinking in develop a script that changes all walls' types' names based on properties of the wall types.
 
-Jeremy
+I sometimes see a name of the type that mentions 30cm Thickness and does not match the real thickness of the wall type, so my script should generate the wall type name based on the function (exterior, interior , etc.), the material of each layer of the wall and thickness and the total wall thickness.
 
-fernadonoso
-2023-05-25 09:36 AM
+For example `InteriorWall_Concrete-100` for a one layer interior wall and 100mm thickness, or
 
-I am thinking in develop a Script that change all Walls types names based in properties of the walls types, is not first time that the name of the type mentions 30cm Thickness wall and it does not match to the real thickness of the wall type, so in my script the name of the wall type will be generated taking the function (exterior, interior , etc) the material of each layer of the wall and thickness and the total wall thickness.
+- ExteriorWall_Concrete-100_Bricks-100_200
 
-For example InteriorWall_Concrete-100, for a one layer interior wall and 100mm thickness or
+Is that against best practices?
 
-ExteriorWall_Concrete-100_Bricks-100_200.
+That plugin would avoid having different naming systems and ensure that the name of the type matches the real properties... sounds a crazy thing for you? or super complicated task?
 
-My I ask why is that against best practices?
-
-With that plugging I will avoid have different naming system and I will be sure that the name of the type is matching to the real properties... sounds a crazy thing for you? or super complicated task?
-
-I will appreciate your advice 🙂
-
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 8
-jeremy.tammik
-Autodesk jeremy.tammik in reply to: fernadonoso
-2023-05-25 11:04 AM
-For me as a programmer, that makes perfect sense and is perfectly feasible.
-
+**Answer 1:** For me, as a programmer, that makes perfect sense and is perfectly feasible.
 However, I am not a BIM expert and cannot advise you on best practices.
+I would suggest that you also raise that question in the generic architectural forum.
 
-I would suggest that you raise that question in the generic architectural forum instead.
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 6 OF 8
-GaryOrrMBI
-Advocate GaryOrrMBI in reply to: fernadonoso
-2023-05-25 12:25 PM
-To respond to the comment made by @jeremy.tammik concerning going over to the Arch group and asking the question again... I might be able to add a bit of info for you...
-
-My primary job is Revit tech (and support) in an Architectural firm (I just do a little coding when needed to get things working the way we need them to) and I have worked as CAD/BIM Manager at a couple of firms over the many years and I can tell you:
+**Answer 2:** I might be able to add a bit of info for you;
+my primary job is Revit tech (and support) in an Architectural firm (I just do a little coding when needed to get things working the way we need them to) and I have worked as CAD/BIM Manager at a couple of firms over the many years and I can confirm:
 
 That is an excellent idea and will greatly benefit those working in the model(s).
 
--Gary
+<!---
 
-Gary J. Orr
-GaryOrrMBI (MBI Companies 2014-Current)
-aka (past user names):
-Gary_J_Orr (GOMO Stuff 2008-2014);
-OrrG (Forum Studio 2005-2008);
-Gary J. Orr (LHB Inc 2002-2005);
-Orr, Gary J. (Gossen Livingston 1997-2002)
-Tags (0)
-Add tags
-Report
-MESSAGE 7 OF 8
-TripleM-Dev.net
-Advisor TripleM-Dev.net in reply to: fernadonoso
-2023-05-25 02:12 PM
 Hi @jeffreybo.liu ,
 
 I can't follow the code completely some context is missing, but from what I think it does I would not recommend it.
@@ -605,3 +548,4 @@ They are also using the name from GetType rather than Revit parameter value or A
 
 </pre>
 
+--->
