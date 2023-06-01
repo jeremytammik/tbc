@@ -87,9 +87,9 @@ been released, bringing a wealth of new and enhanced functionality:
 - ElementId Redirection to Category &ndash; automatically redirect `ElementId` to `Category`, whenever applicable. This simplifies navigation and enhances the user experience
 - Content Virtualization &ndash; applied content virtualization to the dashboard and settings page, optimizing performance by efficiently managing large amounts of data and dynamically loading content as needed. This results in a smoother and more efficient user interaction
 
-We need to discuss which options should be enabled by default
-in theory, we could do a release) and then do a survey
-Let's maybe gather feedback on the new release and then release the poll on GitHub
+We still need to discuss which options should be enabled by default;
+so, please share your feedback on the new release in the
+[RevitLookup GitHub repository](https://github.com/jeremytammik/RevitLookup).
 
 ####<a name="4"></a> RevitLookup Previous Release
 
