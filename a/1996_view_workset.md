@@ -58,6 +58,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> Forma Sustainability Flyer
 
+AU 2022 introduced [Forma for AEC](https://thebuildingcoder.typepad.com/blog/2022/09/aps-au-and-miter-wall-join-for-full-face.html#3)
+
+
 Design a Better Future with Forma’s Suite of Sustainability Solutions
 https://blogs.autodesk.com/forma/2023/05/08/sustainability-solutions/
 
@@ -382,8 +385,7 @@ Many thanks to Richard and Jonas for the explanation and solution!
 
 ####<a name="3"></a> Selection SetReferences
 
-FYI, a quick pointer to the relatively
-new :
+FYI, a quick pointer to a relatively new API method enabling sub-element highlighting:
 
 **Question:** After retrieving an element in a linked file via `PickObjects` with a 'LinkedElement' 'ObjectType', how can I highlight the linked element selected in the current view to achieve the effect of using the TAB key to select the linked element in the UI?
 
@@ -399,7 +401,7 @@ I am not aware of any other way to select an element from another document in pr
 
 ####<a name="4"></a> WallType Naming Best Practices
 
-Several developers contributed suggestions on best practices naming `WallType` elements in the thread
+A discussion on best practices naming `WallType` elements in the thread
 asking [is it possible to change the `WallType` name through API?](https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-change-the-walltype-name-through-api/m-p/11990210)
 
 <!---
@@ -499,6 +501,9 @@ I would suggest that you also raise that question in the generic architectural f
 my primary job is Revit tech (and support) in an Architectural firm (I just do a little coding when needed to get things working the way we need them to) and I have worked as CAD/BIM Manager at a couple of firms over the many years and I can confirm:
 
 That is an excellent idea and will greatly benefit those working in the model(s).
+
+**Answer 3:** This is one of the fundamental things we all want to do at some point: reduce what a type is to a string value of the main things that define it. The idea works fine until there is a certain minor detail which distinguishes two types. In the end, human beings use Revit models not robots. So there is only a certain extent to which you can codify such things and it still be readable and fit on screen where it is read. What features are most important to represent and in which order, that is always the endless discussion.
+
 
 <!---
 
