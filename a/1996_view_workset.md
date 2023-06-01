@@ -73,8 +73,8 @@ Autodesk Forma’s powerful suite of real-time analyses equips design teams with
 
 ####<a name="3"></a> RevitLookup 2024.0.6
 
-[RevitLookup 2024.0.6](https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.6) bring
-a wealth of new and enhanced functionality:
+[RevitLookup 2024.0.6](https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.6) has
+been released, bringing a wealth of new and enhanced functionality:
 
 - User interface Icons &ndash; a collection of new icons for properties, methods, fields, and events, ensuring a visually appealing representation &ndash; [image](https://github-production-user-asset-6210df.s3.amazonaws.com/20504884/242402267-ffbba475-e240-4928-bf02-68d8f75cbc4c.png)
 - Enhanced Performance with Separate UI Thread &ndash; the RevitLookup user interface now operates in a dedicated thread, independent of Revit's workload. This architectural improvement significantly enhances smoothness and responsiveness.
