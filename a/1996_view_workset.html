@@ -5,30 +5,15 @@
 <p></head></p>
 <!---
 
-Design a Better Future with Forma’s Suite of Sustainability Solutions
-https://blogs.autodesk.com/forma/2023/05/08/sustainability-solutions/
-
+- Design a Better Future with Forma’s Suite of Sustainability Solutions
+  https://blogs.autodesk.com/forma/2023/05/08/sustainability-solutions/
 
 - View's Workset Editable - Change from No to Yes with the API?
   https://forums.autodesk.com/t5/revit-api-forum/view-s-workset-editable-change-from-no-to-yes-with-the-api/m-p/11997681#M71740
-  [Q] Can anyone tell me if it's possible to change a view's workset status from "No" to "Yes" (editable) using the Revit API (Revit 2023 or earlier). See image blow.
-I'm not asking to have anyone do my work for me. I just want to know if it's possible and maybe toss me a hint or two? I've searched the internet and I've found several similar posts saying it wasn't possible but they were for much older versions of Revit.
-Thanks in advance!
-view_workset_editable.jpg
-[A]
-explanation by RPT and solution by Jonas Hoyer
 
 - Selection.SetReferences
   https://autodesk.slack.com/archives/C0SR6NAP8/p1685354466881299
-  Shen Wang
-  A customer raised a Revit API question about PickObjects (ObjectType.LinkedElement).
-  After he gets the graphic element in the linked file via PickObjects(ObjectType.LinkedElement), how to make the linked graphic element selected in the current view, just like to achieve the effect of TAB button to select the linked element.
-  Martha Hirstoaga
-  Hello, since Revit 2023 you can use Autodesk.Revit.UI.Selection.SetReferences(IList<Reference> references), which  selects the given references. Reference can be an element or a subelement in the host or a linked document.
-  Shen Wang
-  If the customer is using the version less than 2023, is the above variable still available? Otherwise, does he have any other choice before 2023? Since he is still using 2020.
-  Martha Hirstoaga
-  In Revit Pre-2023, only Autodesk.Revit.UI.Selection.SetElementIds(ICollection<ElementId> elementIds) was available, being able to select only elements in the host document. I am not aware of any other way to select an element  from other document in pre-2023 Revit.
+  Shen Wang + Martha Hirstoaga
 
 - WallType naming best practices
   https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-change-the-walltype-name-through-api/m-p/11990210
@@ -44,6 +29,16 @@ Forma sustainability flyer
 &ndash; <code>WallType</code> naming best practices...
 
 linkedin:
+
+Forma sustainability, RevitLookup 2024.0.6, modifing view workset editable, highlighting subelements and best practices naming WallTypes in the #RevitAPI
+
+https://autode.sk/viewworkset
+
+- Forma sustainability flyer
+- RevitLookup 2024.0.6 and support for previous releases
+- Modify view workset editable
+- Selection <code>SetReferences</code>
+- <code>WallType</code> naming best practices...
 
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
