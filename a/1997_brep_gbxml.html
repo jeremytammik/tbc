@@ -69,8 +69,10 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>BRepBuilder, gbXML and CPython</h3>
-<h4><a name="2"></a></h4>
+<h3>BRepBuilder</h3>
+<h4><a name="2"></a> BRepBuilder Analysis, Tips and Tricks</h4>
+<h4><a name="3"></a> Modify View Workset Editable</h4>
+<h4><a name="2"></a> BRepBuilder Analysis, Tips and Tricks</h4>
 <p>Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
 and Luiz Henrique <a href="https://github.com/ricaun">@ricaun</a> Cassettari
 share some illuminating insights on using the BRepBuilder addressing
@@ -386,11 +388,59 @@ public static class TessellatedShapeCreatorUtils
 
 <p>If you are working with a Revit surface, <code>BRepBuilder</code> is the way to go.</p>
 <p>Many thanks to Richard and Luiz Henrique for the good advice, illuminating discussion and great sample code!</p>
-<h4><a name="3"></a> Modify View Workset Editable</h4>
+<h4><a name="3"></a> Change Toposurface Interior Point to Boundary</h4>
 <p>The long-standing question
-on <a href="https://forums.autodesk.com/t5/revit-api-forum/toposurface-change-interior-point-to-boundary-point/m-p/12015969">Toposurface &amp;ndash Change interior point to boundary point</a> finally
-receives a clear and succinct solution by Mitchell Currie
-of <a href="https://www.struxi.com/">Struxi</a>:</p>
-<p><strong>Question:</strong> Is there any way to change an interior point to a boundary point or vise versa using Revit's API? I want to do this so I can display the boundary of the topography I have generated correctly. I can't seem to find any resources discussing this topic.</p>
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/toposurface-change-interior-point-to-boundary-point/m-p/12015969">Toposurface &ndash; change interior point to boundary point</a> finally
+receives a clear and succinct suggestion for a solution
+by Mitchell Currie of <a href="https://www.struxi.com/">Struxi</a>:</p>
+<p><strong>Question:</strong> Is there any way to change an interior point to a boundary point or vice versa using Revit's API?
+I want to do this so I can display the boundary of the topography I have generated correctly.</p>
+<p><center>
+<img src="img/toposurface_boundary_interior_point.png" alt="Toposurface boundary and interior points" title="Toposurface boundary and interior points" width="600"/> <!-- Pixel Height: 726 Pixel Width: 1,180 -->
+</center></p>
 <p><strong>Answer:</strong> Use a subregion and hide it.</p>
 <p>Thank you for the answer!</p>
+<h4><a name="4"></a> To Code or Not to Code, That is the Question</h4>
+<p>An interesting <a href="https://twitter.com/advany/status/1664451798793584642?s=20">comparison of two programming approaches in modern times</a>
+by <a href="https://twitter.com/advany">Ab Advany</a>:</p>
+<p><center>
+<img src="img/to_code_or_not_to_code.jpg" alt="To code or not to code" title="To code or not to code" width="600"/> <!-- Pixel Height: 450 Pixel Width: 800 -->
+</center></p>
+<p>Supervised a project 2 week ago.
+Two programmers where hired to create an MVP.
+I have worked with both before:</p>
+<ul>
+<li>Alex from Germany. 100% code. 19 years experience.</li>
+<li>Hamid from Pakistan. Code + Copilot + GPT-4 + no-code. 4 years experience.</li>
+</ul>
+<p>What do you think happened?</p>
+<p>Both programmers received Figma screens and detailed specs.
+A designer was available to assist them with the assets they needed, and there was also existing code that needed to be integrated.
+Hamid finished the first version in one week with 100% test coverage of code and end-to-end testing of no-code parts.
+95% of the work seems to be finished and appears to work at first glance... 😲
+Hamid built the UI and front-end workflows in bubble, generated Cloudflare Workers using GPT-4, integrated existing code using Copilot, and generated tests using GPT-4 (playwright/ava).</p>
+<p>Hamid's costs:</p>
+<ul>
+<li>GPT-4: $211</li>
+<li>Copilot: $20</li>
+<li>Cloudflare: $5</li>
+<li>Bubble: $134</li>
+<li>Compensation: $2460 (41 hours worked)</li>
+<li>Costs to host/run: $139/mo</li>
+</ul>
+<p>Alex finished around 7% of the tasks. Costs:</p>
+<ul>
+<li>Vercel: $20</li>
+<li>Compensation: $3500</li>
+<li>Estimated to developing everything: $45k. And expects $11k for adding tests.</li>
+<li>Costs to host/run: $20/mo</li>
+</ul>
+<p>This was a project I supervised for a friend of mine with an agency.
+I only did it because I was really curious about how it would turn out.</p>
+<p>We both thought that Hamid would be finished in 8-10 weeks while Alex would take a week or two extra, but the results amazed us!</p>
+<p>He had a talk with Alex about this. His response? "But it will be so much cheaper to run this app, and you'll have everything under control." Not understanding the opportunity costs of shipping 13 times slower and 25 times more expensive to develop.</p>
+<p>Alex was let go because he wants to "code" and doesn't trust no-code/AI...</p>
+<p>The development agency of my friend has 100+ developers like Alex.
+Now he is going to retrain or replace them with developers like Hamid...</p>
+<p>I think people like Hamid will still have work five years from now, while people like Alex will have to find other jobs/professions.
+What do you think?</p>

@@ -414,12 +414,12 @@ If you are working with a Revit surface, `BRepBuilder` is the way to go.
 
 Many thanks to Richard and Luiz Henrique for the good advice, illuminating discussion and great sample code!
 
-####<a name="3"></a> Modify View Workset Editable
+####<a name="3"></a> Change Toposurface Interior Point to Boundary
 
 The long-standing question
-on [Toposurface &ndash; Change interior point to boundary point](https://forums.autodesk.com/t5/revit-api-forum/toposurface-change-interior-point-to-boundary-point/m-p/12015969) finally
-receives a clear and succinct solution by Mitchell Currie
-of [Struxi](https://www.struxi.com/):
+on [Toposurface &ndash; change interior point to boundary point](https://forums.autodesk.com/t5/revit-api-forum/toposurface-change-interior-point-to-boundary-point/m-p/12015969) finally
+receives a clear and succinct suggestion for a solution
+by Mitchell Currie of [Struxi](https://www.struxi.com/):
 
 **Question:** Is there any way to change an interior point to a boundary point or vice versa using Revit's API?
 I want to do this so I can display the boundary of the topography I have generated correctly.
@@ -431,3 +431,58 @@ I want to do this so I can display the boundary of the topography I have generat
 **Answer:** Use a subregion and hide it.
 
 Thank you for the answer!
+
+####<a name="4"></a> To Code or Not to Code, That is the Question
+
+An interesting [comparison of two programming approaches in modern times](https://twitter.com/advany/status/1664451798793584642?s=20)
+by [Ab Advany](https://twitter.com/advany):
+
+<center>
+<img src="img/to_code_or_not_to_code.jpg" alt="To code or not to code" title="To code or not to code" width="600"/> <!-- Pixel Height: 450 Pixel Width: 800 -->
+</center>
+
+Supervised a project 2 week ago.
+Two programmers where hired to create an MVP.
+I have worked with both before:
+
+- Alex from Germany. 100% code. 19 years experience.
+- Hamid from Pakistan. Code + Copilot + GPT-4 + no-code. 4 years experience.
+
+What do you think happened?
+
+Both programmers received Figma screens and detailed specs.
+A designer was available to assist them with the assets they needed, and there was also existing code that needed to be integrated.
+Hamid finished the first version in one week with 100% test coverage of code and end-to-end testing of no-code parts.
+95% of the work seems to be finished and appears to work at first glance... 😲
+Hamid built the UI and front-end workflows in bubble, generated Cloudflare Workers using GPT-4, integrated existing code using Copilot, and generated tests using GPT-4 (playwright/ava).
+
+Hamid's costs:
+
+- GPT-4: $211
+- Copilot: $20
+- Cloudflare: $5
+- Bubble: $134
+- Compensation: $2460 (41 hours worked)
+- Costs to host/run: $139/mo
+
+Alex finished around 7% of the tasks. Costs:
+
+- Vercel: $20
+- Compensation: $3500
+- Estimated to developing everything: $45k. And expects $11k for adding tests.
+- Costs to host/run: $20/mo
+
+This was a project I supervised for a friend of mine with an agency.
+I only did it because I was really curious about how it would turn out.
+
+We both thought that Hamid would be finished in 8-10 weeks while Alex would take a week or two extra, but the results amazed us!
+
+He had a talk with Alex about this. His response? "But it will be so much cheaper to run this app, and you'll have everything under control." Not understanding the opportunity costs of shipping 13 times slower and 25 times more expensive to develop.
+
+Alex was let go because he wants to "code" and doesn't trust no-code/AI...
+
+The development agency of my friend has 100+ developers like Alex.
+Now he is going to retrain or replace them with developers like Hamid...
+
+I think people like Hamid will still have work five years from now, while people like Alex will have to find other jobs/professions.
+What do you think?
