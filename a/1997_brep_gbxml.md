@@ -70,15 +70,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### BRepBuilder, gbXML and CPython
+### BRepBuilder
 
+####<a name="2"></a> BRepBuilder Analysis, Tips and Tricks
+####<a name="3"></a> Modify View Workset Editable
 
+####<a name="2"></a> BRepBuilder Analysis, Tips and Tricks
 
-####<a name="2"></a>
-
-Very illuminating insights on using the BRepBuilder from
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
-and Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari addressing
+and Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari
+share some illuminating insights on using the BRepBuilder addressing
 why [BRepBuilder fails on very simple example](https://forums.autodesk.com/t5/revit-api-forum/brepbuilder-fails-on-very-simple-example/m-p/12015942):
 
 **Question:** I get a "Failure" result on a very simple BRepBuilder example when I try to build a (4-sided triangle pyramid) Tetrahedron.
@@ -164,7 +165,6 @@ Later: I experienced the same error when try to create a simple pyramid shape as
 It isn't ideal for manual creation since (1) you need to arrange the edges so they are compatible and (2) the edges need to sit on the surface.
 
 I organised the above original into the below edge orders and directions and it worked fine. Each co-edge should be reversed on one face and not reversed on the other. Outer loops for a face should be anticlockwise with respect to the face normal (pointing outwards for a solid). So the edge is indicated as reversed on the face if it can't satisfy that e.g. the edge of two adjoining faces needs to be reversed on one of them.
-
 
 <center>
 <img src="img/rpt_brep_organisation.png" alt="BRep organisation" title="BRep organisation" width="500"/> <!-- Pixel Height: 572 Pixel Width: 729 -->
@@ -417,11 +417,16 @@ Many thanks to Richard and Luiz Henrique for the good advice, illuminating discu
 ####<a name="3"></a> Modify View Workset Editable
 
 The long-standing question
-on [Toposurface &ndash Change interior point to boundary point](https://forums.autodesk.com/t5/revit-api-forum/toposurface-change-interior-point-to-boundary-point/m-p/12015969) finally
+on [Toposurface &ndash; Change interior point to boundary point](https://forums.autodesk.com/t5/revit-api-forum/toposurface-change-interior-point-to-boundary-point/m-p/12015969) finally
 receives a clear and succinct solution by Mitchell Currie
 of [Struxi](https://www.struxi.com/):
 
-**Question:** Is there any way to change an interior point to a boundary point or vise versa using Revit's API? I want to do this so I can display the boundary of the topography I have generated correctly. I can't seem to find any resources discussing this topic.
+**Question:** Is there any way to change an interior point to a boundary point or vice versa using Revit's API?
+I want to do this so I can display the boundary of the topography I have generated correctly.
+
+<center>
+<img src="img/toposurface_boundary_interior_point.png" alt="Toposurface boundary and interior points" title="Toposurface boundary and interior points" width="600"/> <!-- Pixel Height: 726 Pixel Width: 1,180 -->
+</center>
 
 **Answer:** Use a subregion and hide it.
 
