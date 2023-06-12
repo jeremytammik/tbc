@@ -72,7 +72,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### BRepBuilder
 
-An in-depth discussion of Revit geometry generation, Toposurface issue and a look at where the softeware development industry may be headed:
+An in-depth discussion of Revit geometry generation, Toposurface issue and a look at where the software development industry may be headed:
 
 - [BRepBuilder analysis, tips and tricks](#2)
 - [Modify view workset editable](#3)
@@ -445,10 +445,10 @@ by [Ab Advany](https://twitter.com/advany):
 </center>
 
 Supervised a project 2 week ago.
-Two programmers where hired to create an MVP.
+Two programmers were hired to create an MVP.
 I have worked with both before:
 
-- Alex from Germany. 100% code. 19 years experience.
+- Alex from Germany. 100% code. 19 years' experience.
 - Hamid from Pakistan. Code + Copilot + GPT-4 + no-code. 4 years experience.
 
 What do you think happened?
