@@ -412,13 +412,17 @@ public static class TessellatedShapeCreatorUtils
 
 If you are working with a Revit surface, `BRepBuilder` is the way to go.
 
+Many thanks to Richard and Luiz Henrique for the good advice, illuminating discussion and great sample code!
+
 ####<a name="3"></a> Modify View Workset Editable
 
 The long-standing question
 on [Toposurface &ndash Change interior point to boundary point](https://forums.autodesk.com/t5/revit-api-forum/toposurface-change-interior-point-to-boundary-point/m-p/12015969) finally
-receives a clear and succinct solution
+receives a clear and succinct solution by Mitchell Currie
+of [Struxi](https://www.struxi.com/):
 
 **Question:** Is there any way to change an interior point to a boundary point or vise versa using Revit's API? I want to do this so I can display the boundary of the topography I have generated correctly. I can't seem to find any resources discussing this topic.
 
-**Answer:** Use a subregion and hide it
+**Answer:** Use a subregion and hide it.
 
+Thank you for the answer!
