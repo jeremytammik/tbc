@@ -6,7 +6,6 @@
 
 <!---
 
-
 - BRepBuilder fails on very simple example
   https://forums.autodesk.com/t5/revit-api-forum/brepbuilder-fails-on-very-simple-example/m-p/12015942#M71909
   /Users/jta/a/doc/revit/tbc/git/a/img/rpt_brep_organisation.png
@@ -530,6 +529,14 @@ If you are working with a Revit surface BRepBuilder is the way to go.
 
 ####<a name="5"></a> Modify View Workset Editable
 
+The long-standing question
+on [Toposurface &ndash Change interior point to boundary point](https://forums.autodesk.com/t5/revit-api-forum/toposurface-change-interior-point-to-boundary-point/m-p/12015969) finally
+receives a clear and succinct solution
+
+**Question:** Is there any way to change an interior point to a boundary point or vise versa using Revit's API? I want to do this so I can display the boundary of the topography I have generated correctly. I can't seem to find any resources discussing this topic.
+
+**Answer:** Use a subregion and hide it
+
 
 
 **Question:**
@@ -543,21 +550,4 @@ If you are working with a Revit surface BRepBuilder is the way to go.
 
 **Answer:**
 
-long-standing question finally receives a clear and succinct solution
 
- ericabbot 3246 Views, 11 Replies
-2019-03-15 01:37 PM
-Toposurface - Change interior point to boundary point?
-Good afternoon,
-
-
-
-Is there any way to change an interior point to a boundary point or vise versa using Revit's API? I want to do this so I can display the boundary of the topography I have generated correctly. I can't seem to find any resources discussing this topic.
-
-
-
-Thank you in advance!
-
- Mitchell.currie in reply to: ericabbot
-2023-06-06 05:14 PM
-Use a subregion and hide it
